@@ -139,7 +139,7 @@ export function UbinLab() {
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">
           Lab results
           <span data-lab-sync={sinkron} className="ml-2 font-bold normal-case tracking-normal text-neutral-400">
-            {{ lokal: '· this device only', menyinkron: '· syncing…', tersinkron: '· saved to your account', gagal: '· not synced yet — kept on this device' }[sinkron]}
+            {{ lokal: '· this device only', menyinkron: '· syncing…', tersinkron: '· saved to your account', gagal: '· not synced yet — retrying' }[sinkron]}
           </span>
         </h2>
         <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">

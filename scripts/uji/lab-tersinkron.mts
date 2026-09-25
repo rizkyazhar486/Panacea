@@ -22,3 +22,11 @@ assert.match(srv, /app\.get\('\/api\/lab-log', requireAuth/, 'GET lab-log tanpa 
 assert.match(srv, /app\.put\('\/api\/lab-log', requireAuth/, 'PUT lab-log tanpa autentikasi')
 assert.doesNotMatch(srv, /\/api\/lab-log\/:/, 'lab-log menerima id dari jalur — pintu IDOR')
 console.log('lab-tersinkron: arah sinkron benar, status jujur, endpoint terautentikasi tanpa id di jalur')
+
+// Coba ulang otomatis setelah gagal (dulu: tunggu perubahan berikutnya).
+{
+  const s = readFileSync('src/lib/labSync.ts', 'utf8')
+  assert.match(s, /if \(s !== 'gagal'\) \{ percobaan = 0; return \}/, 'coba ulang berjalan juga saat belum login atau sudah tersinkron')
+  assert.match(s, /addEventListener\('online'/, 'kembali online tidak memicu sinkron')
+  assert.match(s, /JEDA_ULANG_MS = \[5_000, 15_000, 60_000, 300_000\]/, 'jadwal coba ulang berubah tanpa gate diperbarui')
+}

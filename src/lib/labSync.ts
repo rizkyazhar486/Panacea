@@ -52,14 +52,26 @@ export async function sinkronLab(): Promise<StatusSinkronLab> {
 
 let dipasang = false
 let tunda = 0
+let percobaan = 0
+let ulang = 0
+// Coba ulang setelah gagal jaringan/server: 5 s, 15 s, 60 s, lalu tiap 5 menit;
+// juga segera saat peramban kembali online. Tidak mengulang saat belum login.
+export const JEDA_ULANG_MS = [5_000, 15_000, 60_000, 300_000] as const
+export function jedaUlang(ke: number): number { return JEDA_ULANG_MS[Math.min(Math.max(ke, 0), JEDA_ULANG_MS.length - 1)] }
+function jadwalkanUlang(s: StatusSinkronLab) {
+  window.clearTimeout(ulang)
+  if (s !== 'gagal') { percobaan = 0; return }
+  ulang = window.setTimeout(() => void sinkronLab().then(jadwalkanUlang), jedaUlang(percobaan++))
+}
 /** Pasang sekali: sinkron saat mulai, lalu dorong setiap perubahan lokal (debounce 1,5 s). */
 export function pasangSinkronLab(): void {
   if (dipasang || typeof window === 'undefined') return
   dipasang = true
-  void sinkronLab()
+  void sinkronLab().then(jadwalkanUlang)
   window.addEventListener('panacea:lab', (e) => {
     if ((e as CustomEvent).detail?.asal !== 'lokal') return
     window.clearTimeout(tunda)
-    tunda = window.setTimeout(() => void sinkronLab(), 1500)
+    tunda = window.setTimeout(() => void sinkronLab().then(jadwalkanUlang), 1500)
   })
+  window.addEventListener('online', () => { percobaan = 0; void sinkronLab().then(jadwalkanUlang) })
 }
