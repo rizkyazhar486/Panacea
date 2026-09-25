@@ -5,6 +5,7 @@ import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { auditTubuh } from '../lib/rujukanTubuh'
 import { IconActivity } from '../components/icons'
 import { getVitals } from '../lib/healthVitals'
+import { UbinLab } from '../components/UbinLab'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,6 +119,10 @@ export function PusatTubuh() {
   return (
     <div className="space-y-4">
       <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
+      {/* Darah adalah fondasi Longevity-First (docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md
+          §4–5). Sebelumnya ubin lab hanya muncul bila dipilih manual di papan
+          widget beranda — tidak aktif secara bawaan. */}
+      <UbinLab />
       <HalamanTab
       judul="Body Signals"
       subjudul="Phone-first checks, energy, heart, sleep, movement and clinical trackers"

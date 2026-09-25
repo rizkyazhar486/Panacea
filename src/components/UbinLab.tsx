@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, umurHari, type ButirLab, type JenisLab } from '../lib/lab'
+import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget hasil laboratorium — dimasukkan sendiri, digambar perjalanannya.
@@ -44,6 +45,45 @@ function Garis({ butir, jenis }: { butir: ButirLab[]; jenis: JenisLab }) {
       ))}
       <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
     </svg>
+  )
+}
+
+const LABEL_TREN: Record<StatusTren, { teks: string; kelas: string }> = {
+  'belum-cukup-data': { teks: 'Building your baseline', kelas: 'bg-neutral-100 text-neutral-500 dark:bg-white/8 dark:text-neutral-300' },
+  stabil: { teks: 'Stable for you', kelas: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300' },
+  pantau: { teks: 'Watch', kelas: 'bg-amber-500/14 text-amber-700 dark:text-amber-300' },
+  'perubahan-bermakna': { teks: 'Meaningful change', kelas: 'bg-orange-500/14 text-orange-700 dark:text-orange-300' },
+  'bicarakan-dengan-dokter': { teks: 'Discuss with a doctor', kelas: 'bg-rose-500/14 text-rose-700 dark:text-rose-300' },
+}
+
+function fmt(n: number): string {
+  return Math.abs(n) >= 100 ? n.toFixed(0) : Math.abs(n) >= 10 ? n.toFixed(1) : n.toFixed(2)
+}
+
+// Satu baris: letak hasil terakhir terhadap garis dasar PRIBADI. Penjelasan
+// dan angka rinci ada di balik ℹ️ supaya gulir utama tetap ringkas.
+function BarisTren({ butir, jenis }: { butir: ButirLab[]; jenis: JenisLab }) {
+  const t = analisisTrenLab(butir, jenis)
+  if (!t) return null
+  const label = LABEL_TREN[t.status]
+  return (
+    <details className="mt-2" data-lab-trend={t.status}>
+      <summary className="flex cursor-pointer list-none items-center gap-2">
+        <span className={`t-mikro rounded-full px-2 py-0.5 font-black ${label.kelas}`}>{label.teks}</span>
+        {t.garisDasar !== null && (
+          <span className="t-mikro tabular-nums text-neutral-500 dark:text-neutral-400">
+            {t.selisih! >= 0 ? '+' : '−'}{fmt(Math.abs(t.selisih!))} vs your usual {fmt(t.garisDasar)}
+          </span>
+        )}
+        <span className="t-mikro ml-auto text-neutral-400" aria-hidden>ℹ️</span>
+      </summary>
+      <div className="t-mikro mt-1.5 space-y-0.5 leading-snug text-neutral-500 dark:text-neutral-400">
+        <p>{t.alasan}</p>
+        {t.rentangPribadi && <p>Your usual range: {fmt(t.rentangPribadi[0])}–{fmt(t.rentangPribadi[1])} {jenis.satuan} (median ± 2 MAD of your earlier results).</p>}
+        {t.lajuPerTahun !== null && <p>Rate since the previous result: {t.lajuPerTahun >= 0 ? '+' : '−'}{fmt(Math.abs(t.lajuPerTahun))} {jenis.satuan} per year.</p>}
+        <p>A monitoring signal from your own history, not a diagnosis.</p>
+      </div>
+    </details>
   )
 }
 
@@ -164,9 +204,10 @@ export function UbinLab() {
                   </div>
 
                   <Garis butir={butir} jenis={j} />
+                  <BarisTren butir={butir} jenis={j} />
 
                   <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
-                    Rujukan: {j.sumber}
+                    Reference: {j.sumber}
                   </p>
                   {j.catatan && <p className="t-mikro mt-0.5 leading-snug text-neutral-400">{j.catatan}</p>}
                   <p className="t-mikro mt-1 leading-snug text-neutral-400">
