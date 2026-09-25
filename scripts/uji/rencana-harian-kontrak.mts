@@ -48,7 +48,9 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
 {
   const { readFileSync } = await import('node:fs')
   const srv = readFileSync('server/src/index.ts', 'utf8')
-  const potong = (awal: string) => srv.slice(srv.indexOf(awal), srv.indexOf(awal) + 1100)
+  // Satu blok rute saja: berhenti di rute berikutnya, supaya pola dari rute
+// tetangga tidak ikut meluluskan pemeriksaan (sabotase pertama lolos karena ini).
+  const potong = (awal: string) => { const a = srv.indexOf(awal); assert.ok(a >= 0, `rute hilang: ${awal}`); const z = srv.indexOf('\napp.', a + 1); return srv.slice(a, z < 0 ? undefined : z) }
   for (const rute of ["app.post('/api/clinician/lab-shares/:id/care-plan'", "app.get('/api/clinician/lab-shares/:id/care'"]) {
     const b = potong(rute)
     assert.ok(b.startsWith(rute + ', requireAuth'), `${rute} tanpa autentikasi`)
