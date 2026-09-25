@@ -24,8 +24,16 @@ export function CekHarian() {
     if (r.terkirim) { setPesan('Saved answers sent to your doctor.'); void muat() }
     if (r.ditolak.length) setPesan(`A saved check-in could not be sent: ${r.ditolak[0]}`)
   }
+  // Pengingat harian (opt-in), dikirim server lewat Web Push pada jam lokal pengguna.
+  const [ingat, setIngat] = useState<{ nyala: boolean; jam: string }>({ nyala: false, jam: '19:00' })
+  const simpanIngat = (v: { nyala: boolean; jam: string }) => {
+    setIngat(v)
+    api.saveSettings({ notifCekHarian: v.nyala, cekHarianHHMM: v.jam, tzOffsetMin: -new Date().getTimezoneOffset() })
+      .catch(() => setPesan('Could not save the reminder — try again.'))
+  }
   useEffect(() => {
     if (!backendEnabled) return
+    api.getSettings().then((s) => setIngat({ nyala: s.notifCekHarian === true, jam: typeof s.cekHarianHHMM === 'string' ? s.cekHarianHHMM : '19:00' })).catch(() => {})
     void muat(); void kuras()
     const on = () => void kuras()
     window.addEventListener('online', on)
@@ -94,6 +102,14 @@ export function CekHarian() {
           <button type="button" onClick={() => void kirim()} className="t-kecil min-h-[44px] w-full rounded-xl bg-brand font-bold text-white">Send to my doctor</button>
         </div>
       )}
+      <label className="t-mikro mt-2 flex items-center justify-between gap-2 text-neutral-500" data-pengingat-cek>
+        <span>Remind me daily if I haven't checked in</span>
+        <span className="flex items-center gap-2">
+          <input type="time" value={ingat.jam} aria-label="Check-in reminder time" onChange={(e) => simpanIngat({ ...ingat, jam: e.target.value })}
+            className="rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums dark:border-white/12" />
+          <input type="checkbox" checked={ingat.nyala} aria-label="Daily check-in reminder" onChange={(e) => simpanIngat({ ...ingat, nyala: e.target.checked })} />
+        </span>
+      </label>
       {pesan && <p role="status" className="t-mikro mt-1.5 font-bold text-neutral-500">{pesan}</p>}
       <p className="t-mikro mt-1.5 text-neutral-400">Not an emergency service — if you feel very unwell, call 119 or go to the nearest emergency room.</p>
     </section>

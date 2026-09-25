@@ -140,6 +140,7 @@ import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
+import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -2035,6 +2036,20 @@ setInterval(() => {
     // Mesin aturan: paling banyak satu notifikasi per detak per orang, dengan
     // kuota harian dan jam senyap. Lihat aturanNotif.ts.
     jalankanAturanNotif(u.id, u.email).catch(() => {})
+    // Pengingat cek harian: hanya bila rencana aktif (izin berlaku) dan hari ini belum mengisi.
+    try {
+      const prefs = getSettings(u.id)
+      if (prefs.notifCekHarian === true) {
+        const kini = new Date()
+        const aktif = listCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
+        const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
+        const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
+        if (p.alasan === 'send') {
+          saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal })
+          notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian').catch(() => {})
+        }
+      }
+    } catch { /* satu pengguna gagal tidak menghentikan yang lain */ }
   }
 }, 60_000)
 
