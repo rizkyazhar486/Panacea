@@ -62,13 +62,13 @@ workflows:
     maturity_level: PARTIAL  # audited 2026-09-25 on main 2bf8335
     clinical_validation: none
     dimensions:
-      functional_completeness: medium  # AI-EMR record (anamnesis, exam, problems, dx, plan, signing, care episodes), deterministic order/lab-interpretation rules (emrPipeline.ts); one record per patient, not per encounter
+      functional_completeness: medium  # AI-EMR now preserves multiple encounters by stable record.id while retaining records[patientId] as a backward-compatible current pointer; clinician can open encounter history; explicit new-encounter creation entrypoint still needs audit
       integration: medium  # server-stamped signed EMR now projects into canonical longitudinal state for patient accounts via emrLongitudinalBridge; practice-vs-account IDs remain separate namespaces and study linkage is still absent
       reliability: medium  # 2026-09-25: clinical writes queued/retried with visible status (328b12a); appends idempotent by id
       usability: unknown  # no clinician usability test yet (SUS instrument now exists for studies)
       clinical_quality: unknown  # rules deterministic and readable; no clinical review recorded
       safety_security: medium  # /api/clinical access is scoped; signatures are server-stamped; 2026-09-26 stale-signature reuse closed so patient clinical edits invalidate the old clinician cap while patient-authored surgery consent remains separately mutable; no external security review
-      observability_testing: medium  # server uji aksesKlinis/idempotenKlinis/rekamKlinis; root antrean-klinis; HTTP proofs; browser offline sync E2E
+      observability_testing: medium  # server uji aksesKlinis/idempotenKlinis/rekamKlinis/rekamEncounter; root antrean-klinis + emr encounter/semantic-state gates; HTTP proofs; browser offline sync E2E
     acceptance_evidence:
       - "b1402c5 clinical data scoped to clinicians or own self-record (HTTP proof)"
       - "328b12a clinical writes never silently lost (browser offline->online E2E)"
@@ -76,9 +76,11 @@ workflows:
       - "2026-09-26: src/lib/emrLongitudinalBridge.ts + scripts/uji/emr-status-longitudinal.mts project only server-signed EMR semantics (signed note, diagnosis, verified plan) into canonical state; unsigned AI drafts fail closed"
       - "2026-09-26: server/uji/rekamKlinis.uji.ts proves patient clinical edits cannot retain a stale clinician signature or physical-exam verification; prior signed version remains archived"
       - "2026-09-26: successful record writes reconcile the server-returned canonical signer/verification state into the client immediately; EMR UI renders draft.signedBy rather than a local settings name"
-    known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, ai_draft_vs_clinician_state_not_modelled_per_field, clinician_usability_test, clinical_validation]
-    next_action: replace_one_record_per_patient_with_encounter_model_then_make_ai_draft_vs_clinician_state_explicit_per_field
-    last_audited_commit: 2bf8335
+      - "2026-09-26: server/src/rekamEncounter.ts + /api/clinical/records/:patientId preserve independent encounters by record.id, lazily migrate the legacy latest record, and scope encounter/history reads to the existing patient authorization boundary"
+      - "2026-09-26: src/lib/emrSemanticState.ts models field origin separately from review state; unsigned/client-only signatures stay unreviewed; AI-origin diagnosis/plan remains AI-origin after clinician review; semantics are visible in AI-EMR and carried into canonical longitudinal event tags"
+    known_gaps: [practice_patient_vs_account_identity_split, explicit_new_encounter_creation_entrypoint_needs_audit, field_origin_metadata_missing_for_history_exam_problem_list, clinician_usability_test, clinical_validation]
+    next_action: resolve_practice_patient_vs_account_identity_then_audit_explicit_new_encounter_creation_and_capture_missing_field_origin_metadata
+    last_audited_commit: 8a2e3c8b
 
   - workflow_id: body.spatial_clinical_context
     name: Patient or educational context to spatial Body Exposure projection
