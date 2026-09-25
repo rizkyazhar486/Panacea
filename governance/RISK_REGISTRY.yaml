@@ -1,0 +1,39 @@
+schema_version: 1
+status: living_source_of_truth
+rules:
+  - "Record material product, clinical, privacy, security, data-integrity, regulatory and scientific risks."
+  - "Do not downgrade risk without evidence."
+  - "Link mitigations to code/tests/evidence where possible."
+
+risks:
+  - risk_id: risk.fragmented_patient_truth
+    category: data_integrity
+    severity: high
+    state: open
+    description: Multiple modules may model the same person independently and diverge.
+    mitigation: Converge on canonical patient state and explicit write authority.
+    evidence: [requires_repository_audit]
+
+  - risk_id: risk.feature_sprawl
+    category: product_architecture
+    severity: high
+    state: open
+    description: Breadth may grow faster than workflow maturity and integration.
+    mitigation: Apply maturity-first priority engine and research-to-implementation gate.
+    evidence: [owner_maturation_directive_2026_09_25]
+
+  - risk_id: risk.clinical_overclaim
+    category: clinical_safety
+    severity: critical
+    state: open
+    description: Technical output may be mistaken for clinically validated decision support.
+    mitigation: Separate technically_working, clinically_reviewed and clinically_validated states; preserve provenance and human review.
+    evidence: [PANACEA_CONSTITUTION.md, PANACEA_HUMANITY_10_CHARTER.md]
+
+  - risk_id: risk.agent_context_loss
+    category: governance
+    severity: high
+    state: mitigated_in_part
+    description: Future models may restart from incomplete context and duplicate or contradict prior architecture.
+    mitigation: Root agent contract plus human-readable architecture plus machine-readable registries and autonomous R&D loop.
+    evidence: [PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
