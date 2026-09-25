@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
+import { bangunBundelRiwayat, ringkasBundel, keJson } from '../lib/fhir'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget hasil laboratorium — dimasukkan sendiri, digambar perjalanannya.
@@ -112,6 +113,25 @@ export function UbinLab() {
 
   const aktif = terisi.find((t) => t.jenis.id === pilih) ?? terisi[0]
 
+  // Ekspor SELURUH riwayat sebagai FHIR — satu Observation per pengambilan
+  // darah dengan tanggalnya sendiri, bukan hanya nilai terakhir. Ini yang
+  // dibawa ke klinik atau EMR lain, bukan tangkapan layar widget ini.
+  const unduhRiwayat = () => {
+    const { bundel, jenisDilewati } = bangunBundelRiwayat(ambilLab())
+    const r = ringkasBundel(bundel)
+    const blob = new Blob([keJson(bundel)], { type: 'application/fhir+json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `panaceamed-lab-history-fhir-${tanggalHariIni()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    const lewat = jenisDilewati.length
+      ? ` · ${jenisDilewati.length} type(s) not yet LOINC-coded and skipped`
+      : ''
+    setTersimpan(`Exported ${r.observasi} result(s) as FHIR (${r.berkode} LOINC-coded)${lewat}`)
+  }
+
   const [galat, setGalat] = useState<string | null>(null)
   // Peringatan satuan harus dikonfirmasi dengan menekan Save sekali lagi pada
   // nilai yang sama; mengubah nilai/jenis/tanggal membatalkan konfirmasinya.
@@ -141,9 +161,16 @@ export function UbinLab() {
             {{ lokal: '· this device only', menyinkron: '· syncing…', tersinkron: '· saved to your account', gagal: '· not synced yet — kept on this device' }[sinkron]}
           </span>
         </h2>
-        <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          {buka ? 'Close' : '+ Add'}
-        </button>
+        <div className="flex items-center gap-3">
+          {terisi.length > 0 && (
+            <button onClick={unduhRiwayat} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500 dark:text-neutral-300">
+              FHIR ⇩
+            </button>
+          )}
+          <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
+            {buka ? 'Close' : '+ Add'}
+          </button>
+        </div>
       </div>
 
       <div className="kaca rounded-3xl p-3">

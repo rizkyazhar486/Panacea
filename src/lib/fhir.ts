@@ -98,6 +98,16 @@ export const UKURAN: Ukuran[] = [
   },
   { kunci: 'trigliserida', loinc: '2571-8', display: 'Triglyceride [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
   { kunci: 'hdl', loinc: '2085-9', display: 'Cholesterol in HDL [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
+  { kunci: 'apob', loinc: '1884-6', display: 'Apolipoprotein B [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
+  {
+    kunci: 'ldl', loinc: '2089-1', display: 'Cholesterol in LDL [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory',
+    catatan: 'Method-unspecified LDL code: the source report may be direct-measured or Friedewald-calculated, and that method is not preserved.',
+  },
+  { kunci: 'tsh', loinc: '3016-3', display: 'Thyrotropin [Units/volume] in Serum or Plasma', satuan: 'mIU/L', ucum: 'm[IU]/L', kategori: 'laboratory' },
+  { kunci: 'b12', loinc: '2132-9', display: 'Cobalamin (Vitamin B12) [Mass/volume] in Serum or Plasma', satuan: 'pg/mL', ucum: 'pg/mL', kategori: 'laboratory' },
+  { kunci: 'ferritin', loinc: '2276-4', display: 'Ferritin [Mass/volume] in Serum or Plasma', satuan: 'ng/mL', ucum: 'ng/mL', kategori: 'laboratory' },
+  { kunci: 'hb', loinc: '718-7', display: 'Hemoglobin [Mass/volume] in Blood', satuan: 'g/dL', ucum: 'g/dL', kategori: 'laboratory' },
+  { kunci: 'asamUrat', loinc: '3084-1', display: 'Urate [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
 ]
 
 // Angka turunan. Tidak satu pun memakai LOINC, dan itu disengaja: masing-masing
@@ -189,6 +199,101 @@ export function bangunBundel(m: MasukanEkspor): Bundel {
   }
 
   return { resourceType: 'Bundle', type: 'collection', timestamp: waktu, entry }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EKSPOR RIWAYAT LAB — satu Observation per butir pengambilan darah.
+//
+// bangunBundel() di atas hanya mengekspor NILAI SEKARANG pada SATU waktu.
+// Riwayat lab yang sebenarnya (lib/lab.ts, disinkronkan ke server oleh
+// labLog.ts) menyimpan banyak pengambilan darah pada tanggal yang berbeda-
+// beda, dan tanggal itulah yang secara klinis berarti — HbA1c dua tahun lalu
+// bukan HbA1c hari ini. Fungsi ini mengekspor SELURUH riwayat, satu Observation
+// per butir, dengan effectiveDateTime = tanggal pengambilan darah yang
+// sesungguhnya, bukan waktu unduhan.
+//
+// Jenis lab yang metodenya tidak diketahui dari data yang tersimpan (mis. eGFR
+// dan vitamin D dari lembar hasil eksternal — bisa CKD-EPI atau MDRD, bisa
+// D3 saja atau D2+D3 total) SENGAJA TIDAK dipetakan di sini. Kode LOINC yang
+// salah lebih berbahaya daripada butir yang tidak diekspor sama sekali.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** id jenis di lib/lab.ts (JENIS_LAB) → kunci di UKURAN. Jenis yang tidak
+ * tercantum di sini (misalnya eGFR dan vitamin D yang metodenya tidak
+ * diketahui) tidak diekspor sebagai Observation berkode LOINC. */
+export const PEMETAAN_JENIS_LAB: Record<string, string> = {
+  hba1c: 'hba1c',
+  gdp: 'glukosaPuasaMgdL',
+  apob: 'apob',
+  ldl: 'ldl',
+  hdl: 'hdl',
+  tg: 'trigliserida',
+  kreatinin: 'kreatininMgdL',
+  sgot: 'ast',
+  sgpt: 'alt',
+  tsh: 'tsh',
+  b12: 'b12',
+  ferritin: 'ferritin',
+  hb: 'hb',
+  crp: 'crpMgL',
+  asamUrat: 'asamUrat',
+  albumin: 'albuminGdL',
+  mcv: 'mcv',
+  rdw: 'rdw',
+  alp: 'alp',
+  wbc: 'wbc',
+  limfosit: 'limfositPersen',
+}
+
+export interface ButirRiwayatLab { id: string; tanggal: string; nilai: number }
+
+/**
+ * Membangun Bundle FHIR R4 dari seluruh riwayat lab, satu Observation per
+ * butir dengan tanggal pengambilan darahnya sendiri sebagai effectiveDateTime.
+ * Jenis yang tidak ada di PEMETAAN_JENIS_LAB dilewati, tidak dipaksakan ke
+ * kode lokal — pemakainya diberi tahu lewat ringkasBundel() + jenisDilewati.
+ */
+export function bangunBundelRiwayat(
+  riwayat: Record<string, ButirRiwayatLab[]>,
+  pasien?: MasukanEkspor['pasien'],
+): { bundel: Bundel; jenisDilewati: string[] } {
+  hitung = 0
+  const waktu = waktuFhir()
+  const idPasien = 'panaceamed-local'
+  const entry: Bundel['entry'] = []
+
+  const p: Pasien = { resourceType: 'Patient', id: idPasien }
+  if (pasien?.nama) p.name = [{ text: pasien.nama }]
+  if (pasien?.kelamin) p.gender = pasien.kelamin === 'F' ? 'female' : 'male'
+  if (pasien?.lahir && /^\d{4}-\d{2}-\d{2}$/.test(pasien.lahir)) p.birthDate = pasien.lahir
+  entry.push({ fullUrl: `urn:uuid:${idPasien}`, resource: p })
+
+  const jenisDilewati: string[] = []
+  for (const [jenis, butir] of Object.entries(riwayat)) {
+    const kunci = PEMETAAN_JENIS_LAB[jenis]
+    const u = kunci ? SEMUA.get(kunci) : undefined
+    if (!u) { if (butir.length) jenisDilewati.push(jenis); continue }
+    for (const b of butir) {
+      if (!Number.isFinite(b.nilai)) continue
+      const coding: Koding[] = u.loinc
+        ? [{ system: LOINC, code: u.loinc, display: u.display }]
+        : [{ system: SISTEM_LOKAL, code: u.kunci, display: u.display }]
+      const obs: Observasi = {
+        resourceType: 'Observation',
+        id: idBaru(u.kunci),
+        status: 'final',
+        category: [{ coding: [{ system: KATEGORI, code: u.kategori, display: u.kategori }] }],
+        code: { coding, text: u.display },
+        subject: { reference: `Patient/${idPasien}` },
+        effectiveDateTime: b.tanggal,
+        valueQuantity: { value: b.nilai, unit: u.satuan, system: UCUM, code: u.ucum },
+      }
+      if (u.catatan) obs.note = [{ text: u.catatan }]
+      entry.push({ fullUrl: `urn:uuid:${obs.id}`, resource: obs })
+    }
+  }
+
+  return { bundel: { resourceType: 'Bundle', type: 'collection', timestamp: waktu, entry }, jenisDilewati }
 }
 
 /** Berapa observasi yang benar-benar ada isinya — dipakai untuk memberi tahu pengguna sebelum ia mengunduh. */

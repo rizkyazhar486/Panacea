@@ -7,7 +7,7 @@
 // sistem penerima memakainya untuk sebuah keputusan.
 
 import {
-  bangunBundel, ringkasBundel, keJson, waktuFhir, UKURAN, TURUNAN, SISTEM_LOKAL,
+  bangunBundel, bangunBundelRiwayat, PEMETAAN_JENIS_LAB, ringkasBundel, keJson, waktuFhir, UKURAN, TURUNAN, SISTEM_LOKAL,
   type Observasi,
 } from '../../src/lib/fhir'
 
@@ -147,6 +147,41 @@ ok('kunci tidak berulang di seluruh kamus', (() => {
 })())
 ok('setiap ukuran punya kode UCUM', [...UKURAN, ...TURUNAN].every((u) => u.ucum.length > 0))
 ok('setiap turunan menerangkan dirinya', TURUNAN.every((u) => (u.catatan?.length ?? 0) > 20))
+
+// ── Riwayat lab: satu Observation per butir, tanggal darah, bukan waktu unduh ─
+{
+  const riwayat = {
+    hba1c: [{ id: 'a', tanggal: '2024-03-01', nilai: 5.4 }, { id: 'b', tanggal: '2025-09-10', nilai: 5.6 }],
+    kreatinin: [{ id: 'c', tanggal: '2025-01-15', nilai: 1.0 }],
+    egfr: [{ id: 'd', tanggal: '2025-01-15', nilai: 88 }], // metode tak diketahui — harus dilewati
+  }
+  const { bundel: r, jenisDilewati } = bangunBundelRiwayat(riwayat)
+  const obs = obsDari(r)
+  ok('satu Observation per butir riwayat', obs.length === 3)
+  ok('effectiveDateTime memakai tanggal pengambilan darah, bukan sekarang',
+    obs.filter((o) => o.code.text.includes('A1c')).every((o) => ['2024-03-01', '2025-09-10'].includes(o.effectiveDateTime)))
+  ok('jenis tanpa metode yang jelas dilewati, tidak dipetakan',
+    !obs.some((o) => o.effectiveDateTime === '2025-01-15' && o.valueQuantity.value === 88))
+  ok('jenis yang dilewati dilaporkan', jenisDilewati.includes('egfr'))
+  ok('jenis yang dilewati tidak menyertakan yang benar-benar dipetakan', !jenisDilewati.includes('hba1c') && !jenisDilewati.includes('kreatinin'))
+  ok('id observasi riwayat tidak berulang', new Set(obs.map((o) => o.id)).size === obs.length)
+  ok('semua observasi riwayat memakai LOINC (tidak ada jenis lokal di contoh ini)',
+    obs.every((o) => o.code.coding[0].system === 'http://loinc.org'))
+  const ring = ringkasBundel(r)
+  ok('ringkasan riwayat menghitung tiga observasi', ring.observasi === 3)
+}
+{
+  // Riwayat kosong tetap membentuk bundel yang sah, hanya berisi Patient.
+  const { bundel: r, jenisDilewati } = bangunBundelRiwayat({})
+  ok('riwayat kosong menghasilkan bundel dengan hanya Patient', r.entry.length === 1)
+  ok('riwayat kosong tidak melaporkan jenis yang dilewati', jenisDilewati.length === 0)
+}
+{
+  // Setiap jenis di peta harus benar-benar menunjuk kunci yang ada di UKURAN.
+  const semua = new Set([...UKURAN, ...TURUNAN].map((u) => u.kunci))
+  ok('setiap pemetaan jenis lab menunjuk kunci UKURAN/TURUNAN yang ada',
+    Object.values(PEMETAAN_JENIS_LAB).every((k) => semua.has(k)))
+}
 
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
 if (gagal) process.exit(1)
