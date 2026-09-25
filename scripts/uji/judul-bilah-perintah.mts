@@ -126,4 +126,11 @@ const cocok = (n: { to: string; end?: boolean }, pathname: string) =>
   }
 }
 
+// ── Shell harus memberi katalog LENGKAP sebagai cadangan, bukan hanya menu
+// harian: /gizi (Nutrition Centre) hanya ada di KATALOG dan tampil "Panaceamed.id".
+{
+  const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
+  assert.match(shell, /judulRute\(loc\.pathname, items, \[\.\.\.nav, \.\.\.KATALOG\], navMatches\)/, 'judul bilah perintah tidak lagi mencari di KATALOG — rute katalog jatuh ke nama merek')
+}
+
 console.log('judul-bilah-perintah: setiap super-page bernama sendiri, rute tersembunyi tetap bernama, dan lebar judul tidak dikunci lagi')
