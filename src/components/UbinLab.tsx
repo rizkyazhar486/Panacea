@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, periksaRujukanLab, rentangUntuk, type ButirLab, type JenisLab } from '../lib/lab'
 import { BagikanLabKeDokter } from './BagikanLabKeDokter'
+import { ImporLembarLab } from './ImporLembarLab'
 import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
@@ -295,6 +296,7 @@ export function UbinLab() {
             })()}
           </>
         )}
+        <ImporLembarLab />
         <BagikanLabKeDokter />
       </div>
     </section>
