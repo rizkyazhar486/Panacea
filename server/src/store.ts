@@ -1,11 +1,12 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
+import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
@@ -330,8 +331,10 @@ function loadFile() {
     try {
       db = JSON.parse(readFileSync(DB_PATH, 'utf-8'))
       muatConnect(db.connect)
-    } catch {
-      /* keep defaults */
+    } catch (e) {
+      // Jangan biarkan simpan berikutnya menimpa berkas rusak dengan keadaan kosong.
+      const ke = amankanBerkasRusak(DB_PATH)
+      console.error(`[store] data file unreadable (${(e as Error).message}); moved to ${ke ?? '(move failed)'}; starting empty`)
     }
   }
 }
@@ -342,18 +345,39 @@ function save() {
   // diam-diam berhenti bekerja karena sidik lama tidak akan pernah cocok lagi.
   try { db.connect = isiConnect() } catch { /* modul belum siap */ }
   // Local file (harmless; ephemeral on hosts like Render).
+  const teks = JSON.stringify(db, null, 2)
   try {
-    writeFileSync(DB_PATH, JSON.stringify(db, null, 2))
-  } catch {
-    /* ignore in read-only envs */
+    tulisAtomik(DB_PATH, teks)
+    if (!mongoCol) catatBerhasil(Buffer.byteLength(teks))
+  } catch (e) {
+    if (!mongoCol) { catatGagal(e); console.error('[store] file save failed:', (e as Error).message) }
   }
   // Mongo (permanent), debounced to coalesce rapid writes.
   if (mongoCol) {
     if (saveTimer) clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => {
-      mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true }).catch(() => {})
-    }, 400)
+    saveTimer = setTimeout(() => { saveTimer = null; void simpanMongo() }, 400)
   }
+}
+
+async function simpanMongo(): Promise<void> {
+  const ukuran = Buffer.byteLength(JSON.stringify(db))
+  if (ukuran >= BATAS_DOKUMEN_MONGO) {
+    catatGagal(new Error(`state ${ukuran} bytes exceeds the MongoDB 16 MB document limit`))
+    console.error('[store] NOT SAVED to MongoDB: state exceeds 16 MB document limit')
+    return
+  }
+  try {
+    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
+    catatBerhasil(ukuran)
+  } catch (e) {
+    catatGagal(e)
+    console.error('[store] MongoDB save failed:', (e as Error).message)
+  }
+}
+
+/** Tulis segera simpan yang masih tertunda (dipanggil saat SIGTERM/deploy). */
+export async function flushStore(): Promise<void> {
+  if (mongoCol && saveTimer) { clearTimeout(saveTimer); saveTimer = null; await simpanMongo() }
 }
 
 // Call once at boot before serving requests.
