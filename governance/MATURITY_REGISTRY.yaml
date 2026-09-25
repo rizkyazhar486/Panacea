@@ -39,12 +39,12 @@ workflows:
       functional_completeness: medium  # plan authoring, patient answers, kernel-recomputed priority; no measurement rules, reminders or offline queue in UI
       integration: medium  # shares consent/grant with lab sharing; not yet projected to longitudinal state or QuestionnaireResponse export
       reliability: medium
-      usability: unknown
+      usability: low  # 2026-09-25 code-review pass (not a full clinician/browser usability test) found and fixed one real bug: RencanaHarianDokter's initial-load failure path returned null before ever rendering its own error state, so a failed fetch left the clinician staring at a permanently blank "Daily follow-up" section forever with no error and no retry; fixed with an explicit loading/error+Retry branch. Remaining known friction: no inline validation on the lab-rule authoring form (errors only surface after a server round trip), no loading indicator on LabPasienUntukDokter's clinician-lab-share list, no submitting-state guard against double-submit on "Start daily check-in".
       clinical_quality: unknown  # rules are clinician-authored only; app adds none
       safety_security: medium  # verified clinician + active grant; revoke stops check-in; 'not an emergency service' line
       observability_testing: medium  # rencana-harian-kontrak (server<->kernel contract + endpoint guards, sabotaged), browser E2E
     acceptance_evidence:
-      - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name)"
+      - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name, incl. 2026-09-25 !data branch must show galat + retry)"
       - "clinician-authored lab review rules (metric lab.<test>, >=/<=, threshold, max result age, evidence reference REQUIRED; verifiedBy/verifiedAt from server identity) evaluated by the kernel in the clinician browser over the shared canonical state; kernel age now from capturedAt (collection time), not receivedAt; gate aturan-lab-dokter (sabotage: receivedAt age fails); browser E2E 390x844: rule refused without evidence, then HbA1c 9.4 -> Meets your rule"
       - "browser E2E 390x844 (2026-09-25): answer offline -> queued, card says saved-not-sent; reconnect -> sent once, queue empty, no page errors; server holds 1 report with offline authoredAt. HTTP: same clientId x3 -> same report id, 1 stored"
       - "opt-in daily reminder (server/src/pengingatCek.ts): only with an active plan + valid grant and no report for the local date, user local time, once per day (server-owned guard), no PHI in text; server/uji/pengingatCek.uji.ts (sabotage: UTC date fails)"
@@ -52,9 +52,9 @@ workflows:
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation]
-    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
-    last_audited_commit: 0cb6906a
+    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation, lab_rule_form_inline_validation, lab_share_list_loading_state, checkin_submit_double_click_guard]
+    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed; 2026-09-25 fixed the blank-panel-on-load-failure bug, three smaller friction items remain (see known_gaps)
+    last_audited_commit: 9a70dfb0
 
   - workflow_id: clinical.patient_review
     name: Longitudinal patient review to clinician-supported next action
