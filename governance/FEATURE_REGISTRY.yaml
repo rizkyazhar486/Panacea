@@ -160,17 +160,17 @@ features:
     patient_state_fields: [requires_repository_audit]
     knowledge_graph_entities: [requires_repository_audit]
     shared_services: [provenance, normalization, terminology]
-    backend_surfaces: [requires_repository_audit]
-    frontend_surfaces: [requires_repository_audit]
-    persistence_surfaces: [requires_repository_audit]
+    backend_surfaces: [server/src/labLog.ts, server/src/labFhir.ts, 'GET/PUT /api/lab-log', 'GET /api/lab-log/fhir', '/api/lab-log/shares', '/api/clinician/lab-shares/*']
+    frontend_surfaces: [src/components/UbinLab.tsx, src/components/LongevityPanel.tsx, src/components/LabPasienUntukDokter.tsx, src/components/BagikanLabKeDokter.tsx]
+    persistence_surfaces: [localStorage pmd_lab_v1 (offline), server db.labLogs/labShares/labReviews/labAudit]
     external_integrations: [requires_repository_audit]
-    maturity_level: UNKNOWN
-    clinical_validation: unknown
+    maturity_level: FUNCTIONAL
+    clinical_validation: none
     technical_risk: high
     clinical_risk: high
     provenance_required: true
-    tests: [requires_repository_audit]
+    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory]
     observability: [requires_repository_audit]
-    known_gaps: [registry_bootstrap_requires_repository_audit]
-    next_actions: [audit_lab_to_baseline_to_trajectory_workflow]
-    last_audited_commit: null
+    known_gaps: [not_projected_into_canonical_longitudinal_state, wearable_and_non_lab_signals_not_audited]
+    next_actions: [project_lab_observations_into_canonical_longitudinal_state]
+    last_audited_commit: 0cb6906a
