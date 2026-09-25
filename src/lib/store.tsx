@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
+import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis } from './antreanKlinis'
 import type {
   AppState,
   Patient,
@@ -57,6 +58,29 @@ export const PLATFORM_FEE = 0.2 // (legacy) 20% — retained for compatibility
 // Marketplace: every content/material sale is charged a FLAT 5 PNC platform fee
 // per article (the rest is the author's royalty).
 export const MARKETPLACE_FEE_PNC = 5
+
+// ── Sinkron tulisan klinis (lihat antreanKlinis.ts) ─────────────────────────
+// Tidak ada lagi `.catch(() => {})`: galat jaringan diantre dan dikirim ulang,
+// penolakan server dicatat dan ditampilkan (StatusSinkronKlinis).
+const kirimOperasiKlinis = (op: OperasiKlinis): Promise<unknown> => {
+  switch (op.jenis) {
+    case 'patient': return api.addPatientRemote(op.payload as Patient)
+    case 'vital': return api.addVitalRemote(op.patientId, op.payload as VitalSign)
+    case 'supportive': return api.addSupportiveRemote(op.patientId, op.payload as SupportiveResult)
+    case 'record': return api.saveRecordRemote(op.patientId, op.payload as EMRRecord)
+    case 'education': return api.saveEducationRemote(op.patientId, op.payload as EducationSheet)
+  }
+}
+const kabarSinkron = () => { try { window.dispatchEvent(new Event(PERISTIWA_SINKRON)) } catch { /* SSR/uji */ } }
+function sinkronKlinis(jenis: JenisOperasi, patientId: string, payload: unknown) {
+  if (!backendEnabled) return
+  const op: OperasiKlinis = { opId: `${jenis}-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, jenis, patientId, payload, dibuat: new Date().toISOString() }
+  void kirimAtauAntre(localStorage, op, kirimOperasiKlinis).then(kabarSinkron)
+}
+export function kurasSinkronKlinis(): Promise<unknown> {
+  if (!backendEnabled) return Promise.resolve()
+  return kurasAntrean(localStorage, kirimOperasiKlinis).then(kabarSinkron)
+}
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
@@ -367,6 +391,13 @@ interface Store {
 const Ctx = createContext<Store | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
+  // Kirim ulang tulisan klinis yang tertunda saat aplikasi dimuat dan saat kembali online.
+  useEffect(() => {
+    void kurasSinkronKlinis()
+    const on = () => void kurasSinkronKlinis()
+    window.addEventListener('online', on)
+    return () => window.removeEventListener('online', on)
+  }, [])
   const [state, setState] = useState<AppState>(load)
 
   // Persist everything EXCEPT the session account, so each visit starts at the
@@ -481,7 +512,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       account: state.account,
       setActivePatient: (id) => setState((st) => ({ ...st, activePatientId: id })),
       addPatient: (p) => {
-        if (backendEnabled) api.addPatientRemote(p).catch(() => {})
+        sinkronKlinis('patient', p.id, p)
         setState((st) => ({
           ...st,
           patients: [...st.patients, p],
@@ -492,14 +523,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }))
       },
       addVital: (patientId, vital) => {
-        if (backendEnabled) api.addVitalRemote(patientId, vital).catch(() => {})
+        sinkronKlinis('vital', patientId, vital)
         setState((st) => ({
           ...st,
           vitals: { ...st.vitals, [patientId]: [...(st.vitals[patientId] ?? []), vital] },
         }))
       },
       addSupportive: (patientId, r) => {
-        if (backendEnabled) api.addSupportiveRemote(patientId, r).catch(() => {})
+        sinkronKlinis('supportive', patientId, r)
         setState((st) => ({
           ...st,
           supportive: {
@@ -511,11 +542,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setChat: (patientId, messages) =>
         setState((st) => ({ ...st, chats: { ...st.chats, [patientId]: messages } })),
       saveRecord: (record) => {
-        if (backendEnabled) api.saveRecordRemote(record.patientId, record).catch(() => {})
+        sinkronKlinis('record', record.patientId, record)
         setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } }))
       },
       saveEducation: (patientId, sheet) => {
-        if (backendEnabled) api.saveEducationRemote(patientId, sheet).catch(() => {})
+        sinkronKlinis('education', patientId, sheet)
         setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } }))
       },
       updateSettings: (partial) => {

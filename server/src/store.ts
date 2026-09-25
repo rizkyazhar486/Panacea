@@ -783,18 +783,26 @@ export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet
   save()
 }
+// Tambah idempoten berdasarkan id butir: kiriman ulang dari antrean sinkron klien
+// (respons pertama hilang di jalan) tidak menggandakan data klinis.
 export function addVital(patientId: string, vital: any) {
   const c = ensureClinical()
-  c.vitals[patientId] = [...(c.vitals[patientId] ?? []), vital]
+  const ada = c.vitals[patientId] ?? []
+  if (vital?.id && ada.some((v) => v?.id === vital.id)) return
+  c.vitals[patientId] = [...ada, vital]
   save()
 }
 export function addSupportive(patientId: string, r: any) {
   const c = ensureClinical()
-  c.supportive[patientId] = [...(c.supportive[patientId] ?? []), r]
+  const ada = c.supportive[patientId] ?? []
+  if (r?.id && ada.some((v) => v?.id === r.id)) return
+  c.supportive[patientId] = [...ada, r]
   save()
 }
 export function addPatient(p: any) {
-  ensureClinical().patients.push(p)
+  const c = ensureClinical()
+  if (p?.id && c.patients.some((x) => x?.id === p.id)) return
+  c.patients.push(p)
   save()
 }
 

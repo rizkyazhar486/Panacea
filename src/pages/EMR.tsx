@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { StatusSinkronKlinis } from '../components/StatusSinkronKlinis'
 import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
@@ -217,6 +218,7 @@ export function EMR() {
 
   return (
     <div className="space-y-6">
+      <StatusSinkronKlinis />
       {/* Header */}
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
