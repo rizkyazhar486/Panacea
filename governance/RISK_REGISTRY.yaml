@@ -106,12 +106,14 @@ risks:
     severity: critical
     state: mitigated
     description: >-
-      A patient could previously modify clinical content of an already-signed EMR while preserving the old
-      signedBy/signedById/signedAt fields, making new content appear to retain the clinician's signature.
+      A patient, or a clinician saving edits without an explicit re-sign, could previously modify clinical content
+      of an already-signed EMR while preserving old signedBy/signedById/signedAt fields, making new content appear
+      to retain an earlier clinician signature.
     mitigation: >-
       server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
       unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
-      Any other patient clinical edit removes the signature and keeps the previous signed version in history; changes
-      to physical-exam findings also clear doctorVerified/verifiedBy/verifiedById unless the findings themselves are unchanged.
+      Any patient clinical edit beyond patient-authored consent removes the signature; clinician content edits carrying
+      the old signedAt also become unsigned until an explicit re-sign intent is sent and server-stamped. Changes to
+      physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
       Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
     evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
