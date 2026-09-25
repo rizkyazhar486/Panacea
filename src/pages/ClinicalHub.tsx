@@ -110,15 +110,6 @@ export function ClinicalHub() {
 
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         <ClinicalPatientContext />
-        <SurfaceGuide
-          summary="see the body → ask one question → record only reviewed facts"
-          steps={[
-            'Use the body surface to orient the region and system.',
-            'Ask Panacea for sourced context, not an autonomous diagnosis.',
-            'Promote findings into AI-EMR only after clinician review.',
-          ]}
-        />
-        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
@@ -238,6 +229,19 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+        {/* Tubuh ditaruh SETELAH aksi klinis. Permukaan tubuh setinggi ~4.400px
+            pada 390px; di atas, ia mendorong "Ask Panacea", aksi utama dan
+            kalkulator ke y~5.000 — enam layar gulir sebelum pemakai klinis
+            bisa melakukan apa pun. */}
+        <SurfaceGuide
+          summary="see the body → ask one question → record only reviewed facts"
+          steps={[
+            'Use the body surface to orient the region and system.',
+            'Ask Panacea for sourced context, not an autonomous diagnosis.',
+            'Promote findings into AI-EMR only after clinician review.',
+          ]}
+        />
+        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <nav aria-label="Clinical references" className="border-y border-white/10">
           <div className="flex gap-6 overflow-x-auto py-1 no-scrollbar">

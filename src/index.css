@@ -179,6 +179,13 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Surfaces */
 .dark .bg-white { background-color: #17191c !important; }
+/* Pengecualian: tombol yang SENGAJA putih dengan teks gelap (CTA utama,
+   "Ask →"). Memetakan latarnya ke #17191c sementara teksnya tetap hitam
+   menghasilkan hitam di atas hitam — tombolnya lenyap. Terukur di Clinical:
+   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibiarkan putih. */
+.dark .bg-white:is(.text-black, .text-ink, .text-neutral-900, .text-neutral-950, .text-slate-900, .text-slate-950) {
+  background-color: #fff !important;
+}
 .dark .bg-white\/95 { background-color: rgba(23, 25, 28, 0.95) !important; }
 .dark .bg-white\/90 { background-color: rgba(23, 25, 28, 0.9) !important; }
 .dark .bg-white\/85 { background-color: rgba(23, 25, 28, 0.85) !important; }
