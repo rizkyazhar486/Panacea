@@ -4,6 +4,7 @@
 // snapshots against slightly older ones to catch meaningful trend shifts.
 
 import { buildPersonalBaseline, type HealthBaselineMetric } from './healthProfileBaseline'
+import { analisisTrenSeri, type StatusTren } from './labTrend'
 
 export interface HistorySnapshot {
   date: string
@@ -26,18 +27,41 @@ const BASELINE_META: Array<{ metric: HealthBaselineMetric; label: string; unit: 
   { metric: 'restingHr', label: 'Resting HR', unit: 'bpm' },
   { metric: 'hrvMs', label: 'HRV', unit: 'ms' },
   { metric: 'sleepH', label: 'Sleep', unit: 'h' },
+  { metric: 'vo2max', label: 'VO₂max', unit: 'mL/kg/min' },
 ]
+
+// Garis dasar wearable memakai mesin yang SAMA dengan tren lab
+// (src/lib/labTrend.ts): median/MAD riwayat sebelumnya, satu titik tidak
+// pernah "bermakna", dua titik berurutan searah baru dikonfirmasi. Tanpa
+// rentang populasi, tingkat tertingginya "perubahan bermakna" — tidak pernah
+// "kritis" dari angka jam tangan saja.
+const JUDUL_STATUS: Record<StatusTren, string> = {
+  'belum-cukup-data': 'building baseline',
+  stabil: 'stable for you',
+  pantau: 'watch',
+  'perubahan-bermakna': 'meaningful change',
+  'bicarakan-dengan-dokter': 'discuss with a doctor',
+}
 
 function baselineInsights(history: HistorySnapshot[]): Insight[] {
   return BASELINE_META.flatMap(({ metric, label, unit }) => {
     const baseline = buildPersonalBaseline(history, metric)
     if (!baseline) return []
+    const seri = history
+      .filter((s) => /^\d{4}-\d{2}-\d{2}$/.test(s.date))
+      .map((s) => ({ tanggal: s.date, nilai: s[metric] }))
+      .filter((x): x is { tanggal: string; nilai: number } => typeof x.nilai === 'number' && Number.isFinite(x.nilai) && x.nilai > 0)
+    const tren = analisisTrenSeri(seri)
+    const status = tren?.status ?? 'belum-cukup-data'
+    const geser = tren?.garisDasar != null && tren.selisih != null
+      ? ` Latest ${tren.terakhir.toFixed(1)} ${unit} is ${tren.selisih >= 0 ? '+' : '−'}${Math.abs(tren.selisih).toFixed(1)} vs your usual ${tren.garisDasar.toFixed(1)}.`
+      : ''
     return [{
       id: `personal-baseline-${metric}`,
-      tone: 'neutral' as const,
+      tone: status === 'pantau' || status === 'perubahan-bermakna' ? ('low' as const) : ('neutral' as const),
       icon: '🎯',
-      title: `Personal baseline · ${label}`,
-      body: `${baseline.count} recorded days: median ${baseline.median.toFixed(1)} ${unit}; observed middle 50% ${baseline.q1.toFixed(1)}–${baseline.q3.toFixed(1)} ${unit}. Descriptive of your own saved history only — not a population normal range, diagnosis, or treatment threshold.`,
+      title: `${label} · ${JUDUL_STATUS[status]}`,
+      body: `${tren?.alasan ?? ''}${geser} Median ${baseline.median.toFixed(1)} ${unit} over ${baseline.count} days; compared with your own history, not a population norm or diagnosis.`.trim(),
     }]
   })
 }

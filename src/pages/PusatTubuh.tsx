@@ -118,11 +118,12 @@ export function PusatTubuh() {
 
   return (
     <div className="space-y-4">
-      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
       {/* Darah adalah fondasi Longevity-First (docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md
           §4–5). Sebelumnya ubin lab hanya muncul bila dipilih manual di papan
           widget beranda — tidak aktif secara bawaan. */}
       <UbinLab />
+      {/* Tubuh 3D setinggi ~2.300px; di atas, ia mendorong hasil darah ke y~3.080. */}
+      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
       <HalamanTab
       judul="Body Signals"
       subjudul="Phone-first checks, energy, heart, sleep, movement and clinical trackers"

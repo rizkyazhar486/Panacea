@@ -93,5 +93,6 @@ console.log('tren-lab-pribadi: garis dasar median/MAD, satu titik tak pernah ber
   const halaman = readFileSync(new URL('../../src/pages/PusatTubuh.tsx', import.meta.url), 'utf8')
   const ubin = readFileSync(new URL('../../src/components/UbinLab.tsx', import.meta.url), 'utf8')
   assert.match(halaman, /<UbinLab \/>/, 'ubin lab tidak lagi dipasang di Your Numbers — kembali tersembunyi di papan widget')
+  assert.ok(halaman.indexOf('<UbinLab />') < halaman.indexOf('<PersonalBodyUnifiedSurface'), 'hasil darah kembali ditaruh di bawah tubuh 3D setinggi ~2.300px')
   assert.match(ubin, /analisisTrenLab\(/, 'ubin lab tidak lagi memakai mesin tren pribadi')
 }

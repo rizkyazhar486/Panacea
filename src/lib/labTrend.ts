@@ -75,6 +75,21 @@ function hari(tanggal: string): number {
   return Date.parse(`${tanggal}T00:00:00Z`) / 864e5
 }
 
+/**
+ * Mesin yang sama untuk sembarang deret bertanggal (lab, wearable, tubuh).
+ * `rentang` adalah rentang populasi bila ada; tanpa itu tingkat tertinggi
+ * yang mungkin adalah "perubahan bermakna".
+ */
+export function analisisTrenSeri(
+  seri: readonly { tanggal: string; nilai: number }[],
+  rentang: { bawah?: number; atas?: number } = {},
+): TrenLab | null {
+  return analisisTrenLab(
+    seri.map((x, i) => ({ id: String(i), tanggal: x.tanggal, nilai: x.nilai })),
+    { id: 'seri', nama: 'seri', satuan: '', sumber: '', ...rentang },
+  )
+}
+
 export function analisisTrenLab(butirMentah: readonly ButirLab[], jenis: JenisLab): TrenLab | null {
   const butir = butirMentah
     .filter((b) => Number.isFinite(b.nilai) && /^\d{4}-\d{2}-\d{2}$/.test(b.tanggal))
