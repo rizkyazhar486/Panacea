@@ -2,8 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
-import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
-import { SurfaceGuide } from '../components/SurfaceGuide'
+import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
@@ -108,25 +107,26 @@ export function UnifiedBodyWorkspace() {
           bergantung pada kelas itu; tanpa penandanya komponen di dalam sini
           merender versi terangnya di atas latar hitam. */}
       <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,.11),transparent_28%),radial-gradient(circle_at_76%_0%,rgba(139,92,246,.09),transparent_24%)]" aria-hidden />
         <div className="relative min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="text-[10px] font-black uppercase tracking-[.22em] text-cyan-200/80">
-              {isExposure ? 'Your Body · Body Exposure OS' : 'Your Body · one personal health workspace'}
-            </div>
-            {isExposure && <span className="rounded-full border border-violet-300/15 bg-violet-300/[.07] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.15em] text-violet-200/80">flagship atlas</span>}
-          </div>
+          {isExposure ? (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-[10px] font-black uppercase tracking-[.22em] text-cyan-200/80">Your Body · Body Exposure OS</div>
+                <span className="rounded-full border border-violet-300/15 bg-violet-300/[.07] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.15em] text-violet-200/80">flagship atlas</span>
+              </div>
+              <h1 className="mt-1 max-w-5xl text-[clamp(1.35rem,4vw,2rem)] font-black leading-[1.04] tracking-[-.035em] text-white">
+                Your body, from whole person to molecule
+              </h1>
+              <p className="mt-1.5 truncate text-[11px] font-bold text-white/48 sm:text-xs">Whole body → organ → tissue → cell → molecule</p>
+            </>
+          ) : (
+            // Bilah perintah sudah bertuliskan "Your Body"; judul kedua yang
+            // sama besar hanya mendorong isi ke bawah. Judulnya tetap ada untuk
+            // pembaca layar.
+            <h1 className="sr-only">Your Body · {active.label}</h1>
+          )}
 
-          <h1 className="mt-1 max-w-5xl text-[clamp(1.35rem,4vw,2rem)] font-black leading-[1.04] tracking-[-.035em] text-white">
-            {isExposure ? 'Your body, from whole person to molecule' : 'One body context'}
-          </h1>
-          <p className="mt-1.5 truncate text-[11px] font-bold text-white/48 sm:text-xs">
-            {isExposure
-              ? 'Whole body → organ → tissue → cell → molecule'
-              : 'Train · recover · eat · measure · age'}
-          </p>
-
-          <div className="no-scrollbar mt-3 flex snap-x gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
+          <div className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`} role="tablist" aria-label="Your Body workspace">
             {primaryViews.map((view) => {
               const selected = activeKey === view.key
               const exposureTab = view.key === 'body-exposure'
@@ -167,24 +167,31 @@ export function UnifiedBodyWorkspace() {
             </label>
           </div>
 
-          <SurfaceGuide
-            summary="pick one goal → stay on one body → open details only when needed"
-            steps={[
-              'Start with My Body or Body Exposure.',
-              'Use the six primary destinations for daily work.',
-              'Everything else stays preserved under More features.',
-            ]}
-          />
-
-          <SurfaceDepthNavigator
-            surface="your-body"
-            activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
-            onSelect={selectDepth}
-          />
-
-          <details className="mt-2.5 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[10px] text-white/45">
-            <summary className="cursor-pointer font-black text-white/72">About {active.label}</summary>
+          {/* Satu ⓘ untuk semua penjelasan: deskripsi tampilan, cara pakai, dan
+              tangga kedalaman. Sebelumnya ketiganya tampil terbuka di layar
+              pertama dan menambah 8 tombol sebelum isi apa pun. */}
+          <details className="mt-2 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[11px] text-white/60">
+            <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 font-black text-white/72">
+              <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full border border-white/20 text-[10px]">i</span>
+              About {active.label}
+            </summary>
             <p className="mt-2 leading-relaxed">{active.description}</p>
+            <ol className="mt-2 grid gap-1 leading-relaxed">
+              {[
+                'Start with My Body or Body Exposure.',
+                'Use the six primary destinations for daily work.',
+                'Everything else stays preserved under More features.',
+              ].map((langkah, i) => (
+                <li key={langkah} className="flex gap-2"><span className="font-black text-cyan-200/90">{i + 1}</span>{langkah}</li>
+              ))}
+            </ol>
+            <div className="mt-2">
+              <SurfaceDepthNavigator
+                surface="your-body"
+                activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
+                onSelect={selectDepth}
+              />
+            </div>
           </details>
         </div>
 
@@ -196,7 +203,13 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0">
-        <Suspense fallback={<Loader exposure={isExposure} />}><Active /></Suspense>
+        {isExposure ? (
+          <Suspense fallback={<Loader exposure />}><Active /></Suspense>
+        ) : (
+          <PersonalBodySurfaceShown>
+            <Suspense fallback={<Loader />}><Active /></Suspense>
+          </PersonalBodySurfaceShown>
+        )}
       </section>
 
       <SuperPageCapabilityRail domain="body" initialLimit={16} />
