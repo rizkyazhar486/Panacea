@@ -464,8 +464,8 @@ export const api = {
   reviewLab: (izinId: string, tes: string, catatan: string, cekUlangSebelum: string) =>
     req<TinjauanLabKlien>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/review`, { method: 'POST', body: JSON.stringify({ tes, catatan, cekUlangSebelum }) }),
   carePlans: () => req<{ plans: { plan: import('./continuousCareOperatingSystem').ContinuousCarePlan; dokterEmail: string; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }[] }>('/api/care/plans'),
-  submitCareReport: (planId: string, scheduledFor: string, answers: { questionId: string; value: boolean | number | string }[]) =>
-    req<import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput>('/api/care/reports', { method: 'POST', body: JSON.stringify({ planId, scheduledFor, answers }) }),
+  submitCareReport: (planId: string, scheduledFor: string, answers: { questionId: string; value: boolean | number | string }[], extra?: { clientId: string; authoredAt: string }) =>
+    req<import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput>('/api/care/reports', { method: 'POST', body: JSON.stringify({ planId, scheduledFor, answers, ...extra }) }),
   clinicianCare: (izinId: string) => req<{ plan: import('./continuousCareOperatingSystem').ContinuousCarePlan | null; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care`),
   createCarePlan: (izinId: string, body: unknown) =>
     req<import('./continuousCareOperatingSystem').ContinuousCarePlan>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care-plan`, { method: 'POST', body: JSON.stringify(body) }),

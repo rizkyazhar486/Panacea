@@ -1048,6 +1048,8 @@ app.post('/api/care/reports', requireAuth, (req, res) => {
   if (!p || !izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini)) { res.status(404).json({ error: 'no active daily check-in' }); return }
   try {
     const laporan = susunLaporan(p.rencana, req.body, kini)
+    const sama = laporan.clientId ? listCareReports(u.email, p.rencana.id).find((l) => l.clientId === laporan.clientId) : undefined
+    if (sama) { res.json(sama); return }
     addCareReport(u.email, laporan)
     res.json(laporan)
   } catch (e) {

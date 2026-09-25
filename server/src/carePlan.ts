@@ -37,6 +37,8 @@ export interface RencanaPerawatan {
 export interface LaporanHarian {
   id: string; planId: string; planVersion: string; subjectId: string
   scheduledFor: string; authoredAt: string; answers: { questionId: string; value: boolean | number | string }[]
+  /** Kunci idempotensi dari klien: kirim ulang (antrean offline) tidak menggandakan laporan. */
+  clientId?: string
 }
 
 const ID = /^[A-Za-z0-9_-]{1,40}$/
@@ -130,9 +132,16 @@ export function susunLaporan(rencana: RencanaPerawatan, masukan: unknown, kini: 
     if (!cocok) throw new Error(`answer does not fit question "${q.prompt.slice(0, 40)}"`)
     return { questionId: q.id, value: v as boolean | number | string }
   })
+  const clientId = m.clientId == null ? undefined : String(m.clientId)
+  if (clientId !== undefined && !/^[A-Za-z0-9_-]{8,64}$/.test(clientId)) throw new Error('invalid client id')
+  const authoredMentah = m.authoredAt == null ? null : Date.parse(String(m.authoredAt))
+  // Jawaban yang diantre offline membawa waktu ditulisnya; diterima hanya bila masuk akal (≤ 7 hari lalu, tidak di masa depan).
+  const authoredAt = authoredMentah != null && Number.isFinite(authoredMentah) && authoredMentah <= kini.getTime() + 5 * 60e3 && authoredMentah >= kini.getTime() - 7 * 864e5
+    ? new Date(authoredMentah).toISOString() : kini.toISOString()
   return {
     id: `daily-${randomBytes(8).toString('hex')}`, planId: rencana.id, planVersion: rencana.version,
-    subjectId: rencana.subjectId, scheduledFor: `${tanggal}T00:00:00.000Z`, authoredAt: kini.toISOString(), answers,
+    subjectId: rencana.subjectId, scheduledFor: `${tanggal}T00:00:00.000Z`, authoredAt, answers,
+    ...(clientId ? { clientId } : {}),
   }
 }
 

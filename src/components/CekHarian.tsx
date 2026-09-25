@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
+import { buatClientId, bacaAntrean, kirimAtauAntre, kurasAntrean, type ButirAntrean } from '../lib/antreanCekHarian'
 import { buildDailyInterview, type ContinuousCarePlan, type DailyAnamnesisAnswer } from '../lib/continuousCareOperatingSystem'
 
 // Cek harian yang diatur dokter (Continuous Care). Pertanyaan dan aturannya
@@ -14,7 +15,22 @@ export function CekHarian() {
   const muat = () => api.carePlans().then((r) => setRencana(r.plans.map((x) => ({
     plan: x.plan, dokterEmail: x.dokterEmail, sudah: x.reports.some((l) => l.scheduledFor.slice(0, 10) === hariIni()),
   })))).catch(() => {})
-  useEffect(() => { if (backendEnabled) void muat() }, [])
+  const kirimSatu = (b: ButirAntrean) => api.submitCareReport(b.planId, b.scheduledFor, b.answers, { clientId: b.clientId, authoredAt: b.authoredAt })
+  const [antre, setAntre] = useState(() => bacaAntrean(localStorage).length)
+  const kuras = async () => {
+    if (!bacaAntrean(localStorage).length) return
+    const r = await kurasAntrean(localStorage, kirimSatu)
+    setAntre(r.sisa)
+    if (r.terkirim) { setPesan('Saved answers sent to your doctor.'); void muat() }
+    if (r.ditolak.length) setPesan(`A saved check-in could not be sent: ${r.ditolak[0]}`)
+  }
+  useEffect(() => {
+    if (!backendEnabled) return
+    void muat(); void kuras()
+    const on = () => void kuras()
+    window.addEventListener('online', on)
+    return () => window.removeEventListener('online', on)
+  }, [])
   if (!backendEnabled || rencana.length === 0) return null
 
   const { plan, dokterEmail, sudah } = rencana[0]
@@ -25,10 +41,12 @@ export function CekHarian() {
   const kirim = async () => {
     const hilang = pertanyaan.filter((q) => q.required && jawab[q.id] === undefined)
     if (hilang.length) { setPesan(`Please answer: ${hilang.map((q) => q.prompt).join(' · ')}`); return }
-    try {
-      await api.submitCareReport(plan.id, hariIni(), jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)))
-      setPesan('Sent to your doctor for review.'); setJawab({}); void muat()
-    } catch (e) { setPesan((e as Error).message) }
+    const b: ButirAntrean = { clientId: buatClientId(), planId: plan.id, scheduledFor: hariIni(), authoredAt: new Date().toISOString(),
+      answers: jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)) }
+    const r = await kirimAtauAntre(localStorage, b, kirimSatu)
+    if (r.status === 'terkirim') { setPesan('Sent to your doctor for review.'); setJawab({}); void muat() }
+    else if (r.status === 'diantre') { setPesan('No connection. Saved on this device; it will be sent when you are back online.'); setJawab({}); setAntre(bacaAntrean(localStorage).length) }
+    else setPesan(r.pesan)
   }
 
   return (
@@ -37,7 +55,10 @@ export function CekHarian() {
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Daily check-in</h2>
         <span className="t-mikro text-neutral-400">set by {dokterEmail}</span>
       </div>
-      {sudah ? (
+      {antre > 0 && <p className="t-mikro mt-1 font-bold text-neutral-500" data-antrean-cek>{antre} check-in waiting to send.</p>}
+      {!sudah && bacaAntrean(localStorage).some((x) => x.planId === plan.id && x.scheduledFor === hariIni()) ? (
+        <p className="t-kecil mt-1 font-bold text-neutral-500">Today's answers are saved on this device and not yet sent to your doctor.</p>
+      ) : sudah ? (
         <p className="t-kecil mt-1 font-bold text-brand">Today's check-in is done. Your doctor will review it.</p>
       ) : (
         <div className="mt-2 space-y-2.5">

@@ -45,11 +45,12 @@ workflows:
       observability_testing: medium  # rencana-harian-kontrak (server<->kernel contract + endpoint guards, sabotaged), browser E2E
     acceptance_evidence:
       - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name)"
+      - "offline queue (src/lib/antreanCekHarian.ts): network failures queued on device and sent on reconnect, server rejections not queued; idempotent POST via clientId; offline authoredAt bounded to 7 days; gates antrean-cek-harian + server carePlanIdem (sabotaged)"
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [measurement_review_rules_with_evidence_and_verifier, reminders, offline_queue_ui, clinical_validation]
-    next_action: reminders_and_offline_queue_ui  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
+    known_gaps: [measurement_review_rules_with_evidence_and_verifier, reminders, offline_queue_browser_e2e, clinical_validation]
+    next_action: daily_reminders_via_existing_push  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
     last_audited_commit: 0cb6906a
 
   - workflow_id: clinical.patient_review
