@@ -10,6 +10,7 @@
 // UID seri juga TIDAK ditulis panel: di PACS rumah sakit UID dapat ditelusuri ke
 // pasien, sedangkan resep dimaksudkan untuk dibagikan. Sidik berkas sudah cukup.
 import type { LapisanVolume } from './lapisanVolume'
+import { BIDANG_AWAL, JARAK_MAKS, type BidangMiring } from './bidangPotong'
 
 export const FORMAT_RESEP = 'panacea-volume-recipe'
 export const VERSI_RESEP = 1
@@ -37,6 +38,8 @@ export interface ParameterResep {
   potong: [number, number, number]
   halus: number
   lapisan: LapisanVolume[]
+  /** Bidang potong miring; resep lama tanpa bidang dimuat dengan bidang mati. */
+  bidang?: BidangMiring
 }
 export interface ResepRender {
   format: typeof FORMAT_RESEP
@@ -94,6 +97,10 @@ export function bacaResep(json: unknown): ResepRender {
       mode: p.mode, ambangBawah: angka(p.ambangBawah, -1e6, 1e6), ambangAtas: angka(p.ambangAtas, -1e6, 1e6),
       kepekatan: angka(p.kepekatan, 0, 1), pajanan: angka(p.pajanan, 0, 10), potong: tiga(p.potong, 0, 1),
       halus: angka(p.halus, 1, 4), lapisan,
+      bidang: p.bidang == null ? { ...BIDANG_AWAL } : {
+        aktif: p.bidang.aktif === true, kemiringanDerajat: angka(p.bidang.kemiringanDerajat, 0, 180),
+        putaranDerajat: angka(p.bidang.putaranDerajat, 0, 360), posisi: angka(p.bidang.posisi, -JARAK_MAKS, JARAK_MAKS),
+      },
     },
     batas: BATAS_RESEP,
   }

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { buatResep, bacaResep, cocokkanResep, sha256Hex, VERSI_RENDERER } from '../../src/lib/resepRender.ts'
 import { lapisanAwalCt } from '../../src/lib/lapisanVolume.ts'
+import { BIDANG_AWAL } from '../../src/lib/bidangPotong.ts'
 import { irisanFantom } from './fantomDicom.ts'
 
 const berkas = Array.from({ length: 12 }, (_, z) => irisanFantom(z, { irisan: 12 }))
@@ -13,7 +14,8 @@ const r = buatResep(data, param, new Date('2026-09-25T00:00:00Z'))
 
 // Pulang-pergi lewat JSON mempertahankan setiap parameter.
 const balik = bacaResep(JSON.parse(JSON.stringify(r)))
-assert.deepEqual(balik.parameter, param, 'parameter berubah setelah disimpan/dimuat')
+// Resep tanpa bidang potong dimuat dengan bidang MATI (kompatibel mundur).
+assert.deepEqual(balik.parameter, { ...param, bidang: BIDANG_AWAL }, 'parameter berubah setelah disimpan/dimuat')
 assert.equal(balik.renderer, VERSI_RENDERER)
 assert.ok(!JSON.stringify(r).includes('PHANTOM') && !('piksel' in r), 'resep membawa isi/tag berkas, bukan hanya sidik')
 

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { lapisanAwalCt, lapisanAwalRelatif, type LapisanVolume } from '../../lib/lapisanVolume'
+import { BIDANG_AWAL, type BidangMiring } from '../../lib/bidangPotong'
 import { buatResep, bacaResep, cocokkanResep, sha256Hex, BATAS_RESEP } from '../../lib/resepRender'
 import { bacaDicom, urutkanSeri, type Citra } from '../../lib/dicom'
 import { buatVolumeMpr } from '../../lib/dicomMpr'
@@ -62,6 +63,7 @@ export function VolumeDicomBagian() {
   const [potong, setPotong] = useState<PotongVolume>([1, 1, 1])
   const [lapisan, setLapisan] = useState<LapisanVolume[]>([])
   const [halus, setHalus] = useState(1.5)
+  const [bidang, setBidang] = useState<BidangMiring>(BIDANG_AWAL)
   const [pesanResep, setPesanResep] = useState<{ nada: 'ok' | 'peringatan'; teks: string } | null>(null)
   const resepRef = useRef<HTMLInputElement | null>(null)
   const masukanRef = useRef<HTMLInputElement | null>(null)
@@ -148,7 +150,7 @@ export function VolumeDicomBagian() {
           </div>
           <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{MODE_RENDER.find((m) => m.id === mode)?.catatan}</p>
 
-          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} />
+          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} bidang={bidang} />
 
           <div className="mt-2 flex flex-wrap items-center gap-2" data-render-recipe>
             <span className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500">Reproduce</span>
@@ -157,7 +159,7 @@ export function VolumeDicomBagian() {
                 const t = keadaan.tekstur
                 const resep = buatResep(
                   { jumlahBerkas: keadaan.sha256.length, sha256: keadaan.sha256, modalitas: keadaan.modalitas, voxel: [t.lebar, t.tinggi, t.dalam], fisikMm: t.fisikMm },
-                  { mode, ambangBawah: bawah, ambangAtas: atas, kepekatan, pajanan, potong, halus, lapisan },
+                  { mode, ambangBawah: bawah, ambangAtas: atas, kepekatan, pajanan, potong, halus, lapisan, bidang },
                   new Date(),
                 )
                 const url = URL.createObjectURL(new Blob([JSON.stringify(resep, null, 2)], { type: 'application/json' }))
@@ -174,7 +176,7 @@ export function VolumeDicomBagian() {
                   const r = bacaResep(JSON.parse(await f.text()))
                   const p = r.parameter
                   setMode(p.mode); setBawah(p.ambangBawah); setAtas(p.ambangAtas); setKepekatan(p.kepekatan)
-                  setPajanan(p.pajanan); setPotong(p.potong); setHalus(p.halus); if (p.lapisan.length) setLapisan(p.lapisan)
+                  setPajanan(p.pajanan); setPotong(p.potong); setHalus(p.halus); setBidang(p.bidang ?? BIDANG_AWAL); if (p.lapisan.length) setLapisan(p.lapisan)
                   const c = cocokkanResep(r, { sha256: keadaan.sha256, seriesUid: keadaan.seriesUid })
                   setPesanResep(c.status === 'identik'
                     ? { nada: 'ok', teks: 'Same files, same renderer version: this view reproduces the recipe.' }
@@ -195,6 +197,25 @@ export function VolumeDicomBagian() {
               </div>
               <button type="button" onClick={() => setPotong([1, 1, 1])} className="min-h-11 shrink-0 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15">Reset</button>
             </div>
+            <label className="mt-2 flex items-center gap-2 text-[11px] font-bold text-ink dark:text-white" data-oblique-plane>
+              <input type="checkbox" checked={bidang.aktif} onChange={(e) => setBidang({ ...bidang, aktif: e.target.checked })} aria-label="Oblique cut plane" className="h-5 w-5" />
+              Oblique cut plane — tilt, rotate and slide freely
+            </label>
+            {bidang.aktif && (
+              <div className="mt-1 grid gap-1">
+                {([
+                  ['Tilt', 'kemiringanDerajat', 0, 180, 1, '°'],
+                  ['Rotate', 'putaranDerajat', 0, 360, 1, '°'],
+                  ['Slide', 'posisi', -0.87, 0.87, 0.01, ''],
+                ] as const).map(([label, kunci, min, maks, langkah, satuan]) => (
+                  <label key={kunci} className="block">
+                    <span className="flex justify-between text-[11px] font-bold text-ink dark:text-white"><span>{label}</span><span className="tabular-nums text-neutral-500">{kunci === 'posisi' ? bidang.posisi.toFixed(2) : `${bidang[kunci]}${satuan}`}</span></span>
+                    <input type="range" min={min} max={maks} step={langkah} value={bidang[kunci]} aria-label={`Cut plane ${label.toLowerCase()}`}
+                      onChange={(e) => setBidang({ ...bidang, [kunci]: Number(e.target.value) })} className="h-11 w-full accent-brand" />
+                  </label>
+                ))}
+              </div>
+            )}
             <div className="mt-2 grid grid-cols-3 gap-2">
               <GeserPotong label="X" nilai={potong[0]} onUbah={(n) => ubahPotong(0, n)} />
               <GeserPotong label="Y" nilai={potong[1]} onUbah={(n) => ubahPotong(1, n)} />

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ambangKeTekstur, skalaKotak, type VolumeTekstur } from '../lib/volumeTekstur'
 import { lapisanKeUniform, type LapisanVolume } from '../lib/lapisanVolume'
+import { normalBidang, jarakBidang, BIDANG_AWAL, type BidangMiring } from '../lib/bidangPotong'
 
 // GPU ray-casting for a DICOM volume. This renders the selected study values;
 // it does not infer organs, diagnoses, or substitute an anatomical atlas.
@@ -43,6 +44,9 @@ uniform vec2 uLapisanRentang[3];
 uniform vec3 uLapisanWarna[3];
 uniform float uLapisanOpasitas[3];
 uniform float uHalus;
+uniform int uBidangAktif;
+uniform vec3 uBidangNormal;
+uniform float uBidangJarak;
 
 vec2 potongKotak(vec3 asal, vec3 arah) {
   vec3 invArah = 1.0 / arah;
@@ -55,6 +59,13 @@ vec2 potongKotak(vec3 asal, vec3 arah) {
 
 bool diKotakPotong(vec3 p) {
   return all(greaterThanEqual(p, uPotongMin)) && all(lessThanEqual(p, uPotongMaks));
+}
+
+// Bidang miring: sisi depan (dot(p, n) > d) DILEWATI, bukan akhir sinar — sinar
+// yang mulai di sisi terbuang harus terus berjalan ke sisi yang dipertahankan.
+// Sama dengan dipertahankan() di bidangPotong.ts.
+bool terpotongBidang(vec3 p) {
+  return uBidangAktif == 1 && dot(p, uBidangNormal) > uBidangJarak;
 }
 
 float ambil(vec3 p) {
@@ -82,6 +93,7 @@ void main() {
     float integral = 0.0;
     for (int i = 0; i < 512; i++) {
       if (!diKotakPotong(p)) break;
+      if (terpotongBidang(p)) { p += langkahVec; continue; }
       float v = ambil(p);
       float hu = uJendelaBawah + v * uJendelaRentang;
       float mu = uMuAir * (1.0 + hu / 1000.0);
@@ -104,6 +116,7 @@ void main() {
     p += langkahVec * fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
     for (int i = 0; i < 512; i++) {
       if (!diKotakPotong(p)) break;
+      if (terpotongBidang(p)) { p += langkahVec; continue; }
       float v = ambil(p);
       for (int k = 0; k < 3; k++) {
         if (k >= uJumlahLapisan || kena[k]) continue;
@@ -130,6 +143,7 @@ void main() {
 
   for (int i = 0; i < 512; i++) {
     if (!diKotakPotong(p)) break;
+    if (terpotongBidang(p)) { p += langkahVec; continue; }
     float v = ambil(p);
     bool diDalam = v >= uAmbangBawah && v <= uAmbangAtas;
 
@@ -197,7 +211,16 @@ export interface VolumeDicom3DProps {
   lapisan?: readonly LapisanVolume[]
   /** Surface-shading smoothing: gradient step multiplier (1 = sharpest). */
   halus?: number
+  /** Freely oriented cut plane (tilt/rotate/slide). */
+  bidang?: BidangMiring
   onGagal?: (alasan: string) => void
+}
+
+function setelBidang(m: THREE.ShaderMaterial, b: BidangMiring) {
+  const n = normalBidang(b)
+  m.uniforms.uBidangAktif.value = b.aktif ? 1 : 0
+  ;(m.uniforms.uBidangNormal.value as THREE.Vector3).set(n[0], n[1], n[2])
+  m.uniforms.uBidangJarak.value = jarakBidang(b)
 }
 
 function setelLapisan(m: THREE.ShaderMaterial, lapisan: readonly LapisanVolume[], tekstur: VolumeTekstur, halus: number) {
@@ -211,7 +234,7 @@ function setelLapisan(m: THREE.ShaderMaterial, lapisan: readonly LapisanVolume[]
 
 export function VolumeDicom3D({
   tekstur, mode, ambangBawah, ambangAtas, kepekatan, pajanan,
-  potong = [1, 1, 1], lapisan = [], halus = 1.5, onGagal,
+  potong = [1, 1, 1], lapisan = [], halus = 1.5, bidang = BIDANG_AWAL, onGagal,
 }: VolumeDicom3DProps) {
   const wadahRef = useRef<HTMLDivElement | null>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
@@ -226,12 +249,13 @@ export function VolumeDicom3D({
     m.uniforms.uMode.value = NOMOR_MODE[mode]
     m.uniforms.uPajanan.value = pajanan
     setelLapisan(m, lapisan, tekstur, halus)
+    setelBidang(m, bidang)
     m.uniforms.uPotongMaks.value.set(
       Math.max(0.01, Math.min(1, potong[0])) - 0.5,
       Math.max(0.01, Math.min(1, potong[1])) - 0.5,
       Math.max(0.01, Math.min(1, potong[2])) - 0.5,
     )
-  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, potong, tekstur, lapisan, halus])
+  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, potong, tekstur, lapisan, halus, bidang])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -295,6 +319,9 @@ export function VolumeDicom3D({
         uLapisanWarna: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
         uLapisanOpasitas: { value: [0, 0, 0] },
         uHalus: { value: 1.5 },
+        uBidangAktif: { value: 0 },
+        uBidangNormal: { value: new THREE.Vector3(0, 0, 1) },
+        uBidangJarak: { value: 0 },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,
@@ -304,6 +331,7 @@ export function VolumeDicom3D({
     })
     materialRef.current = material
     setelLapisan(material, lapisan, tekstur, halus)
+    setelBidang(material, bidang)
 
     const skala = skalaKotak(tekstur.fisikMm)
     const geometry = new THREE.BoxGeometry(skala[0], skala[1], skala[2])
