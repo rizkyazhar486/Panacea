@@ -173,7 +173,7 @@ features:
     observability: [requires_repository_audit]
     known_gaps: [not_wired_into_a_real_ui_call_site_for_the_new_longitudinal_sync, wearable_and_non_lab_signals_not_audited]
     next_actions: [wire_syncProductionAppState_lab_path_into_a_real_app_state_change_handler]
-    last_audited_commit: PENDING_NEXT_COMMIT
+    last_audited_commit: 27f38816
     # 2026-09-25: src/lib/labLongitudinalBridge.ts + src/lib/productionLabLongitudinalSync.ts now
     # project ButirLab (lab.ts) and the PhenoAge/biological-age trajectory (bioAgeTrajectory.ts)
     # into panaceaLongitudinalState.ts (domain 'lab' with honest review.state 'pending', domain

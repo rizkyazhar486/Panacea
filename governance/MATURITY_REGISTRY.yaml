@@ -28,10 +28,10 @@ workflows:
       - "canonical longitudinal projection: src/lib/labLongitudinalBridge.ts (ButirLab + TitikUsiaBiologis -> LongitudinalEvent, domain 'lab' review.state genuinely 'pending' not fabricated 'not-required'/'accepted', domain 'longevity' derived phenoage/phenoage-age-gap) + src/lib/productionLabLongitudinalSync.ts (idempotent orchestrator, same shape as productionHealthLongitudinalSync.ts) composed into src/lib/productionAppStateLongitudinalSync.ts (personal-scope gated, same as selfVitals/vo2max)"
       - "gates: scripts/uji/lab-longitudinal-bridge.mts, scripts/uji/production-lab-longitudinal-sync.mts, scripts/uji/production-appstate-longitudinal-sync.mts (extended) — cover mapping, unit/domain correctness, clinician-review-state honesty, skip-on-invalid-input, idempotent re-ingestion, and direct reachability through projectStateToSurface/buildContextPacket (lab withheld from Clinical while pending, visible in ai-chatbot with true reviewState, derived phenoage visible in Your Body)"
       - "npm run uji: 465/465; tsc -b: no errors; npm run build: passes"
-      - "commit: (recorded on next audit — see below)"
+      - "commit: 27f38816d91e779a5ad37fc17718998b8bbd652a"
     known_gaps: [photo_pdf_import, real_ui_call_site_for_production_sync, timeline_projection, body_exposure_projection, production_deployment_verification, prospective_clinician_validation]
     next_action: wire_syncProductionAppState_into_a_real_app_state_change_handler_so_lab_and_health_store_projection_actually_fires_on_user_events
-    last_audited_commit: PENDING_NEXT_COMMIT
+    last_audited_commit: 27f38816
 
   - workflow_id: care.daily_checkin
     name: Clinician-authored daily check-in to clinician digest
