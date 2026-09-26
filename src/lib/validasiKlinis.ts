@@ -20,7 +20,7 @@ export const VERSI_KERNEL_VALIDASI = 'validasi-klinis-1'
 
 export type IdMetrik =
   | 'correctness' | 'omission' | 'unsupported-claim' | 'harmful' | 'override'
-  | 'inter-rater-kappa' | 'time-to-review-ms'
+  | 'inter-rater-kappa' | 'time-to-review-ms' | 'dangerous-false-negative'
 
 export interface TitikAkhir {
   metrik: IdMetrik
@@ -67,6 +67,14 @@ export interface Penilai {
 
 export type Bahaya = 'none' | 'minor' | 'moderate' | 'severe'
 
+/**
+ * Klasifikasi galat oleh penilai (hanya bila keluaran dinilai salah).
+ * 'missed-critical-finding' = negatif palsu berbahaya: temuan/diagnosis/red flag
+ * kritis yang seharusnya muncul tetapi tidak — kategori yang paling dijaga.
+ */
+export const JENIS_GALAT = ['missed-critical-finding', 'missed-finding', 'false-alarm', 'wrong-value', 'wrong-recommendation', 'unsupported-claim', 'other'] as const
+export type JenisGalat = (typeof JENIS_GALAT)[number]
+
 export interface Penilaian {
   kasusId: string
   protokolSidik: string
@@ -80,6 +88,8 @@ export interface Penilaian {
   waktuTinjauMs: number
   buta: boolean
   catatan?: string
+  /** Kelas galat (kosong bila benar). Opsional agar catatan lama tetap terbaca. */
+  galat?: JenisGalat[]
 }
 
 export interface Adjudikasi { kasusId: string; adjudikator: Penilai; waktu: string; keputusanBenar: boolean; alasan: string }
@@ -244,11 +254,19 @@ export interface HasilMetrik {
   kejadianKeselamatan: { nearMiss: number; harm: number }
   ketidaksepakatanBelumDiadjudikasi: string[]
   sus: { n: number; median: number | null; skor: number[] }
+  /** Negatif palsu berbahaya (penilaian yang menandai 'missed-critical-finding'). */
+  dangerousFalseNegative: Proporsi
+  rincianGalat: Record<JenisGalat, number>
+  /** Penilaian dari penilai tanpa kredensial terverifikasi: dikecualikan dari titik akhir. */
+  dikecualikanTakTerverifikasi: number
 }
 
 export function hitungMetrik(buku: readonly Catatan[], protokolId: string): HasilMetrik {
   const kasusIds = new Set(buku.flatMap((c) => (c.isi.jenis === 'kasus' && c.isi.data.protokolId === protokolId ? [c.isi.data.id] : [])))
-  const nilai = buku.flatMap((c) => (c.isi.jenis === 'penilaian' && kasusIds.has(c.isi.data.kasusId) ? [c.isi.data] : []))
+  const semuaNilai = buku.flatMap((c) => (c.isi.jenis === 'penilaian' && kasusIds.has(c.isi.data.kasusId) ? [c.isi.data] : []))
+  // Pertahanan berlapis: server sudah menolak penilai tak terverifikasi, tetapi buku
+  // besar yang diimpor/dipulihkan tidak boleh memasukkannya ke titik akhir.
+  const nilai = semuaNilai.filter((p) => p.penilai.kredensialTerverifikasi)
   const adj = new Set(buku.flatMap((c) => (c.isi.jenis === 'adjudikasi' && kasusIds.has(c.isi.data.kasusId) ? [c.isi.data.kasusId] : [])))
   const perKasus = new Map<string, Penilaian[]>()
   for (const p of nilai) perKasus.set(p.kasusId, [...(perKasus.get(p.kasusId) ?? []), p])
@@ -272,6 +290,9 @@ export function hitungMetrik(buku: readonly Catatan[], protokolId: string): Hasi
     medianWaktuTinjauMs: median(nilai.map((p) => p.waktuTinjauMs)),
     kejadianKeselamatan: { nearMiss: aman.filter((a) => a.jenis === 'near-miss').length, harm: aman.filter((a) => a.jenis === 'harm').length },
     ketidaksepakatanBelumDiadjudikasi: tidakSepakat.sort(),
+    dangerousFalseNegative: proporsi(nilai.filter((p) => p.galat?.includes('missed-critical-finding')).length, n),
+    rincianGalat: Object.fromEntries(JENIS_GALAT.map((g) => [g, nilai.filter((p) => p.galat?.includes(g)).length])) as Record<JenisGalat, number>,
+    dikecualikanTakTerverifikasi: semuaNilai.length - nilai.length,
     sus: (() => {
       const skor = buku.flatMap((c) => (c.isi.jenis === 'usabilitas' && c.isi.data.protokolId === protokolId ? [skorSus(c.isi.data.jawaban)] : [])).sort((a, b) => a - b)
       return { n: skor.length, median: median(skor), skor }
@@ -303,6 +324,7 @@ export async function susunLaporan(buku: readonly Catatan[], protokolId: string)
   const nilaiMetrik = (id: IdMetrik): number | null => ({
     correctness: m.correctness.nilai, omission: m.omission.nilai, 'unsupported-claim': m.unsupportedClaim.nilai,
     harmful: m.harmful.nilai, override: m.override.nilai, 'inter-rater-kappa': m.kappa.kappa, 'time-to-review-ms': m.medianWaktuTinjauMs,
+    'dangerous-false-negative': m.dangerousFalseNegative.nilai,
   })[id]
   // Titik akhir baru dapat dievaluasi bila SETIAP kasus beku protokol ini sudah dinilai
   // oleh jumlah penilai independen yang ditetapkan, dan tidak ada ketidaksepakatan terbuka.
@@ -322,4 +344,28 @@ export async function susunLaporan(buku: readonly Catatan[], protokolId: string)
     }),
     pernyataan: PERNYATAAN_PEMISAH,
   }
+}
+
+// ── Gerbang rilis keselamatan klinis ─────────────────────────────────────────
+// Menentukan KLAIM yang boleh dipakai produk untuk satu versi sistem. Tiga keadaan
+// dijaga terpisah (arahan pemilik): 'technically-works' (hanya uji rekayasa),
+// 'clinically-reviewed' (ada penilaian klinisi terverifikasi, belum memenuhi
+// semua syarat), 'clinically-validated' (seluruh syarat di bawah terpenuhi).
+export type KlaimKlinis = 'technically-works' | 'clinically-reviewed' | 'clinically-validated'
+
+export function gerbangRilisKlinis(lap: LaporanValidasi, buku: readonly Catatan[], versiSistem: string): { klaim: KlaimKlinis; alasan: string[] } {
+  const alasan: string[] = []
+  const kasus = buku.flatMap((c) => (c.isi.jenis === 'kasus' && c.isi.data.protokolId === lap.protokol.id ? [c.isi.data] : []))
+  if (!kasus.length) return { klaim: 'technically-works', alasan: ['no frozen cases for this protocol'] }
+  const versiLain = [...new Set(kasus.map((k) => k.versiSistem))].filter((v) => v !== versiSistem)
+  if (versiLain.length) alasan.push(`study cases were produced by other system versions (${versiLain.join(', ')}); results do not transfer automatically`)
+  if (lap.metrik.penilaian === 0) return { klaim: 'technically-works', alasan: ['no verified human assessments recorded', ...alasan] }
+  if (!lap.rantai.utuh) alasan.push('ledger hash chain is broken')
+  if (lap.status !== 'endpoints-evaluable') alasan.push('not every case has the required independent reviewers, or disagreements are unadjudicated')
+  const gagal = lap.titikAkhir.filter((t) => t.terpenuhi !== true).map((t) => t.metrik)
+  if (gagal.length) alasan.push(`pre-specified endpoints not met: ${gagal.join(', ')}`)
+  if ((lap.metrik.dangerousFalseNegative.pembilang ?? 0) > 0) alasan.push(`${lap.metrik.dangerousFalseNegative.pembilang} dangerous false negative(s) recorded`)
+  if (lap.metrik.kejadianKeselamatan.harm > 0) alasan.push(`${lap.metrik.kejadianKeselamatan.harm} harm event(s) recorded`)
+  if (lap.protokol.etika.dataPasienNyata && !lap.protokol.etika.nomorPersetujuan) alasan.push('real patient data without a recorded ethics approval number')
+  return { klaim: alasan.length ? 'clinically-reviewed' : 'clinically-validated', alasan }
 }

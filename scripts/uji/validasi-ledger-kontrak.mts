@@ -23,7 +23,7 @@ assert.throws(() => susunPenilaian(buku, 'p', { kasusId: 'k1', benar: true, baha
 assert.throws(() => susunPenilaian(buku, 'p', { kasusId: 'k1', benar: true, bahaya: 'none', waktuTinjauMs: 1, override: { dilakukan: true } }, { ...penilai, id: 'u3' }, new Date()), /reason/)
 // Ketidaksepakatan → adjudikasi oleh klinisi lain; SUS; kernel menerima rantai dan menghitungnya.
 const pB = { ...penilai, id: 'u2' }, pC = { ...penilai, id: 'u3' }
-buku = [...buku, sambung(buku, { jenis: 'penilaian', data: susunPenilaian(buku, 'p', { kasusId: 'k1', benar: false, bahaya: 'minor', waktuTinjauMs: 20000 }, pB, new Date('2026-09-26T01:00:00Z')) })]
+buku = [...buku, sambung(buku, { jenis: 'penilaian', data: susunPenilaian(buku, 'p', { kasusId: 'k1', benar: false, galat: ['missed-finding'], bahaya: 'minor', waktuTinjauMs: 20000 }, pB, new Date('2026-09-26T01:00:00Z')) })]
 assert.throws(() => susunAdjudikasi(buku, { kasusId: 'k1', keputusanBenar: true, alasan: 'x' }, pB, new Date()), /must not be one of the case reviewers/)
 assert.throws(() => susunAdjudikasi(buku, { kasusId: 'k1', keputusanBenar: true, alasan: '' }, pC, new Date()), /reason/)
 buku = [...buku, sambung(buku, { jenis: 'adjudikasi', data: susunAdjudikasi(buku, { kasusId: 'k1', keputusanBenar: true, alasan: 'fixture' }, pC, new Date('2026-09-26T02:00:00Z')) })]

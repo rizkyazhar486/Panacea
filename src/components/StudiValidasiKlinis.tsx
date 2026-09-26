@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
-import { susunLaporan, type KasusBeku, type LaporanValidasi, type Protokol } from '../lib/validasiKlinis'
+import { gerbangRilisKlinis, JENIS_GALAT, susunLaporan, type JenisGalat, type KasusBeku, type KlaimKlinis, type LaporanValidasi, type Protokol } from '../lib/validasiKlinis'
 
 // Studi validasi klinis — layar penilai (buta) dan laporan pemimpin studi.
 // Perangkat lunak tidak membuat penilaian apa pun; setiap angka laporan berasal
@@ -18,12 +18,18 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
   const [studi, setStudi] = useState<{ protokol: Protokol; jumlahKasus: number; sudahSaya: number }[] | null>(null)
   const [aktif, setAktif] = useState<{ protokol: Protokol; cases: Kasus[] } | null>(null)
   const [galat, setGalat] = useState<string | null>(null)
-  const [laporan, setLaporan] = useState<LaporanValidasi | null>(null)
+  const [laporan, setLaporan] = useState<{ r: LaporanValidasi; rilis: { versi: string; klaim: KlaimKlinis; alasan: string[] } } | null>(null)
   useEffect(() => { api.validationStudies().then((r) => setStudi(r.studies)).catch((e) => setGalat((e as Error).message)) }, [])
 
   const buka = (id: string) => api.validationCases(id).then(setAktif).catch((e) => setGalat((e as Error).message))
   const bukaLaporan = async (id: string) => {
-    try { setLaporan(await susunLaporan((await api.validationLedger()).ledger, id)) } catch (e) { setGalat((e as Error).message) }
+    try {
+      const buku = (await api.validationLedger()).ledger
+      const r = await susunLaporan(buku, id)
+      // Versi sistem yang dinilai = versi pada kasus beku protokol ini (klaim berlaku per versi).
+      const versi = buku.flatMap((c) => (c.isi.jenis === 'kasus' && c.isi.data.protokolId === id ? [c.isi.data.versiSistem] : []))[0] ?? 'unknown'
+      setLaporan({ r, rilis: { versi, ...gerbangRilisKlinis(r, buku, versi) } })
+    } catch (e) { setGalat((e as Error).message) }
   }
 
   return (
@@ -47,7 +53,7 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
       </ul>
       {studi && studi.length > 0 && !pemimpin && <AntreanAdjudikasi protokolId={studi[0].protokol.id} />}
       {aktif && <PenilaiKasus studi={aktif} onSelesai={() => { void buka(aktif.protokol.id); api.validationStudies().then((r) => setStudi(r.studies)).catch(() => {}) }} />}
-      {laporan && <LaporanStudi laporan={laporan} />}
+      {laporan && <LaporanStudi laporan={laporan.r} rilis={laporan.rilis} />}
     </section>
   )
 }
@@ -55,10 +61,10 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
 function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases: Kasus[] }; onSelesai: () => void }) {
   const kasus = studi.cases.find((c) => !c.sudahSaya)
   const mulai = useRef(Date.now())
-  const [f, setF] = useState({ benar: null as boolean | null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', coi: '', catatan: '' })
+  const [f, setF] = useState({ galat: [] as JenisGalat[], benar: null as boolean | null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', coi: '', catatan: '' })
   const [kirim, setKirim] = useState(false)
   const [pesan, setPesan] = useState<string | null>(null)
-  useEffect(() => { mulai.current = Date.now(); setF((x) => ({ ...x, benar: null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', catatan: '' })) }, [kasus?.id])
+  useEffect(() => { mulai.current = Date.now(); setF((x) => ({ ...x, galat: [], benar: null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', catatan: '' })) }, [kasus?.id])
   if (!kasus) return (
     <div className="mt-2" data-validation-done>
       <p className="text-[12px] font-bold text-emerald-300">All cases in this study are assessed. Thank you.</p>
@@ -70,11 +76,12 @@ function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases
 
   const simpan = async () => {
     if (f.benar === null) { setPesan('State whether the output is correct.'); return }
+    if (f.benar === false && !f.galat.length) { setPesan('Classify the error.'); return }
     if (f.override && !f.alasan.trim()) { setPesan('An override needs a reason.'); return }
     setKirim(true)
     try {
       await api.submitValidationAssessment(studi.protokol.id, {
-        kasusId: kasus.id, benar: f.benar, bahaya: f.bahaya, klaimTakDidukung: Number(f.klaim) || 0,
+        kasusId: kasus.id, benar: f.benar, galat: f.benar ? [] : f.galat, bahaya: f.bahaya, klaimTakDidukung: Number(f.klaim) || 0,
         omisi: f.omisi.split('\n').map((x) => x.trim()).filter(Boolean), override: { dilakukan: f.override, alasan: f.alasan },
         waktuTinjauMs: Date.now() - mulai.current, konflikKepentingan: f.coi, catatan: f.catatan,
       })
@@ -100,6 +107,16 @@ function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases
               className={`min-h-10 flex-1 rounded-lg border px-2 font-black ${f.benar === v ? 'border-cyan-300/60 bg-cyan-400/15' : 'border-white/15'}`}>{v ? 'Output is correct' : 'Output is incorrect'}</button>
           ))}
         </div>
+        {f.benar === false && (
+          <div className="grid grid-cols-2 gap-1" role="group" aria-label="Error class" data-kelas-galat>
+            {JENIS_GALAT.map((g) => (
+              <label key={g} className={`flex min-h-9 items-center gap-1.5 rounded-lg border px-2 ${g === 'missed-critical-finding' ? 'border-rose-300/50 font-black text-rose-200' : 'border-white/15'}`}>
+                <input type="checkbox" checked={f.galat.includes(g)} onChange={(e) => setF({ ...f, galat: e.target.checked ? [...f.galat, g] : f.galat.filter((x) => x !== g) })} />
+                {LABEL_GALAT[g]}
+              </label>
+            ))}
+          </div>
+        )}
         <label className="flex items-center justify-between gap-2">Potential harm
           <select value={f.bahaya} onChange={(e) => setF({ ...f, bahaya: e.target.value })} aria-label="Potential harm" className="rounded-md border border-white/15 bg-transparent px-1 py-1 text-white">
             <option value="none">None</option><option value="minor">Minor</option><option value="moderate">Moderate</option><option value="severe">Severe</option>
@@ -196,7 +213,17 @@ function AntreanAdjudikasi({ protokolId }: { protokolId: string }) {
 }
 
 const pct = (v: number | null) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`)
-function LaporanStudi({ laporan: r }: { laporan: LaporanValidasi }) {
+const LABEL_GALAT: Record<JenisGalat, string> = {
+  'missed-critical-finding': 'Missed critical finding', 'missed-finding': 'Missed finding', 'false-alarm': 'False alarm',
+  'wrong-value': 'Wrong value', 'wrong-recommendation': 'Wrong recommendation', 'unsupported-claim': 'Unsupported claim', other: 'Other',
+}
+const LABEL_KLAIM: Record<KlaimKlinis, string> = {
+  'technically-works': 'Technically works — no clinical claim allowed',
+  'clinically-reviewed': 'Clinically reviewed — not validated',
+  'clinically-validated': 'Clinically validated for this version',
+}
+
+function LaporanStudi({ laporan: r, rilis }: { laporan: LaporanValidasi; rilis: { versi: string; klaim: KlaimKlinis; alasan: string[] } }) {
   const unduh = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }))
     const a = document.createElement('a'); a.href = url; a.download = `validation-report-${r.protokol.id}-v${r.protokol.versi}.json`; a.click()
@@ -212,6 +239,11 @@ function LaporanStudi({ laporan: r }: { laporan: LaporanValidasi }) {
           <li key={t.metrik} data-endpoint={t.metrik}>{t.metrik}: {t.metrik === 'time-to-review-ms' ? (t.nilai == null ? '—' : `${Math.round(t.nilai / 1000)} s`) : t.metrik === 'inter-rater-kappa' ? (t.nilai?.toFixed(2) ?? '—') : pct(t.nilai)} · target {t.ambang.arah === 'min' ? '≥' : '≤'} {t.ambang.nilai} · {t.terpenuhi == null ? 'not evaluable' : t.terpenuhi ? 'met' : 'not met'}</li>
         ))}
       </ul>
+      <p className="mt-1" data-galat-berbahaya>Dangerous false negatives: <b className={r.metrik.dangerousFalseNegative.pembilang ? 'text-rose-300' : ''}>{r.metrik.dangerousFalseNegative.pembilang}</b> of {r.metrik.penilaian}{r.metrik.dikecualikanTakTerverifikasi ? ` · ${r.metrik.dikecualikanTakTerverifikasi} unverified assessments excluded` : ''}</p>
+      <div className="mt-2 rounded-lg border border-white/15 p-2" data-klaim-rilis={rilis.klaim}>
+        <p className="font-black">Release claim · {rilis.versi}: {LABEL_KLAIM[rilis.klaim]}</p>
+        {rilis.alasan.length > 0 && <ul className="mt-0.5 list-disc pl-4 text-white/60">{rilis.alasan.map((a) => <li key={a}>{a}</li>)}</ul>}
+      </div>
       <p className="mt-1 text-white/45">{r.pernyataan}</p>
       <button type="button" onClick={unduh} className="mt-1 min-h-10 rounded-full border border-white/15 px-3 font-black">Download report (JSON)</button>
     </div>

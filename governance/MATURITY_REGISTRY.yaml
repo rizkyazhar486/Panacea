@@ -26,6 +26,7 @@ workflows:
       - "HTTP: own 200, other patient empty, stale write 409, future date 400; clinician granted 200 / other 404 / unverified 403 / after revoke 404"
       - "browser E2E 390x844: add->warn->save->delete; device A->B sync; share->clinician trend view->review->patient sees review"
       - "commits: 16608b5a 07813792 3fc91bf4 b237c432 88ba36ff 14aa0435 0beadc1c 5516e7d8 7926aee9 96de9684"
+    known_gaps_note: "2026-09-26: error classification (missed-critical-finding = dangerous false negative) required for every 'incorrect' assessment (server + UI); release gate gerbangRilisKlinis per system version (technically-works / clinically-reviewed / clinically-validated); browser 390x844: reviewer must classify, study report shows dangerous FN count and release claim with reasons"
     known_gaps: [photo_ocr_import, direct_lab_system_integration, canonical_state_recomputed_per_view_not_cached, production_deployment_verification, prospective_clinician_validation]
     next_action: external_study_lead_confirms_thresholds_then_two_verified_clinicians_assess_30_cases  # process measures landed; protocol + clinical outcomes need owner (internship)
     last_audited_commit: 0cb6906a

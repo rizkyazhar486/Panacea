@@ -5,7 +5,7 @@ const ui = readFileSync('src/components/StudiValidasiKlinis.tsx', 'utf8')
 assert.match(ui, /\{pemimpin && <button type="button" onClick=\{\(\) => void bukaLaporan/, 'tombol laporan (buku besar penuh) tampil untuk penilai biasa — kebutaan bocor')
 assert.equal((ui.match(/api\.validationLedger\(\)/g) ?? []).length, 1)
 // Laporan dihitung kernel dari buku besar, bukan dari angka server; rantai diverifikasi & ditampilkan.
-assert.match(ui, /susunLaporan\(\(await api\.validationLedger\(\)\)\.ledger, id\)/)
+assert.match(ui, /const buku = \(await api\.validationLedger\(\)\)\.ledger\n\s*const r = await susunLaporan\(buku, id\)/, 'laporan tidak disusun dari buku besar server')
 assert.match(ui, /Audit chain: \{r\.rantai\.utuh \? 'intact' : `BROKEN/)
 assert.match(ui, /No human assessments yet — nothing below is a result\./, 'laporan tanpa data manusia tidak menyatakannya')
 // Keluaran sistem ditandai bukan tinjauan klinisi; identitas penilai tidak dikirim klien.

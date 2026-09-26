@@ -33,6 +33,8 @@ export const protokolKini = (buku: readonly CatatanLedger[], id: string) => {
 }
 
 const BAHAYA = ['none', 'minor', 'moderate', 'severe'] as const
+// Cermin JENIS_GALAT di src/lib/validasiKlinis.ts (gerbang validasi-galat-rilis membandingkan keduanya).
+export const JENIS_GALAT = ['missed-critical-finding', 'missed-finding', 'false-alarm', 'wrong-value', 'wrong-recommendation', 'unsupported-claim', 'other'] as const
 const teks = (v: unknown, maks: number) => (typeof v === 'string' ? v.trim().slice(0, maks) : '')
 
 export interface IdentitasPenilai { id: string; peran: 'physician'; kredensialRef: string; kredensialTerverifikasi: boolean; cakupan: string; konflikKepentingan: string }
@@ -56,9 +58,14 @@ export function susunPenilaian(buku: readonly CatatanLedger[], protokolId: strin
   const override = m.override?.dilakukan === true ? { dilakukan: true, alasan: teks(m.override.alasan, 500) } : { dilakukan: false }
   if (override.dilakukan && !override.alasan) throw new Error('an override needs a reason')
   const omisi = (Array.isArray(m.omisi) ? m.omisi : []).slice(0, 20).map((o: unknown) => teks(o, 200)).filter(Boolean)
+  const galatMentah: unknown[] = Array.isArray(m.galat) ? m.galat : []
+  if (galatMentah.some((g) => !(JENIS_GALAT as readonly unknown[]).includes(g))) throw new Error('unknown error class')
+  const galat = [...new Set(galatMentah as string[])]
+  if (m.benar && galat.length) throw new Error('a correct output cannot carry an error class')
+  if (!m.benar && !galat.length) throw new Error('classify the error (e.g. missed critical finding, false alarm)')
   return {
     kasusId, protokolSidik: sidik(p), penilai, waktu: kini.toISOString(), benar: m.benar, klaimTakDidukung: klaim,
-    omisi, bahaya, override, waktuTinjauMs: Math.round(waktuTinjauMs), buta: true, ...(teks(m.catatan, 1000) ? { catatan: teks(m.catatan, 1000) } : {}),
+    omisi, bahaya, override, waktuTinjauMs: Math.round(waktuTinjauMs), buta: true, galat, ...(teks(m.catatan, 1000) ? { catatan: teks(m.catatan, 1000) } : {}),
   }
 }
 

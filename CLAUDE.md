@@ -920,3 +920,11 @@ Owner direction: position Panacea as a multi-scale Visualization & Simulation OS
 First implemented layer: the Multi-Scale Coupling Kernel (`src/lib/multiskala/kernelKopling.ts`) with a Capability Contract per scale module, hub-and-spoke message passing, fail-closed unit/producer validation, multi-rate scheduling, per-cell σ propagation, deterministic provenance chains and adaptive-refinement flags. Worked example `contohKatupJaringan.ts` (molecule ↔ cell ↔ tissue, two-way) is SIMULATED with illustrative uncalibrated parameters; Body Exposure shows it via `PanelKoplingMultiSkala.tsx`. Gate: `scripts/uji/kernel-kopling-multiskala.mts`.
 
 Hard boundaries: no GPU/BioNeMo/Isaac/MONAI capability is integrated — never imply it; no novelty claim without the Pioneer protocol's prior-art search (MUSCLE3/preCICE/PhysiCell-class coupling already exists); simulated values never flow back into the longitudinal record as measurements. Next steps are ordered in `DOCS/VISSIM-OS.md` §4 (cited parameter ranges first).
+
+
+## Owner master prompt reconciliation — 2026-09-26
+
+The owner's "Beyond-Human Invention Engine" master prompt (formula: Longitudinal Human State + Clinical Intelligence + AI-EMR + Body/Digital Human + Simulation + Life OS + Evidence & R&D; closed loop Data → State → Risk → Plan → Action → Outcome → re-plan) is consistent with this file and is adopted. Reconciled points:
+- Its "Eye Gold Standard Q ≥ 0.88 / anatomical accuracy ≥ 0.92" conflicts with the universal gold-standard directive above, and "Q" has no defined metric in the repo. Keep one universal standard; any numeric quality gate must first get an operational definition, a measurement procedure and a gate before it is used.
+- "Human Clinical Validation is priority #1" is implemented as a release gate: `gerbangRilisKlinis()` in `src/lib/validasiKlinis.ts` decides per system version whether the product may say "technically works", "clinically reviewed" or "clinically validated"; a single dangerous false negative ('missed-critical-finding'), a harm event, a broken ledger chain, unmet endpoints, unadjudicated disagreement, or real-patient data without an ethics number blocks "clinically validated". Gate: `scripts/uji/validasi-galat-rilis.mts`.
+- Invention/discovery claims stay under the Pioneer protocol: no novelty or "Nobel-tier" claim from model memory.
