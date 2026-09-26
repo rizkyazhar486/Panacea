@@ -39,7 +39,7 @@ workflows:
       functional_completeness: medium  # plan authoring, patient answers, kernel-recomputed priority; no measurement rules, reminders or offline queue in UI
       integration: medium  # shares consent/grant with lab sharing; not yet projected to longitudinal state or QuestionnaireResponse export
       reliability: medium
-      usability: low  # 2026-09-25 code-review pass (not a full clinician/browser usability test) found and fixed one real bug: RencanaHarianDokter's initial-load failure path returned null before ever rendering its own error state, so a failed fetch left the clinician staring at a permanently blank "Daily follow-up" section forever with no error and no retry; fixed with an explicit loading/error+Retry branch. Remaining known friction: no inline validation on the lab-rule authoring form (errors only surface after a server round trip), no loading indicator on LabPasienUntukDokter's clinician-lab-share list, no submitting-state guard against double-submit on "Start daily check-in".
+      usability: low  # 2026-09-25 code-review pass (not a full clinician/browser usability test) found and fixed one real bug: RencanaHarianDokter's initial-load failure path returned null before ever rendering its own error state. 2026-09-26 fixed the three friction items it left open: lab-rule authoring now validates threshold/age/evidence inline (mirrors server/src/carePlan.ts wording, per-row, before the round trip); "Start daily check-in" disables itself and reads "Saving…" while in flight instead of allowing a double-submit; LabPasienUntukDokter's clinician-lab-share list shows an explicit loading state before its first response. Still no full clinician/browser usability test.
       clinical_quality: unknown  # rules are clinician-authored only; app adds none
       safety_security: medium  # verified clinician + active grant; revoke stops check-in; 'not an emergency service' line
       observability_testing: medium  # rencana-harian-kontrak (server<->kernel contract + endpoint guards, sabotaged), browser E2E
@@ -52,9 +52,10 @@ workflows:
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation, lab_rule_form_inline_validation, lab_share_list_loading_state, checkin_submit_double_click_guard]
-    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed; 2026-09-25 fixed the blank-panel-on-load-failure bug, three smaller friction items remain (see known_gaps)
-    last_audited_commit: 9a70dfb0
+      - "2026-09-26: lab-rule authoring validates threshold/age/evidence inline before simpan() (RencanaHarianDokter.tsx validasiAturanLab, mirrors server/src/carePlan.ts wording), the submit button guards against double-submit ('Saving…' + disabled while in flight), and LabPasienUntukDokter's clinician-lab-share list shows an explicit loading state; scripts/uji/rencana-harian-kontrak.mts gains 4 source-pattern assertions for these (verified to fail when sabotaged)"
+    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation]
+    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed; 2026-09-25 fixed the blank-panel-on-load-failure bug; 2026-09-26 fixed the three remaining friction items (lab-rule validation, double-submit guard, lab-share loading state) — next is a real clinician/browser usability test, not another code-review pass
+    last_audited_commit: 1204b0f
 
   - workflow_id: clinical.patient_review
     name: Longitudinal patient review to clinician-supported next action (AI-EMR)
