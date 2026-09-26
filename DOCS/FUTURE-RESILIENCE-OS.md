@@ -167,9 +167,12 @@ Replacement requires:
 - clinicalSafety >= 0.70;
 - canonical-contract compatibility >= 0.60;
 - portability >= 0.50;
-- validated benchmark;
-- validated shadow mode;
-- validated rollback.
+- validated benchmark **with an auditable evidence reference**;
+- validated shadow mode **with an auditable evidence reference**;
+- validated rollback **with an auditable evidence reference**;
+- a non-empty authoritative source reference and parseable assessment date.
+
+A boolean such as `benchmarkValidated: true` is not sufficient evidence by itself. The runtime gate fails closed when the benchmark, shadow, or rollback claim lacks a durable artifact/reference pointer.
 
 ### Obsolescence Pressure
 
@@ -247,7 +250,7 @@ Prefer evidence in this order when deciding whether a technology materially chan
 
 Marketing claims are not validation.
 
-For every reviewed technology, store the **source, version/date, retrieval date, test fixture and limitations**.
+For every reviewed technology, store the **source, version/date, retrieval date, test fixture and limitations**. Any candidate eligible for cutover must additionally retain durable references for the benchmark result, shadow-run evidence, and rollback proof; undocumented "validated" flags fail closed.
 
 ## 6. Panacea capability surfaces
 
