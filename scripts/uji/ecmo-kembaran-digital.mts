@@ -84,7 +84,9 @@ assert.ok(s(a1, 'koroner') < s(a1, 'iliaka'), 'perbedaan atas-bawah muncul (sirk
 assert.ok(s(A({ qLv: 3, shunt: 0.05 }), 'brakiosefal') > s(a1, 'brakiosefal'), 'paru asli pulih → perbedaan menutup')
 assert.ok(A({ qEcmo: 5 }).fraksiAsliTotal < A({ qEcmo: 2 }).fraksiAsliTotal, 'aliran VA↑ → kontribusi ECMO pada aliran sistemik↑')
 dekat(CABANG_AORTA.reduce((x, c) => x + c.fraksi, 0), 1, 1e-12, 'fraksi cabang = 1')
-assert.ok(A().belumDisimulasikan.some((t) => /afterload/i.test(t)), 'beban LV harus dinyatakan belum disimulasikan, bukan dipalsukan')
+assert.ok(A().belumDisimulasikan.some((t) => /IABP|Impella/i.test(t)), 'perangkat unloading LV harus dinyatakan belum disimulasikan')
+assert.ok(A().belumDisimulasikan.some((t) => /drainage-site/i.test(t)), 'keterbatasan lokasi drainase (RA vs femoral) harus dinyatakan')
+assert.ok(!A().belumDisimulasikan.some((t) => /afterload/i.test(t)), 'beban LV kini disimulasikan (sirkulasi.ts); jangan menyatakannya hilang')
 assert.equal(A({ qLv: 0, qEcmo: 0 }).status, 'masukan-tidak-sah')
 
 // Penjelasan berasal dari transisi keadaan, bukan teks generik.

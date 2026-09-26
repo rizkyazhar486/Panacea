@@ -57,6 +57,16 @@ export const BUKTI: Record<string, EvidenceReference> = {
     sitasi: 'Badulak J et al. Position paper on the physiology and nomenclature of dual circulation during VA ECMO in adults. Intensive Care Med 2024;50(12):1994-2004',
     populasi: 'Adults on VA ECMO', konfigurasi: ['VA-perifer'],
   },
+  'delazzari-cardiosim-2025': {
+    id: 'delazzari-cardiosim-2025', tahun: 2025, pmid: '40428159', doi: '10.3390/bioengineering12050540', pmcid: 'PMC12109184',
+    sitasi: 'De Lazzari B et al. Modelling and simulation of the interactions between the cardiovascular system and VA ECMO and IABP: peripheral vs central. Bioengineering 2025;12(5):540',
+    populasi: 'Lumped-parameter simulation (CARDIOSIM) of cardiogenic shock — model evidence, not patients', konfigurasi: ['VA-perifer', 'VA-sentral'],
+  },
+  'suga-elastans-1973': {
+    id: 'suga-elastans-1973', tahun: 1973, pmid: '4691336', doi: '10.1161/01.res.32.3.314',
+    sitasi: 'Suga H, Sagawa K, Shoukas AA. Load independence of the instantaneous pressure-volume ratio of the canine left ventricle. Circ Res 1973;32(3):314-22',
+    populasi: 'Canine left ventricle (experimental)', konfigurasi: ['umum'],
+  },
   'severinghaus-1979': {
     id: 'severinghaus-1979', tahun: 1979, pmid: '35496', doi: '10.1152/jappl.1979.46.3.599',
     sitasi: 'Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 1979;46(3):599-602',
@@ -65,6 +75,20 @@ export const BUKTI: Record<string, EvidenceReference> = {
 }
 
 export const MODEL: Record<string, ScientificModel> = {
+  'sirkulasi-tergumpal': {
+    id: 'sirkulasi-tergumpal', nama: 'Lumped-parameter circulation (time-varying elastance)', sistem: 'kardiovaskular',
+    persamaan: 'P_ch = e(t)·Ees·(V−V0) + (1−e(t))·Ped(V);  P = (V − Vu)/C;  Q = ΔP/R;  valves as diodes',
+    satuan: { P: 'mmHg', V: 'mL', C: 'mL/mmHg', R: 'mmHg·s/mL' },
+    asumsi: ['parameters illustrative, calibrated to normal adult bands (tested), not fitted to patients', 'RA merged into systemic veins, LA into pulmonary veins', 'aorta split proximal/distal to separate central and peripheral return'],
+    bukti: ['suga-elastans-1973', 'delazzari-cardiosim-2025'], status: 'ilustratif-tak-terkalibrasi',
+  },
+  'pompa-sentrifugal': {
+    id: 'pompa-sentrifugal', nama: 'Centrifugal pump head curve', sistem: 'ecmo',
+    persamaan: 'H = 7.5·(rpm/1000)² − 1.2·Q²;  H = P_out − P_in + R_circ·Q;  R_drain rises steeply when P_in < 2 mmHg',
+    satuan: { H: 'mmHg', Q: 'L/min', rpm: '1/min' },
+    asumsi: ['flow is the solution of head vs patient pressures, never RPM itself', 'pump backflow at low RPM not modeled (reported as zero)', 'coefficients illustrative, not a specific pump'],
+    bukti: ['elso-vv-2021', 'delazzari-cardiosim-2025'], status: 'ilustratif-tak-terkalibrasi',
+  },
   'kurva-disosiasi': {
     id: 'kurva-disosiasi', nama: 'O2 dissociation curve', sistem: 'hematologi',
     persamaan: 'S = 1 / (23400 / (PO2^3 + 150·PO2) + 1)', satuan: { S: 'fraction', PO2: 'mmHg' },

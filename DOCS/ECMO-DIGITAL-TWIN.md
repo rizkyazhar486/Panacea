@@ -10,6 +10,7 @@ Wording rule: "evidence-informed and aligned with published ELSO guidance". Neve
 | Evidence + scientific-model registry | `src/lib/ecmo/bukti.ts` |
 | O₂ transport (ODC, content) | `src/lib/ecmo/oksigen.ts` |
 | Engine (VV, peripheral VA, CO₂, causal trace) | `src/lib/ecmo/mesin.ts` |
+| Lumped-parameter circulation + centrifugal pump | `src/lib/ecmo/sirkulasi.ts` (gate `scripts/uji/ecmo-sirkulasi.mts`) |
 | UI (reads state only) | `src/components/PanelEcmo.tsx`, mounted in Body Exposure → Physiology |
 | Numerical + golden physiological gate | `scripts/uji/ecmo-kembaran-digital.mts` |
 
@@ -37,14 +38,14 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | # | Step | State |
 |---|------|-------|
 | 1 | Evidence registry | done (6 sources, 11 models with status) |
-| 2 | Lumped-parameter cardiovascular engine | **not started** — needed for LV afterload/distension, waveforms, VA pulsatility |
+| 2 | Lumped-parameter cardiovascular engine | done: time-varying elastance LV/RV (reuses `hemodinamik.ts`), R–C vessels, split aorta, dt-independent, mass-conserving; normal bands and CS criteria locked by tests |
 | 3 | O₂/CO₂ transport | done at steady state (CO₂ membrane term illustrative) |
-| 4 | Circuit engine | partial: flow, membrane O₂/CO₂, pre/post saturation; no pressures, RPM→head curve, temperature |
+| 4 | Circuit engine | partial: RPM → pump head → flow against patient pressures, drainage collapse (suck-down); membrane O₂/CO₂; no displayed circuit pressures (Ppre/Ppost/ΔP) or temperature yet |
 | 5 | VV ECMO | done at steady state |
 | 6 | VV recirculation | done (illustrative geometry model; content method exact; saturation method shown to overestimate) |
-| 7 | Peripheral VA | partial: flow partition and oxygenation; no hemodynamics |
+| 7 | Peripheral VA | done at model level: VA flow comes from the circulation; oxygen partition uses the derived native LV output |
 | 8 | Dual circulation / mixing point | done as plug-flow partition with illustrative branch fractions |
-| 9 | Heart / LV loading | not started (explicitly shown as "not yet simulated") |
+| 9 | Heart / LV loading | done: VA flow ↑ → MAP ↑, LVESV/PCWP ↑, pulse pressure and aortic-valve opening ↓; LV P–V loop and aortic waveform drawn from state. Unloading devices not yet |
 | 10–15 | Lungs (mechanics), brain, kidney, liver, limb, hematology | directional CO₂→CBF only; rest not started |
 | 16–18 | Cannulation, ultrasound, ICU scene | not started |
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
@@ -54,6 +55,12 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 24 | Validation suite | numerical + directional golden tests; sabotaged |
 | 25 | Expert review | **external** — requires real intensivist, cannulating surgeon, perfusionist |
 
+## Model-vs-literature notes
+
+- Peripheral VA direction (LV/LA loading and PCWP rise with pump speed) agrees with De Lazzari 2025 (CARDIOSIM) and ELSO VA 2021; magnitude is smaller here (LVEDV +1–2% vs ≈14% in CARDIOSIM at 3000 rpm).
+- **Not reproduced:** central VA lowering PCWP/RVEDV (De Lazzari 2025). The RA is merged into the systemic venous compartment, so the drainage site cannot differ. Declared in the UI; needs an explicit RA compartment.
+- Shock scenario = LV Ees 30% + 350 mL compensatory volume; meets SBP < 90, PCWP > 15, CI < 2.2 (BSA 1.9 m² assumed).
+
 ## Next increment
 
-Step 2: a time-stepped lumped-parameter circulation (elastance ventricles, R/C compartments). Reuse `hemodinamik.ts` P-V elastance primitives rather than adding a parallel heart. ECMO becomes a flow path in that network, which unlocks LV afterload/distension, pulsatility and pressure waveforms. Calibrate against published normal adult values with sources in the registry.
+Separate RA (and LA) compartments so drainage site matters (central vs femoral), then circuit pressures (Ppre/Ppost/ΔP oxygenator) and membrane clotting as a time-evolving crisis scenario. After that: VV hemodynamic coupling (recirculation from geometry + flow), then organ perfusion from compartment pressures.

@@ -145,7 +145,8 @@ export interface KeadaanVA {
 }
 
 export const BELUM_VA = [
-  'LV afterload, LV distension and aortic valve opening (needs the lumped-parameter heart)',
+  'LV unloading devices (IABP, Impella, venting, septostomy)',
+  'Drainage-site effect (RA vs femoral): venous compartment is merged, so central VA does not show the RV/PCWP unloading reported in lumped-model literature',
   'Differential CO2 between the two circulations',
   'Central VA-ECMO geometry',
   'Limb ischemia from arterial cannula size',

@@ -4,6 +4,7 @@ import {
   type MasukanVV, type MasukanVA, type LangkahSebab,
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
+import { simulasiSirkulasi, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
 
 // Kembaran digital ECMO (edukasi). Panel ini hanya MEMBACA keadaan mesin:
 // tidak ada angka yang ditulis langsung, warna darah = pemetaan saturasi terhitung.
@@ -34,16 +35,27 @@ const KENDALI_VV: Kendali<MasukanVV>[] = [
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
   { k: 'fungsiMembran', label: 'Membrane function', min: 0.05, max: 1, step: 0.01, unit: '' },
 ]
+// VA: aliran LV asli dan aliran ECMO BUKAN penggeser; keduanya keluaran sirkulasi.
+interface KendaliHemo { id: 'ees' | 'rpm' | 'volume' | 'svr'; label: string; min: number; max: number; step: number; unit: string }
+const KENDALI_HEMO: KendaliHemo[] = [
+  { id: 'ees', label: 'LV contractility (% of normal)', min: 10, max: 100, step: 5, unit: '%' },
+  { id: 'rpm', label: 'Pump speed', min: 0, max: 5000, step: 100, unit: 'rpm' },
+  { id: 'volume', label: 'Blood volume', min: 4500, max: 6000, step: 50, unit: 'mL' },
+  { id: 'svr', label: 'SVR', min: 0.6, max: 2, step: 0.05, unit: 'mmHg·s/mL' },
+]
+const HEMO0: ParameterSirkulasi = { ...SKENARIO_SYOK_KARDIOGENIK, ecmo: { konfigurasi: 'VA-perifer', rpm: 3500 } }
+const nilaiHemo = (p: ParameterSirkulasi, id: KendaliHemo['id']) => id === 'ees' ? Math.round((p.lv.ees / SIRKULASI_NORMAL.lv.ees) * 100) : id === 'rpm' ? p.ecmo.rpm : id === 'volume' ? p.volumeDarah : p.svr
+const terapkanHemo = (p: ParameterSirkulasi, id: KendaliHemo['id'], v: number): ParameterSirkulasi =>
+  id === 'ees' ? { ...p, lv: { ...p.lv, ees: (SIRKULASI_NORMAL.lv.ees * v) / 100 } } : id === 'rpm' ? { ...p, ecmo: { ...p.ecmo, rpm: v } } : id === 'volume' ? { ...p, volumeDarah: v } : { ...p, svr: v }
+
 const KENDALI_VA: Kendali<MasukanVA>[] = [
-  { k: 'qLv', label: 'Native LV output', min: 0, max: 6, step: 0.1, unit: 'L/min' },
-  { k: 'qEcmo', label: 'ECMO flow', min: 0.5, max: 6, step: 0.1, unit: 'L/min' },
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
   { k: 'fio2', label: 'Ventilator FiO₂', min: 0.21, max: 1, step: 0.01, unit: '' },
   { k: 'sweep', label: 'Sweep gas', min: 0, max: 10, step: 0.5, unit: 'L/min' },
   { k: 'hb', label: 'Hemoglobin', min: 6, max: 16, step: 0.1, unit: 'g/dL' },
 ]
 
-function Penggeser<T>({ d, nilai, ubah }: { d: Kendali<T>; nilai: number; ubah: (v: number) => void }) {
+function Penggeser({ d, nilai, ubah }: { d: { label: string; min: number; max: number; step: number; unit: string }; nilai: number; ubah: (v: number) => void }) {
   return (
     <label className="block text-[12px]">
       <span className="flex justify-between font-bold text-neutral-300"><span>{d.label}</span><span className="tabular-nums">{nilai.toFixed(d.step < 0.1 ? 2 : 1)} {d.unit}</span></span>
@@ -95,6 +107,31 @@ function Aorta({ keadaan }: { keadaan: ReturnType<typeof simulasiVA> }) {
   )
 }
 
+function Lingkar({ h }: { h: HasilSirkulasi }) {
+  if (!h.sah || h.lingkarLV.length < 3) return null
+  const W = 150, H = 110, vMax = 220, pMax = 140
+  const x = (v: number) => 8 + (v / vMax) * (W - 12), y = (p: number) => H - 8 - (Math.min(p, pMax) / pMax) * (H - 14)
+  const d = h.lingkarLV.map((t, i) => `${i ? 'L' : 'M'}${x(t.v).toFixed(1)} ${y(t.p).toFixed(1)}`).join(' ')
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Left ventricular pressure-volume loop from the simulation">
+      <path d={d} fill="none" stroke="#fb7185" strokeWidth="1.8" />
+      <text x="6" y="10" fontSize="8" fill="#9ca3af">LV P–V (mmHg / mL)</text>
+    </svg>
+  )
+}
+function Gelombang({ h }: { h: HasilSirkulasi }) {
+  if (!h.sah || h.gelombangArteri.length < 3) return null
+  const W = 150, H = 110, n = h.gelombangArteri.length
+  const x = (i: number) => 4 + (i / (n - 1)) * (W - 8), y = (p: number) => H - 8 - (Math.min(p, 140) / 140) * (H - 14)
+  const d = h.gelombangArteri.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p).toFixed(1)}`).join(' ')
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Aortic pressure over one beat from the simulation">
+      <path d={d} fill="none" stroke="#38bdf8" strokeWidth="1.8" />
+      <text x="6" y="10" fontSize="8" fill="#9ca3af">Aortic pressure, 1 beat</text>
+    </svg>
+  )
+}
+
 function Mengapa({ langkah }: { langkah: LangkahSebab[] }) {
   if (!langkah.length) return <p className="text-[12px] text-neutral-400">Move a control to see the causal chain computed from the state change.</p>
   return (
@@ -110,15 +147,29 @@ export function PanelEcmo() {
   const [mode, setMode] = useState<Mode>('VV')
   const [vv, setVv] = useState(VV0)
   const [va, setVa] = useState(VA0)
+  const [hemo, setHemo] = useState<ParameterSirkulasi>(HEMO0)
+  const sebelumHemo = useRef<ParameterSirkulasi>(HEMO0)
   const sebelumVv = useRef<MasukanVV>(VV0)
   const sebelumVa = useRef<MasukanVA>(VA0)
   const [trace, setTrace] = useState<LangkahSebab[]>([])
   const kVv = useMemo(() => simulasiVV(vv), [vv])
-  const kVa = useMemo(() => simulasiVA(va), [va])
+  const kHemo = useMemo(() => simulasiSirkulasi(hemo), [hemo])
+  // Oksigenasi VA dihitung dari aliran yang DIHASILKAN sirkulasi, bukan penggeser.
+  const vaTurunan = (m: MasukanVA, h: HasilSirkulasi): MasukanVA => ({ ...m, qLv: h.sah ? h.coAsli : 0, qEcmo: h.sah ? Math.max(h.qEcmo, 0.01) : 0.01 })
+  const kVa = useMemo(() => simulasiVA(vaTurunan(va, kHemo)), [va, kHemo])
 
   const ubahVv = (k: keyof MasukanVV, v: number) => { const baru = { ...vv, [k]: v }; setTrace(jelaskanVV(sebelumVv.current, simulasiVV(sebelumVv.current), baru, simulasiVV(baru))); setVv(baru) }
-  const ubahVa = (k: keyof MasukanVA, v: number) => { const baru = { ...va, [k]: v }; setTrace(jelaskanVA(sebelumVa.current, simulasiVA(sebelumVa.current), baru, simulasiVA(baru))); setVa(baru) }
-  const tandai = () => { sebelumVv.current = vv; sebelumVa.current = va }
+  const ubahVa = (k: keyof MasukanVA, v: number) => {
+    const baru = { ...va, [k]: v }, a = vaTurunan(sebelumVa.current, kHemo), b = vaTurunan(baru, kHemo)
+    setTrace(jelaskanVA(a, simulasiVA(a), b, simulasiVA(b))); setVa(baru)
+  }
+  const ubahHemo = (id: KendaliHemo['id'], v: number) => {
+    const baru = terapkanHemo(hemo, id, v), hA = simulasiSirkulasi(sebelumHemo.current), hB = simulasiSirkulasi(baru)
+    const a = vaTurunan(va, hA), b = vaTurunan(va, hB)
+    setTrace([...jelaskanHemodinamik(sebelumHemo.current, hA, baru, hB), ...jelaskanVA(a, simulasiVA(a), b, simulasiVA(b)).filter((l) => l.besaran !== 'Native LV output' && l.besaran !== 'ECMO flow')])
+    setHemo(baru)
+  }
+  const tandai = () => { sebelumVv.current = vv; sebelumVa.current = va; sebelumHemo.current = hemo }
 
   const status = mode === 'VV' ? kVv.status : kVa.status
   return (
@@ -157,15 +208,23 @@ export function PanelEcmo() {
       ) : (
         <>
           <Aorta keadaan={kVa} />
+          <div className="grid grid-cols-2 gap-2"><Lingkar h={kHemo} /><Gelombang h={kHemo} /></div>
+          {!kHemo.sah && <p role="alert" className="text-[12px] font-bold text-amber-300">Circulation model rejected these inputs: {kHemo.alasan}</p>}
           <div className="grid grid-cols-3 gap-1.5">
             <Angka id="radial-kanan" label="Right radial SO₂" nilai={pct(kVa.cabang.find((c) => c.id === 'brakiosefal')?.saturasi ?? NaN)} />
             <Angka label="Coronary SO₂" nilai={pct(kVa.cabang.find((c) => c.id === 'koroner')?.saturasi ?? NaN)} />
             <Angka label="Femoral SO₂" nilai={pct(kVa.cabang.find((c) => c.id === 'iliaka')?.saturasi ?? NaN)} />
-            <Angka label="Native share of flow" nilai={pct(kVa.fraksiAsliTotal)} />
+            <Angka id="map" label="MAP" nilai={`${n0(kHemo.map)} mmHg`} />
+            <Angka id="pp" label="Pulse pressure" nilai={`${n0(kHemo.pulsePressure)} mmHg`} />
+            <Angka id="pcwp" label="PCWP" nilai={`${n0(kHemo.pcwp)} mmHg`} />
+            <Angka id="qecmo" label="ECMO flow" nilai={`${n0(kHemo.qEcmo, 1)} L/min`} />
+            <Angka id="colv" label="Native LV output" nilai={`${n0(kHemo.coAsli, 1)} L/min`} />
+            <Angka label="LVEDV / ESV" nilai={`${n0(kHemo.lvedv)} / ${n0(kHemo.lvesv)}`} />
             <Angka label="DO₂" nilai={`${n0(kVa.do2)} mL/min`} />
             <Angka label="SvO₂" nilai={pct(kVa.svo2)} />
           </div>
           <div className="space-y-1.5" onPointerDown={tandai} onKeyDown={tandai}>
+            {KENDALI_HEMO.map((d) => <Penggeser key={d.id} d={d} nilai={nilaiHemo(hemo, d.id)} ubah={(v) => ubahHemo(d.id, v)} />)}
             {KENDALI_VA.map((d) => <Penggeser key={String(d.k)} d={d} nilai={va[d.k] as number} ubah={(v) => ubahVa(d.k, v)} />)}
           </div>
         </>
@@ -178,7 +237,7 @@ export function PanelEcmo() {
 
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Not yet simulated</summary>
-        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'Cardiac lumped-parameter model and waveforms', 'Organ time constants (renal, hepatic, brain injury)', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and circuit crises'].map((t) => <li key={t}>{t}</li>)}</ul>
+        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'ECG, CVP waveform and heart-rate effects on ECMO flow', 'Organ time constants (renal, hepatic, brain injury)', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and circuit crises'].map((t) => <li key={t}>{t}</li>)}</ul>
       </details>
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Scientific basis</summary>
