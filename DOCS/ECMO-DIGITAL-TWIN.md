@@ -50,7 +50,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 10–15 | Lungs (mechanics), brain, kidney, liver, limb, hematology | kidney: RPP = distal MAP − CVP, illustrative autoregulation, creatinine by Chen 2013 mass balance (slow, projected); brain: head–neck DO₂ from the VA partition + PaCO₂ direction (ICP/CPP not modeled); splanchnic DO₂ + CVP; limb: residual lumen from cannula size + DPC (direction per Marbach 2022). Lung mechanics, liver synthetic function, hematology not started |
 | 16–18 | Cannulation, ultrasound, ICU scene | not started |
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
-| 20–21 | Crisis scenarios, weaning | registry `src/lib/ecmo/skenario.ts` (gate `scripts/uji/ecmo-skenario.mts`): drainage insufficiency, sweep failure, pump stop, oxygenator thrombosis, LV distension. Clues are computed from the state change; resolution is judged from physiology; wrong fixes (e.g. more RPM for hypovolaemia) do not resolve. Chatter oscillation, retrograde pump flow and unloading devices are declared not simulated. Weaning not started |
+| 20–21 | Crisis scenarios, weaning | registry `src/lib/ecmo/skenario.ts` (gate `scripts/uji/ecmo-skenario.mts`): drainage insufficiency, sweep failure, pump stop, oxygenator thrombosis, LV distension. Clues are computed from the state change; resolution is judged from physiology; wrong fixes (e.g. more RPM for hypovolaemia) do not resolve. Chatter oscillation, retrograde pump flow and unloading devices are declared not simulated. VV weaning: ELSO VV Table 7 sequence in `src/lib/ecmo/weaningVV.ts` (gate `scripts/uji/ecmo-weaning-vv.mts`), steps enforced in order, acceptable pH as an educator-set range (alkalosis can fail). VA weaning not started |
 | 22 | Explanations | done: causal trace generated from state differences |
 | 23 | Conference mode | not started |
 | 24 | Validation suite | numerical + directional golden tests; sabotaged |
@@ -70,4 +70,4 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 
 ## Next increment
 
-VV hemodynamic coupling (VV flow on the same circulation; recirculation from geometry + flow), VV-side crises (recirculation, refractory hypoxaemia), then weaning modes (VV sweep-off trial per ELSO VV Table 7; VA flow reduction with native-function assessment).
+VV hemodynamic coupling (VV flow on the same circulation; recirculation from geometry + flow), VV-side crises (recirculation, refractory hypoxaemia), then VA weaning (flow reduction with native-function assessment, echo representation).

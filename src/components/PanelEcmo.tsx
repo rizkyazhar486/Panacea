@@ -5,6 +5,7 @@ import {
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
+import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
 import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
@@ -37,6 +38,7 @@ const KENDALI_VV: Kendali<MasukanVV>[] = [
   { k: 'vo2', label: 'VO₂', min: 120, max: 450, step: 5, unit: 'mL/min' },
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
   { k: 'fungsiMembran', label: 'Membrane function', min: 0.05, max: 1, step: 0.01, unit: '' },
+  { k: 'va', label: 'Native alveolar ventilation', min: 0.5, max: 8, step: 0.1, unit: 'L/min' },
 ]
 // VA: aliran LV asli dan aliran ECMO BUKAN penggeser; keduanya keluaran sirkulasi.
 interface KendaliHemo { id: 'ees' | 'rpm' | 'volume' | 'svr'; label: string; min: number; max: number; step: number; unit: string }
@@ -158,6 +160,8 @@ export function PanelEcmo() {
   const kVv = useMemo(() => simulasiVV(vv), [vv])
   const [jamBekuan, setJamBekuan] = useState(0)
   const [frKanula, setFrKanula] = useState(19)
+  const [phMin, setPhMin] = useState(7.3)
+  const [phMaks, setPhMaks] = useState(7.5)
   const [skenarioId, setSkenarioId] = useState<string | null>(null)
   const [awalSk, setAwalSk] = useState<HasilGabungan | null>(null)
   const dasarSk = useMemo(() => jalankan(DASAR), [])
@@ -262,6 +266,26 @@ export function PanelEcmo() {
           </div>
         </>
       )}
+
+      {mode === 'VV' && (() => {
+        const w = nilaiWeaningVV(vv, phMin, phMaks)
+        return (
+          <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-weaning>
+            <h4 className="text-[11px] font-black uppercase text-neutral-400">Weaning trial (ELSO VV sequence)</h4>
+            <ol className="space-y-1 text-[12px]">
+              {w.tahap.map((t, i) => (
+                <li key={t.tahap} data-tahap={t.tahap} data-tercapai={t.tercapai ? 'ya' : 'tidak'} className="flex items-start justify-between gap-2">
+                  <span className="text-neutral-200">{i + 1}. {t.judul}<span className="block text-[10px] text-neutral-500">{t.syarat} · now {t.nilai}</span></span>
+                  <span className={`shrink-0 font-black ${t.tercapai ? 'text-emerald-400' : 'text-neutral-500'}`}>{t.tercapai ? 'met' : 'not met'}</span>
+                </li>
+              ))}
+            </ol>
+            <Penggeser d={{ label: 'Acceptable pH, lower (educator-set; ELSO gives no number)', min: 7.2, max: 7.4, step: 0.01, unit: '' }} nilai={phMin} ubah={setPhMin} />
+            <Penggeser d={{ label: 'Acceptable pH, upper (educator-set)', min: 7.4, max: 7.6, step: 0.01, unit: '' }} nilai={phMaks} ubah={setPhMaks} />
+            <p className="text-[10px] text-neutral-500">Teaching simulation, not a decannulation decision.</p>
+          </div>
+        )
+      })()}
 
       {mode === 'VA' && (() => {
         const s = SKENARIO.find((x) => x.id === skenarioId)

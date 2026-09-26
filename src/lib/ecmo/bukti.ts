@@ -181,6 +181,13 @@ export const MODEL: Record<string, ScientificModel> = {
     satuan: { d_artery: 'mm' }, asumsi: ['direction from meta-analysis (smaller cannula and DPC protect); index is not a probability of ischemia'],
     bukti: ['marbach-tungkai-2022', 'simons-duplex-2022'], status: 'ilustratif-tak-terkalibrasi',
   },
+  'weaning-vv': {
+    id: 'weaning-vv', nama: 'VV weaning sequence', sistem: 'ecmo',
+    persamaan: 'step 1: FdO2 → 0.21 with SpO2 > 92% or PaO2 ≥ 70;  step 2: sweep ≤ 1 L/min with acceptable pH;  step 3: sweep 0 with PaO2 ≥ 70 and acceptable pH;  each step only after the previous',
+    satuan: { PaO2: 'mmHg', sweep: 'L/min' },
+    asumsi: ['sequence and PaO2/SpO2 criteria from ELSO VV 2021 Table 7 (read in full text)', 'ELSO gives no pH number: the acceptable range is an educator-set input', 'teaching evaluation of the simulated state, not a decannulation decision'],
+    bukti: ['elso-vv-2021'], status: 'terverifikasi-teks-lengkap',
+  },
   'membran-o2': {
     id: 'membran-o2', nama: 'Membrane-lung O2 equilibration', sistem: 'ecmo',
     persamaan: 'P_post = P_pre + m·(FdO2·(PB − 47) − P_pre); sweep = 0 ⇒ P_post = P_pre', satuan: { P: 'mmHg', m: 'membrane function 0–1' },
