@@ -17,6 +17,8 @@ function palsu() {
 }
 const f = palsu(); let n = 0
 const loop = mulaiLoopTerjaga({} as Element, () => n++, f.dep)
+assert.equal(f.antre.size, 0, 'visibilitas viewport belum diketahui: jangan render frame spekulatif')
+f.setTerlihat(true); assert.equal(f.antre.size, 1, 'observer terlihat: mulai tepat satu frame')
 f.tik(); f.tik(); assert.equal(n, 2, 'loop berjalan saat terlihat'); assert.equal(f.antre.size, 1, 'tepat satu frame terjadwal')
 f.setTerlihat(false); assert.equal(f.antre.size, 0, 'offscreen: tidak ada frame terjadwal'); f.tik(); assert.equal(n, 2)
 f.setTerlihat(true); assert.equal(f.antre.size, 1, 'kembali terlihat: satu frame, tidak dobel'); f.setTerlihat(true); assert.equal(f.antre.size, 1)
