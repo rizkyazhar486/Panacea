@@ -6,6 +6,7 @@ import {
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
 import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
+import { ujiPenurunanAliranVA, OPSI_WEANING_VA } from '../lib/ecmo/weaningVA'
 import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
@@ -162,6 +163,7 @@ export function PanelEcmo() {
   const [frKanula, setFrKanula] = useState(19)
   const [phMin, setPhMin] = useState(7.3)
   const [phMaks, setPhMaks] = useState(7.5)
+  const [ujiVa, setUjiVa] = useState<ReturnType<typeof ujiPenurunanAliranVA> | null>(null)
   const [skenarioId, setSkenarioId] = useState<string | null>(null)
   const [awalSk, setAwalSk] = useState<HasilGabungan | null>(null)
   const dasarSk = useMemo(() => jalankan(DASAR), [])
@@ -286,6 +288,24 @@ export function PanelEcmo() {
           </div>
         )
       })()}
+
+      {mode === 'VA' && (
+        <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-weaning-va>
+          <h4 className="text-[11px] font-black uppercase text-neutral-400">VA flow-reduction trial</h4>
+          <button type="button" onClick={() => setUjiVa(ujiPenurunanAliranVA(hemoAktif, OPSI_WEANING_VA))} className="min-h-10 rounded-full bg-white/10 px-4 text-[12px] font-bold">Run trial on the current patient</button>
+          {ujiVa && (
+            <ul className="space-y-1 text-[12px]">
+              {ujiVa.kriteria.map((k) => (
+                <li key={k.id} data-kriteria={k.id} data-status={k.status} className="flex items-start justify-between gap-2">
+                  <span className="text-neutral-200">{k.judul}<span className="block text-[10px] text-neutral-500">{k.nilai}</span></span>
+                  <span className={`shrink-0 font-black ${k.status === 'tercapai' ? 'text-emerald-400' : k.status === 'tidak' ? 'text-amber-300' : 'text-neutral-500'}`}>{k.status === 'tercapai' ? 'met' : k.status === 'tidak' ? 'not met' : 'not simulated'}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="text-[10px] text-neutral-500">Criteria from one 51-patient series; TDSa is not simulated, so this tool cannot declare readiness to wean.</p>
+        </div>
+      )}
 
       {mode === 'VA' && (() => {
         const s = SKENARIO.find((x) => x.id === skenarioId)

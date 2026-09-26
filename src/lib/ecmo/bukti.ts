@@ -92,6 +92,11 @@ export const BUKTI: Record<string, EvidenceReference> = {
     sitasi: 'Simons J et al. Duplex analysis of cannulated vessels in peripheral VA ECMO. Medicina (Kaunas) 2022;58(5):671',
     populasi: '19 adults on femoro-femoral VA ECMO', konfigurasi: ['VA-perifer'],
   },
+  'aissaoui-weaning-2011': {
+    id: 'aissaoui-weaning-2011', tahun: 2011, pmid: '21965097', doi: '10.1007/s00134-011-2358-2',
+    sitasi: 'Aissaoui N et al. Predictors of successful ECMO weaning after assistance for refractory cardiogenic shock. Intensive Care Med 2011;37(11):1738-45',
+    populasi: '51 adults, single centre, VA ECMO for refractory cardiogenic shock', konfigurasi: ['VA-perifer', 'VA-sentral'],
+  },
   'severinghaus-1979': {
     id: 'severinghaus-1979', tahun: 1979, pmid: '35496', doi: '10.1152/jappl.1979.46.3.599',
     sitasi: 'Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 1979;46(3):599-602',
@@ -187,6 +192,13 @@ export const MODEL: Record<string, ScientificModel> = {
     satuan: { PaO2: 'mmHg', sweep: 'L/min' },
     asumsi: ['sequence and PaO2/SpO2 criteria from ELSO VV 2021 Table 7 (read in full text)', 'ELSO gives no pH number: the acceptable range is an educator-set input', 'teaching evaluation of the simulated state, not a decannulation decision'],
     bukti: ['elso-vv-2021'], status: 'terverifikasi-teks-lengkap',
+  },
+  'weaning-va': {
+    id: 'weaning-va', nama: 'VA flow-reduction trial', sistem: 'ecmo',
+    persamaan: 'reduce flow < 1.5 L/min; at minimal flow: aortic VTI ≥ 10 cm (VTI = SV/LVOT area), LVEF > 20–25%, TDSa ≥ 6 cm/s',
+    satuan: { VTI: 'cm', SV: 'mL', LVOT: 'cm' },
+    asumsi: ['LVOT diameter assumed 2.0 cm (educational)', 'TDSa not produced by the model, so readiness is never declared', 'tolerance threshold (MAP) is educator-set; the source gives no number'],
+    bukti: ['aissaoui-weaning-2011'], status: 'terverifikasi-abstrak',
   },
   'membran-o2': {
     id: 'membran-o2', nama: 'Membrane-lung O2 equilibration', sistem: 'ecmo',
