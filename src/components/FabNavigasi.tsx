@@ -349,7 +349,8 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const keAtas = pos.y > window.innerHeight / 2
   const keKiri = pos.x > window.innerWidth / 2
 
-  if (sembunyikanDiBodyExplorer || sembunyikanDiBodyExposure) return null
+  if (sembunyikanDiBodyExplorer) return null
+  if (sembunyikanDiBodyExposure) return null
 
   return (
     <>
