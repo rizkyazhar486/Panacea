@@ -86,8 +86,9 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
 }) {
   const lokasi = useLocation()
   const navigasi = useNavigate()
-  const sembunyikanDiPermukaanSpasial = lokasi.pathname.startsWith('/body-explorer')
-    || (lokasi.pathname === '/fitness-hub' && new URLSearchParams(lokasi.search).get('view') === 'body-exposure')
+  const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
+  const sembunyikanDiBodyExposure = lokasi.pathname === '/fitness-hub'
+    && new URLSearchParams(lokasi.search).get('view') === 'body-exposure'
 
   const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
   const [pos, setPos] = useState<AssistivePosition>(() => {
@@ -348,7 +349,7 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const keAtas = pos.y > window.innerHeight / 2
   const keKiri = pos.x > window.innerWidth / 2
 
-  if (sembunyikanDiPermukaanSpasial) return null
+  if (sembunyikanDiBodyExplorer || sembunyikanDiBodyExposure) return null
 
   return (
     <>
