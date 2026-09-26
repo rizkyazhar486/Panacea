@@ -112,10 +112,7 @@ export function ClinicalHub() {
           <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
         </header>
 
-        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         <ClinicalPatientContext />
-        {account?.role === 'dokter' && <LabPasienUntukDokter />}
-        {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
@@ -235,6 +232,10 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
+        {account?.role === 'dokter' && <LabPasienUntukDokter />}
+        {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
+
         {/* Tubuh ditaruh SETELAH aksi klinis. Permukaan tubuh setinggi ~4.400px
             pada 390px; di atas, ia mendorong "Ask Panacea", aksi utama dan
             kalkulator ke y~5.000 — enam layar gulir sebelum pemakai klinis
