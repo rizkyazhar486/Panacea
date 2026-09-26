@@ -487,9 +487,10 @@ export function getUserByEmail(email: string): User | undefined {
   return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
 }
 
-// Resolve a registered patient-user from a self-patient id ("self-<sanitized
-// email>"), mirroring the frontend's id derivation. Returns undefined for
-// doctor-created patients (no linked account).
+// Resolve a registered patient-user from a self-patient id.
+// Primary form is "self-u-<stable server user id>". The historical
+// "self-<sanitized email>" form remains read-compatible for old records only.
+// Returns undefined for doctor-created patients (no linked account).
 /**
  * Cari orang untuk kotak pencarian.
  *
@@ -518,6 +519,10 @@ export function cariOrang(q: string, batas = 8): { id: string; name: string; rol
 
 export function findUserBySelfPatientId(patientId: string): User | undefined {
   if (!patientId?.startsWith('self-')) return undefined
+  if (patientId.startsWith('self-u-')) {
+    const userId = patientId.slice('self-u-'.length)
+    return userId ? db.users.find((u) => u.id === userId) : undefined
+  }
   const suffix = patientId.slice(5).toLowerCase()
   return db.users.find((u) => u.email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) === suffix)
 }

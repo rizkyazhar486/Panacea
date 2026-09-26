@@ -190,6 +190,7 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 
 function toAccount(u: BackendUser): Account {
   return {
+    id: u.id,
     email: u.email,
     name: u.name,
     role: u.role,

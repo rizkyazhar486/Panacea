@@ -164,11 +164,26 @@ const PLACEHOLDER_CONTRIBUTOR: Contributor = {
   id: 'me', name: 'Saya', role: 'Dokter', specialty: '', verified: false, canVerify: false,
 }
 
+// Legacy self id is retained only to migrate browser state created before the
+// server user id was propagated to Account. New longitudinal identity never
+// derives from email, so changing an email cannot create a second patient.
+function legacySelfPatientId(email: string): string {
+  return 'self-' + email.replace(/[^a-z0-9]/gi, '').slice(0, 16)
+}
+
+function pindahkanKunciPasien<T>(map: Record<string, T>, dari: string, ke: string): Record<string, T> {
+  if (dari === ke || !(dari in map) || ke in map) return map
+  const berikut = { ...map, [ke]: map[dari] }
+  delete berikut[dari]
+  return berikut
+}
+
 // Build a patient record from a patient account's registration details.
 function patientFromAccount(account: Account): Patient {
   const year = new Date().getFullYear() - (account.age ?? 30)
+  const stable = account.id?.trim()
   return {
-    id: 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
+    id: stable ? `self-u-${stable}` : legacySelfPatientId(account.email),
     name: account.name,
     sex: account.sex ?? 'L',
     // Prefer the real date of birth from the datepicker; fall back to age estimate.
@@ -653,13 +668,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // (no dummy data). Doctors start with an empty patient list.
           if (account.role === 'pasien') {
             const self = patientFromAccount(account)
-            const exists = st.patients.some((p) => p.id === self.id)
+            const legacyId = legacySelfPatientId(account.email)
+            const stableAda = st.patients.some((p) => p.id === self.id)
+            const legacyAda = legacyId !== self.id && st.patients.some((p) => p.id === legacyId)
+            const patients = stableAda
+              ? st.patients
+              : legacyAda
+                ? st.patients.map((p) => (p.id === legacyId ? { ...p, ...self } : p))
+                : [...st.patients, self]
             const acc = { ...account, patientId: self.id }
             saveSession(acc) // remember login for 7 days
             return {
               ...st,
               account: acc,
-              patients: exists ? st.patients : [...st.patients, self],
+              patients,
+              // Re-key only when the stable destination does not already exist.
+              // This preserves both copies on an unexpected conflict instead of
+              // silently overwriting longitudinal clinical state.
+              vitals: pindahkanKunciPasien(st.vitals, legacyId, self.id),
+              supportive: pindahkanKunciPasien(st.supportive, legacyId, self.id),
+              chats: pindahkanKunciPasien(st.chats, legacyId, self.id),
+              records: pindahkanKunciPasien(st.records, legacyId, self.id),
+              education: pindahkanKunciPasien(st.education, legacyId, self.id),
+              lifeEvents: pindahkanKunciPasien(st.lifeEvents, legacyId, self.id),
+              quests: pindahkanKunciPasien(st.quests, legacyId, self.id),
               activePatientId: self.id,
             }
           }

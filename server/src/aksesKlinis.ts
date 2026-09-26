@@ -5,15 +5,17 @@
 // SEKARANG:
 // - klinisi terverifikasi (peran efektif 'dokter') dan pemilik: data praktik, seperti
 //   sebelumnya (model satu praktik);
-// - selain itu: HANYA rekam "diri" yang terhubung ke akunnya sendiri. Id rekam diri
-//   = 'self-' + 16 alfanumerik pertama surel — skema yang bisa bertabrakan, jadi
-//   akses juga mensyaratkan pencarian balik menunjuk pengguna yang SAMA (tabrakan
-//   gagal tertutup).
+// - selain itu: HANYA rekam "diri" yang terhubung ke akunnya sendiri.
+//   Id primer = 'self-u-' + userId stabil dari server, sehingga perubahan surel
+//   tidak membuat identitas pasien baru. Id berbasis surel lama tetap diterima
+//   hanya sebagai alias kompatibilitas dan selalu harus resolve balik ke userId
+//   yang sama (tabrakan gagal tertutup).
 import type { Clinical } from './store.js'
 
 export interface PenggunaAkses { id: string; email: string; role: string }
 
-export const idPasienDiri = (email: string) => `self-${email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16)}`
+export const idPasienDiri = (userId: string) => `self-u-${userId.trim()}`
+export const idPasienDiriLegacy = (email: string) => `self-${email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16)}`
 
 export function klinisiAtauPemilik(u: PenggunaAkses, pemilik: boolean): boolean {
   return pemilik || u.role === 'dokter' || u.role === 'owner'
@@ -26,7 +28,9 @@ export function bolehAksesPasien(
 ): boolean {
   if (klinisiAtauPemilik(u, pemilik)) return true
   if (tertaut?.(patientId)) return true
-  if (!patientId || patientId !== idPasienDiri(u.email)) return false
+  if (!patientId) return false
+  const kandidat = new Set([idPasienDiri(u.id), idPasienDiriLegacy(u.email)])
+  if (!kandidat.has(patientId)) return false
   return cariPemilikRekamDiri(patientId)?.id === u.id
 }
 
