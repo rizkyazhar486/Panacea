@@ -26,4 +26,4 @@ assert.ok(tools < validation, 'Clinical-validation work queue returned above the
 assert.ok(depth < body && sharedLab < body && validation < body,
   'Secondary Clinical workspaces must remain reachable before the large Body surface')
 
-console.log('clinical-first-viewport-contract: patient context → actions → quick tools precede depth navigation and clinician work queues.')
+console.log('clinical-first-viewport-contract: actions → quick tools → patient context precede depth navigation and clinician work queues.')
