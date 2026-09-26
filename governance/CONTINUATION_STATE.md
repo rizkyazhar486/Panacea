@@ -1,26 +1,30 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
-Updated 2026-09-25 (session_01Jpyv7TnjBpwfz89tDQN4cx). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md.
+Updated 2026-09-26 (scheduled autonomous session). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md.
 
-main_sha: 9a70dfb0 (pushed directly to main; CI at this SHA was in_progress with no failures at write time — Vercel Prebuilt Production already succeeded, Stabilization/Body 3D/Pages/Security/Clinical Evidence still running with 0 failing jobs observed. Local validation is the primary evidence: 474/474 frontend `npm run uji`, server `npm run uji` 0 gagal across every suite, clean `tsc -b`)
-working_branch: main
-latest_verified_commit: 9a70dfb0
+main_sha: (pending push from this session; base was 507b907, see git log for the exact commit this ledger entry lands in)
+working_branch: claude/pensive-heisenberg-7ax2q1 (pushed as a branch, not directly to main, per this session's explicit operating constraints; reconcile into main normally)
+latest_verified_commit: (see the commit this file is part of)
 
 completed_this_session:
-- fixed a real clinician-facing bug in `RencanaHarianDokter.tsx` (9a70dfb0): the daily-follow-up panel's `if (!data) return null` ran *before* the existing `{galat && ...}` error paragraph, so when the initial `api.clinicianCare(izinId)` fetch failed, the component returned `null` forever — the clinician saw a permanently blank "Daily follow-up" section with no error message and no way to recover (the error was set in state but never reached by any render path). Fixed by rendering an explicit loading state or the error message with a "Retry" button that re-runs `muat()`. Added a source-pattern regression assertion in `scripts/uji/rencana-harian-kontrak.mts` that fails if this `if (!data)` branch ever stops referencing `galat`/retry again.
-- confirmed exact-head CI is genuinely green: this worktree started with no `node_modules` in either `/` or `/server` (fresh clone), which made `npm run uji` falsely report 8 failing files (`Cannot find package 'three'`) purely from missing deps, not a real regression. After `npm install` in both locations, frontend is 474/474 and server is 0 gagal across all ~30 suites. Documenting this so the next session doesn't misdiagnose a fresh worktree as broken main.
+- closed the three concrete clinician-usability gaps this ledger flagged after the previous session's `if (!data)` fix, in `RencanaHarianDokter.tsx` and `LabPasienUntukDokter.tsx`:
+  1. added client-side validation for the daily-plan/lab-rule authoring form (`kesalahan` list) mirroring the exact checks `susunRencana()` enforces server-side (diagnosis name required, each question prompt required, lab-rule threshold must parse to a finite number, result-age window 1–730 days, evidence reference required) — errors render inline as a list only after the clinician attempts to submit (`dicoba`), instead of surfacing only after a round trip as a raw thrown-error string;
+  2. added a `mengirim` (submitting) guard around `simpan()`: the "Start daily check-in" button is now `disabled` while a save is in flight or while validation fails, and `simpan()` itself early-returns on the same condition, so a slow/flaky connection cannot double-submit a care plan;
+  3. added a "Loading…" state for `LabPasienUntukDokter`'s clinician-lab-share list between mount and the first `api.clinicianLabShares()` response, matching the existing loading-state convention used elsewhere in the same file/its child `RencanaHarianDokter`.
+- extended `scripts/uji/rencana-harian-kontrak.mts` with source-pattern regression assertions for all three fixes (validation-guard presence, specific validation message text, disabled-button condition, loading-state presence) so a future edit that silently removes any of them fails CI, the same style already used in that file for the prior `if (!data)` fix.
+- re-verified exact-head build health: this worktree also started with a partial `node_modules` (missing `@types/react` and other packages at root, "Cannot find module 'react'" from a raw `tsc -b`, though `server/node_modules` was intact). `npm install` at root fixed it. After that: root `npx tsc -b` clean with zero errors, frontend `npm run uji` 494/494 berkas uji lulus, server `npm run uji` exit 0 with `0 gagal` across every suite. Documenting again (this is the second session in a row to hit a stale/partial `node_modules` in a fresh worktree) so the next session runs `npm install` in both `/` and `/server` before trusting any failing-test read as a real regression.
 
 current_blocker:
-- none in code at 9a70dfb0. This was a small, well-scoped usability/correctness fix, not a large feature; the clinician usability pass of plan authoring + lab-rule digest is not exhausted by this one fix.
+- none in code. This branch has not yet been merged into main by this session (see working_branch note above); the next session (or the owner) should fold it into main through this repository's normal direct-to-main flow once reconciled, rather than stacking further commits on an orphaned branch.
 
 failing_checks:
-- none observed at 9a70dfb0 (see main_sha note above for CI-in-flight caveat)
+- none observed locally (root `tsc -b`, frontend `npm run uji`, server `npm run uji` all clean as of this session)
 
 next_exact_action:
-- continue the clinician usability pass of plan authoring + lab-rule digest (MATURITY_REGISTRY care.daily_checkin next_action). Concrete remaining friction to look at next in `RencanaHarianDokter.tsx` / `LabPasienUntukDokter.tsx`:
-  - the lab-rule authoring form has no client-side validation before `simpan()` (e.g. empty evidence reference, non-numeric threshold) — errors currently surface only after a round trip to the server as a raw thrown-error string; consider inline field-level validation with the same wording as the server's `teks()`/threshold checks so the clinician doesn't have to guess which of several rule rows failed;
-  - `LabPasienUntukDokter`'s clinician-lab-share list (`daftar`) has no loading indicator between mount and the first `api.clinicianLabShares()` response — currently renders nothing until either the list or an error arrives, similar in kind (though not in severity — it does show `galat` correctly once it arrives) to the bug just fixed;
-  - consider whether "Start daily check-in" should be disabled while `simpan()` is in flight to prevent double-submit on a slow/flaky connection (no submitting-state guard currently exists).
+- the three concrete items this ledger listed after the last fix are now done (see completed_this_session). Re-scan `RencanaHarianDokter.tsx` / `LabPasienUntukDokter.tsx` / `CekHarian.tsx` for the next friction item before assuming the clinician usability pass is exhausted — candidates not yet addressed:
+  - `FormTinjauan` (lab-review note form) in `LabPasienUntukDokter.tsx` has no character-count/remaining-length affordance for its 500-char `maxLength` note field, and no submitting-guard on "Save review" (same double-submit class of bug as the one just fixed on "Start daily check-in");
+  - the lab-rule authoring inputs (`ambang`, `hari`) are plain text inputs with no visible inline error styling on the specific invalid field (the new validation surfaces a list, but doesn't highlight which row/input is wrong) — consider `aria-invalid`/border-color per offending field if this keeps coming up in real clinician feedback;
+  - `CekHarian.tsx` (patient-side daily check-in) was not re-audited this session for the same class of missing-loading/double-submit issues just fixed on the clinician side — worth the same pass.
 
 next_priority_after_that:
 - photo OCR lab import (explicit confirmation per value, no silent unit conversion)
@@ -35,8 +39,8 @@ do_not_touch:
 - open PRs of other agents (#2011 body endocrine, #1991 PMF engine, #1948, #1933, #1922, #1877, #1859, #1848, #1845) unless integrating
 
 verification_commands:
-- npm install   (this worktree/clone had NO node_modules at session start; run this first or `npm run uji` false-fails on missing `three` etc.)
-- npm run uji   (expect N/N berkas uji lulus; was 474/474 at 9a70dfb0)
-- (cd server && npm install && npm run uji)   (uses a temp PANACEA_DATA_FILE; data.json untouched; all suites 0 gagal at 9a70dfb0)
-- npx tsc -b   (clean at 9a70dfb0)
-- browser E2E at 390x844: server with ALLOW_DEV_LOGIN=true, doctor needs settings.strStatus=verified and STR field at login (not re-run this session; no UI layout changed, only conditional branches in existing markup)
+- npm install   (fresh/partial worktrees keep missing deps — e.g. `@types/react` was missing this session even though `node_modules` existed; run this first or `npm run uji`/`tsc -b` false-fail on missing packages)
+- npm run uji   (expect N/N berkas uji lulus; was 494/494 this session)
+- (cd server && npm install && npm run uji)   (uses a temp PANACEA_DATA_FILE; data.json untouched; all suites 0 gagal this session)
+- npx tsc -b   (clean this session)
+- browser E2E at 390x844: server with ALLOW_DEV_LOGIN=true, doctor needs settings.strStatus=verified and STR field at login (not re-run this session; no layout/markup structure changed, only new state/validation branches in existing markup)

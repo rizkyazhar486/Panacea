@@ -68,4 +68,15 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))
   assert.match(muatAwal, /galat/, 'cabang !data tidak menampilkan galat saat muat() awal gagal')
   assert.match(muatAwal, /Retry|muat\(\)/, 'cabang !data tidak menawarkan jalan retry')
+  // Validasi sisi klien: ambang/umur/bukti aturan lab dan diagnosis/pertanyaan
+  // wajib dicek sebelum simpan() memanggil server, dan tombol tidak boleh
+  // mengirim dua kali sambil permintaan sebelumnya masih berjalan.
+  assert.match(dokterUi, /if \(kesalahan\.length > 0 \|\| mengirim\) return/, 'simpan() tidak menolak saat ada kesalahan validasi atau sedang mengirim')
+  assert.match(dokterUi, /threshold must be a number/, 'validasi ambang aturan lab hilang')
+  assert.match(dokterUi, /evidence reference is required/, 'validasi rujukan bukti aturan lab hilang')
+  assert.match(dokterUi, /disabled=\{mengirim \|\| \(dicoba && kesalahan\.length > 0\)\}/, 'tombol "Start daily check-in" tidak dinonaktifkan saat validasi gagal atau sedang mengirim')
+  // Daftar lab yang dibagikan ke dokter harus punya status "Loading…" antara
+  // mount dan respons pertama, bukan bagian kosong tanpa penjelasan.
+  const labDokterUi = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+  assert.match(labDokterUi, /daftar === null && !galat.*Loading/, 'daftar lab-shares tidak punya status memuat sebelum respons pertama')
 }
