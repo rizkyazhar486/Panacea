@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
 import { buatClientId, bacaAntrean, kirimAtauAntre, kurasAntrean, type ButirAntrean } from '../lib/antreanCekHarian'
 import { buildDailyInterview, type ContinuousCarePlan, type DailyAnamnesisAnswer } from '../lib/continuousCareOperatingSystem'
@@ -46,12 +46,19 @@ export function CekHarian() {
   let pertanyaan = plan.questions
   try { pertanyaan = buildDailyInterview(plan, new Date(`${hariIni()}T12:00:00Z`).toISOString(), jawaban).questions } catch { /* di luar jendela rencana: tampilkan semua */ }
 
+  // Penjaga ketuk-ganda: tiap ketukan membuat clientId baru, jadi idempotensi server
+  // tidak mencegah dua laporan. Ref (bukan state) menutup celah render berikutnya.
+  const sedangKirim = useRef(false)
+  const [mengirim, setMengirim] = useState(false)
   const kirim = async () => {
+    if (sedangKirim.current) return
     const hilang = pertanyaan.filter((q) => q.required && jawab[q.id] === undefined)
     if (hilang.length) { setPesan(`Please answer: ${hilang.map((q) => q.prompt).join(' · ')}`); return }
     const b: ButirAntrean = { clientId: buatClientId(), planId: plan.id, scheduledFor: hariIni(), authoredAt: new Date().toISOString(),
       answers: jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)) }
-    const r = await kirimAtauAntre(localStorage, b, kirimSatu)
+    sedangKirim.current = true; setMengirim(true)
+    let r: Awaited<ReturnType<typeof kirimAtauAntre>>
+    try { r = await kirimAtauAntre(localStorage, b, kirimSatu) } finally { sedangKirim.current = false; setMengirim(false) }
     if (r.status === 'terkirim') { setPesan('Sent to your doctor for review.'); setJawab({}); void muat() }
     else if (r.status === 'diantre') { setPesan('No connection. Saved on this device; it will be sent when you are back online.'); setJawab({}); setAntre(bacaAntrean(localStorage).length) }
     else setPesan(r.pesan)
@@ -99,7 +106,7 @@ export function CekHarian() {
               )}
             </div>
           ))}
-          <button type="button" onClick={() => void kirim()} className="t-kecil min-h-[44px] w-full rounded-xl bg-brand font-bold text-white">Send to my doctor</button>
+          <button type="button" onClick={() => void kirim()} disabled={mengirim} aria-busy={mengirim} className="t-kecil min-h-[44px] w-full rounded-xl bg-brand font-bold text-white disabled:opacity-60">{mengirim ? 'Sending…' : 'Send to my doctor'}</button>
         </div>
       )}
       <label className="t-mikro mt-2 flex items-center justify-between gap-2 text-neutral-500" data-pengingat-cek>

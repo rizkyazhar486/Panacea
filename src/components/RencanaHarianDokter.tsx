@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { submitDailyAnamnesis, type ContinuousCarePlan, type DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
 import { JENIS_LAB } from '../lib/lab'
-import { evaluasiAturanLab, LABEL_KEADAAN } from '../lib/aturanLabDokter'
+import { evaluasiAturanLab, LABEL_KEADAAN, periksaAturanLab } from '../lib/aturanLabDokter'
 import type { LongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 
 // Dokter menyusun cek harian untuk satu pasien (lewat izin yang sama dengan
@@ -23,7 +23,10 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
   const muat = () => api.clinicianCare(izinId).then(setData).catch((e) => setGalat((e as Error).message))
   useEffect(() => { void muat() }, [izinId])
 
-  const simpan = () => api.createCarePlan(izinId, {
+  const galatAturan = aturanLab.map(periksaAturanLab)
+  const aturanSah = galatAturan.every((g) => Object.keys(g).length === 0)
+  const [menyimpan, setMenyimpan] = useState(false)
+  const simpan = () => { if (!aturanSah || menyimpan) return; setMenyimpan(true); return api.createCarePlan(izinId, {
     diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
     questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
     patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
@@ -39,7 +42,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
         rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
       }
     }),
-  }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message))
+  }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message)).finally(() => setMenyimpan(false)) }
 
   if (!data) {
     return (
@@ -80,6 +83,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
             {aturanLab.map((a, i) => {
               const ubah = (p: Partial<AturanLab>) => setAturanLab(aturanLab.map((x, k) => (k === i ? { ...x, ...p } : x)))
               const j = JENIS_LAB.find((x) => x.id === a.jenis)
+              const g = galatAturan[i] ?? {}
               return (
                 <div key={i} className="grid gap-1 text-[11px] text-white/70">
                   <div className="flex flex-wrap items-center gap-1">
@@ -89,14 +93,15 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
                     <select value={a.op} aria-label={`Comparison ${i + 1}`} onChange={(e) => ubah({ op: e.target.value as AturanLab['op'] })} className="rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white">
                       <option value="gte">≥</option><option value="lte">≤</option>
                     </select>
-                    <input inputMode="decimal" value={a.ambang} onChange={(e) => ubah({ ambang: e.target.value })} aria-label={`Threshold ${i + 1}`} className="w-16 rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white" />
+                    <input inputMode="decimal" value={a.ambang} onChange={(e) => ubah({ ambang: e.target.value })} aria-label={`Threshold ${i + 1}`} aria-invalid={Boolean(g.ambang)} className="w-16 rounded-md border border-white/15 aria-[invalid=true]:border-amber-400 bg-transparent px-1 py-0.5 text-white" />
                     <span>{j?.satuan}</span>
                     <span>· result within</span>
-                    <input inputMode="numeric" value={a.hari} onChange={(e) => ubah({ hari: e.target.value })} aria-label={`Maximum result age in days ${i + 1}`} className="w-12 rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white" />
+                    <input inputMode="numeric" value={a.hari} onChange={(e) => ubah({ hari: e.target.value })} aria-label={`Maximum result age in days ${i + 1}`} aria-invalid={Boolean(g.hari)} className="w-12 rounded-md border border-white/15 aria-[invalid=true]:border-amber-400 bg-transparent px-1 py-0.5 text-white" />
                     <span>days</span>
                   </div>
-                  <input value={a.bukti} onChange={(e) => ubah({ bukti: e.target.value })} placeholder="Evidence reference (guideline, section) — required" aria-label={`Evidence reference ${i + 1}`}
-                    className="rounded-md border border-white/15 bg-transparent px-2 py-1 text-white" />
+                  <input value={a.bukti} onChange={(e) => ubah({ bukti: e.target.value })} placeholder="Evidence reference (guideline, section) — required" aria-label={`Evidence reference ${i + 1}`} aria-invalid={Boolean(g.bukti)}
+                    className="rounded-md border border-white/15 bg-transparent px-2 py-1 text-white aria-[invalid=true]:border-amber-400" />
+                  {Object.keys(g).length > 0 && <p className="text-[10px] font-bold text-amber-300" data-galat-aturan={i}>{Object.values(g).join(' · ')}</p>}
                 </div>
               )
             })}
@@ -104,7 +109,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
           </div>
           <div className="flex gap-1.5">
             {qs.length < 20 && <button type="button" className="min-h-9 rounded-full px-3 text-[11px] font-bold" onClick={() => setQs([...qs, { id: `q${qs.length + 1}`, prompt: '', kind: 'boolean', required: true, tandai: false }])}>+ Question</button>}
-            <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black" onClick={() => void simpan()}>Start daily check-in</button>
+            <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black disabled:opacity-50" disabled={!aturanSah || menyimpan} title={aturanSah ? undefined : 'Fix the highlighted lab rules first'} onClick={() => void simpan()}>{menyimpan ? 'Saving…' : 'Start daily check-in'}</button>
           </div>
         </div>
       ) : (

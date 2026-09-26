@@ -67,7 +67,8 @@ export function LabPasienUntukDokter() {
   const [care, setCare] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] }>({ plan: null, reports: [] })
   useEffect(() => { if (buka) api.clinicianCare(buka.izinId).then(setCare).catch(() => setCare({ plan: null, reports: [] })) }, [buka?.izinId, buka?.reviews.length])
   const [galat, setGalat] = useState<string | null>(null)
-  useEffect(() => { if (backendEnabled) api.clinicianLabShares().then((r) => setDaftar(r.shares)).catch((e) => setGalat((e as Error).message)) }, [])
+  const muatDaftar = () => { setGalat(null); api.clinicianLabShares().then((r) => setDaftar(r.shares)).catch((e) => setGalat((e as Error).message)) }
+  useEffect(() => { if (backendEnabled) muatDaftar() }, [])
   if (!backendEnabled) return null
 
   const kelompok = new Map<string, FhirBundelLab['entry'][number]['resource'][]>()
@@ -80,7 +81,13 @@ export function LabPasienUntukDokter() {
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-[#050708] p-3 text-white" aria-label="Lab results shared with you" data-clinician-lab>
       <h2 className="text-sm font-black">Lab results shared with you</h2>
-      {galat && <p className="mt-1 text-[11px] font-bold text-amber-300">{galat === 'verified clinician role required' ? 'Available after your STR is verified.' : galat}</p>}
+      {galat && (
+        <p role="alert" className="mt-1 text-[11px] font-bold text-amber-300">
+          {galat === 'verified clinician role required' ? 'Available after your STR is verified.' : galat}
+          {galat !== 'verified clinician role required' && <button type="button" className="ml-1 underline" onClick={muatDaftar}>Retry</button>}
+        </p>
+      )}
+      {!daftar && !galat && <p role="status" className="mt-1 text-[11px] text-white/45" data-memuat-berbagi-lab>Loading shared results…</p>}
       {daftar && daftar.length === 0 && <p className="mt-1 text-[11px] text-white/55">No patient has shared lab results with you yet.</p>}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {daftar?.map((d) => (
