@@ -101,6 +101,38 @@ risks:
       whether a data-exposure notification is required.
     evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
 
+  - risk_id: risk.scheduled_session_branch_fragmentation
+    category: governance
+    severity: high
+    state: open
+    description: >-
+      The scheduled autonomous session runs on a fresh disposable branch each firing
+      (claude/pensive-heisenberg-<random>) per its harness template, and CLAUDE.md's own
+      shipping policy ('direct-to-main by default, PR not required') is not being reached from
+      that lane: `git ls-remote` on 2026-09-26 showed 38 distinct claude/pensive-heisenberg-*
+      branches on origin and zero pull requests ever opened from any of them (search_pull_requests
+      head:pensive-heisenberg -> 0 results). Real work is landing on these branches (governance
+      registries, AI-EMR per-item/per-field provenance, the clinical validation release gate, the
+      link-status endpoint, VisSim-OS multigrid, the ubiquitin protein layer) but most of it never
+      reaches main, so the maturity registry's `working_branch: main` and `last_audited_commit`
+      claims can silently describe a branch instead of what main actually contains. This session's
+      own designated branch (claude/pensive-heisenberg-uae3hq) had 3 real, tested, already-described
+      commits sitting locally, never pushed to origin at all, until this session pushed them -
+      one narrowly-avoided loss.
+    mitigation: >-
+      2026-09-26: pushed the 3 stranded commits on claude/pensive-heisenberg-uae3hq before any new
+      work, so they now exist on origin (previously they existed only in this session's local
+      clone). Corrected CONTINUATION_STATE.md, which was two sessions stale (claimed
+      `working_branch: main` and described a HEAD three commits behind the branch's actual tip).
+      Not yet fixed: no mechanism reconciles these branches back into main, and none has ever been
+      opened as a PR. Recommended owner decision: either let the scheduled lane push directly to
+      main like other Claude Code sessions (matching the already-stated repo policy), or have each
+      scheduled run open/update one running PR against main so the accumulated branches stop
+      growing unboundedly. Until decided, each scheduled session should at minimum verify its
+      designated branch is actually pushed (not just committed locally) before ending, and should
+      not assume a stale governance file's `working_branch: main` is accurate.
+    evidence: [git ls-remote origin (38 claude/pensive-heisenberg-* branches, 2026-09-26), mcp__github__search_pull_requests head:pensive-heisenberg -> 0 results, governance/CONTINUATION_STATE.md pre-2026-09-26-fix]
+
   - risk_id: risk.stale_emr_signature_reuse
     category: clinical_safety
     severity: critical
