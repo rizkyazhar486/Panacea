@@ -48,7 +48,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 8 | Dual circulation / mixing point | done as plug-flow partition with illustrative branch fractions |
 | 9 | Heart / LV loading | done: VA flow ↑ → MAP ↑, LVESV/PCWP ↑, pulse pressure and aortic-valve opening ↓; LV P–V loop and aortic waveform drawn from state. Unloading devices not yet |
 | 10–15 | Lungs (mechanics), brain, kidney, liver, limb, hematology | kidney: RPP = distal MAP − CVP, illustrative autoregulation, creatinine by Chen 2013 mass balance (slow, projected); brain: head–neck DO₂ from the VA partition + PaCO₂ direction (ICP/CPP not modeled); splanchnic DO₂ + CVP; limb: residual lumen from cannula size + DPC (direction per Marbach 2022). Lung mechanics, liver synthetic function, hematology not started |
-| 16–18 | Cannulation, ultrasound, ICU scene | not started |
+| 16–18 | Cannulation, ultrasound, ICU scene | schematic echo from state (`src/lib/ecmo/echo.ts`, gate `scripts/uji/ecmo-echo.mts`): LV cavity from simulated volume (area ∝ V^(2/3)), aortic valve open only with simulated aortic flow, LVOT Doppler trace whose integral equals SV/LVOT area. Not an ultrasound image. Cannulation, vascular ultrasound and ICU scene not started |
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
 | 20–21 | Crisis scenarios, weaning | registry `src/lib/ecmo/skenario.ts` (gate `scripts/uji/ecmo-skenario.mts`): drainage insufficiency, sweep failure, pump stop, oxygenator thrombosis, LV distension. Clues are computed from the state change; resolution is judged from physiology; wrong fixes (e.g. more RPM for hypovolaemia) do not resolve. Chatter oscillation, retrograde pump flow and unloading devices are declared not simulated. VV weaning: ELSO VV Table 7 sequence in `src/lib/ecmo/weaningVV.ts` (gate `scripts/uji/ecmo-weaning-vv.mts`), steps enforced in order, acceptable pH as an educator-set range (alkalosis can fail). VA weaning: flow-reduction trial (< 1.5 L/min) in `src/lib/ecmo/weaningVA.ts` (gate `scripts/uji/ecmo-weaning-va.mts`) with LVEF and aortic VTI (= SV/LVOT area) from the same circulation, per Aissaoui 2011 (abstract, n = 51); TDSa is not simulated, so readiness is never declared |
 | 22 | Explanations | done: causal trace generated from state differences |
@@ -68,6 +68,9 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 - LV contractility below 12% of normal is rejected: the exponential passive-filling curve otherwise makes diastolic LV pressure exceed aortic pressure (an artefact, not physiology).
 - Known accessibility defect (shared): the `Prosa` "i" disclosure button is 28 px. An invisible ::after hit-area extension was tried and a browser hit-test showed it did not work, so it was reverted; needs a proper fix in the shared component.
 
+- Systolic activation lengthened to ts = 0.25 + 0.3·T (valve open ≈ 28% of the cycle): the echo view exposed ejection that was too brief. Peak LVOT velocity remains unrealistic (≈ 240 cm/s at rest) because blood inertance is not modeled, so peak velocity is not displayed; VTI is consistent. The LV-distension scenario now resolves on renewed native ejection (aortic valve opening and native output) instead of an invented pulse-pressure number.
+- Browser check found a crash (negative animation frame index unmounted the whole ECMO panel); fixed and regression-gated.
+
 ## Next increment
 
-VV hemodynamic coupling (VV flow on the same circulation; recirculation from geometry + flow), VV-side crises (recirculation, refractory hypoxaemia), then an echo/ultrasound view generated from the same state (LV size, aortic-valve opening, VTI).
+Blood inertance in the valve/aortic segment (realistic ejection velocity), VV hemodynamic coupling and VV-side crises (recirculation, refractory hypoxaemia).

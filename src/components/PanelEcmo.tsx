@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   simulasiVV, simulasiVA, jelaskanVV, jelaskanVA, CABANG_AORTA, BELUM_VA,
   type MasukanVV, type MasukanVA, type LangkahSebab,
@@ -7,6 +7,7 @@ import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
 import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
 import { ujiPenurunanAliranVA, OPSI_WEANING_VA } from '../lib/ecmo/weaningVA'
+import { bangunEcho, indeksBingkai } from '../lib/ecmo/echo'
 import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
@@ -138,6 +139,42 @@ function Gelombang({ h }: { h: HasilSirkulasi }) {
   )
 }
 
+function EchoSkematis({ h }: { h: HasilSirkulasi }) {
+  const echo = useMemo(() => bangunEcho(h), [h])
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (!echo) return
+    const kurang = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (kurang) return
+    let id = 0, mulai = performance.now()
+    // Stempel waktu rAF pertama bisa lebih awal dari performance.now(): bungkus indeks ke 0..n-1.
+    const n = echo.bingkai.length
+    const langkah = (t: number) => { setI(indeksBingkai(t, mulai, echo.dtSampel, n)); id = requestAnimationFrame(langkah) }
+    id = requestAnimationFrame(langkah)
+    return () => cancelAnimationFrame(id)
+  }, [echo])
+  if (!echo) return null
+  const b = echo.bingkai[Math.min(Math.max(0, Number.isFinite(i) ? i : 0), echo.bingkai.length - 1)]
+  const vMaks = Math.max(...echo.bingkai.map((x) => x.kecepatan), 1)
+  const d = echo.bingkai.map((x, k) => `${k ? 'L' : 'M'}${(4 + (k / (echo.bingkai.length - 1)) * 142).toFixed(1)} ${(8 + (x.kecepatan / vMaks) * 44).toFixed(1)}`).join(' ')
+  return (
+    <div className="rounded-xl bg-black p-2" data-ecmo-echo>
+      <svg viewBox="0 0 300 120" className="w-full" role="img" aria-label="Schematic echo view derived from the simulated LV volume and aortic flow">
+        <path d="M150 6 L20 114 A140 140 0 0 0 280 114 Z" fill="#111" stroke="#333" />
+        <ellipse cx="150" cy="70" rx={38 * b.skalaRongga} ry={46 * b.skalaRongga} fill="#000" stroke="#9ca3af" strokeWidth="5" />
+        <g transform="translate(150 22)"><line x1="-10" y1="0" x2={b.katupBuka ? -14 : 0} y2="-10" stroke="#e5e7eb" strokeWidth="3" /><line x1="10" y1="0" x2={b.katupBuka ? 14 : 0} y2="-10" stroke="#e5e7eb" strokeWidth="3" /></g>
+        <text x="6" y="14" fontSize="9" fill="#9ca3af">LV (schematic)</text>
+      </svg>
+      <svg viewBox="0 0 150 60" className="w-full" role="img" aria-label="LVOT Doppler trace derived from simulated aortic flow">
+        <path d={d} fill="none" stroke="#e5e7eb" strokeWidth="1.2" />
+        <line x1={4 + (i / (echo.bingkai.length - 1)) * 142} x2={4 + (i / (echo.bingkai.length - 1)) * 142} y1="4" y2="56" stroke="#fb7185" strokeWidth="0.8" />
+      </svg>
+      <p className="mt-1 text-[11px] text-neutral-300" data-ecmo-vti>Aortic VTI {echo.vtiIntegral.toFixed(1)} cm · valve {b.katupBuka ? 'open' : 'closed'}</p>
+      <Prosa kelas="text-[10px] text-neutral-500">{'Schematic generated from the simulated LV volume and aortic flow — not an ultrasound image. VTI (the integral) is consistent with stroke volume; the velocity profile shape is not validated because blood inertance is not modeled, so peak velocity is not shown.'}</Prosa>
+    </div>
+  )
+}
+
 function Mengapa({ langkah }: { langkah: LangkahSebab[] }) {
   if (!langkah.length) return <p className="text-[12px] text-neutral-400">Move a control to see the causal chain computed from the state change.</p>
   return (
@@ -235,6 +272,7 @@ export function PanelEcmo() {
         <>
           <Aorta keadaan={kVa} />
           <div className="grid grid-cols-2 gap-2"><Lingkar h={kHemo} /><Gelombang h={kHemo} /></div>
+          <EchoSkematis h={kHemo} />
           {!kHemo.sah && <p role="alert" className="text-[12px] font-bold text-amber-300">Circulation model rejected these inputs: {kHemo.alasan}</p>}
           <div className="grid grid-cols-3 gap-1.5">
             <Angka id="radial-kanan" label="Right radial SO₂" nilai={pct(kVa.cabang.find((c) => c.id === 'brakiosefal')?.saturasi ?? NaN)} />

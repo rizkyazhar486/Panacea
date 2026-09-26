@@ -101,7 +101,7 @@ export const SKENARIO: Skenario[] = [
     pemicu: 'Contractility falls further (15% of normal) while support is raised to 5500 rpm',
     terapkan: (k) => ({ ...k, hemo: { ...k.hemo, lv: { ...k.hemo.lv, ees: BILIK_RUJUKAN_LV.ees * 0.15 }, ecmo: { ...k.hemo.ecmo, rpm: 5500 } } }),
     kendaliRelevan: ['rpm', 'ees'],
-    selesai: (_d, n) => n.h.fraksiBukaKatupAorta > 0.05 && n.h.pulsePressure > 5,
+    selesai: (_d, n) => n.h.fraksiBukaKatupAorta > 0.05 && n.h.coAsli > 0.3, // LV kembali mengejeksi: katup aorta membuka dan ada curah asli terukur
     batas: 'Unloading devices (IABP, Impella, venting, septostomy) are not simulated; only flow reduction and contractility are available.',
   },
 ]

@@ -74,7 +74,7 @@ export function tekananSirkuit(rpm: number, q: number, pMasuk: number, faktorBek
 }
 
 function aktivasi(tDalamSiklus: number, periode: number): number {
-  const ts = 0.16 + 0.2 * periode // durasi sistolik (ilustratif, memendek saat HR naik)
+  const ts = 0.25 + 0.3 * periode // durasi sistolik (ilustratif, memendek saat HR naik)
   return tDalamSiklus < ts ? Math.sin((Math.PI * tDalamSiklus) / ts) : 0
 }
 
@@ -93,6 +93,8 @@ export interface HasilSirkulasi {
   aliranArkusKeDistal: number // L/menit; negatif = aliran retrograd mencapai arkus
   fraksiBukaKatupAorta: number
   lingkarLV: Array<{ v: number; p: number }>
+  aliranAorta: number[]      // aliran katup aorta rata-rata per jendela sampel, mL/s (sejajar lingkarLV)
+  dtSampel: number           // detik per sampel
   gelombangArteri: number[]   // tekanan aorta proksimal, satu siklus
   denyut: number              // jumlah siklus sampai periodik
   volumeTotal: number         // harus sama dengan volumeDarah (kekekalan massa)
@@ -100,7 +102,7 @@ export interface HasilSirkulasi {
 }
 
 export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0.0005): HasilSirkulasi {
-  const gagal = (alasan: string): HasilSirkulasi => ({ sah: false, alasan, map: NaN, mapDistal: NaN, sbp: NaN, dbp: NaN, pulsePressure: NaN, cvp: NaN, pcwp: NaN, papMean: NaN, lvedv: NaN, lvesv: NaN, sv: NaN, ef: NaN, rvedv: NaN, coAsli: NaN, qEcmo: NaN, aliranArkusKeDistal: NaN, fraksiBukaKatupAorta: NaN, lingkarLV: [], gelombangArteri: [], denyut: 0, volumeTotal: NaN, sirkuit: null })
+  const gagal = (alasan: string): HasilSirkulasi => ({ sah: false, alasan, map: NaN, mapDistal: NaN, sbp: NaN, dbp: NaN, pulsePressure: NaN, cvp: NaN, pcwp: NaN, papMean: NaN, lvedv: NaN, lvesv: NaN, sv: NaN, ef: NaN, rvedv: NaN, coAsli: NaN, qEcmo: NaN, aliranArkusKeDistal: NaN, fraksiBukaKatupAorta: NaN, lingkarLV: [], aliranAorta: [], dtSampel: NaN, gelombangArteri: [], denyut: 0, volumeTotal: NaN, sirkuit: null })
   // Di bawah ~12% Ees normal, kurva pengisian pasif eksponensial membuat tekanan diastolik LV
   // melampaui tekanan aorta (katup 'membuka' saat diastole): artefak model, jadi ditolak.
   if (p.lv.ees < 0.12 * BILIK_RUJUKAN.ees) return gagal('kontraktilitas LV di bawah rentang sah model (< 12% normal)')
@@ -113,11 +115,11 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
   s.sv = p.volumeDarah - (s.lv + s.rv + s.ao1 + s.ao2 + s.pa + s.pv + s.ra)
   if (s.sv < VU.sv * 0.5) return gagal('volume darah terlalu kecil untuk model')
 
-  let rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [] as Array<{ v: number; p: number }>, gel: [] as number[] }
+  let rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [] as Array<{ v: number; p: number }>, gel: [] as number[], qAo: [] as number[], akumQAo: 0 }
   let sebelum: typeof rekaman | null = null
   let denyut = 0
   for (; denyut < maksDenyut; denyut++) {
-    rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [], gel: [] }
+    rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [], gel: [], qAo: [], akumQAo: 0 }
     for (let i = 0; i < langkah; i++) {
       const e = aktivasi(i * dt, periode)
       const pLv = pBilik(s.lv, e, p.lv), pRv = pBilik(s.rv, e, p.rv)
@@ -150,7 +152,8 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
       rekaman.sumPao += pAo1; rekaman.sumPao2 += pAo2; rekaman.sumCvp += pRa; rekaman.sumPcwp += pPv; rekaman.sumPap += pPa; rekaman.sumMasuk += p.ecmo.konfigurasi === 'VA-sentral' ? pRa : pSv
       rekaman.volAorta += qAorta * dt; rekaman.volEcmo += qE * dt; rekaman.volArkus += qArkus * dt
       if (qAorta > 0) rekaman.buka++
-      if (i % 10 === 0) { rekaman.lingkar.push({ v: s.lv, p: pLv }); rekaman.gel.push(pAo1) }
+      rekaman.akumQAo += qAorta
+      if (i % 10 === 9) { rekaman.lingkar.push({ v: s.lv, p: pLv }); rekaman.gel.push(pAo1); rekaman.qAo.push(rekaman.akumQAo / 10); rekaman.akumQAo = 0 }
     }
     if (sebelum && Math.abs(rekaman.sumPao - sebelum.sumPao) / langkah < 0.02 && Math.abs(rekaman.lvMax - sebelum.lvMax) < 0.05 && Math.abs(rekaman.sumCvp - sebelum.sumCvp) / langkah < 0.01) break
     sebelum = rekaman
@@ -163,7 +166,7 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
     cvp: rekaman.sumCvp / n, pcwp: rekaman.sumPcwp / n, papMean: rekaman.sumPap / n,
     lvedv: rekaman.lvMax, lvesv: rekaman.lvMin, sv, ef: rekaman.lvMax > 0 ? sv / rekaman.lvMax : NaN, rvedv: rekaman.rvMax,
     coAsli: rekaman.volAorta * keLmin, qEcmo: rekaman.volEcmo * keLmin, aliranArkusKeDistal: rekaman.volArkus * keLmin,
-    fraksiBukaKatupAorta: rekaman.buka / n, lingkarLV: rekaman.lingkar, gelombangArteri: rekaman.gel, denyut: denyut + 1,
+    fraksiBukaKatupAorta: rekaman.buka / n, lingkarLV: rekaman.lingkar, aliranAorta: rekaman.qAo, dtSampel: 10 * dt, gelombangArteri: rekaman.gel, denyut: denyut + 1,
     sirkuit: p.ecmo.konfigurasi !== 'tanpa' && p.ecmo.rpm > 0 ? tekananSirkuit(p.ecmo.rpm, rekaman.volEcmo * keLmin, rekaman.sumMasuk / n, p.ecmo.faktorBekuan ?? 1) : null,
     volumeTotal: s.lv + s.rv + s.ao1 + s.ao2 + s.pa + s.pv + s.sv + s.ra,
   }
