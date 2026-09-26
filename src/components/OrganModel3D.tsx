@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { layarBerubah, type TitikLayar } from '../lib/layarBerubah'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -120,6 +121,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
     const v = new THREE.Vector3()
+    let layarTerakhir: TitikLayar | null = null
     function animate() {
       controls.update()
       renderer.render(scene, camera)
@@ -141,7 +143,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
             depan: jarakKamera < camera.position.length() + 0.4,
           }
         }
-        setLayar(next)
+        if (layarBerubah(layarTerakhir, next)) { layarTerakhir = next; setLayar(next) }
       }
     }
     const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)

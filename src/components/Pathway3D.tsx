@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { layarBerubah, type TitikLayar } from '../lib/layarBerubah'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { hitungJalur, type Jalur, type KeadaanJalur } from '../lib/pathway'
@@ -164,6 +165,7 @@ export function Pathway3D({ jalur, keadaan, tinggi = 300, onPilih }: Props) {
     renderer.domElement.addEventListener('webglcontextlost', onHilang)
 
     const v = new THREE.Vector3()
+    let layarTerakhir: TitikLayar | null = null
     const jam = new THREE.Clock()
     function bingkai() {
       const { jalur: J, keadaan: K } = ref.current
@@ -192,7 +194,7 @@ export function Pathway3D({ jalur, keadaan, tinggi = 300, onPilih }: Props) {
         v.project(camera)
         next[s.id] = { x: ((v.x + 1) / 2) * w, y: ((1 - v.y) / 2) * h, v: nilai }
       }
-      setLayar(next)
+      if (layarBerubah(layarTerakhir, next)) { layarTerakhir = next; setLayar(next) }
       controls.update()
       renderer.render(scene, camera)
     }
