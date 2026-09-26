@@ -10,6 +10,20 @@ export function evaluasiAturanLab(plan: ContinuousCarePlan, state: LongitudinalP
   return buildClinicianContinuousCareDigest({ ...plan, subjectId: state.subjectId }, null, state, kini).measurementRules
 }
 
+// Sama persis dengan batas/pesan server (server/src/carePlan.ts) supaya dokter
+// melihat kesalahan sebelum submit, bukan menebak dari pesan galat generik
+// setelah pulang-pergi ke server.
+export const MAKS_HARI_ATURAN_LAB = 730
+
+export function validasiBarisAturanLab(a: { ambang: string; hari: string; bukti: string }): string | null {
+  if (!a.bukti.trim()) return 'evidence reference is required (max 300 characters)'
+  const ambang = Number(a.ambang.replace(',', '.'))
+  if (a.ambang.trim() === '' || !Number.isFinite(ambang)) return 'lab rule threshold must be a number'
+  const hari = Number(a.hari)
+  if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_ATURAN_LAB) return `lab rule age must be 1–${MAKS_HARI_ATURAN_LAB} days`
+  return null
+}
+
 export const LABEL_KEADAAN: Record<MeasurementRuleEvaluation['state'], string> = {
   triggered: 'Meets your rule',
   'not-triggered': 'Within your rule',

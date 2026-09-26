@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { susunRencana } from '../../server/src/carePlan.ts'
 import { validateContinuousCarePlan } from '../../src/lib/continuousCareOperatingSystem.ts'
 import { statusPasienUntukDokter } from '../../src/lib/statusPasienDokter.ts'
-import { evaluasiAturanLab } from '../../src/lib/aturanLabDokter.ts'
+import { evaluasiAturanLab, validasiBarisAturanLab } from '../../src/lib/aturanLabDokter.ts'
 
 const kini = new Date('2026-09-25T06:00:00Z')
 const dasar = {
@@ -37,7 +37,21 @@ const lama = nilai([obs('1', '2024-06-01', 9.4)])
 assert.equal(lama.state, 'stale', 'HbA1c 2024 dianggap segar — umur dihitung dari waktu diterima, bukan waktu diukur')
 assert.equal(nilai([]).state, 'missing')
 
+// Validasi klien harus menolak persis kasus yang ditolak server (susunRencana
+// di atas), dengan pesan yang sama — sebelum submit, bukan sesudah pulang-pergi.
+assert.equal(validasiBarisAturanLab({ ambang: '9', hari: '180', bukti: 'ADA 2026 §6' }), null, 'baris valid ditolak')
+assert.match(validasiBarisAturanLab({ ambang: '9', hari: '180', bukti: '' }) ?? '', /evidence reference is required/)
+assert.match(validasiBarisAturanLab({ ambang: '', hari: '180', bukti: 'x' }) ?? '', /threshold must be a number/, 'ambang kosong jangan diam-diam jadi 0')
+assert.match(validasiBarisAturanLab({ ambang: 'abc', hari: '180', bukti: 'x' }) ?? '', /threshold must be a number/)
+assert.match(validasiBarisAturanLab({ ambang: '9', hari: '0', bukti: 'x' }) ?? '', /age must be 1–730 days/)
+assert.match(validasiBarisAturanLab({ ambang: '9', hari: '731', bukti: 'x' }) ?? '', /age must be 1–730 days/)
+
 const ui = readFileSync('src/components/RencanaHarianDokter.tsx', 'utf8')
 assert.match(ui, /evidenceRef/, 'formulir aturan lab tidak meminta rujukan bukti')
 assert.match(ui, /evaluasiAturanLab\(/, 'tampilan dokter tidak mengevaluasi aturan lab')
-console.log('aturan-lab-dokter: bukti wajib, verifikator dari server, umur dari waktu ukur, dievaluasi kernel di peramban dokter')
+assert.match(ui, /validasiBarisAturanLab/, 'formulir aturan lab tidak divalidasi di klien sebelum submit')
+assert.match(ui, /disabled=\{submitting\}/, 'tombol "Start daily check-in" tidak dikunci selama simpan() berjalan (rawan submit ganda)')
+
+const dokterList = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+assert.match(dokterList, /daftar === null && !galat/, 'daftar berbagi lab dokter tidak menampilkan status memuat sebelum respons pertama datang')
+console.log('aturan-lab-dokter: bukti wajib, verifikator dari server, umur dari waktu ukur, dievaluasi kernel di peramban dokter, divalidasi di klien sebelum submit')
