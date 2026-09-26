@@ -1,23 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { JENIS_LAB, periksaMasukanLab, tambahLab } from '../lib/lab'
 import { uraikanLembarLab, type KandidatLab } from '../lib/imporLab'
 
 const hariIni = () => { const d = new Date(); const p = (x: number) => String(x).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}` }
 
-// Tempel teks lembar hasil lab → kandidat → centang → simpan. Tidak ada angka
-// yang tersimpan tanpa dicentang pengguna; satuan berbeda tidak bisa dicentang.
+// Tempel teks ATAU foto lembar hasil lab → kandidat → centang → simpan. Foto
+// melewati OCR di perangkat (src/lib/ocrLembarLab.ts) lalu masuk ke PARSER TEKS
+// YANG SAMA di bawah — tidak ada jalur terpisah yang mempercayai OCR lebih dari
+// tempel-teks. Tidak ada angka yang tersimpan tanpa dicentang pengguna; satuan
+// berbeda tidak bisa dicentang.
 export function ImporLembarLab() {
   const [teks, setTeks] = useState('')
   const [tanggal, setTanggal] = useState(hariIni)
   const [kandidat, setKandidat] = useState<KandidatLab[] | null>(null)
   const [pilih, setPilih] = useState<Record<string, boolean>>({})
   const [pesan, setPesan] = useState<string | null>(null)
+  const [membacaFoto, setMembacaFoto] = useState(false)
+  const inputFoto = useRef<HTMLInputElement>(null)
 
-  const urai = () => {
-    const k = uraikanLembarLab(teks)
+  useEffect(() => () => { void import('../lib/ocrLembarLab').then((m) => m.tutupWorkerOcrLab()) }, [])
+
+  const uraiTeks = (sumber: string) => {
+    const k = uraikanLembarLab(sumber)
     setKandidat(k)
     setPilih(Object.fromEntries(k.map((x) => [x.jenisId, false])))
     setPesan(k.length ? null : 'No known tests found. Check the text, or add results one by one.')
+  }
+  const urai = () => uraiTeks(teks)
+
+  const bacaFoto = async (berkas: File) => {
+    setMembacaFoto(true)
+    setPesan(null)
+    try {
+      const { bacaFotoLab } = await import('../lib/ocrLembarLab')
+      const h = await bacaFotoLab(berkas)
+      if (!h.ok) { setPesan(h.alasan ?? 'Could not read the photo.'); return }
+      setTeks(h.teks)
+      uraiTeks(h.teks)
+    } finally {
+      setMembacaFoto(false)
+      if (inputFoto.current) inputFoto.current.value = ''
+    }
   }
   const simpan = () => {
     if (!kandidat) return
@@ -36,7 +59,7 @@ export function ImporLembarLab() {
 
   return (
     <details className="mt-3 border-t border-neutral-100 pt-2 dark:border-white/10" data-lab-import>
-      <summary className="t-kecil cursor-pointer font-bold text-brand">Paste from your lab report</summary>
+      <summary className="t-kecil cursor-pointer font-bold text-brand">Paste or scan your lab report</summary>
       <div className="mt-2 space-y-1.5">
         <textarea value={teks} onChange={(e) => setTeks(e.target.value)} rows={4} aria-label="Lab report text"
           placeholder="Copy the results table from your lab PDF or portal and paste it here"
@@ -46,6 +69,15 @@ export function ImporLembarLab() {
           <input id="imp-tgl" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)}
             className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-1.5 text-ink dark:border-white/12 dark:text-white" />
           <button type="button" onClick={urai} className="t-kecil shrink-0 rounded-xl bg-brand px-3 py-1.5 font-bold text-white">Read</button>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <input ref={inputFoto} type="file" accept="image/*" capture="environment" data-ocr-photo-input
+            className="sr-only" aria-label="Photo of your lab report"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) void bacaFoto(f) }} />
+          <button type="button" data-ocr-scan-button disabled={membacaFoto} onClick={() => inputFoto.current?.click()}
+            className="t-kecil min-h-[44px] w-full rounded-xl border border-dashed border-brand/50 px-3 py-1.5 font-bold text-brand disabled:opacity-60">
+            {membacaFoto ? 'Reading photo on this device…' : '📷 Scan a photo of your lab report'}
+          </button>
         </div>
         {kandidat && kandidat.length > 0 && (
           <>
@@ -67,7 +99,7 @@ export function ImporLembarLab() {
           </>
         )}
         {pesan && <p role="status" className="t-mikro font-bold text-neutral-500">{pesan}</p>}
-        <p className="t-mikro text-neutral-400">Read on this device only; nothing is saved until you tick it and press Save.</p>
+        <p className="t-mikro text-neutral-400">Text and photos are read on this device only, never uploaded; nothing is saved until you tick it and press Save.</p>
       </div>
     </details>
   )

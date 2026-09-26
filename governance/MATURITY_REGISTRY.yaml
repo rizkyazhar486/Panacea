@@ -12,7 +12,7 @@ workflows:
     maturity_level: FUNCTIONAL
     clinical_validation: none  # no human assessment recorded. Study infrastructure is software-ready (study 'lab-tren-pribadi' v1, 30 frozen synthetic cases, reviewer UI, audit chain, report) and is externally blocked on qualified clinicians executing it
     dimensions:
-      functional_completeness: high  # entry, correction, per-report range, baseline/trend, PhenoAge trajectory, sync, FHIR, share, review, notify
+      functional_completeness: high  # entry, correction, per-report range, baseline/trend, PhenoAge trajectory, sync, FHIR, share, review, notify, paste-text or photo import
       integration: medium  # server persistence + FHIR R4 + clinician view + notifications + canonical longitudinal state (labLongitudinalBridge -> useLongitudinalState -> What changed + Body Exposure 'Your data' per system + personal timeline); state is client-built only
       reliability: medium  # server validation, last-write-wins with 409, sync retry/backoff; single-node file/Mongo store
       usability: medium  # browser-verified at 390x844; no user testing
@@ -26,10 +26,13 @@ workflows:
       - "HTTP: own 200, other patient empty, stale write 409, future date 400; clinician granted 200 / other 404 / unverified 403 / after revoke 404"
       - "browser E2E 390x844: add->warn->save->delete; device A->B sync; share->clinician trend view->review->patient sees review"
       - "commits: 16608b5a 07813792 3fc91bf4 b237c432 88ba36ff 14aa0435 0beadc1c 5516e7d8 7926aee9 96de9684"
+      - "photo import: camera/gallery photo of a lab report -> on-device OCR (tesseract.js, WASM; photo never leaves the device) -> the SAME deterministic text parser and tick-to-save candidate review already used by paste-text import (src/lib/ocrLembarLab.ts, src/components/ImporLembarLab.tsx); gate scripts/uji/ocr-lembar-lab.mts (empty/whitespace OCR text fails closed with a readable reason; noisy OCR-like text still parses; no fetch/upload around the photo; OCR engine has no static module-level import so importing the module never touches the network; verified the true HTML-entry chunk contains zero tesseract.js bytes after `npm run build`, only a shared lazy chunk does, and the multi-MB WASM+language-model payload is fetched by tesseract.js itself only when the user actually taps 'Scan a photo')"
     known_gaps_note: "2026-09-26: error classification (missed-critical-finding = dangerous false negative) required for every 'incorrect' assessment (server + UI); release gate gerbangRilisKlinis per system version (technically-works / clinically-reviewed / clinically-validated); browser 390x844: reviewer must classify, study report shows dangerous FN count and release claim with reasons"
-    known_gaps: [photo_ocr_import, direct_lab_system_integration, canonical_state_recomputed_per_view_not_cached, production_deployment_verification, prospective_clinician_validation]
-    next_action: external_study_lead_confirms_thresholds_then_two_verified_clinicians_assess_30_cases  # process measures landed; protocol + clinical outcomes need owner (internship)
+    known_gaps: [direct_lab_system_integration, canonical_state_recomputed_per_view_not_cached, production_deployment_verification, prospective_clinician_validation]
+    next_action: canonical_lab_state_should_move_from_client_recomputed_to_a_cached_server_projection  # photo_ocr_import closed this session; remaining software-addressable item is the client-built-only canonical state (see change_log)
     last_audited_commit: 0cb6906a
+    change_log:
+      - "2026-09-26: closed known_gap photo_ocr_import. Reused the existing paste-text candidate/tick/save pipeline end-to-end for photos instead of building a second trust path; OCR runs on-device only. Not yet done: no real photo was tested against the OCR engine in this session (no browser/camera harness available here) — the gate covers the deterministic parsing and lazy-loading contract, not real-world OCR accuracy on an actual lab-report photo. That remains real-device validation, not a fabricated claim of tested accuracy."
 
   - workflow_id: care.daily_checkin
     name: Clinician-authored daily check-in to clinician digest
