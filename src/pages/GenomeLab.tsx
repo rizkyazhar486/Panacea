@@ -12,6 +12,11 @@ import {
 import { bersihkanUrutan, komplemenBalik, persenGC, terjemahkan } from '../lib/genomics'
 import { rancangPanduan } from '../lib/crispr'
 import {
+  PHAGE_RESEARCH_BOUNDARY,
+  analyzePhageCampaign,
+  simulateVirtualPhage,
+} from '../lib/phageResearchSandbox'
+import {
   hill, konsentrasiUntukEfek, bebanSetimbang, bebanAnalitik,
   SENYAWA_GERO, cakupanKuantitatif, type SenyawaGero,
 } from '../lib/farmakodinamik'
@@ -162,6 +167,150 @@ function KurvaBeban({ pembersihan }: { pembersihan: number }) {
       <text x={L - 12} y={H - 6} textAnchor="end" className="fill-current text-[8.5px]" opacity="0.6">time</text>
       <text x="30" y="18" className="fill-current text-[8.5px]" opacity="0.55">dashed = no senolytic</text>
     </svg>
+  )
+}
+
+function PhageResearchSandbox() {
+  const [designed, setDesigned] = useState(285)
+  const [assembled, setAssembled] = useState(285)
+  const [viable, setViable] = useState(16)
+  const [offTargetTested, setOffTargetTested] = useState(6)
+  const [offTargetGrowth, setOffTargetGrowth] = useState(0)
+  const [selectivity, setSelectivity] = useState(82)
+  const [evidence, setEvidence] = useState(72)
+  const [robustness, setRobustness] = useState(55)
+  const [novelty, setNovelty] = useState(35)
+
+  const campaign = useMemo(() => {
+    try {
+      return analyzePhageCampaign({
+        designed,
+        assembled,
+        viable,
+        offTargetHostsTested: offTargetTested,
+        offTargetHostsWithGrowth: offTargetGrowth,
+      })
+    } catch {
+      return null
+    }
+  }, [designed, assembled, viable, offTargetTested, offTargetGrowth])
+
+  const virtual = useMemo(() => simulateVirtualPhage({
+    targetSelectivity: selectivity / 100,
+    evidenceCoverage: evidence / 100,
+    environmentalRobustness: robustness / 100,
+    noveltyPressure: novelty / 100,
+  }), [selectivity, evidence, robustness, novelty])
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconActivity />}
+        title="6 · Phage research sandbox"
+        subtitle="Analyze campaigns and test abstract hypotheses without producing a synthesis-ready virus"
+      />
+
+      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-emerald-800 dark:text-emerald-300">
+          Research-safe boundary
+        </p>
+        <Prosa kelas="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+          Campaign math, uncertainty and abstract scenario sensitivity are available. Viral DNA generation,
+          synthesis export, wet-lab construction steps, host-range expansion, pathogenicity optimization
+          and clinically important resistance-trait engineering are intentionally unavailable.
+        </Prosa>
+      </div>
+
+      <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">A · Campaign analyzer</p>
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {[
+          ['Designed', designed, setDesigned],
+          ['Assembled', assembled, setAssembled],
+          ['Viable', viable, setViable],
+          ['Off-target tested', offTargetTested, setOffTargetTested],
+          ['Off-target growth', offTargetGrowth, setOffTargetGrowth],
+        ].map(([label, value, setter]) => (
+          <label key={String(label)} className="text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-500">
+            {String(label)}
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={value as number}
+              onChange={(e) => (setter as (v: number) => void)(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+              className="mt-1 w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-[13px] font-bold text-ink dark:border-white/10 dark:text-white"
+            />
+          </label>
+        ))}
+      </div>
+
+      {campaign ? (
+        <>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Angka nilai={(campaign.assemblyRate * 100).toFixed(1)} satuan="%" label="Assembly rate" />
+            <Angka nilai={(campaign.viabilityRate * 100).toFixed(1)} satuan="%" label="Viable / assembled" />
+            <Angka nilai={(campaign.overallYield * 100).toFixed(1)} satuan="%" label="Overall yield" />
+            <Angka nilai={(campaign.offTargetNoGrowthRate * 100).toFixed(1)} satuan="%" label="No-growth screen" />
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">
+            95% Wilson interval: {(campaign.viabilityWilson95[0] * 100).toFixed(1)}–{(campaign.viabilityWilson95[1] * 100).toFixed(1)}% · viability = viable ÷ assembled × 100.
+          </p>
+        </>
+      ) : (
+        <p className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-800 dark:text-amber-300">
+          Counts must satisfy viable ≤ assembled ≤ designed and off-target growth ≤ off-target tested.
+        </p>
+      )}
+
+      <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">B · Non-executable virtual candidate</p>
+      <div className="mt-2 grid gap-3 sm:grid-cols-2">
+        {[
+          ['Target selectivity · abstract', selectivity, setSelectivity],
+          ['Evidence coverage', evidence, setEvidence],
+          ['Environmental robustness · abstract', robustness, setRobustness],
+          ['Novelty pressure · abstract', novelty, setNovelty],
+        ].map(([label, value, setter]) => (
+          <label key={String(label)} className="block text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-500">
+            <span className="flex items-center justify-between gap-2">
+              <span>{String(label)}</span>
+              <span className="font-[var(--font-angka)] text-[11px] text-ink dark:text-white">{value as number}</span>
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={value as number}
+              onChange={(e) => (setter as (v: number) => void)(Number(e.target.value))}
+              className="mt-1 w-full accent-[#00BF63]"
+            />
+          </label>
+        ))}
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Angka nilai={(virtual.specificityProxy * 100).toFixed(0)} satuan="%" label="Specificity proxy" />
+        <Angka nilai={(virtual.evidenceAdjustedConfidence * 100).toFixed(0)} satuan="%" label="Evidence confidence" />
+        <Angka nilai={(virtual.modelUncertainty * 100).toFixed(0)} satuan="%" label="Model uncertainty" />
+        <Angka nilai={(virtual.tradeoffPressure * 100).toFixed(0)} satuan="%" label="Trade-off pressure" />
+      </div>
+
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+        The virtual candidate is dimensionless and has no nucleotide, gene, protein, MOI, host-range,
+        culture-condition or synthesis mapping. It cannot be reconstructed into a biological sequence.
+      </Prosa>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+          <p className="text-[10px] font-black uppercase tracking-[0.13em] text-neutral-500">Allowed here</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{PHAGE_RESEARCH_BOUNDARY.allowed.join(' · ')}</p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+          <p className="text-[10px] font-black uppercase tracking-[0.13em] text-neutral-500">Not exposed</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{PHAGE_RESEARCH_BOUNDARY.blocked.join(' · ')}</p>
+        </div>
+      </div>
+    </Card>
   )
 }
 
@@ -427,6 +576,8 @@ export function GenomeLab() {
           not a gap in this page.
         </Prosa>
       </Card>
+
+      <PhageResearchSandbox />
     </div>
   )
 }
