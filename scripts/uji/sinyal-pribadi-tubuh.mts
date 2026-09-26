@@ -30,7 +30,17 @@ assert.deepEqual([...peta.keys()].sort(), ['endocrine', 'urinary'])
 assert.equal(peta.get('endocrine')![0].delta, 18)
 assert.equal(peta.get('endocrine')![0].method, 'patient-transcribed-lab-report')
 
+// Kunci vital AI-EMR harus sampai ke sistemnya (dulu hanya spo2 yang cocok).
+{
+  const { sistemUntukMetrik } = await import('../../src/lib/sinyalPribadiSistem.ts')
+  const { LABEL_METRIK_VITAL_EMR } = await import('../../src/lib/emrLongitudinalBridge.ts')
+  for (const m of ['vital.sbp', 'vital.dbp', 'vital.hr']) assert.equal(sistemUntukMetrik(m), 'cardiovascular', `vital EMR ${m} tidak sampai ke sistem kardiovaskular`)
+  for (const m of ['vital.rr', 'vital.spo2']) assert.equal(sistemUntukMetrik(m), 'respiratory', `vital EMR ${m} tidak sampai ke sistem respirasi`)
+  assert.equal(sistemUntukMetrik('vital.temp'), null, 'suhu dipaksakan ke satu sistem organ')
+  for (const m of Object.keys(LABEL_METRIK_VITAL_EMR)) if (!['vital.temp', 'vital.glucose'].includes(m)) assert.ok(sistemUntukMetrik(m), `vital EMR ${m} tidak terpetakan`)
+}
 const ui = readFileSync('src/components/SinyalPribadiDiTubuh.tsx', 'utf8')
 assert.match(ui, /not where a problem is/, 'batas "bukan lokasi masalah" hilang dari tampilan')
+assert.match(ui, /labelMetrik\(s\.metric, labels\)/, 'label metrik mentah (Sbp/Hr) tampil di Body Exposure')
 assert.match(readFileSync('src/pages/BodyExposureOS.tsx', 'utf8'), /<SinyalPribadiDiTubuh selectedSystemId=\{selectedBodySystemId\} onSelectSystem=\{setSelectedBodySystemId\} \/>/, 'Body Exposure tidak lagi menampilkan data pribadi per sistem')
 console.log('sinyal-pribadi-tubuh: data pribadi per sistem dari status kanonik, peta hanya jenis lab nyata, hematologi tidak dipaksakan')

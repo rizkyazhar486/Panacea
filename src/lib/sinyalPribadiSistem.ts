@@ -19,6 +19,9 @@ export const SISTEM_UNTUK_METRIK: Readonly<Record<string, BodySystemId>> = {
 const VITAL: Readonly<Record<string, BodySystemId>> = {
   systolic: 'cardiovascular', diastolic: 'cardiovascular', heartRate: 'cardiovascular', restingHr: 'cardiovascular',
   spo2: 'respiratory', respiratoryRate: 'respiratory',
+  // Kunci vital AI-EMR (src/lib/emrLongitudinalBridge.ts: vital.sbp/dbp/hr/rr/spo2).
+  // Suhu dan glukosa sengaja tidak dipetakan ke satu sistem organ.
+  sbp: 'cardiovascular', dbp: 'cardiovascular', hr: 'cardiovascular', rr: 'respiratory',
 }
 
 export function sistemUntukMetrik(metric: string): BodySystemId | null {

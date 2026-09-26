@@ -12,7 +12,7 @@ const NAMA: Record<BodySystemId, string> = {
 // Data orang itu sendiri di sistem tubuh yang sedang dilihat, dari status
 // longitudinal kanonik. Chip sistem lain membawa langsung ke tempat datanya.
 export function SinyalPribadiDiTubuh({ selectedSystemId, onSelectSystem }: { selectedSystemId: BodySystemId; onSelectSystem: (id: BodySystemId) => void }) {
-  const { state } = useLongitudinalState()
+  const { state, labels } = useLongitudinalState()
   if (!state) return null
   const peta = sinyalPerSistem(state)
   if (peta.size === 0) return null
@@ -32,7 +32,7 @@ export function SinyalPribadiDiTubuh({ selectedSystemId, onSelectSystem }: { sel
         <ul className="mt-1.5 grid gap-1">
           {di.slice(0, 4).map((s) => (
             <li key={s.metric} className="flex items-baseline justify-between gap-3 text-[12px]" data-metric={s.metric}>
-              <span className="min-w-0 truncate font-bold">{labelMetrik(s.metric)}</span>
+              <span className="min-w-0 truncate font-bold">{labelMetrik(s.metric, labels)}</span>
               <span className="shrink-0 tabular-nums">
                 <b>{angka(s.value)}</b> <span className="text-white/45">{s.unit}</span>
                 {s.delta !== null && <span className="ml-1.5 text-white/55">{s.delta >= 0 ? '▲' : '▼'}{angka(Math.abs(s.delta))}</span>}
