@@ -94,6 +94,10 @@ for (const surface of surfaces) {
     }
   }, surface)
 
+  // Capture the exact rendered state before assertions so a failing surface
+  // still leaves visual evidence in the always-uploaded workflow artifact.
+  await page.screenshot({ path: `${outDir}/${surface.id}.png`, fullPage: false })
+
   if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) {
     throw new Error(`${surface.id}: unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
   }
@@ -116,7 +120,6 @@ for (const surface of surfaces) {
     throw new Error(`${surface.id}: page errors: ${pageErrors.join(' | ')}`)
   }
 
-  await page.screenshot({ path: `${outDir}/${surface.id}.png`, fullPage: false })
   report.push(metrics)
 }
 
