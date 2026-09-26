@@ -3,11 +3,22 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { getEffectiveAnatomySourceNodeSnapshot } from '../../src/lib/anatomySourceNodeRegistry.ts'
 import { STRUKTUR_TEMUAN, strukturUntukTemuan } from '../../src/lib/strukturTemuanFisik.ts'
+import { resolveBodySystemSourceWave } from '../../src/lib/bodySystemSourceWave.ts'
 const snap = getEffectiveAnatomySourceNodeSnapshot()
 for (const [k, s] of Object.entries(STRUKTUR_TEMUAN)) {
   const ada = snap.some((b) => b.file === s.file && b.names.includes(s.name))
   assert.ok(ada, `struktur untuk "${k}" (${s.name} di ${s.file}) tidak ada di geometri sumber — nama dikarang`)
 }
+// Lebih ketat: nama harus termasuk mesh yang BENAR-BENAR diproyeksikan sistem tujuannya,
+// jika tidak kamera tidak punya apa pun untuk dibingkai ('not-rendered').
+const gelombang = resolveBodySystemSourceWave()
+for (const [k, s] of Object.entries(STRUKTUR_TEMUAN)) {
+  const sistem = gelombang.find((x) => x.id === s.systemId)
+  const diproyeksikan = sistem?.targets.some((t) => t.file === s.file && t.names.includes(s.name))
+  assert.ok(diproyeksikan, `struktur untuk "${k}" (${s.name}) tidak diproyeksikan sistem ${s.systemId} — fokus kamera akan gagal`)
+}
+const jantung = gelombang.find((x) => x.id === 'cardiovascular')!.targets.find((t) => t.id === 'heart')!
+assert.ok(['Left ventricle', 'Right ventricle', 'Left atrium', 'Right atrium'].every((n) => jantung.names.includes(n)), 'target "Heart" tidak memuat ruang jantung (hanya arteri koroner)')
 assert.equal(strukturUntukTemuan('kulit'), null, 'kulit dipetakan tanpa node sumber yang tepat')
 assert.equal(strukturUntukTemuan('tidak-ada'), null)
 const proj = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')

@@ -339,6 +339,7 @@ export default function UnifiedHumanSimulationProjector({
               onSemanticZoomChange={setSemanticZoom}
               selectedStructureName={selectedStructureName}
               onStructureSelect={setSelectedStructureName}
+              focusRequest={requestedStructure}
             />
           </Suspense>
         </div>

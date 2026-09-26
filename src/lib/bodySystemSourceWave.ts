@@ -39,7 +39,7 @@ export interface BodySystemSourceDefinition {
 
 export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
   { id: 'cardiovascular', label: 'Cardiovascular', targets: [
-    { id: 'heart', label: 'Heart', file: 'cardiovascular.glb', hints: ['heart'] },
+    { id: 'heart', label: 'Heart', file: 'cardiovascular.glb', hints: ['heart', 'left ventricle', 'right ventricle', 'left atrium', 'right atrium'] },
     { id: 'aorta', label: 'Aorta', file: 'cardiovascular.glb', hints: ['aorta'] },
     { id: 'vena-cava', label: 'Vena cava', file: 'cardiovascular.glb', hints: ['vena cava'] },
     { id: 'pulmonary-vessels', label: 'Pulmonary vessels', file: 'cardiovascular.glb', hints: ['pulmonary artery', 'pulmonary vein'] },
@@ -53,6 +53,7 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
   { id: 'respiratory', label: 'Respiratory', targets: [
     { id: 'trachea', label: 'Trachea', file: 'visceral.glb', hints: ['trachea'] },
     { id: 'bronchi', label: 'Bronchi', file: 'visceral.glb', hints: ['bronch'] },
+    { id: 'upper-airway', label: 'Upper airway', file: 'visceral.glb', hints: ['epiglottis', 'nasal cavity'] },
     { id: 'lungs', label: 'Lungs', file: 'visceral.glb', hints: ['lung'] },
     { id: 'diaphragm', label: 'Diaphragm', file: 'muscular.glb', hints: ['diaphragm'] },
   ] },
@@ -102,6 +103,7 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
   ] },
   { id: 'musculoskeletal', label: 'Musculoskeletal / Articular', targets: [
     { id: 'skeleton', label: 'Skeleton', file: 'skeletal.glb', hints: ['femur', 'humerus', 'vertebra', 'rib', 'pelvis', 'skull'] },
+    { id: 'skull', label: 'Skull', file: 'skeletal.glb', hints: ['frontal bone', 'parietal bone', 'occipital bone', 'temporal bone'] },
     { id: 'muscles', label: 'Major muscles', file: 'muscular.glb', hints: ['muscle'] },
     { id: 'shoulder', label: 'Shoulder complex', file: 'skeletal.glb', hints: ['scapula', 'clavicle', 'humerus'] },
     { id: 'hip', label: 'Hip complex', file: 'skeletal.glb', hints: ['pelvis', 'femur'] },
