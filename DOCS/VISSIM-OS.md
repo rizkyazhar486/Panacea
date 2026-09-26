@@ -127,3 +127,64 @@ artefacts enter only through `daftarkanKorektor` and keep the "simulated" label.
 - Every simulated intervention logs provenance, uncertainty and counterfactuals.
 - Starting point when this lane is prioritised: a published neural-mass model on a
   published parcellation, reproduced exactly, before any coupling or design.
+
+## 7. Residue-resolution protein layer (implemented, one real structure)
+
+Owner direction (2026-09-26): peptide/residue-resolution hierarchy with real
+sequences and geometry, validation, SE(3) transforms and region-of-interest detail.
+Rule kept absolutely: **no invented sequence or geometry**.
+
+Data. `public/molekul/1ubi.pdb` — PDB 1UBI, human ubiquitin (taxid 9606), X-ray
+1.80 Å, Alexeev et al. Biochem J 1994 (PMID 8166633); DBREF → UniProt P62988
+1–76. Obtained from ProDy's test data because RCSB/UniProt are blocked by this
+environment; SHA-256 and provenance in `public/molekul/PROVENANCE.json`, checked by
+the gate. Not re-verified byte-for-byte against RCSB (stated there too).
+
+Code (`src/lib/molekul/`):
+- `struktur.ts` — L0 atoms → L1 residues → chain → structure; PDB parser (wwPDB
+  v3.3 fixed columns, first altLoc only, never fills missing atoms), PDB writer
+  (round-trip preserves coordinates), FASTA with UniProt mapping.
+- `geometri.ts` — distances, angles, IUPAC-signed dihedrals, signed volume, SE(3)
+  superposition by Horn's quaternion method (proper rotation, never a reflection).
+- `validasi.ts` — backbone bonds/angles vs Engh & Huber 1991 (>4σ outliers),
+  Cα chirality, φ/ψ, heavy-atom clashes with Bondi radii (≤3-bond pairs and polar
+  H-bond pairs exempt), backbone H-bonds (distance only, not DSSP), Shrake–Rupley
+  SASA, ATOM/SEQRES/DBREF consistency.
+- `hierarki.ts` — explicit L0–L5 nodes with SE(3) pose and units; levels without
+  source geometry are `not-modelled` and may not request residue/all-atom detail.
+
+Measured on 1UBI: sequence ATOM = SEQRES = P62988 1–76; 680 backbone measures, 0
+outliers, RMS-Z 0.61; 70/70 non-Gly residues L (mirror → all D); helix φ/ψ −71/−33,
+sheet −95/+121; 4 mild 1–5 contacts (<0.64 Å), none severe; SASA ≈4850 Å², Ile3
+buried, Ile44 patch and Lys48 exposed. The L-chirality sign was first guessed
+wrongly from memory and corrected by the data.
+
+Visible: Body Exposure → "Human ubiquitin · PDB 1UBI" (rotatable Cα trace coloured
+by depositor HELIX/SHEET, per-residue exposure, live validation).
+
+### Cost estimates (this representation, ~64 B per entity)
+
+| Scope | Entities | Memory |
+|---|---|---|
+| 1UBI all heavy atoms | 602 | ~38 KiB |
+| 1,000 proteins × 400 residues, residue level | 4.0 × 10⁵ | ~24 MiB |
+| same, heavy atoms (~8/residue) | 3.2 × 10⁶ | ~195 MiB |
+| 20,000 proteins × 400 residues, residue level | 8.0 × 10⁶ | ~490 MiB |
+
+Protein counts and lengths here are illustrative inputs to `estimasiMemori`, not
+proteome claims. A whole-body all-atom model is not attempted.
+
+### Usage and extension points
+
+```ts
+import { parsePdb, keFasta } from 'src/lib/molekul/struktur'
+import { periksaTulangPunggung, kiralitas, sasa } from 'src/lib/molekul/validasi'
+const s = parsePdb(await (await fetch('molekul/1ubi.pdb')).text())
+periksaTulangPunggung(s.rantai[0]) // Engh & Huber outliers
+```
+
+Next, in order: (1) more real structures only with pinned SHA-256 + provenance
+(e.g. an authorised mirror or committed wwPDB files); (2) mmCIF parser for large
+entries; (3) residue-type side-chain ideal geometry (Engh & Huber per residue);
+(4) complexes/organelles (L3) only from deposited assemblies; (5) OpenMM/GROMACS
+topology export only after force-field parameters are sourced, not hand-typed.

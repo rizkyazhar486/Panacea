@@ -8,6 +8,7 @@ import './bodyExposureOS.css'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))
+const PanelUbiquitin = lazy(() => import('../components/PanelUbiquitin'))
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -199,6 +200,11 @@ export function BodyExposureOS() {
         <Suspense fallback={null}>
           <PanelKoplingMultiSkala />
         </Suspense>
+        <div className="mt-3">
+          <Suspense fallback={null}>
+            <PanelUbiquitin />
+          </Suspense>
+        </div>
       </div>
 
       <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
