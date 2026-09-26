@@ -23,6 +23,10 @@ assert.ok(vit([vital('v1', { id: 'd1', klinisi: true })]).events.every((e) => e.
 const rekam = { id: 'r1', patientId: 'p1', createdAt: '2026-09-20T00:00:00.000Z', updatedAt: '2026-09-25T09:00:00.000Z', signedAt: '2026-09-25T09:00:00.000Z', signedById: 'd1', problems: [], plan: [], anamnesis: {}, physicalExam: {}, primaryDiagnosis: { code: 'I10', title: 'Essential hypertension', source: 'AI' } } as never
 const ttd = emrRecordToLongitudinalEvents(rekam, 'emr:p1', consent, kini).events
 assert.ok(ttd.length > 0 && ttd.every((e) => e.semanticState === 'clinician-reviewed' && e.review.reviewerId === 'd1'))
+assert.ok(
+  ttd.find((e) => e.metric === 'emr.primary-diagnosis')?.tags?.includes('field-origin:primary-diagnosis:ai-declared'),
+  'source AI tidak dibawa sebagai deklarasi asal ke status longitudinal',
+)
 
 // Validator kanonik menegakkan batas untuk SEMUA jembatan.
 const dx = ttd[0]

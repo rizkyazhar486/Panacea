@@ -24,6 +24,18 @@ export interface EmrLongitudinalProjection {
 const validIso = (value?: string) => Boolean(value && Number.isFinite(Date.parse(value)))
 const text = (value?: string) => String(value ?? '').trim()
 
+function stampedFieldOrigin(meta?: { asal: 'AI' | 'Dokter'; olehId?: string }): 'clinician-entered' | 'non-clinician-or-ai' | 'unknown' {
+  if (meta?.asal === 'Dokter' && text(meta.olehId)) return 'clinician-entered'
+  if (meta?.asal === 'AI') return 'non-clinician-or-ai'
+  return 'unknown'
+}
+
+function declaredClinicalOrigin(source?: 'AI' | 'Dokter'): 'clinician-entered' | 'ai-declared' | 'unknown' {
+  if (source === 'Dokter') return 'clinician-entered'
+  if (source === 'AI') return 'ai-declared'
+  return 'unknown'
+}
+
 export function emrRecordToLongitudinalEvents(
   record: ServerAcceptedEmrRecord,
   subjectId: string,
@@ -77,7 +89,13 @@ export function emrRecordToLongitudinalEvents(
     id: `emr:${record.id}:signed-note`,
     metric: 'emr.signed-note',
     value: noteParts.join(' · ') || 'Signed clinical record',
-    tags: ['clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-signed'],
+    tags: [
+      'clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-signed',
+      ...(complaint ? [`field-origin:chief-complaint:${stampedFieldOrigin(record.asalIsian?.['anamnesis.keluhanUtama'])}`] : []),
+      ...[...new Set(record.problems
+        .filter((problem) => text(problem.title))
+        .map((problem) => `field-origin:problem:${declaredClinicalOrigin(problem.source)}`))],
+    ],
   })
 
   if (record.primaryDiagnosis && text(record.primaryDiagnosis.code || record.primaryDiagnosis.title)) {
@@ -94,20 +112,28 @@ export function emrRecordToLongitudinalEvents(
         `emr:${record.id}`,
         'semantic-state:clinician-signed',
         `draft-source:${record.primaryDiagnosis.source === 'Dokter' ? 'clinician' : 'ai-or-unspecified'}`,
+        `field-origin:primary-diagnosis:${declaredClinicalOrigin(record.primaryDiagnosis.source)}`,
+        'field-review:primary-diagnosis:clinician-reviewed',
       ],
     })
   }
 
-  const verifiedPlan = record.plan
+  const verifiedPlanItems = record.plan
     .filter((item) => item.status === 'diverifikasi' && text(item.text))
-    .map((item) => text(item.text))
+  const verifiedPlan = verifiedPlanItems.map((item) => text(item.text))
   if (verifiedPlan.length) {
     events.push({
       ...base,
       id: `emr:${record.id}:verified-plan`,
       metric: 'emr.verified-plan',
       value: verifiedPlan.join(' · '),
-      tags: ['clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-verified-plan'],
+      tags: [
+        'clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-verified-plan',
+        ...[...new Set(verifiedPlanItems.map((item) => `field-origin:verified-plan:${declaredClinicalOrigin(item.source)}`))],
+        ...[...new Set(verifiedPlanItems.map((item) =>
+          `field-review:verified-plan:${text(item.verifiedById) && validIso(item.verifiedAt) ? 'clinician-verified' : 'clinician-reviewed'}`,
+        ))],
+      ],
     })
   }
 
