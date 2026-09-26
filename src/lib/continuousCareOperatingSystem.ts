@@ -45,6 +45,8 @@ export interface PatientReportedReviewRule extends CareRulePredicate {
   rationale: string
 }
 
+export type MeasurementSourcePolicy = 'shared-lab-transcribed' | 'verified-clinical-vital'
+
 export interface MeasurementReviewRule {
   id: string
   label: string
@@ -58,6 +60,8 @@ export interface MeasurementReviewRule {
   evidenceRef: string
   verifiedBy: string
   verifiedAt: string
+  /** Server-stamped trust boundary. Legacy lab rules may omit it; vital rules may not. */
+  sourcePolicy?: MeasurementSourcePolicy
 }
 
 export interface ContinuousCarePlan {
@@ -135,7 +139,7 @@ export interface MeasurementRuleEvaluation {
   ruleId: string
   label: string
   metric: string
-  state: 'triggered' | 'not-triggered' | 'missing' | 'stale' | 'unit-mismatch' | 'blocked-by-consent'
+  state: 'triggered' | 'not-triggered' | 'missing' | 'stale' | 'unit-mismatch' | 'blocked-by-consent' | 'source-unverified'
   priority?: Exclude<CareWorkflowPriority, 'routine'>
   rationale: string
   observed?: number
@@ -320,6 +324,10 @@ export function validateContinuousCarePlan(plan: ContinuousCarePlan): true {
     requiredText(rule.evidenceRef, 'measurementReviewRule.evidenceRef')
     requiredText(rule.verifiedBy, 'measurementReviewRule.verifiedBy')
     parseIso(rule.verifiedAt, 'measurementReviewRule.verifiedAt')
+    const sourcePolicy = rule.sourcePolicy ?? (rule.metric.startsWith('lab.') ? 'shared-lab-transcribed' : undefined)
+    if (!sourcePolicy) throw new Error('non-lab measurement rules require an explicit source policy')
+    if (sourcePolicy === 'shared-lab-transcribed' && !rule.metric.startsWith('lab.')) throw new Error('shared-lab source policy requires a lab metric')
+    if (sourcePolicy === 'verified-clinical-vital' && !rule.metric.startsWith('vital.')) throw new Error('verified-vital source policy requires a vital metric')
     if (!Number.isFinite(rule.threshold)) throw new Error('measurement rule threshold must be finite')
     if (!Number.isFinite(rule.maxAgeMinutes) || rule.maxAgeMinutes <= 0) {
       throw new Error('measurement rule maxAgeMinutes must be positive')
@@ -468,6 +476,13 @@ function evaluateMeasurementRule(
   }
   if (!isConsentActive(snapshot.latest.consent, 'clinical-support', Date.parse(now))) {
     return { ruleId: rule.id, label: rule.label, metric: rule.metric, state: 'blocked-by-consent', rationale: rule.rationale }
+  }
+  const sourcePolicy = rule.sourcePolicy ?? (rule.metric.startsWith('lab.') ? 'shared-lab-transcribed' : undefined)
+  if (sourcePolicy === 'verified-clinical-vital') {
+    const trusted = snapshot.latest.provenance.sourceKind === 'clinical-system'
+      && snapshot.latest.provenance.sourceId === 'panaceamed:ai-emr'
+      && snapshot.latest.semanticState === 'clinician-entered'
+    if (!trusted) return { ruleId: rule.id, label: rule.label, metric: rule.metric, state: 'source-unverified', rationale: rule.rationale }
   }
   if (snapshot.latest.unit !== rule.unit) {
     return {

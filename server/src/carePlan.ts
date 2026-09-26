@@ -40,8 +40,13 @@ export interface AturanPengukuran {
   id: string; label: string; metric: string; operator: 'gte' | 'lte'; threshold: number; unit: string
   maxAgeMinutes: number; priority: 'review-today' | 'immediate-human-review'; rationale: string
   evidenceRef: string; verifiedBy: string; verifiedAt: string
+  sourcePolicy: 'shared-lab-transcribed' | 'verified-clinical-vital'
 }
 export const MAKS_HARI_UMUR_NILAI = 730
+export const VITAL_RULE_UNITS: Readonly<Record<string, string>> = {
+  'vital.sbp': 'mmHg', 'vital.dbp': 'mmHg', 'vital.hr': 'bpm', 'vital.rr': '/min',
+  'vital.temp': '°C', 'vital.spo2': '%', 'vital.glucose': 'mg/dL',
+}
 
 export interface LaporanHarian {
   id: string; planId: string; planVersion: string; subjectId: string
@@ -110,24 +115,28 @@ export function susunRencana(masukan: unknown, subjectId: string, clinicianId: s
     }
   })
   const ukurMentah = Array.isArray(m.measurementReviewRules) ? m.measurementReviewRules : []
-  if (ukurMentah.length > 10) throw new Error('at most 10 lab review rules')
+  if (ukurMentah.length > 10) throw new Error('at most 10 measurement review rules')
   const measurementReviewRules: AturanPengukuran[] = ukurMentah.map((r, i) => {
     const x = (r ?? {}) as Record<string, unknown>
     const metric = String(x.metric ?? '')
-    if (!/^lab\.[a-z0-9_-]{1,32}$/.test(metric)) throw new Error('a lab review rule must name a lab test')
-    if (x.operator !== 'gte' && x.operator !== 'lte') throw new Error('lab rule operator must be ≥ or ≤')
+    const lab = /^lab\.[a-z0-9_-]{1,32}$/.test(metric)
+    const vitalUnit = VITAL_RULE_UNITS[metric]
+    if (!lab && !vitalUnit) throw new Error('measurement rule must name a supported lab or vital metric')
+    if (x.operator !== 'gte' && x.operator !== 'lte') throw new Error('measurement rule operator must be ≥ or ≤')
     const threshold = typeof x.threshold === 'number' ? x.threshold : NaN
-    if (!Number.isFinite(threshold)) throw new Error('lab rule threshold must be a number')
+    if (!Number.isFinite(threshold)) throw new Error('measurement rule threshold must be a number')
     const hari = typeof x.maxAgeDays === 'number' ? x.maxAgeDays : NaN
-    if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_UMUR_NILAI) throw new Error(`lab rule age must be 1–${MAKS_HARI_UMUR_NILAI} days`)
+    if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_UMUR_NILAI) throw new Error(`measurement rule age must be 1–${MAKS_HARI_UMUR_NILAI} days`)
+    const unit = vitalUnit ?? teks(x.unit, 'lab rule unit', 20)
+    if (vitalUnit && x.unit !== vitalUnit) throw new Error('vital rule unit must use the canonical unit')
     return {
-      id: `lab-rule-${i + 1}`, label: teks(x.label, 'lab rule label', 120), metric, operator: x.operator, threshold,
-      unit: teks(x.unit, 'lab rule unit', 20), maxAgeMinutes: hari * 1440,
+      id: `${vitalUnit ? 'vital' : 'lab'}-rule-${i + 1}`, label: teks(x.label, 'measurement rule label', 120), metric, operator: x.operator, threshold,
+      unit, maxAgeMinutes: hari * 1440,
       priority: x.priority === 'immediate-human-review' ? 'immediate-human-review' : 'review-today',
-      rationale: teks(x.rationale, 'lab rule rationale', 300),
-      // Tanpa rujukan bukti aturan ditolak: ambang klinis tidak boleh tanpa sumber.
+      rationale: teks(x.rationale, 'measurement rule rationale', 300),
       evidenceRef: teks(x.evidenceRef, 'evidence reference', 300),
       verifiedBy: clinicianId, verifiedAt: kini.toISOString(),
+      sourcePolicy: vitalUnit ? 'verified-clinical-vital' : 'shared-lab-transcribed',
     }
   })
   const hariIni = kini.toISOString()
