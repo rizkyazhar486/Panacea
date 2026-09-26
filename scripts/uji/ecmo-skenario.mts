@@ -1,7 +1,7 @@
 // Skenario krisis ECMO: petunjuk dihitung dari keadaan; penyelesaian dinilai dari fisiologi, bukan jawaban.
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario } from '../../src/lib/ecmo/skenario.ts'
+import { SKENARIO, DASAR, jalankan, petunjuk, SKENARIO_VV, DASAR_VV, jalankanVV, petunjukVV, type KeadaanSkenario, type KeadaanSkenarioVV } from '../../src/lib/ecmo/skenario.ts'
 
 const d = jalankan(DASAR)
 assert.ok(d.h.sah && d.v.status === 'tunak', 'keadaan dasar skenario harus tunak')
@@ -31,8 +31,30 @@ uji('distensi-lv', ['katup', 'pp'], (k) => ({ ...k, hemo: { ...k.hemo, ecmo: { .
 assert.deepEqual(petunjuk(d, jalankan(DASAR)), [], 'keadaan tak berubah → tanpa petunjuk')
 // Tiap skenario menyatakan batasnya.
 for (const s of SKENARIO) assert.ok(s.batas.length > 20, `${s.id}: batas simulasi harus dinyatakan`)
+// ── VV (sirkulasi terkopel) ──
+const dv = jalankanVV(DASAR_VV)
+assert.ok(dv.h.sah && dv.v.status === 'tunak', 'keadaan dasar VV harus tunak')
+const ujiVV = (id: string, wajib: string[], benar: (k: KeadaanSkenarioVV) => KeadaanSkenarioVV, salah: (k: KeadaanSkenarioVV) => KeadaanSkenarioVV) => {
+  const s = SKENARIO_VV.find((x) => x.id === id); assert.ok(s, `skenario ${id} hilang`)
+  const k = s!.terapkan(DASAR_VV), g = jalankanVV(k), ids = petunjukVV(dv, g).map((p) => p.id)
+  for (const w of wajib) assert.ok(ids.includes(w), `${id}: petunjuk '${w}' tidak muncul (ada: ${ids.join(',')})`)
+  assert.equal(s!.selesai(dv, g), false, `${id}: tidak boleh langsung selesai`)
+  assert.equal(s!.selesai(dv, jalankanVV(benar(k))), true, `${id}: tindakan benar harus menyelesaikan`)
+  assert.equal(s!.selesai(dv, jalankanVV(salah(k))), false, `${id}: tindakan salah tidak boleh menyelesaikan`)
+}
+const rpm = (k: KeadaanSkenarioVV, r: number) => ({ ...k, hemo: { ...k.hemo, ecmo: { ...k.hemo.ecmo, rpm: r } } })
+ujiVV('vv-migrasi', ['resirk', 'sao2'], (k) => ({ ...k, gas: { ...k.gas, jarakKanulaCm: 15 } }), (k) => rpm(k, 4500))
+ujiVV('vv-hiperdinamik', ['co', 'do2vo2', 'sao2'], (k) => rpm(k, 4500), (k) => ({ ...k, gas: { ...k.gas, fio2: 1 } }))
+ujiVV('vv-sweep', ['o2', 'paco2'], (k) => ({ ...k, gas: { ...k.gas, sweep: 3 } }), (k) => ({ ...k, gas: { ...k.gas, fio2: 1 } }))
+// ELSO VV 2021 pitfall: menaikkan ventilator hampir tidak menolong hipoksemia pada VV.
+{ const k = SKENARIO_VV.find((x) => x.id === 'vv-hiperdinamik')!.terapkan(DASAR_VV)
+  const naikVent = jalankanVV({ ...k, gas: { ...k.gas, fio2: 1 } }).v.sao2 - jalankanVV(k).v.sao2, naikAliran = jalankanVV(rpm(k, 4500)).v.sao2 - jalankanVV(k).v.sao2
+  assert.ok(naikAliran > 3 * naikVent, `menaikkan aliran ECMO harus jauh lebih efektif daripada FiO2 ventilator: ${naikAliran} vs ${naikVent}`) }
+assert.deepEqual(petunjukVV(dv, jalankanVV(DASAR_VV)), [], 'VV tak berubah → tanpa petunjuk')
+
 // UI tidak punya tombol "jawaban".
 const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
 assert.doesNotMatch(ui, /correct answer|jawaban benar/i, 'skenario tidak boleh berupa kuis tombol-jawaban')
 assert.match(ui, /data-ecmo-skenario/, 'skenario harus terpasang di panel')
+assert.match(ui, /data-ecmo-skenario-vv/, 'skenario VV harus terpasang di panel')
 console.log('ecmo-skenario: lulus')

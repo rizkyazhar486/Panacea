@@ -8,6 +8,7 @@ import { Prosa } from './Prosa'
 import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
 import { ujiPenurunanAliranVA, OPSI_WEANING_VA } from '../lib/ecmo/weaningVA'
 import { bangunEcho, indeksBingkai } from '../lib/ecmo/echo'
+import { SKENARIO_VV, DASAR_VV, jalankanVV, petunjukVV, type HasilVV } from '../lib/ecmo/skenario'
 import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
@@ -39,6 +40,7 @@ const KENDALI_VV: Kendali<MasukanVV>[] = [
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
   { k: 'fungsiMembran', label: 'Membrane function', min: 0.05, max: 1, step: 0.01, unit: '' },
   { k: 'va', label: 'Native alveolar ventilation', min: 0.5, max: 8, step: 0.1, unit: 'L/min' },
+  { k: 'fio2', label: 'Ventilator FiO₂', min: 0.21, max: 1, step: 0.01, unit: '' },
 ]
 // VA: aliran LV asli dan aliran ECMO BUKAN penggeser; keduanya keluaran sirkulasi.
 interface KendaliHemo { id: 'ees' | 'rpm' | 'volume' | 'svr'; label: string; min: number; max: number; step: number; unit: string }
@@ -214,6 +216,15 @@ export function PanelEcmo() {
   const [phMin, setPhMin] = useState(7.3)
   const [phMaks, setPhMaks] = useState(7.5)
   const [ujiVa, setUjiVa] = useState<ReturnType<typeof ujiPenurunanAliranVA> | null>(null)
+  const [skenarioVvId, setSkenarioVvId] = useState<string | null>(null)
+  const [awalVv, setAwalVv] = useState<HasilVV | null>(null)
+  const dasarVv = useMemo(() => jalankanVV(DASAR_VV), [])
+  const mulaiSkenarioVv = (id: string) => {
+    const s = SKENARIO_VV.find((x) => x.id === id); if (!s) return
+    const k = s.terapkan(DASAR_VV)
+    setHemoVv(k.hemo); setVv({ ...VV0, ...k.gas }); setAwalVv(jalankanVV(k)); setSkenarioVvId(id); setTrace([])
+    sebelumHemoVv.current = k.hemo; sebelumVv.current = { ...VV0, ...k.gas }
+  }
   const [skenarioId, setSkenarioId] = useState<string | null>(null)
   const [awalSk, setAwalSk] = useState<HasilGabungan | null>(null)
   const dasarSk = useMemo(() => jalankan(DASAR), [])
@@ -333,6 +344,30 @@ export function PanelEcmo() {
           </div>
         </>
       )}
+
+      {mode === 'VV' && (() => {
+        const s = SKENARIO_VV.find((x) => x.id === skenarioVvId)
+        const kini = s ? jalankanVV({ hemo: hemoVv, gas: vv }) : null
+        const selesai = s && kini ? s.selesai(dasarVv, kini) : false
+        const baris = (p: { id: string; nama: string; dari: number; ke: number; satuan: string }) => <li key={p.id} className="flex justify-between gap-2"><span>{p.nama}</span><span className="shrink-0 tabular-nums text-neutral-400">{p.id === 'o2' ? '' : p.satuan === '' && p.id !== 'do2vo2' ? `${pct(p.dari)} → ${pct(p.ke)}` : `${n0(p.dari, 1)} → ${n0(p.ke, 1)} ${p.satuan}`}</span></li>
+        return (
+          <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-skenario-vv>
+            <h4 className="text-[11px] font-black uppercase text-neutral-400">VV crisis scenarios</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {SKENARIO_VV.map((x) => <button key={x.id} type="button" aria-pressed={skenarioVvId === x.id} onClick={() => mulaiSkenarioVv(x.id)}
+                className={`min-h-10 rounded-full px-3 text-[11px] font-bold ${skenarioVvId === x.id ? 'bg-rose-600' : 'bg-white/10'}`}>{x.judul}</button>)}
+            </div>
+            {s && awalVv && (<>
+              <p className="text-[12px] text-neutral-300">Started: {s.pemicu}. Work it out from the physiology, then correct it with the controls.</p>
+              <p className="text-[10px] font-bold uppercase text-neutral-500">What changed when it started (computed)</p>
+              <ul className="space-y-0.5 text-[12px] text-neutral-200" data-ecmo-petunjuk-vv>{petunjukVV(dasarVv, awalVv).map(baris)}</ul>
+              <p role="status" data-ecmo-selesai-vv={selesai ? 'ya' : 'tidak'} className={`text-[12px] font-bold ${selesai ? 'text-emerald-400' : 'text-amber-300'}`}>{selesai ? 'Restored to the pre-crisis state.' : 'Not yet restored.'}</p>
+              {selesai && kini && (<><p className="text-[10px] font-bold uppercase text-neutral-500">Debrief: what your actions changed</p><ul className="space-y-0.5 text-[12px] text-neutral-200">{petunjukVV(awalVv, kini).map(baris)}</ul></>)}
+              <Prosa kelas="text-[10px] text-neutral-500">{`Not simulated here: ${s.batas}`}</Prosa>
+            </>)}
+          </div>
+        )
+      })()}
 
       {mode === 'VV' && (() => {
         const w = nilaiWeaningVV(vvEfektif, phMin, phMaks)

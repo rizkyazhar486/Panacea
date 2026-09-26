@@ -105,3 +105,70 @@ export const SKENARIO: Skenario[] = [
     batas: 'Unloading devices (IABP, Impella, venting, septostomy) are not simulated; only flow reduction and contractility are available.',
   },
 ]
+
+// ── Skenario VV di atas sirkulasi terkopel (CO dan aliran pompa adalah keluaran) ──
+import { simulasiVV, type MasukanVV, type KeadaanVV } from './mesin'
+import { SIRKULASI_NORMAL as NORMAL_VV } from './sirkulasi'
+
+export interface KeadaanSkenarioVV { hemo: ParameterSirkulasi; gas: Omit<MasukanVV, 'co' | 'qEcmo'> }
+export interface HasilVV { h: HasilSirkulasi; v: KeadaanVV }
+
+export const DASAR_VV: KeadaanSkenarioVV = {
+  hemo: { ...NORMAL_VV, hr: 110, svr: 0.7, ecmo: { konfigurasi: 'VV', rpm: 3500 } },
+  gas: { jarakKanulaCm: 15, hb: 10, vo2: 320, shunt: 0.9, fio2: 0.3, va: 1, hco3: 26, fdo2: 1, sweep: 3, fungsiMembran: 1 },
+}
+export function jalankanVV(k: KeadaanSkenarioVV): HasilVV {
+  const h = simulasiSirkulasi(k.hemo)
+  return { h, v: simulasiVV({ ...k.gas, co: h.sah ? h.coAsli : NaN, qEcmo: h.sah ? h.qEcmo : NaN }) }
+}
+
+const INDIKATOR_VV: Array<{ id: string; nama: string; satuan: string; ambang: number; baca: (g: HasilVV) => number }> = [
+  { id: 'sao2', nama: 'SaO₂', satuan: '', ambang: 0.02, baca: (g) => g.v.sao2 },
+  { id: 'resirk', nama: 'Recirculation fraction', satuan: '', ambang: 0.05, baca: (g) => g.v.resirkulasi },
+  { id: 'rasio', nama: 'Effective ECMO flow / CO', satuan: '', ambang: 0.03, baca: (g) => g.v.rasioEfektifTerhadapCO },
+  { id: 'co', nama: 'Cardiac output', satuan: 'L/min', ambang: 0.3, baca: (g) => g.h.coAsli },
+  { id: 'do2vo2', nama: 'DO₂ : VO₂', satuan: '', ambang: 0.15, baca: (g) => g.v.do2PerVo2 },
+  { id: 'paco2', nama: 'PaCO₂', satuan: 'mmHg', ambang: 3, baca: (g) => g.v.co2.paco2 },
+  { id: 'spre', nama: 'Pre-oxygenator SO₂', satuan: '', ambang: 0.03, baca: (g) => g.v.sPre },
+]
+export function petunjukVV(a: HasilVV, b: HasilVV): Petunjuk[] {
+  const o2: Petunjuk[] = a.v.status === 'tunak' && b.v.status === 'pasokan-o2-tak-cukup'
+    ? [{ id: 'o2', nama: 'O₂ supply can no longer meet VO₂ (no steady state: O₂ debt accumulating)', dari: 1, ke: 0, satuan: '' }] : []
+  return [...o2, ...INDIKATOR_VV.flatMap((i) => {
+    const x = i.baca(a), y = i.baca(b)
+    if (!Number.isFinite(x) || !Number.isFinite(y) || Math.abs(y - x) < i.ambang) return []
+    return [{ id: i.id, nama: i.nama, dari: x, ke: y, satuan: i.satuan }]
+  })]
+}
+
+export interface SkenarioVV {
+  id: string; judul: string; pemicu: string
+  terapkan: (k: KeadaanSkenarioVV) => KeadaanSkenarioVV
+  selesai: (dasar: HasilVV, kini: HasilVV) => boolean
+  batas: string
+}
+
+// Penyelesaian = pemulihan ke keadaan pasien sendiri sebelum krisis, bukan angka karangan.
+export const SKENARIO_VV: SkenarioVV[] = [
+  {
+    id: 'vv-migrasi', judul: 'Cannula migration (recirculation)',
+    pemicu: 'Drainage and return ports migrate to 3 cm apart',
+    terapkan: (k) => ({ ...k, gas: { ...k.gas, jarakKanulaCm: 3 } }),
+    selesai: (d, n) => n.v.status === 'tunak' && n.v.resirkulasi <= d.v.resirkulasi + 0.05 && n.v.sao2 >= d.v.sao2 - 0.02,
+    batas: 'Recirculation uses an illustrative geometry model; imaging-guided repositioning is represented by the port-distance control.',
+  },
+  {
+    id: 'vv-hiperdinamik', judul: 'Refractory hypoxaemia (hyperdynamic sepsis)',
+    pemicu: 'Sepsis: SVR falls to 0.5, heart rate 130, VO₂ rises to 400 mL/min',
+    terapkan: (k) => ({ hemo: { ...k.hemo, svr: 0.5, hr: 130 }, gas: { ...k.gas, vo2: 400 } }),
+    selesai: (d, n) => n.v.status === 'tunak' && n.v.do2PerVo2 >= d.v.do2PerVo2 - 0.05,
+    batas: 'Beta-blockade and targeted temperature management are represented only through heart rate and VO₂ controls.',
+  },
+  {
+    id: 'vv-sweep', judul: 'Sweep gas failure (VV)',
+    pemicu: 'Gas line disconnected: sweep falls to 0',
+    terapkan: (k) => ({ ...k, gas: { ...k.gas, sweep: 0 } }),
+    selesai: (d, n) => n.v.status === 'tunak' && n.v.co2.paco2 <= d.v.co2.paco2 + 5 && n.v.sao2 >= d.v.sao2 - 0.02,
+    batas: 'Gas-side pressures and cylinder states are not simulated.',
+  },
+]
