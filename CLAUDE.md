@@ -911,3 +911,12 @@ Claude Code must read [PANACEA_PRODUCT_MATURITY_OS.md](PANACEA_PRODUCT_MATURITY_
 Do not interpret continuous R&D as permission for continuous feature proliferation. Use research to update evidence, gaps and priorities; promote a new feature only when it solves a real named problem, fits the shared architecture, cannot be better handled by an existing capability, and has a validation path.
 
 When the owner says "lanjut" or equivalent, and no narrower task supersedes it, execute `automation/AUTONOMOUS_RND_LOOP.md`. Keep `governance/FEATURE_REGISTRY.yaml`, `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml` and `governance/RND_BACKLOG.yaml` synchronized with verified repository state.
+
+
+## VisSim-OS multi-scale coupling continuation — 2026-09-26
+
+Owner direction: position Panacea as a multi-scale Visualization & Simulation OS (digital twins, device–tissue physics, biomolecular design, immersive education, closed-loop discovery). The canonical, honest mapping of that vision onto this repository is `DOCS/VISSIM-OS.md` — read its capability matrix before claiming any layer exists.
+
+First implemented layer: the Multi-Scale Coupling Kernel (`src/lib/multiskala/kernelKopling.ts`) with a Capability Contract per scale module, hub-and-spoke message passing, fail-closed unit/producer validation, multi-rate scheduling, per-cell σ propagation, deterministic provenance chains and adaptive-refinement flags. Worked example `contohKatupJaringan.ts` (molecule ↔ cell ↔ tissue, two-way) is SIMULATED with illustrative uncalibrated parameters; Body Exposure shows it via `PanelKoplingMultiSkala.tsx`. Gate: `scripts/uji/kernel-kopling-multiskala.mts`.
+
+Hard boundaries: no GPU/BioNeMo/Isaac/MONAI capability is integrated — never imply it; no novelty claim without the Pioneer protocol's prior-art search (MUSCLE3/preCICE/PhysiCell-class coupling already exists); simulated values never flow back into the longitudinal record as measurements. Next steps are ordered in `DOCS/VISSIM-OS.md` §4 (cited parameter ranges first).

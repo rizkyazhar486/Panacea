@@ -7,6 +7,7 @@ import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
+const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -191,6 +192,12 @@ export function BodyExposureOS() {
             onDomainChange={syncModeFromProjector}
             requestedStructure={strukturDiminta}
           />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={null}>
+          <PanelKoplingMultiSkala />
         </Suspense>
       </div>
 
