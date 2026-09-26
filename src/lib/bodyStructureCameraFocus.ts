@@ -17,13 +17,24 @@ export interface BodyStructureCameraFocus {
 
 /**
  * Frames exact source-mesh bounds while preserving the user's current view
- * direction. Degenerate source bounds stay finite instead of producing NaN.
+ * direction. Degenerate finite source bounds stay stable; non-finite geometry
+ * bounds fail closed instead of producing a poisoned camera pose.
  */
 export function bodyStructureCameraFocus(
   bounds: BodyStructureFocusBounds,
   cameraPosition: BodyStructureFocusPoint,
   padding = 2.25,
-): BodyStructureCameraFocus {
+): BodyStructureCameraFocus | null {
+  const coordinates = [
+    bounds.min.x,
+    bounds.min.y,
+    bounds.min.z,
+    bounds.max.x,
+    bounds.max.y,
+    bounds.max.z,
+  ]
+  if (!coordinates.every(Number.isFinite)) return null
+
   const target = {
     x: (bounds.min.x + bounds.max.x) / 2,
     y: (bounds.min.y + bounds.max.y) / 2,
