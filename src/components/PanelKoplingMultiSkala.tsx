@@ -4,13 +4,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from './Prosa'
 import { jalankanKopling, rantaiProvenans, rerata, type HasilJalan, type Medan } from '../lib/multiskala/kernelKopling'
-import { modulContoh, PARAM_ILUSTRATIF, regangAwal, STATUS_KEBENARAN } from '../lib/multiskala/contohKatupJaringan'
+import { modulMolekul, modulSel, modulJaringan, PARAM_ILUSTRATIF, regangAwal, STATUS_KEBENARAN } from '../lib/multiskala/contohKatupJaringan'
+import { modulJaringanMultigrid } from '../lib/multiskala/jaringanMultigrid'
 
 const T_AKHIR = 600
 
-function jalankan(hubungkanKeBawah: boolean): HasilJalan {
+type Pemecah = 'lokal' | 'multigrid'
+function jalankan(hubungkanKeBawah: boolean, pemecah: Pemecah): HasilJalan {
   const p = { ...PARAM_ILUSTRATIF, hubungkanKeBawah }
-  return jalankanKopling(modulContoh(p), T_AKHIR, [regangAwal(p)])
+  const jaringan = pemecah === 'multigrid' ? modulJaringanMultigrid(p) : modulJaringan(p)
+  return jalankanKopling([modulMolekul(p), modulSel(p), jaringan], T_AKHIR, [regangAwal(p)])
 }
 
 function PetaPanas({ medan, judul, min, maks, perhalus }: { medan: Medan; judul: string; min: number; maks: number; perhalus?: ReadonlySet<number> }) {
@@ -45,6 +48,7 @@ export function PanelKoplingMultiSkala() {
   const [hasil, setHasil] = useState<{ dua: HasilJalan; atas: HasilJalan } | null>(null)
   const [tampil, setTampil] = useState<'dua' | 'atas'>('dua')
   const [ms, setMs] = useState(0)
+  const [pemecah, setPemecah] = useState<Pemecah>('multigrid')
   const aktif = hasil?.[tampil]
   const perhalus = useMemo(() => new Set<number>(aktif?.perhalus[aktif.perhalus.length - 1]?.sel ?? []), [aktif])
   const rantai = useMemo(() => aktif ? rantaiProvenans(aktif, aktif.pesanTerakhir['tissue.stiffness'].provenans.id).slice(0, 4) : [], [aktif])
@@ -56,8 +60,14 @@ export function PanelKoplingMultiSkala() {
           <h3 className="text-xs font-black">Multi-scale coupling · molecule → cell → tissue → back</h3>
           <p className="text-[10px] font-bold text-amber-200/80" data-status-kebenaran>{STATUS_KEBENARAN}</p>
         </div>
+        <span className="flex gap-1" role="group" aria-label="Tissue solver" data-pemecah-jaringan={pemecah}>
+          {([['multigrid', 'Multigrid'], ['lokal', 'Local Hooke']] as const).map(([k, l]) => (
+            <button key={k} type="button" aria-pressed={pemecah === k} onClick={() => { setPemecah(k); setHasil(null) }}
+              className={`min-h-9 rounded-full px-3 text-[10px] font-black ${pemecah === k ? 'bg-cyan-200 text-black' : 'border border-white/15 text-white/70'}`}>{l}</button>
+          ))}
+        </span>
         <button type="button" className="min-h-11 rounded-full border border-cyan-300/30 px-4 text-[11px] font-black text-cyan-100"
-          onClick={() => { const t0 = performance.now(); setHasil({ dua: jalankan(true), atas: jalankan(false) }); setMs(Math.round(performance.now() - t0)) }}>
+          onClick={() => { const t0 = performance.now(); setHasil({ dua: jalankan(true, pemecah), atas: jalankan(false, pemecah) }); setMs(Math.round(performance.now() - t0)) }}>
           {hasil ? 'Run again' : `Run ${T_AKHIR} s simulation`}
         </button>
       </div>
