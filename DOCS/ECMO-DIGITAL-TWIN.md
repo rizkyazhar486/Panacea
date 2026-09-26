@@ -52,7 +52,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
 | 20–21 | Crisis scenarios, weaning | registry `src/lib/ecmo/skenario.ts` (gate `scripts/uji/ecmo-skenario.mts`): drainage insufficiency, sweep failure, pump stop, oxygenator thrombosis, LV distension. Clues are computed from the state change; resolution is judged from physiology; wrong fixes (e.g. more RPM for hypovolaemia) do not resolve. Chatter oscillation, retrograde pump flow and unloading devices are declared not simulated. VV crises on the coupled circulation: cannula migration (recirculation), refractory hypoxaemia in hyperdynamic sepsis, sweep failure; resolution = restoration to the patient's own pre-crisis state; raising ventilator FiO₂ is shown to help far less than more ECMO flow (ELSO VV pitfall). VV weaning: ELSO VV Table 7 sequence in `src/lib/ecmo/weaningVV.ts` (gate `scripts/uji/ecmo-weaning-vv.mts`), steps enforced in order, acceptable pH as an educator-set range (alkalosis can fail). VA weaning: flow-reduction trial (< 1.5 L/min) in `src/lib/ecmo/weaningVA.ts` (gate `scripts/uji/ecmo-weaning-va.mts`) with LVEF and aortic VTI (= SV/LVOT area) from the same circulation, per Aissaoui 2011 (abstract, n = 51); TDSa is not simulated, so readiness is never declared |
 | 22 | Explanations | done: causal trace generated from state differences |
-| 23 | Conference mode | not started |
+| 23 | Conference mode | done (first slice): "Present" renders the same panel and scenarios full-screen via a portal, scaled to the screen (1–1.8×, `src/lib/ecmo/presentasi.ts`, gate `scripts/uji/ecmo-presentasi.mts`); Escape exits. No presenter notes or remote control yet |
 | 24 | Validation suite | numerical + directional golden tests; sabotaged |
 | 25 | Expert review | **external** — requires real intensivist, cannulating surgeon, perfusionist |
 
@@ -77,4 +77,4 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 
 ## Next increment
 
-Conference mode (large, presenter-driven view of the same panels and scenarios); then intrathoracic pressure → venous return coupling (needs a sourced pleural-transmission fraction) and PEEP → shunt (needs a sourced recruitment relation).
+Intrathoracic pressure → venous return coupling (needs a sourced pleural-transmission fraction) and PEEP → shunt (needs a sourced recruitment relation).

@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   simulasiVV, simulasiVA, jelaskanVV, jelaskanVA, CABANG_AORTA, BELUM_VA,
   type MasukanVV, type MasukanVA, type LangkahSebab,
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
+import { skalaPresentasi, LEBAR_PANEL_PRESENTASI } from '../lib/ecmo/presentasi'
 import { mekanikaVentilator, VENTILATOR_ISTIRAHAT, type PengaturanVentilator } from '../lib/ecmo/ventilator'
 import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
 import { ujiPenurunanAliranVA, OPSI_WEANING_VA } from '../lib/ecmo/weaningVA'
@@ -206,6 +208,17 @@ function Mengapa({ langkah }: { langkah: LangkahSebab[] }) {
 
 export function PanelEcmo() {
   const [mode, setMode] = useState<Mode>('VV')
+  // Mode konferensi: panel yang sama, layar penuh, diperbesar; Escape keluar.
+  const [presentasi, setPresentasi] = useState(false)
+  const [lebarLayar, setLebarLayar] = useState(() => (typeof window === 'undefined' ? 390 : window.innerWidth))
+  useEffect(() => {
+    if (!presentasi) return
+    const ukur = () => setLebarLayar(window.innerWidth)
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setPresentasi(false) }
+    ukur(); window.addEventListener('resize', ukur); window.addEventListener('keydown', esc)
+    return () => { window.removeEventListener('resize', ukur); window.removeEventListener('keydown', esc) }
+  }, [presentasi])
+  const skala = skalaPresentasi(lebarLayar)
   const [vv, setVv] = useState(VV0)
   const [va, setVa] = useState(VA0)
   const [hemo, setHemo] = useState<ParameterSirkulasi>(HEMO0)
@@ -285,10 +298,14 @@ export function PanelEcmo() {
   const tandai = () => { sebelumVv.current = vv; sebelumVa.current = va; sebelumHemo.current = hemo; sebelumHemoVv.current = hemoVv }
 
   const status = mode === 'VV' ? kVv.status : kVa.status
-  return (
-    <section data-ecmo className="space-y-3 rounded-2xl bg-neutral-950 p-3 text-white" aria-label="ECMO digital twin">
+  const isi = (
+    <section data-ecmo data-ecmo-presentasi={presentasi ? 'aktif' : undefined} aria-label="ECMO digital twin"
+      className={presentasi ? 'fixed inset-0 z-[100] overflow-y-auto bg-neutral-950 p-4 text-white' : 'space-y-3 rounded-2xl bg-neutral-950 p-3 text-white'}>
+      <div className={presentasi ? 'mx-auto space-y-3' : 'contents'} style={presentasi ? { maxWidth: LEBAR_PANEL_PRESENTASI, zoom: skala } : undefined}>
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-black">ECMO digital twin</h3>
+        <button type="button" onClick={() => setPresentasi((x) => !x)} aria-pressed={presentasi}
+          className="min-h-10 shrink-0 rounded-full bg-white/10 px-3 text-[12px] font-black">{presentasi ? 'Exit presenter' : 'Present'}</button>
         <span className="sr-only">Mode</span>
         <div className="flex gap-1" role="tablist">
           {(['VV', 'VA'] as Mode[]).map((m) => (
@@ -511,8 +528,11 @@ export function PanelEcmo() {
           ))}
         </ul>
       </details>
+      </div>
     </section>
   )
+  // Portal: 'fixed' di dalam induk bertransformasi tidak menutup layar, jadi presenter dirender di body.
+  return presentasi && typeof document !== 'undefined' ? createPortal(isi, document.body) : isi
 }
 
 export default PanelEcmo
