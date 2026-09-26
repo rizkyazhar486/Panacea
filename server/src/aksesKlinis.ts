@@ -39,7 +39,13 @@ export function saringKlinis(c: Clinical, boleh: (patientId: string) => boolean)
   const pilih = <T,>(o: Record<string, T>) => Object.fromEntries(Object.entries(o).filter(([k]) => boleh(k)))
   return {
     patients: c.patients.filter((p) => boleh(String(p?.id ?? ''))),
-    vitals: pilih(c.vitals), supportive: pilih(c.supportive), records: pilih(c.records), education: pilih(c.education), encounters: pilih(c.encounters ?? {}),
+    vitals: pilih(c.vitals),
+    supportive: pilih(c.supportive),
+    records: pilih(c.records),
+    recordEncounters: c.recordEncounters ? pilih(c.recordEncounters) : undefined,
+    recordHistory: c.recordHistory ? pilih(c.recordHistory) : undefined,
+    education: pilih(c.education),
+    encounters: pilih(c.encounters ?? {}),
   }
 }
 
