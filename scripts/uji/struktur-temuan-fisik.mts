@@ -27,5 +27,11 @@ assert.ok(iReset > 0 && iMinta > iReset, 'fokus dari temuan dijalankan sebelum r
 const ov = readFileSync('src/components/BodyExposurePatientOverlay.tsx', 'utf8')
 assert.match(ov, /reference region examined — not the lesion location/, 'batas "bukan lokasi lesi" tidak ditampilkan')
 assert.match(ov, /no exact 3D structure/, 'temuan tanpa struktur tidak gagal tertutup secara terlihat')
+// Body Exposure adalah satu-satunya kanvas 3D; ia HARUS membedakan tanda terverifikasi
+// klinisi dari heuristik teks bebas yang sama seperti BodyDiagram (2D) sudah lakukan,
+// bukan hanya warna status yang identik untuk keduanya.
+assert.match(ov, /LABEL_ASAL_TEMUAN/, 'overlay Body Exposure tidak mengimpor label asal temuan')
+assert.match(ov, /data-asal-temuan=\{m\.origin/, 'asal temuan tidak diteruskan ke DOM overlay Body Exposure')
+assert.match(ov, /unverified heuristic/, 'temuan dari heuristik teks tidak dibedakan secara terlihat dari tanda terverifikasi klinisi di kanvas 3D')
 assert.match(readFileSync('src/pages/BodyExposureOS.tsx', 'utf8'), /requestedStructure=\{strukturDiminta\}/, 'Body Exposure tidak meneruskan fokus ke kanvas')
 console.log(`struktur-temuan-fisik: ${Object.keys(STRUKTUR_TEMUAN).length} kunci terikat ke node sumber nyata; kulit gagal tertutup; batas bukan-lokasi-lesi tampil`)

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { buildBodyClinicalFindings } from '../lib/bodyClinicalFindings'
+import { buildBodyClinicalFindings, LABEL_ASAL_TEMUAN } from '../lib/bodyClinicalFindings'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { focusBodyClinicalProjection } from '../lib/bodyClinicalSystemContext'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
@@ -99,13 +99,19 @@ export function BodyExposurePatientOverlay({
             {tercatat.map((m) => {
               const s = strukturUntukTemuan(m.key)
               const warna = m.status === 'abnormal' ? 'border-rose-300/40 text-rose-100' : m.status === 'recorded' ? 'border-amber-300/40 text-amber-100' : 'border-emerald-300/30 text-emerald-100'
+              const asal = m.origin ? LABEL_ASAL_TEMUAN[m.origin] : undefined
+              const heuristik = m.origin === 'text-heuristic'
+              const label = `${m.label} · ${m.status === 'abnormal' ? 'finding' : m.status}${heuristik ? ' · unverified heuristic' : ''}`
               return s ? (
                 <button key={m.key} type="button" onClick={() => onShowStructure(s)} data-temuan={m.key} data-struktur={s.name}
-                  className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-black ${warna}`}>
-                  {m.label} · {m.status === 'abnormal' ? 'finding' : m.status} · show {s.name}
+                  data-asal-temuan={m.origin ?? ''} title={asal} aria-label={asal ? `${label} · ${asal} · show ${s.name}` : undefined}
+                  className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-black ${warna}${heuristik ? ' border-dashed' : ''}`}>
+                  {label} · show {s.name}
                 </button>
               ) : (
-                <span key={m.key} data-temuan={m.key} className="shrink-0 text-[10px] font-bold text-white/40">{m.label} · no exact 3D structure</span>
+                <span key={m.key} data-temuan={m.key} data-asal-temuan={m.origin ?? ''} title={asal} className="shrink-0 text-[10px] font-bold text-white/40">
+                  {m.label} · no exact 3D structure{heuristik ? ' · unverified heuristic' : ''}
+                </span>
               )
             })}
             <span className="shrink-0 text-[9px] text-white/35">reference region examined — not the lesion location</span>
