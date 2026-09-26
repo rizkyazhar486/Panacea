@@ -66,7 +66,6 @@ dekat(fraksiResirkulasi(10, 0, 6), 0, 0, 'tanpa aliran tak ada resirkulasi')
   assert.ok(t.sao2 >= 0.8 && t.sao2 <= 0.95, `baseline di luar pita tipikal ELSO: ${t.sao2}`)
   assert.ok(t.svo2 >= 0.55 && t.svo2 <= 0.8, `SvO2 baseline di luar pita: ${t.svo2}`)
   assert.ok(simulasiVV({ ...vv, co: 7.5, qEcmo: 3.2, hb: 10, vo2: 320 }).sao2 < 0.9, 'Q/CO ≈ 0.43 → SaO2 < 90%')
-  const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8'); assert.match(ui, /co: 7\.5, qEcmo: 4, jarakKanulaCm: 15, hb: 10, vo2: 320/, 'baseline UI harus sama dengan baseline teruji')
 }
 
 // VA perifer: sirkulasi ganda

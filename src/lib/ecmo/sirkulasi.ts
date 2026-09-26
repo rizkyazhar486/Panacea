@@ -15,7 +15,7 @@
 
 import { tekananPasif, tekananAkhirSistolik, BILIK_RUJUKAN, type ParameterBilik } from '../hemodinamik'
 
-export type KonfigurasiVA = 'tanpa' | 'VA-perifer' | 'VA-sentral'
+export type KonfigurasiVA = 'tanpa' | 'VA-perifer' | 'VA-sentral' | 'VV'
 
 export interface ParameterSirkulasi {
   hr: number                      // denyut/menit
@@ -134,7 +134,8 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
       const qAtas = (pAo1 - pSv) / rAtas, qBawah = (pAo2 - pSv) / rBawah
       const qParu = (pPa - pPv) / p.pvr
       let qE = 0
-      if (p.ecmo.konfigurasi !== 'tanpa' && p.ecmo.rpm > 0) qE = aliranPompa(p.ecmo.rpm, p.ecmo.konfigurasi === 'VA-sentral' ? pRa : pSv, p.ecmo.konfigurasi === 'VA-perifer' ? pAo2 : pAo1, p.ecmo.faktorBekuan ?? 1) * 1000 / 60 // mL/s
+      if (p.ecmo.konfigurasi !== 'tanpa' && p.ecmo.rpm > 0) qE = aliranPompa(p.ecmo.rpm, p.ecmo.konfigurasi === 'VA-sentral' ? pRa : pSv, p.ecmo.konfigurasi === 'VA-perifer' ? pAo2 : p.ecmo.konfigurasi === 'VV' ? pRa : pAo1, p.ecmo.faktorBekuan ?? 1) * 1000 / 60 // mL/s
+      // VV: drainase dari vena femoral/IVC, return ke atrium kanan (seri dengan jantung, bukan paralel).
       const keAo1 = p.ecmo.konfigurasi === 'VA-sentral' ? qE : 0, keAo2 = p.ecmo.konfigurasi === 'VA-perifer' ? qE : 0
       s.lv += dt * (qMitral - qAorta)
       s.ao1 += dt * (qAorta - qArkus - qAtas + keAo1)
@@ -142,7 +143,7 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
       // Drainase: perifer dari vena femoral/IVC (kompartemen vena), sentral dari atrium kanan.
       const qEVena = p.ecmo.konfigurasi === 'VA-sentral' ? 0 : qE, qERa = p.ecmo.konfigurasi === 'VA-sentral' ? qE : 0
       s.sv += dt * (qAtas + qBawah - qBalikVena - qEVena)
-      s.ra += dt * (qBalikVena - qTrikuspid - qERa)
+      s.ra += dt * (qBalikVena - qTrikuspid - qERa + (p.ecmo.konfigurasi === 'VV' ? qE : 0))
       s.rv += dt * (qTrikuspid - qPulmonal)
       s.pa += dt * (qPulmonal - qParu)
       s.pv += dt * (qParu - qMitral)

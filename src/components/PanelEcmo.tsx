@@ -31,10 +31,8 @@ const n0 = (x: number, d = 0) => (Number.isFinite(x) ? x.toFixed(d) : '—')
 
 interface Kendali<T> { k: keyof T; label: string; min: number; max: number; step: number; unit: string }
 const KENDALI_VV: Kendali<MasukanVV>[] = [
-  { k: 'qEcmo', label: 'Pump flow', min: 0, max: 7, step: 0.1, unit: 'L/min' },
   { k: 'sweep', label: 'Sweep gas', min: 0, max: 10, step: 0.5, unit: 'L/min' },
   { k: 'fdo2', label: 'FdO₂', min: 0.21, max: 1, step: 0.01, unit: '' },
-  { k: 'co', label: 'Patient cardiac output', min: 2, max: 12, step: 0.1, unit: 'L/min' },
   { k: 'jarakKanulaCm', label: 'Drainage–return distance', min: 1, max: 30, step: 0.5, unit: 'cm' },
   { k: 'hb', label: 'Hemoglobin', min: 6, max: 16, step: 0.1, unit: 'g/dL' },
   { k: 'vo2', label: 'VO₂', min: 120, max: 450, step: 5, unit: 'mL/min' },
@@ -51,6 +49,15 @@ const KENDALI_HEMO: KendaliHemo[] = [
   { id: 'svr', label: 'SVR', min: 0.6, max: 2, step: 0.05, unit: 'mmHg·s/mL' },
 ]
 const HEMO0: ParameterSirkulasi = { ...SKENARIO_SYOK_KARDIOGENIK, ecmo: { konfigurasi: 'VA-perifer', rpm: 3500 } }
+// VV: pasien hiperdinamik (takikardia, vasodilatasi) yang lazim pada ARDS; nilai ilustratif.
+const HEMO_VV0: ParameterSirkulasi = { ...SIRKULASI_NORMAL, hr: 110, svr: 0.7, ecmo: { konfigurasi: 'VV', rpm: 3500 } }
+type KendaliHemoVv = { id: KendaliHemo['id'] | 'hr'; label: string; min: number; max: number; step: number; unit: string }
+const KENDALI_HEMO_VV: KendaliHemoVv[] = [
+  { id: 'rpm', label: 'Pump speed', min: 0, max: 5000, step: 100, unit: 'rpm' },
+  { id: 'hr', label: 'Heart rate', min: 50, max: 150, step: 5, unit: '/min' },
+  { id: 'svr', label: 'SVR', min: 0.5, max: 2, step: 0.05, unit: 'mmHg·s/mL' },
+  { id: 'volume', label: 'Blood volume', min: 4200, max: 6000, step: 50, unit: 'mL' },
+]
 const nilaiHemo = (p: ParameterSirkulasi, id: KendaliHemo['id']) => id === 'ees' ? Math.round((p.lv.ees / SIRKULASI_NORMAL.lv.ees) * 100) : id === 'rpm' ? p.ecmo.rpm : id === 'volume' ? p.volumeDarah : p.svr
 const terapkanHemo = (p: ParameterSirkulasi, id: KendaliHemo['id'], v: number): ParameterSirkulasi =>
   id === 'ees' ? { ...p, lv: { ...p.lv, ees: (SIRKULASI_NORMAL.lv.ees * v) / 100 } } : id === 'rpm' ? { ...p, ecmo: { ...p.ecmo, rpm: v } } : id === 'volume' ? { ...p, volumeDarah: v } : { ...p, svr: v }
@@ -195,7 +202,13 @@ export function PanelEcmo() {
   const sebelumVv = useRef<MasukanVV>(VV0)
   const sebelumVa = useRef<MasukanVA>(VA0)
   const [trace, setTrace] = useState<LangkahSebab[]>([])
-  const kVv = useMemo(() => simulasiVV(vv), [vv])
+  // VV: curah jantung dan aliran pompa adalah KELUARAN sirkulasi yang sama (drainase femoral/IVC, return RA).
+  const [hemoVv, setHemoVv] = useState<ParameterSirkulasi>(HEMO_VV0)
+  const sebelumHemoVv = useRef<ParameterSirkulasi>(HEMO_VV0)
+  const kHemoVv = useMemo(() => simulasiSirkulasi(hemoVv), [hemoVv])
+  const vvTurunan = (m: MasukanVV, h: HasilSirkulasi): MasukanVV => ({ ...m, co: h.sah ? h.coAsli : NaN, qEcmo: h.sah ? h.qEcmo : NaN })
+  const vvEfektif = useMemo(() => vvTurunan(vv, kHemoVv), [vv, kHemoVv])
+  const kVv = useMemo(() => simulasiVV(vvEfektif), [vvEfektif])
   const [jamBekuan, setJamBekuan] = useState(0)
   const [frKanula, setFrKanula] = useState(19)
   const [phMin, setPhMin] = useState(7.3)
@@ -220,7 +233,17 @@ export function PanelEcmo() {
   const vaTurunan = (m: MasukanVA, h: HasilSirkulasi): MasukanVA => ({ ...m, fungsiMembran: bekuan.fungsiMembran, qLv: h.sah ? h.coAsli : 0, qEcmo: h.sah ? Math.max(h.qEcmo, 0.01) : 0.01 })
   const kVa = useMemo(() => simulasiVA(vaTurunan(va, kHemo)), [va, kHemo])
 
-  const ubahVv = (k: keyof MasukanVV, v: number) => { const baru = { ...vv, [k]: v }; setTrace(jelaskanVV(sebelumVv.current, simulasiVV(sebelumVv.current), baru, simulasiVV(baru))); setVv(baru) }
+  const ubahVv = (k: keyof MasukanVV, v: number) => {
+    const baru = { ...vv, [k]: v }, a = vvTurunan(sebelumVv.current, kHemoVv), b = vvTurunan(baru, kHemoVv)
+    setTrace(jelaskanVV(a, simulasiVV(a), b, simulasiVV(b))); setVv(baru)
+  }
+  const ubahHemoVv = (id: KendaliHemoVv['id'], v: number) => {
+    const baru = id === 'hr' ? { ...hemoVv, hr: v } : terapkanHemo(hemoVv, id, v)
+    const hA = simulasiSirkulasi(sebelumHemoVv.current), hB = simulasiSirkulasi(baru), a = vvTurunan(vv, hA), b = vvTurunan(vv, hB)
+    setTrace([...jelaskanHemodinamik(sebelumHemoVv.current, hA, baru, hB).filter((l) => !/LV end-systolic|PCWP|Pulse pressure/.test(l.besaran)),
+      ...jelaskanVV(a, simulasiVV(a), b, simulasiVV(b)).filter((l) => l.besaran !== 'Pump flow' && l.besaran !== 'Cardiac output')])
+    setHemoVv(baru)
+  }
   const ubahVa = (k: keyof MasukanVA, v: number) => {
     const baru = { ...va, [k]: v }, a = vaTurunan(sebelumVa.current, kHemo), b = vaTurunan(baru, kHemo)
     setTrace(jelaskanVA(a, simulasiVA(a), b, simulasiVA(b))); setVa(baru)
@@ -232,7 +255,7 @@ export function PanelEcmo() {
     setTrace([...jelaskanHemodinamik(sebelumHemo.current, hA, baru, hB), ...jelaskanVA(a, simulasiVA(a), b, simulasiVA(b)).filter((l) => l.besaran !== 'Native LV output' && l.besaran !== 'ECMO flow')])
     setHemo(baru)
   }
-  const tandai = () => { sebelumVv.current = vv; sebelumVa.current = va; sebelumHemo.current = hemo }
+  const tandai = () => { sebelumVv.current = vv; sebelumVa.current = va; sebelumHemo.current = hemo; sebelumHemoVv.current = hemoVv }
 
   const status = mode === 'VV' ? kVv.status : kVa.status
   return (
@@ -255,6 +278,9 @@ export function PanelEcmo() {
           <Sirkuit sPre={kVv.sPre} sPost={kVv.sPost} sArteri={kVv.sao2} sVena={kVv.svo2} />
           <div className="grid grid-cols-3 gap-1.5">
             <Angka id="sao2" label="SaO₂" nilai={pct(kVv.sao2)} />
+            <Angka id="vv-q" label="Pump flow (derived)" nilai={`${n0(kHemoVv.qEcmo, 1)} L/min`} />
+            <Angka id="vv-co" label="Cardiac output (derived)" nilai={`${n0(kHemoVv.coAsli, 1)} L/min`} />
+            <Angka id="vv-map" label="MAP" nilai={`${n0(kHemoVv.map)} mmHg`} />
             <Angka label="PaCO₂" nilai={`${n0(kVv.co2.paco2)} mmHg`} />
             <Angka label="pH" nilai={n0(kVv.co2.ph, 2)} />
             <Angka id="resirkulasi" label="Recirculation" nilai={pct(kVv.resirkulasi)} />
@@ -265,6 +291,7 @@ export function PanelEcmo() {
             <Angka label="ECMO O₂ transfer" nilai={`${n0(kVv.vo2Ecmo)} mL/min`} />
           </div>
           <div className="space-y-1.5" onPointerDown={tandai} onKeyDown={tandai}>
+            {KENDALI_HEMO_VV.map((d) => <Penggeser key={d.id} d={d} nilai={d.id === 'hr' ? hemoVv.hr : nilaiHemo(hemoVv, d.id)} ubah={(v) => ubahHemoVv(d.id, v)} />)}
             {KENDALI_VV.map((d) => <Penggeser key={String(d.k)} d={d} nilai={vv[d.k] as number} ubah={(v) => ubahVv(d.k, v)} />)}
           </div>
         </>
@@ -308,7 +335,7 @@ export function PanelEcmo() {
       )}
 
       {mode === 'VV' && (() => {
-        const w = nilaiWeaningVV(vv, phMin, phMaks)
+        const w = nilaiWeaningVV(vvEfektif, phMin, phMaks)
         return (
           <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-weaning>
             <h4 className="text-[11px] font-black uppercase text-neutral-400">Weaning trial (ELSO VV sequence)</h4>

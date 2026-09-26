@@ -42,7 +42,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 2 | Lumped-parameter cardiovascular engine | done: time-varying elastance LV/RV (reuses `hemodinamik.ts`), R–C vessels, split aorta, dt-independent, mass-conserving; normal bands and CS criteria locked by tests |
 | 3 | O₂/CO₂ transport | done at steady state (CO₂ membrane term illustrative) |
 | 4 | Circuit engine | done except temperature: RPM → head → flow through drainage/oxygenator/return segments; drainage, pre-/post-oxygenator pressures and ΔP (shown vs the circuit's own baseline); suck-down. Scale anchored to Condello 2023 (device-specific) |
-| 5 | VV ECMO | done at steady state |
+| 5 | VV ECMO | done: VV is a configuration of the same circulation (drain femoral/IVC, return RA); patient CO and pump flow are outputs, not sliders (gate `scripts/uji/ecmo-vv-kopling.mts`) |
 | 6 | VV recirculation | done (illustrative geometry model; content method exact; saturation method shown to overestimate) |
 | 7 | Peripheral VA | done at model level: VA flow comes from the circulation; oxygen partition uses the derived native LV output |
 | 8 | Dual circulation / mixing point | done as plug-flow partition with illustrative branch fractions |
@@ -71,6 +71,10 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 - Systolic activation lengthened to ts = 0.25 + 0.3·T (valve open ≈ 28% of the cycle): the echo view exposed ejection that was too brief. Peak LVOT velocity remains unrealistic (≈ 240 cm/s at rest) because blood inertance is not modeled, so peak velocity is not displayed; VTI is consistent. The LV-distension scenario now resolves on renewed native ejection (aortic valve opening and native output) instead of an invented pulse-pressure number.
 - Browser check found a crash (negative animation frame index unmounted the whole ECMO panel); fixed and regression-gated.
 
+- VV coupling: at equal pump speed VV raises MAP ≈ 0.7–4 mmHg vs 30–35 mmHg for VA (ELSO: VV gives no direct circulatory support). The small VV rise comes from the pump path lowering effective venous-return resistance (IVC→RA); recorded as a model discrepancy, not tuned away.
+- A hemodynamic "recirculation" measured as RA→IVC backflow was tried and rejected: in a lumped model it is dominated by normal systolic venous reflux, not ECMO recirculation. Recirculation stays with the geometric model.
+- Blood inertance (for realistic peak LVOT velocity) is blocked on a verified normal-value source; peak velocity stays hidden.
+
 ## Next increment
 
-Blood inertance in the valve/aortic segment (realistic ejection velocity), VV hemodynamic coupling and VV-side crises (recirculation, refractory hypoxaemia).
+VV-side crises on the coupled engine (recirculation after cannula migration, refractory hypoxaemia from high CO, sweep failure), then conference mode.
