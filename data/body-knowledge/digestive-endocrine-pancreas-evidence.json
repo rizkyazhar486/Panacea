@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-27",
+  "system": "digestive-endocrine",
+  "organ": "pancreas",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports general anatomy, physiology and pathophysiology relationships only; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, asset licensing, or human review.",
+  "relationships": [
+    {
+      "id": "pancreas-dual-exocrine-endocrine-organization",
+      "domain": "anatomy-physiology",
+      "from": "pancreas",
+      "to": "exocrine-and-endocrine-compartments",
+      "relationship": "contains-functionally-distinct-compartments",
+      "claim": "The human pancreas has both exocrine and endocrine functions; its organization includes endocrine islets within a predominantly exocrine organ.",
+      "evidence": ["pmid:32894306"],
+      "status": "source-checked"
+    },
+    {
+      "id": "pancreatic-islets-diabetes-pathophysiology-context",
+      "domain": "anatomy-pathophysiology",
+      "from": "pancreatic-islets",
+      "to": "diabetes-context",
+      "relationship": "undergo-disease-associated-changes",
+      "claim": "Human pancreatic endocrine tissue, including insulin-secreting beta cells and glucagon-secreting alpha cells, shows disease-associated changes in type 1 and type 2 diabetes; these changes are heterogeneous and should not be generalized to an individual patient.",
+      "evidence": ["pmid:32894306"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:32894306",
+      "pmid": "32894306",
+      "title": "Organisation of the human pancreas in health and in diabetes.",
+      "year": 2020,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32894306/",
+      "evidenceRole": "Review of human pancreatic anatomy, dual exocrine/endocrine function, islet cell biology, and pancreas changes in type 1 and type 2 diabetes.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata, abstract and indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-or-dose-recommendation",
+      "source-checked-to-human-reviewed",
+      "population-level-diabetes-change-to-individual-islet-state"
+    ]
+  }
+}
