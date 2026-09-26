@@ -4,6 +4,8 @@ import {
   type MasukanVV, type MasukanVA, type LangkahSebab,
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
+import { Prosa } from './Prosa'
+import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
 
 // Kembaran digital ECMO (edukasi). Panel ini hanya MEMBACA keadaan mesin:
@@ -154,6 +156,8 @@ export function PanelEcmo() {
   const [trace, setTrace] = useState<LangkahSebab[]>([])
   const kVv = useMemo(() => simulasiVV(vv), [vv])
   const [jamBekuan, setJamBekuan] = useState(0)
+  const [frKanula, setFrKanula] = useState(19)
+  const [adaDpc, setAdaDpc] = useState(false)
   const bekuan = trombosisOksigenator(jamBekuan)
   const hemoAktif = useMemo<ParameterSirkulasi>(() => ({ ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: bekuan.faktorBekuan } }), [hemo, bekuan.faktorBekuan])
   const kHemo = useMemo(() => simulasiSirkulasi(hemoAktif), [hemoAktif])
@@ -249,6 +253,31 @@ export function PanelEcmo() {
         </>
       )}
 
+      {mode === 'VA' && kHemo.sah && (() => {
+        // Ginjal hanya butuh hemodinamika; ubin yang butuh oksigen menjadi '—' bila model O2 menolak.
+        const o2Sah = kVa.status === 'tunak'
+        const org = o2Sah ? keadaanOrganVA(kHemo, kVa) : { ...keadaanOrganVA(kHemo, { ...kVa, cabang: [] }), otakDo2: NaN, splanknikDo2: NaN }
+        const gfr = 100 * org.ginjal.fraksiFiltrasi
+        const iliaka = kVa.cabang.find((c) => c.id === 'iliaka')?.saturasi ?? NaN
+        const tungkai = keadaanTungkai(frKanula, 8, adaDpc, kHemo.qEcmo, o2Sah ? kVa.sPost : NaN, iliaka)
+        return (
+          <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-organ>
+            <h4 className="text-[11px] font-black uppercase text-neutral-400">Organs (same state)</h4>
+            <div className="grid grid-cols-3 gap-1.5">
+              <Angka id="rpp" label="Renal perfusion P" nilai={`${n0(org.ginjal.tekananPerfusi)} mmHg`} />
+              <Angka id="filtrasi" label="Filtration" nilai={pct(org.ginjal.fraksiFiltrasi)} />
+              <Angka id="kreatinin" label="Cr at 24/48/72 h" nilai={[24, 48, 72].map((j) => kreatininSetelah(j, gfr, { crAwal: 1, gfrDasar: 100, beratKg: 70 }).toFixed(1)).join(' / ')} />
+              <Angka id="otak" label="Head–neck DO₂" nilai={`${n0(org.otakDo2)} mL/min`} />
+              <Angka label="Splanchnic DO₂" nilai={`${n0(org.splanknikDo2)} mL/min`} />
+              <Angka id="tungkai" label="Cannulated leg" nilai={`${pct(tungkai.indeksPerfusi)} ${tungkai.status === 'cukup' ? '' : '⚠'}`} />
+            </div>
+            <Prosa kelas="text-[10px] text-neutral-500">Creatinine: projection if this state persisted (baseline 1.0 mg/dL, 70 kg), not a lab value. CPP needs ICP, which is not modeled.</Prosa>
+            <Penggeser d={{ label: 'Arterial cannula size', min: 15, max: 23, step: 2, unit: 'Fr' }} nilai={frKanula} ubah={setFrKanula} />
+            <label className="flex min-h-10 items-center gap-2 text-[12px] text-neutral-300"><input type="checkbox" checked={adaDpc} onChange={(e) => setAdaDpc(e.target.checked)} />Distal perfusion cannula</label>
+          </div>
+        )
+      })()}
+
       <div className="rounded-xl bg-white/5 p-2.5">
         <h4 className="mb-1 text-[11px] font-black uppercase text-neutral-400">Why did that change?</h4>
         <Mengapa langkah={trace} />
@@ -256,7 +285,7 @@ export function PanelEcmo() {
 
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Not yet simulated</summary>
-        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'ECG, CVP waveform and heart-rate effects on ECMO flow', 'Organ time constants (renal, hepatic, brain injury)', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and the other circuit crises (only oxygenator thrombosis is simulated)'].map((t) => <li key={t}>{t}</li>)}</ul>
+        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'ECG, CVP waveform and heart-rate effects on ECMO flow', 'Hepatic synthetic/lactate kinetics, brain injury states, ICP/CPP, urine output and electrolytes', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and the other circuit crises (only oxygenator thrombosis is simulated)'].map((t) => <li key={t}>{t}</li>)}</ul>
       </details>
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Scientific basis</summary>

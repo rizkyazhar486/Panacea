@@ -77,6 +77,21 @@ export const BUKTI: Record<string, EvidenceReference> = {
     sitasi: 'Butt SP et al. Delta-P as an early indicator of oxygenator failure: the case for standardized manufacturer reference values. J Extra Corpor Technol 2025;57(4):292-293',
     populasi: 'Letter / expert opinion', konfigurasi: ['umum'],
   },
+  'chen-kegfr-2013': {
+    id: 'chen-kegfr-2013', tahun: 2013, pmid: '23704286', doi: '10.1681/ASN.2012070653',
+    sitasi: 'Chen S. Retooling the creatinine clearance equation to estimate kinetic GFR when the plasma creatinine is changing acutely. J Am Soc Nephrol 2013;24(6):877-88',
+    populasi: 'First-principles creatinine kinetics with case illustrations', konfigurasi: ['umum'],
+  },
+  'marbach-tungkai-2022': {
+    id: 'marbach-tungkai-2022', tahun: 2022, pmid: '35523371', doi: '10.1016/j.ijcard.2022.04.084',
+    sitasi: 'Marbach JA et al. Strategies to reduce limb ischemia in peripheral VA ECMO: a systematic review and meta-analysis. Int J Cardiol 2022;361:77-84',
+    populasi: '22 studies of adults on peripheral VA ECMO (small cannula < 17 Fr OR 0.40; prophylactic DPC OR 0.31)', konfigurasi: ['VA-perifer'],
+  },
+  'simons-duplex-2022': {
+    id: 'simons-duplex-2022', tahun: 2022, pmid: '35630088', doi: '10.3390/medicina58050671', pmcid: 'PMC9143327',
+    sitasi: 'Simons J et al. Duplex analysis of cannulated vessels in peripheral VA ECMO. Medicina (Kaunas) 2022;58(5):671',
+    populasi: '19 adults on femoro-femoral VA ECMO', konfigurasi: ['VA-perifer'],
+  },
   'severinghaus-1979': {
     id: 'severinghaus-1979', tahun: 1979, pmid: '35496', doi: '10.1152/jappl.1979.46.3.599',
     sitasi: 'Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 1979;46(3):599-602',
@@ -146,6 +161,25 @@ export const MODEL: Record<string, ScientificModel> = {
     satuan: { t: 'h', clot: 'resistance factor', 'ΔP': 'mmHg' },
     asumsi: ['rate and shape illustrative', 'ΔP rise as an early thrombus sign and ΔP depending on circuit design are from the source; ΔP is shown relative to the circuit’s own baseline'],
     bukti: ['butt-deltap-2025', 'condello-oksigenator-2023'], status: 'ilustratif-tak-terkalibrasi',
+  },
+  'kreatinin-kinetik': {
+    id: 'kreatinin-kinetik', nama: 'Creatinine mass balance', sistem: 'ginjal',
+    persamaan: 'Vd·dCr/dt = P − GFR·Cr;  Cr(t) = P/GFR + (Cr0 − P/GFR)·exp(−GFR·t/Vd);  P = GFR0·Cr0;  Vd = 0.6·weight',
+    satuan: { Cr: 'mg/dL', GFR: 'mL/min', Vd: 'dL', t: 'min' },
+    asumsi: ['production constant and taken from the initial steady state', 'GFR held constant over the projection ("if this state persisted")'],
+    bukti: ['chen-kegfr-2013'], status: 'verifikasi-sumber-tertunda',
+  },
+  'perfusi-ginjal': {
+    id: 'perfusi-ginjal', nama: 'Renal perfusion pressure and filtration', sistem: 'ginjal',
+    persamaan: 'RPP = MAP_distal − CVP;  filtration fraction = clamp((RPP − 40)/35, 0, 1)',
+    satuan: { RPP: 'mmHg' }, asumsi: ['autoregulation curve illustrative (flat ≥ 75, zero ≤ 40 mmHg)', 'venous congestion lowers RPP through CVP'],
+    bukti: [], status: 'ilustratif-tak-terkalibrasi',
+  },
+  'perfusi-tungkai': {
+    id: 'perfusi-tungkai', nama: 'Cannulated-limb perfusion', sistem: 'ecmo',
+    persamaan: 'residual lumen = 1 − (Fr/3 ÷ d_artery)²;  index = min(1, residual + DPC share)',
+    satuan: { d_artery: 'mm' }, asumsi: ['direction from meta-analysis (smaller cannula and DPC protect); index is not a probability of ischemia'],
+    bukti: ['marbach-tungkai-2022', 'simons-duplex-2022'], status: 'ilustratif-tak-terkalibrasi',
   },
   'membran-o2': {
     id: 'membran-o2', nama: 'Membrane-lung O2 equilibration', sistem: 'ecmo',

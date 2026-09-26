@@ -84,6 +84,7 @@ export interface HasilSirkulasi {
   sah: boolean
   alasan?: string
   map: number; sbp: number; dbp: number; pulsePressure: number
+  mapDistal: number     // tekanan rata-rata aorta desendens (viseral, ginjal, tungkai)
   cvp: number; pcwp: number; papMean: number
   lvedv: number; lvesv: number; sv: number; ef: number
   rvedv: number
@@ -99,7 +100,7 @@ export interface HasilSirkulasi {
 }
 
 export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0.0005): HasilSirkulasi {
-  const gagal = (alasan: string): HasilSirkulasi => ({ sah: false, alasan, map: NaN, sbp: NaN, dbp: NaN, pulsePressure: NaN, cvp: NaN, pcwp: NaN, papMean: NaN, lvedv: NaN, lvesv: NaN, sv: NaN, ef: NaN, rvedv: NaN, coAsli: NaN, qEcmo: NaN, aliranArkusKeDistal: NaN, fraksiBukaKatupAorta: NaN, lingkarLV: [], gelombangArteri: [], denyut: 0, volumeTotal: NaN, sirkuit: null })
+  const gagal = (alasan: string): HasilSirkulasi => ({ sah: false, alasan, map: NaN, mapDistal: NaN, sbp: NaN, dbp: NaN, pulsePressure: NaN, cvp: NaN, pcwp: NaN, papMean: NaN, lvedv: NaN, lvesv: NaN, sv: NaN, ef: NaN, rvedv: NaN, coAsli: NaN, qEcmo: NaN, aliranArkusKeDistal: NaN, fraksiBukaKatupAorta: NaN, lingkarLV: [], gelombangArteri: [], denyut: 0, volumeTotal: NaN, sirkuit: null })
   if (!(p.hr >= 20 && p.hr <= 220) || !(p.svr > 0) || !(p.pvr > 0) || !(p.volumeDarah > 2000) || !(p.lv.ees >= 0) || !(p.rv.ees >= 0)) return gagal('parameter di luar rentang')
 
   const periode = 60 / p.hr, langkah = Math.round(periode / dt)
@@ -109,11 +110,11 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
   s.sv = p.volumeDarah - (s.lv + s.rv + s.ao1 + s.ao2 + s.pa + s.pv + s.ra)
   if (s.sv < VU.sv * 0.5) return gagal('volume darah terlalu kecil untuk model')
 
-  let rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [] as Array<{ v: number; p: number }>, gel: [] as number[] }
+  let rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [] as Array<{ v: number; p: number }>, gel: [] as number[] }
   let sebelum: typeof rekaman | null = null
   let denyut = 0
   for (; denyut < maksDenyut; denyut++) {
-    rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [], gel: [] }
+    rekaman = { lvMin: Infinity, lvMax: -Infinity, rvMax: -Infinity, pAoMin: Infinity, pAoMax: -Infinity, sumPao: 0, sumPao2: 0, sumCvp: 0, sumPcwp: 0, sumPap: 0, sumMasuk: 0, volAorta: 0, volEcmo: 0, volArkus: 0, buka: 0, lingkar: [], gel: [] }
     for (let i = 0; i < langkah; i++) {
       const e = aktivasi(i * dt, periode)
       const pLv = pBilik(s.lv, e, p.lv), pRv = pBilik(s.rv, e, p.rv)
@@ -143,7 +144,7 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
       for (const v of Object.values(s)) if (!Number.isFinite(v) || v < 0) return gagal('integrasi tidak stabil (volume negatif atau tak hingga)')
       rekaman.lvMin = Math.min(rekaman.lvMin, s.lv); rekaman.lvMax = Math.max(rekaman.lvMax, s.lv); rekaman.rvMax = Math.max(rekaman.rvMax, s.rv)
       rekaman.pAoMin = Math.min(rekaman.pAoMin, pAo1); rekaman.pAoMax = Math.max(rekaman.pAoMax, pAo1)
-      rekaman.sumPao += pAo1; rekaman.sumCvp += pRa; rekaman.sumPcwp += pPv; rekaman.sumPap += pPa; rekaman.sumMasuk += p.ecmo.konfigurasi === 'VA-sentral' ? pRa : pSv
+      rekaman.sumPao += pAo1; rekaman.sumPao2 += pAo2; rekaman.sumCvp += pRa; rekaman.sumPcwp += pPv; rekaman.sumPap += pPa; rekaman.sumMasuk += p.ecmo.konfigurasi === 'VA-sentral' ? pRa : pSv
       rekaman.volAorta += qAorta * dt; rekaman.volEcmo += qE * dt; rekaman.volArkus += qArkus * dt
       if (qAorta > 0) rekaman.buka++
       if (i % 10 === 0) { rekaman.lingkar.push({ v: s.lv, p: pLv }); rekaman.gel.push(pAo1) }
@@ -155,7 +156,7 @@ export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0
   const sv = rekaman.volAorta
   return {
     sah: true,
-    map: rekaman.sumPao / n, sbp: rekaman.pAoMax, dbp: rekaman.pAoMin, pulsePressure: rekaman.pAoMax - rekaman.pAoMin,
+    map: rekaman.sumPao / n, mapDistal: rekaman.sumPao2 / n, sbp: rekaman.pAoMax, dbp: rekaman.pAoMin, pulsePressure: rekaman.pAoMax - rekaman.pAoMin,
     cvp: rekaman.sumCvp / n, pcwp: rekaman.sumPcwp / n, papMean: rekaman.sumPap / n,
     lvedv: rekaman.lvMax, lvesv: rekaman.lvMin, sv, ef: rekaman.lvMax > 0 ? sv / rekaman.lvMax : NaN, rvedv: rekaman.rvMax,
     coAsli: rekaman.volAorta * keLmin, qEcmo: rekaman.volEcmo * keLmin, aliranArkusKeDistal: rekaman.volArkus * keLmin,
