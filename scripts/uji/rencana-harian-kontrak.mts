@@ -68,4 +68,17 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))
   assert.match(muatAwal, /galat/, 'cabang !data tidak menampilkan galat saat muat() awal gagal')
   assert.match(muatAwal, /Retry|muat\(\)/, 'cabang !data tidak menawarkan jalan retry')
+
+  // 2026-09-26: aturan lab kini divalidasi di klien SEBELUM round trip (bukan
+  // hanya lewat pesan galat server setelah simpan() ditolak), dan tombol
+  // "Start daily check-in" tidak boleh mengirim kiriman ganda saat sedang menyimpan.
+  assert.match(dokterUi, /aturanLabGalat = aturanLab\.map\(validasiAturanLab\)/, 'aturan lab kehilangan validasi per baris sisi klien')
+  assert.match(dokterUi, /aturanLabGalat\[i\] &&.*<p role="alert"/, 'baris aturan lab tidak menampilkan galat validasinya sendiri')
+  assert.match(dokterUi, /disabled=\{submitting \|\| aturanLabGalat\.some\(Boolean\)\}/, 'tombol "Start daily check-in" tidak dijaga dari klik ganda atau aturan lab yang belum valid')
+  assert.match(dokterUi, /if \(submitting\) return Promise\.resolve\(\)/, 'simpan() tidak menolak dipanggil ulang selagi masih berjalan')
+
+  // 2026-09-26: daftar izin lab klinisi (LabPasienUntukDokter) menampilkan
+  // status memuat antara mount dan respons api.clinicianLabShares() pertama.
+  const labUi = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+  assert.match(labUi, /memuatDaftar && !daftar && !galat/, 'daftar izin lab klinisi kehilangan indikator memuat sebelum respons pertama')
 }
