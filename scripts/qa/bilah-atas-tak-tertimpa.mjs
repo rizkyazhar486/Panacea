@@ -103,13 +103,32 @@ try {
   }
   if (tertutup.length) throw new Error(`tombol bilah atas tertutup: ${tertutup.join(' | ')}`)
 
+  // 4. Hierarki lokasi harus benar-benar terbaca di ponsel, bukan cuma ada di
+  //    DOM lalu terpotong ellipsis. /latihan adalah kontrak paling padat:
+  //    Body › Move › Training.
+  const hierarki = page.locator('header.kaca h1[data-navigation-hierarchy="v1"]').first()
+  await hierarki.waitFor({ state: 'visible' })
+  const infoHierarki = await hierarki.evaluate((node) => ({
+    text: (node.innerText || '').replace(/\s+/g, ' ').trim(),
+    scrollWidth: node.scrollWidth,
+    clientWidth: node.clientWidth,
+  }))
+  if (!/^Body\s*›\s*Move\s*›\s*Training$/i.test(infoHierarki.text)) {
+    throw new Error(`hierarki mobile salah: "${infoHierarki.text}"`)
+  }
+  if (infoHierarki.scrollWidth > infoHierarki.clientWidth + 1) {
+    throw new Error(
+      `hierarki mobile terpotong: ${infoHierarki.scrollWidth}px > ${infoHierarki.clientWidth}px`,
+    )
+  }
+
   const lebar = await page.evaluate(() => document.documentElement.scrollWidth)
   if (lebar > 390) throw new Error(`Halaman meluber mendatar: ${lebar}px`)
   if (galat.length) throw new Error(`Galat halaman: ${galat.join(' | ')}`)
 
   console.log(
     `Bilah atas lulus: spanduk harian tampil dan TIDAK menimpa bilah, ${nama.length} tombol navigasi ` +
-    'benar-benar teratas di titiknya, lebar halaman 390px, nol galat halaman.',
+    'benar-benar teratas di titiknya, hierarki Body › Move › Training terbaca utuh, lebar halaman 390px, nol galat halaman.',
   )
 } catch (e) {
   gagal = e

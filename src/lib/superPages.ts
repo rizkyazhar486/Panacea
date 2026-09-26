@@ -63,10 +63,15 @@ export function navigationHierarchyForRoute(
   to: string,
   group = '',
   pageTitle = '',
+  options: { compactSuperPage?: boolean } = {},
 ): string[] {
   const superPage = getSuperPage(superPageForRoute(to, group))
   const productSpace = getProductSpace(productSpaceForRoute(to, group))
-  const labels = [superPage.label, productSpace.shortLabel, pageTitle.trim()]
+  const labels = [
+    options.compactSuperPage ? superPage.shortLabel : superPage.label,
+    productSpace.shortLabel,
+    pageTitle.trim(),
+  ]
   const seen = new Set<string>()
 
   return labels.filter((label) => {

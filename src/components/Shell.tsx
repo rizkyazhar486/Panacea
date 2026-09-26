@@ -439,6 +439,14 @@ export function Shell({ children }: { children: ReactNode }) {
   const judulBilah = loc.pathname === '/'
     ? judul
     : navigationHierarchyForRoute(loc.pathname, ruteAktif?.group ?? '', judul).join(' › ')
+  const judulBilahPonsel = loc.pathname === '/'
+    ? judul
+    : navigationHierarchyForRoute(
+        loc.pathname,
+        ruteAktif?.group ?? '',
+        judul,
+        { compactSuperPage: true },
+      ).join(' › ')
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
@@ -500,10 +508,12 @@ export function Shell({ children }: { children: ReactNode }) {
               </button>
             )}
             <h1
-              className="min-w-0 truncate text-[13px] font-bold sm:text-base"
+              className="min-w-0 flex-1 truncate text-[13px] font-bold sm:text-base"
               title={judulBilah}
+              data-navigation-hierarchy="v1"
             >
-              {judulBilah}
+              <span className="sm:hidden">{judulBilahPonsel}</span>
+              <span className="hidden sm:inline">{judulBilah}</span>
             </h1>
           </div>
 
