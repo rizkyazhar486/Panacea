@@ -153,7 +153,8 @@ function validIso(value: unknown): value is string {
   if (month < 1 || month > 12) return false
   if (day < 1 || day > daysInMonth[month - 1]) return false
   if (hour > 23 || minute > 59 || second > 59) return false
-  if (offsetHour > 23 || offsetMinute > 59) return false
+  if (offsetHour > 14 || offsetMinute > 59) return false
+  if (offsetHour === 14 && offsetMinute !== 0) return false
 
   return Number.isFinite(Date.parse(value))
 }
