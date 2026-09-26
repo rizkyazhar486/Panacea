@@ -1,6 +1,6 @@
 // Sirkulasi berparameter-tergumpal: validasi numerik + golden hemodinamika VA.
 import assert from 'node:assert/strict'
-import { simulasiSirkulasi as S, SIRKULASI_NORMAL as N, SKENARIO_SYOK_KARDIOGENIK as CS, aliranPompa, type ParameterSirkulasi } from '../../src/lib/ecmo/sirkulasi.ts'
+import { simulasiSirkulasi as S, SIRKULASI_NORMAL as N, SKENARIO_SYOK_KARDIOGENIK as CS, aliranPompa, tekananSirkuit, trombosisOksigenator, type ParameterSirkulasi } from '../../src/lib/ecmo/sirkulasi.ts'
 
 const di = (x: number, lo: number, hi: number, m: string) => assert.ok(x >= lo && x <= hi, `${m}: ${x.toFixed(2)} tidak dalam [${lo}, ${hi}]`)
 const va = (p: ParameterSirkulasi, rpm: number, k: 'VA-perifer' | 'VA-sentral' = 'VA-perifer') => S({ ...p, ecmo: { konfigurasi: k, rpm } })
@@ -25,8 +25,8 @@ const cs = S(CS)
 assert.ok(cs.sbp < 90 && cs.pcwp > 15 && cs.coAsli / 1.9 < 2.2, `skenario syok tidak memenuhi kriteria: SBP ${cs.sbp} PCWP ${cs.pcwp} CI ${cs.coAsli / 1.9}`)
 
 // RPM bukan aliran.
-assert.ok(va(CS, 2500).qEcmo < 0.1, 'RPM rendah: head tidak melampaui tekanan arteri → aliran ≈ 0')
-assert.ok(aliranPompa(4000, 5, 150) === 0, 'tekanan keluar melebihi head → aliran nol, bukan negatif palsu')
+assert.ok(va(CS, 1500).qEcmo < 0.05, 'RPM rendah: head tidak melampaui tekanan arteri → aliran ≈ 0')
+assert.ok(aliranPompa(4000, 5, 300) === 0, 'tekanan keluar (300) melebihi head (≈230 mmHg pada 4000 rpm) → aliran nol, bukan negatif palsu')
 assert.ok(aliranPompa(4000, 5, 60) > aliranPompa(4000, 5, 90), 'RPM sama, afterload lebih tinggi → aliran lebih kecil')
 assert.ok(aliranPompa(4000, 0, 70) < aliranPompa(4000, 6, 70), 'tekanan vena rendah (suck-down) → aliran turun')
 assert.ok(va({ ...CS, volumeDarah: 4700 }, 4000).qEcmo < va(CS, 4000).qEcmo, 'hipovolemia membatasi aliran drainase')
@@ -46,4 +46,28 @@ const pulih = va({ ...CS, lv: { ...CS.lv, ees: N.lv.ees * 0.7 } }, 4000)
 assert.ok(pulih.pulsePressure > tangga[2].pulsePressure && pulih.coAsli > tangga[2].coAsli, 'LV pulih → pulsatilitas & curah asli naik')
 // Geometri: return femoral mendorong darah retrograd ke arah arkus; return sentral tidak.
 assert.ok(va(CS, 4500, 'VA-sentral').aliranArkusKeDistal > tangga[3].aliranArkusKeDistal + 1, 'sentral vs perifer: aliran arkus berbeda')
+// Lokasi drainase kini bermakna (RA terpisah): sentral mengalirkan dari atrium kanan, perifer dari vena femoral/IVC.
+{ const per = va(CS, 4000)
+  let sen = va(CS, 3000, 'VA-sentral')
+  for (let r = 3000; r <= 6000; r += 100) { const k = va(CS, r, 'VA-sentral'); if (Math.abs(k.qEcmo - per.qEcmo) < Math.abs(sen.qEcmo - per.qEcmo)) sen = k }
+  assert.ok(Math.abs(per.qEcmo - sen.qEcmo) < 0.15, `aliran harus sepadan untuk perbandingan adil: ${per.qEcmo} vs ${sen.qEcmo}`)
+  assert.ok(sen.pcwp < per.pcwp, 'pada aliran sepadan, VA sentral membebani sisi kiri lebih ringan (arah De Lazzari 2025)')
+  assert.ok(sen.papMean < per.papMean, 'pada aliran sepadan, PAP lebih rendah dengan drainase RA') }
+{ const papPer = [3000, 4000, 5000].map((r) => va(CS, r).papMean), papSen = [3000, 4000, 5000].map((r) => va(CS, r, 'VA-sentral').papMean)
+  assert.ok(papPer[2] > papPer[0], 'VA perifer: PAP naik dengan RPM'); assert.ok(papSen[2] < papSen[0], 'VA sentral: PAP turun dengan RPM') }
+// Tekanan sirkuit (jangkar Condello 2023 untuk skala; arah ΔP dari Butt 2025).
+{ const r = va(CS, 4000), c = r.sirkuit!
+  assert.ok(c.pDrainase < r.cvp && c.pDrainase < 0, 'tekanan drainase negatif di bawah tekanan vena')
+  assert.ok(c.pPraOksigenator > c.pPascaOksigenator && c.pPascaOksigenator > r.map, 'urutan tekanan: pra-oksigenator > pasca > arteri')
+  assert.ok(Math.abs(c.deltaP - (c.pPraOksigenator - c.pPascaOksigenator)) < 1e-9, 'ΔP = Pinlet − Poutlet oksigenator')
+  assert.ok(va(CS, 4500).sirkuit!.pDrainase < va(CS, 3500).sirkuit!.pDrainase, 'RPM↑ → drainase lebih negatif')
+  assert.equal(S(CS).sirkuit, null, 'tanpa ECMO tidak ada tekanan sirkuit palsu') }
+{ const t0 = trombosisOksigenator(0), t48 = trombosisOksigenator(48)
+  assert.equal(t0.faktorBekuan, 1); assert.equal(t0.fungsiMembran, 1)
+  const a = S({ ...CS, ecmo: { konfigurasi: 'VA-perifer', rpm: 4000, faktorBekuan: t0.faktorBekuan } })
+  const b = S({ ...CS, ecmo: { konfigurasi: 'VA-perifer', rpm: 4000, faktorBekuan: t48.faktorBekuan } })
+  assert.ok(b.sirkuit!.deltaP > a.sirkuit!.deltaP * 1.3, 'trombosis → ΔP naik walau aliran turun')
+  assert.ok(b.qEcmo < a.qEcmo, 'trombosis → aliran turun pada RPM tetap')
+  assert.ok(t48.fungsiMembran < t0.fungsiMembran, 'trombosis → fungsi pertukaran gas turun')
+  assert.ok(trombosisOksigenator(-5).faktorBekuan === 1, 'waktu negatif tidak menciptakan bekuan') }
 console.log('ecmo-sirkulasi: lulus')

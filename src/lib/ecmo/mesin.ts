@@ -146,7 +146,7 @@ export interface KeadaanVA {
 
 export const BELUM_VA = [
   'LV unloading devices (IABP, Impella, venting, septostomy)',
-  'Drainage-site effect (RA vs femoral): venous compartment is merged, so central VA does not show the RV/PCWP unloading reported in lumped-model literature',
+  'Magnitude of central-VA unloading: RA drainage now lowers PAP and PCWP relative to femoral drainage, but PCWP stays above the untreated baseline (CARDIOSIM reports a fall), and peripheral RVEDV falls here (CARDIOSIM: rises)',
   'Differential CO2 between the two circulations',
   'Central VA-ECMO geometry',
   'Limb ischemia from arterial cannula size',

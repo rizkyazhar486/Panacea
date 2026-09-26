@@ -67,6 +67,16 @@ export const BUKTI: Record<string, EvidenceReference> = {
     sitasi: 'Suga H, Sagawa K, Shoukas AA. Load independence of the instantaneous pressure-volume ratio of the canine left ventricle. Circ Res 1973;32(3):314-22',
     populasi: 'Canine left ventricle (experimental)', konfigurasi: ['umum'],
   },
+  'condello-oksigenator-2023': {
+    id: 'condello-oksigenator-2023', tahun: 2023, pmid: '36998079', doi: '10.1186/s13019-023-02190-9', pmcid: 'PMC10061787',
+    sitasi: 'Condello I, Lorusso R, Nasso G, Speziale G. Long-term ECMO, efficiency and performance of EUROSETS adult A.L.ONE ECMO oxygenator. J Cardiothorac Surg 2023;18:95',
+    populasi: 'Single centre, 11 adults, one oxygenator model used >14 days (device-specific)', konfigurasi: ['VV', 'VA-perifer', 'VA-sentral'],
+  },
+  'butt-deltap-2025': {
+    id: 'butt-deltap-2025', tahun: 2025, pmid: '41405048', doi: '10.1051/ject/2025039', pmcid: 'PMC12710228',
+    sitasi: 'Butt SP et al. Delta-P as an early indicator of oxygenator failure: the case for standardized manufacturer reference values. J Extra Corpor Technol 2025;57(4):292-293',
+    populasi: 'Letter / expert opinion', konfigurasi: ['umum'],
+  },
   'severinghaus-1979': {
     id: 'severinghaus-1979', tahun: 1979, pmid: '35496', doi: '10.1152/jappl.1979.46.3.599',
     sitasi: 'Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 1979;46(3):599-602',
@@ -84,10 +94,10 @@ export const MODEL: Record<string, ScientificModel> = {
   },
   'pompa-sentrifugal': {
     id: 'pompa-sentrifugal', nama: 'Centrifugal pump head curve', sistem: 'ecmo',
-    persamaan: 'H = 7.5·(rpm/1000)² − 1.2·Q²;  H = P_out − P_in + R_circ·Q;  R_drain rises steeply when P_in < 2 mmHg',
+    persamaan: 'H = 14.4·(rpm/1000)² − 1.0·Q²;  H = P_out − P_in + (R_drain + R_oxy·clot + R_return)·Q;  R = 10/17/12 mmHg per L/min;  R_drain rises steeply when P_in < 2 mmHg',
     satuan: { H: 'mmHg', Q: 'L/min', rpm: '1/min' },
-    asumsi: ['flow is the solution of head vs patient pressures, never RPM itself', 'pump backflow at low RPM not modeled (reported as zero)', 'coefficients illustrative, not a specific pump'],
-    bukti: ['elso-vv-2021', 'delazzari-cardiosim-2025'], status: 'ilustratif-tak-terkalibrasi',
+    asumsi: ['flow is the solution of head vs patient pressures, never RPM itself', 'pump backflow at low RPM not modeled (reported as zero)', 'scale anchored to one published device series (~4250 rpm ≈ 4.5 L/min, ΔP ≈ 76 mmHg); not a specific pump model'],
+    bukti: ['elso-vv-2021', 'condello-oksigenator-2023', 'delazzari-cardiosim-2025'], status: 'ilustratif-tak-terkalibrasi',
   },
   'kurva-disosiasi': {
     id: 'kurva-disosiasi', nama: 'O2 dissociation curve', sistem: 'hematologi',
@@ -129,6 +139,13 @@ export const MODEL: Record<string, ScientificModel> = {
     persamaan: 'R = 0.6/(1+exp((d−8)/2.5)) · (0.4 + 0.6·min(1, Q/CO))', satuan: { d: 'cm between drainage and return ports', Q: 'L/min' },
     asumsi: ['directional teaching model: closer cannulas and higher Q/CO raise recirculation (sources); constants are illustrative, not fitted'],
     bukti: ['abrams-resirkulasi-2015', 'lindholm-kanulasi-2018', 'elso-vv-2021'], status: 'ilustratif-tak-terkalibrasi',
+  },
+  'trombosis-oksigenator': {
+    id: 'trombosis-oksigenator', nama: 'Progressive oxygenator thrombosis (crisis scenario)', sistem: 'ecmo',
+    persamaan: 'clot = 1 + t/24 h;  R_oxy × clot;  membrane function = 1/(1 + 0.6·(clot − 1));  ΔP = P_inlet − P_outlet',
+    satuan: { t: 'h', clot: 'resistance factor', 'ΔP': 'mmHg' },
+    asumsi: ['rate and shape illustrative', 'ΔP rise as an early thrombus sign and ΔP depending on circuit design are from the source; ΔP is shown relative to the circuit’s own baseline'],
+    bukti: ['butt-deltap-2025', 'condello-oksigenator-2023'], status: 'ilustratif-tak-terkalibrasi',
   },
   'membran-o2': {
     id: 'membran-o2', nama: 'Membrane-lung O2 equilibration', sistem: 'ecmo',

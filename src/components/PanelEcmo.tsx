@@ -4,7 +4,7 @@ import {
   type MasukanVV, type MasukanVA, type LangkahSebab,
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
-import { simulasiSirkulasi, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
+import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
 
 // Kembaran digital ECMO (edukasi). Panel ini hanya MEMBACA keadaan mesin:
 // tidak ada angka yang ditulis langsung, warna darah = pemetaan saturasi terhitung.
@@ -153,9 +153,14 @@ export function PanelEcmo() {
   const sebelumVa = useRef<MasukanVA>(VA0)
   const [trace, setTrace] = useState<LangkahSebab[]>([])
   const kVv = useMemo(() => simulasiVV(vv), [vv])
-  const kHemo = useMemo(() => simulasiSirkulasi(hemo), [hemo])
+  const [jamBekuan, setJamBekuan] = useState(0)
+  const bekuan = trombosisOksigenator(jamBekuan)
+  const hemoAktif = useMemo<ParameterSirkulasi>(() => ({ ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: bekuan.faktorBekuan } }), [hemo, bekuan.faktorBekuan])
+  const kHemo = useMemo(() => simulasiSirkulasi(hemoAktif), [hemoAktif])
+  // Garis dasar ΔP sirkuit ini sendiri (tanpa bekuan): nilai absolut ΔP bergantung desain sirkuit.
+  const kDasar = useMemo(() => simulasiSirkulasi({ ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: 1 } }), [hemo])
   // Oksigenasi VA dihitung dari aliran yang DIHASILKAN sirkulasi, bukan penggeser.
-  const vaTurunan = (m: MasukanVA, h: HasilSirkulasi): MasukanVA => ({ ...m, qLv: h.sah ? h.coAsli : 0, qEcmo: h.sah ? Math.max(h.qEcmo, 0.01) : 0.01 })
+  const vaTurunan = (m: MasukanVA, h: HasilSirkulasi): MasukanVA => ({ ...m, fungsiMembran: bekuan.fungsiMembran, qLv: h.sah ? h.coAsli : 0, qEcmo: h.sah ? Math.max(h.qEcmo, 0.01) : 0.01 })
   const kVa = useMemo(() => simulasiVA(vaTurunan(va, kHemo)), [va, kHemo])
 
   const ubahVv = (k: keyof MasukanVV, v: number) => { const baru = { ...vv, [k]: v }; setTrace(jelaskanVV(sebelumVv.current, simulasiVV(sebelumVv.current), baru, simulasiVV(baru))); setVv(baru) }
@@ -164,7 +169,8 @@ export function PanelEcmo() {
     setTrace(jelaskanVA(a, simulasiVA(a), b, simulasiVA(b))); setVa(baru)
   }
   const ubahHemo = (id: KendaliHemo['id'], v: number) => {
-    const baru = terapkanHemo(hemo, id, v), hA = simulasiSirkulasi(sebelumHemo.current), hB = simulasiSirkulasi(baru)
+    const fb = bekuan.faktorBekuan, dgnBekuan = (p: ParameterSirkulasi) => ({ ...p, ecmo: { ...p.ecmo, faktorBekuan: fb } })
+    const baru = terapkanHemo(hemo, id, v), hA = simulasiSirkulasi(dgnBekuan(sebelumHemo.current)), hB = simulasiSirkulasi(dgnBekuan(baru))
     const a = vaTurunan(va, hA), b = vaTurunan(va, hB)
     setTrace([...jelaskanHemodinamik(sebelumHemo.current, hA, baru, hB), ...jelaskanVA(a, simulasiVA(a), b, simulasiVA(b)).filter((l) => l.besaran !== 'Native LV output' && l.besaran !== 'ECMO flow')])
     setHemo(baru)
@@ -220,11 +226,24 @@ export function PanelEcmo() {
             <Angka id="qecmo" label="ECMO flow" nilai={`${n0(kHemo.qEcmo, 1)} L/min`} />
             <Angka id="colv" label="Native LV output" nilai={`${n0(kHemo.coAsli, 1)} L/min`} />
             <Angka label="LVEDV / ESV" nilai={`${n0(kHemo.lvedv)} / ${n0(kHemo.lvesv)}`} />
+            <Angka id="pdrain" label="Drainage P" nilai={kHemo.sirkuit ? `${n0(kHemo.sirkuit.pDrainase)} mmHg` : 'no flow'} />
+            <Angka id="ppre" label="Pre-oxy / post-oxy" nilai={kHemo.sirkuit ? `${n0(kHemo.sirkuit.pPraOksigenator)} / ${n0(kHemo.sirkuit.pPascaOksigenator)}` : '—'} />
+            <Angka id="deltap" label="ΔP vs own baseline" nilai={kHemo.sirkuit && kDasar.sirkuit && kDasar.sirkuit.deltaP > 0.5 ? `${n0(kHemo.sirkuit.deltaP)} (${kHemo.sirkuit.deltaP >= kDasar.sirkuit.deltaP ? '+' : ''}${n0((kHemo.sirkuit.deltaP / kDasar.sirkuit.deltaP - 1) * 100)}%)` : '—'} />
             <Angka label="DO₂" nilai={`${n0(kVa.do2)} mL/min`} />
             <Angka label="SvO₂" nilai={pct(kVa.svo2)} />
           </div>
           <div className="space-y-1.5" onPointerDown={tandai} onKeyDown={tandai}>
             {KENDALI_HEMO.map((d) => <Penggeser key={d.id} d={d} nilai={nilaiHemo(hemo, d.id)} ubah={(v) => ubahHemo(d.id, v)} />)}
+            <Penggeser d={{ label: 'Oxygenator clot: hours since onset (crisis scenario)', min: 0, max: 72, step: 1, unit: 'h' }} nilai={jamBekuan}
+              ubah={(v) => {
+                const a = trombosisOksigenator(jamBekuan), b = trombosisOksigenator(v)
+                const pa = { ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: a.faktorBekuan } }, pb = { ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: b.faktorBekuan } }
+                const hA = simulasiSirkulasi(pa), hB = simulasiSirkulasi(pb)
+                const vA = { ...va, fungsiMembran: a.fungsiMembran, qLv: hA.coAsli, qEcmo: Math.max(hA.qEcmo, 0.01) }, vB = { ...va, fungsiMembran: b.fungsiMembran, qLv: hB.coAsli, qEcmo: Math.max(hB.qEcmo, 0.01) }
+                const dp = hA.sirkuit && hB.sirkuit ? [{ besaran: 'Oxygenator ΔP', dari: Number(hA.sirkuit.deltaP.toFixed(0)), ke: Number(hB.sirkuit.deltaP.toFixed(0)), satuan: 'mmHg' }] : []
+                setTrace([{ besaran: 'Clot burden (resistance factor)', dari: Number(a.faktorBekuan.toFixed(2)), ke: Number(b.faktorBekuan.toFixed(2)), satuan: '×' }, ...dp, ...jelaskanHemodinamik(pa, hA, pb, hB), ...jelaskanVA(vA, simulasiVA(vA), vB, simulasiVA(vB)).filter((l) => l.besaran !== 'Native LV output' && l.besaran !== 'ECMO flow')])
+                setJamBekuan(v)
+              }} />
             {KENDALI_VA.map((d) => <Penggeser key={String(d.k)} d={d} nilai={va[d.k] as number} ubah={(v) => ubahVa(d.k, v)} />)}
           </div>
         </>
@@ -237,7 +256,7 @@ export function PanelEcmo() {
 
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Not yet simulated</summary>
-        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'ECG, CVP waveform and heart-rate effects on ECMO flow', 'Organ time constants (renal, hepatic, brain injury)', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and circuit crises'].map((t) => <li key={t}>{t}</li>)}</ul>
+        <ul className="mt-1 list-disc pl-5 text-neutral-400">{[...BELUM_VA, 'ECG, CVP waveform and heart-rate effects on ECMO flow', 'Organ time constants (renal, hepatic, brain injury)', 'Cannulation, ultrasound and ICU scene', 'Anticoagulation, hemolysis and the other circuit crises (only oxygenator thrombosis is simulated)'].map((t) => <li key={t}>{t}</li>)}</ul>
       </details>
       <details className="text-[12px]">
         <summary className="min-h-10 cursor-pointer font-bold text-neutral-300">Scientific basis</summary>

@@ -40,7 +40,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 1 | Evidence registry | done (6 sources, 11 models with status) |
 | 2 | Lumped-parameter cardiovascular engine | done: time-varying elastance LV/RV (reuses `hemodinamik.ts`), R–C vessels, split aorta, dt-independent, mass-conserving; normal bands and CS criteria locked by tests |
 | 3 | O₂/CO₂ transport | done at steady state (CO₂ membrane term illustrative) |
-| 4 | Circuit engine | partial: RPM → pump head → flow against patient pressures, drainage collapse (suck-down); membrane O₂/CO₂; no displayed circuit pressures (Ppre/Ppost/ΔP) or temperature yet |
+| 4 | Circuit engine | done except temperature: RPM → head → flow through drainage/oxygenator/return segments; drainage, pre-/post-oxygenator pressures and ΔP (shown vs the circuit's own baseline); suck-down. Scale anchored to Condello 2023 (device-specific) |
 | 5 | VV ECMO | done at steady state |
 | 6 | VV recirculation | done (illustrative geometry model; content method exact; saturation method shown to overestimate) |
 | 7 | Peripheral VA | done at model level: VA flow comes from the circulation; oxygen partition uses the derived native LV output |
@@ -49,7 +49,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 10–15 | Lungs (mechanics), brain, kidney, liver, limb, hematology | directional CO₂→CBF only; rest not started |
 | 16–18 | Cannulation, ultrasound, ICU scene | not started |
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
-| 20–21 | Crisis scenarios, weaning | not started |
+| 20–21 | Crisis scenarios, weaning | first crisis: progressive oxygenator thrombosis over hours (ΔP ↑, flow ↓, drainage less negative, gas transfer ↓, dual-circulation shift) — rate illustrative. Others and weaning not started |
 | 22 | Explanations | done: causal trace generated from state differences |
 | 23 | Conference mode | not started |
 | 24 | Validation suite | numerical + directional golden tests; sabotaged |
@@ -59,8 +59,10 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 
 - Peripheral VA direction (LV/LA loading and PCWP rise with pump speed) agrees with De Lazzari 2025 (CARDIOSIM) and ELSO VA 2021; magnitude is smaller here (LVEDV +1–2% vs ≈14% in CARDIOSIM at 3000 rpm).
 - **Not reproduced:** central VA lowering PCWP/RVEDV (De Lazzari 2025). The RA is merged into the systemic venous compartment, so the drainage site cannot differ. Declared in the UI; needs an explicit RA compartment.
+- RA is now a separate compartment: central VA drains the RA, peripheral drains the femoral/IVC compartment. At matched flow central gives lower PCWP and PAP, and PAP falls with central RPM but rises with peripheral (agrees with De Lazzari 2025). Still disagreeing: central PCWP stays above the untreated baseline (CARDIOSIM: falls) and peripheral RVEDV falls (CARDIOSIM: rises).
+- Pump scale: ~4250 rpm → 3.5 L/min in the drainage-limited shock patient (CVP ≈ 1), vs 4.5 L/min in Condello 2023's clinical series.
 - Shock scenario = LV Ees 30% + 350 mL compensatory volume; meets SBP < 90, PCWP > 15, CI < 2.2 (BSA 1.9 m² assumed).
 
 ## Next increment
 
-Separate RA (and LA) compartments so drainage site matters (central vs femoral), then circuit pressures (Ppre/Ppost/ΔP oxygenator) and membrane clotting as a time-evolving crisis scenario. After that: VV hemodynamic coupling (recirculation from geometry + flow), then organ perfusion from compartment pressures.
+Organ perfusion from compartment pressures (kidney: MAP − CVP with renal time constants; brain: MAP, PaCO₂; limb: femoral cannula occlusion + distal perfusion cannula), then more crisis scenarios on the same engine (drainage insufficiency/chatter, pump failure, sweep gas failure, LV distension) and VV hemodynamic coupling.
