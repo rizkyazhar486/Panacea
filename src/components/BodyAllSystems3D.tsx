@@ -514,6 +514,7 @@ export default function BodyAllSystems3D({
         },
         { x: camera.position.x, y: camera.position.y, z: camera.position.z },
       )
+      if (!pose) return
       controls.target.set(pose.target.x, pose.target.y, pose.target.z)
       camera.position.set(pose.position.x, pose.position.y, pose.position.z)
       camera.lookAt(controls.target)
