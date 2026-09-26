@@ -2,6 +2,7 @@
 // peramban atas permintaan dan menampilkan tiga medan (molekul -> sel -> jaringan)
 // serta perbandingan dengan kopling ke-bawah dimatikan. Bukan prediksi pasien.
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Prosa } from './Prosa'
 import { jalankanKopling, rantaiProvenans, rerata, type HasilJalan, type Medan } from '../lib/multiskala/kernelKopling'
 import { modulContoh, PARAM_ILUSTRATIF, regangAwal, STATUS_KEBENARAN } from '../lib/multiskala/contohKatupJaringan'
 
@@ -74,14 +75,14 @@ export function PanelKoplingMultiSkala() {
             <PetaPanas medan={aktif.pesanTerakhir['tissue.stiffness'].medan} judul="Tissue stiffness" min={PARAM_ILUSTRATIF.e0kPa} maks={PARAM_ILUSTRATIF.e0kPa * (1 + PARAM_ILUSTRATIF.gamma)} />
           </div>
           <p className="mt-1 text-[10px] text-white/55">
-            Amber outlines: cells flagged for higher-resolution molecular modelling (binding uncertainty above threshold). {aktif.jejak.length} coupled messages · computed in {ms} ms.
+            Amber: flagged for finer modelling · {aktif.jejak.length} messages · {ms} ms
           </p>
           <details className="mt-1 text-[10px] text-white/55">
             <summary className="cursor-pointer font-bold text-white/70">Provenance of the final stiffness field</summary>
             <ol className="mt-1 space-y-0.5 font-mono" data-rantai-provenans>
               {rantai.map((p) => <li key={p.id}>{p.id} · {p.modul} v{p.versi} · step {p.langkah} · t={p.waktu}s · parents {p.induk.length}</li>)}
             </ol>
-            <p className="mt-1">Equations: θ = L/(L+Kd·e^(−αε)); da/dt = k_on(θ+βε)(1−a) − k_off·a; E = E0(1+γa); ε = load/E (smoothed). Uncertainty by first-order (delta-method) propagation. Parameters are illustrative, not measured valve values.</p>
+            <Prosa kelas="mt-1">{'Equations: θ = L/(L+Kd·e^(−αε)); da/dt = k_on(θ+βε)(1−a) − k_off·a; E = E0(1+γa); ε = load/E (smoothed). Uncertainty by first-order (delta-method) propagation. Parameters are illustrative, not measured valve values.'}</Prosa>
           </details>
         </>
       )}
