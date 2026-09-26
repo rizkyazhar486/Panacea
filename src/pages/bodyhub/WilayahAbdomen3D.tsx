@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
@@ -169,16 +170,14 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let raf = 0
-    const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+    // Loop berhenti saat offscreen / tab tersembunyi (helper bersama).
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-    }
-    raf = requestAnimationFrame(gambar)
+    })
 
     return () => {
-      cancelAnimationFrame(raf)
+      loop.hentikan()
       terapkanRef.current = null
       renderer.domElement.removeEventListener('pointerdown', klik)
       ro.disconnect()
