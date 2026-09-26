@@ -4,6 +4,7 @@ import type { SimulationDomain } from './bodyhub/UnifiedHumanSimulationProjector
 import { BodyExposurePatientOverlay } from '../components/BodyExposurePatientOverlay'
 import { SinyalPribadiDiTubuh } from '../components/SinyalPribadiDiTubuh'
 import { BodyExplorer } from './BodyExplorer'
+import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import './bodyExposureOS.css'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
@@ -37,6 +38,7 @@ const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
+  const modeRailRef = useRef<HTMLElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
@@ -74,6 +76,22 @@ export function BodyExposureOS() {
       if (restoreLiquidActions) html.classList.add(LIQUID_ACTIONS_ROOT_CLASS)
     }
   }, [])
+
+  useLayoutEffect(() => {
+    const rail = modeRailRef.current
+    const active = rail?.querySelector<HTMLElement>('[data-body-exposure-mode-active="true"]')
+    if (!rail || !active) return
+    const railBox = rail.getBoundingClientRect()
+    const itemBox = active.getBoundingClientRect()
+    const next = hitungScrollAgarTerlihat({
+      viewportWidth: rail.clientWidth,
+      scrollWidth: rail.scrollWidth,
+      itemLeft: rail.scrollLeft + itemBox.left - railBox.left,
+      itemWidth: itemBox.width,
+      currentScrollLeft: rail.scrollLeft,
+    })
+    if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next
+  }, [activeMode])
 
   function openPanel(mode: Mode) {
     setActiveMode(mode.key)
@@ -154,7 +172,12 @@ export function BodyExposureOS() {
         </div>
       </header>
 
-      <nav className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl" aria-label="Body Exposure modes">
+      <nav
+        ref={modeRailRef}
+        className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl"
+        aria-label="Body Exposure modes"
+        data-body-exposure-mode-rail="v1"
+      >
         <div className="flex min-w-max gap-1.5">
           {MODES.map((mode) => {
             const active = mode.key === activeMode
@@ -163,6 +186,7 @@ export function BodyExposureOS() {
                 key={mode.key}
                 type="button"
                 aria-pressed={active}
+                data-body-exposure-mode-active={String(active)}
                 onClick={() => openPanel(mode)}
                 className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
                   active

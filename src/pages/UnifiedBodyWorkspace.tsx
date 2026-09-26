@@ -1,10 +1,11 @@
-import { lazy, Suspense, type ComponentType } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { OneShape } from '../components/OneShape'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
+import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -82,6 +83,23 @@ export function UnifiedBodyWorkspace() {
   const primaryViews = VIEWS.filter((view) => PRIMARY_VIEW_KEYS.has(view.key))
   const secondaryViews = VIEWS.filter((view) => !PRIMARY_VIEW_KEYS.has(view.key))
   const secondaryValue = secondaryViews.some((view) => view.key === activeKey) ? activeKey : ''
+  const workspaceRailRef = useRef<HTMLDivElement | null>(null)
+
+  useLayoutEffect(() => {
+    const rail = workspaceRailRef.current
+    const activeTab = rail?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+    if (!rail || !activeTab) return
+    const railBox = rail.getBoundingClientRect()
+    const itemBox = activeTab.getBoundingClientRect()
+    const next = hitungScrollAgarTerlihat({
+      viewportWidth: rail.clientWidth,
+      scrollWidth: rail.scrollWidth,
+      itemLeft: rail.scrollLeft + itemBox.left - railBox.left,
+      itemWidth: itemBox.width,
+      currentScrollLeft: rail.scrollLeft,
+    })
+    if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next
+  }, [activeKey])
 
   function select(view: View) {
     const next = new URLSearchParams(params)
@@ -127,7 +145,14 @@ export function UnifiedBodyWorkspace() {
             <h1 className="sr-only">Your Body · {active.label}</h1>
           )}
 
-          <div className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`} role="tablist" aria-label="Your Body workspace" data-one-shape="aria">
+          <div
+            ref={workspaceRailRef}
+            className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`}
+            role="tablist"
+            aria-label="Your Body workspace"
+            data-one-shape="aria"
+            data-body-workspace-rail="v1"
+          >
             <OneShape />
             {primaryViews.map((view) => {
               const selected = activeKey === view.key

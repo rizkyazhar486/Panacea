@@ -8,6 +8,11 @@ const kasus = [
     harapan: ['Your Body', 'Move', 'Training'],
   },
   {
+    nama: 'ponsel memakai short label super-page tanpa taxonomy baru',
+    aktual: navigationHierarchyForRoute('/latihan', 'Fitness', 'Training', { compactSuperPage: true }),
+    harapan: ['Body', 'Move', 'Training'],
+  },
+  {
     nama: 'Clinical hub tidak mengulang judul Clinical',
     aktual: navigationHierarchyForRoute('/clinical-hub', 'Clinical & AI', 'Clinical'),
     harapan: ['Clinical', 'Care'],
