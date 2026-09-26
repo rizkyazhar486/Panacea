@@ -15,12 +15,12 @@ for (const [name, index] of Object.entries({ patient, ask, tools, depth, sharedL
   assert.ok(index >= 0, `Clinical first-viewport contract lost ${name}`)
 }
 
-// At 390x844 the landing must remain decision-first. Patient identity/context is
-// useful before acting, but navigation depth and clinician-only work queues are
-// secondary to Ask/primary actions and the two inline quick tools.
-assert.ok(patient < ask, 'Patient context must precede Clinical actions')
+// At 390x844 the landing must remain decision-first. A populated
+// ClinicalPatientContext renders the 360px+ ClinicalBodyTwin, so it must not
+// push generic Ask/primary actions or quick tools below the first viewport.
 assert.ok(ask < tools, 'Ask and primary clinical actions must precede quick tools')
-assert.ok(tools < depth, 'Surface depth navigation returned above the decision-first Clinical tools')
+assert.ok(tools < patient, 'Patient-specific body context returned above generic decision-first Clinical tools')
+assert.ok(patient < depth, 'Surface depth navigation returned above patient context')
 assert.ok(tools < sharedLab, 'Clinician shared-lab queue returned above the decision-first Clinical tools')
 assert.ok(tools < validation, 'Clinical-validation work queue returned above the decision-first Clinical tools')
 assert.ok(depth < body && sharedLab < body && validation < body,
