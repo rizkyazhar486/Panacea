@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../ui'
+import { Prosa } from '../Prosa'
 import { IconChartUp } from '../icons'
 import {
   csvHeaders,
@@ -70,9 +71,9 @@ export function FraudThresholdLab() {
           title="Fraud threshold lab"
           subtitle="Precision–recall trade-offs for highly imbalanced scored transactions"
         />
-        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           Upload a CSV that already contains a true binary label (0/1) and a model score between 0 and 1. Panacea does not train a model here. It evaluates the threshold you choose entirely in your browser.
-        </p>
+        </Prosa>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -121,9 +122,9 @@ export function FraudThresholdLab() {
               <Metric label="Positive rows" value={summary.positives.toLocaleString()} />
               <Metric label="Negative rows" value={summary.negatives.toLocaleString()} />
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-neutral-500">
+            <Prosa kelas="mt-3 text-xs leading-relaxed text-neutral-500">
               Average precision summarizes the precision–recall ranking. Raw accuracy is intentionally not promoted here because a highly imbalanced fraud dataset can look “accurate” while missing nearly every positive case.
-            </p>
+            </Prosa>
           </Card>
 
           <Card className="!p-5">
