@@ -55,6 +55,8 @@ A real shared dependency should block only the work that depends on it.
 
 Body Exposure is a single Unified Human Simulation Projector, not a collection of unrelated visual demos.
 
+Read `docs/body-exposure/HUMAN_DIGITAL_TWIN_GOLD_STANDARD.md` first: one Universal Human Gold Standard for the whole body, no organ-specific "gold standard" module (enforced by `scripts/uji/standar-emas-universal.mts`).
+
 All body simulation work should converge on one persistent context:
 - body system / organ / structure selection;
 - source-backed 3D spatial reference;

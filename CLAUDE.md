@@ -928,3 +928,12 @@ The owner's "Beyond-Human Invention Engine" master prompt (formula: Longitudinal
 - Its "Eye Gold Standard Q ≥ 0.88 / anatomical accuracy ≥ 0.92" conflicts with the universal gold-standard directive above, and "Q" has no defined metric in the repo. Keep one universal standard; any numeric quality gate must first get an operational definition, a measurement procedure and a gate before it is used.
 - "Human Clinical Validation is priority #1" is implemented as a release gate: `gerbangRilisKlinis()` in `src/lib/validasiKlinis.ts` decides per system version whether the product may say "technically works", "clinically reviewed" or "clinically validated"; a single dangerous false negative ('missed-critical-finding'), a harm event, a broken ledger chain, unmet endpoints, unadjudicated disagreement, or real-patient data without an ethics number blocks "clinically validated". Gate: `scripts/uji/validasi-galat-rilis.mts`.
 - Invention/discovery claims stay under the Pioneer protocol: no novelty or "Nobel-tier" claim from model memory.
+
+
+## Universal Human Gold Standard + ECMO digital twin — 2026-09-26
+
+Owner directive: the entire human body is gold standard; no organ owns that designation. Canonical source of truth: `docs/body-exposure/HUMAN_DIGITAL_TWIN_GOLD_STANDARD.md` (five layers per organ, HumanState, maturity waves A–H, formula registry, validation pyramid, no-fake-data policy, honest gap audit). Gate: `scripts/uji/standar-emas-universal.mts`.
+
+Largest recorded gap: there is no shared HumanState yet, and shared primitives disagree (O₂ content 1.34/0.003 in `hemodinamik.ts` vs ELSO 1.39/0.0034). Fix by registering one choice, not by adding a third.
+
+ECMO digital twin (owner prompt "PANACEA ECMO DIGITAL TWIN") begins in `src/lib/ecmo/`: evidence registry first, deterministic engine usable without React/Three.js, rendering observes the engine. Status and remaining steps are tracked in `DOCS/ECMO-DIGITAL-TWIN.md`. Never claim ELSO endorsement; wording is "evidence-informed and aligned with published ELSO guidance". Expert review (intensivist, cannulating surgeon, perfusionist) is required before any conference release and must be real.
