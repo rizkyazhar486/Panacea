@@ -31,3 +31,19 @@ test('simplicity contract preserves safety and progressive disclosure', async ()
     'safety-critical information',
   ]) assert.ok(doc.includes(phrase), `missing simplicity rule: ${phrase}`)
 })
+
+test('Body Exposure spatial mode removes the floating assistive control', async () => {
+  const shell = await source('src/components/Shell.tsx')
+  const fab = await source('src/components/FabNavigasi.tsx')
+
+  assert.match(
+    shell,
+    /loc\.pathname === '\/fitness-hub' && new URLSearchParams\(loc\.search\)\.get\('view'\) === 'body-exposure'/,
+    'Shell must classify the Body Exposure query view as spatial',
+  )
+  assert.match(
+    fab,
+    /lokasi\.pathname === '\/fitness-hub' && new URLSearchParams\(lokasi\.search\)\.get\('view'\) === 'body-exposure'/,
+    'assistive navigation must not float over the Body Exposure spatial canvas',
+  )
+})
