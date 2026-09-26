@@ -24,7 +24,7 @@ assert.match(rail, /placeholder="Search tools"/)
 assert.match(rail, /All \$\{items\.length\}/)
 
 assert.doesNotMatch(body, /Your body, from whole person to molecule/)
-assert.match(body, /<h1 className="sr-only">Your Body · \\{active\\.label\\}<\\/h1>/)
+assert.match(body, /<h1 className="sr-only">Your Body · \{active\.label\}/)
 assert.match(exposure, /Your body\\. Every scale\\./)
 assert.match(exposure, /You → anatomy → function → imaging → micro/)
 assert.match(body, /rounded-\[24px\]/)
