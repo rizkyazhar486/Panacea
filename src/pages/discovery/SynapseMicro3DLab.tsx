@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { buatRendererAman, tandaiTanpaWebgl } from '../../lib/rendererAman';
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SYNAPSE_MICRO_BOUNDARY, SYNAPSE_PHASES, SYNAPSE_TRANSMITTERS, type SynapsePhase } from '../../lib/discoverySynapseMicro3D';
@@ -39,7 +40,8 @@ export default function SynapseMicro3DLab() {
     const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 80);
     camera.position.set(7.6, 5.2, 10.8);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = buatRendererAman({ antialias: true, alpha: true });
+    if (!renderer) return tandaiTanpaWebgl(mount);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;

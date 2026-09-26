@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -87,7 +88,8 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100)
     camera.position.set(0, 1.25, 5.2)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true })
+    const renderer = buatRendererAman({ antialias: true, alpha: false, preserveDrawingBuffer: true })
+    if (!renderer) return tandaiTanpaWebgl(mount)
     renderer.domElement.dataset.personalAvatarCanvas = 'true'
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace

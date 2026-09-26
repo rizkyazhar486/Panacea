@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Card, SectionTitle } from './ui'
@@ -185,7 +186,8 @@ export function Medical3DFrontierLab() {
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100)
     camera.position.set(0, 0.4, 6.7)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    const renderer = buatRendererAman({ antialias: true, alpha: false })
+    if (!renderer) return tandaiTanpaWebgl(mount)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     mount.appendChild(renderer.domElement)

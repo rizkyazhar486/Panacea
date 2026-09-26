@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { buatRendererAman } from '../../lib/rendererAman';
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
@@ -17,10 +18,14 @@ function genomeColor(symbol: string) {
 
 function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const [tanpaWebgl, setTanpaWebgl] = useState(false);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    // Tanpa WebGL hanya kanvas 3D yang diganti keterangan; pencarian dan rekaman tetap dipakai.
+    const renderer: THREE.WebGLRenderer | null = buatRendererAman({ antialias: true, powerPreference: 'high-performance' });
+    if (!renderer) { setTanpaWebgl(true); return; }
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x020617);
@@ -29,7 +34,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 80);
     camera.position.set(0, 1.1, 12);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -169,6 +173,7 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     };
   }, [record]);
 
+  if (tanpaWebgl) return <p role="status" data-tanpa-webgl className="rounded-xl bg-slate-900 p-3 text-sm text-slate-300">3D view unavailable on this device (WebGL could not start). The gene record and search below still work.</p>;
   return <div ref={mountRef} className="w-full" aria-label={`${record.symbol} chromosome DNA protein 3D atlas`} />;
 }
 

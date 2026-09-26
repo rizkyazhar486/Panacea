@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as THREE from 'three'
+import { buatRendererAman } from '../../lib/rendererAman'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -111,7 +112,8 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(hero ? 28 : 29, 1, 0.001, 10000)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
+    const renderer = buatRendererAman({ antialias: true, alpha: true, powerPreference: 'high-performance' })
+    if (!renderer) { setStatus('error'); return }
     const isPhone = window.matchMedia('(max-width: 767px)').matches
     const pixelRatioCap = isPhone ? 1.2 : hero ? 1.5 : 1.35
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap))
