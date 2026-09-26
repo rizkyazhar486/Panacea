@@ -8,15 +8,15 @@ const BODY_SYSTEMS: readonly {
   y: number
   keywords: readonly string[]
 }[] = [
-  { key: 'mata', label: 'Eyes', x: 60, y: 9, keywords: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos'] },
-  { key: 'tht', label: 'ENT', x: 38, y: 10, keywords: ['telinga', 'hidung', 'tenggorok', 'faring', 'tonsil', 'mukosa', 'nasofaring'] },
-  { key: 'kepala', label: 'Head', x: 50, y: 5, keywords: ['kepala', 'normosefali', 'wajah', 'facies'] },
-  { key: 'leher', label: 'Neck', x: 50, y: 17, keywords: ['leher', 'kgb', 'trakea', 'tiroid', 'jvp'] },
-  { key: 'paru', label: 'Lungs', x: 37, y: 32, keywords: ['paru', 'vesikuler', 'ronki', 'rhonki', 'wheezing', 'fremitus', 'sonor'] },
-  { key: 'jantung', label: 'Heart', x: 61, y: 34, keywords: ['jantung', 'cardio', 'iktus', 'ictus', 's1s2', 'murmur', 'gallop'] },
-  { key: 'abdomen', label: 'Abdomen', x: 50, y: 47, keywords: ['abdomen', 'bising usus', 'hepatomegali', 'splenomegali', 'nyeri tekan', 'supel'] },
-  { key: 'kulit', label: 'Skin', x: 28, y: 58, keywords: ['kulit', 'spider nevi', 'eritema', 'pucat', 'sianosis'] },
-  { key: 'ekstremitas', label: 'Extremities', x: 72, y: 82, keywords: ['ekstremitas', 'akral', 'crt', 'edema'] },
+  { key: 'mata', label: 'Eyes', x: 60, y: 9, keywords: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos', 'eye', 'eyes', 'conjunctiva', 'sclera', 'visual acuity'] },
+  { key: 'tht', label: 'ENT', x: 38, y: 10, keywords: ['telinga', 'hidung', 'tenggorok', 'faring', 'tonsil', 'mukosa', 'nasofaring', 'ear', 'nose', 'throat', 'pharynx', 'tonsil', 'nasopharynx'] },
+  { key: 'kepala', label: 'Head', x: 50, y: 5, keywords: ['kepala', 'normosefali', 'wajah', 'facies', 'head', 'normocephalic', 'atraumatic'] },
+  { key: 'leher', label: 'Neck', x: 50, y: 17, keywords: ['leher', 'kgb', 'trakea', 'tiroid', 'jvp', 'neck', 'lymph node', 'trachea', 'thyroid', 'jugular'] },
+  { key: 'paru', label: 'Lungs', x: 37, y: 32, keywords: ['paru', 'vesikuler', 'ronki', 'rhonki', 'wheezing', 'fremitus', 'sonor', 'lung', 'lungs', 'auscultation', 'crackle', 'crackles', 'rales', 'rhonchi', 'wheeze', 'wheezes', 'breath sounds'] },
+  { key: 'jantung', label: 'Heart', x: 61, y: 34, keywords: ['jantung', 'cardio', 'iktus', 'ictus', 's1s2', 'murmur', 'gallop', 'heart', 'cardiac', 'rate and rhythm'] },
+  { key: 'abdomen', label: 'Abdomen', x: 50, y: 47, keywords: ['abdomen', 'bising usus', 'hepatomegali', 'splenomegali', 'nyeri tekan', 'supel', 'bowel sounds', 'organomegaly', 'tenderness', 'non-tender', 'nontender'] },
+  { key: 'kulit', label: 'Skin', x: 28, y: 58, keywords: ['kulit', 'spider nevi', 'eritema', 'pucat', 'sianosis', 'skin', 'rash', 'pallor', 'cyanosis', 'jaundice'] },
+  { key: 'ekstremitas', label: 'Extremities', x: 72, y: 82, keywords: ['ekstremitas', 'akral', 'crt', 'edema', 'extremity', 'extremities', 'capillary refill', 'pulses'] },
 ] as const
 
 const ABNORMAL_HINTS = [
@@ -39,16 +39,26 @@ const ABNORMAL_HINTS = [
 const ISTILAH_ABNORMAL = [
   'murmur', 'gallop', 'ronki', 'rhonki', 'wheezing', 'edema', 'massa', 'nyeri', 'pembesaran', 'hepatomegali',
   'splenomegali', 'ikterik', 'anemis', 'sianosis', 'pucat', 'eritema', 'asites', 'deviasi', 'menurun', 'prolaps', 'spider nevi',
+  // English equivalents (exam notes are not restricted to Indonesian shorthand).
+  'crackle', 'crackles', 'rales', 'rhonchi', 'wheeze', 'enlarged', 'enlargement', 'jaundice', 'pallor', 'cyanosis',
+  'rash', 'swelling', 'tenderness', 'tender',
 ] as const
 // Penanda normal eksplisit. Tanpa salah satunya, baris yang tidak abnormal TIDAK
-// dianggap normal — ia 'recorded' (tercatat, tidak diklasifikasi).
-const PENANDA_NORMAL = ['normal', 'dbn', '(-)', '-/-', 'tidak ada', 'tidak ditemukan', 'tanpa', 'reguler', 'vesikuler', 'supel', 'normosefali', 'simetris', 'tunggal', 'sonor', 'jernih', 'baik'] as const
-const NEGASI_SEBELUM = ['tidak ada ', 'tidak ditemukan ', 'tanpa ', 'tidak ', 'no ']
+// dianggap normal — ia 'recorded' (tercatat, tidak diklasifikasi). Frasa Inggris
+// dipilih yang tidak ambigu (bukan kata tunggal seperti "regular"/"clear" yang
+// muncul sebagai substring dari "irregular"/"unclear").
+const PENANDA_NORMAL = [
+  'normal', 'dbn', '(-)', '-/-', 'tidak ada', 'tidak ditemukan', 'tanpa', 'reguler', 'vesikuler', 'supel',
+  'normosefali', 'simetris', 'tunggal', 'sonor', 'jernih', 'baik',
+  'wnl', 'within normal limits', 'unremarkable', 'regular rate and rhythm', 'clear to auscultation',
+  'no acute distress', 'intact', 'non-tender', 'nontender',
+] as const
+const NEGASI_SEBELUM = ['tidak ada ', 'tidak ditemukan ', 'tanpa ', 'tidak ', 'no ', 'not ', 'without ', 'denies ', 'absent ', 'non-', 'non ']
 
 function istilahTerNegasi(teks: string, i: number, istilah: string): boolean {
   const sebelum = teks.slice(Math.max(0, i - 18), i)
   const sesudah = teks.slice(i + istilah.length, i + istilah.length + 8)
-  return NEGASI_SEBELUM.some((n) => sebelum.endsWith(n)) || /^\s*(\(-\)|-\/-|negatif)/.test(sesudah)
+  return NEGASI_SEBELUM.some((n) => sebelum.endsWith(n)) || /^\s*(\(-\)|-\/-|negatif|negative)/.test(sesudah)
 }
 
 /**
