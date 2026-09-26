@@ -41,6 +41,8 @@ interface UnifiedHumanSimulationProjectorProps {
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
   compact?: boolean
+  /** Permintaan fokus struktur sumber dari luar (mis. temuan AI-EMR). `nonce` memicu ulang pilihan yang sama. */
+  requestedStructure?: { name: string; nonce: number } | null
 }
 
 type DomainDefinition = {
@@ -154,6 +156,7 @@ export default function UnifiedHumanSimulationProjector({
   requestedDomain,
   onDomainChange,
   compact = false,
+  requestedStructure = null,
 }: UnifiedHumanSimulationProjectorProps) {
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
@@ -178,6 +181,12 @@ export default function UnifiedHumanSimulationProjector({
   useEffect(() => {
     setSelectedStructureName(null)
   }, [selectedSystemId])
+
+  // Dijalankan SETELAH reset sistem di atas, sehingga fokus dari temuan bertahan
+  // ketika permintaan itu juga mengganti sistem.
+  useEffect(() => {
+    if (requestedStructure?.name) setSelectedStructureName(requestedStructure.name)
+  }, [requestedStructure, selectedSystemId])
 
   useEffect(() => {
     if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')

@@ -4,6 +4,7 @@ import { buildBodyClinicalFindings } from '../lib/bodyClinicalFindings'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { focusBodyClinicalProjection } from '../lib/bodyClinicalSystemContext'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
+import { strukturUntukTemuan, type StrukturTemuan } from '../lib/strukturTemuanFisik'
 
 function reviewLabel(state: 'draft' | 'exam-verified' | 'record-signed') {
   if (state === 'record-signed') return 'Signed record'
@@ -14,9 +15,12 @@ function reviewLabel(state: 'draft' | 'exam-verified' | 'record-signed') {
 export function BodyExposurePatientOverlay({
   selectedSystemId,
   onClinicalView,
+  onShowStructure,
 }: {
   selectedSystemId: BodySystemId
   onClinicalView?: () => void
+  /** Tampilkan struktur rujukan wilayah pemeriksaan di kanvas 3D. */
+  onShowStructure?: (s: StrukturTemuan) => void
 }) {
   const { state, activePatient } = useStore()
   const record = state.records[activePatient.id]
@@ -86,6 +90,28 @@ export function BodyExposurePatientOverlay({
           AI-EMR →
         </Link>
       </div>
+
+      {onShowStructure && (() => {
+        const tercatat = focus.markers.filter((m) => m.status !== 'unchecked')
+        if (!tercatat.length) return null
+        return (
+          <div className="flex items-center gap-1.5 overflow-x-auto border-t border-white/[.06] px-3 py-1.5 no-scrollbar sm:px-4" data-temuan-ke-struktur>
+            {tercatat.map((m) => {
+              const s = strukturUntukTemuan(m.key)
+              const warna = m.status === 'abnormal' ? 'border-rose-300/40 text-rose-100' : m.status === 'recorded' ? 'border-amber-300/40 text-amber-100' : 'border-emerald-300/30 text-emerald-100'
+              return s ? (
+                <button key={m.key} type="button" onClick={() => onShowStructure(s)} data-temuan={m.key} data-struktur={s.name}
+                  className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-black ${warna}`}>
+                  {m.label} · {m.status === 'abnormal' ? 'finding' : m.status} · show {s.name}
+                </button>
+              ) : (
+                <span key={m.key} data-temuan={m.key} className="shrink-0 text-[10px] font-bold text-white/40">{m.label} · no exact 3D structure</span>
+              )
+            })}
+            <span className="shrink-0 text-[9px] text-white/35">reference region examined — not the lesion location</span>
+          </div>
+        )
+      })()}
 
       <details className="border-t border-white/[.06] px-3 py-1.5 text-[9px] font-semibold text-white/35 sm:px-4">
         <summary className="cursor-pointer truncate font-black uppercase tracking-[.1em] text-white/35">

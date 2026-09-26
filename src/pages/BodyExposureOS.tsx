@@ -38,6 +38,7 @@ export function BodyExposureOS() {
   const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
+  const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
 
   useEffect(() => {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
@@ -180,7 +181,7 @@ export function BodyExposureOS() {
       </div>
 
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
-        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} />
+        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
           <UnifiedHumanSimulationProjector
@@ -188,6 +189,7 @@ export function BodyExposureOS() {
             onSystemChange={setSelectedBodySystemId}
             requestedDomain={current.projectorDomain}
             onDomainChange={syncModeFromProjector}
+            requestedStructure={strukturDiminta}
           />
         </Suspense>
       </div>
