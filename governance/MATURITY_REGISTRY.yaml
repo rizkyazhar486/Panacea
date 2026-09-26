@@ -52,7 +52,7 @@ workflows:
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation, checkin_double_tap_guard_not_browser_verified, checkin_not_visible_in_browser_for_patient_with_plan_under_investigation]
+    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation]
     next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed; 2026-09-25 fixed the blank-panel-on-load-failure bug, three smaller friction items remain (see known_gaps)
     last_audited_commit: 9a70dfb0
 

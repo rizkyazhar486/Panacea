@@ -25,15 +25,22 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
 // private to the owner; others never see them.
 const SEX_LABEL: Record<string, string> = { L: '♂ Male', P: '♀ Female', '-': 'Not specified' }
 
+// Pemeriksa akun terpisah: hook di badan hanya berjalan bila akun ada, sehingga
+// urutan hook tidak berubah saat akun berpindah null <-> ada (React crash).
 export function Profile() {
-  const { state, account, updateProfile } = useStore()
+  const { account } = useStore()
+  if (!account) return null
+  return <ProfileIsi account={account} />
+}
+
+function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
+  const { state, updateProfile } = useStore()
   const [tab, setTab] = useState<Tab>('posts')
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<ProfileEdit>({})
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  if (!account) return null
   const email = account.email
   const profile = state.profiles[email] ?? {}
   const handle = '@' + email.split('@')[0]

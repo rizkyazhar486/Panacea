@@ -39,6 +39,11 @@ export function CekHarian() {
     window.addEventListener('online', on)
     return () => window.removeEventListener('online', on)
   }, [])
+  // Penjaga ketuk-ganda: tiap ketukan membuat clientId baru, jadi idempotensi server
+  // tidak mencegah dua laporan. Ref (bukan state) menutup celah render berikutnya.
+  // Hook WAJIB di atas return awal: setelahnya React crash ("Rendered more hooks").
+  const sedangKirim = useRef(false)
+  const [mengirim, setMengirim] = useState(false)
   if (!backendEnabled || rencana.length === 0) return null
 
   const { plan, dokterEmail, sudah } = rencana[0]
@@ -46,10 +51,6 @@ export function CekHarian() {
   let pertanyaan = plan.questions
   try { pertanyaan = buildDailyInterview(plan, new Date(`${hariIni()}T12:00:00Z`).toISOString(), jawaban).questions } catch { /* di luar jendela rencana: tampilkan semua */ }
 
-  // Penjaga ketuk-ganda: tiap ketukan membuat clientId baru, jadi idempotensi server
-  // tidak mencegah dua laporan. Ref (bukan state) menutup celah render berikutnya.
-  const sedangKirim = useRef(false)
-  const [mengirim, setMengirim] = useState(false)
   const kirim = async () => {
     if (sedangKirim.current) return
     const hilang = pertanyaan.filter((q) => q.required && jawab[q.id] === undefined)

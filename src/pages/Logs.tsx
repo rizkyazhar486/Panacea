@@ -11,13 +11,20 @@ const RPE_COLOR = (v: number) => (v >= 8 ? '#EF4444' : v >= 5 ? '#F59E0B' : '#00
 // Log — consolidated data-visualization dashboard: Training Intensity (RPE) trend
 // over 30 days (recharts), a training calendar, communities, high-affinity person,
 // circles, current program, challenges, and the wall of gratitude.
+// Pemeriksa akun terpisah: hook di badan hanya berjalan bila akun ada, sehingga
+// urutan hook tidak berubah saat akun berpindah null <-> ada (React crash).
 export function Logs() {
-  const { state, account, addTrainingLog, setActiveProgram } = useStore()
+  const { account } = useStore()
+  if (!account) return null
+  return <LogsIsi account={account} />
+}
+
+function LogsIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
+  const { state, addTrainingLog, setActiveProgram } = useStore()
   const [rpe, setRpe] = useState(6)
   const [type, setType] = useState('Run')
   const [note, setNote] = useState('')
 
-  if (!account) return null
   const me = account.name
   const today = new Date()
 
