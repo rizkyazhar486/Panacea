@@ -127,23 +127,9 @@ export function UnifiedBodyWorkspace() {
           merender versi terangnya di atas latar hitam. */}
       <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
         <div className="relative min-w-0">
-          {isExposure ? (
-            <>
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="text-[10px] font-black uppercase tracking-[.22em] text-cyan-200/80">Your Body · Body Exposure OS</div>
-                <span className="rounded-full border border-violet-300/15 bg-violet-300/[.07] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.15em] text-violet-200/80">flagship atlas</span>
-              </div>
-              <h1 className="mt-1 max-w-5xl text-[clamp(1.35rem,4vw,2rem)] font-black leading-[1.04] tracking-[-.035em] text-white">
-                Your body, from whole person to molecule
-              </h1>
-              <p className="mt-1.5 truncate text-[11px] font-bold text-white/48 sm:text-xs">Whole body → organ → tissue → cell → molecule</p>
-            </>
-          ) : (
-            // Bilah perintah sudah bertuliskan "Your Body"; judul kedua yang
-            // sama besar hanya mendorong isi ke bawah. Judulnya tetap ada untuk
-            // pembaca layar.
-            <h1 className="sr-only">Your Body · {active.label}</h1>
-          )}
+          {/* Keep one semantic page title without duplicating the visible
+              Body Exposure identity owned by BodyExposureOS. */}
+          <h1 className="sr-only">Your Body · {active.label}</h1>
 
           <div
             ref={workspaceRailRef}
