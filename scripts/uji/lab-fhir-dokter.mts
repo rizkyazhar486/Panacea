@@ -7,7 +7,10 @@ const srv = readFileSync('server/src/index.ts', 'utf8')
 for (const rute of ["app.get('/api/lab-log/fhir', requireAuth", "app.post('/api/lab-log/shares', requireAuth", "app.delete('/api/lab-log/shares/:id', requireAuth", "app.get('/api/clinician/lab-shares', requireAuth", "app.get('/api/clinician/lab-shares/:id/fhir', requireAuth"]) {
   assert.ok(srv.includes(rute), `rute hilang atau tanpa autentikasi: ${rute}`)
 }
-const bacaDokter = srv.slice(srv.indexOf("app.get('/api/clinician/lab-shares/:id/fhir'"), srv.indexOf("app.get('/api/clinician/lab-shares/:id/fhir'") + 900)
+const awalBacaDokter = srv.indexOf("app.get('/api/clinician/lab-shares/:id/fhir'")
+const akhirBacaDokter = srv.indexOf("app.post('/api/clinician/lab-shares/:id/review'", awalBacaDokter)
+assert.ok(awalBacaDokter >= 0 && akhirBacaDokter > awalBacaDokter, 'blok rute pembacaan dokter tidak ditemukan')
+const bacaDokter = srv.slice(awalBacaDokter, akhirBacaDokter)
 assert.match(bacaDokter, /\n  if \(u\.role !== 'dokter'\) \{ res\.status\(403\)/, 'pembacaan dokter tidak lagi mensyaratkan peran dokter terverifikasi')
 assert.match(bacaDokter, /\n  if \(!izinBerlaku\(izin, u\.email, kini\)\) \{ res\.status\(404\)/, 'pembacaan dokter tidak lagi memeriksa izin pasien sebelum membaca')
 assert.match(bacaDokter, /aksi: 'dibaca-dokter'/, 'pembacaan dokter tidak lagi dicatat di audit pasien')

@@ -90,18 +90,19 @@ const plan: ContinuousCarePlan = {
   measurementReviewRules: [{
     id: 'demo-device-rule',
     label: 'Clinician-defined device review rule',
-    metric: 'demo-vital',
+    metric: 'vital.sbp',
     operator: 'gte',
-    threshold: 10,
-    unit: 'u',
+    threshold: 180,
+    unit: 'mmHg',
     maxAgeMinutes: 30,
     priority: 'review-today',
     rationale: 'Demonstration threshold supplied by the care plan, not hard-coded in the OS.',
     evidenceRef: 'local-policy:demo-v1',
     verifiedBy: 'doctor-001',
     verifiedAt: '2026-09-20T00:00:00.000Z',
+    sourcePolicy: 'verified-clinical-vital',
   }],
-  monitoredMetrics: ['demo-vital', 'patient-reported-overall-worse'],
+  monitoredMetrics: ['vital.sbp', 'patient-reported-overall-worse'],
 }
 
 assert.equal(validateContinuousCarePlan(plan), true)
@@ -139,23 +140,24 @@ assert.ok(patientEvents.every((event) => event.provenance.sourceKind === 'manual
 assert.ok(patientEvents.every((event) => event.provenance.method?.includes('daily-questionnaire:')))
 
 const deviceEvent: LongitudinalEvent<number> = {
-  id: 'device-demo-001',
+  id: 'clinical-vital-demo-001',
   subjectId: plan.subjectId,
-  domain: 'device',
-  metric: 'demo-vital',
-  value: 12,
-  unit: 'u',
+  domain: 'vital',
+  metric: 'vital.sbp',
+  value: 190,
+  unit: 'mmHg',
   recordedAt: '2026-09-20T08:04:00.000Z',
   confidence: 0.95,
   provenance: {
-    sourceKind: 'device',
-    sourceId: 'demo-device',
+    sourceKind: 'clinical-system',
+    sourceId: 'panaceamed:ai-emr',
     capturedAt: '2026-09-20T08:04:00.000Z',
     receivedAt: '2026-09-20T08:04:01.000Z',
-    method: 'fixture',
+    method: 'emr-vital:clinician-entered',
   },
   consent,
   review: { state: 'not-required' },
+  semanticState: 'clinician-entered',
 }
 
 let state = createLongitudinalPatientState(plan.subjectId, '2026-09-20T08:00:00.000Z')
@@ -171,7 +173,7 @@ assert.equal(digest.workflowPriority, 'immediate-human-review')
 assert.equal(digest.requiresHumanReview, true)
 assert.equal(digest.governance.autonomousDiagnosisAllowed, false)
 assert.equal(digest.governance.autonomousTreatmentAllowed, false)
-assert.equal(digest.monitoredSignals.find((signal) => signal.metric === 'demo-vital')?.available, true)
+assert.equal(digest.monitoredSignals.find((signal) => signal.metric === 'vital.sbp')?.available, true)
 assert.equal(digest.measurementRules[0].state, 'triggered')
 assert.ok(digest.tasks.includes('perform-physical-examination'))
 assert.ok(digest.tasks.includes('form-clinical-assessment'))
@@ -229,4 +231,4 @@ assert.equal(incomplete.completion, 'incomplete')
 assert.deepEqual(incomplete.missingRequiredQuestionIds, ['medication-taken'])
 assert.equal(incomplete.workflowPriority, 'routine')
 
-console.log('Continuous Care OS verified: disease-linked daily anamnesis, offline reconciliation, longitudinal ingestion, clinician-configured review rules, device/wearable digest, FHIR QuestionnaireResponse projection, and mandatory human clinical commitment.')
+console.log('Continuous Care OS verified: disease-linked daily anamnesis, offline reconciliation, longitudinal ingestion, source-governed clinician review rules, FHIR QuestionnaireResponse projection, and mandatory human clinical commitment.')

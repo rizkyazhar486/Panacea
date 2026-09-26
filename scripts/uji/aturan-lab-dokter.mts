@@ -14,7 +14,7 @@ const aturan = { metric: 'lab.hba1c', operator: 'gte', threshold: 9, unit: '%', 
 
 // Server: bukti wajib; verifikator & waktu dari server, bukan payload.
 assert.throws(() => susunRencana({ ...dasar, measurementReviewRules: [{ ...aturan, evidenceRef: '' }] }, 'p', 'dokter-D', kini), /evidence/, 'aturan tanpa rujukan bukti diterima')
-assert.throws(() => susunRencana({ ...dasar, measurementReviewRules: [{ ...aturan, metric: 'vital.sbp' }] }, 'p', 'dokter-D', kini), /lab test/)
+assert.throws(() => susunRencana({ ...dasar, measurementReviewRules: [{ ...aturan, metric: 'vital.fake' }] }, 'p', 'dokter-D', kini), /supported lab or vital metric/, 'metric pengukuran tak didukung diterima')
 assert.throws(() => susunRencana({ ...dasar, measurementReviewRules: [{ ...aturan, maxAgeDays: 0 }] }, 'p', 'dokter-D', kini), /age/)
 const r = susunRencana({ ...dasar, measurementReviewRules: [aturan] }, 'p', 'dokter-D', kini)
 assert.equal(r.measurementReviewRules[0].verifiedBy, 'dokter-D', 'verifiedBy diambil dari payload')
