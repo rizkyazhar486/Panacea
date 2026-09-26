@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { bolehAksesPasien, hashKode, terbitkanKodeTaut, tebusKodeTaut, tertautKe, type KodeTaut, type TautanPasien } from '../src/aksesKlinis.js'
+import { bolehAksesPasien, hashKode, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe, type KodeTaut, type TautanPasien } from '../src/aksesKlinis.js'
 const kini = new Date('2026-09-26T10:00:00Z')
 const dokter = { id: 'd1', klinisi: true }, pasien = { id: 'u1', email: 'siti@x.id', role: 'pasien' }, lain = { id: 'u2', email: 'lain@x.id', role: 'pasien' }
 const acakTetap = () => Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -30,4 +30,10 @@ const boleh = (u: typeof pasien, pid: string) => bolehAksesPasien(u, pid, false,
 assert.equal(boleh(pasien, 'pt-1'), true, 'akun tertaut tidak dapat membuka rekam praktiknya')
 assert.equal(boleh(lain, 'pt-1'), false, 'akun lain membuka rekam praktik tertaut')
 assert.equal(boleh(pasien, 'pt-2'), false, 'tautan membuka pasien praktik lain')
+
+// Status sisi dokter: boolean + kapan, TANPA userId pasien (privasi tautan yang disetujui pasien).
+assert.deepEqual(statusTautanPasien('pt-1', tautan), { linked: true, linkedAt: r.tautan.ditautkanPada })
+assert.deepEqual(statusTautanPasien('pt-2', tautan), { linked: false })
+assert.deepEqual(statusTautanPasien('pt-1', undefined), { linked: false })
+assert.ok(!('userId' in statusTautanPasien('pt-1', tautan)), 'status tautan sisi dokter membocorkan userId pasien')
 console.log('tautanPasien: kode sekali pakai (hash saja, 7 hari) menautkan satu pasien praktik ke satu akun; akses hanya untuk akun itu')

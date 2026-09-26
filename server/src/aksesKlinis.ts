@@ -82,3 +82,13 @@ export function tebusKodeTaut(kode: string, pengguna: { id: string }, daftarKode
 export function tertautKe(u: { id: string }, patientId: string, tautan: Record<string, TautanPasien> | undefined): boolean {
   return Boolean(patientId && tautan?.[patientId]?.userId === u.id)
 }
+
+/**
+ * Status tautan untuk sisi dokter: hanya boolean + kapan, TANPA userId pasien
+ * (dokter tidak perlu tahu akun mana; membocorkannya tidak menambah kegunaan
+ * dan melanggar batas privasi tautan yang eksplisit-disetujui-pasien).
+ */
+export function statusTautanPasien(patientId: string, tautan: Record<string, TautanPasien> | undefined): { linked: boolean; linkedAt?: string } {
+  const t = tautan?.[patientId]
+  return t ? { linked: true, linkedAt: t.ditautkanPada } : { linked: false }
+}

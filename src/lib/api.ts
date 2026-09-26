@@ -551,6 +551,8 @@ export const api = {
   clinical: () => req<ClinicalData>('/api/clinical'),
   issueLinkCode: (patientId: string) =>
     req<{ code: string; expiresAt: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-code`, { method: 'POST' }),
+  linkStatus: (patientId: string) =>
+    req<{ linked: boolean; linkedAt?: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-status`),
   redeemLinkCode: (code: string) =>
     req<{ ok: boolean; patientId: string }>('/api/clinical/link', { method: 'POST', body: JSON.stringify({ code }) }),
   myLinks: () => req<{ links: { patientId: string; linkedAt: string }[] }>('/api/clinical/links'),

@@ -17,20 +17,38 @@ const galatDari = (e: unknown) => {
   return Object.entries(PESAN).find(([k]) => m.includes(k))?.[1] ?? 'Could not link the record. Try again.'
 }
 
-/** Untuk dokter: terbitkan kode tautan bagi pasien praktik. */
+/** Untuk dokter: terbitkan kode tautan bagi pasien praktik, atau lihat/cabut tautan yang sudah ada. */
 export function TerbitkanKodeTaut({ patientId }: { patientId: string }) {
+  const [status, setStatus] = useState<{ linked: boolean; linkedAt?: string } | 'loading' | null>(null)
   const [kode, setKode] = useState<{ code: string; expiresAt: string } | null>(null)
+  const [busy, setBusy] = useState(false)
   const [galat, setGalat] = useState('')
+  const muat = () => { setStatus('loading'); api.linkStatus(patientId).then(setStatus).catch(() => setStatus(null)) }
+  useEffect(() => { if (backendEnabled && !patientId.startsWith('self-')) muat() }, [patientId])
   if (!backendEnabled || patientId.startsWith('self-')) return null
+  async function cabut() {
+    setBusy(true); setGalat('')
+    try { await api.unlink(patientId); setKode(null); muat() }
+    catch { setGalat('Could not remove the link.'); setBusy(false) }
+  }
   return (
     <div className="mt-3 border-t border-neutral-200 pt-3" data-terbitkan-kode-taut>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Patient app access</p>
-        <button type="button" className="rounded-lg border border-brand px-3 py-1.5 text-xs font-bold text-brand-dark"
-          onClick={() => { setGalat(''); api.issueLinkCode(patientId).then(setKode).catch(() => setGalat('Could not create a code.')) }}>
-          {kode ? 'New code' : 'Create link code'}
-        </button>
+        {status !== 'loading' && status?.linked ? (
+          <button type="button" disabled={busy} className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-bold text-red-600 disabled:opacity-40" onClick={cabut}>
+            {busy ? 'Removing…' : 'Unlink'}
+          </button>
+        ) : (
+          <button type="button" disabled={status === 'loading'} className="rounded-lg border border-brand px-3 py-1.5 text-xs font-bold text-brand-dark disabled:opacity-40"
+            onClick={() => { setGalat(''); api.issueLinkCode(patientId).then(setKode).catch(() => setGalat('Could not create a code.')) }}>
+            {kode ? 'New code' : 'Create link code'}
+          </button>
+        )}
       </div>
+      {status !== 'loading' && status?.linked && (
+        <p className="mt-1 text-xs text-neutral-600" data-status-taut>Linked to the patient's own account · since {new Date(status.linkedAt ?? '').toLocaleDateString('en-US')}</p>
+      )}
       {kode && (
         <p className="mt-1 text-xs">Give the patient this one-time code: <b className="font-mono text-sm tracking-wider" data-kode-taut>{kode.code}</b> · valid until {new Date(kode.expiresAt).toLocaleDateString('en-US')}</p>
       )}

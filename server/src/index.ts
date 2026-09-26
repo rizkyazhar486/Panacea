@@ -158,7 +158,7 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
-import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
+import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
@@ -880,6 +880,11 @@ app.post('/api/clinical/patient/:patientId/link-code', requireAuth, (req, res) =
   simpanKodeTaut(h.catatan)
   addAudit(actor, 'emr.link_code_issued', pid)
   res.json({ code: h.kode, expiresAt: h.catatan.kedaluwarsa })
+})
+app.get('/api/clinical/patient/:patientId/link-status', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  if (!klinisiAtauPemilik(actor, isOwner(actor))) return res.status(403).json({ error: 'not-clinician' })
+  res.json(statusTautanPasien(String(req.params.patientId), getTautan()))
 })
 app.post('/api/clinical/link', requireAuth, (req, res) => {
   const actor = (req as express.Request & { user: User }).user
