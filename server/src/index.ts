@@ -228,6 +228,8 @@ app.use(
       cb(null, false)
     },
     credentials: true,
+    // ID korelasi harus terbaca aplikasi lintas-origin agar laporan galat bisa dicocokkan dengan log.
+    exposedHeaders: ['X-Request-Id'],
   }),
 )
 

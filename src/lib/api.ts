@@ -103,6 +103,9 @@ export interface MarketQuote {
 
 import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet, MedReminder } from './types'
 
+import { galatDariRespons } from './galatApi'
+export { GalatApi, galatDariRespons } from './galatApi'
+
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
 export const backendEnabled = Boolean(API)
 
@@ -183,10 +186,11 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw new Error((body as { error?: string }).error || `HTTP ${res.status}`)
+    throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
   }
   return res.json() as Promise<T>
 }
+
 
 function toAccount(u: BackendUser): Account {
   return {
