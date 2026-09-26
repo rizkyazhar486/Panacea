@@ -5,6 +5,7 @@ const tabs = readFileSync(new URL('../../src/components/HalamanTab.tsx', import.
 const ui = readFileSync(new URL('../../src/components/ui.tsx', import.meta.url), 'utf8')
 const rail = readFileSync(new URL('../../src/components/SuperPageCapabilityRail.tsx', import.meta.url), 'utf8')
 const body = readFileSync(new URL('../../src/pages/UnifiedBodyWorkspace.tsx', import.meta.url), 'utf8')
+const exposure = readFileSync(new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url), 'utf8')
 
 assert.match(tabs, /PRIMARY_TAB_LIMIT = 7/)
 assert.match(tabs, /More \$\{moreTabs\.length\}/)
@@ -22,8 +23,10 @@ assert.match(rail, /Close find/)
 assert.match(rail, /placeholder="Search tools"/)
 assert.match(rail, /All \$\{items\.length\}/)
 
-assert.match(body, /Your body, from whole person to molecule/)
-assert.match(body, /Whole body → organ → tissue → cell → molecule/)
+assert.doesNotMatch(body, /Your body, from whole person to molecule/)
+assert.match(body, /<h1 className="sr-only">Your Body · \\{active\\.label\\}<\\/h1>/)
+assert.match(exposure, /Your body\\. Every scale\\./)
+assert.match(exposure, /You → anatomy → function → imaging → micro/)
 assert.match(body, /rounded-\[24px\]/)
 
 console.log('clarity-pass-v50: crowded tabs, shared primitives, capability rails, and Body hierarchy remain compact and progressively disclosed')
