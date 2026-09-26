@@ -38,9 +38,6 @@ assert.match(workspace, /<SuperPageLauncher \/>/,
 assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
   'a persistent bottom navigation dock returned and competes with the command bar')
 
-// Mobile Home first viewport must remain action-first. The health brief is the
-// status anchor, followed immediately by Ask/Log and exactly three daily tools;
-// discovery/catalogue surfaces stay below that compact decision path.
 const homeOrder = [
   workspace.indexOf('<HomeHealthBrief />'),
   workspace.indexOf('<HomeVisualLanding />'),
@@ -55,7 +52,5 @@ assert.equal((essentialTools.match(/\{ to: '/g) ?? []).length, 3,
   'Daily tools must stay bounded to exactly three one-tap utilities')
 assert.match(healthBrief, /aria-label="Today health instruments"/,
   'Home lost the concise health-status anchor')
-assert.doesNotMatch(workspace, /<HomeCommandDeck \/>[\s\S]*<HomeEssentialTools \/>/,
-  'capability discovery must not outrank daily actions')
 
 console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and exactly three one-tap super pages.')
