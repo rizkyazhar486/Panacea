@@ -12,6 +12,16 @@ import type { LongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 type Q = { id: string; prompt: string; kind: 'boolean' | 'number' | 'text'; required: boolean; tandai: boolean }
 // Aturan atas nilai lab yang dibagikan: ditulis dokter, wajib rujukan bukti.
 type AturanLab = { jenis: string; op: 'gte' | 'lte'; ambang: string; hari: string; bukti: string }
+const PILIHAN_PENGUKURAN = [
+  ...JENIS_LAB.map((x) => ({ id: `lab.${x.id}`, nama: `Lab · ${x.nama}`, satuan: x.satuan })),
+  { id: 'vital.sbp', nama: 'Vital · Systolic BP', satuan: 'mmHg' },
+  { id: 'vital.dbp', nama: 'Vital · Diastolic BP', satuan: 'mmHg' },
+  { id: 'vital.hr', nama: 'Vital · Heart rate', satuan: 'bpm' },
+  { id: 'vital.rr', nama: 'Vital · Respiratory rate', satuan: '/min' },
+  { id: 'vital.temp', nama: 'Vital · Temperature', satuan: '°C' },
+  { id: 'vital.spo2', nama: 'Vital · SpO₂', satuan: '%' },
+  { id: 'vital.glucose', nama: 'Vital · Glucose', satuan: 'mg/dL' },
+] as const
 const LABEL_PRIORITAS = { routine: 'Routine', 'review-today': 'Review today', 'immediate-human-review': 'Review now' } as const
 
 export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?: LongitudinalPatientState }) {
@@ -34,12 +44,12 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
       rationale: 'Clinician-authored: flag a "yes" answer for same-day review.',
     })),
     measurementReviewRules: aturanLab.map((a) => {
-      const j = JENIS_LAB.find((x) => x.id === a.jenis)!
+      const j = PILIHAN_PENGUKURAN.find((x) => x.id === a.jenis)!
       const ambang = Number(a.ambang.replace(',', '.'))
       return {
-        metric: `lab.${a.jenis}`, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
-        label: `${j.nama} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
-        rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
+        metric: a.jenis, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
+        label: `${j.nama.replace(/^(Lab|Vital) · /, '')} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
+        rationale: a.jenis.startsWith('vital.') ? 'Clinician-authored vital review threshold; verified clinical measurements only.' : 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
       }
     }),
   }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message)).finally(() => setMenyimpan(false)) }
@@ -79,16 +89,16 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
             </div>
           ))}
           <div className="grid gap-1 rounded-lg border border-white/10 p-2" data-lab-rules>
-            <p className="text-[11px] font-bold text-white/70">Lab review rules (optional)</p>
+            <p className="text-[11px] font-bold text-white/70">Measurement review rules (optional)</p>
             {aturanLab.map((a, i) => {
               const ubah = (p: Partial<AturanLab>) => setAturanLab(aturanLab.map((x, k) => (k === i ? { ...x, ...p } : x)))
-              const j = JENIS_LAB.find((x) => x.id === a.jenis)
+              const j = PILIHAN_PENGUKURAN.find((x) => x.id === a.jenis)
               const g = galatAturan[i] ?? {}
               return (
                 <div key={i} className="grid gap-1 text-[11px] text-white/70">
                   <div className="flex flex-wrap items-center gap-1">
-                    <select value={a.jenis} aria-label={`Lab test ${i + 1}`} onChange={(e) => ubah({ jenis: e.target.value })} className="rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white">
-                      {JENIS_LAB.map((x) => <option key={x.id} value={x.id}>{x.nama}</option>)}
+                    <select value={a.jenis} aria-label={`Measurement ${i + 1}`} onChange={(e) => ubah({ jenis: e.target.value })} className="rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white">
+                      {PILIHAN_PENGUKURAN.map((x) => <option key={x.id} value={x.id}>{x.nama}</option>)}
                     </select>
                     <select value={a.op} aria-label={`Comparison ${i + 1}`} onChange={(e) => ubah({ op: e.target.value as AturanLab['op'] })} className="rounded-md border border-white/15 bg-transparent px-1 py-0.5 text-white">
                       <option value="gte">≥</option><option value="lte">≤</option>
@@ -105,7 +115,8 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
                 </div>
               )
             })}
-            {aturanLab.length < 10 && <button type="button" className="min-h-9 justify-self-start rounded-full px-3 text-[11px] font-bold" onClick={() => setAturanLab([...aturanLab, { jenis: JENIS_LAB[0].id, op: 'gte', ambang: '', hari: '90', bukti: '' }])}>+ Lab rule</button>}
+            <p className="text-[10px] text-white/40">Vital rules use only server-stamped clinician-entered AI-EMR measurements; patient-entered/manual vitals never trigger priority.</p>
+            {aturanLab.length < 10 && <button type="button" className="min-h-9 justify-self-start rounded-full px-3 text-[11px] font-bold" onClick={() => setAturanLab([...aturanLab, { jenis: PILIHAN_PENGUKURAN[0].id, op: 'gte', ambang: '', hari: '90', bukti: '' }])}>+ Measurement rule</button>}
           </div>
           <div className="flex gap-1.5">
             {qs.length < 20 && <button type="button" className="min-h-9 rounded-full px-3 text-[11px] font-bold" onClick={() => setQs([...qs, { id: `q${qs.length + 1}`, prompt: '', kind: 'boolean', required: true, tandai: false }])}>+ Question</button>}
@@ -123,7 +134,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
                   {e.observed !== undefined && <span className="text-white/45"> · latest {e.observed} {e.unit}</span>}
                 </li>
               ))}
-              <li className="text-[10px] text-white/40">Rules you wrote, with your evidence reference; patient-transcribed values, not verified.</li>
+              <li className="text-[10px] text-white/40">Rules you wrote with an evidence reference; lab values are patient-transcribed, while vital rules require server-stamped clinician-entered measurements.</li>
             </ul>
           )}
           {data.reports.length === 0 && <p className="text-[11px] text-white/45">No check-ins yet.</p>}

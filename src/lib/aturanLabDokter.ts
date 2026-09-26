@@ -17,6 +17,7 @@ export const LABEL_KEADAAN: Record<MeasurementRuleEvaluation['state'], string> =
   stale: 'Latest result too old for this rule',
   'unit-mismatch': 'Unit differs — not compared',
   'blocked-by-consent': 'Sharing not active',
+  'source-unverified': 'Source not clinician-verified — not compared',
 }
 
 /** Isian formulir aturan lab dokter (teks mentah dari input). */

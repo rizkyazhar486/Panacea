@@ -63,7 +63,7 @@ function Garis({ obs }: { obs: FhirObservasiLab[] }) {
 // Angkanya disalin pasien dari lembar hasil — ditandai jelas, bukan dari lab.
 export function LabPasienUntukDokter() {
   const [daftar, setDaftar] = useState<{ id: string; berakhir: string; pasien: string }[] | null>(null)
-  const [buka, setBuka] = useState<{ izinId: string; pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab } | null>(null)
+  const [buka, setBuka] = useState<{ izinId: string; pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab; verifiedVitals: import('../lib/types').VitalSign[] } | null>(null)
   const [care, setCare] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] }>({ plan: null, reports: [] })
   useEffect(() => { if (buka) api.clinicianCare(buka.izinId).then(setCare).catch(() => setCare({ plan: null, reports: [] })) }, [buka?.izinId, buka?.reviews.length])
   const [galat, setGalat] = useState<string | null>(null)
@@ -138,7 +138,7 @@ export function LabPasienUntukDokter() {
           {kelompok.size === 0 && <p className="mt-1 text-[11px] text-white/55">This patient has no lab results yet.</p>}
           {(() => {
             // Status kanonik yang sama dengan sisi pasien, disusun dari sumber server.
-            const { state, labels } = statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString())
+            const { state, labels } = statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString(), buka.verifiedVitals ?? [])
             const hari = timelineHarian(state, 30, labels, 'dokter')
             if (!hari.length) return null
             return (
@@ -160,7 +160,7 @@ export function LabPasienUntukDokter() {
               </details>
             )
           })()}
-          <RencanaHarianDokter izinId={buka.izinId} state={statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString()).state} />
+          <RencanaHarianDokter izinId={buka.izinId} state={statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString(), buka.verifiedVitals ?? []).state} />
         </div>
       )}
     </section>

@@ -470,7 +470,7 @@ export const api = {
   shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
   revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   clinicianLabShares: () => req<{ shares: { id: string; berakhir: string; pasien: string }[] }>('/api/clinician/lab-shares'),
-  clinicianLabFhir: (id: string) => req<{ pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
+  clinicianLabFhir: (id: string) => req<{ pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab; verifiedVitals: (VitalSign & { dicatatOleh: { id: string; klinisi: true } })[] }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
   reviewLab: (izinId: string, tes: string, catatan: string, cekUlangSebelum: string) =>
     req<TinjauanLabKlien>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/review`, { method: 'POST', body: JSON.stringify({ tes, catatan, cekUlangSebelum }) }),
   carePlans: () => req<{ plans: { plan: import('./continuousCareOperatingSystem').ContinuousCarePlan; dokterEmail: string; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }[] }>('/api/care/plans'),

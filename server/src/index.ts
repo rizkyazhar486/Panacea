@@ -1074,7 +1074,24 @@ app.get('/api/clinician/lab-shares/:id/fhir', requireAuth, (req, res) => {
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
   const pasien = getUserByEmail(izin.pasienEmail)
   addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
-  res.json({ pasien: pasien?.name ?? 'Patient', dibuat: izin.dibuat, berakhir: izin.berakhir, reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email), bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
+  // Daily-care vital thresholds may see only server-stamped clinician-entered
+  // vitals belonging to this account's self record or an explicitly linked
+  // practice record. Patient-entered vitals are deliberately omitted.
+  const patientRecordIds = pasien
+    ? new Set([
+        ...Object.keys(getClinical().vitals).filter((patientId) => findUserBySelfPatientId(patientId)?.id === pasien.id),
+        ...Object.values(getTautan()).filter((t) => t.userId === pasien.id).map((t) => t.patientId),
+      ])
+    : new Set<string>()
+  const verifiedVitals = [...patientRecordIds]
+    .flatMap((patientId) => getClinical().vitals[patientId] ?? [])
+    .filter((v) => v?.dicatatOleh?.klinisi === true && typeof v?.dicatatOleh?.id === 'string')
+  res.json({
+    pasien: pasien?.name ?? 'Patient', dibuat: izin.dibuat, berakhir: izin.berakhir,
+    reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email),
+    bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()),
+    verifiedVitals,
+  })
 })
 
 // Tinjauan klinisi atas hasil lab yang dibagikan: dokter terverifikasi, izin

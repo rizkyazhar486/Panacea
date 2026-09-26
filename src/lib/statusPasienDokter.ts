@@ -4,6 +4,7 @@
 // pasien. Server menyimpan sumber; kernel yang sama menyusun status di mana pun.
 // Tujuan izin: 'clinical-support' — pasien memberi akses baca ke dokter ini.
 import { labLogToLongitudinalEvents } from './labLongitudinalBridge.ts'
+import { emrVitalsToLongitudinalEvents, type VitalTercatat } from './emrLongitudinalBridge.ts'
 import { careToLongitudinalEvents, type TinjauanMasuk } from './careLongitudinalBridge.ts'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type ConsentEnvelope, type LongitudinalPatientState } from './panaceaLongitudinalState.ts'
 import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from './continuousCareOperatingSystem.ts'
@@ -40,14 +41,16 @@ export function statusPasienUntukDokter(
   reviews: readonly TinjauanMasuk[],
   izin: { dibuat: string; berakhir: string },
   kini: string,
+  verifiedVitals: readonly VitalTercatat[] = [],
 ): { state: LongitudinalPatientState; labels: Record<string, string>; skipped: number } {
   const subjectId = 'shared-patient'
   const consent: ConsentEnvelope = { granted: true, purposes: ['clinical-support'], grantedAt: izin.dibuat, expiresAt: izin.berakhir }
   let state = createLongitudinalPatientState(subjectId, kini)
   const lab = labLogToLongitudinalEvents(logDariBundel(entries), subjectId, { consent, receivedAt: kini, confidence: 1 })
   const cr = careToLongitudinalEvents(care.plan ? [{ plan: care.plan, reports: care.reports }] : [], reviews, subjectId, consent, kini)
-  let skipped = lab.skipped.length + cr.skipped
-  for (const e of [...lab.events, ...cr.events]) {
+  const vital = emrVitalsToLongitudinalEvents(verifiedVitals, subjectId, consent, kini)
+  let skipped = lab.skipped.length + cr.skipped + vital.skipped
+  for (const e of [...lab.events, ...vital.events, ...cr.events]) {
     try { state = ingestLongitudinalEvent(state, e).state } catch { skipped++ }
   }
   return { state, labels: cr.labels, skipped }
