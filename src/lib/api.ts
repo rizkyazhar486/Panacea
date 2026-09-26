@@ -107,6 +107,7 @@ import { galatDariRespons } from './galatApi'
 export { GalatApi, galatDariRespons } from './galatApi'
 
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
+export const API_BASE = API
 export const backendEnabled = Boolean(API)
 
 export interface IzinLabKlien { id: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }

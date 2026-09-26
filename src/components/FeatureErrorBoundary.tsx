@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { GalatApi } from '../lib/galatApi'
+import { laporGalat } from '../lib/laporGalatKlien'
 
 const LIGHTWEIGHT_MODE_KEY = 'panacea:lightweight-mode'
 
@@ -44,6 +45,7 @@ export class FeatureErrorBoundary extends Component<
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(`[FeatureErrorBoundary:${this.props.featureName}]`, error, info)
+    laporGalat('boundary', error, this.props.featureName)
   }
 
   private retry = () => {

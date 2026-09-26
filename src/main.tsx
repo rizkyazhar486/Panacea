@@ -1,5 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { pasangPelaporGalat } from './lib/laporGalatKlien'
+import { API_BASE } from './lib/api'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import './styles/responsive-density-v1.css'
@@ -176,6 +178,7 @@ function PageLoader() {
   )
 }
 
+pasangPelaporGalat(API_BASE, String(import.meta.env.VITE_APP_VERSION ?? ''))
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>

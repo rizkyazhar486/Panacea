@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
+import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
 import { fileURLToPath as keJalurBerkas } from 'node:url'
@@ -264,6 +265,7 @@ app.get('/api/health', (_req, res) => {
     penyimpananSehat: penyimpananSehat(),
     // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
     http: ringkasanObservabilitas(),
+    galatKlien: ringkasanGalatKlien(),
     simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     /*
@@ -2043,6 +2045,21 @@ app.get('/api/stats', requireAuth, (req, res) => {
 })
 
 // --- owner user directory: who signed up / paid / subscribed ---
+// Galat runtime dari browser (tanpa autentikasi agar crash sebelum login pun terlihat).
+// Dibatasi limiter global, badan kecil, dan dibersihkan ulang di server.
+app.post('/api/client-errors', (req, res) => {
+  if (Number(req.get('content-length') ?? 0) > 4096) return res.status(413).json({ error: 'payload_too_large' })
+  const g = bersihkanGalatKlien(req.body)
+  if (!g) return res.status(400).json({ error: 'bad_request' })
+  catatGalatKlien(g)
+  res.status(204).end()
+})
+app.get('/api/owner/client-errors', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ringkasan: ringkasanGalatKlien(), galat: daftarGalatKlien() })
+})
+
 app.get('/api/owner/users', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
