@@ -26,3 +26,152 @@
 .rel-widget-rumah .widget-instrument-count-v5 {
   color: rgba(255,255,255,.34);
 }
+
+
+/* Quick live tools ---------------------------------------------------------
+   Timer, Focus, dan Breathing adalah mini-app, bukan shortcut. Mereka punya
+   state dan kontrol sendiri, jadi rail mendatar memberi tiap tool satu kanvas
+   utuh tanpa membuat Home padat secara visual. */
+.home-fun-mini {
+  min-width: 0;
+  margin-block: 0 1.25rem;
+}
+
+.home-fun-mini__head {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: 2px;
+}
+
+.home-fun-mini__head > div {
+  display: grid;
+  gap: 2px;
+}
+
+.home-fun-mini__head h2,
+.home-fun-mini__head span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-fun-mini__head h2 {
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.home-fun-mini__head span {
+  color: rgba(255,255,255,.36);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.home-fun-mini__head button {
+  min-height: 40px;
+  flex: 0 0 auto;
+  border: 0;
+  background-color: transparent;
+  color: #00bf63;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.home-fun-mini__rail {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  margin-inline: -2px;
+  scroll-padding-inline: 2px;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.home-fun-mini__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.home-fun-mini__card,
+.home-fun-mini__add {
+  flex: 0 0 min(86vw, 354px);
+  min-width: min(300px, 82vw);
+  scroll-snap-align: start;
+}
+
+.home-fun-mini__card {
+  min-height: 184px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 28px;
+  background-color: #0b0d0c;
+  color: white;
+  overflow: hidden;
+}
+
+.home-fun-mini__card > section {
+  min-width: 0;
+}
+
+.home-fun-mini__card .kaca {
+  background-color: rgba(255,255,255,.035);
+  border-color: rgba(255,255,255,.09);
+  box-shadow: none;
+}
+
+.home-fun-mini__add {
+  min-height: 184px;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 5px;
+  padding: 20px;
+  border: 1px dashed rgba(255,255,255,.18);
+  border-radius: 28px;
+  background-color: transparent;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-fun-mini__add strong {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.home-fun-mini__add span {
+  color: rgba(255,255,255,.42);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (min-width: 760px) {
+  .home-fun-mini__card,
+  .home-fun-mini__add {
+    flex-basis: 354px;
+    min-width: 354px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-fun-mini__rail {
+    scroll-behavior: auto;
+  }
+
+  .home-fun-mini__card *,
+  .home-fun-mini__add {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
