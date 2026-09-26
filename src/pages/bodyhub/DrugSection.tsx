@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, type PharmProfile, type DrugLabelInfo, type DrugClass } from '../../lib/api'
 import { sitesForDrug, keywordsOf, layersOf, type DrugSite } from '../../lib/drugAnatomy'
 import type { AnatomyLayer } from '../../components/Body3D'
+import { FaersOrganSafetyMap } from './FaersOrganSafetyMap'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Obat — bekerja di mana, lewat apa, efek sampingnya di mana, dosisnya berapa.
@@ -56,6 +57,7 @@ function SiteList({ title, sites, tone }: { title: string; sites: DrugSite[]; to
 
 export function DrugSection({ onHighlightSites }: Props) {
   const [q, setQ] = useState('')
+  const [selectedDrug, setSelectedDrug] = useState('')
   const [suggestions, setSuggestions] = useState<Array<{ rxcui: string; nama: string }>>([])
   const [total, setTotal] = useState<number | null>(null)
   const [profile, setProfile] = useState<PharmProfile | null>(null)
@@ -81,6 +83,7 @@ export function DrugSection({ onHighlightSites }: Props) {
 
   async function pilih(name: string) {
     setQ(name)
+    setSelectedDrug(name)
     setSuggestions([])
     setLoading(true)
     setError('')
@@ -124,7 +127,7 @@ export function DrugSection({ onHighlightSites }: Props) {
         <div className="relative">
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => { setQ(e.target.value); if (e.target.value !== selectedDrug) setSelectedDrug('') }}
             onKeyDown={(e) => { if (e.key === 'Enter' && q.trim()) pilih(q.trim()) }}
             aria-label="Search drug, vaccine or serum"
             placeholder="Search a drug, vaccine or serum…"
@@ -210,6 +213,10 @@ export function DrugSection({ onHighlightSites }: Props) {
             </div>
           )}
         </div>
+      )}
+
+      {selectedDrug && (
+        <FaersOrganSafetyMap drugName={selectedDrug} onHighlightSites={onHighlightSites} />
       )}
 
       <p className="text-[10.5px] leading-relaxed text-neutral-400">
