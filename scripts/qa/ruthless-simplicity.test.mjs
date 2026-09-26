@@ -44,7 +44,7 @@ test('Body Exposure spatial mode removes the floating assistive control', async 
   )
   assert.match(
     fab,
-    /lokasi\.pathname === '\/fitness-hub' && new URLSearchParams\(lokasi\.search\)\.get\('view'\) === 'body-exposure'/,
+    /lokasi\.pathname === '\/fitness-hub'\s*&&\s*new URLSearchParams\(lokasi\.search\)\.get\('view'\) === 'body-exposure'/,
     'assistive navigation must not float over the Body Exposure spatial canvas',
   )
 })
