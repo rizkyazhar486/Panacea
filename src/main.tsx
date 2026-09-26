@@ -429,6 +429,12 @@ requestAnimationFrame(() => {
   if (!splash) return
   const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashShownAt))
   setTimeout(() => {
+    // pointer-events must drop in the same tick as opacity, not after the
+    // 450ms fade finishes — otherwise this fixed, full-viewport, z-index:9999
+    // layer keeps swallowing every tap/click underneath it (menu, search,
+    // any button anywhere) for the whole fade duration despite being
+    // invisible.
+    splash.style.pointerEvents = 'none'
     splash.style.opacity = '0'
     setTimeout(() => splash.remove(), 450)
   }, wait)
