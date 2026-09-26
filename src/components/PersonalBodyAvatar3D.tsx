@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -419,17 +420,15 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       )
     }
 
-    let raf = 0
     const tick = () => {
       controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(tick)
     }
-    tick()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, tick)
 
     return () => {
       penjaga.lepas()
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       ro.disconnect()
       controls.dispose()
       scene.traverse((obj) => {

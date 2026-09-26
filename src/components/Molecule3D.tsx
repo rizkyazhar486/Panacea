@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -196,17 +197,15 @@ export function Molecule3D({ id, tanpaH = false, tinggi = 260 }: Props) {
     const onHilang = (e: Event) => { e.preventDefault(); setGagal('The browser dropped the 3D context.') }
     renderer.domElement.addEventListener('webglcontextlost', onHilang)
 
-    let raf = 0
     const bingkai = () => {
-      raf = requestAnimationFrame(bingkai)
       controls.update()
       renderer.render(scene, camera)
     }
-    bingkai()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, bingkai)
 
     return () => {
       batal = true
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerup', padaKlik)
       renderer.domElement.removeEventListener('webglcontextlost', onHilang)

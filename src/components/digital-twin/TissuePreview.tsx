@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { ikatSumbu, pasangTriplanar, setelAnisotropi } from '../../lib/triplanar'
 import { RESEP, type JenisJaringan } from '../../lib/tissueTexture'
@@ -119,20 +120,19 @@ export function TissuePreview({ tinggi = 240 }: { tinggi?: number }) {
     const ro = new ResizeObserver(ukur)
     ro.observe(wadah)
 
-    let hidup = true, bingkai = 0
+    let hidup = true
     const putar = () => {
       if (!hidup) return
-      bingkai = requestAnimationFrame(putar)
       const m = bahanPer.get(pilihRef.current)
       if (m && mesh.material !== m) mesh.material = m
       mesh.rotation.y += 0.004
       renderer.render(scene, camera)
     }
-    putar()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, putar)
 
     return () => {
       hidup = false
-      cancelAnimationFrame(bingkai)
+      loopTerjaga.hentikan()
       ro.disconnect()
       geometri.dispose()
       for (const m of bahanPer.values()) m.dispose()

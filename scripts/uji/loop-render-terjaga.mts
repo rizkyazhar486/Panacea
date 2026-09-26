@@ -24,9 +24,15 @@ f.setHidden(true); assert.equal(f.antre.size, 0, 'tab tersembunyi: berhenti'); f
 loop.kontekHilang(); assert.equal(f.antre.size, 0, 'konteks WebGL hilang: berhenti'); f.setTerlihat(true); assert.equal(f.antre.size, 0, 'tidak dilanjutkan setelah konteks hilang')
 const g = palsu(); const l2 = mulaiLoopTerjaga({} as Element, () => {}, g.dep); l2.hentikan(); l2.hentikan()
 assert.equal(g.antre.size, 0, 'dibuang: tanpa frame menggantung'); assert.deepEqual(g.lepas(), [1, 1], 'listener dilepas tepat sekali')
-for (const nama of ['Arteri3D', 'KelenjarSaluran3D', 'LesiNeuro3D', 'WilayahAbdomen3D', 'Kerangka3D', 'VentilasiBronkus3D']) {
-  const s = readFileSync(`src/pages/bodyhub/${nama}.tsx`, 'utf8')
+const PENGGUNA = [
+  ...['Arteri3D', 'KelenjarSaluran3D', 'LesiNeuro3D', 'WilayahAbdomen3D', 'Kerangka3D', 'VentilasiBronkus3D', 'AlphaGenomeAtlas'].map((n) => `src/pages/bodyhub/${n}.tsx`),
+  ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D'].map((n) => `src/components/${n}.tsx`),
+  ...['MicroPathologyComparator', 'BodyParts3DDeepAtlas', 'RealisticAnatomyAtlas', 'HighDefinitionCellAtlas', 'HraClinicalAtlas', 'CinematicCellGenomeExplorer', 'MicroPhysiologyExplorer', 'TissuePreview'].map((n) => `src/components/digital-twin/${n}.tsx`),
+  'src/pages/discovery/SynapseMicro3DLab.tsx',
+]
+for (const nama of PENGGUNA) {
+  const s = readFileSync(nama, 'utf8').replace(/window\.requestAnimationFrame\(fitVisible\)/, '')
   assert.match(s, /mulaiLoopTerjaga\(/, `${nama} harus memakai loop terjaga`); assert.doesNotMatch(s, /requestAnimationFrame/, `${nama}: loop RAF mentah tanpa penangguhan`)
-  assert.match(s, /loop\.hentikan\(\)/, `${nama}: loop harus dihentikan saat dibuang`)
+  assert.match(s, /(loop|loopTerjaga)\.hentikan\(\)/, `${nama}: loop harus dihentikan saat dibuang`)
 }
 console.log('loop-render-terjaga: lulus')

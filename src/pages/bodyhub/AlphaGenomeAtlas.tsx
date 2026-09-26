@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
   ALPHA_GENOME_ATLAS_BOUNDARY,
@@ -129,7 +130,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     root.add(signal);
 
     const clock = new THREE.Clock();
-    let raf = 0;
     const animate = () => {
       const elapsed = clock.getElapsedTime();
       controls.update();
@@ -139,7 +139,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
       protein.rotation.y = elapsed * 0.23;
       signal.position.copy(bridgeCurve.getPointAt((elapsed * 0.12) % 1));
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(animate);
     };
 
     const resize = () => {
@@ -152,10 +151,10 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
     resize();
-    animate();
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(raf);
+      loopTerjaga.hentikan();
       observer.disconnect();
       controls.dispose();
       root.traverse((object) => {

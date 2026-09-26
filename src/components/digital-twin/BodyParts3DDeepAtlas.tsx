@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
@@ -136,7 +137,6 @@ function DeepScene({ atlas, load, onProgress, onError }: { atlas: Atlas; load: L
     const mount = mountRef.current
     if (!mount) return
     let disposed = false
-    let frame = 0
     mount.innerHTML = ''
 
     const scene = new THREE.Scene()
@@ -234,13 +234,12 @@ function DeepScene({ atlas, load, onProgress, onError }: { atlas: Atlas; load: L
       if (disposed) return
       controls.update()
       renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
       disposed = true
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       ro.disconnect()
       controls.dispose()
       disposables.forEach((geometry) => geometry.dispose())

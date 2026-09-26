@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { hitungJalur, type Jalur, type KeadaanJalur } from '../lib/pathway'
 
@@ -163,10 +164,8 @@ export function Pathway3D({ jalur, keadaan, tinggi = 300, onPilih }: Props) {
     renderer.domElement.addEventListener('webglcontextlost', onHilang)
 
     const v = new THREE.Vector3()
-    let raf = 0
     const jam = new THREE.Clock()
     function bingkai() {
-      raf = requestAnimationFrame(bingkai)
       const { jalur: J, keadaan: K } = ref.current
       if (J.id !== idJalur) { idJalur = J.id; bangun(J) }
 
@@ -197,10 +196,10 @@ export function Pathway3D({ jalur, keadaan, tinggi = 300, onPilih }: Props) {
       controls.update()
       renderer.render(scene, camera)
     }
-    bingkai()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, bingkai)
 
     return () => {
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerup', padaKlik)
       renderer.domElement.removeEventListener('webglcontextlost', onHilang)

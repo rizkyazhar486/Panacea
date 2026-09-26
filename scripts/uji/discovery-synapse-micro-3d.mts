@@ -7,7 +7,7 @@ for (const term of ['glutamate', 'gaba', 'dopamine', 'serotonin', 'norepinephrin
   if (!model.includes(term)) throw new Error(`Missing synapse model guard: ${term}`);
 }
 
-for (const term of ['MeshPhysicalMaterial', 'ACESFilmicToneMapping', 'OrbitControls', 'ResizeObserver', 'requestAnimationFrame', 'makeMembrane', 'SphereGeometry', 'TorusGeometry', 'IcosahedronGeometry', 'renderer.dispose()', 'Synapse microenvironment — animated mechanism studio', 'not microscopy or measured patient physiology']) {
+for (const term of ['MeshPhysicalMaterial', 'ACESFilmicToneMapping', 'OrbitControls', 'ResizeObserver', 'mulaiLoopTerjaga', 'makeMembrane', 'SphereGeometry', 'TorusGeometry', 'IcosahedronGeometry', 'renderer.dispose()', 'Synapse microenvironment — animated mechanism studio', 'not microscopy or measured patient physiology']) {
   if (!ui.includes(term)) throw new Error(`Missing synapse visual-quality guard: ${term}`);
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -542,21 +543,19 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     observer.observe(container)
     resize()
 
-    let animation = 0
     const clock = new THREE.Clock()
     const renderLoop = () => {
-      animation = requestAnimationFrame(renderLoop)
       const elapsed = clock.getElapsedTime()
       if (rootRef.current && stageRef.current !== 'sequencing') rootRef.current.rotation.y += 0.00045
       if (stageRef.current === 'sequencing' && rootRef.current) rootRef.current.position.y = Math.sin(elapsed * 0.45) * 0.015
       controls.update()
       renderer.render(scene, camera)
     }
-    renderLoop()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, renderLoop)
     setReady(true)
 
     return () => {
-      cancelAnimationFrame(animation)
+      loopTerjaga.hentikan()
       observer.disconnect()
       renderer.domElement.removeEventListener('pointerup', pick)
       controls.dispose()

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -371,7 +372,6 @@ export function RealisticAnatomyAtlas() {
     renderer.domElement.addEventListener('pointerup', onUp)
 
     const clock = new THREE.Clock()
-    let frame = 0
     const render = () => {
       const t = clock.getElapsedTime()
       if (motion) {
@@ -406,12 +406,11 @@ export function RealisticAnatomyAtlas() {
           jamRef.current.bersihkan()
         }
       }
-      frame = requestAnimationFrame(render)
     }
-    render()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, render)
 
     return () => {
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       observer.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onDown)
       renderer.domElement.removeEventListener('pointerup', onUp)

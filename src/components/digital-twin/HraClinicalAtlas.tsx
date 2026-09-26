@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -228,16 +229,14 @@ export function HraClinicalAtlas() {
     controls.target.set(0, 0, 0)
     controls.update()
 
-    let frame = 0
     const animate = () => {
       controls.update()
       renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       resizeObserver.disconnect()
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       controls.dispose()

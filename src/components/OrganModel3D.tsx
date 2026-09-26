@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -119,7 +120,6 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
     const v = new THREE.Vector3()
-    let raf = 0
     function animate() {
       controls.update()
       renderer.render(scene, camera)
@@ -143,12 +143,11 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         }
         setLayar(next)
       }
-      raf = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       renderer.domElement.removeEventListener('pointerdown', stopAuto)
