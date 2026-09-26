@@ -347,7 +347,26 @@ function loadFile() {
   }
 }
 
+// Simpan DIGABUNG per putaran event loop: satu handler sering memanggil save() beberapa
+// kali, dan setiap panggilan dulu men-serialisasi SELURUH basis data secara sinkron.
+// Microtask berjalan sebelum I/O berikutnya, jadi tulisan tetap selesai di tick yang sama.
+let simpanTertunda = false
 function save() {
+  if (simpanTertunda) return
+  simpanTertunda = true
+  queueMicrotask(flushSimpan)
+}
+/** Tulis sekarang bila ada perubahan tertunda (dipakai saat shutdown dan oleh uji). */
+export function flushSimpan() {
+  if (!simpanTertunda) return
+  simpanTertunda = false
+  simpanSekarang()
+}
+export const statistikSimpan = { serialisasi: 0 }
+process.once('beforeExit', flushSimpan)
+
+function simpanSekarang() {
+  statistikSimpan.serialisasi++
   // Keadaan Connect ikut disimpan bersama basis data utama. Tanpa ini, garam
   // sidik nomor telepon lahir baru setiap kali server hidup — dan pemeriksaan akun ganda
   // diam-diam berhenti bekerja karena sidik lama tidak akan pernah cocok lagi.
@@ -403,6 +422,7 @@ async function simpanMongo(): Promise<void> {
 
 /** Tulis segera simpan yang masih tertunda (dipanggil saat SIGTERM/deploy). */
 export async function flushStore(): Promise<void> {
+  flushSimpan()
   if (mongoCol && saveTimer) { clearTimeout(saveTimer); saveTimer = null; await simpanMongo() }
 }
 
