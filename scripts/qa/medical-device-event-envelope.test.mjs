@@ -182,3 +182,34 @@ test('invalid identity, timestamps and sequence values fail closed', () => {
   assert.ok(result.errors.some((error) => error.includes('capturedAt')))
   assert.ok(result.errors.some((error) => error.includes('sequence')))
 })
+
+
+test('accepts the ISO maximum offset and quarantines offsets beyond fourteen hours', () => {
+  const boundary = validateMedicalDeviceEvent({
+    ...base,
+    provenance: {
+      ...base.provenance,
+      capturedAt: '2026-09-20T20:00:00.000+14:00',
+      receivedAt: '2026-09-20T20:00:01.000+14:00',
+    },
+  })
+  assert.equal(boundary.accepted, true)
+
+  for (const capturedAt of [
+    '2026-09-20T20:00:00.000+14:01',
+    '2026-09-20T20:00:00.000-14:01',
+    '2026-09-20T20:00:00.000+23:59',
+  ]) {
+    const result = validateMedicalDeviceEvent({
+      ...base,
+      provenance: {
+        ...base.provenance,
+        capturedAt,
+        receivedAt: '2026-09-21T20:00:01.000Z',
+      },
+    })
+    assert.equal(result.accepted, false, capturedAt)
+    assert.equal(result.disposition, 'quarantined', capturedAt)
+    assert.ok(result.errors.some((error) => error.includes('capturedAt')), capturedAt)
+  }
+})
