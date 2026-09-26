@@ -96,7 +96,7 @@ export function Notifications() {
   ]
 
   return (
-    <div className="space-y-4 pb-[env(safe-area-inset-bottom)]">
+    <div className="space-y-4 pb-[env(safe-area-inset-bottom)]" aria-busy={loading}>
       <SectionTitle
         icon={<IconBell />}
         title="Notification Center"
@@ -145,22 +145,24 @@ export function Notifications() {
 
       {serverError && (
         <Card className="border-amber-200 bg-amber-50/95 dark:border-amber-400/20 dark:bg-amber-400/10">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div role="alert" aria-live="assertive" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-amber-900 dark:text-amber-100">Server history could not refresh. Local smart history is still available.</p>
-            <button type="button" onClick={load} className="min-h-10 shrink-0 rounded-xl bg-amber-900 px-3 py-2 text-xs font-semibold text-white dark:bg-amber-200 dark:text-amber-950">Try again</button>
+            <button type="button" onClick={load} disabled={loading} className="min-h-11 shrink-0 rounded-xl bg-amber-900 px-3 py-2 text-xs font-semibold text-white disabled:cursor-wait disabled:opacity-60 dark:bg-amber-200 dark:text-amber-950">{loading ? 'Retrying…' : 'Try again'}</button>
           </div>
         </Card>
       )}
 
       <Card>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <div role="group" aria-label="Notification filters" className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 sm:pb-0">
             {filters.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setFilter(item.id)}
-                className={`min-h-10 shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition ${filter === item.id
+                aria-pressed={filter === item.id}
+                aria-label={`${item.label}: ${item.count} notifications`}
+                className={`min-h-11 shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition ${filter === item.id
                   ? 'border-brand bg-brand-50 text-brand-dark dark:bg-brand/15 dark:text-emerald-300'
                   : 'border-neutral-200 bg-white text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
               >
@@ -170,15 +172,15 @@ export function Notifications() {
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
             {backendEnabled && unread > 0 && (
-              <button type="button" onClick={markAllRead} className="min-h-10 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Mark server read</button>
+              <button type="button" onClick={markAllRead} className="min-h-11 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Mark server read</button>
             )}
-            <button type="button" onClick={load} className="min-h-10 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Refresh</button>
+            <button type="button" onClick={load} disabled={loading} className="min-h-11 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-700 disabled:cursor-wait disabled:opacity-60 dark:bg-white/10 dark:text-neutral-200">{loading ? 'Refreshing…' : 'Refresh'}</button>
           </div>
         </div>
       </Card>
 
       {loading && combined.length === 0 ? (
-        <Card><p className="text-sm font-medium text-neutral-600 dark:text-neutral-300">Loading server history…</p></Card>
+        <Card><p role="status" aria-live="polite" className="text-sm font-medium text-neutral-600 dark:text-neutral-300">Loading server history…</p></Card>
       ) : visible.length === 0 ? (
         <Card>
           <div className="py-5 text-center">
@@ -225,7 +227,7 @@ export function Notifications() {
                           </details>
                         )}
                         {item.route && (
-                          <button type="button" onClick={() => openRoute(item)} className="mt-3 min-h-10 rounded-xl bg-brand px-3 py-2 text-xs font-semibold text-white">Open its page →</button>
+                          <button type="button" onClick={() => openRoute(item)} className="mt-3 min-h-11 rounded-xl bg-brand px-3 py-2 text-xs font-semibold text-white">Open its page →</button>
                         )}
                       </div>
                     </div>
