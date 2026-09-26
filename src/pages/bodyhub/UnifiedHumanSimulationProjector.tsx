@@ -16,6 +16,7 @@ const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: modu
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ default: module.SurgicalLab })))
 const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
+const PanelEcmo = lazy(() => import('../../components/PanelEcmo').then((module) => ({ default: module.PanelEcmo })))
 const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
@@ -213,6 +214,7 @@ export default function UnifiedHumanSimulationProjector({
         return (
           <div className="space-y-3">
             <WholeBodyPhysiologyWorkbench />
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-neutral-900" />}><PanelEcmo /></Suspense>
             <AtlasPhysiologyBridgePanel
               selectedAtlasSystemId={selectedSystemId}
               selectedSourceStructureName={selectedStructureName}
