@@ -5,6 +5,7 @@ import {
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
+import { mekanikaVentilator, VENTILATOR_ISTIRAHAT, type PengaturanVentilator } from '../lib/ecmo/ventilator'
 import { nilaiWeaningVV } from '../lib/ecmo/weaningVV'
 import { ujiPenurunanAliranVA, OPSI_WEANING_VA } from '../lib/ecmo/weaningVA'
 import { bangunEcho, indeksBingkai } from '../lib/ecmo/echo'
@@ -39,7 +40,6 @@ const KENDALI_VV: Kendali<MasukanVV>[] = [
   { k: 'vo2', label: 'VO₂', min: 120, max: 450, step: 5, unit: 'mL/min' },
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
   { k: 'fungsiMembran', label: 'Membrane function', min: 0.05, max: 1, step: 0.01, unit: '' },
-  { k: 'va', label: 'Native alveolar ventilation', min: 0.5, max: 8, step: 0.1, unit: 'L/min' },
   { k: 'fio2', label: 'Ventilator FiO₂', min: 0.21, max: 1, step: 0.01, unit: '' },
 ]
 // VA: aliran LV asli dan aliran ECMO BUKAN penggeser; keduanya keluaran sirkulasi.
@@ -63,6 +63,15 @@ const KENDALI_HEMO_VV: KendaliHemoVv[] = [
 const nilaiHemo = (p: ParameterSirkulasi, id: KendaliHemo['id']) => id === 'ees' ? Math.round((p.lv.ees / SIRKULASI_NORMAL.lv.ees) * 100) : id === 'rpm' ? p.ecmo.rpm : id === 'volume' ? p.volumeDarah : p.svr
 const terapkanHemo = (p: ParameterSirkulasi, id: KendaliHemo['id'], v: number): ParameterSirkulasi =>
   id === 'ees' ? { ...p, lv: { ...p.lv, ees: (SIRKULASI_NORMAL.lv.ees * v) / 100 } } : id === 'rpm' ? { ...p, ecmo: { ...p.ecmo, rpm: v } } : id === 'volume' ? { ...p, volumeDarah: v } : { ...p, svr: v }
+
+// Ventilasi alveolar paru asli (VV) adalah KELUARAN mekanika ventilator, bukan penggeser.
+const KENDALI_VENT: Kendali<PengaturanVentilator>[] = [
+  { k: 'pInspAtasPeep', label: 'Inspiratory pressure above PEEP (ΔP)', min: 0, max: 30, step: 1, unit: 'cmH₂O' },
+  { k: 'peep', label: 'PEEP', min: 0, max: 20, step: 1, unit: 'cmH₂O' },
+  { k: 'rr', label: 'Respiratory rate', min: 0, max: 35, step: 1, unit: '/min' },
+  { k: 'crs', label: 'Respiratory-system compliance', min: 5, max: 60, step: 1, unit: 'mL/cmH₂O' },
+  { k: 'ruangRugiMl', label: 'Dead space (illustrative)', min: 50, max: 300, step: 10, unit: 'mL' },
+]
 
 const KENDALI_VA: Kendali<MasukanVA>[] = [
   { k: 'shunt', label: 'Native lung shunt', min: 0, max: 1, step: 0.01, unit: '' },
@@ -211,6 +220,13 @@ export function PanelEcmo() {
   const vvTurunan = (m: MasukanVV, h: HasilSirkulasi): MasukanVV => ({ ...m, co: h.sah ? h.coAsli : NaN, qEcmo: h.sah ? h.qEcmo : NaN })
   const vvEfektif = useMemo(() => vvTurunan(vv, kHemoVv), [vv, kHemoVv])
   const kVv = useMemo(() => simulasiVV(vvEfektif), [vvEfektif])
+  const [vent, setVent] = useState<PengaturanVentilator>(VENTILATOR_ISTIRAHAT)
+  const kVent = useMemo(() => mekanikaVentilator(vent), [vent])
+  const ubahVent = (k: keyof PengaturanVentilator, v: number) => {
+    const baru = { ...vent, [k]: v }, m = mekanikaVentilator(baru)
+    if (m.sah) ubahVv('va', m.vaLMenit)
+    setVent(baru)
+  }
   const [jamBekuan, setJamBekuan] = useState(0)
   const [frKanula, setFrKanula] = useState(19)
   const [phMin, setPhMin] = useState(7.3)
@@ -222,7 +238,7 @@ export function PanelEcmo() {
   const mulaiSkenarioVv = (id: string) => {
     const s = SKENARIO_VV.find((x) => x.id === id); if (!s) return
     const k = s.terapkan(DASAR_VV)
-    setHemoVv(k.hemo); setVv({ ...VV0, ...k.gas }); setAwalVv(jalankanVV(k)); setSkenarioVvId(id); setTrace([])
+    setHemoVv(k.hemo); setVv({ ...VV0, ...k.gas }); setVent(VENTILATOR_ISTIRAHAT); setAwalVv(jalankanVV(k)); setSkenarioVvId(id); setTrace([])
     sebelumHemoVv.current = k.hemo; sebelumVv.current = { ...VV0, ...k.gas }
   }
   const [skenarioId, setSkenarioId] = useState<string | null>(null)
@@ -292,7 +308,7 @@ export function PanelEcmo() {
             <Angka id="vv-q" label="Pump flow (derived)" nilai={`${n0(kHemoVv.qEcmo, 1)} L/min`} />
             <Angka id="vv-co" label="Cardiac output (derived)" nilai={`${n0(kHemoVv.coAsli, 1)} L/min`} />
             <Angka id="vv-map" label="MAP" nilai={`${n0(kHemoVv.map)} mmHg`} />
-            <Angka label="PaCO₂" nilai={`${n0(kVv.co2.paco2)} mmHg`} />
+            <Angka id="paco2" label="PaCO₂" nilai={`${n0(kVv.co2.paco2)} mmHg`} />
             <Angka label="pH" nilai={n0(kVv.co2.ph, 2)} />
             <Angka id="resirkulasi" label="Recirculation" nilai={pct(kVv.resirkulasi)} />
             <Angka label="Eff. flow / CO" nilai={pct(kVv.rasioEfektifTerhadapCO)} />
@@ -304,6 +320,21 @@ export function PanelEcmo() {
           <div className="space-y-1.5" onPointerDown={tandai} onKeyDown={tandai}>
             {KENDALI_HEMO_VV.map((d) => <Penggeser key={d.id} d={d} nilai={d.id === 'hr' ? hemoVv.hr : nilaiHemo(hemoVv, d.id)} ubah={(v) => ubahHemoVv(d.id, v)} />)}
             {KENDALI_VV.map((d) => <Penggeser key={String(d.k)} d={d} nilai={vv[d.k] as number} ubah={(v) => ubahVv(d.k, v)} />)}
+          </div>
+          <div data-ecmo-ventilator className="space-y-1.5 rounded-xl bg-white/5 p-2">
+            <h4 className="text-[12px] font-black">Ventilator (lung rest)</h4>
+            <div className="grid grid-cols-3 gap-1.5">
+              <Angka id="vt" label="Tidal volume" nilai={`${n0(kVent.vtMl)} mL`} />
+              <Angka id="pplat" label="Plateau" nilai={`${n0(kVent.pplat)} cmH₂O`} />
+              <Angka id="dp" label="Driving pressure" nilai={`${n0(kVent.drivingPressure)} cmH₂O`} />
+              <Angka label="Minute ventilation" nilai={`${n0(kVent.veLMenit, 1)} L/min`} />
+              <Angka id="va-paru" label="Alveolar ventilation" nilai={`${n0(kVent.vaLMenit, 1)} L/min`} />
+              <Angka id="istirahat" label="ELSO rest settings" nilai={!kVent.sah ? '—' : kVent.istirahatElso.memenuhi ? 'met' : 'not met'} />
+            </div>
+            <div className="space-y-1.5" onPointerDown={tandai} onKeyDown={tandai}>
+              {KENDALI_VENT.map((d) => <Penggeser key={String(d.k)} d={d} nilai={vent[d.k]} ubah={(v) => ubahVent(d.k, v)} />)}
+            </div>
+            <Prosa kelas="text-[10px] text-neutral-500">{'VT = compliance × ΔP (pressure control, full equilibration); alveolar ventilation feeds the same PaCO₂ model, so resting the lung raises PaCO₂ unless sweep rises. Rest check uses ELSO VV 2021: plateau ≤ 25 or inspiratory pressure ≤ 15 cmH₂O, with PEEP ≥ 10. Driving pressure has no threshold here: Amato 2015 reports a continuous association with mortality. PEEP effects on shunt and venous return are not modeled.'}</Prosa>
           </div>
         </>
       ) : (

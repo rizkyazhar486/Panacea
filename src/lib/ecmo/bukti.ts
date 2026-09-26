@@ -97,6 +97,11 @@ export const BUKTI: Record<string, EvidenceReference> = {
     sitasi: 'Aissaoui N et al. Predictors of successful ECMO weaning after assistance for refractory cardiogenic shock. Intensive Care Med 2011;37(11):1738-45',
     populasi: '51 adults, single centre, VA ECMO for refractory cardiogenic shock', konfigurasi: ['VA-perifer', 'VA-sentral'],
   },
+  'amato-driving-pressure-2015': {
+    id: 'amato-driving-pressure-2015', tahun: 2015, pmid: '25693014', doi: '10.1056/NEJMsa1410639',
+    sitasi: 'Amato MBP et al. Driving pressure and survival in the acute respiratory distress syndrome. N Engl J Med 2015;372(8):747-55',
+    populasi: '3562 ARDS patients from nine randomized trials (individual-data mediation analysis)', konfigurasi: ['umum'],
+  },
   'severinghaus-1979': {
     id: 'severinghaus-1979', tahun: 1979, pmid: '35496', doi: '10.1152/jappl.1979.46.3.599',
     sitasi: 'Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 1979;46(3):599-602',
@@ -199,6 +204,12 @@ export const MODEL: Record<string, ScientificModel> = {
     satuan: { VTI: 'cm', SV: 'mL', LVOT: 'cm' },
     asumsi: ['LVOT diameter assumed 2.0 cm (educational)', 'TDSa not produced by the model, so readiness is never declared', 'tolerance threshold (MAP) is educator-set; the source gives no number'],
     bukti: ['aissaoui-weaning-2011'], status: 'terverifikasi-abstrak',
+  },
+  'ventilator-istirahat': {
+    id: 'ventilator-istirahat', nama: 'Pressure-control ventilator mechanics and ELSO rest settings', sistem: 'respirasi',
+    persamaan: 'VT = Crs·ΔP; Pplat = PEEP + ΔP; VA = (VT − VD)·RR; rest = (Pplat ≤ 25 or ΔP ≤ 15) and PEEP ≥ 10', satuan: { P: 'cmH2O', Crs: 'mL/cmH2O', VT: 'mL', VA: 'L/min' },
+    asumsi: ['full end-inspiratory equilibration, no auto-PEEP', 'dead space is an illustrative input', 'PEEP effect on shunt/recruitment and on venous return not modeled', 'ΔP has no threshold: continuous association only (Amato 2015)'],
+    bukti: ['elso-vv-2021', 'amato-driving-pressure-2015'], status: 'terverifikasi-abstrak',
   },
   'membran-o2': {
     id: 'membran-o2', nama: 'Membrane-lung O2 equilibration', sistem: 'ecmo',
