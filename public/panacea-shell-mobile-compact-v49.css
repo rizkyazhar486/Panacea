@@ -101,11 +101,11 @@
     button[aria-label^='Search'],
     button[aria-label^='Notifications']
   ) {
-    min-width: 38px !important;
-    width: 38px !important;
-    min-height: 38px !important;
-    height: 38px !important;
-    flex-basis: 38px !important;
+    min-width: 40px !important;
+    width: 40px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    flex-basis: 40px !important;
   }
 }
 

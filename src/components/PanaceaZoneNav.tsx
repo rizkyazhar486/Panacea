@@ -42,7 +42,7 @@ export function PanaceaZoneNav() {
 
   return (
     <nav className="relative flex min-h-[52px] items-center gap-1.5 rounded-[18px] border border-white/[.08] bg-[#01040a]/90 px-1.5 py-1 shadow-[0_12px_36px_rgba(0,0,0,.22)] backdrop-blur-xl sm:min-h-[56px] sm:gap-2 sm:px-2" aria-label="Panacea super pages">
-      <NavLink to="/" end className="flex h-11 shrink-0 items-center gap-1.5 rounded-[14px] px-1 text-white transition hover:bg-white/[.04] active:scale-[.98] sm:px-1.5" aria-label="Panacea Home">
+      <NavLink to="/" end className="flex h-11 w-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[14px] px-1 text-white transition hover:bg-white/[.04] active:scale-[.98] sm:w-auto sm:px-1.5 md:justify-start" aria-label="Panacea Home">
         <LogoMark size={27} />
         <span className="hidden text-[13px] font-black tracking-[-.02em] md:block" style={{ fontFamily: 'var(--font-wordmark)' }}>Panacea<span className="text-emerald-300">med</span><span className="text-cyan-300">.id</span></span>
       </NavLink>

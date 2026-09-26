@@ -87,6 +87,8 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const lokasi = useLocation()
   const navigasi = useNavigate()
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
+  const sembunyikanDiBodyExposure = lokasi.pathname === '/fitness-hub'
+    && new URLSearchParams(lokasi.search).get('view') === 'body-exposure'
 
   const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
   const [pos, setPos] = useState<AssistivePosition>(() => {
@@ -348,6 +350,7 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const keKiri = pos.x > window.innerWidth / 2
 
   if (sembunyikanDiBodyExplorer) return null
+  if (sembunyikanDiBodyExposure) return null
 
   return (
     <>
