@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
 import { fileURLToPath as keJalurBerkas } from 'node:url'
@@ -181,6 +182,7 @@ const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
 // not this API host, so a strict API-side CSP would only add risk of breaking
 // JSON clients without protecting the frontend).
+app.use(middlewareObservabilitas())
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.set('trust proxy', 1) // behind Render's proxy — needed for correct client IPs in rate limiting
 
@@ -258,6 +260,8 @@ app.get('/api/health', (_req, res) => {
     penyimpanan: modePenyimpanan(),
     // Kesehatan simpan: tanpa pesan galat (bisa memuat nama host) di endpoint publik.
     penyimpananSehat: penyimpananSehat(),
+    // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
+    http: ringkasanObservabilitas(),
     simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     /*
@@ -2212,8 +2216,9 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
     return
   }
   const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err)
-  alertOwner(`Route error @ ${req.method} ${req.path}`, msg)
-  if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
+  const requestId = String(res.locals.requestId ?? '')
+  alertOwner(`Route error @ ${req.method} ${jalurAman(req)} [${requestId}]`, msg)
+  if (!res.headersSent) res.status(500).json({ error: 'internal_error', requestId })
 })
 
 process.on('uncaughtException', (e) => alertOwner('Uncaught exception', e?.stack || String(e)))
