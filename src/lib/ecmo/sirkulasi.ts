@@ -101,6 +101,9 @@ export interface HasilSirkulasi {
 
 export function simulasiSirkulasi(p: ParameterSirkulasi, maksDenyut = 60, dt = 0.0005): HasilSirkulasi {
   const gagal = (alasan: string): HasilSirkulasi => ({ sah: false, alasan, map: NaN, mapDistal: NaN, sbp: NaN, dbp: NaN, pulsePressure: NaN, cvp: NaN, pcwp: NaN, papMean: NaN, lvedv: NaN, lvesv: NaN, sv: NaN, ef: NaN, rvedv: NaN, coAsli: NaN, qEcmo: NaN, aliranArkusKeDistal: NaN, fraksiBukaKatupAorta: NaN, lingkarLV: [], gelombangArteri: [], denyut: 0, volumeTotal: NaN, sirkuit: null })
+  // Di bawah ~12% Ees normal, kurva pengisian pasif eksponensial membuat tekanan diastolik LV
+  // melampaui tekanan aorta (katup 'membuka' saat diastole): artefak model, jadi ditolak.
+  if (p.lv.ees < 0.12 * BILIK_RUJUKAN.ees) return gagal('kontraktilitas LV di bawah rentang sah model (< 12% normal)')
   if (!(p.hr >= 20 && p.hr <= 220) || !(p.svr > 0) || !(p.pvr > 0) || !(p.volumeDarah > 2000) || !(p.lv.ees >= 0) || !(p.rv.ees >= 0)) return gagal('parameter di luar rentang')
 
   const periode = 60 / p.hr, langkah = Math.round(periode / dt)
@@ -206,3 +209,4 @@ export function trombosisOksigenator(jam: number): { faktorBekuan: number; fungs
   const faktorBekuan = 1 + t / 24
   return { faktorBekuan, fungsiMembran: 1 / (1 + 0.6 * (faktorBekuan - 1)) }
 }
+export { BILIK_RUJUKAN as BILIK_RUJUKAN_LV }

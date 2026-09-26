@@ -5,6 +5,7 @@ import {
 } from '../lib/ecmo/mesin'
 import { MODEL, BUKTI } from '../lib/ecmo/bukti'
 import { Prosa } from './Prosa'
+import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
 
@@ -40,7 +41,7 @@ const KENDALI_VV: Kendali<MasukanVV>[] = [
 // VA: aliran LV asli dan aliran ECMO BUKAN penggeser; keduanya keluaran sirkulasi.
 interface KendaliHemo { id: 'ees' | 'rpm' | 'volume' | 'svr'; label: string; min: number; max: number; step: number; unit: string }
 const KENDALI_HEMO: KendaliHemo[] = [
-  { id: 'ees', label: 'LV contractility (% of normal)', min: 10, max: 100, step: 5, unit: '%' },
+  { id: 'ees', label: 'LV contractility (% of normal)', min: 15, max: 100, step: 5, unit: '%' },
   { id: 'rpm', label: 'Pump speed', min: 0, max: 5000, step: 100, unit: 'rpm' },
   { id: 'volume', label: 'Blood volume', min: 4500, max: 6000, step: 50, unit: 'mL' },
   { id: 'svr', label: 'SVR', min: 0.6, max: 2, step: 0.05, unit: 'mmHg·s/mL' },
@@ -157,6 +158,15 @@ export function PanelEcmo() {
   const kVv = useMemo(() => simulasiVV(vv), [vv])
   const [jamBekuan, setJamBekuan] = useState(0)
   const [frKanula, setFrKanula] = useState(19)
+  const [skenarioId, setSkenarioId] = useState<string | null>(null)
+  const [awalSk, setAwalSk] = useState<HasilGabungan | null>(null)
+  const dasarSk = useMemo(() => jalankan(DASAR), [])
+  const mulaiSkenario = (id: string) => {
+    const s = SKENARIO.find((x) => x.id === id); if (!s) return
+    const k = s.terapkan(DASAR)
+    setHemo(k.hemo); setVa({ ...VA0, ...k.gas }); setJamBekuan(k.jamBekuan); setAwalSk(jalankan(k)); setSkenarioId(id); setTrace([])
+    sebelumHemo.current = k.hemo; sebelumVa.current = { ...VA0, ...k.gas }
+  }
   const [adaDpc, setAdaDpc] = useState(false)
   const bekuan = trombosisOksigenator(jamBekuan)
   const hemoAktif = useMemo<ParameterSirkulasi>(() => ({ ...hemo, ecmo: { ...hemo.ecmo, faktorBekuan: bekuan.faktorBekuan } }), [hemo, bekuan.faktorBekuan])
@@ -252,6 +262,36 @@ export function PanelEcmo() {
           </div>
         </>
       )}
+
+      {mode === 'VA' && (() => {
+        const s = SKENARIO.find((x) => x.id === skenarioId)
+        const kKini: KeadaanSkenario = { hemo, gas: va, jamBekuan }
+        const gKini = s ? jalankan(kKini) : null
+        const selesai = s && gKini ? s.selesai(dasarSk, gKini, kKini) : false
+        const baris = (p: Petunjuk) => <li key={p.id} className="flex justify-between gap-2"><span>{p.nama}</span><span className="shrink-0 tabular-nums text-neutral-400">{p.satuan === '' && p.id !== 'o2' ? `${pct(p.dari)} → ${pct(p.ke)}` : p.id === 'o2' ? '' : `${n0(p.dari, 1)} → ${n0(p.ke, 1)} ${p.satuan}`}</span></li>
+        return (
+          <div className="space-y-1.5 rounded-xl bg-white/5 p-2.5" data-ecmo-skenario>
+            <h4 className="text-[11px] font-black uppercase text-neutral-400">Crisis scenarios</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {SKENARIO.map((x) => <button key={x.id} type="button" aria-pressed={skenarioId === x.id} onClick={() => mulaiSkenario(x.id)}
+                className={`min-h-10 rounded-full px-3 text-[11px] font-bold ${skenarioId === x.id ? 'bg-rose-600' : 'bg-white/10'}`}>{x.judul}</button>)}
+            </div>
+            {s && awalSk && (
+              <>
+                <p className="text-[12px] text-neutral-300">Started: {s.pemicu}. Work it out from the physiology, then correct it with the controls below.</p>
+                <p className="text-[10px] font-bold uppercase text-neutral-500">What changed when it started (computed)</p>
+                <ul className="space-y-0.5 text-[12px] text-neutral-200" data-ecmo-petunjuk>{petunjuk(dasarSk, awalSk).map(baris)}</ul>
+                <p role="status" data-ecmo-selesai={selesai ? 'ya' : 'tidak'} className={`text-[12px] font-bold ${selesai ? 'text-emerald-400' : 'text-amber-300'}`}>{selesai ? 'Physiology restored.' : 'Not yet restored.'}</p>
+                {selesai && gKini && (<>
+                  <p className="text-[10px] font-bold uppercase text-neutral-500">Debrief: what your actions changed</p>
+                  <ul className="space-y-0.5 text-[12px] text-neutral-200">{petunjuk(awalSk, gKini).map(baris)}</ul>
+                </>)}
+                <Prosa kelas="text-[10px] text-neutral-500">{`Not simulated here: ${s.batas}`}</Prosa>
+              </>
+            )}
+          </div>
+        )
+      })()}
 
       {mode === 'VA' && kHemo.sah && (() => {
         // Ginjal hanya butuh hemodinamika; ubin yang butuh oksigen menjadi '—' bila model O2 menolak.

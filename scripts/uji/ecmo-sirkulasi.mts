@@ -14,6 +14,8 @@ const halus = S(N, 60, 0.00025)
 assert.ok(Math.abs(halus.map - n.map) / n.map < 0.01 && Math.abs(halus.coAsli - n.coAsli) / n.coAsli < 0.02, 'hasil tidak boleh bergantung pada langkah waktu')
 assert.equal(S({ ...N, hr: 0 }).sah, false, 'HR 0 harus gagal-tertutup')
 assert.equal(S({ ...N, volumeDarah: 1000 }).sah, false)
+assert.equal(S({ ...N, lv: { ...N.lv, ees: N.lv.ees * 0.08 } }).sah, false, 'Ees < 12% normal: di luar rentang sah (artefak EDPVR), harus ditolak')
+assert.ok(S({ ...CS, lv: { ...CS.lv, ees: N.lv.ees * 0.15 } }).sah, 'Ees 15% masih dalam rentang sah')
 
 // Level 3: pita dewasa normal (kalibrasi ilustratif yang dikunci).
 di(n.map, 70, 105, 'MAP normal'); di(n.coAsli, 4, 7, 'CO normal'); di(n.cvp, 1, 8, 'CVP normal')

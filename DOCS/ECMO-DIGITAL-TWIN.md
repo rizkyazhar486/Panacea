@@ -50,7 +50,7 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 | 10–15 | Lungs (mechanics), brain, kidney, liver, limb, hematology | kidney: RPP = distal MAP − CVP, illustrative autoregulation, creatinine by Chen 2013 mass balance (slow, projected); brain: head–neck DO₂ from the VA partition + PaCO₂ direction (ICP/CPP not modeled); splanchnic DO₂ + CVP; limb: residual lumen from cannula size + DPC (direction per Marbach 2022). Lung mechanics, liver synthetic function, hematology not started |
 | 16–18 | Cannulation, ultrasound, ICU scene | not started |
 | 19 | Body Exposure 3D overlays | not started (2D schematics only) |
-| 20–21 | Crisis scenarios, weaning | first crisis: progressive oxygenator thrombosis over hours (ΔP ↑, flow ↓, drainage less negative, gas transfer ↓, dual-circulation shift) — rate illustrative. Others and weaning not started |
+| 20–21 | Crisis scenarios, weaning | registry `src/lib/ecmo/skenario.ts` (gate `scripts/uji/ecmo-skenario.mts`): drainage insufficiency, sweep failure, pump stop, oxygenator thrombosis, LV distension. Clues are computed from the state change; resolution is judged from physiology; wrong fixes (e.g. more RPM for hypovolaemia) do not resolve. Chatter oscillation, retrograde pump flow and unloading devices are declared not simulated. Weaning not started |
 | 22 | Explanations | done: causal trace generated from state differences |
 | 23 | Conference mode | not started |
 | 24 | Validation suite | numerical + directional golden tests; sabotaged |
@@ -65,6 +65,9 @@ The default VV patient (CO 7.5, Q 4, Hb 10, VO₂ 320) sits in the ELSO-typical 
 
 - Creatinine: with production taken from a 70 kg steady state (≈1.4 g/day) and Vd = 0.6·weight, anuria raises Cr ≈3.4 mg/dL/day — a physical consequence of the stated inputs, often higher than bedside rises where residual filtration persists.
 
+- LV contractility below 12% of normal is rejected: the exponential passive-filling curve otherwise makes diastolic LV pressure exceed aortic pressure (an artefact, not physiology).
+- Known accessibility defect (shared): the `Prosa` "i" disclosure button is 28 px. An invisible ::after hit-area extension was tried and a browser hit-test showed it did not work, so it was reverted; needs a proper fix in the shared component.
+
 ## Next increment
 
-More crisis scenarios on the same engine (drainage insufficiency/chatter, pump failure, sweep gas failure, LV distension) and VV hemodynamic coupling.
+VV hemodynamic coupling (VV flow on the same circulation; recirculation from geometry + flow), VV-side crises (recirculation, refractory hypoxaemia), then weaning modes (VV sweep-off trial per ELSO VV Table 7; VA flow reduction with native-function assessment).
