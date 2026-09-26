@@ -142,6 +142,8 @@ export interface EMRRecord {
   /** Id pengguna penanda tangan — dicap server (lihat server/src/rekamKlinis.ts). */
   signedById?: string
   signedAt?: string
+  /** Asal per kolom isian ('anamnesis.rps', 'physicalExam.perSystem', …) — dicap server; klien hanya boleh menyatakan 'AI'. */
+  asalIsian?: Record<string, { asal: 'AI' | 'Dokter'; olehId?: string; pada?: string }>
   /** Kunjungan tertutup sebelumnya (dicap server saat kunjungan ditutup). */
   previousEncounterId?: string
   // The downstream half of the care journey — everything the clinical plan

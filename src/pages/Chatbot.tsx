@@ -299,6 +299,9 @@ export function Chatbot() {
         id: existing?.id ?? uid(), patientId: activePatient.id, createdAt: existing?.createdAt ?? now, updatedAt: now,
         anamnesis: { keluhanUtama: d.keluhanUtama, rps: d.rps, rpd: d.rpd, rpk: d.rpk, riwayatKehamilan: '', riwayatPengobatan: d.riwayatPengobatan, riwayatAlergi: d.riwayatAlergi, riwayatTumbuhKembang: '', riwayatNutrisi: d.riwayatNutrisi, riwayatImunisasi: '', riwayatSosialEkonomi: d.riwayatSosialEkonomi },
         physicalExam: existing?.physicalExam ?? { general: '', vitalsNote: autoObjective(messages, ctxOf(store).latestVitals), perSystem: d.suggestedExams.map((s) => `• [AI SUGGESTION] ${s}`).join('\n'), doctorVerified: false },
+        // Kolom yang ditulis AI dinyatakan 'AI' agar server tidak mencapnya sebagai tulisan dokter
+        // meski Chatbot dipakai di sesi dokter.
+        asalIsian: { ...(existing?.asalIsian ?? {}), ...Object.fromEntries(['keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatPengobatan', 'riwayatAlergi', 'riwayatNutrisi', 'riwayatSosialEkonomi'].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])), ...(existing?.physicalExam ? {} : { 'physicalExam.vitalsNote': { asal: 'AI' as const }, 'physicalExam.perSystem': { asal: 'AI' as const } }) },
         problems: d.problems.map((pr) => ({ id: uid(), ...pr })), plan, prognosis: d.prognosis, references: d.references,
       }
       saveRecord(record); nav('/emr')

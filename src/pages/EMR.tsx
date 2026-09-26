@@ -25,7 +25,7 @@ import { KunjunganEmr } from '../components/KunjunganEmr'
 import { statusSistemFisik } from '../lib/bodyClinicalFindings'
 import { statusTinjauRekam } from '../lib/statusTandaTangan'
 import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
-import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
+import { labelAsalIsian, labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, StatusSistemFisik, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -191,10 +191,10 @@ export function EMR() {
   }
 
   function setAnamnesis(key: keyof Anamnesis, value: string) {
-    patch((r) => ({ ...r, anamnesis: { ...r.anamnesis, [key]: value }, updatedAt: new Date().toISOString() }))
+    patch((r) => ({ ...r, anamnesis: { ...r.anamnesis, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `anamnesis.${key}`), updatedAt: new Date().toISOString() }))
   }
   function setExam(key: keyof PhysicalExam, value: string | boolean) {
-    patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, [key]: value }, updatedAt: new Date().toISOString() }))
+    patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `physicalExam.${key}`), updatedAt: new Date().toISOString() }))
   }
 
   function save() {
@@ -285,6 +285,7 @@ export function EMR() {
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
                 {f.label}
+                {draft.anamnesis[f.key]?.trim() && <LencanaAsal asal={draft.asalIsian?.[`anamnesis.${f.key}`]} />}
               </label>
               <textarea
                 value={draft.anamnesis[f.key]}
@@ -340,18 +341,21 @@ export function EMR() {
         <div className="grid gap-4">
           <ExamField
             label="General Condition & Level of Consciousness"
+            asal={draft.physicalExam.general?.trim() ? draft.asalIsian?.['physicalExam.general'] ?? null : undefined}
             value={draft.physicalExam.general}
             onChange={(v) => setExam('general', v)}
             rows={2}
           />
           <ExamField
             label="Vital Signs (clinical notes)"
+            asal={draft.physicalExam.vitalsNote?.trim() ? draft.asalIsian?.['physicalExam.vitalsNote'] ?? null : undefined}
             value={draft.physicalExam.vitalsNote}
             onChange={(v) => setExam('vitalsNote', v)}
             rows={2}
           />
           <ExamField
             label="Examination by system (AI workup suggestions below — complete the findings)"
+            asal={draft.physicalExam.perSystem?.trim() ? draft.asalIsian?.['physicalExam.perSystem'] ?? null : undefined}
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
@@ -359,7 +363,7 @@ export function EMR() {
           <StatusSistemEditor
             value={draft.physicalExam.statusSistem ?? {}}
             findings={systemFindings}
-            onChange={(statusSistem) => patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, statusSistem }, updatedAt: new Date().toISOString() }))}
+            onChange={(statusSistem) => patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, statusSistem }, asalIsian: tanpaDeklarasi(r.asalIsian, 'physicalExam.statusSistem'), updatedAt: new Date().toISOString() }))}
           />
         </div>
       </Card>
@@ -592,13 +596,28 @@ function StatusSistemEditor({ value, findings, onChange }: { value: Record<strin
   )
 }
 
+/** Suntingan manual menghapus cap/deklarasi kolom itu: server mencap ulang dari penulis. */
+function tanpaDeklarasi(a: EMRRecord['asalIsian'], kunci: string) {
+  if (!a?.[kunci]) return a
+  const { [kunci]: _hapus, ...sisa } = a
+  return sisa
+}
+
+function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' } }) {
+  const l = labelAsalIsian(asal)
+  return <span className={`ml-1.5 text-[10px] font-semibold ${asal?.asal === 'Dokter' ? 'text-brand-dark' : asal ? 'text-amber-700' : 'text-neutral-400'}`} data-asal-isian={asal?.asal ?? 'unknown'}>{l}</span>
+}
+
 function ExamField({
   label,
   value,
   onChange,
   rows,
+  asal,
 }: {
   label: string
+  /** undefined = kolom kosong (tanpa lencana); null = terisi tanpa cap asal. */
+  asal?: { asal: 'AI' | 'Dokter' } | null
   value: string
   onChange: (v: string) => void
   rows: number
@@ -607,6 +626,7 @@ function ExamField({
     <div>
       <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
         {label}
+        {asal !== undefined && <LencanaAsal asal={asal ?? undefined} />}
       </label>
       <textarea
         value={value}

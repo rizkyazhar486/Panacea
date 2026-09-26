@@ -25,6 +25,9 @@ function tanpaPersetujuanPasien(value: any) {
     delete copy.surgery.consent
     if (Object.keys(copy.surgery).length === 0) delete copy.surgery
   }
+  // Cap asal per kolom adalah metadata server, bukan isi klinis: salinan klien yang
+  // basi tidak boleh membatalkan tanda tangan yang sah.
+  delete copy.asalIsian
   return copy
 }
 
@@ -90,6 +93,32 @@ function terapkanAsalPerButir(lama: any | undefined, r: any, penulis: Penulis, k
     }
     return out
   })
+}
+
+// Asal per KOLOM isian (anamnesis & pemeriksaan fisik). Kolom yang berubah dicap
+// dari penulis terautentikasi: non-klinisi -> 'AI' (intake AI / isian pasien);
+// klinisi -> 'Dokter' + olehId, kecuali klien menyatakan 'AI' (mis. Chatbot di sesi
+// dokter) — menurunkan asal tidak pernah eskalasi. Kolom tak berubah mempertahankan
+// capnya; cap dari klien selain deklarasi 'AI' diabaikan.
+const KOLOM_ANAMNESIS = ['keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatKehamilan', 'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang', 'riwayatNutrisi', 'riwayatImunisasi', 'riwayatSosialEkonomi']
+const KOLOM_FISIK = ['general', 'vitalsNote', 'perSystem', 'statusSistem']
+export const KOLOM_ASAL = [...KOLOM_ANAMNESIS.map((k) => `anamnesis.${k}`), ...KOLOM_FISIK.map((k) => `physicalExam.${k}`)]
+
+function ambil(o: any, jalur: string) { const [a, b] = jalur.split('.'); return o?.[a]?.[b] }
+const kosong = (v: unknown) => v === undefined || v === null || v === '' || (typeof v === 'object' && !Array.isArray(v) && Object.keys(v as object).length === 0)
+
+function terapkanAsalIsian(lama: any | undefined, r: any, penulis: Penulis, kini: Date) {
+  const asalLama = (lama?.asalIsian ?? {}) as Record<string, any>
+  const deklarasi = (r?.asalIsian ?? {}) as Record<string, any>
+  const keluar: Record<string, { asal: 'AI' | 'Dokter'; olehId?: string; pada: string }> = {}
+  for (const k of KOLOM_ASAL) {
+    const baru = ambil(r, k)
+    if (kosong(baru)) continue
+    if (lama && sama(ambil(lama, k), baru)) { if (asalLama[k]) keluar[k] = asalLama[k]; continue }
+    const asal = !penulis.klinisi || deklarasi[k]?.asal === 'AI' ? 'AI' : 'Dokter'
+    keluar[k] = asal === 'Dokter' ? { asal, olehId: penulis.id, pada: kini.toISOString() } : { asal, pada: kini.toISOString() }
+  }
+  r.asalIsian = keluar
 }
 
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
@@ -164,6 +193,7 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
     }
   }
   terapkanAsalPerButir(lama, r, penulis, kini)
+  terapkanAsalIsian(lama, r, penulis, kini)
   const berubah = lama && !sama(lama, r)
   return { rekam: r, ...(lama?.signedAt && berubah ? { arsip: { ...lama, diarsipkanPada: kini.toISOString(), diarsipkanOleh: penulis.id } } : {}) }
 }

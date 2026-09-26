@@ -13,3 +13,9 @@ export function labelAsalRencana(b: Pick<PlanItem, 'source' | 'status' | 'verifi
   if (b.status === 'diverifikasi') return b.verifiedById ? 'doctor-verified' : 'verified · verifier not recorded'
   return b.source === 'Dokter' ? 'doctor proposal · not verified' : 'AI suggestion · not verified'
 }
+
+/** Label asal satu kolom isian; tanpa cap (data lama) = asal tak tercatat, tidak diklaim dokter. */
+export function labelAsalIsian(a?: { asal: 'AI' | 'Dokter' }): string {
+  if (!a) return 'origin not recorded'
+  return a.asal === 'Dokter' ? 'doctor-written' : 'AI draft / patient-entered'
+}
