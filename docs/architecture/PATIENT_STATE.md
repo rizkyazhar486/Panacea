@@ -1,5 +1,7 @@
 # Canonical Patient State
 
+Canonical architecture doctrine: [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](../../PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).
+
 ## Goal
 Provide one coherent longitudinal representation of what Panaceamed knows about a person while preserving source, time, confidence and truth class.
 
