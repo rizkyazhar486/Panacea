@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict'
+import { createDomainEngineRegistry, runPhysiologicalSimulation } from '../../src/lib/physiology/runtime.ts'
+import { cardiovascularIdentityEngine } from '../../src/lib/physiology/cardiovascularIdentityEngine.ts'
+import { arterialOxygenContentEngine, systemicOxygenDeliveryEngine } from '../../src/lib/physiology/oxygenTransportEngine.ts'
 import {
   comparePredictionToObservation,
   createRealityErrorLedger,
@@ -201,3 +204,83 @@ assert.deepEqual(replayA.ledger.statusByPredictionId,replayB.ledger.statusByPred
 assert.equal(replayA.ledger.revision,replayB.ledger.revision)
 
 console.log('reality-error-ledger task3: deterministic candidate matching and replay')
+
+
+// Infrastructure composition fixture only: this does not establish that the
+// current algebraic cardio/O2 chain is a validated prospective patient model.
+const physiologyRegistry = createDomainEngineRegistry(
+  [systemicOxygenDeliveryEngine(), cardiovascularIdentityEngine(), arterialOxygenContentEngine()],
+  [
+    { name:'cardio.heart_rate', unit:'bpm' },
+    { name:'cardio.lv.edv', unit:'mL' },
+    { name:'cardio.lv.esv', unit:'mL' },
+    { name:'blood.hemoglobin', unit:'g/dL' },
+    { name:'arterial.oxygen_saturation', unit:'1' },
+    { name:'arterial.po2', unit:'mmHg' },
+  ],
+)
+const boundary = (name:string, unit:string, value:number, sigma:number|null) => ({
+  name, unit, value, sigma, truthClass:'measured' as const,
+  source:{ id:`event:${name}`, sourceId:'fixture', capturedAt:'2026-09-27T11:00:00.000Z', semanticState:'measured' as const },
+})
+const physiology = runPhysiologicalSimulation({
+  registry: physiologyRegistry,
+  boundaryConditions:[
+    boundary('cardio.heart_rate','bpm',70,1),
+    boundary('cardio.lv.edv','mL',120,2),
+    boundary('cardio.lv.esv','mL',50,2),
+    boundary('blood.hemoglobin','g/dL',15,0.2),
+    boundary('arterial.oxygen_saturation','1',0.98,0.005),
+    boundary('arterial.po2','mmHg',100,2),
+  ],
+  untilSeconds:0,
+})
+const do2 = physiology.latest['systemic.oxygen_delivery']
+assert.equal(do2.truthClass, 'model-derived')
+assert.ok(do2.provenance.engineId)
+assert.ok(do2.provenance.modelId)
+assert.ok(do2.provenance.modelVersion)
+assert.ok(do2.provenance.parameterSetId)
+assert.ok(do2.provenance.validationClass)
+assert.ok(do2.provenance.fidelity)
+
+const runtimePrediction = prediction({
+  id:'pred-do2',
+  field:do2.name,
+  unit:do2.unit,
+  predictedValue:do2.value,
+  predictedSigma:do2.sigma,
+  createdAt:'2026-09-27T11:00:00.000Z',
+  targetAt:'2026-09-27T11:05:00.000Z',
+  provenance:{
+    provenanceId:do2.provenance.id,
+    engineId:do2.provenance.engineId!,
+    modelId:do2.provenance.modelId!,
+    modelVersion:do2.provenance.modelVersion!,
+    parameterSetId:do2.provenance.parameterSetId!,
+    validationClass:do2.provenance.validationClass!,
+    fidelity:do2.provenance.fidelity!,
+    parentProvenanceIds:do2.provenance.parents,
+  },
+})
+const runtimeLedger = recordRealityPrediction(createRealityErrorLedger('subject-1'),runtimePrediction).ledger
+const runtimeComparison = comparePredictionToObservation(
+  runtimeLedger,
+  'pred-do2',
+  observation({
+    id:'obs-do2',
+    metric:do2.name,
+    unit:do2.unit,
+    value:do2.value + 20,
+    recordedAt:'2026-09-27T11:05:00.000Z',
+    provenance:{sourceKind:'device',sourceId:'fixture:do2-observation',capturedAt:'2026-09-27T11:05:00.000Z',receivedAt:'2026-09-27T11:05:01.000Z'},
+  }),
+  {matchToleranceMs:0,comparisonCreatedAt:'2026-09-27T11:05:02.000Z'},
+)
+assert.equal(runtimeComparison.comparison.signedError,20)
+assert.equal(runtimeComparison.comparison.predictionProvenanceId,do2.provenance.id)
+assert.equal(runtimeComparison.ledger.predictionsById['pred-do2'].provenance.modelId,do2.provenance.modelId)
+assert.equal(runtimeComparison.ledger.predictionsById['pred-do2'].provenance.modelVersion,do2.provenance.modelVersion)
+assert.equal(runtimeComparison.ledger.predictionsById['pred-do2'].provenance.parameterSetId,do2.provenance.parameterSetId)
+
+console.log('reality-error-ledger task4: cardio/O2 integration fixture is infrastructure evidence only')
