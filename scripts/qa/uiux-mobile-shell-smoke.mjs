@@ -2,12 +2,20 @@ import { mkdir } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
 
 const origin = process.env.UIUX_MOBILE_QA_ORIGIN || 'http://127.0.0.1:4173'
-const outDir = process.env.UIUX_MOBILE_QA_DIR || 'artifacts/uiux-mobile-390x844'
+const viewportWidth = Number(process.env.UIUX_MOBILE_QA_WIDTH || 390)
+const viewportHeight = Number(process.env.UIUX_MOBILE_QA_HEIGHT || 844)
+if (!Number.isInteger(viewportWidth) || viewportWidth < 280 || viewportWidth > 1024) {
+  throw new Error(`invalid UIUX_MOBILE_QA_WIDTH: ${process.env.UIUX_MOBILE_QA_WIDTH ?? ''}`)
+}
+if (!Number.isInteger(viewportHeight) || viewportHeight < 480 || viewportHeight > 1600) {
+  throw new Error(`invalid UIUX_MOBILE_QA_HEIGHT: ${process.env.UIUX_MOBILE_QA_HEIGHT ?? ''}`)
+}
+const outDir = process.env.UIUX_MOBILE_QA_DIR || `artifacts/uiux-mobile-${viewportWidth}x${viewportHeight}`
 await mkdir(outDir, { recursive: true })
 
 const browser = await chromium.launch({ headless: true })
 const context = await browser.newContext({
-  viewport: { width: 390, height: 844 },
+  viewport: { width: viewportWidth, height: viewportHeight },
   deviceScaleFactor: 3,
   isMobile: true,
   hasTouch: true,
@@ -98,7 +106,7 @@ for (const surface of surfaces) {
   // still leaves visual evidence in the always-uploaded workflow artifact.
   await page.screenshot({ path: `${outDir}/${surface.id}.png`, fullPage: false })
 
-  if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) {
+  if (metrics.viewport.width !== viewportWidth || metrics.viewport.height !== viewportHeight) {
     throw new Error(`${surface.id}: unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
   }
   if (metrics.overflowPx > 2) {
@@ -106,7 +114,7 @@ for (const surface of surfaces) {
   }
   for (const [name, rect] of [['header', metrics.header], ['zoneNav', metrics.zoneNav], ['surface', metrics.surface]]) {
     if (!rect) throw new Error(`${surface.id}: missing ${name}`)
-    if (rect.left < -1 || rect.right > 391) {
+    if (rect.left < -1 || rect.right > viewportWidth + 1) {
       throw new Error(`${surface.id}: ${name} escapes viewport: ${JSON.stringify(rect)}`)
     }
   }
