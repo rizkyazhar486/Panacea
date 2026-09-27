@@ -38,13 +38,14 @@ try {
   const draws = () => page.evaluate(() => window.__atlasDraws)
   async function stable() {
     const initialDraws = await draws()
-    // Enam detik mencakup kamera fit + ekor damping; tidak mengasumsikan FPS.
-    for (let attempt = 0; attempt < 24; attempt++) {
-      const before = await draws()
-      await page.waitForTimeout(250)
-      if (before === await draws()) return
+    // Jeda antargambar bukan bukti idle pada SwiftShader yang lambat.
+    // Tunggu pekerjaan RAF habis; polling timer tidak menambah RAF tes sendiri.
+    try {
+      await page.waitForFunction(() => window.__atlasFrames.size === 0, null, { polling: 50, timeout: 30000 })
+    } catch {
+      const pending = await page.evaluate(() => window.__atlasFrames.size)
+      throw new Error(`Atlas did not become idle (${await draws() - initialDraws} GPU draws, ${pending} pending RAF callbacks)`)
     }
-    throw new Error(`Atlas did not become idle (${await draws() - initialDraws} GPU draws during the settling window)`)
   }
   async function idle(label, duration = 750) {
     await stable()
