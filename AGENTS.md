@@ -7,6 +7,18 @@
 
 For healthcare impact, every agent must also follow [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md). It defines the standing outcome function, hard clinical gates, evidence tiers, human-AI rule, interoperability/access requirements, learning loop, and anti-feature-count law. A future stronger model should deepen validated benefit rather than merely increase code or feature volume.
 
+## Computational Human Platform — canonical vertical-depth doctrine
+
+Every current and future agent must also read and apply [PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md). It defines Panaceamed as a Computational Human Platform: one canonical patient-record state plus a distinct model-derived Physiological State Engine, specialized domain engines, explicit cross-system coupling, shared scientific infrastructure, and multiple projections such as Clinical, AI-EMR, Body Exposure and simulation.
+
+This doctrine changes the default optimization target from breadth to **validated vertical depth**. After hard safety/security/data/clinical blockers, prefer shared infrastructure -> specialized domain engine -> cross-system coupling -> validation -> projection convergence -> optimization before net-new surface breadth. Do not optimize for route count, widget count, component count, commit count or visual spectacle.
+
+The depth heuristic is architectural, not clinical:
+
+`S_vertical = D_domain × D_model × D_infrastructure × D_integration × D_validation`.
+
+The existing Canonical Patient State remains authoritative for measured/recorded patient truth. Simulated, inferred and model-derived physiological states remain separate truth classes and must not silently overwrite the clinical record. The Universal Human Gold Standard remains whole-body and uniform.
+
 For product prioritization, every agent must also follow [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Panaceamed's primary product center is personalized longitudinal longevity, wellness and healthy aging: one canonical health state combining blood/laboratory trends, personal baselines, biological-age trajectory, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition, environment and real-world wellness exposures such as sauna/bath-house check-ins. Stabilization, security, privacy and clinical-safety blockers still outrank feature expansion.
 
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
