@@ -9,11 +9,15 @@ The repository owner's latest explicit instruction remains the highest product-d
 
 **Healthcare humanity-impact annex:** [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md) is a normative annex for all healthcare-facing work. Every current or future model must use it to prioritize measurable outcomes, safety/evidence, access/equity, efficiency, interoperability, human agency, and controlled learning over raw feature count or code volume.
 
+**Computational-human architecture doctrine:** [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md) is the canonical product-architecture doctrine beneath this Constitution and the Humanity 10 Charter. It requires Panaceamed to mature as a Computational Human Platform with distinct recorded patient truth and model-derived physiological state, specialized domain engines, explicit cross-system coupling, shared provenance/uncertainty/validation infrastructure, and reusable projections. It does not weaken any evidence, safety, privacy, external-validation or human-review requirement in this Constitution.
+
 ---
 
 ## 1. Mission
 
 Panacea is not merely a health application. It is intended to become a continuously improving health, biomedical, clinical, education, research, and human-performance operating system that converts trustworthy evidence and validated observations into useful understanding, safer action, testable hypotheses, and new knowledge.
+
+Architecturally, Panaceamed should converge on a **Computational Human Platform**: shared patient/reference state and evidence feed specialized computational domain engines and explicit cross-system coupling; Clinical Intelligence, AI-EMR, Body Exposure, longitudinal health and simulation become projections of that shared substrate rather than independent feature islands. Ambition should deepen validated computation before multiplying surfaces.
 
 Its long-horizon mission includes:
 - everyday health, prevention, wellness, recovery, nutrition, sleep, exercise and longevity;
