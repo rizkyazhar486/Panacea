@@ -117,3 +117,31 @@ risks:
       physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
       Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
     evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
+
+  - risk_id: risk.speculative_truth_leakage
+    category: scientific_integrity
+    severity: critical
+    state: open
+    description: >-
+      Future-model, hypothesis, simulated, counterfactual, reference or other non-observed outputs could be
+      rendered, persisted or promoted as measured/clinical patient truth as Panacea becomes more capable.
+    mitigation: >-
+      Preserve explicit epistemic/truth class, provenance and promotion boundaries across canonical state,
+      Human Observability, physiology engines and projections; fail closed on unsupported promotion; keep
+      simulation/counterfactual/reference state visibly distinct from observed or clinician-verified truth.
+    evidence: [PANACEA_INVICTUS_PRINCIPLE.md, PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md, PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md, scripts/uji/invictus-canonical-inheritance.mts]
+
+  - risk_id: risk.future_model_lock_in
+    category: product_architecture
+    severity: high
+    state: open
+    description: >-
+      Coupling canonical human state or domain behavior to one AI/model vendor, runtime or proprietary state
+      representation could prevent stronger future models from entering without a rewrite, state fork or loss
+      of longitudinal continuity.
+    mitigation: >-
+      Keep patient truth vendor-neutral; use stable domain/model interfaces, explicit model/version provenance,
+      benchmark and validation gates, rollback/migration paths, and shared canonical state so future models can
+      be replaced or composed without creating parallel humans.
+    evidence: [PANACEA_INVICTUS_PRINCIPLE.md, PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md, PANACEA_PRODUCT_MATURITY_OS.md]
+
