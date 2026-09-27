@@ -74,3 +74,10 @@ The deterministic provenance id is an implementation identifier, not a cryptogra
 `scripts/uji/physiological-runtime.mts` is automatically discovered by `npm run uji`. It covers the fail-closed registry, deterministic scheduler, provenance, longitudinal boundary adapter and synthetic coupling fixture.
 
 Next vertical work should add a literature-grounded domain engine only after its variables, equations, parameter ranges, units, validation target and supported population are explicitly specified. A real organ engine must not inherit the synthetic fixture's constants.
+
+
+## First real domain-engine slice
+
+`src/lib/physiology/cardiovascularIdentityEngine.ts` is the first non-synthetic engine registered on this runtime. It reuses `hemodinamik.ts` for the identities SV = EDV - ESV, CO = HR × SV / 1000 and EF = SV / EDV, propagates known independent input uncertainty, emits only `model-derived` values, and fails closed on unsupported ventricular-volume inputs.
+
+See `DOCS/CARDIOVASCULAR-IDENTITY-ENGINE.md`. Oxygen transport is intentionally deferred until the repository's Hufner/dissolved-O2 constant convention is reconciled body-wide.

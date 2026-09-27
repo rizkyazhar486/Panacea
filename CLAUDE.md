@@ -954,3 +954,8 @@ ECMO digital twin (owner prompt "PANACEA ECMO DIGITAL TWIN") begins in `src/lib/
 ## Physiological runtime foundation — 2026-09-27
 
 The first executable substrate for the Computational Human Platform is implemented at `src/lib/physiology/`. Read `DOCS/PHYSIOLOGICAL-RUNTIME.md` before extending it. Reuse `DomainEngineContract`, the fail-closed registry and deterministic scheduler rather than creating page-local physiology engines. Longitudinal patient events enter only through explicit boundary admission; model outputs remain `model-derived`/`simulated` and never silently become measured clinical state. `exampleEngines.ts` is synthetic infrastructure QA only and must not seed real physiological constants. The existing `multiskala/kernelKopling.ts` remains complementary for grid/multi-scale coupling.
+
+
+## First cardiovascular runtime slice — 2026-09-27
+
+`src/lib/physiology/cardiovascularIdentityEngine.ts` is the first literature-anchored domain engine on the new physiological runtime. Extend it by reusing canonical physiology functions rather than duplicating formulas. Its current scope is only measured-boundary SV/CO/EF identities with uncertainty propagation and fail-closed input bounds. Do not add shared oxygen-transport outputs until the documented 1.34/0.003 vs ECMO 1.39/0.0034 convention discrepancy is resolved into one evidence-backed body-wide constant policy.
