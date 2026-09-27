@@ -48,3 +48,21 @@ test('Body Exposure spatial mode removes the floating assistive control', async 
     'assistive navigation must not float over the Body Exposure spatial canvas',
   )
 })
+
+
+test('mobile command bar stays below the PWA safe area', async () => {
+  const html = await source('index.html')
+  const css = await source('public/panacea-shell-mobile-compact-v49.css')
+
+  assert.match(html, /viewport-fit=cover/, 'the app opts into edge-to-edge viewport rendering')
+  assert.match(
+    html,
+    /apple-mobile-web-app-status-bar-style[^>]*black-translucent/,
+    'standalone iOS intentionally renders beneath the translucent status bar',
+  )
+  assert.match(
+    css,
+    /header\.kaca\.panacea-command-bar\s*\{[\s\S]*?top:\s*max\([^;]*env\(safe-area-inset-top\)[^;]*\)\s*!important/,
+    'the sticky mobile command bar must offset itself below the device safe-area inset',
+  )
+})

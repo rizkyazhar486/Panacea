@@ -13,6 +13,11 @@
     aspect-ratio: auto !important;
     flex: 0 0 auto !important;
     align-self: auto !important;
+    /* `viewport-fit=cover` + translucent iOS status bars make top:0
+       overlap the notch/status region in standalone PWA mode. Keep the same
+       .45rem breathing room on ordinary browsers, but never cross the device
+       safe-area boundary. */
+    top: max(.45rem, env(safe-area-inset-top)) !important;
     margin: .45rem .55rem .2rem !important;
     padding: .4rem .5rem !important;
     gap: .35rem !important;
