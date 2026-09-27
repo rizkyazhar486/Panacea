@@ -28,6 +28,18 @@ This sequencing override changes **priority order**, not the long-term product t
 Accessibility failures, broken mobile flows, dead controls, unsafe clinical-state presentation, loading/error gaps and duplicate-submission hazards are functional defects and may be fixed before the final phase. Purely cosmetic restyling, decorative motion and visual polish remain last.
 
 
+## Computational Human Platform authority — 2026-09-27
+
+For every broad continuation, architecture decision, Body Exposure/simulation task, clinical-infrastructure task, or new feature proposal, Claude Code must read and apply [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).
+
+Panaceamed is now explicitly developed as a **Computational Human Platform**, not a collection of feature surfaces. Preserve one canonical measured/recorded patient state, keep simulated/model-derived physiological state separate, deepen specialized domain engines, make cross-system coupling explicit, and project shared state into Clinical, AI-EMR, Body Exposure, longitudinal health and simulation.
+
+After hard safety/security/data/clinical blockers, default sequencing is:
+
+`DEEPEN SHARED INFRASTRUCTURE -> DEEPEN DOMAIN ENGINE -> COUPLE -> VALIDATE -> PROJECT -> OPTIMIZE -> JUSTIFIED BREADTH`.
+
+A future stronger model should spend additional capability on deeper models, infrastructure, coupling, falsification, validation and integration rather than automatically generating more routes/widgets. Existing longevity sequencing, Universal Human Gold Standard, clinical-validation release gates, provenance rules and no-fake-data boundaries remain in force.
+
 ## Panacea Constitution — parent scientific authority
 
 All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md). It is the model-agnostic parent charter for scientific discovery, R&D, invention, clinical translation, drug discovery, trials, surveillance, publication integrity, continuous model/technology evolution, privacy, safety and validation. The latest explicit owner instruction remains highest product authority, but no model-specific instruction may silently weaken the Constitution's evidence, reproducibility, safety, governance, external-validation, publication-integrity or human-oversight requirements.
