@@ -155,6 +155,16 @@ The default scientific direction is **vertical depth before horizontal breadth**
 
 Hard prohibitions: **superficial, artificial/fabricated and subjective/unsupported representations**. Observed, derived, estimated-latent, simulated, population-reference and unknown states must remain distinguishable. Visualization itself is subject to the No Hollow Gap Principle: scientific fidelity and provenance outrank spectacle.
 
+
+## Depth-over-dispersion execution law — mandatory
+
+All agents must treat breadth as discovery and **validated depth as the default execution mode**. Use:
+
+`EXPLORE -> SELECT -> COMMIT -> DEEPEN -> INTEGRATE -> TEST AGAINST REALITY -> REFINE -> JUSTIFIED EXPANSION`.
+
+Do not fragment implementation across many shallow fronts while a higher-value vertical slice remains incomplete. Drive selected work through shared state, mechanism, coupling, validation, projection and outcome/error feedback as applicable; record genuine external blockers instead of disguising them with new features or visual polish. Reuse deep primitives horizontally only after they are defensible.
+
+
 ## Longitudinal coupled-system requirement
 
 All future computational-human work must preserve the longitudinal operating law from [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
