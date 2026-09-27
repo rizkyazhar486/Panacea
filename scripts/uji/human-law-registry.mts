@@ -3,6 +3,8 @@ import {
   createHumanLawRegistry,
   registerHumanLaw,
   transitionHumanLaw,
+  supersedeHumanLaw,
+  getHumanLawLineage,
   type HumanLawRecord,
 } from '../../src/lib/humanLaw/lawRegistry.ts'
 
@@ -202,3 +204,198 @@ for (const terminal of ['deprecated', 'scope-restricted'] as const) {
 assert.throws(() => transition(lifecycle, 'candidate', '2026-09-28T01:06:00.000Z'), /transition/)
 
 console.log('human-law-registry task2: evidence-gated lifecycle contract')
+
+
+const promoteAccepted = (
+  registry: ReturnType<typeof createHumanLawRegistry>,
+  record: HumanLawRecord,
+  suffix: string,
+) => {
+  let next = registerHumanLaw(registry, record).registry
+  const steps = [
+    ['candidate', []],
+    ['reproduced', [`replication:${suffix}`]],
+    ['mechanistically-supported', [`mechanism:${suffix}`]],
+    ['externally-validated', [`external:${suffix}`]],
+    ['accepted', [`review:${suffix}`]],
+  ] as const
+  for (let i = 0; i < steps.length; i++) {
+    const [to, evidenceRefs] = steps[i]
+    next = transitionHumanLaw(next, record.id, {
+      to,
+      changedAt: `2026-09-28T02:0${i}:00.000Z`,
+      changedBy: 'reviewer:program-a',
+      reason: `promote ${record.id} to ${to}`,
+      evidenceRefs,
+    })
+  }
+  return next
+}
+
+const lawV1 = law()
+const lawV2 = law({
+  id: 'law:recovery-latent-v2',
+  version: '2.0.0',
+  title: 'Candidate latent recovery constraint v2',
+  provenance: {
+    ...law().provenance,
+    codeCommitSha: '1123456789abcdef0123456789abcdef01234567',
+  },
+})
+const lawV3 = law({
+  id: 'law:recovery-latent-v3',
+  version: '3.0.0',
+  title: 'Candidate latent recovery constraint v3',
+  provenance: {
+    ...law().provenance,
+    codeCommitSha: '2123456789abcdef0123456789abcdef01234567',
+  },
+})
+
+let supersession = createHumanLawRegistry()
+supersession = promoteAccepted(supersession, lawV1, 'v1')
+supersession = promoteAccepted(supersession, lawV2, 'v2')
+const beforeSupersession = structuredClone(supersession)
+supersession = supersedeHumanLaw(supersession, {
+  lawId: lawV1.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'v2 reproduces externally and supersedes v1',
+  evidenceRefs: ['external-validation:v2'],
+})
+assert.equal(supersession.lawsById[lawV1.id].status, 'superseded')
+assert.equal(supersession.lawsById[lawV2.id].status, 'accepted')
+assert.equal(supersession.supersededByLawId[lawV1.id], lawV2.id)
+assert.deepEqual(getHumanLawLineage(supersession, lawV1.id), [lawV1.id, lawV2.id])
+assert.equal(beforeSupersession.supersededByLawId[lawV1.id], undefined)
+
+supersession = promoteAccepted(supersession, lawV3, 'v3')
+supersession = supersedeHumanLaw(supersession, {
+  lawId: lawV2.id,
+  replacementLawId: lawV3.id,
+  changedAt: '2026-09-28T02:11:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'v3 supersedes v2',
+  evidenceRefs: ['external-validation:v3'],
+})
+assert.deepEqual(getHumanLawLineage(supersession, lawV1.id), [lawV1.id, lawV2.id, lawV3.id])
+
+const acceptedPair = (() => {
+  let registry = createHumanLawRegistry()
+  registry = promoteAccepted(registry, lawV1, 'pair-v1')
+  registry = promoteAccepted(registry, lawV2, 'pair-v2')
+  return registry
+})()
+
+assert.throws(() => supersedeHumanLaw(acceptedPair, {
+  lawId: 'missing',
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'x',
+  evidenceRefs: ['e:1'],
+}), /unknown law id/)
+assert.throws(() => supersedeHumanLaw(acceptedPair, {
+  lawId: lawV1.id,
+  replacementLawId: 'missing',
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'x',
+  evidenceRefs: ['e:1'],
+}), /replacement/)
+assert.throws(() => supersedeHumanLaw(acceptedPair, {
+  lawId: lawV1.id,
+  replacementLawId: lawV1.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'self',
+  evidenceRefs: ['e:1'],
+}), /itself/)
+
+const generatedV2 = registerHumanLaw(createHumanLawRegistry(), lawV2).registry
+const acceptedV1GeneratedV2 = promoteAccepted(generatedV2, lawV1, 'accepted-source')
+assert.throws(() => supersedeHumanLaw(acceptedV1GeneratedV2, {
+  lawId: lawV1.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'replacement not accepted',
+  evidenceRefs: ['e:1'],
+}), /replacement.*accepted/)
+assert.throws(() => supersedeHumanLaw(generatedV2, {
+  lawId: lawV2.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'source not accepted',
+  evidenceRefs: ['e:1'],
+}), /accepted|itself/)
+
+for (const bad of [
+  { changedBy: ' ', reason: 'x', evidenceRefs: ['e:1'] },
+  { changedBy: 'reviewer:1', reason: ' ', evidenceRefs: ['e:1'] },
+  { changedBy: 'reviewer:1', reason: 'x', evidenceRefs: [] },
+  { changedBy: 'reviewer:1', reason: 'x', evidenceRefs: ['e:1', 'e:1'] },
+] as const) {
+  assert.throws(() => supersedeHumanLaw(acceptedPair, {
+    lawId: lawV1.id,
+    replacementLawId: lawV2.id,
+    changedAt: '2026-09-28T02:10:00.000Z',
+    ...bad,
+  }), /changedBy|reason|evidence|duplicate/)
+}
+
+const onceSuperseded = supersedeHumanLaw(acceptedPair, {
+  lawId: lawV1.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'first',
+  evidenceRefs: ['e:1'],
+})
+assert.throws(() => supersedeHumanLaw(onceSuperseded, {
+  lawId: lawV1.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:11:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'duplicate',
+  evidenceRefs: ['e:2'],
+}), /accepted|superseded|terminal/)
+
+const cyclicGraph = {
+  ...acceptedPair,
+  supersededByLawId: {
+    ...acceptedPair.supersededByLawId,
+    [lawV2.id]: lawV1.id,
+  },
+}
+assert.throws(() => supersedeHumanLaw(cyclicGraph, {
+  lawId: lawV1.id,
+  replacementLawId: lawV2.id,
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'would cycle',
+  evidenceRefs: ['e:1'],
+}), /cycle/)
+assert.throws(() => getHumanLawLineage(acceptedPair, 'missing'), /unknown law id/)
+const lineageCycle = {
+  ...acceptedPair,
+  supersededByLawId: {
+    [lawV1.id]: lawV2.id,
+    [lawV2.id]: lawV1.id,
+  },
+}
+assert.throws(() => getHumanLawLineage(lineageCycle, lawV1.id), /cycle/)
+
+const deprecated = transitionHumanLaw(acceptedPair, lawV1.id, {
+  to: 'deprecated',
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'prospective evidence no longer supports use',
+  evidenceRefs: ['counterexample:42'],
+})
+assert.equal(deprecated.lawsById[lawV1.id].status, 'deprecated')
+assert.equal(deprecated.supersededByLawId[lawV1.id], undefined)
+
+console.log('human-law-registry: provenance-complete lifecycle and reconstructable supersession verified')
