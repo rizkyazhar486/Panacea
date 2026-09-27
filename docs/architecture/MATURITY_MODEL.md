@@ -87,3 +87,34 @@ For the relevant risk level:
 - cross-system coupling is explicit and tested where relevant;
 - shared projections reuse canonical state/model outputs rather than duplicating them;
 - source-of-truth registries are updated.
+
+## No Hollow Gap maturity gate
+
+The mandatory deepening contract is [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](../../PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
+
+For a biological entity (E), optionally track the internal heuristic:
+
+[
+VC(E)=\frac{\sum_i w_iC_i}{\sum_iw_i}
+]
+
+with a hollow-gap floor:
+
+[
+HG(E)=\min_i C_i
+]
+
+where (C_i) is completeness of each scientifically relevant scale and (w_i) is its context-specific weight.
+
+These are prioritization heuristics, never clinical scores; unknown completeness remains unknown.
+
+A capability cannot be declared vertically mature when a critical intermediate biological scale remains essentially absent, even if gross anatomy and genomics are individually excellent. Missing relevant layers must be explicit. Superficial UI/3D polish, artificial/fabricated biological content and subjective/unsupported claims cannot increase vertical maturity.
+
+Definition-of-done additionally requires, where applicable:
+- anatomy -> tissue -> microarchitecture -> cell/niche continuity;
+- organelle/molecular/pathway continuity;
+- RNA/gene/regulatory/chromatin/DNA linkage;
+- physiology/pathophysiology and cross-scale causality;
+- evidence/provenance and explicit truth class;
+- visualization fidelity appropriate to each implemented scale;
+- explicit `VERTICAL GAP — NOT YET MODELED` boundaries rather than fabricated bridges.
