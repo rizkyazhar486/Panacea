@@ -78,7 +78,7 @@ const fakePatientGenome = {
   ...valid,
   nodes: valid.nodes.map((node) => node.id === 'dna' ? { ...node, truthScope: 'patient-specific' as const } : node),
 }
-assert.ok(validateVerticalBiologicalGraph(fakePatientGenome).some((error) => /reference-only molecular/genomic node dna cannot be patient-specific/.test(error)))
+assert.ok(validateVerticalBiologicalGraph(fakePatientGenome).some((error) => error.includes('reference-only molecular/genomic node dna cannot be patient-specific')))
 
 const skipped: VerticalBiologicalGraph = {
   ...valid,
