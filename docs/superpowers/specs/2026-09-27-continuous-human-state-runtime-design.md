@@ -1,7 +1,7 @@
 # Continuous Human State Runtime — Design Specification
 
 **Date:** 2026-09-27  
-**Status:** Owner-approved architectural direction; implementation requires a separate reviewed plan.  
+**Status:** Revised owner-directed architecture; expanded for permissioned real-time human mirroring and zero-trust privacy. Requires owner re-approval before implementation planning.  
 **Parent doctrine:** `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`
 
 ## 1. Product decision
@@ -257,7 +257,216 @@ t_{i,n}=n\Delta t_i
 
 High-frequency ECG must not force renal/endocrine models to run at waveform frequency.
 
-## 14. User-facing state contract
+## 14. Real-time permissioned human mirror
+
+Panaceamed may present a **real-time external human mirror** only from data the user has explicitly permissioned and the device can actually observe.
+
+### External appearance
+
+Examples include:
+- live camera appearance;
+- face/skin surface appearance;
+- posture and gross movement;
+- visible wounds/skin changes when camera quality and permission support them;
+- depth/mesh reconstruction only when a depth-capable source exists.
+
+A normal RGB camera can show a live image, but it must not be represented as an exact metric 3D body surface without appropriate depth/geometry evidence.
+
+Raw camera/video should default to **ephemeral on-device processing** where feasible. Persisting or uploading raw face/body imagery requires a separate explicit purpose-scoped permission.
+
+### Internal body
+
+The internal body shown at the same timestamp may combine:
+- measured physiological observations;
+- imaging-derived anatomy/pathology;
+- reference anatomy;
+- model-estimated physiology;
+- intervention/procedure state.
+
+These layers must remain visually and semantically distinct.
+
+Panaceamed must never imply that an internal structure is literally being seen in real time when it is instead a reference atlas, prior image, inferred state or simulation.
+
+### Consciousness / unconsciousness / cognitive state
+
+Panaceamed may represent **observed or estimated arousal/consciousness-related state** only from supported inputs such as documented clinical examination, EEG/BIS-class signals, sedation/anesthesia context, sleep staging or other validated observations.
+
+It must not claim direct access to thoughts, subjective experience, intention, memory or "mind reading".
+
+The UI must label:
+- observed consciousness examination;
+- device-derived arousal/sedation index;
+- model-estimated state;
+- unavailable/unknown.
+
+## 15. Permission and privacy architecture
+
+Permission is part of state computation, not a settings afterthought.
+
+For every data stream, define:
+
+```text
+subject
++ source/device
++ data class
++ purpose
++ allowed surfaces
++ allowed recipients
++ effective time
++ expiry/revocation
++ retention policy
++ processing location
++ audit trail
+```
+
+A user may permit a wearable HR stream for Your Body while denying raw camera persistence, research export or Clinical access. The runtime must enforce that distinction.
+
+### Consent-scoped access
+
+Authorization must be both identity-aware and purpose-aware.
+
+Prefer:
+- OAuth/OIDC/SMART-style authorization for FHIR-facing integrations;
+- fine-grained scopes;
+- resource/data-class segmentation;
+- consent-aware policy evaluation;
+- RBAC/ABAC where appropriate;
+- explicit device identity and trust state.
+
+Consent withdrawal affects future access immediately. Historical legal/clinical retention obligations, where applicable, must remain separately governed rather than silently deleted or silently retained.
+
+## 16. Security architecture — hard requirement
+
+The continuous human state contains highly sensitive health, biometric, behavioral, device and possibly video data. Security is a first-class architecture layer.
+
+### Zero-trust baseline
+
+No user, device, service, model or network location receives implicit trust.
+
+Every sensitive request requires:
+- authenticated subject/service/device identity;
+- authorization for the exact resource/purpose;
+- token/session freshness;
+- policy evaluation;
+- auditability.
+
+### Data minimization
+
+Collect and retain only what is required for the approved purpose.
+
+Default rules:
+- process raw camera/body imagery on-device when feasible;
+- persist derived features instead of raw media when raw media is unnecessary;
+- do not retain high-frequency raw waveforms indefinitely by default;
+- never reuse health/biometric streams for unrelated analytics, advertising or model training without separate explicit authorization.
+
+### Encryption and keys
+
+Require:
+- modern TLS for data in transit;
+- encryption at rest;
+- hardware/platform-backed key storage on supported devices;
+- server-side key-management service for protected backend keys;
+- key rotation;
+- environment separation;
+- secrets never committed to source control.
+
+For especially sensitive streams, support per-subject/per-tenant cryptographic separation where the deployment architecture permits it.
+
+### Mobile/device security
+
+Mobile clients should be evaluated against OWASP MASVS control families including storage, crypto, authentication, network, platform, code, resilience and privacy.
+
+A compromised/rooted/jailbroken device must not automatically receive unrestricted access to sensitive state; device trust may reduce allowed operations according to policy.
+
+### Audit and provenance
+
+Sensitive access and state mutation must produce append-only/auditable security events containing:
+- actor/service/device;
+- subject;
+- action;
+- resource/data class;
+- purpose;
+- authorization/consent decision;
+- timestamp;
+- outcome;
+- relevant policy/version.
+
+Clinical/resource provenance remains distinct from security audit, but the two must be correlatable.
+
+### Break-glass access
+
+If emergency access is ever supported, it must be:
+- explicitly invoked;
+- narrowly scoped;
+- time-limited;
+- strongly authenticated;
+- prominently audited;
+- reviewable after the event.
+
+There is no silent administrator bypass.
+
+### Retention/deletion
+
+Retention is data-class and purpose specific.
+
+The system must support:
+- retention policy metadata;
+- consent revocation;
+- deletion workflows where legally/operationally permitted;
+- immutable records only where a valid clinical/legal requirement justifies them;
+- export/account closure flows;
+- backups that honor documented retention/deletion lifecycle rather than becoming permanent shadow copies.
+
+### Research and training boundary
+
+Research export or AI-model training is a separate purpose from care/personal use.
+
+It requires:
+- separate authorization/consent basis where applicable;
+- de-identification/pseudonymization appropriate to the use;
+- dataset lineage;
+- access control;
+- reproducibility/audit;
+- no assumption that "user allowed app access" means "user allowed model training".
+
+## 17. Privacy-preserving real-time rendering
+
+Clinical, Your Body and Body Exposure should receive the **minimum projection required for the current surface**, not an unrestricted copy of the entire human-state store.
+
+Example:
+
+```text
+Continuous Human State
+        |
+Policy / Consent Evaluation
+        |
+Projection Builder
+  |        |        |
+Your Body Clinical Body Exposure
+```
+
+The projection builder must strip fields the surface is not authorized to receive.
+
+A skin/face view may use a transient local camera buffer while Clinical receives only derived/authorized findings. Conversely, a clinician may see a signed lab result that Your Body does not need.
+
+## 18. Security acceptance criteria
+
+Before any continuous real-world deployment, the architecture must demonstrate:
+- no sensitive stream without explicit source/purpose authorization;
+- no unauthorized cross-surface state leakage;
+- encryption in transit and at rest;
+- secure local storage/key handling;
+- auditable authorization/consent decisions;
+- revocation enforcement;
+- deterministic separation of measured vs estimated state;
+- no raw camera/biometric persistence unless explicitly enabled;
+- stale/offline data cannot masquerade as live;
+- no silent training/research reuse;
+- recovery/backup procedures preserve security and retention guarantees;
+- security testing against the relevant mobile/API/web threat model.
+
+## 19. User-facing state contract
 
 Every state display in Clinical/Your Body must answer:
 
@@ -269,7 +478,7 @@ Every state display in Clinical/Your Body must answer:
 6. What uncertainty/confidence exists?
 7. What validation class/assumptions apply?
 
-## 15. Safety boundary
+## 20. Safety boundary
 
 Continuous state does not imply autonomous medicine.
 
@@ -283,7 +492,7 @@ The runtime must not:
 - represent reference anatomy as patient-specific anatomy;
 - call an unvalidated model a clinical digital twin.
 
-## 16. Implementation decomposition
+## 21. Implementation decomposition
 
 This program is intentionally split into sequential sub-projects:
 
@@ -297,10 +506,15 @@ This program is intentionally split into sequential sub-projects:
 
 Each sub-project must be independently testable.
 
-## 17. Acceptance criteria
+## 22. Acceptance criteria
 
 Architecture is fulfilled when:
 - one subject has one continuous runtime state;
+- permissioned external appearance can be rendered live from actual camera/depth sources without claiming unsupported internal visibility;
+- internal anatomy/physiology layers clearly distinguish measured/imaged/reference/estimated/simulated state;
+- consciousness/arousal representation is observation/model based and never presented as mind reading;
+- every projection is filtered by consent/purpose policy before reaching Clinical, Your Body or Body Exposure;
+- raw face/body/video data are minimized and default to ephemeral/on-device processing when feasible;
 - Clinical and Your Body query the same snapshot timestamp;
 - measured truth stays separate from estimated state;
 - observations arrive continuously with semantic/unit/provenance contracts;
@@ -313,7 +527,7 @@ Architecture is fulfilled when:
 - Body Exposure/procedure simulators project the same state rather than forking it;
 - future agents cannot create a second patient-state authority.
 
-## 18. References
+## 23. References
 
 Repository authorities:
 - `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`
@@ -325,6 +539,6 @@ Repository authorities:
 - `DOCS/CARDIOVASCULAR-IDENTITY-ENGINE.md`
 - `DOCS/OXYGEN-TRANSPORT-ENGINE.md`
 
-External frameworks to use where appropriate: HL7 FHIR, LOINC, UCUM, DICOM/DICOMweb, IEEE 11073, Fick whole-body oxygen transport, hybrid dynamical systems and state-estimation methods.
+External frameworks to use where appropriate: HL7 FHIR, SMART App Launch/OAuth/OIDC, FHIR Consent/AuditEvent/Provenance/security labels, LOINC, UCUM, DICOM/DICOMweb, IEEE 11073, NIST SP 800-207 zero-trust principles, OWASP MASVS/MASTG, Fick whole-body oxygen transport, hybrid dynamical systems and state-estimation methods.
 
 This specification defines architecture and truth semantics. It does not itself establish clinical validation for any physiological model.
