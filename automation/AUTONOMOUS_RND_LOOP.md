@@ -69,7 +69,15 @@ Look for:
 - duplicated service/API;
 - missing error/loading/empty behavior;
 - missing tests/observability;
-- feature island that should connect to a shared workflow.
+- feature island that should connect to a shared workflow;
+- **Reality Engine / compounding-depth gaps**, where applicable:
+  - prior predictions are not retained for later observed-outcome comparison;
+  - personal parameters are individualized without identifiability/provenance/uncertainty;
+  - unknown/unsupported state is hidden instead of exposed as Reality Gap;
+  - historical state cannot be replayed with original model/version;
+  - counterfactual state can leak into the canonical real timeline;
+  - causal explanation is implied from correlation;
+  - outcome feedback never reaches model-validation/calibration evidence.
 
 ## 4. PRIORITIZE
 Default queue:
@@ -79,11 +87,12 @@ C. canonical-state inconsistency
 D. shared-infrastructure / duplicate-state debt
 E. specialized domain-engine depth gap
 F. cross-system coupling / model-validation gap
-G. projection convergence and workflow maturity
-H. UX friction
-I. performance/observability
-J. visual refinement
-K. net-new feature
+G. compounding-depth gap: identifiability / Reality Gap / replay / prediction-feedback / counterfactual isolation
+H. projection convergence and workflow maturity
+I. UX friction
+J. performance/observability
+K. visual refinement
+L. net-new feature
 
 Priority heuristic:
 
@@ -122,6 +131,35 @@ D_{validation}
 ]
 
 Do not fabricate numeric precision. Prefer improving the weakest relevant factor or removing a shared bottleneck.
+
+For longitudinal computational-human work, also apply:
+
+[
+S_{compound}
+=
+S_{vertical}
+	imes
+D_{personalization}
+	imes
+D_{temporal}
+	imes
+D_{causal}
+	imes
+D_{epistemic}
+	imes
+D_{feedback}
+]
+
+Before net-new breadth, ask:
+- can important predictions be compared against later reality?
+- are personalized parameters actually identifiable and uncertainty-bounded?
+- are important unknowns visible as Reality Gap?
+- can state/history be replayed with original model/version?
+- are simulated counterfactual branches isolated from the real timeline?
+- is causal language supported by mechanism/evidence rather than correlation?
+- does outcome feedback improve validation/calibration evidence?
+
+Hard safety/security/privacy/data/clinical blockers always outrank these experimental deepening dimensions.
 
 A route, widget, component, animation or content-rich page is not a vertical-depth improvement by itself. A model-derived state must remain distinct from measured/recorded patient truth.
 
