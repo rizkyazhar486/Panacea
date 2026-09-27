@@ -964,3 +964,8 @@ The first executable substrate for the Computational Human Platform is implement
 ## Oxygen-content convention registry — 2026-09-27
 
 Use `src/lib/physiology/oxygenContentConventions.ts` for any new shared CaO2/O2-delivery work. Do not hand-type 1.34/1.39 or 0.003/0.0031/0.0034 into another subsystem. The default shared convention currently matches `hemodinamik.ts` (1.34/0.003, Hb g/dL); the theoretical 1.39 convention is separately named; the ELSO VV 2021 verbatim expression is preserved as non-executable until its printed unit inconsistency is explicitly normalized. Do not migrate `ecmo/oksigen.ts` without a versioned recalibration and golden-comparison pass.
+
+
+## First cross-system physiology chain — 2026-09-27
+
+The shared runtime now composes `cardiovascularIdentityEngine.ts` with `oxygenTransportEngine.ts` as a dependency graph: HR/EDV/ESV -> CO; Hb/SaO2/PaO2 -> CaO2; CO + CaO2 -> DO2. Use these canonical field names and engines rather than recoding this chain in UI/features. Preserve the named oxygen-content convention in provenance. This remains mechanistic calculation infrastructure, not diagnosis or treatment guidance.

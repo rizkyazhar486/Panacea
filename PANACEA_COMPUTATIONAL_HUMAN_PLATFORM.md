@@ -214,6 +214,8 @@ As of 2026-09-27, the first code-level whole-body runtime substrate is implement
 - `scripts/uji/physiological-runtime.mts` — deterministic contract gate automatically discovered by `npm run uji`;
 - `DOCS/PHYSIOLOGICAL-RUNTIME.md` — exact status and scientific boundary.
 
+The first real cross-system chain now runs on this substrate: measured ventricular boundaries -> model-derived cardiac output, plus Hb/SaO2/PaO2 -> arterial oxygen content -> systemic oxygen delivery, with dependency ordering, uncertainty and provenance across engine boundaries. See `DOCS/OXYGEN-TRANSPORT-ENGINE.md`.
+
 This foundation does **not** mean Panaceamed has a validated whole-human physiological model. Real organ/system engines remain future vertical work and require literature-grounded equations/parameters, supported-population definitions and validation appropriate to their claims. The existing multiscale kernel remains complementary rather than replaced.
 
 ## 8. One state, many projections

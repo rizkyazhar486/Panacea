@@ -88,3 +88,15 @@ See `DOCS/CARDIOVASCULAR-IDENTITY-ENGINE.md`. Oxygen transport is intentionally 
 `src/lib/physiology/oxygenContentConventions.ts` makes oxygen-content coefficients and their units explicit scientific objects. The current default is `panacea-clinical-effective-v1` (1.34 / 0.003; Hb g/dL), exactly matching `hemodinamik.ts`. A separate theoretical 1.39 / 0.0031 convention is available only by explicit selection. The ELSO VV 2021 verbatim expression is retained but non-executable because its printed Hb-unit convention is dimensionally inconsistent with the dissolved term without normalization.
 
 See `DOCS/OXYGEN-CONTENT-CONVENTIONS.md`. Future domain engines must select a named convention; do not hand-type oxygen-content coefficients.
+
+
+## First real cross-system chain
+
+The first dependency-coupled physiological chain is implemented by:
+- `cardiovascularIdentityEngine.ts` -> cardiac output;
+- `oxygenTransportEngine.ts::arterialOxygenContentEngine()` -> CaO2;
+- `oxygenTransportEngine.ts::systemicOxygenDeliveryEngine()` -> DO2.
+
+The gate deliberately registers these engines out of dependency order; the runtime topologically orders them and preserves exact parent provenance. This proves shared engine coupling rather than page-specific formula chaining.
+
+See `DOCS/OXYGEN-TRANSPORT-ENGINE.md`.
