@@ -1,5 +1,7 @@
 # Cross-Domain Integration Map
 
+Canonical architecture doctrine: [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](../../PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).
+
 ## Purpose
 Make feature relationships inspectable and prevent feature islands.
 
