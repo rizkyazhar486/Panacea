@@ -312,3 +312,115 @@ export function transitionHumanLaw(
     },
   }
 }
+
+
+export interface HumanLawSupersessionInput {
+  lawId: string
+  replacementLawId: string
+  changedAt: string
+  changedBy: string
+  reason: string
+  evidenceRefs: readonly string[]
+}
+
+function assertSupersessionDoesNotCycle(
+  registry: HumanLawRegistry,
+  sourceId: string,
+  replacementId: string,
+): void {
+  const visited = new Set<string>()
+  let current: string | undefined = replacementId
+  while (current) {
+    if (current === sourceId) throw new Error('supersession cycle detected')
+    if (visited.has(current)) throw new Error('supersession cycle detected')
+    visited.add(current)
+    const next: string | undefined = registry.supersededByLawId[current]
+    if (next && !registry.lawsById[next]) {
+      throw new Error(`supersession lineage references unknown law ${next}`)
+    }
+    current = next
+  }
+}
+
+export function supersedeHumanLaw(
+  registry: HumanLawRegistry,
+  input: HumanLawSupersessionInput,
+): HumanLawRegistry {
+  const lawId = nonBlank(input.lawId, 'lawId')
+  const replacementLawId = nonBlank(input.replacementLawId, 'replacementLawId')
+  const source = registry.lawsById[lawId]
+  if (!source) throw new Error(`unknown law id ${lawId}`)
+  const replacement = registry.lawsById[replacementLawId]
+  if (!replacement) throw new Error(`unknown replacement law id ${replacementLawId}`)
+  if (lawId === replacementLawId) throw new Error('law cannot supersede itself')
+  if (source.status !== 'accepted') throw new Error(`source law ${lawId} must be accepted before supersession`)
+  if (replacement.status !== 'accepted') {
+    throw new Error(`replacement law ${replacementLawId} must be accepted before supersession`)
+  }
+  if (registry.supersededByLawId[lawId]) throw new Error(`law ${lawId} is already superseded`)
+
+  const changedAt = parseIso(input.changedAt, 'changedAt')
+  const changedBy = nonBlank(input.changedBy, 'changedBy')
+  const reason = nonBlank(input.reason, 'reason')
+  const evidenceRefs = uniqueRefs(input.evidenceRefs, 'evidenceRefs')
+  if (evidenceRefs.length === 0) throw new Error('supersession requires evidence')
+
+  const history = registry.statusHistoryByLawId[lawId]
+  if (!history?.length) throw new Error(`law ${lawId} has no status history`)
+  const latest = history[history.length - 1]
+  if (Date.parse(changedAt) < Date.parse(latest.changedAt)) {
+    throw new Error('changedAt must not be before the latest status transition')
+  }
+
+  assertSupersessionDoesNotCycle(registry, lawId, replacementLawId)
+
+  const event: HumanLawStatusEvent = {
+    from: 'accepted',
+    to: 'superseded',
+    changedAt,
+    changedBy,
+    reason,
+    evidenceRefs,
+  }
+
+  return {
+    ...registry,
+    revision: registry.revision + 1,
+    lawsById: {
+      ...registry.lawsById,
+      [lawId]: { ...source, status: 'superseded' },
+    },
+    statusHistoryByLawId: {
+      ...registry.statusHistoryByLawId,
+      [lawId]: [...history, event],
+    },
+    supersededByLawId: {
+      ...registry.supersededByLawId,
+      [lawId]: replacementLawId,
+    },
+  }
+}
+
+export function getHumanLawLineage(
+  registry: HumanLawRegistry,
+  lawId: string,
+): readonly string[] {
+  const start = nonBlank(lawId, 'lawId')
+  if (!registry.lawsById[start]) throw new Error(`unknown law id ${start}`)
+
+  const lineage: string[] = []
+  const visited = new Set<string>()
+  let current: string | undefined = start
+
+  while (current) {
+    if (visited.has(current)) throw new Error('supersession cycle detected')
+    if (!registry.lawsById[current]) {
+      throw new Error(`supersession lineage references unknown law ${current}`)
+    }
+    visited.add(current)
+    lineage.push(current)
+    current = registry.supersededByLawId[current]
+  }
+
+  return lineage
+}
