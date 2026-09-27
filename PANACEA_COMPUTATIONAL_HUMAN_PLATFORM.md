@@ -25,6 +25,47 @@ STABILIZE
 -> EXPAND BREADTH ONLY WHEN JUSTIFIED
 ```
 
+## 1A. Human Reality Model and future-capability absorbability
+
+The **Human Reality Model** is Panacea's parent conceptual abstraction for a permissioned, longitudinal representation of a human life. It does **not** create a third patient-state authority. The existing **Canonical Patient State** remains authoritative for measured/recorded human truth, while the **Physiological State Engine** remains the model-derived dynamic layer.
+
+Conceptually, future capability may expand the model across biology, physiology, environment, behavior, user-authored goals, relevant life context and explicit uncertainty, but every dimension remains purpose-scoped, consent-governed and epistemically typed.
+
+Panacea should preserve a logical **Reality Lattice** rather than flattening all information into one certainty class:
+
+```text
+OBSERVED / RECORDED
+DERIVED
+MODEL-ESTIMATED
+SIMULATED
+COUNTERFACTUAL
+REFERENCE
+UNKNOWN / UNSUPPORTED
+```
+
+The hard invariant is that observed reality, predicted state and counterfactual state remain distinct unless later evidence establishes correspondence.
+
+### Future-capability absorbability
+
+Architecture is preferred when stronger future models, higher-fidelity sensors, richer simulators or new interfaces can enter through stable contracts without creating a parallel human or replacing canonical truth semantics.
+
+Future architectural work should therefore ask:
+
+1. Can a substantially stronger model plug in without owning patient truth?
+2. Can higher-resolution observations enter through existing semantic, provenance and consent contracts?
+3. Can scientific evidence or model versions change without rewriting historical truth?
+4. Can new interfaces remain projections of the same governed human state?
+5. Can a model be benchmarked, shadowed, rolled back and replaced?
+
+Two long-term execution directions follow:
+
+- **adaptive resolution** — computational fidelity may increase around the system, scale or event that currently matters instead of running maximal detail everywhere;
+- **multiscale time** — domain engines may operate from fast electrophysiological timescales through chronic disease and aging timescales under explicit coupling rules.
+
+These are architecture directions, not authorization to fabricate unsupported state or prematurely implement maximum-fidelity simulation.
+
+Detailed authority: [Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
 ## 2. Vertical sophistication
 
 Panaceamed optimizes for validated vertical depth rather than raw feature count.
