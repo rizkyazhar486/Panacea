@@ -25,26 +25,14 @@ A system can be morally well-intended and still be functionally bad. A system ca
 
 Therefore release maturity is conjunctive:
 
-[
-K_{release}
-=
-K_{function}
-	imes
-K_{evidence}
-	imes
-K_{safety}
-	imes
-K_{governance}
-	imes
-K_{operability}
-]
+`K_release = K_function × K_evidence × K_safety × K_governance × K_operability`
 
-Every factor is normalized to ([0,1]). A near-zero factor keeps release maturity near zero.
+Every factor is normalized to `[0,1]`. A near-zero factor keeps release maturity near zero.
 
 Implications:
 - good intentions do not excuse unreliable engineering;
 - technical competence does not excuse unsafe, non-consensual or ungoverned behavior;
-- a feature that "looks intelligent" but cannot preserve provenance, uncertainty, consent or reproducibility is not mature;
+- a feature that looks intelligent but cannot preserve provenance, uncertainty, consent or reproducibility is not mature;
 - a feature that is safe but does not actually work is also not mature.
 
 The permanent target is **competent + evidence-grounded + safe + governed + operational**.
@@ -59,41 +47,21 @@ They are observations or projections of one changing human context.
 
 Conceptually, the governed observation history is:
 
-[
-mathcal{O}_{1:t}
-=
-{
-mathbf{y}_{1:t},
-mathbf{u}_{1:t},
-mathbf{e}_{1:t},
-mathbf{c}_{1:t},
-mathbf{b}_{1:t},
-mathbf{r}_{1:t}
-}
-]
+`O[1:t] = { y[1:t], u[1:t], e[1:t], c[1:t], b[1:t], r[1:t] }`
 
 where:
-
-- (mathbf{y}) = measured or imported biological signals;
-- (mathbf{u}) = interventions, medications, procedures and therapies;
-- (mathbf{e}) = environment and external exposures;
-- (mathbf{c}) = clinical context, encounters, findings and records;
-- (mathbf{b}) = behavior, activity, sleep, nutrition and performance context;
-- (mathbf{r}) = patient-reported state and goals.
+- `y` = measured or imported biological signals;
+- `u` = interventions, medications, procedures and therapies;
+- `e` = environment and external exposures;
+- `c` = clinical context, encounters, findings and records;
+- `b` = behavior, activity, sleep, nutrition and performance context;
+- `r` = patient-reported state and goals.
 
 A hidden physiological state may be estimated only as a separate truth class:
 
-[
-p(
-mathbf{x}_t
-mid
-mathcal{O}_{1:t},
-oldsymbol{	heta},
-mathbf{M}
-)
-]
+`p(x_t | O[1:t], θ, M)`
 
-where (mathbf{x}_t) is latent physiological state, (oldsymbol{	heta}) is the parameter set and (mathbf{M}) identifies the exact model/version.
+where `x_t` is latent physiological state, `θ` is the parameter set and `M` identifies the exact model/version.
 
 Observed truth and estimated state are never interchangeable.
 
@@ -104,7 +72,6 @@ Observed truth and estimated state are never interchangeable.
 Every important runtime object should ultimately map into a coherent human ontology rather than remain trapped in feature-local state.
 
 Core object families include:
-
 - **Human / Subject** — the authorized person whose state is represented;
 - **Observation** — vital, lab, waveform, imaging finding, symptom, measurement or report;
 - **Encounter** — visit, admission, consultation, procedure episode or care episode;
@@ -141,24 +108,9 @@ Relations are first-class:
 
 The canonical loop is:
 
-[
-SENSE
-ightarrow NORMALIZE
-ightarrow IDENTIFY
-ightarrow PROVENANCE
-ightarrow AUTHORIZE
-ightarrow FUSE
-ightarrow ESTIMATE
-ightarrow SIMULATE
-ightarrow DETECT
-ightarrow EXPLAIN
-ightarrow REVIEW
-ightarrow ACT
-ightarrow MEASURE OUTCOME
-ightarrow LEARN
-]
+`SENSE → NORMALIZE → IDENTIFY → PROVENANCE → AUTHORIZE → FUSE → ESTIMATE → SIMULATE → DETECT → EXPLAIN → REVIEW → ACT → MEASURE OUTCOME → LEARN`
 
-Each arrow must be inspectable.
+Each transition must be inspectable.
 
 ### 4.1 Sense
 Accept real observations from authorized sources: wearables, medical devices, clinical systems, laboratory systems, imaging systems, patient input, environment adapters and future validated sensors.
@@ -208,17 +160,9 @@ Outcome data can improve models only through governed evaluation, versioning, va
 
 "Real time" means the system reacts to source events with bounded latency. It does not mean inventing data between measurements.
 
-For any variable (z):
+For any variable `z`:
 
-[
-z(t)
-=
-egin{cases}
-z_{observed}(t), & 	ext{when a valid observation exists} \
-hat{z}(t; M), & 	ext{when a declared model estimate exists} \
-unknown, & 	ext{otherwise}
-end{cases}
-]
+`z(t) = observed value when valid evidence exists; otherwise model estimate z_hat(t; M) only when explicitly declared; otherwise unknown.`
 
 The UI and APIs must preserve these distinctions.
 
@@ -239,18 +183,7 @@ Blind spots are first-class state, not an error to hide.
 
 The same longitudinal identity should remain coherent across:
 
-[
-whole human
-ightarrow system
-ightarrow organ
-ightarrow tissue
-ightarrow cell
-ightarrow organelle
-ightarrow molecular network
-ightarrow RNA
-ightarrow chromatin
-ightarrow DNA
-]
+`whole human → system → organ → tissue → cell → organelle → molecular network → RNA → chromatin → DNA`
 
 This does not imply that every scale is directly observable in a living person.
 
@@ -274,25 +207,7 @@ They may present different views, but should not independently invent competing 
 
 The long-term architecture is:
 
-[
-Sources
-ightarrow
-Canonical Longitudinal State
-ightarrow
-Human Ontology
-ightarrow
-Domain Engines
-ightarrow
-Cross	ext{-}System Coupling
-ightarrow
-Governed Projections
-ightarrow
-Authorized Actions
-ightarrow
-Outcomes
-ightarrow
-State
-]
+`Sources → Canonical Longitudinal State → Human Ontology → Domain Engines → Cross-System Coupling → Governed Projections → Authorized Actions → Outcomes → State`
 
 New work should preferentially deepen this loop rather than create isolated feature-local databases or duplicate state machines.
 
@@ -326,19 +241,7 @@ A data-derived artifact should not silently lose the access restrictions of its 
 
 Every material recommendation or action should ultimately be reconstructable as:
 
-[
-D_t =
-(
-Data_t,
-Logic_t,
-Model_t,
-Evidence_t,
-Authorization_t,
-HumanReview_t,
-Action_t,
-Outcome_{t+Delta}
-)
-]
+`D_t = (Data_t, Logic_t, Model_t, Evidence_t, Authorization_t, HumanReview_t, Action_t, Outcome_[t+Δ])`
 
 This is the minimum decision-lineage concept.
 
@@ -369,7 +272,7 @@ Do not rebuild the observability substrate from scratch. The current repository 
 - `src/lib/humanReplay.ts` and `src/lib/panaceaRealityEngine.ts` — longitudinal/reality-oriented orchestration;
 - `src/lib/humanObservability.ts` — universal governed observation frame and explicit blind-spot contract.
 
-Future agents should integrate and deepen these primitives instead of creating parallel incompatible "digital twins".
+Future agents should integrate and deepen these primitives instead of creating parallel incompatible digital twins.
 
 ---
 
