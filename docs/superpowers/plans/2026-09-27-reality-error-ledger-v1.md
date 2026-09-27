@@ -399,3 +399,42 @@ git commit -m "feat(physiology): land reality error ledger v1"
 - **Review Focus:** all five listed conditions have explicit assertions in Tasks 2–3.
 - **Scope:** one production module, one test file, one focused doc plus two status links; no database/UI/API expansion.
 - **TDD:** every behavior task begins with a failing assertion and targeted RED run before implementation.
+
+
+## Execution record — 2026-09-27
+
+**Execution method:** Native inline execution on isolated branch `chatgpt/reality-error-ledger-v1-20260927`. The branch was created from main `ff1da367a0e2480acf1edbc25954b5f8281d7397`; no failing RED commit was placed on shared `main`.
+
+**TDD evidence:**
+- Task 1 RED: targeted test failed with `ERR_MODULE_NOT_FOUND` for the not-yet-created `realityErrorLedger.ts`.
+- Task 1 GREEN: local targeted Node TypeScript test exited 0.
+- Task 2 RED: targeted test failed because `comparePredictionToObservation` did not yet exist.
+- Task 2 GREEN: local targeted test exited 0.
+- Task 3 RED: targeted test failed because `matchPredictionToObservations` did not yet exist.
+- Task 3 GREEN: local targeted test exited 0.
+- Task 4 ruling: the cardio/O2 integration case is composition verification over Tasks 1–3, not a new production behavior. No artificial production change was added merely to manufacture a RED state. The integration assertion was instead verified against the real repository through GitHub CI.
+
+**Implementation commits:**
+- Task 1 — `336dfad6c542ad0e65e1c9a27984f1e44de78fe8` — immutable prediction ledger and lifecycle.
+- Task 2 — `da28087e085df2f3e6b7974000a1386b5cd20413` — direct prediction-vs-observation comparison.
+- Task 3 — `0f7cd633d1ffd679969b3b46c7f6d5299ef01029` — deterministic candidate matching and replay.
+- Task 4 integration fixture — `f726efd7b684c26d152dc9caf8f6f391bd649cf6`.
+- Task 4 documentation/status boundaries — `fae9fd94e38fa59788107521a24b284d54b7592f`.
+
+**Exact code+docs verification at `fae9fd94e38fa59788107521a24b284d54b7592f`:**
+- GitHub workflow `Validate changes` run `36317346696`: **success**.
+  - root `npm ci`: success;
+  - root typecheck + production build (`npm run build`): success;
+  - root deterministic offline tests (`npm run uji`): success;
+  - server TypeScript: success;
+  - server build: success;
+  - full deterministic server tests: success.
+- Security Baseline Enforcement run `36317346683`: success.
+- Security Baseline Inventory run `36317346682`: success.
+- Clinical Evidence Gate run `36317346687`: success.
+- Static exact-head read-back confirms the production module does not import/write AI-EMR, does not import `server/src/validasiLedger.ts`, does not mutate Canonical Patient State, and does not implement automatic calibration.
+- Test read-back confirms coverage of all 22 required deterministic behaviors plus the cardio/O2 integration fixture.
+
+**Final review:** self-review; this harness has no independent general-purpose reviewer subagent. No Critical/Important issue was identified in the static review. Prediction evidence and lifecycle remain separate, unknown sigma remains null, counterfactual input is excluded, candidate matching is deterministic, and broader Reality Engine capabilities remain explicitly unimplemented.
+
+The final plan-record commit is documentation-only and must still receive exact-head status inspection before landing on main.
