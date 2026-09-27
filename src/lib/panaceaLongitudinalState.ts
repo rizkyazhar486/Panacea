@@ -305,6 +305,29 @@ export function metricSnapshot(state: LongitudinalPatientState, metric: string):
 }
 
 /**
+ * Point-in-time metric snapshot. Future observations are excluded so X(t)
+ * cannot be contaminated by data that was not yet effective at t.
+ */
+export function metricSnapshotAt(
+  state: LongitudinalPatientState,
+  metric: string,
+  at: string | number,
+): LongitudinalMetricSnapshot | null {
+  const atMs = typeof at === 'number' ? at : parseIso(at, 'at')
+  if (!Number.isFinite(atMs)) throw new Error('at must be a finite timestamp')
+  const events = eventsForMetric(state, metric).filter((event) => Date.parse(event.recordedAt) <= atMs)
+  const latest = events[events.length - 1]
+  if (!latest) return null
+  return {
+    metric: latest.metric,
+    domain: latest.domain,
+    latest,
+    previous: events.length > 1 ? events[events.length - 2] : undefined,
+    eventCount: events.length,
+  }
+}
+
+/**
  * Ordinary least-squares trend over time.
  * Formula: b = Σ((x−x̄)(y−ȳ)) / Σ((x−x̄)^2), with x measured in days.
  * Direction is a display classification only; it is not a clinical threshold.
@@ -377,7 +400,7 @@ export function projectStateToSurface(
   let pendingClinicalReview = 0
 
   for (const metric of Object.keys(state.metricEventIds).sort()) {
-    const snapshot = metricSnapshot(state, metric)
+    const snapshot = metricSnapshotAt(state, metric, atMs)
     if (!snapshot || !domains.has(snapshot.domain)) continue
 
     if (!isConsentActive(snapshot.latest.consent, purpose, atMs)) {
@@ -421,7 +444,7 @@ export function buildContextPacket(
       metric,
       ids.filter((id) => {
         const event = state.eventsById[id]
-        if (!event || !isConsentActive(event.consent, purpose, atMs)) return false
+        if (!event || Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
         if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(event)) {
           return event.review.state === 'accepted'
         }
