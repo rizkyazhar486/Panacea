@@ -7,7 +7,7 @@ const viewportHeight = Number(process.env.UIUX_MOBILE_QA_HEIGHT || 844)
 if (!Number.isInteger(viewportWidth) || viewportWidth < 280 || viewportWidth > 1024) {
   throw new Error(`invalid UIUX_MOBILE_QA_WIDTH: ${process.env.UIUX_MOBILE_QA_WIDTH ?? ''}`)
 }
-if (!Number.isInteger(viewportHeight) || viewportHeight < 480 || viewportHeight > 1600) {
+if (!Number.isInteger(viewportHeight) || viewportHeight < 320 || viewportHeight > 1600) {
   throw new Error(`invalid UIUX_MOBILE_QA_HEIGHT: ${process.env.UIUX_MOBILE_QA_HEIGHT ?? ''}`)
 }
 const outDir = process.env.UIUX_MOBILE_QA_DIR || `artifacts/uiux-mobile-${viewportWidth}x${viewportHeight}`
