@@ -1,5 +1,13 @@
 # Panaceamed.id — Claude Code working contract
 
+## Invictus compounding-depth authority — 2026-09-28
+
+For every broad continuation, architecture decision, major feature proposal, Computational Human task, Human Observability task, Body Exposure/simulation task, or future-model expansion, Claude Code must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+"Invictus" is an engineering direction, not a literal claim of invincibility or clinical certainty. Optimize for compounding coherence: deepen the canonical longitudinal human model, deepen specialized engines, couple systems and scales, falsify and validate against reality, project shared capability into existing surfaces, measure outcomes, and expand only when expansion strengthens the integrated system. Imagination may generate hypotheses; patient truth and clinical claims remain evidence-bound.
+
+The detailed **Invictus Human Reality Principle** architecture is [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md). For future-facing architecture, imagine beyond present capability, formalize stable interfaces before the capability exists, implement only the deepest justified present slice, and preserve explicit separation between observation, patient truth, model estimates, simulation, counterfactuals, hypotheses and unsupported state. Stronger future models may deepen Panacea but do not gain authority to infer user values, bypass consent, own canonical patient truth or weaken validation.
+
 ## Autonomous final-33% execution directive — 2026-09-25
 
 For the owner's current finishing mission, Claude Code Opus 5.5 must also read and execute [`docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md`](docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md). It converts the maturity-first operating model into a continuous execution loop: inspect current main → select the highest-value blocker → implement → validate → commit → push → inspect exact-head CI → repair/integrate → verify main → immediately continue. Do not wait for a repeated “lanjut” after each verified task. Hard platform/context/usage limits cannot be bypassed; before an unavoidable limit, leave a committed, pushed, exact-SHA continuation state so the next session can resume without reconstructing the work.
@@ -49,12 +57,6 @@ The owner's recurring "surveillance of the human" concept is formalized as **per
 
 Functional competence and ethical/clinical governance are conjunctive. A safe idea that does not work is not mature; a technically capable system that is unsafe, ungoverned or non-consensual is also not mature.
 
-
-## Invictus Human Reality Principle authority — 2026-09-28
-
-For architectural ideation, new subsystem design, future-model planning or major capability expansion, Claude Code must read and apply [the approved Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
-
-**Execution rule:** imagine beyond present capability when a future model/sensor/simulator/interface could make the capability real; formalize the stable interface now; implement only the deepest justified present slice; keep hypotheses/simulation/counterfactuals separate from patient truth; connect new breadth to the same governed Human Reality Model and meaningful human benefit; validate/falsify against reality where possible. Stronger future models may deepen Panacea, but they do not gain authority to fabricate state, infer a user's values, bypass consent, own canonical patient truth or weaken validation.
 
 ## Depth-over-dispersion execution law — 2026-09-27
 

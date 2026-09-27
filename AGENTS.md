@@ -1,6 +1,16 @@
 # Panacea Multi-Agent Operating Policy
 
 
+## Panacea Invictus principle — compounding coherence
+
+Every current and future agent must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+The Invictus objective is not feature maximalism and not a claim that Panaceamed is literally unbeatable. It is a compounding-depth law: meaningful new work should strengthen the governed longitudinal human model, specialized mechanistic engines, cross-system/cross-scale coupling, reality validation, reusable infrastructure, and safe projections. Imagination is encouraged for hypothesis generation; measured patient truth, clinical claims and release decisions remain evidence-, provenance-, consent- and validation-bound.
+
+The approved architectural extension is the **Invictus Human Reality Principle** in [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md). Before architectural ideation, new subsystem design or major capability expansion, **imagine beyond present capability** when stronger future models, sensors, simulation or interfaces could make a meaningful capability real; formalize the stable interface now; implement only the deepest evidence-backed present slice; and keep hypothesis, simulation and counterfactual state distinct from patient truth.
+
+Future-absorbable shared primitives are preferred over model-vendor-specific truth or duplicated state. Human meaning and user-authored goals may guide prioritization, but agents must never invent the user's values or weaken consent, provenance, uncertainty, validation or human authority.
+
 ## Parent charter for every current and future agent
 
 [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.
@@ -31,23 +41,6 @@ Panaceamed's universal state model is longitudinal and operational: authorized s
 
 Treat the owner's "human surveillance" shorthand as **permissioned observability**, not covert monitoring. Purpose-bound consent, least privilege, review boundaries, access lineage and revocation wrap every projection and action. New pages, agents and domain engines should integrate with the existing longitudinal/consent/replay primitives rather than create another isolated truth store.
 
-
-## Invictus Human Reality Principle — mandatory future-model law
-
-Every current and future agent must read and apply [the approved Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) before architectural ideation, new subsystem design or major capability expansion.
-
-The required behavior is:
-
-- **imagine beyond present capability** when stronger future models, sensors, simulation or interfaces could make the capability real;
-- translate imagination into stable contracts and an explicit future integration seam rather than a decorative claim;
-- implement only the deepest evidence-backed slice justified by current resources;
-- preserve the separation between observation, clinical truth, derivation, model estimation, simulation, counterfactuals, hypotheses, reference state, stale state and unknown/unsupported state;
-- prefer future-absorbable shared primitives over model-vendor-specific patient truth or duplicated state;
-- connect horizontal expansion to the same Human Reality Model and to meaningful human benefit;
-- preserve user-authored goals and constraints as human agency, never as permission for an agent to invent the user's values;
-- expose error, uncertainty, disagreement and unsupported state instead of polishing them away.
-
-Future intelligence should make Panacea deeper without making its claims less disciplined.
 
 ## Objective
 
