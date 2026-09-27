@@ -72,4 +72,13 @@ includesAll('governance/RISK_REGISTRY.yaml', [
   'risk.future_model_lock_in',
 ])
 
+const spec = read(specPath)
+assert.ok(
+  !/[\t\f\r]/.test(spec),
+  'Invictus spec must not contain control-character-corrupted formulas',
+)
+for (const latex of ['\\mathcal', '\\times', '\\frac', '\\neq', '\\arg\\max', '\\cap', '\\leftrightarrow']) {
+  assert.ok(spec.includes(latex), `Invictus spec must preserve LaTeX command ${latex}`)
+}
+
 console.log('invictus-human-reality-principle: lulus')
