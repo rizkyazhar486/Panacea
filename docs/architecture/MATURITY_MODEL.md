@@ -6,14 +6,43 @@
 Definitions:
 - **DISCOVERED**: capability exists or is requested.
 - **MAPPED**: use case, owner domain, dependencies and boundaries understood.
-- **CONNECTED**: participates in canonical state/shared services where appropriate.
-- **FUNCTIONAL**: real workflow works beyond mock/demo appearance.
-- **VALIDATED**: relevant deterministic tests and failure modes are covered.
+- **CONNECTED**: participates in canonical state/shared services where appropriate; computational domains expose explicit coupling boundaries rather than UI-to-UI dependencies.
+- **FUNCTIONAL**: real workflow works beyond mock/demo appearance; where a physiological/simulation claim exists, an executable model contract exists rather than animation-only behavior.
+- **VALIDATED**: relevant deterministic tests and failure modes are covered, and computational models have an explicit validation class appropriate to their claim.
 - **MATURE**: reliable, coherent, usable and integrated.
 - **PRODUCTION_READY**: required safety/security/privacy/observability/release gates pass.
 - **OPTIMIZED**: evidence-driven performance/usability improvements applied.
 
 Clinical validation is separate from software maturity. A feature can be technically mature without being clinically validated.
+
+## Vertical computational depth
+
+For computational-human capabilities, software maturity is necessary but insufficient. Track vertical depth across:
+
+[
+S_{vertical}
+=
+D_{domain}
+\times
+D_{model}
+\times
+D_{infrastructure}
+\times
+D_{integration}
+\times
+D_{validation}
+]
+
+This is an internal heuristic. Unknown factors remain unknown.
+
+Interpretation:
+- **Domain depth**: biomedical specificity and appropriate fidelity.
+- **Model depth**: executable governing model/algorithm and explicit assumptions rather than display-only content.
+- **Infrastructure depth**: state, runtime, persistence, scheduling, provenance, units, observability and failure handling.
+- **Integration depth**: canonical state, cross-system coupling and multi-surface reuse.
+- **Validation depth**: numerical/software/scientific/expert/clinical validation appropriate to the claim.
+
+A capability cannot be called computationally deep merely because it has a detailed UI or a large amount of content.
 
 ## Maturity heuristic
 
@@ -51,4 +80,8 @@ For the relevant risk level:
 - tests are relevant;
 - observability exists;
 - integration is coherent;
+- measured/recorded state is not conflated with model-derived/simulated state;
+- computational models identify model version, parameters, units, assumptions and validation class where relevant;
+- cross-system coupling is explicit and tested where relevant;
+- shared projections reuse canonical state/model outputs rather than duplicating them;
 - source-of-truth registries are updated.
