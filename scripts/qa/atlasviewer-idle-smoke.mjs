@@ -54,9 +54,15 @@ try {
     assert.equal(await draws(), before, `${label}: GPU draws while idle`)
   }
   async function active(label) {
-    const before = await draws()
-    await page.waitForTimeout(350)
-    assert(await draws() > before, `${label}: animation stopped`)
+    // Buktikan gambar berlanjut, tanpa mensyaratkan FPS GPU runner.
+    for (let sample = 0; sample < 2; sample++) {
+      const before = await draws()
+      try {
+        await page.waitForFunction(n => window.__atlasDraws > n, before, { polling: 50, timeout: 30000 })
+      } catch {
+        assert.fail(`${label}: animation stopped at ${before} GPU draws`)
+      }
+    }
   }
   async function pixels(path) {
     const png = await canvas.screenshot({ path })
@@ -97,7 +103,7 @@ try {
       const beforeOrbit = await draws()
       await page.mouse.move(box.x + box.width * .6, box.y + box.height * .6, { steps: 12 })
       await page.mouse.up()
-      assert(await draws() > beforeOrbit, 'Orbit must render')
+      await page.waitForFunction(n => window.__atlasDraws > n, beforeOrbit, { polling: 50 })
       await idle('Orbit damping')
       console.log(JSON.stringify({ width, module, colors, idleDraws: 0, idleWindowMs, selectionAndOrbit: 'pass' }))
     }
