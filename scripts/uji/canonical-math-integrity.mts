@@ -20,6 +20,16 @@ for (const path of canonical) {
   )
 }
 
+
+for (const path of canonical) {
+  const text = readFileSync(path, 'utf8')
+  assert.doesNotMatch(
+    text,
+    /\\\\(?:frac|times|rightarrow|boldsymbol)/,
+    `${path} must use single-backslash LaTeX commands, not double-escaped source text`,
+  )
+}
+
 const maturity = readFileSync('PANACEA_PRODUCT_MATURITY_OS.md', 'utf8')
 assert.match(maturity, /S_\{compound\}[\s\S]*?\\times[\s\S]*?D_\{personalization\}/)
 assert.match(maturity, /V\s*=\s*[\s\S]*?\\frac\{D\s*\\times\s*R/)
