@@ -979,3 +979,18 @@ The three superpages are projections of one shared Computational Human Graph. Pr
 **Forbidden:** superficial completion, artificial/fabricated biology or geometry, and subjective/unsupported biomedical claims. Do not use polished UI, cinematic animation, generic meshes, fake histology, arbitrary heatmaps or decorative molecular particles to hide missing mechanisms. A missing scientifically relevant level is `VERTICAL GAP — NOT YET MODELED`.
 
 3D/3DCG is not exempt: visual semantic zoom must preserve biological identity, evidence and truth class across implemented scales. A scripted animation is not a physiological simulation. A population/reference prior is not patient-specific truth. Unknown must remain unknown.
+
+## Longitudinal domino-effect authority — 2026-09-27
+
+Panacea's computational human must evolve as one longitudinal, dependency-aware biological operating system.
+
+When implementing physiology/pathophysiology:
+- preserve time ordering and prior-state dependence;
+- allow simultaneous processes only through the shared scheduler;
+- propagate cross-system domino effects through explicit typed dependencies;
+- represent homeostatic compensation and counter-regulation where evidence supports them;
+- preserve conservation/invariant checks when applicable;
+- retain uncertainty and parent provenance across each transition;
+- keep Clinical, Body Exposure and Simulation projections synchronized to one temporal context.
+
+Never fake compensation or “realistic” downstream behavior with arbitrary scripted animations. Missing feedback loops are explicit vertical/coupling gaps.
