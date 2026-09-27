@@ -110,3 +110,41 @@ Measure:
 - friction and failure rates.
 
 Raw route/component/widget counts are secondary implementation statistics.
+
+
+## Reality Engine extension
+
+Approved child-spec: [../superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](../superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+The Computational Human Platform should progressively extend the continuous human state with a falsifiable Reality Engine loop:
+
+```text
+Observations / interventions
+        |
+Canonical Patient State
+        |
+Continuous Human Runtime
+        |
+Domain Engines + Coupling
+        |
+Predicted / estimated state
+        |
+Reality Engine
+  |        |         |          |
+error    personal   Reality    replay /
+ledger   parameters   Gap      counterfactual branches
+  \        |         |          /
+   +-------+---------+---------+
+            |
+      later observations
+            |
+prediction-vs-reality comparison
+            |
+validation / bounded recalibration / model-gap evidence
+            |
+Clinical / Your Body / Body Exposure / AI-EMR projections
+```
+
+This does not create a second patient-state authority. Canonical Patient State remains measured/recorded truth. Personal model parameters, prediction-error records, counterfactual branches and reanalysis outputs are derived/model metadata with explicit provenance and truth class.
+
+The real observed timeline is canonical reality. Counterfactual branches are isolated simulations. Historical replay should preserve original model/version; newer models may reanalyze history only as a separate interpretation.
