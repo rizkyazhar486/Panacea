@@ -100,3 +100,31 @@ The first dependency-coupled physiological chain is implemented by:
 The gate deliberately registers these engines out of dependency order; the runtime topologically orders them and preserves exact parent provenance. This proves shared engine coupling rather than page-specific formula chaining.
 
 See `DOCS/OXYGEN-TRANSPORT-ENGINE.md`.
+
+## Vertical biological projection foundation
+
+The first executable No-Hollow-Gap substrate is implemented in `src/lib/biology/`:
+
+- `verticalBiologyGraph.ts` defines ordered biological scales, evidence-bearing nodes, explicit gap/not-applicable lineage steps, fail-closed graph validation and lineage completeness assessment;
+- `cardiovascularVerticalLineage.ts` seeds two reference-scoped cardiovascular lineages from whole human through LV myocardium/cardiomyocyte to RyR2 calcium handling and sarcomere/troponin biology, continuing through RNA, gene/regulatory, chromatin and DNA reference layers;
+- `physiologyVerticalProjection.ts` maps the existing SV/EF/CO/CaO2/DO2 runtime fields read-only onto the biological graph without mutating node truth scope or physiological provenance.
+
+The current cardiovascular lineages deliberately retain explicit `VERTICAL GAP — NOT YET MODELED` steps for patient-specific cardiomyocyte state and post-translational molecular state. Reaching DNA in the graph therefore does **not** mean Panacea has measured or inferred an individual's RYR2/TNNC1 expression, chromatin state or sequence.
+
+Projection follows:
+
+[
+R_t = \mathcal{P}(G, X_t, B)
+]
+
+where (G) is the validated vertical biological graph, (X_t) is the physiological runtime state and (B) is the explicit field-to-node binding contract. (mathcal{P}) is read-only: it preserves value, unit, uncertainty, truth class and provenance and cannot promote model-derived values into measured patient truth.
+
+Current bindings:
+- `cardio.lv.stroke_volume` -> left ventricle;
+- `cardio.lv.ejection_fraction` -> left ventricle;
+- `cardio.cardiac_output` -> heart;
+- `arterial.oxygen_content` -> cardiovascular-system projection;
+- `systemic.oxygen_delivery` -> whole-human projection.
+
+This is the first vertical scaffold, not a completeness claim. Subsequent organ/system work should extend the same graph/gap/provenance contracts rather than create disconnected deep-looking content.
+
