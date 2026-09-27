@@ -3,7 +3,7 @@
 ## Purpose
 Define what any capable agent should do when authorized to continue Panaceamed development without a narrowly specified micro-task.
 
-This loop operates under `PANACEA_CONSTITUTION.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `AGENTS.md`, and `PANACEA_PRODUCT_MATURITY_OS.md`.
+This loop operates under `PANACEA_CONSTITUTION.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `AGENTS.md`, and `PANACEA_PRODUCT_MATURITY_OS.md`.
 
 ## Trigger
 When the owner says "lanjut", "continue", "keep going", or equivalent and repository execution is available:
@@ -17,6 +17,7 @@ SCAN
   -> MAP
   -> GAP DETECTION
   -> PRIORITIZE
+  -> DEPTH GATE
   -> SELECT ONE VERTICAL SLICE
   -> IMPLEMENT
   -> INTEGRATE
@@ -53,6 +54,10 @@ Update the working system map:
 ## 3. GAP DETECTION
 Look for:
 - broken core workflows;
+- shared primitive missing while multiple features duplicate the same responsibility;
+- detailed UI with no executable domain-model contract;
+- physiological relationship hidden in page-specific logic instead of an explicit coupling contract;
+- model-derived state lacking model/version/parameter/validation identity;
 - safety/security/data-integrity issues;
 - feature exists but backend/persistence absent;
 - backend exists but no usable workflow;
@@ -71,12 +76,14 @@ Default queue:
 A. safety/security/data integrity
 B. broken core workflow
 C. canonical-state inconsistency
-D. integration debt
-E. maturity gap
-F. UX friction
-G. performance/observability
-H. visual refinement
-I. net-new feature
+D. shared-infrastructure / duplicate-state debt
+E. specialized domain-engine depth gap
+F. cross-system coupling / model-validation gap
+G. projection convergence and workflow maturity
+H. UX friction
+I. performance/observability
+J. visual refinement
+K. net-new feature
 
 Priority heuristic:
 
@@ -86,20 +93,57 @@ Priority = rac{Impact 	imes Frequency 	imes IntegrationGain 	imes RiskReduction
 
 Do not fake numeric precision.
 
+## 4A. DEPTH GATE
+Before selecting net-new breadth, classify the highest-priority candidate against the Computational Human Platform doctrine.
+
+Ask, in order:
+1. does it repair a safety/security/data/canonical-state blocker?
+2. does it deepen a shared infrastructure primitive?
+3. does it deepen an existing specialized domain engine?
+4. does it replace hidden/ad-hoc physiology with explicit cross-system coupling?
+5. does it improve model provenance, units, uncertainty, observability or validation?
+6. does it converge Clinical, AI-EMR, Body Exposure, Timeline or simulation onto shared state/model outputs?
+7. only then: is new breadth justified by a named user/problem, system fit, reuse check and validation path?
+
+For computational-human work, use the architectural heuristic:
+
+[
+S_{vertical}
+=
+D_{domain}
+\times
+D_{model}
+\times
+D_{infrastructure}
+\times
+D_{integration}
+\times
+D_{validation}
+]
+
+Do not fabricate numeric precision. Prefer improving the weakest relevant factor or removing a shared bottleneck.
+
+A route, widget, component, animation or content-rich page is not a vertical-depth improvement by itself. A model-derived state must remain distinct from measured/recorded patient truth.
+
 ## 5. SELECT
 Choose one meaningful independent vertical slice.
 Avoid opening many unrelated implementation lanes.
 
 ## 6. IMPLEMENT
-Prefer end-to-end:
+Prefer end-to-end workflow slices:
 `data -> validation -> service -> persistence -> state -> UI -> action -> follow-up`
 
-Reuse existing canonical systems before creating new ones.
+For computational-human slices prefer:
+`boundary condition -> domain engine -> coupling -> model-derived state -> validation -> shared projection`
+
+Reuse existing canonical systems before creating new ones. Do not create a second patient-record state, domain-specific event bus, model registry or coupling layer when a canonical primitive can be extended.
 
 ## 7. INTEGRATE
 Ask:
 - Which existing systems should consume this result?
-- Does this update Patient State?
+- Does this update recorded Canonical Patient State, or is it derived physiological/simulation state that must stay separate?
+- Which domain engine/model/version owns any derived state?
+- Which other systems consume or produce coupling fields?
 - Does it belong on Timeline?
 - Is there meaningful Body Exposure context?
 - Does it need Knowledge Graph linkage?
@@ -114,6 +158,9 @@ Use risk-appropriate:
 - integration tests;
 - E2E/browser tests;
 - data-contract validation;
+- numerical/model invariant checks where computation is involved;
+- cross-system coupling/unit/time-step checks where applicable;
+- model/parameter/provenance/validation-class checks;
 - unit/terminology/provenance checks;
 - safety/privacy checks;
 - domain expert/clinical validation where required.
