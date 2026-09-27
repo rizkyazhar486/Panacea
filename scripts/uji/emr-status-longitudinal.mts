@@ -77,6 +77,6 @@ assert.equal(emrRecordToLongitudinalEvents(unsigned, 'account-patient-1', consen
 
 const source = readFileSync('src/lib/useLongitudinalState.ts', 'utf8')
 assert.match(source, /api\.clinical\(\)/, 'runtime hook does not load server-accepted EMR')
-assert.match(source, /emrRecordToLongitudinalEvents\(/, 'runtime hook does not project signed EMR into canonical state')
+assert.match(readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8'), /emrRecordToLongitudinalEvents\(/, 'shared projector does not project signed EMR into canonical state')
 
 console.log('emr-status-longitudinal: only server-signed EMR semantics enter canonical patient state')
