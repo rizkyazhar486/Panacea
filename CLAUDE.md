@@ -949,3 +949,8 @@ Owner directive: the entire human body is gold standard; no organ owns that desi
 Largest recorded gap: there is no shared HumanState yet, and shared primitives disagree (O₂ content 1.34/0.003 in `hemodinamik.ts` vs ELSO 1.39/0.0034). Fix by registering one choice, not by adding a third.
 
 ECMO digital twin (owner prompt "PANACEA ECMO DIGITAL TWIN") begins in `src/lib/ecmo/`: evidence registry first, deterministic engine usable without React/Three.js, rendering observes the engine. Status and remaining steps are tracked in `DOCS/ECMO-DIGITAL-TWIN.md`. Never claim ELSO endorsement; wording is "evidence-informed and aligned with published ELSO guidance". Expert review (intensivist, cannulating surgeon, perfusionist) is required before any conference release and must be real.
+
+
+## Physiological runtime foundation — 2026-09-27
+
+The first executable substrate for the Computational Human Platform is implemented at `src/lib/physiology/`. Read `DOCS/PHYSIOLOGICAL-RUNTIME.md` before extending it. Reuse `DomainEngineContract`, the fail-closed registry and deterministic scheduler rather than creating page-local physiology engines. Longitudinal patient events enter only through explicit boundary admission; model outputs remain `model-derived`/`simulated` and never silently become measured clinical state. `exampleEngines.ts` is synthetic infrastructure QA only and must not seed real physiological constants. The existing `multiskala/kernelKopling.ts` remains complementary for grid/multi-scale coupling.

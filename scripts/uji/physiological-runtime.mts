@@ -40,6 +40,8 @@ const boundary = {
   source: { id:'event-1', sourceId:'fixture', capturedAt:'2026-09-27T00:00:00.000Z', semanticState:'measured' as const },
 }
 assert.throws(() => runPhysiologicalSimulation({ registry, boundaryConditions:[], untilSeconds:2 }), /missing boundary condition/)
+assert.throws(() => runPhysiologicalSimulation({ registry, boundaryConditions:[{ ...boundary, truthClass:'simulated' as never, source:{ ...boundary.source, semanticState:'simulated' as never } }], untilSeconds:0 }), /unsupported boundary truth class/)
+assert.throws(() => runPhysiologicalSimulation({ registry, boundaryConditions:[{ ...boundary, source:{ ...boundary.source, semanticState:'imported' } }], untilSeconds:0 }), /does not match source semantic state/)
 
 for (const [engine, pattern] of [
   [baseEngine({ step: () => ({ state:0, outputs:[{ name:'x', unit:'1', value:1, sigma:null }] }) }), /undeclared field/],
@@ -59,7 +61,12 @@ assert.equal(a.latest['engine.a.output'].provenance.id, b.latest['engine.a.outpu
 assert.equal(a.latest['engine.a.output'].provenance.modelId, 'synthetic-a')
 assert.equal(a.latest['engine.a.output'].provenance.modelVersion, '1.0.0')
 assert.equal(a.latest['engine.a.output'].provenance.parameterSetId, 'fixture-v1')
+assert.equal(a.latest['engine.a.output'].provenance.validationClass, 'synthetic')
+assert.equal(a.latest['engine.a.output'].provenance.fidelity, 'infrastructure-fixture')
 assert.ok(a.latest['engine.a.output'].provenance.parents.includes(a.boundaries['boundary.input'].provenance.id))
+const changedOutputRegistry = createDomainEngineRegistry([baseEngine({ step: ({ inputs }) => ({ state:1, outputs:[{ name:'engine.a.output', unit:'1', value:inputs['boundary.input'].value + 1, sigma:null }] }) })],[{ name:'boundary.input', unit:'1' }])
+const changedOutput = runPhysiologicalSimulation({ registry:changedOutputRegistry, boundaryConditions:[boundary], untilSeconds:2 })
+assert.notEqual(a.latest['engine.a.output'].provenance.id, changedOutput.latest['engine.a.output'].provenance.id)
 
 const engineB: DomainEngineContract<number> = {
   id:'engine.b', modelId:'synthetic-b', modelVersion:'1.0.0', parameterSetId:'fixture-v1',

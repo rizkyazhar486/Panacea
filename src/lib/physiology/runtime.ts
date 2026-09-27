@@ -52,6 +52,8 @@ export interface PhysiologicalProvenance {
   modelId?: string
   modelVersion?: string
   parameterSetId?: string
+  validationClass?: PhysiologicalValidationClass
+  fidelity?: PhysiologicalFidelity
   step: number
   timeSeconds: number
   parents: readonly string[]
@@ -97,6 +99,7 @@ export interface DomainEngineRegistry {
 }
 
 const allowedOutputTruthClasses = new Set<PhysiologicalOutputTruthClass>(['model-derived', 'simulated'])
+const allowedBoundaryTruthClasses = new Set<BoundaryTruthClass>(['measured', 'imported', 'clinician-entered'])
 
 function fieldKey(name: string): string {
   const trimmed = name.trim()
@@ -208,6 +211,8 @@ function validateSigma(sigma: number | null, context: string): void {
 }
 
 function boundaryValue(boundary: BoundaryCondition): PhysiologicalValue {
+  if (!allowedBoundaryTruthClasses.has(boundary.truthClass)) throw new Error(`boundary ${boundary.name}: unsupported boundary truth class ${String(boundary.truthClass)}`)
+  if (boundary.source.semanticState !== boundary.truthClass) throw new Error(`boundary ${boundary.name}: truth class does not match source semantic state`)
   if (!Number.isFinite(boundary.value)) throw new Error(`boundary ${boundary.name}: value must be finite`)
   validateSigma(boundary.sigma, `boundary ${boundary.name}`)
   const id = fnv1a(`boundary:${boundary.name}:${boundary.unit}:${boundary.value}:${boundary.sigma ?? 'unknown'}:${boundary.truthClass}:${boundary.source.id}:${boundary.source.sourceId}:${boundary.source.capturedAt}`)
@@ -302,7 +307,7 @@ export function runPhysiologicalSimulation(input: {
         if (declaration.unit !== output.unit) throw new Error(`${engine.id}: field ${output.name} unit ${output.unit} differs from declared ${declaration.unit}`)
         if (!Number.isFinite(output.value)) throw new Error(`${engine.id}: non-finite value in ${output.name}`)
         validateSigma(output.sigma, `${engine.id}: ${output.name}`)
-        const provenanceId = fnv1a(`${engine.id}:${engine.modelId}:${engine.modelVersion}:${engine.parameterSetId}:${step}:${timeSeconds}:${output.name}:${parents.join(',')}`)
+        const provenanceId = fnv1a(`${engine.id}:${engine.modelId}:${engine.modelVersion}:${engine.parameterSetId}:${engine.validationClass}:${engine.fidelity}:${step}:${timeSeconds}:${output.name}:${output.unit}:${output.value}:${output.sigma ?? 'unknown'}:${declaration.truthClass}:${parents.join(',')}`)
         const prov: PhysiologicalProvenance = {
           id: provenanceId,
           kind: 'engine-output',
@@ -310,6 +315,8 @@ export function runPhysiologicalSimulation(input: {
           modelId: engine.modelId,
           modelVersion: engine.modelVersion,
           parameterSetId: engine.parameterSetId,
+          validationClass: engine.validationClass,
+          fidelity: engine.fidelity,
           step,
           timeSeconds,
           parents: [...parents],

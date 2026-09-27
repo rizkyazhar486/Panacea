@@ -188,3 +188,17 @@ Next, in order: (1) more real structures only with pinned SHA-256 + provenance
 entries; (3) residue-type side-chain ideal geometry (Engh & Huber per residue);
 (4) complexes/organelles (L3) only from deposited assemblies; (5) OpenMM/GROMACS
 topology export only after force-field parameters are sourced, not hand-typed.
+
+
+## 8. Whole-body physiological runtime foundation — implemented 2026-09-27
+
+The Computational Human Platform now has a first higher-level domain-engine runtime in `src/lib/physiology/`. It is complementary to the existing `src/lib/multiskala/kernelKopling.ts`: the multiscale kernel handles grid/multi-scale biological coupling, while the physiology runtime provides typed whole-body/domain-engine composition, deterministic multi-rate scheduling, canonical longitudinal boundary admission and cross-engine provenance.
+
+Implemented paths:
+- `src/lib/physiology/runtime.ts`;
+- `src/lib/physiology/longitudinalBoundary.ts`;
+- `src/lib/physiology/exampleEngines.ts` (synthetic fixture only);
+- `scripts/uji/physiological-runtime.mts`;
+- `DOCS/PHYSIOLOGICAL-RUNTIME.md`.
+
+Hard boundary: this is infrastructure, **not a validated human physiology model**. No synthetic fixture constant may be promoted into a real organ model. Real cardiovascular/respiratory/renal/neural/etc. engines must register sourced variables, equations/algorithm contract, parameter set, units, uncertainty, fidelity, supported domain and validation class before stronger claims.

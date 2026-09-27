@@ -23,7 +23,7 @@ It complements, rather than replaces, the existing multi-scale coupling kernel i
 - `runPhysiologicalSimulation()` — deterministic multi-rate scheduling and typed field exchange;
 - `BoundaryCondition` — admitted measured/imported/clinician-entered numeric input with source identity;
 - `PhysiologicalValue` — boundary or model-derived/simulated value with explicit unit and provenance;
-- deterministic provenance containing engine, model, model version, parameter-set id, step, simulation time and parent value ids.
+- deterministic, content-sensitive provenance containing engine, model, model version, parameter-set id, validation class, fidelity, step, simulation time, output value/uncertainty and parent value ids.
 
 ## Truth boundary
 
@@ -43,7 +43,7 @@ A longitudinal event used as a boundary condition is read-only. Simulation outpu
 
 Before execution, the registry rejects duplicate engine ids, invalid/non-positive `dtSeconds`, duplicate field producers, clinical truth classes on model outputs, missing producers/boundaries, self-consumption, unit mismatches and field/boundary collisions.
 
-During execution it rejects missing/undeclared/duplicate boundary values, undeclared outputs, runtime unit mismatch, non-finite values, invalid uncertainty and duplicate output emission.
+During execution it rejects missing/undeclared/duplicate boundary values, unsupported boundary truth classes, truth-class/source-semantic mismatches, undeclared outputs, runtime unit mismatch, non-finite values, invalid uncertainty and duplicate output emission.
 
 ## Deterministic time model
 

@@ -204,6 +204,18 @@ Panaceamed should progressively converge on these logical responsibilities, reus
 
 These are logical boundaries, not a mandate for premature microservices.
 
+## 7A. Implemented runtime foundation
+
+As of 2026-09-27, the first code-level whole-body runtime substrate is implemented in `src/lib/physiology/`:
+
+- `runtime.ts` — fail-closed `DomainEngineContract`, registry, deterministic multi-rate scheduler, typed coupling fields, model/parameter/validation/fidelity provenance and explicit model-derived/simulated output truth classes;
+- `longitudinalBoundary.ts` — read-only admission of explicitly measured/imported/clinician-entered numeric longitudinal events as boundary conditions; unknown measurement uncertainty stays unknown (`sigma = null`);
+- `exampleEngines.ts` — dimensionless synthetic fixtures only, explicitly not human physiology;
+- `scripts/uji/physiological-runtime.mts` — deterministic contract gate automatically discovered by `npm run uji`;
+- `DOCS/PHYSIOLOGICAL-RUNTIME.md` — exact status and scientific boundary.
+
+This foundation does **not** mean Panaceamed has a validated whole-human physiological model. Real organ/system engines remain future vertical work and require literature-grounded equations/parameters, supported-population definitions and validation appropriate to their claims. The existing multiscale kernel remains complementary rather than replaced.
+
 ## 8. One state, many projections
 
 The intended relationship is:
