@@ -138,3 +138,37 @@ After this canonicalization plan is reviewed and executed, do **not** implement 
 11. Privacy-preserving population learning only after governance is separately specified.
 
 Each follow-on plan must use TDD, preserve real-vs-simulated truth boundaries, and produce independently testable software.
+
+
+## Execution record — 2026-09-27
+
+Ruling: this plan mutates documentation/governance only and adds no production functions or runtime behavior. TDD's production-code RED/GREEN cycle is therefore not applicable; each task used exact-head conflict checks plus structural read-back assertions. Runtime implementation remains explicitly outside this plan.
+
+Ruling: repository owner directives authorize coherent direct-to-main work. GitHub connector execution was used rather than creating a local worktree; every multi-file task used expected-parent checks and non-force ref updates so concurrent main movement would abort rather than overwrite newer work.
+
+Task 1: complete — `a353e3f06679e810752dc001376162a2d388830c`
+- Canonical Computational Human doctrine now inherits the approved Reality Engine child-spec.
+- Added `S_compound`, Reality Gap, identifiability, falsification/replay/counterfactual deepening law.
+- Explicitly states architecture approval does not mean Reality Engine runtime is implemented.
+
+Task 2: complete — `029ef14b7dec5537c838f1cc33c4c14560320572`
+- `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` inherit the same child-spec and real-vs-counterfactual/overfit/uncertainty safeguards.
+
+Task 3: complete — `660f2affa2444a468dfb398850a87912144bc802`
+- Product Maturity OS and Autonomous R&D Loop now treat identifiability, Reality Gap, replay/versioning, prediction feedback and counterfactual isolation as maturity gaps while keeping safety/security/data/clinical blockers first.
+
+Task 4: complete — `a850e3a2d149dc47307e49cd13aecc326145bb00`
+- Product System, Patient State, Integration Map and Maturity Model now represent the Reality Engine feedback relationship without creating a second patient-state authority.
+
+Final review fix pass: `ac0f6186e42b50a587dec40fbb7b775fb7043f50`
+- Added explicit parameter-identifiability wording to Gemini inheritance.
+- Added the exact child-spec path, explicit prediction-vs-reality falsification wording and anti-overfit guard to the autonomous loop.
+
+Final review: self-review (no subagent tool available in this harness). Review focus checked:
+- future agents cannot interpret depth as biological-scale depth only;
+- canonical docs distinguish approved architecture from implemented capability;
+- existing safety/clinical sequencing remains higher priority;
+- AGENTS/CLAUDE/GEMINI inherit the same child-spec;
+- autonomous task selection prefers falsifiable compounding depth over shallow breadth after hard blockers.
+
+Task 5 verification requires exact-head read-back and status inspection after this execution-record commit. Absence of a GitHub Actions workflow run must be reported as unknown, not green.
