@@ -279,3 +279,47 @@ export function comparePredictionToObservation(
     },
   }
 }
+
+
+export function matchPredictionToObservations(
+  ledger: RealityErrorLedger,
+  predictionId: string,
+  observations: readonly LongitudinalEvent<number>[],
+  options: RealityComparisonOptions & {
+    observationSigmaByEventId?: Readonly<Record<string, ObservationSigmaEvidence>>
+  },
+): RealityComparisonResult {
+  const prediction = predictionForComparison(ledger, predictionId)
+  const comparisonCreatedAtMs = validateOptions(options)
+  const targetAtMs = parseIso(prediction.targetAt, 'prediction.targetAt')
+
+  const candidates: Array<{ observation: LongitudinalEvent<number>; observedAtMs: number; distanceMs: number }> = []
+  for (const observation of observations) {
+    try {
+      const observedAtMs = validateRealityObservation(
+        prediction,
+        observation,
+        options.matchToleranceMs,
+        comparisonCreatedAtMs,
+      )
+      candidates.push({ observation, observedAtMs, distanceMs: Math.abs(observedAtMs - targetAtMs) })
+    } catch {
+      // List matching is a selector: malformed or incompatible candidates are
+      // ignored, while direct comparison remains fail-closed for one candidate.
+    }
+  }
+
+  candidates.sort((left, right) =>
+    left.distanceMs - right.distanceMs
+    || left.observedAtMs - right.observedAtMs
+    || left.observation.id.localeCompare(right.observation.id),
+  )
+  const selected = candidates[0]
+  if (!selected) throw new Error('no admissible observation within tolerance')
+
+  return comparePredictionToObservation(ledger, predictionId, selected.observation, {
+    matchToleranceMs: options.matchToleranceMs,
+    comparisonCreatedAt: options.comparisonCreatedAt,
+    observationSigma: options.observationSigmaByEventId?.[selected.observation.id] ?? options.observationSigma ?? null,
+  })
+}

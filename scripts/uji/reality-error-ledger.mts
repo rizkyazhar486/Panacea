@@ -3,6 +3,7 @@ import {
   comparePredictionToObservation,
   createRealityErrorLedger,
   markPredictionExpiredUnobserved,
+  matchPredictionToObservations,
   recordRealityPrediction,
   type RealityPredictionRecord,
   type ObservationSigmaEvidence,
@@ -145,3 +146,58 @@ assert.throws(() => comparePredictionToObservation(expired,'pred-1',observation(
 assert.equal(compared.comparison.observedSigma, null, 'confidence must not be converted to sigma')
 
 console.log('reality-error-ledger task2: direct prediction-vs-observation comparison')
+
+
+const matchingBase = () => recordRealityPrediction(createRealityErrorLedger('subject-1'), prediction({ id:'pred-match' })).ledger
+const candidates = [
+  observation({ id:'obs-far', value:120, recordedAt:'2026-09-27T10:29:40.000Z', provenance:{...observation().provenance,capturedAt:'2026-09-27T10:29:40.000Z',receivedAt:'2026-09-27T10:29:41.000Z'} }),
+  observation({ id:'obs-near', value:121, recordedAt:'2026-09-27T10:29:55.000Z', provenance:{...observation().provenance,capturedAt:'2026-09-27T10:29:55.000Z',receivedAt:'2026-09-27T10:29:56.000Z'} }),
+]
+const nearest = matchPredictionToObservations(matchingBase(),'pred-match',candidates,opts)
+assert.equal(nearest.comparison.observationEventId,'obs-near')
+
+const tieEarlier = matchPredictionToObservations(matchingBase(),'pred-match',[
+  observation({id:'obs-later',recordedAt:'2026-09-27T10:30:10.000Z',provenance:{...observation().provenance,capturedAt:'2026-09-27T10:30:10.000Z',receivedAt:'2026-09-27T10:30:11.000Z'}}),
+  observation({id:'obs-earlier',recordedAt:'2026-09-27T10:29:50.000Z',provenance:{...observation().provenance,capturedAt:'2026-09-27T10:29:50.000Z',receivedAt:'2026-09-27T10:29:51.000Z'}}),
+],opts)
+assert.equal(tieEarlier.comparison.observationEventId,'obs-earlier')
+
+const tieLexical = matchPredictionToObservations(matchingBase(),'pred-match',[
+  observation({id:'obs-z'}), observation({id:'obs-a'}),
+],opts)
+assert.equal(tieLexical.comparison.observationEventId,'obs-a')
+
+const invalidCloser = matchPredictionToObservations(matchingBase(),'pred-match',[
+  observation({id:'bad-field',metric:'pulse'}),
+  observation({id:'bad-unit',unit:'1'}),
+  observation({id:'bad-subject',subjectId:'subject-2'}),
+  observation({id:'bad-sim',semanticState:'simulated'}),
+  observation({id:'good-far',recordedAt:'2026-09-27T10:29:30.000Z',provenance:{...observation().provenance,capturedAt:'2026-09-27T10:29:30.000Z',receivedAt:'2026-09-27T10:29:31.000Z'}}),
+],opts)
+assert.equal(invalidCloser.comparison.observationEventId,'good-far')
+
+assert.throws(() => matchPredictionToObservations(matchingBase(),'pred-match',[],opts), /no admissible observation within tolerance/)
+assert.throws(() => matchPredictionToObservations(matchingBase(),'pred-match',[observation({metric:'pulse'})],opts), /no admissible observation within tolerance/)
+const exact = matchPredictionToObservations(matchingBase(),'pred-match',[observation()],{...opts,matchToleranceMs:0})
+assert.equal(exact.comparison.observationEventId,'obs-1')
+assert.throws(() => matchPredictionToObservations(matchingBase(),'pred-match',[
+  observation({recordedAt:'2026-09-27T10:30:00.001Z',provenance:{...observation().provenance,capturedAt:'2026-09-27T10:30:00.001Z',receivedAt:'2026-09-27T10:30:01.001Z'}}),
+],{...opts,matchToleranceMs:0}), /no admissible observation within tolerance/)
+
+const sigmaChoice = matchPredictionToObservations(matchingBase(),'pred-match',candidates,{
+  ...opts,
+  observationSigmaByEventId:{
+    'obs-far':{sigma:9,provenanceId:'sigma:far'},
+    'obs-near':{sigma:3,provenanceId:'sigma:near'},
+  },
+})
+assert.equal(sigmaChoice.comparison.observedSigma,3)
+assert.equal(sigmaChoice.comparison.observationSigmaProvenanceId,'sigma:near')
+
+const replayA = matchPredictionToObservations(matchingBase(),'pred-match',candidates,opts)
+const replayB = matchPredictionToObservations(matchingBase(),'pred-match',candidates,opts)
+assert.deepEqual(replayA.comparison,replayB.comparison)
+assert.deepEqual(replayA.ledger.statusByPredictionId,replayB.ledger.statusByPredictionId)
+assert.equal(replayA.ledger.revision,replayB.ledger.revision)
+
+console.log('reality-error-ledger task3: deterministic candidate matching and replay')
