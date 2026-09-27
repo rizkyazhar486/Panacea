@@ -466,7 +466,82 @@ Before any continuous real-world deployment, the architecture must demonstrate:
 - recovery/backup procedures preserve security and retention guarantees;
 - security testing against the relevant mobile/API/web threat model.
 
-## 19. User-facing state contract
+## 19. AI-EMR as the durable clinical projection
+
+AI-EMR is the durable clinical record/projection of the same Continuous Human State, but it must not indiscriminately persist the entire real-time stream.
+
+Conceptually:
+
+```text
+Continuous Human State
+        |
+Clinical publication / promotion policy
+        |
+AI-EMR longitudinal record
+```
+
+The publication boundary classifies data into three lanes:
+
+### A. Directly recordable clinical observations
+
+Examples:
+- clinician-entered findings;
+- validated/imported laboratory results;
+- device observations whose source, unit, timestamp and clinical-use status are accepted;
+- administered medications/procedures;
+- signed diagnostic/imaging reports;
+- other measured/imported facts allowed by consent and clinical workflow.
+
+These preserve original source and timestamp. They remain measured/imported/clinician-authored truth.
+
+### B. Review-required candidate records
+
+Examples:
+- AI-generated encounter summaries;
+- model-derived physiological estimates;
+- interpreted waveform findings;
+- derived trends;
+- inferred procedure state;
+- candidate structured observations generated from continuous streams.
+
+These may be shown to a clinician but must not silently become signed clinical truth. Promotion requires the review/signoff workflow appropriate to the claim.
+
+### C. Ephemeral/non-record streams
+
+Examples:
+- raw continuous camera frames;
+- raw high-frequency telemetry when long-term retention is unnecessary;
+- transient model states used only for rendering;
+- intermediate inference tensors/features;
+- synthetic simulation states.
+
+These remain outside the durable EMR unless an explicit, authorized workflow promotes a defined artifact.
+
+### AI-EMR state invariant
+
+At any timestamp:
+
+[
+AIEMR(t)
+=
+ClinicalProjection(
+P(t),
+AuthorizedPublishedSubset(X(t))
+)
+]
+
+The AI-EMR therefore remains connected to real-time state while preserving a durable, auditable clinical record boundary.
+
+AI-EMR must record provenance links back to the originating device/event/model where available so a clinician can distinguish:
+- source measurement;
+- normalized representation;
+- deterministic derivation;
+- model estimate;
+- clinician-reviewed/signed record.
+
+The continuous runtime may update thousands of internal states per minute without creating thousands of signed EMR records.
+
+## 20. User-facing state contract
 
 Every state display in Clinical/Your Body must answer:
 
@@ -478,7 +553,7 @@ Every state display in Clinical/Your Body must answer:
 6. What uncertainty/confidence exists?
 7. What validation class/assumptions apply?
 
-## 20. Safety boundary
+## 21. Safety boundary
 
 Continuous state does not imply autonomous medicine.
 
@@ -492,7 +567,7 @@ The runtime must not:
 - represent reference anatomy as patient-specific anatomy;
 - call an unvalidated model a clinical digital twin.
 
-## 21. Implementation decomposition
+## 22. Implementation decomposition
 
 This program is intentionally split into sequential sub-projects:
 
@@ -506,7 +581,7 @@ This program is intentionally split into sequential sub-projects:
 
 Each sub-project must be independently testable.
 
-## 22. Acceptance criteria
+## 23. Acceptance criteria
 
 Architecture is fulfilled when:
 - one subject has one continuous runtime state;
@@ -516,6 +591,8 @@ Architecture is fulfilled when:
 - every projection is filtered by consent/purpose policy before reaching Clinical, Your Body or Body Exposure;
 - raw face/body/video data are minimized and default to ephemeral/on-device processing when feasible;
 - Clinical and Your Body query the same snapshot timestamp;
+- AI-EMR receives the authorized durable clinical projection of that same state without persisting every transient runtime value;
+- review-required model/AI candidates cannot silently become signed EMR truth;
 - measured truth stays separate from estimated state;
 - observations arrive continuously with semantic/unit/provenance contracts;
 - interventions change state through engines rather than directly changing UI;
@@ -527,7 +604,7 @@ Architecture is fulfilled when:
 - Body Exposure/procedure simulators project the same state rather than forking it;
 - future agents cannot create a second patient-state authority.
 
-## 23. References
+## 24. References
 
 Repository authorities:
 - `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`
