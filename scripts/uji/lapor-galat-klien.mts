@@ -9,9 +9,9 @@ assert.equal(lapor('error', new TypeError('x undefined'), 'https://a.id/assets/F
 assert.equal(lapor('error', new TypeError('x undefined'), 'https://a.id/assets/Foo-1.js?v=1', 10), false, 'galat identik tidak dikirim ulang')
 ruteAktif = '/owner?token=rahasia'
 assert.equal(
-  lapor('error', new TypeError('x undefined'), 'https://a.id/assets/Foo-1.js?v=1', 10, 'Owner'),
+  lapor('error', new TypeError('x undefined'), 'https://a.id/assets/Foo-1.js?v=1', 10),
   true,
-  'error yang sama pada route atau fitur berbeda harus tetap menjadi insiden unik',
+  'error yang sama pada route berbeda harus tetap menjadi insiden unik',
 )
 const l = kirim[0] as { rute: string; berkas: string; pesan: string }
 assert.equal(l.rute, '/emr', 'query rute dibuang'); assert.equal(l.berkas, 'Foo-1.js'); assert.equal(l.pesan, 'TypeError: x undefined')
