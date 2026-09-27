@@ -411,3 +411,75 @@ Mechanism > description.
 Continuity > feature count.  
 Explicit unknown > fabricated certainty.  
 Vertical depth > horizontal breadth.
+
+## 16. Longitudinal domino-effect operating law
+
+Panacea must not represent physiology as a bag of simultaneous snapshots. Every running biological engine must participate in an ordered, time-aware, causally linked state transition system.
+
+For the coupled state:
+
+[
+\mathbf X_{t+\Delta t}
+=
+\Phi(
+\mathbf X_t,
+\mathbf U_t,
+\mathbf E_t,
+\boldsymbol\theta,
+\mathbf C_t,
+\Delta t
+)
+]
+
+where `C_t` explicitly represents cross-system coupling, feedback and compensatory relationships.
+
+A change in one subsystem should propagate only through explicit validated dependency edges. The intended pattern is:
+
+```text
+perturbation
+-> primary local response
+-> downstream organ/system effect
+-> compensatory response
+-> secondary consequence
+-> counter-regulation / adaptation
+-> new longitudinal equilibrium or decompensation
+```
+
+Required properties:
+
+- **Sequential:** event ordering, causal precedence and time constants are explicit.
+- **Simultaneous where biologically required:** independently active systems may evolve concurrently under the same scheduler.
+- **Longitudinal:** prior state constrains subsequent state; history cannot be discarded when biology is path-dependent.
+- **Domino-linked:** cross-system effects propagate through typed mechanistic dependencies rather than page-to-page callbacks.
+- **Balanced:** mass, charge, volume, energy or other conserved quantities must respect relevant invariants when the model class supports them.
+- **Compensated:** homeostatic and counter-regulatory responses must be represented where evidence supports them.
+- **Related:** every transition must preserve links to the contributing states, mechanisms, parameters and provenance.
+- **Reversible/auditable:** the path from output back to upstream evidence/model parents must remain inspectable.
+
+Examples include:
+- hemorrhage -> reduced preload -> reduced stroke volume -> sympathetic activation -> vasoconstriction/tachycardia -> renal sodium/water retention;
+- hypoventilation -> PaCO2 rise -> acid-base shift -> chemoreceptor response -> ventilatory compensation;
+- reduced renal perfusion -> renin release -> angiotensin II/aldosterone -> vascular/volume response -> altered cardiac loading;
+- infection -> innate immune activation -> cytokine signaling -> endothelial/hemodynamic effects -> neuroendocrine stress response -> metabolic adaptation.
+
+No compensatory response may be invented merely to make a trajectory look “realistic”. If a feedback loop is not yet modeled, declare the missing coupling explicitly.
+
+## 17. Operating-system synchronization contract
+
+All superpages and engines must consume the same longitudinal state graph and must not maintain conflicting biological timelines.
+
+The system should converge toward a single event/state fabric with:
+- canonical timestamped state transitions;
+- deterministic or explicitly stochastic scheduling;
+- dependency-aware engine execution;
+- explicit feedback/counter-regulation;
+- conserved-variable checks where applicable;
+- intervention/event provenance;
+- uncertainty propagation;
+- replayable simulation history;
+- checkpoint/rollback semantics for experiments where appropriate;
+- projection consistency across Clinical, Body Exposure and Simulation/Training.
+
+A visual state, clinical state and simulation state may differ in truth class, but they must remain synchronized to the same underlying temporal context.
+
+The goal is not “everything updates at once”. The goal is **everything updates in the correct biological order, at the correct modeled timescale, with explicit concurrent processes and explicit compensation**.
