@@ -160,4 +160,38 @@ assert.equal(missingLineage.physiology.simulated.length, 0)
 assert.equal(missingLineage.physiology.blocked.length, 3)
 assert.ok(missingLineage.physiology.blocked.every((field) => field.reason === 'missing-lineage'))
 
+
+const futureHeartRate: LongitudinalEvent<number> = {
+  ...heartRate,
+  id: 'evt-heart-rate-future',
+  value: 88,
+  recordedAt: '2026-09-29T00:00:00.000Z',
+  provenance: {
+    ...heartRate.provenance,
+    capturedAt: '2026-09-29T00:00:00.000Z',
+    receivedAt: '2026-09-29T00:00:01.000Z',
+  },
+}
+const stateWithFuture = ingestLongitudinalEvent(state, futureHeartRate).state
+const futureBoundary = boundaryConditionFromLongitudinalEvent(futureHeartRate, { name: 'boundary.heart-rate' })
+const futurePhysiology = runPhysiologicalSimulation({
+  registry,
+  boundaryConditions: [futureBoundary],
+  untilSeconds: 0,
+})
+const historical = projectHumanState({
+  state: stateWithFuture,
+  surface: 'clinical',
+  physiology: futurePhysiology,
+  at: '2026-09-28T12:00:00.000Z',
+})
+const historicalHeartRate = historical.canonical.metrics.find((item) => item.metric === 'heart-rate')
+assert.equal(historicalHeartRate?.latest.id, heartRate.id, 'snapshot X(t) must not select a canonical observation from the future')
+assert.equal(historicalHeartRate?.latest.value, 72)
+assert.equal(historical.physiology.observed.length, 0)
+assert.equal(historical.physiology.estimated.length, 0)
+assert.equal(historical.physiology.simulated.length, 0)
+assert.equal(historical.physiology.blocked.length, 3)
+assert.ok(historical.physiology.blocked.every((field) => field.reason === 'not-yet-effective'))
+
 console.log('human-state-projection: one shared state, body-exposure surface, consent-scoped physiology lineage, and observed/estimated/simulated separation verified')
