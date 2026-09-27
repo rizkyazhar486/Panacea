@@ -104,9 +104,9 @@ where:
 - (mathbf{x}) = physiological state vector;
 - (mathbf{u}) = medications, procedures, behavior and other interventions;
 - (mathbf{e}) = environmental/external exposures;
-- (oldsymbol{\theta}) = patient/model parameters;
+- (\\boldsymbol{\theta}) = patient/model parameters;
 - (mathbf{C}) = cross-system coupling structure;
-- (oldsymbol{\epsilon}) = model/process uncertainty.
+- (\\boldsymbol{\epsilon}) = model/process uncertainty.
 
 A practical transition may be represented as:
 
