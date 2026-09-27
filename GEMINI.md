@@ -13,3 +13,14 @@ Then follow the canonical operating layer referenced there, including `PANACEA_P
 Do not create feature breadth merely to demonstrate activity. Preserve existing work, improve maturity and integration, and keep the source of truth evidence-backed.
 
 If this adapter conflicts with `AGENTS.md` or the Panacea Constitution, the higher authority governs.
+
+
+## Reality Engine / compounding human depth
+
+Gemini must inherit the model-agnostic doctrine in [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md) for computational-human, Clinical, AI-EMR, Body Exposure, simulation, device, and longitudinal-health work.
+
+Future depth is both biological and longitudinal: deepen scientific scale continuity while also deepening personal calibration, temporal replay, causal explanation, Reality Gap/uncertainty, prediction-vs-reality falsification, outcome feedback, and counterfactual validity.
+
+Never overfit personalization, invent hidden state, hide uncertainty, rewrite real history with newer models, convert correlation into causation, or present counterfactual branches as real outcomes. Real observed history remains canonical; simulated branches remain isolated.
+
+This is an architecture requirement, not a claim that the Reality Engine runtime is implemented.

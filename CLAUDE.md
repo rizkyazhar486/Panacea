@@ -994,3 +994,14 @@ When implementing physiology/pathophysiology:
 - keep Clinical, Body Exposure and Simulation projections synchronized to one temporal context.
 
 Never fake compensation or “realistic” downstream behavior with arbitrary scripted animations. Missing feedback loops are explicit vertical/coupling gaps.
+
+
+## Reality Engine / compounding-depth authority — 2026-09-27
+
+For computational-human, Clinical, AI-EMR, Body Exposure, simulation, device, or longitudinal-health work, Claude must also read and apply [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+Do not interpret vertical depth as anatomy/molecular depth alone. After hard safety/security/data/clinical blockers, deepen the existing system through semantic observation quality, physiological/model depth, cross-system coupling, personal parameter identifiability, explicit Reality Gap/uncertainty, causal explanation, prediction-vs-reality falsification, temporal replay/version fidelity, and counterfactual validation before adding shallow breadth.
+
+Preserve the real observed timeline as canonical reality. Counterfactual branches are simulated only. Never overfit personalization, invent latent internal state for completeness, hide uncertainty, rewrite historical interpretation, or treat correlation as causation. Additional model capability should increase falsifiability and validated compounding depth.
+
+The approved doctrine is architectural direction, not evidence that the Reality Engine runtime is already shipped.
