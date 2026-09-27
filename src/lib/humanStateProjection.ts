@@ -22,7 +22,7 @@ import type {
 } from './physiology/runtime.ts'
 
 export type HumanStateTruthLane = 'observed' | 'estimated' | 'simulated'
-export type HumanStateBlockReason = 'missing-lineage' | 'unauthorized-lineage' | 'surface-policy'
+export type HumanStateBlockReason = 'missing-lineage' | 'unauthorized-lineage' | 'not-yet-effective' | 'surface-policy'
 
 export interface HumanStatePhysiologyField {
   name: string
@@ -120,7 +120,8 @@ function eventSurfacePolicyAllows(
   purpose: ConsentPurpose,
   atMs: number,
   consentLedger?: PurposeConsentLedger,
-): 'allowed' | 'unauthorized-lineage' | 'surface-policy' {
+): 'allowed' | 'unauthorized-lineage' | 'not-yet-effective' | 'surface-policy' {
+  if (Date.parse(event.recordedAt) > atMs) return 'not-yet-effective'
   if (!isConsentActive(event.consent, purpose, atMs)) return 'unauthorized-lineage'
   if (consentLedger && !isEventPurposeAuthorized(event, consentLedger, purpose, atMs)) return 'unauthorized-lineage'
   if ((surface === 'clinical' || surface === 'ai-emr') && !canEnterClinicalRecord(event, atMs)) return 'surface-policy'
@@ -153,7 +154,8 @@ function physiologyField(value: PhysiologicalValue, sourceEventIds: readonly str
  * Recorded observations remain in Canonical Patient State. Physiological values
  * remain explicitly observed/model-estimated/simulated and are admitted only
  * when every patient-derived boundary can be traced to an authorized source
- * event for the requested surface. Missing lineage fails closed.
+ * event for the requested surface. Missing lineage and future-effective
+ * source events fail closed.
  *
  * Invariant:
  *   Observed != Estimated != Simulated
