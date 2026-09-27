@@ -9,4 +9,13 @@ assert.equal(bersihkanGalatKlien({ jenis: 'lain', pesan: 'x' }), null, 'jenis ta
 const log: string[] = []
 catatGalatKlien(g, (b) => log.push(b)); catatGalatKlien(g, (b) => log.push(b))
 assert.equal(log.length, 1, 'galat identik dicatat sekali'); assert.deepEqual(ringkasanGalatKlien(), { total: 2, unik: 1 }); assert.equal(daftarGalatKlien()[0].jumlah, 2)
+
+const konteksLain = { ...g, rute: '/owner', fitur: 'Owner' }
+catatGalatKlien(konteksLain, (b) => log.push(b))
+assert.equal(log.length, 2, 'route atau fitur berbeda harus menghasilkan insiden unik')
+assert.deepEqual(ringkasanGalatKlien(), { total: 3, unik: 2 })
+
+catatGalatKlien(g, (b) => log.push(b))
+assert.equal(log.length, 2, 'konteks yang sama tetap didedup')
+assert.equal(daftarGalatKlien().find((item) => item.rute === g.rute)?.jumlah, 3)
 console.log('galatKlien: lulus')
