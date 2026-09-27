@@ -399,3 +399,30 @@ assert.equal(deprecated.lawsById[lawV1.id].status, 'deprecated')
 assert.equal(deprecated.supersededByLawId[lawV1.id], undefined)
 
 console.log('human-law-registry: provenance-complete lifecycle and reconstructable supersession verified')
+
+
+/* Final review regression tests: supersession must always be reconstructable,
+ * and ontology identity cannot be structurally empty. */
+assert.throws(() => registerHumanLaw(createHumanLawRegistry(), law({
+  id: 'law:empty-ontology-concepts',
+  ontologyRefs: [{ namespace: 'panacea-human', version: '2026-09-28', conceptIds: [] }],
+})), /conceptIds.*empty/)
+
+assert.throws(() => transitionHumanLaw(acceptedPair, lawV1.id, {
+  to: 'superseded',
+  changedAt: '2026-09-28T02:10:00.000Z',
+  changedBy: 'reviewer:1',
+  reason: 'must use dedicated supersession API',
+  evidenceRefs: ['external-validation:v2'],
+}), /supersedeHumanLaw/)
+
+const orphanSuperseded = {
+  ...acceptedPair,
+  lawsById: {
+    ...acceptedPair.lawsById,
+    [lawV1.id]: { ...acceptedPair.lawsById[lawV1.id], status: 'superseded' as const },
+  },
+}
+assert.throws(() => getHumanLawLineage(orphanSuperseded, lawV1.id), /missing supersession edge/)
+
+console.log('human-law-registry final review: ontology identity and supersession integrity')
