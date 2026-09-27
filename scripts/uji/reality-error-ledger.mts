@@ -91,6 +91,32 @@ const observation = (overrides: Record<string, unknown> = {}) => ({
 }) as any
 const opts = { matchToleranceMs: 60_000, comparisonCreatedAt: '2026-09-27T10:30:02.000Z' }
 const fresh = recordRealityPrediction(createRealityErrorLedger('subject-1'), prediction()).ledger
+const blockedObservations = [
+  observation({ consent: { ...observation().consent, granted: false } }),
+  observation({ consent: { ...observation().consent, purposes: ['clinical-support'] } }),
+  observation({ consent: { ...observation().consent, revokedAt: opts.comparisonCreatedAt } }),
+  observation({ consent: { ...observation().consent, expiresAt: opts.comparisonCreatedAt } }),
+  observation({ consent: { ...observation().consent, grantedAt: '2026-09-27T10:31:00.000Z' } }),
+  observation({ provenance: { ...observation().provenance, sourceKind: 'derived' } }),
+  observation({ review: { state: 'rejected', reviewerId: 'fixture-reviewer', reviewedAt: '2026-09-27T10:30:01.000Z' } }),
+  observation({ provenance: { ...observation().provenance, receivedAt: '2026-09-27T10:31:00.000Z' } }),
+  observation({ provenance: { ...observation().provenance, capturedAt: '2026-09-27T10:31:00.000Z', receivedAt: '2026-09-27T10:31:01.000Z' } }),
+]
+for (const blocked of blockedObservations) {
+  const beforeLedger = structuredClone(fresh), beforeObservation = structuredClone(blocked)
+  assert.throws(() => comparePredictionToObservation(fresh, 'pred-1', blocked, opts), /consent|derived|rejected|available/)
+  assert.throws(() => matchPredictionToObservations(fresh, 'pred-1', [blocked], opts), /no admissible observation/)
+  const selected = matchPredictionToObservations(fresh, 'pred-1', [
+    { ...blocked, id: 'a-blocked' }, observation({ id: 'z-admissible' }),
+  ], opts)
+  assert.equal(selected.comparison.observationEventId, 'z-admissible', 'ineligible nearest/tied candidate cannot be selected')
+  assert.deepEqual(fresh, beforeLedger, 'denial and selection leave source ledger unchanged')
+  assert.deepEqual(blocked, beforeObservation, 'governance cannot be rewritten to admit an observation')
+}
+const consentAfterComparison = comparePredictionToObservation(fresh, 'pred-1', observation({
+  consent: { ...observation().consent, revokedAt: '2026-09-27T10:31:00.000Z' },
+}), opts)
+assert.equal(consentAfterComparison.comparison.observedValue, 126, 'historical replay evaluates consent at comparison time')
 const predBeforeCompare = structuredClone(fresh.predictionsById['pred-1'])
 const compared = comparePredictionToObservation(fresh, 'pred-1', observation(), opts)
 assert.equal(compared.ledger.revision, 2)

@@ -1,5 +1,5 @@
 import type { LongitudinalEvent } from '../panaceaLongitudinalState.ts'
-import { validateLongitudinalEvent } from '../panaceaLongitudinalState.ts'
+import { isConsentActive, validateLongitudinalEvent } from '../panaceaLongitudinalState.ts'
 import type { PhysiologicalFidelity, PhysiologicalValidationClass } from './runtime.ts'
 
 export type RealityPredictionStatus = 'pending' | 'matched' | 'expired-unobserved'
@@ -162,6 +162,13 @@ function validateRealityObservation(
   if (!ADMISSIBLE_OBSERVATION_STATES.has(String(observation.semanticState))) {
     throw new Error(`observation semanticState ${String(observation.semanticState)} is not an admissible reality observation`)
   }
+  // Same personal-visualization scope as the canonical physiology pipeline.
+  // Transport validity alone does not authorize use or establish observed truth.
+  if (!isConsentActive(observation.consent, 'personal-visualization', comparisonCreatedAtMs)) {
+    throw new Error('observation consent is not active for personal-visualization')
+  }
+  if (observation.provenance.sourceKind === 'derived') throw new Error('derived source is not a reality observation')
+  if (observation.review.state === 'rejected') throw new Error('rejected observation is not admissible')
   if (observation.subjectId.trim() !== prediction.subjectId) throw new Error('observation subject does not match prediction subject')
   if (observation.metric.trim() !== prediction.field) throw new Error('observation field does not match prediction field')
   if (typeof observation.unit !== 'string' || observation.unit.trim() !== prediction.unit) throw new Error('observation unit does not match prediction unit')
@@ -171,6 +178,9 @@ function validateRealityObservation(
   const targetAtMs = parseIso(prediction.targetAt, 'prediction.targetAt')
   if (Math.abs(observedAtMs - targetAtMs) > matchToleranceMs) throw new Error('observation is outside match tolerance')
   if (comparisonCreatedAtMs < observedAtMs) throw new Error('comparisonCreatedAt must not be before observation time')
+  if ([observation.provenance.capturedAt, observation.provenance.receivedAt].some(time => Date.parse(time) > comparisonCreatedAtMs)) {
+    throw new Error('observation provenance must be available at comparisonCreatedAt')
+  }
   return observedAtMs
 }
 
