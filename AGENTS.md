@@ -162,3 +162,25 @@ All future computational-human work must preserve the longitudinal operating law
 Do not implement independent organ snapshots when a causal/time-dependent relationship exists. Model changes as ordered state transitions with explicit concurrent processes, cross-system domino effects, compensation/counter-regulation, conservation constraints where applicable, uncertainty and parent provenance.
 
 The target is one synchronized biological operating system: different engines may run at different time steps, but all must participate in the same dependency-aware temporal graph.
+
+
+## Reality Engine / compounding human depth — mandatory
+
+Every current and future agent working on computational-human, Clinical, AI-EMR, Body Exposure, simulation, devices, longitudinal health, or physiological modeling must read and apply [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+“Vertical deepening” now has two simultaneous axes:
+1. biological continuity: whole person -> system -> organ -> tissue -> cell -> organelle -> molecular/RNA/DNA;
+2. longitudinal compounding depth: personal calibration -> temporal continuity/replay -> causal explanation -> Reality Gap/uncertainty -> prediction-vs-reality falsification -> outcome feedback/recalibration.
+
+The Reality Engine doctrine requires future work to expose what is unknown, preserve prediction error, improve parameter identifiability before personalization, keep counterfactual branches isolated from real history, and use additional model capability to improve falsifiability and validated depth rather than merely generate more features.
+
+Hard prohibitions:
+- do not overfit personalization;
+- do not invent hidden physiological state to make the model appear complete;
+- do not hide uncertainty or Reality Gaps;
+- do not rewrite historical interpretation with newer model outputs without preserving the original version;
+- do not treat correlation as causation;
+- do not present counterfactual branches as real or guaranteed outcomes;
+- do not silently use private user data for population/model training.
+
+This is approved architecture. It does **not** mean the Reality Engine runtime, Biological Git, Reality Gap Registry, calibration engine, Active Sensing, counterfactual runtime, or Human Model SDK are already implemented.

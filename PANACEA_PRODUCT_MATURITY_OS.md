@@ -40,6 +40,44 @@ Canonical implementation order:
 
 `shared primitive -> domain engine -> coupling -> validation -> projection -> UX/performance optimization -> justified breadth`.
 
+## Compounding-depth operating law
+
+The approved child-spec is [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+A capability may be integrated yet still immature if it is shallow in scientifically relevant personalization, temporal continuity, causal explanation, epistemic coverage, or outcome feedback.
+
+Use the additional internal heuristic:
+
+[
+S_{compound}
+=
+S_{vertical}
+	imes
+D_{personalization}
+	imes
+D_{temporal}
+	imes
+D_{causal}
+	imes
+D_{epistemic}
+	imes
+D_{feedback}
+]
+
+This is an architecture heuristic, not a clinical score. Unknown dimensions remain unknown.
+
+Compounding-depth gaps include, where relevant:
+- prediction-error ledger absent or non-auditable;
+- personal parameters lack identifiability/provenance/uncertainty;
+- Reality Gap is hidden by inferred or decorative completeness;
+- temporal checkpoint/replay/version history is missing;
+- counterfactual branches can contaminate the real timeline;
+- causal explanation is replaced by correlation;
+- later real outcomes are not compared against prior predictions;
+- recalibration occurs without held-out/future validation or overfitting safeguards.
+
+Safety, security, privacy, data integrity, clinical-release boundaries and canonical-state consistency remain higher priority than experimental personalization or counterfactual work.
+
 ## Product value function
 
 [
@@ -125,11 +163,12 @@ A new feature should normally require:
 2. broken core workflows;
 3. canonical-state inconsistency;
 4. integration debt and duplicate state;
-5. high-impact maturity gaps;
-6. UX friction;
-7. performance/observability;
-8. visual refinement;
-9. net-new breadth.
+5. high-impact domain/coupling/validation maturity gaps;
+6. high-impact compounding-depth gaps: identifiability, Reality Gap, replay/versioning, prediction-error feedback, counterfactual isolation;
+7. UX friction;
+8. performance/observability;
+9. visual refinement;
+10. net-new breadth.
 
 The owner may explicitly override this order.
 
@@ -162,7 +201,11 @@ Relevant layers should include:
 - observability;
 - mobile/accessibility;
 - integration with shared state;
-- measurable outcome or justified educational/research purpose.
+- measurable outcome or justified educational/research purpose;
+- prediction-vs-reality feedback where the capability makes predictions;
+- explicit known/unknown/stale/unsupported state where estimation exists;
+- replay/version provenance where historical reinterpretation matters;
+- counterfactual isolation where simulation branches exist.
 
 ## Anti-fragmentation laws
 - REUSE > CREATE

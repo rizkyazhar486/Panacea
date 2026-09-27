@@ -100,3 +100,24 @@ Before adding feature-local patient storage, ask:
 ## Clinical record boundary
 Live streams, AI drafts, simulations and reference anatomy do not silently become a signed clinical record.
 Promotion into committed clinical state must preserve applicable consent, review, provenance and audit rules already defined by the repository.
+
+
+## Personal model and Reality Engine metadata
+
+The approved Reality Engine architecture may maintain derived metadata such as:
+- personal model parameters;
+- parameter uncertainty/identifiability status;
+- prediction records;
+- prediction-vs-observation error records;
+- model-gap / Reality Gap classifications;
+- replay checkpoints;
+- counterfactual branch metadata;
+- recalibration history.
+
+These are **not** a second Canonical Patient State.
+
+A personalized parameter does not become measured patient truth merely because it is individualized. It must retain model/version, parameter definition, units, provenance, identifiability assumptions, uncertainty, calibration data references, validation status and rollback/version history.
+
+Prediction errors must remain auditable. Recalibration must not erase the earlier prediction or rewrite the real observed history.
+
+Counterfactual and reanalysis outputs remain separate from the canonical real timeline and cannot enter the signed clinical record without the same explicit review/publication boundary required for other model-derived outputs.

@@ -118,3 +118,41 @@ Definition-of-done additionally requires, where applicable:
 - evidence/provenance and explicit truth class;
 - visualization fidelity appropriate to each implemented scale;
 - explicit `VERTICAL GAP — NOT YET MODELED` boundaries rather than fabricated bridges.
+
+
+## Compounding human depth
+
+Approved child-spec: [../superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](../superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+For longitudinal computational-human capabilities, also consider:
+
+[
+S_{compound}
+=
+S_{vertical}
+	imes
+D_{personalization}
+	imes
+D_{temporal}
+	imes
+D_{causal}
+	imes
+D_{epistemic}
+	imes
+D_{feedback}
+]
+
+This is an internal architecture heuristic, never a clinical score.
+
+A capability is not compounding-mature merely because it has a detailed model or polished UI. Where relevant, maturity also requires:
+- predictions retained with model/version/provenance so later reality can falsify them;
+- prediction errors preserved rather than erased by recalibration;
+- personalized parameters to have explicit identifiability, uncertainty and bounded update rules;
+- unknown/stale/unsupported state to be visible as Reality Gap;
+- historical replay to preserve original model/version;
+- newer-model reanalysis to remain separate from historical interpretation;
+- counterfactual branches to be isolated from the canonical real timeline;
+- causal explanations to distinguish mechanism/evidence from correlation;
+- outcome feedback to improve validation/calibration evidence without overfitting.
+
+A system that personalizes without identifiability, predicts without outcome comparison, or simulates branches that can contaminate real state is not mature even if its surface is functional.

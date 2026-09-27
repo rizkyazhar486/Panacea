@@ -88,3 +88,28 @@ Resolution order:
 `INTEGRATE -> EXTRACT SHARED CORE -> SPECIALIZE DOMAIN ENGINE -> COUPLE -> VALIDATE -> DEPRECATE SAFELY -> JUSTIFY ISOLATION`
 
 Do not delete a feature solely because it is currently isolated.
+
+
+## Reality Engine feedback integration
+
+Preferred longitudinal feedback path:
+
+`observation -> Canonical Patient State -> Continuous Human Runtime -> model prediction -> later real observation -> Reality Engine comparison -> calibration / uncertainty / model-gap evidence -> validated projection`.
+
+Integration rules:
+- retain both prediction and later observation; never overwrite the former to hide error;
+- bind prediction/error records to model, version, parameter set and parent state;
+- personalize parameters only when an explicit identifiability contract permits it;
+- expose unsupported/unknown state as Reality Gap rather than inventing values;
+- replay historical state with the original model/version when reconstructing history;
+- keep newer-model reanalysis separate from original historical interpretation;
+- isolate counterfactual branches so they cannot publish into the real patient timeline;
+- distinguish mechanistic causal edges from correlation.
+
+Additional feature-island flags:
+- personalized model with no identifiability/provenance contract;
+- prediction surface with no later-outcome comparison;
+- hidden unknown/unsupported state;
+- replay that cannot reproduce original model/version;
+- counterfactual simulation sharing writable state with the real timeline;
+- causal explanation generated only from correlation.
