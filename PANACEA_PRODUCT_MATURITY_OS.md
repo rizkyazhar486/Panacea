@@ -9,17 +9,36 @@ Authority order:
 1. latest explicit repository-owner instruction;
 2. `PANACEA_CONSTITUTION.md`;
 3. `PANACEA_HUMANITY_10_CHARTER.md`;
-4. this Product Maturity OS;
-5. domain-specific directives and implementation notes.
+4. `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`;
+5. this Product Maturity OS;
+6. domain-specific directives and implementation notes.
 
 This file does not replace existing charters. It operationalizes them.
 
 ## Current phase
 Default development phase:
 
-`SPECIALIZE -> MATURE -> INTEGRATE -> VALIDATE -> SIMPLIFY -> OPTIMIZE -> SCALE`
+`STABILIZE -> DEEPEN SHARED INFRASTRUCTURE -> SPECIALIZE DOMAIN ENGINE -> COUPLE -> VALIDATE -> PROJECT -> SIMPLIFY -> OPTIMIZE -> SCALE`
 
-Do not default back to feature-count expansion.
+Do not default back to feature-count expansion. "Depth" means deeper domain computation, model fidelity, infrastructure, integration and validation — not merely more detail inside one page.
+
+## Vertical depth operating law
+
+The current architecture doctrine is [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).
+
+Use the internal heuristic:
+
+[
+S_{vertical} = D_{domain} \times D_{model} \times D_{infrastructure} \times D_{integration} \times D_{validation}
+]
+
+The terms represent biomedical/domain depth, mechanistic/computational model depth, infrastructure/runtime depth, cross-system/workflow integration and appropriate validation. Unknown dimensions remain unknown; do not fabricate precision.
+
+When choosing between similarly valuable software-addressable tasks after hard blockers, prefer the task that increases the weakest vertical factor or removes a coupling/state bottleneck. A new page or widget has low priority when an existing capability lacks a real model, shared state, provenance, uncertainty, validation or integration.
+
+Canonical implementation order:
+
+`shared primitive -> domain engine -> coupling -> validation -> projection -> UX/performance optimization -> justified breadth`.
 
 ## Product value function
 
@@ -42,8 +61,11 @@ The formula is a prioritization heuristic, not a clinical scoring instrument.
 
 ## Canonical system primitives
 Panaceamed should converge around:
-- **Canonical Patient State** — personalized state;
-- **Body Exposure** — spatial model;
+- **Canonical Patient State** — measured/recorded personalized truth with provenance and truth classes;
+- **Physiological State Engine** — separate model-derived dynamic state for mechanistic simulation/digital-twin work;
+- **Domain Engine Registry / Model & Parameter Registry** — specialized computational capabilities, parameters and validation classes;
+- **Cross-System Coupling Fabric / Simulation Scheduler** — typed multi-system exchange and time evolution;
+- **Body Exposure** — spatial projection and interaction surface over shared reference/patient/model state;
 - **Timeline** — temporal model;
 - **Clinical Knowledge Graph** — medical relationship model;
 - **Reasoning Gateway** — AI-assisted synthesis and uncertainty;
@@ -112,9 +134,13 @@ A new feature should normally require:
 The owner may explicitly override this order.
 
 ## One vertical slice at a time
-Prefer:
+Prefer a workflow slice:
 
 `real input -> normalization -> shared state -> reasoning/logic -> user surface -> action -> persistence -> follow-up -> observable outcome`
+
+or, for computational-human work:
+
+`boundary condition -> domain engine -> coupling -> model-derived state -> validation -> shared projection`
 
 over creating multiple partially connected surfaces.
 
