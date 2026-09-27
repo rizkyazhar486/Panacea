@@ -110,4 +110,20 @@ assert.equal(fixture.stepCounts['synthetic.response'], 3)
 assert.equal(fixture.latest['synthetic.response.value'].truthClass, 'simulated')
 assert.ok(Number.isFinite(fixture.latest['synthetic.response.value'].value))
 
-console.log('physiological-runtime: fail-closed registry, deterministic multi-rate coupling, longitudinal boundary, synthetic fixture')
+// Registry declaration order must not control same-time dependency execution.
+const reversedFixtureRegistry = createDomainEngineRegistry([...syntheticCoupledEngines()].reverse(), [{ name:'boundary.input', unit:'1' }])
+const reversedFixture = runPhysiologicalSimulation({ registry:reversedFixtureRegistry, boundaryConditions:[mapped], untilSeconds:0 })
+assert.equal(reversedFixture.latest['synthetic.response.value'].value, fixture.latest['synthetic.response.value'].value)
+assert.deepEqual(reversedFixtureRegistry.engines.map((engine) => engine.id), ['synthetic.drive', 'synthetic.response'])
+
+const cycleA = baseEngine({
+  id:'cycle.a', modelId:'cycle-a', consumes:[{ name:'cycle.b.out', unit:'1' }],
+  produces:[{ name:'cycle.a.out', unit:'1', truthClass:'simulated' }],
+})
+const cycleB = baseEngine({
+  id:'cycle.b', modelId:'cycle-b', consumes:[{ name:'cycle.a.out', unit:'1' }],
+  produces:[{ name:'cycle.b.out', unit:'1', truthClass:'simulated' }],
+})
+assert.throws(() => createDomainEngineRegistry([cycleA, cycleB]), /cyclic engine dependency/)
+
+console.log('physiological-runtime: fail-closed registry, dependency-sorted deterministic multi-rate coupling, longitudinal boundary, synthetic fixture')

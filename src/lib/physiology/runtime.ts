@@ -113,6 +113,46 @@ function unitKey(unit: string): string {
   return trimmed
 }
 
+function topologicalEngineOrder(engines: readonly DomainEngineContract<any>[]): {
+  ordered: DomainEngineContract<any>[]
+  cyclic: string[]
+} {
+  const byId = new Map(engines.map((engine) => [engine.id, engine]))
+  const index = new Map(engines.map((engine, i) => [engine.id, i]))
+  const producer = new Map<string, string>()
+  for (const engine of engines) for (const output of engine.produces) producer.set(output.name, engine.id)
+
+  const dependencies = new Map<string, Set<string>>(engines.map((engine) => [engine.id, new Set<string>()]))
+  const dependents = new Map<string, Set<string>>(engines.map((engine) => [engine.id, new Set<string>()]))
+  for (const engine of engines) {
+    for (const input of engine.consumes) {
+      const producerId = producer.get(input.name)
+      if (!producerId || producerId === engine.id || !byId.has(producerId)) continue
+      dependencies.get(engine.id)!.add(producerId)
+      dependents.get(producerId)!.add(engine.id)
+    }
+  }
+
+  const indegree = new Map([...dependencies].map(([id, deps]) => [id, deps.size]))
+  const ready = engines.filter((engine) => indegree.get(engine.id) === 0).map((engine) => engine.id)
+  const ordered: DomainEngineContract<any>[] = []
+  const sortReady = () => ready.sort((a, b) => (index.get(a) ?? 0) - (index.get(b) ?? 0))
+  sortReady()
+
+  while (ready.length) {
+    const id = ready.shift()!
+    ordered.push(byId.get(id)!)
+    for (const dependentId of dependents.get(id) ?? []) {
+      const next = (indegree.get(dependentId) ?? 0) - 1
+      indegree.set(dependentId, next)
+      if (next === 0) { ready.push(dependentId); sortReady() }
+    }
+  }
+
+  const cyclic = engines.filter((engine) => !ordered.some((candidate) => candidate.id === engine.id)).map((engine) => engine.id)
+  return { ordered, cyclic }
+}
+
 export function validateDomainEngineComposition(
   engines: readonly DomainEngineContract<any>[],
   boundaryFields: readonly BoundaryFieldDeclaration[] = [],
@@ -173,6 +213,12 @@ export function validateDomainEngineComposition(
     }
   }
 
+  const structurallyUnique = engineIds.size === engines.length && [...producers.values()].every((list) => list.length === 1)
+  if (structurallyUnique) {
+    const { cyclic } = topologicalEngineOrder(engines)
+    if (cyclic.length) errors.push(`cyclic engine dependency requires explicit initial-state contract: ${cyclic.join(', ')}`)
+  }
+
   return errors
 }
 
@@ -193,7 +239,8 @@ export function createDomainEngineRegistry(
       declarationByField[name] = { ...output, name, unit: unitKey(output.unit) }
     }
   }
-  return { engines: [...engines], boundaryFields: [...boundaryFields], producerByField, declarationByField }
+  const { ordered } = topologicalEngineOrder(engines)
+  return { engines: ordered, boundaryFields: [...boundaryFields], producerByField, declarationByField }
 }
 
 function fnv1a(text: string): string {
