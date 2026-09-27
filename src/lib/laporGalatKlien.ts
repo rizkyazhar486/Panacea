@@ -9,7 +9,7 @@ export function buatPelapor(kirim: (l: LaporanGalat) => void, rute: () => string
   return (jenis: LaporanGalat['jenis'], pesan: unknown, berkas = '', baris = 0, fitur = '') => {
     const teks = (pesan instanceof Error ? `${pesan.name}: ${pesan.message}` : String(pesan ?? '')).slice(0, 200)
     const l: LaporanGalat = { jenis, pesan: teks, berkas: String(berkas).split(/[?#]/)[0].split('/').pop()?.slice(0, 80) ?? '', baris: Number.isInteger(baris) ? baris : 0, rute: rute().split('?')[0].slice(0, 120), fitur: fitur.slice(0, 60), versi }
-    const tanda = `${l.jenis}|${l.pesan}|${l.berkas}|${l.baris}`
+    const tanda = `${l.jenis}|${l.pesan}|${l.berkas}|${l.baris}|${l.rute}|${l.fitur}|${l.versi}`
     if (terkirim.has(tanda) || terkirim.size >= MAKS_LAPORAN_PER_SESI) return false
     terkirim.add(tanda)
     try { kirim(l) } catch { /* telemetri tidak boleh melempar */ }
