@@ -112,6 +112,45 @@ where (mathbf{M}) identifies the exact model family, version, parameter set, sol
 
 **Hard boundary:** measured, clinician-authored and imported clinical truth must never be silently overwritten by simulated, inferred or model-derived values.
 
+## 3A. Human Observability layer
+
+The Canonical Patient State and Physiological State Engine are connected by a governed **Human Observability** layer defined in [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
+
+Conceptually:
+
+[
+\mathcal{O}_{1:t}
+=
+\{
+\mathbf{y}_{1:t},
+\mathbf{u}_{1:t},
+\mathbf{e}_{1:t},
+\mathbf{c}_{1:t},
+\mathbf{b}_{1:t},
+\mathbf{r}_{1:t}
+\}
+]
+
+collects authorized observed history — measurements, interventions, exposures, clinical context, behavior and patient-reported state — while the physiological engine may estimate hidden state only through an explicitly model-derived distribution such as:
+
+[
+p(
+\mathbf{x}_t
+\mid
+\mathcal{O}_{1:t},
+\boldsymbol{\theta},
+\mathbf{M}
+)
+]
+
+The architecture must preserve the distinction between observation and inference.
+
+Operationally, Panacea should converge toward:
+
+`SENSE -> NORMALIZE -> IDENTIFY -> PROVENANCE -> AUTHORIZE -> FUSE -> ESTIMATE -> SIMULATE -> DETECT -> EXPLAIN -> REVIEW -> ACT -> MEASURE OUTCOME -> LEARN`.
+
+This is universal across Clinical, AI-EMR, Body Exposure, devices, wearables, environment, longevity, performance, imaging, procedures and future domain engines. "Continuous" means event-driven and time-aware; it never permits fabrication between measurements. Missing/stale expected inputs are explicit observability gaps.
+
 ## 4. Specialized domain engines
 
 Every major human system should ultimately be represented by specialized computational engines that share common contracts rather than by isolated pages.

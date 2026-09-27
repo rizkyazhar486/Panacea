@@ -23,6 +23,15 @@ For product prioritization, every agent must also follow [`docs/LONGEVITY_FIRST_
 
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
 
+## Human Observability — universal operational doctrine
+
+Every current and future agent must also read and apply [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
+
+Panaceamed's universal state model is longitudinal and operational: authorized sensor/device data, clinical records, patient-reported state, behavior, interventions, environment and outcomes converge into one governed human context. Each observation preserves timestamp, provenance, confidence and truth class; derived, inferred, simulated and reference state remain distinct from measured patient truth. Expected-but-missing or stale signals are explicit blind spots rather than values to fabricate.
+
+Treat the owner's "human surveillance" shorthand as **permissioned observability**, not covert monitoring. Purpose-bound consent, least privilege, review boundaries, access lineage and revocation wrap every projection and action. New pages, agents and domain engines should integrate with the existing longitudinal/consent/replay primitives rather than create another isolated truth store.
+
+
 ## Objective
 
 Develop Panacea quickly without destroying existing work. Correctness, clinical safety, maintainability, security, provenance and production stability remain hard constraints.

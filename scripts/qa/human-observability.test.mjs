@@ -1,0 +1,149 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {
+  buildHumanObservabilityFrame,
+  observabilityGapForMetric,
+  observationsByTruthClass,
+} from '../../src/lib/humanObservability.ts'
+import {
+  appendPurposeConsentDecision,
+  createPurposeConsentLedger,
+} from '../../src/lib/purposeConsentLedger.ts'
+import {
+  createLongitudinalPatientState,
+  ingestLongitudinalBatch,
+} from '../../src/lib/panaceaLongitudinalState.ts'
+
+const subjectId = 'observability-subject-1'
+const consent = {
+  granted: true,
+  purposes: ['personal-visualization', 'clinical-support', 'ai-context'],
+  grantedAt: '2026-09-01T00:00:00.000Z',
+}
+
+function event({
+  id,
+  metric,
+  domain,
+  value,
+  recordedAt,
+  semanticState = 'measured',
+  sourceKind = 'wearable',
+}) {
+  return {
+    id,
+    subjectId,
+    domain,
+    metric,
+    value,
+    recordedAt,
+    confidence: 0.9,
+    semanticState,
+    provenance: {
+      sourceKind,
+      sourceId: `${sourceKind}:${id}`,
+      capturedAt: recordedAt,
+      receivedAt: recordedAt,
+      method: 'fixture',
+      version: '1',
+    },
+    consent,
+    review: { state: 'not-required' },
+  }
+}
+
+let ledger = createPurposeConsentLedger()
+ledger = appendPurposeConsentDecision(ledger, {
+  id: 'grant-personal',
+  subjectId,
+  purpose: 'personal-visualization',
+  action: 'grant',
+  decidedAt: '2026-09-01T00:00:00.000Z',
+  source: 'user',
+})
+
+let state = createLongitudinalPatientState(subjectId, '2026-09-01T00:00:00.000Z')
+state = ingestLongitudinalBatch(state, [
+  event({
+    id: 'heart-rate',
+    metric: 'heart-rate',
+    domain: 'vital',
+    value: 72,
+    recordedAt: '2026-09-03T10:00:00.000Z',
+  }),
+  event({
+    id: 'simulated-readiness',
+    metric: 'readiness-scenario',
+    domain: 'readiness',
+    value: 0.74,
+    recordedAt: '2026-09-03T10:15:00.000Z',
+    semanticState: 'simulated',
+    sourceKind: 'derived',
+  }),
+  event({
+    id: 'future-heart-rate',
+    metric: 'heart-rate',
+    domain: 'vital',
+    value: 88,
+    recordedAt: '2026-09-03T12:00:00.000Z',
+  }),
+])
+
+test('human observability excludes future knowledge and preserves truth classes', () => {
+  const frame = buildHumanObservabilityFrame({
+    state,
+    consentLedger: ledger,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+    expectations: [
+      { metric: 'heart-rate', maxAgeMs: 2 * 60 * 60 * 1000 },
+      { metric: 'spo2', maxAgeMs: 15 * 60 * 1000 },
+    ],
+  })
+
+  assert.equal(frame.observations.length, 2)
+  assert.equal(frame.observations.some((observation) => observation.eventId === 'future-heart-rate'), false)
+  assert.equal(observationsByTruthClass(frame, 'observed').length, 1)
+  assert.equal(observationsByTruthClass(frame, 'simulated').length, 1)
+  assert.equal(observabilityGapForMetric(frame, 'heart-rate'), undefined)
+  assert.equal(observabilityGapForMetric(frame, 'spo2')?.reason, 'missing')
+  assert.equal(frame.boundary.missingDataMayBeFabricated, false)
+  assert.equal(frame.boundary.autonomousClinicalActionAllowed, false)
+})
+
+test('stale expected signals become explicit blind spots', () => {
+  const frame = buildHumanObservabilityFrame({
+    state,
+    consentLedger: ledger,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+    expectations: [{ metric: 'heart-rate', maxAgeMs: 30 * 60 * 1000 }],
+  })
+
+  const gap = observabilityGapForMetric(frame, 'heart-rate')
+  assert.equal(gap?.reason, 'stale')
+  assert.equal(gap?.ageMs, 60 * 60 * 1000)
+})
+
+test('purpose revocation removes observations from the authorized frame', () => {
+  const revoked = appendPurposeConsentDecision(ledger, {
+    id: 'revoke-personal',
+    subjectId,
+    purpose: 'personal-visualization',
+    action: 'revoke',
+    decidedAt: '2026-09-03T10:30:00.000Z',
+    source: 'user',
+  })
+
+  const frame = buildHumanObservabilityFrame({
+    state,
+    consentLedger: revoked,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+  })
+
+  assert.equal(frame.observations.length, 0)
+  assert.equal(frame.governance.ledgerAuthorized, false)
+  assert.ok(frame.governance.purposeConsentFilteredEvents > 0)
+  assert.equal(frame.boundary.covertCollectionAllowed, false)
+})

@@ -41,6 +41,15 @@ After hard safety/security/data/clinical blockers, default sequencing is:
 A future stronger model should spend additional capability on deeper models, infrastructure, coupling, falsification, validation and integration rather than automatically generating more routes/widgets. Existing longevity sequencing, Universal Human Gold Standard, clinical-validation release gates, provenance rules and no-fake-data boundaries remain in force.
 
 
+## Human Observability authority — 2026-09-28
+
+For every broad continuation, data integration, device/wearable task, AI-EMR/Clinical workflow, Body Exposure/digital-twin task, longitudinal-health task or new domain engine, Claude Code must also read and apply [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
+
+The owner's recurring "surveillance of the human" concept is formalized as **permissioned Human Observability**: continuously integrate authorized observations, interventions, exposures, behavior, clinical context and outcomes into the canonical longitudinal state; preserve time, provenance, truth class, uncertainty and consent; derive latent/simulated physiology only as separate state; expose blind spots instead of fabricating continuity; then project the governed state into Clinical, AI-EMR, Your Body, Body Exposure, longevity, performance, research and future surfaces. Treat the Palantir-style analogy as ontology-driven operational integration — data + logic + action + security around a changing real-world system — never as authorization for covert or non-consensual monitoring.
+
+Functional competence and ethical/clinical governance are conjunctive. A safe idea that does not work is not mature; a technically capable system that is unsafe, ungoverned or non-consensual is also not mature.
+
+
 ## Depth-over-dispersion execution law — 2026-09-27
 
 For broad continuation, feature proposals, Computational Human work and maturity work, apply the canonical loop from `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md` and `PANACEA_PRODUCT_MATURITY_OS.md`:

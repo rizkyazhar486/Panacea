@@ -11,6 +11,8 @@ The repository owner's latest explicit instruction remains the highest product-d
 
 **Computational-human architecture doctrine:** [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md) is the canonical product-architecture doctrine beneath this Constitution and the Humanity 10 Charter. It requires Panaceamed to mature as a Computational Human Platform with distinct recorded patient truth and model-derived physiological state, specialized domain engines, explicit cross-system coupling, shared provenance/uncertainty/validation infrastructure, and reusable projections. It does not weaken any evidence, safety, privacy, external-validation or human-review requirement in this Constitution.
 
+**Human-observability doctrine:** [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md) defines the universal longitudinal observation-and-action layer. It formalizes continuous human-state intelligence as purpose-authorized observability, not covert surveillance: measured/recorded truth, derived/inferred/simulated state, data lineage, uncertainty, blind spots, consent, review, actions and outcomes must remain reconstructable and governed across every Panacea surface.
+
 ---
 
 ## 1. Mission
