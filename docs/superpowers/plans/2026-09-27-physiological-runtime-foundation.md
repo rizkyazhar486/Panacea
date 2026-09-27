@@ -109,3 +109,26 @@
 - [ ] Record actual implemented paths and status only after tests pass.
 - [ ] Preserve no-fake-data and clinical-validation boundaries.
 - [ ] Verify exact-head status/CI and report any red/unknown gates.
+
+
+## Execution record — 2026-09-27
+
+Implemented runtime foundation:
+- `src/lib/physiology/runtime.ts`
+- `src/lib/physiology/longitudinalBoundary.ts`
+- `src/lib/physiology/exampleEngines.ts`
+- `scripts/uji/physiological-runtime.mts`
+- `DOCS/PHYSIOLOGICAL-RUNTIME.md`
+
+Evidence before landing:
+- RED observed when runtime module was absent.
+- Targeted runtime gate passed under Node TypeScript transform.
+- Isolated strict TypeScript check found and fixed a readonly-history typing defect before push.
+- Second RED→GREEN pass added direct-boundary truth-class enforcement, source-semantic consistency, validation/fidelity provenance and content-sensitive provenance ids.
+- Production blob `src/lib/physiology/runtime.ts` on main matches the locally tested blob SHA `d207d58474dcd73f01b7d955815461e539d48527`.
+
+Landed commits:
+- `e26c33ff87ef347c1d68942458b8107c59949c95` — runtime foundation.
+- `5a8a66fc3c0961e40a0875c8922e80c84e8c02d6` — truth/provenance hardening and source-of-truth wiring.
+
+Repository-wide `npm run build` / full `npm run uji` are not claimed from the local partial workspace. Exact-head GitHub acceptance evidence must be read separately; absence of a workflow run is not green status.
