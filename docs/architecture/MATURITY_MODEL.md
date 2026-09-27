@@ -1,5 +1,7 @@
 # Capability Maturity Model
 
+Canonical architecture doctrine: [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](../../PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).
+
 ## Lifecycle
 `DISCOVERED -> MAPPED -> CONNECTED -> FUNCTIONAL -> VALIDATED -> MATURE -> PRODUCTION_READY -> OPTIMIZED`
 
