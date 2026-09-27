@@ -15,9 +15,35 @@ Every important capability should declare:
 - knowledge relationships;
 - shared services;
 - workflow entry/exit;
-- evidence/provenance boundary.
+- evidence/provenance boundary;
+- truth class: measured/reference/inferred/model-derived/simulated;
+- model/parameter identity where computation is involved;
+- coupling fields/events and units;
+- validation class and unsupported domain.
 
 The machine-readable source is `governance/FEATURE_REGISTRY.yaml`.
+
+## Domain-engine and coupling contract
+
+For computational-human work, integration is deeper than connecting pages.
+
+A specialized domain engine should declare:
+- state variables and units;
+- boundary-condition inputs;
+- interventions/exposures consumed;
+- modeled outputs/events;
+- model and parameter versions;
+- uncertainty and provenance;
+- coupling fields consumed/produced;
+- time-step/scheduling assumptions where relevant;
+- failure/non-convergence behavior;
+- validation class.
+
+Cross-system exchange should use shared typed fields/events and unit validation. Do not make cardiovascular, respiratory, renal, neuro, metabolic or other domains depend directly on one another's UI components.
+
+Preferred pattern:
+
+`patient/reference input -> normalized boundary condition -> domain engine -> coupling fabric -> model-derived state -> validation -> one or more projections`.
 
 ## High-value integration patterns
 
@@ -34,7 +60,10 @@ The machine-readable source is `governance/FEATURE_REGISTRY.yaml`.
 `Diagnosis -> clinical record -> timeline -> relevant Body Exposure context -> treatment/monitoring -> outcome`
 
 ### Procedure
-`Procedure -> clinical documentation -> timeline -> anatomy/simulation context -> outcome monitoring`
+`Procedure -> clinical documentation -> timeline -> anatomy/simulation context -> modeled intervention state when justified -> coupled response -> outcome monitoring`
+
+### Cross-system physiology
+`measured/reference boundary conditions -> specialized engines -> typed coupling -> model-derived whole-body state -> Clinical/Body Exposure/Simulation projections`
 
 ## Feature-island detection
 Flag capabilities that have:
@@ -46,9 +75,14 @@ Flag capabilities that have:
 - UI without backend/data contract;
 - backend without reachable user workflow;
 - duplicated APIs/services;
-- no provenance for important clinical outputs.
+- no provenance for important clinical outputs;
+- model output without model/parameter identity;
+- hidden unit conversion across domain engines;
+- direct UI-to-UI physiological coupling;
+- simulated values written back as measurements;
+- duplicated coupling logic that should live in a shared engine/fabric.
 
 Resolution order:
-`INTEGRATE -> EXTRACT SHARED CORE -> SPECIALIZE -> DEPRECATE SAFELY -> JUSTIFY ISOLATION`
+`INTEGRATE -> EXTRACT SHARED CORE -> SPECIALIZE DOMAIN ENGINE -> COUPLE -> VALIDATE -> DEPRECATE SAFELY -> JUSTIFY ISOLATION`
 
 Do not delete a feature solely because it is currently isolated.
