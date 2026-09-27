@@ -69,6 +69,15 @@ Operational laws:
 
 The same rule applies recursively: whole human -> system -> organ -> tissue -> cell -> molecule, and input -> state -> engine -> coupling -> validation -> projection -> outcome. Depth must compound across both biological scale and software execution.
 
+## 1B. Meaningful horizontal expansion and future-realizable depth
+
+This doctrine also inherits [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+**Meaningful horizontal expansion** is allowed when a new domain closes a real human-model gap, supplies an observation/intervention needed by existing engines, creates a consequential coupling, improves a measurable outcome, or provides reusable infrastructure that deepens multiple existing domains.
+
+Future capability may be specified before it is technically implementable, but the present implementation must stop at the deepest scientifically supportable layer. Unsupported intermediate biology remains `VERTICAL GAP — NOT YET MODELED`; future ambition is never permission to fabricate the bridge.
+
+
 ## 2. Hard prohibitions
 
 The following are **forbidden design patterns** for all future work.

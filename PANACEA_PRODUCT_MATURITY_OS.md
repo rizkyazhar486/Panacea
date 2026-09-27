@@ -15,6 +15,24 @@ Authority order:
 
 This file does not replace existing charters. It operationalizes them.
 
+## Invictus future-realizable execution law
+
+This operating system inherits [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+For frontier work, use the explicit sequence:
+
+```text
+IMAGINE FUTURE-REALIZABLE CAPABILITY
+-> FORMALIZE STABLE INTERFACE
+-> SELECT DEEPEST JUSTIFIED PRESENT SLICE
+-> INTEGRATE WITH SHARED HUMAN STATE
+-> VALIDATE / FALSIFY AGAINST REALITY
+-> COMPOUND
+```
+
+Imagination may enter research/specification space before implementation is possible. It does not enter patient truth, clinical claims or production maturity until the corresponding evidence, provenance, consent, validation and release gates are satisfied. Prefer architectures that remain absorbable by stronger future models and avoid vendor-owned patient truth or model-specific state forks.
+
+
 ## Current phase
 Default development phase:
 

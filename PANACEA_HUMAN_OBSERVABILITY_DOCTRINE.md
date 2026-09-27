@@ -179,6 +179,22 @@ Blind spots are first-class state, not an error to hide.
 
 ---
 
+## 5A. Knowledge boundary and uncertainty anatomy
+
+This doctrine inherits [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+Every important human-state question should be able to expose a **knowledge boundary** rather than collapse uncertainty into one answer:
+
+- `KNOWN`
+- `KNOWN_WITH_UNCERTAINTY`
+- `KNOWABLE_BUT_UNMEASURED`
+- `CURRENTLY_UNIDENTIFIABLE`
+- `SCIENTIFICALLY_UNCERTAIN`
+- `UNSUPPORTED`
+
+These are epistemic boundary states, not diagnoses or confidence scores. Body Exposure and other projections should progressively support **uncertainty anatomy**: making it visible which structures/signals are observed, estimated, stale, reference-only, unknown or unsupported for the individual. Realistic rendering must never visually erase a knowledge gap.
+
+
 ## 6. Human observability is multiscale
 
 The same longitudinal identity should remain coherent across:
