@@ -2,6 +2,12 @@
 
 ## Autonomous final-33% execution directive — 2026-09-25
 
+## Invictus compounding-depth authority — 2026-09-28
+
+For every broad continuation, architecture decision, major feature proposal, Computational Human task, Human Observability task, Body Exposure/simulation task, or future-model expansion, Claude Code must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+"Invictus" is an engineering direction, not a literal claim of invincibility or clinical certainty. Optimize for compounding coherence: deepen the canonical longitudinal human model, deepen specialized engines, couple systems and scales, falsify and validate against reality, project shared capability into existing surfaces, measure outcomes, and expand only when expansion strengthens the integrated system. Imagination may generate hypotheses; patient truth and clinical claims remain evidence-bound.
+
 For the owner's current finishing mission, Claude Code Opus 5.5 must also read and execute [`docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md`](docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md). It converts the maturity-first operating model into a continuous execution loop: inspect current main → select the highest-value blocker → implement → validate → commit → push → inspect exact-head CI → repair/integrate → verify main → immediately continue. Do not wait for a repeated “lanjut” after each verified task. Hard platform/context/usage limits cannot be bypassed; before an unavoidable limit, leave a committed, pushed, exact-SHA continuation state so the next session can resume without reconstructing the work.
 
 
