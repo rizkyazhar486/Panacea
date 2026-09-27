@@ -39,13 +39,13 @@ Panacea becomes difficult to displace not by claiming infallibility, but by beco
 The product must therefore maximize two things simultaneously:
 
 [
-I_{future} = Imagination 	imes Absorbability 	imes ArchitecturalContinuity
+I_{future} = Imagination \times Absorbability \times ArchitecturalContinuity
 ]
 
 and
 
 [
-T_{reality} = Provenance 	imes Falsifiability 	imes UncertaintyDiscipline 	imes Validation
+T_{reality} = Provenance \times Falsifiability \times UncertaintyDiscipline \times Validation
 ]
 
 A radical speculative capability is allowed to exist as a design target or hypothesis-space primitive. It is not allowed to cross into patient truth merely because a model can generate it.
@@ -57,7 +57,7 @@ Digital twin is a useful implementation concept but not the final abstraction.
 Panacea should progressively converge on a permissioned Human Reality Model:
 
 [
-mathcal H(t)
+\mathcal H(t)
 =
 {
 B,P,C,M,E,R,A,G,K,U
@@ -86,14 +86,14 @@ A single flat state vector is insufficient for the long-term architecture.
 Conceptually:
 
 [
-mathcal X_{s,d,	au,e,r}(t)
+\mathcal X_{s,d,\tau,e,r}(t)
 ]
 
 may index:
 
 - biological scale (s);
 - physiological/domain axis (d);
-- temporal resolution (	au);
+- temporal resolution (\tau);
 - epistemic class (e);
 - reality/counterfactual branch (r).
 
@@ -128,11 +128,9 @@ The strongest invariant is:
 
 [
 H_{observed}
-
-eq
+\neq
 H_{predicted}
-
-eq
+\neq
 H_{counterfactual}
 ]
 
@@ -235,14 +233,14 @@ The runtime should eventually prioritize model execution by value:
 [
 M^*
 =
-argmax_M
-rac{
+\arg\max_M
+\frac{
 ExpectedInformationGain(M)
-	imes
+\times
 HumanRelevance(M)
-	imes
+\times
 Urgency(M)
-	imes
+\times
 DecisionValue(M)
 }{
 ComputeCost(M)+LatencyCost(M)
@@ -274,9 +272,9 @@ Conceptually:
 
 [
 P(
-X_{t+Delta}
-mid
-X_t,U,E,Theta,M
+X_{t+\Delta}
+\mid
+X_t,U,E,\Theta,M
 )
 ]
 
@@ -299,9 +297,9 @@ Counterfactual simulation should behave like version-control branches over a hum
 
 [
 H_0
-ightarrow
+\rightarrow
 {
-H_A,H_B,H_C,ldots
+H_A,H_B,H_C,\ldots
 }
 ]
 
@@ -322,7 +320,7 @@ Every important predictive or mechanistic model should eventually have an advers
 [
 x^*
 =
-argmax_x Error(M,x)
+\arg\max_x Error(M,x)
 ]
 
 The adversary may search for:
@@ -373,7 +371,7 @@ Conceptually:
 
 [
 VisualConfidence
-sim
+\sim
 f(
 TruthClass,
 Freshness,
@@ -401,10 +399,10 @@ When uncertainty matters, Panacea should eventually identify which new observati
 [
 m^*
 =
-argmax_m
-rac{
+\arg\max_m
+\frac{
 ExpectedUncertaintyReduction(m)
-	imes
+\times
 DecisionValue(m)
 }{
 Risk(m)+Burden(m)+Cost(m)
@@ -486,9 +484,9 @@ The human should not remain computationally isolated from environment.
 Where relevant and permissioned:
 
 [
-rac{dX}{dt}
+\frac{dX}{dt}
 =
-F(X,U,E_{world},Theta,t)
+F(X,U,E_{world},\Theta,t)
 ]
 
 Environment may include:
@@ -528,7 +526,7 @@ Conceptually:
 [
 Utility(a)
 =
-sum_i
+\sum_i
 w_i^{user}
 Outcome_i(a)
 ]
@@ -545,13 +543,13 @@ As AI capability increases, permission must remain distinct from possibility.
 A_{permitted}
 =
 A_{possible}
-cap
+\cap
 Consent
-cap
+\cap
 Authority
-cap
+\cap
 Safety
-cap
+\cap
 HumanIntent
 ]
 
@@ -596,7 +594,7 @@ and:
 [
 Reserve
 =
-Capacity_{max supportable}
+Capacity_{supportable,max}
 -
 CurrentDemand
 ]
@@ -610,15 +608,15 @@ The platform should model capability, compensation and recovery in addition to p
 Humans adapt. Therefore model parameters cannot always remain fixed.
 
 [
-rac{dX}{dt}
+\frac{dX}{dt}
 =
-F(X,U,E,Theta(t),t)
+F(X,U,E,\Theta(t),t)
 ]
 
 [
-rac{dTheta}{dt}
+\frac{d\Theta}{dt}
 =
-G(X,U,E,Theta)
+G(X,U,E,\Theta)
 ]
 
 Training, aging, pregnancy, chronic disease, recovery and rehabilitation may alter model parameters over time.
@@ -655,7 +653,7 @@ Examples:
 Future architecture should allow:
 
 [
-H_A leftrightarrow H_B
+H_A \leftrightarrow H_B
 ]
 
 under explicit consent, purpose and identity boundaries.
@@ -693,7 +691,7 @@ When two valid models disagree:
 
 [
 M_A(X)
-eq M_B(X)
+\neq M_B(X)
 ]
 
 Panacea should preserve disagreement and, when appropriate, identify which observation could discriminate between them.
@@ -791,13 +789,13 @@ A new domain/surface should pass:
 ExpansionValue
 =
 HumanMeaning
-	imes
+\times
 StateReuse
-	imes
+\times
 CausalIntegration
-	imes
+\times
 LongitudinalValue
-	imes
+\times
 ValidationPotential
 ]
 
