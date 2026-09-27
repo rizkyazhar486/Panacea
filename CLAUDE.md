@@ -969,3 +969,28 @@ Use `src/lib/physiology/oxygenContentConventions.ts` for any new shared CaO2/O2-
 ## First cross-system physiology chain — 2026-09-27
 
 The shared runtime now composes `cardiovascularIdentityEngine.ts` with `oxygenTransportEngine.ts` as a dependency graph: HR/EDV/ESV -> CO; Hb/SaO2/PaO2 -> CaO2; CO + CaO2 -> DO2. Use these canonical field names and engines rather than recoding this chain in UI/features. Preserve the named oxygen-content convention in provenance. This remains mechanistic calculation infrastructure, not diagnosis or treatment guidance.
+
+## Vertical / No-Hollow-Gap authority — 2026-09-27
+
+For all future Panacea development, Claude Code must read and apply [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
+
+The three superpages are projections of one shared Computational Human Graph. Prefer the deepest evidence-backed vertical slice over additional horizontal feature breadth. Preserve continuity from person -> system -> organ -> tissue -> microarchitecture -> cell/niche -> organelle -> molecular complex/pathway -> RNA/transcript -> gene/regulatory element -> chromatin/DNA wherever biologically applicable.
+
+**Forbidden:** superficial completion, artificial/fabricated biology or geometry, and subjective/unsupported biomedical claims. Do not use polished UI, cinematic animation, generic meshes, fake histology, arbitrary heatmaps or decorative molecular particles to hide missing mechanisms. A missing scientifically relevant level is `VERTICAL GAP — NOT YET MODELED`.
+
+3D/3DCG is not exempt: visual semantic zoom must preserve biological identity, evidence and truth class across implemented scales. A scripted animation is not a physiological simulation. A population/reference prior is not patient-specific truth. Unknown must remain unknown.
+
+## Longitudinal domino-effect authority — 2026-09-27
+
+Panacea's computational human must evolve as one longitudinal, dependency-aware biological operating system.
+
+When implementing physiology/pathophysiology:
+- preserve time ordering and prior-state dependence;
+- allow simultaneous processes only through the shared scheduler;
+- propagate cross-system domino effects through explicit typed dependencies;
+- represent homeostatic compensation and counter-regulation where evidence supports them;
+- preserve conservation/invariant checks when applicable;
+- retain uncertainty and parent provenance across each transition;
+- keep Clinical, Body Exposure and Simulation projections synchronized to one temporal context.
+
+Never fake compensation or “realistic” downstream behavior with arbitrary scripted animations. Missing feedback loops are explicit vertical/coupling gaps.

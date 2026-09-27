@@ -146,3 +146,19 @@ When the owner says **"lanjut" / "continue"** without a narrower task and execut
 `SCAN -> MAP -> GAP DETECTION -> PRIORITIZE -> SELECT ONE VERTICAL SLICE -> IMPLEMENT -> INTEGRATE -> VALIDATE -> UPDATE SOURCE OF TRUTH -> COMMIT -> VERIFY -> REASSESS -> REPEAT`.
 
 The current default is **maturity and integration before new breadth**. Research may discover new opportunities continuously, but an idea does not become a feature until it passes evidence, real-problem, named-user, system-fit, reuse and validation gates.
+
+## Vertical Computational Human Doctrine — mandatory
+
+Every agent must read and apply [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md) together with the Computational Human Platform doctrine.
+
+The default scientific direction is **vertical depth before horizontal breadth**. A mature biological capability must not leave scientifically relevant intermediate levels hidden between whole-person/system/organ anatomy and tissue, microarchitecture, cell, organelle, molecular mechanisms, RNA/chromatin/DNA. Missing relevant layers must be exposed as `VERTICAL GAP — NOT YET MODELED`, never disguised by polished UI, cinematic 3D, generic organ meshes, decorative particles, fabricated biology or unsupported expert-sounding claims.
+
+Hard prohibitions: **superficial, artificial/fabricated and subjective/unsupported representations**. Observed, derived, estimated-latent, simulated, population-reference and unknown states must remain distinguishable. Visualization itself is subject to the No Hollow Gap Principle: scientific fidelity and provenance outrank spectacle.
+
+## Longitudinal coupled-system requirement
+
+All future computational-human work must preserve the longitudinal operating law from [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
+
+Do not implement independent organ snapshots when a causal/time-dependent relationship exists. Model changes as ordered state transitions with explicit concurrent processes, cross-system domino effects, compensation/counter-regulation, conservation constraints where applicable, uncertainty and parent provenance.
+
+The target is one synchronized biological operating system: different engines may run at different time steps, but all must participate in the same dependency-aware temporal graph.
