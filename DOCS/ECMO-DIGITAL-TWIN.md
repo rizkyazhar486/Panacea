@@ -26,9 +26,16 @@ The engine runs without React/Three.js and is deterministic (no randomness). Alv
 - Badulak 2024 dual-circulation position paper, PMID 39557688 (abstract).
 - Severinghaus 1979 ODC, PMID 35496 — equation printed in abstract.
 
-## Known unit issue (documented, tested)
+## Oxygen-content convention issue (now registered, migration pending)
 
-ELSO prints `CaO2 = Hb(g/L) × 1.39 × SaO2 + 0.0034 × PaO2`. Taken literally the dissolved term is 10× too small relative to the bound term. The engine uses Hb in g/dL so both terms are mL/dL. `hemodinamik.ts` uses the other convention (1.34/0.003); registering one body-wide choice is a HumanState task.
+Canonical convention registry: `src/lib/physiology/oxygenContentConventions.ts` (gate `scripts/uji/oxygen-content-conventions.mts`).
+
+The discrepancy is no longer an undocumented choice:
+- `panacea-clinical-effective-v1` = 1.34 / 0.003 with Hb normalized to g/dL; executable and exactly matches `hemodinamik.ts`;
+- `theoretical-hufner-v1` = 1.39 / 0.0031; executable only when explicitly selected;
+- `elso-vv-2021-verbatim` preserves the guideline's printed Hb g/L + 1.39 + 0.0034 expression as a **non-executable evidence record** because the printed terms are not dimensionally aligned on one blood-volume basis.
+
+The ECMO engine intentionally remains on its existing local 1.39/0.0034 convention for now. Changing that coefficient would alter calibrated/golden outputs and requires an explicit versioned recalibration/comparison, not a silent global replacement.
 
 ## Calibration note
 

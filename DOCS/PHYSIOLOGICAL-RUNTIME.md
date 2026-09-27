@@ -81,3 +81,10 @@ Next vertical work should add a literature-grounded domain engine only after its
 `src/lib/physiology/cardiovascularIdentityEngine.ts` is the first non-synthetic engine registered on this runtime. It reuses `hemodinamik.ts` for the identities SV = EDV - ESV, CO = HR × SV / 1000 and EF = SV / EDV, propagates known independent input uncertainty, emits only `model-derived` values, and fails closed on unsupported ventricular-volume inputs.
 
 See `DOCS/CARDIOVASCULAR-IDENTITY-ENGINE.md`. Oxygen transport is intentionally deferred until the repository's Hufner/dissolved-O2 constant convention is reconciled body-wide.
+
+
+## Oxygen-content scientific convention registry
+
+`src/lib/physiology/oxygenContentConventions.ts` makes oxygen-content coefficients and their units explicit scientific objects. The current default is `panacea-clinical-effective-v1` (1.34 / 0.003; Hb g/dL), exactly matching `hemodinamik.ts`. A separate theoretical 1.39 / 0.0031 convention is available only by explicit selection. The ELSO VV 2021 verbatim expression is retained but non-executable because its printed Hb-unit convention is dimensionally inconsistent with the dissolved term without normalization.
+
+See `DOCS/OXYGEN-CONTENT-CONVENTIONS.md`. Future domain engines must select a named convention; do not hand-type oxygen-content coefficients.

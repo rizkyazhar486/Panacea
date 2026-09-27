@@ -959,3 +959,8 @@ The first executable substrate for the Computational Human Platform is implement
 ## First cardiovascular runtime slice — 2026-09-27
 
 `src/lib/physiology/cardiovascularIdentityEngine.ts` is the first literature-anchored domain engine on the new physiological runtime. Extend it by reusing canonical physiology functions rather than duplicating formulas. Its current scope is only measured-boundary SV/CO/EF identities with uncertainty propagation and fail-closed input bounds. Do not add shared oxygen-transport outputs until the documented 1.34/0.003 vs ECMO 1.39/0.0034 convention discrepancy is resolved into one evidence-backed body-wide constant policy.
+
+
+## Oxygen-content convention registry — 2026-09-27
+
+Use `src/lib/physiology/oxygenContentConventions.ts` for any new shared CaO2/O2-delivery work. Do not hand-type 1.34/1.39 or 0.003/0.0031/0.0034 into another subsystem. The default shared convention currently matches `hemodinamik.ts` (1.34/0.003, Hb g/dL); the theoretical 1.39 convention is separately named; the ELSO VV 2021 verbatim expression is preserved as non-executable until its printed unit inconsistency is explicitly normalized. Do not migrate `ecmo/oksigen.ts` without a versioned recalibration and golden-comparison pass.
