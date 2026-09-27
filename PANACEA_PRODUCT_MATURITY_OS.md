@@ -22,6 +22,33 @@ Default development phase:
 
 Do not default back to feature-count expansion. "Depth" means deeper domain computation, model fidelity, infrastructure, integration and validation — not merely more detail inside one page.
 
+## Future-realizable imagination-to-reality execution law
+
+The approved parent direction is [Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
+Panacea may deliberately specify capabilities that current models, sensors, interfaces or compute cannot yet realize when the capability is relevant to the Human Reality architecture and can be expressed through stable, testable contracts. Speculation belongs first in R&D/specification space; it does not inherit production or clinical truth merely because it is ambitious.
+
+Canonical execution sequence:
+
+```text
+IMAGINE FUTURE-REALIZABLE CAPABILITY
+-> FORMALIZE STABLE INTERFACE
+-> SELECT DEEPEST JUSTIFIED PRESENT SLICE
+-> INTEGRATE WITH SHARED HUMAN STATE
+-> VALIDATE / FALSIFY AGAINST REALITY
+-> COMPOUND
+```
+
+When similarly valuable tasks compete, also consider:
+- **future absorbability** — stronger future models/sensors can enter without rewriting canonical state;
+- **human meaning** — the work materially supports understanding, capability, agency or the life the user explicitly chooses;
+- **shared-state reuse** — the capability deepens the same human rather than creating another truth store;
+- **causal/mechanistic depth** — explanatory structure improves where scientifically justified;
+- **reality feedback** — predictions or models can be confronted with later observation;
+- **model/vendor portability** — no vendor or model family owns patient truth or irreplaceable state semantics.
+
+Imagination may expand the frontier horizontally. Execution still compounds vertically. A future-facing concept that cannot yet be implemented should leave behind an explicit interface, evidence need, blocker or research artifact rather than decorative pseudo-capability.
+
 ## Vertical depth operating law
 
 The current architecture doctrine is [`PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md).

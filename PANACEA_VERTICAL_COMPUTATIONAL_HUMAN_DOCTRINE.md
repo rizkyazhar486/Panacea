@@ -69,6 +69,48 @@ Operational laws:
 
 The same rule applies recursively: whole human -> system -> organ -> tissue -> cell -> molecule, and input -> state -> engine -> coupling -> validation -> projection -> outcome. Depth must compound across both biological scale and software execution.
 
+## 1B. Meaningful expansion and adaptive explanatory scale
+
+The approved [Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) extends depth-over-dispersion with a second rule: Panacea may expand horizontally when the expansion materially increases the meaning, explanatory power or future capability of the **same Human Reality Model**.
+
+### Meaningful horizontal expansion
+
+A new domain, surface or modality is preferred when it strengthens several of the following at once:
+
+- human-life relevance or user-authored goals;
+- canonical-state reuse;
+- longitudinal continuity;
+- causal/mechanistic integration;
+- cross-system coupling;
+- reality feedback;
+- validation potential;
+- future-model/sensor absorbability.
+
+Horizontal expansion must not create another independent human, duplicate state authority or a disconnected feature island.
+
+### Adaptive explanatory scale
+
+Panacea should reason and render at the deepest scale that is relevant to the current human question and scientifically supportable. Depending on the problem, the explanatory path may extend outward or inward:
+
+```text
+world / environment
+-> human
+-> system
+-> organ
+-> tissue
+-> microarchitecture
+-> cell
+-> organelle
+-> molecular complex / pathway
+-> RNA / gene / epigenetic layer
+```
+
+This does not require maximal resolution everywhere. Future runtimes may allocate greater computational resolution around the system, event or scale that currently matters while leaving stable regions coarse.
+
+A future capability may be designed before current technology can execute it, but unsupported intermediate biology remains **VERTICAL GAP — NOT YET MODELED**. Future ambition never authorizes a fabricated bridge.
+
+Human meaning guides which questions deserve deeper investment; it does not change biological evidence, causal certainty or truth class.
+
 ## 2. Hard prohibitions
 
 The following are **forbidden design patterns** for all future work.

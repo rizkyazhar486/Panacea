@@ -316,6 +316,33 @@ If these questions are unanswered, adding another page or widget is usually prem
 
 ---
 
+## 12A. Knowledge boundary and uncertainty anatomy
+
+Human observability must represent not only what Panacea knows, but **what kind of not-knowing remains**.
+
+For important state elements, the system should be able to distinguish:
+
+```text
+KNOWN
+KNOWN_WITH_UNCERTAINTY
+KNOWABLE_BUT_UNMEASURED
+CURRENTLY_UNIDENTIFIABLE
+SCIENTIFICALLY_UNCERTAIN
+UNSUPPORTED
+```
+
+These categories complement, rather than replace, the existing per-observation truth classes. They describe the epistemic boundary around the human model.
+
+### Uncertainty anatomy
+
+Body Exposure and other Human Reality projections should progressively expose where individual knowledge is directly observed, clinically recorded, model-estimated, stale, missing or unsupported. Visual completeness must not imply epistemic completeness.
+
+Where a spatial visualization is used, confidence/coverage cues may communicate the knowledge boundary, but they must not invent patient-specific anatomy or hide source-resolution limits. A visually realistic region with no patient-specific evidence remains reference/model state and must be labeled accordingly.
+
+A sufficiently advanced system may ask which additional observation would materially reduce uncertainty, but it must remain allowed to conclude that no additional measurement is justified when expected information gain does not outweigh risk, burden or cost.
+
+Detailed authority: [Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
 ## 13. Anti-goals
 
 Forbidden architectural interpretations of "human surveillance" include:
