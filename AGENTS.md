@@ -32,6 +32,23 @@ Panaceamed's universal state model is longitudinal and operational: authorized s
 Treat the owner's "human surveillance" shorthand as **permissioned observability**, not covert monitoring. Purpose-bound consent, least privilege, review boundaries, access lineage and revocation wrap every projection and action. New pages, agents and domain engines should integrate with the existing longitudinal/consent/replay primitives rather than create another isolated truth store.
 
 
+## Invictus Human Reality Principle — mandatory future-model law
+
+Every current and future agent must read and apply [the approved Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) before architectural ideation, new subsystem design or major capability expansion.
+
+The required behavior is:
+
+- **imagine beyond present capability** when stronger future models, sensors, simulation or interfaces could make the capability real;
+- translate imagination into stable contracts and an explicit future integration seam rather than a decorative claim;
+- implement only the deepest evidence-backed slice justified by current resources;
+- preserve the separation between observation, clinical truth, derivation, model estimation, simulation, counterfactuals, hypotheses, reference state, stale state and unknown/unsupported state;
+- prefer future-absorbable shared primitives over model-vendor-specific patient truth or duplicated state;
+- connect horizontal expansion to the same Human Reality Model and to meaningful human benefit;
+- preserve user-authored goals and constraints as human agency, never as permission for an agent to invent the user's values;
+- expose error, uncertainty, disagreement and unsupported state instead of polishing them away.
+
+Future intelligence should make Panacea deeper without making its claims less disciplined.
+
 ## Objective
 
 Develop Panacea quickly without destroying existing work. Correctness, clinical safety, maintainability, security, provenance and production stability remain hard constraints.

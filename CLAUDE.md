@@ -50,6 +50,12 @@ The owner's recurring "surveillance of the human" concept is formalized as **per
 Functional competence and ethical/clinical governance are conjunctive. A safe idea that does not work is not mature; a technically capable system that is unsafe, ungoverned or non-consensual is also not mature.
 
 
+## Invictus Human Reality Principle authority — 2026-09-28
+
+For architectural ideation, new subsystem design, future-model planning or major capability expansion, Claude Code must read and apply [the approved Invictus Human Reality Principle](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
+**Execution rule:** imagine beyond present capability when a future model/sensor/simulator/interface could make the capability real; formalize the stable interface now; implement only the deepest justified present slice; keep hypotheses/simulation/counterfactuals separate from patient truth; connect new breadth to the same governed Human Reality Model and meaningful human benefit; validate/falsify against reality where possible. Stronger future models may deepen Panacea, but they do not gain authority to fabricate state, infer a user's values, bypass consent, own canonical patient truth or weaken validation.
+
 ## Depth-over-dispersion execution law — 2026-09-27
 
 For broad continuation, feature proposals, Computational Human work and maturity work, apply the canonical loop from `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md` and `PANACEA_PRODUCT_MATURITY_OS.md`:
