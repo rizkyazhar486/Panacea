@@ -6,6 +6,21 @@
 
 This document applies to every current and future model, agent, workflow and human contributor working on Panaceamed. It does not replace the Constitution, Humanity 10 Charter, clinical/safety gates, Universal Human Gold Standard, or validated existing architecture. It tells builders **what Panaceamed is becoming and how to deepen it**.
 
+## Invictus Human Reality inheritance
+
+This architecture inherits [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+The long-horizon parent abstraction is a governed **Human Reality Model** built from the existing state layers, not a third patient-truth store. Canonical Patient State remains recorded/observed truth; the Physiological State Engine remains model-derived dynamic state. Future models, sensors, simulators and interfaces must enter through shared contracts rather than create parallel humans.
+
+### Future-capability absorbability
+
+For material architecture, ask whether a substantially stronger future model, higher-fidelity sensor or higher-resolution simulator could plug into the same canonical state, provenance, consent, uncertainty and validation contracts without a rewrite or state fork. If not, the interface is too brittle.
+
+A future **Reality Lattice** may distinguish observed, recorded, derived, model-estimated, simulated, counterfactual, reference, stale, unknown and unsupported representations. These are logical epistemic views over governed state, not interchangeable truth classes and not permission to fabricate missing state.
+
+Adaptive biological resolution and multiscale time are standing directions: compute may deepen around the organ/system/scale and timescale relevant to the current question, while unsupported resolution remains explicit rather than cosmetically completed.
+
+
 ## 1. Product identity
 
 Panaceamed is not a collection of healthcare pages, widgets or isolated AI features.

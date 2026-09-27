@@ -13,6 +13,8 @@ The repository owner's latest explicit instruction remains the highest product-d
 
 **Human-observability doctrine:** [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md) defines the universal longitudinal observation-and-action layer. It formalizes continuous human-state intelligence as purpose-authorized observability, not covert surveillance: measured/recorded truth, derived/inferred/simulated state, data lineage, uncertainty, blind spots, consent, review, actions and outcomes must remain reconstructable and governed across every Panacea surface.
 
+**Invictus future-realizable principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) is the canonical compounding-coherence authority. Panacea may imagine **future-realizable** capabilities beyond current models, sensors or compute, but must translate them into stable interfaces and bounded present implementations. Imagination may expand hypothesis/design space; **patient truth** remains evidence-, provenance-, consent-, authorization- and validation-bound. Increased model capability must strengthen **human agency**, not silently infer or replace a person's goals, values or clinical authority.
+
 ---
 
 ## 1. Mission
