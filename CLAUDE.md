@@ -40,6 +40,16 @@ After hard safety/security/data/clinical blockers, default sequencing is:
 
 A future stronger model should spend additional capability on deeper models, infrastructure, coupling, falsification, validation and integration rather than automatically generating more routes/widgets. Existing longevity sequencing, Universal Human Gold Standard, clinical-validation release gates, provenance rules and no-fake-data boundaries remain in force.
 
+
+## Depth-over-dispersion execution law — 2026-09-27
+
+For broad continuation, feature proposals, Computational Human work and maturity work, apply the canonical loop from `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md` and `PANACEA_PRODUCT_MATURITY_OS.md`:
+
+`EXPLORE -> SELECT -> COMMIT -> DEEPEN -> INTEGRATE -> TEST AGAINST REALITY -> REFINE -> JUSTIFIED EXPANSION`.
+
+Breadth is primarily discovery/backlog; depth is the default implementation lane. Do not convert every new idea into a new page, widget or parallel subsystem while a higher-value existing vertical slice remains mechanistically, integrationally or validation-wise hollow. Continue the selected slice until a named maturity boundary is reached or a concrete external blocker is documented. Prefer reusable deep primitives that can later project horizontally.
+
+
 ## Panacea Constitution — parent scientific authority
 
 All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md). It is the model-agnostic parent charter for scientific discovery, R&D, invention, clinical translation, drug discovery, trials, surveillance, publication integrity, continuous model/technology evolution, privacy, safety and validation. The latest explicit owner instruction remains highest product authority, but no model-specific instruction may silently weaken the Constitution's evidence, reproducibility, safety, governance, external-validation, publication-integrity or human-oversight requirements.
