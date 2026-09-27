@@ -172,6 +172,24 @@ A new feature should normally require:
 
 The owner may explicitly override this order.
 
+## Explore broadly, execute vertically
+
+Exploration may remain broad so Panacea does not become intellectually narrow, but **implementation must be selective and compounding**.
+
+Canonical loop:
+
+`EXPLORE -> SELECT -> COMMIT -> DEEPEN -> INTEGRATE -> TEST AGAINST REALITY -> REFINE -> JUSTIFIED EXPANSION`
+
+Rules:
+- Put speculative adjacent ideas into the R&D/backlog system instead of immediately turning each idea into a new surface.
+- Select the vertical slice with the highest evidence-backed value or the weakest maturity factor.
+- Keep working that slice through real input/state, computation, integration, validation, user projection and outcome feedback as applicable.
+- Treat tests, benchmark disagreement, missing provenance, unsupported states, real workflow friction and later outcomes as information that should change the implementation.
+- Do not count route/widget/component/model/commit volume as maturity.
+- Horizontal expansion becomes preferred only after a reusable deep capability exists, a declared stopping boundary is reached, or the current slice is blocked by a concrete external dependency.
+
+This operationalizes the repository's depth doctrine without forbidding breadth: **breadth discovers opportunities; depth creates durable capability.**
+
 ## One vertical slice at a time
 Prefer a workflow slice:
 
