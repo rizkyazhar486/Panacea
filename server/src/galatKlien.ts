@@ -27,8 +27,8 @@ const terakhir: Array<GalatKlien & { at: string; jumlah: number }> = []
 let total = 0
 export function catatGalatKlien(g: GalatKlien, catat: (b: string) => void = (b) => console.log(b)) {
   total++
-  const tanda = `${g.jenis}|${g.pesan}|${g.berkas}|${g.baris}`
-  const ada = terakhir.find((x) => `${x.jenis}|${x.pesan}|${x.berkas}|${x.baris}` === tanda)
+  const tanda = `${g.jenis}|${g.pesan}|${g.berkas}|${g.baris}|${g.rute}|${g.fitur}|${g.versi}`
+  const ada = terakhir.find((x) => `${x.jenis}|${x.pesan}|${x.berkas}|${x.baris}|${x.rute}|${x.fitur}|${x.versi}` === tanda)
   if (ada) { ada.jumlah++; return }
   terakhir.push({ ...g, at: new Date().toISOString(), jumlah: 1 }); if (terakhir.length > 100) terakhir.shift()
   catat(JSON.stringify({ t: new Date().toISOString(), log: 'galat_klien', ...g }))
