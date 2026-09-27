@@ -41,5 +41,5 @@ assert.ok(butir.some((b) => b.metric === 'vital.sbp' && b.keadaan === 'clinician
 assert.ok(butir.some((b) => b.metric === 'emr.primary-diagnosis' && b.keadaan === 'clinician-reviewed'))
 
 assert.match(readFileSync('server/src/index.ts', 'utf8'), /dicatatOleh: \{ id: pencatat\.id, klinisi: klinisiAtauPemilik\(pencatat, isOwner\(pencatat\)\) \}/, 'server tidak mencap pencatat vital/penunjang')
-assert.match(readFileSync('src/lib/useLongitudinalState.ts', 'utf8'), /emrVitalsToLongitudinalEvents\(vitals, subjectId/, 'vital EMR tidak masuk status kanonik')
+assert.match(readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8'), /emrVitalsToLongitudinalEvents\(vitals, subjectId/, 'vital EMR tidak masuk status kanonik')
 console.log('emr-longitudinal: vital berkeadaan dari pencatat server, rekam bertanda tangan = clinician-reviewed, validator kanonik menegakkan, timeline membawa keadaan')

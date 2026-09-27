@@ -8,7 +8,7 @@ assert.match(idx, /app\.post\('\/api\/clinical\/encounter\/close', requireAuth[\
 assert.match(idx, /tutupKunjungan\(getRecord\(patientId\), \{ id: actor\.id, nama: actor\.name, klinisi: klinisiAtauPemilik\(actor, isOwner\(actor\)\) \}/, 'peran penutup diambil dari klien')
 assert.match(idx, /addAudit\(actor, 'emr\.encounter_closed', patientId\)/, 'penutupan kunjungan tidak diaudit')
 assert.match(baca('server/src/aksesKlinis.ts'), /encounters: pilih\(c\.encounters \?\? \{\}\)/, 'kunjungan pasien lain bocor lewat \/api\/clinical')
-assert.match(baca('src/lib/useLongitudinalState.ts'), /Object\.values\(server\.encounters\)\.flat\(\), \.\.\.Object\.values\(server\.records\)/, 'kunjungan tertutup hilang dari status longitudinal')
+assert.match(baca('src/lib/longitudinalSnapshot.ts'), /Object\.values\(server\.encounters\)\.flat\(\), \.\.\.Object\.values\(server\.records\)/, 'kunjungan tertutup hilang dari status longitudinal')
 const ui = baca('src/components/KunjunganEmr.tsx')
 assert.match(ui, /return klinisi && !dirty && Boolean\(r\.signedAt && r\.signedById\)/, 'tombol tutup aktif untuk rekam belum bertanda tangan server')
 assert.match(ui, /terapkanRekamServer\(r\.record\)/, 'draf baru dari server tidak diterapkan')
