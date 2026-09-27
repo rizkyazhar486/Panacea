@@ -57,6 +57,8 @@ export interface PhysiologicalProvenance {
   step: number
   timeSeconds: number
   parents: readonly string[]
+  /** Originating longitudinal event id for patient-derived boundary conditions. */
+  sourceEventId?: string
   sourceId?: string
   capturedAt?: string
 }
@@ -275,6 +277,7 @@ function boundaryValue(boundary: BoundaryCondition): PhysiologicalValue {
       step: 0,
       timeSeconds: 0,
       parents: [],
+      sourceEventId: boundary.source.id,
       sourceId: boundary.source.sourceId,
       capturedAt: boundary.source.capturedAt,
     },
