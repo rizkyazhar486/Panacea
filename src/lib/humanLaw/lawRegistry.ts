@@ -223,3 +223,92 @@ export function registerHumanLaw(
     },
   }
 }
+
+
+export interface HumanLawTransitionInput {
+  to: HumanLawStatus
+  changedAt: string
+  changedBy: string
+  reason: string
+  evidenceRefs: readonly string[]
+}
+
+const terminalStatuses = new Set<HumanLawStatus>([
+  'rejected',
+  'deprecated',
+  'unresolved',
+  'context-specific',
+  'superseded',
+  'scope-restricted',
+])
+
+const allowedTransitions: Readonly<Record<HumanLawStatus, readonly HumanLawStatus[]>> = {
+  generated: ['candidate', 'rejected', 'unresolved', 'context-specific', 'scope-restricted'],
+  candidate: ['reproduced', 'rejected', 'unresolved', 'context-specific', 'scope-restricted'],
+  reproduced: ['mechanistically-supported', 'rejected', 'unresolved', 'context-specific', 'scope-restricted'],
+  'mechanistically-supported': ['externally-validated', 'rejected', 'unresolved', 'context-specific', 'scope-restricted'],
+  'externally-validated': ['accepted', 'rejected', 'unresolved', 'context-specific', 'scope-restricted'],
+  accepted: ['deprecated', 'superseded', 'scope-restricted'],
+  rejected: [],
+  deprecated: [],
+  unresolved: [],
+  'context-specific': [],
+  superseded: [],
+  'scope-restricted': [],
+}
+
+const evidenceRequiredStatuses = new Set<HumanLawStatus>([
+  'reproduced',
+  'mechanistically-supported',
+  'externally-validated',
+  'accepted',
+])
+
+export function transitionHumanLaw(
+  registry: HumanLawRegistry,
+  lawId: string,
+  input: HumanLawTransitionInput,
+): HumanLawRegistry {
+  const id = nonBlank(lawId, 'lawId')
+  const law = registry.lawsById[id]
+  if (!law) throw new Error(`unknown law id ${id}`)
+  if (terminalStatuses.has(law.status)) throw new Error(`law ${id} is in terminal status ${law.status}`)
+  if (!allowedTransitions[law.status].includes(input.to)) {
+    throw new Error(`invalid transition ${law.status} -> ${input.to}`)
+  }
+
+  const changedAt = parseIso(input.changedAt, 'changedAt')
+  const changedBy = nonBlank(input.changedBy, 'changedBy')
+  const reason = nonBlank(input.reason, 'reason')
+  const evidenceRefs = uniqueRefs(input.evidenceRefs, 'evidenceRefs')
+  if (evidenceRequiredStatuses.has(input.to) && evidenceRefs.length === 0) {
+    throw new Error(`transition to ${input.to} requires evidence`)
+  }
+
+  const history = registry.statusHistoryByLawId[id]
+  if (!history?.length) throw new Error(`law ${id} has no status history`)
+  const latest = history[history.length - 1]
+  if (Date.parse(changedAt) < Date.parse(latest.changedAt)) {
+    throw new Error('changedAt must not be before the latest status transition')
+  }
+
+  const event: HumanLawStatusEvent = {
+    from: law.status,
+    to: input.to,
+    changedAt,
+    changedBy,
+    reason,
+    evidenceRefs,
+  }
+  const updatedLaw: HumanLawRecord = { ...law, status: input.to }
+
+  return {
+    ...registry,
+    revision: registry.revision + 1,
+    lawsById: { ...registry.lawsById, [id]: updatedLaw },
+    statusHistoryByLawId: {
+      ...registry.statusHistoryByLawId,
+      [id]: [...history, event],
+    },
+  }
+}
