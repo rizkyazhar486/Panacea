@@ -107,6 +107,7 @@ test('human observability excludes future knowledge and preserves truth classes'
   assert.equal(observationsByTruthClass(frame, 'simulated').length, 1)
   assert.equal(observabilityGapForMetric(frame, 'heart-rate'), undefined)
   assert.equal(observabilityGapForMetric(frame, 'spo2')?.reason, 'missing')
+  assert.deepEqual(frame.coverage.observedMetrics, ['heart-rate'])
   assert.equal(frame.boundary.missingDataMayBeFabricated, false)
   assert.equal(frame.boundary.autonomousClinicalActionAllowed, false)
 })
@@ -146,4 +147,41 @@ test('purpose revocation removes observations from the authorized frame', () => 
   assert.equal(frame.governance.ledgerAuthorized, false)
   assert.ok(frame.governance.purposeConsentFilteredEvents > 0)
   assert.equal(frame.boundary.covertCollectionAllowed, false)
+})
+
+
+test('simulated state cannot satisfy a live observed-signal expectation', () => {
+  let truthState = createLongitudinalPatientState(subjectId, '2026-09-01T00:00:00.000Z')
+  truthState = ingestLongitudinalBatch(truthState, [
+    event({
+      id: 'observed-spo2-old',
+      metric: 'spo2',
+      domain: 'vital',
+      value: 97,
+      recordedAt: '2026-09-03T09:00:00.000Z',
+    }),
+    event({
+      id: 'simulated-spo2-fresh',
+      metric: 'spo2',
+      domain: 'vital',
+      value: 99,
+      recordedAt: '2026-09-03T10:55:00.000Z',
+      semanticState: 'simulated',
+      sourceKind: 'derived',
+    }),
+  ])
+
+  const frame = buildHumanObservabilityFrame({
+    state: truthState,
+    consentLedger: ledger,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+    expectations: [{ metric: 'spo2', maxAgeMs: 30 * 60 * 1000 }],
+  })
+
+  const gap = observabilityGapForMetric(frame, 'spo2')
+  assert.equal(gap?.reason, 'stale')
+  assert.equal(gap?.latestRecordedAt, '2026-09-03T09:00:00.000Z')
+  assert.equal(gap?.ageMs, 2 * 60 * 60 * 1000)
+  assert.deepEqual(frame.coverage.observedMetrics, ['spo2'])
 })
