@@ -66,4 +66,19 @@ const bounded = intersectBodyAtlasSourceMeshesWithPlane({
 assert.equal(bounded.trianglesVisited, 1)
 assert.equal(bounded.truncated, true)
 
+
+for (const coordinate of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+  const invalidCoordinate = intersectBodyAtlasSourceMeshesWithPlane({
+    axis: 'x',
+    coordinate,
+    candidates: [{ file: 'synthetic.glb', name: 'Synthetic box' }],
+    sourceRoots: [{ file: 'synthetic.glb', root: boxRoot }],
+  })
+  assert.equal(invalidCoordinate.blockedReason, 'non-finite-coordinate')
+  assert.equal(invalidCoordinate.segments.length, 0, 'Invalid coordinates must not silently render the zero plane')
+  assert.equal(invalidCoordinate.sourceNodesExamined, 0)
+  assert.equal(invalidCoordinate.meshesExamined, 0)
+  assert.equal(invalidCoordinate.trianglesVisited, 0)
+}
+
 console.log(`body-atlas-exact-mesh-section: ok (${exact.segments.length} raw source-triangle segments)`)
