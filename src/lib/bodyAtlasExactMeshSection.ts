@@ -42,6 +42,7 @@ export interface BodyAtlasExactSectionResult {
   trianglesVisited: number
   coplanarTrianglesSkipped: number
   truncated: boolean
+  blockedReason?: 'non-finite-coordinate'
   semantics: 'exact-source-triangle-plane-segments-not-assembled-contours'
 }
 
@@ -151,7 +152,22 @@ export function intersectBodyAtlasSourceMeshesWithPlane(
   request: BodyAtlasExactSectionRequest,
 ): BodyAtlasExactSectionResult {
   const axisIndex = AXIS_INDEX[request.axis]
-  const coordinate = finiteOr(request.coordinate, 0)
+  const coordinate = request.coordinate
+  if (!Number.isFinite(coordinate)) {
+    return {
+      axis: request.axis,
+      coordinate,
+      segments: [],
+      unresolvedCandidates: [],
+      sourceNodesExamined: 0,
+      meshesExamined: 0,
+      trianglesVisited: 0,
+      coplanarTrianglesSkipped: 0,
+      truncated: false,
+      blockedReason: 'non-finite-coordinate',
+      semantics: 'exact-source-triangle-plane-segments-not-assembled-contours',
+    }
+  }
   const epsilon = Math.max(1e-9, Math.min(Math.abs(finiteOr(request.epsilon, 1e-6)), 1e-2))
   const maxCandidates = boundedInteger(request.maxCandidates, 128, 1, 2_000)
   const maxTrianglesVisited = boundedInteger(request.maxTrianglesVisited, 250_000, 1, 2_000_000)
