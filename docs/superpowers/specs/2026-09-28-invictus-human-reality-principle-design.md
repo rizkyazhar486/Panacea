@@ -1,7 +1,7 @@
 # Panaceamed Invictus Human Reality Principle — Architecture Design
 
 **Date:** 2026-09-28  
-**Status:** Owner-approved conceptual direction encoded as a parent architecture principle; implementation requires a reviewed implementation plan.  
+**Status:** Owner-approved parent architecture principle; Program A canonical inheritance is implemented on the reviewed execution branch, while later runtime/model programs require their own specs and plans.  
 **Purpose:** Make Panaceamed future-realizable, meaning-centered, scientifically ruthless, and structurally capable of absorbing stronger future models, sensors, simulators, interfaces, and compute without architectural reinvention.
 
 ## 1. Product decision
