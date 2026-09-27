@@ -38,12 +38,16 @@ export interface HumanObservabilityObservation {
 
 export interface HumanObservabilityExpectation {
   metric: string
+  domain?: LongitudinalDomain
+  unit?: string
   maxAgeMs: number
   required?: boolean
 }
 
 export interface HumanObservabilityGap {
   metric: string
+  domain?: LongitudinalDomain
+  unit?: string
   reason: 'missing' | 'stale'
   required: boolean
   maxAgeMs: number
@@ -112,17 +116,36 @@ function parseIso(value: string, field: string) {
 }
 
 function normalizeExpectations(expectations: readonly HumanObservabilityExpectation[]) {
-  const byMetric = new Map<string, HumanObservabilityExpectation>()
+  const byIdentity = new Map<string, HumanObservabilityExpectation>()
   for (const expectation of expectations) {
     const metric = expectation.metric.trim()
     if (!metric) throw new Error('expectation.metric must not be blank')
+    const unit = expectation.unit?.trim()
+    if (expectation.unit !== undefined && !unit) throw new Error('expectation.unit must not be blank')
     if (!Number.isFinite(expectation.maxAgeMs) || expectation.maxAgeMs <= 0) {
       throw new Error('expectation.maxAgeMs must be finite and positive')
     }
-    if (byMetric.has(metric)) throw new Error(`duplicate observability expectation: ${metric}`)
-    byMetric.set(metric, { ...expectation, metric, required: expectation.required ?? true })
+    const identity = JSON.stringify([metric, expectation.domain ?? null, unit ?? null])
+    if (byIdentity.has(identity)) {
+      throw new Error(`duplicate observability expectation: ${metric} / ${expectation.domain ?? '*'} / ${unit ?? '*'}`)
+    }
+    byIdentity.set(identity, {
+      ...expectation,
+      metric,
+      ...(unit === undefined ? {} : { unit }),
+      required: expectation.required ?? true,
+    })
   }
-  return [...byMetric.values()]
+  return [...byIdentity.values()]
+}
+
+function observationMatchesExpectation(
+  observation: HumanObservabilityObservation,
+  expectation: HumanObservabilityExpectation,
+) {
+  return observation.metric === expectation.metric
+    && (expectation.domain === undefined || observation.domain === expectation.domain)
+    && (expectation.unit === undefined || observation.unit === expectation.unit)
 }
 
 /**
@@ -173,15 +196,21 @@ export function buildHumanObservabilityFrame(input: {
     } satisfies HumanObservabilityObservation))
 
   const observed = observations.filter((observation) => observation.truthClass === 'observed')
-  const latestObservedByMetric = new Map<string, HumanObservabilityObservation>()
-  for (const observation of observed) latestObservedByMetric.set(observation.metric, observation)
 
   const gaps = normalizeExpectations(input.expectations ?? [])
     .map<HumanObservabilityGap | null>((expectation) => {
-      const latest = latestObservedByMetric.get(expectation.metric)
+      let latest: HumanObservabilityObservation | undefined
+      for (const observation of observed) {
+        if (observationMatchesExpectation(observation, expectation)) latest = observation
+      }
+      const identity = {
+        metric: expectation.metric,
+        ...(expectation.domain === undefined ? {} : { domain: expectation.domain }),
+        ...(expectation.unit === undefined ? {} : { unit: expectation.unit }),
+      }
       if (!latest) {
         return {
-          metric: expectation.metric,
+          ...identity,
           reason: 'missing',
           required: expectation.required ?? true,
           maxAgeMs: expectation.maxAgeMs,
@@ -191,7 +220,7 @@ export function buildHumanObservabilityFrame(input: {
       const ageMs = Math.max(0, atMs - Date.parse(latest.recordedAt))
       if (ageMs <= expectation.maxAgeMs) return null
       return {
-        metric: expectation.metric,
+        ...identity,
         reason: 'stale',
         required: expectation.required ?? true,
         maxAgeMs: expectation.maxAgeMs,
@@ -200,7 +229,9 @@ export function buildHumanObservabilityFrame(input: {
       }
     })
     .filter((gap): gap is HumanObservabilityGap => gap !== null)
-    .sort((left, right) => left.metric.localeCompare(right.metric))
+    .sort((left, right) => left.metric.localeCompare(right.metric)
+      || (left.domain ?? '').localeCompare(right.domain ?? '')
+      || (left.unit ?? '').localeCompare(right.unit ?? ''))
 
   const consent = purposeConsentStatus(
     input.consentLedger,
