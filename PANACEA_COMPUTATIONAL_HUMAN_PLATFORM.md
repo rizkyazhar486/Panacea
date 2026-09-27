@@ -450,4 +450,6 @@ before adding shallow new surface breadth.
 
 The real observed timeline remains canonical reality. Counterfactual branches are simulated and may never overwrite real history. Personal calibration may not overfit or invent unidentifiable latent state. Unknown/unsupported physiology must remain visible as unknown/unsupported rather than being filled for visual completeness.
 
-**Implementation-status boundary:** this doctrine approves the architecture and future-model deepening law. It does **not** claim that the Reality Engine, Biological Git, Reality Gap Registry, Active Sensing, calibration engine, counterfactual runtime or Human Model SDK are already implemented. Implemented capability must continue to be documented only from repository evidence.
+**Implementation-status boundary:** the first bounded Reality Engine primitive, `Reality Error Ledger v1`, is implemented in `src/lib/physiology/realityErrorLedger.ts` with deterministic coverage in `scripts/uji/reality-error-ledger.mts`. It preserves prospective predictions and later prediction-vs-reality error evidence without recalibration or clinical publication.
+
+This does **not** mean the broader Reality Engine is implemented. Personal Parameter Registry/identifiability, automatic calibration, Biological Git, Reality Gap Registry, Active Sensing, counterfactual branch runtime, Human Model SDK and privacy-preserving population learning remain unimplemented unless separately evidenced.

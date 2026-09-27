@@ -100,3 +100,14 @@ The first dependency-coupled physiological chain is implemented by:
 The gate deliberately registers these engines out of dependency order; the runtime topologically orders them and preserves exact parent provenance. This proves shared engine coupling rather than page-specific formula chaining.
 
 See `DOCS/OXYGEN-TRANSPORT-ENGINE.md`.
+
+
+## Reality Error Ledger downstream evidence
+
+`src/lib/physiology/realityErrorLedger.ts` is the first downstream Reality Engine evidence primitive built on the physiological runtime.
+
+It records immutable prospective prediction evidence and matches it only to later admissible measured/imported/clinician-entered longitudinal observations with exact field/unit/time contracts. Prediction errors remain auditable, unknown observation uncertainty stays `null`, and lifecycle status is stored separately from prediction payload.
+
+The ledger performs no automatic calibration and never writes model-derived state back into Canonical Patient State or AI-EMR.
+
+See `DOCS/REALITY-ERROR-LEDGER.md`.
