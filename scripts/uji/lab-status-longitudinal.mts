@@ -45,7 +45,7 @@ assert.equal(top.length, 2)
   assert.match(readFileSync('src/components/ApaYangBerubah.tsx', 'utf8'), /timelineHarian\(state, 30, labels\)/, 'timeline tidak lagi dibaca dari status kanonik')
 }
 
-const ui = readFileSync('src/lib/useLongitudinalState.ts', 'utf8')
+const ui = readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8')
 assert.match(ui, /purposes: \['personal-visualization'\]/, 'hook mengasumsikan izin klinis/AI yang tidak pernah diberikan')
 assert.match(ui, /labLogToLongitudinalEvents\(/); assert.match(ui, /syncProductionAppState\(/)
 assert.match(readFileSync('src/pages/PusatTubuh.tsx', 'utf8'), /<ApaYangBerubah \/>/, 'konsumen runtime status longitudinal hilang dari halaman')

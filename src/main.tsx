@@ -10,6 +10,7 @@ import { applyAppearance } from './lib/theme'
 import { applyLang, getLang, muatKamusKalimat, umumkanBahasa } from './lib/i18n'
 import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
+import { LongitudinalStateProvider } from './lib/useLongitudinalState'
 import { Shell } from './components/Shell'
 import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -183,6 +184,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
     <StoreProvider>
+    <LongitudinalStateProvider>
       <AppStatus />
       <OfflineBanner />
       <HashRouter>
@@ -418,6 +420,7 @@ createRoot(document.getElementById('root')!).render(
           </Suspense>
         </Shell>
       </HashRouter>
+    </LongitudinalStateProvider>
     </StoreProvider>
     </ErrorBoundary>
   </StrictMode>,
