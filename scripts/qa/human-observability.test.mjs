@@ -29,6 +29,7 @@ function event({
   recordedAt,
   semanticState = 'measured',
   sourceKind = 'wearable',
+  unit,
 }) {
   return {
     id,
@@ -36,6 +37,7 @@ function event({
     domain,
     metric,
     value,
+    unit,
     recordedAt,
     confidence: 0.9,
     semanticState,
@@ -184,4 +186,48 @@ test('simulated state cannot satisfy a live observed-signal expectation', () => 
   assert.equal(gap?.latestRecordedAt, '2026-09-03T09:00:00.000Z')
   assert.equal(gap?.ageMs, 2 * 60 * 60 * 1000)
   assert.deepEqual(frame.coverage.observedMetrics, ['spo2'])
+})
+
+
+test('expectation identity keeps domain and unit-specific blind spots separate', () => {
+  let identityState = createLongitudinalPatientState(subjectId, '2026-09-01T00:00:00.000Z')
+  identityState = ingestLongitudinalBatch(identityState, [
+    event({
+      id: 'device-core-temperature-celsius',
+      metric: 'core-temperature',
+      domain: 'device',
+      unit: 'celsius',
+      value: 37,
+      recordedAt: '2026-09-03T10:55:00.000Z',
+    }),
+    event({
+      id: 'vital-core-temperature-fahrenheit',
+      metric: 'core-temperature',
+      domain: 'vital',
+      unit: 'fahrenheit',
+      value: 98.6,
+      recordedAt: '2026-09-03T10:56:00.000Z',
+    }),
+  ])
+
+  const frame = buildHumanObservabilityFrame({
+    state: identityState,
+    consentLedger: ledger,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+    expectations: [
+      { metric: 'core-temperature', domain: 'device', unit: 'celsius', maxAgeMs: 30 * 60 * 1000 },
+      { metric: 'core-temperature', domain: 'vital', unit: 'fahrenheit', maxAgeMs: 30 * 60 * 1000 },
+      { metric: 'core-temperature', domain: 'vital', unit: 'celsius', maxAgeMs: 30 * 60 * 1000 },
+    ],
+  })
+
+  assert.deepEqual(frame.coverage.gaps, [{
+    metric: 'core-temperature',
+    domain: 'vital',
+    unit: 'celsius',
+    reason: 'missing',
+    required: true,
+    maxAgeMs: 30 * 60 * 1000,
+  }])
 })
