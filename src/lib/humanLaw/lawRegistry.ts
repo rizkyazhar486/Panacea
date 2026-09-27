@@ -102,11 +102,14 @@ function uniqueRefs(values: readonly string[], field: string): string[] {
 
 function normalizeOntologyRefs(refs: readonly HumanLawOntologyRef[]): HumanLawOntologyRef[] {
   if (!refs.length) throw new Error('ontologyRefs must not be empty')
-  return refs.map((ref, index) => ({
-    namespace: nonBlank(ref.namespace, `ontologyRefs[${index}].namespace`),
-    version: nonBlank(ref.version, `ontologyRefs[${index}].version`),
-    conceptIds: uniqueRefs(ref.conceptIds, `ontologyRefs[${index}].conceptIds`),
-  }))
+  return refs.map((ref, index) => {
+    if (!ref.conceptIds.length) throw new Error(`ontologyRefs[${index}].conceptIds must not be empty`)
+    return {
+      namespace: nonBlank(ref.namespace, `ontologyRefs[${index}].namespace`),
+      version: nonBlank(ref.version, `ontologyRefs[${index}].version`),
+      conceptIds: uniqueRefs(ref.conceptIds, `ontologyRefs[${index}].conceptIds`),
+    }
+  })
 }
 
 function normalizeUnits(units: Readonly<Record<string, string>>): Record<string, string> {
@@ -273,6 +276,9 @@ export function transitionHumanLaw(
   const law = registry.lawsById[id]
   if (!law) throw new Error(`unknown law id ${id}`)
   if (terminalStatuses.has(law.status)) throw new Error(`law ${id} is in terminal status ${law.status}`)
+  if (input.to === 'superseded') {
+    throw new Error('superseded transition must use supersedeHumanLaw to preserve lineage')
+  }
   if (!allowedTransitions[law.status].includes(input.to)) {
     throw new Error(`invalid transition ${law.status} -> ${input.to}`)
   }
@@ -419,7 +425,11 @@ export function getHumanLawLineage(
     }
     visited.add(current)
     lineage.push(current)
-    current = registry.supersededByLawId[current]
+    const next = registry.supersededByLawId[current]
+    if (registry.lawsById[current].status === 'superseded' && !next) {
+      throw new Error(`superseded law ${current} has missing supersession edge`)
+    }
+    current = next
   }
 
   return lineage
