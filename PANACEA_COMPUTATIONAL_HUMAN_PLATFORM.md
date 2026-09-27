@@ -402,3 +402,52 @@ where `C_t` contains explicit cross-system dependencies, feedback and compensato
 Domain engines may use different time steps, but scheduling must preserve biological order, dependency constraints, state history, uncertainty and provenance. Cross-system responses should form auditable domino chains with compensation/counter-regulation where scientifically supported.
 
 Clinical, Body Exposure and Simulation remain different projections of one synchronized temporal state graph.
+
+
+## 17. Reality Engine and compounding human depth
+
+The approved canonical child-spec is [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+Vertical depth now includes not only biological-scale continuity, but also longitudinal personalization, temporal replay, causal explanation, epistemic transparency, falsification and outcome feedback.
+
+The additional architectural heuristic is:
+
+[
+S_{compound}
+=
+S_{vertical}
+	imes
+D_{personalization}
+	imes
+D_{temporal}
+	imes
+D_{causal}
+	imes
+D_{epistemic}
+	imes
+D_{feedback}
+]
+
+where:
+- (D_{personalization}) = scientifically justified, identifiable individual calibration;
+- (D_{temporal}) = replayable/resumable longitudinal depth;
+- (D_{causal}) = mechanistic causal connectivity;
+- (D_{epistemic}) = explicit known/unknown/stale/unsupported state and uncertainty;
+- (D_{feedback}) = prediction-vs-reality falsification, calibration and model-gap learning.
+
+This is an internal architecture heuristic, not a clinical score.
+
+When future models gain additional capability, context or scientific tools, use that capability preferentially to:
+- reduce scientifically meaningful Reality Gaps;
+- improve semantic observation quality;
+- improve parameter identifiability before personalization;
+- preserve prediction errors and use them for falsification/calibration;
+- deepen causal and temporal explanation;
+- strengthen replay/version fidelity;
+- improve counterfactual validity and isolation from the real timeline;
+- strengthen uncertainty, provenance, validation and security;
+before adding shallow new surface breadth.
+
+The real observed timeline remains canonical reality. Counterfactual branches are simulated and may never overwrite real history. Personal calibration may not overfit or invent unidentifiable latent state. Unknown/unsupported physiology must remain visible as unknown/unsupported rather than being filled for visual completeness.
+
+**Implementation-status boundary:** this doctrine approves the architecture and future-model deepening law. It does **not** claim that the Reality Engine, Biological Git, Reality Gap Registry, Active Sensing, calibration engine, counterfactual runtime or Human Model SDK are already implemented. Implemented capability must continue to be documented only from repository evidence.
