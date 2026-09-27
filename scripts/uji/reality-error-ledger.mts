@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
 import {
+  comparePredictionToObservation,
   createRealityErrorLedger,
   markPredictionExpiredUnobserved,
   recordRealityPrediction,
   type RealityPredictionRecord,
+  type ObservationSigmaEvidence,
 } from '../../src/lib/physiology/realityErrorLedger.ts'
 
 const prediction = (overrides: Partial<RealityPredictionRecord> = {}): RealityPredictionRecord => ({
@@ -74,3 +76,72 @@ const expiredAgain = markPredictionExpiredUnobserved(expired, 'pred-1', '2026-09
 assert.deepEqual(expiredAgain, expired)
 
 console.log('reality-error-ledger task1: prediction lifecycle')
+
+
+const observation = (overrides: Record<string, unknown> = {}) => ({
+  id: 'obs-1', subjectId: 'subject-1', domain: 'vital', metric: 'cardio.heart_rate', value: 126, unit: 'bpm',
+  recordedAt: '2026-09-27T10:30:00.000Z', confidence: 0.42,
+  provenance: { sourceKind: 'wearable', sourceId: 'device:watch', capturedAt: '2026-09-27T10:30:00.000Z', receivedAt: '2026-09-27T10:30:01.000Z' },
+  consent: { granted: true, purposes: ['personal-visualization'], grantedAt: '2026-09-27T09:00:00.000Z' },
+  review: { state: 'not-required' }, semanticState: 'measured', ...overrides,
+}) as any
+const opts = { matchToleranceMs: 60_000, comparisonCreatedAt: '2026-09-27T10:30:02.000Z' }
+const fresh = recordRealityPrediction(createRealityErrorLedger('subject-1'), prediction()).ledger
+const predBeforeCompare = structuredClone(fresh.predictionsById['pred-1'])
+const compared = comparePredictionToObservation(fresh, 'pred-1', observation(), opts)
+assert.equal(compared.ledger.revision, 2)
+assert.equal(compared.ledger.statusByPredictionId['pred-1'], 'matched')
+assert.deepEqual(compared.ledger.predictionsById['pred-1'], predBeforeCompare)
+assert.equal(compared.comparison.signedError, 14)
+assert.equal(compared.comparison.absoluteError, 14)
+assert.equal(compared.comparison.predictedSigma, 6)
+assert.equal(compared.comparison.observedSigma, null)
+assert.equal(compared.comparison.combinedSigma, null)
+assert.equal(compared.comparison.standardizedResidual, null)
+assert.equal(compared.comparison.predictionProvenanceId, 'prov-1')
+assert.equal(compared.comparison.observationEventId, 'obs-1')
+assert.equal(compared.comparison.observationSourceId, 'device:watch')
+assert.equal(compared.comparison.observationSigmaProvenanceId, null)
+
+const sigma: ObservationSigmaEvidence = { sigma: 2, provenanceId: 'sigma:watch-v1' }
+const withSigma = comparePredictionToObservation(fresh, 'pred-1', observation(), { ...opts, observationSigma: sigma })
+assert.equal(withSigma.comparison.combinedSigma, Math.hypot(6, 2))
+assert.ok(Math.abs((withSigma.comparison.standardizedResidual ?? NaN) - 14 / Math.hypot(6,2)) < 1e-12)
+assert.equal(withSigma.comparison.observationSigmaProvenanceId, 'sigma:watch-v1')
+
+const zeroPred = recordRealityPrediction(createRealityErrorLedger('subject-1'), prediction({ id:'pred-zero', predictedSigma:0 })).ledger
+const zeroBoth = comparePredictionToObservation(zeroPred, 'pred-zero', observation({ id:'obs-zero' }), { ...opts, observationSigma:{ sigma:0, provenanceId:'sigma:zero' } })
+assert.equal(zeroBoth.comparison.combinedSigma, 0)
+assert.equal(zeroBoth.comparison.standardizedResidual, null)
+
+for (const badSigma of [
+  { sigma:-1, provenanceId:'sigma:bad' },
+  { sigma:Number.NaN, provenanceId:'sigma:bad' },
+  { sigma:1, provenanceId:' ' },
+] as any[]) assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation(),{...opts,observationSigma:badSigma}), /observationSigma/)
+
+for (const semanticState of ['measured','imported','clinician-entered'] as const) {
+  const led=recordRealityPrediction(createRealityErrorLedger('subject-1'),prediction({id:`pred-${semanticState}`})).ledger
+  const got=comparePredictionToObservation(led,`pred-${semanticState}`,observation({id:`obs-${semanticState}`,semanticState}),opts)
+  assert.equal(got.comparison.observedValue,126)
+}
+for (const semanticState of [undefined,'patient-reported','derived','rule-output','ai-draft','simulated','reference','clinician-reviewed','unavailable'] as const) {
+  const led=recordRealityPrediction(createRealityErrorLedger('subject-1'),prediction({id:`pred-bad-${String(semanticState)}`})).ledger
+  const obs=observation({id:`obs-bad-${String(semanticState)}`,semanticState, ...(semanticState==='clinician-reviewed'?{review:{state:'accepted',reviewerId:'dr-1',reviewedAt:'2026-09-27T10:30:01.000Z'}}:{})})
+  assert.throws(() => comparePredictionToObservation(led,`pred-bad-${String(semanticState)}`,obs,opts), /admissible reality observation/)
+}
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({subjectId:'subject-2'}),opts), /subject/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({metric:'pulse'}),opts), /field/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({unit:'1'}),opts), /unit/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({value:'126'}),opts), /numeric/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({value:Number.NaN}),opts), /finite/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation(),{...opts,matchToleranceMs:-1}), /matchToleranceMs/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation(),{...opts,matchToleranceMs:Number.NaN}), /matchToleranceMs/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation({recordedAt:'2026-09-27T10:32:00.000Z',provenance:{...observation().provenance,capturedAt:'2026-09-27T10:32:00.000Z',receivedAt:'2026-09-27T10:32:01.000Z'}}),opts), /outside match tolerance/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation(),{...opts,comparisonCreatedAt:'bad'}), /comparisonCreatedAt/)
+assert.throws(() => comparePredictionToObservation(fresh,'pred-1',observation(),{...opts,comparisonCreatedAt:'2026-09-27T10:29:59.000Z'}), /before observation/)
+assert.throws(() => comparePredictionToObservation(compared.ledger,'pred-1',observation({id:'obs-2'}),opts), /already matched/)
+assert.throws(() => comparePredictionToObservation(expired,'pred-1',observation(),opts), /expired-unobserved/)
+assert.equal(compared.comparison.observedSigma, null, 'confidence must not be converted to sigma')
+
+console.log('reality-error-ledger task2: direct prediction-vs-observation comparison')
