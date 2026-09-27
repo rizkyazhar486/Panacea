@@ -18,6 +18,57 @@ The target is one shared **Computational Human Graph** projected through three p
 
 These are three lenses over one canonical biological architecture, not three separate biological databases.
 
+## 1A. Depth compounding — breadth discovers, depth compounds
+
+Horizontal breadth is useful for **discovery**, but it is not evidence of maturity. Ideas, candidate domains and future capabilities may be explored broadly, but implementation progress must preferentially compound inside a selected vertical slice until it reaches a defensible stopping boundary.
+
+Canonical execution loop:
+
+```text
+EXPLORE BROADLY
+-> SELECT ONE HIGH-VALUE VERTICAL SLICE
+-> COMMIT TO THE SLICE
+-> DEEPEN MECHANISM / STATE / INFRASTRUCTURE
+-> INTEGRATE WITH THE SHARED HUMAN MODEL
+-> TEST AGAINST REALITY
+-> REFINE FROM ERROR / FEEDBACK
+-> EXPAND BREADTH ONLY WHEN JUSTIFIED
+```
+
+Use the internal heuristic:
+
+[
+S_{compounding}
+=
+S_{vertical}
+\times
+D_{continuity}
+\times
+D_{reality}
+\times
+D_{feedback}
+]
+
+where:
+- (S_{vertical}) = the existing domain × model × infrastructure × integration × validation depth;
+- (D_{continuity}) = whether the capability is developed as a persistent longitudinal system rather than a one-off snapshot;
+- (D_{reality}) = whether claims are confronted with real inputs, reference data, benchmarks, workflows, devices, failure cases or qualified human validation as appropriate;
+- (D_{feedback}) = whether observed error/outcomes change the next model, implementation or calibration step.
+
+This is an architecture and prioritization heuristic, never a clinical score.
+
+Operational laws:
+- **Breadth is a discovery queue; depth is the default execution lane.**
+- Do not open several shallow implementation fronts when one existing high-value slice is still hollow.
+- A slice is not deep because it contains more text, labels, routes, screens, meshes, model calls or commits.
+- Prefer causal/mechanistic resolution, shared state, persistence, cross-system coupling, provenance, uncertainty, validation and outcome feedback over surface-area growth.
+- Continue a selected slice until it is either materially mature for its declared scope or blocked by a concrete external dependency that software cannot resolve; record that boundary explicitly.
+- Reality-testing must expose disagreement between prediction/model and observation. Never polish away error, unknown state or unsupported resolution.
+- Refinement should follow measured failure, benchmark evidence, user/workflow friction, scientific falsification or validation results rather than novelty pressure.
+- Once a reusable deep primitive exists, project it horizontally into additional organs/workflows/surfaces instead of rebuilding shallow copies.
+
+The same rule applies recursively: whole human -> system -> organ -> tissue -> cell -> molecule, and input -> state -> engine -> coupling -> validation -> projection -> outcome. Depth must compound across both biological scale and software execution.
+
 ## 2. Hard prohibitions
 
 The following are **forbidden design patterns** for all future work.
