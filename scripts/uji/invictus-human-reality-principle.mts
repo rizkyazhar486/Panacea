@@ -17,6 +17,15 @@ function includesAll(path: string, needles: string[]) {
 
 const specPath = 'docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md'
 
+includesAll('PANACEA_INVICTUS_PRINCIPLE.md', [
+  'Invictus Human Reality Principle',
+  specPath,
+  'future-realizable',
+  'Human Reality Model',
+  'patient truth',
+  'human agency',
+])
+
 includesAll('PANACEA_CONSTITUTION.md', [
   'Invictus Human Reality Principle',
   specPath,
