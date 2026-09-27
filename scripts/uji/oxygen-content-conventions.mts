@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { HUFNER, KELARUTAN_PLASMA, kandunganOksigen } from '../../src/lib/hemodinamik.ts'
 import {
@@ -8,6 +9,9 @@ import {
 } from '../../src/lib/physiology/oxygenContentConventions.ts'
 
 assert.equal(DEFAULT_OXYGEN_CONTENT_CONVENTION, 'panacea-clinical-effective-v1')
+const hemodynamicSource = readFileSync('src/lib/hemodinamik.ts', 'utf8')
+assert.match(hemodynamicSource, /oxygenContentConvention/, 'hemodinamik.ts must consume the canonical oxygen-content convention registry')
+assert.doesNotMatch(hemodynamicSource, /export const HUFNER\s*=\s*1\.34/, 'HUFNER must not remain a duplicated literal in hemodinamik.ts')
 const clinical = oxygenContentConvention(DEFAULT_OXYGEN_CONTENT_CONVENTION)
 assert.equal(clinical.executable, true)
 assert.equal(clinical.hufnerMlO2PerGHb, HUFNER)
