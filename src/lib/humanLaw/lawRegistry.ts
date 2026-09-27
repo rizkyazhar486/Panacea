@@ -425,7 +425,7 @@ export function getHumanLawLineage(
     }
     visited.add(current)
     lineage.push(current)
-    const next = registry.supersededByLawId[current]
+    const next: string | undefined = registry.supersededByLawId[current]
     if (registry.lawsById[current].status === 'superseded' && !next) {
       throw new Error(`superseded law ${current} has missing supersession edge`)
     }
