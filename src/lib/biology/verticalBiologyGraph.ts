@@ -234,7 +234,7 @@ export function validateVerticalBiologicalGraph(graph: VerticalBiologicalGraph):
 
     for (const requiredScale of graph.requiredScalePath) {
       if (!stepByScale.has(requiredScale)) {
-        errors.push(`lineage ${lineage.id} skipped missing required scale ${requiredScale}`)
+        errors.push(`lineage ${lineage.id} missing required scale ${requiredScale}`)
       }
     }
   }
