@@ -64,6 +64,7 @@ assert.equal(a.latest['engine.a.output'].provenance.parameterSetId, 'fixture-v1'
 assert.equal(a.latest['engine.a.output'].provenance.validationClass, 'synthetic')
 assert.equal(a.latest['engine.a.output'].provenance.fidelity, 'infrastructure-fixture')
 assert.ok(a.latest['engine.a.output'].provenance.parents.includes(a.boundaries['boundary.input'].provenance.id))
+assert.equal(a.boundaries['boundary.input'].provenance.sourceEventId, 'event-1')
 const changedOutputRegistry = createDomainEngineRegistry([baseEngine({ step: ({ inputs }) => ({ state:1, outputs:[{ name:'engine.a.output', unit:'1', value:inputs['boundary.input'].value + 1, sigma:null }] }) })],[{ name:'boundary.input', unit:'1' }])
 const changedOutput = runPhysiologicalSimulation({ registry:changedOutputRegistry, boundaryConditions:[boundary], untilSeconds:2 })
 assert.notEqual(a.latest['engine.a.output'].provenance.id, changedOutput.latest['engine.a.output'].provenance.id)

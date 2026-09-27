@@ -1,4 +1,4 @@
-export type PanaceaSurface = 'your-body' | 'clinical' | 'for-you' | 'ai-emr' | 'ai-chatbot'
+export type PanaceaSurface = 'your-body' | 'clinical' | 'body-exposure' | 'for-you' | 'ai-emr' | 'ai-chatbot'
 
 export type LongitudinalDomain =
   | 'vital'
@@ -122,6 +122,7 @@ export type LongitudinalSubscriber = (event: LongitudinalEvent) => void
 const DOMAIN_BY_SURFACE: Readonly<Record<PanaceaSurface, readonly LongitudinalDomain[]>> = {
   'your-body': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'device'],
   clinical: ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
+  'body-exposure': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'device', 'other'],
   'for-you': ['activity', 'sleep', 'recovery', 'readiness', 'fitness', 'nutrition', 'other'],
   'ai-emr': ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
   'ai-chatbot': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
@@ -357,7 +358,7 @@ export function numericMetricTrend(
   }
 }
 
-function consentPurposeForSurface(surface: PanaceaSurface): ConsentPurpose {
+export function consentPurposeForSurface(surface: PanaceaSurface): ConsentPurpose {
   if (surface === 'clinical' || surface === 'ai-emr') return 'clinical-support'
   if (surface === 'ai-chatbot') return 'ai-context'
   return 'personal-visualization'
