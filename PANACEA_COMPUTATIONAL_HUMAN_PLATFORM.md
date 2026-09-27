@@ -377,3 +377,28 @@ It adds the **No Hollow Gap Principle** across all three superpages and all biol
 This requirement applies equally to visualization. High-end 3DCG must render source/model-backed biological structure and state rather than artificial spectacle. Superficial, fabricated and unsupported/subjective representations are prohibited. Relevant unimplemented layers remain explicit vertical gaps; unknown patient states remain unknown or appropriately classified as derived, estimated, simulated or population-reference.
 
 Future architecture and task selection should therefore maximize evidence-backed vertical continuity and cross-scale coupling, not merely domain count.
+
+## 16. Longitudinal coupled execution
+
+The Computational Human Platform must execute as a longitudinal coupled system rather than isolated organ snapshots.
+
+Conceptually:
+
+[
+\mathbf X_{t+\Delta t}
+=
+\Phi(
+\mathbf X_t,
+\mathbf U_t,
+\mathbf E_t,
+\boldsymbol\theta,
+\mathbf C_t,
+\Delta t
+)
+]
+
+where `C_t` contains explicit cross-system dependencies, feedback and compensatory structure.
+
+Domain engines may use different time steps, but scheduling must preserve biological order, dependency constraints, state history, uncertainty and provenance. Cross-system responses should form auditable domino chains with compensation/counter-regulation where scientifically supported.
+
+Clinical, Body Exposure and Simulation remain different projections of one synchronized temporal state graph.
