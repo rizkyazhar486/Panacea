@@ -3,7 +3,7 @@
 ## Purpose
 Define what any capable agent should do when authorized to continue Panaceamed development without a narrowly specified micro-task.
 
-This loop operates under `PANACEA_CONSTITUTION.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `AGENTS.md`, and `PANACEA_PRODUCT_MATURITY_OS.md`.
+This loop operates under `PANACEA_CONSTITUTION.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `AGENTS.md`, and `PANACEA_PRODUCT_MATURITY_OS.md`. For computational-human continuation it must also apply `docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md`.
 
 ## Trigger
 When the owner says "lanjut", "continue", "keep going", or equivalent and repository execution is available:
@@ -157,9 +157,9 @@ Before net-new breadth, ask:
 - can state/history be replayed with original model/version?
 - are simulated counterfactual branches isolated from the real timeline?
 - is causal language supported by mechanism/evidence rather than correlation?
-- does outcome feedback improve validation/calibration evidence?
+- does outcome feedback improve prediction-vs-reality falsification and validation/calibration evidence?
 
-Hard safety/security/privacy/data/clinical blockers always outrank these experimental deepening dimensions.
+Hard safety/security/privacy/data/clinical blockers always outrank these experimental deepening dimensions. Do not overfit personalization or invent latent state merely to reduce apparent error.
 
 A route, widget, component, animation or content-rich page is not a vertical-depth improvement by itself. A model-derived state must remain distinct from measured/recorded patient truth.
 

@@ -19,7 +19,7 @@ If this adapter conflicts with `AGENTS.md` or the Panacea Constitution, the high
 
 Gemini must inherit the model-agnostic doctrine in [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md) for computational-human, Clinical, AI-EMR, Body Exposure, simulation, device, and longitudinal-health work.
 
-Future depth is both biological and longitudinal: deepen scientific scale continuity while also deepening personal calibration, temporal replay, causal explanation, Reality Gap/uncertainty, prediction-vs-reality falsification, outcome feedback, and counterfactual validity.
+Future depth is both biological and longitudinal: deepen scientific scale continuity while also deepening personal calibration **only after parameter identifiability is established**, temporal replay, causal explanation, Reality Gap/uncertainty, prediction-vs-reality falsification, outcome feedback, and counterfactual validity.
 
 Never overfit personalization, invent hidden state, hide uncertainty, rewrite real history with newer models, convert correlation into causation, or present counterfactual branches as real outcomes. Real observed history remains canonical; simulated branches remain isolated.
 
