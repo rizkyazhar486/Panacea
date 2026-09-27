@@ -172,12 +172,13 @@ export function buildHumanObservabilityFrame(input: {
       review: { ...event.review },
     } satisfies HumanObservabilityObservation))
 
-  const latestByMetric = new Map<string, HumanObservabilityObservation>()
-  for (const observation of observations) latestByMetric.set(observation.metric, observation)
+  const observed = observations.filter((observation) => observation.truthClass === 'observed')
+  const latestObservedByMetric = new Map<string, HumanObservabilityObservation>()
+  for (const observation of observed) latestObservedByMetric.set(observation.metric, observation)
 
   const gaps = normalizeExpectations(input.expectations ?? [])
     .map<HumanObservabilityGap | null>((expectation) => {
-      const latest = latestByMetric.get(expectation.metric)
+      const latest = latestObservedByMetric.get(expectation.metric)
       if (!latest) {
         return {
           metric: expectation.metric,
@@ -208,8 +209,8 @@ export function buildHumanObservabilityFrame(input: {
     input.at,
   )
 
-  const observedDomains = [...new Set(observations.map((observation) => observation.domain))].sort()
-  const observedMetrics = [...new Set(observations.map((observation) => observation.metric))].sort()
+  const observedDomains = [...new Set(observed.map((observation) => observation.domain))].sort()
+  const observedMetrics = [...new Set(observed.map((observation) => observation.metric))].sort()
 
   return {
     subjectId: input.state.subjectId,
