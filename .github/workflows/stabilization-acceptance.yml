@@ -92,10 +92,26 @@ jobs:
           PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
         run: node scripts/qa/panacea-os-mobile-smoke.mjs
 
+      - name: Priority 2 UI/UX mobile 320x568 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_WIDTH: '320'
+          UIUX_MOBILE_QA_HEIGHT: '568'
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-320x568
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
       - name: Priority 2 UI/UX mobile 390x844 smoke
         env:
           UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
           UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-390x844
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
+      - name: Priority 2 UI/UX mobile 430x932 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_WIDTH: '430'
+          UIUX_MOBILE_QA_HEIGHT: '932'
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-430x932
         run: node scripts/qa/uiux-mobile-shell-smoke.mjs
 
       - name: Upload Body Exposure mobile QA artifact
@@ -120,8 +136,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uiux-mobile-390x844
-          path: artifacts/uiux-mobile-390x844/*
+          name: uiux-mobile-responsive-matrix
+          path: artifacts/uiux-mobile-*/*
           if-no-files-found: warn
           retention-days: 7
 
