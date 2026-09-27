@@ -1,3 +1,9 @@
+# Panaceamed Gemini working entry point
+
+Gemini-class agents must follow the model-agnostic repository authorities in `AGENTS.md`, `PANACEA_CONSTITUTION.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_PRODUCT_MATURITY_OS.md`, and `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`.
+
+For broad continuation, treat Panaceamed as a **Computational Human Platform**: preserve one canonical measured/recorded patient state, keep model-derived physiological state separate, deepen specialized domain engines, make cross-system coupling explicit, validate before stronger claims, and project shared state into Clinical, AI-EMR, Body Exposure and simulation. Prefer validated vertical depth over adding disconnected routes/widgets.
+
 # Gemini entry point
 
 Read `AGENTS.md` before material repository work.
