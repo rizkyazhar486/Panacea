@@ -204,6 +204,7 @@ export function EMR() {
   if (strBlocked) return <StrGate str={acc?.str} />
   if (!draft) return <EmptyEMR />
 
+  const historicalReadOnly = Boolean(record && draft.id !== record.id)
   const systemFindings = buildFindings(draft.physicalExam)
   const bodyClinicalProjection = projectEmrToBodyClinicalBridge(
     draft,
@@ -213,6 +214,7 @@ export function EMR() {
   )
 
   function patch(fn: (r: EMRRecord) => EMRRecord) {
+    if (historicalReadOnly) return
     setDraft((d) => (d ? fn(d) : d))
     setDirty(true)
   }
@@ -225,6 +227,7 @@ export function EMR() {
   }
 
   function save() {
+    if (historicalReadOnly) return
     if (draft) {
       saveRecord({ ...draft, updatedAt: new Date().toISOString() })
       setDirty(false)
@@ -232,7 +235,7 @@ export function EMR() {
   }
 
   function sign() {
-    if (!draft) return
+    if (!draft || historicalReadOnly) return
     const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
@@ -258,6 +261,7 @@ export function EMR() {
             subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('en-US')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
+            {historicalReadOnly && <Badge tone="neutral">Historical encounter · read-only</Badge>}
             {draft.signedBy ? (
               <Badge tone="brand">
                 <IconCheck size={13} /> Signed by {draft.signedBy}
@@ -265,8 +269,8 @@ export function EMR() {
             ) : (
               <Badge tone="high">Awaiting doctor verification</Badge>
             )}
-            <Button variant="outline" onClick={save} disabled={!dirty}>
-              {dirty ? 'Save Changes' : 'Saved'}
+            <Button variant="outline" onClick={save} disabled={historicalReadOnly || !dirty}>
+              {historicalReadOnly ? 'Read-only history' : dirty ? 'Save Changes' : 'Saved'}
             </Button>
             <Button variant="outline" onClick={() => window.print()}>
               <IconBook size={14} /> Print / PDF
