@@ -79,6 +79,38 @@ assert.equal(clinical.metrics.some((item) => item.metric === 'ldl-c'), false)
 assert.equal(clinical.pendingClinicalReview, 1)
 assert.equal(canEnterClinicalRecord(state.eventsById['lab-pending']), false)
 
+for (const semanticState of ['ai-draft', 'simulated', 'reference'] as const) {
+  const unsafeClinicalEvent: LongitudinalEvent = {
+    ...event(
+      `unsafe-${semanticState}`,
+      `unsafe-vital-${semanticState}`,
+      'vital',
+      70,
+      '2026-09-14T01:30:00.000Z',
+    ),
+    semanticState,
+  }
+  let isolatedClinicalState = createLongitudinalPatientState(
+    'subject-demo-001',
+    '2026-09-01T00:00:00.000Z',
+  )
+  isolatedClinicalState = ingestLongitudinalEvent(isolatedClinicalState, unsafeClinicalEvent).state
+
+  assert.equal(
+    canEnterClinicalRecord(unsafeClinicalEvent, Date.parse('2026-09-15T00:00:00.000Z')),
+    false,
+    `${semanticState} must not silently enter committed clinical state`,
+  )
+  assert.equal(
+    projectStateToSurface(isolatedClinicalState, 'clinical', '2026-09-15T00:00:00.000Z').metrics.length,
+    0,
+  )
+  assert.equal(
+    projectStateToSurface(isolatedClinicalState, 'ai-emr', '2026-09-15T00:00:00.000Z').metrics.length,
+    0,
+  )
+}
+
 const acceptedLab = event('lab-accepted', 'hdl-c', 'lab', 55, '2026-09-14T02:00:00.000Z', {
   state: 'accepted',
   reviewerId: 'clinician-opaque-001',
