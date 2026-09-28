@@ -1,0 +1,921 @@
+{
+  "schemaVersion": 1,
+  "id": "panacea-99-axiom-constitution",
+  "status": "normative-engineering-annex",
+  "theologicalBoundary": "The Divine Names belong to Allah. Panacea does not possess, instantiate, emulate, or claim divine attributes, omniscience, infallibility, sovereignty, or metaphysical authority. This registry is a human-authored engineering mnemonic inspired by reflection on the Divine Names; it is not aqidah, tafsir, a theological enumeration authority, or a clinical scoring system.",
+  "sourceNote": "Qur'an 7:180 establishes that the Most Beautiful Names belong to Allah. Sahih al-Bukhari 2736 and Sahih Muslim 2677a report the ninety-nine Names tradition. Exact enumerated name lists are treated here as a common pedagogical sequence rather than software-defined theology.",
+  "references": [
+    {
+      "type": "quran",
+      "citation": "Qur'an 7:180",
+      "url": "https://quran.com/7/180"
+    },
+    {
+      "type": "hadith",
+      "citation": "Sahih al-Bukhari 2736",
+      "url": "https://sunnah.com/bukhari/54/23"
+    },
+    {
+      "type": "hadith",
+      "citation": "Sahih Muslim 2677a",
+      "url": "https://sunnah.com/muslim/48/5"
+    }
+  ],
+  "formula": {
+    "hardGate": "C_99(a) = product(g_i(a)) for all applicable hard invariants, with g_i(a) in {0,1}; any failed applicable safety-critical gate blocks execution.",
+    "maturity": "M_99 = exp(sum(w_i * ln(s_i + epsilon)) / sum(w_i)); a descriptive engineering maturity heuristic only, never a theological or clinical score."
+  },
+  "axioms": [
+    {
+      "id": "A01",
+      "sequence": 1,
+      "inspirationName": "Ar-Rahman",
+      "engineeringTheme": "mercy",
+      "invariant": "Optimize system behavior toward broad reduction of avoidable suffering; never optimize engagement or intervention volume above human benefit.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A02",
+      "sequence": 2,
+      "inspirationName": "Ar-Rahim",
+      "engineeringTheme": "mercy",
+      "invariant": "Prefer context-sensitive compassionate assistance, especially for vulnerable or high-risk users, with escalation rather than abandonment.",
+      "enforcement": "runtime",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A03",
+      "sequence": 3,
+      "inspirationName": "Al-Malik",
+      "engineeringTheme": "canonical-order",
+      "invariant": "Maintain one governed canonical recorded-human state; projections must not silently create competing patient truths.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A04",
+      "sequence": 4,
+      "inspirationName": "Al-Quddus",
+      "engineeringTheme": "integrity",
+      "invariant": "Keep clinical/scientific data free from known contamination, fabrication, schema corruption, and untraceable transformations.",
+      "enforcement": "ci",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A05",
+      "sequence": 5,
+      "inspirationName": "As-Salam",
+      "engineeringTheme": "safety",
+      "invariant": "Default to safe failure, bounded degradation, rollback, and non-harmful behavior when required evidence or dependencies fail.",
+      "enforcement": "runtime",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A06",
+      "sequence": 6,
+      "inspirationName": "Al-Mu'min",
+      "engineeringTheme": "assurance",
+      "invariant": "Require authenticated identity, calibrated confidence, verifiable evidence, and explicit trust boundaries for consequential actions.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A07",
+      "sequence": 7,
+      "inspirationName": "Al-Muhaymin",
+      "engineeringTheme": "oversight",
+      "invariant": "Continuously monitor models, data, infrastructure, drift, unsafe outputs, and policy violations with auditable oversight.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A08",
+      "sequence": 8,
+      "inspirationName": "Al-Aziz",
+      "engineeringTheme": "resilience",
+      "invariant": "Design critical capabilities to resist corruption, unauthorized modification, single-point failure, and brittle dependencies.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A09",
+      "sequence": 9,
+      "inspirationName": "Al-Jabbar",
+      "engineeringTheme": "repair",
+      "invariant": "Detect broken invariants and repair forward through controlled reconciliation; never hide inconsistency to preserve appearance.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A10",
+      "sequence": 10,
+      "inspirationName": "Al-Mutakabbir",
+      "engineeringTheme": "anti-hubris",
+      "invariant": "No model, agent, developer, clinician, executive, or vendor is exempt from evidence, audit, safety, and review gates.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A11",
+      "sequence": 11,
+      "inspirationName": "Al-Khaliq",
+      "engineeringTheme": "creation-discipline",
+      "invariant": "New capability must have a defined purpose, ownership, lifecycle, provenance contract, and measurable acceptance boundary.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A12",
+      "sequence": 12,
+      "inspirationName": "Al-Bari'",
+      "engineeringTheme": "separation",
+      "invariant": "Separate truth classes, domains, identities, permissions, and failure domains so one corrupted layer cannot masquerade as another.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A13",
+      "sequence": 13,
+      "inspirationName": "Al-Musawwir",
+      "engineeringTheme": "representation",
+      "invariant": "Represent anatomy, physiology, state, uncertainty, and interfaces faithfully to their evidence rather than aesthetic convenience.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A14",
+      "sequence": 14,
+      "inspirationName": "Al-Ghaffar",
+      "engineeringTheme": "recoverability",
+      "invariant": "Support safe correction, retraction, versioning, and recovery from erroneous states without erasing the audit trail.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A15",
+      "sequence": 15,
+      "inspirationName": "Al-Qahhar",
+      "engineeringTheme": "containment",
+      "invariant": "Unsafe processes, compromised credentials, runaway automation, and invalid clinical actions must be containable and stoppable.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A16",
+      "sequence": 16,
+      "inspirationName": "Al-Wahhab",
+      "engineeringTheme": "benefit-distribution",
+      "invariant": "Reusable validated capability should strengthen multiple user surfaces without extracting unnecessary data or creating lock-in.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A17",
+      "sequence": 17,
+      "inspirationName": "Ar-Razzaq",
+      "engineeringTheme": "resource-stewardship",
+      "invariant": "Compute, storage, bandwidth, clinician attention, and patient burden are scarce resources and must be budgeted deliberately.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A18",
+      "sequence": 18,
+      "inspirationName": "Al-Fattah",
+      "engineeringTheme": "accessibility",
+      "invariant": "Reduce legitimate barriers to safe access, interoperability, explanation, and recovery while preserving authorization boundaries.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A19",
+      "sequence": 19,
+      "inspirationName": "Al-Alim",
+      "engineeringTheme": "epistemics",
+      "invariant": "Encode what is known, how it is known, and its limits; never convert missing knowledge into fabricated certainty.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A20",
+      "sequence": 20,
+      "inspirationName": "Al-Qabid",
+      "engineeringTheme": "restriction",
+      "invariant": "Apply least privilege, data minimization, rate limits, retention limits, and intervention constraints whenever exposure creates risk.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A21",
+      "sequence": 21,
+      "inspirationName": "Al-Basit",
+      "engineeringTheme": "appropriate-expansion",
+      "invariant": "Expand access, context, or capability only when purpose, consent, evidence, and safety justify broader scope.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A22",
+      "sequence": 22,
+      "inspirationName": "Al-Khafid",
+      "engineeringTheme": "de-escalation",
+      "invariant": "Reduce confidence, authority, automation, and intervention intensity when evidence quality or system health deteriorates.",
+      "enforcement": "runtime",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A23",
+      "sequence": 23,
+      "inspirationName": "Ar-Rafi'",
+      "engineeringTheme": "quality-uplift",
+      "invariant": "Promote only models, datasets, workflows, and claims that demonstrate stronger validated quality than the incumbent baseline.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A24",
+      "sequence": 24,
+      "inspirationName": "Al-Mu'izz",
+      "engineeringTheme": "dignity",
+      "invariant": "Preserve human dignity, informed agency, accessibility, and respectful representation across every product surface.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A25",
+      "sequence": 25,
+      "inspirationName": "Al-Mudhill",
+      "engineeringTheme": "privilege-revocation",
+      "invariant": "Rapidly revoke compromised, obsolete, abusive, or unjustified privileges and capabilities without preserving status for prestige.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A26",
+      "sequence": 26,
+      "inspirationName": "As-Sami'",
+      "engineeringTheme": "listening",
+      "invariant": "Patient-reported experience, clinician input, device signals, and feedback must be ingestible with provenance and conflict handling.",
+      "enforcement": "data",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A27",
+      "sequence": 27,
+      "inspirationName": "Al-Basir",
+      "engineeringTheme": "observability",
+      "invariant": "Make consequential state changes, model outputs, blind spots, and system behavior inspectable rather than opaque.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A28",
+      "sequence": 28,
+      "inspirationName": "Al-Hakam",
+      "engineeringTheme": "adjudication",
+      "invariant": "Conflicting observations and model outputs require explicit adjudication rules, source weighting, uncertainty, and human review where needed.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A29",
+      "sequence": 29,
+      "inspirationName": "Al-Adl",
+      "engineeringTheme": "justice",
+      "invariant": "Evaluate and mitigate clinically meaningful performance disparities; resource allocation and UX must not silently disadvantage protected or underserved groups.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A30",
+      "sequence": 30,
+      "inspirationName": "Al-Latif",
+      "engineeringTheme": "weak-signal-care",
+      "invariant": "Detect subtle longitudinal change without overstating noise; sensitivity must be paired with specificity and uncertainty.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A31",
+      "sequence": 31,
+      "inspirationName": "Al-Khabir",
+      "engineeringTheme": "context-depth",
+      "invariant": "Reason from longitudinal, multimodal, cross-system context rather than isolated snapshots when the evidence permits.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A32",
+      "sequence": 32,
+      "inspirationName": "Al-Halim",
+      "engineeringTheme": "deliberation",
+      "invariant": "High-consequence decisions must support deliberate review, cooldown, confirmation, or escalation rather than impulsive automation.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A33",
+      "sequence": 33,
+      "inspirationName": "Al-Azim",
+      "engineeringTheme": "scale-discipline",
+      "invariant": "Architecture must remain coherent under greater data, model, user, geographic, and biological scale without weakening invariants.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A34",
+      "sequence": 34,
+      "inspirationName": "Al-Ghafur",
+      "engineeringTheme": "error-redemption",
+      "invariant": "Corrected errors should stop propagating while historical provenance remains available for audit, learning, and recurrence prevention.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A35",
+      "sequence": 35,
+      "inspirationName": "Ash-Shakur",
+      "engineeringTheme": "feedback-learning",
+      "invariant": "Validated positive and negative outcomes must feed measurable learning loops; do not reward activity metrics that lack human benefit.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A36",
+      "sequence": 36,
+      "inspirationName": "Al-Ali",
+      "engineeringTheme": "higher-order-governance",
+      "invariant": "Constitutional safety, truth, consent, and human-agency rules outrank local feature convenience and optimization targets.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A37",
+      "sequence": 37,
+      "inspirationName": "Al-Kabir",
+      "engineeringTheme": "systemic-view",
+      "invariant": "Assess whole-system and cross-scale consequences before local optimization; avoid subsystem gains that create net harm elsewhere.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A38",
+      "sequence": 38,
+      "inspirationName": "Al-Hafiz",
+      "engineeringTheme": "preservation",
+      "invariant": "Protect confidentiality, integrity, availability, provenance, backups, and longitudinal continuity with tested recovery.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A39",
+      "sequence": 39,
+      "inspirationName": "Al-Muqit",
+      "engineeringTheme": "physiological-resources",
+      "invariant": "Model oxygen, perfusion, energy, nutrition, fluids, electrolytes, and other limiting resources with explicit units and uncertainty.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A40",
+      "sequence": 40,
+      "inspirationName": "Al-Hasib",
+      "engineeringTheme": "accountability",
+      "invariant": "Every consequential inference or action must be attributable to inputs, versions, rules, identities, and timestamps sufficient for audit.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A41",
+      "sequence": 41,
+      "inspirationName": "Al-Jalil",
+      "engineeringTheme": "clinical-seriousness",
+      "invariant": "Clinical-risk surfaces must use professional-grade evidence, validation, failure handling, and review rather than demo-grade shortcuts.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A42",
+      "sequence": 42,
+      "inspirationName": "Al-Karim",
+      "engineeringTheme": "user-benefit",
+      "invariant": "Prefer designs that return useful understanding and control to users instead of maximizing extraction, dependency, or manipulative engagement.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A43",
+      "sequence": 43,
+      "inspirationName": "Ar-Raqib",
+      "engineeringTheme": "continuous-vigilance",
+      "invariant": "Continuously monitor security, safety, drift, data freshness, model calibration, and critical physiological gaps where authorized.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A44",
+      "sequence": 44,
+      "inspirationName": "Al-Mujib",
+      "engineeringTheme": "responsiveness",
+      "invariant": "Respond proportionally to meaningful state change, deterioration, user intent, and operational incidents with bounded latency and escalation.",
+      "enforcement": "runtime",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A45",
+      "sequence": 45,
+      "inspirationName": "Al-Wasi'",
+      "engineeringTheme": "extensibility",
+      "invariant": "Use extensible ontologies, interfaces, provenance, and multiscale models so future evidence can deepen the system without parallel truth stores.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A46",
+      "sequence": 46,
+      "inspirationName": "Al-Hakim",
+      "engineeringTheme": "wise-optimization",
+      "invariant": "Optimize decisions across evidence, risk, burden, benefit, time horizon, uncertainty, and human preference rather than one proxy metric.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A47",
+      "sequence": 47,
+      "inspirationName": "Al-Wadud",
+      "engineeringTheme": "care-relationship",
+      "invariant": "Design longitudinal interactions to support trust, continuity, adherence, and human connection without emotional manipulation.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A48",
+      "sequence": 48,
+      "inspirationName": "Al-Majid",
+      "engineeringTheme": "excellence-with-evidence",
+      "invariant": "Ambition and polish are permitted only when matched by evidence, reliability, accessibility, and truthful capability boundaries.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A49",
+      "sequence": 49,
+      "inspirationName": "Al-Ba'ith",
+      "engineeringTheme": "re-evaluation",
+      "invariant": "Dormant hypotheses, archived data, and prior negative results may be re-evaluated when genuinely new evidence or capability changes tractability.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A50",
+      "sequence": 50,
+      "inspirationName": "Ash-Shahid",
+      "engineeringTheme": "event-witness",
+      "invariant": "Use append-only or tamper-evident event lineage for consequential observations, state transitions, access, and actions.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A51",
+      "sequence": 51,
+      "inspirationName": "Al-Haqq",
+      "engineeringTheme": "truth",
+      "invariant": "Measured fact, reference value, estimate, simulation, hypothesis, and unknown must remain distinct and visibly labeled.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A52",
+      "sequence": 52,
+      "inspirationName": "Al-Wakil",
+      "engineeringTheme": "delegation",
+      "invariant": "Delegated agents and services receive explicit scopes, permissions, objectives, time bounds, and revocation paths; delegation never removes accountability.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A53",
+      "sequence": 53,
+      "inspirationName": "Al-Qawi",
+      "engineeringTheme": "robustness",
+      "invariant": "Critical paths must withstand expected load, adversarial inputs, dependency failure, and partial data without unsafe behavior.",
+      "enforcement": "reliability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A54",
+      "sequence": 54,
+      "inspirationName": "Al-Matin",
+      "engineeringTheme": "structural-strength",
+      "invariant": "Core contracts, schemas, interfaces, and invariants require backward-compatible evolution, tests, and migration plans.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A55",
+      "sequence": 55,
+      "inspirationName": "Al-Wali",
+      "engineeringTheme": "protective-ownership",
+      "invariant": "Every critical subsystem must have clear stewardship, incident responsibility, and a protected operating boundary.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A56",
+      "sequence": 56,
+      "inspirationName": "Al-Hamid",
+      "engineeringTheme": "outcome-merit",
+      "invariant": "Evaluate success by validated user, clinical, scientific, safety, and reliability outcomes rather than self-congratulatory feature counts.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A57",
+      "sequence": 57,
+      "inspirationName": "Al-Muhsi",
+      "engineeringTheme": "measurement",
+      "invariant": "Define denominators, units, event counts, missingness, uncertainty, and measurement windows before deriving metrics or completion claims.",
+      "enforcement": "data",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A58",
+      "sequence": 58,
+      "inspirationName": "Al-Mubdi'",
+      "engineeringTheme": "novelty",
+      "invariant": "Novel hypotheses and designs are welcome, but novelty must be labeled, source-checked, falsifiable, and separated from established knowledge.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A59",
+      "sequence": 59,
+      "inspirationName": "Al-Mu'id",
+      "engineeringTheme": "reproducibility",
+      "invariant": "Important computations and state transitions must be replayable from versioned inputs, code, configuration, and provenance where feasible.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A60",
+      "sequence": 60,
+      "inspirationName": "Al-Muhyi",
+      "engineeringTheme": "life-preserving-priority",
+      "invariant": "When priorities conflict, credible prevention of death or serious harm outranks convenience, growth, aesthetics, and nonessential automation.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A61",
+      "sequence": 61,
+      "inspirationName": "Al-Mumit",
+      "engineeringTheme": "lifecycle-end",
+      "invariant": "Support safe termination, deletion, deactivation, end-of-life care boundaries, and retirement of obsolete models/data without orphaned risk.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A62",
+      "sequence": 62,
+      "inspirationName": "Al-Hayy",
+      "engineeringTheme": "living-state",
+      "invariant": "Model human state as dynamic and time-varying; stale snapshots must never be presented as continuously current reality.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A63",
+      "sequence": 63,
+      "inspirationName": "Al-Qayyum",
+      "engineeringTheme": "operational-continuity",
+      "invariant": "Critical state and safety functions require durable dependencies, health checks, fallback paths, and explicit degraded modes.",
+      "enforcement": "reliability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A64",
+      "sequence": 64,
+      "inspirationName": "Al-Wajid",
+      "engineeringTheme": "gap-discovery",
+      "invariant": "Actively identify missing evidence, missing signals, contradictory state, and unmodeled dependencies instead of assuming completeness.",
+      "enforcement": "observability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A65",
+      "sequence": 65,
+      "inspirationName": "Al-Maajid",
+      "engineeringTheme": "durable-quality",
+      "invariant": "Prefer durable, reusable, validated capability over transient spectacle; technical prestige never substitutes for verified benefit.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A66",
+      "sequence": 66,
+      "inspirationName": "Al-Wahid",
+      "engineeringTheme": "single-source-coherence",
+      "invariant": "For each governed fact class, define one authoritative source-of-truth contract and explicit reconciliation semantics.",
+      "enforcement": "data",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A67",
+      "sequence": 67,
+      "inspirationName": "Al-Ahad",
+      "engineeringTheme": "irreducible-identity",
+      "invariant": "Subject identity must never be inferred from weak aliases; cross-subject contamination is a fail-closed data-integrity event.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A68",
+      "sequence": 68,
+      "inspirationName": "As-Samad",
+      "engineeringTheme": "dependency-clarity",
+      "invariant": "Document external dependencies and avoid hidden circular reliance; core safety must not depend on an unbounded chain of opaque services.",
+      "enforcement": "reliability",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A69",
+      "sequence": 69,
+      "inspirationName": "Al-Qadir",
+      "engineeringTheme": "capability-bounds",
+      "invariant": "A system may exercise only capabilities it can technically perform, is authorized to perform, and can validate for the intended risk tier.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A70",
+      "sequence": 70,
+      "inspirationName": "Al-Muqtadir",
+      "engineeringTheme": "power-control",
+      "invariant": "Greater model or infrastructure power requires stronger sandboxing, evaluation, rate control, monitoring, and human override.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A71",
+      "sequence": 71,
+      "inspirationName": "Al-Muqaddim",
+      "engineeringTheme": "priority",
+      "invariant": "Prioritize P0 safety, security, data integrity, broken runtime, canonical consistency, validation, and integration before expansion.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A72",
+      "sequence": 72,
+      "inspirationName": "Al-Mu'akhkhir",
+      "engineeringTheme": "deferral",
+      "invariant": "Defer launch or automation when evidence, review, security, consent, or validation is incomplete; delay is preferable to unjustified certainty.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A73",
+      "sequence": 73,
+      "inspirationName": "Al-Awwal",
+      "engineeringTheme": "origin-provenance",
+      "invariant": "Every consequential datum, claim, model, and derived state must preserve discoverable origin and acquisition context.",
+      "enforcement": "data",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A74",
+      "sequence": 74,
+      "inspirationName": "Al-Akhir",
+      "engineeringTheme": "terminal-accountability",
+      "invariant": "Every workflow needs an explicit terminal condition, outcome record, retention policy, and post-action accountability state.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A75",
+      "sequence": 75,
+      "inspirationName": "Az-Zahir",
+      "engineeringTheme": "visible-evidence",
+      "invariant": "Expose the observable evidence and user-relevant rationale behind consequential outputs whenever doing so is safe and appropriate.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A76",
+      "sequence": 76,
+      "inspirationName": "Al-Batin",
+      "engineeringTheme": "latent-state-boundary",
+      "invariant": "Latent or hidden-state inference must be labeled model-derived, uncertainty-bounded, and prohibited from silently becoming recorded fact.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A77",
+      "sequence": 77,
+      "inspirationName": "Al-Waliyy",
+      "engineeringTheme": "governed-authority",
+      "invariant": "Authority over data or action is purpose-bound, role-bound, reviewable, and revocable; ownership does not imply unrestricted use.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A78",
+      "sequence": 78,
+      "inspirationName": "Al-Muta'ali",
+      "engineeringTheme": "anti-proxy-capture",
+      "invariant": "Higher mission constraints outrank local proxy metrics; optimize health, truth, safety, and agency rather than whatever is easiest to measure.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A79",
+      "sequence": 79,
+      "inspirationName": "Al-Barr",
+      "engineeringTheme": "beneficence",
+      "invariant": "Prefer interventions and product decisions with evidence of net benefit, proportional burden, and respect for user values.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A80",
+      "sequence": 80,
+      "inspirationName": "At-Tawwab",
+      "engineeringTheme": "reversible-learning",
+      "invariant": "Support reversible experimentation, correction, re-consent, model rollback, and safe return from failed approaches.",
+      "enforcement": "operations",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A81",
+      "sequence": 81,
+      "inspirationName": "Al-Muntaqim",
+      "engineeringTheme": "consequence-enforcement",
+      "invariant": "Confirmed abuse, intrusion, unsafe automation, and policy breach trigger proportionate containment, revocation, investigation, and remediation.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A82",
+      "sequence": 82,
+      "inspirationName": "Al-Afuww",
+      "engineeringTheme": "privacy-erasure",
+      "invariant": "Honor legitimate deletion and revocation rights with verifiable erasure or irreversible de-identification subject to legal and safety constraints.",
+      "enforcement": "privacy",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A83",
+      "sequence": 83,
+      "inspirationName": "Ar-Ra'uf",
+      "engineeringTheme": "vulnerability-protection",
+      "invariant": "Apply stronger safeguards for distress, incapacity, minors, emergencies, coercion risk, and other vulnerability contexts.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A84",
+      "sequence": 84,
+      "inspirationName": "Malik-ul-Mulk",
+      "engineeringTheme": "asset-governance",
+      "invariant": "Data, models, credentials, compute, devices, and deployment authority require explicit ownership, custody, access, and transfer rules.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A85",
+      "sequence": 85,
+      "inspirationName": "Dhul-Jalali-wal-Ikram",
+      "engineeringTheme": "dignity-and-reverence",
+      "invariant": "Treat human life, bodily data, clinical uncertainty, and consequential decisions with heightened dignity, seriousness, and restraint.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A86",
+      "sequence": 86,
+      "inspirationName": "Al-Muqsit",
+      "engineeringTheme": "equitable-correction",
+      "invariant": "When systematic bias or unequal harm is detected, measure it, identify causes, mitigate it, and verify the correction across affected populations.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A87",
+      "sequence": 87,
+      "inspirationName": "Al-Jami'",
+      "engineeringTheme": "integration",
+      "invariant": "Integrate systems through explicit contracts, provenance, identity, time, units, and semantics rather than merely co-locating features.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A88",
+      "sequence": 88,
+      "inspirationName": "Al-Ghani",
+      "engineeringTheme": "independence",
+      "invariant": "Avoid unnecessary vendor, model, and data-source lock-in; retain portable canonical representations, exportability, and graceful substitution.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A89",
+      "sequence": 89,
+      "inspirationName": "Al-Mughni",
+      "engineeringTheme": "capability-amplification",
+      "invariant": "Use automation to augment human understanding and capacity without silently removing required human judgment or creating dependency traps.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A90",
+      "sequence": 90,
+      "inspirationName": "Al-Mani'",
+      "engineeringTheme": "prevention",
+      "invariant": "Block unsafe states before execution through policy, schema, authorization, evidence, and invariants rather than relying only on post-hoc detection.",
+      "enforcement": "security",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A91",
+      "sequence": 91,
+      "inspirationName": "Ad-Darr",
+      "engineeringTheme": "harm-modeling",
+      "invariant": "Model plausible harms, contraindications, misuse, cascading failure, and adverse outcomes explicitly; never optimize through unmodeled harm.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A92",
+      "sequence": 92,
+      "inspirationName": "An-Nafi'",
+      "engineeringTheme": "benefit-validation",
+      "invariant": "Claims of benefit require measurable outcomes and appropriate evidence; simulated or proxy benefit must be labeled as such.",
+      "enforcement": "validation",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A93",
+      "sequence": 93,
+      "inspirationName": "An-Nur",
+      "engineeringTheme": "clarity",
+      "invariant": "Interfaces, explanations, provenance, uncertainty, and alerts must reduce confusion rather than obscure complexity behind false simplicity.",
+      "enforcement": "product",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A94",
+      "sequence": 94,
+      "inspirationName": "Al-Hadi",
+      "engineeringTheme": "guidance",
+      "invariant": "Recommendations must be evidence-linked, uncertainty-aware, preference-sensitive, and explicit about when professional judgment is required.",
+      "enforcement": "clinical",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A95",
+      "sequence": 95,
+      "inspirationName": "Al-Badi'",
+      "engineeringTheme": "responsible-invention",
+      "invariant": "Pursue genuinely new architectures and scientific hypotheses without bypassing falsification, safety, provenance, or external validation.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A96",
+      "sequence": 96,
+      "inspirationName": "Al-Baqi",
+      "engineeringTheme": "durability",
+      "invariant": "Preserve durable knowledge, schemas, tests, provenance, migration history, and reproducibility beyond any single model or vendor generation.",
+      "enforcement": "architecture",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A97",
+      "sequence": 97,
+      "inspirationName": "Al-Warith",
+      "engineeringTheme": "succession",
+      "invariant": "Future maintainers and models must inherit enough context, provenance, rationale, tests, and governance to continue safely without rediscovering hidden assumptions.",
+      "enforcement": "governance",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A98",
+      "sequence": 98,
+      "inspirationName": "Ar-Rashid",
+      "engineeringTheme": "sound-direction",
+      "invariant": "Choose actions by evidence, causal reasoning, risk, uncertainty, constraints, and human goals; avoid optimizing for status, novelty, or model preference.",
+      "enforcement": "scientific",
+      "claimBoundary": "inspiration-only"
+    },
+    {
+      "id": "A99",
+      "sequence": 99,
+      "inspirationName": "As-Sabur",
+      "engineeringTheme": "patience",
+      "invariant": "Do not rush uncertain clinical/scientific claims, migrations, or autonomous actions; accumulate evidence and validate before irreversible escalation.",
+      "enforcement": "safety",
+      "claimBoundary": "inspiration-only"
+    }
+  ]
+}
