@@ -57,6 +57,13 @@ state = ingestLongitudinalBatch(state, [
 
 assert.equal(state.revision, 5)
 assert.equal(ingestLongitudinalEvent(state, event('rhr-3', 'resting-heart-rate', 'vital', 58, '2026-09-14T00:00:00.000Z')).status, 'duplicate')
+assert.throws(
+  () => ingestLongitudinalEvent(
+    state,
+    event('rhr-3', 'resting-heart-rate', 'vital', 99, '2026-09-14T00:00:00.000Z'),
+  ),
+  /conflicting event id rhr-3/,
+)
 
 const trend = numericMetricTrend(state, 'resting-heart-rate')
 assert.ok(trend)
