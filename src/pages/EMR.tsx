@@ -24,6 +24,7 @@ import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { KunjunganEmr } from '../components/KunjunganEmr'
 import { statusSistemFisik } from '../lib/bodyClinicalFindings'
 import { statusTinjauRekam } from '../lib/statusTandaTangan'
+import { clinicalClaimDisclosure, clinicalClaimLabel, clinicalClaimMaturity } from '../lib/clinicalClaimMaturity'
 import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
 import { labelAsalIsian, labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, StatusSistemFisik, VitalSign } from '../lib/types'
@@ -593,7 +594,7 @@ export function EMR() {
           <div>
             <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
-              By signing, the doctor verifies the entire contents of this medical record.
+              By signing, the doctor attests that they reviewed this medical record. Human review does not by itself establish clinical validation of Panacea's underlying capability.
             </p>
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
@@ -601,11 +602,15 @@ export function EMR() {
             {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>
         </div>
-        {draft.signedAt && (statusTinjauRekam(draft) === 'signed' ? (
-          <p className="mt-2 text-xs text-brand-dark" data-status-tanda-tangan="signed">
-            ✓ Certified by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')}
-          </p>
-        ) : (
+        {draft.signedAt && (statusTinjauRekam(draft) === 'signed' ? (() => {
+          const maturity = clinicalClaimMaturity({ clinicianReviewed: true })
+          return (
+            <div className="mt-2 text-xs text-brand-dark" data-status-tanda-tangan="signed" data-clinical-claim-maturity={maturity}>
+              <p>✓ Server-confirmed signature by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')} · {clinicalClaimLabel(maturity)}</p>
+              <p className="mt-1 text-neutral-500">{clinicalClaimDisclosure(maturity)}</p>
+            </div>
+          )
+        })() : (
           <p className="mt-2 text-xs text-amber-700" data-status-tanda-tangan="pending">
             Signature pending — not yet confirmed by the server, so it does not count as signed.
           </p>
@@ -900,9 +905,14 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">{sheet.mendalam}</p>
       </details>
 
-      <p className="text-[11px] text-neutral-500">
-        Generated {new Date(sheet.generatedAt).toLocaleString('en-US')} · AI-assisted, clinician-verified.
-      </p>
+      {(() => {
+        const maturity = clinicalClaimMaturity()
+        return (
+          <p className="text-[11px] text-neutral-500" data-clinical-claim-maturity={maturity}>
+            Generated {new Date(sheet.generatedAt).toLocaleString('en-US')} · AI-generated draft · {clinicalClaimDisclosure(maturity)}
+          </p>
+        )
+      })()}
     </div>
   )
 }
