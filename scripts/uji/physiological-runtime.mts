@@ -96,6 +96,7 @@ assert.equal(mapped.value, 4)
 assert.equal(mapped.sigma, null)
 assert.equal(mapped.truthClass, 'measured')
 assert.equal(mapped.source.id, 'evt-map')
+assert.equal(mapped.source.subjectId, 'subject-1')
 assert.equal(mapped.source.sourceId, 'device:fixture')
 assert.equal(JSON.stringify(sourceEvent), sourceBefore)
 for (const semanticState of ['simulated','ai-draft','unavailable','derived','rule-output'] as const) {
@@ -109,6 +110,7 @@ const fixture = runPhysiologicalSimulation({ registry:fixtureRegistry, boundaryC
 assert.equal(fixture.stepCounts['synthetic.drive'], 5)
 assert.equal(fixture.stepCounts['synthetic.response'], 3)
 assert.equal(fixture.latest['synthetic.response.value'].truthClass, 'simulated')
+assert.equal(fixture.boundaries['boundary.input'].provenance.sourceSubjectId, 'subject-1')
 assert.ok(Number.isFinite(fixture.latest['synthetic.response.value'].value))
 
 // Registry declaration order must not control same-time dependency execution.
