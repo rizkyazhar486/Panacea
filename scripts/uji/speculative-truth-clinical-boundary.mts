@@ -5,6 +5,8 @@ import {
   createLongitudinalPatientState,
   ingestLongitudinalBatch,
   projectStateToSurface,
+  SEMANTIC_STATES,
+  validateLongitudinalEvent,
   type LongitudinalEvent,
   type SemanticState,
 } from '../../src/lib/panaceaLongitudinalState.ts'
@@ -38,6 +40,21 @@ function event(id: string, semanticState: SemanticState): LongitudinalEvent<numb
 }
 
 const speculativeStates: SemanticState[] = ['ai-draft', 'simulated', 'reference', 'unavailable']
+const futureSpeculativeStates = ['model-estimated', 'counterfactual', 'hypothesis', 'stale', 'unknown', 'unsupported'] as const
+for (const semanticState of futureSpeculativeStates) {
+  assert.ok(
+    (SEMANTIC_STATES as readonly string[]).includes(semanticState),
+    `${semanticState} must be representable as a first-class longitudinal truth class`,
+  )
+  const futureEvent = { ...event(`future-${semanticState}`, 'measured'), semanticState: semanticState as SemanticState }
+  assert.doesNotThrow(() => validateLongitudinalEvent(futureEvent))
+  assert.equal(
+    canEnterClinicalRecord(futureEvent, Date.parse('2026-09-28T02:00:00.000Z')),
+    false,
+    `${semanticState} must remain outside patient clinical truth until deliberate evidence-bearing promotion`,
+  )
+}
+
 const speculative = speculativeStates.map((semanticState) => event(semanticState, semanticState))
 const { semanticState: _missingTruthClass, ...unclassified } = event('unclassified', 'measured')
 
