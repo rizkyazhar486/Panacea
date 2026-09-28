@@ -52,15 +52,15 @@ Use the additional internal heuristic:
 S_{compound}
 =
 S_{vertical}
-	imes
+\times
 D_{personalization}
-	imes
+\times
 D_{temporal}
-	imes
+\times
 D_{causal}
-	imes
+\times
 D_{epistemic}
-	imes
+\times
 D_{feedback}
 ]
 
@@ -78,10 +78,28 @@ Compounding-depth gaps include, where relevant:
 
 Safety, security, privacy, data integrity, clinical-release boundaries and canonical-state consistency remain higher priority than experimental personalization or counterfactual work.
 
+## Future-realizable maturity loop
+
+After hard safety, security, data-integrity and clinical blockers, mature future-facing work follows this sequence:
+
+```text
+IMAGINE FUTURE-REALIZABLE CAPABILITY
+-> FORMALIZE STABLE INTERFACE
+-> PRESERVE TRUTH / CONSENT / AUTHORITY BOUNDARIES
+-> IMPLEMENT DEEPEST JUSTIFIED PRESENT SLICE
+-> VALIDATE / FALSIFY AGAINST REALITY
+-> MEASURE OUTCOME AND REALITY GAP
+-> LET FUTURE MODELS DEEPEN THROUGH THE SAME CONTRACT
+```
+
+A capability may exist as a future architecture target before current models or sensors can realize it, but current production behavior remains bounded by available evidence, validation, observability and authorization. Increased model power never licenses a weaker truth boundary.
+
+Canonical authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
 ## Product value function
 
 [
-V = rac{D 	imes R 	imes I 	imes U 	imes E 	imes L}{C + F + H}
+V = \frac{D \times R \times I \times U \times E \times L}{C + F + H}
 ]
 
 Where:
@@ -114,7 +132,7 @@ Panaceamed should converge around:
 Core loop:
 
 [
-Data ightarrow PatientState ightarrow Intelligence ightarrow Workflow ightarrow Action ightarrow Outcome ightarrow UpdatedPatientState
+Data \rightarrow PatientState \rightarrow Intelligence \rightarrow Workflow \rightarrow Action \rightarrow Outcome \rightarrow UpdatedPatientState
 ]
 
 ## Feature organization
@@ -144,7 +162,7 @@ These are living files. Agents update them when the underlying repository state 
 ## Research-to-implementation gate
 
 [
-Research ightarrow Evidence ightarrow Problem ightarrow User ightarrow UseCase ightarrow SystemFit ightarrow ReuseCheck ightarrow ValidationPlan ightarrow Implementation
+Research \rightarrow Evidence \rightarrow Problem \rightarrow User \rightarrow UseCase \rightarrow SystemFit \rightarrow ReuseCheck \rightarrow ValidationPlan \rightarrow Implementation
 ]
 
 Research does not automatically create a feature.
@@ -240,7 +258,7 @@ Relevant layers should include:
 A version reaching its acceptance criteria is not an endpoint.
 
 [
-AcceptedBaseline ightarrow Monitor ightarrow Research ightarrow Benchmark ightarrow Validate ightarrow Integrate ightarrow Revalidate ightarrow NewBaseline
+AcceptedBaseline \rightarrow Monitor \rightarrow Research \rightarrow Benchmark \rightarrow Validate \rightarrow Integrate \rightarrow Revalidate \rightarrow NewBaseline
 ]
 
 This loop must compound validated capability, not compounding complexity or risk.

@@ -47,6 +47,25 @@ OBSERVE
 
 Horizontal breadth discovers useful territory. Vertical depth converts selected territory into durable capability. Integration makes depth compound.
 
+## Future-realizable Human Reality extension
+
+The canonical Invictus entry point includes the owner-approved **Invictus Human Reality Principle** architecture in [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
+Panaceamed must design for capabilities that may exceed today's models, sensors, interfaces or compute when they are **future-realizable**, materially relevant to human life and expressible through stable contracts:
+
+```text
+IMAGINE BEYOND CURRENT CAPABILITY
+-> FORMALIZE THE FUTURE INTERFACE
+-> PRESERVE REALITY / PATIENT TRUTH BOUNDARIES
+-> IMPLEMENT THE DEEPEST JUSTIFIED SLICE TODAY
+-> MEASURE ERROR AGAINST REALITY
+-> LET FUTURE INTELLIGENCE EXPAND THROUGH STABLE CONTRACTS
+```
+
+The parent abstraction is a permissioned **Human Reality Model** over one governed human, not a third patient-state authority. Canonical Patient State remains measured/recorded truth; model-derived physiology remains separate. Future observations, models, simulations, spatial interfaces and world/environment context must enter through shared state, provenance, consent and validation contracts rather than create parallel humans.
+
+The imagination layer may be expansive. The reality layer is fail-closed: hypotheses, estimates, simulations and counterfactuals never become patient truth by persuasion or visual realism. Increased model capability must increase human understanding and capability while preserving **human agency**; user goals and values remain user-authored.
+
 ## Compounding-depth objective
 
 A useful conceptual objective is:

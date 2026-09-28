@@ -36,6 +36,23 @@ Ambition is unlimited; claims are not. Panacea may attempt problems that humanit
 
 ---
 
+## 1A. Invictus Human Reality Principle — future-realizable imagination with ruthless truth
+
+Panaceamed must deliberately design beyond the limits of current models, sensors, interfaces and compute when a capability is **future-realizable**, materially relevant to human life and compatible with the platform's scientific and ethical boundaries.
+
+```text
+IMAGINE BEYOND CURRENT CAPABILITY
+-> FORMALIZE THE FUTURE INTERFACE
+-> PRESERVE REALITY / PATIENT TRUTH BOUNDARIES
+-> IMPLEMENT THE DEEPEST JUSTIFIED SLICE TODAY
+-> MEASURE ERROR AGAINST REALITY
+-> LET FUTURE INTELLIGENCE EXPAND THROUGH STABLE CONTRACTS
+```
+
+The imagination layer may be expansive. **Patient truth remains constrained by evidence, provenance, authorization, uncertainty and appropriate validation.** Hypotheses, simulations, counterfactuals and model estimates never become observed or clinician-verified truth merely because a stronger model can generate them.
+
+Greater capability must increase human understanding without reducing **human agency**. Goals, values and life priorities remain user-authored. Canonical authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md). Detailed design: [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
 ## 2. The permanent scientific loop
 
 All serious discovery and invention work should follow the durable loop:
