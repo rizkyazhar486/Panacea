@@ -25,10 +25,22 @@ risks:
   - risk_id: risk.clinical_overclaim
     category: clinical_safety
     severity: critical
-    state: open
+    state: mitigated_in_part
     description: Technical output may be mistaken for clinically validated decision support.
-    mitigation: Separate technically_working, clinically_reviewed and clinically_validated states; preserve provenance and human review.
-    evidence: [PANACEA_CONSTITUTION.md, PANACEA_HUMANITY_10_CHARTER.md]
+    mitigation: >-
+      2026-09-28 the AI-EMR claim boundary now separates technically-working, clinician-reviewed and
+      clinically-validated states with a fail-closed evidence contract. Clinician review alone cannot become a
+      clinical-validation claim; clinically-validated requires explicit human review, external validation and linked
+      validation evidence. EMR signatures now describe the actual server-confirmed review event rather than
+      "certification", and AI-generated patient education remains visibly draft-level unless review evidence exists.
+      Remaining work is platform-wide: every healthcare-facing surface and generated clinical artifact must adopt the
+      same maturity contract before this risk can be marked fully mitigated.
+    evidence:
+      - PANACEA_CONSTITUTION.md
+      - PANACEA_HUMANITY_10_CHARTER.md
+      - src/lib/clinicalClaimMaturity.ts
+      - src/pages/EMR.tsx
+      - scripts/uji/clinical-claim-maturity.mts
 
   - risk_id: risk.agent_context_loss
     category: governance
