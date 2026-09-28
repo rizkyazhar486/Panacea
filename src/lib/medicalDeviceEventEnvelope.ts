@@ -1,4 +1,8 @@
 import {
+  evaluatePanacea99,
+  type Panacea99DecisionReceipt,
+} from './panacea99Policy.ts'
+import {
   getMedicalDeviceIntegrationProfile,
   type MedicalDeviceDataShape,
   type MedicalDeviceInteropStandard,
@@ -107,6 +111,7 @@ export interface MedicalDeviceEventValidation {
   accepted: boolean
   disposition: 'accepted' | 'quarantined'
   errors: readonly string[]
+  constitutional: Panacea99DecisionReceipt
 }
 
 const EVENT_SHAPES = new Set<MedicalDeviceEventKind>([
@@ -159,6 +164,71 @@ function validIso(value: unknown): value is string {
   return Number.isFinite(Date.parse(value))
 }
 
+function constitutionalMedicalDeviceReceipt(
+  value: unknown,
+  errors: readonly string[],
+  evaluatedAt: string,
+) {
+  const event = record(value)
+  const source = record(event?.source)
+  const payload = record(event?.payload)
+  const therapyActuationContained = event?.kind !== 'therapy-delivery' || payload?.actuationRequested === false
+  const trustBoundaryExplicit = Boolean(
+    event
+      && nonBlank(event.id)
+      && nonBlank(event.subjectId)
+      && source
+      && nonBlank(source.profileId)
+      && nonBlank(source.deviceId)
+      && nonBlank(source.adapterId)
+      && nonBlank(source.adapterVersion)
+      && nonBlank(source.interface),
+  )
+  const readOnlyBoundary = event?.direction === 'inbound-read-only'
+  const minimumExposure = readOnlyBoundary
+    && !Boolean(payload && Object.prototype.hasOwnProperty.call(payload, 'samples'))
+  const containment = readOnlyBoundary && therapyActuationContained
+  const validationPassed = errors.length === 0
+
+  const evidence = (id: string, sourceName: string) => [{
+    id,
+    kind: 'runtime' as const,
+    source: sourceName,
+    capturedAt: evaluatedAt,
+  }]
+
+  return evaluatePanacea99({
+    actionId: 'medical-device-ingress',
+    evaluatedAt,
+    assessments: [
+      {
+        axiomId: 'A06',
+        applicability: 'applicable',
+        status: trustBoundaryExplicit ? 'pass' : 'fail',
+        evidence: evidence('device-trust-boundary', 'medicalDeviceEventEnvelope:identity-and-source-boundary'),
+      },
+      {
+        axiomId: 'A15',
+        applicability: 'applicable',
+        status: containment ? 'pass' : 'fail',
+        evidence: evidence('device-containment', 'medicalDeviceEventEnvelope:read-only-no-actuation'),
+      },
+      {
+        axiomId: 'A20',
+        applicability: 'applicable',
+        status: minimumExposure ? 'pass' : 'fail',
+        evidence: evidence('device-minimum-exposure', 'medicalDeviceEventEnvelope:bounded-envelope'),
+      },
+      {
+        axiomId: 'A90',
+        applicability: 'applicable',
+        status: validationPassed ? 'pass' : 'fail',
+        evidence: evidence('device-preexecution-validation', 'medicalDeviceEventEnvelope:schema-validation'),
+      },
+    ],
+  })
+}
+
 function declaredShapeForKind(kind: string): readonly MedicalDeviceDataShape[] {
   if (kind === 'image-reference') return ['image', 'volume', 'video']
   if (kind === 'report-reference') return ['report']
@@ -170,11 +240,21 @@ function declaredShapeForKind(kind: string): readonly MedicalDeviceDataShape[] {
  * establish clinical correctness, vendor support, diagnostic validity or
  * fitness for treatment.
  */
-export function validateMedicalDeviceEvent(value: unknown): MedicalDeviceEventValidation {
+export function validateMedicalDeviceEvent(
+  value: unknown,
+  evaluatedAt = new Date().toISOString(),
+): MedicalDeviceEventValidation {
   const errors: string[] = []
   const event = record(value)
   if (!event) {
-    return { accepted: false, disposition: 'quarantined', errors: ['event must be an object'] }
+    errors.push('event must be an object')
+    const constitutional = constitutionalMedicalDeviceReceipt(value, errors, evaluatedAt)
+    return {
+      accepted: false,
+      disposition: 'quarantined',
+      errors,
+      constitutional,
+    }
   }
 
   for (const field of ['id', 'subjectId'] as const) {
@@ -280,10 +360,14 @@ export function validateMedicalDeviceEvent(value: unknown): MedicalDeviceEventVa
     }
   }
 
+  const constitutional = constitutionalMedicalDeviceReceipt(value, errors, evaluatedAt)
+  const accepted = errors.length === 0 && constitutional.executionGate === 1
+
   return {
-    accepted: errors.length === 0,
-    disposition: errors.length === 0 ? 'accepted' : 'quarantined',
+    accepted,
+    disposition: accepted ? 'accepted' : 'quarantined',
     errors,
+    constitutional,
   }
 }
 
