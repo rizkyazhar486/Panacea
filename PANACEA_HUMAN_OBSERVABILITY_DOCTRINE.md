@@ -257,6 +257,27 @@ For high-risk clinical workflows, Panacea should be able to answer:
 
 ---
 
+## 9A. Knowledge boundary and uncertainty anatomy
+
+Human Observability must expose not only what Panacea knows, but the **knowledge boundary** around each state, model and projection. At minimum, important state may be classified as:
+
+```text
+KNOWN
+KNOWN_WITH_UNCERTAINTY
+KNOWABLE_BUT_UNMEASURED
+CURRENTLY_UNIDENTIFIABLE
+SCIENTIFICALLY_UNCERTAIN
+UNSUPPORTED
+```
+
+This classification is epistemic, not cosmetic. A stronger model cannot promote `UNSUPPORTED` or `CURRENTLY_UNIDENTIFIABLE` state into patient truth without new evidence.
+
+Panacea should therefore maintain an **uncertainty anatomy**: a map of where an individual has direct observation, clinically recorded evidence, validated estimates, weak estimates, stale signals, unresolved disagreement, or no supported knowledge. Body Exposure and other projections should make important uncertainty visible rather than completing missing regions with visual confidence.
+
+When uncertainty matters, the system may identify which additional observation could reduce decision-relevant uncertainty, but it must also be able to conclude that no additional measurement is justified.
+
+Canonical authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
 ## 10. Existing runtime foundation
 
 Do not rebuild the observability substrate from scratch. The current repository already contains key primitives that should converge under this doctrine:
