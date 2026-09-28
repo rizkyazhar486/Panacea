@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import {
+  buildContextPacket,
   canEnterClinicalRecord,
   createLongitudinalPatientState,
   ingestLongitudinalBatch,
@@ -79,6 +80,33 @@ assert.equal(
 const emr = projectStateToSurface(state, 'ai-emr', '2026-09-28T02:00:00.000Z')
 assert.deepEqual(emr.metrics.map((snapshot) => snapshot.latest.semanticState), ['measured'])
 assert.equal(emr.blockedByTruthClass, speculativeStates.length + 1)
+
+
+const simulatedHistory = {
+  ...event('simulated-history', 'simulated'),
+  metric: 'shared-clinical-metric',
+  value: 100,
+  recordedAt: '2026-09-28T00:30:00.000Z',
+  provenance: {
+    ...event('simulated-history', 'simulated').provenance,
+    capturedAt: '2026-09-28T00:30:00.000Z',
+    receivedAt: '2026-09-28T00:30:01.000Z',
+  },
+}
+const measuredLatest = {
+  ...event('measured-latest', 'measured'),
+  metric: 'shared-clinical-metric',
+  value: 1,
+}
+let trendState = createLongitudinalPatientState('subject-truth-boundary', '2026-09-28T00:00:00.000Z')
+trendState = ingestLongitudinalBatch(trendState, [simulatedHistory, measuredLatest])
+const clinicalPacket = buildContextPacket(trendState, 'clinical', '2026-09-28T02:00:00.000Z')
+assert.equal(clinicalPacket.signals.length, 1)
+assert.equal(
+  clinicalPacket.signals[0]?.trend,
+  null,
+  'clinical trend derivation must not mix speculative historical values into an admitted measured signal',
+)
 
 const body = projectStateToSurface(state, 'body-exposure', '2026-09-28T02:00:00.000Z')
 assert.equal(
