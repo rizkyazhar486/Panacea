@@ -199,6 +199,47 @@ Because `npm run uji` executes every `.mts` file in `scripts/uji`, the contract 
 | A98 | Ar-Rashid | sound-direction | Choose actions by evidence, causal reasoning, risk, uncertainty, constraints, and human goals; avoid optimizing for status, novelty, or model preference. | scientific |
 | A99 | As-Sabur | patience | Do not rush uncertain clinical/scientific claims, migrations, or autonomous actions; accumulate evidence and validate before irreversible escalation. | safety |
 
+
+## Runtime constitutional policy kernel
+
+The constitutional layer is executable through `src/lib/panacea99Policy.ts`.
+
+The runtime decision space is deliberately small:
+
+[
+D(a) in {ALLOW, DEFER, ESCALATE, BLOCK}
+]
+
+with precedence:
+
+[
+BLOCK > ESCALATE > DEFER > ALLOW
+]
+
+The registry defines these enforcement surfaces as **hard by default when applicable**:
+
+`security, safety, privacy, clinical, data, governance`.
+
+Other surfaces remain advisory by default, but callers may upgrade them to hard for a specific action. A caller cannot downgrade a registry hard default.
+
+A hard-gate `PASS` without an evidence reference is not accepted as proof. It becomes unresolved and therefore:
+
+[
+	ext{hard PASS without evidence} Rightarrow DEFER
+]
+
+Required human review behaves as:
+
+- pending / absent review -> `ESCALATE`;
+- explicit rejection -> `BLOCK`;
+- approval requires reviewer identity and review timestamp.
+
+The kernel emits a privacy-minimal decision receipt containing axiom IDs, enforcement class, evidence-reference counts, dispositions and the final execution gate. It does not require raw patient payloads to be copied into the governance receipt.
+
+`panacea99AxiomIdsForSurfaces(...)` allows action profiles to select relevant constraints systematically, while `panacea99GeometricMaturity(...)` implements the non-clinical geometric maturity heuristic.
+
+The policy kernel does **not** itself diagnose, prescribe, authorize access, determine consent, or replace qualified human review. It consumes the evidence and authorization facts supplied by the responsible subsystem and fails closed when applicable hard-gate evidence is unresolved.
+
 ## Operational rule for future agents
 
 For every material capability, ask:

@@ -22,7 +22,7 @@ const registry = JSON.parse(read(registryPath)) as {
   }>
 }
 
-assert.equal(registry.schemaVersion, 1)
+assert.equal(registry.schemaVersion, 2)\nassert.deepEqual(registry.enforcementPolicy.hardByDefaultSurfaces, ['security', 'safety', 'privacy', 'clinical', 'data', 'governance'])\nassert.equal(registry.enforcementPolicy.hardPassRequiresEvidence, true)\nassert.equal(registry.enforcementPolicy.hardCriticalityMayBeDowngraded, false)
 assert.equal(registry.axioms.length, 99, '99-Axiom registry must contain exactly 99 entries')
 
 const ids = new Set(registry.axioms.map((a) => a.id))
