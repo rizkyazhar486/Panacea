@@ -121,19 +121,24 @@ risks:
   - risk_id: risk.speculative_truth_leakage
     category: scientific_integrity
     severity: critical
-    state: open
+    state: mitigated_in_part
     description: >-
       Future-facing hypothesis, model-estimated, simulated or counterfactual output could be rendered,
       persisted or promoted as observed/clinical truth, especially as model capability and visual realism improve.
     mitigation: >-
-      Enforce explicit epistemic classes across state, persistence and projection boundaries; preserve provenance,
-      uncertainty and source identity; require deliberate promotion/review gates before clinical-record use;
-      fail closed when truth class is missing or incompatible; and test that speculative branches cannot write
-      into Canonical Patient State.
+      2026-09-28 longitudinal clinical/AI-EMR admission now fails closed when semantic truth class is missing
+      or speculative, and the same consent/truth/review predicate governs visible snapshot history and derived
+      trends. Visit OS clinician promotion explicitly preserves a measured device-origin truth class alongside
+      accepted human review and provenance. Remaining work is platform-wide: every other persistence/projection
+      boundary and all counterfactual writeback paths must independently prove the same invariant before this risk
+      can be marked fully mitigated.
     evidence:
       - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
       - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
       - PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md
+      - src/lib/panaceaLongitudinalState.ts
+      - src/lib/visitOperatingSystem.ts
+      - scripts/uji/speculative-truth-clinical-boundary.mts
 
   - risk_id: risk.future_model_lock_in
     category: product_architecture

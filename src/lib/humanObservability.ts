@@ -91,11 +91,17 @@ function truthClassForEvent(event: LongitudinalEvent): HumanObservabilityTruthCl
     case 'rule-output':
       return 'derived'
     case 'ai-draft':
+    case 'model-estimated':
+    case 'hypothesis':
       return 'model-estimate'
     case 'simulated':
+    case 'counterfactual':
       return 'simulated'
     case 'reference':
       return 'reference'
+    case 'stale':
+    case 'unknown':
+    case 'unsupported':
     case 'unavailable':
       return 'unknown'
     case 'measured':
