@@ -7,6 +7,7 @@ import {
   type RealityPredictionRecord,
 } from '../../src/lib/physiology/realityErrorLedger.ts'
 import {
+  analyzeResidualIntelligence,
   buildResidualSeries,
   type ResidualIntelligenceOptions,
 } from '../../src/lib/humanLaw/residualIntelligence.ts'
@@ -269,3 +270,111 @@ assert.throws(
 )
 
 console.log('human-law residual intelligence task1: exact-identity residual series and sample classification')
+
+
+function addAnalysisSeries(
+  input: RealityErrorLedger,
+  label: string,
+  residuals: readonly (number | null)[],
+  startMinute: number,
+): RealityErrorLedger {
+  let next = input
+  for (let index = 0; index < residuals.length; index += 1) {
+    const residual = residuals[index]
+    const minute = startMinute + index
+    const targetAt = `2026-09-28T03:${String(minute).padStart(2, '0')}:00.000Z`
+    const id = `${label}-${index}`
+    const base = prediction(id, targetAt)
+    const record: RealityPredictionRecord = {
+      ...base,
+      provenance: {
+        ...base.provenance,
+        provenanceId: `prov:${id}`,
+        modelId: `model-${label}`,
+      },
+    }
+    next = addMatched(
+      next,
+      record,
+      100 + (residual ?? 3),
+      `obs-${id}`,
+      residual === null ? null : 0,
+    )
+  }
+  return next
+}
+
+let analysisLedger = createRealityErrorLedger('subject-1')
+analysisLedger = addAnalysisSeries(analysisLedger, 'insufficient', [2.5, 2.6], 0)
+analysisLedger = addAnalysisSeries(analysisLedger, 'positive', [0.1, 2.5, 2.6, 2.7], 5)
+analysisLedger = addAnalysisSeries(analysisLedger, 'negative', [-2.5, -2.6, -2.7], 10)
+analysisLedger = addAnalysisSeries(analysisLedger, 'repeated', [2.5, -2.5, 2.6, -2.6], 15)
+analysisLedger = addAnalysisSeries(analysisLedger, 'noise', [0.1, 0.2, -0.1], 20)
+analysisLedger = addAnalysisSeries(analysisLedger, 'mixed', [2.5, 0.2, 0.1], 25)
+analysisLedger = addAnalysisSeries(analysisLedger, 'unquantified-tail', [null, 2.5, 2.6, 2.7], 30)
+
+const report = analyzeResidualIntelligence(
+  analysisLedger,
+  '2026-09-28T04:00:00.000Z',
+  options,
+)
+assert.equal(report.subjectId, 'subject-1')
+assert.equal(report.ledgerRevision, analysisLedger.revision)
+assert.equal(report.semantics, 'candidate-residual-structure-not-biological-discovery')
+assert.deepEqual(report.options, options)
+assert.deepEqual(report.boundary, {
+  diagnosisInferenceAllowed: false,
+  causalAttributionAllowed: false,
+  automaticRecalibrationAllowed: false,
+  automaticConceptGenerationAllowed: false,
+  automaticLawPromotionAllowed: false,
+})
+
+const byModel = Object.fromEntries(
+  report.series.map((item) => [item.identity.modelId, item]),
+)
+assert.equal(byModel['model-insufficient'].classification, 'insufficient-evidence')
+assert.equal(byModel['model-insufficient'].candidateStructure, false)
+assert.equal(byModel['model-positive'].classification, 'persistent-positive-bias-candidate')
+assert.equal(byModel['model-positive'].candidateStructure, true)
+assert.equal(byModel['model-negative'].classification, 'persistent-negative-bias-candidate')
+assert.equal(byModel['model-negative'].candidateStructure, true)
+assert.equal(byModel['model-repeated'].classification, 'repeated-extreme-residuals')
+assert.equal(byModel['model-repeated'].candidateStructure, true)
+assert.equal(byModel['model-noise'].classification, 'noise-compatible')
+assert.equal(byModel['model-noise'].candidateStructure, false)
+assert.equal(byModel['model-mixed'].classification, 'mixed-residuals')
+assert.equal(byModel['model-mixed'].candidateStructure, false)
+assert.equal(byModel['model-unquantified-tail'].classification, 'persistent-positive-bias-candidate')
+assert.equal(byModel['model-unquantified-tail'].sampleCount, 4)
+assert.equal(byModel['model-unquantified-tail'].quantifiedSampleCount, 3)
+assert.equal(byModel['model-unquantified-tail'].unquantifiedSampleCount, 1)
+assert.equal(byModel['model-unquantified-tail'].extremeSampleCount, 3)
+assert.equal(byModel['model-unquantified-tail'].meanStandardizedResidual, 2.6)
+assert.ok(byModel['model-unquantified-tail'].latestObservedAt.endsWith('03:33:00.000Z'))
+assert.deepEqual(
+  report.series.map((item) => item.seriesId),
+  [...report.series.map((item) => item.seriesId)].sort(),
+)
+
+const reportReplay = analyzeResidualIntelligence(
+  analysisLedger,
+  '2026-09-28T04:00:00.000Z',
+  options,
+)
+assert.deepEqual(reportReplay, report)
+
+assert.throws(
+  () => analyzeResidualIntelligence(analysisLedger, 'bad-date', options),
+  /evaluatedAt/,
+)
+assert.throws(
+  () => analyzeResidualIntelligence(
+    analysisLedger,
+    '2026-09-28T03:32:00.000Z',
+    options,
+  ),
+  /evaluatedAt.*comparison/,
+)
+
+console.log('human-law residual intelligence task2: bounded structured-residual detection')
