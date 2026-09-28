@@ -38,6 +38,7 @@ function event(id: string, semanticState: SemanticState): LongitudinalEvent<numb
 
 const speculativeStates: SemanticState[] = ['ai-draft', 'simulated', 'reference', 'unavailable']
 const speculative = speculativeStates.map((semanticState) => event(semanticState, semanticState))
+const { semanticState: _missingTruthClass, ...unclassified } = event('unclassified', 'measured')
 
 for (const item of speculative) {
   assert.equal(
@@ -47,6 +48,12 @@ for (const item of speculative) {
   )
 }
 
+assert.equal(
+  canEnterClinicalRecord(unclassified, Date.parse('2026-09-28T02:00:00.000Z')),
+  false,
+  'missing semanticState must fail closed at the clinical-record boundary',
+)
+
 const observed = event('measured', 'measured')
 assert.equal(
   canEnterClinicalRecord(observed, Date.parse('2026-09-28T02:00:00.000Z')),
@@ -55,7 +62,7 @@ assert.equal(
 )
 
 let state = createLongitudinalPatientState('subject-truth-boundary', '2026-09-28T00:00:00.000Z')
-state = ingestLongitudinalBatch(state, [...speculative, observed])
+state = ingestLongitudinalBatch(state, [...speculative, unclassified, observed])
 
 const clinical = projectStateToSurface(state, 'clinical', '2026-09-28T02:00:00.000Z')
 assert.deepEqual(
@@ -65,13 +72,13 @@ assert.deepEqual(
 )
 assert.equal(
   clinical.blockedByTruthClass,
-  speculativeStates.length,
-  'clinical projection must expose how many latest metrics were withheld by the truth-class boundary',
+  speculativeStates.length + 1,
+  'clinical projection must expose explicit speculative and missing truth classes withheld by the boundary',
 )
 
 const emr = projectStateToSurface(state, 'ai-emr', '2026-09-28T02:00:00.000Z')
 assert.deepEqual(emr.metrics.map((snapshot) => snapshot.latest.semanticState), ['measured'])
-assert.equal(emr.blockedByTruthClass, speculativeStates.length)
+assert.equal(emr.blockedByTruthClass, speculativeStates.length + 1)
 
 const body = projectStateToSurface(state, 'body-exposure', '2026-09-28T02:00:00.000Z')
 assert.equal(
