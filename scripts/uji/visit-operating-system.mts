@@ -170,6 +170,7 @@ const reviewed = promoteObservationToClinicalRecord(
   '2026-09-18T10:06:00.000Z',
 )
 assert.equal(reviewed.review.state, 'accepted')
+assert.equal(reviewed.semanticState, 'measured')
 assert.equal(reviewed.value, 76)
 assert.equal(reviewed.metric, 'heart-rate')
 assert.equal(reviewed.provenance.sourceKind, 'device')

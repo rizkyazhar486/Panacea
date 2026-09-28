@@ -23,6 +23,7 @@ function event(id: string, domain: LongitudinalEvent['domain'], metric: string, 
     value,
     recordedAt,
     confidence: 0.95,
+    semanticState: domain === 'lab' ? 'imported' : 'measured',
     provenance: {
       sourceKind: domain === 'lab' ? 'clinical-system' : 'wearable',
       sourceId: domain === 'lab' ? 'lab' : 'wearable',

@@ -34,6 +34,7 @@ function event(
     unit: metric === 'resting-heart-rate' ? 'bpm' : undefined,
     recordedAt,
     confidence: 0.92,
+    semanticState: 'measured',
     provenance: {
       sourceKind: 'wearable',
       sourceId: 'demo-device',

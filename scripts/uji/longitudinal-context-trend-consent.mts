@@ -7,6 +7,7 @@ function event(id: string, day: number, value: number): LongitudinalEvent<number
   return {
     id, subjectId: 'patient', domain: 'lab', metric: 'test-measurement', value, unit: 'unit',
     recordedAt: time, confidence: 1,
+    semanticState: 'imported',
     provenance: { sourceKind: 'clinical-system', sourceId: 'test', capturedAt: time, receivedAt: time },
     consent: { granted: true, purposes: ['ai-context', 'clinical-support'], grantedAt: '2026-09-01T00:00:00.000Z' },
     review: { state: 'accepted', reviewerId: 'reviewer', reviewedAt: time },
