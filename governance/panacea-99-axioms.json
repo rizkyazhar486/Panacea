@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "panacea-99-axiom-constitution",
   "status": "normative-engineering-annex",
   "theologicalBoundary": "The Divine Names belong to Allah. Panacea does not possess, instantiate, emulate, or claim divine attributes, omniscience, infallibility, sovereignty, or metaphysical authority. This registry is a human-authored engineering mnemonic inspired by reflection on the Divine Names; it is not aqidah, tafsir, a theological enumeration authority, or a clinical scoring system.",
@@ -917,5 +917,22 @@
       "enforcement": "safety",
       "claimBoundary": "inspiration-only"
     }
-  ]
+  ],
+  "enforcementPolicy": {
+    "hardByDefaultSurfaces": [
+      "security",
+      "safety",
+      "privacy",
+      "clinical",
+      "data",
+      "governance"
+    ],
+    "explicitHardFailureDecision": "BLOCK",
+    "unresolvedHardGateDecision": "DEFER",
+    "pendingHumanReviewDecision": "ESCALATE",
+    "rejectedHumanReviewDecision": "BLOCK",
+    "hardPassRequiresEvidence": true,
+    "hardCriticalityMayBeDowngraded": false,
+    "note": "Hard-by-default surfaces are conjunctive only when an axiom is applicable to the action. Callers may upgrade additional axioms to hard, but may not downgrade registry hard defaults."
+  }
 }
