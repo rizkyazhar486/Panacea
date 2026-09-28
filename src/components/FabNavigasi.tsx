@@ -69,10 +69,11 @@ function reducedMotion() {
  * long-press, swipe, double tap, atau single tap. Ambang gesture berasal dari
  * kernel murni di `lib/interaction/gesture`, bukan angka lokal yang berbeda.
  */
-export function FabNavigasi({ onCari, tersembunyi = false }: {
+export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
   tujuan: TujuanFab[]
   onTambah?: () => void
   onCari?: () => void
+  onKembali?: () => void
   /**
    * Ikut menyingkir bersama bilah perintah.
    *
@@ -129,14 +130,17 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
     setBuka(false)
     vibrate()
     if (action.jenis === 'rute' && action.ke) navigasi(action.ke)
-    else if (action.jenis === 'kembali') navigasi(-1)
+    else if (action.jenis === 'kembali') {
+      if (onKembali) onKembali()
+      else navigasi(-1)
+    }
     else if (action.jenis === 'atas') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
     else if (action.jenis === 'tema') toggleTheme()
     else if (action.jenis === 'cari') {
       if (onCari) onCari()
       else window.dispatchEvent(new Event('panacea:cari'))
     }
-  }, [navigasi, onCari, vibrate])
+  }, [navigasi, onCari, onKembali, vibrate])
 
   const jalankanPemetaan = useCallback((id: string) => {
     if (id === 'menu') {

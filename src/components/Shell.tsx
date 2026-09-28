@@ -3,7 +3,7 @@ import { MenuPeran } from './MenuPeran'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
 import { pasangKilau } from '../lib/kilau'
-import { indukRute } from '../lib/alurHalaman'
+import { buatAlurKembali } from '../lib/alurHalaman'
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import { FabNavigasi } from './FabNavigasi'
@@ -318,22 +318,20 @@ export function Shell({ children }: { children: ReactNode }) {
   // sehingga history.back() melempar pengguna keluar dari aplikasi.
   const bisaKembali = loc.pathname !== '/'
 
-  // Halaman sebelumnya diingat karena menentukan CARA kembali, bukan tujuannya.
-  // Bila induk kebetulan sama dengan halaman sebelumnya, mundur di riwayat
-  // lebih baik daripada mendorong entri baru — mendorong entri membuat "lanjut"
-  // tidak pernah punya tujuan, karena riwayat ke depan selalu kosong.
-  const sebelumnya = useRef<string | null>(null)
+  const alurKembali = useRef<ReturnType<typeof buatAlurKembali> | null>(null)
+  if (!alurKembali.current) alurKembali.current = buatAlurKembali()
   useEffect(() => {
-    return () => { sebelumnya.current = loc.pathname }
-  }, [loc.pathname])
+    const index = window.history.state?.idx
+    alurKembali.current!.catat({ ...loc, index: Number.isInteger(index) ? index : undefined })
+  }, [loc.pathname, loc.search, loc.hash, loc.key])
 
   const kembali = useCallback(() => {
     if (loc.pathname === '/') return
-    const induk = indukRute(loc.pathname)
-    if (induk && induk === sebelumnya.current) navigate(-1)
-    else if (induk) navigate(induk)
-    else if (window.history.length > 1) navigate(-1)
-    else navigate('/')
+    // idx milik React Router, bukan history.length yang mencakup situs luar.
+    const idx = window.history.state?.idx
+    const target = alurKembali.current!.tujuan(Number.isInteger(idx) && idx > 0)
+    if (typeof target === 'number') navigate(target)
+    else navigate(target)
   }, [loc.pathname, navigate])
 
   // Maju: hanya berarti bila ada yang bisa dimajui. Tidak ada cara membaca
@@ -696,6 +694,7 @@ export function Shell({ children }: { children: ReactNode }) {
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
         <FabNavigasi
           tersembunyi={keadaanBilah === 'hidden'}
+          onKembali={kembali}
           tujuan={[
             { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
             { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
