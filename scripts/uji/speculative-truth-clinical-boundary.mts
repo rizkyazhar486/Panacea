@@ -100,6 +100,19 @@ const measuredLatest = {
 }
 let trendState = createLongitudinalPatientState('subject-truth-boundary', '2026-09-28T00:00:00.000Z')
 trendState = ingestLongitudinalBatch(trendState, [simulatedHistory, measuredLatest])
+const clinicalHistory = projectStateToSurface(trendState, 'clinical', '2026-09-28T02:00:00.000Z')
+assert.equal(clinicalHistory.metrics.length, 1)
+assert.equal(
+  clinicalHistory.metrics[0]?.previous,
+  undefined,
+  'clinical snapshot history must not expose a speculative previous event behind an admitted measured latest value',
+)
+assert.equal(
+  clinicalHistory.metrics[0]?.eventCount,
+  1,
+  'clinical snapshot eventCount must count only events visible through the same truth/consent/review boundary',
+)
+
 const clinicalPacket = buildContextPacket(trendState, 'clinical', '2026-09-28T02:00:00.000Z')
 assert.equal(clinicalPacket.signals.length, 1)
 assert.equal(
