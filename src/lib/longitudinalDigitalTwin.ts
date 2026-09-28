@@ -14,6 +14,7 @@ import type {
   LongitudinalPatientState,
   PanaceaSurface,
   ReviewState,
+  SemanticState,
 } from './panaceaLongitudinalState'
 
 export type TwinEvidenceClass =
@@ -22,6 +23,10 @@ export type TwinEvidenceClass =
   | 'clinical-record'
   | 'derived'
   | 'imported'
+  | 'model-estimate'
+  | 'simulated'
+  | 'reference'
+  | 'unknown'
 
 export type TwinDisplayState =
   | 'recorded'
@@ -40,6 +45,7 @@ export interface LongitudinalTwinSignal {
   evidenceClass: TwinEvidenceClass
   displayState: TwinDisplayState
   reviewState: ReviewState
+  semanticState?: SemanticState
   provenance: LongitudinalEvent['provenance']
 }
 
@@ -63,11 +69,36 @@ export interface LongitudinalTwinSnapshot {
     diagnosticInferenceGenerated: false
     autonomousClinicalActionAllowed: false
     simulatedState: false
+    speculativeSignalsSeparated: true
+    simulatedInputSignalsPresent: boolean
     purposeConsentLedgerApplied: true
   }
 }
 
 function evidenceClass(event: LongitudinalEvent): TwinEvidenceClass {
+  // Semantic truth state outranks transport/source channel. A simulated or
+  // model-estimated event must never become a "clinical record" merely because
+  // its provenance sourceKind is clinical-system.
+  switch (event.semanticState) {
+    case 'derived':
+    case 'rule-output':
+      return 'derived'
+    case 'ai-draft':
+    case 'model-estimated':
+    case 'hypothesis':
+      return 'model-estimate'
+    case 'simulated':
+    case 'counterfactual':
+      return 'simulated'
+    case 'reference':
+      return 'reference'
+    case 'stale':
+    case 'unknown':
+    case 'unsupported':
+    case 'unavailable':
+      return 'unknown'
+  }
+
   switch (event.provenance.sourceKind) {
     case 'manual':
       return 'self-reported'
@@ -153,6 +184,7 @@ export function buildLongitudinalTwinSnapshot(input: {
       evidenceClass: evidenceClass(event),
       displayState: displayState(event.review),
       reviewState: event.review.state,
+      semanticState: event.semanticState,
       provenance: { ...event.provenance },
     } satisfies LongitudinalTwinSignal
   })
@@ -176,7 +208,11 @@ export function buildLongitudinalTwinSnapshot(input: {
       referenceAtlasGeometryMayBeUsedForOrientationOnly: true,
       diagnosticInferenceGenerated: false,
       autonomousClinicalActionAllowed: false,
+      // This adapter generates no simulation. It may pass through explicitly
+      // labeled simulated/counterfactual inputs on non-clinical surfaces.
       simulatedState: false,
+      speculativeSignalsSeparated: true,
+      simulatedInputSignalsPresent: signals.some((signal) => signal.evidenceClass === 'simulated'),
       purposeConsentLedgerApplied: true,
     },
   }
