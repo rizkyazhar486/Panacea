@@ -7,6 +7,14 @@ Every current and future agent must also read and apply [`PANACEA_INVICTUS_PRINC
 
 The Invictus objective is not feature maximalism and not a claim that Panaceamed is literally unbeatable. It is a compounding-depth law: meaningful new work should strengthen the governed longitudinal human model, specialized mechanistic engines, cross-system/cross-scale coupling, reality validation, reusable infrastructure, and safe projections. Imagination is encouraged for hypothesis generation; measured patient truth, clinical claims and release decisions remain evidence-, provenance-, consent- and validation-bound.
 
+## Invictus Human Reality Principle — future-realizable execution
+
+Every current and future agent must also apply the detailed [`Invictus Human Reality Principle`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) through the canonical [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+For future-facing work, **imagine beyond present capability** but formalize stable interfaces before pretending the capability exists. Preserve Canonical Patient State as measured/recorded truth; model estimates, simulations, counterfactuals, hypotheses, references and unknowns remain separate truth classes. Stronger models may deepen Panacea through those contracts, but may not own patient truth, infer user values as authority, bypass consent, or weaken evidence and validation.
+
+Prefer future-realizable architecture when it increases absorbability of better models, sensors, simulators and interfaces without fragmenting identity or state. Implement the deepest justified present slice, measure reality gap, and leave unsupported depth explicitly unknown.
+
 ## 99-Axiom Constitutional Annex — executable ethical/governance constraints
 
 Every current and future agent must also read and apply [`PANACEA_99_AXIOM_CONSTITUTION.md`](PANACEA_99_AXIOM_CONSTITUTION.md) and its machine-readable registry [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
