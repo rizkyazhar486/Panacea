@@ -171,3 +171,185 @@ export function buildResidualSeries(
       }),
     }))
 }
+
+
+export type ResidualStructureClass =
+  | 'insufficient-evidence'
+  | 'noise-compatible'
+  | 'persistent-positive-bias-candidate'
+  | 'persistent-negative-bias-candidate'
+  | 'repeated-extreme-residuals'
+  | 'mixed-residuals'
+
+export interface ResidualSeriesAnalysis {
+  seriesId: string
+  identity: ResidualSeriesIdentity
+  sampleCount: number
+  quantifiedSampleCount: number
+  unquantifiedSampleCount: number
+  extremeSampleCount: number
+  meanSignedError: number
+  meanStandardizedResidual: number | null
+  classification: ResidualStructureClass
+  candidateStructure: boolean
+  comparisonIds: readonly string[]
+  predictionIds: readonly string[]
+  latestObservedAt: string
+  explanation: string
+}
+
+export interface ResidualIntelligenceReport {
+  subjectId: string
+  ledgerRevision: number
+  evaluatedAt: string
+  semantics: 'candidate-residual-structure-not-biological-discovery'
+  options: ResidualIntelligenceOptions
+  series: readonly ResidualSeriesAnalysis[]
+  boundary: {
+    diagnosisInferenceAllowed: false
+    causalAttributionAllowed: false
+    automaticRecalibrationAllowed: false
+    automaticConceptGenerationAllowed: false
+    automaticLawPromotionAllowed: false
+  }
+}
+
+function mean(values: readonly number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+function structureForSeries(
+  series: ResidualSeries,
+  options: ResidualIntelligenceOptions,
+): Pick<ResidualSeriesAnalysis, 'classification' | 'candidateStructure' | 'explanation'> {
+  const quantified = series.samples.filter(
+    (sample): sample is ResidualSample & { standardizedResidual: number } =>
+      sample.standardizedResidual !== null,
+  )
+
+  if (quantified.length < options.minQuantifiedSamples) {
+    return {
+      classification: 'insufficient-evidence',
+      candidateStructure: false,
+      explanation: 'Too few quantified residuals exist to evaluate repeated structure.',
+    }
+  }
+
+  const tail = quantified.slice(-options.minQuantifiedSamples)
+  if (tail.every((sample) => sample.classification === 'extreme-positive')) {
+    return {
+      classification: 'persistent-positive-bias-candidate',
+      candidateStructure: true,
+      explanation: 'The latest quantified residual window is persistently above the configured extreme threshold.',
+    }
+  }
+  if (tail.every((sample) => sample.classification === 'extreme-negative')) {
+    return {
+      classification: 'persistent-negative-bias-candidate',
+      candidateStructure: true,
+      explanation: 'The latest quantified residual window is persistently below the configured extreme threshold.',
+    }
+  }
+
+  if (quantified.every((sample) => sample.classification === 'within-expected-noise')) {
+    return {
+      classification: 'noise-compatible',
+      candidateStructure: false,
+      explanation: 'All quantified residuals remain within the configured standardized-residual threshold.',
+    }
+  }
+
+  const extremeCount = quantified.filter(
+    (sample) =>
+      sample.classification === 'extreme-positive'
+      || sample.classification === 'extreme-negative',
+  ).length
+  if (extremeCount >= options.minQuantifiedSamples) {
+    return {
+      classification: 'repeated-extreme-residuals',
+      candidateStructure: true,
+      explanation: 'Repeated extreme residuals exist without a persistent single-direction tail.',
+    }
+  }
+
+  return {
+    classification: 'mixed-residuals',
+    candidateStructure: false,
+    explanation: 'The residual series is mixed and does not meet the configured repeated-structure criteria.',
+  }
+}
+
+function analyzeSeries(
+  series: ResidualSeries,
+  options: ResidualIntelligenceOptions,
+): ResidualSeriesAnalysis {
+  const quantified = series.samples.filter(
+    (sample): sample is ResidualSample & { standardizedResidual: number } =>
+      sample.standardizedResidual !== null,
+  )
+  const extremeSampleCount = quantified.filter(
+    (sample) =>
+      sample.classification === 'extreme-positive'
+      || sample.classification === 'extreme-negative',
+  ).length
+  const structure = structureForSeries(series, options)
+  const latest = series.samples[series.samples.length - 1]
+  if (!latest) throw new Error(`residual series ${series.id} has no samples`)
+
+  return {
+    seriesId: series.id,
+    identity: series.identity,
+    sampleCount: series.samples.length,
+    quantifiedSampleCount: quantified.length,
+    unquantifiedSampleCount: series.samples.length - quantified.length,
+    extremeSampleCount,
+    meanSignedError: mean(series.samples.map((sample) => sample.signedError)),
+    meanStandardizedResidual: quantified.length
+      ? mean(quantified.map((sample) => sample.standardizedResidual))
+      : null,
+    classification: structure.classification,
+    candidateStructure: structure.candidateStructure,
+    comparisonIds: series.samples.map((sample) => sample.comparisonId),
+    predictionIds: series.samples.map((sample) => sample.predictionId),
+    latestObservedAt: latest.observedAt,
+    explanation: structure.explanation,
+  }
+}
+
+export function analyzeResidualIntelligence(
+  ledger: RealityErrorLedger,
+  evaluatedAt: string,
+  options: ResidualIntelligenceOptions,
+): ResidualIntelligenceReport {
+  const evaluatedAtMs = parseIso(evaluatedAt, 'evaluatedAt')
+  validateOptions(options)
+  for (const comparison of Object.values(ledger.comparisonsById)) {
+    const comparisonCreatedAtMs = parseIso(
+      comparison.createdAt,
+      `comparison ${comparison.id} createdAt`,
+    )
+    if (evaluatedAtMs < comparisonCreatedAtMs) {
+      throw new Error('evaluatedAt must not be before a comparison creation time')
+    }
+  }
+
+  const series = buildResidualSeries(ledger, options)
+    .map((item) => analyzeSeries(item, options))
+    .sort((left, right) => left.seriesId.localeCompare(right.seriesId))
+
+  return {
+    subjectId: ledger.subjectId,
+    ledgerRevision: ledger.revision,
+    evaluatedAt,
+    semantics: 'candidate-residual-structure-not-biological-discovery',
+    options: { ...options },
+    series,
+    boundary: {
+      diagnosisInferenceAllowed: false,
+      causalAttributionAllowed: false,
+      automaticRecalibrationAllowed: false,
+      automaticConceptGenerationAllowed: false,
+      automaticLawPromotionAllowed: false,
+    },
+  }
+}
