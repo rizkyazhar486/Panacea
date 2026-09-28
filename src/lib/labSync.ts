@@ -4,10 +4,11 @@
 import { api, backendEnabled } from './api'
 import { ambilLab, gantiDariServer, labDiperbaruiPada } from './lab'
 import { arahSinkron } from './labSyncArah'
+import { createLabSyncRunner, labSessionScope, type LabSyncLog, type LabSyncStatus } from './labSyncRunner'
 export { arahSinkron }
 
-export type StatusSinkronLab = 'lokal' | 'menyinkron' | 'tersinkron' | 'gagal'
-type Log = Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>
+export type StatusSinkronLab = LabSyncStatus
+type Log = LabSyncLog
 
 let status: StatusSinkronLab = backendEnabled ? 'menyinkron' : 'lokal'
 const pendengar = new Set<(s: StatusSinkronLab) => void>()
@@ -25,30 +26,18 @@ export function logUntukServer(): Log {
   return keluar
 }
 
-export async function sinkronLab(): Promise<StatusSinkronLab> {
-  if (!backendEnabled) { setStatus('lokal'); return status }
-  setStatus('menyinkron')
-  try {
-    const server = await api.getLabLog()
-    const lokal = logUntukServer()
-    const arah = arahSinkron(labDiperbaruiPada(), server.diperbaruiPada, Object.keys(lokal).length > 0)
-    if (arah === 'tarik' && server.diperbaruiPada) gantiDariServer(server.log, server.diperbaruiPada)
-    if (arah === 'dorong') {
-      const cap = labDiperbaruiPada() ?? new Date().toISOString()
-      try { await api.putLabLog(lokal, cap) } catch (e) {
-        // 409: server punya salinan lebih baru dari perangkat lain — ambil itu.
-        if (!/409/.test(String((e as Error).message))) throw e
-        const s2 = await api.getLabLog()
-        if (s2.diperbaruiPada) gantiDariServer(s2.log, s2.diperbaruiPada)
-      }
-    }
-    setStatus('tersinkron')
-  } catch (e) {
-    // Sesi tidak ada/kedaluwarsa: tetap lokal, jangan klaim tersinkron.
-    setStatus(/unauthorized|401/i.test(String((e as Error).message)) ? 'lokal' : 'gagal')
-  }
-  return status
-}
+export const sinkronLab = createLabSyncRunner({
+  enabled: backendEnabled,
+  session: () => labSessionScope(key => localStorage.getItem(key)),
+  getServer: () => api.getLabLog(),
+  putServer: (log, timestamp) => api.putLabLog(log, timestamp),
+  getLocal: logUntukServer,
+  getLocalTimestamp: labDiperbaruiPada,
+  applyServer: gantiDariServer,
+  getStatus: () => status,
+  setStatus,
+  now: () => new Date().toISOString(),
+})
 
 let dipasang = false
 let tunda = 0
