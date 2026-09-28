@@ -594,7 +594,7 @@ export function EMR() {
           <div>
             <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
-              By signing, the doctor attests that they reviewed this medical record. Human review does not by itself establish clinical validation of Panacea's underlying capability.
+              By signing, the doctor attests review of this record; human review alone does not establish clinical validation of Panacea's underlying capability.
             </p>
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
