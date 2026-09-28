@@ -20,6 +20,10 @@ export function boundaryConditionFromLongitudinalEvent(
   }
   const name = (options.name ?? event.metric).trim()
   if (!name) throw new Error(`longitudinal event ${event.id}: physiological boundary name is required`)
+  if (typeof event.subjectId !== 'string' || !event.subjectId.trim()) {
+    throw new Error(`longitudinal event ${event.id}: subjectId is required for a patient-derived physiological boundary`)
+  }
+  const subjectId = event.subjectId.trim()
 
   return {
     name,
@@ -29,6 +33,7 @@ export function boundaryConditionFromLongitudinalEvent(
     truthClass: event.semanticState as BoundaryTruthClass,
     source: {
       id: event.id,
+      subjectId,
       sourceId: event.provenance.sourceId,
       capturedAt: event.provenance.capturedAt,
       semanticState: event.semanticState as BoundaryTruthClass,

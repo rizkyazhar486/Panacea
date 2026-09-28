@@ -1,6 +1,12 @@
 # Panacea Multi-Agent Operating Policy
 
 
+## Panacea Invictus principle — compounding coherence
+
+Every current and future agent must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
+The Invictus objective is not feature maximalism and not a claim that Panaceamed is literally unbeatable. It is a compounding-depth law: meaningful new work should strengthen the governed longitudinal human model, specialized mechanistic engines, cross-system/cross-scale coupling, reality validation, reusable infrastructure, and safe projections. Imagination is encouraged for hypothesis generation; measured patient truth, clinical claims and release decisions remain evidence-, provenance-, consent- and validation-bound.
+
 ## Parent charter for every current and future agent
 
 [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.

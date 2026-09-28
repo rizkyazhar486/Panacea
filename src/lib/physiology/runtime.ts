@@ -32,6 +32,8 @@ export interface BoundaryCondition {
   truthClass: BoundaryTruthClass
   source: {
     id: string
+    /** Canonical subject identity when this boundary originates from longitudinal patient state. */
+    subjectId?: string
     sourceId: string
     capturedAt: string
     semanticState: BoundaryTruthClass
@@ -57,6 +59,10 @@ export interface PhysiologicalProvenance {
   step: number
   timeSeconds: number
   parents: readonly string[]
+  /** Originating longitudinal event id for patient-derived boundary conditions. */
+  sourceEventId?: string
+  /** Canonical subject identity paired with sourceEventId; absent for subjectless reference/synthetic boundaries. */
+  sourceSubjectId?: string
   sourceId?: string
   capturedAt?: string
 }
@@ -262,7 +268,12 @@ function boundaryValue(boundary: BoundaryCondition): PhysiologicalValue {
   if (boundary.source.semanticState !== boundary.truthClass) throw new Error(`boundary ${boundary.name}: truth class does not match source semantic state`)
   if (!Number.isFinite(boundary.value)) throw new Error(`boundary ${boundary.name}: value must be finite`)
   validateSigma(boundary.sigma, `boundary ${boundary.name}`)
-  const id = fnv1a(`boundary:${boundary.name}:${boundary.unit}:${boundary.value}:${boundary.sigma ?? 'unknown'}:${boundary.truthClass}:${boundary.source.id}:${boundary.source.sourceId}:${boundary.source.capturedAt}`)
+  const sourceSubjectId = boundary.source.subjectId?.trim()
+  if (boundary.source.subjectId !== undefined && !sourceSubjectId) {
+    throw new Error(`boundary ${boundary.name}: source subjectId must not be blank when provided`)
+  }
+  const subjectIdentity = sourceSubjectId ? `:${sourceSubjectId}` : ''
+  const id = fnv1a(`boundary:${boundary.name}:${boundary.unit}:${boundary.value}:${boundary.sigma ?? 'unknown'}:${boundary.truthClass}:${boundary.source.id}:${boundary.source.sourceId}:${boundary.source.capturedAt}${subjectIdentity}`)
   return {
     name: boundary.name,
     unit: boundary.unit,
@@ -275,6 +286,8 @@ function boundaryValue(boundary: BoundaryCondition): PhysiologicalValue {
       step: 0,
       timeSeconds: 0,
       parents: [],
+      sourceEventId: boundary.source.id,
+      sourceSubjectId,
       sourceId: boundary.source.sourceId,
       capturedAt: boundary.source.capturedAt,
     },

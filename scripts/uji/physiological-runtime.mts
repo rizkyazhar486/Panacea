@@ -64,6 +64,7 @@ assert.equal(a.latest['engine.a.output'].provenance.parameterSetId, 'fixture-v1'
 assert.equal(a.latest['engine.a.output'].provenance.validationClass, 'synthetic')
 assert.equal(a.latest['engine.a.output'].provenance.fidelity, 'infrastructure-fixture')
 assert.ok(a.latest['engine.a.output'].provenance.parents.includes(a.boundaries['boundary.input'].provenance.id))
+assert.equal(a.boundaries['boundary.input'].provenance.sourceEventId, 'event-1')
 const changedOutputRegistry = createDomainEngineRegistry([baseEngine({ step: ({ inputs }) => ({ state:1, outputs:[{ name:'engine.a.output', unit:'1', value:inputs['boundary.input'].value + 1, sigma:null }] }) })],[{ name:'boundary.input', unit:'1' }])
 const changedOutput = runPhysiologicalSimulation({ registry:changedOutputRegistry, boundaryConditions:[boundary], untilSeconds:2 })
 assert.notEqual(a.latest['engine.a.output'].provenance.id, changedOutput.latest['engine.a.output'].provenance.id)
@@ -95,6 +96,7 @@ assert.equal(mapped.value, 4)
 assert.equal(mapped.sigma, null)
 assert.equal(mapped.truthClass, 'measured')
 assert.equal(mapped.source.id, 'evt-map')
+assert.equal(mapped.source.subjectId, 'subject-1')
 assert.equal(mapped.source.sourceId, 'device:fixture')
 assert.equal(JSON.stringify(sourceEvent), sourceBefore)
 for (const semanticState of ['simulated','ai-draft','unavailable','derived','rule-output'] as const) {
@@ -108,6 +110,7 @@ const fixture = runPhysiologicalSimulation({ registry:fixtureRegistry, boundaryC
 assert.equal(fixture.stepCounts['synthetic.drive'], 5)
 assert.equal(fixture.stepCounts['synthetic.response'], 3)
 assert.equal(fixture.latest['synthetic.response.value'].truthClass, 'simulated')
+assert.equal(fixture.boundaries['boundary.input'].provenance.sourceSubjectId, 'subject-1')
 assert.ok(Number.isFinite(fixture.latest['synthetic.response.value'].value))
 
 // Registry declaration order must not control same-time dependency execution.

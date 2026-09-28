@@ -284,6 +284,21 @@ export function observationsByTruthClass(
 export function observabilityGapForMetric(
   frame: HumanObservabilityFrame,
   metric: string,
+  identity?: Pick<HumanObservabilityGap, 'domain' | 'unit'>,
 ) {
-  return frame.coverage.gaps.find((gap) => gap.metric === metric.trim())
+  const normalizedMetric = metric.trim()
+  const normalizedUnit = identity?.unit?.trim()
+  if (identity?.unit !== undefined && !normalizedUnit) {
+    throw new Error('observability gap identity unit must not be blank')
+  }
+
+  const matches = frame.coverage.gaps.filter((gap) =>
+    gap.metric === normalizedMetric
+    && (identity?.domain === undefined || gap.domain === identity.domain)
+    && (identity?.unit === undefined || gap.unit === normalizedUnit),
+  )
+  if (matches.length > 1) {
+    throw new Error(`ambiguous observability gap lookup: ${normalizedMetric}`)
+  }
+  return matches[0]
 }

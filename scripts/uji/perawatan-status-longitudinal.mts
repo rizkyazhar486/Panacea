@@ -36,5 +36,5 @@ const teks = tl.flatMap((h) => h.butir.map((b) => `${b.label}|${b.value}|${b.asa
 assert.ok(teks.includes('Did you feel dizzy today?|Yes|daily check-in'), `jawaban cek harian tidak terbaca di timeline: ${teks.join(' ; ')}`)
 assert.ok(teks.includes('Doctor review · Fasting glucose|Repeat fasting glucose.|by your doctor'), 'tinjauan dokter tidak terbaca di timeline')
 
-assert.match(readFileSync('src/lib/useLongitudinalState.ts', 'utf8'), /careToLongitudinalEvents\(server\.plans, server\.reviews, subjectId, consent, kini\)/)
+assert.match(readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8'), /careToLongitudinalEvents\(server\.plans, server\.reviews, subjectId, consent, kini\)/)
 console.log('perawatan-status-longitudinal: cek harian + tinjauan dokter masuk status kanonik, terbaca di timeline dengan asalnya')
