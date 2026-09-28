@@ -21,13 +21,21 @@ export type ReviewState = 'not-required' | 'pending' | 'accepted' | 'rejected'
 /**
  * Keadaan semantik sebuah nilai — WAJIB dibedakan di seluruh Panacea:
  * diukur, diimpor, dimasukkan klinisi, dilaporkan pasien, turunan deterministik,
- * keluaran aturan, draf/hipotesis AI, simulasi, rujukan/edukasi, ditinjau klinisi,
- * tidak tersedia. Opsional supaya peristiwa lama tetap sah; bila ada, divalidasi.
+ * keluaran aturan, draf/hipotesis AI, estimasi model, simulasi/counterfactual,
+ * rujukan/edukasi, stale/unknown/unsupported, ditinjau klinisi, atau tidak tersedia.
+ * Opsional supaya peristiwa lama tetap sah; bila ada, divalidasi.
  */
 export type SemanticState =
   | 'measured' | 'imported' | 'clinician-entered' | 'patient-reported' | 'derived'
-  | 'rule-output' | 'ai-draft' | 'simulated' | 'reference' | 'clinician-reviewed' | 'unavailable'
-export const SEMANTIC_STATES: readonly SemanticState[] = ['measured', 'imported', 'clinician-entered', 'patient-reported', 'derived', 'rule-output', 'ai-draft', 'simulated', 'reference', 'clinician-reviewed', 'unavailable']
+  | 'rule-output' | 'ai-draft' | 'model-estimated' | 'simulated' | 'counterfactual'
+  | 'hypothesis' | 'reference' | 'stale' | 'unknown' | 'unsupported'
+  | 'clinician-reviewed' | 'unavailable'
+export const SEMANTIC_STATES: readonly SemanticState[] = [
+  'measured', 'imported', 'clinician-entered', 'patient-reported', 'derived',
+  'rule-output', 'ai-draft', 'model-estimated', 'simulated', 'counterfactual',
+  'hypothesis', 'reference', 'stale', 'unknown', 'unsupported',
+  'clinician-reviewed', 'unavailable',
+]
 export type ConsentPurpose = 'personal-visualization' | 'clinical-support' | 'ai-context' | 'research-export'
 
 export interface LongitudinalProvenance {
