@@ -7,6 +7,14 @@ Every current and future agent must also read and apply [`PANACEA_INVICTUS_PRINC
 
 The Invictus objective is not feature maximalism and not a claim that Panaceamed is literally unbeatable. It is a compounding-depth law: meaningful new work should strengthen the governed longitudinal human model, specialized mechanistic engines, cross-system/cross-scale coupling, reality validation, reusable infrastructure, and safe projections. Imagination is encouraged for hypothesis generation; measured patient truth, clinical claims and release decisions remain evidence-, provenance-, consent- and validation-bound.
 
+## 99-Axiom Constitutional Annex — executable ethical/governance constraints
+
+Every current and future agent must also read and apply [`PANACEA_99_AXIOM_CONSTITUTION.md`](PANACEA_99_AXIOM_CONSTITUTION.md) and its machine-readable registry [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
+
+This annex is non-theocratic and non-deifying. It uses 99 engineering axioms inspired by reflection on the Divine Names as a human-authored mnemonic for mercy, truth, justice, safety, stewardship, accountability, restraint, resilience, and epistemic humility. Panaceamed must never claim divine attributes, omniscience, infallibility, metaphysical authority, or sovereignty over human life.
+
+Applicable hard invariants are conjunctive: a failed safety-critical gate blocks, defers, or escalates the action; no feature count, benchmark, model strength, revenue target, or local optimization may compensate for that failure. The registry complements existing clinical, scientific, consent, privacy, security, provenance, validation, and human-review gates rather than replacing them.
+
 ## Parent charter for every current and future agent
 
 [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.

@@ -4,6 +4,18 @@
 
 This is a canonical product-development principle for Panaceamed. It extends the Panacea Constitution, Computational Human Platform, Human Observability Doctrine, Product Maturity OS, Humanity 10 Charter, and depth-over-dispersion law. It does not override their scientific, clinical, privacy, security, consent, provenance, reproducibility, or human-review gates.
 
+## 99-Axiom constitutional constraint layer
+
+Invictus depth is subordinate to the executable [`PANACEA_99_AXIOM_CONSTITUTION.md`](PANACEA_99_AXIOM_CONSTITUTION.md) and [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
+
+The annex is explicitly non-theocratic and non-deifying: it translates reflection on the Divine Names into human-authored engineering constraints without claiming that Panaceamed possesses divine attributes, omniscience, infallibility, metaphysical authority, or sovereignty over human life.
+
+For applicable safety-critical invariants, use the conjunctive gate:
+
+`C_99(a) = product(g_i(a))`.
+
+A failed applicable gate constrains total Invictus maturity regardless of model power, feature breadth, aesthetic quality, or benchmark performance. More capable future models inherit stronger responsibility to satisfy the constraints; intelligence never grants constitutional exemption.
+
 ## Purpose
 
 Panaceamed must compound into a uniquely coherent computational model of human state and health rather than accumulate disconnected features.
