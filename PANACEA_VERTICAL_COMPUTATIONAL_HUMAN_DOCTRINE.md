@@ -69,6 +69,26 @@ Operational laws:
 
 The same rule applies recursively: whole human -> system -> organ -> tissue -> cell -> molecule, and input -> state -> engine -> coupling -> validation -> projection -> outcome. Depth must compound across both biological scale and software execution.
 
+## 1B. Meaningful horizontal expansion and adaptive explanatory scale
+
+**Meaningful horizontal expansion** is allowed only when a new domain closes an important human-model gap, supplies a needed observation/intervention, creates a reusable cross-system coupling, or improves a validated outcome. Breadth that merely increases page, widget, component or feature count is backlog, not maturity.
+
+Vertical depth uses **adaptive explanatory scale**. Panacea should descend only as far as the question, evidence and identifiability justify:
+
+```text
+whole human -> system -> organ -> tissue -> cell -> organelle -> pathway/molecule -> genome
+```
+
+If a required causal or mechanistic link is not supportable, mark it explicitly:
+
+```text
+VERTICAL GAP — NOT YET MODELED
+```
+
+Do not fill a missing layer with plausible-looking synthetic continuity. Future stronger models may deepen a gap only through stable state, truth-class, provenance, uncertainty and validation contracts.
+
+Canonical authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
 ## 2. Hard prohibitions
 
 The following are **forbidden design patterns** for all future work.
