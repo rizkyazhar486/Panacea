@@ -162,6 +162,19 @@ function cloneEvent<T>(event: LongitudinalEvent<T>): LongitudinalEvent<T> {
   }
 }
 
+function stableEventJson(event: LongitudinalEvent): string {
+  return JSON.stringify(cloneEvent(event), (_key, value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return value
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right)),
+    )
+  })
+}
+
+function sameLongitudinalEvent(left: LongitudinalEvent, right: LongitudinalEvent): boolean {
+  return stableEventJson(left) === stableEventJson(right)
+}
+
 /**
  * Fail-closed validation shared by all ingestion paths.
  * This validates transport/governance shape only; it does not establish that a
@@ -255,9 +268,14 @@ export function ingestLongitudinalEvent(
   validateLongitudinalEvent(incoming)
   if (incoming.subjectId.trim() !== current.subjectId) throw new Error('event.subjectId does not match state.subjectId')
 
-  if (current.eventsById[incoming.id]) return { state: current, status: 'duplicate' }
-
   const event = cloneEvent(incoming)
+  const existing = current.eventsById[event.id]
+  if (existing) {
+    if (!sameLongitudinalEvent(existing, event)) {
+      throw new Error(`conflicting event id ${event.id}`)
+    }
+    return { state: current, status: 'duplicate' }
+  }
   const eventsById: Record<string, LongitudinalEvent> = { ...current.eventsById, [event.id]: event }
   const metricEventIds: Record<string, readonly string[]> = { ...current.metricEventIds }
   const existingIds = current.metricEventIds[event.metric] ?? []
