@@ -162,21 +162,49 @@ export function EMR() {
   const store = useStore()
   const { state, activePatient, saveRecord } = store
   const acc = state.account
-  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
-  if (acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner) {
-    return <StrGate str={acc.str} />
-  }
+  const strBlocked = acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
   const [dirty, setDirty] = useState(false)
+  const [encounters, setEncounters] = useState<EMRRecord[]>(record ? [record] : [])
+  const [encounterLoading, setEncounterLoading] = useState(false)
+  const [encounterError, setEncounterError] = useState('')
 
   useEffect(() => {
     setDraft(state.records[activePatient.id] ?? null)
     setDirty(false)
   }, [activePatient.id, state.records])
 
+  useEffect(() => {
+    let active = true
+    const fallback = record ? [record] : []
+    if (!backendEnabled || strBlocked || activePatient.id === 'none') {
+      setEncounters(fallback)
+      setEncounterLoading(false)
+      setEncounterError('')
+      return () => { active = false }
+    }
+    setEncounterLoading(true)
+    setEncounterError('')
+    void api.recordEncounters(activePatient.id)
+      .then((items) => {
+        if (active) setEncounters(items.length ? items : fallback)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setEncounters(fallback)
+        setEncounterError(error instanceof Error ? error.message : 'Could not load encounter history.')
+      })
+      .finally(() => { if (active) setEncounterLoading(false) })
+    return () => { active = false }
+  }, [activePatient.id, record?.id, record?.updatedAt, strBlocked])
+
+  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
+  // Hooks stay above this return so changing auth state never changes hook order.
+  if (strBlocked) return <StrGate str={acc?.str} />
   if (!draft) return <EmptyEMR />
 
+  const historicalReadOnly = Boolean(record && draft.id !== record.id)
   const systemFindings = buildFindings(draft.physicalExam)
   const bodyClinicalProjection = projectEmrToBodyClinicalBridge(
     draft,
@@ -186,6 +214,7 @@ export function EMR() {
   )
 
   function patch(fn: (r: EMRRecord) => EMRRecord) {
+    if (historicalReadOnly) return
     setDraft((d) => (d ? fn(d) : d))
     setDirty(true)
   }
@@ -198,6 +227,7 @@ export function EMR() {
   }
 
   function save() {
+    if (historicalReadOnly) return
     if (draft) {
       saveRecord({ ...draft, updatedAt: new Date().toISOString() })
       setDirty(false)
@@ -205,7 +235,7 @@ export function EMR() {
   }
 
   function sign() {
-    if (!draft) return
+    if (!draft || historicalReadOnly) return
     const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
@@ -231,6 +261,7 @@ export function EMR() {
             subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('en-US')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
+            {historicalReadOnly && <Badge tone="neutral">Historical encounter · read-only</Badge>}
             {draft.signedBy ? (
               <Badge tone="brand">
                 <IconCheck size={13} /> Signed by {draft.signedBy}
@@ -238,8 +269,8 @@ export function EMR() {
             ) : (
               <Badge tone="high">Awaiting doctor verification</Badge>
             )}
-            <Button variant="outline" onClick={save} disabled={!dirty}>
-              {dirty ? 'Save Changes' : 'Saved'}
+            <Button variant="outline" onClick={save} disabled={historicalReadOnly || !dirty}>
+              {historicalReadOnly ? 'Read-only history' : dirty ? 'Save Changes' : 'Saved'}
             </Button>
             <Button variant="outline" onClick={() => window.print()}>
               <IconBook size={14} /> Print / PDF
@@ -252,6 +283,33 @@ export function EMR() {
           Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
           signing.
         </div>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          title="Encounter history"
+          subtitle="Separate visits are preserved by record ID; opening a prior encounter never merges visits."
+          right={<Badge tone="neutral">{encounters.length} encounter{encounters.length === 1 ? '' : 's'}</Badge>}
+        />
+        {encounterError && <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">Encounter history unavailable: {encounterError}</p>}
+        {encounterLoading ? <p className="text-sm text-neutral-500">Loading encounter history…</p> : (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {encounters.map((encounter) => (
+              <button
+                key={encounter.id}
+                type="button"
+                disabled={dirty && encounter.id !== draft.id}
+                onClick={() => { setDraft(encounter); setDirty(false) }}
+                className={`min-w-[190px] rounded-xl border px-3 py-2 text-left text-xs transition ${encounter.id === draft.id ? 'border-brand bg-brand-50' : 'border-neutral-200 bg-white hover:border-brand/50'} disabled:cursor-not-allowed disabled:opacity-50`}
+                title={dirty && encounter.id !== draft.id ? 'Save current changes before opening another encounter.' : undefined}
+              >
+                <div className="font-semibold text-neutral-900">{new Date(encounter.createdAt).toLocaleString('en-US')}</div>
+                <div className="mt-1 text-neutral-500">{encounter.signedBy ? `Signed · ${encounter.signedBy}` : 'Unsigned draft'}</div>
+                <div className="mt-1 font-mono text-[10px] text-neutral-400">{encounter.id}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </Card>
 
       <VisitCommandCenter recordId={draft.id} embedded />
