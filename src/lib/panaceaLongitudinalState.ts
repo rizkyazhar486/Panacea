@@ -254,7 +254,7 @@ const CLINICAL_TRUTH_STATES = new Set<SemanticState>(['measured', 'imported', 'c
 
 export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()) {
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
-  if (!event.semanticState || !CLINICAL_TRUTH_STATES.has(event.semanticState)) return false
+  if (event.semanticState && !CLINICAL_TRUTH_STATES.has(event.semanticState)) return false
   if (!requiresClinicianReview(event)) return true
   return event.review.state === 'accepted'
 }
@@ -431,7 +431,7 @@ export function projectStateToSurface(
       continue
     }
 
-    if ((surface === 'clinical' || surface === 'ai-emr') && (!snapshot.latest.semanticState || !CLINICAL_TRUTH_STATES.has(snapshot.latest.semanticState))) {
+    if ((surface === 'clinical' || surface === 'ai-emr') && snapshot.latest.semanticState && !CLINICAL_TRUTH_STATES.has(snapshot.latest.semanticState)) {
       blockedByTruthClass += 1
       continue
     }
