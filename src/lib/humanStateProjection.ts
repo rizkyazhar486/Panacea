@@ -70,6 +70,7 @@ export interface HumanStateProjection {
 
 interface BoundaryLineage {
   sourceEventIds: Set<string>
+  sourceSubjectIds: Set<string>
   missing: boolean
 }
 
@@ -90,28 +91,36 @@ function lineageFor(
   byId: ReadonlyMap<string, PhysiologicalProvenance>,
   seen = new Set<string>(),
 ): BoundaryLineage {
-  if (seen.has(provenanceId)) return { sourceEventIds: new Set(), missing: true }
+  const empty = () => ({ sourceEventIds: new Set<string>(), sourceSubjectIds: new Set<string>(), missing: true })
+  if (seen.has(provenanceId)) return empty()
   const provenance = byId.get(provenanceId)
-  if (!provenance) return { sourceEventIds: new Set(), missing: true }
+  if (!provenance) return empty()
 
   if (provenance.kind === 'boundary') {
-    return provenance.sourceEventId
-      ? { sourceEventIds: new Set([provenance.sourceEventId]), missing: false }
-      : { sourceEventIds: new Set(), missing: true }
+    const sourceSubjectId = provenance.sourceSubjectId?.trim()
+    return provenance.sourceEventId && sourceSubjectId
+      ? {
+          sourceEventIds: new Set([provenance.sourceEventId]),
+          sourceSubjectIds: new Set([sourceSubjectId]),
+          missing: false,
+        }
+      : empty()
   }
 
-  if (!provenance.parents.length) return { sourceEventIds: new Set(), missing: true }
+  if (!provenance.parents.length) return empty()
 
   const nextSeen = new Set(seen)
   nextSeen.add(provenanceId)
   const sourceEventIds = new Set<string>()
+  const sourceSubjectIds = new Set<string>()
   let missing = false
   for (const parentId of provenance.parents) {
     const parent = lineageFor(parentId, byId, nextSeen)
     missing ||= parent.missing
     for (const sourceEventId of parent.sourceEventIds) sourceEventIds.add(sourceEventId)
+    for (const sourceSubjectId of parent.sourceSubjectIds) sourceSubjectIds.add(sourceSubjectId)
   }
-  return { sourceEventIds, missing }
+  return { sourceEventIds, sourceSubjectIds, missing }
 }
 
 function eventSurfacePolicyAllows(
@@ -187,7 +196,10 @@ export function projectHumanState(input: {
     const lineage = lineageFor(value.provenance.id, provenanceById)
     const sourceEventIds = [...lineage.sourceEventIds].sort()
 
-    let reason: HumanStateBlockReason | null = lineage.missing || sourceEventIds.length === 0
+    let reason: HumanStateBlockReason | null = lineage.missing
+      || sourceEventIds.length === 0
+      || lineage.sourceSubjectIds.size !== 1
+      || !lineage.sourceSubjectIds.has(input.state.subjectId)
       ? 'missing-lineage'
       : null
 

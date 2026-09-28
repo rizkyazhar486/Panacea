@@ -174,6 +174,26 @@ const clinical = projectHumanState({
 assert.equal(clinical.canonical.metrics.some((item) => item.metric === 'heart-rate'), true)
 assert.equal(clinical.physiology.estimated.length, 1)
 
+
+const subjectlessPhysiology = {
+  ...physiology,
+  provenance: physiology.provenance.map((entry) => (
+    entry.kind === 'boundary' ? { ...entry, sourceSubjectId: undefined } : entry
+  )),
+}
+const subjectlessLineage = projectHumanState({
+  state,
+  surface: 'clinical',
+  physiology: subjectlessPhysiology,
+  at: '2026-09-28T00:11:00.000Z',
+})
+assert.equal(subjectlessLineage.physiology.observed.length, 0)
+assert.equal(subjectlessLineage.physiology.estimated.length, 0)
+assert.equal(subjectlessLineage.physiology.simulated.length, 0)
+assert.equal(subjectlessLineage.physiology.blocked.length, 3)
+assert.ok(subjectlessLineage.physiology.blocked.every((field) => field.reason === 'missing-lineage'))
+
+
 const brokenPhysiology = {
   ...physiology,
   provenance: physiology.provenance.map((entry) => (
