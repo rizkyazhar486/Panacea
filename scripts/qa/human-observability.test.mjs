@@ -231,3 +231,26 @@ test('expectation identity keeps domain and unit-specific blind spots separate',
     maxAgeMs: 30 * 60 * 1000,
   }])
 })
+
+
+test('gap lookup requires signal identity when a metric has multiple blind spots', () => {
+  const frame = buildHumanObservabilityFrame({
+    state: createLongitudinalPatientState(subjectId, '2026-09-01T00:00:00.000Z'),
+    consentLedger: ledger,
+    purpose: 'personal-visualization',
+    at: '2026-09-03T11:00:00.000Z',
+    expectations: [
+      { metric: 'core-temperature', domain: 'device', unit: 'celsius', maxAgeMs: 30 * 60 * 1000 },
+      { metric: 'core-temperature', domain: 'vital', unit: 'celsius', maxAgeMs: 30 * 60 * 1000 },
+    ],
+  })
+
+  assert.throws(
+    () => observabilityGapForMetric(frame, 'core-temperature'),
+    /ambiguous observability gap lookup: core-temperature/,
+  )
+  assert.equal(
+    observabilityGapForMetric(frame, 'core-temperature', { domain: 'vital', unit: 'celsius' })?.domain,
+    'vital',
+  )
+})
