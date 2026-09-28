@@ -49,6 +49,98 @@ Architecture is preferred when stronger future models, higher-fidelity sensors, 
 
 Adaptive resolution and multiscale time are first-class future directions: compute should deepen around the system, scale, uncertainty or event that matters rather than simulate maximum detail everywhere. Detailed authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) and [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
 
+## 1B. Cognitive Translation Kernel — infinite depth, finite interface
+
+Panaceamed remains a healthcare **superapp**, but its breadth must not appear as a collection of disconnected mini-apps. The Computational Human Platform has two coupled kernels:
+
+```text
+HUMAN STATE KERNEL
+reconstructs what is known / estimated / simulated about one changing human
+
+        +
+
+COGNITIVE TRANSLATION KERNEL
+projects that same scientific reality at the resolution the current observer can understand
+```
+
+The governing principle is:
+
+```text
+MAXIMUM SCIENTIFIC DEPTH INTERNALLY
+-> STRUCTURED COGNITIVE COMPRESSION
+-> MINIMUM COGNITIVE FRICTION EXTERNALLY
+```
+
+Compression is applied to **representation, never to scientific truth**. The system must not delete mechanism, provenance, uncertainty or deeper evidence merely to make a screen simple. Deeper information remains recoverable through progressive interaction.
+
+Conceptually:
+
+[
+O_{u,t}
+=
+\mathcal{C}
+\left(
+\mathcal{P}
+\left(
+\mathcal{S}(D_{0:t},\Theta)
+\right),
+u,g,c,r
+\right)
+]
+
+where \(\mathcal{S}\) reconstructs Human State, \(\mathcal{P}\) performs scientific reasoning/simulation, and \(\mathcal{C}\) changes representation for a user, goal, context and requested resolution without manufacturing a new reality.
+
+The universal interaction grammar is:
+
+```text
+SEE -> ASK -> ZOOM -> WHY -> WHAT IF -> ACT
+```
+
+- **See**: orient on the current state with the smallest useful cognitive surface.
+- **Ask**: interrogate the same state, not a separate chatbot truth store.
+- **Zoom**: increase spatial, biological, temporal or conceptual resolution.
+- **Why**: traverse causal/mechanistic ancestry with uncertainty and evidence.
+- **What if**: create an isolated counterfactual branch; never mutate observed history.
+- **Act**: convert understanding into a permissioned next step while preserving clinician/human authority where required.
+
+### Cognitive-semantic zoom
+
+Panacea must be able to expose the same underlying scientific object at progressively deeper representations, for example:
+
+```text
+plain-language orientation
+-> clinical explanation
+-> mechanism
+-> quantitative model
+-> specialist detail
+-> research/model/equation depth
+```
+
+These are **not different truths**. They are different projections of the same admitted state and evidence.
+
+For Body Exposure, spatial semantic zoom remains:
+
+```text
+whole body -> system -> organ -> tissue -> cell -> organelle -> molecule/pathway -> genome
+```
+
+and combines orthogonally with lenses such as anatomy, physiology, pathology, imaging, pharmacology, procedure and time. A user may move across scale, lens and time without creating a parallel body state.
+
+### Non-negotiable invariants
+
+1. **No visualization owns an independent human state.**
+2. **No page, super-page or module may create a parallel patient reality.**
+3. Cognitive translation may hide detail temporarily but may not mutate, invent or discard scientific state.
+4. Observed, estimated and simulated truth lanes remain labelled across every cognitive depth.
+5. Provenance and uncertainty remain recoverable from every scientific assertion.
+6. A `WHY` path must distinguish evidence-backed causality/mechanism from association or hypothesis.
+7. A `WHAT IF` path must remain counterfactual and isolated from real longitudinal history.
+8. Surface simplicity is achieved by progressive disclosure and semantic compression, not by deleting biomedical complexity.
+9. The same scientific object should be reusable across Clinical, AI-EMR, Your Body, Body Exposure, education and simulation.
+10. New functionality should preferably deepen `SENSE -> RECONSTRUCT -> EXPLORE -> SIMULATE -> ACT` rather than introduce another independent destination.
+
+The first runtime contract is implemented in `src/lib/cognitiveTranslationKernel.ts`; its regression gate is `scripts/uji/cognitive-translation-kernel.mts`.
+
 ## 2. Vertical sophistication
 
 Panaceamed optimizes for validated vertical depth rather than raw feature count.
