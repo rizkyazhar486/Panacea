@@ -25,6 +25,30 @@ STABILIZE
 -> EXPAND BREADTH ONLY WHEN JUSTIFIED
 ```
 
+## 1A. Human Reality Model and future-capability absorbability
+
+The **Human Reality Model** is Panacea's parent conceptual abstraction for a permissioned, longitudinal representation of a human life. It does **not** create a third patient-state authority. The existing **Canonical Patient State** remains authoritative for measured/recorded human truth, while the **Physiological State Engine** remains the model-derived dynamic layer.
+
+Panacea preserves a logical **Reality Lattice** rather than flattening information into one certainty class:
+
+```text
+OBSERVED / RECORDED
+DERIVED
+MODEL-ESTIMATED
+SIMULATED
+COUNTERFACTUAL
+REFERENCE
+UNKNOWN / UNSUPPORTED
+```
+
+Observed reality, predicted state and counterfactual state remain distinct unless later evidence establishes correspondence.
+
+### Future-capability absorbability
+
+Architecture is preferred when stronger future models, higher-fidelity sensors, richer simulators or new interfaces can enter through stable contracts without creating a parallel human or replacing canonical truth semantics. Model versions must remain benchmarkable, replaceable and rollback-capable; historical patient truth must remain stable across model upgrades.
+
+Adaptive resolution and multiscale time are first-class future directions: compute should deepen around the system, scale, uncertainty or event that matters rather than simulate maximum detail everywhere. Detailed authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) and [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
 ## 2. Vertical sophistication
 
 Panaceamed optimizes for validated vertical depth rather than raw feature count.
