@@ -478,6 +478,7 @@ export function buildContextPacket(
       ids.filter((id) => {
         const event = state.eventsById[id]
         if (!event || Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
+        if ((surface === 'clinical' || surface === 'ai-emr') && !hasClinicalTruthState(event)) return false
         if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(event)) {
           return event.review.state === 'accepted'
         }
