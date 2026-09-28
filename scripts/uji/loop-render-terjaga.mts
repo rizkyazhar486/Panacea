@@ -28,7 +28,7 @@ const g = palsu(); const l2 = mulaiLoopTerjaga({} as Element, () => {}, g.dep); 
 assert.equal(g.antre.size, 0, 'dibuang: tanpa frame menggantung'); assert.deepEqual(g.lepas(), [1, 1], 'listener dilepas tepat sekali')
 const PENGGUNA = [
   ...['Arteri3D', 'KelenjarSaluran3D', 'LesiNeuro3D', 'WilayahAbdomen3D', 'Kerangka3D', 'VentilasiBronkus3D', 'AlphaGenomeAtlas'].map((n) => `src/pages/bodyhub/${n}.tsx`),
-  ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D'].map((n) => `src/components/${n}.tsx`),
+  ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D', 'VolumeDicom3D'].map((n) => `src/components/${n}.tsx`),
   ...['MicroPathologyComparator', 'BodyParts3DDeepAtlas', 'RealisticAnatomyAtlas', 'HighDefinitionCellAtlas', 'HraClinicalAtlas', 'CinematicCellGenomeExplorer', 'MicroPhysiologyExplorer', 'TissuePreview'].map((n) => `src/components/digital-twin/${n}.tsx`),
   'src/pages/discovery/SynapseMicro3DLab.tsx',
 ]

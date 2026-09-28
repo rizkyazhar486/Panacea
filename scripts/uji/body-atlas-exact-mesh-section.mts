@@ -81,4 +81,36 @@ for (const coordinate of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_
   assert.equal(invalidCoordinate.trianglesVisited, 0)
 }
 
+
+const corruptRoot = new THREE.Group()
+const validBeforeCorrupt = namedMesh(new THREE.BoxGeometry(2, 2, 2), 'Valid before corrupt')
+const corruptGeometry = new THREE.BufferGeometry()
+corruptGeometry.setAttribute('position', new THREE.Float32BufferAttribute([
+  Number.NaN, -1, 0,
+  1, 1, 0,
+  1, -1, 0,
+], 3))
+const corruptMesh = namedMesh(corruptGeometry, 'Corrupt source mesh')
+corruptRoot.add(validBeforeCorrupt, corruptMesh)
+
+const corruptResult = intersectBodyAtlasSourceMeshesWithPlane({
+  axis: 'x',
+  coordinate: 0,
+  candidates: [
+    { file: 'corrupt.glb', name: 'Valid before corrupt' },
+    { file: 'corrupt.glb', name: 'Corrupt source mesh' },
+  ],
+  sourceRoots: [{ file: 'corrupt.glb', root: corruptRoot }],
+})
+assert.equal(corruptResult.blockedReason, 'non-finite-source-geometry')
+assert.equal(corruptResult.segments.length, 0, 'Any invalid source triangle must fail the entire section closed')
+assert.deepEqual(corruptResult.blockedSource, {
+  file: 'corrupt.glb',
+  sourceName: 'Corrupt source mesh',
+  meshName: 'Corrupt source mesh',
+  triangleIndex: 0,
+})
+assert.equal(corruptResult.truncated, false)
+
+
 console.log(`body-atlas-exact-mesh-section: ok (${exact.segments.length} raw source-triangle segments)`)

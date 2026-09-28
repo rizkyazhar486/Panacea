@@ -122,6 +122,12 @@ jobs:
           UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-844x390
         run: node scripts/qa/uiux-mobile-shell-smoke.mjs
 
+      - name: Mobile parent query and history boundary
+        env:
+          NAVIGATION_QA_ORIGIN: http://127.0.0.1:4173
+          NAVIGATION_QA_OUTPUT: artifacts/uiux-mobile-390x844
+        run: node scripts/qa/navigation-back-smoke.mjs
+
       - name: Upload Body Exposure mobile QA artifact
         if: always()
         uses: actions/upload-artifact@v4
