@@ -32,6 +32,13 @@ export interface BodyAtlasExactSectionRequest {
   maxSegments?: number
 }
 
+export interface BodyAtlasExactSectionBlockedSource {
+  file: string
+  sourceName: string
+  meshName: string
+  triangleIndex: number
+}
+
 export interface BodyAtlasExactSectionResult {
   axis: AnatomySpatialAxis
   coordinate: number
@@ -42,7 +49,8 @@ export interface BodyAtlasExactSectionResult {
   trianglesVisited: number
   coplanarTrianglesSkipped: number
   truncated: boolean
-  blockedReason?: 'non-finite-coordinate'
+  blockedReason?: 'non-finite-coordinate' | 'non-finite-source-geometry'
+  blockedSource?: BodyAtlasExactSectionBlockedSource
   semantics: 'exact-source-triangle-plane-segments-not-assembled-contours'
 }
 
@@ -71,6 +79,10 @@ function findExactSourceObject(root: THREE.Object3D, sourceName: string): THREE.
 
 function toTuple(vector: THREE.Vector3): AnatomySpatialVec3 {
   return [vector.x, vector.y, vector.z]
+}
+
+function isFiniteVector(vector: THREE.Vector3) {
+  return Number.isFinite(vector.x) && Number.isFinite(vector.y) && Number.isFinite(vector.z)
 }
 
 function addUniquePoint(points: THREE.Vector3[], point: THREE.Vector3, epsilonSquared: number) {
@@ -229,6 +241,28 @@ export function intersectBodyAtlasSourceMeshesWithPlane(
         a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld)
         b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld)
         c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld)
+
+        if (!isFiniteVector(a) || !isFiniteVector(b) || !isFiniteVector(c)) {
+          return {
+            axis: request.axis,
+            coordinate,
+            segments: [],
+            unresolvedCandidates,
+            sourceNodesExamined,
+            meshesExamined,
+            trianglesVisited,
+            coplanarTrianglesSkipped,
+            truncated,
+            blockedReason: 'non-finite-source-geometry',
+            blockedSource: {
+              file,
+              sourceName: name,
+              meshName: sourceOriginalName(mesh) || mesh.name.trim() || '(unnamed-source-mesh)',
+              triangleIndex,
+            },
+            semantics: 'exact-source-triangle-plane-segments-not-assembled-contours',
+          }
+        }
 
         const intersection = trianglePlaneSegment(a, b, c, axisIndex, coordinate, epsilon)
         if (intersection.coplanar) {
