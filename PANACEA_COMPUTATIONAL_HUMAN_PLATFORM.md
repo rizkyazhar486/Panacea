@@ -113,9 +113,9 @@ where:
 - (mathbf{x}) = physiological state vector;
 - (mathbf{u}) = medications, procedures, behavior and other interventions;
 - (mathbf{e}) = environmental/external exposures;
-- (oldsymbol{\theta}) = patient/model parameters;
+- (\boldsymbol{\theta}) = patient/model parameters;
 - (mathbf{C}) = cross-system coupling structure;
-- (oldsymbol{\epsilon}) = model/process uncertainty.
+- (\boldsymbol{\epsilon}) = model/process uncertainty.
 
 A practical transition may be represented as:
 
@@ -479,15 +479,15 @@ The additional architectural heuristic is:
 S_{compound}
 =
 S_{vertical}
-	imes
+\times
 D_{personalization}
-	imes
+\times
 D_{temporal}
-	imes
+\times
 D_{causal}
-	imes
+\times
 D_{epistemic}
-	imes
+\times
 D_{feedback}
 ]
 
