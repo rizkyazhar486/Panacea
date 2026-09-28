@@ -78,6 +78,24 @@ Compounding-depth gaps include, where relevant:
 
 Safety, security, privacy, data integrity, clinical-release boundaries and canonical-state consistency remain higher priority than experimental personalization or counterfactual work.
 
+## Future-realizable maturity loop
+
+After hard safety, security, data-integrity and clinical blockers, mature future-facing work follows this sequence:
+
+```text
+IMAGINE FUTURE-REALIZABLE CAPABILITY
+-> FORMALIZE STABLE INTERFACE
+-> PRESERVE TRUTH / CONSENT / AUTHORITY BOUNDARIES
+-> IMPLEMENT DEEPEST JUSTIFIED PRESENT SLICE
+-> VALIDATE / FALSIFY AGAINST REALITY
+-> MEASURE OUTCOME AND REALITY GAP
+-> LET FUTURE MODELS DEEPEN THROUGH THE SAME CONTRACT
+```
+
+A capability may exist as a future architecture target before current models or sensors can realize it, but current production behavior remains bounded by available evidence, validation, observability and authorization. Increased model power never licenses a weaker truth boundary.
+
+Canonical authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+
 ## Product value function
 
 [
