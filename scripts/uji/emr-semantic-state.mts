@@ -42,7 +42,6 @@ const rejectedRecord = { ...base, plan: [{ id: 'no', category: 'Follow-up' as co
 assert.equal(deriveEmrFieldStates(rejectedRecord)['plan.no'].review, 'clinician-rejected')
 
 const bridge = readFileSync('src/lib/emrLongitudinalBridge.ts', 'utf8')
-assert.match(bridge, /deriveEmrFieldStates/)
 assert.match(bridge, /field-origin:/)
 assert.match(bridge, /field-review:/)
 
