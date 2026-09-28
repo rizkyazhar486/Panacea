@@ -256,6 +256,21 @@ function hasClinicalTruthState(event: LongitudinalEvent) {
   return event.semanticState !== undefined && CLINICAL_TRUTH_STATES.has(event.semanticState)
 }
 
+function isEventVisibleOnSurface(
+  event: LongitudinalEvent,
+  surface: PanaceaSurface,
+  purpose: ConsentPurpose,
+  atMs: number,
+) {
+  if (Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
+  if (surface === 'clinical' || surface === 'ai-emr') {
+    if (!hasClinicalTruthState(event)) return false
+    if (requiresClinicianReview(event) && event.review.state !== 'accepted') return false
+  }
+  if (surface === 'ai-chatbot' && event.review.state === 'rejected') return false
+  return true
+}
+
 export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()) {
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
   if (!hasClinicalTruthState(event)) return false
@@ -448,7 +463,15 @@ export function projectStateToSurface(
     }
 
     if (surface === 'ai-chatbot' && snapshot.latest.review.state === 'rejected') continue
-    snapshots.push(snapshot)
+
+    const visibleHistory = eventsForMetric(state, metric).filter((event) => (
+      domains.has(event.domain) && isEventVisibleOnSurface(event, surface, purpose, atMs)
+    ))
+    snapshots.push({
+      ...snapshot,
+      previous: visibleHistory.length > 1 ? visibleHistory[visibleHistory.length - 2] : undefined,
+      eventCount: visibleHistory.length,
+    })
   }
 
   return {
@@ -477,12 +500,7 @@ export function buildContextPacket(
       metric,
       ids.filter((id) => {
         const event = state.eventsById[id]
-        if (!event || Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
-        if ((surface === 'clinical' || surface === 'ai-emr') && !hasClinicalTruthState(event)) return false
-        if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(event)) {
-          return event.review.state === 'accepted'
-        }
-        return surface !== 'ai-chatbot' || event.review.state !== 'rejected'
+        return Boolean(event && isEventVisibleOnSurface(event, surface, purpose, atMs))
       }),
     ])),
   }
