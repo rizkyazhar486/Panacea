@@ -50,6 +50,25 @@ export function superPageEntryForRoute(to: string, group = ''): string {
   return getSuperPage(superPageForRoute(to, group)).to
 }
 
+/**
+ * Super-page yang harus ditandai aktif di command drawer.
+ *
+ * Beranda biasa bukan "For You": ia adalah entry surface tersendiri. Hanya tab
+ * eksplisit `?t=for-you` yang membuat For You aktif di path '/'. Seluruh child
+ * route lain memakai taxonomy product-space yang sama dengan hierarchy title.
+ */
+export function activeSuperPageForLocation(
+  pathname: string,
+  search = '',
+  group = '',
+): SuperPageId | null {
+  const path = routePathOnly(pathname)
+  if (path === '/') {
+    return new URLSearchParams(search).get('t') === 'for-you' ? 'for-you' : null
+  }
+  return superPageForRoute(pathname, group)
+}
+
 
 /**
  * Satu baris lokasi yang memakai taksonomi yang SUDAH ada, bukan membuat

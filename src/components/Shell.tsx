@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { MenuPeran } from './MenuPeran'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
@@ -60,7 +60,7 @@ import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
 import { useCommandBar } from './useCommandBar'
-import { SUPER_PAGES, navigationHierarchyForRoute } from '../lib/superPages'
+import { SUPER_PAGES, activeSuperPageForLocation, navigationHierarchyForRoute } from '../lib/superPages'
 import { judulRute } from '../lib/judulRute'
 import '../styles/command-bar.css'
 import '../styles/superpage-convergence.css'
@@ -434,6 +434,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
   const ruteAktif = [...nav, ...KATALOG].find((n) => navMatches(n, loc.pathname))
+  const superPageAktif = activeSuperPageForLocation(loc.pathname, loc.search, ruteAktif?.group ?? '')
+  const homeAktif = loc.pathname === '/' && superPageAktif === null
   const judulBilah = loc.pathname === '/'
     ? judul
     : navigationHierarchyForRoute(loc.pathname, ruteAktif?.group ?? '', judul).join(' › ')
@@ -517,14 +519,30 @@ export function Shell({ children }: { children: ReactNode }) {
 
           {spacesOpen && (
             <div className="pmd-command-spaces" aria-label="Panacea spaces">
-              <NavLink to="/" end className="pmd-command-space-link">
+              <Link
+                to="/"
+                className="pmd-command-space-link"
+                aria-current={homeAktif ? 'page' : undefined}
+                data-superpage-active={homeAktif ? 'true' : 'false'}
+                onClick={() => setSpacesOpen(false)}
+              >
                 <span>Home</span><span aria-hidden>⌂</span>
-              </NavLink>
-              {SUPER_PAGES.map((space) => (
-                <NavLink key={space.id} to={space.to} className="pmd-command-space-link">
-                  <span>{space.label}</span><span aria-hidden>↗</span>
-                </NavLink>
-              ))}
+              </Link>
+              {SUPER_PAGES.map((space) => {
+                const active = superPageAktif === space.id
+                return (
+                  <Link
+                    key={space.id}
+                    to={space.to}
+                    className="pmd-command-space-link"
+                    aria-current={active ? 'location' : undefined}
+                    data-superpage-active={active ? 'true' : 'false'}
+                    onClick={() => setSpacesOpen(false)}
+                  >
+                    <span>{space.label}</span><span aria-hidden>↗</span>
+                  </Link>
+                )
+              })}
               <div className="my-1 h-px bg-black/5 dark:bg-white/10" aria-hidden />
               <NavLink to="/settings" className="pmd-command-space-link">
                 <span>Settings</span><IconSettings size={15} />

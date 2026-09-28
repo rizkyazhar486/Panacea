@@ -355,6 +355,15 @@
   font-weight: 900;
   transition: background 160ms ease, transform 180ms ease;
 }
+.pmd-command-space-link[data-superpage-active='true'],
+.pmd-command-space-link[aria-current='page'] {
+  background: rgba(34,211,238,.10);
+  box-shadow: inset 3px 0 0 rgba(0,191,99,.9);
+}
+.dark .pmd-command-space-link[data-superpage-active='true'],
+.dark .pmd-command-space-link[aria-current='page'] {
+  background: rgba(34,211,238,.11);
+}
 .pmd-command-space-link:hover { background: rgba(34,211,238,.08); transform: translateX(2px); }
 
 @supports (animation-timeline: view()) {

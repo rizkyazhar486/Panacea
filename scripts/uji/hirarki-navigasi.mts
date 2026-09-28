@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { navigationHierarchyForRoute } from '../../src/lib/superPages.ts'
+import { activeSuperPageForLocation, navigationHierarchyForRoute } from '../../src/lib/superPages.ts'
 
 const kasus = [
   {
@@ -40,3 +40,23 @@ for (const k of kasus) {
 }
 
 console.log(`\n${kasus.length} lulus, 0 gagal`)
+
+
+const activeCases = [
+  ['/latihan', '', 'Fitness', 'body'],
+  ['/body-explorer', '', 'Health', 'body'],
+  ['/clinical-hub', '', 'Clinical & AI', 'clinical'],
+  ['/settings', '', 'Account', 'for-you'],
+  ['/', '', 'Home', null],
+  ['/', '?t=for-you', 'Home', 'for-you'],
+] as const
+
+for (const [pathname, search, group, expected] of activeCases) {
+  assert.equal(
+    activeSuperPageForLocation(pathname, search, group),
+    expected,
+    `active super-page salah untuk ${pathname}${search}`,
+  )
+}
+
+console.log(`${activeCases.length} active-state cases lulus, 0 gagal`)
