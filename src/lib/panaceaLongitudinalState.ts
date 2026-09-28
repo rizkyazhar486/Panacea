@@ -97,6 +97,7 @@ export interface SurfaceProjection {
   metrics: readonly LongitudinalMetricSnapshot[]
   pendingClinicalReview: number
   blockedByConsent: number
+  blockedByTruthClass: number
 }
 
 export interface LongitudinalPatientState {
@@ -249,8 +250,11 @@ export function requiresClinicianReview(event: LongitudinalEvent) {
   return CLINICIAN_REVIEW_DOMAINS.has(event.domain)
 }
 
+const CLINICAL_TRUTH_STATES = new Set<SemanticState>(['measured', 'imported', 'clinician-entered', 'patient-reported', 'derived', 'rule-output', 'clinician-reviewed'])
+
 export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()) {
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
+  if (!event.semanticState || !CLINICAL_TRUTH_STATES.has(event.semanticState)) return false
   if (!requiresClinicianReview(event)) return true
   return event.review.state === 'accepted'
 }
@@ -416,6 +420,7 @@ export function projectStateToSurface(
   const snapshots: LongitudinalMetricSnapshot[] = []
   let blockedByConsent = 0
   let pendingClinicalReview = 0
+  let blockedByTruthClass = 0
 
   for (const metric of Object.keys(state.metricEventIds).sort()) {
     const snapshot = metricSnapshotAt(state, metric, atMs)
@@ -423,6 +428,11 @@ export function projectStateToSurface(
 
     if (!isConsentActive(snapshot.latest.consent, purpose, atMs)) {
       blockedByConsent += 1
+      continue
+    }
+
+    if ((surface === 'clinical' || surface === 'ai-emr') && (!snapshot.latest.semanticState || !CLINICAL_TRUTH_STATES.has(snapshot.latest.semanticState))) {
+      blockedByTruthClass += 1
       continue
     }
 
@@ -444,6 +454,7 @@ export function projectStateToSurface(
     metrics: snapshots,
     pendingClinicalReview,
     blockedByConsent,
+    blockedByTruthClass,
   }
 }
 
@@ -489,6 +500,7 @@ export function buildContextPacket(
     governance: {
       pendingClinicalReview: projection.pendingClinicalReview,
       blockedByConsent: projection.blockedByConsent,
+      blockedByTruthClass: projection.blockedByTruthClass,
       autonomousClinicalCommitAllowed: false as const,
     },
   }
