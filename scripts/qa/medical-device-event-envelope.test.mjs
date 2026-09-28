@@ -40,6 +40,9 @@ test('accepts a provenance-preserving external waveform reference', () => {
   const result = validateMedicalDeviceEvent(base)
   assert.equal(result.accepted, true)
   assert.deepEqual(result.errors, [])
+  assert.equal(result.constitutional.decision, 'ALLOW')
+  assert.equal(result.constitutional.executionGate, 1)
+  assert.equal(result.constitutional.counts.hardPassed, 4)
 
   const normalized = normalizeMedicalDeviceEvent({
     ...base,
@@ -56,6 +59,8 @@ test('rejects inline waveform arrays so high-frequency data is not flattened int
     payload: { ...base.payload, samples: [0.1, 0.2] },
   })
   assert.equal(result.accepted, false)
+  assert.equal(result.constitutional.decision, 'BLOCK')
+  assert.ok(result.constitutional.failedHardAxiomIds.includes('A20'))
   assert.ok(result.errors.some((error) => error.includes('inline waveform samples')))
 })
 
@@ -99,6 +104,9 @@ test('therapy-delivery events are observations only and can never request actuat
     payload: { ...therapy.payload, actuationRequested: true },
   })
   assert.equal(actuation.accepted, false)
+  assert.equal(actuation.constitutional.decision, 'BLOCK')
+  assert.equal(actuation.constitutional.executionGate, 0)
+  assert.ok(actuation.constitutional.failedHardAxiomIds.includes('A15'))
   assert.ok(actuation.errors.some((error) => error.includes('actuation')))
   assert.ok(actuation.errors.some((error) => error.includes('inbound-read-only')))
 })
