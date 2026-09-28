@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ambangKeTekstur, skalaKotak, type VolumeTekstur } from '../lib/volumeTekstur'
 import { lapisanKeUniform, type LapisanVolume } from '../lib/lapisanVolume'
 import { normalBidang, jarakBidang, BIDANG_AWAL, type BidangMiring } from '../lib/bidangPotong'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 
 // GPU ray-casting for a DICOM volume. This renders the selected study values;
 // it does not infer organs, diagnoses, or substitute an anatomical atlas.
@@ -363,14 +364,18 @@ export function VolumeDicom3D({
     controls.minDistance = 0.7
     controls.maxDistance = 5
 
-    let hidup = true
-    const gambar = () => {
-      if (!hidup) return
+    // Damping still needs a continuous loop while this viewer is active, but
+    // volume ray-casting is one of the most expensive Body Exposure renders.
+    // Reuse the shared guard so it does no GPU work offscreen or in a hidden tab.
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-      requestAnimationFrame(gambar)
+    })
+    const konteksHilang = (event: Event) => {
+      event.preventDefault()
+      loop.kontekHilang()
     }
-    requestAnimationFrame(gambar)
+    renderer.domElement.addEventListener('webglcontextlost', konteksHilang)
 
     const ubahUkuran = () => {
       const l = wadah.clientWidth || lebar
@@ -382,7 +387,8 @@ export function VolumeDicom3D({
     window.addEventListener('resize', ubahUkuran)
 
     return () => {
-      hidup = false
+      loop.hentikan()
+      renderer.domElement.removeEventListener('webglcontextlost', konteksHilang)
       window.removeEventListener('resize', ubahUkuran)
       controls.dispose()
       geometry.dispose()
