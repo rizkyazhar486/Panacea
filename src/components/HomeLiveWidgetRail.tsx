@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { getVitals } from '../lib/healthVitals'
+import { useVitals } from '../lib/useVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
 
 type SignalDef = {
@@ -79,7 +79,7 @@ function trend(field: string) {
 }
 
 export function HomeLiveWidgetRail() {
-  const vitals = getVitals() as unknown as Record<string, unknown>
+  const vitals = useVitals() as unknown as Record<string, unknown>
 
   return (
     <section aria-labelledby="home-live-widget-rail-title" className="mb-4">
