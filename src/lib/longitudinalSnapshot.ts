@@ -29,6 +29,12 @@ export interface LongitudinalSnapshot {
   state: LongitudinalPatientState | null
   skipped: number
   labels: Record<string, string>
+  labSource: 'server' | 'browser'
+  /** Shared lab+care+clinical+device envelope arrived from the authenticated server. */
+  serverSource: 'server' | 'browser'
+  deviceSource: 'server' | 'browser'
+  selfSource: 'server' | 'browser'
+  vo2Source: 'server' | 'browser'
 }
 const KEPERCAYAAN_CATATAN = 1
 export function sameLongitudinalPatient(a: Account | null, b: Account | null): boolean {
@@ -38,8 +44,31 @@ export function sameLongitudinalOwner(a: Account | null, b: Account | null): boo
   return sameLongitudinalPatient(a, b) && a!.loggedAt === b!.loggedAt && a!.role === b!.role
 }
 
+// When the signed-in server has answered, its stored lab log is the shared
+// state. The browser copy is only the offline fallback.
+export function sumberLabLongitudinal<T>(server: T | null, browser: T): { labs: T; source: 'server' | 'browser' } {
+  if (server) return { labs: server, source: 'server' }
+  return { labs: browser, source: 'browser' }
+}
+
+// Health-profile vitals on the server replace the browser device snapshot.
+export function sumberVitalsLongitudinal<T extends Record<string, unknown>>(
+  server: Record<string, number> | null,
+  browser: T,
+): { vitals: T | (T & Record<string, number>); source: 'server' | 'browser' } {
+  if (server) return { vitals: { ...browser, ...server }, source: 'server' }
+  return { vitals: browser, source: 'browser' }
+}
+
+// Prefer health-profile-derived rows when the server returned any; otherwise keep
+// AppState-only entries that were never synced to the profile.
+export function sumberDeretLongitudinal<T>(server: T[] | null, browser: readonly T[]): { rows: readonly T[]; source: 'server' | 'browser' } {
+  if (server && server.length > 0) return { rows: server, source: 'server' }
+  return { rows: browser, source: 'browser' }
+}
+
 // The existing canonical bridges remain the only path into patient truth.
-export function projectLongitudinalSnapshot(sources: LongitudinalSources, kini = new Date().toISOString()): Omit<LongitudinalSnapshot, 'revision'> {
+export function projectLongitudinalSnapshot(sources: LongitudinalSources, kini = new Date().toISOString()): Omit<LongitudinalSnapshot, 'revision' | 'labSource' | 'serverSource' | 'deviceSource' | 'selfSource' | 'vo2Source'> {
   const { app } = sources
   const account = app.account
   const subjectId = account?.patientId
@@ -112,7 +141,7 @@ export function createLongitudinalSnapshotCache(project = projectLongitudinalSna
       const app = owner ? { ...sources.app, selfVitals: ownedRows(sources.app.selfVitals, owner), vo2maxLog: ownedRows(sources.app.vo2maxLog, owner) } : sources.app
       const next = project({ ...sources, app })
       previous = sources
-      snapshot = { ...next, revision: ++revision }
+      snapshot = { ...next, revision: ++revision, labSource: 'browser', serverSource: 'browser', deviceSource: 'browser', selfSource: 'browser', vo2Source: 'browser' }
       return snapshot
     },
   }

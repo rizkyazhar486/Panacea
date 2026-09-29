@@ -12,6 +12,7 @@ import {
   type FrontierCategory,
   type FrontierFeature,
 } from '../lib/frontierHealthOS'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const STATUS_LABEL: Record<FrontierFeature['status'], string> = {
   'integration-ready': 'Integration ready',
@@ -67,6 +68,7 @@ export function FrontierHealthOS() {
       <section className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-white to-brand/[0.06] p-5 dark:border-white/10 dark:from-neutral-950 dark:via-neutral-950 dark:to-brand/[0.08]">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Panacea Frontier Health OS</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white">From health app → programmable human Life OS</h1>
+        <BatasKlaimKesehatan permukaan="care.frontier-os" />
         <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-500">
           The frontier layer now has three tracks: usable local-first Life OS experiments, the Hope Stack for life preservation and healthy longevity,
           and deeper execution contracts for clinical intelligence, precision medicine, patient sovereignty, care automation, privacy infrastructure and population health.

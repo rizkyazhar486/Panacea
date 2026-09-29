@@ -4,6 +4,7 @@ import { submitDailyAnamnesis, type ContinuousCarePlan, type DailyAnamnesisSubmi
 import { JENIS_LAB } from '../lib/lab'
 import { evaluasiAturanLab, LABEL_KEADAAN, periksaAturanLab } from '../lib/aturanLabDokter'
 import type { LongitudinalPatientState } from '../lib/panaceaLongitudinalState'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Dokter menyusun cek harian untuk satu pasien (lewat izin yang sama dengan
 // berbagi lab) dan membaca laporan. Prioritas/aturan terpicu DIHITUNG ULANG di
@@ -57,6 +58,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
   if (!data) {
     return (
       <div className="mt-3 border-t border-white/10 pt-3" data-care-plan>
+      <BatasKlaimKesehatan permukaan="care.doctor-daily-plan" />
         <h3 className="text-[12px] font-black">Daily follow-up</h3>
         {galat ? (
           <p role="alert" className="mt-1 text-[11px] font-bold text-amber-300">

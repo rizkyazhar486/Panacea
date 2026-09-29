@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type QuestionType = 'diagnosis' | 'therapy' | 'prognosis' | 'harm' | 'mechanism'
 type SavedQuestion = { id: string; query: string; type: QuestionType; createdAt: string }
@@ -63,6 +64,7 @@ export function MedicalLibraryWorkbench({ onRun }: { onRun: (query: string) => v
         <div className="max-w-2xl">
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-sky-700 dark:text-sky-300">Medical Library · evidence workspace</div>
           <h2 className="mt-1 text-xl font-black text-neutral-950 dark:text-white">Start with a question, find the source, then judge whether it applies.</h2>
+          <BatasKlaimKesehatan permukaan="clinical.library-workbench" />
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">Build a structured clinical or scientific question here. The live library below searches evidence; Knowledge Bridge helps connect a selected topic to mechanism and clinical meaning.</p>
         </div>
         <span className="rounded-full bg-sky-50 px-3 py-2 text-[9px] font-black text-sky-800 dark:bg-sky-400/10 dark:text-sky-200">Saved questions {saved.length}</span>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Carbon-Footprint Diet Calculator — estimates the greenhouse-gas footprint of
@@ -70,6 +71,7 @@ export function CarbonDiet() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconLeaf size={20} />} title="Carbon-Footprint Diet Calculator" subtitle="Perkirakan jejak gas rumah kaca pola makan Anda dari jumlah sajian per pekan" />
+        <BatasKlaimKesehatan permukaan="longevity.carbon-diet" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Enter how many servings of each food you eat in a typical <b>week</b>. This uses global-average
           emission factors (kg CO₂-equivalent per kg of food, farm-to-consumer) from Poore &amp; Nemecek,

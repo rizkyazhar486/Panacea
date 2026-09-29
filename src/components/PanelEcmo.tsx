@@ -15,6 +15,7 @@ import { SKENARIO_VV, DASAR_VV, jalankanVV, petunjukVV, type HasilVV } from '../
 import { SKENARIO, DASAR, jalankan, petunjuk, type KeadaanSkenario, type HasilGabungan, type Petunjuk } from '../lib/ecmo/skenario'
 import { keadaanOrganVA, keadaanTungkai, kreatininSetelah } from '../lib/ecmo/organ'
 import { simulasiSirkulasi, trombosisOksigenator, jelaskanHemodinamik, SKENARIO_SYOK_KARDIOGENIK, SIRKULASI_NORMAL, type ParameterSirkulasi, type HasilSirkulasi } from '../lib/ecmo/sirkulasi'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Kembaran digital ECMO (edukasi). Panel ini hanya MEMBACA keadaan mesin:
 // tidak ada angka yang ditulis langsung, warna darah = pemetaan saturasi terhitung.
@@ -179,6 +180,7 @@ function EchoSkematis({ h }: { h: HasilSirkulasi }) {
   const d = echo.bingkai.map((x, k) => `${k ? 'L' : 'M'}${(4 + (k / (echo.bingkai.length - 1)) * 142).toFixed(1)} ${(8 + (x.kecepatan / vMaks) * 44).toFixed(1)}`).join(' ')
   return (
     <div className="rounded-xl bg-black p-2" data-ecmo-echo>
+      <BatasKlaimKesehatan permukaan="clinical.ecmo-panel" />
       <svg viewBox="0 0 300 120" className="w-full" role="img" aria-label="Schematic echo view derived from the simulated LV volume and aortic flow">
         <path d="M150 6 L20 114 A140 140 0 0 0 280 114 Z" fill="#111" stroke="#333" />
         <ellipse cx="150" cy="70" rx={38 * b.skalaRongga} ry={46 * b.skalaRongga} fill="#000" stroke="#9ca3af" strokeWidth="5" />

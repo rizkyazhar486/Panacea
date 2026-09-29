@@ -24,14 +24,14 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   vitd: ['vitamin d', '25-oh', '25(oh)d'],
   b12: ['vitamin b12', 'cobalamin', 'b12'],
   ferritin: ['feritin', 'ferritin'],
-  crp: ['hs-crp', 'hscrp', 'high sensitivity crp'],
+  crp: ['hs-crp', 'hscrp', 'high sensitivity crp', 'crp'],
   albumin: ['albumin'],
   mcv: ['mcv'],
   rdw: ['rdw-cv', 'rdw'],
   alp: ['alkali fosfatase', 'alkaline phosphatase', 'alp'],
   wbc: ['leukosit', 'leukocytes', 'white blood cell', 'wbc'],
   limfosit: ['limfosit', 'lymphocytes', 'lymphocyte'],
-  hb: ['hemoglobin', 'haemoglobin', 'hb'],
+  hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 
 export interface KandidatLab {
@@ -98,3 +98,16 @@ export function uraikanLembarLab(teks: string): KandidatLab[] {
   }
   return hasil
 }
+
+/**
+ * Vision prompt for lab-report photos. OCR drafts plain text only; parsing and
+ * confirm-before-save stay in uraikanLembarLab / ImporLembarLab.
+ */
+export const PERINTAH_BACA_LEMBAR_LAB =
+  'Read the laboratory results table in this image. Transcribe each result line ' +
+  'exactly as printed, one line per test, in the form "Test name  value  unit  ' +
+  'reference range" when those fields are visible. Preserve numbers, units, and ' +
+  'ranges as written (including Indonesian commas as decimals). Do not invent ' +
+  'missing values, convert units, diagnose, or add advice. Skip unreadable lines ' +
+  'and any patient name or address.'
+

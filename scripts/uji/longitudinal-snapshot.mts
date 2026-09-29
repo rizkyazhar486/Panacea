@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { createLongitudinalSnapshotCache, projectLongitudinalSnapshot, emptyLongitudinalServer } from '../../src/lib/longitudinalSnapshot.ts'
+import { createLongitudinalSnapshotCache, projectLongitudinalSnapshot, emptyLongitudinalServer, sumberLabLongitudinal, sumberVitalsLongitudinal, sumberDeretLongitudinal } from '../../src/lib/longitudinalSnapshot.ts'
 import { canEnterAiContext, canEnterClinicalRecord } from '../../src/lib/panaceaLongitudinalState.ts'
 import type { Account } from '../../src/lib/types.ts'
 
@@ -56,4 +56,25 @@ assert(!Object.keys(otherUpdate.state!.eventsById).some(id => id.includes('self1
 assert.doesNotThrow(() => cache.read({ ...sources, app: { ...app, selfVitals: [null, 'invalid'] as never } }), 'malformed personal rows fail closed')
 const metadata = projectLongitudinalSnapshot({ ...sources, app: { ...app, account: { ...account, name: 'Updated label' } } }, now)
 assert.deepEqual(metadata.state, projectLongitudinalSnapshot(sources, now).state, 'cosmetic account updates retain source ownership')
+const serverLabs = { gdp: [{ id: 'server', tanggal: '2026-09-20', nilai: 90 }] }
+const browserLabs = { gdp: [{ id: 'browser', tanggal: '2026-09-20', nilai: 180 }] }
+assert.equal(sumberLabLongitudinal(serverLabs, browserLabs).source, 'server')
+assert.equal(sumberLabLongitudinal(serverLabs, browserLabs).labs.gdp[0].id, 'server', 'a server lab log replaces the browser copy')
+assert.equal(sumberLabLongitudinal(null, browserLabs).source, 'browser')
+assert.equal(sumberLabLongitudinal(null, browserLabs).labs, browserLabs, 'offline keeps the browser copy')
+const fromServer = projectLongitudinalSnapshot({ ...sources, local: { ...local, labs: sumberLabLongitudinal(serverLabs, browserLabs).labs } }, now)
+assert.equal(Object.values(fromServer.state!.eventsById).find(e => e.domain === 'lab')!.value, 90)
+assert.equal(a.labSource, 'browser')
+assert.equal(a.serverSource, 'browser')
+assert.equal(a.deviceSource, 'browser')
+assert.equal(a.selfSource, 'browser')
+assert.equal(a.vo2Source, 'browser')
+const vitalsServer = sumberVitalsLongitudinal({ weightKg: 70, restingHr: 55 }, { weightKg: 99, steps: 1000 })
+assert.equal(vitalsServer.source, 'server')
+assert.equal(vitalsServer.vitals.weightKg, 70)
+assert.equal(vitalsServer.vitals.steps, 1000, 'server keys overlay the browser snapshot without dropping other fields')
+assert.equal(sumberVitalsLongitudinal(null, { weightKg: 99 }).source, 'browser')
+assert.equal(sumberDeretLongitudinal([{ id: 's1' }], [{ id: 'b1' }]).rows[0].id, 's1')
+assert.equal(sumberDeretLongitudinal([], [{ id: 'b1' }]).source, 'browser', 'empty server series keeps AppState-only rows')
+assert.equal(sumberDeretLongitudinal(null, [{ id: 'b1' }]).source, 'browser')
 console.log('longitudinal-snapshot: one build/three reads, revision invalidation, patient isolation and provenance passed')

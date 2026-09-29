@@ -10,6 +10,7 @@ import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 export const GROUPS = [
   {
@@ -112,6 +113,10 @@ export function ClinicalHub() {
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
           <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
         </header>
+        <BatasKlaimKesehatan
+          permukaan="clinical.hub"
+          className="mt-0 text-[11px] leading-snug text-white/55"
+        />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">

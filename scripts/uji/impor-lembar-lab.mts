@@ -25,6 +25,47 @@ assert.equal(per.kreatinin.masalah, 'satuan-berbeda', 'satuan berbeda lolos tanp
 assert.equal(per.sgot.rujukanBawah, undefined); assert.equal(per.hdl.rujukanAtas, undefined)
 // Baris tanpa angka / teks bebas tidak menghasilkan kandidat.
 assert.deepEqual(uraikanLembarLab('Catatan: hemoglobin normal\nDokter penanggung jawab'), [])
+
+// OCR-style draft (what a vision model might emit): uneven spaces, mixed ID/EN,
+// Indonesian decimal comma. Same fail-closed unit rules as clean paste.
+const ocrDraft = `
+Hemoglobin  14.2  g/dL  13.0 - 17.0
+Leukosit 6,8 10^3/uL 4.0 - 11.0
+Fasting glucose  108 mg/dL  74 - 106
+Kreatinin 1.1 mg/dL 0.7 - 1.3
+Patient: DO_NOT_PARSE_THIS
+`
+const ocr = Object.fromEntries(uraikanLembarLab(ocrDraft).map((x) => [x.jenisId, x]))
+assert.equal(ocr.hb?.nilai, 14.2)
+assert.equal(ocr.wbc?.nilai, 6.8)
+assert.equal(ocr.gdp?.nilai, 108)
+assert.equal(ocr.kreatinin?.nilai, 1.1)
+assert.equal(ocr.kreatinin?.masalah, null)
+assert.equal(Object.keys(ocr).includes('patient' as string), false)
+
+// OCR draft: column drift + repeated analyte (keep last readable line), no PHI keys.
+const ocrKolom = `
+HASIL PEMERIKSAAN DARAH
+Hb     13,5   g/dL
+HGB 13.5 g/dL 12-16
+Glukosa Puasa    99   mg/dL   70 - 100
+Creatinine 0.9 mg/dL 0.6-1.2
+CRP   2,5  mg/L
+Nama Pasien: JANGAN_IMPOR
+`
+const kolom = Object.fromEntries(uraikanLembarLab(ocrKolom).map((x) => [x.jenisId, x]))
+assert.equal(kolom.hb?.nilai, 13.5, 'Hb/HGB OCR harus terbaca')
+assert.equal(kolom.gdp?.nilai, 99)
+assert.equal(kolom.kreatinin?.nilai, 0.9)
+assert.equal(kolom.crp?.nilai, 2.5)
+assert.equal(Object.keys(kolom).some((k) => /pasien|nama/i.test(k)), false)
+
+// Negatif OCR: sampah vision / kosong → tidak ada kandidat (fail-closed).
+assert.deepEqual(uraikanLembarLab(''), [])
+assert.deepEqual(uraikanLembarLab('   \n\t  '), [])
+assert.deepEqual(uraikanLembarLab('lorem ipsum dolor sit amet\n###\n???'), [])
+assert.deepEqual(uraikanLembarLab('Hemoglobin normal\nLeukosit dalam batas'), [])
+
 console.log('impor-lembar-lab: nama ID/EN, koma desimal, rentang dua sisi saja, satuan berbeda ditandai tidak diimpor')
 {
   const { readFileSync } = await import('node:fs')
@@ -32,5 +73,10 @@ console.log('impor-lembar-lab: nama ID/EN, koma desimal, rentang dua sisi saja, 
   assert.match(ui, /disabled=\{!!k\.masalah\}/, 'kandidat bersatuan berbeda bisa dicentang')
   assert.match(ui, /Object\.fromEntries\(k\.map\(\(x\) => \[x\.jenisId, false\]\)\)/, 'kandidat tercentang otomatis — angka tersimpan tanpa konfirmasi pengguna')
   assert.match(ui, /periksaMasukanLab\(jenis, String\(k\.nilai\), tanggal, hariIni\(\)\)/, 'impor melewati pemeriksa masukan lab')
+  assert.match(ui, /data-lab-photo-button/, 'lab import must offer a photo OCR draft path')
+  assert.match(ui, /PERINTAH_BACA_LEMBAR_LAB/, 'photo path must use the lab-specific vision prompt')
+  assert.match(ui, /Draft from photo|technical draft/, 'photo OCR must not claim clinical validation')
+  assert.match(ui, /Nothing is saved until you tick/, 'photo OCR must still require per-value confirm')
   assert.match(readFileSync('src/components/UbinLab.tsx', 'utf8'), /<ImporLembarLab \/>/)
+  assert.match(readFileSync('src/lib/imporLab.ts', 'utf8'), /export const PERINTAH_BACA_LEMBAR_LAB/, 'lab vision prompt must stay next to the deterministic parser')
 }

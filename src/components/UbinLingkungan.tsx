@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
 import { muatSetelan } from '../lib/adzan'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Udara dan sinar ultraviolet di kota pemakainya.
@@ -97,6 +98,7 @@ export function UbinLingkungan() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Air & UV</h2>
+        <BatasKlaimKesehatan permukaan="environment.home-tile" />
         <span className="t-mikro truncate text-neutral-400">{data.kota}</span>
       </div>
 

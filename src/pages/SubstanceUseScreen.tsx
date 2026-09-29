@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alcohol & Tobacco Use Screening — two short, validated clinical instruments:
@@ -36,11 +37,11 @@ export function SubstanceUseScreen() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Alcohol & Tobacco Use Screening" subtitle="CAGE questionnaire + pack-year / lung-screening eligibility" />
+        <SectionTitle icon={<IconShield size={20} />} title="Alcohol & Tobacco Use Screening" subtitle="CAGE questionnaire + pack-year / lung-screening eligibility — not a clinically validated Panacea decision" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Two short, validated screens used routinely in primary care. Answer honestly — these tools
-          exist to catch risk early, not to judge.
+          Two short published primary-care screens. Answer honestly — these tools exist to catch risk early, not to judge.
         </p>
+        <BatasKlaimKesehatan permukaan="screening.substance" />
       </Card>
 
       <Card className="!p-5">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { gerbangRilisKlinis, JENIS_GALAT, susunLaporan, type JenisGalat, type KasusBeku, type KlaimKlinis, type LaporanValidasi, type Protokol } from '../lib/validasiKlinis'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Studi validasi klinis — layar penilai (buta) dan laporan pemimpin studi.
 // Perangkat lunak tidak membuat penilaian apa pun; setiap angka laporan berasal
@@ -35,6 +36,7 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-[#050708] p-3 text-white" aria-label="Clinical validation studies" data-validation-studies>
       <h2 className="text-sm font-black">Clinical validation studies</h2>
+      <BatasKlaimKesehatan permukaan="clinical.validation-study" />
       <p className="mt-0.5 text-[11px] text-white/55">Your structured judgement of frozen system outputs; software never scores itself.</p>
       {galat && <p role="alert" className="mt-1 text-[11px] font-bold text-amber-300">{galat === 'verified clinician role required' ? 'Available after your STR is verified.' : galat}</p>}
       {!studi && !galat && <p className="mt-1 text-[11px] text-white/50">Loading studies…</p>}

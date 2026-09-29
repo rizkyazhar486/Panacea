@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -2570,7 +2571,8 @@ export function ClinicalCalculators() {
   if (access && !access.unlocked) {
     return (
       <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} published scores and tools, grouped by organ system — not a clinically validated Panacea decision`} />
+        <BatasKlaimKesehatan permukaan="calculators.clinical" />
         <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
       </div>
     )
@@ -2583,7 +2585,8 @@ export function ClinicalCalculators() {
           <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
         </div>
       )}
-      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
+      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} published scores and tools, grouped by organ system — not a clinically validated Panacea decision`} />
+      <BatasKlaimKesehatan permukaan="calculators.clinical" />
       <KartuDataPerangkat />
       <input
         className={inputClass}

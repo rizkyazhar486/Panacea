@@ -11,6 +11,7 @@ import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { Portal } from '../components/Portal'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
@@ -247,11 +248,8 @@ export function Chatbot() {
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
       setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Uploading image: ${file.name}`, at: new Date().toISOString() }])
-      const r = await api.aiVision(
-        dataUrl,
-        'Analyze this clinical or diagnostic image. Describe only visible/objective features first, then provide a provisional differential, red flags, and the minimum history/examination/tests needed to distinguish the leading diagnoses. Do not invent palpation findings, vital signs, laboratory values, lymph-node findings, or other unseen data.',
-      )
-      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image Analysis**\n\n${r.text}`, at: new Date().toISOString() }))
+      const r = await api.aiVision(dataUrl, 'Describe visible structures in this medical teaching image for education only. Describe only visible/objective features. Do not diagnose, stage, measure lesions, give a differential, or give treatment advice. Do not invent palpation findings, vital signs, laboratory values, lymph-node findings, or other unseen data. If the image is unclear, say so.')
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image description (educational draft)**\n\n${r.text}\n\n_Technical output — not clinician-reviewed or clinically validated._`, at: new Date().toISOString() }))
     } catch { setError('Failed to analyze the image.') } finally { setAnalyzing(false) }
   }
 
@@ -385,6 +383,7 @@ export function Chatbot() {
         <span className="mt-0.5 shrink-0">⚕️</span>
         <span><b>Important:</b> This AI is <b>educational &amp; supportive</b>, not a replacement for a doctor. In an emergency, use <b>Emergency SOS</b> immediately.</span>
       </div>
+      <BatasKlaimKesehatan permukaan="care.ai-chat" />
       {topup && (
         <div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm">
           <span className="text-accent">Insufficient PNC balance ({price} PNC).</span>
@@ -399,8 +398,8 @@ export function Chatbot() {
             <button onClick={() => setShowHistory(true)} title="Chat history" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
             <IconChat className="text-brand" size={20} />
             <div>
-              <div className="font-bold">Anamnesis Co-Physician</div>
-              <div className="text-xs text-neutral-500">AI interviews the patient &amp; recommends supporting tests</div>
+              <div className="font-bold">Anamnesis Assistant</div>
+              <div className="text-xs text-neutral-500">Educational interview draft — not a clinically validated Panacea decision</div>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">

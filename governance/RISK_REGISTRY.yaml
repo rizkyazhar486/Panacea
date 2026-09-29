@@ -9,10 +9,16 @@ risks:
   - risk_id: risk.fragmented_patient_truth
     category: data_integrity
     severity: high
-    state: open
+    state: mitigated_in_part
     description: Multiple modules may model the same person independently and diverge.
-    mitigation: Converge on canonical patient state and explicit write authority.
-    evidence: [requires_repository_audit]
+    mitigation: >-
+      Converge on canonical patient state and explicit write authority.
+      2026-09-29: GET /api/keadaan-longitudinal returns one shared revision for lab, care, self-scoped EMR,
+      health-profile device vitals, and validated selfVitals/vo2max synced through PUT /api/health-series/*
+      (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
+      browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
+      that still model the person independently).
+    evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
 
   - risk_id: risk.feature_sprawl
     category: product_architecture
@@ -33,8 +39,49 @@ risks:
       clinical-validation claim; clinically-validated requires explicit human review, external validation and linked
       validation evidence. EMR signatures now describe the actual server-confirmed review event rather than
       "certification", and AI-generated patient education remains visibly draft-level unless review evidence exists.
-      Remaining work is platform-wide: every healthcare-facing surface and generated clinical artifact must adopt the
-      same maturity contract before this risk can be marked fully mitigated.
+      2026-09-29: the same fail-closed contract now sits on the longevity score, the author-weighted biological-age
+      number, published PhenoAge, the straight-line lab trend, and the risk calculators (src/components/BatasKlaimKesehatan.tsx).
+      Sign-in, landing, and pricing no longer call the record "Certified AI-EMR".
+      Later the same day: clinical calculators, body-composition score, organ-vitality panels, and mental-health
+      screening (PHQ-9/GAD-7) adopt the same contract; then Epworth, CAGE/pack-years, FINDRISC, chronotype (rMEQ),
+      and the Planning CDSS gate. Still later: standalone published clinical scores (NEWS2, SOFA, Wells, HAS-BLED,
+      BISAP, GRACE, TIMI, MELD, Child-Pugh, Caprini, Padua, Glasgow-Blatchford, Rockall, Maddrey, 4Ts, STOP-BANG,
+      Charlson, Braden) share calculators.published-score via BatasKlaimSkorTerbit; STOP-BANG and PusatJiwa copy no
+      longer imply Panacea clinical validation from published instruments. The same day also covers the Framingham
+      what-if simulator (longevity.health-simulator) and family-history screening flags (screening.family-history),
+      plus softened Risk/Wellness hub buyer copy. Still later: dermatology teaching differentials
+      (clinical.dermatology-mapper), second-opinion AI-draft workflow (care.second-opinion), and sports
+      supplement evidence grades (longevity.supplements). Still later: Drug Info label/catalog surface
+      (clinical.drug-info), fitness-test/AI form scores (performance.fitness-test), and photo shape-forming
+      drafts (longevity.shape-forming); chatbot vision prompt no longer asks to "analyze diagnostic imaging"
+      as if for diagnosis. Still later: empiric therapy class reference, NRP education guide, first-aid lay
+      guide, and plain-language lab decoder; Duke criteria joins calculators.published-score. Chatbot surface
+      (care.ai-chat) no longer titles itself "Co-Physician." Still later: remaining Clinical Scores children
+      (PERC, QTc, CHA2DS2-VASc, Light, Ranson, FeNa, Cockcroft-Gault, osmolality, corrected calcium, fluids,
+      pediatric DKA, Friedewald LDL, Ottawa ankle) share calculators.published-score; Gene Info, air-quality tips,
+      and emergency SOS card gain dedicated claim surfaces; Dashboard insight prompt drops "co-physician" branding.
+      2026-09-30: Landing CTA/trust strip no longer sells an "AI co-physician verified by doctors"; sleep-debt,
+      author-weighted sleep score, recovery-phase tracker, and readiness journal adopt the same claim contract.
+      Same day later: Login brand panel drops "doctors verify"; Body Battery, Aesthetic Vitality, vocal biomarkers,
+      self-assessment toolkit, rPPG heart-rate, and A-a oxygen gradient join the claim-boundary contract.
+      Still later: feature catalog drops "Validated … screening" / "really functioning" buyer copy; alcohol BAC,
+      caffeine–sleep, hydration, child-growth, and SNP profiler surfaces join the claim contract.
+      Same day bulk: remaining high-risk wellness/clinical/performance toolkits (vaccine, allergy, pain diary,
+      sleep/movement/mind toolkits, athlete, clinical trackers, MSE, safety plan, genome lab, phone scan,
+      sexual-health tracker, gait, fasting, breathwork, bio-simulators, medication reminders, and related
+      surfaces) adopt the shared claim boundary — then Consult triage, Nutrition longevity score, Data Lab,
+      Calculator Hub, Athlete Science, Electrophysiology, Endurance Tools, Health League, Care Episode,
+      Macro Lab, Longevity Curriculum, Architecture, Clinical Evidence, and Dashboard insights — then clinician
+      shared-lab view, patient share, and What-changed longitudinal panel — then Longevity blood panel,
+      lab photo-import draft, number-rules, Health Profile, Health Sync tutorial, MultiSport,
+      strength log, training physiology, and Pricing honesty banners — then Wellness/Clinical hubs, home health instruments,
+      Health Trends/Snapshot, Gap Navigator, Nutrition Checklist, Performance/Sports Lab,
+      and Frontier Health OS — then Your Body workspace, AI-EMR, Visit OS, VitaPulse,
+      home command/overview, body/sleep/device cards, clinical body twin, manual
+      flowsheet, daily check-in, EMR timeline, and Profile — 226 registered healthcare claim surfaces. Consult no longer claims surgical indication or "AI Recommended" clinician authority.
+      Working tree replayed onto main 04e40942 (uncommitted).
+      Remaining work is still platform-wide for generated clinical artifacts and any new healthcare surface
+      before this risk can be marked fully mitigated.
     evidence:
       - PANACEA_CONSTITUTION.md
       - PANACEA_HUMANITY_10_CHARTER.md
@@ -54,13 +101,26 @@ risks:
     category: data_integrity
     severity: high
     state: mitigated_partially
-    description: All server state is one data.json / one MongoDB document (16 MB BSON limit), rewritten on every save; growth or a failed write can lose data.
+    description: Server state is still one data.json in file mode. On MongoDB the core app document no longer holds the stored keys (16 MB BSON limit applies to whatever remains in that document, and to any single chart or capped series document). A failed write can still lose the latest save.
     mitigation: >-
       2026-09-25: atomic file writes, corrupt file preserved not overwritten, MongoDB save failures and
       near-limit size surfaced in /api/health (penyimpananSehat), flush on SIGTERM, capped clinical/audit
-      records archived append-only (arsip_<name>) instead of deleted. Remaining: real schema with
-      per-record collections/tables and migrations (engineering owner).
-    evidence: [server/src/simpanAman.ts, server/uji/simpanAman.uji.ts, server/uji/arsipKlinis.uji.ts, production /api/health 2026-09-25 penyimpanan=mongo penyimpananSehat=true]
+      records archived append-only (arsip_<name>) instead of deleted.
+      2026-09-29: lab/care, accounts, wallets, per-patient records, posts, settings, Connect, orders,
+      notification inboxes, the transaction ledger, then per-email device series (heart rate, sleep,
+      workouts, heart-rate notifications, webhook deliveries), then per-account health profiles, daily
+      summaries, reminders, sports favorites, push subscriptions, and health-webhook tokens persist as their
+      own MongoDB documents, then the remaining keys (clubs, meets, applications, feedback, prices, visit
+      memberships, creator subscriptions, manual top-ups, second opinions, and the validation ledger),
+      per-item clinical list rows, per-patient chart objects, and per-sample heart-rate rows
+      (server/src/irisanPenyimpanan.ts, versi tuntas-v1, including the clinical audit trail; earlier slice versions still load and upgrade on
+      the next save). The validation ledger is append-only: a shorter in-memory book does not delete stored
+      entries. The phone-hash salt is reloaded into the Connect module after the split so a process restart
+      cannot mint a new salt. A partial older slice does not replace webhook tokens, the ledger, or keys
+      still held in memory. /api/health.irisan reports the split. The 16 MB check applies to the core
+      document only. Remaining: file mode is still one JSON file. One patient chart object is still one
+      document. Capped sleep, workout, and notification series are still one document per email.
+    evidence: [server/src/simpanAman.ts, server/src/irisanPenyimpanan.ts, server/uji/simpanAman.uji.ts, server/uji/irisanPenyimpanan.uji.ts, server/uji/arsipKlinis.uji.ts, production /api/health 2026-09-25 penyimpanan=mongo penyimpananSehat=true]
 
   - risk_id: risk.free_tier_server_sleep
     category: reliability

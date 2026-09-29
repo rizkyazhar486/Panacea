@@ -11,6 +11,7 @@ import {
   relativePoiseuilleResistance,
   type Medical3DFrontierId,
 } from '../lib/medical3DFrontier'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 function clearScene(scene: THREE.Scene) {
   const keep = new Set(scene.children.filter((x) => x.userData.keep))
@@ -260,6 +261,7 @@ export function Medical3DFrontierLab() {
           title="3D Frontier Medical Lab"
           subtitle="Four high-value spatial modules that do not duplicate the existing anatomy, cell, surgery or biomechanics labs"
         />
+        <BatasKlaimKesehatan permukaan="clinical.medical-3d-lab" />
         <div className="mt-4 flex flex-wrap gap-2">
           {MEDICAL_3D_FRONTIER.map((item) => (
             <button

@@ -16,6 +16,7 @@ import {
   kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Analisis Pro — satu halaman berisi padanan fitur analisis berbayar Strava,
@@ -96,6 +97,7 @@ export function AnalisisPro() {
     return (
       <div className="space-y-4 pb-24">
         <SectionTitle icon={<IconChartUp />} title="Pro Analysis" subtitle="Fitness, freshness, relative effort, records and targets" />
+        <BatasKlaimKesehatan permukaan="performance.analisis-pro" />
         <Card>
           <Prosa kelas="text-sm leading-relaxed text-neutral-600">No training sessions stored yet, so there is nothing to analyse. Every number on this page is computed from real sessions — there is no sample or default data.</Prosa>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">

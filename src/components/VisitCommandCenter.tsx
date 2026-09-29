@@ -22,6 +22,7 @@ import {
   type VisitDeviceMetric,
   type VisitOperatingState,
 } from '../lib/visitOperatingSystem'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface VisitCommandCenterProps {
   recordId?: string
@@ -380,6 +381,7 @@ function AuthenticatedVisitCommandCenter({
   if (activePatient.id === 'none') {
     return (
       <section className="dark rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white">
+      <BatasKlaimKesehatan permukaan="care.visit-command" className="mt-2 text-[11px] leading-snug text-white/55" />
         <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/35">Visit OS</div>
         <div className="mt-2 text-lg font-black">Select or add a patient first</div>
       </section>

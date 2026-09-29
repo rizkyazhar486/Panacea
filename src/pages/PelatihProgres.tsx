@@ -8,6 +8,7 @@ import {
   UKURAN, bandingkan, ringkas, kunciPekan, BATAS_PROGRES,
   type PekanProgres,
 } from '../lib/progresPekanan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Pelacak progres pekanan.
 //
@@ -81,6 +82,7 @@ export function PelatihProgres() {
     <div className="space-y-4">
       <SectionTitle icon={<IconChartUp />} title="Progress tracker"
         subtitle="Week against week — what moved, what did not, and what is too small to call" />
+      <BatasKlaimKesehatan permukaan="performance.progress-coach" />
 
       <Card>
         <div className="flex flex-wrap items-baseline justify-between gap-2">

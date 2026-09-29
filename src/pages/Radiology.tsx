@@ -22,6 +22,7 @@ import {
   type DicomDisplayGroup,
   type DicomSliceItem,
 } from '../lib/dicomSeries'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Irisan = DicomSliceItem
 
@@ -252,6 +253,7 @@ export function Radiology() {
           title="MRI / CT workspace"
           subtitle="Load your own uncompressed DICOM study. Pixel data stays in this browser and is never uploaded."
         />
+        <BatasKlaimKesehatan permukaan="clinical.radiology" />
         <label className="mt-3 block cursor-pointer rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50/40 px-4 py-5 text-center active:scale-[0.995] dark:bg-brand/5">
           <input
             type="file"

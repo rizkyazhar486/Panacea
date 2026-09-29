@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 // ─────────────────────────────────────────────────────────────────────────────
 // Morfologi lesi kulit — dua belas gambar potongan melintang, digambar sendiri.
 //
@@ -142,6 +143,7 @@ export function MorfologiLesi() {
       <h2 className="text-sm font-black uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
         Morfologi lesi primer — potongan melintang
       </h2>
+      <BatasKlaimKesehatan permukaan="clinical.lesion-morphology" />
       <p className="mt-1 text-[11px] leading-snug text-neutral-500">
         Yang membedakan makula dari papula, dan papula dari nodul, bukan warnanya melainkan apakah ia menonjol dan
         seberapa dalam ia duduk — dan itu hanya terlihat pada potongan melintang. Kuning muda di atas adalah epidermis,

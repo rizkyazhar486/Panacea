@@ -11,6 +11,7 @@ import {
   MUSCLE_GROUPS, STRETCH_RULES, ROUTINES, RED_FLAGS, WEEKLY_TARGET_SEC,
   stretchDose, fmtDur, type Wilayah,
 } from '../lib/stretching'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Foundation Training — lari, push-up, pull-up, sit-up, dan koreksi postur.
@@ -43,6 +44,7 @@ export function BaseTraining() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Running, push-ups, pull-ups, sit-ups, and posture correction" />
+      <BatasKlaimKesehatan permukaan="performance.base-training" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">

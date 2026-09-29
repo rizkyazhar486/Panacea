@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Doctor-Visit Prep Checklist — turns a short description of why you're going
@@ -97,6 +98,7 @@ export function VisitPrepChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Doctor-Visit Prep Checklist" subtitle="What to bring and what to ask, before you go in" />
+        <BatasKlaimKesehatan permukaan="care.visit-prep" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A consultation goes better when you show up prepared — this page turns your reason for the visit into a real checklist along with questions worth asking, so they don't only come to mind in the car on the way home.</Prosa>
         <Field label="What is this visit about?">
           <select className={`${inputClass} mt-1`} value={type} onChange={(e) => setType(e.target.value as VisitType)}>

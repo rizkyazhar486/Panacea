@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation } from 'react-router-dom'
 import { hariLalu, hariIni } from '../lib/tanggal'
 import '../styles/thermal-recovery.css'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type ThermalMode = 'spa' | 'sauna' | 'steam' | 'jacuzzi' | 'hot' | 'cold' | 'onsen'
 type ThermalFamily = 'mixed' | 'heat' | 'water' | 'cold'
@@ -173,6 +174,7 @@ export function ThermalTherapy() {
       style={{ '--tr-accent': active.accent } as CSSProperties}
       aria-label="Thermal recovery"
     >
+      <BatasKlaimKesehatan permukaan="wellness.thermal-therapy" />
       <div className="thermal-mode-rail" role="tablist" aria-label="Recovery modalities">
         {MODES.map((mode) => (
           <button

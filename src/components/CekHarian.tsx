@@ -9,6 +9,7 @@ import {
   sendOrQueueEncryptedCareReport,
 } from '../lib/secureCareOutbox'
 import { buildDailyInterview, type ContinuousCarePlan, type DailyAnamnesisAnswer } from '../lib/continuousCareOperatingSystem'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Cek harian yang diatur dokter (Continuous Care). Pertanyaan dan aturannya
 // ditulis dokter; halaman ini hanya menampilkan dan mengirim jawaban mentah.
@@ -116,6 +117,7 @@ export function CekHarian() {
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Daily check-in</h2>
         <span className="t-mikro text-neutral-400">set by {dokterEmail}</span>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.daily-checkin" className="mt-1 text-[11px] leading-snug text-neutral-500" />
       {antre > 0 && <p className="t-mikro mt-1 font-bold text-neutral-500" data-antrean-cek>{antre} check-in waiting to send.</p>}
       {!secureCareOutboxSupported() && (
         <p className="t-mikro mt-1 font-bold text-amber-500" data-secure-offline-unavailable>

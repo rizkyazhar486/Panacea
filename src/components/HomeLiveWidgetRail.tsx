@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useVitals } from '../lib/useVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type SignalDef = {
   key: string
@@ -83,6 +84,7 @@ export function HomeLiveWidgetRail() {
 
   return (
     <section aria-labelledby="home-live-widget-rail-title" className="mb-4">
+      <BatasKlaimKesehatan permukaan="wellness.home-live-rail" />
       <div className="mb-2 flex items-center justify-between gap-3 px-0.5">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">33 live instruments</div>

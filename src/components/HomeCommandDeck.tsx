@@ -8,6 +8,7 @@ import { useStore } from '../lib/store'
 import { getUsageCounts } from '../lib/usage'
 import { pintasanTerpakai } from '../lib/pintasanTerpakai'
 import '../styles/home-human-interface.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type Domain = 'Your Body' | 'Clinical' | 'For You'
 
@@ -94,6 +95,7 @@ export function HomeCommandDeck() {
           />
         </label>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.home-command" className="mt-2 text-[11px] leading-snug text-neutral-500" />
 
       {!showIndex && pintasan.length > 0 ? (
         <nav className="panacea-command-recents" aria-label="Most used capabilities">
