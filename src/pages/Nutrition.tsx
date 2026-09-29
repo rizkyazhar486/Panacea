@@ -13,6 +13,7 @@ import { JENIS_OLAHRAGA, type JenisOlahraga } from '../lib/olahraga'
 import { getVitals } from '../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { proyeksikanNilaiNutrisiKeLabKanonic } from '../lib/lab'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -1271,7 +1272,10 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
     Object.entries(editVals).forEach(([k, v]) => { const n = parseFloat(v); if (!isNaN(n)) vals[k] = n })
     if (Object.keys(vals).length === 0) return
     const updated = [...labs.filter(l => l.date !== editDate), { date: editDate, values: vals }]
-    setLabs(updated); saveLabs(updated); setShowForm(false); setEditVals({})
+    setLabs(updated); saveLabs(updated)
+    // Known analytes also join the account-synced lab log (PhenoAge / Your Numbers).
+    proyeksikanNilaiNutrisiKeLabKanonic(editDate, vals)
+    setShowForm(false); setEditVals({})
   }
 
   function labStatus(key: string, val: number) {
@@ -1311,6 +1315,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
         const idx = merged.findIndex(l => l.date === nl.date)
         if (idx >= 0) merged[idx] = { ...merged[idx], values: { ...merged[idx].values, ...nl.values } }
         else merged.push(nl)
+        proyeksikanNilaiNutrisiKeLabKanonic(nl.date, nl.values)
       })
       setLabs(merged); saveLabs(merged)
     }
@@ -1320,7 +1325,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Track how your lab results change week to week" />
+        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Mapped analytes also update your account lab log for longevity trends" />
         <div className="flex gap-2">
           <label className="cursor-pointer rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">
             {'\u{1F4C1}'} Import

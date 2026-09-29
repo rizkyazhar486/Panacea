@@ -180,6 +180,77 @@ export function tetapkanLabPadaTanggal(jenis: string, tanggal: string, nilai: nu
   simpan(s)
 }
 
+/**
+ * Nutrition page camelCase keys → synced lab-log jenis ids.
+ * Keys without a JENIS_LAB entry stay local to Nutrition (explicit skip).
+ */
+export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
+  glucose: 'gdp',
+  hba1c: 'hba1c',
+  totalCholesterol: 'chol',
+  ldl: 'ldl',
+  hdl: 'hdl',
+  triglycerides: 'tg',
+  creatinine: 'kreatinin',
+  gfr: 'egfr',
+  alt: 'sgpt',
+  ast: 'sgot',
+  hemoglobin: 'hb',
+  crp: 'crp',
+  albumin: 'albumin',
+  vitD: 'vitd',
+  uricAcid: 'asamUrat',
+  platelet: 'trombosit',
+  ferritin: 'ferritin',
+  vitB12: 'b12',
+  tsh: 'tsh',
+  mcv: 'mcv',
+  rdw: 'rdw',
+  alp: 'alp',
+  apoB: 'apob',
+}
+
+const JENIS_LAB_KE_NUTRISI: Readonly<Record<string, string>> = Object.freeze(
+  Object.fromEntries(Object.entries(KUNCI_NUTRISI_KE_JENIS_LAB).map(([k, v]) => [v, k])),
+)
+
+/**
+ * Project Nutrition weekly-tracker values into the account-synced lab log.
+ * Unknown keys and non-positive values are skipped — never invented.
+ */
+export function proyeksikanNilaiNutrisiKeLabKanonic(
+  tanggal: string,
+  values: Record<string, number>,
+): { written: string[]; skipped: string[] } {
+  const written: string[] = []
+  const skipped: string[] = []
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || !values || typeof values !== 'object') {
+    return { written, skipped: Object.keys(values ?? {}) }
+  }
+  for (const [kunci, mentah] of Object.entries(values)) {
+    const jenis = KUNCI_NUTRISI_KE_JENIS_LAB[kunci]
+    if (!jenis) { skipped.push(kunci); continue }
+    if (typeof mentah !== 'number' || !Number.isFinite(mentah) || !(mentah > 0)) {
+      skipped.push(kunci)
+      continue
+    }
+    tetapkanLabPadaTanggal(jenis, tanggal, mentah)
+    written.push(kunci)
+  }
+  return { written, skipped }
+}
+
+/** Read synced lab values for a draw date as Nutrition camelCase keys. */
+export function nilaiNutrisiDariLabKanonic(tanggal: string): Record<string, number> {
+  const keluar: Record<string, number> = {}
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return keluar
+  for (const [jenis, kunci] of Object.entries(JENIS_LAB_KE_NUTRISI)) {
+    const n = nilaiLabPadaTanggal(jenis, tanggal)
+    if (n != null && n > 0) keluar[kunci] = n
+  }
+  return keluar
+}
+
 /** Latest value on an exact draw date, else the newest prior value. */
 export function nilaiLabPadaTanggal(jenis: string, tanggal: string): number | undefined {
   const daftar = ambilLab()[jenis] ?? []
