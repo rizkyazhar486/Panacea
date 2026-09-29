@@ -101,6 +101,14 @@ export const JENIS_LAB: JenisLab[] = [
   { id: 'wbc', nama: 'White blood cells', satuan: '10³/µL', bawah: 4.0, atas: 11.0, sumber: 'Usual adult range; varies by laboratory' },
   { id: 'limfosit', nama: 'Lymphocytes', satuan: '%', bawah: 20, atas: 40, sumber: 'Usual adult differential; varies by laboratory' },
   { id: 'trombosit', nama: 'Platelets', satuan: '×10⁹/L', bawah: 150, atas: 450, sumber: 'Usual adult range; varies by laboratory' },
+  {
+    id: 'natrium', nama: 'Sodium', satuan: 'mEq/L', bawah: 135, atas: 145,
+    sumber: 'Usual adult serum range; interpret with volume status',
+  },
+  {
+    id: 'kalium', nama: 'Potassium', satuan: 'mEq/L', bawah: 3.5, atas: 5.0,
+    sumber: 'Usual adult serum range; critical when markedly abnormal',
+  },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -208,6 +216,8 @@ export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
   rdw: 'rdw',
   alp: 'alp',
   apoB: 'apob',
+  sodium: 'natrium',
+  potassium: 'kalium',
 }
 
 const JENIS_LAB_KE_NUTRISI: Readonly<Record<string, string>> = Object.freeze(

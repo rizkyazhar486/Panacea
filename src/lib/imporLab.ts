@@ -35,6 +35,8 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   wbc: ['leukosit', 'leukocytes', 'white blood cell', 'white blood cells', 'wbc'],
   limfosit: ['limfosit', 'lymphocytes', 'lymphocyte', 'lym'],
   trombosit: ['trombosit', 'platelet', 'platelets', 'plt'],
+  natrium: ['natrium', 'sodium'],
+  kalium: ['kalium', 'potassium'],
   hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 
@@ -58,6 +60,7 @@ const SATUAN_SETARA: Readonly<Record<string, readonly string[]>> = {
   'miu/l': ['miu/l', 'uiu/ml', 'µiu/ml', 'miu/l'],
   'ng/ml': ['ng/ml', 'ug/l', 'µg/l'],
   'pg/ml': ['pg/ml', 'ng/l'],
+  'meq/l': ['meq/l', 'mmol/l', 'meq/l'],
 }
 export function satuanCocok(lembar: string, jenis: JenisLab): boolean {
   const a = normal(lembar), b = normal(jenis.satuan)
