@@ -12,6 +12,7 @@ const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ defa
 const BodyToolkit = lazy(() => import('./BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
 const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
+const HealthPerformanceLeague = lazy(() => import('./HealthPerformanceLeague').then((m) => ({ default: m.HealthPerformanceLeague })))
 const PusatTubuh = lazy(() => import('./PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
 const PusatGizi = lazy(() => import('./PusatGizi').then((m) => ({ default: m.PusatGizi })))
 const HealthProfile = lazy(() => import('./HealthProfile').then((m) => ({ default: m.HealthProfile })))
@@ -19,7 +20,7 @@ const VitaPulse = lazy(() => import('./VitaPulse').then((m) => ({ default: m.Vit
 const Longevity = lazy(() => import('./Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./DataLab').then((m) => ({ default: m.DataLab })))
 
-type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
+type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
@@ -28,6 +29,7 @@ const VIEWS: View[] = [
   { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Body-region symptom logging, skin routine tools and daily non-exercise activity tracking connected to the body workspace.' },
   { key: 'character', label: '3D Character & Body Shaper', short: '3D Character', component: ShapeForming, description: 'Use your measurements and body/posture photo analysis to refine the same personal 3D character shown above.' },
   { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans, sport science and training progression in the same personal workspace.' },
+  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: 'A 90-day Health Rank and Sport Rank ladder driven by observed training, recovery, progression and evidence quality.' },
   { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily sessions, strength and movement work.' },
   { key: 'recovery', label: 'Sleep & Recovery', short: 'Recovery', component: PusatTubuh, childTab: 'pulih', description: 'Sleep, recovery and readiness context.' },
   { key: 'numbers', label: 'Your Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Your recorded signals and body metrics.' },
@@ -38,7 +40,7 @@ const VIEWS: View[] = [
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'A compact vitality view tied to the rest of Your Body.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
-const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'recovery', 'nutrition', 'health-data'])
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
@@ -46,6 +48,7 @@ const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   'body-tools': 'domain',
   character: 'domain',
   training: 'domain',
+  ranked: 'domain',
   workout: 'session',
   recovery: 'domain',
   numbers: 'metric',
