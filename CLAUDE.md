@@ -130,7 +130,50 @@ Wajib:
 - **TypeScript ketat**: tanpa `any` baru, tanpa `@ts-ignore` tanpa alasan tertulis; gunakan union/branded type untuk unit dan truth class (measured/derived/simulated).
 - **Hapus, jangan tambah**: kode mati, duplikat, dan wrapper tak berguna dihapus **hanya bila kapabilitas terjaga** atau digantikan implementasi lebih baik.
 - Komentar menjelaskan *kenapa* (batasan, sumber, formula), bukan *apa*. Ikuti gaya berkas sekitar.
-- Logika non-trivial (cabang, loop, parser, jalur klinis/uang/keamanan) meninggalkan **satu uji deterministik** di `scripts/uji/` atau `scripts/qa/`.
+- Logika non-trivial (cabang, loop, parser, jalur klinis/uang/keamanan) wajib disertai uji **positif dan negatif** sesuai §3.1.
+
+### 3.1 Standar unit test (ketat: positif + negatif wajib)
+
+Runner: `node --test` (`scripts/qa/*.test.mjs`) atau skrip deterministik `scripts/uji/*.mts`; server di `server/uji/`. Tanpa jaringan, tanpa waktu/acak nyata (injeksikan `clock`/`rng`), tanpa urutan antar-tes.
+
+**Kewajiban per unit (fungsi/engine/komponen/handler) yang ditambah atau diubah:**
+
+| Kategori | Wajib ada | Contoh |
+|---|---|---|
+| **Positif** (happy path) | ≥1 kasus input valid → hasil persis yang diharapkan | `CO = HR×SV` dari HR/EDV/ESV valid |
+| **Negatif** (invalid) | ≥1 kasus per aturan validasi: input salah tipe, kosong, `NaN`/`Infinity`, di luar rentang, unit tidak cocok, provenance hilang → **ditolak/fail-closed dengan error/hasil eksplisit**, bukan nilai tebakan | Hb negatif → error; unit salah → ditolak |
+| **Batas** (boundary) | nilai tepat di batas bawah/atas, ±1 langkah di luar batas | ambang fresh/delayed/stale 30 s / 120 s |
+| **Keamanan/otorisasi** (bila relevan) | akses tanpa identitas, role salah, replay, payload berlebih → ditolak | sinyal Visit dari non-anggota |
+| **Regresi** | setiap bug yang diperbaiki mendapat tes yang gagal sebelum perbaikan | — |
+
+**Aturan mutu:**
+1. **Tes negatif tidak boleh sekadar "tidak melempar error".** Assert jenis penolakan (kode/pesan/`ok:false`) dan bahwa **tidak ada efek samping** (state tidak berubah, tidak ada data tertulis).
+2. **Assert nilai eksak** (atau toleransi numerik yang dinyatakan) — bukan `toBeTruthy`/"tidak undefined". Rumus klinis/fisiologi diuji dengan **nilai referensi berbunyi sumber** (golden case) dan propagasi ketidakpastian bila ada.
+3. **Tes berpasangan**: setiap aturan penolakan punya kasus penerima yang *hanya berbeda pada kondisi itu* (membuktikan aturan itu yang menolak, bukan hal lain).
+4. **Determinisme**: dua kali jalan → hasil identik; tanpa `Date.now()`/`Math.random()`/jaringan; fixture di dalam repo.
+5. **Satu perilaku per tes**, nama deskriptif: `menolak_hb_negatif`, `menerima_ef_pada_batas_atas`. Tidak ada tes yang di-skip/`.only` yang tertinggal; tidak ada `catch` yang menelan assertion.
+6. **Dilarang melemahkan tes** (menghapus assert, melonggarkan toleransi, men-skip) agar hijau. Perubahan ekspektasi harus dijelaskan di PR.
+7. **Komponen UI**: uji state loading, error, kosong, dan data; tombol tidak bisa dobel-submit; input tidak valid menampilkan pesan dan tidak memanggil handler.
+8. **Kode klinis/keamanan/privasi**: cakupan cabang penuh untuk jalur keputusan (setiap `if`/`switch` punya kasus positif *dan* negatif); jalur fail-closed wajib diuji secara eksplisit.
+9. **Mock hanya di boundary** (adapter/repo). Logika murni diuji tanpa mock.
+10. Modul baru di `lib`/`domains/*/engine` tanpa berkas uji = PR ditolak.
+
+Kerangka minimum (ilustrasi — sesuaikan dengan nama/API nyata modul):
+
+```js
+import test from 'node:test'; import assert from 'node:assert/strict';
+import { hitungCO } from '../../src/lib/physiology/cardiovascularIdentityEngine.ts';
+
+test('positif: CO = HR x SV', () => assert.equal(hitungCO({ hr: 60, sv: 70 }).value, 4.2));
+test('negatif: HR negatif ditolak tanpa efek samping', () => {
+  const r = hitungCO({ hr: -1, sv: 70 });
+  assert.equal(r.ok, false); assert.equal(r.reason, 'out-of-range');
+});
+test('batas: HR tepat di batas atas diterima, +1 ditolak', () => {
+  assert.equal(hitungCO({ hr: MAX_HR, sv: 70 }).ok, true);
+  assert.equal(hitungCO({ hr: MAX_HR + 1, sv: 70 }).ok, false);
+});
+```
 
 ---
 
@@ -200,7 +243,7 @@ Aturan:
 ## Validasi
 - [ ] `npm run build` hijau
 - [ ] `npm run uji` hijau
-- [ ] Uji baru/diperbarui: <path>
+- [ ] Uji baru/diperbarui: <path> (positif + negatif + batas, §3.1)
 - [ ] Server typecheck (bila menyentuh `server/`)
 - [ ] Smoke UI/mobile 390×844 (bila menyentuh UI/3D)
 
@@ -219,7 +262,8 @@ Akhiri deskripsi PR dengan baris atribusi dari harness.
 2. Minimal satu review (manusia pemilik atau reviewer yang ditunjuk); temuan review diselesaikan atau dijawab.
 3. Tidak ada konflik dengan `main`; branch sudah rebase pada `main` terbaru.
 4. Perubahan yang menyentuh area klinis/keamanan/privasi menyebut batasnya di bagian "Risiko & batas".
-5. Registry `governance/*.yaml` dan dokumen kontrak diperbarui bila status berubah.
+5. Setiap unit baru/diubah punya tes positif **dan** negatif (§3.1); reviewer menolak PR yang hanya berisi happy path.
+6. Registry `governance/*.yaml` dan dokumen kontrak diperbarui bila status berubah.
 
 Strategi merge: **squash merge** ke `main` (riwayat linear, satu commit per PR). Hotfix: PR kecil langsung dari `hotfix/*`, tetap wajib CI hijau.
 
@@ -235,7 +279,7 @@ Laporan kemajuan konkret: SHA/nomor PR, kapabilitas yang berubah, hasil uji, sta
 - [ ] Dependensi arah §2.1 dipatuhi (tidak ada `lib` → `components`).
 - [ ] Tidak ada logika/konstanta yang disalin; komponen berulang diekstrak.
 - [ ] Input dari boundary divalidasi; error/loading/empty state tertangani; tidak ada tombol mati.
-- [ ] Uji deterministik untuk logika baru; `build` + `uji` lokal hijau.
+- [ ] Uji positif **dan** negatif (+ batas/otorisasi bila relevan) untuk logika baru; tidak ada tes dilemahkan/di-skip; `build` + `uji` lokal hijau.
 - [ ] String UI baru berbahasa Inggris; satu kalimat ringkas per item di scroll utama, detail di balik disclosure.
 - [ ] Tanpa rahasia/kredensial/PHI di kode, log, atau commit.
 - [ ] Aksesibilitas dasar (kontras, fokus, label) dan mobile 390×844 terjaga.
