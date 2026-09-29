@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
+import { api, backendEnabled, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
 import { RencanaHarianDokter } from './RencanaHarianDokter'
 import { statusPasienUntukDokter } from '../lib/statusPasienDokter'
 import { timelineHarian, angka } from '../lib/perubahanLongitudinal'
