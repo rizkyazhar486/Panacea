@@ -12,14 +12,14 @@ const audit = auditCakupanWearableLongitudinal(kunciKatalog)
 
 assert.ok(audit.covered.length >= 46, `cakupan wearable terlalu kecil: ${audit.covered.length}`)
 assert.ok(audit.gap.length > 0, 'gap harus eksplisit — jangan pura-pura katalog penuh')
-for (const wajib of ['restingHr', 'hrvMs', 'vo2max', 'waistCm', 'bloodGlucoseMgdl', 'walkingHr']) {
+for (const wajib of ['restingHr', 'hrvMs', 'vo2max', 'waistCm', 'bloodGlucoseMgdl', 'walkingHr', 'proteinG', 'carbsG', 'dietKcal', 'caffeineMg']) {
   assert.ok(audit.covered.includes(wajib), `${wajib} belum masuk jembatan longitudinal`)
 }
-for (const perangkat of ['sleepH', 'sleepDeepH', 'restingHr']) {
+for (const perangkat of ['sleepH', 'sleepDeepH', 'restingHr', 'sodiumMg']) {
   assert.ok(KUNCI_METRIK_PERANGKAT_LONGITUDINAL.includes(perangkat), `${perangkat} hilang dari DEVICE_METRICS`)
 }
-for (const belum of ['proteinG', 'caffeineMg', 'vitCMg']) {
-  assert.ok(audit.gap.includes(belum), `${belum} harus tetap gap (nutrisi detail belum dipetakan)`)
+for (const belum of ['vitCMg', 'biotinMcg', 'sexualActivity']) {
+  assert.ok(audit.gap.includes(belum), `${belum} harus tetap gap (mikronutrien/detail belum diprioritaskan)`)
 }
 assert.deepEqual(
   [...KUNCI_METRIK_PERANGKAT_LONGITUDINAL].sort(),
@@ -36,6 +36,14 @@ assert.deepEqual(deviceSnapshotToBodyExposureSignals({ restingHr: 56 }, { max: 0
 const overlay = readFileSync('src/components/BodyExposurePatientOverlay.tsx', 'utf8')
 assert.match(overlay, /deviceSnapshotToBodyExposureSignals\(/)
 assert.match(overlay, /data-pmd-device-overlay-signal/)
+
+{
+  const { labelMetrik } = await import('../../src/lib/perubahanLongitudinal.ts')
+  assert.equal(labelMetrik('resting-heart-rate'), 'Resting heart rate')
+  assert.equal(labelMetrik('dietary-protein'), 'Protein')
+  assert.equal(labelMetrik('dietary-caffeine'), 'Caffeine')
+  assert.equal(labelMetrik('lab.gdp'), 'Fasting glucose')
+}
 
 console.log(
   `audit-wearable-longitudinal: ${audit.covered.length} covered, ${audit.gap.length} explicit gaps; device overlay wired`,

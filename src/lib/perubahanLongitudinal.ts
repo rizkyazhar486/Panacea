@@ -7,13 +7,39 @@ const LABEL: Record<string, string> = {
   systolic: 'Systolic BP', diastolic: 'Diastolic BP', heartRate: 'Heart rate', restingHr: 'Resting heart rate',
   weightKg: 'Weight', spo2: 'SpO₂', temperatureC: 'Temperature', respiratoryRate: 'Respiratory rate', vo2max: 'VO₂max',
   glucose: 'Glucose', hrvMs: 'HRV', sleepH: 'Sleep',
+  // Longitudinal device-bridge metric ids (kebab-case)
+  'resting-heart-rate': 'Resting heart rate',
+  'heart-rate': 'Heart rate',
+  'blood-pressure-systolic': 'Systolic BP',
+  'blood-pressure-diastolic': 'Diastolic BP',
+  'sleep-duration': 'Sleep',
+  hrv: 'HRV',
+  'active-energy': 'Active energy',
+  'basal-energy': 'Basal energy',
+  'dietary-energy': 'Dietary energy',
+  'dietary-protein': 'Protein',
+  'dietary-carbohydrate': 'Carbohydrate',
+  'dietary-fat': 'Fat',
+  'dietary-fiber': 'Fiber',
+  'dietary-sugar': 'Sugar',
+  'dietary-sodium': 'Sodium',
+  'dietary-caffeine': 'Caffeine',
+  'alcohol-consumption': 'Alcohol',
+  'dietary-water': 'Water',
+  'waist-circumference': 'Waist',
+  'blood-glucose': 'Blood glucose',
 }
 export const labelMetrik = (m: string, labels: Record<string, string> = {}) => {
   if (labels[m]) return labels[m]
   if (m.startsWith('review.lab.')) return `Doctor review · ${JENIS_LAB.find((j) => j.id === m.slice(11))?.nama ?? m.slice(11)}`
   if (m.startsWith('lab.')) return JENIS_LAB.find((j) => j.id === m.slice(4))?.nama ?? m.slice(4)
+  if (LABEL[m]) return LABEL[m]
   const kunci = m.split('.').pop() ?? m
-  return LABEL[kunci] ?? kunci.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
+  if (LABEL[kunci]) return LABEL[kunci]
+  if (kunci.includes('-')) {
+    return kunci.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
+  return kunci.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
 }
 export type SudutPandang = 'pasien' | 'dokter'
 // Label asal dari sudut pandang pembaca: pasien membaca 'your lab report', dokter membaca 'patient-transcribed'.

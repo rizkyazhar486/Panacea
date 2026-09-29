@@ -149,7 +149,27 @@ const DEVICE_METRICS: Readonly<Record<string, NumericMetricSpec>> = {
   fallCount: { metric: 'falls', domain: 'other', unit: 'count' },
   moveMin: { metric: 'move-minutes', domain: 'activity', unit: 'min' },
   standMin: { metric: 'stand-minutes', domain: 'activity', unit: 'min' },
+  // Core dietary macros / minerals from Health Auto Export — clear units only.
+  // Micronutrient megavitamin lists stay explicit gaps until product needs them.
+  dietKcal: { metric: 'dietary-energy', domain: 'longevity', unit: 'kcal' },
+  proteinG: { metric: 'dietary-protein', domain: 'longevity', unit: 'g' },
+  carbsG: { metric: 'dietary-carbohydrate', domain: 'longevity', unit: 'g' },
+  fatG: { metric: 'dietary-fat', domain: 'longevity', unit: 'g' },
+  satFatG: { metric: 'dietary-saturated-fat', domain: 'longevity', unit: 'g' },
+  monoFatG: { metric: 'dietary-monounsaturated-fat', domain: 'longevity', unit: 'g' },
+  polyFatG: { metric: 'dietary-polyunsaturated-fat', domain: 'longevity', unit: 'g' },
+  fiberG: { metric: 'dietary-fiber', domain: 'longevity', unit: 'g' },
+  sugarG: { metric: 'dietary-sugar', domain: 'longevity', unit: 'g' },
+  cholesterolMg: { metric: 'dietary-cholesterol', domain: 'longevity', unit: 'mg' },
+  sodiumMg: { metric: 'dietary-sodium', domain: 'longevity', unit: 'mg' },
+  potassiumMg: { metric: 'dietary-potassium', domain: 'longevity', unit: 'mg' },
+  calciumMg: { metric: 'dietary-calcium', domain: 'longevity', unit: 'mg' },
+  ironMg: { metric: 'dietary-iron', domain: 'longevity', unit: 'mg' },
+  magnesiumMg: { metric: 'dietary-magnesium', domain: 'longevity', unit: 'mg' },
+  caffeineMg: { metric: 'dietary-caffeine', domain: 'longevity', unit: 'mg' },
+  alcoholUnits: { metric: 'alcohol-consumption', domain: 'longevity', unit: 'unit' },
 }
+
 
 /** Keys the device/health-profile bridge is allowed to ingest. */
 export const KUNCI_METRIK_PERANGKAT_LONGITUDINAL = Object.freeze(Object.keys(DEVICE_METRICS))
