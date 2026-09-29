@@ -1,4 +1,4 @@
-import type { ButirAntrean, HasilKirim, Kirim } from './antreanCekHarian.ts'
+import { KUNCI_ANTREAN, type ButirAntrean, type HasilKirim, type Kirim } from './antreanCekHarian.ts'
 
 const DB_NAME = 'panacea-secure-care-outbox-v1'
 const DB_VERSION = 1
@@ -71,7 +71,7 @@ async function encryptionKey(db: IDBDatabase): Promise<CryptoKey> {
     const tx = db.transaction(KEY_STORE, 'readonly')
     const existing = await requestResult(tx.objectStore(KEY_STORE).get(KEY_ID))
     await txDone(tx)
-    if (existing instanceof CryptoKey) return existing
+    if (typeof CryptoKey !== 'undefined' && existing instanceof CryptoKey) return existing
   }
 
   const key = await crypto.subtle.generateKey(
@@ -142,6 +142,64 @@ async function putReceipt(db: IDBDatabase, clientId: string) {
   const receipt: SecureCareReceipt = { clientId, status: 'sent', acknowledgedAt: new Date().toISOString() }
   tx.objectStore(RECEIPT_STORE).put(receipt)
   await txDone(tx)
+}
+
+export interface LegacyCareQueueStorage {
+  getItem(key: string): string | null
+  removeItem(key: string): void
+}
+
+export interface LegacyCareQueueMigrationResult {
+  migrated: number
+  discardedCorrupt: boolean
+}
+
+/**
+ * One-time migration from the historical plaintext queue.
+ *
+ * The legacy key is removed only after every readable report has been persisted
+ * as encrypted IndexedDB ciphertext. Malformed JSON was already unreadable by
+ * the old queue; it is deleted instead of leaving abandoned PHI in plaintext.
+ */
+export async function migrateLegacyPlaintextCareQueue(
+  storage: LegacyCareQueueStorage,
+): Promise<LegacyCareQueueMigrationResult> {
+  const raw = storage.getItem(KUNCI_ANTREAN)
+  if (!raw) return { migrated: 0, discardedCorrupt: false }
+  if (!secureCareOutboxSupported()) throw new Error('secure offline storage unavailable for legacy migration')
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    storage.removeItem(KUNCI_ANTREAN)
+    return { migrated: 0, discardedCorrupt: true }
+  }
+  if (!Array.isArray(parsed)) {
+    storage.removeItem(KUNCI_ANTREAN)
+    return { migrated: 0, discardedCorrupt: true }
+  }
+
+  const items = parsed.filter((value): value is ButirAntrean => {
+    if (!value || typeof value !== 'object') return false
+    const item = value as Partial<ButirAntrean>
+    return typeof item.clientId === 'string'
+      && typeof item.planId === 'string'
+      && typeof item.scheduledFor === 'string'
+      && typeof item.authoredAt === 'string'
+      && Array.isArray(item.answers)
+  })
+
+  // Any malformed element makes the legacy blob unsafe to interpret. Do not
+  // silently preserve a partial clinical history.
+  if (items.length !== parsed.length) {
+    storage.removeItem(KUNCI_ANTREAN)
+    return { migrated: 0, discardedCorrupt: true }
+  }
+
+  for (const item of items) await queueEncryptedCareReport(item)
+  storage.removeItem(KUNCI_ANTREAN)
+  return { migrated: items.length, discardedCorrupt: false }
 }
 
 export async function queueEncryptedCareReport(item: ButirAntrean): Promise<void> {
