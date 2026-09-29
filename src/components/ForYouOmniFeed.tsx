@@ -89,23 +89,23 @@ function useSeasonRank() {
   }, 'health', new Date()), [revision])
 }
 
-function matchesMode(post: SocialPost, mode: FeedMode, me?: string) {
+function matchesMode(post: SocialPost, mode: FeedMode, me?: string, follows: readonly string[] = []) {
   if (mode === 'all') return true
   const text = `${post.activity ?? ''} ${post.caption ?? ''} ${post.articleTitle ?? ''}`.toLowerCase()
-  if (mode === 'following') return post.authorEmail !== me
+  if (mode === 'following') return follows.includes(post.authorEmail)
   if (mode === 'fitness') return /(run|running|gym|workout|strength|cycling|swim|sport|fitness|padel|badminton|walk|yoga|training)/.test(text)
   if (mode === 'work') return /(job|hiring|intern|research|startup|cofounder|co-founder|work|career|opportunity|lowongan|role|collaborat)/.test(text)
   if (mode === 'people') return post.authorEmail !== me
   return true
 }
 
-function postPriority(post: SocialPost, mode: FeedMode, me?: string) {
+function postPriority(post: SocialPost, mode: FeedMode, me?: string, follows: readonly string[] = []) {
   const ageDays = Math.max(0, (Date.now() - Date.parse(post.at)) / 86_400_000)
   const freshness = Math.max(0, 1 - ageDays / 30)
   const social = Math.min(1, ((post.likes ?? 0) + (post.comments ?? 0) * 2 + (post.reposts ?? 0) * 2) / 30)
   const media = post.videoUrl ? 1 : post.photos?.length ? 0.75 : 0.35
   const selfPenalty = post.authorEmail === me ? -0.08 : 0
-  const modeBonus = mode === 'all' ? 0 : matchesMode(post, mode, me) ? 0.15 : 0
+  const modeBonus = mode === 'all' ? 0 : matchesMode(post, mode, me, follows) ? 0.15 : 0
   return freshness * 0.48 + social * 0.24 + media * 0.20 + modeBonus + selfPenalty
 }
 
@@ -263,8 +263,8 @@ export function ForYouOmniFeed() {
 
   const posts = useMemo(() => [...state.posts]
     .filter((post) => !post.archived && !post.locked)
-    .filter((post) => matchesMode(post, mode, account?.email))
-    .sort((a, b) => postPriority(b, mode, account?.email) - postPriority(a, mode, account?.email)), [state.posts, mode, account?.email])
+    .filter((post) => matchesMode(post, mode, account?.email, state.follows))
+    .sort((a, b) => postPriority(b, mode, account?.email, state.follows) - postPriority(a, mode, account?.email, state.follows)), [state.posts, state.follows, mode, account?.email])
 
   const items = useMemo(() => buildMixedFeed(posts), [posts])
 
