@@ -171,9 +171,9 @@ features:
     provenance_required: true
     tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory, scripts/uji/clinical-claim-maturity.mts, scripts/uji/trajektori-usia-biologis.mts, scripts/uji/impor-lembar-lab.mts, server/uji/keadaanLongitudinal.uji.ts]
     observability: [requires_repository_audit]
-    known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent, micronutrient_wearable_keys_unmapped]
-    next_actions: [verify_deployed_lab_sync_and_ocr, map_micronutrient_wearable_keys_when_product_needs_them]
-    last_audited_commit: 04e40942
+    known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent]
+    next_actions: [verify_deployed_lab_sync_and_ocr]
+    last_audited_commit: 328b7508
 
   - feature_id: core.embodied_workflow_observation_os
     name: Embodied Workflow Observation OS
