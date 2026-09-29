@@ -94,5 +94,10 @@ assert.match(ui,/buildClinicianContinuousCareDigest/)
 assert.match(ui,/data-clinician-care-inbox/)
 assert.match(ui,/no bulk diagnosis, prescription or treatment action/)
 assert.doesNotMatch(ui,/bulk.*sign/i)
+const inboxEffect = ui.slice(ui.indexOf('const loadInbox = async'), ui.indexOf('void loadInbox()'))
+assert.doesNotMatch(inboxEffect, /clinicianLabFhir/,
+  'inbox must not eagerly open audited lab records for every shared patient')
+assert.match(ui, /audited clinical-record access/,
+  'privacy boundary must stay explicit next to the inbox loader')
 
 console.log('clinician-care-inbox: canonical digest compression + deterministic queue order + mandatory human review.')
