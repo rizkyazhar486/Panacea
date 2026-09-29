@@ -15,6 +15,7 @@ import { penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
@@ -589,6 +590,7 @@ export function BodyExplorer() {
         title="Body Explorer"
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
+      <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
         {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
             selalu berada di sistem yang sedang dimatikan -- itu sebabnya ia

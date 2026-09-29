@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Charlson Comorbidity Index (CCI) — Charlson, M.E., et al. (1987),
@@ -67,6 +68,7 @@ export function CharlsonIndex() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Charlson Comorbidity Index" subtitle="Comorbidity burden & estimated 10-year survival (Charlson et al. 1987)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Indeks komorbiditas yang paling luas dipakai — 19 penyakit berbobot ditambah penyesuaian umur. Bila bentuk ringan dan berat dari penyakit yang sama sama-sama dicentang, hanya bentuk beratnya yang dihitung (sesuai indeks aslinya).</Prosa>
         <div className="mt-3 max-w-[200px]">
           <Field label="Age (years)">

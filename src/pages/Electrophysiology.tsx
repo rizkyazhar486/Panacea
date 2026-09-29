@@ -8,6 +8,7 @@ import {
   pasangGelombangBerputar, TANPA_OBAT,
   type Jaringan, type Obat, type UkuranJaringan,
 } from '../lib/bioelectric'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LABORATORIUM ELEKTROFISIOLOGI — aritmia yang benar-benar dihitung.
@@ -239,6 +240,7 @@ export function Electrophysiology() {
         title="Arrhythmia Mechanism Lab"
         subtitle="A sheet of excitable heart tissue, integrated live. Nothing here is animation — the wave persists or dies because of the physics."
       />
+      <BatasKlaimKesehatan permukaan="clinical.electrophysiology" />
 
       <Card className="!p-4">
         <div className="relative mx-auto aspect-square w-full max-w-[420px] overflow-hidden rounded-2xl bg-[#0c1024]">

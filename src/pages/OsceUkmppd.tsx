@@ -4,6 +4,7 @@ import { hitungKasus, ringkasPerSistem, ringkasSeluruh, periodeTerurut, type Hit
 import { catatanStasiun } from '../lib/osceStationNoteAliases'
 import { CatatanStasiunKartu } from '../components/CatatanStasiunKartu'
 import { RIWAYAT_OSCE } from '../lib/osceUkmppdRiwayat'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rekap stasiun OSCE UKMPPD — apa yang benar-benar keluar, 2016 sampai 2026.
@@ -104,6 +105,7 @@ export function OsceUkmppd() {
       <div className="j-grup px-fluid pb-6">
         <section>
           <h1 className="t-judul font-black text-ink dark:text-white">Stasiun OSCE UKMPPD</h1>
+          <BatasKlaimKesehatan permukaan="clinical.osce" />
           <p className="t-kecil mt-1 leading-relaxed text-neutral-600 dark:text-neutral-300">
             {total.stasiun} stasiun dari {total.periode} periode ujian, Februari 2016 sampai 2026.
           </p>

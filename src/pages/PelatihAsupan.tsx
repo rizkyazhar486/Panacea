@@ -8,6 +8,7 @@ import {
   MASUKAN, PERAN, BATAS_PELATIH, periksaKesiapan, sulihanTerpakai,
   type Masukan, type PeranPelatih, type Terisi,
 } from '../lib/asupanPelatih'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Empat peran, satu aturan: kumpulkan masukannya SEBELUM membuat rencana.
 //
@@ -253,6 +254,7 @@ export function PelatihAsupan() {
         title="Coach intake"
         subtitle="Answer first, plan second — nothing is computed from a value you did not give"
       />
+      <BatasKlaimKesehatan permukaan="performance.nutrition-coach" />
 
       <Card>
         <h3 className="text-sm font-black text-ink dark:text-white">What do you want built?</h3>

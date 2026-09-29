@@ -12,6 +12,7 @@ import { getDemo, setDemo } from '../lib/profile'
 import { JENIS_OLAHRAGA, type JenisOlahraga } from '../lib/olahraga'
 import { getVitals } from '../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -780,6 +781,7 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
     <Card className="!p-5">
       <div className="flex items-center justify-between">
         <SectionTitle icon={<span className="text-lg">{'\u2696\uFE0F'}</span>} title="Body Profile" />
+        <BatasKlaimKesehatan permukaan="longevity.nutrition-score" />
         <button onClick={() => setEdit(true)} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">{'\u270F\uFE0F'} Edit</button>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">

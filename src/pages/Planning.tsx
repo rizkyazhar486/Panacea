@@ -8,6 +8,7 @@ import { evaluatePlanSafety, scorePlanItem, WEIGHTS } from '../lib/cdss'
 import { checkInteractions } from '../lib/ddi'
 import { ensureEpisodeFromVerifiedPlan } from '../lib/careEpisode'
 import type { PlanItem, Patient } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const CATEGORIES: PlanItem['category'][] = [
   'Suportif',
@@ -396,7 +397,7 @@ function CdssPanel({
       <SectionTitle
         icon={<IconShield size={20} />}
         title="CDSS Safety Engine — Verification Gate"
-        subtitle={`Heuristic display: α·V + β·L + γ·S (α=${WEIGHTS.alpha}, β=${WEIGHTS.beta}, γ=${WEIGHTS.gamma}); verification is governed by explicit blocker rules.`}
+        subtitle={`Heuristic display: α·V + β·L + γ·S (α=${WEIGHTS.alpha}, β=${WEIGHTS.beta}, γ=${WEIGHTS.gamma}); verification is governed by explicit blocker rules. Not a clinically validated Panacea decision.`}
         right={
           <div className="flex items-center gap-2">
             {blocked.length > 0 ? (
@@ -410,6 +411,7 @@ function CdssPanel({
           </div>
         }
       />
+      <BatasKlaimKesehatan permukaan="care.cdss" />
       {open && (
         <div className="space-y-2.5">
           {scored.length === 0 && <p className="text-sm text-neutral-500">No items to score yet.</p>}

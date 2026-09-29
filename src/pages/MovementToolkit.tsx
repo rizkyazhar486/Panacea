@@ -5,6 +5,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement Longevity Toolkit — five small real tools bundled into one page:
@@ -142,6 +143,7 @@ export function MovementToolkit() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconRun size={20} />} title="Movement Longevity Toolkit" subtitle="Five small, real movement tools in one place" />
+        <BatasKlaimKesehatan permukaan="longevity.movement-toolkit" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>

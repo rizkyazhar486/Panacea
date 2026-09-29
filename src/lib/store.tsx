@@ -965,7 +965,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ),
         })),
       addSelfVital: (v) =>
-        setState((st) => ({ ...st, selfVitals: [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50) })),
+        setState((st) => {
+          const next = [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putSelfVitalsLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, selfVitals: next }
+        }),
       addSleepLog: (hours, bedtimeConsistent) =>
         setState((st) => {
           const date = hariIni()
@@ -993,7 +999,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       answerQuiz: (correct) =>
         setState((st) => ({ ...st, quizScore: { correct: st.quizScore.correct + (correct ? 1 : 0), total: st.quizScore.total + 1 } })),
       logVo2Max: (value, method) =>
-        setState((st) => (value > 0 ? { ...st, vo2maxLog: [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50) } : st)),
+        setState((st) => {
+          if (!(value > 0)) return st
+          const next = [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putVo2maxLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, vo2maxLog: next }
+        }),
       addGoal: (g) =>
         setState((st) => (g.label.trim() && g.target > 0 ? { ...st, goals: [{ id: uid(), ...g }, ...st.goals] } : st)),
       removeGoal: (id) => setState((st) => ({ ...st, goals: st.goals.filter((g) => g.id !== id) })),

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Prosa } from '../components/Prosa'
 import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
 import { getPhoneHealthScanSnapshot, phoneReadingAge, type PhoneHealthScanSnapshot } from '../lib/phoneHealthScan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type PhotoSlot = 'front' | 'profile'
 
@@ -145,6 +146,7 @@ export function PhoneHealthScan() {
       </header>
 
       <div className="space-y-5 p-3 sm:p-5">
+      <BatasKlaimKesehatan permukaan="wellness.phone-health-scan" />
         <div className="overflow-hidden rounded-[24px] border border-white/[.08] bg-black">
           <div className="relative aspect-[4/3] min-h-[280px] bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,.12),transparent_45%),linear-gradient(180deg,#111716,#020303)]">
             {latestCapture ? (

@@ -95,6 +95,7 @@ export const JENIS_LAB: JenisLab[] = [
   { id: 'alp', nama: 'Alkaline phosphatase', satuan: 'U/L', bawah: 44, atas: 147, sumber: 'Usual adult range; higher in adolescents and pregnancy' },
   { id: 'wbc', nama: 'White blood cells', satuan: '10³/µL', bawah: 4.0, atas: 11.0, sumber: 'Usual adult range; varies by laboratory' },
   { id: 'limfosit', nama: 'Lymphocytes', satuan: '%', bawah: 20, atas: 40, sumber: 'Usual adult differential; varies by laboratory' },
+  { id: 'trombosit', nama: 'Platelets', satuan: '×10⁹/L', bawah: 150, atas: 450, sumber: 'Usual adult range; varies by laboratory' },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -154,6 +155,33 @@ export function tambahLab(jenis: string, tanggal: string, nilai: number, rujukan
   // Seratus butir per jenis sudah lebih dari seumur hidup pemeriksaan tahunan.
   s[jenis] = daftar.slice(-100)
   simpan(s)
+}
+
+/**
+ * Set one analyte for one blood-draw date (replace same date, else append).
+ * Used by PhenoAge / Biological Age so edits join the account-synced lab log
+ * instead of a parallel browser-only sheet.
+ */
+export function tetapkanLabPadaTanggal(jenis: string, tanggal: string, nilai: number): void {
+  if (!(nilai > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return
+  if (!JENIS_LAB.some((j) => j.id === jenis)) return
+  const s = ambilLab()
+  const daftar = [...(s[jenis] ?? [])]
+  const i = daftar.findIndex((b) => b.tanggal === tanggal)
+  if (i >= 0) daftar[i] = { ...daftar[i], nilai }
+  else daftar.push({ id: `${jenis}-${Date.now()}`, tanggal, nilai })
+  daftar.sort((a, b) => a.tanggal.localeCompare(b.tanggal))
+  s[jenis] = daftar.slice(-100)
+  simpan(s)
+}
+
+/** Latest value on an exact draw date, else the newest prior value. */
+export function nilaiLabPadaTanggal(jenis: string, tanggal: string): number | undefined {
+  const daftar = ambilLab()[jenis] ?? []
+  const exact = daftar.find((b) => b.tanggal === tanggal && b.nilai > 0)
+  if (exact) return exact.nilai
+  const prior = [...daftar].filter((b) => b.tanggal <= tanggal && b.nilai > 0).sort((a, b) => b.tanggal.localeCompare(a.tanggal))[0]
+  return prior?.nilai
 }
 
 export function hapusLab(jenis: string, id: string): void {

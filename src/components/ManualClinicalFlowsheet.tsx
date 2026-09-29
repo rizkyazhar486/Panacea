@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { SupportiveResult, VitalSign } from '../lib/types'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type FieldKind = 'number' | 'text' | 'textarea'
 type GroupId = 'vitals' | 'resp' | 'hemo' | 'io' | 'labs' | 'support'
@@ -271,6 +272,7 @@ export function ManualClinicalFlowsheet({ onAddVital, onAddSupportive }: ManualC
 
   return (
     <section id="manual-icu-flowsheet" aria-labelledby="manual-icu-flowsheet-title" className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+      <BatasKlaimKesehatan permukaan="clinical.manual-flowsheet" />
       <div className="flex flex-col gap-3 border-b border-neutral-100 px-5 py-4 dark:border-white/10 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h3 id="manual-icu-flowsheet-title" className="text-sm font-black text-ink dark:text-white">Manual ICU flowsheet</h3>

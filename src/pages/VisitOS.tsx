@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { VisitCommandCenter } from '../components/VisitCommandCenter'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 export function VisitOS() {
   return (
     <div className="mx-auto w-full max-w-[1480px] space-y-6 pb-20 text-white">
       <PanaceaZoneNav />
+      <BatasKlaimKesehatan permukaan="care.visit-os" className="mt-2 text-[11px] leading-snug text-white/55" />
       <VisitCommandCenter />
       <nav aria-label="Visit OS related clinical tools" className="flex gap-5 overflow-x-auto border-y border-white/10 py-1 no-scrollbar">
         {[

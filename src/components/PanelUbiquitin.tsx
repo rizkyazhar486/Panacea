@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 // Protein nyata resolusi residu: ubiquitin manusia (PDB 1UBI). Jejak Cα, diputar
 // dengan seret/slider, diwarnai anotasi HELIX/SHEET penyimpan; validasi dihitung
 // langsung dari berkas. Struktur rujukan eksperimen — bukan protein pasien.
@@ -38,6 +39,7 @@ export function PanelUbiquitin() {
   const pilih = sorot !== null ? r.residu.find((x) => x.seq === sorot) : undefined
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-black/45 p-3 text-white" aria-label="Human ubiquitin at residue resolution" data-panel-ubiquitin>
+      <BatasKlaimKesehatan permukaan="longevity.ubiquitin-panel" />
       <h3 className="text-xs font-black">Human ubiquitin · 76 residues · PDB {s.idPdb}</h3>
       <p className="text-[10px] font-bold text-emerald-200/80" data-sumber-struktur>experimental X-ray {s.resolusiA} Å · UniProt {s.dbref[0]?.aksesi} · reference structure, not patient-specific</p>
       <svg viewBox={`${-W / 2} ${-H / 2} ${W} ${H}`} className="mt-2 w-full touch-none rounded-lg border border-white/10 bg-black/40" role="img" aria-label="C-alpha trace"

@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HAS-BLED — Pisters, R., et al. (2010), Chest, 138(5):1093-1100. Estimates
@@ -44,6 +45,7 @@ export function HasBledScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="HAS-BLED Score" subtitle="1-year major bleeding risk on anticoagulation (Pisters et al. 2010)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Used alongside CHA2DS2-VASc stroke risk, not as a reason to withhold anticoagulation — a high score flags modifiable bleeding-risk factors (blood pressure control, labile INR, concurrent NSAIDs/antiplatelets, alcohol) to address rather than an automatic contraindication.</Prosa>
       </Card>
 

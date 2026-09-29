@@ -10,6 +10,7 @@ import { ApaYangBerubah } from '../components/ApaYangBerubah'
 import { TebusKodeTaut } from '../components/TautanRekamPraktik'
 import { UbinLab } from '../components/UbinLab'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sinyal Tubuh — lima halaman yang semuanya membaca deret dari jam tangan,
@@ -140,6 +141,7 @@ export function PusatTubuh() {
         klinis.length > 0 ? (
           <section className="space-y-3">
             <h2 className="text-[13px] font-black text-ink dark:text-white">Where these numbers come from</h2>
+            <BatasKlaimKesehatan permukaan="body.pusat-tubuh" />
             <p className="text-[12px] leading-relaxed text-neutral-500">
               Each number below carries its reference range and the population it came from, how much it swings
               day to day, and when it should not be trusted.

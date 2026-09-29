@@ -8,6 +8,7 @@ import { Portal } from '../components/Portal'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
 import type { ProfileEdit } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Tab = 'posts' | 'locked' | 'reposts' | 'saved' | 'liked' | 'archive'
 
@@ -91,6 +92,8 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
           </div>
         </div>
       </div>
+
+      <BatasKlaimKesehatan permukaan="care.profile" className="mt-2 text-[11px] leading-snug text-neutral-500" />
 
       {/* Identity + bio + link */}
       <div className="mt-3 space-y-1">

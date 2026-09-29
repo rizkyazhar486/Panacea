@@ -6,6 +6,7 @@ import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 import { hitungHasilTerukur } from '../lib/hasilTerukurLab'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget hasil laboratorium — dimasukkan sendiri, digambar perjalanannya.
@@ -160,6 +161,7 @@ export function UbinLab() {
           {buka ? 'Close' : '+ Add'}
         </button>
       </div>
+      <BatasKlaimKesehatan permukaan="lab.blood-trend" />
 
       <div className="kaca rounded-3xl p-3">
         {buka && (

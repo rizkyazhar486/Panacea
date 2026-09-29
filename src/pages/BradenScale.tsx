@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Braden Scale — Bergstrom, N., Braden, B.J., et al. (1987), Nurs Res,
@@ -103,6 +104,7 @@ export function BradenScale() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Braden Scale" subtitle="Pressure injury risk assessment (Bergstrom & Braden 1987)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enam subskala, masing-masing bernilai 1-4 (gesekan/geseran 1-3). Total yang LEBIH RENDAH berarti risiko LEBIH TINGGI — rentang 6-23, dengan ≤18 lazim dianggap "berisiko" pada pasien dewasa rawat inap.</Prosa>
       </Card>
 

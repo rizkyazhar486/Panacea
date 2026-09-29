@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 /**
  * Panel angka: baris kartu KPI dengan grafik arah.
  *
@@ -61,6 +62,7 @@ const LATAR: Record<string, string> = {
 export function KartuAngka({ a }: { a: Angka }) {
   return (
     <div className={`flex min-w-0 flex-1 flex-col gap-[6px] rounded-2xl p-3 ${LATAR[a.nada] ?? 'bg-white/70 dark:bg-white/5'}`}>
+      <BatasKlaimKesehatan permukaan="wellness.number-panel" />
       {/* Label dipangkas, bukan dibiarkan membungkus: empat kartu pada layar
           390 px menyisakan ±78 px per kartu, dan label sembilan huruf pecah di
           tengah kata. Yang dipendekkan labelnya, bukan angkanya. */}

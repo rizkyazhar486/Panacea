@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 // Kunjungan AI-EMR: tutup kunjungan bertanda tangan server, mulai draf baru, dan
 // lihat kunjungan tertutup. Hanya rekam bertanda tangan server yang dapat ditutup;
 // draf baru membawa daftar masalah saja (bukan diagnosis, rencana atau tanda tangan).
@@ -42,6 +43,7 @@ export function KunjunganEmr({ record, dirty, klinisi }: { record: EMRRecord; di
 
   return (
     <div className="mt-3 border-t border-neutral-200 pt-3" data-kunjungan-emr>
+      <BatasKlaimKesehatan permukaan="care.kunjungan-emr" />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Encounters{daftar ? ` · ${daftar.length} closed` : ''}</p>
         {klinisi && (

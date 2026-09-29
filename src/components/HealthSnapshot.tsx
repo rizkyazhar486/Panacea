@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Compact, at-a-glance snapshot of the user's saved health data (from
 // /health-data). Reads the same local cache the health page writes and links
@@ -21,6 +22,7 @@ export function HealthSnapshot({ className = '' }: { className?: string }) {
         <span className="text-xs font-bold text-brand-dark">❤️ Health Data</span>
         <span className="text-[10px] font-semibold text-neutral-500">Source: {src} · Edit →</span>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.health-snapshot" className="mt-1 text-[10px] leading-snug text-neutral-500" />
       {stats.length ? (
         <div className="mt-2 grid grid-cols-4 gap-2">
           {stats.map((s) => (

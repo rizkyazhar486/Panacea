@@ -50,6 +50,31 @@ assert.equal(titikDariHasil('2025-01-01', 0, h50.data), null)
 const panel = readFileSync(new URL('../../src/components/LongevityPanel.tsx', import.meta.url), 'utf8')
 assert.match(panel, /<TrajektoriUsia titik=\{gabungSumber\(trajektori, titikDariRiwayatLab\(/, 'trajektori (manual + log lab) tidak lagi dirender di panel PhenoAge')
 assert.match(panel, /Save to trajectory/, 'tombol menyimpan titik trajektori hilang')
+assert.match(panel, /tetapkanLabPadaTanggal/, 'PhenoAge panel must write the synced lab log')
+assert.doesNotMatch(panel, /localStorage\.setItem\(\s*['"]pmd_labs_v1['"]/, 'PhenoAge panel must not keep writing the parallel pmd_labs_v1 sheet')
+assert.match(panel, /migrasiPanelLama|pmd_labs_v1_to_lab_log/, 'legacy panel sheet must migrate once into the synced lab log')
+
+// Upsert into the synced lab log (PhenoAge panel write path).
+{
+  const store: Record<string, string> = {}
+  const g = globalThis as { localStorage?: Storage; window?: { dispatchEvent: (e: Event) => boolean } }
+  g.localStorage = {
+    getItem: (k) => store[k] ?? null,
+    setItem: (k, v) => { store[k] = String(v) },
+    removeItem: (k) => { delete store[k] },
+    clear: () => { for (const k of Object.keys(store)) delete store[k] },
+    key: () => null,
+    length: 0,
+  } as Storage
+  g.window = { dispatchEvent: () => true }
+  const { tetapkanLabPadaTanggal, nilaiLabPadaTanggal, ambilLab } = await import('../../src/lib/lab.ts')
+  tetapkanLabPadaTanggal('albumin', '2026-09-25', 4.5)
+  tetapkanLabPadaTanggal('albumin', '2026-09-25', 4.2)
+  assert.equal(ambilLab().albumin?.length, 1, 'same-date PhenoAge edit must replace, not duplicate')
+  assert.equal(nilaiLabPadaTanggal('albumin', '2026-09-25'), 4.2)
+  tetapkanLabPadaTanggal('albumin', '2026-09-20', 4.0)
+  assert.equal(nilaiLabPadaTanggal('albumin', '2026-09-22'), 4.0, 'prior draw should fill when exact date missing')
+}
 
 console.log('trajektori-usia-biologis: AgeGap tak bergerak karena bertambah tua, ΔAgeGap/laju sesuai hitungan tangan, tanggal sama menggantikan')
 

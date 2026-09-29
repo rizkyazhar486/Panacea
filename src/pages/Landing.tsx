@@ -23,6 +23,7 @@ import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { MedicalNews } from '../components/MedicalNews'
 import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCinematic'
 import { PricingSection } from '../components/PricingSection'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 /**
  * Video yang hanya berputar SAAT TERLIHAT.
@@ -68,11 +69,11 @@ function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
 
 const FEATURES = [
   { icon: IconUsers, title: 'Healthy Living Dashboard', text: 'A Strava/TikTok-style social network: share activities, healthy habits & longevity articles. Photos, short videos, profiles, bookmarks.' },
-  { icon: IconHeart, title: 'AI Longevity Calculator', text: 'Log your diet, exercise, hydration, sleep & sun exposure — AI calculates your longevity score (30-day subscription).' },
+  { icon: IconHeart, title: 'Longevity estimate', text: 'Log diet, exercise, hydration, sleep and sun. The longevity number is a technical estimate, not a clinically validated age.' },
   { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI interviews the patient (SOCRATES method); results flow automatically into the Subjective/Objective fields of the AI-EMR, accessible only to doctors.' },
   { icon: IconStethoscope, title: 'Consultations, Pharmacy & Facilities', text: 'AI consultation (Rp49,000) → referral to specialist doctors; pharmacy with prescription fulfillment; nearest healthcare facilities via GPS for emergencies.' },
   { icon: IconStore, title: 'Medical Knowledge Hub', text: 'Discover & share curated medical notes, journals, and articles. Pricing set by the authors; watermarked PDFs protect contributors.' },
-  { icon: IconShield, title: 'Certified AI-EMR', text: 'For certified clinicians & institutions (STR/NPWP). Doctor-in-the-loop CDSS flags drug interactions, allergies & contraindications.' },
+  { icon: IconShield, title: 'AI-EMR for clinicians', text: 'For licensed clinicians and institutions (STR/NPWP). A doctor reviews the record. Interaction flags are technical checks, not a certified clinical decision.' },
 ]
 
 const ROLES = [
@@ -105,7 +106,7 @@ const MARQUEE = [
   { icon: IconStethoscope, label: 'Doctor Consultations' },
   { icon: IconHeart, label: 'AI Longevity' },
   { icon: IconStore, label: 'Medical Content' },
-  { icon: IconShield, label: 'Certified AI-EMR' },
+  { icon: IconShield, label: 'AI-EMR for clinicians' },
   { icon: IconChartUp, label: 'Healthspan Tracking' },
 ]
 
@@ -226,11 +227,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 Your Access to Healthcare
               </span>
             </h1>
+            <BatasKlaimKesehatan permukaan="care.landing" className="mt-3 max-w-xl text-[12px] leading-snug text-neutral-500" />
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-5 max-w-2xl text-neutral-600 sm:text-lg">
-              AI handles the intake & education; doctors verify. We extend <b>healthspan</b> — not just
-              lifespan — through precise clinical reasoning, early prevention, and lifestyle optimization.
+              AI handles intake & education; licensed clinicians can review. We extend <b>healthspan</b> — not just
+              lifespan — through careful clinical tooling, early prevention, and lifestyle tracking.
             </p>
           </Reveal>
           <Reveal delay={240}>
@@ -277,7 +279,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal delay={360}>
             <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
               {[
-                { icon: IconStethoscope, label: 'Verified by licensed doctors' },
+                { icon: IconStethoscope, label: 'Clinician review when you consult' },
                 { icon: IconShield, label: 'PDP Law compliant' },
                 { icon: IconCheck, label: 'FHIR data standard' },
                 { icon: IconHeart, label: 'Measurable longevity' },
@@ -678,7 +680,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div className="relative">
               <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">Start your <span className="font-serif-display italic">healthspan</span> journey</h2>
               <p className="mx-auto mt-3 max-w-xl text-ink/85">
-                Free to try — choose your role and experience an AI co-physician verified by doctors.
+                Free to try — choose your role and explore AI-assisted intake with optional clinician review.
               </p>
               <button
                 onClick={onMasuk}
