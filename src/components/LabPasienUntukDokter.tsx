@@ -3,7 +3,8 @@ import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type Ti
 import { RencanaHarianDokter } from './RencanaHarianDokter'
 import { statusPasienUntukDokter } from '../lib/statusPasienDokter'
 import { timelineHarian, angka } from '../lib/perubahanLongitudinal'
-import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
+import { buildClinicianContinuousCareDigest, submitDailyAnamnesis, type ContinuousCarePlan, type DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
+import { sortClinicianCareInbox, summarizeClinicianCareDigest, type ClinicianCareInboxRow } from '../lib/clinicianCareInbox'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
@@ -20,6 +21,27 @@ const STATUS_KLINISI: Record<StatusTren, { teks: string; urut: number; kelas: st
 }
 
 const jenisDari = (o: FhirObservasiLab) => o.identifier?.find((i) => i.system.endsWith('/lab-entry'))?.value.split('/')[0] ?? ''
+
+type ClinicianShare = { id: string; berakhir: string; pasien: string }
+type ClinicianLabPayload = Awaited<ReturnType<typeof api.clinicianLabFhir>>
+type ClinicianCarePayload = Awaited<ReturnType<typeof api.clinicianCare>>
+type ClinicianInboxItem = ClinicianCareInboxRow & {
+  payload?: { detail: ClinicianLabPayload; care: ClinicianCarePayload }
+  loadError?: string
+}
+
+function latestCareReport(plan: ContinuousCarePlan, reports: readonly DailyAnamnesisSubmissionInput[]) {
+  const parsed = reports.flatMap((report) => {
+    try { return [submitDailyAnamnesis(plan, report)] } catch { return [] }
+  }).sort((a, b) => Date.parse(a.authoredAt) - Date.parse(b.authoredAt))
+  return parsed.length ? parsed[parsed.length - 1] : null
+}
+
+const PRIORITY_LABEL: Record<ClinicianCareInboxRow['workflowPriority'], string> = {
+  routine: 'Routine',
+  'review-today': 'Review today',
+  'immediate-human-review': 'Immediate human review',
+}
 
 // Tinjauan ditulis dokter dan disimpan terpisah; angka lab pasien tidak berubah.
 function FormTinjauan({ izinId, tes, sebelumnya, onSimpan }: { izinId: string; tes: string; sebelumnya?: TinjauanLabKlien; onSimpan: (t: TinjauanLabKlien) => void }) {
@@ -62,13 +84,71 @@ function Garis({ obs }: { obs: FhirObservasiLab[] }) {
 // Observation. Setiap pembukaan tercatat di jejak audit pasien (server).
 // Angkanya disalin pasien dari lembar hasil — ditandai jelas, bukan dari lab.
 export function LabPasienUntukDokter() {
-  const [daftar, setDaftar] = useState<{ id: string; berakhir: string; pasien: string }[] | null>(null)
-  const [buka, setBuka] = useState<{ izinId: string; pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab; verifiedVitals: import('../lib/types').VitalSign[] } | null>(null)
-  const [care, setCare] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] }>({ plan: null, reports: [] })
+  const [daftar, setDaftar] = useState<ClinicianShare[] | null>(null)
+  const [buka, setBuka] = useState<(ClinicianLabPayload & { izinId: string }) | null>(null)
+  const [care, setCare] = useState<ClinicianCarePayload>({ plan: null, reports: [] })
+  const [inbox, setInbox] = useState<ClinicianInboxItem[] | null>(null)
   useEffect(() => { if (buka) api.clinicianCare(buka.izinId).then(setCare).catch(() => setCare({ plan: null, reports: [] })) }, [buka?.izinId, buka?.reviews.length])
   const [galat, setGalat] = useState<string | null>(null)
   const muatDaftar = () => { setGalat(null); api.clinicianLabShares().then((r) => setDaftar(r.shares)).catch((e) => setGalat((e as Error).message)) }
   useEffect(() => { if (backendEnabled) muatDaftar() }, [])
+
+  useEffect(() => {
+    if (!daftar) return
+    let cancelled = false
+    setInbox(null)
+
+    const loadInbox = async () => {
+      const baseRows: ClinicianCareInboxRow[] = []
+      const payloads = new Map<string, ClinicianInboxItem['payload']>()
+      const errors = new Map<string, string>()
+
+      await Promise.all(daftar.map(async (share) => {
+        try {
+          const [detail, careData] = await Promise.all([
+            api.clinicianLabFhir(share.id),
+            api.clinicianCare(share.id),
+          ])
+          payloads.set(share.id, { detail, care: careData })
+
+          if (!careData.plan) {
+            baseRows.push(summarizeClinicianCareDigest(share.id, share.pasien, null))
+            return
+          }
+
+          const canonical = statusPasienUntukDokter(
+            detail.bundle.entry as never,
+            careData,
+            detail.reviews,
+            detail,
+            new Date().toISOString(),
+            detail.verifiedVitals ?? [],
+          )
+          const latest = latestCareReport(careData.plan, careData.reports)
+          const digest = buildClinicianContinuousCareDigest(
+            careData.plan,
+            latest,
+            canonical.state,
+            new Date().toISOString(),
+          )
+          baseRows.push(summarizeClinicianCareDigest(share.id, share.pasien, digest))
+        } catch (error) {
+          baseRows.push(summarizeClinicianCareDigest(share.id, share.pasien, null))
+          errors.set(share.id, (error as Error).message || 'Unable to load')
+        }
+      }))
+
+      if (cancelled) return
+      setInbox(sortClinicianCareInbox(baseRows).map((row) => ({
+        ...row,
+        payload: payloads.get(row.shareId),
+        loadError: errors.get(row.shareId),
+      })))
+    }
+
+    void loadInbox()
+    return () => { cancelled = true }
+  }, [daftar])
   if (!backendEnabled) return null
 
   const kelompok = new Map<string, FhirBundelLab['entry'][number]['resource'][]>()
@@ -88,6 +168,74 @@ export function LabPasienUntukDokter() {
         </p>
       )}
       {!daftar && !galat && <p role="status" className="mt-1 text-[11px] text-white/45" data-memuat-berbagi-lab>Loading shared results…</p>}
+
+      {daftar && daftar.length > 0 && (
+        <section className="mt-3 border-y border-white/10 py-3" data-clinician-care-inbox aria-label="Continuous care clinician inbox">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <div>
+              <h3 className="text-[12px] font-black">Continuous care inbox</h3>
+              <p className="mt-0.5 text-[10px] text-white/40">One scan queue from clinician-authored rules and canonical longitudinal state.</p>
+            </div>
+            <span className="text-[10px] font-black text-white/35">{inbox?.filter((row) => row.hasActivePlan).length ?? 0} active plan{(inbox?.filter((row) => row.hasActivePlan).length ?? 0) === 1 ? '' : 's'}</span>
+          </div>
+
+          {!inbox ? (
+            <p role="status" className="mt-2 text-[11px] text-white/45">Building provenance-preserving digests…</p>
+          ) : (
+            <div className="mt-2 divide-y divide-white/[.08]">
+              {inbox.map((row) => (
+                <button
+                  key={row.shareId}
+                  type="button"
+                  disabled={!row.payload}
+                  onClick={() => {
+                    if (!row.payload) return
+                    setCare(row.payload.care)
+                    setBuka({ ...row.payload.detail, izinId: row.shareId })
+                  }}
+                  className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-3 py-2.5 text-left disabled:opacity-55"
+                  data-care-inbox-priority={row.workflowPriority}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate text-[12px] font-black text-white">{row.patientLabel}</span>
+                    <span className="mt-0.5 block truncate text-[10px] text-white/45">
+                      {row.loadError
+                        ? `Load error · ${row.loadError}`
+                        : row.hasActivePlan
+                          ? (row.diagnosisLabels.join(', ') || 'Active follow-up plan')
+                          : 'No active continuous-care plan'}
+                    </span>
+                    {row.hasActivePlan && (
+                      <span className="mt-1 block text-[9px] text-white/35">
+                        {row.latestReportAt ? `Last check-in ${row.latestReportAt.slice(0, 10)}` : 'No check-in yet'}
+                        {' · '}{row.availableSignalCount} signal{row.availableSignalCount === 1 ? '' : 's'}
+                        {row.missingRequiredCount ? ` · ${row.missingRequiredCount} missing required` : ''}
+                        {row.triggeredRuleCount ? ` · ${row.triggeredRuleCount} patient rule` : ''}
+                        {row.measurementAttentionCount ? ` · ${row.measurementAttentionCount} measurement review` : ''}
+                      </span>
+                    )}
+                  </span>
+                  <span className={
+                    `self-start rounded-full border px-2.5 py-1 text-[9px] font-black ${
+                      row.workflowPriority === 'immediate-human-review'
+                        ? 'border-rose-300/25 text-rose-200'
+                        : row.workflowPriority === 'review-today'
+                          ? 'border-amber-300/25 text-amber-200'
+                          : 'border-white/10 text-white/45'
+                    }`
+                  }>
+                    {PRIORITY_LABEL[row.workflowPriority]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <p className="mt-2 text-[9px] leading-relaxed text-white/30">
+            Ordering is workflow support from rules authored by the clinician, not diagnosis, prognosis or emergency disposition. There is no bulk diagnosis, prescription or treatment action; each patient remains a human-review workflow.
+          </p>
+        </section>
+      )}
       {daftar && daftar.length === 0 && <p className="mt-1 text-[11px] text-white/55">No patient has shared lab results with you yet.</p>}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {daftar?.map((d) => (
