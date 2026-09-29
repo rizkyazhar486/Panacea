@@ -6,6 +6,7 @@ import { getWorkouts } from '../lib/workoutStore'
 import { calculateSeasonalRank, type RankedHealthEvidence } from '../lib/seasonalHealthSportRank'
 import { ForYouDailyStack } from './ForYouDailyStack'
 import { ForYouNetworkHub } from './ForYouNetworkHub'
+import { ShareToFeed } from './ShareToFeed'
 
 type FeedMode = 'all' | 'following' | 'fitness' | 'work' | 'people'
 
@@ -109,7 +110,7 @@ function postPriority(post: SocialPost, mode: FeedMode, me?: string) {
 }
 
 function PostCard({ post }: { post: SocialPost }) {
-  const { state } = useStore()
+  const { state, toggleLike, toggleRepost, toggleBookmark } = useStore()
   const avatar = state.profiles[post.authorEmail]?.avatar
   const media = post.photos?.[0]
 
@@ -158,10 +159,10 @@ function PostCard({ post }: { post: SocialPost }) {
       ) : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 px-1 text-[10px] font-black text-white/38">
-        <Link to="/feed">♡ {post.hideLikes ? '—' : post.likes ?? 0}</Link>
-        <Link to="/feed">◌ {post.comments ?? 0}</Link>
-        <Link to="/feed">↻ {post.reposts ?? 0}</Link>
-        <Link to="/feed">↗ Share</Link>
+        <button type="button" onClick={() => toggleLike(post.id)} className={post.likedByMe ? 'text-rose-300' : 'hover:text-white'}>{post.likedByMe ? '♥' : '♡'} {post.hideLikes ? '—' : post.likes ?? 0}</button>
+        <Link to="/feed" className="hover:text-white">◌ {post.comments ?? 0}</Link>
+        <button type="button" onClick={() => toggleRepost(post.id)} className={post.repostedByMe ? 'text-emerald-300' : 'hover:text-white'}>↻ {post.reposts ?? 0}</button>
+        <button type="button" onClick={() => toggleBookmark(post.id)} className={post.bookmarkedByMe ? 'text-amber-300' : 'hover:text-white'}>{post.bookmarkedByMe ? '★ Saved' : '☆ Save'}</button>
         <span className="ml-auto flex flex-wrap gap-3">
           {typeof post.distanceKm === 'number' && <span>{post.distanceKm.toFixed(1)} km</span>}
           {typeof post.durationMin === 'number' && <span>{Math.round(post.durationMin)} min</span>}
@@ -308,6 +309,30 @@ export function ForYouOmniFeed() {
       </nav>
 
       <div className="mx-auto max-w-2xl">
+        <div className="border-b border-white/[.08] py-4">
+          <div className="flex items-center gap-3">
+            <ShareToFeed defaultCaption="" activity="For You" />
+            <Link to="/messages" className="grid min-h-[42px] place-items-center rounded-full border border-white/10 px-4 text-[10px] font-black text-white/56">Messages</Link>
+            <Link to="/clubs" className="grid min-h-[42px] place-items-center rounded-full border border-white/10 px-4 text-[10px] font-black text-white/56">Squads</Link>
+          </div>
+        </div>
+
+        {state.stories.filter((story) => Date.now() - Date.parse(story.at) < 86_400_000).length > 0 && (
+          <div className="no-scrollbar flex gap-3 overflow-x-auto border-b border-white/[.08] py-4" aria-label="Stories">
+            {state.stories
+              .filter((story) => Date.now() - Date.parse(story.at) < 86_400_000)
+              .slice(0, 12)
+              .map((story) => (
+                <Link key={story.id} to="/feed" className="w-16 shrink-0 text-center">
+                  <span className="mx-auto grid h-14 w-14 place-items-center overflow-hidden rounded-full border-2 border-emerald-300/65 bg-white/[.04] p-0.5">
+                    {story.image ? <img src={story.image} alt="" className="h-full w-full rounded-full object-cover" /> : <span className="grid h-full w-full place-items-center rounded-full bg-white/[.05] text-[10px] font-black text-white/70">{initials(story.authorName)}</span>}
+                  </span>
+                  <span className="mt-1 block truncate text-[9px] font-black text-white/42">{story.authorName.split(/\s+/)[0]}</span>
+                </Link>
+              ))}
+          </div>
+        )}
+
         {items.slice(0, visible).map((item) => {
           if (item.kind === 'post') return <PostCard key={item.id} post={item.post} />
           if (item.kind === 'rank') return <RankCard key={item.id} />
