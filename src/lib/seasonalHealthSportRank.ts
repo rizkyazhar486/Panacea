@@ -306,7 +306,7 @@ export function calculateEffortStar(
   const relativeEnergy = personalMedian && previousEnergy.length >= 3
     ? kcalPerKg / personalMedian
     : 1
-  const personalDifficulty = clampUnit(0.9 + (relativeEnergy - 1) * 0.22, 0.78, 1.18)
+  const personalDifficulty = clampUnit(1 + (relativeEnergy - 1) * 0.18, 0.82, 1.18)
 
   const rpe = typeof workout.rpe === 'number' && workout.rpe >= 1 && workout.rpe <= 10
     ? workout.rpe
@@ -329,7 +329,7 @@ export function calculateEffortStar(
 
   const stars = clampUnit(roundedQuarter(rawStars), 0, 3)
   const energyScore = clamp((energyBase / 2) * 100)
-  const personalScore = clamp(((personalDifficulty - 0.78) / (1.18 - 0.78)) * 100)
+  const personalScore = clamp(((personalDifficulty - 0.82) / (1.18 - 0.82)) * 100)
   const internalScore = rpe == null ? 50 : clamp(rpe * 10)
   const victoryScore = clamp((stars / 3) * 100)
 
