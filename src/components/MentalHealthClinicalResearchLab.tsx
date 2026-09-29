@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from './Prosa'
 import {
   MENTAL_HEALTH_COMPOUND_MODELS,
   MENTAL_HEALTH_DAILY_BEHAVIORS,
@@ -67,11 +68,9 @@ export function MentalHealthClinicalResearchLab() {
           >
             Neuropsychiatric mechanism + routine lab
           </h2>
-          <p className="mt-2 max-w-3xl text-xs leading-relaxed text-white/50">
-            Molecular pharmacology, social biology and longitudinal behavior in one
-            clinician-facing research surface. It is deliberately not a chatbot and
-            does not prescribe medication.
-          </p>
+          <Prosa kelas="mt-2 max-w-3xl text-xs leading-relaxed text-white/50">
+            Molecular pharmacology, social biology and longitudinal behavior in one clinician-facing research surface. It is deliberately not a chatbot and does not prescribe medication.
+          </Prosa>
         </div>
         <div className="text-[9px] font-black uppercase tracking-[.12em] text-white/30">
           mechanism ≠ recommendation
@@ -107,7 +106,7 @@ export function MentalHealthClinicalResearchLab() {
               <select
                 value={selected.id}
                 onChange={(event) => setCompoundId(event.target.value)}
-                className="mt-2 min-h-[44px] w-full max-w-xl border-b border-white/20 bg-black py-2 text-sm font-black text-white outline-none sm:min-w-[380px]"
+                className="dark mt-2 min-h-[44px] w-full max-w-xl border-b border-white/20 bg-black py-2 text-sm font-black text-white outline-none sm:min-w-[380px]"
               >
                 {available.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -264,11 +263,9 @@ export function MentalHealthClinicalResearchLab() {
               </div>
             </div>
 
-            <p className="mt-4 text-[10px] leading-relaxed text-white/32">
-              These equations are deliberately generic. Real psychiatric PK/PD can
-              include absorption, active metabolites, protein binding, nonlinear
-              kinetics, brain exposure, receptor kinetics and delayed network adaptation.
-            </p>
+            <Prosa kelas="mt-4 text-[10px] leading-relaxed text-white/32">
+              These equations are deliberately generic. Real psychiatric PK/PD can include absorption, active metabolites, protein binding, nonlinear kinetics, brain exposure, receptor kinetics and delayed network adaptation.
+            </Prosa>
           </div>
 
           <div className="border-t border-white/10 pt-4">
