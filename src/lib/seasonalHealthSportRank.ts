@@ -305,7 +305,8 @@ export function calculateSeasonalRank(
   // Each eligible week contributes up to 250 RP. A perfect 13-week season
   // yields 3250 RP, enough to reach Mythic Immortal without rewarding unsafe
   // volume beyond the activity cap.
-  const points = Math.round(score * elapsedWeeks * 2.5)
+  const evidenceMultiplier = evidence < 25 ? 0 : 0.5 + evidence / 200
+  const points = Math.round(score * elapsedWeeks * 2.5 * evidenceMultiplier)
   const currentTier = rankTierForPoints(points)
   const tierIndex = RANK_TIERS.findIndex((tier) => tier.id === currentTier.id)
   const nextTier = RANK_TIERS[tierIndex + 1] ?? null
