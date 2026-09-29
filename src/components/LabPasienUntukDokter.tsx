@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { api, backendEnabled, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
+import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
 import { RencanaHarianDokter } from './RencanaHarianDokter'
 import { statusPasienUntukDokter } from '../lib/statusPasienDokter'
 import { timelineHarian, angka } from '../lib/perubahanLongitudinal'
 import { buildClinicianContinuousCareDigest, submitDailyAnamnesis, type ContinuousCarePlan, type DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
 import { sortClinicianCareInbox, summarizeClinicianCareDigest, type ClinicianCareInboxRow } from '../lib/clinicianCareInbox'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
+import { createLongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
 // garis dasar pribadi (median ± 2·MAD×1,4826 dari hasil SEBELUMNYA), satu titik
