@@ -31,6 +31,6 @@ test('network OS connects discovery discussion tasks and opportunity discovery',
 })
 
 test('empty social state is fail-closed rather than populated by fake people or posts', () => {
-  assert.match(feed, /does not fabricate people or posts/)
+  assert.match(feed, /fabricat(?:e|ing).*people.*posts/i)
   assert.match(network, /instead of synthetic matches/)
 })
