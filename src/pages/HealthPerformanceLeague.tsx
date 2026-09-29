@@ -45,7 +45,7 @@ function readWorkoutEvidence(): RankedWorkoutEvidence[] {
   return getWorkouts().map((workout) => ({
     id: workout.id,
     startedAt: workout.mulai,
-    durationMinutes: Math.max(0, Number(workout.durasi) || 0),
+    durationMinutes: Math.max(0, (Number(workout.durasi) || 0) / 60),
     paceSecondsPerKm: typeof workout.paceSec === 'number' ? workout.paceSec : undefined,
     speedKmh: typeof workout.kecepatanKmh === 'number' ? workout.kecepatanKmh : undefined,
     rpe: typeof workout.rpe === 'number' ? workout.rpe : undefined,
@@ -54,7 +54,7 @@ function readWorkoutEvidence(): RankedWorkoutEvidence[] {
 
 const COMPONENT_META = [
   ['consistency', 'Consistency', 'Repeatable active days, capped so grinding extra sessions cannot dominate.'],
-  ['activity', 'Activity', 'Weekly verified duration against the 150 min baseline; excess volume is not rewarded indefinitely.'],
+  ['activity', 'Activity', 'Weekly recorded workout duration referenced to the 150 min adult activity baseline; intensity equivalence is not assumed.'],
   ['recovery', 'Recovery', 'Recovery/sleep context protects planned rest instead of treating it as a loss.'],
   ['progression', 'Progression', 'Comparable pace/speed sessions across the season; trend matters more than one peak workout.'],
   ['evidence', 'Evidence', 'Source coverage and longitudinal depth. Weak evidence suppresses RP rather than inventing certainty.'],
@@ -267,7 +267,7 @@ export function HealthPerformanceLeague() {
             ))}
           </div>
           <p className="mt-4 text-[10px] leading-relaxed text-white/35">
-            Activity credit uses the WHO adult baseline of at least 150 minutes/week as a reference point.
+            Activity credit uses the WHO adult baseline of at least 150 minutes/week only as a reference point; imported workout duration is not automatically equivalent to moderate-intensity minutes.
             This is a gamification layer, not a diagnosis, prognosis, medical clearance or substitute for clinician/coach judgement.
           </p>
         </Card>
