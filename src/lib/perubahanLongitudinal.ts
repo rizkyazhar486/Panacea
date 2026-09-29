@@ -47,6 +47,11 @@ const LABEL: Record<string, string> = {
   'dietary-water': 'Water',
   'waist-circumference': 'Waist',
   'blood-glucose': 'Blood glucose',
+  'cycling-distance': 'Cycling distance',
+  'cycling-power': 'Cycling power',
+  'swim-distance': 'Swim distance',
+  'stair-speed-ascent': 'Stair ascent speed',
+  'uv-exposure-index': 'UV index',
 }
 export const labelMetrik = (m: string, labels: Record<string, string> = {}) => {
   if (labels[m]) return labels[m]

@@ -10,20 +10,21 @@ import {
 const kunciKatalog = KATALOG.map((d) => d.kunci)
 const audit = auditCakupanWearableLongitudinal(kunciKatalog)
 
-assert.ok(audit.covered.length >= 90, `cakupan wearable terlalu kecil: ${audit.covered.length}`)
+assert.ok(audit.covered.length >= 100, `cakupan wearable terlalu kecil: ${audit.covered.length}`)
 assert.ok(audit.gap.length > 0, 'gap harus eksplisit — jangan pura-pura katalog penuh')
 for (const wajib of [
   'restingHr', 'hrvMs', 'vo2max', 'waistCm', 'bloodGlucoseMgdl', 'walkingHr',
   'proteinG', 'carbsG', 'dietKcal', 'caffeineMg',
   'vitCMg', 'vitDMcg', 'vitB12Mcg', 'folateMcg', 'zincMg', 'seleniumMcg', 'biotinMcg',
+  'cyclingDistanceKm', 'swimDistanceM', 'stairSpeedUpMs', 'uvIndex',
 ]) {
   assert.ok(audit.covered.includes(wajib), `${wajib} belum masuk jembatan longitudinal`)
 }
-for (const perangkat of ['sleepH', 'sleepDeepH', 'restingHr', 'sodiumMg', 'vitDMcg', 'folateMcg']) {
+for (const perangkat of ['sleepH', 'sleepDeepH', 'restingHr', 'sodiumMg', 'vitDMcg', 'folateMcg', 'cyclingPowerW']) {
   assert.ok(KUNCI_METRIK_PERANGKAT_LONGITUDINAL.includes(perangkat), `${perangkat} hilang dari DEVICE_METRICS`)
 }
-for (const belum of ['sexualActivity', 'cyclingPowerW', 'insulinIU', 'bloodAlcoholPct', 'uvIndex']) {
-  assert.ok(audit.gap.includes(belum), `${belum} harus tetap gap (bukan mikronutrien longevity)`)
+for (const belum of ['sexualActivity', 'insulinIU', 'bloodAlcoholPct', 'handwashSec', 'edaMicroS', 'underwaterDepthM']) {
+  assert.ok(audit.gap.includes(belum), `${belum} harus tetap gap (sensitif/klinis/higienis)`)
 }
 assert.deepEqual(
   [...KUNCI_METRIK_PERANGKAT_LONGITUDINAL].sort(),
@@ -49,6 +50,8 @@ assert.match(overlay, /data-pmd-device-overlay-signal/)
   assert.equal(labelMetrik('dietary-vitamin-d'), 'Vitamin D')
   assert.equal(labelMetrik('dietary-vitamin-b12'), 'Vitamin B12')
   assert.equal(labelMetrik('dietary-folate'), 'Folate')
+  assert.equal(labelMetrik('cycling-distance'), 'Cycling distance')
+  assert.equal(labelMetrik('uv-exposure-index'), 'UV index')
   assert.equal(labelMetrik('lab.gdp'), 'Fasting glucose')
 }
 

@@ -150,7 +150,7 @@ const DEVICE_METRICS: Readonly<Record<string, NumericMetricSpec>> = {
   moveMin: { metric: 'move-minutes', domain: 'activity', unit: 'min' },
   standMin: { metric: 'stand-minutes', domain: 'activity', unit: 'min' },
   // Core dietary macros / minerals / vitamins from Health Auto Export — clear units only.
-  // Sport/hygiene/sexual/insulin/alcohol-BAC/environment keys stay explicit gaps.
+  // Hygiene, insulin delivery, BAC, EDA, and underwater keys stay explicit gaps.
   dietKcal: { metric: 'dietary-energy', domain: 'longevity', unit: 'kcal' },
   proteinG: { metric: 'dietary-protein', domain: 'longevity', unit: 'g' },
   carbsG: { metric: 'dietary-carbohydrate', domain: 'longevity', unit: 'g' },
@@ -190,6 +190,21 @@ const DEVICE_METRICS: Readonly<Record<string, NumericMetricSpec>> = {
   folateMcg: { metric: 'dietary-folate', domain: 'longevity', unit: 'µg' },
   caffeineMg: { metric: 'dietary-caffeine', domain: 'longevity', unit: 'mg' },
   alcoholUnits: { metric: 'alcohol-consumption', domain: 'longevity', unit: 'unit' },
+  // Clear fitness / environment Health keys — hygiene, insulin, BAC, EDA stay gaps.
+  cyclingDistanceKm: { metric: 'cycling-distance', domain: 'activity', unit: 'km' },
+  cyclingSpeedKmh: { metric: 'cycling-speed', domain: 'fitness', unit: 'km/h' },
+  cyclingPowerW: { metric: 'cycling-power', domain: 'fitness', unit: 'W' },
+  cyclingCadence: { metric: 'cycling-cadence', domain: 'fitness', unit: 'rpm' },
+  cyclingFtpW: { metric: 'cycling-ftp', domain: 'fitness', unit: 'W' },
+  swimDistanceM: { metric: 'swim-distance', domain: 'activity', unit: 'm' },
+  swimStrokes: { metric: 'swim-strokes', domain: 'activity', unit: 'count' },
+  stairSpeedUpMs: { metric: 'stair-speed-ascent', domain: 'fitness', unit: 'm/s' },
+  stairSpeedDownMs: { metric: 'stair-speed-descent', domain: 'fitness', unit: 'm/s' },
+  snowDistanceKm: { metric: 'snow-sports-distance', domain: 'activity', unit: 'km' },
+  wheelchairDistanceKm: { metric: 'wheelchair-distance', domain: 'activity', unit: 'km' },
+  pushCount: { metric: 'wheelchair-pushes', domain: 'activity', unit: 'count' },
+  physicalEffort: { metric: 'physical-effort', domain: 'fitness', unit: 'score' },
+  uvIndex: { metric: 'uv-exposure-index', domain: 'other', unit: 'index' },
 }
 
 
