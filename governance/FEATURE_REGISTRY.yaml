@@ -174,3 +174,36 @@ features:
     known_gaps: [canonical_state_built_client_side_only, wearable_and_non_lab_signals_not_audited]
     next_actions: [project_canonical_state_into_body_exposure_and_timeline]
     last_audited_commit: 0cb6906a
+
+  - feature_id: core.embodied_workflow_observation_os
+    name: Embodied Workflow Observation OS
+    domain: Core Health Intelligence
+    capability: Permissioned embodied workflow observability
+    workflow: Authorized camera/sensor evidence -> hand-object graph -> workflow episode -> canonical derived summary
+    user_types: [clinician, researcher, learner, system]
+    primary_problem: Real-world clinical/lab/procedural work is fragmented into unstructured visual activity that cannot be replayed with provenance and uncertainty
+    use_case: Convert authorized egocentric or ambient perception output into governed workflow evidence without creating a parallel patient truth store
+    inputs: [authorized_perception_frames, hand_detections, object_detections, relation_evidence, optional_protocol_definition]
+    outputs: [embodied_interaction_graph, workflow_episode, protocol_coverage_gap, uncertainty_index, longitudinal_model_estimated_event]
+    reads_from: [purpose_consent, approved_protocol_definitions]
+    writes_to: [core.canonical_patient_state]
+    dependencies: [core.canonical_patient_state, provenance, consent, human_observability]
+    dependents: [clinical_records, universal_operation_simulator, body_exposure, research_reproducibility]
+    patient_state_fields: [embodied-workflow-episode_as_derived_summary]
+    knowledge_graph_entities: [workflow_episode, protocol_step, hand_object_interaction]
+    shared_services: [consent, provenance, audit, longitudinal_replay, human_observability]
+    backend_surfaces: [future_perception_adapter_ingest]
+    frontend_surfaces: [future_records_replay, future_clinical_review, future_simulation_overlay]
+    persistence_surfaces: [canonical_longitudinal_event_summary_only]
+    external_integrations: [future_head_camera, future_ar_glasses, future_device_telemetry]
+    maturity_level: FUNCTIONAL
+    clinical_validation: not_started
+    technical_risk: medium
+    clinical_risk: high
+    provenance_required: true
+    tests: [scripts/qa/human-observability.test.mjs]
+    observability: [interaction_confidence, protocol_coverage_gap, episode_uncertainty, sequence_evidence]
+    known_gaps: [no_live_perception_adapter, no_external_dataset_validation, no_qualified_clinical_workflow_validation, raw_media_service_not_implemented]
+    next_actions: [connect_first_authorized_perception_adapter, validate_against_annotated_egocentric_workflow_dataset, add_human_review_surface]
+    last_audited_commit: 6d7dc92f18369dabd04c436acba36e8b3b1c603a
+

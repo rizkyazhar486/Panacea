@@ -13,6 +13,12 @@ import {
   createLongitudinalPatientState,
   ingestLongitudinalBatch,
 } from '../../src/lib/panaceaLongitudinalState.ts'
+import {
+  EMBODIED_WORKFLOW_OS_POLICY,
+  buildEmbodiedInteractionGraph,
+  buildEmbodiedWorkflowEpisode,
+  buildEmbodiedWorkflowLongitudinalEvent,
+} from '../../src/lib/embodiedWorkflowOS.ts'
 
 const subjectId = 'observability-subject-1'
 const consent = {
@@ -253,4 +259,123 @@ test('gap lookup requires signal identity when a metric has multiple blind spots
     observabilityGapForMetric(frame, 'core-temperature', { domain: 'vital', unit: 'celsius' })?.domain,
     'vital',
   )
+})
+
+
+test('embodied workflow OS converts authorized hand-object evidence into explicit protocol gaps', () => {
+  const protocol = {
+    id: 'bench-demo',
+    version: '1',
+    label: 'Bench demonstration',
+    contextKinds: ['laboratory'],
+    provenanceRef: 'approved-protocol:bench-demo:v1',
+    steps: [
+      {
+        id: 'select-pipette',
+        label: 'Select pipette',
+        requirements: [
+          { id: 'pipette-grasp', objectLabels: ['pipette'], actionLabels: ['grasp'] },
+        ],
+      },
+      {
+        id: 'dispense-tube',
+        label: 'Dispense into tube',
+        requirements: [
+          { id: 'tube-dispense', objectLabels: ['tube'], actionLabels: ['dispense'] },
+        ],
+      },
+    ],
+  }
+
+  const frameA = {
+    id: 'frame-a',
+    workspaceId: 'bench-a',
+    capturedAt: '2026-09-29T10:00:00.000Z',
+    source: { kind: 'head-mounted-camera', id: 'headcam-a', modelVersion: 'fixture-1' },
+    detections: [
+      { id: 'hand-a', kind: 'hand', label: 'right hand', handedness: 'right', confidence: 0.98 },
+      { id: 'pipette-a', kind: 'instrument', label: 'pipette', confidence: 0.96 },
+    ],
+    relations: [
+      {
+        id: 'interaction-a',
+        handDetectionId: 'hand-a',
+        objectDetectionId: 'pipette-a',
+        actionLabel: 'grasp',
+        spatialConfidence: 0.94,
+        temporalConfidence: 0.92,
+        contactConfidence: 0.93,
+        actionConfidence: 0.90,
+      },
+    ],
+  }
+
+  const firstEpisode = buildEmbodiedWorkflowEpisode({
+    id: 'episode-a',
+    contextKind: 'laboratory',
+    frames: [frameA],
+    protocol,
+  })
+
+  assert.equal(buildEmbodiedInteractionGraph(frameA).length, 1)
+  assert.equal(firstEpisode.stepEvidence[0].state, 'supported-candidate')
+  assert.equal(firstEpisode.stepEvidence[1].state, 'unobserved')
+  assert.equal(firstEpisode.protocolCoverage, 0.5)
+  assert.equal(firstEpisode.protocolCoverageGap, 0.5)
+  assert.equal(firstEpisode.boundary.protocolComplianceEstablished, false)
+  assert.equal(EMBODIED_WORKFLOW_OS_POLICY.autonomousClinicalActionAllowed, false)
+})
+
+test('embodied workflow OS writes only a model-estimated derived summary until human review', () => {
+  const episode = buildEmbodiedWorkflowEpisode({
+    id: 'episode-reviewed-boundary',
+    contextKind: 'laboratory',
+    frames: [{
+      id: 'frame-boundary',
+      workspaceId: 'bench-a',
+      capturedAt: '2026-09-29T10:00:00.000Z',
+      source: { kind: 'head-mounted-camera', id: 'headcam-a' },
+      detections: [
+        { id: 'hand-boundary', kind: 'hand', label: 'left hand', handedness: 'left', confidence: 0.97 },
+        { id: 'tube-boundary', kind: 'container', label: 'tube', confidence: 0.95 },
+      ],
+      relations: [{
+        id: 'interaction-boundary',
+        handDetectionId: 'hand-boundary',
+        objectDetectionId: 'tube-boundary',
+        actionLabel: 'position',
+        spatialConfidence: 0.92,
+        temporalConfidence: 0.91,
+        contactConfidence: 0.90,
+        actionConfidence: 0.89,
+      }],
+    }],
+  })
+
+  const event = buildEmbodiedWorkflowLongitudinalEvent(episode, {
+    subjectId,
+    purpose: 'clinical-support',
+    consent,
+    receivedAt: '2026-09-29T10:01:00.000Z',
+  })
+
+  assert.equal(event.domain, 'other')
+  assert.equal(event.metric, 'embodied-workflow-episode')
+  assert.equal(event.semanticState, 'model-estimated')
+  assert.equal(event.provenance.sourceKind, 'derived')
+  assert.equal(JSON.stringify(event.value).includes('xMin'), false)
+  assert.equal(JSON.stringify(event.value).includes('rawMedia'), true)
+
+  const reviewed = buildEmbodiedWorkflowLongitudinalEvent(episode, {
+    subjectId,
+    purpose: 'clinical-support',
+    consent,
+    receivedAt: '2026-09-29T10:01:00.000Z',
+    review: {
+      state: 'accepted',
+      reviewerId: 'clinician-reviewer-1',
+      reviewedAt: '2026-09-29T10:02:00.000Z',
+    },
+  })
+  assert.equal(reviewed.semanticState, 'clinician-reviewed')
 })
