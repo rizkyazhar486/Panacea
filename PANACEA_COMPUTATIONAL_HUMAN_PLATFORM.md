@@ -141,6 +141,52 @@ and combines orthogonally with lenses such as anatomy, physiology, pathology, im
 
 The first runtime contract is implemented in `src/lib/cognitiveTranslationKernel.ts`; its regression gate is `scripts/uji/cognitive-translation-kernel.mts`.
 
+### Category pages: compression without fragmentation
+
+Panacea's visible product topology is constrained to seven semantic category pages:
+
+```text
+Home (entry)
+  |
+  +-- Human     : anatomy / physiology / imaging
+  +-- Health    : prevention / performance / recovery
+  +-- Clinical  : care / reasoning / treatment
+  +-- Explore   : knowledge / evidence / education
+  +-- Simulate  : what-if / procedures / models
+  +-- Records   : timeline / devices / medical record
+  +-- For You   : life / people / account
+```
+
+Panacea AI is transversal across these surfaces rather than becoming another destination.
+
+The category-page law is:
+
+```text
+feature route -> product space -> category page -> canonical human state
+```
+
+and never:
+
+```text
+feature route -> feature-owned patient state
+```
+
+Formally, for category lens \(L_k\) and canonical human state \(S_t\):
+
+\[
+V_k(t) = L_k(S_t)
+\]
+
+with the state-identity invariant:
+
+\[
+S_t^{Human}=S_t^{Health}=S_t^{Clinical}=S_t^{Explore}=S_t^{Simulate}=S_t^{Records}
+\]
+
+The categories may differ in representation, permissions, workflow and cognitive depth, but not by manufacturing parallel human truths. Existing feature routes are preserved as deep child views; compactness is achieved by lowering the number of first-class destinations, not by deleting capability.
+
+Runtime taxonomy and integration contract: `src/lib/superPages.ts`. Navigation regression gate: `scripts/uji/hirarki-navigasi.mts`.
+
 ## 2. Vertical sophistication
 
 Panaceamed optimizes for validated vertical depth rather than raw feature count.
