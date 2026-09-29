@@ -26,7 +26,7 @@ type ClinicianShare = { id: string; berakhir: string; pasien: string }
 type ClinicianLabPayload = Awaited<ReturnType<typeof api.clinicianLabFhir>>
 type ClinicianCarePayload = Awaited<ReturnType<typeof api.clinicianCare>>
 type ClinicianInboxItem = ClinicianCareInboxRow & {
-  payload?: { detail: ClinicianLabPayload; care: ClinicianCarePayload }
+  care?: ClinicianCarePayload
   loadError?: string
 }
 
@@ -100,36 +100,31 @@ export function LabPasienUntukDokter() {
 
     const loadInbox = async () => {
       const baseRows: ClinicianCareInboxRow[] = []
-      const payloads = new Map<string, ClinicianInboxItem['payload']>()
+      const careByShare = new Map<string, ClinicianCarePayload>()
       const errors = new Map<string, string>()
+      const generatedAt = new Date().toISOString()
 
+      // Deliberately do NOT call clinicianLabFhir here. Opening that endpoint is
+      // an audited clinical-record access. The inbox loads only authorization
+      // metadata + care-plan/check-in data; labs/vitals are fetched after the
+      // clinician explicitly opens one patient.
       await Promise.all(daftar.map(async (share) => {
         try {
-          const [detail, careData] = await Promise.all([
-            api.clinicianLabFhir(share.id),
-            api.clinicianCare(share.id),
-          ])
-          payloads.set(share.id, { detail, care: careData })
+          const careData = await api.clinicianCare(share.id)
+          careByShare.set(share.id, careData)
 
           if (!careData.plan) {
             baseRows.push(summarizeClinicianCareDigest(share.id, share.pasien, null))
             return
           }
 
-          const canonical = statusPasienUntukDokter(
-            detail.bundle.entry as never,
-            careData,
-            detail.reviews,
-            detail,
-            new Date().toISOString(),
-            detail.verifiedVitals ?? [],
-          )
           const latest = latestCareReport(careData.plan, careData.reports)
+          const minimalState = createLongitudinalPatientState(careData.plan.subjectId, generatedAt)
           const digest = buildClinicianContinuousCareDigest(
             careData.plan,
             latest,
-            canonical.state,
-            new Date().toISOString(),
+            minimalState,
+            generatedAt,
           )
           baseRows.push(summarizeClinicianCareDigest(share.id, share.pasien, digest))
         } catch (error) {
@@ -141,7 +136,7 @@ export function LabPasienUntukDokter() {
       if (cancelled) return
       setInbox(sortClinicianCareInbox(baseRows).map((row) => ({
         ...row,
-        payload: payloads.get(row.shareId),
+        care: careByShare.get(row.shareId),
         loadError: errors.get(row.shareId),
       })))
     }
@@ -174,7 +169,7 @@ export function LabPasienUntukDokter() {
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <h3 className="text-[12px] font-black">Continuous care inbox</h3>
-              <p className="mt-0.5 text-[10px] text-white/40">One scan queue from clinician-authored rules and canonical longitudinal state.</p>
+              <p className="mt-0.5 text-[10px] text-white/40">One scan queue from clinician-authored rules; audited clinical signals load only after you open a patient.</p>
             </div>
             <span className="text-[10px] font-black text-white/35">{inbox?.filter((row) => row.hasActivePlan).length ?? 0} active plan{(inbox?.filter((row) => row.hasActivePlan).length ?? 0) === 1 ? '' : 's'}</span>
           </div>
@@ -187,11 +182,16 @@ export function LabPasienUntukDokter() {
                 <button
                   key={row.shareId}
                   type="button"
-                  disabled={!row.payload}
+                  disabled={!row.care}
                   onClick={() => {
-                    if (!row.payload) return
-                    setCare(row.payload.care)
-                    setBuka({ ...row.payload.detail, izinId: row.shareId })
+                    if (!row.care) return
+                    setGalat(null)
+                    api.clinicianLabFhir(row.shareId)
+                      .then((detail) => {
+                        setCare(row.care!)
+                        setBuka({ ...detail, izinId: row.shareId })
+                      })
+                      .catch((error) => setGalat((error as Error).message))
                   }}
                   className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-3 py-2.5 text-left disabled:opacity-55"
                   data-care-inbox-priority={row.workflowPriority}
@@ -208,7 +208,7 @@ export function LabPasienUntukDokter() {
                     {row.hasActivePlan && (
                       <span className="mt-1 block text-[9px] text-white/35">
                         {row.latestReportAt ? `Last check-in ${row.latestReportAt.slice(0, 10)}` : 'No check-in yet'}
-                        {' · '}{row.availableSignalCount} signal{row.availableSignalCount === 1 ? '' : 's'}
+                        {' · '}signals load on open
                         {row.missingRequiredCount ? ` · ${row.missingRequiredCount} missing required` : ''}
                         {row.triggeredRuleCount ? ` · ${row.triggeredRuleCount} patient rule` : ''}
                         {row.measurementAttentionCount ? ` · ${row.measurementAttentionCount} measurement review` : ''}
