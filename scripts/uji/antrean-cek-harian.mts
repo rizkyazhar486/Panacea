@@ -30,4 +30,7 @@ assert.match(rute, /find\(\(l\) => l\.clientId === laporan\.clientId\)[\s\S]*if 
 const ui = readFileSync('src/components/CekHarian.tsx', 'utf8')
 assert.match(ui, /addEventListener\('online'/, 'antrean tidak dikuras saat kembali online')
 assert.match(ui, /not yet sent to your doctor/, 'jawaban yang masih diantre ditampilkan seolah sudah terkirim')
-console.log('antrean-cek-harian: jaringan→antre, penolakan→tidak, idempoten via clientId, kuras saat online')
+assert.match(ui, /sendOrQueueEncryptedCareReport/, 'production check-in tidak memakai secure encrypted outbox')
+assert.doesNotMatch(ui, /bacaAntrean\(localStorage\)|kirimAtauAntre\(localStorage|kurasAntrean\(localStorage/,
+  'production check-in kembali menyimpan jawaban medis di plaintext localStorage')
+console.log('antrean-cek-harian: legacy algorithm remains idempotent; production UI is locked to the encrypted outbox.')
