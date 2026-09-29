@@ -13,6 +13,8 @@ import {
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
 
 type StoredHealth = {
+  weightKg?: number
+  restingHr?: number
   recoveryPct?: number
   sleepH?: number
   updatedAt?: string
@@ -25,6 +27,8 @@ function readHealthEvidence(): RankedHealthEvidence | undefined {
     if (!raw) return undefined
     const parsed = JSON.parse(raw) as StoredHealth
     return {
+      weightKg: typeof parsed.weightKg === 'number' ? parsed.weightKg : undefined,
+      restingHr: typeof parsed.restingHr === 'number' ? parsed.restingHr : undefined,
       recoveryPct: typeof parsed.recoveryPct === 'number' ? parsed.recoveryPct : undefined,
       sleepHours: typeof parsed.sleepH === 'number' ? parsed.sleepH : undefined,
       updatedAt: parsed.updatedAt,
@@ -46,6 +50,9 @@ function readWorkoutEvidence(): RankedWorkoutEvidence[] {
     id: workout.id,
     startedAt: workout.mulai,
     durationMinutes: Math.max(0, (Number(workout.durasi) || 0) / 60),
+    activeKcal: typeof workout.kcal === 'number' ? workout.kcal : undefined,
+    avgHr: typeof workout.avgHr === 'number' ? workout.avgHr : undefined,
+    maxHr: typeof workout.maxHr === 'number' ? workout.maxHr : undefined,
     paceSecondsPerKm: typeof workout.paceSec === 'number' ? workout.paceSec : undefined,
     speedKmh: typeof workout.kecepatanKmh === 'number' ? workout.kecepatanKmh : undefined,
     rpe: typeof workout.rpe === 'number' ? workout.rpe : undefined,
@@ -53,11 +60,11 @@ function readWorkoutEvidence(): RankedWorkoutEvidence[] {
 }
 
 const COMPONENT_META = [
-  ['consistency', 'Consistency', 'Repeatable active days, capped so grinding extra sessions cannot dominate.'],
-  ['activity', 'Activity', 'Weekly recorded workout duration referenced to the 150 min adult activity baseline; intensity equivalence is not assumed.'],
-  ['recovery', 'Recovery', 'Recovery/sleep context protects planned rest instead of treating it as a loss.'],
-  ['progression', 'Progression', 'Comparable pace/speed sessions across the season; trend matters more than one peak workout.'],
-  ['evidence', 'Evidence', 'Source coverage and longitudinal depth. Weak evidence suppresses RP rather than inventing certainty.'],
+  ['consistency', 'Consistency', 'Repeatable active days matter, but grinding extra sessions cannot dominate.'],
+  ['energy', 'Energy', 'Verified active calories are the base competitive currency, normalised to the person rather than compared raw.'],
+  ['recovery', 'Recovery', 'Recovery/sleep context protects planned rest instead of rewarding unsafe suffering.'],
+  ['progression', 'Progression', 'Comparable pace/speed evidence modifies the star only relative to your own recent baseline.'],
+  ['evidence', 'Evidence', 'Source coverage determines how confidently the AI can size each effort star.'],
 ] as const
 
 function formatDate(d: Date) {
@@ -107,8 +114,8 @@ export function HealthPerformanceLeague() {
               </div>
               <h2 className="mt-1 text-2xl font-black tracking-[-.035em] sm:text-3xl">Health & Performance League</h2>
               <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-white/55 sm:text-sm">
-                A 90-day competitive ladder built from your observed training, recovery and longitudinal data.
-                Visible rank resets every three months; illness, injury and planned recovery are never treated as moral failure.
+                A 90-day competitive ladder where every verified effort is a match. Active calories are the base currency;
+                Panacea sizes the star using your body, recent baseline, perceived/physiological load, progression, recovery and evidence quality.
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[.045] px-3 py-2 text-right">
@@ -143,7 +150,7 @@ export function HealthPerformanceLeague() {
               </div>
               <div className="mt-4 text-[10px] font-black uppercase tracking-[.22em] text-white/40">Current rank</div>
               <div className="mt-1 text-2xl font-black tracking-[-.03em]">{tierLabel}</div>
-              <div className="mt-1 text-xs font-bold text-cyan-200">{result.points.toLocaleString()} RP</div>
+              <div className="mt-1 text-xs font-bold text-cyan-200">★ {result.stars.toFixed(2)} season stars</div>
               <div className="mt-3">
                 <Badge tone={result.evidenceLabel === 'strong' ? 'normal' : 'neutral'}>
                   {result.evidenceLabel} evidence
@@ -154,12 +161,12 @@ export function HealthPerformanceLeague() {
             <div className="rounded-[28px] border border-white/10 bg-white/[.035] p-4 sm:p-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-[.18em] text-white/40">Season performance score</div>
+                  <div className="text-[10px] font-black uppercase tracking-[.18em] text-white/40">AI victory index</div>
                   <div className="mt-1 text-4xl font-black tabular-nums">{result.score}<span className="text-base text-white/35">/100</span></div>
                 </div>
                 <div className="text-right text-[11px] text-white/45">
-                  <div>{result.workoutCount} verified workouts</div>
-                  <div>{result.eligibleWeeks} season weeks scored</div>
+                  <div>{result.calorieVerifiedWorkoutCount}/{result.workoutCount} calorie-verified efforts</div>
+                  <div>{result.eligibleWeeks} season weeks active</div>
                 </div>
               </div>
 
@@ -175,7 +182,7 @@ export function HealthPerformanceLeague() {
                   />
                 </div>
                 <div className="mt-2 text-[11px] text-white/45">
-                  {result.nextTier ? `${result.pointsToNext} RP to promotion` : 'Mythic Immortal reached for this season.'}
+                  {result.nextTier ? `★ ${result.starsToNext.toFixed(2)} to promotion` : 'Mythic Immortal reached for this season.'}
                 </div>
               </div>
 
@@ -201,6 +208,42 @@ export function HealthPerformanceLeague() {
       <Card className="!border-white/10 !bg-[#07090c] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
+            <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Recent matches</div>
+            <h3 className="mt-1 text-lg font-black">Every effort earns a different-sized star</h3>
+          </div>
+          <span className="text-[10px] font-bold text-white/40">0–3★ per verified effort</span>
+        </div>
+        <div className="mt-4 grid gap-2">
+          {result.effortWins.slice(-6).reverse().map((effort) => {
+            const starScale = effort.stars >= 2.5 ? 'text-3xl' : effort.stars >= 1.75 ? 'text-2xl' : effort.stars >= 1.25 ? 'text-xl' : 'text-lg'
+            return (
+              <details key={effort.workoutId} className="rounded-2xl border border-white/[.07] bg-white/[.025] p-3">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black text-white/75">
+                      {new Date(effort.startedAt).toLocaleDateString()} · {Math.round(effort.calories)} kcal
+                    </div>
+                    <div className="mt-0.5 text-[10px] text-white/40">{effort.kcalPerKg.toFixed(1)} kcal/kg · {effort.size} effort win</div>
+                  </div>
+                  <div className={`${starScale} shrink-0 font-black text-amber-300`}>★ <span className="text-sm">{effort.stars.toFixed(2)}</span></div>
+                </summary>
+                <div className="mt-3 grid gap-1.5 border-t border-white/[.06] pt-3">
+                  {effort.rationale.map((line) => <div key={line} className="text-[10px] leading-relaxed text-white/45">{line}</div>)}
+                </div>
+              </details>
+            )
+          })}
+          {result.effortWins.length === 0 && (
+            <div className="rounded-2xl border border-white/[.07] bg-white/[.025] p-4 text-[11px] text-white/45">
+              No season efforts yet. Import a workout with verified active calories to play the first match.
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <Card className="!border-white/10 !bg-[#07090c] text-white">
+        <div className="flex items-center justify-between gap-3">
+          <div>
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Rank ladder</div>
             <h3 className="mt-1 text-lg font-black">Master → Mythic Immortal</h3>
           </div>
@@ -209,7 +252,7 @@ export function HealthPerformanceLeague() {
         <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
           {RANK_TIERS.map((tier) => {
             const active = tier.id === result.currentTier.id
-            const reached = result.points >= tier.minPoints
+            const reached = result.stars >= tier.minStars
             return (
               <div
                 key={tier.id}
@@ -223,7 +266,7 @@ export function HealthPerformanceLeague() {
               >
                 <div className={`grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br ${tier.accent} font-black text-black`}>{tier.glyph}</div>
                 <div className="mt-3 text-[12px] font-black">{tier.label}</div>
-                <div className="mt-0.5 text-[10px] text-white/40">{tier.minPoints.toLocaleString()} RP</div>
+                <div className="mt-0.5 text-[10px] text-white/40">★ {tier.minStars.toFixed(0)}</div>
               </div>
             )
           })}
@@ -252,11 +295,9 @@ export function HealthPerformanceLeague() {
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Scoring model</div>
           <h3 className="mt-1 text-lg font-black">Competitive, but clinically sane</h3>
           <div className="mt-4 rounded-2xl border border-white/[.07] bg-black/35 p-3 font-mono text-[11px] leading-relaxed text-cyan-100/80">
-            {mode === 'health'
-              ? 'S = 0.30C + 0.25A + 0.25R + 0.10P + 0.10E'
-              : 'S = 0.25C + 0.20A + 0.15R + 0.30P + 0.10E'}
+            ★ = Q0.25[(kcal / kg / 4) × personal difficulty × internal load × progression × recovery protection × evidence confidence]
             <br />
-            RP = S × elapsed season weeks × 2.5 × evidence multiplier
+            max = 3.00★ per effort · no verified calories = 0★
           </div>
           <div className="mt-3 space-y-2">
             {COMPONENT_META.map(([key, label, description]) => (
@@ -267,8 +308,7 @@ export function HealthPerformanceLeague() {
             ))}
           </div>
           <p className="mt-4 text-[10px] leading-relaxed text-white/35">
-            Activity credit uses the WHO adult baseline of at least 150 minutes/week only as a reference point; imported workout duration is not automatically equivalent to moderate-intensity minutes.
-            This is a gamification layer, not a diagnosis, prognosis, medical clearance or substitute for clinician/coach judgement.
+            Calories are the base game currency, not the final judgement. Raw kcal are body-size normalised, compared against the user's own recent energy baseline, then modified conservatively by available effort/progression/recovery evidence. This is a gamification layer, not a diagnosis, medical clearance or substitute for clinician/coach judgement.
           </p>
         </Card>
       </div>
@@ -280,7 +320,7 @@ export function HealthPerformanceLeague() {
             ['90-day seasons', 'Quarterly hard reset of visible rank so each season becomes a new campaign.'],
             ['Hidden MMR ready', 'A separate soft-reset rating can later power fair matchmaking without contaminating health rank.'],
             ['Promotion divisions', 'Master through Mythic use V → I progression before the next major tier.'],
-            ['Leaderboard-safe', 'Friends/global boards should only activate after opt-in identity, anti-cheat and source verification exist.'],
+            ['Clan star mass', 'Clan competition sums AI-sized stars, not raw calories; a daily cap prevents one high-volume member from carrying the whole clan.'],
           ].map(([title, copy]) => (
             <div key={title} className="rounded-2xl border border-white/[.07] bg-white/[.025] p-3">
               <div className="text-[12px] font-black">{title}</div>
