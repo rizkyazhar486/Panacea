@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { ConsultChat } from './ConsultChat'
+import { Prosa } from './Prosa'
 
 type NetworkIntent = 'friends' | 'training' | 'dating' | 'mentor' | 'collaborate'
 type WorkMode = 'any' | 'remote' | 'hybrid' | 'onsite'
@@ -228,9 +229,9 @@ export function ForYouNetworkHub() {
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/34">Network OS</div>
           <h2 className="mt-1 text-xl font-black tracking-[-.03em] text-white">People → groups → action → opportunity</h2>
-          <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-white/42">
+          <Prosa kelas="mt-1 max-w-3xl text-[11px] leading-relaxed text-white/42">
             Meet with explicit intent, move into a squad or discussion, coordinate what needs to happen, then surface relevant work and collaboration.
-          </p>
+          </Prosa>
         </div>
         <Link to="/connect" className="rounded-full border border-white/12 px-4 py-2 text-[10px] font-black text-white/70 hover:text-white">
           Full Connect ↗
@@ -373,9 +374,9 @@ export function ForYouNetworkHub() {
             <div className="py-6 text-center text-[11px] text-white/38">Sign in to join live group discussion.</div>
           )}
         </div>
-        <p className="mt-2 text-[9px] leading-relaxed text-white/28">
+        <Prosa kelas="mt-2 text-[9px] leading-relaxed text-white/28">
           Public community channels are for social/work discussion. Do not post private medical records, identifiers or confidential patient information.
-        </p>
+        </Prosa>
       </div>
 
       <div className="mt-6 border-t border-white/10 pt-4">
