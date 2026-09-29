@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import { ConsultChat } from './ConsultChat'
 
 type NetworkIntent = 'friends' | 'training' | 'dating' | 'mentor' | 'collaborate'
 type WorkMode = 'any' | 'remote' | 'hybrid' | 'onsite'
@@ -14,6 +15,13 @@ interface WorkTask {
 }
 
 const TASK_KEY = 'pmd_for_you_workboard_v1'
+
+const CHANNELS = [
+  { id: 'general', label: '# general', copy: 'Open community discussion' },
+  { id: 'training', label: '# training', copy: 'Sports, sessions and accountability' },
+  { id: 'research', label: '# research', copy: 'Medicine, science and collaboration' },
+  { id: 'jobs', label: '# opportunities', copy: 'Jobs, internships and projects' },
+] as const
 
 const INTENTS: Array<{ id: NetworkIntent; label: string; copy: string }> = [
   { id: 'friends', label: 'Friends', copy: 'Meet people with overlapping interests and activity.' },
@@ -86,6 +94,7 @@ export function ForYouNetworkHub() {
   const [jobQuery, setJobQuery] = useState('')
   const [jobLocation, setJobLocation] = useState('')
   const [workMode, setWorkMode] = useState<WorkMode>('any')
+  const [channel, setChannel] = useState<(typeof CHANNELS)[number]['id']>('general')
 
   useEffect(() => {
     setTasks(safeTasks())
@@ -332,6 +341,41 @@ export function ForYouNetworkHub() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 border-t border-white/10 pt-4">
+        <div className="text-[9px] font-black uppercase tracking-[.14em] text-white/32">Channels</div>
+        <div className="mt-1 text-sm font-black text-white/82">Slack-like group discussion inside For You</div>
+        <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
+          {CHANNELS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setChannel(item.id)}
+              title={item.copy}
+              className={`min-h-[36px] shrink-0 rounded-full border px-3 text-[9px] font-black ${
+                channel === item.id ? 'border-white bg-white text-black' : 'border-white/10 text-white/45'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 rounded-[22px] border border-white/[.08] bg-white/[.02] p-3">
+          {account ? (
+            <ConsultChat
+              room={`community-${channel}`}
+              name={account.name}
+              title={CHANNELS.find((item) => item.id === channel)?.label ?? '# channel'}
+              compact
+            />
+          ) : (
+            <div className="py-6 text-center text-[11px] text-white/38">Sign in to join live group discussion.</div>
+          )}
+        </div>
+        <p className="mt-2 text-[9px] leading-relaxed text-white/28">
+          Public community channels are for social/work discussion. Do not post private medical records, identifiers or confidential patient information.
+        </p>
       </div>
 
       <div className="mt-6 border-t border-white/10 pt-4">
