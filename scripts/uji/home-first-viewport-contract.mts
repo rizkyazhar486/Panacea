@@ -7,6 +7,7 @@ const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const healthBrief = readFileSync('src/components/HomeHealthBrief.tsx', 'utf8')
 const essentialTools = readFileSync('src/components/HomeEssentialTools.tsx', 'utf8')
+const liveRail = readFileSync('src/components/HomeLiveWidgetRail.tsx', 'utf8')
 
 // Simplicity is not feature deletion. Home stays an entry surface; the hero is
 // allowed only contextual actions so category pages do not compete with it.
@@ -55,6 +56,7 @@ const homeOrder = [
   workspace.indexOf('<HomeVisualLanding />'),
   workspace.indexOf('<HomeEssentialTools />'),
   workspace.indexOf('<SuperPageLauncher />'),
+  workspace.indexOf('<HomeLiveWidgetRail />'),
   workspace.indexOf('<HomeCommandDeck />'),
 ]
 assert.ok(homeOrder.every((index) => index >= 0), 'Home lost a required first-viewport or discovery surface')
@@ -65,4 +67,15 @@ assert.equal((essentialTools.match(/\{ to: '/g) ?? []).length, 3,
 assert.match(healthBrief, /aria-label="Today health instruments"/,
   'Home lost the concise health-status anchor')
 
-console.log('home-first-viewport-contract: one focal hero, bounded daily tools, seven compact category lenses, and complete feature reachability.')
+assert.match(workspace, /<HomeLiveWidgetRail \/>/,
+  'Home lost the compact live-health rail required for dense progressive instrumentation')
+assert.equal((liveRail.match(/\{ key: '/g) ?? []).length, 33,
+  'The compact live-health rail must keep the complete 33-signal registry')
+assert.match(liveRail, /const vitals = useVitals\(\)/,
+  'Home live instruments must subscribe to the shared health-data bus instead of freezing a one-time snapshot')
+assert.doesNotMatch(liveRail, /getVitals\(\)/,
+  'Home live instrument rail regressed to a non-reactive direct snapshot')
+assert.match(liveRail, /overflow-x-auto/,
+  'Dense Home instruments must remain a progressive horizontal rail instead of becoming a dashboard wall')
+
+console.log('home-first-viewport-contract: focal first viewport + seven shared-state categories + 33 reactive progressive health instruments.')
