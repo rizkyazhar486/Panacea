@@ -16,6 +16,7 @@ const lap = susunLaporan(plan, { scheduledFor: '2026-09-25', answers: [{ questio
 const izin = { dibuat: '2026-09-25T00:00:00.000Z', berakhir: '2026-12-25T00:00:00.000Z' }
 const { state, labels } = statusPasienUntukDokter(bundel.entry, { plan: plan as never, reports: [lap as never] },
   [{ id: 'rv', tes: 'gdp', dokterEmail: 'dr@x.test', ditinjau: '2026-09-25T05:00:00.000Z', catatan: 'Repeat.' }], izin, kini.toISOString())
+assert.equal(state.subjectId, plan.subjectId, 'status dokter kehilangan subjectId kanonik rencana care')
 const teks = timelineHarian(state, 30, labels, 'dokter').flatMap((h) => h.butir.map((b) => `${h.tanggal}|${b.label}|${b.asal}`))
 assert.deepEqual(teks.sort(), [
   '2026-09-20|Fasting glucose|patient-transcribed lab report',
