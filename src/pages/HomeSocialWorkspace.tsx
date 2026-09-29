@@ -2,6 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
+import { HomeLiveWidgetRail } from '../components/HomeLiveWidgetRail'
 import { HomeRecoveryVisuals } from '../components/HomeRecoveryVisuals'
 import { HomeEssentialTools } from '../components/HomeEssentialTools'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
@@ -69,6 +70,7 @@ export function HomeSocialWorkspace() {
           <SuperPageLauncher />
           <HomeRecoveryVisuals />
           <RelWidgetRumah />
+          <HomeLiveWidgetRail />
           <PanaceaImageSlider />
           <HomeCommandDeck />
         </div>
