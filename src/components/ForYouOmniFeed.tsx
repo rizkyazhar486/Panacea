@@ -6,7 +6,9 @@ import { getWorkouts } from '../lib/workoutStore'
 import { calculateSeasonalRank, type RankedHealthEvidence } from '../lib/seasonalHealthSportRank'
 import { ForYouDailyStack } from './ForYouDailyStack'
 import { ForYouNetworkHub } from './ForYouNetworkHub'
+import { ForYouSocialPulse } from './ForYouSocialPulse'
 import { ShareToFeed } from './ShareToFeed'
+import { Prosa } from './Prosa'
 
 type FeedMode = 'all' | 'following' | 'fitness' | 'work' | 'people'
 
@@ -17,6 +19,7 @@ type FeedItem =
   | { kind: 'daily'; id: 'daily' }
   | { kind: 'community'; id: 'community' }
   | { kind: 'jobs'; id: 'jobs' }
+  | { kind: 'pulse'; id: 'pulse' }
 
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
 
@@ -205,9 +208,9 @@ function CommunityCard() {
       <div className="rounded-[24px] border border-white/[.08] p-5">
         <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/30">People & squads</div>
         <h3 className="mt-1 text-lg font-black tracking-[-.025em] text-white/84">Meet → join → talk → train together</h3>
-        <p className="mt-2 text-[11px] leading-relaxed text-white/42">
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-white/42">
           Discovery is only the first step. Move directly into messages, a club, meetup or community discussion without leaving For You.
-        </p>
+        </Prosa>
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Link to="/connect" className="grid min-h-[48px] place-items-center rounded-xl border border-white/10 text-[10px] font-black text-white/62">Discover</Link>
           <Link to="/messages" className="grid min-h-[48px] place-items-center rounded-xl border border-white/10 text-[10px] font-black text-white/62">Messages</Link>
@@ -225,9 +228,9 @@ function JobsCard() {
       <Link to="#network-os" className="block rounded-[24px] border border-white/[.08] p-5">
         <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/30">Opportunity feed</div>
         <h3 className="mt-1 text-lg font-black tracking-[-.025em] text-white/84">Jobs, research, collaborators, cofounders</h3>
-        <p className="mt-2 text-[11px] leading-relaxed text-white/42">
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-white/42">
           Community opportunity signals and external job search live in the same scroll, instead of another isolated career page.
-        </p>
+        </Prosa>
         <div className="mt-3 text-[10px] font-black text-cyan-200/60">Open Network OS ↓</div>
       </Link>
     </section>
@@ -243,6 +246,7 @@ function buildMixedFeed(posts: SocialPost[]): FeedItem[] {
     if (index === 5) items.push({ kind: 'daily', id: 'daily' })
     if (index === 7) items.push({ kind: 'jobs', id: 'jobs' })
     if (index === 9) items.push({ kind: 'network', id: 'network' })
+    if (index === 11) items.push({ kind: 'pulse', id: 'pulse' })
   })
   if (!posts.length) {
     items.push({ kind: 'rank', id: 'rank' }, { kind: 'community', id: 'community' }, { kind: 'daily', id: 'daily' }, { kind: 'network', id: 'network' })
@@ -251,6 +255,7 @@ function buildMixedFeed(posts: SocialPost[]): FeedItem[] {
     if (!items.some((item) => item.kind === 'community')) items.push({ kind: 'community', id: 'community' })
     if (!items.some((item) => item.kind === 'daily')) items.push({ kind: 'daily', id: 'daily' })
     if (!items.some((item) => item.kind === 'network')) items.push({ kind: 'network', id: 'network' })
+    if (!items.some((item) => item.kind === 'pulse')) items.push({ kind: 'pulse', id: 'pulse' })
   }
   return items
 }
@@ -339,6 +344,7 @@ export function ForYouOmniFeed() {
           if (item.kind === 'community') return <CommunityCard key={item.id} />
           if (item.kind === 'jobs') return <JobsCard key={item.id} />
           if (item.kind === 'daily') return <section key={item.id} className="snap-start border-b border-white/[.08] py-6"><ForYouDailyStack /></section>
+          if (item.kind === 'pulse') return <section key={item.id} className="snap-start border-b border-white/[.08] py-6"><ForYouSocialPulse /></section>
           return <section id="network-os" key={item.id} className="snap-start border-b border-white/[.08] py-6"><ForYouNetworkHub /></section>
         })}
 
