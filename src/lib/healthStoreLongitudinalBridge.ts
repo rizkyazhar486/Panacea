@@ -15,6 +15,11 @@ export interface HealthStoreBridgeConfidence {
   deviceSnapshot: number
 }
 
+export type HealthStoreEvidenceClass =
+  | 'consumer-wellness'
+  | 'clinical-record'
+  | 'manual-self-report'
+
 export interface HealthStoreBridgeContext {
   consent: ConsentEnvelope
   /** Time this bridge actually received/processed the stored record. */
@@ -24,6 +29,13 @@ export interface HealthStoreBridgeContext {
    * fabricate confidence from the numeric measurement itself.
    */
   confidence: HealthStoreBridgeConfidence
+  /**
+   * Shared device snapshots are consumer-wellness by default. A trusted,
+   * source-specific adapter may explicitly promote the ingestion boundary to
+   * clinical-record after its own authorization/QC checks; source labels alone
+   * never promote evidence class.
+   */
+  deviceSnapshotEvidenceClass?: Extract<HealthStoreEvidenceClass, 'consumer-wellness' | 'clinical-record'>
 }
 
 export type BridgeSkipReason =
@@ -248,7 +260,7 @@ export function clinicalVitalToLongitudinalEvents(
     recordedAt: vital.takenAt,
     confidence: context.confidence.clinicalVital,
     context,
-    tags: ['store:clinical-vitals'],
+    tags: ['store:clinical-vitals', 'evidence-class:clinical-record'],
   })
 }
 
@@ -269,7 +281,7 @@ export function selfVitalToLongitudinalEvents(
     recordedAt: vital.at,
     confidence: context.confidence.selfVital,
     context,
-    tags: ['store:self-vitals'],
+    tags: ['store:self-vitals', 'evidence-class:manual-self-report'],
   })
 }
 
@@ -300,7 +312,7 @@ export function vo2MaxToLongitudinalEvent(
       method: entry.method,
     },
     consent: context.consent,
-    tags: ['store:vo2max-log', `record:${entry.id}`],
+    tags: ['store:vo2max-log', 'evidence-class:manual-self-report', `record:${entry.id}`],
   })
 }
 
@@ -338,7 +350,12 @@ export function currentDeviceVitalsToLongitudinalEvents(
   }
 
   const sourceKind: LongitudinalProvenance['sourceKind'] = source.toLowerCase() === 'manual' ? 'manual' : 'device'
-  const provenanceMethod = sourceKind === 'manual' ? 'shared-vitals-manual-entry' : 'health-vitals-snapshot'
+  const evidenceClass: HealthStoreEvidenceClass = sourceKind === 'manual'
+    ? 'manual-self-report'
+    : (context.deviceSnapshotEvidenceClass ?? 'consumer-wellness')
+  const provenanceMethod = sourceKind === 'manual'
+    ? 'shared-vitals-manual-entry'
+    : `health-vitals-snapshot:${evidenceClass}`
   const events: LongitudinalEvent<number>[] = []
   const skipped: BridgeSkippedRecord[] = []
   const sourceToken = idToken(source)
@@ -368,7 +385,7 @@ export function currentDeviceVitalsToLongitudinalEvents(
         method: provenanceMethod,
       },
       consent: context.consent,
-      tags: ['store:health-vitals', `source:${source}`],
+      tags: ['store:health-vitals', `source:${source}`, `evidence-class:${evidenceClass}`],
     }))
   }
 
