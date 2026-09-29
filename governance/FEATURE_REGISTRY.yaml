@@ -173,7 +173,7 @@ features:
     observability: [requires_repository_audit]
     known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent]
     next_actions: [verify_deployed_lab_sync_and_ocr]
-    last_audited_commit: 328b7508
+    last_audited_commit: e53c04d3
 
   - feature_id: core.embodied_workflow_observation_os
     name: Embodied Workflow Observation OS

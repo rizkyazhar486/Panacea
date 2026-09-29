@@ -10,27 +10,29 @@ import { JENIS_LAB, type JenisLab } from './lab.ts'
 
 /** Alias nama tes seperti yang lazim tercetak pada lembar lab (ID/EN). Urutan: yang lebih spesifik dulu. */
 export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
-  hba1c: ['hba1c', 'hb a1c', 'hemoglobin a1c', 'glycated hemoglobin'],
-  gdp: ['glukosa puasa', 'gula darah puasa', 'fasting glucose', 'fasting blood glucose', 'gdp'],
+  hba1c: ['hba1c', 'hb a1c', 'hemoglobin a1c', 'glycated hemoglobin', 'glycohemoglobin'],
+  gdp: ['glukosa puasa', 'gula darah puasa', 'fasting glucose', 'fasting blood glucose', 'fasting blood sugar', 'gdp', 'fbs'],
   apob: ['apolipoprotein b', 'apo b', 'apob'],
-  ldl: ['kolesterol ldl', 'ldl cholesterol', 'ldl-c', 'ldl'],
-  hdl: ['kolesterol hdl', 'hdl cholesterol', 'hdl-c', 'hdl'],
-  tg: ['trigliserida', 'triglyceride', 'triglycerides', 'trigliserid'],
-  egfr: ['egfr', 'laju filtrasi glomerulus'],
-  kreatinin: ['kreatinin', 'creatinine'],
-  sgot: ['sgot', 'ast'],
-  sgpt: ['sgpt', 'alt'],
-  tsh: ['tsh'],
-  vitd: ['vitamin d', '25-oh', '25(oh)d'],
-  b12: ['vitamin b12', 'cobalamin', 'b12'],
+  ldl: ['kolesterol ldl', 'ldl cholesterol', 'ldl-c', 'ldl chol', 'ldl'],
+  hdl: ['kolesterol hdl', 'hdl cholesterol', 'hdl-c', 'hdl chol', 'hdl'],
+  tg: ['trigliserida', 'triglyceride', 'triglycerides', 'trigliserid', 'tg'],
+  egfr: ['egfr', 'estimated gfr', 'estimated glomerular filtration', 'laju filtrasi glomerulus'],
+  kreatinin: ['kreatinin', 'creatinine', 'creat'],
+  sgot: ['sgot', 'ast', 'aspartate aminotransferase'],
+  sgpt: ['sgpt', 'alt', 'alanine aminotransferase'],
+  tsh: ['tsh', 'thyroid stimulating hormone', 'thyroid-stimulating hormone'],
+  vitd: ['25-oh vitamin d', '25 oh vitamin d', 'vitamin d 25', 'vitamin d', '25-oh', '25(oh)d'],
+  b12: ['vitamin b12', 'cobalamin', 'vit b12', 'b12'],
   ferritin: ['feritin', 'ferritin'],
-  crp: ['hs-crp', 'hscrp', 'high sensitivity crp', 'crp'],
+  crp: ['hs-crp', 'hscrp', 'high sensitivity crp', 'c-reactive protein', 'crp'],
+  asamUrat: ['asam urat', 'uric acid', 'urate'],
   albumin: ['albumin'],
-  mcv: ['mcv'],
+  mcv: ['mcv', 'mean corpuscular volume'],
   rdw: ['rdw-cv', 'rdw'],
   alp: ['alkali fosfatase', 'alkaline phosphatase', 'alp'],
-  wbc: ['leukosit', 'leukocytes', 'white blood cell', 'wbc'],
-  limfosit: ['limfosit', 'lymphocytes', 'lymphocyte'],
+  wbc: ['leukosit', 'leukocytes', 'white blood cell', 'white blood cells', 'wbc'],
+  limfosit: ['limfosit', 'lymphocytes', 'lymphocyte', 'lym'],
+  trombosit: ['trombosit', 'platelet', 'platelets', 'plt'],
   hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 
@@ -49,8 +51,11 @@ const normal = (s: string) => s.toLowerCase().replace(/µ/g, 'u').replace(/\s+/g
 // Satuan setara secara penulisan (bukan konversi): hanya variasi ejaan simbol.
 const SATUAN_SETARA: Readonly<Record<string, readonly string[]>> = {
   '10³/µl': ['10^3/ul', '10³/ul', '10*3/ul', 'ribu/ul', 'x10^3/ul', 'x10³/ul', '10^9/l', '10³/µl'],
+  '×10⁹/l': ['x10^9/l', '10^9/l', 'x10⁹/l', '×10^9/l', '10*9/l', 'ribu/ul', '10^3/ul'],
   'ml/min/1.73m²': ['ml/min/1.73m2', 'ml/min/1,73m2', 'ml/menit/1.73m2', 'ml/min/1.73m²'],
   'miu/l': ['miu/l', 'uiu/ml', 'µiu/ml', 'miu/l'],
+  'ng/ml': ['ng/ml', 'ug/l', 'µg/l'],
+  'pg/ml': ['pg/ml', 'ng/l'],
 }
 export function satuanCocok(lembar: string, jenis: JenisLab): boolean {
   const a = normal(lembar), b = normal(jenis.satuan)

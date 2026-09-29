@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict'
-import { uraikanLembarLab } from '../../src/lib/imporLab.ts'
+import { uraikanLembarLab, ALIAS_LAB } from '../../src/lib/imporLab.ts'
+import { JENIS_LAB } from '../../src/lib/lab.ts'
+
+// Every catalog analyte must have at least one explicit OCR/paste alias.
+for (const j of JENIS_LAB) {
+  assert.ok((ALIAS_LAB[j.id]?.length ?? 0) > 0, `ALIAS_LAB missing for ${j.id}`)
+}
 
 // Teks tipikal lembar lab Indonesia yang disalin dari PDF.
 const lembar = `
@@ -59,6 +65,33 @@ assert.equal(kolom.gdp?.nilai, 99)
 assert.equal(kolom.kreatinin?.nilai, 0.9)
 assert.equal(kolom.crp?.nilai, 2.5)
 assert.equal(Object.keys(kolom).some((k) => /pasien|nama/i.test(k)), false)
+
+// OCR draft: uric acid + platelets + EN longevity panel names (fail-closed units).
+const ocrLongevity = `
+Uric acid  5.8  mg/dL  3.5 - 7.0
+Platelets  220  x10^9/L  150 - 450
+PLT 210 ×10⁹/L 150-450
+25-OH Vitamin D  32  ng/mL  20 - 50
+Vitamin B12  450  pg/mL  200 - 900
+Thyroid stimulating hormone  1.8  mIU/L  0.4 - 4.0
+Estimated GFR  95  mL/min/1.73m2
+Asam urat 6,1 mg/dL 3.4-7.0
+`
+const longev = Object.fromEntries(uraikanLembarLab(ocrLongevity).map((x) => [x.jenisId, x]))
+assert.equal(longev.asamUrat?.nilai, 5.8, 'uric acid harus terbaca sebelum baris ID kedua')
+assert.equal(longev.asamUrat?.masalah, null)
+assert.equal(longev.trombosit?.nilai, 220, 'Platelets/PLT OCR harus terbaca')
+assert.equal(longev.trombosit?.masalah, null, 'x10^9/L harus setara ×10⁹/L')
+assert.equal(longev.vitd?.nilai, 32)
+assert.equal(longev.vitd?.masalah, null)
+assert.equal(longev.b12?.nilai, 450)
+assert.equal(longev.b12?.masalah, null)
+assert.equal(longev.tsh?.nilai, 1.8)
+assert.equal(longev.egfr?.nilai, 95)
+assert.equal(longev.egfr?.masalah, null)
+
+// Negatif: alias asam urat tidak boleh menelan baris tanpa angka.
+assert.deepEqual(uraikanLembarLab('Uric acid within normal limits\nPlatelets adequate'), [])
 
 // Negatif OCR: sampah vision / kosong → tidak ada kandidat (fail-closed).
 assert.deepEqual(uraikanLembarLab(''), [])
