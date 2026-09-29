@@ -90,6 +90,23 @@ assert.equal(longev.tsh?.nilai, 1.8)
 assert.equal(longev.egfr?.nilai, 95)
 assert.equal(longev.egfr?.masalah, null)
 
+// Lipid panel: total cholesterol must not steal LDL/HDL lines.
+const lipid = `
+Kolesterol Total  198  mg/dL  < 200
+Kolesterol LDL  118  mg/dL  < 100
+Kolesterol HDL  52  mg/dL  > 40
+Total cholesterol  210 mg/dL  0 - 200
+Triglycerides  140 mg/dL  < 150
+`
+const lip = Object.fromEntries(uraikanLembarLab(lipid).map((x) => [x.jenisId, x]))
+assert.equal(lip.chol?.nilai, 198, 'kolesterol total harus terbaca')
+assert.equal(lip.chol?.masalah, null)
+assert.equal(lip.ldl?.nilai, 118)
+assert.equal(lip.hdl?.nilai, 52)
+assert.notEqual(lip.ldl?.jenisId, 'chol')
+assert.equal(uraikanLembarLab('Kolesterol LDL 118 mg/dL').map((x) => x.jenisId).join(), 'ldl')
+assert.equal(uraikanLembarLab('Total cholesterol 210 mg/dL').map((x) => x.jenisId).join(), 'chol')
+
 // Negatif: alias asam urat tidak boleh menelan baris tanpa angka.
 assert.deepEqual(uraikanLembarLab('Uric acid within normal limits\nPlatelets adequate'), [])
 

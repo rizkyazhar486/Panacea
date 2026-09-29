@@ -70,6 +70,11 @@ export const JENIS_LAB: JenisLab[] = [
     sumber: 'Fast for 9–12 hours; ≥150 mg/dL counts as high',
   },
   {
+    id: 'chol', nama: 'Total cholesterol', satuan: 'mg/dL', atas: 200,
+    sumber: 'Usual desirable <200 mg/dL; individual targets depend on cardiovascular risk',
+    catatan: 'Not a substitute for LDL, ApoB or non-HDL when those are available.',
+  },
+  {
     id: 'egfr', nama: 'eGFR', satuan: 'mL/min/1.73m²', bawah: 90,
     sumber: 'KDIGO: <60 for ≥3 months marks chronic kidney disease',
   },

@@ -16,6 +16,8 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   ldl: ['kolesterol ldl', 'ldl cholesterol', 'ldl-c', 'ldl chol', 'ldl'],
   hdl: ['kolesterol hdl', 'hdl cholesterol', 'hdl-c', 'hdl chol', 'hdl'],
   tg: ['trigliserida', 'triglyceride', 'triglycerides', 'trigliserid', 'tg'],
+  // After LDL/HDL in JENIS_LAB so "Kolesterol LDL/HDL" never steals total.
+  chol: ['kolesterol total', 'total cholesterol', 'cholesterol total', 'chol total', 'total chol'],
   egfr: ['egfr', 'estimated gfr', 'estimated glomerular filtration', 'laju filtrasi glomerulus'],
   kreatinin: ['kreatinin', 'creatinine', 'creat'],
   sgot: ['sgot', 'ast', 'aspartate aminotransferase'],
