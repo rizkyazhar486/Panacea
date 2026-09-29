@@ -42,11 +42,18 @@ export interface RespiratoryHighEndScenePlan {
 const RIGHT_PREFIX = ['resp:larynx', 'resp:trachea', 'resp:carina', 'resp:right-main-bronchus'] as const
 const LEFT_PREFIX = ['resp:larynx', 'resp:trachea', 'resp:carina', 'resp:left-main-bronchus'] as const
 
+const AIRWAY_ROUTE_BY_LOBE: Readonly<Record<RespiratoryLobeId, readonly string[]>> = {
+  'resp:right-upper-lobe': [...RIGHT_PREFIX, 'resp:right-upper-lobar-bronchus'],
+  'resp:right-middle-lobe': [...RIGHT_PREFIX, 'resp:bronchus-intermedius', 'resp:right-middle-lobar-bronchus'],
+  'resp:right-lower-lobe': [...RIGHT_PREFIX, 'resp:bronchus-intermedius', 'resp:right-lower-lobar-bronchus'],
+  'resp:left-upper-lobe': [...LEFT_PREFIX, 'resp:left-upper-lobar-bronchus'],
+  'resp:left-lower-lobe': [...LEFT_PREFIX, 'resp:left-lower-lobar-bronchus'],
+}
+
 const route = (
-  side: RespiratorySide,
   lobeId: RespiratoryLobeId,
   atlasNodeId: string,
-) => [...(side === 'right' ? RIGHT_PREFIX : LEFT_PREFIX), lobeId, atlasNodeId] as const
+) => [...AIRWAY_ROUTE_BY_LOBE[lobeId], atlasNodeId] as const
 
 /**
  * Canonical educational bronchopulmonary segment routing matrix.
@@ -56,24 +63,24 @@ const route = (
  * Left S1+2 and S7+8 remain explicitly combined in the shipped scaffold.
  */
 export const BRONCHOPULMONARY_SEGMENT_RUNTIME: readonly BronchopulmonarySegmentRuntime[] = [
-  { atlasNodeId: 'resp:segment:r-s1', code: 'R-S1', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('right', 'resp:right-upper-lobe', 'resp:segment:r-s1'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s2', code: 'R-S2', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('right', 'resp:right-upper-lobe', 'resp:segment:r-s2'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s3', code: 'R-S3', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('right', 'resp:right-upper-lobe', 'resp:segment:r-s3'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s4', code: 'R-S4', side: 'right', lobeId: 'resp:right-middle-lobe', bronchoscopicRoute: route('right', 'resp:right-middle-lobe', 'resp:segment:r-s4'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s5', code: 'R-S5', side: 'right', lobeId: 'resp:right-middle-lobe', bronchoscopicRoute: route('right', 'resp:right-middle-lobe', 'resp:segment:r-s5'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s6', code: 'R-S6', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('right', 'resp:right-lower-lobe', 'resp:segment:r-s6'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s7', code: 'R-S7', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('right', 'resp:right-lower-lobe', 'resp:segment:r-s7'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s8', code: 'R-S8', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('right', 'resp:right-lower-lobe', 'resp:segment:r-s8'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s9', code: 'R-S9', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('right', 'resp:right-lower-lobe', 'resp:segment:r-s9'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:r-s10', code: 'R-S10', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('right', 'resp:right-lower-lobe', 'resp:segment:r-s10'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s1-2', code: 'L-S1+2', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('left', 'resp:left-upper-lobe', 'resp:segment:l-s1-2'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s3', code: 'L-S3', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('left', 'resp:left-upper-lobe', 'resp:segment:l-s3'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s4', code: 'L-S4', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('left', 'resp:left-upper-lobe', 'resp:segment:l-s4'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s5', code: 'L-S5', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('left', 'resp:left-upper-lobe', 'resp:segment:l-s5'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s6', code: 'L-S6', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('left', 'resp:left-lower-lobe', 'resp:segment:l-s6'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s7-8', code: 'L-S7+8', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('left', 'resp:left-lower-lobe', 'resp:segment:l-s7-8'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s9', code: 'L-S9', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('left', 'resp:left-lower-lobe', 'resp:segment:l-s9'), topologyStatus: 'reference-route' },
-  { atlasNodeId: 'resp:segment:l-s10', code: 'L-S10', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('left', 'resp:left-lower-lobe', 'resp:segment:l-s10'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s1', code: 'R-S1', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('resp:right-upper-lobe', 'resp:segment:r-s1'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s2', code: 'R-S2', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('resp:right-upper-lobe', 'resp:segment:r-s2'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s3', code: 'R-S3', side: 'right', lobeId: 'resp:right-upper-lobe', bronchoscopicRoute: route('resp:right-upper-lobe', 'resp:segment:r-s3'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s4', code: 'R-S4', side: 'right', lobeId: 'resp:right-middle-lobe', bronchoscopicRoute: route('resp:right-middle-lobe', 'resp:segment:r-s4'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s5', code: 'R-S5', side: 'right', lobeId: 'resp:right-middle-lobe', bronchoscopicRoute: route('resp:right-middle-lobe', 'resp:segment:r-s5'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s6', code: 'R-S6', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('resp:right-lower-lobe', 'resp:segment:r-s6'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s7', code: 'R-S7', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('resp:right-lower-lobe', 'resp:segment:r-s7'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s8', code: 'R-S8', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('resp:right-lower-lobe', 'resp:segment:r-s8'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s9', code: 'R-S9', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('resp:right-lower-lobe', 'resp:segment:r-s9'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:r-s10', code: 'R-S10', side: 'right', lobeId: 'resp:right-lower-lobe', bronchoscopicRoute: route('resp:right-lower-lobe', 'resp:segment:r-s10'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s1-2', code: 'L-S1+2', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('resp:left-upper-lobe', 'resp:segment:l-s1-2'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s3', code: 'L-S3', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('resp:left-upper-lobe', 'resp:segment:l-s3'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s4', code: 'L-S4', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('resp:left-upper-lobe', 'resp:segment:l-s4'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s5', code: 'L-S5', side: 'left', lobeId: 'resp:left-upper-lobe', bronchoscopicRoute: route('resp:left-upper-lobe', 'resp:segment:l-s5'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s6', code: 'L-S6', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('resp:left-lower-lobe', 'resp:segment:l-s6'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s7-8', code: 'L-S7+8', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('resp:left-lower-lobe', 'resp:segment:l-s7-8'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s9', code: 'L-S9', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('resp:left-lower-lobe', 'resp:segment:l-s9'), topologyStatus: 'reference-route' },
+  { atlasNodeId: 'resp:segment:l-s10', code: 'L-S10', side: 'left', lobeId: 'resp:left-lower-lobe', bronchoscopicRoute: route('resp:left-lower-lobe', 'resp:segment:l-s10'), topologyStatus: 'reference-route' },
 ] as const
 
 const segmentById = new Map(BRONCHOPULMONARY_SEGMENT_RUNTIME.map((segment) => [segment.atlasNodeId, segment]))
@@ -164,6 +171,21 @@ export function validateRespiratoryHighEndRuntime(manifest: AtlasManifest): stri
     }
     if (atlasNode.system !== 'respiratory') issues.push(`Respiratory runtime node is assigned to another system: ${segment.atlasNodeId}`)
     if (atlasNode.parentId !== segment.lobeId) issues.push(`Respiratory segment/lobe mismatch: ${segment.atlasNodeId} -> ${atlasNode.parentId ?? 'none'}, expected ${segment.lobeId}`)
+
+    const parenchymalLobes = new Set<RespiratoryLobeId>([
+      'resp:right-upper-lobe',
+      'resp:right-middle-lobe',
+      'resp:right-lower-lobe',
+      'resp:left-upper-lobe',
+      'resp:left-lower-lobe',
+    ])
+    const expectedAirway = AIRWAY_ROUTE_BY_LOBE[segment.lobeId]
+    if (segment.bronchoscopicRoute.some((routeId) => parenchymalLobes.has(routeId as RespiratoryLobeId))) {
+      issues.push(`Bronchoscopic route must not traverse lung parenchyma: ${segment.code}`)
+    }
+    if (!expectedAirway.every((routeId, index) => segment.bronchoscopicRoute[index] === routeId)) {
+      issues.push(`Bronchoscopic route does not follow canonical lobar airway topology: ${segment.code}`)
+    }
 
     for (const routeId of segment.bronchoscopicRoute) {
       if (!atlasNodeById(manifest, routeId)) issues.push(`Bronchoscopic reference route contains missing atlas node: ${routeId}`)
