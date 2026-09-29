@@ -100,7 +100,7 @@ test('For You exposes anticipation-release-gratitude while preserving safety lan
     'Recognition',
     'Gratitude',
     'Calm',
-    'meaning > compulsion',
+    'meaning &gt; compulsion',
     'no XP, no streak bonus, no leaderboard points',
     'not dopamine, hormone, addiction or mental-health measurements',
   ]) {
