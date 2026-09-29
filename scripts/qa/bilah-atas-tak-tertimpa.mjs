@@ -103,9 +103,9 @@ try {
   }
   if (tertutup.length) throw new Error(`tombol bilah atas tertutup: ${tertutup.join(' | ')}`)
 
-  // 4. Konteks lokasi harus terbaca utuh pada 390px. Desktop tetap memakai
-  // label penuh "Your Body"; ponsel memakai short label yang sudah ada, bukan
-  // membuat taxonomy baru atau membuang level konteks.
+  // 4. Konteks lokasi harus terbaca utuh pada 390px. Category page tetap
+  // hadir sebagai level pertama; ponsel boleh memakai short label yang sama
+  // maknanya, tanpa membuat taxonomy baru atau membuang level konteks.
   const hierarki = page.locator('header.kaca h1[data-navigation-hierarchy="v1"]').first()
   await hierarki.waitFor({ state: 'visible' })
   const infoHierarki = await hierarki.evaluate((node) => ({
@@ -113,7 +113,7 @@ try {
     scrollWidth: node.scrollWidth,
     clientWidth: node.clientWidth,
   }))
-  if (!/^Body\s*›\s*Move\s*›\s*Training$/i.test(infoHierarki.text)) {
+  if (!/^Health\s*›\s*Move\s*›\s*Training$/i.test(infoHierarki.text)) {
     throw new Error(`hierarki mobile salah: "${infoHierarki.text}"`)
   }
   if (infoHierarki.scrollWidth > infoHierarki.clientWidth + 1) {
@@ -128,7 +128,7 @@ try {
 
   console.log(
     `Bilah atas lulus: spanduk harian tampil dan TIDAK menimpa bilah, ${nama.length} tombol navigasi ` +
-    'benar-benar teratas di titiknya, hierarki Body › Move › Training terbaca utuh, lebar halaman 390px, nol galat halaman.',
+    'benar-benar teratas di titiknya, hierarki Health › Move › Training terbaca utuh, lebar halaman 390px, nol galat halaman.',
   )
 } catch (e) {
   gagal = e

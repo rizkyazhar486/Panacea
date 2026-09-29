@@ -94,6 +94,46 @@ Independent lanes may continue concurrently:
 
 A real shared dependency should block only the work that depends on it.
 
+## Cognitive Translation Kernel — mandatory
+
+All current and future agents must treat Panacea as one Computational Human superapp with two coupled kernels: the **Human State Kernel** and the **Cognitive Translation Kernel**.
+
+Use the universal interaction grammar `SEE -> ASK -> ZOOM -> WHY -> WHAT IF -> ACT`.
+
+Hard execution laws:
+- maximum scientific depth internally; minimum cognitive friction externally;
+- simplify representation, **never** scientific truth;
+- no visualization/page/module owns an independent human state;
+- observed, estimated and simulated lanes remain distinct;
+- provenance and uncertainty remain recoverable at deeper disclosure;
+- semantic/cognitive zoom changes resolution, not reality;
+- `WHY` traverses evidence/mechanism without converting association into causation;
+- `WHAT IF` uses isolated counterfactual branches and never rewrites real history;
+- prefer one shared scientific object projected into many surfaces over duplicate feature-specific models;
+- when a surface feels fragmented, consolidate around canonical state/projection contracts before adding breadth.
+
+Canonical implementation: `src/lib/cognitiveTranslationKernel.ts`.
+Canonical architecture: `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md#1b-cognitive-translation-kernel--infinite-depth-finite-interface`.
+
+### Category-page convergence — mandatory
+
+Treat **page = semantic category projection**, never page = feature silo.
+
+Canonical first-class category pages are:
+`Human | Health | Clinical | Explore | Simulate | Records | For You`.
+
+Execution rules:
+- Home is an entry surface, not another domain state.
+- Panacea AI is an orchestration/interaction layer across categories, not an eighth silo.
+- feature routes remain deep, searchable child views under a category page;
+- every category projects `canonical-human-state`; category switches change lens/task context, never the represented human truth;
+- preserve product-space ancestry beneath category pages for orientation and backward compatibility;
+- cross-cutting longitudinal evidence belongs to Records, while interpretation/actions remain available from the relevant Human, Health or Clinical lens;
+- prefer routing an existing feature into the correct category over creating another top-level page.
+
+Canonical implementation: `src/lib/superPages.ts`.
+Regression contract: `scripts/uji/hirarki-navigasi.mts`.
+
 ## Body Exposure operating model
 
 Body Exposure is a single Unified Human Simulation Projector, not a collection of unrelated visual demos.

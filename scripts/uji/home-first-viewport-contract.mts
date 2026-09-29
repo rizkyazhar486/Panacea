@@ -8,15 +8,19 @@ const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const healthBrief = readFileSync('src/components/HomeHealthBrief.tsx', 'utf8')
 const essentialTools = readFileSync('src/components/HomeEssentialTools.tsx', 'utf8')
 
-// Simplicity is not feature deletion. The persistent dock owns top-level
-// navigation; the hero is allowed only contextual actions, so the same four
-// super-pages do not compete in two or three places above the fold.
+// Simplicity is not feature deletion. Home stays an entry surface; the hero is
+// allowed only contextual actions so category pages do not compete with it.
 const heroActions = [...landing.matchAll(/\{ to: '([^']+)', label: '([^']+)'/g)]
 assert.equal(heroActions.length, 2, `Home hero exposes ${heroActions.length} actions; keep one focal message and at most two contextual actions`)
 assert.deepEqual(heroActions.map((m) => m[1]), ['/chatbot', '/harian'],
-  'Hero should keep universal actions (ask + log), not duplicate the four top-level navigation destinations')
-assert.doesNotMatch(landing, /Your Body|Clinical|For You/,
-  'Hero duplicates persistent top-level navigation again')
+  'Hero should keep universal actions (ask + log), not duplicate category destinations')
+for (const category of SUPER_PAGES) {
+  assert.equal(
+    heroActions.some((match) => match[2] === category.label),
+    false,
+    `Hero duplicates category-page navigation for ${category.label}`,
+  )
+}
 
 // The capability area is retrieval, not another navigation bar. Search first;
 // the complete catalogue remains one disclosure away and is never truncated.
@@ -29,12 +33,20 @@ assert.match(deck, /group\.items\.map\(/, 'The full capability index must remain
 assert.match(deck, /gabungKatalog\(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN\)/,
   'Simplifying the surface must not drop menu-only destinations')
 
-// Home itself is the zero-step surface; three one-tap super-page launchers
-// replace the persistent dock without creating another navigation bar.
-assert.deepEqual(SUPER_PAGES.map((space) => space.label), ['Your Body', 'Clinical', 'For You'],
-  'the primary product model drifted away from exactly three super pages')
+// Home itself is the zero-step entry surface. Seven compact one-tap category
+// launchers expose semantic lenses while all feature routes remain deeper.
+assert.deepEqual(
+  SUPER_PAGES.map((space) => space.id),
+  ['human', 'health', 'clinical', 'explore', 'simulate', 'records', 'for-you'],
+  'the primary product model drifted away from the seven category pages',
+)
+assert.equal(
+  SUPER_PAGES.every((space) => space.stateSource === 'canonical-human-state'),
+  true,
+  'category pages must remain projections of one canonical human state',
+)
 assert.match(workspace, /<SuperPageLauncher \/>/,
-  'Home lost the one-tap three-super-page launcher')
+  'Home lost the one-tap category-page launcher')
 assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
   'a persistent bottom navigation dock returned and competes with the command bar')
 
@@ -53,4 +65,4 @@ assert.equal((essentialTools.match(/\{ to: '/g) ?? []).length, 3,
 assert.match(healthBrief, /aria-label="Today health instruments"/,
   'Home lost the concise health-status anchor')
 
-console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and exactly three one-tap super pages.')
+console.log('home-first-viewport-contract: one focal hero, bounded daily tools, seven compact category lenses, and complete feature reachability.')

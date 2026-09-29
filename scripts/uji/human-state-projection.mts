@@ -107,6 +107,8 @@ assert.deepEqual(body.physiology.simulated.map((field) => field.name), ['simulat
 assert.equal(body.physiology.blocked.length, 0)
 assert.equal(body.physiology.estimated[0].sourceEventIds[0], heartRate.id)
 assert.equal(body.invariants.counterfactualMayMutateCurrentState, false)
+assert.equal(body.invariants.surfaceMayOwnIndependentHumanState, false)
+assert.equal(body.invariants.cognitiveTranslationMayMutateScientificState, false)
 
 consentLedger = appendPurposeConsentDecision(consentLedger, {
   id: 'revoke-personal',

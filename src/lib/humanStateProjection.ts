@@ -65,6 +65,8 @@ export interface HumanStateProjection {
     consentScopedProjection: true
     counterfactualMayMutateCurrentState: false
     autonomousClinicalCommitAllowed: false
+    surfaceMayOwnIndependentHumanState: false
+    cognitiveTranslationMayMutateScientificState: false
   }
 }
 
@@ -247,6 +249,8 @@ export function projectHumanState(input: {
       consentScopedProjection: true,
       counterfactualMayMutateCurrentState: false,
       autonomousClinicalCommitAllowed: false,
+      surfaceMayOwnIndependentHumanState: false,
+      cognitiveTranslationMayMutateScientificState: false,
     },
   }
 }
