@@ -3,12 +3,63 @@ import { atlasNodeById } from '../../src/lib/anatomy/atlasKernel.ts'
 import { COMPLETE_WHOLE_BODY_ATLAS } from '../../src/lib/anatomy/completeAtlas.ts'
 import {
   BRONCHOPULMONARY_SEGMENT_RUNTIME,
+  type BronchopulmonarySegmentRuntime,
   respiratorySegmentRuntime,
   validateRespiratoryHighEndRuntime,
 } from '../../src/lib/anatomy/respiratoryHighEndRuntime.ts'
 
 const validation = validateRespiratoryHighEndRuntime(COMPLETE_WHOLE_BODY_ATLAS)
 assert.deepEqual(validation, [], validation.join('\n'))
+
+const reparentedLobarManifest = {
+  ...COMPLETE_WHOLE_BODY_ATLAS,
+  nodes: COMPLETE_WHOLE_BODY_ATLAS.nodes.map((node) =>
+    node.id === 'resp:right-upper-lobar-bronchus'
+      ? { ...node, parentId: 'resp:carina' }
+      : node,
+  ),
+}
+const reparentedLobarIssues = validateRespiratoryHighEndRuntime(reparentedLobarManifest)
+assert.ok(
+  reparentedLobarIssues.some((issue) => issue.includes('Airway hierarchy mismatch: resp:right-upper-lobar-bronchus')),
+  'validator must reject a lobar bronchus whose manifest parent disagrees with the canonical airway route',
+)
+
+const disconnectedSegmentManifest = {
+  ...COMPLETE_WHOLE_BODY_ATLAS,
+  nodes: COMPLETE_WHOLE_BODY_ATLAS.nodes.map((node) =>
+    node.id === 'resp:segment:r-s1'
+      ? {
+          ...node,
+          relations: node.relations?.map((relation) =>
+            relation.kind === 'continuous-with'
+              ? { ...relation, targetId: 'resp:right-main-bronchus' }
+              : relation,
+          ),
+        }
+      : node,
+  ),
+}
+const disconnectedSegmentIssues = validateRespiratoryHighEndRuntime(disconnectedSegmentManifest)
+assert.ok(
+  disconnectedSegmentIssues.some((issue) => issue.includes('Segment airway continuity mismatch: R-S1')),
+  'validator must reject a segment whose continuous-with relation disagrees with its terminal lobar bronchus',
+)
+
+const mutableRuntimeSegment = BRONCHOPULMONARY_SEGMENT_RUNTIME[0] as BronchopulmonarySegmentRuntime & {
+  bronchoscopicRoute: readonly string[]
+}
+const originalRoute = mutableRuntimeSegment.bronchoscopicRoute
+try {
+  mutableRuntimeSegment.bronchoscopicRoute = [...originalRoute, 'resp:trachea']
+  const malformedRouteIssues = validateRespiratoryHighEndRuntime(COMPLETE_WHOLE_BODY_ATLAS)
+  assert.ok(
+    malformedRouteIssues.some((issue) => issue.includes('Bronchoscopic route does not terminate at its segment: R-S1')),
+    'validator must reject routes with extra trailing nodes after the target segment',
+  )
+} finally {
+  mutableRuntimeSegment.bronchoscopicRoute = originalRoute
+}
 
 const parenchymalLobes = new Set([
   'resp:right-upper-lobe',
