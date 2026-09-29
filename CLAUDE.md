@@ -158,22 +158,7 @@ Runner: `node --test` (`scripts/qa/*.test.mjs`) atau skrip deterministik `script
 9. **Mock hanya di boundary** (adapter/repo). Logika murni diuji tanpa mock.
 10. Modul baru di `lib`/`domains/*/engine` tanpa berkas uji = PR ditolak.
 
-Kerangka minimum (ilustrasi — sesuaikan dengan nama/API nyata modul):
-
-```js
-import test from 'node:test'; import assert from 'node:assert/strict';
-import { hitungCO } from '../../src/lib/physiology/cardiovascularIdentityEngine.ts';
-
-test('positif: CO = HR x SV', () => assert.equal(hitungCO({ hr: 60, sv: 70 }).value, 4.2));
-test('negatif: HR negatif ditolak tanpa efek samping', () => {
-  const r = hitungCO({ hr: -1, sv: 70 });
-  assert.equal(r.ok, false); assert.equal(r.reason, 'out-of-range');
-});
-test('batas: HR tepat di batas atas diterima, +1 ditolak', () => {
-  assert.equal(hitungCO({ hr: MAX_HR, sv: 70 }).ok, true);
-  assert.equal(hitungCO({ hr: MAX_HR + 1, sv: 70 }).ok, false);
-});
-```
+Prosedur, matriks kasus, dan kerangka kode ada di skill **`panacea-testing`**.
 
 ---
 
@@ -233,28 +218,7 @@ Aturan:
 
 ### 6.1 Template deskripsi PR
 
-```markdown
-## Ringkasan
-<1–3 kalimat: apa & kenapa>
-
-## Perubahan
-- …
-
-## Validasi
-- [ ] `npm run build` hijau
-- [ ] `npm run uji` hijau
-- [ ] Uji baru/diperbarui: <path> (positif + negatif + batas, §3.1)
-- [ ] Server typecheck (bila menyentuh `server/`)
-- [ ] Smoke UI/mobile 390×844 (bila menyentuh UI/3D)
-
-## Risiko & batas
-<keselamatan/privasi/provenance/klinis; deviasi dari arahan lama>
-
-## Catatan reviewer
-<hal yang perlu diperhatikan; tumpang tindih PR lain>
-```
-
-Akhiri deskripsi PR dengan baris atribusi dari harness.
+Bagian wajib: **Ringkasan · Perubahan · Validasi (checklist) · Risiko & batas · Catatan reviewer**, diakhiri baris atribusi harness. Template lengkap dan perintah langkah demi langkah ada di skill **`panacea-git-flow`** (`.claude/skills/`), yang dimuat otomatis saat bekerja dengan git/PR.
 
 ### 6.2 Syarat merge
 
@@ -303,7 +267,9 @@ Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur
 
 ---
 
-## 10. Dokumen rujukan
+## 10. Skill proyek & dokumen rujukan
+
+Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif). Panggil manual dengan `/panacea-git-flow` dst. bila tidak terpicu otomatis.
 
 Instruksi umum multi-agent (dimuat otomatis lewat import di bawah; bila bertentangan dengan dokumen ini, **dokumen ini menang**):
 
