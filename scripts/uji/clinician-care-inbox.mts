@@ -94,9 +94,17 @@ assert.match(ui,/buildClinicianContinuousCareDigest/)
 assert.match(ui,/data-clinician-care-inbox/)
 assert.match(ui,/no bulk diagnosis, prescription or treatment action/)
 assert.doesNotMatch(ui,/bulk.*sign/i)
-const inboxEffect = ui.slice(ui.indexOf('const loadInbox = async'), ui.indexOf('void loadInbox()'))
+const awal = ui.indexOf('const loadInbox = async')
+const akhir = ui.indexOf('void loadInbox()')
+assert.ok(awal >= 0 && akhir > awal, 'loader inbox harus ditemukan agar asersi di bawah bermakna')
+// Hanya KODE yang dinilai: komentar penjelas boleh menyebut endpoint tanpa memanggilnya.
+const tanpaKomentar = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
+const inboxEffect = tanpaKomentar(ui.slice(awal, akhir))
 assert.doesNotMatch(inboxEffect, /clinicianLabFhir/,
   'inbox must not eagerly open audited lab records for every shared patient')
+// Kontrol positif: pemanggilan nyata (bukan komentar) tetap tertangkap; komentar saja tidak.
+assert.match(tanpaKomentar('await api.clinicianLabFhir(share.id)'), /clinicianLabFhir/)
+assert.doesNotMatch(tanpaKomentar('// jangan panggil clinicianLabFhir di sini\n/* clinicianLabFhir */'), /clinicianLabFhir/)
 assert.match(ui, /audited clinical-record access/,
   'privacy boundary must stay explicit next to the inbox loader')
 
