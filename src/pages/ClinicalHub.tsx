@@ -9,6 +9,7 @@ import { StudiValidasiKlinis } from '../components/StudiValidasiKlinis'
 import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
+import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
 
 export const GROUPS = [
   {
@@ -231,6 +232,7 @@ export function ClinicalHub() {
           </div>
         </section>
 
+        <MentalHealthClinicalResearchLab />
         <ClinicalPatientContext />
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         {account?.role === 'dokter' && <LabPasienUntukDokter />}
