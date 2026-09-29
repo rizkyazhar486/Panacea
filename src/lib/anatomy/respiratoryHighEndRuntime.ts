@@ -186,6 +186,29 @@ export function validateRespiratoryHighEndRuntime(manifest: AtlasManifest): stri
     if (!expectedAirway.every((routeId, index) => segment.bronchoscopicRoute[index] === routeId)) {
       issues.push(`Bronchoscopic route does not follow canonical lobar airway topology: ${segment.code}`)
     }
+    if (
+      segment.bronchoscopicRoute.length !== expectedAirway.length + 1
+      || segment.bronchoscopicRoute[expectedAirway.length] !== segment.atlasNodeId
+    ) {
+      issues.push(`Bronchoscopic route does not terminate at its segment: ${segment.code}`)
+    }
+
+    for (let index = 1; index < expectedAirway.length; index += 1) {
+      const airwayNodeId = expectedAirway[index]
+      const expectedParentId = expectedAirway[index - 1]
+      const airwayNode = atlasNodeById(manifest, airwayNodeId)
+      if (airwayNode && airwayNode.parentId !== expectedParentId) {
+        issues.push(`Airway hierarchy mismatch: ${airwayNodeId} -> ${airwayNode.parentId ?? 'none'}, expected ${expectedParentId}`)
+      }
+    }
+
+    const terminalAirwayId = expectedAirway[expectedAirway.length - 1]
+    const continuityTargets = (atlasNode.relations ?? [])
+      .filter((relation) => relation.kind === 'continuous-with')
+      .map((relation) => relation.targetId)
+    if (!continuityTargets.includes(terminalAirwayId)) {
+      issues.push(`Segment airway continuity mismatch: ${segment.code} -> ${continuityTargets.join(', ') || 'none'}, expected ${terminalAirwayId}`)
+    }
 
     for (const routeId of segment.bronchoscopicRoute) {
       if (!atlasNodeById(manifest, routeId)) issues.push(`Bronchoscopic reference route contains missing atlas node: ${routeId}`)
