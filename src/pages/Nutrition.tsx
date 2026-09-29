@@ -13,7 +13,7 @@ import { JENIS_OLAHRAGA, type JenisOlahraga } from '../lib/olahraga'
 import { getVitals } from '../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { proyeksikanNilaiNutrisiKeLabKanonic } from '../lib/lab'
+import { proyeksikanNilaiNutrisiKeLabKanonic, gabungLabNutrisiDenganKanonic } from '../lib/lab'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -1257,7 +1257,7 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
    6. LAB TRACKER (Weekly Comparison)
    ═══════════════════════════════════════════════════════ */
 function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
-  const [labs, setLabs] = useState<LabEntry[]>(loadLabs)
+  const [labs, setLabs] = useState<LabEntry[]>(() => gabungLabNutrisiDenganKanonic(loadLabs()))
   const [editVals, setEditVals] = useState<Record<string, string>>({})
   const [editDate, setEditDate] = useState<string>(today())
   const [showForm, setShowForm] = useState(false)

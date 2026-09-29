@@ -251,6 +251,34 @@ export function nilaiNutrisiDariLabKanonic(tanggal: string): Record<string, numb
   return keluar
 }
 
+export interface BarisLabNutrisi {
+  date: string
+  values: Record<string, number>
+}
+
+/**
+ * Merge Nutrition-local weekly rows with account-synced values.
+ * Local values win on key conflict; canonical-only draw dates still appear.
+ */
+export function gabungLabNutrisiDenganKanonic(lokal: readonly BarisLabNutrisi[]): BarisLabNutrisi[] {
+  const perTanggal = new Map<string, Record<string, number>>()
+  for (const row of lokal) {
+    if (!row?.date || !/^\d{4}-\d{2}-\d{2}$/.test(row.date)) continue
+    perTanggal.set(row.date, { ...(row.values ?? {}) })
+  }
+  for (const daftar of Object.values(ambilLab())) {
+    for (const b of daftar ?? []) {
+      if (!b?.tanggal || !/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal)) continue
+      if (!perTanggal.has(b.tanggal)) perTanggal.set(b.tanggal, {})
+    }
+  }
+  const keluar: BarisLabNutrisi[] = []
+  for (const [date, values] of perTanggal) {
+    keluar.push({ date, values: { ...nilaiNutrisiDariLabKanonic(date), ...values } })
+  }
+  return keluar.sort((a, b) => b.date.localeCompare(a.date))
+}
+
 /** Latest value on an exact draw date, else the newest prior value. */
 export function nilaiLabPadaTanggal(jenis: string, tanggal: string): number | undefined {
   const daftar = ambilLab()[jenis] ?? []

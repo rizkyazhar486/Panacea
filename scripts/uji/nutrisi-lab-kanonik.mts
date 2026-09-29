@@ -4,6 +4,7 @@ import {
   KUNCI_NUTRISI_KE_JENIS_LAB,
   proyeksikanNilaiNutrisiKeLabKanonic,
   nilaiNutrisiDariLabKanonic,
+  gabungLabNutrisiDenganKanonic,
   nilaiLabPadaTanggal,
   ambilLab,
 } from '../../src/lib/lab.ts'
@@ -56,6 +57,23 @@ for (const wajib of ['glucose', 'hba1c', 'totalCholesterol', 'ldl', 'hdl', 'albu
 const page = readFileSync('src/pages/Nutrition.tsx', 'utf8')
 assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(editDate, vals\)/)
 assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(nl\.date, nl\.values\)/)
+assert.match(page, /gabungLabNutrisiDenganKanonic/)
 assert.match(page, /account lab log/)
+
+// Hydration: canonical-only draw date surfaces in Nutrition camelCase keys.
+store['pmd_lab_v1'] = JSON.stringify({
+  gdp: [{ id: 'g1', tanggal: '2026-09-20', nilai: 95 }],
+  chol: [{ id: 'c1', tanggal: '2026-09-20', nilai: 185 }],
+})
+assert.equal(nilaiNutrisiDariLabKanonic('2026-09-20').glucose, 95)
+assert.equal(nilaiNutrisiDariLabKanonic('2026-09-20').totalCholesterol, 185)
+{
+  const gabung = gabungLabNutrisiDenganKanonic([{ date: '2026-09-20', values: { potassium: 4.1 } }])
+  assert.equal(gabung.length, 1)
+  assert.equal(gabung[0].values.glucose, 95, 'canonical glucose fills the Nutrition row')
+  assert.equal(gabung[0].values.potassium, 4.1, 'local-only key preserved')
+  assert.equal(gabungLabNutrisiDenganKanonic([{ date: 'bad', values: { glucose: 1 } }]).every((r) => r.date !== 'bad'), true)
+  assert.deepEqual(gabungLabNutrisiDenganKanonic([{ date: 'not-a-date', values: {} }]).filter((r) => r.date === 'not-a-date'), [])
+}
 
 console.log('nutrisi-lab-kanonik: Nutrition weekly tracker writes known analytes into synced lab log')
