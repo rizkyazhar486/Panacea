@@ -130,7 +130,51 @@ const DEVICE_METRICS: Readonly<Record<string, NumericMetricSpec>> = {
   runningVerticalOscCm: { metric: 'running-vertical-oscillation', domain: 'fitness', unit: 'cm' },
   audioExposureDb: { metric: 'environmental-audio-exposure', domain: 'other', unit: 'dB' },
   headphoneAudioDb: { metric: 'headphone-audio-exposure', domain: 'other', unit: 'dB' },
+  // High-value Health Auto Export / Apple Health keys that previously arrived
+  // on the server catalog but never entered the longitudinal kernel.
+  waistCm: { metric: 'waist-circumference', domain: 'longevity', unit: 'cm' },
+  walkingHr: { metric: 'walking-heart-rate', domain: 'vital', unit: 'bpm' },
+  afibBurdenPct: { metric: 'atrial-fibrillation-burden', domain: 'vital', unit: '%' },
+  perfusionIndexPct: { metric: 'peripheral-perfusion-index', domain: 'vital', unit: '%' },
+  bloodGlucoseMgdl: { metric: 'blood-glucose', domain: 'vital', unit: 'mg/dL' },
+  fev1L: { metric: 'fev1', domain: 'vital', unit: 'L' },
+  fvcL: { metric: 'fvc', domain: 'vital', unit: 'L' },
+  peakFlow: { metric: 'peak-expiratory-flow', domain: 'vital', unit: 'L/min' },
+  breathingDisturbances: { metric: 'breathing-disturbances', domain: 'sleep', unit: 'count' },
+  gangguanNapasTidur: { metric: 'sleep-breathing-disturbances', domain: 'sleep', unit: '/h' },
+  basalTempC: { metric: 'basal-body-temperature', domain: 'vital', unit: '°C' },
+  wristTempC: { metric: 'sleeping-wrist-temperature', domain: 'vital', unit: '°C' },
+  waterL: { metric: 'dietary-water', domain: 'longevity', unit: 'L' },
+  mindfulMin: { metric: 'mindful-minutes', domain: 'recovery', unit: 'min' },
+  fallCount: { metric: 'falls', domain: 'other', unit: 'count' },
+  moveMin: { metric: 'move-minutes', domain: 'activity', unit: 'min' },
+  standMin: { metric: 'stand-minutes', domain: 'activity', unit: 'min' },
 }
+
+/** Keys the device/health-profile bridge is allowed to ingest. */
+export const KUNCI_METRIK_PERANGKAT_LONGITUDINAL = Object.freeze(Object.keys(DEVICE_METRICS))
+
+/**
+ * Audit which Health-catalog keys are longitudinal-ready versus still a gap.
+ * Does not invent mappings — missing keys stay explicit.
+ */
+export function auditCakupanWearableLongitudinal(katalogKunci: readonly string[]): {
+  covered: string[]
+  gap: string[]
+} {
+  const covered: string[] = []
+  const gap: string[] = []
+  for (const kunci of katalogKunci) {
+    if (!kunci || typeof kunci !== 'string') continue
+    if (kunci in DEVICE_METRICS) covered.push(kunci)
+    else gap.push(kunci)
+  }
+  return {
+    covered: covered.sort((a, b) => a.localeCompare(b)),
+    gap: gap.sort((a, b) => a.localeCompare(b)),
+  }
+}
+
 
 function parseIso(value: string, field: string) {
   const timestamp = Date.parse(value)
@@ -390,4 +434,58 @@ export function currentDeviceVitalsToLongitudinalEvents(
   }
 
   return { events, skipped }
+}
+
+/** Compact device values for Body Exposure — consumer/device snapshot, not atlas anatomy. */
+export interface DeviceBodyExposureSignal {
+  id: string
+  label: string
+  value: string
+  unit: string
+  truthClass: 'patient-recorded'
+  source: 'device-snapshot'
+  method: 'health-vitals-snapshot'
+  jenisId: string
+}
+
+const OVERLAY_PERANGKAT: readonly { kunci: string; label: string }[] = [
+  { kunci: 'restingHr', label: 'Resting HR' },
+  { kunci: 'hrvMs', label: 'HRV' },
+  { kunci: 'sleepH', label: 'Sleep' },
+  { kunci: 'vo2max', label: 'VO₂max' },
+  { kunci: 'spo2Pct', label: 'SpO₂' },
+  { kunci: 'steps', label: 'Steps' },
+  { kunci: 'systolic', label: 'SBP' },
+  { kunci: 'weightKg', label: 'Weight' },
+]
+
+/**
+ * Newest positive device/health-profile numbers for overlay display.
+ * Unknown keys and non-positive values are skipped — never invented.
+ */
+export function deviceSnapshotToBodyExposureSignals(
+  vitals: Record<string, unknown>,
+  opts: { max?: number } = {},
+): DeviceBodyExposureSignal[] {
+  const max = opts.max ?? 5
+  if (!(max > 0) || !Number.isFinite(max)) return []
+  const keluar: DeviceBodyExposureSignal[] = []
+  for (const { kunci, label } of OVERLAY_PERANGKAT) {
+    const spec = DEVICE_METRICS[kunci]
+    if (!spec) continue
+    const raw = vitals[kunci]
+    if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) continue
+    keluar.push({
+      id: `device-overlay:${kunci}`,
+      label,
+      value: String(raw),
+      unit: spec.unit,
+      truthClass: 'patient-recorded',
+      source: 'device-snapshot',
+      method: 'health-vitals-snapshot',
+      jenisId: kunci,
+    })
+    if (keluar.length >= Math.floor(max)) break
+  }
+  return keluar
 }

@@ -8,7 +8,13 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { strukturUntukTemuan, type StrukturTemuan } from '../lib/strukturTemuanFisik'
 import { ambilLab } from '../lib/lab'
 import { labLogToBodyExposureSignals, type LabBodyExposureSignal } from '../lib/labLongitudinalBridge'
+import { getVitals } from '../lib/healthVitals'
+import {
+  deviceSnapshotToBodyExposureSignals,
+  type DeviceBodyExposureSignal,
+} from '../lib/healthStoreLongitudinalBridge'
 import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
+import { PERISTIWA_SINKRON } from '../lib/antreanKlinis'
 
 function reviewLabel(state: 'draft' | 'exam-verified' | 'record-signed') {
   if (state === 'record-signed') return 'Signed record'
@@ -36,15 +42,22 @@ export function BodyExposurePatientOverlay({
   const [labSignals, setLabSignals] = useState<LabBodyExposureSignal[]>(() =>
     labLogToBodyExposureSignals(ambilLab(), { nowISO: hariIniISO() }),
   )
+  const [deviceSignals, setDeviceSignals] = useState<DeviceBodyExposureSignal[]>(() =>
+    deviceSnapshotToBodyExposureSignals(getVitals() as unknown as Record<string, unknown>),
+  )
 
   useEffect(() => {
-    const muat = () => setLabSignals(labLogToBodyExposureSignals(ambilLab(), { nowISO: hariIniISO() }))
-    muat()
-    window.addEventListener('panacea:lab', muat)
-    window.addEventListener('storage', muat)
+    const muatLab = () => setLabSignals(labLogToBodyExposureSignals(ambilLab(), { nowISO: hariIniISO() }))
+    const muatDevice = () => setDeviceSignals(deviceSnapshotToBodyExposureSignals(getVitals() as unknown as Record<string, unknown>))
+    const muatSemua = () => { muatLab(); muatDevice() }
+    muatSemua()
+    window.addEventListener('panacea:lab', muatLab)
+    window.addEventListener('storage', muatSemua)
+    window.addEventListener(PERISTIWA_SINKRON, muatDevice)
     return () => {
-      window.removeEventListener('panacea:lab', muat)
-      window.removeEventListener('storage', muat)
+      window.removeEventListener('panacea:lab', muatLab)
+      window.removeEventListener('storage', muatSemua)
+      window.removeEventListener(PERISTIWA_SINKRON, muatDevice)
     }
   }, [])
 
@@ -106,6 +119,31 @@ export function BodyExposurePatientOverlay({
                   <span className="ml-1 text-[8px] font-bold text-white/35">{signal.unit}</span>
                 </div>
                 <div className="truncate text-[8px] font-semibold text-white/28">{signal.recordedAt}</div>
+              </div>
+            ))}
+          </>
+        ) : null}
+
+        {deviceSignals.length > 0 ? (
+          <>
+            <div className="h-7 w-px shrink-0 bg-white/10" aria-hidden />
+            <div className="min-w-[72px] shrink-0" data-pmd-device-overlay-label>
+              <div className="text-[8px] font-black uppercase tracking-[.1em] text-amber-200/55">Device · snapshot</div>
+              <div className="truncate text-[10px] font-black text-white/55">not atlas anatomy</div>
+            </div>
+            {deviceSignals.map((signal) => (
+              <div
+                key={signal.id}
+                className="min-w-[82px] shrink-0"
+                data-pmd-device-overlay-signal={signal.jenisId}
+                data-truth-class={signal.truthClass}
+                data-device-source={signal.source}
+              >
+                <div className="truncate text-[8px] font-black uppercase tracking-[.1em] text-amber-200/45">{signal.label}</div>
+                <div className="truncate text-sm font-black text-white/88">
+                  {signal.value}
+                  <span className="ml-1 text-[8px] font-bold text-white/35">{signal.unit}</span>
+                </div>
               </div>
             ))}
           </>
