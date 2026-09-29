@@ -303,11 +303,24 @@ Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur
 
 ---
 
-## 10. Dokumen rujukan (baca sesuai tugas)
+## 10. Dokumen rujukan
 
-- Arahan pemilik & ledger domain: [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md)
-- Konstitusi & doktrin: `PANACEA_CONSTITUTION.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `PANACEA_INVICTUS_PRINCIPLE.md`, `PANACEA_HUMANITY_10_CHARTER.md`
-- Maturity & loop otonom: `PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/`
-- Instruksi agent umum: `AGENTS.md`
+Instruksi umum multi-agent (dimuat otomatis lewat import di bawah; bila bertentangan dengan dokumen ini, **dokumen ini menang**):
 
-Untuk pekerjaan luas ("lanjut"), baca dokumen relevan di atas terlebih dahulu; tugas sempit cukup mengikuti §2–§8.
+@AGENTS.md
+
+Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
+
+| Bila tugasmu menyentuh… | Baca dulu |
+|---|---|
+| Apa pun yang luas / "lanjut" | `PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
+| Klaim ilmiah/klinis, R&D, novelty | `PANACEA_CONSTITUTION.md`, `DOCS/ACADEMIC-ACCURACY-GATE.md` |
+| Model manusia, fisiologi, simulasi, coupling | `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/PHYSIOLOGICAL-RUNTIME.md` |
+| Data pasien, wearable, device, EMR | `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
+| Body Exposure / 3D / atlas | `DOCS/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `PANACEA_OWNER_DIRECTIVES.md` |
+| Visit OS / realtime / WebRTC | bagian "Visit OS" di `PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
+| Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |
+| UI/UX & navigasi | `DOCS/RUTHLESS-SIMPLICITY.md`, `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md` |
+| Keputusan arsitektur | `DOCS/adr/` (mulai `0001-domain-first-clean-architecture.md`) |
+
+Arahan pemilik lengkap (ledger historis): [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md) — dibaca on-demand, tidak di-import agar konteks sesi tetap ramping. Doktrin tambahan: `PANACEA_INVICTUS_PRINCIPLE.md`, `PANACEA_HUMANITY_10_CHARTER.md`.
