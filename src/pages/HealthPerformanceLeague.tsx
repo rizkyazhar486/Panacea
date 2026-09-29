@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, Badge } from '../components/ui'
+import { Prosa } from '../components/Prosa'
 import { getWorkouts } from '../lib/workoutStore'
 import {
   RANK_TIERS,
@@ -113,10 +114,10 @@ export function HealthPerformanceLeague() {
                 Panacea Ranked Season · {result.season.id}
               </div>
               <h2 className="mt-1 text-2xl font-black tracking-[-.035em] sm:text-3xl">Health & Performance League</h2>
-              <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-white/55 sm:text-sm">
+              <Prosa kelas="mt-1 max-w-2xl text-[12px] leading-relaxed text-white/55 sm:text-sm">
                 A 90-day competitive ladder where every verified effort is a match. Active calories are the base currency;
                 Panacea sizes the star using your body, recent baseline, perceived/physiological load, progression, recovery and evidence quality.
-              </p>
+              </Prosa>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[.045] px-3 py-2 text-right">
               <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/45">Season reset</div>
@@ -307,9 +308,9 @@ export function HealthPerformanceLeague() {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-[10px] leading-relaxed text-white/35">
+          <Prosa kelas="mt-4 text-[10px] leading-relaxed text-white/35">
             Calories are the base game currency, not the final judgement. Raw kcal are body-size normalised, compared against the user's own recent energy baseline, then modified conservatively by available effort/progression/recovery evidence. This is a gamification layer, not a diagnosis, medical clearance or substitute for clinician/coach judgement.
-          </p>
+          </Prosa>
         </Card>
       </div>
 
