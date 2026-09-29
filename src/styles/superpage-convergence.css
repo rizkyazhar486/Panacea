@@ -1,6 +1,5 @@
-/* Panacea three-super-page convergence layer.
-   This is deliberately a low-energy spectral stage: data and controls stay legible
-   while the page still has a coherent material identity. */
+/* Panacea category-page convergence layer.
+   Scientific depth stays behind seven compact connected lenses over one human state. */
 
 .pmd-spectral-shell {
   position: relative;
@@ -83,8 +82,8 @@
 
 .pmd-superpage-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
   margin-top: 12px;
 }
 
@@ -134,13 +133,13 @@
 }
 
 .pmd-superpage-tile {
-  min-height: 138px;
+  min-height: 112px;
   display: grid;
   grid-template-columns: auto minmax(0,1fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 30px;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 24px;
   color: #0b1117;
   transition: border-color 180ms ease, box-shadow 260ms cubic-bezier(.22,1,.36,1), background 260ms ease;
 }
@@ -160,9 +159,9 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 24px;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
   color: white;
   background:
     radial-gradient(circle at 28% 18%, rgba(255,255,255,.88), rgba(255,255,255,.08) 22%, transparent 31%),
@@ -380,11 +379,23 @@
 }
 
 @media (max-width: 760px) {
-  .pmd-superpage-grid { grid-template-columns: 1fr; gap: 9px; }
-  .pmd-superpage-tile { min-height: 104px; padding: 13px; border-radius: 24px; }
-  .pmd-liquid-metal-icon { width: 58px; height: 58px; border-radius: 19px; }
-  .pmd-superpage-copy strong { font-size: 15px; }
+  .pmd-superpage-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .pmd-superpage-tile {
+    min-height: 82px;
+    grid-template-columns: auto minmax(0,1fr);
+    gap: 8px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  .pmd-liquid-metal-icon { width: 42px; height: 42px; border-radius: 14px; }
+  .pmd-superpage-copy strong { font-size: 14px; }
+  .pmd-superpage-copy small { margin-top: 3px; font-size: 8px; }
+  .pmd-superpage-arrow { display: none; }
   .pmd-image-slide { height: 218px; }
+}
+
+@media (max-width: 340px) {
+  .pmd-superpage-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
