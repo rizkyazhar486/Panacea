@@ -35,7 +35,7 @@ test('safe longitudinal participation can reach top season rank without rewardin
     for (let day = 0; day < 4; day++) {
       const d = new Date(start)
       d.setDate(start.getDate() + week * 7 + day)
-      workouts.push(workout(`${week}-${day}`, d.toISOString(), 45))
+      workouts.push(workout(`${week}-${day}`, d.toISOString(), 45, { speedKmh: 10 }))
     }
   }
   const history = Array.from({ length: 30 }, (_, i) => ({
