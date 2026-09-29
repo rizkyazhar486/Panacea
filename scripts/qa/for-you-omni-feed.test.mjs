@@ -25,7 +25,7 @@ test('superfeed mixes community rank daily work and network objects into the sam
 })
 
 test('network OS connects discovery discussion tasks and opportunity discovery', () => {
-  for (const token of ['Discover people', 'Squads / Clubs', 'Discussions', 'Workboard', 'For You · opportunities', 'Search LinkedIn Jobs']) {
+  for (const token of ['Discover people', 'Squads / Clubs', 'Discussions', 'Workboard', 'Slack-like group discussion inside For You', '# training', '# research', '# opportunities', 'For You · opportunities', 'Search LinkedIn Jobs']) {
     assert.ok(network.includes(token), `missing network surface: ${token}`)
   }
 })
@@ -33,4 +33,10 @@ test('network OS connects discovery discussion tasks and opportunity discovery',
 test('empty social state is fail-closed rather than populated by fake people or posts', () => {
   assert.match(feed, /fabricat(?:e|ing).*people.*posts/i)
   assert.match(network, /instead of synthetic matches/)
+})
+
+
+test('Following mode uses the canonical follow graph and discovery deep-links into DMs', () => {
+  assert.match(feed, /state\.follows/)
+  assert.match(network, /\/messages\?peer=/)
 })
