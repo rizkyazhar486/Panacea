@@ -58,18 +58,17 @@ Treat the owner's "human surveillance" shorthand as **permissioned observability
 
 Develop Panacea quickly without destroying existing work. Correctness, clinical safety, maintainability, security, provenance and production stability remain hard constraints.
 
-## Owner directive: main-first continuous development
+## Owner directive: branch + pull request flow (supersedes direct-to-main, 2026-09-29)
 
-GitHub main is the source of truth. As of 2026-09-18, authorized agents may and should commit coherent production changes directly to main. This supersedes the repository's older PR-only traffic rule.
+GitHub main is the source of truth and stays always-deployable. The 2026-09-18 direct-to-main rule is **retired**: the owner now requires feature branches and pull requests. The canonical flow is in [`CLAUDE.md`](CLAUDE.md) §5–§6.
 
 Traffic rules:
-1. Resolve the current main head immediately before writing.
-2. Preserve already-landed work and inspect likely overlap when practical.
-3. Commit coherent, buildable batches directly to main; do not create a PR merely because an older instruction required one.
-4. Never force-push, rewrite shared history, or overwrite a newer main.
-5. If main advances during preparation, replay/rebuild on the newer head.
-6. Validate before committing when practical and inspect CI after committing.
-7. A broken main is repaired forward immediately; do not bypass or weaken tests, security checks or biomedical gates to make status green.
+1. Branch from the newest main (`feat/`, `fix/`, `refactor/`, `test/`, `docs/`, `chore/`, `hotfix/`); one branch = one logical change.
+2. Preserve already-landed work and inspect overlapping open PRs (`gh pr list`) before touching shared files.
+3. Open a PR into main; merge only with exact-head CI green and review. Agents do not merge their own PRs unless the owner explicitly asks.
+4. Never force-push shared history or push directly to main.
+5. If main advances, rebase your own branch onto it.
+6. Validate before pushing and inspect CI after; a red gate is the next repair task. Never bypass or weaken tests, security checks or biomedical gates to make status green.
 
 ## Agent autonomy and collaboration
 

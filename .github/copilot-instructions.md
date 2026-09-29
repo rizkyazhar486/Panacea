@@ -1,5 +1,7 @@
 # Panaceamed AI contribution instructions
 
+> **Standar proyek terbaru (arsitektur, git flow branch+PR, unit test ketat):** ikuti [`CLAUDE.md`](../CLAUDE.md). Jika bertentangan dengan dokumen ini, `CLAUDE.md` menang.
+
 The canonical repository instructions are in `/AGENTS.md`.
 Before material changes, follow its authority order and read the Product Maturity OS and living governance registries it references.
 
