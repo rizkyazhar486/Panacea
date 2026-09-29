@@ -43,7 +43,7 @@ export function statusPasienUntukDokter(
   kini: string,
   verifiedVitals: readonly VitalTercatat[] = [],
 ): { state: LongitudinalPatientState; labels: Record<string, string>; skipped: number } {
-  const subjectId = 'shared-patient'
+  const subjectId = care.plan?.subjectId ?? 'shared-patient'
   const consent: ConsentEnvelope = { granted: true, purposes: ['clinical-support'], grantedAt: izin.dibuat, expiresAt: izin.berakhir }
   let state = createLongitudinalPatientState(subjectId, kini)
   const lab = labLogToLongitudinalEvents(logDariBundel(entries), subjectId, { consent, receivedAt: kini, confidence: 1 })
