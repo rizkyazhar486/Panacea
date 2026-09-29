@@ -289,4 +289,6 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 | UI/UX & navigasi | `DOCS/RUTHLESS-SIMPLICITY.md`, `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md` |
 | Keputusan arsitektur | `DOCS/adr/` (mulai `0001-domain-first-clean-architecture.md`) |
 
+Prinsip **Invictus Human Reality Principle** (arsitektur masa depan yang dapat direalisasikan): `docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`, kanonik lewat `PANACEA_INVICTUS_PRINCIPLE.md`.
+
 Arahan pemilik lengkap (ledger historis): [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md) — dibaca on-demand, tidak di-import agar konteks sesi tetap ramping. Doktrin tambahan: `PANACEA_INVICTUS_PRINCIPLE.md`, `PANACEA_HUMANITY_10_CHARTER.md`.
