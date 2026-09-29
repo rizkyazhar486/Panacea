@@ -104,7 +104,7 @@ export function HealthPerformanceLeague() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 pb-10">
-      <section className="relative overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[#030509] p-4 text-white shadow-[0_24px_90px_rgba(0,0,0,.42)] sm:p-6">
+      <section className="dark relative overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[#030509] p-4 text-white shadow-[0_24px_90px_rgba(0,0,0,.42)] sm:p-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(34,211,238,.14),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(168,85,247,.13),transparent_30%),radial-gradient(circle_at_50%_120%,rgba(16,185,129,.14),transparent_42%)]" />
         <div className="relative">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -205,7 +205,7 @@ export function HealthPerformanceLeague() {
         </div>
       </section>
 
-      <Card className="!border-white/10 !bg-[#07090c] text-white">
+      <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Recent matches</div>
@@ -241,7 +241,7 @@ export function HealthPerformanceLeague() {
         </div>
       </Card>
 
-      <Card className="!border-white/10 !bg-[#07090c] text-white">
+      <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Rank ladder</div>
@@ -274,7 +274,7 @@ export function HealthPerformanceLeague() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="!border-white/10 !bg-[#07090c] text-white">
+        <Card className="dark !border-white/10 !bg-[#07090c] text-white">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Promotion objectives</div>
           <h3 className="mt-1 text-lg font-black">What raises your rank next</h3>
           <div className="mt-4 space-y-2">
@@ -291,7 +291,7 @@ export function HealthPerformanceLeague() {
           </div>
         </Card>
 
-        <Card className="!border-white/10 !bg-[#07090c] text-white">
+        <Card className="dark !border-white/10 !bg-[#07090c] text-white">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Scoring model</div>
           <h3 className="mt-1 text-lg font-black">Competitive, but clinically sane</h3>
           <div className="mt-4 rounded-2xl border border-white/[.07] bg-black/35 p-3 font-mono text-[11px] leading-relaxed text-cyan-100/80">
@@ -313,7 +313,7 @@ export function HealthPerformanceLeague() {
         </Card>
       </div>
 
-      <Card className="!border-white/10 !bg-[#07090c] text-white">
+      <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Game systems preserved</div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {[
