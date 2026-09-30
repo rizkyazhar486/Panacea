@@ -1,0 +1,119 @@
+name: PR Unblocker
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Open same-repository PR number to unstick"
+        required: true
+        type: string
+      rerun_failed:
+        description: "Retry failed/cancelled workflow runs when branch is already current"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: pr-unblocker-${{ inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  unblock:
+    name: Safely sync and retry PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Validate target and sync with latest main
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          RERUN_FAILED: ${{ inputs.rerun_failed }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$PR_NUMBER" in
+            ''|*[!0-9]*)
+              echo "pr_number must be numeric" >&2
+              exit 2
+              ;;
+          esac
+
+          pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
+          state="$(jq -r '.state' <<<"$pr_json")"
+          base_ref="$(jq -r '.base.ref' <<<"$pr_json")"
+          head_repo="$(jq -r '.head.repo.full_name // ""' <<<"$pr_json")"
+          head_sha="$(jq -r '.head.sha' <<<"$pr_json")"
+          head_ref="$(jq -r '.head.ref' <<<"$pr_json")"
+
+          [[ "$state" == "open" ]] || { echo "PR #$PR_NUMBER is not open" >&2; exit 3; }
+          [[ "$base_ref" == "main" ]] || { echo "PR #$PR_NUMBER does not target main" >&2; exit 4; }
+          [[ "$head_repo" == "$GITHUB_REPOSITORY" ]] || {
+            echo "Cross-repository PRs are intentionally refused by this workflow" >&2
+            exit 5
+          }
+
+          compare_json="$(gh api "repos/${GITHUB_REPOSITORY}/compare/main...${head_sha}")"
+          behind_by="$(jq -r '.behind_by // 0' <<<"$compare_json")"
+
+          echo "head_ref=$head_ref" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "behind_by=$behind_by" >> "$GITHUB_OUTPUT"
+
+          if (( behind_by > 0 )); then
+            echo "PR #$PR_NUMBER is $behind_by commit(s) behind main; requesting a protected branch update."
+            gh api               --method PUT               "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/update-branch"               -f expected_head_sha="$head_sha"               >/tmp/update.json
+            cat /tmp/update.json
+            echo "synced=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR #$PR_NUMBER is already current with main."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Retry failed or cancelled runs on unchanged head
+        if: ${{ steps.sync.outputs.synced == 'false' && inputs.rerun_failed }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.sync.outputs.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t run_ids < <(
+            gh run list               --repo "$GITHUB_REPOSITORY"               --commit "$HEAD_SHA"               --limit 50               --json databaseId,conclusion               --jq '.[] | select(.conclusion == "failure" or .conclusion == "cancelled") | .databaseId'
+          )
+
+          if (( ${#run_ids[@]} == 0 )); then
+            echo "No failed or cancelled runs to retry."
+            exit 0
+          fi
+
+          for run_id in "${run_ids[@]}"; do
+            echo "Re-running failed jobs for workflow run $run_id"
+            gh run rerun "$run_id" --failed --repo "$GITHUB_REPOSITORY" ||               echo "Run $run_id could not be retried; leaving it visible for manual inspection."
+          done
+
+      - name: Summarize
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_REF: ${{ steps.sync.outputs.head_ref }}
+          BEHIND_BY: ${{ steps.sync.outputs.behind_by }}
+          SYNCED: ${{ steps.sync.outputs.synced }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$SYNCED" == "true" ]]; then
+            msg="PR Unblocker synced `$HEAD_REF` with latest `main` without force-push. Fresh CI must complete before merge."
+          else
+            msg="PR Unblocker found `$HEAD_REF` already current with `main`; failed/cancelled runs were eligible for retry. Existing review and CI requirements remain unchanged."
+          fi
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$msg"
+
