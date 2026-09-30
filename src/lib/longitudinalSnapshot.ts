@@ -2,12 +2,13 @@ import type { Account, EMRRecord } from './types'
 import type { Vitals } from './healthVitals'
 import type { ButirLab } from './lab'
 import type { ProductionHealthStoreState } from './productionHealthStoreSelector'
-import type { FoodEntry } from './types'
+import type { FoodEntry, GpsActivity, SleepLog, TrainingLog, WellnessDay } from './types'
 import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from './continuousCareOperatingSystem'
 import { labLogToLongitudinalEvents } from './labLongitudinalBridge'
 import { careToLongitudinalEvents, type TinjauanMasuk } from './careLongitudinalBridge'
 import { emrRecordToLongitudinalEvents, emrVitalsToLongitudinalEvents, LABEL_METRIK_VITAL_EMR, type ServerAcceptedEmrRecord, type VitalTercatat } from './emrLongitudinalBridge'
 import { foodLogToLongitudinalEvents } from './healthStoreLongitudinalBridge'
+import { syncProductionPersonalStores } from './productionPersonalLongitudinalSync'
 import { syncProductionAppState } from './productionAppStateLongitudinalSync'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type ConsentEnvelope, type LongitudinalPatientState } from './panaceaLongitudinalState'
 
@@ -21,7 +22,13 @@ export interface LongitudinalServerSources {
 }
 export const emptyLongitudinalServer = (): LongitudinalServerSources => ({ owner: null, plans: [], reviews: [], records: {}, vitals: {}, encounters: {} })
 export interface LongitudinalSources {
-  app: ProductionHealthStoreState & { foods?: readonly FoodEntry[] }
+  app: ProductionHealthStoreState & {
+    foods?: readonly FoodEntry[]
+    sleepLogs?: readonly SleepLog[]
+    wellness?: Record<string, WellnessDay>
+    trainingLogs?: readonly TrainingLog[]
+    gpsActivities?: readonly GpsActivity[]
+  }
   local: { owner: Account | null; labs: Record<string, ButirLab[]>; vitals: Vitals }
   server: LongitudinalServerSources
 }
@@ -94,6 +101,27 @@ export function projectLongitudinalSnapshot(sources: LongitudinalSources, kini =
   for (const ev of makanan.events) {
     try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
   }
+  try {
+    // Per-meal food events stay out: daily totals above already represent the food log.
+    const personal = syncProductionPersonalStores({
+      state,
+      subjectId,
+      appState: {
+        account,
+        foods: [],
+        sleepLogs: [...(app.sleepLogs ?? [])],
+        wellness: { ...(app.wellness ?? {}) },
+        trainingLogs: [...(app.trainingLogs ?? [])],
+        gpsActivities: [...(app.gpsActivities ?? [])],
+      },
+      context: {
+        consent,
+        receivedAt: kini,
+        confidence: { userReported: KEPERCAYAAN_CATATAN, derived: KEPERCAYAAN_CATATAN },
+      },
+    })
+    state = personal.state
+  } catch { skipped++ }
   const lab = labLogToLongitudinalEvents(local.labs, subjectId, { consent, receivedAt: kini, confidence: KEPERCAYAAN_CATATAN })
   skipped += lab.skipped.length
   for (const ev of lab.events) {

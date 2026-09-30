@@ -63,6 +63,15 @@ function dateOnly(value: string, field: string) {
   return normalized
 }
 
+/** Day stamp that still validates against receivedAt. One local day ahead of UTC clamps; farther dates are skipped. */
+function saatHarian(value: string, field: string, receivedAt: string): string | null {
+  const date = dateOnly(value, field)
+  if (Date.parse(date) <= Date.parse(receivedAt) + 5 * 60_000) return date
+  const ahead = (Date.parse(`${date}T00:00:00.000Z`) - Date.parse(`${receivedAt.slice(0, 10)}T00:00:00.000Z`)) / 864e5
+  if (ahead > 1) return null
+  return receivedAt
+}
+
 function instant(value: string, field: string) {
   const parsed = Date.parse(value)
   if (!Number.isFinite(parsed) || !value.includes('T')) {
@@ -119,7 +128,8 @@ function sleepEvents(
   row: SleepLog,
   context: ProductionPersonalBridgeContext,
 ): LongitudinalEvent[] {
-  const at = dateOnly(row.date, 'sleep.date')
+  const at = saatHarian(row.date, 'sleep.date', context.receivedAt)
+  if (!at) return []
   const base = {
     subjectId,
     recordedAt: at,
@@ -190,7 +200,8 @@ function trainingEvents(
   context: ProductionPersonalBridgeContext,
 ): LongitudinalEvent[] {
   if (!finite(row.rpe)) return []
-  const at = dateOnly(row.date, 'training.date')
+  const at = saatHarian(row.date, 'training.date', context.receivedAt)
+  if (!at) return []
   return [event({
     id: `personal:training:${row.id}:rpe`,
     subjectId,
@@ -211,7 +222,8 @@ function foodEvents(
   row: FoodEntry,
   context: ProductionPersonalBridgeContext,
 ): LongitudinalEvent[] {
-  const at = dateOnly(row.date, 'food.date')
+  const at = saatHarian(row.date, 'food.date', context.receivedAt)
+  if (!at) return []
   const base = {
     subjectId,
     recordedAt: at,
@@ -241,7 +253,8 @@ function wellnessEvents(
   row: WellnessDay,
   context: ProductionPersonalBridgeContext,
 ): LongitudinalEvent[] {
-  const at = dateOnly(row.date, 'wellness.date')
+  const at = saatHarian(row.date, 'wellness.date', context.receivedAt)
+  if (!at) return []
   const manualBase = {
     subjectId,
     recordedAt: at,

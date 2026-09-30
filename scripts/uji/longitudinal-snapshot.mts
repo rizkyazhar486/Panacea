@@ -77,4 +77,31 @@ assert.equal(sumberVitalsLongitudinal(null, { weightKg: 99 }).source, 'browser')
 assert.equal(sumberDeretLongitudinal([{ id: 's1' }], [{ id: 'b1' }]).rows[0].id, 's1')
 assert.equal(sumberDeretLongitudinal([], [{ id: 'b1' }]).source, 'browser', 'empty server series keeps AppState-only rows')
 assert.equal(sumberDeretLongitudinal(null, [{ id: 'b1' }]).source, 'browser')
+
+{
+  const harian = projectLongitudinalSnapshot({
+    ...sources,
+    app: {
+      ...app,
+      foods: [{ id: 'f1', date: '2026-09-25', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 1 }],
+      sleepLogs: [
+        { id: 's1', date: '2026-09-25', hours: 7.5, bedtimeConsistent: true },
+        { id: 'far', date: '2026-10-05', hours: 8, bedtimeConsistent: false },
+      ],
+      wellness: { '2026-09-25': { date: '2026-09-25', waterMl: 1800, sleepHr: 7 } },
+      trainingLogs: [{ id: 't1', date: '2026-09-25', rpe: 6, type: 'Run' }],
+    },
+  }, now)
+  const metrik = Object.values(harian.state!.eventsById)
+  assert.equal(metrik.find((e) => e.metric === 'logged-sleep-duration')?.value, 7.5)
+  assert.equal(metrik.find((e) => e.metric === 'wellness-sleep-duration')?.value, 7)
+  assert.equal(metrik.find((e) => e.metric === 'water-intake')?.value, 1800)
+  assert.equal(metrik.find((e) => e.metric === 'training-rpe')?.value, 6)
+  assert.equal(metrik.find((e) => e.metric === 'nutrition.dietary-protein')?.value, 3)
+  assert.equal(metrik.some((e) => e.metric === 'protein'), false, 'per-meal food events must not duplicate the daily total')
+  assert.equal(metrik.some((e) => e.metric === 'sleep-duration' && e.provenance.method === 'user sleep log'), false)
+  assert.equal(metrik.some((e) => e.id.includes('far')), false, 'a sleep date more than one day ahead is skipped')
+  assert.ok(metrik.some((e) => e.domain === 'lab'), 'a skipped future sleep row must not drop the lab log')
+}
+
 console.log('longitudinal-snapshot: one build/three reads, revision invalidation, patient isolation and provenance passed')

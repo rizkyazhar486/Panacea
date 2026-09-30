@@ -161,4 +161,29 @@ assert.throws(
   /yyyy-mm-dd date/,
 )
 
+{
+  const ahead = syncProductionPersonalStores({
+    state: initial,
+    appState: {
+      ...appState,
+      sleepLogs: [{ id: 'tomorrow', date: '2026-09-19', hours: 6, bedtimeConsistent: true }],
+    },
+    subjectId: 'self-owner',
+    context,
+  })
+  const row = ahead.state.eventsById['personal:sleep:tomorrow:duration']
+  assert.equal(row?.recordedAt, context.receivedAt, 'one local day ahead of UTC clamps instead of failing the diary')
+  const far = syncProductionPersonalStores({
+    state: initial,
+    appState: {
+      ...appState,
+      sleepLogs: [{ id: 'far', date: '2026-09-21', hours: 6, bedtimeConsistent: true }],
+    },
+    subjectId: 'self-owner',
+    context,
+  })
+  assert.equal(far.state.eventsById['personal:sleep:far:duration'], undefined)
+  assert.ok(far.candidateEventCount > 0, 'one future sleep row must not drop the rest of the diary')
+}
+
 console.log('production personal longitudinal sync: ok')
