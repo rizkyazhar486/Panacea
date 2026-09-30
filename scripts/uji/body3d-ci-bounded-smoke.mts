@@ -8,7 +8,7 @@ const workflow = readFileSync(
 
 assert.match(
   workflow,
-  /timeout --signal=TERM --kill-after=15s 150s npm run "\$gerbang"/,
+  /timeout --signal=TERM --kill-after=15s 180s npm run "\$gerbang"/,
   'every Body3D smoke command must have its own hard runtime bound',
 )
 assert.match(
@@ -23,7 +23,7 @@ assert.match(
 )
 assert.match(
   workflow,
-  /::error::\$gerbang timeout setelah \$\{durasi\}s \(batas 150s\)/,
+  /::error::\$gerbang timeout setelah \$\{durasi\}s \(batas 180s\)/,
   'timeout diagnostics must identify the affected gate and configured bound',
 )
 
@@ -52,4 +52,4 @@ for (const gate of ordered) {
   previous = index
 }
 
-console.log('Body3D CI: 12 serial proofs retain order and each has a 150s hard timeout with duration diagnostics')
+console.log('Body3D CI: 12 serial proofs retain order and each has a 180s hard timeout with duration diagnostics')
