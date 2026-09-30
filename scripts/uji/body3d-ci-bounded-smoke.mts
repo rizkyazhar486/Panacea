@@ -23,8 +23,18 @@ assert.match(
 )
 assert.match(
   workflow,
-  /timeout --signal=TERM --kill-after=15s 180s npm run "\$gerbang"/,
-  'every Body3D smoke command must have its own hard runtime bound',
+  /batas=180/,
+  'Body3D smoke gates must default to a finite 180s runtime bound',
+)
+assert.match(
+  workflow,
+  /if \[ "\$gerbang" = 'qa:organ-3d' \]; then[\s\S]*?batas=240/,
+  'the heavier organ proof must receive only its evidence-based 240s exception',
+)
+assert.match(
+  workflow,
+  /timeout --signal=TERM --kill-after=15s "\$\{batas\}s" npm run "\$gerbang"/,
+  'every Body3D smoke command must execute through its selected hard runtime bound',
 )
 assert.match(
   workflow,
@@ -38,8 +48,8 @@ assert.match(
 )
 assert.match(
   workflow,
-  /::error::\$gerbang timeout setelah \$\{durasi\}s \(batas 180s\)/,
-  'timeout diagnostics must identify the affected gate and configured bound',
+  /::error::\$gerbang timeout setelah \$\{durasi\}s \(batas \$\{batas\}s\)/,
+  'timeout diagnostics must identify the affected gate and selected configured bound',
 )
 assert.match(
   workflow,
@@ -89,5 +99,5 @@ assert.match(
 )
 
 console.log(
-  'Body3D CI: serial proofs are individually bounded, fail fast, and the runner has stage/job/process-group hard stops',
+  'Body3D CI: serial proofs are individually bounded with a 240s organ exception, fail fast, and retain stage/job/process-group hard stops',
 )
