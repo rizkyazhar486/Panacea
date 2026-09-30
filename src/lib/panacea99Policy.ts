@@ -91,33 +91,102 @@ const registry = registryJson as RegistryShape
 const axiomById = new Map(registry.axioms.map((axiom) => [axiom.id, axiom]))
 const hardByDefault = new Set(registry.enforcementPolicy.hardByDefaultSurfaces)
 
-function validIso(value: string) {
+const APPLICABILITIES = new Set<Panacea99Applicability>(['applicable', 'not-applicable', 'unknown'])
+const STATUSES = new Set<Panacea99Status>(['pass', 'fail', 'unknown'])
+const HUMAN_REVIEW_STATES = new Set<Panacea99HumanReviewState>(['approved', 'rejected', 'pending'])
+const EVIDENCE_KINDS = new Set<Panacea99EvidenceRef['kind']>([
+  'test',
+  'citation',
+  'audit',
+  'approval',
+  'runtime',
+  'measurement',
+  'other',
+])
+const ISO_8601_TIMESTAMP = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(?:Z|[+-](\d{2}):(\d{2}))$/
+
+function validIso(value: unknown): value is string {
+  if (typeof value !== 'string') return false
+  const match = ISO_8601_TIMESTAMP.exec(value)
+  if (!match) return false
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const hour = Number(match[4])
+  const minute = Number(match[5])
+  const second = Number(match[6])
+  const offsetHour = match[7] === undefined ? 0 : Number(match[7])
+  const offsetMinute = match[8] === undefined ? 0 : Number(match[8])
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+  if (month < 1 || month > 12) return false
+  if (day < 1 || day > (daysInMonth[month - 1] ?? 0)) return false
+  if (hour > 23 || minute > 59 || second > 59) return false
+  if (offsetHour > 14 || offsetMinute > 59) return false
+  if (offsetHour === 14 && offsetMinute !== 0) return false
   return Number.isFinite(Date.parse(value))
 }
 
-function requiredText(value: string, field: string) {
+function requiredText(value: unknown, field: string) {
+  if (typeof value !== 'string') throw new Error(`${field} must be a string`)
   const normalized = value.trim()
   if (!normalized) throw new Error(`${field} must not be blank`)
   return normalized
 }
 
-function validateEvidence(evidence: readonly Panacea99EvidenceRef[] | undefined) {
-  for (const ref of evidence ?? []) {
-    requiredText(ref.id, 'evidence.id')
-    requiredText(ref.source, 'evidence.source')
-    if (ref.capturedAt !== undefined && !validIso(ref.capturedAt)) {
-      throw new Error('evidence.capturedAt must be a valid ISO timestamp')
-    }
+function asRecord(value: unknown, field: string): Record<string, unknown> {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${field} must be an object`)
   }
+  return value as Record<string, unknown>
 }
 
-function validateHumanReview(review: Panacea99HumanReview | undefined) {
-  if (!review) return
-  if (review.state === 'approved' || review.state === 'rejected') {
-    requiredText(review.reviewerId ?? '', 'humanReview.reviewerId')
-    if (!review.reviewedAt || !validIso(review.reviewedAt)) {
+function validateEvidence(evidence: unknown): readonly Panacea99EvidenceRef[] | undefined {
+  if (evidence === undefined) return undefined
+  if (!Array.isArray(evidence)) throw new Error('evidence must be an array')
+
+  for (const [index, rawRef] of evidence.entries()) {
+    const ref = asRecord(rawRef, `evidence[${index}]`)
+    requiredText(ref.id, `evidence[${index}].id`)
+    requiredText(ref.source, `evidence[${index}].source`)
+    if (!EVIDENCE_KINDS.has(ref.kind as Panacea99EvidenceRef['kind'])) {
+      throw new Error(`evidence[${index}].kind is invalid`)
+    }
+    if (ref.capturedAt !== undefined && !validIso(ref.capturedAt)) {
+      throw new Error(`evidence[${index}].capturedAt must be a valid ISO timestamp`)
+    }
+  }
+
+  return evidence as readonly Panacea99EvidenceRef[]
+}
+
+function validateHumanReview(review: unknown): Panacea99HumanReview | undefined {
+  if (review === undefined) return undefined
+  const value = asRecord(review, 'humanReview')
+  if (!HUMAN_REVIEW_STATES.has(value.state as Panacea99HumanReviewState)) {
+    throw new Error('humanReview.state is invalid')
+  }
+
+  const state = value.state as Panacea99HumanReviewState
+  if (value.reviewerId !== undefined) requiredText(value.reviewerId, 'humanReview.reviewerId')
+  if (value.reviewedAt !== undefined && !validIso(value.reviewedAt)) {
+    throw new Error('humanReview.reviewedAt must be a valid ISO timestamp when supplied')
+  }
+
+  if (state === 'approved' || state === 'rejected') {
+    const reviewerId = requiredText(value.reviewerId, 'humanReview.reviewerId')
+    if (!validIso(value.reviewedAt)) {
       throw new Error('approved/rejected human review requires a valid reviewedAt timestamp')
     }
+    return { state, reviewerId, reviewedAt: value.reviewedAt }
+  }
+
+  return {
+    state,
+    reviewerId: value.reviewerId as string | undefined,
+    reviewedAt: value.reviewedAt as string | undefined,
   }
 }
 
@@ -140,8 +209,12 @@ export function panacea99AxiomIdsForSurfaces(surfaces: readonly string[]) {
 }
 
 export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99DecisionReceipt {
-  const actionId = requiredText(input.actionId, 'actionId')
-  if (!validIso(input.evaluatedAt)) throw new Error('evaluatedAt must be a valid ISO timestamp')
+  const rawInput = asRecord(input, 'input')
+  const actionId = requiredText(rawInput.actionId, 'actionId')
+  const evaluatedAt = rawInput.evaluatedAt
+  if (!validIso(evaluatedAt)) throw new Error('evaluatedAt must be a valid ISO timestamp')
+  const assessments = rawInput.assessments
+  if (!Array.isArray(assessments)) throw new Error('assessments must be an array')
 
   const seen = new Set<string>()
   const receipts: Panacea99AssessmentReceipt[] = []
@@ -154,14 +227,33 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
   let hardApplicable = 0
   let hardPassed = 0
 
-  for (const assessment of input.assessments) {
+  for (const [index, rawAssessment] of assessments.entries()) {
+    const assessmentRecord = asRecord(rawAssessment, `assessments[${index}]`)
+    const axiomId = requiredText(assessmentRecord.axiomId, `assessments[${index}].axiomId`)
+    const assessment = { ...assessmentRecord, axiomId } as unknown as Panacea99Assessment
     const axiom = axiomById.get(assessment.axiomId)
     if (!axiom) throw new Error(`unknown 99-Axiom id: ${assessment.axiomId}`)
     if (seen.has(assessment.axiomId)) throw new Error(`duplicate 99-Axiom assessment: ${assessment.axiomId}`)
     seen.add(assessment.axiomId)
 
-    validateEvidence(assessment.evidence)
-    validateHumanReview(assessment.humanReview)
+    if (!APPLICABILITIES.has(assessment.applicability as Panacea99Applicability)) {
+      throw new Error(`${assessment.axiomId} applicability is invalid`)
+    }
+    if (!STATUSES.has(assessment.status as Panacea99Status)) {
+      throw new Error(`${assessment.axiomId} status is invalid`)
+    }
+    if (assessment.criticalityOverride !== undefined && assessment.criticalityOverride !== 'hard') {
+      throw new Error(`${assessment.axiomId} criticalityOverride is invalid`)
+    }
+    if (assessment.humanReviewRequired !== undefined && typeof assessment.humanReviewRequired !== 'boolean') {
+      throw new Error(`${assessment.axiomId} humanReviewRequired must be boolean when supplied`)
+    }
+    if (assessment.rationale !== undefined && typeof assessment.rationale !== 'string') {
+      throw new Error(`${assessment.axiomId} rationale must be a string when supplied`)
+    }
+
+    const evidence = validateEvidence(assessment.evidence)
+    const humanReview = validateHumanReview(assessment.humanReview)
 
     if ((assessment.applicability === 'not-applicable' || assessment.applicability === 'unknown')
       && !assessment.rationale?.trim()) {
@@ -208,16 +300,16 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
           disposition = 'advisory'
           reasons.push('applicable advisory invariant has unknown status')
         }
-      } else if (hard && registry.enforcementPolicy.hardPassRequiresEvidence && (assessment.evidence?.length ?? 0) === 0) {
+      } else if (hard && registry.enforcementPolicy.hardPassRequiresEvidence && (evidence?.length ?? 0) === 0) {
         unresolvedHardAxiomIds.push(assessment.axiomId)
         disposition = 'unresolved'
         reasons.push('hard pass has no evidence reference')
       } else if (assessment.humanReviewRequired) {
-        if (!assessment.humanReview || assessment.humanReview.state === 'pending') {
+        if (!humanReview || humanReview.state === 'pending') {
           humanReviewAxiomIds.push(assessment.axiomId)
           disposition = 'review-required'
           reasons.push('required human review is pending')
-        } else if (assessment.humanReview.state === 'rejected') {
+        } else if (humanReview.state === 'rejected') {
           failedHardAxiomIds.push(assessment.axiomId)
           disposition = 'failed'
           reasons.push('required human review rejected the action')
@@ -236,7 +328,7 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
       hard,
       applicability: assessment.applicability,
       status: assessment.status,
-      evidenceCount: assessment.evidence?.length ?? 0,
+      evidenceCount: evidence?.length ?? 0,
       disposition,
       reasons,
     })
@@ -252,7 +344,7 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
     registryId: registry.id,
     registrySchemaVersion: registry.schemaVersion,
     actionId,
-    evaluatedAt: input.evaluatedAt,
+    evaluatedAt,
     decision,
     executionGate,
     hardGateProduct: executionGate,
