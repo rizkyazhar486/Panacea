@@ -280,6 +280,11 @@ export function validateMedicalDeviceEvent(
   for (const field of ['deviceId', 'adapterId', 'adapterVersion', 'interface'] as const) {
     if (!nonBlank(source?.[field])) errors.push(`source.${field} must not be blank`)
   }
+  for (const field of ['manufacturer', 'model', 'firmware'] as const) {
+    if (source?.[field] !== undefined && !nonBlank(source[field])) {
+      errors.push(`source.${field} must be a non-blank string when supplied`)
+    }
+  }
 
   if (profile && nonBlank(source?.interface)) {
     const supportedInterfaces = [...profile.preferredStandards, ...profile.fallbackTransports]
@@ -332,6 +337,9 @@ export function validateMedicalDeviceEvent(
     if (!nonBlank(payload.code)) errors.push('alarm code must not be blank')
     if (!ALARM_SEVERITIES.has(String(payload.severity))) errors.push('alarm severity is invalid')
     if (!ALARM_STATES.has(String(payload.state))) errors.push('alarm state is invalid')
+    if (payload.message !== undefined && !nonBlank(payload.message)) {
+      errors.push('alarm message must be a non-blank string when supplied')
+    }
   } else if (kind === 'setting') {
     if (!nonBlank(payload.name)) errors.push('setting name must not be blank')
     const settingValue = payload.value
@@ -339,6 +347,9 @@ export function validateMedicalDeviceEvent(
       || (typeof settingValue === 'number' && Number.isFinite(settingValue))
       || nonBlank(settingValue)
     if (!validValue) errors.push('setting value must be a finite number, boolean or non-blank string')
+    if (payload.unit !== undefined && !nonBlank(payload.unit)) {
+      errors.push('setting unit must be a non-blank string when supplied')
+    }
   } else if (kind === 'therapy-delivery') {
     if (!nonBlank(payload.therapyCode)) errors.push('therapyCode must not be blank')
     if (!THERAPY_STATUSES.has(String(payload.status))) errors.push('therapy-delivery status is invalid')
@@ -351,9 +362,17 @@ export function validateMedicalDeviceEvent(
     }
   } else if (kind === 'image-reference') {
     if (!nonBlank(payload.uri)) errors.push('image reference uri must not be blank')
+    for (const field of ['studyInstanceUid', 'seriesInstanceUid', 'sopInstanceUid', 'contentType'] as const) {
+      if (payload[field] !== undefined && !nonBlank(payload[field])) {
+        errors.push(`image reference ${field} must be a non-blank string when supplied`)
+      }
+    }
   } else if (kind === 'report-reference') {
     if (!nonBlank(payload.uri)) errors.push('report reference uri must not be blank')
     if (!nonBlank(payload.reportType)) errors.push('reportType must not be blank')
+    if (payload.contentType !== undefined && !nonBlank(payload.contentType)) {
+      errors.push('report contentType must be a non-blank string when supplied')
+    }
     if (payload.checksumSha256 !== undefined
       && (typeof payload.checksumSha256 !== 'string' || !SHA256.test(payload.checksumSha256))) {
       errors.push('report checksumSha256 must be 64 hexadecimal characters when supplied')
@@ -393,7 +412,13 @@ export function normalizeMedicalDeviceEvent<T extends MedicalDeviceEventEnvelope
   } else if (payload.shape === 'therapy-delivery') {
     Object.assign(payload, { therapyCode: payload.therapyCode.trim(), unit: payload.unit.trim() })
   } else if (payload.shape === 'image-reference') {
-    Object.assign(payload, { uri: payload.uri.trim(), contentType: payload.contentType?.trim() })
+    Object.assign(payload, {
+      uri: payload.uri.trim(),
+      studyInstanceUid: payload.studyInstanceUid?.trim(),
+      seriesInstanceUid: payload.seriesInstanceUid?.trim(),
+      sopInstanceUid: payload.sopInstanceUid?.trim(),
+      contentType: payload.contentType?.trim(),
+    })
   } else {
     Object.assign(payload, {
       uri: payload.uri.trim(),
