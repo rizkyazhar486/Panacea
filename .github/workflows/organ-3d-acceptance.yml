@@ -19,7 +19,7 @@ concurrency:
 jobs:
   render-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +37,7 @@ jobs:
         run: npm run build
 
       - name: Install browser smoke runner
+        timeout-minutes: 15
         run: |
           set -euo pipefail
 
@@ -88,7 +89,7 @@ jobs:
 
       - name: Start production preview
         run: |
-          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-organ-preview.log 2>&1 &
+          nohup setsid npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-organ-preview.log 2>&1 &
           echo $! > /tmp/panacea-organ-preview.pid
           for attempt in $(seq 1 45); do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
@@ -126,6 +127,7 @@ jobs:
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
+        timeout-minutes: 12
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
@@ -141,7 +143,6 @@ jobs:
           SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
         run: |
           set -e
-          gagal=""
           for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
                          qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
                          qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
@@ -160,17 +161,20 @@ jobs:
               else
                 echo "::error::$gerbang gagal setelah ${durasi}s (exit $kode)"
               fi
-              gagal="$gagal $gerbang"
+              # Fail fast. A timed-out WebGL proof is already actionable; do not
+              # queue the remaining gates behind a known-bad runner.
+              exit 1
             fi
           done
-          if [ -n "$gagal" ]; then
-            echo "Gerbang 3D yang gagal:$gagal"
-            exit 1
-          fi
 
       - name: Stop production preview
         if: always()
         run: |
           if [ -f /tmp/panacea-organ-preview.pid ]; then
-            kill "$(cat /tmp/panacea-organ-preview.pid)" 2>/dev/null || true
+            preview_pid="$(cat /tmp/panacea-organ-preview.pid)"
+            # Preview is started in its own session. Terminate the full process
+            # group so Vite/npm descendants cannot survive a cancelled smoke.
+            kill -TERM -- "-$preview_pid" 2>/dev/null || kill -TERM "$preview_pid" 2>/dev/null || true
+            sleep 1
+            kill -KILL -- "-$preview_pid" 2>/dev/null || true
           fi
