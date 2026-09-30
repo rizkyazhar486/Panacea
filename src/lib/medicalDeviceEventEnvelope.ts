@@ -126,6 +126,7 @@ const ALARM_SEVERITIES = new Set(['low', 'medium', 'high', 'critical'])
 const ALARM_STATES = new Set(['active', 'acknowledged', 'cleared'])
 const THERAPY_STATUSES = new Set(['started', 'delivering', 'delivered', 'paused', 'stopped', 'unknown'])
 const SHA256 = /^[a-f0-9]{64}$/i
+const DETERMINISTIC_VALIDATION_FALLBACK = '1970-01-01T00:00:00.000Z'
 
 function record(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -254,13 +255,21 @@ function declaredShapeForKind(kind: string): readonly MedicalDeviceDataShape[] {
  */
 export function validateMedicalDeviceEvent(
   value: unknown,
-  evaluatedAt = new Date().toISOString(),
+  evaluatedAt?: string,
 ): MedicalDeviceEventValidation {
   const errors: string[] = []
   const event = record(value)
+  const receivedAtForReceipt = record(event?.provenance)?.receivedAt
+  const requestedEvaluatedAt = evaluatedAt
+    ?? (validIso(receivedAtForReceipt) ? receivedAtForReceipt : DETERMINISTIC_VALIDATION_FALLBACK)
+  if (!validIso(requestedEvaluatedAt)) errors.push('evaluatedAt must be a valid ISO timestamp')
+  const receiptAt = validIso(requestedEvaluatedAt)
+    ? requestedEvaluatedAt
+    : DETERMINISTIC_VALIDATION_FALLBACK
+
   if (!event) {
     errors.push('event must be an object')
-    const constitutional = constitutionalMedicalDeviceReceipt(value, errors, evaluatedAt)
+    const constitutional = constitutionalMedicalDeviceReceipt(value, errors, receiptAt)
     return {
       accepted: false,
       disposition: 'quarantined',
@@ -432,7 +441,7 @@ export function validateMedicalDeviceEvent(
     }
   }
 
-  const constitutional = constitutionalMedicalDeviceReceipt(value, errors, evaluatedAt)
+  const constitutional = constitutionalMedicalDeviceReceipt(value, errors, receiptAt)
   const accepted = errors.length === 0 && constitutional.executionGate === 1
 
   return {
