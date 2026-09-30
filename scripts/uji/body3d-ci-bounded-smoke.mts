@@ -41,7 +41,7 @@ const ordered = [
   'qa:bilah-atas',
   'qa:share-card',
 ]
-const loopMatch = workflow.match(/for gerbang in ([\\s\\S]*?); do/)
+const loopMatch = workflow.match(/for gerbang in ([\s\S]*?); do/)
 assert.ok(loopMatch, 'Body3D smoke loop declaration must exist')
 const loopDeclaration = loopMatch[1]
 
