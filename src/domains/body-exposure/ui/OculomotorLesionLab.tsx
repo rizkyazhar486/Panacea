@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../../../components/Prosa'
 import type { OcularSide, OculomotorGazeKey, OculomotorPattern } from '../model/oculomotor'
 import {
   OCULOMOTOR_GAZE,
@@ -88,7 +87,7 @@ export function OculomotorLesionLab() {
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-violet-700 dark:text-violet-300">Oculomotor lesion lab</div>
           <h4 className="mt-1 text-base font-black text-neutral-950 dark:text-white">CN III · IV · VI · MLF localization simulator</h4>
-          <Prosa kelas="mt-1 max-w-3xl text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">Deterministic educational model adapted from the MIT-licensed docramiro/oculomotor lesion map. It visualizes expected directional deficits, ptosis/pupil teaching proxies and syndrome localization without claiming patient-specific measurements.</Prosa>
+          <p className="mt-1 max-w-3xl text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">Deterministic educational model adapted from MIT-licensed docramiro/oculomotor lesion mapping, visualizing directional deficits, ptosis/pupil teaching proxies and syndrome localization without patient-specific measurement claims.</p>
         </div>
         <span className="rounded-full border border-violet-200 px-2.5 py-1 text-[8px] font-black text-violet-800 dark:border-violet-300/20 dark:text-violet-200">MIT-derived logic · Panacea domain engine</span>
       </div>
