@@ -113,6 +113,69 @@ test('privacy: raw media and identity-bearing fields fail closed at adapter boun
   assert.equal(EMBODIED_PERCEPTION_ADAPTER_POLICY.identityFieldsAccepted, false)
 })
 
+test('privacy: nested raw media and identity-bearing fields fail closed anywhere in packet', () => {
+  const baseSource = packet().source
+  const cases = [
+    [
+      'rawMedia',
+      packet({
+        source: {
+          ...baseSource,
+          rawMedia: 'forbidden',
+        },
+      }),
+    ],
+    [
+      'patientId',
+      packet({
+        detections: [
+          {
+            id: 'hand-1',
+            kind: 'hand',
+            label: 'right hand',
+            handedness: 'right',
+            confidence: 0.98,
+            metadata: {
+              patientId: 'patient-1',
+            },
+          },
+        ],
+        relations: [],
+      }),
+    ],
+    [
+      'imageData',
+      packet({
+        extension: {
+          nested: {
+            imageData: 'forbidden',
+          },
+        },
+      }),
+    ],
+  ]
+
+  for (const [field, input] of cases) {
+    assert.throws(
+      () => adaptExternalEmbodiedPerceptionPacket(input),
+      new RegExp('forbidden field: ' + field),
+    )
+  }
+})
+
+test('privacy: benign nested extension data remains accepted when it has no forbidden fields', () => {
+  const frame = adaptExternalEmbodiedPerceptionPacket(packet({
+    extension: {
+      vendor: {
+        qualityTier: 'research',
+      },
+    },
+  }))
+
+  assert.equal(frame.id, 'packet-1')
+  assert.equal(frame.source.id, 'headcam-1')
+})
+
 test('negative: confidence outside the closed unit interval is rejected', () => {
   const input = packet({
     detections: [
