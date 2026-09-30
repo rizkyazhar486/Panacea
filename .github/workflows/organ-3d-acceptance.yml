@@ -148,7 +148,14 @@ jobs:
                          qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
             echo "::group::$gerbang"
             mulai=$SECONDS
-            if timeout --signal=TERM --kill-after=15s 180s npm run "$gerbang"; then
+            batas=180
+            # qa:organ-3d has a legitimate internal worst-case near 195s:
+            # navigation/action headroom plus three 45s per-organ terminal waits.
+            # Give only this heavier proof bounded extra headroom.
+            if [ "$gerbang" = 'qa:organ-3d' ]; then
+              batas=240
+            fi
+            if timeout --signal=TERM --kill-after=15s "${batas}s" npm run "$gerbang"; then
               durasi=$((SECONDS - mulai))
               echo "::notice::$gerbang lulus dalam ${durasi}s"
               echo "::endgroup::"
@@ -157,7 +164,7 @@ jobs:
               durasi=$((SECONDS - mulai))
               echo "::endgroup::"
               if [ "$kode" = '124' ] || [ "$kode" = '137' ]; then
-                echo "::error::$gerbang timeout setelah ${durasi}s (batas 180s)"
+                echo "::error::$gerbang timeout setelah ${durasi}s (batas ${batas}s)"
               else
                 echo "::error::$gerbang gagal setelah ${durasi}s (exit $kode)"
               fi
