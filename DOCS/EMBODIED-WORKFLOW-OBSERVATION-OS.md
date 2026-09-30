@@ -110,6 +110,28 @@ The bridge uses:
 
 This means an egocentric workflow can later be replayed in Records, explained in Clinical, projected into Body Exposure, or compared with a teaching simulation without creating a parallel truth store.
 
+### External perception adapter boundary
+
+The first concrete adapter boundary is implemented at:
+
+- `src/domains/observability/adapters/embodiedPerceptionAdapter.ts`
+- `src/domains/observability/index.ts`
+- `scripts/qa/embodied-perception-adapter.test.mjs`
+
+It accepts structured output from an already-authorized perception system and normalizes it into `EmbodiedWorkflowFrame`. It does not ingest raw video bytes.
+
+The adapter fails closed when capture authorization is absent, expired or revoked; source/model provenance is missing; confidence leaves `[0,1]`; normalized geometry is invalid; hand-object references are inconsistent; packet limits are exceeded; or privacy-forbidden raw-media/identity fields are present.
+
+Transport continuity is explicit:
+
+```text
+missing_packets = sequence_current - sequence_previous - 1
+```
+
+for positive sequence gaps. Timestamp regressions are recorded as clock-integrity gaps instead of silently sorted away, so replay/review layers can distinguish missing transport evidence from a coherent capture stream.
+
+A device-specific camera connector is still required before Panacea can claim live headcam/AR capture support. This adapter is the governed normalization boundary that those connectors must use.
+
 ## High-value Panacea use cases
 
 ### Laboratory / research
