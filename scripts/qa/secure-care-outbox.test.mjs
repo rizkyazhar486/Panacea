@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { sendOrQueueEncryptedCareReport } from '../../src/lib/secureCareOutbox.ts'
 
 const secure = readFileSync(new URL('../../src/lib/secureCareOutbox.ts', import.meta.url), 'utf8')
 const ui = readFileSync(new URL('../../src/components/CekHarian.tsx', import.meta.url), 'utf8')
@@ -48,4 +49,54 @@ test('successful replay keeps idempotency receipt and removes ciphertext', () =>
   assert.match(secure, /putReceipt\(db, item\.clientId\)/)
   assert.match(secure, /removeEncryptedCareReport\(item, true\)/)
   assert.match(secure, /idempotency remains clientId-based/)
+})
+
+
+test('confirmed server acknowledgement stays successful when local receipt persistence fails', async () => {
+  const originalIndexedDb = Object.getOwnPropertyDescriptor(globalThis, 'indexedDB')
+  Object.defineProperty(globalThis, 'indexedDB', {
+    configurable: true,
+    value: {
+      open() {
+        throw new Error('local receipt store unavailable')
+      },
+    },
+  })
+
+  const item = {
+    clientId: 'client-ack-1',
+    planId: 'plan-1',
+    scheduledFor: '2026-09-30',
+    authoredAt: '2026-09-30T02:00:00.000Z',
+    answers: [{ questionId: 'q1', value: true }],
+  }
+
+  let sends = 0
+  try {
+    const result = await sendOrQueueEncryptedCareReport(item, async () => {
+      sends += 1
+    })
+
+    assert.equal(sends, 1)
+    assert.deepEqual(result, { status: 'terkirim' })
+  } finally {
+    if (originalIndexedDb) Object.defineProperty(globalThis, 'indexedDB', originalIndexedDb)
+    else delete globalThis.indexedDB
+  }
+})
+
+test('deterministic server rejection remains rejected and is not reclassified as local storage failure', async () => {
+  const item = {
+    clientId: 'client-reject-1',
+    planId: 'plan-1',
+    scheduledFor: '2026-09-30',
+    authoredAt: '2026-09-30T02:00:00.000Z',
+    answers: [{ questionId: 'q1', value: true }],
+  }
+
+  const result = await sendOrQueueEncryptedCareReport(item, async () => {
+    throw new Error('revoked plan')
+  })
+
+  assert.deepEqual(result, { status: 'ditolak', pesan: 'revoked plan' })
 })
