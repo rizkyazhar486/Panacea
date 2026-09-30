@@ -146,6 +146,15 @@ export function ClinicalHub() {
               </Link>
             ))}
           </nav>
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review"
+              className="mt-4 flex min-h-[48px] items-center justify-between border-y border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Doctor Review Checklist</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
 
         <section className="grid gap-8 lg:grid-cols-2" aria-label="Clinical quick tools">
