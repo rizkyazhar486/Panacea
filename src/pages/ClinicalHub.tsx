@@ -4,8 +4,12 @@ import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
+import { LabPasienUntukDokter } from '../components/LabPasienUntukDokter'
+import { StudiValidasiKlinis } from '../components/StudiValidasiKlinis'
+import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
+import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
 
 export const GROUPS = [
   {
@@ -57,6 +61,7 @@ const REFERENCE_LINKS = [
 ] as const
 
 export function ClinicalHub() {
+  const { account } = useStore()
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
   const [weight, setWeight] = useState('')
@@ -93,7 +98,13 @@ export function ClinicalHub() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
+    // `dark` bukan hiasan di sini. Permukaan ini memang ruang komando gelap
+    // apa pun tema aplikasinya, sementara tema aplikasi bisa saja terang —
+    // dan seluruh gaya `dark:` serta lapisan pemetaan `.dark` di index.css
+    // dipasang pada kelas itu. Tanpa penandanya, setiap komponen di dalam
+    // sini merender versi TERANGnya di atas latar gelap: panduan "How to
+    // use" muncul sebagai lempengan putih menyilaukan pada halaman hitam.
+    <div className="dark mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
       <PanaceaZoneNav />
 
       <main aria-label="Clinical command surface" className="space-y-9">
@@ -101,18 +112,6 @@ export function ClinicalHub() {
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
           <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
         </header>
-
-        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
-        <ClinicalPatientContext />
-        <SurfaceGuide
-          summary="see the body → ask one question → record only reviewed facts"
-          steps={[
-            'Use the body surface to orient the region and system.',
-            'Ask Panacea for sourced context, not an autonomous diagnosis.',
-            'Promote findings into AI-EMR only after clinician review.',
-          ]}
-        />
-        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
@@ -232,6 +231,26 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+
+        <MentalHealthClinicalResearchLab />
+        <ClinicalPatientContext />
+        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
+        {account?.role === 'dokter' && <LabPasienUntukDokter />}
+        {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
+
+        {/* Tubuh ditaruh SETELAH aksi klinis. Permukaan tubuh setinggi ~4.400px
+            pada 390px; di atas, ia mendorong "Ask Panacea", aksi utama dan
+            kalkulator ke y~5.000 — enam layar gulir sebelum pemakai klinis
+            bisa melakukan apa pun. */}
+        <SurfaceGuide
+          summary="see the body → ask one question → record only reviewed facts"
+          steps={[
+            'Use the body surface to orient the region and system.',
+            'Ask Panacea for sourced context, not an autonomous diagnosis.',
+            'Promote findings into AI-EMR only after clinician review.',
+          ]}
+        />
+        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <nav aria-label="Clinical references" className="border-y border-white/10">
           <div className="flex gap-6 overflow-x-auto py-1 no-scrollbar">

@@ -14,7 +14,7 @@ assert.doesNotMatch(body, /FeatureBoulevard/)
 assert.match(rail, /FOR_YOU_PATHS/)
 assert.doesNotMatch(rail, /if \(domain === 'for-you'\) return true/)
 assert.match(rail, /previewLimit = Math\.min\(initialLimit, 10\)/)
-assert.match(rail, /rounded-\[22px\]/)
+assert.match(rail, /rounded-\[16px\]/)
 
 assert.doesNotMatch(forYou, /const LIFE:/)
 assert.doesNotMatch(forYou, /DestinationRail label="Life"/)

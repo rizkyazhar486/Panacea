@@ -69,10 +69,11 @@ function reducedMotion() {
  * long-press, swipe, double tap, atau single tap. Ambang gesture berasal dari
  * kernel murni di `lib/interaction/gesture`, bukan angka lokal yang berbeda.
  */
-export function FabNavigasi({ onCari, tersembunyi = false }: {
+export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
   tujuan: TujuanFab[]
   onTambah?: () => void
   onCari?: () => void
+  onKembali?: () => void
   /**
    * Ikut menyingkir bersama bilah perintah.
    *
@@ -87,6 +88,8 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const lokasi = useLocation()
   const navigasi = useNavigate()
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
+  const sembunyikanDiBodyExposure = lokasi.pathname === '/fitness-hub'
+    && new URLSearchParams(lokasi.search).get('view') === 'body-exposure'
 
   const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
   const [pos, setPos] = useState<AssistivePosition>(() => {
@@ -127,14 +130,17 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
     setBuka(false)
     vibrate()
     if (action.jenis === 'rute' && action.ke) navigasi(action.ke)
-    else if (action.jenis === 'kembali') navigasi(-1)
+    else if (action.jenis === 'kembali') {
+      if (onKembali) onKembali()
+      else navigasi(-1)
+    }
     else if (action.jenis === 'atas') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
     else if (action.jenis === 'tema') toggleTheme()
     else if (action.jenis === 'cari') {
       if (onCari) onCari()
       else window.dispatchEvent(new Event('panacea:cari'))
     }
-  }, [navigasi, onCari, vibrate])
+  }, [navigasi, onCari, onKembali, vibrate])
 
   const jalankanPemetaan = useCallback((id: string) => {
     if (id === 'menu') {
@@ -348,6 +354,7 @@ export function FabNavigasi({ onCari, tersembunyi = false }: {
   const keKiri = pos.x > window.innerWidth / 2
 
   if (sembunyikanDiBodyExplorer) return null
+  if (sembunyikanDiBodyExposure) return null
 
   return (
     <>

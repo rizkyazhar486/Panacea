@@ -1,5 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { pasangPelaporGalat } from './lib/laporGalatKlien'
+import { API_BASE } from './lib/api'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import './styles/responsive-density-v1.css'
@@ -8,6 +10,7 @@ import { applyAppearance } from './lib/theme'
 import { applyLang, getLang, muatKamusKalimat, umumkanBahasa } from './lib/i18n'
 import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
+import { LongitudinalStateProvider } from './lib/useLongitudinalState'
 import { Shell } from './components/Shell'
 import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -176,10 +179,12 @@ function PageLoader() {
   )
 }
 
+pasangPelaporGalat(API_BASE, String(import.meta.env.VITE_APP_VERSION ?? ''))
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
     <StoreProvider>
+    <LongitudinalStateProvider>
       <AppStatus />
       <OfflineBanner />
       <HashRouter>
@@ -415,6 +420,7 @@ createRoot(document.getElementById('root')!).render(
           </Suspense>
         </Shell>
       </HashRouter>
+    </LongitudinalStateProvider>
     </StoreProvider>
     </ErrorBoundary>
   </StrictMode>,
@@ -429,6 +435,12 @@ requestAnimationFrame(() => {
   if (!splash) return
   const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashShownAt))
   setTimeout(() => {
+    // pointer-events must drop in the same tick as opacity, not after the
+    // 450ms fade finishes — otherwise this fixed, full-viewport, z-index:9999
+    // layer keeps swallowing every tap/click underneath it (menu, search,
+    // any button anywhere) for the whole fade duration despite being
+    // invisible.
+    splash.style.pointerEvents = 'none'
     splash.style.opacity = '0'
     setTimeout(() => splash.remove(), 450)
   }, wait)

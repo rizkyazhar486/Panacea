@@ -37,6 +37,7 @@ function makeEvent(input: {
     unit: input.unit,
     recordedAt: input.recordedAt,
     confidence: input.confidence ?? 0.9,
+    semanticState: input.domain === 'lab' ? 'imported' : 'measured',
     provenance: {
       sourceKind: input.domain === 'lab' ? 'clinical-system' : 'wearable',
       sourceId: input.domain === 'lab' ? 'lab-source' : 'wearable-source',

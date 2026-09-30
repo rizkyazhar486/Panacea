@@ -92,7 +92,7 @@ export function CounterfactualHraWorkbench() {
           </div>
         </aside>
 
-        <main className="rounded-[26px] border border-neutral-200 bg-[#071019] p-4 text-white dark:border-white/10 sm:p-5">
+        <main className="dark rounded-[26px] border border-neutral-200 bg-[#071019] p-4 text-white dark:border-white/10 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="text-[9px] font-black uppercase tracking-[.17em] text-cyan-300">Executable causal state</div>

@@ -1,9 +1,9 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { MenuPeran } from './MenuPeran'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
 import { pasangKilau } from '../lib/kilau'
-import { indukRute } from '../lib/alurHalaman'
+import { buatAlurKembali } from '../lib/alurHalaman'
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import { FabNavigasi } from './FabNavigasi'
@@ -60,7 +60,8 @@ import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
 import { useCommandBar } from './useCommandBar'
-import { SUPER_PAGES } from '../lib/superPages'
+import { SUPER_PAGES, activeSuperPageForLocation, navigationHierarchyForRoute } from '../lib/superPages'
+import { judulRute } from '../lib/judulRute'
 import '../styles/command-bar.css'
 import '../styles/superpage-convergence.css'
 
@@ -317,22 +318,20 @@ export function Shell({ children }: { children: ReactNode }) {
   // sehingga history.back() melempar pengguna keluar dari aplikasi.
   const bisaKembali = loc.pathname !== '/'
 
-  // Halaman sebelumnya diingat karena menentukan CARA kembali, bukan tujuannya.
-  // Bila induk kebetulan sama dengan halaman sebelumnya, mundur di riwayat
-  // lebih baik daripada mendorong entri baru — mendorong entri membuat "lanjut"
-  // tidak pernah punya tujuan, karena riwayat ke depan selalu kosong.
-  const sebelumnya = useRef<string | null>(null)
+  const alurKembali = useRef<ReturnType<typeof buatAlurKembali> | null>(null)
+  if (!alurKembali.current) alurKembali.current = buatAlurKembali()
   useEffect(() => {
-    return () => { sebelumnya.current = loc.pathname }
-  }, [loc.pathname])
+    const index = window.history.state?.idx
+    alurKembali.current!.catat({ ...loc, index: Number.isInteger(index) ? index : undefined })
+  }, [loc.pathname, loc.search, loc.hash, loc.key])
 
   const kembali = useCallback(() => {
     if (loc.pathname === '/') return
-    const induk = indukRute(loc.pathname)
-    if (induk && induk === sebelumnya.current) navigate(-1)
-    else if (induk) navigate(induk)
-    else if (window.history.length > 1) navigate(-1)
-    else navigate('/')
+    // idx milik React Router, bukan history.length yang mencakup situs luar.
+    const idx = window.history.state?.idx
+    const target = alurKembali.current!.tujuan(Number.isInteger(idx) && idx > 0)
+    if (typeof target === 'number') navigate(target)
+    else navigate(target)
   }, [loc.pathname, navigate])
 
   // Maju: hanya berarti bila ada yang bisa dimajui. Tidak ada cara membaca
@@ -433,7 +432,21 @@ export function Shell({ children }: { children: ReactNode }) {
 
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
-  const title = items.find((n) => navMatches(n, loc.pathname))
+  const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
+  const ruteAktif = [...nav, ...KATALOG].find((n) => navMatches(n, loc.pathname))
+  const superPageAktif = activeSuperPageForLocation(loc.pathname, loc.search, ruteAktif?.group ?? '')
+  const homeAktif = loc.pathname === '/' && superPageAktif === null
+  const judulBilah = loc.pathname === '/'
+    ? judul
+    : navigationHierarchyForRoute(loc.pathname, ruteAktif?.group ?? '', judul).join(' › ')
+  const judulBilahPonsel = loc.pathname === '/'
+    ? judul
+    : navigationHierarchyForRoute(
+        loc.pathname,
+        ruteAktif?.group ?? '',
+        judul,
+        { compactSuperPage: true },
+      ).join(' › ')
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
@@ -494,19 +507,42 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
-            <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
+            <h1
+              className="min-w-0 flex-1 truncate text-[13px] font-bold sm:text-base"
+              title={judulBilah}
+              data-navigation-hierarchy="v1"
+            >
+              <span className="sm:hidden">{judulBilahPonsel}</span>
+              <span className="hidden sm:inline">{judulBilah}</span>
+            </h1>
           </div>
 
           {spacesOpen && (
             <div className="pmd-command-spaces" aria-label="Panacea spaces">
-              <NavLink to="/" end className="pmd-command-space-link">
+              <Link
+                to="/"
+                className="pmd-command-space-link"
+                aria-current={homeAktif ? 'page' : undefined}
+                data-superpage-active={homeAktif ? 'true' : 'false'}
+                onClick={() => setSpacesOpen(false)}
+              >
                 <span>Home</span><span aria-hidden>⌂</span>
-              </NavLink>
-              {SUPER_PAGES.map((space) => (
-                <NavLink key={space.id} to={space.to} className="pmd-command-space-link">
-                  <span>{space.label}</span><span aria-hidden>↗</span>
-                </NavLink>
-              ))}
+              </Link>
+              {SUPER_PAGES.map((space) => {
+                const active = superPageAktif === space.id
+                return (
+                  <Link
+                    key={space.id}
+                    to={space.to}
+                    className="pmd-command-space-link"
+                    aria-current={active ? 'location' : undefined}
+                    data-superpage-active={active ? 'true' : 'false'}
+                    onClick={() => setSpacesOpen(false)}
+                  >
+                    <span>{space.label}</span><span aria-hidden>↗</span>
+                  </Link>
+                )
+              })}
               <div className="my-1 h-px bg-black/5 dark:bg-white/10" aria-hidden />
               <NavLink to="/settings" className="pmd-command-space-link">
                 <span>Settings</span><IconSettings size={15} />
@@ -676,6 +712,7 @@ export function Shell({ children }: { children: ReactNode }) {
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
         <FabNavigasi
           tersembunyi={keadaanBilah === 'hidden'}
+          onKembali={kembali}
           tujuan={[
             { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
             { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },

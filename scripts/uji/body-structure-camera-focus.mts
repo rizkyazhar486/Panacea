@@ -15,6 +15,7 @@ const focus = bodyStructureCameraFocus(
   { x: 10, y: 7, z: 10 },
 )
 
+assert.ok(focus, 'finite source bounds must produce a camera pose')
 assert.deepEqual(focus.target, { x: 4, y: 7, z: 10 }, 'focus target must be the exact source-mesh bounds center')
 assert.equal(focus.span, 8, 'focus distance must use the largest source-mesh dimension')
 assert.ok(Math.abs(focus.position.x - 22) < 1e-9, 'current view direction must be preserved while framing')
@@ -22,14 +23,31 @@ assert.deepEqual(
   bodyStructureCameraFocus(
     { min: { x: 1, y: 1, z: 1 }, max: { x: 1, y: 1, z: 1 } },
     { x: 1, y: 1, z: 1 },
-  ).target,
+  )?.target,
   { x: 1, y: 1, z: 1 },
   'degenerate source bounds must remain finite and centered',
+)
+assert.equal(
+  bodyStructureCameraFocus(
+    { min: { x: Number.NaN, y: 1, z: 1 }, max: { x: 2, y: 2, z: 2 } },
+    { x: 4, y: 4, z: 4 },
+  ),
+  null,
+  'non-finite source bounds must fail closed instead of producing a poisoned camera pose',
+)
+assert.equal(
+  bodyStructureCameraFocus(
+    { min: { x: 1, y: 1, z: 1 }, max: { x: 2, y: Number.POSITIVE_INFINITY, z: 2 } },
+    { x: 4, y: 4, z: 4 },
+  ),
+  null,
+  'infinite source bounds must fail closed instead of moving the camera',
 )
 
 const renderer = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(renderer, /bodyStructureCameraFocus/, 'shared renderer must use the deterministic source-bounds focus pose')
+assert.match(renderer, /if \(!pose\) return/, 'shared renderer must leave the current camera unchanged when bounds are invalid')
 assert.match(renderer, /dblclick/, 'focus must be reachable through an explicit double-activation gesture')
 assert.match(renderer, /panaceaContext !== true/, 'context envelope must never become a focus target')
 
-console.log('body structure camera focus: exact source bounds are centered with deterministic finite framing')
+console.log('body structure camera focus: exact finite source bounds are centered and invalid bounds fail closed')

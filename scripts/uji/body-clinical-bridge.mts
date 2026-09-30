@@ -26,11 +26,13 @@ const record: EMRRecord = {
     perSystem: '',
     doctorVerified: true,
     verifiedBy: 'doctor-1',
+    verifiedById: 'doctor-1',
   },
   problems: [],
   plan: [],
   references: [],
   signedBy: 'doctor-1',
+  signedById: 'doctor-1',
   signedAt: '2026-09-18T10:00:00.000Z',
 }
 
@@ -72,7 +74,7 @@ const projection = projectEmrToBodyClinicalBridge(
 assert.equal(projection.patientId, 'patient-1')
 assert.equal(projection.recordId, 'emr-1')
 assert.equal(projection.reviewState, 'record-signed')
-assert.deepEqual(projection.findingCounts, { normal: 1, abnormal: 1, unchecked: 1 })
+assert.deepEqual(projection.findingCounts, { normal: 1, abnormal: 1, recorded: 0, unchecked: 1 })
 assert.equal(projection.markers[0].source.kind, 'ai-emr')
 assert.equal(projection.markers[0].source.recordId, 'emr-1')
 assert.equal(projection.markers[0].reviewState, 'record-signed')
@@ -97,6 +99,13 @@ const draftProjection = projectEmrToBodyClinicalBridge(
   [],
 )
 assert.equal(draftProjection.reviewState, 'draft')
+
+// Tanda tangan/verifikasi optimistis klien (belum dicap server) tidak boleh tampil
+// sebagai rekam bertanda tangan atau pemeriksaan terverifikasi di Body Exposure.
+const optimistis = projectEmrToBodyClinicalBridge({ ...record, signedById: undefined }, [], [])
+assert.equal(optimistis.reviewState, 'exam-verified', 'tanda tangan sisi klien saja tampil sebagai rekam bertanda tangan')
+const fisikKlien = projectEmrToBodyClinicalBridge({ ...record, signedById: undefined, physicalExam: { ...record.physicalExam, verifiedById: undefined } }, [], [])
+assert.equal(fisikKlien.reviewState, 'draft', 'verifikasi fisik sisi klien saja tampil sebagai terverifikasi')
 assert.equal(draftProjection.signals.length, 0)
 
 console.log('AI-EMR → Clinical/Body Exposure visual bridge contract verified.')

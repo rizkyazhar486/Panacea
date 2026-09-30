@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { StatusSinkronKlinis } from '../components/StatusSinkronKlinis'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
@@ -495,6 +496,7 @@ export function Dashboard() {
   /* ── Main Layout ── */
   return (
     <div className="space-y-5">
+      <StatusSinkronKlinis />
 
       {/* Story-like Quick Actions */}
       <div className="flex items-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

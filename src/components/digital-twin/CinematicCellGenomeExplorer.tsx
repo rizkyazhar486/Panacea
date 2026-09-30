@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { buatRendererAman, tandaiTanpaWebgl } from '../../lib/rendererAman'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -476,7 +478,8 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     camera.position.set(0.3, 0.1, 8)
     cameraRef.current = camera
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
+    const renderer = buatRendererAman({ antialias: true, powerPreference: 'high-performance' })
+    if (!renderer) return tandaiTanpaWebgl(container)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.18
@@ -542,21 +545,19 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     observer.observe(container)
     resize()
 
-    let animation = 0
     const clock = new THREE.Clock()
     const renderLoop = () => {
-      animation = requestAnimationFrame(renderLoop)
       const elapsed = clock.getElapsedTime()
       if (rootRef.current && stageRef.current !== 'sequencing') rootRef.current.rotation.y += 0.00045
       if (stageRef.current === 'sequencing' && rootRef.current) rootRef.current.position.y = Math.sin(elapsed * 0.45) * 0.015
       controls.update()
       renderer.render(scene, camera)
     }
-    renderLoop()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, renderLoop)
     setReady(true)
 
     return () => {
-      cancelAnimationFrame(animation)
+      loopTerjaga.hentikan()
       observer.disconnect()
       renderer.domElement.removeEventListener('pointerup', pick)
       controls.dispose()
@@ -597,7 +598,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
   }, [stage, ready])
 
   return (
-    <section className={`overflow-hidden border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_32px_110px_rgba(0,0,0,.38)] ${compact ? 'rounded-2xl' : 'rounded-[32px]'}`}>
+    <section className={`dark overflow-hidden border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_32px_110px_rgba(0,0,0,.38)] ${compact ? 'rounded-2xl' : 'rounded-[32px]'}`}>
       <header className="border-b border-white/8 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-4xl">

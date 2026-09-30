@@ -678,6 +678,7 @@ export function promoteObservationToClinicalRecord(
     unit: sample.unit,
     recordedAt: sample.capturedAt,
     confidence: sample.signalQuality,
+    semanticState: 'measured',
     provenance: {
       sourceKind: 'device',
       sourceId: `visit-os:${sample.deviceId}`,

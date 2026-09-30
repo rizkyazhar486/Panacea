@@ -61,7 +61,7 @@ const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
 // sehingga tidak ada satu pun cara membukanya dari dalam aplikasi.
 const WholeBodyPrecisionLab = lazy(() => import('./bodyhub/WholeBodyPrecisionLab'))
 const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
-// Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
+// Ruang bedah: interactive simulation runtime + source-grounded surgical layers.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 const BiomechanicsMotionLab = lazy(() => import('./bodyhub/BiomechanicsMotionLab'))
@@ -153,7 +153,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'presisi', label: 'Whole-body precision' },
   { key: 'mesin', label: 'Biomedical engine' },
   { key: 'sel', label: 'Cell & metabolism' },
-  { key: 'bedah', label: 'Surgical layers' },
+  { key: 'bedah', label: 'Surgery sim' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -1214,7 +1214,7 @@ export function BodyExplorer() {
             )}
 
             {panelTab === 'bedah' && (
-              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgical layers…</p>}>
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgery simulator…</p>}>
                 <SurgicalLab
                   onKedalaman={setDissect}
                   onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}

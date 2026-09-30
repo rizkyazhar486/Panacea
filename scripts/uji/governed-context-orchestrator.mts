@@ -23,6 +23,7 @@ function event(id: string, domain: LongitudinalEvent['domain'], metric: string, 
     value,
     recordedAt,
     confidence: 0.95,
+    semanticState: domain === 'lab' ? 'imported' : 'measured',
     provenance: {
       sourceKind: domain === 'lab' ? 'clinical-system' : 'wearable',
       sourceId: domain === 'lab' ? 'lab' : 'wearable',
@@ -77,6 +78,9 @@ assert.equal(bundle.pendingReview.length, 0)
 assert.equal(bundle.governance.autonomousEmrSigningAllowed, false)
 assert.equal(bundle.governance.autonomousMedicationCommitAllowed, false)
 assert.equal(bundle.governance.autonomousOrderCommitAllowed, false)
+assert.equal(bundle.governance.constitutional.decision, 'ALLOW')
+assert.equal(bundle.governance.constitutional.executionGate, 1)
+assert.equal(bundle.governance.constitutional.counts.hardPassed, 3)
 
 consentLedger = appendPurposeConsentDecision(consentLedger, {
   id: 'ai-revoke', subjectId: 'governed-subject', purpose: 'ai-context', action: 'revoke', decidedAt: '2026-09-16T12:00:00.000Z', source: 'user',
@@ -92,5 +96,6 @@ assert.equal(revoked.aiChatbot.signals.length, 0)
 assert.ok(revoked.aiEmr.signals.some((signal) => signal.metric === 'demo-lab'))
 assert.equal(revoked.consent.aiContext.ledgerAuthorized, false)
 assert.equal(revoked.consent.clinicalSupport.ledgerAuthorized, true)
+assert.equal(revoked.governance.constitutional.decision, 'ALLOW', 'revocation remains safe because the forbidden AI scope is filtered to zero signals')
 
 console.log('Governed context orchestrator verified: clinician review, purpose-specific consent and minimum-necessary AI packing are enforced together before AI Chatbot/AI-EMR context.')

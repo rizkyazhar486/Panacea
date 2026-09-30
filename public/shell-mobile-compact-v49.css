@@ -28,12 +28,18 @@
     align-items: center !important;
   }
 
+  /* Judulnya TIDAK boleh dibatasi lebar tetap. `min-width: 0` sudah cukup
+     membuatnya mengalah terhadap tombol-tombol di sampingnya; batas keras di
+     sini memotong nama halaman walaupun ruangnya masih ada — pada 390px ia
+     mengunci judul di 78px padahal tersedia sekitar 170px, sehingga "Your
+     Body" terbaca "Panacea...". Biarkan flexbox yang memutuskan, dan biarkan
+     `truncate` bekerja hanya saat ruangnya benar-benar habis. */
   header.kaca.panacea-command-bar h1 {
     min-width: 0 !important;
-    max-width: clamp(4.25rem, 24vw, 7.75rem) !important;
+    max-width: none !important;
     margin: 0 !important;
-    font-size: .9rem !important;
-    line-height: 1.05 !important;
+    font-size: .95rem !important;
+    line-height: 1.1 !important;
   }
 
   header.kaca.panacea-command-bar :where(
@@ -86,8 +92,8 @@
   }
 
   header.kaca.panacea-command-bar h1 {
-    max-width: clamp(3.8rem, 20vw, 6rem) !important;
-    font-size: .84rem !important;
+    max-width: none !important;
+    font-size: .9rem !important;
   }
 
   header.kaca.panacea-command-bar :where(

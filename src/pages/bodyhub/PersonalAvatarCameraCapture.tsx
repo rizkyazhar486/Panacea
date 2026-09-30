@@ -156,7 +156,7 @@ export default function PersonalAvatarCameraCapture({
       data-avatar-truth-layer="camera-surface-avatar"
       data-patient-specific-internal-anatomy="not-inferred"
       data-raw-frame-persistence="ephemeral"
-      className="overflow-hidden rounded-[28px] border border-white/[.08] bg-[#030506] text-white"
+      className="dark overflow-hidden rounded-[28px] border border-white/[.08] bg-[#030506] text-white"
       aria-labelledby="personal-avatar-camera-title"
     >
       <header className="flex items-end justify-between gap-3 border-b border-white/[.08] p-3 sm:p-4">

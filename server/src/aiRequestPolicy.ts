@@ -37,6 +37,11 @@ const MAX_TEXT_CHARS = 64_000
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 const MAX_BLOCKS_PER_MESSAGE = 12
 const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif'])
+const ALLOWED_REQUEST_MODELS = new Set([
+  'claude-sonnet-4-6',
+  'claude-opus-4-8',
+  'claude-haiku-4-5-20251001',
+])
 
 function fail(status: 400 | 413, reason: string): AiPolicyFailure {
   return {
@@ -57,6 +62,9 @@ function decodedBase64Bytes(data: string): number {
 export function validateAiProxyRequest(input: unknown): AiPolicyResult {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return fail(400, 'body_must_be_object')
   const body = input as Record<string, unknown>
+  if (body.model !== undefined && (typeof body.model !== 'string' || !ALLOWED_REQUEST_MODELS.has(body.model))) {
+    return fail(400, 'unsupported_model')
+  }
   const system = typeof body.system === 'string' ? body.system : ''
   if (system.length > MAX_SYSTEM_CHARS) return fail(413, 'system_prompt_too_large')
   if (!Array.isArray(body.messages) || body.messages.length === 0) return fail(400, 'messages_required')
