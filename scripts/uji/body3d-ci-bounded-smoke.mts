@@ -41,9 +41,13 @@ const ordered = [
   'qa:bilah-atas',
   'qa:share-card',
 ]
+const loopMatch = workflow.match(/for gerbang in ([\\s\\S]*?); do/)
+assert.ok(loopMatch, 'Body3D smoke loop declaration must exist')
+const loopDeclaration = loopMatch[1]
+
 let previous = -1
 for (const gate of ordered) {
-  const index = workflow.indexOf(gate)
+  const index = loopDeclaration.indexOf(gate)
   assert.ok(index > previous, `Body3D smoke gate missing or reordered unexpectedly: ${gate}`)
   previous = index
 }
