@@ -6,7 +6,7 @@ import {
   type LongitudinalEvent,
   type LongitudinalProvenance,
 } from './panaceaLongitudinalState.ts'
-import type { SelfVital, VitalSign, Vo2MaxEntry } from './types.ts'
+import type { FoodEntry, SelfVital, VitalSign, Vo2MaxEntry } from './types.ts'
 
 export interface HealthStoreBridgeConfidence {
   clinicalVital: number
@@ -545,4 +545,92 @@ export function deviceSnapshotToBodyExposureSignals(
     if (keluar.length >= Math.floor(max)) break
   }
   return keluar
+}
+
+const MAKANAN_METRIK = [
+  ['kcal', 'nutrition.dietary-energy', 'kcal'],
+  ['protein', 'nutrition.dietary-protein', 'g'],
+  ['carbs', 'nutrition.dietary-carbohydrate', 'g'],
+  ['fat', 'nutrition.dietary-fat', 'g'],
+] as const
+
+export interface FoodLogBridgeContext {
+  consent: ConsentEnvelope
+  receivedAt: string
+  /** Caller-supplied confidence. The bridge does not invent it from the grams. */
+  confidence: number
+}
+
+/**
+ * Daily Nutrition food-log totals → longitudinal events.
+ * Distinct metric ids from device diet keys so a watch export and a typed meal
+ * are not mixed into one series. Invalid rows are skipped, never zero-filled.
+ */
+export function foodLogToLongitudinalEvents(
+  subjectId: string,
+  foods: readonly FoodEntry[],
+  context: FoodLogBridgeContext,
+): HealthStoreBridgeResult {
+  parseIso(context.receivedAt, 'context.receivedAt')
+  assertConfidence(context.confidence, 'context.confidence')
+  assertNonBlank(subjectId, 'subjectId')
+  const receivedMs = Date.parse(context.receivedAt)
+  const hariTerima = context.receivedAt.slice(0, 10)
+  const buckets = new Map<string, { kcal: number; protein: number; carbs: number; fat: number }>()
+  const skipped: BridgeSkippedRecord[] = []
+
+  for (const food of foods) {
+    const id = food?.id?.trim() ?? ''
+    if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(food?.date ?? '')) {
+      skipped.push({ sourceRecordId: id || 'food', reason: 'missing-measured-at' })
+      continue
+    }
+    const aheadDays = (Date.parse(`${food.date}T00:00:00.000Z`) - Date.parse(`${hariTerima}T00:00:00.000Z`)) / 864e5
+    if (aheadDays > 1) {
+      skipped.push({ sourceRecordId: id, reason: 'missing-measured-at', field: 'date' })
+      continue
+    }
+    const bucket = buckets.get(food.date) ?? { kcal: 0, protein: 0, carbs: 0, fat: 0 }
+    let any = false
+    for (const key of ['kcal', 'protein', 'carbs', 'fat'] as const) {
+      const raw = food[key]
+      if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) {
+        if (raw != null) skipped.push({ sourceRecordId: id, reason: 'invalid-number', field: key })
+        continue
+      }
+      bucket[key] += raw
+      any = true
+    }
+    if (any) buckets.set(food.date, bucket)
+  }
+
+  const events: LongitudinalEvent<number>[] = []
+  for (const [date, bucket] of buckets) {
+    let recordedAt = `${date}T12:00:00.000Z`
+    if (Date.parse(recordedAt) > receivedMs + 5 * 60_000) recordedAt = context.receivedAt
+    for (const [key, metric, unit] of MAKANAN_METRIK) {
+      const value = bucket[key]
+      if (!(value > 0)) continue
+      events.push(makeNumericEvent({
+        id: `nutrition:food:${idToken(subjectId)}:${date}:${metric}`,
+        subjectId,
+        metric,
+        domain: 'nutrition',
+        value,
+        unit,
+        recordedAt,
+        confidence: context.confidence,
+        provenance: {
+          sourceKind: 'manual',
+          sourceId: 'panaceamed:nutrition-food-log',
+          capturedAt: recordedAt,
+          receivedAt: context.receivedAt,
+          method: 'nutrition-food-log',
+        },
+        consent: context.consent,
+        tags: ['nutrition-food-log', 'evidence-class:manual-self-report', `day:${date}`],
+      }))
+    }
+  }
+  return { events, skipped }
 }

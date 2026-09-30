@@ -2,10 +2,12 @@ import type { Account, EMRRecord } from './types'
 import type { Vitals } from './healthVitals'
 import type { ButirLab } from './lab'
 import type { ProductionHealthStoreState } from './productionHealthStoreSelector'
+import type { FoodEntry } from './types'
 import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from './continuousCareOperatingSystem'
 import { labLogToLongitudinalEvents } from './labLongitudinalBridge'
 import { careToLongitudinalEvents, type TinjauanMasuk } from './careLongitudinalBridge'
 import { emrRecordToLongitudinalEvents, emrVitalsToLongitudinalEvents, LABEL_METRIK_VITAL_EMR, type ServerAcceptedEmrRecord, type VitalTercatat } from './emrLongitudinalBridge'
+import { foodLogToLongitudinalEvents } from './healthStoreLongitudinalBridge'
 import { syncProductionAppState } from './productionAppStateLongitudinalSync'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type ConsentEnvelope, type LongitudinalPatientState } from './panaceaLongitudinalState'
 
@@ -19,7 +21,7 @@ export interface LongitudinalServerSources {
 }
 export const emptyLongitudinalServer = (): LongitudinalServerSources => ({ owner: null, plans: [], reviews: [], records: {}, vitals: {}, encounters: {} })
 export interface LongitudinalSources {
-  app: ProductionHealthStoreState
+  app: ProductionHealthStoreState & { foods?: readonly FoodEntry[] }
   local: { owner: Account | null; labs: Record<string, ButirLab[]>; vitals: Vitals }
   server: LongitudinalServerSources
 }
@@ -85,6 +87,13 @@ export function projectLongitudinalSnapshot(sources: LongitudinalSources, kini =
     })
     state = r.state; skipped += r.skipped.length
   } catch { skipped++ }
+  const makanan = foodLogToLongitudinalEvents(subjectId, app.foods ?? [], {
+    consent, receivedAt: kini, confidence: KEPERCAYAAN_CATATAN,
+  })
+  skipped += makanan.skipped.length
+  for (const ev of makanan.events) {
+    try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
+  }
   const lab = labLogToLongitudinalEvents(local.labs, subjectId, { consent, receivedAt: kini, confidence: KEPERCAYAAN_CATATAN })
   skipped += lab.skipped.length
   for (const ev of lab.events) {

@@ -148,8 +148,9 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       vitals: app.vitals,
       selfVitals: [...sumberSelf.rows],
       vo2maxLog: [...sumberVo2.rows],
+      foods: app.foods,
     }),
-    [account, app.vitals, sumberSelf.rows, sumberVo2.rows],
+    [account, app.vitals, app.foods, sumberSelf.rows, sumberVo2.rows],
   )
   const sourceLocal = useMemo(
     () => ({ ...local, labs: sumberLab.labs, vitals: sumberVitals.vitals as typeof local.vitals }),
