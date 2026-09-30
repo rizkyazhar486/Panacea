@@ -26,4 +26,31 @@ const tt = terapkanSimpanRekam(c, { ...c, signedAt: 'intent' }, dokter, t2).reka
 const basi = terapkanSimpanRekam(tt, { ...tt, asalIsian: {} }, dokter, t2).rekam
 assert.equal(basi.signedById, 'd1', 'salinan cap asal yang basi membatalkan tanda tangan')
 assert.deepEqual(basi.asalIsian, tt.asalIsian, 'cap asal hilang karena salinan klien kosong')
+
+// 6. Status pemeriksaan terstruktur yang ditulis dokter mendapat asal dokter dari server.
+const e = terapkanSimpanRekam(d, {
+  ...d,
+  physicalExam: { ...d.physicalExam, statusSistem: { jantung: 'abnormal' } },
+}, dokter, t2).rekam
+assert.deepEqual(
+  e.asalIsian['physicalExam.statusSistem'],
+  { asal: 'Dokter', olehId: 'd1', pada: t2.toISOString() },
+  'status sistem yang ditulis dokter tidak memiliki provenance server',
+)
+
+// 7. Mengosongkan kolom harus membuang provenance kolom itu agar metadata basi tidak menempel ke data kosong.
+const f = terapkanSimpanRekam(e, {
+  ...e,
+  anamnesis: { ...e.anamnesis, rps: '' },
+}, pasien, t2).rekam
+assert.equal(f.asalIsian['anamnesis.rps'], undefined, 'kolom kosong masih membawa provenance lama')
+
+// 8. Field legacy tanpa provenance tidak boleh retroaktif diklaim sebagai tulisan dokter hanya karena dokter menyimpan record.
+const legacy = { ...dasar, anamnesis: { keluhanUtama: 'batuk' }, asalIsian: {} }
+const legacySaved = terapkanSimpanRekam(legacy, structuredClone(legacy), dokter, t2).rekam
+assert.equal(
+  legacySaved.asalIsian['anamnesis.keluhanUtama'],
+  undefined,
+  'field legacy yang tidak diubah retroaktif diklaim sebagai tulisan dokter',
+)
 console.log('asalIsianKlinis: asal per kolom anamnesis/pemeriksaan dicap server; deklarasi AI dihormati; cap palsu diabaikan')
