@@ -16,6 +16,20 @@ test('offline clinical answers use authenticated encryption and a non-extractabl
   assert.match(secure, /IndexedDB ciphertext/)
 })
 
+test('first-use encryption key installation is insert-only and reuses the winning key', () => {
+  const start = secure.indexOf('async function encryptionKey')
+  const end = secure.indexOf('function b64', start)
+  const keyInit = secure.slice(start, end)
+
+  assert.ok(start >= 0 && end > start)
+  assert.match(keyInit, /storedEncryptionKey\(db\)/)
+  assert.match(keyInit, /\.add\(candidate, KEY_ID\)/)
+  assert.doesNotMatch(keyInit, /\.put\([^\n]*KEY_ID/)
+  assert.match(keyInit, /const winner = await storedEncryptionKey\(db\)/)
+  assert.match(keyInit, /if \(winner\) return winner/)
+  assert.match(keyInit, /throw error/)
+})
+
 test('production daily check-in has no plaintext queue fallback', () => {
   assert.match(ui, /sendOrQueueEncryptedCareReport/)
   assert.match(ui, /drainEncryptedCareOutbox/)
