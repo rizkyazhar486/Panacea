@@ -132,6 +132,28 @@ assert.throws(() => evaluatePanacea99({
   assessments: [{ axiomId: 'A100', applicability: 'applicable', status: 'pass', evidence }],
 }), /unknown 99-Axiom id/)
 
+assert.throws(() => unsafeEvaluate(null), /input must be an object/)
+assert.throws(() => unsafeEvaluate({
+  actionId: 42,
+  evaluatedAt: at,
+  assessments: [],
+}), /actionId must be a string/)
+assert.throws(() => unsafeEvaluate({
+  actionId: 'missing-assessment-array',
+  evaluatedAt: at,
+  assessments: {},
+}), /assessments must be an array/)
+assert.throws(() => unsafeEvaluate({
+  actionId: 'primitive-assessment',
+  evaluatedAt: at,
+  assessments: [true],
+}), /assessments\[0\] must be an object/)
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-axiom-id-type',
+  evaluatedAt: at,
+  assessments: [{ axiomId: 99, applicability: 'applicable', status: 'pass' }],
+}), /assessments\[0\]\.axiomId must be a string/)
+
 for (const evaluatedAt of [
   'September 28, 2026 07:15:00 UTC',
   '2026-02-30T07:15:00.000Z',
