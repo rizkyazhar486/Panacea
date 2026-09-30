@@ -8,8 +8,8 @@ const host = readFileSync(new URL('../../src/components/digital-twin/OcularMotil
 assert.match(ui, /CN III · IV · VI · MLF localization simulator/)
 assert.match(ui, /type="range" min="0" max="100"/)
 assert.match(ui, /aria-pressed=/)
-assert.match(ui, /Deterministic educational model adapted from the MIT-licensed/)
-assert.match(ui, /without claiming patient-specific measurements/)
+assert.match(ui, /Deterministic educational model adapted from MIT-licensed/)
+assert.match(ui, /without patient-specific measurement claims/)
 assert.match(ui, /MIT-derived logic/)
 assert.match(host, /<OculomotorLesionLab \/>/)
 
