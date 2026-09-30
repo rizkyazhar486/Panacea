@@ -23,6 +23,7 @@ export const GROUPS = [
       { to: '/med-study', name: 'Medical Library', kw: 'library evidence guideline journal' },
       { to: '/chatbot', name: 'Ask Health', kw: 'health question ai clinical assistant' },
       { to: '/emr', name: 'AI-EMR', kw: 'medical record longitudinal care documentation' },
+      { to: '/doctor-review', name: 'Doctor Review Checklist', kw: 'doctor human review checklist clinical notes provenance safety' },
       { to: '/clinical-calculators', name: 'Calculators & Lab', kw: 'calculator laboratory clinical score' },
       { to: '/learn', name: 'Learn & Look Up', kw: 'learn lookup study reference' },
     ],
