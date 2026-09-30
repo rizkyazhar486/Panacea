@@ -159,7 +159,7 @@ import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
-import { validasiSelfVitalsLog, validasiVo2maxLog, validasiDiarySleep, validasiDiaryFoods, validasiDiaryWellness } from './catatanKesehatanDiri.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary } from './catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
@@ -1053,11 +1053,7 @@ app.put('/api/health-series/diary', requireAuth, (req, res) => {
     return
   }
   try {
-    const patch: Record<string, unknown> = {}
-    if ('sleepLogs' in body) patch.diarySleep = validasiDiarySleep(body.sleepLogs)
-    if ('foods' in body) patch.diaryFoods = validasiDiaryFoods(body.foods)
-    if ('wellness' in body) patch.diaryWellness = validasiDiaryWellness(body.wellness)
-    if (!Object.keys(patch).length) throw new Error('diary payload is empty')
+    const patch = susunPatchDiary(getHealthProfile(u.email), body)
     const profil = saveHealthProfile(u.email, patch)
     res.json({ ok: true, sleep: profil.diarySleep, foods: profil.diaryFoods ?? [], wellness: profil.diaryWellness ?? [] })
   } catch (e) {

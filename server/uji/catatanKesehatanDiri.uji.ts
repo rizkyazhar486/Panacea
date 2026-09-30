@@ -45,4 +45,49 @@ assert.equal(hari.length, 1)
 assert.equal(hari[0].waterMl, 1800)
 assert.deepEqual(bacaDiarySleep({ diarySleep: [{ id: 'bad' }] }), [])
 
+const { susunPatchDiary, MAKS_TIDUR } = await import('../src/catatanKesehatanDiri.ts')
+const profil = {
+  diarySleep: [{ id: 's1', date: '2026-09-28', hours: 7, bedtimeConsistent: true }],
+  diaryFoods: [{ id: 'f1', date: '2026-09-28', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 0 }],
+  diaryWellness: [{ date: '2026-09-28', waterMl: 1800 }],
+}
+const gabung = susunPatchDiary(profil, {
+  sleepLogs: [
+    { id: 's1', date: '2026-09-28', hours: 4, bedtimeConsistent: false },
+    { id: 's2', date: '2026-09-29', hours: 8, bedtimeConsistent: true },
+  ],
+  foods: [{ id: 'f2', date: '2026-09-29', name: 'egg', grams: 50, kcal: 70, protein: 6, carbs: 1, fat: 5 }],
+  wellness: [{ date: '2026-09-28', waterMl: 200, sleepHr: 7 }, { date: '2026-09-29', waterMl: 1500 }],
+})
+const tidurGabung = gabung.diarySleep as { id: string; hours: number }[]
+assert.equal(tidurGabung.find((r) => r.id === 's1')?.hours, 7)
+assert.equal(tidurGabung.some((r) => r.id === 's2'), true)
+assert.equal((gabung.diaryFoods as { id: string }[]).map((r) => r.id).sort().join(','), 'f1,f2')
+const hariGabung = gabung.diaryWellness as { date: string; waterMl?: number; sleepHr?: number }[]
+assert.equal(hariGabung.find((r) => r.date === '2026-09-28')?.waterMl, 1800)
+assert.equal(hariGabung.find((r) => r.date === '2026-09-28')?.sleepHr, 7)
+assert.equal(hariGabung.find((r) => r.date === '2026-09-29')?.waterMl, 1500)
+assert.equal((profil.diarySleep as { hours: number }[])[0].hours, 7)
+
+const kosong = susunPatchDiary(profil, { sleepLogs: [] })
+assert.equal((kosong.diarySleep as { id: string }[])[0].id, 's1')
+assert.equal((kosong.diarySleep as { id: string }[]).length, 1)
+
+assert.throws(() => susunPatchDiary(profil, { sleepLogs: [{ id: 's9', date: '2026-09-28', hours: 30, bedtimeConsistent: true }] }), /invalid sleep/)
+assert.equal((profil.diarySleep as { hours: number }[])[0].hours, 7)
+assert.throws(() => susunPatchDiary(profil, {}), /diary payload is empty/)
+
+const penuh = Array.from({ length: MAKS_TIDUR }, (_, i) => {
+  const d = new Date(Date.UTC(2026, 0, 1 + i))
+  return { id: `p${i}`, date: d.toISOString().slice(0, 10), hours: 7, bedtimeConsistent: true }
+})
+const batas = susunPatchDiary({ diarySleep: penuh }, {
+  sleepLogs: [{ id: 'baru', date: '2026-12-01', hours: 8, bedtimeConsistent: true }],
+})
+const batasTidur = batas.diarySleep as { id: string }[]
+assert.equal(batasTidur.length, MAKS_TIDUR)
+assert.equal(batasTidur.some((r) => r.id === 'baru'), true)
+assert.equal(batasTidur.some((r) => r.id === 'p0'), false)
+assert.equal((susunPatchDiary({ diarySleep: penuh }, { sleepLogs: [] }).diarySleep as unknown[]).length, MAKS_TIDUR)
+
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')

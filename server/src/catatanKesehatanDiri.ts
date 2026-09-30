@@ -207,3 +207,43 @@ export function bacaDiaryFoods(profil: Record<string, unknown> | undefined | nul
 export function bacaDiaryWellness(profil: Record<string, unknown> | undefined | null) {
   return bacaDaftar(profil, 'diaryWellness', validasiDiaryWellness) as CatatanWellnessServer[]
 }
+
+/** Union by id. Stored rows stay; a second device only adds ids the account does not have yet. */
+export function gabungDiarySleep(tersimpan: readonly CatatanTidurServer[], masuk: readonly CatatanTidurServer[]): CatatanTidurServer[] {
+  const ids = new Set(tersimpan.map((r) => r.id))
+  const gabung = [...tersimpan]
+  for (const row of masuk) if (!ids.has(row.id)) gabung.push(row)
+  return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_TIDUR)
+}
+
+export function gabungDiaryFoods(tersimpan: readonly CatatanMakananServer[], masuk: readonly CatatanMakananServer[]): CatatanMakananServer[] {
+  const ids = new Set(tersimpan.map((r) => r.id))
+  const gabung = [...tersimpan]
+  for (const row of masuk) if (!ids.has(row.id)) gabung.push(row)
+  return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
+}
+
+/** Same date keeps stored numbers and only fills fields the account does not have yet. */
+export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[], masuk: readonly CatatanWellnessServer[]): CatatanWellnessServer[] {
+  const byDate = new Map(tersimpan.map((r) => [r.date, { ...r }]))
+  for (const row of masuk) {
+    const ada = byDate.get(row.date)
+    if (!ada) { byDate.set(row.date, { ...row }); continue }
+    if (ada.sleepHr == null && row.sleepHr != null) ada.sleepHr = row.sleepHr
+    if (ada.waterMl == null && row.waterMl != null) ada.waterMl = row.waterMl
+  }
+  return [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
+}
+
+/** Validate then union. Throws before returning a patch, so a bad row never replaces the stored lists. */
+export function susunPatchDiary(
+  profil: Record<string, unknown> | undefined | null,
+  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown },
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {}
+  if (body && 'sleepLogs' in body) patch.diarySleep = gabungDiarySleep(bacaDiarySleep(profil), validasiDiarySleep(body.sleepLogs))
+  if (body && 'foods' in body) patch.diaryFoods = gabungDiaryFoods(bacaDiaryFoods(profil), validasiDiaryFoods(body.foods))
+  if (body && 'wellness' in body) patch.diaryWellness = gabungDiaryWellness(bacaDiaryWellness(profil), validasiDiaryWellness(body.wellness))
+  if (!Object.keys(patch).length) throw new Error('diary payload is empty')
+  return patch
+}

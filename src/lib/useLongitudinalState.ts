@@ -1,4 +1,5 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { barisBelumAda, tampilkanWellness, wellnessBelumAda } from './homeCrossTabDailyState'
 import { useStore } from './store'
 import { getVitals } from './healthVitals'
 import { ambilLab, type ButirLab } from './lab'
@@ -39,12 +40,14 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   const [serverReady, setServerReady] = useState(false)
   const adoptedLocal = useRef(Boolean(account))
   const migrasiSeries = useRef('')
+  const unggahDiary = useRef('')
   const akunId = account ? `${account.id}|${account.email}|${account.patientId ?? ''}` : ''
   const cache = useRef<ReturnType<typeof createLongitudinalSnapshotCache> | null>(null)
   if (!cache.current) cache.current = createLongitudinalSnapshotCache()
 
   useEffect(() => {
     migrasiSeries.current = ''
+    unggahDiary.current = ''
   }, [akunId])
 
   useEffect(() => {
@@ -119,20 +122,6 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         if (keadaan.device.vo2maxLog.length === 0 && app.vo2maxLog.length > 0) {
           jobs.push(api.putVo2maxLog(app.vo2maxLog))
         }
-        const diary = keadaan.diary
-        if (diary?.truthClass === 'patient-recorded' && diary.source === 'health-profile') {
-          const unggah: Parameters<typeof api.putDiary>[0] = {}
-          if (diary.sleep.length === 0 && app.sleepLogs.length > 0) unggah.sleepLogs = app.sleepLogs
-          if (diary.foods.length === 0 && app.foods.length > 0) unggah.foods = app.foods
-          if (diary.wellness.length === 0 && Object.keys(app.wellness ?? {}).length > 0) {
-            unggah.wellness = Object.values(app.wellness).map((row) => ({
-              date: row.date,
-              ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
-              ...(row.waterMl != null ? { waterMl: row.waterMl } : {}),
-            }))
-          }
-          if (unggah.sleepLogs || unggah.foods || unggah.wellness) jobs.push(api.putDiary(unggah))
-        }
         if (jobs.length) {
           Promise.all(jobs).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { /* keep browser copy */ })
         }
@@ -161,17 +150,33 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     return () => { active = false }
   }, [account, akunId, local.labs, clinicalRevision])
 
+  useEffect(() => {
+    if (!backendEnabled || !account || !diaryServer) return
+    const sleepLogs = barisBelumAda(diaryServer.sleep, app.sleepLogs)
+    const foods = barisBelumAda(diaryServer.foods, app.foods)
+    const wellness = wellnessBelumAda(diaryServer.wellness, app.wellness ?? {})
+    if (!sleepLogs.length && !foods.length && !wellness.length) return
+    const tanda = JSON.stringify({ sleepLogs, foods, wellness })
+    if (unggahDiary.current === tanda) return
+    unggahDiary.current = tanda
+    let active = true
+    api.putDiary({
+      ...(sleepLogs.length ? { sleepLogs } : {}),
+      ...(foods.length ? { foods } : {}),
+      ...(wellness.length ? { wellness } : {}),
+    }).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { unggahDiary.current = '' })
+    return () => { active = false }
+  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness])
+
   const sumberLab = sumberLabLongitudinal(labServer && labServer.subjectId === account?.id ? labServer.log : null, local.labs)
   const sumberVitals = sumberVitalsLongitudinal(serverReady && account ? deviceCurrent : null, local.vitals as Record<string, unknown>)
   const sumberSelf = sumberDeretLongitudinal(serverReady ? deviceSeries?.selfVitals ?? null : null, app.selfVitals)
   const sumberVo2 = sumberDeretLongitudinal(serverReady ? deviceSeries?.vo2maxLog ?? null : null, app.vo2maxLog)
   const sourceApp = useMemo(
     () => {
-      const tidur = diaryServer && diaryServer.sleep.length > 0 ? diaryServer.sleep : app.sleepLogs
-      const makanan = diaryServer && diaryServer.foods.length > 0 ? diaryServer.foods : app.foods
-      const wellness = diaryServer && diaryServer.wellness.length > 0
-        ? Object.fromEntries(diaryServer.wellness.map((row) => [row.date, row]))
-        : app.wellness
+      const tidur = diaryServer ? [...diaryServer.sleep, ...barisBelumAda(diaryServer.sleep, app.sleepLogs)] : app.sleepLogs
+      const makanan = diaryServer ? [...diaryServer.foods, ...barisBelumAda(diaryServer.foods, app.foods)] : app.foods
+      const wellness = diaryServer ? tampilkanWellness(diaryServer.wellness, app.wellness ?? {}) : app.wellness
       return {
         account,
         vitals: app.vitals,

@@ -169,7 +169,7 @@ features:
     technical_risk: high
     clinical_risk: high
     provenance_required: true
-    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory, scripts/uji/clinical-claim-maturity.mts, scripts/uji/trajektori-usia-biologis.mts, scripts/uji/impor-lembar-lab.mts, scripts/uji/nutrisi-lab-kanonik.mts, scripts/uji/makanan-longitudinal.mts, server/uji/keadaanLongitudinal.uji.ts]
+    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory, scripts/uji/clinical-claim-maturity.mts, scripts/uji/trajektori-usia-biologis.mts, scripts/uji/impor-lembar-lab.mts, scripts/uji/nutrisi-lab-kanonik.mts, scripts/uji/makanan-longitudinal.mts, scripts/uji/catatan-harian-gabung.mts, server/uji/keadaanLongitudinal.uji.ts, server/uji/catatanKesehatanDiri.uji.ts]
     observability: [requires_repository_audit]
     known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent]
     next_actions: [verify_deployed_lab_sync_and_ocr]
