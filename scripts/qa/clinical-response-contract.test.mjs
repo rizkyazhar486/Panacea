@@ -54,9 +54,10 @@ test('detailed clinical output has adequate generation headroom', () => {
 })
 
 
+
 test('assistant chatbot output exposes fail-closed clinical maturity', () => {
-  assert.match(chatbot, /clinicalClaimMaturity\\(\\)/)
-  assert.match(chatbot, /data-clinical-claim-maturity=\\{maturity\\}/)
-  assert.match(chatbot, /clinicalClaimLabel\\(maturity\\)/)
-  assert.match(chatbot, /clinicalClaimDisclosure\\(maturity\\)/)
+  assert.match(chatbot, /clinicalClaimMaturity\(\)/)
+  assert.match(chatbot, /data-clinical-claim-maturity=\{maturity\}/)
+  assert.match(chatbot, /clinicalClaimLabel\(maturity\)/)
+  assert.match(chatbot, /clinicalClaimDisclosure\(maturity\)/)
 })
