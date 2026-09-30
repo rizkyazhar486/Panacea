@@ -20,6 +20,7 @@ const event = ({
   recordedAt,
   receivedAt = recordedAt,
   sourceKind,
+  semanticState,
   review = { state: 'not-required' },
   eventConsent = consent,
 }) => ({
@@ -31,6 +32,7 @@ const event = ({
   unit,
   recordedAt,
   confidence: 0.91,
+  semanticState,
   provenance: {
     sourceKind,
     sourceId: `${sourceKind}:${id}`,
@@ -68,6 +70,7 @@ state = ingestLongitudinalBatch(state, [
     unit: 'bpm',
     recordedAt: '2026-09-03T06:00:00.000Z',
     sourceKind: 'wearable',
+    semanticState: 'measured',
   }),
   event({
     id: 'manual-sleep',
@@ -77,6 +80,7 @@ state = ingestLongitudinalBatch(state, [
     unit: 'h',
     recordedAt: '2026-09-03T07:00:00.000Z',
     sourceKind: 'manual',
+    semanticState: 'patient-reported',
   }),
   event({
     id: 'lab-ldl',
@@ -87,6 +91,7 @@ state = ingestLongitudinalBatch(state, [
     recordedAt: '2026-09-03T10:00:00.000Z',
     receivedAt: '2026-09-03T11:00:00.000Z',
     sourceKind: 'clinical-system',
+    semanticState: 'imported',
     review: {
       state: 'accepted',
       reviewerId: 'clinician-1',

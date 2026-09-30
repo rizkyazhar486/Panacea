@@ -26,6 +26,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Architecture boundaries (new violations only)
+        run: npm run lint:arsitektur
       - name: Typecheck and production build
         run: npm run build
       - name: Deterministic offline tests

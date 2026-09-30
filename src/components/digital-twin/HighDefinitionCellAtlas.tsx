@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -338,18 +339,16 @@ export function HighDefinitionCellAtlas() {
     }
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    let frame = 0
     const animate = () => {
       controls.update()
       if (visible && document.visibilityState !== 'hidden') renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
     setReady(true)
 
     return () => {
       setReady(false)
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       resizeObserver.disconnect()
       intersectionObserver.disconnect()
       renderer.domElement.removeEventListener('pointerup', onPointerUp)

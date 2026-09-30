@@ -39,6 +39,49 @@ const candidateScore = (candidate: BodyAssetCandidate): number => {
   return 10;
 };
 
+const intentRank: Record<BodyPrefetchIntent, number> = {
+  'idle-opportunistic': 0,
+  'likely-next': 1,
+  'required-now': 2,
+};
+
+/**
+ * Consolidate duplicate observations before allocating bounded loader slots.
+ * Conservative facts win: any resident observation suppresses a reload, the
+ * strongest intent is retained, and the largest transfer estimate is used.
+ */
+const mergeCandidatesByAssetId = (
+  candidates: readonly BodyAssetCandidate[],
+): BodyAssetCandidate[] => {
+  const merged = new Map<string, BodyAssetCandidate>();
+
+  for (const candidate of candidates) {
+    const estimatedTransferMb = finiteNonNegative(candidate.estimatedTransferMb);
+    const current = merged.get(candidate.assetId);
+
+    if (!current) {
+      merged.set(candidate.assetId, {
+        ...candidate,
+        estimatedTransferMb,
+      });
+      continue;
+    }
+
+    merged.set(candidate.assetId, {
+      assetId: candidate.assetId,
+      estimatedTransferMb: Math.max(current.estimatedTransferMb, estimatedTransferMb),
+      intent: intentRank[candidate.intent] > intentRank[current.intent]
+        ? candidate.intent
+        : current.intent,
+      selected: current.selected || candidate.selected,
+      adjacentToSelection: current.adjacentToSelection || candidate.adjacentToSelection,
+      alreadyResident: current.alreadyResident || candidate.alreadyResident,
+    });
+  }
+
+  return [...merged.values()];
+};
+
 function defaultsFor(context: BodyPrefetchContext): {
   maxConcurrent: number;
   transferBudgetMb: number;
@@ -112,12 +155,8 @@ export function planBodyProgressivePrefetch(
   const defaults = defaultsFor(context);
   const maxConcurrent = resolveMaxConcurrent(context.maxConcurrentOverride, defaults.maxConcurrent);
 
-  const pending = candidates
+  const pending = mergeCandidatesByAssetId(candidates)
     .filter((candidate) => !candidate.alreadyResident)
-    .map((candidate) => ({
-      ...candidate,
-      estimatedTransferMb: finiteNonNegative(candidate.estimatedTransferMb),
-    }))
     .sort((a, b) =>
       candidateScore(b) - candidateScore(a) ||
       a.estimatedTransferMb - b.estimatedTransferMb ||

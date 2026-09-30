@@ -6,6 +6,8 @@ import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
+const WholeBodyPhysiologyWorkbench = lazy(() => import('./WholeBodyPhysiologyWorkbench'))
+const PhysiologyDeepDivePanel = lazy(() => import('./PhysiologyDeepDivePanel').then((module) => ({ default: module.PhysiologyDeepDivePanel })))
 const BodySystemDeepDiveWorkspace = lazy(() => import('./BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./PharmacologyMechanismPanel'))
@@ -14,6 +16,7 @@ const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: modu
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ default: module.SurgicalLab })))
 const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
+const PanelEcmo = lazy(() => import('../../components/PanelEcmo').then((module) => ({ default: module.PanelEcmo })))
 const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
@@ -39,6 +42,8 @@ interface UnifiedHumanSimulationProjectorProps {
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
   compact?: boolean
+  /** Permintaan fokus struktur sumber dari luar (mis. temuan AI-EMR). `nonce` memicu ulang pilihan yang sama. */
+  requestedStructure?: { name: string; nonce: number } | null
 }
 
 type DomainDefinition = {
@@ -152,6 +157,7 @@ export default function UnifiedHumanSimulationProjector({
   requestedDomain,
   onDomainChange,
   compact = false,
+  requestedStructure = null,
 }: UnifiedHumanSimulationProjectorProps) {
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
@@ -177,6 +183,12 @@ export default function UnifiedHumanSimulationProjector({
     setSelectedStructureName(null)
   }, [selectedSystemId])
 
+  // Dijalankan SETELAH reset sistem di atas, sehingga fokus dari temuan bertahan
+  // ketika permintaan itu juga mengganti sistem.
+  useEffect(() => {
+    if (requestedStructure?.name) setSelectedStructureName(requestedStructure.name)
+  }, [requestedStructure, selectedSystemId])
+
   useEffect(() => {
     if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')
   }, [domain, onSystemChange, selectedSystemId])
@@ -201,12 +213,15 @@ export default function UnifiedHumanSimulationProjector({
       case 'physiology':
         return (
           <div className="space-y-3">
+            <WholeBodyPhysiologyWorkbench />
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-neutral-900" />}><PanelEcmo /></Suspense>
             <AtlasPhysiologyBridgePanel
               selectedAtlasSystemId={selectedSystemId}
               selectedSourceStructureName={selectedStructureName}
               onSystemChange={(systemId) => onSystemChange(systemId)}
             />
             <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedSystemId} />
+            <PhysiologyDeepDivePanel />
           </div>
         )
       case 'pathophysiology':
@@ -269,7 +284,7 @@ export default function UnifiedHumanSimulationProjector({
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
       data-selected-source-structure={selectedStructureName ?? undefined}
-      className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
+      className="dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
       aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >
@@ -326,6 +341,7 @@ export default function UnifiedHumanSimulationProjector({
               onSemanticZoomChange={setSemanticZoom}
               selectedStructureName={selectedStructureName}
               onStructureSelect={setSelectedStructureName}
+              focusRequest={requestedStructure}
             />
           </Suspense>
         </div>

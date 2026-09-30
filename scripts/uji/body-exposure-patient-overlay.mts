@@ -49,14 +49,14 @@ const projection = {
 const cardiovascular = focusBodyClinicalProjection(projection, 'cardiovascular')
 assert.equal(cardiovascular.label, 'Cardiovascular')
 assert.deepEqual(cardiovascular.markers.map((marker) => marker.key), ['jantung', 'leher', 'ekstremitas'])
-assert.deepEqual(cardiovascular.findingCounts, { normal: 1, abnormal: 1, unchecked: 1 })
+assert.deepEqual(cardiovascular.findingCounts, { normal: 1, abnormal: 1, recorded: 0, unchecked: 1 })
 assert.equal(cardiovascular.recordedFindings, 2)
 assert.equal(cardiovascular.boundary.vitalsRemainPatientWide, true)
 assert.equal(cardiovascular.boundary.diagnosticInferenceGenerated, false)
 
 const respiratory = focusBodyClinicalProjection(projection, 'respiratory')
 assert.deepEqual(respiratory.markers.map((marker) => marker.key), ['paru', 'leher'])
-assert.deepEqual(respiratory.findingCounts, { normal: 2, abnormal: 0, unchecked: 0 })
+assert.deepEqual(respiratory.findingCounts, { normal: 2, abnormal: 0, recorded: 0, unchecked: 0 })
 assert.equal(respiratory.recordedFindings, 2)
 
 console.log('Body Exposure AI-EMR patient-overlay integration contract verified.')

@@ -16,6 +16,16 @@ if (valid.ok) {
   assert.equal(valid.value.json, true)
 }
 
+assert.deepEqual(validateAiProxyRequest({
+  model: 'cheap-opus-trigger',
+  messages: [{ role: 'user', content: 'Use the normal chat route.' }],
+}), {
+  ok: false,
+  status: 400,
+  error: 'bad_ai_request',
+  reason: 'unsupported_model',
+}, 'caller-controlled model names must not select the expensive reasoning route')
+
 assert.deepEqual(validateAiProxyRequest({ messages: [] }), {
   ok: false,
   status: 400,

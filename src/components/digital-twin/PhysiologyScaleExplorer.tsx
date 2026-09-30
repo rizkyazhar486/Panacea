@@ -254,7 +254,7 @@ export function PhysiologyScaleExplorer({ initialScale = 'tissue' }: Props) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_28px_90px_rgba(0,0,0,.30)]">
+    <section className="dark overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_28px_90px_rgba(0,0,0,.30)]">
       <header className="border-b border-white/8 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-4xl">

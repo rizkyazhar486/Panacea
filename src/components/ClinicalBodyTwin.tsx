@@ -5,6 +5,7 @@ import type { BodyClinicalBridgeProjection, BodyClinicalMarkerStatus } from '../
 const STATUS: Record<BodyClinicalMarkerStatus, { dot: string; ring: string; label: string }> = {
   normal: { dot: '#00BF63', ring: 'rgba(0,191,99,.28)', label: 'Recorded normal' },
   abnormal: { dot: '#ff5d5d', ring: 'rgba(255,93,93,.3)', label: 'Finding recorded' },
+  recorded: { dot: '#f5b942', ring: 'rgba(245,185,66,.28)', label: 'Recorded · not classified' },
   unchecked: { dot: '#64748b', ring: 'rgba(100,116,139,.24)', label: 'Not examined' },
 }
 
@@ -27,7 +28,7 @@ export function ClinicalBodyTwin({
 
   return (
     <section
-      className="mb-4 overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white shadow-[0_28px_90px_rgba(0,0,0,.28)]"
+      className="dark mb-4 overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white shadow-[0_28px_90px_rgba(0,0,0,.28)]"
       aria-label="AI-EMR body context"
       data-pmd-unclamped="true"
     >

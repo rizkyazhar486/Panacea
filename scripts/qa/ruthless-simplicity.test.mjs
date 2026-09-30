@@ -31,3 +31,38 @@ test('simplicity contract preserves safety and progressive disclosure', async ()
     'safety-critical information',
   ]) assert.ok(doc.includes(phrase), `missing simplicity rule: ${phrase}`)
 })
+
+
+test('Body Exposure spatial mode removes the floating assistive control', async () => {
+  const shell = await source('src/components/Shell.tsx')
+  const fab = await source('src/components/FabNavigasi.tsx')
+
+  assert.match(
+    shell,
+    /loc\.pathname === '\/fitness-hub' && new URLSearchParams\(loc\.search\)\.get\('view'\) === 'body-exposure'/,
+    'Shell must classify the Body Exposure query view as spatial',
+  )
+  assert.match(
+    fab,
+    /lokasi\.pathname === '\/fitness-hub'\s*&&\s*new URLSearchParams\(lokasi\.search\)\.get\('view'\) === 'body-exposure'/,
+    'assistive navigation must not float over the Body Exposure spatial canvas',
+  )
+})
+
+
+test('mobile command bar stays below the PWA safe area', async () => {
+  const html = await source('index.html')
+  const css = await source('public/panacea-shell-mobile-compact-v49.css')
+
+  assert.match(html, /viewport-fit=cover/, 'the app opts into edge-to-edge viewport rendering')
+  assert.match(
+    html,
+    /apple-mobile-web-app-status-bar-style[^>]*black-translucent/,
+    'standalone iOS intentionally renders beneath the translucent status bar',
+  )
+  assert.match(
+    css,
+    /header\.kaca\.panacea-command-bar\s*\{[\s\S]*?top:\s*max\([^;]*env\(safe-area-inset-top\)[^;]*\)\s*!important/,
+    'the sticky mobile command bar must offset itself below the device safe-area inset',
+  )
+})

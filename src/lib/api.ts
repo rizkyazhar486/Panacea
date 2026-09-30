@@ -103,8 +103,25 @@ export interface MarketQuote {
 
 import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet, MedReminder } from './types'
 
+import { galatDariRespons } from './galatApi'
+export { GalatApi, galatDariRespons } from './galatApi'
+
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
+export const API_BASE = API
 export const backendEnabled = Boolean(API)
+
+export interface IzinLabKlien { id: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }
+export interface FhirObservasiLab {
+  id: string
+  code: { coding?: { system: string; code: string; display: string }[]; text: string }
+  effectiveDateTime: string
+  valueQuantity: { value: number; unit: string; code?: string }
+  meta?: { tag?: { code: string }[] }
+  identifier?: { system: string; value: string }[]
+  referenceRange?: { low?: { value: number }; high?: { value: number }; text?: string }[]
+}
+export interface TinjauanLabKlien { id: string; tes: string; dokterEmail: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }
+export interface FhirBundelLab { resourceType: 'Bundle'; total: number; entry: { resource: FhirObservasiLab }[] }
 export const apiBaseUrl = API
 
 export interface Health {
@@ -170,13 +187,15 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw new Error((body as { error?: string }).error || `HTTP ${res.status}`)
+    throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
   }
   return res.json() as Promise<T>
 }
 
+
 function toAccount(u: BackendUser): Account {
   return {
+    id: u.id,
     email: u.email,
     name: u.name,
     role: u.role,
@@ -439,6 +458,32 @@ export const api = {
     req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
   // Per-user health profile (manual / WHOOP / Apple Watch / other)
+  getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
+  putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
+    req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
+  getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
+  // Studi validasi klinis (lihat src/lib/validasiKlinis.ts). Identitas penilai ditetapkan server.
+  validationStudies: () => req<{ studies: { protokol: import('./validasiKlinis').Protokol; jumlahKasus: number; sudahSaya: number }[] }>('/api/validation/studies'),
+  validationCases: (id: string) => req<{ protokol: import('./validasiKlinis').Protokol; cases: (import('./validasiKlinis').KasusBeku & { sudahSaya: boolean })[] }>(`/api/validation/${encodeURIComponent(id)}/cases`),
+  submitValidationAssessment: (id: string, body: unknown) => req<{ ok: true; urutan: number; sidik: string }>(`/api/validation/${encodeURIComponent(id)}/assessments`, { method: 'POST', body: JSON.stringify(body) }),
+  reportValidationSafetyEvent: (body: unknown) => req<{ ok: true }>('/api/validation/safety-events', { method: 'POST', body: JSON.stringify(body) }),
+  validationDisagreements: (id: string) => req<{ cases: { kasus: import('./validasiKlinis').KasusBeku; penilaian: { benar: boolean; bahaya: string; omisi: string[]; override: { dilakukan: boolean; alasan?: string }; klaimTakDidukung: number }[] }[] }>(`/api/validation/${encodeURIComponent(id)}/disagreements`),
+  submitValidationAdjudication: (body: unknown) => req<{ ok: true }>('/api/validation/adjudications', { method: 'POST', body: JSON.stringify(body) }),
+  submitValidationUsability: (id: string, body: unknown) => req<{ ok: true }>(`/api/validation/${encodeURIComponent(id)}/usability`, { method: 'POST', body: JSON.stringify(body) }),
+  validationLedger: () => req<{ ledger: import('./validasiKlinis').Catatan[] }>('/api/validation/ledger'),
+  getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[]; reviews: TinjauanLabKlien[] }>('/api/lab-log/shares'),
+  shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
+  revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  clinicianLabShares: () => req<{ shares: { id: string; berakhir: string; pasien: string }[] }>('/api/clinician/lab-shares'),
+  clinicianLabFhir: (id: string) => req<{ pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab; verifiedVitals: (VitalSign & { dicatatOleh: { id: string; klinisi: true } })[] }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
+  reviewLab: (izinId: string, tes: string, catatan: string, cekUlangSebelum: string) =>
+    req<TinjauanLabKlien>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/review`, { method: 'POST', body: JSON.stringify({ tes, catatan, cekUlangSebelum }) }),
+  carePlans: () => req<{ plans: { plan: import('./continuousCareOperatingSystem').ContinuousCarePlan; dokterEmail: string; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }[] }>('/api/care/plans'),
+  submitCareReport: (planId: string, scheduledFor: string, answers: { questionId: string; value: boolean | number | string }[], extra?: { clientId: string; authoredAt: string }) =>
+    req<import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput>('/api/care/reports', { method: 'POST', body: JSON.stringify({ planId, scheduledFor, answers, ...extra }) }),
+  clinicianCare: (izinId: string) => req<{ plan: import('./continuousCareOperatingSystem').ContinuousCarePlan | null; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care`),
+  createCarePlan: (izinId: string, body: unknown) =>
+    req<import('./continuousCareOperatingSystem').ContinuousCarePlan>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care-plan`, { method: 'POST', body: JSON.stringify(body) }),
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),
@@ -510,8 +555,26 @@ export const api = {
     req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
+  issueLinkCode: (patientId: string) =>
+    req<{ code: string; expiresAt: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-code`, { method: 'POST' }),
+  linkStatus: (patientId: string) =>
+    req<{ linked: boolean; linkedAt?: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-status`),
+  redeemLinkCode: (code: string) =>
+    req<{ ok: boolean; patientId: string }>('/api/clinical/link', { method: 'POST', body: JSON.stringify({ code }) }),
+  myLinks: () => req<{ links: { patientId: string; linkedAt: string }[] }>('/api/clinical/links'),
+  unlink: (patientId: string) => req<{ ok: boolean }>(`/api/clinical/link/${encodeURIComponent(patientId)}`, { method: 'DELETE' }),
+  closeEncounter: (patientId: string) =>
+    req<{ ok: boolean; encounter: EMRRecord & { encounterId: string; closedAt: string; closedBy?: string }; record: EMRRecord }>('/api/clinical/encounter/close', { method: 'POST', body: JSON.stringify({ patientId }) }),
+  encounters: (patientId: string) =>
+    req<{ encounters: (EMRRecord & { encounterId: string; closedAt: string; closedBy?: string })[] }>(`/api/clinical/encounters/${encodeURIComponent(patientId)}`),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
-    req<{ ok: boolean }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+    req<{ ok: boolean; record: EMRRecord }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+  recordEncounters: (patientId: string) =>
+    req<{ records: EMRRecord[] }>(`/api/clinical/records/${encodeURIComponent(patientId)}`).then((r) => r.records),
+  recordHistory: (patientId: string, recordId?: string) =>
+    req<{ history: EMRRecord[] }>(
+      `/api/clinical/record-history/${encodeURIComponent(patientId)}${recordId ? `?recordId=${encodeURIComponent(recordId)}` : ''}`,
+    ).then((r) => r.history),
   saveEducationRemote: (patientId: string, sheet: EducationSheet) =>
     req<{ ok: boolean }>('/api/clinical/education', { method: 'POST', body: JSON.stringify({ patientId, sheet }) }),
   addVitalRemote: (patientId: string, vital: VitalSign) =>
@@ -527,6 +590,8 @@ export interface ClinicalData {
   vitals: Record<string, VitalSign[]>
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
+  recordEncounters?: Record<string, EMRRecord[]>
+  recordHistory?: Record<string, EMRRecord[]>
   education: Record<string, EducationSheet>
 }
 

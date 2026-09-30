@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -86,7 +88,8 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100)
     camera.position.set(0, 1.25, 5.2)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true })
+    const renderer = buatRendererAman({ antialias: true, alpha: false, preserveDrawingBuffer: true })
+    if (!renderer) return tandaiTanpaWebgl(mount)
     renderer.domElement.dataset.personalAvatarCanvas = 'true'
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -419,17 +422,15 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       )
     }
 
-    let raf = 0
     const tick = () => {
       controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(tick)
     }
-    tick()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, tick)
 
     return () => {
       penjaga.lepas()
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       ro.disconnect()
       controls.dispose()
       scene.traverse((obj) => {
@@ -448,7 +449,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
   }, [input, bentuk])
 
   return (
-    <section className="overflow-hidden rounded-[26px] border border-white/10 bg-[#071018] text-white shadow-2xl">
+    <section className="dark overflow-hidden rounded-[26px] border border-white/10 bg-[#071018] text-white shadow-2xl">
       <div ref={mountRef} className={compact ? "h-[300px] w-full sm:h-[340px]" : "h-[360px] w-full sm:h-[430px]"} aria-label="Personalized 3D body character" />
       <div className="border-t border-white/10 p-3">
         <div className="flex flex-wrap gap-2 text-[10px] font-bold text-white/75">

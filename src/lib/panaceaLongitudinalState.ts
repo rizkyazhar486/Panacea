@@ -1,4 +1,4 @@
-export type PanaceaSurface = 'your-body' | 'clinical' | 'for-you' | 'ai-emr' | 'ai-chatbot'
+export type PanaceaSurface = 'your-body' | 'clinical' | 'body-exposure' | 'for-you' | 'ai-emr' | 'ai-chatbot'
 
 export type LongitudinalDomain =
   | 'vital'
@@ -17,6 +17,25 @@ export type LongitudinalDomain =
   | 'other'
 
 export type ReviewState = 'not-required' | 'pending' | 'accepted' | 'rejected'
+
+/**
+ * Keadaan semantik sebuah nilai — WAJIB dibedakan di seluruh Panacea:
+ * diukur, diimpor, dimasukkan klinisi, dilaporkan pasien, turunan deterministik,
+ * keluaran aturan, draf/hipotesis AI, estimasi model, simulasi/counterfactual,
+ * rujukan/edukasi, stale/unknown/unsupported, ditinjau klinisi, atau tidak tersedia.
+ * Opsional supaya peristiwa lama tetap sah; bila ada, divalidasi.
+ */
+export type SemanticState =
+  | 'measured' | 'imported' | 'clinician-entered' | 'patient-reported' | 'derived'
+  | 'rule-output' | 'ai-draft' | 'model-estimated' | 'simulated' | 'counterfactual'
+  | 'hypothesis' | 'reference' | 'stale' | 'unknown' | 'unsupported'
+  | 'clinician-reviewed' | 'unavailable'
+export const SEMANTIC_STATES: readonly SemanticState[] = [
+  'measured', 'imported', 'clinician-entered', 'patient-reported', 'derived',
+  'rule-output', 'ai-draft', 'model-estimated', 'simulated', 'counterfactual',
+  'hypothesis', 'reference', 'stale', 'unknown', 'unsupported',
+  'clinician-reviewed', 'unavailable',
+]
 export type ConsentPurpose = 'personal-visualization' | 'clinical-support' | 'ai-context' | 'research-export'
 
 export interface LongitudinalProvenance {
@@ -56,6 +75,7 @@ export interface LongitudinalEvent<T = unknown> {
   consent: ConsentEnvelope
   review: ClinicianReviewEnvelope
   tags?: readonly string[]
+  semanticState?: SemanticState
 }
 
 export interface LongitudinalMetricSnapshot<T = unknown> {
@@ -85,6 +105,7 @@ export interface SurfaceProjection {
   metrics: readonly LongitudinalMetricSnapshot[]
   pendingClinicalReview: number
   blockedByConsent: number
+  blockedByTruthClass: number
 }
 
 export interface LongitudinalPatientState {
@@ -110,6 +131,7 @@ export type LongitudinalSubscriber = (event: LongitudinalEvent) => void
 const DOMAIN_BY_SURFACE: Readonly<Record<PanaceaSurface, readonly LongitudinalDomain[]>> = {
   'your-body': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'device'],
   clinical: ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
+  'body-exposure': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'device', 'other'],
   'for-you': ['activity', 'sleep', 'recovery', 'readiness', 'fitness', 'nutrition', 'other'],
   'ai-emr': ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
   'ai-chatbot': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
@@ -149,12 +171,36 @@ function cloneEvent<T>(event: LongitudinalEvent<T>): LongitudinalEvent<T> {
   }
 }
 
+function stableEventJson(event: LongitudinalEvent): string {
+  return JSON.stringify(cloneEvent(event), (_key, value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return value
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right)),
+    )
+  })
+}
+
+function sameLongitudinalEvent(left: LongitudinalEvent, right: LongitudinalEvent): boolean {
+  return stableEventJson(left) === stableEventJson(right)
+}
+
 /**
  * Fail-closed validation shared by all ingestion paths.
  * This validates transport/governance shape only; it does not establish that a
  * measurement is clinically correct, diagnostic, or appropriate for treatment.
  */
 export function validateLongitudinalEvent(event: LongitudinalEvent) {
+  if (event.semanticState !== undefined) {
+    if (!SEMANTIC_STATES.includes(event.semanticState)) throw new Error('event.semanticState is not a known semantic state')
+    // AI tidak pernah diam-diam menjadi kebenaran klinis: 'clinician-reviewed' butuh tinjauan diterima
+    // oleh peninjau yang teridentifikasi; draf AI tidak boleh berstatus diterima.
+    if (event.semanticState === 'clinician-reviewed' && !(event.review.state === 'accepted' && event.review.reviewerId)) {
+      throw new Error('clinician-reviewed events need an accepted review with an identified reviewer')
+    }
+    if (event.semanticState === 'ai-draft' && event.review.state === 'accepted') {
+      throw new Error('an ai-draft event cannot carry an accepted review; promote it to clinician-reviewed')
+    }
+  }
   assertNonBlank(event.id, 'event.id')
   assertNonBlank(event.subjectId, 'event.subjectId')
   assertNonBlank(event.metric, 'event.metric')
@@ -212,8 +258,30 @@ export function requiresClinicianReview(event: LongitudinalEvent) {
   return CLINICIAN_REVIEW_DOMAINS.has(event.domain)
 }
 
+const CLINICAL_TRUTH_STATES = new Set<SemanticState>(['measured', 'imported', 'clinician-entered', 'patient-reported', 'derived', 'rule-output', 'clinician-reviewed'])
+
+function hasClinicalTruthState(event: LongitudinalEvent) {
+  return event.semanticState !== undefined && CLINICAL_TRUTH_STATES.has(event.semanticState)
+}
+
+function isEventVisibleOnSurface(
+  event: LongitudinalEvent,
+  surface: PanaceaSurface,
+  purpose: ConsentPurpose,
+  atMs: number,
+) {
+  if (Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
+  if (surface === 'clinical' || surface === 'ai-emr') {
+    if (!hasClinicalTruthState(event)) return false
+    if (requiresClinicianReview(event) && event.review.state !== 'accepted') return false
+  }
+  if (surface === 'ai-chatbot' && event.review.state === 'rejected') return false
+  return true
+}
+
 export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()) {
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
+  if (!hasClinicalTruthState(event)) return false
   if (!requiresClinicianReview(event)) return true
   return event.review.state === 'accepted'
 }
@@ -231,9 +299,14 @@ export function ingestLongitudinalEvent(
   validateLongitudinalEvent(incoming)
   if (incoming.subjectId.trim() !== current.subjectId) throw new Error('event.subjectId does not match state.subjectId')
 
-  if (current.eventsById[incoming.id]) return { state: current, status: 'duplicate' }
-
   const event = cloneEvent(incoming)
+  const existing = current.eventsById[event.id]
+  if (existing) {
+    if (!sameLongitudinalEvent(existing, event)) {
+      throw new Error(`conflicting event id ${event.id}`)
+    }
+    return { state: current, status: 'duplicate' }
+  }
   const eventsById: Record<string, LongitudinalEvent> = { ...current.eventsById, [event.id]: event }
   const metricEventIds: Record<string, readonly string[]> = { ...current.metricEventIds }
   const existingIds = current.metricEventIds[event.metric] ?? []
@@ -269,6 +342,29 @@ export function eventsForMetric(state: LongitudinalPatientState, metric: string)
 
 export function metricSnapshot(state: LongitudinalPatientState, metric: string): LongitudinalMetricSnapshot | null {
   const events = eventsForMetric(state, metric)
+  const latest = events[events.length - 1]
+  if (!latest) return null
+  return {
+    metric: latest.metric,
+    domain: latest.domain,
+    latest,
+    previous: events.length > 1 ? events[events.length - 2] : undefined,
+    eventCount: events.length,
+  }
+}
+
+/**
+ * Point-in-time metric snapshot. Future observations are excluded so X(t)
+ * cannot be contaminated by data that was not yet effective at t.
+ */
+export function metricSnapshotAt(
+  state: LongitudinalPatientState,
+  metric: string,
+  at: string | number,
+): LongitudinalMetricSnapshot | null {
+  const atMs = typeof at === 'number' ? at : parseIso(at, 'at')
+  if (!Number.isFinite(atMs)) throw new Error('at must be a finite timestamp')
+  const events = eventsForMetric(state, metric).filter((event) => Date.parse(event.recordedAt) <= atMs)
   const latest = events[events.length - 1]
   if (!latest) return null
   return {
@@ -334,7 +430,7 @@ export function numericMetricTrend(
   }
 }
 
-function consentPurposeForSurface(surface: PanaceaSurface): ConsentPurpose {
+export function consentPurposeForSurface(surface: PanaceaSurface): ConsentPurpose {
   if (surface === 'clinical' || surface === 'ai-emr') return 'clinical-support'
   if (surface === 'ai-chatbot') return 'ai-context'
   return 'personal-visualization'
@@ -351,13 +447,19 @@ export function projectStateToSurface(
   const snapshots: LongitudinalMetricSnapshot[] = []
   let blockedByConsent = 0
   let pendingClinicalReview = 0
+  let blockedByTruthClass = 0
 
   for (const metric of Object.keys(state.metricEventIds).sort()) {
-    const snapshot = metricSnapshot(state, metric)
+    const snapshot = metricSnapshotAt(state, metric, atMs)
     if (!snapshot || !domains.has(snapshot.domain)) continue
 
     if (!isConsentActive(snapshot.latest.consent, purpose, atMs)) {
       blockedByConsent += 1
+      continue
+    }
+
+    if ((surface === 'clinical' || surface === 'ai-emr') && !hasClinicalTruthState(snapshot.latest)) {
+      blockedByTruthClass += 1
       continue
     }
 
@@ -369,7 +471,15 @@ export function projectStateToSurface(
     }
 
     if (surface === 'ai-chatbot' && snapshot.latest.review.state === 'rejected') continue
-    snapshots.push(snapshot)
+
+    const visibleHistory = eventsForMetric(state, metric).filter((event) => (
+      domains.has(event.domain) && isEventVisibleOnSurface(event, surface, purpose, atMs)
+    ))
+    snapshots.push({
+      ...snapshot,
+      previous: visibleHistory.length > 1 ? visibleHistory[visibleHistory.length - 2] : undefined,
+      eventCount: visibleHistory.length,
+    })
   }
 
   return {
@@ -379,6 +489,7 @@ export function projectStateToSurface(
     metrics: snapshots,
     pendingClinicalReview,
     blockedByConsent,
+    blockedByTruthClass,
   }
 }
 
@@ -397,11 +508,7 @@ export function buildContextPacket(
       metric,
       ids.filter((id) => {
         const event = state.eventsById[id]
-        if (!event || !isConsentActive(event.consent, purpose, atMs)) return false
-        if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(event)) {
-          return event.review.state === 'accepted'
-        }
-        return surface !== 'ai-chatbot' || event.review.state !== 'rejected'
+        return Boolean(event && isEventVisibleOnSurface(event, surface, purpose, atMs))
       }),
     ])),
   }
@@ -424,6 +531,7 @@ export function buildContextPacket(
     governance: {
       pendingClinicalReview: projection.pendingClinicalReview,
       blockedByConsent: projection.blockedByConsent,
+      blockedByTruthClass: projection.blockedByTruthClass,
       autonomousClinicalCommitAllowed: false as const,
     },
   }

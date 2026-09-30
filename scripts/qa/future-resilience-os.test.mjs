@@ -43,6 +43,11 @@ const candidate = {
   benchmarkValidated: true,
   shadowValidated: true,
   rollbackValidated: true,
+  validationEvidence: {
+    benchmarkRef: 'artifact://benchmark/candidate-a',
+    shadowRef: 'artifact://shadow/candidate-a',
+    rollbackRef: 'artifact://rollback/candidate-a',
+  },
 }
 
 test('malformed numeric evidence never authorizes technology replacement', () => {
@@ -84,10 +89,46 @@ test('cutover validation requires explicit boolean true rather than truthy input
   }
 })
 
+
+test('cutover proof requires source provenance and auditable validation artifacts', () => {
+  for (const [field, blocker] of [
+    ['sourceRef', 'missing-source-ref'],
+    ['assessedAt', 'invalid-assessed-at'],
+  ]) {
+    for (const value of ['', '   ', null, undefined]) {
+      const assessment = assessTechnology({ ...candidate, [field]: value })
+      assert.equal(assessment.replacementAllowed, false)
+      assert.ok(assessment.blockers.includes(blocker), `${field}=${String(value)}`)
+    }
+  }
+
+  assert.ok(
+    assessTechnology({ ...candidate, assessedAt: 'not-a-date' }).blockers.includes('invalid-assessed-at'),
+  )
+
+  for (const [field, blocker] of [
+    ['benchmarkRef', 'benchmark-evidence-missing'],
+    ['shadowRef', 'shadow-evidence-missing'],
+    ['rollbackRef', 'rollback-evidence-missing'],
+  ]) {
+    const validationEvidence = { ...candidate.validationEvidence, [field]: '' }
+    const assessment = assessTechnology({ ...candidate, validationEvidence })
+    assert.equal(assessment.replacementAllowed, false)
+    assert.ok(assessment.blockers.includes(blocker))
+  }
+
+  const missingBundle = assessTechnology({ ...candidate, validationEvidence: undefined })
+  assert.equal(missingBundle.replacementAllowed, false)
+  assert.ok(missingBundle.blockers.includes('benchmark-evidence-missing'))
+  assert.ok(missingBundle.blockers.includes('shadow-evidence-missing'))
+  assert.ok(missingBundle.blockers.includes('rollback-evidence-missing'))
+})
+
 test('future resilience policy keeps canonical product behavior replaceable at the edge', () => {
   assert.equal(listResiliencePolicyViolations().length, 0)
   assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.singleVendorMayNotOwnPatientTruth, true)
   assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.preserveHumanClinicalGate, true)
+  assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.validationEvidenceRequired, true)
   assert.ok(PANACEA_RESILIENCE_SURFACES.length >= 10)
   assert.equal(new Set(PANACEA_RESILIENCE_SURFACES.map((surface) => surface.id)).size, PANACEA_RESILIENCE_SURFACES.length)
 })

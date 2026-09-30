@@ -1,14 +1,17 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
+import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
+import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const DB_PATH = join(__dirname, '..', 'data.json')
+// PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
+const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
 export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
 
@@ -82,7 +85,16 @@ export interface Clinical {
   vitals: Record<string, any[]>
   supportive: Record<string, any[]>
   records: Record<string, any>
+  /** Full encounter history; records[patientId] remains the backward-compatible latest pointer. */
+  recordEncounters?: Record<string, any[]>
+  recordHistory?: Record<string, any[]>
   education: Record<string, any>
+  /** Kunjungan tertutup per pasien (append-only). */
+  encounters?: Record<string, any[]>
+  /** Tautan pasien praktik -> akun pasien (disetujui pasien lewat kode). */
+  tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
+  /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
+  kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
 }
 
 export interface VisitMembership {
@@ -116,6 +128,14 @@ interface DB {
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
+  labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
+  /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
+  validasiLedger?: import('./validasiLedger.js').CatatanLedger[]
+  carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
+  careReports?: { pasienEmail: string; laporan: any }[]
+  labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
+  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter' | 'rencana-harian'; izinId: string }[]
+  labLogs?: Record<string, { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }> // email -> riwayat lab pribadi
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
   sleepSeries?: Record<string, Record<string, any>[]> // email -> one entry per night, with stages
@@ -323,30 +343,91 @@ function loadFile() {
     try {
       db = JSON.parse(readFileSync(DB_PATH, 'utf-8'))
       muatConnect(db.connect)
-    } catch {
-      /* keep defaults */
+    } catch (e) {
+      // Jangan biarkan simpan berikutnya menimpa berkas rusak dengan keadaan kosong.
+      const ke = amankanBerkasRusak(DB_PATH)
+      console.error(`[store] data file unreadable (${(e as Error).message}); moved to ${ke ?? '(move failed)'}; starting empty`)
     }
   }
 }
 
+// Simpan DIGABUNG per putaran event loop: satu handler sering memanggil save() beberapa
+// kali, dan setiap panggilan dulu men-serialisasi SELURUH basis data secara sinkron.
+// Microtask berjalan sebelum I/O berikutnya, jadi tulisan tetap selesai di tick yang sama.
+let simpanTertunda = false
 function save() {
+  if (simpanTertunda) return
+  simpanTertunda = true
+  queueMicrotask(flushSimpan)
+}
+/** Tulis sekarang bila ada perubahan tertunda (dipakai saat shutdown dan oleh uji). */
+export function flushSimpan() {
+  if (!simpanTertunda) return
+  simpanTertunda = false
+  simpanSekarang()
+}
+export const statistikSimpan = { serialisasi: 0 }
+process.once('beforeExit', flushSimpan)
+
+function simpanSekarang() {
+  statistikSimpan.serialisasi++
   // Keadaan Connect ikut disimpan bersama basis data utama. Tanpa ini, garam
   // sidik nomor telepon lahir baru setiap kali server hidup — dan pemeriksaan akun ganda
   // diam-diam berhenti bekerja karena sidik lama tidak akan pernah cocok lagi.
   try { db.connect = isiConnect() } catch { /* modul belum siap */ }
   // Local file (harmless; ephemeral on hosts like Render).
+  const teks = JSON.stringify(db, null, 2)
   try {
-    writeFileSync(DB_PATH, JSON.stringify(db, null, 2))
-  } catch {
-    /* ignore in read-only envs */
+    tulisAtomik(DB_PATH, teks)
+    if (!mongoCol) catatBerhasil(Buffer.byteLength(teks))
+  } catch (e) {
+    if (!mongoCol) { catatGagal(e); console.error('[store] file save failed:', (e as Error).message) }
   }
   // Mongo (permanent), debounced to coalesce rapid writes.
   if (mongoCol) {
     if (saveTimer) clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => {
-      mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true }).catch(() => {})
-    }, 400)
+    saveTimer = setTimeout(() => { saveTimer = null; void simpanMongo() }, 400)
   }
+}
+
+// Arsip append-only untuk catatan klinis/audit yang keluar dari dokumen utama
+// karena batas ukuran. Batas itu ada untuk menjaga dokumen < 16 MB, bukan untuk
+// MENGHAPUS data: yang tergeser dipindah ke sini, tidak dibuang.
+let mongoDb: any = null
+const ARSIP_DIR = process.env.PANACEA_ARCHIVE_DIR || join(dirname(DB_PATH), 'arsip')
+export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): void {
+  if (!catatan.length) return
+  const baris = catatan.map((c) => ({ c, diarsipkan: new Date().toISOString() }))
+  if (mongoDb) {
+    mongoDb.collection(`arsip_${nama}`).insertMany(baris).catch((e: Error) => {
+      catatGagal(e); console.error(`[store] archive ${nama} failed:`, e.message)
+    })
+    return
+  }
+  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n') }
+  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message) }
+}
+
+async function simpanMongo(): Promise<void> {
+  const ukuran = Buffer.byteLength(JSON.stringify(db))
+  if (ukuran >= BATAS_DOKUMEN_MONGO) {
+    catatGagal(new Error(`state ${ukuran} bytes exceeds the MongoDB 16 MB document limit`))
+    console.error('[store] NOT SAVED to MongoDB: state exceeds 16 MB document limit')
+    return
+  }
+  try {
+    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
+    catatBerhasil(ukuran)
+  } catch (e) {
+    catatGagal(e)
+    console.error('[store] MongoDB save failed:', (e as Error).message)
+  }
+}
+
+/** Tulis segera simpan yang masih tertunda (dipanggil saat SIGTERM/deploy). */
+export async function flushStore(): Promise<void> {
+  flushSimpan()
+  if (mongoCol && saveTimer) { clearTimeout(saveTimer); saveTimer = null; await simpanMongo() }
 }
 
 // Call once at boot before serving requests.
@@ -370,13 +451,15 @@ export async function initStore() {
     const client = new mongo.MongoClient(uri)
     await client.connect()
     const dbName = process.env.MONGODB_DB || 'panaceamed'
-    mongoCol = client.db(dbName).collection('app')
+    mongoDb = client.db(dbName)
+    mongoCol = mongoDb.collection('app')
     const doc = await mongoCol.findOne({ _id: 'state' })
     if (doc?.data) { db = doc.data as DB; muatConnect(db.connect) }
     else await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
     console.log('[store] MongoDB connected — permanent mode')
   } catch (e) {
     mongoCol = null
+    mongoDb = null
     loadFile()
     console.error('[store] MongoDB failed, using file mode:', (e as Error).message)
   }
@@ -428,9 +511,10 @@ export function getUserByEmail(email: string): User | undefined {
   return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
 }
 
-// Resolve a registered patient-user from a self-patient id ("self-<sanitized
-// email>"), mirroring the frontend's id derivation. Returns undefined for
-// doctor-created patients (no linked account).
+// Resolve a registered patient-user from a self-patient id.
+// Primary form is "self-u-<stable server user id>". The historical
+// "self-<sanitized email>" form remains read-compatible for old records only.
+// Returns undefined for doctor-created patients (no linked account).
 /**
  * Cari orang untuk kotak pencarian.
  *
@@ -459,6 +543,10 @@ export function cariOrang(q: string, batas = 8): { id: string; name: string; rol
 
 export function findUserBySelfPatientId(patientId: string): User | undefined {
   if (!patientId?.startsWith('self-')) return undefined
+  if (patientId.startsWith('self-u-')) {
+    const userId = patientId.slice('self-u-'.length)
+    return userId ? db.users.find((u) => u.id === userId) : undefined
+  }
   const suffix = patientId.slice(5).toLowerCase()
   return db.users.find((u) => u.email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) === suffix)
 }
@@ -722,26 +810,66 @@ function ensureClinical() {
 export function getClinical(): Clinical {
   return ensureClinical()
 }
-export function saveRecord(patientId: string, record: any) {
-  ensureClinical().records[patientId] = record
+export function getRecord(patientId: string, recordId?: string) {
+  return ambilEncounter(ensureClinical(), patientId, recordId)
+}
+export function getRecords(patientId: string): any[] {
+  return daftarEncounter(ensureClinical(), patientId)
+}
+export function saveRecord(patientId: string, record: any, arsip?: any) {
+  const c = ensureClinical()
+  simpanEncounter(c, patientId, record, arsip)
   save()
+}
+// Kunjungan tertutup: append-only, tidak dipangkas, tidak dapat diubah via API.
+export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any) {
+  const c = ensureClinical() as any
+  c.encounters ??= {}
+  const daftar = (c.encounters[patientId] ??= [])
+  if (!daftar.some((k: any) => k.encounterId === kunjungan.encounterId)) daftar.push(kunjungan)
+  c.records[patientId] = rekamBaru
+  save()
+}
+export function simpanKodeTaut(k: import('./aksesKlinis.js').KodeTaut) {
+  const c = ensureClinical(); (c.kodeTaut ??= []).push(k); save()
+}
+export function getKodeTaut() { return ensureClinical().kodeTaut ?? [] }
+export function getTautan() { return ensureClinical().tautan ?? {} }
+export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHash: string) {
+  const c = ensureClinical()
+  ;(c.tautan ??= {})[t.patientId] = t
+  const k = (c.kodeTaut ?? []).find((x) => x.hash === kodeHash); if (k) { k.dipakaiPada = t.ditautkanPada; k.dipakaiOleh = t.userId }
+  save()
+}
+export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
+export function getRecordHistory(patientId: string, recordId?: string): any[] {
+  return daftarRiwayatEncounter(ensureClinical(), patientId, recordId)
 }
 export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet
   save()
 }
+// Tambah idempoten berdasarkan id butir: kiriman ulang dari antrean sinkron klien
+// (respons pertama hilang di jalan) tidak menggandakan data klinis.
 export function addVital(patientId: string, vital: any) {
   const c = ensureClinical()
-  c.vitals[patientId] = [...(c.vitals[patientId] ?? []), vital]
+  const ada = c.vitals[patientId] ?? []
+  if (vital?.id && ada.some((v) => v?.id === vital.id)) return
+  c.vitals[patientId] = [...ada, vital]
   save()
 }
 export function addSupportive(patientId: string, r: any) {
   const c = ensureClinical()
-  c.supportive[patientId] = [...(c.supportive[patientId] ?? []), r]
+  const ada = c.supportive[patientId] ?? []
+  if (r?.id && ada.some((v) => v?.id === r.id)) return
+  c.supportive[patientId] = [...ada, r]
   save()
 }
 export function addPatient(p: any) {
-  ensureClinical().patients.push(p)
+  const c = ensureClinical()
+  if (p?.id && c.patients.some((x) => x?.id === p.id)) return
+  c.patients.push(p)
   save()
 }
 
@@ -794,6 +922,7 @@ export const SERVER_OWNED_SETTING_KEYS: readonly string[] = [
   'hrZoneLastAlertAt',      // alert cooldown; client-writable = spam bypass
   'sleepLastFiredOn',       // once-a-day guard; client-writable = repeat sends
   'latihanLastFiredOn',     // penjaga sekali sehari untuk pengingat latihan
+  'cekHarianLastFiredOn',   // penjaga sekali sehari untuk pengingat cek harian
   'salatLastFired',         // penjaga per salat per hari; client-writable = kirim ulang
   'notifTerakhir',          // penjaga jeda antar-aturan; client-writable = banjir
   'notifHitung',            // pemakaian kuota harian; client-writable = lewat kuota
@@ -827,6 +956,46 @@ export function saveSettings(userId: string, prefs: Record<string, any>) {
 // Per-user health profile — an opaque JSON blob owned by the frontend
 // (demographics + wearable snapshot from manual/WHOOP/Apple Watch/etc.).
 // Keyed by user email so it follows the account across devices.
+export function getLabLog(email: string) {
+  return db.labLogs?.[email]
+}
+export function putLabLog(email: string, isi: { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }) {
+  if (!db.labLogs) db.labLogs = {}
+  db.labLogs[email] = isi
+  save()
+}
+
+type IzinLabDb = NonNullable<typeof db.labShares>[number]
+type AuditLabDb = NonNullable<typeof db.labAudit>[number]
+export function listLabShares(): IzinLabDb[] { return db.labShares ?? [] }
+export function addLabShare(i: IzinLabDb) { (db.labShares ??= []).push(i); save() }
+export function revokeLabShare(id: string, pasienEmail: string, waktu: string): IzinLabDb | undefined {
+  const i = db.labShares?.find((x) => x.id === id && x.pasienEmail === pasienEmail && !x.dicabut)
+  if (i) { i.dicabut = waktu; save() }
+  return i
+}
+// Jejak audit hanya bertambah; dibatasi 5.000 butir terbaru agar tidak tumbuh tanpa batas.
+export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.push(a); if (l.length > 5000) arsipkan('labAudit', l.splice(0, l.length - 5000)); save() }
+type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
+export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
+export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
+export function listCarePlans() { return db.carePlans ?? [] }
+export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
+/** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
+export function tambahLedgerValidasi(c: import('./validasiLedger.js').CatatanLedger) {
+  const l = (db.validasiLedger ??= [])
+  if (c.urutan !== l.length || (l.length && c.sidikSebelum !== l[l.length - 1].sidik)) throw new Error('ledger append out of order')
+  l.push(c); save()
+}
+export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
+  // Satu rencana aktif per pasien–dokter: rencana baru menggantikan yang lama.
+  for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat
+  ;(db.carePlans ??= []).push(p); save()
+}
+export function addCareReport(pasienEmail: string, laporan: any) { const l = (db.careReports ??= []); l.push({ pasienEmail, laporan }); if (l.length > 50000) arsipkan('careReports', l.splice(0, l.length - 50000)); save() }
+export function listCareReports(pasienEmail: string, planId: string) { return (db.careReports ?? []).filter((r) => r.pasienEmail === pasienEmail && r.laporan.planId === planId).map((r) => r.laporan).slice(-60) }
+export function listLabAudit(pasienEmail: string): AuditLabDb[] { return (db.labAudit ?? []).filter((a) => a.pasienEmail === pasienEmail).slice(-100).reverse() }
+
 export function getHealthProfile(email: string): Record<string, any> {
   if (!db.healthProfiles) db.healthProfiles = {}
   return db.healthProfiles[email] ?? {}

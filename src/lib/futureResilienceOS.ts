@@ -36,6 +36,12 @@ export interface FutureResilienceBaseline {
   teamContinuity: number
 }
 
+export interface TechnologyValidationEvidence {
+  benchmarkRef?: string
+  shadowRef?: string
+  rollbackRef?: string
+}
+
 export interface TechnologyCandidate {
   id: string
   name: string
@@ -55,6 +61,7 @@ export interface TechnologyCandidate {
   benchmarkValidated: boolean
   shadowValidated: boolean
   rollbackValidated: boolean
+  validationEvidence?: TechnologyValidationEvidence
   unknowns?: readonly string[]
 }
 
@@ -84,6 +91,7 @@ export const PANACEA_FUTURE_RESILIENCE_POLICY = Object.freeze({
   benchmarkBeforeReplacement: true,
   shadowBeforeCutover: true,
   rollbackBeforeCutover: true,
+  validationEvidenceRequired: true,
   preserveClinicalProvenance: true,
   preserveHumanClinicalGate: true,
   preserveExistingCapabilityDuringMigration: true,
@@ -144,6 +152,14 @@ export const PANACEA_RESILIENCE_SURFACES: ReadonlyArray<{
 ])
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0))
+
+function hasEvidenceRef(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function hasValidAssessmentTimestamp(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && Number.isFinite(Date.parse(value))
+}
 
 function weightedMean(entries: ReadonlyArray<readonly [number, number]>): number {
   const totalWeight = entries.reduce((sum, [, weight]) => sum + weight, 0)
@@ -261,6 +277,20 @@ export function assessTechnology(candidate: TechnologyCandidate): TechnologyAsse
   if (!Number.isFinite(candidate.evidenceAgeDays) || candidate.evidenceAgeDays < 0) {
     blockers.push('invalid-evidence:evidenceAgeDays')
   }
+  if (!hasEvidenceRef(candidate.sourceRef)) blockers.push('missing-source-ref')
+  if (!hasValidAssessmentTimestamp(candidate.assessedAt)) blockers.push('invalid-assessed-at')
+
+  // A boolean "validated" flag is not itself evidence. Critical replacement must
+  // retain an auditable pointer to the benchmark, shadow run and rollback proof.
+  if (candidate.benchmarkValidated === true && !hasEvidenceRef(candidate.validationEvidence?.benchmarkRef)) {
+    blockers.push('benchmark-evidence-missing')
+  }
+  if (candidate.shadowValidated === true && !hasEvidenceRef(candidate.validationEvidence?.shadowRef)) {
+    blockers.push('shadow-evidence-missing')
+  }
+  if (candidate.rollbackValidated === true && !hasEvidenceRef(candidate.validationEvidence?.rollbackRef)) {
+    blockers.push('rollback-evidence-missing')
+  }
 
   if (candidate.security < 0.7) blockers.push('security-below-cutover-threshold')
   if (candidate.clinicalSafety < 0.7) blockers.push('clinical-safety-below-cutover-threshold')
@@ -326,6 +356,7 @@ export function listResiliencePolicyViolations(): string[] {
     'benchmarkBeforeReplacement',
     'shadowBeforeCutover',
     'rollbackBeforeCutover',
+    'validationEvidenceRequired',
     'preserveClinicalProvenance',
     'preserveHumanClinicalGate',
     'preserveExistingCapabilityDuringMigration',

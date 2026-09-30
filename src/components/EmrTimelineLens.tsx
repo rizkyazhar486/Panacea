@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { EMRRecord, SupportiveResult, VitalSign } from '../lib/types'
 import { SurfaceDepthNavigator } from './SurfaceDepthNavigator'
+import { LABEL_STATUS_TINJAU, statusTinjauRekam } from '../lib/statusTandaTangan'
 
 type EmrDepth = 'timeline' | 'encounter' | 'problem' | 'observation' | 'resource' | 'provenance'
 
@@ -43,7 +44,7 @@ export function EmrTimelineLens({
       latestVital ? { id: 'vital', at: latestVital.takenAt, label: 'Vitals recorded', detail: `${latestVital.systolic}/${latestVital.diastolic} mmHg · HR ${latestVital.heartRate} bpm · SpO₂ ${latestVital.spo2}%` } : null,
       latestSupportive ? { id: 'supportive', at: latestSupportive.takenAt, label: latestSupportive.category, detail: `${latestSupportive.name}: ${latestSupportive.value}${latestSupportive.unit ? ` ${latestSupportive.unit}` : ''}` } : null,
       record.primaryDiagnosis ? { id: 'diagnosis', at: record.updatedAt, label: 'Diagnosis context', detail: `${record.primaryDiagnosis.code} · ${record.primaryDiagnosis.title}` } : null,
-      record.signedAt ? { id: 'signed', at: record.signedAt, label: 'Record signed', detail: record.signedBy || 'Clinician verified' } : null,
+      record.signedAt ? { id: 'signed', at: record.signedAt, label: statusTinjauRekam(record) === 'signed' ? 'Record signed' : 'Signature pending', detail: statusTinjauRekam(record) === 'signed' ? record.signedBy || 'Clinician' : 'Not yet confirmed by the server' } : null,
     ].filter(Boolean) as { id: string; at: string; label: string; detail: string }[]
 
     return items.sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
@@ -81,7 +82,7 @@ export function EmrTimelineLens({
     },
     provenance: {
       label: 'Provenance',
-      value: record.signedBy ? 'Clinician signed' : record.physicalExam.doctorVerified ? 'Exam verified' : 'Draft',
+      value: LABEL_STATUS_TINJAU[statusTinjauRekam(record)],
       detail: record.signedBy
         ? `Signed by ${record.signedBy} at ${shortDate(record.signedAt)}; later edits require explicit re-signing.`
         : 'AI-assisted content remains draft context until the clinician explicitly verifies and signs it.',
@@ -91,7 +92,7 @@ export function EmrTimelineLens({
   const current = depthContent[depth]
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white" aria-label="AI-EMR longitudinal lens" data-pmd-unclamped="true">
+    <section className="dark overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white" aria-label="AI-EMR longitudinal lens" data-pmd-unclamped="true">
       <header className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-5">
         <div className="min-w-0">
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/65">AI-EMR · longitudinal lens</div>

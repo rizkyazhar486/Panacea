@@ -2,7 +2,9 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
+import { HomeLiveWidgetRail } from '../components/HomeLiveWidgetRail'
 import { HomeRecoveryVisuals } from '../components/HomeRecoveryVisuals'
+import { HomeEssentialTools } from '../components/HomeEssentialTools'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { SuperPageLauncher } from '../components/SuperPageLauncher'
@@ -64,9 +66,11 @@ export function HomeSocialWorkspace() {
         <div className="panacea-human-home">
           <HomeHealthBrief />
           <HomeVisualLanding />
+          <HomeEssentialTools />
           <SuperPageLauncher />
           <HomeRecoveryVisuals />
           <RelWidgetRumah />
+          <HomeLiveWidgetRail />
           <PanaceaImageSlider />
           <HomeCommandDeck />
         </div>

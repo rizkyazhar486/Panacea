@@ -132,7 +132,7 @@ export function PhoneHealthScan() {
 
   return (
     <section
-      className="mx-auto max-w-3xl overflow-hidden rounded-[30px] border border-white/[.08] bg-[#040606] text-white"
+      className="dark mx-auto max-w-3xl overflow-hidden rounded-[30px] border border-white/[.08] bg-[#040606] text-white"
       aria-labelledby="phone-health-scan-title"
       data-phone-health-scan="v1"
     >

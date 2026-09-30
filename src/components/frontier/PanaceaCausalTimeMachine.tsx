@@ -169,7 +169,7 @@ export function PanaceaCausalTimeMachine() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[34px] border border-white/10 bg-[#020306] text-white shadow-[0_24px_90px_rgba(0,0,0,.32)]">
+    <section className="dark overflow-hidden rounded-[34px] border border-white/10 bg-[#020306] text-white shadow-[0_24px_90px_rgba(0,0,0,.32)]">
       <div className="border-b border-white/10 p-5 sm:p-6" style={{ backgroundImage: 'radial-gradient(circle at 8% 0%,rgba(77,231,255,.14),transparent 32%),radial-gradient(circle at 92% 0%,rgba(255,99,216,.12),transparent 28%)' }}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">

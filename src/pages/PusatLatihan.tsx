@@ -100,6 +100,8 @@ const TABS: TabDef[] = [
     ringkas: 'Fat loss and muscle gain with explicit assumptions' },
 ]
 
+const PRIMARY_TRAINING_FLOW = ['pelatih', 'progres', 'fisiologi', 'rencana', 'lab'] as const
+
 type Sex = 'M' | 'F'
 
 function angkaPositif(value: unknown): value is number {
@@ -257,6 +259,7 @@ export function PusatLatihan() {
         </div>
       }
       tabs={TABS}
+      primaryTabIds={PRIMARY_TRAINING_FLOW}
       kaki={
         <div className="space-y-3">
           {audit && (

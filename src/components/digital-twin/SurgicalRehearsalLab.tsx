@@ -34,7 +34,7 @@ function ProcedureSelect({ value, onChange, label }: { value: string; onChange: 
   return (
     <label className="block">
       <span className="text-[9px] font-black uppercase tracking-[.15em] text-white/30">{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1.5 h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none focus:border-emerald-300/30">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="dark mt-1.5 h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none focus:border-emerald-300/30">
         {ALL_SURGICAL_PROCEDURES.map((procedure) => <option key={procedure.id} value={procedure.id}>{procedure.name}</option>)}
       </select>
     </label>
@@ -94,7 +94,7 @@ export function SurgicalRehearsalLab() {
   const pct = coverage.totalPhases ? Math.round((coverage.reviewedPhases / coverage.totalPhases) * 100) : 0
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="max-w-3xl">
@@ -120,7 +120,7 @@ export function SurgicalRehearsalLab() {
 
           <label className="mt-4 block">
             <span className="text-[9px] font-black uppercase tracking-[.15em] text-white/30">Rehearse operation</span>
-            <select value={procedure.id} onChange={(event) => chooseProcedure(event.target.value)} className="mt-1.5 h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none">
+            <select value={procedure.id} onChange={(event) => chooseProcedure(event.target.value)} className="dark mt-1.5 h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none">
               {filtered.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
