@@ -321,6 +321,31 @@ test('rejects undeclared fields so bounded envelopes cannot hide inline raw data
   }
 })
 
+test('validation receipts are deterministic and derive time from event provenance', () => {
+  const first = validateMedicalDeviceEvent(base)
+  const second = validateMedicalDeviceEvent(base)
+
+  assert.deepEqual(first.constitutional, second.constitutional)
+  assert.equal(first.constitutional.evaluatedAt, base.provenance.receivedAt)
+})
+
+test('invalid explicit evaluation time fails closed without injecting wall-clock time', () => {
+  const result = validateMedicalDeviceEvent(base, 'not-a-timestamp')
+
+  assert.equal(result.accepted, false)
+  assert.equal(result.disposition, 'quarantined')
+  assert.ok(result.errors.some((error) => error.includes('evaluatedAt')))
+  assert.equal(result.constitutional.evaluatedAt, '1970-01-01T00:00:00.000Z')
+})
+
+test('non-object events use a deterministic validation receipt timestamp', () => {
+  const first = validateMedicalDeviceEvent(null)
+  const second = validateMedicalDeviceEvent(null)
+
+  assert.deepEqual(first.constitutional, second.constitutional)
+  assert.equal(first.constitutional.evaluatedAt, '1970-01-01T00:00:00.000Z')
+})
+
 test('rejects parseable non-ISO timestamps so provenance is runtime-stable', () => {
   const result = validateMedicalDeviceEvent({
     ...base,
