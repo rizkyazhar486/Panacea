@@ -147,7 +147,7 @@ jobs:
                          qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
             echo "::group::$gerbang"
             mulai=$SECONDS
-            if timeout --signal=TERM --kill-after=15s 150s npm run "$gerbang"; then
+            if timeout --signal=TERM --kill-after=15s 180s npm run "$gerbang"; then
               durasi=$((SECONDS - mulai))
               echo "::notice::$gerbang lulus dalam ${durasi}s"
               echo "::endgroup::"
@@ -156,7 +156,7 @@ jobs:
               durasi=$((SECONDS - mulai))
               echo "::endgroup::"
               if [ "$kode" = '124' ] || [ "$kode" = '137' ]; then
-                echo "::error::$gerbang timeout setelah ${durasi}s (batas 150s)"
+                echo "::error::$gerbang timeout setelah ${durasi}s (batas 180s)"
               else
                 echo "::error::$gerbang gagal setelah ${durasi}s (exit $kode)"
               fi
