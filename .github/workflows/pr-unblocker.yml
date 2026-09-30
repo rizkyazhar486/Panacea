@@ -111,9 +111,9 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$SYNCED" == "true" ]]; then
-            msg="PR Unblocker synced `$HEAD_REF` with latest `main` without force-push. Fresh CI must complete before merge."
+            msg="PR Unblocker synced branch $HEAD_REF with latest main without force-push. Fresh CI must complete before merge."
           else
-            msg="PR Unblocker found `$HEAD_REF` already current with `main`; failed/cancelled runs were eligible for retry. Existing review and CI requirements remain unchanged."
+            msg="PR Unblocker found branch $HEAD_REF already current with main; failed/cancelled runs were eligible for retry. Existing review and CI requirements remain unchanged."
           fi
           gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$msg"
 
