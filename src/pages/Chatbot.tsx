@@ -321,8 +321,7 @@ export function Chatbot() {
         },
         // Every AI-written field stays provenance-tagged as AI until a clinician
         // edits/verifies it; missing history is explicit rather than silently blank.
-        asalIsian: {
-          ...(existing?.asalIsian ?? {}),
+        asalIsian: { ...(existing?.asalIsian ?? {}),
           ...Object.fromEntries([
             'keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatKehamilan',
             'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang',
