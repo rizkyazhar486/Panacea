@@ -65,6 +65,7 @@ assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(editDate, vals\)/)
 assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(nl\.date, nl\.values\)/)
 assert.match(page, /gabungLabNutrisiDenganKanonic/)
 assert.match(page, /account lab log/)
+assert.match(page, /not a diagnosis/)
 
 // Hydration: canonical-only draw date surfaces in Nutrition camelCase keys.
 store['pmd_lab_v1'] = JSON.stringify({
@@ -78,6 +79,11 @@ assert.equal(nilaiNutrisiDariLabKanonic('2026-09-20').totalCholesterol, 185)
   assert.equal(gabung.length, 1)
   assert.equal(gabung[0].values.glucose, 95, 'canonical glucose fills the Nutrition row')
   assert.equal(gabung[0].values.folate, 11, 'local-only key preserved')
+  const konflik = gabungLabNutrisiDenganKanonic([{ date: '2026-09-20', values: { glucose: 120, folate: 11 } }])
+  assert.equal(konflik[0].values.glucose, 95, 'account lab log wins over a stale Nutrition weekly value')
+  assert.equal(konflik[0].values.folate, 11)
+  const besok = gabungLabNutrisiDenganKanonic([{ date: '2026-09-21', values: { folate: 8 } }])
+  assert.equal(besok.find((r) => r.date === '2026-09-21')?.values.glucose, undefined, 'an older draw must not fill a later Nutrition row')
   assert.equal(gabungLabNutrisiDenganKanonic([{ date: 'bad', values: { glucose: 1 } }]).every((r) => r.date !== 'bad'), true)
   assert.deepEqual(gabungLabNutrisiDenganKanonic([{ date: 'not-a-date', values: {} }]).filter((r) => r.date === 'not-a-date'), [])
 }

@@ -251,11 +251,14 @@ export function proyeksikanNilaiNutrisiKeLabKanonic(
 }
 
 /** Read synced lab values for a draw date as Nutrition camelCase keys. */
-export function nilaiNutrisiDariLabKanonic(tanggal: string): Record<string, number> {
+export function nilaiNutrisiDariLabKanonic(tanggal: string, opts: { tepat?: boolean } = {}): Record<string, number> {
   const keluar: Record<string, number> = {}
   if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return keluar
   for (const [jenis, kunci] of Object.entries(JENIS_LAB_KE_NUTRISI)) {
-    const n = nilaiLabPadaTanggal(jenis, tanggal)
+    const daftar = ambilLab()[jenis] ?? []
+    const n = opts.tepat
+      ? daftar.find((b) => b.tanggal === tanggal && b.nilai > 0)?.nilai
+      : nilaiLabPadaTanggal(jenis, tanggal)
     if (n != null && n > 0) keluar[kunci] = n
   }
   return keluar
@@ -267,8 +270,9 @@ export interface BarisLabNutrisi {
 }
 
 /**
- * Merge Nutrition-local weekly rows with account-synced values.
- * Local values win on key conflict; canonical-only draw dates still appear.
+ * Merge Nutrition-local weekly rows with the account lab log.
+ * Mapped analytes use the account value for that exact draw date.
+ * Keys without a catalog id stay on the Nutrition row.
  */
 export function gabungLabNutrisiDenganKanonic(lokal: readonly BarisLabNutrisi[]): BarisLabNutrisi[] {
   const perTanggal = new Map<string, Record<string, number>>()
@@ -278,13 +282,19 @@ export function gabungLabNutrisiDenganKanonic(lokal: readonly BarisLabNutrisi[])
   }
   for (const daftar of Object.values(ambilLab())) {
     for (const b of daftar ?? []) {
-      if (!b?.tanggal || !/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal)) continue
+      if (!b?.tanggal || !/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal) || !(b.nilai > 0)) continue
       if (!perTanggal.has(b.tanggal)) perTanggal.set(b.tanggal, {})
     }
   }
   const keluar: BarisLabNutrisi[] = []
   for (const [date, values] of perTanggal) {
-    keluar.push({ date, values: { ...nilaiNutrisiDariLabKanonic(date), ...values } })
+    const kanonic = nilaiNutrisiDariLabKanonic(date, { tepat: true })
+    const sisa: Record<string, number> = {}
+    for (const [kunci, nilai] of Object.entries(values)) {
+      if (KUNCI_NUTRISI_KE_JENIS_LAB[kunci] && kanonic[kunci] != null) continue
+      if (typeof nilai === 'number' && Number.isFinite(nilai)) sisa[kunci] = nilai
+    }
+    keluar.push({ date, values: { ...sisa, ...kanonic } })
   }
   return keluar.sort((a, b) => b.date.localeCompare(a.date))
 }
