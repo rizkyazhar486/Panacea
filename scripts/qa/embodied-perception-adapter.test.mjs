@@ -176,6 +176,49 @@ test('privacy: benign nested extension data remains accepted when it has no forb
   assert.equal(frame.source.id, 'headcam-1')
 })
 
+test('provenance: rejects parseable non-ISO and impossible capture timestamps', () => {
+  for (const capturedAt of [
+    'September 30, 2026 01:00:00 UTC',
+    '2026-02-30T01:00:00.000Z',
+    '2026-09-30T24:00:00.000Z',
+    '2026-09-30T01:00:00.000+14:01',
+  ]) {
+    assert.throws(
+      () => adaptExternalEmbodiedPerceptionPacket(packet({ capturedAt })),
+      /packet\.capturedAt must be a valid ISO timestamp/,
+      capturedAt,
+    )
+  }
+})
+
+test('provenance: authorization timestamps use the same strict ISO boundary', () => {
+  const input = packet({
+    authorization: {
+      captureAuthorized: true,
+      purposeRef: 'research-protocol:bench-observation',
+      authorizedAt: '2026-02-30T00:55:00.000Z',
+    },
+  })
+
+  assert.throws(
+    () => adaptExternalEmbodiedPerceptionPacket(input),
+    /authorization\.authorizedAt must be a valid ISO timestamp/,
+  )
+})
+
+test('provenance: maximum ISO offset remains accepted', () => {
+  const frame = adaptExternalEmbodiedPerceptionPacket(packet({
+    capturedAt: '2026-09-30T15:00:00.000+14:00',
+    authorization: {
+      captureAuthorized: true,
+      purposeRef: 'research-protocol:bench-observation',
+      authorizedAt: '2026-09-30T14:55:00.000+14:00',
+    },
+  }))
+
+  assert.equal(frame.capturedAt, '2026-09-30T15:00:00.000+14:00')
+})
+
 test('negative: confidence outside the closed unit interval is rejected', () => {
   const input = packet({
     detections: [
