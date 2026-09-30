@@ -250,7 +250,12 @@ async function removeEncryptedCareReport(item: ButirAntrean, acknowledged: boole
     const tx = db.transaction(QUEUE_STORE, 'readwrite')
     tx.objectStore(QUEUE_STORE).delete(slot)
     await txDone(tx)
-    if (acknowledged) await putReceipt(db, item.clientId)
+    if (acknowledged) {
+      try { await putReceipt(db, item.clientId) } catch {
+        // The server acknowledgement is authoritative. Local receipt persistence
+        // must not reclassify an accepted replay as a server rejection.
+      }
+    }
   } finally {
     db.close()
   }
