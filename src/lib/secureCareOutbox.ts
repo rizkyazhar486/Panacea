@@ -66,23 +66,36 @@ function openDb(): Promise<IDBDatabase> {
   })
 }
 
-async function encryptionKey(db: IDBDatabase): Promise<CryptoKey> {
-  {
-    const tx = db.transaction(KEY_STORE, 'readonly')
-    const existing = await requestResult(tx.objectStore(KEY_STORE).get(KEY_ID))
-    await txDone(tx)
-    if (typeof CryptoKey !== 'undefined' && existing instanceof CryptoKey) return existing
-  }
+async function storedEncryptionKey(db: IDBDatabase): Promise<CryptoKey | null> {
+  const tx = db.transaction(KEY_STORE, 'readonly')
+  const existing = await requestResult(tx.objectStore(KEY_STORE).get(KEY_ID))
+  await txDone(tx)
+  return typeof CryptoKey !== 'undefined' && existing instanceof CryptoKey ? existing : null
+}
 
-  const key = await crypto.subtle.generateKey(
+async function encryptionKey(db: IDBDatabase): Promise<CryptoKey> {
+  const existing = await storedEncryptionKey(db)
+  if (existing) return existing
+
+  const candidate = await crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
     false, // non-extractable: the raw key is never persisted as app-readable text
     ['encrypt', 'decrypt'],
   )
-  const tx = db.transaction(KEY_STORE, 'readwrite')
-  tx.objectStore(KEY_STORE).put(key, KEY_ID)
-  await txDone(tx)
-  return key
+
+  try {
+    const tx = db.transaction(KEY_STORE, 'readwrite')
+    await requestResult(tx.objectStore(KEY_STORE).add(candidate, KEY_ID))
+    await txDone(tx)
+    return candidate
+  } catch (error) {
+    // First-use callers can race after both observe an empty key store. The
+    // insert-only add lets exactly one candidate win; losers must reuse that
+    // committed key rather than overwriting it and orphaning earlier ciphertext.
+    const winner = await storedEncryptionKey(db)
+    if (winner) return winner
+    throw error
+  }
 }
 
 function b64(bytes: Uint8Array): string {
@@ -237,7 +250,12 @@ async function removeEncryptedCareReport(item: ButirAntrean, acknowledged: boole
     const tx = db.transaction(QUEUE_STORE, 'readwrite')
     tx.objectStore(QUEUE_STORE).delete(slot)
     await txDone(tx)
-    if (acknowledged) await putReceipt(db, item.clientId)
+    if (acknowledged) {
+      try { await putReceipt(db, item.clientId) } catch {
+        // The server acknowledgement is authoritative. Local receipt persistence
+        // must not reclassify an accepted replay as a server rejection.
+      }
+    }
   } finally {
     db.close()
   }
@@ -263,11 +281,6 @@ export async function sendOrQueueEncryptedCareReport(
 ): Promise<HasilKirim> {
   try {
     await send(item)
-    if (secureCareOutboxSupported()) {
-      const db = await openDb()
-      try { await putReceipt(db, item.clientId) } finally { db.close() }
-    }
-    return { status: 'terkirim' }
   } catch (error) {
     if (!networkFailure(error)) return { status: 'ditolak', pesan: (error as Error).message }
     if (!secureCareOutboxSupported()) {
@@ -286,6 +299,18 @@ export async function sendOrQueueEncryptedCareReport(
       }
     }
   }
+
+  if (secureCareOutboxSupported()) {
+    try {
+      const db = await openDb()
+      try { await putReceipt(db, item.clientId) } finally { db.close() }
+    } catch {
+      // The server acknowledgement is authoritative. A local audit-receipt
+      // failure must never downgrade an already accepted clinical check-in.
+    }
+  }
+
+  return { status: 'terkirim' }
 }
 
 export async function drainEncryptedCareOutbox(send: Kirim): Promise<SecureDrainResult> {
