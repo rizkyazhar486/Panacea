@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import {
   prismDioptersFromDegrees,
   simulateOculomotor,
-} from '../../src/domains/body-exposure/index.ts'
+} from '../../src/domains/body-exposure/engine/oculomotorLesionEngine.ts'
 
 const normal = simulateOculomotor({
   pattern: { scope: 'lesion', key: 'normal' },
