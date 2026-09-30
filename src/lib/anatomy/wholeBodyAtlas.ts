@@ -118,10 +118,13 @@ const majorNodes: readonly AtlasNode[] = [
   node({ id: 'gi:esophagus', label: 'Esophagus', system: 'digestive', regions: ['neck', 'thorax'], laterality: 'midline', scale: 'organ', parentId: 'system:digestive', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Oesophagus'] }, synonyms: ['Oesophagus'], geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
   node({ id: 'gi:gallbladder', label: 'Gallbladder', system: 'digestive', regions: ['abdomen'], laterality: 'right', scale: 'organ', parentId: 'gi:liver', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Gallbladder', 'Body of gallbladder', 'Fundus of gallbladder', 'Neck of gallbladder', 'Bile duct'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
   node({ id: 'gi:salivary-glands', label: 'Major salivary glands', system: 'digestive', regions: ['head', 'neck'], laterality: 'paired', scale: 'organ', parentId: 'system:digestive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Parotid gland', 'Submandibular gland', 'Sublingual gland'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true, surgicalLandmark: true }),
-  // Sengaja 'partial': berkasnya memuat lidah, palatum molle, dan uvula, tetapi
-  // rongga mulut yang utuh juga menuntut gigi dan palatum durum, yang tidak ada
-  // di sini. Menyebutnya 'shipped' akan menjanjikan lebih daripada yang tampil.
-  node({ id: 'gi:oral-cavity', label: 'Oral cavity', system: 'digestive', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:digestive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Tongue', 'Soft palate', 'Uvula of palate'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
+  // The oral-cavity binding used to expose only tongue/soft-palate geometry even
+  // though the shipped skeletal/visceral index also contains gingiva, palatine
+  // bones and the permanent incisor/canine/premolar/molar groups. Bind those
+  // exact sources so the renderer can expose the available gross anatomy.
+  // Keep the node partial: source-backed constituents do not prove a complete
+  // oral cavity or hard-palate mucosal surface.
+  node({ id: 'gi:oral-cavity', label: 'Oral cavity', system: 'digestive', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:digestive', source: { mode: 'composite', files: ['visceral.glb', 'skeletal.glb'], nodeHints: ['Tongue', 'Soft palate', 'Uvula of palate', 'Gingiva', 'Palatine bone', 'Upper medial incisor', 'Upper lateral incisor', 'Upper canine', 'Upper first premolar', 'Upper second premolar', 'Upper first molar tooth', 'Upper second molar tooth', 'Lower medial incisor', 'Lower lateral incisor', 'Lower canine', 'Lower first premolar', 'Lower second premolar', 'Lower first molar tooth', 'Lower second molar tooth'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
 
   node({ id: 'urinary:urethra', label: 'Urethra', system: 'urinary', regions: ['pelvis'], laterality: 'midline', scale: 'organ', parentId: 'urinary:bladder', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Urethra'] }, geometryStatus: 'shipped', educationalPriority: 0.7, physiologyCapable: true }),
 
@@ -148,10 +151,12 @@ const majorNodes: readonly AtlasNode[] = [
 
   node({ id: 'repro:male-organs', label: 'Male reproductive organ set', system: 'reproductive', regions: ['pelvis'], laterality: 'midline', scale: 'organ', parentId: 'system:reproductive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Prostate', 'Ductus deferens', 'Epididymis', 'Corpus cavernosum of penis', 'Glans penis'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true, surgicalLandmark: true }),
 
-  // 'Partial': tulang pendengaran lengkap, tetapi koklea dan labirin sebagai
-  // organ tidak ada di berkas mana pun. Nukleus koklearis di bundel saraf
-  // adalah batang otak, bukan telinga, dan sengaja tidak dipakai di sini.
-  node({ id: 'sensory:ears', label: 'Auditory ossicles', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['Malleus', 'Incus', 'Stapes'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
+  // The shipped head index contains substantially more ear geometry than the
+  // former ossicle-only declaration: tympanic membranes, auditory tubes,
+  // cochleae and vestibules are all exact source meshes. Semicircular canals,
+  // utricle and saccule are not independently represented in the current index,
+  // so this remains partial rather than overstating vestibular completeness.
+  node({ id: 'sensory:ears', label: 'Auditory and vestibular structures', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['skeletal.glb', 'nervous.glb'], nodeHints: ['Malleus', 'Incus', 'Stapes', 'Tympanic membrane', 'Auditory tube', 'Cochlea', 'Vestibule'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
 
   // Mata: bola mata lengkap dengan isinya, ditambah aparatus lakrimal.
   //
