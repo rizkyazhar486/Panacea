@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   buildHumanObservabilityFrame,
   observabilityGapForMetric,
@@ -20,6 +21,8 @@ import {
   buildEmbodiedWorkflowLongitudinalEvent,
   scoreProtocolStep,
 } from '../../src/lib/embodiedWorkflowOS.ts'
+
+const embodiedWorkflowSource = readFileSync(new URL('../../src/lib/embodiedWorkflowOS.ts', import.meta.url), 'utf8')
 
 const subjectId = 'observability-subject-1'
 const consent = {
@@ -262,6 +265,11 @@ test('gap lookup requires signal identity when a metric has multiple blind spots
   )
 })
 
+
+test('embodied protocol label normalization is locale-independent', () => {
+  assert.match(embodiedWorkflowSource, /nonBlank\(value, 'label'\)\.toLowerCase\(\)/)
+  assert.doesNotMatch(embodiedWorkflowSource, /toLocaleLowerCase/)
+})
 
 test('embodied workflow OS converts authorized hand-object evidence into explicit protocol gaps', () => {
   const protocol = {
