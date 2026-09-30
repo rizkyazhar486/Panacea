@@ -24,6 +24,10 @@ export interface ButirLab {
   /** yyyy-mm-dd */
   tanggal: string
   nilai: number
+  /** Rentang rujukan yang TERCETAK di lembar hasil lab ini (opsional). Setiap
+   *  lab punya rentangnya sendiri; bila ada, ini yang dipakai, bukan rentang umum. */
+  rujukanBawah?: number
+  rujukanAtas?: number
 }
 
 export interface JenisLab {
@@ -82,6 +86,15 @@ export const JENIS_LAB: JenisLab[] = [
   { id: 'hb', nama: 'Hemoglobin', satuan: 'g/dL', bawah: 12, atas: 17, sumber: 'WHO: anaemia below 13 g/dL (men) or 12 g/dL (women)' },
   { id: 'crp', nama: 'hs-CRP', satuan: 'mg/L', atas: 3, sumber: 'AHA/CDC: <1 low risk, 1–3 moderate, >3 high (not during acute infection)' },
   { id: 'asamUrat', nama: 'Uric acid', satuan: 'mg/dL', atas: 7, sumber: 'Usual range; gout can occur at normal levels' },
+  // Enam penanda berikut melengkapi sembilan masukan PhenoAge (Levine 2018)
+  // bersama glukosa puasa, kreatinin dan hs-CRP di atas, sehingga usia
+  // biologis bisa dihitung dari riwayat lab yang sama, per tanggal ambil darah.
+  { id: 'albumin', nama: 'Albumin', satuan: 'g/dL', bawah: 3.5, atas: 5.0, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'mcv', nama: 'MCV', satuan: 'fL', bawah: 80, atas: 100, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'rdw', nama: 'RDW', satuan: '%', bawah: 11.5, atas: 14.5, sumber: 'Usual adult range (RDW-CV); varies by analyser' },
+  { id: 'alp', nama: 'Alkaline phosphatase', satuan: 'U/L', bawah: 44, atas: 147, sumber: 'Usual adult range; higher in adolescents and pregnancy' },
+  { id: 'wbc', nama: 'White blood cells', satuan: '10³/µL', bawah: 4.0, atas: 11.0, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'limfosit', nama: 'Lymphocytes', satuan: '%', bawah: 20, atas: 40, sumber: 'Usual adult differential; varies by laboratory' },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -103,15 +116,40 @@ export function ambilLab(): Simpanan {
   }
 }
 
-function simpan(s: Simpanan) {
-  try { localStorage.setItem(KUNCI, JSON.stringify(s)) } catch { /* kuota */ }
-  try { window.dispatchEvent(new Event('panacea:lab')) } catch { /* ignore */ }
+// Cap waktu perubahan lokal terakhir — dasar sinkronisasi "yang terakhir
+// menang" dengan server (lihat labSync.ts dan server/src/labLog.ts).
+export const KUNCI_DIPERBARUI = 'pmd_lab_diperbarui_v1'
+
+export function labDiperbaruiPada(): string | null {
+  try { return localStorage.getItem(KUNCI_DIPERBARUI) } catch { return null }
 }
 
-export function tambahLab(jenis: string, tanggal: string, nilai: number): void {
+function tulis(s: Simpanan, cap: string) {
+  try {
+    localStorage.setItem(KUNCI, JSON.stringify(s))
+    localStorage.setItem(KUNCI_DIPERBARUI, cap)
+  } catch { /* kuota */ }
+}
+
+function simpan(s: Simpanan) {
+  tulis(s, new Date().toISOString())
+  try { window.dispatchEvent(new CustomEvent('panacea:lab', { detail: { asal: 'lokal' } })) } catch { /* ignore */ }
+}
+
+/** Ganti seluruh log dengan salinan server; tidak dianggap perubahan lokal. */
+export function gantiDariServer(s: Simpanan, cap: string): void {
+  tulis(s, cap)
+  try { window.dispatchEvent(new CustomEvent('panacea:lab', { detail: { asal: 'server' } })) } catch { /* ignore */ }
+}
+
+export function tambahLab(jenis: string, tanggal: string, nilai: number, rujukan?: { bawah?: number; atas?: number }): void {
   const s = ambilLab()
   const daftar = s[jenis] ?? []
-  daftar.push({ id: `${jenis}-${Date.now()}`, tanggal, nilai })
+  daftar.push({
+    id: `${jenis}-${Date.now()}`, tanggal, nilai,
+    ...(rujukan?.bawah != null ? { rujukanBawah: rujukan.bawah } : {}),
+    ...(rujukan?.atas != null ? { rujukanAtas: rujukan.atas } : {}),
+  })
   daftar.sort((a, b) => a.tanggal.localeCompare(b.tanggal))
   // Seratus butir per jenis sudah lebih dari seumur hidup pemeriksaan tahunan.
   s[jenis] = daftar.slice(-100)
@@ -142,4 +180,55 @@ export function umurHari(butir: ButirLab[]): number | null {
   const t = Date.parse(butir[butir.length - 1].tanggal)
   if (Number.isNaN(t)) return null
   return Math.floor((Date.now() - t) / 864e5)
+}
+
+// ── Pemeriksaan masukan sebelum disimpan ──────────────────────────────────
+// Satu angka yang salah masuk ke riwayat merusak tiga hal sekaligus: garis
+// dasar pribadi, tren, dan PhenoAge — dan hasilnya tetap TAMPAK meyakinkan.
+// Kesalahan paling lazim bukan salah ketik digit, melainkan salah SATUAN
+// (glukosa 5,4 mmol/L diketik ke kolom mg/dL). Ambang "periksa satuan" di sini
+// diturunkan dari rentang rujukan yang sudah tercatat di JENIS_LAB (di bawah
+// sepersepuluh batas bawah atau di atas sepuluh kali batas atas); tidak ada
+// angka klinis baru yang ditambahkan. Ini penjaga masukan, bukan penilaian.
+export type HasilPeriksaLab =
+  | { ok: false; alasan: string }
+  | { ok: true; nilai: number; periksaSatuan: string | null }
+
+export const FAKTOR_CURIGA_SATUAN = 10
+
+export function periksaMasukanLab(jenis: JenisLab, teks: string, tanggal: string, hariIniISO: string): HasilPeriksaLab {
+  const bersih = teks.trim().replace(',', '.')
+  if (!bersih) return { ok: false, alasan: 'Enter the result value.' }
+  if (!/^\d+(\.\d+)?$/.test(bersih)) return { ok: false, alasan: 'Use a plain number, e.g. 5.4 — no units or symbols.' }
+  const nilai = Number(bersih)
+  if (!Number.isFinite(nilai) || nilai <= 0) return { ok: false, alasan: 'The value must be greater than zero.' }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || Number.isNaN(Date.parse(`${tanggal}T00:00:00Z`))) {
+    return { ok: false, alasan: 'Choose the date the blood was taken.' }
+  }
+  if (tanggal > hariIniISO) return { ok: false, alasan: 'The collection date cannot be in the future.' }
+  if (tanggal < '1900-01-01') return { ok: false, alasan: 'Check the collection date.' }
+
+  let periksaSatuan: string | null = null
+  if (typeof jenis.bawah === 'number' && nilai < jenis.bawah / FAKTOR_CURIGA_SATUAN) {
+    periksaSatuan = `${nilai} ${jenis.satuan} is far below the usual range (${jenis.bawah}–${jenis.atas ?? '…'}). Is your lab sheet in a different unit?`
+  } else if (typeof jenis.atas === 'number' && nilai > jenis.atas * FAKTOR_CURIGA_SATUAN) {
+    periksaSatuan = `${nilai} ${jenis.satuan} is far above the usual range (${jenis.bawah ?? '…'}–${jenis.atas}). Is your lab sheet in a different unit?`
+  }
+  return { ok: true, nilai, periksaSatuan }
+}
+
+/** Rentang rujukan lab (opsional) — kosong boleh; bila diisi harus angka > 0 dan bawah < atas. */
+export function periksaRujukanLab(bawahTeks: string, atasTeks: string): { ok: true; bawah?: number; atas?: number } | { ok: false; alasan: string } {
+  const baca = (t: string) => { const b = t.trim().replace(',', '.'); return b === '' ? undefined : /^\d+(\.\d+)?$/.test(b) ? Number(b) : NaN }
+  const bawah = baca(bawahTeks), atas = baca(atasTeks)
+  if (Number.isNaN(bawah) || Number.isNaN(atas)) return { ok: false, alasan: 'Reference range: use plain numbers as printed on your report.' }
+  if ((bawah !== undefined && bawah < 0) || (atas !== undefined && atas <= 0)) return { ok: false, alasan: 'Reference range must be positive.' }
+  if (bawah !== undefined && atas !== undefined && bawah >= atas) return { ok: false, alasan: 'Reference range: the low value must be below the high value.' }
+  return { ok: true, ...(bawah !== undefined ? { bawah } : {}), ...(atas !== undefined ? { atas } : {}) }
+}
+
+/** Rentang yang berlaku untuk satu butir: dari lembar lab bila ada, selain itu rentang umum. */
+export function rentangUntuk(b: ButirLab, j: JenisLab): { bawah?: number; atas?: number; dariLab: boolean } {
+  if (b.rujukanBawah != null || b.rujukanAtas != null) return { bawah: b.rujukanBawah, atas: b.rujukanAtas, dariLab: true }
+  return { bawah: j.bawah, atas: j.atas, dariLab: false }
 }

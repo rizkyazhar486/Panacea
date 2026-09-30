@@ -50,6 +50,23 @@ for (const coverage of bodySystemSourceCoverage()) {
   assert.ok(coverage.total > 0)
 }
 
+// The full-body source contract must keep the superficial envelope, the eye,
+// and male reproductive anatomy connected to the same compatible source body.
+// Missing female whole-body anatomy remains an explicit source gap rather than
+// being spatially guessed from the separate HRA female pelvis module.
+const integument = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'integumentary-surface')!
+assert.equal(integument.targets[0]?.file, 'surface.glb')
+assert.equal(integument.targets[0]?.allSourceNodes, true)
+
+const sensory = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'sensory-ent')!
+assert.ok(sensory.targets.some((target) => target.id === 'eye-globe' && target.file === 'nervous.glb'))
+assert.ok(sensory.targets.some((target) => target.id === 'ocular-motor' && target.file === 'muscular.glb'))
+
+const reproductive = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'reproductive')!
+for (const id of ['penis', 'erectile-tissue', 'testis', 'epididymis', 'deferent-duct', 'seminal-vesicle', 'prostate']) {
+  assert.ok(reproductive.targets.some((target) => target.id === id), `missing male reproductive source target: ${id}`)
+}
+
 const component = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(component, /muatAtlas/)
 assert.match(component, /namaAtlas/)
@@ -73,9 +90,14 @@ assert.match(trustedLoader, /MeshoptDecoder/)
 assert.match(trustedLoader, /GLTFLoader/)
 
 const bodyExposureOS = readFileSync(new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url), 'utf8')
-assert.match(bodyExposureOS, /BodyAllSystems3D/)
+const projector = readFileSync(new URL('../../src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', import.meta.url), 'utf8')
+assert.match(bodyExposureOS, /UnifiedHumanSimulationProjector/)
 assert.match(bodyExposureOS, /Explore 11 systems/)
-assert.match(bodyExposureOS, /11-system source atlas/)
-assert.match(bodyExposureOS, /Suspense/)
+assert.match(bodyExposureOS, /one simulation projector/)
+assert.match(projector, /BodyAllSystems3D/)
+assert.match(projector, /data-unified-human-simulation-projector="v1"/)
+assert.match(projector, /selectedSystemId=\{selectedSystemId\}/)
+assert.match(projector, /onSystemChange=\{onSystemChange\}/)
+assert.match(projector, /Suspense/)
 
-console.log('body-all-systems-source-wave: Body Exposure 11-system atlas is canonical-source-only and fail-closed')
+console.log('body-all-systems-source-wave: the 11-system canonical source atlas remains fail-closed inside the unified simulation projector')

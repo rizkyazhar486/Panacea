@@ -35,14 +35,22 @@ page.on('pageerror', (e) => galat.push(e.message))
 
 let gagal = null
 try {
-  await page.goto(url, { waitUntil: 'networkidle' })
-  await page.waitForSelector('header.kaca')
-  await page.waitForTimeout(1500)
+  // Jangan menunggu networkidle di sini. DailyQuoteBanner memang sengaja
+  // auto-hide setelah waktu baca (minimum 9 detik), sementara halaman ini
+  // memuat modul lazy/3D yang dapat membuat networkidle datang setelah banner
+  // sudah menghilang. Itu membuat gerbang gagal bukan karena overlap, tetapi
+  // karena observasinya dimulai terlalu terlambat. Tangkap kedua elemen segera
+  // setelah DOM siap, lalu uji stacking saat banner benar-benar masih tampil.
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('header.kaca', { state: 'visible' })
+  await page.waitForSelector('[data-daily-reminder]', { state: 'visible', timeout: 8_000 })
 
   // 1. Spanduk harian harus benar-benar TAMPIL -- kalau tidak, pemeriksaan ini
   //    lulus tanpa menguji apa pun, persis cara gerbang kehilangan artinya.
-  const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('div')]
-    .some((d) => /TODAY.S REMINDER/i.test(d.textContent || '') && getComputedStyle(d).position === 'fixed'))
+  //    Dikenali lewat penanda stabil, bukan teks labelnya: label "Today's
+  //    reminder" dihapus demi keringkasan dan gerbang ini ikut buta karenanya.
+  const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('[data-daily-reminder]')]
+    .some((d) => getComputedStyle(d).position === 'fixed' && (d.textContent || '').trim().length > 0))
   if (!adaSpanduk) throw new Error('spanduk harian tidak tampil, jadi tumpang-tindihnya tidak teruji sama sekali')
 
   // 2. Tidak boleh ada apa pun yang MENUTUPI bilah atas.
@@ -95,13 +103,32 @@ try {
   }
   if (tertutup.length) throw new Error(`tombol bilah atas tertutup: ${tertutup.join(' | ')}`)
 
+  // 4. Konteks lokasi harus terbaca utuh pada 390px. Category page tetap
+  // hadir sebagai level pertama; ponsel boleh memakai short label yang sama
+  // maknanya, tanpa membuat taxonomy baru atau membuang level konteks.
+  const hierarki = page.locator('header.kaca h1[data-navigation-hierarchy="v1"]').first()
+  await hierarki.waitFor({ state: 'visible' })
+  const infoHierarki = await hierarki.evaluate((node) => ({
+    text: (node.innerText || '').replace(/\s+/g, ' ').trim(),
+    scrollWidth: node.scrollWidth,
+    clientWidth: node.clientWidth,
+  }))
+  if (!/^Health\s*›\s*Move\s*›\s*Training$/i.test(infoHierarki.text)) {
+    throw new Error(`hierarki mobile salah: "${infoHierarki.text}"`)
+  }
+  if (infoHierarki.scrollWidth > infoHierarki.clientWidth + 1) {
+    throw new Error(
+      `hierarki mobile terpotong: ${infoHierarki.scrollWidth}px > ${infoHierarki.clientWidth}px`,
+    )
+  }
+
   const lebar = await page.evaluate(() => document.documentElement.scrollWidth)
   if (lebar > 390) throw new Error(`Halaman meluber mendatar: ${lebar}px`)
   if (galat.length) throw new Error(`Galat halaman: ${galat.join(' | ')}`)
 
   console.log(
     `Bilah atas lulus: spanduk harian tampil dan TIDAK menimpa bilah, ${nama.length} tombol navigasi ` +
-    'benar-benar teratas di titiknya, lebar halaman 390px, nol galat halaman.',
+    'benar-benar teratas di titiknya, hierarki Health › Move › Training terbaca utuh, lebar halaman 390px, nol galat halaman.',
   )
 } catch (e) {
   gagal = e

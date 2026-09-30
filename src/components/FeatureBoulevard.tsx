@@ -147,7 +147,7 @@ export function FeatureBoulevard({ zone = 'all', title = 'Feature Boulevard' }: 
 
   return (
     <section
-      className="relative isolate overflow-hidden rounded-[26px] border border-white/10 bg-[#020509]/95 p-3 text-white shadow-[0_24px_80px_rgba(0,0,0,.44)] backdrop-blur-2xl sm:rounded-[30px] sm:p-5"
+      className="dark relative isolate overflow-hidden rounded-[26px] border border-white/10 bg-[#020509]/95 p-3 text-white shadow-[0_24px_80px_rgba(0,0,0,.44)] backdrop-blur-2xl sm:rounded-[30px] sm:p-5"
       aria-label={title}
     >
       <div className="pointer-events-none absolute -right-20 -top-24 h-60 w-60 rounded-full bg-emerald-400/[.10] blur-3xl" aria-hidden />

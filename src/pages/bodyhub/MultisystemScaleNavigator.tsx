@@ -101,8 +101,8 @@ export default function MultisystemScaleNavigator() {
       <div className="mt-3 rounded-2xl border border-sky-200 bg-sky-50/70 p-3 dark:border-sky-300/20 dark:bg-sky-300/[.06]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Current organ benchmark</div>
-            <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">Eye 4D Gold Standard</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Organ deep dive</div>
+            <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">Eye / orbit detail</div>
             <p className="mt-1 max-w-2xl text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">Open the ocular atlas directly inside Body Exposure to inspect the globe, optical media, retina, visual pathway, orbit, extraocular muscles, lacrimal system and source-backed neurovascular reference coverage without leaving the whole-body learning flow.</p>
           </div>
           <button
@@ -111,7 +111,7 @@ export default function MultisystemScaleNavigator() {
             onClick={() => setEyeOpen((value) => !value)}
             className="min-h-11 shrink-0 rounded-xl border border-sky-300 bg-white px-4 text-[10px] font-black text-sky-800 shadow-sm transition hover:bg-sky-100 dark:border-sky-300/30 dark:bg-white/5 dark:text-sky-200 dark:hover:bg-white/10"
           >
-            {eyeOpen ? 'Close Eye 4D' : 'Open Eye 4D'}
+            {eyeOpen ? 'Close eye detail' : 'Open eye detail'}
           </button>
         </div>
       </div>

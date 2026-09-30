@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { ForYouOmniFeed } from '../components/ForYouOmniFeed'
 import { useStore } from '../lib/store'
 import {
   IconBook,
   IconChat,
   IconEMR,
-  IconHeart,
-  IconMoon,
   IconPlan,
   IconSettings,
-  IconSparkle,
-  IconStore,
   IconUser,
   IconUsers,
-  IconWallet,
 } from '../components/icons'
 
 type Destination = {
@@ -22,15 +18,6 @@ type Destination = {
   to: string
   icon: typeof IconUsers
 }
-
-const LIFE: Destination[] = [
-  { label: 'Social', to: '/?t=social', icon: IconUsers },
-  { label: 'Community', to: '/?t=community', icon: IconHeart },
-  { label: 'Clubs', to: '/?t=clubs', icon: IconSparkle },
-  { label: 'Faith', to: '/?t=religion', icon: IconMoon },
-  { label: 'Finance', to: '/?t=finance', icon: IconWallet },
-  { label: 'Markets', to: '/?t=markets', icon: IconStore },
-]
 
 const INTELLIGENCE: Destination[] = [
   { label: 'Ask Panacea', to: '/chatbot', icon: IconChat },
@@ -73,7 +60,7 @@ function DestinationRail({ label, items }: { label: string; items: Destination[]
 export function ForYouHub() {
   const { account } = useStore()
   const name = account?.name?.trim().split(/\s+/)[0] || 'You'
-  const [score, setScore] = useState(72)
+  const [score, setScore] = useState<number | null>(null)
   const [budget, setBudget] = useState('')
   const [motivation, setMotivation] = useState(0)
   const [prompt, setPrompt] = useState('')
@@ -81,13 +68,14 @@ export function ForYouHub() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const stored = Number(window.localStorage.getItem('pm_for_you_score'))
+    const rawScore = window.localStorage.getItem('pm_for_you_score')
+    const stored = rawScore == null ? Number.NaN : Number(rawScore)
     if (Number.isFinite(stored) && stored >= 0 && stored <= 100) setScore(stored)
     setBudget(window.localStorage.getItem('pm_for_you_budget_note') ?? '')
   }, [])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || score == null) return
     window.localStorage.setItem('pm_for_you_score', String(score))
   }, [score])
 
@@ -141,17 +129,19 @@ export function ForYouHub() {
         </div>
       </section>
 
-      <DestinationRail label="Life" items={LIFE} />
+      <ForYouOmniFeed />
+
       <DestinationRail label="Intelligence" items={INTELLIGENCE} />
 
       <section aria-label="Personal tools" className="border-t border-white/10">
         <details className="group border-b border-white/10">
           <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-xs font-black">
-            <span>Daily score</span>
-            <span className="text-2xl tabular-nums">{score}</span>
+            <span>Daily check-in</span>
+            <span className="text-2xl tabular-nums">{score == null ? '—' : score}</span>
           </summary>
           <div className="pb-5">
-            <input type="range" min="0" max="100" value={score} onChange={(event) => setScore(Number(event.target.value))} className="w-full accent-emerald-300" aria-label="Daily score" />
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[.12em] text-white/32">Self-rated · 0–100</div>
+            <input type="range" min="0" max="100" value={score ?? 50} onChange={(event) => setScore(Number(event.target.value))} className="w-full accent-emerald-300" aria-label="Self-rated daily check-in" />
           </div>
         </details>
 

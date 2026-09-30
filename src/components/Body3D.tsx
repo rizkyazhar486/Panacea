@@ -17,6 +17,8 @@ import {
   publishAnatomySourceSelection,
 } from '../lib/anatomySourceNodeRegistry'
 import { createBodyAtlasRuntimeRootLifecycle } from '../lib/bodyAtlasRuntimeRootLifecycle'
+import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -380,29 +382,35 @@ export function Body3D({
     controlsRef.current = controls
     hasFitRef.current = false
 
-    let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
 
-    // Tidak ada loop 60-fps saat tubuh diam. OrbitControls tanpa damping
-    // mengirim event "change" saat drag/zoom; perubahan React lain memanggil
-    // requestRenderRef. Ini mempertahankan detail tinggi tanpa membakar GPU
-    // hanya untuk menggambar frame identik berulang kali.
-    function requestRender() {
-      if (raf !== 0 || !inViewport || !documentVisible) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        if (!inViewport || !documentVisible) return
+    // Body3D shares the same demand-render lifecycle as the rest of the Body
+    // runtime. The scheduler coalesces bursty invalidations into one frame and
+    // never owns a permanent RAF loop.
+    let contextLifecycle!: ReturnType<typeof createBodyWebglContextLifecycle>
+    const renderScheduler = createBodyRenderScheduler({
+      canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
+      renderFrame: () => {
         controls.update()
         renderer.render(scene, camera)
-      })
-    }
+      },
+      requestFrame: (callback) => requestAnimationFrame(callback),
+      cancelFrame: (frameId) => cancelAnimationFrame(frameId),
+    })
+    contextLifecycle = createBodyWebglContextLifecycle({
+      onLost: () => {
+        renderScheduler.stop()
+        setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
+      },
+      onRestored: () => {
+        setFatal('')
+        renderScheduler.request()
+      },
+    })
 
-    function stopRendering() {
-      if (raf === 0) return
-      cancelAnimationFrame(raf)
-      raf = 0
-    }
+    const requestRender = () => renderScheduler.request()
+    const stopRendering = () => renderScheduler.stop()
 
     requestRenderRef.current = requestRender
     controls.addEventListener('change', requestRender)
@@ -459,15 +467,8 @@ export function Body3D({
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    const onContextLost = (e: Event) => {
-      e.preventDefault()
-      stopRendering()
-      setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
-    }
-    const onContextRestored = () => {
-      setFatal('')
-      requestRender()
-    }
+    const onContextLost = (e: Event) => contextLifecycle.handleLost(e)
+    const onContextRestored = () => contextLifecycle.handleRestored()
     renderer.domElement.addEventListener('webglcontextlost', onContextLost)
     renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
@@ -492,7 +493,8 @@ export function Body3D({
 
     return () => {
       requestRenderRef.current = () => undefined
-      stopRendering()
+      renderScheduler.dispose()
+      contextLifecycle.dispose()
       controls.removeEventListener('change', requestRender)
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)

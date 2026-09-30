@@ -1,26 +1,32 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { IconHeart, IconSparkle, IconStethoscope } from './icons'
+import {
+  IconActivity,
+  IconBook,
+  IconEMR,
+  IconHeart,
+  IconSparkle,
+  IconStethoscope,
+  IconUser,
+} from './icons'
 import { SUPER_PAGES, type SuperPageId } from '../lib/superPages'
 
 const ICONS = {
-  body: IconHeart,
+  human: IconActivity,
+  health: IconHeart,
   clinical: IconStethoscope,
-  'for-you': IconSparkle,
+  explore: IconBook,
+  simulate: IconSparkle,
+  records: IconEMR,
+  'for-you': IconUser,
 } satisfies Record<SuperPageId, typeof IconHeart>
-
-const GLYPHS: Record<SuperPageId, string> = {
-  body: '01',
-  clinical: '02',
-  'for-you': '03',
-}
 
 export function SuperPageLauncher() {
   return (
-    <section className="pmd-superpage-launcher pmd-scroll-section" aria-label="Panacea super pages">
+    <section className="pmd-superpage-launcher pmd-scroll-section" aria-label="Panacea category pages">
       <div className="pmd-section-heading">
-        <span className="pmd-section-kicker">Three spaces</span>
-        <strong className="pmd-one-line">Everything in Panacea, without the maze</strong>
+        <span className="pmd-section-kicker">Seven categories</span>
+        <strong className="pmd-one-line">One human state, seven connected lenses</strong>
       </div>
 
       <div className="pmd-superpage-grid">
@@ -32,19 +38,19 @@ export function SuperPageLauncher() {
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: .35 }}
-              transition={{ duration: .36, delay: index * .055, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4, scale: 1.012 }}
+              transition={{ duration: .36, delay: index * .045, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -3, scale: 1.008 }}
               whileTap={{ scale: .985 }}
             >
               <Link
                 to={space.to}
                 className="pmd-liquid-metal pmd-superpage-tile"
                 data-superpage={space.id}
+                data-human-state-source={space.stateSource}
                 aria-label={'Open ' + space.label}
               >
                 <span className="pmd-liquid-metal-icon" aria-hidden>
-                  <Icon size={28} />
-                  <i>{GLYPHS[space.id]}</i>
+                  <Icon size={22} />
                 </span>
                 <span className="pmd-superpage-copy">
                   <strong className="pmd-one-line">{space.label}</strong>

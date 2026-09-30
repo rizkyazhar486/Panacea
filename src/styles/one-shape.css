@@ -1,0 +1,21 @@
+/* One Shape: satu permukaan aktif yang bergerak di belakang pilihan. */
+[data-one-shape] { position: relative; isolation: isolate; }
+.pmd-one-shape {
+  position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none;
+  opacity: 0; will-change: transform, width, height;
+  transform-origin: center;
+}
+.pmd-one-shape--light { background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.28); }
+.pmd-one-shape--green { background: #00BF63; box-shadow: 0 6px 20px rgba(0,191,99,.28); }
+[data-one-shape] > :not(.pmd-one-shape) { position: relative; z-index: 1; }
+/* Anak aktif menyerahkan latarnya pada bentuk bersama. Spesifisitasnya sengaja
+   melampaui lapisan tombol global v46 (`html.pmd-liquid-actions-v45 :where(…)`). */
+html [data-one-shape="aria"] :is([aria-selected="true"],[aria-current="page"]),
+html [data-one-shape] [data-one-shape-active="true"] {
+  background: transparent !important; background-image: none !important;
+  box-shadow: none !important; border-color: transparent !important;
+  color: #000 !important; transition: color .18s ease;
+}
+html [data-one-shape="aria"] :is([aria-selected="true"],[aria-current="page"]) :is(span, small, strong),
+html [data-one-shape] [data-one-shape-active="true"] :is(span, small, strong) { color: inherit !important; }
+@media (prefers-reduced-motion: reduce) { .pmd-one-shape { transition: none; } }

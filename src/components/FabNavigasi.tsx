@@ -69,10 +69,27 @@ function reducedMotion() {
  * long-press, swipe, double tap, atau single tap. Ambang gesture berasal dari
  * kernel murni di `lib/interaction/gesture`, bukan angka lokal yang berbeda.
  */
-export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
+export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
+  tujuan: TujuanFab[]
+  onTambah?: () => void
+  onCari?: () => void
+  onKembali?: () => void
+  /**
+   * Ikut menyingkir bersama bilah perintah.
+   *
+   * Yang diminta adalah layar yang benar-benar bersih saat sedang dibaca:
+   * bilah atas DAN tombol melayang sama-sama pergi, lalu keduanya kembali
+   * bersama saat digulir ke atas atau tepi atas diketuk. Menyembunyikan
+   * bilahnya saja menyisakan satu benda mengambang di atas isi halaman, dan
+   * itu justru yang paling menarik perhatian.
+   */
+  tersembunyi?: boolean
+}) {
   const lokasi = useLocation()
   const navigasi = useNavigate()
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
+  const sembunyikanDiBodyExposure = lokasi.pathname === '/fitness-hub'
+    && new URLSearchParams(lokasi.search).get('view') === 'body-exposure'
 
   const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
   const [pos, setPos] = useState<AssistivePosition>(() => {
@@ -85,6 +102,7 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
   const [aturBuka, setAturBuka] = useState(false)
   const [redup, setRedup] = useState(false)
   const [halaman, setHalaman] = useState(0)
+  const menyingkir = tersembunyi && !buka && !menggeser
 
   const orbRef = useRef<HTMLButtonElement>(null)
   const railRef = useRef<SlidableRailHandle>(null)
@@ -112,14 +130,17 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
     setBuka(false)
     vibrate()
     if (action.jenis === 'rute' && action.ke) navigasi(action.ke)
-    else if (action.jenis === 'kembali') navigasi(-1)
+    else if (action.jenis === 'kembali') {
+      if (onKembali) onKembali()
+      else navigasi(-1)
+    }
     else if (action.jenis === 'atas') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
     else if (action.jenis === 'tema') toggleTheme()
     else if (action.jenis === 'cari') {
       if (onCari) onCari()
       else window.dispatchEvent(new Event('panacea:cari'))
     }
-  }, [navigasi, onCari, vibrate])
+  }, [navigasi, onCari, onKembali, vibrate])
 
   const jalankanPemetaan = useCallback((id: string) => {
     if (id === 'menu') {
@@ -333,6 +354,7 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
   const keKiri = pos.x > window.innerWidth / 2
 
   if (sembunyikanDiBodyExplorer) return null
+  if (sembunyikanDiBodyExposure) return null
 
   return (
     <>
@@ -418,8 +440,12 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
             touchAction: 'none',
             cursor: menggeser ? 'grabbing' : 'grab',
             transition: menggeser || reducedMotion() ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1), opacity 0.35s ease',
-            transform: buka ? 'scale(1.06)' : 'none',
-            opacity: redup && !buka && !menggeser ? prefs.idleOpacity : 1,
+            // Menyingkir hanya saat memang sedang tidak dipakai: menu yang
+            // terbuka dan orb yang sedang digeser TIDAK boleh hilang di tengah
+            // gerakan jari — itu membatalkan aksi yang sedang berlangsung.
+            transform: buka ? 'scale(1.06)' : menyingkir ? 'scale(0.82)' : 'none',
+            opacity: menyingkir ? 0 : redup && !buka && !menggeser ? prefs.idleOpacity : 1,
+            pointerEvents: menyingkir ? 'none' : undefined,
           }}
         >
           <LogoMark size={Math.max(28, Math.round(prefs.size * 0.52))} />

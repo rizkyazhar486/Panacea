@@ -49,6 +49,7 @@ assert.equal(clinical.events[0].provenance.sourceKind, 'clinical-system')
 assert.equal(clinical.events[0].provenance.sourceId, 'panaceamed:clinical-vitals')
 assert.ok(clinical.events.every((event) => event.id.includes('vital-1')))
 assert.ok(clinical.events.every((event) => event.review.state === 'not-required'))
+assert.ok(clinical.events.every((event) => event.tags?.includes('evidence-class:clinical-record')))
 
 const self = selfVitalToLongitudinalEvents('self-42', {
   id: 'self-vital-1',
@@ -63,6 +64,7 @@ assert.equal(self.events.length, 5)
 assert.ok(self.events.every((event) => event.provenance.sourceKind === 'manual'))
 assert.ok(self.events.every((event) => event.provenance.sourceId === 'panaceamed:self-vitals'))
 assert.ok(self.events.every((event) => event.tags?.includes('record:self-vital-1')))
+assert.ok(self.events.every((event) => event.tags?.includes('evidence-class:manual-self-report')))
 
 const vo2 = vo2MaxToLongitudinalEvent('self-42', {
   id: 'vo2-1',
@@ -105,6 +107,18 @@ assert.ok(device.events.every((event) => event.recordedAt === '2026-09-17T01:15:
 assert.ok(device.events.every((event) => event.provenance.receivedAt === '2026-09-17T01:16:00.000Z'))
 assert.ok(device.events.every((event) => event.provenance.sourceId === 'health-vitals:Apple Watch'))
 assert.ok(device.events.every((event) => event.provenance.sourceKind === 'device'))
+assert.ok(device.events.every((event) => event.tags?.includes('evidence-class:consumer-wellness')),
+  'consumer wearable snapshot must not silently become clinical-grade')
+assert.ok(device.events.every((event) => event.provenance.method === 'health-vitals-snapshot:consumer-wellness'))
+
+const explicitlyClinical = currentDeviceVitalsToLongitudinalEvents('patient-clinical', {
+  heartRate: 72,
+  source: 'Authorized bedside adapter',
+  measuredAt: '2026-09-17T01:20:00.000Z',
+}, { ...context, deviceSnapshotEvidenceClass: 'clinical-record' })
+assert.equal(explicitlyClinical.events[0].provenance.sourceKind, 'device')
+assert.ok(explicitlyClinical.events[0].tags?.includes('evidence-class:clinical-record'))
+assert.equal(explicitlyClinical.events[0].provenance.method, 'health-vitals-snapshot:clinical-record')
 
 const noChronology = currentDeviceVitalsToLongitudinalEvents('self-42', {
   heartRate: 61,

@@ -19,6 +19,11 @@ import { readFileSync } from 'node:fs'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const css = readFileSync(new URL('../../public/panacea-visual-first-v43.css', import.meta.url), 'utf8')
+// Komentar dibuang: pemeriksaan di bawah membaca SELEKTOR, dan prosa yang
+// menjelaskan sebuah larangan pernah tertangkap sebagai pelanggarannya.
+const cssKode = css.replace(/\/\*[\s\S]*?\*\//g, '')
+/** Setiap blok aturan sebagai pasangan [selektor, isi]. */
+const aturan = [...cssKode.matchAll(/([^{}]+)\{([^}]*)\}/g)].map((m) => [m[1].trim(), m[2]] as const)
 
 /** Blok aturan yang selektornya memuat `sepotong`. */
 function blok(sepotong: string): string {
@@ -48,11 +53,26 @@ assert.ok(/main :where\(\[class\*='grid'\], \[class\*='flex'\]\) > \* \{[^}]*min
   'inside a card still stretches its whole column past the viewport.')
 
 // ── 3. Permukaan detail harus benar-benar lepas dari pemotongan ──────────
-const lepas = blok("data-pmd-unclamped='true'")
-// Keduanya disebut terpisah dengan sengaja: `line-clamp` saja juga cocok
-// dengan `-webkit-line-clamp`, jadi menghapus salah satunya akan lolos.
-for (const p of ['white-space:\\s*normal', 'display:\\s*revert', '-webkit-line-clamp:\\s*none', '\\n\\s*line-clamp:\\s*none']) {
-  assert.ok(new RegExp(p).test(lepas),
+//
+// Pelepasannya kini dua aturan, dan pemisahan itu bukan gaya penulisan.
+// `white-space` dan `text-overflow` boleh berlaku luas sampai span dan div;
+// `display` tidak boleh, dan blok kedua di bawah menjaganya.
+const lepasTeks = blok("data-pmd-unclamped='true'")
+// Aturan yang benar-benar melepas pemotongan dicari menurut ISINYA, bukan
+// menurut teks selektor yang persis. Versi pertama mencocokkan selektor kata
+// demi kata, jadi begitu selektornya berubah pemeriksa ini patah lebih dulu —
+// dan sabotase yang seharusnya ditangkap penjaga span/div justru gagal dengan
+// pesan yang salah.
+const aturanRevert = aturan.filter(([, isi]) => /display:\s*revert/.test(isi))
+assert.ok(aturanRevert.length > 0,
+  'nothing resets display any more, so dialogs and detail surfaces stay clamped at three lines')
+const isiRevert = aturanRevert.map(([, isi]) => isi).join('\n')
+for (const [p, teks] of [
+  ['white-space:\\s*normal', lepasTeks],
+  ['-webkit-line-clamp:\\s*none', isiRevert],
+  ['\\n\\s*line-clamp:\\s*none', isiRevert],
+] as const) {
+  assert.ok(new RegExp(p).test(teks),
     `the opt-out for dialogs and detail surfaces no longer resets ${p.replace(/\\[ns]|\\s\*/g, '').split(':')[0]}, ` +
     'so those surfaces stay clipped')
 }
@@ -64,5 +84,27 @@ assert.ok(/white-space:\s*nowrap/.test(judul),
 assert.ok(/min-width:\s*0/.test(judul),
   'headings and controls can stretch their own column again: without min-width:0 their nowrap text sets the ' +
   "column's minimum width")
+
+
+// ── 6. `display: revert` TIDAK BOLEH menyentuh span atau div ─────────────
+//
+// Ini bukan kerapian, ini cacat yang pernah hidup di produksi. Aturan pertama
+// menyertakan `span,div` bersama prosa, dan `display: revert` mengembalikan
+// sebuah div ke `block` bawaan peramban — sehingga setiap `display:flex` dan
+// `display:grid` milik kelas Tailwind di dalam permukaan yang memilih keluar
+// ikut hilang.
+//
+// Terukur di 390x844 pada /body-explorer: baris 40 tab yang seharusnya satu
+// jalur bergulir mendatar berubah menjadi `display:block` dengan anak
+// `inline-block`, membungkus menjadi 18 baris setinggi 800 piksel pada layar
+// setinggi 844 piksel. Halamannya tidak rusak menurut TypeScript, tidak rusak
+// menurut gerbang mana pun, dan tetap tampak "hanya panjang".
+for (const [selektor] of aturanRevert) {
+  assert.ok(!/\bspan\b|\bdiv\b/.test(selektor),
+    'display: revert is applied to span or div again. That resets a div to the browser default `block`, so every ' +
+    'Tailwind flex/grid layout inside an opted-out surface collapses — the Body Explorer tab rail became an ' +
+    '800px wall of 18 rows the last time this shipped. Only p/li/dd/figcaption/.pmd-vf-copy are ever clamped, ' +
+    `so only they need reverting. Offending selector: ${selektor.trim().slice(0, 90)}`)
+}
 
 console.log('prosa-tak-dipaksa-satu-baris: ok (prose wraps and clamps; grid/flex children may shrink)')

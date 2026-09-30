@@ -128,6 +128,25 @@ export function UbinSkor() {
           if (ada) return ada
           try {
             const r = await api.getSportsScores(liga, rentang(hariKeDepan))
+            /* SUMBERNYA MENJAWAB 200 SEKALIPUN GAGAL.
+               /api/sports/scores selalu `res.json(...)`, dan saat hulu tidak
+               terjawab bentuknya `{events: [], error: 'upstream_403'}` —
+               tetap HTTP 200. Jadi `catch` di bawah TIDAK PERNAH berjalan
+               untuk kegagalan yang paling sering terjadi, dan daftar kosong
+               itu mengalir ke layar sebagai "no fixtures".
+               Inilah sebabnya tiga belas tim sekaligus — Barcelona, Arsenal,
+               Liverpool, PSG, Inter — dilaporkan tidak punya satu pun laga
+               dalam 30 hari: bukan karena mereka libur, melainkan karena
+               tidak satu pun pertanyaan terjawab. */
+            if (r.error) {
+              gagal.add(liga)
+              singgah.set(kunci, [])
+              return []
+            }
+            // Liga yang gagal pada jendela 14 hari lalu TERJAWAB pada 30 hari
+            // tidak boleh tetap dicap gagal: itu keliru ke arah sebaliknya,
+            // menyebut sumbernya rusak padahal ia menjawab "memang kosong".
+            gagal.delete(liga)
             const ev = ((r.events ?? []) as Laga[]).filter((e) => e && e.id)
             singgah.set(kunci, ev)
             return ev
@@ -259,8 +278,17 @@ export function UbinSkor() {
           </Link>
         ) : laga.length === 0 ? (
           <div className="flex flex-col gap-1.5">
+            {/* Kalimat pembukanya HARUS mengikuti sebab yang sebenarnya.
+                "Tidak ada laga dalam 30 hari" adalah klaim tentang jadwal;
+                ia hanya boleh diucapkan bila sumbernya benar-benar menjawab.
+                Ketika yang terjadi adalah sumbernya tidak terjawab, kalimat
+                itu berubah dari keterangan menjadi kekeliruan. */}
             <p className="t-kecil text-neutral-500">
-              None of your teams have a match in the next 30 days according to the scores source.
+              {kosongTim.length > 0 && kosongTim.every((t) => t.sebab === 'gagal')
+                ? 'The scores source could not be reached, so no fixture could be checked. This is not the same as your teams having no match.'
+                : kosongTim.some((t) => t.sebab === 'gagal')
+                  ? 'Some leagues could not be reached. The teams below are listed with what actually happened for each.'
+                  : 'None of your teams have a match in the next 30 days according to the scores source.'}
             </p>
             {kosongTim.map((t) => (
               <p key={t.nama} className="t-mikro text-neutral-400">

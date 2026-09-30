@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const os = readFileSync(resolve('src/pages/BodyExposureOS.tsx'), 'utf8')
+const projector = readFileSync(resolve('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx'), 'utf8')
 const explorerPage = readFileSync(resolve('src/pages/BodyExplorer.tsx'), 'utf8')
 const routes = readFileSync(resolve('src/main.tsx'), 'utf8')
 const body3d = readFileSync(resolve('src/components/BodyAllSystems3D.tsx'), 'utf8')
@@ -36,24 +37,57 @@ assert.match(os, /html\.classList\.remove\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body E
 assert.match(os, /if \(restoreLiquidActions\) html\.classList\.add\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must restore the global control layer when the workspace unmounts')
 assert.match(grading, /html\.pmd-liquid-actions-v45/, 'guard assumption changed: review the Body Exposure isolation boundary before removing it')
 
-const atlas3d = os.indexOf('<BodyAllSystems3D')
-const bridge = os.indexOf('<AtlasPhysiologyBridgePanel')
-const deepDive = os.indexOf('<BodySystemDeepDiveWorkspace')
-const pathophysiology = os.indexOf('<PathophysiologyNetworkPanel')
-const pharmacology = os.indexOf('<PharmacologyMechanismPanel')
+const projectorMount = os.indexOf('<UnifiedHumanSimulationProjector')
 const explorer = os.indexOf('<BodyExplorer')
-assert.ok(atlas3d >= 0 && bridge > atlas3d && deepDive > bridge && pathophysiology > deepDive && pharmacology > pathophysiology && explorer > pharmacology,
-  'Body Exposure learning flow must remain 3D anatomy → physiology → organ deep dive → pathophysiology → pharmacology → full explorer')
+assert.ok(projectorMount >= 0 && explorer > projectorMount,
+  'the unified simulation projector must remain the primary Body Exposure experience before the full legacy explorer')
 
-assert.match(os, /<BodyAllSystems3D selectedSystemId=\{selectedBodySystemId\} onSystemChange=\{setSelectedBodySystemId\}/,
-  '3D anatomy atlas must use the same selected-system source of truth as the downstream workbenches')
+const domainTokens = [
+  "id: 'anatomy'",
+  "id: 'physiology'",
+  "id: 'pathophysiology'",
+  "id: 'biomechanics'",
+  "id: 'cell'",
+  "id: 'genome'",
+  "id: 'surgery'",
+  "id: 'pharmacology'",
+]
+const domainPositions = domainTokens.map((token) => projector.indexOf(token))
+assert.ok(domainPositions.every((position) => position >= 0), 'every unified simulation domain must remain declared')
+for (let index = 1; index < domainPositions.length; index += 1) {
+  assert.ok(domainPositions[index] > domainPositions[index - 1],
+    'the unified domain ladder must remain anatomy → physiology → pathophysiology → biomechanics → cell → genome → surgery → pharmacology')
+}
+
+for (const requiredEngine of [
+  'BodyAllSystems3D',
+  'AtlasPhysiologyBridgePanel',
+  'BodySystemDeepDiveWorkspace',
+  'PathophysiologyNetworkPanel',
+  'BiomechanicsMotionLab',
+  'CellLab',
+  'AlphaGenomeAtlas',
+  'SurgicalLab',
+  'PharmacologyMechanismPanel',
+]) {
+  assert.match(projector, new RegExp(requiredEngine), `${requiredEngine} must remain integrated in the unified projector`)
+}
+
+assert.match(os, /selectedSystemId=\{selectedBodySystemId\}/,
+  'Body Exposure must pass the shared selected-system state into the unified projector')
+assert.match(os, /onSystemChange=\{setSelectedBodySystemId\}/,
+  'Body Exposure must receive source-atlas system changes through controlled React state')
+assert.match(projector, /selectedAtlasSystemId=\{selectedSystemId\}/,
+  'the selected system must keep driving physiology, deep-dive, pathology and pharmacology projections')
+assert.match(projector, /<BodyAllSystems3D[\s\S]*selectedSystemId=\{selectedSystemId\}[\s\S]*onSystemChange=\{onSystemChange\}/,
+  'the 3D source atlas must use the same selected-system source of truth as the simulation projections')
 assert.match(body3d, /const systemId = selectedSystemId \?\? internalSystemId/,
   '3D atlas must support a controlled system id while preserving standalone fallback behavior')
 assert.match(body3d, /onSystemChange\?\.\(nextSystemId\)/,
   '3D atlas selection must propagate directly instead of relying on DOM text capture')
 assert.doesNotMatch(os, /resolveBodySystemIdFromAtlasLabel|captureSystemAtlasSelection/,
   'Body Exposure must not synchronize anatomy state by scraping button labels from the DOM')
-assert.match(os, /selectedAtlasSystemId=\{selectedBodySystemId\}/, 'selected system must keep driving downstream Body workbenches')
-assert.match(os, /onSystemChange=\{setSelectedBodySystemId\}/, 'atlas/physiology bridge must remain synchronized with the shared system state')
+assert.match(projector, /Generic atlas geometry and synthetic models are not patient-specific anatomy/,
+  'the unified projector must preserve an explicit reference/simulation clinical boundary')
 
-console.log('body exposure foundation boundary: global UI mutation is isolated across OS and standalone Explorer, and the end-to-end body-system state stays synchronized')
+console.log('body exposure foundation boundary: global UI isolation is preserved and one controlled system state now drives the unified multi-scale simulation projector')

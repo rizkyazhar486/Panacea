@@ -2,11 +2,20 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
+import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
+import { LabPasienUntukDokter } from '../components/LabPasienUntukDokter'
+import { StudiValidasiKlinis } from '../components/StudiValidasiKlinis'
+import { useStore } from '../lib/store'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { SurfaceGuide } from '../components/SurfaceGuide'
+import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
 
 export const GROUPS = [
   {
     name: 'Clinical',
     tools: [
+      { to: '/visit-os', name: 'Visit OS', kw: 'doctor visit camera medical device realtime ai emr' },
       { to: '/body-explorer', name: 'Body Explorer', kw: 'anatomy physiology imaging atlas' },
       { to: '/frontier-health', name: 'Discovery & Innovation', kw: 'research discovery invention simulation' },
       { to: '/genome-lab', name: 'Genome Databank', kw: 'gene genome dna variant genetics' },
@@ -23,35 +32,56 @@ export const GROUPS = [
 type Calculator = 'bmi' | 'map'
 
 const PRIMARY_ACTIONS = [
+  { to: '/visit-os', label: 'Visit OS' },
   { to: '/emr', label: 'AI-EMR' },
   { to: '/emergency', label: 'Emergency' },
   { to: '/care-episode', label: 'Care' },
   { to: '/body-explorer', label: 'Body Explorer' },
 ] as const
 
+const CLINICAL_DEPTH_ROUTES = {
+  overview: '/clinical-hub',
+  condition: '/learn',
+  mechanism: '/body-explorer',
+  assessment: '/clinical-calculators',
+  management: '/rujukan?t=empiris',
+  coding: '/emr',
+  evidence: '/evidence',
+} as const
+
 const REFERENCE_LINKS = [
-  { to: '/body-explorer', label: 'Anatomy' },
+  { to: '/learn', label: 'Diseases' },
+  { to: '/clinical-calculators', label: 'Calculators' },
   { to: '/radiology', label: 'Imaging' },
-  { to: '/rujukan?t=obat', label: 'Drugs' },
-  { to: '/genome-lab', label: 'Genome' },
+  { to: '/rujukan?t=obat', label: 'Doses & Drugs' },
+  { to: '/rujukan?t=empiris', label: 'Management' },
+  { to: '/emr', label: 'ICD-10 ↔ 11' },
   { to: '/evidence', label: 'Evidence' },
   { to: '/med-study', label: 'Library' },
-  { to: '/frontier-health', label: 'Discovery' },
 ] as const
 
 export function ClinicalHub() {
+  const { account } = useStore()
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
-  const [weight, setWeight] = useState(70)
-  const [height, setHeight] = useState(170)
-  const [sbp, setSbp] = useState(120)
-  const [dbp, setDbp] = useState(80)
+  const [weight, setWeight] = useState('')
+  const [height, setHeight] = useState('')
+  const [sbp, setSbp] = useState('')
+  const [dbp, setDbp] = useState('')
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
 
-  const bmi = useMemo(() => height > 0 ? weight / ((height / 100) ** 2) : 0, [height, weight])
-  const map = useMemo(() => (sbp + 2 * dbp) / 3, [sbp, dbp])
+  const bmi = useMemo(() => {
+    const kg = Number(weight)
+    const cm = Number(height)
+    return kg > 0 && cm > 0 ? kg / ((cm / 100) ** 2) : null
+  }, [height, weight])
+  const map = useMemo(() => {
+    const systolic = Number(sbp)
+    const diastolic = Number(dbp)
+    return systolic > 0 && diastolic > 0 ? (systolic + 2 * diastolic) / 3 : null
+  }, [sbp, dbp])
   const labState = useMemo(() => {
     const value = Number(lab)
     const min = Number(low)
@@ -68,7 +98,13 @@ export function ClinicalHub() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
+    // `dark` bukan hiasan di sini. Permukaan ini memang ruang komando gelap
+    // apa pun tema aplikasinya, sementara tema aplikasi bisa saja terang —
+    // dan seluruh gaya `dark:` serta lapisan pemetaan `.dark` di index.css
+    // dipasang pada kelas itu. Tanpa penandanya, setiap komponen di dalam
+    // sini merender versi TERANGnya di atas latar gelap: panduan "How to
+    // use" muncul sebagai lempengan putih menyilaukan pada halaman hitam.
+    <div className="dark mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
       <PanaceaZoneNav />
 
       <main aria-label="Clinical command surface" className="space-y-9">
@@ -98,7 +134,7 @@ export function ClinicalHub() {
             </Link>
           </div>
 
-          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-4" aria-label="Primary clinical actions">
+          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-5" aria-label="Primary clinical actions">
             {PRIMARY_ACTIONS.map((item) => (
               <Link
                 key={item.to}
@@ -138,29 +174,34 @@ export function ClinicalHub() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">Weight · kg</span>
-                  <input type="number" value={weight} onChange={(event) => setWeight(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="decimal" type="number" value={weight} onChange={(event) => setWeight(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">Height · cm</span>
-                  <input type="number" value={height} onChange={(event) => setHeight(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="decimal" type="number" value={height} onChange={(event) => setHeight(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
               </div>
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">SBP</span>
-                  <input type="number" value={sbp} onChange={(event) => setSbp(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="numeric" type="number" value={sbp} onChange={(event) => setSbp(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">DBP</span>
-                  <input type="number" value={dbp} onChange={(event) => setDbp(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="numeric" type="number" value={dbp} onChange={(event) => setDbp(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
               </div>
             )}
 
             <output className="mt-5 block text-4xl font-black tracking-[-.05em] tabular-nums">
-              {calculator === 'bmi' ? bmi.toFixed(1) : `${Math.round(map)} mmHg`}
+              {calculator === 'bmi'
+                ? bmi == null ? '—' : bmi.toFixed(1)
+                : map == null ? '—' : `${Math.round(map)} mmHg`}
             </output>
+            <div className="mt-1 truncate text-[9px] font-bold text-white/30">
+              {calculator === 'bmi' ? 'BMI = kg ÷ m²' : 'MAP = (SBP + 2×DBP) ÷ 3'}
+            </div>
           </div>
 
           <div className="border-t border-white/10 pt-4">
@@ -190,6 +231,26 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+
+        <MentalHealthClinicalResearchLab />
+        <ClinicalPatientContext />
+        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
+        {account?.role === 'dokter' && <LabPasienUntukDokter />}
+        {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
+
+        {/* Tubuh ditaruh SETELAH aksi klinis. Permukaan tubuh setinggi ~4.400px
+            pada 390px; di atas, ia mendorong "Ask Panacea", aksi utama dan
+            kalkulator ke y~5.000 — enam layar gulir sebelum pemakai klinis
+            bisa melakukan apa pun. */}
+        <SurfaceGuide
+          summary="see the body → ask one question → record only reviewed facts"
+          steps={[
+            'Use the body surface to orient the region and system.',
+            'Ask Panacea for sourced context, not an autonomous diagnosis.',
+            'Promote findings into AI-EMR only after clinician review.',
+          ]}
+        />
+        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <nav aria-label="Clinical references" className="border-y border-white/10">
           <div className="flex gap-6 overflow-x-auto py-1 no-scrollbar">

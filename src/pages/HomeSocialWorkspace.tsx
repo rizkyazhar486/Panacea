@@ -2,15 +2,20 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
+import { HomeLiveWidgetRail } from '../components/HomeLiveWidgetRail'
+import { HomeRecoveryVisuals } from '../components/HomeRecoveryVisuals'
+import { HomeEssentialTools } from '../components/HomeEssentialTools'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { SuperPageLauncher } from '../components/SuperPageLauncher'
 import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
 import { ThinkingOrb } from '../components/ThinkingOrb'
+import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
 import '../styles/home-liquid-control-layer.css'
+import '../styles/home-compact-responsive.css'
 
 const Feed = lazy(() => import('./Feed'))
 const Community = lazy(() => import('./Community').then((m) => ({ default: m.Community })))
@@ -56,12 +61,16 @@ export function HomeSocialWorkspace() {
 
   return (
     <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-32">
+      <PanaceaZoneNav />
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
-          <SuperPageLauncher />
-          <RelWidgetRumah />
           <HomeVisualLanding />
+          <HomeEssentialTools />
+          <SuperPageLauncher />
+          <HomeRecoveryVisuals />
+          <RelWidgetRumah />
+          <HomeLiveWidgetRail />
           <PanaceaImageSlider />
           <HomeCommandDeck />
         </div>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { StatusSinkronKlinis } from '../components/StatusSinkronKlinis'
+import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconHeart, IconShield, IconPlus, IconSparkle } from '../components/icons'
@@ -7,6 +9,7 @@ import { GrowthChart } from '../components/GrowthChart'
 import { api, backendEnabled } from '../lib/api'
 import { detectDrift, driftSummary } from '../lib/physiologicalDrift'
 import { ResilienceQuoteCard } from '../components/ResilienceQuoteCard'
+import { ManualClinicalFlowsheet } from '../components/ManualClinicalFlowsheet'
 import type { VitalSign, Patient } from '../lib/types'
 
 /* ═══════════════════════════════════════════
@@ -454,7 +457,7 @@ const SUPPORTIVE_CAT_LABEL: Record<string, string> = {
 }
 
 export function Dashboard() {
-  const { state, activePatient, addVital, addPatient } = useStore()
+  const { state, activePatient, addVital, addPatient, addSupportive } = useStore()
   const p = activePatient
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vitals: VitalSign[] = (state.vitals[p.id] ?? []) as any
@@ -493,6 +496,7 @@ export function Dashboard() {
   /* ── Main Layout ── */
   return (
     <div className="space-y-5">
+      <StatusSinkronKlinis />
 
       {/* Story-like Quick Actions */}
       <div className="flex items-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -502,6 +506,16 @@ export function Dashboard() {
         <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
+        <a href="#manual-icu-flowsheet" className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85">
+          ICU Flowsheet
+        </a>
+        <Link
+          to="/clinical-hub"
+          title="Open visual clinical workspace"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85"
+        >
+          Visual Clinical →
+        </Link>
         {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
       </div>
 
@@ -625,6 +639,15 @@ export function Dashboard() {
           </a>
         </div>
       )}
+
+      {/* Manual bedside ICU charting — mirrors the paper flowsheet structure
+          without copying patient-identifying values from the reference photos.
+          Structured core vitals reuse the canonical vital timeline; all other
+          manually entered fields use the existing supportive-result store. */}
+      <ManualClinicalFlowsheet
+        onAddVital={(vital) => addVital(p.id, vital)}
+        onAddSupportive={(result) => addSupportive(p.id, result)}
+      />
 
       {/* AI Clinical Insight */}
       {backendEnabled && <AiClinicalInsight patient={p} vitals={vitals} supportive={supportive} />}

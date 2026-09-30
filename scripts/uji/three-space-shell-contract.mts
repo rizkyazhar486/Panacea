@@ -18,30 +18,37 @@ const routes = [...main.matchAll(/<Route\s+path="([^"]+)"/g)]
   .map((match) => match[1])
   .filter((route) => route !== '*')
 
-chk('exactly three super pages define the primary product model', SUPER_PAGES.length === 3)
+const categoryIds = ['human', 'health', 'clinical', 'explore', 'simulate', 'records', 'for-you'] as const
+const categoryIdSet = new Set<string>(categoryIds)
+
+chk('exactly seven category pages define the primary product model', SUPER_PAGES.length === categoryIds.length)
 chk(
-  'stable super-page identities exist',
-  ['body', 'clinical', 'for-you'].every((id) => SUPER_PAGES.some((space) => space.id === id)),
+  'stable category-page identities exist',
+  categoryIds.every((id) => SUPER_PAGES.some((space) => space.id === id)),
+)
+chk(
+  'all category pages project canonical human state',
+  SUPER_PAGES.every((space) => space.stateSource === 'canonical-human-state'),
 )
 chk('router inventory is derived from real source and exceeds 200 explicit routes', routes.length >= 200, String(routes.length))
 chk(
-  'every explicit route resolves to one super-page family',
-  routes.every((route) => ['body', 'clinical', 'for-you'].includes(superPageForRoute(route))),
+  'every explicit route resolves to one category-page family',
+  routes.every((route) => categoryIdSet.has(superPageForRoute(route))),
   String(routes.length),
 )
 chk(
-  'every catalogued capability resolves to one super-page family',
-  FITUR_DARI_HUB.every((feature) => ['body', 'clinical', 'for-you'].includes(superPageForRoute(feature.to, feature.grup))),
+  'every catalogued capability resolves to one category-page family',
+  FITUR_DARI_HUB.every((feature) => categoryIdSet.has(superPageForRoute(feature.to, feature.grup))),
   String(FITUR_DARI_HUB.length),
 )
 
-chk('Home mounts the three-space launcher', home.includes('<SuperPageLauncher'))
+chk('Home mounts the category-page launcher', home.includes('<SuperPageLauncher'))
 chk('Home mounts the existing-asset image slider', home.includes('<PanaceaImageSlider'))
 chk('Home has no persistent primary navigation dock', !home.includes('data-panacea-primary-nav'))
 
 chk('Shell has no drawer/sidebar implementation', !shell.includes('DrawerNav') && !shell.includes('menuOpen') && !shell.includes('setMenuOpen'))
 chk('Shell has no second persistent primary-link navbar', !shell.includes('panacea-command-primary-links'))
-chk('command bar owns the three-space dropdown', shell.includes('SUPER_PAGES.map') && shell.includes('pmd-command-spaces'))
+chk('command bar owns the category dropdown', shell.includes('SUPER_PAGES.map') && shell.includes('pmd-command-spaces'))
 chk('spectral stage is global to authenticated Shell', shell.includes('pmd-spectral-shell'))
 chk('scroll choreography is disabled on spatial surfaces', shell.includes("data-spatial={spatialSurface ? 'true' : 'false'}"))
 

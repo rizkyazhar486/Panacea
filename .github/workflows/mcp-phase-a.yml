@@ -1,6 +1,15 @@
 name: MCP Phase A
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'server/src/mcp/**'
+      - 'server/uji/mcp*.uji.ts'
+      - 'server/package.json'
+      - 'server/package-lock.json'
+      - '.github/workflows/mcp-phase-a.yml'
   pull_request:
     paths:
       - 'server/src/mcp/**'
