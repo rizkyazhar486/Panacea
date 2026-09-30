@@ -8,6 +8,21 @@ const workflow = readFileSync(
 
 assert.match(
   workflow,
+  /render-proof:[\s\S]*?timeout-minutes: 30/,
+  'the Body3D job must have a finite total runtime bound',
+)
+assert.match(
+  workflow,
+  /name: Install browser smoke runner\n\s+timeout-minutes: 15/,
+  'browser provisioning must not consume the whole job indefinitely',
+)
+assert.match(
+  workflow,
+  /name: Prove every 3D panel renders\n\s+timeout-minutes: 12/,
+  'the serial Body3D proof stage must have its own total runtime bound',
+)
+assert.match(
+  workflow,
   /timeout --signal=TERM --kill-after=15s 180s npm run "\$gerbang"/,
   'every Body3D smoke command must have its own hard runtime bound',
 )
@@ -25,6 +40,21 @@ assert.match(
   workflow,
   /::error::\$gerbang timeout setelah \$\{durasi\}s \(batas 180s\)/,
   'timeout diagnostics must identify the affected gate and configured bound',
+)
+assert.match(
+  workflow,
+  /nohup setsid npm run preview/,
+  'the production preview must run in its own process group for reliable cleanup',
+)
+assert.match(
+  workflow,
+  /kill -TERM -- "-\$preview_pid"/,
+  'cleanup must terminate the preview process group, not only the npm parent',
+)
+assert.doesNotMatch(
+  workflow,
+  /gagal=/,
+  'Body3D smoke failures must fail fast instead of queueing the remaining gates',
 )
 
 const ordered = [
@@ -52,4 +82,12 @@ for (const gate of ordered) {
   previous = index
 }
 
-console.log('Body3D CI: 12 serial proofs retain order and each has a 180s hard timeout with duration diagnostics')
+assert.match(
+  workflow,
+  /# Fail fast\.[\s\S]*?exit 1\n\s+fi\n\s+done/,
+  'a failed or timed-out gate must stop the serial queue immediately',
+)
+
+console.log(
+  'Body3D CI: serial proofs are individually bounded, fail fast, and the runner has stage/job/process-group hard stops',
+)
