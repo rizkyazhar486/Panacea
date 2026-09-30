@@ -233,7 +233,7 @@ function clamp01(value: number) {
 }
 
 function normalizeLabel(value: string) {
-  return nonBlank(value, 'label').toLocaleLowerCase()
+  return nonBlank(value, 'label').toLowerCase()
 }
 
 function validateBox(box: NormalizedBoundingBox, field: string) {
