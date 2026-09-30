@@ -44,6 +44,8 @@ const TEKS: Record<string, [string, string]> = {
   ferritin: ['Ferritin', 'ng/mL'], hb: ['Hemoglobin', 'g/dL'], crp: ['hs-CRP', 'mg/L'],
   chol: ['Total cholesterol', 'mg/dL'], asamUrat: ['Uric acid', 'mg/dL'],
   trombosit: ['Platelets', '10*9/L'], natrium: ['Sodium', 'mEq/L'], kalium: ['Potassium', 'mEq/L'],
+  kalsium: ['Calcium', 'mg/dL'], fosfor: ['Phosphorus', 'mg/dL'],
+  folat: ['Folate', 'ng/mL'], bilirubin: ['Bilirubin', 'mg/dL'],
 }
 
 export function kodeUntuk(jenis: string) {

@@ -109,6 +109,12 @@ export const JENIS_LAB: JenisLab[] = [
     id: 'kalium', nama: 'Potassium', satuan: 'mEq/L', bawah: 3.5, atas: 5.0,
     sumber: 'Usual adult serum range; critical when markedly abnormal',
   },
+  // Rentang di bawah sama dengan yang sudah ditampilkan tracker Nutrition,
+  // supaya dua permukaan tidak memakai angka rujukan yang berbeda.
+  { id: 'kalsium', nama: 'Calcium', satuan: 'mg/dL', bawah: 8.5, atas: 10.5, sumber: 'Usual adult serum range; varies by laboratory' },
+  { id: 'fosfor', nama: 'Phosphorus', satuan: 'mg/dL', bawah: 2.5, atas: 4.5, sumber: 'Usual adult serum range; varies by laboratory' },
+  { id: 'folat', nama: 'Folate', satuan: 'ng/mL', bawah: 3, atas: 20, sumber: 'Usual adult serum range; varies by laboratory' },
+  { id: 'bilirubin', nama: 'Bilirubin', satuan: 'mg/dL', bawah: 0.1, atas: 1.2, sumber: 'Usual adult total bilirubin range; varies by laboratory' },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -204,6 +210,7 @@ export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
   alt: 'sgpt',
   ast: 'sgot',
   hemoglobin: 'hb',
+  wbc: 'wbc',
   crp: 'crp',
   albumin: 'albumin',
   vitD: 'vitd',
@@ -218,6 +225,16 @@ export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
   apoB: 'apob',
   sodium: 'natrium',
   potassium: 'kalium',
+  calcium: 'kalsium',
+  phosphorus: 'fosfor',
+  folate: 'folat',
+  bilirubin: 'bilirubin',
+}
+
+/** Nutrition protocols sometimes type platelets or WBC per µL. Those magnitudes must not enter the ×10⁹/L or 10³/µL catalog. */
+const SKALA_MAKS_KATALOG: Readonly<Record<string, number>> = {
+  trombosit: 5000,
+  wbc: 500,
 }
 
 const JENIS_LAB_KE_NUTRISI: Readonly<Record<string, string>> = Object.freeze(
@@ -241,6 +258,11 @@ export function proyeksikanNilaiNutrisiKeLabKanonic(
     const jenis = KUNCI_NUTRISI_KE_JENIS_LAB[kunci]
     if (!jenis) { skipped.push(kunci); continue }
     if (typeof mentah !== 'number' || !Number.isFinite(mentah) || !(mentah > 0)) {
+      skipped.push(kunci)
+      continue
+    }
+    const skalaMaks = SKALA_MAKS_KATALOG[jenis]
+    if (skalaMaks != null && mentah > skalaMaks) {
       skipped.push(kunci)
       continue
     }

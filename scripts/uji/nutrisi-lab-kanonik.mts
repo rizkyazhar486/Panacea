@@ -30,9 +30,13 @@ const ok = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', {
   potassium: 4.2,
   sodium: 140,
   folate: 12,
+  calcium: 9.4,
+  phosphorus: 3.2,
+  bilirubin: 0.8,
+  homocysteine: 9,
 })
-assert.deepEqual(ok.written.sort(), ['glucose', 'ldl', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
-assert.deepEqual(ok.skipped, ['folate'], 'folate stays Nutrition-local until catalogued')
+assert.deepEqual(ok.written.sort(), ['bilirubin', 'calcium', 'folate', 'glucose', 'ldl', 'phosphorus', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
+assert.deepEqual(ok.skipped, ['homocysteine'], 'uncatalogued keys stay Nutrition-local')
 assert.equal(nilaiLabPadaTanggal('gdp', '2026-09-28'), 98)
 assert.equal(nilaiLabPadaTanggal('chol', '2026-09-28'), 190)
 assert.equal(nilaiLabPadaTanggal('vitd', '2026-09-28'), 32)
@@ -46,13 +50,30 @@ assert.equal(balik.totalCholesterol, 190)
 assert.equal(balik.vitD, 32)
 assert.equal(balik.potassium, 4.2)
 assert.equal(balik.sodium, 140)
-assert.equal(balik.folate, undefined)
+assert.equal(balik.folate, 12)
+assert.equal(balik.calcium, 9.4)
+assert.equal(balik.bilirubin, 0.8)
+assert.equal(balik.homocysteine, undefined)
+assert.equal(nilaiLabPadaTanggal('folat', '2026-09-28'), 12)
+assert.equal(nilaiLabPadaTanggal('kalsium', '2026-09-28'), 9.4)
 
 // Negatif: bad date / non-positive / unknown key → no write.
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('kemarin', { glucose: 90 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: 0 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: -1 }).skipped, ['glucose'])
-assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { folate: 12 }).skipped, ['folate'])
+assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { homocysteine: 9 }).skipped, ['homocysteine'])
+{
+  const sebelum = ambilLab().trombosit?.length ?? 0
+  const skala = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { platelet: 220000, wbc: 6800, hemoglobin: 14 })
+  assert.deepEqual(skala.skipped.sort(), ['platelet', 'wbc'])
+  assert.deepEqual(skala.written, ['hemoglobin'])
+  assert.equal(ambilLab().trombosit?.length ?? 0, sebelum, 'per-µL platelet count must not be stored as ×10⁹/L')
+  assert.equal(ambilLab().wbc?.some((b) => b.nilai === 6800) ?? false, false)
+  const kecil = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-27', { platelet: 220, wbc: 6.8 })
+  assert.deepEqual(kecil.written.sort(), ['platelet', 'wbc'])
+  assert.equal(nilaiLabPadaTanggal('trombosit', '2026-09-27'), 220)
+  assert.equal(nilaiLabPadaTanggal('wbc', '2026-09-27'), 6.8)
+}
 assert.deepEqual(nilaiNutrisiDariLabKanonic('not-a-date'), {})
 
 // Mapping covers core lipid + PhenoAge-adjacent Nutrition keys.

@@ -56,6 +56,7 @@ const LABEL: Record<string, string> = {
   'nutrition.dietary-protein': 'Logged protein',
   'nutrition.dietary-carbohydrate': 'Logged carbohydrate',
   'nutrition.dietary-fat': 'Logged fat',
+  'logged-sleep-duration': 'Logged sleep',
 }
 export const labelMetrik = (m: string, labels: Record<string, string> = {}) => {
   if (labels[m]) return labels[m]

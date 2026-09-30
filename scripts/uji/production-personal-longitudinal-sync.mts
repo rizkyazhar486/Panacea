@@ -108,6 +108,7 @@ assert.ok(events.every((item) => !item.id.includes('gps-foreign')))
 
 const sleep = first.state.eventsById['personal:sleep:sleep-1:duration']
 assert.ok(sleep)
+assert.equal(sleep.metric, 'logged-sleep-duration', 'self-reported sleep must not share the device sleep-duration series')
 assert.equal(sleep.recordedAt, '2026-09-17')
 assert.equal(sleep.provenance.capturedAt, '2026-09-17')
 assert.ok(sleep.tags?.includes('temporal-precision:day'))

@@ -133,7 +133,7 @@ function sleepEvents(
       ...base,
       id: `personal:sleep:${row.id}:duration`,
       domain: 'sleep',
-      metric: 'sleep-duration',
+      metric: 'logged-sleep-duration',
       value: row.hours,
       unit: 'h',
       tags: dayTags('sleep-log'),

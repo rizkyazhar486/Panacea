@@ -35,6 +35,7 @@ for (const e of obsSaja) {
 }
 assert.equal(kodeUntuk('crp'), null); assert.equal(kodeUntuk('apob'), null); assert.ok(kodeUntuk('hba1c'))
 assert.equal(kodeUntuk('chol'), null); assert.equal(kodeUntuk('natrium'), null); assert.equal(kodeUntuk('kalium'), null)
+assert.equal(kodeUntuk('folat'), null); assert.equal(kodeUntuk('kalsium'), null); assert.equal(kodeUntuk('bilirubin'), null)
 
 {
   const teks = logKeBundelFhir({

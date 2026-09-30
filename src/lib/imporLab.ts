@@ -37,6 +37,10 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   trombosit: ['trombosit', 'platelet', 'platelets', 'plt'],
   natrium: ['natrium', 'sodium'],
   kalium: ['kalium', 'potassium'],
+  kalsium: ['kalsium', 'calcium'],
+  fosfor: ['fosfor', 'phosphorus', 'phosphate'],
+  folat: ['folat', 'folate', 'folic acid'],
+  bilirubin: ['bilirubin total', 'total bilirubin', 'bilirubin'],
   hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 
