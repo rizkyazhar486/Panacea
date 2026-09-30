@@ -15,6 +15,15 @@ assert.equal(normal.left.gazeFunction, 1)
 assert.equal(normal.right.pupilMm, 3.5)
 assert.equal(normal.right.lidOpenFraction, 1)
 
+const zeroSeverity = simulateOculomotor({
+  pattern: { scope: 'lesion', key: 'VI' },
+  side: 'R',
+  severity: 0,
+  gaze: 'right',
+})
+assert.equal(zeroSeverity.right.function.LR, 1)
+assert.equal(zeroSeverity.right.gazeFunction, 1)
+
 const third = simulateOculomotor({
   pattern: { scope: 'lesion', key: 'III' },
   side: 'R',
@@ -80,6 +89,12 @@ assert.throws(() => simulateOculomotor({
   pattern: { scope: 'lesion', key: 'VI' },
   side: 'R',
   severity: Number.NaN,
+  gaze: 'primary',
+}), /severity/)
+assert.throws(() => simulateOculomotor({
+  pattern: { scope: 'lesion', key: 'VI' },
+  side: 'R',
+  severity: 101,
   gaze: 'primary',
 }), /severity/)
 assert.throws(() => prismDioptersFromDegrees(Number.POSITIVE_INFINITY), /finite/)
