@@ -141,10 +141,28 @@ function hasOwn(record: Record<string, unknown>, key: string) {
 }
 
 function assertNoForbiddenFields(packet: Record<string, unknown>) {
-  for (const field of FORBIDDEN_PACKET_FIELDS) {
-    if (hasOwn(packet, field)) {
-      throw new Error('perception packet contains forbidden field: ' + field)
+  const pending: unknown[] = [packet]
+  const seen = new Set<object>()
+
+  while (pending.length) {
+    const current = pending.pop()
+    if (current === null || typeof current !== 'object') continue
+    if (seen.has(current)) continue
+    seen.add(current)
+
+    if (Array.isArray(current)) {
+      pending.push(...current)
+      continue
     }
+
+    const record = current as Record<string, unknown>
+    for (const field of FORBIDDEN_PACKET_FIELDS) {
+      if (hasOwn(record, field)) {
+        throw new Error('perception packet contains forbidden field: ' + field)
+      }
+    }
+
+    pending.push(...Object.values(record))
   }
 }
 
