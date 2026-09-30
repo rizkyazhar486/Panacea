@@ -262,6 +262,65 @@ test('rejects malformed optional DICOM identifiers instead of accepting untyped 
   }
 })
 
+test('rejects undeclared fields so bounded envelopes cannot hide inline raw data', () => {
+  const cases = [
+    {
+      label: 'event',
+      expected: 'event contains unsupported field: debugBlob',
+      event: { ...base, debugBlob: [1, 2, 3] },
+    },
+    {
+      label: 'source',
+      expected: 'source contains unsupported field: vendorSecret',
+      event: { ...base, source: { ...base.source, vendorSecret: 'opaque' } },
+    },
+    {
+      label: 'provenance',
+      expected: 'provenance contains unsupported field: rawClock',
+      event: { ...base, provenance: { ...base.provenance, rawClock: { ticks: [1, 2] } } },
+    },
+    {
+      label: 'waveform payload',
+      expected: 'waveform payload contains unsupported field: rawSamples',
+      event: { ...base, payload: { ...base.payload, rawSamples: [0.1, 0.2, 0.3] } },
+    },
+    {
+      label: 'waveform storage',
+      expected: 'waveform storage contains unsupported field: inlineBytes',
+      event: {
+        ...base,
+        payload: {
+          ...base.payload,
+          storage: { ...base.payload.storage, inlineBytes: [1, 2, 3] },
+        },
+      },
+    },
+    {
+      label: 'alarm payload',
+      expected: 'alarm payload contains unsupported field: pixels',
+      event: {
+        ...base,
+        kind: 'alarm',
+        source: { ...base.source, profileId: 'ventilator' },
+        payload: {
+          shape: 'alarm',
+          code: 'HIGH_PRESSURE',
+          severity: 'high',
+          state: 'active',
+          pixels: [1, 2, 3],
+        },
+      },
+    },
+  ]
+
+  for (const { label, expected, event } of cases) {
+    const result = validateMedicalDeviceEvent(event)
+    assert.equal(result.accepted, false, label)
+    assert.equal(result.disposition, 'quarantined', label)
+    assert.ok(result.errors.includes(expected), label)
+  }
+})
+
 test('rejects parseable non-ISO timestamps so provenance is runtime-stable', () => {
   const result = validateMedicalDeviceEvent({
     ...base,
