@@ -137,6 +137,18 @@ function nonBlank(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+function rejectUnexpectedFields(
+  value: Record<string, unknown>,
+  allowed: readonly string[],
+  field: string,
+  errors: string[],
+) {
+  const allowedFields = new Set(allowed)
+  for (const key of Object.keys(value)) {
+    if (!allowedFields.has(key)) errors.push(`${field} contains unsupported field: ${key}`)
+  }
+}
+
 const ISO_8601_TIMESTAMP = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(?:Z|[+-](\d{2}):(\d{2}))$/
 
 function validIso(value: unknown): value is string {
@@ -257,6 +269,12 @@ export function validateMedicalDeviceEvent(
     }
   }
 
+  rejectUnexpectedFields(
+    event,
+    ['id', 'subjectId', 'encounterId', 'kind', 'direction', 'source', 'provenance', 'payload'],
+    'event',
+    errors,
+  )
   for (const field of ['id', 'subjectId'] as const) {
     if (!nonBlank(event[field])) errors.push(`${field} must not be blank`)
   }
@@ -273,6 +291,14 @@ export function validateMedicalDeviceEvent(
   }
 
   const source = record(event.source)
+  if (source) {
+    rejectUnexpectedFields(
+      source,
+      ['profileId', 'deviceId', 'adapterId', 'adapterVersion', 'interface', 'manufacturer', 'model', 'firmware'],
+      'source',
+      errors,
+    )
+  }
   const profileId = source?.profileId
   const profile = nonBlank(profileId) ? getMedicalDeviceIntegrationProfile(profileId.trim()) : undefined
   if (!profile) errors.push('source.profileId must resolve to a medical-device catalog profile')
@@ -298,6 +324,9 @@ export function validateMedicalDeviceEvent(
   }
 
   const provenance = record(event.provenance)
+  if (provenance) {
+    rejectUnexpectedFields(provenance, ['capturedAt', 'receivedAt', 'sequence'], 'provenance', errors)
+  }
   const capturedAt = provenance?.capturedAt
   const receivedAt = provenance?.receivedAt
   if (!validIso(capturedAt)) errors.push('provenance.capturedAt must be a valid ISO timestamp')
@@ -315,6 +344,7 @@ export function validateMedicalDeviceEvent(
   } else if (payload.shape !== kind) {
     errors.push('payload.shape must match event.kind')
   } else if (kind === 'waveform') {
+    rejectUnexpectedFields(payload, ['shape', 'channels', 'sampleRateHz', 'sampleCount', 'storage', 'samples'], 'waveform payload', errors)
     if (Object.prototype.hasOwnProperty.call(payload, 'samples')) {
       errors.push('inline waveform samples are forbidden; use an external bounded storage reference')
     }
@@ -328,12 +358,16 @@ export function validateMedicalDeviceEvent(
       errors.push('waveform sampleCount must be a positive safe integer')
     }
     const storage = record(payload.storage)
+    if (storage) {
+      rejectUnexpectedFields(storage, ['uri', 'checksumSha256', 'contentType'], 'waveform storage', errors)
+    }
     if (!nonBlank(storage?.uri)) errors.push('waveform storage uri must not be blank')
     if (!nonBlank(storage?.contentType)) errors.push('waveform storage contentType must not be blank')
     if (typeof storage?.checksumSha256 !== 'string' || !SHA256.test(storage.checksumSha256)) {
       errors.push('waveform storage checksumSha256 must be 64 hexadecimal characters')
     }
   } else if (kind === 'alarm') {
+    rejectUnexpectedFields(payload, ['shape', 'code', 'severity', 'state', 'message'], 'alarm payload', errors)
     if (!nonBlank(payload.code)) errors.push('alarm code must not be blank')
     if (!ALARM_SEVERITIES.has(String(payload.severity))) errors.push('alarm severity is invalid')
     if (!ALARM_STATES.has(String(payload.state))) errors.push('alarm state is invalid')
@@ -341,6 +375,7 @@ export function validateMedicalDeviceEvent(
       errors.push('alarm message must be a non-blank string when supplied')
     }
   } else if (kind === 'setting') {
+    rejectUnexpectedFields(payload, ['shape', 'name', 'value', 'unit'], 'setting payload', errors)
     if (!nonBlank(payload.name)) errors.push('setting name must not be blank')
     const settingValue = payload.value
     const validValue = typeof settingValue === 'boolean'
@@ -351,6 +386,12 @@ export function validateMedicalDeviceEvent(
       errors.push('setting unit must be a non-blank string when supplied')
     }
   } else if (kind === 'therapy-delivery') {
+    rejectUnexpectedFields(
+      payload,
+      ['shape', 'therapyCode', 'status', 'amount', 'unit', 'actuationRequested'],
+      'therapy-delivery payload',
+      errors,
+    )
     if (!nonBlank(payload.therapyCode)) errors.push('therapyCode must not be blank')
     if (!THERAPY_STATUSES.has(String(payload.status))) errors.push('therapy-delivery status is invalid')
     if (typeof payload.amount !== 'number' || !Number.isFinite(payload.amount) || payload.amount < 0) {
@@ -361,6 +402,12 @@ export function validateMedicalDeviceEvent(
       errors.push('therapy-delivery events are observations only; actuation is forbidden')
     }
   } else if (kind === 'image-reference') {
+    rejectUnexpectedFields(
+      payload,
+      ['shape', 'uri', 'studyInstanceUid', 'seriesInstanceUid', 'sopInstanceUid', 'contentType'],
+      'image-reference payload',
+      errors,
+    )
     if (!nonBlank(payload.uri)) errors.push('image reference uri must not be blank')
     for (const field of ['studyInstanceUid', 'seriesInstanceUid', 'sopInstanceUid', 'contentType'] as const) {
       if (payload[field] !== undefined && !nonBlank(payload[field])) {
@@ -368,6 +415,12 @@ export function validateMedicalDeviceEvent(
       }
     }
   } else if (kind === 'report-reference') {
+    rejectUnexpectedFields(
+      payload,
+      ['shape', 'uri', 'reportType', 'contentType', 'checksumSha256'],
+      'report-reference payload',
+      errors,
+    )
     if (!nonBlank(payload.uri)) errors.push('report reference uri must not be blank')
     if (!nonBlank(payload.reportType)) errors.push('reportType must not be blank')
     if (payload.contentType !== undefined && !nonBlank(payload.contentType)) {
