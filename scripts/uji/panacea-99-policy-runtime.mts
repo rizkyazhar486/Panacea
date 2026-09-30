@@ -8,6 +8,8 @@ import {
 const at = '2026-09-28T07:15:00.000Z'
 const evidence = [{ id: 'ci-1', kind: 'test' as const, source: 'stabilization-acceptance', capturedAt: at }]
 
+const unsafeEvaluate = (input: unknown) => evaluatePanacea99(input as Parameters<typeof evaluatePanacea99>[0])
+
 assert.ok(panacea99AxiomIdsForSurfaces(['security']).includes('A06'))
 assert.ok(panacea99AxiomIdsForSurfaces(['privacy']).includes('A82'))
 
@@ -129,6 +131,112 @@ assert.throws(() => evaluatePanacea99({
   evaluatedAt: at,
   assessments: [{ axiomId: 'A100', applicability: 'applicable', status: 'pass', evidence }],
 }), /unknown 99-Axiom id/)
+
+for (const evaluatedAt of [
+  'September 28, 2026 07:15:00 UTC',
+  '2026-02-30T07:15:00.000Z',
+  '2026-09-28T24:00:00.000Z',
+  '2026-09-28T07:15:00.000+14:01',
+]) {
+  assert.throws(() => unsafeEvaluate({
+    actionId: 'invalid-evaluation-time',
+    evaluatedAt,
+    assessments: [],
+  }), /evaluatedAt must be a valid ISO timestamp/, evaluatedAt)
+}
+
+assert.equal(evaluatePanacea99({
+  actionId: 'maximum-offset-boundary',
+  evaluatedAt: '2026-09-28T21:15:00.000+14:00',
+  assessments: [],
+}).decision, 'ALLOW')
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-applicability',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A06',
+    applicability: 'assumed-applicable',
+    status: 'pass',
+    evidence,
+  }],
+}), /applicability is invalid/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-status',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A06',
+    applicability: 'applicable',
+    status: 'rubber-stamped',
+    evidence,
+  }],
+}), /status is invalid/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-evidence-kind',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A06',
+    applicability: 'applicable',
+    status: 'pass',
+    evidence: [{ id: 'fake-1', kind: 'invented-proof', source: 'untrusted', capturedAt: at }],
+  }],
+}), /evidence\[0\]\.kind is invalid/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-evidence-time',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A06',
+    applicability: 'applicable',
+    status: 'pass',
+    evidence: [{ id: 'ci-1', kind: 'test', source: 'ci', capturedAt: '2026-02-30T07:15:00.000Z' }],
+  }],
+}), /evidence\[0\]\.capturedAt must be a valid ISO timestamp/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'primitive-human-review',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A94',
+    applicability: 'applicable',
+    status: 'pass',
+    evidence,
+    humanReviewRequired: true,
+    humanReview: true,
+  }],
+}), /humanReview must be an object/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-human-review-state',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A94',
+    applicability: 'applicable',
+    status: 'pass',
+    evidence,
+    humanReviewRequired: true,
+    humanReview: { state: 'rubber-stamped', reviewerId: 'clinician-1', reviewedAt: at },
+  }],
+}), /humanReview\.state is invalid/)
+
+assert.throws(() => unsafeEvaluate({
+  actionId: 'invalid-reviewed-at',
+  evaluatedAt: at,
+  assessments: [{
+    axiomId: 'A94',
+    applicability: 'applicable',
+    status: 'pass',
+    evidence,
+    humanReviewRequired: true,
+    humanReview: {
+      state: 'approved',
+      reviewerId: 'clinician-1',
+      reviewedAt: '2026-02-30T07:15:00.000Z',
+    },
+  }],
+}), /humanReview\.reviewedAt must be a valid ISO timestamp/)
 
 assert.equal(panacea99GeometricMaturity([
   { axiomId: 'A01', score: 1 },
