@@ -38,14 +38,53 @@ jobs:
 
       - name: Install browser smoke runner
         run: |
-          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          set -euo pipefail
+
+          # Keep the smoke runner outside the application dependency tree.
+          # A root-level `npm install @playwright/test` re-resolves unrelated
+          # Panacea dependencies after the reproducible `npm ci` step and has
+          # previously failed on transient registry metadata for packages that
+          # the smoke runner does not require.
+          PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
+          mkdir -p "$PW_PREFIX"
+          printf '%s\n' '{"private":true}' > "$PW_PREFIX/package.json"
+
+          installed=''
+          for attempt in 1 2 3; do
+            if npm install \
+              --prefix "$PW_PREFIX" \
+              --no-save \
+              --package-lock=false \
+              --no-audit \
+              --no-fund \
+              @playwright/test@1.55.0; then
+              installed='yes'
+              break
+            fi
+
+            if [ "$attempt" = '3' ]; then
+              echo "Playwright smoke-runner install failed after $attempt attempts." >&2
+              exit 1
+            fi
+            echo "Playwright install attempt $attempt failed; retrying isolated install." >&2
+            sleep $((attempt * 5))
+          done
+          test "$installed" = 'yes'
+
+          # The QA scripts import @playwright/test from the repository root.
+          # Expose only that package through a symlink; its own dependencies
+          # remain resolved from the isolated prefix.
+          mkdir -p node_modules/@playwright
+          rm -rf node_modules/@playwright/test
+          ln -s "$PW_PREFIX/node_modules/@playwright/test" node_modules/@playwright/test
+
           for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
             [ -f "$source" ] || continue
             if grep -q 'dl.google.com/linux/chrome-stable' "$source"; then
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
-          npx playwright install --with-deps chromium
+          "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Start production preview
         run: |
