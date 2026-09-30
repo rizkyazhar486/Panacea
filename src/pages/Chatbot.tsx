@@ -247,7 +247,10 @@ export function Chatbot() {
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
       setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Uploading image: ${file.name}`, at: new Date().toISOString() }])
-      const r = await api.aiVision(dataUrl, 'Analyze this diagnostic imaging.')
+      const r = await api.aiVision(
+        dataUrl,
+        'Analyze this clinical or diagnostic image. Describe only visible/objective features first, then provide a provisional differential, red flags, and the minimum history/examination/tests needed to distinguish the leading diagnoses. Do not invent palpation findings, vital signs, laboratory values, lymph-node findings, or other unseen data.',
+      )
       setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image Analysis**\n\n${r.text}`, at: new Date().toISOString() }))
     } catch { setError('Failed to analyze the image.') } finally { setAnalyzing(false) }
   }
@@ -297,12 +300,46 @@ export function Chatbot() {
       const existing = state.records[activePatient.id]
       const record: EMRRecord = {
         id: existing?.id ?? uid(), patientId: activePatient.id, createdAt: existing?.createdAt ?? now, updatedAt: now,
-        anamnesis: { keluhanUtama: d.keluhanUtama, rps: d.rps, rpd: d.rpd, rpk: d.rpk, riwayatKehamilan: '', riwayatPengobatan: d.riwayatPengobatan, riwayatAlergi: d.riwayatAlergi, riwayatTumbuhKembang: '', riwayatNutrisi: d.riwayatNutrisi, riwayatImunisasi: '', riwayatSosialEkonomi: d.riwayatSosialEkonomi },
-        physicalExam: existing?.physicalExam ?? { general: '', vitalsNote: autoObjective(messages, ctxOf(store).latestVitals), perSystem: d.suggestedExams.map((s) => `• [AI SUGGESTION] ${s}`).join('\n'), doctorVerified: false },
-        // Kolom yang ditulis AI dinyatakan 'AI' agar server tidak mencapnya sebagai tulisan dokter
-        // meski Chatbot dipakai di sesi dokter.
-        asalIsian: { ...(existing?.asalIsian ?? {}), ...Object.fromEntries(['keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatPengobatan', 'riwayatAlergi', 'riwayatNutrisi', 'riwayatSosialEkonomi'].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])), ...(existing?.physicalExam ? {} : { 'physicalExam.vitalsNote': { asal: 'AI' as const }, 'physicalExam.perSystem': { asal: 'AI' as const } }) },
-        problems: d.problems.map((pr) => ({ id: uid(), ...pr })), plan, prognosis: d.prognosis, references: d.references,
+        anamnesis: {
+          keluhanUtama: d.keluhanUtama,
+          rps: d.rps,
+          rpd: d.rpd,
+          rpk: d.rpk,
+          riwayatKehamilan: d.riwayatKehamilan,
+          riwayatPengobatan: d.riwayatPengobatan,
+          riwayatAlergi: d.riwayatAlergi,
+          riwayatTumbuhKembang: d.riwayatTumbuhKembang,
+          riwayatNutrisi: d.riwayatNutrisi,
+          riwayatImunisasi: d.riwayatImunisasi,
+          riwayatSosialEkonomi: d.riwayatSosialEkonomi,
+        },
+        physicalExam: existing?.physicalExam ?? {
+          general: '',
+          vitalsNote: autoObjective(messages, ctxOf(store).latestVitals),
+          perSystem: d.suggestedExams.map((exam) => `• [AI SUGGESTION — NOT EXAMINED] ${exam.replace(/^AI SUGGESTION\s*[—:-]?\s*NOT EXAMINED\s*[—:-]?\s*/i, '')}`).join('\n'),
+          doctorVerified: false,
+        },
+        // Every AI-written field stays provenance-tagged as AI until a clinician
+        // edits/verifies it; missing history is explicit rather than silently blank.
+        asalIsian: {
+          ...(existing?.asalIsian ?? {}),
+          ...Object.fromEntries([
+            'keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatKehamilan',
+            'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang',
+            'riwayatNutrisi', 'riwayatImunisasi', 'riwayatSosialEkonomi',
+          ].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])),
+          ...(existing?.physicalExam ? {} : {
+            'physicalExam.vitalsNote': { asal: 'AI' as const },
+            'physicalExam.perSystem': { asal: 'AI' as const },
+          }),
+        },
+        anthropometry: d.anthropometry,
+        labEkgInterpretation: d.labEkgInterpretation,
+        supportive: d.supportive,
+        problems: d.problems.map((pr) => ({ id: uid(), source: 'AI' as const, ...pr })),
+        plan,
+        prognosis: d.prognosis,
+        references: d.references,
       }
       saveRecord(record); nav('/emr')
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to compose the draft.') } finally { setDrafting(false) }
