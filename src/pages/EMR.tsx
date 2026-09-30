@@ -436,6 +436,20 @@ export function EMR() {
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Anthropometry — Formula, Standard & Interpretation
+          </label>
+          <textarea
+            value={draft.anthropometry ?? ''}
+            onChange={(e) =>
+              patch((r) => ({ ...r, anthropometry: e.target.value, updatedAt: new Date().toISOString() }))
+            }
+            rows={3}
+            placeholder="BMI = kg/m²; pediatric WHO/CDC z-score/percentile only when valid age/sex/reference inputs are available."
+            className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
             Interpretation of Lab Findings & ECG Results
           </label>
           <textarea

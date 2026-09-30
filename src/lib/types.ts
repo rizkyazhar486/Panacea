@@ -134,6 +134,7 @@ export interface EMRRecord {
   plan: PlanItem[]
   prognosis?: string
   // Penunjang & supportive (Mode-1 clinical workup)
+  anthropometry?: string // formula + WHO/CDC/adult BMI interpretation; never fabricated z-score
   labEkgInterpretation?: string // interpretasi temuan Lab & hasil EKG
   supportive?: SupportivePlan
   surgery?: SurgeryPlan
