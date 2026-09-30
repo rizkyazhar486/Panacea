@@ -1,5 +1,5 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { barisBelumAda, tampilkanWellness, wellnessBelumAda } from './homeCrossTabDailyState'
+import { barisBelumAda, makananTampil, tampilkanWellness, tidurTampil, wellnessBelumAda } from './homeCrossTabDailyState'
 import { useStore } from './store'
 import { getVitals } from './healthVitals'
 import { ambilLab, type ButirLab } from './lab'
@@ -25,7 +25,7 @@ type LabServer = { subjectId: string; revision: string; log: Record<string, Buti
 type DeviceSeries = { selfVitals: SelfVital[]; vo2maxLog: Vo2MaxEntry[] }
 
 export function LongitudinalStateProvider({ children }: { children: ReactNode }) {
-  const { state: app, account } = useStore()
+  const { state: app, account, lupakanCatatanDihapus } = useStore()
   const [local, setLocal] = useState<LongitudinalSources['local']>(() => ({ owner: account, labs: ambilLab(), vitals: getVitals() }))
   const [clinicalRevision, setClinicalRevision] = useState(0)
   const [server, setServer] = useState(emptyLongitudinalServer)
@@ -36,6 +36,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
     foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
     wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+    removed: { foods: string[]; sleep: string[] }
   } | null>(null)
   const [serverReady, setServerReady] = useState(false)
   const adoptedLocal = useRef(Boolean(account))
@@ -141,7 +142,12 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       })
       setServerReady(true)
       if (keadaan.diary?.truthClass === 'patient-recorded' && keadaan.diary.source === 'health-profile') {
-        setDiaryServer({ sleep: keadaan.diary.sleep, foods: keadaan.diary.foods, wellness: keadaan.diary.wellness })
+        setDiaryServer({
+          sleep: keadaan.diary.sleep,
+          foods: keadaan.diary.foods,
+          wellness: keadaan.diary.wellness,
+          removed: keadaan.diary.removed ?? { foods: [], sleep: [] },
+        })
       }
     }).catch(() => {
       // Offline: browser copies remain the fallback; care/EMR stay empty.
@@ -151,12 +157,23 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   }, [account, akunId, local.labs, clinicalRevision])
 
   useEffect(() => {
+    if (!diaryServer) return
+    const foods = app.foods.filter((row) => diaryServer.removed.foods.includes(row.id)).map((row) => row.id)
+    const sleep = app.sleepLogs.filter((row) => diaryServer.removed.sleep.includes(row.id)).map((row) => row.id)
+    if (foods.length || sleep.length) lupakanCatatanDihapus(foods, sleep)
+  }, [diaryServer, app.foods, app.sleepLogs, lupakanCatatanDihapus])
+
+  useEffect(() => {
     if (!backendEnabled || !account || !diaryServer) return
-    const sleepLogs = barisBelumAda(diaryServer.sleep, app.sleepLogs)
-    const foods = barisBelumAda(diaryServer.foods, app.foods)
+    const dihapusTidur = [...diaryServer.removed.sleep, ...(app.diaryHiddenSleepIds ?? [])]
+    const dihapusMakan = [...diaryServer.removed.foods, ...(app.diaryHiddenFoodIds ?? [])]
+    const sleepLogs = barisBelumAda(diaryServer.sleep, app.sleepLogs, dihapusTidur)
+    const foods = barisBelumAda(diaryServer.foods, app.foods, dihapusMakan)
     const wellness = wellnessBelumAda(diaryServer.wellness, app.wellness ?? {})
-    if (!sleepLogs.length && !foods.length && !wellness.length) return
-    const tanda = JSON.stringify({ sleepLogs, foods, wellness })
+    const removeFoodIds = (app.diaryHiddenFoodIds ?? []).filter((id) => !diaryServer.removed.foods.includes(id))
+    const removeSleepIds = (app.diaryHiddenSleepIds ?? []).filter((id) => !diaryServer.removed.sleep.includes(id))
+    if (!sleepLogs.length && !foods.length && !wellness.length && !removeFoodIds.length && !removeSleepIds.length) return
+    const tanda = JSON.stringify({ sleepLogs, foods, wellness, removeFoodIds, removeSleepIds })
     if (unggahDiary.current === tanda) return
     unggahDiary.current = tanda
     let active = true
@@ -164,9 +181,11 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       ...(sleepLogs.length ? { sleepLogs } : {}),
       ...(foods.length ? { foods } : {}),
       ...(wellness.length ? { wellness } : {}),
+      ...(removeFoodIds.length ? { removeFoodIds } : {}),
+      ...(removeSleepIds.length ? { removeSleepIds } : {}),
     }).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { unggahDiary.current = '' })
     return () => { active = false }
-  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness])
+  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds])
 
   const sumberLab = sumberLabLongitudinal(labServer && labServer.subjectId === account?.id ? labServer.log : null, local.labs)
   const sumberVitals = sumberVitalsLongitudinal(serverReady && account ? deviceCurrent : null, local.vitals as Record<string, unknown>)
@@ -174,8 +193,10 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   const sumberVo2 = sumberDeretLongitudinal(serverReady ? deviceSeries?.vo2maxLog ?? null : null, app.vo2maxLog)
   const sourceApp = useMemo(
     () => {
-      const tidur = diaryServer ? [...diaryServer.sleep, ...barisBelumAda(diaryServer.sleep, app.sleepLogs)] : app.sleepLogs
-      const makanan = diaryServer ? [...diaryServer.foods, ...barisBelumAda(diaryServer.foods, app.foods)] : app.foods
+      const dihapusTidur = [...(diaryServer?.removed.sleep ?? []), ...(app.diaryHiddenSleepIds ?? [])]
+      const dihapusMakan = [...(diaryServer?.removed.foods ?? []), ...(app.diaryHiddenFoodIds ?? [])]
+      const tidur = tidurTampil(diaryServer ? diaryServer.sleep : null, app.sleepLogs, dihapusTidur)
+      const makanan = makananTampil(diaryServer ? diaryServer.foods : null, app.foods, dihapusMakan)
       const wellness = diaryServer ? tampilkanWellness(diaryServer.wellness, app.wellness ?? {}) : app.wellness
       return {
         account,
@@ -189,7 +210,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         gpsActivities: app.gpsActivities,
       }
     },
-    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, diaryServer, sumberSelf.rows, sumberVo2.rows],
+    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds, diaryServer, sumberSelf.rows, sumberVo2.rows],
   )
   const sourceLocal = useMemo(
     () => ({ ...local, labs: sumberLab.labs, vitals: sumberVitals.vitals as typeof local.vitals }),

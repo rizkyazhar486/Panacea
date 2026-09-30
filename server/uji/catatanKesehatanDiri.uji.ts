@@ -90,4 +90,58 @@ assert.equal(batasTidur.some((r) => r.id === 'baru'), true)
 assert.equal(batasTidur.some((r) => r.id === 'p0'), false)
 assert.equal((susunPatchDiary({ diarySleep: penuh }, { sleepLogs: [] }).diarySleep as unknown[]).length, MAKS_TIDUR)
 
+const { buangKunciDiary, MAKS_NISAN } = await import('../src/catatanKesehatanDiri.ts')
+const diganti = susunPatchDiary(profil, {
+  sleepLogs: [{ id: 's9', date: '2026-09-28', hours: 8, bedtimeConsistent: false }],
+})
+assert.deepEqual((diganti.diarySleep as { id: string; hours: number }[]).map((r) => [r.id, r.hours]), [['s9', 8]])
+assert.deepEqual(diganti.diaryRemovedSleep, ['s1'])
+const hidupLagi = susunPatchDiary(
+  { diarySleep: diganti.diarySleep, diaryRemovedSleep: diganti.diaryRemovedSleep },
+  { sleepLogs: [{ id: 's1', date: '2026-09-28', hours: 7, bedtimeConsistent: true }] },
+)
+assert.equal((hidupLagi.diarySleep as { id: string }[]).some((r) => r.id === 's1'), false)
+assert.equal((hidupLagi.diarySleep as { id: string }[])[0].id, 's9')
+
+const hapus = susunPatchDiary(profil, { removeFoodIds: ['f1'] })
+assert.equal((hapus.diaryFoods as unknown[]).length, 0)
+assert.deepEqual(hapus.diaryRemovedFoods, ['f1'])
+assert.equal((profil.diaryFoods as unknown[]).length, 1)
+const tidakHidup = susunPatchDiary(
+  { diaryFoods: hapus.diaryFoods, diaryRemovedFoods: hapus.diaryRemovedFoods },
+  { foods: [{ id: 'f1', date: '2026-09-28', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 0 }] },
+)
+assert.equal((tidakHidup.diaryFoods as unknown[]).length, 0)
+assert.throws(() => susunPatchDiary(profil, { removeFoodIds: [''] }), /invalid removed id/)
+assert.equal((profil.diaryFoods as { id: string }[])[0].id, 'f1')
+assert.throws(() => susunPatchDiary(profil, { removeFoodIds: [] }), /diary payload is empty/)
+assert.throws(() => susunPatchDiary(profil, { removeSleepIds: Array.from({ length: 101 }, (_, i) => `x${i}`) }), /too many removed ids/)
+
+const nisanPenuh = Array.from({ length: MAKS_NISAN }, (_, i) => `n${i}`)
+const nisanBaru = susunPatchDiary({ diaryRemovedFoods: nisanPenuh, diaryFoods: [] }, { removeFoodIds: ['nbaru'] })
+const nisanHasil = nisanBaru.diaryRemovedFoods as string[]
+assert.equal(nisanHasil.length, MAKS_NISAN)
+assert.equal(nisanHasil.includes('n0'), false)
+assert.equal(nisanHasil.includes('nbaru'), true)
+const nisanKedaluwarsa = susunPatchDiary(
+  { diaryRemovedFoods: nisanHasil, diaryFoods: [] },
+  { foods: [{ id: 'n0', date: '2026-09-28', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 0 }] },
+)
+assert.equal((nisanKedaluwarsa.diaryFoods as { id: string }[])[0].id, 'n0')
+
+const disaring = buangKunciDiary({
+  weightKg: 70,
+  diarySleep: [{ id: 's1' }],
+  diaryFoods: [{ id: 'f1' }],
+  diaryWellness: [{ date: '2026-09-28' }],
+  diaryRemovedFoods: ['f1'],
+  diaryRemovedSleep: ['s1'],
+  selfVitalsLog: [{ id: 'v' }],
+  vo2maxEntries: [{ id: 'o' }],
+})
+assert.equal(disaring.weightKg, 70)
+assert.equal('diaryRemovedFoods' in disaring, false)
+assert.equal('diarySleep' in disaring, false)
+assert.equal('selfVitalsLog' in disaring, false)
+
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')

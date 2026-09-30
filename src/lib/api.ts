@@ -501,6 +501,7 @@ export const api = {
       sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
       foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
       wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+      removed?: { foods: string[]; sleep: string[] }
     }
   }>('/api/keadaan-longitudinal'),
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
@@ -539,6 +540,8 @@ export const api = {
     sleepLogs?: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
     foods?: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
     wellness?: { date: string; sleepHr?: number; waterMl?: number }[]
+    removeFoodIds?: string[]
+    removeSleepIds?: string[]
   }) => req<{ ok: boolean }>('/api/health-series/diary', { method: 'PUT', body: JSON.stringify(body) }),
   // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),

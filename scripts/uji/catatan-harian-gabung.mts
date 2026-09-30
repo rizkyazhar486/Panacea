@@ -34,4 +34,20 @@ assert.equal(tampil['2026-09-28'].exerciseMin, 20)
 assert.equal(tampil['2026-09-30'].exerciseMin, 15)
 assert.equal(tampilkanWellness(null, { '2026-09-30': { date: '2026-09-30', waterMl: 1 } })['2026-09-30'].waterMl, 1)
 
+const { makananTampil, tidurTampil } = await import('../../src/lib/homeCrossTabDailyState.ts')
+const makan = makananTampil(
+  [{ id: 'f1', name: 'rice' }, { id: 'f2', name: 'egg' }],
+  [{ id: 'f1', name: 'rice' }, { id: 'f3', name: 'tea' }],
+  ['f1'],
+)
+assert.deepEqual(makan.map((r) => r.id), ['f2', 'f3'])
+assert.deepEqual(barisBelumAda([{ id: 'f2' }], [{ id: 'f1' }, { id: 'f9' }], ['f1']).map((r) => r.id), ['f9'])
+const tidur = tidurTampil(
+  [{ id: 's1', date: '2026-09-28', hours: 7 }, { id: 's0', date: '2026-09-27', hours: 6 }],
+  [{ id: 's2', date: '2026-09-28', hours: 8 }],
+  [],
+)
+assert.deepEqual(tidur.map((r) => [r.id, r.hours]), [['s0', 6], ['s2', 8]])
+assert.deepEqual(tidurTampil([{ id: 's2', date: '2026-09-28', hours: 8 }], [{ id: 's1', date: '2026-09-28', hours: 7 }], ['s1']).map((r) => r.id), ['s2'])
+
 console.log('catatan-harian-gabung: second device adds rows without replacing the account')

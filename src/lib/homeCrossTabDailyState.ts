@@ -42,10 +42,29 @@ export function homeDailyStateSignature(state: HomeDailyState): string {
   }
 }
 
-/** Ids already on the account stay; local-only ids are the ones worth uploading. */
-export function barisBelumAda<T extends { id: string }>(akun: readonly { id: string }[], lokal: readonly T[]): T[] {
+/** Ids already on the account, or already removed, stay off the upload. */
+export function barisBelumAda<T extends { id: string }>(akun: readonly { id: string }[], lokal: readonly T[], dihapus: readonly string[] = []): T[] {
   const ids = new Set(akun.map((r) => r.id))
-  return lokal.filter((r) => r?.id && !ids.has(r.id))
+  const hapus = new Set(dihapus)
+  return lokal.filter((r) => r?.id && !ids.has(r.id) && !hapus.has(r.id))
+}
+
+export function makananTampil<T extends { id: string }>(akun: readonly T[] | null, lokal: readonly T[], dihapus: readonly string[] = []): T[] {
+  const hapus = new Set(dihapus)
+  const lokalHidup = lokal.filter((r) => r?.id && !hapus.has(r.id))
+  if (!akun) return lokalHidup
+  const akunHidup = akun.filter((r) => r?.id && !hapus.has(r.id))
+  return [...akunHidup, ...barisBelumAda(akunHidup, lokalHidup)]
+}
+
+/** One local night hides the account row for that date so an edit does not appear twice. */
+export function tidurTampil<T extends { id: string; date: string }>(akun: readonly T[] | null, lokal: readonly T[], dihapus: readonly string[] = []): T[] {
+  const hapus = new Set(dihapus)
+  const lokalHidup = lokal.filter((r) => r?.id && !hapus.has(r.id))
+  if (!akun) return lokalHidup
+  const tanggalLokal = new Set(lokalHidup.map((r) => r.date))
+  const akunHidup = akun.filter((r) => r?.id && !hapus.has(r.id) && !tanggalLokal.has(r.date))
+  return [...akunHidup, ...barisBelumAda(akunHidup, lokalHidup, dihapus)]
 }
 
 export function wellnessBelumAda(

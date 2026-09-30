@@ -152,5 +152,20 @@ assert.equal(denganDiary.diary.sleep[0].hours, 7)
 assert.equal(denganDiary.diary.truthClass, 'patient-recorded')
 assert.notEqual(denganDiary.revision, dasar.revision, 'a diary row changes the shared revision')
 assert.equal(denganDiary.diary.foods.length, 0)
+assert.deepEqual(denganDiary.diary.removed, { foods: [], sleep: [] })
+const denganNisan = susunKeadaanLongitudinal({
+  subjectId: 'user-1',
+  generatedAt: '2026-09-29T00:00:00.000Z',
+  lab: { log, diperbaruiPada: null },
+  care: { plans: [], reviews: [] },
+  clinical: null,
+  device: {
+    diarySleep: [{ id: 's1', date: '2026-09-28', hours: 7, bedtimeConsistent: true }],
+    diaryRemovedFoods: ['f1'],
+  },
+})
+assert.deepEqual(denganNisan.diary.removed.foods, ['f1'])
+assert.equal(denganNisan.diary.sleep.length, 1)
+assert.notEqual(denganNisan.revision, denganDiary.revision, 'a tombstoned food id changes the shared revision')
 
 console.log('keadaanLongitudinal: one shared revision for lab, care, clinical and device')

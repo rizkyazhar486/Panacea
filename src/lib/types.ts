@@ -782,6 +782,9 @@ export interface AppState {
   lifeEvents: Record<string, LifeEvent[]> // patientId -> the user's own life story (see LifeEvent below)
   quests: Record<string, Quest[]> // patientId -> self-set goals tied to life domains (see Quest below)
   foods: FoodEntry[]
+  /** Food and sleep ids removed on this device. The account remembers them so another phone cannot restore the row. */
+  diaryHiddenFoodIds: string[]
+  diaryHiddenSleepIds: string[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
   orders: Order[]

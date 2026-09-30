@@ -159,7 +159,7 @@ import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
-import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary } from './catatanKesehatanDiri.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
@@ -1019,9 +1019,7 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
     return
   }
   try {
-    // Self-vital / VO₂max lists only move through the dedicated series routes.
-    const { selfVitalsLog: _s, vo2maxEntries: _v, diarySleep: _d, diaryFoods: _f, diaryWellness: _w, ...profil } = data as Record<string, unknown>
-    res.json({ ok: true, profile: saveHealthProfile(u.email, profil) })
+    res.json({ ok: true, profile: saveHealthProfile(u.email, buangKunciDiary(data as Record<string, unknown>)) })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
@@ -1047,7 +1045,7 @@ app.put('/api/health-series/vo2max', requireAuth, (req, res) => {
 })
 app.put('/api/health-series/diary', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown }
+  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown }
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     res.status(400).json({ error: 'invalid diary payload' })
     return

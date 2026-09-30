@@ -208,18 +208,79 @@ export function bacaDiaryWellness(profil: Record<string, unknown> | undefined | 
   return bacaDaftar(profil, 'diaryWellness', validasiDiaryWellness) as CatatanWellnessServer[]
 }
 
-/** Union by id. Stored rows stay; a second device only adds ids the account does not have yet. */
-export function gabungDiarySleep(tersimpan: readonly CatatanTidurServer[], masuk: readonly CatatanTidurServer[]): CatatanTidurServer[] {
-  const ids = new Set(tersimpan.map((r) => r.id))
-  const gabung = [...tersimpan]
-  for (const row of masuk) if (!ids.has(row.id)) gabung.push(row)
-  return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_TIDUR)
+export const MAKS_NISAN = 400
+const MAKS_HAPUS_SEKALI = 100
+
+function bacaNisan(profil: Record<string, unknown> | undefined | null, kunci: string): string[] {
+  const mentah = profil?.[kunci]
+  if (!Array.isArray(mentah)) return []
+  const keluar: string[] = []
+  for (const id of mentah) {
+    if (typeof id === 'string' && ID.test(id) && !keluar.includes(id)) keluar.push(id)
+  }
+  return keluar.slice(-MAKS_NISAN)
 }
 
-export function gabungDiaryFoods(tersimpan: readonly CatatanMakananServer[], masuk: readonly CatatanMakananServer[]): CatatanMakananServer[] {
-  const ids = new Set(tersimpan.map((r) => r.id))
-  const gabung = [...tersimpan]
-  for (const row of masuk) if (!ids.has(row.id)) gabung.push(row)
+export function bacaDiaryDihapus(profil: Record<string, unknown> | undefined | null): { foods: string[]; sleep: string[] } {
+  return { foods: bacaNisan(profil, 'diaryRemovedFoods'), sleep: bacaNisan(profil, 'diaryRemovedSleep') }
+}
+
+export function validasiIdDihapus(masukan: unknown): string[] {
+  if (!Array.isArray(masukan)) throw new Error('removed ids must be a list')
+  if (masukan.length > MAKS_HAPUS_SEKALI) throw new Error('too many removed ids')
+  const keluar: string[] = []
+  for (const id of masukan) {
+    if (typeof id !== 'string' || !ID.test(id)) throw new Error('invalid removed id')
+    if (!keluar.includes(id)) keluar.push(id)
+  }
+  return keluar
+}
+
+function simpanNisan(ada: readonly string[], tambahan: readonly string[]): string[] {
+  const keluar = [...ada]
+  for (const id of tambahan) if (!keluar.includes(id)) keluar.push(id)
+  return keluar.slice(-MAKS_NISAN)
+}
+
+/** One night stays one row. A new id for the same date replaces the stored night and names the id that must not return. */
+export function gabungDiarySleep(
+  tersimpan: readonly CatatanTidurServer[],
+  masuk: readonly CatatanTidurServer[],
+  dihapus: ReadonlySet<string>,
+): { rows: CatatanTidurServer[]; diganti: string[] } {
+  let rows = tersimpan.filter((r) => !dihapus.has(r.id))
+  const diganti: string[] = []
+  for (const row of masuk) {
+    if (dihapus.has(row.id)) continue
+    const sama = rows.filter((r) => r.date === row.date)
+    if (sama.some((r) => r.id === row.id)) continue
+    for (const lama of sama) diganti.push(lama.id)
+    rows = rows.filter((r) => r.date !== row.date)
+    rows.push(row)
+  }
+  return {
+    rows: rows.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_TIDUR),
+    diganti,
+  }
+}
+
+export function gabungDiaryFoods(
+  tersimpan: readonly CatatanMakananServer[],
+  masuk: readonly CatatanMakananServer[],
+  dihapus: ReadonlySet<string>,
+): CatatanMakananServer[] {
+  const ids = new Set<string>()
+  const gabung: CatatanMakananServer[] = []
+  for (const row of tersimpan) {
+    if (dihapus.has(row.id) || ids.has(row.id)) continue
+    ids.add(row.id)
+    gabung.push(row)
+  }
+  for (const row of masuk) {
+    if (dihapus.has(row.id) || ids.has(row.id)) continue
+    ids.add(row.id)
+    gabung.push(row)
+  }
   return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
 }
 
@@ -235,14 +296,38 @@ export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[],
   return [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
 }
 
-/** Validate then union. Throws before returning a patch, so a bad row never replaces the stored lists. */
+const KUNCI_DIARY_TERKUNCI = ['selfVitalsLog', 'vo2maxEntries', 'diarySleep', 'diaryFoods', 'diaryWellness', 'diaryRemovedFoods', 'diaryRemovedSleep'] as const
+
+/** Generic profile writes cannot set diary rows or their tombstones. */
+export function buangKunciDiary(data: Record<string, unknown>): Record<string, unknown> {
+  const keluar: Record<string, unknown> = { ...data }
+  for (const kunci of KUNCI_DIARY_TERKUNCI) delete keluar[kunci]
+  return keluar
+}
+
+/** Validate then union. A listed id is removed and remembered so a later upload cannot restore it. */
 export function susunPatchDiary(
   profil: Record<string, unknown> | undefined | null,
-  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown },
+  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown },
 ): Record<string, unknown> {
+  const foodsHapus = body && 'removeFoodIds' in body ? validasiIdDihapus(body.removeFoodIds) : []
+  const sleepHapus = body && 'removeSleepIds' in body ? validasiIdDihapus(body.removeSleepIds) : []
+  const dihapus = bacaDiaryDihapus(profil)
+  const nisanMakan = simpanNisan(dihapus.foods, foodsHapus)
+  const nisanTidurAwal = simpanNisan(dihapus.sleep, sleepHapus)
   const patch: Record<string, unknown> = {}
-  if (body && 'sleepLogs' in body) patch.diarySleep = gabungDiarySleep(bacaDiarySleep(profil), validasiDiarySleep(body.sleepLogs))
-  if (body && 'foods' in body) patch.diaryFoods = gabungDiaryFoods(bacaDiaryFoods(profil), validasiDiaryFoods(body.foods))
+  if (body && ('sleepLogs' in body || sleepHapus.length > 0)) {
+    const masuk = 'sleepLogs' in body ? validasiDiarySleep(body.sleepLogs) : []
+    const hasil = gabungDiarySleep(bacaDiarySleep(profil), masuk, new Set(nisanTidurAwal))
+    const masihHidup = new Set(hasil.rows.map((r) => r.id))
+    const nisanTidur = simpanNisan(nisanTidurAwal, hasil.diganti.filter((id) => !masihHidup.has(id)))
+    patch.diarySleep = hasil.rows.filter((r) => !nisanTidur.includes(r.id))
+    patch.diaryRemovedSleep = nisanTidur
+  }
+  if (body && ('foods' in body || foodsHapus.length > 0)) {
+    patch.diaryFoods = gabungDiaryFoods(bacaDiaryFoods(profil), 'foods' in body ? validasiDiaryFoods(body.foods) : [], new Set(nisanMakan))
+    patch.diaryRemovedFoods = nisanMakan
+  }
   if (body && 'wellness' in body) patch.diaryWellness = gabungDiaryWellness(bacaDiaryWellness(profil), validasiDiaryWellness(body.wellness))
   if (!Object.keys(patch).length) throw new Error('diary payload is empty')
   return patch
