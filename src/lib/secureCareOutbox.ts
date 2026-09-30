@@ -263,11 +263,6 @@ export async function sendOrQueueEncryptedCareReport(
 ): Promise<HasilKirim> {
   try {
     await send(item)
-    if (secureCareOutboxSupported()) {
-      const db = await openDb()
-      try { await putReceipt(db, item.clientId) } finally { db.close() }
-    }
-    return { status: 'terkirim' }
   } catch (error) {
     if (!networkFailure(error)) return { status: 'ditolak', pesan: (error as Error).message }
     if (!secureCareOutboxSupported()) {
@@ -286,6 +281,18 @@ export async function sendOrQueueEncryptedCareReport(
       }
     }
   }
+
+  if (secureCareOutboxSupported()) {
+    try {
+      const db = await openDb()
+      try { await putReceipt(db, item.clientId) } finally { db.close() }
+    } catch {
+      // The server acknowledgement is authoritative. A local audit-receipt
+      // failure must never downgrade an already accepted clinical check-in.
+    }
+  }
+
+  return { status: 'terkirim' }
 }
 
 export async function drainEncryptedCareOutbox(send: Kirim): Promise<SecureDrainResult> {
