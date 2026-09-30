@@ -66,6 +66,18 @@ test('successful replay keeps idempotency receipt and removes ciphertext', () =>
 })
 
 
+test('successful replay does not become a server rejection when receipt persistence fails', () => {
+  const start = secure.indexOf('async function removeEncryptedCareReport')
+  const end = secure.indexOf('export async function encryptedCareOutboxCount', start)
+  const cleanup = secure.slice(start, end)
+
+  assert.ok(start >= 0 && end > start)
+  assert.match(cleanup, /if \(acknowledged\) \{/)
+  assert.match(cleanup, /try \{ await putReceipt\(db, item\.clientId\) \} catch \{/)
+  assert.doesNotMatch(cleanup, /if \(acknowledged\) await putReceipt\(db, item\.clientId\)/)
+})
+
+
 test('confirmed server acknowledgement stays successful when local receipt persistence fails', async () => {
   const originalIndexedDb = Object.getOwnPropertyDescriptor(globalThis, 'indexedDB')
   Object.defineProperty(globalThis, 'indexedDB', {
