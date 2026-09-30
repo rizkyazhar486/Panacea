@@ -192,18 +192,18 @@ features:
     patient_state_fields: [embodied-workflow-episode_as_derived_summary]
     knowledge_graph_entities: [workflow_episode, protocol_step, hand_object_interaction]
     shared_services: [consent, provenance, audit, longitudinal_replay, human_observability]
-    backend_surfaces: [future_perception_adapter_ingest]
+    backend_surfaces: [src/domains/observability/adapters/embodiedPerceptionAdapter.ts]
     frontend_surfaces: [future_records_replay, future_clinical_review, future_simulation_overlay]
     persistence_surfaces: [canonical_longitudinal_event_summary_only]
-    external_integrations: [future_head_camera, future_ar_glasses, future_device_telemetry]
+    external_integrations: [structured_perception_adapter_contract]
     maturity_level: FUNCTIONAL
     clinical_validation: not_started
     technical_risk: medium
     clinical_risk: high
     provenance_required: true
-    tests: [scripts/qa/human-observability.test.mjs]
-    observability: [interaction_confidence, protocol_coverage_gap, episode_uncertainty, sequence_evidence]
-    known_gaps: [no_live_perception_adapter, no_external_dataset_validation, no_qualified_clinical_workflow_validation, raw_media_service_not_implemented]
-    next_actions: [connect_first_authorized_perception_adapter, validate_against_annotated_egocentric_workflow_dataset, add_human_review_surface]
-    last_audited_commit: 6d7dc92f18369dabd04c436acba36e8b3b1c603a
+    tests: [scripts/qa/human-observability.test.mjs, scripts/qa/embodied-perception-adapter.test.mjs]
+    observability: [interaction_confidence, protocol_coverage_gap, episode_uncertainty, sequence_evidence, packet_sequence_gap, timestamp_regression]
+    known_gaps: [no_device_specific_live_capture_connector, no_external_dataset_validation, no_qualified_clinical_workflow_validation, raw_media_service_not_implemented]
+    next_actions: [validate_against_annotated_egocentric_workflow_dataset, add_human_review_surface, connect_first_authorized_device_specific_capture_connector]
+    last_audited_commit: 04e40942000b847367a29bd3d1082746442cb929
 
