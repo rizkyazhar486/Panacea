@@ -209,8 +209,12 @@ export function panacea99AxiomIdsForSurfaces(surfaces: readonly string[]) {
 }
 
 export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99DecisionReceipt {
-  const actionId = requiredText(input.actionId, 'actionId')
-  if (!validIso(input.evaluatedAt)) throw new Error('evaluatedAt must be a valid ISO timestamp')
+  const rawInput = asRecord(input, 'input')
+  const actionId = requiredText(rawInput.actionId, 'actionId')
+  const evaluatedAt = rawInput.evaluatedAt
+  if (!validIso(evaluatedAt)) throw new Error('evaluatedAt must be a valid ISO timestamp')
+  const assessments = rawInput.assessments
+  if (!Array.isArray(assessments)) throw new Error('assessments must be an array')
 
   const seen = new Set<string>()
   const receipts: Panacea99AssessmentReceipt[] = []
@@ -223,7 +227,10 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
   let hardApplicable = 0
   let hardPassed = 0
 
-  for (const assessment of input.assessments) {
+  for (const [index, rawAssessment] of assessments.entries()) {
+    const assessmentRecord = asRecord(rawAssessment, `assessments[${index}]`)
+    const axiomId = requiredText(assessmentRecord.axiomId, `assessments[${index}].axiomId`)
+    const assessment = { ...assessmentRecord, axiomId } as unknown as Panacea99Assessment
     const axiom = axiomById.get(assessment.axiomId)
     if (!axiom) throw new Error(`unknown 99-Axiom id: ${assessment.axiomId}`)
     if (seen.has(assessment.axiomId)) throw new Error(`duplicate 99-Axiom assessment: ${assessment.axiomId}`)
@@ -337,7 +344,7 @@ export function evaluatePanacea99(input: Panacea99EvaluationInput): Panacea99Dec
     registryId: registry.id,
     registrySchemaVersion: registry.schemaVersion,
     actionId,
-    evaluatedAt: input.evaluatedAt,
+    evaluatedAt,
     decision,
     executionGate,
     hardGateProduct: executionGate,
