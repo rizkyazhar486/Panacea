@@ -7,7 +7,7 @@
 import { createHash } from 'node:crypto'
 import type { LogLab } from './labLog.js'
 import { KATALOG } from './healthMetrics.js'
-import { bacaSelfVitalsLog, bacaVo2maxLog } from './catatanKesehatanDiri.js'
+import { bacaSelfVitalsLog, bacaVo2maxLog, bacaDiarySleep, bacaDiaryFoods, bacaDiaryWellness } from './catatanKesehatanDiri.js'
 
 const KUNCI_METRIK = new Set<string>([...KATALOG.map((d) => d.kunci), 'sleepH'])
 const MAKS_RIWAYAT = 90
@@ -77,6 +77,13 @@ export interface KeadaanLongitudinal {
   /** Hanya untuk peran pasien (rekam diri). Klinisi memakai /api/clinical. */
   clinical: JalurKlinisLongitudinal | null
   device: JalurPerangkatLongitudinal
+  diary: {
+    truthClass: 'patient-recorded'
+    source: 'health-profile'
+    sleep: ReturnType<typeof bacaDiarySleep>
+    foods: ReturnType<typeof bacaDiaryFoods>
+    wellness: ReturnType<typeof bacaDiaryWellness>
+  }
 }
 
 /** @deprecated Prefer susunKeadaanLongitudinal; kept for the lab-only tests. */
@@ -247,6 +254,13 @@ export function susunKeadaanLongitudinal(input: {
     source: 'health-profile',
     ...dipilih,
   }
+  const diary = {
+    truthClass: 'patient-recorded' as const,
+    source: 'health-profile' as const,
+    sleep: bacaDiarySleep(input.device as Record<string, unknown> | null),
+    foods: bacaDiaryFoods(input.device as Record<string, unknown> | null),
+    wellness: bacaDiaryWellness(input.device as Record<string, unknown> | null),
+  }
   const isi = JSON.stringify({
     lab: lab.log,
     care: { plans: care.plans, reviews: care.reviews },
@@ -259,7 +273,8 @@ export function susunKeadaanLongitudinal(input: {
       selfVitals: device.selfVitals,
       vo2maxLog: device.vo2maxLog,
     },
+    diary,
   })
   const revision = createHash('sha256').update(`${input.subjectId}\n${isi}`).digest('hex').slice(0, 16)
-  return { subjectId: input.subjectId, revision, generatedAt: input.generatedAt, lab, care, clinical, device }
+  return { subjectId: input.subjectId, revision, generatedAt: input.generatedAt, lab, care, clinical, device, diary }
 }

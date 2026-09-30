@@ -495,6 +495,13 @@ export const api = {
       selfVitals: { id: string; at: string; systolic: number; diastolic: number; heartRate: number; spo2: number; tempC: number }[]
       vo2maxLog: { id: string; at: string; value: number; method: string }[]
     }
+    diary?: {
+      truthClass: 'patient-recorded'
+      source: 'health-profile'
+      sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
+      foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
+      wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+    }
   }>('/api/keadaan-longitudinal'),
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
@@ -528,6 +535,11 @@ export const api = {
     req<{ ok: boolean; selfVitals: typeof selfVitals }>('/api/health-series/self-vitals', { method: 'PUT', body: JSON.stringify({ selfVitals }) }),
   putVo2maxLog: (vo2maxLog: { id: string; at: string; value: number; method: string }[]) =>
     req<{ ok: boolean; vo2maxLog: typeof vo2maxLog }>('/api/health-series/vo2max', { method: 'PUT', body: JSON.stringify({ vo2maxLog }) }),
+  putDiary: (body: {
+    sleepLogs?: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
+    foods?: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
+    wellness?: { date: string; sleepHr?: number; waterMl?: number }[]
+  }) => req<{ ok: boolean }>('/api/health-series/diary', { method: 'PUT', body: JSON.stringify(body) }),
   // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
   rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),

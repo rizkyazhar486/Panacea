@@ -75,3 +75,135 @@ export function bacaVo2maxLog(profil: Record<string, unknown> | undefined | null
     return []
   }
 }
+
+const TANGGAL = /^\d{4}-\d{2}-\d{2}$/
+export const MAKS_TIDUR = 60
+export const MAKS_MAKANAN = 200
+export const MAKS_WELLNESS = 60
+
+export interface CatatanTidurServer {
+  id: string
+  date: string
+  hours: number
+  bedtimeConsistent: boolean
+}
+
+export interface CatatanMakananServer {
+  id: string
+  date: string
+  name: string
+  grams: number
+  kcal: number
+  protein: number
+  carbs: number
+  fat: number
+}
+
+export interface CatatanWellnessServer {
+  date: string
+  sleepHr?: number
+  waterMl?: number
+}
+
+function tanggalSah(v: unknown): string | null {
+  if (typeof v !== 'string' || !TANGGAL.test(v) || !Number.isFinite(Date.parse(v))) return null
+  return v
+}
+
+function angkaRentang(v: unknown, min: number, max: number, termasukNol: boolean): number | null {
+  if (typeof v !== 'number' || !Number.isFinite(v) || v > max) return null
+  if (termasukNol ? v < min : v <= min) return null
+  return v
+}
+
+export function validasiDiarySleep(masukan: unknown): CatatanTidurServer[] {
+  if (!Array.isArray(masukan)) throw new Error('sleep log must be a list')
+  if (masukan.length > MAKS_TIDUR) throw new Error('too many sleep rows')
+  const keluar: CatatanTidurServer[] = []
+  const dilihat = new Set<string>()
+  for (const b of masukan) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) throw new Error('invalid sleep row')
+    const x = b as Record<string, unknown>
+    if (typeof x.id !== 'string' || !ID.test(x.id)) throw new Error('invalid sleep id')
+    if (dilihat.has(x.id)) continue
+    const date = tanggalSah(x.date)
+    const hours = angkaRentang(x.hours, 0, 24, true)
+    if (!date || hours == null) throw new Error('invalid sleep row')
+    if (typeof x.bedtimeConsistent !== 'boolean') throw new Error('invalid sleep row')
+    dilihat.add(x.id)
+    keluar.push({ id: x.id, date, hours, bedtimeConsistent: x.bedtimeConsistent })
+  }
+  return keluar.sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_TIDUR)
+}
+
+export function validasiDiaryFoods(masukan: unknown): CatatanMakananServer[] {
+  if (!Array.isArray(masukan)) throw new Error('food log must be a list')
+  if (masukan.length > MAKS_MAKANAN) throw new Error('too many food rows')
+  const keluar: CatatanMakananServer[] = []
+  const dilihat = new Set<string>()
+  for (const b of masukan) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) throw new Error('invalid food row')
+    const x = b as Record<string, unknown>
+    if (typeof x.id !== 'string' || !ID.test(x.id)) throw new Error('invalid food id')
+    if (dilihat.has(x.id)) continue
+    const date = tanggalSah(x.date)
+    const name = typeof x.name === 'string' ? x.name.trim().slice(0, 80) : ''
+    const grams = angkaRentang(x.grams, 0, 5000, false)
+    const kcal = angkaRentang(x.kcal, 0, 20000, false)
+    const protein = angkaRentang(x.protein, 0, 2000, true)
+    const carbs = angkaRentang(x.carbs, 0, 2000, true)
+    const fat = angkaRentang(x.fat, 0, 2000, true)
+    if (!date || !name || grams == null || kcal == null || protein == null || carbs == null || fat == null) {
+      throw new Error('invalid food row')
+    }
+    dilihat.add(x.id)
+    keluar.push({ id: x.id, date, name, grams, kcal, protein, carbs, fat })
+  }
+  return keluar.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
+}
+
+export function validasiDiaryWellness(masukan: unknown): CatatanWellnessServer[] {
+  if (!Array.isArray(masukan)) throw new Error('wellness log must be a list')
+  if (masukan.length > MAKS_WELLNESS) throw new Error('too many wellness rows')
+  const keluar: CatatanWellnessServer[] = []
+  const dilihat = new Set<string>()
+  for (const b of masukan) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) throw new Error('invalid wellness row')
+    const x = b as Record<string, unknown>
+    const date = tanggalSah(x.date)
+    if (!date || dilihat.has(date)) continue
+    const row: CatatanWellnessServer = { date }
+    if (x.sleepHr != null) {
+      const sleepHr = angkaRentang(x.sleepHr, 0, 24, true)
+      if (sleepHr == null) throw new Error('invalid wellness sleep')
+      row.sleepHr = sleepHr
+    }
+    if (x.waterMl != null) {
+      const waterMl = angkaRentang(x.waterMl, 0, 20000, true)
+      if (waterMl == null) throw new Error('invalid wellness water')
+      row.waterMl = waterMl
+    }
+    if (row.sleepHr == null && row.waterMl == null) continue
+    dilihat.add(date)
+    keluar.push(row)
+  }
+  return keluar.sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
+}
+
+function bacaDaftar(profil: Record<string, unknown> | undefined | null, kunci: string, validasi: (m: unknown) => unknown[]) {
+  try {
+    return validasi(profil && Array.isArray(profil[kunci]) ? profil[kunci] : [])
+  } catch {
+    return []
+  }
+}
+
+export function bacaDiarySleep(profil: Record<string, unknown> | undefined | null) {
+  return bacaDaftar(profil, 'diarySleep', validasiDiarySleep) as CatatanTidurServer[]
+}
+export function bacaDiaryFoods(profil: Record<string, unknown> | undefined | null) {
+  return bacaDaftar(profil, 'diaryFoods', validasiDiaryFoods) as CatatanMakananServer[]
+}
+export function bacaDiaryWellness(profil: Record<string, unknown> | undefined | null) {
+  return bacaDaftar(profil, 'diaryWellness', validasiDiaryWellness) as CatatanWellnessServer[]
+}

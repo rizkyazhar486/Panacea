@@ -159,7 +159,7 @@ import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
-import { validasiSelfVitalsLog, validasiVo2maxLog } from './catatanKesehatanDiri.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, validasiDiarySleep, validasiDiaryFoods, validasiDiaryWellness } from './catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
@@ -1020,7 +1020,7 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
   }
   try {
     // Self-vital / VO₂max lists only move through the dedicated series routes.
-    const { selfVitalsLog: _s, vo2maxEntries: _v, ...profil } = data as Record<string, unknown>
+    const { selfVitalsLog: _s, vo2maxEntries: _v, diarySleep: _d, diaryFoods: _f, diaryWellness: _w, ...profil } = data as Record<string, unknown>
     res.json({ ok: true, profile: saveHealthProfile(u.email, profil) })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
@@ -1041,6 +1041,25 @@ app.put('/api/health-series/vo2max', requireAuth, (req, res) => {
   try {
     const vo2maxEntries = validasiVo2maxLog((req.body as { vo2maxLog?: unknown })?.vo2maxLog)
     res.json({ ok: true, vo2maxLog: saveHealthProfile(u.email, { vo2maxEntries }).vo2maxEntries })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.put('/api/health-series/diary', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    res.status(400).json({ error: 'invalid diary payload' })
+    return
+  }
+  try {
+    const patch: Record<string, unknown> = {}
+    if ('sleepLogs' in body) patch.diarySleep = validasiDiarySleep(body.sleepLogs)
+    if ('foods' in body) patch.diaryFoods = validasiDiaryFoods(body.foods)
+    if ('wellness' in body) patch.diaryWellness = validasiDiaryWellness(body.wellness)
+    if (!Object.keys(patch).length) throw new Error('diary payload is empty')
+    const profil = saveHealthProfile(u.email, patch)
+    res.json({ ok: true, sleep: profil.diarySleep, foods: profil.diaryFoods ?? [], wellness: profil.diaryWellness ?? [] })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }

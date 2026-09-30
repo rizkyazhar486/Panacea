@@ -31,6 +31,11 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   const [labServer, setLabServer] = useState<LabServer | null>(null)
   const [deviceCurrent, setDeviceCurrent] = useState<Record<string, number> | null>(null)
   const [deviceSeries, setDeviceSeries] = useState<DeviceSeries | null>(null)
+  const [diaryServer, setDiaryServer] = useState<{
+    sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
+    foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
+    wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+  } | null>(null)
   const [serverReady, setServerReady] = useState(false)
   const adoptedLocal = useRef(Boolean(account))
   const migrasiSeries = useRef('')
@@ -83,6 +88,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     setLabServer(null)
     setDeviceCurrent(null)
     setDeviceSeries(null)
+    setDiaryServer(null)
     setServer(emptyLongitudinalServer())
     setServerReady(false)
   }, [akunId])
@@ -113,6 +119,20 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         if (keadaan.device.vo2maxLog.length === 0 && app.vo2maxLog.length > 0) {
           jobs.push(api.putVo2maxLog(app.vo2maxLog))
         }
+        const diary = keadaan.diary
+        if (diary?.truthClass === 'patient-recorded' && diary.source === 'health-profile') {
+          const unggah: Parameters<typeof api.putDiary>[0] = {}
+          if (diary.sleep.length === 0 && app.sleepLogs.length > 0) unggah.sleepLogs = app.sleepLogs
+          if (diary.foods.length === 0 && app.foods.length > 0) unggah.foods = app.foods
+          if (diary.wellness.length === 0 && Object.keys(app.wellness ?? {}).length > 0) {
+            unggah.wellness = Object.values(app.wellness).map((row) => ({
+              date: row.date,
+              ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
+              ...(row.waterMl != null ? { waterMl: row.waterMl } : {}),
+            }))
+          }
+          if (unggah.sleepLogs || unggah.foods || unggah.wellness) jobs.push(api.putDiary(unggah))
+        }
         if (jobs.length) {
           Promise.all(jobs).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { /* keep browser copy */ })
         }
@@ -131,6 +151,9 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         encounters: clinical?.encounters ?? {},
       })
       setServerReady(true)
+      if (keadaan.diary?.truthClass === 'patient-recorded' && keadaan.diary.source === 'health-profile') {
+        setDiaryServer({ sleep: keadaan.diary.sleep, foods: keadaan.diary.foods, wellness: keadaan.diary.wellness })
+      }
     }).catch(() => {
       // Offline: browser copies remain the fallback; care/EMR stay empty.
       if (active) setServerReady(false)
@@ -143,18 +166,25 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   const sumberSelf = sumberDeretLongitudinal(serverReady ? deviceSeries?.selfVitals ?? null : null, app.selfVitals)
   const sumberVo2 = sumberDeretLongitudinal(serverReady ? deviceSeries?.vo2maxLog ?? null : null, app.vo2maxLog)
   const sourceApp = useMemo(
-    () => ({
-      account,
-      vitals: app.vitals,
-      selfVitals: [...sumberSelf.rows],
-      vo2maxLog: [...sumberVo2.rows],
-      foods: app.foods,
-      sleepLogs: app.sleepLogs,
-      wellness: app.wellness,
-      trainingLogs: app.trainingLogs,
-      gpsActivities: app.gpsActivities,
-    }),
-    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, sumberSelf.rows, sumberVo2.rows],
+    () => {
+      const tidur = diaryServer && diaryServer.sleep.length > 0 ? diaryServer.sleep : app.sleepLogs
+      const makanan = diaryServer && diaryServer.foods.length > 0 ? diaryServer.foods : app.foods
+      const wellness = diaryServer && diaryServer.wellness.length > 0
+        ? Object.fromEntries(diaryServer.wellness.map((row) => [row.date, row]))
+        : app.wellness
+      return {
+        account,
+        vitals: app.vitals,
+        selfVitals: [...sumberSelf.rows],
+        vo2maxLog: [...sumberVo2.rows],
+        foods: makanan,
+        sleepLogs: tidur,
+        wellness,
+        trainingLogs: app.trainingLogs,
+        gpsActivities: app.gpsActivities,
+      }
+    },
+    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, diaryServer, sumberSelf.rows, sumberVo2.rows],
   )
   const sourceLocal = useMemo(
     () => ({ ...local, labs: sumberLab.labs, vitals: sumberVitals.vitals as typeof local.vitals }),
