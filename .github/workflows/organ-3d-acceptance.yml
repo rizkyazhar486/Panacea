@@ -19,7 +19,7 @@ concurrency:
 jobs:
   render-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,7 +127,11 @@ jobs:
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
-        timeout-minutes: 12
+        # 12 serial gates are individually bounded below (240s for organ,
+        # 180s for each of the other 11). The stage hard stop must be large
+        # enough to let those fail-closed per-gate verdicts run instead of
+        # pre-empting a healthy queue: 240 + 11*180 = 2220s = 37m.
+        timeout-minutes: 38
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
