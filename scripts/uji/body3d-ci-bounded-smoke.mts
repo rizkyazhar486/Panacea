@@ -18,8 +18,8 @@ assert.match(
 )
 assert.match(
   workflow,
-  /name: Prove every 3D panel renders\n\s+timeout-minutes: 12/,
-  'the serial Body3D proof stage must have its own total runtime bound',
+  /name: Prove every 3D panel renders\n\s+timeout-minutes: 18/,
+  'the serial Body3D proof stage must retain the evidence-based 18 minute bounded envelope',
 )
 assert.match(
   workflow,
@@ -99,5 +99,5 @@ assert.match(
 )
 
 console.log(
-  'Body3D CI: serial proofs are individually bounded with a 240s organ exception, fail fast, and retain stage/job/process-group hard stops',
+  'Body3D CI: serial proofs are individually bounded with a 240s organ exception, fail fast, and retain evidence-based stage/job/process-group hard stops',
 )
