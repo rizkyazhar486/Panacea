@@ -123,7 +123,7 @@ export function ringkasGpsUntukAkun<T extends { id: string; email?: string; hrSa
   return keluar
 }
 
-export function gpsTampil<T extends { id: string; email?: string; hrSamples?: { s: number; bpm: number }[] }>(
+export function gpsTampil<T extends { id: string; email: string; emoji: string; hrSamples?: { s: number; bpm: number }[] }>(
   akun: readonly Omit<T, 'email' | 'hrSamples'>[] | null,
   lokal: readonly T[],
   emailPemilik: string,
@@ -137,12 +137,12 @@ export function gpsTampil<T extends { id: string; email?: string; hrSamples?: { 
     ids.add(row.id)
     const ada = lokalById.get(row.id)
     const emoji = ('emoji' in row && typeof row.emoji === 'string' && row.emoji) ? row.emoji : (ada && 'emoji' in ada && typeof ada.emoji === 'string' ? ada.emoji : '')
-    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as T)
+    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as unknown as T)
   }
   for (const row of ringkasGpsUntukAkun(lokal, emailPemilik)) {
     if (ids.has(row.id)) continue
     ids.add(row.id)
-    keluar.push({ ...row, email: emailPemilik } as T)
+    keluar.push({ ...row, email: emailPemilik } as unknown as T)
   }
   return keluar
 }
