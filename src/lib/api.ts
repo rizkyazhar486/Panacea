@@ -501,6 +501,8 @@ export const api = {
       sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
       foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
       wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+      training?: { id: string; date: string; rpe: number; type: string; note?: string }[]
+      gps?: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
       removed?: { foods: string[]; sleep: string[] }
     }
   }>('/api/keadaan-longitudinal'),
@@ -542,6 +544,8 @@ export const api = {
     wellness?: { date: string; sleepHr?: number; waterMl?: number }[]
     removeFoodIds?: string[]
     removeSleepIds?: string[]
+    trainingLogs?: { id: string; date: string; rpe: number; type: string; note?: string }[]
+    gpsActivities?: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
   }) => req<{ ok: boolean }>('/api/health-series/diary', { method: 'PUT', body: JSON.stringify(body) }),
   // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),

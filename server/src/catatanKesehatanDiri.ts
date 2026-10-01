@@ -80,6 +80,9 @@ const TANGGAL = /^\d{4}-\d{2}-\d{2}$/
 export const MAKS_TIDUR = 60
 export const MAKS_MAKANAN = 200
 export const MAKS_WELLNESS = 60
+export const MAKS_LATIHAN = 120
+export const MAKS_GPS = 80
+const JENIS_OLAHRAGA = new Set(['run', 'cycle', 'swim', 'marathon', 'half_marathon', 'triathlon', 'walk'])
 
 export interface CatatanTidurServer {
   id: string
@@ -103,6 +106,29 @@ export interface CatatanWellnessServer {
   date: string
   sleepHr?: number
   waterMl?: number
+}
+
+export interface CatatanLatihanServer {
+  id: string
+  date: string
+  rpe: number
+  type: string
+  note?: string
+}
+
+export interface CatatanGpsServer {
+  id: string
+  name: string
+  sport: string
+  sportType: string
+  emoji?: string
+  distKm: number
+  durSec: number
+  avgSpeedKmh: number
+  kcal: number
+  at: string
+  avgHr?: number
+  maxHr?: number
 }
 
 function tanggalSah(v: unknown): string | null {
@@ -296,7 +322,110 @@ export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[],
   return [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
 }
 
-const KUNCI_DIARY_TERKUNCI = ['selfVitalsLog', 'vo2maxEntries', 'diarySleep', 'diaryFoods', 'diaryWellness', 'diaryRemovedFoods', 'diaryRemovedSleep'] as const
+function gabungMenurutId<T extends { id: string }>(tersimpan: readonly T[], masuk: readonly T[], urut: (a: T, b: T) => number, maks: number): T[] {
+  const ids = new Set<string>()
+  const gabung: T[] = []
+  for (const row of tersimpan) {
+    if (ids.has(row.id)) continue
+    ids.add(row.id)
+    gabung.push(row)
+  }
+  for (const row of masuk) {
+    if (ids.has(row.id)) continue
+    ids.add(row.id)
+    gabung.push(row)
+  }
+  return gabung.sort(urut).slice(0, maks)
+}
+
+export function validasiDiaryTraining(masukan: unknown): CatatanLatihanServer[] {
+  if (!Array.isArray(masukan)) throw new Error('training log must be a list')
+  if (masukan.length > MAKS_LATIHAN) throw new Error('too many training rows')
+  const keluar: CatatanLatihanServer[] = []
+  const dilihat = new Set<string>()
+  for (const b of masukan) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) throw new Error('invalid training row')
+    const x = b as Record<string, unknown>
+    if (typeof x.id !== 'string' || !ID.test(x.id)) throw new Error('invalid training id')
+    if (dilihat.has(x.id)) continue
+    const date = tanggalSah(x.date)
+    const rpe = angkaRentang(x.rpe, 1, 10, true)
+    const type = typeof x.type === 'string' ? x.type.trim().slice(0, 40) : ''
+    if (!date || rpe == null || !type) throw new Error('invalid training row')
+    const row: CatatanLatihanServer = { id: x.id, date, rpe, type }
+    if (x.note != null) {
+      if (typeof x.note !== 'string') throw new Error('invalid training note')
+      const note = x.note.trim().slice(0, 140)
+      if (note) row.note = note
+    }
+    dilihat.add(x.id)
+    keluar.push(row)
+  }
+  return keluar.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_LATIHAN)
+}
+
+function detakOpsional(v: unknown, ada: boolean): number | undefined {
+  if (!ada) return undefined
+  const n = angkaRentang(v, 29, 230, false)
+  if (n == null) throw new Error('invalid gps heart rate')
+  return n
+}
+
+export function validasiDiaryGps(masukan: unknown): CatatanGpsServer[] {
+  if (!Array.isArray(masukan)) throw new Error('gps log must be a list')
+  if (masukan.length > MAKS_GPS) throw new Error('too many gps rows')
+  const keluar: CatatanGpsServer[] = []
+  const dilihat = new Set<string>()
+  for (const b of masukan) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) throw new Error('invalid gps row')
+    const x = b as Record<string, unknown>
+    if (typeof x.id !== 'string' || !ID.test(x.id)) throw new Error('invalid gps id')
+    if (dilihat.has(x.id)) continue
+    const name = typeof x.name === 'string' ? x.name.trim().slice(0, 60) : ''
+    const sport = typeof x.sport === 'string' ? x.sport.trim().slice(0, 40) : ''
+    const sportType = typeof x.sportType === 'string' ? x.sportType : ''
+    const distKm = angkaRentang(x.distKm, 0, 500, false)
+    const durSec = angkaRentang(x.durSec, 0, 86400, false)
+    const avgSpeedKmh = angkaRentang(x.avgSpeedKmh, 0, 150, false)
+    const kcal = angkaRentang(x.kcal, 0, 20000, true)
+    if (!name || !sport || !JENIS_OLAHRAGA.has(sportType) || distKm == null || durSec == null || avgSpeedKmh == null || kcal == null) {
+      throw new Error('invalid gps row')
+    }
+    if (typeof x.at !== 'string' || !Number.isFinite(Date.parse(x.at))) throw new Error('invalid gps time')
+    const avgHr = detakOpsional(x.avgHr, x.avgHr != null)
+    const maxHr = detakOpsional(x.maxHr, x.maxHr != null)
+    if (avgHr != null && maxHr != null && maxHr < avgHr) throw new Error('invalid gps heart rate')
+    const row: CatatanGpsServer = {
+      id: x.id,
+      name,
+      sport,
+      sportType,
+      distKm,
+      durSec,
+      avgSpeedKmh,
+      kcal,
+      at: new Date(Date.parse(x.at)).toISOString(),
+    }
+    if (typeof x.emoji === 'string') {
+      const emoji = x.emoji.trim().slice(0, 8)
+      if (emoji) row.emoji = emoji
+    } else if (x.emoji != null) throw new Error('invalid gps row')
+    if (avgHr != null) row.avgHr = avgHr
+    if (maxHr != null) row.maxHr = maxHr
+    dilihat.add(x.id)
+    keluar.push(row)
+  }
+  return keluar.sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id)).slice(0, MAKS_GPS)
+}
+
+export function bacaDiaryTraining(profil: Record<string, unknown> | undefined | null) {
+  return bacaDaftar(profil, 'diaryTraining', validasiDiaryTraining) as CatatanLatihanServer[]
+}
+export function bacaDiaryGps(profil: Record<string, unknown> | undefined | null) {
+  return bacaDaftar(profil, 'diaryGps', validasiDiaryGps) as CatatanGpsServer[]
+}
+
+const KUNCI_DIARY_TERKUNCI = ['selfVitalsLog', 'vo2maxEntries', 'diarySleep', 'diaryFoods', 'diaryWellness', 'diaryTraining', 'diaryGps', 'diaryRemovedFoods', 'diaryRemovedSleep'] as const
 
 /** Generic profile writes cannot set diary rows or their tombstones. */
 export function buangKunciDiary(data: Record<string, unknown>): Record<string, unknown> {
@@ -308,7 +437,7 @@ export function buangKunciDiary(data: Record<string, unknown>): Record<string, u
 /** Validate then union. A listed id is removed and remembered so a later upload cannot restore it. */
 export function susunPatchDiary(
   profil: Record<string, unknown> | undefined | null,
-  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown },
+  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown },
 ): Record<string, unknown> {
   const foodsHapus = body && 'removeFoodIds' in body ? validasiIdDihapus(body.removeFoodIds) : []
   const sleepHapus = body && 'removeSleepIds' in body ? validasiIdDihapus(body.removeSleepIds) : []
@@ -329,6 +458,12 @@ export function susunPatchDiary(
     patch.diaryRemovedFoods = nisanMakan
   }
   if (body && 'wellness' in body) patch.diaryWellness = gabungDiaryWellness(bacaDiaryWellness(profil), validasiDiaryWellness(body.wellness))
+  if (body && 'trainingLogs' in body) {
+    patch.diaryTraining = gabungMenurutId(bacaDiaryTraining(profil), validasiDiaryTraining(body.trainingLogs), (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id), MAKS_LATIHAN)
+  }
+  if (body && 'gpsActivities' in body) {
+    patch.diaryGps = gabungMenurutId(bacaDiaryGps(profil), validasiDiaryGps(body.gpsActivities), (a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id), MAKS_GPS)
+  }
   if (!Object.keys(patch).length) throw new Error('diary payload is empty')
   return patch
 }

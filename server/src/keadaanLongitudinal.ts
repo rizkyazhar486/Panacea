@@ -7,7 +7,7 @@
 import { createHash } from 'node:crypto'
 import type { LogLab } from './labLog.js'
 import { KATALOG } from './healthMetrics.js'
-import { bacaSelfVitalsLog, bacaVo2maxLog, bacaDiarySleep, bacaDiaryFoods, bacaDiaryWellness, bacaDiaryDihapus } from './catatanKesehatanDiri.js'
+import { bacaSelfVitalsLog, bacaVo2maxLog, bacaDiarySleep, bacaDiaryFoods, bacaDiaryWellness, bacaDiaryDihapus, bacaDiaryTraining, bacaDiaryGps } from './catatanKesehatanDiri.js'
 
 const KUNCI_METRIK = new Set<string>([...KATALOG.map((d) => d.kunci), 'sleepH'])
 const MAKS_RIWAYAT = 90
@@ -83,6 +83,8 @@ export interface KeadaanLongitudinal {
     sleep: ReturnType<typeof bacaDiarySleep>
     foods: ReturnType<typeof bacaDiaryFoods>
     wellness: ReturnType<typeof bacaDiaryWellness>
+    training: ReturnType<typeof bacaDiaryTraining>
+    gps: ReturnType<typeof bacaDiaryGps>
     removed: { foods: string[]; sleep: string[] }
   }
 }
@@ -261,6 +263,8 @@ export function susunKeadaanLongitudinal(input: {
     sleep: bacaDiarySleep(input.device as Record<string, unknown> | null),
     foods: bacaDiaryFoods(input.device as Record<string, unknown> | null),
     wellness: bacaDiaryWellness(input.device as Record<string, unknown> | null),
+    training: bacaDiaryTraining(input.device as Record<string, unknown> | null),
+    gps: bacaDiaryGps(input.device as Record<string, unknown> | null),
     removed: bacaDiaryDihapus(input.device as Record<string, unknown> | null),
   }
   const isi = JSON.stringify({

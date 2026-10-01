@@ -1,5 +1,5 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { barisBelumAda, makananTampil, tampilkanWellness, tidurTampil, wellnessBelumAda } from './homeCrossTabDailyState'
+import { barisBelumAda, gpsTampil, makananTampil, ringkasGpsUntukAkun, tampilkanWellness, tidurTampil, wellnessBelumAda } from './homeCrossTabDailyState'
 import { useStore } from './store'
 import { getVitals } from './healthVitals'
 import { ambilLab, type ButirLab } from './lab'
@@ -36,6 +36,8 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
     foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
     wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+    training: { id: string; date: string; rpe: number; type: string; note?: string }[]
+    gps: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
     removed: { foods: string[]; sleep: string[] }
   } | null>(null)
   const [serverReady, setServerReady] = useState(false)
@@ -146,6 +148,8 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
           sleep: keadaan.diary.sleep,
           foods: keadaan.diary.foods,
           wellness: keadaan.diary.wellness,
+          training: keadaan.diary.training ?? [],
+          gps: keadaan.diary.gps ?? [],
           removed: keadaan.diary.removed ?? { foods: [], sleep: [] },
         })
       }
@@ -170,10 +174,12 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     const sleepLogs = barisBelumAda(diaryServer.sleep, app.sleepLogs, dihapusTidur)
     const foods = barisBelumAda(diaryServer.foods, app.foods, dihapusMakan)
     const wellness = wellnessBelumAda(diaryServer.wellness, app.wellness ?? {})
+    const trainingLogs = barisBelumAda(diaryServer.training, app.trainingLogs)
+    const gpsActivities = barisBelumAda(diaryServer.gps, ringkasGpsUntukAkun(app.gpsActivities, account.email))
     const removeFoodIds = (app.diaryHiddenFoodIds ?? []).filter((id) => !diaryServer.removed.foods.includes(id))
     const removeSleepIds = (app.diaryHiddenSleepIds ?? []).filter((id) => !diaryServer.removed.sleep.includes(id))
-    if (!sleepLogs.length && !foods.length && !wellness.length && !removeFoodIds.length && !removeSleepIds.length) return
-    const tanda = JSON.stringify({ sleepLogs, foods, wellness, removeFoodIds, removeSleepIds })
+    if (!sleepLogs.length && !foods.length && !wellness.length && !trainingLogs.length && !gpsActivities.length && !removeFoodIds.length && !removeSleepIds.length) return
+    const tanda = JSON.stringify({ sleepLogs, foods, wellness, trainingLogs, gpsActivities, removeFoodIds, removeSleepIds })
     if (unggahDiary.current === tanda) return
     unggahDiary.current = tanda
     let active = true
@@ -181,11 +187,13 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       ...(sleepLogs.length ? { sleepLogs } : {}),
       ...(foods.length ? { foods } : {}),
       ...(wellness.length ? { wellness } : {}),
+      ...(trainingLogs.length ? { trainingLogs } : {}),
+      ...(gpsActivities.length ? { gpsActivities } : {}),
       ...(removeFoodIds.length ? { removeFoodIds } : {}),
       ...(removeSleepIds.length ? { removeSleepIds } : {}),
     }).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { unggahDiary.current = '' })
     return () => { active = false }
-  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds])
+  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds])
 
   const sumberLab = sumberLabLongitudinal(labServer && labServer.subjectId === account?.id ? labServer.log : null, local.labs)
   const sumberVitals = sumberVitalsLongitudinal(serverReady && account ? deviceCurrent : null, local.vitals as Record<string, unknown>)
@@ -198,6 +206,8 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       const tidur = tidurTampil(diaryServer ? diaryServer.sleep : null, app.sleepLogs, dihapusTidur)
       const makanan = makananTampil(diaryServer ? diaryServer.foods : null, app.foods, dihapusMakan)
       const wellness = diaryServer ? tampilkanWellness(diaryServer.wellness, app.wellness ?? {}) : app.wellness
+      const latihan = makananTampil(diaryServer ? diaryServer.training : null, app.trainingLogs)
+      const gps = gpsTampil(diaryServer ? diaryServer.gps : null, app.gpsActivities, account?.email ?? '')
       return {
         account,
         vitals: app.vitals,
@@ -206,8 +216,8 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         foods: makanan,
         sleepLogs: tidur,
         wellness,
-        trainingLogs: app.trainingLogs,
-        gpsActivities: app.gpsActivities,
+        trainingLogs: latihan,
+        gpsActivities: gps,
       }
     },
     [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds, diaryServer, sumberSelf.rows, sumberVo2.rows],

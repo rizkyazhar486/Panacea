@@ -1045,7 +1045,7 @@ app.put('/api/health-series/vo2max', requireAuth, (req, res) => {
 })
 app.put('/api/health-series/diary', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown }
+  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown }
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     res.status(400).json({ error: 'invalid diary payload' })
     return
