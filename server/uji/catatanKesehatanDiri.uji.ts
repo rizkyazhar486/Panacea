@@ -138,11 +138,15 @@ const disaring = buangKunciDiary({
   diaryWellness: [{ date: '2026-09-28' }],
   diaryRemovedFoods: ['f1'],
   diaryRemovedSleep: ['s1'],
+  diaryRemovedTraining: ['t1'],
+  diaryRemovedGps: ['g1'],
   selfVitalsLog: [{ id: 'v' }],
   vo2maxEntries: [{ id: 'o' }],
 })
 assert.equal(disaring.weightKg, 70)
 assert.equal('diaryRemovedFoods' in disaring, false)
+assert.equal('diaryRemovedTraining' in disaring, false)
+assert.equal('diaryRemovedGps' in disaring, false)
 assert.equal('diarySleep' in disaring, false)
 assert.equal('selfVitalsLog' in disaring, false)
 
@@ -159,6 +163,27 @@ assert.equal(barisLatihan.find((r) => r.id === 't1')?.rpe, 8)
 assert.equal(barisLatihan.find((r) => r.id === 't2')?.rpe, 1)
 assert.equal(barisLatihan.find((r) => r.id === 't2')?.note, 'mudah')
 assert.equal((susunPatchDiary({ diaryTraining: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] }, { trainingLogs: [] }).diaryTraining as { id: string }[])[0].id, 't1')
+const hapusLatihan = susunPatchDiary({
+  diaryTraining: [
+    { id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' },
+    { id: 't2', date: '2026-09-29', rpe: 4, type: 'Gym' },
+  ],
+}, { removeTrainingIds: ['t1'] })
+assert.equal((hapusLatihan.diaryTraining as { id: string }[]).some((r) => r.id === 't1'), false)
+assert.equal((hapusLatihan.diaryTraining as { id: string }[])[0].id, 't2')
+assert.deepEqual(hapusLatihan.diaryRemovedTraining, ['t1'])
+const pulihLatihan = susunPatchDiary(
+  { diaryTraining: hapusLatihan.diaryTraining, diaryRemovedTraining: hapusLatihan.diaryRemovedTraining },
+  { trainingLogs: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] },
+)
+assert.equal((pulihLatihan.diaryTraining as { id: string }[]).some((r) => r.id === 't1'), false)
+const profilHapusLatihan = { diaryTraining: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] }
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: ['bukan id'] }), /invalid removed id/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: Array.from({ length: 101 }, (_, i) => `id${i}ok`) }), /too many removed ids/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: [] }), /diary payload is empty/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
 assert.equal(validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 10, type: 'HIIT' }])[0].rpe, 10)
 assert.throws(() => validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 0, type: 'HIIT' }]), /invalid training/)
 assert.throws(() => validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 10.1, type: 'HIIT' }]), /invalid training/)
@@ -181,6 +206,19 @@ assert.equal(barisGps.map((r) => r.id).sort().join(','), 'g1,g2')
 assert.equal(barisGps.find((r) => r.id === 'g2')?.kcal, 0)
 assert.equal(barisGps.find((r) => r.id === 'g2')?.avgHr, 140)
 assert.equal('hrSamples' in (barisGps.find((r) => r.id === 'g2') ?? {}), false)
+const hapusGps = susunPatchDiary({
+  diaryGps: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }],
+}, { removeGpsIds: ['g1'] })
+assert.equal((hapusGps.diaryGps as unknown[]).length, 0)
+assert.deepEqual(hapusGps.diaryRemovedGps, ['g1'])
+const pulihGps = susunPatchDiary(
+  { diaryGps: hapusGps.diaryGps, diaryRemovedGps: hapusGps.diaryRemovedGps },
+  { gpsActivities: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }] },
+)
+assert.equal((pulihGps.diaryGps as unknown[]).length, 0)
+const profilGps = { diaryGps: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }] }
+assert.throws(() => susunPatchDiary(profilGps, { removeGpsIds: [3] }), /invalid removed id/)
+assert.equal((profilGps.diaryGps as { id: string }[])[0].id, 'g1')
 assert.equal(validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'run', distKm: 500, durSec: 86400, avgSpeedKmh: 150, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]).length, 1)
 assert.throws(() => validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'run', distKm: 0, durSec: 60, avgSpeedKmh: 10, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]), /invalid gps/)
 assert.throws(() => validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'fly', distKm: 1, durSec: 60, avgSpeedKmh: 10, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]), /invalid gps/)

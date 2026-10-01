@@ -503,7 +503,7 @@ export const api = {
       wellness: { date: string; sleepHr?: number; waterMl?: number }[]
       training?: { id: string; date: string; rpe: number; type: string; note?: string }[]
       gps?: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
-      removed?: { foods: string[]; sleep: string[] }
+      removed?: { foods: string[]; sleep: string[]; training?: string[]; gps?: string[] }
     }
   }>('/api/keadaan-longitudinal'),
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
@@ -544,6 +544,8 @@ export const api = {
     wellness?: { date: string; sleepHr?: number; waterMl?: number }[]
     removeFoodIds?: string[]
     removeSleepIds?: string[]
+    removeTrainingIds?: string[]
+    removeGpsIds?: string[]
     trainingLogs?: { id: string; date: string; rpe: number; type: string; note?: string }[]
     gpsActivities?: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
   }) => req<{ ok: boolean }>('/api/health-series/diary', { method: 'PUT', body: JSON.stringify(body) }),

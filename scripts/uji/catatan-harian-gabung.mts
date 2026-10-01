@@ -83,5 +83,12 @@ const gpsLayar = gpsTampil(
 assert.equal(gpsLayar.find((r) => r.id === 'g1')?.hrSamples?.[0].bpm, 140)
 assert.equal(gpsLayar.some((r) => r.id === 'g3'), true)
 assert.equal(gpsLayar.some((r) => r.id === 'g2'), false)
+const gpsHapus = gpsTampil(
+  [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z' }],
+  [{ id: 'g1', email: 'a@x.com', name: 'Pagi', sport: 'Lari', sportType: 'run', emoji: '🏃', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z' }],
+  'a@x.com',
+  ['g1'],
+)
+assert.equal(gpsHapus.length, 0)
 
 console.log('catatan-harian-gabung: second device adds rows without replacing the account')

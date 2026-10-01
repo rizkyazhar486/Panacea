@@ -132,25 +132,28 @@ export function ringkasGpsUntukAkun<T extends { id: string; email?: string; hrSa
 }
 
 export function gpsTampil<T extends { id: string; email?: string; hrSamples?: { s: number; bpm: number }[] }>(
-  akun: readonly Omit<T, 'email' | 'hrSamples'>[] | null,
+  akun: readonly (Omit<T, 'email' | 'hrSamples' | 'emoji'> & { id: string; emoji?: string })[] | null,
   lokal: readonly T[],
   emailPemilik: string,
+  dihapus: readonly string[] = [],
 ): T[] {
-  if (!akun) return lokal.filter((row) => row?.id)
-  const lokalById = new Map(lokal.filter((row) => row?.id).map((row) => [row.id, row]))
+  const hapus = new Set(dihapus)
+  const lokalHidup = lokal.filter((row) => row?.id && !hapus.has(row.id))
+  if (!akun) return lokalHidup
+  const lokalById = new Map(lokalHidup.map((row) => [row.id, row]))
   const ids = new Set<string>()
   const keluar: T[] = []
   for (const row of akun) {
-    if (!row?.id || ids.has(row.id)) continue
+    if (!row?.id || ids.has(row.id) || hapus.has(row.id)) continue
     ids.add(row.id)
     const ada = lokalById.get(row.id)
     const emoji = ('emoji' in row && typeof row.emoji === 'string' && row.emoji) ? row.emoji : (ada && 'emoji' in ada && typeof ada.emoji === 'string' ? ada.emoji : '')
-    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as T)
+    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as unknown as T)
   }
-  for (const row of ringkasGpsUntukAkun(lokal, emailPemilik)) {
+  for (const row of ringkasGpsUntukAkun(lokalHidup, emailPemilik)) {
     if (ids.has(row.id)) continue
     ids.add(row.id)
-    keluar.push({ ...row, email: emailPemilik } as T)
+    keluar.push({ ...row, email: emailPemilik } as unknown as T)
   }
   return keluar
 }

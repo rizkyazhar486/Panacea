@@ -94,7 +94,7 @@ function ingatDihapus(ada: unknown, ids: readonly string[]): string[] {
   return keluar.slice(-400)
 }
 
-function unggahHapusDiary(body: { removeFoodIds?: string[]; removeSleepIds?: string[]; sleepLogs?: SleepLog[] }) {
+function unggahHapusDiary(body: { removeFoodIds?: string[]; removeSleepIds?: string[]; removeTrainingIds?: string[]; removeGpsIds?: string[]; sleepLogs?: SleepLog[] }) {
   if (!backendEnabled) return
   api.putDiary(body).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* retry when the account diary is read again */ })
 }
@@ -254,6 +254,8 @@ function seed(): AppState {
     foods: [],
     diaryHiddenFoodIds: [],
     diaryHiddenSleepIds: [],
+    diaryHiddenTrainingIds: [],
+    diaryHiddenGpsIds: [],
     wellness: {},
     consults: [],
     orders: [],
@@ -389,6 +391,8 @@ interface Store {
   removeGoal: (id: string) => void
   addGpsActivity: (a: Omit<GpsActivity, 'id'>) => void // auto from GPS, never manual
   addTrainingLog: (rpe: number, type: string, note?: string) => void // RPE journal
+  removeTrainingLog: (id: string) => void
+  removeGpsActivity: (id: string) => void
   setActiveProgram: (program: string) => void
   addLifeEvent: (patientId: string, e: Omit<LifeEvent, 'id'>) => void
   removeLifeEvent: (patientId: string, id: string) => void
@@ -409,7 +413,7 @@ interface Store {
    */
   removeFood: (id: string) => void
   /** Drop rows the account has already tombstoned, without sending another delete. */
-  lupakanCatatanDihapus: (foodIds: string[], sleepIds: string[]) => void
+  lupakanCatatanDihapus: (foodIds: string[], sleepIds: string[], trainingIds?: string[], gpsIds?: string[]) => void
   logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
   addProduct: (p: PharmacyProduct) => void
@@ -1042,6 +1046,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           trainingLogs: [{ id: uid(), date: hariIni(), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
         })),
+      removeTrainingLog: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeTrainingIds: [id] })
+        return { ...st, trainingLogs: st.trainingLogs.filter((row) => row.id !== id), diaryHiddenTrainingIds: ingatDihapus(st.diaryHiddenTrainingIds, [id]) }
+      }),
+      removeGpsActivity: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeGpsIds: [id] })
+        return { ...st, gpsActivities: st.gpsActivities.filter((row) => row.id !== id), diaryHiddenGpsIds: ingatDihapus(st.diaryHiddenGpsIds, [id]) }
+      }),
       setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
       addLifeEvent: (patientId, e) =>
         setState((st) => ({
@@ -1103,18 +1117,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (st.account) unggahHapusDiary({ removeFoodIds: [id] })
         return { ...st, foods: st.foods.filter((f) => f.id !== id), diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, [id]) }
       }),
-      lupakanCatatanDihapus: (foodIds, sleepIds) => setState((st) => {
+      lupakanCatatanDihapus: (foodIds, sleepIds, trainingIds = [], gpsIds = []) => setState((st) => {
         const foodsH = new Set(foodIds)
         const sleepH = new Set(sleepIds)
+        const trainingH = new Set(trainingIds)
+        const gpsH = new Set(gpsIds)
         const foods = st.foods.filter((f) => !foodsH.has(f.id))
         const sleepLogs = st.sleepLogs.filter((s) => !sleepH.has(s.id))
-        if (foods.length === st.foods.length && sleepLogs.length === st.sleepLogs.length) return st
+        const trainingLogs = st.trainingLogs.filter((row) => !trainingH.has(row.id))
+        const gpsActivities = st.gpsActivities.filter((row) => !gpsH.has(row.id))
+        if (foods.length === st.foods.length && sleepLogs.length === st.sleepLogs.length && trainingLogs.length === st.trainingLogs.length && gpsActivities.length === st.gpsActivities.length) return st
         return {
           ...st,
           foods,
           sleepLogs,
+          trainingLogs,
+          gpsActivities,
           diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, foodIds),
           diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, sleepIds),
+          diaryHiddenTrainingIds: ingatDihapus(st.diaryHiddenTrainingIds, trainingIds),
+          diaryHiddenGpsIds: ingatDihapus(st.diaryHiddenGpsIds, gpsIds),
         }
       }),
       logWellness: (date, patch) =>
