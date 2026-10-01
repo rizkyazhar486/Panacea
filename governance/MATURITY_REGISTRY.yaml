@@ -118,3 +118,27 @@ workflows:
     last_audited_commit: 555028e
     change_log:
       - "2026-09-26 (555028e): the free-text heuristic fallback only recognized Indonesian medical shorthand, so an English-language exam note (e.g. 'Lungs: clear to auscultation bilaterally') could match none of a system's keywords and silently rendered as 'unchecked' rather than being classified conservatively. Extended src/lib/bodyClinicalFindings.ts (BODY_SYSTEMS keywords, abnormal terms, explicit-normal markers, negation prefixes) with English equivalents, keeping the same safety invariant: 'normal' only with an explicit unambiguous marker, everything else stays 'recorded'. This does not close the known_gap — the heuristic remains a fallback by design for unmarked systems — it only widens the language the fallback correctly recognizes. scripts/uji/klasifikasi-temuan-fisik.mts extended with English cases including a full per-system pass. npm run uji 512/512, server 0 gagal, tsc -b clean, npm run build clean."
+
+
+  - workflow_id: physiology.canonical_to_model_to_reality
+    name: Canonical observed state to model-derived physiology to Reality Error
+    strategic_priority: core
+    maturity_level: FUNCTIONAL
+    clinical_validation: none
+    dimensions:
+      functional_completeness: medium  # shared runtime + longitudinal boundary + oxygen-delivery slice + standalone cerebral-perfusion/Fick models; domain coverage remains incomplete
+      integration: medium  # canonical longitudinal events feed typed boundaries; model-derived oxygen delivery records Reality Error evidence without patient-truth writeback
+      reliability: medium  # deterministic composition, unit, finite-value, truth-class, provenance and replay tests; no production runtime telemetry
+      usability: unknown  # engine-level infrastructure; projection usability has not been tested as one workflow
+      clinical_quality: unknown  # source-backed model contracts exist, but Panacea has no qualified clinical validation for these physiological outputs
+      safety_security: medium  # speculative states are rejected as patient-derived boundaries; model outputs stay model-derived/simulated and do not overwrite canonical truth
+      observability_testing: medium  # deterministic provenance graph plus Reality Error/Gap primitives and fail-closed tests
+    acceptance_evidence:
+      - "src/lib/physiology/runtime.ts declares units, truth class, model/version/parameter identity, validation class and provenance for coupled engine outputs; invalid composition and non-finite outputs fail closed"
+      - "src/lib/physiology/longitudinalBoundary.ts admits only measured/imported/clinician-entered longitudinal events as patient-derived physiological boundaries"
+      - "scripts/uji/physiological-runtime.mts covers duplicate producers, unit mismatch, unsupported truth classes, missing boundaries, cycles, deterministic provenance and speculative-boundary rejection"
+      - "scripts/uji/longitudinal-physiology-pipeline.mts proves canonical state -> oxygen transport -> model-derived Reality Error prediction without writing model output back into patient truth"
+      - "adfaf2d5 adds fail-closed Fick oxygen extraction; 93bfdbcc adds bounded cerebral-perfusion coupling, both explicitly model-derived with source-backed educational boundaries"
+    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    next_action: integrate_next_source_backed_couplings_through_shared_runtime_then_project_without_patient_truth_writeback
+    last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
