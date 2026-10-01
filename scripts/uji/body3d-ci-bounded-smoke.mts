@@ -7,12 +7,17 @@ const workflow = readFileSync(
 )
 
 assert.ok(
-  workflow.includes("group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}"),
-  'Body3D runs must retain one concurrency lane per PR or target ref',
+  workflow.includes("group: body-3d-acceptance-${{ github.event.pull_request.number || github.sha }}"),
+  'Body3D must share one cancellation lane per PR while isolating every non-PR exact commit SHA',
 )
 assert.ok(
-  workflow.includes("cancel-in-progress: ${{ github.event_name == 'pull_request' }}"),
-  'canonical main pushes must queue instead of cancelling exact-head render evidence',
+  workflow.includes('cancel-in-progress: true'),
+  'new PR heads may supersede stale PR evidence because canonical main SHAs use distinct groups',
+)
+assert.doesNotMatch(
+  workflow,
+  /group: body-3d-acceptance-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}/,
+  'canonical main runs must not share a ref-level pending slot that can replace earlier merged-SHA evidence',
 )
 
 assert.match(
