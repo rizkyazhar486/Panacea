@@ -13,12 +13,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
-  # Supersede stale PR heads, but never discard canonical main evidence.
-  # Main pushes share one group and queue to completion so every merged SHA
-  # receives a fail-closed render verdict instead of being pre-empted by the
-  # next merge while its serial WebGL proof is still running.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # PR heads share one lane so a newer head supersedes stale PR evidence.
+  # Non-PR runs use the immutable commit SHA as their lane: distinct merged
+  # main SHAs cannot replace each other while waiting for serial WebGL proof.
+  group: body-3d-acceptance-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 
 jobs:
   render-proof:
