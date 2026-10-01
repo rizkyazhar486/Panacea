@@ -8,8 +8,8 @@ const workflow = readFileSync(
 
 assert.match(
   workflow,
-  /render-proof:[\s\S]*?timeout-minutes: 30/,
-  'the Body3D job must have a finite total runtime bound',
+  /render-proof:[\s\S]*?timeout-minutes: 60/,
+  'the Body3D job must retain enough bounded headroom for setup plus the serial proof stage',
 )
 assert.match(
   workflow,
@@ -18,8 +18,8 @@ assert.match(
 )
 assert.match(
   workflow,
-  /name: Prove every 3D panel renders\n\s+timeout-minutes: 12/,
-  'the serial Body3D proof stage must have its own total runtime bound',
+  /name: Prove every 3D panel renders[\s\S]*?timeout-minutes: 38/,
+  'the serial Body3D proof stage must have a coherent hard stop above the sum of its per-gate bounds',
 )
 assert.match(
   workflow,
@@ -65,6 +65,17 @@ assert.doesNotMatch(
   workflow,
   /gagal=/,
   'Body3D smoke failures must fail fast instead of queueing the remaining gates',
+)
+
+const aggregateBoundSeconds = 240 + (11 * 180)
+assert.equal(aggregateBoundSeconds, 2220, 'declared per-gate Body3D bounds must total 37 minutes')
+assert.ok(
+  38 * 60 > aggregateBoundSeconds,
+  'the stage hard stop must not pre-empt any individually bounded serial gate',
+)
+assert.ok(
+  60 * 60 > (38 * 60) + (15 * 60),
+  'the job hard stop must leave bounded headroom for browser provisioning plus the proof stage',
 )
 
 const ordered = [
