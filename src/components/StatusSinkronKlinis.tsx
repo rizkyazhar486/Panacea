@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { bacaAntrean, bacaGalat, catatGalat, PERISTIWA_SINKRON } from '../lib/antreanKlinis'
 import { kurasSinkronKlinis } from '../lib/store'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Status sinkron catatan klinis: tidak pernah diam. Tampil hanya bila ada yang
 // tertunda (belum di server) atau ditolak server; selain itu tidak memakan tempat.
@@ -17,6 +18,7 @@ export function StatusSinkronKlinis() {
   return (
     <div role="status" data-clinical-sync={s.galat ? 'refused' : 'pending'}
       className={`rounded-xl border px-3 py-2 text-[12px] font-bold ${s.galat ? 'border-rose-500/40 bg-rose-500/10 text-rose-800 dark:text-rose-200' : 'border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-200'}`}>
+      <BatasKlaimKesehatan permukaan="clinical.sync-status" />
       {s.antre > 0 && <p>{s.antre} clinical change{s.antre > 1 ? 's are' : ' is'} saved on this device and not yet on the server.</p>}
       {s.galat && <p>The server refused a clinical change ({s.galat.pesan}). It was not saved there.</p>}
       <div className="mt-1 flex gap-2">

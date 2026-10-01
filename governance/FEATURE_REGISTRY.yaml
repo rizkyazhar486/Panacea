@@ -160,20 +160,20 @@ features:
     patient_state_fields: [requires_repository_audit]
     knowledge_graph_entities: [requires_repository_audit]
     shared_services: [provenance, normalization, terminology]
-    backend_surfaces: [server/src/labLog.ts, server/src/labFhir.ts, 'GET/PUT /api/lab-log', 'GET /api/lab-log/fhir', '/api/lab-log/shares', '/api/clinician/lab-shares/*']
-    frontend_surfaces: [src/components/UbinLab.tsx, src/components/LongevityPanel.tsx, src/components/LabPasienUntukDokter.tsx, src/components/BagikanLabKeDokter.tsx]
-    persistence_surfaces: [localStorage pmd_lab_v1 (offline), server db.labLogs/labShares/labReviews/labAudit]
+    backend_surfaces: [server/src/labLog.ts, server/src/labFhir.ts, server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/src/irisanPenyimpanan.ts, 'GET/PUT /api/lab-log', 'GET /api/lab-log/fhir', '/api/lab-log/shares', '/api/clinician/lab-shares/*']
+    frontend_surfaces: [src/components/UbinLab.tsx, src/components/LongevityPanel.tsx, src/components/LabPasienUntukDokter.tsx, src/components/BagikanLabKeDokter.tsx, src/components/ImporLembarLab.tsx, src/components/BatasKlaimKesehatan.tsx, src/lib/clinicalClaimMaturity.ts]
+    persistence_surfaces: [localStorage pmd_lab_v1 (offline), server db.labLogs/labShares/labReviews/labAudit, Mongo split for longitudinal state when configured]
     external_integrations: [requires_repository_audit]
     maturity_level: FUNCTIONAL
     clinical_validation: none
     technical_risk: high
     clinical_risk: high
     provenance_required: true
-    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory]
+    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory, scripts/uji/clinical-claim-maturity.mts, scripts/uji/trajektori-usia-biologis.mts, scripts/uji/impor-lembar-lab.mts, scripts/uji/nutrisi-lab-kanonik.mts, scripts/uji/makanan-longitudinal.mts, scripts/uji/catatan-harian-gabung.mts, server/uji/keadaanLongitudinal.uji.ts, server/uji/catatanKesehatanDiri.uji.ts]
     observability: [requires_repository_audit]
-    known_gaps: [canonical_state_built_client_side_only, wearable_and_non_lab_signals_not_audited]
-    next_actions: [project_canonical_state_into_body_exposure_and_timeline]
-    last_audited_commit: 0cb6906a
+    known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent]
+    next_actions: [verify_deployed_lab_sync_and_ocr]
+    last_audited_commit: d4e09c48
 
   - feature_id: core.embodied_workflow_observation_os
     name: Embodied Workflow Observation OS

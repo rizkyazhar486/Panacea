@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pain / Symptom Diary — log a 0-10 severity rating with location/notes and
@@ -25,6 +26,7 @@ export function PainDiary() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Pain / Symptom Diary" subtitle="Ikuti derajat beratnya dari waktu ke waktu — berguna bagi Anda dan tenaga medis Anda" />
+        <BatasKlaimKesehatan permukaan="wellness.pain-diary" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Satu bacaan hanyalah potret sesaat; sebuah tren adalah keterangan. Nilai derajat nyeri atau gejala Anda sekarang, tambahkan letaknya dan apa yang mungkin memicunya, lalu simpan — grafik di bawah mengikuti tiap catatan supaya Anda (atau dokter Anda) melihat polanya, bukan hanya hari ini.</Prosa>
       </Card>
 

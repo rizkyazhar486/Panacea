@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled, type IzinLabKlien } from '../lib/api'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Pasien memberi satu dokter akses baca ke riwayat labnya untuk waktu terbatas,
 // melihat siapa yang sudah membukanya, dan dapat mencabutnya kapan saja.
@@ -24,6 +25,7 @@ export function BagikanLabKeDokter() {
   return (
     <details className="mt-3 border-t border-neutral-100 pt-2 dark:border-white/10" data-lab-share>
       <summary className="t-kecil cursor-pointer font-bold text-brand">Share with your doctor{aktif.length ? ` · ${aktif.length} active` : ''}</summary>
+      <BatasKlaimKesehatan permukaan="lab.patient-share" />
       <div className="mt-2 space-y-2">
         <div className="flex gap-1.5">
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Doctor's email" aria-label="Doctor's email"

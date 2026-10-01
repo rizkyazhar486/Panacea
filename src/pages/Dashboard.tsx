@@ -11,6 +11,7 @@ import { detectDrift, driftSummary } from '../lib/physiologicalDrift'
 import { ResilienceQuoteCard } from '../components/ResilienceQuoteCard'
 import { ManualClinicalFlowsheet } from '../components/ManualClinicalFlowsheet'
 import type { VitalSign, Patient } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 /* ═══════════════════════════════════════════
    LOCAL TYPES
@@ -242,6 +243,7 @@ function DriftPanel({ vitals }: { vitals: VitalSign[] }) {
           title="Physiological Drift"
           subtitle="Compared to this patient's own recent baseline — not a population norm"
         />
+        <BatasKlaimKesehatan permukaan="care.dashboard-insights" />
       </div>
       <div className="space-y-2 p-5">
         {findings.map((f) => (
@@ -388,7 +390,7 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
 /* ═══════════════════════════════════════════
    AI CLINICAL INSIGHT
    ═══════════════════════════════════════════ */
-const INSIGHT_SYSTEM = `You are Panaceamed's AI co-physician, helping doctors quickly read a patient's clinical data. Based on the vital signs & supportive test data provided, write ONE short paragraph (max 3 sentences) with a concise clinical analysis in English, then 3 concrete action recommendations (using "• "). Be honest if the data isn't sufficient for a strong conclusion. This is a support tool, not a final diagnosis — the doctor still decides.`
+const INSIGHT_SYSTEM = `You are Panaceamed's educational clinical draft assistant for licensed clinicians. Based on the vital signs & supportive test data provided, write ONE short paragraph (max 3 sentences) with a concise technical summary in English, then 3 concrete action recommendations (using "• "). Be honest if the data isn't sufficient for a strong conclusion. This is a support draft, not a final diagnosis or clinically validated decision — the doctor still decides.`
 
 function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; vitals: VitalSign[]; supportive: SupportiveResult[] }) {
   const [text, setText] = useState('')

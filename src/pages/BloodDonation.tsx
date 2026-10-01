@@ -3,6 +3,7 @@ import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconDrop } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Blood Donation Eligibility Checker — a quick pre-screen against the
@@ -67,6 +68,7 @@ export function BloodDonation() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconDrop size={20} />} title="Blood Donation Eligibility" subtitle="A short pre-screen, plus the date you can donate again" />
+        <BatasKlaimKesehatan permukaan="wellness.blood-donation" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This checks the generic criteria most national blood services use — it is <b>not</b> the
           actual screening (hemoglobin check, brief health interview) every blood bank performs on-site

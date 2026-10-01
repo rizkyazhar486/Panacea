@@ -108,6 +108,7 @@ assert.ok(events.every((item) => !item.id.includes('gps-foreign')))
 
 const sleep = first.state.eventsById['personal:sleep:sleep-1:duration']
 assert.ok(sleep)
+assert.equal(sleep.metric, 'logged-sleep-duration', 'self-reported sleep must not share the device sleep-duration series')
 assert.equal(sleep.recordedAt, '2026-09-17')
 assert.equal(sleep.provenance.capturedAt, '2026-09-17')
 assert.ok(sleep.tags?.includes('temporal-precision:day'))
@@ -159,5 +160,30 @@ assert.throws(
   }),
   /yyyy-mm-dd date/,
 )
+
+{
+  const ahead = syncProductionPersonalStores({
+    state: initial,
+    appState: {
+      ...appState,
+      sleepLogs: [{ id: 'tomorrow', date: '2026-09-19', hours: 6, bedtimeConsistent: true }],
+    },
+    subjectId: 'self-owner',
+    context,
+  })
+  const row = ahead.state.eventsById['personal:sleep:tomorrow:duration']
+  assert.equal(row?.recordedAt, context.receivedAt, 'one local day ahead of UTC clamps instead of failing the diary')
+  const far = syncProductionPersonalStores({
+    state: initial,
+    appState: {
+      ...appState,
+      sleepLogs: [{ id: 'far', date: '2026-09-21', hours: 6, bedtimeConsistent: true }],
+    },
+    subjectId: 'self-owner',
+    context,
+  })
+  assert.equal(far.state.eventsById['personal:sleep:far:duration'], undefined)
+  assert.ok(far.candidateEventCount > 0, 'one future sleep row must not drop the rest of the diary')
+}
 
 console.log('production personal longitudinal sync: ok')

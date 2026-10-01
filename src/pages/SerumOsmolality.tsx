@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Serum Osmolality & Osmolal Gap — standard calculated osmolality formula
@@ -46,6 +47,7 @@ export function SerumOsmolality() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Serum Osmolality & Osmolal Gap" subtitle="Calculated osmolality + its gap against the measured value (toxic-alcohol screening)" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Calculated osmolality = 2×Na + glucose/18 + BUN/2.8 (+ ethanol/3.7 if measured).
           Comparing this with the lab-measured osmolality gives the osmolal gap — a gap {'>'}10 mOsm/kg

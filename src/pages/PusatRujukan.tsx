@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconBook } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rujukan — yang DIBACA, bukan yang dicatat atau dihitung.
@@ -61,12 +62,15 @@ const TABS: TabDef[] = [
 
 export function PusatRujukan() {
   return (
-    <HalamanTab
+    <>
+      <BatasKlaimKesehatan permukaan="clinical.pusat-rujukan" />
+      <HalamanTab
       judul="Reference"
       subjudul="Emergency guides, therapy and drug reference, evidence, and patient material"
       ikon={<IconBook />}
       tabs={TABS}
     />
+    </>
   )
 }
 

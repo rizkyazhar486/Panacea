@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconSparkle } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Jiwa — halaman-halaman yang dibaca orang UNTUK DIRINYA SENDIRI.
@@ -31,7 +32,7 @@ const TABS: TabDef[] = [
   { id: 'aman', label: 'Safety plan', emoji: '🛟', komponen: MentalSafetyPlan,
     ringkas: 'A private local-first plan for warning signs, coping, trusted support and urgent escalation' },
   { id: 'saring', label: 'Screening', emoji: '📝', komponen: MentalHealthScreen,
-    ringkas: 'Validated self-report screens for mood and anxiety — a starting point, not a diagnosis' },
+    ringkas: 'Published self-report screens for mood and anxiety — a starting point, not a diagnosis' },
   { id: 'zat', label: 'Substance use', emoji: '🚭', komponen: SubstanceUseScreen,
     ringkas: 'Alcohol, tobacco and other substance screening, answered privately' },
   { id: 'alat', label: 'Toolkit', emoji: '🧰', komponen: MindToolkit,
@@ -50,12 +51,15 @@ const TABS: TabDef[] = [
 
 export function PusatJiwa() {
   return (
-    <HalamanTab
+    <>
+      <BatasKlaimKesehatan permukaan="wellness.pusat-jiwa" />
+      <HalamanTab
       judul="Mind"
       subjudul="Safety, screening, everyday tools, connection, direction and meaning"
       ikon={<IconSparkle />}
       tabs={TABS}
     />
+    </>
   )
 }
 

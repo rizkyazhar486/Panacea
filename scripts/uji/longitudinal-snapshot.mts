@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { createLongitudinalSnapshotCache, projectLongitudinalSnapshot, emptyLongitudinalServer } from '../../src/lib/longitudinalSnapshot.ts'
+import { createLongitudinalSnapshotCache, projectLongitudinalSnapshot, emptyLongitudinalServer, sumberLabLongitudinal, sumberVitalsLongitudinal, sumberDeretLongitudinal } from '../../src/lib/longitudinalSnapshot.ts'
 import { canEnterAiContext, canEnterClinicalRecord } from '../../src/lib/panaceaLongitudinalState.ts'
 import type { Account } from '../../src/lib/types.ts'
 
@@ -56,4 +56,52 @@ assert(!Object.keys(otherUpdate.state!.eventsById).some(id => id.includes('self1
 assert.doesNotThrow(() => cache.read({ ...sources, app: { ...app, selfVitals: [null, 'invalid'] as never } }), 'malformed personal rows fail closed')
 const metadata = projectLongitudinalSnapshot({ ...sources, app: { ...app, account: { ...account, name: 'Updated label' } } }, now)
 assert.deepEqual(metadata.state, projectLongitudinalSnapshot(sources, now).state, 'cosmetic account updates retain source ownership')
+const serverLabs = { gdp: [{ id: 'server', tanggal: '2026-09-20', nilai: 90 }] }
+const browserLabs = { gdp: [{ id: 'browser', tanggal: '2026-09-20', nilai: 180 }] }
+assert.equal(sumberLabLongitudinal(serverLabs, browserLabs).source, 'server')
+assert.equal(sumberLabLongitudinal(serverLabs, browserLabs).labs.gdp[0].id, 'server', 'a server lab log replaces the browser copy')
+assert.equal(sumberLabLongitudinal(null, browserLabs).source, 'browser')
+assert.equal(sumberLabLongitudinal(null, browserLabs).labs, browserLabs, 'offline keeps the browser copy')
+const fromServer = projectLongitudinalSnapshot({ ...sources, local: { ...local, labs: sumberLabLongitudinal(serverLabs, browserLabs).labs } }, now)
+assert.equal(Object.values(fromServer.state!.eventsById).find(e => e.domain === 'lab')!.value, 90)
+assert.equal(a.labSource, 'browser')
+assert.equal(a.serverSource, 'browser')
+assert.equal(a.deviceSource, 'browser')
+assert.equal(a.selfSource, 'browser')
+assert.equal(a.vo2Source, 'browser')
+const vitalsServer = sumberVitalsLongitudinal({ weightKg: 70, restingHr: 55 }, { weightKg: 99, steps: 1000 })
+assert.equal(vitalsServer.source, 'server')
+assert.equal(vitalsServer.vitals.weightKg, 70)
+assert.equal(vitalsServer.vitals.steps, 1000, 'server keys overlay the browser snapshot without dropping other fields')
+assert.equal(sumberVitalsLongitudinal(null, { weightKg: 99 }).source, 'browser')
+assert.equal(sumberDeretLongitudinal([{ id: 's1' }], [{ id: 'b1' }]).rows[0].id, 's1')
+assert.equal(sumberDeretLongitudinal([], [{ id: 'b1' }]).source, 'browser', 'empty server series keeps AppState-only rows')
+assert.equal(sumberDeretLongitudinal(null, [{ id: 'b1' }]).source, 'browser')
+
+{
+  const harian = projectLongitudinalSnapshot({
+    ...sources,
+    app: {
+      ...app,
+      foods: [{ id: 'f1', date: '2026-09-25', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 1 }],
+      sleepLogs: [
+        { id: 's1', date: '2026-09-25', hours: 7.5, bedtimeConsistent: true },
+        { id: 'far', date: '2026-10-05', hours: 8, bedtimeConsistent: false },
+      ],
+      wellness: { '2026-09-25': { date: '2026-09-25', waterMl: 1800, sleepHr: 7 } },
+      trainingLogs: [{ id: 't1', date: '2026-09-25', rpe: 6, type: 'Run' }],
+    },
+  }, now)
+  const metrik = Object.values(harian.state!.eventsById)
+  assert.equal(metrik.find((e) => e.metric === 'logged-sleep-duration')?.value, 7.5)
+  assert.equal(metrik.find((e) => e.metric === 'wellness-sleep-duration')?.value, 7)
+  assert.equal(metrik.find((e) => e.metric === 'water-intake')?.value, 1800)
+  assert.equal(metrik.find((e) => e.metric === 'training-rpe')?.value, 6)
+  assert.equal(metrik.find((e) => e.metric === 'nutrition.dietary-protein')?.value, 3)
+  assert.equal(metrik.some((e) => e.metric === 'protein'), false, 'per-meal food events must not duplicate the daily total')
+  assert.equal(metrik.some((e) => e.metric === 'sleep-duration' && e.provenance.method === 'user sleep log'), false)
+  assert.equal(metrik.some((e) => e.id.includes('far')), false, 'a sleep date more than one day ahead is skipped')
+  assert.ok(metrik.some((e) => e.domain === 'lab'), 'a skipped future sleep row must not drop the lab log')
+}
+
 console.log('longitudinal-snapshot: one build/three reads, revision invalidation, patient isolation and provenance passed')

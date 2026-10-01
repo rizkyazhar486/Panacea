@@ -459,6 +459,51 @@ export const api = {
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
   // Per-user health profile (manual / WHOOP / Apple Watch / other)
   getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
+  getKeadaanLongitudinal: () => req<{
+    subjectId: string
+    revision: string
+    generatedAt: string
+    lab: {
+      diperbaruiPada: string | null
+      truthClass: 'patient-recorded'
+      source: 'lab-log'
+      method: 'patient-transcribed-lab-report'
+      log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>
+    }
+    care: {
+      truthClass: 'server-stored'
+      source: 'care-plans'
+      plans: { plan: import('./continuousCareOperatingSystem').ContinuousCarePlan; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }[]
+      reviews: TinjauanLabKlien[]
+    }
+    clinical: {
+      truthClass: 'server-stored'
+      source: 'clinical'
+      records: Record<string, EMRRecord>
+      vitals: Record<string, VitalSign[]>
+      encounters: Record<string, EMRRecord[]>
+    } | null
+    device: {
+      truthClass: 'patient-recorded'
+      source: 'health-profile'
+      method: 'device-sync' | 'manual-or-import'
+      updatedAt: string | null
+      lastDeviceSyncAt: string | null
+      deviceSyncSource: string | null
+      current: Record<string, number>
+      history: { date: string; metrics: Record<string, number> }[]
+      selfVitals: { id: string; at: string; systolic: number; diastolic: number; heartRate: number; spo2: number; tempC: number }[]
+      vo2maxLog: { id: string; at: string; value: number; method: string }[]
+    }
+    diary?: {
+      truthClass: 'patient-recorded'
+      source: 'health-profile'
+      sleep: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
+      foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
+      wellness: { date: string; sleepHr?: number; waterMl?: number }[]
+      removed?: { foods: string[]; sleep: string[] }
+    }
+  }>('/api/keadaan-longitudinal'),
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
@@ -487,6 +532,17 @@ export const api = {
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),
+  putSelfVitalsLog: (selfVitals: { id: string; at: string; systolic: number; diastolic: number; heartRate: number; spo2: number; tempC: number }[]) =>
+    req<{ ok: boolean; selfVitals: typeof selfVitals }>('/api/health-series/self-vitals', { method: 'PUT', body: JSON.stringify({ selfVitals }) }),
+  putVo2maxLog: (vo2maxLog: { id: string; at: string; value: number; method: string }[]) =>
+    req<{ ok: boolean; vo2maxLog: typeof vo2maxLog }>('/api/health-series/vo2max', { method: 'PUT', body: JSON.stringify({ vo2maxLog }) }),
+  putDiary: (body: {
+    sleepLogs?: { id: string; date: string; hours: number; bedtimeConsistent: boolean }[]
+    foods?: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
+    wellness?: { date: string; sleepHr?: number; waterMl?: number }[]
+    removeFoodIds?: string[]
+    removeSleepIds?: string[]
+  }) => req<{ ok: boolean }>('/api/health-series/diary', { method: 'PUT', body: JSON.stringify(body) }),
   // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
   rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),

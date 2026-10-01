@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type RailGroup = 'Today' | 'Body' | 'Clinical' | 'Learn'
 
@@ -44,6 +45,7 @@ export function HomeInteractiveRail() {
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.22em] text-emerald-300">Panacea Live Rail · interactive</div>
           <h2 id="home-interactive-rail-title" className="mt-1 text-[19px] font-black tracking-[-.025em] text-white sm:text-[22px]">Swipe. Tap. Go.</h2>
+          <BatasKlaimKesehatan permukaan="wellness.home-interactive-rail" />
           <p className="mt-1 max-w-2xl text-[11px] font-semibold leading-relaxed text-emerald-50/60">A fast, scrollable layer for the actions and workspaces you use most.</p>
         </div>
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border border-emerald-300/20 bg-emerald-300/10 text-lg text-emerald-200" aria-hidden>✦</span>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconShield } from '../components/icons'
 import { INDIKATOR, RENCANA, type Indikator } from '../lib/indikator'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aturan main — halaman yang menjelaskan angka-angka aplikasi ini.
@@ -124,6 +125,7 @@ export function AturanAngka() {
         title="How your numbers work"
         subtitle="The rules of the game: what each number reads, what moves it, how fast, and what it cannot see"
       />
+      <BatasKlaimKesehatan permukaan="lab.number-rules" />
 
       <Card>
         <p className="text-[13px] leading-[1.7] text-ink dark:text-neutral-200">

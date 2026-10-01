@@ -10,6 +10,7 @@ import {
   type RankedMode,
   type RankedWorkoutEvidence,
 } from '../lib/seasonalHealthSportRank'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
 
@@ -105,6 +106,7 @@ export function HealthPerformanceLeague() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 pb-10">
+      <BatasKlaimKesehatan permukaan="performance.health-league" />
       <section className="dark relative overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[#030509] p-4 text-white shadow-[0_24px_90px_rgba(0,0,0,.42)] sm:p-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(34,211,238,.14),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(168,85,247,.13),transparent_30%),radial-gradient(circle_at_50%_120%,rgba(16,185,129,.14),transparent_42%)]" />
         <div className="relative">

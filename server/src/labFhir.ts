@@ -42,6 +42,10 @@ const TEKS: Record<string, [string, string]> = {
   apob: ['ApoB', 'mg/dL'], ldl: ['LDL cholesterol', 'mg/dL'], egfr: ['eGFR (as reported)', 'mL/min/1.73m2'],
   tsh: ['TSH', 'mIU/L'], vitd: ['Vitamin D (25-OH)', 'ng/mL'], b12: ['Vitamin B12', 'pg/mL'],
   ferritin: ['Ferritin', 'ng/mL'], hb: ['Hemoglobin', 'g/dL'], crp: ['hs-CRP', 'mg/L'],
+  chol: ['Total cholesterol', 'mg/dL'], asamUrat: ['Uric acid', 'mg/dL'],
+  trombosit: ['Platelets', '10*9/L'], natrium: ['Sodium', 'mEq/L'], kalium: ['Potassium', 'mEq/L'],
+  kalsium: ['Calcium', 'mg/dL'], fosfor: ['Phosphorus', 'mg/dL'],
+  folat: ['Folate', 'ng/mL'], bilirubin: ['Bilirubin', 'mg/dL'],
 }
 
 export function kodeUntuk(jenis: string) {

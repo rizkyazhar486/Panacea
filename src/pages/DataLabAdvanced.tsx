@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { CfpbComplaintRoutingLab } from '../components/finance/CfpbComplaintRoutingLab'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data Lab Advanced — local data-processing tools and transparent research workspaces in one
@@ -50,6 +51,7 @@ function BloodTrendForecaster() {
             {projected.map((p, i) => <Badge key={i} tone={reg.slope > 0 ? 'low' : 'brand'}>Yr+{i + 1}: {p}</Badge>)}
           </div>
           <p className="mt-2 text-[11px] text-neutral-500">Trend: {reg.slope > 0 ? '+' : ''}{(reg.slope).toFixed(2)}/year — a simple straight-line projection, not a physiological model; real biomarkers rarely move perfectly linearly.</p>
+          <BatasKlaimKesehatan permukaan="lab.blood-trend" />
         </div>
       )}
     </Card>
@@ -119,6 +121,7 @@ function PhenoAgeCalc() {
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
         <div className="text-3xl font-black text-brand-dark">{phenoAge}</div>
         <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {f.age})</div>
+        <BatasKlaimKesehatan permukaan="lab.phenoage" />
       </div>
       <Prosa kelas="mt-2 text-[11px] text-neutral-500">Levine ME dkk., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Penerapan koefisien terbitannya sebaik yang kami mampu; bukan pengganti pemeriksaan laboratorium klinis tervalidasi, dan sebaiknya diperiksa silang dengan kalkulator PhenoAge lain.</Prosa>
     </Card>

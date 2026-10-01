@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useStore } from '../lib/store'
 import { kunciTanggal } from '../lib/ramalan'
 import { hitungRangkaian, bacaRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan harian — satu layar, tiga pertanyaan, tanpa menggulir.
@@ -96,6 +97,7 @@ export function CatatanHarian() {
           {untukKemarin ? 'for yesterday' : 'for yesterday?'}
         </button>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.daily-notes" className="mt-1 text-[11px] leading-snug text-neutral-500" />
 
       {/* Satu baris. Peringatannya tidak dihapus dari aplikasi — ia pindah ke
           title, terbaca saat disentuh lama atau oleh pembaca layar, tanpa

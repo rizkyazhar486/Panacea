@@ -7,13 +7,72 @@ const LABEL: Record<string, string> = {
   systolic: 'Systolic BP', diastolic: 'Diastolic BP', heartRate: 'Heart rate', restingHr: 'Resting heart rate',
   weightKg: 'Weight', spo2: 'SpO₂', temperatureC: 'Temperature', respiratoryRate: 'Respiratory rate', vo2max: 'VO₂max',
   glucose: 'Glucose', hrvMs: 'HRV', sleepH: 'Sleep',
+  // Longitudinal device-bridge metric ids (kebab-case)
+  'resting-heart-rate': 'Resting heart rate',
+  'heart-rate': 'Heart rate',
+  'blood-pressure-systolic': 'Systolic BP',
+  'blood-pressure-diastolic': 'Diastolic BP',
+  'sleep-duration': 'Sleep',
+  hrv: 'HRV',
+  'active-energy': 'Active energy',
+  'basal-energy': 'Basal energy',
+  'dietary-energy': 'Dietary energy',
+  'dietary-protein': 'Protein',
+  'dietary-carbohydrate': 'Carbohydrate',
+  'dietary-fat': 'Fat',
+  'dietary-fiber': 'Fiber',
+  'dietary-sugar': 'Sugar',
+  'dietary-sodium': 'Sodium',
+  'dietary-potassium': 'Potassium',
+  'dietary-calcium': 'Calcium',
+  'dietary-iron': 'Iron',
+  'dietary-magnesium': 'Magnesium',
+  'dietary-zinc': 'Zinc',
+  'dietary-selenium': 'Selenium',
+  'dietary-iodine': 'Iodine',
+  'dietary-vitamin-a': 'Vitamin A',
+  'dietary-vitamin-c': 'Vitamin C',
+  'dietary-vitamin-d': 'Vitamin D',
+  'dietary-vitamin-e': 'Vitamin E',
+  'dietary-vitamin-k': 'Vitamin K',
+  'dietary-vitamin-b6': 'Vitamin B6',
+  'dietary-vitamin-b12': 'Vitamin B12',
+  'dietary-folate': 'Folate',
+  'dietary-biotin': 'Biotin',
+  'dietary-thiamin': 'Thiamin',
+  'dietary-riboflavin': 'Riboflavin',
+  'dietary-niacin': 'Niacin',
+  'dietary-caffeine': 'Caffeine',
+  'alcohol-consumption': 'Alcohol',
+  'dietary-water': 'Water',
+  'waist-circumference': 'Waist',
+  'blood-glucose': 'Blood glucose',
+  'cycling-distance': 'Cycling distance',
+  'cycling-power': 'Cycling power',
+  'swim-distance': 'Swim distance',
+  'stair-speed-ascent': 'Stair ascent speed',
+  'uv-exposure-index': 'UV index',
+  'nutrition.dietary-energy': 'Logged energy',
+  'nutrition.dietary-protein': 'Logged protein',
+  'nutrition.dietary-carbohydrate': 'Logged carbohydrate',
+  'nutrition.dietary-fat': 'Logged fat',
+  'logged-sleep-duration': 'Logged sleep',
+  'wellness-sleep-duration': 'Logged sleep',
+  'water-intake': 'Water',
+  'exercise-duration': 'Exercise',
+  'training-rpe': 'Training effort',
 }
 export const labelMetrik = (m: string, labels: Record<string, string> = {}) => {
   if (labels[m]) return labels[m]
   if (m.startsWith('review.lab.')) return `Doctor review · ${JENIS_LAB.find((j) => j.id === m.slice(11))?.nama ?? m.slice(11)}`
   if (m.startsWith('lab.')) return JENIS_LAB.find((j) => j.id === m.slice(4))?.nama ?? m.slice(4)
+  if (LABEL[m]) return LABEL[m]
   const kunci = m.split('.').pop() ?? m
-  return LABEL[kunci] ?? kunci.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
+  if (LABEL[kunci]) return LABEL[kunci]
+  if (kunci.includes('-')) {
+    return kunci.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
+  return kunci.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
 }
 export type SudutPandang = 'pasien' | 'dokter'
 // Label asal dari sudut pandang pembaca: pasien membaca 'your lab report', dokter membaca 'patient-transcribed'.

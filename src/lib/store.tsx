@@ -87,6 +87,18 @@ export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
 }
 
+function ingatDihapus(ada: unknown, ids: readonly string[]): string[] {
+  const daftar = Array.isArray(ada) ? ada.filter((id): id is string => typeof id === 'string' && id.length > 0) : []
+  const keluar = [...daftar]
+  for (const id of ids) if (id && !keluar.includes(id)) keluar.push(id)
+  return keluar.slice(-400)
+}
+
+function unggahHapusDiary(body: { removeFoodIds?: string[]; removeSleepIds?: string[]; sleepLogs?: SleepLog[] }) {
+  if (!backendEnabled) return
+  api.putDiary(body).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* retry when the account diary is read again */ })
+}
+
 // #9: convert a backend post into the richer local SocialPost shape.
 function backendPostToSocial(p: BackendPost): SocialPost {
   return {
@@ -240,6 +252,8 @@ function seed(): AppState {
     lifeEvents: {},
     quests: {},
     foods: [],
+    diaryHiddenFoodIds: [],
+    diaryHiddenSleepIds: [],
     wellness: {},
     consults: [],
     orders: [],
@@ -394,6 +408,8 @@ interface Store {
    * kalori dan makro sepanjang hari.
    */
   removeFood: (id: string) => void
+  /** Drop rows the account has already tombstoned, without sending another delete. */
+  lupakanCatatanDihapus: (foodIds: string[], sleepIds: string[]) => void
   logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
   addProduct: (p: PharmacyProduct) => void
@@ -965,22 +981,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ),
         })),
       addSelfVital: (v) =>
-        setState((st) => ({ ...st, selfVitals: [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50) })),
+        setState((st) => {
+          const next = [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putSelfVitalsLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, selfVitals: next }
+        }),
       addSleepLog: (hours, bedtimeConsistent) =>
         setState((st) => {
           const date = hariIni()
-          const without = st.sleepLogs.filter((s) => s.date !== date)
-          return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
+          const lama = st.sleepLogs.filter((s) => s.date === date).map((s) => s.id)
+          const row = { id: uid(), date, hours, bedtimeConsistent }
+          if (st.account) unggahHapusDiary({ ...(lama.length ? { removeSleepIds: lama } : {}), sleepLogs: [row] })
+          return {
+            ...st,
+            sleepLogs: [row, ...st.sleepLogs.filter((s) => s.date !== date)].slice(0, 60),
+            diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, lama),
+          }
         }),
       setSleepLog: (date, hours, bedtimeConsistent) =>
         setState((st) => {
           if (!date || !Number.isFinite(hours) || hours <= 0 || hours > 24) return st
-          const without = st.sleepLogs.filter((s) => s.date !== date)
+          const lama = st.sleepLogs.filter((s) => s.date === date).map((s) => s.id)
+          const row = { id: uid(), date, hours, bedtimeConsistent }
+          if (st.account) unggahHapusDiary({ ...(lama.length ? { removeSleepIds: lama } : {}), sleepLogs: [row] })
           return {
             ...st,
-            sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without]
+            sleepLogs: [row, ...st.sleepLogs.filter((s) => s.date !== date)]
               .sort((a, b) => (a.date < b.date ? 1 : -1))
               .slice(0, 60),
+            diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, lama),
           }
         }),
       toggleEduBookmark: (articleId) =>
@@ -993,7 +1024,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       answerQuiz: (correct) =>
         setState((st) => ({ ...st, quizScore: { correct: st.quizScore.correct + (correct ? 1 : 0), total: st.quizScore.total + 1 } })),
       logVo2Max: (value, method) =>
-        setState((st) => (value > 0 ? { ...st, vo2maxLog: [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50) } : st)),
+        setState((st) => {
+          if (!(value > 0)) return st
+          const next = [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putVo2maxLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, vo2maxLog: next }
+        }),
       addGoal: (g) =>
         setState((st) => (g.label.trim() && g.target > 0 ? { ...st, goals: [{ id: uid(), ...g }, ...st.goals] } : st)),
       removeGoal: (id) => setState((st) => ({ ...st, goals: st.goals.filter((g) => g.id !== id) })),
@@ -1060,7 +1098,25 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           quests: { ...st.quests, [patientId]: (st.quests[patientId] ?? []).filter((q) => q.id !== id) },
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
-      removeFood: (id) => setState((st) => ({ ...st, foods: st.foods.filter((f) => f.id !== id) })),
+      removeFood: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeFoodIds: [id] })
+        return { ...st, foods: st.foods.filter((f) => f.id !== id), diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, [id]) }
+      }),
+      lupakanCatatanDihapus: (foodIds, sleepIds) => setState((st) => {
+        const foodsH = new Set(foodIds)
+        const sleepH = new Set(sleepIds)
+        const foods = st.foods.filter((f) => !foodsH.has(f.id))
+        const sleepLogs = st.sleepLogs.filter((s) => !sleepH.has(s.id))
+        if (foods.length === st.foods.length && sleepLogs.length === st.sleepLogs.length) return st
+        return {
+          ...st,
+          foods,
+          sleepLogs,
+          diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, foodIds),
+          diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, sleepIds),
+        }
+      }),
       logWellness: (date, patch) =>
         setState((st) => ({
           ...st,

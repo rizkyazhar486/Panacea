@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { lazy, Suspense } from 'react'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
 // rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
@@ -279,6 +280,7 @@ export function EMR() {
             <SatusehatButton patient={activePatient} record={draft} vitals={state.vitals[activePatient.id] ?? []} />
           </div>
         </div>
+        <BatasKlaimKesehatan permukaan="care.ai-emr" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">
           <IconSparkle size={14} />
           Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before

@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ── Key Performance Indicators per cabang, dari sains olahraga nyata ──────────
 // Tiap KPI menjelaskan: apa yang diukur, alat/indikator (jam/device/tes), dan
@@ -159,6 +160,7 @@ export function SportsScience() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Sports Science & KPIs" subtitle="Performance, analysis and mental markers — drawn from the literature and how world-champion teams actually work" />
+        <BatasKlaimKesehatan permukaan="performance.sports-science" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">
           Physical preparation, workload, and precise timing ensure you reach peak fitness during
           critical phases. Data-based training — VO₂max, oxygen & CO₂ levels, lactate threshold, HRV — determines

@@ -6,6 +6,7 @@ import { SinyalPribadiDiTubuh } from '../components/SinyalPribadiDiTubuh'
 import { BodyExplorer } from './BodyExplorer'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import './bodyExposureOS.css'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))
@@ -147,6 +148,7 @@ export function BodyExposureOS() {
             <h2 id="body-exposure-os-title" className="mt-1 text-xl font-black tracking-[-.035em] text-white sm:text-2xl">
               Your body. Every scale.
             </h2>
+            <BatasKlaimKesehatan permukaan="body.exposure-os" className="mt-2 text-[11px] leading-snug text-white/55" />
             <p className="mt-1 truncate text-[10px] font-bold text-white/42 sm:text-[11px]">
               You → anatomy → function → imaging → micro
             </p>

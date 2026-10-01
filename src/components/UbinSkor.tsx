@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget skor pertandingan — tim yang DIPILIH SENDIRI, bukan yang ditebak.
@@ -249,6 +250,7 @@ export function UbinSkor() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Your teams’ scores</h2>
+        <BatasKlaimKesehatan permukaan="wellness.score-tile" />
         <div className="ml-auto flex items-center gap-2">
           {/* Penanda halaman: berapa laga yang ada dan di mana kita sekarang.
               Tanpa ini, satu-satunya cara mengetahui masih ada tim lain di

@@ -8,6 +8,7 @@ import {
   type Sport, type Goal,
 } from '../lib/multiSport'
 import { parsePace, fmtPace, trainingPaces, RUN_ZONES } from '../lib/baseTraining'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lari, Sepeda, Renang — zona intensitas per cabang, kerja kecepatan, dan
@@ -33,6 +34,7 @@ export function MultiSport() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Intensity zones, speed work, and posture across three sports" />
+      <BatasKlaimKesehatan permukaan="performance.multi-sport" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">

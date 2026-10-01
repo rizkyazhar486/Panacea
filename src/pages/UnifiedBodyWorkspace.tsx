@@ -6,6 +6,7 @@ import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -209,6 +210,7 @@ export function UnifiedBodyWorkspace() {
               />
             </div>
           </details>
+          <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2 text-[11px] leading-snug text-white/55" />
         </div>
 
         {!isExposure && (

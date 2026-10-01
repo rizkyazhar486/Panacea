@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kartu Data Perangkat — angka Anda sendiri, ditampilkan tanpa diisikan.
@@ -48,6 +49,7 @@ export function KartuDataPerangkat() {
 
   return (
     <div className="rounded-2xl border border-neutral-100 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+      <BatasKlaimKesehatan permukaan="wellness.device-data-card" />
       <div className="flex items-baseline justify-between gap-3">
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">⌚ Your device data</div>
         {umur && <div className="text-[10px] text-neutral-500">{umur}</div>}

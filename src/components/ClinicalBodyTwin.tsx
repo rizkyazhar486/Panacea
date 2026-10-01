@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { BodyClinicalBridgeProjection, BodyClinicalMarkerStatus } from '../lib/bodyClinicalBridge'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const STATUS: Record<BodyClinicalMarkerStatus, { dot: string; ring: string; label: string }> = {
   normal: { dot: '#00BF63', ring: 'rgba(0,191,99,.28)', label: 'Recorded normal' },
@@ -42,6 +43,7 @@ export function ClinicalBodyTwin({
           <span className="rounded-full border border-emerald-300/20 px-2 py-1 text-emerald-200/75">Body Exposure bridge</span>
         </div>
       </header>
+      <div className="px-4 pt-2 sm:px-5"><BatasKlaimKesehatan permukaan="clinical.body-twin" className="mt-2 text-[11px] leading-snug text-white/55" /></div>
 
       <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[220px_minmax(0,1fr)_220px] lg:items-stretch">
         <aside className="order-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:order-1 lg:grid-cols-1 lg:content-start" aria-label="Latest clinical vitals">

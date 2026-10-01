@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
 import { IconHeart, IconMoon, IconPlus, IconRun } from './icons'
 import '../styles/home-human-interface.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 function num(value: number | undefined, digits = 0) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—'
@@ -86,6 +87,7 @@ export function HomeHealthBrief() {
       className="panacea-instrument-strip"
       aria-label="Today health instruments"
     >
+      <BatasKlaimKesehatan permukaan="wellness.home-brief" />
       <div className="panacea-instrument-head">
         <span className="panacea-instrument-date">{date}</span>
         <Link

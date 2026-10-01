@@ -16,6 +16,7 @@ import {
 } from '../lib/athlytic'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { nilaiKebugaran, vo2DariDenyut } from '../lib/bugarIlmiah'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan atlet — beranda angka, bukan beranda kalimat.
@@ -156,6 +157,7 @@ export function PapanAtlet() {
     return (
       <div className="mx-auto max-w-2xl space-y-4 pb-24">
         <SectionTitle icon={<IconActivity size={20} />} title="Athlete board" subtitle="Load, ratio, focus, and when you train" />
+        <BatasKlaimKesehatan permukaan="performance.athlete-board" />
         <p className="rounded-2xl border border-neutral-200 p-4 text-[13px] leading-relaxed text-neutral-500 dark:border-white/10">
           Needs at least three sessions with heart-rate data. Nothing is drawn from fewer — a board full of zeros
           reads as a broken app, and zeros that look like measurements get believed.

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconPill, IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { api, backendEnabled } from '../lib/api'
 import { ATC, cariObat, jumlahObat, jumlahEml, jumlahDenganDosisSkdi, dosisSkdi, type Obat } from '../lib/obatKatalog'
 import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
@@ -119,8 +120,12 @@ export function DrugInfo() {
         <SectionTitle
           icon={<IconPill size={20} />}
           title="Drug Info"
-          subtitle="Search an active substance — its class, what it is used for, and the safety point that matters. The official label is fetched on top when you are online."
+          subtitle="Catalog facts plus optional openFDA label text — not a clinically validated Panacea prescribing decision"
         />
+        <BatasKlaimKesehatan permukaan="clinical.drug-info" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          In-app catalog entries have no invented doses. Official dose and warning text appear only when an online label is fetched, quoted as source text for that product — always follow your prescriber and the physical package for your country.
+        </p>
         {tab !== 'periksa' && <div className="mt-3 flex gap-2">
           <input
             className={inputClass}

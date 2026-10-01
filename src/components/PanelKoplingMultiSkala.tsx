@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 // Panel kopling multi-skala (SIMULASI ILUSTRATIF). Menjalankan kernel kopling di
 // peramban atas permintaan dan menampilkan tiga medan (molekul -> sel -> jaringan)
 // serta perbandingan dengan kopling ke-bawah dimatikan. Bukan prediksi pasien.
@@ -55,6 +56,7 @@ export function PanelKoplingMultiSkala() {
 
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-black/45 p-3 text-white" aria-label="Multi-scale coupling simulation" data-kopling-multiskala>
+      <BatasKlaimKesehatan permukaan="body.multiscale-coupling" />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-xs font-black">Multi-scale coupling · molecule → cell → tissue → back</h3>

@@ -49,4 +49,31 @@ const ui = readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8')
 assert.match(ui, /purposes: \['personal-visualization'\]/, 'hook mengasumsikan izin klinis/AI yang tidak pernah diberikan')
 assert.match(ui, /labLogToLongitudinalEvents\(/); assert.match(ui, /syncProductionAppState\(/)
 assert.match(readFileSync('src/pages/PusatTubuh.tsx', 'utf8'), /<ApaYangBerubah \/>/, 'konsumen runtime status longitudinal hilang dari halaman')
+
+// Body Exposure overlay: lab log → transcribed signals (not atlas anatomy).
+{
+  const { labLogToBodyExposureSignals } = await import('../../src/lib/labLongitudinalBridge.ts')
+  const sinyal = labLogToBodyExposureSignals(
+    {
+      gdp: [{ id: 'g1', tanggal: '2026-04-01', nilai: 90 }, { id: 'g2', tanggal: '2026-09-20', nilai: 108 }],
+      hba1c: [{ id: 'h2', tanggal: '2026-09-20', nilai: 5.5 }],
+      misteri: [{ id: 'x', tanggal: '2026-09-20', nilai: 1 }],
+      crp: [{ id: 'c9', tanggal: '2026-09-27', nilai: 1 }],
+      hb: [{ id: 'bad', tanggal: 'bukan-tanggal', nilai: 14 }, { id: 'neg', tanggal: '2026-09-20', nilai: -1 }],
+    },
+    { max: 5, nowISO: '2026-09-25' },
+  )
+  assert.deepEqual(sinyal.map((s) => s.jenisId).sort(), ['gdp', 'hba1c'], 'jenis tak dikenal / masa depan / invalid ikut')
+  assert.equal(sinyal.find((s) => s.jenisId === 'gdp')!.value, '108')
+  assert.equal(sinyal.find((s) => s.jenisId === 'gdp')!.recordedAt, '2026-09-20')
+  assert.ok(sinyal.every((s) => s.truthClass === 'patient-recorded' && s.source === 'lab-log' && s.method === 'patient-transcribed-lab-report'))
+  assert.deepEqual(labLogToBodyExposureSignals({}, { nowISO: '2026-09-25' }), [])
+  assert.deepEqual(labLogToBodyExposureSignals({ gdp: [{ id: 'g', tanggal: '2026-09-20', nilai: 100 }] }, { max: 0 }), [])
+  assert.deepEqual(labLogToBodyExposureSignals({ gdp: [{ id: 'g', tanggal: '2026-09-20', nilai: 100 }] }, { nowISO: 'bukan' }), [])
+  const overlay = readFileSync('src/components/BodyExposurePatientOverlay.tsx', 'utf8')
+  assert.match(overlay, /labLogToBodyExposureSignals\(/, 'overlay Body Exposure tidak memproyeksikan lab tersinkron')
+  assert.match(overlay, /data-pmd-lab-overlay-signal/, 'sinyal lab overlay tanpa penanda mesin')
+  assert.match(overlay, /not atlas anatomy|do not morph atlas/, 'lab overlay harus menolak klaim anatomi atlas')
+}
+
 console.log('lab-status-longitudinal: lab masuk status kanonik (tinjauan pending, hanya visualisasi pribadi), What changed membaca status itu')
