@@ -6,6 +6,15 @@ const workflow = readFileSync(
   'utf8',
 )
 
+assert.ok(
+  workflow.includes("group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}"),
+  'Body3D runs must retain one concurrency lane per PR or target ref',
+)
+assert.ok(
+  workflow.includes("cancel-in-progress: ${{ github.event_name == 'pull_request' }}"),
+  'canonical main pushes must queue instead of cancelling exact-head render evidence',
+)
+
 assert.match(
   workflow,
   /render-proof:[\s\S]*?timeout-minutes: 60/,
