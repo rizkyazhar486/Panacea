@@ -207,3 +207,35 @@ features:
     next_actions: [validate_against_annotated_egocentric_workflow_dataset, add_human_review_surface, connect_first_authorized_device_specific_capture_connector]
     last_audited_commit: 04e40942000b847367a29bd3d1082746442cb929
 
+
+  - feature_id: core.physiological_state_engine
+    name: Provenance-aware Physiological State Engine
+    domain: Core Health Intelligence
+    capability: Typed multi-engine physiology runtime
+    workflow: Canonical observed boundary -> domain engines -> model-derived state -> Reality Error comparison
+    user_types: [system, clinician, learner, researcher]
+    primary_problem: Physiological models can fragment truth, units, provenance, and version identity when implemented as isolated calculators
+    use_case: Run versioned physiology models with typed coupling while keeping simulated and model-derived outputs separate from canonical patient truth
+    inputs: [admissible_longitudinal_events, explicit_boundary_conditions, versioned_model_parameters]
+    outputs: [model_derived_physiological_state, simulated_state, provenance_graph, reality_predictions, reality_error_evidence]
+    reads_from: [core.canonical_patient_state]
+    writes_to: [physiological_runtime_state, reality_error_ledger]
+    dependencies: [provenance, truth_class, units, model_versioning, consent_for_patient_derived_boundaries]
+    dependents: [body_exposure, clinical_context, simulation, reality_engine]
+    patient_state_fields: [read_only_longitudinal_events]
+    knowledge_graph_entities: [physiology, hemodynamics, oxygen_transport, neurovascular_perfusion]
+    shared_services: [provenance, longitudinal_state, reality_error, reality_gap]
+    backend_surfaces: []
+    frontend_surfaces: []
+    persistence_surfaces: []
+    external_integrations: []
+    maturity_level: FUNCTIONAL
+    clinical_validation: not_started
+    technical_risk: medium
+    clinical_risk: high
+    provenance_required: true
+    tests: [scripts/uji/physiological-runtime.mts, scripts/uji/longitudinal-physiology-pipeline.mts, scripts/uji/cerebral-perfusion-coupling.mts, scripts/uji/fick-oxygen-extraction.mts]
+    observability: [deterministic_provenance_ids, reality_error_ledger, explicit_reality_gap]
+    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    next_actions: [route_additional_domain_couplings_through_runtime, connect_model_derived_state_to_existing_projections_without_writeback, validate_models_against_external_reference_data]
+    last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
