@@ -17,7 +17,7 @@ import {
   type LongitudinalSources,
   type LongitudinalServerSources,
 } from './longitudinalSnapshot'
-import type { SelfVital, Vo2MaxEntry } from './types'
+import type { GpsActivity, SelfVital, Vo2MaxEntry } from './types'
 
 const Context = createContext<LongitudinalSnapshot | null>(null)
 
@@ -37,7 +37,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     foods: { id: string; date: string; name: string; grams: number; kcal: number; protein: number; carbs: number; fat: number }[]
     wellness: { date: string; sleepHr?: number; waterMl?: number }[]
     training: { id: string; date: string; rpe: number; type: string; note?: string }[]
-    gps: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
+    gps: Omit<GpsActivity, 'email' | 'hrSamples'>[]
     removed: { foods: string[]; sleep: string[] }
   } | null>(null)
   const [serverReady, setServerReady] = useState(false)
