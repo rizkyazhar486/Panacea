@@ -12,6 +12,7 @@ import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { Portal } from '../components/Portal'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { clinicalClaimDisclosure, clinicalClaimLabel, clinicalClaimMaturity } from '../lib/clinicalClaimMaturity'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
@@ -606,6 +607,7 @@ interface BubbleProps {
 function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegenerate }: BubbleProps) {
   const isUser = msg.role === 'user'
   const time = msg.at ? new Date(msg.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''
+  const maturity = clinicalClaimMaturity()
 
   if (isUser) {
     return (
@@ -626,6 +628,9 @@ function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegen
         <div className="rounded-2xl rounded-tl-sm bg-neutral-50 px-4 py-3 text-sm leading-relaxed text-ink">
           <RenderContent text={msg.content} />
         </div>
+        <p className="mt-1 pl-1 text-[10px] text-neutral-500" data-clinical-claim-maturity={maturity}>
+          {clinicalClaimLabel(maturity)} · {clinicalClaimDisclosure(maturity)}
+        </p>
         <div className="mt-1 flex items-center gap-0.5 pl-1 opacity-0 transition-opacity group-hover/b:opacity-100">
           <span className="mr-1 text-[10px] text-neutral-500">{time}</span>
           <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-500 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>
