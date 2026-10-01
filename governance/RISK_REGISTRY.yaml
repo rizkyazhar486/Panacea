@@ -80,6 +80,9 @@ risks:
       home command/overview, body/sleep/device cards, clinical body twin, manual
       flowsheet, daily check-in, EMR timeline, and Profile — 226 registered healthcare claim surfaces. Consult no longer claims surgical indication or "AI Recommended" clinician authority.
       Working tree replayed onto main 04e40942 (uncommitted).
+      2026-10-01: every AI assistant bubble in the clinical Chatbot now renders the same fail-closed maturity label
+      and disclosure (Technical output unless explicit review/validation evidence exists), so conversational output
+      no longer relies only on a page-level disclaimer.
       Remaining work is still platform-wide for generated clinical artifacts and any new healthcare surface
       before this risk can be marked fully mitigated.
     evidence:
@@ -87,6 +90,8 @@ risks:
       - PANACEA_HUMANITY_10_CHARTER.md
       - src/lib/clinicalClaimMaturity.ts
       - src/pages/EMR.tsx
+      - src/pages/Chatbot.tsx
+      - scripts/qa/clinical-response-contract.test.mjs
       - scripts/uji/clinical-claim-maturity.mts
 
   - risk_id: risk.agent_context_loss
