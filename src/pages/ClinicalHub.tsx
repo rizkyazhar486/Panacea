@@ -24,6 +24,7 @@ export const GROUPS = [
       { to: '/med-study', name: 'Medical Library', kw: 'library evidence guideline journal' },
       { to: '/chatbot', name: 'Ask Health', kw: 'health question ai clinical assistant' },
       { to: '/emr', name: 'AI-EMR', kw: 'medical record longitudinal care documentation' },
+      { to: '/doctor-review', name: 'Doctor Review Checklist', kw: 'doctor human review checklist clinical notes provenance safety' },
       { to: '/clinical-calculators', name: 'Calculators & Lab', kw: 'calculator laboratory clinical score' },
       { to: '/learn', name: 'Learn & Look Up', kw: 'learn lookup study reference' },
     ],
@@ -151,6 +152,15 @@ export function ClinicalHub() {
               </Link>
             ))}
           </nav>
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review"
+              className="mt-4 flex min-h-[48px] items-center justify-between border-y border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Doctor Review Checklist</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
 
         <section className="grid gap-8 lg:grid-cols-2" aria-label="Clinical quick tools">
