@@ -14,7 +14,11 @@ permissions:
 
 concurrency:
   group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Supersede stale PR heads, but never discard canonical main evidence.
+  # Main pushes share one group and queue to completion so every merged SHA
+  # receives a fail-closed render verdict instead of being pre-empted by the
+  # next merge while its serial WebGL proof is still running.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   render-proof:
