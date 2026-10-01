@@ -33,14 +33,18 @@ risks:
       clinical-validation claim; clinically-validated requires explicit human review, external validation and linked
       validation evidence. EMR signatures now describe the actual server-confirmed review event rather than
       "certification", and AI-generated patient education remains visibly draft-level unless review evidence exists.
-      Remaining work is platform-wide: every healthcare-facing surface and generated clinical artifact must adopt the
-      same maturity contract before this risk can be marked fully mitigated.
+      2026-09-30: every AI assistant bubble in the clinical Chatbot now renders the same fail-closed maturity label
+      and disclosure ("Technical output" unless explicit review/validation evidence exists), so conversational output
+      can no longer rely only on a page-level disclaimer. Remaining work is platform-wide: every other healthcare-facing
+      surface and generated clinical artifact must adopt the same maturity contract before this risk can be marked fully mitigated.
     evidence:
       - PANACEA_CONSTITUTION.md
       - PANACEA_HUMANITY_10_CHARTER.md
       - src/lib/clinicalClaimMaturity.ts
       - src/pages/EMR.tsx
+      - src/pages/Chatbot.tsx
       - scripts/uji/clinical-claim-maturity.mts
+      - scripts/qa/clinical-response-contract.test.mjs
 
   - risk_id: risk.agent_context_loss
     category: governance
