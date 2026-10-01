@@ -13,7 +13,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
+  # PR heads share one lane so a newer head supersedes stale PR evidence.
+  # Non-PR runs use the immutable commit SHA as their lane: distinct merged
+  # main SHAs cannot replace each other while waiting for serial WebGL proof.
+  group: body-3d-acceptance-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
