@@ -73,7 +73,7 @@ const FEATURES = [
   { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI interviews the patient (SOCRATES method); results flow automatically into the Subjective/Objective fields of the AI-EMR, accessible only to doctors.' },
   { icon: IconStethoscope, title: 'Consultations, Pharmacy & Facilities', text: 'AI consultation (Rp49,000) → referral to specialist doctors; pharmacy with prescription fulfillment; nearest healthcare facilities via GPS for emergencies.' },
   { icon: IconStore, title: 'Medical Knowledge Hub', text: 'Discover & share curated medical notes, journals, and articles. Pricing set by the authors; watermarked PDFs protect contributors.' },
-  { icon: IconShield, title: 'AI-EMR for clinicians', text: 'For licensed clinicians and institutions (STR/NPWP). A doctor reviews the record. Interaction flags are technical checks, not a certified clinical decision.' },
+  { icon: IconShield, title: 'Certified AI-EMR', text: 'For licensed clinicians and institutions (STR/NPWP). A doctor reviews the record. Interaction flags are technical checks, not a certified clinical decision.' },
 ]
 
 const ROLES = [
