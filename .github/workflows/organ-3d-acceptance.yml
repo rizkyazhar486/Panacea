@@ -126,8 +126,13 @@ jobs:
       # Dijalankan berurutan, bukan paralel: WebGL di sini memakai SwiftShader,
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
+      # Evidence-based parent envelope:
+      # exact-head #2129 completed all 12 gates in 640s; on main@c32aa37 the
+      # first seven stretched from 498s to 697s (1.40x). Applying that observed
+      # slowdown to the full queue gives ~896s; 20% bounded headroom rounds to
+      # 18 minutes. Individual 180/240s fail-fast limits remain authoritative.
       - name: Prove every 3D panel renders
-        timeout-minutes: 12
+        timeout-minutes: 18
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
