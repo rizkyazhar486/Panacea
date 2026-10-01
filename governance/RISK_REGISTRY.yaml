@@ -216,6 +216,11 @@ risks:
       - src/lib/panaceaLongitudinalState.ts
       - src/lib/visitOperatingSystem.ts
       - scripts/uji/speculative-truth-clinical-boundary.mts
+      - src/lib/physiology/runtime.ts
+      - src/lib/physiology/longitudinalBoundary.ts
+      - src/lib/physiology/canonicalOxygenDelivery.ts
+      - scripts/uji/physiological-runtime.mts
+      - scripts/uji/longitudinal-physiology-pipeline.mts
 
   - risk_id: risk.future_model_lock_in
     category: product_architecture
@@ -232,3 +237,5 @@ risks:
       - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
       - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
       - PANACEA_PRODUCT_MATURITY_OS.md
+      - src/lib/physiology/runtime.ts
+      - scripts/uji/physiological-runtime.mts
