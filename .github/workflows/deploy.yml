@@ -43,11 +43,18 @@ jobs:
           VITE_TURN_URL: ${{ vars.VITE_TURN_URL }}
           VITE_TURN_USER: ${{ vars.VITE_TURN_USER }}
           VITE_TURN_CRED: ${{ vars.VITE_TURN_CRED }}
-      - uses: actions/upload-pages-artifact@v3
+      # Pages is optional. The repository's canonical production deployment is
+      # independent of this workflow, so an unavailable Pages target must not
+      # turn an otherwise healthy main push red. Set repository variable
+      # ENABLE_GITHUB_PAGES=true only after Pages is enabled in repository settings.
+      - name: Upload GitHub Pages artifact
+        if: ${{ vars.ENABLE_GITHUB_PAGES == 'true' }}
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    if: ${{ vars.ENABLE_GITHUB_PAGES == 'true' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
