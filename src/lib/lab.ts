@@ -115,6 +115,13 @@ export const JENIS_LAB: JenisLab[] = [
   { id: 'fosfor', nama: 'Phosphorus', satuan: 'mg/dL', bawah: 2.5, atas: 4.5, sumber: 'Usual adult serum range; varies by laboratory' },
   { id: 'folat', nama: 'Folate', satuan: 'ng/mL', bawah: 3, atas: 20, sumber: 'Usual adult serum range; varies by laboratory' },
   { id: 'bilirubin', nama: 'Bilirubin', satuan: 'mg/dL', bawah: 0.1, atas: 1.2, sumber: 'Usual adult total bilirubin range; varies by laboratory' },
+  { id: 'homosistein', nama: 'Homocysteine', satuan: 'µmol/L', bawah: 5, atas: 15, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'inr', nama: 'INR', satuan: 'ratio', bawah: 0.8, atas: 1.2, sumber: 'Usual range without anticoagulant therapy; a treatment target is set by a clinician' },
+  {
+    id: 'kortisol', nama: 'Cortisol', satuan: 'µg/dL', bawah: 6, atas: 23,
+    sumber: 'Usual serum range used by the Nutrition tracker; varies by laboratory and time of day',
+    catatan: 'Not a stimulation-test result and not a diagnosis.',
+  },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -229,6 +236,9 @@ export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
   phosphorus: 'fosfor',
   folate: 'folat',
   bilirubin: 'bilirubin',
+  homocysteine: 'homosistein',
+  inr: 'inr',
+  cortisol: 'kortisol',
 }
 
 /** Nutrition protocols sometimes type platelets or WBC per µL. Those magnitudes must not enter the ×10⁹/L or 10³/µL catalog. */

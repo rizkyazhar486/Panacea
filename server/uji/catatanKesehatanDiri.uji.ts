@@ -36,6 +36,8 @@ const makan = validasiDiaryFoods([{ id: 'f1', date: '2026-09-28', name: ' rice '
 assert.equal(makan[0].name, 'rice')
 assert.equal(makan[0].fat, 0)
 assert.throws(() => validasiDiaryWellness([{ date: '2026-09-28', waterMl: -1 }]), /water/)
+assert.equal(validasiDiaryWellness([{ date: '2026-09-28', waterMl: 20000 }])[0].waterMl, 20000)
+assert.throws(() => validasiDiaryWellness([{ date: '2026-09-28', waterMl: 20001 }]), /water/)
 const hari = validasiDiaryWellness([
   { date: '2026-09-28', waterMl: 1800 },
   { date: '2026-09-28', sleepHr: 8 },
@@ -187,5 +189,34 @@ const tanpaJejak = buangKunciDiary({ diaryTraining: [{ id: 't1' }], diaryGps: [{
 assert.equal(tanpaJejak.weightKg, 70)
 assert.equal('diaryTraining' in tanpaJejak, false)
 assert.equal('diaryGps' in tanpaJejak, false)
+
+const airTersimpan = {
+  diaryWellness: [
+    { date: '2026-09-28', waterMl: 1800, sleepHr: 7 },
+    { date: '2026-09-27', waterMl: 500 },
+  ],
+}
+const air = susunPatchDiary(airTersimpan, {
+  wellness: [
+    { date: '2026-09-28', waterMl: 0 },
+    { date: '2026-09-27', waterMl: 400 },
+    { date: '2026-09-26', waterMl: 900 },
+    { date: '2026-09-25', waterMl: 2200 },
+    { date: '2026-09-24', waterMl: 0 },
+  ],
+})
+const airHari = air.diaryWellness as { date: string; waterMl?: number; sleepHr?: number }[]
+assert.equal(airHari.find((r) => r.date === '2026-09-28')?.waterMl, undefined)
+assert.equal(airHari.find((r) => r.date === '2026-09-28')?.sleepHr, 7)
+assert.equal(airHari.find((r) => r.date === '2026-09-27')?.waterMl, 500)
+assert.equal(airHari.find((r) => r.date === '2026-09-26')?.waterMl, 900)
+assert.equal(airHari.find((r) => r.date === '2026-09-25')?.waterMl, 2200)
+assert.equal(airHari.some((r) => r.date === '2026-09-24'), false)
+const naik = susunPatchDiary({ diaryWellness: [{ date: '2026-09-28', waterMl: 1800 }] }, { wellness: [{ date: '2026-09-28', waterMl: 2200 }] })
+assert.equal((naik.diaryWellness as { waterMl: number }[])[0].waterMl, 2200)
+assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 1800)
+assert.throws(() => susunPatchDiary(airTersimpan, { wellness: [{ date: '2026-09-28', waterMl: -5 }] }), /water/)
+assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 1800)
+assert.equal((susunPatchDiary(airTersimpan, { wellness: [] }).diaryWellness as { date: string }[]).length, 2)
 
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')

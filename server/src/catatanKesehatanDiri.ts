@@ -310,14 +310,16 @@ export function gabungDiaryFoods(
   return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
 }
 
-/** Same date keeps stored numbers and only fills fields the account does not have yet. */
+/** Same date keeps an existing sleep value. Water may rise, and zero clears that day's water without dropping sleep. */
 export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[], masuk: readonly CatatanWellnessServer[]): CatatanWellnessServer[] {
   const byDate = new Map(tersimpan.map((r) => [r.date, { ...r }]))
   for (const row of masuk) {
-    const ada = byDate.get(row.date)
-    if (!ada) { byDate.set(row.date, { ...row }); continue }
+    const ada = byDate.get(row.date) ?? { date: row.date }
     if (ada.sleepHr == null && row.sleepHr != null) ada.sleepHr = row.sleepHr
-    if (ada.waterMl == null && row.waterMl != null) ada.waterMl = row.waterMl
+    if (row.waterMl === 0) delete ada.waterMl
+    else if (row.waterMl != null && (ada.waterMl == null || row.waterMl > ada.waterMl)) ada.waterMl = row.waterMl
+    if (ada.sleepHr == null && ada.waterMl == null) byDate.delete(row.date)
+    else byDate.set(row.date, ada)
   }
   return [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
 }

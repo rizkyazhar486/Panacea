@@ -76,12 +76,19 @@ export function wellnessBelumAda(
     if (!row?.date) continue
     const ada = akun.find((d) => d.date === row.date)
     if (!ada) {
-      if (row.sleepHr != null || row.waterMl != null) keluar.push({ date: row.date, ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}), ...(row.waterMl != null ? { waterMl: row.waterMl } : {}) })
+      if (row.sleepHr != null || (row.waterMl != null && row.waterMl > 0)) {
+        keluar.push({
+          date: row.date,
+          ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
+          ...(row.waterMl != null && row.waterMl > 0 ? { waterMl: row.waterMl } : {}),
+        })
+      }
       continue
     }
     const isi: { date: string; sleepHr?: number; waterMl?: number } = { date: row.date }
     if (row.sleepHr != null && ada.sleepHr == null) isi.sleepHr = row.sleepHr
-    if (row.waterMl != null && ada.waterMl == null) isi.waterMl = row.waterMl
+    if (row.waterMl === 0 && ada.waterMl != null) isi.waterMl = 0
+    else if (row.waterMl != null && row.waterMl > 0 && (ada.waterMl == null || row.waterMl > ada.waterMl)) isi.waterMl = row.waterMl
     if (isi.sleepHr != null || isi.waterMl != null) keluar.push(isi)
   }
   return keluar
@@ -100,11 +107,12 @@ export function tampilkanWellness<T extends { date: string; sleepHr?: number; wa
   for (const row of Object.values(lokal)) if (row?.date) base[row.date] = { ...row }
   for (const row of akun) {
     const ada = base[row.date] ?? ({ date: row.date } as T)
-    base[row.date] = {
-      ...ada,
-      ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
-      ...(row.waterMl != null ? { waterMl: row.waterMl } : {}),
+    const berikutnya: T = { ...ada }
+    if (row.sleepHr != null) berikutnya.sleepHr = row.sleepHr
+    if (berikutnya.waterMl !== 0 && row.waterMl != null && (berikutnya.waterMl == null || row.waterMl > berikutnya.waterMl)) {
+      berikutnya.waterMl = row.waterMl
     }
+    base[row.date] = berikutnya
   }
   return base
 }

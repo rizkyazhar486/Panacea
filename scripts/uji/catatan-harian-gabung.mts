@@ -32,6 +32,23 @@ assert.equal(tampil['2026-09-28'].waterMl, 1800)
 assert.equal(tampil['2026-09-28'].sleepHr, 7)
 assert.equal(tampil['2026-09-28'].exerciseMin, 20)
 assert.equal(tampil['2026-09-30'].exerciseMin, 15)
+const airNol = tampilkanWellness(
+  [{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }],
+  { '2026-09-28': { date: '2026-09-28', waterMl: 0, sleepHr: 7 } },
+)
+assert.equal(airNol['2026-09-28'].waterMl, 0)
+assert.equal(airNol['2026-09-28'].sleepHr, 7)
+const airNaik = tampilkanWellness(
+  [{ date: '2026-09-28', waterMl: 1800 }],
+  { '2026-09-28': { date: '2026-09-28', waterMl: 500 } },
+)
+assert.equal(airNaik['2026-09-28'].waterMl, 1800)
+assert.deepEqual(wellnessBelumAda([{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }], {
+  '2026-09-28': { date: '2026-09-28', waterMl: 0, sleepHr: 7 },
+}), [{ date: '2026-09-28', waterMl: 0 }])
+assert.deepEqual(wellnessBelumAda([{ date: '2026-09-28', waterMl: 1800 }], {
+  '2026-09-28': { date: '2026-09-28', waterMl: 2200 },
+}), [{ date: '2026-09-28', waterMl: 2200 }])
 assert.equal(tampilkanWellness(null, { '2026-09-30': { date: '2026-09-30', waterMl: 1 } })['2026-09-30'].waterMl, 1)
 
 const { makananTampil, tidurTampil } = await import('../../src/lib/homeCrossTabDailyState.ts')

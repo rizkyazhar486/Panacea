@@ -41,6 +41,9 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   fosfor: ['fosfor', 'phosphorus', 'phosphate'],
   folat: ['folat', 'folate', 'folic acid'],
   bilirubin: ['bilirubin total', 'total bilirubin', 'bilirubin'],
+  homosistein: ['homocysteine', 'homosistein'],
+  inr: ['international normalized ratio', 'inr'],
+  kortisol: ['cortisol', 'kortisol'],
   hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 
