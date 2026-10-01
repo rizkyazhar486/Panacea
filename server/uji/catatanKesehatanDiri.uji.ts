@@ -36,6 +36,8 @@ const makan = validasiDiaryFoods([{ id: 'f1', date: '2026-09-28', name: ' rice '
 assert.equal(makan[0].name, 'rice')
 assert.equal(makan[0].fat, 0)
 assert.throws(() => validasiDiaryWellness([{ date: '2026-09-28', waterMl: -1 }]), /water/)
+assert.equal(validasiDiaryWellness([{ date: '2026-09-28', waterMl: 20000 }])[0].waterMl, 20000)
+assert.throws(() => validasiDiaryWellness([{ date: '2026-09-28', waterMl: 20001 }]), /water/)
 const hari = validasiDiaryWellness([
   { date: '2026-09-28', waterMl: 1800 },
   { date: '2026-09-28', sleepHr: 8 },
@@ -136,11 +138,15 @@ const disaring = buangKunciDiary({
   diaryWellness: [{ date: '2026-09-28' }],
   diaryRemovedFoods: ['f1'],
   diaryRemovedSleep: ['s1'],
+  diaryRemovedTraining: ['t1'],
+  diaryRemovedGps: ['g1'],
   selfVitalsLog: [{ id: 'v' }],
   vo2maxEntries: [{ id: 'o' }],
 })
 assert.equal(disaring.weightKg, 70)
 assert.equal('diaryRemovedFoods' in disaring, false)
+assert.equal('diaryRemovedTraining' in disaring, false)
+assert.equal('diaryRemovedGps' in disaring, false)
 assert.equal('diarySleep' in disaring, false)
 assert.equal('selfVitalsLog' in disaring, false)
 
@@ -157,6 +163,27 @@ assert.equal(barisLatihan.find((r) => r.id === 't1')?.rpe, 8)
 assert.equal(barisLatihan.find((r) => r.id === 't2')?.rpe, 1)
 assert.equal(barisLatihan.find((r) => r.id === 't2')?.note, 'mudah')
 assert.equal((susunPatchDiary({ diaryTraining: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] }, { trainingLogs: [] }).diaryTraining as { id: string }[])[0].id, 't1')
+const hapusLatihan = susunPatchDiary({
+  diaryTraining: [
+    { id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' },
+    { id: 't2', date: '2026-09-29', rpe: 4, type: 'Gym' },
+  ],
+}, { removeTrainingIds: ['t1'] })
+assert.equal((hapusLatihan.diaryTraining as { id: string }[]).some((r) => r.id === 't1'), false)
+assert.equal((hapusLatihan.diaryTraining as { id: string }[])[0].id, 't2')
+assert.deepEqual(hapusLatihan.diaryRemovedTraining, ['t1'])
+const pulihLatihan = susunPatchDiary(
+  { diaryTraining: hapusLatihan.diaryTraining, diaryRemovedTraining: hapusLatihan.diaryRemovedTraining },
+  { trainingLogs: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] },
+)
+assert.equal((pulihLatihan.diaryTraining as { id: string }[]).some((r) => r.id === 't1'), false)
+const profilHapusLatihan = { diaryTraining: [{ id: 't1', date: '2026-09-28', rpe: 8, type: 'Lari' }] }
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: ['bukan id'] }), /invalid removed id/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: Array.from({ length: 101 }, (_, i) => `id${i}ok`) }), /too many removed ids/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
+assert.throws(() => susunPatchDiary(profilHapusLatihan, { removeTrainingIds: [] }), /diary payload is empty/)
+assert.equal((profilHapusLatihan.diaryTraining as { id: string }[])[0].id, 't1')
 assert.equal(validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 10, type: 'HIIT' }])[0].rpe, 10)
 assert.throws(() => validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 0, type: 'HIIT' }]), /invalid training/)
 assert.throws(() => validasiDiaryTraining([{ id: 'tb', date: '2026-09-28', rpe: 10.1, type: 'HIIT' }]), /invalid training/)
@@ -179,6 +206,19 @@ assert.equal(barisGps.map((r) => r.id).sort().join(','), 'g1,g2')
 assert.equal(barisGps.find((r) => r.id === 'g2')?.kcal, 0)
 assert.equal(barisGps.find((r) => r.id === 'g2')?.avgHr, 140)
 assert.equal('hrSamples' in (barisGps.find((r) => r.id === 'g2') ?? {}), false)
+const hapusGps = susunPatchDiary({
+  diaryGps: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }],
+}, { removeGpsIds: ['g1'] })
+assert.equal((hapusGps.diaryGps as unknown[]).length, 0)
+assert.deepEqual(hapusGps.diaryRemovedGps, ['g1'])
+const pulihGps = susunPatchDiary(
+  { diaryGps: hapusGps.diaryGps, diaryRemovedGps: hapusGps.diaryRemovedGps },
+  { gpsActivities: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }] },
+)
+assert.equal((pulihGps.diaryGps as unknown[]).length, 0)
+const profilGps = { diaryGps: [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T01:00:00.000Z' }] }
+assert.throws(() => susunPatchDiary(profilGps, { removeGpsIds: [3] }), /invalid removed id/)
+assert.equal((profilGps.diaryGps as { id: string }[])[0].id, 'g1')
 assert.equal(validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'run', distKm: 500, durSec: 86400, avgSpeedKmh: 150, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]).length, 1)
 assert.throws(() => validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'run', distKm: 0, durSec: 60, avgSpeedKmh: 10, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]), /invalid gps/)
 assert.throws(() => validasiDiaryGps([{ id: 'gb', name: 'A', sport: 'Lari', sportType: 'fly', distKm: 1, durSec: 60, avgSpeedKmh: 10, kcal: 1, at: '2026-09-28T00:00:00.000Z' }]), /invalid gps/)
@@ -187,5 +227,34 @@ const tanpaJejak = buangKunciDiary({ diaryTraining: [{ id: 't1' }], diaryGps: [{
 assert.equal(tanpaJejak.weightKg, 70)
 assert.equal('diaryTraining' in tanpaJejak, false)
 assert.equal('diaryGps' in tanpaJejak, false)
+
+const airTersimpan = {
+  diaryWellness: [
+    { date: '2026-09-28', waterMl: 1800, sleepHr: 7 },
+    { date: '2026-09-27', waterMl: 500 },
+  ],
+}
+const air = susunPatchDiary(airTersimpan, {
+  wellness: [
+    { date: '2026-09-28', waterMl: 0 },
+    { date: '2026-09-27', waterMl: 400 },
+    { date: '2026-09-26', waterMl: 900 },
+    { date: '2026-09-25', waterMl: 2200 },
+    { date: '2026-09-24', waterMl: 0 },
+  ],
+})
+const airHari = air.diaryWellness as { date: string; waterMl?: number; sleepHr?: number }[]
+assert.equal(airHari.find((r) => r.date === '2026-09-28')?.waterMl, undefined)
+assert.equal(airHari.find((r) => r.date === '2026-09-28')?.sleepHr, 7)
+assert.equal(airHari.find((r) => r.date === '2026-09-27')?.waterMl, 500)
+assert.equal(airHari.find((r) => r.date === '2026-09-26')?.waterMl, 900)
+assert.equal(airHari.find((r) => r.date === '2026-09-25')?.waterMl, 2200)
+assert.equal(airHari.some((r) => r.date === '2026-09-24'), false)
+const naik = susunPatchDiary({ diaryWellness: [{ date: '2026-09-28', waterMl: 1800 }] }, { wellness: [{ date: '2026-09-28', waterMl: 2200 }] })
+assert.equal((naik.diaryWellness as { waterMl: number }[])[0].waterMl, 2200)
+assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 1800)
+assert.throws(() => susunPatchDiary(airTersimpan, { wellness: [{ date: '2026-09-28', waterMl: -5 }] }), /water/)
+assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 1800)
+assert.equal((susunPatchDiary(airTersimpan, { wellness: [] }).diaryWellness as { date: string }[]).length, 2)
 
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')

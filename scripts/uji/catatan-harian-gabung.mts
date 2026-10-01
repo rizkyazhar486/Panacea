@@ -32,6 +32,23 @@ assert.equal(tampil['2026-09-28'].waterMl, 1800)
 assert.equal(tampil['2026-09-28'].sleepHr, 7)
 assert.equal(tampil['2026-09-28'].exerciseMin, 20)
 assert.equal(tampil['2026-09-30'].exerciseMin, 15)
+const airNol = tampilkanWellness(
+  [{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }],
+  { '2026-09-28': { date: '2026-09-28', waterMl: 0, sleepHr: 7 } },
+)
+assert.equal(airNol['2026-09-28'].waterMl, 0)
+assert.equal(airNol['2026-09-28'].sleepHr, 7)
+const airNaik = tampilkanWellness(
+  [{ date: '2026-09-28', waterMl: 1800 }],
+  { '2026-09-28': { date: '2026-09-28', waterMl: 500 } },
+)
+assert.equal(airNaik['2026-09-28'].waterMl, 1800)
+assert.deepEqual(wellnessBelumAda([{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }], {
+  '2026-09-28': { date: '2026-09-28', waterMl: 0, sleepHr: 7 },
+}), [{ date: '2026-09-28', waterMl: 0 }])
+assert.deepEqual(wellnessBelumAda([{ date: '2026-09-28', waterMl: 1800 }], {
+  '2026-09-28': { date: '2026-09-28', waterMl: 2200 },
+}), [{ date: '2026-09-28', waterMl: 2200 }])
 assert.equal(tampilkanWellness(null, { '2026-09-30': { date: '2026-09-30', waterMl: 1 } })['2026-09-30'].waterMl, 1)
 
 const { makananTampil, tidurTampil } = await import('../../src/lib/homeCrossTabDailyState.ts')
@@ -66,5 +83,12 @@ const gpsLayar = gpsTampil(
 assert.equal(gpsLayar.find((r) => r.id === 'g1')?.hrSamples?.[0].bpm, 140)
 assert.equal(gpsLayar.some((r) => r.id === 'g3'), true)
 assert.equal(gpsLayar.some((r) => r.id === 'g2'), false)
+const gpsHapus = gpsTampil(
+  [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z' }],
+  [{ id: 'g1', email: 'a@x.com', name: 'Pagi', sport: 'Lari', sportType: 'run', emoji: '🏃', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z' }],
+  'a@x.com',
+  ['g1'],
+)
+assert.equal(gpsHapus.length, 0)
 
 console.log('catatan-harian-gabung: second device adds rows without replacing the account')

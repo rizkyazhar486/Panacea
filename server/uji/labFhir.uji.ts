@@ -36,6 +36,7 @@ for (const e of obsSaja) {
 assert.equal(kodeUntuk('crp'), null); assert.equal(kodeUntuk('apob'), null); assert.ok(kodeUntuk('hba1c'))
 assert.equal(kodeUntuk('chol'), null); assert.equal(kodeUntuk('natrium'), null); assert.equal(kodeUntuk('kalium'), null)
 assert.equal(kodeUntuk('folat'), null); assert.equal(kodeUntuk('kalsium'), null); assert.equal(kodeUntuk('bilirubin'), null)
+assert.equal(kodeUntuk('homosistein'), null); assert.equal(kodeUntuk('inr'), null); assert.equal(kodeUntuk('kortisol'), null)
 
 {
   const teks = logKeBundelFhir({
@@ -44,14 +45,19 @@ assert.equal(kodeUntuk('folat'), null); assert.equal(kodeUntuk('kalsium'), null)
     kalium: [{ id: 'k1', tanggal: '2026-09-20', nilai: 4.1 }],
     asamUrat: [{ id: 'ua1', tanggal: '2026-09-20', nilai: 5.8 }],
     trombosit: [{ id: 'pl1', tanggal: '2026-09-20', nilai: 220 }],
+    homosistein: [{ id: 'hcy1', tanggal: '2026-09-20', nilai: 9 }],
     misteri: [{ id: 'm2', tanggal: '2026-09-20', nilai: 9 }],
   }, 'Patient/p-a', kini.toISOString()) as any
   const hanya = teks.entry.filter((e: any) => e.resource.resourceType === 'Observation')
-  assert.equal(hanya.length, 5, 'analit katalog tanpa LOINC tetap diekspor sebagai teks')
+  assert.equal(hanya.length, 6, 'analit katalog tanpa LOINC tetap diekspor sebagai teks')
   const chol = hanya.find((e: any) => e.resource.id === 'lab-ch1').resource
   assert.equal(chol.code.coding, undefined, 'kolesterol total tidak boleh dapat LOINC tebakan')
   assert.equal(chol.code.text, 'Total cholesterol')
   assert.equal(chol.valueQuantity.unit, 'mg/dL')
+  const hcy = hanya.find((e: any) => e.resource.id === 'lab-hcy1').resource
+  assert.equal(hcy.code.coding, undefined)
+  assert.equal(hcy.code.text, 'Homocysteine')
+  assert.equal(hcy.valueQuantity.unit, 'umol/L')
   assert.equal(hanya.some((e: any) => e.resource.id === 'lab-m2'), false)
 }
 

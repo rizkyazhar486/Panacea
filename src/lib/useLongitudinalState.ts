@@ -38,7 +38,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     wellness: { date: string; sleepHr?: number; waterMl?: number }[]
     training: { id: string; date: string; rpe: number; type: string; note?: string }[]
     gps: { id: string; name: string; sport: string; sportType: string; emoji?: string; distKm: number; durSec: number; avgSpeedKmh: number; kcal: number; at: string; avgHr?: number; maxHr?: number }[]
-    removed: { foods: string[]; sleep: string[] }
+    removed: { foods: string[]; sleep: string[]; training: string[]; gps: string[] }
   } | null>(null)
   const [serverReady, setServerReady] = useState(false)
   const adoptedLocal = useRef(Boolean(account))
@@ -150,7 +150,12 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
           wellness: keadaan.diary.wellness,
           training: keadaan.diary.training ?? [],
           gps: keadaan.diary.gps ?? [],
-          removed: keadaan.diary.removed ?? { foods: [], sleep: [] },
+          removed: {
+            foods: keadaan.diary.removed?.foods ?? [],
+            sleep: keadaan.diary.removed?.sleep ?? [],
+            training: keadaan.diary.removed?.training ?? [],
+            gps: keadaan.diary.removed?.gps ?? [],
+          },
         })
       }
     }).catch(() => {
@@ -164,22 +169,28 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     if (!diaryServer) return
     const foods = app.foods.filter((row) => diaryServer.removed.foods.includes(row.id)).map((row) => row.id)
     const sleep = app.sleepLogs.filter((row) => diaryServer.removed.sleep.includes(row.id)).map((row) => row.id)
-    if (foods.length || sleep.length) lupakanCatatanDihapus(foods, sleep)
-  }, [diaryServer, app.foods, app.sleepLogs, lupakanCatatanDihapus])
+    const training = app.trainingLogs.filter((row) => (diaryServer.removed.training ?? []).includes(row.id)).map((row) => row.id)
+    const gps = app.gpsActivities.filter((row) => (diaryServer.removed.gps ?? []).includes(row.id)).map((row) => row.id)
+    if (foods.length || sleep.length || training.length || gps.length) lupakanCatatanDihapus(foods, sleep, training, gps)
+  }, [diaryServer, app.foods, app.sleepLogs, app.trainingLogs, app.gpsActivities, lupakanCatatanDihapus])
 
   useEffect(() => {
     if (!backendEnabled || !account || !diaryServer) return
     const dihapusTidur = [...diaryServer.removed.sleep, ...(app.diaryHiddenSleepIds ?? [])]
     const dihapusMakan = [...diaryServer.removed.foods, ...(app.diaryHiddenFoodIds ?? [])]
+    const dihapusLatihan = [...(diaryServer.removed.training ?? []), ...(app.diaryHiddenTrainingIds ?? [])]
+    const dihapusGps = [...(diaryServer.removed.gps ?? []), ...(app.diaryHiddenGpsIds ?? [])]
     const sleepLogs = barisBelumAda(diaryServer.sleep, app.sleepLogs, dihapusTidur)
     const foods = barisBelumAda(diaryServer.foods, app.foods, dihapusMakan)
     const wellness = wellnessBelumAda(diaryServer.wellness, app.wellness ?? {})
-    const trainingLogs = barisBelumAda(diaryServer.training, app.trainingLogs)
-    const gpsActivities = barisBelumAda(diaryServer.gps, ringkasGpsUntukAkun(app.gpsActivities, account.email))
+    const trainingLogs = barisBelumAda(diaryServer.training, app.trainingLogs, dihapusLatihan)
+    const gpsActivities = barisBelumAda(diaryServer.gps, ringkasGpsUntukAkun(app.gpsActivities, account.email), dihapusGps)
     const removeFoodIds = (app.diaryHiddenFoodIds ?? []).filter((id) => !diaryServer.removed.foods.includes(id))
     const removeSleepIds = (app.diaryHiddenSleepIds ?? []).filter((id) => !diaryServer.removed.sleep.includes(id))
-    if (!sleepLogs.length && !foods.length && !wellness.length && !trainingLogs.length && !gpsActivities.length && !removeFoodIds.length && !removeSleepIds.length) return
-    const tanda = JSON.stringify({ sleepLogs, foods, wellness, trainingLogs, gpsActivities, removeFoodIds, removeSleepIds })
+    const removeTrainingIds = (app.diaryHiddenTrainingIds ?? []).filter((id) => !(diaryServer.removed.training ?? []).includes(id))
+    const removeGpsIds = (app.diaryHiddenGpsIds ?? []).filter((id) => !(diaryServer.removed.gps ?? []).includes(id))
+    if (!sleepLogs.length && !foods.length && !wellness.length && !trainingLogs.length && !gpsActivities.length && !removeFoodIds.length && !removeSleepIds.length && !removeTrainingIds.length && !removeGpsIds.length) return
+    const tanda = JSON.stringify({ sleepLogs, foods, wellness, trainingLogs, gpsActivities, removeFoodIds, removeSleepIds, removeTrainingIds, removeGpsIds })
     if (unggahDiary.current === tanda) return
     unggahDiary.current = tanda
     let active = true
@@ -191,9 +202,11 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
       ...(gpsActivities.length ? { gpsActivities } : {}),
       ...(removeFoodIds.length ? { removeFoodIds } : {}),
       ...(removeSleepIds.length ? { removeSleepIds } : {}),
+      ...(removeTrainingIds.length ? { removeTrainingIds } : {}),
+      ...(removeGpsIds.length ? { removeGpsIds } : {}),
     }).then(() => { if (active) setClinicalRevision(v => v + 1) }).catch(() => { unggahDiary.current = '' })
     return () => { active = false }
-  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds])
+  }, [account, diaryServer, app.sleepLogs, app.foods, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds, app.diaryHiddenTrainingIds, app.diaryHiddenGpsIds])
 
   const sumberLab = sumberLabLongitudinal(labServer && labServer.subjectId === account?.id ? labServer.log : null, local.labs)
   const sumberVitals = sumberVitalsLongitudinal(serverReady && account ? deviceCurrent : null, local.vitals as Record<string, unknown>)
@@ -203,11 +216,13 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     () => {
       const dihapusTidur = [...(diaryServer?.removed.sleep ?? []), ...(app.diaryHiddenSleepIds ?? [])]
       const dihapusMakan = [...(diaryServer?.removed.foods ?? []), ...(app.diaryHiddenFoodIds ?? [])]
+      const dihapusLatihan = [...(diaryServer?.removed.training ?? []), ...(app.diaryHiddenTrainingIds ?? [])]
+      const dihapusGps = [...(diaryServer?.removed.gps ?? []), ...(app.diaryHiddenGpsIds ?? [])]
       const tidur = tidurTampil(diaryServer ? diaryServer.sleep : null, app.sleepLogs, dihapusTidur)
       const makanan = makananTampil(diaryServer ? diaryServer.foods : null, app.foods, dihapusMakan)
       const wellness = diaryServer ? tampilkanWellness(diaryServer.wellness, app.wellness ?? {}) : app.wellness
-      const latihan = makananTampil(diaryServer ? diaryServer.training : null, app.trainingLogs)
-      const gps = gpsTampil(diaryServer ? diaryServer.gps : null, app.gpsActivities, account?.email ?? '')
+      const latihan = makananTampil(diaryServer ? diaryServer.training : null, app.trainingLogs, dihapusLatihan)
+      const gps = gpsTampil(diaryServer ? diaryServer.gps : null, app.gpsActivities, account?.email ?? '', dihapusGps)
       return {
         account,
         vitals: app.vitals,
@@ -220,7 +235,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         gpsActivities: gps,
       }
     },
-    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds, diaryServer, sumberSelf.rows, sumberVo2.rows],
+    [account, app.vitals, app.foods, app.sleepLogs, app.wellness, app.trainingLogs, app.gpsActivities, app.diaryHiddenFoodIds, app.diaryHiddenSleepIds, app.diaryHiddenTrainingIds, app.diaryHiddenGpsIds, diaryServer, sumberSelf.rows, sumberVo2.rows],
   )
   const sourceLocal = useMemo(
     () => ({ ...local, labs: sumberLab.labs, vitals: sumberVitals.vitals as typeof local.vitals }),

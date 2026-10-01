@@ -247,8 +247,13 @@ function bacaNisan(profil: Record<string, unknown> | undefined | null, kunci: st
   return keluar.slice(-MAKS_NISAN)
 }
 
-export function bacaDiaryDihapus(profil: Record<string, unknown> | undefined | null): { foods: string[]; sleep: string[] } {
-  return { foods: bacaNisan(profil, 'diaryRemovedFoods'), sleep: bacaNisan(profil, 'diaryRemovedSleep') }
+export function bacaDiaryDihapus(profil: Record<string, unknown> | undefined | null): { foods: string[]; sleep: string[]; training: string[]; gps: string[] } {
+  return {
+    foods: bacaNisan(profil, 'diaryRemovedFoods'),
+    sleep: bacaNisan(profil, 'diaryRemovedSleep'),
+    training: bacaNisan(profil, 'diaryRemovedTraining'),
+    gps: bacaNisan(profil, 'diaryRemovedGps'),
+  }
 }
 
 export function validasiIdDihapus(masukan: unknown): string[] {
@@ -310,28 +315,36 @@ export function gabungDiaryFoods(
   return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
 }
 
-/** Same date keeps stored numbers and only fills fields the account does not have yet. */
+/** Same date keeps an existing sleep value. Water may rise, and zero clears that day's water without dropping sleep. */
 export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[], masuk: readonly CatatanWellnessServer[]): CatatanWellnessServer[] {
   const byDate = new Map(tersimpan.map((r) => [r.date, { ...r }]))
   for (const row of masuk) {
-    const ada = byDate.get(row.date)
-    if (!ada) { byDate.set(row.date, { ...row }); continue }
+    const ada = byDate.get(row.date) ?? { date: row.date }
     if (ada.sleepHr == null && row.sleepHr != null) ada.sleepHr = row.sleepHr
-    if (ada.waterMl == null && row.waterMl != null) ada.waterMl = row.waterMl
+    if (row.waterMl === 0) delete ada.waterMl
+    else if (row.waterMl != null && (ada.waterMl == null || row.waterMl > ada.waterMl)) ada.waterMl = row.waterMl
+    if (ada.sleepHr == null && ada.waterMl == null) byDate.delete(row.date)
+    else byDate.set(row.date, ada)
   }
   return [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAKS_WELLNESS)
 }
 
-function gabungMenurutId<T extends { id: string }>(tersimpan: readonly T[], masuk: readonly T[], urut: (a: T, b: T) => number, maks: number): T[] {
+function gabungMenurutId<T extends { id: string }>(
+  tersimpan: readonly T[],
+  masuk: readonly T[],
+  urut: (a: T, b: T) => number,
+  maks: number,
+  dihapus: ReadonlySet<string> = new Set(),
+): T[] {
   const ids = new Set<string>()
   const gabung: T[] = []
   for (const row of tersimpan) {
-    if (ids.has(row.id)) continue
+    if (dihapus.has(row.id) || ids.has(row.id)) continue
     ids.add(row.id)
     gabung.push(row)
   }
   for (const row of masuk) {
-    if (ids.has(row.id)) continue
+    if (dihapus.has(row.id) || ids.has(row.id)) continue
     ids.add(row.id)
     gabung.push(row)
   }
@@ -425,7 +438,7 @@ export function bacaDiaryGps(profil: Record<string, unknown> | undefined | null)
   return bacaDaftar(profil, 'diaryGps', validasiDiaryGps) as CatatanGpsServer[]
 }
 
-const KUNCI_DIARY_TERKUNCI = ['selfVitalsLog', 'vo2maxEntries', 'diarySleep', 'diaryFoods', 'diaryWellness', 'diaryTraining', 'diaryGps', 'diaryRemovedFoods', 'diaryRemovedSleep'] as const
+const KUNCI_DIARY_TERKUNCI = ['selfVitalsLog', 'vo2maxEntries', 'diarySleep', 'diaryFoods', 'diaryWellness', 'diaryTraining', 'diaryGps', 'diaryRemovedFoods', 'diaryRemovedSleep', 'diaryRemovedTraining', 'diaryRemovedGps'] as const
 
 /** Generic profile writes cannot set diary rows or their tombstones. */
 export function buangKunciDiary(data: Record<string, unknown>): Record<string, unknown> {
@@ -437,13 +450,17 @@ export function buangKunciDiary(data: Record<string, unknown>): Record<string, u
 /** Validate then union. A listed id is removed and remembered so a later upload cannot restore it. */
 export function susunPatchDiary(
   profil: Record<string, unknown> | undefined | null,
-  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown },
+  body: { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown; removeTrainingIds?: unknown; removeGpsIds?: unknown },
 ): Record<string, unknown> {
   const foodsHapus = body && 'removeFoodIds' in body ? validasiIdDihapus(body.removeFoodIds) : []
   const sleepHapus = body && 'removeSleepIds' in body ? validasiIdDihapus(body.removeSleepIds) : []
+  const trainingHapus = body && 'removeTrainingIds' in body ? validasiIdDihapus(body.removeTrainingIds) : []
+  const gpsHapus = body && 'removeGpsIds' in body ? validasiIdDihapus(body.removeGpsIds) : []
   const dihapus = bacaDiaryDihapus(profil)
   const nisanMakan = simpanNisan(dihapus.foods, foodsHapus)
   const nisanTidurAwal = simpanNisan(dihapus.sleep, sleepHapus)
+  const nisanLatihan = simpanNisan(dihapus.training, trainingHapus)
+  const nisanGps = simpanNisan(dihapus.gps, gpsHapus)
   const patch: Record<string, unknown> = {}
   if (body && ('sleepLogs' in body || sleepHapus.length > 0)) {
     const masuk = 'sleepLogs' in body ? validasiDiarySleep(body.sleepLogs) : []
@@ -458,11 +475,25 @@ export function susunPatchDiary(
     patch.diaryRemovedFoods = nisanMakan
   }
   if (body && 'wellness' in body) patch.diaryWellness = gabungDiaryWellness(bacaDiaryWellness(profil), validasiDiaryWellness(body.wellness))
-  if (body && 'trainingLogs' in body) {
-    patch.diaryTraining = gabungMenurutId(bacaDiaryTraining(profil), validasiDiaryTraining(body.trainingLogs), (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id), MAKS_LATIHAN)
+  if (body && ('trainingLogs' in body || trainingHapus.length > 0)) {
+    patch.diaryTraining = gabungMenurutId(
+      bacaDiaryTraining(profil),
+      'trainingLogs' in body ? validasiDiaryTraining(body.trainingLogs) : [],
+      (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id),
+      MAKS_LATIHAN,
+      new Set(nisanLatihan),
+    )
+    patch.diaryRemovedTraining = nisanLatihan
   }
-  if (body && 'gpsActivities' in body) {
-    patch.diaryGps = gabungMenurutId(bacaDiaryGps(profil), validasiDiaryGps(body.gpsActivities), (a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id), MAKS_GPS)
+  if (body && ('gpsActivities' in body || gpsHapus.length > 0)) {
+    patch.diaryGps = gabungMenurutId(
+      bacaDiaryGps(profil),
+      'gpsActivities' in body ? validasiDiaryGps(body.gpsActivities) : [],
+      (a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id),
+      MAKS_GPS,
+      new Set(nisanGps),
+    )
+    patch.diaryRemovedGps = nisanGps
   }
   if (!Object.keys(patch).length) throw new Error('diary payload is empty')
   return patch

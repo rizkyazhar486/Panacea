@@ -34,9 +34,12 @@ const ok = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', {
   phosphorus: 3.2,
   bilirubin: 0.8,
   homocysteine: 9,
+  cortisol: 12,
+  inr: 1,
+  bun: 14,
 })
-assert.deepEqual(ok.written.sort(), ['bilirubin', 'calcium', 'folate', 'glucose', 'ldl', 'phosphorus', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
-assert.deepEqual(ok.skipped, ['homocysteine'], 'uncatalogued keys stay Nutrition-local')
+assert.deepEqual(ok.written.sort(), ['bilirubin', 'calcium', 'cortisol', 'folate', 'glucose', 'homocysteine', 'inr', 'ldl', 'phosphorus', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
+assert.deepEqual(ok.skipped, ['bun'], 'uncatalogued keys stay Nutrition-local')
 assert.equal(nilaiLabPadaTanggal('gdp', '2026-09-28'), 98)
 assert.equal(nilaiLabPadaTanggal('chol', '2026-09-28'), 190)
 assert.equal(nilaiLabPadaTanggal('vitd', '2026-09-28'), 32)
@@ -53,7 +56,9 @@ assert.equal(balik.sodium, 140)
 assert.equal(balik.folate, 12)
 assert.equal(balik.calcium, 9.4)
 assert.equal(balik.bilirubin, 0.8)
-assert.equal(balik.homocysteine, undefined)
+assert.equal(balik.homocysteine, 9)
+assert.equal(balik.cortisol, 12)
+assert.equal(balik.inr, 1)
 assert.equal(nilaiLabPadaTanggal('folat', '2026-09-28'), 12)
 assert.equal(nilaiLabPadaTanggal('kalsium', '2026-09-28'), 9.4)
 
@@ -61,7 +66,8 @@ assert.equal(nilaiLabPadaTanggal('kalsium', '2026-09-28'), 9.4)
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('kemarin', { glucose: 90 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: 0 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: -1 }).skipped, ['glucose'])
-assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { homocysteine: 9 }).skipped, ['homocysteine'])
+assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { bun: 14 }).skipped, ['bun'])
+assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { inr: 0, cortisol: Number.NaN }).skipped.sort(), ['cortisol', 'inr'])
 {
   const sebelum = ambilLab().trombosit?.length ?? 0
   const skala = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { platelet: 220000, wbc: 6800, hemoglobin: 14 })

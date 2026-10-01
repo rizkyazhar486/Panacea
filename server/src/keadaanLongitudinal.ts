@@ -85,7 +85,7 @@ export interface KeadaanLongitudinal {
     wellness: ReturnType<typeof bacaDiaryWellness>
     training: ReturnType<typeof bacaDiaryTraining>
     gps: ReturnType<typeof bacaDiaryGps>
-    removed: { foods: string[]; sleep: string[] }
+    removed: { foods: string[]; sleep: string[]; training: string[]; gps: string[] }
   }
 }
 

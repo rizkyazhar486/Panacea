@@ -152,7 +152,7 @@ assert.equal(denganDiary.diary.sleep[0].hours, 7)
 assert.equal(denganDiary.diary.truthClass, 'patient-recorded')
 assert.notEqual(denganDiary.revision, dasar.revision, 'a diary row changes the shared revision')
 assert.equal(denganDiary.diary.foods.length, 0)
-assert.deepEqual(denganDiary.diary.removed, { foods: [], sleep: [] })
+assert.deepEqual(denganDiary.diary.removed, { foods: [], sleep: [], training: [], gps: [] })
 const denganNisan = susunKeadaanLongitudinal({
   subjectId: 'user-1',
   generatedAt: '2026-09-29T00:00:00.000Z',

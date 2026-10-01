@@ -76,12 +76,19 @@ export function wellnessBelumAda(
     if (!row?.date) continue
     const ada = akun.find((d) => d.date === row.date)
     if (!ada) {
-      if (row.sleepHr != null || row.waterMl != null) keluar.push({ date: row.date, ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}), ...(row.waterMl != null ? { waterMl: row.waterMl } : {}) })
+      if (row.sleepHr != null || (row.waterMl != null && row.waterMl > 0)) {
+        keluar.push({
+          date: row.date,
+          ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
+          ...(row.waterMl != null && row.waterMl > 0 ? { waterMl: row.waterMl } : {}),
+        })
+      }
       continue
     }
     const isi: { date: string; sleepHr?: number; waterMl?: number } = { date: row.date }
     if (row.sleepHr != null && ada.sleepHr == null) isi.sleepHr = row.sleepHr
-    if (row.waterMl != null && ada.waterMl == null) isi.waterMl = row.waterMl
+    if (row.waterMl === 0 && ada.waterMl != null) isi.waterMl = 0
+    else if (row.waterMl != null && row.waterMl > 0 && (ada.waterMl == null || row.waterMl > ada.waterMl)) isi.waterMl = row.waterMl
     if (isi.sleepHr != null || isi.waterMl != null) keluar.push(isi)
   }
   return keluar
@@ -100,11 +107,12 @@ export function tampilkanWellness<T extends { date: string; sleepHr?: number; wa
   for (const row of Object.values(lokal)) if (row?.date) base[row.date] = { ...row }
   for (const row of akun) {
     const ada = base[row.date] ?? ({ date: row.date } as T)
-    base[row.date] = {
-      ...ada,
-      ...(row.sleepHr != null ? { sleepHr: row.sleepHr } : {}),
-      ...(row.waterMl != null ? { waterMl: row.waterMl } : {}),
+    const berikutnya: T = { ...ada }
+    if (row.sleepHr != null) berikutnya.sleepHr = row.sleepHr
+    if (berikutnya.waterMl !== 0 && row.waterMl != null && (berikutnya.waterMl == null || row.waterMl > berikutnya.waterMl)) {
+      berikutnya.waterMl = row.waterMl
     }
+    base[row.date] = berikutnya
   }
   return base
 }
@@ -124,25 +132,28 @@ export function ringkasGpsUntukAkun<T extends { id: string; email?: string; hrSa
 }
 
 export function gpsTampil<T extends { id: string; email?: string; hrSamples?: { s: number; bpm: number }[] }>(
-  akun: readonly Omit<T, 'email' | 'hrSamples'>[] | null,
+  akun: readonly (Omit<T, 'email' | 'hrSamples' | 'emoji'> & { id: string; emoji?: string })[] | null,
   lokal: readonly T[],
   emailPemilik: string,
+  dihapus: readonly string[] = [],
 ): T[] {
-  if (!akun) return lokal.filter((row) => row?.id)
-  const lokalById = new Map(lokal.filter((row) => row?.id).map((row) => [row.id, row]))
+  const hapus = new Set(dihapus)
+  const lokalHidup = lokal.filter((row) => row?.id && !hapus.has(row.id))
+  if (!akun) return lokalHidup
+  const lokalById = new Map(lokalHidup.map((row) => [row.id, row]))
   const ids = new Set<string>()
   const keluar: T[] = []
   for (const row of akun) {
-    if (!row?.id || ids.has(row.id)) continue
+    if (!row?.id || ids.has(row.id) || hapus.has(row.id)) continue
     ids.add(row.id)
     const ada = lokalById.get(row.id)
     const emoji = ('emoji' in row && typeof row.emoji === 'string' && row.emoji) ? row.emoji : (ada && 'emoji' in ada && typeof ada.emoji === 'string' ? ada.emoji : '')
-    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as T)
+    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as unknown as T)
   }
-  for (const row of ringkasGpsUntukAkun(lokal, emailPemilik)) {
+  for (const row of ringkasGpsUntukAkun(lokalHidup, emailPemilik)) {
     if (ids.has(row.id)) continue
     ids.add(row.id)
-    keluar.push({ ...row, email: emailPemilik } as T)
+    keluar.push({ ...row, email: emailPemilik } as unknown as T)
   }
   return keluar
 }
