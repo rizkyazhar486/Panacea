@@ -127,7 +127,12 @@ jobs:
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
-        timeout-minutes: 12
+        # Twelve serial WebGL gates are individually fail-fast bounded below.
+        # The former 12-minute aggregate cap expired after 7 successful gates
+        # (~11-12 min on SwiftShader), before later gates could reach their own
+        # timeout/assertion boundary. Keep the 30-minute job cap and per-gate
+        # 180s/240s bounds authoritative while allowing the full suite to run.
+        timeout-minutes: 25
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
