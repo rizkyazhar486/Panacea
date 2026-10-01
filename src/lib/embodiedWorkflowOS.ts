@@ -233,7 +233,7 @@ function clamp01(value: number) {
 }
 
 function normalizeLabel(value: string) {
-  return nonBlank(value, 'label').toLocaleLowerCase()
+  return nonBlank(value, 'label').toLowerCase()
 }
 
 function validateBox(box: NormalizedBoundingBox, field: string) {
@@ -434,24 +434,56 @@ export function scoreProtocolStep(
   step: ProtocolStepDefinition,
   interactions: readonly EmbodiedInteraction[],
 ): ProtocolStepEvidence {
-  const used = new Set<string>()
+  const candidatesByRequirement = step.requirements.map((requirement) =>
+    interactions
+      .map((interaction, index) => ({ interaction, index }))
+      .filter(({ interaction }) => matchesRequirement(interaction, requirement))
+      .sort((left, right) => right.interaction.confidence - left.interaction.confidence
+        || Date.parse(left.interaction.capturedAt) - Date.parse(right.interaction.capturedAt)
+        || left.interaction.id.localeCompare(right.interaction.id)
+        || left.index - right.index))
+
+  // Maximum-cardinality bipartite matching prevents an early broad requirement
+  // from consuming the only interaction that can satisfy a later specific one.
+  // Interactions stay one-use-only; augmenting paths deterministically reassign
+  // an earlier match when that increases total observed requirement coverage.
+  const ownerByInteractionIndex = new Map<number, number>()
+  const tryAssignRequirement = (requirementIndex: number, visited: Set<number>): boolean => {
+    for (const candidate of candidatesByRequirement[requirementIndex] ?? []) {
+      if (visited.has(candidate.index)) continue
+      visited.add(candidate.index)
+
+      const previousOwner = ownerByInteractionIndex.get(candidate.index)
+      if (previousOwner === undefined || tryAssignRequirement(previousOwner, visited)) {
+        ownerByInteractionIndex.set(candidate.index, requirementIndex)
+        return true
+      }
+    }
+    return false
+  }
+
+  for (let requirementIndex = 0; requirementIndex < step.requirements.length; requirementIndex += 1) {
+    tryAssignRequirement(requirementIndex, new Set())
+  }
+
+  const interactionIndexByRequirement = new Map<number, number>()
+  for (const [interactionIndex, requirementIndex] of ownerByInteractionIndex) {
+    interactionIndexByRequirement.set(requirementIndex, interactionIndex)
+  }
+
   const matches: Array<{ requirementId: string; interaction: EmbodiedInteraction }> = []
   const missing: string[] = []
-
-  for (const requirement of step.requirements) {
-    const best = interactions
-      .filter((interaction) => !used.has(interaction.id) && matchesRequirement(interaction, requirement))
-      .sort((left, right) => right.confidence - left.confidence
-        || Date.parse(left.capturedAt) - Date.parse(right.capturedAt)
-        || left.id.localeCompare(right.id))[0]
-
-    if (!best) {
+  step.requirements.forEach((requirement, requirementIndex) => {
+    const interactionIndex = interactionIndexByRequirement.get(requirementIndex)
+    if (interactionIndex === undefined) {
       missing.push(requirement.id)
-      continue
+      return
     }
-    used.add(best.id)
-    matches.push({ requirementId: requirement.id, interaction: best })
-  }
+    matches.push({
+      requirementId: requirement.id,
+      interaction: interactions[interactionIndex]!,
+    })
+  })
 
   const coverage = step.requirements.length ? matches.length / step.requirements.length : 0
   const matchedConfidence = weightedGeometricMean(

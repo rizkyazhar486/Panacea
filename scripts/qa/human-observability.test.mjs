@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   buildHumanObservabilityFrame,
   observabilityGapForMetric,
@@ -18,7 +19,10 @@ import {
   buildEmbodiedInteractionGraph,
   buildEmbodiedWorkflowEpisode,
   buildEmbodiedWorkflowLongitudinalEvent,
+  scoreProtocolStep,
 } from '../../src/lib/embodiedWorkflowOS.ts'
+
+const embodiedWorkflowSource = readFileSync(new URL('../../src/lib/embodiedWorkflowOS.ts', import.meta.url), 'utf8')
 
 const subjectId = 'observability-subject-1'
 const consent = {
@@ -262,6 +266,11 @@ test('gap lookup requires signal identity when a metric has multiple blind spots
 })
 
 
+test('embodied protocol label normalization is locale-independent', () => {
+  assert.match(embodiedWorkflowSource, /nonBlank\(value, 'label'\)\.toLowerCase\(\)/)
+  assert.doesNotMatch(embodiedWorkflowSource, /toLocaleLowerCase/)
+})
+
 test('embodied workflow OS converts authorized hand-object evidence into explicit protocol gaps', () => {
   const protocol = {
     id: 'bench-demo',
@@ -324,6 +333,70 @@ test('embodied workflow OS converts authorized hand-object evidence into explici
   assert.equal(firstEpisode.protocolCoverageGap, 0.5)
   assert.equal(firstEpisode.boundary.protocolComplianceEstablished, false)
   assert.equal(EMBODIED_WORKFLOW_OS_POLICY.autonomousClinicalActionAllowed, false)
+})
+
+test('protocol scoring reassigns broad matches so specific evidence is not falsely missed', () => {
+  const step = {
+    id: 'pipette-use',
+    label: 'Use pipette',
+    requirements: [
+      { id: 'pipette-any-action', objectLabels: ['pipette'] },
+      { id: 'pipette-grasp', objectLabels: ['pipette'], actionLabels: ['grasp'] },
+    ],
+  }
+  const interactions = [
+    {
+      id: 'grasp-high',
+      capturedAt: '2026-09-29T10:00:00.000Z',
+      objectLabel: 'pipette',
+      actionLabel: 'grasp',
+      handedness: 'right',
+      confidence: 0.98,
+    },
+    {
+      id: 'move-lower',
+      capturedAt: '2026-09-29T10:00:01.000Z',
+      objectLabel: 'pipette',
+      actionLabel: 'move',
+      handedness: 'right',
+      confidence: 0.84,
+    },
+  ]
+
+  const scored = scoreProtocolStep(step, interactions)
+
+  assert.equal(scored.coverage, 1)
+  assert.equal(scored.state, 'supported-candidate')
+  assert.deepEqual(scored.matchedRequirementIds, ['pipette-any-action', 'pipette-grasp'])
+  assert.deepEqual(scored.missingRequirementIds, [])
+  assert.deepEqual(scored.supportingInteractionIds, ['move-lower', 'grasp-high'])
+})
+
+test('protocol scoring still forbids reusing one interaction for two requirements', () => {
+  const step = {
+    id: 'pipette-use',
+    label: 'Use pipette',
+    requirements: [
+      { id: 'pipette-any-action', objectLabels: ['pipette'] },
+      { id: 'pipette-grasp', objectLabels: ['pipette'], actionLabels: ['grasp'] },
+    ],
+  }
+  const interactions = [{
+    id: 'grasp-only',
+    capturedAt: '2026-09-29T10:00:00.000Z',
+    objectLabel: 'pipette',
+    actionLabel: 'grasp',
+    handedness: 'right',
+    confidence: 0.98,
+  }]
+
+  const scored = scoreProtocolStep(step, interactions)
+
+  assert.equal(scored.coverage, 0.5)
+  assert.equal(scored.state, 'partial')
+  assert.equal(scored.matchedRequirementIds.length, 1)
+  assert.equal(scored.missingRequirementIds.length, 1)
+  assert.deepEqual(scored.supportingInteractionIds, ['grasp-only'])
 })
 
 test('embodied workflow OS writes only a model-estimated derived summary until human review', () => {
