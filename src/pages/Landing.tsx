@@ -104,7 +104,7 @@ const MARQUEE = [
   { icon: IconHospital, label: 'Nearest Facilities' },
   { icon: IconPill, label: 'Digital Pharmacy' },
   { icon: IconStethoscope, label: 'Doctor Consultations' },
-  { icon: IconHeart, label: 'AI Longevity' },
+  { icon: IconHeart, label: 'AI Longevity Calculator' },
   { icon: IconStore, label: 'Medical Content' },
   { icon: IconShield, label: 'AI-EMR for clinicians' },
   { icon: IconChartUp, label: 'Healthspan Tracking' },
