@@ -132,16 +132,16 @@ features:
     frontend_surfaces: [src/pages/EMR.tsx, src/lib/useLongitudinalState.ts]
     persistence_surfaces: [server_clinical_records, signed_record_history]
     external_integrations: [SATUSEHAT]
-    maturity_level: CONNECTED
+    maturity_level: FUNCTIONAL
     clinical_validation: none
     technical_risk: high
     clinical_risk: critical
     provenance_required: true
-    tests: [scripts/uji/emr-status-longitudinal.mts, server/uji/rekamKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
+    tests: [scripts/uji/emr-status-longitudinal.mts, scripts/uji/asal-butir-emr.mts, server/uji/rekamKlinis.uji.ts, server/uji/asalIsianKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
     observability: [clinical.read_audit, emr.save_audit, emr.signed_version_archived_audit]
-    known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, per_field_ai_draft_vs_clinician_state, clinician_usability_test, clinical_validation]
-    next_actions: [encounter_model, per_field_semantic_state, clinician_usability_test]
-    last_audited_commit: 687d77db
+    known_gaps: [clinician_usability_test, clinical_validation]
+    next_actions: [clinician_usability_test, qualified_clinical_validation]
+    last_audited_commit: 5b060d12
 
   - feature_id: health.longitudinal_longevity
     name: Longitudinal Health and Longevity
