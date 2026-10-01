@@ -102,7 +102,7 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   useEffect(() => {
     if (!backendEnabled || !account) return
     let active = true
-    api.getKeadaanLongitudinal().then(keadaan => {
+    Promise.all([api.getKeadaanLongitudinal(), api.clinical().catch(() => null)]).then(([keadaan, acceptedClinical]) => {
       if (!active || keadaan.subjectId !== account.id) return
       if (keadaan.lab.truthClass !== 'patient-recorded' || keadaan.lab.source !== 'lab-log') return
       if (keadaan.care.truthClass !== 'server-stored' || keadaan.care.source !== 'care-plans') return
@@ -138,9 +138,9 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
         owner: account,
         plans: keadaan.care.plans,
         reviews: keadaan.care.reviews,
-        records: clinical?.records ?? {},
-        vitals: (clinical?.vitals ?? {}) as LongitudinalServerSources['vitals'],
-        encounters: clinical?.encounters ?? {},
+        records: acceptedClinical?.records ?? clinical?.records ?? {},
+        vitals: (acceptedClinical?.vitals ?? clinical?.vitals ?? {}) as LongitudinalServerSources['vitals'],
+        encounters: acceptedClinical?.recordEncounters ?? clinical?.encounters ?? {},
       })
       setServerReady(true)
       if (keadaan.diary?.truthClass === 'patient-recorded' && keadaan.diary.source === 'health-profile') {
