@@ -50,4 +50,21 @@ const tidur = tidurTampil(
 assert.deepEqual(tidur.map((r) => [r.id, r.hours]), [['s0', 6], ['s2', 8]])
 assert.deepEqual(tidurTampil([{ id: 's2', date: '2026-09-28', hours: 8 }], [{ id: 's1', date: '2026-09-28', hours: 7 }], ['s1']).map((r) => r.id), ['s2'])
 
+const { ringkasGpsUntukAkun, gpsTampil } = await import('../../src/lib/homeCrossTabDailyState.ts')
+const ringkas = ringkasGpsUntukAkun([
+  { id: 'g1', email: 'A@x.com', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z', hrSamples: [{ s: 0, bpm: 140 }] },
+  { id: 'g2', email: 'other@x.com', name: 'Orang', sport: 'Lari', sportType: 'run', distKm: 1, durSec: 600, avgSpeedKmh: 6, kcal: 50, at: '2026-09-28T00:00:00.000Z' },
+], 'a@x.com')
+assert.deepEqual(ringkas.map((r) => r.id), ['g1'])
+assert.equal('hrSamples' in ringkas[0], false)
+const gpsLayar = gpsTampil(
+  [{ id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z' }],
+  [{ id: 'g1', email: 'a@x.com', name: 'Pagi', sport: 'Lari', sportType: 'run', emoji: '🏃', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300, at: '2026-09-28T00:00:00.000Z', hrSamples: [{ s: 0, bpm: 140 }] },
+    { id: 'g3', email: 'a@x.com', name: 'Baru', sport: 'Lari', sportType: 'run', emoji: '🏃', distKm: 2, durSec: 700, avgSpeedKmh: 10, kcal: 80, at: '2026-09-29T00:00:00.000Z' }],
+  'a@x.com',
+)
+assert.equal(gpsLayar.find((r) => r.id === 'g1')?.hrSamples?.[0].bpm, 140)
+assert.equal(gpsLayar.some((r) => r.id === 'g3'), true)
+assert.equal(gpsLayar.some((r) => r.id === 'g2'), false)
+
 console.log('catatan-harian-gabung: second device adds rows without replacing the account')

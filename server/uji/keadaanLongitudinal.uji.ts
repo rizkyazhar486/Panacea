@@ -167,5 +167,32 @@ const denganNisan = susunKeadaanLongitudinal({
 assert.deepEqual(denganNisan.diary.removed.foods, ['f1'])
 assert.equal(denganNisan.diary.sleep.length, 1)
 assert.notEqual(denganNisan.revision, denganDiary.revision, 'a tombstoned food id changes the shared revision')
+assert.equal(denganDiary.diary.training.length, 0)
+assert.equal(denganDiary.diary.gps.length, 0)
+const denganLatihan = susunKeadaanLongitudinal({
+  subjectId: 'user-1',
+  generatedAt: '2026-09-29T00:00:00.000Z',
+  lab: { log, diperbaruiPada: null },
+  care: { plans: [], reviews: [] },
+  clinical: null,
+  device: { diaryTraining: [{ id: 't1', date: '2026-09-28', rpe: 6, type: 'Lari' }] },
+})
+assert.equal(denganLatihan.diary.training[0].rpe, 6)
+assert.notEqual(denganLatihan.revision, dasar.revision, 'a training row changes the shared revision')
+const gpsDisimpan = susunKeadaanLongitudinal({
+  subjectId: 'user-1',
+  generatedAt: '2026-09-29T00:00:00.000Z',
+  lab: { log, diperbaruiPada: null },
+  care: { plans: [], reviews: [] },
+  clinical: null,
+  device: {
+    diaryGps: [{
+      id: 'g1', name: 'Pagi', sport: 'Lari', sportType: 'run', distKm: 5, durSec: 1800, avgSpeedKmh: 10, kcal: 300,
+      at: '2026-09-28T01:00:00.000Z', hrSamples: [{ s: 0, bpm: 150 }],
+    }],
+  },
+})
+assert.equal(gpsDisimpan.diary.gps[0].distKm, 5)
+assert.equal('hrSamples' in gpsDisimpan.diary.gps[0], false)
 
 console.log('keadaanLongitudinal: one shared revision for lab, care, clinical and device')

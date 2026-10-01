@@ -108,3 +108,41 @@ export function tampilkanWellness<T extends { date: string; sleepHr?: number; wa
   }
   return base
 }
+
+export function ringkasGpsUntukAkun<T extends { id: string; email?: string; hrSamples?: unknown }>(
+  lokal: readonly T[],
+  emailPemilik: string,
+): Omit<T, 'email' | 'hrSamples'>[] {
+  const email = emailPemilik.trim().toLocaleLowerCase('en-US')
+  const keluar: Omit<T, 'email' | 'hrSamples'>[] = []
+  for (const row of lokal) {
+    if (!row?.id || !row.email || row.email.trim().toLocaleLowerCase('en-US') !== email) continue
+    const { email: _email, hrSamples: _samples, ...ringkas } = row
+    keluar.push(ringkas)
+  }
+  return keluar
+}
+
+export function gpsTampil<T extends { id: string; email?: string; hrSamples?: { s: number; bpm: number }[] }>(
+  akun: readonly Omit<T, 'email' | 'hrSamples'>[] | null,
+  lokal: readonly T[],
+  emailPemilik: string,
+): T[] {
+  if (!akun) return lokal.filter((row) => row?.id)
+  const lokalById = new Map(lokal.filter((row) => row?.id).map((row) => [row.id, row]))
+  const ids = new Set<string>()
+  const keluar: T[] = []
+  for (const row of akun) {
+    if (!row?.id || ids.has(row.id)) continue
+    ids.add(row.id)
+    const ada = lokalById.get(row.id)
+    const emoji = ('emoji' in row && typeof row.emoji === 'string' && row.emoji) ? row.emoji : (ada && 'emoji' in ada && typeof ada.emoji === 'string' ? ada.emoji : '')
+    keluar.push({ ...row, email: emailPemilik, emoji, ...(ada?.hrSamples ? { hrSamples: ada.hrSamples } : {}) } as T)
+  }
+  for (const row of ringkasGpsUntukAkun(lokal, emailPemilik)) {
+    if (ids.has(row.id)) continue
+    ids.add(row.id)
+    keluar.push({ ...row, email: emailPemilik } as T)
+  }
+  return keluar
+}
