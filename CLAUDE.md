@@ -269,7 +269,7 @@ Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur
 
 ## 10. Skill proyek & dokumen rujukan
 
-Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif). Panggil manual dengan `/panacea-git-flow` dst. bila tidak terpicu otomatis.
+Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif), **`invictus`** (eksekusi compounding-depth berbasis `PANACEA_INVICTUS_PRINCIPLE.md`). Panggil manual dengan `/panacea-git-flow`, `/panacea-architecture`, `/panacea-testing`, atau `/invictus`. Teks pemilik **`@invictus`** adalah pemanggilan eksplisit yang ekuivalen dengan `/invictus` untuk scope tugas saat itu; tidak pernah menonaktifkan gate keselamatan, bukti, provenance, testing, review, atau Git flow.
 
 Instruksi umum multi-agent (dimuat otomatis lewat import di bawah; bila bertentangan dengan dokumen ini, **dokumen ini menang**):
 
