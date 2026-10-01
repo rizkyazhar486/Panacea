@@ -18,8 +18,13 @@ assert.match(
 )
 assert.match(
   workflow,
-  /name: Prove every 3D panel renders\n\s+timeout-minutes: 12/,
-  'the serial Body3D proof stage must have its own total runtime bound',
+  /name: Prove every 3D panel renders[\s\S]*?timeout-minutes: 25/,
+  'the serial Body3D proof stage must retain a finite aggregate bound large enough for all individually bounded gates',
+)
+assert.doesNotMatch(
+  workflow,
+  /name: Prove every 3D panel renders[\s\S]*?timeout-minutes: (?:3[0-9]|[4-9][0-9]|[1-9][0-9]{2,})/,
+  'the Body3D proof-stage bound must remain below the 30-minute job hard stop',
 )
 assert.match(
   workflow,
