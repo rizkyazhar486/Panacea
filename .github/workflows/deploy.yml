@@ -43,11 +43,15 @@ jobs:
           VITE_TURN_URL: ${{ vars.VITE_TURN_URL }}
           VITE_TURN_USER: ${{ vars.VITE_TURN_USER }}
           VITE_TURN_CRED: ${{ vars.VITE_TURN_CRED }}
-      - uses: actions/upload-pages-artifact@v3
+      # Publishing is optional; build and tests above remain mandatory.
+      - name: Upload GitHub Pages artifact
+        if: ${{ vars.ENABLE_GITHUB_PAGES == 'true' }}
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    if: ${{ vars.ENABLE_GITHUB_PAGES == 'true' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
