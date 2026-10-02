@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { tissueShading } from '../domains/body-exposure'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 import {
@@ -254,6 +255,35 @@ function latarGradasi(atas: number, bawah: number): THREE.Texture {
   return t
 }
 
+// Material sumber menyimpan warna saja; default glTF membuatnya logam penuh.
+// Ganti dengan material fisik dielektrik per jenis jaringan (warna sumber tetap).
+// Pencahayaan studio mode anatomi: ambient rendah + key/rim kuat memberi
+// pemodelan bentuk (chiaroscuro) sehingga relief otot terbaca, bukan siluet datar.
+const STUDIO = { ambient: 0.12, key: 1.7, fill: 0.35, rim: 1.1, env: 0.55 } as const
+
+function shadeTissue(material: THREE.Material): THREE.Material {
+  if (!(material instanceof THREE.MeshStandardMaterial)) return material.clone()
+  const s = tissueShading(material.name)
+  const fisik = new THREE.MeshPhysicalMaterial({
+    name: material.name,
+    color: material.color.clone(),
+    transparent: material.transparent,
+    opacity: material.opacity,
+    alphaTest: material.alphaTest,
+    side: material.side,
+    depthWrite: material.depthWrite,
+    metalness: s.metalness,
+    roughness: s.roughness,
+    clearcoat: s.clearcoat,
+    clearcoatRoughness: s.clearcoatRoughness,
+    sheen: s.sheen,
+    sheenRoughness: s.sheenRoughness,
+    sheenColor: material.color.clone().lerp(new THREE.Color(1, 1, 1), 0.35),
+  })
+  fisik.userData = { ...material.userData, body3dTissue: s.tissue }
+  return fisik
+}
+
 function cloneLayerMaterials(root: THREE.Group) {
   // Object3D.clone(true) tetap berbagi material dengan modelCache. Dissection
   // mengubah opacity/depthWrite, jadi setiap viewer perlu material lokal tanpa
@@ -265,7 +295,7 @@ function cloneLayerMaterials(root: THREE.Group) {
     const salinan = sumber.map((material) => {
       const existing = lokal.get(material)
       if (existing) return existing
-      const copy = material.clone()
+      const copy = shadeTissue(material)
       copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
       lokal.set(material, copy)
       return copy
@@ -354,22 +384,22 @@ export function Body3D({
     const lingkungan = pmrem.fromScene(ruang, 0.04)
     ruang.dispose()
     scene.environment = lingkungan.texture
-    scene.environmentIntensity = 0.4
+    scene.environmentIntensity = STUDIO.env
     pmrem.dispose()
 
     latarRef.current = latarGradasi(0x141922, 0x05070b)
     scene.background = latarRef.current
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.32)
+    const ambient = new THREE.AmbientLight(0xffffff, STUDIO.ambient)
     scene.add(ambient)
-    const key = new THREE.DirectionalLight(0xffffff, 0.85)
-    key.position.set(2, 4, 3)
+    const key = new THREE.DirectionalLight(0xfff4e8, STUDIO.key)
+    key.position.set(2.5, 4, 2)
     scene.add(key)
-    const fill = new THREE.DirectionalLight(0xffffff, 0.25)
+    const fill = new THREE.DirectionalLight(0xe8f0ff, STUDIO.fill)
     fill.position.set(-3, 1, -2)
     scene.add(fill)
-    const tepi = new THREE.DirectionalLight(0xdce8ff, 0.55)
-    tepi.position.set(-1.5, 2.5, -4)
+    const tepi = new THREE.DirectionalLight(0xdce8ff, STUDIO.rim)
+    tepi.position.set(-2.5, 2.5, -3)
     scene.add(tepi)
     lightsRef.current = { ambient, key, fill, tepi }
 
@@ -691,15 +721,15 @@ export function Body3D({
     const lights = lightsRef.current
     if (lights) {
       const flat = renderMode === 'xray'
-      lights.ambient.intensity = flat ? 1.1 : 0.32
-      lights.key.intensity = flat ? 0.15 : 0.85
-      lights.fill.intensity = flat ? 0.1 : 0.25
-      lights.tepi.intensity = flat ? 0 : 0.55
+      lights.ambient.intensity = flat ? 1.1 : STUDIO.ambient
+      lights.key.intensity = flat ? 0.15 : STUDIO.key
+      lights.fill.intensity = flat ? 0.1 : STUDIO.fill
+      lights.tepi.intensity = flat ? 0 : STUDIO.rim
     }
     const sc = sceneRef.current
     if (sc) {
       const anatomi = renderMode === 'anatomy'
-      sc.environmentIntensity = anatomi ? 0.4 : 0
+      sc.environmentIntensity = anatomi ? STUDIO.env : 0
       sc.background = anatomi ? latarRef.current : null
     }
     requestRenderRef.current()
