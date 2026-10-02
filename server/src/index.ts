@@ -168,7 +168,7 @@ import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien,
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
-import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
+import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
 import { lingkunganKota, cariPangan } from './lingkungan.js'
@@ -2390,8 +2390,11 @@ setInterval(() => {
         const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
         const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
         if (p.alasan === 'send') {
-          saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal })
-          notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian').catch(() => {})
+          // Kirim dulu, baru tandai hari ini (deliverThenCommitAlertState tidak pernah melempar).
+          void deliverThenCommitAlertState(
+            () => notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian'),
+            () => saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal }),
+          )
         }
       }
     } catch { /* satu pengguna gagal tidak menghentikan yang lain */ }
