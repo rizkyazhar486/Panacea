@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // First Aid Quick Guide — plain-language emergency steps for bystanders, not
@@ -153,7 +154,11 @@ export function FirstAidGuide() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="First Aid Quick Guide" subtitle="Plain-language emergency steps for bystanders" />
+        <SectionTitle icon={<IconShield size={20} />} title="First Aid Quick Guide" subtitle="Lay-rescuer teaching steps — not a clinically validated Panacea emergency protocol" />
+        <BatasKlaimKesehatan permukaan="clinical.first-aid" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Call local emergency services first when needed. Sequences follow common Red Cross / AHA bystander teaching — practice with a certified course; this page cannot replace hands-on training or scene judgment.
+        </p>
         <p className="mt-2 text-[13px] leading-relaxed text-red-600 dark:text-red-300">
           <b>This does not replace calling emergency services.</b> In a real emergency,
           call for help first (or have someone else call) — the steps here are what to

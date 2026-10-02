@@ -4,6 +4,7 @@ import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp } from '../components/icons'
 import { TOPICS, TIER_LABEL, type Topic, type Tier } from '../lib/learn'
 import { Ringkas, Poin } from '../components/Ringkas'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const PILLARS = [
   { id: 'money', emoji: '💰', title: 'Money', line: 'Income, ownership, resilience and enough.', to: '/keuangan', tone: 'bg-lime-100 text-lime-900 dark:bg-lime-400/15 dark:text-lime-100' },
@@ -61,6 +62,7 @@ export function Learn() {
         title="Panacea Life Library"
         subtitle="Panacea is medicine for life: money, career, family, time, health and social connection—not the body alone."
       />
+      <BatasKlaimKesehatan permukaan="care.learn-base" />
 
       <section className="overflow-hidden rounded-[30px] border border-neutral-200 bg-gradient-to-br from-white via-amber-50/70 to-sky-50/80 p-5 shadow-[0_20px_55px_rgba(20,35,45,.07)] dark:border-white/10 dark:from-[#111315] dark:via-[#15130d] dark:to-[#0c1419] sm:p-6">
         <div className="max-w-3xl">

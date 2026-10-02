@@ -6,6 +6,7 @@ import { useVitals } from '../lib/useVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../components/icons'
 import { getHealthCache, pushBiometrics, mergeHealthCache } from '../lib/profile'
 import { mergeVitals } from '../lib/healthVitals'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Komposisi Tubuh — InBody-style visual page. Nilai yang diketahui perangkat
@@ -284,6 +285,7 @@ export function BodyComposition() {
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
           <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
           <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
+          <BatasKlaimKesehatan permukaan="longevity.body-composition" />
         </Card>
         <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
       </div>

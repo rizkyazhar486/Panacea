@@ -78,10 +78,11 @@ async function callClaude(
   messages: { role: 'user' | 'assistant'; content: string }[],
   systemExtra = '',
   modelOverride = '',
+  maxTokens = 2048,
 ): Promise<string> {
   const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
   const model = modelOverride || settings.model
-  const { text } = await api.aiMessages({ model, system, messages, max_tokens: 2048 })
+  const { text } = await api.aiMessages({ model, system, messages, max_tokens: maxTokens })
   return text || '(no response)'
 }
 
@@ -95,7 +96,9 @@ export async function sendChat(
   const sysExtra = contextBlock(ctx)
   if (!aiAvailable()) return demoChatReply(history, ctx)
   try {
-    return await callClaude(settings, msgs, sysExtra)
+    // Full clinical syntheses (case workup / image follow-up / "what is this?")
+    // need enough headroom for the complete anamnesis→assessment→plan contract.
+    return await callClaude(settings, msgs, sysExtra, '', 3600)
   } catch (e) {
     // Surface a clear message when the server-side rate limit is hit, rather
     // than silently dropping to scripted text.
@@ -111,15 +114,97 @@ export interface EMRDraft {
   rps: string
   rpd: string
   rpk: string
+  riwayatKehamilan: string
   riwayatPengobatan: string
   riwayatAlergi: string
+  riwayatTumbuhKembang: string
   riwayatNutrisi: string
+  riwayatImunisasi: string
   riwayatSosialEkonomi: string
+  anthropometry: string
+  labEkgInterpretation: string
   suggestedExams: string[]
   problems: { title: string; basis: string; assessment: string; probability?: number; differentials?: string[] }[]
+  supportive: {
+    resusitasi: string
+    balansCairan: string
+    kebutuhanKalori: string
+    urineOutput: string
+  }
   draftPlan: { category: string; text: string }[]
   prognosis?: string
   references: string[]
+}
+
+const MISSING_CLINICAL_DATA = 'Belum ada data / perlu dikonfirmasi.'
+
+function normalizeEMRDraft(value: unknown): EMRDraft {
+  const raw = value && typeof value === 'object' ? value as Record<string, unknown> : {}
+  const text = (key: string, fallback = MISSING_CLINICAL_DATA) =>
+    typeof raw[key] === 'string' && raw[key].trim() ? raw[key] as string : fallback
+  const texts = (key: string) =>
+    Array.isArray(raw[key]) ? (raw[key] as unknown[]).filter((v): v is string => typeof v === 'string' && Boolean(v.trim())) : []
+  const supportiveRaw = raw.supportive && typeof raw.supportive === 'object'
+    ? raw.supportive as Record<string, unknown>
+    : {}
+  const supportiveText = (key: string, fallback: string) =>
+    typeof supportiveRaw[key] === 'string' && supportiveRaw[key].trim()
+      ? supportiveRaw[key] as string
+      : fallback
+  const problems = Array.isArray(raw.problems)
+    ? raw.problems.flatMap((entry) => {
+        if (!entry || typeof entry !== 'object') return []
+        const p = entry as Record<string, unknown>
+        if (typeof p.title !== 'string' || !p.title.trim()) return []
+        const probability = typeof p.probability === 'number' && Number.isFinite(p.probability)
+          ? Math.max(0, Math.min(100, p.probability))
+          : undefined
+        return [{
+          title: p.title,
+          basis: typeof p.basis === 'string' ? p.basis : MISSING_CLINICAL_DATA,
+          assessment: typeof p.assessment === 'string' ? p.assessment : MISSING_CLINICAL_DATA,
+          ...(probability === undefined ? {} : { probability }),
+          differentials: Array.isArray(p.differentials)
+            ? p.differentials.filter((v): v is string => typeof v === 'string' && Boolean(v.trim()))
+            : [],
+        }]
+      })
+    : []
+  const draftPlan = Array.isArray(raw.draftPlan)
+    ? raw.draftPlan.flatMap((entry) => {
+        if (!entry || typeof entry !== 'object') return []
+        const p = entry as Record<string, unknown>
+        return typeof p.category === 'string' && typeof p.text === 'string' && p.text.trim()
+          ? [{ category: p.category, text: p.text }]
+          : []
+      })
+    : []
+  return {
+    keluhanUtama: text('keluhanUtama'),
+    rps: text('rps'),
+    rpd: text('rpd'),
+    rpk: text('rpk'),
+    riwayatKehamilan: text('riwayatKehamilan'),
+    riwayatPengobatan: text('riwayatPengobatan'),
+    riwayatAlergi: text('riwayatAlergi'),
+    riwayatTumbuhKembang: text('riwayatTumbuhKembang'),
+    riwayatNutrisi: text('riwayatNutrisi'),
+    riwayatImunisasi: text('riwayatImunisasi'),
+    riwayatSosialEkonomi: text('riwayatSosialEkonomi'),
+    anthropometry: text('anthropometry', 'Antropometri belum dapat diinterpretasikan secara lengkap dari data yang tersedia.'),
+    labEkgInterpretation: text('labEkgInterpretation', 'Tidak ada data Lab/ECG yang diberikan — interpretasi tidak boleh direkayasa.'),
+    suggestedExams: texts('suggestedExams'),
+    problems,
+    supportive: {
+      resusitasi: supportiveText('resusitasi', 'Nilai ABC dan kebutuhan resusitasi berdasarkan kondisi aktual; jangan memberi bolus rutin pada pasien stabil.'),
+      balansCairan: supportiveText('balansCairan', 'Kebutuhan cairan harus dihitung dari berat badan, status volume, kehilangan berjalan, dan komorbid.'),
+      kebutuhanKalori: supportiveText('kebutuhanKalori', 'Kebutuhan kalori/protein perlu diindividualisasi berdasarkan berat badan dan status nutrisi.'),
+      urineOutput: supportiveText('urineOutput', 'Target urine output harus disesuaikan usia/kondisi; gunakan ≥0,5 mL/kg/jam sebagai referensi dewasa bila monitoring memang diindikasikan.'),
+    },
+    draftPlan,
+    prognosis: typeof raw.prognosis === 'string' ? raw.prognosis : undefined,
+    references: texts('references'),
+  }
 }
 
 export async function draftEMR(
@@ -138,8 +223,8 @@ export async function draftEMR(
     },
   ]
   try {
-    const raw = await callClaude(settings, msgs, EMR_FRAMEWORK)
-    return extractJson(raw) as EMRDraft
+    const raw = await callClaude(settings, msgs, EMR_FRAMEWORK, '', 4096)
+    return normalizeEMRDraft(extractJson(raw))
   } catch {
     return demoDraft(ctx)
   }
@@ -267,10 +352,15 @@ function demoDraft(ctx: PatientContext): EMRDraft {
       '⚠️ EDUCATIONAL SIMULATION — findings fabricated for learning. Patient reports headache (Site: occipital; Onset: gradual; Character: pressure-like; Radiation: none; Associations: mild vertigo; Time: worse in the morning; Exacerbating: activity; Severity: 5/10). Accompanied by fatigue and neck stiffness.',
     rpd: `History of ${chronic}, poorly controlled.`,
     rpk: 'Mother with hypertension and type 2 diabetes.',
+    riwayatKehamilan: '⚠️ EDUCATIONAL SIMULATION — not applicable to this adult demo case.',
     riwayatPengobatan: 'Amlodipine 5 mg/day (often misses doses).',
     riwayatAlergi: ctx.patient.allergies.join(', ') || 'No known allergies.',
+    riwayatTumbuhKembang: '⚠️ EDUCATIONAL SIMULATION — not applicable to this adult demo case.',
     riwayatNutrisi: 'High-salt, low-fiber diet; insufficient physical activity.',
+    riwayatImunisasi: '⚠️ EDUCATIONAL SIMULATION — immunization history not supplied in demo data.',
     riwayatSosialEkonomi: 'Lives with family, passive smoker, moderate work stress.',
+    anthropometry: `⚠️ EDUCATIONAL SIMULATION — BMI = weight(kg) / height(m)^2 using recorded demo weight and height. Pediatric z-scores are not applicable to this adult demo.`,
+    labEkgInterpretation: '⚠️ EDUCATIONAL SIMULATION — no actual Lab/ECG result was supplied; interpretation cannot be fabricated.',
     suggestedExams: [
       'Focused physical exam: BP in both arms, fundoscopy, carotid & cardiac auscultation',
       'Labs: CBC, urea/creatinine, electrolytes, lipid profile, fasting glucose/HbA1c, urinalysis',
@@ -291,6 +381,12 @@ function demoDraft(ctx: PatientContext): EMRDraft {
         ],
       },
     ],
+    supportive: {
+      resusitasi: 'No resuscitation is indicated in this stable educational demo unless ABC instability is found.',
+      balansCairan: 'Use oral hydration when appropriate; IV fluid requires a clinical indication and reassessment rather than a routine bolus.',
+      kebutuhanKalori: 'Reference estimate: 25–30 kcal/kg/day when clinically appropriate; individualize to nutritional status and goals.',
+      urineOutput: 'Reference adult target: ≥0.5 mL/kg/hour when urine-output monitoring is clinically indicated.',
+    },
     prognosis:
       'Fair — good if adherence & BP targets are achieved; risk of cardio-cerebrovascular complications rises if uncontrolled.',
     draftPlan: [

@@ -16,6 +16,7 @@ import { usahaTerbaik, kemajuanTarget, type Target, type JenisTarget, type Perio
 import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { GrafikOlahraga } from '../components/GrafikOlahraga'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // History Latihan — sesi nyata beserta deret detak jantung per menit.
@@ -85,6 +86,7 @@ export function WorkoutHistory() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconRun />} title="Training History" subtitle="Real sessions, with beat-by-beat heart rate" />
+        <BatasKlaimKesehatan permukaan="performance.workout-history" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             No sessions stored yet. Upload a Health Auto Export file on{' '}

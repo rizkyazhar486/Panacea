@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { getVitals } from '../lib/healthVitals'
 import { getDemo } from '../lib/profile'
 import { useStore } from '../lib/store'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Angka klinis komposisi tubuh dan energi.
@@ -153,6 +154,7 @@ export function KartuKlinisTubuh() {
         <h2 className="text-[13px] font-black text-ink dark:text-white">Body composition &amp; energy</h2>
         <span className="text-[10px] text-neutral-500">{baris.length} figures</span>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.body-energy-card" className="mb-2 text-[10px] leading-snug text-neutral-500" />
 
       <div className="divide-y divide-neutral-100 dark:divide-white/10">
         {baris.map((b) => (

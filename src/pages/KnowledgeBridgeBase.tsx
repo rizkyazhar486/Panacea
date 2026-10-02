@@ -7,6 +7,7 @@ import {
   compareRisks,
   type BridgeModuleKey,
 } from '../lib/knowledgeBridge'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 function pct(value: number) {
   return `${(value * 100).toFixed(value * 100 < 10 ? 1 : 0)}%`
@@ -45,6 +46,7 @@ export function KnowledgeBridge() {
       <section className="rounded-[30px] border border-neutral-200 bg-neutral-950 p-5 text-white shadow-[0_24px_70px_rgba(20,25,30,.18)] dark:border-white/10 sm:p-7">
         <div className="text-[9px] font-black uppercase tracking-[.2em] text-emerald-300">Panacea Knowledge Bridge</div>
         <h1 className="mt-2 max-w-4xl text-3xl font-black tracking-[-.045em] sm:text-5xl">Start from a real source. Then explain it.</h1>
+        <BatasKlaimKesehatan permukaan="care.knowledge-bridge" />
         <p className="mt-3 max-w-3xl text-[12px] leading-relaxed text-white/60">This page now searches live biomedical sources instead of pretending that a static concept card is a knowledge engine. Search a disease, drug, anatomy term, procedure or physiology concept and inspect the underlying ontology, literature, clinical trials and FDA label data.</p>
       </section>
 

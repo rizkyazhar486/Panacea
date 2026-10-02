@@ -21,3 +21,19 @@ The Body Exposure Anatomy mode keeps the existing Human Anatomy Master Atlas and
 ## BodyParts3D deep source layer
 
 An additional on-demand deep atlas uses the browser-ready BodyParts3D 4.0 packaging from `ashemag/human-atlas`: 2,234 individual source meshes, 15 display systems and 3,432 named concepts. It is not loaded at app launch. Users can search and load a single structure (lighter) or explicitly load a whole system. BodyParts3D data attribution is preserved as CC BY 4.0 and upstream application-source attribution is preserved as MIT. The source represents an adult male reference and is not patient-specific anatomy.
+
+
+## Oculomotor lesion laboratory
+
+Eye 4D now includes a deterministic teaching lab for CN III, IV and VI palsies, pupil-sparing CN III patterns, superior/inferior CN III divisions, internuclear ophthalmoplegia (MLF), Horner contrast, cavernous-sinus/orbital-apex patterns, bilateral VI/IV patterns, a III-nuclear pattern, one-and-a-half syndrome and Weber-pattern localization.
+
+The lesion-map design is adapted from [docramiro/oculomotor](https://github.com/docramiro/oculomotor), whose original code/content is MIT-licensed. Panacea does **not** bundle that repository's Lee Perry-Smith face scan; upstream documents that asset separately as CC BY 3.0.
+
+The engine is deliberately deterministic and educational:
+
+- residual effector function: `f = 1 - severity/100`;
+- prism-diopter conversion utility: `Δ = 100 × tan(|θ|)`, with `θ` in degrees after conversion to radians;
+- pupil and lid-opening values are teaching proxies adapted from the MIT reference model and are explicitly not patient-specific measurements;
+- INO impairs conjugate adduction through the MLF proxy while leaving the medial-rectus convergence proxy available.
+
+This module does not infer diagnosis, acuity, intracranial pathology, aneurysm probability, or treatment from user data.

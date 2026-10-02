@@ -5,6 +5,12 @@ import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { auditTubuh } from '../lib/rujukanTubuh'
 import { IconActivity } from '../components/icons'
 import { getVitals } from '../lib/healthVitals'
+import { CekHarian } from '../components/CekHarian'
+import { ApaYangBerubah } from '../components/ApaYangBerubah'
+import { TebusKodeTaut } from '../components/TautanRekamPraktik'
+import { UbinLab } from '../components/UbinLab'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sinyal Tubuh — lima halaman yang semuanya membaca deret dari jam tangan,
@@ -34,8 +40,11 @@ const Breathwork = lazy(() => import('./Breathwork').then((m) => ({ default: m.B
 const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
 const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
 const FastingTimer = lazy(() => import('./FastingTimer').then((m) => ({ default: m.FastingTimer })))
+const PhoneHealthScan = lazy(() => import('./PhoneHealthScan').then((m) => ({ default: m.PhoneHealthScan })))
 
 const TABS: TabDef[] = [
+  { id: 'phone', label: 'Phone scan', emoji: '📱', komponen: PhoneHealthScan,
+    ringkas: 'Camera pulse + local visual intake; useful without a wearable' },
   { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
     ringkas: 'Energy reserve 0–100 and stress level through the day' },
   { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
@@ -57,8 +66,8 @@ const TABS: TabDef[] = [
     ringkas: 'Recovering from surgery, injury, illness or overtraining' },
   { id: 'napas', label: 'Breathwork', emoji: '💨', komponen: Breathwork,
     ringkas: 'Breathing patterns that shift autonomic balance, and their limits' },
-  { id: 'termal', label: 'Heat & cold', emoji: '🔥', komponen: ThermalTherapy,
-    ringkas: 'Sauna and cold exposure — what the evidence supports' },
+  { id: 'termal', label: 'Thermal recovery', emoji: '♨️', komponen: ThermalTherapy,
+    ringkas: 'Spa, sauna, steam, jacuzzi, hot, cold and onsen — visual first, safety in context' },
   { id: 'postur', label: 'Posture breaks', emoji: '🪑', komponen: PostureBreaks,
     ringkas: 'Breaking up sitting — the intervention with the best evidence' },
   { id: 'puasa', label: 'Fasting', emoji: '⏳', komponen: FastingTimer,
@@ -112,9 +121,19 @@ export function PusatTubuh() {
   }, [])
 
   return (
-    <HalamanTab
+    <div className="space-y-4">
+      {/* Darah adalah fondasi Longevity-First (docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md
+          §4–5). Sebelumnya ubin lab hanya muncul bila dipilih manual di papan
+          widget beranda — tidak aktif secara bawaan. */}
+      <ApaYangBerubah />
+      <TebusKodeTaut />
+      <CekHarian />
+      <UbinLab />
+      {/* Tubuh 3D setinggi ~2.300px; di atas, ia mendorong hasil darah ke y~3.080. */}
+      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
+      <HalamanTab
       judul="Body Signals"
-      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
+      subjudul="Phone-first checks, energy, heart, sleep, movement and clinical trackers"
       ikon={<IconActivity />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
@@ -122,6 +141,7 @@ export function PusatTubuh() {
         klinis.length > 0 ? (
           <section className="space-y-3">
             <h2 className="text-[13px] font-black text-ink dark:text-white">Where these numbers come from</h2>
+            <BatasKlaimKesehatan permukaan="body.pusat-tubuh" />
             <p className="text-[12px] leading-relaxed text-neutral-500">
               Each number below carries its reference range and the population it came from, how much it swings
               day to day, and when it should not be trusted.
@@ -132,7 +152,8 @@ export function PusatTubuh() {
           </section>
         ) : undefined
       }
-    />
+      />
+    </div>
   )
 }
 

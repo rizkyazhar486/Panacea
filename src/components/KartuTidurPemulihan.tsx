@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { getVitals } from '../lib/healthVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tidur semalam beserta tahapannya.
@@ -59,6 +60,7 @@ export function KartuTidurPemulihan() {
         <h2 className="text-[13px] font-black text-ink dark:text-white">Sleep &amp; recovery</h2>
         {rataMalam && <span className="text-[10px] text-neutral-500">avg {malam.length} nights {rataMalam.toFixed(1)} hrs</span>}
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.sleep-recovery-card" className="mb-2 text-[10px] leading-snug text-neutral-500" />
 
       {total && (
         <div className="flex items-baseline gap-1.5">

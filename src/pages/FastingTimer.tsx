@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconTimer, IconActivity } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fasting & Autophagy Timer — maps to several longevity-list features (autophagy
@@ -66,6 +67,7 @@ export function FastingTimer() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconTimer size={20} />} title="Fasting & Autophagy Timer" subtitle="Ikuti jalannya puasa dan lihat tahap metabolik mana yang kemungkinan sedang berlangsung" />
+        <BatasKlaimKesehatan permukaan="wellness.fasting-timer" />
 
         {/* Plan picker */}
         <div className="mt-3 flex flex-wrap gap-2">

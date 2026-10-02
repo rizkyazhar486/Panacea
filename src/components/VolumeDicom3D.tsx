@@ -2,23 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ambangKeTekstur, skalaKotak, type VolumeTekstur } from '../lib/volumeTekstur'
+import { lapisanKeUniform, type LapisanVolume } from '../lib/lapisanVolume'
+import { normalBidang, jarakBidang, BIDANG_AWAL, type BidangMiring } from '../lib/bidangPotong'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 
-// Ray-casting volume di GPU untuk volume DICOM.
-//
-// INI MERENDER ISI BERKAS, BUKAN MODEL ANATOMI. Tidak ada mesh yang dimuat,
-// tidak ada organ yang dikenali, tidak ada bentuk yang ditebak. Yang terlihat
-// di layar adalah nilai-nilai dari irisan yang dibaca, ditembus sinar satu per
-// satu. Kalau berkasnya berlubang, gambarnya berlubang.
-//
-// KENAPA RAY-CASTING DAN BUKAN ISOSURFACE. Isosurface membuang volumenya dan
-// menyisakan satu permukaan pada satu ambang; sebuah lubang pada permukaan itu
-// tidak dapat dibedakan antara lubang pada pasien dan lubang pada pilihan
-// ambang. Ray-casting mempertahankan seluruh volume di sepanjang sinar, jadi
-// jaringan yang lebih lemah tetap terlihat sebagai lebih lemah, bukan hilang.
-//
-// WebGL2 DIPERLUKAN, karena sampler3D tidak ada di WebGL1. Ketiadaannya
-// dinyatakan, bukan disiasati dengan tumpukan gambar 2D yang tampak mirip.
-
+// GPU ray-casting for a DICOM volume. This renders the selected study values;
+// it does not infer organs, diagnoses, or substitute an anatomical atlas.
 const VERTEX = `
 out vec3 vOrigin;
 out vec3 vDirection;
@@ -30,9 +19,6 @@ void main() {
 }
 `
 
-// Satu langkah penting di dalam shader: sinar dipotong pada kotak satuan
-// terlebih dahulu (slab method), supaya langkah-langkahnya tidak dihabiskan
-// di ruang kosong di luar volume.
 const FRAGMENT = `
 precision highp float;
 precision highp sampler3D;
@@ -46,36 +32,50 @@ uniform float uAmbangBawah;
 uniform float uAmbangAtas;
 uniform float uKepekatan;
 uniform float uLangkah;
-// 0 = volume (kumpulkan sepanjang sinar), 1 = permukaan (berhenti di
-// perpotongan pertama), 2 = keduanya ditumpuk.
 uniform int uMode;
-// Simulasi radiograf: jendela dibawa masuk supaya byte tekstur dapat
-// dikembalikan menjadi Hounsfield, dan panjang lintasan dalam MILIMETER
-// supaya integralnya punya satuan.
 uniform float uJendelaBawah;
 uniform float uJendelaRentang;
 uniform float uMmPerLangkah;
 uniform float uMuAir;
 uniform float uPajanan;
+uniform vec3 uPotongMin;
+uniform vec3 uPotongMaks;
+uniform int uJumlahLapisan;
+uniform vec2 uLapisanRentang[3];
+uniform vec3 uLapisanWarna[3];
+uniform float uLapisanOpasitas[3];
+uniform float uHalus;
+uniform int uBidangAktif;
+uniform vec3 uBidangNormal;
+uniform float uBidangJarak;
+uniform int uPenandaAktif;
+uniform vec3 uPenanda;
+uniform float uPenandaR;
 
 vec2 potongKotak(vec3 asal, vec3 arah) {
-  const vec3 kotakMin = vec3(-0.5);
-  const vec3 kotakMaks = vec3(0.5);
   vec3 invArah = 1.0 / arah;
-  vec3 tMin = (kotakMin - asal) * invArah;
-  vec3 tMaks = (kotakMaks - asal) * invArah;
+  vec3 tMin = (uPotongMin - asal) * invArah;
+  vec3 tMaks = (uPotongMaks - asal) * invArah;
   vec3 t1 = min(tMin, tMaks);
   vec3 t2 = max(tMin, tMaks);
   return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
+}
+
+bool diKotakPotong(vec3 p) {
+  return all(greaterThanEqual(p, uPotongMin)) && all(lessThanEqual(p, uPotongMaks));
+}
+
+// Bidang miring: sisi depan (dot(p, n) > d) DILEWATI, bukan akhir sinar — sinar
+// yang mulai di sisi terbuang harus terus berjalan ke sisi yang dipertahankan.
+// Sama dengan dipertahankan() di bidangPotong.ts.
+bool terpotongBidang(vec3 p) {
+  return uBidangAktif == 1 && dot(p, uBidangNormal) > uBidangJarak;
 }
 
 float ambil(vec3 p) {
   return texture(uData, p + vec3(0.5)).r;
 }
 
-// Normal permukaan dari GRADIEN nilai, bukan dari mesh: tidak ada segitiga
-// yang dibuat, jadi tidak ada bentuk yang dikarang di antara voxel. Arah
-// perubahan nilai di sekitar titik itulah yang menjadi arah permukaannya.
 vec3 gradien(vec3 p, float h) {
   return normalize(vec3(
     ambil(p + vec3(h, 0.0, 0.0)) - ambil(p - vec3(h, 0.0, 0.0)),
@@ -93,30 +93,60 @@ void main() {
   vec3 langkahVec = arah * uLangkah;
   vec3 p = vOrigin + arah * t.x;
 
-  // ── Mode 3: radiograf tersimulasi (DRR) ─────────────────────────────
-  // Beer-Lambert: I = I0 * exp(-integral(mu dl)). Koefisien atenuasi linier
-  // diturunkan dari definisi Hounsfield itu sendiri --
-  // HU = 1000 * (mu - mu_air) / (mu_air - mu_air_ref), yang untuk udara
-  // mendekati nol memberi mu = mu_air * (1 + HU/1000).
-  //
-  // INI SIMULASI, BUKAN FOTO. Ia berkas tunggal berenergi satu, tanpa
-  // hamburan, tanpa pengerasan berkas, tanpa respons detektor. Sebuah
-  // radiograf sungguhan berbeda justru pada hal-hal itu.
+  // Penanda kursor MPR: bola kecil yang selalu tampak (seperti crosshair), sehingga
+  // titik yang dipilih di bidang aksial/koronal/sagital terlihat di 3D.
+  if (uPenandaAktif == 1) {
+    vec3 oc = vOrigin - uPenanda;
+    float bq = dot(oc, arah);
+    float cq = dot(oc, oc) - uPenandaR * uPenandaR;
+    if (bq * bq - cq >= 0.0 && -bq > 0.0) { color = vec4(0.25, 0.9, 1.0, 1.0); return; }
+  }
+
   if (uMode == 3) {
     float integral = 0.0;
     for (int i = 0; i < 512; i++) {
+      if (!diKotakPotong(p)) break;
+      if (terpotongBidang(p)) { p += langkahVec; continue; }
       float v = ambil(p);
       float hu = uJendelaBawah + v * uJendelaRentang;
       float mu = uMuAir * (1.0 + hu / 1000.0);
       integral += max(mu, 0.0) * uMmPerLangkah;
       p += langkahVec;
-      if (p.x < -0.5 || p.x > 0.5 || p.y < -0.5 || p.y > 0.5 || p.z < -0.5 || p.z > 0.5) break;
     }
     float transmisi = exp(-integral * uPajanan);
-    // Film: yang banyak menyerap tampak TERANG, seperti radiograf cetak.
     float film = 1.0 - transmisi;
     if (film < 0.004) discard;
     color = vec4(vec3(film), 1.0);
+    return;
+  }
+
+  if (uMode == 4) {
+    // Lapisan: permukaan pertama tiap lapisan, dikomposit depan-ke-belakang,
+    // sehingga lapisan tembus pandang (kulit) memperlihatkan yang di baliknya (tulang).
+    vec4 akum = vec4(0.0);
+    bool kena[3] = bool[3](false, false, false);
+    // Jitter awal sinar per piksel: menghapus pola cincin dari langkah tetap.
+    p += langkahVec * fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    for (int i = 0; i < 512; i++) {
+      if (!diKotakPotong(p)) break;
+      if (terpotongBidang(p)) { p += langkahVec; continue; }
+      float v = ambil(p);
+      for (int k = 0; k < 3; k++) {
+        if (k >= uJumlahLapisan || kena[k]) continue;
+        if (v >= uLapisanRentang[k].x && v <= uLapisanRentang[k].y) {
+          kena[k] = true;
+          vec3 n = gradien(p, uLangkah * uHalus);
+          float terang = clamp(0.25 + 0.75 * abs(dot(n, arah)), 0.0, 1.0);
+          float a = uLapisanOpasitas[k];
+          akum.rgb += (1.0 - akum.a) * a * uLapisanWarna[k] * terang;
+          akum.a += (1.0 - akum.a) * a;
+        }
+      }
+      if (akum.a >= 0.98) break;
+      p += langkahVec;
+    }
+    if (akum.a < 0.01) discard;
+    color = vec4(akum.rgb / akum.a, akum.a);
     return;
   }
 
@@ -125,27 +155,19 @@ void main() {
   vec3 warnaPermukaan = vec3(0.0);
 
   for (int i = 0; i < 512; i++) {
+    if (!diKotakPotong(p)) break;
+    if (terpotongBidang(p)) { p += langkahVec; continue; }
     float v = ambil(p);
     bool diDalam = v >= uAmbangBawah && v <= uAmbangAtas;
 
-    // PERMUKAAN: berhenti pada perpotongan PERTAMA. Inilah yang membuang
-    // volumenya dan menyisakan satu kulit -- dan itu sebabnya mode ini
-    // tidak menggantikan mode volume melainkan mendampinginya: sebuah
-    // lubang pada kulit ini tidak dapat dibedakan antara lubang pada
-    // pasien dan lubang pada ambang yang dipilih.
     if (uMode >= 1 && diDalam && !kenaPermukaan) {
       vec3 n = gradien(p, uLangkah);
-      // Pencahayaan dari arah kamera: bentuknya terbaca tanpa lampu yang
-      // ditempatkan sembarangan, yang akan menyembunyikan sisi tertentu.
       float terang = clamp(abs(dot(n, arah)), 0.12, 1.0);
       warnaPermukaan = vec3(terang);
       kenaPermukaan = true;
       if (uMode == 1) break;
     }
 
-    // VOLUME: di luar ambang berarti TIDAK DIGAMBAR, bukan digambar
-    // transparan -- di bawah ambang bawah adalah udara, di atas ambang atas
-    // adalah logam atau artefak, dan keduanya tidak boleh mewarnai apa pun.
     if (uMode != 1 && diDalam) {
       float rentang = max(1e-4, uAmbangAtas - uAmbangBawah);
       float n = (v - uAmbangBawah) / rentang;
@@ -156,7 +178,6 @@ void main() {
     }
 
     p += langkahVec;
-    if (p.x < -0.5 || p.x > 0.5 || p.y < -0.5 || p.y > 0.5 || p.z < -0.5 || p.z > 0.5) break;
   }
 
   if (uMode == 1) {
@@ -166,8 +187,6 @@ void main() {
   }
 
   if (uMode == 2 && kenaPermukaan) {
-    // Kulit di atas volumenya, keduanya dari ambang yang SAMA -- supaya yang
-    // dibandingkan memang hal yang sama, bukan dua pengaturan berbeda.
     terkumpul.rgb = mix(terkumpul.rgb, warnaPermukaan, 0.55);
     terkumpul.a = max(terkumpul.a, 0.55);
   }
@@ -177,41 +196,65 @@ void main() {
 }
 `
 
-export type ModeRender = 'volume' | 'permukaan' | 'keduanya' | 'radiograf'
+export type ModeRender = 'volume' | 'permukaan' | 'keduanya' | 'radiograf' | 'lapisan'
+export type PotongVolume = [number, number, number]
 
 export const MODE_RENDER: { id: ModeRender; label: string; catatan: string }[] = [
   { id: 'volume', label: 'Volume', catatan: 'Every voxel along the ray contributes, so weaker tissue stays visible as weaker.' },
   { id: 'permukaan', label: 'Surface', catatan: 'Stops at the first voxel inside the threshold. A hole here may be a hole in the data or in your threshold.' },
   { id: 'keduanya', label: 'Both', catatan: 'The same threshold drawn both ways at once, so the two can be compared rather than trusted separately.' },
+  { id: 'lapisan', label: 'Layers', catatan: 'Up to three surfaces at once, each with its own range, colour and opacity, so a translucent layer shows what lies behind it. Ranges are thresholds on this scan, not a segmentation: a layer contains whatever falls in its range.' },
   { id: 'radiograf', label: 'X-ray (simulated)', catatan: 'Beer-Lambert attenuation integrated along each ray from the actual Hounsfield values — a single-energy beam with no scatter, no beam hardening and no detector response. It is a simulation, not a photograph, and thresholds do not apply to it.' },
 ]
 
-/** Koefisien atenuasi linier air, 1/mm, pada energi efektif ~70 keV. */
+/** Approximate linear attenuation coefficient used only by the educational DRR simulation. */
 export const MU_AIR_PER_MM = 0.0193
-
-const NOMOR_MODE: Record<ModeRender, number> = { volume: 0, permukaan: 1, keduanya: 2, radiograf: 3 }
+const NOMOR_MODE: Record<ModeRender, number> = { volume: 0, permukaan: 1, keduanya: 2, radiograf: 3, lapisan: 4 }
 
 export interface VolumeDicom3DProps {
   tekstur: VolumeTekstur
   mode: ModeRender
-  /** Ambang dalam satuan asli (HU untuk CT). */
   ambangBawah: number
   ambangAtas: number
   kepekatan: number
-  /** Pengali pajanan simulasi; 1 berarti tanpa penguatan. */
   pajanan: number
-  /** Dilaporkan ke atas supaya halaman dapat menyatakan kegagalan, bukan diam. */
+  /** Fraction of the volume retained from the negative side on X/Y/Z. */
+  potong?: PotongVolume
+  /** Mode 'lapisan': up to three surfaces with their own range/colour/opacity. */
+  lapisan?: readonly LapisanVolume[]
+  /** Surface-shading smoothing: gradient step multiplier (1 = sharpest). */
+  halus?: number
+  /** Freely oriented cut plane (tilt/rotate/slide). */
+  bidang?: BidangMiring
+  /** MPR cursor in box space [-0.5, 0.5]^3 (see sinkronMpr3d.ts); null hides it. */
+  penanda?: [number, number, number] | null
   onGagal?: (alasan: string) => void
 }
 
-export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekatan, pajanan, onGagal }: VolumeDicom3DProps) {
+function setelBidang(m: THREE.ShaderMaterial, b: BidangMiring) {
+  const n = normalBidang(b)
+  m.uniforms.uBidangAktif.value = b.aktif ? 1 : 0
+  ;(m.uniforms.uBidangNormal.value as THREE.Vector3).set(n[0], n[1], n[2])
+  m.uniforms.uBidangJarak.value = jarakBidang(b)
+}
+
+function setelLapisan(m: THREE.ShaderMaterial, lapisan: readonly LapisanVolume[], tekstur: VolumeTekstur, halus: number) {
+  const u = lapisanKeUniform(lapisan, tekstur.jendela)
+  m.uniforms.uJumlahLapisan.value = u.jumlah
+  u.rentang.forEach((r, i) => (m.uniforms.uLapisanRentang.value[i] as THREE.Vector2).set(r[0], r[1]))
+  u.warna.forEach((w, i) => (m.uniforms.uLapisanWarna.value[i] as THREE.Vector3).set(w[0], w[1], w[2]))
+  m.uniforms.uLapisanOpasitas.value = u.opasitas
+  m.uniforms.uHalus.value = Math.max(1, Math.min(4, halus))
+}
+
+export function VolumeDicom3D({
+  tekstur, mode, ambangBawah, ambangAtas, kepekatan, pajanan,
+  potong = [1, 1, 1], lapisan = [], halus = 1.5, bidang = BIDANG_AWAL, penanda = null, onGagal,
+}: VolumeDicom3DProps) {
   const wadahRef = useRef<HTMLDivElement | null>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
   const [gagal, setGagal] = useState<string | null>(null)
 
-  // Ambang berubah jauh lebih sering daripada tekstur. Memisahkan keduanya
-  // mencegah seluruh volume diunggah ulang ke GPU setiap kali penggeser
-  // digerakkan satu satuan Hounsfield.
   useEffect(() => {
     const m = materialRef.current
     if (!m) return
@@ -220,7 +263,16 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
     m.uniforms.uKepekatan.value = kepekatan
     m.uniforms.uMode.value = NOMOR_MODE[mode]
     m.uniforms.uPajanan.value = pajanan
-  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, tekstur.jendela])
+    setelLapisan(m, lapisan, tekstur, halus)
+    setelBidang(m, bidang)
+    m.uniforms.uPotongMaks.value.set(
+      Math.max(0.01, Math.min(1, potong[0])) - 0.5,
+      Math.max(0.01, Math.min(1, potong[1])) - 0.5,
+      Math.max(0.01, Math.min(1, potong[2])) - 0.5,
+    )
+    m.uniforms.uPenandaAktif.value = penanda ? 1 : 0
+    if (penanda) (m.uniforms.uPenanda.value as THREE.Vector3).set(penanda[0], penanda[1], penanda[2])
+  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, potong, tekstur, lapisan, halus, bidang, penanda?.[0], penanda?.[1], penanda?.[2]])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -270,19 +322,26 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
         uAmbangBawah: { value: ambangKeTekstur(ambangBawah, tekstur.jendela) },
         uAmbangAtas: { value: ambangKeTekstur(ambangAtas, tekstur.jendela) },
         uKepekatan: { value: kepekatan },
-        // Langkah sinar diikat ke ketebalan voxel terkecil: langkah yang
-        // lebih besar melewati lapisan tipis dan membuat tulang berlubang.
         uLangkah: { value: 1 / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam) },
         uMode: { value: NOMOR_MODE[mode] },
         uJendelaBawah: { value: tekstur.jendela.bawah },
         uJendelaRentang: { value: tekstur.jendela.atas - tekstur.jendela.bawah },
-        // Panjang satu langkah sinar dalam milimeter: sisi fisik terpanjang
-        // dibagi jumlah langkah sepanjang kotak satuan.
-        uMmPerLangkah: {
-          value: Math.max(...tekstur.fisikMm) / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam),
-        },
+        uMmPerLangkah: { value: Math.max(...tekstur.fisikMm) / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam) },
         uMuAir: { value: MU_AIR_PER_MM },
         uPajanan: { value: pajanan },
+        uPotongMin: { value: new THREE.Vector3(-0.5, -0.5, -0.5) },
+        uPotongMaks: { value: new THREE.Vector3(potong[0] - 0.5, potong[1] - 0.5, potong[2] - 0.5) },
+        uJumlahLapisan: { value: 0 },
+        uLapisanRentang: { value: [new THREE.Vector2(2, 2), new THREE.Vector2(2, 2), new THREE.Vector2(2, 2)] },
+        uLapisanWarna: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
+        uLapisanOpasitas: { value: [0, 0, 0] },
+        uHalus: { value: 1.5 },
+        uBidangAktif: { value: 0 },
+        uBidangNormal: { value: new THREE.Vector3(0, 0, 1) },
+        uBidangJarak: { value: 0 },
+        uPenandaAktif: { value: penanda ? 1 : 0 },
+        uPenanda: { value: new THREE.Vector3(...(penanda ?? [0, 0, 0])) },
+        uPenandaR: { value: 0.018 },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,
@@ -291,6 +350,8 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
       depthWrite: false,
     })
     materialRef.current = material
+    setelLapisan(material, lapisan, tekstur, halus)
+    setelBidang(material, bidang)
 
     const skala = skalaKotak(tekstur.fisikMm)
     const geometry = new THREE.BoxGeometry(skala[0], skala[1], skala[2])
@@ -300,15 +361,21 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.enablePan = false
+    controls.minDistance = 0.7
+    controls.maxDistance = 5
 
-    let hidup = true
-    const gambar = () => {
-      if (!hidup) return
+    // Damping still needs a continuous loop while this viewer is active, but
+    // volume ray-casting is one of the most expensive Body Exposure renders.
+    // Reuse the shared guard so it does no GPU work offscreen or in a hidden tab.
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-      requestAnimationFrame(gambar)
+    })
+    const konteksHilang = (event: Event) => {
+      event.preventDefault()
+      loop.kontekHilang()
     }
-    requestAnimationFrame(gambar)
+    renderer.domElement.addEventListener('webglcontextlost', konteksHilang)
 
     const ubahUkuran = () => {
       const l = wadah.clientWidth || lebar
@@ -320,7 +387,8 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
     window.addEventListener('resize', ubahUkuran)
 
     return () => {
-      hidup = false
+      loop.hentikan()
+      renderer.domElement.removeEventListener('webglcontextlost', konteksHilang)
       window.removeEventListener('resize', ubahUkuran)
       controls.dispose()
       geometry.dispose()
@@ -330,8 +398,6 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
       if (renderer.domElement.parentNode === wadah) wadah.removeChild(renderer.domElement)
       materialRef.current = null
     }
-    // Tekstur adalah satu-satunya hal yang membenarkan pembangunan ulang
-    // seluruh adegan. Ambang ditangani effect di atas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tekstur])
 
@@ -343,5 +409,5 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
     )
   }
 
-  return <div ref={wadahRef} className="w-full overflow-hidden rounded-2xl bg-black" aria-label="Volume rendering of the loaded DICOM series" />
+  return <div ref={wadahRef} className="w-full touch-none overflow-hidden rounded-2xl bg-black" aria-label="Volume rendering of the loaded DICOM series" />
 }

@@ -9,6 +9,7 @@ import {
   aklimatisasiPanas, aklimatisasiKetinggian, penaltiKetinggian,
   type Segmen, type TesFtp, type PaparanPanas, type PaparanKetinggian,
 } from '../lib/enduranceTools'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alat Endurance — bahan bakar, FTP, panduan daya, aklimatisasi.
@@ -38,6 +39,7 @@ export function EnduranceTools() {
     <div className="space-y-4">
       <SectionTitle icon={<IconActivity />} title="Endurance Tools"
         subtitle="Fuelling, FTP, power guidance and climate adaptation — all from your own inputs" />
+      <BatasKlaimKesehatan permukaan="performance.endurance-tools" />
 
       <Card>
         <p className="text-sm leading-relaxed text-neutral-600">

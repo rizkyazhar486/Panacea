@@ -4,6 +4,7 @@ import { IconHospital, IconPhone, IconCheck, IconSearch } from '../components/ic
 import { BottomSheet } from '../components/BottomSheet'
 import { ButtonGroup } from '../components/Carousel'
 import { HOSPITALS, fetchNearbyFacilities, type FacilityKind, type NearbyFacility } from '../lib/hospitals'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const KIND_LABEL: Record<string, string> = { Semua: 'All Facilities', RS: 'Hospital', Klinik: 'Clinic', Apotek: 'Pharmacy' }
 const KIND_EMOJI: Record<string, string> = { Semua: '🏥', RS: '🏥', Klinik: '🩺', Apotek: '💊' }
@@ -69,6 +70,7 @@ export function Hospitals() {
           subtitle="Nearby hospitals, clinics and pharmacies — what matters in an emergency"
           right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Searching…' : 'Use My Location (GPS)'}</Button>}
         />
+        <BatasKlaimKesehatan permukaan="care.hospitals" />
         <div className={`rounded-xl px-3 py-2 text-xs ${geoState === 'granted' ? 'bg-brand-50 text-brand-dark' : geoState === 'denied' ? 'bg-red-50 text-accent' : 'bg-neutral-50 text-neutral-500'}`}>
           {geoState === 'granted' && coords && live
             ? `📍 ${live.length} real facilities near you (OpenStreetMap data).`

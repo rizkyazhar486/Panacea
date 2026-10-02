@@ -5,6 +5,7 @@ import { IconPill, IconUpload, IconCheck, IconShield, IconSearch, IconPlus } fro
 import { Carousel, ButtonGroup } from '../components/Carousel'
 import { Portal } from '../components/Portal'
 import type { PharmacyProduct, PharmacyCategory } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Cat = PharmacyCategory
 type Product = PharmacyProduct
@@ -70,6 +71,7 @@ export function Pharmacy() {
               <Button variant="outline" onClick={() => setShowRx(true)}><IconUpload size={16} /> Fill / Scan Prescription</Button>
             </div>
           } />
+        <BatasKlaimKesehatan permukaan="clinical.pharmacy" />
         <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
           <IconSearch size={16} className="text-neutral-500" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search medicine… (e.g. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />

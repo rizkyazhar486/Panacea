@@ -34,6 +34,15 @@
 # menjadi gagal, supaya tidak mengirimi Anda pemberitahuan galat tiap sepuluh
 # menit.
 #
+# SATU RUN MENJAGA BERJAM-JAM (2026-09-25). Riwayat 22-25 September
+# menunjukkan cron "tiap 10 menit" di atas nyatanya hanya jalan 3-5 kali
+# SEHARI, jadi server tertidur hampir sepanjang hari. Karena repositori ini
+# publik, menit Actions gratis; satu job boleh berjalan sampai 6 jam. Maka
+# tiap run kini MENGULANG sentuhan tiap 9 menit selama masih jam bangun
+# (maks. 5 jam 50 menit). Cron hanya perlu berhasil beberapa kali sehari
+# untuk menyambung loop berikutnya; grup concurrency menjaga hanya satu loop
+# yang berjalan. Tetap gratis: tidak ada layanan berbayar.
+#
 # YANG JUJUR HARUS DIKATAKAN. Penjadwal GitHub Actions bersifat "sebisanya":
 # pada jam sibuk ia lazim terlambat lima sampai lima belas menit, dan sesekali
 # satu putaran dilewati sama sekali. Untuk membangunkan server itu tidak
@@ -60,7 +69,7 @@ concurrency:
 jobs:
   ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 355
     steps:
       - name: Sentuh /api/health
         env:
@@ -76,16 +85,20 @@ jobs:
             echo "Tidak ada VITE_API_URL maupun SERVER_URL di repositori ini — lihat keterangan di kepala berkas. Berhenti tanpa menjadi gagal."
             exit 0
           fi
-          echo "Menyentuh: ${alamat%/}/api/health"
           SERVER_URL="$alamat"
-          # Instans yang benar-benar tidur perlu waktu lama untuk bangun;
-          # 90 detik cukup untuk hampir semua kasus, dan kegagalan sesekali
-          # memang tidak boleh menjadi kegagalan alur kerja: yang berikutnya
-          # datang sepuluh menit lagi.
-          kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${SERVER_URL%/}/api/health" || echo 000)
-          echo "HTTP $kode"
-          head -c 400 /tmp/jawab.json || true
-          echo
-          if [ "$kode" != "200" ]; then
-            echo "::warning::Server belum menjawab 200 (kode $kode). Percobaan berikutnya sepuluh menit lagi."
-          fi
+          # Jam bangun dalam UTC: 21-23 dan 0-16 (= 04.00-23.00 WIB).
+          jam_bangun() { h=$((10#$(date -u +%H))); [ "$h" -ge 21 ] || [ "$h" -le 16 ]; }
+          mulai=$(date +%s)
+          while :; do
+            echo "Menyentuh: ${SERVER_URL%/}/api/health ($(date -u +%H:%M) UTC)"
+            # Instans yang tidur perlu waktu untuk bangun; kegagalan sesekali
+            # tidak boleh menggagalkan alur kerja.
+            kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${SERVER_URL%/}/api/health" || true)
+            kode=${kode:-000}
+            echo "HTTP $kode"; head -c 200 /tmp/jawab.json || true; echo
+            [ "$kode" = "200" ] || echo "::warning::Server belum menjawab 200 (kode $kode)."
+            # Berhenti di luar jam bangun atau sebelum batas 6 jam GitHub.
+            [ $(( $(date +%s) - mulai )) -lt $((340 * 60)) ] || break
+            sleep 540
+            jam_bangun || break
+          done
