@@ -74,6 +74,9 @@ const learn = readFileSync('src/pages/MedStudyHub.tsx', 'utf8')
 assert.match(learn, /<Fold label="Topics" defaultOpen=\{params\.has\('bagian'\)\}>/, 'Learn opens Topics itself when an evidence query sets `bagian`')
 assert.match(learn, /<Fold label="Planner">/, 'Learn folds the study planner')
 assert.match(learn, /<MedicalLibraryWorkbench onRun=\{runEvidenceQuery\} \/>/, 'the library search stays the visible main surface')
+const bench = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
+for (const w of ['Guide', 'Appraisal']) assert.match(bench, new RegExp(`<Fold label="${w}">`), `the library workbench folds ${w}`)
+assert.doesNotMatch(bench, /<Fold label="[A-Za-z]+">\s*<div className="mt-3 rounded-\[22px\] bg-neutral-950/, 'the generated query and its search/save actions are never folded')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
