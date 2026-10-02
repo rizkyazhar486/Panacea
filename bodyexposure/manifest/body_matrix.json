@@ -1,0 +1,140 @@
+{
+ "meta": {
+  "generated": "2026-10-03T03:21:27",
+  "master": "PANACEA_HUMAN_MASTER_v005.blend",
+  "blender": "5.2.2 LTS",
+  "units": "metres",
+  "frame": "+Z superior, +X subject left, -Y anterior",
+  "educational_only": true
+ },
+ "bodies": [
+  {
+   "body_id": "HUMAN.ADULT.MALE",
+   "status": "source_backed",
+   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0",
+   "frame": "+Z superior, +X subject left, -Y anterior, metres, feet at z=0",
+   "source_requirement": null,
+   "structures": 2610,
+   "verts": 5006541,
+   "systems": {
+    "surface": 256,
+    "skeletal": 232,
+    "joint": 23,
+    "muscular": 470,
+    "fascia": 39,
+    "cardiovascular": 676,
+    "lymphatic": 163,
+    "nervous": 549,
+    "respiratory": 49,
+    "digestive": 76,
+    "urinary": 11,
+    "endocrine": 8,
+    "reproductive": 14,
+    "sensory": 44
+   }
+  },
+  {
+   "body_id": "HUMAN.ADULT.FEMALE",
+   "status": "source_backed_partial",
+   "source": "HuBMAP CCF 3D Reference Object Library, VH_Female (NLM Visible Human female) VH_F_United v1.1, CC BY 4.0",
+   "frame": "same axes as male master; feet shifted to z=0; displayed at +1.2 m X via ROOT empty (display only)",
+   "source_requirement": null,
+   "structures": 801,
+   "verts": 1775544,
+   "systems": {
+    "nervous": 273,
+    "cardiovascular": 102,
+    "reproductive": 42,
+    "joint": 53,
+    "digestive": 63,
+    "sensory": 62,
+    "respiratory": 67,
+    "skeletal": 24,
+    "lymphatic": 12,
+    "urinary": 100,
+    "muscular": 2,
+    "surface": 1
+   }
+  },
+  {
+   "body_id": "HUMAN.PREGNANT",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires gestational-age-staged maternal + fetal source anatomy (e.g. segmented maternal MRI/CT atlases by trimester); must not be produced by inflating the female abdomen.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "FETUS",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires fetal anatomical source data by gestational week (fetal MRI atlases / embryology references); fetal circulation shunts (foramen ovale, ductus arteriosus, ductus venosus) must be source-backed.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.NEONATE",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires neonatal source anatomy (fontanelles, thymus, relative liver size); adult scaling is prohibited.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.INFANT",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires infant source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.TODDLER",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires toddler source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.CHILD",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires child source anatomy (growth plates, ossification centres, airway dimensions); adult scaling is prohibited.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.ADOLESCENT",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires adolescent source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "HUMAN.OLDER_ADULT",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Requires older-adult source anatomy; normal ageing must be kept separate from pathology.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  }
+ ]
+}
