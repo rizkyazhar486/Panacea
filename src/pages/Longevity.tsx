@@ -10,6 +10,7 @@ import { ShareStatCard } from '../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
 import { bahanOtomatis } from '../lib/bugarOtomatis'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Fold } from '../shared/ui/Fold'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -286,7 +287,7 @@ export function Longevity() {
         <SectionTitle
           icon={<IconHeart size={20} />}
           title="Longevity Center"
-          subtitle="Your watch judges your day — this page judges your decade. VO₂max, resting heart rate, sleep & waist-to-hip ratio update themselves from Health Profile (Apple Health / WHOOP) and Body Composition."
+          subtitle="Your decade, not your day."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -339,6 +340,7 @@ export function Longevity() {
           dilaporkan penelitian beserta sumbernya, sehingga pembacanya dapat
           membedakan keduanya — dan itu tidak mungkin bila yang berdasar bukti
           diletakkan di bawah yang berdasar tebakan. */}
+      <Fold label="Evidence">
       <Card className="!p-5">
         <SectionTitle
           icon={<span className="text-lg">🔬</span>}
@@ -363,7 +365,9 @@ export function Longevity() {
           )}
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Pillars">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Long-term predictors that are genuinely established — BUT the weights combining them are the author’s choice, not a research finding" />
         <div className="mt-2 grid grid-cols-2 gap-3">
@@ -414,8 +418,10 @@ export function Longevity() {
           ))}
         </div>
       </Card>
+      </Fold>
 
       {/* Decade projection */}
+      <Fold label="Projection">
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Decade Projection — Train Your 80-Year-Old Self" subtitle="Untrained: VO₂max −10% per decade, muscle −8% per decade after age 30. Trained: half that." />
         {vo2Proj60 && vo2Proj80 ? (
@@ -446,8 +452,10 @@ export function Longevity() {
           </div>
         ) : <p className="mt-2 text-[11px] text-neutral-500">Fill in VO₂max (and grip) to see your projection at ages 60 & 80.</p>}
       </Card>
+      </Fold>
 
       {/* Lab sharpening */}
+      <Fold label="Labs">
       <Card className="!p-5">
         <SectionTitle icon={<span className="text-lg">🧪</span>} title="Lab markers (optional)" subtitle="Annual lab values can move this estimate. They do not validate it." />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -461,8 +469,10 @@ export function Longevity() {
           Discuss your lab results with your doctor; the <a href="#/chatbot" className="font-bold text-brand-dark underline">AI Consultation</a> feature can help you prepare questions.
         </p>
       </Card>
+      </Fold>
 
       {/* Testing protocol */}
+      <Fold label="Protocol">
       <Card className="!p-5">
         <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="What gets measured improves — tick each item once it is done" />
         <div className="mt-2 space-y-2">
@@ -487,7 +497,9 @@ export function Longevity() {
           })}
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Sources">
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs leading-relaxed text-brand-dark">
         This page is a <b>complement</b> to your watch: Apple Watch/WHOOP answers "how was today?" —
         the Longevity Center answers "how will 30 years from now be?". Daily execution:
@@ -496,6 +508,7 @@ export function Longevity() {
         {' '}<a href="#/body" className="font-bold underline">Body Composition</a>.
         <br /><span className="text-[10px] opacity-70">References: Mandsager 2018 (JAMA), PURE study (grip), BMJ 2022 (flamingo balance), Rikli & Jones, Attia — Outlive. Educational estimate, not a diagnosis.</span>
       </div>
+      </Fold>
     </div>
   )
 }
