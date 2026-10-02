@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
 import { build } from 'esbuild'
+import { openFoldsAround } from '../../src/shared/ui/openFolds.ts'
 import { foldsForcedOpen, foldsOpenForSession } from '../../src/shared/ui/foldsPreference.ts'
 
 const out = await build({
@@ -82,6 +83,25 @@ const comp = readFileSync('src/pages/BodyComposition.tsx', 'utf8')
 for (const w of ['Measurements', 'Analysis', 'Screening', 'Markers']) assert.match(comp, new RegExp(`<Fold label="${w}">`), `Body folds ${w}`)
 assert.ok(comp.indexOf('Composition Score') < comp.indexOf('<Fold label="Measurements">'), 'the score hero comes before every fold')
 assert.doesNotMatch(comp, /<Fold label="[A-Za-z]+">\s*\{\/\* Score \+ bento header/, 'the score hero is never folded')
+// Lompatan ke jangkar membuka lipatan yang membungkusnya (dua tingkat), dan tidak menyentuh yang lain.
+{
+  const mkDetails = (parent: any) => { const d: any = { open: false, parentElement: parent, closest(sel: string) { return sel === 'details.fold' ? d : null } }; return d }
+  const outer: any = { open: false, parentElement: null, closest: () => outer }
+  const inner: any = { open: false, parentElement: outer, closest: () => inner }
+  const target: any = { parentElement: inner, closest: () => inner }
+  assert.equal(openFoldsAround(target), 2, 'both enclosing folds are opened')
+  assert.equal(outer.open && inner.open, true, 'the target is no longer hidden')
+  assert.equal(openFoldsAround(target), 0, 'already-open folds are left alone (idempotent)')
+  assert.equal(openFoldsAround(null), 0, 'a missing target is a no-op')
+  const loose: any = { parentElement: null, closest: () => null }
+  assert.equal(openFoldsAround(loose), 0, 'an element outside any fold opens nothing')
+  void mkDetails
+}
+// Nutrition: angka hari ini adalah hero; pencatatan, kalkulator dan sumber dilipat; lompatan membuka lipatan.
+const gizi = readFileSync('src/pages/Nutrition.tsx', 'utf8')
+for (const w of ['Longevity', 'Log', 'Calculators', 'Sources']) assert.match(gizi, new RegExp(`<Fold label="${w}">`), `Nutrition folds ${w}`)
+assert.ok(gizi.indexOf('<PanelAngka angka={angkaHariIni} />') < gizi.indexOf('<Fold label="Longevity">'), "today's numbers come before every fold")
+assert.match(gizi, /openFoldsAround\(el\)/, 'anchor jumps (lompat) open the fold that holds their target')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
