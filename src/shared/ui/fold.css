@@ -1,0 +1,13 @@
+/* Ruang lega, huruf besar, satu fokus. Ringkasan memenuhi lantai sentuh 44px. */
+.fold { border-top: 1px solid rgba(255,255,255,.1); margin-top: 8px; }
+.fold__summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 56px; padding: 12px 0; cursor: pointer; list-style: none;
+}
+.fold__summary::-webkit-details-marker { display: none; }
+.fold__summary:focus-visible { outline: 3px solid rgba(59,130,246,.5); outline-offset: 2px; border-radius: 8px; }
+.fold__word { font-size: 1.125rem; font-weight: 500; letter-spacing: .01em; }
+.fold__chevron { width: 10px; height: 10px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); opacity: .6; transition: transform .18s ease; }
+.fold[open] > .fold__summary .fold__chevron { transform: rotate(-135deg); }
+.fold__body { padding: 8px 0 24px; }
+@media (prefers-reduced-motion: reduce) { .fold__chevron { transition: none; } }

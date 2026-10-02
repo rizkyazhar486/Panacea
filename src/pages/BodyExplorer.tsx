@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
+import { Fold } from '../shared/ui/Fold'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
@@ -625,6 +626,10 @@ export function BodyExplorer() {
           onPick={onPickStructure}
         />
 
+        <p className="mt-1 text-center text-[10px] text-neutral-400">
+          Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
+        </p>
+        <Fold label="Modality">
         {/* Modalitas pencitraan — deret tunggal tepat di bawah viewer, karena
             inilah yang paling sering diganti saat mengamati satu struktur. */}
         <div className="mt-2.5 flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
@@ -644,29 +649,6 @@ export function BodyExplorer() {
         </div>
         <p className="mt-1.5 text-center text-[10.5px] leading-relaxed text-neutral-400">
           {RENDER_MODES.find((m) => m.key === renderMode)?.hint}
-        </p>
-
-        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
-          <div className="relative min-w-0 flex-1">
-            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-            <input
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask about anatomy, a symptom, or a disease…"
-              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={asking || !question.trim()}
-            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
-          >
-            {asking ? 'Asking…' : 'Ask'}
-          </button>
-        </form>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
-          Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
-          pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
         {/* Keadaan referensi fisiologi — angka berubah, atlas sumber tetap stabil. */}
@@ -791,9 +773,32 @@ export function BodyExplorer() {
           {renderMode !== 'anatomy' &&
             'Greyscale is computed from standard tissue values (Hounsfield units for CT, relative T1/T2 signal for MRI) — a rendering of real geometry, not a scan of a patient. Real radiographs and scan slices are in the image tabs.'}
         </p>
-        <p className="mt-1 text-center text-[10px] text-neutral-400">
-          Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
+        </Fold>
+        <Fold label="Ask">
+        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask about anatomy, a symptom, or a disease…"
+              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={asking || !question.trim()}
+            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {asking ? 'Asking…' : 'Ask'}
+          </button>
+        </form>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+          Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
+          pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
+
+        </Fold>
 
         {/* Hasil ketukan organ muncul TEPAT DI SINI — di bawah figur, di atas
             deret tab. Kalau ia diletakkan setelah tab, orang harus menggulir
@@ -826,6 +831,7 @@ export function BodyExplorer() {
         {/* Satu panel bertab menggantikan empat deret pilihan yang dulu
             ditumpuk sekaligus. Isinya sama persis, cuma tidak semuanya
             berteriak bersamaan. */}
+        <Fold label="Explore">
         <div className="mt-4">
           {/* Tujuh tab tidak muat dibagi rata di layar 390px — dipaksa
               flex-1 membuat halamannya menggulir ke samping, dan itu terukur:
@@ -1377,6 +1383,8 @@ export function BodyExplorer() {
             </div>
           )}
         </div>
+
+        </Fold>
 
         {/* Empat paragraf sumber & sangkalan dulu tergelar penuh di kaki
             halaman dan itu bagian paling berisik dari layar ini. Atribusi CC

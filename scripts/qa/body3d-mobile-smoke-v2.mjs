@@ -66,6 +66,7 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 
 let metrics = null
 let failure = null
+let failureContext = null
 
 async function canvasHealth(locator) {
   return withTimeout(locator.evaluate((node) => {
@@ -321,12 +322,18 @@ try {
   console.log(JSON.stringify({ ok: true, url, ...metrics }))
 } catch (error) {
   failure = error instanceof Error ? error.message : String(error)
+  // Konteks diagnostik saat gagal: hash saat ini dan keadaan tiap lipatan (tidak mengubah asersi apa pun).
+  failureContext = await page.evaluate(() => ({
+    hash: window.location.hash,
+    folds: [...document.querySelectorAll('details.fold')].map((d) => ({ word: d.querySelector('.fold__word')?.textContent ?? null, open: d.open })),
+  })).catch(() => null)
   throw error
 } finally {
   await writeFile(metricsPath, `${JSON.stringify({
     ok: !failure,
     url,
     failure,
+    failureContext,
     pageErrors,
     metrics,
   }, null, 2)}\n`)

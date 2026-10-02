@@ -32,9 +32,18 @@ for (const route of Object.keys(routes)) {
   await page.goto(`${origin}/#/${route}`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(4000)
   measured[route] = await page.evaluate((minPx) => {
+    // Isi <details> yang tertutup tidak terlihat pengguna (kecuali judul <summary>-nya),
+    // walau elemennya masih ada di DOM; tidak boleh dihitung sebagai tulisan di layar.
+    const foldedAway = (e) => {
+      for (let d = e.closest('details'); d; d = d.parentElement ? d.parentElement.closest('details') : null) {
+        const ownSummary = e.closest('summary')
+        if (!d.open && !(ownSummary && ownSummary.parentElement === d)) return true
+      }
+      return false
+    }
     const visible = (e) => {
       const r = e.getBoundingClientRect(), s = getComputedStyle(e)
-      return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'
+      return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && !foldedAway(e)
     }
     let words = 0, small = 0
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
