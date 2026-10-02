@@ -5,7 +5,7 @@ import {
   NEUROPSYCHIATRY_VISUAL_PRESETS,
   type NeuroVisualKind,
   type NeuroVisualPreset,
-} from '../../lib/neuropsychiatryVisualModels';
+} from '../../lib/discovery/neuropsychiatryVisualModels';
 
 function materialFor(kind: NeuroVisualKind) {
   const palette: Record<NeuroVisualKind, number> = {

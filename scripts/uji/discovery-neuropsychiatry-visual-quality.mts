@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const model = fs.readFileSync('src/lib/neuropsychiatryVisualModels.ts', 'utf8');
-const ui = fs.readFileSync('src/pages/discovery/NeuropsychiatryCircuitStudio3D.tsx', 'utf8');
+const model = fs.readFileSync('src/lib/discovery/neuropsychiatryVisualModels.ts', 'utf8');
+const ui = fs.readFileSync('src/components/frontier/NeuropsychiatryCircuitStudio3D.tsx', 'utf8');
 
 const modelTerms = [
   'Integrated cognition',
