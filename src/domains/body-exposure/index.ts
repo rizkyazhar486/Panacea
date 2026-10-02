@@ -20,3 +20,11 @@ export {
 } from './engine/oculomotorLesionEngine'
 
 export { OculomotorLesionLab } from './ui/OculomotorLesionLab'
+
+export {
+  BoundsBvh,
+  type BvhItem,
+  type BvhRayHit,
+  type BvhStats,
+  type BvhVec3,
+} from './engine/boundsBvh'
