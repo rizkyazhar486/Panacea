@@ -168,6 +168,7 @@ import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien,
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
+import { readBuildCommit } from './shared/buildInfo.js'
 import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
@@ -261,6 +262,8 @@ app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
+    // Commit sumber proses ini (null bila tidak diketahui); dipakai smoke pasca-deploy.
+    build: { commit: readBuildCommit(process.env) },
     // 'berkas' berarti data hanya ada di cakram sementara dan akan HILANG pada
     // deploy ulang berikutnya — aplikasi mengatakannya, bukan menunggu orang
     // menemukannya sendiri saat gagal masuk.

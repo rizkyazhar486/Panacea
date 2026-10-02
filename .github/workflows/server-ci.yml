@@ -93,6 +93,8 @@ jobs:
         run: npm run uji:health-webhook
       - name: Test health alert delivery-state semantics
         run: npm run uji:health-alerts
+      - name: Test build commit provenance
+        run: npm run uji:build-info
       - name: Test alert stamps are committed after delivery
         run: npm run uji:alert-stamp-order
       - name: Test Connect privacy boundaries
