@@ -1,3 +1,5 @@
+import { compactPrimaryNavigation } from './productSpaces'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Menyembunyikan fitur.
 //
@@ -18,6 +20,12 @@
 //      aplikasi kesehatan.
 //   3. SELALU BISA DIKEMBALIKAN, dari satu tempat, tanpa perlu mengingat apa
 //      yang dulu disembunyikan.
+//
+// Selain preferensi pengguna, menu harian sekarang punya satu lapis kurasi
+// produk: pintu-pintu sekunder/duplikat tidak lagi berebut tempat di sidebar.
+// Rute tersebut tetap hidup dan tetap dapat ditemukan lewat pencarian/All
+// Features. Ini memisahkan "fitur tersedia" dari "fitur yang pantas tampil di
+// navigasi utama" agar Panacea terasa seperti satu OS, bukan ratusan mini-app.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const KUNCI = 'pmd-fitur-tersembunyi'
@@ -65,11 +73,18 @@ export function tampilkanSemua(): void {
   simpanTersembunyi([])
 }
 
-/** Saring daftar apa pun yang punya properti `to`. */
+/**
+ * Saring daftar apa pun yang punya properti `to`.
+ *
+ * Hanya daftar yang terdeteksi sebagai navigasi Shell yang mendapat kurasi
+ * compact-by-default. Daftar fitur lengkap, katalog pencarian, dan layar Atur
+ * Fitur tidak ikut dipangkas karena mereka tidak membawa tiga sentinel Shell.
+ */
 export function saring<T extends { to: string }>(items: T[], tersembunyi: string[]): T[] {
-  if (!tersembunyi.length) return items
+  const compact = compactPrimaryNavigation(items)
+  if (!tersembunyi.length) return compact
   const set = new Set(tersembunyi)
-  return items.filter((i) => !set.has(i.to))
+  return compact.filter((i) => !set.has(i.to))
 }
 
 /** Hook sederhana tanpa dependensi: baca sekali, lalu ikuti siarannya. */

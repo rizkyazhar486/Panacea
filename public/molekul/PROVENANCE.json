@@ -1,0 +1,16 @@
+{
+  "files": {
+    "1ubi.pdb": {
+      "sha256": "5099c2e6a871eefe14fa98b816c936fb5fa11cd4def16e4f59316d20cb3a3dd7",
+      "pdbId": "1UBI",
+      "molecule": "Ubiquitin, chain A, residues 1-76",
+      "organism": "Homo sapiens (NCBI taxid 9606)",
+      "method": "X-ray diffraction, 1.80 Å",
+      "citation": "Alexeev D, Bury SM, Turner MA, Ogunjobi OM, Muir TW, Ramage R, Sawyer L. Synthetic, structural and biological studies of the ubiquitin system: the total chemical synthesis of ubiquitin. Biochem J. 1994;299:151-158. PMID 8166633.",
+      "uniprotMapping": "DBREF 1UBI A 1-76 -> UniProt P62988 (UBIQ_HUMAN) 1-76, as recorded in the file. P62988 is a legacy accession; human ubiquitin is encoded by UBB, UBC, UBA52 and RPS27A with an identical mature 76-residue sequence.",
+      "obtainedFrom": "ProDy source distribution test data (prody sdist on PyPI, tests/datafiles/pdb1ubi.pdb), MIT-licensed package; the PDB entry itself is distributed by wwPDB under CC0 1.0.",
+      "verification": "Header, DBREF, SEQRES, HELIX/SHEET and coordinates read from the file. NOT re-verified byte-for-byte against files.rcsb.org because RCSB and UniProt are blocked by this environment's network policy.",
+      "notes": "Synthetic (chemically synthesised) human ubiquitin made from L-amino acids; 81 HETATM records are waters."
+    }
+  }
+}

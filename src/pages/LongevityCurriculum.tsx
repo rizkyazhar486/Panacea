@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Physician-led longevity medicine curriculum — an educational overview of
 // the major domains, each tagged by evidence maturity (Established / Emerging
@@ -134,6 +135,7 @@ export function LongevityCurriculum() {
         title="Longevity Medicine Curriculum"
         subtitle="A tiered overview for clinicians and institutions — stem cells, robotics, SGLT2i, AI, peptides, hormones, cardiovascular health, biomarkers and research infrastructure"
       />
+      <BatasKlaimKesehatan permukaan="longevity.curriculum" />
       <p className="text-[12px] leading-relaxed text-neutral-500">
         Each module is tagged with its evidence maturity level. This is educational/orientation material for clinicians, <b>not a prescribing guide</b> —
         several topics (peptides, hormone optimization) carry a real risk of gray-market misuse outside licensed

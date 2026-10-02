@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { OBAT_PER_KELUHAN, type GolonganObat } from '../lib/golonganObat'
 import { Rantai } from './Rantai'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Golongan obat dibaca DARI KELUHAN, bukan dari abjad.
@@ -18,6 +19,7 @@ import { Rantai } from './Rantai'
 function KartuGolongan({ g, buka, ketuk }: { g: GolonganObat; buka: boolean; ketuk: () => void }) {
   return (
     <div className="rounded-xl border border-neutral-200 dark:border-white/10">
+      <BatasKlaimKesehatan permukaan="clinical.drug-by-complaint" />
       <button
         onClick={ketuk}
         aria-expanded={buka}

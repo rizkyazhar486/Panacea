@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wells Score — two related, extremely widely used clinical decision rules
@@ -57,6 +58,7 @@ export function WellsScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Wells Score" subtitle="Venous thromboembolism risk — DVT and pulmonary embolism, combined with D-dimer" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Dua aturan keputusan klinis bersaudara yang luas dipakai bersama pemeriksaan D-dimer untuk menentukan perlu tidaknya pencitraan (USG untuk DVT, CT angiografi paru untuk emboli paru).</Prosa>
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('dvt')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'dvt' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>DVT (leg)</button>

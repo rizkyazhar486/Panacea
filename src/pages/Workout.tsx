@@ -8,6 +8,7 @@ import { FightHero } from '../components/FightHero'
 import { AchievementToasts } from '../components/AchievementToasts'
 import { evaluateWorkoutAchievements, newlyUnlocked, unlockedCount, type Achievement } from '../lib/achievements'
 import '../styles/metal.css'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'
 type Modality =
@@ -302,6 +303,7 @@ export function Workout() {
 
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Static and dynamic, with equipment or calisthenics, by muscle group — grounded in sports science and orthopaedics" />
+        <BatasKlaimKesehatan permukaan="performance.workout" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <select className={inputClass} value={muscle} onChange={(e) => setMuscle(e.target.value as Muscle | 'All')}>
             <option value="All">All Muscles</option>

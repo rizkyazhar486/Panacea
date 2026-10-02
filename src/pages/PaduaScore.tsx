@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Padua Prediction Score — Barbar, S., et al. (2010), J Thromb Haemost,
@@ -38,6 +39,7 @@ export function PaduaScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Padua Prediction Score" subtitle="VTE risk in hospitalized medical patients (Barbar et al. 2010)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Menentukan pasien penyakit dalam (nonbedah) yang dirawat mana yang perlu profilaksis tromboemboli vena dengan obat. Skor ≥4 = risiko tinggi. Selalu sandingkan dengan penilaian risiko perdarahan sebelum meresepkan profilaksis antikoagulan.</Prosa>
       </Card>
 

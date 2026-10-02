@@ -22,7 +22,7 @@ export function Batang({ w = '100%', h = 12, kelas = '' }: { w?: string; h?: num
 }
 
 /** Pembungkus: satu pengumuman untuk pembaca layar, bukan puluhan. */
-export function Memuat({ label = 'Memuat isi', children }: { label?: string; children: React.ReactNode }) {
+export function Memuat({ label = 'Loading content', children }: { label?: string; children: React.ReactNode }) {
   return (
     <div role="status" aria-live="polite" aria-busy="true">
       <span className="sr-only">{label}</span>
@@ -76,7 +76,7 @@ export function RangkaDaftar({ jumlah = 3, baris = 2 }: { jumlah?: number; baris
 /** Rangka baris angka di puncak halaman — sepadan dengan PanelAngka. */
 export function RangkaAngka({ jumlah = 4 }: { jumlah?: number }) {
   return (
-    <Memuat label="Memuat angka">
+    <Memuat label="Loading figures">
       <div className="flex gap-[6px]">
         {Array.from({ length: jumlah }).map((_, i) => (
           <div key={i} className="flex min-w-0 flex-1 flex-col gap-[6px] rounded-2xl bg-white/70 p-3 dark:bg-white/5">
@@ -102,7 +102,7 @@ export function RangkaHalaman({ angka = true, keping = true, kartu = 3 }: {
   angka?: boolean; keping?: boolean; kartu?: number
 }) {
   return (
-    <Memuat label="Memuat halaman">
+    <Memuat label="Loading page">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <span className="rangka h-11 w-11 shrink-0 rounded-2xl" aria-hidden="true" />

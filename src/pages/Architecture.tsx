@@ -2,6 +2,7 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../components/icons'
 import { WEIGHTS, S_THRESHOLD } from '../lib/cdss'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const MODULES = [
   ['EHR & Data Ingest', 'HL7/FHIR connectors — medication list, labs, allergies, vitals. Input normalization.'],
@@ -58,6 +59,7 @@ export function Architecture() {
           title="Hybrid CDSS Architecture — Lateral + Vertical"
           subtitle="The foundation of Panaceamed.id: safe prescribing support (a doctor stays in the loop) + personalised patient education"
         />
+        <BatasKlaimKesehatan permukaan="care.cdss-architecture" />
         <div className="flex flex-wrap gap-2">
           <Badge tone="brand">The doctor stays in the loop</Badge>
           <Badge tone="brand">SMART on FHIR</Badge>

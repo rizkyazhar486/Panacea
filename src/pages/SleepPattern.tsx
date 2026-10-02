@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sleep Pattern — per tahapan, per malam.
@@ -121,6 +122,7 @@ export function SleepPattern() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconTimer />} title="Sleep Pattern" />
+        <BatasKlaimKesehatan permukaan="wellness.sleep-pattern" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Stage-by-stage sleep detail is filled in by the server through automatic sync, and the app

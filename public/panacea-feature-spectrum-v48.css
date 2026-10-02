@@ -1,0 +1,292 @@
+/*
+ * Panaceamed Feature Spectrum v48
+ * Palette-aware feature identity for shell navigation, feature links and the
+ * multifunction assistive FAB. Loaded after v47; deliberately scoped so the
+ * established liquid-control and accessibility behavior remains intact.
+ */
+
+:root {
+  --pmd-route-primary: #d9dee2;
+  --pmd-route-secondary: #22517a;
+  --pmd-route-tertiary: #917e66;
+  --pmd-route-metal: #d9dee2;
+  --pmd-route-soft: rgba(217, 222, 226, .12);
+  --pmd-route-soft-strong: rgba(217, 222, 226, .19);
+  --pmd-route-border: rgba(217, 222, 226, .32);
+  --pmd-route-focus: rgba(217, 222, 226, .72);
+  --pmd-route-glow: rgba(217, 222, 226, .22);
+  --pmd-route-glow-strong: rgba(217, 222, 226, .34);
+  --pmd-route-secondary-soft: rgba(34, 81, 122, .13);
+  --pmd-route-metal-soft: rgba(217, 222, 226, .14);
+}
+
+/* ── Route-aware shell identity ───────────────────────────────────────── */
+html.pmd-spectrum-ready header.kaca::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pmd-route-primary) 22%,
+    var(--pmd-route-secondary) 48%,
+    var(--pmd-route-metal) 72%,
+    var(--pmd-route-tertiary) 88%,
+    transparent 100%
+  ) !important;
+  opacity: .72;
+}
+
+html.pmd-spectrum-ready aside.sticky[class*="h-screen"],
+html.pmd-spectrum-ready .drawer-in {
+  border-color: var(--pmd-route-border) !important;
+}
+
+html.pmd-spectrum-ready aside.sticky[class*="h-screen"]::after,
+html.pmd-spectrum-ready .drawer-in::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(20rem 28rem at 8% 18%, var(--pmd-route-soft), transparent 68%),
+    radial-gradient(15rem 22rem at 92% 82%, var(--pmd-route-secondary-soft), transparent 72%);
+  opacity: .55;
+}
+
+/* ── Every feature gets its own stable identity inside a coherent family ─ */
+a[data-pmd-feature-link="true"] {
+  --pmd-feature-primary: var(--pmd-route-primary);
+  --pmd-feature-secondary: var(--pmd-route-secondary);
+  --pmd-feature-tertiary: var(--pmd-route-tertiary);
+  --pmd-feature-metal: var(--pmd-route-metal);
+  --pmd-feature-soft: var(--pmd-route-soft);
+  --pmd-feature-soft-strong: var(--pmd-route-soft-strong);
+  --pmd-feature-border: var(--pmd-route-border);
+  --pmd-feature-focus: var(--pmd-route-focus);
+  --pmd-feature-glow: var(--pmd-route-glow);
+  --pmd-feature-glow-strong: var(--pmd-route-glow-strong);
+  --pmd-feature-secondary-soft: var(--pmd-route-secondary-soft);
+  --pmd-feature-metal-soft: var(--pmd-route-metal-soft);
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"],
+.drawer-in nav a[data-pmd-feature-link="true"],
+[data-pintasan] a[data-pmd-feature-link="true"] {
+  position: relative;
+  isolation: isolate;
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"] svg,
+.drawer-in nav a[data-pmd-feature-link="true"] svg,
+[data-pintasan] a[data-pmd-feature-link="true"] svg {
+  color: var(--pmd-feature-primary) !important;
+  filter: drop-shadow(0 0 8px var(--pmd-feature-glow));
+  transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"]::before,
+.drawer-in nav a[data-pmd-feature-link="true"]::before,
+[data-pintasan] a[data-pmd-feature-link="true"]::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(.2,.8,.2,1);
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"]::before,
+.drawer-in nav a[data-pmd-feature-link="true"]::before {
+  left: 5px;
+  top: 50%;
+  width: 3px;
+  height: 54%;
+  border-radius: 999px;
+  transform: translateY(-50%) scaleY(.55);
+  background: linear-gradient(180deg, var(--pmd-feature-metal), var(--pmd-feature-primary));
+  box-shadow: 0 0 14px var(--pmd-feature-glow-strong);
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"]:hover,
+.drawer-in nav a[data-pmd-feature-link="true"]:hover,
+[data-pintasan] a[data-pmd-feature-link="true"]:hover {
+  border-color: var(--pmd-feature-border) !important;
+  background: linear-gradient(105deg, var(--pmd-feature-soft), var(--pmd-feature-secondary-soft)) !important;
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"]:hover::before,
+.drawer-in nav a[data-pmd-feature-link="true"]:hover::before {
+  opacity: .56;
+  transform: translateY(-50%) scaleY(.78);
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"][aria-current="page"],
+.drawer-in nav a[data-pmd-feature-link="true"][aria-current="page"],
+[data-pintasan] a[data-pmd-feature-link="true"][aria-current="page"] {
+  border-color: var(--pmd-feature-border) !important;
+  background:
+    linear-gradient(108deg, var(--pmd-feature-soft-strong), var(--pmd-feature-secondary-soft) 58%, transparent 100%) !important;
+  box-shadow:
+    inset 3px 0 0 var(--pmd-feature-primary),
+    0 8px 28px var(--pmd-feature-glow) !important;
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"][aria-current="page"]::before,
+.drawer-in nav a[data-pmd-feature-link="true"][aria-current="page"]::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"][aria-current="page"] svg,
+.drawer-in nav a[data-pmd-feature-link="true"][aria-current="page"] svg,
+[data-pintasan] a[data-pmd-feature-link="true"][aria-current="page"] svg {
+  color: var(--pmd-feature-metal) !important;
+  filter:
+    drop-shadow(0 0 5px var(--pmd-feature-glow-strong))
+    drop-shadow(0 0 14px var(--pmd-feature-glow));
+}
+
+/* Feature cards/shortcuts retain their existing geometry and semantics. Only
+   their edge, icon and hover aura inherit the feature identity. */
+main a[data-pmd-feature-link="true"][class*="rounded"],
+main a[data-pmd-feature-link="true"][class*="border"] {
+  --pmd-card-edge: var(--pmd-feature-border);
+  transition-property: transform, border-color, box-shadow, background-color, opacity;
+}
+
+main a[data-pmd-feature-link="true"][class*="rounded"] svg,
+main a[data-pmd-feature-link="true"][class*="border"] svg {
+  color: var(--pmd-feature-primary);
+}
+
+main a[data-pmd-feature-link="true"][class*="rounded"]:hover,
+main a[data-pmd-feature-link="true"][class*="border"]:hover {
+  border-color: var(--pmd-card-edge) !important;
+  box-shadow: 0 12px 34px var(--pmd-feature-glow) !important;
+}
+
+/* ── Multifunction assistive: one control, current-context identity ───── */
+button[data-pmd-assistive="true"] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border: 1px solid var(--pmd-route-border) !important;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255,255,255,.48) 0 4%, transparent 28%),
+    linear-gradient(135deg, var(--pmd-route-metal-soft), var(--pmd-route-soft-strong) 38%, var(--pmd-route-secondary-soft) 76%),
+    rgba(5, 8, 14, .66) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    inset 0 -1px 0 rgba(0,0,0,.18),
+    0 10px 30px rgba(0,0,0,.20),
+    0 0 0 1px var(--pmd-route-soft),
+    0 0 24px var(--pmd-route-glow) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(155%);
+  backdrop-filter: blur(18px) saturate(155%);
+}
+
+button[data-pmd-assistive="true"]::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from 205deg,
+    transparent 0 18%,
+    var(--pmd-route-primary) 27%,
+    var(--pmd-route-metal) 41%,
+    transparent 52% 67%,
+    var(--pmd-route-secondary) 78%,
+    transparent 91% 100%
+  );
+  filter: blur(7px);
+  opacity: .34;
+  transition: opacity 220ms ease, filter 220ms ease;
+}
+
+button[data-pmd-assistive="true"][aria-expanded="true"]::before,
+button[data-pmd-assistive="true"]:active::before {
+  opacity: .72;
+  filter: blur(9px);
+}
+
+button[data-pmd-assistive="true"] > span {
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.28)) drop-shadow(0 0 8px var(--pmd-route-glow));
+}
+
+[role="menu"][aria-label="Tindakan cepat"][data-pmd-assistive-menu="true"] {
+  border: 1px solid var(--pmd-route-border) !important;
+  background:
+    radial-gradient(12rem 10rem at 14% 8%, var(--pmd-route-soft-strong), transparent 68%),
+    radial-gradient(11rem 9rem at 92% 90%, var(--pmd-route-secondary-soft), transparent 70%),
+    rgba(8, 11, 18, .72) !important;
+  box-shadow:
+    0 24px 72px rgba(0,0,0,.34),
+    0 0 32px var(--pmd-route-glow) !important;
+}
+
+html:not(.dark) [role="menu"][aria-label="Tindakan cepat"][data-pmd-assistive-menu="true"] {
+  background:
+    radial-gradient(12rem 10rem at 14% 8%, var(--pmd-route-soft-strong), transparent 68%),
+    radial-gradient(11rem 9rem at 92% 90%, var(--pmd-route-secondary-soft), transparent 70%),
+    rgba(250, 252, 255, .82) !important;
+}
+
+[role="menu"][aria-label="Tindakan cepat"] button[class*="bg-brand"] {
+  border: 1px solid var(--pmd-route-border) !important;
+  background: linear-gradient(135deg, var(--pmd-route-primary), var(--pmd-route-secondary)) !important;
+  box-shadow: 0 8px 20px var(--pmd-route-glow) !important;
+}
+
+[role="menu"][aria-label="Tindakan cepat"] button:not([class*="bg-brand"]):hover {
+  background: var(--pmd-route-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--pmd-route-border);
+}
+
+/* Visible focus remains stronger than decorative glow. */
+a[data-pmd-feature-link="true"]:focus-visible,
+button[data-pmd-assistive="true"]:focus-visible,
+[role="menu"][aria-label="Tindakan cepat"] button:focus-visible {
+  outline: 3px solid var(--pmd-route-focus) !important;
+  outline-offset: 3px;
+}
+
+/* Low-memory / touch devices keep the identity but drop expensive blur/glow. */
+html.pmd-low-memory button[data-pmd-assistive="true"] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html.pmd-low-memory button[data-pmd-assistive="true"]::before {
+  filter: none;
+  opacity: .16;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button[data-pmd-assistive="true"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  button[data-pmd-assistive="true"]::before {
+    filter: none;
+    opacity: .16;
+  }
+
+  aside.sticky[class*="h-screen"] nav a[data-pmd-feature-link="true"] svg,
+  .drawer-in nav a[data-pmd-feature-link="true"] svg,
+  [data-pintasan] a[data-pmd-feature-link="true"] svg {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a[data-pmd-feature-link="true"],
+  a[data-pmd-feature-link="true"]::before,
+  a[data-pmd-feature-link="true"] svg,
+  button[data-pmd-assistive="true"],
+  button[data-pmd-assistive="true"]::before {
+    transition-duration: .001ms !important;
+    animation: none !important;
+  }
+}
