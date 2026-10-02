@@ -165,8 +165,8 @@
       "then": { "properties": { "validation": { "properties": { "patientSpecific": { "const": true } } } } }
     },
     {
-      "if": { "properties": { "license": { "properties": { "status": { "const": "BLOCKED" } } } },
-      "then": { "properties": { "runtime": { "properties": { "enabled": { "const": false } } } }
+      "if": { "properties": { "license": { "properties": { "status": { "const": "BLOCKED" } } } } },
+      "then": { "properties": { "runtime": { "properties": { "enabled": { "const": false } } } } }
     }
   ]
 }
