@@ -41,8 +41,10 @@ export function LimfePanel() {
   const pilihWilayah = (id: WilayahLimfe) => {
     setTurBerjalan(false)
     setWilayah(id)
-    const awal = stasiunDiWilayah(id)[0]
-    setTerpilih(awal?.id ?? null)
+    // Tanpa pilihan otomatis: memilih stasiun pertama membuat klik berikutnya pada
+    // stasiun yang sama melepas pilihan (toggle) dan menyalakan model sebelum
+    // pengguna memilih. Tur memulai dari stasiun pertama lewat tombol berikut/Auto tour.
+    setTerpilih(null)
   }
 
   return (
