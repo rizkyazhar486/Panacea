@@ -1,41 +1,29 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
-Updated 2026-09-26 (scheduled autonomous session). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md; sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
+Updated 2026-10-02 (scheduled autonomous session, bookkeeping only — no product code changed). Sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
 
-main_sha: (this session's commit, pushed on top of db38eb3 — see git log for exact SHA)
-working_branch: main
-latest_verified_commit: this session's commit
+base: main at 9416eed (#2208). Work branch: claude/pensive-heisenberg-2rfs27. Git flow per CLAUDE.md §5–§6 (branch + PR; no direct push to main).
 
-completed_this_session:
-- closed MATURITY_REGISTRY known_gap `link_code_ui_for_doctor_not_browser_verified` on `clinical.patient_review` (AI-EMR + longitudinal clinician workflow lane, the tier right after hard-safety/clinical-validation-enablement per the balanced gap closure ordering). The doctor-facing `TerbitkanKodeTaut` component (`src/components/TautanRekamPraktik.tsx`) could issue a one-time link code but had no way to see whether the practice patient record was already linked to a patient account, and no unlink control — only the patient side (`TebusKodeTaut`) had that. `GET /api/clinical/links` only ever returns the caller's own links, so a clinician had no status signal at all.
-- added `statusTautanPasien()` (`server/src/aksesKlinis.ts`) and `GET /api/clinical/patient/:patientId/link-status` (clinician/owner only, 403 otherwise), returning `{ linked, linkedAt }` **without** the patient's `userId` — deliberately preserving the existing privacy rule that a link is explicit and patient-approved, so the doctor learns only that a link exists, not which account.
-- wired the doctor UI to fetch that status on mount and show "Linked to the patient's own account · since <date>" with an Unlink button when linked, falling back to the existing create-code flow when not.
-- verified end-to-end against a real running server (dev-login owner/doctor/patient, owner verifies doctor STR, doctor creates a practice patient, checks status false, issues a code, patient redeems it, doctor's status flips to true with a timestamp, doctor unlinks, status flips back to false; a patient-role caller gets 403 on the new route) — this is the "browser-verified" evidence the known_gap was named for, done at the HTTP layer since no UI framework/browser harness was already wired in this worktree.
-- extended `server/uji/tautanPasien.uji.ts` (`statusTautanPasien` never leaks `userId`) and `scripts/uji/tautan-rekam-praktik.mts` (route wiring + doctor unlink button source-pattern assertions).
-- updated `governance/MATURITY_REGISTRY.yaml` (`clinical.patient_review.known_gaps` and a dated `change_log` entry).
+correction_to_previous_handoff:
+- The 2026-09-26 handoff listed `anamnesis_and_exam_fields_have_no_per_field_origin` and `self_id_still_email_derived_for_self_records` as open next actions. Both are already closed on main and recorded in `governance/MATURITY_REGISTRY.yaml` (`clinical.patient_review`):
+  - per-field origin: `asalIsian` stamped server-side in `server/src/rekamKlinis.ts` (`terapkanAsalIsian`), proven by `server/uji/asalIsianKlinis.uji.ts` (2026-09-30);
+  - stable self-record id: closed at c3061d41 (`scripts/uji/id-rekam-diri-stabil.mts`).
+- Do not re-implement either.
 
-current_blocker:
-- none in code. This closes one named known_gap; `clinical.patient_review` still carries `self_id_still_email_derived_for_self_records`, `anamnesis_and_exam_fields_have_no_per_field_origin`, `clinician_usability_test` and `clinical_validation` (the last two are externally blocked on real clinicians, per `risk.clinical_validation_external_dependency` — do not fabricate).
+remaining_known_gaps (from MATURITY_REGISTRY.yaml):
+- longitudinal.lab_to_trajectory: photo_ocr_live_vision_accuracy, direct_lab_system_integration, production_deployment_verification, prospective_clinician_validation — all need external data/people/deploy access.
+- care.daily_checkin: reminder_live_push_verification (needs a real subscribed device), clinical_validation.
+- clinical.patient_review: clinician_usability_test, clinical_validation — externally blocked on real clinicians (`risk.clinical_validation_external_dependency`); do not fabricate.
+- body.spatial_clinical_context (PARTIAL): free_text_heuristic_remains_fallback_for_unmarked_systems (software-addressable), usability_test.
+- physiology.canonical_to_model_to_reality: limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract (software-addressable), limited_projection_wiring, no_qualified_clinical_validation.
 
-failing_checks:
-- none. Frontend `npm run uji` 500/500, server `npm run uji` 0 gagal across every suite, `npx tsc -b` clean, all confirmed in this session after a fresh `npm install` in both `/` and `/server`.
+next_exact_action (smallest software-addressable, core lanes before more Body Exposure UI):
+1. `body.spatial_clinical_context`: replace the free-text heuristic fallback for unmarked systems with explicit structured system tags (fail closed to "unknown" when untagged); positive + negative tests per CLAUDE.md §3.1.
+2. or `physiology.canonical_to_model_to_reality`: define the parameter-identifiability contract (which parameters may be personalized from which measured signals; unidentifiable => stays population reference) before any further personalization.
+Re-check `git log --oneline origin/main` and open PRs first; main moves between sessions.
 
-next_exact_action (pick the next software-addressable item per the balanced gap closure order — hard safety → clinical-validation enablement → AI-EMR/longitudinal workflow → weakest core maturity gap):
-- `clinical.patient_review` known_gap `anamnesis_and_exam_fields_have_no_per_field_origin`: per-item provenance already exists for problems/plan/diagnosis (`server/uji/asalButirKlinis.uji.ts`, 2026-09-26); anamnesis and exam fields still have no per-field origin stamp. Extend the same server-stamped-origin pattern to those fields.
-- or `self_id_still_email_derived_for_self_records`: the `self-<email-hash>` scheme is a known collision surface (mitigated by the reverse-lookup check in `bolehAksesPasien`, but not a real identity binding). Consider whether a durable self-record id independent of email is worth the migration cost before touching it — this one is riskier/larger, read `server/src/aksesKlinis.ts` comments first.
-- if both feel too large for one session, re-scan `governance/MATURITY_REGISTRY.yaml` known_gaps across all four core workflows for the next smallest concrete, software-addressable item before touching Body Exposure (VisSim-OS et al. are already ahead of the core-maturity lanes per the 2026-09-25 sequencing override and should not get further disproportionate attention until the core lanes are more level).
-
-files_in_scope:
-- server/src/{aksesKlinis,index}.ts, server/uji/tautanPasien.uji.ts
-- src/components/TautanRekamPraktik.tsx, src/lib/api.ts
-- scripts/uji/tautan-rekam-praktik.mts
-
-do_not_touch:
-- open PRs of other agents unless integrating; re-check `git log --oneline -20 origin/main` for concurrent work before starting, since main moves between sessions.
+current_blocker: none in code for the items above. External blockers (clinicians, live devices, lab-system access) are recorded, not worked around.
 
 verification_commands:
-- npm install   (run in both `/` and `/server` on a fresh worktree, or `npm run uji` false-fails on missing deps)
-- npm run uji   (500/500 at this session's commit)
-- (cd server && npm install && npm run uji)   (0 gagal at this session's commit)
-- npx tsc -b   (clean)
-- HTTP proof for the link-status endpoint (no browser harness needed): start `server` with `ALLOW_DEV_LOGIN=true PANACEA_DATA_FILE=<tmp>`, dev-login as `OWNER_EMAIL` (owner), a doctor and a patient with separate cookie jars, verify the doctor via `POST /api/doctors/:id/verify`, then walk create-patient → link-status(false) → issue-code → redeem → link-status(true) → unlink → link-status(false).
+- npm install (root and `/server`) on a fresh worktree, then `npm run build && npm run uji`, and `cd server && npm run typecheck && npm run uji`.
+- This session changed documentation only; no build/test was run for it.
