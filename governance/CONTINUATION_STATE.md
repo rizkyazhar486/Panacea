@@ -39,3 +39,9 @@ verification_commands:
 - (cd server && npm install && npm run uji)   (0 gagal at this session's commit)
 - npx tsc -b   (clean)
 - HTTP proof for the link-status endpoint (no browser harness needed): start `server` with `ALLOW_DEV_LOGIN=true PANACEA_DATA_FILE=<tmp>`, dev-login as `OWNER_EMAIL` (owner), a doctor and a patient with separate cookie jars, verify the doctor via `POST /api/doctors/:id/verify`, then walk create-patient → link-status(false) → issue-code → redeem → link-status(true) → unlink → link-status(false).
+
+
+## 2026-10-02 (scheduled run)
+- Stale item: `anamnesis_and_exam_fields_have_no_per_field_origin` was already closed 2026-09-30 (asalIsian, server/uji/asalIsianKlinis.uji.ts); clinical.patient_review now only has externally blocked gaps.
+- Added `parameterIdentifiability.ts`: fail-closed gate deciding whether a model parameter may be *considered* for personalization (admissible patient-class observations only, prior range, min count/span, quantified sigma, SNR). Output is a candidate flag; personalization, recalibration and clinical validation stay explicitly false.
+- next_exact_action: have one engine (e.g. cardiovascularIdentityEngine) consume the gate and record population-default-only vs candidate in its provenance.

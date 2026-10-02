@@ -139,6 +139,6 @@ workflows:
       - "scripts/uji/physiological-runtime.mts covers duplicate producers, unit mismatch, unsupported truth classes, missing boundaries, cycles, deterministic provenance and speculative-boundary rejection"
       - "scripts/uji/longitudinal-physiology-pipeline.mts proves canonical state -> oxygen transport -> model-derived Reality Error prediction without writing model output back into patient truth"
       - "adfaf2d5 adds fail-closed Fick oxygen extraction; 93bfdbcc adds bounded cerebral-perfusion coupling, both explicitly model-derived with source-backed educational boundaries"
-    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    known_gaps: [limited_domain_coupling_coverage, parameter_identifiability_gate_not_yet_wired_to_engines, no_qualified_clinical_validation, limited_projection_wiring]  # 2026-10-02: gate contract landed (src/lib/physiology/parameterIdentifiability.ts, scripts/uji/parameter-identifiability.mts); no engine consumes it yet
     next_action: integrate_next_source_backed_couplings_through_shared_runtime_then_project_without_patient_truth_writeback
     last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
