@@ -74,6 +74,11 @@
   background: rgba(255,255,255,.055);
 }
 
+.panacea-intent-action:focus-visible {
+  outline: 3px solid rgba(84,223,130,.85);
+  outline-offset: 2px;
+}
+
 .panacea-intent-action:active {
   transform: scale(.985);
 }
