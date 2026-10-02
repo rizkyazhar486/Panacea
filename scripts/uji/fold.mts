@@ -135,6 +135,9 @@ for (const panel of ['<PanelKoplingMultiSkala />', '<PanelUbiquitin />']) {
   assert.ok(lipatMulti >= 0 && at > lipatMulti && at < penutupMulti, `${panel} lives inside the Multiscale fold`)
 }
 assert.equal((eksposur.match(/<UnifiedHumanSimulationProjector/g) ?? []).length, 1, 'Body Exposure keeps exactly one unified projector')
+// Proyektor Body Exposure: panel kamera "My Body" dilipat satu kata agar 3D tetap fokus tunggal.
+const proyektor = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
+assert.match(proyektor, /<Fold label="Scan"><PersonalAvatarCameraCapture \/><\/Fold>/, 'the projector folds the camera capture panel as Scan')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)

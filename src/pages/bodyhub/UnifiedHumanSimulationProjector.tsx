@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { Fold } from '../../shared/ui/Fold'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
@@ -207,7 +208,7 @@ export default function UnifiedHumanSimulationProjector({
   function renderDomain() {
     switch (domain) {
       case 'personal-avatar':
-        return <PersonalAvatarCameraCapture />
+        return <Fold label="Scan"><PersonalAvatarCameraCapture /></Fold>
       case 'localization':
         return <LokalisasiLesiPanel />
       case 'physiology':
