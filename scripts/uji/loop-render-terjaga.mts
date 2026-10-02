@@ -31,6 +31,7 @@ const PENGGUNA = [
   ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D', 'VolumeDicom3D'].map((n) => `src/components/${n}.tsx`),
   ...['MicroPathologyComparator', 'BodyParts3DDeepAtlas', 'RealisticAnatomyAtlas', 'HighDefinitionCellAtlas', 'HraClinicalAtlas', 'CinematicCellGenomeExplorer', 'MicroPhysiologyExplorer', 'TissuePreview'].map((n) => `src/components/digital-twin/${n}.tsx`),
   'src/pages/discovery/SynapseMicro3DLab.tsx',
+  'src/components/discovery/MentalStateCircuit3DLab.tsx',
 ]
 for (const nama of PENGGUNA) {
   const s = readFileSync(nama, 'utf8').replace(/window\.requestAnimationFrame\(fitVisible\)/, '')

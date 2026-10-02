@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -360,7 +361,7 @@ export function HighDefinitionCellAtlas() {
       })
       environment.dispose()
       pmrem.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement)
       rendererRef.current = null
       cameraRef.current = null

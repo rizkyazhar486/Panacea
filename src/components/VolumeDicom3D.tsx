@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../lib/rendererAman'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ambangKeTekstur, skalaKotak, type VolumeTekstur } from '../lib/volumeTekstur'
 import { lapisanKeUniform, type LapisanVolume } from '../lib/lapisanVolume'
@@ -394,7 +395,7 @@ export function VolumeDicom3D({
       geometry.dispose()
       material.dispose()
       data3d.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentNode === wadah) wadah.removeChild(renderer.domElement)
       materialRef.current = null
     }

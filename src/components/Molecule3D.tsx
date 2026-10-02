@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -218,7 +219,7 @@ export function Molecule3D({ id, tanpaH = false, tinggi = 260 }: Props) {
           Array.isArray(b) ? b.forEach((x) => x.dispose()) : b.dispose()
         }
       })
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement)
     }
   }, [id, tanpaH])

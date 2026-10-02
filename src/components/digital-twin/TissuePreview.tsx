@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { ikatSumbu, pasangTriplanar, setelAnisotropi } from '../../lib/triplanar'
@@ -137,7 +138,7 @@ export function TissuePreview({ tinggi = 240 }: { tinggi?: number }) {
       geometri.dispose()
       for (const m of bahanPer.values()) m.dispose()
       lingkungan.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       wadah.removeChild(renderer.domElement)
     }
   }, [])

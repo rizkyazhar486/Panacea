@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -242,7 +243,7 @@ export function HraClinicalAtlas() {
       controls.dispose()
       environment.dispose()
       pmrem.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement)
       worldRef.current = null
       cameraRef.current = null

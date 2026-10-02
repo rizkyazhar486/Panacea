@@ -25,7 +25,7 @@ if (!registry.includes('no fabricated coordinates or patient inference')) throw 
 for (const term of [
   "from 'three'", 'OrbitControls', 'WebGLRenderer', 'ACESFilmicToneMapping',
   'CapsuleGeometry', 'TubeGeometry', 'TorusKnotGeometry', 'CatmullRomCurve3',
-  'ResizeObserver', 'mulaiLoopTerjaga', 'renderer.dispose()',
+  'ResizeObserver', 'mulaiLoopTerjaga', 'lepasRenderer(renderer)',
   'Chromosome → locus → gene → transcript → variant → protein → pathway',
   'missing coordinates or evidence stay missing rather than being synthesized',
   'Search atlas', 'ALPHA_GENOME_SEED_RECORDS', 'selected.symbol', 'filtered.map',

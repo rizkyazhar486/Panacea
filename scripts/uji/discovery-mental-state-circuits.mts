@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const model = fs.readFileSync('src/lib/discoveryMentalStateCircuits.ts', 'utf8');
-const ui = fs.readFileSync('src/pages/discovery/MentalStateCircuit3DLab.tsx', 'utf8');
+const ui = fs.readFileSync('src/components/discovery/MentalStateCircuit3DLab.tsx', 'utf8');
 
 const requiredModelTerms = [
   'Alzheimer disease: synapse-to-network failure',
@@ -27,8 +27,9 @@ const requiredUiTerms = [
   "from 'three'",
   'OrbitControls',
   'ResizeObserver',
-  'requestAnimationFrame',
-  'renderer.dispose()',
+  'buatRendererAman',
+  'mulaiLoopTerjaga',
+  'lepasRenderer(renderer)',
   'Disease, thought, perception & mental-state circuits',
   'not connectomics, microscopy, receptor-density imaging or patient physiology',
   'Evidence anchors',

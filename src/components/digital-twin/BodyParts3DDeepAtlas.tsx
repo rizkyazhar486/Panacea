@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -245,7 +246,7 @@ function DeepScene({ atlas, load, onProgress, onError }: { atlas: Atlas; load: L
       disposables.forEach((geometry) => geometry.dispose())
       materials.forEach((item) => item.dispose())
       environment.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       mount.innerHTML = ''
     }
   }, [atlas, load, onError, onProgress])

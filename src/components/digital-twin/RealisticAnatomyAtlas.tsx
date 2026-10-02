@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -416,7 +417,7 @@ export function RealisticAnatomyAtlas() {
       renderer.domElement.removeEventListener('pointerup', onUp)
       controls.dispose()
       environment.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement)
       sceneRef.current = null
       rendererRef.current = null

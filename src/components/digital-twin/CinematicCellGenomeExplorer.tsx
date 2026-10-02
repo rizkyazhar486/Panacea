@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { buatRendererAman, tandaiTanpaWebgl } from '../../lib/rendererAman'
+import { buatRendererAman, tandaiTanpaWebgl, lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -563,7 +563,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
       controls.dispose()
       environment.dispose()
       pmrem.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
       scene.clear()
       rootRef.current = null

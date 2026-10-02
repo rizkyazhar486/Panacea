@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { buatRendererAman, tandaiTanpaWebgl } from '../../lib/rendererAman';
+import { buatRendererAman, tandaiTanpaWebgl, lepasRenderer } from '../../lib/rendererAman';
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SYNAPSE_MICRO_BOUNDARY, SYNAPSE_PHASES, SYNAPSE_TRANSMITTERS, type SynapsePhase } from '../../lib/discoverySynapseMicro3D';
@@ -175,7 +175,7 @@ export default function SynapseMicro3DLab() {
           if (Array.isArray(material)) material.forEach((item) => item.dispose()); else material.dispose();
         }
       });
-      renderer.dispose();
+      lepasRenderer(renderer);
       renderer.domElement.remove();
     };
   }, [phaseIndex, transmitterId]);

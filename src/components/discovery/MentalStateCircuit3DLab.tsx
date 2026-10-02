@@ -6,7 +6,9 @@ import {
   DISCOVERY_MENTAL_STATE_CIRCUITS,
   type CircuitNode,
 } from '../../lib/discoveryMentalStateCircuits';
-import { Prosa } from '../../components/Prosa'
+import { buatRendererAman, lepasRenderer, tandaiTanpaWebgl } from '../../lib/rendererAman';
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
+import { Prosa } from '../Prosa'
 
 function nodeColor(kind: CircuitNode['kind']) {
   switch (kind) {
@@ -19,24 +21,84 @@ function nodeColor(kind: CircuitNode['kind']) {
   }
 }
 
+type CircuitModel = (typeof DISCOVERY_MENTAL_STATE_CIRCUITS)[number]
+
+function buildCircuitGraph(model: CircuitModel) {
+  const positions = model.nodes.map((_, index) => {
+    const angle = (index / Math.max(1, model.nodes.length)) * Math.PI * 2;
+    const radius = index === 0 ? 0 : 2.4 + (index % 2) * 0.7;
+    return new THREE.Vector3(
+      Math.cos(angle) * radius,
+      Math.sin(angle * 1.7) * 1.2,
+      Math.sin(angle) * radius * 0.5,
+    );
+  });
+
+  const group = new THREE.Group();
+  model.edges.forEach((edge) => {
+    const fromIndex = model.nodes.findIndex((node) => node.id === edge.from);
+    const toIndex = model.nodes.findIndex((node) => node.id === edge.to);
+    if (fromIndex < 0 || toIndex < 0) return;
+    const geometry = new THREE.BufferGeometry().setFromPoints([positions[fromIndex], positions[toIndex]]);
+    const material = new THREE.LineBasicMaterial({ color: 0x6b7280, transparent: true, opacity: 0.55 });
+    group.add(new THREE.Line(geometry, material));
+  });
+
+  model.nodes.forEach((node, index) => {
+    const geometry = new THREE.SphereGeometry(node.kind === 'mental-state' ? 0.42 : 0.32, 24, 18);
+    const material = new THREE.MeshStandardMaterial({
+      color: nodeColor(node.kind),
+      roughness: 0.45,
+      metalness: 0.05,
+      transparent: true,
+      opacity: node.kind === 'mental-state' ? 0.92 : 0.82,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.copy(positions[index]);
+    group.add(mesh);
+  });
+  return group;
+}
+
+function disposeGraph(group: THREE.Group) {
+  group.traverse((object) => {
+    if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
+      object.geometry.dispose();
+      const material = object.material;
+      if (Array.isArray(material)) material.forEach((item) => item.dispose());
+      else material.dispose();
+    }
+  });
+}
+
+// Rotasi pelan 0,108 rad/s (dulu 0,0018 rad per frame): berbasis waktu agar tidak
+// berlipat pada layar 120 Hz, dan dimatikan bila pengguna meminta gerak berkurang.
+const AUTO_ROTATE_RAD_PER_SECOND = 0.108;
+
 export default function MentalStateCircuit3DLab() {
   const [selectedId, setSelectedId] = useState(DISCOVERY_MENTAL_STATE_CIRCUITS[0].id);
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<THREE.Group | null>(null);
+  const markDirtyRef = useRef<() => void>(() => undefined);
   const selected = useMemo(
     () => DISCOVERY_MENTAL_STATE_CIRCUITS.find((model) => model.id === selectedId) ?? DISCOVERY_MENTAL_STATE_CIRCUITS[0],
     [selectedId],
   );
 
+  // Renderer, kamera, kontrol, dan loop dibuat SEKALI per mount. Dulu efek ini bergantung pada
+  // model terpilih, sehingga setiap pindah tab membuat konteks WebGL baru (batas konteks per halaman).
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
+    const renderer = buatRendererAman({ antialias: true, alpha: true });
+    if (!renderer) return tandaiTanpaWebgl(mount);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    mount.appendChild(renderer.domElement);
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
     camera.position.set(0, 1.8, 9);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mount.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -48,49 +110,31 @@ export default function MentalStateCircuit3DLab() {
     key.position.set(4, 6, 8);
     scene.add(key);
 
-    const positions = selected.nodes.map((_, index) => {
-      const angle = (index / Math.max(1, selected.nodes.length)) * Math.PI * 2;
-      const radius = index === 0 ? 0 : 2.4 + (index % 2) * 0.7;
-      return new THREE.Vector3(
-        Math.cos(angle) * radius,
-        Math.sin(angle * 1.7) * 1.2,
-        Math.sin(angle) * radius * 0.5,
-      );
-    });
+    const stage = new THREE.Group();
+    scene.add(stage);
+    stageRef.current = stage;
 
-    const group = new THREE.Group();
-    scene.add(group);
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    let dirty = true;
+    let last = performance.now();
+    const markDirty = () => { dirty = true; };
+    markDirtyRef.current = markDirty;
+    controls.addEventListener('change', markDirty);
+    const onContextRestored = () => { dirty = true; };
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored);
 
-    selected.edges.forEach((edge) => {
-      const fromIndex = selected.nodes.findIndex((node) => node.id === edge.from);
-      const toIndex = selected.nodes.findIndex((node) => node.id === edge.to);
-      if (fromIndex < 0 || toIndex < 0) return;
-      const points = [positions[fromIndex], positions[toIndex]];
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({ color: 0x6b7280, transparent: true, opacity: 0.55 });
-      group.add(new THREE.Line(geometry, material));
-    });
-
-    selected.nodes.forEach((node, index) => {
-      const geometry = new THREE.SphereGeometry(node.kind === 'mental-state' ? 0.42 : 0.32, 24, 18);
-      const material = new THREE.MeshStandardMaterial({
-        color: nodeColor(node.kind),
-        roughness: 0.45,
-        metalness: 0.05,
-        transparent: true,
-        opacity: node.kind === 'mental-state' ? 0.92 : 0.82,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.copy(positions[index]);
-      group.add(mesh);
-    });
-
-    let raf = 0;
-    const animate = () => {
-      controls.update();
-      group.rotation.y += 0.0018;
+    const frame = () => {
+      const now = performance.now();
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      const moved = controls.update();
+      if (!reducedMotion) {
+        stage.rotation.y += AUTO_ROTATE_RAD_PER_SECOND * dt;
+        dirty = true;
+      }
+      if (!dirty && !moved) return;
+      dirty = false;
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(animate);
     };
 
     const resize = () => {
@@ -99,26 +143,37 @@ export default function MentalStateCircuit3DLab() {
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      dirty = true;
     };
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
     resize();
-    animate();
+    const loop = mulaiLoopTerjaga(mount, frame);
 
     return () => {
-      cancelAnimationFrame(raf);
+      loop.hentikan();
       observer.disconnect();
+      controls.removeEventListener('change', markDirty);
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+      markDirtyRef.current = () => undefined;
       controls.dispose();
-      group.traverse((object) => {
-        if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
-          object.geometry.dispose();
-          const material = object.material;
-          if (Array.isArray(material)) material.forEach((item) => item.dispose());
-          else material.dispose();
-        }
-      });
-      renderer.dispose();
+      stage.children.slice().forEach((child) => { stage.remove(child); if (child instanceof THREE.Group) disposeGraph(child); });
+      stageRef.current = null;
+      lepasRenderer(renderer);
       renderer.domElement.remove();
+    };
+  }, []);
+
+  // Pindah model hanya mengganti isi panggung; konteks WebGL tidak dibuat ulang.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const graph = buildCircuitGraph(selected);
+    stage.add(graph);
+    markDirtyRef.current();
+    return () => {
+      stage.remove(graph);
+      disposeGraph(graph);
     };
   }, [selected]);
 

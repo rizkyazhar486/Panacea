@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../lib/rendererAman'
 import { layarBerubah, type TitikLayar } from '../lib/layarBerubah'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -154,7 +155,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       renderer.domElement.removeEventListener('pointerdown', stopAuto)
       controls.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       container.removeChild(renderer.domElement)
     }
   }, [organ])

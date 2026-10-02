@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
@@ -229,7 +230,7 @@ export function LesiNeuro3D({ tingkat, sisi, tinggi = 280 }: LesiNeuro3DProps) {
       ro.disconnect()
       controls.dispose()
       if (grup) scene.remove(grup)
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
     // Sengaja sekali jalan: perubahan tingkat/sisi ditangani efek di bawah.

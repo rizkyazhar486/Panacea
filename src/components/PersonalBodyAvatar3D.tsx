@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
+import { buatRendererAman, tandaiTanpaWebgl, lepasRenderer } from '../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -443,7 +443,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
           material.dispose()
         })
       })
-      renderer.dispose()
+      lepasRenderer(renderer)
       if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement)
     }
   }, [input, bentuk])

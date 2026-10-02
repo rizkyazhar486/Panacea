@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -593,7 +594,7 @@ export function MicroPhysiologyExplorer() {
       starMaterial.dispose()
       environment.dispose()
       pmrem.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       mount.innerHTML = ''
     }
   }, [topicKey, shockMode, playing])

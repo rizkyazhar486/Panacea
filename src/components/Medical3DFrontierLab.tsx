@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
+import { buatRendererAman, tandaiTanpaWebgl, lepasRenderer } from '../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Card, SectionTitle } from './ui'
@@ -249,7 +249,7 @@ export function Medical3DFrontierLab() {
       observer.disconnect()
       controls.dispose()
       clearScene(scene)
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
   }, [mode])

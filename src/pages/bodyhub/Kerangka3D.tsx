@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -214,7 +215,7 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
         const m = o as THREE.Mesh
         if (m.isMesh) m.geometry.dispose()
       })
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
     // Sengaja dijalankan sekali: pilihan diterapkan lewat terapkanRef.

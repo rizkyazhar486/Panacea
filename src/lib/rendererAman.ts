@@ -24,3 +24,15 @@ export function tandaiTanpaWebgl(wadah: HTMLElement, pesan = '3D view unavailabl
   wadah.appendChild(p)
   return () => p.remove()
 }
+
+/**
+ * Melepas GPU renderer: sumber daya di dalam konteks DAN konteks WebGL-nya. dispose() saja tidak cukup —
+ * konteks baru lepas saat kanvas di-GC, jadi tiap mount/unmount menyisakan konteks zombi dan browser
+ * (batas ±16, lebih rendah di iOS) mulai membuang konteks TERTUA, sering viewer utama yang masih dipakai.
+ * Pencopotan kanvas dari DOM tetap urusan pemanggil. Tidak pernah melempar: dipanggil dari cleanup efek.
+ */
+export function lepasRenderer(renderer: THREE.WebGLRenderer): void {
+  renderer.renderLists.dispose()
+  renderer.dispose()
+  try { renderer.forceContextLoss() } catch { /* konteks sudah hilang */ }
+}

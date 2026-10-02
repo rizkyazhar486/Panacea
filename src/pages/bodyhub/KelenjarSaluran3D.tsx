@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { muatAtlas, namaAtlas, type AtlasDimuat } from '../../lib/anatomy/pemuatAtlas'
@@ -207,7 +208,7 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
       ro.disconnect()
       controls.dispose()
       for (const g of grup) scene.remove(g)
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

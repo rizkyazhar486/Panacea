@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../lib/rendererAman'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ambilIrisanMpr, jendelakanMpr, type IrisanMpr, type VolumeMpr } from '../lib/dicomMpr'
 import {
@@ -148,7 +149,7 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
       controls.dispose()
       disposeGroup(content)
       scene.remove(content)
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
       rendererRef.current = null
       sceneRef.current = null

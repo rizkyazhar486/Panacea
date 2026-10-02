@@ -13,7 +13,10 @@ assert.match(renderer, /pointercancel/, 'Touch cancellation must clear selection
 assert.match(renderer, /webglcontextlost/, 'WebGL context loss must fail closed')
 assert.match(renderer, /bahanMilikViewport/, 'Viewport-owned cloned materials must be tracked')
 assert.match(renderer, /bahan\.dispose\(\)/, 'Viewport-owned cloned materials must be disposed')
-assert.match(renderer, /renderLists\.dispose\(\)/, 'Renderer lists must be disposed')
+// Daftar render dibuang lewat lepasRenderer (yang juga melepas konteks WebGL); jaminan aslinya dijaga di dua sisi.
+assert.match(renderer, /lepasRenderer\(renderer\)/, 'Renderer must be released through the shared helper')
+const helper = await readFile(new URL('../../src/lib/rendererAman.ts', import.meta.url), 'utf8')
+assert.match(helper, /export function lepasRenderer[\s\S]*renderLists\.dispose\(\)[\s\S]*forceContextLoss\(\)/, 'Renderer lists must be disposed and the WebGL context released')
 assert.match(renderer, /aria-label="Interactive source-backed lymphatic anatomy"/, '3D region must have an accessible name')
 assert.match(renderer, /role="alert"/, 'Fatal 3D state must be announced')
 assert.match(panel, /Limfe3D/, 'The source-backed 3D must remain reachable from the lymphatic panel')

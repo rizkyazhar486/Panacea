@@ -5,9 +5,10 @@ import {
   evidenceReadiness,
   type DiscoveryMode,
 } from '../../lib/discoveryWorkbench'
+import { OnDemandDisclosure } from '../../shared/ui/OnDemandDisclosure'
 
 const SynapseMicro3DLab = lazy(() => import('../../pages/discovery/SynapseMicro3DLab'))
-const MentalStateCircuit3DLab = lazy(() => import('../../pages/discovery/MentalStateCircuit3DLab'))
+const MentalStateCircuit3DLab = lazy(() => import('../discovery/MentalStateCircuit3DLab'))
 
 const MODE_COPY: Record<DiscoveryMode, { label: string; subtitle: string }> = {
   discovery: { label: 'Discovery', subtitle: 'Competing hypotheses, causal structure, falsification and missing evidence.' },
@@ -155,25 +156,29 @@ export function DiscoveryWorkbench() {
       )}
 
       {challenge.id === 'cross-scale-neurodegeneration' && (
-        <details className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3">
-          <summary className="cursor-pointer text-xs font-black text-brand">Open visualization bridge: synapse microenvironment 3D</summary>
+        <OnDemandDisclosure
+          className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3"
+          summary={<summary className="cursor-pointer text-xs font-black text-brand">Open visualization bridge: synapse microenvironment 3D</summary>}
+        >
           <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">This loads the existing Panacea schematic 3D synapse model only on demand. It remains an educational spatial encoding, not microscopy, connectomics, molecular dynamics or measured patient physiology.</p>
           <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
             <Suspense fallback={<div className="p-4 text-xs text-neutral-500" role="status" aria-live="polite">Loading 3D synapse workbench…</div>}>
               <SynapseMicro3DLab />
             </Suspense>
           </div>
-        </details>
+        </OnDemandDisclosure>
       )}
       {challenge.id === 'cross-scale-neurodegeneration' && (
-        <details className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3">
-          <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open circuit bridge: neurodegeneration and mental-state networks 3D</summary>
+        <OnDemandDisclosure
+          className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3"
+          summary={<summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open circuit bridge: neurodegeneration and mental-state networks 3D</summary>}
+        >
           <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
             <Suspense fallback={<div className="p-4 text-xs text-neutral-500" role="status" aria-live="polite">Loading circuit model…</div>}>
               <MentalStateCircuit3DLab />
             </Suspense>
           </div>
-        </details>
+        </OnDemandDisclosure>
       )}
     </section>
   )

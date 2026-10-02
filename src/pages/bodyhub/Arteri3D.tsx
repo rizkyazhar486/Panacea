@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -248,7 +249,7 @@ export function Arteri3D({ terpilih, onPilih, onTerikat, tinggi = 320 }: Arteri3
       ro.disconnect()
       controls.dispose()
       if (grup) scene.remove(grup)
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

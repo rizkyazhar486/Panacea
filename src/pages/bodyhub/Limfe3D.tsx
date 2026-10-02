@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { lepasRenderer } from '../../lib/rendererAman'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
@@ -275,8 +276,7 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
       controls.dispose()
       if (grup) scene.remove(grup)
       for (const bahan of bahanMilikViewport) bahan.dispose()
-      renderer.renderLists.dispose()
-      renderer.dispose()
+      lepasRenderer(renderer)
       renderer.domElement.remove()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

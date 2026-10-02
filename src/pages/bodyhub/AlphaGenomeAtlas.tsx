@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { buatRendererAman } from '../../lib/rendererAman';
+import { buatRendererAman, lepasRenderer } from '../../lib/rendererAman';
 import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
@@ -168,7 +168,7 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
           if (Array.isArray(material)) material.forEach((item) => item.dispose()); else material.dispose();
         }
       });
-      renderer.dispose();
+      lepasRenderer(renderer);
       renderer.domElement.remove();
     };
   }, [record]);

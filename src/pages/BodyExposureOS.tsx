@@ -3,7 +3,8 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './bodyhub/UnifiedHumanSimulationProjector'
 import { BodyExposurePatientOverlay } from '../components/BodyExposurePatientOverlay'
 import { SinyalPribadiDiTubuh } from '../components/SinyalPribadiDiTubuh'
-import { BodyExplorer } from './BodyExplorer'
+import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
+import { OnDemandDisclosure } from '../shared/ui/OnDemandDisclosure'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import './bodyExposureOS.css'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
@@ -11,6 +12,9 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))
 const PanelUbiquitin = lazy(() => import('../components/PanelUbiquitin'))
+// Penjelajah lama membawa viewer Body3D (konteks WebGL + berkas GLB puluhan MB). Ia dimuat
+// hanya saat panel "Deep reference labs" dibuka, bukan pada setiap kunjungan Body Exposure.
+const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -233,18 +237,26 @@ export function BodyExposureOS() {
         </div>
       </div>
 
-      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
-        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
-          <span>Deep reference labs</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
-        </summary>
+      <OnDemandDisclosure
+        className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35"
+        summary={(
+          <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
+            <span>Deep reference labs</span>
+            <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
+          </summary>
+        )}
+      >
         <div
           id="body-exposure-core"
           className="body-exposure-os__core border-t border-white/[.08] p-2 sm:p-3"
         >
-          <BodyExplorer />
+          <FeatureErrorBoundary featureName="Deep reference labs">
+            <Suspense fallback={<div role="status" className="grid min-h-56 place-items-center text-xs font-bold text-white/40">Loading deep reference labs…</div>}>
+              <BodyExplorer />
+            </Suspense>
+          </FeatureErrorBoundary>
         </div>
-      </details>
+      </OnDemandDisclosure>
     </section>
   )
 }
