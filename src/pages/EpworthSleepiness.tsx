@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Epworth Sleepiness Scale (ESS) — Johns, M.W. (1991), Sleep, 14(6):540-545.
@@ -39,8 +40,9 @@ export function EpworthSleepiness() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Epworth Sleepiness Scale" subtitle="Validated measure of excessive daytime sleepiness (Johns, 1991)" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Epworth Sleepiness Scale" subtitle="Published daytime-sleepiness screen (Johns, 1991) — not a clinically validated Panacea decision" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Seberapa besar kemungkinan Anda terkantuk atau tertidur pada tiap keadaan di bawah — bukan sekadar merasa lelah, melainkan benar-benar terlelap? Nilailah menurut kebiasaan hidup Anda belakangan ini, meskipun sebagian keadaan itu belum Anda alami akhir-akhir ini.</Prosa>
+        <BatasKlaimKesehatan permukaan="screening.epworth" />
       </Card>
 
       {SITUATIONS.map((text, qi) => (

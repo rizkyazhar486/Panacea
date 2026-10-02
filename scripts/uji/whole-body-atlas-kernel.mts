@@ -51,6 +51,7 @@ const airwayPath = traceAtlasPath(COMPLETE_WHOLE_BODY_ATLAS, 'resp:segment:r-s1'
 assert.ok(airwayPath)
 assert.deepEqual(airwayPath.nodeIds, [
   'resp:segment:r-s1',
+  'resp:right-upper-lobar-bronchus',
   'resp:right-main-bronchus',
   'resp:carina',
   'resp:trachea',

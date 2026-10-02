@@ -20,7 +20,7 @@ for (const marker of [
   'AI Chatbot → AI-EMR',
   'Consultations, Pharmacy & Facilities',
   'Medical Knowledge Hub',
-  'Certified AI-EMR',
+  'AI-EMR for clinicians',
   'Customer / Patient',
   'Contributor',
   'Verifier',

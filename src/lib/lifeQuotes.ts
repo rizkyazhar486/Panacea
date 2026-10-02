@@ -47,3 +47,28 @@ export function kutipanHariIni(tanggal: Date = new Date()): LifeQuote {
   const hariKe = Math.floor((Date.UTC(tanggal.getUTCFullYear(), tanggal.getUTCMonth(), tanggal.getUTCDate()) - mulaiTahun) / 86_400_000)
   return KUTIPAN_HIDUP[hariKe % KUTIPAN_HIDUP.length]
 }
+
+// Berapa lama spanduknya pantas menutupi halaman.
+//
+// Komentar di DailyQuoteBanner selalu menjanjikan spanduk ini menyingkir
+// "setelah waktu baca yang wajar", tetapi pengatur waktunya tidak pernah ada:
+// satu-satunya jalan keluar adalah menekan ×. Diukur di peramban pada 390x844,
+// kartunya menutupi 290 px — 34% dari layar pertama — di SETIAP halaman, tanpa
+// batas waktu. Halaman yang baru dibuka menyambut pemakainya dengan kutipan
+// yang menutupi judul halamannya sendiri.
+//
+// Kecepatan bacanya sengaja lambat (160 kata/menit; pembaca dewasa biasanya
+// 200-250) karena kutipan dibaca lebih pelan daripada prosa biasa, dan karena
+// menyingkir terlalu cepat lebih buruk daripada terlalu lambat. Ditambah waktu
+// untuk baris atribusi, lalu dibatasi supaya kutipan sangat pendek tetap
+// sempat dibaca dan kutipan sangat panjang tidak menyandera layar.
+export const BACA_KATA_PER_MENIT = 160
+export const BACA_MIN_MS = 9_000
+export const BACA_MAKS_MS = 20_000
+
+export function durasiBacaMs(teks: string): number {
+  const kata = teks.trim().split(/\s+/).filter(Boolean).length
+  if (kata === 0) return BACA_MIN_MS
+  const ms = (kata / BACA_KATA_PER_MENIT) * 60_000 + 2_500
+  return Math.min(BACA_MAKS_MS, Math.max(BACA_MIN_MS, Math.round(ms)))
+}

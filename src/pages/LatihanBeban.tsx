@@ -5,6 +5,7 @@ import {
   ambilSesi, simpanSesi, hapusSesi, volumeSesi, rekorPerGerakan, volumeMingguan, epley,
   type SesiAngkat, type SetAngkat,
 } from '../lib/angkatBeban'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Latihan beban.
@@ -57,6 +58,7 @@ export function LatihanBeban() {
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
       <SectionTitle icon={<IconRun size={20} />} title="Strength Training Log" subtitle="Sets, reps, weight — and what can honestly be concluded from them" />
+      <BatasKlaimKesehatan permukaan="performance.strength-log" />
 
       <Card className="!p-3">
         <h2 className="text-[13px] font-black text-ink dark:text-white">Log a session</h2>

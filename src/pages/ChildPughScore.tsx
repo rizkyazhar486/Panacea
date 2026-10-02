@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child-Pugh Score — Pugh, R.N.H., et al. (1973), Br J Surg, 60(8):646-649
@@ -69,6 +70,7 @@ export function ChildPughScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Child-Pugh Score" subtitle="Cirrhosis severity & surgical risk (Pugh et al. 1973)" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Five criteria, 1-3 points each (5-15 total). Used alongside MELD-Na for prognosis, and
           specifically for surgical risk stratification and drug-dosing decisions in cirrhosis.

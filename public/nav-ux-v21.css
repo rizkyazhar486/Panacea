@@ -1,0 +1,377 @@
+/* Panaceamed navigation UX v21
+   Scope: app shell navigation only — top bar, desktop sidebar, mobile drawer,
+   and the horizontal quick-navigation strip. No route, data, or feature logic. */
+
+:root {
+  --pmd-nav-border: rgba(15, 23, 42, .09);
+  --pmd-nav-surface: rgba(250, 252, 253, .90);
+  --pmd-nav-surface-strong: rgba(255, 255, 255, .96);
+  --pmd-nav-active: rgba(0, 191, 99, .11);
+  --pmd-nav-active-border: rgba(0, 191, 99, .24);
+  --pmd-nav-focus: rgba(0, 191, 99, .62);
+  --pmd-nav-shadow: 0 10px 32px rgba(15, 23, 42, .08);
+}
+
+.dark {
+  --pmd-nav-border: rgba(255, 255, 255, .10);
+  --pmd-nav-surface: rgba(5, 9, 16, .91);
+  --pmd-nav-surface-strong: rgba(8, 13, 22, .97);
+  --pmd-nav-active: rgba(0, 210, 255, .10);
+  --pmd-nav-active-border: rgba(76, 220, 255, .24);
+  --pmd-nav-focus: rgba(82, 224, 255, .72);
+  --pmd-nav-shadow: 0 16px 42px rgba(0, 0, 0, .30);
+}
+
+/* ── Top navigation ─────────────────────────────────────────────────────── */
+header.kaca {
+  position: sticky;
+  top: 0;
+  z-index: 50 !important;
+  isolation: isolate;
+  min-height: 64px;
+  padding-top: max(.7rem, env(safe-area-inset-top));
+  padding-right: max(.85rem, env(safe-area-inset-right));
+  padding-bottom: .7rem;
+  padding-left: max(.85rem, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--pmd-nav-border) !important;
+  background: var(--pmd-nav-surface) !important;
+  box-shadow: var(--pmd-nav-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+/* A restrained spectral edge gives the shell identity without tinting the
+   entire glass surface or reducing text contrast. */
+header.kaca::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: 8%;
+  bottom: -1px;
+  left: 8%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(0, 210, 255, .42),
+    rgba(103, 80, 255, .38),
+    rgba(226, 79, 255, .28),
+    rgba(255, 186, 73, .24),
+    transparent);
+  opacity: .78;
+}
+
+header.kaca > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: .35rem;
+}
+
+header.kaca > div:last-child {
+  flex: 0 1 auto;
+  gap: .35rem;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+header.kaca > div:last-child::-webkit-scrollbar {
+  display: none;
+}
+
+header.kaca h1 {
+  min-width: 0;
+  max-width: min(34vw, 28rem);
+  letter-spacing: -.018em;
+  line-height: 1.15;
+  text-wrap: nowrap;
+}
+
+/* Every primary navigation control meets the 44×44 CSS-pixel touch target. */
+header.kaca .header-icon-btn,
+header.kaca > button[aria-label^="Search"],
+header.kaca button[aria-label^="Notifications"],
+header.kaca button[aria-label="Toggle theme"],
+header.kaca button[aria-label="Log Out"] {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255, 255, 255, .58);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .62);
+  transition: transform 150ms ease, background-color 150ms ease,
+    border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.dark header.kaca .header-icon-btn,
+.dark header.kaca > button[aria-label^="Search"],
+.dark header.kaca button[aria-label^="Notifications"],
+.dark header.kaca button[aria-label="Toggle theme"] {
+  border-color: rgba(255, 255, 255, .10) !important;
+  background: rgba(255, 255, 255, .055) !important;
+  color: rgba(244, 248, 252, .94) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .055), 0 5px 18px rgba(0, 0, 0, .12);
+}
+
+header.kaca .header-icon-btn:hover,
+header.kaca > button[aria-label^="Search"]:hover,
+header.kaca button[aria-label^="Notifications"]:hover,
+header.kaca button[aria-label="Toggle theme"]:hover {
+  border-color: var(--pmd-nav-active-border) !important;
+  background: var(--pmd-nav-active) !important;
+  color: var(--brand, #00bf63) !important;
+}
+
+header.kaca .header-icon-btn:active,
+header.kaca > button[aria-label^="Search"]:active,
+header.kaca button[aria-label^="Notifications"]:active,
+header.kaca button[aria-label="Toggle theme"]:active {
+  transform: scale(.94);
+}
+
+/* Logout already exists in the mobile drawer. Removing the duplicate header
+   target gives the title and search/bell pair breathing room on 320–430px. */
+@media (max-width: 1023px) {
+  header.kaca button[aria-label="Log Out"] {
+    display: none !important;
+  }
+}
+
+/* ── Desktop sidebar ───────────────────────────────────────────────────── */
+aside.sticky[class*="h-screen"] {
+  top: 0;
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  border-color: var(--pmd-nav-border) !important;
+  background: var(--pmd-nav-surface) !important;
+  box-shadow: 12px 0 40px rgba(15, 23, 42, .035);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.dark aside.sticky[class*="h-screen"] {
+  background: var(--pmd-nav-surface) !important;
+  box-shadow: 14px 0 44px rgba(0, 0, 0, .22);
+}
+
+aside.sticky[class*="h-screen"] nav {
+  padding-right: .2rem;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 132, 148, .28) transparent;
+}
+
+aside.sticky[class*="h-screen"] nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+aside.sticky[class*="h-screen"] nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(120, 132, 148, .28);
+}
+
+aside.sticky[class*="h-screen"] nav a,
+aside.sticky[class*="h-screen"] nav button,
+aside.sticky[class*="h-screen"] > button {
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+aside.sticky[class*="h-screen"] nav a {
+  position: relative;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease, border-color 150ms ease,
+    color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+aside.sticky[class*="h-screen"] nav a[aria-current="page"] {
+  border-color: var(--pmd-nav-active-border) !important;
+  background: linear-gradient(105deg, var(--pmd-nav-active), rgba(0, 210, 255, .035)) !important;
+  box-shadow: inset 3px 0 0 rgba(0, 191, 99, .82), 0 5px 18px rgba(0, 191, 99, .055);
+}
+
+.dark aside.sticky[class*="h-screen"] nav a[aria-current="page"] {
+  box-shadow: inset 3px 0 0 rgba(0, 210, 255, .82), 0 8px 24px rgba(0, 0, 0, .14);
+  color: #f7fbff !important;
+}
+
+aside.sticky[class*="h-screen"] nav a:hover {
+  transform: translateX(2px);
+}
+
+/* ── Mobile drawer ─────────────────────────────────────────────────────── */
+.drawer-in {
+  width: min(88vw, 22rem) !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-right: 1px solid var(--pmd-nav-border) !important;
+  background: var(--pmd-nav-surface-strong) !important;
+  box-shadow: 24px 0 70px rgba(15, 23, 42, .22) !important;
+  overscroll-behavior: contain;
+}
+
+.dark .drawer-in {
+  background: var(--pmd-nav-surface-strong) !important;
+  box-shadow: 28px 0 80px rgba(0, 0, 0, .52) !important;
+}
+
+.drawer-in > div:first-child {
+  min-height: 68px;
+}
+
+.drawer-in nav {
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+.drawer-in nav::-webkit-scrollbar {
+  display: none;
+}
+
+.drawer-in nav a,
+.drawer-in nav button,
+.drawer-in > div button,
+.drawer-in > div a {
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.drawer-in nav a {
+  border: 1px solid transparent;
+}
+
+.drawer-in nav a[aria-current="page"] {
+  border-color: var(--pmd-nav-active-border) !important;
+  background: linear-gradient(105deg, var(--pmd-nav-active), rgba(103, 80, 255, .035)) !important;
+  box-shadow: inset 3px 0 0 rgba(0, 191, 99, .80);
+}
+
+.dark .drawer-in nav a[aria-current="page"] {
+  box-shadow: inset 3px 0 0 rgba(0, 210, 255, .82);
+  color: #f7fbff !important;
+}
+
+/* ── Mobile quick-navigation strip ─────────────────────────────────────── */
+[data-pintasan].kaca {
+  border-bottom: 1px solid var(--pmd-nav-border) !important;
+  background: var(--pmd-nav-surface) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+}
+
+[data-pintasan] > div:first-child {
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-left: max(.75rem, env(safe-area-inset-left));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
+}
+
+[data-pintasan] > div:first-child::-webkit-scrollbar {
+  display: none;
+}
+
+[data-pintasan] a {
+  min-height: 44px !important;
+  scroll-snap-align: start;
+  border: 1px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+[data-pintasan] a[aria-current="page"] {
+  border-color: var(--pmd-nav-active-border) !important;
+  box-shadow: 0 5px 18px rgba(0, 191, 99, .10);
+}
+
+/* ── Keyboard focus + narrow-screen fitting ───────────────────────────── */
+header.kaca button:focus-visible,
+aside.sticky[class*="h-screen"] a:focus-visible,
+aside.sticky[class*="h-screen"] button:focus-visible,
+.drawer-in a:focus-visible,
+.drawer-in button:focus-visible,
+[data-pintasan] a:focus-visible {
+  outline: 3px solid var(--pmd-nav-focus) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(0, 191, 99, .08);
+}
+
+@media (max-width: 639px) {
+  header.kaca {
+    gap: .35rem !important;
+    min-height: 62px;
+    padding-right: max(.65rem, env(safe-area-inset-right));
+    padding-left: max(.65rem, env(safe-area-inset-left));
+  }
+
+  header.kaca h1 {
+    max-width: clamp(5.25rem, 27vw, 8.5rem);
+    font-size: .95rem !important;
+  }
+
+  header.kaca > div:last-child {
+    max-width: 42vw;
+  }
+}
+
+@media (max-width: 359px) {
+  header.kaca h1 {
+    max-width: 4.6rem;
+    font-size: .875rem !important;
+  }
+
+  header.kaca .header-icon-btn,
+  header.kaca > button[aria-label^="Search"],
+  header.kaca button[aria-label^="Notifications"] {
+    min-width: 42px !important;
+    min-height: 42px !important;
+    width: 42px !important;
+    height: 42px !important;
+    flex-basis: 42px;
+  }
+}
+
+/* On touch/low-memory devices, shell-performance-v20 intentionally removes
+   live backdrop filters. These opaque fallbacks preserve the same hierarchy. */
+@media (hover: none) and (pointer: coarse) {
+  header.kaca,
+  [data-pintasan].kaca {
+    background: rgba(250, 252, 253, .965) !important;
+  }
+
+  .dark header.kaca,
+  .dark [data-pintasan].kaca {
+    background: rgba(5, 9, 16, .975) !important;
+  }
+}
+
+html.pmd-low-memory header.kaca,
+html.pmd-low-memory [data-pintasan].kaca {
+  background: rgba(250, 252, 253, .975) !important;
+}
+
+html.dark.pmd-low-memory header.kaca,
+html.dark.pmd-low-memory [data-pintasan].kaca {
+  background: rgba(5, 9, 16, .985) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header.kaca *,
+  aside.sticky[class*="h-screen"] *,
+  .drawer-in *,
+  [data-pintasan] * {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+
+  aside.sticky[class*="h-screen"] nav a:hover {
+    transform: none;
+  }
+}

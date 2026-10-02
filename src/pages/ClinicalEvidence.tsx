@@ -11,6 +11,7 @@ import {
   fetchRelatedArticles, type PubmedArticle,
   AUDIENS, type Audiens,
 } from '../lib/evidence'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Evidence — ask a clinical question, get a structured, graded,
@@ -136,6 +137,7 @@ export function ClinicalEvidence() {
           title="Clinical Evidence"
           subtitle="Ask a clinical question — the answer is structured, graded by evidence, and names its sources. It applies in any country, and every answer links to the primary literature so you can check it yourself."
         />
+        <BatasKlaimKesehatan permukaan="care.clinical-evidence" />
         {!evidenceAvailable() && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
             AI synthesis isn't configured on this deployment — the verification links still work for searching the literature directly.

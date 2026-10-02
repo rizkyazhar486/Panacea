@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Vaccine / Immunization Schedule Tracker — log your last dose of each common
@@ -85,6 +86,7 @@ export function VaccineTracker() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconShield size={20} />} title="Vaccine / Immunization Tracker" subtitle="Record your last dose, see when the next one is due" />
+        <BatasKlaimKesehatan permukaan="wellness.vaccine-tracker" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enter the date of the last dose for each vaccine — for ones given on a fixed interval (influenza, Tdap, COVID boosters), you'll see the due date. Multi-dose series (MMR, HPV, herpes zoster, pneumococcal, hepatitis B) aren't routine repeats, so track series status with a healthcare provider, not via a countdown here.</Prosa>
       </Card>
 

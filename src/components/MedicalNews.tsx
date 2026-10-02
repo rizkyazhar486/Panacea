@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, type LiveNewsItem } from '../lib/api'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface Brief {
   tag: string
@@ -123,6 +124,7 @@ export function MedicalNews() {
         <div className="max-w-2xl">
           <div className="text-[10px] font-black uppercase tracking-[.18em] text-[#f0d68a]">Health briefing</div>
           <h2 className="mt-3 text-3xl font-black tracking-[-.035em] text-white sm:text-5xl">Know what is live. Know what is evergreen.</h2>
+          <BatasKlaimKesehatan permukaan="clinical.medical-news" />
           <p className="mt-3 text-sm leading-relaxed text-white/60">PanaceaMed does not disguise editorial summaries as current news. Live headlines show their publisher and recency; if the upstream feed briefly fails, the last successful headlines remain visible and are explicitly marked as cached.</p>
         </div>
         <div className={`rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.14em] ${fresh ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200' : usingCached ? 'border-amber-200/20 bg-amber-200/10 text-amber-100' : 'border-white/10 bg-white/[.04] text-white/55'}`}>

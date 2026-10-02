@@ -1,0 +1,39 @@
+/* Panacea global premium interaction layer — progressive enhancement only. */
+:root{--px-ease:cubic-bezier(.22,1,.36,1);--px-glass:rgba(12,16,24,.46);--px-line:rgba(255,255,255,.105);--px-glow:rgba(106,214,255,.18)}
+@keyframes px-enter{from{opacity:0;transform:translate3d(0,10px,0) scale(.992);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes px-shimmer{0%{transform:translateX(-140%) rotate(12deg)}100%{transform:translateX(340%) rotate(12deg)}}
+@keyframes px-breathe{50%{opacity:.72;transform:scale(1.035)}}
+
+/* Existing surfaces gain depth without changing information architecture. */
+:is(.card,[class*="card"],[class*="widget"],[class*="panel"],[class*="tile"]){transition:transform .48s var(--px-ease),border-color .35s ease,box-shadow .48s var(--px-ease),background-color .35s ease,filter .35s ease;backface-visibility:hidden}
+@media (hover:hover) and (pointer:fine){
+:is(.card,[class*="card"],[class*="widget"],[class*="panel"],[class*="tile"]):hover{transform:translate3d(0,-3px,0) scale(1.006);border-color:rgba(255,255,255,.16);box-shadow:0 22px 60px rgba(0,0,0,.24),0 0 0 1px rgba(130,220,255,.035) inset}
+}
+
+/* Buttons feel physical and luminous, but remain clean. */
+:is(button,[role="button"],a[class*="button"],a[class*="btn"]){position:relative;isolation:isolate;transition:transform .34s var(--px-ease),box-shadow .34s var(--px-ease),border-color .25s ease,background-color .25s ease,opacity .25s ease}
+@media (hover:hover) and (pointer:fine){:is(button,[role="button"],a[class*="button"],a[class*="btn"]):not(:disabled):hover{transform:translateY(-2px) scale(1.015);box-shadow:0 12px 34px rgba(0,0,0,.18),0 0 24px var(--px-glow)} }
+:is(button,[role="button"],a[class*="button"],a[class*="btn"]):not(:disabled):active{transform:translateY(0) scale(.975);transition-duration:.1s}
+:is(button,[role="button"],a):focus-visible{outline:2px solid rgba(130,220,255,.78);outline-offset:3px}
+
+/* Icon motion follows intent: parent interaction drives the glyph. */
+:is(button,a,[role="button"]):is(:hover,:focus-visible) svg{transform:translateY(-1px) scale(1.07);filter:drop-shadow(0 0 8px rgba(120,220,255,.24))}
+:is(button,a,[role="button"]) svg{transition:transform .42s var(--px-ease),filter .32s ease}
+
+/* Form controls become subtle liquid-glass surfaces. */
+:is(input,select,textarea){transition:border-color .28s ease,box-shadow .32s var(--px-ease),background-color .28s ease,transform .32s var(--px-ease)}
+:is(input,select,textarea):focus{border-color:rgba(140,220,255,.38);box-shadow:0 0 0 3px rgba(100,200,255,.07),0 12px 30px rgba(0,0,0,.12)}
+
+/* Navigation has a calm spring response. */
+:is(nav,[class*="dock"],[class*="nav"]) a{transition:transform .38s var(--px-ease),opacity .25s ease,background-color .3s ease,box-shadow .38s var(--px-ease)}
+@media (hover:hover) and (pointer:fine){:is(nav,[class*="dock"],[class*="nav"]) a:hover{transform:translateY(-2px)}}
+
+/* Premium entrance; descendants do not endlessly animate. */
+main>section,main>article{animation:px-enter .7s var(--px-ease) both}
+main>section:nth-child(2){animation-delay:.045s}main>section:nth-child(3){animation-delay:.09s}
+
+/* Opt-in stronger glass for components that already use translucent surfaces. */
+.panacea-glass,.glass,[class*="glass"]{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025)),var(--px-glass);border:1px solid var(--px-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 18px 60px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(20px) saturate(145%);backdrop-filter:blur(20px) saturate(145%)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+@media (max-width:720px){:is(.card,[class*="card"],[class*="widget"],[class*="panel"],[class*="tile"]):hover{transform:none}.panacea-glass,.glass,[class*="glass"]{-webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%)}}

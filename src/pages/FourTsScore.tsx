@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4Ts Score — Lo, G.K., et al. (2006), J Thromb Haemost, 4(4):759-765
@@ -66,6 +67,7 @@ export function FourTsScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="4Ts Score" subtitle="Heparin-induced thrombocytopenia pretest probability (Lo et al. 2006)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Memperkirakan kemungkinan pratest HIT sebelum pemeriksaan laboratorium pemastian (ELISA antibodi HIT atau serotonin release assay). Skor rendah punya nilai prediksi negatif yang tinggi — HIT praktis tersingkir tanpa perlu pemeriksaan lanjutan.</Prosa>
       </Card>
 

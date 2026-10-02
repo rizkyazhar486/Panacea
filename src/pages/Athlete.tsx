@@ -13,6 +13,7 @@ import { evaluateAthleteAchievements, newlyUnlocked, unlockedCount, type Achieve
 import '../styles/metal.css'
 
 import { KUTIPAN_ATLET as ATHLETE_QUOTES } from '../lib/kutipanAtlet'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 function AthleteQuotePopup() {
   const [q] = useState(() => ATHLETE_QUOTES[Math.floor(Math.random() * ATHLETE_QUOTES.length)])
@@ -121,6 +122,7 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
     return (
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="The bpm trace and time in each zone" />
+        <BatasKlaimKesehatan permukaan="performance.athlete" />
         <p className="mt-2 text-xs text-neutral-500">
           No session with heart-rate data yet. Track a workout with the <b>GPS Tracker</b> on Home and enter your HR (bpm) while training — or sync a watch — and your BPM chart and time-in-zone breakdown will appear here automatically.
         </p>

@@ -3,6 +3,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { IconBook, IconSparkle, IconCheck, IconScissors } from '../components/icons'
 import { generateEducation } from '../lib/ai'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 export function PatientEducation() {
   const { state, account, activePatient, saveEducation, sendEmail } = useStore()
@@ -45,6 +46,7 @@ export function PatientEducation() {
           title="My Health Education"
           subtitle="A brief look at signs and symptoms, the diagnosis, and how to look after your health"
         />
+        <BatasKlaimKesehatan permukaan="care.patient-education" />
         <div className="mt-3 flex flex-wrap gap-2">
           {sheet && <Button variant="outline" onClick={() => window.print()}><IconBook size={14} /> Download PDF</Button>}
           <Button onClick={gen} disabled={busy}>

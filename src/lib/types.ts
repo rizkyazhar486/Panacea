@@ -72,6 +72,28 @@ export interface PhysicalExam {
   perSystem: string
   doctorVerified: boolean
   verifiedBy?: string
+  /** Id verifikator — dicap server (server/src/rekamKlinis.ts). */
+  verifiedById?: string
+  /** Status per sistem yang ditandai klinisi (kunci sistem: mata, tht, kepala, leher, paru, jantung, abdomen, kulit, ekstremitas).
+   *  Mengalahkan heuristik teks; dihitung "diverifikasi klinisi" hanya bila server mencap verifiedById. */
+  statusSistem?: Record<string, StatusSistemFisik>
+}
+
+export type StatusSistemFisik = 'normal' | 'abnormal' | 'not-examined'
+
+export interface PlanSafetyOverride {
+  /** Human-readable rationale recorded by the clinician at the moment of override. */
+  reason: string
+  /** Identified clinician/account responsible for the override. */
+  by: string
+  /** ISO timestamp for the audit trail. */
+  at: string
+  /**
+   * Exact safety-finding identities acknowledged by this override.
+   * If the blocker set changes, the override no longer applies and the gate
+   * fails closed until the new findings are reviewed.
+   */
+  findingIds: string[]
 }
 
 export interface PlanItem {
@@ -80,11 +102,19 @@ export interface PlanItem {
   text: string
   source: 'AI' | 'Dokter'
   status: 'usulan' | 'diverifikasi' | 'ditolak'
+  /** Dicap server saat butir diverifikasi klinisi (server/src/rekamKlinis.ts). */
+  verifiedById?: string
+  verifiedAt?: string
+  safetyOverride?: PlanSafetyOverride
 }
 
 export interface ProblemEntry {
   id: string
   title: string
+  /** Id kunjungan asal bila masalah dibawa dari kunjungan tertutup sebelumnya. */
+  carriedFrom?: string
+  /** Asal dicap server: 'AI' bila ditulis/diubah non-klinisi, 'Dokter' bila oleh klinisi. */
+  source?: 'AI' | 'Dokter'
   basis: string // basis from anamnesis/exam/supporting
   assessment: string // "Dipikirkan ..." comparative reasoning
   probability?: number // 0-100 Bayesian estimate
@@ -104,12 +134,19 @@ export interface EMRRecord {
   plan: PlanItem[]
   prognosis?: string
   // Penunjang & supportive (Mode-1 clinical workup)
+  anthropometry?: string // formula + WHO/CDC/adult BMI interpretation; never fabricated z-score
   labEkgInterpretation?: string // interpretasi temuan Lab & hasil EKG
   supportive?: SupportivePlan
   surgery?: SurgeryPlan
   references: string[]
   signedBy?: string
+  /** Id pengguna penanda tangan — dicap server (lihat server/src/rekamKlinis.ts). */
+  signedById?: string
   signedAt?: string
+  /** Asal per kolom isian ('anamnesis.rps', 'physicalExam.perSystem', …) — dicap server; klien hanya boleh menyatakan 'AI'. */
+  asalIsian?: Record<string, { asal: 'AI' | 'Dokter'; olehId?: string; pada?: string }>
+  /** Kunjungan tertutup sebelumnya (dicap server saat kunjungan ditutup). */
+  previousEncounterId?: string
   // The downstream half of the care journey — everything the clinical plan
   // above triggers in the real world (who, where, how much, when, and
   // whether it's actually happening). Optional: only present once a plan
@@ -230,6 +267,8 @@ export interface ConsentStage {
 // -------- Accounts & roles -------------------------------------------------
 export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
 export interface Account {
+  /** Stable server user id; used for identity-bound longitudinal records. */
+  id?: string
   email: string
   name: string
   role: Role
@@ -743,6 +782,11 @@ export interface AppState {
   lifeEvents: Record<string, LifeEvent[]> // patientId -> the user's own life story (see LifeEvent below)
   quests: Record<string, Quest[]> // patientId -> self-set goals tied to life domains (see Quest below)
   foods: FoodEntry[]
+  /** Food, sleep, training and GPS ids removed on this device. The account remembers them so another phone cannot restore the row. */
+  diaryHiddenFoodIds: string[]
+  diaryHiddenSleepIds: string[]
+  diaryHiddenTrainingIds: string[]
+  diaryHiddenGpsIds: string[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
   orders: Order[]

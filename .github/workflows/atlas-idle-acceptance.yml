@@ -1,0 +1,64 @@
+name: Atlas Idle GPU Acceptance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/components/AtlasViewer3D.tsx'
+      - 'src/lib/cardioFlow.ts'
+      - 'src/lib/gltfSesudahLepas.ts'
+      - 'scripts/qa/atlasviewer-*'
+      - 'public/atlas/**'
+      - 'package*.json'
+      - '.github/workflows/atlas-idle-acceptance.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/components/AtlasViewer3D.tsx'
+      - 'src/lib/cardioFlow.ts'
+      - 'src/lib/gltfSesudahLepas.ts'
+      - 'scripts/qa/atlasviewer-*'
+      - 'public/atlas/**'
+      - 'package*.json'
+      - '.github/workflows/atlas-idle-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-idle-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  idle-and-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Install browser runner
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Prove idle GPU, interaction and recovery
+        env:
+          ATLAS_QA_OUTPUT: test-results/atlas-idle
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 5180 --strictPort > /tmp/atlas-idle-vite.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:5180/scripts/qa/atlasviewer-fixture.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/qa/atlasviewer-idle-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: atlas-idle-render-proof
+          path: test-results/atlas-idle

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PERC Rule (Pulmonary Embolism Rule-out Criteria) — Kline, J.A., et al.
@@ -35,7 +36,8 @@ export function PercRule() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="PERC Rule" subtitle="Pulmonary Embolism Rule-out Criteria (Kline et al. 2004)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="PERC Rule" subtitle="Published PE rule-out criteria (Kline et al. 2004) — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Applies only when a clinician has already judged the patient low pretest probability for PE
           (gestalt {'<'}15%). If all 8 criteria are negative in that context, further testing (D-dimer,

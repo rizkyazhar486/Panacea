@@ -12,6 +12,7 @@ import {
 import { computeBmi } from '../lib/anthro'
 import { Badge } from './ui'
 import type { Patient } from '../lib/types'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const METRICS: GrowthMetric[] = ['weightForAge', 'heightForAge', 'bmiForAge']
 const SD_LINES = [-3, -2, 0, 2, 3]
@@ -74,6 +75,7 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
 
   return (
     <div>
+      <BatasKlaimKesehatan permukaan="pediatrics.growth-chart" />
       <div className="mb-3 flex flex-wrap gap-1.5">
         {METRICS.map((m) => (
           <button

@@ -3,9 +3,10 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconMoon } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STOP-BANG — validated obstructive sleep apnea (OSA) risk screening tool
+// STOP-BANG — published obstructive sleep apnea (OSA) risk screening tool
 // (Chung et al., 2008, Anesthesiology 108(5):812-821), one of the most widely
 // used pre-operative and primary-care OSA screens. 8 yes/no items, 1 point
 // each, total 0-8. Standard risk bands: 0-2 low, 3-4 intermediate, 5-8 high.
@@ -56,8 +57,9 @@ export function SleepApneaScreen() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Validated obstructive sleep apnea risk screen (Chung et al., 2008)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Salah satu alat penapisan apnea tidur obstruktif yang paling luas dipakai menjelang operasi dan di layanan primer. Jawablah tiap butir dengan jujur — ini alat penapisan untuk menimbang perlu tidaknya uji tidur, bukan diagnosis.</Prosa>
+        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Published obstructive sleep apnea risk screen (Chung et al., 2008) — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A widely used obstructive sleep apnea screen before surgery and in primary care. Answer each item honestly — it helps decide whether a sleep study may be worth discussing, not a diagnosis.</Prosa>
       </Card>
 
       <Card className="!p-5">
