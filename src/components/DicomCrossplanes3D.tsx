@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { ambilIrisanMpr, jendelakanMpr, type IrisanMpr, type VolumeMpr } from '../lib/dicomMpr'
+import { ambilIrisanMpr, jendelakanMpr, posisiFisikVoxel, type IrisanMpr, type VolumeMpr } from '../lib/dicomMpr'
 import {
   arahBidangDicom,
   BATAS_ARAH_DICOM,
@@ -73,8 +73,8 @@ function disposeGroup(group: THREE.Group) {
   }
 }
 
-function mm(value: number) {
-  return Number.isFinite(value) ? `${value.toFixed(value >= 100 ? 0 : 1)} mm` : '—'
+function mm(value: number | undefined) {
+  return value != null && Number.isFinite(value) ? `${value.toFixed(value >= 100 ? 0 : 1)} mm` : '—'
 }
 
 export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbalik }: Props) {
@@ -94,15 +94,13 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
   })
 
   const patientDirections = arahBidangDicom(volume.orientasiPasien)
-  const xIndex = Math.max(0, Math.min(volume.kolom - 1, Math.round(cursor.x)))
-  const yIndex = Math.max(0, Math.min(volume.baris - 1, Math.round(cursor.y)))
-  const zIndex = Math.max(0, Math.min(volume.kedalaman - 1, Math.round(slice)))
+  const posisi = posisiFisikVoxel(volume, cursor.x, cursor.y, slice)
+  const { xIndex, yIndex, zIndex } = posisi
+  // Ukuran untuk menggambar tetap memakai jarak yang ada (aspek visual); hanya READOUT
+  // milimeter yang dijaga oleh posisi.mm, yang null bila jaraknya diasumsikan.
   const widthMm = volume.kolom * volume.jarakKolomMm
   const heightMm = volume.baris * volume.jarakBarisMm
   const depthMm = volume.kedalaman * volume.jarakIrisMm
-  const localXmm = (xIndex - (volume.kolom - 1) / 2) * volume.jarakKolomMm
-  const localYmm = ((volume.baris - 1) / 2 - yIndex) * volume.jarakBarisMm
-  const localZmm = (zIndex - (volume.kedalaman - 1) / 2) * volume.jarakIrisMm
 
   useEffect(() => {
     const host = hostRef.current
@@ -254,10 +252,10 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Volume</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(widthMm)} × {mm(heightMm)} × {mm(depthMm)}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Volume</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(posisi.mm?.lebar)} × {mm(posisi.mm?.tinggi)} × {mm(posisi.mm?.kedalaman)}</div></div>
           <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Voxel</div><div className="mt-0.5 text-[9px] font-black text-white/75">{xIndex + 1}, {yIndex + 1}, {zIndex + 1}</div></div>
-          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local X / Y</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(localXmm)} · {mm(localYmm)}</div></div>
-          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local Z</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(localZmm)}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local X / Y</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(posisi.mm?.x)} · {mm(posisi.mm?.y)}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local Z</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(posisi.mm?.z)}</div></div>
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
