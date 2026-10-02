@@ -28,3 +28,25 @@ export {
   type BvhStats,
   type BvhVec3,
 } from './engine/boundsBvh'
+
+export {
+  layoutLabels,
+  DEFAULT_LABEL_LAYOUT_OPTIONS,
+  type LabelCandidate,
+  type LabelLayout,
+  type LabelLayoutOptions,
+  type LabelPlacement,
+  type ScreenPoint,
+  type ScreenRect,
+} from './engine/labelLayout'
+
+export {
+  buildExplodedLayout,
+  interpolateExplodedOffset,
+  DEFAULT_EXPLODE_OPTIONS,
+  type ExplodeItem,
+  type ExplodeLayout,
+  type ExplodeOptions,
+  type ExplodeTransform,
+  type ExplodeVec3,
+} from './engine/explodedLayout'
