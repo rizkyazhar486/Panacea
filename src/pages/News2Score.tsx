@@ -5,6 +5,7 @@ import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { getHealthCache, hasHealth } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS2 (National Early Warning Score 2) — Royal College of Physicians (2017).
@@ -113,6 +114,7 @@ export function News2Score() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="NEWS2 Score" subtitle="National Early Warning Score — ward deterioration risk (RCP 2017)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Combines 7 routine vital signs into a single escalation trigger. Widely used across UK and international hospital wards to standardize the response to acute deterioration.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Respiration rate (/min)">

@@ -5,6 +5,7 @@ import { PanelIsncsci } from './PanelIsncsci'
 
 // 3D dimuat hanya saat panel ini dibuka; ia membawa three.js dan nervous.glb.
 const LesiNeuro3D = lazy(() => import('./LesiNeuro3D').then((m) => ({ default: m.LesiNeuro3D })))
+const BrainEegSourceGate = lazy(() => import('../../components/digital-twin/BrainEegSourceGate'))
 import {
   lokalisasi, tempatTerbaik, NAMA_TINGKAT, TINGKAT_SARAF_KRANIAL, DI_LUAR_MODEL,
   type Temuan, type TemuanSarafKranial, type Modalitas, type Sisi, type Wilayah,
@@ -239,6 +240,15 @@ export function LokalisasiLesiPanel() {
             <li key={d} className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">— {d}</li>
           ))}
         </ul>
+      </details>
+
+      <details className="rounded-2xl border border-emerald-200/70 p-3 dark:border-emerald-300/15">
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-emerald-700 dark:text-emerald-300">Brain · scalp EEG source gate (public datasets only)</summary>
+        <div className="mt-3">
+          <Suspense fallback={<p className="text-sm text-neutral-500" role="status" aria-live="polite">Loading EEG source gate…</p>}>
+            <BrainEegSourceGate />
+          </Suspense>
+        </div>
       </details>
 
       <PanelIsncsci />

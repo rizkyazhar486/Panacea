@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { penjelasan } from '../lib/penjelasanFitur'
 import { compactBrowseResults } from '../lib/featureEntryPoints'

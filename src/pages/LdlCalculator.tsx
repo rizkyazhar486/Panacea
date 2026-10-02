@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LDL Cholesterol (calculated) — Friedewald, W.T., et al. (1972), Clin Chem,
@@ -46,6 +47,7 @@ export function LdlCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="LDL Cholesterol (Friedewald)" subtitle="Calculated LDL + non-HDL cholesterol (Friedewald et al. 1972)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Most laboratories report LDL calculated with this formula, not measured directly: LDL = Total − HDL − Triglycerides/5. The TG/5 term estimates VLDL and no longer holds at high triglycerides.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="Total cholesterol (mg/dL)">

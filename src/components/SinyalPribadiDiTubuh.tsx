@@ -2,6 +2,7 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { useLongitudinalState } from '../lib/useLongitudinalState'
 import { sinyalPerSistem } from '../lib/sinyalPribadiSistem'
 import { labelMetrik, angka } from '../lib/perubahanLongitudinal'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const NAMA: Record<BodySystemId, string> = {
   cardiovascular: 'Cardiovascular', nervous: 'Nervous', respiratory: 'Respiratory', digestive: 'Digestive & liver',
@@ -19,6 +20,7 @@ export function SinyalPribadiDiTubuh({ selectedSystemId, onSelectSystem }: { sel
   const di = peta.get(selectedSystemId) ?? []
   return (
     <section aria-label="Your data in this body system" data-personal-body-signals className="dark mb-2 rounded-[20px] border border-white/10 bg-black/55 px-3 py-2 text-white">
+      <BatasKlaimKesehatan permukaan="body.personal-signals" />
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">Your data</span>
         {[...peta.entries()].map(([id, d]) => (

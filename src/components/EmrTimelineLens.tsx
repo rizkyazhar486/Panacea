@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { EMRRecord, SupportiveResult, VitalSign } from '../lib/types'
 import { SurfaceDepthNavigator } from './SurfaceDepthNavigator'
 import { LABEL_STATUS_TINJAU, statusTinjauRekam } from '../lib/statusTandaTangan'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type EmrDepth = 'timeline' | 'encounter' | 'problem' | 'observation' | 'resource' | 'provenance'
 
@@ -100,6 +101,9 @@ export function EmrTimelineLens({
         </div>
         <div className="shrink-0 text-[9px] font-black uppercase tracking-[.12em] text-white/32">{shortDate(record.updatedAt)}</div>
       </header>
+      <div className="px-4 pt-2 sm:px-5">
+        <BatasKlaimKesehatan permukaan="care.emr-timeline" className="mt-0 text-[11px] leading-snug text-white/55" />
+      </div>
 
       <div className="px-4 pt-3 sm:px-5">
         <SurfaceDepthNavigator surface="ai-emr" activeStopId={depth} onSelect={(stop) => setDepth(stop as EmrDepth)} />

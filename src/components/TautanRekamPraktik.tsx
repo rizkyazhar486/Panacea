@@ -1,3 +1,4 @@
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 // Tautan pasien praktik ↔ akun pasien. Dokter menerbitkan kode sekali pakai (7 hari);
 // pasien menebusnya dari akunnya sendiri. Tanpa tautan, rekam yang dibuat dokter
 // tidak pernah terlihat oleh pasiennya dan tidak masuk status longitudinalnya.
@@ -33,6 +34,7 @@ export function TerbitkanKodeTaut({ patientId }: { patientId: string }) {
   }
   return (
     <div className="mt-3 border-t border-neutral-200 pt-3" data-terbitkan-kode-taut>
+      <BatasKlaimKesehatan permukaan="care.practice-record-link" />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Patient app access</p>
         {status !== 'loading' && status?.linked ? (

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ALAT_DI_HALAMAN, tautanAlat, samakan } from '../lib/katalogKalkulator'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Calculator Hub — searchable index of every clinical calculator and score in
@@ -147,6 +148,7 @@ export function CalculatorHub() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <BatasKlaimKesehatan permukaan="calculators.hub" />
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Calculator Hub" subtitle={`${total} standalone clinical tools, searchable by what you're trying to do`} />
         <input

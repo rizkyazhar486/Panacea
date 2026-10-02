@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { bentoSpan } from '../lib/interaction/bento'
 import { gabungKatalog, saringPeran, rutaKanonik as canonical, type EntriKatalog } from '../lib/katalogLengkap'
-import { NAV_UNTUK_PENGATURAN } from './Shell'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import { useStore } from '../lib/store'
 import { getUsageCounts } from '../lib/usage'
 import { pintasanTerpakai } from '../lib/pintasanTerpakai'
 import '../styles/home-human-interface.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type Domain = 'Your Body' | 'Clinical' | 'For You'
 
@@ -94,6 +95,7 @@ export function HomeCommandDeck() {
           />
         </label>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.home-command" className="mt-2 text-[11px] leading-snug text-neutral-500" />
 
       {!showIndex && pintasan.length > 0 ? (
         <nav className="panacea-command-recents" aria-label="Most used capabilities">

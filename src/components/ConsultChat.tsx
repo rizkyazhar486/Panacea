@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { wsUrl } from '../lib/api'
 import { Button } from './ui'
 import { IconStethoscope } from './icons'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface Line { from?: string; text?: string; type: string; at?: string }
 
@@ -208,6 +209,7 @@ export function ConsultChat({
   if (compact) {
     return (
       <div className="overflow-hidden rounded-[22px] border border-white/10 bg-black/35 text-white">
+      <BatasKlaimKesehatan permukaan="care.consult-chat" />
         <div className="flex min-h-11 items-center gap-2 border-b border-white/10 px-3">
           <IconStethoscope size={16} className="text-emerald-300" />
           <span className="min-w-0 flex-1 truncate text-[10px] font-black uppercase tracking-[.12em] text-white/65">{title ?? 'Visit camera'}</span>

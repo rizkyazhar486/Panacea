@@ -8,6 +8,7 @@ import {
   transcriptionFrame,
   translationFrame,
 } from '../lib/centralDogmaEvolution'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type Mode = 'replication' | 'transcription' | 'translation' | 'evolution'
 
@@ -34,6 +35,7 @@ function Strand({
       : 'text-ink dark:text-white'
   return (
     <div className="min-w-0">
+      <BatasKlaimKesehatan permukaan="genomics.central-dogma-sim" />
       <div className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-500">{label}</div>
       <div className={`mt-1 overflow-x-auto whitespace-nowrap font-[var(--font-angka)] text-[12px] tracking-[0.16em] ${toneClass}`}>
         {sequence || '—'}

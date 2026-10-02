@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
+import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -332,11 +333,13 @@ let db: DB = {
   clubs: seedClubs(),
 }
 
-// MongoDB persistence (optional). When MONGODB_URI is set the whole state is
-// stored as a single document and survives restarts/redeploys (permanent,
-// cross-device). Otherwise it falls back to the ephemeral data.json file.
+// MongoDB persistence (optional). When MONGODB_URI is set, accounts, wallets,
+// per-patient clinical records, and the lab/care slices each live in their own
+// collections. The rest of the state remains one document. Without MONGODB_URI
+// the process falls back to data.json, which still keeps a full copy.
 let mongoCol: any = null
 let saveTimer: ReturnType<typeof setTimeout> | null = null
+let irisanAktif = false
 
 function loadFile() {
   if (existsSync(DB_PATH)) {
@@ -409,14 +412,20 @@ export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catata
 }
 
 async function simpanMongo(): Promise<void> {
-  const ukuran = Buffer.byteLength(JSON.stringify(db))
+  // Batas 16 MB diukur pada dokumen inti saja. Irisan lab/cek harian sudah
+  // keluar ke koleksi sendiri; memasukkan mereka ke ukuran ini akan menolak
+  // simpan justru ketika pemisahan itu sedang bekerja.
+  const inti = dokumenInti(db as unknown as Record<string, unknown>)
+  const ukuran = Buffer.byteLength(JSON.stringify(inti))
   if (ukuran >= BATAS_DOKUMEN_MONGO) {
     catatGagal(new Error(`state ${ukuran} bytes exceeds the MongoDB 16 MB document limit`))
     console.error('[store] NOT SAVED to MongoDB: state exceeds 16 MB document limit')
     return
   }
   try {
-    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
+    if (mongoDb) await simpanIrisan(mongoDb, db as unknown as Record<string, unknown>)
+    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
+    irisanAktif = true
     catatBerhasil(ukuran)
   } catch (e) {
     catatGagal(e)
@@ -453,13 +462,26 @@ export async function initStore() {
     const dbName = process.env.MONGODB_DB || 'panaceamed'
     mongoDb = client.db(dbName)
     mongoCol = mongoDb.collection('app')
+    await pastikanIndeksIrisan(mongoDb)
     const doc = await mongoCol.findOne({ _id: 'state' })
     if (doc?.data) { db = doc.data as DB; muatConnect(db.connect) }
-    else await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
-    console.log('[store] MongoDB connected — permanent mode')
+    const irisan = await muatIrisan(mongoDb)
+    if (irisan) {
+      pasangIrisan(db as unknown as Record<string, unknown>, irisan.data)
+      // Connect memegang garam sidik. Muat modulnya SETELAH pasang, kalau
+      // tidak garam acak yang lahir bersama proses menimpa garam tersimpan
+      // pada simpan berikutnya.
+      if (irisan.data.connect) muatConnect(irisan.data.connect as unknown as Parameters<typeof muatConnect>[0])
+      irisanAktif = irisan.lengkap
+    }
+    if (!irisanAktif) await simpanMongo()
+    console.log(irisanAktif
+      ? '[store] MongoDB connected — every stored collection is outside the core document'
+      : '[store] MongoDB connected — full split did not commit; core document still holds the remainder')
   } catch (e) {
     mongoCol = null
     mongoDb = null
+    irisanAktif = false
     loadFile()
     console.error('[store] MongoDB failed, using file mode:', (e as Error).message)
   }
@@ -479,6 +501,11 @@ export async function initStore() {
  */
 export function modePenyimpanan(): 'mongo' | 'berkas' {
   return mongoCol ? 'mongo' : 'berkas'
+}
+
+/** `tuntas-v1` bila seluruh keadaan tersimpan, termasuk jejak audit, sudah keluar dari dokumen tunggal. */
+export function modeIrisan(): typeof VERSI_IRISAN | 'menyatu' {
+  return irisanAktif ? VERSI_IRISAN : 'menyatu'
 }
 
 export function uid(): string {

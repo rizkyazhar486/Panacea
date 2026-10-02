@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELD-Na Score — end-stage liver disease severity & transplant priority.
@@ -69,6 +70,7 @@ export function MeldScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="MELD-Na Score" subtitle="End-stage liver disease severity — transplant allocation priority" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Model for End-Stage Liver Disease, sodium-adjusted (current UNOS/OPTN organ allocation
           formula). Higher scores mean higher short-term mortality and higher transplant priority.

@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { hariLalu, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Breathwork Pacer — an animated breathing coach. Slow, paced breathing
@@ -104,6 +105,7 @@ export function Breathwork() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Breathwork Pacer" subtitle="Rhythmic breathing to calm the nervous system in minutes" />
+        <BatasKlaimKesehatan permukaan="wellness.breathwork" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Slow breathing at around 5-6 breaths per minute raises heart rate variability and activates the parasympathetic "rest &amp; digest" response. Follow the circle — expanding as you inhale, shrinking as you exhale.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {PROTOCOLS.map((p) => (

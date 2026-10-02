@@ -1,8 +1,8 @@
 // Penulisan penyimpanan yang tidak diam-diam kehilangan data.
 //
-// Store saat ini menyimpan SELURUH keadaan sebagai satu berkas / satu dokumen
-// MongoDB. Sampai skema basis data sungguhan ada, tiga jalur kehilangan data
-// ditutup di sini:
+// Berkas lokal masih menyimpan seluruh keadaan. Di MongoDB, lab dan cek harian
+// sudah satu dokumen per rekaman (irisanPenyimpanan.ts); sisa keadaan masih
+// satu dokumen. Tiga jalur kehilangan data ditutup di sini:
 // 1. tulis berkas atomik (tmp → rename): server mati di tengah menulis tidak
 //    meninggalkan data.json terpotong;
 // 2. berkas rusak dipindahkan ke samping (.corrupt-<waktu>), bukan ditimpa

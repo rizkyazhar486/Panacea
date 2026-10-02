@@ -138,6 +138,7 @@ import {
   getWebhookDeliveries,
   diagnoseSync,
   modePenyimpanan,
+  modeIrisan,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -157,6 +158,8 @@ import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './pa
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
+import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
@@ -165,7 +168,7 @@ import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien,
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
-import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
+import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
 import { lingkunganKota, cariPangan } from './lingkungan.js'
@@ -262,6 +265,7 @@ app.get('/api/health', (_req, res) => {
     // deploy ulang berikutnya — aplikasi mengatakannya, bukan menunggu orang
     // menemukannya sendiri saat gagal masuk.
     penyimpanan: modePenyimpanan(),
+    irisan: modeIrisan(),
     // Kesehatan simpan: tanpa pesan galat (bisa memuat nama host) di endpoint publik.
     penyimpananSehat: penyimpananSehat(),
     // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
@@ -1015,7 +1019,41 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
     return
   }
   try {
-    res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+    res.json({ ok: true, profile: saveHealthProfile(u.email, buangKunciDiary(data as Record<string, unknown>)) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+// Daftar self-vital / VO₂max dari AppState — last-write-wins setelah validasi server.
+app.put('/api/health-series/self-vitals', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const selfVitalsLog = validasiSelfVitalsLog((req.body as { selfVitals?: unknown })?.selfVitals)
+    res.json({ ok: true, selfVitals: saveHealthProfile(u.email, { selfVitalsLog }).selfVitalsLog })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.put('/api/health-series/vo2max', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const vo2maxEntries = validasiVo2maxLog((req.body as { vo2maxLog?: unknown })?.vo2maxLog)
+    res.json({ ok: true, vo2maxLog: saveHealthProfile(u.email, { vo2maxEntries }).vo2maxEntries })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.put('/api/health-series/diary', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown; removeTrainingIds?: unknown; removeGpsIds?: unknown }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    res.status(400).json({ error: 'invalid diary payload' })
+    return
+  }
+  try {
+    const patch = susunPatchDiary(getHealthProfile(u.email), body)
+    const profil = saveHealthProfile(u.email, patch)
+    res.json({ ok: true, sleep: profil.diarySleep, foods: profil.diaryFoods ?? [], wellness: profil.diaryWellness ?? [] })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
@@ -1027,6 +1065,35 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
 app.get('/api/lab-log', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json(getLabLog(u.email) ?? { log: {}, diperbaruiPada: null })
+})
+// Satu revisi longitudinal untuk akun ini: lab + care + (untuk pasien) EMR.
+// Isi diambil dari penyimpanan yang sudah ada; klien tidak mengirim peristiwa.
+app.get('/api/keadaan-longitudinal', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const tersimpan = getLabLog(u.email)
+  const plans = listCarePlans()
+    .filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+    .map((p) => ({ plan: p.rencana, reports: listCareReports(u.email, p.rencana.id).slice(-7) }))
+  const reviews = listLabReviews(u.email)
+  // Klinisi tetap memakai /api/clinical untuk praktik. Jalur ini hanya rekam diri.
+  let clinical: { records: Record<string, unknown>; vitals: Record<string, unknown[]>; encounters: Record<string, unknown[]> } | null = null
+  if (u.role === 'pasien') {
+    const saringan = saringKlinis(getClinical(), (pid) => bolehPasien(u, pid))
+    clinical = {
+      records: saringan.records as Record<string, unknown>,
+      vitals: saringan.vitals as Record<string, unknown[]>,
+      encounters: (saringan.encounters ?? {}) as Record<string, unknown[]>,
+    }
+  }
+  res.json(susunKeadaanLongitudinal({
+    subjectId: u.id,
+    generatedAt: kini.toISOString(),
+    lab: { log: tersimpan?.log, diperbaruiPada: tersimpan?.diperbaruiPada ?? null },
+    care: { plans, reviews },
+    clinical,
+    device: getHealthProfile(u.email),
+  }))
 })
 app.put('/api/lab-log', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -2323,8 +2390,11 @@ setInterval(() => {
         const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
         const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
         if (p.alasan === 'send') {
-          saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal })
-          notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian').catch(() => {})
+          // Kirim dulu, baru tandai hari ini (deliverThenCommitAlertState tidak pernah melempar).
+          void deliverThenCommitAlertState(
+            () => notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian'),
+            () => saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal }),
+          )
         }
       }
     } catch { /* satu pengguna gagal tidak menghentikan yang lain */ }

@@ -16,7 +16,7 @@ assert.match(capture, /rendered WebGL canvas|rendered-webgl-canvas/i, 'capture m
 assert.match(capture, /preserveDrawingBuffer:\s*true/, 'artifact browser must preserve only its QA WebGL buffer before direct canvas copy')
 assert.match(capture, /getContextAttributes\(\)/, 'capture must verify that its QA-only WebGL context actually preserves the drawing buffer')
 assert.match(capture, /drawImage\(node, 0, 0\)/, 'capture must copy the actual rendered WebGL canvas without a compositor screenshot')
-assert.match(capture, /scrollIntoViewIfNeeded\(\)/, 'capture must bring the real Body3D canvas onscreen before demanding visual evidence')
+assert.match(capture, /scrollIntoView\(\{\s*block:\s*['\"]center['\"],\s*inline:\s*['\"]center['\"],\s*behavior:\s*['\"]auto['\"]\s*\}\)/, 'capture must bring the real Body3D canvas onscreen before demanding visual evidence')
 assert.match(capture, /canvas center outside viewport/i, 'capture must reject an offscreen Body3D canvas')
 assert.match(capture, /visibleSamples < 100/, 'capture must fail closed for visually empty output')
 assert.match(capture, /luma >= 40/, 'capture must explicitly count pixels bright enough to distinguish anatomy from the dark viewer background')

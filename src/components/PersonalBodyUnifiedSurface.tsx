@@ -3,6 +3,7 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { sharePersonalBodyCanvas } from '../lib/sharePersonalBody'
 import { PersonalBodyAvatar3D } from './PersonalBodyAvatar3D'
 import { SurfaceGuide } from './SurfaceGuide'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('../pages/bodyhub/UnifiedHumanSimulationProjector'))
 const PersonalAvatarCameraCapture = lazy(() => import('../pages/bodyhub/PersonalAvatarCameraCapture'))
@@ -159,6 +160,7 @@ function PermukaanTubuh({
       <header className="grid gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
         <div className="flex items-center gap-2">
           <h2 className="min-w-0 flex-1 text-base font-black tracking-[-.02em]">{title}</h2>
+          <BatasKlaimKesehatan permukaan="body.personal-surface" className="mt-2 text-[11px] leading-snug text-white/55" />
 
           {cameraCapture ? (
             <button

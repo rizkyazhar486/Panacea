@@ -50,4 +50,26 @@ assert.match(renderer, /if \(!pose\) return/, 'shared renderer must leave the cu
 assert.match(renderer, /dblclick/, 'focus must be reachable through an explicit double-activation gesture')
 assert.match(renderer, /panaceaContext !== true/, 'context envelope must never become a focus target')
 
+const canonicalBody = readFileSync(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+assert.match(
+  canonicalBody,
+  /bodyStructureCameraFocus/,
+  'canonical Body3D focus must use the same deterministic source-bounds camera primitive.',
+)
+assert.match(
+  canonicalBody,
+  /const pose = bodyStructureCameraFocus\(/,
+  'canonical Body3D must calculate focus from exact rendered source bounds.',
+)
+assert.match(
+  canonicalBody,
+  /if \(pose\) \{/,
+  'canonical Body3D must keep the current camera unchanged when focus bounds fail closed.',
+)
+assert.doesNotMatch(
+  canonicalBody,
+  /const radius = Math\.max\(size\.length\(\) \* 0\.5/,
+  'canonical Body3D must not keep a second heuristic radius-based focus implementation.',
+)
+
 console.log('body structure camera focus: exact finite source bounds are centered and invalid bounds fail closed')
