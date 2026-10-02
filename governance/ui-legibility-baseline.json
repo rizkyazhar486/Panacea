@@ -2,7 +2,13 @@
   "purpose": "Ratchet jumlah kata terlihat dan kata di bawah 14px di 390x844. Hanya boleh turun (lihat scripts/qa/ui-legibility-ratchet.mjs).",
   "measuredOn": "2026-10-02",
   "routes": {
-    "": { "words": 790, "smallWords": 708 },
-    "body-explorer": { "words": 576, "smallWords": 566 }
+    "": {
+      "words": 775,
+      "smallWords": 693
+    },
+    "body-explorer": {
+      "words": 154,
+      "smallWords": 143
+    }
   }
 }
