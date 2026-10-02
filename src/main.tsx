@@ -1,5 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { captureFoldsPreference } from './shared/ui/foldsPreference'
 import { pasangPelaporGalat } from './lib/laporGalatKlien'
 import { API_BASE } from './lib/api'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
@@ -181,6 +182,9 @@ function PageLoader() {
 }
 
 pasangPelaporGalat(API_BASE, String(import.meta.env.VITE_APP_VERSION ?? ''))
+// Ingat tautan folds=open sebelum rute mana pun sempat menulis ulang hash.
+captureFoldsPreference()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
