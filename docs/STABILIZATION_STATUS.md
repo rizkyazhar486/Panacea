@@ -1,6 +1,6 @@
 # Panacea Stabilization Status
 
-Last updated: 2026-09-08
+Last updated: 2026-10-02
 
 ## Baseline
 
@@ -113,6 +113,22 @@ Priority order:
 | Desktop browser | browser verification required | pending |
 | Vercel deployment | production workflow | baseline deployable |
 | Production HTTP smoke | Vercel workflow | available on actual deploy runs |
+
+## 2026-10-02 — Measured WebGL lifecycle audit (Body Exposure and adjacent 3D)
+
+Method: production bundle served with `vite preview`, headless Chromium with SwiftShader (software GL), viewport 390×844, instrumented `getContext`/draw calls. This measures **lifecycle behavior** (contexts created, GLBs fetched, draw calls, leaks, crashes). It is **not** a real-GPU frame-rate, thermal or real-device memory measurement; those remain pending on physical phones.
+
+| Defect (user-visible effect) | Before | After |
+|---|---|---|
+| Body Exposure mounted Body3D inside the closed "Deep reference labs" panel | 1 hidden WebGL context + `skeletal.glb` + `muscular.glb` (~8.3 MB) on every visit | 0 contexts, 0 GLB requests on load; 1 visible context after the panel is opened |
+| Context loss then restore left Body3D dim (PMREM render-target contents are not restored by three.js) | mean luminance 21.3 → 18.1, bright-pixel fraction 0.0127 → 0.0058 | 21.29 → 21.28, 0.0127 → 0.0127 |
+| Frontier Health 3D labs mounted in closed panels | ~213 draw calls/s while hidden; **app-wide crash screen when WebGL is unavailable** | 0 draw calls/s hidden; local "WebGL unavailable" note instead of a crash |
+| Circuit lab created a new WebGL context on every model switch | 1 context per switch | 1 context per mount (18 switches → still 1) |
+| 24 viewers called `renderer.dispose()` without releasing the context | 12/12 detached canvases kept live GPU contexts after route hopping | 0/10 (all released explicitly) |
+
+Guards: `scripts/uji/restorable-environment.mts`, `body-exposure-idle-mount.mts`, `renderer-dilepas.mts` (every renderer-creating source file must release its context); browser smokes `scripts/qa/body-exposure-idle-smoke.mjs` and `body3d-context-restore-smoke.mjs` (run in `stabilization-acceptance.yml`).
+
+Still open from this audit: restore behavior differs per viewer (e.g. `Limfe3D` treats a context loss as permanent failure instead of waiting for restoration); a failed lazy-chunk load after a deploy has no app-level recovery; real-device mobile GPU/memory verification.
 
 ## Remaining backlog
 
