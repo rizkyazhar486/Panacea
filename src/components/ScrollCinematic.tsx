@@ -81,7 +81,7 @@ export function ScrollCinematic() {
 
   if (reduced) {
     return (
-      <section className="anatomy-cinematic relative h-[760px] overflow-hidden bg-[#02050a] text-white" aria-label="Human body overview">
+      <section className="dark anatomy-cinematic relative h-[760px] overflow-hidden bg-[#02050a] text-white" aria-label="Human body overview">
         <AnatomyScene stage="exploded" reduced />
         <div className="pointer-events-none absolute inset-x-5 top-12 z-20 text-center">
           <p className="text-[9px] font-bold uppercase tracking-[0.32em] text-cyan-100/70">PANACEAMED · YOUR BODY</p>
@@ -93,7 +93,7 @@ export function ScrollCinematic() {
 
   return (
     <section ref={trackRef} className="anatomy-cinematic relative" style={{ height: '360vh' }} aria-label="Interactive human anatomy cinematic">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#02050a] text-white">
+      <div className="dark sticky top-0 h-[100svh] overflow-hidden bg-[#02050a] text-white">
         <AnatomyScene stage="whole" sceneRef={sceneRef} />
 
         <div className="pointer-events-none absolute inset-0 z-20">
