@@ -1,6 +1,6 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
-Updated 2026-09-26 (scheduled autonomous session). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md; sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
+Updated 2026-10-02 (scheduled autonomous session, bookkeeping refresh; body below the Updated line partly from 2026-09-26). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md; sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
 
 main_sha: (this session's commit, pushed on top of db38eb3 — see git log for exact SHA)
 working_branch: main
@@ -15,15 +15,16 @@ completed_this_session:
 - updated `governance/MATURITY_REGISTRY.yaml` (`clinical.patient_review.known_gaps` and a dated `change_log` entry).
 
 current_blocker:
-- none in code. This closes one named known_gap; `clinical.patient_review` still carries `self_id_still_email_derived_for_self_records`, `anamnesis_and_exam_fields_have_no_per_field_origin`, `clinician_usability_test` and `clinical_validation` (the last two are externally blocked on real clinicians, per `risk.clinical_validation_external_dependency` — do not fabricate).
+- none in code for `clinical.patient_review`. Re-audited 2026-10-02 against MATURITY_REGISTRY: `self_id_still_email_derived_for_self_records` (closed c3061d41) and `anamnesis_and_exam_fields_have_no_per_field_origin` (closed 2026-09-30, `server/uji/asalIsianKlinis.uji.ts`) are already landed; earlier text in this file listing them as open was stale.
+- remaining known_gaps across the core lanes are externally blocked, not software-addressable: `clinician_usability_test` / `clinical_validation` / `prospective_clinician_validation` (need real clinicians, per `risk.clinical_validation_external_dependency`), `photo_ocr_live_vision_accuracy`, `direct_lab_system_integration`, `production_deployment_verification`, `reminder_live_push_verification` (need real devices/feeds/deploys). Do not fabricate evidence for them.
 
 failing_checks:
-- none. Frontend `npm run uji` 500/500, server `npm run uji` 0 gagal across every suite, `npx tsc -b` clean, all confirmed in this session after a fresh `npm install` in both `/` and `/server`.
+- not re-run in this bookkeeping-only session (no code changed, deps not installed); last recorded: frontend `npm run uji` 500/500, server 0 gagal, `npx tsc -b` clean.
 
-next_exact_action (pick the next software-addressable item per the balanced gap closure order — hard safety → clinical-validation enablement → AI-EMR/longitudinal workflow → weakest core maturity gap):
-- `clinical.patient_review` known_gap `anamnesis_and_exam_fields_have_no_per_field_origin`: per-item provenance already exists for problems/plan/diagnosis (`server/uji/asalButirKlinis.uji.ts`, 2026-09-26); anamnesis and exam fields still have no per-field origin stamp. Extend the same server-stamped-origin pattern to those fields.
-- or `self_id_still_email_derived_for_self_records`: the `self-<email-hash>` scheme is a known collision surface (mitigated by the reverse-lookup check in `bolehAksesPasien`, but not a real identity binding). Consider whether a durable self-record id independent of email is worth the migration cost before touching it — this one is riskier/larger, read `server/src/aksesKlinis.ts` comments first.
-- if both feel too large for one session, re-scan `governance/MATURITY_REGISTRY.yaml` known_gaps across all four core workflows for the next smallest concrete, software-addressable item before touching Body Exposure (VisSim-OS et al. are already ahead of the core-maturity lanes per the 2026-09-25 sequencing override and should not get further disproportionate attention until the core lanes are more level).
+next_exact_action:
+- run `npm install` (root and `/server`), then `npm run uji` and `npx tsc -b` to re-baseline on current main before any code change.
+- pick the weakest *software-addressable* item: re-scan `governance/RND_BACKLOG.yaml` (`rnd.feature_island_scan` is recurring) for orphan/duplicate/mock-only capabilities, and the `physiology.canonical_to_model_to_reality` gaps (`limited_domain_coupling_coverage`, `limited_projection_wiring`).
+- work on a `feat/`/`fix/`/`docs/` branch per CLAUDE.md §5; never push to main directly.
 
 files_in_scope:
 - server/src/{aksesKlinis,index}.ts, server/uji/tautanPasien.uji.ts
