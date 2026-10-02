@@ -7,7 +7,7 @@ import {
 } from '../../lib/discoveryWorkbench'
 
 const SynapseMicro3DLab = lazy(() => import('../../pages/discovery/SynapseMicro3DLab'))
-const MentalStateCircuit3DLab = lazy(() => import('../../pages/discovery/MentalStateCircuit3DLab'))
+const MentalStateCircuit3DLab = lazy(() => import('./MentalStateCircuit3DLab'))
 
 const MODE_COPY: Record<DiscoveryMode, { label: string; subtitle: string }> = {
   discovery: { label: 'Discovery', subtitle: 'Competing hypotheses, causal structure, falsification and missing evidence.' },

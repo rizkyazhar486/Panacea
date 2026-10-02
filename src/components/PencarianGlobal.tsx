@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Portal } from './Portal'
-import { NAV_UNTUK_PENGATURAN } from './Shell'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import { ambilTersembunyi } from '../lib/fiturTersembunyi'
 import { api, backendEnabled } from '../lib/api'
 import type { Role } from '../lib/types'
