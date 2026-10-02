@@ -20,15 +20,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Wait for Render deployment and verify genomics API
         env:
           SERVER_URL: ${{ vars.SERVER_URL }}
           SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
-          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          # Render hanya redeploy saat server/ berubah: provenance = commit terakhir yang menyentuh server.
+          expected_sha="$(git log -1 --format=%H -- server)"
+          if [ -z "$expected_sha" ]; then
+            echo 'Cannot resolve server-source provenance commit.' >&2
+            exit 1
+          fi
+          export EXPECTED_SHA="$expected_sha"
           base="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
           if [ -z "$base" ]; then
             echo 'VITE_API_URL/SERVER_URL is not configured.' >&2
