@@ -7,6 +7,7 @@ import { BodyExplorer } from './BodyExplorer'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import './bodyExposureOS.css'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Fold } from '../shared/ui/Fold'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))
@@ -222,7 +223,7 @@ export function BodyExposureOS() {
         </Suspense>
       </div>
 
-      <div className="relative z-[2] mt-3">
+      <Fold label="Multiscale" className="relative z-[2] mt-3">
         <Suspense fallback={null}>
           <PanelKoplingMultiSkala />
         </Suspense>
@@ -231,7 +232,7 @@ export function BodyExposureOS() {
             <PanelUbiquitin />
           </Suspense>
         </div>
-      </div>
+      </Fold>
 
       <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
         <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">

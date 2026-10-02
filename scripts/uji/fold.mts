@@ -124,6 +124,17 @@ assert.match(vita, /<Fold label="Video"/, 'VitaPulse folds Video')
 for (const w of ['Assistant', 'Vitals', 'Sleep', 'Fitness', 'News', 'Learn', 'Goals']) assert.match(pusat, new RegExp(`<Fold label="${w}">`), `VitaPulse folds ${w}`)
 assert.ok(pusat.indexOf('Real-Time Summary') < pusat.indexOf('<Fold label="Assistant">'), 'the summary hero comes before every fold')
 assert.ok(pusat.slice(pusat.indexOf('Real-Time Summary'), pusat.indexOf('<Fold label="Assistant">')).includes('</Card>'), 'the folds are siblings of the summary hero, never nested inside its card')
+// Body Exposure: proyektor tunggal tetap di atas; panel multiskala + ubiquitin (proyeksi molekul kedua) dilipat satu kata.
+const eksposur = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
+const lipatMulti = eksposur.indexOf('<Fold label="Multiscale"')
+assert.ok(lipatMulti >= 0, 'Body Exposure folds Multiscale')
+assert.ok(lipatMulti > eksposur.indexOf('<UnifiedHumanSimulationProjector'), 'the single projector comes before the Multiscale fold')
+const penutupMulti = eksposur.indexOf('</Fold>', lipatMulti)
+for (const panel of ['<PanelKoplingMultiSkala />', '<PanelUbiquitin />']) {
+  const at = eksposur.indexOf(panel)
+  assert.ok(lipatMulti >= 0 && at > lipatMulti && at < penutupMulti, `${panel} lives inside the Multiscale fold`)
+}
+assert.equal((eksposur.match(/<UnifiedHumanSimulationProjector/g) ?? []).length, 1, 'Body Exposure keeps exactly one unified projector')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
