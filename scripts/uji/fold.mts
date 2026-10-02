@@ -113,6 +113,10 @@ const liga = readFileSync('src/pages/HealthPerformanceLeague.tsx', 'utf8')
 for (const w of ['Components', 'Matches', 'Ladder', 'Promotion', 'Scoring', 'Seasons']) assert.match(liga, new RegExp(`<Fold label="${w}"`), `League folds ${w}`)
 assert.ok(liga.indexOf('Current rank') < liga.indexOf('<Fold label="Components"'), 'the rank hero comes before every fold')
 assert.ok(liga.indexOf('AI victory index') < liga.indexOf('<Fold label="Matches">'), 'the victory index stays outside the folds')
+// Longevity: skor + usia biologis adalah hero; enam bagian lain dilipat satu kata.
+const umur = readFileSync('src/pages/Longevity.tsx', 'utf8')
+for (const w of ['Evidence', 'Pillars', 'Projection', 'Labs', 'Testing', 'Sources']) assert.match(umur, new RegExp(`<Fold label="${w}">`), `Longevity folds ${w}`)
+assert.ok(umur.indexOf('Biological Age (est.)') < umur.indexOf('<Fold label="Evidence">'), 'the score hero comes before every fold')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
