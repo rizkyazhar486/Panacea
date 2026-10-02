@@ -7,3 +7,6 @@ sources/
 renders/test/
 renders/log_*.txt
 __pycache__/
+web/raw/
+web/.qa_*.png
+web/export_log.txt

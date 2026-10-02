@@ -38,6 +38,37 @@
 - **Limitations:** the convex outline slightly overfills the posterior concavity; the annulus
   fibrosus and nucleus pulposus are not separated.
 
+## Pericardium (in HUMAN.ADULT.MALE) — approximate
+
+- **Method:** `pipeline/build_pericardium.py`. Takes the union of the source heart chambers,
+  the coronary sinus, the roots of the great vessels and the epicardial vessels, then:
+  - voxel remesh at 3 mm, morphological closing at 6 mm, and a 3.5 mm outward offset;
+  - cut at the top of the pulmonary-trunk bifurcation (superior reflection) and where it
+    enters the diaphragm.
+- **Reference:** Gray's Anatomy, middle mediastinum. The sac encloses the heart and the great
+  vessel roots, reflects at about the pulmonary-trunk bifurcation and start of the aortic
+  arch, and rests on the central tendon of the diaphragm.
+- **Limitations:** the fibrous and parietal serous layers are one surface, with no wall
+  thickness; reflections around the pulmonary veins and the oblique and transverse sinuses
+  are not modelled.
+
+## Lung correction (source_backed_corrected)
+
+The source lungs intrude into the space occupied by the source heart (confirmed by a
+three-ray parity test: 17–24 of about 450 sampled ventricle vertices lie inside the left
+upper lobe). Lung vertices lying inside the pericardial sac were moved onto its surface
+plus 0.8 mm, which produces the cardiac impression. Vertices within 4 mm of the sac's cut
+edges were left alone, because the inside/outside test is unreliable there. Each lobe
+records how many vertices moved in `panacea_qa_note`.
+
+## Source objects with lost names
+
+Three source objects had non-ASCII names that did not survive export:
+- `????????` — identified by morphology as the **probable** epicardial veins of the right
+  ventricle (anterior cardiac veins plus right marginal vein). Flagged `review_required`.
+- `?x.l` / `?x.r` — a small paired artery running front-to-back beside the nasal septum at
+  palate level. **Not identified**; stored as `UNIDENTIFIED_PARASEPTAL_ARTERY_NASAL_FLOOR`.
+
 ## Label anchors — approximate
 
 Sixteen `ANCHOR.ADULT_MALE.*` empties (femoral head, greater trochanter, ASIS, tibial plateau,
@@ -59,10 +90,33 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
     from heart/liver/spleen/kidney positions.
   - Semantic IDs, metadata and `PAN_*` materials as for the male. System assignment was
     inferred from source names and is marked `panacea_system_assignment: inferred`.
+- **Additional parts merged (2026-10-03),** only structures absent from VH_F_United, placed with
+  the same body transform:
+  - `v1.2/VH_F_Spinal_Cord.glb`: 29 spinal cord segments, C1–S4;
+  - `v1.3/VH_F_mammary_gland_L/R.glb`: lobes, lactiferous ducts and sinuses, nipple, areola,
+    areolar tubercles, mammary fat, suspensory (Cooper's) ligaments;
+  - `v1.4/3d-vh-f-blood-vasculature.glb`: 2 new vessels.
+
+  The other 108 objects in those files duplicated structures already present and were
+  dropped. Alignment check: the cord lies posterior to the aortic arch, and the breast
+  lobes are anterior to the chest wall.
+- **System routing audit:** keyword routing had collisions, all corrected:
+  - "bladder" in gallbladder;
+  - "papilla" in the heart's papillary muscles;
+  - "renal" in the liver's renal impression;
+  - laryngeal cartilages and femoral condyles filed under joint;
+  - hepatic, uterine and sigmoid vessels filed under their organs instead of
+    cardiovascular;
+  - "uter" in "outer cortex of kidney".
+
+  The male master had the same gallbladder error, plus the suprarenal gland under urinary;
+  both are fixed.
+- **Embedded laterality:** 69 kidney sub-parts were named like `major calyx L a`. They now
+  carry the side as laterality (`MAJOR_CALYX_A.L`).
 - **Coverage:** thoracic, abdominal and pelvic organs (including uterus, cervix, tubes,
   ovaries and their ligaments), heart with coronaries, airway, kidneys with internal
   structure, eyes, knees, female bony pelvis, brain. **Not present:** full skeleton, most
-  musculature, peripheral nerves.
+  musculature, peripheral nerves. (Spinal cord and breast tissue were added afterwards; see above.)
 - **Not merged with the male.** The two bodies are separate subjects; combining them would
   need a registration transform that no source provides.
 
