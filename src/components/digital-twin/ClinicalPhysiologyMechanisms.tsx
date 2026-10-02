@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentConvention } from '../../lib/physiology/oxygenContentConventions'
 
 type TopicKey =
   | 'cardio'
@@ -29,6 +30,9 @@ type Topic = {
   formulae?: Formula[]
   challenge?: string[]
 }
+
+// Coefficients come from the canonical oxygen-content convention registry, not from this file.
+const OXYGEN = oxygenContentConvention(DEFAULT_OXYGEN_CONTENT_CONVENTION)
 
 const TOPICS: Topic[] = [
   {
@@ -313,7 +317,7 @@ function TeachingLab({ topic }: { topic: TopicKey }) {
     const co = cardio.hr * sv / 1000
     const ef = cardio.edv > 0 ? sv / cardio.edv * 100 : 0
     const map = cardio.dbp + (cardio.sbp - cardio.dbp) / 3
-    const cao2 = 1.34 * cardio.hb * (cardio.sao2 / 100) + 0.003 * cardio.pao2
+    const cao2 = OXYGEN.hufnerMlO2PerGHb * cardio.hb * (cardio.sao2 / 100) + OXYGEN.dissolvedMlO2PerDlPerMmHg * cardio.pao2
     const do2 = co * cao2 * 10
     return <LabShell title="Hemodynamic teaching lab" note="Illustrative adult inputs. Change values to see equations respond; these are not inferred patient measurements."><div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"><NumberField label="Heart rate" value={cardio.hr} onChange={(hr) => setCardio({ ...cardio, hr })} unit="bpm" max={240}/><NumberField label="EDV" value={cardio.edv} onChange={(edv) => setCardio({ ...cardio, edv })} unit="mL" max={300}/><NumberField label="ESV" value={cardio.esv} onChange={(esv) => setCardio({ ...cardio, esv })} unit="mL" max={250}/><NumberField label="SBP" value={cardio.sbp} onChange={(sbp) => setCardio({ ...cardio, sbp })} unit="mmHg" max={300}/><NumberField label="DBP" value={cardio.dbp} onChange={(dbp) => setCardio({ ...cardio, dbp })} unit="mmHg" max={200}/><NumberField label="Hemoglobin" value={cardio.hb} onChange={(hb) => setCardio({ ...cardio, hb })} unit="g/dL" step={0.1} max={30}/><NumberField label="SaO₂" value={cardio.sao2} onChange={(sao2) => setCardio({ ...cardio, sao2 })} unit="%" step={0.1} max={100}/><NumberField label="PaO₂" value={cardio.pao2} onChange={(pao2) => setCardio({ ...cardio, pao2 })} unit="mmHg" max={700}/></div><div className="mt-3 grid gap-2 grid-cols-2 lg:grid-cols-5"><Result label="SV" value={`${sv.toFixed(0)} mL`}/><Result label="CO" value={`${co.toFixed(2)} L/min`}/><Result label="EF" value={`${ef.toFixed(0)}%`}/><Result label="MAP" value={`${map.toFixed(0)} mmHg`}/><Result label="O₂ delivery" value={`${do2.toFixed(0)} mL/min`} note="Calculated DO₂ from teaching Hb/SaO₂/PaO₂ and CO."/></div></LabShell>
   }

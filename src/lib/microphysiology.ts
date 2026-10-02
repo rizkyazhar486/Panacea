@@ -1,3 +1,5 @@
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentMlDl } from './physiology/oxygenContentConventions.ts'
+
 /**
  * Deterministic microphysiology helpers used by the visual physiology explorer.
  * Values are educational calculations from user-entered reference inputs;
@@ -14,14 +16,15 @@ function clamp(value: number, min: number, max: number) {
 
 /**
  * Arterial/venous oxygen content in mL O2/dL.
- * C_O2 = 1.34 * Hb * S_O2 + 0.003 * P_O2
+ * Coefficients come from the canonical oxygen-content convention registry
+ * (src/lib/physiology/oxygenContentConventions.ts), not from this file.
  * Hb: g/dL, saturation: %, partial pressure: mmHg.
  */
 export function oxygenContent(hb: number, saturationPct: number, partialPressureMmHg: number) {
   const safeHb = Math.max(0, finite(hb))
   const saturation = clamp(saturationPct, 0, 100) / 100
   const partialPressure = Math.max(0, finite(partialPressureMmHg))
-  return 1.34 * safeHb * saturation + 0.003 * partialPressure
+  return oxygenContentMlDl(DEFAULT_OXYGEN_CONTENT_CONVENTION, { value: safeHb, unit: 'g/dL' }, saturation, partialPressure)
 }
 
 /**
