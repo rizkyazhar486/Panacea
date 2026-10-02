@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Light's Criteria — Light, R.W., et al. (1972), Ann Intern Med, 77(4):507-513.
@@ -34,6 +35,7 @@ export function LightsCriteria() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Light's Criteria" subtitle="Exudate vs. transudate pleural effusion (Light et al. 1972)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Cairan digolongkan eksudat bila SALAH SATU dari ketiga kriteria terpenuhi. Kepekaannya tinggi untuk eksudat, tetapi gagal jantung yang sedang diberi diuretik kadang melewati ambang itu dan tampak sebagai eksudat palsu.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Pleural fluid protein (g/dL)">

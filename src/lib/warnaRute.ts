@@ -1,6 +1,6 @@
 import { FITUR_DARI_HUB } from './katalogFitur'
 import { WIDGETS } from './homeWidgets'
-import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import { rupa, type Rupa } from './kategoriRupa'
 
 // ─────────────────────────────────────────────────────────────────────────────

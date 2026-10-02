@@ -15,7 +15,7 @@ import {
 type Simpul = { name?: string; mesh?: number; children?: number[] }
 
 async function bacaGltf(berkas: string) {
-  const buf = await readFile(new URL(`../../public/${berkas}`, import.meta.url))
+  const buf = await readFile(new URL(`../../public/anatomy/${berkas}`, import.meta.url))
   assert.equal(buf.readUInt32LE(0), 0x46546c67, `Bukan berkas GLB: ${berkas}`)
   assert.equal(buf.readUInt32LE(16), 0x4e4f534a, `Chunk pertama bukan JSON: ${berkas}`)
   const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8'))

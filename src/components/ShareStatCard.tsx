@@ -5,6 +5,7 @@ import { uploadOrLocal } from '../lib/upload'
 import { IconShare2, IconX, IconDownload } from './icons'
 import { Portal } from './Portal'
 import type { Role } from '../lib/types'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const CARD_W = 1080
 const CARD_H = 1350
@@ -222,6 +223,7 @@ export function ShareStatCard(props: StatCardProps) {
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-base font-black text-ink">Share Results</h3>
+        <BatasKlaimKesehatan permukaan="wellness.share-stat" className="mt-2 text-[11px] leading-snug text-neutral-500" />
               <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 

@@ -15,7 +15,7 @@ import {
 // (memuat lewat three, memeriksa nama scene) sudah pernah lolos sambil
 // mengikat nol geometri.
 
-const buf = await readFile(new URL(`../../public/${BERKAS_LIMFOID}`, import.meta.url))
+const buf = await readFile(new URL(`../../public/anatomy/${BERKAS_LIMFOID}`, import.meta.url))
 assert.equal(buf.readUInt32LE(0), 0x46546c67, 'Bukan berkas GLB')
 assert.equal(buf.readUInt32LE(16), 0x4e4f534a, 'Chunk pertama bukan JSON')
 const gltf = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8')) as {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSun } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sun Exposure & Vitamin D Calculator — live UV index (GPS, free Open-Meteo
@@ -94,6 +95,7 @@ export function SunExposure() {
           subtitle="Live local UV index, sunburn timing & a rough vitamin D window"
           right={<button onClick={locate} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">📍 Refresh</button>}
         />
+        <BatasKlaimKesehatan permukaan="wellness.sun-exposure" />
 
         <div className="mt-3">
           <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Your skin type (Fitzpatrick scale)</div>

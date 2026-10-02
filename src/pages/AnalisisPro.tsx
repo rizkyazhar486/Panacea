@@ -6,9 +6,9 @@ import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, Responsive
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
 import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
-import { parseWorkouts, hrMaxFromAge, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
+import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
 import { useVitals } from '../lib/useVitals'
 import {
@@ -16,6 +16,7 @@ import {
   kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Analisis Pro — satu halaman berisi padanan fitur analisis berbayar Strava,
@@ -67,7 +68,7 @@ export function AnalisisPro() {
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
-      hrMax: Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex)),
+      hrMax: Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan())),
       hrRest: demo.restingHr && demo.restingHr > 0 ? demo.restingHr : 60,
       sex: demo.sex,
     }
@@ -96,6 +97,7 @@ export function AnalisisPro() {
     return (
       <div className="space-y-4 pb-24">
         <SectionTitle icon={<IconChartUp />} title="Pro Analysis" subtitle="Fitness, freshness, relative effort, records and targets" />
+        <BatasKlaimKesehatan permukaan="performance.analisis-pro" />
         <Card>
           <Prosa kelas="text-sm leading-relaxed text-neutral-600">No training sessions stored yet, so there is nothing to analyse. Every number on this page is computed from real sessions — there is no sample or default data.</Prosa>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">

@@ -12,6 +12,8 @@ import { getDemo, setDemo } from '../lib/profile'
 import { JENIS_OLAHRAGA, type JenisOlahraga } from '../lib/olahraga'
 import { getVitals } from '../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { proyeksikanNilaiNutrisiKeLabKanonic, gabungLabNutrisiDenganKanonic } from '../lib/lab'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -780,6 +782,7 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
     <Card className="!p-5">
       <div className="flex items-center justify-between">
         <SectionTitle icon={<span className="text-lg">{'\u2696\uFE0F'}</span>} title="Body Profile" />
+        <BatasKlaimKesehatan permukaan="longevity.nutrition-score" />
         <button onClick={() => setEdit(true)} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">{'\u270F\uFE0F'} Edit</button>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -1254,7 +1257,7 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
    6. LAB TRACKER (Weekly Comparison)
    ═══════════════════════════════════════════════════════ */
 function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
-  const [labs, setLabs] = useState<LabEntry[]>(loadLabs)
+  const [labs, setLabs] = useState<LabEntry[]>(() => gabungLabNutrisiDenganKanonic(loadLabs()))
   const [editVals, setEditVals] = useState<Record<string, string>>({})
   const [editDate, setEditDate] = useState<string>(today())
   const [showForm, setShowForm] = useState(false)
@@ -1269,15 +1272,18 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
     Object.entries(editVals).forEach(([k, v]) => { const n = parseFloat(v); if (!isNaN(n)) vals[k] = n })
     if (Object.keys(vals).length === 0) return
     const updated = [...labs.filter(l => l.date !== editDate), { date: editDate, values: vals }]
-    setLabs(updated); saveLabs(updated); setShowForm(false); setEditVals({})
+    setLabs(updated); saveLabs(updated)
+    // Known analytes also join the account-synced lab log (PhenoAge / Your Numbers).
+    proyeksikanNilaiNutrisiKeLabKanonic(editDate, vals)
+    setShowForm(false); setEditVals({})
   }
 
   function labStatus(key: string, val: number) {
     const range = labRanges[key]
     if (!range) return { color: '#a3a3a3', label: '-' }
-    if (val >= range[0] && val <= range[1]) return { color: CT.ok, label: 'Normal' }
-    if (val < range[0]) return { color: CT.blue, label: 'Low' }
-    return { color: CT.bad, label: 'High' }
+    if (val >= range[0] && val <= range[1]) return { color: CT.ok, label: 'in range' }
+    if (val < range[0]) return { color: CT.blue, label: 'below' }
+    return { color: CT.bad, label: 'above' }
   }
 
   function labTrend(key: string) {
@@ -1309,6 +1315,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
         const idx = merged.findIndex(l => l.date === nl.date)
         if (idx >= 0) merged[idx] = { ...merged[idx], values: { ...merged[idx].values, ...nl.values } }
         else merged.push(nl)
+        proyeksikanNilaiNutrisiKeLabKanonic(nl.date, nl.values)
       })
       setLabs(merged); saveLabs(merged)
     }
@@ -1318,7 +1325,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Track how your lab results change week to week" />
+        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Mapped analytes use your account lab log. Colors compare with usual published ranges, not a diagnosis." />
         <div className="flex gap-2">
           <label className="cursor-pointer rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">
             {'\u{1F4C1}'} Import
@@ -1367,7 +1374,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                 {labKeys.map(k => (
                   <th key={k} className="py-2 px-2 text-center font-bold text-neutral-500 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
                 ))}
-                <th className="py-2 pl-2 text-center font-bold text-neutral-500">Status</th>
+                <th className="py-2 pl-2 text-center font-bold text-neutral-500" title="Count of values outside usual published ranges. Not a diagnosis.">Usual range</th>
               </tr>
             </thead>
             <tbody>
@@ -1383,7 +1390,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                       const v = lab.values[k]; const st = v != null ? labStatus(k, v) : null
                       return (
                         <td key={k} className="py-2 px-2 text-center tabular-nums whitespace-nowrap">
-                          {v != null ? <span style={{ color: st?.color ?? '#404040', fontWeight: st?.label !== 'Normal' ? 700 : 400 }}>{v}</span> : <span className="text-neutral-300">-</span>}
+                          {v != null ? <span style={{ color: st?.color ?? '#404040', fontWeight: st?.label !== 'in range' ? 700 : 400 }}>{v}</span> : <span className="text-neutral-300">-</span>}
                         </td>
                       )
                     })}

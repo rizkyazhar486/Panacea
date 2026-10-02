@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-18",
+  "system": "digestive",
+  "organ": "liver",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports general anatomy, physiology, pathophysiology and pharmacology-context relationships only; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, asset licensing, or human review.",
+  "relationships": [
+    {
+      "id": "hepatic-acinus-metabolic-zonation",
+      "domain": "anatomy-physiology",
+      "from": "hepatic-acinus",
+      "to": "metabolic-zonation",
+      "relationship": "organizes-spatial-metabolic-heterogeneity",
+      "claim": "Hepatocytes across the hepatic acinus have spatially heterogeneous metabolic capacities; periportal and perivenous zones differ in multiple metabolic functions, and this zonation is dynamic rather than a fixed uniform property of the liver.",
+      "evidence": ["pmid:1542056"],
+      "status": "source-checked"
+    },
+    {
+      "id": "hepatic-zonation-metabolic-disease-context",
+      "domain": "physiology-pathophysiology",
+      "from": "metabolic-zonation",
+      "to": "metabolic-liver-disease-context",
+      "relationship": "can-be-perturbed-in-disease",
+      "claim": "Glucose and fatty-acid metabolic pathways are zonated across the liver acinus, and perturbation of this spatial organization has been described in the context of metabolic liver disease.",
+      "evidence": ["pmid:23792151"],
+      "status": "source-checked"
+    },
+    {
+      "id": "hepatic-zonation-xenobiotic-metabolism-context",
+      "domain": "physiology-pharmacology",
+      "from": "perivenous-zone",
+      "to": "xenobiotic-metabolism",
+      "relationship": "has-zonated-metabolic-capacity",
+      "claim": "The reviewed adult hepatic acinus shows zonation of metabolic functions, including predominance of xenobiotic metabolism in the perivenous region; this is an educational physiology/pharmacology relationship and not a basis for drug selection or dosing.",
+      "evidence": ["pmid:1542056"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:1542056",
+      "pmid": "1542056",
+      "title": "Metabolic heterogeneity of hepatocytes across the liver acinus.",
+      "year": 1992,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/1542056/",
+      "evidenceRole": "Review describing periportal/perivenous metabolic heterogeneity, dynamic hepatic acinar zonation, and zonated xenobiotic metabolism.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:23792151",
+      "pmid": "23792151",
+      "title": "Zonation of glucose and fatty acid metabolism in the liver: mechanism and metabolic consequences.",
+      "year": 2014,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23792151/",
+      "evidenceRole": "Review describing glucose/fatty-acid metabolic zonation and its perturbation in metabolic liver disease contexts.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata and abstract were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-or-dose-recommendation",
+      "source-checked-to-human-reviewed",
+      "metabolic-zonation-to-patient-specific-drug-response"
+    ]
+  }
+}

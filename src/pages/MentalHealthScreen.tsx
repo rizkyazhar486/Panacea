@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart, IconPhone } from '../components/icons'
@@ -6,6 +7,8 @@ import {
   simpan, bacaRiwayat, perubahan, riwayatAlat, pita, MAKSIMAL,
   type Alat, type Catatan,
 } from '../lib/mentalTrend'
+import { deriveMentalHealthSafetyDisposition } from '../lib/mentalHealthSafety'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mental Health Screening — PHQ-9 (depression, Kroenke, Spitzer & Williams,
@@ -95,6 +98,12 @@ export function MentalHealthScreen() {
   const phqScore = phqAnswered ? (phq as number[]).reduce((s, a) => s + a, 0) : null
   const gadScore = gadAnswered ? (gad as number[]).reduce((s, a) => s + a, 0) : null
   const item9Positive = (phq[8] ?? 0) > 0
+  // PHQ-9 item 9 covers the preceding two weeks. It is a positive self-harm
+  // signal that requires direct assessment/follow-up, but it does not by
+  // itself establish that suicidal thoughts are current or imminent.
+  const safetyDisposition = deriveMentalHealthSafetyDisposition(
+    item9Positive ? { suicidalThoughts: true } : {},
+  )
 
   // Menyimpan hasil, bukan menampilkannya lalu membuangnya. Skor tunggal
   // hampir tidak berarti; yang bermakna secara klinis adalah perubahannya.
@@ -112,26 +121,41 @@ export function MentalHealthScreen() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — short validated screeners" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Over the last 2 weeks, how often have you been bothered by each of these? These are the most widely used screening instruments in primary care worldwide — not a diagnosis, but a validated way to gauge severity and, more importantly, to follow how it changes over time.</Prosa>
+        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — published brief screeners" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Over the last 2 weeks, how often have you been bothered by each of these? These are widely used primary-care screening instruments — not a diagnosis, and not a clinically validated Panacea decision. Use them to track change over time and discuss results with a clinician.</Prosa>
+        <BatasKlaimKesehatan permukaan="screening.mental" />
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('phq9')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'phq9' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>PHQ-9 (Depression)</button>
           <button onClick={() => setTab('gad7')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'gad7' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>GAD-7 (Anxiety)</button>
         </div>
       </Card>
 
-      {item9Positive && (
+      {safetyDisposition.humanReviewRequired && (
         <Card className="!p-5 border-2 border-rose-300 bg-rose-50 dark:border-rose-500/40 dark:bg-rose-500/10">
           <div className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-500 text-white"><IconPhone size={18} /></span>
-            <div>
-              <div className="text-sm font-black text-rose-700 dark:text-rose-300">You don't have to go through this alone</div>
-              <Prosa kelas="mt-1 text-[13px] leading-relaxed text-rose-700/90 dark:text-rose-200/90">You reported thoughts of harming yourself, or that you would be better off gone. Please reach someone now — a person you trust, a mental health professional, or one of these lines:</Prosa>
-              <ul className="mt-2 space-y-1 text-[13px] font-semibold text-rose-800 dark:text-rose-200">
-                <li>🇮🇩 Indonesia — Kemenkes SEJIWA: <b>119 ext. 8</b></li>
-                <li>🌍 International — <a href="https://findahelpline.com" target="_blank" rel="noreferrer" className="underline">findahelpline.com</a> (crisis lines by country)</li>
-                <li>Or go to your nearest emergency department.</li>
-              </ul>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-black text-rose-700 dark:text-rose-300">Please arrange direct support and follow-up</div>
+              <Prosa kelas="mt-1 text-[13px] leading-relaxed text-rose-700/90 dark:text-rose-200/90">
+                A positive PHQ-9 item 9 needs direct assessment; it does not by itself prove an immediate emergency. If these thoughts are happening right now, you may act on them, or you cannot stay safe, use urgent help now.
+              </Prosa>
+              <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-black">
+                <a href="https://healing119.id" target="_blank" rel="noreferrer" className="rounded-full border border-rose-300 bg-white px-3 py-1.5 text-rose-700 dark:bg-white/10 dark:text-rose-200">
+                  Healing119 · 119 ext. 8
+                </a>
+                <Link to="/jiwa?t=aman" className="rounded-full border border-rose-300 bg-white px-3 py-1.5 text-rose-700 dark:bg-white/10 dark:text-rose-200">
+                  Open safety plan
+                </Link>
+                <Link to="/consult" className="rounded-full border border-rose-300 bg-white px-3 py-1.5 text-rose-700 dark:bg-white/10 dark:text-rose-200">
+                  Open consult
+                </Link>
+                <Link to="/hospitals" className="rounded-full border border-rose-300 bg-white px-3 py-1.5 text-rose-700 dark:bg-white/10 dark:text-rose-200">
+                  Find emergency care
+                </Link>
+              </div>
+              <p className="mt-2 text-[10.5px] leading-relaxed text-rose-700/80 dark:text-rose-200/80">
+                Panacea does not automatically contact anyone from this screen. External help remains your action or a clinician-led handoff.
+              </p>
             </div>
           </div>
         </Card>

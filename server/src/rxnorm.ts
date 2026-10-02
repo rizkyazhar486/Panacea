@@ -43,30 +43,57 @@ function firstNumericRxcui(ids: Array<string | undefined>): string | undefined {
   return ids.find((id): id is string => typeof id === 'string' && /^\d+$/.test(id))
 }
 
-/** Resolve misspellings/local brand-like terms to the canonical RxNorm name.
- * This is terminology normalization only; it is not a drug-interaction or
- * therapeutic-equivalence decision. */
-export async function normalizeDrugName(name: string): Promise<string | null> {
-  const q = cleanQuery(name)
-  if (!q) return null
+export interface RxNormConcept {
+  rxcui: string
+  name: string
+}
 
-  const approximateUrl = new URL(`${BASE}/approximateTerm.json`)
-  approximateUrl.searchParams.set('term', q)
-  approximateUrl.searchParams.set('maxEntries', '5')
-  const approximateRes = await fetch(approximateUrl, upstreamInit())
-  if (!approximateRes.ok) throw new Error(`rxnorm_approximate_${approximateRes.status}`)
-  const approximateJson = (await approximateRes.json()) as ApproximateResp
-  const rxcui = firstNumericRxcui((approximateJson.approximateGroup?.candidate ?? []).map((candidate) => candidate.rxcui))
-  if (!rxcui) return null
-
+async function rxNormNameForRxcui(rxcui: string): Promise<string | null> {
   const propertyUrl = new URL(`${BASE}/rxcui/${rxcui}/property.json`)
   propertyUrl.searchParams.set('propName', 'RxNorm Name')
   const propertyRes = await fetch(propertyUrl, upstreamInit())
   if (!propertyRes.ok) throw new Error(`rxnorm_property_${propertyRes.status}`)
   const propertyJson = (await propertyRes.json()) as PropertyResp
-  const rawName = propertyJson.propConceptGroup?.propConcept?.find((prop) => typeof prop.propValue === 'string' && prop.propValue.trim())?.propValue
+  const rawName = propertyJson.propConceptGroup?.propConcept?.find(
+    (prop) => typeof prop.propValue === 'string' && prop.propValue.trim(),
+  )?.propValue
   if (!rawName) return null
   return rawName.replace(/\s+/g, ' ').trim().slice(0, MAX_NORMALIZED_NAME_LENGTH)
+}
+
+/** Resolve either an explicit RxCUI or a name-like term to canonical RxNorm
+ * identity. This remains terminology resolution only; it does not establish
+ * therapeutic equivalence, indication, interaction safety, or a dose. */
+export async function resolveRxNormConcept(value: string): Promise<RxNormConcept | null> {
+  const q = cleanQuery(value)
+  if (!q) return null
+
+  let rxcui: string | undefined
+  if (/^\d+$/.test(q)) {
+    rxcui = q
+  } else {
+    const approximateUrl = new URL(`${BASE}/approximateTerm.json`)
+    approximateUrl.searchParams.set('term', q)
+    approximateUrl.searchParams.set('maxEntries', '5')
+    const approximateRes = await fetch(approximateUrl, upstreamInit())
+    if (!approximateRes.ok) throw new Error(`rxnorm_approximate_${approximateRes.status}`)
+    const approximateJson = (await approximateRes.json()) as ApproximateResp
+    rxcui = firstNumericRxcui(
+      (approximateJson.approximateGroup?.candidate ?? []).map((candidate) => candidate.rxcui),
+    )
+  }
+
+  if (!rxcui) return null
+  const name = await rxNormNameForRxcui(rxcui)
+  return name ? { rxcui, name } : null
+}
+
+/** Resolve misspellings/local brand-like terms to the canonical RxNorm name.
+ * This is terminology normalization only; it is not a drug-interaction or
+ * therapeutic-equivalence decision. */
+export async function normalizeDrugName(name: string): Promise<string | null> {
+  const concept = await resolveRxNormConcept(name)
+  return concept?.name ?? null
 }
 
 export async function findRelatedDrugs(name: string): Promise<RelatedDrug[]> {

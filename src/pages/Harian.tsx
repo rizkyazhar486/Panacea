@@ -6,6 +6,7 @@ import { useStore } from '../lib/store'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { fmtDurasi, fmtPace } from '../lib/workoutImport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Harian — satu hari mana pun, ditelusuri maju-mundur.
@@ -120,6 +121,7 @@ export function Harian() {
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
       <SectionTitle icon={<IconChartUp size={20} />} title="Daily" subtitle="Browse any day — what was measured and what you felt" />
+      <BatasKlaimKesehatan permukaan="wellness.daily-hub" />
 
       <div className="flex items-center gap-2">
         <button onClick={() => setGeser((g) => g - 1)} aria-label="Previous day"

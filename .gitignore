@@ -12,6 +12,8 @@ yarn-error.log*
 
 # backend
 server/data.json
+server/arsip/
+server/data.json.corrupt-*
 
 # Locally-added agent skills (tooling, not app code)
 .agents/
@@ -31,3 +33,33 @@ tsconfig.tsbuildinfo
 # Unggahan CI tidak terpengaruh: actions/upload-artifact membaca pohon kerja,
 # bukan indeks git.
 artifacts/
+
+# Worktree terisolasi untuk agen paralel. Dibuat oleh perkakas, bukan isi repo:
+# beberapa agen bekerja serentak di checkout masing-masing supaya indeks git
+# mereka tidak saling menimpa.
+.claude/worktrees/
+
+# Skrip smoke sementara. Pemeriksaan browser sering ditulis sebagai berkas
+# sekali pakai di akar repo; menamainya *.tmp.mjs membuatnya tidak pernah
+# terbawa ke dalam commit kalau seseorang lupa menghapusnya.
+*.tmp.mjs
+
+# Worktree milik agen, bukan isi repositori.
+#
+# Beberapa agen bekerja serentak di repositori ini dan masing-masing membuat
+# git worktree terisolasi di bawah .claude/. Isinya checkout penuh — puluhan
+# megabyte per worktree — dan sepenuhnya merupakan keadaan alat lokal: tidak
+# ada satu pun yang berarti bagi orang lain yang meng-clone repositori ini.
+#
+# Tanpa baris ini, `git status` setiap agen menampilkan .claude/ sebagai
+# untracked, dan cepat atau lambat ada yang menganggapnya pekerjaan yang
+# belum disimpan lalu meng-commit checkout agen lain ke dalam riwayat.
+.claude/*
+!.claude/settings.json
+!.claude/skills/
+
+# Skrip uji sekali pakai. Konvensi *.tmp.* dipakai untuk berkas yang sengaja
+# dibuang setelah dipakai; yang tertinggal di akar repositori hampir selalu
+# sisa sesi, bukan sesuatu yang ingin dibagikan.
+*.tmp.mjs
+*.tmp.js

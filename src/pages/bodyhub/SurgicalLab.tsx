@@ -13,12 +13,16 @@ import {
 } from '../../lib/surgicalLayerRiskGeometry'
 import {
   SURGICAL_SPATIAL_SCENARIOS,
+  alasanRisikoTanpaGeometri,
+  TANDA_RISIKO_TANPA_GEOMETRI,
   type SurgicalSpatialCheckpoint,
   type SurgicalSpatialRegion,
 } from '../../lib/surgicalSpatialTeaching'
 import type { AtlasLayerKey, AtlasRegionKey } from '../../lib/wholeBodyAtlasBlueprint'
+import { SurgicalSimulatorPanel } from './SurgicalSimulatorPanel'
 
 export interface SurgicalLabProps {
+  selectedSourceStructureName?: string | null
   onKedalaman?: (kedalaman: number) => void
   onSorot?: (nama: string[]) => void
 }
@@ -46,7 +50,7 @@ export function kedalamanUntukLangkah(langkah: number, total: number): number {
   return Math.round(bagian * KEDALAMAN.visceral)
 }
 
-export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
+export function SurgicalLab({ selectedSourceStructureName, onKedalaman, onSorot }: SurgicalLabProps) {
   const [incomingHandoff] = useState(() => consumeAnatomyContextHandoff('surgery'))
   const initialSpatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === incomingHandoff?.surgicalScenarioId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
   const [kunci, setKunci] = useState<string | null>(null)
@@ -111,7 +115,14 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      data-selected-source-structure={selectedSourceStructureName ?? undefined}
+      data-structure-procedure-inference="not-inferred"
+      data-patient-specific-surgical-target="not-generated"
+    >
+      <SurgicalSimulatorPanel onSorot={onSorot} onKedalaman={onKedalaman} />
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>
@@ -173,7 +184,26 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
                   {checkpoint.structuresAtRisk.length > 0 && (
                     <div className="mt-2 rounded-lg border border-red-400/20 bg-red-400/[0.05] p-2">
                       <div className="text-[9px] font-black uppercase tracking-wide text-red-300">Adjacent / at-risk structures</div>
-                      <div className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.structuresAtRisk.join(' · ')}</div>
+                      {/* Dulu satu teks gabungan, sehingga struktur yang bisa
+                          ditunjuk pada model tampil sama persis dengan yang
+                          tidak dikirim sama sekali. Hanya 4 dari 17 nama di
+                          seluruh checkpoint yang benar-benar resolve. */}
+                      <ul className="mt-1 space-y-0.5 text-[10px] leading-relaxed text-neutral-300">
+                        {checkpoint.structuresAtRisk.map((risiko) => {
+                          const alasan = alasanRisikoTanpaGeometri(risiko)
+                          return (
+                            <li key={risiko} className={alasan ? 'text-neutral-400' : undefined}
+                              {...(alasan ? { [TANDA_RISIKO_TANPA_GEOMETRI]: 'true' } : {})}
+                              title={alasan ? `Named only — not shipped as geometry in this atlas, so it cannot be highlighted on the model. ${alasan}` : undefined}>
+                              • {risiko}
+                              {alasan && <>
+                                <span aria-hidden="true" className="ml-1 font-black">○</span>
+                                <span className="sr-only"> — named only; not shipped as geometry in this atlas.</span>
+                              </>}
+                            </li>
+                          )
+                        })}
+                      </ul>
                     </div>
                   )}
                   <div className={`mt-2 text-[9px] font-bold ${exactNames.length ? 'text-brand' : 'text-amber-300'}`}>{exactNames.length ? 'Highlight exact represented anatomy in 3D →' : 'No exact regional source mesh · keep this checkpoint text-only'}</div>

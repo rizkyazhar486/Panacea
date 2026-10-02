@@ -6,6 +6,10 @@ import {
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
 import type { AtlasLayerKey, GeometryProvenance } from '../../lib/wholeBodyAtlasBlueprint'
+import {
+  buildRespiratoryHdReadiness,
+  type RespiratoryHdReadinessEntry,
+} from '../../lib/anatomy/respiratoryHdReadiness'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -152,6 +156,13 @@ function provenanceLabel(value: GeometryProvenance) {
   return 'not represented at whole-body mesh scale'
 }
 
+function readinessBadge(entry: RespiratoryHdReadinessEntry) {
+  if (entry.sourceCoverage === 'source-node-present') return 'source geometry available'
+  if (entry.nextAction === 'derive-reference-from-lobe-masks') return 'derived reference only'
+  if (entry.nextAction === 'acquire-licensed-source') return 'licensed acquisition candidate'
+  return entry.sourceCoverage === 'source-node-missing' ? 'source-node-missing' : 'reference only'
+}
+
 export function BreathAtlasLab({ onHighlight, onFocusRegion, onEnableLayer }: Props) {
   const [phase, setPhase] = useState<BreathPhase>('inspiration')
   const [selectedId, setSelectedId] = useState('central-airway')
@@ -163,6 +174,17 @@ export function BreathAtlasLab({ onHighlight, onFocusRegion, onEnableLayer }: Pr
 
   const selected = TARGETS.find((target) => target.id === selectedId) ?? TARGETS[0]
   const phaseInfo = PHASES[phase]
+
+  const respiratoryHdReadiness = useMemo(
+    () => buildRespiratoryHdReadiness(sourceBundles),
+    [sourceBundles],
+  )
+  const lobarFissureReadiness = useMemo(
+    () => respiratoryHdReadiness.entries.filter((entry) =>
+      entry.structureId.includes('lobe') || entry.structureId.includes('fissure'),
+    ),
+    [respiratoryHdReadiness],
+  )
 
   const resolvedById = useMemo(() => {
     const result = new Map<string, ReturnType<typeof resolveAllAnatomySourceNodes>>()
@@ -197,6 +219,13 @@ export function BreathAtlasLab({ onHighlight, onFocusRegion, onEnableLayer }: Pr
     // but they never become substitute geometry when a source-name match is absent.
     onHighlight?.(exact)
     onFocusRegion?.(exact.length ? exact : target.nodeHints)
+  }
+
+  function inspectReadiness(entry: RespiratoryHdReadinessEntry) {
+    if (entry.sourceCoverage !== 'source-node-present' || entry.exactSourceNames.length === 0) return
+    onEnableLayer?.('visceral')
+    onHighlight?.(entry.exactSourceNames)
+    onFocusRegion?.(entry.exactSourceNames)
   }
 
   function inspectExchangeContext() {
@@ -246,6 +275,49 @@ export function BreathAtlasLab({ onHighlight, onFocusRegion, onEnableLayer }: Pr
           </div>
         </div>
       </section>
+
+      <details className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-cyan-500">Lobar / fissure readiness</div>
+            <div className="mt-1 truncate text-[10px] font-bold text-neutral-500">
+              {respiratoryHdReadiness.sourceNodePresent} source-bound · {respiratoryHdReadiness.sourceNodeMissing} missing · {respiratoryHdReadiness.referenceOnly} reference-only
+            </div>
+          </div>
+          <span className="shrink-0 text-[9px] font-black text-neutral-400">source truth ▾</span>
+        </summary>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {lobarFissureReadiness.map((entry) => {
+            const inspectable = entry.sourceCoverage === 'source-node-present' && entry.exactSourceNames.length > 0
+            return (
+              <button
+                key={entry.structureId}
+                type="button"
+                disabled={!inspectable}
+                onClick={() => inspectReadiness(entry)}
+                className="min-h-11 rounded-xl border border-neutral-200 p-3 text-left disabled:cursor-default disabled:opacity-70 dark:border-white/10"
+                aria-label={inspectable ? `Inspect ${entry.label} source geometry` : `${entry.label}: source geometry unavailable`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[10px] font-black text-ink dark:text-white">{entry.label}</span>
+                  <span className="shrink-0 text-[8px] font-black text-neutral-400">{entry.sourceCoverage}</span>
+                </div>
+                <div className="mt-1 text-[8px] font-bold uppercase tracking-wide text-cyan-600 dark:text-cyan-300">
+                  {readinessBadge(entry)}
+                </div>
+                <div className="mt-1 text-[8px] leading-relaxed text-neutral-500">
+                  {inspectable ? `${entry.exactSourceNames.length} exact source node${entry.exactSourceNames.length === 1 ? '' : 's'} · inspect shared viewer` : 'No substitute mesh · provenance/review required'}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="mt-3 text-[8.5px] leading-relaxed text-neutral-500">
+          Missing lobar geometry may have a licensed acquisition candidate; fissure surfaces may be a derived reference only. Neither state is promoted to verified anatomy without asset provenance and qualified review.
+        </div>
+      </details>
 
       <section className="grid gap-2 md:grid-cols-3">
         {(Object.keys(PHASES) as BreathPhase[]).map((key) => {

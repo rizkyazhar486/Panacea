@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KepingStrukturRisiko } from './KepingStrukturRisiko'
+import { UniversalOperationSimulationConsole } from './UniversalOperationSimulationConsole'
+import { GlobalOperationUniverseCoverage } from './GlobalOperationUniverseCoverage'
 import { Body3D, CT_WINDOWS, type MotionState } from '../Body3D'
 import { IconActivity, IconBook, IconHeart, IconShield, IconSparkle, IconTimer } from '../icons'
 import {
@@ -171,7 +174,7 @@ export function SurgicalOperationAtlasV2() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="max-w-3xl">
@@ -281,7 +284,7 @@ export function SurgicalOperationAtlasV2() {
 
               <div className="mt-4 rounded-2xl border border-rose-300/15 bg-rose-300/[.05] p-4">
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-rose-200"><IconHeart size={13} /> Structures at risk</div>
-                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <span key={item} className="rounded-full border border-rose-200/12 bg-black/20 px-2.5 py-1.5 text-[10px] font-bold text-rose-100/75">{item}</span>)}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <KepingStrukturRisiko key={item} struktur={item} gaya="rounded-full border border-rose-200/12 bg-black/20 px-2.5 py-1.5 text-[10px] font-bold text-rose-100/75" />)}</div>
               </div>
 
               <div className="mt-3 rounded-2xl border border-[#f0d68a]/15 bg-[#f0d68a]/[.055] p-4">
@@ -310,6 +313,8 @@ export function SurgicalOperationAtlasV2() {
             </div>
           </div>
 
+          <UniversalOperationSimulationConsole procedure={procedure} />
+
           <div className="grid gap-3 border-t border-white/8 p-5 md:grid-cols-3 sm:p-6">
             <article className="rounded-2xl border border-white/8 bg-white/[.025] p-4">
               <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-cyan-200"><IconBook size={13} /> Learning objectives</div>
@@ -326,6 +331,8 @@ export function SurgicalOperationAtlasV2() {
               {showPatientGate && <div className="mt-3 space-y-1.5">{procedure.patientSpecificInputs.map((item) => <div key={item} className="text-[9px] leading-relaxed text-white/40">• {item}</div>)}</div>}
             </article>
           </div>
+
+          <GlobalOperationUniverseCoverage />
 
           <div className="border-t border-white/8 p-5 sm:p-6">
             <div className="flex flex-wrap items-end justify-between gap-3">

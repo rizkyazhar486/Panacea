@@ -4,6 +4,7 @@ import { Card, SectionTitle } from './ui'
 import { IconHeart, IconBell, IconTimer } from './icons'
 import { api, backendEnabled } from '../lib/api'
 import { pushSupported, pushStatus, type PushStatus } from '../lib/push'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pengaturan tiga pengingat yang terhubung ke perangkat.
@@ -83,6 +84,7 @@ export function HealthAlertSettings() {
     return (
       <Card>
         <SectionTitle icon={<IconBell />} title="Device-linked reminders" />
+        <BatasKlaimKesehatan permukaan="wellness.health-alerts" />
         <p className="mt-2 text-sm text-neutral-500">
           These reminders are sent by the server, and the app is running without one.
         </p>

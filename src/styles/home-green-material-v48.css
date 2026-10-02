@@ -1,0 +1,3 @@
+/* Home loads the production v48 material layer after its local reference CSS.
+   The actual rules live in /public so browser caching keeps the Home chunk small. */
+@import url('/panacea-green-material-v48.css?v=20260916-1');

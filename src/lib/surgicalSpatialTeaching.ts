@@ -180,3 +180,49 @@ export const SURGICAL_SPATIAL_SCENARIOS: SurgicalSpatialScenario[] = [
     geometryBoundary: 'The viewer cannot verify a real critical view of safety, duct identity, or vascular variant. It visualizes only named relationships present in educational source geometry.',
   },
 ]
+
+/**
+ * Struktur berisiko pada checkpoint yang TIDAK punya geometri terkirim.
+ *
+ * SurgicalLab sudah jujur tentang cakupan geometri di bagian "at risk in this
+ * layer" -- tiap barisnya menyebut berapa simpul sumber persis yang ditemukan,
+ * atau "reference only". Daftar checkpoint di atasnya tidak: ia mencetak nama
+ * berisiko sebagai teks gabungan, sehingga struktur yang bisa ditunjuk pada
+ * model tampil sama persis dengan yang tidak ada sama sekali.
+ *
+ * Diukur terhadap berkas yang dikirim: hanya 4 dari 17 nama yang resolve.
+ *
+ * Sebagian besar sisanya bukan sekadar "tidak dikirim" melainkan BUKAN NAMA
+ * STRUKTUR: ia kalimat operatif yang membawa syarat atau arah ("... if spatial
+ * orientation is lost", "... superficially", "... distally", "... variants").
+ * Kalimat seperti itu tidak akan pernah cocok dengan simpul mana pun, dan itu
+ * dicatat apa adanya alih-alih dipangkas sampai kebetulan cocok -- memangkasnya
+ * akan menyorot struktur yang berbeda dari yang dimaksud kalimatnya.
+ */
+export interface RisikoTanpaGeometri {
+  structure: string
+  reason: string
+}
+
+export const RISIKO_CHECKPOINT_TANPA_GEOMETRI: RisikoTanpaGeometri[] = [
+  { structure: 'Aortic root', reason: 'Not shipped as a named node. The cardiovascular layer carries Aorta and its named segments, but nothing standing for the root specifically.' },
+  { structure: 'Common bile duct', reason: 'Not shipped under this name; the biliary layer carries only a single \'Bile duct\' node, which does not distinguish the common duct.' },
+  { structure: 'Common hepatic duct', reason: 'Not shipped. Neither hepatic duct appears in any layer.' },
+  { structure: 'Coronary sinus ostium and adjacent atrial tissue', reason: 'Operative phrasing joining an ostium to surrounding tissue; no single node corresponds to it, and no coronary sinus ostium is shipped.' },
+  { structure: 'Cruciate ligaments', reason: 'Not shipped. No cruciate ligament geometry exists in any layer.' },
+  { structure: 'Infrapatellar branch of saphenous nerve in superficial tissues', reason: 'Carries a location qualifier and names a branch finer than anything shipped; the nervous layer stops well short of this branch.' },
+  { structure: 'Left atrial free wall if spatial orientation is lost', reason: 'A conditional warning rather than a structure name. It cannot match a node as written, and trimming it to \'Left atrial free wall\' would still find nothing shipped.' },
+  { structure: 'Menisci', reason: 'Not shipped. No meniscal geometry exists in any layer.' },
+  { structure: 'Palmar cutaneous branch of median nerve superficially', reason: 'Names a branch finer than anything shipped and carries a depth qualifier; the median nerve itself resolves, this branch does not.' },
+  { structure: 'Recurrent motor branch distally', reason: 'Names a branch finer than anything shipped and carries a direction qualifier.' },
+  { structure: 'Right hepatic artery', reason: 'Not shipped. \'Common hepatic artery\' and \'Proper hepatic artery\' exist; the right branch does not.' },
+  { structure: 'Right hepatic artery variants', reason: 'Anatomical variation is by definition not in a single generic atlas; no variant geometry is shipped, and inventing one would be worse than saying so.' },
+  { structure: 'Subvesical bile ducts / ductal variants', reason: 'Variant biliary anatomy, absent from the shipped atlas for the same reason; the phrase also names a class rather than one structure.' },
+]
+
+export const TANDA_RISIKO_TANPA_GEOMETRI = 'data-risiko-tanpa-geometri'
+
+/** Alasan sebuah struktur berisiko tidak bisa disorot, atau null bila bisa. */
+export function alasanRisikoTanpaGeometri(structure: string): string | null {
+  return RISIKO_CHECKPOINT_TANPA_GEOMETRI.find((d) => d.structure === structure)?.reason ?? null
+}

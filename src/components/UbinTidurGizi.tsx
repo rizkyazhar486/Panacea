@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dua widget lebar yang menggambarkan hari: tidur dan asupan.
@@ -86,6 +87,7 @@ export function UbinTidurLebar() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">14-night sleep</h2>
+        <BatasKlaimKesehatan permukaan="wellness.sleep-nutrition-tile" />
         <Link to="/pola-tidur" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           Open →
         </Link>

@@ -1,0 +1,554 @@
+/* Panaceamed Infinite Liquid OS v44
+   Presentation-only system layer inspired by contemporary spatial UI principles.
+   Functional hierarchy: content remains the focus; controls/navigation float above it.
+
+   Design formulas:
+   - Fluid spacing = clamp(16px, 1.2vw + 12px, 48px)
+   - Liquid control = translucent base + 18–24px backdrop blur + 150–175% saturation
+                      + 1px specular edge + soft ambient shadow
+   - Motion = 140–420ms with spring-like cubic-bezier(.16,1,.3,1)
+   - Content surface opacity > control opacity so hierarchy stays readable.
+*/
+
+:root {
+  --pmd-liquid-gap: clamp(1rem, 1.2vw + .75rem, 3rem);
+  --pmd-liquid-gutter: clamp(1rem, 3.2vw, 4rem);
+  --pmd-liquid-radius: clamp(1.25rem, 1vw + 1rem, 2rem);
+  --pmd-liquid-pill: 999px;
+  --pmd-liquid-line: rgba(15, 23, 42, .10);
+  --pmd-liquid-line-hot: rgba(21, 130, 255, .22);
+  --pmd-liquid-specular: rgba(255, 255, 255, .72);
+  --pmd-liquid-control: rgba(250, 252, 255, .60);
+  --pmd-liquid-control-strong: rgba(250, 252, 255, .78);
+  --pmd-liquid-content: rgba(250, 252, 255, .84);
+  --pmd-liquid-shadow: 0 18px 56px rgba(15, 23, 42, .10), inset 0 1px 0 rgba(255,255,255,.62);
+  --pmd-liquid-shadow-float: 0 26px 80px rgba(15, 23, 42, .15), inset 0 1px 0 rgba(255,255,255,.72);
+  --pmd-liquid-ease: cubic-bezier(.16, 1, .3, 1);
+  --pmd-liquid-fast: 160ms;
+  --pmd-liquid-spatial: 420ms;
+  --pmd-lens-x: 50%;
+  --pmd-lens-y: 0%;
+  --pmd-canvas-0: #f6f8fc;
+  --pmd-canvas-1: #eef3f9;
+  --pmd-canvas-2: #f9fbfd;
+}
+
+html.dark,
+.dark {
+  --pmd-liquid-line: rgba(255, 255, 255, .115);
+  --pmd-liquid-line-hot: rgba(112, 222, 255, .34);
+  --pmd-liquid-specular: rgba(255, 255, 255, .22);
+  --pmd-liquid-control: rgba(9, 14, 24, .52);
+  --pmd-liquid-control-strong: rgba(9, 14, 24, .70);
+  --pmd-liquid-content: rgba(8, 14, 24, .78);
+  --pmd-liquid-shadow: 0 18px 60px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.11);
+  --pmd-liquid-shadow-float: 0 28px 92px rgba(0, 0, 0, .44), inset 0 1px 0 rgba(255,255,255,.14);
+  --pmd-canvas-0: #010306;
+  --pmd-canvas-1: #020712;
+  --pmd-canvas-2: #030814;
+}
+
+/* --------------------------------------------------------------------------
+   Infinite canvas — no visible page frame or hard visual ending.
+   -------------------------------------------------------------------------- */
+html,
+body,
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+html {
+  background: var(--pmd-canvas-0) !important;
+  overscroll-behavior-y: auto;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(70rem 52rem at 4% -12%, rgba(62, 139, 255, .13), transparent 62%),
+    radial-gradient(64rem 46rem at 98% 12%, rgba(130, 96, 255, .11), transparent 64%),
+    radial-gradient(56rem 42rem at 62% 92%, rgba(27, 210, 197, .065), transparent 68%),
+    linear-gradient(180deg, var(--pmd-canvas-1), var(--pmd-canvas-0) 52%, var(--pmd-canvas-2)) !important;
+  background-attachment: fixed !important;
+}
+
+#root {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+/* Static atmospheric light is cheaper than several full-screen blurred orbs,
+   so mobile can keep depth without turning navigation into opaque grey slabs. */
+#root::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  inset: -12vmax;
+  pointer-events: none;
+  background:
+    radial-gradient(36rem 30rem at 18% 14%, rgba(55, 165, 255, .075), transparent 72%),
+    radial-gradient(34rem 28rem at 86% 22%, rgba(157, 92, 255, .065), transparent 74%),
+    radial-gradient(30rem 26rem at 66% 82%, rgba(0, 214, 166, .045), transparent 72%);
+  transform: translateZ(0);
+}
+
+/* The route canvas is deliberately wider and breathes more than the old
+   max-w-6xl shell. It still has readable gutters rather than edge-hugging UI. */
+main.mx-auto {
+  width: 100% !important;
+  max-width: 100rem !important;
+  min-height: calc(100dvh - 5rem);
+  padding-inline: var(--pmd-liquid-gutter) !important;
+  padding-top: clamp(1.5rem, 3.5vw, 4rem) !important;
+  padding-bottom: max(7rem, calc(5rem + env(safe-area-inset-bottom))) !important;
+}
+
+main.mx-auto::after {
+  content: '';
+  display: block;
+  height: clamp(4rem, 12vh, 10rem);
+  pointer-events: none;
+}
+
+.page-enter {
+  min-width: 0;
+}
+
+/* Create broad rhythm between direct route sections without inflating controls,
+   forms, tables, or dense clinical subcomponents inside each section. */
+.page-enter > :where(section, article, header, footer) + :where(section, article, header, footer) {
+  margin-top: var(--pmd-liquid-gap);
+}
+
+/* --------------------------------------------------------------------------
+   Floating Liquid Glass functional layer — navigation and controls only.
+   -------------------------------------------------------------------------- */
+header.kaca {
+  top: .55rem !important;
+  margin: .55rem clamp(.7rem, 1.6vw, 1.35rem) .25rem !important;
+  min-height: 58px !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: clamp(1.3rem, 1vw + 1rem, 1.8rem) !important;
+  background:
+    radial-gradient(26rem 12rem at var(--pmd-lens-x) -70%, rgba(255,255,255,.24), transparent 68%),
+    linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.025) 48%, rgba(104,182,255,.035)),
+    var(--pmd-liquid-control) !important;
+  box-shadow: var(--pmd-liquid-shadow-float) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
+  backdrop-filter: blur(22px) saturate(165%) !important;
+  overflow: clip;
+  transition:
+    background-color var(--pmd-liquid-spatial) var(--pmd-liquid-ease),
+    border-color var(--pmd-liquid-spatial) var(--pmd-liquid-ease),
+    box-shadow var(--pmd-liquid-spatial) var(--pmd-liquid-ease),
+    transform var(--pmd-liquid-spatial) var(--pmd-liquid-ease) !important;
+}
+
+header.kaca::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(112deg, rgba(255,255,255,.18), transparent 24%, transparent 70%, rgba(112,222,255,.07)),
+    radial-gradient(12rem 5rem at var(--pmd-lens-x) 0%, rgba(255,255,255,.12), transparent 72%);
+  mix-blend-mode: screen;
+  opacity: .72;
+}
+
+header.kaca > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Replace hard underline/divider with a soft scroll edge. */
+header.kaca::after {
+  right: 8% !important;
+  bottom: -10px !important;
+  left: 8% !important;
+  height: 18px !important;
+  background: linear-gradient(180deg, rgba(0,0,0,.16), transparent) !important;
+  filter: blur(10px);
+  opacity: .24 !important;
+}
+
+html.pmd-scroll-compact header.kaca {
+  border-color: var(--pmd-liquid-line-hot) !important;
+  box-shadow: 0 16px 54px rgba(0,0,0,.20), inset 0 1px 0 var(--pmd-liquid-specular) !important;
+}
+
+header.kaca :where(.header-icon-btn, button[aria-label^='Search'], button[aria-label^='Notifications'], button[aria-label='Toggle theme']) {
+  border-color: var(--pmd-liquid-line) !important;
+  border-radius: 50% !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.025)),
+    color-mix(in srgb, var(--pmd-liquid-control-strong) 82%, transparent) !important;
+  box-shadow: inset 0 1px 0 var(--pmd-liquid-specular), 0 7px 22px rgba(0,0,0,.10) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(155%);
+  backdrop-filter: blur(14px) saturate(155%);
+}
+
+/* Desktop sidebar becomes a freestanding spatial island instead of a wall. */
+aside.sticky[class*='h-screen'] {
+  top: .7rem !important;
+  height: calc(100dvh - 1.4rem) !important;
+  margin: .7rem 0 .7rem .7rem;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: 1.75rem !important;
+  background:
+    linear-gradient(155deg, rgba(255,255,255,.105), transparent 36%),
+    var(--pmd-liquid-control) !important;
+  box-shadow: var(--pmd-liquid-shadow) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  overflow: hidden;
+}
+
+aside.sticky[class*='h-screen'] nav a,
+aside.sticky[class*='h-screen'] nav button {
+  border-radius: 1rem !important;
+}
+
+/* Quick navigation floats as a small rail instead of creating another page bar. */
+[data-pintasan].kaca {
+  margin: .45rem .7rem 0 !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: 1.35rem !important;
+  background: var(--pmd-liquid-control) !important;
+  box-shadow: var(--pmd-liquid-shadow) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(155%) !important;
+  backdrop-filter: blur(18px) saturate(155%) !important;
+  overflow: clip;
+}
+
+[data-pintasan] a {
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid transparent !important;
+}
+
+[data-pintasan] a[aria-current='page'] {
+  border-color: var(--pmd-liquid-line-hot) !important;
+  background: rgba(77, 231, 255, .10) !important;
+}
+
+.drawer-in {
+  margin: .65rem !important;
+  width: min(calc(100vw - 1.3rem), 23rem) !important;
+  height: calc(100dvh - 1.3rem) !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: 1.85rem !important;
+  background: var(--pmd-liquid-control-strong) !important;
+  box-shadow: var(--pmd-liquid-shadow-float) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  overflow: hidden;
+}
+
+/* The draggable global action button should read as one droplet, not a grey disc. */
+button.kaca[aria-label*='menu navigasi'],
+button.kaca[aria-label*='menu'] {
+  border: 1px solid var(--pmd-liquid-line-hot) !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.22), transparent 32%),
+    linear-gradient(145deg, rgba(78,218,255,.14), rgba(128,92,255,.08) 58%, rgba(255,255,255,.035)),
+    var(--pmd-liquid-control) !important;
+  box-shadow: 0 16px 44px rgba(0,0,0,.28), inset 0 1px 0 var(--pmd-liquid-specular) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+  backdrop-filter: blur(20px) saturate(170%) !important;
+}
+
+[role='menu'].kaca[aria-label='Tindakan cepat'] {
+  border: 1px solid var(--pmd-liquid-line) !important;
+  background: var(--pmd-liquid-control-strong) !important;
+  box-shadow: var(--pmd-liquid-shadow-float) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
+  backdrop-filter: blur(24px) saturate(170%) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Home as an OS surface: remove the giant containing box, keep real widgets.
+   -------------------------------------------------------------------------- */
+nav[aria-label='Home spaces'] {
+  top: calc(var(--tinggi-bilah-atas, 64px) + 1rem) !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: var(--pmd-liquid-pill) !important;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.09), rgba(255,255,255,.018)),
+    var(--pmd-liquid-control) !important;
+  box-shadow: var(--pmd-liquid-shadow) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(165%) !important;
+  backdrop-filter: blur(20px) saturate(165%) !important;
+  padding: .38rem !important;
+}
+
+nav[aria-label='Home spaces'] [role='tab'] {
+  min-height: 44px !important;
+  border-radius: var(--pmd-liquid-pill) !important;
+  padding-inline: 1rem !important;
+  background: transparent !important;
+  color: color-mix(in srgb, currentColor 68%, transparent) !important;
+  transition: transform var(--pmd-liquid-fast) var(--pmd-liquid-ease), background var(--pmd-liquid-fast) ease, color var(--pmd-liquid-fast) ease, box-shadow var(--pmd-liquid-fast) ease !important;
+}
+
+nav[aria-label='Home spaces'] [role='tab'][aria-selected='true'] {
+  border-color: var(--pmd-liquid-line) !important;
+  background:
+    radial-gradient(8rem 4rem at 28% 0%, rgba(255,255,255,.18), transparent 72%),
+    rgba(0,0,0,.72) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 22px rgba(0,0,0,.18) !important;
+}
+
+.dark nav[aria-label='Home spaces'] [role='tab'][aria-selected='true'] {
+  background: rgba(255,255,255,.105) !important;
+}
+
+section[aria-label='Panacea command deck'] {
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: clamp(.25rem, 1vw, .75rem) 0 !important;
+}
+
+/* Disable the old giant deck ambient blobs; the infinite canvas already owns
+   atmosphere, and nested glows make glass muddy rather than clearer. */
+section[aria-label='Panacea command deck'] > div.pointer-events-none.absolute {
+  display: none !important;
+}
+
+section[aria-label='Panacea command deck'] > div.relative.flex {
+  padding: .15rem .15rem 1.1rem !important;
+}
+
+section[aria-label='Panacea command deck'] > div.relative.grid > a {
+  min-height: 112px !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: 1.55rem !important;
+  background:
+    radial-gradient(16rem 9rem at 18% -20%, rgba(255,255,255,.15), transparent 68%),
+    linear-gradient(145deg, rgba(70,192,255,.105), rgba(132,92,255,.045) 52%, rgba(255,255,255,.025)),
+    var(--pmd-liquid-content) !important;
+  box-shadow: var(--pmd-liquid-shadow) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(125%);
+  backdrop-filter: blur(8px) saturate(125%);
+}
+
+section[aria-label='Panacea command deck'] > div.relative.grid > a span:first-child {
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.07) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+section[aria-label='Panacea command deck'] > div.relative.mt-3 {
+  margin-top: var(--pmd-liquid-gap) !important;
+  border: 1px solid var(--pmd-liquid-line) !important;
+  border-radius: 1.75rem !important;
+  background:
+    linear-gradient(155deg, rgba(255,255,255,.055), transparent 36%),
+    color-mix(in srgb, var(--pmd-liquid-content) 82%, transparent) !important;
+  box-shadow: var(--pmd-liquid-shadow) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  backdrop-filter: blur(10px) saturate(130%);
+  padding: clamp(.75rem, 1.6vw, 1.25rem) !important;
+}
+
+section[aria-label='Panacea command deck'] input,
+section[aria-label='Panacea command deck'] button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Direct manipulation — clear action meaning, subtle water-like response.
+   -------------------------------------------------------------------------- */
+:where(header.kaca, nav[aria-label='Home spaces'], [data-pintasan], section[aria-label='Panacea command deck']) :where(button, a) {
+  transform-origin: center;
+  transition:
+    transform var(--pmd-liquid-fast) var(--pmd-liquid-ease),
+    border-color var(--pmd-liquid-fast) ease,
+    background-color var(--pmd-liquid-fast) ease,
+    box-shadow var(--pmd-liquid-fast) ease,
+    opacity var(--pmd-liquid-fast) ease !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(header.kaca, nav[aria-label='Home spaces'], [data-pintasan], section[aria-label='Panacea command deck']) :where(button, a):hover {
+    transform: translateY(-1px) scale(1.008);
+  }
+}
+
+:where(header.kaca, nav[aria-label='Home spaces'], [data-pintasan], section[aria-label='Panacea command deck']) :where(button, a):active {
+  transform: scale(.965) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile: widget rails + generous gaps, not a wall of cards.
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  :root {
+    --pmd-liquid-gutter: clamp(.9rem, 4vw, 1.15rem);
+    --pmd-liquid-gap: 1.35rem;
+  }
+
+  header.kaca {
+    margin-inline: .6rem !important;
+    border-radius: 1.55rem !important;
+  }
+
+  header.kaca h1 {
+    max-width: clamp(5.4rem, 30vw, 9rem) !important;
+  }
+
+  main.mx-auto {
+    padding-top: 1.35rem !important;
+    padding-inline: var(--pmd-liquid-gutter) !important;
+  }
+
+  nav[aria-label='Home spaces'] {
+    margin-inline: 0 !important;
+    top: calc(var(--tinggi-bilah-atas, 64px) + .85rem) !important;
+  }
+
+  nav[aria-label='Home spaces'] > div {
+    gap: .25rem !important;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+  }
+
+  nav[aria-label='Home spaces'] [role='tab'] {
+    min-width: auto !important;
+    scroll-snap-align: start;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.grid {
+    display: grid !important;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(9.5rem, 70vw);
+    grid-template-columns: none !important;
+    gap: .8rem !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: .1rem .1rem .75rem;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.grid > a {
+    scroll-snap-align: start;
+    min-height: 118px !important;
+  }
+
+  /* Feature browser becomes a compact horizontal rail until the user searches
+     or deliberately expands, preserving the short Home principle. */
+  section[aria-label='Panacea command deck'] > div.relative.mt-3 .mt-2.grid {
+    display: grid !important;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(8.5rem, 44vw);
+    grid-template-columns: none !important;
+    gap: .55rem !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding-bottom: .4rem;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.mt-3 .mt-2.grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.mt-3 .mt-2.grid > a {
+    scroll-snap-align: start;
+  }
+
+  [data-pintasan].kaca {
+    margin-inline: .6rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   iPhone/touch performance: keep Liquid Glass only on the functional layer.
+   Previous layers disabled blur entirely on iOS; v44 uses one restrained blur
+   per floating control surface instead, while content cards stay mostly opaque.
+   -------------------------------------------------------------------------- */
+@media (hover: none) and (pointer: coarse) {
+  header.kaca,
+  [data-pintasan].kaca,
+  nav[aria-label='Home spaces'],
+  button.kaca[aria-label*='menu navigasi'] {
+    -webkit-backdrop-filter: blur(14px) saturate(145%) !important;
+    backdrop-filter: blur(14px) saturate(145%) !important;
+  }
+
+  .drawer-in,
+  [role='menu'].kaca[aria-label='Tindakan cepat'] {
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+    backdrop-filter: blur(18px) saturate(150%) !important;
+  }
+
+  section[aria-label='Panacea command deck'] > div.relative.grid > a,
+  section[aria-label='Panacea command deck'] > div.relative.mt-3 {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+html.pmd-low-memory header.kaca,
+html.pmd-low-memory [data-pintasan].kaca,
+html.pmd-low-memory nav[aria-label='Home spaces'],
+html.pmd-low-memory button.kaca[aria-label*='menu navigasi'] {
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  filter: none !important;
+}
+
+/* User accessibility preferences always win over aesthetics. */
+@media (prefers-reduced-transparency: reduce) {
+  header.kaca,
+  aside.sticky[class*='h-screen'],
+  [data-pintasan].kaca,
+  .drawer-in,
+  nav[aria-label='Home spaces'],
+  button.kaca[aria-label*='menu navigasi'],
+  [role='menu'].kaca[aria-label='Tindakan cepat'] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: var(--pmd-liquid-control-strong) !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  .dark {
+    --pmd-liquid-line: rgba(255,255,255,.34);
+    --pmd-liquid-line-hot: rgba(95,225,255,.72);
+  }
+  header.kaca,
+  nav[aria-label='Home spaces'],
+  [data-pintasan].kaca,
+  section[aria-label='Panacea command deck'] > div.relative.grid > a {
+    border-width: 1.5px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header.kaca,
+  nav[aria-label='Home spaces'],
+  [data-pintasan].kaca,
+  section[aria-label='Panacea command deck'] *,
+  button.kaca[aria-label*='menu navigasi'] {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    transform: none !important;
+  }
+}

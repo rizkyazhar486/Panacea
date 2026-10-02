@@ -9,6 +9,7 @@ import {
   type GapSignal,
   type GapStatus,
 } from '../lib/healthGapNavigator'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const STATUS_LABEL: Record<GapStatus, string> = {
   clear: 'Clear',
@@ -71,6 +72,7 @@ export function HealthGapNavigator() {
         <div>
           <div className="text-[11px] font-black uppercase tracking-[0.18em] text-brand">Panacea signature tool</div>
           <h2 className="mt-1 text-xl font-black text-ink dark:text-white">Gap Navigator</h2>
+          <BatasKlaimKesehatan permukaan="wellness.gap-navigator" />
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-neutral-500">
             Find what is still unclear, unsafe, unaffordable, unowned or unsupported before limited appointment time is spent.
             It measures care-plan execution gaps — never disease severity.

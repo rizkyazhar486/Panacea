@@ -31,7 +31,7 @@ function fmtDur(sec: number): string {
 // only for legacy/synced activities that actually provide a positive value;
 // the browser GPS recorder never invents energy expenditure from distance.
 export function GpsCompetition() {
-  const { state } = useStore()
+  const { state, account, removeGpsActivity } = useStore()
   const acts = state.gpsActivities
   const [sport, setSport] = useState<string>('all')
 
@@ -58,6 +58,7 @@ export function GpsCompetition() {
   const calorieActivities = filtered.filter((a) => Number.isFinite(a.kcal) && a.kcal > 0)
   const totalKcal = calorieActivities.reduce((s, a) => s + a.kcal, 0)
   const recent = [...filtered].slice(0, 8).reverse()
+  const milikSaya = account ? filtered.filter((a) => a.email.trim().toLocaleLowerCase('en-US') === account.email.trim().toLocaleLowerCase('en-US')).slice(0, 8) : []
   const label = (a: GpsActivity) => new Date(a.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
   const medal = ['🥇', '🥈', '🥉']
 
@@ -108,6 +109,17 @@ export function GpsCompetition() {
           </div>
 
           <div className="space-y-3 border-t border-neutral-100 pt-3 dark:border-white/10">
+            {milikSaya.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-bold text-neutral-500">Your recorded activities</div>
+                {milikSaya.map((a) => (
+                  <div key={a.id} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[11px] dark:bg-white/5">
+                    <span className="min-w-0 truncate text-ink dark:text-white">{a.emoji} {a.sport} · {a.distKm.toFixed(1)} km · {fmtDur(a.durSec)}</span>
+                    <button type="button" onClick={() => removeGpsActivity(a.id)} className="shrink-0 rounded-lg px-2 py-1 font-bold text-red-600">Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div><div className="mb-1 text-[11px] font-bold text-neutral-500">📏 Distance per activity (km)</div><BarChart data={recent.map((a) => ({ label: label(a), value: a.distKm }))} color="#00BF63" unit="km" /></div>
             <div><div className="mb-1 text-[11px] font-bold text-neutral-500">⚡ Average moving speed (km/h)</div><BarChart data={recent.map((a) => ({ label: label(a), value: a.avgSpeedKmh }))} color="#3b82f6" unit="km/h" /></div>
             <div><div className="mb-1 text-[11px] font-bold text-neutral-500">⏱️ Moving time (minutes)</div><BarChart data={recent.map((a) => ({ label: label(a), value: Math.round(a.durSec / 60) }))} color="#8b5cf6" unit="min" /></div>

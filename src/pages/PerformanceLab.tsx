@@ -6,6 +6,7 @@ import { useStore } from '../lib/store'
 import { getDemo } from '../lib/profile'
 import { useVitalField } from '../lib/useVitals'
 import { KolomVitalTerikat } from '../components/KolomVital'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Performa — data-driven calculators for the full strength/endurance/speed
@@ -79,6 +80,7 @@ export function PerformanceLab() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="A full suite of strength, endurance and speed tests and calculators — manual and lab-based" />
+        <BatasKlaimKesehatan permukaan="performance.lab" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           Fill in values from a watch, lab equipment (lactate, NIRS, power meter) or field tests. Everything is stored offline on your device.
           Before starting a heavy program, first complete the <a href="#/assessment" className="font-bold text-brand-dark underline">Initial Assessment</a> (movement patterns, pain, injury risk, asymmetry).

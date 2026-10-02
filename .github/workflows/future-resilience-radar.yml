@@ -1,0 +1,75 @@
+name: Future Resilience Radar
+
+on:
+  schedule:
+    - cron: '17 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Future Resilience OS
+        run: npm run test:future-resilience
+
+      - name: Capture dependency drift
+        shell: bash
+        run: |
+          npm outdated --json > /tmp/npm-outdated.json || true
+          node scripts/ops/future-resilience-radar.mjs /tmp/npm-outdated.json > /tmp/future-resilience-radar.md
+
+      - name: Update recurring Future Resilience Radar issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const title = '[automation] Future Resilience Radar'
+            const body = fs.readFileSync('/tmp/future-resilience-radar.md', 'utf8')
+            const { owner, repo } = context.repo
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            })
+
+            const existing = issues.find(
+              (issue) => !issue.pull_request && issue.title === title,
+            )
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              })
+              core.notice(`Updated Future Resilience Radar issue #${existing.number}`)
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+              })
+              core.notice(`Created Future Resilience Radar issue #${created.data.number}`)
+            }

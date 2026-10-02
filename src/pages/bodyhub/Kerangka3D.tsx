@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
+import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { muatAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_KERANGKA, kelompokDariNama } from '../../lib/anatomy/rangkaKerangka'
 
@@ -92,24 +93,15 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
     const kelompokMesh = new Map<THREE.Mesh, string>()
     const dapatDipilih: THREE.Mesh[] = []
     let grup: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
-    const loader = new GLTFLoader()
-    // Tanpa baris ini berkasnya ditolak dan kanvasnya kosong, tanpa galat.
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}${BERKAS_KERANGKA}`,
-      (gltf) => {
-        grup = gltf.scene
-
-        // Nama ASLI dipulihkan dari JSON berkasnya lewat associations.
-        const nodesJson = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
-        const namaAsli = new Map<THREE.Object3D, string>()
-        grup.traverse((o) => {
-          const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-          const idx = assoc?.nodes
-          const nama = idx !== undefined ? nodesJson?.[idx]?.name : undefined
-          if (nama) namaAsli.set(o, nama)
-        })
+    // muatAtlas memasang dekoder meshopt dan memulihkan nama ASLI lewat
+    // parser.associations. Keduanya sebelumnya disalin tangan di sini.
+    muatAtlas(BERKAS_KERANGKA)
+      .then(({ scene: adegan, namaAsli }) => {
+        if (!penjaga.terima(adegan)) return
+        grup = adegan
 
         // Tiga tulang tengkorak adalah node PIVOT bernama yang geometrinya ada
         // di anak TANPA nama. Karena itu nama dicari menaik sampai ketemu.
@@ -170,13 +162,11 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
         renderer.domElement.dataset.kerangkaMesh = String(dapatDipilih.length)
         setMuat(false)
         terapkanRef.current?.(terpilih)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         setGagal('Could not load the skeleton model.')
         setMuat(false)
-      },
-    )
+      })
 
     terapkanRef.current = (id) => {
       const adaPilihan = Boolean(id && bahanPerKelompok.has(id))
@@ -206,16 +196,15 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let raf = 0
-    const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+    // Loop berhenti saat offscreen / tab tersembunyi (helper bersama).
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-    }
-    raf = requestAnimationFrame(gambar)
+    })
 
     return () => {
-      cancelAnimationFrame(raf)
+      penjaga.lepas()
+      loop.hentikan()
       terapkanRef.current = null
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', klik)

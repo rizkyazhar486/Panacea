@@ -6,6 +6,7 @@ import { ambilRiwayat } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
 import { KartuKlinisTubuh } from '../components/KartuKlinisTubuh'
 import { KartuTidurPemulihan } from '../components/KartuTidurPemulihan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ikhtisar — seluruh angka tubuh pada satu layar, dengan jangka yang dipilih.
@@ -90,6 +91,7 @@ export function Ikhtisar() {
     return (
       <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
         <SectionTitle icon={<IconChartUp size={20} />} title="Overview" subtitle="All your body figures in one screen" />
+        <BatasKlaimKesehatan permukaan="wellness.overview" />
         <KartuTidurPemulihan />
         <KartuKlinisTubuh />
         <Card>

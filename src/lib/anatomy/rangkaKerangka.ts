@@ -57,7 +57,7 @@ export const WILAYAH_RANGKA: readonly WilayahRangka[] = [
   'Axial skeleton', 'Upper limb', 'Lower limb',
 ]
 
-export const BERKAS_KERANGKA = 'anatomy/skeletal.glb'
+export const BERKAS_KERANGKA = 'skeletal.glb'
 
 // Node hiasan pada berkasnya — bukan tulang, dan tidak boleh ikut tampil.
 export const NODE_BUKAN_TULANG: readonly string[] = ['HOW TO ...', 'Take a picture']

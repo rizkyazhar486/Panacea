@@ -36,7 +36,7 @@
 // anatomi seseorang tertentu.
 
 /** Nama berkas atlas, relatif terhadap BASE_URL. */
-export const BERKAS_LIMFOID = 'anatomy/lymphoid.glb'
+export const BERKAS_LIMFOID = 'lymphoid.glb'
 
 /** Kelompok wilayah untuk daftar yang bisa dipakai tanpa menunjuk model. */
 export type WilayahLimfe = 'head-neck' | 'upper-limb' | 'thorax' | 'abdomen' | 'pelvis' | 'lower-limb' | 'organ'
