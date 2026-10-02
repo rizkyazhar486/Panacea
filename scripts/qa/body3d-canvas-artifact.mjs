@@ -61,7 +61,11 @@ const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
 async function placeCanvasOnscreen(canvas) {
-  await canvas.scrollIntoViewIfNeeded()
+  // Playwright's scrollIntoViewIfNeeded waits for element stability; the live
+  // WebGL canvas can legitimately keep changing while anatomy settles. Use an
+  // immediate DOM scroll instead, then keep the strict viewport/WebGL/pixel
+  // assertions below as the fail-closed proof.
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
   await page.waitForTimeout(250)
   const geometry = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()

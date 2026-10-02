@@ -27,7 +27,7 @@ jobs:
           ref: claude/continue-previous-task-un3s83
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - name: Install frontend dependencies
         run: npm ci
@@ -50,9 +50,16 @@ jobs:
           ref: claude/continue-previous-task-un3s83
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Some server regression tests import shared root TS/TSX modules.
+          # Use the same Node/runtime and dependency graph as main acceptance.
+          node-version: 24
           cache: npm
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+      - name: Install shared root dependencies
+        working-directory: .
+        run: npm ci
       - name: Install server dependencies
         run: npm ci
       - name: Server TypeScript

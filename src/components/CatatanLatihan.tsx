@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from './Prosa'
 import { kunciTanggal } from '../lib/ramalan'
 import { getWorkouts } from '../lib/workoutStore'
 import { catatLatihanTangan, sesiTangan } from '../lib/latihanManual'
@@ -416,9 +417,9 @@ export function CatatanLatihan() {
                 <span>{Math.round(ringkas.recoveryHr[0].bpm)} bpm · +{Math.max(0, Math.round(ringkas.recoveryHr[0].t))}s</span>
                 <span>{Math.round(ringkas.recoveryHr[ringkas.recoveryHr.length - 1].bpm)} bpm · +{Math.max(0, Math.round(ringkas.recoveryHr[ringkas.recoveryHr.length - 1].t))}s</span>
               </div>
-              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+              <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
                 This is the recorded post-exercise heart-rate trajectory. The ≈1-minute drop is shown only when a recovery sample exists around 45–75 seconds; posture and active vs passive cool-down can change the value, so no fitness or clinical grade is inferred here.
-              </p>
+              </Prosa>
             </div>
           )}
 
@@ -463,9 +464,9 @@ export function CatatanLatihan() {
                 <div className="h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-white dark:bg-neutral-900" />
                 <div className="h-1.5 flex-1 rounded-full bg-emerald-400/80 dark:bg-emerald-300/35" />
               </div>
-              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+              <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
                 Values come from imported session fields. Pace and speed can represent the same underlying distance-time data, and the importer may derive them when direct speed is absent. Cadence is shown only when captured; no efficiency score or target range is inferred.
-              </p>
+              </Prosa>
             </div>
           )}
 
@@ -513,9 +514,9 @@ export function CatatanLatihan() {
             ))}
           </div>
 
-          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Sessions are listed newest to oldest up to the selected date. Metrics stay session-specific: this timeline does not rank mixed activities or turn pace, cadence, heart rate, distance, and duration into a single performance score.
-          </p>
+          </Prosa>
         </div>
       )}
 
@@ -564,9 +565,9 @@ export function CatatanLatihan() {
             ))}
           </div>
 
-          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Only sessions with the same normalized activity name are grouped. Route, duration, environment, and session purpose can still differ, so values are shown without ranking or causal interpretation.
-          </p>
+          </Prosa>
         </div>
       )}
 
@@ -597,9 +598,9 @@ export function CatatanLatihan() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+        <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
           Bar height is relative to your busiest logged day in this 7-day window. It shows recorded duration, not training quality or recovery.
-        </p>
+        </Prosa>
       </div>
 
       <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10" aria-label="Training duration across four consecutive 7-day blocks">
@@ -629,9 +630,9 @@ export function CatatanLatihan() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+        <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
           Each row is one consecutive 7-day block, oldest to newest. Bar length compares recorded duration within this 28-day window; active days show frequency, not adherence quality.
-        </p>
+        </Prosa>
       </div>
 
       {ringkas.sesiDenganRpe28 > 0 && (
@@ -662,9 +663,9 @@ export function CatatanLatihan() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             sRPE load = session RPE (1–10) × duration in minutes; AU means arbitrary units. Sessions without a valid RPE are excluded, so compare blocks only when rating coverage is similar. This is perceived training load, not a recovery or injury-risk score.
-          </p>
+          </Prosa>
         </div>
       )}
 

@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
+import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
 import type {
   AppState,
   Patient,
@@ -58,8 +60,43 @@ export const PLATFORM_FEE = 0.2 // (legacy) 20% — retained for compatibility
 // per article (the rest is the author's royalty).
 export const MARKETPLACE_FEE_PNC = 5
 
+// ── Sinkron tulisan klinis (lihat antreanKlinis.ts) ─────────────────────────
+// Tidak ada lagi `.catch(() => {})`: galat jaringan diantre dan dikirim ulang,
+// penolakan server dicatat dan ditampilkan (StatusSinkronKlinis).
+const kirimOperasiKlinis = (op: OperasiKlinis): Promise<unknown> => {
+  switch (op.jenis) {
+    case 'patient': return api.addPatientRemote(op.payload as Patient)
+    case 'vital': return api.addVitalRemote(op.patientId, op.payload as VitalSign)
+    case 'supportive': return api.addSupportiveRemote(op.patientId, op.payload as SupportiveResult)
+    case 'record': return api.saveRecordRemote(op.patientId, op.payload as EMRRecord)
+    case 'education': return api.saveEducationRemote(op.patientId, op.payload as EducationSheet)
+  }
+}
+const kabarSinkron = () => { try { window.dispatchEvent(new Event(PERISTIWA_SINKRON)) } catch { /* SSR/uji */ } }
+function sinkronKlinis(jenis: JenisOperasi, patientId: string, payload: unknown, terima?: TerimaBalasan) {
+  if (!backendEnabled) return
+  const op: OperasiKlinis = { opId: `${jenis}-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, jenis, patientId, payload, dibuat: new Date().toISOString() }
+  void kirimAtauAntre(localStorage, op, kirimOperasiKlinis, terima).then(kabarSinkron)
+}
+export function kurasSinkronKlinis(terima?: TerimaBalasan): Promise<unknown> {
+  if (!backendEnabled) return Promise.resolve()
+  return kurasAntrean(localStorage, kirimOperasiKlinis, terima).then(kabarSinkron)
+}
+
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
+}
+
+function ingatDihapus(ada: unknown, ids: readonly string[]): string[] {
+  const daftar = Array.isArray(ada) ? ada.filter((id): id is string => typeof id === 'string' && id.length > 0) : []
+  const keluar = [...daftar]
+  for (const id of ids) if (id && !keluar.includes(id)) keluar.push(id)
+  return keluar.slice(-400)
+}
+
+function unggahHapusDiary(body: { removeFoodIds?: string[]; removeSleepIds?: string[]; removeTrainingIds?: string[]; removeGpsIds?: string[]; sleepLogs?: SleepLog[] }) {
+  if (!backendEnabled) return
+  api.putDiary(body).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* retry when the account diary is read again */ })
 }
 
 // #9: convert a backend post into the richer local SocialPost shape.
@@ -139,11 +176,26 @@ const PLACEHOLDER_CONTRIBUTOR: Contributor = {
   id: 'me', name: 'Saya', role: 'Dokter', specialty: '', verified: false, canVerify: false,
 }
 
+// Legacy self id is retained only to migrate browser state created before the
+// server user id was propagated to Account. New longitudinal identity never
+// derives from email, so changing an email cannot create a second patient.
+function legacySelfPatientId(email: string): string {
+  return 'self-' + email.replace(/[^a-z0-9]/gi, '').slice(0, 16)
+}
+
+function pindahkanKunciPasien<T>(map: Record<string, T>, dari: string, ke: string): Record<string, T> {
+  if (dari === ke || !(dari in map) || ke in map) return map
+  const berikut = { ...map, [ke]: map[dari] }
+  delete berikut[dari]
+  return berikut
+}
+
 // Build a patient record from a patient account's registration details.
 function patientFromAccount(account: Account): Patient {
   const year = new Date().getFullYear() - (account.age ?? 30)
+  const stable = account.id?.trim()
   return {
-    id: 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
+    id: stable ? `self-u-${stable}` : legacySelfPatientId(account.email),
     name: account.name,
     sex: account.sex ?? 'L',
     // Prefer the real date of birth from the datepicker; fall back to age estimate.
@@ -200,6 +252,10 @@ function seed(): AppState {
     lifeEvents: {},
     quests: {},
     foods: [],
+    diaryHiddenFoodIds: [],
+    diaryHiddenSleepIds: [],
+    diaryHiddenTrainingIds: [],
+    diaryHiddenGpsIds: [],
     wellness: {},
     consults: [],
     orders: [],
@@ -267,6 +323,8 @@ interface Store {
   addSupportive: (patientId: string, r: SupportiveResult) => void
   setChat: (patientId: string, messages: ChatMessage[]) => void
   saveRecord: (record: EMRRecord) => void
+  /** Terapkan rekam kanonik yang SUDAH disimpan server (tanpa sinkron ulang). */
+  terapkanRekamServer: (record: EMRRecord) => void
   saveEducation: (patientId: string, sheet: EducationSheet) => void
   updateSettings: (partial: Partial<AppState['settings']>) => void
   resetDemo: () => void
@@ -333,6 +391,8 @@ interface Store {
   removeGoal: (id: string) => void
   addGpsActivity: (a: Omit<GpsActivity, 'id'>) => void // auto from GPS, never manual
   addTrainingLog: (rpe: number, type: string, note?: string) => void // RPE journal
+  removeTrainingLog: (id: string) => void
+  removeGpsActivity: (id: string) => void
   setActiveProgram: (program: string) => void
   addLifeEvent: (patientId: string, e: Omit<LifeEvent, 'id'>) => void
   removeLifeEvent: (patientId: string, id: string) => void
@@ -352,6 +412,8 @@ interface Store {
    * kalori dan makro sepanjang hari.
    */
   removeFood: (id: string) => void
+  /** Drop rows the account has already tombstoned, without sending another delete. */
+  lupakanCatatanDihapus: (foodIds: string[], sleepIds: string[], trainingIds?: string[], gpsIds?: string[]) => void
   logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
   addProduct: (p: PharmacyProduct) => void
@@ -368,6 +430,24 @@ const Ctx = createContext<Store | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(load)
+
+  // Rekam yang dikembalikan server adalah canonical: identitas penandatangan,
+  // waktu tanda tangan, dan verifikasi fisik dicap server, bukan dipercaya dari klien.
+  const terimaBalasanKlinis: TerimaBalasan = (op, hasil) => {
+    if (op.jenis !== 'record' || !hasil || typeof hasil !== 'object') return
+    const record = (hasil as { record?: EMRRecord }).record
+    if (!record || record.patientId !== op.patientId) return
+    setState((st) => ({ ...st, records: { ...st.records, [op.patientId]: record } }))
+  }
+
+  // Kirim ulang tulisan klinis yang tertunda saat aplikasi dimuat dan saat kembali online.
+  // Jika antrean memuat rekam, balasan canonical server langsung mengganti state lokal.
+  useEffect(() => {
+    void kurasSinkronKlinis(terimaBalasanKlinis)
+    const on = () => void kurasSinkronKlinis(terimaBalasanKlinis)
+    window.addEventListener('online', on)
+    return () => window.removeEventListener('online', on)
+  }, [])
 
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
@@ -406,7 +486,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then((data) =>
         setState((st) => ({
           ...st,
-          patients: data.patients?.length ? data.patients : st.patients,
+          patients: normalisasiDaftarPasien(data.patients).length ? normalisasiDaftarPasien(data.patients) : st.patients,
           vitals: { ...st.vitals, ...(data.vitals ?? {}) },
           supportive: { ...st.supportive, ...(data.supportive ?? {}) },
           records: { ...st.records, ...(data.records ?? {}) },
@@ -481,7 +561,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       account: state.account,
       setActivePatient: (id) => setState((st) => ({ ...st, activePatientId: id })),
       addPatient: (p) => {
-        if (backendEnabled) api.addPatientRemote(p).catch(() => {})
+        sinkronKlinis('patient', p.id, p)
         setState((st) => ({
           ...st,
           patients: [...st.patients, p],
@@ -492,14 +572,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }))
       },
       addVital: (patientId, vital) => {
-        if (backendEnabled) api.addVitalRemote(patientId, vital).catch(() => {})
+        sinkronKlinis('vital', patientId, vital)
         setState((st) => ({
           ...st,
           vitals: { ...st.vitals, [patientId]: [...(st.vitals[patientId] ?? []), vital] },
         }))
       },
       addSupportive: (patientId, r) => {
-        if (backendEnabled) api.addSupportiveRemote(patientId, r).catch(() => {})
+        sinkronKlinis('supportive', patientId, r)
         setState((st) => ({
           ...st,
           supportive: {
@@ -511,11 +591,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setChat: (patientId, messages) =>
         setState((st) => ({ ...st, chats: { ...st.chats, [patientId]: messages } })),
       saveRecord: (record) => {
-        if (backendEnabled) api.saveRecordRemote(record.patientId, record).catch(() => {})
+        sinkronKlinis('record', record.patientId, record, terimaBalasanKlinis)
         setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } }))
       },
+      terapkanRekamServer: (record) =>
+        setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } })),
       saveEducation: (patientId, sheet) => {
-        if (backendEnabled) api.saveEducationRemote(patientId, sheet).catch(() => {})
+        sinkronKlinis('education', patientId, sheet)
         setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } }))
       },
       updateSettings: (partial) => {
@@ -606,13 +688,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // (no dummy data). Doctors start with an empty patient list.
           if (account.role === 'pasien') {
             const self = patientFromAccount(account)
-            const exists = st.patients.some((p) => p.id === self.id)
+            const legacyId = legacySelfPatientId(account.email)
+            const stableAda = st.patients.some((p) => p.id === self.id)
+            const legacyAda = legacyId !== self.id && st.patients.some((p) => p.id === legacyId)
+            const patients = stableAda
+              ? st.patients
+              : legacyAda
+                ? st.patients.map((p) => (p.id === legacyId ? { ...p, ...self } : p))
+                : [...st.patients, self]
             const acc = { ...account, patientId: self.id }
             saveSession(acc) // remember login for 7 days
             return {
               ...st,
               account: acc,
-              patients: exists ? st.patients : [...st.patients, self],
+              patients,
+              // Re-key only when the stable destination does not already exist.
+              // This preserves both copies on an unexpected conflict instead of
+              // silently overwriting longitudinal clinical state.
+              vitals: pindahkanKunciPasien(st.vitals, legacyId, self.id),
+              supportive: pindahkanKunciPasien(st.supportive, legacyId, self.id),
+              chats: pindahkanKunciPasien(st.chats, legacyId, self.id),
+              records: pindahkanKunciPasien(st.records, legacyId, self.id),
+              education: pindahkanKunciPasien(st.education, legacyId, self.id),
+              lifeEvents: pindahkanKunciPasien(st.lifeEvents, legacyId, self.id),
+              quests: pindahkanKunciPasien(st.quests, legacyId, self.id),
               activePatientId: self.id,
             }
           }
@@ -886,22 +985,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ),
         })),
       addSelfVital: (v) =>
-        setState((st) => ({ ...st, selfVitals: [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50) })),
+        setState((st) => {
+          const next = [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putSelfVitalsLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, selfVitals: next }
+        }),
       addSleepLog: (hours, bedtimeConsistent) =>
         setState((st) => {
           const date = hariIni()
-          const without = st.sleepLogs.filter((s) => s.date !== date)
-          return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
+          const lama = st.sleepLogs.filter((s) => s.date === date).map((s) => s.id)
+          const row = { id: uid(), date, hours, bedtimeConsistent }
+          if (st.account) unggahHapusDiary({ ...(lama.length ? { removeSleepIds: lama } : {}), sleepLogs: [row] })
+          return {
+            ...st,
+            sleepLogs: [row, ...st.sleepLogs.filter((s) => s.date !== date)].slice(0, 60),
+            diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, lama),
+          }
         }),
       setSleepLog: (date, hours, bedtimeConsistent) =>
         setState((st) => {
           if (!date || !Number.isFinite(hours) || hours <= 0 || hours > 24) return st
-          const without = st.sleepLogs.filter((s) => s.date !== date)
+          const lama = st.sleepLogs.filter((s) => s.date === date).map((s) => s.id)
+          const row = { id: uid(), date, hours, bedtimeConsistent }
+          if (st.account) unggahHapusDiary({ ...(lama.length ? { removeSleepIds: lama } : {}), sleepLogs: [row] })
           return {
             ...st,
-            sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without]
+            sleepLogs: [row, ...st.sleepLogs.filter((s) => s.date !== date)]
               .sort((a, b) => (a.date < b.date ? 1 : -1))
               .slice(0, 60),
+            diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, lama),
           }
         }),
       toggleEduBookmark: (articleId) =>
@@ -914,7 +1028,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       answerQuiz: (correct) =>
         setState((st) => ({ ...st, quizScore: { correct: st.quizScore.correct + (correct ? 1 : 0), total: st.quizScore.total + 1 } })),
       logVo2Max: (value, method) =>
-        setState((st) => (value > 0 ? { ...st, vo2maxLog: [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50) } : st)),
+        setState((st) => {
+          if (!(value > 0)) return st
+          const next = [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50)
+          if (backendEnabled && st.account) {
+            api.putVo2maxLog(next).then(() => window.dispatchEvent(new Event(PERISTIWA_SINKRON))).catch(() => { /* offline */ })
+          }
+          return { ...st, vo2maxLog: next }
+        }),
       addGoal: (g) =>
         setState((st) => (g.label.trim() && g.target > 0 ? { ...st, goals: [{ id: uid(), ...g }, ...st.goals] } : st)),
       removeGoal: (id) => setState((st) => ({ ...st, goals: st.goals.filter((g) => g.id !== id) })),
@@ -925,6 +1046,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           trainingLogs: [{ id: uid(), date: hariIni(), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
         })),
+      removeTrainingLog: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeTrainingIds: [id] })
+        return { ...st, trainingLogs: st.trainingLogs.filter((row) => row.id !== id), diaryHiddenTrainingIds: ingatDihapus(st.diaryHiddenTrainingIds, [id]) }
+      }),
+      removeGpsActivity: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeGpsIds: [id] })
+        return { ...st, gpsActivities: st.gpsActivities.filter((row) => row.id !== id), diaryHiddenGpsIds: ingatDihapus(st.diaryHiddenGpsIds, [id]) }
+      }),
       setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
       addLifeEvent: (patientId, e) =>
         setState((st) => ({
@@ -981,7 +1112,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           quests: { ...st.quests, [patientId]: (st.quests[patientId] ?? []).filter((q) => q.id !== id) },
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
-      removeFood: (id) => setState((st) => ({ ...st, foods: st.foods.filter((f) => f.id !== id) })),
+      removeFood: (id) => setState((st) => {
+        if (!id) return st
+        if (st.account) unggahHapusDiary({ removeFoodIds: [id] })
+        return { ...st, foods: st.foods.filter((f) => f.id !== id), diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, [id]) }
+      }),
+      lupakanCatatanDihapus: (foodIds, sleepIds, trainingIds = [], gpsIds = []) => setState((st) => {
+        const foodsH = new Set(foodIds)
+        const sleepH = new Set(sleepIds)
+        const trainingH = new Set(trainingIds)
+        const gpsH = new Set(gpsIds)
+        const foods = st.foods.filter((f) => !foodsH.has(f.id))
+        const sleepLogs = st.sleepLogs.filter((s) => !sleepH.has(s.id))
+        const trainingLogs = st.trainingLogs.filter((row) => !trainingH.has(row.id))
+        const gpsActivities = st.gpsActivities.filter((row) => !gpsH.has(row.id))
+        if (foods.length === st.foods.length && sleepLogs.length === st.sleepLogs.length && trainingLogs.length === st.trainingLogs.length && gpsActivities.length === st.gpsActivities.length) return st
+        return {
+          ...st,
+          foods,
+          sleepLogs,
+          trainingLogs,
+          gpsActivities,
+          diaryHiddenFoodIds: ingatDihapus(st.diaryHiddenFoodIds, foodIds),
+          diaryHiddenSleepIds: ingatDihapus(st.diaryHiddenSleepIds, sleepIds),
+          diaryHiddenTrainingIds: ingatDihapus(st.diaryHiddenTrainingIds, trainingIds),
+          diaryHiddenGpsIds: ingatDihapus(st.diaryHiddenGpsIds, gpsIds),
+        }
+      }),
       logWellness: (date, patch) =>
         setState((st) => ({
           ...st,

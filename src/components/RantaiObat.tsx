@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { obatDalam, type MekanismeObat } from '../lib/mekanismeObat'
 import { Rantai } from './Rantai'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mekanisme obat sebagai RANTAI, bukan paragraf.
@@ -34,6 +35,7 @@ function KartuObat({ o }: { o: MekanismeObat }) {
   const [buka, setBuka] = useState(false)
   return (
     <div className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
+      <BatasKlaimKesehatan permukaan="clinical.drug-chain" />
       <div className="flex flex-wrap items-baseline gap-x-2">
         <span className="text-[12px] font-black text-ink dark:text-white">{o.nama}</span>
         <span className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{o.golongan}</span>

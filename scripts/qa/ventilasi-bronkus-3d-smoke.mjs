@@ -66,6 +66,31 @@ try {
   const terikat = Number(await canvas.evaluate((n) => n.dataset.segmenTerikat))
   if (terikat !== 18) throw new Error(`Harus 18 segmen terikat ke mesh, dapat ${terikat}`)
 
+  // Tunggu angka pengisiannya BENAR-BENAR ADA sebelum mulai mencuplik.
+  //
+  // segmenTerikat ditulis saat model selesai diikat; isiRerata ditulis oleh
+  // loop animasinya, satu bingkai kemudian. Pada runner yang kehabisan bingkai
+  // jaraknya melebar, cuplikan pertama terbaca NaN, dan gerbang melaporkan
+  // "pengisian tidak terbaca" untuk panel yang sebenarnya baik-baik saja --
+  // persis kegagalan yang dilihat pada PR #1439:
+  //
+  //   Pengisian tidak terbaca: NaN,0.092,0.176,0.176,0.176
+  //
+  // Empat cuplikan berikutnya membuktikan angkanya ada dan naik. Yang gagal
+  // adalah waktunya membaca, bukan barang yang dibaca. Tuduhan palsu dari
+  // sebuah gerbang jauh lebih mahal daripada gerbang yang sabar.
+  await canvas.evaluate((n) => new Promise((res, rej) => {
+    const mulai = Date.now()
+    const cek = () => {
+      if (Number.isFinite(Number(n.dataset.isiRerata))) return res(null)
+      if (Date.now() - mulai > 20_000) {
+        return rej(new Error('isiRerata tidak pernah ditulis: loop animasinya tidak pernah berjalan sama sekali'))
+      }
+      setTimeout(cek, 250)
+    }
+    cek()
+  }))
+
   // Pengisian harus NAIK. Angka yang beku berarti model berjalan di kepala
   // sendiri sementara gambarnya tidak pernah ikut.
   const sampel = []

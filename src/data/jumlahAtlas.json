@@ -1,0 +1,14 @@
+{
+  "_catatan": "Dihasilkan oleh scripts/bangun/jumlahAtlas.mjs dengan membaca berkas GLB-nya. Jangan disunting tangan; jalankan ulang skripnya.",
+  "sumber": "Z-Anatomy (CC BY-SA 4.0), turunan BodyParts3D (CC BY-SA 2.1 JP). Lihat public/anatomy/CREDITS.txt.",
+  "perSistem": {
+    "surface": 224,
+    "skeletal": 274,
+    "muscular": 505,
+    "cardiovascular": 434,
+    "nervous": 497,
+    "visceral": 94,
+    "lymphoid": 159
+  },
+  "total": 2187
+}

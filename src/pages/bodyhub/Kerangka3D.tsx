@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
+import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { muatAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
@@ -91,11 +93,14 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
     const kelompokMesh = new Map<THREE.Mesh, string>()
     const dapatDipilih: THREE.Mesh[] = []
     let grup: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
     // muatAtlas memasang dekoder meshopt dan memulihkan nama ASLI lewat
     // parser.associations. Keduanya sebelumnya disalin tangan di sini.
     muatAtlas(BERKAS_KERANGKA)
       .then(({ scene: adegan, namaAsli }) => {
+        if (!penjaga.terima(adegan)) return
         grup = adegan
 
         // Tiga tulang tengkorak adalah node PIVOT bernama yang geometrinya ada
@@ -191,16 +196,15 @@ export function Kerangka3D({ terpilih, onPilih, tinggi = 340 }: Kerangka3DProps)
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let raf = 0
-    const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+    // Loop berhenti saat offscreen / tab tersembunyi (helper bersama).
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-    }
-    raf = requestAnimationFrame(gambar)
+    })
 
     return () => {
-      cancelAnimationFrame(raf)
+      penjaga.lepas()
+      loop.hentikan()
       terapkanRef.current = null
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', klik)

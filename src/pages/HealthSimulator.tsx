@@ -6,11 +6,12 @@ import { IconSparkle } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { framinghamCVD, cvdBand } from '../lib/riskModels'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Simulator Bagaimana-Jika — the honest, transparent foundation of a "digital
-// twin": it composes VALIDATED, published risk equations the app already
-// trusts (Framingham General CVD 10-year risk, D'Agostino 2008) and lets the
+// twin": it composes published risk equations the app already ships
+// (Framingham General CVD 10-year risk, D'Agostino 2008) and lets the
 // user toggle modifiable choices — quit smoking, treat blood pressure, lower
 // cholesterol, control diabetes — then shows how the risk changes side by side.
 //
@@ -74,8 +75,8 @@ export function HealthSimulator() {
   const baseRisk = framinghamCVD(b)
   const simRisk = framinghamCVD(simulated)
 
-  // Life Timeline — project the same validated equation across future ages
-  // (Framingham is validated for ages 30-74, so we cap the projection there).
+  // Life Timeline — project the same published equation across future ages
+  // (Framingham published age range is 30-74, so we cap the projection there).
   // Biomarkers are held constant: this isolates the effect of the interventions
   // themselves rather than guessing how labs drift, which keeps it honest.
   const timeline = useMemo(() => {
@@ -106,8 +107,9 @@ export function HealthSimulator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Simulator Bagaimana-Jika" subtitle="See how today's choices change your 10-year risk" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A first step toward an open "digital twin": enter your current numbers, then toggle real evidence-based changes and watch your 10-year cardiovascular risk move. Every number comes from the published Framingham equation — no black-box guessing.</Prosa>
+        <SectionTitle icon={<IconSparkle size={20} />} title="What-If Health Simulator" subtitle="Published Framingham 10-year CVD risk under toggled choices — not a clinically validated Panacea decision" />
+        <BatasKlaimKesehatan permukaan="longevity.health-simulator" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enter your current numbers, then toggle published-model levers and watch estimated 10-year cardiovascular risk move. Every number comes from Framingham (D'Agostino 2008) — a technical estimate to discuss with a clinician, not a personal prognosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {num('Age (years)', 'age')}
           <Field label="Sex">
@@ -201,7 +203,7 @@ export function HealthSimulator() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <Prosa kelas="mt-2 text-[11px] text-neutral-500">Proyeksi memakai persamaan Framingham pada tiap umur dengan penanda hayati Anda sekarang ditahan tetap (model ini tervalidasi untuk umur 30-74 tahun). Ia memisahkan pengaruh tindakannya saja — hasil laboratorium dan tekanan darah sesungguhnya juga bergeser seiring umur, jadi bacalah ini sebagai arah, bukan kepastian.</Prosa>
+          <Prosa kelas="mt-2 text-[11px] text-neutral-500">Projection uses the published Framingham equation at each age with your current biomarkers held fixed (published age range 30–74). That isolates the levers alone — real labs and blood pressure also drift with age — so read this as direction, not certainty, and not a clinically validated Panacea forecast.</Prosa>
         </Card>
       )}
 

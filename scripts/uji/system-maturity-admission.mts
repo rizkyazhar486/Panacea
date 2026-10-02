@@ -33,12 +33,20 @@ for (const entry of report.admissions) {
   assert.equal(entry.admitted, entry.status === 'same-frame-shipped')
 }
 
-for (const system of ['articular', 'fascial'] as const) {
+assert.deepEqual(report.blockedSystems, ['articular', 'reproductive', 'fascial'])
+for (const system of ['articular', 'reproductive', 'fascial'] as const) {
   const entry = report.admissions.find((candidate) => candidate.system === system)
   assert.ok(entry)
   assert.equal(entry.status, 'same-frame-partial')
   assert.equal(entry.admitted, false)
   assert.notEqual(entry.geometryStatus, 'shipped')
+}
+
+for (const system of ['surface', 'skeletal', 'nervous', 'digestive', 'endocrine', 'sensory'] as const) {
+  const entry = report.admissions.find((candidate) => candidate.system === system)
+  assert.ok(entry)
+  assert.equal(entry.status, 'same-frame-shipped', `${system} must resolve exact shipped same-frame source anchors`)
+  assert.deepEqual(entry.unresolvedHints, [], `${system} must not retain conceptual source-name debt`)
 }
 
 // A specialty/reference-frame GLB must never satisfy whole-body system admission,

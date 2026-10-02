@@ -171,9 +171,9 @@ export function OcularOpticsLesson() {
 
             <article className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
               <label htmlFor={`${controlsId}-pupil`} className="flex items-center justify-between text-[9px] font-black uppercase tracking-wide text-neutral-500"><span>Pupil aperture</span><span>{pupilMm.toFixed(1)} mm</span></label>
-              <input id={`${controlsId}-pupil`} type="range" min="2" max="8" step="0.5" value={pupilMm} onChange={(event) => setPupilMm(Number(event.target.value))} className="mt-2 w-full" />
+              <input id={`${controlsId}-pupil`} type="range" min="2" max="8" step="0.5" value={pupilMm} aria-valuetext={`${pupilMm.toFixed(1)} millimetres`} onChange={(event) => setPupilMm(Number(event.target.value))} className="mt-2 w-full" />
               <label htmlFor={`${controlsId}-distance`} className="mt-4 flex items-center justify-between text-[9px] font-black uppercase tracking-wide text-neutral-500"><span>Target distance</span><span>{distanceM < 1 ? distanceM.toFixed(2) : distanceM.toFixed(1)} m</span></label>
-              <input id={`${controlsId}-distance`} type="range" min="0.25" max="6" step="0.05" value={distanceM} onChange={(event) => setDistanceM(Number(event.target.value))} className="mt-2 w-full" />
+              <input id={`${controlsId}-distance`} type="range" min="0.25" max="6" step="0.05" value={distanceM} aria-valuetext={`${distanceM.toFixed(2)} metres`} onChange={(event) => setDistanceM(Number(event.target.value))} className="mt-2 w-full" />
             </article>
 
             <article className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
@@ -244,7 +244,7 @@ export function Ocular4DAtlas() {
             <div className="px-1 text-[9px] font-black uppercase tracking-[.15em] text-neutral-400">{group.label}</div>
             <div className="mt-2 space-y-1.5">
               {visibleStructures.map((item) => (
-                <button key={item.term} onClick={() => setSelectedStructure(item.term)} className={`w-full rounded-2xl border p-3 text-left ${item.term === activeStructure?.term ? 'border-sky-300 bg-sky-50 dark:border-sky-300/30 dark:bg-sky-300/10' : 'border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-white/[.02]'}`}>
+                <button key={item.term} type="button" aria-pressed={item.term === activeStructure?.term} onClick={() => setSelectedStructure(item.term)} className={`w-full rounded-2xl border p-3 text-left ${item.term === activeStructure?.term ? 'border-sky-300 bg-sky-50 dark:border-sky-300/30 dark:bg-sky-300/10' : 'border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-white/[.02]'}`}>
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-[10px] font-black text-neutral-950 dark:text-white">{item.label}</span>
                     <span className="shrink-0 text-[7px] font-bold text-neutral-400">{item.ontology}</span>

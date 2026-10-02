@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconMoon } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +61,8 @@ export function CaffeineCalculator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Caffeine & Sleep Calculator" subtitle="How much caffeine is still in your body at bedtime" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Caffeine & Sleep Calculator" subtitle="Educational half-life estimate of caffeine remaining at bedtime" />
+        <BatasKlaimKesehatan permukaan="wellness.caffeine-sleep" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Caffeine clears the body by first-order kinetics (a fixed <i>fraction</i> per hour, not a fixed
           amount) with a plasma half-life that averages ~5 hours but genuinely varies — roughly

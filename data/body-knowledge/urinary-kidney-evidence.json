@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-18",
+  "system": "urinary",
+  "organ": "kidney",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports anatomy/physiology/pathophysiology relationships only at the general educational level; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
+  "relationships": [
+    {
+      "id": "glomerular-filtration-barrier",
+      "domain": "anatomy-physiology",
+      "from": "glomerular-filtration-barrier",
+      "to": "glomerular-filtration",
+      "relationship": "supports-selective-filtration",
+      "claim": "The glomerular filtration barrier includes specialized podocyte foot processes and slit diaphragms; disruption of this barrier can impair filtration-barrier function and contribute to proteinuria.",
+      "evidence": ["pmid:23176147"],
+      "status": "source-checked"
+    },
+    {
+      "id": "tubular-function-renal-testing",
+      "domain": "physiology",
+      "from": "kidney-tubules",
+      "to": "renal-function-assessment",
+      "relationship": "physiology-relevant-to-assessment",
+      "claim": "Kidney function assessment extends beyond glomerular filtration and includes tubular physiology, renal circulation, urinalysis, acid-base handling, and proteinuria assessment.",
+      "evidence": ["pmid:16377400"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:23176147",
+      "pmid": "23176147",
+      "title": "Podocyte mitosis - a catastrophe.",
+      "year": 2013,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23176147/",
+      "evidenceRole": "Podocyte structure, slit diaphragm, filtration-barrier dysfunction and proteinuria relationship.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:16377400",
+      "pmid": "16377400",
+      "title": "Renal function testing.",
+      "year": 2006,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16377400/",
+      "evidenceRole": "Educational overview of glomerular filtration, tubular physiology, renal circulation and renal function testing.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-recommendation",
+      "source-checked-to-human-reviewed"
+    ]
+  }
+}

@@ -26,20 +26,25 @@ function node(input: Omit<AtlasNode, 'provenance' | 'educationalPriority'> & { p
   }
 }
 
+// Organism-scale source hints are exact anchors into the shipped same-frame
+// Z-Anatomy bundles. They are intentionally representative rather than generic
+// English category words: source admission validates real mesh identities, while
+// geometryStatus and the downstream closure gates remain responsible for coverage
+// completeness. Do not add absent anatomy just to make admission green.
 const systemRoots: readonly AtlasNode[] = [
-  ['surface', 'Integumentary surface', ['surface'], ['whole-body'], ['skin', 'surface']],
-  ['skeletal', 'Skeletal system', ['skeletal'], ['whole-body'], ['bone', 'skeleton']],
+  ['surface', 'Integumentary surface', ['surface'], ['whole-body'], ['Hairs of head', 'Posterior region of neck', 'Pectoral region', 'Urogenital region', 'Dorsal surfaces of digits of hand', 'Posterior region of thigh', 'Dorsal surfaces of digits of foot']],
+  ['skeletal', 'Skeletal system', ['skeletal'], ['whole-body'], ['Frontal bone', 'Clavicle', 'Humerus', 'Hip bone', 'Femur', 'Tibia']],
   ['articular', 'Articular system', ['skeletal'], ['whole-body'], ['joint', 'cartilage', 'ligament']],
   ['muscular', 'Muscular system', ['muscular'], ['whole-body'], ['muscle']],
   ['cardiovascular', 'Cardiovascular system', ['cardiovascular'], ['whole-body'], ['heart', 'artery', 'vein']],
   ['lymphatic', 'Lymphatic system', ['lymphoid'], ['whole-body'], ['nodes', 'Spleen', 'thymus']],
-  ['nervous', 'Nervous system', ['nervous'], ['whole-body'], ['brain', 'spinal cord', 'nerve']],
+  ['nervous', 'Nervous system', ['nervous'], ['whole-body'], ['Midbrain', 'Sciatic nerve', 'Median nerve', 'Femoral nerve']],
   ['respiratory', 'Respiratory system', ['visceral'], ['head', 'neck', 'thorax'], ['trachea', 'bronch', 'lung']],
-  ['digestive', 'Digestive system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['esophagus', 'stomach', 'intestine', 'liver']],
+  ['digestive', 'Digestive system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['Oesophagus', 'Stomach', 'Liver', 'Duodenum', 'Ascending colon']],
   ['urinary', 'Urinary system', ['visceral'], ['abdomen', 'pelvis'], ['kidney', 'ureter', 'urinary bladder']],
-  ['endocrine', 'Endocrine system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['hypophysis', 'thyroid', 'suprarenal', 'pancreas']],
-  ['reproductive', 'Reproductive system', ['visceral'], ['pelvis'], ['prostate', 'testis', 'uterus', 'ovary']],
-  ['sensory', 'Special sensory organs', ['nervous', 'visceral'], ['head'], ['eye', 'cochlea', 'vestibular']],
+  ['endocrine', 'Endocrine system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['Adenohypophysis', 'Thyroid gland', 'Suprarenal gland', 'Pancreas']],
+  ['reproductive', 'Reproductive system', ['visceral'], ['pelvis'], ['Prostate', 'Testis', 'Ductus deferens', 'Epididymis']],
+  ['sensory', 'Special sensory organs', ['nervous', 'visceral'], ['head'], ['Sclera', 'Cornea', 'Cochlea', 'Vestibular nerve']],
   ['fascial', 'Fascial and connective planes', ['surface', 'muscular'], ['whole-body'], ['fascia', 'aponeurosis']],
 ].map(([id, label, files, regions, hints]) => node({
   id: `system:${id}`,
@@ -50,7 +55,10 @@ const systemRoots: readonly AtlasNode[] = [
   scale: 'organism',
   children: [],
   source: { mode: 'composite', files: (files as string[]).map((file) => `${file}.glb`), nodeHints: hints as string[] },
-  geometryStatus: id === 'articular' || id === 'fascial' ? 'partial' : 'shipped',
+  // Female reproductive anatomy is not present in the compatible whole-body
+  // frame yet; keep the system partial instead of letting male-only geometry
+  // masquerade as complete reproductive-system coverage.
+  geometryStatus: id === 'articular' || id === 'reproductive' || id === 'fascial' ? 'partial' : 'shipped',
   educationalPriority: 0.9,
 }))
 

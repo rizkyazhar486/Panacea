@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import CardioAtlas3D from '../../components/CardioAtlas3D'
+import { EcgAnatomyStudio } from './EcgAnatomyStudio'
 import { FLOW_PATHS, alirStenosis, strukturJalur } from '../../lib/cardioFlow'
 import {
   CARDIO_CONDITIONS, kondisiUntukStruktur, strukturKondisi, type CardioCondition,
@@ -152,6 +153,8 @@ export function CardioLab({ onBukaOrgan, awal = null }: Props) {
         dipilih={struktur}
         onPilih={(n) => { setStruktur(n); if (n) setKondisiId(null) }}
       />
+
+      <EcgAnatomyStudio heartRate={hr} onHeartRateChange={setHr} />
 
       {/* ── Aliran ─────────────────────────────────────────────────────────── */}
       <section className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
@@ -324,7 +327,6 @@ export function CardioLab({ onBukaOrgan, awal = null }: Props) {
           <Daftar judul="What you find" isi={kondisi.temuan} />
           <Daftar judul="What confirms it" isi={kondisi.penunjang} />
           <Daftar judul="What you do" isi={kondisi.tata} />
-
 
           {obatKondisi.length > 0 && (
             <div>
