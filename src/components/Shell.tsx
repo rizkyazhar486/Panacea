@@ -57,6 +57,7 @@ import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
 import { useCommandBar } from './useCommandBar'
@@ -83,11 +84,6 @@ function navMatches(n: Nav, pathname: string): boolean {
 
 const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 
-/**
- * Dipakai layar "Atur Fitur" agar daftarnya berasal dari sumber yang sama
- * dengan menu. Daftar terpisah yang ditulis ulang pasti akan tertinggal.
- */
-export const NAV_UNTUK_PENGATURAN: { to: string; label: string; group: string; roles: Role[] }[] = []
 
 /**
  * MENU HARIAN — hanya yang dibuka berulang kali.

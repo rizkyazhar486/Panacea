@@ -3,7 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconSettings } from '../components/icons'
-import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
+import { NAV_UNTUK_PENGATURAN } from '../data/navPengaturan'
 import {
   ambilTersembunyi, alihkanFitur, simpanTersembunyi, tampilkanSemua,
   bolehDisembunyikan, langgananFitur,
