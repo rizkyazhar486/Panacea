@@ -138,6 +138,12 @@ assert.equal((eksposur.match(/<UnifiedHumanSimulationProjector/g) ?? []).length,
 // Proyektor Body Exposure: panel kamera "My Body" dilipat satu kata agar 3D tetap fokus tunggal.
 const proyektor = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 assert.match(proyektor, /<Fold label="Scan"><PersonalAvatarCameraCapture \/><\/Fold>/, 'the projector folds the camera capture panel as Scan')
+// Atlas 3D: daftar target sumber dilipat, tetapi hitungan dan catatan target hilang tetap terlihat (batas kebenaran).
+const atlas3d = readFileSync('src/components/BodyAllSystems3D.tsx', 'utf8')
+const lipatSumber = atlas3d.indexOf('<Fold label="Sources">')
+assert.ok(lipatSumber >= 0, 'the atlas folds its source target list as Sources')
+assert.ok(atlas3d.indexOf('selected.targets.map', lipatSumber) > lipatSumber && atlas3d.indexOf('selected.targets.map', lipatSumber) < atlas3d.indexOf('</Fold>', lipatSumber), 'the target cards live inside the Sources fold')
+assert.ok(atlas3d.indexOf('Missing or failed targets are deliberately not approximated') > atlas3d.indexOf('</Fold>', lipatSumber), 'the missing-target boundary note stays outside the fold, always visible')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
