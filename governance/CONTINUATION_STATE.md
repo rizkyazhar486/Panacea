@@ -1,3 +1,14 @@
+Updated 2026-10-02 (scheduled autonomous session, docs-only reconciliation).
+
+reconciliation:
+- The two "next_exact_action" items below were already closed on main; the registry is the source of truth, this file had drifted:
+  - `anamnesis_and_exam_fields_have_no_per_field_origin` -> closed 2026-09-30 (server-stamped `asalIsian`, `server/uji/asalIsianKlinis.uji.ts`; see `clinical.patient_review` change_log in `governance/MATURITY_REGISTRY.yaml`).
+  - `self_id_still_email_derived_for_self_records` -> closed 2026-09-26 at c3061d41 (stable `self-u-<userId>`, gate `scripts/uji/id-rekam-diri-stabil.mts`).
+- `clinical.patient_review` now carries only `clinician_usability_test` and `clinical_validation`, both externally blocked on real clinicians (`risk.clinical_validation_external_dependency`) — do not fabricate.
+- next software-addressable work: re-scan `known_gaps` across `governance/MATURITY_REGISTRY.yaml` (e.g. `photo_ocr_live_vision_accuracy`, `reminder_live_push_verification`, `limited_domain_coupling_coverage`, `no_patient_specific_parameter_identifiability_contract`) and pick one concrete item; run `npm install` in `/` and `/server` first, then `npm run uji` + `npx tsc -b` as gates.
+
+---- previous session (2026-09-26), kept for history ----
+
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
 Updated 2026-09-26 (scheduled autonomous session). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md; sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
