@@ -6,7 +6,7 @@ import {
   getLongevityProgram,
   simulateLongevityStrategy,
   type LongevityProgramId,
-} from '../../lib/longevityProblemSolver'
+} from '../../lib/physiology/longevityProblemSolver'
 
 type ViewMode = 'systems' | 'simulator' | 'translation' | 'evidence'
 

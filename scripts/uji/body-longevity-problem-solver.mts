@@ -6,7 +6,7 @@ import {
   LONGEVITY_TRANSLATION_BOTTLENECKS,
   listLongevityLevers,
   simulateLongevityStrategy,
-} from '../../src/lib/longevityProblemSolver.ts'
+} from '../../src/lib/physiology/longevityProblemSolver.ts'
 
 const coreIds = [
   'epigenetic-reprogramming',
