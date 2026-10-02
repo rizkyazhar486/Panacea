@@ -21,7 +21,9 @@
 //    boleh dikeluarkan adalah "bicarakan dengan dokter".
 // 5. Bila MAD = 0 (semua riwayat identik), simpangan z tidak terdefinisi;
 //    mesin memakai lantai 1% dari median agar satu digit bulat tidak menjadi
-//    "simpangan tak hingga".
+//    "simpangan tak hingga". Bila median juga 0 (riwayat nol semua), lantai itu
+//    pun nol: sebaran TIDAK terdefinisi, z dan rentang pribadi dinyatakan
+//    tidak diketahui (null) dan hasil terbaik yang mungkin hanyalah "pantau".
 //
 // Ini sinyal pemantauan, bukan diagnosis.
 
@@ -66,6 +68,13 @@ function median(xs: number[]): number {
   const s = [...xs].sort((a, b) => a - b)
   const m = s.length >> 1
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2
+}
+
+/** Sebaran riwayat (MAD terskala, berlantai 1% median); null bila tak terdefinisi. */
+function sebarRiwayat(xs: number[], med: number): number | null {
+  const mad = median(xs.map((x) => Math.abs(x - med))) * SKALA_MAD
+  const sebar = Math.max(mad, Math.abs(med) * LANTAI_SEBAR_RELATIF)
+  return sebar > 0 ? sebar : null
 }
 
 function di_luar(nilai: number, j: JenisLab): boolean {
@@ -134,10 +143,27 @@ export function analisisTrenLab(butirMentah: readonly ButirLab[], jenis: JenisLa
   }
 
   const med = median(riwayat)
-  const mad = median(riwayat.map((x) => Math.abs(x - med))) * SKALA_MAD
-  const sebar = Math.max(mad, Math.abs(med) * LANTAI_SEBAR_RELATIF, Number.EPSILON)
-  const z = (akhir.nilai - med) / sebar
+  const sebar = sebarRiwayat(riwayat, med)
   const selisih = akhir.nilai - med
+  if (sebar === null) {
+    // Riwayat nol semua: tanpa sebaran, "seberapa jauh" tidak bisa diukur.
+    // Gagal tertutup — tidak ada z/rentang karangan, dan tidak pernah "bermakna".
+    const berubah = selisih !== 0
+    return {
+      ...dasar,
+      garisDasar: med,
+      selisih,
+      selisihPersen: null,
+      arah: berubah ? (selisih > 0 ? 'naik' : 'turun') : 'datar',
+      status: berubah || luarPop ? 'pantau' : 'stabil',
+      alasan: berubah
+        ? 'Your earlier results were all identical, so how far this one moved cannot be scaled; recheck before reading into it.'
+        : luarPop
+          ? 'Steady for you, but outside the usual population range — worth checking against your lab sheet.'
+          : 'Within your own usual range.',
+    }
+  }
+  const z = selisih / sebar
   const selisihPersen = med !== 0 ? (selisih / Math.abs(med)) * 100 : null
   const arah: Arah = Math.abs(z) < Z_BERMAKNA ? 'datar' : z > 0 ? 'naik' : 'turun'
 
@@ -147,10 +173,11 @@ export function analisisTrenLab(butirMentah: readonly ButirLab[], jenis: JenisLa
   if (arah !== 'datar' && sebelum && riwayat.length - 1 >= MIN_RIWAYAT_GARIS_DASAR) {
     const riwayat2 = riwayat.slice(0, -1)
     const med2 = median(riwayat2)
-    const mad2 = median(riwayat2.map((x) => Math.abs(x - med2))) * SKALA_MAD
-    const sebar2 = Math.max(mad2, Math.abs(med2) * LANTAI_SEBAR_RELATIF, Number.EPSILON)
-    const z2 = (sebelum.nilai - med2) / sebar2
-    terkonfirmasi = Math.abs(z2) >= Z_BERMAKNA && Math.sign(z2) === Math.sign(z)
+    const sebar2 = sebarRiwayat(riwayat2, med2)
+    if (sebar2 !== null) {
+      const z2 = (sebelum.nilai - med2) / sebar2
+      terkonfirmasi = Math.abs(z2) >= Z_BERMAKNA && Math.sign(z2) === Math.sign(z)
+    }
   }
 
   const isi = {

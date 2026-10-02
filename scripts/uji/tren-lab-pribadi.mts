@@ -86,6 +86,29 @@ const b = (t: string, n: number) => ({ id: t, tanggal: t, nilai: n })
   assert.doesNotMatch(src, /'urgent|'darurat/i, 'mesin tren lab memperoleh tingkat darurat dari angka yang dimasukkan sendiri')
 }
 
+// ── Regresi: riwayat nol semua -> sebaran tak terdefinisi. Dulu lantai
+//    Number.EPSILON menghasilkan z ~ 4,5e14 dan rentang pribadi ±4e-16.
+{
+  const nol = [b('2024-01-01', 0), b('2024-02-01', 0), b('2024-03-01', 0)]
+  const naik = analisisTrenLab([...nol, b('2024-04-01', 0.1)], LDL)!
+  assert.equal(naik.zPribadi, null, `z ${naik.zPribadi} dikarang dari sebaran nol`)
+  assert.equal(naik.rentangPribadi, null)
+  assert.equal(naik.status, 'pantau')
+  assert.equal(naik.arah, 'naik')
+  assert.equal(naik.selisih, 0.1)
+  assert.equal(naik.selisihPersen, null)
+  // Berpasangan: hanya beda pada nilai terakhir -> tidak ada perubahan, stabil.
+  const sama = analisisTrenLab([...nol, b('2024-04-01', 0)], LDL)!
+  assert.equal(sama.status, 'stabil')
+  assert.equal(sama.arah, 'datar')
+  // Dua titik berurutan menyimpang tetap tidak boleh "bermakna" tanpa sebaran.
+  const dua = analisisTrenLab([...nol, b('2024-04-01', 0.1), b('2024-05-01', 0.2)], LDL)!
+  assert.equal(dua.status, 'pantau', `sebaran nol menghasilkan ${dua.status}`)
+  // Pembanding: riwayat bervariasi di sekitar 0 tetap punya sebaran -> z terdefinisi.
+  const sebar = analisisTrenLab([b('2024-01-01', -1), b('2024-02-01', 0), b('2024-03-01', 1), b('2024-04-01', 0.1)], LDL)!
+  assert.notEqual(sebar.zPribadi, null)
+}
+
 console.log('tren-lab-pribadi: garis dasar median/MAD, satu titik tak pernah bermakna, dua titik terkonfirmasi, populasi vs pribadi terpisah, tanpa tingkat darurat')
 
 // ── Terjangkau: ubin lab dengan baris tren pribadi dipasang di halaman Your Numbers.
