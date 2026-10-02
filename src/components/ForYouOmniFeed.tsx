@@ -7,7 +7,9 @@ import { calculateSeasonalRank, type RankedHealthEvidence } from '../lib/seasona
 import { ForYouDailyStack } from './ForYouDailyStack'
 import { ForYouNetworkHub } from './ForYouNetworkHub'
 import { ForYouSocialPulse } from './ForYouSocialPulse'
+import { ForYouAffectArc } from './ForYouAffectArc'
 import { ShareToFeed } from './ShareToFeed'
+import { recordAffectEvent } from '../domains/affect'
 import { Prosa } from './Prosa'
 
 type FeedMode = 'all' | 'following' | 'fitness' | 'work' | 'people'
@@ -20,6 +22,7 @@ type FeedItem =
   | { kind: 'community'; id: 'community' }
   | { kind: 'jobs'; id: 'jobs' }
   | { kind: 'pulse'; id: 'pulse' }
+  | { kind: 'affect'; id: 'affect' }
 
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
 
@@ -162,10 +165,10 @@ function PostCard({ post }: { post: SocialPost }) {
       ) : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 px-1 text-[10px] font-black text-white/38">
-        <button type="button" onClick={() => toggleLike(post.id)} className={post.likedByMe ? 'text-rose-300' : 'hover:text-white'}>{post.likedByMe ? '♥' : '♡'} {post.hideLikes ? '—' : post.likes ?? 0}</button>
+        <button type="button" onClick={() => { toggleLike(post.id); recordAffectEvent('social_reaction', 1) }} className={post.likedByMe ? 'text-rose-300' : 'hover:text-white'}>{post.likedByMe ? '♥' : '♡'} {post.hideLikes ? '—' : post.likes ?? 0}</button>
         <Link to="/feed" className="hover:text-white">◌ {post.comments ?? 0}</Link>
-        <button type="button" onClick={() => toggleRepost(post.id)} className={post.repostedByMe ? 'text-emerald-300' : 'hover:text-white'}>↻ {post.reposts ?? 0}</button>
-        <button type="button" onClick={() => toggleBookmark(post.id)} className={post.bookmarkedByMe ? 'text-amber-300' : 'hover:text-white'}>{post.bookmarkedByMe ? '★ Saved' : '☆ Save'}</button>
+        <button type="button" onClick={() => { toggleRepost(post.id); recordAffectEvent('social_reaction', 1) }} className={post.repostedByMe ? 'text-emerald-300' : 'hover:text-white'}>↻ {post.reposts ?? 0}</button>
+        <button type="button" onClick={() => { toggleBookmark(post.id); recordAffectEvent('social_reaction', 0.5) }} className={post.bookmarkedByMe ? 'text-amber-300' : 'hover:text-white'}>{post.bookmarkedByMe ? '★ Saved' : '☆ Save'}</button>
         <span className="ml-auto flex flex-wrap gap-3">
           {typeof post.distanceKm === 'number' && <span>{post.distanceKm.toFixed(1)} km</span>}
           {typeof post.durationMin === 'number' && <span>{Math.round(post.durationMin)} min</span>}
@@ -180,7 +183,7 @@ function RankCard() {
   const result = useSeasonRank()
   return (
     <section className="snap-start border-b border-white/[.08] py-6">
-      <Link to="/fitness-hub?view=ranked" className="block rounded-[24px] border border-cyan-300/15 bg-[radial-gradient(circle_at_20%_10%,rgba(34,211,238,.12),transparent_36%),#05070a] p-5">
+      <Link to="/fitness-hub?view=ranked" onClick={() => recordAffectEvent('achievement_view', Math.min(1, result.progressToNext / 100))} className="block rounded-[24px] border border-cyan-300/15 bg-[radial-gradient(circle_at_20%_10%,rgba(34,211,238,.12),transparent_36%),#05070a] p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/50">Ranked Season</div>
@@ -242,6 +245,7 @@ function buildMixedFeed(posts: SocialPost[]): FeedItem[] {
   posts.forEach((post, index) => {
     items.push({ kind: 'post', id: `post-${post.id}`, post })
     if (index === 1) items.push({ kind: 'rank', id: 'rank' })
+    if (index === 2) items.push({ kind: 'affect', id: 'affect' })
     if (index === 3) items.push({ kind: 'community', id: 'community' })
     if (index === 5) items.push({ kind: 'daily', id: 'daily' })
     if (index === 7) items.push({ kind: 'jobs', id: 'jobs' })
@@ -249,9 +253,10 @@ function buildMixedFeed(posts: SocialPost[]): FeedItem[] {
     if (index === 11) items.push({ kind: 'pulse', id: 'pulse' })
   })
   if (!posts.length) {
-    items.push({ kind: 'rank', id: 'rank' }, { kind: 'community', id: 'community' }, { kind: 'daily', id: 'daily' }, { kind: 'network', id: 'network' })
+    items.push({ kind: 'rank', id: 'rank' }, { kind: 'affect', id: 'affect' }, { kind: 'community', id: 'community' }, { kind: 'daily', id: 'daily' }, { kind: 'network', id: 'network' })
   } else {
     if (!items.some((item) => item.kind === 'rank')) items.push({ kind: 'rank', id: 'rank' })
+    if (!items.some((item) => item.kind === 'affect')) items.push({ kind: 'affect', id: 'affect' })
     if (!items.some((item) => item.kind === 'community')) items.push({ kind: 'community', id: 'community' })
     if (!items.some((item) => item.kind === 'daily')) items.push({ kind: 'daily', id: 'daily' })
     if (!items.some((item) => item.kind === 'network')) items.push({ kind: 'network', id: 'network' })
@@ -280,7 +285,11 @@ export function ForYouOmniFeed() {
     if (!node) return
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
-        setVisible((value) => Math.min(items.length, value + 6))
+        setVisible((value) => {
+          const next = Math.min(items.length, value + 6)
+          if (next > value) recordAffectEvent('feed_reveal', next - value)
+          return next
+        })
       }
     }, { rootMargin: '500px 0px' })
     observer.observe(node)
@@ -301,7 +310,7 @@ export function ForYouOmniFeed() {
             <button
               key={value}
               type="button"
-              onClick={() => setMode(value)}
+              onClick={() => { setMode(value); recordAffectEvent('mode_switch') }}
               className={`relative min-h-[48px] shrink-0 px-4 text-[11px] font-black transition ${
                 mode === value ? 'text-white' : 'text-white/38 hover:text-white/70'
               }`}
@@ -341,6 +350,7 @@ export function ForYouOmniFeed() {
         {items.slice(0, visible).map((item) => {
           if (item.kind === 'post') return <PostCard key={item.id} post={item.post} />
           if (item.kind === 'rank') return <RankCard key={item.id} />
+          if (item.kind === 'affect') return <ForYouAffectArc key={item.id} />
           if (item.kind === 'community') return <CommunityCard key={item.id} />
           if (item.kind === 'jobs') return <JobsCard key={item.id} />
           if (item.kind === 'daily') return <section key={item.id} className="snap-start border-b border-white/[.08] py-6"><ForYouDailyStack /></section>
