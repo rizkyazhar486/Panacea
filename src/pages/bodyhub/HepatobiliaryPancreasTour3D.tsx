@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AtlasViewer3D } from '../../components/AtlasViewer3D'
 import { ATLAS_PARTS } from '../../lib/systemAtlas.gen'
 
@@ -65,6 +65,21 @@ export default function HepatobiliaryPancreasTour3D() {
     setSelected(stop.names[0] ?? null)
   }, [stop?.id])
 
+  // Kanvas dibuat AtlasViewer3D, bukan panel ini. Penanda dipasang di sini agar
+  // gerbang QA bisa menunjuk kanvas panel ini saja di halaman yang memuat banyak
+  // kanvas, dan dipasang ulang bila penampil membangun ulang kanvasnya.
+  const raiz = useRef<HTMLElement | null>(null)
+  const adaStop = Boolean(stop)
+  useEffect(() => {
+    const el = raiz.current
+    if (!el) return
+    const tandai = () => el.querySelectorAll('canvas').forEach((c) => { c.dataset.hepatobiliary3d = 'true' })
+    tandai()
+    const pengamat = new MutationObserver(tandai)
+    pengamat.observe(el, { childList: true, subtree: true })
+    return () => pengamat.disconnect()
+  }, [adaStop])
+
   useEffect(() => {
     if (!playing || stops.length < 2) return
     const timer = window.setInterval(() => {
@@ -90,7 +105,7 @@ export default function HepatobiliaryPancreasTour3D() {
   const progress = ((index + 1) / stops.length) * 100
 
   return (
-    <section data-hepatobiliary-tour3d="v1" className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
+    <section ref={raiz} data-hepatobiliary-tour3d="v1" className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
       <div className="border-b border-white/10 bg-gradient-to-br from-emerald-400/10 via-transparent to-amber-300/10 p-4">
         <div className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">Hepatobiliary + pancreas · source-backed 3D</div>
         <div className="mt-1 flex flex-wrap items-start justify-between gap-3">

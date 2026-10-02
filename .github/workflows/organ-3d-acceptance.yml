@@ -130,17 +130,18 @@ jobs:
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
-        # 12 serial gates are individually bounded below (240s for organ,
-        # 180s for each of the other 11). The stage hard stop must be large
+        # 13 serial gates are individually bounded below (240s for organ,
+        # 180s for each of the other 12). The stage hard stop must be large
         # enough to let those fail-closed per-gate verdicts run instead of
-        # pre-empting a healthy queue: 240 + 11*180 = 2220s = 37m.
-        timeout-minutes: 38
+        # pre-empting a healthy queue: 240 + 12*180 = 2400s = 40m.
+        timeout-minutes: 41
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           ARTERI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           LIMFE3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          HEPATOBILIARY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
@@ -151,7 +152,7 @@ jobs:
         run: |
           set -e
           for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
-                         qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
+                         qa:limfe-3d qa:hepatobiliary-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
                          qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
             echo "::group::$gerbang"
             mulai=$SECONDS

@@ -32,7 +32,7 @@ assert.match(
 )
 assert.match(
   workflow,
-  /name: Prove every 3D panel renders[\s\S]*?timeout-minutes: 38/,
+  /name: Prove every 3D panel renders[\s\S]*?timeout-minutes: 41/,
   'the serial Body3D proof stage must have a coherent hard stop above the sum of its per-gate bounds',
 )
 assert.match(
@@ -81,14 +81,14 @@ assert.doesNotMatch(
   'Body3D smoke failures must fail fast instead of queueing the remaining gates',
 )
 
-const aggregateBoundSeconds = 240 + (11 * 180)
-assert.equal(aggregateBoundSeconds, 2220, 'declared per-gate Body3D bounds must total 37 minutes')
+const aggregateBoundSeconds = 240 + (12 * 180)
+assert.equal(aggregateBoundSeconds, 2400, 'declared per-gate Body3D bounds must total 40 minutes')
 assert.ok(
-  38 * 60 > aggregateBoundSeconds,
+  41 * 60 > aggregateBoundSeconds,
   'the stage hard stop must not pre-empt any individually bounded serial gate',
 )
 assert.ok(
-  60 * 60 > (38 * 60) + (15 * 60),
+  60 * 60 > (41 * 60) + (15 * 60),
   'the job hard stop must leave bounded headroom for browser provisioning plus the proof stage',
 )
 
@@ -98,6 +98,7 @@ const ordered = [
   'qa:ventilasi-3d',
   'qa:arteri-3d',
   'qa:limfe-3d',
+  'qa:hepatobiliary-3d',
   'qa:kerangka-3d',
   'qa:lesi-3d',
   'qa:kelenjar-3d',

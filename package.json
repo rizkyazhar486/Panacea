@@ -33,6 +33,7 @@
     "qa:ventilasi-3d": "node scripts/qa/ventilasi-bronkus-3d-smoke.mjs",
     "qa:arteri-3d": "node scripts/qa/arteri-3d-smoke.mjs",
     "qa:limfe-3d": "node scripts/qa/limfe-3d-smoke.mjs",
+    "qa:hepatobiliary-3d": "node scripts/qa/hepatobiliary-3d-smoke.mjs",
     "qa:kerangka-3d": "node scripts/qa/kerangka-3d-smoke.mjs",
     "qa:lesi-3d": "node scripts/qa/lesi-neuro-3d-smoke.mjs",
     "qa:kelenjar-3d": "node scripts/qa/kelenjar-3d-smoke.mjs",
