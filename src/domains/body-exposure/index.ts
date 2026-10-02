@@ -52,3 +52,5 @@ export {
 } from './engine/explodedLayout'
 
 export { classifyTissue, tissueShading, type TissueClass, type TissueShading } from './engine/tissueShading'
+export { matchBakedAo, aoToVertexColors, type AoLayerEntry, type AoMatch } from './engine/bakedAo'
+export { applyBakedAoToLayer } from './adapters/bakedAoLayer'

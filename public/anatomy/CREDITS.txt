@@ -28,6 +28,11 @@ under CC BY-SA 4.0 — attribution above must be kept, and any redistribution of
 these specific files must carry the same license. This does not extend to the
 rest of the Panaceamed.id application/codebase.
 
+Derived lighting data: the files in ao/ (manifest.json and *.ao.bin) are per-vertex ambient
+occlusion values computed from the GLB files above by scripts/bake/bake-anatomy-ao.mjs. They
+contain no geometry of their own and are derivative works of those GLBs, therefore also licensed
+under CC BY-SA 4.0 with the same attribution.
+
 Note: other files that may appear in this folder are not covered by this notice
 unless they are explicitly named above; their provenance/license must be checked
 separately rather than inferred from proximity.

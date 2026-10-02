@@ -1403,7 +1403,7 @@ export function BodyExplorer() {
             </p>
             <p className="text-[11px] leading-relaxed text-neutral-400">
               3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
-              based on BodyParts3D — licensed under CC BY-SA 4.0.
+              based on BodyParts3D — licensed under CC BY-SA 4.0. The ambient-occlusion shading is computed from the same model and carries the same licence.
             </p>
             <p className="text-[11px] leading-relaxed text-neutral-400">
               The X-ray, CT and MRI options recolour that same 3D model to match how each modality sees tissue. They

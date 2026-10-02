@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { tissueShading } from '../domains/body-exposure'
+import { tissueShading, applyBakedAoToLayer } from '../domains/body-exposure'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 import {
@@ -609,6 +609,10 @@ export function Body3D({
             groupsRef.current[def.key] = clone
             runtimeRootLifecycle.publish(def.file, clone)
             scene.add(clone)
+            // AO dihitung dari geometri sumber (sidecar); gagal/tak cocok = tampil tanpa AO.
+            void applyBakedAoToLayer(def.key, clone).then((dipasang) => {
+              if (dipasang && groupsRef.current[def.key] === clone) requestRenderRef.current()
+            })
             setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
             setProgress((p) => ({ ...p, [def.key]: 1 }))
 
