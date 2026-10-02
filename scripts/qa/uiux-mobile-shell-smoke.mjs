@@ -59,6 +59,34 @@ for (const surface of surfaces) {
   await page.waitForSelector('nav[aria-label="Panacea super pages"]', { state: 'visible' })
   await page.waitForSelector(surface.marker, { state: 'visible', timeout: 45_000 })
 
+  if (surface.id === 'home') {
+    const actions = page.locator(`${surface.marker} .panacea-intent-action`)
+    const count = await actions.count()
+    if (count < 2) {
+      throw new Error(`home: expected active Home actions, found ${count}`)
+    }
+    for (let index = 0; index < count; index += 1) {
+      const box = await actions.nth(index).boundingBox()
+      if (!box) throw new Error(`home: action ${index} is not measurable`)
+      if (box.width < 44 || box.height < 44) {
+        throw new Error(`home: action ${index} below 44px touch floor: ${JSON.stringify(box)}`)
+      }
+    }
+
+    const firstAction = actions.first()
+    await firstAction.focus()
+    const focusStyle = await firstAction.evaluate((node) => {
+      const style = getComputedStyle(node)
+      return {
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth) || 0,
+      }
+    })
+    if (focusStyle.outlineStyle === 'none' || focusStyle.outlineWidth < 2) {
+      throw new Error(`home: active action lacks a visible focus ring: ${JSON.stringify(focusStyle)}`)
+    }
+  }
+
   const metrics = await page.evaluate(({ id, marker }) => {
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
