@@ -10,6 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -185,21 +186,25 @@ function BishopCalc() {
 }
 
 /* ══════════════════ CKD-EPI 2021 (race-free eGFR) ══════════════════ */
+const GFR_STAGE_LABEL: Record<KdigoGfrStage, string> = {
+  G1: 'G1 — Normal/high',
+  G2: 'G2 — Mildly decreased',
+  G3a: 'G3a — Mild-moderate decrease',
+  G3b: 'G3b — Moderate-severe decrease',
+  G4: 'G4 — Severely decreased',
+  G5: 'G5 — Kidney failure',
+}
+const GFR_STAGE_TONE: Record<KdigoGfrStage, 'normal' | 'low' | 'critical'> = {
+  G1: 'normal', G2: 'normal', G3a: 'low', G3b: 'low', G4: 'critical', G5: 'critical',
+}
+
 function CkdEpiCalc() {
   const [scr, setScr] = useState(0.9)
   const [age, setAge] = useState(45)
   const [sex, setSex] = useState<'M' | 'F'>('M')
-  function egfr(): number {
-    const k = sex === 'F' ? 0.7 : 0.9
-    const a = sex === 'F' ? -0.241 : -0.302
-    const sexMult = sex === 'F' ? 1.012 : 1
-    const minTerm = Math.min(scr / k, 1) ** a
-    const maxTerm = Math.max(scr / k, 1) ** -1.2
-    return 142 * minTerm * maxTerm * (0.9938 ** age) * sexMult
-  }
-  const result = egfr()
-  const stage = result >= 90 ? 'G1 — Normal/high' : result >= 60 ? 'G2 — Mildly decreased' : result >= 45 ? 'G3a — Mild-moderate decrease' : result >= 30 ? 'G3b — Moderate-severe decrease' : result >= 15 ? 'G4 — Severely decreased' : 'G5 — Kidney failure'
-  const tone = result >= 60 ? 'normal' as const : result >= 30 ? 'low' as const : 'critical' as const
+  // Rumus dan validasi hidup di lib/longevity: masukan kosong, nol, negatif, atau di luar rentang tidak
+  // menghasilkan angka (dulu: kreatinin kosong -> "Infinity" berlabel G1, kreatinin negatif -> "NaN" berlabel G5).
+  const egfr = egfrCkdEpi2021(scr, age, sex === 'F')
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="CKD-EPI 2021 (eGFR)" subtitle="Latest race-free equation (Inker et al., NEJM 2021)" />
@@ -209,10 +214,14 @@ function CkdEpiCalc() {
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
-        <div>
-          <div className="text-2xl font-black text-ink">{result.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mL/min/1.73m²</span></div>
-          <Badge tone={tone}>{stage}</Badge>
-        </div>
+        {egfr.ok ? (
+          <div>
+            <div className="text-2xl font-black text-ink">{egfr.data.nilai.toFixed(1)}<span className="text-sm font-semibold text-neutral-500"> mL/min/1.73m²</span></div>
+            <Badge tone={GFR_STAGE_TONE[egfr.data.stadium]}>{GFR_STAGE_LABEL[egfr.data.stadium]}</Badge>
+          </div>
+        ) : (
+          <p role="status" className="max-w-[55%] text-xs font-semibold text-neutral-600">{egfr.alasan}. No result is shown until both values are valid.</p>
+        )}
         <p className="max-w-[40%] text-right text-[10px] text-neutral-500">The 2021 equation removes the race coefficient used in earlier versions (CKD-EPI 2009/2012).</p>
       </div>
     </Card>

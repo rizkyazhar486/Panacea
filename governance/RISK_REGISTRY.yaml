@@ -265,3 +265,25 @@ risks:
       - scripts/qa/fixtures/dependency-audit/server-before-2210.json
       - governance/dependency-audit-policy.json
       - .github/workflows/dependency-audit.yml
+
+  - risk_id: risk.clinical_calculator_input_validation
+    category: clinical_safety
+    severity: medium
+    state: mitigated_in_part
+    description: >-
+      src/pages/ClinicalCalculators.tsx reads numeric fields with `+e.target.value` and 48 handlers have no finite or
+      range check, across roughly 23 numeric calculators. An empty field becomes 0 and a negative or out-of-range
+      value is accepted, so a calculator can print Infinity, NaN or a plausible-looking number with a clinical stage
+      label (reproduced on CKD-EPI: empty creatinine gave Infinity labelled G1 normal, negative creatinine gave NaN
+      labelled G5 kidney failure). Outputs are decision-support displays, not orders, but a wrong stage is misleading.
+    mitigation: >-
+      2026-10-02: CKD-EPI now calls the validated egfrCkdEpi2021 (creatinine 0.1-25 mg/dL, age 18-120), shows the
+      reason and no number when input is invalid, and derives the KDIGO stage from the unrounded value
+      (scripts/uji/egfr-ckd-epi-2021.mts, with sabotage-checked tests). Remaining calculators are still unvalidated;
+      fix them one at a time, dose/volume-like first (PedsDoseCalc, ParklandCalc, BurnCalc, HollidaySegarCalc,
+      IvDripCalc, FluidBalanceCalc, NaCorrectionCalc, AbgCalc), moving each formula into src/domains with its own
+      positive and negative tests.
+    evidence:
+      - src/lib/longevity.ts
+      - src/pages/ClinicalCalculators.tsx
+      - scripts/uji/egfr-ckd-epi-2021.mts

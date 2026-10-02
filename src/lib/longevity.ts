@@ -165,6 +165,18 @@ export function phenoAge(m: MasukanPhenoAge): Hasil<HasilPhenoAge> {
   }
 }
 
+export type KdigoGfrStage = 'G1' | 'G2' | 'G3a' | 'G3b' | 'G4' | 'G5'
+
+/**
+ * Kategori GFR KDIGO dari eGFR (mL/min/1.73 m²): G1 ≥90, G2 60–89, G3a 45–59, G3b 30–44, G4 15–29, G5 <15.
+ * Gagal-tertutup: nilai yang bukan angka hingga atau negatif dilempar, bukan dipetakan ke stadium.
+ * Rantai `>=` yang lama memetakan NaN ke G5 (stadium terburuk) karena semua perbandingannya salah.
+ */
+export function kdigoGfrStage(egfr: number): KdigoGfrStage {
+  if (!Number.isFinite(egfr) || egfr < 0) throw new RangeError('eGFR must be a finite, non-negative number')
+  return egfr >= 90 ? 'G1' : egfr >= 60 ? 'G2' : egfr >= 45 ? 'G3a' : egfr >= 30 ? 'G3b' : egfr >= 15 ? 'G4' : 'G5'
+}
+
 /**
  * eGFR CKD-EPI 2021, persamaan tanpa koefisien ras.
  *
@@ -173,7 +185,7 @@ export function phenoAge(m: MasukanPhenoAge): Hasil<HasilPhenoAge> {
  * sama memperoleh eGFR berbeda semata karena kotak yang dicentang, yang
  * menunda rujukan dan transplantasi bagi pasien kulit hitam.
  */
-export function egfrCkdEpi2021(kreatininMgdL: number, usia: number, perempuan: boolean): Hasil<HasilAngka> {
+export function egfrCkdEpi2021(kreatininMgdL: number, usia: number, perempuan: boolean): Hasil<HasilAngka & { stadium: KdigoGfrStage }> {
   if (!angkaSah(kreatininMgdL, 0.1, 25)) return { ok: false, alasan: 'Creatinine must be 0.1–25 mg/dL' }
   if (!angkaSah(usia, 18, 120)) return { ok: false, alasan: 'Age must be 18–120 years' }
   const kappa = perempuan ? 0.7 : 0.9
@@ -181,11 +193,12 @@ export function egfrCkdEpi2021(kreatininMgdL: number, usia: number, perempuan: b
   const r = kreatininMgdL / kappa
   const nilai = 142 * Math.pow(Math.min(r, 1), alfa) * Math.pow(Math.max(r, 1), -1.2)
     * Math.pow(0.9938, usia) * (perempuan ? 1.012 : 1)
-  const stadium = nilai >= 90 ? 'G1' : nilai >= 60 ? 'G2' : nilai >= 45 ? 'G3a' : nilai >= 30 ? 'G3b' : nilai >= 15 ? 'G4' : 'G5'
+  // Stadium dari nilai TAK dibulatkan: 59,97 dibulatkan jadi 60,0 tetapi tetap G3a.
+  const stadium = kdigoGfrStage(nilai)
   return {
     ok: true,
     data: {
-      nilai: Number(nilai.toFixed(1)), satuan: 'mL/min/1.73m²',
+      nilai: Number(nilai.toFixed(1)), satuan: 'mL/min/1.73m²', stadium,
       catatan: [
         `KDIGO category ${stadium} by eGFR alone`,
         'Staging also needs albuminuria — eGFR by itself is only half of it',
