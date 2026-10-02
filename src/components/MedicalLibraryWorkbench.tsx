@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Fold } from '../shared/ui/Fold'
 import { Link } from 'react-router-dom'
 import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
@@ -65,16 +66,18 @@ export function MedicalLibraryWorkbench({ onRun }: { onRun: (query: string) => v
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-sky-700 dark:text-sky-300">Medical Library · evidence workspace</div>
           <h2 className="mt-1 text-xl font-black text-neutral-950 dark:text-white">Start with a question, find the source, then judge whether it applies.</h2>
           <BatasKlaimKesehatan permukaan="clinical.library-workbench" />
-          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">Build a structured clinical or scientific question here. The live library below searches evidence; Knowledge Bridge helps connect a selected topic to mechanism and clinical meaning.</p>
         </div>
         <span className="rounded-full bg-sky-50 px-3 py-2 text-[9px] font-black text-sky-800 dark:bg-sky-400/10 dark:text-sky-200">Saved questions {saved.length}</span>
       </div>
 
+      <Fold label="Guide">
+        <p className="mb-3 text-[13px] leading-relaxed text-neutral-500">Build a structured clinical or scientific question here. The live library below searches evidence; Knowledge Bridge helps connect a selected topic to mechanism and clinical meaning.</p>
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
         <GuideCard label="Function" text="Turn a clinical or biomedical problem into a searchable evidence question." />
         <GuideCard label="How to use" text="Choose question type → fill the fields → search live evidence → appraise the source." />
         <GuideCard label="Benefit" text="Keeps the question, source and applicability connected instead of relying on memory alone." />
       </div>
+      </Fold>
 
       <div className="no-scrollbar -mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-1">{(Object.keys(TYPE_HINTS) as QuestionType[]).map((item) => <button key={item} type="button" onClick={() => { setType(item); setChecks(new Set()) }} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${type === item ? 'border-sky-600 bg-sky-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{TYPE_HINTS[item].label}</button>)}</div>
       <p className="mt-2 text-[9px] font-semibold leading-relaxed text-neutral-400">{TYPE_HINTS[type].hint}</p>
@@ -91,10 +94,12 @@ export function MedicalLibraryWorkbench({ onRun }: { onRun: (query: string) => v
         </div>
       </div>
 
+      <Fold label="Appraisal">
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <div className="rounded-[22px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]"><div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Evidence types to look for</div><div className="mt-2 flex flex-wrap gap-1.5">{TYPE_HINTS[type].evidence.map((item) => <span key={item} className="rounded-full bg-white px-3 py-1.5 text-[9px] font-black text-neutral-600 shadow-sm dark:bg-white/10 dark:text-neutral-300">{item}</span>)}</div><p className="mt-3 text-[9px] leading-relaxed text-neutral-500">Study design does not automatically determine truth. Risk of bias, precision, directness and applicability still matter.</p></div>
         <div className="rounded-[22px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]"><div className="flex items-center justify-between"><div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Appraisal before conclusion</div><span className="text-[9px] font-black text-sky-700 dark:text-sky-300">{checks.size}/{qualityChecks.length}</span></div><div className="mt-2 space-y-1.5">{qualityChecks.map((item, index) => <button key={item} type="button" onClick={() => toggleCheck(index)} className="flex w-full items-start gap-2 text-left"><span className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full text-[7px] font-black ${checks.has(index) ? 'bg-sky-600 text-white' : 'border border-neutral-300 text-neutral-400 dark:border-white/20'}`}>{checks.has(index) ? '✓' : ''}</span><span className="text-[9.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{item}</span></button>)}</div></div>
       </div>
+      </Fold>
 
       {saved.length > 0 && <div className="no-scrollbar -mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1">{saved.map((item) => <article key={item.id} className="w-[250px] shrink-0 snap-start rounded-[20px] border border-neutral-200 p-3 dark:border-white/10"><div className="text-[8px] font-black uppercase tracking-wide text-sky-700 dark:text-sky-300">{TYPE_HINTS[item.type].label} · {new Date(item.createdAt).toLocaleDateString()}</div><p className="mt-2 line-clamp-4 text-[10px] font-semibold leading-relaxed text-neutral-700 dark:text-neutral-200">{item.query}</p><div className="mt-3 flex flex-wrap gap-2"><button type="button" onClick={() => run(item.query)} className="rounded-full bg-neutral-950 px-3 py-1.5 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950">Search</button><Link to={`/knowledge-bridge?q=${encodeURIComponent(item.query)}`} className="rounded-full bg-sky-50 px-3 py-1.5 text-[9px] font-black text-sky-700 dark:bg-sky-400/10 dark:text-sky-200">Bridge</Link><button type="button" onClick={() => remove(item.id)} className="text-[9px] font-black text-neutral-400">Remove</button></div></article>)}</div>}
     </section>

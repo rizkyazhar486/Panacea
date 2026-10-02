@@ -29,7 +29,8 @@ const routes = JSON.parse(readFileSync(baselinePath, 'utf8')).routes
 const measured = {}
 for (const route of Object.keys(routes)) {
   const page = await context.newPage()
-  await page.goto(`${origin}/#/${route}`, { waitUntil: 'networkidle' })
+  // 'networkidle' nunggu selamanya di halaman yang terus memanggil API (CI tanpa backend); cukup 'load' + jeda tetap.
+  await page.goto(`${origin}/#/${route}`, { waitUntil: 'load', timeout: 60_000 })
   await page.waitForTimeout(4000)
   measured[route] = await page.evaluate((minPx) => {
     // Isi <details> yang tertutup tidak terlihat pengguna (kecuali judul <summary>-nya),
