@@ -81,7 +81,8 @@ function systemsForLeaves(leaves: readonly SourceTopologyLeaf[]) {
   return sortedUnique(leaves.map((leaf) => leaf.domain.system).filter((system): system is AtlasSystemId => Boolean(system)))
 }
 
-function pairingStatus(leaves: readonly SourceTopologyLeaf[]): SourcePairingStatus {
+/** Diekspor agar tabel kebenarannya bisa diuji langsung, termasuk kombinasi yang tidak ada di data terkirim. */
+export function pairingStatus(leaves: readonly Pick<SourceTopologyLeaf, 'laterality'>[]): SourcePairingStatus {
   const sides = new Set(leaves.map((leaf) => leaf.laterality))
   const left = sides.has('kiri')
   const right = sides.has('kanan')
