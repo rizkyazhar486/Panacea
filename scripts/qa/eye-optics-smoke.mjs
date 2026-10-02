@@ -35,7 +35,14 @@ async function activateWithKeyboard(button) {
   await button.scrollIntoViewIfNeeded()
   await button.focus()
   await expect(button).toBeFocused()
-  await button.press('Enter')
+
+  // Focus is already explicitly established and asserted above. Using
+  // locator.press() here asks Playwright to perform another locator-level
+  // focus/actionability cycle; on the WebGL-heavy mobile runner that second
+  // cycle can time out even though the control is visibly focused. Send the
+  // key to the verified active element instead. Subsequent assertions still
+  // prove that Enter actually activated the control.
+  await button.page().keyboard.press('Enter')
 }
 
 async function runEyeOptics(page) {
@@ -49,11 +56,11 @@ async function runEyeOptics(page) {
   await step('open-specialty', () => specialty.click())
 
   const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
-  await step('wait-neuro', () => neuro.waitFor({ state: 'visible', timeout: 20_000 }))
+  await step('wait-neuro', () => neuro.waitFor({ state: 'visible', timeout: 45_000 }))
   await step('activate-neuro', () => activateWithKeyboard(neuro))
 
   const eye = page.getByRole('button', { name: 'Eye & orbit', exact: true })
-  await step('wait-eye', () => eye.waitFor({ state: 'visible', timeout: 20_000 }))
+  await step('wait-eye', () => eye.waitFor({ state: 'visible', timeout: 45_000 }))
   await step('activate-eye', () => activateWithKeyboard(eye))
 
   const opener = page.getByRole('button', { name: 'Explore pupil & accommodation', exact: true })

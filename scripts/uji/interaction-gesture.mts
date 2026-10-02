@@ -1,0 +1,15 @@
+const { classifyReleasedGesture, dominantDirection } = await import('../../src/lib/interaction/gesture.ts')
+
+const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
+chk('small movement is a tap', classifyReleasedGesture({ dx: 3, dy: 2, elapsedMs: 120, dragged: false, longPressed: false, cancelled: false }) === 'tap')
+chk('right swipe is classified', classifyReleasedGesture({ dx: 44, dy: 8, elapsedMs: 220, dragged: false, longPressed: false, cancelled: false }) === 'swipe-right')
+chk('left swipe is classified', classifyReleasedGesture({ dx: -45, dy: 3, elapsedMs: 200, dragged: false, longPressed: false, cancelled: false }) === 'swipe-left')
+chk('up swipe is classified', classifyReleasedGesture({ dx: 3, dy: -52, elapsedMs: 180, dragged: false, longPressed: false, cancelled: false }) === 'swipe-up')
+chk('down swipe is classified', classifyReleasedGesture({ dx: 4, dy: 51, elapsedMs: 180, dragged: false, longPressed: false, cancelled: false }) === 'swipe-down')
+chk('slow movement is not a swipe', classifyReleasedGesture({ dx: 44, dy: 8, elapsedMs: 700, dragged: false, longPressed: false, cancelled: false }) === 'none')
+chk('drag suppresses release action', classifyReleasedGesture({ dx: 90, dy: 2, elapsedMs: 280, dragged: true, longPressed: false, cancelled: false }) === 'none')
+chk('long press suppresses release action', classifyReleasedGesture({ dx: 0, dy: 0, elapsedMs: 900, dragged: false, longPressed: true, cancelled: false }) === 'none')
+chk('cancelled pointer emits no action', classifyReleasedGesture({ dx: 0, dy: 0, elapsedMs: 80, dragged: false, longPressed: false, cancelled: true }) === 'none')
+chk('dominant horizontal direction is stable', dominantDirection(20, 20) === 'right')
+chk('zero vector has no direction', dominantDirection(0, 0) === null)

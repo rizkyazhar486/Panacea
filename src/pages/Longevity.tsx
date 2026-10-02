@@ -9,6 +9,7 @@ import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
 import { bahanOtomatis } from '../lib/bugarOtomatis'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -317,6 +318,7 @@ export function Longevity() {
             <div className="mt-1 text-[10px] text-neutral-500">vs chronological age {d.age}</div>
           </div>
         </div>
+        <BatasKlaimKesehatan permukaan="longevity.score" />
         {score == null && <p className="mt-3 text-center text-[11px] text-neutral-500">Fill in at least 4 pillars below to activate your score & biological age.</p>}
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age"><input className={inputClass} type="number" value={d.age} onChange={(e) => u({ age: +e.target.value })} /></Field>
@@ -447,7 +449,7 @@ export function Longevity() {
 
       {/* Lab sharpening */}
       <Card className="!p-5">
-        <SectionTitle icon={<span className="text-lg">🧪</span>} title="Lab Sharpening (optional)" subtitle="Fill in from your annual lab results — for a more accurate biological age" />
+        <SectionTitle icon={<span className="text-lg">🧪</span>} title="Lab markers (optional)" subtitle="Annual lab values can move this estimate. They do not validate it." />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {num('HbA1c (%)', 'hba1c', 0.1, '<5.4')}
           {num('LDL (mg/dL)', 'ldl', 1, '<115')}

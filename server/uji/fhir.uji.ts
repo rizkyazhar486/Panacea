@@ -8,7 +8,7 @@
 
 import {
   bangunBundel, ringkasBundel, keJson, waktuFhir, UKURAN, TURUNAN, SISTEM_LOKAL,
-  type Observasi,
+  type Observasi, type ProvenansFhir,
 } from '../../src/lib/fhir'
 
 let lulus = 0, gagal = 0
@@ -37,6 +37,9 @@ ok('bundel bertanda waktu ISO dengan zona',
   /^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/.test(b.timestamp))
 ok('entri pertama adalah Patient', b.entry[0].resource.resourceType === 'Patient')
 ok('setiap entri punya fullUrl', b.entry.every((e) => e.fullUrl.startsWith('urn:uuid:')))
+ok('setiap fullUrl urn:uuid benar-benar UUID', b.entry.every((e) =>
+  /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(e.fullUrl)))
+ok('fullUrl tidak berulang dalam bundle', new Set(b.entry.map((e) => e.fullUrl)).size === b.entry.length)
 ok('jumlah observasi sama dengan jumlah nilai yang diisi',
   obsDari(b).length === Object.keys(contoh.nilai).length)
 
@@ -122,6 +125,51 @@ ok('id observasi tidak berulang', (() => {
 }
 ok('kunci yang tidak dikenali diabaikan',
   obsDari(bangunBundel({ nilai: { entahApa: 5, weightKg: 70 } })).length === 1)
+
+// ── Provenance: data klinis harus membawa asalnya ───────────────────────────
+{
+  const bersumber = bangunBundel({
+    ...contoh,
+    sumber: {
+      identifierSystem: 'https://panaceamed.id/device-registry',
+      identifierValue: 'device-demo-001',
+      display: 'Demo validated device',
+    },
+  })
+  const provenans = bersumber.entry
+    .filter((e) => e.resource.resourceType === 'Provenance')
+    .map((e) => e.resource as ProvenansFhir)
+  const obs = obsDari(bersumber)
+  ok('bundle bersumber punya tepat satu Provenance', provenans.length === 1)
+  ok('Provenance menargetkan semua dan hanya Observation',
+    provenans[0].target.length === obs.length &&
+    provenans[0].target.every((t) => obs.some((o) => t.reference === `Observation/${o.id}`)))
+  ok('Provenance mencatat Panaceamed sebagai assembler',
+    provenans[0].agent[0].type[0].coding[0].code === 'assembler' &&
+    provenans[0].agent[0].who.identifier.value === 'panaceamed')
+  ok('Provenance membawa identitas sumber upstream',
+    provenans[0].entity[0].role === 'source' &&
+    provenans[0].entity[0].what.identifier.system === 'https://panaceamed.id/device-registry' &&
+    provenans[0].entity[0].what.identifier.value === 'device-demo-001')
+  ok('semua Observation bersumber punya identifier ekspor',
+    obs.every((o) => o.identifier?.length === 1 &&
+      o.identifier[0].system === 'https://panaceamed.id/fhir/identifier/export-observation' &&
+      o.identifier[0].value.includes('device-demo-001')))
+  ok('identifier Observation bersumber tidak berulang',
+    new Set(obs.map((o) => o.identifier?.[0].value)).size === obs.length)
+}
+{
+  ok('bundle lama tanpa sumber tidak mengarang Provenance',
+    !b.entry.some((e) => e.resource.resourceType === 'Provenance'))
+  let ditolak = 0
+  for (const sumber of [
+    { identifierSystem: 'not-a-uri', identifierValue: 'x' },
+    { identifierSystem: 'https://panaceamed.id/source', identifierValue: '   ' },
+  ]) {
+    try { bangunBundel({ nilai: { weightKg: 70 }, sumber }) } catch { ditolak++ }
+  }
+  ok('identitas sumber tidak sah ditolak fail-closed', ditolak === 2)
+}
 
 // ── Ringkasan dan JSON ──────────────────────────────────────────────────────
 {

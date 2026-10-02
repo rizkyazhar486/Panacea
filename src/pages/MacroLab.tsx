@@ -8,7 +8,6 @@ import {
   rateImpact, simulatePolicy, analyseTrade,
   type Bloc, type Country,
 } from '../lib/macroEconomics'
-
 // Macro Lab. Two rules the page states openly rather than hiding:
 //   - the country table is dated static reference, not a live feed
 //   - the simulator shows consequences of YOUR assumptions, not a forecast

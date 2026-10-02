@@ -14,6 +14,7 @@ import {
 import RadiologyModalityHub from './RadiologyModalityHub'
 
 const Ocular4DAtlas = lazy(() => import('../../components/digital-twin/Ocular4DAtlas'))
+const LongevityProblemSolver = lazy(() => import('./LongevityProblemSolver'))
 const WholeBodyPhysiologyWorkbench = lazy(() => import('./WholeBodyPhysiologyWorkbench'))
 
 const SCALE_GROUPS: readonly { label: string; scales: readonly KnowledgeScale[] }[] = [
@@ -101,23 +102,24 @@ export default function MultisystemScaleNavigator() {
       <div className="mt-3 rounded-2xl border border-sky-200 bg-sky-50/70 p-3 dark:border-sky-300/20 dark:bg-sky-300/[.06]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Current organ benchmark</div>
-            <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">Eye 4D Gold Standard</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Organ deep dive</div>
+            <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">Eye / orbit detail</div>
             <p className="mt-1 max-w-2xl text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">Open the ocular atlas directly inside Body Exposure to inspect the globe, optical media, retina, visual pathway, orbit, extraocular muscles, lacrimal system and source-backed neurovascular reference coverage without leaving the whole-body learning flow.</p>
           </div>
           <button
             type="button"
             aria-expanded={eyeOpen}
+            aria-controls={eyeOpen ? 'body-eye-4d-panel' : undefined}
             onClick={() => setEyeOpen((value) => !value)}
             className="min-h-11 shrink-0 rounded-xl border border-sky-300 bg-white px-4 text-[10px] font-black text-sky-800 shadow-sm transition hover:bg-sky-100 dark:border-sky-300/30 dark:bg-white/5 dark:text-sky-200 dark:hover:bg-white/10"
           >
-            {eyeOpen ? 'Close Eye 4D' : 'Open Eye 4D'}
+            {eyeOpen ? 'Close eye detail' : 'Open eye detail'}
           </button>
         </div>
       </div>
 
       {eyeOpen && (
-        <div className="mt-3 space-y-3">
+        <div id="body-eye-4d-panel" role="region" aria-label="Eye 4D benchmark" className="mt-3 space-y-3">
           <div className="overflow-hidden rounded-2xl border border-sky-200 bg-white p-2 dark:border-sky-300/20 dark:bg-[#080c10] sm:p-3">
             <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center text-xs font-bold text-neutral-500">Loading Eye 4D atlas…</div>}>
               <Ocular4DAtlas />
@@ -202,6 +204,14 @@ export default function MultisystemScaleNavigator() {
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">Selection is educational context only. It never creates patient anatomy, measured RNA/genomic data, diagnosis, treatment, personality inference, or an immortality claim.</p>
         </div>
       </div>
+
+      {selected.scale === 'aging-longevity' && (
+        <div className="mt-3">
+          <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center rounded-2xl border border-neutral-200 text-xs font-bold text-neutral-500 dark:border-white/10">Loading longevity systems lab…</div>}>
+            <LongevityProblemSolver />
+          </Suspense>
+        </div>
+      )}
 
       <details className="mt-3 rounded-xl border border-neutral-200 p-3 dark:border-white/10">
         <summary className="cursor-pointer text-[10px] font-black text-ink dark:text-white">Evidence & mandatory references</summary>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import type { Vitals } from '../lib/healthVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
 import '../styles/home-health-instruments-v40.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type Point = { tanggal: string; nilai: number }
 
@@ -107,6 +108,7 @@ export function HomeHealthInstruments({ vitals }: { vitals: Vitals }) {
         <div>
           <span>LIVE HEALTH INSTRUMENTS</span>
           <h2 id="health-instruments-title">Your recorded scores & signals</h2>
+          <BatasKlaimKesehatan permukaan="wellness.home-instruments" />
         </div>
         <Link to="/health-data">Device data <b>↗</b></Link>
       </div>

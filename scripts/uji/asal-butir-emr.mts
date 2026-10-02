@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { labelAsalIsian, labelAsalMasalah, labelAsalRencana } from '../../src/lib/asalButirEmr.ts'
+assert.equal(labelAsalMasalah({}), 'AI draft', 'masalah tanpa asal (data lama) tampil sebagai tulisan dokter')
+assert.equal(labelAsalMasalah({ source: 'Dokter' }), 'doctor-written')
+assert.equal(labelAsalMasalah({ source: 'AI', carriedFrom: 'r1' }), 'AI draft · carried from previous visit')
+assert.equal(labelAsalRencana({ source: 'AI', status: 'usulan' }), 'AI suggestion · not verified')
+assert.equal(labelAsalRencana({ source: 'Dokter', status: 'diverifikasi' }), 'verified · verifier not recorded', 'verifikasi tanpa cap server tampil sebagai terverifikasi dokter')
+assert.equal(labelAsalRencana({ source: 'AI', status: 'diverifikasi', verifiedById: 'd1' }), 'doctor-verified')
+const emr = readFileSync('src/pages/EMR.tsx', 'utf8')
+assert.match(emr, /data-asal-masalah>\{labelAsalMasalah\(pr\)\}/, 'asal masalah tidak tampil di EMR')
+assert.match(emr, /data-asal-rencana>\{labelAsalRencana\(pi\)\}/, 'asal rencana tidak tampil di EMR')
+assert.match(readFileSync('server/package.json', 'utf8'), /"uji": [^\n]*uji\/asalButirKlinis\.uji\.ts/, 'uji asal per butir di server tidak dijalankan')
+assert.equal(labelAsalIsian(undefined), 'origin not recorded', 'kolom tanpa cap diklaim tulisan dokter')
+assert.equal(labelAsalIsian({ asal: 'AI' }), 'AI draft / patient-entered')
+assert.equal(labelAsalIsian({ asal: 'Dokter' }), 'doctor-written')
+assert.match(emr, /asalIsian: tanpaDeklarasi\(r\.asalIsian, `anamnesis\.\$\{key\}`\)/, 'suntingan anamnesis tidak menghapus deklarasi AI (server akan tetap mencap AI)')
+assert.match(emr, /<LencanaAsal asal=\{draft\.asalIsian\?\.\[`anamnesis\.\$\{f\.key\}`\]\} \/>/, 'asal kolom anamnesis tidak tampil')
+assert.match(readFileSync('src/pages/Chatbot.tsx', 'utf8'), /asalIsian: \{ \.\.\.\(existing\?\.asalIsian \?\? \{\}\)/, 'Chatbot tidak menyatakan kolom yang ditulisnya sebagai AI')
+assert.match(readFileSync('server/package.json', 'utf8'), /"uji": [^\n]*uji\/asalIsianKlinis\.uji\.ts/)
+console.log('asal-butir-emr: asal per butir tampil, fail closed untuk data lama dan verifikasi tanpa cap server')

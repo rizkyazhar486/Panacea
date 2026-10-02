@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wellness Hub — one flagship surface for the longevity / mental-health /
@@ -19,10 +20,10 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     feats: [
       { to: '/health-simulator', name: 'What-If Health Simulator', what: "See how today's choices reshape your 10-year risk", kw: 'simulator digital twin future risk what-if prevent timeline', tag: 'New' },
       { to: '/findrisc', name: 'Diabetes Risk (FINDRISC)', what: 'Your 10-year diabetes risk — and how to lower it', kw: 'diabetes findrisc prediabetes prevention metabolic glucose', tag: 'New' },
-      { to: '/biological-age', name: 'Biological Age', what: 'How old your body is really functioning, from your data', kw: 'phenoage biomarker aging longevity', tag: 'Antiaging' },
-      { to: '/longevity', name: 'Longevity Blueprint', what: 'Your personalized healthspan levers and risk drivers', kw: 'lifespan healthspan risk', tag: 'Longevity' },
+      { to: '/biological-age', name: 'Biological Age', what: 'PhenoAge-style estimate from your logged labs — technical, not a true age', kw: 'phenoage biomarker aging longevity', tag: 'Antiaging' },
+      { to: '/longevity', name: 'Longevity Blueprint', what: 'Healthspan levers and risk drivers from logged inputs', kw: 'lifespan healthspan risk', tag: 'Longevity' },
       { to: '/organ-vitality', name: 'Organ Vitality', what: 'System-by-system health snapshot', kw: 'organ heart liver kidney vitality', tag: 'Longevity' },
-      { to: '/supplements', name: 'Supplement Guide', what: 'Evidence-graded longevity supplements', kw: 'supplement vitamin omega creatine stack', tag: 'Antiaging' },
+      { to: '/supplements', name: 'Supplement Guide', what: 'Educational evidence grades for sports supplements', kw: 'supplement vitamin omega creatine stack', tag: 'Antiaging' },
       { to: '/family-health', name: 'Family Health History', what: 'Early-screening flags from your family history', kw: 'family history genogram legacy tree hereditary risk', tag: 'Longevity' },
       { to: '/gene-info', name: 'Gene Info', what: 'Look up what a gene does and why it matters', kw: 'gene genetics dna hereditary', tag: 'Longevity' },
     ],
@@ -34,8 +35,8 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/connect', name: 'Connect — Cari Teman & Pasangan', what: 'Profiles, filters and matching based on a healthy lifestyle — not device pairing', kw: 'connect kenalan teman pasangan jodoh relasi relationship match kecocokan deck profil sosial dating', tag: 'Wellness' },
       { to: '/breathwork', name: 'Breathwork Pacer', what: 'Animated paced breathing to calm you in minutes', kw: 'breathing box 478 coherence anxiety stress calm vagus', tag: 'New' },
       { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
-      { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
-      { to: '/substance-use-screen', name: 'Alcohol & Tobacco Screening', what: 'Validated substance-use screening', kw: 'audit fagerstrom alcohol tobacco smoking screen substance', tag: 'Mental' },
+      { to: '/mental-health-screen', name: 'Mental Health Check', what: 'PHQ-9 & GAD-7 self-screens — not a Panacea diagnosis', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
+      { to: '/substance-use-screen', name: 'Alcohol & Tobacco Screening', what: 'Published CAGE / pack-year screens — not a Panacea diagnosis', kw: 'audit fagerstrom alcohol tobacco smoking screen substance', tag: 'Mental' },
       { to: '/ikigai', name: 'Ikigai & Purpose', what: 'Find your reason for being', kw: 'ikigai purpose meaning japanese', tag: 'Wellness' },
       { to: '/harada', name: 'Harada 9×9 Goal Grid', what: 'One goal, eight pillars, 64 concrete actions', kw: 'harada mandal-art mandala 9x9 goal target sasaran tujuan rencana ohtani grid kisi', tag: 'Wellness' },
       { to: '/life-compass', name: 'Life Compass', what: 'Plan your vision, mission, and next step', kw: 'vision mission purpose goals future anxiety worry planning', tag: 'New' },
@@ -57,7 +58,7 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     emoji: '⚡',
     feats: [
       { to: '/fasting', name: 'Metabolic Fasting', what: 'Time-restricted eating window & metabolic phases', kw: 'fasting intermittent eating window metabolic autophagy', tag: 'Metabolic' },
-      { to: '/thermal-therapy', name: 'Thermal Therapy', what: 'Sauna & cold-exposure protocols with the evidence', kw: 'sauna cold plunge heat ice thermal recovery', tag: 'New' },
+      { to: '/thermal-therapy', name: 'Thermal Recovery', what: 'Spa · sauna · steam · jacuzzi · hot · cold · onsen', kw: 'spa sauna steam jacuzzi hot cold plunge heat ice onsen thermal recovery', tag: 'New' },
       { to: '/macro-lab', name: 'Macro Lab', what: 'Macronutrient targets and meal composition', kw: 'macro protein karbohidrat lemak gizi makro kalori', tag: 'Wellness' },
       { to: '/sehat-sibuk', name: 'Healthy But Busy', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
       { to: '/carbon-diet', name: 'Carbon-Footprint Diet', what: 'Dietary choices weighed by carbon footprint', kw: 'carbon jejak karbon diet lingkungan iklim makanan', tag: 'Wellness' },
@@ -158,6 +159,7 @@ export function WellnessHub() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Live longer, feel better, age well — your whole journey in one place" />
+        <BatasKlaimKesehatan permukaan="wellness.hub" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Longevity, mental wellness, sleep, metabolism, and aesthetics — {total} tools, each grounded
           in evidence and yours to build a daily practice around.

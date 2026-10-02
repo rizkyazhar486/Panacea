@@ -5,7 +5,10 @@ import { PostCard } from './Feed'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { IconX } from '../components/icons'
 import { Portal } from '../components/Portal'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { SurfaceGuide } from '../components/SurfaceGuide'
 import type { ProfileEdit } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Tab = 'posts' | 'locked' | 'reposts' | 'saved' | 'liked' | 'archive'
 
@@ -23,15 +26,22 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
 // private to the owner; others never see them.
 const SEX_LABEL: Record<string, string> = { L: '♂ Male', P: '♀ Female', '-': 'Not specified' }
 
+// Pemeriksa akun terpisah: hook di badan hanya berjalan bila akun ada, sehingga
+// urutan hook tidak berubah saat akun berpindah null <-> ada (React crash).
 export function Profile() {
-  const { state, account, updateProfile } = useStore()
+  const { account } = useStore()
+  if (!account) return null
+  return <ProfileIsi account={account} />
+}
+
+function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
+  const { state, updateProfile } = useStore()
   const [tab, setTab] = useState<Tab>('posts')
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<ProfileEdit>({})
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  if (!account) return null
   const email = account.email
   const profile = state.profiles[email] ?? {}
   const handle = '@' + email.split('@')[0]
@@ -63,7 +73,7 @@ export function Profile() {
   const list = collections[tab]
 
   return (
-    <div className="mx-auto w-full max-w-xl">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button onClick={openEdit} className="relative h-20 w-20 shrink-0" aria-label="Change profile photo">
@@ -83,6 +93,8 @@ export function Profile() {
         </div>
       </div>
 
+      <BatasKlaimKesehatan permukaan="care.profile" className="mt-2 text-[11px] leading-snug text-neutral-500" />
+
       {/* Identity + bio + link */}
       <div className="mt-3 space-y-1">
         {profile.bio && <p className="text-sm text-neutral-700">{profile.bio}</p>}
@@ -97,6 +109,16 @@ export function Profile() {
           <a href={normalizeUrl(profile.link)} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-semibold text-brand-dark">🔗 {profile.link}</a>
         )}
       </div>
+
+      <SurfaceGuide
+        summary="build your body once → keep it synced → share only when you choose"
+        steps={[
+          'Use My Body to orient your personal visual identity.',
+          'Open anatomy only when you want internal reference context.',
+          'Share exports are user-triggered and never automatic.',
+        ]}
+      />
+      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
 
       <HealthSnapshot className="mt-3" />
 

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconActivity } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -115,6 +116,7 @@ export function VocalBiomarkers() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Vocal Biomarker Analyzer (experimental)" subtitle="Fundamental pitch, jitter & shimmer from a 5-second voice sample" />
+        <BatasKlaimKesehatan permukaan="wellness.vocal-biomarkers" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
           <b>Experimental, not a diagnostic tool.</b> Jitter and shimmer are real acoustic measures used
           in clinical voice science, but this consumer-microphone estimate is far noisier than a lab

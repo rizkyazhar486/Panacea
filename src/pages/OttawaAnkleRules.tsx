@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ottawa Ankle Rules — Stiell, I.G., et al. (1992/1993), JAMA/Ann Emerg Med.
@@ -73,7 +74,8 @@ export function OttawaAnkleRules() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Ottawa Ankle Rules" subtitle="A decision rule for whether an ankle/foot X-ray is needed" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Ottawa Ankle Rules" subtitle="Published ankle/foot X-ray decision rule — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">One of the most extensively validated clinical decision rules in emergency medicine — highly sensitive for clinically significant fractures, used to reduce unnecessary X-rays after acute ankle/foot injury. Applies to pain in the malleolar zone and midfoot zone, assessed separately.</Prosa>
       </Card>
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ranson's Criteria — Ranson, J.H.C., et al. (1974), Surg Gynecol Obstet,
@@ -45,7 +46,8 @@ export function RansonCriteria() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Ranson's Criteria" subtitle="Acute pancreatitis severity & mortality prediction (Ranson et al. 1974)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Ranson's Criteria" subtitle="Published pancreatitis severity criteria (Ranson et al. 1974) — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           11 criteria evaluated at two time points — 5 at admission, 6 more re-assessed at 48 hours.
           Score = total criteria met.

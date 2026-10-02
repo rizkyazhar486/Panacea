@@ -7,6 +7,7 @@ import {
   DOMAIN_LABEL, pickDoses, triageBadReading,
   type Domain, type Slot,
 } from '../lib/minimumDose'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // "Sehat Tapi Sibuk" — built as a deliberate answer to the complaint that
@@ -67,6 +68,7 @@ export function RealisticHealth() {
       {/* Step 1 — the only inputs, kept to three taps. */}
       <Card className="!p-4">
         <SectionTitle icon={<IconHeart size={18} />} title="How much time do you realistically have?" subtitle="Answer honestly — a small answer is the useful one" />
+        <BatasKlaimKesehatan permukaan="longevity.realistic-health" />
 
         <div className="mt-3 grid gap-2">
           {SLOTS.map((s) => (

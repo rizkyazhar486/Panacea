@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_BRONKUS, kunciNama, petaMeshKeSegmen } from '../../lib/anatomy/bronkusSegmental'
@@ -151,12 +152,10 @@ export function VentilasiBronkus3D({
         setMuat(false)
       })
 
-    let raf = 0
     let sebelumnya = performance.now()
     const warna = new THREE.Color()
 
     const gambar = (sekarang: number) => {
-      raf = requestAnimationFrame(gambar)
       const dt = Math.min((sekarang - sebelumnya) / 1000, 0.05)
       sebelumnya = sekarang
 
@@ -186,10 +185,10 @@ export function VentilasiBronkus3D({
         renderer.domElement.dataset.isiRerata = (jumlah / perSegmen.size).toFixed(3)
       }
     }
-    raf = requestAnimationFrame(gambar)
+    const loop = mulaiLoopTerjaga(wadah, () => gambar(performance.now()))
 
     return () => {
-      cancelAnimationFrame(raf)
+      loop.hentikan()
       ro.disconnect()
       controls.dispose()
       if (grup) scene.remove(grup)

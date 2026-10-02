@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { muatAtlas, namaAtlas, type AtlasDimuat } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
@@ -192,17 +193,15 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let raf = 0
-    const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+    // Loop berhenti saat offscreen / tab tersembunyi (helper bersama).
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-    }
-    raf = requestAnimationFrame(gambar)
+    })
 
     return () => {
       dibatalkan = true
-      cancelAnimationFrame(raf)
+      loop.hentikan()
       terapkanRef.current = null
       renderer.domElement.removeEventListener('pointerdown', klik)
       ro.disconnect()

@@ -1,0 +1,234 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {
+  PANACEA_FUTURE_RESILIENCE_POLICY,
+  PANACEA_RESILIENCE_SURFACES,
+  assessTechnology,
+  buildFutureResilienceAssessment,
+  calculateAdoptionReadiness,
+  calculateFreshnessPressure,
+  calculateObsolescencePressure,
+  calculateResearchUrgency,
+  calculateResilienceIndex,
+  listResiliencePolicyViolations,
+} from '../../src/lib/futureResilienceOS.ts'
+
+const perfectBaseline = {
+  contractCoverage: 1,
+  automatedTestCoverage: 1,
+  providerAbstraction: 1,
+  dataPortability: 1,
+  observability: 1,
+  rollbackReadiness: 1,
+  evidenceFreshness: 1,
+  teamContinuity: 1,
+}
+
+const candidate = {
+  id: 'candidate-a',
+  name: 'Candidate A',
+  surface: 'ai-runtime',
+  sourceRef: 'official-source',
+  assessedAt: '2026-09-20',
+  expectedUpside: 0.9,
+  maturity: 0.9,
+  compatibility: 0.9,
+  portability: 0.9,
+  reversibility: 0.9,
+  security: 0.9,
+  clinicalSafety: 0.9,
+  migrationCost: 0.2,
+  vendorLockIn: 0.2,
+  evidenceAgeDays: 7,
+  benchmarkValidated: true,
+  shadowValidated: true,
+  rollbackValidated: true,
+  validationEvidence: {
+    benchmarkRef: 'artifact://benchmark/candidate-a',
+    shadowRef: 'artifact://shadow/candidate-a',
+    rollbackRef: 'artifact://rollback/candidate-a',
+  },
+}
+
+test('malformed numeric evidence never authorizes technology replacement', () => {
+  const fields = [
+    'expectedUpside', 'maturity', 'compatibility', 'portability', 'reversibility',
+    'security', 'clinicalSafety', 'migrationCost', 'vendorLockIn',
+  ]
+  // Perfect remaining dimensions ensure averaging cannot hide an invalid field.
+  const ready = Object.fromEntries(fields.map((field) => [field, 1]))
+  ready.migrationCost = 0
+  ready.vendorLockIn = 0
+  for (const field of fields) {
+    for (const value of [NaN, Infinity, -Infinity, undefined, null, '1', -0.01, 1.01]) {
+      const assessment = assessTechnology({ ...candidate, ...ready, [field]: value })
+      assert.equal(assessment.replacementAllowed, false, `${field}=${String(value)}`)
+      assert.ok(assessment.blockers.includes(`invalid-evidence:${field}`))
+      assert.ok(Number.isFinite(assessment.adoptionReadiness))
+      assert.ok(Number.isFinite(assessment.researchUrgency))
+    }
+  }
+})
+
+test('evidence age must be a finite nonnegative number', () => {
+  for (const evidenceAgeDays of [NaN, Infinity, -Infinity, undefined, null, '7', -1]) {
+    const assessment = assessTechnology({ ...candidate, evidenceAgeDays })
+    assert.equal(assessment.replacementAllowed, false)
+    assert.ok(assessment.blockers.includes('invalid-evidence:evidenceAgeDays'))
+  }
+  assert.equal(assessTechnology({ ...candidate, evidenceAgeDays: 0 }).replacementAllowed, true)
+})
+
+test('cutover validation requires explicit boolean true rather than truthy input', () => {
+  for (const field of ['benchmarkValidated', 'shadowValidated', 'rollbackValidated']) {
+    for (const value of ['false', 'true', 1, {}, [], null, undefined, false]) {
+      const assessment = assessTechnology({ ...candidate, [field]: value })
+      assert.equal(assessment.replacementAllowed, false, `${field}=${String(value)}`)
+      assert.ok(assessment.blockers.length > 0)
+    }
+  }
+})
+
+
+test('cutover proof requires source provenance and auditable validation artifacts', () => {
+  for (const [field, blocker] of [
+    ['sourceRef', 'missing-source-ref'],
+    ['assessedAt', 'invalid-assessed-at'],
+  ]) {
+    for (const value of ['', '   ', null, undefined]) {
+      const assessment = assessTechnology({ ...candidate, [field]: value })
+      assert.equal(assessment.replacementAllowed, false)
+      assert.ok(assessment.blockers.includes(blocker), `${field}=${String(value)}`)
+    }
+  }
+
+  assert.ok(
+    assessTechnology({ ...candidate, assessedAt: 'not-a-date' }).blockers.includes('invalid-assessed-at'),
+  )
+
+  for (const [field, blocker] of [
+    ['benchmarkRef', 'benchmark-evidence-missing'],
+    ['shadowRef', 'shadow-evidence-missing'],
+    ['rollbackRef', 'rollback-evidence-missing'],
+  ]) {
+    const validationEvidence = { ...candidate.validationEvidence, [field]: '' }
+    const assessment = assessTechnology({ ...candidate, validationEvidence })
+    assert.equal(assessment.replacementAllowed, false)
+    assert.ok(assessment.blockers.includes(blocker))
+  }
+
+  const missingBundle = assessTechnology({ ...candidate, validationEvidence: undefined })
+  assert.equal(missingBundle.replacementAllowed, false)
+  assert.ok(missingBundle.blockers.includes('benchmark-evidence-missing'))
+  assert.ok(missingBundle.blockers.includes('shadow-evidence-missing'))
+  assert.ok(missingBundle.blockers.includes('rollback-evidence-missing'))
+})
+
+test('future resilience policy keeps canonical product behavior replaceable at the edge', () => {
+  assert.equal(listResiliencePolicyViolations().length, 0)
+  assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.singleVendorMayNotOwnPatientTruth, true)
+  assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.preserveHumanClinicalGate, true)
+  assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.validationEvidenceRequired, true)
+  assert.ok(PANACEA_RESILIENCE_SURFACES.length >= 10)
+  assert.equal(new Set(PANACEA_RESILIENCE_SURFACES.map((surface) => surface.id)).size, PANACEA_RESILIENCE_SURFACES.length)
+})
+
+test('resilience index is normalized and reaches one only for a fully ready baseline', () => {
+  assert.equal(calculateResilienceIndex(perfectBaseline), 1)
+  assert.equal(
+    calculateResilienceIndex({
+      contractCoverage: 0,
+      automatedTestCoverage: 0,
+      providerAbstraction: 0,
+      dataPortability: 0,
+      observability: 0,
+      rollbackReadiness: 0,
+      evidenceFreshness: 0,
+      teamContinuity: 0,
+    }),
+    0,
+  )
+})
+
+test('research urgency and adoption readiness are deliberately separate', () => {
+  const unsafeNovelty = {
+    ...candidate,
+    id: 'unsafe-novelty',
+    expectedUpside: 1,
+    maturity: 0.8,
+    security: 0.35,
+    clinicalSafety: 0.4,
+    vendorLockIn: 0.8,
+    migrationCost: 0.8,
+    evidenceAgeDays: 220,
+    benchmarkValidated: false,
+    shadowValidated: false,
+    rollbackValidated: false,
+  }
+
+  assert.ok(calculateResearchUrgency(unsafeNovelty) > 0.7)
+  assert.ok(calculateAdoptionReadiness(unsafeNovelty) < 0.7)
+
+  const assessment = assessTechnology(unsafeNovelty)
+  assert.equal(assessment.replacementAllowed, false)
+  assert.ok(assessment.blockers.includes('security-below-cutover-threshold'))
+  assert.ok(assessment.blockers.includes('clinical-safety-below-cutover-threshold'))
+})
+
+test('high-quality reversible technology can become eligible after benchmark, shadow and rollback validation', () => {
+  const assessment = assessTechnology(candidate)
+  assert.ok(assessment.adoptionReadiness >= 0.8)
+  assert.equal(assessment.replacementAllowed, true)
+  assert.equal(assessment.blockers.length, 0)
+})
+
+test('lock-in and stale evidence increase research pressure without forcing migration', () => {
+  const locked = {
+    ...candidate,
+    id: 'locked',
+    portability: 0.2,
+    reversibility: 0.2,
+    vendorLockIn: 0.95,
+    migrationCost: 0.9,
+    evidenceAgeDays: 365,
+    benchmarkValidated: false,
+    shadowValidated: false,
+    rollbackValidated: false,
+  }
+
+  assert.ok(calculateObsolescencePressure(locked) > 0.8)
+  assert.equal(calculateFreshnessPressure(locked), 1)
+
+  const assessment = assessTechnology(locked)
+  assert.equal(assessment.replacementAllowed, false)
+  assert.ok(['prototype', 'watch'].includes(assessment.disposition))
+})
+
+test('technology radar sorts by research urgency and exposes an overall resilience grade', () => {
+  const lowUrgency = {
+    ...candidate,
+    id: 'low',
+    expectedUpside: 0.1,
+    evidenceAgeDays: 0,
+    vendorLockIn: 0,
+    migrationCost: 0,
+  }
+
+  const highUrgency = {
+    ...candidate,
+    id: 'high',
+    expectedUpside: 1,
+    evidenceAgeDays: 365,
+    vendorLockIn: 0.9,
+    migrationCost: 0.8,
+    portability: 0.4,
+    reversibility: 0.4,
+    benchmarkValidated: false,
+    shadowValidated: false,
+    rollbackValidated: false,
+  }
+
+  const assessment = buildFutureResilienceAssessment(perfectBaseline, [lowUrgency, highUrgency])
+  assert.equal(assessment.resilienceGrade, 'anti-fragile')
+  assert.equal(assessment.technologyRadar[0].candidateId, 'high')
+})

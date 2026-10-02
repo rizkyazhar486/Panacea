@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIMI Risk Score for UA/NSTEMI — Antman, E.M., et al. (2000), JAMA,
@@ -41,6 +42,7 @@ export function TimiRiskScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="TIMI Risk Score" subtitle="Unstable angina / NSTEMI 14-day risk (Antman et al. 2000)" />
+        <BatasKlaimSkorTerbit />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Predicts 14-day risk of death, (re)infarction, or need for urgent revascularization in
           patients with unstable angina or NSTEMI. 7 criteria, 1 point each.

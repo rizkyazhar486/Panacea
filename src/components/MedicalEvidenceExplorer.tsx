@@ -10,6 +10,7 @@ import {
   removeBridgeEvidence,
   type BridgeEvidenceRef,
 } from '../lib/knowledgeBridgeHandoff'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type SourceKey = 'all' | 'literature' | 'ontology' | 'trials' | 'drugLabels'
 
@@ -166,6 +167,7 @@ export function MedicalEvidenceExplorer({
         <div className="min-w-0">
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-emerald-700 dark:text-emerald-300">Evidence APIs</div>
           <h2 className={`${compact ? 'mt-1 text-[15px]' : 'mt-1 text-[19px]'} font-black tracking-[-.025em] text-neutral-950 dark:text-white`}>{title}</h2>
+          <BatasKlaimKesehatan permukaan="clinical.evidence-explorer" />
           {!compact && <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{subtitle}</p>}
         </div>
         <div className="flex flex-wrap gap-1.5">

@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { JENIS_LAB, ambilLab, tambahLab, umurHari, type ButirLab, type JenisLab } from '../lib/lab'
+import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, periksaRujukanLab, rentangUntuk, type ButirLab, type JenisLab } from '../lib/lab'
+import { BagikanLabKeDokter } from './BagikanLabKeDokter'
+import { ImporLembarLab } from './ImporLembarLab'
+import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
+import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
+import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
+import { hitungHasilTerukur } from '../lib/hasilTerukurLab'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget hasil laboratorium — dimasukkan sendiri, digambar perjalanannya.
@@ -47,6 +54,45 @@ function Garis({ butir, jenis }: { butir: ButirLab[]; jenis: JenisLab }) {
   )
 }
 
+const LABEL_TREN: Record<StatusTren, { teks: string; kelas: string }> = {
+  'belum-cukup-data': { teks: 'Building your baseline', kelas: 'bg-neutral-100 text-neutral-500 dark:bg-white/8 dark:text-neutral-300' },
+  stabil: { teks: 'Stable for you', kelas: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300' },
+  pantau: { teks: 'Watch', kelas: 'bg-amber-500/14 text-amber-700 dark:text-amber-300' },
+  'perubahan-bermakna': { teks: 'Meaningful change', kelas: 'bg-orange-500/14 text-orange-700 dark:text-orange-300' },
+  'bicarakan-dengan-dokter': { teks: 'Discuss with a doctor', kelas: 'bg-rose-500/14 text-rose-700 dark:text-rose-300' },
+}
+
+function fmt(n: number): string {
+  return Math.abs(n) >= 100 ? n.toFixed(0) : Math.abs(n) >= 10 ? n.toFixed(1) : n.toFixed(2)
+}
+
+// Satu baris: letak hasil terakhir terhadap garis dasar PRIBADI. Penjelasan
+// dan angka rinci ada di balik ℹ️ supaya gulir utama tetap ringkas.
+function BarisTren({ butir, jenis }: { butir: ButirLab[]; jenis: JenisLab }) {
+  const t = analisisTrenLab(butir, jenis)
+  if (!t) return null
+  const label = LABEL_TREN[t.status]
+  return (
+    <details className="mt-2" data-lab-trend={t.status}>
+      <summary className="flex cursor-pointer list-none items-center gap-2">
+        <span className={`t-mikro rounded-full px-2 py-0.5 font-black ${label.kelas}`}>{label.teks}</span>
+        {t.garisDasar !== null && (
+          <span className="t-mikro tabular-nums text-neutral-500 dark:text-neutral-400">
+            {t.selisih! >= 0 ? '+' : '−'}{fmt(Math.abs(t.selisih!))} vs your usual {fmt(t.garisDasar)}
+          </span>
+        )}
+        <span className="t-mikro ml-auto text-neutral-400" aria-hidden>ℹ️</span>
+      </summary>
+      <div className="t-mikro mt-1.5 space-y-0.5 leading-snug text-neutral-500 dark:text-neutral-400">
+        <p>{t.alasan}</p>
+        {t.rentangPribadi && <p>Your usual range: {fmt(t.rentangPribadi[0])}–{fmt(t.rentangPribadi[1])} {jenis.satuan} (median ± 2 MAD of your earlier results).</p>}
+        {t.lajuPerTahun !== null && <p>Rate since the previous result: {t.lajuPerTahun >= 0 ? '+' : '−'}{fmt(Math.abs(t.lajuPerTahun))} {jenis.satuan} per year.</p>}
+        <p>A monitoring signal from your own history, not a diagnosis.</p>
+      </div>
+    </details>
+  )
+}
+
 export function UbinLab() {
   const [versi, setVersi] = useState(0)
   const [buka, setBuka] = useState(false)
@@ -54,6 +100,12 @@ export function UbinLab() {
   const [nilai, setNilai] = useState('')
   const [tanggal, setTanggal] = useState(tanggalHariIni)
   const [pilih, setPilih] = useState<string | null>(null)
+
+  const [sinkron, setSinkron] = useState<StatusSinkronLab>(statusSinkronLab)
+  // Tinjauan dokter (clinician-authored) — ditampilkan terpisah dari angka lab.
+  const [tinjauan, setTinjauan] = useState<TinjauanLabKlien[]>([])
+  useEffect(() => { if (backendEnabled) api.getLabShares().then((r) => setTinjauan(r.reviews ?? [])).catch(() => {}) }, [])
+  useEffect(() => { pasangSinkronLab(); return dengarSinkronLab(setSinkron) }, [])
 
   useEffect(() => {
     const on = () => setVersi((v) => v + 1)
@@ -66,12 +118,31 @@ export function UbinLab() {
     return JENIS_LAB.filter((j) => (s[j.id] ?? []).length > 0).map((j) => ({ jenis: j, butir: s[j.id] }))
   }, [versi])
 
+  // Ukuran proses (lab-outcome-v1): apakah lingkaran hasil → tinjauan → cek ulang menutup.
+  const lingkaran = useMemo(() => hitungHasilTerukur(ambilLab(), tinjauan, new Date().toISOString().slice(0, 10)), [versi, tinjauan])
+
   const aktif = terisi.find((t) => t.jenis.id === pilih) ?? terisi[0]
 
+  const [rBawah, setRBawah] = useState('')
+  const [rAtas, setRAtas] = useState('')
+  const [galat, setGalat] = useState<string | null>(null)
+  // Peringatan satuan harus dikonfirmasi dengan menekan Save sekali lagi pada
+  // nilai yang sama; mengubah nilai/jenis/tanggal membatalkan konfirmasinya.
+  const [konfirmasi, setKonfirmasi] = useState<string | null>(null)
+  const [tersimpan, setTersimpan] = useState<string | null>(null)
+
   const simpanBaru = () => {
-    const n = Number(nilai.replace(',', '.'))
-    if (!Number.isFinite(n) || n <= 0) return
-    tambahLab(jenisId, tanggal, n)
+    const jenis = JENIS_LAB.find((j) => j.id === jenisId) ?? JENIS_LAB[0]
+    const h = periksaMasukanLab(jenis, nilai, tanggal, tanggalHariIni())
+    if (!h.ok) { setGalat(h.alasan); setKonfirmasi(null); return }
+    const r = periksaRujukanLab(rBawah, rAtas)
+    if (!r.ok) { setGalat(r.alasan); setKonfirmasi(null); return }
+    const kunci = `${jenisId}|${tanggal}|${h.nilai}`
+    if (h.periksaSatuan && konfirmasi !== kunci) { setGalat(h.periksaSatuan + ' Press Save again to keep it.'); setKonfirmasi(kunci); return }
+    tambahLab(jenisId, tanggal, h.nilai, { bawah: r.bawah, atas: r.atas })
+    setRBawah(''); setRAtas('')
+    setGalat(null); setKonfirmasi(null)
+    setTersimpan(`Saved ${jenis.nama} ${h.nilai} ${jenis.satuan} · ${tanggal}`)
     setNilai('')
     setPilih(jenisId)
     setBuka(false)
@@ -80,18 +151,24 @@ export function UbinLab() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Lab results</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">
+          Lab results
+          <span data-lab-sync={sinkron} className="ml-2 font-bold normal-case tracking-normal text-neutral-400">
+            {{ lokal: '· this device only', menyinkron: '· syncing…', tersinkron: '· saved to your account', gagal: '· not synced yet — retrying' }[sinkron]}
+          </span>
+        </h2>
         <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           {buka ? 'Close' : '+ Add'}
         </button>
       </div>
+      <BatasKlaimKesehatan permukaan="lab.blood-trend" />
 
       <div className="kaca rounded-3xl p-3">
         {buka && (
           <div className="mb-3 border-b border-neutral-100 pb-3 dark:border-white/10">
             <select
               value={jenisId}
-              onChange={(e) => setJenisId(e.target.value)}
+              onChange={(e) => { setJenisId(e.target.value); setGalat(null); setKonfirmasi(null) }}
               aria-label="Test type"
               className="t-kecil w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
             >
@@ -103,7 +180,7 @@ export function UbinLab() {
               <input
                 inputMode="decimal"
                 value={nilai}
-                onChange={(e) => setNilai(e.target.value)}
+                onChange={(e) => { setNilai(e.target.value); setGalat(null); setKonfirmasi(null) }}
                 placeholder="Value"
                 aria-label="Result value"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
@@ -111,18 +188,27 @@ export function UbinLab() {
               <input
                 type="date"
                 value={tanggal}
-                onChange={(e) => setTanggal(e.target.value)}
+                onChange={(e) => { setTanggal(e.target.value); setGalat(null); setKonfirmasi(null) }}
                 aria-label="Collection date"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
               />
               <button onClick={simpanBaru} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Save</button>
             </div>
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span className="t-mikro shrink-0 text-neutral-500">Range on your report</span>
+              <input inputMode="decimal" value={rBawah} onChange={(e) => { setRBawah(e.target.value); setGalat(null) }} placeholder="low" aria-label="Reference range low (from your report)"
+                className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-1.5 text-ink dark:border-white/12 dark:text-white" />
+              <input inputMode="decimal" value={rAtas} onChange={(e) => { setRAtas(e.target.value); setGalat(null) }} placeholder="high" aria-label="Reference range high (from your report)"
+                className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-1.5 text-ink dark:border-white/12 dark:text-white" />
+            </div>
+            {galat && <p role="alert" className="t-kecil mt-1.5 font-bold leading-snug text-amber-500">{galat}</p>}
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
               The date blood was TAKEN, not the date the result came out — the gap between them can be days.
             </p>
           </div>
         )}
 
+        {tersimpan && !buka && <p role="status" className="t-mikro mb-2 font-bold text-brand">{tersimpan}</p>}
         {!aktif ? (
           <p className="t-kecil text-neutral-500">No results yet. Press “+ Add” to enter your first lab result.</p>
         ) : (
@@ -148,9 +234,10 @@ export function UbinLab() {
               const akhir = butir[butir.length - 1]
               const umur = umurHari(butir)
               const j = aktif.jenis
+              const rr = rentangUntuk(akhir, j)
               const diLuar =
-                (typeof j.bawah === 'number' && akhir.nilai < j.bawah) ||
-                (typeof j.atas === 'number' && akhir.nilai > j.atas)
+                (typeof rr.bawah === 'number' && akhir.nilai < rr.bawah) ||
+                (typeof rr.atas === 'number' && akhir.nilai > rr.atas)
               return (
                 <>
                   <div className="flex items-baseline gap-1.5">
@@ -164,9 +251,47 @@ export function UbinLab() {
                   </div>
 
                   <Garis butir={butir} jenis={j} />
+                  <BarisTren butir={butir} jenis={j} />
+                  {(() => {
+                    const t = tinjauan.find((x) => x.tes === j.id)
+                    if (!t) return null
+                    const jatuhTempo = t.cekUlangSebelum && t.cekUlangSebelum <= tanggalHariIni()
+                    return (
+                      <div className="t-mikro mt-2 rounded-xl border border-emerald-500/25 px-2.5 py-2 leading-snug" data-lab-review>
+                        <p className="font-bold text-emerald-600 dark:text-emerald-300">Reviewed by {t.dokterEmail} · {t.ditinjau.slice(0, 10)}</p>
+                        {t.cekUlangSebelum && <p className={jatuhTempo ? 'font-bold text-amber-600 dark:text-amber-300' : 'text-neutral-500'}>{jatuhTempo ? 'Recheck due' : 'Recheck by'} {t.cekUlangSebelum}</p>}
+                        {t.catatan && <p className="text-neutral-600 dark:text-neutral-300">“{t.catatan}” <span className="text-neutral-400">— clinician note</span></p>}
+                      </div>
+                    )
+                  })()}
+
+                  {/* Riwayat yang bisa dikoreksi: satu hasil salah ketik tanpa
+                      jalan menghapusnya merusak garis dasar dan PhenoAge selamanya. */}
+                  <details className="mt-2" data-lab-history>
+                    <summary className="t-mikro cursor-pointer font-bold text-neutral-500">All {butir.length} results · edit</summary>
+                    <ul className="mt-1 divide-y divide-neutral-100 dark:divide-white/10">
+                      {[...butir].reverse().map((b) => (
+                        <li key={b.id} className="t-kecil flex min-h-[40px] items-center justify-between gap-2">
+                          <span className="tabular-nums text-ink dark:text-white">{b.tanggal} · <b>{b.nilai}</b> {j.satuan}</span>
+                          <button
+                            type="button"
+                            aria-label={`Delete ${j.nama} ${b.nilai} ${j.satuan} from ${b.tanggal}`}
+                            onClick={() => {
+                              if (!window.confirm(`Delete ${j.nama} ${b.nilai} ${j.satuan} (${b.tanggal})?`)) return
+                              hapusLab(j.id, b.id)
+                              setTersimpan(`Deleted ${j.nama} ${b.nilai} ${j.satuan} · ${b.tanggal}`)
+                            }}
+                            className="t-mikro min-h-[36px] px-2 font-bold text-red-500"
+                          >
+                            Delete
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
 
                   <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
-                    Rujukan: {j.sumber}
+                    {rr.dariLab ? `Your lab's range: ${rr.bawah ?? '…'}–${rr.atas ?? '…'} ${j.satuan} (from your report)` : `Reference: ${j.sumber}`}
                   </p>
                   {j.catatan && <p className="t-mikro mt-0.5 leading-snug text-neutral-400">{j.catatan}</p>}
                   <p className="t-mikro mt-1 leading-snug text-neutral-400">
@@ -177,6 +302,14 @@ export function UbinLab() {
             })()}
           </>
         )}
+        {(lingkaran.cakupanTinjauan.penyebut > 0 || lingkaran.kepatuhanCekUlang.penyebut > 0) && (
+          <p className="text-xs opacity-80" data-lingkaran-lab>
+            Follow-up loop: {lingkaran.cakupanTinjauan.pembilang} of {lingkaran.cakupanTinjauan.penyebut} out-of-range results reviewed by a doctor within 14 days
+            {lingkaran.kepatuhanCekUlang.penyebut > 0 && <>; {lingkaran.kepatuhanCekUlang.pembilang} of {lingkaran.kepatuhanCekUlang.penyebut} rechecks done by their due date</>}.
+          </p>
+        )}
+        <ImporLembarLab />
+        <BagikanLabKeDokter />
       </div>
     </section>
   )

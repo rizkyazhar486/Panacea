@@ -17,6 +17,16 @@
     '[contenteditable="true"]',
     '.sr-only',
     '#pmd-context-dialog',
+    // Any descendant of a real control. Without this, a wrapping <button> or
+    // <a> whose child copy is long enough gets wrapped in its own
+    // role="button"/tabindex target: the click opens the interpretation
+    // dialog on top of the control instead of (or as well as) activating it,
+    // and the dialog then blocks every click underneath until closed.
+    'button',
+    'a',
+    '[role="button"]',
+    '[role="tab"]',
+    'summary',
   ].join(',')
 
   const originals = new WeakMap()

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconWallet, IconStethoscope, IconHeart } from '../components/icons'
 import { MANUAL_BANK } from '../lib/payment'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // In-app pricing page (mirrors the public landing page's "Layanan & Harga"
 // section, but for already-logged-in users browsing under Layanan). Each
@@ -70,6 +71,7 @@ export function Pricing() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
       <SectionTitle icon={<IconWallet size={20} />} title="Services & Pricing" subtitle="Three simple plans — pick what fits, move up or down at any time" />
+      <BatasKlaimKesehatan permukaan="care.pricing" />
 
       <div className="grid gap-4">
         {TIERS.map((t) => (
@@ -153,7 +155,7 @@ export function Pricing() {
       </Card>
 
       <p className="text-center text-[11px] leading-relaxed text-neutral-500">
-        Certified AI-EMR + CDSS for clinicians/institutions: contact us for subscription pricing.
+        AI-EMR and clinician decision support for licensed clinicians and institutions: contact us for subscription pricing. This product is not clinically validated.
         Medical Materials Hub: pricing set by authors, royalties paid automatically to contributors.
       </p>
     </div>

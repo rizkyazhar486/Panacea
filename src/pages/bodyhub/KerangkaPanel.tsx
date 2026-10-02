@@ -20,7 +20,7 @@ export function KerangkaPanel() {
         </Prosa>
       </div>
 
-      <Suspense fallback={<div className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
+      <Suspense fallback={<div role="status" aria-label="Loading source-backed skeleton" className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
         <Kerangka3D terpilih={terpilih} onPilih={setTerpilih} />
       </Suspense>
 
@@ -30,14 +30,14 @@ export function KerangkaPanel() {
       {WILAYAH_RANGKA.map((wilayah) => (
         <div key={wilayah}>
           <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">{wilayah}</div>
-          <div role="group" aria-label={wilayah} className="mt-1.5 grid grid-cols-2 gap-1.5">
+          <div role="group" aria-label={wilayah} className="mt-1.5 grid grid-cols-1 gap-1.5 min-[390px]:grid-cols-2">
             {KELOMPOK_TULANG.filter((k) => k.wilayah === wilayah).map((k) => (
               <button
                 key={k.id}
                 type="button"
                 aria-pressed={terpilih === k.id}
                 onClick={() => setTerpilih(terpilih === k.id ? null : k.id)}
-                className={`min-w-0 rounded-xl px-2 py-2 text-left text-[10.5px] font-bold leading-tight transition ${
+                className={`min-h-11 min-w-0 rounded-xl px-3 py-2 text-left text-[10.5px] font-bold leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF63] focus-visible:ring-offset-2 ${
                   terpilih === k.id
                     ? 'bg-[#00BF63] text-white'
                     : 'bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] text-ink dark:text-white'
@@ -55,7 +55,7 @@ export function KerangkaPanel() {
             <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">
               {kelompok.wilayah}
             </div>
-            <div className="mt-1 text-[14px] font-black text-ink dark:text-white">{kelompok.label}</div>
+            <div className="mt-1 break-words text-[14px] font-black text-ink dark:text-white">{kelompok.label}</div>
             <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
               {kelompok.ringkas}
             </p>
@@ -64,7 +64,7 @@ export function KerangkaPanel() {
             </div>
             <ul className="mt-1 space-y-1">
               {kelompok.artikulasi.map((a) => (
-                <li key={a} className="text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">• {a}</li>
+                <li key={a} className="break-words text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">• {a}</li>
               ))}
             </ul>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
@@ -86,7 +86,7 @@ export function KerangkaPanel() {
         </div>
         <ul className="mt-1 space-y-1">
           {TIDAK_DIBAWA.map((t) => (
-            <li key={t.label} className="text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">
+            <li key={t.label} className="break-words text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">
               • <strong className="font-black">{t.label}</strong> — {t.catatan}
             </li>
           ))}

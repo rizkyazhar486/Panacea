@@ -28,5 +28,7 @@ assert.match(componentSource, /Reset cue/)
 assert.match(componentSource, /data-digestive-flow-running/)
 assert.match(componentSource, /role="img"/)
 assert.match(componentSource, /aria-live="polite"/)
+assert.match(componentSource, /disposeOwnedObject3DResources\(scene\)/)
+assert.match(componentSource, /setRouteCount\(0\)/)
 
 console.log('digestive flow visual state: ok')
