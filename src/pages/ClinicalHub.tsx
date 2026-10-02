@@ -10,6 +10,7 @@ import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
+import { Fold } from '../shared/ui/Fold'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 export const GROUPS = [
@@ -163,6 +164,7 @@ export function ClinicalHub() {
           )}
         </section>
 
+        <Fold label="Calculators">
         <section className="grid gap-8 lg:grid-cols-2" aria-label="Clinical quick tools">
           <div className="border-t border-white/10 pt-4">
             <div className="flex items-center justify-between gap-3">
@@ -246,10 +248,20 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+        </Fold>
 
+        <Fold label="Research">
         <MentalHealthClinicalResearchLab />
+        </Fold>
+
+        <Fold label="Patient">
         <ClinicalPatientContext />
+        </Fold>
+
+        <Fold label="Depth">
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
+        </Fold>
+
         {account?.role === 'dokter' && <LabPasienUntukDokter />}
         {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
 
@@ -257,6 +269,7 @@ export function ClinicalHub() {
             pada 390px; di atas, ia mendorong "Ask Panacea", aksi utama dan
             kalkulator ke y~5.000 — enam layar gulir sebelum pemakai klinis
             bisa melakukan apa pun. */}
+        <Fold label="Guide">
         <SurfaceGuide
           summary="see the body → ask one question → record only reviewed facts"
           steps={[
@@ -265,6 +278,8 @@ export function ClinicalHub() {
             'Promote findings into AI-EMR only after clinician review.',
           ]}
         />
+        </Fold>
+
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <nav aria-label="Clinical references" className="border-y border-white/10">
@@ -282,7 +297,7 @@ export function ClinicalHub() {
         </nav>
       </main>
 
-      <SuperPageCapabilityRail domain="clinical" initialLimit={28} />
+      <Fold label="Capabilities"><SuperPageCapabilityRail domain="clinical" initialLimit={28} /></Fold>
     </div>
   )
 }
