@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
+import '../shared/ui/infoLabel.css'
 import { rupaRute } from '../lib/warnaRute'
 import { Prosa } from './Prosa'
 import '../styles/readability.css'
@@ -54,14 +55,19 @@ export function SectionTitle({
   icon,
   title,
   subtitle,
+  info,
   right,
 }: {
   icon?: ReactNode
   title: string
   subtitle?: string
+  /** Penjelasan paragraf di balik tombol i; menggantikan subtitle di permukaan utama. */
+  info?: string
   right?: ReactNode
 }) {
   const w = rupaRute()
+  const [infoOpen, setInfoOpen] = useState(false)
+  const infoId = useId()
   const showBodyExplorerGuide = title === 'Body Explorer'
   return (
     <div className="mb-4">
@@ -77,12 +83,29 @@ export function SectionTitle({
               <span aria-hidden className={`mt-1 h-4 w-1 shrink-0 rounded-full ${w.garis}`} />
               <span>{title}</span>
             </h2>
-            {subtitle && (
+            {info && infoOpen && (
+              <Prosa kelas="mt-3 max-w-3xl text-[14px] leading-[1.7] text-neutral-600 dark:text-neutral-300">
+                <span id={infoId}>{info}</span>
+              </Prosa>
+            )}
+            {!info && subtitle && (
               <Prosa kelas="mt-1 max-w-3xl text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                 {subtitle}
               </Prosa>
             )}
           </div>
+          {info && (
+          <button
+            type="button"
+            className="info-label__button ml-auto"
+            aria-expanded={infoOpen}
+            aria-controls={infoOpen ? infoId : undefined}
+            aria-label={`${infoOpen ? 'Hide' : 'Show'} details: ${title}`}
+            onClick={() => setInfoOpen((v) => !v)}
+          >
+            <span aria-hidden="true">i</span>
+          </button>
+        )}
         </div>
         {right && <div className="no-scrollbar flex max-w-full shrink-0 items-center gap-2 overflow-x-auto sm:justify-end">{right}</div>}
       </div>

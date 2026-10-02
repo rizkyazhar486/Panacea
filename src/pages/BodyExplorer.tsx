@@ -589,7 +589,7 @@ export function BodyExplorer() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Explorer"
-        subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
+        info="A real 3D anatomy model. Tap any bone, muscle, vessel, nerve, or organ to inspect it, rotate with one finger, and pinch to zoom."
       />
       <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
