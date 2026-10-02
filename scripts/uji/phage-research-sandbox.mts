@@ -5,7 +5,7 @@ import {
   isBlockedPhageCapability,
   simulateVirtualPhage,
   wilsonInterval95,
-} from '../../src/lib/phageResearchSandbox.ts'
+} from '../../src/lib/biology/phageResearchSandbox.ts'
 
 const scienceLike = analyzePhageCampaign({
   designed: 285,
