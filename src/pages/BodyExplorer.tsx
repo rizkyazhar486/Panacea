@@ -4,6 +4,8 @@ import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
+import jumlahAtlas from '../data/jumlahAtlas.json'
+import { CariStrukturCepat } from '../components/CariStrukturCepat'
 import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
 import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
@@ -13,6 +15,7 @@ import { penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
@@ -32,6 +35,7 @@ const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ defa
 const VentilasiMembranPanel = lazy(() => import('./bodyhub/VentilasiMembranPanel').then((m) => ({ default: m.VentilasiMembranPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const KelenjarSaluranPanel = lazy(() => import('./bodyhub/KelenjarSaluranPanel').then((m) => ({ default: m.KelenjarSaluranPanel })))
+const HumanSexualReproductivePhysiologyLab = lazy(() => import('./bodyhub/HumanSexualReproductivePhysiologyLab'))
 const TuasSendiPanel = lazy(() => import('./bodyhub/TuasSendiPanel').then((m) => ({ default: m.TuasSendiPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
@@ -49,6 +53,8 @@ const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
 // Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
 const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
 const AlphaGenomeAtlas = lazy(() => import('./bodyhub/AlphaGenomeAtlas'))
+const VertikalMolekulerPanel = lazy(() => import('./bodyhub/VertikalMolekulerPanel').then((m) => ({ default: m.VertikalMolekulerPanel })))
+const PencitraanVolumetrikPanel = lazy(() => import('./bodyhub/PencitraanVolumetrikPanel').then((m) => ({ default: m.PencitraanVolumetrikPanel })))
 // Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
 const CellLab = lazy(() => import('./bodyhub/CellLab'))
 // Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
@@ -57,7 +63,7 @@ const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
 // sehingga tidak ada satu pun cara membukanya dari dalam aplikasi.
 const WholeBodyPrecisionLab = lazy(() => import('./bodyhub/WholeBodyPrecisionLab'))
 const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
-// Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
+// Ruang bedah: interactive simulation runtime + source-grounded surgical layers.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 const BiomechanicsMotionLab = lazy(() => import('./bodyhub/BiomechanicsMotionLab'))
@@ -82,11 +88,12 @@ function toSearchTerm(rawName: string): string {
 // dulu tiap deret menulis ulang kelasnya sendiri, dan itu yang membuat
 // halaman terasa ramai: bentuk yang sama tampil sedikit berbeda-beda.
 function Chip({
-  active, onClick, children,
-}: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  active, onClick, children, ariaLabel,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; ariaLabel?: string }) {
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${
         active
           ? 'border-brand bg-brand text-white'
@@ -107,7 +114,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'indera' | 'termoregulasi' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'genom-alfa' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'indera' | 'termoregulasi' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'genom-alfa' | 'vertikal-molekuler' | 'pencitraan-volumetrik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 import { kelompokUntuk, kelompokTerpakai, urutkanMenurutKelompok } from '../lib/bodyExplorerTabGroups'
 
@@ -142,11 +149,13 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'molekul', label: 'Molecules' },
   { key: 'genomik', label: 'Genomics' },
   { key: 'genom-alfa', label: 'Genome atlas' },
+  { key: 'vertikal-molekuler', label: 'Tissue → gene' },
+  { key: 'pencitraan-volumetrik', label: 'DICOM → 3D' },
   { key: 'cari', label: 'Find structure' },
   { key: 'presisi', label: 'Whole-body precision' },
   { key: 'mesin', label: 'Biomedical engine' },
   { key: 'sel', label: 'Cell & metabolism' },
-  { key: 'bedah', label: 'Surgical layers' },
+  { key: 'bedah', label: 'Surgery sim' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -576,13 +585,32 @@ export function BodyExplorer() {
   }
 
   return (
-    <div className="space-y-4">
+    <div data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" className="space-y-4">
       <SectionTitle
         icon={<IconActivity />}
         title="Body Explorer"
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
+      <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
+        {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
+            selalu berada di sistem yang sedang dimatikan -- itu sebabnya ia
+            dicari dan bukan diketuk -- jadi memilih hasil ikut menyalakan
+            sistemnya, kalau tidak layarnya tidak berubah dan strukturnya
+            terbaca sebagai tidak ada. */}
+        <div className="mb-2">
+          <CariStrukturCepat
+            lapisanAktif={layers}
+            onNyalakanLapisan={(kunci) => setLayers((prev) => new Set(prev).add(kunci))}
+            onSorot={(nama, label) => {
+              setActiveWorkout(null)
+              setActiveOrgan(null)
+              setFocusKeywords(null)
+              setHighlighted(nama)
+              lookup(label, [toSearchTerm(nama[0])], undefined, nama[0])
+            }}
+          />
+        </div>
         <Body3D
           layers={layers}
           highlighted={highlighted}
@@ -866,13 +894,35 @@ export function BodyExplorer() {
             <div className="mt-3">
               {panelTab === 'layers' && (
               <>
-                <p className="mb-1.5 text-[11px] text-neutral-400">
-                  Turn body systems on or off. Only what you can see can be tapped.
-                </p>
+                <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+                  <p className="text-[11px] text-neutral-400">
+                    Turn body systems on or off. Only what you can see can be tapped.
+                  </p>
+                  {/* Jumlah struktur yang SEDANG terlihat, dihitung dari berkas
+                      geometrinya sendiri lewat src/data/jumlahAtlas.json. */}
+                  <p className="text-[11px] font-bold tabular-nums text-neutral-500 dark:text-neutral-400">
+                    {ANATOMY_LAYERS.filter((l) => layers.has(l.key))
+                      .reduce((n, l) => n + (jumlahAtlas.perSistem[l.key] ?? 0), 0)
+                      .toLocaleString()}
+                    {' of '}
+                    {jumlahAtlas.total.toLocaleString()} structures visible
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {ANATOMY_LAYERS.map((l) => (
-                    <Chip key={l.key} active={layers.has(l.key)} onClick={() => toggleLayer(l.key)}>
+                    <Chip
+                      key={l.key}
+                      active={layers.has(l.key)}
+                      onClick={() => toggleLayer(l.key)}
+                      /* Angka di pil adalah data, bukan bagian dari nama tombol.
+                         Tanpa label ini nama aksesibelnya terbaca "Vessels 434",
+                         yang ambigu bagi pembaca layar. */
+                      ariaLabel={`${l.label}, ${(jumlahAtlas.perSistem[l.key] ?? 0).toLocaleString()} structures`}
+                    >
                       {l.label}
+                      <span aria-hidden="true" className={`ml-1.5 tabular-nums ${layers.has(l.key) ? 'text-white/70' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                        {jumlahAtlas.perSistem[l.key] ?? 0}
+                      </span>
                     </Chip>
                   ))}
                 </div>
@@ -1119,6 +1169,18 @@ export function BodyExplorer() {
               </Suspense>
             )}
 
+            {panelTab === 'vertikal-molekuler' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the multiscale vertical…</p>}>
+                <VertikalMolekulerPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'pencitraan-volumetrik' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the volumetric imaging panel…</p>}>
+                <PencitraanVolumetrikPanel />
+              </Suspense>
+            )}
+
             {panelTab === 'cari' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the structure index…</p>}>
                 <StructureFinder
@@ -1155,7 +1217,7 @@ export function BodyExplorer() {
             )}
 
             {panelTab === 'bedah' && (
-              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgical layers…</p>}>
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgery simulator…</p>}>
                 <SurgicalLab
                   onKedalaman={setDissect}
                   onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
@@ -1187,6 +1249,14 @@ export function BodyExplorer() {
                   onPick={onPickHierarchyEntry}
                   onView3d={onViewLayer3d}
                 />
+                <details className="rounded-xl border border-brand/20 bg-brand/[.03] p-2.5">
+                  <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Sexual &amp; reproductive physiology (staged, schematic)</summary>
+                  <div className="mt-2">
+                    <Suspense fallback={<p className="text-sm text-neutral-500" role="status" aria-live="polite">Loading reproductive physiology…</p>}>
+                      <HumanSexualReproductivePhysiologyLab />
+                    </Suspense>
+                  </div>
+                </details>
                 {/* Catatan & kurikulum kedokteran tetap tinggal di Med Study
                     Hub — isinya ratusan kilobyte dan tidak pantas ikut termuat
                     tiap kali orang memutar model 3D. Yang digabung di sini

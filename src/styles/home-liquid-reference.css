@@ -1,0 +1,208 @@
+.panacea-liquid-home {
+  --liquid-ink: #f7fbff;
+  --liquid-muted: rgba(226, 238, 255, .58);
+  --liquid-line: rgba(255, 255, 255, .105);
+  --liquid-surface: rgba(9, 15, 28, .58);
+  --liquid-surface-strong: rgba(5, 10, 20, .82);
+  position: relative;
+  isolation: isolate;
+}
+
+.panacea-liquid-home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(56rem 38rem at 8% -8%, rgba(44, 164, 255, .13), transparent 66%),
+    radial-gradient(46rem 32rem at 92% 8%, rgba(154, 90, 255, .13), transparent 66%),
+    radial-gradient(40rem 34rem at 54% 112%, rgba(38, 226, 178, .08), transparent 70%),
+    #02050b;
+}
+
+.panacea-liquid-home::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .22;
+  background-image:
+    radial-gradient(circle at 20% 35%, rgba(255,255,255,.34) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 76% 22%, rgba(125,211,252,.34) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 66% 72%, rgba(196,181,253,.26) 0 1px, transparent 1.4px);
+  background-size: 170px 170px, 230px 230px, 290px 290px;
+}
+
+.liquid-glass {
+  border: 1px solid var(--liquid-line);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025) 42%, rgba(86,110,170,.035)),
+    var(--liquid-surface);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(255,255,255,.02),
+    0 24px 70px rgba(0,0,0,.26);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  backdrop-filter: blur(24px) saturate(145%);
+}
+
+.liquid-glass-strong {
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.085), rgba(255,255,255,.025) 38%, rgba(80,120,210,.04)),
+    var(--liquid-surface-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 26px 90px rgba(0,0,0,.38);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  backdrop-filter: blur(30px) saturate(150%);
+}
+
+.liquid-spectral-edge {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-spectral-edge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(125,211,252,.38), rgba(255,255,255,.08) 30%, rgba(196,181,253,.32) 66%, rgba(110,231,183,.22));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: .66;
+}
+
+.liquid-lens {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.22);
+  background:
+    radial-gradient(circle at 35% 24%, rgba(255,255,255,.42), transparent 18%),
+    radial-gradient(circle at 65% 65%, rgba(90,110,255,.20), transparent 46%),
+    linear-gradient(145deg, rgba(94,234,212,.14), rgba(59,130,246,.12) 45%, rgba(217,70,239,.12));
+  box-shadow:
+    inset 0 0 22px rgba(255,255,255,.08),
+    0 10px 34px rgba(79,70,229,.18);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.liquid-lens::after {
+  content: '';
+  position: absolute;
+  width: 72%;
+  height: 30%;
+  top: 8%;
+  left: 14%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0));
+  transform: rotate(-8deg);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.liquid-action {
+  transform: translateZ(0);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.liquid-action:hover {
+  transform: translateY(-2px) scale(1.005);
+}
+
+.liquid-action:active {
+  transform: translateY(0) scale(.975);
+  transition-duration: 90ms;
+}
+
+.liquid-widget-rail {
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-inline: contain;
+}
+
+.liquid-widget-rail::-webkit-scrollbar { display: none; }
+.liquid-widget-rail > * { scroll-snap-align: start; }
+
+.liquid-mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 34px;
+}
+
+.liquid-mini-bars > span {
+  width: 5px;
+  min-height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: .62;
+  transform-origin: bottom;
+  animation: panacea-liquid-breathe 4.8s ease-in-out infinite;
+}
+
+.liquid-mini-bars > span:nth-child(2) { animation-delay: -.8s; }
+.liquid-mini-bars > span:nth-child(3) { animation-delay: -1.6s; }
+.liquid-mini-bars > span:nth-child(4) { animation-delay: -2.4s; }
+.liquid-mini-bars > span:nth-child(5) { animation-delay: -3.2s; }
+
+@keyframes panacea-liquid-breathe {
+  0%, 100% { transform: scaleY(.92); opacity: .52; }
+  50% { transform: scaleY(1.08); opacity: .82; }
+}
+
+.panacea-liquid-dock {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: min(calc(100vw - 22px), 520px);
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,.13);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    rgba(2, 7, 15, .76);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 18px 52px rgba(0,0,0,.45);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+}
+
+.panacea-liquid-dock .liquid-dock-item {
+  position: relative;
+  min-width: 0;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms cubic-bezier(.2,.8,.2,1);
+}
+
+.panacea-liquid-dock .liquid-dock-item:active { transform: scale(.94); }
+.panacea-liquid-dock .liquid-dock-item[data-active='true'] {
+  color: #07101d;
+  background: linear-gradient(135deg, rgba(226,248,255,.98), rgba(176,244,235,.94) 50%, rgba(215,199,255,.95));
+  box-shadow: 0 8px 26px rgba(94,234,212,.15), inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+@media (min-width: 900px) {
+  .panacea-liquid-dock {
+    bottom: 18px;
+    width: min(600px, calc(100vw - 40px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-action,
+  .panacea-liquid-dock .liquid-dock-item,
+  .liquid-mini-bars > span {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+}

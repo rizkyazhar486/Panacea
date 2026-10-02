@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconPill } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empiric Therapy Reference — a searchable, curated quick-reference of
@@ -59,11 +60,12 @@ export function EmpiricTherapyReference() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconPill size={20} />} title="Empiric Therapy Reference" subtitle="First-line drug classes by diagnosis — a curated quick reference" />
+        <SectionTitle icon={<IconPill size={20} />} title="Empiric Therapy Reference" subtitle="Published first-line drug classes by diagnosis — not a clinically validated Panacea prescribing decision" />
+        <BatasKlaimKesehatan permukaan="clinical.empiric-therapy" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
           Educational reference of commonly-published first-line drug <b>classes</b> only — deliberately
           no doses. Always individualize for allergies, renal/hepatic function, pregnancy, local
-          resistance/antibiogram, and drug interactions before prescribing.
+          resistance/antibiogram, and drug interactions before prescribing. Not a patient-specific order.
         </p>
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"

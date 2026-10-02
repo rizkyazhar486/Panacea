@@ -893,6 +893,108 @@ export const EJAAN_ID: Record<string, string[]> = {
   'Cyanocobalamin (B12)': ['Mekobalamin'],
   'Zinc sulfate': ['Zinc'],
   'Zinc sulfate (supplement)': ['Zinc'],
+  // Ditambahkan setelah diperiksa satu per satu terhadap `contoh` di
+  // golonganObat.ts: dosis untuk 33 zat ini SUDAH ada di sana, tertulis
+  // berdampingan dengan zat lain dalam golongan yang sama, tetapi tidak
+  // pernah tersambung ke sini karena ejaan Indonesianya belum didaftar.
+  // Hasilnya, DrugInfo menampilkan "No dose is given here on purpose" untuk
+  // zat yang dosisnya sebenarnya sudah tertulis di berkas ini sendiri.
+  'Esomeprazole': ['Esomeprazol'],
+  'Lansoprazole': ['Lansoprazol'],
+  'Pantoprazole': ['Pantoprazol'],
+  'Rabeprazole': ['Rabeprazol'],
+  'Ranitidine': ['Ranitidin'],
+  'Famotidine': ['Famotidin'],
+  'Mebeverine': ['Mebeverin'],
+  'Drotaverine': ['Drotaverin'],
+  'Domperidone': ['Domperidon'],
+  'Glimepiride': ['Glimepirid'],
+  'Semaglutide': ['Semaglutid'],
+  'Dulaglutide': ['Dulaglutid'],
+  'Magnesium sulfate': ['Magnesium sulfat'],
+  'Clopidogrel': ['Klopidogrel'],
+  'Ticagrelor': ['Tikagrelor'],
+  'Milrinone': ['Milrinon'],
+  'Indapamide': ['Indapamid'],
+  'Eplerenone': ['Eplerenon'],
+  'Carvedilol': ['Karvedilol'],
+  'Nifedipine': ['Nifedipin'],
+  'Candesartan': ['Kandesartan'],
+  'Terbinafine': ['Terbinafin'],
+  'Diclofenac': ['Diklofenak'],
+  'Ketorolac': ['Ketorolak'],
+  'Baclofen': ['Baklofen'],
+  'Tizanidine': ['Tizanidin'],
+  'Phenobarbital': ['Fenobarbital'],
+  'Topiramate': ['Topiramat'],
+  'Clonazepam': ['Klonazepam'],
+  'Mebendazole': ['Mebendazol'],
+  'Terbutaline': ['Terbutalin'],
+  'Mometasone': ['Mometason'],
+  'Loratadine': ['Loratadin'],
+  // Second pass, found with a wider (still hand-verified, never auto-applied)
+  // set of spelling-shift patterns. Each was checked against golonganObat.ts
+  // for both a real drug-specific number AND a matching route/indication —
+  // two of the raw hits from this pass were rejected for exactly that second
+  // reason and are recorded below the table, not added here.
+  'Sucralfate': ['Sukralfat'],
+  'Promethazine': ['Prometazin'],
+  'Docusate': ['Dokusat'],
+  'Gliclazide': ['Gliklazid'],
+  'Thiamine (B1)': ['Tiamin'],
+  'Clotrimazole (topical)': ['Klotrimazol'],
+  'Miconazole (topical)': ['Mikonazol'],
+  'Itraconazole': ['Itrakonazol'],
+  'Naproxen': ['Naproksen'],
+  'Codeine': ['Kodein'],
+  'Carbamazepine': ['Karbamazepin'],
+  'Duloxetine': ['Duloksetin'],
+  'Amitriptyline': ['Amitriptilin'],
+  'Ambroxol': ['Ambroksol'],
+  'Fexofenadine': ['Feksofenadin'],
+  // Third pass — exact corpus hits with explicit drug-specific dosing and
+  // matching route/indication. These were discovered mechanically only as
+  // candidates, then checked one-by-one against golonganObat.ts before being
+  // admitted. Ambiguous same-molecule/different-route candidates remain
+  // fail-closed below.
+  'Pyridoxine (B6)': ['Piridoksin'],
+  'Sacubitril/valsartan': ['Sakubitril-valsartan'],
+  'Clarithromycin': ['Klaritromisin'],
+  'Erythromycin': ['Eritromisin'],
+  'Levofloxacin': ['Levofloksasin'],
+  'Moxifloxacin': ['Moksifloksasin'],
+  'Amikacin': ['Amikasin'],
+  'Streptomycin': ['Streptomisin'],
+  'Clindamycin': ['Klindamisin'],
+  'Fosfomycin': ['Fosfomisin'],
+  'Meloxicam': ['Meloksikam'],
+  'Levetiracetam': ['Levetirasetam'],
+  'Oxymetazoline': ['Oksimetazolin'],
+  'Amoxicillin/clavulanate': ['Amoksisilin-klavulanat'],
+  'Polyethylene glycol': ['Polietilen glikol'],
+  'Dexamethasone': ['Deksametason'],
+  'Cloxacillin': ['Kloksasilin'],
+  'Vasopressin': ['Vasopresin'],
+  'Cefotaxime': ['Sefotaksim'],
+  'Ceftazidime': ['Seftazidim'],
+  'Ampicillin': ['Ampisilin'],
+  'Chlortalidone': ['Klortalidon'],
+  'Calcium gluconate': ['Kalsium glukonas'],
+  // Fourth pass — exact systemic corticosteroid name/route match.
+  'Methylprednisolone': ['Metilprednisolon'],
+  // NOT added, on purpose:
+  //   'Clotrimazole (vaginal)' — the only golongan mentioning "klotrimazol"
+  //     covers topical/oral skin dosing only; nothing here addresses the
+  //     vaginal route, so showing it would misrepresent a real regimen.
+  //   'Betamethasone (antenatal)' — "betametason" only appears in the
+  //     TOPICAL corticosteroid golongan (cream/ointment for skin). Antenatal
+  //     betamethasone is an IM injection for fetal lung maturation — an
+  //     entirely different route, dose and purpose. Matching by molecule
+  //     name alone here would attach a skin-cream regimen to an obstetric
+  //     injection.
+  //   'Beclometasone' — catalogued as an asthma-maintenance INHALER; the
+  //     only golongan mentioning it is nasal-spray dosing for rhinitis.
+  //     Same molecule, different device, different numbers.
 }
 
 /**
@@ -924,6 +1026,11 @@ export function dosisSkdi(nama: string): { keluhan: string; golongan: string; do
     }
   }
   return keluar
+}
+
+/** Number of offline catalogue substances with at least one named SKDI dose bridge. */
+export function jumlahDenganDosisSkdi(): number {
+  return semuaObat().filter((obat) => dosisSkdi(obat.nama).length > 0).length
 }
 
 export default ATC

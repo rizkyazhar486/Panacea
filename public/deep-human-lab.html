@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#03060c" />
+<meta name="description" content="PanaceaMed Deep Human Lab — multiscale biomedical, neurocognitive, endurance, gut-brain, pharmacology and immunodynamics simulation surface." />
+<title>PanaceaMed · Deep Human Lab</title>
+<link rel="stylesheet" href="/deep-human-lab-v2.css" />
+</head>
+<body class="dhl-body">
+<div class="dhl-shell">
+  <header class="dhl-top">
+    <div class="dhl-brand">
+      <div class="dhl-logo" aria-hidden="true"></div>
+      <div><strong>PanaceaMed · Deep Human Lab</strong><small>Multiscale biomedical simulation studio</small></div>
+    </div>
+    <div class="dhl-chip"><i></i> vector + high-DPI simulation · research mode</div>
+  </header>
+
+  <main>
+    <section class="dhl-hero">
+      <div class="dhl-glass dhl-hero-copy">
+        <div class="dhl-eyebrow">Do not merely describe the human state · make it visible</div>
+        <h1>See the <span class="dhl-spectrum">human causal stack</span> move.</h1>
+        <p>
+          An interactive research surface that connects atomic and molecular abstractions to cells, tissues, organs,
+          neural networks, interoception, affect, cognition, impulse, endurance, recovery and evidence. Mental stillness,
+          will, trust, love, toughness, perception and the observing “witness” are represented as changing latent states
+          with visible network consequences—not as claims that a single number explains a person.
+        </p>
+        <div class="dhl-hero-actions">
+          <button class="dhl-button dhl-button--primary" data-scroll="consciousnessLab">Enter consciousness theater</button>
+          <button class="dhl-button" data-scroll="enduranceLab">Run body twin</button>
+          <button class="dhl-button" data-scroll="moleculeLab">Molecule → mind</button>
+          <button class="dhl-button" data-scroll="immuneLab">Immunodynamics</button>
+          <button class="dhl-button" id="exportState">Export research state</button>
+        </div>
+      </div>
+      <div class="dhl-glass dhl-hero-viz" aria-label="Multiscale orbital visualization">
+        <div class="dhl-stack-orbit">
+          <div class="dhl-ring" style="--i:7%;--r:14deg"></div>
+          <div class="dhl-ring" style="--i:16%;--r:72deg"></div>
+          <div class="dhl-ring" style="--i:25%;--r:126deg"></div>
+          <div class="dhl-ring" style="--i:31%;--r:168deg"></div>
+          <div class="dhl-core"></div>
+          <div class="dhl-dot" style="--rad:150px;--speed:6.4s"></div>
+          <div class="dhl-dot" style="--rad:118px;--speed:5.1s;animation-delay:-1.7s"></div>
+          <div class="dhl-dot" style="--rad:92px;--speed:3.9s;animation-delay:-2.2s"></div>
+          <div class="dhl-stack-label"><span>atom · molecule · cell</span><b>→ network → experience</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section">
+      <div class="dhl-grid-3">
+        <article class="dhl-glass dhl-panel"><div class="dhl-kicker">Scale 01</div><h3>Microscopic → systems</h3><p>Every visualization carries its scale. Molecular affinity is not automatically a mood; a circuit state is not automatically a diagnosis.</p><div class="dhl-formula">atom → molecule → receptor → organelle → cell → tissue → organ → circuit → phenotype</div></article>
+        <article class="dhl-glass dhl-panel"><div class="dhl-kicker">Scale 02</div><h3>State → trajectory</h3><p>Move sleep, stress, arousal, reward, inflammation and control. The system updates several downstream states together.</p><div class="dhl-formula">x(t+1) = A·x(t) + B·u(t) + ε(t)</div></article>
+        <article class="dhl-glass dhl-panel dhl-legal"><div class="dhl-kicker">Hard safety boundary</div><h3>Research simulation ≠ automatic treatment</h3><p><strong>Drug and vaccine modules are conceptual.</strong> No viral construct design, biological sequence generation, wet-lab protocol, autonomous prescribing or instant patient deployment is produced.</p></article>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="consciousnessLab">
+      <div class="dhl-titlebar">
+        <div><div class="dhl-kicker">Neuropsychiatric function · voluntary self-regulation</div><h2>Consciousness & State Theater</h2></div>
+        <p>Manipulate observable drivers. Watch salience, executive control, default-mode activity, limbic threat, reward and interoception reorganize in real time. “Witness” is modeled as a transparent meta-awareness heuristic, not a solved theory of consciousness.</p>
+      </div>
+      <div class="dhl-grid-2">
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-sim-stage">
+            <svg id="brainSvg" viewBox="0 0 620 390" role="img" aria-label="Dynamic neurocognitive network simulation">
+              <defs>
+                <radialGradient id="brainHalo"><stop offset="0" stop-color="#6de8ff" stop-opacity=".14"/><stop offset="1" stop-color="#6d5fff" stop-opacity="0"/></radialGradient>
+                <linearGradient id="observerGrad"><stop stop-color="#62eaff"/><stop offset=".5" stop-color="#a47cff"/><stop offset="1" stop-color="#ff6fd9"/></linearGradient>
+              </defs>
+              <ellipse cx="310" cy="190" rx="235" ry="154" fill="url(#brainHalo)"/>
+              <ellipse id="observerRing" cx="310" cy="190" rx="257" ry="172" fill="none" stroke="url(#observerGrad)" stroke-width="2" opacity=".4" stroke-dasharray="8 11"/>
+              <path class="dhl-edge" data-x1="192" data-y1="120" data-x2="305" data-y2="88" d="M192 120 Q245 85 305 88"/>
+              <path class="dhl-edge" data-x1="305" data-y1="88" data-x2="430" data-y2="126" d="M305 88 Q368 92 430 126"/>
+              <path class="dhl-edge" data-x1="192" data-y1="120" data-x2="165" data-y2="235" d="M192 120 Q151 174 165 235"/>
+              <path class="dhl-edge" data-x1="430" data-y1="126" data-x2="452" data-y2="244" d="M430 126 Q474 181 452 244"/>
+              <path class="dhl-edge" data-x1="165" data-y1="235" data-x2="310" data-y2="205" d="M165 235 Q228 189 310 205"/>
+              <path class="dhl-edge" data-x1="452" data-y1="244" data-x2="310" data-y2="205" d="M452 244 Q383 198 310 205"/>
+              <path class="dhl-edge" data-x1="310" data-y1="205" data-x2="303" data-y2="302" d="M310 205 L303 302"/>
+              <path class="dhl-edge" data-x1="226" data-y1="291" data-x2="303" data-y2="302" d="M226 291 Q262 307 303 302"/>
+              <path class="dhl-edge" data-x1="303" data-y1="302" data-x2="390" data-y2="292" d="M303 302 Q350 309 390 292"/>
+              <path class="dhl-edge" data-x1="192" data-y1="120" data-x2="310" data-y2="205" d="M192 120 Q266 135 310 205"/>
+              <path class="dhl-edge" data-x1="430" data-y1="126" data-x2="310" data-y2="205" d="M430 126 Q356 140 310 205"/>
+              <g id="net-dmn" class="dhl-net-node" style="color:#9d75ff"><circle cx="192" cy="120" r="15" fill="#7258ff" fill-opacity=".5"/><text x="192" y="123" text-anchor="middle">DMN</text></g>
+              <g id="net-cen" class="dhl-net-node" style="color:#58dcff"><circle cx="305" cy="88" r="15" fill="#48c8ff" fill-opacity=".5"/><text x="305" y="91" text-anchor="middle">CEN</text></g>
+              <g id="net-sn" class="dhl-net-node" style="color:#ff5fd2"><circle cx="430" cy="126" r="15" fill="#ff5fd2" fill-opacity=".45"/><text x="430" y="129" text-anchor="middle">SN</text></g>
+              <g id="net-pfc" class="dhl-net-node" style="color:#58dcff"><circle cx="165" cy="235" r="15" fill="#58dcff" fill-opacity=".44"/><text x="165" y="238" text-anchor="middle">PFC</text></g>
+              <g id="net-insula" class="dhl-net-node" style="color:#43f5a6"><circle cx="452" cy="244" r="15" fill="#43f5a6" fill-opacity=".40"/><text x="452" y="247" text-anchor="middle">INS</text></g>
+              <g id="net-thalamus" class="dhl-net-node" style="color:#ffd28a"><circle cx="310" cy="205" r="17" fill="#ffd28a" fill-opacity=".42"/><text x="310" y="208" text-anchor="middle">THAL</text></g>
+              <g id="net-limbic" class="dhl-net-node" style="color:#ff6d8a"><circle cx="226" cy="291" r="15" fill="#ff6d8a" fill-opacity=".43"/><text x="226" y="294" text-anchor="middle">LIM</text></g>
+              <g id="net-striatum" class="dhl-net-node" style="color:#9d75ff"><circle cx="390" cy="292" r="15" fill="#9d75ff" fill-opacity=".43"/><text x="390" y="295" text-anchor="middle">STR</text></g>
+              <g id="net-brainstem" class="dhl-net-node" style="color:#58dcff"><circle cx="303" cy="302" r="14" fill="#58dcff" fill-opacity=".38"/><text x="303" y="305" text-anchor="middle">BS</text></g>
+              <circle class="dhl-pulse" r="3"/><circle class="dhl-pulse" r="2.6"/><circle class="dhl-pulse" r="2.2"/><circle class="dhl-pulse" r="3"/><circle class="dhl-pulse" r="2.4"/><circle class="dhl-pulse" r="2.8"/><circle class="dhl-pulse" r="2.2"/><circle class="dhl-pulse" r="2.7"/>
+              <text x="310" y="365" fill="#7e8da2" text-anchor="middle" font-size="9">dynamic systems visualization · not a diagnostic brain scan</text>
+            </svg>
+            <div class="dhl-stage-caption"><span>network reconfiguration</span><b id="neuroStateLabel">mixed adaptive state</b></div>
+          </div>
+          <div class="dhl-hero-actions">
+            <button class="dhl-button" data-preset="still">Stillness</button><button class="dhl-button" data-preset="focus">Will / focus</button><button class="dhl-button" data-preset="threat">Threat</button><button class="dhl-button" data-preset="recovery">Recovery</button><button class="dhl-button" data-preset="endurance">Endurance</button>
+          </div>
+        </div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-kicker">Move the state · do not merely read it</div>
+          <h3>Neurostate controls</h3>
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Attention stability</label><input id="attention" type="range" min="0" max="100" value="72" data-output="attentionOut"/><output id="attentionOut"></output></div>
+            <div class="dhl-control"><label>Arousal</label><input id="arousal" type="range" min="0" max="100" value="56" data-output="arousalOut"/><output id="arousalOut"></output></div>
+            <div class="dhl-control"><label>Valence</label><input id="valence" type="range" min="0" max="100" value="62" data-output="valenceOut"/><output id="valenceOut"></output></div>
+            <div class="dhl-control"><label>Stress load</label><input id="stress" type="range" min="0" max="100" value="34" data-output="stressOut"/><output id="stressOut"></output></div>
+            <div class="dhl-control"><label>Sleep sufficiency</label><input id="sleep" type="range" min="0" max="100" value="78" data-output="sleepOut"/><output id="sleepOut"></output></div>
+            <div class="dhl-control"><label>Reward drive</label><input id="reward" type="range" min="0" max="100" value="61" data-output="rewardOut"/><output id="rewardOut"></output></div>
+            <div class="dhl-control"><label>Inflammation proxy</label><input id="inflammation" type="range" min="0" max="100" value="22" data-output="inflammationOut"/><output id="inflammationOut"></output></div>
+            <div class="dhl-control"><label>Interoceptive clarity</label><input id="interoception" type="range" min="0" max="100" value="68" data-output="interoceptionOut"/><output id="interoceptionOut"></output></div>
+            <div class="dhl-control"><label>Social safety / trust</label><input id="social" type="range" min="0" max="100" value="66" data-output="socialOut"/><output id="socialOut"></output></div>
+            <div class="dhl-control"><label>Regulatory control</label><input id="regulation" type="range" min="0" max="100" value="76" data-output="regulationOut"/><output id="regulationOut"></output></div>
+          </div>
+          <div class="dhl-metric-grid">
+            <div class="dhl-metric" id="focusMetric"><b>0</b><span>focus / will</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="impulseMetric"><b>0</b><span>impulse pressure</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="resilienceMetric"><b>0</b><span>toughness / resilience</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="witnessMetric"><b>0</b><span>witness / meta-awareness</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="trustMetric"><b>0</b><span>trust openness</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="recoveryMetric"><b>0</b><span>recovery reserve</span><div class="dhl-meter"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="affectLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Feelings · love · trust · perception</div><h2>Affect & Perception Phase Space</h2></div><p>The luminous point moves in valence × arousal space. Its halo changes with regulatory dominance. Named emotions are regions, not hard biological compartments.</p></div>
+      <div class="dhl-affect-wrap">
+        <div class="dhl-glass dhl-panel"><div class="dhl-affect-space"><canvas id="affectCanvas"></canvas><div class="dhl-affect-labels"><span class="up">high arousal</span><span class="down">low arousal</span><span class="left">negative valence</span><span class="right">positive valence</span></div></div></div>
+        <div class="dhl-glass dhl-panel"><div class="dhl-kicker">Why this matters</div><h3>Feelings become trajectories</h3><p>Instead of telling the user “you are stressed” or “you should trust,” this view makes the system inspect how sleep, threat, social safety, interoception and control shift the location and stability of an affective state.</p><div class="dhl-formula">affect ≈ (valence, arousal, control) + context + memory + uncertainty</div><p class="dhl-subtle" style="margin-top:10px">This is a visualization scaffold for research and education—not an objective measurement of love, morality, courage or consciousness.</p></div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="enduranceLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Brain · heart · lung · muscle · gut · immune</div><h2>Endurance & Recovery Twin</h2></div><p>One session drives several reserves simultaneously. The body stays one connected model instead of six unrelated wellness cards.</p></div>
+      <div class="dhl-body-twin">
+        <div class="dhl-glass dhl-bodymap">
+          <svg viewBox="0 0 320 430" role="img" aria-label="Body-wide endurance and recovery map">
+            <path class="dhl-body-shell" d="M160 22c-28 0-48 20-48 47 0 22 12 38 29 45l-13 25-38 30c-11 9-17 25-14 39l14 74c2 12 11 20 22 20h6l-7 103c-1 13 8 23 20 23 10 0 18-7 20-18l9-73 9 73c2 11 10 18 20 18 12 0 21-10 20-23l-7-103h6c11 0 20-8 22-20l14-74c3-14-3-30-14-39l-38-30-13-25c17-7 29-23 29-45 0-27-20-47-48-47z"/>
+            <path class="dhl-body-flow" d="M160 76 C150 130 170 154 160 205 C150 260 169 287 160 354"/>
+            <g id="organ-brain" class="dhl-organ" style="color:#58dcff"><ellipse cx="160" cy="69" rx="27" ry="20" fill="#58dcff" fill-opacity=".6"/><text x="160" y="73" text-anchor="middle" fill="#fff" font-size="9">brain</text></g>
+            <g id="organ-lungs" class="dhl-organ" style="color:#9d75ff"><ellipse cx="139" cy="145" rx="19" ry="31" fill="#9d75ff" fill-opacity=".45"/><ellipse cx="181" cy="145" rx="19" ry="31" fill="#9d75ff" fill-opacity=".45"/><text x="160" y="148" text-anchor="middle" fill="#fff" font-size="8">lungs</text></g>
+            <g id="organ-heart" class="dhl-organ" style="color:#ff6d8a"><path d="M160 176c-26-20-43 17 0 46 43-29 26-66 0-46z" fill="#ff6d8a" fill-opacity=".62"/><text x="160" y="197" text-anchor="middle" fill="#fff" font-size="8">heart</text></g>
+            <g id="organ-gut" class="dhl-organ" style="color:#ffd28a"><path d="M130 232c17-20 53-16 60 8 6 21-8 54-31 57-25 4-47-15-42-37 3-13 17-17 30-9 14 9 19 27 7 38" fill="none" stroke="#ffd28a" stroke-width="9" stroke-linecap="round" opacity=".58"/><text x="160" y="268" text-anchor="middle" fill="#fff" font-size="8">gut</text></g>
+            <g id="organ-muscle" class="dhl-organ" style="color:#43f5a6"><path d="M104 182c-11 35-13 72 3 101M216 182c11 35 13 72-3 101M132 303c-10 43-11 75-9 105M188 303c10 43 11 75 9 105" fill="none" stroke="#43f5a6" stroke-width="10" stroke-linecap="round" opacity=".45"/><text x="93" y="319" fill="#fff" font-size="8">muscle</text></g>
+            <g id="organ-immune" class="dhl-organ" style="color:#ff5fd2"><circle cx="216" cy="226" r="15" fill="#ff5fd2" fill-opacity=".48"/><circle cx="225" cy="241" r="7" fill="#ff5fd2" fill-opacity=".38"/><text x="216" y="229" text-anchor="middle" fill="#fff" font-size="7">immune</text></g>
+          </svg>
+        </div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Intensity</label><input id="intensity" type="range" min="0" max="100" value="68" data-output="intensityOut"/><output id="intensityOut"></output></div>
+            <div class="dhl-control"><label>Duration</label><input id="duration" type="range" min="5" max="180" value="60" data-output="durationOut" data-unit="m"/><output id="durationOut"></output></div>
+            <div class="dhl-control"><label>Sleep</label><input id="endSleep" type="range" min="0" max="100" value="80" data-output="endSleepOut"/><output id="endSleepOut"></output></div>
+            <div class="dhl-control"><label>Fuel availability</label><input id="fueling" type="range" min="0" max="100" value="72" data-output="fuelingOut"/><output id="fuelingOut"></output></div>
+            <div class="dhl-control"><label>Hydration</label><input id="hydration" type="range" min="0" max="100" value="78" data-output="hydrationOut"/><output id="hydrationOut"></output></div>
+            <div class="dhl-control"><label>Heat strain</label><input id="heat" type="range" min="0" max="100" value="34" data-output="heatOut"/><output id="heatOut"></output></div>
+            <div class="dhl-control"><label>Training adaptation</label><input id="training" type="range" min="0" max="100" value="64" data-output="trainingOut"/><output id="trainingOut"></output></div>
+          </div>
+          <div class="dhl-energy">
+            <div class="dhl-metric" id="wPrimeMetric"><b>0</b><span>W′ reserve proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="glycogenMetric"><b>0</b><span>fuel reserve</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="autonomicMetric"><b>0</b><span>autonomic reserve</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="brainReserveMetric"><b>0</b><span>cognitive reserve</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="endRecoveryMetric"><b>0</b><span>recovery readiness</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="fatigueMetric"><b>0</b><span>fatigue pressure</span><div class="dhl-meter"><i></i></div></div>
+          </div>
+          <div class="dhl-timeline"><canvas id="enduranceCanvas"></canvas></div>
+          <div class="dhl-formula">if P &gt; CP: dW′/dt ≈ −(P − CP) · coupled here to fuel, heat and autonomic proxies</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="gutLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Gut · vagus · immune · brain</div><h2>Gut–Brain–Immune Axis</h2></div><p>Visualize a systems hypothesis: barrier integrity, microbial diversity, activity, sleep and stress influence inflammatory and vagal-state proxies that feed back into cognition.</p></div>
+      <div class="dhl-grid-2">
+        <div class="dhl-glass dhl-panel dhl-gut-stage">
+          <svg viewBox="0 0 620 360" role="img" aria-label="Gut brain immune axis visualization">
+            <defs><linearGradient id="dhlAxisGradient"><stop stop-color="#58dcff"/><stop offset=".5" stop-color="#9d75ff"/><stop offset="1" stop-color="#ff5fd2"/></linearGradient><radialGradient id="gutGrad"><stop stop-color="#ffd28a" stop-opacity=".85"/><stop offset="1" stop-color="#ff5fd2" stop-opacity=".05"/></radialGradient><radialGradient id="brainGrad"><stop stop-color="#58dcff" stop-opacity=".85"/><stop offset="1" stop-color="#9d75ff" stop-opacity=".02"/></radialGradient></defs>
+            <ellipse id="gutBrainGlow" cx="160" cy="100" rx="95" ry="70" fill="url(#brainGrad)" opacity=".65"/><path d="M103 102c17-55 95-64 116-7 18 49-23 84-76 67-34-10-48-31-40-60z" fill="none" stroke="#6ee7ff" stroke-width="3" opacity=".62"/><text x="160" y="104" text-anchor="middle" fill="#eaffff" font-size="12">brain networks</text>
+            <ellipse id="gutGlow" cx="454" cy="251" rx="105" ry="72" fill="url(#gutGrad)" opacity=".65"/><path d="M395 236c9-43 102-48 114-4 14 48-44 89-78 48-19-23-1-54 28-48 22 4 31 34 13 48" fill="none" stroke="#ffd28a" stroke-width="11" stroke-linecap="round" opacity=".62"/><text x="454" y="326" text-anchor="middle" fill="#fbe5c2" font-size="11">gut · barrier · metabolites</text>
+            <circle id="gutImmuneGlow" cx="455" cy="89" r="58" fill="#ff5fd2" opacity=".20"/><g fill="none" stroke="#ff77d8" opacity=".7"><circle cx="438" cy="77" r="13"/><circle cx="470" cy="96" r="10"/><circle cx="458" cy="64" r="7"/></g><text x="455" y="143" text-anchor="middle" fill="#efb8df" font-size="10">immune tone</text>
+            <path class="dhl-axis-path" d="M215 126 C300 134 350 210 399 238"/><path class="dhl-axis-path" d="M407 215 C380 148 360 101 493 91"/><path class="dhl-axis-path" d="M405 246 C318 276 256 198 192 140"/>
+            <circle class="dhl-axis-particle" cx="292" cy="159" r="4"/><circle class="dhl-axis-particle" cx="361" cy="208" r="3"/><circle class="dhl-axis-particle" cx="397" cy="144" r="3.5"/>
+          </svg>
+        </div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Fiber substrate</label><input id="fiber" type="range" min="0" max="100" value="70" data-output="fiberOut"/><output id="fiberOut"></output></div>
+            <div class="dhl-control"><label>Microbial diversity proxy</label><input id="diversity" type="range" min="0" max="100" value="68" data-output="diversityOut"/><output id="diversityOut"></output></div>
+            <div class="dhl-control"><label>Barrier integrity</label><input id="barrier" type="range" min="0" max="100" value="78" data-output="barrierOut"/><output id="barrierOut"></output></div>
+            <div class="dhl-control"><label>Sleep</label><input id="gutSleep" type="range" min="0" max="100" value="80" data-output="gutSleepOut"/><output id="gutSleepOut"></output></div>
+            <div class="dhl-control"><label>Stress</label><input id="gutStress" type="range" min="0" max="100" value="34" data-output="gutStressOut"/><output id="gutStressOut"></output></div>
+            <div class="dhl-control"><label>Physical activity</label><input id="activity" type="range" min="0" max="100" value="64" data-output="activityOut"/><output id="activityOut"></output></div>
+          </div>
+          <div class="dhl-metric-grid">
+            <div class="dhl-metric" id="scfaMetric"><b>0</b><span>SCFA-support proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="inflammationMetric"><b>0</b><span>inflammatory pressure</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="vagalMetric"><b>0</b><span>vagal-support proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="gutCognitionMetric"><b>0</b><span>cognitive support</span><div class="dhl-meter"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="moleculeLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Safe translational pharmacology sandbox</div><h2>Molecule → Receptor → Circuit → Mind</h2></div><p>Adjust abstract PK/PD parameters and watch receptor occupancy, exposure and CNS-effect proxies change. It does not generate a compound, synthesis route or patient prescription.</p></div>
+      <div class="dhl-molecule">
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-mol-view"><canvas id="moleculeCanvas"></canvas></div>
+          <div class="dhl-receptor"><div class="dhl-receptor-shape"></div><div id="conceptLigand" class="dhl-ligand"></div></div>
+        </div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Affinity proxy</label><input id="affinity" type="range" min="1" max="100" value="76" data-output="affinityOut"/><output id="affinityOut"></output></div>
+            <div class="dhl-control"><label>Selectivity</label><input id="selectivity" type="range" min="0" max="100" value="82" data-output="selectivityOut"/><output id="selectivityOut"></output></div>
+            <div class="dhl-control"><label>Exposure</label><input id="exposure" type="range" min="1" max="100" value="56" data-output="exposureOut"/><output id="exposureOut"></output></div>
+            <div class="dhl-control"><label>Half-life</label><input id="halfLife" type="range" min="1" max="24" value="8" data-output="halfLifeOut" data-unit="h"/><output id="halfLifeOut"></output></div>
+            <div class="dhl-control"><label>BBB relevance</label><input id="bbb" type="range" min="0" max="100" value="62" data-output="bbbOut"/><output id="bbbOut"></output></div>
+            <div class="dhl-control"><label>Intrinsic efficacy</label><input id="efficacy" type="range" min="0" max="100" value="68" data-output="efficacyOut"/><output id="efficacyOut"></output></div>
+          </div>
+          <div class="dhl-metric-grid">
+            <div class="dhl-metric" id="occupancyMetric"><b>0</b><span>occupancy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="effectMetric"><b>0</b><span>system effect</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="cnsMetric"><b>0</b><span>CNS-effect proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="offTargetMetric"><b>0</b><span>off-target pressure</span><div class="dhl-meter"><i></i></div></div>
+          </div>
+          <div class="dhl-pkplot"><canvas id="pkCanvas"></canvas></div>
+          <div class="dhl-formula">θ = C/(C + Kd) · C(t)=C₀e^(−kt) · k=ln(2)/t½</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="immuneLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Vaccine research visualization · no pathogen engineering</div><h2>Immunodynamics Studio</h2></div><p>Explore abstract antigen-presentation, innate signaling, humoral/cellular response, memory and tolerability. The studio intentionally has no sequence editor, construct designer, culture settings or viral optimization controls.</p></div>
+      <div class="dhl-immune">
+        <div class="dhl-glass dhl-panel"><div class="dhl-immune-stage"><canvas id="immuneCanvas"></canvas><div class="dhl-immune-legend"><span>cyan · humoral response</span><span>violet · cellular response</span><span>green · memory-support cells</span><span>gold core · presentation signal</span></div></div></div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Priming signal</label><input id="priming" type="range" min="0" max="100" value="72" data-output="primingOut"/><output id="primingOut"></output></div>
+            <div class="dhl-control"><label>Innate signal</label><input id="innate" type="range" min="0" max="100" value="56" data-output="innateOut"/><output id="innateOut"></output></div>
+            <div class="dhl-control"><label>Population match</label><input id="populationMatch" type="range" min="0" max="100" value="78" data-output="populationMatchOut"/><output id="populationMatchOut"></output></div>
+            <div class="dhl-control"><label>Memory support</label><input id="memorySupport" type="range" min="0" max="100" value="74" data-output="memorySupportOut"/><output id="memorySupportOut"></output></div>
+            <div class="dhl-control"><label>Baseline immunity</label><input id="baselineImmune" type="range" min="0" max="100" value="68" data-output="baselineImmuneOut"/><output id="baselineImmuneOut"></output></div>
+            <div class="dhl-control"><label>Tolerability</label><input id="tolerance" type="range" min="0" max="100" value="82" data-output="toleranceOut"/><output id="toleranceOut"></output></div>
+          </div>
+          <div class="dhl-metric-grid">
+            <div class="dhl-metric" id="presentationMetric"><b>0</b><span>presentation</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="antibodyMetric"><b>0</b><span>humoral proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="cellularMetric"><b>0</b><span>cellular proxy</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="durabilityMetric"><b>0</b><span>memory durability</span><div class="dhl-meter"><i></i></div></div>
+            <div class="dhl-metric" id="reactogenicMetric"><b>0</b><span>reactogenicity proxy</span><div class="dhl-meter"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section" id="translationLab">
+      <div class="dhl-titlebar"><div><div class="dhl-kicker">Data provenance · uncertainty · human oversight</div><h2>Evidence & Clinical Translation Gate</h2></div><p>The objective is not “fastest possible patient application.” The objective is fastest defensible translation: evidence must mature before clinical deployment.</p></div>
+      <div class="dhl-grid-2">
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-controls">
+            <div class="dhl-control"><label>Data quality</label><input id="dataQuality" type="range" min="0" max="100" value="76" data-output="dataQualityOut"/><output id="dataQualityOut"></output></div>
+            <div class="dhl-control"><label>Replication</label><input id="replication" type="range" min="0" max="100" value="64" data-output="replicationOut"/><output id="replicationOut"></output></div>
+            <div class="dhl-control"><label>Calibration</label><input id="calibration" type="range" min="0" max="100" value="72" data-output="calibrationOut"/><output id="calibrationOut"></output></div>
+            <div class="dhl-control"><label>Explainability</label><input id="explainability" type="range" min="0" max="100" value="84" data-output="explainabilityOut"/><output id="explainabilityOut"></output></div>
+            <div class="dhl-control"><label>External validation</label><input id="externalValidation" type="range" min="0" max="100" value="54" data-output="externalValidationOut"/><output id="externalValidationOut"></output></div>
+            <div class="dhl-control"><label>Human oversight</label><input id="humanOversight" type="range" min="0" max="100" value="92" data-output="humanOversightOut"/><output id="humanOversightOut"></output></div>
+          </div>
+          <div id="trustRing" class="dhl-trust-ring" style="--trust:0"><div><b id="trustScore">0</b><span>trust score</span></div></div>
+          <div class="dhl-metric" id="readinessMetric"><b>0</b><span id="translationGate">research / simulation only</span><div class="dhl-meter"><i></i></div></div>
+        </div>
+        <div class="dhl-glass dhl-panel">
+          <div class="dhl-kicker">Governed translation ladder</div><h3>From imagination to patient care</h3>
+          <div class="dhl-evidence-grid">
+            <div class="dhl-evidence-step" style="--h:18%"><b>Hypothesis</b><small>mechanism + falsifiable prediction</small></div>
+            <div class="dhl-evidence-step" style="--h:30%"><b>In silico</b><small>sensitivity + uncertainty</small></div>
+            <div class="dhl-evidence-step" style="--h:45%"><b>Preclinical</b><small>independent evidence</small></div>
+            <div class="dhl-evidence-step" style="--h:62%"><b>Clinical trial</b><small>protocol + endpoints + safety</small></div>
+            <div class="dhl-evidence-step" style="--h:78%"><b>External validation</b><small>transportability + calibration</small></div>
+            <div class="dhl-evidence-step" style="--h:94%"><b>Clinical use</b><small>clinician + governance + audit</small></div>
+          </div>
+          <div class="dhl-safe-gate">
+            <div><b>1 · provenance</b>Where did every parameter and dataset come from?</div>
+            <div><b>2 · uncertainty</b>What does the model not know?</div>
+            <div><b>3 · reproducibility</b>Can another group reproduce the result?</div>
+            <div><b>4 · validation</b>Does performance survive another population?</div>
+            <div><b>5 · oversight</b>Does a qualified human own the final decision?</div>
+          </div>
+          <div class="dhl-hero-actions"><button class="dhl-button" id="copyMethods">Copy methods snapshot</button><button class="dhl-button" id="resetLab">Reset simulations</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dhl-section">
+      <div class="dhl-grid-2">
+        <article class="dhl-glass dhl-reference"><div class="dhl-kicker">Scientific anchors</div><h3>Selected references</h3><ol>
+          <li>Dehaene S, Changeux J-P. Experimental and theoretical approaches to conscious processing. Neuron. 2011.</li>
+          <li>Friston K. The free-energy principle: a unified brain theory? Nat Rev Neurosci. 2010.</li>
+          <li>Schultz W, Dayan P, Montague PR. A neural substrate of prediction and reward. Science. 1997.</li>
+          <li>Posner MI, Petersen SE. The attention system of the human brain. Annu Rev Neurosci. 1990.</li>
+          <li>Tononi G, Boly M, Massimini M, Koch C. Integrated information theory. Nat Rev Neurosci. 2016.</li>
+          <li>Monod H, Scherrer J. The work capacity of a synergic muscular group. Ergonomics. 1965.</li>
+        </ol></article>
+        <article class="dhl-glass dhl-reference"><div class="dhl-kicker">Translational anchors</div><h3>Pharmacology & evidence</h3><ol>
+          <li>Hill AV. The possible effects of aggregation of the molecules of haemoglobin on its dissociation curves. J Physiol. 1910.</li>
+          <li>Collins FS, Varmus H. A new initiative on precision medicine. N Engl J Med. 2015.</li>
+          <li>Doudna JA, Charpentier E. The new frontier of genome engineering with CRISPR-Cas9. Science. 2014.</li>
+          <li>Plotkin SA. Vaccines: past, present and future. Nat Med. 2005.</li>
+          <li>All quantitative outputs on this page are simulation constructs unless linked to validated external datasets in a future evidence layer.</li>
+        </ol></article>
+      </div>
+    </section>
+
+    <footer class="dhl-footer">
+      PanaceaMed Deep Human Lab · research / educational simulation · vector + device-pixel-ratio rendering for high-density displays.<br />
+      It does not diagnose, prescribe, engineer pathogens, generate biological constructs, replace clinical trials or authorize patient treatment.
+    </footer>
+  </main>
+</div>
+<div id="dhlToast" class="dhl-toast" role="status" aria-live="polite"></div>
+<script src="/deep-human-lab-v2.js" defer></script>
+<script src="/deep-human-lab-v3.js" defer></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ import { Prosa } from '../../components/Prosa'
 import { wilayahUntuk, WILAYAH_ABDOMEN } from '../../lib/anatomy/wilayahAbdomen'
 
 const WilayahAbdomen3D = lazy(() => import('./WilayahAbdomen3D').then((m) => ({ default: m.WilayahAbdomen3D })))
+const HepatobiliaryPancreasTour3D = lazy(() => import('./HepatobiliaryPancreasTour3D'))
 
 export function WilayahAbdomenPanel() {
   const [terpilih, setTerpilih] = useState<string | null>(null)
@@ -42,14 +43,21 @@ export function WilayahAbdomenPanel() {
         )}
       </div>
 
+      <div className="pt-1">
+        <div className="mb-2">
+          <div className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">Deeper abdominal anatomy</div>
+          <h4 className="mt-0.5 text-sm font-black text-ink dark:text-white">Liver → bile ducts → gallbladder → pancreas</h4>
+          <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+            Continue from surface regions into a guided, rotatable 3D view made only from structures already registered in Panacea’s biliary/pancreatic atlas.
+          </p>
+        </div>
+        <Suspense fallback={<div className="h-[390px] w-full animate-pulse rounded-3xl bg-neutral-950" />}>
+          <HepatobiliaryPancreasTour3D />
+        </Suspense>
+      </div>
+
       <Prosa>
-        <p className="text-[11px] leading-relaxed text-neutral-500">
-          This is surface anatomy: which structures lie behind the abdominal wall in that region in an
-          average adult. It is not a list of causes of pain, not a differential, and it concludes nothing
-          about anyone. Pain does not obey this map — visceral pain is referred away from its organ, and
-          organs move with breathing, posture and body habitus. Region boundaries are conventions drawn on
-          a continuous wall, not structures in their own right.
-        </p>
+        <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">{'This is surface anatomy: which structures lie behind the abdominal wall in that region in an average adult. It is not a list of causes of pain, not a differential, and it concludes nothing about anyone. Pain does not obey this map — visceral pain is referred away from its organ, and organs move with breathing, posture and body habitus. Region boundaries are conventions drawn on a continuous wall, not structures in their own right.'}</Prosa>
       </Prosa>
     </div>
   )

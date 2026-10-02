@@ -1,6 +1,7 @@
 import { useStore } from '../lib/store'
 import { PusatKesehatanRealtime } from './Feed'
 import { VideoGallery } from '../components/VideoGallery'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // VitaPulse — pusat pemantauan kesehatan realtime: kalkulator (BMI, kalori,
 // cairan, tensi, VO2Max/Cooper), monitor vital, tidur, pengingat obat, berita,
@@ -15,6 +16,7 @@ export function VitaPulse() {
         <div>
           <h1 className="text-lg font-black text-ink">VitaPulse</h1>
           <p className="text-xs text-neutral-500">Monitor & calculate your health in real time</p>
+          <BatasKlaimKesehatan permukaan="wellness.vitapulse" className="mt-1 text-[11px] leading-snug text-neutral-500" />
         </div>
       </div>
       <div className="mb-4">

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { susunPekan, periksaAturan, kadensLariPekanan, perkiraanMenit, BATAS_ORGANIZER } from '../../src/lib/organizerLatihan.ts'
+import { susunPekan, periksaAturan, kadensLariPekanan, sesiLariAwal, perkiraanMenit, BATAS_ORGANIZER } from '../../src/lib/organizerLatihan.ts'
 
 // ── 1. Setiap kombinasi pilihan harus mematuhi aturan yang diiklankan ───────
 // Bukan satu contoh yang kebetulan rapi: SEMUA kombinasi yang bisa dipilih
@@ -52,6 +52,40 @@ assert.equal(perkiraanMenit([]), 0)
 const satu = perkiraanMenit([{ nama: 'x', pola: 'inti', set: 3, ulangan: '5', jeda: 60 }])
 const dua = perkiraanMenit([{ nama: 'x', pola: 'inti', set: 6, ulangan: '5', jeda: 60 }])
 assert.ok(dua > satu, 'more sets must estimate more time')
+
+// ── 4b. Lari tercatat BENAR-BENAR sampai ke rencananya ─────────────────────
+//
+// Versi pertama halaman ini mengatakan "dijadwalkan di sekitar lari yang sudah
+// Anda lakukan" dan mencetak rata-rata lari per pekan yang tercatat -- lalu
+// menyusun pekannya dari angka tetap 2. Cadangan `sesiLariTercatat` di
+// susunPekan tidak pernah terpakai karena `pilihan.sesiLari` selalu berupa
+// angka. Klaim di layar tidak didukung perilakunya, dan tidak ada satu pun uji
+// yang gagal karenanya.
+assert.equal(sesiLariAwal(null), 2, 'tanpa riwayat, nilai awalnya templat')
+assert.equal(sesiLariAwal(undefined), 2)
+assert.equal(sesiLariAwal(Number.NaN), 2, 'angka tidak sah tidak boleh menyamar sebagai data')
+assert.equal(sesiLariAwal(4), 4, 'empat lari tercatat harus menjadi empat, bukan dua')
+assert.equal(sesiLariAwal(3.4), 3)
+assert.equal(sesiLariAwal(3.6), 4)
+assert.equal(sesiLariAwal(99), BATAS_ORGANIZER.LARI_MAKS, 'dijepit ke yang bisa dijadwalkan')
+assert.equal(sesiLariAwal(-2), 0, 'tidak pernah negatif')
+
+// Dan angka itu harus BENAR-BENAR mengubah pekannya, bukan sekadar dicetak.
+{
+  const empat = susunPekan({ hariLatihan: 4, sesiLari: sesiLariAwal(4), fokus: 'seimbang' })
+  const satu = susunPekan({ hariLatihan: 4, sesiLari: sesiLariAwal(1), fokus: 'seimbang' })
+  const hitung = (p: ReturnType<typeof susunPekan>) => p.filter((h) => h.jenis === 'lari').length
+  assert.ok(hitung(empat) > hitung(satu), 'kadens tercatat yang berbeda harus menghasilkan pekan yang berbeda')
+}
+
+// Halaman harus memakainya, bukan menuliskan 2 sendiri.
+{
+  const halamanOrg = readFileSync('src/pages/OrganizerLatihan.tsx', 'utf8')
+  assert.match(halamanOrg, /sesiLari: sesiLariAwal\(tercatat\)/,
+    'the page must seed the run count from the recorded cadence, not a hard-coded number')
+  assert.doesNotMatch(halamanOrg, /sesiLari: 2\b/,
+    'a hard-coded 2 puts the claim on screen back out of step with the plan')
+}
 
 // ── 5. Batas biomedis: tidak ada beban, tidak ada klaim klinis ──────────────
 // Halaman ini menjadwalkan latihan; ia tidak boleh berubah menjadi resep.

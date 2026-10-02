@@ -32,6 +32,7 @@ import {
   type StageStall,
 } from '../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // The Care Episode Graph: connects a clinical plan to what actually has to
 // happen to carry it out — provider, cost, schedule, treatment, recovery,
@@ -97,6 +98,7 @@ export function CareEpisodePage() {
         title="Care journey"
         subtitle="Problem to prevention — everything a plan item triggers in the real world."
       />
+      <BatasKlaimKesehatan permukaan="care.episode" />
 
       <Card>
         <Field label="New care episode">

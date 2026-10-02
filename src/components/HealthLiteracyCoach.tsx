@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type Need = 'understand' | 'prepare' | 'medicines' | 'tests' | 'urgency'
 
@@ -33,7 +34,8 @@ export function HealthLiteracyCoach() {
 
   return (
     <section className="rounded-[30px] border border-neutral-200 bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.06)] dark:border-white/10 dark:bg-[#0d1117] sm:p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3"><div className="max-w-2xl"><div className="text-[9px] font-black uppercase tracking-[.16em] text-emerald-700 dark:text-emerald-300">Health Literacy Coach</div><h2 className="mt-1 text-xl font-black text-neutral-950 dark:text-white">Turn health information into better questions and safer next steps.</h2><p className="mt-1 text-[10px] leading-relaxed text-neutral-500">Use this before reading the complaint cards below. It does not diagnose or replace emergency care; it helps you organize the question you are trying to answer.</p></div><div className="rounded-full bg-neutral-100 px-3 py-2 text-[9px] font-black text-neutral-500 dark:bg-white/10 dark:text-neutral-300">Checklist {completion}%</div></div>
+      <div className="flex flex-wrap items-start justify-between gap-3"><div className="max-w-2xl"><div className="text-[9px] font-black uppercase tracking-[.16em] text-emerald-700 dark:text-emerald-300">Health Literacy Coach</div><h2 className="mt-1 text-xl font-black text-neutral-950 dark:text-white">Turn health information into better questions and safer next steps.</h2>
+      <BatasKlaimKesehatan permukaan="wellness.literacy-coach" /><p className="mt-1 text-[10px] leading-relaxed text-neutral-500">Use this before reading the complaint cards below. It does not diagnose or replace emergency care; it helps you organize the question you are trying to answer.</p></div><div className="rounded-full bg-neutral-100 px-3 py-2 text-[9px] font-black text-neutral-500 dark:bg-white/10 dark:text-neutral-300">Checklist {completion}%</div></div>
 
       <div className="no-scrollbar -mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-1">
         {(Object.keys(QUESTIONS) as Need[]).map((item) => <button key={item} type="button" onClick={() => choose(item)} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${need === item ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{QUESTIONS[item].title}</button>)}

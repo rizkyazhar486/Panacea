@@ -211,6 +211,61 @@ export function validateMultiscaleBridge(bridge: MultiscaleBridge): MultiscaleVa
   return { valid: uniqueReasons.length === 0, publicationReady, reasons: uniqueReasons }
 }
 
+/**
+ * Satu skala yang SENGAJA tidak punya simpul, beserta alasannya.
+ *  - withheld-by-policy: bukti yang ada ditolak kebijakan sumber.
+ *  - not-yet-modeled: bukti yang memenuhi syarat belum tercatat, jadi simpul tidak dibuat.
+ * Keduanya bukan izin untuk mengarang simpul pengganti.
+ */
+export interface WithheldScale {
+  scale: BiologicalScale
+  label: string
+  kind: 'withheld-by-policy' | 'not-yet-modeled'
+  reason: string
+  evidence: MultiscaleEvidenceRef | null
+}
+
+export interface EmptyScaleAudit {
+  /** Skala tanpa simpul dan tanpa alasan tercatat: kekosongan diam-diam. */
+  unexplained: BiologicalScale[]
+  /** Skala yang punya simpul tetapi juga mengaku "ditahan": catatan usang. */
+  contradicted: BiologicalScale[]
+  /** Skala ditahan dengan alasan kosong/spasi saja. */
+  blankReason: BiologicalScale[]
+  /** Skala dengan lebih dari satu catatan. */
+  duplicated: BiologicalScale[]
+  ok: boolean
+}
+
+/**
+ * Setiap skala di rel harus punya simpul ATAU alasan tercatat, tidak keduanya.
+ * Tanpa pemeriksaan ini sebuah tombol skala yang mati terbaca sebagai "belum
+ * dikerjakan", dan halaman bisa mengaku semua celah sudah dijelaskan padahal tidak.
+ */
+export function auditEmptyScales(bridge: MultiscaleBridge, withheld: readonly WithheldScale[]): EmptyScaleAudit {
+  const unexplained: BiologicalScale[] = []
+  const contradicted: BiologicalScale[] = []
+  const blankReason: BiologicalScale[] = []
+  const duplicated: BiologicalScale[] = []
+
+  for (const scale of SCALE_ORDER) {
+    const hasNode = bridge.nodes.some((node) => node.scale === scale)
+    const entries = withheld.filter((entry) => entry.scale === scale)
+    if (!hasNode && entries.length === 0) unexplained.push(scale)
+    if (hasNode && entries.length > 0) contradicted.push(scale)
+    if (entries.length > 1) duplicated.push(scale)
+    if (entries.some((entry) => !nonBlank(entry.reason))) blankReason.push(scale)
+  }
+
+  return {
+    unexplained,
+    contradicted,
+    blankReason,
+    duplicated,
+    ok: !unexplained.length && !contradicted.length && !blankReason.length && !duplicated.length,
+  }
+}
+
 export function nextScale(scale: BiologicalScale): BiologicalScale | null {
   const index = SCALE_ORDER.indexOf(scale)
   return index >= 0 && index < SCALE_ORDER.length - 1 ? SCALE_ORDER[index + 1] : null

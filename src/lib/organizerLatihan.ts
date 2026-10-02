@@ -143,6 +143,26 @@ export function kadensLariPekanan(
   return Math.round((waktu.length / pekan) * 10) / 10
 }
 
+/**
+ * Jumlah sesi lari yang dipakai SEBELUM orangnya menyentuh penggeser.
+ *
+ * Ini memperbaiki cacat yang saya kirim sendiri. Halaman ini mengatakan
+ * "dijadwalkan di sekitar lari yang sudah Anda lakukan" dan mencetak rata-rata
+ * lari per pekan yang benar-benar tercatat -- lalu menyusun pekannya dari
+ * angka tetap 2, karena `pilihan.sesiLari` selalu berupa angka sehingga
+ * cadangan `sesiLariTercatat` di susunPekan TIDAK PERNAH terpakai. Orang yang
+ * tercatat berlari empat kali sepekan tetap mendapat dua, tanpa satu pun galat
+ * dan tanpa satu pun uji gagal.
+ *
+ * Angka tercatat dibulatkan dan dijepit ke rentang yang bisa dijadwalkan.
+ * Tanpa sesi lari tersimpan hasilnya 2 -- sebuah nilai awal yang jujur
+ * disebut templat, bukan tebakan yang menyamar sebagai data.
+ */
+export function sesiLariAwal(tercatat: number | null | undefined): number {
+  if (tercatat === null || tercatat === undefined || !Number.isFinite(tercatat)) return 2
+  return Math.min(BATAS_ORGANIZER.LARI_MAKS, Math.max(0, Math.round(tercatat)))
+}
+
 function jepit(nilai: number, bawah: number, atas: number): number {
   if (!Number.isFinite(nilai)) return bawah
   return Math.min(atas, Math.max(bawah, Math.round(nilai)))

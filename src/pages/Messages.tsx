@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../lib/store'
+import { useSearchParams } from 'react-router-dom'
 import { ConsultChat } from '../components/ConsultChat'
 import { backendEnabled } from '../lib/api'
 import { IconSend, IconX } from '../components/icons'
@@ -27,9 +28,23 @@ function dmRoom(a: string, b: string): string {
 // (e.g. each other's name/handle) and connect instantly.
 export function Messages() {
   const { account } = useStore()
+  const [params] = useSearchParams()
   const [threads, setThreads] = useState<Thread[]>(loadThreads)
   const [open, setOpen] = useState<Thread | null>(null)
   const [draft, setDraft] = useState('')
+
+  useEffect(() => {
+    const peer = params.get('peer')?.trim()
+    if (!peer || !account) return
+    const existing = loadThreads().find((thread) => thread.peer.toLowerCase() === peer.toLowerCase())
+    const thread = existing ?? { id: Math.random().toString(36).slice(2), peer }
+    if (!existing) {
+      const next = [thread, ...loadThreads()]
+      setThreads(next)
+      saveThreads(next)
+    }
+    setOpen(thread)
+  }, [params, account])
 
   if (!account) return null
   const me = account.name

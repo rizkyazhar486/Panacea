@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconHeart } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Air Quality & Respiratory Risk — GPS air quality from the free Open-Meteo
@@ -76,9 +77,13 @@ export function AirQuality() {
         <SectionTitle
           icon={<IconActivity size={20} />}
           title="Air Quality & Respiratory Risk"
-          subtitle="Live local air quality, with advice tailored to your lungs"
+          subtitle="Open-Meteo AQI with heuristic sensitive-group tips — not a clinically validated Panacea respiratory decision"
           right={<button onClick={locate} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">📍 Refresh</button>}
         />
+        <BatasKlaimKesehatan permukaan="environment.air-quality" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Location is used only to fetch air-quality data. Tips are general US-AQI banding plus optional self-identified sensitivity — follow your own asthma/COPD action plan and local public-health alerts.
+        </p>
 
         <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-ink">
           <input type="checkbox" checked={sensitive} onChange={(e) => setSens(e.target.checked)} />

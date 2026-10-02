@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconSparkle, IconHeart, IconChartUp, IconActivity } from '../components/icons'
 import { getHealthCache, pushBiometrics } from '../lib/profile'
 
@@ -203,6 +204,7 @@ export function AestheticVitality() {
           subtitle="The science of looking healthy and well — read as vitality, not as a judgement. Body-proportion, skin and recovery markers sync automatically from your Health Profile and Body Composition."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
+        <BatasKlaimKesehatan permukaan="longevity.aesthetic-vitality" />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
         <div className="mt-3 flex items-center gap-5">
           <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
@@ -222,7 +224,7 @@ export function AestheticVitality() {
           <div className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             {score == null
               ? 'Enter or sync at least three indicators below to see your Aesthetic Vitality Index — a blend of proportion, body composition, skin-repair, and vitality signals that research links to a healthy, attractive appearance.'
-              : <>Your index combines <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition moves it, and each also adds years of healthspan.</>}
+              : <>Your index combines <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition can move it. It is not a beauty ranking or a clinical prognosis.</>}
           </div>
         </div>
       </Card>

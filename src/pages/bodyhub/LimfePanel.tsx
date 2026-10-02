@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import {
   STASIUN_LIMFE, WILAYAH_LIMFE, stasiunDiWilayah, stasiunUntuk, semuaMeshTerikat,
@@ -7,21 +7,44 @@ import {
 
 const Limfe3D = lazy(() => import('./Limfe3D').then((m) => ({ default: m.Limfe3D })))
 
-// Panel limfe: model DAN daftar, keduanya setara.
-//
-// 3D tidak bisa dipakai dengan papan tombol, dan tidak semua orang bisa
-// menunjuk benda sekecil satu nodus. Daftar di bawah karena itu bukan
-// pelengkap: setiap stasiun bisa dipilih dari sana, dan pilihan dari mana pun
-// menyalakan stasiun yang sama.
-
 export function LimfePanel() {
   const [terpilih, setTerpilih] = useState<string | null>(null)
   const [wilayah, setWilayah] = useState<WilayahLimfe>('head-neck')
+  const [turBerjalan, setTurBerjalan] = useState(false)
   const stasiun = terpilih ? stasiunUntuk(terpilih) : undefined
   const daftar = useMemo(() => stasiunDiWilayah(wilayah), [wilayah])
+  const indeksAktif = daftar.findIndex((s) => s.id === terpilih)
 
   const pilih = (id: string) => {
     setTerpilih((lama) => (lama === id ? null : id))
+  }
+
+  const pindahTur = (arah: -1 | 1) => {
+    if (!daftar.length) return
+    const asal = indeksAktif < 0 ? (arah > 0 ? -1 : 0) : indeksAktif
+    const berikut = (asal + arah + daftar.length) % daftar.length
+    setTerpilih(daftar[berikut].id)
+  }
+
+  useEffect(() => {
+    if (!turBerjalan || daftar.length === 0) return
+    if (indeksAktif < 0) setTerpilih(daftar[0].id)
+    const timer = window.setInterval(() => {
+      setTerpilih((aktif) => {
+        const i = daftar.findIndex((s) => s.id === aktif)
+        return daftar[(i + 1 + daftar.length) % daftar.length].id
+      })
+    }, 3200)
+    return () => window.clearInterval(timer)
+  }, [turBerjalan, daftar, indeksAktif])
+
+  const pilihWilayah = (id: WilayahLimfe) => {
+    setTurBerjalan(false)
+    setWilayah(id)
+    // Tanpa pilihan otomatis: memilih stasiun pertama membuat klik berikutnya pada
+    // stasiun yang sama melepas pilihan (toggle) dan menyalakan model sebelum
+    // pengguna memilih. Tur memulai dari stasiun pertama lewat tombol berikut/Auto tour.
+    setTerpilih(null)
   }
 
   return (
@@ -36,22 +59,45 @@ export function LimfePanel() {
         </Prosa>
       </div>
 
-      <Suspense fallback={<div className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
-        <Limfe3D terpilih={terpilih} onPilih={(id) => setTerpilih(id)} />
+      <Suspense fallback={<div role="status" aria-label="Loading lymphatic anatomy" className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
+        <Limfe3D terpilih={terpilih} onPilih={(id) => { setTurBerjalan(false); setTerpilih(id) }} />
       </Suspense>
 
+      <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] p-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">Guided 3D tour</div>
+            <div className="mt-0.5 text-[11px] text-neutral-600 dark:text-neutral-300">
+              {indeksAktif >= 0 ? `${indeksAktif + 1} / ${daftar.length} · ${daftar[indeksAktif].label}` : `${daftar.length} stations in this region`}
+            </div>
+          </div>
+          <div className="flex gap-1.5" role="group" aria-label="Lymphatic guided tour controls">
+            <button type="button" onClick={() => { setTurBerjalan(false); pindahTur(-1) }} aria-label="Previous lymph node station"
+              className="min-h-11 min-w-11 rounded-xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] px-3 text-sm font-black text-ink dark:text-white">‹</button>
+            <button type="button" onClick={() => setTurBerjalan((v) => !v)} aria-pressed={turBerjalan}
+              className={`min-h-11 rounded-xl px-4 text-[11px] font-black ${turBerjalan ? 'bg-[#00BF63] text-white' : 'border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] text-ink dark:text-white'}`}>
+              {turBerjalan ? 'Pause' : 'Auto tour'}
+            </button>
+            <button type="button" onClick={() => { setTurBerjalan(false); pindahTur(1) }} aria-label="Next lymph node station"
+              className="min-h-11 min-w-11 rounded-xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] px-3 text-sm font-black text-ink dark:text-white">›</button>
+          </div>
+        </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/10 dark:bg-white/10" aria-hidden="true">
+          <div className="h-full rounded-full bg-[#00BF63] transition-[width] duration-300"
+            style={{ width: `${daftar.length && indeksAktif >= 0 ? ((indeksAktif + 1) / daftar.length) * 100 : 0}%` }} />
+        </div>
+      </div>
+
       <p className="text-[11px] leading-relaxed text-neutral-500">
-        Tap a station on the model, or use the list below. The view moves in close when you choose one —
-        a single node is a few millimetres across on a whole body, and would otherwise be invisible.
+        Tap a station on the model, use the list, or start the guided tour. The camera moves to each source-backed
+        node group in turn; this is an anatomical orientation tour, not a simulation of lymph transport.
       </p>
 
-      {/* Pemilih wilayah, lalu daftar. Setiap stasiun bisa dicapai tanpa
-          menyentuh model sama sekali. */}
       <div role="group" aria-label="Body regions" className="flex flex-wrap gap-1.5">
         {WILAYAH_LIMFE.map((w) => (
           <button key={w.id} type="button" aria-pressed={wilayah === w.id}
-            onClick={() => setWilayah(w.id)}
-            className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition ${
+            onClick={() => pilihWilayah(w.id)}
+            className={`min-h-11 rounded-full px-3 py-2 text-[11px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF63] focus-visible:ring-offset-2 ${
               wilayah === w.id
                 ? 'bg-[#00BF63] text-white'
                 : 'bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] text-ink dark:text-white'
@@ -61,11 +107,11 @@ export function LimfePanel() {
         ))}
       </div>
 
-      <div role="group" aria-label="Lymph node stations" className="grid gap-1.5">
+      <div role="group" aria-label="Lymph node stations" className="grid gap-1.5 sm:grid-cols-2">
         {daftar.map((s) => (
           <button key={s.id} type="button" aria-pressed={terpilih === s.id}
-            onClick={() => pilih(s.id)}
-            className={`rounded-xl px-3 py-2 text-left text-[12px] font-bold leading-tight transition ${
+            onClick={() => { setTurBerjalan(false); pilih(s.id) }}
+            className={`min-h-11 rounded-xl px-3 py-2 text-left text-[12px] font-bold leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF63] focus-visible:ring-offset-2 ${
               terpilih === s.id
                 ? 'bg-[#00BF63] text-white'
                 : 'bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] text-ink dark:text-white'
@@ -98,8 +144,6 @@ export function LimfePanel() {
         )}
       </div>
 
-      {/* Prosa hanya melipat anak berupa string, jadi tiap paragraf dikirim
-          utuh sebagai string -- juga supaya tidak ada <p> di dalam <p>. */}
       <Prosa kelas="text-[11px] leading-relaxed text-neutral-500" baris={2}>
         {'What this atlas does not carry: there are no lymphatic vessels in this model — no thoracic duct, no cisterna chyli, no lymph trunks. Only the nodes and the lymphoid organs were modelled. Nothing here has been mirrored, substituted or drawn in to cover that gap: the connections between stations exist in the text, not in the geometry. Two labelled stations in the source file, "Cubital nodes" and "Inferior deep lateral cervical nodes", carry no geometry of their own, so they are shown through the named nodes that sit inside them.'}
       </Prosa>
@@ -107,7 +151,6 @@ export function LimfePanel() {
       <Prosa kelas="text-[11px] leading-relaxed text-neutral-500" baris={2}>
         {'Limits: these are standard gross-anatomy drainage relationships for orientation — which region of the body drains to which group of nodes in an adult. This is not staging, says nothing about the spread of disease or about prognosis, and concludes nothing about any individual. Lymphatic drainage varies between people and has many alternative routes, and node groups are conventional names for clusters that are inconstant in number and position.'}
       </Prosa>
-
     </div>
   )
 }

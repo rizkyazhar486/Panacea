@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
@@ -233,17 +234,15 @@ export function Arteri3D({ terpilih, onPilih, onTerikat, tinggi = 320 }: Arteri3
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let raf = 0
-    const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+    // Loop berhenti saat offscreen / tab tersembunyi (helper bersama).
+    const loop = mulaiLoopTerjaga(wadah, () => {
       controls.update()
       renderer.render(scene, camera)
-    }
-    raf = requestAnimationFrame(gambar)
+    })
 
     return () => {
       batal = true
-      cancelAnimationFrame(raf)
+      loop.hentikan()
       terapkanRef.current = null
       renderer.domElement.removeEventListener('pointerdown', klik)
       ro.disconnect()

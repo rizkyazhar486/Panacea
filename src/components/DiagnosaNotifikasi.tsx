@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
 import { pushSupported, resyncPush } from '../lib/push'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mengapa notifikasi tidak berbunyi — diperiksa mata rantai demi mata rantai.
@@ -161,6 +162,7 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
 
   return (
     <div className="border-t border-neutral-100 py-2 dark:border-white/10">
+      <BatasKlaimKesehatan permukaan="clinical.diagnosis-notify" />
       <button onClick={() => setBuka((b) => !b)} className="t-kecil flex min-h-[40px] w-full items-center justify-between gap-2 font-bold text-brand">
         <span>Notifications not arriving? Check here</span>
         <span aria-hidden>{buka ? '▴' : '▾'}</span>

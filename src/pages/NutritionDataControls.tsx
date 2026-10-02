@@ -9,6 +9,7 @@ import {
   sanitizeNutritionJournal,
   serializeNutritionJournal,
 } from '../lib/nutritionJournal'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 interface StatusMessage {
   kind: 'idle' | 'success' | 'error'
@@ -86,6 +87,7 @@ export function NutritionDataControls() {
 
   return (
     <div className="space-y-4">
+      <BatasKlaimKesehatan permukaan="longevity.nutrition-data-controls" />
       <section className="rounded-3xl border border-neutral-200 bg-white p-5 dark:border-white/10 dark:bg-white/[0.02]">
         <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Nutrition journal · local data controls</div>
         <h3 className="mt-2 text-xl font-black text-ink dark:text-white">Portable without inventing data</h3>
@@ -99,7 +101,7 @@ export function NutritionDataControls() {
             <div className="mt-1 text-2xl font-black text-ink dark:text-white">{state.foods.length}</div>
           </div>
           <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
-            <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Validated now</div>
+            <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Accepted now</div>
             <div className="mt-1 text-2xl font-black text-emerald-600">{journal.entries.length}</div>
           </div>
           <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
@@ -110,7 +112,7 @@ export function NutritionDataControls() {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button type="button" onClick={exportJournal} className="min-h-11 rounded-full bg-brand px-4 text-xs font-black text-white">
-            Export validated JSON
+            Export accepted JSON
           </button>
           <label className="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-neutral-300 px-4 text-xs font-black text-neutral-700 dark:border-white/15 dark:text-neutral-200">
             Import local JSON
