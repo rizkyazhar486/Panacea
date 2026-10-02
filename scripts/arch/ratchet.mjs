@@ -18,8 +18,9 @@ export const IMPURE_PATTERNS = {
   'new Date()': /\bnew Date\(\)/,
   'Math.random': /\bMath\.random\(/,
   fetch: /(?<![\w.$])fetch\(/,
-  window: /(?<![\w.$])window\./,
-  document: /(?<![\w.$])document\./,
+  // Harus diikuti pengenal: kata "window." di akhir kalimat dalam string bukan akses DOM.
+  window: /(?<![\w.$])window\.[A-Za-z_$]/,
+  document: /(?<![\w.$])document\.[A-Za-z_$]/,
 }
 
 const KODE = /\.tsx?$/
