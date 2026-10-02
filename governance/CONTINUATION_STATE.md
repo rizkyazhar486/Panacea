@@ -1,41 +1,39 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
-Updated 2026-09-26 (scheduled autonomous session). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md; sequencing per docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md.
+Updated 2026-10-02 (autonomous Final Convergence session). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
 
-main_sha: (this session's commit, pushed on top of db38eb3 — see git log for exact SHA)
-working_branch: main
-latest_verified_commit: this session's commit
+main_sha: c5cd71e5f. CI at this exact head, all success: Stabilization Acceptance, Body 3D Render Acceptance, Security Baseline Enforcement, Clinical Evidence Gate, Deploy to GitHub Pages, Vercel Prebuilt Production.
+working_branch: docs/continuation-state-2026-10-02 (docs only)
 
 completed_this_session:
-- closed MATURITY_REGISTRY known_gap `link_code_ui_for_doctor_not_browser_verified` on `clinical.patient_review` (AI-EMR + longitudinal clinician workflow lane, the tier right after hard-safety/clinical-validation-enablement per the balanced gap closure ordering). The doctor-facing `TerbitkanKodeTaut` component (`src/components/TautanRekamPraktik.tsx`) could issue a one-time link code but had no way to see whether the practice patient record was already linked to a patient account, and no unlink control — only the patient side (`TebusKodeTaut`) had that. `GET /api/clinical/links` only ever returns the caller's own links, so a clinician had no status signal at all.
-- added `statusTautanPasien()` (`server/src/aksesKlinis.ts`) and `GET /api/clinical/patient/:patientId/link-status` (clinician/owner only, 403 otherwise), returning `{ linked, linkedAt }` **without** the patient's `userId` — deliberately preserving the existing privacy rule that a link is explicit and patient-approved, so the doctor learns only that a link exists, not which account.
-- wired the doctor UI to fetch that status on mount and show "Linked to the patient's own account · since <date>" with an Unlink button when linked, falling back to the existing create-code flow when not.
-- verified end-to-end against a real running server (dev-login owner/doctor/patient, owner verifies doctor STR, doctor creates a practice patient, checks status false, issues a code, patient redeems it, doctor's status flips to true with a timestamp, doctor unlinks, status flips back to false; a patient-role caller gets 403 on the new route) — this is the "browser-verified" evidence the known_gap was named for, done at the HTTP layer since no UI framework/browser harness was already wired in this worktree.
-- extended `server/uji/tautanPasien.uji.ts` (`statusTautanPasien` never leaks `userId`) and `scripts/uji/tautan-rekam-praktik.mts` (route wiring + doctor unlink button source-pattern assertions).
-- updated `governance/MATURITY_REGISTRY.yaml` (`clinical.patient_review.known_gaps` and a dated `change_log` entry).
+- UI at 390x844 (one hero + one-word closed folds, content stays in the DOM): Health Data, League, Longevity, VitaPulse (#2194, #2195, #2196, #2197) and Body Exposure (#2201, #2204, #2208). Committed baseline, words visible: health-data 209, ranked 173, longevity 154, vitapulse 164, body-exposure 460 (was 593 before #2201). Body Exposure's remaining words sit inside the unified 3D projector. Its two modality selectors (mode rail and domain tabs) are intentionally untouched: flattening them changes behaviour browser tests rely on and needs an owner decision.
+- Dependency security: server production highs 2 -> 0 by lockfile-only patches (#2210: axios 1.20.0, ip-address 10.7.3, body-parser, qs, express), react-router-dom 6.30.6 (#2211), and a fail-closed audit gate with expiring, reasoned acceptances (#2212: `scripts/qa/dependency-audit-gate.mjs`, `governance/dependency-audit-policy.json`, `.github/workflows/dependency-audit.yml`, `risk.dependency_supply_chain`). After the #2210 merge the live Render service reported revision 437c08a about 80 s later and passed the capability and auth-boundary smoke.
+- CI observability (#2213): `body3d-canvas-artifact.mjs` now writes `artifacts/body3d-mobile-canvas-failure.json` when it fails. There is deliberately no screenshot (legacy guard `scripts/uji/body3d-visual-artifact.mts` forbids it).
+- Correction of earlier claims in this session's reports: #2193 is an anatomy asset-schema fix, not Training folding. No Training/Move folding was ever merged or pending; the remote branch `feat/health-training-folds` only holds the pre-squash League commit already merged as #2195.
 
 current_blocker:
-- none in code. This closes one named known_gap; `clinical.patient_review` still carries `self_id_still_email_derived_for_self_records`, `anamnesis_and_exam_fields_have_no_per_field_origin`, `clinician_usability_test` and `clinical_validation` (the last two are externally blocked on real clinicians, per `risk.clinical_validation_external_dependency` — do not fabricate).
+- none in code.
 
 failing_checks:
-- none. Frontend `npm run uji` 500/500, server `npm run uji` 0 gagal across every suite, `npx tsc -b` clean, all confirmed in this session after a fresh `npm install` in both `/` and `/server`.
+- none at the main head above. Known intermittent: Stabilization Acceptance, step "Body Exposure rendered WebGL visual artifact", fails with `locator.evaluate: Timeout 20000ms exceeded` at `placeCanvasOnscreen` (the canvas was visible, then gone). Seen 3 times on 2026-10-02 (PR #2194 attempt 1, PR #2211 attempt 1, main@1091ab3); each passed on rerun or on the next head. Not reproduced in 8 local runs. On the next occurrence read `canvasCount`, `targetCanvasCount`, `webglEvents` and `bodyText` in `body3d-mobile-canvas-failure.json` (artifact `body3d-mobile-qa`) before rerunning; the cause is still unknown.
 
-next_exact_action (pick the next software-addressable item per the balanced gap closure order — hard safety → clinical-validation enablement → AI-EMR/longitudinal workflow → weakest core maturity gap):
-- `clinical.patient_review` known_gap `anamnesis_and_exam_fields_have_no_per_field_origin`: per-item provenance already exists for problems/plan/diagnosis (`server/uji/asalButirKlinis.uji.ts`, 2026-09-26); anamnesis and exam fields still have no per-field origin stamp. Extend the same server-stamped-origin pattern to those fields.
-- or `self_id_still_email_derived_for_self_records`: the `self-<email-hash>` scheme is a known collision surface (mitigated by the reverse-lookup check in `bolehAksesPasien`, but not a real identity binding). Consider whether a durable self-record id independent of email is worth the migration cost before touching it — this one is riskier/larger, read `server/src/aksesKlinis.ts` comments first.
-- if both feel too large for one session, re-scan `governance/MATURITY_REGISTRY.yaml` known_gaps across all four core workflows for the next smallest concrete, software-addressable item before touching Body Exposure (VisSim-OS et al. are already ahead of the core-maturity lanes per the 2026-09-25 sequencing override and should not get further disproportionate attention until the core lanes are more level).
+open_work_of_other_lanes:
+- PR #2209 (Render live provenance should expect the latest `server/**` commit): a push that changes only `render-live-smoke.yml` currently false-fails because Render does not redeploy. Root cause independently confirmed from the live log. Leave it to its lane.
 
-files_in_scope:
-- server/src/{aksesKlinis,index}.ts, server/uji/tautanPasien.uji.ts
-- src/components/TautanRekamPraktik.tsx, src/lib/api.ts
-- scripts/uji/tautan-rekam-praktik.mts
+owner_verification (cannot be checked from the agent sandbox: outbound traffic to Render is blocked):
+- Production `/api/health` must report `modePenyimpanan: "mongo"`. File mode loses every account on each Render redeploy, and any merge touching `server/**` redeploys.
+- Decide whether Body Exposure's two modality selectors should become one.
+
+residual_risks (accepted, tracked in `risk.dependency_supply_chain`): `gaxios -> uuid` (fix needs google-auth-library 9 -> 10) and `react-router < 7.18` (fix needs the v7 migration; client-only HashRouter, no SSR). P3, unfixed: `/api/cron/daily-briefing` takes its secret in the query string and compares with `!==`; `/api/posts/:id/like` is anonymous.
+
+next_exact_action: re-scan the registries and pick the weakest core lane. At this head the only software-addressable gaps in `MATURITY_REGISTRY.yaml` are on `physiology.canonical_to_model_to_reality` (`limited_domain_coupling_coverage`, `limited_projection_wiring`, `no_patient_specific_parameter_identifiability_contract`); every other listed gap needs external validation, live infrastructure or human review. Prefer vertical depth on one of those over new breadth (`PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`).
 
 do_not_touch:
 - open PRs of other agents unless integrating; re-check `git log --oneline -20 origin/main` for concurrent work before starting, since main moves between sessions.
 
 verification_commands:
-- npm install   (run in both `/` and `/server` on a fresh worktree, or `npm run uji` false-fails on missing deps)
-- npm run uji   (500/500 at this session's commit)
-- (cd server && npm install && npm run uji)   (0 gagal at this session's commit)
-- npx tsc -b   (clean)
-- HTTP proof for the link-status endpoint (no browser harness needed): start `server` with `ALLOW_DEV_LOGIN=true PANACEA_DATA_FILE=<tmp>`, dev-login as `OWNER_EMAIL` (owner), a doctor and a patient with separate cookie jars, verify the doctor via `POST /api/doctors/:id/verify`, then walk create-patient → link-status(false) → issue-code → redeem → link-status(true) → unlink → link-status(false).
+- `npm ci` in both `/` and `/server` on a fresh worktree. The server suite imports root modules, so a missing root `node_modules` false-fails with `Cannot find package 'react'`.
+- `npm run uji` (630 files; 630/630 passed on the #2213 branch before it merged) and `node --test scripts/qa/*.test.mjs` (396/396 at the head above; `npm run build` runs this glob).
+- `cd server && npm run typecheck && npm run build && npm run uji` (exit 0 at #2210).
+- Dependency gate: `npm audit --omit=dev --json > audit.json; node scripts/qa/dependency-audit-gate.mjs --workspace web --file audit.json`; for the server run it from `server/` with `--workspace server --policy ../governance/dependency-audit-policy.json`.
+- Local browser QA in the agent sandbox: `node_modules/@playwright/test` there is a `0.0.0` shim. Install `@playwright/test@1.55.1` outside the repo, symlink it into `scripts/qa/node_modules/@playwright/test` (untracked), and preload a module that gives `chromium.launch` the sandbox Chromium `executablePath`. Commit nothing from that setup.
