@@ -72,6 +72,13 @@ function di_luar(nilai: number, j: JenisLab): boolean {
   return (typeof j.bawah === 'number' && nilai < j.bawah) || (typeof j.atas === 'number' && nilai > j.atas)
 }
 
+/** Tanggal kalender nyata: V8 menggeser '2024-02-31' ke 2 Maret tanpa galat, jadi cocokkan balik. */
+function tanggalNyata(tanggal: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return false
+  const t = Date.parse(`${tanggal}T00:00:00Z`)
+  return Number.isFinite(t) && new Date(t).toISOString().slice(0, 10) === tanggal
+}
+
 function hari(tanggal: string): number {
   return Date.parse(`${tanggal}T00:00:00Z`) / 864e5
 }
@@ -93,7 +100,7 @@ export function analisisTrenSeri(
 
 export function analisisTrenLab(butirMentah: readonly ButirLab[], jenis: JenisLab): TrenLab | null {
   const butir = butirMentah
-    .filter((b) => Number.isFinite(b.nilai) && /^\d{4}-\d{2}-\d{2}$/.test(b.tanggal))
+    .filter((b) => Number.isFinite(b.nilai) && tanggalNyata(b.tanggal))
     .slice()
     .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
   if (!butir.length) return null

@@ -80,6 +80,19 @@ const b = (t: string, n: number) => ({ id: t, tanggal: t, nilai: n })
   assert.equal(r.garisDasar, 92)
 }
 
+// ── Tanggal kalender yang tidak ada (31 Februari) dibuang, bukan digeser diam-diam ke 2 Maret.
+//    Berpasangan: hanya tanggal itu yang berbeda antara dua kasus.
+{
+  const dasar = [b('2023-01-01', 90), b('2023-07-01', 92), b('2024-01-01', 94)]
+  const ada = analisisTrenLab([...dasar, b('2024-02-29', 93)], LDL)!
+  assert.equal(ada.jumlahRiwayat, 4, '29 Feb 2024 (tahun kabisat) adalah tanggal nyata dan harus diterima')
+  const tidakAda = analisisTrenLab([...dasar, b('2024-02-31', 93)], LDL)!
+  assert.equal(tidakAda.jumlahRiwayat, 3, '31 Feb 2024 tidak ada di kalender tetapi ikut dihitung')
+  assert.equal(tidakAda.terakhir, 94, 'hasil dengan tanggal mustahil menjadi "terakhir"')
+  assert.equal(analisisTrenLab([...dasar.slice(0, 2), b('2023-02-29', 1)], LDL)!.jumlahRiwayat, 2, '29 Feb 2023 (bukan kabisat) lolos')
+  assert.equal(analisisTrenLab([b('2024-13-01', 1)], LDL), null, 'bulan 13 lolos')
+}
+
 // ── Mesin ini tidak boleh punya tingkat "urgent".
 {
   const src = readFileSync(new URL('../../src/lib/labTrend.ts', import.meta.url), 'utf8')
