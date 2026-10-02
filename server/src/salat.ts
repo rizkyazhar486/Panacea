@@ -1,5 +1,6 @@
 import { getSettings, saveSettings } from './store.js'
 import { notify } from './push.js'
+import { deliverThenCommitAlertState } from './healthAlerts.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pengingat SEBELUM waktu salat, dikirim server.
@@ -103,14 +104,19 @@ export async function checkPrayerReminder(userId: string): Promise<SalatCheck> {
     if (beda > 2) continue
     if (sudah[s.id] === tanggal) continue
 
-    saveSettings(userId, { salatLastFired: { ...sudah, [s.id]: tanggal } })
     const jam = `${String(Math.floor(waktu / 60)).padStart(2, '0')}.${String(waktu % 60).padStart(2, '0')}`
-    await notify(userId, {
-      title: lead > 0 ? `🕌 ${lead} menit lagi ${s.nama}` : `🕌 Waktu ${s.nama}`,
-      body: `${s.nama} pukul ${jam} di ${kota}. Sumber jadwal: AlAdhan.`,
-      url: './#/prayer-times',
-      tag: `salat-${s.id}`,
-    }, 'notifSalat').catch(() => {})
+    // Kirim dulu, baru tandai: penanda yang ditulis sebelum kirim menekan semua percobaan
+    // ulang bila penulisan notifikasi gagal (lihat deliverThenCommitAlertState).
+    const hasil = await deliverThenCommitAlertState(
+      () => notify(userId, {
+        title: lead > 0 ? `🕌 ${lead} menit lagi ${s.nama}` : `🕌 Waktu ${s.nama}`,
+        body: `${s.nama} pukul ${jam} di ${kota}. Sumber jadwal: AlAdhan.`,
+        url: './#/prayer-times',
+        tag: `salat-${s.id}`,
+      }, 'notifSalat'),
+      () => saveSettings(userId, { salatLastFired: { ...sudah, [s.id]: tanggal } }),
+    )
+    if (!hasil.delivered) return { sent: false, reason: 'delivery-failed' }
     return { sent: true, reason: s.id }
   }
   return { sent: false, reason: 'not-time' }
