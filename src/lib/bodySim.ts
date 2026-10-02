@@ -107,11 +107,16 @@ export interface SimOutput {
   catatan: string[]
 }
 
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentConvention } from './physiology/oxygenContentConventions.ts'
+
 const CVP = 4                  // tekanan vena sentral, mmHg
 const SVR_NORMAL = 16          // mmHg per L/min, sehingga CO 5 -> MAP ~84
 const P50 = 26.6               // mmHg
 const HILL_N = 2.7
 const R_QUOTIENT = 0.8         // hasil bagi pernapasan
+// Koefisien kapasitas Hb dan kelarutan O2 berasal dari registri konvensi kanonik; bukan literal di sini.
+const { hufnerMlO2PerGHb: HUFNER, dissolvedMlO2PerDlPerMmHg: KELARUTAN_O2 } =
+  oxygenContentConvention(DEFAULT_OXYGEN_CONTENT_CONVENTION)
 
 function batas(x: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, x)) }
 
@@ -124,7 +129,7 @@ function saturasi(po2: number): number {
  *  adalah KANDUNGAN, bukan saturasi — itulah sebabnya anemia berat berbahaya
  *  meski oksimeter menunjukkan 98%. */
 function kandunganO2(hb: number, sat: number, po2: number): number {
-  return 1.34 * hb * (sat / 100) + 0.003 * po2
+  return HUFNER * hb * (sat / 100) + KELARUTAN_O2 * po2
 }
 
 export function simulate(inp: SimInput): SimOutput {
@@ -204,7 +209,7 @@ export function simulate(inp: SimInput): SimOutput {
   let pao2 = 95
   let sao2 = 97
   for (let i = 0; i < 8; i++) {
-    sao2 = batas(((caO2 - 0.003 * pao2) / (1.34 * inp.hemoglobin)) * 100, 1, 99.5)
+    sao2 = batas(((caO2 - KELARUTAN_O2 * pao2) / (HUFNER * inp.hemoglobin)) * 100, 1, 99.5)
     pao2 = Math.min(
       batas(P50 * Math.pow(sao2 / Math.max(100 - sao2, 0.01), 1 / HILL_N), 5, 700),
       pAO2,

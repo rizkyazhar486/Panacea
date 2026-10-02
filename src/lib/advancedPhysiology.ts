@@ -1,3 +1,5 @@
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentMlDl } from './physiology/oxygenContentConventions.ts'
+
 export type AdvancedPhysiologySystemKey = 'endocrine' | 'hepatic-metabolic' | 'hematology-immune' | 'autonomic' | 'reproductive'
 export type AdvancedPhysiologyStateKey = 'rest' | 'exercise' | 'recovery' | 'sleep'
 export type AdvancedPhysiologyProvenance = 'measured' | 'derived' | 'educational' | 'unavailable'
@@ -121,5 +123,5 @@ export function homaIr(glucoseMgDl: number, insulinMicroUml: number): number | u
 export function arterialOxygenContentMlDl(hbGdl: number, sao2Fraction: number, pao2MmHg: number): number | undefined {
   if (!Number.isFinite(hbGdl) || !Number.isFinite(sao2Fraction) || !Number.isFinite(pao2MmHg)) return undefined
   if (hbGdl <= 0 || sao2Fraction < 0 || sao2Fraction > 1 || pao2MmHg < 0) return undefined
-  return 1.34 * hbGdl * sao2Fraction + 0.003 * pao2MmHg
+  return oxygenContentMlDl(DEFAULT_OXYGEN_CONTENT_CONVENTION, { value: hbGdl, unit: 'g/dL' }, sao2Fraction, pao2MmHg)
 }
