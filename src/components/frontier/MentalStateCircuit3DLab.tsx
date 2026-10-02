@@ -6,7 +6,7 @@ import {
   DISCOVERY_MENTAL_STATE_CIRCUITS,
   type CircuitNode,
 } from '../../lib/discoveryMentalStateCircuits';
-import { Prosa } from '../../components/Prosa'
+import { Prosa } from '../Prosa'
 
 function nodeColor(kind: CircuitNode['kind']) {
   switch (kind) {

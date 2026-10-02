@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const model = fs.readFileSync('src/lib/discoveryMentalStateCircuits.ts', 'utf8');
-const ui = fs.readFileSync('src/pages/discovery/MentalStateCircuit3DLab.tsx', 'utf8');
+const ui = fs.readFileSync('src/components/frontier/MentalStateCircuit3DLab.tsx', 'utf8');
 
 const requiredModelTerms = [
   'Alzheimer disease: synapse-to-network failure',

@@ -68,6 +68,7 @@
     "test:mental-health-clinical-research": "node --test scripts/qa/mental-health-clinical-research.test.mjs",
     "test:secure-care-outbox": "node --test scripts/qa/secure-care-outbox.test.mjs",
     "lint:arsitektur": "depcruise src server/src --config .dependency-cruiser.cjs --ignore-known",
+    "lint:ratchet": "node scripts/arch/ratchet.mjs",
     "test:embodied-perception-adapter": "node --test scripts/qa/embodied-perception-adapter.test.mjs",
     "test:clinical-response-contract": "node --test scripts/qa/clinical-response-contract.test.mjs"
   },

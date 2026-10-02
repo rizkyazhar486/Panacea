@@ -8,6 +8,7 @@ const akar = join(di, '..', '..')
 
 const shell = readFileSync(join(akar, 'src/components/Shell.tsx'), 'utf8')
 const home = readFileSync(join(akar, 'src/components/HomeCommandDeck.tsx'), 'utf8')
+const dataNav = readFileSync(join(akar, 'src/data/navPengaturan.ts'), 'utf8')
 
 assert.doesNotMatch(
   shell,
@@ -45,10 +46,21 @@ assert.match(
   'the command dropdown must expose the three super pages after drawer removal',
 )
 
+// Deklarasi dipindah ke src/data (memutus siklus lib -> Shell); Shell tetap yang mengisinya.
 assert.match(
-  shell,
+  dataNav,
   /export const NAV_UNTUK_PENGATURAN/,
   'navigation data must stay exported even when the desktop presentation is removed',
+)
+assert.match(
+  shell,
+  /from '\.\.\/data\/navPengaturan'/,
+  'Shell must keep importing the shared navigation array it populates',
+)
+assert.match(
+  shell,
+  /NAV_UNTUK_PENGATURAN\.push\(/,
+  'Shell must keep populating the navigation data',
 )
 
 assert.match(
