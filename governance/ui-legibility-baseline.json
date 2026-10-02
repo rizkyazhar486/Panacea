@@ -33,6 +33,10 @@
     "fitness-hub?view=ranked": {
       "words": 173,
       "smallWords": 142
+    },
+    "fitness-hub?view=longevity": {
+      "words": 154,
+      "smallWords": 129
     }
   }
 }
