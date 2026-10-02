@@ -29,6 +29,10 @@
     "fitness-hub?view=health-data": {
       "words": 209,
       "smallWords": 188
+    },
+    "fitness-hub?view=ranked": {
+      "words": 173,
+      "smallWords": 142
     }
   }
 }
