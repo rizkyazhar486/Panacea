@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "purpose": "Audit deterministik layer anatomi terkirim (geometri, skala, anggaran) dan pernyataan provenance yang jujur. Bukan validasi anatomi.",
+  "coordinateConvention": "glTF: 1 unit = 1 meter, +Y atas (superior), tubuh tegak menghadap +Z (anterior). Diukur dari batas dunia; lihat boundsMeters.",
+  "totals": {
+    "sizeBytes": 33753908,
+    "meshCount": 3707,
+    "vertexCount": 5568632,
+    "triangleCount": 9936226,
+    "materialCount": 163
+  },
+  "layers": {
+    "surface": {
+      "file": "surface.glb",
+      "sizeBytes": 998480,
+      "sha256": "f1e2db4ff3082199ae758cbe151ea4964754633f32c8ad7e327c03dafbf4352b",
+      "meshCount": 697,
+      "uniqueGeometries": 355,
+      "vertexCount": 89443,
+      "triangleCount": 135561,
+      "materialCount": 19,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.3401,
+          -0.0509,
+          -0.1484
+        ],
+        "max": [
+          0.3401,
+          1.7433,
+          0.1456
+        ],
+        "size": [
+          0.6801,
+          1.7943,
+          0.294
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "skeletal": {
+      "file": "skeletal.glb",
+      "sizeBytes": 2653500,
+      "sha256": "cd81466d30e9ec283bcc4f55db1953291fe4f1d40f73a0bfe5f6be205ae98413",
+      "meshCount": 577,
+      "uniqueGeometries": 338,
+      "vertexCount": 382723,
+      "triangleCount": 702368,
+      "materialCount": 24,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.3346,
+          -0.0509,
+          -0.1128
+        ],
+        "max": [
+          0.3346,
+          1.7055,
+          0.1373
+        ],
+        "size": [
+          0.6693,
+          1.7564,
+          0.2501
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "muscular": {
+      "file": "muscular.glb",
+      "sizeBytes": 5636668,
+      "sha256": "2b1caca412726894decbaf07f34cb7838fcd1edfe8922053348497ab11468f1d",
+      "meshCount": 743,
+      "uniqueGeometries": 375,
+      "vertexCount": 1196289,
+      "triangleCount": 2003279,
+      "materialCount": 24,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.33,
+          -0.0509,
+          -0.1301
+        ],
+        "max": [
+          0.33,
+          1.7076,
+          0.1284
+        ],
+        "size": [
+          0.66,
+          1.7585,
+          0.2585
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "cardiovascular": {
+      "file": "cardiovascular.glb",
+      "sizeBytes": 12344948,
+      "sha256": "7656915445e555d3a47a3d7fdbe7186b93ecc5774c944d79f10ddcf67f4accf2",
+      "meshCount": 677,
+      "uniqueGeometries": 431,
+      "vertexCount": 2101566,
+      "triangleCount": 3844125,
+      "materialCount": 8,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.332,
+          -0.0509,
+          -0.1127
+        ],
+        "max": [
+          0.332,
+          1.7015,
+          0.1363
+        ],
+        "size": [
+          0.664,
+          1.7524,
+          0.2489
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "nervous": {
+      "file": "nervous.glb",
+      "sizeBytes": 7785940,
+      "sha256": "2e82e4024d89f3ed32ad7431333ca01796aceb24d90aeb71237fd6f6f239636e",
+      "meshCount": 710,
+      "uniqueGeometries": 384,
+      "vertexCount": 1335049,
+      "triangleCount": 2408194,
+      "materialCount": 36,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.3337,
+          -0.0509,
+          -0.1123
+        ],
+        "max": [
+          0.3337,
+          1.7006,
+          0.1303
+        ],
+        "size": [
+          0.6675,
+          1.7515,
+          0.2426
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "visceral": {
+      "file": "visceral.glb",
+      "sizeBytes": 3682364,
+      "sha256": "d9507e6d1596d37fb018202a9efb6e8914bde2a568ff7981f8d5443b96106ba7",
+      "meshCount": 139,
+      "uniqueGeometries": 126,
+      "vertexCount": 378625,
+      "triangleCount": 714660,
+      "materialCount": 40,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.1323,
+          -0.0509,
+          -0.0845
+        ],
+        "max": [
+          0.19,
+          1.6197,
+          0.1081
+        ],
+        "size": [
+          0.3223,
+          1.6706,
+          0.1926
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    },
+    "lymphoid": {
+      "file": "lymphoid.glb",
+      "sizeBytes": 652008,
+      "sha256": "450ef35d72ee6bfa8781ca1f930b25f816693326a66ebff2c8bc0e742918ee2a",
+      "meshCount": 164,
+      "uniqueGeometries": 102,
+      "vertexCount": 84937,
+      "triangleCount": 128039,
+      "materialCount": 12,
+      "extensionsUsed": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.2339,
+          -0.0509,
+          -0.1659
+        ],
+        "max": [
+          0.2339,
+          1.5951,
+          0.1544
+        ],
+        "size": [
+          0.4679,
+          1.6461,
+          0.3203
+        ]
+      },
+      "sourceRegistryId": "z_anatomy",
+      "sourceRegistryFile": "data/source-registry/anatomy/z-anatomy.json",
+      "upstream": "Z-Anatomy / BodyParts3D (revisi upstream tidak dipin di repositori)",
+      "license": "CC-BY-SA-4.0",
+      "licenseNote": "Registri sumber menyatakan ada pengecualian lisensi tingkat-aset (termasuk NC) di upstream; per-mesh belum ditinjau. Jangan simpulkan izin komersial dari lisensi tingkat repositori.",
+      "accuracyStatus": "source-backed-unreviewed",
+      "validated": false,
+      "revisionPinned": false,
+      "educationalOnly": true
+    }
+  }
+}
