@@ -68,7 +68,12 @@ export function VertikalMolekulerPanel() {
                   </span>
                 </span>
               </div>
-              <p className="mt-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{gap.reason}</p>
+              <details className="mt-1">
+                <summary className="flex min-h-11 cursor-pointer items-center text-[11px] font-bold text-brand">
+                  Why is this empty?
+                </summary>
+                <p className="pb-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{gap.reason}</p>
+              </details>
             </li>
           ))}
         </ul>
