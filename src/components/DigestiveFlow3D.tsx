@@ -9,7 +9,7 @@ import {
   resolveAllAnatomySourceNodes,
 } from '../lib/anatomySourceNodeRegistry'
 import { body3dPixelRatio } from '../lib/body3dQuality'
-import { disposeOwnedObject3DResources } from '../lib/threeOwnedResourceDisposal'
+import { disposeOwnedObject3DResources } from '../lib/bodyExposure/threeOwnedResourceDisposal'
 import { advanceDigestiveFlowTime, digestiveFlowVisualState, type DigestiveFlowPhase } from '../lib/digestiveFlowVisual'
 
 interface Target {

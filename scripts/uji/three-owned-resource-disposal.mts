@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import * as THREE from 'three'
-import { disposeOwnedObject3DResources } from '../../src/lib/threeOwnedResourceDisposal.ts'
+import { disposeOwnedObject3DResources } from '../../src/lib/bodyExposure/threeOwnedResourceDisposal.ts'
 
 const root = new THREE.Group()
 const sharedGeometry = new THREE.BoxGeometry(1, 1, 1)
