@@ -4,7 +4,7 @@ import {
   HUMAN_SEXUAL_REPRODUCTIVE_PHYSIOLOGY,
   stageAt,
   stagesForDomain,
-} from '../../src/lib/humanSexualReproductivePhysiology'
+} from '../../src/lib/physiology/humanSexualReproductivePhysiology'
 
 const ui = await readFile(new URL('../../src/pages/bodyhub/HumanSexualReproductivePhysiologyLab.tsx', import.meta.url), 'utf8')
 const ids = new Set(HUMAN_SEXUAL_REPRODUCTIVE_PHYSIOLOGY.map((stage) => stage.id))

@@ -4,7 +4,7 @@ import {
   stageAt,
   stagesForDomain,
   type SexualReproductiveDomain,
-} from '../../lib/humanSexualReproductivePhysiology'
+} from '../../lib/physiology/humanSexualReproductivePhysiology'
 
 const DOMAIN_LABELS: Array<[SexualReproductiveDomain, string]> = [
   ['sexual-response', 'Sexual response'],
