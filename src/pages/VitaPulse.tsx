@@ -1,3 +1,4 @@
+import { Fold } from '../shared/ui/Fold'
 import { useStore } from '../lib/store'
 import { PusatKesehatanRealtime } from './Feed'
 import { VideoGallery } from '../components/VideoGallery'
@@ -19,7 +20,7 @@ export function VitaPulse() {
           <BatasKlaimKesehatan permukaan="wellness.vitapulse" className="mt-1 text-[11px] leading-snug text-neutral-500" />
         </div>
       </div>
-      <div className="mb-4">
+      <Fold label="Video" className="mb-4">
         <VideoGallery
           icon={<span className="text-lg">🩺</span>}
           title="Educational Videos"
@@ -28,7 +29,7 @@ export function VitaPulse() {
             { label: 'Measuring Blood Pressure', cue: 'Sit calmly for 5 min · arm resting on table at heart height · feet flat on floor · don\'t talk', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073025_ac2d37c3-a20e-45c4-ae71-ce92a0be4bc8.mp4' },
           ]}
         />
-      </div>
+      </Fold>
       <PusatKesehatanRealtime viewerEmail={account.email} />
     </div>
   )

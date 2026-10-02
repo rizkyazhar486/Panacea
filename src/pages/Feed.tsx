@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+import { Fold } from '../shared/ui/Fold'
 import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { KolomVitalTerikat } from '../components/KolomVital'
@@ -1874,6 +1875,22 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         </div>
       )}
 
+      {/* 10. Dashboard Summary Realtime — agregasi semua metrik di atas */}
+      <Card className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-black text-ink">📊 Real-Time Summary</div>
+          <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Export Report</button>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
+        </div>
+      </Card>
+
+      <Fold label="Assistant">
       {/* #6 + #7: Asisten Kesehatan AI dengan deteksi anomali */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🤖 AI Health Assistant</div>
@@ -1895,7 +1912,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         </div>
         <p className="text-[10px] text-neutral-500">Automated analysis based on the data you've logged. Not a substitute for professional medical consultation.</p>
       </Card>
+      </Fold>
 
+      <Fold label="Vitals">
       {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🧮 BMI, Calorie & Fluid Calculator</div>
@@ -1959,7 +1978,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <p className="text-[11px] text-neutral-500">Last recorded: {timeAgo(lastVital.at)} — {lastVital.systolic}/{lastVital.diastolic} mmHg, HR {lastVital.heartRate}, SpO2 {lastVital.spo2}%, {lastVital.tempC}°C</p>
         )}
       </Card>
+      </Fold>
 
+      <Fold label="Sleep">
       {/* 5. Skor Kualitas Tidur */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">😴 Sleep Quality Score</div>
@@ -1994,7 +2015,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         </div>
         <p className="text-[10px] text-neutral-500">Log vitals & sleep regularly to see trends here.</p>
       </Card>
+      </Fold>
 
+      <Fold label="Fitness">
       {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🫁 VO2Max Calculator</div>
@@ -2029,7 +2052,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           </div>
         )}
       </Card>
+      </Fold>
 
+      <Fold label="News">
       {/* 7. Live Health News Ticker */}
       <Card className="space-y-1.5 overflow-hidden">
         <div className="flex items-center gap-2 text-xs font-black text-ink">
@@ -2052,7 +2077,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           )
         })()}
       </Card>
+      </Fold>
 
+      <Fold label="Learn">
       {/* 6. Pengingat Obat/Vitamin — full CRUD + real push notifications live on its own page */}
       <Card className="flex items-center justify-between gap-3">
         <div>
@@ -2085,7 +2112,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card>
         <ExamQuiz />
       </Card>
+      </Fold>
 
+      <Fold label="Goals">
       {/* #4: Target & Badge Progres */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🎯 Health Goals</div>
@@ -2132,21 +2161,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           )
         })}
       </Card>
-
-      {/* 10. Dashboard Summary Realtime — agregasi semua metrik di atas */}
-      <Card className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="text-xs font-black text-ink">📊 Real-Time Summary</div>
-          <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Export Report</button>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-[11px]">
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
-        </div>
-      </Card>
+      </Fold>
     </div>
   )
 }
