@@ -271,3 +271,22 @@ OverlayAllowed =
 ```
 
 "Looks aligned" is never a registration method.
+
+## Ambient occlusion sidecar (derived lighting, no new anatomy)
+
+`scripts/bake/bake-anatomy-ao.mjs` computes per-vertex ambient occlusion from the **shipped** layer GLBs and
+writes `public/anatomy/ao/<layer>.ao.bin` plus `manifest.json`. It adds depth to crevices between structures
+and nothing else: no geometry, colour, texture or anatomical detail is created, and the source GLBs are
+never modified.
+
+- Method: cosine-weighted hemisphere rays around each vertex normal, occluders limited to the same layer,
+  radius = 2% of layer height, distance-weighted, floor 0.4 so crevices never turn black. Deterministic
+  (Hammersley samples rotated by a hash of the vertex *position*; no `Math.random`/`Date.now`).
+- Binding: the manifest records the SHA-256 of each source GLB, the sidecar hash, and every mesh's name,
+  vertex count and offset. The gate `scripts/uji/baked-ao.mts` fails when a GLB changes without a re-bake.
+- Runtime (`applyBakedAoToLayer`): applied only if **every** mesh of the layer matches (all-or-nothing, because
+  layer materials are shared and a mesh without a colour attribute would render black). Any failure means
+  the layer renders without AO; it never blocks rendering.
+- Re-bake: `node scripts/bake/bake-anatomy-ao.mjs --baked-on YYYY-MM-DD` (about 12 minutes single-threaded;
+  muscular alone is ~1.2M vertices). Output is only used in anatomy mode; CT/MRI/X-ray materials ignore it.
+- Limits: per-vertex AO is as fine as the mesh; it is not a normal map and does not add surface detail.
