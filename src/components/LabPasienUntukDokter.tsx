@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
+import { createLongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 import { RencanaHarianDokter } from './RencanaHarianDokter'
 import { statusPasienUntukDokter } from '../lib/statusPasienDokter'
 import { timelineHarian, angka } from '../lib/perubahanLongitudinal'
 import { buildClinicianContinuousCareDigest, submitDailyAnamnesis, type ContinuousCarePlan, type DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
 import { sortClinicianCareInbox, summarizeClinicianCareDigest, type ClinicianCareInboxRow } from '../lib/clinicianCareInbox'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
-import { createLongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
 // garis dasar pribadi (median ± 2·MAD×1,4826 dari hasil SEBELUMNYA), satu titik
@@ -157,6 +158,7 @@ export function LabPasienUntukDokter() {
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-[#050708] p-3 text-white" aria-label="Lab results shared with you" data-clinician-lab>
       <h2 className="text-sm font-black">Lab results shared with you</h2>
+      <BatasKlaimKesehatan permukaan="lab.clinician-shared-view" className="mt-1 text-[11px] leading-snug text-white/55" />
       {galat && (
         <p role="alert" className="mt-1 text-[11px] font-bold text-amber-300">
           {galat === 'verified clinician role required' ? 'Available after your STR is verified.' : galat}

@@ -6,7 +6,7 @@ import {
   type LongitudinalEvent,
   type LongitudinalProvenance,
 } from './panaceaLongitudinalState.ts'
-import type { SelfVital, VitalSign, Vo2MaxEntry } from './types.ts'
+import type { FoodEntry, SelfVital, VitalSign, Vo2MaxEntry } from './types.ts'
 
 export interface HealthStoreBridgeConfidence {
   clinicalVital: number
@@ -14,6 +14,11 @@ export interface HealthStoreBridgeConfidence {
   vo2max: number
   deviceSnapshot: number
 }
+
+export type HealthStoreEvidenceClass =
+  | 'consumer-wellness'
+  | 'clinical-record'
+  | 'manual-self-report'
 
 export interface HealthStoreBridgeContext {
   consent: ConsentEnvelope
@@ -24,6 +29,13 @@ export interface HealthStoreBridgeContext {
    * fabricate confidence from the numeric measurement itself.
    */
   confidence: HealthStoreBridgeConfidence
+  /**
+   * Shared device snapshots are consumer-wellness by default. A trusted,
+   * source-specific adapter may explicitly promote the ingestion boundary to
+   * clinical-record after its own authorization/QC checks; source labels alone
+   * never promote evidence class.
+   */
+  deviceSnapshotEvidenceClass?: Extract<HealthStoreEvidenceClass, 'consumer-wellness' | 'clinical-record'>
 }
 
 export type BridgeSkipReason =
@@ -118,7 +130,108 @@ const DEVICE_METRICS: Readonly<Record<string, NumericMetricSpec>> = {
   runningVerticalOscCm: { metric: 'running-vertical-oscillation', domain: 'fitness', unit: 'cm' },
   audioExposureDb: { metric: 'environmental-audio-exposure', domain: 'other', unit: 'dB' },
   headphoneAudioDb: { metric: 'headphone-audio-exposure', domain: 'other', unit: 'dB' },
+  // High-value Health Auto Export / Apple Health keys that previously arrived
+  // on the server catalog but never entered the longitudinal kernel.
+  waistCm: { metric: 'waist-circumference', domain: 'longevity', unit: 'cm' },
+  walkingHr: { metric: 'walking-heart-rate', domain: 'vital', unit: 'bpm' },
+  afibBurdenPct: { metric: 'atrial-fibrillation-burden', domain: 'vital', unit: '%' },
+  perfusionIndexPct: { metric: 'peripheral-perfusion-index', domain: 'vital', unit: '%' },
+  bloodGlucoseMgdl: { metric: 'blood-glucose', domain: 'vital', unit: 'mg/dL' },
+  fev1L: { metric: 'fev1', domain: 'vital', unit: 'L' },
+  fvcL: { metric: 'fvc', domain: 'vital', unit: 'L' },
+  peakFlow: { metric: 'peak-expiratory-flow', domain: 'vital', unit: 'L/min' },
+  breathingDisturbances: { metric: 'breathing-disturbances', domain: 'sleep', unit: 'count' },
+  gangguanNapasTidur: { metric: 'sleep-breathing-disturbances', domain: 'sleep', unit: '/h' },
+  basalTempC: { metric: 'basal-body-temperature', domain: 'vital', unit: '°C' },
+  wristTempC: { metric: 'sleeping-wrist-temperature', domain: 'vital', unit: '°C' },
+  waterL: { metric: 'dietary-water', domain: 'longevity', unit: 'L' },
+  mindfulMin: { metric: 'mindful-minutes', domain: 'recovery', unit: 'min' },
+  fallCount: { metric: 'falls', domain: 'other', unit: 'count' },
+  moveMin: { metric: 'move-minutes', domain: 'activity', unit: 'min' },
+  standMin: { metric: 'stand-minutes', domain: 'activity', unit: 'min' },
+  // Core dietary macros / minerals / vitamins from Health Auto Export — clear units only.
+  // Hygiene, insulin delivery, BAC, EDA, and underwater keys stay explicit gaps.
+  dietKcal: { metric: 'dietary-energy', domain: 'longevity', unit: 'kcal' },
+  proteinG: { metric: 'dietary-protein', domain: 'longevity', unit: 'g' },
+  carbsG: { metric: 'dietary-carbohydrate', domain: 'longevity', unit: 'g' },
+  fatG: { metric: 'dietary-fat', domain: 'longevity', unit: 'g' },
+  satFatG: { metric: 'dietary-saturated-fat', domain: 'longevity', unit: 'g' },
+  monoFatG: { metric: 'dietary-monounsaturated-fat', domain: 'longevity', unit: 'g' },
+  polyFatG: { metric: 'dietary-polyunsaturated-fat', domain: 'longevity', unit: 'g' },
+  fiberG: { metric: 'dietary-fiber', domain: 'longevity', unit: 'g' },
+  sugarG: { metric: 'dietary-sugar', domain: 'longevity', unit: 'g' },
+  cholesterolMg: { metric: 'dietary-cholesterol', domain: 'longevity', unit: 'mg' },
+  sodiumMg: { metric: 'dietary-sodium', domain: 'longevity', unit: 'mg' },
+  potassiumMg: { metric: 'dietary-potassium', domain: 'longevity', unit: 'mg' },
+  calciumMg: { metric: 'dietary-calcium', domain: 'longevity', unit: 'mg' },
+  ironMg: { metric: 'dietary-iron', domain: 'longevity', unit: 'mg' },
+  magnesiumMg: { metric: 'dietary-magnesium', domain: 'longevity', unit: 'mg' },
+  zincMg: { metric: 'dietary-zinc', domain: 'longevity', unit: 'mg' },
+  phosphorusMg: { metric: 'dietary-phosphorus', domain: 'longevity', unit: 'mg' },
+  chlorideMg: { metric: 'dietary-chloride', domain: 'longevity', unit: 'mg' },
+  copperMg: { metric: 'dietary-copper', domain: 'longevity', unit: 'mg' },
+  manganeseMg: { metric: 'dietary-manganese', domain: 'longevity', unit: 'mg' },
+  seleniumMcg: { metric: 'dietary-selenium', domain: 'longevity', unit: 'µg' },
+  iodineMcg: { metric: 'dietary-iodine', domain: 'longevity', unit: 'µg' },
+  chromiumMcg: { metric: 'dietary-chromium', domain: 'longevity', unit: 'µg' },
+  molybdenumMcg: { metric: 'dietary-molybdenum', domain: 'longevity', unit: 'µg' },
+  vitAMcg: { metric: 'dietary-vitamin-a', domain: 'longevity', unit: 'µg' },
+  vitCMg: { metric: 'dietary-vitamin-c', domain: 'longevity', unit: 'mg' },
+  vitDMcg: { metric: 'dietary-vitamin-d', domain: 'longevity', unit: 'µg' },
+  vitEMg: { metric: 'dietary-vitamin-e', domain: 'longevity', unit: 'mg' },
+  vitKMcg: { metric: 'dietary-vitamin-k', domain: 'longevity', unit: 'µg' },
+  vitB6Mg: { metric: 'dietary-vitamin-b6', domain: 'longevity', unit: 'mg' },
+  vitB12Mcg: { metric: 'dietary-vitamin-b12', domain: 'longevity', unit: 'µg' },
+  thiaminMg: { metric: 'dietary-thiamin', domain: 'longevity', unit: 'mg' },
+  riboflavinMg: { metric: 'dietary-riboflavin', domain: 'longevity', unit: 'mg' },
+  niacinMg: { metric: 'dietary-niacin', domain: 'longevity', unit: 'mg' },
+  pantothenicMg: { metric: 'dietary-pantothenic-acid', domain: 'longevity', unit: 'mg' },
+  biotinMcg: { metric: 'dietary-biotin', domain: 'longevity', unit: 'µg' },
+  folateMcg: { metric: 'dietary-folate', domain: 'longevity', unit: 'µg' },
+  caffeineMg: { metric: 'dietary-caffeine', domain: 'longevity', unit: 'mg' },
+  alcoholUnits: { metric: 'alcohol-consumption', domain: 'longevity', unit: 'unit' },
+  // Clear fitness / environment Health keys — hygiene, insulin, BAC, EDA stay gaps.
+  cyclingDistanceKm: { metric: 'cycling-distance', domain: 'activity', unit: 'km' },
+  cyclingSpeedKmh: { metric: 'cycling-speed', domain: 'fitness', unit: 'km/h' },
+  cyclingPowerW: { metric: 'cycling-power', domain: 'fitness', unit: 'W' },
+  cyclingCadence: { metric: 'cycling-cadence', domain: 'fitness', unit: 'rpm' },
+  cyclingFtpW: { metric: 'cycling-ftp', domain: 'fitness', unit: 'W' },
+  swimDistanceM: { metric: 'swim-distance', domain: 'activity', unit: 'm' },
+  swimStrokes: { metric: 'swim-strokes', domain: 'activity', unit: 'count' },
+  stairSpeedUpMs: { metric: 'stair-speed-ascent', domain: 'fitness', unit: 'm/s' },
+  stairSpeedDownMs: { metric: 'stair-speed-descent', domain: 'fitness', unit: 'm/s' },
+  snowDistanceKm: { metric: 'snow-sports-distance', domain: 'activity', unit: 'km' },
+  wheelchairDistanceKm: { metric: 'wheelchair-distance', domain: 'activity', unit: 'km' },
+  pushCount: { metric: 'wheelchair-pushes', domain: 'activity', unit: 'count' },
+  physicalEffort: { metric: 'physical-effort', domain: 'fitness', unit: 'score' },
+  uvIndex: { metric: 'uv-exposure-index', domain: 'other', unit: 'index' },
 }
+
+
+/** Keys the device/health-profile bridge is allowed to ingest. */
+export const KUNCI_METRIK_PERANGKAT_LONGITUDINAL = Object.freeze(Object.keys(DEVICE_METRICS))
+
+/**
+ * Audit which Health-catalog keys are longitudinal-ready versus still a gap.
+ * Does not invent mappings — missing keys stay explicit.
+ */
+export function auditCakupanWearableLongitudinal(katalogKunci: readonly string[]): {
+  covered: string[]
+  gap: string[]
+} {
+  const covered: string[] = []
+  const gap: string[] = []
+  for (const kunci of katalogKunci) {
+    if (!kunci || typeof kunci !== 'string') continue
+    if (kunci in DEVICE_METRICS) covered.push(kunci)
+    else gap.push(kunci)
+  }
+  return {
+    covered: covered.sort((a, b) => a.localeCompare(b)),
+    gap: gap.sort((a, b) => a.localeCompare(b)),
+  }
+}
+
 
 function parseIso(value: string, field: string) {
   const timestamp = Date.parse(value)
@@ -248,7 +361,7 @@ export function clinicalVitalToLongitudinalEvents(
     recordedAt: vital.takenAt,
     confidence: context.confidence.clinicalVital,
     context,
-    tags: ['store:clinical-vitals'],
+    tags: ['store:clinical-vitals', 'evidence-class:clinical-record'],
   })
 }
 
@@ -269,7 +382,7 @@ export function selfVitalToLongitudinalEvents(
     recordedAt: vital.at,
     confidence: context.confidence.selfVital,
     context,
-    tags: ['store:self-vitals'],
+    tags: ['store:self-vitals', 'evidence-class:manual-self-report'],
   })
 }
 
@@ -300,7 +413,7 @@ export function vo2MaxToLongitudinalEvent(
       method: entry.method,
     },
     consent: context.consent,
-    tags: ['store:vo2max-log', `record:${entry.id}`],
+    tags: ['store:vo2max-log', 'evidence-class:manual-self-report', `record:${entry.id}`],
   })
 }
 
@@ -338,7 +451,12 @@ export function currentDeviceVitalsToLongitudinalEvents(
   }
 
   const sourceKind: LongitudinalProvenance['sourceKind'] = source.toLowerCase() === 'manual' ? 'manual' : 'device'
-  const provenanceMethod = sourceKind === 'manual' ? 'shared-vitals-manual-entry' : 'health-vitals-snapshot'
+  const evidenceClass: HealthStoreEvidenceClass = sourceKind === 'manual'
+    ? 'manual-self-report'
+    : (context.deviceSnapshotEvidenceClass ?? 'consumer-wellness')
+  const provenanceMethod = sourceKind === 'manual'
+    ? 'shared-vitals-manual-entry'
+    : `health-vitals-snapshot:${evidenceClass}`
   const events: LongitudinalEvent<number>[] = []
   const skipped: BridgeSkippedRecord[] = []
   const sourceToken = idToken(source)
@@ -368,9 +486,151 @@ export function currentDeviceVitalsToLongitudinalEvents(
         method: provenanceMethod,
       },
       consent: context.consent,
-      tags: ['store:health-vitals', `source:${source}`],
+      tags: ['store:health-vitals', `source:${source}`, `evidence-class:${evidenceClass}`],
     }))
   }
 
+  return { events, skipped }
+}
+
+/** Compact device values for Body Exposure — consumer/device snapshot, not atlas anatomy. */
+export interface DeviceBodyExposureSignal {
+  id: string
+  label: string
+  value: string
+  unit: string
+  truthClass: 'patient-recorded'
+  source: 'device-snapshot'
+  method: 'health-vitals-snapshot'
+  jenisId: string
+}
+
+const OVERLAY_PERANGKAT: readonly { kunci: string; label: string }[] = [
+  { kunci: 'restingHr', label: 'Resting HR' },
+  { kunci: 'hrvMs', label: 'HRV' },
+  { kunci: 'sleepH', label: 'Sleep' },
+  { kunci: 'vo2max', label: 'VO₂max' },
+  { kunci: 'spo2Pct', label: 'SpO₂' },
+  { kunci: 'steps', label: 'Steps' },
+  { kunci: 'systolic', label: 'SBP' },
+  { kunci: 'weightKg', label: 'Weight' },
+]
+
+/**
+ * Newest positive device/health-profile numbers for overlay display.
+ * Unknown keys and non-positive values are skipped — never invented.
+ */
+export function deviceSnapshotToBodyExposureSignals(
+  vitals: Record<string, unknown>,
+  opts: { max?: number } = {},
+): DeviceBodyExposureSignal[] {
+  const max = opts.max ?? 5
+  if (!(max > 0) || !Number.isFinite(max)) return []
+  const keluar: DeviceBodyExposureSignal[] = []
+  for (const { kunci, label } of OVERLAY_PERANGKAT) {
+    const spec = DEVICE_METRICS[kunci]
+    if (!spec) continue
+    const raw = vitals[kunci]
+    if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) continue
+    keluar.push({
+      id: `device-overlay:${kunci}`,
+      label,
+      value: String(raw),
+      unit: spec.unit,
+      truthClass: 'patient-recorded',
+      source: 'device-snapshot',
+      method: 'health-vitals-snapshot',
+      jenisId: kunci,
+    })
+    if (keluar.length >= Math.floor(max)) break
+  }
+  return keluar
+}
+
+const MAKANAN_METRIK = [
+  ['kcal', 'nutrition.dietary-energy', 'kcal'],
+  ['protein', 'nutrition.dietary-protein', 'g'],
+  ['carbs', 'nutrition.dietary-carbohydrate', 'g'],
+  ['fat', 'nutrition.dietary-fat', 'g'],
+] as const
+
+export interface FoodLogBridgeContext {
+  consent: ConsentEnvelope
+  receivedAt: string
+  /** Caller-supplied confidence. The bridge does not invent it from the grams. */
+  confidence: number
+}
+
+/**
+ * Daily Nutrition food-log totals → longitudinal events.
+ * Distinct metric ids from device diet keys so a watch export and a typed meal
+ * are not mixed into one series. Invalid rows are skipped, never zero-filled.
+ */
+export function foodLogToLongitudinalEvents(
+  subjectId: string,
+  foods: readonly FoodEntry[],
+  context: FoodLogBridgeContext,
+): HealthStoreBridgeResult {
+  parseIso(context.receivedAt, 'context.receivedAt')
+  assertConfidence(context.confidence, 'context.confidence')
+  assertNonBlank(subjectId, 'subjectId')
+  const receivedMs = Date.parse(context.receivedAt)
+  const hariTerima = context.receivedAt.slice(0, 10)
+  const buckets = new Map<string, { kcal: number; protein: number; carbs: number; fat: number }>()
+  const skipped: BridgeSkippedRecord[] = []
+
+  for (const food of foods) {
+    const id = food?.id?.trim() ?? ''
+    if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(food?.date ?? '')) {
+      skipped.push({ sourceRecordId: id || 'food', reason: 'missing-measured-at' })
+      continue
+    }
+    const aheadDays = (Date.parse(`${food.date}T00:00:00.000Z`) - Date.parse(`${hariTerima}T00:00:00.000Z`)) / 864e5
+    if (aheadDays > 1) {
+      skipped.push({ sourceRecordId: id, reason: 'missing-measured-at', field: 'date' })
+      continue
+    }
+    const bucket = buckets.get(food.date) ?? { kcal: 0, protein: 0, carbs: 0, fat: 0 }
+    let any = false
+    for (const key of ['kcal', 'protein', 'carbs', 'fat'] as const) {
+      const raw = food[key]
+      if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) {
+        if (raw != null) skipped.push({ sourceRecordId: id, reason: 'invalid-number', field: key })
+        continue
+      }
+      bucket[key] += raw
+      any = true
+    }
+    if (any) buckets.set(food.date, bucket)
+  }
+
+  const events: LongitudinalEvent<number>[] = []
+  for (const [date, bucket] of buckets) {
+    let recordedAt = `${date}T12:00:00.000Z`
+    if (Date.parse(recordedAt) > receivedMs + 5 * 60_000) recordedAt = context.receivedAt
+    for (const [key, metric, unit] of MAKANAN_METRIK) {
+      const value = bucket[key]
+      if (!(value > 0)) continue
+      events.push(makeNumericEvent({
+        id: `nutrition:food:${idToken(subjectId)}:${date}:${metric}`,
+        subjectId,
+        metric,
+        domain: 'nutrition',
+        value,
+        unit,
+        recordedAt,
+        confidence: context.confidence,
+        provenance: {
+          sourceKind: 'manual',
+          sourceId: 'panaceamed:nutrition-food-log',
+          capturedAt: recordedAt,
+          receivedAt: context.receivedAt,
+          method: 'nutrition-food-log',
+        },
+        consent: context.consent,
+        tags: ['nutrition-food-log', 'evidence-class:manual-self-report', `day:${date}`],
+      }))
+    }
+  }
   return { events, skipped }
 }

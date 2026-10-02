@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconActivity } from '../components/icons'
 import { savePhonePulse } from '../lib/phoneHealthScan'
 
@@ -128,6 +129,7 @@ export function RppgHeartRate() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="rPPG Heart Rate (experimental)" subtitle="Estimate your pulse from the camera — no wearable needed" />
+        <BatasKlaimKesehatan permukaan="wellness.rppg-heart-rate" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
           <b>Experimental, not a medical device.</b> This estimates heart rate from subtle color changes
           in your face caused by blood flow (remote photoplethysmography) — accuracy depends heavily on

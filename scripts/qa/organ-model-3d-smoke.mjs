@@ -59,24 +59,25 @@ try {
     })
     if (!sehat.webgl || sehat.lost) throw new Error(`${organ}: WebGL tidak sehat ${JSON.stringify(sehat)}`)
 
-    // Menunggu SALAH SATU dari dua hasil, bukan hanya yang berhasil. Sebuah
-    // pemuatan yang ditolak tidak pernah memanggil onLoad, jadi menunggu jumlah
-    // mesh saja berakhir sebagai batas waktu 40 detik yang tidak menjelaskan
-    // apa pun. Pesan gagal panel muncul seketika, dan itu yang ingin dibaca.
-    const hasil = await Promise.race([
-      canvas.evaluate((n) => new Promise((res) => {
-        const cek = () => {
-          if (n.dataset.organMesh !== undefined) return res({ mesh: Number(n.dataset.organMesh) })
-          setTimeout(cek, 200)
+    // Tunggu satu hasil terminal dalam SATU polling loop. Versi lama memakai
+    // Promise.race dengan timer 45 detik; ketika mesh menang lebih cepat, timer
+    // yang kalah tetap hidup dan menahan event loop Node setelah tes sudah
+    // mencetak "lulus". Itu membuat CI tampak hang sampai dibunuh timeout.
+    // Polling tunggal ini tidak meninggalkan timer kalah atau waiter Playwright.
+    const hasil = await canvas.evaluate((n) => new Promise((res) => {
+      const batasWaktu = Date.now() + 45_000
+      const cek = () => {
+        if (n.dataset.organMesh !== undefined) {
+          return res({ mesh: Number(n.dataset.organMesh) })
         }
-        cek()
-      })),
-      page.waitForFunction(
-        () => (document.body.textContent || '').includes('Could not load this organ model.'),
-        null, { timeout: 40_000 },
-      ).then(() => ({ ditolak: true })).catch(() => new Promise(() => {})),
-      new Promise((res) => setTimeout(() => res({ habisWaktu: true }), 45_000)),
-    ])
+        if ((document.body.textContent || '').includes('Could not load this organ model.')) {
+          return res({ ditolak: true })
+        }
+        if (Date.now() >= batasWaktu) return res({ habisWaktu: true })
+        setTimeout(cek, 200)
+      }
+      cek()
+    }))
 
     if (hasil.ditolak) {
       throw new Error(
@@ -111,6 +112,8 @@ try {
 } catch (e) {
   gagal = e
 } finally {
+  await page.close().catch(() => {})
+  await context.close().catch(() => {})
   await browser.close()
 }
 if (gagal) {

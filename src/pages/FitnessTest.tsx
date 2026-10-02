@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../compone
 import { IconActivity, IconFlame, IconRun } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { readAsDataUrl, compressImage } from '../lib/upload'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ── Physical readiness / SIPSS scoring ─────────────────────────────────────
 // Approximate max-score targets (≈ "Excellent") for the Indonesian
@@ -82,13 +83,14 @@ export function FitnessTest() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🎖️</span>
         <div>
           <h1 className="text-lg font-black text-ink">Physical Test & Form Analysis</h1>
-          <p className="text-xs text-neutral-500">SIPSS/civil service fitness · AI form · Hyrox/Marathon programs</p>
+          <p className="text-xs text-neutral-500">Heuristic SIPSS-style scores and educational AI form tips — not a clinically validated Panacea fitness decision</p>
         </div>
       </div>
+      <BatasKlaimKesehatan permukaan="performance.fitness-test" />
 
       {/* 1. Fitness Test Score */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Fitness Test Score" subtitle="Estimated scores for SIPSS / military / police / civil-service tests" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Fitness Test Score" subtitle="Approximate self-scored targets inspired by public SIPSS / civil-service styles — not an official test result" />
         <div className="mt-3 mb-3 flex gap-2">
           {(['L', 'P'] as Sex[]).map((s) => (
             <button key={s} onClick={() => setSex(s)} className={`flex-1 rounded-xl py-2 text-sm font-bold ${sex === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>

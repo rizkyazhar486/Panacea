@@ -8,6 +8,7 @@ import {
   simulateReceptorOccupancy,
   type MentalHealthResearchDomain,
 } from '../lib/mentalHealthClinicalResearch'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const DOMAIN_LABELS: Record<MentalHealthResearchDomain, string> = {
   depression: 'Depression',
@@ -68,6 +69,7 @@ export function MentalHealthClinicalResearchLab() {
           >
             Neuropsychiatric mechanism + routine lab
           </h2>
+          <BatasKlaimKesehatan permukaan="clinical.mental-research-lab" className="mt-2 text-[11px] leading-snug text-white/55" />
           <Prosa kelas="mt-2 max-w-3xl text-xs leading-relaxed text-white/50">
             Molecular pharmacology, social biology and longitudinal behavior in one clinician-facing research surface. It is deliberately not a chatbot and does not prescribe medication.
           </Prosa>

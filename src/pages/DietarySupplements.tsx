@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconShield, IconChartUp, IconHeart } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Supplements for Training and Sports Performance
@@ -444,9 +445,10 @@ export function DietarySupplements() {
         <SectionTitle
           icon={<IconActivity size={20} />}
           title="Supplements for Training and Sports Performance"
-          subtitle="Evidence-review reference, compiled following the NIH Office of Dietary Supplements fact sheets"
+          subtitle="Educational evidence grades from public ODS-style sources — not a clinically validated Panacea recommendation"
         />
-        <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Athletes and active people use a wide range of products to improve appearance, recovery, and body composition — from well-studied nutrients to prescription hormones and unapproved research chemicals. This page reviews what these substances actually are, what the evidence does and does NOT show, and their safety and legal status. The goal is honest, evidence-based harm reduction.</Prosa>
+        <BatasKlaimKesehatan permukaan="longevity.supplements" />
+        <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Athletes and active people use a wide range of products to improve appearance, recovery, and body composition — from well-studied nutrients to prescription hormones and unapproved research chemicals. This page reviews what these substances actually are, what published evidence does and does NOT show, and their safety and legal status. Evidence labels here summarize external literature; they are not Panacea clinical validation of any product or dose.</Prosa>
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
           <b>Important:</b> This is educational material, not a how-to-use guide. This page deliberately contains <b>no doses, cycles, or protocols</b> for
           steroids, SARMs, research peptides, or banned agents. Prescription medicines belong under the care of a licensed clinician;

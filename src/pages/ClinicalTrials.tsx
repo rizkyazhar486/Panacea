@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { IconSearch, IconStethoscope } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Trials Finder — connects people to REAL registered studies from
@@ -48,6 +49,7 @@ export function ClinicalTrials() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Trials Finder" subtitle="Search real registered studies worldwide — ClinicalTrials.gov" />
+        <BatasKlaimKesehatan permukaan="clinical.trials" />
         {!backendEnabled && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
             Live trial search needs the backend — you can browse directly at clinicaltrials.gov meanwhile.

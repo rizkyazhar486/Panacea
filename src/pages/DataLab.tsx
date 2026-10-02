@@ -4,6 +4,7 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconChartUp, IconActivity } from '../components/icons'
 import { FraudThresholdLab } from '../components/finance/FraudThresholdLab'
 import { analyzeCsv, type AnalysisResult, type ColumnStats } from '../lib/dataAnalyzer'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Data Lab keeps the existing health-device CSV workflow and adds a separate,
 // explicitly non-clinical finance analytics mode. Files remain browser-local.
@@ -53,6 +54,7 @@ export function DataLab() {
         <>
           <Card className="!p-5">
             <SectionTitle icon={<IconChartUp size={20} />} title="Data Lab" subtitle="Unggah ekspor dari jam tangan / CGM / timbangan / tensimeter — diubah menjadi kesimpulan yang gamblang" />
+            <BatasKlaimKesehatan permukaan="lab.data-lab" />
             <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ekspor berkas CSV dari perangkat atau aplikasi kesehatan Anda (pemantau glukosa, jam tangan, timbangan pintar, tensimeter), lalu jatuhkan di sini. Panaceamed mengenali kolomnya dan mengolahnya menjadi apa artinya bagi Anda — tidak ada yang keluar dari perangkat Anda.</Prosa>
             <button onClick={() => fileRef.current?.click()}
               className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50 py-8 text-sm font-bold text-brand-dark dark:bg-white/5">

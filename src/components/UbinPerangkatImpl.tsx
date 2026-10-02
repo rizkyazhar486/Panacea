@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getVitals } from '../lib/healthVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget yang menunggu data dari PERANGKAT — HRV, tahap tidur, saturasi, laju
@@ -31,6 +32,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke: string; kanan?: React
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      <BatasKlaimKesehatan permukaan="wellness.device-tile" />
       {kanan ?? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link>}
     </div>
   )

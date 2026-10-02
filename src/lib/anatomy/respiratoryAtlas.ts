@@ -4,7 +4,7 @@ const SHIPPED: AtlasProvenance = {
   sourceId: 'z-anatomy-shipped-glb-index',
   sourceRevision: 'panacea-body-index-2026-09-09',
   license: 'CC BY-SA 4.0',
-  sourceLocator: 'public/anatomy/visceral.glb + src/lib/bodyIndex.gen.ts',
+  sourceLocator: 'public/anatomy/*.glb + src/lib/bodyIndex.gen.ts',
   reviewStatus: 'academic-review-required',
   reviewerScope: 'Engineering graph/source-node mapping only; final anatomy review remains human.',
 }
@@ -89,23 +89,26 @@ const segmentNodes: readonly AtlasNode[] = SEGMENTS.map((segment) => resp({
 }))
 
 export const RESPIRATORY_ATLAS_NODES: readonly AtlasNode[] = [
-  resp({ id: 'resp:upper-airway', label: 'Upper airway', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'system:respiratory', children: ['resp:nasal-cavity', 'resp:pharynx', 'resp:larynx'], source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['nasal cavity', 'pharynx', 'larynx'] }, geometryStatus: 'shipped', physiologyCapable: true }),
-  // Rongga hidung berskala ORGAN, bukan suborgan.
-  //
-  // Kontrak cakupan organ menuntutnya sebagai organ makro, sementara simpul ini
-  // dulu dideklarasikan 'suborgan'. Akibatnya gerbang cakupan -- yang hanya
-  // menerima skala 'organ' -- melaporkannya HILANG, padahal geometrinya
-  // dikirim: "Mucosa of nasal cavity" di visceral.glb, konka inferior, tulang
-  // hidung dan kartilago septum di skeletal.glb.
-  //
-  // Yang diperbaiki adalah klasifikasinya, BUKAN aturannya. Statusnya tetap
-  // 'partial' karena memang hanya mukosanya yang dirujuk dari berkas ini, jadi
-  // perubahan ini tidak menambah satu pun organ ke hitungan 'shipped'.
-  resp({ id: 'resp:nasal-cavity', label: 'Nasal cavity', regions: ['head'], laterality: 'bilateral', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['nasal cavity', 'nose'] }, geometryStatus: 'partial', physiologyCapable: true }),
-  resp({ id: 'resp:pharynx', label: 'Pharynx', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['pharynx'] }, geometryStatus: 'shipped', physiologyCapable: true }),
-  // Bundel viseral memuat epiglotis, tetapi tidak ada satu simpul pun untuk
-  // laring sebagai organ utuh; karena itu 'partial', bukan 'shipped'.
-  resp({ id: 'resp:larynx', label: 'Larynx', regions: ['neck'], laterality: 'midline', scale: 'organ', parentId: 'resp:upper-airway', children: ['resp:trachea'], source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Epiglottis'] }, geometryStatus: 'partial', educationalPriority: 0.95, physiologyCapable: true, surgicalLandmark: true }),
+  // Upper-airway rendering is a source-backed composition, not a single mesh.
+  // Every hint below is an exact shipped source identity. Child organ nodes keep
+  // their own completeness state, so this aggregate does not promote an
+  // incomplete nasal cavity, pharynx or larynx to anatomically complete.
+  resp({ id: 'resp:upper-airway', label: 'Upper airway', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'system:respiratory', children: ['resp:nasal-cavity', 'resp:pharynx', 'resp:larynx'], source: { mode: 'composite', files: ['visceral.glb', 'skeletal.glb'], nodeHints: ['Mucosa of nasal cavity', 'Laryngopharynx', 'Epiglottis', 'Thyroid cartilage', 'Cricoid cartilage', 'Arytenoid cartilage'] }, geometryStatus: 'shipped', physiologyCapable: true }),
+  // The shipped atlas contains more nasal-cavity geometry than the former
+  // mucosa-only binding exposed: septal cartilage, inferior conchae and nasal
+  // bones are present in the same indexed whole-body frame. This remains
+  // partial because the current source does not separately establish every
+  // gross nasal-cavity component required for a completeness claim.
+  resp({ id: 'resp:nasal-cavity', label: 'Nasal cavity', regions: ['head'], laterality: 'bilateral', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'composite', files: ['visceral.glb', 'skeletal.glb'], nodeHints: ['Mucosa of nasal cavity', 'Nasal septal cartilage', 'Inferior nasal concha bone', 'Nasal bone'] }, geometryStatus: 'partial', physiologyCapable: true }),
+  // Only the laryngopharynx has a direct cavity mesh in the shipped index.
+  // Keeping the whole pharynx partial prevents a broad label from silently
+  // claiming nasopharyngeal/oropharyngeal geometry that is not independently
+  // represented by the current source assets.
+  resp({ id: 'resp:pharynx', label: 'Pharynx', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Laryngopharynx'] }, geometryStatus: 'partial', physiologyCapable: true }),
+  // Laryngeal source coverage spans epiglottis plus major cartilages in the
+  // shipped visceral/skeletal bundles. It remains partial because a dedicated
+  // complete larynx/vocal-fold mesh is not present in the indexed assets.
+  resp({ id: 'resp:larynx', label: 'Larynx', regions: ['neck'], laterality: 'midline', scale: 'organ', parentId: 'resp:upper-airway', children: ['resp:trachea'], source: { mode: 'composite', files: ['visceral.glb', 'skeletal.glb'], nodeHints: ['Epiglottis', 'Thyroid cartilage', 'Cricoid cartilage', 'Arytenoid cartilage', 'Corniculate cartilage'] }, geometryStatus: 'partial', educationalPriority: 0.95, physiologyCapable: true, surgicalLandmark: true }),
   resp({ id: 'resp:trachea', label: 'Trachea', regions: ['neck', 'thorax'], laterality: 'midline', scale: 'organ', parentId: 'resp:larynx', children: ['resp:carina'], source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['trachea'] }, geometryStatus: 'shipped', educationalPriority: 1, physiologyCapable: true, surgicalLandmark: true }),
   // Karina adalah rigi di dalam percabangan trakea, dan bundel ini tidak
   // memuatnya sebagai objek tersendiri -- yang ada hanya 'Trachea'. Petunjuk

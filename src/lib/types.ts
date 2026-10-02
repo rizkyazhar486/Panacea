@@ -134,6 +134,7 @@ export interface EMRRecord {
   plan: PlanItem[]
   prognosis?: string
   // Penunjang & supportive (Mode-1 clinical workup)
+  anthropometry?: string // formula + WHO/CDC/adult BMI interpretation; never fabricated z-score
   labEkgInterpretation?: string // interpretasi temuan Lab & hasil EKG
   supportive?: SupportivePlan
   surgery?: SurgeryPlan
@@ -781,6 +782,11 @@ export interface AppState {
   lifeEvents: Record<string, LifeEvent[]> // patientId -> the user's own life story (see LifeEvent below)
   quests: Record<string, Quest[]> // patientId -> self-set goals tied to life domains (see Quest below)
   foods: FoodEntry[]
+  /** Food, sleep, training and GPS ids removed on this device. The account remembers them so another phone cannot restore the row. */
+  diaryHiddenFoodIds: string[]
+  diaryHiddenSleepIds: string[]
+  diaryHiddenTrainingIds: string[]
+  diaryHiddenGpsIds: string[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
   orders: Order[]

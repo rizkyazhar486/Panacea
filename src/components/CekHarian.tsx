@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
-import { buatClientId, bacaAntrean, kirimAtauAntre, kurasAntrean, type ButirAntrean } from '../lib/antreanCekHarian'
+import { buatClientId, type ButirAntrean } from '../lib/antreanCekHarian'
+import {
+  drainEncryptedCareOutbox,
+  migrateLegacyPlaintextCareQueue,
+  readEncryptedCareQueue,
+  secureCareOutboxSupported,
+  sendOrQueueEncryptedCareReport,
+} from '../lib/secureCareOutbox'
 import { buildDailyInterview, type ContinuousCarePlan, type DailyAnamnesisAnswer } from '../lib/continuousCareOperatingSystem'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Cek harian yang diatur dokter (Continuous Care). Pertanyaan dan aturannya
 // ditulis dokter; halaman ini hanya menampilkan dan mengirim jawaban mentah.
@@ -16,13 +24,36 @@ export function CekHarian() {
     plan: x.plan, dokterEmail: x.dokterEmail, sudah: x.reports.some((l) => l.scheduledFor.slice(0, 10) === hariIni()),
   })))).catch(() => {})
   const kirimSatu = (b: ButirAntrean) => api.submitCareReport(b.planId, b.scheduledFor, b.answers, { clientId: b.clientId, authoredAt: b.authoredAt })
-  const [antre, setAntre] = useState(() => bacaAntrean(localStorage).length)
+  const [antreanLokal, setAntreanLokal] = useState<ButirAntrean[]>([])
+  const [antre, setAntre] = useState(0)
+
+  const muatAntreanAman = async () => {
+    if (!secureCareOutboxSupported()) {
+      setAntreanLokal([])
+      setAntre(0)
+      return
+    }
+    try {
+      const items = await readEncryptedCareQueue()
+      setAntreanLokal(items)
+      setAntre(items.length)
+    } catch {
+      setAntreanLokal([])
+      setAntre(0)
+      setPesan('Encrypted offline storage could not be read. Check-ins require a connection until secure storage is available.')
+    }
+  }
+
   const kuras = async () => {
-    if (!bacaAntrean(localStorage).length) return
-    const r = await kurasAntrean(localStorage, kirimSatu)
-    setAntre(r.sisa)
-    if (r.terkirim) { setPesan('Saved answers sent to your doctor.'); void muat() }
-    if (r.ditolak.length) setPesan(`A saved check-in could not be sent: ${r.ditolak[0]}`)
+    if (!secureCareOutboxSupported()) return
+    try {
+      const r = await drainEncryptedCareOutbox(kirimSatu)
+      await muatAntreanAman()
+      if (r.terkirim) { setPesan('Saved answers sent to your doctor.'); void muat() }
+      if (r.ditolak.length) setPesan(`A saved check-in could not be sent: ${r.ditolak[0]}`)
+    } catch {
+      setPesan('Encrypted offline queue could not be opened. Your current answers remain on screen until you retry.')
+    }
   }
   // Pengingat harian (opt-in), dikirim server lewat Web Push pada jam lokal pengguna.
   const [ingat, setIngat] = useState<{ nyala: boolean; jam: string }>({ nyala: false, jam: '19:00' })
@@ -34,7 +65,19 @@ export function CekHarian() {
   useEffect(() => {
     if (!backendEnabled) return
     api.getSettings().then((s) => setIngat({ nyala: s.notifCekHarian === true, jam: typeof s.cekHarianHHMM === 'string' ? s.cekHarianHHMM : '19:00' })).catch(() => {})
-    void muat(); void kuras()
+    void muat()
+    void (async () => {
+      if (secureCareOutboxSupported()) {
+        try {
+          const migrated = await migrateLegacyPlaintextCareQueue(localStorage)
+          if (migrated.discardedCorrupt) setPesan('An unreadable legacy offline check-in was removed rather than keeping clinical answers in plaintext.')
+        } catch {
+          setPesan('Legacy offline answers could not be moved into encrypted storage. Connect to send a new check-in safely.')
+        }
+      }
+      await muatAntreanAman()
+      await kuras()
+    })()
     const on = () => void kuras()
     window.addEventListener('online', on)
     return () => window.removeEventListener('online', on)
@@ -58,11 +101,14 @@ export function CekHarian() {
     const b: ButirAntrean = { clientId: buatClientId(), planId: plan.id, scheduledFor: hariIni(), authoredAt: new Date().toISOString(),
       answers: jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)) }
     sedangKirim.current = true; setMengirim(true)
-    let r: Awaited<ReturnType<typeof kirimAtauAntre>>
-    try { r = await kirimAtauAntre(localStorage, b, kirimSatu) } finally { sedangKirim.current = false; setMengirim(false) }
+    let r: Awaited<ReturnType<typeof sendOrQueueEncryptedCareReport>>
+    try { r = await sendOrQueueEncryptedCareReport(b, kirimSatu) } finally { sedangKirim.current = false; setMengirim(false) }
     if (r.status === 'terkirim') { setPesan('Sent to your doctor for review.'); setJawab({}); void muat() }
-    else if (r.status === 'diantre') { setPesan('No connection. Saved on this device; it will be sent when you are back online.'); setJawab({}); setAntre(bacaAntrean(localStorage).length) }
-    else setPesan(r.pesan)
+    else if (r.status === 'diantre') {
+      setPesan('No connection. Answers are encrypted on this device and will be sent when you are back online.')
+      setJawab({})
+      await muatAntreanAman()
+    } else setPesan(r.pesan)
   }
 
   return (
@@ -71,8 +117,14 @@ export function CekHarian() {
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Daily check-in</h2>
         <span className="t-mikro text-neutral-400">set by {dokterEmail}</span>
       </div>
+      <BatasKlaimKesehatan permukaan="wellness.daily-checkin" className="mt-1 text-[11px] leading-snug text-neutral-500" />
       {antre > 0 && <p className="t-mikro mt-1 font-bold text-neutral-500" data-antrean-cek>{antre} check-in waiting to send.</p>}
-      {!sudah && bacaAntrean(localStorage).some((x) => x.planId === plan.id && x.scheduledFor === hariIni()) ? (
+      {!secureCareOutboxSupported() && (
+        <p className="t-mikro mt-1 font-bold text-amber-500" data-secure-offline-unavailable>
+          Encrypted offline storage is unavailable in this browser; check-ins require a connection and are never saved as plaintext.
+        </p>
+      )}
+      {!sudah && antreanLokal.some((x) => x.planId === plan.id && x.scheduledFor === hariIni()) ? (
         <p className="t-kecil mt-1 font-bold text-neutral-500">Today's answers are saved on this device and not yet sent to your doctor.</p>
       ) : sudah ? (
         <p className="t-kecil mt-1 font-bold text-brand">Today's check-in is done. Your doctor will review it.</p>

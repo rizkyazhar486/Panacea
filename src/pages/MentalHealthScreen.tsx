@@ -8,6 +8,7 @@ import {
   type Alat, type Catatan,
 } from '../lib/mentalTrend'
 import { deriveMentalHealthSafetyDisposition } from '../lib/mentalHealthSafety'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mental Health Screening — PHQ-9 (depression, Kroenke, Spitzer & Williams,
@@ -120,8 +121,9 @@ export function MentalHealthScreen() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — short validated screeners" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Over the last 2 weeks, how often have you been bothered by each of these? These are the most widely used screening instruments in primary care worldwide — not a diagnosis, but a validated way to gauge severity and, more importantly, to follow how it changes over time.</Prosa>
+        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — published brief screeners" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Over the last 2 weeks, how often have you been bothered by each of these? These are widely used primary-care screening instruments — not a diagnosis, and not a clinically validated Panacea decision. Use them to track change over time and discuss results with a clinician.</Prosa>
+        <BatasKlaimKesehatan permukaan="screening.mental" />
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('phq9')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'phq9' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>PHQ-9 (Depression)</button>
           <button onClick={() => setTab('gad7')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'gad7' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>GAD-7 (Anxiety)</button>

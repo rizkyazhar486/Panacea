@@ -60,3 +60,63 @@ export function labLogToLongitudinalEvents(
   }
   return { events, skipped }
 }
+
+/** Latest transcribed lab values for Body Exposure overlay — not organ anatomy. */
+export interface LabBodyExposureSignal {
+  id: string
+  label: string
+  value: string
+  unit: string
+  /** Blood-draw date (yyyy-mm-dd), not save time. */
+  recordedAt: string
+  truthClass: 'patient-recorded'
+  source: 'lab-log'
+  method: 'patient-transcribed-lab-report'
+  jenisId: string
+}
+
+const TANGGAL_LAB = /^\d{4}-\d{2}-\d{2}$/
+
+/**
+ * Project the newest valid analyte per known type into overlay signals.
+ * Unknown types, non-positive values, bad dates, and future draws (vs nowISO)
+ * are skipped — never invented. Does not map labs onto atlas geometry.
+ */
+export function labLogToBodyExposureSignals(
+  lab: Record<string, readonly ButirLab[]>,
+  opts: { max?: number; nowISO?: string } = {},
+): LabBodyExposureSignal[] {
+  const max = opts.max ?? 5
+  if (!(max > 0) || !Number.isFinite(max)) return []
+  const nowMs = opts.nowISO ? Date.parse(`${opts.nowISO.slice(0, 10)}T23:59:59.999Z`) : Number.POSITIVE_INFINITY
+  if (opts.nowISO && !Number.isFinite(nowMs)) return []
+
+  const terbaru: LabBodyExposureSignal[] = []
+  for (const jenis of JENIS_LAB) {
+    const daftar = lab[jenis.id]
+    if (!Array.isArray(daftar) || daftar.length === 0) continue
+    let best: ButirLab | null = null
+    for (const b of daftar) {
+      if (!b || !TANGGAL_LAB.test(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
+      const t = Date.parse(`${b.tanggal}T00:00:00.000Z`)
+      if (!Number.isFinite(t) || t > nowMs) continue
+      if (!best || b.tanggal > best.tanggal) best = b
+    }
+    if (!best) continue
+    terbaru.push({
+      id: `lab-overlay:${jenis.id}:${best.id}`,
+      label: jenis.nama,
+      value: String(best.nilai),
+      unit: jenis.satuan,
+      recordedAt: best.tanggal,
+      truthClass: 'patient-recorded',
+      source: 'lab-log',
+      method: 'patient-transcribed-lab-report',
+      jenisId: jenis.id,
+    })
+  }
+  return terbaru
+    .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt) || a.jenisId.localeCompare(b.jenisId))
+    .slice(0, Math.floor(max))
+}
+

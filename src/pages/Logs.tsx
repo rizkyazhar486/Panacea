@@ -20,7 +20,7 @@ export function Logs() {
 }
 
 function LogsIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
-  const { state, addTrainingLog, setActiveProgram } = useStore()
+  const { state, addTrainingLog, removeTrainingLog, setActiveProgram } = useStore()
   const [rpe, setRpe] = useState(6)
   const [type, setType] = useState('Run')
   const [note, setNote] = useState('')
@@ -111,6 +111,16 @@ function LogsIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>
           <div className="flex justify-between text-[10px] text-neutral-500"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notes (optional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
           <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-ink tinta-tetap" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>Log Today's Intensity</button>
+          {state.trainingLogs.length > 0 && (
+            <div className="space-y-1.5 pt-1">
+              {state.trainingLogs.slice(0, 7).map((row) => (
+                <div key={row.id} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
+                  <span className="min-w-0 truncate text-ink"><b>{row.type}</b> · RPE {row.rpe} · {row.date}</span>
+                  <button type="button" onClick={() => removeTrainingLog(row.id)} className="shrink-0 rounded-lg px-2 py-1 font-bold text-red-600">Remove</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Card>
 

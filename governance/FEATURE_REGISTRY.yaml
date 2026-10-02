@@ -132,16 +132,16 @@ features:
     frontend_surfaces: [src/pages/EMR.tsx, src/lib/useLongitudinalState.ts]
     persistence_surfaces: [server_clinical_records, signed_record_history]
     external_integrations: [SATUSEHAT]
-    maturity_level: CONNECTED
+    maturity_level: FUNCTIONAL
     clinical_validation: none
     technical_risk: high
     clinical_risk: critical
     provenance_required: true
-    tests: [scripts/uji/emr-status-longitudinal.mts, server/uji/rekamKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
+    tests: [scripts/uji/emr-status-longitudinal.mts, scripts/uji/asal-butir-emr.mts, server/uji/rekamKlinis.uji.ts, server/uji/asalIsianKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
     observability: [clinical.read_audit, emr.save_audit, emr.signed_version_archived_audit]
-    known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, per_field_ai_draft_vs_clinician_state, clinician_usability_test, clinical_validation]
-    next_actions: [encounter_model, per_field_semantic_state, clinician_usability_test]
-    last_audited_commit: 687d77db
+    known_gaps: [clinician_usability_test, clinical_validation]
+    next_actions: [clinician_usability_test, qualified_clinical_validation]
+    last_audited_commit: 5b060d12
 
   - feature_id: health.longitudinal_longevity
     name: Longitudinal Health and Longevity
@@ -160,17 +160,82 @@ features:
     patient_state_fields: [requires_repository_audit]
     knowledge_graph_entities: [requires_repository_audit]
     shared_services: [provenance, normalization, terminology]
-    backend_surfaces: [server/src/labLog.ts, server/src/labFhir.ts, 'GET/PUT /api/lab-log', 'GET /api/lab-log/fhir', '/api/lab-log/shares', '/api/clinician/lab-shares/*']
-    frontend_surfaces: [src/components/UbinLab.tsx, src/components/LongevityPanel.tsx, src/components/LabPasienUntukDokter.tsx, src/components/BagikanLabKeDokter.tsx]
-    persistence_surfaces: [localStorage pmd_lab_v1 (offline), server db.labLogs/labShares/labReviews/labAudit]
+    backend_surfaces: [server/src/labLog.ts, server/src/labFhir.ts, server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/src/irisanPenyimpanan.ts, 'GET/PUT /api/lab-log', 'GET /api/lab-log/fhir', '/api/lab-log/shares', '/api/clinician/lab-shares/*']
+    frontend_surfaces: [src/components/UbinLab.tsx, src/components/LongevityPanel.tsx, src/components/LabPasienUntukDokter.tsx, src/components/BagikanLabKeDokter.tsx, src/components/ImporLembarLab.tsx, src/components/BatasKlaimKesehatan.tsx, src/lib/clinicalClaimMaturity.ts]
+    persistence_surfaces: [localStorage pmd_lab_v1 (offline), server db.labLogs/labShares/labReviews/labAudit, Mongo split for longitudinal state when configured]
     external_integrations: [requires_repository_audit]
     maturity_level: FUNCTIONAL
     clinical_validation: none
     technical_risk: high
     clinical_risk: high
     provenance_required: true
-    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory]
+    tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory, scripts/uji/clinical-claim-maturity.mts, scripts/uji/trajektori-usia-biologis.mts, scripts/uji/impor-lembar-lab.mts, scripts/uji/nutrisi-lab-kanonik.mts, scripts/uji/makanan-longitudinal.mts, scripts/uji/catatan-harian-gabung.mts, server/uji/keadaanLongitudinal.uji.ts, server/uji/catatanKesehatanDiri.uji.ts]
     observability: [requires_repository_audit]
-    known_gaps: [canonical_state_built_client_side_only, wearable_and_non_lab_signals_not_audited]
-    next_actions: [project_canonical_state_into_body_exposure_and_timeline]
-    last_audited_commit: 0cb6906a
+    known_gaps: [live_ocr_accuracy_unproven, prospective_clinician_validation_absent]
+    next_actions: [verify_deployed_lab_sync_and_ocr]
+    last_audited_commit: d4e09c48
+
+  - feature_id: core.embodied_workflow_observation_os
+    name: Embodied Workflow Observation OS
+    domain: Core Health Intelligence
+    capability: Permissioned embodied workflow observability
+    workflow: Authorized camera/sensor evidence -> hand-object graph -> workflow episode -> canonical derived summary
+    user_types: [clinician, researcher, learner, system]
+    primary_problem: Real-world clinical/lab/procedural work is fragmented into unstructured visual activity that cannot be replayed with provenance and uncertainty
+    use_case: Convert authorized egocentric or ambient perception output into governed workflow evidence without creating a parallel patient truth store
+    inputs: [authorized_perception_frames, hand_detections, object_detections, relation_evidence, optional_protocol_definition]
+    outputs: [embodied_interaction_graph, workflow_episode, protocol_coverage_gap, uncertainty_index, longitudinal_model_estimated_event]
+    reads_from: [purpose_consent, approved_protocol_definitions]
+    writes_to: [core.canonical_patient_state]
+    dependencies: [core.canonical_patient_state, provenance, consent, human_observability]
+    dependents: [clinical_records, universal_operation_simulator, body_exposure, research_reproducibility]
+    patient_state_fields: [embodied-workflow-episode_as_derived_summary]
+    knowledge_graph_entities: [workflow_episode, protocol_step, hand_object_interaction]
+    shared_services: [consent, provenance, audit, longitudinal_replay, human_observability]
+    backend_surfaces: [src/domains/observability/adapters/embodiedPerceptionAdapter.ts]
+    frontend_surfaces: [future_records_replay, future_clinical_review, future_simulation_overlay]
+    persistence_surfaces: [canonical_longitudinal_event_summary_only]
+    external_integrations: [structured_perception_adapter_contract]
+    maturity_level: FUNCTIONAL
+    clinical_validation: not_started
+    technical_risk: medium
+    clinical_risk: high
+    provenance_required: true
+    tests: [scripts/qa/human-observability.test.mjs, scripts/qa/embodied-perception-adapter.test.mjs]
+    observability: [interaction_confidence, protocol_coverage_gap, episode_uncertainty, sequence_evidence, packet_sequence_gap, timestamp_regression]
+    known_gaps: [no_device_specific_live_capture_connector, no_external_dataset_validation, no_qualified_clinical_workflow_validation, raw_media_service_not_implemented]
+    next_actions: [validate_against_annotated_egocentric_workflow_dataset, add_human_review_surface, connect_first_authorized_device_specific_capture_connector]
+    last_audited_commit: 04e40942000b847367a29bd3d1082746442cb929
+
+
+  - feature_id: core.physiological_state_engine
+    name: Provenance-aware Physiological State Engine
+    domain: Core Health Intelligence
+    capability: Typed multi-engine physiology runtime
+    workflow: Canonical observed boundary -> domain engines -> model-derived state -> Reality Error comparison
+    user_types: [system, clinician, learner, researcher]
+    primary_problem: Physiological models can fragment truth, units, provenance, and version identity when implemented as isolated calculators
+    use_case: Run versioned physiology models with typed coupling while keeping simulated and model-derived outputs separate from canonical patient truth
+    inputs: [admissible_longitudinal_events, explicit_boundary_conditions, versioned_model_parameters]
+    outputs: [model_derived_physiological_state, simulated_state, provenance_graph, reality_predictions, reality_error_evidence]
+    reads_from: [core.canonical_patient_state]
+    writes_to: [physiological_runtime_state, reality_error_ledger]
+    dependencies: [provenance, truth_class, units, model_versioning, consent_for_patient_derived_boundaries]
+    dependents: [body_exposure, clinical_context, simulation, reality_engine]
+    patient_state_fields: [read_only_longitudinal_events]
+    knowledge_graph_entities: [physiology, hemodynamics, oxygen_transport, neurovascular_perfusion]
+    shared_services: [provenance, longitudinal_state, reality_error, reality_gap]
+    backend_surfaces: []
+    frontend_surfaces: []
+    persistence_surfaces: []
+    external_integrations: []
+    maturity_level: FUNCTIONAL
+    clinical_validation: not_started
+    technical_risk: medium
+    clinical_risk: high
+    provenance_required: true
+    tests: [scripts/uji/physiological-runtime.mts, scripts/uji/longitudinal-physiology-pipeline.mts, scripts/uji/cerebral-perfusion-coupling.mts, scripts/uji/fick-oxygen-extraction.mts]
+    observability: [deterministic_provenance_ids, reality_error_ledger, explicit_reality_gap]
+    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    next_actions: [route_additional_domain_couplings_through_runtime, connect_model_derived_state_to_existing_projections_without_writeback, validate_models_against_external_reference_data]
+    last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583

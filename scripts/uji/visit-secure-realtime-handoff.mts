@@ -1,18 +1,19 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const claude = readFileSync('CLAUDE.md', 'utf8')
+// Ledger arahan pemilik dipindah dari CLAUDE.md ke PANACEA_OWNER_DIRECTIVES.md (CLAUDE.md v2, #2094).
+const claude = readFileSync('PANACEA_OWNER_DIRECTIVES.md', 'utf8')
 
 assert.match(
   claude,
   /## Visit OS secure realtime handoff — updated 2026-09-20/,
-  'CLAUDE.md must carry the current secure Visit realtime handoff',
+  'PANACEA_OWNER_DIRECTIVES.md must carry the current secure Visit realtime handoff',
 )
 
 assert.doesNotMatch(
   claude,
   /backend has no canonical server-side visit\/encounter membership registry/i,
-  'CLAUDE.md must not retain the resolved Visit membership blocker',
+  'PANACEA_OWNER_DIRECTIVES.md must not retain the resolved Visit membership blocker',
 )
 
 for (const required of [
@@ -25,7 +26,7 @@ for (const required of [
 ]) {
   assert.ok(
     claude.includes(required),
-    `CLAUDE.md secure Visit handoff missing current boundary: ${required}`,
+    `PANACEA_OWNER_DIRECTIVES.md secure Visit handoff missing current boundary: ${required}`,
   )
 }
 

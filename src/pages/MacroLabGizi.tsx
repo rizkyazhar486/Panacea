@@ -8,6 +8,7 @@ import { useVitalField } from '../lib/useVitals'
 import { KolomVitalTerikat } from '../components/KolomVital'
 import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Macro Lab — target makronutrien dan komposisi makan.
@@ -82,6 +83,7 @@ export function MacroLabGizi() {
         title="Macro Lab"
         subtitle="Macronutrient targets and meal structure, from the body mass you enter"
       />
+      <BatasKlaimKesehatan permukaan="wellness.macro-lab" />
 
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Your data</div>

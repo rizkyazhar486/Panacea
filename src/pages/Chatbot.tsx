@@ -11,6 +11,8 @@ import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { Portal } from '../components/Portal'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { clinicalClaimDisclosure, clinicalClaimLabel, clinicalClaimMaturity } from '../lib/clinicalClaimMaturity'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
@@ -247,8 +249,8 @@ export function Chatbot() {
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
       setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Uploading image: ${file.name}`, at: new Date().toISOString() }])
-      const r = await api.aiVision(dataUrl, 'Analyze this diagnostic imaging.')
-      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image Analysis**\n\n${r.text}`, at: new Date().toISOString() }))
+      const r = await api.aiVision(dataUrl, 'Describe visible structures in this medical teaching image for education only. Describe only visible/objective features. Do not diagnose, stage, measure lesions, give a differential, or give treatment advice. Do not invent palpation findings, vital signs, laboratory values, lymph-node findings, or other unseen data. If the image is unclear, say so.')
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image description (educational draft)**\n\n${r.text}\n\n_Technical output — not clinician-reviewed or clinically validated._`, at: new Date().toISOString() }))
     } catch { setError('Failed to analyze the image.') } finally { setAnalyzing(false) }
   }
 
@@ -297,12 +299,45 @@ export function Chatbot() {
       const existing = state.records[activePatient.id]
       const record: EMRRecord = {
         id: existing?.id ?? uid(), patientId: activePatient.id, createdAt: existing?.createdAt ?? now, updatedAt: now,
-        anamnesis: { keluhanUtama: d.keluhanUtama, rps: d.rps, rpd: d.rpd, rpk: d.rpk, riwayatKehamilan: '', riwayatPengobatan: d.riwayatPengobatan, riwayatAlergi: d.riwayatAlergi, riwayatTumbuhKembang: '', riwayatNutrisi: d.riwayatNutrisi, riwayatImunisasi: '', riwayatSosialEkonomi: d.riwayatSosialEkonomi },
-        physicalExam: existing?.physicalExam ?? { general: '', vitalsNote: autoObjective(messages, ctxOf(store).latestVitals), perSystem: d.suggestedExams.map((s) => `• [AI SUGGESTION] ${s}`).join('\n'), doctorVerified: false },
-        // Kolom yang ditulis AI dinyatakan 'AI' agar server tidak mencapnya sebagai tulisan dokter
-        // meski Chatbot dipakai di sesi dokter.
-        asalIsian: { ...(existing?.asalIsian ?? {}), ...Object.fromEntries(['keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatPengobatan', 'riwayatAlergi', 'riwayatNutrisi', 'riwayatSosialEkonomi'].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])), ...(existing?.physicalExam ? {} : { 'physicalExam.vitalsNote': { asal: 'AI' as const }, 'physicalExam.perSystem': { asal: 'AI' as const } }) },
-        problems: d.problems.map((pr) => ({ id: uid(), ...pr })), plan, prognosis: d.prognosis, references: d.references,
+        anamnesis: {
+          keluhanUtama: d.keluhanUtama,
+          rps: d.rps,
+          rpd: d.rpd,
+          rpk: d.rpk,
+          riwayatKehamilan: d.riwayatKehamilan,
+          riwayatPengobatan: d.riwayatPengobatan,
+          riwayatAlergi: d.riwayatAlergi,
+          riwayatTumbuhKembang: d.riwayatTumbuhKembang,
+          riwayatNutrisi: d.riwayatNutrisi,
+          riwayatImunisasi: d.riwayatImunisasi,
+          riwayatSosialEkonomi: d.riwayatSosialEkonomi,
+        },
+        physicalExam: existing?.physicalExam ?? {
+          general: '',
+          vitalsNote: autoObjective(messages, ctxOf(store).latestVitals),
+          perSystem: d.suggestedExams.map((exam) => `• [AI SUGGESTION — NOT EXAMINED] ${exam.replace(/^AI SUGGESTION\s*[—:-]?\s*NOT EXAMINED\s*[—:-]?\s*/i, '')}`).join('\n'),
+          doctorVerified: false,
+        },
+        // Every AI-written field stays provenance-tagged as AI until a clinician
+        // edits/verifies it; missing history is explicit rather than silently blank.
+        asalIsian: { ...(existing?.asalIsian ?? {}),
+          ...Object.fromEntries([
+            'keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatKehamilan',
+            'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang',
+            'riwayatNutrisi', 'riwayatImunisasi', 'riwayatSosialEkonomi',
+          ].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])),
+          ...(existing?.physicalExam ? {} : {
+            'physicalExam.vitalsNote': { asal: 'AI' as const },
+            'physicalExam.perSystem': { asal: 'AI' as const },
+          }),
+        },
+        anthropometry: d.anthropometry,
+        labEkgInterpretation: d.labEkgInterpretation,
+        supportive: d.supportive,
+        problems: d.problems.map((pr) => ({ id: uid(), source: 'AI' as const, ...pr })),
+        plan,
+        prognosis: d.prognosis,
+        references: d.references,
       }
       saveRecord(record); nav('/emr')
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to compose the draft.') } finally { setDrafting(false) }
@@ -349,6 +384,7 @@ export function Chatbot() {
         <span className="mt-0.5 shrink-0">⚕️</span>
         <span><b>Important:</b> This AI is <b>educational &amp; supportive</b>, not a replacement for a doctor. In an emergency, use <b>Emergency SOS</b> immediately.</span>
       </div>
+      <BatasKlaimKesehatan permukaan="care.ai-chat" />
       {topup && (
         <div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm">
           <span className="text-accent">Insufficient PNC balance ({price} PNC).</span>
@@ -363,8 +399,8 @@ export function Chatbot() {
             <button onClick={() => setShowHistory(true)} title="Chat history" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
             <IconChat className="text-brand" size={20} />
             <div>
-              <div className="font-bold">Anamnesis Co-Physician</div>
-              <div className="text-xs text-neutral-500">AI interviews the patient &amp; recommends supporting tests</div>
+              <div className="font-bold">Anamnesis Assistant</div>
+              <div className="text-xs text-neutral-500">Educational interview draft — not a clinically validated Panacea decision</div>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -571,6 +607,7 @@ interface BubbleProps {
 function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegenerate }: BubbleProps) {
   const isUser = msg.role === 'user'
   const time = msg.at ? new Date(msg.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''
+  const maturity = clinicalClaimMaturity()
 
   if (isUser) {
     return (
@@ -591,6 +628,9 @@ function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegen
         <div className="rounded-2xl rounded-tl-sm bg-neutral-50 px-4 py-3 text-sm leading-relaxed text-ink">
           <RenderContent text={msg.content} />
         </div>
+        <p className="mt-1 pl-1 text-[10px] text-neutral-500" data-clinical-claim-maturity={maturity}>
+          {clinicalClaimLabel(maturity)} · {clinicalClaimDisclosure(maturity)}
+        </p>
         <div className="mt-1 flex items-center gap-0.5 pl-1 opacity-0 transition-opacity group-hover/b:opacity-100">
           <span className="mr-1 text-[10px] text-neutral-500">{time}</span>
           <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-500 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>

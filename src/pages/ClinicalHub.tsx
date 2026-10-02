@@ -10,6 +10,7 @@ import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../components/MentalHealthClinicalResearchLab'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 export const GROUPS = [
   {
@@ -23,6 +24,7 @@ export const GROUPS = [
       { to: '/med-study', name: 'Medical Library', kw: 'library evidence guideline journal' },
       { to: '/chatbot', name: 'Ask Health', kw: 'health question ai clinical assistant' },
       { to: '/emr', name: 'AI-EMR', kw: 'medical record longitudinal care documentation' },
+      { to: '/doctor-review', name: 'Doctor Review Checklist', kw: 'doctor human review checklist clinical notes provenance safety' },
       { to: '/clinical-calculators', name: 'Calculators & Lab', kw: 'calculator laboratory clinical score' },
       { to: '/learn', name: 'Learn & Look Up', kw: 'learn lookup study reference' },
     ],
@@ -112,6 +114,10 @@ export function ClinicalHub() {
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
           <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
         </header>
+        <BatasKlaimKesehatan
+          permukaan="clinical.hub"
+          className="mt-0 text-[11px] leading-snug text-white/55"
+        />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
@@ -146,6 +152,15 @@ export function ClinicalHub() {
               </Link>
             ))}
           </nav>
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review"
+              className="mt-4 flex min-h-[48px] items-center justify-between border-y border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Doctor Review Checklist</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
 
         <section className="grid gap-8 lg:grid-cols-2" aria-label="Clinical quick tools">

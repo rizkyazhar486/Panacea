@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { lazy, Suspense } from 'react'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
 // rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
@@ -279,6 +280,7 @@ export function EMR() {
             <SatusehatButton patient={activePatient} record={draft} vitals={state.vitals[activePatient.id] ?? []} />
           </div>
         </div>
+        <BatasKlaimKesehatan permukaan="care.ai-emr" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">
           <IconSparkle size={14} />
           Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
@@ -434,6 +436,20 @@ export function EMR() {
           subtitle="Lab/ECG interpretation · resuscitation, fluid balance, caloric needs, urine output"
         />
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
+        <div className="mb-4">
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Anthropometry — Formula, Standard & Interpretation
+          </label>
+          <textarea
+            value={draft.anthropometry ?? ''}
+            onChange={(e) =>
+              patch((r) => ({ ...r, anthropometry: e.target.value, updatedAt: new Date().toISOString() }))
+            }
+            rows={3}
+            placeholder="BMI = kg/m²; pediatric WHO/CDC z-score/percentile only when valid age/sex/reference inputs are available."
+            className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          />
+        </div>
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
             Interpretation of Lab Findings & ECG Results

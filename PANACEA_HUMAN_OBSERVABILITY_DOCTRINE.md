@@ -363,3 +363,34 @@ Panacea should progressively become capable of answering, with explicit evidence
 > What is happening to this human now, what changed, why might it have changed, what is still unknown, what could happen next under explicit assumptions, what safe action is authorized, and what actually happened after that action?
 
 The quality of Panacea is not measured by how much it watches. It is measured by how accurately, continuously, transparently and safely it converts authorized observations into useful human understanding and validated action.
+
+
+---
+
+## Embodied Workflow Observation profile
+
+Authorized egocentric/head-mounted cameras, room cameras, mobile cameras, AR glasses and fused device sensors may feed a replaceable perception layer that reconstructs hand-object interactions and workflow episodes. This profile exists to observe **how work unfolds through time** without creating a second human truth store.
+
+Canonical implementation: `src/lib/embodiedWorkflowOS.ts`  
+Design: `DOCS/EMBODIED-WORKFLOW-OBSERVATION-OS.md`
+
+Hard rules:
+
+- capture must be explicitly authorized for its purpose;
+- the perception layer may estimate hands, instruments, containers, devices, anatomy, actions and temporal relations;
+- detections and reconstructed steps remain model estimates until an identified human review promotes them;
+- missing visual evidence is a knowledge gap, not automatic proof of protocol deviation;
+- Canonical Longitudinal State receives a derived episode summary only after explicit subject binding and active purpose consent;
+- raw media, face/biometric identity and pixel geometry do not enter canonical patient state by default;
+- this profile cannot authorize autonomous clinical action, patient-specific surgical navigation, dosing, device actuation or covert monitoring.
+
+The workflow confidence contract is:
+
+```text
+C_interaction = product(c_k ^ w_k)
+C_step = coverage_step * GM(C_interaction matched)
+Gap_protocol = 1 - weighted_mean(coverage_step)
+U_episode = 1 - C_episode
+```
+
+This enables reproducible lab records, reviewed bedside workflow evidence, procedural education, rehabilitation observation and consented self-care replay while preserving Panacea's existing provenance, consent, replay and truth-class boundaries.

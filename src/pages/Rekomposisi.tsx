@@ -7,6 +7,7 @@ import { useVitalField } from '../lib/useVitals'
 import {
   SASARAN, FASE_REKOMP, PEKAN, PENGUKURAN, giziFase, type FaseRekomp,
 } from '../lib/rekomposisi'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Program rekomposisi — kalistenik dan dumbel.
@@ -51,6 +52,7 @@ export function Rekomposisi() {
         title="Recomposition programme"
         subtitle="Calisthenics and dumbbells — legs, abdomen, core, chest, traps and neck"
       />
+      <BatasKlaimKesehatan permukaan="performance.recomposition" />
 
       {/* ── Sasaran, apa adanya ──────────────────────────────────────────── */}
       <Card className="!p-4">

@@ -7,6 +7,7 @@ import {
   FORMAT, BENCHMARK, ARKETIPE, RABDO, ATURAN_AMAN, RUJUKAN, GAMBAR_SKALA,
   type Benchmark,
 } from '../lib/crossfit'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CrossFit — halaman edukasi.
@@ -49,6 +50,7 @@ export function CrossFit() {
         title="CrossFit & AMRAP"
         subtitle="Workout formats, named benchmarks, and how to scale them safely"
       />
+      <BatasKlaimKesehatan permukaan="performance.crossfit" />
 
       {/* Peringatan didahulukan, bukan disembunyikan di bawah. */}
       <Card className="!border-rose-500/30 !bg-rose-500/5">

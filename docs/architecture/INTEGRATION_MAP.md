@@ -67,6 +67,13 @@ Preferred pattern:
 ### Cross-system physiology
 `measured/reference boundary conditions -> specialized engines -> typed coupling -> model-derived whole-body state -> Clinical/Body Exposure/Simulation projections`
 
+
+Current canonical implementation evidence (audited at `adfaf2d5040a4e96bb305173060df14bddb75583`):
+- `src/lib/physiology/runtime.ts` is the shared typed coupling runtime: engines declare units, model/version/parameter identity, validation/fidelity class, truth class and provenance; duplicate producers, undeclared fields, cycles, unit mismatches and non-finite outputs fail closed.
+- `src/lib/physiology/longitudinalBoundary.ts` admits patient-derived boundaries only from measured, imported or clinician-entered longitudinal events; simulated, AI-draft, derived and unavailable states are rejected.
+- `src/lib/physiology/canonicalOxygenDelivery.ts` proves the integrated path from canonical observed events through cardiovascular/oxygen engines into a model-derived Reality Error prediction while preserving source lineage and leaving canonical patient truth unchanged.
+- `src/lib/physiology/cerebralPerfusionCoupling.ts` and `src/lib/physiology/fickOxygenExtraction.ts` are bounded source-backed model-derived calculations. They do not establish cerebral blood flow, tissue oxygen utilization, diagnosis, prognosis or treatment thresholds, and should be routed through the shared runtime before broader projection.
+
 ## Feature-island detection
 Flag capabilities that have:
 - no inbound workflow;

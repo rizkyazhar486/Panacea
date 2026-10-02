@@ -1,17 +1,19 @@
 import { useLongitudinalState } from '../lib/useLongitudinalState'
 import { JENDELA_HARI, perubahanTeratas, labelMetrik, asal, angka, timelineHarian } from '../lib/perubahanLongitudinal'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // "What changed" — konsumen runtime pertama status longitudinal kanonik.
 // Menaruh lab, vital, dan kebugaran di satu daftar yang sama, diurutkan menurut
 // besarnya perubahan relatif dalam 180 hari. Ini deskripsi perubahan, bukan
 // penilaian klinis: tidak ada label normal/abnormal di sini.
 export function ApaYangBerubah() {
-  const { state, labels } = useLongitudinalState()
+  const { state, labels, labSource, serverSource, deviceSource, selfSource, vo2Source } = useLongitudinalState()
   if (!state) return null
   const daftar = perubahanTeratas(state, new Date())
   return (
-    <section className="kaca rounded-3xl p-3" aria-label="What changed" data-what-changed>
+    <section className="kaca rounded-3xl p-3" aria-label="What changed" data-what-changed data-lab-source={labSource} data-server-source={serverSource} data-device-source={deviceSource} data-self-source={selfSource} data-vo2-source={vo2Source}>
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">What changed · last {JENDELA_HARI} days</h2>
+      <BatasKlaimKesehatan permukaan="lab.what-changed" />
       {daftar.length === 0 ? (
         <p className="t-kecil mt-1 text-neutral-500">Record something twice — a lab result, weight or blood pressure — to see how it moves.</p>
       ) : (
