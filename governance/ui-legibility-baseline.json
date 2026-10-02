@@ -13,6 +13,10 @@
     "clinical-hub": {
       "words": 71,
       "smallWords": 56
+    },
+    "med-study": {
+      "words": 234,
+      "smallWords": 217
     }
   }
 }

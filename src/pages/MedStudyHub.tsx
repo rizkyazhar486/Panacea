@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import { MedicalLibraryWorkbench } from '../components/MedicalLibraryWorkbench'
 import { StudyCommandCenter } from '../components/StudyCommandCenter'
 import { MedStudyHub as MedStudyHubBase } from './MedStudyHubBase'
+import { Fold } from '../shared/ui/Fold'
 
 export function MedStudyHub() {
   const [params, setParams] = useSearchParams()
@@ -16,19 +17,17 @@ export function MedStudyHub() {
   return (
     <div className="space-y-5 pb-8">
       <MedicalLibraryWorkbench onRun={runEvidenceQuery} />
-      <MedStudyHubBase key={params.toString()} />
+      {/* Hasil pencarian bukti tampil di bagian ini; ia terbuka sendiri bila ada `bagian`. */}
+      <Fold label="Topics" defaultOpen={params.has('bagian')}>
+        <MedStudyHubBase key={params.toString()} />
+      </Fold>
 
-      <details className="mx-auto max-w-5xl rounded-[24px] border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[.035] sm:p-4">
-        <summary className="cursor-pointer text-[11px] font-black text-neutral-700 dark:text-neutral-200">
-          Optional study planner · focus timer, goals and spaced review
-        </summary>
-        <p className="mt-2 text-[9.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-          This planner supports study workflow but is separate from the Medical Library itself. Open it only when you want to plan or review learning.
+      <Fold label="Planner">
+        <p className="mb-3 text-[13px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          Focus timer, goals and spaced review. Separate from the Medical Library; open it only to plan or review learning.
         </p>
-        <div className="mt-3">
-          <StudyCommandCenter />
-        </div>
-      </details>
+        <StudyCommandCenter />
+      </Fold>
     </div>
   )
 }

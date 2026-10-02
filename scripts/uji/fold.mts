@@ -45,6 +45,10 @@ assert.doesNotMatch(html, /<details[^>]*\sopen/, 'a fold is closed by default')
 assert.match(html, /fold__word">Layers</, 'the fold shows one word')
 assert.match(html, /<button>Vessels<\/button>/, 'folded content stays in the DOM, so no control disappears')
 
+const openHtml = renderToStaticMarkup(createElement(Fold, { label: 'Topics', defaultOpen: true }, createElement('p', null, 'x')))
+assert.match(openHtml, /<details[^>]*\sopen/, 'defaultOpen renders the fold open (search results must be visible)')
+assert.doesNotMatch(renderToStaticMarkup(createElement(Fold, { label: 'Topics', defaultOpen: false }, createElement('p', null, 'x'))), /<details[^>]*\sopen/, 'defaultOpen=false stays closed')
+
 // Gaya: lantai sentuh dan huruf besar, fokus terlihat, gerak dihormati.
 const css = readFileSync('src/shared/ui/fold.css', 'utf8')
 assert.match(css, /min-height: 56px/, 'summary keeps a generous touch target')
@@ -65,6 +69,11 @@ assert.doesNotMatch(home, /<Fold label="[A-Za-z]+"><(HomeHealthBrief|HomeVisualL
 const clinical = readFileSync('src/pages/ClinicalHub.tsx', 'utf8')
 for (const w of ['Calculators', 'Research', 'Patient', 'Depth', 'Guide', 'Capabilities']) assert.match(clinical, new RegExp(`<Fold label="${w}">`), `Clinical folds ${w}`)
 assert.doesNotMatch(clinical, /<Fold label="[A-Za-z]+">\s*<PersonalBodyUnifiedSurface/, 'the body projection is the main surface and is never folded')
+// Learn: hasil pencarian bukti tidak boleh tersembunyi di lipatan tertutup.
+const learn = readFileSync('src/pages/MedStudyHub.tsx', 'utf8')
+assert.match(learn, /<Fold label="Topics" defaultOpen=\{params\.has\('bagian'\)\}>/, 'Learn opens Topics itself when an evidence query sets `bagian`')
+assert.match(learn, /<Fold label="Planner">/, 'Learn folds the study planner')
+assert.match(learn, /<MedicalLibraryWorkbench onRun=\{runEvidenceQuery\} \/>/, 'the library search stays the visible main surface')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
