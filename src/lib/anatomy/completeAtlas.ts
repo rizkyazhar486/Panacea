@@ -8,6 +8,7 @@ import { HIGHER_END_WHOLE_BODY_NODES } from './higherEndWholeBodyAtlas'
 import { RESPIRATORY_ATLAS_NODES } from './respiratoryAtlas'
 import { WHOLE_BODY_ATLAS_BASE_NODES } from './wholeBodyAtlas'
 import { INDEKS_TUBUH } from '../bodyIndex.gen'
+import { WHOLE_BODY_DEEP_WAVE_2_NODES } from './wholeBodyDeepWave2'
 
 /**
  * Build hierarchy solely from parentId. Raw `children` arrays are deliberately
@@ -96,6 +97,9 @@ const COMPOSED_STRUCTURAL_NODES = applyAtlasRelationPatches(
     ...DEEP_CARDIOVASCULAR_ATLAS_NODES,
     ...DEEP_NEUROVASCULAR_ATLAS_NODES,
     ...CARDIOPULMONARY_BRIDGE_NODES,
+    // Gelombang 2 paling akhir: definisi pertama sebuah id menang, jadi ia memperluas
+    // kontinuitas makro -> jaringan -> mikrostruktur tanpa menimpa node yang geometrinya sudah terikat.
+    ...WHOLE_BODY_DEEP_WAVE_2_NODES,
   ]),
   [...HIGH_END_ATLAS_RELATION_PATCHES, ...CARDIOPULMONARY_RELATION_PATCHES],
 )
