@@ -4,6 +4,7 @@ import {
   PULMONARY_SFTPC_MOLECULAR_VERTICAL, PULMONARY_SFTPC_WITHHELD_GAPS,
   validatePulmonarySftpcVertical,
 } from '../../src/lib/bodyPulmonaryMolecularVertical.ts'
+import { auditEmptyScales } from '../../src/lib/bodyMultiscaleBridge.ts'
 
 // Rel skala multiskala dan vertikal molekuler paru sudah lengkap di
 // repositori ini sejak lama -- dan TIDAK ADA satu berkas pun yang
@@ -38,6 +39,14 @@ assert.match(panel, /gap\.reason/, 'each withheld scale must carry its recorded 
 for (const gap of PULMONARY_SFTPC_WITHHELD_GAPS) {
   assert.ok(gap.reason.length > 40, `${gap.scale}: a withheld scale needs a real reason, not a label`)
 }
+// Memeriksa alasan yang ADA tidak cukup: skala kosong TANPA alasan lolos dari loop di atas, dan
+// halaman sempat mengaku semua skala abu-abu dijelaskan padahal tiga dari lima tidak (tubuh utuh,
+// sistem, organ). Kelengkapannya kini diperiksa dan harus dinyatakan di layar hanya bila benar.
+assert.equal(auditEmptyScales(PULMONARY_SFTPC_MOLECULAR_VERTICAL, PULMONARY_SFTPC_WITHHELD_GAPS).ok, true,
+  'every scale without a node must have exactly one recorded reason')
+assert.match(panel, /auditEmptyScales/, 'the panel must verify coverage before claiming every empty scale is explained')
+assert.match(panel, /role="alert"/, 'an unexplained empty scale must be shown, not hidden')
+assert.doesNotMatch(panel, /is not unfinished work/, 'the panel must not claim empty scales are not unfinished work')
 
 // ── 4. Status telaah tidak boleh disembunyikan ─────────────────────────────
 const periksa = validatePulmonarySftpcVertical()
