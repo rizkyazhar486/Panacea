@@ -1,10 +1,14 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
 import { verifyEyeOptics } from './eye-optics-smoke.mjs'
+import { buildFailureEvidence, failureEvidencePaths } from './body3d-failure-evidence.mjs'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const outputPath = process.env.BODY3D_QA_CANVAS_ARTIFACT || 'artifacts/body3d-mobile-canvas.png'
 const timeoutMs = Number(process.env.BODY3D_QA_VISUAL_TIMEOUT_MS || 120_000)
+
+const startedAt = Date.now()
+const evidencePaths = failureEvidencePaths(outputPath)
 
 await mkdir('artifacts', { recursive: true })
 
@@ -33,7 +37,17 @@ await context.addInitScript(() => {
   const nativeGetContext = HTMLCanvasElement.prototype.getContext
   HTMLCanvasElement.prototype.getContext = function getContext(type, attributes) {
     if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
-      return nativeGetContext.call(this, type, { ...(attributes || {}), preserveDrawingBuffer: true })
+      const gl = nativeGetContext.call(this, type, { ...(attributes || {}), preserveDrawingBuffer: true })
+      // Hanya mencatat; tidak memanggil preventDefault, jadi pemulihan konteks aplikasi tidak berubah.
+      if (gl && !this.__qaWebglWatched) {
+        this.__qaWebglWatched = true
+        for (const name of ['webglcontextlost', 'webglcontextrestored']) {
+          this.addEventListener(name, () => {
+            ;(window.__qaWebglEvents ||= []).push({ type: name, atMs: performance.now() })
+          })
+        }
+      }
+      return gl
     }
     return nativeGetContext.call(this, type, attributes)
   }
@@ -59,6 +73,44 @@ const page = await context.newPage()
 page.setDefaultTimeout(20_000)
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
+const consoleMessages = []
+page.on('console', (message) => {
+  if (message.type() === 'error' || message.type() === 'warning') {
+    consoleMessages.push({ type: message.type(), text: message.text() })
+  }
+})
+
+// Saat gerbang gagal, simpan apa yang sebenarnya terlihat di halaman. Tanpa ini sebuah timeout
+// "canvas hilang" tidak dapat dibedakan dari konteks WebGL yang hilang atau komponen yang remount.
+async function saveFailureEvidence(error) {
+  try {
+    const state = await Promise.race([
+      page.evaluate(() => ({
+        readyState: document.readyState,
+        canvasCount: document.querySelectorAll('canvas').length,
+        targetCanvasCount: document.querySelectorAll('div.h-full.w-full.touch-none > canvas').length,
+        bodyText: document.body?.innerText ?? '',
+        webglEvents: window.__qaWebglEvents ?? [],
+      })),
+      new Promise((resolve) => setTimeout(() => resolve(null), 5_000)),
+    ]).catch(() => null)
+    const evidence = buildFailureEvidence({
+      error,
+      elapsedMs: Date.now() - startedAt,
+      url,
+      page: state ? { ...state, collected: true } : { collected: false },
+      consoleMessages,
+      pageErrors,
+      webglEvents: state?.webglEvents ?? [],
+    })
+    await writeFile(evidencePaths.json, JSON.stringify(evidence, null, 2))
+    // Sengaja tanpa tangkapan layar: screenshot compositor Playwright pernah menggantung pada WebGL SwiftShader,
+    // dan jalur gagal justru saat konteks WebGL mungkin hilang. Teks halaman dan jumlah canvas sudah cukup.
+    console.error(`Body3D failure evidence written to ${evidencePaths.json}`)
+  } catch {
+    // Bukti hanya upaya terbaik. Yang menggagalkan gerbang tetap galat aslinya, yang dilempar ulang di bawah.
+  }
+}
 
 async function placeCanvasOnscreen(canvas) {
   // Playwright's scrollIntoViewIfNeeded waits for element stability; the live
@@ -248,6 +300,9 @@ try {
     lumaSpread: capture.lumaSpread,
     bytes: png.length,
   }))
+} catch (error) {
+  await saveFailureEvidence(error)
+  throw error
 } finally {
   await context.close().catch(() => undefined)
   await browser.close().catch(() => undefined)
