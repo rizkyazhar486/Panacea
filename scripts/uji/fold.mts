@@ -117,6 +117,13 @@ assert.ok(liga.indexOf('AI victory index') < liga.indexOf('<Fold label="Matches"
 const umur = readFileSync('src/pages/Longevity.tsx', 'utf8')
 for (const w of ['Evidence', 'Pillars', 'Projection', 'Labs', 'Testing', 'Sources']) assert.match(umur, new RegExp(`<Fold label="${w}">`), `Longevity folds ${w}`)
 assert.ok(umur.indexOf('Biological Age (est.)') < umur.indexOf('<Fold label="Evidence">'), 'the score hero comes before every fold')
+// VitaPulse: ringkasan waktu-nyata adalah hero; tujuh bagian lain dan video dilipat satu kata.
+const vita = readFileSync('src/pages/VitaPulse.tsx', 'utf8')
+const pusat = readFileSync('src/pages/Feed.tsx', 'utf8')
+assert.match(vita, /<Fold label="Video"/, 'VitaPulse folds Video')
+for (const w of ['Assistant', 'Vitals', 'Sleep', 'Fitness', 'News', 'Learn', 'Goals']) assert.match(pusat, new RegExp(`<Fold label="${w}">`), `VitaPulse folds ${w}`)
+assert.ok(pusat.indexOf('Real-Time Summary') < pusat.indexOf('<Fold label="Assistant">'), 'the summary hero comes before every fold')
+assert.ok(pusat.slice(pusat.indexOf('Real-Time Summary'), pusat.indexOf('<Fold label="Assistant">')).includes('</Card>'), 'the folds are siblings of the summary hero, never nested inside its card')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)

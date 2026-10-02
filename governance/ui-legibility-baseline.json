@@ -37,6 +37,10 @@
     "fitness-hub?view=longevity": {
       "words": 154,
       "smallWords": 129
+    },
+    "fitness-hub?view=vitapulse": {
+      "words": 164,
+      "smallWords": 141
     }
   }
 }
