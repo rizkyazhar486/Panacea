@@ -48,6 +48,7 @@ assert.equal(effectiveRoleForRequest(user('owner', ownerEmail), undefined, owner
 
 const authSource = readFileSync('src/auth.ts', 'utf8')
 const otpSource = readFileSync('src/otp.ts', 'utf8')
+assert.match(authSource, /payload\.email_verified !== true/)
 assert.match(authSource, /ALLOW_DEV_LOGIN === 'true'/)
 assert.match(authSource, /NODE_ENV !== 'production'/)
 assert.match(authSource, /effectiveRoleForRequest/)

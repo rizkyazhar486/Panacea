@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity, IconHeart, IconRun } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 interface AthleteProfile {
   age?: number
@@ -70,6 +71,7 @@ export function AthleteScience() {
         title="Athlete Science"
         subtitle="Performance analytics with assumptions, uncertainty and physiological context"
       />
+      <BatasKlaimKesehatan permukaan="performance.athlete-science" />
 
       <Card className="!p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">

@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { useJam } from '../lib/useJam'
 import { getWorkouts } from '../lib/workoutStore'
 import { getVitals } from '../lib/healthVitals'
-import { getDemo } from '../lib/profile'
-import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
 import { deretMetrik, rentangPribadi } from '../lib/riwayatVitals'
 import { kesiapan } from '../lib/trainingPhysiology'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Label kesiapan dari trainingPhysiology adalah DATA berbahasa Indonesia yang
 // dipakai juga di layar lain; dipetakan ke antarmuka di sini, bukan diubah di
@@ -88,7 +89,7 @@ export function UbinRingHarian() {
     const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
     const workouts = getWorkouts()
     const k = {
-      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxPerkiraan(getDemoTersimpan()),
       hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
       sex: jk,
     }
@@ -152,6 +153,7 @@ export function UbinRingHarian() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Today</h2>
+        <BatasKlaimKesehatan permukaan="wellness.daily-ring-tile" />
         <Link to="/athlete-board" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           Board →
         </Link>

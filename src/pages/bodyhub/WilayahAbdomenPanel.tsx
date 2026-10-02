@@ -43,13 +43,7 @@ export function WilayahAbdomenPanel() {
       </div>
 
       <Prosa>
-        <p className="text-[11px] leading-relaxed text-neutral-500">
-          This is surface anatomy: which structures lie behind the abdominal wall in that region in an
-          average adult. It is not a list of causes of pain, not a differential, and it concludes nothing
-          about anyone. Pain does not obey this map — visceral pain is referred away from its organ, and
-          organs move with breathing, posture and body habitus. Region boundaries are conventions drawn on
-          a continuous wall, not structures in their own right.
-        </p>
+        <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">{'This is surface anatomy: which structures lie behind the abdominal wall in that region in an average adult. It is not a list of causes of pain, not a differential, and it concludes nothing about anyone. Pain does not obey this map — visceral pain is referred away from its organ, and organs move with breathing, posture and body habitus. Region boundaries are conventions drawn on a continuous wall, not structures in their own right.'}</Prosa>
       </Prosa>
     </div>
   )

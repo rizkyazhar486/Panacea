@@ -123,6 +123,12 @@ const pageErrors = []
 const consoleErrors = []
 page.on('pageerror', (e) => pageErrors.push(e.message))
 page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()) })
+// Permintaan huruf yang GAGAL di jaringan. Dipakai untuk membedakan "lembar
+// gayanya tidak pernah sampai" dari "hurufnya ada tetapi tidak dipakai".
+const hurufGagal = []
+page.on('requestfailed', (r) => {
+  if (/fonts\.(googleapis|gstatic)\.com/.test(r.url())) hurufGagal.push(r.url().slice(0, 80))
+})
 
 const hasil = { tema, kontras: null, fontsLoaded: null, cardFont: null, chipRect: null, cardRect: null, exportSize: null, clone: null, pageErrors, consoleErrors }
 try {
@@ -150,10 +156,42 @@ try {
   // Huruf ekspor harus benar-benar tersedia. Kalau Oxanium tidak termuat,
   // kulit ekspor diam-diam jatuh ke huruf berikutnya dan "futuristik" hilang
   // tanpa satu pun galat.
+  //
+  // TIDAK memakai document.fonts.check(). Fungsi itu menjawab "bisakah teks ini
+  // digambar", bukan "apakah hurufnya termuat" -- dan untuk keluarga yang TIDAK
+  // punya @font-face sama sekali ia mengembalikan TRUE, karena tidak ada yang
+  // tertunda dan peramban akan memakai huruf pengganti. Akibatnya terbalik:
+  // ketika seluruh lembar gaya Google Fonts gagal diambil, document.fonts
+  // kosong (0 entri) dan gerbang ini justru mencetak "huruf termuat" -- lulus
+  // paling meyakinkan tepat pada keadaan yang paling rusak. Terverifikasi:
+  // 0 FontFace, dua permintaan huruf gagal, ketiga check() mengembalikan true.
+  //
+  // Yang ditanyakan sekarang: adakah @font-face yang COCOK, dan apakah ia
+  // benar-benar berstatus 'loaded' setelah diminta memuat.
   hasil.fontsLoaded = await page.evaluate(async () => {
     await document.fonts.ready
-    return { inter: document.fonts.check('400 16px Inter'), oxanium: document.fonts.check('800 20px Oxanium'), mono: document.fonts.check('400 14px "JetBrains Mono"') }
+    const periksa = async (spek, keluarga) => {
+      let cocok = []
+      try { cocok = await document.fonts.load(spek) } catch { cocok = [] }
+      const nama = keluarga.toLowerCase()
+      const semua = []
+      document.fonts.forEach((f) => {
+        if (f.family.replace(/["']/g, '').toLowerCase() === nama) semua.push(f.status)
+      })
+      return {
+        dideklarasikan: semua.length > 0,
+        termuat: cocok.length > 0 && cocok.every((f) => f.status === 'loaded'),
+        status: semua,
+      }
+    }
+    return {
+      total: document.fonts.size,
+      inter: await periksa('400 16px Inter', 'Inter'),
+      oxanium: await periksa('800 20px Oxanium', 'Oxanium'),
+      mono: await periksa('400 14px "JetBrains Mono"', 'JetBrains Mono'),
+    }
   })
+  hasil.hurufGagal = hurufGagal
 
   const kartu = tombol.locator('xpath=ancestor::div[@class][1]/ancestor::div[1]')
   hasil.cardFont = await kartu.evaluate((el) => getComputedStyle(el).fontFamily)
@@ -222,9 +260,48 @@ try {
 }
 
 const gagal = []
-if (!hasil.fontsLoaded?.inter) gagal.push('Inter tidak termuat; badan kartu ekspor akan memakai huruf pengganti.')
-if (!hasil.fontsLoaded?.oxanium) gagal.push('Oxanium tidak termuat; judul ekspor kehilangan huruf hero-nya.')
-if (!hasil.fontsLoaded?.mono) gagal.push('JetBrains Mono tidak termuat; kolom metrik ekspor tidak lagi lebar-tetap.')
+const dilewati = []
+
+// Tiga keadaan yang berbeda, dan hanya dua di antaranya menyalahkan kodenya.
+{
+  const f = hasil.fontsLoaded
+  // Aturannya presisi: kalau ADA permintaan huruf yang gagal di jaringan, apa
+  // pun yang hilang sesudahnya adalah akibat jaringan, bukan akibat kode. Kalau
+  // TIDAK ada permintaan yang gagal dan hurufnya tetap tidak ada, itu memang
+  // cacat di repositori ini -- nama keluarga salah, tautan terhapus, atau
+  // @font-face yang tidak pernah dideklarasikan.
+  const takTerjangkau = (hasil.hurufGagal?.length ?? 0) > 0
+  if (takTerjangkau) {
+    // Lembar gaya hurufnya tidak pernah sampai. Itu pernyataan tentang jaringan
+    // mesin ini, bukan tentang kartu ekspornya -- dan dicetak apa adanya alih-alih
+    // menjadi "huruf termuat", yang dulu terjadi persis pada keadaan ini.
+    // DILEWATI, bukan digagalkan. Menggagalkan di sini berarti gerbang ini
+    // memerahkan setiap PR karena mesinnya tidak bisa menghubungi penyedia
+    // huruf pihak ketiga -- dan gerbang yang merah karena alasan yang bukan
+    // urusan repositori ini mengajari orang mengabaikan warna merah. Seluruh
+    // pemeriksaan lain di berkas ini tetap berjalan dan tetap menggagalkan
+    // cacat sungguhan.
+    dilewati.push(
+      `Pemeriksaan huruf dilewati: ${hasil.hurufGagal.length} permintaan ke penyedia huruf gagal ` +
+      `(${hasil.fontsLoaded?.total ?? 0} @font-face terdaftar). Ini pernyataan tentang jaringan mesin ` +
+      'yang menjalankan gerbang ini, BUKAN bukti bahwa kartu ekspornya rusak. Huruf tetap ' +
+      'diperiksa penuh di mana pun permintaannya berhasil.',
+    )
+  } else {
+    for (const [kunci, nama, akibat] of [
+      ['inter', 'Inter', 'badan kartu ekspor akan memakai huruf pengganti'],
+      ['oxanium', 'Oxanium', 'judul ekspor kehilangan huruf hero-nya'],
+      ['mono', 'JetBrains Mono', 'kolom metrik ekspor tidak lagi lebar-tetap'],
+    ]) {
+      const k = f?.[kunci]
+      if (!k?.dideklarasikan) {
+        gagal.push(`${nama} tidak punya @font-face sama sekali; ${akibat}, dan tidak ada yang pernah mencoba memuatnya.`)
+      } else if (!k.termuat) {
+        gagal.push(`${nama} dideklarasikan tetapi tidak termuat (status ${k.status.join(', ')}); ${akibat}.`)
+      }
+    }
+  }
+}
 if (!hasil.exportSize || hasil.exportSize.width < 100) gagal.push('Tidak ada kanvas yang diekspor: penangkapan gagal sebelum toBlob.')
 if (/serif/i.test(hasil.cardFont || '') && !/sans-serif/i.test(hasil.cardFont || '')) gagal.push(`Kartu hidup memakai serif: ${hasil.cardFont}`)
 const k = hasil.clone
@@ -254,5 +331,10 @@ else if (hasil.kontrasJudul < 80) {
 if (pageErrors.length) gagal.push(`Galat halaman: ${pageErrors.join(' | ')}`)
 
 console.log(JSON.stringify(hasil, null, 2))
+if (dilewati.length) console.warn('\nDILEWATI:\n- ' + dilewati.join('\n- '))
 if (gagal.length) { console.error('\nGAGAL:\n- ' + gagal.join('\n- ')); process.exit(1) }
-console.log('\nShare card export smoke lulus: huruf termuat, kanvas terekspor, cip share tidak ikut tercetak.')
+console.log(
+  '\nShare card export smoke lulus: ' +
+  (dilewati.length ? 'huruf TIDAK diperiksa (lihat DILEWATI di atas)' : 'huruf benar-benar termuat') +
+  ', kanvas terekspor, cip share tidak ikut tercetak.',
+)

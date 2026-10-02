@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -72,6 +73,7 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.domElement.dataset.cardiacCycle3d = 'true'
+    renderer.domElement.setAttribute('aria-hidden', 'true')
     wadah.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.75))
@@ -104,6 +106,8 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     const meshes: THREE.Mesh[] = []
     const warna = new Map<THREE.Mesh, THREE.Color>()
     let root: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
     const flows = [
       { flow: buatPartikel(scene, kurva(JALUR.rightFill), '#5aa2ff'), mode: 'fill' as const },
@@ -120,6 +124,7 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     loader.load(
       `${import.meta.env.BASE_URL}cardio/cardio.glb`,
       (gltf) => {
+        if (!penjaga.terima(gltf.scene)) return
         root = gltf.scene
         root.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
@@ -252,6 +257,7 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     start()
 
     return () => {
+      penjaga.lepas()
       stop()
       io.disconnect()
       ro.disconnect()
@@ -277,17 +283,25 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
   }, [])
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-neutral-50 dark:bg-white/5">
+    <div
+      className="relative overflow-hidden rounded-2xl bg-neutral-50 dark:bg-white/5"
+      role="region"
+      aria-label="Animated cardiac cycle 3D visualization"
+      aria-busy={muat && !gagal}
+    >
       <div ref={wadahRef} style={{ height: tinggi }} className="w-full" />
       {muat && !gagal && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center" role="status" aria-live="polite">
           <span className="text-xs font-semibold text-neutral-500">Loading cardiac cycle render…</span>
         </div>
       )}
       {gagal && (
-        <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="absolute inset-0 flex items-center justify-center p-4" role="alert">
           <span className="text-center text-xs font-semibold text-neutral-500">{gagal}</span>
         </div>
+      )}
+      {!muat && !gagal && (
+        <span className="sr-only" role="status" aria-live="polite">Cardiac cycle 3D visualization ready. Drag or swipe the visualization to orbit.</span>
       )}
     </div>
   )

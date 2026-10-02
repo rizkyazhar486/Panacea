@@ -22,8 +22,8 @@ import { GrafikMini } from './GrafikMini'
 import { titikTengahVo2, ML_PER_MET } from '../lib/bugarIlmiah'
 import { kebugaranKesegaran } from '../lib/analisisPro'
 import { saranBerikutnya } from '../lib/pelatih'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { UbinSalat } from './UbinSalat'
 
 const HARI = 864e5
@@ -276,7 +276,7 @@ export function hitungPelatih(sekarang = Date.now()) {
   const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
   const v = getVitals()
   const k = {
-    hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+    hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxPerkiraan(getDemoTersimpan()),
     hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
     sex: jk,
   }

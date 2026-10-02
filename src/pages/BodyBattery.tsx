@@ -3,10 +3,11 @@ import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconActivity, IconMoon, IconHeart } from '../components/icons'
 import { api, backendEnabled, type HrSample, type SleepNight } from '../lib/api'
-import { getDemo } from '../lib/profile'
-import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
 import { hitungBodyBattery, hitungStres, saranBaterai, JEDA_MAKS_MS } from '../lib/bodyBattery'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ export function BodyBattery() {
 
   const hrMaks = useMemo(() => {
     const teramati = samples.reduce((a, s) => Math.max(a, s.bpm), 0)
-    return Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex))
+    return Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan()))
   }, [samples, demo])
 
   const load = useCallback(() => {
@@ -76,6 +77,7 @@ export function BodyBattery() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconActivity />} title="Body Battery" />
+        <BatasKlaimKesehatan permukaan="wellness.body-battery" />
         <Card>
           <p className="text-sm leading-relaxed text-neutral-600">
             Body Battery is computed from the heart-rate trace the server collects through automatic
@@ -91,8 +93,9 @@ export function BodyBattery() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Battery"
-        subtitle="A 0–100 energy reserve, computed from heart rate through the day"
+        subtitle="A 0–100 energy reserve estimated from heart rate through the day — not a Garmin® Body Battery® reading"
       />
+      <BatasKlaimKesehatan permukaan="wellness.body-battery" />
 
       <div className="flex gap-2">
         {RENTANG.map((r) => (

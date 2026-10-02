@@ -41,6 +41,9 @@ export interface LiveHeartRate {
   disconnectStrap: () => void
   /** Manual entry. Passing 0 clears it and hands control back to the device. */
   setManual: (n: number) => void
+  /** Timestamp + sequence of the latest BLE notification. */
+  lastSampleAt: string | null
+  sampleSequence: number
   /** Human-readable one-liner for the UI, e.g. "Chest strap · live". */
   label: string
 }
@@ -60,6 +63,8 @@ export function useLiveHeartRate(): LiveHeartRate {
   const deviceBpm = typeof vitals.heartRate === 'number' ? vitals.heartRate : 0
 
   const [bleBpm, setBleBpm] = useState(0)
+  const [lastSampleAt, setLastSampleAt] = useState<string | null>(null)
+  const [sampleSequence, setSampleSequence] = useState(0)
   const [manual, setManualState] = useState(0)
   const bleSupported = typeof navigator !== 'undefined' && !!(navigator as any).bluetooth
   const [bleStatus, setBleStatus] = useState<BleStatus>(bleSupported ? 'idle' : 'unsupported')
@@ -85,11 +90,16 @@ export function useLiveHeartRate(): LiveHeartRate {
       await char.startNotifications()
       char.addEventListener('characteristicvaluechanged', (e: any) => {
         const next = parseHeartRateMeasurement(e.target.value as DataView)
-        if (next > 0) setBleBpm(next)
+        if (next > 0) {
+          setBleBpm(next)
+          setLastSampleAt(new Date().toISOString())
+          setSampleSequence((current) => current + 1)
+        }
       })
       device.addEventListener('gattserverdisconnected', () => {
         setBleStatus('idle')
         setBleBpm(0)
+        setLastSampleAt(null)
       })
       deviceRef.current = device
       setBleStatus('connected')
@@ -102,6 +112,7 @@ export function useLiveHeartRate(): LiveHeartRate {
     try { deviceRef.current?.gatt?.disconnect() } catch { /* already gone */ }
     deviceRef.current = null
     setBleBpm(0)
+    setLastSampleAt(null)
     setBleStatus(bleSupported ? 'idle' : 'unsupported')
   }, [bleSupported])
 
@@ -127,6 +138,8 @@ export function useLiveHeartRate(): LiveHeartRate {
     connectStrap,
     disconnectStrap,
     setManual,
+    lastSampleAt,
+    sampleSequence,
     label,
   }
 }

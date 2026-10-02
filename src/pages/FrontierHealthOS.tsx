@@ -1,6 +1,10 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
+import { DiscoveryWorkbench } from '../components/frontier/DiscoveryWorkbench'
+import { PanaceaCausalTimeMachine } from '../components/frontier/PanaceaCausalTimeMachine'
 import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
+import { PanaceaRealityEngine } from '../components/frontier/PanaceaRealityEngine'
+const AGILongevitySystemsLab = lazy(() => import('./bodyhub/AGILongevitySystemsLab'))
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -9,6 +13,7 @@ import {
   type FrontierCategory,
   type FrontierFeature,
 } from '../lib/frontierHealthOS'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const STATUS_LABEL: Record<FrontierFeature['status'], string> = {
   'integration-ready': 'Integration ready',
@@ -64,6 +69,7 @@ export function FrontierHealthOS() {
       <section className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-white to-brand/[0.06] p-5 dark:border-white/10 dark:from-neutral-950 dark:via-neutral-950 dark:to-brand/[0.08]">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Panacea Frontier Health OS</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white">From health app → programmable human Life OS</h1>
+        <BatasKlaimKesehatan permukaan="care.frontier-os" />
         <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-500">
           The frontier layer now has three tracks: usable local-first Life OS experiments, the Hope Stack for life preservation and healthy longevity,
           and deeper execution contracts for clinical intelligence, precision medicine, patient sovereignty, care automation, privacy infrastructure and population health.
@@ -73,6 +79,9 @@ export function FrontierHealthOS() {
 
       <PanaceaFrontierSeven />
       <PanaceaHopeStack />
+      <DiscoveryWorkbench />
+      <PanaceaRealityEngine />
+      <PanaceaCausalTimeMachine />
 
       <section className="space-y-4 rounded-[30px] border border-neutral-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[.025] sm:p-5">
         <div>
@@ -152,6 +161,12 @@ export function FrontierHealthOS() {
           </section>
         </div>
       </section>
+      <details className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open longevity research orchestration sandbox</summary>
+        <Suspense fallback={<div className="p-3 text-xs text-neutral-500" role="status">Loading sandbox…</div>}>
+          <AGILongevitySystemsLab />
+        </Suspense>
+      </details>
     </div>
   )
 }

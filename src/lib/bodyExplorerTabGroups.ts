@@ -51,6 +51,8 @@ export const KELOMPOK_TAB: Readonly<Record<string, string>> = {
   'dialisis': 'Physiology',
   'gas-alveolar': 'Physiology',
   'difusi': 'Physiology',
+  'indera': 'Reference',
+  'termoregulasi': 'Physiology',
   'sel': 'Physiology',
 
   // Sistem anatomi yang bisa ditunjuk pada model.
@@ -73,6 +75,9 @@ export const KELOMPOK_TAB: Readonly<Record<string, string>> = {
   // Rujukan dan alat yang lebih dalam.
   'molekul': 'Reference',
   'genomik': 'Reference',
+  'genom-alfa': 'Reference',
+  'vertikal-molekuler': 'Reference',
+  'pencitraan-volumetrik': 'Clinical',
   'presisi': 'Reference',
   'mesin': 'Reference',
   'reference': 'Reference',

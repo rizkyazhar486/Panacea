@@ -116,4 +116,28 @@ assert.equal(reducedOverride.maxConcurrent, 1);
 assert.deepEqual(reducedOverride.loadNow, ['visceral-selected']);
 assert.deepEqual(reducedOverride.prefetchNext, []);
 
+const duplicateRequired = planBodyProgressivePrefetch([
+  { assetId: 'shared-required', estimatedTransferMb: 3, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'shared-required', estimatedTransferMb: 3, intent: 'required-now', selected: false, adjacentToSelection: true, alreadyResident: false },
+  { assetId: 'other-required', estimatedTransferMb: 2, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+], { network: 'normal', memory: 'standard', viewportWidth: 390 });
+assert.deepEqual(
+  duplicateRequired.loadNow,
+  ['other-required', 'shared-required'],
+  'one asset ID must consume only one concurrency slot',
+);
+assert.equal(new Set([
+  ...duplicateRequired.loadNow,
+  ...duplicateRequired.prefetchNext,
+  ...duplicateRequired.deferred,
+]).size, 2, 'each unresolved asset ID must appear exactly once in the plan');
+
+const duplicateResident = planBodyProgressivePrefetch([
+  { assetId: 'already-loaded', estimatedTransferMb: 4, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'already-loaded', estimatedTransferMb: 4, intent: 'idle-opportunistic', selected: false, adjacentToSelection: false, alreadyResident: true },
+], { network: 'normal', memory: 'high', viewportWidth: 1440 });
+assert.deepEqual(duplicateResident.loadNow, [], 'resident identity must suppress duplicate reloads');
+assert.deepEqual(duplicateResident.prefetchNext, [], 'resident identity must suppress duplicate prefetch');
+assert.deepEqual(duplicateResident.deferred, [], 'resident identity is not deferred work');
+
 console.log('body-progressive-prefetch-policy: bounded deterministic loading policy verified');

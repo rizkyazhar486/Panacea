@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Environment & Toxin Checklist — a consolidated set of daily-life exposure
@@ -87,6 +88,7 @@ export function ToxinChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconLeaf size={20} />} title="Environment & Toxin Checklist" subtitle="Everyday exposure reduction, in one place" />
+        <BatasKlaimKesehatan permukaan="wellness.toxin-checklist" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Semua ini bukan soal ketakutan — menghindari tiap jejak paparan sepenuhnya tidak realistis dan tidak perlu. Ini adalah penggantian yang pengaruhnya paling besar dengan usaha paling kecil, yang layak diketahui.</Prosa>
       </Card>
 

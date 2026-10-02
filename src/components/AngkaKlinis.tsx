@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TINGKAT_INFO, type AngkaKlinis as Angka } from '../lib/angkaKlinis'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tampilan angka yang dapat diperiksa.
@@ -29,6 +30,7 @@ import { TINGKAT_INFO, type AngkaKlinis as Angka } from '../lib/angkaKlinis'
 function Bagian({ judul, warna, children }: { judul: string; warna?: string; children: React.ReactNode }) {
   return (
     <div className={`rounded-2xl p-3 ${warna ?? 'bg-neutral-50 dark:bg-white/5'}`}>
+      <BatasKlaimKesehatan permukaan="clinical.angka-klinis" />
       <div className="mb-1.5 text-[10px] font-black uppercase tracking-wide text-neutral-500">{judul}</div>
       {children}
     </div>
