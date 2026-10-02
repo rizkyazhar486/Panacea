@@ -286,7 +286,7 @@ export function CellGenomeExplorer({ initialStage = 'cell' }: { initialStage?: M
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#050b13] text-white">
+    <div className="dark overflow-hidden rounded-2xl border border-white/10 bg-[#050b13] text-white">
       <div className="border-b border-white/10 bg-white/[0.025] p-3 md:p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

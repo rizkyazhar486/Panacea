@@ -6,6 +6,7 @@ import {
 import { ambilSesi, volumeMingguan, rekorPerGerakan } from '../lib/angkatBeban'
 import { api, backendEnabled } from '../lib/api'
 import type { MedReminder } from '../lib/types'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empat widget: obat, latihan beban, pengukuran berkala, dan jadwal skrining.
@@ -21,6 +22,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      <BatasKlaimKesehatan permukaan="wellness.measure-tile" />
       {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link> : null)}
     </div>
   )

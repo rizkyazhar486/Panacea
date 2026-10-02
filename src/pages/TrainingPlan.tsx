@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../components/icons'
 import { getDemo, setDemo, hasHealth, pushBiometrics } from '../lib/profile'
 import { PrefillBadge } from '../components/HealthSnapshot'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Training Planner — rule-based sports-science generator (runs offline).
@@ -341,6 +342,7 @@ function RunnerCoach() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Enter your last run — get a real VO₂max, personal pace zones and a plan that makes sense" />
+      <BatasKlaimKesehatan permukaan="performance.training-plan" />
 
       {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
       <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">

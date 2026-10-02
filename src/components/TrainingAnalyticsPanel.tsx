@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { getWorkouts } from '../lib/workoutStore'
 import { buildTrainingAnalytics } from '../lib/trainingAnalytics'
 import { fmtPace } from '../lib/workoutImport'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface Props {
   untukKemarin: boolean
@@ -112,6 +113,7 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
             const pct = coveragePct(item.n, total28.sesi)
             return (
               <div key={item.label} aria-label={`${item.label}: ${item.n} of ${total28.sesi} sessions`}>
+      <BatasKlaimKesehatan permukaan="performance.training-analytics" />
                 <div className="mb-1 flex items-center justify-between text-[9px]">
                   <span className="font-bold text-neutral-500">{item.label}</span>
                   <span className="font-black tabular-nums text-ink dark:text-white">{item.n}/{total28.sesi} · {pct}%</span>

@@ -10,6 +10,7 @@ import {
   type TingkatAktivitas,
 } from '../lib/tdee'
 import '../styles/widget-concepts-v6.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const KUNCI = 'pmd_tdee_pilihan_v1'
 
@@ -81,6 +82,7 @@ export function UbinTdee() {
       <section className="pw-concept">
         <div className="mb-2 flex items-baseline justify-between gap-2">
           <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Metabolic compass</h2>
+          <BatasKlaimKesehatan permukaan="wellness.tdee-tile" />
           <Link to="/profil" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Complete profile →</Link>
         </div>
         <p className="t-kecil leading-snug text-neutral-500">

@@ -12,6 +12,7 @@ import { KolomPelatih } from './KolomPelatih'
 import { ArtiKebugaran } from './ArtiKebugaran'
 import { GrafikOlahraga } from './GrafikOlahraga'
 import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, type Target } from '../lib/analisisPro'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kartu pilihan pengguna di Beranda.
@@ -179,6 +180,7 @@ export function WidgetBeranda() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-black text-white">Customize home cards</h2>
+                <BatasKlaimKesehatan permukaan="wellness.home-widget" />
                 <p className="mt-0.5 text-[12px] leading-relaxed text-slate-400">
                   Choose what you want to see every time you open the app. Cards with no data won't
                   appear even when turned on.

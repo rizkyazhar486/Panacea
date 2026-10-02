@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -371,7 +372,6 @@ export function RealisticAnatomyAtlas() {
     renderer.domElement.addEventListener('pointerup', onUp)
 
     const clock = new THREE.Clock()
-    let frame = 0
     const render = () => {
       const t = clock.getElapsedTime()
       if (motion) {
@@ -406,12 +406,11 @@ export function RealisticAnatomyAtlas() {
           jamRef.current.bersihkan()
         }
       }
-      frame = requestAnimationFrame(render)
     }
-    render()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, render)
 
     return () => {
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       observer.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onDown)
       renderer.domElement.removeEventListener('pointerup', onUp)
@@ -562,7 +561,7 @@ export function RealisticAnatomyAtlas() {
 
   return (
     <div className="space-y-4 pb-8">
-      <header className="overflow-hidden rounded-3xl border border-white/10 bg-[#070b10] p-5 text-white shadow-xl">
+      <header className="dark overflow-hidden rounded-3xl border border-white/10 bg-[#070b10] p-5 text-white shadow-xl">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">
             <div className="text-[11px] font-black uppercase tracking-[0.24em] text-cyan-300">PanaceaMed · Realistic Anatomy Atlas</div>

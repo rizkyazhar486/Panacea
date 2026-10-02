@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Psychiatric Status (Mental Status Exam) — a structured MSE documentation
@@ -48,6 +49,7 @@ export function PsychiatricStatusExam() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Psychiatric Status Exam" subtitle="Structured Mental Status Exam (MSE) documentation" />
+        <BatasKlaimKesehatan permukaan="clinical.psychiatric-mse" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tap each standard mental status exam domain to build a tidy one-line summary ready to enter into the medical record. A documentation aid only — not a diagnostic instrument or risk-severity tool; always apply your own clinical judgment and a validated risk assessment tool (e.g. C-SSRS) when there's concern about suicide/self-harm risk.</Prosa>
       </Card>
 

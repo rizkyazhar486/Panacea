@@ -1,0 +1,116 @@
+/* Compact action surface: one line of intent + two real actions. */
+.panacea-intent-hero {
+  position: relative;
+  min-height: 116px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 360px);
+  align-items: center;
+  gap: clamp(16px, 3vw, 32px);
+  padding: clamp(14px, 2.4vw, 22px) clamp(2px, 1vw, 10px);
+  overflow: hidden;
+  border-block: 1px solid rgba(255,255,255,.08);
+  background: transparent;
+  color: #fff;
+}
+
+.panacea-intent-hero__copy h1 {
+  margin: 0;
+  max-width: 620px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(22px, 3.2vw, 34px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-weight: 720;
+}
+
+.panacea-intent-hero__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.panacea-intent-action {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 15px;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(13,18,16,.46);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 140ms cubic-bezier(.2,.8,.2,1);
+}
+
+.panacea-intent-action__icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: rgba(255,255,255,.055);
+}
+
+.panacea-intent-action__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: -.01em;
+}
+
+.panacea-intent-action:hover,
+.panacea-intent-action:focus-visible {
+  border-color: rgba(84,223,130,.22);
+  background: rgba(255,255,255,.055);
+}
+
+.panacea-intent-action:active {
+  transform: scale(.985);
+}
+
+@media (max-width: 680px) {
+  .panacea-intent-hero {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 12px;
+    padding: 12px 0 0;
+    border-bottom: 0;
+  }
+
+  .panacea-intent-hero__copy h1 {
+    font-size: clamp(24px, 7.2vw, 31px);
+  }
+
+  .panacea-intent-action {
+    min-height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-intent-action {
+    transition: none !important;
+  }
+}
+
+/* Baris alat harian: tiga kolom, jarak yang sama dengan pahlawan. */
+.panacea-essential-tools {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 7px;
+}
+.panacea-essential-tools .panacea-intent-action {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}

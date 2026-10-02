@@ -1,0 +1,90 @@
+{
+  "version": "2026-09-17",
+  "scope": "Small hand-audited original-paraphrase seed corpus for routing and QA; intentionally non-exhaustive.",
+  "units": [
+    {
+      "id": "adaptive-stress-is-bounded",
+      "sourceId": "pubmed-rattan-hormesis-2008",
+      "sourceClass": "scientific_evidence",
+      "locator": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/17964227/",
+        "title": "Hormesis in aging",
+        "publicationDate": "2008-01"
+      },
+      "domains": ["body", "mind"],
+      "principle": "Mild, recoverable stress can activate adaptive maintenance and defense responses, while more intense or persistent stress is not assumed to be beneficial.",
+      "evidenceRole": "scientific_support",
+      "supportingEvidenceIds": [],
+      "contradictingUnitIds": [],
+      "agreementUnitIds": ["stress-adaptation-can-become-allostatic-load"],
+      "risks": ["Do not infer that more fasting, heat, cold, exercise, pain, or deprivation produces more benefit."],
+      "limitations": ["Review-level synthesis; intervention effects remain stressor-, dose-, population-, and outcome-specific."],
+      "rights": {
+        "status": "check_required",
+        "fullTextRetention": "forbidden",
+        "redistribution": "forbidden"
+      },
+      "transformation": {
+        "mode": "original_paraphrase",
+        "transformedAt": "2026-09-17T11:00:00Z",
+        "transformer": "model"
+      }
+    },
+    {
+      "id": "stress-adaptation-can-become-allostatic-load",
+      "sourceId": "pubmed-mcewen-stress-adaptation-2007",
+      "sourceClass": "scientific_evidence",
+      "locator": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/17615391/",
+        "title": "Physiology and neurobiology of stress and adaptation: central role of the brain",
+        "publicationDate": "2007-07"
+      },
+      "domains": ["body", "mind"],
+      "principle": "Short-term stress responses can support adaptation, but repeated or poorly recovered activation can accumulate as allostatic load and increase physiological wear.",
+      "evidenceRole": "scientific_support",
+      "supportingEvidenceIds": [],
+      "contradictingUnitIds": [],
+      "agreementUnitIds": ["adaptive-stress-is-bounded", "interoception-links-body-state-and-feeling"],
+      "risks": ["Chronic distress, sleep loss, illness, injury, trauma, or severe mental-health symptoms must not be reframed as useful hormesis."],
+      "limitations": ["Allostatic mechanisms are multi-system and individual; a single consumer metric cannot establish clinical allostatic load."],
+      "rights": {
+        "status": "check_required",
+        "fullTextRetention": "forbidden",
+        "redistribution": "forbidden"
+      },
+      "transformation": {
+        "mode": "original_paraphrase",
+        "transformedAt": "2026-09-17T11:00:00Z",
+        "transformer": "model"
+      }
+    },
+    {
+      "id": "interoception-links-body-state-and-feeling",
+      "sourceId": "pubmed-pace-schott-physiological-feelings-2019",
+      "sourceClass": "scientific_evidence",
+      "locator": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/31125635/",
+        "title": "Physiological feelings",
+        "publicationDate": "2019-08"
+      },
+      "domains": ["mind", "body"],
+      "principle": "Emotion and bodily state interact bidirectionally; interoceptive signals can influence feelings while brain appraisal and regulation can also shape physiological responses.",
+      "evidenceRole": "scientific_support",
+      "supportingEvidenceIds": [],
+      "contradictingUnitIds": [],
+      "agreementUnitIds": ["stress-adaptation-can-become-allostatic-load"],
+      "risks": ["Do not reduce distress to mindset alone or imply that emotional regulation can replace indicated clinical care."],
+      "limitations": ["Mechanisms do not imply that every subjective feeling maps uniquely to a measurable physiological state."],
+      "rights": {
+        "status": "check_required",
+        "fullTextRetention": "forbidden",
+        "redistribution": "forbidden"
+      },
+      "transformation": {
+        "mode": "original_paraphrase",
+        "transformedAt": "2026-09-17T11:00:00Z",
+        "transformer": "model"
+      }
+    }
+  ]
+}

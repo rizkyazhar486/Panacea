@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -567,7 +568,6 @@ export function MicroPhysiologyExplorer() {
     const observer = new ResizeObserver(resize)
     observer.observe(mount)
 
-    let frame = 0
     const start = performance.now()
     const animate = () => {
       if (disposed) return
@@ -575,13 +575,12 @@ export function MicroPhysiologyExplorer() {
       if (playing) animators.forEach((animator) => animator(time))
       controls.update()
       renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
       disposed = true
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       observer.disconnect()
       controls.dispose()
       world.traverse((object) => {

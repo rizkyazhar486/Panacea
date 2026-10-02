@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Longevity Science Explainers — plain-language accordion entries on
@@ -77,6 +78,7 @@ export function LongevityScience() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Longevity Science Explainers" subtitle="What the terms everyone is using actually mean" />
+        <BatasKlaimKesehatan permukaan="longevity.science-explainers" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mechanism explanations in plain language for terms that keep coming up in longevity discussions. Items that are drugs (metformin, rapamycin, methylene blue) are explained for understanding, not as a recommendation to use them — all of them require a prescribing doctor.</Prosa>
       </Card>
 

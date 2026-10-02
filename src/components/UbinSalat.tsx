@@ -2,19 +2,29 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   SALAT, berikutnya, jadwalHariIni, menitSekarang, muatSetelan,
-  type JadwalHari,
+  type JadwalHari, type WaktuSalat,
 } from '../lib/adzan'
+import { batalkanCatatan, catatSelesai, jumlahHariIni, sudahDicatat, tanggalLokal } from '../lib/prayerLog'
+import { HoldToConfirm } from './HoldToConfirm'
 import '../styles/widget-concepts-v6.css'
 import '../styles/widget-archetypes-v6.css'
 import '../styles/widget-concepts-v7.css'
 import '../styles/widget-concepts-v9.css'
 import '../styles/prayer-widget-dark-hotfix.css'
 
+/** Salat terakhir yang waktunya sudah lewat hari ini — bukan yang berikutnya. Menahan tombol untuk salat yang belum tiba waktunya tidak berarti apa-apa. */
+function sudahLewat(j: JadwalHari, menit: number): WaktuSalat | null {
+  let lewat: WaktuSalat | null = null
+  for (const w of j.waktu) if (w.menit <= menit) lewat = w
+  return lewat
+}
+
 export function UbinSalat() {
   const setelan = useMemo(() => muatSetelan(), [])
   const [jadwal, setJadwal] = useState<JadwalHari | null>(null)
   const [gagal, setGagal] = useState(false)
   const [kini, setKini] = useState(() => menitSekarang())
+  const [, tandai] = useState(0)
 
   useEffect(() => {
     let hidup = true
@@ -75,6 +85,39 @@ export function UbinSalat() {
           )
         })}
       </div>
+
+      {/* Menandai salat yang sudah lewat — bukan yang berikutnya, sebab
+          menahan tombol untuk salat yang belum tiba waktunya tidak berarti
+          apa-apa. `preventDefault` DI SINI, BUKAN HANYA `stopPropagation`:
+          kartu ini sendiri adalah tautan ke /prayer-times, dan navigasi
+          bawaan sebuah tautan ditentukan oleh `defaultPrevented`, bukan oleh
+          sampai-tidaknya kejadian itu ke elemen tautannya. `stopPropagation`
+          sendirian justru MENCEGAH <Link> sempat memanggil preventDefault
+          miliknya — diuji langsung dengan tekan-tahan sungguhan: tanpa
+          preventDefault di sini, peramban tetap pindah halaman begitu
+          jarinya dilepas, walau progres sudah penuh dan tercatat. */}
+      {(() => {
+        const terlewat = sudahLewat(jadwal, kini)
+        if (!terlewat) return null
+        const tgl = tanggalLokal()
+        const namaLewat = SALAT.find((s) => s.id === terlewat.salat)?.nama ?? terlewat.salat
+        const selesai = sudahDicatat(tgl, terlewat.salat)
+        return (
+          <div
+            className="pw-prayer-confirm"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
+          >
+            <HoldToConfirm
+              label={`Mark ${namaLewat} as prayed`}
+              doneLabel={`${namaLewat} prayed`}
+              done={selesai}
+              onConfirm={() => { catatSelesai(tgl, terlewat.salat); tandai((n) => n + 1) }}
+              onUndo={() => { batalkanCatatan(tgl, terlewat.salat); tandai((n) => n + 1) }}
+            />
+            <span className="t-mikro shrink-0 tabular-nums text-neutral-400">{jumlahHariIni(tgl)}/{SALAT.length} today</span>
+          </div>
+        )
+      })()}
     </Link>
   )
 }

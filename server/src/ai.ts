@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import type { User } from './store.js'
 import { balance, credit, getStats, listManualTopups, listDoctors, getAudit } from './store.js'
 import { config } from './config.js'
+import { toPublicAiFailure, validateAiProxyRequest } from './aiRequestPolicy.js'
 
 // Server-side Claude proxy — keeps the Anthropic key on the server so AI works
 // for every signed-in user without anyone pasting a key in the browser.
@@ -26,6 +27,11 @@ function rateLimited(userId: string): boolean {
   }
   cur.n += 1
   return cur.n > MAX_PER_WINDOW
+}
+
+function respondWithSafeAiFailure(res: Response, error: unknown) {
+  const failure = toPublicAiFailure(error)
+  return res.status(failure.status).json({ error: failure.error, retryable: failure.retryable })
 }
 
 type Msg = { role: 'user' | 'assistant'; content: string | any[] }
@@ -89,8 +95,7 @@ async function callOpenRouter(model: string, system: string, messages: Msg[], ma
     }),
   })
   if (!r.ok) {
-    const txt = await r.text()
-    throw new Error(`openrouter_${r.status}:${txt.slice(0, 200)}`)
+    throw new Error(`openrouter_${r.status}`)
   }
   const data = (await r.json()) as { choices?: { message?: { content?: string } }[] }
   return data.choices?.[0]?.message?.content ?? ''
@@ -124,8 +129,7 @@ async function callAnthropic(model: string, system: string, messages: Msg[], max
     }),
   })
   if (!r.ok) {
-    const txt = await r.text()
-    throw new Error(`upstream_${r.status}:${txt.slice(0, 200)}`)
+    throw new Error(`upstream_${r.status}`)
   }
   const data = (await r.json()) as { content?: { type: string; text?: string }[] }
   return (data.content || []).find((b) => b.type === 'text')?.text ?? ''
@@ -141,10 +145,21 @@ export async function panggilModel(system: string, prompt: string, maxTokens: nu
   return callAnthropic('opus', system, [{ role: 'user', content: prompt }], maxTokens, json)
 }
 
-// Vision: analyze a supportive-exam image (EKG, CT, MRI, X-ray, USG, lab photo)
-// and describe objective findings for the AI-EMR Objective → Assessment flow.
-const VISION_SYSTEM = `Anda adalah AI co-physician Panaceamed yang menganalisis CITRA PEMERIKSAAN PENUNJANG (EKG, CT-scan, MRI, X-ray/Rontgen, USG, foto lab, dll). Jawab berbahasa Indonesia, terstruktur dengan judul tebal (markdown):
-**Jenis Pemeriksaan** (identifikasi modalitas), **Temuan Objektif** (deskripsi sistematis untuk bagian OBJECTIVE rekam medis), **Interpretasi/Kemungkinan** (membantu ASSESSMENT — diferensial), **Tanda Bahaya & Saran**. WAJIB: ini alat bantu edukatif, BUKAN diagnosis final — tegaskan verifikasi dokter/radiolog/kardiolog. Jika gambar bukan citra medis, katakan dengan jujur.`
+// Vision: supports both bedside clinical photographs (skin/eye/wound, etc.)
+// and formal supportive studies (EKG, CT, MRI, X-ray, USG, lab photos).
+// Visible facts stay separate from inferred diagnosis and unobserved examination.
+const VISION_SYSTEM = `Anda adalah AI co-physician Panaceamed untuk CITRA KLINIS dan PEMERIKSAAN PENUNJANG: foto kulit/luka/mata yang relevan secara medis, EKG, CT-scan, MRI, X-ray/Rontgen, USG, foto hasil lab, dan citra medis lain.
+
+Jawab dalam bahasa pengguna bila dapat ditentukan dari prompt; bila tidak, gunakan Bahasa Indonesia. Strukturkan dengan markdown:
+**Jenis Citra/Modalitas**
+**Temuan Objektif yang Benar-Benar Terlihat** — deskripsikan morfologi/lokasi/pola secara sistematis. Jangan mengarang palpasi, suhu lokal, fluktuasi, nyeri tekan, KGB, visus, tanda vital, laboratorium, atau temuan yang tidak terlihat.
+**Interpretasi & Diagnosis Banding** — berikan diagnosis kerja/sindrom yang mungkin dan pembeda utamanya; jelaskan ketidakpastian.
+**Data yang Masih Dibutuhkan** — anamnesis SOCRATES, pemeriksaan fisik fokus, Lab/ECG/imaging yang benar-benar relevan.
+**Tanda Bahaya & Urgensi**
+**Pengkajian** — bila berbahasa Indonesia, paragraf per diagnosis harus diawali "Dipikirkan ...", menghubungkan fakta gambar + data klinis yang diberikan dengan etiologi, patofisiologi, faktor risiko, dan pembeda diagnosis banding.
+**Sumber** — hanya sumber yang diketahui dengan yakin; jangan mengarang DOI/PMID/detail bibliografi.
+
+Jika sebuah diagnosis tidak mempunyai satu gold standard, katakan demikian dan jelaskan cara diagnosis ditegakkan serta pemeriksaan konfirmasi yang paling berguna. Bedakan dengan tegas fakta dari citra vs inferensi. Semua kesimpulan klinis tetap draf untuk diverifikasi dokter/radiolog/kardiolog/klinisi terkait.`
 
 export async function aiVision(req: Request, res: Response) {
   if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
@@ -153,15 +168,31 @@ export async function aiVision(req: Request, res: Response) {
   const { image, prompt } = req.body as { image?: string; prompt?: string }
   const m = typeof image === 'string' && image.match(/^data:(image\/(?:png|jpe?g|webp|gif));base64,(.+)$/)
   if (!m) return res.status(400).json({ error: 'bad_image' })
-  const content = [
-    { type: 'text', text: prompt?.trim() || 'Analisis citra pemeriksaan penunjang ini untuk rekam medis.' },
-    { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
-  ]
+  const mediaType = m[1] === 'image/jpg' ? 'image/jpeg' : m[1]
+  const checked = validateAiProxyRequest({
+    system: VISION_SYSTEM,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt?.trim() || 'Analisis citra pemeriksaan penunjang ini untuk rekam medis.' },
+        { type: 'image', source: { type: 'base64', media_type: mediaType, data: m[2] } },
+      ],
+    }],
+    max_tokens: 2600,
+  })
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
+  }
   try {
-    const text = await callAnthropic('claude-opus-4-8', VISION_SYSTEM, [{ role: 'user', content }], 1500)
+    const text = await callAnthropic(
+      'claude-opus-4-8',
+      checked.value.system,
+      checked.value.messages as Msg[],
+      checked.value.maxTokens,
+    )
     res.json({ text })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -170,15 +201,22 @@ export async function aiMessages(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
 
-  const body = req.body as { model?: string; system?: string; messages?: Msg[]; max_tokens?: number; json?: boolean }
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return res.status(400).json({ error: 'bad_messages' })
+  const checked = validateAiProxyRequest(req.body)
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
   }
+  const body = checked.value
   try {
-    const text = await callAnthropic(body.model || 'claude-sonnet-4-6', body.system || '', body.messages, Number(body.max_tokens) || 2048, body.json === true)
+    const text = await callAnthropic(
+      body.model || 'claude-sonnet-4-6',
+      body.system,
+      body.messages as Msg[],
+      body.maxTokens,
+      body.json,
+    )
     res.json({ text })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -194,17 +232,26 @@ export async function aiConsult(req: Request, res: Response) {
   if (balance(user.id) < price) {
     return res.status(402).json({ error: 'insufficient_balance', price, balance: balance(user.id) })
   }
-  const body = req.body as { messages?: Msg[] }
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return res.status(400).json({ error: 'bad_messages' })
+  const checked = validateAiProxyRequest({
+    system: CONSULT_SYSTEM,
+    messages: (req.body as { messages?: unknown }).messages,
+    max_tokens: 3000,
+  })
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
   }
   try {
-    const text = await callAnthropic('claude-opus-4-8', CONSULT_SYSTEM, body.messages, 3000)
+    const text = await callAnthropic(
+      'claude-opus-4-8',
+      checked.value.system,
+      checked.value.messages as Msg[],
+      checked.value.maxTokens,
+    )
     // Charge only after a successful generation.
     credit(user.id, -price, 'purchase', 'Konsultasi AI Mendalam')
     res.json({ text, charged: price, balance: balance(user.id) })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -313,7 +360,7 @@ export async function aiOperator(req: Request, res: Response) {
       const text = await callAnthropic('claude-sonnet-4-6', CONTENT_SYSTEM, [{ role: 'user', content: 'Buat satu artikel hidup sehat untuk feed hari ini.' }], 800)
       return res.json({ text, mode })
     } catch (e) {
-      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+      return respondWithSafeAiFailure(res, e)
     }
   }
   if (mode in DEPARTMENT_SYSTEM) {
@@ -322,13 +369,13 @@ export async function aiOperator(req: Request, res: Response) {
       const text = await callAnthropic('claude-sonnet-4-6', DEPARTMENT_SYSTEM[mode], [{ role: 'user', content: context }], 1600)
       return res.json({ text, mode })
     } catch (e) {
-      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+      return respondWithSafeAiFailure(res, e)
     }
   }
   try {
     const r = await generateOperatorBriefing()
     res.json({ text: r.text, mode: 'briefing', pending: r.pending })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }

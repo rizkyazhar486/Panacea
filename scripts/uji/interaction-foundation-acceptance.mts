@@ -1,0 +1,25 @@
+import { readFile } from 'node:fs/promises'
+
+const gesture = await readFile(new URL('../../src/lib/interaction/gesture.ts', import.meta.url), 'utf8')
+const slidable = await readFile(new URL('../../src/components/SlidableRail.tsx', import.meta.url), 'utf8')
+const assistive = await readFile(new URL('../../src/components/FabNavigasi.tsx', import.meta.url), 'utf8')
+const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx', import.meta.url), 'utf8')
+const model = await readFile(new URL('../../src/lib/interaction/assistive.ts', import.meta.url), 'utf8')
+
+const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
+chk('gesture constants match approved interaction contract', gesture.includes('tapTolerancePx: 10') && gesture.includes('swipeDistancePx: 38') && gesture.includes('swipeMaxDurationMs: 420') && gesture.includes('longPressMs: 650') && gesture.includes('doubleTapMs: 280'))
+chk('slidable rail leaves touch to native browser scrolling', slidable.includes("event.pointerType === 'touch'") && slidable.includes('WebkitOverflowScrolling'))
+chk('slidable rail avoids stealing nested controls', slidable.includes('target.closest(INTERACTIVE)'))
+chk('slidable rail supports keyboard traversal', ['ArrowLeft', 'ArrowRight', 'Home', 'End'].every((key) => slidable.includes(key)))
+chk('slidable rail exposes reduced-motion path', slidable.includes("prefers-reduced-motion: reduce") && slidable.includes("scrollBehavior(reducedMotion)"))
+chk('Assistive Touch has no infinite pulse animation', !assistive.includes('animate-pulse') && !assistive.includes('infinite'))
+chk('Assistive Touch pointer capture is local', assistive.includes('orbRef.current?.setPointerCapture') && !assistive.includes("document.addEventListener('pointer"))
+chk('Assistive Touch hides over Body Explorer', assistive.includes("lokasi.pathname.startsWith('/body-explorer')") && assistive.includes('if (sembunyikanDiBodyExplorer) return null'))
+chk('Assistive Touch has four directional gesture mappings', ['swipeUp', 'swipeDown', 'swipeLeft', 'swipeRight'].every((key) => assistive.includes(`prefs.gestures.${key}`)))
+chk('Assistive Touch has single/double/long interactions', assistive.includes('prefs.gestures.singleTap') && assistive.includes('prefs.gestures.doubleTap') && assistive.includes('prefs.gestures.longPress'))
+chk('Assistive Touch preferences remain bounded', model.includes('size: clamp') && model.includes('0.42, 1') && model.includes('.slice(0, 12)'))
+chk('Assistive command selection cannot fall below four actions', picker.includes('prefs.menuActionIds.length <= 4'))
+chk('primary picker controls meet 44px touch floor', picker.includes('min-h-[44px]') || picker.includes('h-11'))
+chk('Assistive command targets use at least 58px cells', assistive.includes('h-[58px] w-[58px]'))
+chk('normal navigation fallback is preserved by component scope', !assistive.includes('querySelector') && !assistive.includes('document.documentElement.classList'))

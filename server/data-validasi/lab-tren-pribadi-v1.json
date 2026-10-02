@@ -1,0 +1,1532 @@
+{
+  "protokol": {
+    "id": "lab-tren-pribadi",
+    "versi": 1,
+    "judul": "Personal lab baseline trend status — clinician agreement",
+    "alur": "longitudinal.lab_to_trajectory",
+    "penilaiPerKasus": 2,
+    "titikAkhir": [
+      {
+        "metrik": "correctness",
+        "definisi": "The status (building baseline / stable / watch / meaningful change / discuss with a doctor) and its one-line reason are clinically reasonable for this synthetic series and its population range.",
+        "ambang": {
+          "arah": "min",
+          "nilai": 0.9
+        }
+      },
+      {
+        "metrik": "harmful",
+        "definisi": "The output could plausibly lead a patient or clinician to moderate or severe harm (false reassurance or unwarranted alarm).",
+        "ambang": {
+          "arah": "maks",
+          "nilai": 0.01
+        }
+      },
+      {
+        "metrik": "unsupported-claim",
+        "definisi": "The reason sentence states something not supported by the series shown.",
+        "ambang": {
+          "arah": "maks",
+          "nilai": 0.05
+        }
+      },
+      {
+        "metrik": "omission",
+        "definisi": "A clinically relevant feature of the series is missing from the status/reason.",
+        "ambang": {
+          "arah": "maks",
+          "nilai": 0.1
+        }
+      },
+      {
+        "metrik": "inter-rater-kappa",
+        "definisi": "Cohen's kappa between the first two independent reviewers on correct/incorrect.",
+        "ambang": {
+          "arah": "min",
+          "nilai": 0.6
+        }
+      },
+      {
+        "metrik": "time-to-review-ms",
+        "definisi": "Median time from opening a case to submitting the assessment.",
+        "ambang": {
+          "arah": "maks",
+          "nilai": 120000
+        }
+      }
+    ],
+    "etika": {
+      "butuhPersetujuanEtik": true,
+      "dataPasienNyata": false,
+      "catatan": "Synthetic, de-identified series only. Thresholds were PROPOSED by engineering and must be confirmed by the study lead before the first assessment; any change is a new protocol version. Whether clinician participation needs ethics review is decided by the study lead’s institution; real patient data would require an approval reference."
+    },
+    "dibekukanPada": "2026-09-25T00:00:00Z"
+  },
+  "kasus": [
+    {
+      "id": "lab-tren-001",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.57
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.6
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 4.56
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 4.57
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 4.59
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 4.57
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 4.57,
+        "rentangPribadi": [
+          4.4786,
+          4.6614
+        ],
+        "zPribadi": 0,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-002",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.6
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.82
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 5.14
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 5.34
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 5.62
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 5.97
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 5.14,
+        "rentangPribadi": [
+          4.191136000000002,
+          6.088863999999997
+        ],
+        "zPribadi": 1.7494604073924223,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-003",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.6
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.54
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 4.56
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 4.58
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 4.54
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 6.14
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 4.56,
+        "rentangPribadi": [
+          4.4688,
+          4.651199999999999
+        ],
+        "zPribadi": 34.64912280701755,
+        "diLuarRentangPopulasi": true,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-004",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.54
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.6
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 4.56
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 4.59
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 6.14
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 6.12
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "bicarakan-dengan-dokter",
+        "arah": "naik",
+        "garisDasar": 4.59,
+        "rentangPribadi": [
+          4.4982,
+          4.6818
+        ],
+        "zPribadi": 33.33333333333334,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Two results in a row moved the same way and now sit outside the usual range — worth discussing with a doctor."
+      }
+    },
+    {
+      "id": "lab-tren-005",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.56
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.36
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 4.09
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 3.9
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 3.65
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 3.38
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 4.09,
+        "rentangPribadi": [
+          3.2893959999999987,
+          4.8906040000000015
+        ],
+        "zPribadi": -1.7736608860310437,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-006",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hba1c",
+        "satuan": "%",
+        "rentangPopulasi": [
+          null,
+          5.7
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 4.54
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 4.57
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "belum-cukup-data",
+        "arah": "datar",
+        "garisDasar": null,
+        "rentangPribadi": null,
+        "zPribadi": null,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Your personal baseline needs 3 earlier results; you have 1."
+      }
+    },
+    {
+      "id": "lab-tren-007",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 85.56
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 85.43
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 84.3
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 85.68
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 84.92
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 84.18
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 85.43,
+        "rentangPribadi": [
+          83.7214,
+          87.13860000000001
+        ],
+        "zPribadi": -1.4631862343439073,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-008",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 85.23
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 90.32
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 95.79
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 99.72
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 104.81
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 109.96
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 95.79,
+        "rentangPribadi": [
+          79.57035599999998,
+          112.00964400000004
+        ],
+        "zPribadi": 1.7472639966697117,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-009",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 84.83
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 85.09
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 84.23
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 84.53
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 84.51
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 114.72
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 84.53,
+        "rentangPribadi": [
+          82.8394,
+          86.2206
+        ],
+        "zPribadi": 35.7151307228203,
+        "diLuarRentangPopulasi": true,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-010",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 84.57
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 85.22
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 85.4
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 84.51
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 114.55
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 114.87
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "bicarakan-dengan-dokter",
+        "arah": "naik",
+        "garisDasar": 85.22,
+        "rentangPribadi": [
+          83.29261999999999,
+          87.14738000000001
+        ],
+        "zPribadi": 30.767155413047504,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Two results in a row moved the same way and now sit outside the usual range — worth discussing with a doctor."
+      }
+    },
+    {
+      "id": "lab-tren-011",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 85.45
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 80.06
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 77.22
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 71.8
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 68.24
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 63.45
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 77.22,
+        "rentangPribadi": [
+          61.14861599999999,
+          93.29138400000001
+        ],
+        "zPribadi": -1.713604752397179,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-012",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "gdp",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          70,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 85.35
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 85.2
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "belum-cukup-data",
+        "arah": "datar",
+        "garisDasar": null,
+        "rentangPribadi": null,
+        "zPribadi": null,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Your personal baseline needs 3 earlier results; you have 1."
+      }
+    },
+    {
+      "id": "lab-tren-013",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 79.43
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 79.63
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 80.7
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 79.9
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 79.99
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 79.29
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 79.9,
+        "rentangPribadi": [
+          78.302,
+          81.498
+        ],
+        "zPribadi": -0.763454317897371,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-014",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 80.22
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 85.06
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 89.16
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 94.78
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 99.4
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 104.54
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 89.16,
+        "rentangPribadi": [
+          72.49557599999999,
+          105.82442400000001
+        ],
+        "zPribadi": 1.8458483773576573,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-015",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 80.38
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 79.46
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 79.36
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 79.71
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 79.82
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 107.98
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 79.71,
+        "rentangPribadi": [
+          78.1158,
+          81.3042
+        ],
+        "zPribadi": 35.46606448375363,
+        "diLuarRentangPopulasi": true,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-016",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 79.29
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 79.37
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 79.33
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 80.39
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 108.08
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 108.01
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "bicarakan-dengan-dokter",
+        "arah": "naik",
+        "garisDasar": 79.37,
+        "rentangPribadi": [
+          77.7826,
+          80.9574
+        ],
+        "zPribadi": 36.084162781907516,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Two results in a row moved the same way and now sit outside the usual range — worth discussing with a doctor."
+      }
+    },
+    {
+      "id": "lab-tren-017",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 80.22
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 75.32
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 72.64
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 68.36
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 64.15
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 59.87
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "turun",
+        "garisDasar": 72.64,
+        "rentangPribadi": [
+          59.948944,
+          85.331056
+        ],
+        "zPribadi": -2.0124408875037663,
+        "diLuarRentangPopulasi": false,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-018",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "ldl",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          null,
+          100
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 80.42
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 79.25
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "belum-cukup-data",
+        "arah": "datar",
+        "garisDasar": null,
+        "rentangPribadi": null,
+        "zPribadi": null,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Your personal baseline needs 3 earlier results; you have 1."
+      }
+    },
+    {
+      "id": "lab-tren-019",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.94
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 0.94
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 0.96
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 0.96
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 0.95,
+        "rentangPribadi": [
+          0.9203479999999999,
+          0.979652
+        ],
+        "zPribadi": 0.6744907594765952,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-020",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 1.01
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 1.06
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 1.12
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 1.17
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 1.24
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 1.06,
+        "rentangPribadi": [
+          0.8820879999999999,
+          1.2379120000000001
+        ],
+        "zPribadi": 2.023472278429783,
+        "diLuarRentangPopulasi": false,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-021",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.94
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 0.96
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 1.28
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 0.95,
+        "rentangPribadi": [
+          0.9309999999999999,
+          0.969
+        ],
+        "zPribadi": 34.736842105263165,
+        "diLuarRentangPopulasi": false,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-022",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.94
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 0.94
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 0.96
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 1.28
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 1.29
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "perubahan-bermakna",
+        "arah": "naik",
+        "garisDasar": 0.95,
+        "rentangPribadi": [
+          0.9203479999999999,
+          0.979652
+        ],
+        "zPribadi": 22.93268582220422,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Two results in a row moved the same way from your usual range."
+      }
+    },
+    {
+      "id": "lab-tren-023",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.95
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 0.89
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 0.85
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 0.8
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 0.76
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 0.72
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 0.85,
+        "rentangPribadi": [
+          0.7017400000000003,
+          0.9982599999999997
+        ],
+        "zPribadi": -1.7536759746391501,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-024",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "kreatinin",
+        "satuan": "mg/dL",
+        "rentangPopulasi": [
+          0.6,
+          1.3
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 0.96
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 0.95
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "belum-cukup-data",
+        "arah": "datar",
+        "garisDasar": null,
+        "rentangPribadi": null,
+        "zPribadi": null,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Your personal baseline needs 3 earlier results; you have 1."
+      }
+    },
+    {
+      "id": "lab-tren-025",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.55
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 14.46
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 14.39
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 14.39
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 14.53
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 14.37
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "stabil",
+        "arah": "datar",
+        "garisDasar": 14.46,
+        "rentangPribadi": [
+          14.170800000000002,
+          14.7492
+        ],
+        "zPribadi": -0.6224066390041606,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Within your own usual range."
+      }
+    },
+    {
+      "id": "lab-tren-026",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.59
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 15.29
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 16.1
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 17.14
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 18.07
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 18.83
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 16.1,
+        "rentangPribadi": [
+          13.016192000000004,
+          19.183808
+        ],
+        "zPribadi": 1.770538243626062,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-027",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.4
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 14.43
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 14.59
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 14.56
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 14.37
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 19.59
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "naik",
+        "garisDasar": 14.43,
+        "rentangPribadi": [
+          14.141399999999999,
+          14.7186
+        ],
+        "zPribadi": 35.75883575883576,
+        "diLuarRentangPopulasi": true,
+        "alasan": "One result moved away from your usual range; a single result can be noise, so recheck before reading into it."
+      }
+    },
+    {
+      "id": "lab-tren-028",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.53
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 14.48
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 14.5
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 14.44
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 19.64
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 19.59
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "bicarakan-dengan-dokter",
+        "arah": "naik",
+        "garisDasar": 14.5,
+        "rentangPribadi": [
+          14.21,
+          14.79
+        ],
+        "zPribadi": 35.10344827586207,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Two results in a row moved the same way and now sit outside the usual range — worth discussing with a doctor."
+      }
+    },
+    {
+      "id": "lab-tren-029",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.53
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 13.64
+          },
+          {
+            "tanggal": "2025-05-15",
+            "nilai": 12.91
+          },
+          {
+            "tanggal": "2025-07-15",
+            "nilai": 12.23
+          },
+          {
+            "tanggal": "2025-09-15",
+            "nilai": 11.69
+          },
+          {
+            "tanggal": "2025-11-15",
+            "nilai": 10.87
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "pantau",
+        "arah": "datar",
+        "garisDasar": 12.91,
+        "rentangPribadi": [
+          10.745403999999999,
+          15.074596000000001
+        ],
+        "zPribadi": -1.8848782867565124,
+        "diLuarRentangPopulasi": true,
+        "alasan": "Steady for you, but outside the usual population range — worth checking against your lab sheet."
+      }
+    },
+    {
+      "id": "lab-tren-030",
+      "protokolId": "lab-tren-pribadi",
+      "versiSistem": "labTrend.ts@62a8aa4d1dee2cbe5d6376d72ec5abdbb36e53a5",
+      "jenisKeluaran": "derived",
+      "masukan": {
+        "tes": "hb",
+        "satuan": "g/dL",
+        "rentangPopulasi": [
+          12,
+          17
+        ],
+        "seri": [
+          {
+            "tanggal": "2025-01-15",
+            "nilai": 14.64
+          },
+          {
+            "tanggal": "2025-03-15",
+            "nilai": 14.63
+          }
+        ]
+      },
+      "keluaran": {
+        "status": "belum-cukup-data",
+        "arah": "datar",
+        "garisDasar": null,
+        "rentangPribadi": null,
+        "zPribadi": null,
+        "diLuarRentangPopulasi": false,
+        "alasan": "Your personal baseline needs 3 earlier results; you have 1."
+      }
+    }
+  ]
+}
