@@ -2,8 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const root = process.cwd()
-const modelPath = path.join(root, 'src/lib/discoveryNeuropsychiatry3D.ts')
-const labPath = path.join(root, 'src/pages/discovery/Neuropsychiatry3DLab.tsx')
+const modelPath = path.join(root, 'src/lib/discovery/discoveryNeuropsychiatry3D.ts')
+const labPath = path.join(root, 'src/components/frontier/Neuropsychiatry3DLab.tsx')
 for (const file of [modelPath, labPath]) {
   if (!fs.existsSync(file)) throw new Error(`missing ${path.relative(root, file)}`)
 }

@@ -5,7 +5,7 @@ import {
   DISCOVERY_NEURO_3D_BOUNDARY,
   NEUROCHEMICALS,
   type NeurochemicalId,
-} from '../../lib/discoveryNeuropsychiatry3D'
+} from '../../lib/discovery/discoveryNeuropsychiatry3D'
 
 const PALETTE: Record<NeurochemicalId, number> = {
   sodium: 0x3b82f6,

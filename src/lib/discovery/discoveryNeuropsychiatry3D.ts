@@ -33,7 +33,7 @@ export const NEUROCHEMICALS: readonly NeurochemicalMechanism[] = [
 ]
 
 export const DISCOVERY_NEURO_3D_BOUNDARY =
-  'Educational mechanistic reconstruction. Geometry is schematic, not microscopy-derived neuronal anatomy, connectomics, receptor-density imaging, patient-specific physiology, or proof that a psychiatric construct maps to one transmitter, receptor, neuron or brain region.'
+  'Educational mechanistic reconstruction. Geometry is schematic, not microscopy-derived neuronal anatomy, not connectomics, not receptor-density imaging, not patient-specific physiology, and not proof that a psychiatric construct maps to one transmitter, receptor, neuron or brain region.'
 
 export const PSYCHIATRY_NEUROSCIENCE_DOMAINS = [
   'attention', 'working-memory', 'long-term-memory', 'visuospatial-processing', 'language',
