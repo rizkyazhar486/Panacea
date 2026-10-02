@@ -305,3 +305,15 @@ starts pinning a revision (the manifest must then be updated).
 
 Measured budget on 2026-10-02 (all layers enabled would be 9.94M triangles, 32.2 MB): surface 0.14M, skeletal 0.70M, muscular 2.00M,
 cardiovascular 3.84M (12 MB), nervous 2.41M, visceral 0.71M, lymphoid 0.13M. Runtime FPS on devices is **not** measured here.
+
+## Blender mesh audit (headless, descriptive)
+
+`scripts/blender/run_mesh_audit.sh` measures the shipped layers with Blender's own importer and mesh library (`bpy` as a Python module,
+no GUI): non-manifold edges, boundary edges, loose vertices, zero-area faces, meshes without faces and duplicate object names, written to
+`data/anatomy-assets/mesh-quality.json`. Blender's glTF importer cannot read `EXT_meshopt_compression`, so layers are decompressed into a
+temp directory first (sources are untouched). The report records the Blender version and each source GLB's SHA-256.
+
+It is a **measurement, not a verdict**: surface atlas meshes are largely open shells, so boundary edges are expected. Findings on
+2026-10-02 (Blender 4.5.14): 321 non-manifold edges and 14,394 zero-area faces across 9.94M faces, of which 13,126 zero-area faces are
+in the nervous layer. Vertex counts match the Three.js audit exactly; face counts differ by at most 12 (Blender drops degenerate
+faces on import). The gate `scripts/uji/anatomy-mesh-quality.mts` keeps the report bound to the shipped GLBs and cross-checks the two tools.
