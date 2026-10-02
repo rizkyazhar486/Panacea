@@ -136,17 +136,17 @@ jobs:
         # pre-empting a healthy queue: 240 + 12*180 = 2400s = 40m.
         timeout-minutes: 41
         env:
-          ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          ARTERI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          LIMFE3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          HEPATOBILIARY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          ARTERI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          LIMFE3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          HEPATOBILIARY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+          KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
           SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
         run: |
