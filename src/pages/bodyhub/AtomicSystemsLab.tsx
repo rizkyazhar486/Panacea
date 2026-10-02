@@ -86,6 +86,19 @@ export function AtomicSystemsLab() {
           <div className="rounded-xl bg-neutral-100/60 p-2.5 dark:bg-white/5"><div className="text-[10px] font-black uppercase text-neutral-500">Candidate interventions</div><div className="mt-1 text-[11px] text-neutral-500">{challenge.interventions.join(' · ')}</div></div>
           <div className="rounded-xl bg-neutral-100/60 p-2.5 dark:bg-white/5"><div className="text-[10px] font-black uppercase text-neutral-500">Unsolved bottlenecks</div><div className="mt-1 text-[11px] text-neutral-500">{challenge.bottlenecks.join(' · ')}</div></div>
         </div>
+        {challenge.evidenceAnchors?.length ? (
+          <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+            <div className="text-[10px] font-black uppercase text-neutral-500">Evidence anchors</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {challenge.evidenceAnchors.map((anchor) => (
+                <a key={anchor.pmid} href={`https://pubmed.ncbi.nlm.nih.gov/${anchor.pmid}/`} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 px-2 py-1 text-[10px] font-bold text-brand hover:underline" title={anchor.label}>
+                  PMID {anchor.pmid}
+                </a>
+              ))}
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-neutral-500">These publications anchor the research context; they do not validate the sandbox sliders or imply that the open problem is solved.</p>
+          </div>
+        ) : null}
       </div>
 
       <div className="rounded-2xl border border-white/10 p-3">
