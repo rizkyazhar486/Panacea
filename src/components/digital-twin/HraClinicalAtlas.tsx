@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -228,16 +229,14 @@ export function HraClinicalAtlas() {
     controls.target.set(0, 0, 0)
     controls.update()
 
-    let frame = 0
     const animate = () => {
       controls.update()
       renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(frame)
+      loopTerjaga.hentikan()
       resizeObserver.disconnect()
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       controls.dispose()
@@ -390,7 +389,7 @@ export function HraClinicalAtlas() {
   const selectedFile = selected ? catalogByName.get(selected.file) : undefined
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-neutral-200 bg-[#070a0d] text-white shadow-[0_28px_90px_rgba(0,0,0,.24)] dark:border-white/10">
+    <section className="dark overflow-hidden rounded-[30px] border border-neutral-200 bg-[#070a0d] text-white shadow-[0_28px_90px_rgba(0,0,0,.24)] dark:border-white/10">
       <header className="border-b border-white/10 bg-[#0b0f13] p-4 sm:p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">

@@ -4,6 +4,7 @@ import { kunciHari } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHeart, IconUsers, IconHospital, IconShield } from '../components/icons'
 import { HOSPITALS, fetchNearbyFacilities, type NearbyFacility } from '../lib/hospitals'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Coords = { lat: number; lng: number }
 
@@ -123,7 +124,8 @@ function PeriodTracker() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Cycle & Period Tracker" subtitle="Ovulation prediction, fertility calendar & fetal growth" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Cycle & Period Tracker" subtitle="Cycle log with educational fertility calendar context — not a contraception or pregnancy diagnosis" />
+        <BatasKlaimKesehatan permukaan="wellness.sexual-health" />
 
       <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
         <input type="checkbox" checked={data.pregnant} onChange={(e) => update({ pregnant: e.target.checked })} className="h-5 w-5 accent-brand" />

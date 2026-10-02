@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconChartUp, IconHeart } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Habit Reality Check — pure, shareable "wow" calculators that turn everyday
@@ -36,6 +37,7 @@ function SmokingCard() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="🚬 Smoking, in real numbers" subtitle="What a daily habit actually costs in money and time" />
+      <BatasKlaimKesehatan permukaan="longevity.reality-check" />
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Field label="Cigarettes / day"><input className={inputClass} type="number" value={perDay || ''} onChange={(e) => setPerDay(+e.target.value)} /></Field>
         <Field label="Price / pack"><input className={inputClass} type="number" value={pricePack || ''} onChange={(e) => setPricePack(+e.target.value)} /></Field>

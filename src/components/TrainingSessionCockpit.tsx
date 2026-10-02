@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ImportedWorkout } from '../lib/workoutImport'
 import { getAutoSyncStatus, type AutoSyncStatus } from '../lib/autoIsi'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface Props {
   workout: ImportedWorkout
@@ -101,6 +102,7 @@ export function TrainingSessionCockpit({ workout, nextTitle, nextWhen, nextColor
 
   return (
     <section className="relative overflow-hidden rounded-[30px] border border-white/10 bg-slate-950/95 p-4 shadow-[0_24px_80px_rgba(2,6,23,0.38)] sm:p-5" aria-label="Synchronized training session cockpit">
+      <BatasKlaimKesehatan permukaan="performance.session-cockpit" />
       <div className="pointer-events-none absolute -right-16 -top-20 h-60 w-60 rounded-full bg-cyan-400/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 -left-10 h-60 w-60 rounded-full bg-emerald-400/10 blur-3xl" />
       <div className="pointer-events-none absolute left-1/2 top-12 h-36 w-36 -translate-x-1/2 rounded-full bg-indigo-400/[0.08] blur-3xl" />

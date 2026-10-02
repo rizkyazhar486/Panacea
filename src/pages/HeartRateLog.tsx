@@ -5,8 +5,9 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceA
 import { Card, SectionTitle } from '../components/ui'
 import { IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled, type HrSample } from '../lib/api'
-import { getDemo } from '../lib/profile'
-import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Heart Rate Log — setiap sampel yang dikirim jam tangan, bukan hanya nilai
@@ -69,7 +70,7 @@ export function HeartRateLog() {
   const demo = useMemo(() => getDemo(), [])
   const hrMax = useMemo(() => {
     const teramati = samples.reduce((a, s) => Math.max(a, s.bpm), 0)
-    return Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex))
+    return Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan()))
   }, [samples, demo])
 
   const ms = RENTANG.find((r) => r.key === rentang)!.ms
@@ -126,6 +127,7 @@ export function HeartRateLog() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
+        <BatasKlaimKesehatan permukaan="wellness.heart-rate-log" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             This log is filled in by the server through automatic sync, and the app is currently running

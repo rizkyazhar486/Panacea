@@ -32,6 +32,13 @@ export interface BodyAtlasExactSectionRequest {
   maxSegments?: number
 }
 
+export interface BodyAtlasExactSectionBlockedSource {
+  file: string
+  sourceName: string
+  meshName: string
+  triangleIndex: number
+}
+
 export interface BodyAtlasExactSectionResult {
   axis: AnatomySpatialAxis
   coordinate: number
@@ -42,6 +49,8 @@ export interface BodyAtlasExactSectionResult {
   trianglesVisited: number
   coplanarTrianglesSkipped: number
   truncated: boolean
+  blockedReason?: 'non-finite-coordinate' | 'non-finite-source-geometry'
+  blockedSource?: BodyAtlasExactSectionBlockedSource
   semantics: 'exact-source-triangle-plane-segments-not-assembled-contours'
 }
 
@@ -70,6 +79,10 @@ function findExactSourceObject(root: THREE.Object3D, sourceName: string): THREE.
 
 function toTuple(vector: THREE.Vector3): AnatomySpatialVec3 {
   return [vector.x, vector.y, vector.z]
+}
+
+function isFiniteVector(vector: THREE.Vector3) {
+  return Number.isFinite(vector.x) && Number.isFinite(vector.y) && Number.isFinite(vector.z)
 }
 
 function addUniquePoint(points: THREE.Vector3[], point: THREE.Vector3, epsilonSquared: number) {
@@ -151,7 +164,22 @@ export function intersectBodyAtlasSourceMeshesWithPlane(
   request: BodyAtlasExactSectionRequest,
 ): BodyAtlasExactSectionResult {
   const axisIndex = AXIS_INDEX[request.axis]
-  const coordinate = finiteOr(request.coordinate, 0)
+  const coordinate = request.coordinate
+  if (!Number.isFinite(coordinate)) {
+    return {
+      axis: request.axis,
+      coordinate,
+      segments: [],
+      unresolvedCandidates: [],
+      sourceNodesExamined: 0,
+      meshesExamined: 0,
+      trianglesVisited: 0,
+      coplanarTrianglesSkipped: 0,
+      truncated: false,
+      blockedReason: 'non-finite-coordinate',
+      semantics: 'exact-source-triangle-plane-segments-not-assembled-contours',
+    }
+  }
   const epsilon = Math.max(1e-9, Math.min(Math.abs(finiteOr(request.epsilon, 1e-6)), 1e-2))
   const maxCandidates = boundedInteger(request.maxCandidates, 128, 1, 2_000)
   const maxTrianglesVisited = boundedInteger(request.maxTrianglesVisited, 250_000, 1, 2_000_000)
@@ -213,6 +241,28 @@ export function intersectBodyAtlasSourceMeshesWithPlane(
         a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld)
         b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld)
         c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld)
+
+        if (!isFiniteVector(a) || !isFiniteVector(b) || !isFiniteVector(c)) {
+          return {
+            axis: request.axis,
+            coordinate,
+            segments: [],
+            unresolvedCandidates,
+            sourceNodesExamined,
+            meshesExamined,
+            trianglesVisited,
+            coplanarTrianglesSkipped,
+            truncated,
+            blockedReason: 'non-finite-source-geometry',
+            blockedSource: {
+              file,
+              sourceName: name,
+              meshName: sourceOriginalName(mesh) || mesh.name.trim() || '(unnamed-source-mesh)',
+              triangleIndex,
+            },
+            semantics: 'exact-source-triangle-plane-segments-not-assembled-contours',
+          }
+        }
 
         const intersection = trianglePlaneSegment(a, b, c, axisIndex, coordinate, epsilon)
         if (intersection.coplanar) {

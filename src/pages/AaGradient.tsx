@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
 
@@ -33,8 +34,9 @@ export function AaGradient() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Gradien Oksigen A-a" subtitle="Persamaan gas alveolar — menentukan letak sebab hipoksemia" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Gradien normal disertai hipoksemia menunjuk ke hipoventilasi atau kadar oksigen inspirasi yang rendah (parunya sendiri baik); gradien yang melebar menunjuk ke masalah paru — ketidakserasian V/Q, pirau, atau gangguan difusi. Memerlukan analisis gas darah arteri.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="A-a Oxygen Gradient" subtitle="Published alveolar gas equation — decision-support arithmetic, not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A normal gradient with hypoxemia points toward hypoventilation or low inspired oxygen (the lungs themselves may be fine); a widened gradient points toward a lung problem — V/Q mismatch, shunt, or diffusion limitation. Requires an arterial blood gas.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="FiO₂ (%)">
             <input className={inputClass} type="number" min={21} max={100} value={fio2 || ''} onChange={(e) => setFio2(Number(e.target.value) || 0)} />

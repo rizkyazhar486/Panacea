@@ -4,6 +4,7 @@ import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { getHealthCache, hasHealth } from '../lib/profile'
 
 type RecoveryType = 'surgery' | 'injury' | 'illness' | 'overtraining'
@@ -89,6 +90,7 @@ function SleepScoreCard() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconMoon size={20} />} title="Sleep Score" subtitle="Duration, time to fall asleep, awakenings, and how consistent your bedtime is" />
+      <BatasKlaimKesehatan permukaan="wellness.sleep-score" />
       <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
         The weighting of these four components is <b>the author's choice</b>, not a validated sleep score. Use your own
         night-to-night change. For a standardized assessment, the PSQI (Buysse et al., 1989) is the commonly used one.
@@ -269,7 +271,7 @@ export function Recovery() {
       <VideoGallery
         icon={<IconLeaf size={20} />}
         title="Recovery Videos"
-        subtitle="Gentle stretching & breathing exercises to speed up recovery"
+        subtitle="Gentle stretching & breathing exercises for recovery sessions"
         videos={[
           { label: 'Hamstring Stretch & Twist', cue: 'Hold 20-30 sec per side · deep breathing · no pain', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072959_151332b7-0e3e-4388-b7f3-4775a65c9b9c.mp4' },
           { label: 'Breathing & Meditation', cue: 'Sit upright · 4-7-8 breathing · 10 minutes lowers stress and improves HRV', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073011_31df726a-68e4-43bf-a5c6-7cbbb41c748e.mp4' },
@@ -278,6 +280,7 @@ export function Recovery() {
 
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Recovery Tracker" subtitle="Recovery-phase tracker & step-by-step guidance" />
+        <BatasKlaimKesehatan permukaan="wellness.recovery" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Recovery Type">
             <select className={inputClass} value={p.type} onChange={(e) => upd({ type: e.target.value as RecoveryType })}>

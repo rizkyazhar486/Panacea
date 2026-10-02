@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Caprini Score (2005 version) — Caprini, J.A. (2005), Dis Mon, 51(2-3):70-78;
@@ -95,7 +96,8 @@ export function CapriniScore() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Caprini Score" subtitle="Surgical VTE risk assessment (Caprini 2005; validated Bahl 2010)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Caprini Score" subtitle="Surgical VTE risk assessment (Caprini 2005; published surgical cohorts, Bahl 2010)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Determines the degree of venous thromboembolism risk in surgical patients, mapped to a prophylaxis level per ACCP/CHEST guidelines. For admitted medical (non-surgical) patients, use the Padua score instead. Check only the matching age group.</Prosa>
       </Card>
 

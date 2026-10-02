@@ -1,0 +1,656 @@
+# PANACEA COMPUTATIONAL HUMAN PLATFORM
+
+## Model-agnostic vertical-depth architecture doctrine
+
+**Status:** Canonical product-architecture doctrine beneath `PANACEA_CONSTITUTION.md` and `PANACEA_HUMANITY_10_CHARTER.md`, operationalized by `PANACEA_PRODUCT_MATURITY_OS.md`.
+
+This document applies to every current and future model, agent, workflow and human contributor working on Panaceamed. It does not replace the Constitution, Humanity 10 Charter, clinical/safety gates, Universal Human Gold Standard, or validated existing architecture. It tells builders **what Panaceamed is becoming and how to deepen it**.
+
+## 1. Product identity
+
+Panaceamed is not a collection of healthcare pages, widgets or isolated AI features.
+
+Panaceamed is a **Computational Human Platform**: a continuously improving biomedical operating system in which Clinical Intelligence, AI-EMR, longitudinal health, Body Exposure, digital-twin simulation, education, devices, imaging, pharmacology, procedures and future applications are different projections of shared patient/reference state, evidence, knowledge and computational models.
+
+The default build hierarchy is:
+
+```text
+STABILIZE
+-> DEEPEN SHARED INFRASTRUCTURE
+-> DEEPEN SPECIALIZED DOMAIN ENGINE
+-> COUPLE ACROSS SYSTEMS
+-> VALIDATE
+-> PROJECT INTO CLINICAL / BODY / SIMULATION SURFACES
+-> OPTIMIZE
+-> EXPAND BREADTH ONLY WHEN JUSTIFIED
+```
+
+## 1A. Human Reality Model and future-capability absorbability
+
+The **Human Reality Model** is Panacea's parent conceptual abstraction for a permissioned, longitudinal representation of a human life. It does **not** create a third patient-state authority. The existing **Canonical Patient State** remains authoritative for measured/recorded human truth, while the **Physiological State Engine** remains the model-derived dynamic layer.
+
+Panacea preserves a logical **Reality Lattice** rather than flattening information into one certainty class:
+
+```text
+OBSERVED / RECORDED
+DERIVED
+MODEL-ESTIMATED
+SIMULATED
+COUNTERFACTUAL
+REFERENCE
+UNKNOWN / UNSUPPORTED
+```
+
+Observed reality, predicted state and counterfactual state remain distinct unless later evidence establishes correspondence.
+
+### Future-capability absorbability
+
+Architecture is preferred when stronger future models, higher-fidelity sensors, richer simulators or new interfaces can enter through stable contracts without creating a parallel human or replacing canonical truth semantics. Model versions must remain benchmarkable, replaceable and rollback-capable; historical patient truth must remain stable across model upgrades.
+
+Adaptive resolution and multiscale time are first-class future directions: compute should deepen around the system, scale, uncertainty or event that matters rather than simulate maximum detail everywhere. Detailed authority: [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) and [`docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md).
+
+## 1B. Cognitive Translation Kernel — infinite depth, finite interface
+
+Panaceamed remains a healthcare **superapp**, but its breadth must not appear as a collection of disconnected mini-apps. The Computational Human Platform has two coupled kernels:
+
+```text
+HUMAN STATE KERNEL
+reconstructs what is known / estimated / simulated about one changing human
+
+        +
+
+COGNITIVE TRANSLATION KERNEL
+projects that same scientific reality at the resolution the current observer can understand
+```
+
+The governing principle is:
+
+```text
+MAXIMUM SCIENTIFIC DEPTH INTERNALLY
+-> STRUCTURED COGNITIVE COMPRESSION
+-> MINIMUM COGNITIVE FRICTION EXTERNALLY
+```
+
+Compression is applied to **representation, never to scientific truth**. The system must not delete mechanism, provenance, uncertainty or deeper evidence merely to make a screen simple. Deeper information remains recoverable through progressive interaction.
+
+Conceptually:
+
+[
+O_{u,t}
+=
+\mathcal{C}
+\left(
+\mathcal{P}
+\left(
+\mathcal{S}(D_{0:t},\Theta)
+\right),
+u,g,c,r
+\right)
+]
+
+where \(\mathcal{S}\) reconstructs Human State, \(\mathcal{P}\) performs scientific reasoning/simulation, and \(\mathcal{C}\) changes representation for a user, goal, context and requested resolution without manufacturing a new reality.
+
+The universal interaction grammar is:
+
+```text
+SEE -> ASK -> ZOOM -> WHY -> WHAT IF -> ACT
+```
+
+- **See**: orient on the current state with the smallest useful cognitive surface.
+- **Ask**: interrogate the same state, not a separate chatbot truth store.
+- **Zoom**: increase spatial, biological, temporal or conceptual resolution.
+- **Why**: traverse causal/mechanistic ancestry with uncertainty and evidence.
+- **What if**: create an isolated counterfactual branch; never mutate observed history.
+- **Act**: convert understanding into a permissioned next step while preserving clinician/human authority where required.
+
+### Cognitive-semantic zoom
+
+Panacea must be able to expose the same underlying scientific object at progressively deeper representations, for example:
+
+```text
+plain-language orientation
+-> clinical explanation
+-> mechanism
+-> quantitative model
+-> specialist detail
+-> research/model/equation depth
+```
+
+These are **not different truths**. They are different projections of the same admitted state and evidence.
+
+For Body Exposure, spatial semantic zoom remains:
+
+```text
+whole body -> system -> organ -> tissue -> cell -> organelle -> molecule/pathway -> genome
+```
+
+and combines orthogonally with lenses such as anatomy, physiology, pathology, imaging, pharmacology, procedure and time. A user may move across scale, lens and time without creating a parallel body state.
+
+### Non-negotiable invariants
+
+1. **No visualization owns an independent human state.**
+2. **No page, super-page or module may create a parallel patient reality.**
+3. Cognitive translation may hide detail temporarily but may not mutate, invent or discard scientific state.
+4. Observed, estimated and simulated truth lanes remain labelled across every cognitive depth.
+5. Provenance and uncertainty remain recoverable from every scientific assertion.
+6. A `WHY` path must distinguish evidence-backed causality/mechanism from association or hypothesis.
+7. A `WHAT IF` path must remain counterfactual and isolated from real longitudinal history.
+8. Surface simplicity is achieved by progressive disclosure and semantic compression, not by deleting biomedical complexity.
+9. The same scientific object should be reusable across Clinical, AI-EMR, Your Body, Body Exposure, education and simulation.
+10. New functionality should preferably deepen `SENSE -> RECONSTRUCT -> EXPLORE -> SIMULATE -> ACT` rather than introduce another independent destination.
+
+The first runtime contract is implemented in `src/lib/cognitiveTranslationKernel.ts`; its regression gate is `scripts/uji/cognitive-translation-kernel.mts`.
+
+### Category pages: compression without fragmentation
+
+Panacea's visible product topology is constrained to seven semantic category pages:
+
+```text
+Home (entry)
+  |
+  +-- Human     : anatomy / physiology / imaging
+  +-- Health    : prevention / performance / recovery
+  +-- Clinical  : care / reasoning / treatment
+  +-- Explore   : knowledge / evidence / education
+  +-- Simulate  : what-if / procedures / models
+  +-- Records   : timeline / devices / medical record
+  +-- For You   : life / people / account
+```
+
+Panacea AI is transversal across these surfaces rather than becoming another destination.
+
+The category-page law is:
+
+```text
+feature route -> product space -> category page -> canonical human state
+```
+
+and never:
+
+```text
+feature route -> feature-owned patient state
+```
+
+Formally, for category lens \(L_k\) and canonical human state \(S_t\):
+
+\[
+V_k(t) = L_k(S_t)
+\]
+
+with the state-identity invariant:
+
+\[
+S_t^{Human}=S_t^{Health}=S_t^{Clinical}=S_t^{Explore}=S_t^{Simulate}=S_t^{Records}
+\]
+
+The categories may differ in representation, permissions, workflow and cognitive depth, but not by manufacturing parallel human truths. Existing feature routes are preserved as deep child views; compactness is achieved by lowering the number of first-class destinations, not by deleting capability.
+
+Runtime taxonomy and integration contract: `src/lib/superPages.ts`. Navigation regression gate: `scripts/uji/hirarki-navigasi.mts`.
+
+## 2. Vertical sophistication
+
+Panaceamed optimizes for validated vertical depth rather than raw feature count.
+
+[
+S_{vertical}
+=
+D_{domain}
+\times
+D_{model}
+\times
+D_{infrastructure}
+\times
+D_{integration}
+\times
+D_{validation}
+]
+
+Where:
+
+- (D_{domain}) = biomedical/domain depth;
+- (D_{model}) = mechanistic/computational depth;
+- (D_{infrastructure}) = state/runtime/data execution depth;
+- (D_{integration}) = cross-domain and workflow coupling;
+- (D_{validation}) = software/scientific/clinical validation appropriate to the claim.
+
+This is an internal prioritization heuristic, not a clinical score.
+
+A visually impressive or feature-rich module remains shallow if its model, state, provenance, uncertainty, integration or validation are shallow.
+
+## 3. Two distinct state layers
+
+### 3.1 Canonical Patient State
+
+The existing Canonical Patient State remains the source of truth for what Panaceamed knows or records about a person: measured observations, imported records, clinician-authored facts, patient-reported data, provenance, time, confidence and truth class.
+
+It must not be replaced by simulation state.
+
+### 3.2 Physiological State Engine
+
+Panaceamed may derive a separate computational physiological state for simulation, mechanistic reasoning and digital-twin work.
+
+Conceptually:
+
+[
+\frac{d\mathbf{x}}{dt}
+=
+F(
+\mathbf{x},
+\mathbf{u},
+\mathbf{e},
+\boldsymbol{\theta},
+\mathbf{C},
+t
+)
++
+\boldsymbol{\epsilon}
+]
+
+where:
+
+- (mathbf{x}) = physiological state vector;
+- (mathbf{u}) = medications, procedures, behavior and other interventions;
+- (mathbf{e}) = environmental/external exposures;
+- (\boldsymbol{\theta}) = patient/model parameters;
+- (mathbf{C}) = cross-system coupling structure;
+- (\boldsymbol{\epsilon}) = model/process uncertainty.
+
+A practical transition may be represented as:
+
+[
+\mathbf{x}_{t+\Delta t}
+=
+\Phi(
+\mathbf{x}_{t},
+\mathbf{u}_{t},
+\mathbf{e}_{t},
+\boldsymbol{\theta},
+\mathbf{M},
+\Delta t
+)
+]
+
+where (mathbf{M}) identifies the exact model family, version, parameter set, solver and provenance.
+
+**Hard boundary:** measured, clinician-authored and imported clinical truth must never be silently overwritten by simulated, inferred or model-derived values.
+
+## 3A. Human Observability layer
+
+The Canonical Patient State and Physiological State Engine are connected by a governed **Human Observability** layer defined in [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
+
+Conceptually:
+
+[
+\mathcal{O}_{1:t}
+=
+\{
+\mathbf{y}_{1:t},
+\mathbf{u}_{1:t},
+\mathbf{e}_{1:t},
+\mathbf{c}_{1:t},
+\mathbf{b}_{1:t},
+\mathbf{r}_{1:t}
+\}
+]
+
+collects authorized observed history — measurements, interventions, exposures, clinical context, behavior and patient-reported state — while the physiological engine may estimate hidden state only through an explicitly model-derived distribution such as:
+
+[
+p(
+\mathbf{x}_t
+\mid
+\mathcal{O}_{1:t},
+\boldsymbol{\theta},
+\mathbf{M}
+)
+]
+
+The architecture must preserve the distinction between observation and inference.
+
+Operationally, Panacea should converge toward:
+
+`SENSE -> NORMALIZE -> IDENTIFY -> PROVENANCE -> AUTHORIZE -> FUSE -> ESTIMATE -> SIMULATE -> DETECT -> EXPLAIN -> REVIEW -> ACT -> MEASURE OUTCOME -> LEARN`.
+
+This is universal across Clinical, AI-EMR, Body Exposure, devices, wearables, environment, longevity, performance, imaging, procedures and future domain engines. "Continuous" means event-driven and time-aware; it never permits fabrication between measurements. Missing/stale expected inputs are explicit observability gaps.
+
+## 4. Specialized domain engines
+
+Every major human system should ultimately be represented by specialized computational engines that share common contracts rather than by isolated pages.
+
+Target engine families include:
+
+- cardiovascular / hemodynamics / electrophysiology;
+- respiratory / gas exchange / ventilation mechanics;
+- renal / fluid / electrolyte / acid-base;
+- neurological / autonomic / sensory / motor;
+- endocrine / metabolic;
+- hepatic / gastrointestinal / nutrition;
+- hematologic / coagulation;
+- immune / inflammatory;
+- musculoskeletal / biomechanics;
+- reproductive / fetal-neonatal where appropriate;
+- integumentary / wound;
+- pharmacokinetic / pharmacodynamic;
+- procedure / device interaction;
+- environment / human-performance coupling.
+
+The Universal Human Gold Standard remains whole-body and uniform. No organ or module owns a permanently superior quality standard.
+
+## 5. Domain Engine Contract
+
+A mature domain engine should declare, as applicable:
+
+1. state variables, dimensions, units, bounds and truth class;
+2. measured/reference inputs and boundary conditions;
+3. outputs and events with explicit units;
+4. governing equations, algorithms or learned-model contract;
+5. assumptions, supported population and fidelity limits;
+6. parameter set with source, version, units, calibration status and range;
+7. solver/runtime method, time step, tolerances and failure behavior;
+8. coupling fields/events consumed and produced;
+9. uncertainty representation where supported;
+10. provenance and model version;
+11. validation class;
+12. failure modes and unsupported extrapolation behavior;
+13. fidelity level;
+14. observability and reproducibility hooks;
+15. projection adapters for Clinical, AI-EMR, Body Exposure, Timeline and simulation surfaces.
+
+A UI component is not a domain engine.
+
+## 6. Cross-system coupling fabric
+
+Human physiology is coupled. Domain engines must not become isolated mini-applications.
+
+Cross-system influence is a first-class architecture concept. A useful conceptual sensitivity form is:
+
+[
+C_{ij}
+=
+\frac{\partial F_i}{\partial x_j}
+]
+
+Implementations do not need an analytic Jacobian unless scientifically justified. The requirement is architectural: shared typed fields/events, units, provenance, timing and uncertainty must make coupling explicit rather than hiding it in page-specific logic.
+
+Examples:
+
+- gas exchange -> acid-base -> cardiovascular and neurological state;
+- renal sodium/water handling -> volume/preload/BP -> neurohormonal response;
+- autonomic tone -> chronotropy/vascular resistance -> perfusion;
+- drug exposure -> target effect -> organ response -> whole-body response;
+- perfusion -> oxygen delivery -> metabolism -> organ function.
+
+## 7. Shared infrastructure primitives
+
+Panaceamed should progressively converge on these logical responsibilities, reusing existing implementations where present:
+
+- Canonical Patient State;
+- Physiological State Engine;
+- Domain Engine Registry;
+- Model / Parameter Registry;
+- Cross-System Coupling Fabric;
+- Simulation Scheduler;
+- Clinical Event Bus;
+- Biomedical Knowledge Graph;
+- Terminology and Unit Service;
+- Evidence / Provenance Ledger;
+- Uncertainty representation/engine;
+- Imaging Pipeline;
+- Waveform / Telemetry Pipeline;
+- Interoperability Layer;
+- AI Inference / Reasoning Gateway;
+- Observability Layer;
+- Validation Harness;
+- Acceleration Layer only when workload and benchmarks justify it.
+
+These are logical boundaries, not a mandate for premature microservices.
+
+## 7A. Implemented runtime foundation
+
+As of 2026-09-27, the first code-level whole-body runtime substrate is implemented in `src/lib/physiology/`:
+
+- `runtime.ts` — fail-closed `DomainEngineContract`, registry, deterministic multi-rate scheduler, typed coupling fields, model/parameter/validation/fidelity provenance and explicit model-derived/simulated output truth classes;
+- `longitudinalBoundary.ts` — read-only admission of explicitly measured/imported/clinician-entered numeric longitudinal events as boundary conditions; unknown measurement uncertainty stays unknown (`sigma = null`);
+- `exampleEngines.ts` — dimensionless synthetic fixtures only, explicitly not human physiology;
+- `scripts/uji/physiological-runtime.mts` — deterministic contract gate automatically discovered by `npm run uji`;
+- `DOCS/PHYSIOLOGICAL-RUNTIME.md` — exact status and scientific boundary.
+
+The first real cross-system chain now runs on this substrate: measured ventricular boundaries -> model-derived cardiac output, plus Hb/SaO2/PaO2 -> arterial oxygen content -> systemic oxygen delivery, with dependency ordering, uncertainty and provenance across engine boundaries. See `DOCS/OXYGEN-TRANSPORT-ENGINE.md`.
+
+This foundation does **not** mean Panaceamed has a validated whole-human physiological model. Real organ/system engines remain future vertical work and require literature-grounded equations/parameters, supported-population definitions and validation appropriate to their claims. The existing multiscale kernel remains complementary rather than replaced.
+
+## 8. One state, many projections
+
+The intended relationship is:
+
+```text
+Clinical / Device / Imaging / Wearable / Environment Inputs
+                         |
+              Normalization + Provenance
+                         |
+              Canonical Patient State
+                         |
+        +----------------+----------------+
+        |                                 |
+Biomedical Knowledge              Boundary Conditions
+        |                                 |
+        +---------- Physiological State Engine ----------+
+                    |       |       |       |
+                  Cardio   Resp    Renal   Neuro ... engines
+                    \       |       |      /
+                     Cross-System Coupling
+                              |
+                   Model-derived State/Event Stream
+                              |
+         +--------------------+--------------------+
+         |                    |                    |
+Clinical Intelligence    Body Exposure       Simulation/Training
+         |                    |                    |
+AI-EMR / Workflow        Spatial Projection   Procedure / Device UI
+```
+
+Application surfaces observe or interact with shared state. They do not create independent physiological truth.
+
+## 9. Body Exposure
+
+Body Exposure is the principal spatial projector and interaction surface of the Computational Human Platform.
+
+It should progressively project:
+
+- source-backed anatomy/reference geometry;
+- legitimate patient context;
+- modeled physiological states;
+- pathophysiological transitions;
+- imaging-derived findings;
+- device/procedure interactions;
+- tissue/cell/molecular semantic zoom;
+- uncertainty and provenance;
+- intervention response over time.
+
+Rendering is downstream of state/model contracts. An animation, static layer list or scripted sequence must not be represented as a physiological or surgical simulator unless a stateful computational model and appropriate validation support that claim.
+
+## 10. Future-model task-selection law
+
+Every future agent should apply this order when no narrower owner instruction overrides it:
+
+1. preserve safety, security, privacy, provenance, data integrity and clinical-release gates;
+2. inspect existing shared primitives and current main before creating anything;
+3. repair broken core workflows or inconsistent canonical state;
+4. deepen shared infrastructure before adding parallel feature-local infrastructure;
+5. deepen an existing specialized domain engine before adding a shallow new surface;
+6. strengthen cross-system coupling and shared state;
+7. strengthen validation, observability, uncertainty and provenance;
+8. project the stronger shared state into Clinical, Body Exposure, AI-EMR, Timeline or simulation;
+9. optimize performance and UX;
+10. add net-new breadth only when evidence, user need, system fit, reuse check and validation path justify it.
+
+When two similarly valuable tasks compete, prefer the larger evidence-backed increase in:
+
+[
+\Delta S_{vertical}
+=
+\Delta(
+D_{domain}
+\times
+D_{model}
+\times
+D_{infrastructure}
+\times
+D_{integration}
+\times
+D_{validation}
+)
+]
+
+subject to risk, cost, regression and owner sequencing constraints.
+
+Do **not** optimize by default for route count, component count, widget count, commit count, prompt count or visual spectacle.
+
+## 11. Validation ladder
+
+Use the validation level appropriate to the model and claim:
+
+```text
+schema/unit validation
+-> deterministic numerical validation
+-> manufactured/synthetic benchmark
+-> published-model reproduction
+-> cross-engine invariant/conservation tests
+-> external/reference benchmark
+-> domain-expert review
+-> human clinical validation when the intended claim/use requires it
+```
+
+Software validation never becomes clinical validation by wording.
+
+## 12. Migration doctrine
+
+Apply this architecture incrementally:
+
+- preserve proven existing implementations;
+- map them to the canonical primitives;
+- expose explicit contracts;
+- migrate duplicate state only after compatibility is demonstrated;
+- deepen one validated vertical slice at a time;
+- add cross-system coupling after individual contracts are stable enough;
+- converge projections onto shared state;
+- introduce GPU/WebGPU/HPC/neural operators/FE/FSI/MD or external scientific services only after workload, evidence, benchmark, provenance, security and rollback requirements are defined.
+
+## 13. Anti-goals
+
+This doctrine does not authorize:
+
+- fabricated patient-specific values;
+- simulation silently promoted into the clinical record;
+- clinical-validation claims from software tests;
+- AI-generated equations treated as evidence without sources/validation;
+- premature microservice proliferation;
+- a second patient-state authority;
+- organ-specific privileged gold standards;
+- destructive rewrites of validated capability;
+- complexity for its own sake;
+- more features when existing capabilities remain shallow or disconnected.
+
+## 14. Relationship to existing authorities
+
+This doctrine must be read together with:
+
+- `PANACEA_CONSTITUTION.md`;
+- `PANACEA_HUMANITY_10_CHARTER.md`;
+- `PANACEA_PRODUCT_MATURITY_OS.md`;
+- `docs/body-exposure/HUMAN_DIGITAL_TWIN_GOLD_STANDARD.md`;
+- `docs/architecture/PRODUCT_SYSTEM.md`;
+- `docs/architecture/PATIENT_STATE.md`;
+- `docs/architecture/KNOWLEDGE_GRAPH.md`;
+- `docs/architecture/INTEGRATION_MAP.md`;
+- `docs/architecture/MATURITY_MODEL.md`;
+- `DOCS/VISSIM-OS.md`;
+- `automation/AUTONOMOUS_RND_LOOP.md`.
+
+If an older agent-authored breadth recommendation conflicts with this doctrine and no newer explicit owner instruction requires that breadth, prefer deeper shared computational architecture.
+
+## 15. Mandatory vertical continuity
+
+The canonical deepening contract is [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
+
+It adds the **No Hollow Gap Principle** across all three superpages and all biological representations. Whole-body/system/organ capability must progressively connect through tissue, functional microarchitecture, cellular niche, cell state, organelle, molecular complex/pathway, transcript/RNA, gene/regulatory element, chromatin/epigenetic state and DNA/genomic variation wherever scientifically applicable.
+
+This requirement applies equally to visualization. High-end 3DCG must render source/model-backed biological structure and state rather than artificial spectacle. Superficial, fabricated and unsupported/subjective representations are prohibited. Relevant unimplemented layers remain explicit vertical gaps; unknown patient states remain unknown or appropriately classified as derived, estimated, simulated or population-reference.
+
+Future architecture and task selection should therefore maximize evidence-backed vertical continuity and cross-scale coupling, not merely domain count.
+
+## 16. Longitudinal coupled execution
+
+The Computational Human Platform must execute as a longitudinal coupled system rather than isolated organ snapshots.
+
+Conceptually:
+
+[
+\mathbf X_{t+\Delta t}
+=
+\Phi(
+\mathbf X_t,
+\mathbf U_t,
+\mathbf E_t,
+\boldsymbol\theta,
+\mathbf C_t,
+\Delta t
+)
+]
+
+where `C_t` contains explicit cross-system dependencies, feedback and compensatory structure.
+
+Domain engines may use different time steps, but scheduling must preserve biological order, dependency constraints, state history, uncertainty and provenance. Cross-system responses should form auditable domino chains with compensation/counter-regulation where scientifically supported.
+
+Clinical, Body Exposure and Simulation remain different projections of one synchronized temporal state graph.
+
+
+## 17. Reality Engine and compounding human depth
+
+The approved canonical child-spec is [docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md](docs/superpowers/specs/2026-09-27-reality-engine-compounding-human-model-design.md).
+
+Vertical depth now includes not only biological-scale continuity, but also longitudinal personalization, temporal replay, causal explanation, epistemic transparency, falsification and outcome feedback.
+
+The additional architectural heuristic is:
+
+[
+S_{compound}
+=
+S_{vertical}
+\times
+D_{personalization}
+\times
+D_{temporal}
+\times
+D_{causal}
+\times
+D_{epistemic}
+\times
+D_{feedback}
+]
+
+where:
+- (D_{personalization}) = scientifically justified, identifiable individual calibration;
+- (D_{temporal}) = replayable/resumable longitudinal depth;
+- (D_{causal}) = mechanistic causal connectivity;
+- (D_{epistemic}) = explicit known/unknown/stale/unsupported state and uncertainty;
+- (D_{feedback}) = prediction-vs-reality falsification, calibration and model-gap learning.
+
+This is an internal architecture heuristic, not a clinical score.
+
+When future models gain additional capability, context or scientific tools, use that capability preferentially to:
+- reduce scientifically meaningful Reality Gaps;
+- improve semantic observation quality;
+- improve parameter identifiability before personalization;
+- preserve prediction errors and use them for falsification/calibration;
+- deepen causal and temporal explanation;
+- strengthen replay/version fidelity;
+- improve counterfactual validity and isolation from the real timeline;
+- strengthen uncertainty, provenance, validation and security;
+before adding shallow new surface breadth.
+
+The real observed timeline remains canonical reality. Counterfactual branches are simulated and may never overwrite real history. Personal calibration may not overfit or invent unidentifiable latent state. Unknown/unsupported physiology must remain visible as unknown/unsupported rather than being filled for visual completeness.
+
+**Implementation-status boundary:** the first bounded Reality Engine primitive, `Reality Error Ledger v1`, is implemented in `src/lib/physiology/realityErrorLedger.ts` with deterministic coverage in `scripts/uji/reality-error-ledger.mts`. It preserves prospective predictions and later prediction-vs-reality error evidence without recalibration or clinical publication.
+
+This does **not** mean the broader Reality Engine is implemented. Personal Parameter Registry/identifiability, automatic calibration, Biological Git, Reality Gap Registry, Active Sensing, counterfactual branch runtime, Human Model SDK and privacy-preserving population learning remain unimplemented unless separately evidenced.

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -296,7 +297,7 @@ export function RadiologyReconstructionLab() {
         <div className="min-w-0">
           <div className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">Radiology reconstruction lab</div>
           <h3 className="mt-0.5 text-sm font-black">Surface + volume reconstruction simulator</h3>
-          <p className="mt-1 max-w-2xl text-[10.5px] leading-relaxed text-white/55">Interactive teaching phantom inspired by CT/MRI reconstruction workstations. It is generated geometry, not a DICOM study and not suitable for diagnosis.</p>
+          <Prosa kelas="mt-1 max-w-2xl text-[10.5px] leading-relaxed text-white/55">Interactive teaching phantom inspired by CT/MRI reconstruction workstations. It is generated geometry, not a DICOM study and not suitable for diagnosis.</Prosa>
         </div>
         <div className="flex flex-wrap gap-1">
           <span className="rounded-full border border-white/10 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-white/45">synthetic phantom</span>
@@ -366,7 +367,7 @@ export function RadiologyReconstructionLab() {
         </div>
         <div className="rounded-xl border border-white/10 p-2.5">
           <div className="text-[9px] font-black uppercase tracking-[0.12em] text-white/45">Fail-closed boundary</div>
-          <p className="mt-1 text-[10px] leading-relaxed text-white/55">DICOM import, MRI/CT segmentation, STL/DICOM export, patient measurement and diagnostic inference are intentionally not claimed by this synthetic mode. Those require a validated medical-imaging pipeline and source-specific QA.</p>
+          <Prosa kelas="mt-1 text-[10px] leading-relaxed text-white/55">DICOM import, MRI/CT segmentation, STL/DICOM export, patient measurement and diagnostic inference are intentionally not claimed by this synthetic mode. Those require a validated medical-imaging pipeline and source-specific QA.</Prosa>
         </div>
       </div>
     </section>

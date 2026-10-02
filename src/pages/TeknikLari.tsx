@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { BAGIAN, FISIOLOGI, LABEL_BUKTI, RUJUKAN_LARI } from '../lib/teknikLari'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Teknik Lari.
@@ -34,6 +35,7 @@ export function TeknikLari() {
         title="Running Technique"
         subtitle="From your first stride to your breathing — ordered by strength of evidence"
       />
+      <BatasKlaimKesehatan permukaan="performance.running-form" />
 
       {/* Yang paling sering salah dipahami, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">

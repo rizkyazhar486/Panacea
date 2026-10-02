@@ -36,7 +36,13 @@ assert.ok(system)
 assert.equal(system.status, 'incomplete')
 assert.equal(system.authoringAllowed, true)
 assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:articular' && blocker.code === 'geometry-not-shipped'))
+assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:reproductive' && blocker.code === 'geometry-not-shipped'))
 assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:fascial' && blocker.code === 'geometry-not-shipped'))
+assert.equal(
+  system.blockers.filter((blocker) => blocker.code === 'source-admission-failed').length,
+  0,
+  'shipped system roots must resolve exact same-frame source anchors before deeper maturation work continues',
+)
 
 for (const stage of report.stages.slice(2)) {
   assert.equal(stage.status, 'locked', `${stage.id} must remain locked while whole-body system coverage is incomplete`)
