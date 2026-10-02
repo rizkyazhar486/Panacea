@@ -7,8 +7,8 @@
       "smallWords": 104
     },
     "body-explorer": {
-      "words": 133,
-      "smallWords": 121
+      "words": 121,
+      "smallWords": 109
     },
     "clinical-hub": {
       "words": 71,
@@ -17,6 +17,10 @@
     "med-study": {
       "words": 97,
       "smallWords": 78
+    },
+    "fitness-hub": {
+      "words": 167,
+      "smallWords": 146
     }
   }
 }
