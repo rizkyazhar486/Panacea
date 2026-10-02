@@ -102,6 +102,11 @@ jobs:
           cat /tmp/panacea-vite-preview.log
           exit 1
 
+      - name: UI legibility ratchet 390x844
+        env:
+          UI_LEGIBILITY_ORIGIN: http://127.0.0.1:4173
+        run: node scripts/qa/ui-legibility-ratchet.mjs
+
       - name: Body Exposure mobile 390x844 smoke
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
