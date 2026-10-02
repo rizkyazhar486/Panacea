@@ -1,0 +1,104 @@
+[
+  {
+    "name": "ordinary authoritative provider",
+    "request": {
+      "capabilityId": "research.biomedical.pubmed",
+      "executor": "chatgpt",
+      "availableProviders": ["pubmed", "consensus"],
+      "policyAllowed": true,
+      "authorizationAvailable": true
+    },
+    "expected": { "provider": "pubmed", "fallbackUsed": false }
+  },
+  {
+    "name": "primary unavailable uses ordered fallback",
+    "request": {
+      "capabilityId": "research.biomedical.pubmed",
+      "executor": "chatgpt",
+      "availableProviders": ["elicit", "consensus"],
+      "policyAllowed": true,
+      "authorizationAvailable": true
+    },
+    "expected": { "provider": "consensus", "fallbackUsed": true }
+  },
+  {
+    "name": "unsupported executor fails closed",
+    "request": {
+      "capabilityId": "research.biomedical.pubmed",
+      "executor": "claude-code",
+      "availableProviders": ["pubmed"],
+      "policyAllowed": true,
+      "authorizationAvailable": true
+    },
+    "expectedError": "executor"
+  },
+  {
+    "name": "policy denial never falls back",
+    "request": {
+      "capabilityId": "release.frontend.vercel",
+      "executor": "chatgpt",
+      "availableProviders": ["vercel", "appdeploy"],
+      "policyAllowed": false,
+      "authorizationAvailable": true
+    },
+    "expectedError": "policy"
+  },
+  {
+    "name": "authorization requirement stops instead of bypassing",
+    "request": {
+      "capabilityId": "growth.social.metricool",
+      "executor": "chatgpt",
+      "availableProviders": ["metricool"],
+      "policyAllowed": true,
+      "authorizationAvailable": false
+    },
+    "expectedError": "authorization"
+  },
+  {
+    "name": "high-risk corroboration may request a second evidence provider",
+    "request": {
+      "capabilityId": "research.biomedical.synthesis",
+      "executor": "chatgpt",
+      "availableProviders": ["consensus", "elicit"],
+      "policyAllowed": true,
+      "authorizationAvailable": true,
+      "additionalProviderRequested": true,
+      "duplicateReason": "high-risk-corroboration"
+    },
+    "expected": { "provider": "consensus", "fallbackUsed": false, "duplicateProviderAllowed": true }
+  },
+  {
+    "name": "ordinary duplicate provider request is denied without a reason",
+    "request": {
+      "capabilityId": "research.web.firecrawl",
+      "executor": "chatgpt",
+      "availableProviders": ["firecrawl", "tavily-ai"],
+      "policyAllowed": true,
+      "authorizationAvailable": true,
+      "additionalProviderRequested": true
+    },
+    "expectedError": "duplicate"
+  },
+  {
+    "name": "deployment ownership does not migrate to an undeclared provider",
+    "request": {
+      "capabilityId": "release.frontend.vercel",
+      "executor": "chatgpt",
+      "availableProviders": ["appdeploy"],
+      "policyAllowed": true,
+      "authorizationAvailable": true
+    },
+    "expectedError": "available provider"
+  },
+  {
+    "name": "repository overlap is represented as policy denial",
+    "request": {
+      "capabilityId": "engineering.repo.github",
+      "executor": "claude-code",
+      "availableProviders": ["github"],
+      "policyAllowed": false,
+      "authorizationAvailable": true
+    },
+    "expectedError": "policy"
+  }
+]
