@@ -69,7 +69,7 @@ const nodes: readonly VerticalBiologicalNode[] = [
   node('human', 'Human', 'person', anatomyEvidence, { domain: 'whole-human' }),
   node('cardiovascular-system', 'Cardiovascular system', 'system', anatomyEvidence),
   node('heart', 'Heart', 'organ', anatomyEvidence, {
-    representation: { kind: '3d-reference', sourceId: 'repo:anatomy-source-registry:heart' },
+    representation: { kind: '3d-reference', sourceId: 'repo:source-registry:z_anatomy' },
   }),
   node('left-ventricle', 'Left ventricle', 'substructure', anatomyEvidence),
   node('lv-myocardium', 'Left-ventricular myocardium', 'tissue', [
