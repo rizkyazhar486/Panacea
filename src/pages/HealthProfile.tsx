@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Fold } from '../shared/ui/Fold'
 import { Prosa } from '../components/Prosa'
 import { KolomAngka } from '../components/KolomAngka'
 import { simpanTeks } from '../lib/unduh'
@@ -287,6 +288,7 @@ export function HealthProfile() {
         {account && <div className="mt-2 text-[10px] text-neutral-500">Account: {account.email}</div>}
       </Card>
 
+      <Fold label="Import">
       {/* Import from / export to a file */}
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · scale screenshot .jpg/.png" />
@@ -313,12 +315,16 @@ export function HealthProfile() {
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
+      </Fold>
 
+      <Fold label="Metrics">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Demographics" subtitle="Dasar bagi seluruh perhitungan" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -363,10 +369,13 @@ export function HealthProfile() {
           {num('Muscle mass (kg)', 'muscleMassKg', 0.1)}
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Insights">
       <InsightCard history={p.history ?? []} />
       <BenchmarkCard profile={p} />
       <TrendChart history={p.history ?? []} />
+      </Fold>
 
       <div className="sticky bottom-4 z-10">
         <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg">
