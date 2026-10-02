@@ -19,18 +19,20 @@ export function SurfaceDepthNavigator({
   return (
     <nav
       aria-label={`${surface} depth`}
-      className="no-scrollbar flex gap-5 overflow-x-auto border-y border-white/10 py-1"
+      className="no-scrollbar flex snap-x gap-1.5 overflow-x-auto border-y border-white/[.08] py-1.5"
       data-pmd-surface-depth={surface}
     >
       {contract.stops.map((stop, index) => {
         const active = stop.id === activeStopId
-        const className = `flex min-h-[46px] shrink-0 items-center gap-2 border-b text-[10px] font-black uppercase tracking-[.12em] transition ${
-          active ? 'border-white text-white' : 'border-transparent text-white/38 hover:text-white/72'
+        const className = `flex min-h-[42px] shrink-0 snap-start items-center gap-1.5 rounded-full border px-3 text-[10px] font-black transition ${
+          active
+            ? 'border-white/[.16] bg-white/[.08] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]'
+            : 'border-transparent text-white/42 hover:border-white/[.07] hover:bg-white/[.035] hover:text-white/78'
         }`
         const content = (
           <>
-            <span className="text-white/22">{String(index + 1).padStart(2, '0')}</span>
-            <span>{stop.label}</span>
+            <span className="hidden tabular-nums text-white/22 sm:inline">{String(index + 1).padStart(2, '0')}</span>
+            <span className="whitespace-nowrap">{stop.label}</span>
           </>
         )
 

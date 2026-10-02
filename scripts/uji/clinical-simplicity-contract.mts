@@ -24,9 +24,15 @@ for (const path of ['/radiology', '/genome-lab', '/evidence', '/med-study', '/fr
 assert.ok(clinical.includes("to: '/rujukan?t=obat'"), 'Clinical lost direct drug reference access')
 
 // Inline tools must remain functional and deterministic.
-assert.match(clinical, /weight \/ \(\(height \/ 100\) \*\* 2\)/,
+// The literal identifiers were renamed (weight/height -> kg/cm) in
+// 017e579 "fix(clinical): keep quick calculators empty until input" so the
+// hook can guard on empty input before computing; the arithmetic itself is
+// still exactly weight_kg / (height_m) ** 2, so the contract follows the
+// renamed-but-equivalent source rather than asserting on identifier names.
+assert.match(clinical, /kg \/ \(\(cm \/ 100\) \*\* 2\)/,
   'BMI calculation is missing or changed')
-assert.match(clinical, /\(sbp \+ 2 \* dbp\) \/ 3/,
+// Same 017e579 rename: sbp/dbp -> systolic/diastolic, same (SBP + 2*DBP)/3 arithmetic.
+assert.match(clinical, /\(systolic \+ 2 \* diastolic\) \/ 3/,
   'MAP calculation is missing or changed')
 assert.match(clinical, /if \(value < min\) return 'LOW'/,
   'Lab range low boundary is missing')

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { hariIni } from '../lib/tanggal'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // 7-day trend of BMI, BMR & VO₂Max. A real snapshot is appended to localStorage
 // once per day, so the chart fills in honestly as the user keeps visiting.
@@ -55,6 +56,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
 
   return (
     <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+      <BatasKlaimKesehatan permukaan="wellness.health-trends" />
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-extrabold text-ink">📈 7-Day Health Trends</h3>

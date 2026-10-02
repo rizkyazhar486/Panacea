@@ -8,6 +8,9 @@ import {
   type BodySystemId,
 } from '../lib/bodySystemSourceWave'
 import { body3dPixelRatio } from '../lib/body3dQuality'
+import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { bodyStructureCameraFocus } from '../lib/bodyStructureCameraFocus'
+import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
@@ -101,6 +104,10 @@ function projectMatchedSourceMeshes(
     projected.userData.panaceaContext = role === 'context'
     projected.matrix.copy(source.matrixWorld)
     projected.matrixAutoUpdate = false
+    // three r185: updateWorldMatrix() tidak menghitung ulang matrixWorld untuk
+    // objek matrixAutoUpdate=false; tanpa updateMatrixWorld(true) batas memakai
+    // matriks identitas (kubus ±1 terkuantisasi) — kamera membingkai kotak yang salah.
+    projected.updateMatrixWorld(true)
     projected.frustumCulled = source.frustumCulled
     projected.renderOrder = source.renderOrder
     group.add(projected)
@@ -131,6 +138,9 @@ interface BodyAllSystems3DProps {
   onSemanticZoomChange?: (state: BodySemanticZoomState) => void
   selectedStructureName?: string | null
   onStructureSelect?: (sourceName: string) => void
+  /** Permintaan fokus dari luar (mis. temuan AI-EMR): buka atlas bila tertutup,
+   *  lalu bingkai kamera pada mesh sumber dengan nama PERSIS itu. Tidak ada mesh -> tidak ada fokus. */
+  focusRequest?: { name: string; nonce: number } | null
 }
 
 export default function BodyAllSystems3D({
@@ -139,6 +149,7 @@ export default function BodyAllSystems3D({
   onSemanticZoomChange,
   selectedStructureName,
   onStructureSelect,
+  focusRequest = null,
 }: BodyAllSystems3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
@@ -153,6 +164,9 @@ export default function BodyAllSystems3D({
   const semanticZoomCallbackRef = useRef(onSemanticZoomChange)
   const structureSelectCallbackRef = useRef(onStructureSelect)
   const selectionApplierRef = useRef<((name?: string | null) => void) | null>(null)
+  const focusApplierRef = useRef<((name: string) => boolean) | null>(null)
+  const pendingFocusRef = useRef<string | null>(null)
+  const [focusStatus, setFocusStatus] = useState<{ name: string; framed: boolean; attempted: boolean } | null>(null)
 
   useEffect(() => {
     semanticZoomCallbackRef.current = onSemanticZoomChange
@@ -178,6 +192,33 @@ export default function BodyAllSystems3D({
     if (selectedSystemId === undefined) setInternalSystemId(nextSystemId)
     onSystemChange?.(nextSystemId)
   }
+
+  function openAtlas() {
+    if (open) return
+    setOpen(true)
+    openTimerRef.current = window.setTimeout(() => {
+      openTimerRef.current = null
+      setRendererArmed(true)
+    }, 120)
+  }
+
+  // Fokus dari luar: simpan sebagai tertunda; terapkan segera bila adegan siap,
+  // atau setelah semua bundel sumber selesai dimuat.
+  useEffect(() => {
+    if (!focusRequest?.name) return
+    pendingFocusRef.current = focusRequest.name
+    setFocusStatus({ name: focusRequest.name, framed: false, attempted: false })
+    if (!open) { openAtlas(); return }
+    if (focusApplierRef.current?.(focusRequest.name)) {
+      pendingFocusRef.current = null
+      setFocusStatus({ name: focusRequest.name, framed: true, attempted: true })
+    } else if (focusApplierRef.current && !loading) {
+      // Adegan sudah dimuat penuh dan mesh itu tidak ada: katakan terus terang.
+      pendingFocusRef.current = null
+      setFocusStatus({ name: focusRequest.name, framed: false, attempted: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRequest])
 
   function toggleOpen() {
     if (openTimerRef.current !== null) {
@@ -248,41 +289,54 @@ export default function BodyAllSystems3D({
       applyProjectedSelection(projectedGroups, name)
       requestRender()
     }
+    // Cari mesh sumber dengan nama PERSIS (dinormalisasi) lalu bingkai kamera.
+    focusApplierRef.current = (name) => {
+      const cari = normalizeAnatomySourceName(name)
+      let mesh: THREE.Mesh | undefined
+      for (const g of projectedGroups) g.traverse((o) => { const m = o as THREE.Mesh; if (!mesh && m.isMesh && m.userData.panaceaContext !== true && normalizeAnatomySourceName(m.name) === cari) mesh = m })
+      if (!mesh) return false
+      applyProjectedSelection(projectedGroups, name)
+      bingkaiMesh(mesh)
+      return true
+    }
     let fittedCameraDistance = 0
     let lastSemanticScale: BodySemanticScale = 'whole-body'
     let lastRelativeZoom = 1
     let disposed = false
-    let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
+    let contextAvailable = true
 
-    const renderFrame = () => {
-      if (disposed || !inViewport || !documentVisible) return
-      controls.update()
-      renderer.render(scene, camera)
-    }
-    const renderLoop = () => {
-      raf = 0
-      if (disposed || !inViewport || !documentVisible) return
-      renderFrame()
-      raf = requestAnimationFrame(renderLoop)
-    }
-    const requestRender = () => {
-      if (disposed || !inViewport || !documentVisible) return
-      if (mobile) {
-        if (raf) return
-        raf = requestAnimationFrame(() => {
-          raf = 0
-          renderFrame()
-        })
-      } else if (!raf) {
-        raf = requestAnimationFrame(renderLoop)
-      }
-    }
-    const stop = () => {
-      if (raf) cancelAnimationFrame(raf)
-      raf = 0
-    }
+    const renderScheduler = createBodyRenderScheduler({
+      canRender: () => !disposed && inViewport && documentVisible && contextAvailable,
+      requestFrame: (callback) => requestAnimationFrame(callback),
+      cancelFrame: (frameId) => cancelAnimationFrame(frameId),
+      renderFrame: () => {
+        // OrbitControls emits another change while damping is still settling,
+        // which requests only the next necessary frame.
+        controls.update()
+        renderer.render(scene, camera)
+      },
+    })
+    const requestRender = () => renderScheduler.request()
+    const stop = () => renderScheduler.stop()
+    const contextLifecycle = createBodyWebglContextLifecycle({
+      onLost: () => {
+        contextAvailable = false
+        stop()
+        setLoading(false)
+        setError('Graphics context was lost. The 3D atlas is paused until this device restores it.')
+      },
+      onRestored: () => {
+        contextAvailable = true
+        setError('')
+        requestRender()
+      },
+    })
+    const onContextLost = (event: Event) => contextLifecycle.handleLost(event)
+    const onContextRestored = () => contextLifecycle.handleRestored()
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
     const resolvedByFile = new Map<string, Set<string>>()
     const contextNamesByFile = new Map<string, Set<string>>()
@@ -342,6 +396,7 @@ export default function BodyAllSystems3D({
       camera.updateProjectionMatrix()
       controls.minDistance = Math.max(span * 0.008, camera.near * 4)
       fittedCameraDistance = camera.position.distanceTo(center)
+      renderer.domElement.dataset.jarakTubuh = fittedCameraDistance.toFixed(4)
       camera.lookAt(center)
       semanticZoomCallbackRef.current?.({ scale: 'whole-body', relativeZoom: 1 })
       lastSemanticScale = 'whole-body'
@@ -357,6 +412,11 @@ export default function BodyAllSystems3D({
       if (completed === filesNeeded.length) {
         fitCamera()
         setLoading(false)
+        const tertunda = pendingFocusRef.current
+        if (tertunda) {
+          pendingFocusRef.current = null
+          setFocusStatus({ name: tertunda, framed: Boolean(focusApplierRef.current?.(tertunda)), attempted: true })
+        }
       }
     }
 
@@ -418,25 +478,56 @@ export default function BodyAllSystems3D({
       pointerStartX = event.clientX
       pointerStartY = event.clientY
     }
-    const onPointerUp = (event: PointerEvent) => {
-      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 7) return
+    const pickStructure = (event: PointerEvent | MouseEvent) => {
       const rect = renderer.domElement.getBoundingClientRect()
-      if (rect.width <= 0 || rect.height <= 0) return
+      if (rect.width <= 0 || rect.height <= 0) return undefined
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObjects(projectedGroups, true).find((entry) => {
+      return raycaster.intersectObjects(projectedGroups, true).find((entry) => {
         const candidate = entry.object as THREE.Mesh
         return candidate.isMesh && candidate.userData.panaceaContext !== true
-      })
-      const mesh = hit?.object as THREE.Mesh | undefined
+      })?.object as THREE.Mesh | undefined
+    }
+    const onPointerUp = (event: PointerEvent) => {
+      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 7) return
+      const mesh = pickStructure(event)
       if (!mesh?.name) return
       structureSelectCallbackRef.current?.(mesh.name)
       applyProjectedSelection(projectedGroups, mesh.name)
       requestRender()
     }
+    const onDoubleClick = (event: MouseEvent) => {
+      const mesh = pickStructure(event)
+      if (!mesh) return
+      bingkaiMesh(mesh)
+    }
+    function bingkaiMesh(mesh: THREE.Mesh) {
+      // Paksa matrixWorld (lihat catatan r185 di projectMatchedSourceMeshes).
+      mesh.updateMatrixWorld(true)
+      const bounds = new THREE.Box3().setFromObject(mesh, true)
+      if (bounds.isEmpty()) return
+      const pose = bodyStructureCameraFocus(
+        {
+          min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
+          max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z },
+        },
+        { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+      )
+      if (!pose) return
+      controls.target.set(pose.target.x, pose.target.y, pose.target.z)
+      camera.position.set(pose.position.x, pose.position.y, pose.position.z)
+      camera.lookAt(controls.target)
+      controls.update()
+      // Terukur untuk uji: jarak kamera->target setelah dibingkai (lebih kecil dari seluruh tubuh).
+      renderer.domElement.dataset.jarakKamera = camera.position.distanceTo(controls.target).toFixed(4)
+      renderer.domElement.dataset.bentangStruktur = pose.span.toFixed(4)
+      emitSemanticZoom()
+      requestRender()
+    }
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
+    renderer.domElement.addEventListener('dblclick', onDoubleClick)
 
     const io = new IntersectionObserver(([entry]) => {
       inViewport = Boolean(entry?.isIntersecting)
@@ -455,14 +546,19 @@ export default function BodyAllSystems3D({
 
     return () => {
       disposed = true
-      stop()
+      renderScheduler.dispose()
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       controls.removeEventListener('change', onControlChange)
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
+      renderer.domElement.removeEventListener('dblclick', onDoubleClick)
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
+      contextLifecycle.dispose()
       selectionApplierRef.current = null
+      focusApplierRef.current = null
       controls.dispose()
       projectedGroups.forEach(disposeProjectedMaterials)
       renderer.dispose()
@@ -536,6 +632,11 @@ export default function BodyAllSystems3D({
           {selectedStructureName && (
             <div className="pointer-events-none absolute left-3 top-12 max-w-[72%] truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
               Selected · {selectedStructureName}
+            </div>
+          )}
+          {focusStatus?.attempted && focusStatus.name === selectedStructureName && (
+            <div data-fokus-kamera={focusStatus.framed ? 'framed' : 'not-rendered'} className="pointer-events-none absolute left-3 top-[4.5rem] max-w-[72%] truncate rounded-full border border-white/10 bg-black/70 px-2.5 py-1 text-[8px] font-black text-white/70">
+              {focusStatus.framed ? 'Camera framed on this structure' : 'Not rendered in this system view — not framed'}
             </div>
           )}
           {loading && <div role="status" className="absolute inset-x-3 bottom-3 rounded-xl border border-cyan-300/10 bg-black/75 px-3 py-2 text-[10px] font-bold text-cyan-100 backdrop-blur-xl">Loading canonical source bundles… {loadedFiles}</div>}

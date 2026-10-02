@@ -7,6 +7,7 @@ import {
   panduanKursiRoda,
   type BacaanSpo2, type CatatanEkg, type KlasifikasiEkg,
 } from '../lib/clinicalTrackers'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pelacak Klinis — saturasi, EKG, jet lag, kehamilan, kursi roda.
@@ -36,6 +37,7 @@ export function ClinicalTrackers() {
     <div className="space-y-4">
       <SectionTitle icon={<IconHeart />} title="Clinical Trackers"
         subtitle="Oxygen saturation, ECG, jet lag, pregnancy, and wheelchair-user physiology" />
+      <BatasKlaimKesehatan permukaan="clinical.trackers" />
 
       <Card>
         <p className="text-sm leading-relaxed text-neutral-600">

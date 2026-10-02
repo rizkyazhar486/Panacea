@@ -1,15 +1,19 @@
-import { lazy, Suspense, type ComponentType } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
-import { FeatureBoulevard } from '../components/FeatureBoulevard'
-import { PersonalBodyAvatar3D } from '../components/PersonalBodyAvatar3D'
+import { OneShape } from '../components/OneShape'
+import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
+import { hitungScrollAgarTerlihat } from '../lib/railViewport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
 const BodyToolkit = lazy(() => import('./BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
 const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
+const HealthPerformanceLeague = lazy(() => import('./HealthPerformanceLeague').then((m) => ({ default: m.HealthPerformanceLeague })))
 const PusatTubuh = lazy(() => import('./PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
 const PusatGizi = lazy(() => import('./PusatGizi').then((m) => ({ default: m.PusatGizi })))
 const HealthProfile = lazy(() => import('./HealthProfile').then((m) => ({ default: m.HealthProfile })))
@@ -17,7 +21,7 @@ const VitaPulse = lazy(() => import('./VitaPulse').then((m) => ({ default: m.Vit
 const Longevity = lazy(() => import('./Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./DataLab').then((m) => ({ default: m.DataLab })))
 
-type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
+type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
@@ -26,6 +30,7 @@ const VIEWS: View[] = [
   { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Body-region symptom logging, skin routine tools and daily non-exercise activity tracking connected to the body workspace.' },
   { key: 'character', label: '3D Character & Body Shaper', short: '3D Character', component: ShapeForming, description: 'Use your measurements and body/posture photo analysis to refine the same personal 3D character shown above.' },
   { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans, sport science and training progression in the same personal workspace.' },
+  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: 'A 90-day Health Rank and Sport Rank ladder driven by observed training, recovery, progression and evidence quality.' },
   { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily sessions, strength and movement work.' },
   { key: 'recovery', label: 'Sleep & Recovery', short: 'Recovery', component: PusatTubuh, childTab: 'pulih', description: 'Sleep, recovery and readiness context.' },
   { key: 'numbers', label: 'Your Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Your recorded signals and body metrics.' },
@@ -36,6 +41,7 @@ const VIEWS: View[] = [
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'A compact vitality view tied to the rest of Your Body.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
@@ -43,6 +49,7 @@ const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   'body-tools': 'domain',
   character: 'domain',
   training: 'domain',
+  ranked: 'domain',
   workout: 'session',
   recovery: 'domain',
   numbers: 'metric',
@@ -77,6 +84,26 @@ export function UnifiedBodyWorkspace() {
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
   const isExposure = activeKey === 'body-exposure'
+  const primaryViews = VIEWS.filter((view) => PRIMARY_VIEW_KEYS.has(view.key))
+  const secondaryViews = VIEWS.filter((view) => !PRIMARY_VIEW_KEYS.has(view.key))
+  const secondaryValue = secondaryViews.some((view) => view.key === activeKey) ? activeKey : ''
+  const workspaceRailRef = useRef<HTMLDivElement | null>(null)
+
+  useLayoutEffect(() => {
+    const rail = workspaceRailRef.current
+    const activeTab = rail?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+    if (!rail || !activeTab) return
+    const railBox = rail.getBoundingClientRect()
+    const itemBox = activeTab.getBoundingClientRect()
+    const next = hitungScrollAgarTerlihat({
+      viewportWidth: rail.clientWidth,
+      scrollWidth: rail.scrollWidth,
+      itemLeft: rail.scrollLeft + itemBox.left - railBox.left,
+      itemWidth: itemBox.width,
+      currentScrollLeft: rail.scrollLeft,
+    })
+    if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next
+  }, [activeKey])
 
   function select(view: View) {
     const next = new URLSearchParams(params)
@@ -98,27 +125,26 @@ export function UnifiedBodyWorkspace() {
     <div className="mx-auto w-full max-w-[1580px] space-y-4 pb-10">
       <PanaceaZoneNav />
 
-      <section className={`relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,.11),transparent_28%),radial-gradient(circle_at_76%_0%,rgba(139,92,246,.09),transparent_24%)]" aria-hidden />
+      {/* `dark` menandai bahwa permukaan ini memang gelap apa pun tema
+          aplikasinya. Seluruh gaya `dark:` dan lapisan pemetaan `.dark`
+          bergantung pada kelas itu; tanpa penandanya komponen di dalam sini
+          merender versi terangnya di atas latar hitam. */}
+      <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
         <div className="relative min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="text-[10px] font-black uppercase tracking-[.22em] text-cyan-200/80">
-              {isExposure ? 'Your Body · Body Exposure OS' : 'Your Body · one personal health workspace'}
-            </div>
-            {isExposure && <span className="rounded-full border border-violet-300/15 bg-violet-300/[.07] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.15em] text-violet-200/80">flagship atlas</span>}
-          </div>
+          {/* Keep one semantic page title without duplicating the visible
+              Body Exposure identity owned by BodyExposureOS. */}
+          <h1 className="sr-only">Your Body · {active.label}</h1>
 
-          <h1 className="mt-1 max-w-5xl text-[clamp(1.35rem,4vw,2rem)] font-black leading-[1.04] tracking-[-.035em] text-white">
-            {isExposure ? 'Your body, from whole person to molecule' : 'One body context'}
-          </h1>
-          <p className="mt-1.5 truncate text-[11px] font-bold text-white/48 sm:text-xs">
-            {isExposure
-              ? 'Whole body → organ → tissue → cell → molecule'
-              : 'Train · recover · eat · measure · age'}
-          </p>
-
-          <div className="no-scrollbar mt-3 flex snap-x gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
-            {VIEWS.map((view) => {
+          <div
+            ref={workspaceRailRef}
+            className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`}
+            role="tablist"
+            aria-label="Your Body workspace"
+            data-one-shape="aria"
+            data-body-workspace-rail="v1"
+          >
+            <OneShape />
+            {primaryViews.map((view) => {
               const selected = activeKey === view.key
               const exposureTab = view.key === 'body-exposure'
               return (
@@ -130,10 +156,10 @@ export function UnifiedBodyWorkspace() {
                   onClick={() => select(view)}
                   className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
-                      ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.13),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_28px_rgba(34,211,238,.05)]'
+                      ? 'border-transparent text-black'
                       : exposureTab
-                        ? 'border-cyan-300/15 bg-cyan-300/[.055] text-cyan-100/80 hover:bg-cyan-300/[.09]'
-                        : 'border-white/[.08] bg-white/[.035] text-white/55 hover:border-white/15 hover:bg-white/[.055] hover:text-white/80'
+                        ? 'border-white/15 bg-white/[.055] text-white/85 hover:bg-white/[.09]'
+                        : 'border-white/[.08] bg-white/[.035] text-white/75 hover:border-white/15 hover:bg-white/[.055] hover:text-white'
                   }`}
                 >
                   {view.short}
@@ -141,32 +167,70 @@ export function UnifiedBodyWorkspace() {
                 </button>
               )
             })}
+            <label className="shrink-0">
+              <span className="sr-only">More features</span>
+              <select
+                aria-label="More features"
+                value={secondaryValue}
+                onChange={(event) => {
+                  const target = VIEWS.find((view) => view.key === event.target.value)
+                  if (target) select(target)
+                }}
+                className="min-h-[42px] rounded-full border border-white/10 bg-white/[.04] px-3 text-[11px] font-black text-white outline-none"
+              >
+                <option value="">More features</option>
+                {secondaryViews.map((view) => <option key={view.key} value={view.key}>{view.short}</option>)}
+              </select>
+            </label>
           </div>
 
-          <SurfaceDepthNavigator
-            surface="your-body"
-            activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
-            onSelect={selectDepth}
-          />
-
-          <details className="mt-2.5 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[10px] text-white/45">
-            <summary className="cursor-pointer font-black text-white/72">About {active.label}</summary>
+          {/* Satu ⓘ untuk semua penjelasan: deskripsi tampilan, cara pakai, dan
+              tangga kedalaman. Sebelumnya ketiganya tampil terbuka di layar
+              pertama dan menambah 8 tombol sebelum isi apa pun. */}
+          <details className="mt-2 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[11px] text-white/60">
+            <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 font-black text-white/72">
+              <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full border border-white/20 text-[10px]">i</span>
+              About {active.label}
+            </summary>
             <p className="mt-2 leading-relaxed">{active.description}</p>
+            <ol className="mt-2 grid gap-1 leading-relaxed">
+              {[
+                'Start with My Body or Body Exposure.',
+                'Use the six primary destinations for daily work.',
+                'Everything else stays preserved under More features.',
+              ].map((langkah, i) => (
+                <li key={langkah} className="flex gap-2"><span className="font-black text-cyan-200/90">{i + 1}</span>{langkah}</li>
+              ))}
+            </ol>
+            <div className="mt-2">
+              <SurfaceDepthNavigator
+                surface="your-body"
+                activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
+                onSelect={selectDepth}
+              />
+            </div>
           </details>
+          <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2 text-[11px] leading-snug text-white/55" />
         </div>
 
         {!isExposure && (
           <div className="relative lg:sticky lg:top-24 lg:self-start">
-            <PersonalBodyAvatar3D />
+            <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
           </div>
         )}
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0">
-        <Suspense fallback={<Loader exposure={isExposure} />}><Active /></Suspense>
+        {isExposure ? (
+          <Suspense fallback={<Loader exposure />}><Active /></Suspense>
+        ) : (
+          <PersonalBodySurfaceShown>
+            <Suspense fallback={<Loader />}><Active /></Suspense>
+          </PersonalBodySurfaceShown>
+        )}
       </section>
 
-      <FeatureBoulevard zone="body" title="Your Body feature boulevard" />
+      <SuperPageCapabilityRail domain="body" initialLimit={16} />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
   UNAVAILABLE, type Sesi,
 } from '../lib/trainingPhysiology'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Training Physiology — padanan kelompok metrik Garmin, dari data Apple Health.
@@ -122,6 +123,7 @@ export function TrainingPhysiology() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery and readiness" />
+        <BatasKlaimKesehatan permukaan="performance.training-physiology" />
         <Card>
           <Prosa kelas="text-sm text-neutral-600 leading-relaxed">No training sessions stored yet. Everything on this page is computed from the heart-rate trace of each session, so there is nothing to show until sessions arrive.</Prosa>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">

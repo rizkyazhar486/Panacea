@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconStethoscope } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -125,6 +126,7 @@ export function SnpProfiler() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Local SNP Longevity Profiler" subtitle="Reads your raw DNA file entirely inside the browser — nothing is uploaded" />
+        <BatasKlaimKesehatan permukaan="genomics.snp-profiler" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Upload a raw genotype export (23andMe, AncestryDNA, or similar — usually a "Download Raw Data"
           option in your account settings). It's matched locally against {SNP_DB.length} well-documented

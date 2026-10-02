@@ -31,7 +31,7 @@ function useNearViewport(rootMargin = '900px 0px') {
 function Placeholder({ label, tall = false }: { label: string; tall?: boolean }) {
   return (
     <div
-      className={`overflow-hidden rounded-[24px] border border-emerald-500/20 bg-[#050a08] p-4 text-white shadow-[0_14px_34px_rgba(0,0,0,.24)] ${tall ? 'min-h-[220px]' : ''}`}
+      className={`dark overflow-hidden rounded-[24px] border border-emerald-500/20 bg-[#050a08] p-4 text-white shadow-[0_14px_34px_rgba(0,0,0,.24)] ${tall ? 'min-h-[220px]' : ''}`}
       aria-label={`${label} loading`}
       role="status"
       aria-live="polite"
@@ -125,7 +125,7 @@ export function DeferredBodyExposureWidget() {
         </button>
         <Link
           to="/body-explorer?mode=realistic-atlas"
-          className="inline-flex min-h-11 items-center rounded-full border border-emerald-400/25 bg-[#07110c] px-4 py-2.5 text-[10px] font-black text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+          className="dark inline-flex min-h-11 items-center rounded-full border border-emerald-400/25 bg-[#07110c] px-4 py-2.5 text-[10px] font-black text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
         >
           Open full atlas →
         </Link>

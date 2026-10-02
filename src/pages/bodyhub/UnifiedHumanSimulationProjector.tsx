@@ -6,6 +6,8 @@ import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
+const WholeBodyPhysiologyWorkbench = lazy(() => import('./WholeBodyPhysiologyWorkbench'))
+const PhysiologyDeepDivePanel = lazy(() => import('./PhysiologyDeepDivePanel').then((module) => ({ default: module.PhysiologyDeepDivePanel })))
 const BodySystemDeepDiveWorkspace = lazy(() => import('./BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./PharmacologyMechanismPanel'))
@@ -14,15 +16,20 @@ const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: modu
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ default: module.SurgicalLab })))
 const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
+const PanelEcmo = lazy(() => import('../../components/PanelEcmo').then((module) => ({ default: module.PanelEcmo })))
 const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
+const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
+const PersonalAvatarCameraCapture = lazy(() => import('./PersonalAvatarCameraCapture'))
 
 export type SimulationDomain =
   | 'anatomy'
+  | 'personal-avatar'
   | 'localization'
   | 'physiology'
   | 'pathophysiology'
   | 'imaging'
+  | 'endoscopy'
   | 'biomechanics'
   | 'cell'
   | 'genome'
@@ -34,6 +41,9 @@ interface UnifiedHumanSimulationProjectorProps {
   onSystemChange: (systemId: BodySystemId) => void
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
+  compact?: boolean
+  /** Permintaan fokus struktur sumber dari luar (mis. temuan AI-EMR). `nonce` memicu ulang pilihan yang sama. */
+  requestedStructure?: { name: string; nonce: number } | null
 }
 
 type DomainDefinition = {
@@ -44,6 +54,12 @@ type DomainDefinition = {
 }
 
 const DOMAINS: DomainDefinition[] = [
+  {
+    id: 'personal-avatar',
+    label: 'My Body',
+    scale: 'camera → personal surface',
+    description: 'Import the patient-facing external body identity from one RGB camera while keeping internal anatomy provenance separate.',
+  },
   {
     id: 'anatomy',
     label: '3D Anatomy',
@@ -73,6 +89,12 @@ const DOMAINS: DomainDefinition[] = [
     label: 'Imaging',
     scale: 'voxel → anatomy',
     description: 'Connect CT windowing, volumetric reconstruction and DICOM context back to the same anatomy instead of a separate radiology island.',
+  },
+  {
+    id: 'endoscopy',
+    label: 'Scope',
+    scale: 'lumen → landmark',
+    description: 'Move through a simulated endoluminal teaching view while a schematic anatomy route stays visible.',
   },
   {
     id: 'biomechanics',
@@ -134,6 +156,8 @@ export default function UnifiedHumanSimulationProjector({
   onSystemChange,
   requestedDomain,
   onDomainChange,
+  compact = false,
+  requestedStructure = null,
 }: UnifiedHumanSimulationProjectorProps) {
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
@@ -148,6 +172,8 @@ export default function UnifiedHumanSimulationProjector({
   const systemLabel = readableSystem(selectedSystemId)
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
+  const isEndoscopy = domain === 'endoscopy'
+  const hideReferenceAtlasCanvas = isEndoscopy
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
@@ -156,6 +182,12 @@ export default function UnifiedHumanSimulationProjector({
   useEffect(() => {
     setSelectedStructureName(null)
   }, [selectedSystemId])
+
+  // Dijalankan SETELAH reset sistem di atas, sehingga fokus dari temuan bertahan
+  // ketika permintaan itu juga mengganti sistem.
+  useEffect(() => {
+    if (requestedStructure?.name) setSelectedStructureName(requestedStructure.name)
+  }, [requestedStructure, selectedSystemId])
 
   useEffect(() => {
     if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')
@@ -174,22 +206,30 @@ export default function UnifiedHumanSimulationProjector({
 
   function renderDomain() {
     switch (domain) {
+      case 'personal-avatar':
+        return <PersonalAvatarCameraCapture />
       case 'localization':
         return <LokalisasiLesiPanel />
       case 'physiology':
         return (
           <div className="space-y-3">
+            <WholeBodyPhysiologyWorkbench />
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-neutral-900" />}><PanelEcmo /></Suspense>
             <AtlasPhysiologyBridgePanel
               selectedAtlasSystemId={selectedSystemId}
+              selectedSourceStructureName={selectedStructureName}
               onSystemChange={(systemId) => onSystemChange(systemId)}
             />
             <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedSystemId} />
+            <PhysiologyDeepDivePanel />
           </div>
         )
       case 'pathophysiology':
-        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} />
+        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'imaging':
-        return <PencitraanVolumetrikPanel />
+        return <PencitraanVolumetrikPanel selectedSourceStructureName={selectedStructureName} />
+      case 'endoscopy':
+        return <VirtualEndoscopyWorkbench selectedSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} onSystemChange={onSystemChange} />
       case 'biomechanics':
         return <BiomechanicsMotionLab />
       case 'cell':
@@ -197,9 +237,9 @@ export default function UnifiedHumanSimulationProjector({
       case 'genome':
         return <AlphaGenomeAtlas />
       case 'surgery':
-        return <SurgicalLab />
+        return <SurgicalLab selectedSourceStructureName={selectedStructureName} />
       case 'pharmacology':
-        return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} />
+        return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'anatomy':
       default:
         return (
@@ -244,18 +284,19 @@ export default function UnifiedHumanSimulationProjector({
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
       data-selected-source-structure={selectedStructureName ?? undefined}
-      className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
+      className="dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
+      aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >
       <header className="border-b border-white/[.08] p-3 sm:p-4">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="min-w-0">
             <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/70">Body Exposure · unified human simulation projector</div>
             <h3 id="unified-human-simulation-title" className="mt-1 text-lg font-black tracking-[-.025em] sm:text-xl">
-              One 3D body, one selected system, every biological scale
+              One body. Switch the projection.
             </h3>
             <p className="mt-1 max-w-4xl text-[10px] leading-relaxed text-white/45 sm:text-[11px]">
-              Switch the simulation layer without abandoning the spatial context. Anatomy is the anchor; physiology, disease, movement, cells, genome, surgery and pharmacology are projections over the same body model.
+              Anatomy · function · imaging · scope · surgery · micro — one persistent body context.
             </p>
           </div>
           <div className="shrink-0 rounded-2xl border border-cyan-300/15 bg-cyan-300/[.055] px-3 py-2">
@@ -264,28 +305,33 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </div>
 
-        <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
-          {DOMAINS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={domain === item.id}
-              onClick={() => selectDomain(item.id)}
-              className={tabClass(domain === item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {!compact && (
+          <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
+            {DOMAINS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={domain === item.id}
+                onClick={() => selectDomain(item.id)}
+                className={tabClass(domain === item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
-      <UniversalAtlasDepthRail
-        semanticScale={semanticZoom.scale}
-        selectedSystemId={selectedSystemId}
-        onOpenScale={openScale}
-      />
+      {!hideReferenceAtlasCanvas && (
+        <UniversalAtlasDepthRail
+          semanticScale={semanticZoom.scale}
+          selectedSystemId={selectedSystemId}
+          onOpenScale={openScale}
+        />
+      )}
 
+      {!hideReferenceAtlasCanvas && (
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_250px]">
         <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 xl:border-b-0 xl:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
@@ -295,6 +341,7 @@ export default function UnifiedHumanSimulationProjector({
               onSemanticZoomChange={setSemanticZoom}
               selectedStructureName={selectedStructureName}
               onStructureSelect={setSelectedStructureName}
+              focusRequest={requestedStructure}
             />
           </Suspense>
         </div>
@@ -307,7 +354,7 @@ export default function UnifiedHumanSimulationProjector({
 
           <div className="mt-4 flex items-end justify-between gap-2">
             <div>
-              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Semantic zoom</div>
+              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30" title="Relative zoom controls representation/LOD; it is not optical magnification">Semantic zoom</div>
               <div className="mt-1 text-xs font-black text-white/85">{semanticStop.label}</div>
             </div>
             <div className="text-right text-[8px] font-bold text-cyan-200/55">{semanticZoom.relativeZoom.toFixed(1)}× from fitted view</div>
@@ -330,8 +377,9 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </aside>
       </div>
+      )}
 
-      {microscopic && (
+      {!hideReferenceAtlasCanvas && microscopic && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
             <SemanticMicroscopeStage scale={semanticZoom.scale} selectedSystemId={selectedSystemId} />

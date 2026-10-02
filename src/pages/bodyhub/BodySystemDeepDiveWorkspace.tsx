@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 
+const CardiacInteractiveSurface = lazy(() => import('./CardiacInteractiveSurface'))
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
 const RespiratoryGasExchangeWorkbench = lazy(() => import('./RespiratoryGasExchangeWorkbench'))
@@ -60,7 +61,10 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: { selecte
       </div>
       {selectedAtlasSystemId === 'cardiovascular' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading cardiovascular function…</div>}>
-          <CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedAtlasSystemId} />
+          <div className="space-y-3">
+            <CardiacInteractiveSurface />
+            <CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedAtlasSystemId} />
+          </div>
         </Suspense>
       )}
       {selectedAtlasSystemId === 'nervous' && (

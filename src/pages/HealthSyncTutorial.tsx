@@ -6,6 +6,7 @@ import {
   IconTimer, IconGauge, IconChevronRight,
 } from '../components/icons'
 import { api, backendEnabled, type SyncFinding } from '../lib/api'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public-facing, step-by-step guide for connecting Apple Watch / Apple Health
@@ -148,6 +149,7 @@ export function HealthSyncTutorial() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Connect Apple Watch to Panaceamed"
           subtitle="Full guide — anyone can follow it" />
+        <BatasKlaimKesehatan permukaan="wellness.health-sync" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">
           A website can't read Apple Health directly — this is an official Apple restriction, not a Panaceamed limitation. The solution: a bridge app called <b>Health Auto Export</b> that sends your HealthKit data to the Panaceamed server on a schedule. Follow the 7 steps below — set it up once, and it runs automatically from then on.
         </p>

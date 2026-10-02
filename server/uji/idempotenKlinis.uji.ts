@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict'
+const { addVital, addSupportive, addPatient, getClinical } = await import('../src/store.js')
+addPatient({ id: 'p-idem', name: 'x' }); addPatient({ id: 'p-idem', name: 'x' })
+addVital('p-idem', { id: 'v1', sbp: 120 }); addVital('p-idem', { id: 'v1', sbp: 120 }); addVital('p-idem', { id: 'v2', sbp: 130 })
+addSupportive('p-idem', { id: 's1' }); addSupportive('p-idem', { id: 's1' })
+const c = getClinical()
+assert.equal(c.patients.filter((p: { id: string }) => p.id === 'p-idem').length, 1, 'pasien tergandakan oleh kiriman ulang')
+assert.deepEqual(c.vitals['p-idem'].map((v: { id: string }) => v.id), ['v1', 'v2'], 'vital tergandakan oleh kiriman ulang')
+assert.equal(c.supportive['p-idem'].length, 1)
+console.log('idempotenKlinis: kiriman ulang pasien/vital/penunjang tidak menggandakan data')

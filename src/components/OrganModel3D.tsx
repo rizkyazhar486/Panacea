@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { layarBerubah, type TitikLayar } from '../lib/layarBerubah'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { body3dPixelRatio } from '../lib/body3dQuality'
+import { disposeOwnedObject3DResources } from '../lib/bodyExposure/threeOwnedResourceDisposal'
 import { folderModel, type OrganModel } from '../lib/organModels'
 
 // Penampil satu organ dari dekat. Lihat src/lib/organModels.ts untuk asal
@@ -32,6 +36,12 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     const container = containerRef.current
     if (!container) return
 
+    // Ganti organ memakai ulang komponen yang sama: tanpa reset ini status
+    // "selesai" organ sebelumnya bocor ke organ berikutnya.
+    setLoading(true)
+    setPct(0)
+    setFatal('')
+
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100)
     let renderer: THREE.WebGLRenderer
@@ -39,15 +49,17 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     } catch {
       setFatal('This device could not start 3D graphics (WebGL).')
+      setLoading(false)
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     // Penanda kanvas supaya gerbang browser bisa memeriksa TEPAT panel ini di
     // halaman yang memuat beberapa kanvas sekaligus.
     renderer.domElement.dataset.organModel3d = 'true'
+    // Kanvas hanya gambar; ketergunaan ada di wadah berlabel dan titik HTML-nya.
+    renderer.domElement.setAttribute('aria-hidden', 'true')
     container.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9))
@@ -61,12 +73,17 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enablePan = false
     controls.enableDamping = true
-    controls.autoRotate = true
+    controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     controls.autoRotateSpeed = 0.7
 
     const resize = () => {
       const w = container.clientWidth
       const h = container.clientHeight
+      if (w < 2 || h < 2) return
+      // Resolusi dibatasi kebijakan bersama (DPR dan anggaran piksel), bukan
+      // devicePixelRatio mentah: ponsel 3x tidak perlu menggambar 9x piksel.
+      const mobile = window.matchMedia('(max-width: 640px)').matches
+      renderer.setPixelRatio(body3dPixelRatio(w, h, window.devicePixelRatio || 1, mobile))
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
@@ -76,11 +93,18 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     ro.observe(container)
 
     let group: THREE.Group | null = null
+    let disposed = false
     const loader = new GLTFLoader()
     loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
       (gltf) => {
+        // Berkas bisa selesai terurai SETELAH komponen dilepas; adegan yang
+        // sudah tidak dipasang itu harus dibuang di sini, tak ada yang lain akan.
+        if (disposed) {
+          disposeOwnedObject3DResources(gltf.scene)
+          return
+        }
         group = gltf.scene
         // Model dinormalkan ke ukuran & titik pusat yang sama, karena berkas
         // aslinya tidak sepakat soal skala — tanpa ini ginjal bisa datang
@@ -103,13 +127,18 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         renderer.domElement.dataset.organMesh = String(jumlahMesh)
         setLoading(false)
       },
-      (ev) => { if (ev.total > 0) setPct(ev.loaded / ev.total) },
-      () => { setFatal('Could not load this organ model.'); setLoading(false) },
+      (ev) => { if (!disposed && ev.total > 0) setPct(ev.loaded / ev.total) },
+      () => {
+        if (disposed) return
+        setFatal('Could not load this organ model.')
+        setLoading(false)
+      },
     )
 
     const onContextLost = (e: Event) => {
       e.preventDefault()
       setFatal('The browser dropped the 3D context, usually because memory ran low.')
+      setLoading(false)
     }
     renderer.domElement.addEventListener('webglcontextlost', onContextLost)
 
@@ -119,7 +148,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
     const v = new THREE.Vector3()
-    let raf = 0
+    let layarTerakhir: TitikLayar | null = null
     function animate() {
       controls.update()
       renderer.render(scene, camera)
@@ -141,65 +170,80 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
             depan: jarakKamera < camera.position.length() + 0.4,
           }
         }
-        setLayar(next)
+        if (layarBerubah(layarTerakhir, next)) { layarTerakhir = next; setLayar(next) }
       }
-      raf = requestAnimationFrame(animate)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(raf)
+      disposed = true
+      loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       renderer.domElement.removeEventListener('pointerdown', stopAuto)
       controls.dispose()
+      // Geometri, material, dan tekstur milik adegan ini dilepas dari GPU,
+      // lalu konteksnya dilepas eksplisit: tanpa itu, membuka banyak organ
+      // berturut-turut menghabiskan batas konteks WebGL peramban.
+      disposeOwnedObject3DResources(scene)
+      renderer.renderLists.dispose()
       renderer.dispose()
-      container.removeChild(renderer.domElement)
+      renderer.forceContextLoss()
+      if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement)
     }
   }, [organ])
 
   return (
-    <div className="relative h-[300px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-950">
-      <div ref={containerRef} className="h-full w-full touch-none" />
+    <div
+      className="relative h-[300px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-950"
+      role="region"
+      aria-label={`${organ.label} source 3D model`}
+      aria-busy={loading}
+    >
+      <div ref={containerRef} className="h-full w-full touch-none" aria-hidden="true" />
 
       {organ.hotspots.map((spot) => {
         const pos = layar[spot.id]
         if (!pos || loading || fatal) return null
         const aktif = selected === spot.id
         return (
+          // Sasaran sentuh 44 px; penanda yang terlihat tetap kecil di dalamnya.
           <button
             key={spot.id}
+            type="button"
             onClick={() => onSelectRef.current?.(aktif ? null : spot.id)}
             style={{ left: pos.x, top: pos.y, opacity: pos.depan ? 1 : 0.35 }}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition ${
-              aktif ? 'h-5 w-5 border-white bg-brand' : 'h-3.5 w-3.5 border-white/90'
-            }`}
+            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             aria-label={spot.ta}
+            aria-pressed={aktif}
           >
-            <span className="sr-only">{spot.ta}</span>
-            {!aktif && <span className="block h-full w-full rounded-full" style={{ background: spot.color }} />}
+            <span
+              aria-hidden="true"
+              className={`block rounded-full border-2 border-white transition ${aktif ? 'h-5 w-5 bg-brand' : 'h-3.5 w-3.5'}`}
+              style={!aktif ? { background: spot.color } : undefined}
+            />
           </button>
         )
       })}
 
       {loading && !fatal && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center" role="status" aria-live="polite">
           <div className="rounded-xl bg-black/60 px-3 py-2 text-center">
             <span className="text-xs font-semibold text-white">Loading {organ.label.toLowerCase()}…</span>
-            <div className="mt-1 h-1 w-32 overflow-hidden rounded-full bg-white/20">
+            <div className="mt-1 h-1 w-32 overflow-hidden rounded-full bg-white/20" aria-hidden="true">
               <div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(pct * 100)}%` }} />
             </div>
           </div>
         </div>
       )}
       {fatal && (
-        <div className="absolute inset-0 flex items-center justify-center p-5">
+        <div className="absolute inset-0 flex items-center justify-center p-5" role="alert">
           <p className="text-center text-xs leading-relaxed text-neutral-500">{fatal}</p>
         </div>
       )}
       {!loading && !fatal && (
-        <p className="pointer-events-none absolute bottom-1.5 left-0 right-0 text-center text-[10px] text-neutral-500">
-          Drag to rotate · tap a marker to name the part
+        <p className="pointer-events-none absolute bottom-1.5 left-0 right-0 text-center text-[10px] text-neutral-500" aria-live="polite">
+          3D ready · drag to rotate · tap a marker to name the part
         </p>
       )}
     </div>

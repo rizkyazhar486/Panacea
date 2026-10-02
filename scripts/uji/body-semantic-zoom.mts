@@ -5,6 +5,7 @@ import {
   bodySemanticScaleFromRelativeZoom,
   getBodySemanticZoomStop,
   isMicroscopicBodyScale,
+  resolveBodySemanticRepresentation,
 } from '../../src/lib/bodySemanticZoom.ts'
 
 assert.deepEqual(BODY_SEMANTIC_ZOOM_STOPS.map((stop) => stop.id), [
@@ -25,6 +26,46 @@ assert.equal(getBodySemanticZoomStop('tissue').literalGrossSpatialContinuity, fa
 assert.equal(isMicroscopicBodyScale('organ'), false)
 assert.equal(isMicroscopicBodyScale('cell'), true)
 
+
+const grossOnly = {
+  'whole-body': { state: 'available', sourceId: 'atlas:whole', version: '2026-09' },
+  system: { state: 'available', sourceId: 'atlas:system', version: '2026-09' },
+  organ: { state: 'available', sourceId: 'atlas:organ', version: '2026-09' },
+} as const
+assert.deepEqual(resolveBodySemanticRepresentation('genome', grossOnly), {
+  requestedScale: 'genome',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'missing-source-asset',
+})
+assert.deepEqual(resolveBodySemanticRepresentation('tissue', {
+  ...grossOnly,
+  tissue: { state: 'available' },
+}), {
+  requestedScale: 'tissue',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'missing-provenance',
+})
+assert.deepEqual(resolveBodySemanticRepresentation('cell', {
+  ...grossOnly,
+  tissue: { state: 'available', sourceId: 'histology:tissue', version: 'v1' },
+  cell: { state: 'available', sourceId: 'cell-atlas:cell', version: 'v2' },
+}), {
+  requestedScale: 'cell',
+  resolvedScale: 'cell',
+  blocked: false,
+})
+assert.deepEqual(resolveBodySemanticRepresentation('tissue', {
+  ...grossOnly,
+  tissue: { state: 'failed', sourceId: 'histology:tissue', version: 'v1' },
+}), {
+  requestedScale: 'tissue',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'source-load-failed',
+})
+
 const atlas = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(atlas, /fittedCameraDistance \/ cameraDistance/)
 assert.match(atlas, /onSemanticZoomChange/)
@@ -43,6 +84,23 @@ assert.match(microscope, /must not manufacture a microscopic layer by enlarging 
 assert.match(microscope, /CellLab/)
 assert.match(microscope, /AlphaGenomeAtlas/)
 assert.match(microscope, /VertikalMolekulerPanel/)
-assert.match(microscope, /No validated organ → tissue → cell → protein\/pathway vertical/)
+// 7023e43 "feat(body): expose chemistry depth across all body systems"
+// (part of the universal gold-standard directive) replaced the blanket
+// "No validated organ → tissue → cell → protein/pathway vertical" fail-closed
+// message at the molecule scale with a real MolecularChemistryStage that
+// renders verified, PubChem-linked metabolites (glucose/NAD+/NADH/ATP) for
+// every system, and keeps VertikalMolekulerPanel layered on top for the
+// respiratory system specifically. The vertical is no longer universally
+// unregistered, so the contract now checks that the new stage is wired in
+// and that it still fails closed on precision it cannot back (no invented
+// 3D chemical structure without a verified identifier).
+assert.match(microscope, /MolecularChemistryStage/)
+const chemistryStage = readFileSync(new URL('../../src/pages/bodyhub/MolecularChemistryStage.tsx', import.meta.url), 'utf8')
+assert.match(chemistryStage, /pubchemCid/,
+  'molecular chemistry stage lost its verified PubChem provenance')
+assert.match(chemistryStage, /not a measured patient flux/,
+  'molecular chemistry stage lost its reference-vs-measured disclaimer')
+assert.match(chemistryStage, /must bind to verified chemical\/protein identifiers before they are rendered as source-backed 3D/,
+  'molecular chemistry stage lost its fail-closed boundary for unverified 3D structures')
 
 console.log('body semantic zoom: camera-relative LOD switches macro anatomy toward source-aware microscopic representations without fake optical magnification')

@@ -28,9 +28,10 @@ const STEP_KIND_CLASS: Record<PathophysiologyStepKind, string> = {
 
 interface PathophysiologyNetworkPanelProps {
   selectedAtlasSystemId?: BodySystemId
+  selectedSourceStructureName?: string | null
 }
 
-export default function PathophysiologyNetworkPanel({ selectedAtlasSystemId }: PathophysiologyNetworkPanelProps) {
+export default function PathophysiologyNetworkPanel({ selectedAtlasSystemId, selectedSourceStructureName }: PathophysiologyNetworkPanelProps) {
   const related = useMemo(
     () => selectedAtlasSystemId ? listBodyPathophysiologyScenariosForAtlasSystem(selectedAtlasSystemId) : BODY_PATHOPHYSIOLOGY_NETWORK,
     [selectedAtlasSystemId],
@@ -45,7 +46,7 @@ export default function PathophysiologyNetworkPanel({ selectedAtlasSystemId }: P
   const selectedIsRelated = selectedAtlasSystemId ? scenario.atlasSystemIds.includes(selectedAtlasSystemId) : true
 
   return (
-    <section data-body-pathophysiology-network="v1" data-pathophysiology-scenario={scenario.id} className="overflow-hidden rounded-[28px] border border-white/[.09] bg-[linear-gradient(145deg,rgba(244,63,94,.045),rgba(2,6,12,.94)_38%,rgba(79,70,229,.055))] text-white shadow-[0_24px_80px_rgba(0,0,0,.28)]">
+    <section data-body-pathophysiology-network="v1" data-pathophysiology-scenario={scenario.id} data-selected-source-structure={selectedSourceStructureName ?? undefined} data-structure-specific-mechanism="not-inferred" className="overflow-hidden rounded-[28px] border border-white/[.09] bg-[linear-gradient(145deg,rgba(244,63,94,.045),rgba(2,6,12,.94)_38%,rgba(79,70,229,.055))] text-white shadow-[0_24px_80px_rgba(0,0,0,.28)]">
       <div className="relative overflow-hidden border-b border-white/[.08] p-4 sm:p-5">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(244,63,94,.12),transparent_30%),radial-gradient(circle_at_88%_0%,rgba(34,211,238,.1),transparent_30%)]" />
         <div className="relative flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">

@@ -66,4 +66,51 @@ const bounded = intersectBodyAtlasSourceMeshesWithPlane({
 assert.equal(bounded.trianglesVisited, 1)
 assert.equal(bounded.truncated, true)
 
+
+for (const coordinate of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+  const invalidCoordinate = intersectBodyAtlasSourceMeshesWithPlane({
+    axis: 'x',
+    coordinate,
+    candidates: [{ file: 'synthetic.glb', name: 'Synthetic box' }],
+    sourceRoots: [{ file: 'synthetic.glb', root: boxRoot }],
+  })
+  assert.equal(invalidCoordinate.blockedReason, 'non-finite-coordinate')
+  assert.equal(invalidCoordinate.segments.length, 0, 'Invalid coordinates must not silently render the zero plane')
+  assert.equal(invalidCoordinate.sourceNodesExamined, 0)
+  assert.equal(invalidCoordinate.meshesExamined, 0)
+  assert.equal(invalidCoordinate.trianglesVisited, 0)
+}
+
+
+const corruptRoot = new THREE.Group()
+const validBeforeCorrupt = namedMesh(new THREE.BoxGeometry(2, 2, 2), 'Valid before corrupt')
+const corruptGeometry = new THREE.BufferGeometry()
+corruptGeometry.setAttribute('position', new THREE.Float32BufferAttribute([
+  Number.NaN, -1, 0,
+  1, 1, 0,
+  1, -1, 0,
+], 3))
+const corruptMesh = namedMesh(corruptGeometry, 'Corrupt source mesh')
+corruptRoot.add(validBeforeCorrupt, corruptMesh)
+
+const corruptResult = intersectBodyAtlasSourceMeshesWithPlane({
+  axis: 'x',
+  coordinate: 0,
+  candidates: [
+    { file: 'corrupt.glb', name: 'Valid before corrupt' },
+    { file: 'corrupt.glb', name: 'Corrupt source mesh' },
+  ],
+  sourceRoots: [{ file: 'corrupt.glb', root: corruptRoot }],
+})
+assert.equal(corruptResult.blockedReason, 'non-finite-source-geometry')
+assert.equal(corruptResult.segments.length, 0, 'Any invalid source triangle must fail the entire section closed')
+assert.deepEqual(corruptResult.blockedSource, {
+  file: 'corrupt.glb',
+  sourceName: 'Corrupt source mesh',
+  meshName: 'Corrupt source mesh',
+  triangleIndex: 0,
+})
+assert.equal(corruptResult.truncated, false)
+
+
 console.log(`body-atlas-exact-mesh-section: ok (${exact.segments.length} raw source-triangle segments)`)

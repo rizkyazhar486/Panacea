@@ -15,6 +15,7 @@ import { getDemoTersimpan } from '../lib/profile'
 import { statusSingkat } from '../lib/pelatih'
 import { upayaRelatif } from '../lib/analisisPro'
 import { hrMaxFromAge } from '../lib/workoutImport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Training is organized decision-first rather than feature-first:
 // 1) what should I do today, 2) what does the data say, 3) what physiology
@@ -100,6 +101,8 @@ const TABS: TabDef[] = [
   { id: 'rekomposisi', label: 'Recomp', emoji: '⚖️', komponen: Rekomposisi,
     ringkas: 'Fat loss · muscle gain' },
 ]
+
+const PRIMARY_TRAINING_FLOW = ['pelatih', 'progres', 'fisiologi', 'rencana', 'lab'] as const
 
 type Sex = 'M' | 'F'
 
@@ -292,6 +295,7 @@ export function PusatLatihan() {
         </div>
       }
       tabs={TABS}
+      primaryTabIds={PRIMARY_TRAINING_FLOW}
       kaki={
         <div className="space-y-3">
           {audit && (
@@ -301,6 +305,7 @@ export function PusatLatihan() {
                 <span aria-hidden>+</span>
               </summary>
               <div className="training-audit-detail space-y-3">
+                <BatasKlaimKesehatan permukaan="performance.pusat-latihan" />
                 <p className="text-[11px] leading-relaxed text-neutral-500">
                   Fitness, fatigue and freshness are model outputs, not direct biological measurements. HRmax input: {audit.k.hrMax} bpm ({snapshot.hrMaxSource}); resting HR: {audit.k.hrRest} bpm. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
                 </p>

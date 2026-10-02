@@ -175,3 +175,23 @@ export function universalRequirementsForSystem(system: BodySystemId) {
     (item) => item.system === system || item.system === 'cross-system',
   )
 }
+
+/**
+ * The requirement records a system owns for itself, excluding the shared
+ * cross-system chemistry/genomic entries.
+ *
+ * `SemanticMicroscopeStage` previously named the resolution boundary in the
+ * abstract ("tissue microanatomy") without saying which structures it
+ * actually means for the selected system. The named structures already exist
+ * here — `UNIVERSAL_ATLAS_REQUIREMENTS[n].examples` — they were simply never
+ * read back out into that message. This makes the boundary concrete instead
+ * of generic, using only structures already reviewed into this registry.
+ *
+ * Returns an ARRAY, not a single entry: `reproductive`, `sensory-ent` and
+ * `integumentary-surface` each own TWO records (male/female reproductive;
+ * eye/ear; skin/breast). Reducing to one match would silently drop the
+ * second half of an already-reviewed list for exactly those three systems.
+ */
+export function ownRequirementsForSystem(system: BodySystemId): readonly UniversalAtlasRequirement[] {
+  return UNIVERSAL_ATLAS_REQUIREMENTS.filter((item) => item.system === system)
+}

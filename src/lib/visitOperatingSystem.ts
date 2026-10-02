@@ -205,6 +205,7 @@ export interface AiEmrVisitContext {
 const LIVE_ARRIVAL_MAX_MS = 5 * 60_000
 const FRESH_MS = 30_000
 const DELAYED_MS = 2 * 60_000
+const DEVICE_OFFLINE_MS = 5 * 60_000
 
 function assertNonBlank(value: string, field: string) {
   if (!value.trim()) throw new Error(`${field} must not be blank`)
@@ -330,6 +331,81 @@ export function endVisit(state: VisitOperatingState, endedAt: string): VisitOper
       Object.entries(state.devices).map(([id, device]) => [id, { ...device, status: 'offline' as const }]),
     ),
   }
+}
+
+/**
+ * Fail-closed consent revocation.
+ *
+ * Revoking clinical-support consent immediately removes live encounter state:
+ * media is stopped, ambient AI is disabled, and registered devices are marked
+ * offline. The visit must obtain active consent again before it can resume.
+ */
+export function revokeVisitClinicalConsent(
+  state: VisitOperatingState,
+  revokedAt: string,
+): VisitOperatingState {
+  const revokedMs = parseIso(revokedAt, 'revokedAt')
+  const grantedMs = parseIso(state.consent.clinicalData.grantedAt, 'consent.clinicalData.grantedAt')
+  if (revokedMs < grantedMs) throw new Error('revokedAt must not be earlier than consent grant')
+
+  const next = cloneState(state)
+  return {
+    ...next,
+    phase: state.phase === 'ended' ? 'ended' : 'consent-required',
+    consent: {
+      ...next.consent,
+      clinicalData: {
+        ...next.consent.clinicalData,
+        revokedAt,
+      },
+    },
+    media: {
+      ...next.media,
+      camera: 'off',
+      microphone: 'off',
+      peerCount: 0,
+      ambientAi: 'disabled',
+    },
+    devices: Object.fromEntries(
+      Object.entries(next.devices).map(([id, device]) => [
+        id,
+        { ...device, status: 'offline' as const },
+      ]),
+    ),
+  }
+}
+
+/**
+ * Reconcile connection labels from transport freshness.
+ *
+ * This is not a clinical severity signal. A device that has not produced data
+ * for >120 s is degraded; >5 min is offline. Future timestamps never create a
+ * negative age and are handled as age=0 here, while sample ingestion separately
+ * validates impossible captured/received ordering.
+ */
+export function reconcileVisitDeviceLiveness(
+  state: VisitOperatingState,
+  now: string,
+): VisitOperatingState {
+  const nowMs = parseIso(now, 'now')
+  if (state.phase === 'ended') return state
+
+  const next = cloneState(state)
+  next.devices = Object.fromEntries(
+    Object.entries(next.devices).map(([id, device]) => {
+      if (!device.lastSeenAt) return [id, device]
+      const seenMs = parseIso(device.lastSeenAt, `device.${id}.lastSeenAt`)
+      const ageMs = Math.max(0, nowMs - seenMs)
+      const status: VisitDeviceConnectionStatus =
+        ageMs > DEVICE_OFFLINE_MS
+          ? 'offline'
+          : ageMs > DELAYED_MS
+            ? 'degraded'
+            : device.status
+      return [id, { ...device, status }]
+    }),
+  )
+  return next
 }
 
 export function updateVisitMedia(
@@ -504,8 +580,10 @@ export function buildAiEmrVisitContext(
   state: VisitOperatingState,
   generatedAt: string,
 ): AiEmrVisitContext {
-  parseIso(generatedAt, 'generatedAt')
-  const observations = Object.values(state.latestByMetric)
+  const generatedMs = parseIso(generatedAt, 'generatedAt')
+  // Recheck at read time: retained samples must not outlive their consent.
+  const clinicalConsentActive = isConsentActive(state.consent.clinicalData, 'clinical-support', generatedMs)
+  const observations = (clinicalConsentActive ? Object.values(state.latestByMetric) : [])
     .filter((observation): observation is VisitDeviceObservation => Boolean(observation))
     .map((observation) => {
       const freshness = visitObservationFreshness(observation.receivedAt, generatedAt)
@@ -526,10 +604,16 @@ export function buildAiEmrVisitContext(
     visitId: state.visitId,
     subjectId: state.subjectId,
     clinicianId: state.clinicianId,
-    phase: state.phase,
+    phase: clinicalConsentActive || state.phase === 'ended' ? state.phase : 'consent-required',
     generatedAt,
-    media: { ...state.media },
-    connectedDevices: Object.values(state.devices)
+    media: clinicalConsentActive ? { ...state.media } : {
+      ...state.media,
+      camera: 'off',
+      microphone: 'off',
+      peerCount: 0,
+      ambientAi: 'disabled',
+    },
+    connectedDevices: (clinicalConsentActive ? Object.values(state.devices) : [])
       .map((device) => ({
         id: device.id,
         label: device.label,
@@ -569,9 +653,15 @@ export function promoteObservationToClinicalRecord(
   reviewedAt: string,
 ): LongitudinalEvent<number> {
   assertNonBlank(reviewerId, 'reviewerId')
-  parseIso(reviewedAt, 'reviewedAt')
+  const reviewedMs = parseIso(reviewedAt, 'reviewedAt')
+  if (!isConsentActive(state.consent.clinicalData, 'clinical-support', reviewedMs)) {
+    throw new Error('active clinical consent is required for observation promotion')
+  }
   const sample = state.latestByMetric[metric]
   if (!sample) throw new Error(`no live observation is available for ${metric}`)
+  if (reviewedMs < parseIso(sample.receivedAt, 'sample.receivedAt')) {
+    throw new Error('reviewedAt must not be earlier than observation receipt')
+  }
   const device = state.devices[sample.deviceId]
   if (!device) throw new Error('observation device is no longer registered')
 
@@ -588,6 +678,7 @@ export function promoteObservationToClinicalRecord(
     unit: sample.unit,
     recordedAt: sample.capturedAt,
     confidence: sample.signalQuality,
+    semanticState: 'measured',
     provenance: {
       sourceKind: 'device',
       sourceId: `visit-os:${sample.deviceId}`,

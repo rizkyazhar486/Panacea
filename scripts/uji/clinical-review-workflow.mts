@@ -22,6 +22,7 @@ const pendingLab: LongitudinalEvent<number> = {
   unit: 'mg/dL',
   recordedAt: '2026-09-16T01:00:00.000Z',
   confidence: 0.98,
+  semanticState: 'imported',
   provenance: {
     sourceKind: 'clinical-system',
     sourceId: 'lab-system',

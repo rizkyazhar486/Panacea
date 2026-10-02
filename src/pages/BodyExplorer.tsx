@@ -15,6 +15,7 @@ import { penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
@@ -34,6 +35,7 @@ const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ defa
 const VentilasiMembranPanel = lazy(() => import('./bodyhub/VentilasiMembranPanel').then((m) => ({ default: m.VentilasiMembranPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const KelenjarSaluranPanel = lazy(() => import('./bodyhub/KelenjarSaluranPanel').then((m) => ({ default: m.KelenjarSaluranPanel })))
+const HumanSexualReproductivePhysiologyLab = lazy(() => import('./bodyhub/HumanSexualReproductivePhysiologyLab'))
 const TuasSendiPanel = lazy(() => import('./bodyhub/TuasSendiPanel').then((m) => ({ default: m.TuasSendiPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
@@ -61,7 +63,7 @@ const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
 // sehingga tidak ada satu pun cara membukanya dari dalam aplikasi.
 const WholeBodyPrecisionLab = lazy(() => import('./bodyhub/WholeBodyPrecisionLab'))
 const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
-// Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
+// Ruang bedah: interactive simulation runtime + source-grounded surgical layers.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 const BiomechanicsMotionLab = lazy(() => import('./bodyhub/BiomechanicsMotionLab'))
@@ -153,7 +155,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'presisi', label: 'Whole-body precision' },
   { key: 'mesin', label: 'Biomedical engine' },
   { key: 'sel', label: 'Cell & metabolism' },
-  { key: 'bedah', label: 'Surgical layers' },
+  { key: 'bedah', label: 'Surgery sim' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -589,6 +591,7 @@ export function BodyExplorer() {
         title="Body Explorer"
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
+      <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
         {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
             selalu berada di sistem yang sedang dimatikan -- itu sebabnya ia
@@ -1214,7 +1217,7 @@ export function BodyExplorer() {
             )}
 
             {panelTab === 'bedah' && (
-              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgical layers…</p>}>
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgery simulator…</p>}>
                 <SurgicalLab
                   onKedalaman={setDissect}
                   onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
@@ -1246,6 +1249,14 @@ export function BodyExplorer() {
                   onPick={onPickHierarchyEntry}
                   onView3d={onViewLayer3d}
                 />
+                <details className="rounded-xl border border-brand/20 bg-brand/[.03] p-2.5">
+                  <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Sexual &amp; reproductive physiology (staged, schematic)</summary>
+                  <div className="mt-2">
+                    <Suspense fallback={<p className="text-sm text-neutral-500" role="status" aria-live="polite">Loading reproductive physiology…</p>}>
+                      <HumanSexualReproductivePhysiologyLab />
+                    </Suspense>
+                  </div>
+                </details>
                 {/* Catatan & kurikulum kedokteran tetap tinggal di Med Study
                     Hub — isinya ratusan kilobyte dan tidak pantas ikut termuat
                     tiap kali orang memutar model 3D. Yang digabung di sini

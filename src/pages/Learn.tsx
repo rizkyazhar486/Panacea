@@ -1,5 +1,6 @@
 import { Suspense, lazy, useState } from 'react'
 import { UnifiedLearnWorkspace } from './UnifiedLearnWorkspace'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Immediate-release marker: keep the completed workspaces reachable while the
 // mobile UI hotfix is released without waiting for the normal Vercel batch.
@@ -39,6 +40,7 @@ export function Learn() {
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-emerald-700 dark:text-emerald-300">Learning extensions</div>
             <h2 className="mt-1 text-base font-black tracking-tight text-neutral-950 dark:text-white">Open deeper tools only when you need them.</h2>
+            <BatasKlaimKesehatan permukaan="care.learn" />
           </div>
           {extension !== 'none' && (
             <button

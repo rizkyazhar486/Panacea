@@ -7,6 +7,7 @@ import {
   susunPekan, periksaAturan, kadensLariPekanan, sesiLariAwal, BATAS_ORGANIZER,
   type HariRencana, type JenisHari, type PilihanOrganizer,
 } from '../lib/organizerLatihan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Organizer pekanan. Halaman Training hanya bisa bercerita tentang lari,
 // padahal push/pull/kaki/perut dilakukan orang yang sama dan tidak punya
@@ -108,6 +109,7 @@ export function OrganizerLatihan() {
         title="Weekly organizer"
         subtitle="Push · pull · legs · abs, scheduled around the runs you already do"
       />
+      <BatasKlaimKesehatan permukaan="performance.session-organizer" />
 
       <Card>
         <div className="flex flex-wrap items-baseline justify-between gap-2">

@@ -1,0 +1,47 @@
+/* Panaceamed production readability pass.
+   The app historically used very low alpha text on near-black surfaces.
+   Keep hierarchy, but never make ordinary interface copy look disabled. */
+
+.dark #root .text-white\/25 { color: rgb(255 255 255 / .58) !important; }
+.dark #root .text-white\/30 { color: rgb(255 255 255 / .62) !important; }
+.dark #root .text-white\/35 { color: rgb(255 255 255 / .66) !important; }
+.dark #root .text-white\/38 { color: rgb(255 255 255 / .68) !important; }
+.dark #root .text-white\/40 { color: rgb(255 255 255 / .70) !important; }
+.dark #root .text-white\/42 { color: rgb(255 255 255 / .72) !important; }
+.dark #root .text-white\/45 { color: rgb(255 255 255 / .74) !important; }
+.dark #root .text-white\/48 { color: rgb(255 255 255 / .76) !important; }
+.dark #root .text-white\/50 { color: rgb(255 255 255 / .78) !important; }
+.dark #root .text-white\/55 { color: rgb(255 255 255 / .80) !important; }
+
+.dark #root .text-neutral-500 { color: #aeb8b4 !important; }
+.dark #root .text-neutral-400 { color: #9ca8a3 !important; }
+
+.pmd-product-surface {
+  background: #050708;
+  color: #f6f8f7;
+}
+
+.pmd-product-surface button,
+.pmd-product-surface a,
+.pmd-product-surface summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pmd-product-surface button:active,
+.pmd-product-surface a:active {
+  transform: scale(.985);
+}
+
+.pmd-surface-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .pmd-product-surface {
+    border-radius: 20px;
+  }
+
+  .pmd-surface-guide {
+    margin: 8px;
+  }
+}

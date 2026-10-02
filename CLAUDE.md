@@ -1,282 +1,294 @@
-# Panaceamed.id — Claude Code working contract
+# Panaceamed.id — Standar Proyek untuk AI Agent (v2)
+
+Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
+
+1. Instruksi eksplisit terbaru dari pemilik repo.
+2. Batas keselamatan/keamanan/privasi/provenance di §8 (tidak boleh dilemahkan).
+3. Dokumen ini → `AGENTS.md` → dokumen doktrin di §10.
+4. Rencana/rekomendasi agent lama.
+
+> Catatan migrasi: CLAUDE.md versi lama (1000+ baris, ledger arahan pemilik) dipindahkan utuh ke [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md). Isinya tetap berlaku sebagai arahan produk/domain, **kecuali** aturan shipping "direct-to-main" yang kini digantikan oleh §5–§6 di bawah.
+
+---
+
+## 1. Gambaran proyek
+
+Panaceamed adalah platform kesehatan berbasis **satu model manusia longitudinal** (Computational Human Platform): AI-EMR, Clinical, Your Body, Body Exposure (proyektor simulasi 3D), sport/performance, dan Visit OS berbagi kontrak & state yang sama — bukan kumpulan halaman terpisah.
+
+| Bagian | Stack |
+|---|---|
+| Frontend | React + TypeScript + Vite (`src/`) |
+| Backend | Node + TypeScript (`server/`, dijalankan `tsx`) |
+| Deploy | Vercel (frontend), Render (`render.yaml`, server) |
+| CI | GitHub Actions (`.github/workflows/`) |
+
+Bahasa: **UI berbahasa Inggris dulu** lalu diterjemahkan (`src/locales`). Komentar kode boleh Bahasa Indonesia (konvensi repo). Identifier/route key/storage key adalah data, bukan teks UI.
+
+---
+
+## 2. Arsitektur — Clean Architecture
+
+### 2.1 Aturan ketergantungan (satu arah, ke dalam)
+
+```
+pages/  →  components/  →  lib/ (logika murni)  →  data/ (konstanta, korpus)
+   ↓
+ lib/api.ts (satu-satunya pintu HTTP)  →  server/src (routes → service → store)
+```
+
+- **Dalam tidak boleh mengimpor luar.** `lib/` tidak boleh impor `components/` atau `pages/`. `data/` tidak boleh impor apa pun dari `lib/` yang berefek samping.
+- **`lib/` = domain + use-case, murni & deterministik**: tanpa React, tanpa DOM, tanpa `fetch` langsung, tanpa `Date.now()`/`Math.random()` tersembunyi (injeksikan `now`/seed sebagai parameter). Ini yang membuatnya bisa diuji offline.
+- **`components/` = presentasi**. Tidak berisi rumus, aturan klinis, atau parsing. Hanya memanggil `lib/` lalu merender.
+- **`pages/` = komposisi** (routing, lazy-load, menggabungkan komponen). Tanpa logika domain.
+- **Server**: `routes/handler` (validasi input + auth) → `service` (aturan bisnis) → `store/adapter` (DB, FHIR, API eksternal). Handler tidak berisi bisnis; service tidak tahu HTTP.
+
+### 2.2 Struktur tree kanonik (target)
+
+Struktur dikelompokkan **per bounded context (domain)**, bukan per jenis file. Di dalam tiap domain, layer dipisah. Kondisi saat ini: `src/lib` datar (~513 berkas + 15 subfolder) — arah migrasinya di §2.4.
+
+```
+Panacea/
+├─ src/
+│  ├─ app/                      # composition root: main.tsx, router, providers, lazy-route map
+│  ├─ shared/                   # lintas-domain, TANPA logika domain
+│  │  ├─ ui/                    # primitif UI reusable (Button, Disclosure, Chart, Sheet)
+│  │  ├─ hooks/                 # hook generik (useMedia, useDebounce)
+│  │  ├─ kernel/                # tipe inti: TruthClass, Provenance, Unit, Result, Clock
+│  │  ├─ styles/                # token & tema
+│  │  └─ i18n/                  # locales EN-sumber
+│  ├─ domains/                  # satu folder = satu bounded context
+│  │  ├─ physiology/
+│  │  │  ├─ model/              # ENTITAS/tipe + invariants (murni)
+│  │  │  ├─ engine/             # USE-CASE/rumus/simulasi (murni, deterministik)
+│  │  │  ├─ data/               # konstanta, korpus, registry statis
+│  │  │  ├─ adapters/           # boundary: API/sensor/device → model (satu-satunya tempat I/O)
+│  │  │  ├─ ui/                 # komponen khusus domain (presentasi)
+│  │  │  └─ index.ts            # PUBLIC API domain (satu-satunya pintu impor dari luar)
+│  │  ├─ anatomy/  emr/  clinical/  body-exposure/  sport/  visit/  devices/  environment/  ...
+│  ├─ features/                 # komposisi lintas-domain per skenario pengguna (opsional, tipis)
+│  └─ pages/                    # layar/super-page: merangkai features + domains, tanpa logika
+├─ server/src/
+│  ├─ app/                      # bootstrap, wiring DI, middleware, config
+│  ├─ shared/                   # auth, audit, error, logger, kernel tipe
+│  └─ modules/<domain>/         # satu modul per bounded context
+│     ├─ http/                  # routes + validasi input (zod/skema) + mapping DTO
+│     ├─ service/               # use-case / aturan bisnis (tanpa HTTP, tanpa SQL)
+│     ├─ domain/                # entitas + kebijakan murni
+│     ├─ repo/                  # port (interface) + implementasi DB/FHIR/vendor
+│     └─ index.ts
+├─ scripts/  uji/ qa/ bangun/   # uji deterministik, smoke, pembangun aset
+├─ governance/  DOCS/  docs/    # registry, ADR, desain
+└─ .github/workflows/
+```
+
+**Aturan dependensi (ditegakkan mesin, bukan niat baik):**
+
+```
+pages → features → domains/* (via index.ts) → shared
+                    domains/A  ✗→  domains/B/internal   (hanya lewat index.ts B, dan hanya bila ada alasan tertulis)
+model ← engine ← adapters ← ui        (panah = "boleh mengimpor"; model tidak tahu siapa pun)
+```
+
+- `model` & `engine`: tanpa React/DOM/fetch/`Date.now()`/`Math.random()` (injeksi `clock`/`rng`).
+- I/O hanya di `adapters/` (frontend) dan `repo/` (server).
+- Antar-domain berkomunikasi lewat **kontrak tipe di `shared/kernel`** atau public API `index.ts`, bukan mengimpor internal.
+- Data sumber statis besar (mis. korpus catatan penyakit puluhan ribu baris) hidup di `data/` dan **di-`import()` dinamis**, tidak masuk bundle awal.
+
+### 2.3 Penegakan otomatis (wajib ditambahkan)
+
+Aturan yang hanya ada di dokumen akan luntur. Tegakkan di CI:
+1. **Boundary lint** (`dependency-cruiser` atau `eslint-plugin-boundaries`) yang menggagalkan build bila `lib/model/engine` mengimpor `components/pages`, atau domain mengimpor internal domain lain.
+2. **Path alias** di `tsconfig.json`/`vite.config.ts`: `@shared/*`, `@domains/*`, `@app/*` — hapus impor `../../..`.
+3. **Uji kemurnian**: skrip `scripts/qa` yang gagal bila `engine/`/`model/` memuat `fetch(`, `Date.now(`, `Math.random(`, `document.`, `window.`.
+4. **Ratchet**: pelanggaran yang sudah ada dicatat di baseline; CI hanya menolak pelanggaran **baru** dan jumlah baseline harus turun, tidak naik.
+
+### 2.4 Prinsip desain inti & jalur migrasi
+
+- **Satu sumber kebenaran per konsep** (state pasien, konstanta fisiologi, renderer 3D, registry). Sebelum membuat sesuatu, **cari yang sudah ada** (`git grep`, lihat `src/lib`). Perluas atau komposisikan; jangan buat versi kedua.
+- **Kontrak dulu, implementasi kemudian**: definisikan tipe/interface stabil di `lib/`, lalu adapter untuk sumber eksternal (wearable, device, API) di *boundary*. Data eksternal divalidasi & dinormalisasi di boundary, tidak menyebar mentah ke UI.
+- **Kedalaman > kebanyakan halaman.** Fitur baru butuh: pengguna bernama, masalah nyata, cara mengukur manfaat, dan alasan tidak bisa ditangani kapabilitas yang ada. Halaman sekunder dikelompokkan/disembunyikan, bukan dihapus.
+- **Fail closed**: data/provenance/unit hilang → tampilkan batas "tidak diketahui", jangan diisi tebakan.
+
+**Jalur migrasi (strangler, bukan big-bang):** dilarang memindahkan ratusan berkas dalam satu PR.
+1. **Aturan baru:** semua kode baru langsung ditulis di struktur §2.2; folder `src/lib` datar dibekukan (hanya perbaikan bug, tidak ada berkas baru).
+2. **Pindah saat menyentuh:** ketika berkas lama diubah substansial, pindahkan ke domainnya dalam PR terpisah bertipe `refactor/` (perilaku tidak berubah), tinggalkan re-export tipis di lokasi lama sampai semua pemanggil dimigrasi, lalu hapus.
+3. **Urutan domain:** mulai dari yang sudah punya subfolder (`physiology`, `anatomy`, `multiskala`, `ecmo`, `bodyExposure`), lalu domain dengan kopling terendah.
+4. **Server:** pecah `server/src/*.ts` datar (60 berkas) menjadi `modules/<domain>/` dengan cara sama; mulai dari `visits`/`visitRealtimePolicy`/`realtime*` (sudah punya batas keamanan jelas).
+5. Setiap PR migrasi wajib: `build` + `uji` hijau, tanpa perubahan perilaku, tanpa perubahan uji kecuali path impor.
+
+---
 
-## Authority order
+## 3. Kode efisien, tidak redundan, komponen reusable
 
-The latest explicit instruction from the repository owner/user is the highest product-development authority. After that, prefer the current working repository state, then this file and AGENTS.md, then older agent-authored plans or recommendations.
+**Sebelum menulis:** (1) apakah perlu ada? (2) sudah ada di repo? (3) stdlib/platform native? (4) dependency terpasang? Baru tulis kode minimum.
 
-Claude Code may supersede older ChatGPT/Codex/Claude implementation recommendations, sequencing, architecture preferences, file-ownership assumptions, or handoff conventions when a better engineering path is available. Explain material deviations in the commit message or durable repository notes when useful. No agent-authored recommendation is permanent merely because it was written first.
+Wajib:
+- **DRY nyata**: logika/konstanta yang muncul ≥2 kali dipindah ke `lib/` (satu fungsi, satu konstanta). Jangan menyalin rumus/angka klinis — impor dari registry kanonik (mis. `oxygenContentConventions.ts`).
+- **Tanpa abstraksi spekulatif**: tidak ada interface dengan satu implementasi, factory untuk satu produk, atau config untuk nilai yang tak pernah berubah. Ekstrak setelah pemakaian kedua, bukan sebelum.
+- **Komponen reusable**: komponen kecil, satu tanggung jawab, props bertipe, komposisi > prop-drilling/flag boolean bertumpuk. Pola berulang di ≥2 tempat → jadi komponen/hook di `components/`. State lokal tetap lokal; angkat hanya bila dibagi.
+- **Performa**: engine 3D/berat di-`lazy`-load; memo hanya bila terukur perlu; hindari re-render/hitung ulang di jalur panas; muat data progresif; jaga mobile 390×844 dan fallback WebGL.
+- **TypeScript ketat**: tanpa `any` baru, tanpa `@ts-ignore` tanpa alasan tertulis; gunakan union/branded type untuk unit dan truth class (measured/derived/simulated).
+- **Hapus, jangan tambah**: kode mati, duplikat, dan wrapper tak berguna dihapus **hanya bila kapabilitas terjaga** atau digantikan implementasi lebih baik.
+- Komentar menjelaskan *kenapa* (batasan, sumber, formula), bukan *apa*. Ikuti gaya berkas sekitar.
+- Logika non-trivial (cabang, loop, parser, jalur klinis/uang/keamanan) wajib disertai uji **positif dan negatif** sesuai §3.1.
 
-Safety, security, data integrity, licensing, biomedical provenance, and the clinical-publication boundary are not optional implementation preferences and must not be weakened as a shortcut.
+### 3.1 Standar unit test (ketat: positif + negatif wajib)
 
-## Language
+Runner: `node --test` (`scripts/qa/*.test.mjs`) atau skrip deterministik `scripts/uji/*.mts`; server di `server/uji/`. Tanpa jaringan, tanpa waktu/acak nyata (injeksikan `clock`/`rng`), tanpa urutan antar-tes.
 
-English is the product source language. New user-facing interface strings are written in English first and translated outward. Supported translation work may include Arabic, Mandarin, Indonesian, French, Japanese and Dutch.
+**Kewajiban per unit (fungsi/engine/komponen/handler) yang ditambah atau diubah:**
 
-Exceptions:
-1. SKDI / OSCE / UKMPPD medical corpus content may remain Indonesian because it mirrors Indonesian competency material.
-2. Scripture/religious source content may retain its source language and the established Indonesian rendering.
+| Kategori | Wajib ada | Contoh |
+|---|---|---|
+| **Positif** (happy path) | ≥1 kasus input valid → hasil persis yang diharapkan | `CO = HR×SV` dari HR/EDV/ESV valid |
+| **Negatif** (invalid) | ≥1 kasus per aturan validasi: input salah tipe, kosong, `NaN`/`Infinity`, di luar rentang, unit tidak cocok, provenance hilang → **ditolak/fail-closed dengan error/hasil eksplisit**, bukan nilai tebakan | Hb negatif → error; unit salah → ditolak |
+| **Batas** (boundary) | nilai tepat di batas bawah/atas, ±1 langkah di luar batas | ambang fresh/delayed/stale 30 s / 120 s |
+| **Keamanan/otorisasi** (bila relevan) | akses tanpa identitas, role salah, replay, payload berlebih → ditolak | sinyal Visit dari non-anggota |
+| **Regresi** | setiap bug yang diperbaiki mendapat tes yang gagal sebelum perbaikan | — |
 
-Code comments may remain Indonesian by repository convention. Identifiers, route keys, option values, storage keys and other programmatic identifiers are data, not translatable interface copy.
+**Aturan mutu:**
+1. **Tes negatif tidak boleh sekadar "tidak melempar error".** Assert jenis penolakan (kode/pesan/`ok:false`) dan bahwa **tidak ada efek samping** (state tidak berubah, tidak ada data tertulis).
+2. **Assert nilai eksak** (atau toleransi numerik yang dinyatakan) — bukan `toBeTruthy`/"tidak undefined". Rumus klinis/fisiologi diuji dengan **nilai referensi berbunyi sumber** (golden case) dan propagasi ketidakpastian bila ada.
+3. **Tes berpasangan**: setiap aturan penolakan punya kasus penerima yang *hanya berbeda pada kondisi itu* (membuktikan aturan itu yang menolak, bukan hal lain).
+4. **Determinisme**: dua kali jalan → hasil identik; tanpa `Date.now()`/`Math.random()`/jaringan; fixture di dalam repo.
+5. **Satu perilaku per tes**, nama deskriptif: `menolak_hb_negatif`, `menerima_ef_pada_batas_atas`. Tidak ada tes yang di-skip/`.only` yang tertinggal; tidak ada `catch` yang menelan assertion.
+6. **Dilarang melemahkan tes** (menghapus assert, melonggarkan toleransi, men-skip) agar hijau. Perubahan ekspektasi harus dijelaskan di PR.
+7. **Komponen UI**: uji state loading, error, kosong, dan data; tombol tidak bisa dobel-submit; input tidak valid menampilkan pesan dan tidak memanggil handler.
+8. **Kode klinis/keamanan/privasi**: cakupan cabang penuh untuk jalur keputusan (setiap `if`/`switch` punya kasus positif *dan* negatif); jalur fail-closed wajib diuji secara eksplisit.
+9. **Mock hanya di boundary** (adapter/repo). Logika murni diuji tanpa mock.
+10. Modul baru di `lib`/`domains/*/engine` tanpa berkas uji = PR ditolak.
 
-## Shipping — direct main is the active owner directive
+Prosedur, matriks kasus, dan kerangka kode ada di skill **`panacea-testing`**.
 
-As of 2026-09-18, authorized Panacea development is direct-to-main by default. This supersedes the older PR-only rule in this repository.
+---
 
-For authorized implementation:
-1. Read the current main head immediately before changing files.
-2. Build on the newest main and preserve already-landed work.
-3. Commit coherent, buildable batches directly to main. A pull request is not required.
-4. Never force-push or rewrite shared history.
-5. If main moves while a change is being prepared, replay the change on the newest main rather than overwriting the newer work.
-6. Run targeted validation before the commit when practical and inspect CI/deployment evidence after the commit. A failing gate becomes the next concrete repair task; it does not restore the retired PR-only policy.
-7. Never weaken tests, academic gates, biomedical checks or security controls merely to obtain green status.
+## 4. Konvensi penamaan & commit
 
-Direct-to-main does not mean destructive editing. Preserve user-visible capability and other agents' useful work unless replacement is necessary to implement a better equivalent or explicitly requested redesign.
+- File `lib`: `camelCase.ts`; komponen: `PascalCase.tsx`; uji: `nama-modul.test.mjs` / `nama-modul.mts`.
+- Commit **Conventional Commits**: `feat(scope): …`, `fix(scope): …`, `test(scope): …`, `refactor(scope): …`, `docs(scope): …`, `chore(scope): …`. Satu commit = satu perubahan koheren yang bisa dibangun.
+- Badan commit menjelaskan *kenapa*, menyebut deviasi material dari arahan lama.
+- Akhiri commit dengan baris atribusi yang diberikan harness (Co-Authored-By).
 
-## Claude Code development autonomy
+---
 
-Claude Code is authorized to improve Panacea beyond literal older implementation prescriptions when doing so advances the owner's product intent.
+## 5. Git Flow — branching
 
-Claude Code may:
-- refactor, consolidate, split or replace existing implementations;
-- change architecture, state flow, component boundaries, data contracts and developer workflow;
-- add or replace dependencies when the trade-off is justified;
-- add tests, validators, tooling, documentation, schemas and reusable infrastructure;
-- repair or improve work originally written by ChatGPT/Codex, Claude Code, Replit or another agent;
-- simplify or remove obsolete duplication when the capability is preserved or replaced by a demonstrably better integrated implementation;
-- choose a different technical route from an older agent recommendation when current repository evidence supports it.
+`main` = selalu deployable, dilindungi. **Dilarang commit/push langsung ke `main`** (menggantikan aturan direct-to-main lama). Tidak pernah force-push/rewrite riwayat bersama.
 
-Default collaboration behavior remains: understand first, preserve intent, integrate rather than sabotage, and avoid deleting useful capability merely to make the code look cleaner.
+### 5.1 Nama branch
 
-## Body Exposure — one unified human simulation project
+`<tipe>/<scope>-<deskripsi-singkat-kebab>`, huruf kecil, ≤ 50 karakter.
 
-Body Exposure is one project: the Unified Human Simulation Projector. Do not grow anatomy, physiology, pathophysiology, biomechanics, cellular biology, genomics, pharmacology, imaging and surgical simulation as unrelated demo pages.
+| Tipe | Untuk | Contoh |
+|---|---|---|
+| `feat/` | fitur/kapabilitas baru | `feat/care-encrypted-outbox` |
+| `fix/` | perbaikan bug | `fix/visit-replay-guard` |
+| `refactor/` | ubah struktur tanpa ubah perilaku | `refactor/lib-oxygen-constants` |
+| `test/` | uji saja | `test/fhir-observation-golden` |
+| `docs/` | dokumentasi | `docs/claude-standard-v2` |
+| `chore/` | tooling, CI, dependensi | `chore/ci-node-24` |
+| `hotfix/` | perbaikan produksi mendesak (dari `main`) | `hotfix/auth-token-expiry` |
 
-The canonical model is one persistent body context with shared:
-- selected body system / organ / structure;
-- spatial 3D reference;
-- scale and depth;
-- simulation/scenario state;
-- timeline or motion state when relevant;
-- provenance, confidence and educational/clinical boundary.
+Prefix agent lama (`chatgpt/`, `codex/`, `claude/`, `panacea-maturity/`) tidak dipakai lagi untuk pekerjaan baru; pakai tipe di atas.
 
-The scale ladder is:
-whole body → system → organ → tissue → cell → organelle → molecule/pathway → genome/DNA.
+### 5.2 Alur kerja
 
-The main simulation domains are:
-3D anatomy, physiology, pathophysiology, biomechanics, cells/metabolism, genome, surgery, pharmacology and imaging.
+```
+git switch main && git pull --ff-only         # 1. mulai dari main terbaru
+git switch -c feat/<scope>-<deskripsi>        # 2. satu branch = satu tujuan
+# ... commit kecil & koheren ...
+git fetch origin && git rebase origin/main    # 3. sinkron sebelum PR (rebase branch SENDIRI saja)
+npm run build && npm run uji                  # 4. gate lokal (+ cd server && npm run typecheck bila menyentuh server)
+git push -u origin HEAD                       # 5. push branch
+gh pr create --base main                      # 6. buka PR (lihat §6)
+```
 
-Existing engines are reusable simulation plugins inside the same project. Prefer coupling them through shared state and source-backed spatial context instead of adding another standalone page. A user should be able to select an organ/system once and then change the projection from anatomy to function, failure, motion, micro/cellular/genomic scale or surgical layers without losing orientation.
+Aturan:
+- Satu branch/PR = **satu perubahan logis**. Jangan campur fitur, refactor besar, dan format ulang.
+- Umur branch pendek (idealnya < 3 hari); besar → pecah jadi PR berurutan.
+- Branch sudah di-merge dihapus. Jangan pakai ulang.
+- Sebelum menyentuh berkas bersama (ClinicalHub, UnifiedBodyWorkspace, BodyExposure, EMR, ForYouHub), periksa PR/branch terbuka yang tumpang tindih (`gh pr list`) dan rekonsiliasi, jangan timpa.
+- Agent **tidak** merge PR sendiri kecuali diminta pemilik secara eksplisit.
 
-Whole-body coverage comes first, then important organs, then tissues and smaller scales. Deep organ work should improve the shared engine rather than create isolated toy anatomy.
+---
 
-## Body Exposure scientific rules
+## 6. Mekanisme Pull Request
 
-Reference atlas geometry must never be represented as patient-specific anatomy. Synthetic physiology/pathophysiology/biomechanics simulations must be labeled as simulated. Genomic and cellular content must retain source provenance and fail closed when evidence is missing.
+**Setiap perubahan masuk `main` lewat PR.** Judul mengikuti Conventional Commits.
 
-For anatomy, physiology, pathology, pharmacology, genomics, surgery, diagnosis/treatment or other biomedical content:
-- preserve source identity, version, provenance and uncertainty;
-- distinguish measured, reference, simulated, derived and unsupported states;
-- preserve the repository Academic Accuracy Gate;
-- never invent human review, reviewer credentials, anatomy, geometry or citations;
-- never infer patient-specific lesion location, procedure target, device setting, diagnosis or treatment from generic atlas/simulation data;
-- high-risk clinical publication remains blocked until the required qualified human review is genuinely recorded.
+### 6.1 Template deskripsi PR
 
-## Product architecture and simplicity
+Bagian wajib: **Ringkasan · Perubahan · Validasi (checklist) · Risiko & batas · Catatan reviewer**, diakhiri baris atribusi harness. Template lengkap dan perintah langkah demi langkah ada di skill **`panacea-git-flow`** (`.claude/skills/`), yang dimuat otomatis saat bekerja dengan git/PR.
 
-Panacea should remain simple inside and outside. Consolidate overlapping capabilities into compact super-pages and shared engines rather than multiplying routes. Keep data flow, naming, API contracts, state ownership and developer workflow legible.
+### 6.2 Syarat merge
 
-For Body Exposure specifically, prefer a shared scene/state graph and progressive disclosure. Heavy 3D engines should lazy-load. Maintain mobile usability and WebGL degradation behavior.
+1. CI `Validate changes` (`build` + `uji` + server-validate) **hijau pada SHA terakhir**. Gate merah = tugas perbaikan berikutnya; **dilarang** melemahkan/mematikan uji, gate akademik, cek biomedis, atau kontrol keamanan agar hijau.
+2. Minimal satu review (manusia pemilik atau reviewer yang ditunjuk); temuan review diselesaikan atau dijawab.
+3. Tidak ada konflik dengan `main`; branch sudah rebase pada `main` terbaru.
+4. Perubahan yang menyentuh area klinis/keamanan/privasi menyebut batasnya di bagian "Risiko & batas".
+5. Setiap unit baru/diubah punya tes positif **dan** negatif (§3.1); reviewer menolak PR yang hanya berisi happy path.
+6. Registry `governance/*.yaml` dan dokumen kontrak diperbarui bila status berubah.
 
-## Multi-agent collaboration
+Strategi merge: **squash merge** ke `main` (riwayat linear, satu commit per PR). Hotfix: PR kecil langsung dari `hotfix/*`, tetap wajib CI hijau.
 
-GitHub main is the source of truth. Multiple agents may work concurrently. No agent has permanent ownership over a file or subsystem.
+### 6.3 Pelaporan
 
-Before a material edit, inspect current main and recent overlapping work when available. When another agent's landed change is useful, build on it. If two approaches conflict, reconcile intent and keep the stronger integrated result rather than deleting one side reflexively.
+Laporan kemajuan konkret: SHA/nomor PR, kapabilitas yang berubah, hasil uji, status CI, blocker tersisa. Jangan klaim build/test/CI/deploy/validasi klinis tanpa bukti. Bedakan "berfungsi secara teknis" / "ditinjau klinis" / "tervalidasi klinis".
 
-Long-running, blocked or high-context tasks should leave durable continuation notes here or in the repository's canonical task ledger so the next agent can continue without reconstructing the entire history.
+---
 
-## Validation and reporting
+## 7. Checklist sebelum membuka PR
 
-Do not claim build, test, CI, deployment, browser or biomedical validation without evidence. For user-visible Body/3D work, preserve the existing 390x844 browser/WebGL smoke expectations when available.
+- [ ] Sudah cek apakah kapabilitas ini ada di repo (tidak duplikat).
+- [ ] Dependensi arah §2.1 dipatuhi (tidak ada `lib` → `components`).
+- [ ] Tidak ada logika/konstanta yang disalin; komponen berulang diekstrak.
+- [ ] Input dari boundary divalidasi; error/loading/empty state tertangani; tidak ada tombol mati.
+- [ ] Uji positif **dan** negatif (+ batas/otorisasi bila relevan) untuk logika baru; tidak ada tes dilemahkan/di-skip; `build` + `uji` lokal hijau.
+- [ ] String UI baru berbahasa Inggris; satu kalimat ringkas per item di scroll utama, detail di balik disclosure.
+- [ ] Tanpa rahasia/kredensial/PHI di kode, log, atau commit.
+- [ ] Aksesibilitas dasar (kontras, fokus, label) dan mobile 390×844 terjaga.
 
-Useful progress is concrete: commit SHA, changed capability, test result, CI state and remaining blocker. Do not invent completion percentages without a trustworthy denominator.
+---
 
+## 8. Batas keras (tidak boleh dilemahkan)
 
-## UI convergence handoff — 2026-09-18
+- **Keselamatan klinis**: tidak ada diagnosis, dosis, resep, order, target prosedur, atau keputusan darurat otonom dari AI/simulasi. Draf AI tetap draf sampai ditinjau klinisi teridentifikasi. Data device/live ≠ rekam medis bertanda tangan.
+- **Provenance & truth class**: bedakan measured / reference / simulated / derived / unsupported. Anatomi atlas ≠ anatomi pasien. Jangan mengarang sitasi, reviewer, kredensial, geometri, atau data. Tidak tahu = tampilkan "tidak diketahui".
+- **Tanpa data/angka karangan**: konstanta klinis hanya dari sumber terverifikasi; dosis hanya dari korpus terkurasi/label resmi dengan kecocokan indikasi & rute (blank lebih baik daripada salah).
+- **Privasi & keamanan**: consent, audit, retensi terbatas; tanpa pelacakan diam-diam; PHI tidak masuk log/repo; jangan melonggarkan authz (owner/admin bukan alasan melewati kontrol Visit). Repo publik: jangan commit rahasia/NDA/detail paten.
+- **Integritas**: tidak menghapus fitur yang berguna hanya demi "bersih"; tidak mengklaim integrasi vendor/device tanpa adapter + fixture yang teruji.
+- **Gate akademik/biomedis/keamanan**: jangan diakali. Klaim "novel/first/discovery" wajib mengikuti protokol Pioneer (bukti pencarian, bukan ingatan model).
 
-The current UI convergence work is additive and already landed on main:
-- `src/components/ForYouSocialPulse.tsx` makes For You social-first with recent people/posts, real stored GPS activity summaries, and the existing live football data source; it links into the canonical Feed, GPS tracker, Sports Scores, Community, Clubs, Markets, Finance and Faith capabilities instead of duplicating them.
-- `src/styles/superpage-cohesion-v1.css` is the shared visual-rhythm compatibility layer for Home, Clinical and Body Exposure.
-- `HomeSocialWorkspace` now uses the same `PanaceaZoneNav` as Your Body and Clinical. Preserve that common shell.
+---
 
-Active overlap to reconcile rather than overwrite: PR #1745 touches ClinicalHub/FitnessHub/ForYouHub; #1827 touches ClinicalHub/UnifiedBodyWorkspace/SuperPageCapabilityRail; #1845 touches the Home widget board; #1848 touches Body Exposure styling/simulators. When those streams land or are superseded, fold their stronger implementation into the shared visual language rather than recreating a second shell.
+## 9. Produk: sederhana di luar, dalam terstruktur
 
-For You direction: keep the social feed as the primary scrolling experience; keep GPS device-derived (weekly distance = sum of stored accepted activity distances inside the 7-day window) and sports scores source-backed/fail-explicitly when unavailable. Use progressive disclosure for secondary personal tools so the main feed remains visual, compact and social.
+Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur penting ≤2 interaksi dari Home; visual/data dulu, interpretasi di balik disclosure; dekorasi harus bermakna. Detail: `DOCS/RUTHLESS-SIMPLICITY.md`.
 
+---
 
-## Body Exposure microscopic semantic zoom target — 2026-09-18
+## 10. Skill proyek & dokumen rujukan
 
-Body Exposure must target inspectability at least comparable to mature commercial 3D anatomy atlases while going deeper across biological scale. Zoom is not allowed to mean “make the same low-resolution gross mesh larger.”
+Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif), **`invictus`** (eksekusi compounding-depth berbasis `PANACEA_INVICTUS_PRINCIPLE.md`). Panggil manual dengan `/panacea-git-flow`, `/panacea-architecture`, `/panacea-testing`, atau `/invictus`. Teks pemilik **`@invictus`** adalah pemanggilan eksplisit yang ekuivalen dengan `/invictus` untuk scope tugas saat itu; tidak pernah menonaktifkan gate keselamatan, bukti, provenance, testing, review, atau Git flow.
 
-The required interaction model is **semantic zoom / representation LOD**:
-- whole body → system → organ use source-backed gross 3D geometry;
-- tissue/microstructure switches to source-backed histology or microanatomy representation;
-- cell → organelle switches to cell-type-appropriate 3D/subcellular representation;
-- molecule/protein/pathway uses verified molecular or evidence-network representation;
-- genome/DNA/chromatin uses sequence/chromatin/genomic reference representation.
-- Preserve the selected system/organ/structure context across scale transitions whenever a validated cross-scale evidence edge exists.
-- If that edge or source asset does not exist, fail closed and show the missing-resolution boundary. Never synthesize microscopic precision by enlarging gross anatomy or inventing vessels, nerves, fascia, cells, proteins or DNA coordinates.
+Instruksi umum multi-agent (dimuat otomatis lewat import di bawah; bila bertentangan dengan dokumen ini, **dokumen ini menang**):
 
-Interaction quality target:
-- selectable structures with isolate/fade/hide/show-others behavior;
-- fine arterial/venous/nerve branching where the source truly contains it;
-- layer peeling, clipping/cross-section, exploded anatomy, focus and search;
-- continuous pinch/wheel/orbit behavior on mobile and desktop;
-- scale-aware labels and units;
-- explicit geometry/source/version/review metadata;
-- progressive loading and LOD so high detail does not destroy mobile performance.
+@AGENTS.md
 
-Scientific/detail target by exemplar:
-- nervous system: network → neuron → dendritic tree → synapse → axon/axon hillock → myelin → cytoskeleton/microtubules → mitochondria → molecular layer → DNA;
-- nucleus: nuclear pore complex → outer/inner membrane → perinuclear space → lamina → nucleoplasm/nucleolus → chromatin → histones/nucleosomes → DNA;
-- DNA packaging: double helix → nucleosome → higher-order chromatin/looped domains → chromatid → chromosome, using current evidence rather than legacy textbook simplifications when the literature is contested;
-- vascular anatomy: progressively finer branches only when source resolution/provenance supports them.
+Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 
-The semantic-zoom trigger may use relative camera distance, for example M_semantic = D_fit / D_camera, strictly as an interaction/LOD signal. It must never be displayed as literal optical magnification or implied physical continuity across incompatible biological scales.
+| Bila tugasmu menyentuh… | Baca dulu |
+|---|---|
+| Apa pun yang luas / "lanjut" | `PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
+| Klaim ilmiah/klinis, R&D, novelty | `PANACEA_CONSTITUTION.md`, `DOCS/ACADEMIC-ACCURACY-GATE.md` |
+| Model manusia, fisiologi, simulasi, coupling | `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/PHYSIOLOGICAL-RUNTIME.md` |
+| Data pasien, wearable, device, EMR | `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
+| Body Exposure / 3D / atlas | `DOCS/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `PANACEA_OWNER_DIRECTIVES.md` |
+| Visit OS / realtime / WebRTC | bagian "Visit OS" di `PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
+| Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |
+| UI/UX & navigasi | `DOCS/RUTHLESS-SIMPLICITY.md`, `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md` |
+| Keputusan arsitektur | `DOCS/adr/` (mulai `0001-domain-first-clean-architecture.md`) |
 
-Claude Code may replace the initial implementation with a stronger renderer, asset pipeline, spatial index, streaming LOD, GPU instancing, WebGPU, volume rendering, histology tiles, point-cloud/meshlet strategy or other architecture if it advances this target without weakening provenance, safety, mobile usability or the fail-closed rule.
+Prinsip **Invictus Human Reality Principle** (arsitektur masa depan yang dapat direalisasikan): `docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`, kanonik lewat `PANACEA_INVICTUS_PRINCIPLE.md`.
 
-
-## Clinical ↔ Body Exposure command-space target — 2026-09-18
-
-The owner supplied a concrete visual direction for Clinical and Body Exposure: a dark, immersive medical command space with the anatomical/body canvas as the focal point and compact vitals, trends, imaging/finding context and actions arranged around it. Avoid returning to a card-wall dashboard.
-
-Phase 1 is the AI-EMR integration seam:
-- `src/lib/bodyClinicalBridge.ts` projects existing AI-EMR examination markers and latest recorded clinical vitals into one shared visual-overlay contract.
-- `src/components/ClinicalBodyTwin.tsx` renders that contract inside AI-EMR as a body-centered command surface while keeping long explanation behind disclosure.
-- Reference silhouette/atlas geometry remains explicitly non-patient-specific. Patient signals, reviewed findings, reference anatomy, simulation and AI-derived/draft content must remain distinguishable.
-- The bridge generates no diagnosis, severity, prognosis, treatment, lesion location, procedure target or autonomous clinical action.
-
-Next integration steps must reconcile rather than overwrite active overlap in #1827 (ClinicalHub/UnifiedBodyWorkspace) and #1848 (Body Exposure styling/simulators). When those lanes settle, mount the same patient overlay contract into Clinical and Body Exposure so the selected patient context can follow the user without creating a second patient-state authority. Preserve the canonical longitudinal governance and clinician-review boundaries already on main.
-
-
-## Cross-surface semantic depth + For You stack — 2026-09-18
-
-Owner direction: progressive detail must become a shared Panacea interaction language, while each surface keeps its own medical/product role. The durable implementation brief is `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md`. Use `src/lib/surfaceSemanticDepth.ts` as the product-level depth contract and `src/lib/forYouWidgetCatalog.ts` as the initial source-aware For You registry.
-
-Required surface behavior:
-- **Your Body** is the everyday physiology/fitness OS: recovery, sleep, running, workouts, push-ups/sit-ups/calisthenics, load, pace, distance, zones, body composition, nutrition and longitudinal signals. Depth is **Today → domain → metric → session → sample/event → source/provenance**. Charts/numbers/body visualization first; interpretation behind Info/Interpret.
-- **Body Exposure** keeps true semantic representation zoom **whole body → system → organ → tissue → cell → organelle → molecule/pathway → genome/DNA**. Continue using `bodySemanticZoom.ts` for actual zoom/LOD thresholds. Never fake microscopic precision by enlarging gross meshes.
-- **Clinical** is the clinical learning/action layer: disease education, Look & Learn, exam/diagnostic reasoning, calculators/scores, labs/imaging, treatment pathways, drug dosing references, ICD-11 and evidence. Depth is **overview → condition → mechanism → assessment → management → coding → evidence**.
-- **AI-EMR** is the longitudinal clinical source of truth. Depth is **timeline → encounter → problem → observation → structured resource → provenance/audit**. AI-derived/draft content must remain visually and semantically distinct from clinician-authored/verified facts.
-- **For You** is a fun daily stack, not another medical dashboard: music adapters (Spotify/Apple Music), sports scores, faith/adzan/scripture, mental wellbeing, motivation, library/books/materials, stories, social/community and activity highlights. Activity/sport on the main scroll is graphics/numbers first.
-
-Global copy rule for these super-pages: persistent scrolling UI gets **one concise sentence per widget/item**; the sentence may wrap responsively, but it remains one sentence. Longer interpretation belongs behind contextual disclosure and should default to one short paragraph. Safety-critical warnings are exempt when brevity would hide risk.
-
-External integrations must be real or explicitly unavailable. Never fabricate Spotify/Apple Music connection state, wearable measurements, live sports data, biomedical evidence, reviewer identity or patient-specific anatomy.
-
-Implementation order for Claude Code:
-1. wire Your Body modules into the shared depth/provenance contract without deleting existing functionality;
-2. converge Clinical modules around the clinical depth ladder and existing routes;
-3. add AI-EMR timeline/provenance drill-down over current record state/`emrPipeline`;
-4. render For You from a registry and add explicit music-adapter auth/error states;
-5. bind all surfaces to the canonical longitudinal patient/event state;
-6. expand deeper anatomical/molecular assets only after provenance and performance gates remain trustworthy.
-
-Treat this as a continuation target, not permission to duplicate super-pages or bypass active overlap. Re-read latest main before touching ClinicalHub, UnifiedBodyWorkspace, Body Exposure, EMR or ForYouHub and reconcile any concurrently landed work.
-
-## Panacea Visit Operating System handoff — 2026-09-18
-
-The owner wants doctor visits to operate as one AI-EMR-connected clinical OS: camera/microphone encounter plus continuous medical-device context, with the visual direction of a body/organ-centered medical command space rather than a card wall.
-
-Phase 1 is landed on main:
-- `src/lib/visitOperatingSystem.ts` is the canonical visit-session kernel.
-- `scripts/uji/visit-operating-system.mts` covers consent, identity, device/unit/signal-quality checks, freshness, idempotency, lifecycle, AI-EMR live context and clinician-reviewed promotion.
-- Existing `server/src/realtime.ts` + `src/components/ConsultChat.tsx` already provide WebRTC camera/microphone signaling and peer media. Reuse them; do not create a competing video stack.
-- Continuous device samples are live/ephemeral visit context by default. They do not silently become the signed AI-EMR. A selected sample crosses into the longitudinal clinical record only through `promoteObservationToClinicalRecord()` with an identified clinician review.
-- Raw camera/audio is not persisted by the Visit OS kernel and recording remains disabled by default.
-
-Continue in this order, reconciling active UI work instead of overwriting it:
-1. **Runtime integration:** couple WebRTC call state to `VisitOperatingState.media`; selected patient and clinician identities must come from authenticated application state, never room-name inference.
-2. **Device adapter boundary:** normalize supported BLE/USB/local-network/vendor-cloud/FHIR feeds into `VisitDeviceObservation`. Preserve manufacturer/model/firmware, source timestamp, standard code where known, and signal quality. Do not claim support for a device until its adapter is actually implemented and tested.
-3. **Secure transport:** for remote patient devices, prefer authenticated/authorized transport or an encrypted WebRTC data channel. Do not place patient device data onto the current generic unauthenticated room relay merely because it is convenient.
-4. **AI-EMR visit surface:** project `buildAiEmrVisitContext()` into the existing AI-EMR/Clinical/Body command space. Keep camera, live vitals/trends, device health and review actions compact around the patient/body focal canvas. Respect the one-line primary-UI rule and progressive disclosure.
-5. **Ambient visit intelligence:** only after explicit audio/video AI consent, produce source-linked draft transcript/note candidates. Generated findings remain drafts until clinician review; no autonomous diagnosis, prescription, order, procedure target or emergency disposition.
-6. **Record interoperability:** after clinician acceptance/signing, map eligible measurements to FHIR R4 Observation using verified LOINC/UCUM and the existing SATUSEHAT pathway. Preserve Encounter, subject, effective time, performer/device provenance and review state.
-7. **Reliability:** add reconnect/backpressure handling, device clock-skew detection, stale-stream detection, adapter-level validation, audit events, fail-closed consent revocation, and production observability before calling the stream continuous.
-8. **Validation:** maintain deterministic Visit OS tests plus browser camera/WebRTC smoke, device-adapter fixtures, FHIR/SATUSEHAT conformance checks and mobile behavior. Never weaken clinical/security gates merely to make CI green.
-
-Freshness in the Visit OS is transport freshness, not clinical severity: `ageMs = max(0, now - receivedAt)`; ≤30 s fresh, 30–120 s delayed, >120 s stale. Clinical alert thresholds must remain separate evidence-backed logic.
-
-The durable boundary is: **live encounter context ≠ signed clinical record**. Device streams and AI drafts may inform the clinician; clinical commitment remains provenance-preserving, consent-aware and human-reviewed.
-
-
-## Body Exposure Blender-first asset handoff — 2026-09-18
-
-The owner explicitly wants Body Exposure to stop treating Three.js code as a substitute for anatomical assets. The durable pipeline and multi-agent work contract are now:
-
-- `DOCS/BODY-3D-ASSET-PIPELINE.md`
-- `DOCS/BODY-3D-MULTIAGENT-CONTRACT.md`
-- `scripts/blender/build_panacea_whole_body.py`
-- `src/lib/anatomy/wholeBodyAssetContract.ts`
-
-Immediate source-continuity fixes already landed on main:
-- `integumentary-surface` resolves the complete compatible `surface.glb` catalogue instead of depending on a nonexistent generic “skin” source node;
-- whole-body ocular lookup now uses the actual `nervous.glb` ocular compartments plus `muscular.glb` extraocular context;
-- the compatible male whole-body reproductive set now explicitly includes penis/glans, erectile tissue, testes, epididymides, deferent ducts, seminal vesicles and prostate where source names resolve;
-- female vagina/uterus/ovary anatomy remains available in the separate HRA female pelvis module; additionally, the HRA Visible Human Female united v1.5 whole-body source is now pinned as a pipeline-ready candidate, but neither may be visually fitted into the male Z-Anatomy reference body.
-
-Tomorrow/next Body 3D lane priority:
-1. run the Blender assembly pipeline against the seven compatible `public/anatomy/*.glb` source layers;
-2. inspect the exported manifest, exact source-name retention, whole-body alignment, file size and visual artifact before committing generated binary output;
-3. wire the accepted asset through the canonical Three.js runtime rather than adding a second renderer;
-4. implement atlas-grade select/search/focus/hide/fade/isolate/show-others/layer controls around one continuous body canvas;
-5. acquire/audit the pinned HRA female united v1.5 reference with `scripts/bangun/acquire-hra-female-v1_5.mjs`; keep fascia, skin depth and external female genital surface claims blocked until exact source geometry/nodes are verified.
-
-Astra/Blender owns asset assembly/packaging work; Claude Code owns Three.js/runtime integration; ChatGPT Work owns provenance/source-gap/acceptance/reconciliation. This is lane responsibility, not permanent file ownership: re-read latest main and active overlap before every shared-file edit.
-
-
-## Body Exposure one-projector continuation — 2026-09-18
-
-The owner explicitly wants Body Exposure to reach the capability class of a detailed interactive anatomy atlas: exact structure selection, lesion-localization teaching, education, simulation, imaging, surgical layers and biological scale transitions must stay inside one unified human simulation projector rather than fragmenting into unrelated pages.
-
-Already landed on main:
-- exact rendered source-mesh picking in `BodyAllSystems3D` using raycasting; selected source anatomy is visually isolated without mutating canonical GLTF geometry;
-- persistent selected-structure context in `UnifiedHumanSimulationProjector`;
-- first-class projector domains for Localization and Imaging, reusing the existing tract-based `LokalisasiLesiPanel` and source-grounded volumetric/DICOM teaching panel;
-- continuous representation ladder: whole body → system → organ → tissue → cell → organelle → molecule → genome;
-- structure teaching explanation inside the same projector;
-- Body Exposure top-level modes now drive the projector directly; the historical Body Explorer remains preserved as an on-demand deep-reference lab;
-- regression contract: `scripts/uji/body-exposure-one-projector.mts`.
-
-Next deep work should extend rather than replace this contract:
-1. propagate exact selected source node into physiology, pathophysiology, pharmacology, imaging and surgery adapters so those projections are structure-specific, not only system-specific;
-2. extend educational lesion localization beyond the current tract/cranial-nerve engine with source-backed peripheral nerve, root/dermatome/myotome, spinal cord, brain vascular territory and musculoskeletal lesion maps; never claim patient-specific localization from generic atlas data;
-3. register verified tissue/histology/cellular assets per organ so semantic scale transitions replace representation at real source-resolution boundaries rather than enlarging gross meshes;
-4. integrate patient-specific imaging only from actual uploaded/authorized DICOM with explicit registration/provenance and a clear distinction between atlas reference and patient data;
-5. AR/WebXR may be added as a spatial educational view of the same selected source structure, never as operative navigation or patient-specific anatomy without validated registration and review;
-6. preserve mobile 390×844, WebGL fallback, source provenance, fail-closed missing anatomy and Academic Accuracy Gate behavior.
-
-
-## Body Exposure universal gold-standard directive — 2026-09-18
-
-There is no privileged “Eye Gold Standard.” The quality target is universal across the whole body and every biological scale.
-
-The canonical registry is now:
-- `src/lib/anatomy/universalAtlasStandard.ts`
-- `src/pages/bodyhub/UniversalAtlasDepthRail.tsx`
-- `src/pages/bodyhub/MolecularChemistryStage.tsx`
-- `scripts/uji/universal-atlas-standard.mts`
-
-Required product behavior:
-- every body system must ultimately satisfy the same ladder: gross anatomy → histology/microanatomy → cell → organelle → chemistry → genome;
-- examples such as nails, sebaceous glands, areola, nephron, kidney microstructure, lens, auricle, cornea, eyelid, tunica intima/media/adventitia, genital/reproductive anatomy, ATP, NAD+/NADH, glucose, proteins, peptides and compounds are part of the universal target, not special-case side modules;
-- gross geometry, histology, cells and molecular structures must each come from the appropriate source class; never enlarge a gross mesh and call it microscopic anatomy;
-- missing microanatomy remains an explicit source gap until licensed/verified assets exist;
-- molecular/compound nodes must bind to verified identifiers/provenance before 3D chemical structures are called source-backed;
-- keep the UI compact and visual-first: one depth rail, progressive disclosure, no duplicate scale navigation walls.
-
-The first runtime implementation is already visible in Unified Human Simulation Projector: a universal depth rail replaces the duplicate scale rail, and the molecular stage now exposes ATP/NAD+/NADH/glucose chemistry context across all systems with PubChem references for the verified core compounds.
-
-Continue by adding real source adapters and assets, not more placeholder prose.
+Arahan pemilik lengkap (ledger historis): [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md) — dibaca on-demand, tidak di-import agar konteks sesi tetap ramping. Doktrin tambahan: `PANACEA_INVICTUS_PRINCIPLE.md`, `PANACEA_HUMANITY_10_CHARTER.md`.

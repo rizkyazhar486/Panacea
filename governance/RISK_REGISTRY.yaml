@@ -1,0 +1,241 @@
+schema_version: 1
+status: living_source_of_truth
+rules:
+  - "Record material product, clinical, privacy, security, data-integrity, regulatory and scientific risks."
+  - "Do not downgrade risk without evidence."
+  - "Link mitigations to code/tests/evidence where possible."
+
+risks:
+  - risk_id: risk.fragmented_patient_truth
+    category: data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: Multiple modules may model the same person independently and diverge.
+    mitigation: >-
+      Converge on canonical patient state and explicit write authority.
+      2026-09-29: GET /api/keadaan-longitudinal returns one shared revision for lab, care, self-scoped EMR,
+      health-profile device vitals, and validated selfVitals/vo2max synced through PUT /api/health-series/*
+      (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
+      browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
+      that still model the person independently).
+    evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
+
+  - risk_id: risk.feature_sprawl
+    category: product_architecture
+    severity: high
+    state: open
+    description: Breadth may grow faster than workflow maturity and integration.
+    mitigation: Apply maturity-first priority engine and research-to-implementation gate.
+    evidence: [owner_maturation_directive_2026_09_25]
+
+  - risk_id: risk.clinical_overclaim
+    category: clinical_safety
+    severity: critical
+    state: mitigated_in_part
+    description: Technical output may be mistaken for clinically validated decision support.
+    mitigation: >-
+      2026-09-28 the AI-EMR claim boundary now separates technically-working, clinician-reviewed and
+      clinically-validated states with a fail-closed evidence contract. Clinician review alone cannot become a
+      clinical-validation claim; clinically-validated requires explicit human review, external validation and linked
+      validation evidence. EMR signatures now describe the actual server-confirmed review event rather than
+      "certification", and AI-generated patient education remains visibly draft-level unless review evidence exists.
+      2026-09-29: the same fail-closed contract now sits on the longevity score, the author-weighted biological-age
+      number, published PhenoAge, the straight-line lab trend, and the risk calculators (src/components/BatasKlaimKesehatan.tsx).
+      Sign-in, landing, and pricing no longer call the record "Certified AI-EMR".
+      Later the same day: clinical calculators, body-composition score, organ-vitality panels, and mental-health
+      screening (PHQ-9/GAD-7) adopt the same contract; then Epworth, CAGE/pack-years, FINDRISC, chronotype (rMEQ),
+      and the Planning CDSS gate. Still later: standalone published clinical scores (NEWS2, SOFA, Wells, HAS-BLED,
+      BISAP, GRACE, TIMI, MELD, Child-Pugh, Caprini, Padua, Glasgow-Blatchford, Rockall, Maddrey, 4Ts, STOP-BANG,
+      Charlson, Braden) share calculators.published-score via BatasKlaimSkorTerbit; STOP-BANG and PusatJiwa copy no
+      longer imply Panacea clinical validation from published instruments. The same day also covers the Framingham
+      what-if simulator (longevity.health-simulator) and family-history screening flags (screening.family-history),
+      plus softened Risk/Wellness hub buyer copy. Still later: dermatology teaching differentials
+      (clinical.dermatology-mapper), second-opinion AI-draft workflow (care.second-opinion), and sports
+      supplement evidence grades (longevity.supplements). Still later: Drug Info label/catalog surface
+      (clinical.drug-info), fitness-test/AI form scores (performance.fitness-test), and photo shape-forming
+      drafts (longevity.shape-forming); chatbot vision prompt no longer asks to "analyze diagnostic imaging"
+      as if for diagnosis. Still later: empiric therapy class reference, NRP education guide, first-aid lay
+      guide, and plain-language lab decoder; Duke criteria joins calculators.published-score. Chatbot surface
+      (care.ai-chat) no longer titles itself "Co-Physician." Still later: remaining Clinical Scores children
+      (PERC, QTc, CHA2DS2-VASc, Light, Ranson, FeNa, Cockcroft-Gault, osmolality, corrected calcium, fluids,
+      pediatric DKA, Friedewald LDL, Ottawa ankle) share calculators.published-score; Gene Info, air-quality tips,
+      and emergency SOS card gain dedicated claim surfaces; Dashboard insight prompt drops "co-physician" branding.
+      2026-09-30: Landing CTA/trust strip no longer sells an "AI co-physician verified by doctors"; sleep-debt,
+      author-weighted sleep score, recovery-phase tracker, and readiness journal adopt the same claim contract.
+      Same day later: Login brand panel drops "doctors verify"; Body Battery, Aesthetic Vitality, vocal biomarkers,
+      self-assessment toolkit, rPPG heart-rate, and A-a oxygen gradient join the claim-boundary contract.
+      Still later: feature catalog drops "Validated … screening" / "really functioning" buyer copy; alcohol BAC,
+      caffeine–sleep, hydration, child-growth, and SNP profiler surfaces join the claim contract.
+      Same day bulk: remaining high-risk wellness/clinical/performance toolkits (vaccine, allergy, pain diary,
+      sleep/movement/mind toolkits, athlete, clinical trackers, MSE, safety plan, genome lab, phone scan,
+      sexual-health tracker, gait, fasting, breathwork, bio-simulators, medication reminders, and related
+      surfaces) adopt the shared claim boundary — then Consult triage, Nutrition longevity score, Data Lab,
+      Calculator Hub, Athlete Science, Electrophysiology, Endurance Tools, Health League, Care Episode,
+      Macro Lab, Longevity Curriculum, Architecture, Clinical Evidence, and Dashboard insights — then clinician
+      shared-lab view, patient share, and What-changed longitudinal panel — then Longevity blood panel,
+      lab photo-import draft, number-rules, Health Profile, Health Sync tutorial, MultiSport,
+      strength log, training physiology, and Pricing honesty banners — then Wellness/Clinical hubs, home health instruments,
+      Health Trends/Snapshot, Gap Navigator, Nutrition Checklist, Performance/Sports Lab,
+      and Frontier Health OS — then Your Body workspace, AI-EMR, Visit OS, VitaPulse,
+      home command/overview, body/sleep/device cards, clinical body twin, manual
+      flowsheet, daily check-in, EMR timeline, and Profile — 226 registered healthcare claim surfaces. Consult no longer claims surgical indication or "AI Recommended" clinician authority.
+      Working tree replayed onto main 04e40942 (uncommitted).
+      2026-10-01: every AI assistant bubble in the clinical Chatbot now renders the same fail-closed maturity label
+      and disclosure (Technical output unless explicit review/validation evidence exists), so conversational output
+      no longer relies only on a page-level disclaimer.
+      Remaining work is still platform-wide for generated clinical artifacts and any new healthcare surface
+      before this risk can be marked fully mitigated.
+    evidence:
+      - PANACEA_CONSTITUTION.md
+      - PANACEA_HUMANITY_10_CHARTER.md
+      - src/lib/clinicalClaimMaturity.ts
+      - src/pages/EMR.tsx
+      - src/pages/Chatbot.tsx
+      - scripts/qa/clinical-response-contract.test.mjs
+      - scripts/uji/clinical-claim-maturity.mts
+
+  - risk_id: risk.agent_context_loss
+    category: governance
+    severity: high
+    state: mitigated_in_part
+    description: Future models may restart from incomplete context and duplicate or contradict prior architecture.
+    mitigation: Root agent contract plus human-readable architecture plus machine-readable registries and autonomous R&D loop.
+    evidence: [PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
+
+  - risk_id: risk.single_document_store
+    category: data_integrity
+    severity: high
+    state: mitigated_partially
+    description: Server state is still one data.json in file mode. On MongoDB the core app document no longer holds the stored keys (16 MB BSON limit applies to whatever remains in that document, and to any single chart or capped series document). A failed write can still lose the latest save.
+    mitigation: >-
+      2026-09-25: atomic file writes, corrupt file preserved not overwritten, MongoDB save failures and
+      near-limit size surfaced in /api/health (penyimpananSehat), flush on SIGTERM, capped clinical/audit
+      records archived append-only (arsip_<name>) instead of deleted.
+      2026-09-29: lab/care, accounts, wallets, per-patient records, posts, settings, Connect, orders,
+      notification inboxes, the transaction ledger, then per-email device series (heart rate, sleep,
+      workouts, heart-rate notifications, webhook deliveries), then per-account health profiles, daily
+      summaries, reminders, sports favorites, push subscriptions, and health-webhook tokens persist as their
+      own MongoDB documents, then the remaining keys (clubs, meets, applications, feedback, prices, visit
+      memberships, creator subscriptions, manual top-ups, second opinions, and the validation ledger),
+      per-item clinical list rows, per-patient chart objects, and per-sample heart-rate rows
+      (server/src/irisanPenyimpanan.ts, versi tuntas-v1, including the clinical audit trail; earlier slice versions still load and upgrade on
+      the next save). The validation ledger is append-only: a shorter in-memory book does not delete stored
+      entries. The phone-hash salt is reloaded into the Connect module after the split so a process restart
+      cannot mint a new salt. A partial older slice does not replace webhook tokens, the ledger, or keys
+      still held in memory. /api/health.irisan reports the split. The 16 MB check applies to the core
+      document only. Remaining: file mode is still one JSON file. One patient chart object is still one
+      document. Capped sleep, workout, and notification series are still one document per email.
+    evidence: [server/src/simpanAman.ts, server/src/irisanPenyimpanan.ts, server/uji/simpanAman.uji.ts, server/uji/irisanPenyimpanan.uji.ts, server/uji/arsipKlinis.uji.ts, production /api/health 2026-09-25 penyimpanan=mongo penyimpananSehat=true]
+
+  - risk_id: risk.free_tier_server_sleep
+    category: reliability
+    severity: medium
+    state: open
+    description: >-
+      Backend runs on Render free tier and sleeps when idle; the 10-minute wake cron actually fires ~3-5
+      times/day, so per-minute schedulers (reminders, rule engine) run only while someone is using the app.
+    mitigation: >-
+      Check-in reminder catches up within 6 h of its time (02772b82). Medication reminders intentionally do
+      not catch up (double-dose risk). Owner decision 2026-09-25: free options only, medication reminders
+      are not a focus. Free fix: each wake-workflow run now loops a health ping every 9 minutes for up to
+      5h50m within 04:00-23:00 WIB (public repo => free Actions minutes), so a few successful cron starts a
+      day keep the server awake through waking hours. Verify with the next days' run durations.
+    evidence: [.github/workflows/bangunkan-server.yml run history 2026-09-22..25, server/uji/pengingatCek.uji.ts]
+
+  - risk_id: risk.clinical_validation_external_dependency
+    category: clinical_safety
+    severity: high
+    state: externally_blocked
+    description: >-
+      No Panacea workflow is clinically validated. Validation cannot be produced by software; it needs qualified
+      clinicians, a study lead and (where required) ethics review.
+    mitigation: >-
+      2026-09-25: validation infrastructure is software-ready - src/lib/validasiKlinis.ts (predeclared endpoints,
+      frozen protocol hash, frozen cases pinned to system version, reviewer identity/credential/scope/COI,
+      one assessment per reviewer per case, adjudication, safety/near-miss events, SHA-256 audit chain, Wilson CI,
+      Cohen's kappa, report separating engineering acceptance from clinical validation); server ledger + blinded
+      reviewer routes; first study lab-tren-pribadi v1 (30 synthetic cases); reviewer and study-lead UI in Clinical.
+      External steps: (1) study lead confirms or revises the PROPOSED thresholds (a revision = protocol v2 before any
+      assessment); (2) at least two STR-verified clinicians assess all 30 cases; (3) adjudicate disagreements;
+      (4) institution decides whether clinician participation needs ethics review; real patient data would need an
+      approval reference.
+    evidence: [scripts/uji/validasi-klinis.mts, scripts/uji/validasi-ledger-kontrak.mts, scripts/uji/studi-lab-tren-beku.mts, scripts/uji/validasi-ui.mts, server/data-validasi/lab-tren-pribadi-v1.json]
+
+  - risk_id: risk.clinical_store_overexposure
+    category: privacy_security
+    severity: critical
+    state: mitigated
+    description: >-
+      Found 2026-09-25 during the AI-EMR audit: GET /api/clinical returned the entire clinical store (all patients,
+      EMR records, vitals, supportive results, education) to ANY authenticated user, including patients and
+      unverified doctors, and the clinical write routes accepted any patientId. Production (Render, mongo) was
+      exposed for as long as these routes existed; no access log review has been done yet.
+    mitigation: >-
+      server/src/aksesKlinis.ts: verified clinicians / owner keep practice-wide access; everyone else reads and
+      writes only the self-record linked to their own account (id match AND reverse lookup to the same user, so an
+      id-prefix collision fails closed). Enforced on GET /api/clinical and all five clinical write routes.
+      Follow-up for the owner: review the audit log ('clinical.read') for reads by non-clinician accounts to decide
+      whether a data-exposure notification is required.
+    evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
+
+  - risk_id: risk.stale_emr_signature_reuse
+    category: clinical_safety
+    severity: critical
+    state: mitigated
+    description: >-
+      A patient, or a clinician saving edits without an explicit re-sign, could previously modify clinical content
+      of an already-signed EMR while preserving old signedBy/signedById/signedAt fields, making new content appear
+      to retain an earlier clinician signature.
+    mitigation: >-
+      server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
+      unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
+      Any patient clinical edit beyond patient-authored consent removes the signature; clinician content edits carrying
+      the old signedAt also become unsigned until an explicit re-sign intent is sent and server-stamped. Changes to
+      physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
+      Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
+    evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
+
+  - risk_id: risk.speculative_truth_leakage
+    category: scientific_integrity
+    severity: critical
+    state: mitigated_in_part
+    description: >-
+      Future-facing hypothesis, model-estimated, simulated or counterfactual output could be rendered,
+      persisted or promoted as observed/clinical truth, especially as model capability and visual realism improve.
+    mitigation: >-
+      2026-09-28 longitudinal clinical/AI-EMR admission now fails closed when semantic truth class is missing
+      or speculative, and the same consent/truth/review predicate governs visible snapshot history and derived
+      trends. Visit OS clinician promotion explicitly preserves a measured device-origin truth class alongside
+      accepted human review and provenance. Remaining work is platform-wide: every other persistence/projection
+      boundary and all counterfactual writeback paths must independently prove the same invariant before this risk
+      can be marked fully mitigated.
+    evidence:
+      - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
+      - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
+      - PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md
+      - src/lib/panaceaLongitudinalState.ts
+      - src/lib/visitOperatingSystem.ts
+      - scripts/uji/speculative-truth-clinical-boundary.mts
+      - src/lib/physiology/runtime.ts
+      - src/lib/physiology/longitudinalBoundary.ts
+      - src/lib/physiology/canonicalOxygenDelivery.ts
+      - scripts/uji/physiological-runtime.mts
+      - scripts/uji/longitudinal-physiology-pipeline.mts
+
+  - risk_id: risk.future_model_lock_in
+    category: product_architecture
+    severity: high
+    state: open
+    description: >-
+      A model-vendor-specific runtime, schema or state authority could make Panacea unable to adopt substantially
+      stronger future models without rewriting longitudinal human state, fragmenting provenance or duplicating the human.
+    mitigation: >-
+      Keep Canonical Patient State vendor-neutral; require stable domain/model interfaces with declared inputs,
+      outputs, units, provenance and validation class; benchmark and shadow candidate replacements; preserve
+      rollback/version history; and never let a model vendor own irreplaceable patient truth.
+    evidence:
+      - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
+      - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
+      - PANACEA_PRODUCT_MATURITY_OS.md
+      - src/lib/physiology/runtime.ts
+      - scripts/uji/physiological-runtime.mts

@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -945,10 +946,10 @@ function SirirajCalc() {
         <li>A score strictly between −1 and +1 is genuinely indeterminate — that range occurs often, and it means "obtain imaging," not "pick the more likely option".</li>
         <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Poungvarin N, Viriyavejakul A, Komontri C. Siriraj stroke score and validation study to
         distinguish supratentorial intracerebral haemorrhage from infarction. BMJ. 1991;302(6792):1565-7.
-      </p>
+      </Prosa>
     </Card>
   )
 }
@@ -1001,10 +1002,10 @@ function GadjahMadaCalc() {
         <li><b>Not a substitute for a CT scan.</b> Like Siriraj, this algorithm is meant for facilities without imaging — the decision to give antiplatelets or thrombolysis must not be based on this algorithm alone.</li>
         <li>If the algorithm and Siriraj results disagree, that is a strong signal the patient needs urgent referral for imaging, not a reason to pick one over the other.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
         Yogyakarta. Widely reproduced in Indonesian neurology teaching materials and PERDOSSI guidance.
-      </p>
+      </Prosa>
     </Card>
   )
 }
@@ -1096,7 +1097,7 @@ function NaCorrectionCalc() {
         <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">mEq/L</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Corrected Sodium</div>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</Prosa>
 
       <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Potassium</h4>
       <div className="mt-2">
@@ -1274,7 +1275,7 @@ function RsiCalc() {
           <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/45</span></div>
           <Badge tone={abnormal ? 'critical' : 'normal'}>{abnormal ? 'Abnormal' : 'Normal'}</Badge>
         </div>
-        <p className="mt-2 text-[11px] text-neutral-500">Scale 0 (no problem) - 5 (severe problem) per item. A score &gt;13 is considered abnormal, suggestive of laryngopharyngeal reflux.</p>
+        <Prosa kelas="mt-2 text-[11px] text-neutral-500">Scale 0 (no problem) - 5 (severe problem) per item. A score &gt;13 is considered abnormal, suggestive of laryngopharyngeal reflux.</Prosa>
       </div>
     </Card>
   )
@@ -1344,7 +1345,7 @@ function FourScoreCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">E{e}M{m}B{b}R{r} = {total}<span className="text-sm font-semibold text-neutral-500">/16</span></div>
-        <p className="mt-2 text-[11px] text-neutral-500">Lower score → more impaired consciousness. Superior to GCS for assessing intubated patients (assesses breathing rather than verbal response) and detecting brainstem/locked-in signs.</p>
+        <Prosa kelas="mt-2 text-[11px] text-neutral-500">Lower score → more impaired consciousness. Superior to GCS for assessing intubated patients (assesses breathing rather than verbal response) and detecting brainstem/locked-in signs.</Prosa>
       </div>
     </Card>
   )
@@ -2058,7 +2059,7 @@ function BurnCalc() {
         </div>
       )}
       {tbsa > 0 && tbsa < 20 && (
-        <p className="mt-3 text-[11px] text-neutral-500">The Parkland formula is generally applied to burns ≥20% TBSA. For smaller areas, fluid management is tailored to individual clinical needs.</p>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">The Parkland formula is generally applied to burns ≥20% TBSA. For smaller areas, fluid management is tailored to individual clinical needs.</Prosa>
       )}
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
@@ -2570,7 +2571,8 @@ export function ClinicalCalculators() {
   if (access && !access.unlocked) {
     return (
       <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} published scores and tools, grouped by organ system — not a clinically validated Panacea decision`} />
+        <BatasKlaimKesehatan permukaan="calculators.clinical" />
         <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
       </div>
     )
@@ -2583,7 +2585,8 @@ export function ClinicalCalculators() {
           <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
         </div>
       )}
-      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
+      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} published scores and tools, grouped by organ system — not a clinically validated Panacea decision`} />
+      <BatasKlaimKesehatan permukaan="calculators.clinical" />
       <KartuDataPerangkat />
       <input
         className={inputClass}

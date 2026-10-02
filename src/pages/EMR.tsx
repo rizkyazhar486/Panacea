@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { StatusSinkronKlinis } from '../components/StatusSinkronKlinis'
 import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { lazy, Suspense } from 'react'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
 // rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
@@ -20,7 +22,13 @@ import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
-import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
+import { KunjunganEmr } from '../components/KunjunganEmr'
+import { statusSistemFisik } from '../lib/bodyClinicalFindings'
+import { statusTinjauRekam } from '../lib/statusTandaTangan'
+import { clinicalClaimDisclosure, clinicalClaimLabel, clinicalClaimMaturity } from '../lib/clinicalClaimMaturity'
+import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
+import { labelAsalIsian, labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
+import type { Anamnesis, EMRRecord, PhysicalExam, StatusSistemFisik, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
 function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
@@ -65,7 +73,6 @@ const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: stri
   { key: 'ekstremitas', label: 'Extremities', x: 72, y: 82, kw: ['ekstremitas', 'akral', 'crt', 'edema'] },
 ]
 
-const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
 
 function LabPanel({ results }: { results: import('../lib/types').SupportiveResult[] }) {
   const labs = results.filter((r) => r.category === 'Lab')
@@ -108,15 +115,13 @@ function supportiveDefaults(weightKg: number) {
   }
 }
 
-function buildFindings(perSystem: string): SystemFinding[] {
-  const lines = perSystem.split('\n').filter(Boolean)
+function buildFindings(exam: PhysicalExam): SystemFinding[] {
+  const lines = (exam.perSystem ?? '').split('\n').filter(Boolean)
   return BODY_SYSTEMS.map((sys) => {
     const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
-    if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
-    const note = matched.join(' ')
-    const low = note.toLowerCase()
-    const abnormal = ABNORMAL_HINTS.some((h) => low.includes(h))
-    return { ...sys, status: abnormal ? ('abnormal' as const) : ('normal' as const), note }
+    const note = matched.length ? matched.join(' ') : undefined
+    const { status, origin } = statusSistemFisik(sys.key, note, exam)
+    return { ...sys, status, ...(note ? { note } : {}), ...(origin ? { origin } : {}) }
   })
 }
 
@@ -159,22 +164,50 @@ export function EMR() {
   const store = useStore()
   const { state, activePatient, saveRecord } = store
   const acc = state.account
-  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
-  if (acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner) {
-    return <StrGate str={acc.str} />
-  }
+  const strBlocked = acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
   const [dirty, setDirty] = useState(false)
+  const [encounters, setEncounters] = useState<EMRRecord[]>(record ? [record] : [])
+  const [encounterLoading, setEncounterLoading] = useState(false)
+  const [encounterError, setEncounterError] = useState('')
 
   useEffect(() => {
     setDraft(state.records[activePatient.id] ?? null)
     setDirty(false)
   }, [activePatient.id, state.records])
 
+  useEffect(() => {
+    let active = true
+    const fallback = record ? [record] : []
+    if (!backendEnabled || strBlocked || activePatient.id === 'none') {
+      setEncounters(fallback)
+      setEncounterLoading(false)
+      setEncounterError('')
+      return () => { active = false }
+    }
+    setEncounterLoading(true)
+    setEncounterError('')
+    void api.recordEncounters(activePatient.id)
+      .then((items) => {
+        if (active) setEncounters(items.length ? items : fallback)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setEncounters(fallback)
+        setEncounterError(error instanceof Error ? error.message : 'Could not load encounter history.')
+      })
+      .finally(() => { if (active) setEncounterLoading(false) })
+    return () => { active = false }
+  }, [activePatient.id, record?.id, record?.updatedAt, strBlocked])
+
+  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
+  // Hooks stay above this return so changing auth state never changes hook order.
+  if (strBlocked) return <StrGate str={acc?.str} />
   if (!draft) return <EmptyEMR />
 
-  const systemFindings = buildFindings(draft.physicalExam.perSystem)
+  const historicalReadOnly = Boolean(record && draft.id !== record.id)
+  const systemFindings = buildFindings(draft.physicalExam)
   const bodyClinicalProjection = projectEmrToBodyClinicalBridge(
     draft,
     state.vitals[activePatient.id] ?? [],
@@ -183,18 +216,20 @@ export function EMR() {
   )
 
   function patch(fn: (r: EMRRecord) => EMRRecord) {
+    if (historicalReadOnly) return
     setDraft((d) => (d ? fn(d) : d))
     setDirty(true)
   }
 
   function setAnamnesis(key: keyof Anamnesis, value: string) {
-    patch((r) => ({ ...r, anamnesis: { ...r.anamnesis, [key]: value }, updatedAt: new Date().toISOString() }))
+    patch((r) => ({ ...r, anamnesis: { ...r.anamnesis, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `anamnesis.${key}`), updatedAt: new Date().toISOString() }))
   }
   function setExam(key: keyof PhysicalExam, value: string | boolean) {
-    patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, [key]: value }, updatedAt: new Date().toISOString() }))
+    patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `physicalExam.${key}`), updatedAt: new Date().toISOString() }))
   }
 
   function save() {
+    if (historicalReadOnly) return
     if (draft) {
       saveRecord({ ...draft, updatedAt: new Date().toISOString() })
       setDirty(false)
@@ -202,11 +237,12 @@ export function EMR() {
   }
 
   function sign() {
-    if (!draft) return
+    if (!draft || historicalReadOnly) return
+    const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
-      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: state.settings.doctorName },
-      signedBy: state.settings.doctorName,
+      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: signer },
+      signedBy: signer,
       signedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -217,6 +253,7 @@ export function EMR() {
 
   return (
     <div className="space-y-6">
+      <StatusSinkronKlinis />
       {/* Header */}
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -226,6 +263,7 @@ export function EMR() {
             subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('en-US')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
+            {historicalReadOnly && <Badge tone="neutral">Historical encounter · read-only</Badge>}
             {draft.signedBy ? (
               <Badge tone="brand">
                 <IconCheck size={13} /> Signed by {draft.signedBy}
@@ -233,8 +271,8 @@ export function EMR() {
             ) : (
               <Badge tone="high">Awaiting doctor verification</Badge>
             )}
-            <Button variant="outline" onClick={save} disabled={!dirty}>
-              {dirty ? 'Save Changes' : 'Saved'}
+            <Button variant="outline" onClick={save} disabled={historicalReadOnly || !dirty}>
+              {historicalReadOnly ? 'Read-only history' : dirty ? 'Save Changes' : 'Saved'}
             </Button>
             <Button variant="outline" onClick={() => window.print()}>
               <IconBook size={14} /> Print / PDF
@@ -242,11 +280,39 @@ export function EMR() {
             <SatusehatButton patient={activePatient} record={draft} vitals={state.vitals[activePatient.id] ?? []} />
           </div>
         </div>
+        <BatasKlaimKesehatan permukaan="care.ai-emr" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">
           <IconSparkle size={14} />
           Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
           signing.
         </div>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          title="Encounter history"
+          subtitle="Separate visits are preserved by record ID; opening a prior encounter never merges visits."
+          right={<Badge tone="neutral">{encounters.length} encounter{encounters.length === 1 ? '' : 's'}</Badge>}
+        />
+        {encounterError && <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">Encounter history unavailable: {encounterError}</p>}
+        {encounterLoading ? <p className="text-sm text-neutral-500">Loading encounter history…</p> : (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {encounters.map((encounter) => (
+              <button
+                key={encounter.id}
+                type="button"
+                disabled={dirty && encounter.id !== draft.id}
+                onClick={() => { setDraft(encounter); setDirty(false) }}
+                className={`min-w-[190px] rounded-xl border px-3 py-2 text-left text-xs transition ${encounter.id === draft.id ? 'border-brand bg-brand-50' : 'border-neutral-200 bg-white hover:border-brand/50'} disabled:cursor-not-allowed disabled:opacity-50`}
+                title={dirty && encounter.id !== draft.id ? 'Save current changes before opening another encounter.' : undefined}
+              >
+                <div className="font-semibold text-neutral-900">{new Date(encounter.createdAt).toLocaleString('en-US')}</div>
+                <div className="mt-1 text-neutral-500">{encounter.signedBy ? `Signed · ${encounter.signedBy}` : 'Unsigned draft'}</div>
+                <div className="mt-1 font-mono text-[10px] text-neutral-400">{encounter.id}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </Card>
 
       <VisitCommandCenter recordId={draft.id} embedded />
@@ -280,6 +346,7 @@ export function EMR() {
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
                 {f.label}
+                {draft.anamnesis[f.key]?.trim() && <LencanaAsal asal={draft.asalIsian?.[`anamnesis.${f.key}`]} />}
               </label>
               <textarea
                 value={draft.anamnesis[f.key]}
@@ -335,21 +402,29 @@ export function EMR() {
         <div className="grid gap-4">
           <ExamField
             label="General Condition & Level of Consciousness"
+            asal={draft.physicalExam.general?.trim() ? draft.asalIsian?.['physicalExam.general'] ?? null : undefined}
             value={draft.physicalExam.general}
             onChange={(v) => setExam('general', v)}
             rows={2}
           />
           <ExamField
             label="Vital Signs (clinical notes)"
+            asal={draft.physicalExam.vitalsNote?.trim() ? draft.asalIsian?.['physicalExam.vitalsNote'] ?? null : undefined}
             value={draft.physicalExam.vitalsNote}
             onChange={(v) => setExam('vitalsNote', v)}
             rows={2}
           />
           <ExamField
             label="Examination by system (AI workup suggestions below — complete the findings)"
+            asal={draft.physicalExam.perSystem?.trim() ? draft.asalIsian?.['physicalExam.perSystem'] ?? null : undefined}
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
+          />
+          <StatusSistemEditor
+            value={draft.physicalExam.statusSistem ?? {}}
+            findings={systemFindings}
+            onChange={(statusSistem) => patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, statusSistem }, asalIsian: tanpaDeklarasi(r.asalIsian, 'physicalExam.statusSistem'), updatedAt: new Date().toISOString() }))}
           />
         </div>
       </Card>
@@ -361,6 +436,20 @@ export function EMR() {
           subtitle="Lab/ECG interpretation · resuscitation, fluid balance, caloric needs, urine output"
         />
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
+        <div className="mb-4">
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Anthropometry — Formula, Standard & Interpretation
+          </label>
+          <textarea
+            value={draft.anthropometry ?? ''}
+            onChange={(e) =>
+              patch((r) => ({ ...r, anthropometry: e.target.value, updatedAt: new Date().toISOString() }))
+            }
+            rows={3}
+            placeholder="BMI = kg/m²; pediatric WHO/CDC z-score/percentile only when valid age/sex/reference inputs are available."
+            className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          />
+        </div>
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
             Interpretation of Lab Findings & ECG Results
@@ -426,6 +515,7 @@ export function EMR() {
                   {i + 1}
                 </span>
                 <h4 className="font-bold">{pr.title}</h4>
+                <span className={`text-[10px] font-semibold ${pr.source === 'Dokter' ? 'text-brand-dark' : 'text-amber-700'}`} data-asal-masalah>{labelAsalMasalah(pr)}</span>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-neutral-500">Probability</span>
@@ -493,6 +583,7 @@ export function EMR() {
                 {pi.category}
               </Badge>
               <span className={pi.status === 'ditolak' ? 'text-neutral-500 line-through' : ''}>{pi.text}</span>
+              <span className="ml-auto shrink-0 text-[10px] font-semibold text-neutral-500" data-asal-rencana>{labelAsalRencana(pi)}</span>
             </li>
           ))}
         </ul>
@@ -519,22 +610,81 @@ export function EMR() {
           <div>
             <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
-              By signing, the doctor verifies the entire contents of this medical record.
+              By signing, the doctor attests review of this record; human review alone does not establish clinical validation of Panacea's underlying capability.
             </p>
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
             <IconCheck size={16} />
-            {draft.signedBy ? 'Re-sign' : `Sign as ${state.settings.doctorName}`}
+            {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>
         </div>
-        {draft.signedAt && (
-          <p className="mt-2 text-xs text-brand-dark">
-            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('en-US')}
+        {draft.signedAt && (statusTinjauRekam(draft) === 'signed' ? (() => {
+          const maturity = clinicalClaimMaturity({ clinicianReviewed: true })
+          return (
+            <div className="mt-2 text-xs text-brand-dark" data-status-tanda-tangan="signed" data-clinical-claim-maturity={maturity}>
+              <p>✓ Server-confirmed signature by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')} · {clinicalClaimLabel(maturity)}</p>
+              <p className="mt-1 text-neutral-500">{clinicalClaimDisclosure(maturity)}</p>
+            </div>
+          )
+        })() : (
+          <p className="mt-2 text-xs text-amber-700" data-status-tanda-tangan="pending">
+            Signature pending — not yet confirmed by the server, so it does not count as signed.
           </p>
-        )}
+        ))}
+        <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
+        {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
     </div>
   )
+}
+
+// Status terstruktur per sistem: klinisi menandai Normal / Finding / Not examined.
+// Tanda ini mengalahkan heuristik teks di EMR, Clinical dan Body Exposure.
+const PILIHAN_STATUS: { v: StatusSistemFisik; label: string; on: string }[] = [
+  { v: 'normal', label: 'Normal', on: 'bg-brand text-white' },
+  { v: 'abnormal', label: 'Finding', on: 'bg-red-600 text-white' },
+  { v: 'not-examined', label: 'Not examined', on: 'bg-neutral-600 text-white' },
+]
+function StatusSistemEditor({ value, findings, onChange }: { value: Record<string, StatusSistemFisik>; findings: SystemFinding[]; onChange: (v: Record<string, StatusSistemFisik>) => void }) {
+  return (
+    <fieldset className="rounded-xl border border-neutral-200 p-3" data-status-sistem-editor>
+      <legend className="px-1 text-xs font-semibold text-neutral-600">Mark each system (overrides reading the free text)</legend>
+      <ul className="divide-y divide-neutral-100">
+        {BODY_SYSTEMS.map((sys) => {
+          const kini = value[sys.key]
+          const heuristik = !kini ? findings.find((f) => f.key === sys.key) : undefined
+          return (
+            <li key={sys.key} className="flex flex-wrap items-center justify-between gap-2 py-1.5" data-sistem={sys.key}>
+              <span className="min-w-[5.5rem] text-sm font-semibold">{sys.label}
+                {heuristik && heuristik.status !== 'unchecked' && <span className="block text-[10px] font-normal text-neutral-500">text suggests: {heuristik.status === 'abnormal' ? 'finding' : heuristik.status}</span>}
+              </span>
+              <span className="flex gap-1" role="group" aria-label={`${sys.label} status`}>
+                {PILIHAN_STATUS.map((o) => (
+                  <button key={o.v} type="button" aria-pressed={kini === o.v}
+                    onClick={() => { const n = { ...value }; if (kini === o.v) delete n[sys.key]; else n[sys.key] = o.v; onChange(n) }}
+                    className={`min-h-9 rounded-lg px-2.5 text-xs font-bold ${kini === o.v ? o.on : 'border border-neutral-200 text-neutral-600'}`}>
+                    {o.label}
+                  </button>
+                ))}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </fieldset>
+  )
+}
+
+/** Suntingan manual menghapus cap/deklarasi kolom itu: server mencap ulang dari penulis. */
+function tanpaDeklarasi(a: EMRRecord['asalIsian'], kunci: string) {
+  if (!a?.[kunci]) return a
+  const { [kunci]: _hapus, ...sisa } = a
+  return sisa
+}
+
+function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' } }) {
+  const l = labelAsalIsian(asal)
+  return <span className={`ml-1.5 text-[10px] font-semibold ${asal?.asal === 'Dokter' ? 'text-brand-dark' : asal ? 'text-amber-700' : 'text-neutral-400'}`} data-asal-isian={asal?.asal ?? 'unknown'}>{l}</span>
 }
 
 function ExamField({
@@ -542,8 +692,11 @@ function ExamField({
   value,
   onChange,
   rows,
+  asal,
 }: {
   label: string
+  /** undefined = kolom kosong (tanpa lencana); null = terisi tanpa cap asal. */
+  asal?: { asal: 'AI' | 'Dokter' } | null
   value: string
   onChange: (v: string) => void
   rows: number
@@ -552,6 +705,7 @@ function ExamField({
     <div>
       <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
         {label}
+        {asal !== undefined && <LencanaAsal asal={asal ?? undefined} />}
       </label>
       <textarea
         value={value}
@@ -767,9 +921,14 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">{sheet.mendalam}</p>
       </details>
 
-      <p className="text-[11px] text-neutral-500">
-        Generated {new Date(sheet.generatedAt).toLocaleString('en-US')} · AI-assisted, clinician-verified.
-      </p>
+      {(() => {
+        const maturity = clinicalClaimMaturity()
+        return (
+          <p className="text-[11px] text-neutral-500" data-clinical-claim-maturity={maturity}>
+            Generated {new Date(sheet.generatedAt).toLocaleString('en-US')} · AI-generated draft · {clinicalClaimDisclosure(maturity)}
+          </p>
+        )
+      })()}
     </div>
   )
 }

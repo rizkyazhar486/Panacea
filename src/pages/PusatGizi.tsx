@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconLeaf } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Gizi — sepuluh halaman yang semuanya menjawab satu pertanyaan yang sama:
@@ -61,12 +62,15 @@ const TABS: TabDef[] = [
 
 export function PusatGizi() {
   return (
-    <HalamanTab
+    <>
+      <BatasKlaimKesehatan permukaan="longevity.pusat-gizi" />
+      <HalamanTab
       judul="Nutrition"
       subjudul="Food, macros, fluids, supplements, caffeine and alcohol on one page"
       ikon={<IconLeaf />}
       tabs={TABS}
     />
+    </>
   )
 }
 

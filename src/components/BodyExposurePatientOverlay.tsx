@@ -1,7 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { buildBodyClinicalFindings } from '../lib/bodyClinicalFindings'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
+import { focusBodyClinicalProjection } from '../lib/bodyClinicalSystemContext'
+import type { BodySystemId } from '../lib/bodySystemSourceWave'
+import { strukturUntukTemuan, type StrukturTemuan } from '../lib/strukturTemuanFisik'
+import { ambilLab } from '../lib/lab'
+import { labLogToBodyExposureSignals, type LabBodyExposureSignal } from '../lib/labLongitudinalBridge'
+import { getVitals } from '../lib/healthVitals'
+import {
+  deviceSnapshotToBodyExposureSignals,
+  type DeviceBodyExposureSignal,
+} from '../lib/healthStoreLongitudinalBridge'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
+import { PERISTIWA_SINKRON } from '../lib/antreanKlinis'
 
 function reviewLabel(state: 'draft' | 'exam-verified' | 'record-signed') {
   if (state === 'record-signed') return 'Signed record'
@@ -9,31 +22,67 @@ function reviewLabel(state: 'draft' | 'exam-verified' | 'record-signed') {
   return 'Draft context'
 }
 
+function hariIniISO() {
+  const d = new Date()
+  const p = (x: number) => String(x).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
 export function BodyExposurePatientOverlay({
+  selectedSystemId,
   onClinicalView,
+  onShowStructure,
 }: {
+  selectedSystemId: BodySystemId
   onClinicalView?: () => void
+  /** Tampilkan struktur rujukan wilayah pemeriksaan di kanvas 3D. */
+  onShowStructure?: (s: StrukturTemuan) => void
 }) {
   const { state, activePatient } = useStore()
+  const [labSignals, setLabSignals] = useState<LabBodyExposureSignal[]>(() =>
+    labLogToBodyExposureSignals(ambilLab(), { nowISO: hariIniISO() }),
+  )
+  const [deviceSignals, setDeviceSignals] = useState<DeviceBodyExposureSignal[]>(() =>
+    deviceSnapshotToBodyExposureSignals(getVitals() as unknown as Record<string, unknown>),
+  )
+
+  useEffect(() => {
+    const muatLab = () => setLabSignals(labLogToBodyExposureSignals(ambilLab(), { nowISO: hariIniISO() }))
+    const muatDevice = () => setDeviceSignals(deviceSnapshotToBodyExposureSignals(getVitals() as unknown as Record<string, unknown>))
+    const muatSemua = () => { muatLab(); muatDevice() }
+    muatSemua()
+    window.addEventListener('panacea:lab', muatLab)
+    window.addEventListener('storage', muatSemua)
+    window.addEventListener(PERISTIWA_SINKRON, muatDevice)
+    return () => {
+      window.removeEventListener('panacea:lab', muatLab)
+      window.removeEventListener('storage', muatSemua)
+      window.removeEventListener(PERISTIWA_SINKRON, muatDevice)
+    }
+  }, [])
+
   const record = state.records[activePatient.id]
   if (!record) return null
 
   const projection = projectEmrToBodyClinicalBridge(
     record,
     state.vitals[activePatient.id] ?? [],
-    buildBodyClinicalFindings(record.physicalExam.perSystem),
+    buildBodyClinicalFindings(record.physicalExam?.perSystem, record.physicalExam),
     record.updatedAt,
   )
+  const focus = focusBodyClinicalProjection(projection, selectedSystemId)
 
   return (
     <section
       aria-label="AI-EMR patient context overlay"
       data-pmd-patient-overlay="true"
+      data-pmd-system-focus={focus.systemId}
       className="mb-2 overflow-hidden rounded-[20px] border border-emerald-300/15 bg-black/60 text-white backdrop-blur-2xl"
     >
+      <BatasKlaimKesehatan permukaan="body.patient-overlay" className="mt-2 text-[11px] leading-snug text-white/55" />
       <div className="flex min-h-[52px] items-center gap-4 overflow-x-auto px-3 no-scrollbar sm:px-4">
         <div className="min-w-[150px] shrink-0">
-          <div className="truncate text-[9px] font-black uppercase tracking-[.15em] text-emerald-200/70">Patient overlay · AI-EMR</div>
+          <div className="truncate text-[9px] font-black uppercase tracking-[.15em] text-emerald-200/70">Patient overlay · AI-EMR · {focus.label}</div>
           <div className="truncate text-xs font-black text-white/88">{activePatient.name}</div>
         </div>
 
@@ -49,11 +98,66 @@ export function BodyExposurePatientOverlay({
           </div>
         ))}
 
+        {labSignals.length > 0 ? (
+          <>
+            <div className="h-7 w-px shrink-0 bg-white/10" aria-hidden />
+            <div className="min-w-[72px] shrink-0" data-pmd-lab-overlay-label>
+              <div className="text-[8px] font-black uppercase tracking-[.1em] text-cyan-200/55">Lab · transcribed</div>
+              <div className="truncate text-[10px] font-black text-white/55">not atlas anatomy</div>
+            </div>
+            {labSignals.map((signal) => (
+              <div
+                key={signal.id}
+                className="min-w-[82px] shrink-0"
+                data-pmd-lab-overlay-signal={signal.jenisId}
+                data-truth-class={signal.truthClass}
+                data-lab-source={signal.source}
+              >
+                <div className="truncate text-[8px] font-black uppercase tracking-[.1em] text-cyan-200/45">{signal.label}</div>
+                <div className="truncate text-sm font-black text-white/88">
+                  {signal.value}
+                  <span className="ml-1 text-[8px] font-bold text-white/35">{signal.unit}</span>
+                </div>
+                <div className="truncate text-[8px] font-semibold text-white/28">{signal.recordedAt}</div>
+              </div>
+            ))}
+          </>
+        ) : null}
+
+        {deviceSignals.length > 0 ? (
+          <>
+            <div className="h-7 w-px shrink-0 bg-white/10" aria-hidden />
+            <div className="min-w-[72px] shrink-0" data-pmd-device-overlay-label>
+              <div className="text-[8px] font-black uppercase tracking-[.1em] text-amber-200/55">Device · snapshot</div>
+              <div className="truncate text-[10px] font-black text-white/55">not atlas anatomy</div>
+            </div>
+            {deviceSignals.map((signal) => (
+              <div
+                key={signal.id}
+                className="min-w-[82px] shrink-0"
+                data-pmd-device-overlay-signal={signal.jenisId}
+                data-truth-class={signal.truthClass}
+                data-device-source={signal.source}
+              >
+                <div className="truncate text-[8px] font-black uppercase tracking-[.1em] text-amber-200/45">{signal.label}</div>
+                <div className="truncate text-sm font-black text-white/88">
+                  {signal.value}
+                  <span className="ml-1 text-[8px] font-bold text-white/35">{signal.unit}</span>
+                </div>
+              </div>
+            ))}
+          </>
+        ) : null}
+
         <div className="h-7 w-px shrink-0 bg-white/10" aria-hidden />
 
         <div className="min-w-[76px] shrink-0">
-          <div className="text-[8px] font-black uppercase tracking-[.1em] text-white/30">Findings</div>
-          <div className="text-sm font-black text-rose-200/85">{projection.findingCounts.abnormal}</div>
+          <div className="text-[8px] font-black uppercase tracking-[.1em] text-white/30">Focused findings</div>
+          <div className="text-sm font-black text-rose-200/85">{focus.findingCounts.abnormal}</div>
+        </div>
+        <div className="min-w-[88px] shrink-0">
+          <div className="text-[8px] font-black uppercase tracking-[.1em] text-white/30">Exam context</div>
+          <div className="truncate text-[10px] font-black text-white/70">{focus.recordedFindings}/{focus.markers.length}</div>
         </div>
         <div className="min-w-[104px] shrink-0">
           <div className="text-[8px] font-black uppercase tracking-[.1em] text-white/30">Review</div>
@@ -77,12 +181,34 @@ export function BodyExposurePatientOverlay({
         </Link>
       </div>
 
+      {onShowStructure && (() => {
+        const tercatat = focus.markers.filter((m) => m.status !== 'unchecked')
+        if (!tercatat.length) return null
+        return (
+          <div className="flex items-center gap-1.5 overflow-x-auto border-t border-white/[.06] px-3 py-1.5 no-scrollbar sm:px-4" data-temuan-ke-struktur>
+            {tercatat.map((m) => {
+              const s = strukturUntukTemuan(m.key)
+              const warna = m.status === 'abnormal' ? 'border-rose-300/40 text-rose-100' : m.status === 'recorded' ? 'border-amber-300/40 text-amber-100' : 'border-emerald-300/30 text-emerald-100'
+              return s ? (
+                <button key={m.key} type="button" onClick={() => onShowStructure(s)} data-temuan={m.key} data-struktur={s.name}
+                  className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-black ${warna}`}>
+                  {m.label} · {m.status === 'abnormal' ? 'finding' : m.status} · show {s.name}
+                </button>
+              ) : (
+                <span key={m.key} data-temuan={m.key} className="shrink-0 text-[10px] font-bold text-white/40">{m.label} · no exact 3D structure</span>
+              )
+            })}
+            <span className="shrink-0 text-[9px] text-white/35">reference region examined — not the lesion location</span>
+          </div>
+        )
+      })()}
+
       <details className="border-t border-white/[.06] px-3 py-1.5 text-[9px] font-semibold text-white/35 sm:px-4">
         <summary className="cursor-pointer truncate font-black uppercase tracking-[.1em] text-white/35">
-          Patient signals overlay reference anatomy · geometry remains reference-only
+          {focus.label} exam focus · patient-wide vitals · transcribed labs · geometry remains reference-only
         </summary>
         <p className="mt-2 max-w-4xl pb-2 leading-relaxed text-white/45">
-          Recorded vitals and examination findings follow the selected AI-EMR patient into Body Exposure as contextual overlays only. They do not morph atlas geometry into patient-specific anatomy and do not generate diagnosis, severity, prognosis, treatment, lesion location or procedure targets.
+          Recorded examination markers are filtered to the selected Body Exposure system for navigation only. Vitals remain patient-wide and are not re-labeled as organ-specific measurements. Lab values are patient-transcribed from the account-synced lab log — they do not morph atlas geometry into patient-specific anatomy and do not generate diagnosis, severity, prognosis, treatment, lesion location or procedure targets.
         </p>
       </details>
     </section>
