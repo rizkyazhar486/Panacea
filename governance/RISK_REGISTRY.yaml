@@ -239,3 +239,29 @@ risks:
       - PANACEA_PRODUCT_MATURITY_OS.md
       - src/lib/physiology/runtime.ts
       - scripts/uji/physiological-runtime.mts
+
+  - risk_id: risk.dependency_supply_chain
+    category: security
+    severity: medium
+    state: mitigated_in_part
+    description: >-
+      Third-party production dependencies accumulate published advisories between reviews. The first audit
+      (2026-10-02) found 7 vulnerable packages in the server tree (2 high: axios, ip-address) and 2 moderate in the
+      web tree, with nothing in CI that would have detected them.
+    mitigation: >-
+      2026-10-02: lockfile-only patches cleared the server high advisories (axios 1.20.0, ip-address 10.7.3, plus
+      body-parser/qs/express) and the react-router-dom open-redirect XSS advisory (6.30.6). A fail-closed gate
+      (scripts/qa/dependency-audit-gate.mjs, governance/dependency-audit-policy.json,
+      .github/workflows/dependency-audit.yml) now fails on any high/critical advisory without an explicit,
+      expiring, reasoned acceptance; it runs weekly and on every lockfile or policy change, and treats empty or
+      malformed audit output as a failure. Residual and accepted for now, both moderate: gaxios -> uuid (only uuid
+      v3/v5/v6 with a caller-supplied buffer is affected and gaxios uses v4; the fix needs a google-auth-library
+      9 -> 10 major bump) and react-router < 7.18 (open redirect via backslash in Link/useNavigate and the SSR-only
+      deserializeErrors; the app is a client-only HashRouter SPA and the fix needs the v7 migration). Moderate
+      advisories are reported as warnings, not failures; revisit when either major upgrade is scheduled.
+    evidence:
+      - scripts/qa/dependency-audit-gate.mjs
+      - scripts/qa/dependency-audit-gate.test.mjs
+      - scripts/qa/fixtures/dependency-audit/server-before-2210.json
+      - governance/dependency-audit-policy.json
+      - .github/workflows/dependency-audit.yml
