@@ -65,8 +65,8 @@ await browser.close()
 if (process.env.UI_LEGIBILITY_UPDATE === '1') {
   const next = JSON.parse(readFileSync(baselinePath, 'utf8'))
   for (const [r, m] of Object.entries(measured)) {
-    if (m.words > next.routes[r].words || m.smallWords > next.routes[r].smallWords) throw new Error(`refusing to raise baseline for "${r}"`)
-    next.routes[r] = m
+    // Nilai tak pernah naik: ambil yang lebih rendah per kolom (selisih kecil karena banner harian bukan regresi).
+    next.routes[r] = { words: Math.min(next.routes[r].words, m.words), smallWords: Math.min(next.routes[r].smallWords, m.smallWords) }
   }
   writeFileSync(baselinePath, JSON.stringify(next, null, 2) + '\n')
 }

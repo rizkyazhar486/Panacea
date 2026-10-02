@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Fold } from '../shared/ui/Fold'
 import { Prosa } from '../components/Prosa'
 import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
@@ -250,6 +251,18 @@ export function BodyComposition() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
+      {/* Score + bento header */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="!p-4 liquid-glass">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
+          <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
+          <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
+          <BatasKlaimKesehatan permukaan="longevity.body-composition" />
+        </Card>
+        <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
+      </div>
+
+      <Fold label="Measurements">
       {/* Inputs */}
       <Card className="!p-5">
         <SectionTitle
@@ -279,19 +292,10 @@ export function BodyComposition() {
         </div>
       </Card>
 
-      {/* Score + bento header */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="!p-4 liquid-glass">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
-          <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
-          <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
-          <BatasKlaimKesehatan permukaan="longevity.body-composition" />
-        </Card>
-        <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
-      </div>
-
       <ScaleMeasurements />
+      </Fold>
 
+      <Fold label="Analysis">
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
@@ -310,7 +314,9 @@ export function BodyComposition() {
           Body fat is calculated using the US Navy method from body circumference measurements when InBody data is not provided.
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Screening">
       {/* Lab & Pemeriksaan Lanjutan */}
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Bone mineral density (DEXA) — fill this in if you have a scan result" />
@@ -330,7 +336,9 @@ export function BodyComposition() {
         )}
         {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-500">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
       </Card>
+      </Fold>
 
+      <Fold label="Markers">
       {/* Longevity indicator bento */}
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Daily Markers" subtitle="The direction of change in yourself, not absolute numbers" />
@@ -390,6 +398,7 @@ export function BodyComposition() {
           </div>
         </div>
       </Card>
+      </Fold>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-3 text-center text-[10px] text-neutral-500">
         <IconMoon size={12} className="mr-1 inline" /> Estimates based on validated formulas (US Navy, Mifflin-St Jeor, Cooper) —

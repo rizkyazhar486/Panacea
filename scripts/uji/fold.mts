@@ -77,6 +77,11 @@ assert.match(learn, /<MedicalLibraryWorkbench onRun=\{runEvidenceQuery\} \/>/, '
 const bench = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
 for (const w of ['Guide', 'Appraisal']) assert.match(bench, new RegExp(`<Fold label="${w}">`), `the library workbench folds ${w}`)
 assert.doesNotMatch(bench, /<Fold label="[A-Za-z]+">\s*<div className="mt-3 rounded-\[22px\] bg-neutral-950/, 'the generated query and its search/save actions are never folded')
+// Health > Body: satu hero (skor + tipe tubuh) lalu empat lipatan satu kata; formulir pengukuran dilipat.
+const comp = readFileSync('src/pages/BodyComposition.tsx', 'utf8')
+for (const w of ['Measurements', 'Analysis', 'Screening', 'Markers']) assert.match(comp, new RegExp(`<Fold label="${w}">`), `Body folds ${w}`)
+assert.ok(comp.indexOf('Composition Score') < comp.indexOf('<Fold label="Measurements">'), 'the score hero comes before every fold')
+assert.doesNotMatch(comp, /<Fold label="[A-Za-z]+">\s*\{\/\* Score \+ bento header/, 'the score hero is never folded')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
