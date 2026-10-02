@@ -290,3 +290,18 @@ never modified.
 - Re-bake: `node scripts/bake/bake-anatomy-ao.mjs --baked-on YYYY-MM-DD` (about 12 minutes single-threaded;
   muscular alone is ~1.2M vertices). Output is only used in anatomy mode; CT/MRI/X-ray materials ignore it.
 - Limits: per-vertex AO is as fine as the mesh; it is not a normal map and does not add surface detail.
+
+## Asset manifest and audit (geometry, scale, budget, honest provenance)
+
+`node scripts/bake/audit-anatomy-assets.mjs --write` writes `data/anatomy-assets/manifest.json`: for every shipped layer GLB it
+records size, SHA-256, mesh/vertex/triangle/material counts, glTF extensions and world bounds in metres, plus a deliberately
+conservative provenance statement (`accuracyStatus: source-backed-unreviewed`, `validated: false`, `revisionPinned: false`,
+`educationalOnly: true`, and the upstream asset-level licence exceptions from `data/source-registry/anatomy/z-anatomy.json`).
+It is deterministic (no clock, no randomness) and is the repository-side counterpart of a Blender scene audit.
+
+The gate `scripts/uji/anatomy-asset-manifest.mts` recomputes the audit and fails when a GLB changes without a refreshed manifest, when
+scale stops being plausible adult metres, when any layer is claimed validated/reviewed without evidence, or when `CREDITS.txt`
+starts pinning a revision (the manifest must then be updated).
+
+Measured budget on 2026-10-02 (all layers enabled would be 9.94M triangles, 32.2 MB): surface 0.14M, skeletal 0.70M, muscular 2.00M,
+cardiovascular 3.84M (12 MB), nervous 2.41M, visceral 0.71M, lymphoid 0.13M. Runtime FPS on devices is **not** measured here.
