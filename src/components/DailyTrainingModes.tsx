@@ -10,7 +10,7 @@ import {
   type DailyTrainingReminderSettings,
   type TrainingLevel,
   type TrainingMode,
-} from '../lib/dailyTrainingModes'
+} from '../lib/training/dailyTrainingModes'
 import { Card, SectionTitle } from './ui'
 import { IconActivity, IconTimer } from './icons'
 
@@ -56,13 +56,13 @@ function fmt(sec: number) {
 }
 
 function completionKey(mode: TrainingMode, level: TrainingLevel) {
-  return `${dateKey()}::${mode}::${level}`
+  return `${dateKey(new Date())}::${mode}::${level}`
 }
 
 export function DailyTrainingModes() {
   const [mode, setMode] = useState<TrainingMode>(loadMode)
   const [level, setLevel] = useState<TrainingLevel>(loadLevel)
-  const session = useMemo(() => getDailyTrainingSession(mode, level), [mode, level])
+  const session = useMemo(() => getDailyTrainingSession(mode, level, new Date()), [mode, level])
   const [completed, setCompleted] = useState<Record<string, boolean>>(() => safeJson<Record<string, boolean>>(DAILY_TRAINING_COMPLETION_KEY, {}))
   const [stationDone, setStationDone] = useState<Record<string, boolean>>({})
   const [rounds, setRounds] = useState(0)

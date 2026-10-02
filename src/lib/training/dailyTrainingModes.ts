@@ -224,12 +224,12 @@ function dayIndex(date: Date): number {
   return Math.floor(diff / 86_400_000)
 }
 
-export function getDailyTrainingSession(mode: TrainingMode, level: TrainingLevel, date = new Date()): DailyTrainingSession {
+export function getDailyTrainingSession(mode: TrainingMode, level: TrainingLevel, date: Date): DailyTrainingSession {
   const sessions = LIBRARY[mode][level]
   return sessions[Math.abs(dayIndex(date)) % sessions.length]
 }
 
-export function dateKey(date = new Date()): string {
+export function dateKey(date: Date): string {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const d = String(date.getDate()).padStart(2, '0')
@@ -240,7 +240,7 @@ export function isValidReminderTime(value: string): boolean {
   return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value)
 }
 
-export function reminderDue(settings: DailyTrainingReminderSettings, now = new Date()): boolean {
+export function reminderDue(settings: DailyTrainingReminderSettings, now: Date): boolean {
   if (!settings.enabled || !isValidReminderTime(settings.time)) return false
   const today = dateKey(now)
   if (settings.lastDeliveredDate === today) return false

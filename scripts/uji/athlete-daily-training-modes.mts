@@ -4,7 +4,7 @@ import path from 'node:path'
 
 const root = process.cwd()
 const component = fs.readFileSync(path.join(root, 'src/components/DailyTrainingModes.tsx'), 'utf8')
-const library = fs.readFileSync(path.join(root, 'src/lib/dailyTrainingModes.ts'), 'utf8')
+const library = fs.readFileSync(path.join(root, 'src/lib/training/dailyTrainingModes.ts'), 'utf8')
 const organizer = fs.readFileSync(path.join(root, 'src/pages/OrganizerLatihan.tsx'), 'utf8')
 
 for (const mode of ['calisthenics', 'gymnastics', 'amrap', 'hyrox']) {
