@@ -35,22 +35,25 @@ jobs:
             exit 1
           fi
           endpoint="${base%/}/api/genomics/compute/capabilities"
-          echo "Waiting for live Render endpoint: $endpoint"
+          health_endpoint="${base%/}/api/health"
+          echo "Waiting for live Render endpoint: $endpoint (build provenance: $health_endpoint)"
 
           ok=''
           for attempt in $(seq 1 45); do
             code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
-            if [ "$code" = '200' ]; then
+            health_code=$(curl -sS --max-time 30 -o /tmp/health.json -w '%{http_code}' "$health_endpoint" || true)
+            if [ "$code" = '200' ] && [ "$health_code" = '200' ]; then
               if EXPECTED_SHA="$EXPECTED_SHA" node - <<'NODE'
           const fs = require('node:fs')
           const body = JSON.parse(fs.readFileSync('/tmp/capabilities.json', 'utf8'))
+          const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'))
           const expected = process.env.EXPECTED_SHA || ''
           if (body.backend !== 'render-control-plane') process.exit(2)
           for (const kind of ['ont-basecalling', 'pharmcat', 'sv-calling']) {
             if (!body.jobKinds?.includes(kind)) process.exit(3)
           }
-          const revision = body.runtime?.revision || ''
-          if (revision && expected && revision !== expected) process.exit(4)
+          // Capability sukses saja tidak membuktikan deploy terbaru: commit build harus persis sama.
+          if (!expected || health.build?.commit !== expected) process.exit(4)
           console.log(JSON.stringify({
             backend: body.backend,
             configured: body.configured,
@@ -69,8 +72,8 @@ jobs:
           done
 
           if [ "$ok" != 'yes' ]; then
-            echo 'Live Render genomics capability check did not converge.' >&2
-            cat /tmp/capabilities.json 2>/dev/null || true
+            echo 'Live Render genomics capability + build provenance check did not converge.' >&2
+            cat /tmp/capabilities.json /tmp/health.json 2>/dev/null || true
             exit 1
           fi
 
