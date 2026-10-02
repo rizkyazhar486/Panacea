@@ -1,9 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { deriveAffectDecision } from '../../src/lib/affectEngine.ts'
+import { deriveAffectDecision, summarizeAffectEvents } from '../../src/domains/affect/engine/affectEngine.ts'
 
-const engineSource = readFileSync(new URL('../../src/lib/affectEngine.ts', import.meta.url), 'utf8')
+const engineSource = readFileSync(new URL('../../src/domains/affect/engine/affectEngine.ts', import.meta.url), 'utf8')
 const affectSurface = readFileSync(new URL('../../src/components/ForYouAffectArc.tsx', import.meta.url), 'utf8')
 const feedSource = readFileSync(new URL('../../src/components/ForYouOmniFeed.tsx', import.meta.url), 'utf8')
 
@@ -114,4 +114,55 @@ test('real social interactions feed the affect engine instead of synthetic rewar
   assert.match(feedSource, /recordAffectEvent\('mode_switch'/)
   assert.match(feedSource, /recordAffectEvent\('achievement_view'/)
   assert.match(feedSource, /<ForYouAffectArc/)
+})
+
+// ── summarizeAffectEvents: murni, jam dan awal sesi disuplai pemanggil ──────────
+const T0 = Date.parse('2026-10-02T10:00:00Z')
+const at = (menit) => new Date(T0 + menit * 60_000).toISOString()
+const ev = (type, menit) => ({ type, at: at(menit) })
+
+test('positif: peristiwa 5 menit terakhir dihitung sebagai putaran cepat', () => {
+  const r = summarizeAffectEvents([ev('feed_reveal', 8), ev('social_reaction', 9), ev('mode_switch', 9)], T0, T0 + 10 * 60_000)
+  assert.deepEqual({ reveals: r.reveals, reactions: r.reactions, rapidLoops: r.rapidLoops }, { reveals: 2, reactions: 1, rapidLoops: 3 })
+  assert.equal(r.sessionMinutes, 10)
+  assert.equal(r.gratitudeCompleted, false)
+})
+test('positif: gratitude di mana pun dalam sesi menandai selesai', () => {
+  assert.equal(summarizeAffectEvents([ev('gratitude', 1)], T0, T0 + 30 * 60_000).gratitudeCompleted, true)
+})
+test('batas: peristiwa tepat di tepi jendela 5 menit ikut dihitung, 1 ms sebelumnya tidak', () => {
+  const sekarang = T0 + 10 * 60_000
+  const tepi = { type: 'feed_reveal', at: new Date(sekarang - 5 * 60_000).toISOString() }
+  const lewat = { type: 'feed_reveal', at: new Date(sekarang - 5 * 60_000 - 1).toISOString() }
+  assert.equal(summarizeAffectEvents([tepi], T0, sekarang).reveals, 1)
+  assert.equal(summarizeAffectEvents([lewat], T0, sekarang).reveals, 0)
+})
+test('negatif: peristiwa sebelum sesi dimulai diabaikan sepenuhnya', () => {
+  const r = summarizeAffectEvents([ev('gratitude', -5), ev('feed_reveal', -1)], T0, T0 + 2 * 60_000)
+  assert.deepEqual({ reveals: r.reveals, gratitude: r.gratitudeCompleted }, { reveals: 0, gratitude: false })
+})
+test('negatif: awal sesi di masa depan tidak menghasilkan menit negatif', () => {
+  assert.equal(summarizeAffectEvents([], T0 + 60_000, T0).sessionMinutes, 0)
+})
+test('negatif: tanpa peristiwa semua hitungan nol', () => {
+  const r = summarizeAffectEvents([], T0, T0 + 60_000)
+  assert.deepEqual({ a: r.rapidLoops, b: r.reactions, c: r.reveals }, { a: 0, b: 0, c: 0 })
+})
+test('pasangan: peristiwa sama, hanya beda tipe -> social_reaction vs feed_reveal', () => {
+  assert.deepEqual(
+    [summarizeAffectEvents([ev('social_reaction', 9)], T0, T0 + 10 * 60_000).reactions, summarizeAffectEvents([ev('feed_reveal', 9)], T0, T0 + 10 * 60_000).reactions],
+    [1, 0],
+  )
+})
+test('determinisme: dua panggilan identik dan hasil dibekukan', () => {
+  const a = summarizeAffectEvents([ev('feed_reveal', 9)], T0, T0 + 10 * 60_000)
+  assert.deepEqual(a, summarizeAffectEvents([ev('feed_reveal', 9)], T0, T0 + 10 * 60_000))
+  assert.ok(Object.isFrozen(a))
+})
+// engine murni: tidak menyentuh storage, window, jam atau acak
+test('kemurnian: engine tidak memuat window, storage, Date.now, new Date() atau Math.random', () => {
+  const kode = engineSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+  for (const pola of [/\bwindow\b/, /localStorage/, /sessionStorage/, /Date\.now\s*\(/, /new Date\(\s*\)/, /Math\.random\s*\(/]) {
+    assert.doesNotMatch(kode, pola, `engine tidak boleh memuat ${pola}`)
+  }
 })

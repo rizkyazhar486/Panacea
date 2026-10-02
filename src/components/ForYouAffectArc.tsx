@@ -7,7 +7,7 @@ import {
   resetAffectSession,
   summarizeAffectSession,
   type AffectTrigger,
-} from '../lib/affectEngine'
+} from '../domains/affect'
 import { Prosa } from './Prosa'
 
 const GRATITUDE_KEY = 'pmd_gratitude_v1'

@@ -9,7 +9,7 @@ import { ForYouNetworkHub } from './ForYouNetworkHub'
 import { ForYouSocialPulse } from './ForYouSocialPulse'
 import { ForYouAffectArc } from './ForYouAffectArc'
 import { ShareToFeed } from './ShareToFeed'
-import { recordAffectEvent } from '../lib/affectEngine'
+import { recordAffectEvent } from '../domains/affect'
 import { Prosa } from './Prosa'
 
 type FeedMode = 'all' | 'following' | 'fitness' | 'work' | 'people'

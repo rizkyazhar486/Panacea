@@ -93,9 +93,6 @@ export interface AffectSessionSummary {
   gratitudeCompleted: boolean
 }
 
-const EVENT_KEY = 'pmd_affect_events_v1'
-const SESSION_KEY = 'pmd_affect_session_started_v1'
-const MAX_EVENTS = 200
 const MINUTE_MS = 60_000
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0))
@@ -206,52 +203,14 @@ export function deriveAffectDecision(input: AffectInputs): AffectDecision {
   })
 }
 
-function readEvents(): AffectEvent[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(EVENT_KEY) || '[]')
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter((event): event is AffectEvent =>
-      !!event
-      && typeof event.type === 'string'
-      && typeof event.at === 'string'
-      && Number.isFinite(Date.parse(event.at)),
-    ).slice(-MAX_EVENTS)
-  } catch {
-    return []
-  }
-}
-
-function sessionStarted(nowMs: number) {
-  if (typeof window === 'undefined') return nowMs
-  try {
-    const stored = Number(window.sessionStorage.getItem(SESSION_KEY))
-    if (Number.isFinite(stored) && stored > 0 && stored <= nowMs) return stored
-    window.sessionStorage.setItem(SESSION_KEY, String(nowMs))
-  } catch { /* privacy/storage restricted */ }
-  return nowMs
-}
-
-export function recordAffectEvent(type: AffectEventType, value?: number, now = new Date()) {
-  if (typeof window === 'undefined') return
-  const events = readEvents()
-  events.push({
-    type,
-    at: now.toISOString(),
-    value: typeof value === 'number' && Number.isFinite(value) ? value : undefined,
-  })
-  try {
-    window.localStorage.setItem(EVENT_KEY, JSON.stringify(events.slice(-MAX_EVENTS)))
-    window.dispatchEvent(new CustomEvent('panacea-affect-event', { detail: { type } }))
-  } catch { /* best-effort local telemetry only */ }
-}
-
-export function summarizeAffectSession(now = new Date()): AffectSessionSummary {
-  const nowMs = now.getTime()
-  const started = sessionStarted(nowMs)
-  const sessionMinutes = Math.max(0, (nowMs - started) / MINUTE_MS)
+/**
+ * Ringkasan sesi dari daftar peristiwa: MURNI, tanpa penyimpanan dan tanpa jam.
+ * `startedMs` dan `nowMs` disuplai pemanggil (adapter yang memegang jam dan storage).
+ */
+export function summarizeAffectEvents(events: readonly AffectEvent[], startedMs: number, nowMs: number): AffectSessionSummary {
+  const sessionMinutes = Math.max(0, (nowMs - startedMs) / MINUTE_MS)
   const recentWindow = nowMs - 5 * MINUTE_MS
-  const sessionEvents = readEvents().filter((event) => Date.parse(event.at) >= started)
+  const sessionEvents = events.filter((event) => Date.parse(event.at) >= startedMs)
   const recent = sessionEvents.filter((event) => Date.parse(event.at) >= recentWindow)
   const reveals = recent.filter((event) =>
     event.type === 'feed_reveal' || event.type === 'social_reveal' || event.type === 'mode_switch',
@@ -265,12 +224,4 @@ export function summarizeAffectSession(now = new Date()): AffectSessionSummary {
     reveals,
     gratitudeCompleted: sessionEvents.some((event) => event.type === 'gratitude'),
   })
-}
-
-export function resetAffectSession(now = new Date()) {
-  if (typeof window === 'undefined') return
-  try {
-    window.sessionStorage.setItem(SESSION_KEY, String(now.getTime()))
-    window.dispatchEvent(new CustomEvent('panacea-affect-event', { detail: { type: 'return' } }))
-  } catch { /* ignore */ }
 }
