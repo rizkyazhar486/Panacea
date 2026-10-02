@@ -102,6 +102,12 @@ const gizi = readFileSync('src/pages/Nutrition.tsx', 'utf8')
 for (const w of ['Longevity', 'Log', 'Calculators', 'Sources']) assert.match(gizi, new RegExp(`<Fold label="${w}">`), `Nutrition folds ${w}`)
 assert.ok(gizi.indexOf('<PanelAngka angka={angkaHariIni} />') < gizi.indexOf('<Fold label="Longevity">'), "today's numbers come before every fold")
 assert.match(gizi, /openFoldsAround\(el\)/, 'anchor jumps (lompat) open the fold that holds their target')
+// Health > Data: kartu sumber data tetap terlihat; impor, sinkronisasi, metrik dan wawasan dilipat; Simpan tetap melekat.
+const data = readFileSync('src/pages/HealthProfile.tsx', 'utf8')
+for (const w of ['Import', 'Sync', 'Metrics', 'Insights']) assert.match(data, new RegExp(`<Fold label="${w}">`), `Health Data folds ${w}`)
+assert.ok(data.indexOf('title="My Health Data"') < data.indexOf('<Fold label="Import">'), 'the source card comes before every fold')
+assert.ok(data.indexOf('<div className="sticky bottom-4 z-10">') > data.indexOf('<Fold label="Insights">'), 'the Save bar stays outside the folds (always reachable)')
+assert.doesNotMatch(data, /<Fold label="[A-Za-z]+">\s*<div className="sticky bottom-4/, 'the Save bar is never folded')
 // Alur QA harus membuka lipatan lewat tautan, bukan mengubah apa yang diuji.
 for (const f of ['.github/workflows/stabilization-acceptance.yml', '.github/workflows/organ-3d-acceptance.yml']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /#\/body-explorer(?!\?folds=open)\s*$/m, `${f} must open folds for body-explorer smokes`)
