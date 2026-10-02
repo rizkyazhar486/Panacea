@@ -32,13 +32,20 @@ for (const reference of MANDATORY_ANATOMY_REFERENCES) {
   assert.equal(reference.directCopyAllowed, false, `${reference.id} must not become a blanket copy source without verified licensing.`)
 }
 
-const breathAtlasUi = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const breathAtlasEntry = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const breathAtlasUi = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasContent.tsx', import.meta.url), 'utf8')
 for (const reference of MANDATORY_ANATOMY_REFERENCES) {
   assert.ok(
-    breathAtlasUi.includes(reference.url),
+    breathAtlasEntry.includes(reference.url),
     `BreathAtlasLab must retain the mandatory visible reference ${reference.url}`,
   )
+  assert.ok(
+    breathAtlasUi.includes(reference.url),
+    `BreathAtlasContent must retain the mandatory visible reference ${reference.url}`,
+  )
 }
+assert.match(breathAtlasEntry, /RespiratoryFlow3D/)
+assert.match(breathAtlasEntry, /BreathAtlasContent/)
 assert.match(breathAtlasUi, /independently implemented Panacea teaching layer/i)
 assert.match(breathAtlasUi, /does not embed or copy third-party viewer code or assets/i)
 assert.match(breathAtlasUi, /Scientific boundary/i)
@@ -156,4 +163,4 @@ for (const overlay of RESPIRATORY_OVERLAY_POLICIES) {
   assert.equal(overlay.requiresExplicitSourceForQuantification, true)
 }
 
-console.log('Mandatory HD Anatomy + Breath Atlas capability, UI references, provenance, LOD, and physiology boundaries verified.')
+console.log('Mandatory HD Anatomy + Breath Atlas capability, split UI references, provenance, LOD, and physiology boundaries verified.')

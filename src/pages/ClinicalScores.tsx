@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSearch, IconActivity } from '../components/icons'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SKOR KLINIS — dua puluh satu halaman terpisah dijadikan SATU.
@@ -156,8 +157,9 @@ export function ClinicalScores() {
       <SectionTitle
         icon={<IconActivity />}
         title="Clinical Scores"
-        subtitle={`${SKOR.length} validated scores in one place — search by name or by what you need to decide`}
+        subtitle={`${SKOR.length} published scores in one place — search by name or purpose; this list is not a clinically validated Panacea decision.`}
       />
+      <BatasKlaimSkorTerbit />
 
       {aktif ? (
         <>

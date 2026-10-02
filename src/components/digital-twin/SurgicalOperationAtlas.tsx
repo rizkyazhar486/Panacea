@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KepingStrukturRisiko } from './KepingStrukturRisiko'
 import { Body3D, CT_WINDOWS, type MotionState } from '../Body3D'
 import { IconActivity, IconBook, IconHeart, IconShield, IconSparkle, IconTimer } from '../icons'
 import {
@@ -172,7 +173,7 @@ export function SurgicalOperationAtlas() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
+    <section className="dark overflow-hidden rounded-[30px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
@@ -260,7 +261,7 @@ export function SurgicalOperationAtlas() {
 
               <div className="mt-4 rounded-2xl border border-rose-300/15 bg-rose-300/[.05] p-4">
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-rose-200"><IconHeart size={13} /> Structures at risk</div>
-                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <span key={item} className="rounded-full border border-rose-200/12 bg-black/15 px-2.5 py-1.5 text-[9px] font-bold text-white/60">{item}</span>)}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <KepingStrukturRisiko key={item} struktur={item} gaya="rounded-full border border-rose-200/12 bg-black/15 px-2.5 py-1.5 text-[9px] font-bold text-white/60" />)}</div>
               </div>
 
               <div className="mt-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/[.05] p-4">

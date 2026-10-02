@@ -18,6 +18,7 @@ import { mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import { diagnose, type SyncDiagnosis } from '../lib/syncDiagnostics'
 import { generateInsights } from '../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -270,6 +271,7 @@ export function HealthProfile() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
+        <BatasKlaimKesehatan permukaan="wellness.health-profile" />
         <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch syncs directly; Garmin and WHOOP are imported from a file you export and upload; everything else can be filled in by hand. Whatever you enter here flows straight into every fitness and longevity calculator in the app.</Prosa>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>

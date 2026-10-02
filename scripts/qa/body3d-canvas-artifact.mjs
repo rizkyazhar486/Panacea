@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
+import { verifyEyeOptics } from './eye-optics-smoke.mjs'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const outputPath = process.env.BODY3D_QA_CANVAS_ARTIFACT || 'artifacts/body3d-mobile-canvas.png'
@@ -60,7 +61,11 @@ const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
 async function placeCanvasOnscreen(canvas) {
-  await canvas.scrollIntoViewIfNeeded()
+  // Playwright's scrollIntoViewIfNeeded waits for element stability; the live
+  // WebGL canvas can legitimately keep changing while anatomy settles. Use an
+  // immediate DOM scroll instead, then keep the strict viewport/WebGL/pixel
+  // assertions below as the fail-closed proof.
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
   await page.waitForTimeout(250)
   const geometry = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
@@ -219,9 +224,13 @@ try {
   if (png.length < 10_000) throw new Error(`Body3D visual artifact is unexpectedly small: ${png.length} bytes`)
   await writeFile(outputPath, png)
 
+  const eyeOptics = await verifyEyeOptics(page)
+  if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
+
   console.log(JSON.stringify({
     ok: true,
     artifact: outputPath,
+    eyeOptics,
     captureScope: 'onscreen-rendered-webgl-canvas-preserved-in-qa-only-context',
     viewport: { width: 390, height: 844 },
     captureGeometry,

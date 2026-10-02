@@ -175,7 +175,7 @@ export function CellGenomeEvidenceLab({ mode = 'cell-genome' }: Props) {
     <div className="space-y-4">
       <AnatomyFirstCellAtlas />
 
-      <section className="overflow-hidden rounded-[22px] border border-neutral-200 bg-[#080b0e] text-white shadow-[0_18px_52px_rgba(0,0,0,.18)] dark:border-white/10">
+      <section className="dark overflow-hidden rounded-[22px] border border-neutral-200 bg-[#080b0e] text-white shadow-[0_18px_52px_rgba(0,0,0,.18)] dark:border-white/10">
         <header className="border-b border-white/10 bg-[#0c1116] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="max-w-3xl">

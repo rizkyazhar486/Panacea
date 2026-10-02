@@ -60,3 +60,35 @@ export function indukRute(path: string): string | null {
 }
 
 export default indukRute
+
+type LokasiRute = { pathname: string; search: string; hash: string; key?: string; index?: number }
+
+// Ingatan navigasi hanya hidup selama Shell terpasang, bukan penyimpanan pasien.
+// Query dan anchor induk dipertahankan tanpa menebak isi riwayat lintas situs.
+export function buatAlurKembali() {
+  const terakhir = new Map<string, string>()
+  let kini: LokasiRute | null = null
+  let sebelumnya: LokasiRute | null = null
+  const url = (location: LokasiRute) => location.pathname + location.search + location.hash
+  return {
+    catat(location: LokasiRute) {
+      if (kini && kini.key === location.key && kini.index === location.index && url(kini) === url(location)) return
+      sebelumnya = kini
+      kini = { ...location }
+      terakhir.delete(location.pathname)
+      terakhir.set(location.pathname, url(location))
+      if (terakhir.size > 64) terakhir.delete(terakhir.keys().next().value!)
+    },
+    tujuan(adaRiwayatAplikasi: boolean): string | number {
+      if (!kini || kini.pathname === '/') return '/'
+      const induk = indukRute(kini.pathname)
+      if (induk) {
+        // POP dapat mengunjungi induk dari arah sebaliknya; buktikan kedekatan indeks.
+        if (adaRiwayatAplikasi && sebelumnya?.pathname === induk &&
+          Number.isInteger(kini.index) && kini.index! > 0 && sebelumnya.index === kini.index! - 1) return -1
+        return terakhir.get(induk) ?? induk
+      }
+      return adaRiwayatAplikasi ? -1 : '/'
+    },
+  }
+}

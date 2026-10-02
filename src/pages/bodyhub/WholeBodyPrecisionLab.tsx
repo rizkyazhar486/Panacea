@@ -9,6 +9,11 @@ import {
   type GeometryProvenance,
 } from '../../lib/wholeBodyAtlasBlueprint'
 import { calculateExternalLoad } from '../../lib/biomechanicsModel'
+import { findUniqueExactAnatomySourceNode } from '../../lib/anatomyExactSourceSelection'
+import {
+  getEffectiveAnatomySourceNodeSnapshot,
+  publishAnatomySourceSelection,
+} from '../../lib/anatomySourceNodeRegistry'
 import BreathAtlasLab from './BreathAtlasLab'
 import MultisystemScaleNavigator from './MultisystemScaleNavigator'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
@@ -112,6 +117,18 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
     contactTimeS: 0.3,
   }), [])
 
+  function highlightZAnatomy(nodes: string[]) {
+    onHighlight?.(nodes)
+    if (nodes.length !== 1) return
+
+    const exact = findUniqueExactAnatomySourceNode(
+      nodes[0],
+      getEffectiveAnatomySourceNodeSnapshot(),
+    )
+    if (!exact) return
+    publishAnatomySourceSelection(exact.name, exact.file)
+  }
+
   function chooseRegion(key: AtlasRegionKey) {
     setRegionKey(key)
     const picked = WHOLE_BODY_REGIONS.find((item) => item.key === key)
@@ -156,14 +173,14 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
       {mode === 'z-anatomy' && (
         <div className="space-y-3">
           <ZAnatomyAtlasWorkbench
-            onHighlight={onHighlight}
+            onHighlight={highlightZAnatomy}
             onFocusRegion={onFocusRegion}
             onEnableLayer={onEnableLayer}
             onOpenSurgical={onOpenSurgical}
             onOpenBiomechanics={() => setMode('movement')}
           />
-          <ZAnatomySystemExplorer onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
-          <ZAnatomySourceMeshBrowser onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+          <ZAnatomySystemExplorer onHighlight={highlightZAnatomy} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+          <ZAnatomySourceMeshBrowser onHighlight={highlightZAnatomy} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
         </div>
       )}
 

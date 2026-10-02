@@ -6,6 +6,7 @@ import {
   type InnovationDomain,
   type InnovationStatus,
 } from '../lib/recentHealthInnovations'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const DOMAIN_LABELS: Record<InnovationDomain, string> = {
   'personal-experiments': 'Personal experiments',
@@ -46,6 +47,7 @@ export function RecentInnovationLab() {
           title="2020–2026 Innovation Gap Lab"
           subtitle="Eight high-value capabilities prepared as execution contracts — not claims that external clinical services are already connected."
         />
+        <BatasKlaimKesehatan permukaan="care.innovation-lab" />
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           <button
             type="button"

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { ImportedWorkout } from '../lib/workoutImport'
 import { hariRiwayatLatihan } from '../lib/analisisPro'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Penjelasan angka Kebugaran / Kelelahan / Kesegaran.
@@ -68,6 +69,7 @@ export function ArtiKebugaran({
 
   return (
     <div className="mt-2">
+      <BatasKlaimKesehatan permukaan="performance.fitness-meaning" />
       <button
         onClick={() => setBuka((v) => !v)}
         aria-expanded={buka}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KepingStrukturRisiko } from './KepingStrukturRisiko'
 import { HraContextBridge } from './HraContextBridge'
 import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
 import {
@@ -121,7 +122,7 @@ export function SurgicalHraWorkbench() {
             <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
               <div className="text-[8px] font-black uppercase tracking-[.14em] text-neutral-400">Structures at risk · phase</div>
               <div className="mt-2 space-y-1.5">
-                {phase.structuresAtRisk.slice(0, 6).map((item) => <div key={item} className="text-[10px] font-semibold text-neutral-700 dark:text-neutral-300">• {item}</div>)}
+                {phase.structuresAtRisk.slice(0, 6).map((item) => <div key={item} className="text-[10px] font-semibold text-neutral-700 dark:text-neutral-300">• <KepingStrukturRisiko struktur={item} gaya="" /></div>)}
               </div>
             </div>
           </div>

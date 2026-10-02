@@ -1,11 +1,16 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { pasangPelaporGalat } from './lib/laporGalatKlien'
+import { API_BASE } from './lib/api'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
+import './styles/responsive-density-v1.css'
+import './styles/production-readability-v1.css'
 import { applyAppearance } from './lib/theme'
 import { applyLang, getLang, muatKamusKalimat, umumkanBahasa } from './lib/i18n'
 import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
+import { LongitudinalStateProvider } from './lib/useLongitudinalState'
 import { Shell } from './components/Shell'
 import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -31,7 +36,10 @@ const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default:
 // dipasang ke rute mana pun sehingga tidak ada satu pun jalan menuju ke sana.
 const FrontierHealthOS = lazy(() => import('./pages/FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
 const KnowledgeBridge = lazy(() => import('./pages/KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
+const Electrophysiology = lazy(() => import('./pages/Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
+const GenomeLab = lazy(() => import('./pages/GenomeLab').then((m) => ({ default: m.GenomeLab })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
+const VisitOS = lazy(() => import('./pages/VisitOS').then((m) => ({ default: m.VisitOS })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
 const Orders = lazy(() => import('./pages/Orders').then((m) => ({ default: m.Orders })))
@@ -127,6 +135,7 @@ const AturFitur = lazy(() => import('./pages/AturFitur').then((m) => ({ default:
 const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
+const DoctorReviewChecklist = lazy(() => import('./pages/DoctorReviewChecklist').then((m) => ({ default: m.DoctorReviewChecklist })))
 const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) => ({ default: m.LongevityScience })))
 const SelfAssessmentToolkit = lazy(() => import('./pages/SelfAssessmentToolkit').then((m) => ({ default: m.SelfAssessmentToolkit })))
 const BodyToolkit = lazy(() => import('./pages/BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
@@ -171,10 +180,12 @@ function PageLoader() {
   )
 }
 
+pasangPelaporGalat(API_BASE, String(import.meta.env.VITE_APP_VERSION ?? ''))
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
     <StoreProvider>
+    <LongitudinalStateProvider>
       <AppStatus />
       <OfflineBanner />
       <HashRouter>
@@ -195,6 +206,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/architecture" element={<Architecture />} />
               <Route path="/owner" element={<Owner />} />
               <Route path="/clinical" element={<Dashboard />} />
+              <Route path="/doctor-review" element={<DoctorReviewChecklist />} />
               <Route path="/social" element={<Home />} />
               <Route path="/community" element={<Community />} />
               <Route path="/feed" element={<Feed />} />
@@ -376,6 +388,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/radiology" element={<Radiology />} />
               <Route path="/frontier-health" element={<FrontierHealthOS />} />
               <Route path="/knowledge-bridge" element={<KnowledgeBridge />} />
+              <Route path="/electrophysiology" element={<Electrophysiology />} />
+              <Route path="/genome-lab" element={<GenomeLab />} />
               <Route path="/translator" element={<Translator />} />
               {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
                   digabung ke satu halaman. Rute lamanya SENGAJA dipertahankan
@@ -392,6 +406,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sexual-health" element={<SexualHealth />} />
               <Route path="/shape-forming" element={<Navigate to="/latihan?t=bentuk" replace />} />
               <Route path="/consult" element={<Consult />} />
+              <Route path="/visit-os" element={<VisitOS />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/pharmacy" element={<Pharmacy />} />
               <Route path="/orders" element={<Orders />} />
@@ -407,6 +422,7 @@ createRoot(document.getElementById('root')!).render(
           </Suspense>
         </Shell>
       </HashRouter>
+    </LongitudinalStateProvider>
     </StoreProvider>
     </ErrorBoundary>
   </StrictMode>,
@@ -421,6 +437,12 @@ requestAnimationFrame(() => {
   if (!splash) return
   const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashShownAt))
   setTimeout(() => {
+    // pointer-events must drop in the same tick as opacity, not after the
+    // 450ms fade finishes — otherwise this fixed, full-viewport, z-index:9999
+    // layer keeps swallowing every tap/click underneath it (menu, search,
+    // any button anywhere) for the whole fade duration despite being
+    // invisible.
+    splash.style.pointerEvents = 'none'
     splash.style.opacity = '0'
     setTimeout(() => splash.remove(), 450)
   }, wait)

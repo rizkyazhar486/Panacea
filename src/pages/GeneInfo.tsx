@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconStethoscope, IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { api } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -37,7 +38,11 @@ export function GeneInfo() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Gene Info" subtitle="Look up a human gene — function, aliases & genomic location" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Gene Info" subtitle="Public gene reference (MyGene.info) — not genetic counselling or a clinically validated Panacea interpretation" />
+        <BatasKlaimKesehatan permukaan="genomics.gene-info" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Educational lookup of gene symbol, aliases, and location from public databases. Not a clinical genetic test report and not a substitute for a genetics clinician.
+        </p>
         <div className="mt-3 flex gap-2">
           <input className={inputClass} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') search() }} placeholder="Gene symbol or name — e.g. APOE" />
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Search'}</Button>

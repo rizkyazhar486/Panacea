@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconChartUp } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Result Decoder ("Jargon Buster" / "Blood Test Decoder") — paste common
@@ -82,7 +83,11 @@ export function LabDecoder() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Lab Result Decoder" subtitle="Enter your blood test values → read back in plain language. Private, processed on your device." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Lab Result Decoder" subtitle="Plain-language flags against generic adult ranges — not a clinically validated Panacea lab interpretation" />
+        <BatasKlaimKesehatan permukaan="lab.decoder" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Private on this device. Reference ranges vary by lab, age, sex, and clinical context — discuss real results with a clinician. For account-synced labs with provenance, use Your Numbers / lab import instead.
+        </p>
         <div className="mt-3 max-w-[160px]">
           <Field label="Sex (for reference ranges)">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as Sex)}>

@@ -8,6 +8,7 @@ import { StudyStartPanel, type StudyStartSection } from '../components/medstudy/
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
 import '../styles/panacea2026.css'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Section = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
@@ -62,6 +63,7 @@ export function MedStudyHub() {
         <div className="max-w-3xl">
           <div className="text-[9px] font-black uppercase tracking-[.18em] text-amber-300">PanaceaMed learning system</div>
           <h1 className="mt-3 text-3xl font-black tracking-[-.045em] text-white sm:text-5xl">Medical study should search, test, explain and verify.</h1>
+          <BatasKlaimKesehatan permukaan="clinical.med-study" />
           <p className="mt-3 max-w-2xl text-[12px] leading-relaxed text-white/60">The local disease, treatment, OSCE and question libraries remain. A live evidence layer now sits beside them so the page is not only a collection of static cards.</p>
           {motivation && <div className="mt-5 inline-flex max-w-xl rounded-2xl border border-white/10 bg-white/[.05] px-4 py-3 text-[11px] leading-relaxed text-white/65">“{motivation.quote}”</div>}
         </div>

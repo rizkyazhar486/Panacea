@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconMoon } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STOP-BANG — validated obstructive sleep apnea (OSA) risk screening tool
+// STOP-BANG — published obstructive sleep apnea (OSA) risk screening tool
 // (Chung et al., 2008, Anesthesiology 108(5):812-821), one of the most widely
 // used pre-operative and primary-care OSA screens. 8 yes/no items, 1 point
 // each, total 0-8. Standard risk bands: 0-2 low, 3-4 intermediate, 5-8 high.
@@ -26,23 +27,39 @@ function bandFor(score: number): { label: string; tone: 'brand' | 'low' | 'criti
 }
 
 export function SleepApneaScreen() {
-  const demo = getDemo()
+  // Halaman ini sudah sebagian besar jujur: IMT, usia dan lingkar leher
+  // dimulai nol, dan ambangnya `> 0`, jadi nol tidak menghasilkan poin.
+  //
+  // Satu yang tidak: jenis kelamin. `demo.sex === 'M'` dengan getDemo()
+  // SELALU benar, karena DEMO_DEFAULT menjawab 'M' untuk profil kosong. Satu
+  // poin BANG karena itu diberikan diam-diam kepada semua orang -- dan pada
+  // STOP-BANG satu poin memindahkan ambang 3 dan 5.
+  const demo = getDemoTersimpan()
   const [answers, setAnswers] = useState<Record<string, boolean>>({})
-  const [bmi, setBmi] = useState(() => demo.weightKg && demo.heightCm ? +(demo.weightKg / Math.pow(demo.heightCm / 100, 2)).toFixed(1) : 0)
-  const [age, setAge] = useState(demo.age || 0)
+  const [bmi, setBmi] = useState(() => (demo.weightKg && demo.weightKg > 0 && demo.heightCm && demo.heightCm > 0
+    ? +(demo.weightKg / Math.pow(demo.heightCm / 100, 2)).toFixed(1) : 0))
+  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
   const [neckCm, setNeckCm] = useState(0)
-  const [male, setMale] = useState(demo.sex === 'M')
+  const [sex, setSex] = useState<'M' | 'F' | ''>(demo.sex === 'M' || demo.sex === 'F' ? demo.sex : '')
+  const male = sex === 'M'
 
   const stopScore = ITEMS.reduce((s, it) => s + (answers[it.key] ? 1 : 0), 0)
   const bangScore = (bmi > 35 ? 1 : 0) + (age > 50 ? 1 : 0) + (neckCm > 40 ? 1 : 0) + (male ? 1 : 0)
   const total = stopScore + bangScore
-  const band = bandFor(total)
+  const belum: string[] = []
+  if (sex === '') belum.push('sex')
+  if (!(age > 0)) belum.push('age')
+  if (!(bmi > 0)) belum.push('BMI')
+  if (!(neckCm > 0)) belum.push('neck circumference')
+  const lengkap = belum.length === 0
+  const band = lengkap ? bandFor(total) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Validated obstructive sleep apnea risk screen (Chung et al., 2008)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Salah satu alat penapisan apnea tidur obstruktif yang paling luas dipakai menjelang operasi dan di layanan primer. Jawablah tiap butir dengan jujur — ini alat penapisan untuk menimbang perlu tidaknya uji tidur, bukan diagnosis.</Prosa>
+        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Published obstructive sleep apnea risk screen (Chung et al., 2008) — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A widely used obstructive sleep apnea screen before surgery and in primary care. Answer each item honestly — it helps decide whether a sleep study may be worth discussing, not a diagnosis.</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -70,7 +87,8 @@ export function SleepApneaScreen() {
             <input className={inputClass} type="number" value={neckCm || ''} onChange={(e) => setNeckCm(Number(e.target.value) || 0)} placeholder="measure around the neck" />
           </Field>
           <Field label="G — Gender">
-            <select className={inputClass} value={male ? 'M' : 'F'} onChange={(e) => setMale(e.target.value === 'M')}>
+            <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F' | '')}>
+              <option value="">Not answered</option>
               <option value="M">Male</option>
               <option value="F">Female</option>
             </select>
@@ -80,17 +98,28 @@ export function SleepApneaScreen() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{total}/8</span>
-          <div>
-            <Badge tone={band.tone}>{band.label}</Badge>
-            <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
-          </div>
-        </div>
-        <div className="mt-3 flex gap-4 text-[11px] text-neutral-500">
-          <span>STOP: {stopScore}/4</span>
-          <span>BANG: {bangScore}/4</span>
-        </div>
+        {lengkap && band !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{total}/8</span>
+              <div>
+                <Badge tone={band.tone}>{band.label}</Badge>
+                <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
+              </div>
+            </div>
+            <div className="mt-3 flex gap-4 text-[11px] text-neutral-500">
+              <span>STOP: {stopScore}/4</span>
+              <span>BANG: {bangScore}/4</span>
+            </div>
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}The four STOP questions above are already answered — unticked means no, worth zero. Sex is different:
+            it carries a BANG point on its own, and an unanswered profile used to default to male, quietly handing
+            everyone that point.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">

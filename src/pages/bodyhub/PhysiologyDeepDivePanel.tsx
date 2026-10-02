@@ -7,7 +7,7 @@ import {
 } from '../../lib/physiologyDeepDives'
 
 interface Props {
-  onFocus: (topic: PhysiologyDeepDive) => void
+  onFocus?: (topic: PhysiologyDeepDive) => void
 }
 
 type DomainFilter = PhysiologyDomain | 'all'
@@ -93,7 +93,7 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
         </div>
       </div>
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Physiology domains">
+      <div role="group" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Physiology domains">
         {PHYSIOLOGY_DOMAINS.map((item) => (
           <button
             key={item.key}
@@ -112,7 +112,7 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <div className="max-h-[390px] space-y-1 overflow-y-auto pr-1" aria-label="Physiology topics">
+        <div role="group" className="max-h-[390px] space-y-1 overflow-y-auto pr-1" aria-label="Physiology topics">
           {visible.map((topic) => (
             <button
               key={topic.id}
@@ -140,13 +140,15 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
               <h4 className="mt-0.5 text-lg font-black text-ink dark:text-white">{selected.label}</h4>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{selected.summary}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => onFocus(selected)}
-              className="min-h-11 shrink-0 rounded-full border border-brand px-3 text-[10px] font-black text-brand transition hover:bg-brand hover:text-white"
-            >
-              Focus in 3D →
-            </button>
+            {onFocus && (
+              <button
+                type="button"
+                onClick={() => onFocus(selected)}
+                className="min-h-11 shrink-0 rounded-full border border-brand px-3 text-[10px] font-black text-brand transition hover:bg-brand hover:text-white"
+              >
+                Focus in 3D →
+              </button>
+            )}
           </div>
 
           <div className="grid gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(240px,0.85fr)]">

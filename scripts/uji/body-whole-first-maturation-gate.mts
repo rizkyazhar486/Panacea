@@ -4,8 +4,11 @@ import {
   BODY_MATURATION_ORDER,
   REQUIRED_MACRO_REGIONS,
   REQUIRED_WHOLE_BODY_SYSTEMS,
+  auditOrganStage,
   buildBodyMaturationReport,
 } from '../../src/lib/anatomy/bodyMaturationGate.ts'
+import { REQUIRED_MACRO_ORGANS } from '../../src/lib/anatomy/organCoverageGate.ts'
+import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../../src/lib/anatomySourceNodeRegistry.ts'
 
 assert.deepEqual(BODY_MATURATION_ORDER, [
   'whole-body',
@@ -33,7 +36,13 @@ assert.ok(system)
 assert.equal(system.status, 'incomplete')
 assert.equal(system.authoringAllowed, true)
 assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:articular' && blocker.code === 'geometry-not-shipped'))
+assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:reproductive' && blocker.code === 'geometry-not-shipped'))
 assert.ok(system.blockers.some((blocker) => blocker.nodeId === 'system:fascial' && blocker.code === 'geometry-not-shipped'))
+assert.equal(
+  system.blockers.filter((blocker) => blocker.code === 'source-admission-failed').length,
+  0,
+  'shipped system roots must resolve exact same-frame source anchors before deeper maturation work continues',
+)
 
 for (const stage of report.stages.slice(2)) {
   assert.equal(stage.status, 'locked', `${stage.id} must remain locked while whole-body system coverage is incomplete`)
@@ -41,19 +50,119 @@ for (const stage of report.stages.slice(2)) {
   assert.ok(stage.blockers.some((blocker) => blocker.code === 'upstream-incomplete'))
 }
 
-const fabricated = structuredClone(COMPLETE_WHOLE_BODY_ATLAS)
-for (const node of fabricated.nodes) {
-  if (node.id === 'system:articular' || node.id === 'system:fascial') {
-    ;(node as { geometryStatus: string }).geometryStatus = 'shipped'
-  }
+const syntheticSystemReady = structuredClone(COMPLETE_WHOLE_BODY_ATLAS)
+const requiredSystemRootIds = new Set(REQUIRED_WHOLE_BODY_SYSTEMS.map((id) => `system:${id}`))
+for (const node of syntheticSystemReady.nodes) {
+  if (!requiredSystemRootIds.has(node.id)) continue
+  const file = node.source.files?.find((candidate) =>
+    INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT.some((bundle) => bundle.file === candidate),
+  )
+  assert.ok(file, `${node.id} must retain at least one indexed same-frame source bundle`)
+  const exactName = INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT
+    .find((bundle) => bundle.file === file)
+    ?.names[0]
+  assert.ok(exactName, `${file} must retain at least one exact generated source name`)
+  Object.assign(node, {
+    geometryStatus: 'shipped' as const,
+    source: {
+      mode: 'specific-fallback' as const,
+      files: [file],
+      nodeHints: [exactName],
+    },
+  })
 }
-const afterSystems = buildBodyMaturationReport(fabricated)
-assert.equal(afterSystems.activeStage, 'region')
-const region = afterSystems.stages.find((stage) => stage.id === 'region')
-assert.ok(region)
-assert.equal(region.status, 'incomplete')
-assert.ok(region.blockers.some((blocker) => blocker.requirement === 'region:hand' && blocker.code === 'missing-root'))
-assert.ok(region.blockers.some((blocker) => blocker.requirement === 'region:foot' && blocker.code === 'missing-root'))
+
+const afterGenericAdmission = buildBodyMaturationReport(syntheticSystemReady)
+assert.equal(afterGenericAdmission.activeStage, 'system')
+assert.equal(afterGenericAdmission.wholeBodyComplete, false)
+const afterGenericSystem = afterGenericAdmission.stages.find((stage) => stage.id === 'system')
+assert.ok(afterGenericSystem)
+assert.ok(afterGenericSystem.blockers.some((blocker) =>
+  blocker.nodeId === 'system:articular' && blocker.code === 'macro-closure-failed',
+))
+assert.ok(afterGenericSystem.blockers.some((blocker) =>
+  blocker.nodeId === 'system:fascial' && blocker.code === 'macro-closure-failed',
+))
+for (const stage of afterGenericAdmission.stages.slice(2)) {
+  assert.equal(stage.status, 'locked')
+  assert.equal(stage.authoringAllowed, false)
+}
+
+const metadataOnly = structuredClone(syntheticSystemReady)
+const surfaceRoot = metadataOnly.nodes.find((node) => node.id === 'system:surface')
+assert.ok(surfaceRoot)
+Object.assign(surfaceRoot, {
+  geometryStatus: 'shipped' as const,
+  source: {
+    mode: 'composite' as const,
+    files: ['surface.glb'],
+    nodeHints: ['panacea definitely absent source node'],
+  },
+})
+const sourceBlocked = buildBodyMaturationReport(metadataOnly)
+assert.equal(sourceBlocked.activeStage, 'system')
+assert.equal(sourceBlocked.wholeBodyComplete, false)
+const sourceBlockedSystem = sourceBlocked.stages.find((stage) => stage.id === 'system')
+assert.ok(sourceBlockedSystem)
+assert.ok(sourceBlockedSystem.blockers.some((blocker) =>
+  blocker.nodeId === 'system:surface'
+  && blocker.code === 'source-admission-failed'
+  && blocker.requirement === 'source-name-unresolved',
+))
+for (const stage of sourceBlocked.stages.slice(2)) {
+  assert.equal(stage.status, 'locked')
+  assert.equal(stage.authoringAllowed, false)
+}
+
+const syntheticOrganReady = {
+  id: 'synthetic-organ-maturation',
+  revision: 'test',
+  nodes: REQUIRED_MACRO_ORGANS.map((entry) => ({
+    id: entry.acceptedNodeIds[0],
+    label: entry.label,
+    system: entry.system,
+    regions: ['whole-body'],
+    laterality: 'not-applicable',
+    scale: 'organ',
+    source: { mode: 'specific-fallback', nodeHints: [entry.label] },
+    geometryStatus: 'shipped',
+    educationalPriority: 1,
+    provenance: {
+      sourceId: 'test',
+      sourceRevision: 'test',
+      license: 'test',
+      sourceLocator: 'test',
+      reviewStatus: 'academic-review-required',
+      reviewerScope: 'test',
+    },
+  })),
+} as const
+
+assert.deepEqual(auditOrganStage(syntheticOrganReady as never), [])
+
+const firstOrgan = REQUIRED_MACRO_ORGANS[0]
+assert.ok(firstOrgan)
+const syntheticOrganPartial = {
+  ...syntheticOrganReady,
+  nodes: syntheticOrganReady.nodes.map((node, index) =>
+    index === 0 ? { ...node, geometryStatus: 'partial' as const } : node,
+  ),
+}
+const partialOrganBlockers = auditOrganStage(syntheticOrganPartial as never)
+assert.equal(partialOrganBlockers.length, 1)
+assert.equal(partialOrganBlockers[0]?.stage, 'organ')
+assert.equal(partialOrganBlockers[0]?.code, 'organ-coverage-incomplete')
+assert.equal(partialOrganBlockers[0]?.requirement, `${firstOrgan.id}:partial`)
+assert.equal(partialOrganBlockers[0]?.nodeId, firstOrgan.acceptedNodeIds[0])
+
+const syntheticOrganMissing = {
+  ...syntheticOrganReady,
+  nodes: syntheticOrganReady.nodes.slice(1),
+}
+const missingOrganBlockers = auditOrganStage(syntheticOrganMissing as never)
+assert.equal(missingOrganBlockers.length, 1)
+assert.equal(missingOrganBlockers[0]?.requirement, `${firstOrgan.id}:missing`)
+assert.equal(missingOrganBlockers[0]?.nodeId, undefined)
 
 console.log(JSON.stringify({
   activeStage: report.activeStage,
@@ -62,9 +171,15 @@ console.log(JSON.stringify({
     nodeId: blocker.nodeId,
     requirement: blocker.requirement,
   })),
-  nextMacroRegionBlockers: region.blockers.map((blocker) => ({
-    code: blocker.code,
-    nodeId: blocker.nodeId,
-    requirement: blocker.requirement,
-  })),
+  macroClosureGuard: afterGenericSystem.blockers
+    .filter((blocker) => blocker.code === 'macro-closure-failed')
+    .map((blocker) => ({ nodeId: blocker.nodeId, requirement: blocker.requirement })),
+  sourceAdmissionGuard: sourceBlockedSystem.blockers
+    .filter((blocker) => blocker.code === 'source-admission-failed')
+    .map((blocker) => ({ nodeId: blocker.nodeId, requirement: blocker.requirement })),
+  organCoverageGuard: {
+    allShippedBlockers: auditOrganStage(syntheticOrganReady as never).length,
+    partial: partialOrganBlockers.map((blocker) => blocker.requirement),
+    missing: missingOrganBlockers.map((blocker) => blocker.requirement),
+  },
 }, null, 2))

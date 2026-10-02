@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { evaluatePaymentNotification, orderStatus, visibleOrderStatus } from '../src/payments'
+import crypto from 'node:crypto'
+import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
 
 const ownOrder = { userId: 'user-a', status: 'pending' as const }
 const paidOrder = { userId: 'user-a', status: 'paid' as const }
@@ -9,6 +10,17 @@ assert.equal(visibleOrderStatus(ownOrder, 'user-a'), 'pending')
 assert.equal(visibleOrderStatus(paidOrder, 'user-a'), 'paid')
 assert.equal(visibleOrderStatus(foreignOrder, 'user-a'), undefined)
 assert.equal(visibleOrderStatus(undefined, 'user-a'), undefined)
+
+assert.equal(normalizeTopUpPnc(1, 1000), 1)
+assert.equal(normalizeTopUpPnc(12.9, 1000), 12)
+assert.equal(normalizeTopUpPnc('25', 1000), 25)
+assert.equal(normalizeTopUpPnc(0, 1000), undefined)
+assert.equal(normalizeTopUpPnc(-1, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.POSITIVE_INFINITY, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.NaN, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.MAX_SAFE_INTEGER, 1000), undefined)
+assert.equal(normalizeTopUpPnc(100, 0), undefined)
+assert.equal(normalizeTopUpPnc(100, Number.POSITIVE_INFINITY), undefined)
 
 let statusCode = 200
 let responseBody: unknown
@@ -20,6 +32,23 @@ const res = {
 orderStatus({ headers: {}, cookies: {}, params: { orderId: 'PMD-unknown' } } as any, res as any)
 assert.equal(statusCode, 401)
 assert.deepEqual(responseBody, { error: 'unauthorized' })
+
+const serverKey = 'test-midtrans-server-key'
+const signedBody = {
+  order_id: 'PMD-test-1',
+  status_code: '200',
+  gross_amount: '10000.00',
+  signature_key: crypto
+    .createHash('sha512')
+    .update('PMD-test-1' + '200' + '10000.00' + serverKey)
+    .digest('hex'),
+}
+assert.equal(verifyPaymentSignature(signedBody, serverKey), true)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: signedBody.signature_key.toUpperCase() }, serverKey), true)
+assert.equal(verifyPaymentSignature({ ...signedBody, gross_amount: '9999.00' }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: signedBody.signature_key.slice(2) }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: 'z'.repeat(128) }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: '' }, serverKey), false)
 
 const pending = { amountIdr: 10000, status: 'pending' as const }
 const paid = { amountIdr: 10000, status: 'paid' as const }
@@ -125,4 +154,4 @@ assert.deepEqual(
   { action: 'ignore' },
 )
 
-console.log('Payment ownership, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
+console.log('Payment ownership, amount normalization, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')

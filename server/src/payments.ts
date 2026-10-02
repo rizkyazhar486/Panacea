@@ -53,11 +53,30 @@ function channels(method: string): string[] {
   return ['credit_card'] // Visa / Mastercard
 }
 
+/**
+ * Preserve the existing integer-floor behavior for ordinary numeric top-ups,
+ * but fail closed before persistence when coercion produces a non-finite value
+ * or when the PNC/IDR multiplication would leave JavaScript's safe-integer
+ * range. Fixed-price purchases bypass this helper because their IDR amount is
+ * server-owned.
+ */
+export function normalizeTopUpPnc(value: unknown, tokenToIdr: number): number | undefined {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric) || numeric < 1) return undefined
+  const pnc = Math.floor(numeric)
+  if (!Number.isSafeInteger(pnc)) return undefined
+  if (!Number.isFinite(tokenToIdr) || tokenToIdr <= 0) return undefined
+  if (!Number.isSafeInteger(pnc * tokenToIdr)) return undefined
+  return pnc
+}
+
 export async function createPayment(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
   const isFixed = !!purpose && purpose in FIXED_PRICE
-  const pnc = isFixed ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
+  const normalizedPnc = isFixed ? 0 : normalizeTopUpPnc(amountPnc, config.tokenToIdr)
+  if (normalizedPnc === undefined) return res.status(400).json({ error: 'invalid_amount' })
+  const pnc = normalizedPnc
   const baseIdr = isFixed ? FIXED_PRICE[purpose!] : pnc * config.tokenToIdr
   // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
   const early = isEarlyAdopter(user.id)
@@ -158,17 +177,30 @@ export function evaluatePaymentNotification(
   return { action: 'ignore' }
 }
 
+/**
+ * Verify Midtrans' documented SHA-512 notification signature without a
+ * data-dependent string comparison. Invalid/malformed signatures fail closed
+ * before timingSafeEqual, which requires equal-length buffers.
+ */
+export function verifyPaymentSignature(body: Record<string, string>, serverKey: string): boolean {
+  const provided = String(body.signature_key ?? '').trim()
+  if (!/^[0-9a-f]{128}$/i.test(provided)) return false
+
+  const expected = crypto
+    .createHash('sha512')
+    .update(String(body.order_id ?? '') + String(body.status_code ?? '') + String(body.gross_amount ?? '') + serverKey)
+    .digest()
+  const received = Buffer.from(provided, 'hex')
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected)
+}
+
 // Real Midtrans webhook (HTTP notification). Verifies signature and only then
 // applies a state transition that is safe for the matching local order.
 export function paymentWebhook(req: Request, res: Response) {
   const body = req.body as Record<string, string>
-  const { order_id, status_code, gross_amount, signature_key } = body
+  const { order_id } = body
   if (!order_id) return res.status(400).json({ error: 'bad_request' })
-  const expected = crypto
-    .createHash('sha512')
-    .update(order_id + status_code + gross_amount + config.midtrans.serverKey)
-    .digest('hex')
-  if (signature_key !== expected) return res.status(403).json({ error: 'bad_signature' })
+  if (!verifyPaymentSignature(body, config.midtrans.serverKey)) return res.status(403).json({ error: 'bad_signature' })
 
   const order = getOrder(order_id)
   if (!order) return res.status(404).json({ error: 'order_not_found' })

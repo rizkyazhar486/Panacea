@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
+import '../shared/ui/infoLabel.css'
 import { rupaRute } from '../lib/warnaRute'
 import { Prosa } from './Prosa'
 import '../styles/readability.css'
@@ -14,7 +15,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`kaca relative overflow-hidden rounded-[28px] border border-white/75 bg-white/90 shadow-[0_18px_55px_rgba(15,35,45,.075)] ring-1 ring-black/[.035] backdrop-blur-2xl dark:border-white/12 dark:bg-[#111315]/95 dark:shadow-[0_22px_70px_rgba(0,0,0,.26)] dark:ring-white/[.035] ${pad ? 'p-5 sm:p-6' : ''} ${className}`}
+      className={`kaca relative overflow-hidden rounded-[22px] border border-white/70 bg-white/92 shadow-[0_10px_30px_rgba(15,35,45,.06)] ring-1 ring-black/[.025] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d1012]/96 dark:shadow-[0_14px_40px_rgba(0,0,0,.22)] dark:ring-white/[.025] ${pad ? 'p-4 sm:p-5' : ''} ${className}`}
     >
       {children}
     </div>
@@ -25,49 +26,27 @@ function BodyExplorerStartHere() {
   return (
     <details
       data-testid="body-explorer-start-here"
-      className="mt-3 overflow-hidden rounded-2xl border border-brand/20 bg-brand/[.045] shadow-[0_8px_28px_rgba(15,100,70,.06)] dark:border-brand/25 dark:bg-brand/[.08]"
+      className="mt-2 overflow-hidden rounded-[16px] border border-brand/18 bg-brand/[.035] dark:border-brand/20 dark:bg-brand/[.055]"
     >
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-ink marker:hidden dark:text-white">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2 text-ink marker:hidden dark:text-white">
         <span className="min-w-0">
-          <span className="block text-sm font-black">Start here · 60-second guide</span>
-          <span className="block truncate text-[10.5px] font-semibold text-neutral-500 dark:text-neutral-400">
-            Tap structure · drag to rotate · pinch/scroll to zoom
-          </span>
+          <span className="block text-xs font-black">How to use</span>
+          <span className="block truncate text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">Tap · rotate · zoom · inspect</span>
         </span>
-        <span aria-hidden className="shrink-0 rounded-full border border-brand/25 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand">
-          Help
-        </span>
+        <span aria-hidden className="shrink-0 text-[10px] font-black text-brand">＋</span>
       </summary>
-      <div className="border-t border-brand/15 px-4 py-3">
-        <ol className="grid gap-2 sm:grid-cols-3">
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">1 · Explore</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Tap a structure on the 3D body, or start with <strong>Organs</strong>, <strong>Muscles</strong>, or <strong>Find structure</strong>.
-            </p>
+      <ol className="grid border-t border-brand/12 sm:grid-cols-3">
+        {[
+          ['1', 'Select', 'Tap a body structure or use Find.'],
+          ['2', 'Inspect', 'Rotate and zoom while keeping Anatomy as the anchor.'],
+          ['3', 'Deepen', 'Open physiology, imaging, disease or molecular detail only when needed.'],
+        ].map(([step, title, copy]) => (
+          <li key={step} className="min-w-0 border-b border-brand/10 px-3.5 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+            <div className="text-[9px] font-black uppercase tracking-[.12em] text-brand">{step} · {title}</div>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">{copy}</p>
           </li>
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">2 · Inspect</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Keep <strong>Anatomy</strong> as the default view. Switch to CT, MRI, or another view only when you need that perspective.
-            </p>
-          </li>
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">3 · Go deeper</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Open <strong>Physiology</strong>, <strong>Drugs</strong>, <strong>Diseases</strong>, or advanced labs after you have selected what you want to study.
-            </p>
-          </li>
-        </ol>
-        <div className="mt-2 flex flex-wrap gap-1.5 text-[10.5px] font-bold text-neutral-500 dark:text-neutral-300">
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Explore: Layers · Muscles · Organs · Find</span>
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Learn: Physiology · Drugs · Diseases · Study</span>
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Advanced: Cardio · Specialty · Molecular · Genomics · Cell · Surgical</span>
-        </div>
-        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-          You do not need to use every tab. The same 3D body stays your anchor while the tools around it change.
-        </p>
-      </div>
+        ))}
+      </ol>
     </details>
   )
 }
@@ -76,35 +55,57 @@ export function SectionTitle({
   icon,
   title,
   subtitle,
+  info,
   right,
 }: {
   icon?: ReactNode
   title: string
   subtitle?: string
+  /** Penjelasan paragraf di balik tombol i; menggantikan subtitle di permukaan utama. */
+  info?: string
   right?: ReactNode
 }) {
   const w = rupaRute()
+  const [infoOpen, setInfoOpen] = useState(false)
+  const infoId = useId()
   const showBodyExplorerGuide = title === 'Body Explorer'
   return (
-    <div className="mb-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3.5">
+    <div className="mb-4">
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
           {icon && (
-            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-[inset_0_1px_rgba(255,255,255,.7),0_8px_24px_rgba(20,40,50,.08)] ${w.bg} ${w.teks}`}>
+            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-[14px] shadow-[inset_0_1px_rgba(255,255,255,.55),0_6px_18px_rgba(20,40,50,.06)] ${w.bg} ${w.teks}`}>
               {icon}
             </span>
           )}
           <div className="min-w-0 pt-0.5">
-            <h2 className="flex items-start gap-2.5 text-[clamp(1.2rem,2.3vw,1.65rem)] font-black leading-[1.08] tracking-[-.025em] text-ink dark:text-white">
-              <span aria-hidden className={`mt-1 h-5 w-1.5 shrink-0 rounded-full ${w.garis}`} />
+            <h2 className="flex items-start gap-2 text-[clamp(1.08rem,2.1vw,1.48rem)] font-black leading-[1.1] tracking-[-.022em] text-ink dark:text-white">
+              <span aria-hidden className={`mt-1 h-4 w-1 shrink-0 rounded-full ${w.garis}`} />
               <span>{title}</span>
             </h2>
-            {subtitle && (
-              <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            {info && infoOpen && (
+              <Prosa kelas="mt-3 max-w-3xl text-[14px] leading-[1.7] text-neutral-600 dark:text-neutral-300">
+                <span id={infoId}>{info}</span>
+              </Prosa>
+            )}
+            {!info && subtitle && (
+              <Prosa kelas="mt-1 max-w-3xl text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                 {subtitle}
               </Prosa>
             )}
           </div>
+          {info && (
+          <button
+            type="button"
+            className="info-label__button ml-auto"
+            aria-expanded={infoOpen}
+            aria-controls={infoOpen ? infoId : undefined}
+            aria-label={`${infoOpen ? 'Hide' : 'Show'} details: ${title}`}
+            onClick={() => setInfoOpen((v) => !v)}
+          >
+            <span aria-hidden="true">i</span>
+          </button>
+        )}
         </div>
         {right && <div className="no-scrollbar flex max-w-full shrink-0 items-center gap-2 overflow-x-auto sm:justify-end">{right}</div>}
       </div>
@@ -162,7 +163,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`liquid-glass-btn liquid-glass-btn--${variant} inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-black tracking-[-.01em] shadow-sm transition duration-200 hover:-translate-y-0.5 active:scale-[.98] active:translate-y-0 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${textColor[variant]} ${className}`}
+      className={`liquid-glass-btn liquid-glass-btn--${variant} inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 text-[13px] font-black tracking-[-.01em] shadow-sm transition duration-200 hover:-translate-y-0.5 active:scale-[.98] active:translate-y-0 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${textColor[variant]} ${className}`}
     >
       {children}
     </button>
@@ -208,4 +209,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full min-h-[46px] rounded-2xl border border-black/[.10] bg-white/95 px-3.5 py-2.5 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.8),0_6px_20px_rgba(20,40,50,.035)] outline-none backdrop-blur-xl transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#111315]/95 dark:text-white dark:placeholder:text-neutral-500'
+  'w-full min-h-[44px] rounded-[14px] border border-black/[.10] bg-white/95 px-3.5 py-2 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.7),0_4px_14px_rgba(20,40,50,.03)] outline-none backdrop-blur-lg transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#101214]/96 dark:text-white dark:placeholder:text-neutral-500'

@@ -1,0 +1,13 @@
+/* Ruang lega: jarak vertikal besar, satu baris fokus, panel tidak menggeser tombol. */
+.info-label { padding: 20px 0; }
+.info-label__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.info-label__word { font-size: 1.125rem; font-weight: 500; letter-spacing: 0.01em; }
+.info-label__button {
+  width: 44px; height: 44px; flex: none; border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,.16); background: transparent; color: inherit;
+  font: italic 600 1rem/1 Georgia, 'Times New Roman', serif; cursor: pointer;
+}
+.info-label__button:focus-visible { outline: 3px solid rgba(59,130,246,.5); outline-offset: 2px; }
+.info-label__panel { margin-top: 12px; max-width: 34rem; font-size: .9375rem; line-height: 1.7; opacity: .78; }
+@media (prefers-reduced-motion: no-preference) { .info-label__panel:not([hidden]) { animation: info-label-in .18s ease-out; } }
+@keyframes info-label-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: .78; transform: none; } }

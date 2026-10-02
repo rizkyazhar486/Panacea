@@ -1,4 +1,11 @@
 import type { AtlasManifest, AtlasNode, AtlasSystemId } from './atlasKernel'
+import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../anatomySourceNodeRegistry'
+import { buildSystemMaturityAdmissionReport } from './systemMaturityAdmission'
+import { buildOrganCoverageReport } from './organCoverageGate'
+import {
+  evaluateMacroDomainClosure,
+  type MacroTargetPublicationRecord,
+} from './macroSystemClosureGate'
 
 export const BODY_MATURATION_ORDER = [
   'whole-body',
@@ -51,6 +58,9 @@ export type BodyMaturationBlockerCode =
   | 'duplicate-root'
   | 'wrong-scale'
   | 'geometry-not-shipped'
+  | 'source-admission-failed'
+  | 'macro-closure-failed'
+  | 'organ-coverage-incomplete'
   | 'schema-not-authoritative'
   | 'upstream-incomplete'
 
@@ -76,12 +86,30 @@ export interface BodyMaturationReport {
   mayAdvancePastActiveStage: false
 }
 
+export interface BodyMaturationEvidence {
+  /**
+   * Asset-level publication records are optional input and fail closed when absent.
+   * Supplying records does not itself establish truth: macroSystemClosureGate still
+   * requires complete provenance fields, source candidates and approved review.
+   */
+  macroPublicationRecords?: readonly MacroTargetPublicationRecord[]
+}
+
 function rootNodes(manifest: AtlasManifest, id: string): readonly AtlasNode[] {
   return manifest.nodes.filter((node) => node.id === id)
 }
 
-function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
+function auditSystemStage(
+  manifest: AtlasManifest,
+  evidence: BodyMaturationEvidence,
+): BodyMaturationBlocker[] {
   const blockers: BodyMaturationBlocker[] = []
+  const admissionBySystem = new Map(
+    buildSystemMaturityAdmissionReport(manifest, INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT)
+      .admissions
+      .map((entry) => [entry.system, entry] as const),
+  )
+
   for (const system of REQUIRED_WHOLE_BODY_SYSTEMS) {
     const id = `system:${system}`
     const matches = rootNodes(manifest, id)
@@ -100,6 +128,33 @@ function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
     }
     if (node.geometryStatus !== 'shipped') {
       blockers.push({ stage: 'system', code: 'geometry-not-shipped', requirement: node.geometryStatus, nodeId: node.id, message: `${node.label} is ${node.geometryStatus}; whole-body system coverage is not complete.` })
+      continue
+    }
+
+    const admission = admissionBySystem.get(system)
+    if (!admission?.admitted) {
+      const status = admission?.status ?? 'missing-admission'
+      blockers.push({
+        stage: 'system',
+        code: 'source-admission-failed',
+        requirement: status,
+        nodeId: node.id,
+        message: `${node.label} cannot complete whole-body system coverage until same-frame source admission succeeds (${status}).`,
+      })
+      continue
+    }
+
+    if (system === 'articular' || system === 'fascial') {
+      const closure = evaluateMacroDomainClosure(system, evidence.macroPublicationRecords ?? [])
+      if (!closure.mayPromoteSystemRootToShipped) {
+        blockers.push({
+          stage: 'system',
+          code: 'macro-closure-failed',
+          requirement: closure.status,
+          nodeId: node.id,
+          message: `${node.label} cannot complete whole-body system coverage until every required ${system} macro target passes asset-level provenance and qualified-review closure (${closure.status}).`,
+        })
+      }
     }
   }
   return blockers
@@ -130,6 +185,18 @@ function auditRegionStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
   return blockers
 }
 
+export function auditOrganStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
+  return buildOrganCoverageReport(manifest).entries
+    .filter((entry) => entry.status !== 'shipped')
+    .map((entry) => ({
+      stage: 'organ' as const,
+      code: 'organ-coverage-incomplete' as const,
+      requirement: `${entry.id}:${entry.status}`,
+      nodeId: entry.matchedNodeId,
+      message: `${entry.label} organ coverage is ${entry.status}; organ-scale maturation requires an accepted canonical organ node with shipped geometry.`,
+    }))
+}
+
 function locked(stage: BodyMaturationStageId, upstream: BodyMaturationStageId): BodyMaturationStage {
   return {
     id: stage,
@@ -157,13 +224,10 @@ function unsupportedSchema(stage: BodyMaturationStageId): BodyMaturationStage {
   }
 }
 
-/**
- * Enforces the project's required maturation direction:
- * whole body -> systems -> regions -> organs -> smaller scales -> molecular -> DNA.
- * Existing smaller-scale content may remain viewable, but it cannot be used as evidence
- * that the project is ready to advance while a larger upstream stage is incomplete.
- */
-export function buildBodyMaturationReport(manifest: AtlasManifest): BodyMaturationReport {
+export function buildBodyMaturationReport(
+  manifest: AtlasManifest,
+  evidence: BodyMaturationEvidence = {},
+): BodyMaturationReport {
   const wholeBody: BodyMaturationStage = {
     id: 'whole-body',
     status: 'complete',
@@ -171,7 +235,7 @@ export function buildBodyMaturationReport(manifest: AtlasManifest): BodyMaturati
     blockers: [],
   }
 
-  const systemBlockers = auditSystemStage(manifest)
+  const systemBlockers = auditSystemStage(manifest, evidence)
   const system: BodyMaturationStage = {
     id: 'system',
     status: systemBlockers.length ? 'incomplete' : 'complete',
@@ -207,10 +271,28 @@ export function buildBodyMaturationReport(manifest: AtlasManifest): BodyMaturati
     return { activeStage: 'region', stages, wholeBodyComplete: false, mayAdvancePastActiveStage: false }
   }
 
-  const deeper = BODY_MATURATION_ORDER.slice(3).map(unsupportedSchema)
+  const organBlockers = auditOrganStage(manifest)
+  const organ: BodyMaturationStage = {
+    id: 'organ',
+    status: organBlockers.length ? 'incomplete' : 'complete',
+    authoringAllowed: true,
+    blockers: organBlockers,
+  }
+
+  if (organ.status !== 'complete') {
+    const stages: BodyMaturationStage[] = [wholeBody, system, region, organ]
+    let upstream: BodyMaturationStageId = 'organ'
+    for (const stage of BODY_MATURATION_ORDER.slice(4)) {
+      stages.push(locked(stage, upstream))
+      upstream = stage
+    }
+    return { activeStage: 'organ', stages, wholeBodyComplete: true, mayAdvancePastActiveStage: false }
+  }
+
+  const deeper = BODY_MATURATION_ORDER.slice(4).map(unsupportedSchema)
   return {
-    activeStage: 'organ',
-    stages: [wholeBody, system, region, ...deeper],
+    activeStage: 'suborgan',
+    stages: [wholeBody, system, region, organ, ...deeper],
     wholeBodyComplete: true,
     mayAdvancePastActiveStage: false,
   }

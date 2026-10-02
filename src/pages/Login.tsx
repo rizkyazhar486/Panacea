@@ -8,6 +8,7 @@ import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { ageFromDob } from '../lib/anthro'
 import type { Account, Role } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
 
@@ -204,14 +205,18 @@ export function Login({ onBack }: { onBack?: () => void }) {
         <div className="relative">
           <h1 className="text-4xl font-extrabold leading-tight">
             Longevity Medical-AI{' '}
-            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
+            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">clinicians can review</span>
           </h1>
+          <BatasKlaimKesehatan
+            permukaan="care.login"
+            className="mt-3 max-w-md text-[12px] leading-snug text-white/70"
+          />
           <p className="mt-3 max-w-md text-ink/85">
-            AI handles history-taking & education; doctors verify. Tokenized medical records,
+            AI handles history-taking & education; licensed clinicians can review. Tokenized medical records,
             continuous monitoring for healthspan.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
-            {['Certified AI-EMR', 'Longevity AI', 'Emergency Care', 'Digital Pharmacy'].map(t => (
+            {['AI-EMR for clinicians', 'Longevity estimate', 'Health tracking', 'Digital Pharmacy'].map(t => (
               <span key={t} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
             ))}
           </div>

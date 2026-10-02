@@ -1,0 +1,195 @@
+name: Body 3D Render Acceptance
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # PR heads share one lane so a newer head supersedes stale PR evidence.
+  # Non-PR runs use the immutable commit SHA as their lane: distinct merged
+  # main SHAs cannot replace each other while waiting for serial WebGL proof.
+  group: body-3d-acceptance-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  render-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install browser smoke runner
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+
+          # Keep the smoke runner outside the application dependency tree.
+          # A root-level `npm install @playwright/test` re-resolves unrelated
+          # Panacea dependencies after the reproducible `npm ci` step and has
+          # previously failed on transient registry metadata for packages that
+          # the smoke runner does not require.
+          PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
+          mkdir -p "$PW_PREFIX"
+          printf '%s\n' '{"private":true}' > "$PW_PREFIX/package.json"
+
+          installed=''
+          for attempt in 1 2 3; do
+            if npm install \
+              --prefix "$PW_PREFIX" \
+              --no-save \
+              --package-lock=false \
+              --no-audit \
+              --no-fund \
+              @playwright/test@1.55.0; then
+              installed='yes'
+              break
+            fi
+
+            if [ "$attempt" = '3' ]; then
+              echo "Playwright smoke-runner install failed after $attempt attempts." >&2
+              exit 1
+            fi
+            echo "Playwright install attempt $attempt failed; retrying isolated install." >&2
+            sleep $((attempt * 5))
+          done
+          test "$installed" = 'yes'
+
+          # The QA scripts import @playwright/test from the repository root.
+          # Expose only that package through a symlink; its own dependencies
+          # remain resolved from the isolated prefix.
+          mkdir -p node_modules/@playwright
+          rm -rf node_modules/@playwright/test
+          ln -s "$PW_PREFIX/node_modules/@playwright/test" node_modules/@playwright/test
+
+          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome-stable' "$source"; then
+              sudo mv "$source" "$source.panacea-disabled"
+            fi
+          done
+          "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Start production preview
+        run: |
+          nohup setsid npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-organ-preview.log 2>&1 &
+          echo $! > /tmp/panacea-organ-preview.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-organ-preview.log
+          exit 1
+
+      # Kesepuluh gerbang dijalankan terhadap SATU build dan SATU preview.
+      #
+      # qa:bergerak, qa:kendali dan qa:share-card ditambahkan belakangan, dan
+      # ketiadaan mereka adalah PERSIS lubang yang diperingatkan komentar di
+      # bawah. Dua di antaranya sudah ada lengkap di repositori dan tidak
+      # terdaftar di alur kerja mana pun, jadi tidak pernah menjaga main sehari
+      # pun. scripts/uji/gerbang-qa-terdaftar.mts sekarang menolak pengulangan:
+      # setiap skrip qa:* harus benar-benar dijalankan oleh sebuah alur kerja.
+      #
+      # (komentar lama, masih berlaku)
+      # qa:bergerak dan qa:kendali ditambahkan belakangan, dan ketiadaan
+      # keduanya adalah PERSIS lubang yang diperingatkan komentar di bawah:
+      # qa:bergerak sudah ada di repositori, lengkap dengan gerbangnya, tetapi
+      # tidak terdaftar di alur kerja mana pun -- jadi ia tidak pernah menjaga
+      # main sejak hari ia digabungkan. qa:kendali menutup selisih antara
+      # "pernah diperiksa dengan tangan sekali" dan "dijaga".
+      #
+      # Sebelumnya hanya qa:organ-3d yang berjalan di CI, sementara tujuh gerbang
+      # lain hanya ada di mesin pengembang -- artinya mereka tidak menjaga main
+      # sama sekali. Panel organ gagal untuk sembilan model justru karena ia
+      # satu-satunya permukaan 3D tanpa gerbang; membiarkan tujuh gerbang tidak
+      # pernah berjalan adalah bentuk lain dari lubang yang sama.
+      #
+      # Dijalankan berurutan, bukan paralel: WebGL di sini memakai SwiftShader,
+      # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
+      # habis waktu karena kelambatan, bukan karena cacat.
+      - name: Prove every 3D panel renders
+        # 13 serial gates are individually bounded below (240s for organ,
+        # 180s for each of the other 12). The stage hard stop must be large
+        # enough to let those fail-closed per-gate verdicts run instead of
+        # pre-empting a healthy queue: 240 + 12*180 = 2400s = 40m.
+        timeout-minutes: 41
+        env:
+          ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          ARTERI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          LIMFE3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          HEPATOBILIARY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+          SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+        run: |
+          set -e
+          for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
+                         qa:limfe-3d qa:hepatobiliary-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
+                         qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
+            echo "::group::$gerbang"
+            mulai=$SECONDS
+            batas=180
+            # qa:organ-3d has a legitimate internal worst-case near 195s:
+            # navigation/action headroom plus three 45s per-organ terminal waits.
+            # Give only this heavier proof bounded extra headroom.
+            if [ "$gerbang" = 'qa:organ-3d' ]; then
+              batas=240
+            fi
+            if timeout --signal=TERM --kill-after=15s "${batas}s" npm run "$gerbang"; then
+              durasi=$((SECONDS - mulai))
+              echo "::notice::$gerbang lulus dalam ${durasi}s"
+              echo "::endgroup::"
+            else
+              kode=$?
+              durasi=$((SECONDS - mulai))
+              echo "::endgroup::"
+              if [ "$kode" = '124' ] || [ "$kode" = '137' ]; then
+                echo "::error::$gerbang timeout setelah ${durasi}s (batas ${batas}s)"
+              else
+                echo "::error::$gerbang gagal setelah ${durasi}s (exit $kode)"
+              fi
+              # Fail fast. A timed-out WebGL proof is already actionable; do not
+              # queue the remaining gates behind a known-bad runner.
+              exit 1
+            fi
+          done
+
+      - name: Stop production preview
+        if: always()
+        run: |
+          if [ -f /tmp/panacea-organ-preview.pid ]; then
+            preview_pid="$(cat /tmp/panacea-organ-preview.pid)"
+            # Preview is started in its own session. Terminate the full process
+            # group so Vite/npm descendants cannot survive a cancelled smoke.
+            kill -TERM -- "-$preview_pid" 2>/dev/null || kill -TERM "$preview_pid" 2>/dev/null || true
+            sleep 1
+            kill -KILL -- "-$preview_pid" 2>/dev/null || true
+          fi

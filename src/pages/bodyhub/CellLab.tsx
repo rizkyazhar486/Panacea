@@ -49,6 +49,8 @@ export function CellLab() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
+            aria-pressed={tab === t.id}
             onClick={() => { setTab(t.id); setTahapAktif(0) }}
             className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold active:scale-95 ${
               tab === t.id ? 'bg-brand text-white' : 'border border-brand/30 bg-brand-50 text-brand-dark'
@@ -72,6 +74,8 @@ export function CellLab() {
             {ORGANEL.map((o) => (
               <button
                 key={o.kunci}
+                type="button"
+                aria-pressed={organel === o.kunci}
                 onClick={() => setOrganel(organel === o.kunci ? null : o.kunci)}
                 className={`rounded-full px-2.5 py-1 text-[11px] font-bold active:scale-95 ${
                   organel === o.kunci ? 'bg-brand text-white' : 'border border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-400'
@@ -215,6 +219,8 @@ export function CellLab() {
             {(['malat-aspartat', 'gliserol-fosfat'] as Antarjemput[]).map((a) => (
               <button
                 key={a}
+                type="button"
+                aria-pressed={antarjemput === a}
                 onClick={() => setAntarjemput(a)}
                 className={`flex-1 rounded-xl px-3 py-2 text-[11px] font-bold active:scale-95 ${
                   antarjemput === a ? 'bg-brand text-white' : 'border border-brand/30 bg-brand-50 text-brand-dark'

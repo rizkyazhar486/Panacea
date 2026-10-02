@@ -5,13 +5,14 @@ import { Card } from './ui'
 import { Portal } from './Portal'
 import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
 import { getWorkouts } from '../lib/workoutStore'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
 import { ArtiKebugaran } from './ArtiKebugaran'
 import { GrafikOlahraga } from './GrafikOlahraga'
 import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, type Target } from '../lib/analisisPro'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kartu pilihan pengguna di Beranda.
@@ -41,7 +42,7 @@ export function WidgetBeranda() {
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
-      hrMax: Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex)),
+      hrMax: Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan())),
       hrRest: demo.restingHr && demo.restingHr > 0 ? demo.restingHr : 60,
       sex: demo.sex,
     }
@@ -179,6 +180,7 @@ export function WidgetBeranda() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-black text-white">Customize home cards</h2>
+                <BatasKlaimKesehatan permukaan="wellness.home-widget" />
                 <p className="mt-0.5 text-[12px] leading-relaxed text-slate-400">
                   Choose what you want to see every time you open the app. Cards with no data won't
                   appear even when turned on.

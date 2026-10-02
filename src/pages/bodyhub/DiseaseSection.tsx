@@ -15,18 +15,21 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
   const [loading, setLoading] = useState(false)
   const [sudahCari, setSudahCari] = useState(false)
   const [icd11, setIcd11] = useState(false)
+  const [lookupFailed, setLookupFailed] = useState(false)
 
   async function cari() {
     const term = q.trim()
     if (!term) return
     setLoading(true)
     setSudahCari(true)
+    setLookupFailed(false)
     try {
       const r = await api.icdSearch(term)
       setResults(r.results)
       setIcd11(r.icd11)
     } catch {
       setResults([])
+      setLookupFailed(true)
     } finally {
       setLoading(false)
     }
@@ -34,10 +37,10 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
 
   return (
     <div className="space-y-2.5">
-      <form onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
+      <form aria-busy={loading} onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
         <input
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => { setQ(e.target.value); setLookupFailed(false) }}
           aria-label="Search diagnosis or classification code"
           placeholder="Search a diagnosis or code…"
           className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-200 bg-white px-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
@@ -51,12 +54,17 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
         </button>
       </form>
 
-      {sudahCari && !loading && results.length === 0 && (
+      {sudahCari && !loading && lookupFailed && (
+        <p role="alert" className="text-sm text-neutral-500">Classification lookup failed. Try again.</p>
+      )}
+
+      {sudahCari && !loading && !lookupFailed && results.length === 0 && (
         <p role="status" className="text-sm text-neutral-500">No matching diagnosis found.</p>
       )}
 
       {results.length > 0 && (
         <>
+          <p role="status" className="sr-only">{results.length} classification results loaded.</p>
           <div className="flex items-center gap-1.5">
             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
               icd11 ? 'bg-brand/10 text-brand' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400'

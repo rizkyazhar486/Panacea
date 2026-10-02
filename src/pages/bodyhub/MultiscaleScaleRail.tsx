@@ -76,7 +76,7 @@ export function MultiscaleScaleRail({ bridge, initialNodeId, onOpenDestination }
         </p>
       </div>
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Biological scales">
+      <div role="group" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Biological scales">
         {SCALE_ORDER.map((scale) => {
           const nodes = bridge.nodes.filter((node) => node.scale === scale)
           const selectable = nodes[0]
@@ -139,10 +139,10 @@ export function MultiscaleScaleRail({ bridge, initialNodeId, onOpenDestination }
             )}
           </div>
 
-          {active.destination && (
+          {active.destination && onOpenDestination && (
             <button
               type="button"
-              onClick={() => onOpenDestination?.(active)}
+              onClick={() => onOpenDestination(active)}
               className="mt-3 min-h-11 rounded-full border border-brand px-3 text-[10px] font-black text-brand transition hover:bg-brand hover:text-white"
             >
               Open {active.destination.replaceAll('-', ' ')} →

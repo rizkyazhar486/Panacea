@@ -1,0 +1,70 @@
+name: Stabilization Validation
+
+on:
+  push:
+    branches:
+      - claude/continue-previous-task-un3s83
+    paths:
+      - 'src/**'
+      - 'scripts/uji/**'
+      - 'server/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/stabilization-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/continue-previous-task-un3s83
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
+      - name: Frontend production build
+        run: npm run build
+      - name: Frontend test suite
+        run: npm run uji
+
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/continue-previous-task-un3s83
+      - uses: actions/setup-node@v4
+        with:
+          # Some server regression tests import shared root TS/TSX modules.
+          # Use the same Node/runtime and dependency graph as main acceptance.
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+      - name: Install shared root dependencies
+        working-directory: .
+        run: npm ci
+      - name: Install server dependencies
+        run: npm ci
+      - name: Server TypeScript
+        run: npm run typecheck
+      - name: Server build
+        run: npm run build
+      - name: Server test suite
+        run: npm run uji

@@ -7,8 +7,8 @@ import { widgetPapan, ambilWidget } from '../lib/homeWidgets'
 const WIDGETS = widgetPapan()
 import { lazy, Suspense } from 'react'
 import { getWorkouts } from '../lib/workoutStore'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 
 // Dimuat malas: berkas grafik beserta analisisnya tidak perlu ikut ke bundel
 // awal bagi pemakai yang tidak menyalakan kartunya.
@@ -362,7 +362,7 @@ function KartuGrafikOlahraga() {
   if (!workouts.length) return null
   const demo = getDemo()
   const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
-  const hrMax = Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex))
+  const hrMax = Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan()))
   return (
     <section className="rounded-3xl bg-neutral-900 p-4 dark:bg-white/5">
       <Suspense fallback={<div className="h-24" />}>
@@ -552,6 +552,38 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         menutup aplikasinya. Alasan lengkapnya di kepala lib/semangat.ts. */}
     {pilihan.includes('semangat') && <div className="mb-5"><UbinSemangat /></div>}
 
+    {/* QUICK TOOLS: tiga mini-app yang memang punya state dan aksi langsung.
+        Sebelumnya Timer, Focus, dan Breathing terkubur di dalam Summary carousel
+        bersama puluhan widget lain. Mereka tetap memakai komponen kanonik yang
+        sama — tidak ada versi palsu atau duplikat logika — tetapi sekarang
+        punya jalur horizontal sendiri yang dapat ditemukan dan dipakai segera. */}
+    <section className="home-fun-mini" aria-label="Quick live tools">
+      <div className="home-fun-mini__head">
+        <div className="min-w-0">
+          <h2>Quick tools</h2>
+          <span>Timer · focus · breathing</span>
+        </div>
+        <button type="button" onClick={() => setAturBuka(true)}>Manage</button>
+      </div>
+      <div className="home-fun-mini__rail">
+        {pilihan.includes('pewaktu') && (
+          <article className="home-fun-mini__card" data-tool="timer"><UbinPewaktu /></article>
+        )}
+        {pilihan.includes('fokus') && (
+          <article className="home-fun-mini__card" data-tool="focus"><UbinFokus /></article>
+        )}
+        {pilihan.includes('napas') && (
+          <article className="home-fun-mini__card" data-tool="breathing"><UbinNapas /></article>
+        )}
+        {!pilihan.some((id) => id === 'pewaktu' || id === 'fokus' || id === 'napas') && (
+          <button type="button" className="home-fun-mini__add" onClick={() => setAturBuka(true)}>
+            <strong>Add quick tools</strong>
+            <span>Choose Timer, Focus, or Breathing →</span>
+          </button>
+        )}
+      </div>
+    </section>
+
     {/* TUMPUKAN: widget lebar berbagi satu petak dan digeser mendatar.
         Empat widget lebar berdiri sendiri-sendiri memakai empat kali tinggi
         yang sama; ditumpuk, ketiganya memakai tinggi satu widget. Yang masuk
@@ -627,13 +659,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('hrr') ? [{ kunci: 'hrr', isi: <UbinPemulihanDenyut /> }] : []),
         ...(pilihan.includes('utangTidur') ? [{ kunci: 'utangTidur', isi: <UbinUtangTidur /> }] : []),
         ...(pilihan.includes('tekanan') ? [{ kunci: 'tekanan', isi: <UbinTekanan /> }] : []),
-        ...(pilihan.includes('napas') ? [{ kunci: 'napas', isi: <UbinNapas /> }] : []),
         ...(pilihan.includes('duduk') ? [{ kunci: 'duduk', isi: <UbinDuduk /> }] : []),
-        ...(pilihan.includes('fokus') ? [{ kunci: 'fokus', isi: <UbinFokus /> }] : []),
         ...(pilihan.includes('mata') ? [{ kunci: 'mata', isi: <UbinMata /> }] : []),
         ...(pilihan.includes('puasa') ? [{ kunci: 'puasa', isi: <UbinPuasa /> }] : []),
         ...(pilihan.includes('kopi') ? [{ kunci: 'kopi', isi: <UbinKopi /> }] : []),
-        ...(pilihan.includes('pewaktu') ? [{ kunci: 'pewaktu', isi: <UbinPewaktu /> }] : []),
         ...(pilihan.includes('kabar') ? [{ kunci: 'kabar', isi: <UbinKabar /> }] : []),
         ...(pilihan.includes('pengingat') ? [{ kunci: 'pengingat', isi: <UbinNotifikasi /> }] : []),
         ...(pilihan.includes('inspirasi') ? [{ kunci: 'inspirasi', isi: <UbinInspirasi /> }] : []),

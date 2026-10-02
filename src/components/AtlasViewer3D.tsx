@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { bangunLintasan, kecepatanAliran, titikPada, type FlowPath, type Vec3 } from '../lib/cardioFlow'
 import { body3dPixelRatio } from '../lib/body3dQuality'
@@ -63,6 +65,11 @@ export function AtlasViewer3D({
   bagianRef.current = bagian
   const onPilihRef = useRef(onPilih)
   onPilihRef.current = onPilih
+  const invalidateRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    invalidateRef.current?.()
+  }, [lesi, hilir, jalur, hr, wilayah, dipilih])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -107,6 +114,7 @@ export function AtlasViewer3D({
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      invalidateRef.current?.()
     }
     ukur()
     const ro = new ResizeObserver(ukur)
@@ -117,6 +125,8 @@ export function AtlasViewer3D({
     const wilayahMesh = new Map<THREE.Mesh, string>()
     const jenisMesh = new Map<THREE.Mesh, string>()
     let grup: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
     const geoPartikel = new THREE.SphereGeometry(1, 8, 6)
     const matPartikel = new THREE.MeshBasicMaterial({
@@ -142,9 +152,11 @@ export function AtlasViewer3D({
     let idJalur = ''
 
     const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       `${import.meta.env.BASE_URL}${berkas}`,
       (gltf) => {
+        if (!penjaga.terima(gltf.scene)) return
         grup = gltf.scene
 
         // Satu nama sanitized hanya boleh menunjuk ke satu metadata atlas.
@@ -187,6 +199,7 @@ export function AtlasViewer3D({
         if (takDikenal) console.warn(`${takDikenal} mesh pada ${berkas} tidak dikenali namanya`)
         scene.add(grup)
         setMuat(false)
+        startRendering()
       },
       (ev) => {
         if (ev.total > 0) setPct(ev.loaded / ev.total)
@@ -242,6 +255,7 @@ export function AtlasViewer3D({
     let kunciBingkai = ''
     let inViewport = true
     let documentVisible = !document.hidden
+    let contextLost = false
     const v = new THREE.Vector3()
 
     function stopRendering() {
@@ -251,13 +265,15 @@ export function AtlasViewer3D({
     }
 
     function startRendering() {
-      if (raf || !inViewport || !documentVisible) return
+      if (raf || !penjaga.hidup || contextLost || !inViewport || !documentVisible) return
       raf = requestAnimationFrame(bingkai)
     }
+    invalidateRef.current = startRendering
+    controls.addEventListener('change', startRendering)
 
     function bingkai() {
       raf = 0
-      if (!inViewport || !documentVisible) return
+      if (!penjaga.hidup || contextLost || !inViewport || !documentVisible) return
 
       const dt = Math.min(jam.getDelta(), 0.1)
       const { lesi: L, hilir: H, jalur: J, hr: HR, wilayah: W, dipilih: D } = propRef.current
@@ -361,17 +377,21 @@ export function AtlasViewer3D({
         if (Math.abs(jarakBaru - jarakTujuan) < 0.01 && controls.target.distanceTo(pusatTujuan) < 0.01) adaTujuan = false
       }
 
-      controls.update()
+      const cameraMoving = controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(bingkai)
+      // Anatomi diam tidak membutuhkan GPU terus-menerus. Kamera, denyut lesi
+      // dan aliran tetap kontinu; perubahan props/model/ukuran membangunkannya.
+      if (adaTujuan || cameraMoving || setLesi.size > 0 || (J && lintasan.length >= 2)) startRendering()
     }
 
     const onHilang = (e: Event) => {
       e.preventDefault()
+      contextLost = true
       stopRendering()
       setGagal('The browser dropped the 3D context, usually because memory ran low.')
     }
     const onPulih = () => {
+      contextLost = false
       setGagal('')
       ukur()
       startRendering()
@@ -399,10 +419,13 @@ export function AtlasViewer3D({
     startRendering()
 
     return () => {
+      penjaga.lepas()
+      invalidateRef.current = null
       stopRendering()
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
+      controls.removeEventListener('change', startRendering)
       renderer.domElement.removeEventListener('pointerup', padaKlik)
       renderer.domElement.removeEventListener('webglcontextlost', onHilang)
       renderer.domElement.removeEventListener('webglcontextrestored', onPulih)

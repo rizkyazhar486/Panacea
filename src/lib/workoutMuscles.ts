@@ -138,15 +138,19 @@ export const WORKOUT_MUSCLE_GROUPS: WorkoutMuscleGroup[] = [
   {
     key: 'abs',
     label: 'Abs',
+    // Oblik eksternal TIDAK dikirim oleh muscular.glb. Ia ada di daftar ini
+    // sejak lama dan tidak pernah menyala, karena nama yang tidak ditemukan
+    // tidak menghasilkan galat apa pun -- ia hanya diam. Ia dihapus dari sini
+    // alih-alih diganti oblik internal: itu otot lain, dan menyalakan otot
+    // yang salah lebih buruk daripada tidak menyalakan apa-apa.
     nodeNames: [
       'Rectus abdominis muscle.l', 'Rectus abdominis muscle.r',
-      'External abdominal oblique muscle.l', 'External abdominal oblique muscle.r',
       'Internal abdominal oblique muscle.l', 'Internal abdominal oblique muscle.r',
       'Transversus abdominis muscle.l', 'Transversus abdominis muscle.r',
     ],
     searchTerms: ['abdominal muscle strain'],
     penjelasan: {
-      otot: 'Rectus abdominis, the internal and external obliques, and transversus abdominis beneath them.',
+      otot: 'Rectus abdominis, the internal oblique, and transversus abdominis beneath them. The external oblique lies over the internal one but is not carried by this model, so it does not light up.',
       aksi: 'Flexes and rotates the trunk, and — more importantly — resists movement. Transversus and the obliques stiffen the trunk so force can pass between the legs and the arms without the spine buckling.',
       latihan: 'Anti-movement work matters more than crunches: planks resist extension, side planks resist lateral flexion, Pallof presses resist rotation. Add loaded carries.',
       hatiHati: 'Visible abdominal muscles are a matter of body fat, not of training volume — no amount of crunching reveals them on its own. Repeated loaded flexion is a poor trade for the lumbar discs.',
