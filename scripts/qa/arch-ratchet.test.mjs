@@ -13,6 +13,10 @@ test('positif: mendeteksi window dan document', () => assert.deepEqual(detectImp
 test('positif: kode murni tidak terdeteksi', () => assert.deepEqual(detectImpure('export const f = (now: Date) => now.getTime()'), []))
 
 // negatif / false positive: bukan pelanggaran
+test('negatif: kata "window." di akhir kalimat dalam string bukan akses DOM', () =>
+  assert.deepEqual(detectImpure("const s = 'in a bounded remodeling window.'; const d = 'see the document.'"), []))
+test('positif: window.<pengenal> tetap terdeteksi walau di tengah ekspresi', () =>
+  assert.deepEqual(detectImpure('const w = window.innerWidth'), ['window']))
 test('negatif: new Date(argumen) bukan jam sistem', () => assert.deepEqual(detectImpure('new Date(2026, 8, 29)'), []))
 test('negatif: method .fetch( bukan fetch global', () => assert.deepEqual(detectImpure('repo.fetch(id)'), []))
 test('negatif: identifier berakhiran window bukan window global', () => assert.deepEqual(detectImpure('myWindow.size; subdocument.x'), []))

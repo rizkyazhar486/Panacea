@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { DailyTrainingModes } from '../components/DailyTrainingModes'
 import { getWorkouts } from '../lib/workoutStore'
 import { useVitals } from '../lib/useVitals'
 import {
@@ -107,9 +108,11 @@ export function OrganizerLatihan() {
       <SectionTitle
         icon={<IconActivity />}
         title="Weekly organizer"
-        subtitle="Push · pull · legs · abs, scheduled around the runs you already do"
+        subtitle="Run · push · pull · legs · abs, plus Calisthenics · Gymnastics · AMRAP · HYROX daily modes"
       />
       <BatasKlaimKesehatan permukaan="performance.session-organizer" />
+
+      <DailyTrainingModes />
 
       <Card>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
