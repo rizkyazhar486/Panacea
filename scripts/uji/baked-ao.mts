@@ -86,4 +86,6 @@ for (const layer of LAYERS) {
   assert.ok(mean > 150 && mean < 255, `${layer}: mean AO ${mean.toFixed(1)} is plausible (not all-white, not all-dark)`)
   assert.ok(sd > 4, `${layer}: AO varies across the surface (sd ${sd.toFixed(1)}); a constant sidecar is not occlusion`)
 }
+const credits = readFileSync('public/anatomy/CREDITS.txt', 'utf8')
+assert.match(credits, /files in ao\/[\s\S]{0,400}derivative works[\s\S]{0,120}CC BY-SA 4\.0/, 'CREDITS names the AO sidecar as a CC BY-SA 4.0 derivative (files are not licensed by proximity)')
 console.log(`Baked AO verified: matching rules, physical golden cases, determinism, and ${LAYERS.length} shipped layers bound to their GLBs.`)
