@@ -35,16 +35,20 @@ jobs:
             exit 1
           fi
           endpoint="${base%/}/api/genomics/compute/capabilities"
+          health_endpoint="${base%/}/api/health"
           echo "Waiting for live Render endpoint: $endpoint"
 
           ok=''
           for attempt in $(seq 1 45); do
             code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
-            if [ "$code" = '200' ]; then
+            health_code=$(curl -sS --max-time 90 -o /tmp/health.json -w '%{http_code}' "$health_endpoint" || true)
+            if [ "$code" = '200' ] && [ "$health_code" = '200' ]; then
               if EXPECTED_SHA="$EXPECTED_SHA" node - <<'NODE'
           const fs = require('node:fs')
           const body = JSON.parse(fs.readFileSync('/tmp/capabilities.json', 'utf8'))
+          const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'))
           const expected = process.env.EXPECTED_SHA || ''
+          if (!expected || health.build?.commit !== expected) process.exit(4)
           if (body.backend !== 'render-control-plane') process.exit(2)
           for (const kind of ['ont-basecalling', 'pharmcat', 'sv-calling']) {
             if (!body.jobKinds?.includes(kind)) process.exit(3)
@@ -64,7 +68,7 @@ jobs:
                 break
               fi
             fi
-            echo "Attempt $attempt: HTTP ${code:-000}; Render may still be deploying."
+            echo "Attempt $attempt: capability HTTP ${code:-000}, health HTTP ${health_code:-000}; Render may still be deploying."
             sleep 10
           done
 
