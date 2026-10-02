@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Organ Donor Pledge Card — an informational primer on organ/tissue donation
@@ -54,6 +55,7 @@ export function OrganDonorCard() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Organ Donor Pledge" subtitle="Make your wishes clear, then talk them through with your family" />
+        <BatasKlaimKesehatan permukaan="care.organ-donor" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           A single organ donor can save up to 8 lives, and tissue donation can help dozens more — but
           donation decisions are only actually honored if your family or next-of-kin know your wishes

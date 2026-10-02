@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconChartUp } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -101,8 +102,9 @@ export function ChildGrowthTracker() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Child Growth Tracker" subtitle="Gambarkan berat & tinggi anak dari waktu ke waktu terhadap standar pertumbuhan WHO" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Berbeda dari pemeriksaan persentil sekali kunjung, halaman ini mencatat tiap kunjungan dan menggambar lintasan pertumbuhan anak yang sebenarnya terhadap WHO Child Growth Standards (2006), 0-60 bulan — tampilan yang layak diperlihatkan langsung kepada orang tua. Tren yang mendatar atau memotong garis ke bawah antarkunjungan lebih bermakna daripada satu pengukuran mana pun.</Prosa>
+        <SectionTitle icon={<IconChartUp size={20} />} title="Child Growth Tracker" subtitle="Plot weight & height over time against a simplified WHO growth reference — screening aid only" />
+        <BatasKlaimKesehatan permukaan="pediatrics.child-growth" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Unlike a one-visit percentile check, this page logs each visit and plots the child’s trajectory against a simplified WHO Child Growth Standards (2006) 0–60 month reference. A flattening or downward-crossing trend between visits matters more than any single point. This is a screening approximation with checkpoint interpolation — not the full WHO LMS table and not a growth diagnosis.</Prosa>
         <div className="mt-3">
           <Field label="Sex">
             <select className={inputClass} value={state.sex} onChange={(e) => persist({ ...state, sex: e.target.value as 'M' | 'F' })}>

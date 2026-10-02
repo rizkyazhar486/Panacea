@@ -35,7 +35,11 @@ function Geser({ label, nilai, min, maks, langkah, onUbah }: {
   )
 }
 
-export function PencitraanVolumetrikPanel() {
+export interface PencitraanVolumetrikPanelProps {
+  selectedSourceStructureName?: string | null
+}
+
+export function PencitraanVolumetrikPanel({ selectedSourceStructureName }: PencitraanVolumetrikPanelProps = {}) {
   const [bawah, setBawah] = useState(300)
   const [atas, setAtas] = useState(1900)
 
@@ -43,7 +47,12 @@ export function PencitraanVolumetrikPanel() {
   const terlihat = useMemo(() => kelasDalamJendela(jendela), [jendela])
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      data-selected-source-structure={selectedSourceStructureName ?? undefined}
+      data-atlas-dicom-registration="not-performed"
+      data-patient-specific-localization="not-inferred"
+    >
       <Prosa>
         <h3 className="text-base font-black">From a DICOM stack to a 3D body</h3>
         <p className="text-[12px] leading-relaxed">

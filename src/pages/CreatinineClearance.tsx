@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cockcroft-Gault Creatinine Clearance — Cockcroft, D.W. & Gault, M.H. (1976),
@@ -69,7 +70,8 @@ export function CreatinineClearance() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Creatinine Clearance (Cockcroft-Gault)" subtitle="Fungsi ginjal untuk penghitungan dosis obat — berbeda dari eGFR CKD-EPI" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Creatinine Clearance (Cockcroft-Gault)" subtitle="Published Cockcroft-Gault estimate for dosing context — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Banyak brosur obat dan nomogram dosis menetapkan penyesuaian dosis ginjal justru dengan rumus ini, bukan dengan eGFR — keduanya punya perannya masing-masing dan tidak dapat saling menggantikan.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">

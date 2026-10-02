@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Modified Duke Criteria — Durack, D.T., et al. (1994), Am J Med, 96:200-209;
@@ -55,8 +56,9 @@ export function DukeCriteria() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Modified Duke Criteria" subtitle="Infective endocarditis diagnosis (Durack 1994, modified Li 2000)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Pasti (klinis) = 2 mayor, 1 mayor + 3 minor, atau 5 minor. Mungkin = 1 mayor + 1 minor, atau 3 minor. Pemastian patologis berdiri sendiri sebagai bukti pasti.</Prosa>
+        <SectionTitle icon={<IconHeart size={20} />} title="Modified Duke Criteria" subtitle="Published IE classification (Durack 1994; Li 2000) — not a clinically validated Panacea diagnosis" />
+        <BatasKlaimSkorTerbit />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Definite (clinical) = 2 major, 1 major + 3 minor, or 5 minor. Possible = 1 major + 1 minor, or 3 minor. Pathologic confirmation stands alone as definite. Teaching checklist only — clinical judgment and guideline care remain with the treating team.</Prosa>
         <label className="mt-3 flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
           <input type="checkbox" className="h-4 w-4 rounded" checked={pathologic} onChange={(e) => setPathologic(e.target.checked)} />
           Pathologic criterion met (histology or culture of vegetation/abscess positive)

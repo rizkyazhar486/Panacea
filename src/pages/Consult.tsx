@@ -7,6 +7,7 @@ import { ConsultChat } from '../components/ConsultChat'
 import { Carousel } from '../components/Carousel'
 import { backendEnabled } from '../lib/api'
 import { MANUAL_BANK } from '../lib/payment'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '').slice(0, 24)
@@ -64,7 +65,7 @@ export function Consult() {
       id: uid(),
       to: account?.email ?? '',
       subject: 'Your Panaceamed AI Triage Result',
-      body: `Based on your symptoms, our AI recommends ${SPECIALTY_LABEL[r.tag] ?? 'a general practitioner'}. ${r.surgery ? 'Possible surgical intervention indicated — hospital search enabled.' : ''}`,
+      body: `Based on your symptoms, our AI suggests considering ${SPECIALTY_LABEL[r.tag] ?? 'a general practitioner'} as a next step — this is a technical triage draft, not a diagnosis. ${r.surgery ? 'Hospital search is available if a clinician later advises procedural care.' : ''}`,
       at,
     })
     setResult(r)
@@ -101,8 +102,9 @@ export function Consult() {
           <SectionTitle
             icon={<IconChat size={20} />}
             title="Step 1 — AI Consultation (required)"
-            subtitle="Every doctor consultation starts with our AI Chatbot. The AI will suggest the appropriate specialist."
+            subtitle="Every doctor consultation starts with an AI intake draft. It may suggest a specialist category — a licensed clinician decides."
           />
+          <BatasKlaimKesehatan permukaan="care.consult-triage" />
           <Field label="Describe your symptoms">
             <textarea
               className={`${inputClass} min-h-[90px]`}
@@ -119,7 +121,7 @@ export function Consult() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
-              <b>Rp{AI_FEE.toLocaleString('en-GB')}</b> for the AI consultation — includes referral to a registered specialist.
+              <b>Rp{AI_FEE.toLocaleString('en-GB')}</b> for the AI intake draft — unlocks booking a licensed clinician when available.
             </div>
             <Button onClick={payAITriage} disabled={!complaint.trim()}>
               <IconCheck size={16} /> Pay & Start AI Triage
@@ -133,10 +135,11 @@ export function Consult() {
         <Card>
           <SectionTitle
             icon={<IconStethoscope size={20} />}
-            title="Step 2 — AI-Recommended Specialist"
-            subtitle={`AI: ${result.reason}. Top recommendation: ${recSpecialty}.`}
+            title="Step 2 — Suggested Specialist Category"
+            subtitle={`Technical draft: ${result.reason}. Suggested category: ${recSpecialty}.`}
             right={<Button variant="ghost" onClick={() => { setResult(null); setComplaint('') }}>Redo triage</Button>}
           />
+          <BatasKlaimKesehatan permukaan="care.consult-triage" />
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-neutral-500">Session payment method:</span>
             <span className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">
@@ -148,7 +151,7 @@ export function Consult() {
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
               <div className="flex items-start gap-2 text-sm text-amber-800">
                 <IconHospital size={18} className="mt-0.5 shrink-0" />
-                <span>Your symptoms <b>may indicate a need for surgery</b>. Find a nearby hospital for a surgical referral.</span>
+                <span>Some of the words you entered are also used in surgical pathways. This is <b>not</b> a surgical indication — use nearby hospitals only as a directory while you seek clinician advice.</span>
               </div>
               <Link to="/hospitals">
                 <Button variant="outline"><IconHospital size={16} /> Nearby Hospitals</Button>
@@ -166,8 +169,8 @@ export function Consult() {
           </span>
           <h3 className="mt-3 text-lg font-bold">Real doctors are currently being onboarded</h3>
           <p className="mx-auto mt-1 max-w-md text-sm text-neutral-500">
-            The AI recommends <b>{recSpecialty}</b>. A list of verified doctors (with active medical licenses) will
-            appear here once they join. In the meantime, use the AI Chatbot for a full assessment or
+            The AI suggested <b>{recSpecialty}</b> as a category to consider. A list of verified doctors (with active medical licenses) will
+            appear here once they join. In the meantime, use the AI Chatbot for a fuller educational intake or
             find a nearby healthcare facility for immediate care.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -195,7 +198,7 @@ export function Consult() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold leading-tight">{d.name}</h3>
-                      {isRec && <Badge tone="brand">AI Recommended</Badge>}
+                      {isRec && <Badge tone="brand">Suggested category</Badge>}
                     </div>
                     <p className="text-sm text-neutral-500">{d.specialty}</p>
                     <div className="mt-1 flex items-center gap-2 text-xs">
@@ -234,7 +237,7 @@ export function Consult() {
 
       <Card>
         <div className="mb-3 flex items-center gap-2 text-xs text-neutral-500">
-          <IconShield size={14} className="text-brand" /> Flow: AI Chatbot → doctor recommendation → (if surgery is needed) find a hospital.
+          <IconShield size={14} className="text-brand" /> Flow: AI intake draft → clinician booking when available → hospital directory if needed.
         </div>
         <SectionTitle title="My Sessions" />
         <Sessions />

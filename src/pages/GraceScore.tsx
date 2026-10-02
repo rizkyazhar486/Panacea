@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GRACE Score (in-hospital mortality) — Granger, C.B., et al. (2003),
@@ -97,6 +98,7 @@ export function GraceScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="GRACE Score" subtitle="ACS in-hospital mortality (Granger et al. 2003)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mencakup seluruh rentang sindrom koroner akut (STEMI, NSTEMI, angina tidak stabil) dan lebih dianjurkan dalam panduan ESC untuk menentukan waktu strategi invasif — melengkapi skor TIMI yang khusus untuk UA/NSTEMI.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">

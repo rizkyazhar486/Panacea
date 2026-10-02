@@ -65,6 +65,11 @@ export function AtlasViewer3D({
   bagianRef.current = bagian
   const onPilihRef = useRef(onPilih)
   onPilihRef.current = onPilih
+  const invalidateRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    invalidateRef.current?.()
+  }, [lesi, hilir, jalur, hr, wilayah, dipilih])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -109,6 +114,7 @@ export function AtlasViewer3D({
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      invalidateRef.current?.()
     }
     ukur()
     const ro = new ResizeObserver(ukur)
@@ -193,6 +199,7 @@ export function AtlasViewer3D({
         if (takDikenal) console.warn(`${takDikenal} mesh pada ${berkas} tidak dikenali namanya`)
         scene.add(grup)
         setMuat(false)
+        startRendering()
       },
       (ev) => {
         if (ev.total > 0) setPct(ev.loaded / ev.total)
@@ -248,6 +255,7 @@ export function AtlasViewer3D({
     let kunciBingkai = ''
     let inViewport = true
     let documentVisible = !document.hidden
+    let contextLost = false
     const v = new THREE.Vector3()
 
     function stopRendering() {
@@ -257,13 +265,15 @@ export function AtlasViewer3D({
     }
 
     function startRendering() {
-      if (raf || !inViewport || !documentVisible) return
+      if (raf || !penjaga.hidup || contextLost || !inViewport || !documentVisible) return
       raf = requestAnimationFrame(bingkai)
     }
+    invalidateRef.current = startRendering
+    controls.addEventListener('change', startRendering)
 
     function bingkai() {
       raf = 0
-      if (!inViewport || !documentVisible) return
+      if (!penjaga.hidup || contextLost || !inViewport || !documentVisible) return
 
       const dt = Math.min(jam.getDelta(), 0.1)
       const { lesi: L, hilir: H, jalur: J, hr: HR, wilayah: W, dipilih: D } = propRef.current
@@ -367,17 +377,21 @@ export function AtlasViewer3D({
         if (Math.abs(jarakBaru - jarakTujuan) < 0.01 && controls.target.distanceTo(pusatTujuan) < 0.01) adaTujuan = false
       }
 
-      controls.update()
+      const cameraMoving = controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(bingkai)
+      // Anatomi diam tidak membutuhkan GPU terus-menerus. Kamera, denyut lesi
+      // dan aliran tetap kontinu; perubahan props/model/ukuran membangunkannya.
+      if (adaTujuan || cameraMoving || setLesi.size > 0 || (J && lintasan.length >= 2)) startRendering()
     }
 
     const onHilang = (e: Event) => {
       e.preventDefault()
+      contextLost = true
       stopRendering()
       setGagal('The browser dropped the 3D context, usually because memory ran low.')
     }
     const onPulih = () => {
+      contextLost = false
       setGagal('')
       ukur()
       startRendering()
@@ -406,10 +420,12 @@ export function AtlasViewer3D({
 
     return () => {
       penjaga.lepas()
+      invalidateRef.current = null
       stopRendering()
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
+      controls.removeEventListener('change', startRendering)
       renderer.domElement.removeEventListener('pointerup', padaKlik)
       renderer.domElement.removeEventListener('webglcontextlost', onHilang)
       renderer.domElement.removeEventListener('webglcontextrestored', onPulih)

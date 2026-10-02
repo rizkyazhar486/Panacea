@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { IconActivity } from '../components/icons'
+import { CentralDogmaEvolutionSimulator } from '../components/CentralDogmaEvolutionSimulator'
 import {
   TETAPAN, TELOMERASE, GARPU_PER_ORIGIN,
   mulaiReplikasi, langkahReplikasi, lamaFaseSDetik, anggaranGalat,
@@ -14,6 +15,7 @@ import {
   hill, konsentrasiUntukEfek, bebanSetimbang, bebanAnalitik,
   SENYAWA_GERO, cakupanKuantitatif, type SenyawaGero,
 } from '../lib/farmakodinamik'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Halaman ini menjelaskan MEKANISME, bukan keadaan seseorang. Tidak ada satu
 // pun angka di sini yang berasal dari pengguna, dan tidak satu pun boleh
@@ -190,6 +192,7 @@ export function GenomeLab() {
     <div className="space-y-4">
       <SectionTitle icon={<IconActivity />} title="Genome Lab"
         subtitle="How replication, telomere attrition and editing actually work — mechanism, not measurement" />
+      <BatasKlaimKesehatan permukaan="genomics.genome-lab" />
 
       {/* Batas ilmiah diletakkan di ATAS, bukan di kaki halaman: pembaca harus
           tahu apa yang sedang dilihatnya sebelum melihat angkanya. */}
@@ -290,6 +293,7 @@ export function GenomeLab() {
       <Card>
         <SectionTitle icon={<IconActivity />} title="4 · DNA → RNA → protein, and where an edit would land"
           subtitle="Transcription, translation, and Cas9 guide placement on the same sequence" />
+        <CentralDogmaEvolutionSimulator codingDna={bersih} />
         <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500" htmlFor="urutan">
           Sequence (A, C, G, T)
         </label>

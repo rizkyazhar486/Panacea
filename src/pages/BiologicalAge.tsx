@@ -5,6 +5,7 @@ import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
 import { getHealthCache, getDemoTersimpan, pushBiometrics } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
 import { LongevityPanel } from '../components/LongevityPanel'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Biological & Metabolic Age — estimates how old your body "acts" versus your
@@ -228,6 +229,7 @@ export function BiologicalAge() {
             <div className="mt-1 text-[10px] text-neutral-500">from resting metabolic rate</div>
           </div>
         </div>
+        <BatasKlaimKesehatan permukaan="longevity.biological-age" />
 
         {/* Koefisien di berkas ini adalah pilihan penulis, bukan hasil
             penelitian. Menampilkan angka bertahun-tahun tanpa mengatakan itu

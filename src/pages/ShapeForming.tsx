@@ -4,6 +4,7 @@ import { IconSparkle, IconUpload, IconActivity, IconLeaf, IconHeart } from '../c
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { api } from '../lib/api'
 import { saveBodyCharacter } from '../lib/bodyCharacter'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Level-based workout plans (Beginner → Pro) for shaping the body.
 type Level = 'beginner' | 'intermediate' | 'advanced' | 'pro'
@@ -133,7 +134,11 @@ export function ShapeForming() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Body Shaping & Longevity from a Photo" subtitle="Upload a photo for tailored training, nutrition & skin-quality recommendations" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Body Shaping & Longevity from a Photo" subtitle="AI lifestyle draft from a photo — not a clinically validated Panacea body, skin, or medical assessment" />
+        <BatasKlaimKesehatan permukaan="longevity.shape-forming" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Photo analysis is a technical coaching draft. It does not diagnose disease, measure fat or age clinically, or replace a trainer or clinician. The image is sent to the server for reading — crop faces or identifiers you do not want shared.
+        </p>
         <div className="mt-3 flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-brand/30 bg-brand-50/30 p-6 text-center">
           {preview ? (
             <img src={preview} alt="Preview" className="h-40 w-40 rounded-2xl object-cover shadow-sm" />

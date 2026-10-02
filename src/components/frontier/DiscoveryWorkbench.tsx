@@ -7,6 +7,8 @@ import {
 } from '../../lib/discoveryWorkbench'
 
 const SynapseMicro3DLab = lazy(() => import('../../pages/discovery/SynapseMicro3DLab'))
+const MentalStateCircuit3DLab = lazy(() => import('./MentalStateCircuit3DLab'))
+const NeuropsychiatryCircuitStudio3D = lazy(() => import('./NeuropsychiatryCircuitStudio3D'))
 
 const MODE_COPY: Record<DiscoveryMode, { label: string; subtitle: string }> = {
   discovery: { label: 'Discovery', subtitle: 'Competing hypotheses, causal structure, falsification and missing evidence.' },
@@ -160,6 +162,26 @@ export function DiscoveryWorkbench() {
           <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
             <Suspense fallback={<div className="p-4 text-xs text-neutral-500" role="status" aria-live="polite">Loading 3D synapse workbench…</div>}>
               <SynapseMicro3DLab />
+            </Suspense>
+          </div>
+        </details>
+      )}
+      {challenge.id === 'cross-scale-neurodegeneration' && (
+        <details className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3">
+          <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open circuit bridge: neurodegeneration and mental-state networks 3D</summary>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+            <Suspense fallback={<div className="p-4 text-xs text-neutral-500" role="status" aria-live="polite">Loading circuit model…</div>}>
+              <MentalStateCircuit3DLab />
+            </Suspense>
+          </div>
+        </details>
+      )}
+      {challenge.id === 'cross-scale-neurodegeneration' && (
+        <details className="rounded-2xl border border-brand/20 bg-brand/[.03] p-3">
+          <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open circuit studio: neuropsychiatric network presets 3D</summary>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+            <Suspense fallback={<div className="p-4 text-xs text-neutral-500" role="status" aria-live="polite">Loading circuit studio…</div>}>
+              <NeuropsychiatryCircuitStudio3D />
             </Suspense>
           </div>
         </details>

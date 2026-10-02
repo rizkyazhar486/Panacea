@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
 import { IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Live sports scores — football (multi-league), NBA, NFL, F1. Sources are free
@@ -103,6 +104,7 @@ export function SportsScores() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Live Scores" subtitle="Football, NBA, NFL, MLB, NHL, UFC, tennis, cricket, F1, MotoGP — free sources" />
+        <BatasKlaimKesehatan permukaan="performance.sports-scores" />
         <label className="mt-3 block">
           <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-neutral-500">Choose league / sport</span>
           <select

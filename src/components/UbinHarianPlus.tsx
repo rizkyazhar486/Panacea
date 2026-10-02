@@ -7,6 +7,7 @@ import {
   ambilSuplemen, tambahSuplemen, hapusSuplemen, sudahDiminum, alihkanMinum,
   ambilSesiSuhu, catatSesiSuhu, hariSejak, tanggalHariIni,
 } from '../lib/kebiasaanHarian'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Delapan widget harian dari data yang sudah dicatat aplikasi ini, ditambah dua
@@ -24,6 +25,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      <BatasKlaimKesehatan permukaan="wellness.daily-plus-tile" />
       {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link> : null)}
     </div>
   )

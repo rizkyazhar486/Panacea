@@ -182,7 +182,7 @@ export function HumanPassportWidget({ name = '' }: { name?: string }) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/10 bg-[#050c13] text-white shadow-[0_28px_90px_rgba(0,0,0,.22)]">
+    <section className="dark overflow-hidden rounded-[30px] border border-white/10 bg-[#050c13] text-white shadow-[0_28px_90px_rgba(0,0,0,.22)]">
       <div className="grid lg:grid-cols-[.9fr_1.1fr]">
         <div className="relative min-h-[420px] border-b border-white/8 lg:border-b-0 lg:border-r">
           <BodyExposureWidget hero interactive showCta={false} className="h-full min-h-[420px] !rounded-none" />

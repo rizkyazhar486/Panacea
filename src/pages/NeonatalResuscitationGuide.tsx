@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Neonatal Resuscitation education guide — the standard NRP (Neonatal
@@ -68,7 +69,8 @@ export function NeonatalResuscitationGuide() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Neonatal Resuscitation (NRP) Guide" subtitle="The initial-steps algorithm & Golden Minute, as a learning/practice aid" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Neonatal Resuscitation (NRP) Guide" subtitle="Educational Golden Minute checklist — not a clinically validated Panacea resuscitation authority" />
+        <BatasKlaimKesehatan permukaan="clinical.neonatal-resus" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">A learning reference only, adapted from the standard AAP/ILCOR NRP initial-steps algorithm — not a substitute for NRP certification, your institution's protocol, or real-time clinical judgment during an actual resuscitation.</Prosa>
       </Card>
 

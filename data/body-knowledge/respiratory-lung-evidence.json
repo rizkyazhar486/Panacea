@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-18",
+  "system": "respiratory",
+  "organ": "lung",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports anatomy/physiology relationships only at the general educational level; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
+  "relationships": [
+    {
+      "id": "alveolar-capillary-air-blood-barrier",
+      "domain": "anatomy-physiology",
+      "from": "alveolar-capillary-air-blood-barrier",
+      "to": "pulmonary-gas-exchange",
+      "relationship": "provides-structural-interface-for-diffusion",
+      "claim": "The lung air-blood barrier establishes close contact between alveolar gas and pulmonary capillary blood, providing the structural interface across which respiratory-gas diffusion occurs.",
+      "evidence": ["pmid:27981379"],
+      "status": "source-checked"
+    },
+    {
+      "id": "ventilation-perfusion-gas-exchange",
+      "domain": "physiology",
+      "from": "alveolar-ventilation-and-perfusion",
+      "to": "oxygen-carbon-dioxide-exchange",
+      "relationship": "supports-gas-exchange",
+      "claim": "Pulmonary gas exchange depends on ventilation bringing fresh gas to alveoli and perfusion bringing blood to alveolar capillaries; ventilation-perfusion mismatch can impair arterial oxygenation or carbon-dioxide elimination.",
+      "evidence": ["pmid:37816345"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:27981379",
+      "pmid": "27981379",
+      "title": "Lung morphometry: the link between structure and function.",
+      "year": 2017,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/27981379/",
+      "evidenceRole": "Structural relationship between alveolar air, capillary blood, the air-blood barrier and gas-exchange capacity.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:37816345",
+      "pmid": "37816345",
+      "title": "Gas Exchange in the Lung.",
+      "year": 2023,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37816345/",
+      "evidenceRole": "Educational review of alveolar ventilation, perfusion, diffusion and ventilation-perfusion mismatch in pulmonary gas exchange.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-recommendation",
+      "source-checked-to-human-reviewed"
+    ]
+  }
+}

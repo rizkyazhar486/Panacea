@@ -2,6 +2,11 @@ export type AtomicScale = 'organism' | 'organ' | 'tissue' | 'cell' | 'organelle'
 
 export type EvidenceState = 'established' | 'preclinical' | 'experimental' | 'hypothesis' | 'unsolved'
 
+export interface EvidenceAnchor {
+  pmid: string
+  label: string
+}
+
 export interface AtomicChallenge {
   id: string
   title: string
@@ -12,6 +17,7 @@ export interface AtomicChallenge {
   bottlenecks: string[]
   evidence: EvidenceState
   solved: boolean
+  evidenceAnchors?: EvidenceAnchor[]
 }
 
 export const ATOMIC_CHALLENGES: AtomicChallenge[] = [
@@ -62,6 +68,19 @@ export const ATOMIC_CHALLENGES: AtomicChallenge[] = [
     interventions: ['selective senolytic concept', 'immune-cell targeting concept', 'thymic rejuvenation research'],
     bottlenecks: ['marker specificity', 'beneficial senescence', 'immune exhaustion', 'tissue heterogeneity', 'clinical endpoints'],
     evidence: 'experimental', solved: false,
+  },
+  {
+    id: 'immune-tolerance', title: 'Antigen-specific immune tolerance', scale: 'cell',
+    problem: 'Restore durable self-tolerance in autoimmune disease without globally suppressing protective immunity or assuming one antigen explains a heterogeneous disease.',
+    mechanism: 'Antigen-linked regulatory T-cell strategies, engineered TCR/CAR-Tregs and tolerogenic antigen delivery aim to focus suppression around disease-relevant immune recognition while preserving broader immune competence.',
+    interventions: ['antigen-specific Treg/TCR-Treg research', 'CAR-Treg research', 'tolerogenic antigen-delivery research', 'immune-reset versus tolerance comparison'],
+    bottlenecks: ['autoantigen and disease-stage heterogeneity', 'Treg stability and fitness in inflamed tissue', 'manufacturing complexity and access', 'durability', 'infection or generalized immunosuppression risk', 'prospective clinical validation'],
+    evidence: 'experimental', solved: false,
+    evidenceAnchors: [
+      { pmid: '42276316', label: 'Antigen-specific tolerance in type 1 diabetes' },
+      { pmid: '42661942', label: 'Treg translation in autoimmune disease' },
+      { pmid: '42677052', label: 'CAR-T immune reset in rheumatic disease' },
+    ],
   },
   {
     id: 'ecm-crosslinks', title: 'ECM cross-links & stiffness', scale: 'tissue',

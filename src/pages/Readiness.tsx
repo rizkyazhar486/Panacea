@@ -7,6 +7,7 @@ import { awal, awalBulat } from '../lib/nilaiAwal'
 import { useVitals } from '../lib/useVitals'
 import { mergeVitals } from '../lib/healthVitals'
 import { mergeHealthCache } from '../lib/profile'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { buildRecoveryRecordedChecklist } from '../lib/recoveryRecordedChecklist'
 
 interface Workout { rpe: number; min: number }
@@ -195,6 +196,7 @@ export function Readiness() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Readiness & Recovery" subtitle="Recorded signals and your own recent history — without a synthetic readiness score" />
+        <BatasKlaimKesehatan permukaan="performance.readiness" />
         <div className="mt-3 rounded-2xl border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-950 dark:border-amber-700/60 dark:bg-amber-950/30 dark:text-amber-100">
           Panacea does not convert HRV, resting heart rate, sleep, behaviors, or workout entries into a home-made recovery score or training prescription. Provider-derived scores must remain attributed to their provider and are not available here unless a reviewed adapter supplies them with provenance.
         </div>
