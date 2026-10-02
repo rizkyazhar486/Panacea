@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "description": "Policy for scripts/qa/dependency-audit-gate.mjs. The gate fails on any high/critical advisory in the production dependency tree unless it is listed in accepted. An acceptance needs a reason, a risk register id and an expiry date, and stops covering the advisory the day after it expires.",
+  "fail_on": ["high", "critical"],
+  "accepted": []
+}
