@@ -69,7 +69,7 @@ const pupilEvidence: EyePhysiologyEvidence = {
 }
 
 /**
- * Eye Gold Standard physiology core.
+ * Eye physiology core (one organ under the Universal Human Gold Standard; see docs/body-exposure/HUMAN_DIGITAL_TWIN_GOLD_STANDARD.md).
  * These are ordered educational state transitions anchored to named anatomy.
  * They are not measured flow, pressure, refractive power, latency, disease state,
  * treatment logic, or patient-specific physiology.

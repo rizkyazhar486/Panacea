@@ -96,12 +96,40 @@ function classifyGeometry(status: string | undefined): OrganCoverageStatus {
   return 'missing'
 }
 
+const ORGAN_COVERAGE_RANK: Readonly<Record<OrganCoverageStatus, number>> = {
+  missing: 0,
+  'reference-only': 1,
+  partial: 2,
+  shipped: 3,
+}
+
+function selectBestAcceptedOrganNode(
+  requirement: RequiredOrganCoverage,
+  nodesById: ReadonlyMap<string, AtlasManifest['nodes'][number]>,
+) {
+  let best: AtlasManifest['nodes'][number] | undefined
+  let bestRank = ORGAN_COVERAGE_RANK.missing
+
+  for (const nodeId of requirement.acceptedNodeIds) {
+    const candidate = nodesById.get(nodeId)
+    if (!candidate || candidate.scale !== 'organ') continue
+    const rank = ORGAN_COVERAGE_RANK[classifyGeometry(candidate.geometryStatus)]
+    if (!best || rank > bestRank) {
+      best = candidate
+      bestRank = rank
+    }
+  }
+
+  return best
+}
+
 export function buildOrganCoverageReport(manifest: AtlasManifest): OrganCoverageReport {
   const nodesById = new Map(manifest.nodes.map((node) => [node.id, node]))
   const entries: OrganCoverageEntry[] = REQUIRED_MACRO_ORGANS.map((requirement) => {
-    const matched = requirement.acceptedNodeIds
-      .map((id) => nodesById.get(id))
-      .find((node) => node?.scale === 'organ')
+    // Some requirements deliberately accept multiple canonical representations.
+    // Prefer the strongest actually shipped organ-scale candidate instead of
+    // allowing an earlier partial alias to mask a later complete source-backed node.
+    const matched = selectBestAcceptedOrganNode(requirement, nodesById)
 
     return {
       ...requirement,

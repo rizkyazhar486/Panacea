@@ -61,10 +61,10 @@ export const HOPE_DOMAINS: HopeDomain[] = [
     gate: 'self-directed',
     mission: 'Treat psychological safety, distress, connection, recovery and meaning as core health infrastructure rather than a secondary wellness feature.',
     whyItMatters: 'Mental disorders create a major global disability burden. Panacea should make help-seeking, validated screening, coping tools and a private safety plan easier to reach while keeping diagnosis and emergency response with qualified humans and local services.',
-    evidenceStage: 'Validated screening and safety-planning components can be productized now; diagnosis, crisis disposition and treatment selection remain clinician-led.',
+    evidenceStage: 'Published screening instruments and safety-planning components can be productized now; diagnosis, crisis disposition and treatment selection remain clinician-led.',
     inputs: ['self-reported mood/anxiety screens', 'warning signs', 'coping strategies', 'trusted supports', 'care contacts', 'sleep/stress context'],
     outputs: ['screening context', 'private safety plan', 'coping toolkit', 'support map', 'follow-up prompts', 'clear escalation path'],
-    modules: ['Validated screening', 'Safety plan', 'Coping & grounding', 'Substance-use screening', 'Meaning & values', 'Recovery stories'],
+    modules: ['Published screening instruments', 'Safety plan', 'Coping & grounding', 'Substance-use screening', 'Meaning & values', 'Recovery stories'],
     integrations: ['Pusat Jiwa', 'Notifications', 'Consult', 'Hospitals', 'Sleep Pattern', 'Life Compass'],
     formulas: [
       { label: 'Safety-plan completeness', expression: 'completeness = completed sections / core sections × 100%', meaning: 'A usability indicator only; never a suicide-risk score.' },

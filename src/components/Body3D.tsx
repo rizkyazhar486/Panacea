@@ -17,6 +17,9 @@ import {
   publishAnatomySourceSelection,
 } from '../lib/anatomySourceNodeRegistry'
 import { createBodyAtlasRuntimeRootLifecycle } from '../lib/bodyAtlasRuntimeRootLifecycle'
+import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { bodyStructureCameraFocus } from '../lib/bodyStructureCameraFocus'
+import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -380,29 +383,35 @@ export function Body3D({
     controlsRef.current = controls
     hasFitRef.current = false
 
-    let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
 
-    // Tidak ada loop 60-fps saat tubuh diam. OrbitControls tanpa damping
-    // mengirim event "change" saat drag/zoom; perubahan React lain memanggil
-    // requestRenderRef. Ini mempertahankan detail tinggi tanpa membakar GPU
-    // hanya untuk menggambar frame identik berulang kali.
-    function requestRender() {
-      if (raf !== 0 || !inViewport || !documentVisible) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        if (!inViewport || !documentVisible) return
+    // Body3D shares the same demand-render lifecycle as the rest of the Body
+    // runtime. The scheduler coalesces bursty invalidations into one frame and
+    // never owns a permanent RAF loop.
+    let contextLifecycle!: ReturnType<typeof createBodyWebglContextLifecycle>
+    const renderScheduler = createBodyRenderScheduler({
+      canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
+      renderFrame: () => {
         controls.update()
         renderer.render(scene, camera)
-      })
-    }
+      },
+      requestFrame: (callback) => requestAnimationFrame(callback),
+      cancelFrame: (frameId) => cancelAnimationFrame(frameId),
+    })
+    contextLifecycle = createBodyWebglContextLifecycle({
+      onLost: () => {
+        renderScheduler.stop()
+        setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
+      },
+      onRestored: () => {
+        setFatal('')
+        renderScheduler.request()
+      },
+    })
 
-    function stopRendering() {
-      if (raf === 0) return
-      cancelAnimationFrame(raf)
-      raf = 0
-    }
+    const requestRender = () => renderScheduler.request()
+    const stopRendering = () => renderScheduler.stop()
 
     requestRenderRef.current = requestRender
     controls.addEventListener('change', requestRender)
@@ -459,15 +468,8 @@ export function Body3D({
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    const onContextLost = (e: Event) => {
-      e.preventDefault()
-      stopRendering()
-      setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
-    }
-    const onContextRestored = () => {
-      setFatal('')
-      requestRender()
-    }
+    const onContextLost = (e: Event) => contextLifecycle.handleLost(e)
+    const onContextRestored = () => contextLifecycle.handleRestored()
     renderer.domElement.addEventListener('webglcontextlost', onContextLost)
     renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
@@ -492,7 +494,8 @@ export function Body3D({
 
     return () => {
       requestRenderRef.current = () => undefined
-      stopRendering()
+      renderScheduler.dispose()
+      contextLifecycle.dispose()
       controls.removeEventListener('change', requestRender)
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
@@ -802,18 +805,22 @@ export function Body3D({
     const controls = controlsRef.current
     if (camera && controls) {
       if (focusBox && !focusBox.isEmpty()) {
-        const center = focusBox.getCenter(new THREE.Vector3())
-        const size = focusBox.getSize(new THREE.Vector3())
-        const radius = Math.max(size.length() * 0.5, 0.03)
-        const dist = Math.max(radius * 8, 0.35)
-        let dir = camera.position.clone().sub(controls.target)
-        if (dir.lengthSq() < 1e-8) dir = new THREE.Vector3(0, 0.15, 1)
-        dir.normalize()
-        camera.position.copy(center.clone().add(dir.multiplyScalar(dist)))
-        controls.target.copy(center)
-        controls.minDistance = dist * 0.3
-        controls.maxDistance = dist * 8
-        controls.update()
+        const pose = bodyStructureCameraFocus(
+          {
+            min: { x: focusBox.min.x, y: focusBox.min.y, z: focusBox.min.z },
+            max: { x: focusBox.max.x, y: focusBox.max.y, z: focusBox.max.z },
+          },
+          { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+          4.5,
+        )
+        if (pose) {
+          camera.position.set(pose.position.x, pose.position.y, pose.position.z)
+          controls.target.set(pose.target.x, pose.target.y, pose.target.z)
+          const distance = camera.position.distanceTo(controls.target)
+          controls.minDistance = Math.max(pose.span * 0.08, 0.005)
+          controls.maxDistance = Math.max(pose.span * 12, distance * 8)
+          controls.update()
+        }
       } else if (!focusKeywords && homeFramingRef.current) {
         const home = homeFramingRef.current
         camera.position.copy(home.position)

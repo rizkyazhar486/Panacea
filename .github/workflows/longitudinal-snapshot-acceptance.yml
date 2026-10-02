@@ -1,0 +1,50 @@
+name: Shared Longitudinal Snapshot
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/lib/*Longitudinal*'
+      - 'src/lib/longitudinalSnapshot.ts'
+      - 'src/lib/store.tsx'
+      - 'src/main.tsx'
+      - 'scripts/qa/longitudinal-*'
+      - 'scripts/uji/longitudinal-snapshot.mts'
+      - '.github/workflows/longitudinal-snapshot-acceptance.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/lib/*Longitudinal*'
+      - 'src/lib/longitudinalSnapshot.ts'
+      - 'src/lib/store.tsx'
+      - 'src/main.tsx'
+      - 'scripts/qa/longitudinal-*'
+      - 'scripts/uji/longitudinal-snapshot.mts'
+      - '.github/workflows/longitudinal-snapshot-acceptance.yml'
+permissions:
+  contents: read
+jobs:
+  shared-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/longitudinal-snapshot.mts
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Three real consumers and account isolation
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 5180 --strictPort > /tmp/longitudinal-vite.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:5180/scripts/qa/longitudinal-fixture.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/qa/longitudinal-snapshot-smoke.mjs

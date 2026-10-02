@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { IconActivity, IconHeart, IconCheck } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Initial Assessment — required before starting a demanding program: movement
@@ -97,6 +98,7 @@ export function InitialAssessment() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Initial Assessment" subtitle="Movement patterns, injury risk, pain, strength and asymmetry — before starting a demanding programme" />
+        <BatasKlaimKesehatan permukaan="clinical.initial-assessment" />
         <div className="mt-3 flex flex-wrap gap-1.5">
           {STEPS.map((s, i) => (
             <button key={s} onClick={() => setStep(i)} className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition ' + (step === i ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{i + 1}. {s}</button>

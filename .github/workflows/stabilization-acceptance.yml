@@ -45,8 +45,38 @@ jobs:
         run: npm run uji
 
       - name: Install mobile browser smoke runner
+        timeout-minutes: 8
         run: |
-          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          set -euo pipefail
+          PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
+          mkdir -p "$PW_PREFIX"
+          printf '%s\n' '{"private":true}' > "$PW_PREFIX/package.json"
+
+          installed=''
+          for attempt in 1 2 3; do
+            if npm install \
+              --prefix "$PW_PREFIX" \
+              --no-save \
+              --package-lock=false \
+              --no-audit \
+              --no-fund \
+              @playwright/test@1.55.0; then
+              installed='yes'
+              break
+            fi
+            if [ "$attempt" = '3' ]; then
+              echo "Playwright smoke-runner install failed after $attempt attempts." >&2
+              exit 1
+            fi
+            echo "Playwright install attempt $attempt failed; retrying isolated install." >&2
+            sleep $((attempt * 5))
+          done
+          test "$installed" = 'yes'
+
+          mkdir -p node_modules/@playwright
+          rm -rf node_modules/@playwright/test
+          ln -s "$PW_PREFIX/node_modules/@playwright/test" node_modules/@playwright/test
+
           # GitHub's Ubuntu runner can include the unrelated Google Chrome apt
           # source. A transient checksum mismatch there must not block Playwright
           # Chromium's own system-dependency installation.
@@ -57,11 +87,11 @@ jobs:
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
-          npx playwright install --with-deps chromium
+          "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Start frontend preview
         run: |
-          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-vite-preview.log 2>&1 &
+          nohup setsid npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-vite-preview.log 2>&1 &
           echo $! > /tmp/panacea-vite-preview.pid
           for attempt in $(seq 1 45); do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
@@ -77,7 +107,7 @@ jobs:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           BODY3D_QA_SCREENSHOT: artifacts/body3d-mobile-390x844.png
           BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
-        run: node scripts/qa/body3d-mobile-smoke.mjs
+        run: node scripts/qa/body3d-mobile-smoke-v2.mjs
 
       - name: Body Exposure rendered WebGL visual artifact
         env:
@@ -91,6 +121,42 @@ jobs:
           PANACEA_OS_QA_SCREENSHOT: artifacts/panacea-os-mobile-390x844.png
           PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
         run: node scripts/qa/panacea-os-mobile-smoke.mjs
+
+      - name: Priority 2 UI/UX mobile 320x568 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_WIDTH: '320'
+          UIUX_MOBILE_QA_HEIGHT: '568'
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-320x568
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
+      - name: Priority 2 UI/UX mobile 390x844 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-390x844
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
+      - name: Priority 2 UI/UX mobile 430x932 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_WIDTH: '430'
+          UIUX_MOBILE_QA_HEIGHT: '932'
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-430x932
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
+      - name: Priority 2 UI/UX mobile landscape 844x390 smoke
+        env:
+          UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173
+          UIUX_MOBILE_QA_WIDTH: '844'
+          UIUX_MOBILE_QA_HEIGHT: '390'
+          UIUX_MOBILE_QA_DIR: artifacts/uiux-mobile-844x390
+        run: node scripts/qa/uiux-mobile-shell-smoke.mjs
+
+      - name: Mobile parent query and history boundary
+        env:
+          NAVIGATION_QA_ORIGIN: http://127.0.0.1:4173
+          NAVIGATION_QA_OUTPUT: artifacts/uiux-mobile-390x844
+        run: node scripts/qa/navigation-back-smoke.mjs
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()
@@ -110,11 +176,23 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Upload Priority 2 UI/UX mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uiux-mobile-responsive-matrix
+          path: artifacts/uiux-mobile-*/*
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Stop frontend preview
         if: always()
         run: |
           if [ -f /tmp/panacea-vite-preview.pid ]; then
-            kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
+            preview_pid="$(cat /tmp/panacea-vite-preview.pid)"
+            kill -TERM -- "-$preview_pid" 2>/dev/null || kill -TERM "$preview_pid" 2>/dev/null || true
+            sleep 1
+            kill -KILL -- "-$preview_pid" 2>/dev/null || true
           fi
 
   # Server acceptance is independent of the browser/WebGL runner. Some backend

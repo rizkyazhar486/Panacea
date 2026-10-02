@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSparkle } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Bio-Simulators — three illustrative visualizations of longevity mechanisms
@@ -126,6 +127,7 @@ export function BioSimulators() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Bio-Simulators" subtitle="An illustration of mechanism, not a measurement" />
+        <BatasKlaimKesehatan permukaan="longevity.bio-simulators" />
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
           The curves on this page <b>are built to illustrate the shape of the relationship</b>, not calculated from your body and not
           drawn from research data. Do not read them as actual levels or rates.

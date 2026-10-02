@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { BilahRujukan } from '../lib/bilahRujukan'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Bilah rentang rujukan sebagai gambar.
@@ -110,6 +111,7 @@ export function BilahTubuh({ daftar }: { daftar: BilahRujukan[] }) {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Against reference ranges</h2>
+        <BatasKlaimKesehatan permukaan="body.status-bar" />
         <Link to="/tubuh" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           More →
         </Link>

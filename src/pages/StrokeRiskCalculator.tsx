@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CHA2DS2-VASc Score — Lip, G.Y.H., et al. (2010), Chest, 137(2):263-272.
@@ -42,7 +43,8 @@ export function StrokeRiskCalculator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="CHA₂DS₂-VASc Score" subtitle="Stroke risk in atrial fibrillation (Lip et al., 2010)" />
+        <SectionTitle icon={<IconHeart size={20} />} title="CHA₂DS₂-VASc Score" subtitle="Published AF stroke risk (Lip et al. 2010) — not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The standard clinical tool for estimating annual stroke risk in patients with atrial fibrillation and guiding the anticoagulation decision. Check every factor that applies.</Prosa>
       </Card>
 

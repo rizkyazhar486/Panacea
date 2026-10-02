@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { KepingStrukturRisiko } from './KepingStrukturRisiko'
+import { UniversalOperationSimulationConsole } from './UniversalOperationSimulationConsole'
+import { GlobalOperationUniverseCoverage } from './GlobalOperationUniverseCoverage'
 import { Body3D, CT_WINDOWS, type MotionState } from '../Body3D'
 import { IconActivity, IconBook, IconHeart, IconShield, IconSparkle, IconTimer } from '../icons'
 import {
@@ -172,7 +174,7 @@ export function SurgicalOperationAtlasV2() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="max-w-3xl">
@@ -311,6 +313,8 @@ export function SurgicalOperationAtlasV2() {
             </div>
           </div>
 
+          <UniversalOperationSimulationConsole procedure={procedure} />
+
           <div className="grid gap-3 border-t border-white/8 p-5 md:grid-cols-3 sm:p-6">
             <article className="rounded-2xl border border-white/8 bg-white/[.025] p-4">
               <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-cyan-200"><IconBook size={13} /> Learning objectives</div>
@@ -327,6 +331,8 @@ export function SurgicalOperationAtlasV2() {
               {showPatientGate && <div className="mt-3 space-y-1.5">{procedure.patientSpecificInputs.map((item) => <div key={item} className="text-[9px] leading-relaxed text-white/40">• {item}</div>)}</div>}
             </article>
           </div>
+
+          <GlobalOperationUniverseCoverage />
 
           <div className="border-t border-white/8 p-5 sm:p-6">
             <div className="flex flex-wrap items-end justify-between gap-3">

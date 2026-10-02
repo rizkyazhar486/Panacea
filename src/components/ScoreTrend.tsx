@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card } from './ui'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Serial score tracking for severity scores that are meant to be TRENDED
 // rather than read once (SOFA, NEWS2): save the currently-entered score with
@@ -42,6 +43,7 @@ export function ScoreTrend({ storageKey, scoreName, total, maxScore, detail }: {
 
   return (
     <Card className="!p-5">
+      <BatasKlaimKesehatan permukaan="wellness.score-trend" />
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Trend — serial {scoreName}</div>

@@ -9,6 +9,7 @@ import {
   muat, simpan, ringkas, pekanBerjalan, tinjauanJatuhTempo, WILAYAH,
   type Keadaan, type Komitmen, type Wilayah,
 } from '../lib/perubahan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Change — halaman yang mengubah membaca menjadi berbuat.
@@ -50,6 +51,7 @@ export function Perubahan() {
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Change"
         subtitle={`Week ${Math.min(pekan, k.pekanTotal)} of ${k.pekanTotal}`} />
+      <BatasKlaimKesehatan permukaan="wellness.change-log" />
 
       <Card>
         <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Your one commitment</div>

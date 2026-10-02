@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSparkle } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const STORAGE_KEY = 'panacea:mental-safety-plan:v1'
 
@@ -144,6 +145,7 @@ export function MentalSafetyPlan() {
           title="My Safety Plan"
           subtitle="A private plan for the moments when distress becomes hard to carry alone"
         />
+        <BatasKlaimKesehatan permukaan="care.mental-safety-plan" />
 
         <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-3 dark:border-red-500/20 dark:bg-red-500/10">
           <div className="text-xs font-black text-red-700 dark:text-red-200">If you may act on thoughts of harming yourself or someone else now</div>
