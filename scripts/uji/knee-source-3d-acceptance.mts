@@ -26,7 +26,7 @@ for (const [label, pattern] of [
   ['patella', /patella/],
   ['articular cartilage', /cartilage/],
   ['patellar ligament or tendon', /patellar ligament|patellar tendon/],
-  ['quadriceps tendon', /quadriceps.*tendon/],
+  ['quadriceps tendon', /tendon of quadriceps|quadriceps.*tendon/],
 ] as const) {
   assert.ok(names.some((name) => pattern.test(name)), `${label} source geometry must remain present`)
 }
