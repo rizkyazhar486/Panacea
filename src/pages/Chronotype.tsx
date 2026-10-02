@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Chronotype Quiz — the reduced Morningness-Eveningness Questionnaire (rMEQ),
@@ -82,8 +83,9 @@ export function Chronotype() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Chronotype Quiz" subtitle="Reduced Morningness-Eveningness Questionnaire (rMEQ)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A validated 5-item short form (Adan &amp; Almirall, 1991) of the classic Horne &amp; Östberg questionnaire, used in chronobiology research to classify a person's natural circadian tendency. Answer according to how you naturally feel — not your current schedule.</Prosa>
+        <SectionTitle icon={<IconMoon size={20} />} title="Chronotype Quiz" subtitle="Published rMEQ (Adan & Almirall, 1991) — not a clinically validated Panacea decision" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A published 5-item short form of the classic Horne &amp; Östberg questionnaire, used in chronobiology research to classify a person's natural circadian tendency. Answer according to how you naturally feel — not your current schedule.</Prosa>
+        <BatasKlaimKesehatan permukaan="screening.chronotype" />
       </Card>
 
       {QUESTIONS.map((q, qi) => (

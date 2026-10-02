@@ -1,4 +1,5 @@
 import { MultiscaleScaleRail } from './MultiscaleScaleRail'
+import { auditEmptyScales } from '../../lib/bodyMultiscaleBridge'
 import {
   PULMONARY_SFTPC_MOLECULAR_VERTICAL,
   PULMONARY_SFTPC_WITHHELD_GAPS,
@@ -22,6 +23,9 @@ import {
 
 export function VertikalMolekulerPanel() {
   const periksa = validatePulmonarySftpcVertical()
+  // Kalimat "tiap skala kosong ada alasannya" hanya boleh tampil bila benar.
+  const audit = auditEmptyScales(PULMONARY_SFTPC_MOLECULAR_VERTICAL, PULMONARY_SFTPC_WITHHELD_GAPS)
+  const tanpaPenjelasan = audit.unexplained.join(', ')
 
   return (
     <div className="space-y-4">
@@ -32,25 +36,44 @@ export function VertikalMolekulerPanel() {
         className="rounded-2xl border border-amber-500/25 bg-amber-500/[.06] p-3.5"
       >
         <div className="text-[10px] font-black uppercase tracking-[.14em] text-amber-600 dark:text-amber-300">
-          Withheld on purpose
+          Empty on purpose
         </div>
         <h3 id="vertikal-ditahan" className="mt-1 text-sm font-black text-ink dark:text-white">
-          {PULMONARY_SFTPC_WITHHELD_GAPS.length} scales are deliberately empty
+          {PULMONARY_SFTPC_WITHHELD_GAPS.length} scales have no node
         </h3>
-        <p className="mt-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          A greyed-out scale above is not unfinished work. Each one below was refused for a
-          recorded reason, because inventing a node would be worse than leaving the step missing.
-        </p>
+        {audit.ok ? (
+          <p className="mt-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            A greyed-out scale above is never silently missing. Each one below is empty because the
+            source policy refuses the available evidence, or because admissible, pinned evidence is
+            not recorded yet. Neither case is filled with an invented node.
+          </p>
+        ) : (
+          <p role="alert" className="mt-1 text-[11.5px] font-semibold leading-relaxed text-red-600 dark:text-red-300">
+            {tanpaPenjelasan
+              ? `No recorded reason for: ${tanpaPenjelasan}. This page does not claim every empty scale is explained.`
+              : 'The list of empty scales is inconsistent with the nodes above. This page does not claim every empty scale is explained.'}
+          </p>
+        )}
         <ul className="mt-2.5 space-y-2">
           {PULMONARY_SFTPC_WITHHELD_GAPS.map((gap) => (
             <li key={gap.scale} className="rounded-xl bg-white/60 p-3 dark:bg-white/[.05]">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-xs font-black text-ink dark:text-white">{gap.label}</span>
-                <span className="rounded-full border border-amber-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-600 dark:text-amber-300">
-                  {gap.scale}
+                <span className="flex flex-wrap items-center gap-1">
+                  <span className="rounded-full border border-amber-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-600 dark:text-amber-300">
+                    {gap.scale}
+                  </span>
+                  <span className="rounded-full border border-neutral-300 px-2 py-0.5 text-[9px] font-bold text-neutral-500 dark:border-white/15 dark:text-neutral-400">
+                    {gap.kind === 'not-yet-modeled' ? 'Not yet modeled' : 'Withheld by policy'}
+                  </span>
                 </span>
               </div>
-              <p className="mt-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{gap.reason}</p>
+              <details className="mt-1">
+                <summary className="flex min-h-11 cursor-pointer items-center text-[11px] font-bold text-brand">
+                  Why is this empty?
+                </summary>
+                <p className="pb-1 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{gap.reason}</p>
+              </details>
             </li>
           ))}
         </ul>

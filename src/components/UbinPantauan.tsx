@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ambilPantauan, hapusPantauan, type Pantauan } from '../lib/pantauan'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ubin daftar pantauan — isinya ditentukan pemakainya sendiri.
@@ -40,6 +41,7 @@ export function UbinPantauan() {
     return (
       <section>
         <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Watching</h2>
+        <BatasKlaimKesehatan permukaan="wellness.monitor-tile" />
         <button
           onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
           className="t-kecil flex min-h-[64px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"

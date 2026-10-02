@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
 import { useStore } from '../lib/store'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cari pangan kemasan dan catat langsung — dari Open Food Facts.
@@ -92,6 +93,7 @@ export function UbinPangan() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Search packaged food</h2>
+        <BatasKlaimKesehatan permukaan="longevity.food-tile" />
         <span className="t-mikro text-neutral-400">Open Food Facts</span>
       </div>
 

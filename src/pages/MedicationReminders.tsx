@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../compone
 import { IconPill, IconBell } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import type { MedReminder } from '../lib/types'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Medication Reminders — daily push notifications at a chosen time, backed by
@@ -59,6 +60,7 @@ export function MedicationReminders() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconPill size={20} />} title="Medication Reminders" subtitle="Terima pemberitahuan saat waktunya minum obat" />
+        <BatasKlaimKesehatan permukaan="care.medication-reminders" />
         {!backendEnabled && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
             Reminders need the backend (and push notifications turned on in Settings) to actually notify you.

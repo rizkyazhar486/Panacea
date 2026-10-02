@@ -253,7 +253,7 @@ export function PanaceaRealityEngine() {
   const causalPath = realityCausalPath(reality)
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#020305] text-white shadow-[0_24px_80px_rgba(0,0,0,.42)]" aria-labelledby="panacea-reality-heading">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#020305] text-white shadow-[0_24px_80px_rgba(0,0,0,.42)]" aria-labelledby="panacea-reality-heading">
       <div className="border-b border-white/10 px-4 py-4 sm:px-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="max-w-3xl">

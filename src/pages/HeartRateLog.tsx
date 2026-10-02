@@ -7,6 +7,7 @@ import { IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled, type HrSample } from '../lib/api'
 import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Heart Rate Log — setiap sampel yang dikirim jam tangan, bukan hanya nilai
@@ -126,6 +127,7 @@ export function HeartRateLog() {
     return (
       <div className="space-y-4">
         <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
+        <BatasKlaimKesehatan permukaan="wellness.heart-rate-log" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             This log is filled in by the server through automatic sync, and the app is currently running

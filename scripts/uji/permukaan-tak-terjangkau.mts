@@ -72,7 +72,27 @@ const takTerjangkau = komponen.filter((p) => !dirujuk(p)).map((p) => p.replace(`
  * dan tidak dilihat siapa pun.
  */
 const DIKETAHUI: readonly string[] = [
+  // Ditambahkan 2026-09-16, dengan alasannya, bukan sekadar didiamkan:
+  //
+  // HomeNowWidget adalah susunan Home generasi v43 (mosaik + instrumen +
+  // empat aksi cepat). Home sekarang disusun oleh HomeCommandDeck,
+  // HomeHealthBrief dan HomeVisualLanding; memasangnya kembali akan
+  // menampilkan vitals yang sama dua kali di satu layar. Ia disimpan, tidak
+  // dihapus, karena HomeOverviewMosaic dan HomeHealthInstruments hanya hidup
+  // lewat berkas ini.
+  'components/HomeNowWidget.tsx',
   'components/KartuPratinjau.tsx',
+  // PremiumMotionRuntime hanya menyuapi --panacea-pointer-x/y untuk
+  // src/styles/panacea-pointer-light.css, yang sendirinya hanya terjangkau
+  // lewat src/styles/premium-motion-entry.css — dan berkas itu tidak diimpor
+  // siapa pun. Jadi seluruh pulau gerak premium ini tidak aktif.
+  //
+  // Menyalakannya BUKAN perbaikan kecil: panacea-premium-motion.css menyasar
+  // [class*="card"], [class*="glass"], setiap button dan main>section di
+  // seluruh aplikasi, sementara index.html sudah memuat lapisan v43–v48 yang
+  // menguasai permukaan yang sama. Keputusan itu milik pemilik lapisan v48,
+  // dan dicatat di sini alih-alih dinyalakan diam-diam di tengah PR lain.
+  'components/PremiumMotionRuntime.tsx',
   'components/RelatedFeaturesRail.tsx',
   'components/dashboard/ActivityAchievementWidget.tsx',
   'components/dashboard/LibraryDiscoveryWidget.tsx',

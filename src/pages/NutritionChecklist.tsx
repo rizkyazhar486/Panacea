@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 interface CheckItem {
   id: string
@@ -50,6 +51,7 @@ export function NutritionChecklist() {
           <div className="max-w-2xl">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-300">Safety checklist · not a diet-quality score</p>
             <h2 id="nutrition-checklist-title" className="mt-1 text-lg font-black text-ink dark:text-white">Review nutrition data before interpreting it</h2>
+            <BatasKlaimKesehatan permukaan="longevity.nutrition-checklist" />
             <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
               This is a process check for recorded data and provenance. It does not calculate needs, fill missing observations or provide clinical clearance.
             </p>

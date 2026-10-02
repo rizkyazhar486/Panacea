@@ -175,11 +175,7 @@ export function DialisisPanel() {
         <Angka nilai={ureaSekarang.toFixed(1)} satuan="mg/dL" label="Urea now" />
         <Angka nilai={volumeSekarang.toFixed(2)} satuan="L" label="Volume now" />
       </div>
-      <p className="text-[11px] leading-relaxed text-neutral-500">
-        The session replays on a fixed time step, and the marker reads its position from the same
-        function that draws the curve. Move any control and the whole trajectory is recomputed, not
-        redrawn from a stored picture.
-      </p>
+      <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">{'The session replays on a fixed time step, and the marker reads its position from the same function that draws the curve. Move any control and the whole trajectory is recomputed, not redrawn from a stored picture.'}</Prosa>
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
         <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">The dialyser</div>
@@ -225,14 +221,7 @@ export function DialisisPanel() {
           <Angka nilai={Number.isFinite(urrMurni) ? (urrMurni * 100).toFixed(2) : '—'} satuan="%" label="URR integrated" />
           <Angka nilai={Number.isFinite(ktvMurni) ? (urrDariKtv(ktvMurni) * 100).toFixed(2) : '—'} satuan="%" label="1 − e^(−Kt/V)" />
         </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
-          Strip out ultrafiltration and generation and the two middle numbers are not merely close —
-          they are the same number, because URR = 1 − e^(−Kt/V) is what the differential equation
-          collapses to when the volume is fixed and no urea is made. Put either back and the identity
-          breaks: generation holds the concentration up, and ultrafiltration concentrates what is left,
-          so URR stops being a clean translation of Kt/V. That is the whole reason two routes to Kt/V
-          exist at all.
-        </p>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">{'Strip out ultrafiltration and generation and the two middle numbers are not merely close — they are the same number, because URR = 1 − e^(−Kt/V) is what the differential equation collapses to when the volume is fixed and no urea is made. Put either back and the identity breaks: generation holds the concentration up, and ultrafiltration concentrates what is left, so URR stops being a clean translation of Kt/V. That is the whole reason two routes to Kt/V exist at all.'}</Prosa>
       </div>
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
@@ -241,15 +230,7 @@ export function DialisisPanel() {
       </div>
 
       <Prosa>
-        <p className="text-[11px] leading-relaxed text-neutral-500">
-          Mechanism, not treatment. Nothing here is a prescription, a dose, a recommended session
-          length, or a clinical adequacy threshold, and no number on this panel applies to any person.
-          A single pool is a drastic simplification: access recirculation and cardiopulmonary
-          recirculation are both absent, urea is assumed to mix instantly, clearance is treated as
-          constant for the whole session, and no solute other than urea is modelled. The starting
-          concentration, the distribution volume and the generation rate are values you set, not
-          measurements of anyone.
-        </p>
+        <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">{'Mechanism, not treatment. Nothing here is a prescription, a dose, a recommended session length, or a clinical adequacy threshold, and no number on this panel applies to any person. A single pool is a drastic simplification: access recirculation and cardiopulmonary recirculation are both absent, urea is assumed to mix instantly, clearance is treated as constant for the whole session, and no solute other than urea is modelled. The starting concentration, the distribution volume and the generation rate are values you set, not measurements of anyone.'}</Prosa>
       </Prosa>
     </div>
   )

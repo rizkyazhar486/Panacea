@@ -3,6 +3,7 @@ import {
   validateMultiscaleBridge,
   type MultiscaleBridge,
   type MultiscaleEvidenceRef,
+  type WithheldScale,
 } from './bodyMultiscaleBridge'
 import { validateEvidenceSourceForScale } from './bodyMultiscaleSourcePolicy'
 
@@ -156,20 +157,50 @@ export const PULMONARY_SFTPC_MOLECULAR_VERTICAL: MultiscaleBridge = {
   ],
 }
 
-export const PULMONARY_SFTPC_WITHHELD_GAPS = [
+// Tiga skala teratas (tubuh utuh, sistem, organ) kosong karena SATU sebab yang sama dan dapat
+// dibuktikan dari repositori: aset anatominya ada, tetapi tidak ada revisi sumber, id aset, atau
+// hash isi yang dipin. Kebijakan sumber skala-skala ini mensyaratkan id struktur/aset yang persis
+// dan revisi sumber (bodyMultiscaleSourcePolicy.ts), jadi simpulnya tidak dibuat. Model organ di
+// /public/organs sengaja TIDAK dipakai: dibangkitkan AI (src/lib/organModels.ts), bukan bukti
+// anatomi kasar. Gate skala-kosong-dijelaskan menjaga premis ini: bila revisi sumber kelak dipin
+// di CREDITS, gate itu gagal dan catatan ini harus diganti simpul sungguhan.
+export const PULMONARY_SFTPC_WITHHELD_GAPS: readonly WithheldScale[] = [
   {
-    scale: 'organelle' as const,
+    scale: 'whole-body',
+    label: 'Whole-body reference figure',
+    kind: 'not-yet-modeled',
+    reason: 'VERTICAL GAP — NOT YET MODELED: the full-body figure (public/anatomy: skeletal, muscular, cardiovascular, nervous and visceral layers) is derived from Z-Anatomy (CC BY-SA 4.0), but the repository records no pinned source revision, asset id or content hash for it. The whole-body source policy requires an exact atlas structure id and a source revision, so no whole-body node is created.',
+    evidence: null,
+  },
+  {
+    scale: 'system',
+    label: 'Respiratory system',
+    kind: 'not-yet-modeled',
+    reason: 'VERTICAL GAP — NOT YET MODELED: the respiratory module (public/atlas/respirasi.glb: airway tree to segmental bronchi, diaphragm, chest wall) is packaged from BodyParts3D 4.0 via ashemag/human-atlas, but no packaging revision, asset id or content hash is pinned in the repository. The system-scale source policy requires an exact structure id and a source revision, so no system node is created.',
+    evidence: null,
+  },
+  {
+    scale: 'organ',
+    label: 'Lungs and pleura',
+    kind: 'not-yet-modeled',
+    reason: 'VERTICAL GAP — NOT YET MODELED: lung and pleura gross anatomy ships as public/atlas/paru.glb from Z-Anatomy (CC BY-SA 4.0), but only the upstream repository is named; no pinned source revision, asset id or content hash is recorded. The organ-scale source policy requires an exact organ/asset id and a source revision, so no organ node is created. The AI-generated lung model in /organs is an approximation and is not accepted as gross-anatomy evidence.',
+    evidence: null,
+  },
+  {
+    scale: 'organelle',
     label: 'Lamellar body',
+    kind: 'withheld-by-policy',
     reason: 'Reactome v97 records SFTPC in the lamellar-body compartment, but the current organelle source policy only accepts Human Protein Atlas subcellular localization. HPA v25.1 reports SFTPC subcellular location as unavailable, so this node stays withheld.',
     evidence: reactomeSftpcLamellarBody,
   },
   {
-    scale: 'molecule' as const,
+    scale: 'molecule',
     label: 'Pulmonary surfactant lipid species',
+    kind: 'withheld-by-policy',
     reason: 'No single small-molecule identity is substituted for the heterogeneous pulmonary surfactant lipid mixture. A molecule node requires an exact compound/component identity and its own provenance.',
     evidence: null,
   },
-] as const
+]
 
 export function validatePulmonarySftpcVertical() {
   const bridge = validateMultiscaleBridge(PULMONARY_SFTPC_MOLECULAR_VERTICAL)

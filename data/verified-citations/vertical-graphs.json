@@ -1,0 +1,55 @@
+{
+  "purpose": "Citations used as evidence in vertical biological graphs, with how each was verified. A graph may only cite an id listed here; unverified ids are labelled, never silently trusted.",
+  "pmid": {
+    "28956314": {
+      "doi": "10.1007/5584_2017_106",
+      "title": "New Insights in Cardiac Calcium Handling and Excitation-Contraction Coupling.",
+      "journal": "Adv Exp Med Biol 2018;1067:373-385",
+      "supports": "cardiac Ca handling, EC coupling, ryanodine receptor role",
+      "verification": "verified",
+      "verifiedVia": "PubMed metadata lookup (NCBI)",
+      "verifiedOn": "2026-10-02"
+    },
+    "32661902": {
+      "doi": "10.1007/s12551-020-00729-x",
+      "title": "The architecture and function of cardiac dyads.",
+      "journal": "Biophys Rev 2020;12(4):1007-1017",
+      "supports": "dyad structure (T-tubule/junctional SR), Ca-induced Ca release through RYR",
+      "verification": "verified",
+      "verifiedVia": "PubMed metadata lookup (NCBI)",
+      "verifiedOn": "2026-10-02"
+    },
+    "34745372": {
+      "doi": "10.1007/s12551-021-00840-7",
+      "title": "Cardiac sarcomere mechanics in health and disease.",
+      "journal": "Biophys Rev 2021;13(5):637-652",
+      "supports": "sarcomere composition, activation, active force generation",
+      "verification": "verified",
+      "verifiedVia": "PubMed metadata lookup (NCBI)",
+      "verifiedOn": "2026-10-02"
+    },
+    "39211905": {
+      "doi": "10.1016/j.gendis.2024.101263",
+      "title": "Focus on cardiac troponin complex: From gene expression to cardiomyopathy.",
+      "journal": "Genes Dis 2024;11(6):101263",
+      "supports": "cardiac troponin complex subunits, gene expression, post-translational modification",
+      "verification": "verified",
+      "verifiedVia": "PubMed metadata lookup (NCBI)",
+      "verifiedOn": "2026-10-02"
+    }
+  },
+  "ncbiGene": {
+    "6262": {
+      "symbol": "RYR2",
+      "verification": "verified",
+      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
+      "verifiedOn": "2026-10-02"
+    },
+    "7134": {
+      "symbol": "TNNC1",
+      "verification": "verified",
+      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
+      "verifiedOn": "2026-10-02"
+    }
+  }
+}

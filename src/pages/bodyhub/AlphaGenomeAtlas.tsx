@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { buatRendererAman } from '../../lib/rendererAman';
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
   ALPHA_GENOME_ATLAS_BOUNDARY,
@@ -16,10 +18,14 @@ function genomeColor(symbol: string) {
 
 function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const [tanpaWebgl, setTanpaWebgl] = useState(false);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    // Tanpa WebGL hanya kanvas 3D yang diganti keterangan; pencarian dan rekaman tetap dipakai.
+    const renderer: THREE.WebGLRenderer | null = buatRendererAman({ antialias: true, powerPreference: 'high-performance' });
+    if (!renderer) { setTanpaWebgl(true); return; }
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x020617);
@@ -28,7 +34,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 80);
     camera.position.set(0, 1.1, 12);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -129,7 +134,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     root.add(signal);
 
     const clock = new THREE.Clock();
-    let raf = 0;
     const animate = () => {
       const elapsed = clock.getElapsedTime();
       controls.update();
@@ -139,7 +143,6 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
       protein.rotation.y = elapsed * 0.23;
       signal.position.copy(bridgeCurve.getPointAt((elapsed * 0.12) % 1));
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(animate);
     };
 
     const resize = () => {
@@ -152,10 +155,10 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
     resize();
-    animate();
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(raf);
+      loopTerjaga.hentikan();
       observer.disconnect();
       controls.dispose();
       root.traverse((object) => {
@@ -170,6 +173,7 @@ function GenomeScene({ record }: { record: GenomeAtlasRecord }) {
     };
   }, [record]);
 
+  if (tanpaWebgl) return <p role="status" data-tanpa-webgl className="rounded-xl bg-slate-900 p-3 text-sm text-slate-300">3D view unavailable on this device (WebGL could not start). The gene record and search below still work.</p>;
   return <div ref={mountRef} className="w-full" aria-label={`${record.symbol} chromosome DNA protein 3D atlas`} />;
 }
 

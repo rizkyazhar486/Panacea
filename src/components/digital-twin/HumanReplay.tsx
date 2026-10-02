@@ -154,7 +154,7 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
   }
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_34px_110px_rgba(0,0,0,.30)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">

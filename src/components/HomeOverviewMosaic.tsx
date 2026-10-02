@@ -4,6 +4,7 @@ import type { Vitals } from '../lib/healthVitals'
 import { vitalsAge } from '../lib/healthVitals'
 import { ambilRiwayat, deretMetrik } from '../lib/riwayatVitals'
 import '../styles/home-overview-mosaic-v43.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type MetricKey = Extract<keyof Vitals, string>
 
@@ -91,6 +92,7 @@ export function HomeOverviewMosaic({ vitals }: { vitals: Vitals }) {
         <div>
           <span>OVERVIEW · LIVE MOSAIC</span>
           <h2 id="pmd-overview-title">One glance, more dimensions.</h2>
+          <BatasKlaimKesehatan permukaan="wellness.home-overview" />
         </div>
         <div className="pmd-overview-head-meta"><b>{recorded}</b> signals available <span aria-hidden>↔</span></div>
       </div>

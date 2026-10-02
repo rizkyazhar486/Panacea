@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { buatRendererAman, tandaiTanpaWebgl } from '../lib/rendererAman'
+import { mulaiLoopTerjaga } from '../lib/loopRenderTerjaga'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Card, SectionTitle } from './ui'
 import {
@@ -9,6 +11,7 @@ import {
   relativePoiseuilleResistance,
   type Medical3DFrontierId,
 } from '../lib/medical3DFrontier'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 function clearScene(scene: THREE.Scene) {
   const keep = new Set(scene.children.filter((x) => x.userData.keep))
@@ -184,7 +187,8 @@ export function Medical3DFrontierLab() {
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100)
     camera.position.set(0, 0.4, 6.7)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    const renderer = buatRendererAman({ antialias: true, alpha: false })
+    if (!renderer) return tandaiTanpaWebgl(mount)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     mount.appendChild(renderer.domElement)
@@ -216,10 +220,8 @@ export function Medical3DFrontierLab() {
     resize()
     buildMode(scene, mode)
 
-    let raf = 0
     const clock = new THREE.Clock()
     const animate = () => {
-      raf = requestAnimationFrame(animate)
       const t = clock.getElapsedTime()
       scene.traverse((obj) => {
         const group = obj as THREE.Group
@@ -240,10 +242,10 @@ export function Medical3DFrontierLab() {
       controls.update()
       renderer.render(scene, camera)
     }
-    animate()
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
-      cancelAnimationFrame(raf)
+      loopTerjaga.hentikan()
       observer.disconnect()
       controls.dispose()
       clearScene(scene)
@@ -259,6 +261,7 @@ export function Medical3DFrontierLab() {
           title="3D Frontier Medical Lab"
           subtitle="Four high-value spatial modules that do not duplicate the existing anatomy, cell, surgery or biomechanics labs"
         />
+        <BatasKlaimKesehatan permukaan="clinical.medical-3d-lab" />
         <div className="mt-4 flex flex-wrap gap-2">
           {MEDICAL_3D_FRONTIER.map((item) => (
             <button

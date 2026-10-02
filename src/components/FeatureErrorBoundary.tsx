@@ -1,4 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { GalatApi } from '../lib/galatApi'
+import { laporGalat } from '../lib/laporGalatKlien'
 
 const LIGHTWEIGHT_MODE_KEY = 'panacea:lightweight-mode'
 
@@ -43,6 +45,7 @@ export class FeatureErrorBoundary extends Component<
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(`[FeatureErrorBoundary:${this.props.featureName}]`, error, info)
+    laporGalat('boundary', error, this.props.featureName)
   }
 
   private retry = () => {
@@ -93,6 +96,9 @@ export class FeatureErrorBoundary extends Component<
         <details className="mt-3 rounded-2xl bg-neutral-50 px-3 py-2 text-xs text-neutral-500 dark:bg-white/5 dark:text-neutral-400">
           <summary className="cursor-pointer font-semibold">Technical detail</summary>
           <p className="mt-2 break-words font-mono">{error.message || 'Unknown feature error'}</p>
+          {error instanceof GalatApi && error.requestId && (
+            <p className="mt-1 break-words font-mono" data-request-id={error.requestId}>Reference: {error.requestId}</p>
+          )}
         </details>
         <div className="mt-4 flex flex-wrap gap-2">
           <button

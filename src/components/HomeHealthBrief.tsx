@@ -2,30 +2,59 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
-import { getWorkouts } from '../lib/workoutStore'
-import { IconHeart, IconMoon, IconRun, IconSparkle } from './icons'
+import { IconHeart, IconMoon, IconPlus, IconRun } from './icons'
+import '../styles/home-human-interface.css'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 function num(value: number | undefined, digits = 0) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—'
   return digits ? value.toFixed(digits) : Math.round(value).toLocaleString()
 }
 
+type Instrument = {
+  key: string
+  label: string
+  value: string
+  unit?: string
+  to: string
+  icon: typeof IconRun
+}
+
+function ConnectionStatusGlyph({ online }: { online: boolean }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M2.8 9.2a7.2 7.2 0 0 1 8.4 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity={online ? 1 : .38} />
+      <path d="M4.8 12a4.2 4.2 0 0 1 4.4 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity={online ? 1 : .38} />
+      <circle cx="7" cy="15" r="1.1" fill="currentColor" opacity={online ? 1 : .38} />
+      <rect x="13" y="6" width="8" height="12" rx="2.1" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M15.6 3.8h2.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="15.3" y="13.2" width="3.4" height="2.6" rx=".8" fill="currentColor" opacity={online ? .9 : .28} />
+    </svg>
+  )
+}
+
 export function HomeHealthBrief() {
-  const { account, state } = useStore()
+  const { state } = useStore()
   const [refresh, setRefresh] = useState(0)
+  const [online, setOnline] = useState(() => typeof navigator === 'undefined' ? true : navigator.onLine)
 
   useEffect(() => {
     const update = () => setRefresh((value) => value + 1)
+    const markOnline = () => setOnline(true)
+    const markOffline = () => setOnline(false)
     window.addEventListener('panacea:health-updated', update)
     window.addEventListener('focus', update)
+    window.addEventListener('online', markOnline)
+    window.addEventListener('offline', markOffline)
     return () => {
       window.removeEventListener('panacea:health-updated', update)
       window.removeEventListener('focus', update)
+      window.removeEventListener('online', markOnline)
+      window.removeEventListener('offline', markOffline)
     }
   }, [])
 
   const vitals = useMemo(() => getVitals(), [refresh])
-  const workouts = useMemo(() => getWorkouts(), [refresh])
   const latestSleep = useMemo(() => [...(state.sleepLogs ?? [])]
     .filter((item) => typeof item?.hours === 'number' && item.hours > 0)
     .sort((a, b) => (a.date < b.date ? 1 : -1))[0], [state.sleepLogs])
@@ -36,68 +65,95 @@ export function HomeHealthBrief() {
   const steps = typeof vitals.steps === 'number' && vitals.steps >= 0 ? vitals.steps : undefined
   const restingHr = typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? vitals.restingHr : undefined
   const vo2max = typeof vitals.vo2max === 'number' && vitals.vo2max > 0 ? vitals.vo2max : undefined
-  const name = account?.name?.trim().split(/\s+/)[0] || ''
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
-  const date = useMemo(() => new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date()), [])
   const source = typeof vitals.source === 'string' && vitals.source.trim() ? vitals.source.trim() : 'Health data'
+  const date = useMemo(
+    () => new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date()),
+    [],
+  )
+
+  const instruments: Instrument[] = [
+    { key: 'steps', label: 'Steps', value: num(steps), to: '/tubuh?t=gerak', icon: IconRun },
+    { key: 'sleep', label: 'Sleep', value: num(sleep, 1), unit: 'h', to: '/tubuh?t=tidur', icon: IconMoon },
+    { key: 'heart', label: 'Rest HR', value: num(restingHr), unit: 'bpm', to: '/tubuh?t=jantung', icon: IconHeart },
+    { key: 'vo2', label: 'VO₂max', value: num(vo2max, 1), to: '/latihan?t=lab', icon: IconRun },
+  ]
+
+  const primary = instruments[0]
+  const availableCount = instruments.filter((instrument) => instrument.value !== '—').length
 
   return (
-    <section className="liquid-glass-strong liquid-spectral-edge relative overflow-hidden rounded-[32px] p-4 text-white sm:p-6" aria-label="Today health brief">
-      <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-violet-500/[.11] blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -left-24 bottom-[-9rem] h-72 w-72 rounded-full bg-cyan-400/[.10] blur-3xl" aria-hidden />
-
-      <div className="relative flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-[10px] font-black uppercase tracking-[.17em] text-cyan-100/48">{date}</div>
-          <h1 className="mt-1 truncate text-[22px] font-black tracking-[-.045em] sm:text-[28px]">{greeting}{name ? `, ${name}` : ''}</h1>
-        </div>
-        <Link to="/health-data" className="liquid-action shrink-0 rounded-full border border-white/[.10] bg-white/[.045] px-3 py-2 text-[9px] font-black uppercase tracking-[.09em] text-white/55" title={source}>
-          Sync
+    <section
+      data-panacea-instrument-strip
+      className="panacea-instrument-strip"
+      aria-label="Today health instruments"
+    >
+      <BatasKlaimKesehatan permukaan="wellness.home-brief" />
+      <div className="panacea-instrument-head">
+        <span className="panacea-instrument-date">{date}</span>
+        <Link
+          to="/health-data"
+          className="panacea-instrument-status"
+          data-online={online ? 'true' : 'false'}
+          aria-label={`${online ? 'Online' : 'Offline'}. Open connected health data. Current source: ${source}`}
+          title={`${online ? 'Online' : 'Offline'} · ${source}`}
+        >
+          <ConnectionStatusGlyph online={online} />
         </Link>
       </div>
 
-      <div className="relative mt-5 grid gap-3 lg:grid-cols-[1.15fr_.85fr]">
-        <Link to="/tubuh?t=gerak" className="liquid-action liquid-glass overflow-hidden rounded-[28px] p-5 sm:p-6" aria-label={`Steps ${num(steps)}`}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="truncate text-[10px] font-black uppercase tracking-[.16em] text-white/38">Steps</div>
-              <div className="mt-2 truncate text-[48px] font-black leading-none tracking-[-.065em] tabular-nums sm:text-[62px]">{num(steps)}</div>
-            </div>
-            <span className="liquid-lens grid h-12 w-12 shrink-0 place-items-center rounded-full text-cyan-100" aria-hidden><IconRun size={21} /></span>
-          </div>
-          <div className="mt-5 grid grid-cols-3 gap-2 border-t border-white/[.07] pt-4">
-            <div className="min-w-0"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Sleep</div><div className="mt-1 truncate text-sm font-black tabular-nums">{typeof sleep === 'number' ? `${num(sleep, 1)} h` : '—'}</div></div>
-            <div className="min-w-0"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Rest HR</div><div className="mt-1 truncate text-sm font-black tabular-nums">{restingHr ? `${num(restingHr)} bpm` : '—'}</div></div>
-            <div className="min-w-0"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Sessions</div><div className="mt-1 truncate text-sm font-black tabular-nums">{workouts.length || '—'}</div></div>
-          </div>
+      <div className="panacea-instrument-rail">
+        <Link
+          to={primary.to}
+          className="panacea-signal-ring"
+          aria-label={`${primary.label} ${primary.value}. ${availableCount} of ${instruments.length} health signals currently available.`}
+        >
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle className="panacea-signal-ring-track" cx="60" cy="60" r="48" />
+            {instruments.map((instrument, index) => (
+              <circle
+                key={instrument.key}
+                className="panacea-signal-segment"
+                data-signal={instrument.key}
+                data-available={instrument.value !== '—' ? 'true' : 'false'}
+                cx="60"
+                cy="60"
+                r="48"
+                pathLength="100"
+                strokeDasharray="18 82"
+                strokeDashoffset={-(index * 25)}
+              />
+            ))}
+          </svg>
+          <span className="panacea-signal-ring-copy">
+            <span className="panacea-signal-ring-kicker">{primary.label}</span>
+            <span className="panacea-signal-ring-value">{primary.value}</span>
+            <span className="panacea-signal-ring-meta">{availableCount}/{instruments.length} signals</span>
+          </span>
         </Link>
 
-        <div className="grid grid-cols-2 gap-2.5">
-          <Link to="/tubuh?t=tidur" className="liquid-action liquid-glass rounded-[24px] p-4">
-            <div className="flex items-center justify-between gap-2"><span className="truncate text-[9px] font-black uppercase tracking-[.12em] text-indigo-100/48">Sleep</span><IconMoon size={16} className="text-indigo-200" /></div>
-            <div className="mt-4 truncate text-2xl font-black tracking-[-.05em] tabular-nums">{num(sleep, 1)}<span className="ml-1 text-[9px] text-white/30">h</span></div>
-          </Link>
-          <Link to="/tubuh?t=jantung" className="liquid-action liquid-glass rounded-[24px] p-4">
-            <div className="flex items-center justify-between gap-2"><span className="truncate text-[9px] font-black uppercase tracking-[.12em] text-rose-100/48">Rest HR</span><IconHeart size={16} className="text-rose-200" /></div>
-            <div className="mt-4 truncate text-2xl font-black tracking-[-.05em] tabular-nums">{num(restingHr)}<span className="ml-1 text-[9px] text-white/30">bpm</span></div>
-          </Link>
-          <Link to="/latihan?t=lab" className="liquid-action liquid-glass rounded-[24px] p-4">
-            <div className="flex items-center justify-between gap-2"><span className="truncate text-[9px] font-black uppercase tracking-[.12em] text-cyan-100/48">VO₂max</span><IconRun size={16} className="text-cyan-200" /></div>
-            <div className="mt-4 truncate text-2xl font-black tracking-[-.05em] tabular-nums">{num(vo2max, 1)}</div>
-          </Link>
-          <Link to="/harian" className="liquid-action liquid-glass rounded-[24px] p-4">
-            <div className="flex items-center justify-between gap-2"><span className="truncate text-[9px] font-black uppercase tracking-[.12em] text-emerald-100/48">Check-in</span><IconSparkle size={16} className="text-emerald-200" /></div>
-            <div className="mt-4 truncate text-sm font-black tracking-[-.025em]">Log today</div>
+        <div className="panacea-instrument-grid">
+          {instruments.slice(1).map(({ key, label, value, unit, to, icon: Icon }) => (
+            <Link
+              key={key}
+              to={to}
+              className="panacea-instrument-mini"
+              aria-label={`${label} ${value}${unit ? ` ${unit}` : ''}`}
+            >
+              <span className="panacea-instrument-mini-main">
+                <span className="panacea-instrument-mini-label"><Icon size={13} />{label}</span>
+                <span className="panacea-instrument-mini-value">
+                  <span>{value}</span>
+                  {unit ? <span className="panacea-instrument-unit">{unit}</span> : null}
+                </span>
+              </span>
+            </Link>
+          ))}
+
+          <Link to="/harian" className="panacea-instrument-checkin" aria-label="Log today">
+            <IconPlus size={17} />
+            <span>Log</span>
           </Link>
         </div>
-      </div>
-
-      <div className="relative mt-3 grid grid-cols-4 gap-2">
-        <Link to="/latihan" className="liquid-action rounded-[18px] border border-white/[.075] bg-white/[.03] px-2 py-3 text-center text-[9px] font-black text-white/58">Move</Link>
-        <Link to="/readiness" className="liquid-action rounded-[18px] border border-white/[.075] bg-white/[.03] px-2 py-3 text-center text-[9px] font-black text-white/58">Readiness</Link>
-        <Link to="/chatbot" className="liquid-action rounded-[18px] border border-white/[.075] bg-white/[.03] px-2 py-3 text-center text-[9px] font-black text-white/58">Ask</Link>
-        <Link to="/health-data" className="liquid-action rounded-[18px] border border-white/[.075] bg-white/[.03] px-2 py-3 text-center text-[9px] font-black text-white/58">Connect</Link>
       </div>
     </section>
   )

@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Reveal } from './Reveal'
 import { MANUAL_BANK } from '../lib/payment'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Dark "Services & Prices" bento-grid section — a professional, scroll-
 // reactive pricing page baked directly into the Landing page's long-scroll
@@ -135,6 +136,12 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
             <br />
             <span className="font-serif-display italic text-emerald-300">&amp; Pricing</span>
           </h2>
+          <div className="mx-auto mt-4 max-w-xl text-left">
+            <BatasKlaimKesehatan
+              permukaan="care.pricing"
+              className="mt-0 text-[11px] leading-snug text-white/55"
+            />
+          </div>
           <p className="mx-auto mt-4 max-w-xl text-white/60">
             Three simple plans — pick what fits your needs, upgrade or downgrade anytime.
           </p>
@@ -218,7 +225,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
 
         <Reveal delay={80}>
           <p className="mx-auto mt-6 max-w-2xl text-center text-[11px] leading-relaxed text-white/40">
-            Certified AI-EMR + CDSS for clinicians/institutions: contact us for subscription pricing.
+            AI-EMR and clinician decision support for licensed clinicians and institutions: contact us for subscription pricing. This product is not clinically validated.
             Medical Materials Hub: pricing set by authors, royalties paid automatically to contributors.
             All prices are in Indonesian Rupiah, inclusive of applicable VAT.
           </p>

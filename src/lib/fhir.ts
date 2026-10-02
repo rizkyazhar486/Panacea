@@ -21,10 +21,12 @@
 
 export interface Kuantitas { value: number; unit: string; system: string; code: string }
 export interface Koding { system: string; code: string; display: string }
+export interface PengenalFhir { system: string; value: string }
 
 export interface Observasi {
   resourceType: 'Observation'
   id: string
+  identifier?: PengenalFhir[]
   status: 'final'
   category: Array<{ coding: Koding[] }>
   code: { coding: Koding[]; text: string }
@@ -42,16 +44,43 @@ export interface Pasien {
   birthDate?: string
 }
 
+export interface SumberEksporFhir {
+  /** URI namespace yang menetapkan identitas sumber, mis. vendor/device registry. */
+  identifierSystem: string
+  /** Identitas sumber di namespace tersebut; tidak boleh kosong. */
+  identifierValue: string
+  display?: string
+}
+
+export interface ProvenansFhir {
+  resourceType: 'Provenance'
+  id: string
+  target: Array<{ reference: string }>
+  occurredDateTime: string
+  recorded: string
+  agent: Array<{
+    type: Array<{ coding: Koding[] }>
+    who: { identifier: PengenalFhir; display?: string }
+  }>
+  entity: Array<{
+    role: 'source'
+    what: { identifier: PengenalFhir; display?: string }
+  }>
+}
+
 export interface Bundel {
   resourceType: 'Bundle'
   type: 'collection'
   timestamp: string
-  entry: Array<{ fullUrl: string; resource: Observasi | Pasien }>
+  entry: Array<{ fullUrl: string; resource: Observasi | Pasien | ProvenansFhir }>
 }
 
 const LOINC = 'http://loinc.org'
 const UCUM = 'http://unitsofmeasure.org'
 const KATEGORI = 'http://terminology.hl7.org/CodeSystem/observation-category'
+const TIPE_PELAKU_PROVENANS = 'http://terminology.hl7.org/CodeSystem/provenance-participant-type'
+const SISTEM_AGEN_PANACEA = 'https://panaceamed.id/fhir/identifier/software-agent'
+const SISTEM_PENGENAL_EKSPOR = 'https://panaceamed.id/fhir/identifier/export-observation'
 /** Sistem kode milik aplikasi ini, untuk angka yang memang tidak punya padanan baku. */
 export const SISTEM_LOKAL = 'https://panaceamed.id/fhir/CodeSystem/derived'
 
@@ -139,11 +168,38 @@ function idBaru(kunci: string): string {
   return `${kunci}-${hitung}`
 }
 
+/** fullUrl urn:uuid HARUS benar-benar berisi UUID, bukan sekadar label lokal. */
+function uuidBaru(): string {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
+  // Fallback hanya untuk runtime lama; UUID ini adalah identitas bundle, bukan token keamanan.
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(Math.random() * 16)
+    const v = c === 'x' ? r : ((r & 0x3) | 0x8)
+    return v.toString(16)
+  })
+}
+
+function fullUrlBaru(): string {
+  return `urn:uuid:${uuidBaru()}`
+}
+
+function validasiSumber(sumber: SumberEksporFhir): SumberEksporFhir {
+  const system = sumber.identifierSystem?.trim()
+  const value = sumber.identifierValue?.trim()
+  if (!system || !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(system)) {
+    throw new Error('FHIR provenance source identifierSystem must be an absolute URI')
+  }
+  if (!value) throw new Error('FHIR provenance source identifierValue must not be blank')
+  return { identifierSystem: system, identifierValue: value, display: sumber.display?.trim() || undefined }
+}
+
 export interface MasukanEkspor {
   /** kunci → nilai. Nilai undefined, nol-berarti-kosong dan NaN dilewati. */
   nilai: Record<string, number | undefined>
   pasien?: { nama?: string; kelamin?: 'M' | 'F'; lahir?: string }
   waktu?: Date
+  /** Bila diberikan, setiap observasi diberi identifier dan Bundle membawa Provenance FHIR R4. */
+  sumber?: SumberEksporFhir
 }
 
 /**
@@ -156,6 +212,7 @@ export interface MasukanEkspor {
 export function bangunBundel(m: MasukanEkspor): Bundel {
   hitung = 0
   const waktu = waktuFhir(m.waktu)
+  const sumber = m.sumber ? validasiSumber(m.sumber) : undefined
   const idPasien = 'panaceamed-local'
   const entry: Bundel['entry'] = []
 
@@ -163,7 +220,7 @@ export function bangunBundel(m: MasukanEkspor): Bundel {
   if (m.pasien?.nama) pasien.name = [{ text: m.pasien.nama }]
   if (m.pasien?.kelamin) pasien.gender = m.pasien.kelamin === 'F' ? 'female' : 'male'
   if (m.pasien?.lahir && /^\d{4}-\d{2}-\d{2}$/.test(m.pasien.lahir)) pasien.birthDate = m.pasien.lahir
-  entry.push({ fullUrl: `urn:uuid:${idPasien}`, resource: pasien })
+  entry.push({ fullUrl: fullUrlBaru(), resource: pasien })
 
   for (const [kunci, nilai] of Object.entries(m.nilai)) {
     const u = SEMUA.get(kunci)
@@ -185,7 +242,48 @@ export function bangunBundel(m: MasukanEkspor): Bundel {
       valueQuantity: { value: nilai, unit: u.satuan, system: UCUM, code: u.ucum },
     }
     if (u.catatan) obs.note = [{ text: u.catatan }]
-    entry.push({ fullUrl: `urn:uuid:${obs.id}`, resource: obs })
+    if (sumber) {
+      obs.identifier = [{
+        system: SISTEM_PENGENAL_EKSPOR,
+        value: `${sumber.identifierSystem}|${sumber.identifierValue}|${u.kunci}|${waktu}`,
+      }]
+    }
+    entry.push({ fullUrl: fullUrlBaru(), resource: obs })
+  }
+
+  if (sumber) {
+    const target: Array<{ reference: string }> = []
+    for (const e of entry) {
+      if (e.resource.resourceType === 'Observation') target.push({ reference: `Observation/${e.resource.id}` })
+    }
+    if (target.length) {
+      const provenans: ProvenansFhir = {
+        resourceType: 'Provenance',
+        id: idBaru('provenance'),
+        target,
+        occurredDateTime: waktu,
+        recorded: waktu,
+        agent: [{
+          type: [{ coding: [{
+            system: TIPE_PELAKU_PROVENANS,
+            code: 'assembler',
+            display: 'Assembler',
+          }] }],
+          who: {
+            identifier: { system: SISTEM_AGEN_PANACEA, value: 'panaceamed' },
+            display: 'Panaceamed.id',
+          },
+        }],
+        entity: [{
+          role: 'source',
+          what: {
+            identifier: { system: sumber.identifierSystem, value: sumber.identifierValue },
+            display: sumber.display,
+          },
+        }],
+      }
+      entry.push({ fullUrl: fullUrlBaru(), resource: provenans })
+    }
   }
 
   return { resourceType: 'Bundle', type: 'collection', timestamp: waktu, entry }

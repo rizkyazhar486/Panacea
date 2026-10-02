@@ -5,6 +5,7 @@ import {
   SPORT_LABEL, SPORT_METRICS, valuePlayer, findSimilar, analyseTeam,
   type Player, type Sport,
 } from '../lib/sportsAnalytics'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Sports Lab — roster entry, multi-agent valuation, and similarity search.
 //
@@ -157,6 +158,7 @@ export function SportsLab() {
               <Card className="!p-4">
                 <SectionTitle icon={<IconActivity size={18} />} title="Similar players"
                   subtitle="Cosine similarity on normalised performance vectors" />
+                <BatasKlaimKesehatan permukaan="performance.sports-lab" />
                 {similar.length === 0 ? (
                   <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
                     At least two players in the same sport are needed to compare.

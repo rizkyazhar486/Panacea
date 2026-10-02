@@ -1,3 +1,5 @@
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentConvention } from './physiology/oxygenContentConventions.ts'
+
 // Hemodinamika dan hantaran oksigen.
 //
 // `bodyPhysiology.ts` menuliskan rantai ini sebagai teks: CO = HR x SV,
@@ -18,11 +20,14 @@
 //     berarti sesuatu harus diberikan.
 //   * Nilai rujukan adalah dewasa sehat pada umumnya, bukan seseorang.
 
+/** Canonical oxygen-content coefficients come from the versioned convention registry. */
+const OXYGEN_CONVENTION = oxygenContentConvention(DEFAULT_OXYGEN_CONTENT_CONVENTION)
+
 /** Kapasitas angkut oksigen hemoglobin, mL O2 per gram Hb. */
-export const HUFNER = 1.34
+export const HUFNER = OXYGEN_CONVENTION.hufnerMlO2PerGHb
 
 /** Kelarutan oksigen dalam plasma, mL O2 per dL per mmHg. */
-export const KELARUTAN_PLASMA = 0.003
+export const KELARUTAN_PLASMA = OXYGEN_CONVENTION.dissolvedMlO2PerDlPerMmHg
 
 /**
  * Kandungan oksigen arteri, mL O2 per dL.

@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-19",
+  "system": "endocrine",
+  "organ": "pituitary",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports anatomy/physiology relationships only at the general educational level; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
+  "relationships": [
+    {
+      "id": "hypothalamic-pituitary-regulation",
+      "domain": "anatomy-physiology",
+      "from": "hypothalamus",
+      "to": "anterior-pituitary",
+      "relationship": "regulates-neuroendocrine-output",
+      "claim": "Anterior pituitary hormone secretion is regulated through hypothalamic neuroendocrine pathways, with additional feedback from peripheral target-gland hormones and intrapituitary mechanisms.",
+      "evidence": ["pmid:18226728"],
+      "status": "source-checked"
+    },
+    {
+      "id": "pituitary-target-tissue-function",
+      "domain": "physiology",
+      "from": "anterior-pituitary-hormones",
+      "to": "peripheral-glands-and-target-tissues",
+      "relationship": "coordinates-endocrine-functions",
+      "claim": "Anterior pituitary hormones act on peripheral glands or target tissues and participate in regulation of reproduction, growth and development, metabolism, environmental adaptation, and stress responses.",
+      "evidence": ["pmid:18226728"],
+      "status": "source-checked"
+    },
+    {
+      "id": "endocrine-feedback-rhythms",
+      "domain": "physiology",
+      "from": "target-gland-hormones",
+      "to": "hypothalamic-pituitary-axis",
+      "relationship": "participates-in-feedback-regulation",
+      "claim": "Endocrine axes include feedback links among the central nervous system, hypothalamus, anterior pituitary, target glands and tissues, while hormone secretion may also show pulsatile and time-dependent organization.",
+      "evidence": ["pmid:7985925", "pmid:18226728"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:18226728",
+      "pmid": "18226728",
+      "title": "Normal physiology of hypothalamic pituitary regulation.",
+      "year": 2008,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/18226728/",
+      "evidenceRole": "Review of hypothalamic control, peripheral feedback, intrapituitary regulation and pulsatile anterior-pituitary secretion.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:7985925",
+      "pmid": "7985925",
+      "title": "Chronobiology in endocrinology.",
+      "year": 1993,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/7985925/",
+      "evidenceRole": "Review describing feedback links and temporal organization across hypothalamic-pituitary-target-gland endocrine axes.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-recommendation",
+      "source-checked-to-human-reviewed"
+    ]
+  }
+}

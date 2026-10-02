@@ -179,6 +179,13 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Surfaces */
 .dark .bg-white { background-color: #17191c !important; }
+/* Pengecualian: tombol yang SENGAJA putih dengan teks gelap (CTA utama,
+   "Ask →"). Memetakan latarnya ke #17191c sementara teksnya tetap hitam
+   menghasilkan hitam di atas hitam — tombolnya lenyap. Terukur di Clinical:
+   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibiarkan putih. */
+.dark .bg-white:is(.text-black, .text-ink, .text-neutral-900, .text-neutral-950, .text-slate-900, .text-slate-950) {
+  background-color: #fff !important;
+}
 .dark .bg-white\/95 { background-color: rgba(23, 25, 28, 0.95) !important; }
 .dark .bg-white\/90 { background-color: rgba(23, 25, 28, 0.9) !important; }
 .dark .bg-white\/85 { background-color: rgba(23, 25, 28, 0.85) !important; }
@@ -674,11 +681,13 @@ input:focus, textarea:focus, select:focus {
   100% { background-position: 400% 50%; }
 }
 
-/* "Flying in" entrance — a popup arriving from above with a slight tilt and
-   overshoot, not a plain fade. Used by DailyQuoteBanner. */
+/* "Flying in" entrance — the DailyQuoteBanner rises into its resting
+   position from below. It must never travel upward through the command bar:
+   the banner is intentionally parked below that bar so navigation remains
+   visible and clickable for the entire entrance animation, not only at rest. */
 @keyframes fly-in-drop {
-  0% { opacity: 0; transform: translateY(-64px) scale(0.92) rotate(-3deg); }
-  60% { opacity: 1; transform: translateY(6px) scale(1.015) rotate(0.5deg); }
+  0% { opacity: 0; transform: translateY(24px) scale(0.94) rotate(2deg); }
+  60% { opacity: 1; transform: translateY(4px) scale(1.015) rotate(0.5deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
 }
 .reduce-motion .fly-in-drop { animation: none !important; }

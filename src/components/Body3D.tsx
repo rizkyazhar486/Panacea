@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { tissueShading } from '../domains/body-exposure'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 import {
@@ -17,6 +18,9 @@ import {
   publishAnatomySourceSelection,
 } from '../lib/anatomySourceNodeRegistry'
 import { createBodyAtlasRuntimeRootLifecycle } from '../lib/bodyAtlasRuntimeRootLifecycle'
+import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { bodyStructureCameraFocus } from '../lib/bodyStructureCameraFocus'
+import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -251,6 +255,35 @@ function latarGradasi(atas: number, bawah: number): THREE.Texture {
   return t
 }
 
+// Material sumber menyimpan warna saja; default glTF membuatnya logam penuh.
+// Ganti dengan material fisik dielektrik per jenis jaringan (warna sumber tetap).
+// Pencahayaan studio mode anatomi: ambient rendah + key/rim kuat memberi
+// pemodelan bentuk (chiaroscuro) sehingga relief otot terbaca, bukan siluet datar.
+const STUDIO = { ambient: 0.12, key: 1.7, fill: 0.35, rim: 1.1, env: 0.55 } as const
+
+function shadeTissue(material: THREE.Material): THREE.Material {
+  if (!(material instanceof THREE.MeshStandardMaterial)) return material.clone()
+  const s = tissueShading(material.name)
+  const fisik = new THREE.MeshPhysicalMaterial({
+    name: material.name,
+    color: material.color.clone(),
+    transparent: material.transparent,
+    opacity: material.opacity,
+    alphaTest: material.alphaTest,
+    side: material.side,
+    depthWrite: material.depthWrite,
+    metalness: s.metalness,
+    roughness: s.roughness,
+    clearcoat: s.clearcoat,
+    clearcoatRoughness: s.clearcoatRoughness,
+    sheen: s.sheen,
+    sheenRoughness: s.sheenRoughness,
+    sheenColor: material.color.clone().lerp(new THREE.Color(1, 1, 1), 0.35),
+  })
+  fisik.userData = { ...material.userData, body3dTissue: s.tissue }
+  return fisik
+}
+
 function cloneLayerMaterials(root: THREE.Group) {
   // Object3D.clone(true) tetap berbagi material dengan modelCache. Dissection
   // mengubah opacity/depthWrite, jadi setiap viewer perlu material lokal tanpa
@@ -262,7 +295,7 @@ function cloneLayerMaterials(root: THREE.Group) {
     const salinan = sumber.map((material) => {
       const existing = lokal.get(material)
       if (existing) return existing
-      const copy = material.clone()
+      const copy = shadeTissue(material)
       copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
       lokal.set(material, copy)
       return copy
@@ -351,22 +384,22 @@ export function Body3D({
     const lingkungan = pmrem.fromScene(ruang, 0.04)
     ruang.dispose()
     scene.environment = lingkungan.texture
-    scene.environmentIntensity = 0.4
+    scene.environmentIntensity = STUDIO.env
     pmrem.dispose()
 
     latarRef.current = latarGradasi(0x141922, 0x05070b)
     scene.background = latarRef.current
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.32)
+    const ambient = new THREE.AmbientLight(0xffffff, STUDIO.ambient)
     scene.add(ambient)
-    const key = new THREE.DirectionalLight(0xffffff, 0.85)
-    key.position.set(2, 4, 3)
+    const key = new THREE.DirectionalLight(0xfff4e8, STUDIO.key)
+    key.position.set(2.5, 4, 2)
     scene.add(key)
-    const fill = new THREE.DirectionalLight(0xffffff, 0.25)
+    const fill = new THREE.DirectionalLight(0xe8f0ff, STUDIO.fill)
     fill.position.set(-3, 1, -2)
     scene.add(fill)
-    const tepi = new THREE.DirectionalLight(0xdce8ff, 0.55)
-    tepi.position.set(-1.5, 2.5, -4)
+    const tepi = new THREE.DirectionalLight(0xdce8ff, STUDIO.rim)
+    tepi.position.set(-2.5, 2.5, -3)
     scene.add(tepi)
     lightsRef.current = { ambient, key, fill, tepi }
 
@@ -380,29 +413,35 @@ export function Body3D({
     controlsRef.current = controls
     hasFitRef.current = false
 
-    let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
 
-    // Tidak ada loop 60-fps saat tubuh diam. OrbitControls tanpa damping
-    // mengirim event "change" saat drag/zoom; perubahan React lain memanggil
-    // requestRenderRef. Ini mempertahankan detail tinggi tanpa membakar GPU
-    // hanya untuk menggambar frame identik berulang kali.
-    function requestRender() {
-      if (raf !== 0 || !inViewport || !documentVisible) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        if (!inViewport || !documentVisible) return
+    // Body3D shares the same demand-render lifecycle as the rest of the Body
+    // runtime. The scheduler coalesces bursty invalidations into one frame and
+    // never owns a permanent RAF loop.
+    let contextLifecycle!: ReturnType<typeof createBodyWebglContextLifecycle>
+    const renderScheduler = createBodyRenderScheduler({
+      canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
+      renderFrame: () => {
         controls.update()
         renderer.render(scene, camera)
-      })
-    }
+      },
+      requestFrame: (callback) => requestAnimationFrame(callback),
+      cancelFrame: (frameId) => cancelAnimationFrame(frameId),
+    })
+    contextLifecycle = createBodyWebglContextLifecycle({
+      onLost: () => {
+        renderScheduler.stop()
+        setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
+      },
+      onRestored: () => {
+        setFatal('')
+        renderScheduler.request()
+      },
+    })
 
-    function stopRendering() {
-      if (raf === 0) return
-      cancelAnimationFrame(raf)
-      raf = 0
-    }
+    const requestRender = () => renderScheduler.request()
+    const stopRendering = () => renderScheduler.stop()
 
     requestRenderRef.current = requestRender
     controls.addEventListener('change', requestRender)
@@ -459,15 +498,8 @@ export function Body3D({
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    const onContextLost = (e: Event) => {
-      e.preventDefault()
-      stopRendering()
-      setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
-    }
-    const onContextRestored = () => {
-      setFatal('')
-      requestRender()
-    }
+    const onContextLost = (e: Event) => contextLifecycle.handleLost(e)
+    const onContextRestored = () => contextLifecycle.handleRestored()
     renderer.domElement.addEventListener('webglcontextlost', onContextLost)
     renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
@@ -492,7 +524,8 @@ export function Body3D({
 
     return () => {
       requestRenderRef.current = () => undefined
-      stopRendering()
+      renderScheduler.dispose()
+      contextLifecycle.dispose()
       controls.removeEventListener('change', requestRender)
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
@@ -688,15 +721,15 @@ export function Body3D({
     const lights = lightsRef.current
     if (lights) {
       const flat = renderMode === 'xray'
-      lights.ambient.intensity = flat ? 1.1 : 0.32
-      lights.key.intensity = flat ? 0.15 : 0.85
-      lights.fill.intensity = flat ? 0.1 : 0.25
-      lights.tepi.intensity = flat ? 0 : 0.55
+      lights.ambient.intensity = flat ? 1.1 : STUDIO.ambient
+      lights.key.intensity = flat ? 0.15 : STUDIO.key
+      lights.fill.intensity = flat ? 0.1 : STUDIO.fill
+      lights.tepi.intensity = flat ? 0 : STUDIO.rim
     }
     const sc = sceneRef.current
     if (sc) {
       const anatomi = renderMode === 'anatomy'
-      sc.environmentIntensity = anatomi ? 0.4 : 0
+      sc.environmentIntensity = anatomi ? STUDIO.env : 0
       sc.background = anatomi ? latarRef.current : null
     }
     requestRenderRef.current()
@@ -802,18 +835,22 @@ export function Body3D({
     const controls = controlsRef.current
     if (camera && controls) {
       if (focusBox && !focusBox.isEmpty()) {
-        const center = focusBox.getCenter(new THREE.Vector3())
-        const size = focusBox.getSize(new THREE.Vector3())
-        const radius = Math.max(size.length() * 0.5, 0.03)
-        const dist = Math.max(radius * 8, 0.35)
-        let dir = camera.position.clone().sub(controls.target)
-        if (dir.lengthSq() < 1e-8) dir = new THREE.Vector3(0, 0.15, 1)
-        dir.normalize()
-        camera.position.copy(center.clone().add(dir.multiplyScalar(dist)))
-        controls.target.copy(center)
-        controls.minDistance = dist * 0.3
-        controls.maxDistance = dist * 8
-        controls.update()
+        const pose = bodyStructureCameraFocus(
+          {
+            min: { x: focusBox.min.x, y: focusBox.min.y, z: focusBox.min.z },
+            max: { x: focusBox.max.x, y: focusBox.max.y, z: focusBox.max.z },
+          },
+          { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+          4.5,
+        )
+        if (pose) {
+          camera.position.set(pose.position.x, pose.position.y, pose.position.z)
+          controls.target.set(pose.target.x, pose.target.y, pose.target.z)
+          const distance = camera.position.distanceTo(controls.target)
+          controls.minDistance = Math.max(pose.span * 0.08, 0.005)
+          controls.maxDistance = Math.max(pose.span * 12, distance * 8)
+          controls.update()
+        }
       } else if (!focusKeywords && homeFramingRef.current) {
         const home = homeFramingRef.current
         camera.position.copy(home.position)
