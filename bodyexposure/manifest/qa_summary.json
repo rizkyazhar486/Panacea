@@ -1,0 +1,194 @@
+{
+ "meta": {
+  "generated": "2026-10-03T03:21:27",
+  "master": "PANACEA_HUMAN_MASTER_v005.blend",
+  "blender": "5.2.2 LTS",
+  "units": "metres",
+  "frame": "+Z superior, +X subject left, -Y anterior",
+  "educational_only": true
+ },
+ "by_body_system": {
+  "HUMAN.ADULT.FEMALE|cardiovascular": {
+   "structures": 102,
+   "verts": 195614,
+   "tris": 384663,
+   "open_meshes": 87,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|digestive": {
+   "structures": 63,
+   "verts": 85962,
+   "tris": 167425,
+   "open_meshes": 63,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|joint": {
+   "structures": 53,
+   "verts": 23407,
+   "tris": 45453,
+   "open_meshes": 33,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|lymphatic": {
+   "structures": 12,
+   "verts": 130544,
+   "tris": 264402,
+   "open_meshes": 7,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|muscular": {
+   "structures": 2,
+   "verts": 11256,
+   "tris": 22432,
+   "open_meshes": 2,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|nervous": {
+   "structures": 273,
+   "verts": 330708,
+   "tris": 664964,
+   "open_meshes": 50,
+   "nonmanifold_meshes": 56
+  },
+  "HUMAN.ADULT.FEMALE|reproductive": {
+   "structures": 42,
+   "verts": 87658,
+   "tris": 170016,
+   "open_meshes": 32,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|respiratory": {
+   "structures": 67,
+   "verts": 197751,
+   "tris": 389088,
+   "open_meshes": 66,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|sensory": {
+   "structures": 62,
+   "verts": 448708,
+   "tris": 890684,
+   "open_meshes": 22,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|skeletal": {
+   "structures": 24,
+   "verts": 58182,
+   "tris": 115560,
+   "open_meshes": 10,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 62176,
+   "tris": 124348,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|urinary": {
+   "structures": 100,
+   "verts": 143578,
+   "tris": 281054,
+   "open_meshes": 92,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.MALE|cardiovascular": {
+   "structures": 676,
+   "verts": 1938900,
+   "tris": 3840263,
+   "open_meshes": 663,
+   "nonmanifold_meshes": 8
+  },
+  "HUMAN.ADULT.MALE|digestive": {
+   "structures": 76,
+   "verts": 226049,
+   "tris": 451297,
+   "open_meshes": 13,
+   "nonmanifold_meshes": 1
+  },
+  "HUMAN.ADULT.MALE|endocrine": {
+   "structures": 8,
+   "verts": 2579,
+   "tris": 5018,
+   "open_meshes": 2,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.MALE|fascia": {
+   "structures": 39,
+   "verts": 80032,
+   "tris": 159652,
+   "open_meshes": 7,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.MALE|joint": {
+   "structures": 23,
+   "verts": 18262,
+   "tris": 36432,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.MALE|lymphatic": {
+   "structures": 163,
+   "verts": 65165,
+   "tris": 127682,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.MALE|muscular": {
+   "structures": 470,
+   "verts": 919147,
+   "tris": 1838090,
+   "open_meshes": 36,
+   "nonmanifold_meshes": 20
+  },
+  "HUMAN.ADULT.MALE|nervous": {
+   "structures": 549,
+   "verts": 1143803,
+   "tris": 2268489,
+   "open_meshes": 294,
+   "nonmanifold_meshes": 70
+  },
+  "HUMAN.ADULT.MALE|reproductive": {
+   "structures": 14,
+   "verts": 9822,
+   "tris": 19519,
+   "open_meshes": 5,
+   "nonmanifold_meshes": 1
+  },
+  "HUMAN.ADULT.MALE|respiratory": {
+   "structures": 49,
+   "verts": 137836,
+   "tris": 273197,
+   "open_meshes": 37,
+   "nonmanifold_meshes": 5
+  },
+  "HUMAN.ADULT.MALE|sensory": {
+   "structures": 44,
+   "verts": 73442,
+   "tris": 146398,
+   "open_meshes": 10,
+   "nonmanifold_meshes": 4
+  },
+  "HUMAN.ADULT.MALE|skeletal": {
+   "structures": 232,
+   "verts": 309033,
+   "tris": 617288,
+   "open_meshes": 13,
+   "nonmanifold_meshes": 9
+  },
+  "HUMAN.ADULT.MALE|surface": {
+   "structures": 256,
+   "verts": 68913,
+   "tris": 135201,
+   "open_meshes": 42,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.MALE|urinary": {
+   "structures": 11,
+   "verts": 13558,
+   "tris": 26992,
+   "open_meshes": 5,
+   "nonmanifold_meshes": 0
+  }
+ }
+}

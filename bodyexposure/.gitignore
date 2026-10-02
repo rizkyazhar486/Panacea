@@ -1,0 +1,9 @@
+# Master .blend berukuran >100 MB (batas GitHub) — dibangun ulang lewat pipeline/
+*.blend
+*.blend1
+# Sumber unduhan pihak ketiga (HuBMAP VH_F_United ~73 MB)
+sources/
+# Render uji dan log
+renders/test/
+renders/log_*.txt
+__pycache__/
