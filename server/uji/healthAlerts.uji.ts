@@ -14,8 +14,8 @@ import { deliverThenCommitAlertState } from '../src/healthAlerts.js'
     },
   )
 
-  assert.deepEqual(events, ['deliver:start', 'deliver:done', 'commit'])
-  assert.deepEqual(result, { delivered: true, stateCommitted: true })
+  assert.deepEqual(events, ['deliver:start', 'deliver:done', 'commit'], 'state must be committed only after delivery completed')
+  assert.deepEqual(result, { delivered: true, stateCommitted: true }, 'successful delivery plus commit must report both true')
 }
 
 {
@@ -30,7 +30,7 @@ import { deliverThenCommitAlertState } from '../src/healthAlerts.js'
   )
 
   assert.equal(committed, false, 'failed delivery must not write cooldown/once-per-day state')
-  assert.deepEqual(result, { delivered: false, stateCommitted: false })
+  assert.deepEqual(result, { delivered: false, stateCommitted: false }, 'failed delivery must report neither delivered nor committed')
 }
 
 {
@@ -44,8 +44,8 @@ import { deliverThenCommitAlertState } from '../src/healthAlerts.js'
     },
   )
 
-  assert.equal(deliveries, 1)
-  assert.deepEqual(result, { delivered: true, stateCommitted: false })
+  assert.equal(deliveries, 1, 'a commit failure must not trigger a second delivery')
+  assert.deepEqual(result, { delivered: true, stateCommitted: false }, 'commit failure after delivery must be reported as delivered but uncommitted')
 }
 
 console.log('Health-alert delivery/commit ordering verified.')
