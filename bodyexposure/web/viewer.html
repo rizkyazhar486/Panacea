@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Body Exposure — LOD verification viewer</title>
+<style>
+  :root { color-scheme: dark; --bg:#07080b; --panel:#11141acc; --line:#262b35; --fg:#e8eaee; --dim:#9aa1ad; --accent:#8fd3ff; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:14px/1.4 system-ui, sans-serif; }
+  #c { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  .bar { position:fixed; left:12px; right:12px; top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+  select, button { background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; min-height:44px; }
+  #info { position:fixed; left:12px; right:12px; bottom:12px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; backdrop-filter:blur(8px); }
+  #info b { color:var(--accent); word-break:break-all; }
+  #info small { color:var(--dim); display:block; margin-top:4px; }
+  .note { color:var(--dim); font-size:12px; margin-top:6px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="bar">
+  <select id="body" aria-label="Body"><option value="adult_male">Adult male</option><option value="adult_female">Adult female</option></select>
+  <select id="lod" aria-label="Level of detail"><option>LOD3</option><option selected>LOD2</option><option>LOD1</option><option>LOD0</option></select>
+  <button id="reset">Reset view</button>
+</div>
+<div id="info"><span id="status">Loading…</span><div class="note">Educational model. Not patient-specific anatomy.</div></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/" } }
+</script>
+<script type="module">
+// Penampil verifikasi aset web Body Exposure: memuat GLB per sistem, memastikan dekompresi meshopt,
+// nama node semantik dan extras provenance terbaca di runtime three.js.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+const SYSTEMS = {
+  adult_male: ['skeletal','joint','muscular','fascia','cardiovascular','nervous','respiratory','digestive','urinary','endocrine','reproductive','lymphatic','sensory','surface'],
+  adult_female: ['skeletal','joint','muscular','cardiovascular','nervous','respiratory','digestive','urinary','reproductive','lymphatic','sensory','surface'],
+};
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.AgXToneMapping;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x07080b);
+const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1410, 1.4));
+const key = new THREE.DirectionalLight(0xfff4ea, 2.2); key.position.set(-2, 3, 3); scene.add(key);
+const rim = new THREE.DirectionalLight(0xcfe3ff, 1.2); rim.position.set(2, 2, -3); scene.add(rim);
+
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+const root = new THREE.Group(); scene.add(root);
+const status = document.getElementById('status');
+let stats = {}, loadId = 0;
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+function frame() {
+  const box = new THREE.Box3().setFromObject(root);
+  const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
+  controls.target.copy(c);
+  camera.position.set(c.x, c.y, c.z + Math.max(s.y, s.x * camera.aspect) * 1.9);
+  controls.update();
+}
+
+async function load() {
+  const body = document.getElementById('body').value, lod = document.getElementById('lod').value;
+  const id = ++loadId;  // pemuatan lama yang masih berjalan dibuang
+  root.clear(); stats = { files: 0, nodes: 0, tris: 0, extras: 0, failed: [] };
+  status.textContent = `Loading ${body} ${lod}…`;
+  const t0 = performance.now();
+  await Promise.all(SYSTEMS[body].map(async sys => {
+    try {
+      const g = await loader.loadAsync(`glb/${body}.${sys}.${lod}.glb`);
+      if (id !== loadId) return;
+      g.scene.traverse(o => {
+        if (o.isMesh && sys === 'surface') {
+          // kulit tembus pandang supaya lapisan dalam tetap terbaca; tidak ikut raycast
+          o.material = o.material.clone();
+          Object.assign(o.material, { transparent: true, opacity: 0.12, depthWrite: false });
+          o.raycast = () => {};
+        }
+        if (o.isMesh) { stats.tris += o.geometry.index ? o.geometry.index.count / 3 : o.geometry.attributes.position.count / 3; }
+        if (o.name && o.userData.panacea_structure_id) { stats.nodes++; stats.extras++; }
+      });
+      root.add(g.scene); stats.files++;
+    } catch (e) { stats.failed.push(sys); }
+  }));
+  if (id !== loadId) return;
+  frame();
+  window.__bodyStats = { ...stats, ms: Math.round(performance.now() - t0) };
+  status.innerHTML = `<b>${body} · ${lod}</b> — ${stats.files} files, ${stats.nodes} structures with provenance, ` +
+    `${Math.round(stats.tris / 1000)}k triangles, ${window.__bodyStats.ms} ms` +
+    (stats.failed.length ? `<small>Failed: ${stats.failed.join(', ')}</small>` : '') + `<small>Tap a structure to identify it.</small>`;
+}
+
+// identifikasi struktur: naik dari mesh ke node bernama yang membawa extras panacea_*
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+let down = null;
+canvas.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObject(root, true)[0];
+  if (!hit) return;
+  let o = hit.object; while (o && !o.userData.panacea_structure_id) o = o.parent;
+  if (!o) return;
+  const u = o.userData;
+  window.__lastPick = u;
+  status.innerHTML = `<b>${u.canonical_name || o.name}</b><small>${u.panacea_structure_id}</small>` +
+    `<small>${u.panacea_system} · ${u.panacea_laterality} · ${u.panacea_accuracy_status}</small>` +
+    `<small>${u.panacea_source}</small>`;
+});
+
+document.getElementById('body').onchange = load;
+document.getElementById('lod').onchange = load;
+document.getElementById('reset').onclick = frame;
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+load();
+</script>
+</body>
+</html>

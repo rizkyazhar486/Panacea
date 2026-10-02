@@ -1,0 +1,1438 @@
+[
+ {
+  "file": "adult_female.cardiovascular.LOD0.glb",
+  "bytes_raw": 6917484,
+  "bytes_packed": 1446404,
+  "nodes": 135,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 135
+ },
+ {
+  "file": "adult_female.cardiovascular.LOD1.glb",
+  "bytes_raw": 3653400,
+  "bytes_packed": 868468,
+  "nodes": 135,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 135
+ },
+ {
+  "file": "adult_female.cardiovascular.LOD2.glb",
+  "bytes_raw": 1677492,
+  "bytes_packed": 509404,
+  "nodes": 135,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 135
+ },
+ {
+  "file": "adult_female.cardiovascular.LOD3.glb",
+  "bytes_raw": 857896,
+  "bytes_packed": 356604,
+  "nodes": 135,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 135
+ },
+ {
+  "file": "adult_female.digestive.LOD0.glb",
+  "bytes_raw": 1572196,
+  "bytes_packed": 474700,
+  "nodes": 50,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 50
+ },
+ {
+  "file": "adult_female.digestive.LOD1.glb",
+  "bytes_raw": 850216,
+  "bytes_packed": 290948,
+  "nodes": 50,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 50
+ },
+ {
+  "file": "adult_female.digestive.LOD2.glb",
+  "bytes_raw": 420724,
+  "bytes_packed": 177756,
+  "nodes": 50,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 50
+ },
+ {
+  "file": "adult_female.digestive.LOD3.glb",
+  "bytes_raw": 236352,
+  "bytes_packed": 127412,
+  "nodes": 50,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 50
+ },
+ {
+  "file": "adult_female.joint.LOD0.glb",
+  "bytes_raw": 278456,
+  "bytes_packed": 110620,
+  "nodes": 28,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 28
+ },
+ {
+  "file": "adult_female.joint.LOD1.glb",
+  "bytes_raw": 178040,
+  "bytes_packed": 84284,
+  "nodes": 28,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 28
+ },
+ {
+  "file": "adult_female.joint.LOD2.glb",
+  "bytes_raw": 118412,
+  "bytes_packed": 67704,
+  "nodes": 28,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 28
+ },
+ {
+  "file": "adult_female.joint.LOD3.glb",
+  "bytes_raw": 90256,
+  "bytes_packed": 60080,
+  "nodes": 28,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 28
+ },
+ {
+  "file": "adult_female.lymphatic.LOD0.glb",
+  "bytes_raw": 133252,
+  "bytes_packed": 45624,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "adult_female.lymphatic.LOD1.glb",
+  "bytes_raw": 76448,
+  "bytes_packed": 30872,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "adult_female.lymphatic.LOD2.glb",
+  "bytes_raw": 42020,
+  "bytes_packed": 21604,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "adult_female.lymphatic.LOD3.glb",
+  "bytes_raw": 26188,
+  "bytes_packed": 17200,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "adult_female.muscular.LOD0.glb",
+  "bytes_raw": 238924,
+  "bytes_packed": 66040,
+  "nodes": 4,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 4
+ },
+ {
+  "file": "adult_female.muscular.LOD1.glb",
+  "bytes_raw": 124464,
+  "bytes_packed": 38596,
+  "nodes": 4,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 4
+ },
+ {
+  "file": "adult_female.muscular.LOD2.glb",
+  "bytes_raw": 55380,
+  "bytes_packed": 21472,
+  "nodes": 4,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 4
+ },
+ {
+  "file": "adult_female.muscular.LOD3.glb",
+  "bytes_raw": 27656,
+  "bytes_packed": 14220,
+  "nodes": 4,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 4
+ },
+ {
+  "file": "adult_female.nervous.LOD0.glb",
+  "bytes_raw": 10774100,
+  "bytes_packed": 2771312,
+  "nodes": 302,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 302
+ },
+ {
+  "file": "adult_female.nervous.LOD1.glb",
+  "bytes_raw": 6024136,
+  "bytes_packed": 1710352,
+  "nodes": 302,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 302
+ },
+ {
+  "file": "adult_female.nervous.LOD2.glb",
+  "bytes_raw": 3341864,
+  "bytes_packed": 1109756,
+  "nodes": 302,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 302
+ },
+ {
+  "file": "adult_female.nervous.LOD3.glb",
+  "bytes_raw": 2222536,
+  "bytes_packed": 849732,
+  "nodes": 302,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 302
+ },
+ {
+  "file": "adult_female.reproductive.LOD0.glb",
+  "bytes_raw": 20414788,
+  "bytes_packed": 3853576,
+  "nodes": 54,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 54
+ },
+ {
+  "file": "adult_female.reproductive.LOD1.glb",
+  "bytes_raw": 9690352,
+  "bytes_packed": 2071840,
+  "nodes": 54,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 54
+ },
+ {
+  "file": "adult_female.reproductive.LOD2.glb",
+  "bytes_raw": 4039624,
+  "bytes_packed": 930096,
+  "nodes": 54,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 54
+ },
+ {
+  "file": "adult_female.reproductive.LOD3.glb",
+  "bytes_raw": 1711272,
+  "bytes_packed": 444780,
+  "nodes": 54,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 54
+ },
+ {
+  "file": "adult_female.respiratory.LOD0.glb",
+  "bytes_raw": 5749032,
+  "bytes_packed": 1091912,
+  "nodes": 73,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 73
+ },
+ {
+  "file": "adult_female.respiratory.LOD1.glb",
+  "bytes_raw": 2553064,
+  "bytes_packed": 624332,
+  "nodes": 73,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 73
+ },
+ {
+  "file": "adult_female.respiratory.LOD2.glb",
+  "bytes_raw": 1153124,
+  "bytes_packed": 341268,
+  "nodes": 73,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 73
+ },
+ {
+  "file": "adult_female.respiratory.LOD3.glb",
+  "bytes_raw": 572624,
+  "bytes_packed": 220844,
+  "nodes": 73,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 73
+ },
+ {
+  "file": "adult_female.sensory.LOD0.glb",
+  "bytes_raw": 9082272,
+  "bytes_packed": 2041924,
+  "nodes": 62,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 62
+ },
+ {
+  "file": "adult_female.sensory.LOD1.glb",
+  "bytes_raw": 4650592,
+  "bytes_packed": 1121632,
+  "nodes": 62,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 62
+ },
+ {
+  "file": "adult_female.sensory.LOD2.glb",
+  "bytes_raw": 1990452,
+  "bytes_packed": 541112,
+  "nodes": 62,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 62
+ },
+ {
+  "file": "adult_female.sensory.LOD3.glb",
+  "bytes_raw": 899676,
+  "bytes_packed": 294132,
+  "nodes": 62,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 62
+ },
+ {
+  "file": "adult_female.skeletal.LOD0.glb",
+  "bytes_raw": 1156712,
+  "bytes_packed": 353344,
+  "nodes": 38,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 38
+ },
+ {
+  "file": "adult_female.skeletal.LOD1.glb",
+  "bytes_raw": 631860,
+  "bytes_packed": 217596,
+  "nodes": 38,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 38
+ },
+ {
+  "file": "adult_female.skeletal.LOD2.glb",
+  "bytes_raw": 314872,
+  "bytes_packed": 133220,
+  "nodes": 38,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 38
+ },
+ {
+  "file": "adult_female.skeletal.LOD3.glb",
+  "bytes_raw": 179364,
+  "bytes_packed": 96456,
+  "nodes": 38,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 38
+ },
+ {
+  "file": "adult_female.surface.LOD0.glb",
+  "bytes_raw": 1495244,
+  "bytes_packed": 277344,
+  "nodes": 1,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 1
+ },
+ {
+  "file": "adult_female.surface.LOD1.glb",
+  "bytes_raw": 749128,
+  "bytes_packed": 144992,
+  "nodes": 1,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 1
+ },
+ {
+  "file": "adult_female.surface.LOD2.glb",
+  "bytes_raw": 301472,
+  "bytes_packed": 61936,
+  "nodes": 1,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 1
+ },
+ {
+  "file": "adult_female.surface.LOD3.glb",
+  "bytes_raw": 122376,
+  "bytes_packed": 27512,
+  "nodes": 1,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 1
+ },
+ {
+  "file": "adult_female.urinary.LOD0.glb",
+  "bytes_raw": 2570684,
+  "bytes_packed": 766576,
+  "nodes": 87,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 87
+ },
+ {
+  "file": "adult_female.urinary.LOD1.glb",
+  "bytes_raw": 1401164,
+  "bytes_packed": 473964,
+  "nodes": 87,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 87
+ },
+ {
+  "file": "adult_female.urinary.LOD2.glb",
+  "bytes_raw": 696932,
+  "bytes_packed": 292360,
+  "nodes": 87,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 87
+ },
+ {
+  "file": "adult_female.urinary.LOD3.glb",
+  "bytes_raw": 398464,
+  "bytes_packed": 213084,
+  "nodes": 87,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 87
+ },
+ {
+  "file": "adult_male.cardiovascular.LOD0.glb",
+  "bytes_raw": 37493612,
+  "bytes_packed": 8702244,
+  "nodes": 677,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 677
+ },
+ {
+  "file": "adult_male.cardiovascular.LOD1.glb",
+  "bytes_raw": 19999668,
+  "bytes_packed": 5101304,
+  "nodes": 677,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 677
+ },
+ {
+  "file": "adult_male.cardiovascular.LOD2.glb",
+  "bytes_raw": 9394404,
+  "bytes_packed": 2764128,
+  "nodes": 677,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 677
+ },
+ {
+  "file": "adult_male.cardiovascular.LOD3.glb",
+  "bytes_raw": 5064884,
+  "bytes_packed": 1764784,
+  "nodes": 677,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 677
+ },
+ {
+  "file": "adult_male.digestive.LOD0.glb",
+  "bytes_raw": 4731884,
+  "bytes_packed": 1243644,
+  "nodes": 77,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 77
+ },
+ {
+  "file": "adult_male.digestive.LOD1.glb",
+  "bytes_raw": 2447908,
+  "bytes_packed": 710308,
+  "nodes": 77,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 77
+ },
+ {
+  "file": "adult_male.digestive.LOD2.glb",
+  "bytes_raw": 1081296,
+  "bytes_packed": 370204,
+  "nodes": 77,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 77
+ },
+ {
+  "file": "adult_male.digestive.LOD3.glb",
+  "bytes_raw": 532704,
+  "bytes_packed": 226908,
+  "nodes": 77,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 77
+ },
+ {
+  "file": "adult_male.endocrine.LOD0.glb",
+  "bytes_raw": 128932,
+  "bytes_packed": 46808,
+  "nodes": 10,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 10
+ },
+ {
+  "file": "adult_male.endocrine.LOD1.glb",
+  "bytes_raw": 77776,
+  "bytes_packed": 32916,
+  "nodes": 10,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 10
+ },
+ {
+  "file": "adult_male.endocrine.LOD2.glb",
+  "bytes_raw": 48504,
+  "bytes_packed": 24728,
+  "nodes": 10,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 10
+ },
+ {
+  "file": "adult_male.endocrine.LOD3.glb",
+  "bytes_raw": 31064,
+  "bytes_packed": 19836,
+  "nodes": 10,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 10
+ },
+ {
+  "file": "adult_male.fascia.LOD0.glb",
+  "bytes_raw": 1579168,
+  "bytes_packed": 430680,
+  "nodes": 39,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 39
+ },
+ {
+  "file": "adult_male.fascia.LOD1.glb",
+  "bytes_raw": 846028,
+  "bytes_packed": 253444,
+  "nodes": 39,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 39
+ },
+ {
+  "file": "adult_male.fascia.LOD2.glb",
+  "bytes_raw": 402704,
+  "bytes_packed": 144032,
+  "nodes": 39,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 39
+ },
+ {
+  "file": "adult_male.fascia.LOD3.glb",
+  "bytes_raw": 209516,
+  "bytes_packed": 94948,
+  "nodes": 39,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 39
+ },
+ {
+  "file": "adult_male.joint.LOD0.glb",
+  "bytes_raw": 374880,
+  "bytes_packed": 125200,
+  "nodes": 23,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 23
+ },
+ {
+  "file": "adult_male.joint.LOD1.glb",
+  "bytes_raw": 210912,
+  "bytes_packed": 85204,
+  "nodes": 23,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 23
+ },
+ {
+  "file": "adult_male.joint.LOD2.glb",
+  "bytes_raw": 112196,
+  "bytes_packed": 60568,
+  "nodes": 23,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 23
+ },
+ {
+  "file": "adult_male.joint.LOD3.glb",
+  "bytes_raw": 72448,
+  "bytes_packed": 50400,
+  "nodes": 23,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 23
+ },
+ {
+  "file": "adult_male.lymphatic.LOD0.glb",
+  "bytes_raw": 1573344,
+  "bytes_packed": 573048,
+  "nodes": 163,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 163
+ },
+ {
+  "file": "adult_male.lymphatic.LOD1.glb",
+  "bytes_raw": 993232,
+  "bytes_packed": 419072,
+  "nodes": 163,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 163
+ },
+ {
+  "file": "adult_male.lymphatic.LOD2.glb",
+  "bytes_raw": 673732,
+  "bytes_packed": 334548,
+  "nodes": 163,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 163
+ },
+ {
+  "file": "adult_male.lymphatic.LOD3.glb",
+  "bytes_raw": 472856,
+  "bytes_packed": 283852,
+  "nodes": 163,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 163
+ },
+ {
+  "file": "adult_male.muscular.LOD0.glb",
+  "bytes_raw": 19485168,
+  "bytes_packed": 5500164,
+  "nodes": 470,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 470
+ },
+ {
+  "file": "adult_male.muscular.LOD1.glb",
+  "bytes_raw": 10303392,
+  "bytes_packed": 3192256,
+  "nodes": 470,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 470
+ },
+ {
+  "file": "adult_male.muscular.LOD2.glb",
+  "bytes_raw": 4797184,
+  "bytes_packed": 1780612,
+  "nodes": 470,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 470
+ },
+ {
+  "file": "adult_male.muscular.LOD3.glb",
+  "bytes_raw": 2508672,
+  "bytes_packed": 1181796,
+  "nodes": 470,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 470
+ },
+ {
+  "file": "adult_male.nervous.LOD0.glb",
+  "bytes_raw": 22717852,
+  "bytes_packed": 5893400,
+  "nodes": 549,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 549
+ },
+ {
+  "file": "adult_male.nervous.LOD1.glb",
+  "bytes_raw": 12064348,
+  "bytes_packed": 3450252,
+  "nodes": 549,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 549
+ },
+ {
+  "file": "adult_male.nervous.LOD2.glb",
+  "bytes_raw": 5686108,
+  "bytes_packed": 1926144,
+  "nodes": 549,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 549
+ },
+ {
+  "file": "adult_male.nervous.LOD3.glb",
+  "bytes_raw": 3046540,
+  "bytes_packed": 1286552,
+  "nodes": 549,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 549
+ },
+ {
+  "file": "adult_male.reproductive.LOD0.glb",
+  "bytes_raw": 218284,
+  "bytes_packed": 73232,
+  "nodes": 14,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 14
+ },
+ {
+  "file": "adult_male.reproductive.LOD1.glb",
+  "bytes_raw": 121812,
+  "bytes_packed": 48044,
+  "nodes": 14,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 14
+ },
+ {
+  "file": "adult_male.reproductive.LOD2.glb",
+  "bytes_raw": 68344,
+  "bytes_packed": 33636,
+  "nodes": 14,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 14
+ },
+ {
+  "file": "adult_male.reproductive.LOD3.glb",
+  "bytes_raw": 43476,
+  "bytes_packed": 26808,
+  "nodes": 14,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 14
+ },
+ {
+  "file": "adult_male.respiratory.LOD0.glb",
+  "bytes_raw": 2793776,
+  "bytes_packed": 778540,
+  "nodes": 49,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 49
+ },
+ {
+  "file": "adult_male.respiratory.LOD1.glb",
+  "bytes_raw": 1474240,
+  "bytes_packed": 444112,
+  "nodes": 49,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 49
+ },
+ {
+  "file": "adult_male.respiratory.LOD2.glb",
+  "bytes_raw": 674696,
+  "bytes_packed": 234188,
+  "nodes": 49,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 49
+ },
+ {
+  "file": "adult_male.respiratory.LOD3.glb",
+  "bytes_raw": 340148,
+  "bytes_packed": 143096,
+  "nodes": 49,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 49
+ },
+ {
+  "file": "adult_male.sensory.LOD0.glb",
+  "bytes_raw": 1510644,
+  "bytes_packed": 443796,
+  "nodes": 44,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 44
+ },
+ {
+  "file": "adult_male.sensory.LOD1.glb",
+  "bytes_raw": 807684,
+  "bytes_packed": 263496,
+  "nodes": 44,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 44
+ },
+ {
+  "file": "adult_male.sensory.LOD2.glb",
+  "bytes_raw": 381168,
+  "bytes_packed": 150176,
+  "nodes": 44,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 44
+ },
+ {
+  "file": "adult_male.sensory.LOD3.glb",
+  "bytes_raw": 201884,
+  "bytes_packed": 101572,
+  "nodes": 44,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
+  ],
+  "extras_on_nodes": 44
+ },
+ {
+  "file": "adult_male.skeletal.LOD0.glb",
+  "bytes_raw": 6694836,
+  "bytes_packed": 1942652,
+  "nodes": 232,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 232
+ },
+ {
+  "file": "adult_male.skeletal.LOD1.glb",
+  "bytes_raw": 3738160,
+  "bytes_packed": 1210632,
+  "nodes": 232,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 232
+ },
+ {
+  "file": "adult_male.skeletal.LOD2.glb",
+  "bytes_raw": 1957320,
+  "bytes_packed": 761944,
+  "nodes": 232,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 232
+ },
+ {
+  "file": "adult_male.skeletal.LOD3.glb",
+  "bytes_raw": 1156352,
+  "bytes_packed": 558196,
+  "nodes": 232,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 232
+ },
+ {
+  "file": "adult_male.surface.LOD0.glb",
+  "bytes_raw": 2613476,
+  "bytes_packed": 908304,
+  "nodes": 256,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 256
+ },
+ {
+  "file": "adult_male.surface.LOD1.glb",
+  "bytes_raw": 1880428,
+  "bytes_packed": 732916,
+  "nodes": 256,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 256
+ },
+ {
+  "file": "adult_male.surface.LOD2.glb",
+  "bytes_raw": 1406152,
+  "bytes_packed": 619856,
+  "nodes": 256,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 256
+ },
+ {
+  "file": "adult_male.surface.LOD3.glb",
+  "bytes_raw": 1077436,
+  "bytes_packed": 538696,
+  "nodes": 256,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 256
+ },
+ {
+  "file": "adult_male.urinary.LOD0.glb",
+  "bytes_raw": 194736,
+  "bytes_packed": 60920,
+  "nodes": 8,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 8
+ },
+ {
+  "file": "adult_male.urinary.LOD1.glb",
+  "bytes_raw": 104560,
+  "bytes_packed": 37456,
+  "nodes": 8,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 8
+ },
+ {
+  "file": "adult_male.urinary.LOD2.glb",
+  "bytes_raw": 50028,
+  "bytes_packed": 22792,
+  "nodes": 8,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 8
+ },
+ {
+  "file": "adult_male.urinary.LOD3.glb",
+  "bytes_raw": 28180,
+  "bytes_packed": 16764,
+  "nodes": 8,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 8
+ },
+ {
+  "file": "module_tissue_lymph_node.lymphatic.LOD0.glb",
+  "bytes_raw": 2299240,
+  "bytes_packed": 621684,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "module_tissue_lymph_node.lymphatic.LOD1.glb",
+  "bytes_raw": 1154496,
+  "bytes_packed": 322744,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "module_tissue_lymph_node.lymphatic.LOD2.glb",
+  "bytes_raw": 477072,
+  "bytes_packed": 144756,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ },
+ {
+  "file": "module_tissue_lymph_node.lymphatic.LOD3.glb",
+  "bytes_raw": 343980,
+  "bytes_packed": 108156,
+  "nodes": 7,
+  "names_preserved": true,
+  "extensions": [
+   "KHR_mesh_quantization",
+   "EXT_meshopt_compression",
+   "KHR_materials_clearcoat"
+  ],
+  "extras_on_nodes": 7
+ }
+]
