@@ -10,6 +10,7 @@ import {
   type RankedMode,
   type RankedWorkoutEvidence,
 } from '../lib/seasonalHealthSportRank'
+import { Fold } from '../shared/ui/Fold'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
@@ -116,10 +117,6 @@ export function HealthPerformanceLeague() {
                 Panacea Ranked Season · {result.season.id}
               </div>
               <h2 className="mt-1 text-2xl font-black tracking-[-.035em] sm:text-3xl">Health & Performance League</h2>
-              <Prosa kelas="mt-1 max-w-2xl text-[12px] leading-relaxed text-white/55 sm:text-sm">
-                A 90-day competitive ladder where every verified effort is a match. Active calories are the base currency;
-                Panacea sizes the star using your body, recent baseline, perceived/physiological load, progression, recovery and evidence quality.
-              </Prosa>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[.045] px-3 py-2 text-right">
               <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/45">Season reset</div>
@@ -189,7 +186,8 @@ export function HealthPerformanceLeague() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-2 sm:grid-cols-5">
+              <Fold label="Components" className="mt-5">
+              <div className="grid gap-2 sm:grid-cols-5">
                 {COMPONENT_META.map(([key, label]) => {
                   const value = pct(result.components[key])
                   return (
@@ -203,11 +201,13 @@ export function HealthPerformanceLeague() {
                   )
                 })}
               </div>
+              </Fold>
             </div>
           </div>
         </div>
       </section>
 
+      <Fold label="Matches">
       <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -243,7 +243,9 @@ export function HealthPerformanceLeague() {
           )}
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Ladder">
       <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -275,8 +277,9 @@ export function HealthPerformanceLeague() {
           })}
         </div>
       </Card>
+      </Fold>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <Fold label="Promotion">
         <Card className="dark !border-white/10 !bg-[#07090c] text-white">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Promotion objectives</div>
           <h3 className="mt-1 text-lg font-black">What raises your rank next</h3>
@@ -294,6 +297,8 @@ export function HealthPerformanceLeague() {
           </div>
         </Card>
 
+      </Fold>
+      <Fold label="Scoring">
         <Card className="dark !border-white/10 !bg-[#07090c] text-white">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Scoring model</div>
           <h3 className="mt-1 text-lg font-black">Competitive, but clinically sane</h3>
@@ -314,8 +319,9 @@ export function HealthPerformanceLeague() {
             Calories are the base game currency, not the final judgement. Raw kcal are body-size normalised, compared against the user's own recent energy baseline, then modified conservatively by available effort/progression/recovery evidence. This is a gamification layer, not a diagnosis, medical clearance or substitute for clinician/coach judgement.
           </Prosa>
         </Card>
-      </div>
+      </Fold>
 
+      <Fold label="Seasons">
       <Card className="dark !border-white/10 !bg-[#07090c] text-white">
         <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Game systems preserved</div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -332,6 +338,7 @@ export function HealthPerformanceLeague() {
           ))}
         </div>
       </Card>
+      </Fold>
     </div>
   )
 }
