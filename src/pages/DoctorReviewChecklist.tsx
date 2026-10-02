@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { DOCTOR_REVIEW_CHECKLIST, doctorReviewIsComplete } from '../domains/clinical-review'
+import { Prosa } from '../components/Prosa'
 
 export function DoctorReviewChecklist() {
   const { account } = useStore()
@@ -71,10 +72,7 @@ export function DoctorReviewChecklist() {
         <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">Review Checklist</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
-              Review means inspect, document, and leave human notes. There is no approve/reject control on this page.
-              Automated safety, provenance, privacy, and CI gates remain separate and continue to run independently.
-            </p>
+            <Prosa kelas="mt-3 max-w-2xl text-sm leading-6 text-white/55">{'Review means inspect, document, and leave human notes. There is no approve/reject control on this page. Automated safety, provenance, privacy, and CI gates remain separate and continue to run independently.'}</Prosa>
           </div>
           <Link to="/clinical-hub" className="text-xs font-black text-white/50 hover:text-white">Clinical →</Link>
         </div>

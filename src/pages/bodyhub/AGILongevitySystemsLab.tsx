@@ -5,6 +5,7 @@ import {
   evaluateAgiResearchReadiness,
   type AgiLongevityDomainId,
 } from '../../lib/agiLongevitySystems'
+import { Prosa } from '../../components/Prosa'
 
 export default function AGILongevitySystemsLab() {
   const [domainId, setDomainId] = useState<AgiLongevityDomainId>('whole-cell-digital-twin')
@@ -26,7 +27,7 @@ export default function AGILongevitySystemsLab() {
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Frontier Medicine · AGI Systems Engineering</div>
             <h2 className="mt-1 text-lg font-black text-ink dark:text-white">Longevity research orchestration sandbox</h2>
-            <p className="mt-2 max-w-4xl text-[11px] leading-relaxed text-neutral-500">Explore how stronger models, better experiments, controllable actuation and prospective validation constrain one another. The weakest link matters more than a visually impressive average.</p>
+            <Prosa kelas="mt-2 max-w-4xl text-[11px] leading-relaxed text-neutral-500">{'Explore how stronger models, better experiments, controllable actuation and prospective validation constrain one another. The weakest link matters more than a visually impressive average.'}</Prosa>
           </div>
           <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[10px] font-black text-amber-700 dark:text-amber-300">CONCEPTUAL · NOT CLINICAL</span>
         </div>

@@ -5,6 +5,7 @@ import {
   type BreastGuideStage,
   type BreastSide,
 } from '../../lib/breastAtlasGuide'
+import { Prosa } from '../../components/Prosa'
 
 interface Props {
   selected: string | null
@@ -48,9 +49,7 @@ export function BreastAtlasGuide({ selected, onSelect }: Props) {
             Guided breast anatomy · HuBMAP female reference
           </div>
           <h3 className="mt-1 text-sm font-black text-ink dark:text-white">Trace all 16 shipped structures in the existing 3D atlas</h3>
-          <p className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">
-            Choose a side and structure below. The existing source-backed viewer will isolate and frame that exact named mesh; no replacement geometry is generated.
-          </p>
+          <Prosa kelas="mt-1 text-[10.5px] leading-relaxed text-neutral-500">{'Choose a side and structure below. The existing source-backed viewer will isolate and frame that exact named mesh; no replacement geometry is generated.'}</Prosa>
         </div>
         <div className="flex rounded-xl border border-neutral-200 bg-white p-1 dark:border-white/10 dark:bg-white/5" aria-label="Breast side">
           {(['Left', 'Right'] as const).map((item) => (
@@ -106,15 +105,11 @@ export function BreastAtlasGuide({ selected, onSelect }: Props) {
             <p className="mt-1 text-[9.5px] leading-relaxed text-neutral-500">{activeStage.description}</p>
           </>
         ) : (
-          <p className="text-[9.5px] leading-relaxed text-neutral-500">
-            Select any guided structure to frame it in 3D. You can still tap another verified mesh directly in the viewer.
-          </p>
+          <Prosa kelas="text-[9.5px] leading-relaxed text-neutral-500">{'Select any guided structure to frame it in 3D. You can still tap another verified mesh directly in the viewer.'}</Prosa>
         )}
       </div>
 
-      <p className="mt-2 text-[8.5px] leading-relaxed text-neutral-500">
-        Educational source geometry only. This is not mammography, ultrasound or MRI; it does not simulate milk flow, infer a lesion, screen for cancer, or represent an individual patient. Human academic review remains separate from engineering validation.
-      </p>
+      <Prosa kelas="mt-2 text-[8.5px] leading-relaxed text-neutral-500">{'Educational source geometry only. This is not mammography, ultrasound or MRI; it does not simulate milk flow, infer a lesion, screen for cancer, or represent an individual patient. Human academic review remains separate from engineering validation.'}</Prosa>
     </section>
   )
 }

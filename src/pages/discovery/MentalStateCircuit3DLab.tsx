@@ -6,6 +6,7 @@ import {
   DISCOVERY_MENTAL_STATE_CIRCUITS,
   type CircuitNode,
 } from '../../lib/discoveryMentalStateCircuits';
+import { Prosa } from '../../components/Prosa'
 
 function nodeColor(kind: CircuitNode['kind']) {
   switch (kind) {
@@ -126,9 +127,7 @@ export default function MentalStateCircuit3DLab() {
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.18em] text-emerald-300">Discovery · Neuropsychiatry 3D</p>
         <h2 id="mental-state-circuit-title" className="text-xl font-semibold text-white">Disease, thought, perception & mental-state circuits</h2>
-        <p className="max-w-4xl text-sm text-slate-300">
-          Interactive schematic network showing how molecular, cellular, regional and distributed circuit factors can converge on cognition, behavior and mental-state observations. The scene is not connectomics, microscopy, receptor-density imaging or patient physiology.
-        </p>
+        <Prosa kelas="max-w-4xl text-sm text-slate-300">{'Interactive schematic network showing how molecular, cellular, regional and distributed circuit factors can converge on cognition, behavior and mental-state observations. The scene is not connectomics, microscopy, receptor-density imaging or patient physiology.'}</Prosa>
       </header>
 
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Circuit model">

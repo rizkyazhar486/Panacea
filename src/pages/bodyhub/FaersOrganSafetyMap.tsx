@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { AnatomyLayer } from '../../components/Body3D'
+import { Prosa } from '../../components/Prosa'
 
 type ReactionRow = { term: string; count: number }
 
@@ -228,14 +229,12 @@ export function FaersOrganSafetyMap({ drugName, onHighlightSites }: Props) {
           <div className="rounded-xl bg-neutral-50 p-2.5 text-[10.5px] leading-relaxed text-neutral-500 dark:bg-white/5 dark:text-neutral-400">
             <div className="font-bold text-neutral-600 dark:text-neutral-300">How the percentage is calculated</div>
             <div className="mt-0.5 font-mono">share(system) = mapped report-term occurrences in system / all mapped report-term occurrences × 100%</div>
-            <p className="mt-1">This percentage describes only the selected mapping among the reaction terms returned by this query. It is not incidence, probability, relative risk, prevalence, severity or causal strength.</p>
+            <Prosa kelas="mt-1">{'This percentage describes only the selected mapping among the reaction terms returned by this query. It is not incidence, probability, relative risk, prevalence, severity or causal strength.'}</Prosa>
           </div>
         </div>
       )}
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">
-        Source: FDA Adverse Event Reporting System (FAERS) via openFDA drug/event reaction-term aggregation. Reaction terms are returned by openFDA; Panacea maps only a small explicit set of exact terms to broad body systems for educational anatomy navigation. It does not claim this subset is an official MedDRA System Organ Class mapping.
-      </p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-400">{'Source: FDA Adverse Event Reporting System (FAERS) via openFDA drug/event reaction-term aggregation. Reaction terms are returned by openFDA; Panacea maps only a small explicit set of exact terms to broad body systems for educational anatomy navigation. It does not claim this subset is an official MedDRA System Organ Class mapping.'}</Prosa>
     </section>
   )
 }

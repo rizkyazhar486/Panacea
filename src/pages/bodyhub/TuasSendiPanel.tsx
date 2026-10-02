@@ -116,14 +116,7 @@ export function TuasSendiPanel() {
     <div className="space-y-4">
       <Prosa>
         <h3 className="text-base font-black">Joint lever mechanics</h3>
-        <p className="text-[12px] leading-relaxed">
-          Most human joints are third-class levers: the muscle inserts between the joint
-          axis and the load. That arrangement buys speed and range at the far end of the
-          segment, and it pays for them in force. Hold a modest weight in the hand and the
-          muscle develops several times that weight, while the joint surface itself carries
-          more still. Move the angle and watch the effective moment arm — r · sin θ —
-          collapse toward either end of the range.
-        </p>
+        <Prosa kelas="text-[12px] leading-relaxed">{'Most human joints are third-class levers: the muscle inserts between the joint axis and the load. That arrangement buys speed and range at the far end of the segment, and it pays for them in force. Hold a modest weight in the hand and the muscle develops several times that weight, while the joint surface itself carries more still. Move the angle and watch the effective moment arm — r · sin θ — collapse toward either end of the range.'}</Prosa>
       </Prosa>
 
       <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">

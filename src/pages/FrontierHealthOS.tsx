@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { DiscoveryWorkbench } from '../components/frontier/DiscoveryWorkbench'
 import { PanaceaCausalTimeMachine } from '../components/frontier/PanaceaCausalTimeMachine'
 import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
 import { PanaceaRealityEngine } from '../components/frontier/PanaceaRealityEngine'
+const AGILongevitySystemsLab = lazy(() => import('./bodyhub/AGILongevitySystemsLab'))
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -160,6 +161,12 @@ export function FrontierHealthOS() {
           </section>
         </div>
       </section>
+      <details className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open longevity research orchestration sandbox</summary>
+        <Suspense fallback={<div className="p-3 text-xs text-neutral-500" role="status">Loading sandbox…</div>}>
+          <AGILongevitySystemsLab />
+        </Suspense>
+      </details>
     </div>
   )
 }

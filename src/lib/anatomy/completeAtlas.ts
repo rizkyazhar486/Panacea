@@ -7,6 +7,7 @@ import { applyAtlasRelationPatches, HIGH_END_ATLAS_RELATION_PATCHES } from './hi
 import { HIGHER_END_WHOLE_BODY_NODES } from './higherEndWholeBodyAtlas'
 import { RESPIRATORY_ATLAS_NODES } from './respiratoryAtlas'
 import { WHOLE_BODY_ATLAS_BASE_NODES } from './wholeBodyAtlas'
+import { INDEKS_TUBUH } from '../bodyIndex.gen'
 
 /**
  * Build hierarchy solely from parentId. Raw `children` arrays are deliberately
@@ -43,8 +44,51 @@ export function deriveCanonicalAtlasHierarchy(nodes: readonly AtlasNode[]): read
  * until independently verified. No patient-specific anatomy, diagnosis,
  * treatment or surgical inference is introduced here.
  */
+/**
+ * Composition integrity, applied before relation patches:
+ *
+ * 1. First definition of an id wins. Earlier modules (base, curated respiratory,
+ *    higher-end) carry geometry bindings verified against the shipped GLB; a
+ *    later deep-module node reusing the same id must not create a second,
+ *    differently parented copy of the same structure.
+ * 2. A source-candidate node whose hints match no structure name in the shipped
+ *    index for its file is demoted to 'reference-only' (no files). Claiming
+ *    candidate geometry that the shipped bundle does not contain would let a
+ *    viewer search for a mesh that does not exist; fail closed instead.
+ */
+const NAMA_PER_LAPISAN = (() => {
+  const peta = new Map<string, string[]>()
+  for (const s of INDEKS_TUBUH) {
+    const daftar = peta.get(s.l) ?? []
+    daftar.push(s.n.toLowerCase())
+    peta.set(s.l, daftar)
+  }
+  return peta
+})()
+
+export function hintsResolveInShippedIndex(node: AtlasNode): boolean {
+  const files = node.source?.files ?? []
+  const hints = node.source?.nodeHints ?? []
+  const names = files.flatMap((f) => NAMA_PER_LAPISAN.get(f.replace(/\.glb$/, '')) ?? [])
+  if (!names.length) return true // file outside the shipped index: not judged here
+  return hints.some((h) => { const q = h.toLowerCase(); return names.some((n) => n.includes(q)) })
+}
+
+export function integrateComposedAtlasNodes(nodes: readonly AtlasNode[]): AtlasNode[] {
+  const seen = new Set<string>()
+  const out: AtlasNode[] = []
+  for (const node of nodes) {
+    if (seen.has(node.id)) continue
+    seen.add(node.id)
+    if (node.geometryStatus === 'partial' && node.source?.files?.length && !hintsResolveInShippedIndex(node)) {
+      out.push({ ...node, geometryStatus: 'reference-only', source: { ...node.source, files: undefined } })
+    } else out.push(node)
+  }
+  return out
+}
+
 const COMPOSED_STRUCTURAL_NODES = applyAtlasRelationPatches(
-  [
+  integrateComposedAtlasNodes([
     ...WHOLE_BODY_ATLAS_BASE_NODES,
     ...RESPIRATORY_ATLAS_NODES,
     ...HIGHER_END_WHOLE_BODY_NODES,
@@ -52,7 +96,7 @@ const COMPOSED_STRUCTURAL_NODES = applyAtlasRelationPatches(
     ...DEEP_CARDIOVASCULAR_ATLAS_NODES,
     ...DEEP_NEUROVASCULAR_ATLAS_NODES,
     ...CARDIOPULMONARY_BRIDGE_NODES,
-  ],
+  ]),
   [...HIGH_END_ATLAS_RELATION_PATCHES, ...CARDIOPULMONARY_RELATION_PATCHES],
 )
 
