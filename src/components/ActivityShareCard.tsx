@@ -6,6 +6,7 @@ import { Portal } from './Portal'
 import { useStore, uid } from '../lib/store'
 import { uploadOrLocal } from '../lib/upload'
 import type { Role } from '../lib/types'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // Shareable activity image. Aggregate metrics are safe by default. The exact
 // route is NEVER put on the card unless the user explicitly enables it; even
@@ -223,7 +224,8 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-950">
         <div className="mb-3 flex items-center justify-between">
-          <div><h3 className="text-sm font-black text-ink dark:text-white">Share Activity</h3><p className="mt-0.5 text-[10px] text-neutral-500">Exact route is private by default.</p></div>
+          <div><h3 className="text-sm font-black text-ink dark:text-white">Share Activity</h3>
+        <BatasKlaimKesehatan permukaan="performance.activity-share" className="mt-2 text-[11px] leading-snug text-neutral-500" /><p className="mt-0.5 text-[10px] text-neutral-500">Exact route is private by default.</p></div>
           <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-white/10"><IconX size={18} /></button>
         </div>
         <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ aspectRatio: '1080/1350' }} />

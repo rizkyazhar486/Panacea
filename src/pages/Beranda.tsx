@@ -12,6 +12,7 @@ import { emptyHomeDailyState, homeDailyStateSignature, PANACEA_STATE_STORAGE_KEY
 import '../styles/home-odyssey.css'
 import '../styles/home-utility-polish.css'
 import '../styles/home-mobile-stability.css'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const LazyPapanWidget = lazy(() => import('../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
 const LazyKisiFitur = lazy(() => import('../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
@@ -246,6 +247,7 @@ export default function Beranda() {
           <h1 id="panacea-home-title" className="home-odyssey-title">
             {name ? `Hi, ${name}. ` : ''}Your <span className="energy-word">daily command center.</span>
           </h1>
+          <BatasKlaimKesehatan permukaan="wellness.home" />
           <p className="home-odyssey-copy">
             Useful actions, recorded health signals and your own widgets — dense enough to work every day, light enough to stay smooth.
           </p>

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconShield } from '../components/icons'
 import { INDIKATOR, RENCANA, type Indikator } from '../lib/indikator'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../components/Prosa'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aturan main — halaman yang menjelaskan angka-angka aplikasi ini.
@@ -124,19 +126,20 @@ export function AturanAngka() {
         title="How your numbers work"
         subtitle="The rules of the game: what each number reads, what moves it, how fast, and what it cannot see"
       />
+      <BatasKlaimKesehatan permukaan="lab.number-rules" />
 
       <Card>
-        <p className="text-[13px] leading-[1.7] text-ink dark:text-neutral-200">
+        <Prosa kelas="text-[13px] leading-[1.7] text-ink dark:text-neutral-200">
           Treating your health as a game only works if the rules are written down. A game you can play has readable
           rules; a machine you can only feed does not. So every number this app shows you is set out below with the
           data it actually reads, the arithmetic in plain words, what pushes it up and down and how quickly, and —
           just as important — what it is blind to.
-        </p>
-        <p className="mt-2 text-[13px] leading-[1.7] text-neutral-600 dark:text-neutral-300">
+        </Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-[1.7] text-neutral-600 dark:text-neutral-300">
           There is deliberately no single combined &ldquo;health score&rdquo; here, no badges, and no streak that
           punishes you for breaking it. Those make people chase the number instead of the state, and on a health app
           that does real harm.
-        </p>
+        </Prosa>
       </Card>
 
       <div className="space-y-2">

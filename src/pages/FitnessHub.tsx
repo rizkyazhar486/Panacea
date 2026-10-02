@@ -9,6 +9,7 @@ export const GROUPS = [
       { to: '/fitness-hub?view=body', name: 'Your Body', kw: 'body composition measurements' },
       { to: '/fitness-hub?view=character', name: '3D Character & Body Shaper', kw: '3d avatar posture body shaper' },
       { to: '/fitness-hub?view=training', name: 'Training', kw: 'training plan sport science progression' },
+      { to: '/fitness-hub?view=ranked', name: 'Ranked Season', kw: 'league rank master grandmaster epic legend mythic immortal season sport health performance' },
       { to: '/fitness-hub?view=workout', name: 'Workout', kw: 'workout strength movement session' },
       { to: '/fitness-hub?view=recovery', name: 'Sleep & Recovery', kw: 'sleep recovery readiness' },
       { to: '/fitness-hub?view=numbers', name: 'Your Numbers', kw: 'metrics vitals health signals' },

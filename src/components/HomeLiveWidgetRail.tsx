@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { getVitals } from '../lib/healthVitals'
+import { useVitals } from '../lib/useVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 type SignalDef = {
   key: string
@@ -79,10 +80,11 @@ function trend(field: string) {
 }
 
 export function HomeLiveWidgetRail() {
-  const vitals = getVitals() as unknown as Record<string, unknown>
+  const vitals = useVitals() as unknown as Record<string, unknown>
 
   return (
     <section aria-labelledby="home-live-widget-rail-title" className="mb-4">
+      <BatasKlaimKesehatan permukaan="wellness.home-live-rail" />
       <div className="mb-2 flex items-center justify-between gap-3 px-0.5">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">33 live instruments</div>
@@ -101,7 +103,7 @@ export function HomeLiveWidgetRail() {
             <Link
               key={signal.key}
               to={signal.to}
-              className="group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#00BF63]/35 bg-black p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition active:scale-[.97]"
+              className="dark group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#00BF63]/35 bg-black p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition active:scale-[.97]"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="text-[9px] font-black uppercase tracking-[.13em] text-[#00BF63]">{signal.label}</span>

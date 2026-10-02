@@ -1,109 +1,185 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { ForYouOmniFeed } from '../components/ForYouOmniFeed'
 import { useStore } from '../lib/store'
 import {
   IconBook,
   IconChat,
   IconEMR,
-  IconHeart,
-  IconMoon,
   IconPlan,
   IconSettings,
-  IconSparkle,
-  IconStore,
   IconUser,
   IconUsers,
-  IconWallet,
 } from '../components/icons'
 
-type Tile = {
+type Destination = {
   label: string
   to: string
   icon: typeof IconUsers
-  tone: string
-  meta: string
 }
 
-const PERSONAL_TILES: Tile[] = [
-  { label: 'Social', to: '/?t=social', icon: IconUsers, tone: 'from-rose-400/22 via-fuchsia-400/[.08] to-transparent', meta: 'Feed' },
-  { label: 'Community', to: '/?t=community', icon: IconHeart, tone: 'from-cyan-400/22 via-blue-400/[.08] to-transparent', meta: 'People' },
-  { label: 'Clubs', to: '/?t=clubs', icon: IconSparkle, tone: 'from-violet-400/22 via-indigo-400/[.08] to-transparent', meta: 'Groups' },
-  { label: 'Faith', to: '/?t=religion', icon: IconMoon, tone: 'from-emerald-400/22 via-teal-400/[.08] to-transparent', meta: 'Practice' },
-  { label: 'Finance', to: '/?t=finance', icon: IconWallet, tone: 'from-amber-300/22 via-orange-400/[.08] to-transparent', meta: 'Money' },
-  { label: 'Markets', to: '/?t=markets', icon: IconStore, tone: 'from-sky-400/22 via-cyan-400/[.08] to-transparent', meta: 'Track' },
+const INTELLIGENCE: Destination[] = [
+  { label: 'Ask Panacea', to: '/chatbot', icon: IconChat },
+  { label: 'AI-EMR', to: '/emr', icon: IconEMR },
+  { label: 'Care', to: '/care-episode', icon: IconPlan },
+  { label: 'Materials', to: '/my-materials', icon: IconBook },
 ]
 
-const INTELLIGENCE_TILES: Tile[] = [
-  { label: 'Ask Panacea', to: '/chatbot', icon: IconChat, tone: 'from-cyan-300/24 via-blue-500/[.09] to-transparent', meta: 'AI' },
-  { label: 'AI-EMR', to: '/emr', icon: IconEMR, tone: 'from-violet-300/24 via-fuchsia-500/[.08] to-transparent', meta: 'Record' },
-  { label: 'Care', to: '/care-episode', icon: IconPlan, tone: 'from-emerald-300/24 via-teal-500/[.08] to-transparent', meta: 'Episode' },
-  { label: 'Materials', to: '/my-materials', icon: IconBook, tone: 'from-amber-300/24 via-orange-500/[.08] to-transparent', meta: 'Library' },
+const MOTIVATION = [
+  'Small systems beat heroic bursts.',
+  'Make the next healthy action obvious.',
+  'Consistency compounds quietly.',
+  'Protect attention; spend it on what matters.',
 ]
 
-function TileCard({ tile }: { tile: Tile }) {
-  const Icon = tile.icon
+function DestinationRail({ label, items }: { label: string; items: Destination[] }) {
   return (
-    <Link
-      to={tile.to}
-      className={`liquid-action liquid-glass liquid-spectral-edge group relative min-h-[116px] overflow-hidden rounded-[24px] bg-gradient-to-br ${tile.tone} p-4`}
-      aria-label={`${tile.label} — ${tile.meta}`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span className="liquid-lens grid h-11 w-11 place-items-center rounded-[16px] text-white" aria-hidden>
-          <Icon size={20} />
-        </span>
-        <span className="text-sm text-white/32 transition group-hover:translate-x-0.5 group-hover:text-white/70" aria-hidden>↗</span>
-      </div>
-      <div className="mt-5 flex items-end justify-between gap-2">
-        <span className="truncate text-[15px] font-black tracking-[-.02em] text-white">{tile.label}</span>
-        <span className="shrink-0 text-[9px] font-black uppercase tracking-[.16em] text-white/38">{tile.meta}</span>
-      </div>
-    </Link>
+    <section aria-label={label} className="border-t border-white/10 pt-4">
+      <div className="mb-1 text-[9px] font-black uppercase tracking-[.14em] text-white/34">{label}</div>
+      <nav className="flex gap-6 overflow-x-auto no-scrollbar">
+        {items.map((item) => {
+          const Icon = item.icon
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="flex min-h-[52px] shrink-0 items-center gap-2 text-xs font-black text-white/58 transition hover:text-white"
+            >
+              <Icon size={16} />
+              <span>{item.label}</span>
+              <span aria-hidden>↗</span>
+            </Link>
+          )
+        })}
+      </nav>
+    </section>
   )
 }
 
 export function ForYouHub() {
   const { account } = useStore()
   const name = account?.name?.trim().split(/\s+/)[0] || 'You'
+  const [score, setScore] = useState<number | null>(null)
+  const [budget, setBudget] = useState('')
+  const [motivation, setMotivation] = useState(0)
+  const [prompt, setPrompt] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const rawScore = window.localStorage.getItem('pm_for_you_score')
+    const stored = rawScore == null ? Number.NaN : Number(rawScore)
+    if (Number.isFinite(stored) && stored >= 0 && stored <= 100) setScore(stored)
+    setBudget(window.localStorage.getItem('pm_for_you_budget_note') ?? '')
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || score == null) return
+    window.localStorage.setItem('pm_for_you_score', String(score))
+  }, [score])
+
+  const saveBudget = () => {
+    if (typeof window !== 'undefined' && budget.trim()) {
+      window.localStorage.setItem('pm_for_you_budget_note', budget.trim())
+    }
+    setSaved(true)
+    window.setTimeout(() => setSaved(false), 1200)
+  }
+
+  const handoffPrompt = () => {
+    if (typeof window !== 'undefined' && prompt.trim()) {
+      window.sessionStorage.setItem('pm_chat_draft', prompt.trim())
+    }
+  }
 
   return (
-    <main className="space-y-5 pb-28 text-white" aria-label="For You super page">
-      <section className="liquid-glass-strong liquid-spectral-edge overflow-hidden rounded-[30px] p-5 sm:p-7">
-        <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <div className="text-[10px] font-black uppercase tracking-[.18em] text-cyan-100/55">For You</div>
-            <h1 className="mt-1 truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">{name}'s space</h1>
-          </div>
-          <Link to="/profile" className="liquid-lens grid h-14 w-14 shrink-0 place-items-center rounded-full" aria-label="Open account">
-            <IconUser size={22} />
+    <main className="space-y-8 pb-28 text-white" aria-label="For You super page">
+      <header className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div className="min-w-0">
+          <div className="text-[9px] font-black uppercase tracking-[.14em] text-white/34">For You</div>
+          <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">{name}</h1>
+        </div>
+        <Link to="/profile" className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/10 text-white/70 transition hover:text-white" aria-label="Open account">
+          <IconUser size={19} />
+        </Link>
+      </header>
+
+      <nav className="grid grid-cols-3 border-b border-white/10" aria-label="Personal controls">
+        <Link to="/messages" className="grid min-h-[52px] place-items-center border-r border-white/10 text-[11px] font-black text-white/64 hover:text-white">Messages</Link>
+        <Link to="/notifikasi" className="grid min-h-[52px] place-items-center border-r border-white/10 text-[11px] font-black text-white/64 hover:text-white">Alerts</Link>
+        <Link to="/settings" className="flex min-h-[52px] items-center justify-center gap-1.5 text-[11px] font-black text-white/64 hover:text-white"><IconSettings size={14} />Settings</Link>
+      </nav>
+
+      <section aria-label="Ask Panacea" className="border-b border-white/10 pb-8">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
+          <label className="flex min-h-[52px] items-center gap-3 border-b border-white/20 px-1 focus-within:border-white/70">
+            <IconChat size={16} />
+            <span className="sr-only">Ask Panacea</span>
+            <input
+              value={prompt}
+              onChange={(event) => setPrompt(event.target.value)}
+              placeholder="Ask Panacea"
+              className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-white/30"
+            />
+          </label>
+          <Link to="/chatbot" onClick={handoffPrompt} className="grid min-h-[52px] place-items-center rounded-full bg-white px-4 text-xs font-black text-black transition active:scale-[.98]">
+            Ask →
           </Link>
         </div>
-
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          <Link to="/messages" className="liquid-action rounded-[18px] border border-white/[.08] bg-white/[.035] px-3 py-3 text-center text-[11px] font-black text-white/75">Messages</Link>
-          <Link to="/notifikasi" className="liquid-action rounded-[18px] border border-white/[.08] bg-white/[.035] px-3 py-3 text-center text-[11px] font-black text-white/75">Alerts</Link>
-          <Link to="/settings" className="liquid-action flex items-center justify-center gap-1.5 rounded-[18px] border border-white/[.08] bg-white/[.035] px-3 py-3 text-[11px] font-black text-white/75"><IconSettings size={14} />Settings</Link>
-        </div>
       </section>
 
-      <section aria-label="Personal spaces">
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-xs font-black uppercase tracking-[.15em] text-white/50">Life</h2>
-          <span className="text-[10px] font-black text-cyan-100/45">6 spaces</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-          {PERSONAL_TILES.map((tile) => <TileCard key={tile.label} tile={tile} />)}
-        </div>
+      <ForYouOmniFeed />
+
+      <DestinationRail label="Intelligence" items={INTELLIGENCE} />
+
+      <section aria-label="Personal tools" className="border-t border-white/10">
+        <details className="group border-b border-white/10">
+          <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-xs font-black">
+            <span>Daily check-in</span>
+            <span className="text-2xl tabular-nums">{score == null ? '—' : score}</span>
+          </summary>
+          <div className="pb-5">
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[.12em] text-white/32">Self-rated · 0–100</div>
+            <input type="range" min="0" max="100" value={score ?? 50} onChange={(event) => setScore(Number(event.target.value))} className="w-full accent-emerald-300" aria-label="Self-rated daily check-in" />
+          </div>
+        </details>
+
+        <details className="group border-b border-white/10">
+          <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-xs font-black">
+            <span>Budget note</span>
+            <span className="text-white/35" aria-hidden>＋</span>
+          </summary>
+          <div className="grid gap-3 pb-5 sm:grid-cols-[minmax(0,1fr)_96px]">
+            <input
+              value={budget}
+              onChange={(event) => setBudget(event.target.value)}
+              placeholder="Budget note"
+              className="min-h-[44px] border-b border-white/15 bg-transparent text-sm font-semibold outline-none placeholder:text-white/28"
+            />
+            <button type="button" onClick={saveBudget} className="min-h-[44px] rounded-full border border-white/12 text-[10px] font-black text-white/70">
+              {saved ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+        </details>
+
+        <details className="group border-b border-white/10">
+          <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-xs font-black">
+            <span>Motivation</span>
+            <span className="text-white/35" aria-hidden>＋</span>
+          </summary>
+          <div className="flex items-center justify-between gap-4 pb-5">
+            <span className="truncate text-sm font-bold text-white/72">{MOTIVATION[motivation]}</span>
+            <button type="button" onClick={() => setMotivation((value) => (value + 1) % MOTIVATION.length)} className="min-h-[44px] shrink-0 px-2 text-xs font-black text-white/55 hover:text-white">Next →</button>
+          </div>
+        </details>
+
+        <Link to="/prayer-times" className="flex min-h-[56px] items-center justify-between border-b border-white/10 text-xs font-black text-white/60 hover:text-white">
+          <span>Prayer times</span><span aria-hidden>→</span>
+        </Link>
       </section>
 
-      <section aria-label="Personal intelligence">
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-xs font-black uppercase tracking-[.15em] text-white/50">Intelligence</h2>
-          <span className="text-[10px] font-black text-violet-100/45">4 tools</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          {INTELLIGENCE_TILES.map((tile) => <TileCard key={tile.label} tile={tile} />)}
-        </div>
-      </section>
+      <SuperPageCapabilityRail domain="for-you" initialLimit={24} />
     </main>
   )
 }

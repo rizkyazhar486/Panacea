@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconBook } from '../components/icons'
 import { KELUHAN_AWAM, BUKAN, type Keluhan } from '../lib/edukasiAwam'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Halaman edukasi untuk orang awam.
@@ -105,6 +106,7 @@ export function EdukasiAwam() {
         title="Health, explained"
         subtitle="Everyday complaints: what it usually is, when to see someone, and what actually helps"
       />
+      <BatasKlaimKesehatan permukaan="care.lay-education" />
 
       <Card className="!p-4">
         <p className="text-[13px] leading-[1.7] text-ink dark:text-neutral-200">

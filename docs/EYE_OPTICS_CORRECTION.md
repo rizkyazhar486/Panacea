@@ -1,4 +1,4 @@
-# Eye Gold Standard — optics interaction correction
+# Eye optics interaction correction (Universal Human Gold Standard)
 
 Status: PARTIAL, ready for PR validation. Original audit base: ceddc368551b89ebd16b2ec148d493cec91e2098. Synchronized with 6f10a006900efee405356096533547b4f929f6cc before publication.
 
@@ -25,4 +25,4 @@ Production build (including TypeScript and 32 build-gate tests) passed; Vite rep
 
 Local browser installation failed due to certificate/download errors. A dedicated eye interaction helper now runs in the existing rendered-WebGL CI step after its original canvas capture, reusing its browser and production build. It checks route reachability, keyboard sliders, actual SVG changes, selected phase, overflow and close/reopen behavior; it captures an eye screenshot. Browser/WebGL results, qualified anatomical review, exact-head PR validation and Stabilization Acceptance remain required. No new pathology, pharmacology, imaging or 3D assets were implemented. Adnexal coverage is still incomplete. No numeric quality/accuracy score is assigned without an evaluated rubric and reviewer evidence.
 
-The user authorized pushing this eye candidate and opening a PR in rizkyazhar486/Panacea. Merge and deployment remain contingent on their actual gates and evidence. Eye Gold Standard as a whole is not complete; no numeric accuracy score or qualified review is claimed.
+The user authorized pushing this eye candidate and opening a PR in rizkyazhar486/Panacea. Merge and deployment remain contingent on their actual gates and evidence. The eye, as one organ under the Universal Human Gold Standard, is not complete; no numeric accuracy score or qualified review is claimed.

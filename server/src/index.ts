@@ -1,3 +1,9 @@
+import { randomUUID } from 'node:crypto'
+import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
+import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './galatKlien.js'
+import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
+import { dirname as folderDari, join as gabungJalur } from 'node:path'
+import { fileURLToPath as keJalurBerkas } from 'node:url'
 import { createServer } from 'node:http'
 import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
@@ -37,6 +43,16 @@ import {
   completeSecondOpinion,
   uid,
   getClinical,
+  getRecord,
+  getRecords,
+  getRecordHistory,
+  closeEncounter,
+  getEncounters,
+  getKodeTaut,
+  getTautan,
+  hapusTautan,
+  simpanKodeTaut,
+  simpanTautan,
   saveRecord,
   saveEducation,
   addVital,
@@ -45,6 +61,21 @@ import {
   getSettings,
   saveSettings,
   getHealthProfile,
+  getLabLog,
+  putLabLog,
+  listLabShares,
+  addLabShare,
+  revokeLabShare,
+  addLabAudit,
+  listLabAudit,
+  addLabReview,
+  listLabReviews,
+  listCarePlans,
+  addCarePlan,
+  bacaLedgerValidasi,
+  tambahLedgerValidasi,
+  addCareReport,
+  listCareReports,
   saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
@@ -92,6 +123,7 @@ import {
   addAudit,
   getAudit,
   initStore,
+  flushStore,
   type User,
   type Post,
   type Meet,
@@ -106,6 +138,7 @@ import {
   getWebhookDeliveries,
   diagnoseSync,
   modePenyimpanan,
+  modeIrisan,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -124,8 +157,18 @@ import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
+import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
+import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './catatanKesehatanDiri.js'
+import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
+import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
+import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
+import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
+import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
-import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
+import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
 import { lingkunganKota, cariPangan } from './lingkungan.js'
@@ -137,11 +180,14 @@ import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
 import { findRelatedDrugs } from './rxnorm.js'
 import { attachRealtime } from './realtime.js'
+import { mountHttpMcp } from './mcp/mount.js'
+import { mountVisitRoutes } from './visits.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
 // not this API host, so a strict API-side CSP would only add risk of breaking
 // JSON clients without protecting the frontend).
+app.use(middlewareObservabilitas())
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.set('trust proxy', 1) // behind Render's proxy — needed for correct client IPs in rate limiting
 
@@ -179,7 +225,6 @@ app.use('/api/health-webhook/:token', webhookLimiter, (req, res, next) => {
 // sesi itu hilang tanpa jejak di mana pun.
 app.use('/api/health-webhook', express.json({ limit: '12mb' }))
 
-app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
   cors({
@@ -188,6 +233,8 @@ app.use(
       cb(null, false)
     },
     credentials: true,
+    // ID korelasi harus terbaca aplikasi lintas-origin agar laporan galat bisa dicocokkan dengan log.
+    exposedHeaders: ['X-Request-Id'],
   }),
 )
 
@@ -205,6 +252,9 @@ const authLimiter = rateLimit({
   message: { error: 'rate_limited' },
 })
 app.use('/api', globalLimiter)
+mountHttpMcp(app)
+app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
+mountVisitRoutes(app)
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
@@ -215,6 +265,13 @@ app.get('/api/health', (_req, res) => {
     // deploy ulang berikutnya — aplikasi mengatakannya, bukan menunggu orang
     // menemukannya sendiri saat gagal masuk.
     penyimpanan: modePenyimpanan(),
+    irisan: modeIrisan(),
+    // Kesehatan simpan: tanpa pesan galat (bisa memuat nama host) di endpoint publik.
+    penyimpananSehat: penyimpananSehat(),
+    // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
+    http: ringkasanObservabilitas(),
+    galatKlien: ringkasanGalatKlien(),
+    simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     /*
      * KEMAMPUAN SERVER, supaya aplikasi dapat membedakan SERVER YANG BELUM
@@ -775,15 +832,30 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
+// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
+const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId, (pid) => tertautKe(u, pid, getTautan()))
 app.get('/api/clinical', requireAuth, (req, res) => {
-  addAudit((req as express.Request & { user: User }).user, 'clinical.read')
-  res.json(getClinical())
+  const u = (req as express.Request & { user: User }).user
+  addAudit(u, 'clinical.read')
+  const c = getClinical()
+  // Hash kode tautan tidak pernah keluar dari server.
+  const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
+  res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
-  const { patientId, record } = req.body as { patientId?: string; record?: unknown }
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
+  const { patientId, record } = req.body as { patientId?: string; record?: any }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  if (!record || typeof record !== 'object' || typeof record.id !== 'string' || !record.id.trim()) {
+    return res.status(400).json({ error: 'missing_record_id' })
+  }
+  if (record.patientId !== patientId) return res.status(400).json({ error: 'record_patient_mismatch' })
   const actor = (req as express.Request & { user: User }).user
-  saveRecord(patientId, record)
+  // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
+  // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
+  const hasil = terapkanSimpanRekam(getRecord(patientId, record.id), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  saveRecord(patientId, hasil.rekam, hasil.arsip)
+  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
@@ -794,29 +866,115 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
       url: './#/education',
     }, 'notifVitals').catch(() => {})
   }
+  res.json({ ok: true, record: hasil.rekam })
+})
+
+// Tutup kunjungan bertanda tangan dan mulai draf baru (klinisi saja).
+app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
+  closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
+  addAudit(actor, 'emr.encounter_closed', patientId)
+  res.json({ ok: true, encounter: hasil.kunjungan, record: hasil.rekamBaru })
+})
+app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.encounters.read', String(req.params.patientId))
+  res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Tautan pasien praktik -> akun pasien, disetujui pasien lewat kode sekali pakai.
+app.post('/api/clinical/patient/:patientId/link-code', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId)
+  if (!getClinical().patients.some((p) => p?.id === pid)) return res.status(404).json({ error: 'no-patient' })
+  const h = terbitkanKodeTaut(pid, { id: actor.id, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  if (!h.ok) return res.status(h.alasan === 'not-clinician' ? 403 : 400).json({ error: h.alasan })
+  simpanKodeTaut(h.catatan)
+  addAudit(actor, 'emr.link_code_issued', pid)
+  res.json({ code: h.kode, expiresAt: h.catatan.kedaluwarsa })
+})
+app.get('/api/clinical/patient/:patientId/link-status', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  if (!klinisiAtauPemilik(actor, isOwner(actor))) return res.status(403).json({ error: 'not-clinician' })
+  res.json(statusTautanPasien(String(req.params.patientId), getTautan()))
+})
+app.post('/api/clinical/link', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const hasil = tebusKodeTaut(String((req.body as { code?: unknown })?.code ?? ''), actor, getKodeTaut(), getTautan(), new Date())
+  if (!hasil.ok) { addAudit(actor, 'emr.link_failed', hasil.alasan); return res.status(hasil.alasan === 'invalid' ? 404 : 409).json({ error: hasil.alasan }) }
+  simpanTautan(hasil.tautan, hasil.kodeHash)
+  addAudit(actor, 'emr.linked', hasil.tautan.patientId)
+  res.json({ ok: true, patientId: hasil.tautan.patientId })
+})
+app.get('/api/clinical/links', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ links: Object.values(getTautan()).filter((t) => t.userId === u.id).map((t) => ({ patientId: t.patientId, linkedAt: t.ditautkanPada })) })
+})
+app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId), t = getTautan()[pid]
+  if (!t) return res.status(404).json({ error: 'not-linked' })
+  if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
+  hapusTautan(pid)
+  addAudit(u, 'emr.unlinked', pid)
   res.json({ ok: true })
 })
+
+// Semua encounter pasien (newest first). Akses identik dengan rekam klinis.
+app.get('/api/clinical/records/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const patientId = String(req.params.patientId)
+  if (!bolehPasien(u, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.encounters.read', patientId)
+  res.json({ records: getRecords(patientId) })
+})
+
+// Riwayat versi bertanda tangan (akses sama dengan rekamnya), opsional per encounter.
+app.get('/api/clinical/record-history/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const patientId = String(req.params.patientId)
+  if (!bolehPasien(u, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  const recordId = typeof req.query.recordId === 'string' ? req.query.recordId : undefined
+  addAudit(u, 'emr.history.read', recordId ? `${patientId}:${recordId}` : patientId)
+  res.json({ history: getRecordHistory(patientId, recordId) })
+})
 app.post('/api/clinical/education', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addVital(patientId, vital)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
+  addVital(patientId, vitalTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, result } = req.body as { patientId?: string; result?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addSupportive(patientId, result)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
+  addSupportive(patientId, resultTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
   const { patient } = req.body as { patient?: unknown }
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
   res.json({ ok: true })
 })
@@ -861,7 +1019,257 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
     return
   }
   try {
-    res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+    res.json({ ok: true, profile: saveHealthProfile(u.email, buangKunciDiary(data as Record<string, unknown>)) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+// Daftar self-vital / VO₂max dari AppState — last-write-wins setelah validasi server.
+app.put('/api/health-series/self-vitals', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const selfVitalsLog = validasiSelfVitalsLog((req.body as { selfVitals?: unknown })?.selfVitals)
+    res.json({ ok: true, selfVitals: saveHealthProfile(u.email, { selfVitalsLog }).selfVitalsLog })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.put('/api/health-series/vo2max', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const vo2maxEntries = validasiVo2maxLog((req.body as { vo2maxLog?: unknown })?.vo2maxLog)
+    res.json({ ok: true, vo2maxLog: saveHealthProfile(u.email, { vo2maxEntries }).vo2maxEntries })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.put('/api/health-series/diary', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = req.body as { sleepLogs?: unknown; foods?: unknown; wellness?: unknown; trainingLogs?: unknown; gpsActivities?: unknown; removeFoodIds?: unknown; removeSleepIds?: unknown; removeTrainingIds?: unknown; removeGpsIds?: unknown }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    res.status(400).json({ error: 'invalid diary payload' })
+    return
+  }
+  try {
+    const patch = susunPatchDiary(getHealthProfile(u.email), body)
+    const profil = saveHealthProfile(u.email, patch)
+    res.json({ ok: true, sleep: profil.diarySleep, foods: profil.diaryFoods ?? [], wellness: profil.diaryWellness ?? [] })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Riwayat lab pribadi. Kepemilikan dari sesi terautentikasi saja (tanpa id di
+// jalur), validasi di server, dan tulisan lama ditolak (409) agar penghapusan
+// di perangkat lain tidak dihidupkan kembali. Lihat server/src/labLog.ts.
+app.get('/api/lab-log', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(getLabLog(u.email) ?? { log: {}, diperbaruiPada: null })
+})
+// Satu revisi longitudinal untuk akun ini: lab + care + (untuk pasien) EMR.
+// Isi diambil dari penyimpanan yang sudah ada; klien tidak mengirim peristiwa.
+app.get('/api/keadaan-longitudinal', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const tersimpan = getLabLog(u.email)
+  const plans = listCarePlans()
+    .filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+    .map((p) => ({ plan: p.rencana, reports: listCareReports(u.email, p.rencana.id).slice(-7) }))
+  const reviews = listLabReviews(u.email)
+  // Klinisi tetap memakai /api/clinical untuk praktik. Jalur ini hanya rekam diri.
+  let clinical: { records: Record<string, unknown>; vitals: Record<string, unknown[]>; encounters: Record<string, unknown[]> } | null = null
+  if (u.role === 'pasien') {
+    const saringan = saringKlinis(getClinical(), (pid) => bolehPasien(u, pid))
+    clinical = {
+      records: saringan.records as Record<string, unknown>,
+      vitals: saringan.vitals as Record<string, unknown[]>,
+      encounters: (saringan.encounters ?? {}) as Record<string, unknown[]>,
+    }
+  }
+  res.json(susunKeadaanLongitudinal({
+    subjectId: u.id,
+    generatedAt: kini.toISOString(),
+    lab: { log: tersimpan?.log, diperbaruiPada: tersimpan?.diperbaruiPada ?? null },
+    care: { plans, reviews },
+    clinical,
+    device: getHealthProfile(u.email),
+  }))
+})
+app.put('/api/lab-log', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = req.body as { log?: unknown; diperbaruiPada?: unknown }
+  try {
+    const kini = new Date()
+    const baru = { log: validasiLogLab(body?.log, kini), diperbaruiPada: validasiCapWaktu(body?.diperbaruiPada, kini) }
+    const { diterima, hasil } = terimaTulisan(getLabLog(u.email), baru)
+    if (diterima) putLabLog(u.email, hasil)
+    res.status(diterima ? 200 : 409).json(hasil)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/labFhir.ts).
+app.get('/api/lab-log/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(logKeBundelFhir(getLabLog(u.email)?.log ?? {}, `Patient/${u.id}`, new Date().toISOString()))
+})
+app.get('/api/lab-log/shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ shares: listLabShares().filter((i) => i.pasienEmail === u.email), audit: listLabAudit(u.email), reviews: listLabReviews(u.email) })
+})
+app.post('/api/lab-log/shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const b = req.body as { dokterEmail?: unknown; hari?: unknown }
+    const izin = buatIzin(u.email, b?.dokterEmail, b?.hari, new Date())
+    // Satu izin aktif per dokter: berbagi ulang menggantikan yang lama (tercatat).
+    for (const lama of listLabShares().filter((i) => i.pasienEmail === u.email && i.dokterEmail === izin.dokterEmail && !i.dicabut)) {
+      revokeLabShare(lama.id, u.email, izin.dibuat)
+      addLabAudit({ waktu: izin.dibuat, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dicabut', izinId: lama.id })
+    }
+    addLabShare(izin)
+    addLabAudit({ waktu: izin.dibuat, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dibuat', izinId: izin.id })
+    // Tanpa nama/nilai di isi notifikasi: push bisa tampil di layar kunci.
+    const dokter = getUserByEmail(izin.dokterEmail)
+    if (dokter) void notify(dokter.id, { title: 'Lab results shared with you', body: 'A patient gave you read access. Open Clinical to review.', url: '/clinical-hub' }).catch((e) => console.warn('[lab-share] notify failed', (e as Error).message))
+    res.json(izin)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.delete('/api/lab-log/shares/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const waktu = new Date().toISOString()
+  const i = revokeLabShare(String(req.params.id), u.email, waktu)
+  if (!i) { res.status(404).json({ error: 'not found' }); return }
+  addLabAudit({ waktu, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dicabut', izinId: i.id })
+  res.json(i)
+})
+// Dokter: hanya peran dokter terverifikasi (peran efektif dari requireAuth),
+// hanya izin yang menyebut emailnya, belum kedaluwarsa, belum dicabut.
+app.get('/api/clinician/lab-shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  res.json({
+    shares: listLabShares().filter((i) => izinBerlaku(i, u.email, kini)).map((i) => ({
+      id: i.id, berakhir: i.berakhir, pasien: getUserByEmail(i.pasienEmail)?.name ?? 'Patient',
+    })),
+  })
+})
+app.get('/api/clinician/lab-shares/:id/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const pasien = getUserByEmail(izin.pasienEmail)
+  addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  // Daily-care vital thresholds may see only server-stamped clinician-entered
+  // vitals belonging to this account's self record or an explicitly linked
+  // practice record. Patient-entered vitals are deliberately omitted.
+  const patientRecordIds = pasien
+    ? new Set([
+        ...Object.keys(getClinical().vitals).filter((patientId) => findUserBySelfPatientId(patientId)?.id === pasien.id),
+        ...Object.values(getTautan()).filter((t) => t.userId === pasien.id).map((t) => t.patientId),
+      ])
+    : new Set<string>()
+  const verifiedVitals = [...patientRecordIds]
+    .flatMap((patientId) => getClinical().vitals[patientId] ?? [])
+    .filter((v) => v?.dicatatOleh?.klinisi === true && typeof v?.dicatatOleh?.id === 'string')
+  res.json({
+    pasien: pasien?.name ?? 'Patient', dibuat: izin.dibuat, berakhir: izin.berakhir,
+    reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email),
+    bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()),
+    verifiedVitals,
+  })
+})
+
+// Tinjauan klinisi atas hasil lab yang dibagikan: dokter terverifikasi, izin
+// berlaku, dicatat di audit pasien. Tidak mengubah angka lab pasien.
+app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  try {
+    const t = buatTinjauan(izin, req.body as Record<string, unknown>, kini)
+    addLabReview(t)
+    addLabAudit({ waktu: t.ditinjau, pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'ditinjau-dokter', izinId: izin.id })
+    const pasien = getUserByEmail(izin.pasienEmail)
+    if (pasien) void notify(pasien.id, { title: 'Your doctor reviewed a lab result', body: 'Open your lab results to see the review.', url: '/tubuh' }).catch((e) => console.warn('[lab-review] notify failed', (e as Error).message))
+    res.json(t)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Anamnesis harian (Continuous Care). Relasi perawatan = izin pasien yang sama
+// dengan berbagi lab: dokter terverifikasi + izin berlaku. Laporan disimpan
+// sebagai jawaban MENTAH; prioritas dihitung ulang oleh kernel di sisi dokter.
+app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const pasien = getUserByEmail(izin.pasienEmail)
+  if (!pasien) { res.status(404).json({ error: 'patient not found' }); return }
+  try {
+    const rencana = susunRencana(req.body, pasien.id, u.id, kini)
+    addCarePlan({ izinId: izin.id, pasienEmail: izin.pasienEmail, dokterEmail: u.email, dibuat: kini.toISOString(), rencana })
+    addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'rencana-harian', izinId: izin.id })
+    void notify(pasien.id, { title: 'Your doctor set up a daily check-in', body: 'Open Your Body to answer today\'s questions.', url: '/tubuh' }).catch((e) => console.warn('[care-plan] notify failed', (e as Error).message))
+    res.json(rencana)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+// Ekspor FHIR R4 (Questionnaire + QuestionnaireResponse) — izin berlaku, diaudit.
+app.get('/api/clinician/lab-shares/:id/care/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  if (!p) { res.status(404).json({ error: 'no daily plan' }); return }
+  addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  const pasienRef = `Patient/${getUserByEmail(izin.pasienEmail)?.id ?? 'unknown'}`
+  res.type('application/fhir+json').json(laporanKeBundelFhir(p.rencana, listCareReports(izin.pasienEmail, p.rencana.id), pasienRef, kini.toISOString()))
+})
+
+app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  if (p) addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  res.json({ plan: p?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
+})
+// Pasien: rencana aktif dari dokter yang IZINNYA MASIH BERLAKU; dicabut = berhenti.
+app.get('/api/care/plans', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const aktif = listCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+  res.json({ plans: aktif.map((p) => ({ plan: p.rencana, dokterEmail: p.dokterEmail, reports: listCareReports(u.email, p.rencana.id).slice(-7) })) })
+})
+app.post('/api/care/reports', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const b = req.body as { planId?: unknown }
+  const p = listCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
+  if (!p || !izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini)) { res.status(404).json({ error: 'no active daily check-in' }); return }
+  try {
+    const laporan = susunLaporan(p.rencana, req.body, kini)
+    const sama = laporan.clientId ? listCareReports(u.email, p.rencana.id).find((l) => l.clientId === laporan.clientId) : undefined
+    if (sama) { res.json(sama); return }
+    addCareReport(u.email, laporan)
+    res.json(laporan)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
@@ -1483,6 +1891,117 @@ app.delete('/api/reminders/:id', requireAuth, (req, res) => {
   res.json({ ok: true })
 })
 
+// ── Studi validasi klinis ───────────────────────────────────────────────────
+// Server menyimpan buku besar append-only dan menegakkan siapa penilai; metrik &
+// laporan dihitung kernel di peramban (src/lib/validasiKlinis.ts), yang juga
+// memverifikasi rantai ini. Tidak ada penilaian yang dibuat oleh perangkat lunak.
+const STUDI_BEKU = ['lab-tren-pribadi-v1.json']
+function semaiStudiValidasi() {
+  for (const berkas of STUDI_BEKU) {
+    const jalur = gabungJalur(folderDari(keJalurBerkas(import.meta.url)), '..', 'data-validasi', berkas)
+    if (!adaBerkas(jalur)) continue
+    const { protokol, kasus } = JSON.parse(bacaBerkas(jalur, 'utf8'))
+    let buku = bacaLedgerValidasi()
+    if (protokolKini(buku, protokol.id)) continue
+    for (const isi of [{ jenis: 'protokol' as const, data: protokol }, ...kasus.map((k: unknown) => ({ jenis: 'kasus' as const, data: k }))]) {
+      const c = sambung(buku, isi); tambahLedgerValidasi(c); buku = bacaLedgerValidasi()
+    }
+    console.log(`[validation] seeded study ${protokol.id} v${protokol.versi} with ${kasus.length} frozen cases`)
+  }
+}
+const penilaiDari = (u: User, coi: unknown): IdentitasPenilai => ({
+  id: u.id, peran: 'physician', kredensialRef: 'panaceamed-str-verification', kredensialTerverifikasi: u.role === 'dokter',
+  cakupan: 'declared by reviewer at assessment time', konflikKepentingan: typeof coi === 'string' && coi.trim() ? coi.trim().slice(0, 300) : 'none declared',
+})
+const bolehMenilai = (u: User) => u.role === 'dokter'
+
+app.get('/api/validation/studies', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi()
+  const ids = [...new Set(buku.filter((c) => c.isi.jenis === 'protokol').map((c) => c.isi.data.id))]
+  res.json({ studies: ids.map((id) => {
+    const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id)
+    const saya = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id && kasus.some((k) => k.isi.data.id === c.isi.data.kasusId)).length
+    return { protokol: protokolKini(buku, id), jumlahKasus: kasus.length, sudahSaya: saya }
+  }) })
+})
+
+// Kasus untuk dinilai — BUTA: penilaian penilai lain tidak pernah dikirim.
+app.get('/api/validation/:id/cases', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  if (!protokolKini(buku, id)) { res.status(404).json({ error: 'unknown study' }); return }
+  const sudah = new Set(buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id).map((c) => c.isi.data.kasusId))
+  res.json({ protokol: protokolKini(buku, id), cases: buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => ({ ...c.isi.data, sudahSaya: sudah.has(c.isi.data.id) })) })
+})
+
+app.post('/api/validation/:id/assessments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunPenilaian(buku, String(req.params.id), req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date())
+    const c = sambung(buku, { jenis: 'penilaian', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan, sidik: c.sidik })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/safety-events', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunKeselamatan(req.body, u.id, new Date(), `safety-${buku.length}`)
+    const c = sambung(buku, { jenis: 'keselamatan', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Antrean adjudikasi: kasus dengan ketidaksepakatan yang BUKAN dinilai klinisi ini.
+// Adjudikator memang harus melihat kedua penilaian kasus itu — hanya kasus itu.
+app.get('/api/validation/:id/disagreements', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => c.isi.data)
+  const sudahAdj = new Set(buku.filter((c) => c.isi.jenis === 'adjudikasi').map((c) => c.isi.data.kasusId))
+  res.json({ cases: kasus.flatMap((k) => {
+    const n = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.kasusId === k.id).map((c) => c.isi.data)
+    if (sudahAdj.has(k.id) || new Set(n.map((x) => x.benar)).size < 2 || n.some((x) => x.penilai.id === u.id)) return []
+    return [{ kasus: k, penilaian: n.map((x) => ({ benar: x.benar, bahaya: x.bahaya, omisi: x.omisi, override: x.override, klaimTakDidukung: x.klaimTakDidukung })) }]
+  }) })
+})
+
+app.post('/api/validation/adjudications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'adjudikasi', data: susunAdjudikasi(buku, req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/:id/usability', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'usabilitas', data: susunUsabilitas(buku, String(req.params.id), req.body, u.id, new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Ekspor buku besar lengkap — hanya pemimpin studi (owner), supaya penilai tetap buta.
+app.get('/api/validation/ledger', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) { res.status(403).json({ error: 'study lead only' }); return }
+  res.json({ ledger: bacaLedgerValidasi() })
+})
+
+
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
@@ -1610,6 +2129,21 @@ app.get('/api/stats', requireAuth, (req, res) => {
 })
 
 // --- owner user directory: who signed up / paid / subscribed ---
+// Galat runtime dari browser (tanpa autentikasi agar crash sebelum login pun terlihat).
+// Dibatasi limiter global, badan kecil, dan dibersihkan ulang di server.
+app.post('/api/client-errors', (req, res) => {
+  if (Number(req.get('content-length') ?? 0) > 4096) return res.status(413).json({ error: 'payload_too_large' })
+  const g = bersihkanGalatKlien(req.body)
+  if (!g) return res.status(400).json({ error: 'bad_request' })
+  catatGalatKlien(g)
+  res.status(204).end()
+})
+app.get('/api/owner/client-errors', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ringkasan: ringkasanGalatKlien(), galat: daftarGalatKlien() })
+})
+
 app.get('/api/owner/users', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
@@ -1785,8 +2319,9 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
     return
   }
   const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err)
-  alertOwner(`Route error @ ${req.method} ${req.path}`, msg)
-  if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
+  const requestId = String(res.locals.requestId ?? '')
+  alertOwner(`Route error @ ${req.method} ${jalurAman(req)} [${requestId}]`, msg)
+  if (!res.headersSent) res.status(500).json({ error: 'internal_error', requestId })
 })
 
 process.on('uncaughtException', (e) => alertOwner('Uncaught exception', e?.stack || String(e)))
@@ -1795,6 +2330,7 @@ process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection'
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
+semaiStudiValidasi()
 // Penghapusan akun Connect yang kreditnya jatuh di bawah ambang. Dijadwalkan
 // tujuh hari, bukan seketika: keputusan yang keliru masih bisa ditarik pemilik
 // lewat pulihkanKredit, dan penghapusan yang tidak bisa dibatalkan bukan hal
@@ -1845,8 +2381,30 @@ setInterval(() => {
     // Mesin aturan: paling banyak satu notifikasi per detak per orang, dengan
     // kuota harian dan jam senyap. Lihat aturanNotif.ts.
     jalankanAturanNotif(u.id, u.email).catch(() => {})
+    // Pengingat cek harian: hanya bila rencana aktif (izin berlaku) dan hari ini belum mengisi.
+    try {
+      const prefs = getSettings(u.id)
+      if (prefs.notifCekHarian === true) {
+        const kini = new Date()
+        const aktif = listCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
+        const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
+        const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
+        if (p.alasan === 'send') {
+          // Kirim dulu, baru tandai hari ini (deliverThenCommitAlertState tidak pernah melempar).
+          void deliverThenCommitAlertState(
+            () => notify(u.id, PESAN_PENGINGAT_CEK, 'notifCekHarian'),
+            () => saveSettings(u.id, { cekHarianLastFiredOn: p.tanggalLokal }),
+          )
+        }
+      }
+    } catch { /* satu pengguna gagal tidak menghentikan yang lain */ }
   }
 }, 60_000)
+
+// Deploy ulang mengirim SIGTERM: tulis simpan MongoDB yang masih tertunda dulu.
+for (const sinyal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(sinyal, () => { void flushStore().finally(() => process.exit(0)) })
+}
 
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)

@@ -2,6 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
@@ -93,6 +94,7 @@ export function UnifiedLearnWorkspace() {
           <div className="max-w-3xl">
             <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Panacea Learn · one visual simulation workspace</div>
             <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Learn by seeing, manipulating and simulating the human body</h1>
+            <BatasKlaimKesehatan permukaan="care.learn-workspace" />
             <p className="mt-2 text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">
               Body Exposure no longer behaves like a link that disappears when another tool opens. The body stays as the visual core; imaging, ECG, genome, drugs, disease notes, cases, evidence, discovery, innovation and invention open as learning instruments in the same page.
             </p>

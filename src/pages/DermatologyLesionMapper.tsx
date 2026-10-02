@@ -4,6 +4,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dermatology Status & Lesion Predilection Mapper — a structured teaching
@@ -73,8 +74,9 @@ export function DermatologyLesionMapper() {
       </div>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Structured examination notes + classic differentials by morphology and site — not a diagnosis from a photo" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Alat ini tidak menganalisis foto dan tidak mendiagnosis dari gambar — model tingkat konsumen tidak dapat menyingkirkan keganasan secara andal maupun memberi diagnosis yang tepat dari sebuah gambar, dan berpura-pura sebaliknya tidak aman. Sebagai gantinya ia mencatat temuan pemeriksaan Anda secara tersusun lalu memunculkan diagnosis banding klasik yang diajarkan dermatologi untuk morfologi + lokasi itu, persis seperti cara kerja tabel di buku ajar. Selalu padukan dengan keadaan klinis, dan lakukan biopsi/rujukan bila ragu.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Teaching differentials by morphology and site — not a clinically validated Panacea diagnosis, and not photo triage" />
+        <BatasKlaimKesehatan permukaan="clinical.dermatology-mapper" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">This tool does not analyze photos and does not diagnose from images — consumer-grade models cannot reliably rule out malignancy or give a precise diagnosis from a picture, and pretending otherwise is unsafe. It records structured exam findings and surfaces classic textbook differentials for that morphology + site. Always correlate clinically; biopsy or refer when uncertain.</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -115,7 +117,7 @@ export function DermatologyLesionMapper() {
               ))}
             </div>
           ) : (
-            <Prosa kelas="mt-2 text-[13px] text-neutral-500">Belum ada kaitan ajar yang disusun untuk gabungan persis ini — pilih morfologinya saja atau lokasinya saja untuk kecocokan yang lebih luas, atau pakai pendekatan diagnosis banding baku Anda.</Prosa>
+            <Prosa kelas="mt-2 text-[13px] text-neutral-500">No curated teaching association for this exact combination — try morphology alone or site alone for a wider match, or use your usual differential approach.</Prosa>
           )}
           <div className="mt-3"><CopyNote text={summary} /></div>
         </Card>

@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconBook } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan — hal-hal yang DICATAT SESEORANG TENTANG DIRINYA sendiri, dari waktu
@@ -53,12 +54,15 @@ const TABS: TabDef[] = [
 
 export function PusatCatatan() {
   return (
-    <HalamanTab
+    <>
+      <BatasKlaimKesehatan permukaan="care.pusat-catatan" />
+      <HalamanTab
       judul="Records"
       subjudul="What you record about yourself over time — logs, diaries and trackers"
       ikon={<IconBook />}
       tabs={TABS}
     />
+    </>
   )
 }
 

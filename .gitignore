@@ -12,6 +12,8 @@ yarn-error.log*
 
 # backend
 server/data.json
+server/arsip/
+server/data.json.corrupt-*
 
 # Locally-added agent skills (tooling, not app code)
 .agents/
@@ -52,7 +54,9 @@ artifacts/
 # Tanpa baris ini, `git status` setiap agen menampilkan .claude/ sebagai
 # untracked, dan cepat atau lambat ada yang menganggapnya pekerjaan yang
 # belum disimpan lalu meng-commit checkout agen lain ke dalam riwayat.
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/skills/
 
 # Skrip uji sekali pakai. Konvensi *.tmp.* dipakai untuk berkas yang sengaja
 # dibuang setelah dipakai; yang tertinggal di akar repositori hampir selalu
