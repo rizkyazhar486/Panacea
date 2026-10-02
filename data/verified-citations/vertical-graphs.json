@@ -41,13 +41,15 @@
   "ncbiGene": {
     "6262": {
       "symbol": "RYR2",
-      "verification": "pending",
-      "note": "Not independently verified: NCBI/MyGene were unreachable from the build environment on 2026-10-02. Confirm against NCBI Gene before any release that cites it."
+      "verification": "verified",
+      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
+      "verifiedOn": "2026-10-02"
     },
     "7134": {
       "symbol": "TNNC1",
-      "verification": "pending",
-      "note": "Not independently verified: NCBI/MyGene were unreachable from the build environment on 2026-10-02. Confirm against NCBI Gene before any release that cites it."
+      "verification": "verified",
+      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
+      "verifiedOn": "2026-10-02"
     }
   }
 }

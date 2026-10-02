@@ -71,7 +71,7 @@ assert.ok(ids.length >= 7, 'the cardiovascular graph must cite sources')
 const failures = ids.map((id) => [id, resolveSourceId(id)] as const).filter(([, r]) => !r.ok)
 assert.deepEqual(failures.map(([id, r]) => `${id}: ${r.reason}`), [], 'every cardiovascular sourceId must resolve')
 const pending = ids.filter((id) => resolveSourceId(id).pending)
-assert.deepEqual(pending, ['NCBI-GENE:6262', 'NCBI-GENE:7134'], 'unverified gene ids are acknowledged as pending, never silently trusted')
+assert.deepEqual(pending, [], 'no source id may remain pending: gene ids 6262/7134 were verified by the owner on 2026-10-02')
 
 // ── Tabel sitasi: tidak ada entri terverifikasi tanpa jejak verifikasi ──────
 for (const [pmid, e] of Object.entries(table.pmid)) {
