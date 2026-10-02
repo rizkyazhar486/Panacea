@@ -336,3 +336,42 @@ export function labelBidangMpr(
 
 export const BATAS_MPR =
   'Orthogonal views are local voxel reformats of one compatible loaded series. Panacea validates available SeriesInstanceUID, frame of reference, orientation and spacing, never invents missing anatomy or findings, and marks simple row/column reconstructions as “-like” rather than implying a diagnostic reformat.'
+
+export interface PosisiFisikVoxel {
+  xIndex: number
+  yIndex: number
+  zIndex: number
+  /** null = jarak antar-voxel tidak sah untuk pengukuran; jangan tampilkan milimeter. */
+  mm: { lebar: number; tinggi: number; kedalaman: number; x: number; y: number; z: number } | null
+}
+
+const jepit = (nilai: number, jumlah: number) => (Number.isFinite(nilai) ? Math.max(0, Math.min(jumlah - 1, Math.round(nilai))) : 0)
+
+/**
+ * Posisi voxel di bawah kursor dan, bila jaraknya sah, koordinat lokal dalam milimeter
+ * (pusat volume = 0; Y naik ke atas). Jarak yang diasumsikan (1 mm pengganti), tidak
+ * terbaca, atau tanpa catatan asal TIDAK dipakai: hasil `mm` menjadi null supaya UI
+ * menampilkan "tidak diketahui", bukan pengukuran buatan.
+ */
+export function posisiFisikVoxel(volume: VolumeMpr, x: number, y: number, iris: number): PosisiFisikVoxel {
+  const xIndex = jepit(x, volume.kolom)
+  const yIndex = jepit(y, volume.baris)
+  const zIndex = jepit(iris, volume.kedalaman)
+  const asal = volume.asalSpasi
+  const sah =
+    [x, y, iris].every(Number.isFinite) &&
+    [volume.jarakKolomMm, volume.jarakBarisMm, volume.jarakIrisMm].every((v) => Number.isFinite(v) && v > 0) &&
+    asal != null && asal.baris === 'dicom' && asal.kolom === 'dicom' && asal.iris !== 'asumsi'
+  if (!sah) return { xIndex, yIndex, zIndex, mm: null }
+  return {
+    xIndex, yIndex, zIndex,
+    mm: {
+      lebar: volume.kolom * volume.jarakKolomMm,
+      tinggi: volume.baris * volume.jarakBarisMm,
+      kedalaman: volume.kedalaman * volume.jarakIrisMm,
+      x: (xIndex - (volume.kolom - 1) / 2) * volume.jarakKolomMm,
+      y: ((volume.baris - 1) / 2 - yIndex) * volume.jarakBarisMm,
+      z: (zIndex - (volume.kedalaman - 1) / 2) * volume.jarakIrisMm,
+    },
+  }
+}
