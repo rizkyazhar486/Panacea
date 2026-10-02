@@ -50,3 +50,5 @@ export {
   type ExplodeTransform,
   type ExplodeVec3,
 } from './engine/explodedLayout'
+
+export { classifyTissue, tissueShading, type TissueClass, type TissueShading } from './engine/tissueShading'
