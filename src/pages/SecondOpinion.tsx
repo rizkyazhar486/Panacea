@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { api, type BackendSecondOpinion } from '../lib/api'
 import { useStore } from '../lib/store'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Second Opinion — human-in-the-loop, same pattern as AI-EMR: a patient
@@ -50,12 +51,14 @@ function PatientView({ email }: { email: string }) {
   return (
     <>
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="The AI drafts privately; a real doctor reviews it before you see anything" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="AI drafts privately for a licensed doctor — not a clinically validated Panacea decision you receive directly" />
+        <BatasKlaimKesehatan permukaan="care.second-opinion" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Describe your current diagnosis, treatment, symptoms, and relevant history. An AI assistant
           drafts a structured analysis, but <b>you will never see that draft</b> — a licensed doctor
           reviews it, edits it, and writes the opinion you actually receive. Think of the AI as the
-          doctor's research assistant, not your doctor.
+          doctor's research assistant, not your doctor. The workflow is technical until a real clinician
+          finalizes the opinion; that clinician review is not the same as product-level clinical validation.
         </p>
       </Card>
 

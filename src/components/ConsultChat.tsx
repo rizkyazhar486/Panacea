@@ -2,8 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { wsUrl } from '../lib/api'
 import { Button } from './ui'
 import { IconStethoscope } from './icons'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 interface Line { from?: string; text?: string; type: string; at?: string }
+
+export interface ConsultChatMediaState {
+  connected: boolean
+  inCall: boolean
+  camera: 'off' | 'live' | 'degraded'
+  microphone: 'off' | 'live' | 'degraded'
+  peerCount: number
+}
 
 // Public STUN server for NAT traversal. For users behind symmetric NAT a TURN
 // server is also required — supply it via VITE_TURN_URL / VITE_TURN_USER /
@@ -27,7 +36,19 @@ function iceServers(): RTCIceServer[] {
 // Real-time consultation room over WebSocket (doctor ↔ patient join the same room).
 // Text chat + optional WebRTC audio/video call. The WebSocket relays both chat
 // messages and WebRTC signaling (offer/answer/ICE) to the other peer in the room.
-export function ConsultChat({ room, name, title }: { room: string; name: string; title?: string }) {
+export function ConsultChat({
+  room,
+  name,
+  title,
+  compact = false,
+  onMediaStateChange,
+}: {
+  room: string
+  name: string
+  title?: string
+  compact?: boolean
+  onMediaStateChange?: (state: ConsultChatMediaState) => void
+}) {
   const [lines, setLines] = useState<Line[]>([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
@@ -57,7 +78,11 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
     pc.onicecandidate = (e) => { if (e.candidate) wsSend({ type: 'rtc-ice', candidate: e.candidate }) }
     pc.ontrack = (e) => { if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0] }
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') setCallError('The call connection was lost.')
+      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        setCallError('The call connection was lost.')
+      } else if (pc.connectionState === 'connected') {
+        setCallError('')
+      }
     }
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     localStreamRef.current = stream
@@ -154,6 +179,22 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
   }, [room, name])
 
   useEffect(() => {
+    if (inCall && localVideoRef.current && localStreamRef.current) {
+      localVideoRef.current.srcObject = localStreamRef.current
+    }
+  }, [inCall])
+
+  useEffect(() => {
+    onMediaStateChange?.({
+      connected,
+      inCall,
+      camera: inCall && camOn ? (callError ? 'degraded' : 'live') : 'off',
+      microphone: inCall && micOn ? (callError ? 'degraded' : 'live') : 'off',
+      peerCount: count,
+    })
+  }, [callError, camOn, connected, count, inCall, micOn, onMediaStateChange])
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [lines])
 
@@ -163,6 +204,44 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
     wsRef.current.send(JSON.stringify({ type: 'msg', room, text: t, from: name }))
     setLines((l) => [...l, { type: 'msg', from: name, text: t }]) // optimistic local echo
     setInput('')
+  }
+
+  if (compact) {
+    return (
+      <div className="overflow-hidden rounded-[22px] border border-white/10 bg-black/35 text-white">
+      <BatasKlaimKesehatan permukaan="care.consult-chat" />
+        <div className="flex min-h-11 items-center gap-2 border-b border-white/10 px-3">
+          <IconStethoscope size={16} className="text-emerald-300" />
+          <span className="min-w-0 flex-1 truncate text-[10px] font-black uppercase tracking-[.12em] text-white/65">{title ?? 'Visit camera'}</span>
+          <span className="shrink-0 text-[9px] font-bold text-white/35">{connected ? count + ' online' : 'connecting…'}</span>
+        </div>
+
+        {inCall ? (
+          <div className="relative bg-black">
+            <video ref={remoteVideoRef} autoPlay playsInline className="h-[220px] w-full bg-[#05070a] object-cover sm:h-[250px]" />
+            <video ref={localVideoRef} autoPlay playsInline muted className="absolute bottom-3 right-3 h-24 w-20 rounded-[16px] border border-white/20 bg-black object-cover shadow-2xl" />
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
+              <button type="button" aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'} onClick={toggleMic} className={'grid h-9 w-9 place-items-center rounded-full border border-white/15 text-sm backdrop-blur-xl ' + (micOn ? 'bg-black/45 text-white' : 'bg-red-500 text-white')}>{micOn ? '🎙️' : '🔇'}</button>
+              <button type="button" aria-label={camOn ? 'Turn camera off' : 'Turn camera on'} onClick={toggleCam} className={'grid h-9 w-9 place-items-center rounded-full border border-white/15 text-sm backdrop-blur-xl ' + (camOn ? 'bg-black/45 text-white' : 'bg-red-500 text-white')}>{camOn ? '📹' : '🚫'}</button>
+              <button type="button" aria-label="End video call" onClick={endCall} className="grid h-9 w-9 place-items-center rounded-full bg-red-600 text-sm text-white">📞</button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid h-[220px] place-items-center bg-[#05070a] p-5 sm:h-[250px]">
+            <button
+              type="button"
+              onClick={() => void startCall()}
+              disabled={!connected}
+              className="min-h-11 rounded-full bg-white px-5 text-xs font-black text-black transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              {connected ? 'Start camera visit' : 'Connecting…'}
+            </button>
+          </div>
+        )}
+
+        {callError ? <div className="border-t border-red-300/10 bg-red-500/[.08] px-3 py-2 text-[10px] font-semibold text-red-100/75">{callError}</div> : null}
+      </div>
+    )
   }
 
   return (

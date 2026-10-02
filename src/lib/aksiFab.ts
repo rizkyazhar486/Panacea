@@ -25,6 +25,8 @@ export const KATALOG_AKSI: AksiFab[] = [
   { id: 'tema', label: 'Light/dark', ikon: '◐', jenis: 'tema' },
   { id: 'semuaFitur', label: 'All features', ikon: '⊞', jenis: 'rute', ke: '/semua-fitur' },
   { id: 'pengaturan', label: 'Settings', ikon: '⚙', jenis: 'rute', ke: '/settings' },
+  { id: 'profil', label: 'Profile', ikon: '◉', jenis: 'rute', ke: '/profile' },
+  { id: 'pesan', label: 'Messages', ikon: '✉', jenis: 'rute', ke: '/messages' },
 
   // Everyday Life OS
   { id: 'catat', label: 'Log today', ikon: '✎', jenis: 'rute', ke: '/harian' },
@@ -51,6 +53,7 @@ export const KATALOG_AKSI: AksiFab[] = [
   { id: 'obat', label: 'Treatment', ikon: '💊', jenis: 'rute', ke: '/med-study?bagian=therapy' },
   { id: 'penyakit', label: 'Diseases', ikon: '📖', jenis: 'rute', ke: '/med-study?bagian=diseases' },
   { id: 'kalkulator', label: 'Calculator', ikon: '🧮', jenis: 'rute', ke: '/clinical-calculators' },
+  { id: 'rekam', label: 'Medical records', ikon: '▤', jenis: 'rute', ke: '/emr' },
 
   // Services & faith
   { id: 'sos', label: 'SOS', ikon: '✚', jenis: 'rute', ke: '/emergency' },

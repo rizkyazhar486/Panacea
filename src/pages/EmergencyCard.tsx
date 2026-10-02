@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { IconHeart, IconPhone, IconShield } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency Medical Card + SOS — a lock-screen-style card a paramedic or
@@ -59,7 +60,11 @@ export function EmergencyCard() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       {/* SOS actions — always on top */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconPhone size={20} />} title="Emergency SOS" subtitle="One tap to call for help and share your current location" />
+        <SectionTitle icon={<IconPhone size={20} />} title="Emergency SOS" subtitle="Local emergency card + one-tap call/share — not a clinically validated Panacea emergency system" />
+        <BatasKlaimKesehatan permukaan="care.emergency-card" />
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          Stored on this device until you tap SOS or share. Does not replace certified emergency services, medical-alert devices, or institutional triage. Verify the local emergency number for your country.
+        </p>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <a href={`tel:${(d.localEmergencyNumber || '112').replace(/[^0-9+]/g, '')}`}
             className="flex items-center justify-center gap-2 rounded-2xl bg-rose-500 py-4 text-base font-black text-white transition active:scale-95">

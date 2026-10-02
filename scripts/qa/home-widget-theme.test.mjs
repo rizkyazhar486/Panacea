@@ -7,9 +7,10 @@ const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), '
 const tumpukan = read('src/components/Tumpukan.tsx')
 const semangat = read('src/components/UbinSemangat.tsx')
 const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
-const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
+const mobileStability = read('src/styles/home-mobile-stability.css')
+const higFoundation = read('public/panacea-hig-v41.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -18,8 +19,12 @@ test('Living Instrument mounts the active source widget, not only the filtered i
   assert.match(tumpukan, /widget-instrument-loading-v29/)
 })
 
+// home-widget-dark-v31.css duplicated this guard but every selector was scoped
+// to the unrouted `.panacea-home` page, so it never matched; it was retired together
+// with the other dead Home layers (scripts/uji/lembar-gaya-mati.mts), so the
+// scoped guard below is the single authority.
 test('Dark mode guards every nested widget card and loading surface', () => {
-  for (const css of [scopedGuard, emergencyGuard]) {
+  for (const css of [scopedGuard]) {
     assert.match(css, /\.widget-instrument-loading-v29/)
     assert.match(css, /Loading widget…/)
     assert.match(css, /background:#0a0f16!important/)
@@ -32,19 +37,37 @@ test('Dark mode guards every nested widget card and loading surface', () => {
 })
 
 test('Active Suspense fallback cannot retain a giant previous widget canvas', () => {
-  for (const css of [scopedGuard, emergencyGuard]) {
+  for (const css of [scopedGuard]) {
     assert.match(css, /aria-hidden='false'/)
     assert.match(css, /height:184px!important/)
     assert.match(css, /max-height:184px!important/)
   }
 })
 
-test('Final-authority Dark Home guard loads after the general Home contrast layer', () => {
-  const contrast = index.indexOf('/home-contrast-v27.css')
-  const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
-  assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
-  assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260909-v33'/)
+test('Cache maintenance key tracks the newest linked presentation layer', () => {
+  // Kunci perawatan cache harus ikut naik setiap kali lapisan presentasi naik;
+  // kalau tidak, pengguna lama tetap memakai stylesheet lama dari cache.
+  //
+  // Versinya TIDAK lagi ditulis sebagai teks tetap di sini. Versi tetap membuat
+  // gerbang ini gagal pada setiap kenaikan yang sah — dan gerbang yang gagal
+  // karena hal yang sah akan ditulis ulang, bukan dibaca. Angkanya dibaca dari
+  // index.html sendiri, sehingga yang diperiksa adalah hubungannya: kunci
+  // perawatan tidak boleh tertinggal dari lapisan presentasi tertinggi.
+  const lapisan = [...index.matchAll(/\/panacea-[a-z0-9-]+-v(\d+)\.css/g)].map((m) => Number(m[1]))
+  assert.ok(lapisan.length > 0, 'index.html no longer links any versioned panacea-* presentation layer')
+  const tertinggi = Math.max(...lapisan)
+  const kunci = index.match(/MAINTENANCE_VERSION = '(\d{8})-v(\d+)'/)
+  assert.ok(kunci, "MAINTENANCE_VERSION is missing or no longer shaped 'YYYYMMDD-vN'")
+  const versiKunci = Number(kunci?.[2])
+  assert.equal(
+    versiKunci,
+    tertinggi,
+    versiKunci < tertinggi
+      ? `the cache maintenance key is still v${versiKunci} while index.html already loads v${tertinggi}; ` +
+        'returning users would keep serving the older stylesheet from cache'
+      : `the cache maintenance key claims v${versiKunci} but the newest presentation layer linked from ` +
+        `index.html is v${tertinggi}; the key names a release that is not shipped`,
+  )
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
@@ -84,4 +107,32 @@ test('Home v35 separates mobile widget identity from global controls', () => {
   assert.match(activeGuard, /max-width:min\(68vw,240px\)!important/)
   assert.match(activeGuard, /widget-instrument-label-v5/)
   assert.match(activeGuard, /font-size:11px!important/)
+})
+
+test('Mobile dashboard restoration never blanket-recolors widget descendants', () => {
+  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child h2/)
+  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child p/)
+  assert.doesNotMatch(
+    mobileStability,
+    /section\[aria-labelledby="my-dashboard-title"\]\s+div\s*\{[^}]*color:\s*#fff/s,
+    'Dashboard mobile guard must not force every nested widget div to white',
+  )
+})
+
+test('Mobile loading cards stay explicit black-green instead of gray placeholders', () => {
+  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*background:\s*#000\s*!important/s)
+  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*border-color:\s*rgba\(0,\s*191,\s*99,\s*\.22\)\s*!important/s)
+  assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
+})
+
+test('HIG v41 is loaded once after the remaining legacy shell layers', () => {
+  const legacy = index.indexOf('/welcome-revitalization-v28.css')
+  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
+  assert.ok(hig >= 0, 'HIG foundation must remain registered')
+  assert.ok(hig > legacy, 'HIG foundation must load after the remaining legacy layers')
+  assert.equal(index.split('/panacea-hig-v41.css').length - 1, 1, 'HIG foundation must not be loaded twice')
+  assert.match(higFoundation, /--pmd-ease-spring:/)
+  assert.match(higFoundation, /\.pmd-control-material/)
+  assert.match(higFoundation, /prefers-reduced-motion/)
+  assert.match(higFoundation, /html\.pmd-low-memory/)
 })

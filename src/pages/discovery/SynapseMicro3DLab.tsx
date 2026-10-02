@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { buatRendererAman, tandaiTanpaWebgl } from '../../lib/rendererAman';
+import { mulaiLoopTerjaga } from '../../lib/loopRenderTerjaga';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SYNAPSE_MICRO_BOUNDARY, SYNAPSE_PHASES, SYNAPSE_TRANSMITTERS, type SynapsePhase } from '../../lib/discoverySynapseMicro3D';
 
@@ -38,7 +40,8 @@ export default function SynapseMicro3DLab() {
     const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 80);
     camera.position.set(7.6, 5.2, 10.8);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = buatRendererAman({ antialias: true, alpha: true });
+    if (!renderer) return tandaiTanpaWebgl(mount);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -117,7 +120,6 @@ export default function SynapseMicro3DLab() {
     activeZone.position.y = 1.02;
     root.add(activeZone);
 
-    let raf = 0;
     const animate = (time: number) => {
       const t = time * 0.001;
       controls.update();
@@ -148,7 +150,6 @@ export default function SynapseMicro3DLab() {
       });
       root.rotation.y = Math.sin(t * 0.18) * 0.08;
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(animate);
     };
 
     const resize = () => {
@@ -161,10 +162,10 @@ export default function SynapseMicro3DLab() {
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
     resize();
-    raf = requestAnimationFrame(animate);
+    const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, () => animate(performance.now()))
 
     return () => {
-      cancelAnimationFrame(raf);
+      loopTerjaga.hentikan();
       observer.disconnect();
       controls.dispose();
       root.traverse((object) => {

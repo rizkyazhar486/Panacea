@@ -6,6 +6,7 @@ import {
   bacaSelaman, simpanSelaman, hapusSelaman, lamaMenit, jedaPermukaan,
   waktuTerbang, ringkasSelam, peringatan, type Selaman,
 } from '../lib/menyelam'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan menyelam.
@@ -71,6 +72,7 @@ export function Menyelam() {
         title="Dive log"
         subtitle="Depth, surface interval, and the wait before flying"
       />
+      <BatasKlaimKesehatan permukaan="performance.diving" />
 
       {/* PALING ATAS DAN PALING BESAR — satu-satunya angka di sini yang dapat
           mencederai seseorang bila diabaikan. */}

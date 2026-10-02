@@ -34,10 +34,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Root/shared regression modules use the repository's Node 24
+          # TypeScript execution contract. Keeping backend CI on Node 20 makes
+          # the same code pass acceptance but fail here before tests start.
+          node-version: 24
           cache: npm
-          cache-dependency-path: server/package-lock.json
-      - name: Install dependencies
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+      - name: Install shared root dependencies
+        working-directory: .
+        run: npm ci
+      - name: Install server dependencies
         run: npm ci
       - name: Typecheck backend
         run: npm run typecheck

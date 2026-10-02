@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rockall Score — Rockall, T.A., et al. (1996), Gut, 38(3):316-321. Mortality
@@ -74,6 +75,7 @@ export function RockallScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Rockall Score" subtitle="Mortality risk after upper GI bleeding (Rockall et al. 1996)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Complements the pre-endoscopy Glasgow-Blatchford Score: Blatchford answers "who needs admission/intervention?", Rockall answers "how likely is rebleeding or death?" — the full score after endoscopy adds diagnosis and stigmata criteria.</Prosa>
       </Card>
 

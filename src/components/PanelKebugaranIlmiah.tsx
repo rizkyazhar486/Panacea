@@ -3,6 +3,7 @@ import {
   SUMBER, ML_PER_MET, nilaiKebugaran, titikTengahVo2, vo2DariDenyut,
   denyutMaksPerkiraan, hrGenggam, bacaLangkah, bacaSebaran,
 } from '../lib/bugarIlmiah'
+import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel kebugaran yang setiap angkanya dapat dilacak ke sumbernya.
@@ -66,6 +67,7 @@ function SkalaVo2({ vo2, titik, jk, usia }: { vo2: number; titik: number; jk: 'L
   const warna = warnaPita(met - metTitik)
   return (
     <div className="mt-2">
+      <BatasKlaimKesehatan permukaan="performance.fitness-science-panel" />
       <div className="relative h-9">
         {/* Batang skala */}
         <div className="absolute inset-x-0 top-3 h-2 rounded-full bg-gradient-to-r from-red-500/25 via-neutral-400/25 to-teal-500/25" />

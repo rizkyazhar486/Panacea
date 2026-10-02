@@ -1,0 +1,490 @@
+.panacea-human-home {
+  display: grid;
+  gap: clamp(40px, 6vw, 88px);
+}
+
+.panacea-instrument-strip,
+.panacea-command-surface {
+  color: rgba(255,255,255,.94);
+}
+
+.panacea-instrument-strip {
+  border-block: 1px solid rgba(255,255,255,.10);
+  padding-block: 18px;
+}
+
+.panacea-instrument-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: 2px;
+  margin-bottom: 10px;
+}
+
+.panacea-instrument-date {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.42);
+}
+
+.panacea-instrument-sync {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: rgba(255,255,255,.58);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.panacea-instrument-sync:hover,
+.panacea-instrument-sync:focus-visible {
+  color: rgba(255,255,255,.96);
+  transform: translateY(-1px);
+}
+
+.panacea-instrument-rail {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.55fr) repeat(3, minmax(150px, 1fr)) 56px;
+  align-items: stretch;
+}
+
+.panacea-instrument-cell {
+  position: relative;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 22px;
+  color: inherit;
+  text-decoration: none;
+  border-left: 1px solid rgba(255,255,255,.08);
+  scroll-snap-align: start;
+}
+
+.panacea-instrument-cell:first-child {
+  border-left: 0;
+  padding-left: 2px;
+}
+
+.panacea-instrument-cell::after {
+  content: '';
+  position: absolute;
+  inset: auto 22px 0 22px;
+  height: 1px;
+  background: rgba(255,255,255,.72);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms cubic-bezier(.22,1,.36,1);
+}
+
+.panacea-instrument-cell:hover::after,
+.panacea-instrument-cell:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.panacea-instrument-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.42);
+  white-space: nowrap;
+}
+
+.panacea-instrument-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 850;
+  letter-spacing: -.055em;
+  line-height: .92;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-instrument-primary .panacea-instrument-value {
+  font-size: clamp(58px, 7vw, 92px);
+}
+
+.panacea-instrument-unit {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.34);
+}
+
+.panacea-instrument-checkin {
+  align-self: stretch;
+  min-width: 56px;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.58);
+  text-decoration: none;
+  border-left: 1px solid rgba(255,255,255,.08);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.panacea-instrument-checkin:hover,
+.panacea-instrument-checkin:focus-visible {
+  color: rgba(255,255,255,.98);
+  transform: translateY(-1px);
+}
+
+.panacea-command-surface {
+  border-top: 1px solid rgba(255,255,255,.10);
+  padding-top: 22px;
+}
+
+.panacea-command-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.panacea-command-title {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 850;
+  letter-spacing: -.045em;
+}
+
+.panacea-command-search-wrap {
+  position: relative;
+  flex: 1 1 360px;
+  max-width: 520px;
+}
+
+.panacea-command-search {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255,255,255,.96);
+  padding: 0;
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panacea-command-search::placeholder {
+  color: rgba(255,255,255,.34);
+}
+
+.panacea-command-search:focus {
+  border-bottom-color: rgba(255,255,255,.72);
+}
+
+
+
+
+.panacea-command-index-toggle {
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.50);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.panacea-command-index-toggle:hover,
+.panacea-command-index-toggle:focus-visible {
+  color: rgba(255,255,255,.96);
+}
+
+.panacea-command-results {
+  margin-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+
+.panacea-command-result {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding-block: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  color: inherit;
+  text-decoration: none;
+}
+
+.panacea-command-result-main {
+  min-width: 0;
+}
+
+.panacea-command-result-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.panacea-command-result-meta {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,.34);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.panacea-command-result-arrow {
+  color: rgba(255,255,255,.34);
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.panacea-command-result:hover .panacea-command-result-arrow,
+.panacea-command-result:focus-visible .panacea-command-result-arrow {
+  transform: translateX(3px);
+  color: rgba(255,255,255,.92);
+}
+
+.panacea-assistive-orbit {
+  position: absolute;
+  width: 236px;
+  height: 236px;
+  pointer-events: none;
+}
+
+.panacea-assistive-orbit[data-side='left'] {
+  left: -10px;
+}
+
+.panacea-assistive-orbit[data-side='right'] {
+  right: -10px;
+}
+
+.panacea-assistive-orbit[data-vertical='up'] {
+  bottom: 0;
+}
+
+.panacea-assistive-orbit[data-vertical='down'] {
+  top: 0;
+}
+
+.panacea-assistive-action {
+  position: absolute;
+  width: 54px;
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(2,5,10,.74);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  color: rgba(255,255,255,.88);
+  pointer-events: auto;
+  transition: transform 170ms cubic-bezier(.22,1,.36,1), border-color 170ms ease, background-color 170ms ease;
+}
+
+.panacea-assistive-action:hover,
+.panacea-assistive-action:focus-visible {
+  transform: scale(1.06);
+  border-color: rgba(255,255,255,.34);
+  background: rgba(6,10,18,.92);
+}
+
+.panacea-assistive-action-label {
+  position: absolute;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 800;
+  color: rgba(255,255,255,.58);
+  transform: translateY(38px);
+  pointer-events: none;
+}
+
+.panacea-assistive-page-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.24);
+  pointer-events: auto;
+}
+
+.panacea-assistive-page-dot[aria-current='page'] {
+  background: rgba(255,255,255,.92);
+}
+
+@media (max-width: 760px) {
+  .panacea-human-home {
+    gap: 48px;
+  }
+
+  .panacea-instrument-strip {
+    margin-inline: -4px;
+  }
+
+  .panacea-instrument-rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .panacea-instrument-cell {
+    flex: 0 0 42vw;
+    min-width: 148px;
+  }
+
+  .panacea-instrument-primary {
+    flex-basis: 72vw;
+    min-width: 250px;
+  }
+
+  .panacea-instrument-checkin {
+    flex: 0 0 64px;
+    min-width: 64px;
+  }
+
+  .panacea-command-topline {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .panacea-command-search-wrap {
+    max-width: none;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-instrument-sync,
+  .panacea-instrument-cell::after,
+  .panacea-instrument-checkin,
+  .panacea-command-result-arrow,
+  .panacea-assistive-action {
+    transition: none !important;
+  }
+}
+
+/* ── Bento indeks kapabilitas ──────────────────────────────────────────────
+   Ubin dikelompokkan menurut `grup` milik katalog, dan LEBARNYA dibaca dari
+   jumlah isinya (lihat bentoSpan): kelompok dengan lima puluh kapabilitas
+   memang mengambil ruang lebih besar daripada yang bersembilan. Ukuran yang
+   dipilih menurut selera tidak memberi tahu apa pun; ukuran yang dihitung
+   memberi tahu di mana isi produk sebenarnya berada.
+
+   Tidak ada gradien dan tidak ada bayangan melayang di sini: bahasa rupa
+   permukaan ini sudah ditetapkan datar dan bergaris rambut, dan gerbang
+   home-anti-slop menjaganya tetap begitu. */
+.panacea-bento {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.panacea-bento-tile {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  background: rgba(255,255,255,.018);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.panacea-bento-tile[data-span='lead'],
+.panacea-bento-tile[data-open='true'] {
+  grid-column: 1 / -1;
+}
+
+.panacea-bento-tile:hover,
+.panacea-bento-tile:focus-within {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.04);
+}
+
+.panacea-bento-head {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.panacea-bento-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+/* Hitungan ditulis dengan angka tabular supaya deretan ubin tidak bergoyang
+   saat pencarian mengubah jumlahnya dari 9 menjadi 41. */
+.panacea-bento-count {
+  flex: 0 0 auto;
+  color: rgba(255,255,255,.40);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-bento-tile[data-open='true'] .panacea-bento-count {
+  color: rgba(255,255,255,.88);
+}
+
+.panacea-bento-items {
+  margin: 0;
+  padding: 0 16px 6px;
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* Isi kelompok yang panjang digulir di dalam ubinnya sendiri, bukan
+   memanjangkan halaman: 57 baris sekaligus mendorong segalanya keluar layar
+   dan membuat kelompok berikutnya mustahil dijangkau tanpa menggulir jauh. */
+.panacea-bento-items {
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 520px) {
+  .panacea-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-bento-tile {
+    transition: none;
+  }
+}

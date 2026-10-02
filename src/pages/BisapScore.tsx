@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BISAP Score — Wu, B.U., et al. (2008), Gut, 57(12):1698-1703. Bedside
@@ -38,6 +39,7 @@ export function BisapScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="BISAP Score" subtitle="Bedside pancreatitis severity — usable within 24h (Wu et al. 2008)" />
+        <BatasKlaimSkorTerbit />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">5 criteria, calculable from data available in the first 24 hours of admission — a simpler alternative to Ranson's Criteria (which requires waiting 48 hours) with comparable accuracy.</Prosa>
       </Card>
 

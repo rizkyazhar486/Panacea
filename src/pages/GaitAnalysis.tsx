@@ -7,6 +7,7 @@ import {
   buildGaitSections, highlights, coverage, fmtPaceSec, paceFromSpeed, DISCLAIMER,
   type Band, type Reading,
 } from '../lib/gaitAnalysis'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement Analysis — kualitas berjalan, bentuk lari, pemulihan, dan paparan.
@@ -37,6 +38,7 @@ export function GaitAnalysis() {
         title="Movement Analysis"
         subtitle="Walking quality, running form and recovery — from watch data that has gone unread until now"
       />
+      <BatasKlaimKesehatan permukaan="performance.gait-analysis" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">

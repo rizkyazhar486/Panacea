@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconAlertTriangle } from '../components/icons'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Allergy Tracker — a personal record of known allergies across food, drinks,
@@ -107,6 +108,7 @@ export function AllergyTracker() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconAlertTriangle size={20} />} title="Allergy Log" subtitle="A personal record of food, drink, medication & contact allergies" />
+        <BatasKlaimKesehatan permukaan="wellness.allergy-tracker" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Simpan daftar berjalan hal-hal yang membuat Anda alergi — makanan, minuman, obat, serta pemicu kontak/benda (lateks, nikel, kosmetik, dan penyebab dermatitis kontak alergi lainnya). Daftar ini tersimpan di perangkat Anda sebagai catatan pribadi; tunjukkan kepada tenaga medis mana pun sebelum resep baru, tindakan, atau makanan yang Anda ragukan.</Prosa>
       </Card>
 

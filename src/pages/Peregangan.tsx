@@ -6,6 +6,7 @@ import {
   GERAKAN, PROTOKOL, SALAH_KAPRAH, RUJUKAN_PEREGANGAN,
   type Kapan,
 } from '../lib/peregangan'
+import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Peregangan & Postur.
@@ -57,6 +58,7 @@ export function Peregangan() {
         title="Stretching & Posture"
         subtitle="Organised by when, not by muscle"
       />
+      <BatasKlaimKesehatan permukaan="performance.stretching" />
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">

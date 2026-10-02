@@ -16,6 +16,8 @@ export interface VolumeMpr {
   seriesInstanceUid?: string
   frameOfReferenceUid?: string
   orientasiPasien?: Citra['orientasiPasien']
+  /** Dari mana jarak tiap sumbu berasal. 'asumsi' = 1 mm pengganti: tidak sah untuk pengukuran. */
+  asalSpasi?: { baris: 'dicom' | 'asumsi'; kolom: 'dicom' | 'asumsi'; iris: 'posisi' | 'tebal-iris' | 'asumsi' }
 }
 
 export interface IrisanMpr {
@@ -178,11 +180,18 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
     }
   }
 
-  const jarakIrisMm = median(spatialDistances)
-    ?? median(citra.map((item) => item.tebalIrisMm ?? Number.NaN))
-    ?? 1
-  const jarakBarisMm = median(citra.map((item) => item.jarakPiksel?.[0] ?? Number.NaN)) ?? 1
-  const jarakKolomMm = median(citra.map((item) => item.jarakPiksel?.[1] ?? Number.NaN)) ?? 1
+  const irisPosisi = median(spatialDistances)
+  const irisTebal = median(citra.map((item) => item.tebalIrisMm ?? Number.NaN))
+  const jarakIrisMm = irisPosisi ?? irisTebal ?? 1
+  const barisDicom = median(citra.map((item) => item.jarakPiksel?.[0] ?? Number.NaN))
+  const kolomDicom = median(citra.map((item) => item.jarakPiksel?.[1] ?? Number.NaN))
+  const jarakBarisMm = barisDicom ?? 1
+  const jarakKolomMm = kolomDicom ?? 1
+  const asalSpasi = {
+    baris: barisDicom != null ? 'dicom' : 'asumsi',
+    kolom: kolomDicom != null ? 'dicom' : 'asumsi',
+    iris: irisPosisi != null ? 'posisi' : irisTebal != null ? 'tebal-iris' : 'asumsi',
+  } as const
 
   let minimum = Infinity
   let maksimum = -Infinity
@@ -210,6 +219,7 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
       seriesInstanceUid: seriesIdentity.value,
       frameOfReferenceUid: frameIdentity.value,
       orientasiPasien: orientationCount === citra.length ? pertama.orientasiPasien : undefined,
+      asalSpasi,
     },
   }
 }
