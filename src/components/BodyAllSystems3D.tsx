@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fold } from '../shared/ui/Fold'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { normalizeAnatomySourceName } from '../lib/anatomySourceNodeRegistry'
@@ -651,6 +652,7 @@ export default function BodyAllSystems3D({
             <p className="mt-2 text-[9px] leading-relaxed text-white/32">Rendered counts require both exact source-name resolution and successful bundle loading. They do not claim full anatomical completeness or patient-specific validity.</p>
           </div>
 
+          <Fold label="Sources">
           <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
             {selected.targets.map((target) => {
               const bundleFailed = failedFiles.includes(target.file)
@@ -678,6 +680,7 @@ export default function BodyAllSystems3D({
               )
             })}
           </div>
+          </Fold>
 
           {unavailable.length > 0 && (
             <p className="rounded-[16px] border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/70">
