@@ -3,12 +3,12 @@
   "measuredOn": "2026-10-02",
   "routes": {
     "": {
-      "words": 775,
-      "smallWords": 693
+      "words": 123,
+      "smallWords": 104
     },
     "body-explorer": {
-      "words": 154,
-      "smallWords": 143
+      "words": 133,
+      "smallWords": 121
     }
   }
 }

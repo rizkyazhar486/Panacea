@@ -11,6 +11,7 @@ import { SuperPageLauncher } from '../components/SuperPageLauncher'
 import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
 import { ThinkingOrb } from '../components/ThinkingOrb'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { Fold } from '../shared/ui/Fold'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
@@ -68,11 +69,11 @@ export function HomeSocialWorkspace() {
           <HomeVisualLanding />
           <HomeEssentialTools />
           <SuperPageLauncher />
-          <HomeRecoveryVisuals />
-          <RelWidgetRumah />
-          <HomeLiveWidgetRail />
-          <PanaceaImageSlider />
-          <HomeCommandDeck />
+          <Fold label="Recovery"><HomeRecoveryVisuals /></Fold>
+          <Fold label="Widgets"><RelWidgetRumah /></Fold>
+          <Fold label="Live"><HomeLiveWidgetRail /></Fold>
+          <Fold label="Stories"><PanaceaImageSlider /></Fold>
+          <Fold label="Deck"><HomeCommandDeck /></Fold>
         </div>
       ) : activeKey === 'for-you' ? (
         <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
