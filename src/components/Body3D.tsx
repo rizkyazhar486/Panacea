@@ -5,6 +5,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
+import { createRestorableEnvironment } from '../domains/body-exposure'
 import {
   Body3dLayerLoadGeneration,
   body3dDissectionMaterialState,
@@ -349,13 +350,24 @@ export function Body3D({
     // Procedural environment memberi bentuk PBR tanpa download HDR tambahan.
     // RoomEnvironment sendiri hanya dibutuhkan saat PMREM dibangun; geometri
     // sementaranya langsung dilepas setelah render target terbentuk.
-    const pmrem = new THREE.PMREMGenerator(renderer)
-    const ruang = new RoomEnvironment()
-    const lingkungan = pmrem.fromScene(ruang, 0.04)
-    ruang.dispose()
-    scene.environment = lingkungan.texture
-    scene.environmentIntensity = 0.4
-    pmrem.dispose()
+    // Isi render target PMREM tidak ikut pulih saat konteks WebGL dipulihkan, jadi
+    // lingkungan dibangun lewat mesin yang dapat dibangun ulang (lihat onRestored).
+    const environment = createRestorableEnvironment<THREE.WebGLRenderTarget>({
+      build: () => {
+        const pmrem = new THREE.PMREMGenerator(renderer)
+        const ruang = new RoomEnvironment()
+        try { return pmrem.fromScene(ruang, 0.04) } finally { ruang.dispose(); pmrem.dispose() }
+      },
+      install: (target) => {
+        scene.environment = target ? target.texture : null
+        scene.environmentIntensity = 0.4
+      },
+    })
+    const rebuildEnvironment = (previousContextLost = false) => {
+      environment.rebuild({ previousContextLost })
+      renderer.domElement.dataset.environmentGeneration = String(environment.generation())
+    }
+    rebuildEnvironment()
 
     latarRef.current = latarGradasi(0x141922, 0x05070b)
     scene.background = latarRef.current
@@ -405,6 +417,7 @@ export function Body3D({
         setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
       },
       onRestored: () => {
+        rebuildEnvironment(true)
         setFatal('')
         renderScheduler.request()
       },
@@ -518,7 +531,7 @@ export function Body3D({
       for (const def of ANATOMY_LAYERS) clearAnatomySourceNodes(def.file)
       groupsRef.current = {}
 
-      lingkungan.dispose()
+      environment.dispose()
       latarRef.current?.dispose()
       latarRef.current = null
       scene.environment = null

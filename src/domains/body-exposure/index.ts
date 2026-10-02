@@ -20,3 +20,11 @@ export {
 } from './engine/oculomotorLesionEngine'
 
 export { OculomotorLesionLab } from './ui/OculomotorLesionLab'
+
+export { createRestorableEnvironment } from './engine/restorableEnvironment'
+export type {
+  EnvironmentHandle,
+  RebuildOptions,
+  RestorableEnvironment,
+  RestorableEnvironmentOptions,
+} from './engine/restorableEnvironment'
