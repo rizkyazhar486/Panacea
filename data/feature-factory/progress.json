@@ -113,6 +113,14 @@
       "note": "Matured the existing Knowledge Bridge copy-summary path as a bounded structured-report capability: it reuses the canonical curated topic identity, one-line context and fixed seven stage objects in deterministic order, normalizes glossary-enhanced display labels back to canonical stage names, performs no hidden synthesis or network call, and retains explicit educational/not-patient-specific plus original-source-verification boundaries.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch adds deterministic report-contract guards only and introduces no new biomedical, diagnostic, treatment or patient-specific factual claim. Existing curated medical teaching text is exported without reinterpretation and remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T08:15:00.000Z"
+    },
+    "ff-medical-education-search": {
+      "status": "done",
+      "commit": "5adaf0a64b1184644d748ff10a50113b471b74d2",
+      "paths": ["src/lib/knowledgeBridgeMap.ts", "src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-search.mts"],
+      "note": "Knowledge Bridge search now indexes curated stage text (not only title/alias) via a bounded whole-word local index, surfaced as Did-you-mean suggestions. No network dependency and no new medical claim: same static BRIDGE_TOPICS corpus resolveBridgeTopic already used. Preserves the pre-existing fail-closed fragment guard (e.g. \"art\" must not match \"heart attack\").",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Search/indexing UX only over the already-curated BRIDGE_TOPICS text; this candidate adds no new medical factual, quantitative, causal, diagnostic or treatment claim.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-16T20:51:56.295Z"
     }
   }
 }

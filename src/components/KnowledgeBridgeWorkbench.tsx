@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
+import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic, searchBridgeTopics, type BridgeSearchHit } from '../lib/knowledgeBridgeMap'
 import {
   clearBridgeEvidence,
   loadBridgeEvidence,
@@ -33,6 +33,7 @@ export function KnowledgeBridgeWorkbench() {
   const [evidence, setEvidence] = useState<BridgeEvidenceRef[]>(loadBridgeEvidence)
   const [copied, setCopied] = useState(false)
   const [status, setStatus] = useState(initialTopic || initialQuery === 'hypertension' ? '' : `No curated causal map matches “${initialQuery}” yet. You can still verify this query in Medical Library.`)
+  const [suggestions, setSuggestions] = useState<BridgeSearchHit[]>(initialTopic ? [] : searchBridgeTopics(initialQuery))
 
   const topic = useMemo(() => BRIDGE_TOPICS.find((item) => item.id === selectedId) ?? resolveBridgeTopic(query) ?? BRIDGE_TOPICS[0], [selectedId, query])
   const note = notes[topic.id] ?? ''
@@ -41,15 +42,24 @@ export function KnowledgeBridgeWorkbench() {
     const clean = query.trim()
     if (!clean) {
       setStatus('Enter a disease, mechanism or clinical topic first.')
+      setSuggestions([])
       return
     }
     const found = resolveBridgeTopic(clean)
     if (found) {
       setSelectedId(found.id)
       setStatus('')
+      setSuggestions([])
       return
     }
     setStatus(`No curated causal map matches “${clean}” yet. Use Medical Library for the live evidence search instead.`)
+    setSuggestions(searchBridgeTopics(clean))
+  }
+  function pickSuggestion(hit: BridgeSearchHit) {
+    setSelectedId(hit.topic.id)
+    setQuery(hit.topic.title)
+    setStatus('')
+    setSuggestions([])
   }
   function saveNote(value: string) {
     const next = { ...notes, [topic.id]: value }
@@ -127,8 +137,17 @@ export function KnowledgeBridgeWorkbench() {
 
       {status && <div role="status" aria-live="polite" className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[9.5px] leading-relaxed text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100"><span>{status}</span>{query.trim() && <Link to={`/med-study?bagian=evidence&cari=${encodeURIComponent(query.trim())}`} className={`shrink-0 rounded-full bg-amber-900 px-3 py-1.5 text-[9px] font-black text-white dark:bg-amber-100 dark:text-amber-950 ${FOCUS_RING}`}>Search evidence →</Link>}</div>}
 
+      {suggestions.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label="Related curated topics">
+          <span className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Did you mean</span>
+          {suggestions.map((hit) => (
+            <button key={hit.topic.id} type="button" onClick={() => pickSuggestion(hit)} className={`rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-[9.5px] font-black text-cyan-800 dark:border-cyan-400/20 dark:bg-cyan-400/10 dark:text-cyan-200 ${FOCUS_RING}`}>{hit.topic.title}</button>
+          ))}
+        </div>
+      )}
+
       <nav aria-label="Curated medical topics" className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {BRIDGE_TOPICS.map((item) => <button key={item.id} type="button" aria-pressed={topic.id === item.id} onClick={() => { setSelectedId(item.id); setQuery(item.title); setStatus('') }} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${FOCUS_RING} ${topic.id === item.id ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{item.title}</button>)}
+        {BRIDGE_TOPICS.map((item) => <button key={item.id} type="button" aria-pressed={topic.id === item.id} onClick={() => { setSelectedId(item.id); setQuery(item.title); setStatus(''); setSuggestions([]) }} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${FOCUS_RING} ${topic.id === item.id ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{item.title}</button>)}
       </nav>
 
       <div className="mt-4 rounded-[24px] bg-neutral-950 p-4 text-white dark:bg-black/30" aria-live="polite">
