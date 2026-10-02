@@ -74,8 +74,10 @@ for (const surface of surfaces) {
     }
 
     const firstAction = actions.first()
-    await firstAction.focus()
+    // preventScroll: a scrolling focus() would hide the auto-hiding command bar
+    // and fail the next surface's visibility wait.
     const focusStyle = await firstAction.evaluate((node) => {
+      node.focus({ preventScroll: true })
       const style = getComputedStyle(node)
       return {
         outlineStyle: style.outlineStyle,
