@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { Fold } from '../shared/ui/Fold'
+import { openFoldsAround } from '../shared/ui/openFolds'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { Ringkas, Poin } from '../components/Ringkas'
@@ -1821,7 +1823,11 @@ export function Nutrition() {
   const lompat = (anchor: string) => {
     const tujuan = TAB_ANCHOR[anchor]
     if (tujuan && tujuan !== kel) setKel(tujuan)
-    setTimeout(() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+    setTimeout(() => {
+      const el = document.getElementById(anchor)
+      openFoldsAround(el) // jangkar bisa berada di lipatan yang tertutup
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 60)
   }
 
   return (
@@ -1836,8 +1842,11 @@ export function Nutrition() {
       <PanelAngka angka={angkaHariIni} />
 
       {/* Skor umur panjang tetap di luar tab: ia merangkum keempatnya. */}
-      <LongevityCard body={body} wt={wt} todaysFoods={todaysFoods} vitals={vitals} activeProtocol={activeProtocol} />
+      <Fold label="Longevity">
+        <LongevityCard body={body} wt={wt} todaysFoods={todaysFoods} vitals={vitals} activeProtocol={activeProtocol} />
+      </Fold>
 
+      <Fold label="Log">
       <div className="no-scrollbar -mx-1 flex gap-[6px] overflow-x-auto px-1">
         {KELOMPOK.map((k) => (
           <button key={k.id} onClick={() => setKel(k.id)} aria-pressed={kel === k.id}
@@ -1882,7 +1891,9 @@ export function Nutrition() {
           <RecommendationsCard recs={recs} />
         </>
       )}
+      </Fold>
 
+      <Fold label="Calculators">
       {/* Quick Links — longevity calculator capabilities */}
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={18} />} title="Longevity Calculators" subtitle="Built to help people live longer and healthier" />
@@ -1922,7 +1933,9 @@ export function Nutrition() {
           />
         </div>
       </Card>
+      </Fold>
 
+      <Fold label="Sources">
       {/* Nutrition Data Sources */}
       <Card className="!p-5">
         <SectionTitle icon={<span className="text-lg">📚</span>} title="Nutrition Data Sources" subtitle="Food composition references underlying the Panaceamed nutrition database" />
@@ -1947,6 +1960,7 @@ export function Nutrition() {
           />
         </div>
       </Card>
+      </Fold>
     </div>
   )
 }

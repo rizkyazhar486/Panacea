@@ -21,6 +21,10 @@
     "fitness-hub": {
       "words": 167,
       "smallWords": 146
+    },
+    "fitness-hub?view=nutrition": {
+      "words": 183,
+      "smallWords": 160
     }
   }
 }
