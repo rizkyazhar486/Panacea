@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
+import { formatSmokeFailureLog } from './body3d-failure-evidence.mjs'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
@@ -64,9 +65,11 @@ await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
+const startedAt = Date.now()
 let metrics = null
 let failure = null
 let failureContext = null
+let responsiveProbe = null
 
 async function canvasHealth(locator) {
   return withTimeout(locator.evaluate((node) => {
@@ -322,6 +325,16 @@ try {
   console.log(JSON.stringify({ ok: true, url, ...metrics }))
 } catch (error) {
   failure = error instanceof Error ? error.message : String(error)
+  // Dijalankan lebih dulu karena evaluate berikutnya bisa menunggu 20 detik bila halaman macet. Membedakan canvas rusak dari halaman macet: evaluate sederhana harus dijawab dalam 3 detik.
+  const probeStart = Date.now()
+  responsiveProbe = await withTimeout(page.evaluate(() => performance.now()), 'responsiveness probe', 3_000)
+    .then(() => ({ responsive: true, evaluateMs: Date.now() - probeStart }))
+    // Hanya timeout yang berarti utas utama macet; galat lain (halaman error, navigasi gagal) tidak boleh dilaporkan sebagai macet.
+    .catch((probeError) => (
+      probeError instanceof Error && /timed out/.test(probeError.message)
+        ? { responsive: false, evaluateMs: null }
+        : { responsive: null, evaluateMs: null, error: probeError instanceof Error ? probeError.message : String(probeError) }
+    ))
   // Konteks diagnostik saat gagal: hash saat ini dan keadaan tiap lipatan (tidak mengubah asersi apa pun).
   failureContext = await page.evaluate(() => ({
     hash: window.location.hash,
@@ -337,6 +350,8 @@ try {
     pageErrors,
     metrics,
   }, null, 2)}\n`)
+  const failureLog = formatSmokeFailureLog({ failure, failureContext, pageErrors, probe: responsiveProbe, elapsedMs: Date.now() - startedAt })
+  if (failureLog) console.error(failureLog)
   await withTimeout(context.close(), 'Body3D browser context close', 10_000).catch(() => undefined)
   await withTimeout(browser.close(), 'Body3D browser close', 10_000).catch(() => undefined)
 }
