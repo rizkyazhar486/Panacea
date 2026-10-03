@@ -10,6 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parklandVolumes } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -747,10 +748,7 @@ function HollidaySegarCalc() {
 function ParklandCalc() {
   const [weight, setWeight] = useState(70)
   const [tbsa, setTbsa] = useState(20)
-  const total24h = 4 * weight * tbsa
-  const first8h = total24h / 2
-  const first8hRate = first8h / 8
-  const next16hRate = (total24h - first8h) / 16
+  const parkland = parklandVolumes(weight, tbsa)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Fluid resuscitation for burns ≥20% TBSA (Baxter, 1968)" />
@@ -758,20 +756,24 @@ function ParklandCalc() {
         <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
         <Field label="% TBSA (burn surface area)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
       </div>
+      {parkland.ok ? (
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
+          <div className="text-lg font-black text-ink">{parkland.data.total24hMl.toFixed(0)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL Total 24 hours</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
+          <div className="text-lg font-black text-ink">{parkland.data.first8hMlPerHour.toFixed(0)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (first 8 hours)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
+          <div className="text-lg font-black text-ink">{parkland.data.next16hMlPerHour.toFixed(0)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{parkland.reason}. No volume is shown until both values are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (Ringer's Lactate). Half is given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the following 16 hours. Titrate against urine output (target ~0.5 mL/kg/hour in adults).</Prosa>
     </Card>
   )
@@ -1975,9 +1977,8 @@ function BurnCalc() {
   const allRegions = [...drawFront, ...drawBack]
   const drawTbsa = allRegions.filter((r) => selected[r.key]).reduce((sum, r) => sum + r.pct, 0)
   const tbsa = method === 'manual' ? manualTbsa : drawTbsa
-  const total24h = 4 * weight * tbsa
-  const first8hRate = total24h / 2 / 8
-  const next16hRate = (total24h - total24h / 2) / 16
+  // Di bawah 20% (termasuk 0 saat belum ada area dipilih) formula tidak ditampilkan; nilai di luar domain tetap ditolak eksplisit.
+  const parkland = tbsa >= 20 || !Number.isFinite(tbsa) || tbsa < 0 ? parklandVolumes(weight, tbsa) : null
 
   const regions = view === 'front' ? drawFront : drawBack
 
@@ -2051,18 +2052,21 @@ function BurnCalc() {
         <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
       </div>
 
-      {tbsa >= 20 && (
+      {parkland && !parkland.ok && (
+        <p role="status" className="mt-3 text-xs font-bold text-neutral-600">{parkland.reason}. No volume is shown until both values are valid.</p>
+      )}
+      {parkland?.ok && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
+            <div className="text-lg font-black text-ink">{parkland.data.total24hMl.toFixed(0)}</div>
             <div className="text-[10px] font-bold uppercase text-neutral-500">Total mL / 24h (Parkland)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
+            <div className="text-lg font-black text-ink">{parkland.data.first8hMlPerHour.toFixed(0)}</div>
             <div className="text-[10px] font-bold uppercase text-neutral-500">mL/h (first 8 hours)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
+            <div className="text-lg font-black text-ink">{parkland.data.next16hMlPerHour.toFixed(0)}</div>
             <div className="text-[10px] font-bold uppercase text-neutral-500">mL/h (next 16 hours)</div>
           </div>
         </div>
