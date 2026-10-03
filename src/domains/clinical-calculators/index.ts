@@ -51,3 +51,5 @@ export { widmarkBac, gramsOf, DRINKS, BAC_RANGES, WIDMARK_R, ETHANOL_DENSITY_G_P
 export type { BacInput, BacResult, Drink } from './engine/widmarkBac'
 export { hydrationTarget, HYDRATION_RANGES, INTENSITY_ML_PER_HOUR, ML_PER_KG, HOT_CLIMATE_ML, PREGNANCY_ML, BREASTFEEDING_ML, ML_PER_GLASS } from './engine/hydrationTarget'
 export type { HydrationInput, HydrationResult, HydrationIntensity, HydrationRow } from './engine/hydrationTarget'
+export { sleepDebt, sanitizeNights, validateNeed, validateHours, SLEEP_RANGES, MAX_NIGHTS, DEBT_GOOD_MAX_H, DEBT_MILD_MAX_H } from './engine/sleepDebt'
+export type { Night, SleepDebtResult, SleepDebtTone, SleepInputResult } from './engine/sleepDebt'
