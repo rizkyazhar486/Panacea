@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { sofaScore } from '../../src/domains/clinical-calculators/index.ts'
+import { sofaScore, childPugh } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,8 +71,10 @@ const cpKode = kodeDari(cp)
 for (const bawaan of ['useState(1.5)', 'useState(3.2)', 'useState(1.4)']) {
   assert.ok(!cpKode.includes(bawaan), `a laboratory default is back in Child-Pugh: ${bawaan}`)
 }
-assert.ok(/const cls = lengkap \? classify\(pts\) : null/.test(cpKode),
+assert.ok(/const lengkap = res\.points !== null/.test(cpKode) && /const cls = res\.cls/.test(cpKode),
   'Child-Pugh still prints a class and a survival figure without the laboratory values')
+assert.equal(childPugh({ bili: NaN, alb: NaN, inr: NaN, ascites: 1, enceph: 1 }).cls, null,
+  'Child-Pugh engine still classifies laboratory values nobody drew')
 // Asites dan ensefalopati berskala 1-3; 1 berarti "tidak ada" -- jawaban sah.
 for (const tetap of ['ascites, setAscites] = useState<Level>(1)', 'enceph, setEnceph] = useState<Level>(1)']) {
   assert.ok(cpKode.includes(tetap), `a valid one-point clinical finding was removed from Child-Pugh: ${tetap}`)

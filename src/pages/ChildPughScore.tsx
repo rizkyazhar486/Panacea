@@ -4,6 +4,7 @@ import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { childPugh, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child-Pugh Score — Pugh, R.N.H., et al. (1973), Br J Surg, 60(8):646-649
@@ -13,22 +14,6 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Level = 1 | 2 | 3
-
-function bilirubinPts(v: number): Level {
-  if (v < 2) return 1
-  if (v <= 3) return 2
-  return 3
-}
-function albuminPts(v: number): Level {
-  if (v > 3.5) return 1
-  if (v >= 2.8) return 2
-  return 3
-}
-function inrPts(v: number): Level {
-  if (v < 1.7) return 1
-  if (v <= 2.3) return 2
-  return 3
-}
 
 const ASCITES_OPTS: { label: string; pts: Level }[] = [
   { label: 'None', pts: 1 },
@@ -41,30 +26,21 @@ const ENCEPH_OPTS: { label: string; pts: Level }[] = [
   { label: 'Grade 3-4 (severe/coma)', pts: 3 },
 ]
 
-function classify(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; survival: string } {
-  if (score <= 6) return { label: 'Class A', tone: 'brand', survival: '~100% 1-year, ~85% 2-year survival' }
-  if (score <= 9) return { label: 'Class B', tone: 'low', survival: '~80% 1-year, ~60% 2-year survival' }
-  return { label: 'Class C', tone: 'critical', survival: '~45% 1-year, ~35% 2-year survival' }
-}
-
 export function ChildPughScore() {
   // Tiga nilai lab dimulai kosong. Asites dan ensefalopati TIDAK: keduanya
   // berskala 1-3 dengan 1 berarti "tidak ada", yaitu jawaban klinis yang sah
   // bernilai satu poin, bukan kekosongan.
-  const [bilirubin, setBilirubin] = useState(0)
-  const [albumin, setAlbumin] = useState(0)
-  const [inr, setInr] = useState(0)
+  const [bilirubin, setBilirubin] = useState('')
+  const [albumin, setAlbumin] = useState('')
+  const [inr, setInr] = useState('')
   const [ascites, setAscites] = useState<Level>(1)
   const [enceph, setEnceph] = useState<Level>(1)
 
-  const belum: string[] = []
-  if (!(bilirubin > 0)) belum.push('total bilirubin')
-  if (!(albumin > 0)) belum.push('albumin')
-  if (!(inr > 0)) belum.push('INR')
-  const lengkap = belum.length === 0
-
-  const pts = bilirubinPts(bilirubin) + albuminPts(albumin) + inrPts(inr) + ascites + enceph
-  const cls = lengkap ? classify(pts) : null
+  const res = childPugh({ bili: parseNumberField(bilirubin), alb: parseNumberField(albumin), inr: parseNumberField(inr), ascites, enceph })
+  const belum = res.missing
+  const lengkap = res.points !== null
+  const pts = res.points
+  const cls = res.cls
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -77,13 +53,13 @@ export function ChildPughScore() {
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Total bilirubin (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin || ''} onChange={(e) => setBilirubin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin} onChange={(e) => setBilirubin(e.target.value)} />
           </Field>
           <Field label="Albumin (g/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={albumin || ''} onChange={(e) => setAlbumin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={albumin} onChange={(e) => setAlbumin(e.target.value)} />
           </Field>
           <Field label="INR">
-            <input className={inputClass} type="number" step="0.1" min={0} value={inr || ''} onChange={(e) => setInr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={inr} onChange={(e) => setInr(e.target.value)} />
           </Field>
         </div>
         <div className="mt-3 grid grid-cols-1 gap-3">
@@ -106,7 +82,7 @@ export function ChildPughScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Child-Pugh Class</div>
-        {lengkap && cls !== null ? (
+        {lengkap && cls !== null && pts !== null ? (
           <>
             <div className="mt-2 flex items-center gap-3">
               <span className="text-3xl font-black text-brand-dark">{pts} pts</span>
@@ -117,14 +93,15 @@ export function ChildPughScore() {
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No class yet. Still needed: {belum.join(', ')}.
+            No class yet.{belum.length > 0 && <> Still needed: {belum.join(', ')}.</>}
+            {res.invalid.map((m) => <span key={m} role="alert" className="block font-semibold text-amber-700 dark:text-amber-300">{m}</span>)}
             {' '}Ascites and encephalopathy are already answered — "none" is a real finding worth one point each —
             but the three laboratory values are not answers until someone draws them.
           </p>
         )}
       </Card>
 
-      {lengkap && (
+      {lengkap && pts !== null && (
       <ScoreTrend
         storageKey="pmd_childpugh_trend_v1"
         scoreName="Child-Pugh"
