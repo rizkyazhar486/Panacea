@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1030,18 +1030,9 @@ function CentorCalc() {
   const [noCough, setNoCough] = useState(false)
   const [tenderNodes, setTenderNodes] = useState(false)
   const [exudate, setExudate] = useState(false)
-  const [age, setAge] = useState(30)
-  const ageAdj = age < 15 ? 1 : age >= 45 ? -1 : 0
-  const total = [fever, noCough, tenderNodes, exudate].filter(Boolean).length + ageAdj
-  const interp = total <= 0
-    ? { l: 'Very low risk (1-2.5%)', tone: 'normal' as const, note: 'No swab/empiric antibiotics needed.' }
-    : total === 1
-    ? { l: 'Low risk (5-10%)', tone: 'normal' as const, note: 'Antibiotics generally not needed.' }
-    : total === 2
-    ? { l: 'Moderate risk (11-17%)', tone: 'low' as const, note: 'Consider a rapid strep test/culture before antibiotics.' }
-    : total === 3
-    ? { l: 'High risk (28-35%)', tone: 'low' as const, note: 'Strep testing recommended; treat if positive.' }
-    : { l: 'Very high risk (51-53%)', tone: 'critical' as const, note: 'Consider empiric antibiotics (e.g. penicillin) or a rapid test first per local policy.' }
+  // Teks mentah supaya usia yang belum diisi tidak terbaca 0 (yang menambah satu poin sebagai anak).
+  const [age, setAge] = useState('30')
+  const centor = centorMcIsaac({ fever, noCough, tenderNodes, exudate }, parseNumberField(age))
   const Row = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1056,15 +1047,19 @@ function CentorCalc() {
         <Row label="Absence of cough" checked={noCough} onChange={setNoCough} />
         <Row label="Tender anterior cervical lymphadenopathy" checked={tenderNodes} onChange={setTenderNodes} />
         <Row label="Tonsillar exudate/swelling" checked={exudate} onChange={setExudate} />
-        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(e.target.value)} /></Field>
       </div>
+      {centor.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}</div>
-          <Badge tone={interp.tone}>{interp.l}</Badge>
+          <div className="text-2xl font-black text-ink">{centor.data.score}</div>
+          <Badge tone={centor.data.tone}>{centor.data.label}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{centor.data.note}</p>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{centor.reason}. No score is shown until the age is valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
     </Card>
   )
@@ -1175,41 +1170,35 @@ function MidParentalCalc() {
 /* ══════════════════ FLETCHER INDEX (HEARING LOSS) ══════════════════ */
 function FletcherCalc() {
   const [mode, setMode] = useState<'basic' | 'complete'>('basic')
-  const [t500, setT500] = useState(20)
-  const [t1000, setT1000] = useState(20)
-  const [t2000, setT2000] = useState(20)
-  const [t3000, setT3000] = useState(20)
+  const [t500, setT500] = useState('20')
+  const [t1000, setT1000] = useState('20')
+  const [t2000, setT2000] = useState('20')
+  const [t3000, setT3000] = useState('20')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 dB dan tampil sebagai "Normal".
   // Complete (AAO-HNS 4-frequency) average adds 3000Hz — captures noise-
   // induced/occupational hearing-loss notches that the classic 3-frequency
   // Fletcher index (500/1000/2000Hz) alone can miss.
-  const index = mode === 'basic' ? (t500 + t1000 + t2000) / 3 : (t500 + t1000 + t2000 + t3000) / 4
-  const cls = index < 26
-    ? { l: 'Normal', tone: 'normal' as const }
-    : index < 41
-    ? { l: 'Mild hearing loss', tone: 'low' as const }
-    : index < 56
-    ? { l: 'Moderate hearing loss', tone: 'low' as const }
-    : index < 71
-    ? { l: 'Moderately severe hearing loss', tone: 'critical' as const }
-    : index < 91
-    ? { l: 'Severe hearing loss', tone: 'critical' as const }
-    : { l: 'Profound (total) hearing loss', tone: 'critical' as const }
+  const fletcher = fletcherIndex(mode, parseNumberField(t500), parseNumberField(t1000), parseNumberField(t2000), parseNumberField(t3000))
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Pure-tone average threshold — hearing loss grade classification" />
       <SegButtons value={mode} onChange={setMode} options={[{ v: 'basic', l: 'Basic (3-frequency)' }, { v: 'complete', l: 'Complete (4-frequency, AAO-HNS)' }]} />
       <div className={`mt-3 grid gap-2 ${mode === 'basic' ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
-        <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
-        <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(+e.target.value)} /></Field>
-        <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(+e.target.value)} /></Field>
-        {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(+e.target.value)} /></Field>}
+        <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(e.target.value)} /></Field>
+        <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(e.target.value)} /></Field>
+        <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(e.target.value)} /></Field>
+        {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(e.target.value)} /></Field>}
       </div>
+      {fletcher.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{index.toFixed(1)} dB</div>
-          <Badge tone={cls.tone}>{cls.l}</Badge>
+          <div className="text-2xl font-black text-ink">{fletcher.data.indexDb.toFixed(1)} dB</div>
+          <Badge tone={fletcher.data.tone}>{fletcher.data.label}</Badge>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{fletcher.reason}. No classification is shown until every threshold is filled in.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">
         {mode === 'basic' ? 'Fletcher Index = average threshold at 500+1000+2000 Hz.' : 'Complete (AAO-HNS 4-frequency) = average threshold at 500+1000+2000+3000 Hz — more sensitive to noise/occupational notches.'} &lt;26dB normal · 26-40 mild · 41-55 moderate · 56-70 moderately severe · 71-90 severe · &gt;90 profound.
       </p>
@@ -1386,7 +1375,7 @@ function ParadiseCalc() {
   const [y2, setY2] = useState(0)
   const [y3, setY3] = useState(0)
   const [documented, setDocumented] = useState(false)
-  const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
+  const paradise = paradiseCriteria(y1, y2, y3, documented)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indication for tonsillectomy in recurrent pharyngitis/tonsillitis (Paradise et al., 1984)" />
@@ -1400,7 +1389,11 @@ function ParadiseCalc() {
         <div className="text-sm font-bold text-ink">Every episode well documented (fever &gt;38.3°C, tonsillar exudate, tender cervical lymphadenopathy, or positive streptococcal culture)</div>
       </label>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-        <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
+        {paradise.ok ? (
+          <Badge tone={paradise.data.meetsCriteria ? 'critical' : 'normal'}>{paradise.data.meetsCriteria ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
+        ) : (
+          <p role="status" className="text-xs font-bold text-neutral-600">{paradise.reason}. No result is shown until all three counts are valid.</p>
+        )}
         <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with each episode well documented. This is one indication; the decision to proceed with tonsillectomy remains individualized together with an ENT physician.</Prosa>
       </div>
     </Card>
