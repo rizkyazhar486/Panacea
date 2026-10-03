@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { graceScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -66,8 +67,15 @@ const graceKode = kodeDari(grace)
 for (const bawaan of ['useState(75)', 'useState(130)', 'useState(1.0)']) {
   assert.ok(!graceKode.includes(bawaan), `a measurement default is back in GRACE: ${bawaan}`)
 }
-assert.ok(/const result = lengkap \? band\(score\) : null/.test(graceKode),
-  'GRACE still prints an in-hospital mortality band for measurements nobody took')
+// Sejak perhitungan dipindah ke domain/graceScore, skor dan pita hanya ada bila keempat pengukuran sah. Regex teks-sumber lama
+// diganti padanannya, ditambah pemeriksaan perilaku pada mesin (lebih kuat dari regex).
+assert.ok(/const result = res\.band/.test(graceKode) && /const lengkap = res\.score !== null/.test(graceKode),
+  'GRACE page no longer takes its band/completeness from the validated engine')
+{
+  const tanpaUkur = graceScore({ age: NaN, hr: NaN, sbp: NaN, creat: NaN, killip: 0, arrest: false, stDev: false, markers: false })
+  assert.equal(tanpaUkur.band, null, 'GRACE still prints an in-hospital mortality band for measurements nobody took')
+  assert.equal(tanpaUkur.score, null, 'GRACE still totals measurements nobody took')
+}
 assert.ok(/getDemoTersimpan/.test(graceKode) && !/\bgetDemo\s*\(/.test(graceKode),
   'GRACE still seeds age from getDemo()')
 // Yang berbentuk jawaban harus TETAP ada. Memaksa seseorang mencentang

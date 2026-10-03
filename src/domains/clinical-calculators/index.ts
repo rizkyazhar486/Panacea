@@ -57,3 +57,5 @@ export { serumOsmolality, osmBand, gapBand, OSM_RANGES } from './engine/serumOsm
 export type { OsmInput, OsmResult, OsmTone } from './engine/serumOsmolality'
 export { sofaScore, respPts, coagPts, liverPts, renalPts, cnsPts, mortalityBand as sofaMortalityBand, SOFA_RANGES } from './engine/sofaScore'
 export type { SofaInput, SofaResult, SofaBand, CvLevel } from './engine/sofaScore'
+export { graceScore, graceBand, agePts as graceAgePts, hrPts as graceHrPts, sbpPts as graceSbpPts, creatPts as graceCreatPts, GRACE_RANGES, KILLIP_PTS, ARREST_PTS, ST_DEVIATION_PTS, MARKERS_PTS } from './engine/graceScore'
+export type { GraceInput, GraceResult, GraceBand } from './engine/graceScore'
