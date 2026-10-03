@@ -163,9 +163,41 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
 - **Not merged with the male.** The two bodies are separate subjects; combining them would
   need a registration transform that no source provides.
 
+## Paediatric bodies — source_backed (local; redistribution pending)
+
+- **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*
+  (2024), polygon-mesh OBJ files from `P156 Electronic files.zip`
+  (https://www.icrp.org/publication.asp?id=ICRP+Publication+156). Ten phantoms: newborn and
+  1, 5, 10 and 15 years, male and female. They are built from CT images of real people and
+  adjusted to the ICRP Publication 89 reference values. They are **not** scaled adults.
+- **Retrieval:** HTTP range requests on the 11.8 GB archive fetched only the README and the
+  ten OBJ/MTL pairs.
+- **Licence:** neither the ICRP page nor the README states terms for redistributing the data.
+  The derived bodies live only in local `bodies/*.blend` (git-ignored) and are **not** in the
+  repo or the app until the owner decides on redistribution.
+- **Conversion** (`pipeline/build_icrp156_bodies.py`): cm → m, feet to z = 0, no rotation
+  needed. Verified on the 5-year-old male: sternum at −Y, liver at −X, the master's
+  convention.
+- **Kept:** 102–140 anatomical surfaces per body.
+- **Dropped:** 88–90 dosimetry-only groups per body (µm target layers, spongiosa and
+  medulla, lumen and air contents, residual soft tissue).
+- **Measured statures:**
+
+  | Age | Male | Female | ICRP reference |
+  |---|---|---|---|
+  | Newborn | 48.1 cm | 48.2 cm | 51 cm |
+  | 1 year | 76.0 cm | 76.0 cm | 76 cm |
+  | 5 years | 109.0 cm | 109.1 cm | 109 cm |
+  | 10 years | 138.0 cm | 138.1 cm | 138 cm |
+  | 15 years | 167.0 cm | 161.0 cm | 167 / 161 cm |
+
+  The newborn phantom has flexed legs, which explains the shorter standing height.
+- **In the master:** each variant is linked as a library collection (one `.blend` per body)
+  under `PEDIATRIC.NEONATE`, `PEDIATRIC.INFANT`, `PEDIATRIC.CHILD` (5 and 10 y) and
+  `PEDIATRIC.ADOLESCENT`.
+
 ## Placeholders
 
-`HUMAN.PREGNANT`, `FETUS`, `PEDIATRIC.{NEONATE,INFANT,TODDLER,CHILD,ADOLESCENT}` and
-`HUMAN.OLDER_ADULT` exist as empty root collections. Each records the source data it needs
+`HUMAN.PREGNANT`, `FETUS`, `PEDIATRIC.TODDLER` and `HUMAN.OLDER_ADULT` exist as empty root collections. Each records the source data it needs
 (`panacea_source_requirement`). No geometry was fabricated, and none was produced by scaling
 or inflating an adult body.

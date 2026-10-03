@@ -1,12 +1,13 @@
 {
- "generated": "2026-10-03T10:21:55",
- "master": "PANACEA_HUMAN_MASTER_v007.blend",
+ "generated": "2026-10-03T11:30:45",
+ "master": "PANACEA_HUMAN_MASTER_v008.blend",
  "bodies": [
   {
    "body_id": "HUMAN.ADULT.MALE",
    "status": "source_backed",
    "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 \u2014 Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae)",
    "source_requirement": null,
+   "redistribution": null,
    "structures": 3876,
    "systems": {
     "surface": 256,
@@ -30,6 +31,7 @@
    "status": "source_backed_partial",
    "source": "HuBMAP CCF 3D Reference Object Library, VH_Female (NLM Visible Human female): VH_F_United v1.1 + Spinal_Cord v1.2 + mammary glands v1.3 + vasculature v1.4, CC BY 4.0",
    "source_requirement": null,
+   "redistribution": null,
    "structures": 841,
    "systems": {
     "nervous": 302,
@@ -50,7 +52,8 @@
    "body_id": "HUMAN.PREGNANT",
    "status": "placeholder",
    "source": null,
-   "source_requirement": "Requires gestational-age-staged maternal + fetal source anatomy (e.g. segmented maternal MRI/CT atlases by trimester); must not be produced by inflating the female abdomen.",
+   "source_requirement": "ICRP pregnant-female mesh-type phantoms (fetal ages 8\u201338 weeks) are in public consultation; data not yet released. Re-check https://www.icrp.org/page.asp?id=698.",
+   "redistribution": null,
    "structures": 0,
    "systems": {}
   },
@@ -58,55 +61,62 @@
    "body_id": "FETUS",
    "status": "placeholder",
    "source": null,
-   "source_requirement": "Requires fetal anatomical source data by gestational week (fetal MRI atlases / embryology references); fetal circulation shunts (foramen ovale, ductus arteriosus, ductus venosus) must be source-backed.",
+   "source_requirement": "Fetus comes with the ICRP pregnant-female phantoms (not yet released).",
+   "redistribution": null,
    "structures": 0,
    "systems": {}
   },
   {
    "body_id": "PEDIATRIC.NEONATE",
-   "status": "placeholder",
-   "source": null,
+   "status": "source_backed",
+   "source": "ICRP Publication 156 paediatric mesh-type reference computational phantoms (CT-based; male and female variants), linked from bodies/",
    "source_requirement": "Requires neonatal source anatomy (fontanelles, thymus, relative liver size); adult scaling is prohibited.",
-   "structures": 0,
+   "redistribution": "pending licence review \u2014 ICRP terms not stated",
+   "structures": 204,
    "systems": {}
   },
   {
    "body_id": "PEDIATRIC.INFANT",
-   "status": "placeholder",
-   "source": null,
+   "status": "source_backed",
+   "source": "ICRP Publication 156 paediatric mesh-type reference computational phantoms (CT-based; male and female variants), linked from bodies/",
    "source_requirement": "Requires infant source anatomy; adult scaling is prohibited.",
-   "structures": 0,
+   "redistribution": "pending licence review \u2014 ICRP terms not stated",
+   "structures": 220,
    "systems": {}
   },
   {
    "body_id": "PEDIATRIC.TODDLER",
    "status": "placeholder",
    "source": null,
-   "source_requirement": "Requires toddler source anatomy; adult scaling is prohibited.",
+   "source_requirement": "No open source found for 2\u20133 years. ICRP 156 covers 0, 1, 5, 10, 15 years; interpolating between ages would be invented anatomy.",
+   "redistribution": null,
    "structures": 0,
    "systems": {}
   },
   {
    "body_id": "PEDIATRIC.CHILD",
-   "status": "placeholder",
-   "source": null,
+   "status": "source_backed",
+   "source": "ICRP Publication 156 paediatric mesh-type reference computational phantoms (CT-based; male and female variants), linked from bodies/",
    "source_requirement": "Requires child source anatomy (growth plates, ossification centres, airway dimensions); adult scaling is prohibited.",
-   "structures": 0,
+   "redistribution": "pending licence review \u2014 ICRP terms not stated",
+   "structures": 518,
    "systems": {}
   },
   {
    "body_id": "PEDIATRIC.ADOLESCENT",
-   "status": "placeholder",
-   "source": null,
+   "status": "source_backed",
+   "source": "ICRP Publication 156 paediatric mesh-type reference computational phantoms (CT-based; male and female variants), linked from bodies/",
    "source_requirement": "Requires adolescent source anatomy; adult scaling is prohibited.",
-   "structures": 0,
+   "redistribution": "pending licence review \u2014 ICRP terms not stated",
+   "structures": 258,
    "systems": {}
   },
   {
    "body_id": "HUMAN.OLDER_ADULT",
    "status": "placeholder",
    "source": null,
-   "source_requirement": "Requires older-adult source anatomy; normal ageing must be kept separate from pathology.",
+   "source_requirement": "No open age-specific (\u226565 y) whole-body anatomical phantom found.",
+   "redistribution": null,
    "structures": 0,
    "systems": {}
   }

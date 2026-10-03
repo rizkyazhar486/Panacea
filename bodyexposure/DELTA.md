@@ -1,6 +1,6 @@
 # Delta: current implementation vs. Body Exposure master directive
 
-Status as of master v007 (2026-10-03).
+Status as of master v008 (2026-10-03).
 
 ## Body matrix
 
@@ -8,10 +8,11 @@ Status as of master v007 (2026-10-03).
 |---|---|---|
 | Adult male | **source_backed** | 2,610 structures, all systems, Z-Anatomy/BodyParts3D |
 | Adult female | **source_backed_partial** | 848 structures (+ spinal cord C1–S4, mammary gland architecture), HuBMAP VH_Female: organs, female pelvis, uterus/adnexa, heart, airway, kidneys, eyes, knees, brain. No full skeleton, musculature or peripheral nerves |
-| Pregnant | placeholder | needs gestation-staged maternal + fetal source data |
-| Fetus | placeholder | needs fetal anatomy by gestational week |
-| Neonate / infant / toddler / child / adolescent | placeholder | needs paediatric source anatomy; adult scaling is prohibited |
-| Older adult | placeholder | needs older-adult source anatomy |
+| Pregnant | placeholder | ICRP pregnant-female mesh phantoms (fetal ages 8–38 wk) are in public consultation; data not released |
+| Fetus | placeholder | comes with the ICRP pregnant-female phantoms (not released) |
+| Neonate / infant / child (5, 10 y) / adolescent | **source_backed** (local) | ICRP Publication 156 CT-based phantoms, male + female (10 bodies, 102–140 structures each). Not shipped: ICRP redistribution terms unstated |
+| Toddler | placeholder | no open 2–3 y source; ICRP covers 0/1/5/10/15 y and interpolation would be invented anatomy |
+| Older adult | placeholder | no open age-specific (65+) whole-body phantom found |
 
 ## Systems (adult male)
 
@@ -37,3 +38,19 @@ Status as of master v007 (2026-10-03).
 1. Link the canonical page from the existing 3D Body explorer (`BodyExplorer.tsx`; needs the owner's uncommitted changes there to land first).
 2. Use Z-Anatomy label leader lines as source-backed landmark anchors (requires evaluating their hook modifiers and validating against bone surfaces).
 3. Source acquisition for paediatric, pregnancy and fetal bodies. HuBMAP ships a placenta (v1.2) but no gravid uterus or fetus, so a pregnant body is still blocked on source data.
+
+## SOP breadth gate (target-lock SOP §10)
+
+| Canonical body | Structural presence | Source |
+|---|---|---|
+| Adult male | yes | Z-Anatomy / BodyParts3D |
+| Adult female | yes (partial systems) | HuBMAP VH_Female |
+| Neonate | yes (M + F) | ICRP 156 |
+| Infant | yes (M + F) | ICRP 156 |
+| Child | yes (5 y, 10 y; M + F) | ICRP 156 |
+| Adolescent | yes (M + F) | ICRP 156 |
+| Pregnant | **blocked** | data not released |
+| Fetus | **blocked** | data not released |
+| Older adult | **blocked** | no open source found |
+
+Gate status: 6 / 9. The three blocked classes need source data, not modelling effort.

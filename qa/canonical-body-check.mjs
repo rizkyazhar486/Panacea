@@ -12,7 +12,7 @@ try {
   for (const [width, height] of [[390, 844], [1440, 900]]) {
     for (const theme of ['light', 'dark']) {
       await page.setViewportSize({ width, height })
-      await page.goto(URL)
+      await page.goto(URL, { timeout: 180000 })  // server dev Vite dingin bisa lambat
       await page.evaluate((t) => document.documentElement.classList.toggle('dark', t === 'dark'), theme)
       const stats = page.getByText(/structures · \d+k triangles/)
       await stats.waitFor({ timeout: 60000 })
