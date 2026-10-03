@@ -5,6 +5,7 @@ import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { parseNumberField, sofaScore, type CvLevel } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SOFA Score (Sequential Organ Failure Assessment) — Vincent, J.L., et al.
@@ -14,43 +15,6 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 // dysfunction over time. Pure checklist/threshold scoring, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function respPts(pf: number, supported: boolean): number {
-  if (pf < 100 && supported) return 4
-  if (pf < 200 && supported) return 3
-  if (pf < 300) return 2
-  if (pf < 400) return 1
-  return 0
-}
-function coagPts(plt: number): number {
-  if (plt < 20) return 4
-  if (plt < 50) return 3
-  if (plt < 100) return 2
-  if (plt < 150) return 1
-  return 0
-}
-function liverPts(bili: number): number {
-  if (bili >= 12.0) return 4
-  if (bili >= 6.0) return 3
-  if (bili >= 2.0) return 2
-  if (bili >= 1.2) return 1
-  return 0
-}
-function renalPts(creat: number): number {
-  if (creat >= 5.0) return 4
-  if (creat >= 3.5) return 3
-  if (creat >= 2.0) return 2
-  if (creat >= 1.2) return 1
-  return 0
-}
-function cnsPts(gcs: number): number {
-  if (gcs < 6) return 4
-  if (gcs < 10) return 3
-  if (gcs < 13) return 2
-  if (gcs < 15) return 1
-  return 0
-}
-
-type CvLevel = 0 | 1 | 2 | 3 | 4
 const CV_OPTS: { label: string; pts: CvLevel }[] = [
   { label: 'MAP ≥ 70 mmHg, no vasopressors', pts: 0 },
   { label: 'MAP < 70 mmHg, no vasopressors', pts: 1 },
@@ -58,14 +22,6 @@ const CV_OPTS: { label: string; pts: CvLevel }[] = [
   { label: 'Dopamine >5, or epinephrine ≤0.1, or norepinephrine ≤0.1 mcg/kg/min', pts: 3 },
   { label: 'Dopamine >15, or epinephrine >0.1, or norepinephrine >0.1 mcg/kg/min', pts: 4 },
 ]
-
-function mortalityBand(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; mortality: string } {
-  if (score <= 1) return { label: 'Minimal dysfunction', tone: 'brand', mortality: '<10%' }
-  if (score <= 5) return { label: 'Mild-moderate dysfunction', tone: 'low', mortality: '~10-20%' }
-  if (score <= 9) return { label: 'Moderate-severe dysfunction', tone: 'critical', mortality: '~20-40%' }
-  if (score <= 12) return { label: 'Severe dysfunction', tone: 'critical', mortality: '~50-60%' }
-  return { label: 'Extreme dysfunction', tone: 'critical', mortality: '>80%' }
-}
 
 export function SofaScore() {
   // Empat nilai lab dan satu skala neurologis dimulai kosong. Dengan nilai
@@ -77,35 +33,26 @@ export function SofaScore() {
   // Tingkat kardiovaskular 0 ("tanpa hipotensi") dan "tidak disokong
   // ventilasi" TETAP: keduanya penilaian yang memang dijawab, bukan kolom
   // yang dibiarkan kosong.
-  const [pf, setPf] = useState(0)
+  const [pf, setPf] = useState('')
   const [supported, setSupported] = useState(false)
-  const [plt, setPlt] = useState(0)
-  const [bili, setBili] = useState(0)
+  const [plt, setPlt] = useState('')
+  const [bili, setBili] = useState('')
   const [cv, setCv] = useState<CvLevel>(0)
-  const [gcs, setGcs] = useState(0)
-  const [creat, setCreat] = useState(0)
+  const [gcs, setGcs] = useState('')
+  const [creat, setCreat] = useState('')
 
-  const belum: string[] = []
-  if (!(pf > 0)) belum.push('PaO₂/FiO₂')
-  if (!(plt > 0)) belum.push('platelets')
-  if (!(bili > 0)) belum.push('bilirubin')
-  if (!(gcs > 0)) belum.push('Glasgow Coma Scale')
-  if (!(creat > 0)) belum.push('creatinine')
-  const lengkap = belum.length === 0
-
-  const resp = respPts(pf, supported)
-  const coag = coagPts(plt)
-  const liver = liverPts(bili)
-  const renal = renalPts(creat)
-  const cns = cnsPts(gcs)
-  const total = resp + coag + liver + renal + cns + cv
-  const band = lengkap ? mortalityBand(total) : null
+  const res = sofaScore({ pf: parseNumberField(pf), plt: parseNumberField(plt), bili: parseNumberField(bili), creat: parseNumberField(creat), gcs: parseNumberField(gcs), supported, cv })
+  const belum = res.missing
+  const lengkap = res.total !== null
+  const { resp, coag, liver, renal, cns } = res.points
+  const total = res.total
+  const band = res.band
 
   const rows = [
     { name: 'Respiration (PaO₂/FiO₂)', pts: resp },
     { name: 'Coagulation (platelets)', pts: coag },
     { name: 'Liver (bilirubin)', pts: liver },
-    { name: 'Cardiovascular (MAP/vasopressors)', pts: cv },
+    { name: 'Cardiovascular (MAP/vasopressors)', pts: res.points.cv },
     { name: 'CNS (Glasgow Coma Scale)', pts: cns },
     { name: 'Renal (creatinine)', pts: renal },
   ]
@@ -118,19 +65,19 @@ export function SofaScore() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A full ICU severity score across 6 organ systems — different from the bedside qSOFA screening tool. Used for prognosis and tracking organ dysfunction over time, not as an initial screen.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="PaO₂/FiO₂ ratio">
-            <input className={inputClass} type="number" min={0} value={pf || ''} onChange={(e) => setPf(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={pf} onChange={(e) => setPf(e.target.value)} />
           </Field>
           <Field label="Platelets (×10³/µL)">
-            <input className={inputClass} type="number" min={0} value={plt || ''} onChange={(e) => setPlt(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={plt} onChange={(e) => setPlt(e.target.value)} />
           </Field>
           <Field label="Bilirubin (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={bili || ''} onChange={(e) => setBili(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={bili} onChange={(e) => setBili(e.target.value)} />
           </Field>
           <Field label="Creatinine (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={creat || ''} onChange={(e) => setCreat(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={creat} onChange={(e) => setCreat(e.target.value)} />
           </Field>
           <Field label="Glasgow Coma Scale">
-            <input className={inputClass} type="number" min={3} max={15} value={gcs || ''} onChange={(e) => setGcs(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={3} max={15} value={gcs} onChange={(e) => setGcs(e.target.value)} />
           </Field>
         </div>
         <label className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
@@ -154,7 +101,7 @@ export function SofaScore() {
           {rows.map((r) => (
             <div key={r.name} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <div className="text-sm font-bold text-ink dark:text-ink">{r.name}</div>
-              <div className="text-lg font-black text-brand-dark">{r.pts}</div>
+              <div className="text-lg font-black text-brand-dark">{r.pts ?? '—'}</div>
             </div>
           ))}
         </div>
@@ -162,7 +109,7 @@ export function SofaScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total SOFA Score</div>
-        {lengkap && band !== null ? (
+        {lengkap && band !== null && total !== null ? (
           <>
             <div className="mt-2 flex items-center gap-3">
               <span className="text-3xl font-black text-brand-dark">{total} / 24</span>
@@ -173,7 +120,8 @@ export function SofaScore() {
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No score yet. Still needed: {belum.join(', ')}.
+            No score yet.{belum.length > 0 && <> Still needed: {belum.join(', ')}.</>}
+            {res.invalid.map((m) => <span key={m} role="alert" className="block font-semibold text-amber-700 dark:text-amber-300">{m}</span>)}
             {' '}The cardiovascular level and the ventilation question are already answered. The five measurements are
             not — and with their old starting values every subscore was zero, so this page opened at SOFA 0 with an
             estimated mortality under 10% and wrote that to a trend.
@@ -181,7 +129,7 @@ export function SofaScore() {
         )}
       </Card>
 
-      {lengkap && (
+      {lengkap && total !== null && (
       <ScoreTrend
         storageKey="pmd_sofa_trend_v1"
         scoreName="SOFA"
