@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, fluidBalance, hollidaySegar, interpretAbg, ivDrip, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, meanArterialPressure, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -821,12 +821,7 @@ function NaegeleCalc() {
 function MapCalc() {
   const [sys, setSys] = useState(120)
   const [dia, setDia] = useState(80)
-  const map = (sys + 2 * dia) / 3
-  const interp = map < 60
-    ? { l: 'Very low', tone: 'critical' as const, note: 'Organ perfusion at risk of being impaired — evaluate for shock/hypoperfusion.' }
-    : map <= 100
-    ? { l: 'Normal', tone: 'normal' as const, note: 'Generally sufficient for organ perfusion (target MAP ≥65 in septic shock).' }
-    : { l: 'High', tone: 'low' as const, note: 'Evaluate for hypertension / hypertensive crisis if very high.' }
+  const map = meanArterialPressure(sys, dia)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Mean Arterial Pressure (MAP)" subtitle="Average organ perfusion pressure" />
@@ -834,13 +829,17 @@ function MapCalc() {
         <Field label="Systolic (mmHg)"><input className={inputClass} type="number" value={sys} onChange={(e) => setSys(+e.target.value)} /></Field>
         <Field label="Diastolic (mmHg)"><input className={inputClass} type="number" value={dia} onChange={(e) => setDia(+e.target.value)} /></Field>
       </div>
+      {map.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{map.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mmHg</span></div>
-          <Badge tone={interp.tone}>{interp.l}</Badge>
+          <div className="text-2xl font-black text-ink">{map.data.map.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mmHg</span></div>
+          <Badge tone={map.data.tone}>{map.data.label}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{map.data.note}</p>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{map.reason}. No MAP is shown until both values are valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">MAP = (Systolic + 2×Diastolic) / 3.</p>
     </Card>
   )
@@ -1125,8 +1124,7 @@ function NaCorrectionCalc() {
 function BrocaCalc() {
   const [height, setHeight] = useState(165)
   const [sex, setSex] = useState<'M' | 'F'>('M')
-  const base = height - 100
-  const ibw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
+  const ibw = idealBodyWeight(height, sex, 'broca')
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Broca index, modified by sex" />
@@ -1134,10 +1132,14 @@ function BrocaCalc() {
         <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
+      {ibw.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
+        <div className="text-2xl font-black text-ink">{ibw.data.ibwKg.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{ibw.reason}. No ideal body weight is shown until the height is valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approach — when higher clinical precision is needed (e.g. drug dosing calculations), consider the Devine/Robinson formula.</Prosa>
     </Card>
   )
@@ -2323,19 +2325,7 @@ function BrocaLorentzCalorieCalc() {
   const [activity, setActivity] = useState<'ringan' | 'sedang' | 'berat'>('sedang') // 'light' | 'moderate' | 'heavy'
   const [formula, setFormula] = useState<'broca' | 'lorentz'>('lorentz')
 
-  const base = height - 100
-  const brocaIbw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
-  // Lorentz formula — adjusts Broca for height, more accurate for taller/shorter builds
-  const lorentzIbw = sex === 'M'
-    ? height - 100 - (height - 150) / 4
-    : height - 100 - (height - 150) / 2.5
-  const ibw = formula === 'broca' ? brocaIbw : lorentzIbw
-
-  // 25 kcal/kg basal, scaled by activity factor — a simple, widely-taught
-  // Indonesian clinical-nutrition shortcut (RS/Puskesmas gizi klinik) rather
-  // than the more granular Harris-Benedict/Mifflin equations.
-  const activityFactor = { ringan: 30, sedang: 35, berat: 40 }[activity]
-  const totalKcal = ibw * activityFactor
+  const energy = dailyCalories(height, sex, formula, activity)
 
   return (
     <Card>
@@ -2348,16 +2338,20 @@ function BrocaLorentzCalorieCalc() {
       <Field label="Activity Level">
         <SegButtons value={activity} onChange={setActivity} options={[{ v: 'ringan', l: 'Light (30 kcal/kg)' }, { v: 'sedang', l: 'Moderate (35 kcal/kg)' }, { v: 'berat', l: 'Heavy (40 kcal/kg)' }]} />
       </Field>
+      {energy.ok ? (
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{ibw.toFixed(1)} kg</div>
+          <div className="text-xl font-black text-ink">{energy.data.ibwKg.toFixed(1)} kg</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kcal/day</div>
+          <div className="text-xl font-black text-ink">{energy.data.kcalPerDay.toFixed(0)} kcal/day</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{energy.reason}. No weight or calorie estimate is shown until the height is valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights and is generally considered more accurate than plain Broca. Calories = ideal body weight × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic states.</Prosa>
     </Card>
   )
