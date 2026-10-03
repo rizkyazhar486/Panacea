@@ -71,3 +71,10 @@ export function formatSmokeFailureLog({ failure, failureContext, pageErrors, pro
   }
   return `BODY3D_SMOKE_FAILURE ${JSON.stringify(report)}`
 }
+
+// Satu baris log untuk kegagalan skrip canvas-artifact. Artefak CI tidak selalu bisa diunduh, sedangkan log job selalu bisa
+// dibaca; bukti yang sama (sudah dipotong oleh buildFailureEvidence) dicetak ke stderr. Hanya diagnostik; tidak mengubah lulus/gagal.
+export function formatCanvasArtifactFailureLog(evidence) {
+  if (!evidence || typeof evidence !== 'object' || evidence.schema !== 'body3d-failure-evidence/v1') return ''
+  return `BODY3D_CANVAS_ARTIFACT_FAILURE ${JSON.stringify(evidence)}`
+}
