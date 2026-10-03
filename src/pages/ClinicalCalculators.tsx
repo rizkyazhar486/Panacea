@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, validateBallardInputs, validateDenverAge } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -290,12 +290,7 @@ function whzFromHeight(heightCm: number, sex: 'M' | 'F'): { m: number; sd: numbe
   return { m, sd }
 }
 
-function WhoGrowthCalc() {
-  const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [ageMo, setAgeMo] = useState(12)
-  const [weight, setWeight] = useState(9.6)
-  const [height, setHeight] = useState(75.7)
-
+function WhoGrowthResults({ sex, ageMonths: ageMo, weightKg: weight, lengthCm: height }: { sex: 'M' | 'F'; ageMonths: number; weightKg: number; lengthCm: number }) {
   const wM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_M[sex])
   const wSD = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_SD[sex])
   const hM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_HEIGHT_M[sex])
@@ -323,15 +318,7 @@ function WhoGrowthCalc() {
   }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesia's Child Anthropometry Standard (Permenkes 2/2020)" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
-        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Age (WAZ)</div>
@@ -376,6 +363,33 @@ function WhoGrowthCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for clinical decisions, compare against the official WHO/KMS growth chart or the MCH handbook per the Child Anthropometry Standard (Permenkes RI No. 2/2020).</Prosa>
+    </>
+  )
+}
+
+function WhoGrowthCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (BMI Infinity, z-score ekstrem).
+  const [ageText, setAgeText] = useState('12')
+  const [weightText, setWeightText] = useState('9.6')
+  const [heightText, setHeightText] = useState('75.7')
+
+  const inputs = validateWhoGrowthInputs(parseNumberField(ageText), parseNumberField(weightText), parseNumberField(heightText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesia's Child Anthropometry Standard (Permenkes 2/2020)" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weightText} onChange={(e) => setWeightText(e.target.value)} /></Field>
+        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={heightText} onChange={(e) => setHeightText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <WhoGrowthResults {...inputs.data} sex={sex} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No z-scores are shown until age, weight and length are valid.</p>
+      )}
     </Card>
   )
 }
@@ -391,11 +405,7 @@ const NEONATE_DAYS = [0, 3, 5, 7, 10, 14, 21, 30]
 const NEONATE_PCT_OF_BW = [100, 93, 91, 95, 100, 105, 112, 120]
 const NEONATE_PCT_SD = [0, 3, 3.5, 3, 2.5, 3, 4, 5]
 
-function WhoNeonateCalc() {
-  const [birthWeightG, setBirthWeightG] = useState(3200)
-  const [days, setDays] = useState(5)
-  const [currentWeightG, setCurrentWeightG] = useState(2950)
-
+function WhoNeonateResults({ birthWeightG, days, currentWeightG }: { birthWeightG: number; days: number; currentWeightG: number }) {
   const expectedPct = interp(days, NEONATE_DAYS, NEONATE_PCT_OF_BW)
   const sdPct = interp(days, NEONATE_DAYS, NEONATE_PCT_SD)
   const expectedG = (birthWeightG * expectedPct) / 100
@@ -409,14 +419,7 @@ function WhoNeonateCalc() {
   const chartData = NEONATE_DAYS.map((d, i) => ({ d, pctMedian: NEONATE_PCT_OF_BW[i] }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & return to birth weight" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
-        <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
-        <Field label="Current Weight (g)"><input className={inputClass} type="number" value={currentWeightG} onChange={(e) => setCurrentWeightG(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{lossFromBirth >= 0 ? lossFromBirth.toFixed(1) : '0'}%</div>
@@ -454,6 +457,31 @@ function WhoNeonateCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">A physiologic loss of up to about 7-10% of birth weight by day 3-5 is normal (extravascular fluid loss), and birth weight is usually regained by around day 10-14. This estimate is simplified from standard reference points — compare against the official neonate chart (WHO/Fenton) for borderline cases.</Prosa>
+    </>
+  )
+}
+
+function WhoNeonateCalc() {
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (berat lahir 0 → "NaN SD").
+  const [birthText, setBirthText] = useState('3200')
+  const [daysText, setDaysText] = useState('5')
+  const [currentText, setCurrentText] = useState('2950')
+
+  const inputs = validateNeonateInputs(parseNumberField(birthText), parseNumberField(daysText), parseNumberField(currentText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & return to birth weight" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthText} onChange={(e) => setBirthText(e.target.value)} /></Field>
+        <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={daysText} onChange={(e) => setDaysText(e.target.value)} /></Field>
+        <Field label="Current Weight (g)"><input className={inputClass} type="number" value={currentText} onChange={(e) => setCurrentText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <WhoNeonateResults {...inputs.data} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No weight trajectory is shown until birth weight, age and current weight are valid.</p>
+      )}
     </Card>
   )
 }
@@ -479,12 +507,7 @@ function cdcBmiClass(bmi: number, ageYr: number, sex: 'M' | 'F'): { l: string; t
   return { l: 'Obese (≥P95)', tone: 'critical' }
 }
 
-function CdcAnthropometryCalc() {
-  const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [ageYr, setAgeYr] = useState(10)
-  const [weight, setWeight] = useState(32)
-  const [height, setHeight] = useState(138)
-
+function CdcAnthropometryResults({ sex, ageYears: ageYr, weightKg: weight, heightCm: height }: { sex: 'M' | 'F'; ageYears: number; weightKg: number; heightCm: number }) {
   const bmi = weight / (height / 100) ** 2
   const cls = cdcBmiClass(bmi, ageYr, sex)
   const p85 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P85[sex])
@@ -498,15 +521,7 @@ function CdcAnthropometryCalc() {
   }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
-        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div className="text-2xl font-black text-ink">{bmi.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg/m²</span></div>
@@ -530,6 +545,33 @@ function CdcAnthropometryCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the full pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</Prosa>
+    </>
+  )
+}
+
+function CdcAnthropometryCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (tinggi 0 → BMI Infinity).
+  const [ageText, setAgeText] = useState('10')
+  const [weightText, setWeightText] = useState('32')
+  const [heightText, setHeightText] = useState('138')
+
+  const inputs = validateCdcInputs(parseNumberField(ageText), parseNumberField(weightText), parseNumberField(heightText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weightText} onChange={(e) => setWeightText(e.target.value)} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" step="0.1" value={heightText} onChange={(e) => setHeightText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <CdcAnthropometryResults {...inputs.data} sex={sex} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No BMI classification is shown until age, weight and height are valid.</p>
+      )}
     </Card>
   )
 }
