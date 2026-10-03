@@ -53,3 +53,5 @@ export { hydrationTarget, HYDRATION_RANGES, INTENSITY_ML_PER_HOUR, ML_PER_KG, HO
 export type { HydrationInput, HydrationResult, HydrationIntensity, HydrationRow } from './engine/hydrationTarget'
 export { sleepDebt, sanitizeNights, validateNeed, validateHours, SLEEP_RANGES, MAX_NIGHTS, DEBT_GOOD_MAX_H, DEBT_MILD_MAX_H } from './engine/sleepDebt'
 export type { Night, SleepDebtResult, SleepDebtTone, SleepInputResult } from './engine/sleepDebt'
+export { serumOsmolality, osmBand, gapBand, OSM_RANGES } from './engine/serumOsmolality'
+export type { OsmInput, OsmResult, OsmTone } from './engine/serumOsmolality'
