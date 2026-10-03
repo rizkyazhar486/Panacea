@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, sirirajStrokeScore, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -944,15 +944,11 @@ function SirirajCalc() {
   const [conscious, setConscious] = useState(0)   // 0 alert, 1 drowsy/stupor, 2 semicoma/coma
   const [vomiting, setVomiting] = useState(0)
   const [headache, setHeadache] = useState(0)     // within 2 hours
-  const [dbp, setDbp] = useState(90)
+  // Teks mentah supaya TD diastolik yang belum diisi tidak terbaca 0 (skor bergeser −9 poin, condong "iskemik").
+  const [dbp, setDbp] = useState('90')
   const [atheroma, setAtheroma] = useState(0)     // DM, angina, claudication
 
-  const score = 2.5 * conscious + 2 * vomiting + 2 * headache + 0.1 * dbp - 3 * atheroma - 12
-  const rounded = Math.round(score * 100) / 100
-  const verdict =
-    score > 1 ? { l: 'Suggests HAEMORRHAGIC stroke', tone: 'critical' as const }
-    : score < -1 ? { l: 'Suggests ISCHAEMIC stroke', tone: 'low' as const }
-    : { l: 'Indeterminate — imaging required', tone: 'high' as const }
+  const siriraj = sirirajStrokeScore({ consciousness: conscious, vomiting, headache, diastolicMmHg: parseNumberField(dbp), atheroma })
 
   return (
     <Card>
@@ -976,7 +972,7 @@ function SirirajCalc() {
         </div>
         <Field label="Diastolic blood pressure (mmHg)">
           <input className={inputClass} type="number" value={dbp}
-            onChange={(e) => setDbp(Number(e.target.value) || 0)} />
+            onChange={(e) => setDbp(e.target.value)} />
         </Field>
         <div>
           <div className="text-[12px] font-bold text-ink dark:text-ink">Atheroma markers</div>
@@ -986,16 +982,20 @@ function SirirajCalc() {
         </div>
       </div>
 
+      {siriraj.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
-          <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{siriraj.data.rounded > 0 ? '+' : ''}{siriraj.data.rounded}</span>
         </div>
-        <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
+        <div className="mt-1"><Badge tone={siriraj.data.tone}>{siriraj.data.label}</Badge></div>
         <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-          (2.5 × {conscious}) + (2 × {vomiting}) + (2 × {headache}) + (0.1 × {dbp}) − (3 × {atheroma}) − 12
+          (2.5 × {conscious}) + (2 × {vomiting}) + (2 × {headache}) + (0.1 × {siriraj.data.diastolicMmHg}) − (3 × {atheroma}) − 12
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{siriraj.reason}. No Siriraj score is shown until the diastolic pressure is valid.</p>
+      )}
 
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
         <li><b>This does not replace a CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>

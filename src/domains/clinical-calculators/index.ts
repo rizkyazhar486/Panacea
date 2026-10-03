@@ -39,3 +39,5 @@ export {
   WHO_AGE_MONTHS, WHO_WEIGHT_KG, WHO_LENGTH_CM, NEONATE_AGE_DAYS, NEONATE_WEIGHT_G, CDC_AGE_YEARS, CDC_WEIGHT_KG, CDC_HEIGHT_CM,
 } from './engine/growthInputs'
 export type { GrowthInputsResult } from './engine/growthInputs'
+export { sirirajStrokeScore } from './engine/sirirajStrokeScore'
+export type { SirirajResult, SirirajInput, SirirajTone } from './engine/sirirajStrokeScore'
