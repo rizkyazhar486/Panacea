@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { cronAuthorized } from './cronAuth.js'
 import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
 import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
@@ -1587,7 +1588,7 @@ app.post('/api/ai/operator', requireAuth, (req, res) => {
 // secret key (e.g. a free Render Cron Job). No login needed; protected by token.
 app.get('/api/cron/daily-briefing', async (req, res) => {
   const secret = process.env.CRON_SECRET
-  if (!secret || req.query.key !== secret) return res.status(403).json({ error: 'forbidden' })
+  if (!cronAuthorized(req, secret)) return res.status(403).json({ error: 'forbidden' })
   if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   try {
     const { text, pending } = await generateOperatorBriefing()
