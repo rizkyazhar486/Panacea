@@ -232,7 +232,7 @@ export function CanonicalBody() {
 
   // ── muat GLB bertahap: tubuh/LOD baru → kosongkan; lalu hanya sistem yang aktif dimuat ──
   // (muatan awal = sistem default ≤ 80.000 segitiga; sistem lain dimuat saat dinyalakan)
-  const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0 })
+  const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0, inflight: 0 })
   const pendingSelect = useRef<string | null>(null)
   useEffect(() => {
     const s = sceneRef.current
@@ -241,18 +241,21 @@ export function CanonicalBody() {
     const key = `${bodyId}|${lod}`
     const reset = L.key !== key
     if (reset) {
-      L.key = key; L.gen += 1; L.loaded = new Set(); L.tris = 0
-      setPicked(null); selectedRef.current = null
+      L.key = key; L.gen += 1; L.loaded = new Set(); L.tris = 0; L.inflight = 0
+      setPicked(null); selectedRef.current = null; pendingSelect.current = null; setError('')
       s.root.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
       s.root.clear(); s.groups.clear(); s.byId.clear()
     }
     const todo = systems.filter((sys) => enabled.has(sys) && !L.loaded.has(sys))
-    if (!todo.length) return
+    if (!todo.length) {
+      if (reset) { setLoading(false); setStats({ structures: 0, tris: 0, ms: 0 }); bodyBox.current = null }  // semua sistem mati
+      return
+    }
     todo.forEach((sys) => L.loaded.add(sys))
     const gen = L.gen
-    setLoading(true)
+    L.inflight += 1; setLoading(true)
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     const tag = fileTag(bodyId)
     const t0 = performance.now()
@@ -263,6 +266,7 @@ export function CanonicalBody() {
       // Komponen sudah dilepas: scene-nya mati dan tidak ada yang akan membuang muatan ini, jadi buang di sini.
       if (!s.penjaga.hidup) { for (const r of results) if (r.status === 'fulfilled') s.penjaga.terima(r.value.scene); return }
       if (gen !== loadState.current.gen) return  // tubuh/LOD sudah berganti
+      L.inflight -= 1
       for (const r of results) {
         if (r.status !== 'fulfilled') continue
         const { sys, scene } = r.value
@@ -282,14 +286,16 @@ export function CanonicalBody() {
       const failed = results.filter((r) => r.status === 'rejected')
       results.forEach((r, i) => { if (r.status === 'rejected') L.loaded.delete(todo[i]) })
       if (failed.length) setError(`${failed.length} system file(s) could not be loaded.`)
+      else if (!L.inflight) setError('')
       setStats({ structures: s.byId.size, tris: Math.round(L.tris), ms: Math.round(performance.now() - t0) })
-      if (reset) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
+      if (reset || !bodyBox.current) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
       applyVisibility()
       applyDisperse(disperse)
-      setLoading(false)
+      if (!L.inflight) setLoading(false)  // overlay hilang hanya setelah semua pemuatan selesai
       const want = pendingSelect.current
       const o = want ? s.byId.get(want) : undefined
       if (o) { pendingSelect.current = null; select(o); focusOn(o) }
+      else if (want && failed.length) pendingSelect.current = null
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bodyId, lod, systems, enabled])
