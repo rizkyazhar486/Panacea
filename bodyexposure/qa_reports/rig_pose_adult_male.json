@@ -1,0 +1,17 @@
+{
+ "pose_deg": {
+  "THIGH.R": 90,
+  "SHIN.R": 90,
+  "UPPER_ARM.L": 90,
+  "FOREARM.L": 100,
+  "SHIN.L": 170,
+  "FOOT.R": 30,
+  "HAND.R": 60
+ },
+ "left_knee_rest_deg": 2.8,
+ "left_knee_after_170_request_deg": 132.8,
+ "rom_clamped": true,
+ "right_knee_anterior_y_m": -0.4,
+ "meshes_far_from_bone": [],
+ "ok": true
+}

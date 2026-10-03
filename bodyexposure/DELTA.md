@@ -78,3 +78,12 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - This closes the adult female's axial-skeleton and upper-GI gap with a complete, internally consistent body, not by grafting anatomy from another individual.
 - Gross-anatomy gate: both pass. App: variant selector on the adult tabs; the browser check covers the ICRP female (163 cm, 93 structures, ribs searchable).
 - Builder fixes found on the adult data: drop "Air remaining", classify "Teeth" and "Cranium cortical surrounding frontal sinus", readable ICRP airway names.
+
+## P5: adult male skeletal rig (2026-10-04)
+
+- `pipeline/build_rig.py` builds `bodies/PANACEA_RIG_ADULT_MALE.blend` (local, not committed: .blend). The master and the web export pipeline are untouched.
+- **Joint centres from source geometry, ISB definitions (Wu et al. 2002, 2005):** hip and shoulder by sphere fit on the femoral and humeral heads (femoral radius 23.8 mm, RMS 1.2 mm); knee and elbow at the epicondyle midpoint; ankle at the malleolus midpoint; wrist at the styloid-tip midpoint; spine at intervertebral disc centroids. Values and methods are in `manifest/rig_adult_male.json`.
+- **39 bones; all 645 skeletal and joint meshes rigidly bound.** Rule-based binding; 39 nearest-segment assignments are listed for review. 14 multi-segment ligaments are flagged: rigid binding is only an approximation for them.
+- **ROM limits:** AAOS normal values (Greene & Heckman 1994) as local rotation limits. The sign of each axis is set numerically on the rig.
+- **QA** (`pipeline/check_rig_pose.py` → `qa_reports/rig_pose_adult_male.json`): a test pose keeps every mesh with its bone; a 170° knee request is clamped to 132.8° (135° AAOS limit minus the rest angle); hip flexion moves the knee anteriorly. Left/right segment lengths match within 0.01 mm.
+- Not yet: soft-tissue skinning (muscle and skin deformation), scapulothoracic and atlantoaxial joints as separate bones, rigs for the other bodies, and posing in the app.
