@@ -271,8 +271,9 @@ risks:
     severity: medium
     state: mitigated_in_part
     description: >-
-      src/pages/ClinicalCalculators.tsx reads numeric fields with `+e.target.value` and 48 handlers have no finite or
-      range check, across roughly 23 numeric calculators. An empty field becomes 0 and a negative or out-of-range
+      src/pages/ClinicalCalculators.tsx reads numeric fields with `+e.target.value` and its handlers had no finite or
+      range check (48 counted on first review; 59 `+e.target.value` reads across 23 calculators when recounted on
+      2026-10-03, which includes the nine since fixed). An empty field becomes 0 and a negative or out-of-range
       value is accepted, so a calculator can print Infinity, NaN or a plausible-looking number with a clinical stage
       label (reproduced on CKD-EPI: empty creatinine gave Infinity labelled G1 normal, negative creatinine gave NaN
       labelled G5 kidney failure). Outputs are decision-support displays, not orders, but a wrong stage is misleading.
@@ -288,7 +289,12 @@ risks:
       ivDrip/fluidBalance, scripts/uji/iv-drip-fluid-balance.mts). NaCorrectionCalc followed through
       correctedSodiumKatz/potassiumAssessment, scripts/uji/electrolyte-correction.mts, with the existing formulas and
       potassium severity thresholds moved unchanged and pinned at every boundary; an empty potassium field used to show
-      a Severe badge). Next: AbgCalc and the rest of the numeric calculators), moving each formula into src/domains with its own
+      a Severe badge). AbgCalc followed through interpretAbg, scripts/uji/blood-gas-interpretation.mts, with the stepwise logic and its
+      text moved unchanged and the delta-ratio and Winter thresholds pinned at their boundaries; pH/PaCO2/HCO3
+      consistency checking is deliberately not added because it would be a new clinical feature). Next: the rest of
+      the numeric calculators (14 calculators counted on 2026-10-03 still read +e.target.value without a domain function: WhoGrowth,
+      WhoNeonate, CdcAnthropometry, BallardSoap, Naegele, Map, Centor, Broca, MidParental, Fletcher, McDonald,
+      Paradise, Denver, BrocaLorentzCalorie), moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
       - src/lib/longevity.ts
@@ -304,3 +310,5 @@ risks:
       - scripts/uji/iv-drip-fluid-balance.mts
       - src/domains/clinical-calculators/engine/electrolyteCorrection.ts
       - scripts/uji/electrolyte-correction.mts
+      - src/domains/clinical-calculators/engine/bloodGas.ts
+      - scripts/uji/blood-gas-interpretation.mts

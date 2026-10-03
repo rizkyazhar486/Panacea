@@ -13,3 +13,5 @@ export {
   correctedSodiumKatz, potassiumAssessment, SODIUM_MEQ_L, GLUCOSE_MG_DL, POTASSIUM_MEQ_L,
 } from './engine/electrolyteCorrection'
 export type { SodiumCorrectionResult, PotassiumResult, PotassiumTone } from './engine/electrolyteCorrection'
+export { interpretAbg, ABG_RANGES } from './engine/bloodGas'
+export type { AbgInput, AbgResult } from './engine/bloodGas'

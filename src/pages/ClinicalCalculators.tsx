@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, fluidBalance, hollidaySegar, ivDrip, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, fluidBalance, hollidaySegar, interpretAbg, ivDrip, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1816,40 +1816,7 @@ function AbgCalc() {
   const [cl, setCl] = useState(104)
   const [albumin, setAlbumin] = useState(4.0)
 
-  const acidemia = ph < 7.35
-  const alkalemia = ph > 7.45
-  const phNormal = !acidemia && !alkalemia
-
-  let primary = 'Cannot be determined'
-  if (acidemia) primary = hco3 < 22 ? 'Metabolic Acidosis' : paco2 > 45 ? 'Respiratory Acidosis' : 'Mixed/unclear acidemia'
-  else if (alkalemia) primary = hco3 > 26 ? 'Metabolic Alkalosis' : paco2 < 35 ? 'Respiratory Alkalosis' : 'Mixed/unclear alkalemia'
-  else primary = (paco2 > 45 || paco2 < 35 || hco3 > 26 || hco3 < 22) ? 'Normal pH but abnormal PaCO2/HCO3 — possible mixed disorder (full compensation)' : 'Normal'
-
-  // Winter's formula for expected PaCO2 in metabolic acidosis
-  const winterExpected = 1.5 * hco3 + 8
-  const winterLo = winterExpected - 2
-  const winterHi = winterExpected + 2
-
-  let compensationNote = ''
-  if (primary === 'Metabolic Acidosis') {
-    if (paco2 < winterLo) compensationNote = `PaCO2 (${paco2}) is lower than the Winter's formula estimate (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — suspect concomitant respiratory alkalosis.`
-    else if (paco2 > winterHi) compensationNote = `PaCO2 (${paco2}) is higher than the Winter's formula estimate (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — suspect concomitant respiratory acidosis.`
-    else compensationNote = `Respiratory compensation is appropriate (Winter's estimate ${winterLo.toFixed(1)}-${winterHi.toFixed(1)}).`
-  }
-
-  const anionGap = na - (cl + hco3)
-  const correctedAG = anionGap + 2.5 * (4 - albumin) // correct for hypoalbuminemia
-  const agHigh = correctedAG > 12
-
-  let deltaRatioNote = ''
-  if (primary === 'Metabolic Acidosis' && agHigh) {
-    const deltaRatio = (correctedAG - 12) / (24 - hco3)
-    deltaRatioNote = deltaRatio < 0.4
-      ? `Delta ratio ${deltaRatio.toFixed(2)} (<0.4) — suspect concomitant non-gap (hyperchloremic) acidosis.`
-      : deltaRatio <= 2
-      ? `Delta ratio ${deltaRatio.toFixed(2)} (0.4-2) — consistent with pure high-gap acidosis.`
-      : `Delta ratio ${deltaRatio.toFixed(2)} (>2) — suspect concomitant metabolic alkalosis or chronic respiratory acidosis.`
-  }
+  const abg = interpretAbg({ ph, paco2, hco3, na, cl, albumin })
 
   return (
     <Card>
@@ -1863,35 +1830,41 @@ function AbgCalc() {
         <Field label="Albumin (g/dL)"><input className={inputClass} type="number" step="0.1" value={albumin} onChange={(e) => setAlbumin(+e.target.value)} /></Field>
       </div>
 
+      {abg.ok ? (
+      <>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="text-[10px] font-bold uppercase text-neutral-500">Step 1 — pH Status</div>
-        <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Acidemia' : alkalemia ? 'Alkalemia' : 'Normal pH'}</Badge>
+        <Badge tone={abg.data.phStatus === 'Normal pH' ? 'normal' : 'critical'}>{abg.data.phStatus}</Badge>
       </div>
       <div className="mt-2 rounded-xl bg-neutral-50 p-3">
         <div className="text-[10px] font-bold uppercase text-neutral-500">Step 2 — Primary Disorder</div>
-        <div className="mt-1 text-sm font-black text-ink">{primary}</div>
+        <div className="mt-1 text-sm font-black text-ink">{abg.data.primary}</div>
       </div>
-      {compensationNote && (
+      {abg.data.compensationNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
           <div className="text-[10px] font-bold uppercase text-neutral-500">Step 3 — Compensation Adequacy (Winter's Formula)</div>
-          <p className="mt-1 text-[12px] font-semibold text-ink">{compensationNote}</p>
+          <p className="mt-1 text-[12px] font-semibold text-ink">{abg.data.compensationNote}</p>
         </div>
       )}
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
+          <div className="text-lg font-black text-ink">{abg.data.correctedAnionGap.toFixed(1)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
+          <Badge tone={abg.data.anionGapHigh ? 'critical' : 'normal'}>{abg.data.anionGapHigh ? 'High Gap' : 'Normal Gap'}</Badge>
           <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">AG Classification</div>
         </div>
       </div>
-      {deltaRatioNote && (
+      {abg.data.deltaRatioNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
           <div className="text-[10px] font-bold uppercase text-neutral-500">Step 4 — Delta Ratio (detects mixed disorders)</div>
-          <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
+          <p className="mt-1 text-[12px] font-semibold text-ink">{abg.data.deltaRatioNote}</p>
         </div>
+      )}
+      </>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{abg.reason}. No interpretation is shown until all six values are valid.</p>
       )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">High anion gap (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic anion gap: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always correlate with the overall clinical picture.</Prosa>
     </Card>
