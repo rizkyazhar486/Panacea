@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
 import { verifyEyeOptics } from './eye-optics-smoke.mjs'
-import { buildFailureEvidence, failureEvidencePaths } from './body3d-failure-evidence.mjs'
+import { buildFailureEvidence, failureEvidencePaths, formatCanvasArtifactFailureLog } from './body3d-failure-evidence.mjs'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const outputPath = process.env.BODY3D_QA_CANVAS_ARTIFACT || 'artifacts/body3d-mobile-canvas.png'
@@ -104,6 +104,7 @@ async function saveFailureEvidence(error) {
       webglEvents: state?.webglEvents ?? [],
     })
     await writeFile(evidencePaths.json, JSON.stringify(evidence, null, 2))
+    console.error(formatCanvasArtifactFailureLog(evidence))
     // Sengaja tanpa tangkapan layar: screenshot compositor Playwright pernah menggantung pada WebGL SwiftShader,
     // dan jalur gagal justru saat konteks WebGL mungkin hilang. Teks halaman dan jumlah canvas sudah cukup.
     console.error(`Body3D failure evidence written to ${evidencePaths.json}`)

@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { buildFailureEvidence, failureEvidencePaths, formatSmokeFailureLog } from './body3d-failure-evidence.mjs'
+import { buildFailureEvidence, failureEvidencePaths, formatCanvasArtifactFailureLog, formatSmokeFailureLog } from './body3d-failure-evidence.mjs'
 
 const observed = {
   collected: true,
@@ -212,4 +212,31 @@ test('smoke_v2_memanggil_probe_dan_mencetak_log_saat_gagal', () => {
   assert.ok(source.indexOf("'responsiveness probe'") < source.indexOf('failureContext = await page.evaluate'))
   // Gerbang tidak boleh dilemahkan: tidak ada penelan galat baru di sekitar asersi, galat asli tetap dilempar ulang.
   assert.match(source, /throw error\n\} finally \{/)
+})
+
+test('log_canvas_artifact_memuat_bukti_yang_sama_pada_satu_baris', () => {
+  const evidence = build()
+  const line = formatCanvasArtifactFailureLog(evidence)
+  assert.ok(line.startsWith('BODY3D_CANVAS_ARTIFACT_FAILURE {'))
+  assert.equal(line.includes('\n'), false)
+  assert.deepEqual(JSON.parse(line.slice('BODY3D_CANVAS_ARTIFACT_FAILURE '.length)), evidence)
+  // Pasangan: halaman tak terkumpul tetap tidak menyajikan angka sebagai pengamatan di log.
+  const blind = JSON.parse(formatCanvasArtifactFailureLog(build({ page: { ...observed, collected: false } })).slice('BODY3D_CANVAS_ARTIFACT_FAILURE '.length))
+  assert.equal(blind.page.canvasCount, null)
+  assert.equal(blind.page.collected, false)
+})
+
+test('log_canvas_artifact_menolak_masukan_yang_bukan_bukti', () => {
+  for (const bad of [undefined, null, 'x', 0, [], {}, { schema: 'lain/v1' }]) {
+    assert.equal(formatCanvasArtifactFailureLog(bad), '', `masukan ${JSON.stringify(bad)}`)
+  }
+})
+
+test('skrip_canvas_artifact_mencetak_bukti_ke_log_setelah_menulis_berkas', () => {
+  const src = readFileSync(new URL('./body3d-canvas-artifact.mjs', import.meta.url), 'utf8')
+  const lines = src.split('\n').map((l) => l.trim())
+  const write = lines.indexOf('await writeFile(evidencePaths.json, JSON.stringify(evidence, null, 2))')
+  const print = lines.indexOf('console.error(formatCanvasArtifactFailureLog(evidence))')
+  assert.ok(write >= 0 && print === write + 1, 'pencetakan harus tepat setelah penulisan berkas bukti')
+  assert.ok(lines.includes("import { buildFailureEvidence, failureEvidencePaths, formatCanvasArtifactFailureLog } from './body3d-failure-evidence.mjs'"))
 })
