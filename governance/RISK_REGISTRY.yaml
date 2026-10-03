@@ -296,9 +296,13 @@ risks:
       thresholds are pinned at their boundaries. MidParentalCalc and McDonaldCalc followed through midParentalHeight/mcdonaldGestationalAge
       (scripts/uji/mid-parental-mcdonald.mts), formulas and constants unchanged; McDonald now refuses fundal heights
       outside the 20-36 cm range its own page text states. NaegeleCalc is in open PR #2226, held for clinical sign-off
-      because it corrects a gestational-age sign. Next: the rest of the numeric calculators (8 counted on 2026-10-03
-      still read +e.target.value without a domain function and are not in an open PR: WhoGrowth, WhoNeonate,
-      CdcAnthropometry, BallardSoap, Centor, Fletcher, Paradise, Denver). Noted, not changed: the Broca-Lorentz page
+      because it corrects a gestational-age sign. CentorCalc, ParadiseCalc and FletcherCalc followed through centorMcIsaac/paradiseCriteria/fletcherIndex
+      (scripts/uji/centor-paradise-fletcher.mts) with every classification threshold moved unchanged and pinned at its
+      boundary; Centor age and Fletcher thresholds now keep the raw field text so an empty field is rejected instead of
+      being read as 0 (an empty Fletcher form used to show "Normal", an empty Centor age added a point, 1e999 episodes
+      met the Paradise criteria). Next: the rest of the numeric calculators (5 counted on 2026-10-03 still read
+      +e.target.value without a domain function and are not in an open PR: WhoGrowth, WhoNeonate, CdcAnthropometry,
+      BallardSoap, Denver; the first three use reference tables). Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -323,3 +327,7 @@ risks:
       - src/domains/clinical-calculators/engine/midParentalHeight.ts
       - src/domains/clinical-calculators/engine/mcdonaldRule.ts
       - scripts/uji/mid-parental-mcdonald.mts
+      - src/domains/clinical-calculators/engine/centor.ts
+      - src/domains/clinical-calculators/engine/paradise.ts
+      - src/domains/clinical-calculators/engine/fletcher.ts
+      - scripts/uji/centor-paradise-fletcher.mts

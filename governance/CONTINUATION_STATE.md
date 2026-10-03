@@ -26,14 +26,14 @@ open_work_of_other_lanes:
 
 held_for_owner:
 - PR #2226 (Naegele): CI is 8/8 green, but it corrects a gestational-age sign (the old page gave 294 days on the EDD day for a 35-day cycle and 266 for a 21-day cycle instead of 280) and so changes a clinical output for non-28-day cycles. It needs the owner's or a clinician's decision before merge; it was deliberately not merged.
-- Eight numeric calculators remain without a domain function and are not in an open PR: WhoGrowth, WhoNeonate, CdcAnthropometry, BallardSoap, Centor, Fletcher, Paradise, Denver. Several encode diagnostic thresholds or reference tables; move them only with the thresholds unchanged and say so.
+- Five numeric calculators remain without a domain function and are not in an open PR: WhoGrowth, WhoNeonate, CdcAnthropometry (reference tables) and BallardSoap, Denver. Centor, Paradise and Fletcher were moved with their thresholds unchanged and pinned at the boundary. Move the rest the same way and say so.
 - The Broca-Lorentz page text says "25 kcal/kg basal" while the factors applied are 30/35/40 (not changed; needs clinical-nutrition review).
 
 verification_queue (items that need a human or clinician; none can be closed by an agent):
 - PR #2226 (Naegele): decide on the gestational-age sign correction (see held_for_owner).
 - Lab reference ranges added in dc0d1eed5 (`src/lib/lab.ts`): homocysteine 5-15 umol/L, INR 0.8-1.2, cortisol 6-23 ug/dL. Their `sumber` text says only "usual range; varies by laboratory" with no citation. CLAUDE.md section 8 requires clinical constants from verified sources: a clinician or lab specialist should verify them and add a citable source, or replace them with the user's own laboratory range.
 - PR #2230 (cron secret): merging touches `server/**`, so Render redeploys and an agent cannot reach it. After the deploy confirm the daily-briefing scheduler still works (`?key=` is unchanged for a correct secret; `Authorization: Bearer` is new), then rotate `CRON_SECRET` and update the scheduler, because a secret that has been in URLs should be treated as exposed.
-- `posisiFisikVoxel` (`src/lib/dicomMpr.ts`, #2181): verified by running it that a finite index outside the volume (-50, 500) is clamped to the edge voxel and still reports millimetres (-4.5 / 4.5) as if valid, while a non-finite index correctly gives `mm: null`. Whether the UI can pass an out-of-range index was not checked; if it can, return `mm: null` there too. Needs the module owner's decision.
+- `posisiFisikVoxel` (`src/lib/dicomMpr.ts`, #2181): verified by running it that a finite index outside the volume (-50, 500) is clamped to the edge voxel and still reports millimetres (-4.5 / 4.5) as if valid, while a non-finite index correctly gives `mm: null`. Checked afterwards in `src/pages/Radiology.tsx`: the cursor comes from bounded sliders and an effect that clamps it to the image size, so the only exposure is one render when the series dimensions shrink (the effect runs after render). Low priority; returning `mm: null` for a finite out-of-range index would close it. Needs the module owner's decision.
 - Broca-Lorentz text vs factors (see held_for_owner).
 
 owner_verification (cannot be checked from the agent sandbox: outbound traffic to Render is blocked):
