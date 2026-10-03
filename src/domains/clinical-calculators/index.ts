@@ -41,3 +41,5 @@ export {
 export type { GrowthInputsResult } from './engine/growthInputs'
 export { sirirajStrokeScore } from './engine/sirirajStrokeScore'
 export type { SirirajResult, SirirajInput, SirirajTone } from './engine/sirirajStrokeScore'
+export { aaGradient, AA_RANGES, PH2O_MMHG, RESPIRATORY_QUOTIENT, ROOM_AIR_RULE_FIO2_MAX } from './engine/aaGradient'
+export type { AaInput, AaResult } from './engine/aaGradient'
