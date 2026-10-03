@@ -62,6 +62,38 @@ Iterations that failed and were replaced, kept here for the record:
 | LOD2 mean geometric error vs master | 0.03–0.39 mm by system (worst single case: hair, 7.8 mm max) |
 | Browser test at 390×844 (Chromium, three r185) | male LOD2: 2,611 structures in 0.7 s; female LOD2: 841 in 0.12 s; 0 load failures; tap-to-identify returns ID, system, laterality, status and source |
 
+## Paediatric bodies — gross-anatomy gate (SOP §11), `pipeline/qa_gross_anatomy.py`
+
+Ten automated checks per body:
+- the side suffix (.L/.R) matches the centroid side;
+- liver on the right, spleen and stomach on the left, heart left of the midline;
+- vertical organ order brain > heart > liver ≥ kidneys > bladder;
+- feet on the ground;
+- heart within the rib-cage height;
+- brain inside the cranium;
+- no gross interpenetration between major organ pairs (three-ray parity test).
+
+| Body | Checks passed | Liver x / spleen x (m) | Organ heights z (m) |
+|---|---|---|---|
+| ADOLESCENT.FEMALE | 10/10 | -0.045 / +0.097 | 1.516 > 1.226 > 1.11 > 0.834 |
+| ADOLESCENT.MALE | 10/10 | -0.050 / +0.103 | 1.566 > 1.27 > 1.141 > 0.868 |
+| CHILD_10Y.FEMALE | 10/10 | -0.041 / +0.081 | 1.29 > 1.039 > 0.951 > 0.709 |
+| CHILD_10Y.MALE | 10/10 | -0.041 / +0.081 | 1.287 > 1.036 > 0.948 > 0.699 |
+| CHILD_5Y.FEMALE | 10/10 | -0.033 / +0.067 | 0.998 > 0.782 > 0.711 > 0.533 |
+| CHILD_5Y.MALE | 10/10 | -0.033 / +0.067 | 0.996 > 0.778 > 0.708 > 0.525 |
+| INFANT.FEMALE | 10/10 | -0.030 / +0.056 | 0.68 > 0.508 > 0.441 > 0.317 |
+| INFANT.MALE | 10/10 | -0.030 / +0.056 | 0.679 > 0.507 > 0.439 > 0.313 |
+| NEONATE.FEMALE | 10/10 | -0.011 / +0.041 | 0.422 > 0.305 > 0.263 > 0.16 |
+| NEONATE.MALE | 10/10 | -0.011 / +0.041 | 0.422 > 0.305 > 0.263 > 0.167 |
+
+The gate found three defects, all fixed:
+1. Side words in the middle of ICRP labels (`Kidney_left_cortex`) were not stripped.
+2. "pelvis" in the bone keyword list sent the kidney pelvis to skeletal.
+3. **Source error:** the 15-year-old female phantom labels its ovaries with swapped sides
+   (`Ovary_left` at x = −0.034 m). The builder now corrects any side label that contradicts
+   the geometry and records the correction on the object
+   (`panacea_laterality_source: geometry_override`).
+
 ## Pass v007
 
 - **Joint capsule reconstruction: attempted and rejected.** Distance-rule attachment regions
