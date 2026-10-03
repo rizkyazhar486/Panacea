@@ -30,7 +30,7 @@ export function hydrationTarget(input: HydrationInput): HydrationResult {
   const { weightKg: w, exerciseMin: e } = HYDRATION_RANGES
   if (!inRange(input.weightKg, w.min, w.max)) return { ok: false, reason: `Body weight must be ${w.min}–${w.max} kg` }
   if (!inRange(input.exerciseMin, e.min, e.max)) return { ok: false, reason: `Exercise must be ${e.min}–${e.max} minutes` }
-  if (!Object.hasOwn(INTENSITY_ML_PER_HOUR, input.intensity)) return { ok: false, reason: 'Unknown exercise intensity' }
+  if (!Object.prototype.hasOwnProperty.call(INTENSITY_ML_PER_HOUR, input.intensity)) return { ok: false, reason: 'Unknown exercise intensity' }
   const baseMl = input.weightKg * ML_PER_KG
   const exerciseMl = (input.exerciseMin / 60) * INTENSITY_ML_PER_HOUR[input.intensity]
   const climateMl = input.hotClimate ? HOT_CLIMATE_ML : 0
