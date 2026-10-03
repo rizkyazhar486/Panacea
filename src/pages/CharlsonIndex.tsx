@@ -5,6 +5,7 @@ import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Charlson Comorbidity Index (CCI) — Charlson, M.E., et al. (1987),
@@ -16,53 +17,12 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 // Pure checklist arithmetic, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CONDITIONS = [
-  { key: 'mi', label: 'Myocardial infarction (history)', pts: 1 },
-  { key: 'chf', label: 'Congestive heart failure', pts: 1 },
-  { key: 'pvd', label: 'Peripheral vascular disease', pts: 1 },
-  { key: 'cva', label: 'Cerebrovascular disease (CVA/TIA)', pts: 1 },
-  { key: 'dementia', label: 'Dementia', pts: 1 },
-  { key: 'copd', label: 'Chronic pulmonary disease', pts: 1 },
-  { key: 'ctd', label: 'Connective tissue disease', pts: 1 },
-  { key: 'pud', label: 'Peptic ulcer disease', pts: 1 },
-  { key: 'liverMild', label: 'Mild liver disease', pts: 1 },
-  { key: 'dm', label: 'Diabetes without end-organ damage', pts: 1 },
-  { key: 'hemiplegia', label: 'Hemiplegia', pts: 2 },
-  { key: 'ckd', label: 'Moderate-severe chronic kidney disease', pts: 2 },
-  { key: 'dmOrgan', label: 'Diabetes with end-organ damage', pts: 2 },
-  { key: 'tumor', label: 'Solid tumor (non-metastatic)', pts: 2 },
-  { key: 'leukemia', label: 'Leukemia', pts: 2 },
-  { key: 'lymphoma', label: 'Lymphoma', pts: 2 },
-  { key: 'liverSevere', label: 'Moderate-severe liver disease', pts: 3 },
-  { key: 'mets', label: 'Metastatic solid tumor', pts: 6 },
-  { key: 'aids', label: 'AIDS', pts: 6 },
-] as const
-
-function agePts(age: number): number {
-  if (age < 50) return 0
-  if (age < 60) return 1
-  if (age < 70) return 2
-  if (age < 80) return 3
-  return 4
-}
-
 export function CharlsonIndex() {
-  const [age, setAge] = useState(() => getDemo().age || 45)
+  const [age, setAge] = useState(() => String(getDemo().age || 45))
   const [checked, setChecked] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setChecked((c) => ({ ...c, [key]: !c[key] }))
 
-  // Mutually exclusive pairs: score the more severe form only, as in the original index
-  const comorbidityPts = CONDITIONS.reduce((s, c) => {
-    if (!checked[c.key]) return s
-    if (c.key === 'dm' && checked.dmOrgan) return s
-    if (c.key === 'liverMild' && checked.liverSevere) return s
-    if (c.key === 'tumor' && checked.mets) return s
-    return s + c.pts
-  }, 0)
-  const total = comorbidityPts + agePts(age)
-  const survival10y = Math.pow(0.983, Math.exp(0.9 * total)) * 100
-
-  const tone: 'brand' | 'low' | 'critical' = survival10y >= 90 ? 'brand' : survival10y >= 50 ? 'low' : 'critical'
+  const res = charlsonIndex(parseNumberField(age), checked)
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -72,14 +32,14 @@ export function CharlsonIndex() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Indeks komorbiditas yang paling luas dipakai — 19 penyakit berbobot ditambah penyesuaian umur. Bila bentuk ringan dan berat dari penyakit yang sama sama-sama dicentang, hanya bentuk beratnya yang dihitung (sesuai indeks aslinya).</Prosa>
         <div className="mt-3 max-w-[200px]">
           <Field label="Age (years)">
-            <input className={inputClass} type="number" min={18} max={110} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={18} max={110} value={age} onChange={(e) => setAge(e.target.value)} />
           </Field>
         </div>
       </Card>
 
       <Card className="!p-5">
         <div className="space-y-2">
-          {CONDITIONS.map((c) => (
+          {CHARLSON_CONDITIONS.map((c) => (
             <label key={c.key} className="flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
               <input type="checkbox" className="h-4 w-4 rounded" checked={!!checked[c.key]} onChange={() => toggle(c.key)} />
               <span className="flex-1">{c.label}</span>
@@ -90,26 +50,32 @@ export function CharlsonIndex() {
       </Card>
 
       <Card className="!p-5">
+        {!res.ok ? (
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        ) : (
+          <>
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Comorbidity</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{comorbidityPts}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{res.data.comorbidityPts}</div>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Age points</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{agePts(age)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{res.data.agePts}</div>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Total CCI</div>
-            <div className="mt-1 text-2xl font-black text-brand-dark">{total}</div>
+            <div className="mt-1 text-2xl font-black text-brand-dark">{res.data.total}</div>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{survival10y.toFixed(0)}%</span>
-          <Badge tone={tone}>Estimated 10-year survival</Badge>
+          <span className="text-3xl font-black text-brand-dark">{res.data.survival10y.toFixed(0)}%</span>
+          <Badge tone={res.data.tone}>Estimated 10-year survival</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">10-yr survival = 0.983 ^ exp(0.9 × score) — a population-level estimate from the original cohort, not an individual prognosis.</p>
-        <CopyNote text={`Charlson Comorbidity Index ${total} (comorbidity ${comorbidityPts} + age ${agePts(age)}) — est. 10-year survival ${survival10y.toFixed(0)}% [Charlson 1987]`} />
+        <CopyNote text={`Charlson Comorbidity Index ${res.data.total} (comorbidity ${res.data.comorbidityPts} + age ${res.data.agePts}) — est. 10-year survival ${res.data.survival10y.toFixed(0)}% [Charlson 1987]`} />
+          </>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">

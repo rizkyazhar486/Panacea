@@ -45,3 +45,5 @@ export { aaGradient, AA_RANGES, PH2O_MMHG, RESPIRATORY_QUOTIENT, ROOM_AIR_RULE_F
 export type { AaInput, AaResult } from './engine/aaGradient'
 export { lightsCriteria, LIGHTS_RANGES, PROTEIN_RATIO_CUTOFF, LDH_RATIO_CUTOFF, LDH_ULN_FRACTION } from './engine/lightsCriteria'
 export type { LightsInput, LightsResult, LightsCriterion } from './engine/lightsCriteria'
+export { charlsonIndex, charlsonAgePoints, CHARLSON_CONDITIONS, CHARLSON_AGE } from './engine/charlson'
+export type { CharlsonResult } from './engine/charlson'
