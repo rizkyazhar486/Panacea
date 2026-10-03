@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-03T11:30:45",
- "master": "PANACEA_HUMAN_MASTER_v008.blend",
+ "generated": "2026-10-03T14:53:30",
+ "master": "PANACEA_HUMAN_MASTER_v009.blend",
  "bodies": [
   {
    "body_id": "HUMAN.ADULT.MALE",
@@ -40,8 +40,8 @@
     "reproductive": 54,
     "joint": 28,
     "sensory": 62,
-    "respiratory": 73,
-    "digestive": 50,
+    "respiratory": 71,
+    "digestive": 52,
     "skeletal": 38,
     "lymphatic": 7,
     "urinary": 87,

@@ -65,6 +65,15 @@ const SYSTEM_LABEL: Record<string, string> = {
   cardiovascular: 'Heart & vessels', nervous: 'Nervous', respiratory: 'Respiratory', digestive: 'Digestive',
   urinary: 'Urinary', endocrine: 'Endocrine', reproductive: 'Reproductive', lymphatic: 'Lymphatic', sensory: 'Eye & ear',
 }
+// arah dispersi per sistem (kolom lateral, kelipatan tinggi tubuh): P_disp = P0 + d · E · w
+// orientasi tidak berubah; E = 0 mengembalikan setiap struktur tepat ke posisi anatomisnya
+const DISPERSE: Record<string, number> = {
+  surface: -0.97, nervous: -0.65, sensory: -0.65, cardiovascular: -0.32, skeletal: 0, joint: 0,
+  muscular: 0.32, fascia: 0.32, respiratory: 0.65, digestive: 0.65, urinary: 0.65, endocrine: 0.65,
+  reproductive: 0.65, lymphatic: 0.97,
+}
+type Section = 'none' | 'sagittal' | 'coronal' | 'axial'
+
 const DEFAULT_ON = new Set(['surface', 'skeletal', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'reproductive'])
 
 // ID tubuh → awalan berkas (HUMAN.ADULT.MALE → adult_male)
@@ -91,6 +100,14 @@ export function CanonicalBody() {
   const [lod, setLod] = useState<'LOD2' | 'LOD3'>(() => (window.matchMedia('(max-width: 767px)').matches ? 'LOD3' : 'LOD2'))
   const [enabled, setEnabled] = useState<Set<string>>(DEFAULT_ON)
   const [mode, setMode] = useState<Mode>('normal')
+  const [section, setSection] = useState<Section>('none')
+  const [sectionPos, setSectionPos] = useState(0.5)
+  const [disperse, setDisperse] = useState(0)
+  const [measuring, setMeasuring] = useState(false)
+  const [measureMm, setMeasureMm] = useState<number | null>(null)
+  const measuringRef = useRef(false)
+  const measurePts = useRef<THREE.Vector3[]>([])
+  const bodyBox = useRef<THREE.Box3 | null>(null)
   const [picked, setPicked] = useState<Picked | null>(null)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
@@ -174,6 +191,7 @@ export function CanonicalBody() {
       ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
       ray.setFromCamera(ptr, camera)
       const hit = ray.intersectObject(root, true).find((h) => h.object.visible)
+      if (measuringRef.current) { if (hit) addMeasurePoint(hit.point); return }
       let o: THREE.Object3D | null = hit?.object ?? null
       while (o && !o.userData.panacea_structure_id) o = o.parent
       if (o) select(o)
@@ -234,8 +252,10 @@ export function CanonicalBody() {
       const failed = results.filter((r) => r.status === 'rejected').length
       if (failed) setError(`${failed} system file(s) could not be loaded.`)
       setStats({ structures: s.byId.size, tris: Math.round(tris), ms: Math.round(performance.now() - t0) })
+      bodyBox.current = new THREE.Box3().setFromObject(s.root)
       frame()
       applyVisibility()
+      applyDisperse(disperse)
       setLoading(false)
     })
     return () => { cancelled = true }
@@ -267,6 +287,67 @@ export function CanonicalBody() {
     s.camera.position.copy(c.clone().add(dir.multiplyScalar(r * 3.2)))
     s.invalidate()
   }
+
+  // ── potongan: satu bidang kliping global (sagital x, koronal z [anterior +z], aksial y) ──
+  useEffect(() => {
+    const s = sceneRef.current
+    const box = bodyBox.current
+    if (!s) return
+    if (section === 'none' || !box) { s.renderer.clippingPlanes = []; s.invalidate(); return }
+    const axis = section === 'sagittal' ? 'x' : section === 'coronal' ? 'z' : 'y'
+    const n = new THREE.Vector3(axis === 'x' ? 1 : 0, axis === 'y' ? 1 : 0, axis === 'z' ? 1 : 0)
+    const v = box.min[axis] + sectionPos * (box.max[axis] - box.min[axis])
+    s.renderer.clippingPlanes = [new THREE.Plane(n.negate(), v)]  // simpan sisi di bawah posisi bidang
+    s.invalidate()
+  }, [section, sectionPos, stats])
+
+  function applyDisperse(E: number) {
+    const s = sceneRef.current
+    const box = bodyBox.current
+    if (!s || !box) return
+    const h = box.max.y - box.min.y  // w: diskalakan dengan tinggi tubuh agar tubuh anak tetap proporsional
+    for (const [sys, g] of s.groups) g.position.x = (DISPERSE[sys] ?? 0) * E * h
+    s.invalidate()
+  }
+  useEffect(() => { applyDisperse(disperse); if (disperse === 0) frame() ; else frameDispersed() }, [disperse])
+
+  function frameDispersed() {
+    const s = sceneRef.current
+    if (!s) return
+    const b = new THREE.Box3().setFromObject(s.root)
+    const c = b.getCenter(new THREE.Vector3()), size = b.getSize(new THREE.Vector3())
+    s.controls.target.copy(c)
+    s.camera.position.set(c.x, c.y, c.z + Math.max(size.y, size.x / s.camera.aspect) * 1.9)
+    s.controls.update(); s.invalidate()
+  }
+
+  // ── pengukuran: dua ketukan pada anatomi → jarak garis lurus (ruang dunia, meter → mm) ──
+  function clearMeasure() {
+    const s = sceneRef.current
+    measurePts.current = []
+    setMeasureMm(null)
+    const old = s?.root.parent?.getObjectByName('measure-markers')
+    if (old) { old.removeFromParent(); old.traverse((o) => { if (o instanceof THREE.Mesh || o instanceof THREE.Line) { o.geometry.dispose(); (o.material as THREE.Material).dispose() } }) }
+    s?.invalidate()
+  }
+  function addMeasurePoint(p: THREE.Vector3) {
+    const s = sceneRef.current
+    if (!s) return
+    if (measurePts.current.length >= 2) clearMeasure()
+    measurePts.current.push(p.clone())
+    let g = s.root.parent?.getObjectByName('measure-markers') as THREE.Group | undefined
+    if (!g) { g = new THREE.Group(); g.name = 'measure-markers'; s.root.parent?.add(g) }
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.004, 12, 8), new THREE.MeshBasicMaterial({ color: 0x7ee0ff, depthTest: false }))
+    dot.position.copy(p); dot.renderOrder = 11; g.add(dot)
+    if (measurePts.current.length === 2) {
+      const [a, b] = measurePts.current
+      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), new THREE.LineBasicMaterial({ color: 0x7ee0ff, depthTest: false }))
+      line.renderOrder = 11; g.add(line)
+      setMeasureMm(a.distanceTo(b) * 1000)
+    }
+    s.invalidate()
+  }
+  useEffect(() => { measuringRef.current = measuring; if (!measuring) clearMeasure() }, [measuring])
 
   function applyVisibility() {
     const s = sceneRef.current
@@ -403,6 +484,13 @@ export function CanonicalBody() {
               </button>
             ))}
           </div>
+          {/* alat ukur di toolbar kanvas: tetap terlihat saat mengetuk anatomi (tidak menggulir keluar) */}
+          <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
+            <button onClick={() => { setMeasuring((m) => !m); setDisperse(0) }} aria-pressed={measuring}
+              className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold ${measuring ? 'bg-[#7ee0ff] text-[#0b0c0e]' : 'text-white/80'}`}>
+              {measuring ? 'Stop measuring' : 'Measure'}
+            </button>
+          </div>
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
             {(['LOD3', 'LOD2'] as const).map((l) => (
               <button key={l} onClick={() => setLod(l)} aria-pressed={lod === l}
@@ -412,6 +500,11 @@ export function CanonicalBody() {
             ))}
           </div>
         </div>
+        {measuring && (
+          <div className="pointer-events-none absolute inset-x-3 bottom-12 text-center text-[12px] font-bold text-[#7ee0ff]">
+            {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
+          </div>
+        )}
         {loading && <div className="absolute inset-0 grid place-items-center text-sm font-bold text-white/80">Loading anatomy…</div>}
         {!loading && stats.structures > 0 && (
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70">
@@ -419,6 +512,32 @@ export function CanonicalBody() {
           </div>
         )}
       </div>
+
+      <Card>
+        <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Section plane</p>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Section plane">
+              {(['none', 'sagittal', 'coronal', 'axial'] as Section[]).map((k) => (
+                <button key={k} role="radio" aria-checked={section === k} onClick={() => setSection(k)}
+                  className={`min-h-[40px] rounded-full border px-3.5 text-[13px] font-bold capitalize ${section === k ? 'border-brand bg-brand-100 text-brand-dark dark:bg-emerald-400/15 dark:text-emerald-200' : 'border-neutral-500/30 opacity-70'}`}>
+                  {k === 'none' ? 'Off' : k}
+                </button>
+              ))}
+            </div>
+            {section !== 'none' && (
+              <input type="range" min={0} max={1} step={0.005} value={sectionPos} aria-label="Section position"
+                onChange={(e) => setSectionPos(Number(e.target.value))} className="mt-3 w-full" />
+            )}
+          </div>
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Disperse systems</p>
+            <input type="range" min={0} max={1} step={0.01} value={disperse} aria-label="Disperse systems"
+              disabled={measuring} onChange={(e) => setDisperse(Number(e.target.value))} className="w-full" />
+            <p className="mt-1 text-[11px] text-neutral-500">Each system moves along its own fixed axis; slide back to 0 to restore exact anatomical positions.</p>
+          </div>
+        </div>
+      </Card>
 
       {error && <Card><p className="text-sm text-red-700 dark:text-red-300">{error}</p></Card>}
 

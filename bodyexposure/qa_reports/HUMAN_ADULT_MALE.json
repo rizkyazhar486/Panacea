@@ -1,0 +1,80 @@
+{
+ "body": "HUMAN.ADULT.MALE",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 3403,
+    "documented_exceptions": 1,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.0211
+  },
+  {
+   "check": "spleen_on_left",
+   "ok": true,
+   "detail": 0.0863
+  },
+  {
+   "check": "heart_left_of_midline",
+   "ok": true,
+   "detail": 0.0506
+  },
+  {
+   "check": "stomach_on_left",
+   "ok": true,
+   "detail": 0.043
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "detail": {
+    "brain": 1.64,
+    "heart": 1.275,
+    "liver": 1.186,
+    "kidney": 1.103,
+    "bladder": 0.853
+   }
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": -0.0004
+  },
+  {
+   "check": "heart_within_ribcage_height",
+   "ok": true,
+   "detail": {
+    "heart_z": 1.275,
+    "ribs_z": [
+     1.056,
+     1.447
+    ]
+   }
+  },
+  {
+   "check": "brain_within_cranium_bounds",
+   "ok": true,
+   "detail": "bbox containment"
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "DIGESTIVE.LIVER|CARDIOVASCULAR.LEFT_VENTRICLE": 0.013,
+    "DIGESTIVE.LIVER|DIGESTIVE.STOMACH": 0.042,
+    "CARDIOVASCULAR.LEFT_VENTRICLE|RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG": 0.0,
+    "CARDIOVASCULAR.LEFT_VENTRICLE|RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG": 0.0,
+    "URINARY.KIDNEY.L|LYMPHATIC.SPLEEN": 0.029,
+    "DIGESTIVE.LIVER|URINARY.KIDNEY.R": 0.006,
+    "URINARY.URINARY_BLADDER|DIGESTIVE.SIGMOID_COLON": 0.01
+   }
+  }
+ ],
+ "failures": []
+}

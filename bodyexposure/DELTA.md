@@ -1,6 +1,6 @@
 # Delta: current implementation vs. Body Exposure master directive
 
-Status as of master v008 (2026-10-03).
+Status as of master v009 (2026-10-03).
 
 ## Body matrix
 
@@ -29,7 +29,7 @@ Status as of master v008 (2026-10-03).
 | Label anchors | 16 skeletal anchors, approximate |
 | Material library, lighting, AgX, 13 camera presets | done |
 | 4K benchmarks | 6 frames: male layered, male+female lineup, female layered, opened thorax (pericardium), cutaway digital twin, exploded systems |
-| Exploded / cutaway | 4K render scenes (`render_benchmarks.py`); not yet a reversible in-app mode |
+| Exploded / cutaway / section | **In app:** section plane (sagittal, coronal, axial, with slider), reversible system dispersion (P = P0 + d·E·w), two-point measurement, plus the existing ghost/isolate/hide/search/focus. The 4K exploded and cutaway scenes remain |
 | LOD / web GLB derivation | **done**: 4 LODs × 24 body-system files, meshopt-compressed, error-measured; verified in a standalone three.js viewer. **Live in the app** at `#/body-exposure/canonical` (LOD2/LOD3, 22 MB) |
 | Rigging, physiology, pathology, imaging, micro/molecular | not started |
 
@@ -54,3 +54,7 @@ Status as of master v008 (2026-10-03).
 | Older adult | **blocked** | no open source found |
 
 Gate status: 6 / 9. The three blocked classes need source data, not modelling effort.
+
+## SOP gross-anatomy gate (§11)
+
+All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
