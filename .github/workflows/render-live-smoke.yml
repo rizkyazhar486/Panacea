@@ -20,15 +20,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Wait for Render deployment and verify genomics API
         env:
           SERVER_URL: ${{ vars.SERVER_URL }}
           SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
-          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          expected_sha="$(git log -1 --format=%H -- server)"
+          if [ -z "$expected_sha" ]; then
+            echo 'No canonical server-source commit could be resolved.' >&2
+            exit 1
+          fi
+          echo "Expected latest server-source revision: $expected_sha"
           base="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
           if [ -z "$base" ]; then
             echo 'VITE_API_URL/SERVER_URL is not configured.' >&2
@@ -43,7 +52,7 @@ jobs:
             code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
             health_code=$(curl -sS --max-time 90 -o /tmp/health.json -w '%{http_code}' "$health_endpoint" || true)
             if [ "$code" = '200' ] && [ "$health_code" = '200' ]; then
-              if EXPECTED_SHA="$EXPECTED_SHA" node - <<'NODE'
+              if EXPECTED_SHA="$expected_sha" node - <<'NODE'
           const fs = require('node:fs')
           const body = JSON.parse(fs.readFileSync('/tmp/capabilities.json', 'utf8'))
           const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'))
