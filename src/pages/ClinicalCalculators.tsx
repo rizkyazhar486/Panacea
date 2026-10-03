@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { fluidBalance, hollidaySegar, ivDrip, parklandVolumes, pedsDose } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, fluidBalance, hollidaySegar, ivDrip, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1075,23 +1075,10 @@ function CentorCalc() {
 function NaCorrectionCalc() {
   const [measuredNa, setMeasuredNa] = useState(130)
   const [glucose, setGlucose] = useState(400)
-  // Katz correction: +1.6 mEq/L Na per 100 mg/dL glucose above 100 mg/dL
-  const correctedNa = measuredNa + 1.6 * Math.max(0, (glucose - 100) / 100)
+  const sodium = correctedSodiumKatz(measuredNa, glucose)
 
-  // Potassium deficit estimate (Sterns' rule-of-thumb, widely taught):
-  // each 1 mEq/L drop in serum K+ below 4.0 corresponds to roughly a 200-400
-  // mEq total-body deficit — presented as a range, not a single number, since
-  // the true relationship is nonlinear and affected by acid-base status.
   const [measuredK, setMeasuredK] = useState(3.2)
-  const kDeficitLow = Math.max(0, (4.0 - measuredK) * 200)
-  const kDeficitHigh = Math.max(0, (4.0 - measuredK) * 400)
-  const kSeverity = measuredK < 2.5 || measuredK > 6.5
-    ? { l: 'Severe — monitor ECG closely', tone: 'critical' as const }
-    : measuredK < 3.0 || measuredK > 6.0
-    ? { l: 'Moderate', tone: 'low' as const }
-    : measuredK < 3.5 || measuredK > 5.5
-    ? { l: 'Mild', tone: 'low' as const }
-    : { l: 'Normal', tone: 'normal' as const }
+  const potassium = potassiumAssessment(measuredK)
 
   return (
     <Card>
@@ -1102,25 +1089,33 @@ function NaCorrectionCalc() {
         <Field label="Measured Sodium (mEq/L)"><input className={inputClass} type="number" value={measuredNa} onChange={(e) => setMeasuredNa(+e.target.value)} /></Field>
         <Field label="Blood Glucose (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
       </div>
+      {sodium.ok ? (
       <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">mEq/L</span></div>
+        <div className="text-2xl font-black text-ink">{sodium.data.correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">mEq/L</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Corrected Sodium</div>
       </div>
+      ) : (
+        <p role="status" className="mt-3 text-xs font-bold text-neutral-600">{sodium.reason}. No corrected sodium is shown until both values are valid.</p>
+      )}
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</Prosa>
 
       <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Potassium</h4>
       <div className="mt-2">
         <Field label="Measured Potassium (mEq/L)"><input className={inputClass} type="number" step="0.1" value={measuredK} onChange={(e) => setMeasuredK(+e.target.value)} /></Field>
       </div>
+      {potassium.ok ? (
       <div className="mt-3 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-lg font-black text-ink">{measuredK < 4.0 ? `${kDeficitLow.toFixed(0)}–${kDeficitHigh.toFixed(0)} mEq` : '—'}</div>
+            <div className="text-lg font-black text-ink">{potassium.data.deficitMeq ? `${potassium.data.deficitMeq.low.toFixed(0)}–${potassium.data.deficitMeq.high.toFixed(0)} mEq` : '—'}</div>
             <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Total-Body K⁺ Deficit</div>
           </div>
-          <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
+          <Badge tone={potassium.data.severity.tone}>{potassium.data.severity.label}</Badge>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-3 text-xs font-bold text-neutral-600">{potassium.reason}. No potassium assessment is shown until the value is valid.</p>
+      )}
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ a 200-400 mEq total-body deficit (the relationship is nonlinear and affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hour via peripheral vein (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</Prosa>
     </Card>
   )

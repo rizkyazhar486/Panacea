@@ -285,8 +285,10 @@ risks:
       fix them one at a time, dose/volume-like first (done 2026-10-03: PedsDoseCalc and HollidaySegarCalc through
       pedsDose/hollidaySegar, scripts/uji/peds-dose-holliday-segar.mts; the dose function is arithmetic only and
       deliberately invents no drug maximum; IvDripCalc and FluidBalanceCalc followed on 2026-10-03 through
-      ivDrip/fluidBalance, scripts/uji/iv-drip-fluid-balance.mts). Next: NaCorrectionCalc, AbgCalc and the rest of
-      the numeric calculators), moving each formula into src/domains with its own
+      ivDrip/fluidBalance, scripts/uji/iv-drip-fluid-balance.mts). NaCorrectionCalc followed through
+      correctedSodiumKatz/potassiumAssessment, scripts/uji/electrolyte-correction.mts, with the existing formulas and
+      potassium severity thresholds moved unchanged and pinned at every boundary; an empty potassium field used to show
+      a Severe badge). Next: AbgCalc and the rest of the numeric calculators), moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
       - src/lib/longevity.ts
@@ -300,3 +302,5 @@ risks:
       - src/domains/clinical-calculators/engine/ivDrip.ts
       - src/domains/clinical-calculators/engine/fluidBalance.ts
       - scripts/uji/iv-drip-fluid-balance.mts
+      - src/domains/clinical-calculators/engine/electrolyteCorrection.ts
+      - scripts/uji/electrolyte-correction.mts
