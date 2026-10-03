@@ -57,3 +57,5 @@ export { serumOsmolality, osmBand, gapBand, OSM_RANGES } from './engine/serumOsm
 export type { OsmInput, OsmResult, OsmTone } from './engine/serumOsmolality'
 export { sofaScore, respPts, coagPts, liverPts, renalPts, cnsPts, mortalityBand as sofaMortalityBand, SOFA_RANGES } from './engine/sofaScore'
 export type { SofaInput, SofaResult, SofaBand, CvLevel } from './engine/sofaScore'
+export { childPugh, classifyChildPugh, bilirubinPts, albuminPts, inrPts, CHILD_PUGH_RANGES } from './engine/childPugh'
+export type { ChildPughResult, ChildPughInput, ChildPughClass, ChildPughLevel, ChildPughTone } from './engine/childPugh'

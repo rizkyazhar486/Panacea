@@ -71,8 +71,8 @@ const cpKode = kodeDari(cp)
 for (const bawaan of ['useState(1.5)', 'useState(3.2)', 'useState(1.4)']) {
   assert.ok(!cpKode.includes(bawaan), `a laboratory default is back in Child-Pugh: ${bawaan}`)
 }
-assert.ok(/const cls = lengkap \? classify\(pts\) : null/.test(cpKode),
-  'Child-Pugh still prints a class and a survival figure without the laboratory values')
+assert.ok(/res\.ok \? \(/.test(cpKode) && /const res = childPugh\(/.test(cpKode),
+  'Child-Pugh still prints a class and a survival figure without validating the laboratory values')
 // Asites dan ensefalopati berskala 1-3; 1 berarti "tidak ada" -- jawaban sah.
 for (const tetap of ['ascites, setAscites] = useState<Level>(1)', 'enceph, setEnceph] = useState<Level>(1)']) {
   assert.ok(cpKode.includes(tetap), `a valid one-point clinical finding was removed from Child-Pugh: ${tetap}`)
