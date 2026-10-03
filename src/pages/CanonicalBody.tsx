@@ -26,6 +26,7 @@ interface BodyEntry {
   source_requirement: string | null
   redistribution?: string | null
   structures: number
+  variants?: Array<{ body_id: string; structures: number; stature_m: number }>
 }
 interface BodyMatrix { bodies: BodyEntry[]; files: string[] }
 
@@ -67,6 +68,13 @@ const SYSTEM_LABEL: Record<string, string> = {
 const DEFAULT_ON = new Set(['surface', 'skeletal', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'reproductive'])
 
 // ID tubuh → awalan berkas (HUMAN.ADULT.MALE → adult_male)
+// label varian: 'PEDIATRIC.CHILD_5Y.FEMALE' → '5 y · Female'
+function variantLabel(id: string) {
+  const [, stage, sex] = id.split('.')
+  const age = stage.match(/_(\d+)Y$/)?.[1]
+  return `${age ? `${age} y · ` : ''}${sex.charAt(0)}${sex.slice(1).toLowerCase()}`
+}
+
 const fileTag = (bodyId: string) => bodyId.replace('HUMAN.', '').replaceAll('.', '_').toLowerCase()
 
 function statusTone(s: string): 'normal' | 'low' | 'neutral' {
@@ -78,7 +86,8 @@ function statusTone(s: string): 'normal' | 'low' | 'neutral' {
 export function CanonicalBody() {
   const [matrix, setMatrix] = useState<BodyMatrix | null>(null)
   const [error, setError] = useState('')
-  const [bodyId, setBodyId] = useState('HUMAN.ADULT.MALE')
+  const [entryId, setEntryId] = useState('HUMAN.ADULT.MALE')
+  const [variantId, setVariantId] = useState<string | null>(null)
   const [lod, setLod] = useState<'LOD2' | 'LOD3'>(() => (window.matchMedia('(max-width: 767px)').matches ? 'LOD3' : 'LOD2'))
   const [enabled, setEnabled] = useState<Set<string>>(DEFAULT_ON)
   const [mode, setMode] = useState<Mode>('normal')
@@ -108,7 +117,12 @@ export function CanonicalBody() {
     fetch(`${BASE}anchors_adult_male.json`).then((r) => (r.ok ? r.json() : null)).then(setAnchors).catch(() => setAnchors(null))
   }, [])
 
-  const body = matrix?.bodies.find((b) => b.body_id === bodyId)
+  const body = matrix?.bodies.find((b) => b.body_id === entryId)
+  const hasFiles = (id: string) => (matrix?.files ?? []).some((f) => f.startsWith(fileTag(id) + '.'))
+  const variants = (body?.variants ?? []).filter((v) => hasFiles(v.body_id))
+  // tubuh yang benar-benar dimuat: varian terpilih (pediatrik) atau entri itu sendiri (dewasa)
+  const bodyId = variants.length ? (variants.find((v) => v.body_id === variantId) ?? variants[0]).body_id : entryId
+  const activeVariant = variants.find((v) => v.body_id === bodyId)
   const systems = useMemo(() => {
     const tag = fileTag(bodyId)
     return (matrix?.files ?? []).filter((f) => f.startsWith(tag + '.')).map((f) => f.slice(tag.length + 1))
@@ -341,27 +355,38 @@ export function CanonicalBody() {
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Body">
           {(matrix?.bodies ?? []).map((b) => {
             // tersedia hanya bila berkas web tubuh ini benar-benar diterbitkan
-            const available = (matrix?.files ?? []).some((f) => f.startsWith(fileTag(b.body_id) + '.'))
+            const available = hasFiles(b.body_id) || (b.variants ?? []).some((v) => hasFiles(v.body_id))
             return (
               <button
                 key={b.body_id}
                 role="tab"
-                aria-selected={b.body_id === bodyId}
+                aria-selected={b.body_id === entryId}
                 disabled={!available}
                 title={available ? undefined : b.redistribution ?? b.source_requirement ?? 'Source data required'}
-                onClick={() => available && setBodyId(b.body_id)}
-                className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-bold transition ${b.body_id === bodyId ? 'border-brand bg-brand text-white' : available ? 'border-neutral-500/30 bg-neutral-500/10' : 'cursor-not-allowed border-dashed border-neutral-500/30 opacity-55'}`}
+                onClick={() => { if (available) { setEntryId(b.body_id); setVariantId(null) } }}
+                className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-bold transition ${b.body_id === entryId ? 'border-brand bg-brand text-white' : available ? 'border-neutral-500/30 bg-neutral-500/10' : 'cursor-not-allowed border-dashed border-neutral-500/30 opacity-55'}`}
               >
                 {BODY_LABEL[b.body_id] ?? b.body_id}
-                {!available && <span className="ml-1.5 text-[11px] font-semibold">· {b.structures > 0 ? 'licence review' : 'not yet'}</span>}
+                {!available && <span className="ml-1.5 text-[11px] font-semibold">· not yet</span>}
               </button>
             )
           })}
         </div>
+        {variants.length > 1 && (
+          <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Body variant">
+            {variants.map((v) => (
+              <button key={v.body_id} role="radio" aria-checked={v.body_id === bodyId} onClick={() => setVariantId(v.body_id)}
+                className={`min-h-[40px] rounded-full border px-3.5 text-[13px] font-bold ${v.body_id === bodyId ? 'border-brand bg-brand-100 text-brand-dark dark:bg-emerald-400/15 dark:text-emerald-200' : 'border-neutral-500/30 opacity-70'}`}>
+                {variantLabel(v.body_id)}
+              </button>
+            ))}
+          </div>
+        )}
         {body && (
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-neutral-600 dark:text-neutral-300">
             <Badge tone={statusTone(body.status)}>{body.status.replaceAll('_', ' ')}</Badge>
-            <span>{body.structures.toLocaleString('en')} structures</span>
+            <span>{(activeVariant?.structures ?? body.structures).toLocaleString('en')} structures</span>
+            {activeVariant && <span>· stature {Math.round(activeVariant.stature_m * 100)} cm</span>}
             {body.source && <span className="min-w-0 truncate">· {body.source}</span>}
           </div>
         )}
@@ -474,8 +499,9 @@ export function CanonicalBody() {
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
         Adult male: Z-Anatomy / BodyParts3D (CC BY-SA 4.0), with reconstructed intervertebral discs and pericardium.
-        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Bodies marked “not yet” need
-        source anatomy that this project does not have; they are not built by scaling an adult body.
+        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Neonate to adolescent: ICRP
+        Publication 156 paediatric reference phantoms, built from CT images of real children. Bodies marked “not yet”
+        need source anatomy that this project does not have; they are not built by scaling an adult body.
       </p>
     </div>
   )

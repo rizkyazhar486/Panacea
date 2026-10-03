@@ -53,7 +53,10 @@ def main():
                      "extras_on_nodes": sum(1 for n in doc.get("nodes", []) if n.get("extras") and "name" in n)})
         print(f"{name:45s} {rows[-1]['bytes_raw']/1e6:7.2f} MB -> {rows[-1]['bytes_packed']/1e6:6.2f} MB  "
               f"names_ok={rows[-1]['names_preserved']} extras={rows[-1]['extras_on_nodes']}")
-    json.dump(rows, open(os.path.join(a.out, "pack_report.json"), "w"), indent=1)
+    rp = os.path.join(a.out, "pack_report.json")
+    merged = {r["file"]: r for r in (json.load(open(rp)) if os.path.exists(rp) else [])}
+    merged.update({r["file"]: r for r in rows})  # gabung dengan hasil kemasan sebelumnya
+    json.dump(sorted(merged.values(), key=lambda r: r["file"]), open(rp, "w"), indent=1)
     bad = [r["file"] for r in rows if not r["names_preserved"]]
     if bad:
         print("NAMA NODE BERUBAH:", bad); sys.exit(2)

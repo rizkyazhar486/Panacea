@@ -1,0 +1,2158 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  }
+ },
+ "files": [
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "cardiovascular",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.cardiovascular.LOD0.glb",
+   "structures": 4,
+   "tris_master": 186430,
+   "tris_lod": 93212,
+   "bytes_raw": 1684120,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.03,
+     0.116
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.02,
+     0.073
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.033,
+     0.134
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.HEART_WALL",
+     0.026,
+     0.103
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "digestive",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.digestive.LOD0.glb",
+   "structures": 63,
+   "tris_master": 276810,
+   "tris_lod": 138472,
+   "bytes_raw": 2615204,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_PULP",
+     0.003,
+     0.012
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.015,
+     0.06
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.01,
+     0.048
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.01,
+     0.041
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.113,
+     0.321
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.004,
+     0.021
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.009,
+     0.044
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ORAL_MUCOSA_LIP_AND_CHEEKS",
+     0.004,
+     0.084
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.LIVER",
+     0.039,
+     0.157
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_PERMANENT_DENTIN",
+     0.012,
+     0.043
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_PERMANENT_ENAMEL",
+     0.003,
+     0.05
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_PERMANENT_ENAMEL",
+     0.002,
+     0.028
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "endocrine",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.endocrine.LOD0.glb",
+   "structures": 5,
+   "tris_master": 8960,
+   "tris_lod": 4476,
+   "bytes_raw": 89756,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PANCREAS",
+     0.043,
+     0.157
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.THYROID",
+     0.031,
+     0.141
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.R",
+     0.017,
+     0.097
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.L",
+     0.02,
+     0.083
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PITUITARY_GLAND",
+     0.023,
+     0.049
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "lymphatic",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.lymphatic.LOD0.glb",
+   "structures": 9,
+   "tris_master": 70938,
+   "tris_lod": 35468,
+   "bytes_raw": 657768,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.149,
+     0.303
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.152,
+     0.303
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.152,
+     0.303
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.124,
+     0.208
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.124,
+     0.208
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.THYMUS",
+     0.026,
+     0.131
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.149,
+     0.303
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.TONSILS",
+     0.039,
+     0.076
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.SPLEEN",
+     0.066,
+     0.197
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "muscular",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.muscular.LOD0.glb",
+   "structures": 1,
+   "tris_master": 328382,
+   "tris_lod": 164190,
+   "bytes_raw": 3931012,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.MUSCULAR.MUSCLE",
+     0.033,
+     0.215
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "nervous",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.nervous.LOD0.glb",
+   "structures": 2,
+   "tris_master": 8368,
+   "tris_lod": 4182,
+   "bytes_raw": 79296,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.BRAIN",
+     0.062,
+     0.212
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.SPINAL_CORD",
+     0.047,
+     0.215
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "reproductive",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.reproductive.LOD0.glb",
+   "structures": 7,
+   "tris_master": 5358,
+   "tris_lod": 3028,
+   "bytes_raw": 67436,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.029,
+     0.073
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.031,
+     0.081
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.031,
+     0.071
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.031,
+     0.071
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.UTERUS",
+     0.033,
+     0.116
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.L",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.R",
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "respiratory",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.respiratory.LOD0.glb",
+   "structures": 6,
+   "tris_master": 21636,
+   "tris_lod": 10816,
+   "bytes_raw": 205764,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET2",
+     0.028,
+     0.119
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.R",
+     0.033,
+     0.141
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.L",
+     0.039,
+     0.184
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET1",
+     0.01,
+     0.098
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.BB1",
+     0.045,
+     0.145
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.TRACHEA",
+     0.041,
+     0.101
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "sensory",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.sensory.LOD0.glb",
+   "structures": 10,
+   "tris_master": 109656,
+   "tris_lod": 54828,
+   "bytes_raw": 1004736,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.L",
+     0.002,
+     0.005
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.R",
+     0.002,
+     0.005
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.L",
+     0.002,
+     0.006
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.R",
+     0.002,
+     0.006
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.L",
+     0.001,
+     0.008
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.R",
+     0.001,
+     0.008
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.L",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.R",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.L",
+     0.001,
+     0.002
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.R",
+     0.001,
+     0.002
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.skeletal.LOD0.glb",
+   "structures": 23,
+   "tris_master": 322708,
+   "tris_lod": 161506,
+   "bytes_raw": 2955364,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.027,
+     0.096
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.012,
+     0.068
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CRANIUM_CORTICAL",
+     0.02,
+     0.095
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CARTILAGE_TRUNK",
+     0.021,
+     0.116
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.032,
+     0.127
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.RIBS_CORTICAL",
+     0.068,
+     0.191
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.064,
+     0.226
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.123,
+     0.44
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SACRUM_CORTICAL",
+     0.031,
+     0.138
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.014,
+     0.082
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SCAPULAE_CORTICAL",
+     0.042,
+     0.146
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.PELVIS_CORTICAL",
+     0.097,
+     0.351
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "surface",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.surface.LOD0.glb",
+   "structures": 1,
+   "tris_master": 57502,
+   "tris_lod": 28750,
+   "bytes_raw": 519840,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SURFACE.SKIN",
+     0.036,
+     0.159
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "urinary",
+   "lod": "LOD0",
+   "file": "pediatric_child_10y_female.urinary.LOD0.glb",
+   "structures": 9,
+   "tris_master": 10248,
+   "tris_lod": 5120,
+   "bytes_raw": 108312,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.L",
+     0.093,
+     0.273
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.R",
+     0.089,
+     0.233
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URINARY_BLADDER_WALL",
+     0.101,
+     0.27
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.L",
+     0.047,
+     0.21
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.L",
+     0.082,
+     0.192
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.R",
+     0.077,
+     0.224
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.R",
+     0.054,
+     0.241
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.L",
+     0.056,
+     0.134
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.R",
+     0.055,
+     0.138
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "cardiovascular",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.cardiovascular.LOD1.glb",
+   "structures": 4,
+   "tris_master": 186430,
+   "tris_lod": 46606,
+   "bytes_raw": 845188,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.078,
+     0.312
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.06,
+     0.222
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.079,
+     0.289
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.HEART_WALL",
+     0.065,
+     0.233
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "digestive",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.digestive.LOD1.glb",
+   "structures": 63,
+   "tris_master": 276810,
+   "tris_lod": 69206,
+   "bytes_raw": 1368344,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_PULP",
+     0.007,
+     0.034
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.03,
+     0.108
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.026,
+     0.075
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.026,
+     0.098
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.231,
+     0.648
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.011,
+     0.05
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.023,
+     0.093
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ORAL_MUCOSA_LIP_AND_CHEEKS",
+     0.031,
+     0.388
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.LIVER",
+     0.089,
+     0.396
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_PERMANENT_DENTIN",
+     0.027,
+     0.104
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_PERMANENT_ENAMEL",
+     0.013,
+     0.071
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_PERMANENT_ENAMEL",
+     0.014,
+     0.062
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "endocrine",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.endocrine.LOD1.glb",
+   "structures": 5,
+   "tris_master": 8960,
+   "tris_lod": 2236,
+   "bytes_raw": 49436,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PANCREAS",
+     0.098,
+     0.404
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.THYROID",
+     0.064,
+     0.263
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.R",
+     0.045,
+     0.165
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.L",
+     0.044,
+     0.143
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PITUITARY_GLAND",
+     0.046,
+     0.109
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "lymphatic",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.lymphatic.LOD1.glb",
+   "structures": 9,
+   "tris_master": 70938,
+   "tris_lod": 17730,
+   "bytes_raw": 366616,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.287,
+     0.631
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.3,
+     0.694
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.295,
+     0.694
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.322,
+     0.551
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.322,
+     0.551
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.THYMUS",
+     0.07,
+     0.282
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.284,
+     0.631
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.TONSILS",
+     0.08,
+     0.166
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.SPLEEN",
+     0.152,
+     0.518
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "muscular",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.muscular.LOD1.glb",
+   "structures": 1,
+   "tris_master": 328382,
+   "tris_lod": 82094,
+   "bytes_raw": 1468144,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.MUSCULAR.MUSCLE",
+     0.094,
+     0.327
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "nervous",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.nervous.LOD1.glb",
+   "structures": 2,
+   "tris_master": 8368,
+   "tris_lod": 2090,
+   "bytes_raw": 41636,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.BRAIN",
+     0.136,
+     0.495
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.SPINAL_CORD",
+     0.107,
+     0.511
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "reproductive",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.reproductive.LOD1.glb",
+   "structures": 7,
+   "tris_master": 5358,
+   "tris_lod": 1610,
+   "bytes_raw": 41904,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.061,
+     0.15
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.075,
+     0.168
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.061,
+     0.171
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.061,
+     0.171
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.UTERUS",
+     0.079,
+     0.234
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.L",
+     0.044,
+     0.158
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.R",
+     0.049,
+     0.149
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "respiratory",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.respiratory.LOD1.glb",
+   "structures": 6,
+   "tris_master": 21636,
+   "tris_lod": 5404,
+   "bytes_raw": 108316,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET2",
+     0.068,
+     0.251
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.R",
+     0.077,
+     0.313
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.L",
+     0.093,
+     0.305
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET1",
+     0.043,
+     0.232
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.BB1",
+     0.096,
+     0.299
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.TRACHEA",
+     0.075,
+     0.186
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "sensory",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.sensory.LOD1.glb",
+   "structures": 10,
+   "tris_master": 109656,
+   "tris_lod": 27412,
+   "bytes_raw": 511224,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.L",
+     0.005,
+     0.012
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.R",
+     0.005,
+     0.014
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.L",
+     0.006,
+     0.013
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.R",
+     0.006,
+     0.014
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.L",
+     0.004,
+     0.013
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.R",
+     0.004,
+     0.013
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.L",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.R",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.L",
+     0.001,
+     0.004
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.R",
+     0.001,
+     0.004
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.skeletal.LOD1.glb",
+   "structures": 23,
+   "tris_master": 322708,
+   "tris_lod": 80742,
+   "bytes_raw": 1501556,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.057,
+     0.243
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.026,
+     0.115
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CRANIUM_CORTICAL",
+     0.057,
+     0.236
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CARTILAGE_TRUNK",
+     0.051,
+     0.212
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.074,
+     0.318
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.RIBS_CORTICAL",
+     0.14,
+     0.591
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.144,
+     0.514
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.278,
+     0.973
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SACRUM_CORTICAL",
+     0.074,
+     0.292
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.039,
+     0.194
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SCAPULAE_CORTICAL",
+     0.088,
+     0.355
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.PELVIS_CORTICAL",
+     0.196,
+     0.693
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "surface",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.surface.LOD1.glb",
+   "structures": 1,
+   "tris_master": 57502,
+   "tris_lod": 14374,
+   "bytes_raw": 261068,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SURFACE.SKIN",
+     0.097,
+     0.342
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "urinary",
+   "lod": "LOD1",
+   "file": "pediatric_child_10y_female.urinary.LOD1.glb",
+   "structures": 9,
+   "tris_master": 10248,
+   "tris_lod": 2558,
+   "bytes_raw": 62184,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.L",
+     0.18,
+     0.552
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.R",
+     0.178,
+     0.557
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URINARY_BLADDER_WALL",
+     0.198,
+     0.597
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.L",
+     0.113,
+     0.442
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.L",
+     0.155,
+     0.465
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.R",
+     0.151,
+     0.464
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.R",
+     0.123,
+     0.578
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.L",
+     0.106,
+     0.278
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.R",
+     0.104,
+     0.277
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "cardiovascular",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.cardiovascular.LOD2.glb",
+   "structures": 4,
+   "tris_master": 186430,
+   "tris_lod": 18640,
+   "bytes_raw": 341788,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.196,
+     0.835
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.142,
+     2.318
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.174,
+     0.879
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.HEART_WALL",
+     0.144,
+     0.573
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "digestive",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.digestive.LOD2.glb",
+   "structures": 63,
+   "tris_master": 276810,
+   "tris_lod": 28078,
+   "bytes_raw": 627720,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_PULP",
+     0.015,
+     0.066
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.059,
+     0.288
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.056,
+     0.235
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.057,
+     0.271
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.473,
+     1.655
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.026,
+     0.148
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.045,
+     0.202
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ORAL_MUCOSA_LIP_AND_CHEEKS",
+     0.073,
+     0.453
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.LIVER",
+     0.201,
+     0.958
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_PERMANENT_DENTIN",
+     0.06,
+     0.229
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_PERMANENT_ENAMEL",
+     0.031,
+     0.179
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_PERMANENT_ENAMEL",
+     0.033,
+     0.16
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "endocrine",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.endocrine.LOD2.glb",
+   "structures": 5,
+   "tris_master": 8960,
+   "tris_lod": 924,
+   "bytes_raw": 25800,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PANCREAS",
+     0.211,
+     0.801
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.THYROID",
+     0.148,
+     0.557
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.R",
+     0.096,
+     0.415
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.L",
+     0.104,
+     0.513
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PITUITARY_GLAND",
+     0.073,
+     0.213
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "lymphatic",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.lymphatic.LOD2.glb",
+   "structures": 9,
+   "tris_master": 70938,
+   "tris_lod": 7090,
+   "bytes_raw": 169244,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.582,
+     1.141
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.601,
+     1.287
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.602,
+     1.287
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.674,
+     1.13
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.674,
+     1.13
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.THYMUS",
+     0.162,
+     0.731
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.58,
+     1.141
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.TONSILS",
+     0.158,
+     0.472
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.SPLEEN",
+     0.335,
+     1.451
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "muscular",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.muscular.LOD2.glb",
+   "structures": 1,
+   "tris_master": 328382,
+   "tris_lod": 32838,
+   "bytes_raw": 581536,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.MUSCULAR.MUSCLE",
+     0.221,
+     0.956
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "nervous",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.nervous.LOD2.glb",
+   "structures": 2,
+   "tris_master": 8368,
+   "tris_lod": 834,
+   "bytes_raw": 19028,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.BRAIN",
+     0.293,
+     1.396
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.SPINAL_CORD",
+     0.257,
+     1.217
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "reproductive",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.reproductive.LOD2.glb",
+   "structures": 7,
+   "tris_master": 5358,
+   "tris_lod": 842,
+   "bytes_raw": 28036,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.133,
+     0.368
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.134,
+     0.435
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.1,
+     0.29
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.1,
+     0.29
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.UTERUS",
+     0.13,
+     0.436
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.L",
+     0.114,
+     0.304
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.R",
+     0.127,
+     0.355
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "respiratory",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.respiratory.LOD2.glb",
+   "structures": 6,
+   "tris_master": 21636,
+   "tris_lod": 2248,
+   "bytes_raw": 51492,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET2",
+     0.156,
+     0.653
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.R",
+     0.158,
+     0.689
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.L",
+     0.192,
+     0.76
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET1",
+     0.099,
+     0.856
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.BB1",
+     0.167,
+     0.641
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.TRACHEA",
+     0.112,
+     0.338
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "sensory",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.sensory.LOD2.glb",
+   "structures": 10,
+   "tris_master": 109656,
+   "tris_lod": 10960,
+   "bytes_raw": 215064,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.L",
+     0.01,
+     0.039
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.R",
+     0.01,
+     0.035
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.L",
+     0.012,
+     0.04
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.R",
+     0.013,
+     0.04
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.L",
+     0.009,
+     0.044
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.R",
+     0.009,
+     0.044
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.L",
+     0.004,
+     0.015
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.R",
+     0.004,
+     0.02
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.L",
+     0.004,
+     0.018
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.R",
+     0.004,
+     0.018
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.skeletal.LOD2.glb",
+   "structures": 23,
+   "tris_master": 322708,
+   "tris_lod": 32350,
+   "bytes_raw": 630408,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.129,
+     0.494
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.066,
+     0.334
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CRANIUM_CORTICAL",
+     0.135,
+     0.617
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CARTILAGE_TRUNK",
+     0.124,
+     0.765
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.172,
+     0.645
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.RIBS_CORTICAL",
+     0.334,
+     1.262
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.31,
+     1.142
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.6,
+     2.303
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SACRUM_CORTICAL",
+     0.188,
+     0.916
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.103,
+     0.716
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SCAPULAE_CORTICAL",
+     0.185,
+     0.647
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.PELVIS_CORTICAL",
+     0.433,
+     1.703
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "surface",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.surface.LOD2.glb",
+   "structures": 1,
+   "tris_master": 57502,
+   "tris_lod": 5750,
+   "bytes_raw": 105832,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SURFACE.SKIN",
+     0.214,
+     0.853
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "urinary",
+   "lod": "LOD2",
+   "file": "pediatric_child_10y_female.urinary.LOD2.glb",
+   "structures": 9,
+   "tris_master": 10248,
+   "tris_lod": 1132,
+   "bytes_raw": 36468,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.L",
+     0.367,
+     1.405
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.R",
+     0.379,
+     1.196
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URINARY_BLADDER_WALL",
+     0.421,
+     1.255
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.L",
+     0.232,
+     1.023
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.L",
+     0.318,
+     0.989
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.R",
+     0.297,
+     0.937
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.R",
+     0.226,
+     0.873
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.L",
+     0.163,
+     0.547
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.R",
+     0.169,
+     0.419
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "cardiovascular",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.cardiovascular.LOD3.glb",
+   "structures": 4,
+   "tris_master": 186430,
+   "tris_lod": 7454,
+   "bytes_raw": 140432,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.48,
+     3.547
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.426,
+     12.148
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.383,
+     2.02
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.CARDIOVASCULAR.HEART_WALL",
+     0.276,
+     1.221
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "digestive",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.digestive.LOD3.glb",
+   "structures": 63,
+   "tris_master": 276810,
+   "tris_lod": 11550,
+   "bytes_raw": 330016,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_PULP",
+     0.037,
+     0.228
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.133,
+     0.52
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.131,
+     0.618
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.132,
+     0.682
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     1.233,
+     4.366
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.06,
+     0.277
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.11,
+     0.539
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ORAL_MUCOSA_LIP_AND_CHEEKS",
+     0.178,
+     2.068
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.LIVER",
+     0.463,
+     1.91
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_PERMANENT_DENTIN",
+     0.138,
+     0.525
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_PERMANENT_ENAMEL",
+     0.078,
+     0.459
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_PERMANENT_ENAMEL",
+     0.087,
+     0.441
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "endocrine",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.endocrine.LOD3.glb",
+   "structures": 5,
+   "tris_master": 8960,
+   "tris_lod": 378,
+   "bytes_raw": 15944,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PANCREAS",
+     0.468,
+     1.682
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.THYROID",
+     0.337,
+     1.692
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.R",
+     0.195,
+     0.727
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.ADRENAL.L",
+     0.192,
+     0.842
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.ENDOCRINE.PITUITARY_GLAND",
+     0.137,
+     0.372
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "lymphatic",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.lymphatic.LOD3.glb",
+   "structures": 9,
+   "tris_master": 70938,
+   "tris_lod": 2834,
+   "bytes_raw": 95948,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     1.147,
+     2.047
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     1.22,
+     2.282
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     1.217,
+     2.282
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     1.126,
+     2.048
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     1.128,
+     2.047
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.THYMUS",
+     0.352,
+     1.733
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     1.147,
+     2.047
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.TONSILS",
+     0.392,
+     1.201
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.LYMPHATIC.SPLEEN",
+     0.737,
+     2.471
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "muscular",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.muscular.LOD3.glb",
+   "structures": 1,
+   "tris_master": 328382,
+   "tris_lod": 13134,
+   "bytes_raw": 226856,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.MUSCULAR.MUSCLE",
+     0.511,
+     4.857
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "nervous",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.nervous.LOD3.glb",
+   "structures": 2,
+   "tris_master": 8368,
+   "tris_lod": 334,
+   "bytes_raw": 10016,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.BRAIN",
+     0.666,
+     2.557
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.NERVOUS.SPINAL_CORD",
+     0.618,
+     2.507
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "reproductive",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.reproductive.LOD3.glb",
+   "structures": 7,
+   "tris_master": 5358,
+   "tris_lod": 420,
+   "bytes_raw": 20428,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.273,
+     0.832
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.257,
+     0.838
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.201,
+     0.583
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.201,
+     0.583
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.UTERUS",
+     0.249,
+     0.832
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.L",
+     0.227,
+     0.63
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.REPRODUCTIVE.OVARY.R",
+     0.22,
+     0.577
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "respiratory",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.respiratory.LOD3.glb",
+   "structures": 6,
+   "tris_master": 21636,
+   "tris_lod": 932,
+   "bytes_raw": 27792,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET2",
+     0.349,
+     1.398
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.R",
+     0.315,
+     1.517
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.LUNG.L",
+     0.466,
+     1.687
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.ET1",
+     0.178,
+     0.856
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.BB1",
+     0.305,
+     0.976
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.RESPIRATORY.TRACHEA",
+     0.193,
+     0.519
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "sensory",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.sensory.LOD3.glb",
+   "structures": 10,
+   "tris_master": 109656,
+   "tris_lod": 4372,
+   "bytes_raw": 96420,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.L",
+     0.024,
+     0.074
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.VITREOUS.R",
+     0.025,
+     0.081
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.L",
+     0.029,
+     0.107
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.CORNEA.R",
+     0.028,
+     0.1
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.L",
+     0.026,
+     0.165
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.AQUEOUS.R",
+     0.026,
+     0.165
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.L",
+     0.011,
+     0.047
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.INSENSITIVELENS.R",
+     0.01,
+     0.038
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.L",
+     0.013,
+     0.064
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SENSORY.SENSITIVELENS.R",
+     0.014,
+     0.064
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.skeletal.LOD3.glb",
+   "structures": 23,
+   "tris_master": 322708,
+   "tris_lod": 12984,
+   "bytes_raw": 281756,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.274,
+     1.053
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.157,
+     0.635
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CRANIUM_CORTICAL",
+     0.297,
+     1.512
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.CARTILAGE_TRUNK",
+     0.286,
+     1.09
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.36,
+     1.752
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.RIBS_CORTICAL",
+     0.8,
+     2.771
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.665,
+     2.271
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     1.306,
+     4.458
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SACRUM_CORTICAL",
+     0.464,
+     2.223
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.254,
+     0.978
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.SCAPULAE_CORTICAL",
+     0.409,
+     1.489
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SKELETAL.PELVIS_CORTICAL",
+     1.012,
+     4.271
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "surface",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.surface.LOD3.glb",
+   "structures": 1,
+   "tris_master": 57502,
+   "tris_lod": 2300,
+   "bytes_raw": 43732,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.SURFACE.SKIN",
+     0.489,
+     2.111
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+   "system": "urinary",
+   "lod": "LOD3",
+   "file": "pediatric_child_10y_female.urinary.LOD3.glb",
+   "structures": 9,
+   "tris_master": 10248,
+   "tris_lod": 538,
+   "bytes_raw": 25756,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.L",
+     0.889,
+     3.862
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_CORTEX.R",
+     0.861,
+     2.691
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URINARY_BLADDER_WALL",
+     0.901,
+     2.741
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.L",
+     0.461,
+     2.288
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.L",
+     0.562,
+     1.787
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_MEDULLA.R",
+     0.545,
+     1.83
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.URETER.R",
+     0.424,
+     1.919
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.L",
+     0.295,
+     0.925
+    ],
+    [
+     "PEDIATRIC.CHILD_10Y.FEMALE.URINARY.KIDNEY_PELVIS.R",
+     0.306,
+     1.51
+    ]
+   ]
+  }
+ ]
+}

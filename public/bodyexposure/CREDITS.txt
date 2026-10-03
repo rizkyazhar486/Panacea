@@ -9,3 +9,10 @@ adult_female.* — derived from HuBMAP CCF 3D Reference Object Library, VH_Femal
 module_tissue_lymph_node.* — HuBMAP CCF library lymph node tissue model, CC BY 4.0.
 
 Educational models. Not patient-specific anatomy and not a clinical tool.
+
+pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Reference
+               Computational Phantoms (2024), ICRP. Newborn, 1, 5, 10 and 15 years,
+               male and female; CT-based reference phantoms. Dosimetry-only layers
+               removed; laterality corrected where the source label contradicted the
+               geometry (15-year female ovaries). Redistribution in Panacea cleared
+               by the project owner (2026-10-03).

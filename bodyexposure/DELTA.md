@@ -10,7 +10,7 @@ Status as of master v008 (2026-10-03).
 | Adult female | **source_backed_partial** | 848 structures (+ spinal cord C1–S4, mammary gland architecture), HuBMAP VH_Female: organs, female pelvis, uterus/adnexa, heart, airway, kidneys, eyes, knees, brain. No full skeleton, musculature or peripheral nerves |
 | Pregnant | placeholder | ICRP pregnant-female mesh phantoms (fetal ages 8–38 wk) are in public consultation; data not released |
 | Fetus | placeholder | comes with the ICRP pregnant-female phantoms (not released) |
-| Neonate / infant / child (5, 10 y) / adolescent | **source_backed** (local) | ICRP Publication 156 CT-based phantoms, male + female (10 bodies, 102–140 structures each). Not shipped: ICRP redistribution terms unstated |
+| Neonate / infant / child (5, 10 y) / adolescent | **source_backed**, live in app | ICRP Publication 156 CT-based phantoms, male + female (10 bodies, 102–140 structures each); gross-anatomy gate 10/10 on every body |
 | Toddler | placeholder | no open 2–3 y source; ICRP covers 0/1/5/10/15 y and interpolation would be invented anatomy |
 | Older adult | placeholder | no open age-specific (65+) whole-body phantom found |
 

@@ -1,0 +1,2158 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  }
+ },
+ "files": [
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.cardiovascular.LOD0.glb",
+   "structures": 4,
+   "tris_master": 155216,
+   "tris_lod": 77606,
+   "bytes_raw": 1403024,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.012,
+     0.049
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.017,
+     0.072
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.076,
+     0.192
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.066,
+     0.169
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "digestive",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.digestive.LOD0.glb",
+   "structures": 22,
+   "tris_master": 117344,
+   "tris_lod": 58892,
+   "bytes_raw": 1103156,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.026,
+     0.075
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.002,
+     0.012
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.005,
+     0.027
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.005,
+     0.032
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.004,
+     0.029
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.LIVER",
+     0.047,
+     0.189
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SIGMOID_COLON_WALL",
+     0.011,
+     0.176
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.OESOPHAGUS_WALL",
+     0.02,
+     0.076
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.L",
+     0.014,
+     0.084
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.GALL_BLADDER_WALL",
+     0.019,
+     0.055
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SALIVARY_GLANDS.L",
+     0.051,
+     0.143
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.R",
+     0.016,
+     0.089
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "endocrine",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.endocrine.LOD0.glb",
+   "structures": 5,
+   "tris_master": 5350,
+   "tris_lod": 2908,
+   "bytes_raw": 61420,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.L",
+     0.013,
+     0.049
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.R",
+     0.021,
+     0.073
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PANCREAS",
+     0.065,
+     0.232
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.THYROID",
+     0.032,
+     0.133
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "lymphatic",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.lymphatic.LOD0.glb",
+   "structures": 9,
+   "tris_master": 68454,
+   "tris_lod": 34364,
+   "bytes_raw": 637712,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.083,
+     0.169
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.085,
+     0.169
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.085,
+     0.169
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.069,
+     0.116
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.069,
+     0.116
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.083,
+     0.169
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.THYMUS",
+     0.039,
+     0.147
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.SPLEEN",
+     0.07,
+     0.216
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.TONSILS",
+     0.015,
+     0.047
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "muscular",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.muscular.LOD0.glb",
+   "structures": 1,
+   "tris_master": 296992,
+   "tris_lod": 148496,
+   "bytes_raw": 3554048,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.MUSCULAR.MUSCLE",
+     0.015,
+     0.079
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "nervous",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.nervous.LOD0.glb",
+   "structures": 2,
+   "tris_master": 6460,
+   "tris_lod": 3230,
+   "bytes_raw": 62120,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.BRAIN",
+     0.038,
+     0.147
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.SPINAL_CORD",
+     0.03,
+     0.104
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "reproductive",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.reproductive.LOD0.glb",
+   "structures": 7,
+   "tris_master": 6298,
+   "tris_lod": 3418,
+   "bytes_raw": 74336,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.008,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.008,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.01,
+     0.024
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.01,
+     0.025
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.PROSTATE",
+     0.026,
+     0.058
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.R",
+     0.015,
+     0.054
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.L",
+     0.014,
+     0.049
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "respiratory",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.respiratory.LOD0.glb",
+   "structures": 6,
+   "tris_master": 21940,
+   "tris_lod": 10998,
+   "bytes_raw": 208732,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET2",
+     0.016,
+     0.084
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.R",
+     0.021,
+     0.069
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.L",
+     0.02,
+     0.074
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.BB1",
+     0.006,
+     0.018
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET1",
+     0.004,
+     0.043
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.TRACHEA",
+     0.012,
+     0.057
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "sensory",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.sensory.LOD0.glb",
+   "structures": 10,
+   "tris_master": 150012,
+   "tris_lod": 75004,
+   "bytes_raw": 1367700,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.L",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.R",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.L",
+     0.002,
+     0.005
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.R",
+     0.002,
+     0.005
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.L",
+     0.001,
+     0.002
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.R",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.L",
+     0.0,
+     0.001
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.R",
+     0.0,
+     0.001
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.L",
+     0.0,
+     0.002
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.R",
+     0.0,
+     0.002
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "skeletal",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.skeletal.LOD0.glb",
+   "structures": 26,
+   "tris_master": 565622,
+   "tris_lod": 282900,
+   "bytes_raw": 5143968,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.012,
+     0.059
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.005,
+     0.034
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_LEGS",
+     0.013,
+     0.048
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.01,
+     0.044
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.022,
+     0.094
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.006,
+     0.029
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_ARMS",
+     0.019,
+     0.076
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.01,
+     0.035
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.RIBS_CORTICAL",
+     0.037,
+     0.128
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.021,
+     0.058
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.028,
+     0.063
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.029,
+     0.086
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "surface",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.surface.LOD0.glb",
+   "structures": 1,
+   "tris_master": 85978,
+   "tris_lod": 42988,
+   "bytes_raw": 776104,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SURFACE.SKIN",
+     0.008,
+     0.051
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "urinary",
+   "lod": "LOD0",
+   "file": "pediatric_neonate_male.urinary.LOD0.glb",
+   "structures": 9,
+   "tris_master": 23502,
+   "tris_lod": 11748,
+   "bytes_raw": 227428,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.018,
+     0.045
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.008,
+     0.034
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.012,
+     0.058
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.006,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.011,
+     0.039
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.016,
+     0.056
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.007,
+     0.02
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.L",
+     0.032,
+     0.148
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.R",
+     0.038,
+     0.147
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.cardiovascular.LOD1.glb",
+   "structures": 4,
+   "tris_master": 155216,
+   "tris_lod": 38800,
+   "bytes_raw": 704496,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.029,
+     0.118
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.044,
+     0.175
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.148,
+     0.466
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.12,
+     0.344
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "digestive",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.digestive.LOD1.glb",
+   "structures": 22,
+   "tris_master": 117344,
+   "tris_lod": 29434,
+   "bytes_raw": 572896,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.054,
+     0.194
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.006,
+     0.028
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.013,
+     0.077
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.014,
+     0.052
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.014,
+     0.051
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.LIVER",
+     0.105,
+     0.505
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SIGMOID_COLON_WALL",
+     0.05,
+     0.265
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.OESOPHAGUS_WALL",
+     0.042,
+     0.16
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.L",
+     0.051,
+     0.352
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.GALL_BLADDER_WALL",
+     0.045,
+     0.167
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SALIVARY_GLANDS.L",
+     0.098,
+     0.331
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.R",
+     0.054,
+     0.458
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "endocrine",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.endocrine.LOD1.glb",
+   "structures": 5,
+   "tris_master": 5350,
+   "tris_lod": 1508,
+   "bytes_raw": 36216,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.L",
+     0.033,
+     0.121
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.R",
+     0.05,
+     0.169
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PANCREAS",
+     0.133,
+     0.386
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.THYROID",
+     0.092,
+     0.268
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.026,
+     0.069
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "lymphatic",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.lymphatic.LOD1.glb",
+   "structures": 9,
+   "tris_master": 68454,
+   "tris_lod": 17178,
+   "bytes_raw": 356496,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.16,
+     0.352
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.166,
+     0.387
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.168,
+     0.387
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.18,
+     0.307
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.18,
+     0.308
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.158,
+     0.352
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.THYMUS",
+     0.077,
+     0.312
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.SPLEEN",
+     0.141,
+     0.41
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.TONSILS",
+     0.056,
+     0.132
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "muscular",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.muscular.LOD1.glb",
+   "structures": 1,
+   "tris_master": 296992,
+   "tris_lod": 74248,
+   "bytes_raw": 1326604,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.MUSCULAR.MUSCLE",
+     0.045,
+     0.231
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "nervous",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.nervous.LOD1.glb",
+   "structures": 2,
+   "tris_master": 6460,
+   "tris_lod": 1614,
+   "bytes_raw": 33028,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.BRAIN",
+     0.084,
+     0.322
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.SPINAL_CORD",
+     0.068,
+     0.256
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "reproductive",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.reproductive.LOD1.glb",
+   "structures": 7,
+   "tris_master": 6298,
+   "tris_lod": 1708,
+   "bytes_raw": 43552,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.02,
+     0.059
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.02,
+     0.059
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.023,
+     0.062
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.023,
+     0.065
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.PROSTATE",
+     0.049,
+     0.142
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.R",
+     0.05,
+     0.118
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.L",
+     0.05,
+     0.11
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "respiratory",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.respiratory.LOD1.glb",
+   "structures": 6,
+   "tris_master": 21940,
+   "tris_lod": 5496,
+   "bytes_raw": 109672,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET2",
+     0.035,
+     0.126
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.R",
+     0.042,
+     0.163
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.L",
+     0.04,
+     0.186
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.BB1",
+     0.012,
+     0.045
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET1",
+     0.027,
+     0.109
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.TRACHEA",
+     0.031,
+     0.129
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "sensory",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.sensory.LOD1.glb",
+   "structures": 10,
+   "tris_master": 150012,
+   "tris_lod": 37496,
+   "bytes_raw": 692532,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.L",
+     0.003,
+     0.008
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.R",
+     0.003,
+     0.009
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.L",
+     0.005,
+     0.013
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.R",
+     0.005,
+     0.014
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.L",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.R",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.L",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.R",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.L",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.R",
+     0.001,
+     0.003
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "skeletal",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.skeletal.LOD1.glb",
+   "structures": 26,
+   "tris_master": 565622,
+   "tris_lod": 141440,
+   "bytes_raw": 2597644,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.031,
+     0.137
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.018,
+     0.088
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_LEGS",
+     0.033,
+     0.113
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.021,
+     0.078
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.053,
+     0.27
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.013,
+     0.047
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_ARMS",
+     0.043,
+     0.143
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.021,
+     0.077
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.RIBS_CORTICAL",
+     0.082,
+     0.331
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.04,
+     0.123
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.051,
+     0.141
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.056,
+     0.182
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "surface",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.surface.LOD1.glb",
+   "structures": 1,
+   "tris_master": 85978,
+   "tris_lod": 21494,
+   "bytes_raw": 389212,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SURFACE.SKIN",
+     0.026,
+     0.104
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "urinary",
+   "lod": "LOD1",
+   "file": "pediatric_neonate_male.urinary.LOD1.glb",
+   "structures": 9,
+   "tris_master": 23502,
+   "tris_lod": 5870,
+   "bytes_raw": 121604,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.035,
+     0.109
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.024,
+     0.08
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.037,
+     0.131
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.016,
+     0.051
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.029,
+     0.097
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.042,
+     0.166
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.017,
+     0.064
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.L",
+     0.067,
+     0.28
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.R",
+     0.077,
+     0.315
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.cardiovascular.LOD2.glb",
+   "structures": 4,
+   "tris_master": 155216,
+   "tris_lod": 15518,
+   "bytes_raw": 285400,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.071,
+     0.273
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.109,
+     0.523
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.312,
+     1.224
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.259,
+     0.974
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "digestive",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.digestive.LOD2.glb",
+   "structures": 22,
+   "tris_master": 117344,
+   "tris_lod": 11976,
+   "bytes_raw": 258528,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.117,
+     0.401
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.014,
+     0.09
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.027,
+     0.108
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.028,
+     0.106
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.033,
+     0.157
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.LIVER",
+     0.215,
+     0.828
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SIGMOID_COLON_WALL",
+     0.161,
+     0.776
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.OESOPHAGUS_WALL",
+     0.094,
+     0.379
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.L",
+     0.166,
+     0.747
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.GALL_BLADDER_WALL",
+     0.094,
+     0.343
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SALIVARY_GLANDS.L",
+     0.21,
+     0.89
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.R",
+     0.176,
+     0.864
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "endocrine",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.endocrine.LOD2.glb",
+   "structures": 5,
+   "tris_master": 5350,
+   "tris_lod": 722,
+   "bytes_raw": 22040,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.L",
+     0.071,
+     0.271
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.R",
+     0.105,
+     0.469
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PANCREAS",
+     0.204,
+     0.74
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.THYROID",
+     0.139,
+     0.39
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.061,
+     0.117
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "lymphatic",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.lymphatic.LOD2.glb",
+   "structures": 9,
+   "tris_master": 68454,
+   "tris_lod": 6952,
+   "bytes_raw": 166568,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.325,
+     0.637
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.336,
+     0.718
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.336,
+     0.718
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.376,
+     0.63
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.376,
+     0.631
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.323,
+     0.637
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.THYMUS",
+     0.172,
+     0.581
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.SPLEEN",
+     0.215,
+     0.662
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.TONSILS",
+     0.083,
+     0.173
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "muscular",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.muscular.LOD2.glb",
+   "structures": 1,
+   "tris_master": 296992,
+   "tris_lod": 29698,
+   "bytes_raw": 524704,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.MUSCULAR.MUSCLE",
+     0.103,
+     0.734
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "nervous",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.nervous.LOD2.glb",
+   "structures": 2,
+   "tris_master": 6460,
+   "tris_lod": 666,
+   "bytes_raw": 15960,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.BRAIN",
+     0.182,
+     0.829
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.SPINAL_CORD",
+     0.135,
+     0.667
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "reproductive",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.reproductive.LOD2.glb",
+   "structures": 7,
+   "tris_master": 6298,
+   "tris_lod": 856,
+   "bytes_raw": 28172,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.044,
+     0.158
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.045,
+     0.142
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.038,
+     0.092
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.036,
+     0.091
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.PROSTATE",
+     0.078,
+     0.27
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.R",
+     0.076,
+     0.209
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.L",
+     0.071,
+     0.154
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "respiratory",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.respiratory.LOD2.glb",
+   "structures": 6,
+   "tris_master": 21940,
+   "tris_lod": 2268,
+   "bytes_raw": 51544,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET2",
+     0.078,
+     0.393
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.R",
+     0.098,
+     0.405
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.L",
+     0.083,
+     0.341
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.BB1",
+     0.026,
+     0.093
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET1",
+     0.049,
+     0.221
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.TRACHEA",
+     0.048,
+     0.181
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "sensory",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.sensory.LOD2.glb",
+   "structures": 10,
+   "tris_master": 150012,
+   "tris_lod": 14996,
+   "bytes_raw": 287484,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.L",
+     0.006,
+     0.021
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.R",
+     0.006,
+     0.021
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.L",
+     0.01,
+     0.036
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.R",
+     0.01,
+     0.033
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.L",
+     0.004,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.R",
+     0.004,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.L",
+     0.002,
+     0.008
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.R",
+     0.002,
+     0.008
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.L",
+     0.002,
+     0.009
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.R",
+     0.002,
+     0.009
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "skeletal",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.skeletal.LOD2.glb",
+   "structures": 26,
+   "tris_master": 565622,
+   "tris_lod": 56626,
+   "bytes_raw": 1070860,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.07,
+     0.299
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.045,
+     0.23
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_LEGS",
+     0.079,
+     0.333
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.047,
+     0.248
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.123,
+     0.508
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.027,
+     0.121
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_ARMS",
+     0.097,
+     0.319
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.047,
+     0.221
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.RIBS_CORTICAL",
+     0.201,
+     0.741
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.083,
+     0.343
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.096,
+     0.344
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.122,
+     0.41
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "surface",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.surface.LOD2.glb",
+   "structures": 1,
+   "tris_master": 85978,
+   "tris_lod": 8596,
+   "bytes_raw": 157044,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SURFACE.SKIN",
+     0.06,
+     0.323
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "urinary",
+   "lod": "LOD2",
+   "file": "pediatric_neonate_male.urinary.LOD2.glb",
+   "structures": 9,
+   "tris_master": 23502,
+   "tris_lod": 2378,
+   "bytes_raw": 58724,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.079,
+     0.275
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.052,
+     0.223
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.092,
+     0.321
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.035,
+     0.144
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.064,
+     0.227
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.096,
+     0.349
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.038,
+     0.142
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.L",
+     0.137,
+     0.589
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.R",
+     0.125,
+     0.469
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.cardiovascular.LOD3.glb",
+   "structures": 4,
+   "tris_master": 155216,
+   "tris_lod": 6206,
+   "bytes_raw": 117780,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.185,
+     0.771
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.257,
+     1.137
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.732,
+     2.144
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.595,
+     2.212
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "digestive",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.digestive.LOD3.glb",
+   "structures": 22,
+   "tris_master": 117344,
+   "tris_lod": 4912,
+   "bytes_raw": 131320,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.273,
+     1.245
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.031,
+     0.155
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.059,
+     0.295
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.064,
+     0.324
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.069,
+     0.28
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.LIVER",
+     0.438,
+     2.003
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SIGMOID_COLON_WALL",
+     0.416,
+     1.617
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.OESOPHAGUS_WALL",
+     0.195,
+     0.982
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.L",
+     0.427,
+     2.013
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.GALL_BLADDER_WALL",
+     0.205,
+     0.911
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.SALIVARY_GLANDS.L",
+     0.415,
+     1.464
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.DIGESTIVE.TRANSVERSE_COLON_WALL.R",
+     0.469,
+     3.214
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "endocrine",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.endocrine.LOD3.glb",
+   "structures": 5,
+   "tris_master": 5350,
+   "tris_lod": 330,
+   "bytes_raw": 14968,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.L",
+     0.182,
+     0.786
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.ADRENAL.R",
+     0.209,
+     1.337
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PANCREAS",
+     0.349,
+     1.114
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.THYROID",
+     0.23,
+     0.711
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.109,
+     0.262
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "lymphatic",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.lymphatic.LOD3.glb",
+   "structures": 9,
+   "tris_master": 68454,
+   "tris_lod": 2804,
+   "bytes_raw": 95232,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.641,
+     1.142
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.679,
+     1.274
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.68,
+     1.273
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.629,
+     1.142
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.629,
+     1.143
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.64,
+     1.143
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.THYMUS",
+     0.365,
+     1.612
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.SPLEEN",
+     0.345,
+     1.254
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.LYMPHATIC.TONSILS",
+     0.154,
+     0.421
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "muscular",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.muscular.LOD3.glb",
+   "structures": 1,
+   "tris_master": 296992,
+   "tris_lod": 11878,
+   "bytes_raw": 203940,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.MUSCULAR.MUSCLE",
+     0.258,
+     1.273
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "nervous",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.nervous.LOD3.glb",
+   "structures": 2,
+   "tris_master": 6460,
+   "tris_lod": 278,
+   "bytes_raw": 8972,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.BRAIN",
+     0.422,
+     1.889
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.NERVOUS.SPINAL_CORD",
+     0.226,
+     0.967
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "reproductive",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.reproductive.LOD3.glb",
+   "structures": 7,
+   "tris_master": 6298,
+   "tris_lod": 416,
+   "bytes_raw": 20240,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.091,
+     0.253
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.088,
+     0.248
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.068,
+     0.198
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.071,
+     0.222
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.PROSTATE",
+     0.147,
+     0.48
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.R",
+     0.131,
+     0.325
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.REPRODUCTIVE.TESTIS.L",
+     0.131,
+     0.404
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "respiratory",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.respiratory.LOD3.glb",
+   "structures": 6,
+   "tris_master": 21940,
+   "tris_lod": 928,
+   "bytes_raw": 27412,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET2",
+     0.194,
+     0.837
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.R",
+     0.213,
+     0.865
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.LUNG.L",
+     0.182,
+     0.673
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.BB1",
+     0.063,
+     0.243
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.ET1",
+     0.098,
+     0.443
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.RESPIRATORY.TRACHEA",
+     0.094,
+     0.316
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "sensory",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.sensory.LOD3.glb",
+   "structures": 10,
+   "tris_master": 150012,
+   "tris_lod": 5988,
+   "bytes_raw": 125300,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.L",
+     0.014,
+     0.051
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.VITREOUS.R",
+     0.014,
+     0.051
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.L",
+     0.023,
+     0.073
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.CORNEA.R",
+     0.026,
+     0.076
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.L",
+     0.01,
+     0.036
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.AQUEOUS.R",
+     0.011,
+     0.043
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.L",
+     0.005,
+     0.023
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.INSENSITIVELENS.R",
+     0.005,
+     0.018
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.L",
+     0.006,
+     0.022
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SENSORY.SENSITIVELENS.R",
+     0.005,
+     0.023
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "skeletal",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.skeletal.LOD3.glb",
+   "structures": 26,
+   "tris_master": 565622,
+   "tris_lod": 22674,
+   "bytes_raw": 459648,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.181,
+     0.802
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.101,
+     0.647
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_LEGS",
+     0.172,
+     0.85
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.116,
+     0.527
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.272,
+     1.327
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.061,
+     0.265
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.CARTILAGE_ARMS",
+     0.21,
+     0.697
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.107,
+     0.43
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.RIBS_CORTICAL",
+     0.483,
+     1.704
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.193,
+     0.699
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.221,
+     0.765
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.256,
+     0.92
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "surface",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.surface.LOD3.glb",
+   "structures": 1,
+   "tris_master": 85978,
+   "tris_lod": 3438,
+   "bytes_raw": 64196,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.SURFACE.SKIN",
+     0.148,
+     0.77
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.NEONATE.MALE",
+   "system": "urinary",
+   "lod": "LOD3",
+   "file": "pediatric_neonate_male.urinary.LOD3.glb",
+   "structures": 9,
+   "tris_master": 23502,
+   "tris_lod": 970,
+   "bytes_raw": 33336,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.195,
+     0.683
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.119,
+     0.48
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.212,
+     0.853
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.087,
+     0.343
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.144,
+     0.623
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.204,
+     0.751
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.086,
+     0.303
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.L",
+     0.29,
+     1.05
+    ],
+    [
+     "PEDIATRIC.NEONATE.MALE.URINARY.URETER.R",
+     0.218,
+     0.9
+    ]
+   ]
+  }
+ ]
+}

@@ -163,7 +163,7 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
 - **Not merged with the male.** The two bodies are separate subjects; combining them would
   need a registration transform that no source provides.
 
-## Paediatric bodies — source_backed (local; redistribution pending)
+## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
 
 - **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*
   (2024), polygon-mesh OBJ files from `P156 Electronic files.zip`
@@ -172,9 +172,11 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
   adjusted to the ICRP Publication 89 reference values. They are **not** scaled adults.
 - **Retrieval:** HTTP range requests on the 11.8 GB archive fetched only the README and the
   ten OBJ/MTL pairs.
-- **Licence:** neither the ICRP page nor the README states terms for redistributing the data.
-  The derived bodies live only in local `bodies/*.blend` (git-ignored) and are **not** in the
-  repo or the app until the owner decides on redistribution.
+- **Licence:** neither the ICRP page nor the README states redistribution terms. The project
+  owner cleared redistribution in Panacea on 2026-10-03. The web derivatives are published in
+  `public/bodyexposure/pediatric_*`; the master body `.blend` files stay local (size).
+- **Laterality correction:** the 15-year female phantom labels its ovaries with swapped
+  sides; the builder corrects this from geometry and records it on the objects.
 - **Conversion** (`pipeline/build_icrp156_bodies.py`): cm → m, feet to z = 0, no rotation
   needed. Verified on the 5-year-old male: sternum at −Y, liver at −X, the master's
   convention.
@@ -201,3 +203,13 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
 `HUMAN.PREGNANT`, `FETUS`, `PEDIATRIC.TODDLER` and `HUMAN.OLDER_ADULT` exist as empty root collections. Each records the source data it needs
 (`panacea_source_requirement`). No geometry was fabricated, and none was produced by scaling
 or inflating an adult body.
+
+## Considered and not used: thebuggeddev/anatomy
+
+The owner pointed to https://github.com/thebuggeddev/anatomy (inspected 2026-10-03). Its nine
+organ models (brain, eyeball, heart, intestine, kidneys, liver, lungs, pancreas, skin) are
+each a single mesh named `tripo_node_<uuid>`: output of the Tripo AI text/image-to-3D
+generator. The repository has no licence file and no attribution, and the meshes have no
+internal anatomy. Under this project's reference standard, generated geometry is not
+evidence for anatomy, so none of it was merged. Source-backed versions of all nine organs
+already exist in the canonical bodies.

@@ -18,8 +18,9 @@ try {
       await stats.waitFor({ timeout: 60000 })
       assert.match(await stats.textContent(), /^3,876 structures/, 'male structure count')
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow')
-      // tubuh yang belum punya data sumber tidak bisa dipilih
-      assert(await page.getByRole('tab', { name: /Neonate/ }).isDisabled(), 'placeholder body must be disabled')
+      // tubuh tanpa data sumber tetap tidak bisa dipilih; tubuh pediatrik ICRP bisa
+      assert(await page.getByRole('tab', { name: /Pregnancy/ }).isDisabled(), 'placeholder body must be disabled')
+      assert(!(await page.getByRole('tab', { name: /Neonate/ }).isDisabled()), 'neonate must be available')
       // pencarian → pilih → panel provenans
       await page.getByLabel('Find a structure').fill('femur')
       await page.getByRole('button', { name: /^femur/i }).first().click()
@@ -33,7 +34,15 @@ try {
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })
-      console.log(JSON.stringify({ width, theme, male: 3876, female: (await page.getByText(/structures · \d+k/).textContent()) }))
+      // anak: varian 5 th & 10 th, laki-laki & perempuan
+      await page.getByRole('tab', { name: /^Child/ }).click()
+      await page.getByRole('radio', { name: '10 y · Female' }).click()
+      await page.getByText(/stature 138 cm/).waitFor({ timeout: 60000 })
+      await page.getByText(/^140 structures · \d+k triangles/).waitFor({ timeout: 60000 })
+      await page.getByRole('tab', { name: /^Neonate/ }).click()
+      await page.getByText(/stature 48 cm/).waitFor({ timeout: 60000 })
+      await page.screenshot({ path: `/private/tmp/canonical-neonate-${width}-${theme}.png`, fullPage: true })
+      console.log(JSON.stringify({ width, theme, male: 3876, last_loaded: (await page.getByText(/structures · \d+k/).textContent()) }))
     }
   }
   assert.deepEqual(errors, [])

@@ -1,0 +1,76 @@
+{
+ "body": "PEDIATRIC.ADOLESCENT.FEMALE",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": "44 paired structures consistent"
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.045
+  },
+  {
+   "check": "spleen_on_left",
+   "ok": true,
+   "detail": 0.0967
+  },
+  {
+   "check": "heart_left_of_midline",
+   "ok": true,
+   "detail": 0.0224
+  },
+  {
+   "check": "stomach_on_left",
+   "ok": true,
+   "detail": 0.049
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "detail": {
+    "brain": 1.516,
+    "heart": 1.226,
+    "liver": 1.11,
+    "kidney": 1.057,
+    "bladder": 0.834
+   }
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "heart_within_ribcage_height",
+   "ok": true,
+   "detail": {
+    "heart_z": 1.226,
+    "ribs_z": [
+     1.038,
+     1.366
+    ]
+   }
+  },
+  {
+   "check": "brain_within_cranium_bounds",
+   "ok": true,
+   "detail": "bbox containment"
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "LIVER|CARDIOVASCULAR.HEART_WALL": 0.0,
+    "LIVER|DIGESTIVE.STOMACH_WALL": 0.0,
+    "HEART_WALL|RESPIRATORY.LUNG.L": 0.0,
+    "HEART_WALL|RESPIRATORY.LUNG.R": 0.0,
+    "L|LYMPHATIC.SPLEEN": 0.0,
+    "LIVER|URINARY.KIDNEY_CORTEX.R": 0.0,
+    "URINARY_BLADDER_WALL|DIGESTIVE.RECTUM_WALL": 0.0
+   }
+  }
+ ],
+ "failures": []
+}

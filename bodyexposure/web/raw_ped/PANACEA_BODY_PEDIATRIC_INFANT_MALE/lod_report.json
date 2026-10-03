@@ -1,0 +1,2158 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  }
+ },
+ "files": [
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.cardiovascular.LOD0.glb",
+   "structures": 4,
+   "tris_master": 174508,
+   "tris_lod": 87252,
+   "bytes_raw": 1576612,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.012,
+     0.048
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.018,
+     0.072
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.095,
+     0.336
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.099,
+     0.393
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "digestive",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.digestive.LOD0.glb",
+   "structures": 32,
+   "tris_master": 169962,
+   "tris_lod": 85306,
+   "bytes_raw": 1597984,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.003,
+     0.014
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.007,
+     0.054
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.01,
+     0.046
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.008,
+     0.035
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.071,
+     0.303
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.006,
+     0.024
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.005,
+     0.021
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_PULP",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.006,
+     0.023
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_DECIDUOUS_ENAMEL",
+     0.002,
+     0.019
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_DECIDUOUS_ENAMEL",
+     0.001,
+     0.03
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_DECIDUOUS_DENTIN",
+     0.006,
+     0.031
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "endocrine",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.endocrine.LOD0.glb",
+   "structures": 5,
+   "tris_master": 1924,
+   "tris_lod": 1824,
+   "bytes_raw": 41876,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.THYROID",
+     0.015,
+     0.12
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.L",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.R",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PANCREAS",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.lymphatic.LOD0.glb",
+   "structures": 9,
+   "tris_master": 67100,
+   "tris_lod": 33900,
+   "bytes_raw": 629272,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.1,
+     0.204
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.102,
+     0.204
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.102,
+     0.204
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.083,
+     0.14
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.083,
+     0.14
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.1,
+     0.204
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.THYMUS",
+     0.064,
+     0.314
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.TONSILS",
+     0.024,
+     0.098
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.SPLEEN",
+     0.021,
+     0.251
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "muscular",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.muscular.LOD0.glb",
+   "structures": 1,
+   "tris_master": 320412,
+   "tris_lod": 160206,
+   "bytes_raw": 3836232,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.MUSCULAR.MUSCLE",
+     0.022,
+     0.095
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "nervous",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.nervous.LOD0.glb",
+   "structures": 2,
+   "tris_master": 13516,
+   "tris_lod": 6756,
+   "bytes_raw": 125576,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.BRAIN",
+     0.025,
+     0.123
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.SPINAL_CORD",
+     0.089,
+     0.385
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "reproductive",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.reproductive.LOD0.glb",
+   "structures": 7,
+   "tris_master": 2408,
+   "tris_lod": 2114,
+   "bytes_raw": 50788,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.PROSTATE",
+     0.017,
+     0.069
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.R",
+     0.01,
+     0.05
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.L",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.0,
+     0.0
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "respiratory",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.respiratory.LOD0.glb",
+   "structures": 6,
+   "tris_master": 14170,
+   "tris_lod": 7292,
+   "bytes_raw": 141952,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET2",
+     0.019,
+     0.086
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.R",
+     0.059,
+     0.266
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.L",
+     0.066,
+     0.276
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.BB1",
+     0.023,
+     0.08
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET1",
+     0.007,
+     0.065
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.TRACHEA",
+     0.004,
+     0.044
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "sensory",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.sensory.LOD0.glb",
+   "structures": 10,
+   "tris_master": 130136,
+   "tris_lod": 65068,
+   "bytes_raw": 1188776,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.L",
+     0.001,
+     0.004
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.R",
+     0.001,
+     0.004
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.L",
+     0.002,
+     0.005
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.R",
+     0.002,
+     0.006
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.L",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.R",
+     0.001,
+     0.003
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.L",
+     0.001,
+     0.002
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.R",
+     0.001,
+     0.002
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.L",
+     0.0,
+     0.002
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.R",
+     0.0,
+     0.002
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "skeletal",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.skeletal.LOD0.glb",
+   "structures": 24,
+   "tris_master": 353834,
+   "tris_lod": 177052,
+   "bytes_raw": 3234980,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.013,
+     0.051
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.022,
+     0.093
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.013,
+     0.054
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.RIBS_CORTICAL",
+     0.027,
+     0.086
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.017,
+     0.073
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.018,
+     0.075
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.008,
+     0.039
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.053,
+     0.172
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.SACRUM_CORTICAL",
+     0.02,
+     0.09
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.055,
+     0.217
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.014,
+     0.056
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.037,
+     0.111
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "surface",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.surface.LOD0.glb",
+   "structures": 1,
+   "tris_master": 58038,
+   "tris_lod": 29018,
+   "bytes_raw": 524640,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SURFACE.SKIN",
+     0.008,
+     0.053
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "urinary",
+   "lod": "LOD0",
+   "file": "pediatric_infant_male.urinary.LOD0.glb",
+   "structures": 9,
+   "tris_master": 9934,
+   "tris_lod": 5232,
+   "bytes_raw": 110076,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.027,
+     0.089
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.R",
+     0.045,
+     0.205
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.L",
+     0.051,
+     0.222
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.076,
+     0.327
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.053,
+     0.204
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.03,
+     0.142
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.083,
+     0.274
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.057,
+     0.214
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.031,
+     0.104
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.cardiovascular.LOD1.glb",
+   "structures": 4,
+   "tris_master": 174508,
+   "tris_lod": 43622,
+   "bytes_raw": 791264,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.035,
+     0.121
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.045,
+     0.17
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.211,
+     0.703
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.225,
+     0.906
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "digestive",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.digestive.LOD1.glb",
+   "structures": 32,
+   "tris_master": 169962,
+   "tris_lod": 42640,
+   "bytes_raw": 829924,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.008,
+     0.036
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.016,
+     0.09
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.023,
+     0.092
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.021,
+     0.078
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.191,
+     0.667
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.012,
+     0.054
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.014,
+     0.044
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_PULP",
+     0.004,
+     0.022
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.014,
+     0.052
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_DECIDUOUS_ENAMEL",
+     0.01,
+     0.043
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_DECIDUOUS_ENAMEL",
+     0.007,
+     0.074
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_DECIDUOUS_DENTIN",
+     0.015,
+     0.057
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "endocrine",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.endocrine.LOD1.glb",
+   "structures": 5,
+   "tris_master": 1924,
+   "tris_lod": 1000,
+   "bytes_raw": 27036,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.THYROID",
+     0.09,
+     0.263
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.L",
+     0.064,
+     0.199
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.R",
+     0.057,
+     0.186
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PANCREAS",
+     0.142,
+     0.568
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.005,
+     0.035
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.lymphatic.LOD1.glb",
+   "structures": 9,
+   "tris_master": 67100,
+   "tris_lod": 16946,
+   "bytes_raw": 352240,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.194,
+     0.425
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.201,
+     0.467
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.203,
+     0.467
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.217,
+     0.371
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.217,
+     0.371
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.191,
+     0.425
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.THYMUS",
+     0.184,
+     0.682
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.TONSILS",
+     0.102,
+     0.193
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.SPLEEN",
+     0.166,
+     0.544
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "muscular",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.muscular.LOD1.glb",
+   "structures": 1,
+   "tris_master": 320412,
+   "tris_lod": 80102,
+   "bytes_raw": 1433120,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.MUSCULAR.MUSCLE",
+     0.057,
+     0.243
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "nervous",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.nervous.LOD1.glb",
+   "structures": 2,
+   "tris_master": 13516,
+   "tris_lod": 3376,
+   "bytes_raw": 64732,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.BRAIN",
+     0.058,
+     0.232
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.SPINAL_CORD",
+     0.183,
+     0.803
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "reproductive",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.reproductive.LOD1.glb",
+   "structures": 7,
+   "tris_master": 2408,
+   "tris_lod": 1400,
+   "bytes_raw": 37928,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.PROSTATE",
+     0.056,
+     0.167
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.R",
+     0.056,
+     0.139
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.L",
+     0.047,
+     0.122
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.009,
+     0.048
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.009,
+     0.048
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.007,
+     0.069
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.007,
+     0.069
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "respiratory",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.respiratory.LOD1.glb",
+   "structures": 6,
+   "tris_master": 14170,
+   "tris_lod": 3644,
+   "bytes_raw": 76268,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET2",
+     0.047,
+     0.23
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.R",
+     0.143,
+     0.714
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.L",
+     0.164,
+     0.723
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.BB1",
+     0.047,
+     0.153
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET1",
+     0.037,
+     0.166
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.TRACHEA",
+     0.05,
+     0.132
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "sensory",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.sensory.LOD1.glb",
+   "structures": 10,
+   "tris_master": 130136,
+   "tris_lod": 32528,
+   "bytes_raw": 603040,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.L",
+     0.003,
+     0.009
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.R",
+     0.003,
+     0.01
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.L",
+     0.005,
+     0.013
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.R",
+     0.005,
+     0.013
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.L",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.R",
+     0.002,
+     0.007
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.L",
+     0.001,
+     0.004
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.R",
+     0.001,
+     0.004
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.L",
+     0.001,
+     0.002
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.R",
+     0.001,
+     0.002
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "skeletal",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.skeletal.LOD1.glb",
+   "structures": 24,
+   "tris_master": 353834,
+   "tris_lod": 88514,
+   "bytes_raw": 1641212,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.027,
+     0.131
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.045,
+     0.196
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.028,
+     0.113
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.RIBS_CORTICAL",
+     0.065,
+     0.205
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.043,
+     0.172
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.042,
+     0.166
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.018,
+     0.067
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.109,
+     0.363
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.SACRUM_CORTICAL",
+     0.048,
+     0.215
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.128,
+     0.421
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.031,
+     0.133
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.067,
+     0.244
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "surface",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.surface.LOD1.glb",
+   "structures": 1,
+   "tris_master": 58038,
+   "tris_lod": 14508,
+   "bytes_raw": 263452,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SURFACE.SKIN",
+     0.042,
+     0.261
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "urinary",
+   "lod": "LOD1",
+   "file": "pediatric_infant_male.urinary.LOD1.glb",
+   "structures": 9,
+   "tris_master": 9934,
+   "tris_lod": 2614,
+   "bytes_raw": 62936,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.055,
+     0.177
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.R",
+     0.104,
+     0.385
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.L",
+     0.118,
+     0.492
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.195,
+     0.795
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.12,
+     0.543
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.072,
+     0.248
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.206,
+     0.636
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.136,
+     0.534
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.077,
+     0.223
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.cardiovascular.LOD2.glb",
+   "structures": 4,
+   "tris_master": 174508,
+   "tris_lod": 17482,
+   "bytes_raw": 320716,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.085,
+     0.338
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.113,
+     0.464
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.428,
+     1.461
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.341,
+     1.315
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "digestive",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.digestive.LOD2.glb",
+   "structures": 32,
+   "tris_master": 169962,
+   "tris_lod": 17334,
+   "bytes_raw": 374296,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.018,
+     0.092
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.034,
+     0.205
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.045,
+     0.222
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.048,
+     0.241
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.408,
+     1.946
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.024,
+     0.109
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.028,
+     0.108
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_PULP",
+     0.009,
+     0.039
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.03,
+     0.114
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_DECIDUOUS_ENAMEL",
+     0.023,
+     0.113
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_DECIDUOUS_ENAMEL",
+     0.017,
+     0.103
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_DECIDUOUS_DENTIN",
+     0.036,
+     0.169
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "endocrine",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.endocrine.LOD2.glb",
+   "structures": 5,
+   "tris_master": 1924,
+   "tris_lod": 600,
+   "bytes_raw": 19800,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.THYROID",
+     0.164,
+     0.534
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.L",
+     0.109,
+     0.276
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.R",
+     0.114,
+     0.342
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PANCREAS",
+     0.288,
+     0.816
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.067,
+     0.144
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.lymphatic.LOD2.glb",
+   "structures": 9,
+   "tris_master": 67100,
+   "tris_lod": 6900,
+   "bytes_raw": 165544,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.391,
+     0.768
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.405,
+     0.866
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.404,
+     0.866
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.454,
+     0.76
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.454,
+     0.76
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.39,
+     0.768
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.THYMUS",
+     0.3,
+     1.093
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.TONSILS",
+     0.147,
+     0.34
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.SPLEEN",
+     0.287,
+     1.303
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "muscular",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.muscular.LOD2.glb",
+   "structures": 1,
+   "tris_master": 320412,
+   "tris_lod": 32040,
+   "bytes_raw": 568000,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.MUSCULAR.MUSCLE",
+     0.138,
+     0.49
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "nervous",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.nervous.LOD2.glb",
+   "structures": 2,
+   "tris_master": 13516,
+   "tris_lod": 1350,
+   "bytes_raw": 28248,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.BRAIN",
+     0.125,
+     0.593
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.SPINAL_CORD",
+     0.358,
+     1.459
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "reproductive",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.reproductive.LOD2.glb",
+   "structures": 7,
+   "tris_master": 2408,
+   "tris_lod": 840,
+   "bytes_raw": 27808,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.PROSTATE",
+     0.085,
+     0.22
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.R",
+     0.09,
+     0.271
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.L",
+     0.088,
+     0.261
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.051,
+     0.157
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.051,
+     0.157
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.068,
+     0.201
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.068,
+     0.201
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "respiratory",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.respiratory.LOD2.glb",
+   "structures": 6,
+   "tris_master": 14170,
+   "tris_lod": 1534,
+   "bytes_raw": 38272,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET2",
+     0.121,
+     0.654
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.R",
+     0.309,
+     1.223
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.L",
+     0.352,
+     1.28
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.BB1",
+     0.1,
+     0.369
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET1",
+     0.061,
+     0.252
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.TRACHEA",
+     0.077,
+     0.215
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "sensory",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.sensory.LOD2.glb",
+   "structures": 10,
+   "tris_master": 130136,
+   "tris_lod": 13004,
+   "bytes_raw": 251572,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.L",
+     0.007,
+     0.026
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.R",
+     0.007,
+     0.028
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.L",
+     0.011,
+     0.036
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.R",
+     0.011,
+     0.033
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.L",
+     0.004,
+     0.017
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.R",
+     0.004,
+     0.016
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.L",
+     0.003,
+     0.01
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.R",
+     0.003,
+     0.01
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.L",
+     0.002,
+     0.008
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.R",
+     0.002,
+     0.008
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "skeletal",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.skeletal.LOD2.glb",
+   "structures": 24,
+   "tris_master": 353834,
+   "tris_lod": 35460,
+   "bytes_raw": 686160,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.064,
+     0.3
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.103,
+     0.379
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.061,
+     0.284
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.RIBS_CORTICAL",
+     0.145,
+     0.46
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.099,
+     0.495
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.084,
+     0.351
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.038,
+     0.175
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.237,
+     0.875
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.SACRUM_CORTICAL",
+     0.105,
+     0.503
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.287,
+     1.021
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.067,
+     0.241
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.154,
+     0.558
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "surface",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.surface.LOD2.glb",
+   "structures": 1,
+   "tris_master": 58038,
+   "tris_lod": 5802,
+   "bytes_raw": 106744,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SURFACE.SKIN",
+     0.108,
+     0.454
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "urinary",
+   "lod": "LOD2",
+   "file": "pediatric_infant_male.urinary.LOD2.glb",
+   "structures": 9,
+   "tris_master": 9934,
+   "tris_lod": 1300,
+   "bytes_raw": 39232,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.13,
+     0.464
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.R",
+     0.23,
+     1.032
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.L",
+     0.213,
+     0.913
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.307,
+     1.03
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.197,
+     0.824
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.112,
+     0.445
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.308,
+     1.148
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.219,
+     0.714
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.124,
+     0.469
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.cardiovascular.LOD3.glb",
+   "structures": 4,
+   "tris_master": 174508,
+   "tris_lod": 7014,
+   "bytes_raw": 132292,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_ARTERIES",
+     0.206,
+     1.693
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_LARGE_VEINS",
+     0.28,
+     1.48
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.BLOOD_IN_HEART_CHAMBER",
+     0.851,
+     3.042
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.CARDIOVASCULAR.HEART_WALL",
+     0.631,
+     2.224
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "digestive",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.digestive.LOD3.glb",
+   "structures": 32,
+   "tris_master": 169962,
+   "tris_lod": 7076,
+   "bytes_raw": 189536,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_PULP",
+     0.041,
+     0.191
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.DECIDUOUS_CEMENTUM",
+     0.083,
+     0.404
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_ENAMEL",
+     0.096,
+     0.607
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_DECIDUOUS_DENTIN",
+     0.101,
+     0.5
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.SMALL_INTESTINE_WALL",
+     0.9,
+     4.357
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_CEMENTUM",
+     0.046,
+     0.194
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_ENAMEL",
+     0.063,
+     0.244
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.PERMANENT_PULP",
+     0.019,
+     0.076
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.UNERUPTED_PERMANENT_DENTIN",
+     0.068,
+     0.256
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_LINGUAL_DECIDUOUS_ENAMEL",
+     0.043,
+     0.207
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_BUCCAL_DECIDUOUS_ENAMEL",
+     0.038,
+     0.254
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.DIGESTIVE.ERUPTED_LOWER_FRONT_DECIDUOUS_DENTIN",
+     0.071,
+     0.356
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "endocrine",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.endocrine.LOD3.glb",
+   "structures": 5,
+   "tris_master": 1924,
+   "tris_lod": 300,
+   "bytes_raw": 14404,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.THYROID",
+     0.318,
+     1.081
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.L",
+     0.222,
+     0.75
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.ADRENAL.R",
+     0.213,
+     0.626
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PANCREAS",
+     0.468,
+     1.597
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.ENDOCRINE.PITUITARY_GLAND",
+     0.139,
+     0.306
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.lymphatic.LOD3.glb",
+   "structures": 9,
+   "tris_master": 67100,
+   "tris_lod": 2796,
+   "bytes_raw": 95008,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_TRUNK",
+     0.772,
+     1.377
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ET",
+     0.819,
+     1.535
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_THORACIC",
+     0.821,
+     1.535
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_ARMS",
+     0.758,
+     1.377
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_LEGS",
+     0.758,
+     1.377
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.LYMPHATIC_NODES_HEAD",
+     0.772,
+     1.377
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.THYMUS",
+     0.535,
+     2.738
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.TONSILS",
+     0.262,
+     0.679
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.LYMPHATIC.SPLEEN",
+     0.461,
+     1.612
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "muscular",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.muscular.LOD3.glb",
+   "structures": 1,
+   "tris_master": 320412,
+   "tris_lod": 12816,
+   "bytes_raw": 221968,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.MUSCULAR.MUSCLE",
+     0.333,
+     1.937
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "nervous",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.nervous.LOD3.glb",
+   "structures": 2,
+   "tris_master": 13516,
+   "tris_lod": 538,
+   "bytes_raw": 13632,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.BRAIN",
+     0.278,
+     1.343
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.NERVOUS.SPINAL_CORD",
+     0.66,
+     2.461
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "reproductive",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.reproductive.LOD3.glb",
+   "structures": 7,
+   "tris_master": 2408,
+   "tris_lod": 420,
+   "bytes_raw": 20244,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.PROSTATE",
+     0.148,
+     0.524
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.R",
+     0.172,
+     0.591
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.TESTIS.L",
+     0.173,
+     0.479
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.L",
+     0.148,
+     0.387
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_GLANDULAR_TISSUE.R",
+     0.148,
+     0.387
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.L",
+     0.203,
+     0.55
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.REPRODUCTIVE.BREAST_ADIPOSE_TISSUE.R",
+     0.203,
+     0.55
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "respiratory",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.respiratory.LOD3.glb",
+   "structures": 6,
+   "tris_master": 14170,
+   "tris_lod": 636,
+   "bytes_raw": 22088,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET2",
+     0.266,
+     1.189
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.R",
+     0.592,
+     2.398
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.LUNG.L",
+     0.781,
+     3.359
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.BB1",
+     0.223,
+     0.834
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.ET1",
+     0.112,
+     0.453
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.RESPIRATORY.TRACHEA",
+     0.148,
+     0.399
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "sensory",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.sensory.LOD3.glb",
+   "structures": 10,
+   "tris_master": 130136,
+   "tris_lod": 5196,
+   "bytes_raw": 110984,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.L",
+     0.016,
+     0.063
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.VITREOUS.R",
+     0.017,
+     0.068
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.L",
+     0.024,
+     0.086
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.CORNEA.R",
+     0.023,
+     0.08
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.L",
+     0.013,
+     0.061
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.AQUEOUS.R",
+     0.011,
+     0.051
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.L",
+     0.008,
+     0.031
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.INSENSITIVELENS.R",
+     0.008,
+     0.031
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.L",
+     0.006,
+     0.034
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SENSORY.SENSITIVELENS.R",
+     0.006,
+     0.031
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "skeletal",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.skeletal.LOD3.glb",
+   "structures": 24,
+   "tris_master": 353834,
+   "tris_lod": 14198,
+   "bytes_raw": 303360,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.THORACIC_SPINE_CORTICAL",
+     0.139,
+     0.599
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CRANIUM_CORTICAL",
+     0.254,
+     1.165
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CERVICAL_SPINE_CORTICAL",
+     0.147,
+     0.674
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.RIBS_CORTICAL",
+     0.367,
+     1.222
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_TRUNK",
+     0.212,
+     0.802
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.LUMBAR_SPINE_CORTICAL",
+     0.18,
+     0.64
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.CARTILAGE_HEAD",
+     0.078,
+     0.328
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.WRISTS_AND_HAND_BONES_CORTICAL",
+     0.538,
+     2.058
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.SACRUM_CORTICAL",
+     0.271,
+     1.174
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.ANKLES_AND_FOOT_CORTICAL",
+     0.591,
+     2.182
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.MANDIBLE_CORTICAL",
+     0.173,
+     0.666
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.SKELETAL.PELVIS_CORTICAL",
+     0.356,
+     1.708
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "surface",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.surface.LOD3.glb",
+   "structures": 1,
+   "tris_master": 58038,
+   "tris_lod": 2320,
+   "bytes_raw": 44064,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.SURFACE.SKIN",
+     0.255,
+     1.344
+    ]
+   ]
+  },
+  {
+   "body": "PEDIATRIC.INFANT.MALE",
+   "system": "urinary",
+   "lod": "LOD3",
+   "file": "pediatric_infant_male.urinary.LOD3.glb",
+   "structures": 9,
+   "tris_master": 9934,
+   "tris_lod": 610,
+   "bytes_raw": 26804,
+   "error_mm_largest_structures": [
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URINARY_BLADDER_WALL",
+     0.335,
+     1.293
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.R",
+     0.419,
+     1.641
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.URETER.L",
+     0.453,
+     1.884
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.L",
+     0.592,
+     2.126
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.L",
+     0.343,
+     1.281
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.L",
+     0.198,
+     0.803
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_CORTEX.R",
+     0.589,
+     1.956
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_MEDULLA.R",
+     0.426,
+     1.444
+    ],
+    [
+     "PEDIATRIC.INFANT.MALE.URINARY.KIDNEY_PELVIS.R",
+     0.22,
+     0.789
+    ]
+   ]
+  }
+ ]
+}

@@ -25,7 +25,7 @@ SEX = {"M": "MALE", "F": "FEMALE"}
 
 DROP = re.compile(r"(_-?\d+um\b|_-?\d+um_|spongiosa|medullary|contents|\(air\)|^RST$|Teeth_retention|^Skin_(40|100)um)", re.I)
 SYSTEMS = [  # (pola, sistem, bahan)
-    (r"cortical|cartilage|cranium|mandible|pelvis|ribs|spine|sacrum|sternum|scapulae|clavicles", "skeletal", "PAN_Bone"),
+    (r"cortical$|^cartilage", "skeletal", "PAN_Bone"),  # semua grup tulang ICRP berakhiran _cortical
     (r"enamel|dentin|cementum|pulp", "digestive", "PAN_Enamel"),
     (r"blood_in_large_arteries", "cardiovascular", "PAN_Artery"),
     (r"blood_in_large_veins", "cardiovascular", "PAN_Vein"),
@@ -95,9 +95,15 @@ def build(code):
         me = bpy.data.meshes.new(raw)
         me.from_pydata(verts, [], [[remap[i] for i in f] for f in faces])
         me.validate(clean_customdata=False)
-        lat = "left" if re.search(r"_left\b|_left_|left$", label, re.I) else "right" if re.search(r"_right\b|_right_|right$", label, re.I) else "unpaired"
-        name = re.sub(r"_(left|right)\b", "", label, flags=re.I)
+        lat = "left" if re.search(r"_left(?=_|$)", label, re.I) else "right" if re.search(r"_right(?=_|$)", label, re.I) else "unpaired"
+        name = re.sub(r"_(left|right)(?=_|$)", "", label, flags=re.I)  # kata sisi bisa di tengah nama
         name = re.sub(r"_surface$", "", name).replace("_", " ").replace("(AI)", "").strip()
+        # label sisi sumber diuji terhadap geometri (+X = kiri subjek); bila bertentangan dikoreksi & dicatat
+        cx = sum(v[0] for v in verts) / len(verts)
+        side_fix = None
+        if (lat == "left" and cx < -0.003) or (lat == "right" and cx > 0.003):
+            side_fix = f"Source group '{raw}' is labelled {lat} but its centroid lies at x={cx:+.4f} m; laterality corrected from geometry."
+            lat = "right" if lat == "left" else "left"
         sid = f"{body_id}.{snake(sysn)}.{snake(name)}" + {"left": ".L", "right": ".R"}.get(lat, "")
         if sid in bpy.data.objects:
             sid += f".ID{organ_id}"
@@ -112,13 +118,15 @@ def build(code):
         meta = {"panacea_structure_id": sid, "panacea_body_id": body_id, "canonical_name": name,
                 "panacea_system": sysn, "panacea_laterality": lat, "panacea_laterality_source": "name",
                 "panacea_source": f"ICRP Publication 156, paediatric mesh-type reference computational phantom MRCP_{code} ({age_label}, {SEX[sx].lower()})",
-                "panacea_license": "ICRP data — redistribution terms not stated; review before public release",
+                "panacea_license": "ICRP Publication 156 reference phantom data; redistribution in Panacea cleared by the project owner (2026-10-03)",
                 "panacea_source_raw_name": raw, "panacea_icrp_organ_id": int(organ_id),
                 "panacea_accuracy_status": "source_backed", "panacea_review_status": "review_required",
                 "panacea_developmental_stage": stage.lower(), "panacea_age": age_label,
                 "biological_sex_applicability": SEX[sx].lower(), "panacea_version": "body_v008",
                 "panacea_educational_only": True}
-        if re.search(r"cortical", label, re.I):
+        if side_fix:
+            meta["panacea_laterality_source"] = "geometry_override"; meta["panacea_qa_note"] = side_fix
+        elif re.search(r"cortical", label, re.I):
             meta["panacea_qa_note"] = "Cortical-bone surface of the ICRP bone region (outer bone shape); spongiosa/medulla omitted."
         for k, v in meta.items():
             ob[k] = v
@@ -138,6 +146,9 @@ if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     only = argv[argv.index("--only") + 1].split(",") if "--only" in argv else [f"{a}{s}" for a in STAGES for s in "MF"]
     res = [build(c) for c in only]
-    json.dump(res, open(f"{ROOT}/bodies/build_report.json", "w"), indent=1)
+    rp = f"{ROOT}/bodies/build_report.json"
+    old = {r["body"]: r for r in json.load(open(rp))} if os.path.exists(rp) else {}
+    old.update({r["body"]: r for r in res})  # gabung, jangan timpa hasil tubuh lain
+    json.dump(sorted(old.values(), key=lambda r: r["file"]), open(rp, "w"), indent=1)
     for r in res:
         print("BODY", r)
