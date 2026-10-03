@@ -74,6 +74,11 @@ const DISPERSE: Record<string, number> = {
 }
 type Section = 'none' | 'sagittal' | 'coronal' | 'axial'
 
+// urutan kupas dari luar ke dalam: 0 kulit · 1 fasia & otot · 2 tulang & sendi
+// opasitas tiap lapisan = 1 − clamp(kedalaman − indeks, 0, 1) → transisi kontinu, tanpa 'popping'
+const PEEL_LAYER: Record<string, number> = { surface: 0, fascia: 1, muscular: 1, skeletal: 2, joint: 2 }
+const PEEL_LABELS = ['All layers', 'Skin removed', 'Muscle & fascia removed', 'Bones removed']
+
 const DEFAULT_ON = new Set(['surface', 'skeletal', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'reproductive'])
 
 // ID tubuh → awalan berkas (HUMAN.ADULT.MALE → adult_male)
@@ -103,6 +108,7 @@ export function CanonicalBody() {
   const [section, setSection] = useState<Section>('none')
   const [sectionPos, setSectionPos] = useState(0.5)
   const [disperse, setDisperse] = useState(0)
+  const [peel, setPeel] = useState(0)
   const [measuring, setMeasuring] = useState(false)
   const [measureMm, setMeasureMm] = useState<number | null>(null)
   const measuringRef = useRef(false)
@@ -362,9 +368,11 @@ export function CanonicalBody() {
         const m = o.material as THREE.MeshStandardMaterial
         const inSel = !!selObj && isInside(o, selObj)
         const base = o.userData.baseOpacity as number
-        let opacity = base
-        if (selObj && mode === 'ghost' && !inSel) opacity = Math.min(base, 0.12)
-        o.visible = !(selObj && mode === 'isolate' && !inSel)
+        const layer = PEEL_LAYER[sys]
+        const peelKeep = layer === undefined || inSel ? 1 : 1 - Math.min(Math.max(peel - layer, 0), 1)
+        let opacity = base * peelKeep
+        if (selObj && mode === 'ghost' && !inSel) opacity = Math.min(opacity, 0.12)
+        o.visible = !(selObj && mode === 'isolate' && !inSel) && opacity > 0.01
         m.transparent = opacity < 1
         m.opacity = opacity
         m.depthWrite = opacity >= 1
@@ -529,6 +537,13 @@ export function CanonicalBody() {
               <input type="range" min={0} max={1} step={0.005} value={sectionPos} aria-label="Section position"
                 onChange={(e) => setSectionPos(Number(e.target.value))} className="mt-3 w-full" />
             )}
+          </div>
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">
+              Peel layers · <span className="normal-case">{PEEL_LABELS[Math.min(Math.round(peel), 3)]}</span>
+            </p>
+            <input type="range" min={0} max={3} step={0.01} value={peel} aria-label="Peel layers"
+              onChange={(e) => setPeel(Number(e.target.value))} className="w-full" />
           </div>
           <div>
             <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Disperse systems</p>
