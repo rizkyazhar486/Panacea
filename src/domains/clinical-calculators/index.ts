@@ -19,3 +19,5 @@ export { meanArterialPressure, SYSTOLIC_MMHG, DIASTOLIC_MMHG } from './engine/me
 export type { MapResult, MapTone } from './engine/meanArterialPressure'
 export { idealBodyWeight, dailyCalories, IBW_HEIGHT_CM, KCAL_PER_KG } from './engine/idealBodyWeight'
 export type { IdealBodyWeightResult, DailyCaloriesResult, IbwSex, IbwFormula, ActivityLevel } from './engine/idealBodyWeight'
+export { naegele, CYCLE_LENGTH_DAYS, LMP_YEAR, MAX_DISPLAY_GA_DAYS } from './engine/naegele'
+export type { NaegeleResult } from './engine/naegele'

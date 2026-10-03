@@ -293,9 +293,13 @@ risks:
       text moved unchanged and the delta-ratio and Winter thresholds pinned at their boundaries; pH/PaCO2/HCO3
       consistency checking is deliberately not added because it would be a new clinical feature). MapCalc, BrocaCalc and BrocaLorentzCalorieCalc followed through meanArterialPressure/idealBodyWeight/dailyCalories,
       scripts/uji/map-ideal-body-weight.mts; Broca had been copied into two pages and is now one source, and the MAP
-      thresholds are pinned at their boundaries. Next: the rest of the numeric calculators (11 counted on 2026-10-03
-      still read +e.target.value without a domain function: WhoGrowth, WhoNeonate, CdcAnthropometry, BallardSoap,
-      Naegele, Centor, MidParental, Fletcher, McDonald, Paradise, Denver). Noted, not changed: the Broca-Lorentz page
+      thresholds are pinned at their boundaries. NaegeleCalc followed through naegele (scripts/uji/naegele-gestational-age.mts): UTC calendar arithmetic with an
+      injected clock, real-date validation, and a CORRECTED gestational-age sign — the old page added the cycle
+      adjustment to GA while the EDD already used it, so GA on the EDD day was 294 days for a 35-day cycle and 266 for
+      a 21-day cycle instead of 280; the new test pins GA = 40w0d on the EDD for every cycle 20-60. This is a clinical
+      output change that needs clinical sign-off. Next: the rest of the numeric calculators (10 counted on
+      2026-10-03 still read +e.target.value without a domain function: WhoGrowth, WhoNeonate, CdcAnthropometry,
+      BallardSoap, Centor, MidParental, Fletcher, McDonald, Paradise, Denver). Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -317,3 +321,5 @@ risks:
       - src/domains/clinical-calculators/engine/meanArterialPressure.ts
       - src/domains/clinical-calculators/engine/idealBodyWeight.ts
       - scripts/uji/map-ideal-body-weight.mts
+      - src/domains/clinical-calculators/engine/naegele.ts
+      - scripts/uji/naegele-gestational-age.mts
