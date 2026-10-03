@@ -284,8 +284,8 @@ risks:
       scripts/uji/parkland-volumes.mts). Remaining calculators are still unvalidated;
       fix them one at a time, dose/volume-like first (done 2026-10-03: PedsDoseCalc and HollidaySegarCalc through
       pedsDose/hollidaySegar, scripts/uji/peds-dose-holliday-segar.mts; the dose function is arithmetic only and
-      deliberately invents no drug maximum). Next:
-      IvDripCalc, FluidBalanceCalc, NaCorrectionCalc, AbgCalc), moving each formula into src/domains with its own
+      deliberately invents no drug maximum; IvDripCalc through ivDrip, 2026-10-03, scripts/uji/iv-drip-rate.mts). Next:
+      FluidBalanceCalc, NaCorrectionCalc, AbgCalc), moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
       - src/lib/longevity.ts
@@ -296,3 +296,5 @@ risks:
       - src/domains/clinical-calculators/engine/pedsDose.ts
       - src/domains/clinical-calculators/engine/hollidaySegar.ts
       - scripts/uji/peds-dose-holliday-segar.mts
+      - src/domains/clinical-calculators/engine/ivDrip.ts
+      - scripts/uji/iv-drip-rate.mts
