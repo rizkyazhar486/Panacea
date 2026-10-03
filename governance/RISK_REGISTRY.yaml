@@ -311,9 +311,12 @@ risks:
       z-score and BMI classes and the masked-stunting, >10% loss and day-14 warnings are untouched. The old pages showed
       Infinity or NaN for an empty height, birth weight 0 and CDC age 1000. Inventory after this change (a scan of every
       type=number input, not only the +e.target.value pattern my first count used): 24 calculators take numeric
-      input; all now go through a domain function except SirirajCalc, which parses with Number(e.target.value) || 0 so an
-      empty diastolic pressure is silently read as 0 (next slice), and NaegeleCalc, which is in open PR #2226 held for
-      clinical sign-off. Noted, not changed: the Broca-Lorentz page
+      input; all now go through a domain function except NaegeleCalc, which is in open PR #2226 held for clinical
+      sign-off. SirirajCalc, the one my first count missed because it parsed with Number(e.target.value) || 0 (an empty
+      diastolic pressure was read as 0 and showed a score of -12, "Suggests ISCHAEMIC stroke"), now goes through
+      sirirajStrokeScore (scripts/uji/siriraj-stroke-score.mts): expression, +/-1 thresholds, labels, CT-scan warning
+      and source are unchanged, and the float arithmetic is shown not to misclassify at the thresholds over 8664
+      combinations. Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -347,3 +350,5 @@ risks:
       - scripts/uji/ballard-denver-inputs.mts
       - src/domains/clinical-calculators/engine/growthInputs.ts
       - scripts/uji/growth-inputs.mts
+      - src/domains/clinical-calculators/engine/sirirajStrokeScore.ts
+      - scripts/uji/siriraj-stroke-score.mts
