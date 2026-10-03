@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1031,17 +1031,7 @@ function CentorCalc() {
   const [tenderNodes, setTenderNodes] = useState(false)
   const [exudate, setExudate] = useState(false)
   const [age, setAge] = useState(30)
-  const ageAdj = age < 15 ? 1 : age >= 45 ? -1 : 0
-  const total = [fever, noCough, tenderNodes, exudate].filter(Boolean).length + ageAdj
-  const interp = total <= 0
-    ? { l: 'Very low risk (1-2.5%)', tone: 'normal' as const, note: 'No swab/empiric antibiotics needed.' }
-    : total === 1
-    ? { l: 'Low risk (5-10%)', tone: 'normal' as const, note: 'Antibiotics generally not needed.' }
-    : total === 2
-    ? { l: 'Moderate risk (11-17%)', tone: 'low' as const, note: 'Consider a rapid strep test/culture before antibiotics.' }
-    : total === 3
-    ? { l: 'High risk (28-35%)', tone: 'low' as const, note: 'Strep testing recommended; treat if positive.' }
-    : { l: 'Very high risk (51-53%)', tone: 'critical' as const, note: 'Consider empiric antibiotics (e.g. penicillin) or a rapid test first per local policy.' }
+  const centor = centorMcIsaac({ fever, noCough, tenderNodes, exudate }, age)
   const Row = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1058,13 +1048,17 @@ function CentorCalc() {
         <Row label="Tonsillar exudate/swelling" checked={exudate} onChange={setExudate} />
         <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
       </div>
+      {centor.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}</div>
-          <Badge tone={interp.tone}>{interp.l}</Badge>
+          <div className="text-2xl font-black text-ink">{centor.data.total}</div>
+          <Badge tone={centor.data.tone}>{centor.data.riskLabel}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{centor.data.note}</p>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{centor.reason}. No score is shown until the age is valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
     </Card>
   )

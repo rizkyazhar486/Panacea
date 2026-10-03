@@ -23,3 +23,5 @@ export { midParentalHeight, PARENT_HEIGHT_CM, TARGET_RANGE_CM } from './engine/m
 export type { MidParentalResult } from './engine/midParentalHeight'
 export { mcdonaldGestationalAge, MCDONALD_FUNDAL_CM } from './engine/mcdonaldRule'
 export type { McdonaldResult } from './engine/mcdonaldRule'
+export { centorMcIsaac, CENTOR_AGE_YEARS } from './engine/centorMcIsaac'
+export type { CentorCriteria, CentorResult, CentorOutcome, CentorTone } from './engine/centorMcIsaac'
