@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { hollidaySegar, parklandVolumes, pedsDose } from '../domains/clinical-calculators'
+import { fluidBalance, hollidaySegar, ivDrip, parklandVolumes, pedsDose } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1470,9 +1470,7 @@ function FluidBalanceCalc() {
   const [drainOut, setDrainOut] = useState(0)
   const [insensible, setInsensible] = useState(500)
   const [otherOut, setOtherOut] = useState(0)
-  const totalIn = oralIn + ivIn + otherIn
-  const totalOut = urineOut + drainOut + insensible + otherOut
-  const balance = totalIn - totalOut
+  const fluid = fluidBalance({ oralIn, ivIn, otherIn, urineOut, drainOut, insensibleOut: insensible, otherOut })
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Fluid Balance (24 hours)" subtitle="Total intake vs output — fluid status monitoring" />
@@ -1489,11 +1487,15 @@ function FluidBalanceCalc() {
         <Field label="Insensible Loss"><input className={inputClass} type="number" value={insensible} onChange={(e) => setInsensible(+e.target.value)} /></Field>
         <Field label="Other"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
       </div>
+      {fluid.ok ? (
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Intake</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{fluid.data.totalIn}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Intake</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{fluid.data.totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${fluid.data.balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{fluid.data.balance >= 0 ? '+' : ''}{fluid.data.balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{fluid.reason}. No balance is shown until every value is valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] text-neutral-500">Estimated insensible fluid loss in adults ~500-800 mL/day (higher with fever/tachypnea). A large, sustained positive balance → risk of fluid overload; a negative balance → risk of dehydration/hypoperfusion.</Prosa>
     </Card>
   )
@@ -2399,8 +2401,7 @@ function IvDripCalc() {
   const [hours, setHours] = useState(8)
   const [dropFactor, setDropFactor] = useState<15 | 20 | 60>(20)
 
-  const mlPerHour = volumeMl / hours
-  const dropsPerMin = (volumeMl * dropFactor) / (hours * 60)
+  const drip = ivDrip(volumeMl, hours, dropFactor)
 
   return (
     <Card>
@@ -2412,16 +2413,20 @@ function IvDripCalc() {
           <SegButtons value={dropFactor} onChange={setDropFactor} options={[{ v: 15, l: '15 (macro)' }, { v: 20, l: '20 (macro)' }, { v: 60, l: '60 (micro)' }]} />
         </Field>
       </div>
+      {drip.ok ? (
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/h</div>
+          <div className="text-xl font-black text-ink">{drip.data.mlPerHour.toFixed(1)} mL/h</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">Rate (infusion pump)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} drops/min</div>
+          <div className="text-xl font-black text-ink">{drip.data.dropsPerMin.toFixed(0)} drops/min</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{drip.reason}. No rate is shown until both values are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/minute = (Volume mL × drop factor) / (duration hours × 60). Standard macro sets are usually 15 or 20 drops/mL (adult/general use), micro sets 60 drops/mL (pediatric/neonatal, precise titration). Always confirm the drop factor printed on the packaging of the giving set you are using.</Prosa>
     </Card>
   )
