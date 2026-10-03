@@ -240,3 +240,15 @@ test('skrip_canvas_artifact_mencetak_bukti_ke_log_setelah_menulis_berkas', () =>
   assert.ok(write >= 0 && print === write + 1, 'pencetakan harus tepat setelah penulisan berkas bukti')
   assert.ok(lines.includes("import { buildFailureEvidence, failureEvidencePaths, formatCanvasArtifactFailureLog } from './body3d-failure-evidence.mjs'"))
 })
+
+test('canvas_artifact_memberi_batas_aksi_60_detik_tanpa_melonggarkan_pernyataan_ketat', () => {
+  const src = readFileSync(new URL('./body3d-canvas-artifact.mjs', import.meta.url), 'utf8')
+  const lines = src.split('\n').map((l) => l.trim())
+  assert.ok(lines.includes('const ACTION_TIMEOUT_MS = Number(process.env.BODY3D_QA_ACTION_TIMEOUT_MS || 60_000)'))
+  assert.ok(lines.includes('page.setDefaultTimeout(ACTION_TIMEOUT_MS)'))
+  assert.equal(lines.some((l) => /setDefaultTimeout\(\s*20_?000\s*\)/.test(l)), false, 'batas 20 dtk tidak boleh kembali')
+  // Pernyataan ketat tetap ada (kontrol bahwa perubahan ini hanya toleransi macet).
+  assert.ok(src.includes('Body3D canvas center outside viewport during visual capture'))
+  assert.ok(src.includes("waitFor({ state: 'hidden', timeout: timeoutMs })"))
+  assert.ok(lines.includes('await canvas.waitFor({ state: \'visible\', timeout: 45_000 })'))
+})

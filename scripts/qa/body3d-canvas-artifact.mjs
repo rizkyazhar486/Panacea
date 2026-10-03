@@ -6,6 +6,10 @@ import { buildFailureEvidence, failureEvidencePaths, formatCanvasArtifactFailure
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const outputPath = process.env.BODY3D_QA_CANVAS_ARTIFACT || 'artifacts/body3d-mobile-canvas.png'
 const timeoutMs = Number(process.env.BODY3D_QA_VISUAL_TIMEOUT_MS || 120_000)
+// Batas tiap aksi Playwright (evaluate, dsb.). 20 dtk terlalu ketat untuk runner CI yang sibuk: bukti kegagalan di main (#2241)
+// menunjukkan halaman sehat (1 canvas, tanpa galat) tetapi evaluate tidak sempat berjalan karena utas utama macet oleh render
+// software. Hanya toleransi macet; seluruh pernyataan ketat di bawah (viewport, WebGL, piksel) tidak berubah.
+const ACTION_TIMEOUT_MS = Number(process.env.BODY3D_QA_ACTION_TIMEOUT_MS || 60_000)
 
 const startedAt = Date.now()
 const evidencePaths = failureEvidencePaths(outputPath)
@@ -70,7 +74,7 @@ await context.addInitScript(() => {
 })
 
 const page = await context.newPage()
-page.setDefaultTimeout(20_000)
+page.setDefaultTimeout(ACTION_TIMEOUT_MS)
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 const consoleMessages = []
