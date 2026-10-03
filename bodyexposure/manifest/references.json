@@ -1,0 +1,1018 @@
+{
+ "registered": "2026-10-03",
+ "source_folder": "owner-supplied 'Panaceamed Resources'",
+ "policy": "Art direction and scope only. Generated images and meshes are never used as anatomical geometry, landmark positions or measurements.",
+ "files": [
+  {
+   "file": "4a3f65ba-72a8-4ae1-8f8f-240ea1c763c2 2/4a3f65ba-72a8-4ae1-8f8f-240ea1c763c2.fbx",
+   "sha256": "c29d42b229dabc0c82c5a44b0544a66b431ba0402bf9f0faf2b229a5e1b46e1b",
+   "bytes": 2697616,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "4a3f65ba-72a8-4ae1-8f8f-240ea1c763c2 4/4a3f65ba-72a8-4ae1-8f8f-240ea1c763c2.fbx",
+   "sha256": "c29d42b229dabc0c82c5a44b0544a66b431ba0402bf9f0faf2b229a5e1b46e1b",
+   "bytes": 2697616,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "4a3f65ba-72a8-4ae1-8f8f-240ea1c763c2.zip",
+   "sha256": "43fa18bf9f3ad1d48548f0cf4a6d472d7a244a8780e59edc1cb594aa452d558c",
+   "bytes": 9565633,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Body Exposure 2D Organ.png",
+   "sha256": "d7d249724da42ae53167b404278f3bf17b1b040342cd8e4e860ef0a768915f7d",
+   "bytes": 2322797,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_coverage_checklist",
+   "note": "Twelve-system overview (integumentary to sensory) with per-system organ lists. Used as a coverage checklist against the source-backed structure inventory.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Cardiovascular 2D Panacea.png",
+   "sha256": "025a6b7eaca9b237c19660ac3f32ab16ee8c2451d140c26c6657b18eaf71996c",
+   "bytes": 2610030,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "view_convention",
+   "note": "Multiscale sheet: six orthographic views with axis labels, 45-degree turntable, labelled close-ups with scale bars, projectile path through thoracic layers. Sets the benchmark view layout and the trauma-path visualisation brief.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 04_05_59 PM.png",
+   "sha256": "463b549e7902775a6a463d95c85fc3d02a91e9b078690043cfb2a4342586cb28",
+   "bytes": 2646752,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "layer_sequence",
+   "note": "Female body exposure asset set: external to skeletal layer sequence plus regional and sectional detail panels. Sets the layer-peel order and regional close-up list.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 05_17_08 PM.png",
+   "sha256": "22ce5ee84d7252b532ea4bba2e68917fcda571b4bbdd01c31d0a683856694721",
+   "bytes": 1277356,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1536
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 05_34_12 PM.png",
+   "sha256": "ae3d1719f6178853f5f905e635b04db076c84e622a4acb21e16663bd8df7b7b1",
+   "bytes": 923759,
+   "kind": "image",
+   "pixels": [
+    1222,
+    1287
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 05_55_34 PM.png",
+   "sha256": "3ce61d18437cd698c693302240e420534d0ead547243218b6dc59d82fcedc85e",
+   "bytes": 2455401,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "multiscale_hierarchy",
+   "note": "Chemical, cellular, tissue, organ and organ-system levels. Brief for multiscale zoom; out of scope for gross anatomy.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 05_57_19 PM.png",
+   "sha256": "3ce61d18437cd698c693302240e420534d0ead547243218b6dc59d82fcedc85e",
+   "bytes": 2455401,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 05_58_30 PM.png",
+   "sha256": "9317429f01a2c533064f33d897acdc65144c3ba26bfab73b409fe6902ef8994e",
+   "bytes": 2640653,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 06_01_03 PM-1.png",
+   "sha256": "9317429f01a2c533064f33d897acdc65144c3ba26bfab73b409fe6902ef8994e",
+   "bytes": 2640653,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 06_01_07 PM-2.png",
+   "sha256": "1b99d04ed828864b5f037824f330c3a8b7a2227e57c0677bde85979eb930dc07",
+   "bytes": 2091805,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 07_13_28 PM.png",
+   "sha256": "31482f33f89dea8531ea51d0934de7f3962599daa36109ee1e9ae5677c27e757",
+   "bytes": 2939667,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "ChatGPT Image Oct 3, 2026, 08_18_12 PM.png",
+   "sha256": "9666ed63ed8acb14f88702fc3cdb50ae288daeff046dc07040a6e3d0ee3a28b9",
+   "bytes": 2593183,
+   "kind": "image",
+   "pixels": [
+    1312,
+    1199
+   ],
+   "generator": "ChatGPT image generation",
+   "role": "view_convention",
+   "note": "Pelvic and reproductive multiscale sheet with orthographic views, sections and projectile trajectory panels.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "DNA RNA Panacea.png",
+   "sha256": "111144453cb0674c21750aadf948d31823f489cdb221e8d537cae7457f963b18",
+   "bytes": 2467725,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Digestive Panacea 2D.png",
+   "sha256": "6ed171cfb4cf184053d16ac0151636d781da13a7ed89081f0059b6ca86073e6d",
+   "bytes": 2052381,
+   "kind": "image",
+   "pixels": [
+    1312,
+    1199
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine Panacea 2D.png",
+   "sha256": "c3eb154828e33033869c0397e2e7ddcdc4ff5abaa169655128c26f1b176f1b7a",
+   "bytes": 2598159,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (1).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (10).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (11).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (2).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (4).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Endocrine System Atlas Infographic (5).png",
+   "sha256": "937b302845ec71bc5adc13bb648cbc0872e1cc600d2d1f889cce62dfc6fa0e54",
+   "bytes": 2634064,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Integument Panace 2D .png",
+   "sha256": "3586e3c9c55a672b942ebb75decf676fad992000692bea8690e2bdbe64e942b0",
+   "bytes": 2804804,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Integumentary 2D Panacea.png",
+   "sha256": "a65a3a100aef23649504c55bec1a5bd9123b344f1fad6db704b2a1a2fd3d28ac",
+   "bytes": 2458557,
+   "kind": "image",
+   "pixels": [
+    1374,
+    1145
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Neuro Panacea 2D.png",
+   "sha256": "e08025616548fc0144c276505783056a598f94a3381e52315b09f3bd500a2cc2",
+   "bytes": 2916494,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Neurovascular Panacea 2d.png",
+   "sha256": "20d32b85d3713b1405f5a96b9b69ca1b5f340bc257118e19173935a4b690691a",
+   "bytes": 2694172,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Panacea Body Exposure 2D.png",
+   "sha256": "5fb27ae553905336453cca416164c1061fd8a5d2d09b5eeda60fe5de8c3613d8",
+   "bytes": 1623599,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "body_matrix_target",
+   "note": "Six-body neutral-pose sheet (adult male/female, elderly male, 15 y, 8 y, infant) with anterior, posterior, lateral, 3/4, head, hand and foot views. Sets the presentation view set and confirms an older-adult body is in scope.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Panacea Lymphatic 2D.png",
+   "sha256": "df091f9fdaf8ccdc4fadee2b7355b628d7de72bf41b8073b5c1757b952c3d2c4",
+   "bytes": 2515120,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Panacea Reproductive 2D.png",
+   "sha256": "9666ed63ed8acb14f88702fc3cdb50ae288daeff046dc07040a6e3d0ee3a28b9",
+   "bytes": 2593183,
+   "kind": "image",
+   "pixels": [
+    1312,
+    1199
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Respiration Panacea 2D.png",
+   "sha256": "7ca1622fa4609c2ae389728064f076f359a78b5d5baff2e2776e6a6cf9f46f21",
+   "bytes": 2607557,
+   "kind": "image",
+   "pixels": [
+    1536,
+    1024
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Tripo3d_Blender_Bridge-latest (1).zip",
+   "sha256": "8260e3f9344c56bbc508862131a5a05b24b9f0f8dc1d51281531bf0f2e0440fb",
+   "bytes": 224044,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Tripo3d_Blender_Bridge-latest (2).zip",
+   "sha256": "8260e3f9344c56bbc508862131a5a05b24b9f0f8dc1d51281531bf0f2e0440fb",
+   "bytes": 224044,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Tripo3d_Blender_Bridge-latest.zip",
+   "sha256": "8260e3f9344c56bbc508862131a5a05b24b9f0f8dc1d51281531bf0f2e0440fb",
+   "bytes": 224044,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "Urinary 2D Panacea.png",
+   "sha256": "07f6b8491ff5d2e3106758e45f792d18ead9bf7b4c37adcc6c16c68f070d1de3",
+   "bytes": 2103563,
+   "kind": "image",
+   "pixels": [
+    1312,
+    1199
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "animal cell 3d model.glb",
+   "sha256": "a483c23d76ef673a5344d16747231afe1f16fa0f58809c31b14524275dfd9471",
+   "bytes": 111511464,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "carbon atom 3d model.zip",
+   "sha256": "608c9fc8f12e615d1bb79820ee3601cab97d12061ad87ce7f670af78a51de210",
+   "bytes": 11222857,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "carbon atom 3d model/carbon+atom+3d+model.fbx",
+   "sha256": "01a4cad9602f024e5f9d023a6c2bec31c350dda4682484cb06c768ca60d6f3fb",
+   "bytes": 950048,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "dna double helix 3d model.glb",
+   "sha256": "cd9f89c8ede2f5793228890438f6d7980c85598f50622c853c9151d4509dbbea",
+   "bytes": 11615920,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "endocrine system diagram 3d model.glb",
+   "sha256": "a66e4ed7b7a84af8e3f2e6f9cdb4e7f4bb7f617f1b895ce8337363c5af3d7c0a",
+   "bytes": 15001132,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy 3d model (1).glb",
+   "sha256": "0eb47645fd317846195cd6c066e7c960ad73b58b297a43bfa072dc3f41a79411",
+   "bytes": 12366048,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy 3d model (2).glb",
+   "sha256": "6a61fde1a5254c09979d38a613786428de9a06e7adbbd1d0067ea790bc1b5c0b",
+   "bytes": 13165152,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy 3d model.glb",
+   "sha256": "71754835df635a7f742efc9156cc3b938362d498d724b6901f4b7e9710b83860",
+   "bytes": 14382260,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy diagram 3d model (1).zip",
+   "sha256": "210cbfb3974f328fc2a1db8a7c739f4c6f403ec59850d1844155213e65e7304c",
+   "bytes": 6283342,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy diagram 3d model (1)/human+anatomy+diagram+3d+model.fbx",
+   "sha256": "dab1d76d6e34c98247ca483115f482657ea8b9227a3a0e85915974df173ae7e5",
+   "bytes": 1836272,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy diagram 3d model.zip",
+   "sha256": "e8e9aa97d5d6d8583bef8f9810d2af36d97394a643cdd50c0052b17e738d9d92",
+   "bytes": 6283341,
+   "kind": "archive",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "human anatomy diagram 3d model/human+anatomy+diagram+3d+model.fbx",
+   "sha256": "f4e6b3dda42f539e0c243fbbc556a1b7051829371bb70d84a4e7080ba5e85187",
+   "bytes": 1836272,
+   "kind": "mesh",
+   "pixels": null,
+   "generator": "Tripo",
+   "role": "not_used_geometry",
+   "note": "AI-generated mesh; not anatomical evidence and not merged.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "image_0.png",
+   "sha256": "b6b18285453eb98d075166f576edcaba33faf2d63ad9e267b30169fbdaccb05e",
+   "bytes": 1523868,
+   "kind": "image",
+   "pixels": [
+    1344,
+    768
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "image_1.png",
+   "sha256": "99f933cb728bf59461858dcd1ad0e10a69d040c9b12d4865d8b1f0e9e18dfc18",
+   "bytes": 1793864,
+   "kind": "image",
+   "pixels": [
+    1344,
+    768
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "image_2.png",
+   "sha256": "7090f62a333577edc6523d7f33e35da9d593c68e3f5ad58b3dcb8e730a1d1f7d",
+   "bytes": 1426968,
+   "kind": "image",
+   "pixels": [
+    1344,
+    768
+   ],
+   "generator": "AI-generated (owner-supplied; style matches ChatGPT image generation)",
+   "role": "system_art_direction",
+   "note": "System infographic used for colour, labelling and layout direction only.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_0_1bf6e670-54a1-421b-9959-21950644dcf3.jpeg",
+   "sha256": "54fca203c8668ed16a9aa2e89c9f9cfbda1b46b05701326cc13ea0440c99a12c",
+   "bytes": 220538,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_0_24f7f849-3d2a-4c1a-96c9-86319581556d.jpeg",
+   "sha256": "766b6964755b2b2a7f6ffe6de7e7cb513a692524715e0d72dc2d7090faf7c7da",
+   "bytes": 245995,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_0_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074 (1).jpeg",
+   "sha256": "4433058d61e887c5b6d1e2ea1f2db8a5a014441c6f847bd2abe3d46ba866559d",
+   "bytes": 223316,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_0_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074.jpeg",
+   "sha256": "4433058d61e887c5b6d1e2ea1f2db8a5a014441c6f847bd2abe3d46ba866559d",
+   "bytes": 223316,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_0_b34723c0-680a-4e85-b66f-f3c436eedf6b.jpeg",
+   "sha256": "be42729deffddde5f7ec4d198f8c6164c31ab0f80467fd8689bce031751f432d",
+   "bytes": 190937,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_1_1bf6e670-54a1-421b-9959-21950644dcf3.jpeg",
+   "sha256": "ff951feb42981e7240c66adc3b3fe4c0bb23636e482a36835f9f9326389abce3",
+   "bytes": 93278,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_1_24f7f849-3d2a-4c1a-96c9-86319581556d.jpeg",
+   "sha256": "9665e8429f1049f828d4477dd020bfd3fc85f80d0b7aca2b8cca6652524d9aca",
+   "bytes": 83597,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_1_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074 (1).jpeg",
+   "sha256": "411cc906124b62514d01c6cd5946a30c38451aa8a784cdeed2a018e37f50f141",
+   "bytes": 106138,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_1_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074.jpeg",
+   "sha256": "411cc906124b62514d01c6cd5946a30c38451aa8a784cdeed2a018e37f50f141",
+   "bytes": 106138,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_1_b34723c0-680a-4e85-b66f-f3c436eedf6b.jpeg",
+   "sha256": "f0dffdc78ee32edbaef4756a5a5035156894fcf3ce786901eca88e3cfe0a3f00",
+   "bytes": 135268,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_2_1bf6e670-54a1-421b-9959-21950644dcf3.jpeg",
+   "sha256": "bd16eaa6d7e6361503113df23826a16de7f4dda7669273d44eb3b91a93e2c603",
+   "bytes": 214854,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_2_24f7f849-3d2a-4c1a-96c9-86319581556d.jpeg",
+   "sha256": "985f7b843a9a8a6fd61b8c786a91f0a8900a9207913cb966ccc46ce008ac7582",
+   "bytes": 244627,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_2_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074 (1).jpeg",
+   "sha256": "c4544ac8b5e8acdc6de0dd5de9eb5f7b8680750125b13e103f6521adef2cd651",
+   "bytes": 226654,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_2_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074.jpeg",
+   "sha256": "c4544ac8b5e8acdc6de0dd5de9eb5f7b8680750125b13e103f6521adef2cd651",
+   "bytes": 226654,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_2_b34723c0-680a-4e85-b66f-f3c436eedf6b.jpeg",
+   "sha256": "400f5aacaead61ad45711fe83b7cbde7882005f0bac0fc635b29014c6694d79b",
+   "bytes": 153400,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_3_1bf6e670-54a1-421b-9959-21950644dcf3.jpeg",
+   "sha256": "5ce2eb2202966c78065c712b7d7792954354d08cadb14744d2b55be899a787ed",
+   "bytes": 108613,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_3_24f7f849-3d2a-4c1a-96c9-86319581556d.jpeg",
+   "sha256": "2dffdf812bbf4c6c814b79276512ff775dfa1e20c7ac1bf826e2766056ec8663",
+   "bytes": 106086,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_3_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074 (1).jpeg",
+   "sha256": "126923b7b6e062c3873a16995f01d509b950ba265c0a10067ed09364dc71c89b",
+   "bytes": 106989,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_3_b2a7e19e-0f0d-483e-b6f5-ea35a4fd0074.jpeg",
+   "sha256": "126923b7b6e062c3873a16995f01d509b950ba265c0a10067ed09364dc71c89b",
+   "bytes": 106989,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  },
+  {
+   "file": "multiview_3_b34723c0-680a-4e85-b66f-f3c436eedf6b.jpeg",
+   "sha256": "0118eaa5612812d1627f4faf51d674243412caf88e78b8e76b707b731901bcb0",
+   "bytes": 152274,
+   "kind": "image",
+   "pixels": [
+    1024,
+    1024
+   ],
+   "generator": "Tripo",
+   "role": "generator_input",
+   "note": "Tripo multiview input image.",
+   "anatomical_evidence": false,
+   "redistributed": false
+  }
+ ]
+}

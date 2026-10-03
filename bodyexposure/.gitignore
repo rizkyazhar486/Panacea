@@ -12,3 +12,5 @@ web/.qa_*.png
 web/export_log.txt
 web/glb/pediatric_*
 qa_reports/*.tmp
+# Referensi visual pemilik (323 MB, dihasilkan AI) — salinan lokal, tidak didistribusikan
+references/files/

@@ -58,3 +58,9 @@ Gate status: 6 / 9. The three blocked classes need source data, not modelling ef
 ## SOP gross-anatomy gate (§11)
 
 All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
+
+## Owner reference set and coverage check (2026-10-03)
+
+- 71 owner-supplied reference files were registered (`manifest/references.json`, `references/README.md`). All are AI-generated (ChatGPT or Tripo), so they serve as **art direction and scope only**. No geometry was merged.
+- The reference 12-system checklist was run against the inventory (`manifest/reference_coverage.json`). Adult male 58/67, adult female 41/67.
+- New open dependencies: the male **rectum, anal canal, ileum and caecum** (absent from Z-Anatomy too), and the female **axial skeleton and upper GI tract** (absent from HuBMAP VH_F).

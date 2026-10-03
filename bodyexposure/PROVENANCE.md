@@ -213,3 +213,10 @@ generator. The repository has no licence file and no attribution, and the meshes
 internal anatomy. Under this project's reference standard, generated geometry is not
 evidence for anatomy, so none of it was merged. Source-backed versions of all nine organs
 already exist in the canonical bodies.
+
+## Owner reference set (art direction only)
+
+The owner's "Panaceamed Resources" folder (71 files, registered 2026-10-03 in `manifest/references.json`) is
+entirely AI-generated: ChatGPT images and Tripo meshes or multiview inputs. It sets the view layout, the peel order
+and the coverage checklists (see `references/README.md`). It contributes no geometry, landmarks or measurements to
+any canonical body, and it is not redistributed with the app.
