@@ -1,0 +1,143 @@
+{
+ "generated": "2026-10-03T04:17:01",
+ "master": "PANACEA_HUMAN_MASTER_v006.blend",
+ "bodies": [
+  {
+   "body_id": "HUMAN.ADULT.MALE",
+   "status": "source_backed",
+   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0",
+   "source_requirement": null,
+   "structures": 2611,
+   "systems": {
+    "surface": 256,
+    "skeletal": 232,
+    "joint": 23,
+    "muscular": 470,
+    "fascia": 39,
+    "cardiovascular": 677,
+    "lymphatic": 163,
+    "nervous": 549,
+    "respiratory": 49,
+    "digestive": 77,
+    "urinary": 8,
+    "endocrine": 10,
+    "reproductive": 14,
+    "sensory": 44
+   }
+  },
+  {
+   "body_id": "HUMAN.ADULT.FEMALE",
+   "status": "source_backed_partial",
+   "source": "HuBMAP CCF 3D Reference Object Library, VH_Female (NLM Visible Human female): VH_F_United v1.1 + Spinal_Cord v1.2 + mammary glands v1.3 + vasculature v1.4, CC BY 4.0",
+   "source_requirement": null,
+   "structures": 841,
+   "systems": {
+    "nervous": 302,
+    "cardiovascular": 135,
+    "reproductive": 54,
+    "joint": 28,
+    "sensory": 62,
+    "respiratory": 73,
+    "digestive": 50,
+    "skeletal": 38,
+    "lymphatic": 7,
+    "urinary": 87,
+    "muscular": 4,
+    "surface": 1
+   }
+  },
+  {
+   "body_id": "HUMAN.PREGNANT",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires gestational-age-staged maternal + fetal source anatomy (e.g. segmented maternal MRI/CT atlases by trimester); must not be produced by inflating the female abdomen.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "FETUS",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires fetal anatomical source data by gestational week (fetal MRI atlases / embryology references); fetal circulation shunts (foramen ovale, ductus arteriosus, ductus venosus) must be source-backed.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.NEONATE",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires neonatal source anatomy (fontanelles, thymus, relative liver size); adult scaling is prohibited.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.INFANT",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires infant source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.TODDLER",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires toddler source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.CHILD",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires child source anatomy (growth plates, ossification centres, airway dimensions); adult scaling is prohibited.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "PEDIATRIC.ADOLESCENT",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires adolescent source anatomy; adult scaling is prohibited.",
+   "structures": 0,
+   "systems": {}
+  },
+  {
+   "body_id": "HUMAN.OLDER_ADULT",
+   "status": "placeholder",
+   "source": null,
+   "source_requirement": "Requires older-adult source anatomy; normal ageing must be kept separate from pathology.",
+   "structures": 0,
+   "systems": {}
+  }
+ ],
+ "files": [
+  "adult_female.cardiovascular",
+  "adult_female.digestive",
+  "adult_female.joint",
+  "adult_female.lymphatic",
+  "adult_female.muscular",
+  "adult_female.nervous",
+  "adult_female.reproductive",
+  "adult_female.respiratory",
+  "adult_female.sensory",
+  "adult_female.skeletal",
+  "adult_female.surface",
+  "adult_female.urinary",
+  "adult_male.cardiovascular",
+  "adult_male.digestive",
+  "adult_male.endocrine",
+  "adult_male.fascia",
+  "adult_male.joint",
+  "adult_male.lymphatic",
+  "adult_male.muscular",
+  "adult_male.nervous",
+  "adult_male.reproductive",
+  "adult_male.respiratory",
+  "adult_male.sensory",
+  "adult_male.skeletal",
+  "adult_male.surface",
+  "adult_male.urinary",
+  "module_tissue_lymph_node.lymphatic"
+ ]
+}

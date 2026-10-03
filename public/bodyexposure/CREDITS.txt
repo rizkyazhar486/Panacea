@@ -1,0 +1,11 @@
+Body Exposure canonical bodies (web derivatives, LOD2/LOD3)
+===========================================================
+
+adult_male.*  — derived from Z-Anatomy (BodyParts3D, DBCLS), CC BY-SA 4.0.
+                Includes Panacea-reconstructed intervertebral discs and pericardium
+                (derivatives, same licence). See bodyexposure/PROVENANCE.md.
+adult_female.* — derived from HuBMAP CCF 3D Reference Object Library, VH_Female
+                (NLM Visible Human female), CC BY 4.0.
+module_tissue_lymph_node.* — HuBMAP CCF library lymph node tissue model, CC BY 4.0.
+
+Educational models. Not patient-specific anatomy and not a clinical tool.
