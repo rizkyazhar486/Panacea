@@ -288,3 +288,30 @@ def run():
 if __name__ == "__main__":
     for r in run():
         print(r)
+
+
+def correct_source_discs():
+    """Master v007: diskus sumber Z-Anatomy (dari merge_zanatomy_extra.py) menggantikan rekonstruksi.
+    Diskus sumber menumpang ke korpus vertebra; dorong keluar ke permukaan tulang + GAP."""
+    import re as _re
+    coll = bpy.data.collections["03_JOINTS.INTERVERTEBRAL_DISCS"]
+    for o in [o for o in coll.objects if o.get("panacea_accuracy_status") == "reconstructed"]:
+        bpy.data.objects.remove(o, do_unlink=True)
+    out = []
+    for o in list(coll.objects):
+        raw = o.get("panacea_source_raw_name", "")
+        m = _re.search(r"([CTL]\d+|S1)-([CTL]\d+|S1)", raw)
+        if not m:
+            continue
+        u, d = m.groups()
+        kind = "INTERVERTEBRAL_DISC" if raw.startswith("Intervertebral") else "NUCLEUS_PULPOSUS"
+        n = f"ADULT.MALE.JOINT.{kind}_{u}_{d}"
+        o.name = n; o.data.name = n; o["panacea_structure_id"] = n
+        if kind == "INTERVERTEBRAL_DISC":
+            moved = resolve_penetration(o, [bone_of(u), bone_of(d)])
+            o["qa_vertices_pushed_out_of_bone"] = moved
+            o["panacea_accuracy_status"] = "source_backed_corrected"
+            o["panacea_qa_note"] = (f"Source disc overlapped adjacent vertebral bodies; {moved} vertex moves pushed it out "
+                                    "to bone surface +0.15 mm (build_intervertebral_discs.resolve_penetration).")
+            out.append((n, moved))
+    return out

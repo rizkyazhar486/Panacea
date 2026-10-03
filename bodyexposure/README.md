@@ -39,11 +39,15 @@ raw source name, accuracy status, review status, version) that survive glTF expo
 1. Import `public/anatomy/*.glb` (Z-Anatomy) and the HuBMAP `VH_F_United.glb` (see PROVENANCE).
 2. Normalise transforms, merge duplicate vertices, route into system collections, assign
    semantic IDs and metadata (steps recorded in `PROVENANCE.md`).
-3. `pipeline/build_intervertebral_discs.py` — reconstruct the 23 discs.
-4. `pipeline/export_manifest.py` — write `manifest/`.
-5. `pipeline/build_pericardium.py` — reconstruct the pericardial sac and correct heart–lung contact.
-6. `pipeline/render_benchmarks.py --bench layered|lineup|female_layered|cutaway|exploded`.
-7. `pipeline/export_web_lods.py` → `web/raw/`, then `pipeline/pack_web.py` → `web/glb/`.
+3. `pipeline/extract_zanatomy.py` (headless, on Z-Anatomy `Startup.blend`) then
+   `pipeline/merge_zanatomy_extra.py` (in the master): adds 1,238 structures the original web
+   export lacked. Then `build_intervertebral_discs.correct_source_discs()` replaces the
+   reconstructed discs with the corrected source discs.
+4. `pipeline/annotate_ta2.py` — TA2 ID, Latin and French names (exact matches only).
+5. `pipeline/export_manifest.py` — write `manifest/`.
+6. `pipeline/build_pericardium.py` — reconstruct the pericardial sac and correct heart–lung contact.
+7. `pipeline/render_benchmarks.py --bench layered|lineup|female_layered|cutaway|exploded`.
+8. `pipeline/export_web_lods.py` → `web/raw/`, then `pipeline/pack_web.py` → `web/glb/`.
 
 ## In the app
 

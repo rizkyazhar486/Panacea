@@ -16,7 +16,8 @@ OUT = argv[argv.index("--out") + 1] if "--out" in argv else os.path.join(os.path
 KEYS = ["panacea_structure_id", "canonical_name", "panacea_body_id", "panacea_system", "panacea_kind", "panacea_laterality",
         "panacea_laterality_source", "panacea_position_side", "panacea_region", "panacea_source", "panacea_license",
         "panacea_source_raw_name", "panacea_accuracy_status", "panacea_review_status", "panacea_reference", "panacea_method",
-        "panacea_known_limitations", "panacea_qa_note", "panacea_version", "biological_sex_applicability"]
+        "panacea_known_limitations", "panacea_qa_note", "panacea_version", "biological_sex_applicability",
+        "panacea_kind", "panacea_ta2_id", "panacea_latin_name", "panacea_name_fr", "panacea_ta2_match", "panacea_source_group"]
 
 
 def mesh_stats(o):
@@ -67,7 +68,8 @@ def run(out=OUT):
     anchors = []
     for o in bpy.data.objects:
         if o.type == 'EMPTY' and o.name.startswith("ANCHOR."):
-            anchors.append({"id": o.name, "anchor_of": o.get("panacea_anchor_of"), "method": o.get("panacea_anchor_method"),
+            anchors.append({"id": o.name, "anchor_of": o.get("panacea_anchor_of"), "landmark": o.get("panacea_anchor_landmark"), "kind": o.get("panacea_anchor_kind"),
+                            "surface_distance_mm": o.get("panacea_anchor_surface_distance_mm"), "method": o.get("panacea_anchor_method"),
                             "accuracy_status": o.get("panacea_accuracy_status"), "position_m": [round(x, 4) for x in o.matrix_world.translation]})
     meta = {"generated": datetime.datetime.now().isoformat(timespec="seconds"), "master": os.path.basename(bpy.data.filepath),
             "blender": bpy.app.version_string, "units": "metres", "frame": "+Z superior, +X subject left, -Y anterior",

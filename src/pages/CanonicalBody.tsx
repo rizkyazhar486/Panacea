@@ -28,6 +28,9 @@ interface BodyEntry {
 }
 interface BodyMatrix { bodies: BodyEntry[]; files: string[] }
 
+// jangkar landmark sumber (Z-Anatomy), dikelompokkan per struktur inang; koordinat sudah Y-up
+interface AnchorIndex { by_structure: Record<string, Array<{ id: string; name: string; p: [number, number, number]; s: string }>> }
+
 interface Picked {
   id: string
   name: string
@@ -36,6 +39,8 @@ interface Picked {
   status: string
   source: string
   license: string
+  latin?: string
+  ta2?: string
   note?: string
 }
 
@@ -80,6 +85,7 @@ export function CanonicalBody() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({ structures: 0, tris: 0, ms: 0 })
+  const [anchors, setAnchors] = useState<AnchorIndex | null>(null)
 
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
@@ -89,6 +95,7 @@ export function CanonicalBody() {
     root: THREE.Group
     groups: Map<string, THREE.Group>
     byId: Map<string, THREE.Object3D>
+    invalidate: () => void
   } | null>(null)
   const selectedRef = useRef<string | null>(null)
 
@@ -97,6 +104,7 @@ export function CanonicalBody() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then(setMatrix)
       .catch((e) => setError(`Body index could not be loaded (${e.message}).`))
+    fetch(`${BASE}anchors_adult_male.json`).then((r) => (r.ok ? r.json() : null)).then(setAnchors).catch(() => setAnchors(null))
   }, [])
 
   const body = matrix?.bodies.find((b) => b.body_id === bodyId)
@@ -123,14 +131,23 @@ export function CanonicalBody() {
     const key = new THREE.DirectionalLight(0xfff4ea, 2.2); key.position.set(-2, 3, 3); scene.add(key)
     const rim = new THREE.DirectionalLight(0xcfe3ff, 1.2); rim.position.set(2, 2, -3); scene.add(rim)
     const root = new THREE.Group(); scene.add(root)
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map() }
+    // render sesuai kebutuhan: hanya saat kamera bergerak atau adegan berubah (hemat baterai ponsel)
+    let dirty = true
+    const invalidate = () => { dirty = true }
+    controls.addEventListener('change', invalidate)
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate }
 
     const resize = () => {
       const w = mount.clientWidth, h = mount.clientHeight
-      renderer.setSize(w, h); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix()
+      renderer.setSize(w, h); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix(); invalidate()
     }
     const ro = new ResizeObserver(resize); ro.observe(mount); resize()
-    renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera) })
+    renderer.setAnimationLoop(() => {
+      controls.update()  // redaman memicu event 'change' selama kamera masih bergerak
+      if (!dirty) return
+      dirty = false
+      renderer.render(scene, camera)
+    })
 
     // identifikasi struktur dengan ketukan (bukan seretan)
     const ray = new THREE.Raycaster(), ptr = new THREE.Vector2()
@@ -221,6 +238,7 @@ export function CanonicalBody() {
     s.controls.target.copy(c)
     s.camera.position.set(c.x, c.y, c.z + Math.max(size.y, size.x * s.camera.aspect) * 1.9)
     s.controls.update()
+    s.invalidate()
   }
 
   function focusOn(o: THREE.Object3D) {
@@ -232,11 +250,13 @@ export function CanonicalBody() {
     const dir = s.camera.position.clone().sub(s.controls.target).normalize()
     s.controls.target.copy(c)
     s.camera.position.copy(c.clone().add(dir.multiplyScalar(r * 3.2)))
+    s.invalidate()
   }
 
   function applyVisibility() {
     const s = sceneRef.current
     if (!s) return
+    s.invalidate()
     const sel = selectedRef.current
     const selObj = sel ? s.byId.get(sel) : undefined
     for (const [sys, g] of s.groups) {
@@ -268,9 +288,29 @@ export function CanonicalBody() {
     setPicked({
       id: u.panacea_structure_id, name: u.canonical_name ?? u.panacea_structure_id, system: u.panacea_system ?? '',
       laterality: u.panacea_laterality ?? '', status: u.panacea_accuracy_status ?? '', source: u.panacea_source ?? '',
-      license: u.panacea_license ?? '', note: u.panacea_qa_note,
+      license: u.panacea_license ?? '', latin: u.panacea_latin_name, ta2: u.panacea_ta2_id, note: u.panacea_qa_note,
     })
   }
+
+  const landmarks = useMemo(() => {
+    if (!picked || !anchors) return []
+    return anchors.by_structure[picked.id] ?? []
+  }, [picked, anchors])
+
+  // penanda landmark: titik kecil di atas struktur terpilih, selalu terlihat (depthTest mati)
+  useEffect(() => {
+    const s = sceneRef.current
+    if (!s) return
+    const old = s.root.parent?.getObjectByName('landmark-markers')
+    if (old) { old.removeFromParent(); old.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (o.material as THREE.Material).dispose() } }) }
+    if (!landmarks.length) { s.invalidate(); return }
+    const g = new THREE.Group(); g.name = 'landmark-markers'
+    const geo = new THREE.SphereGeometry(0.0035, 12, 8)
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffd166, depthTest: false })
+    for (const l of landmarks) { const m = new THREE.Mesh(geo, mat); m.position.set(...l.p); m.renderOrder = 10; m.raycast = () => {}; g.add(m) }
+    s.root.parent?.add(g)
+    s.invalidate()
+  }, [landmarks])
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -402,6 +442,11 @@ export function CanonicalBody() {
               <h3 className="text-lg font-black capitalize text-ink dark:text-white">{picked.name}</h3>
               <Badge tone={statusTone(picked.status)}>{picked.status.replaceAll('_', ' ')}</Badge>
             </div>
+            {picked.latin && (
+              <p className="text-sm italic text-neutral-700 dark:text-neutral-200">
+                {picked.latin}{picked.ta2 && <span className="not-italic text-neutral-500"> · TA2 {picked.ta2}</span>}
+              </p>
+            )}
             <p className="break-all font-mono text-[11px] text-neutral-500">{picked.id}</p>
             <p className="text-sm text-neutral-700 dark:text-neutral-200">
               {SYSTEM_LABEL[picked.system] ?? picked.system}
@@ -409,6 +454,13 @@ export function CanonicalBody() {
             </p>
             <p className="text-[13px] text-neutral-600 dark:text-neutral-300">Source: {picked.source}{picked.license ? ` (${picked.license})` : ''}</p>
             {picked.note && <p className="text-[13px] text-amber-800 dark:text-amber-200">Note: {picked.note}</p>}
+            {landmarks.length > 0 && (
+              <div className="pt-1">
+                <p className="text-[12px] font-bold uppercase tracking-wide text-neutral-500">Landmarks on this structure ({landmarks.length})</p>
+                <p className="mt-1 text-[13px] capitalize leading-relaxed text-neutral-700 dark:text-neutral-200">{landmarks.map((l) => l.name).join(' · ')}</p>
+                <p className="mt-1 text-[11px] text-neutral-500">Shown as yellow points. Positions from Z-Anatomy label lines (right side where labelled once).</p>
+              </div>
+            )}
             <button className="text-[13px] font-bold text-brand-dark underline dark:text-emerald-300" onClick={() => {
               const o = sceneRef.current?.byId.get(picked.id); if (o) focusOn(o)
             }}>Focus on this structure</button>

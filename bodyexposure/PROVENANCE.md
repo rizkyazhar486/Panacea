@@ -25,7 +25,50 @@
     transmission). Pulmonary arteries are shown blue and pulmonary veins red, following the
     oxygenation colour convention used in Netter.
 
-## Intervertebral discs (in HUMAN.ADULT.MALE) — reconstructed
+## Structures from the full Z-Anatomy model (in HUMAN.ADULT.MALE) — source_backed
+
+Panacea's original web export (`public/anatomy/*.glb`) contained 2,431 of the 4,567 meshes in
+Z-Anatomy's full model (`Startup.blend` from `Z-Anatomy.zip`, Z-Anatomy/Models-of-human-anatomy,
+CC BY-SA 4.0, downloaded 2026-10-03). The full model uses the same coordinate frame: the left
+femur's bounds match to 0.1 mm. Using `pipeline/extract_zanatomy.py` (headless) and `pipeline/merge_zanatomy_extra.py`, 1,238
+missing structures were added, with modifiers applied (subdivision, solidify) and in world
+coordinates:
+
+| Kind | Count |
+|---|---|
+| Muscle origin areas (`.o`) / insertion areas (`.e`) | 351 / 354 |
+| Ligaments | 304 |
+| Bursae / tendon sheaths | 78 / 38 |
+| Fascia sheets and intermuscular septa | 54 |
+| Joint capsules | 32 |
+| Cartilages and menisci | 31 |
+| Intervertebral discs and nuclei pulposi | 23 + 23 |
+
+The `.o`/`.e` reading comes from the source's own material names (`Origin-*`, `End-*`).
+
+Dropped:
+- 24 exact duplicates of structures already present (0.0 mm apart);
+- collection icons;
+- label leader lines (2-vertex `.j`/`.i` objects, hook-driven; their raw vertices do not lie
+  on the named landmark, so they were not used as anchors);
+- reference lines (pelvic inlet and outlet, eyeball axes and meridians).
+
+## Intervertebral discs (in HUMAN.ADULT.MALE) — source_backed_corrected
+
+The source discs replace the earlier Panacea reconstruction. The source shape is primary
+evidence; a reconstruction is not. The source discs overlapped the adjacent vertebral bodies
+(14–33 % of their vertices lay inside bone), so each one was pushed out to the bone surface
++0.15 mm with the same routine the reconstruction used. The moved-vertex count is stored per
+disc in `qa_vertices_pushed_out_of_bone`.
+
+## Terminologia Anatomica 2
+
+`TA2.csv` (Z-Anatomy repository, CC BY-SA 4.0) supplies the TA2 ID, Latin name and French name
+through `pipeline/annotate_ta2.py`. Matching is exact on the English name only, with no fuzzy
+matching, because a wrong Latin label is worse than none. Coverage: male 3,489 / 3,876; female
+259 / 841 (HuBMAP naming departs from TA more often).
+
+## Intervertebral discs (superseded reconstruction)
 
 - **Method:** `pipeline/build_intervertebral_discs.py`. Each disc fills the space between the
   source vertebral endplates. The endplates are detected as the connected face patch on the

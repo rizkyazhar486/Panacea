@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T04:17:01",
-  "master": "PANACEA_HUMAN_MASTER_v006.blend",
+  "generated": "2026-10-03T11:00:51",
+  "master": "PANACEA_HUMAN_MASTER_v007.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -114,18 +114,18 @@
    "nonmanifold_meshes": 0
   },
   "HUMAN.ADULT.MALE|fascia": {
-   "structures": 39,
-   "verts": 80032,
-   "tris": 159652,
-   "open_meshes": 7,
-   "nonmanifold_meshes": 2
+   "structures": 93,
+   "verts": 158885,
+   "tris": 309469,
+   "open_meshes": 59,
+   "nonmanifold_meshes": 10
   },
   "HUMAN.ADULT.MALE|joint": {
-   "structures": 23,
-   "verts": 18262,
-   "tris": 36432,
-   "open_meshes": 0,
-   "nonmanifold_meshes": 0
+   "structures": 413,
+   "verts": 182528,
+   "tris": 358055,
+   "open_meshes": 33,
+   "nonmanifold_meshes": 25
   },
   "HUMAN.ADULT.MALE|lymphatic": {
    "structures": 163,
@@ -135,11 +135,11 @@
    "nonmanifold_meshes": 0
   },
   "HUMAN.ADULT.MALE|muscular": {
-   "structures": 470,
-   "verts": 919147,
-   "tris": 1838090,
-   "open_meshes": 36,
-   "nonmanifold_meshes": 20
+   "structures": 1291,
+   "verts": 1472207,
+   "tris": 2940410,
+   "open_meshes": 44,
+   "nonmanifold_meshes": 30
   },
   "HUMAN.ADULT.MALE|nervous": {
    "structures": 549,
