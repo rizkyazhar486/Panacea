@@ -45,6 +45,15 @@ raw source name, accuracy status, review status, version) that survive glTF expo
 6. `pipeline/render_benchmarks.py --bench layered|lineup|female_layered|cutaway|exploded`.
 7. `pipeline/export_web_lods.py` → `web/raw/`, then `pipeline/pack_web.py` → `web/glb/`.
 
+## In the app
+
+`src/pages/CanonicalBody.tsx`, route `#/body-exposure/canonical`, listed in the feature
+catalogue as "Canonical Human Bodies". It serves LOD2 (desktop) and LOD3 (phones) from
+`public/bodyexposure/`. Features: body picker (bodies without source data are shown and
+disabled), system toggles, normal/ghost/isolate, search, and tap-to-identify with the source
+and licence of every structure. Browser check: `qa/canonical-body-check.mjs` (390 and 1440 px,
+light and dark).
+
 ## Web assets
 
 | LOD | Triangle target vs master | Minimum per structure | Intended use |

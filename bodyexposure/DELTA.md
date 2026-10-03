@@ -29,12 +29,12 @@ Status as of master v006 (2026-10-03).
 | Material library, lighting, AgX, 13 camera presets | done |
 | 4K benchmarks | 6 frames: male layered, male+female lineup, female layered, opened thorax (pericardium), cutaway digital twin, exploded systems |
 | Exploded / cutaway | 4K render scenes (`render_benchmarks.py`); not yet a reversible in-app mode |
-| LOD / web GLB derivation | **done**: 4 LODs × 24 body-system files, meshopt-compressed, error-measured; verified in a standalone three.js viewer. Not yet wired into the app |
+| LOD / web GLB derivation | **done**: 4 LODs × 24 body-system files, meshopt-compressed, error-measured; verified in a standalone three.js viewer. **Live in the app** at `#/body-exposure/canonical` (LOD2/LOD3, 22 MB) |
 | Rigging, physiology, pathology, imaging, micro/molecular | not started |
 
 ## Next targets (priority order)
 
-1. Wire `web/glb` into Body Exposure (`Body3D.tsx`) as an opt-in canonical-body mode.
+1. Link the canonical page from the existing 3D Body explorer (`BodyExplorer.tsx`; needs the owner's uncommitted changes there to land first).
 2. Missing male structures that can be reconstructed from source geometry without
    invention (joint capsules from the articular surfaces, pericardium from the heart surface).
 3. Source acquisition for paediatric, pregnancy and fetal bodies. HuBMAP ships a placenta (v1.2) but no gravid uterus or fetus, so a pregnant body is still blocked on source data.
