@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, validateBallardInputs, validateDenverAge } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -591,30 +591,32 @@ const PHYSICAL_CRITERIA: { key: string; label: string; opts: { v: number; l: str
 function BallardSoapCalc() {
   const [neuro, setNeuro] = useState<Record<string, number>>({ posture: 2, squareWindow: 2, armRecoil: 1, poplitealAngle: 2, scarfSign: 1, heelToEar: 1 })
   const [phys, setPhys] = useState<Record<string, number>>({ skin: 2, lanugo: 1, plantar: 2, breast: 2, eyeEar: 2, genitals: 2 })
-  const [apgar1, setApgar1] = useState(8)
-  const [apgar5, setApgar5] = useState(9)
-  const [birthWeightG, setBirthWeightG] = useState(3000)
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (Apgar 0 = depresi berat, berat lahir 0 = SGA).
+  const [apgar1, setApgar1] = useState('8')
+  const [apgar5, setApgar5] = useState('9')
+  const [birthWeightG, setBirthWeightG] = useState('3000')
   const [babyName, setBabyName] = useState('')
   const [sex, setSex] = useState<'M' | 'F'>('M')
 
   const total = Object.values(neuro).reduce((a, b) => a + b, 0) + Object.values(phys).reduce((a, b) => a + b, 0)
   const gaWeeks = ballardScoreToGA(total)
-  const lub = lubchencoClass(gaWeeks, birthWeightG)
+  const neonate = validateBallardInputs(parseNumberField(birthWeightG), parseNumberField(apgar1), parseNumberField(apgar5))
+  const lub = neonate.ok ? lubchencoClass(gaWeeks, neonate.data.birthWeightG) : null
 
-  const soapNote = `SOAP — Neonatal Assessment${babyName ? ` (${babyName})` : ''}
-Sex: ${sex === 'M' ? 'Male' : 'Female'} · Birth Weight: ${birthWeightG} g
+  const soapNote = !neonate.ok || !lub ? '' : `SOAP — Neonatal Assessment${babyName ? ` (${babyName})` : ''}
+Sex: ${sex === 'M' ? 'Male' : 'Female'} · Birth Weight: ${neonate.data.birthWeightG} g
 
 S (Subjective): Newborn, maturity and immediate postnatal adaptation assessment performed.
 
 O (Objective):
-- APGAR at 1 min: ${apgar1}/10, at 5 min: ${apgar5}/10
+- APGAR at 1 min: ${neonate.data.apgar1}/10, at 5 min: ${neonate.data.apgar5}/10
 - New Ballard Score total: ${total} → estimated gestational age ${gaWeeks.toFixed(1)} weeks
 - Birth weight classification for gestational age (Lubchenco): ${lub.l}
 
 A (Assessment):
 - ${gaWeeks < 37 ? 'Preterm' : gaWeeks > 42 ? 'Post-term' : 'Term'} (Ballard estimate ${gaWeeks.toFixed(1)} weeks)
 - ${lub.l}
-- 5-minute APGAR ${apgar5 >= 7 ? 'good, adequate neonatal adaptation' : apgar5 >= 4 ? 'needs close observation' : 'severe depression, needs further resuscitation & NICU referral'}
+- 5-minute APGAR ${neonate.data.apgar5 >= 7 ? 'good, adequate neonatal adaptation' : neonate.data.apgar5 >= 4 ? 'needs close observation' : 'severe depression, needs further resuscitation & NICU referral'}
 
 P (Plan):
 - Manage per gestational age & birth weight classification (rooming-in if stable; NICU observation if preterm/SGA/low APGAR)
@@ -630,11 +632,11 @@ P (Plan):
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(e.target.value)} /></Field>
         <Field label="APGAR 1' / 5'">
           <div className="flex gap-1.5">
-            <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(+e.target.value)} />
-            <input className={inputClass} type="number" min={0} max={10} value={apgar5} onChange={(e) => setApgar5(+e.target.value)} />
+            <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(e.target.value)} />
+            <input className={inputClass} type="number" min={0} max={10} value={apgar5} onChange={(e) => setApgar5(e.target.value)} />
           </div>
         </Field>
       </div>
@@ -667,15 +669,19 @@ P (Plan):
           <div className="text-[10px] font-bold uppercase text-neutral-500">Gestational Age</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
+          {lub ? <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge> : <span className="text-sm font-black text-neutral-400">—</span>}
           <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Lubchenco</div>
         </div>
       </div>
 
+      {neonate.ok ? (
       <div className="mt-4">
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{neonate.reason}. No classification or SOAP note is shown until birth weight and both APGAR scores are valid.</p>
+      )}
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">The gestational age estimate & Lubchenco classification are simplified from standard reference points — check against the official table/chart for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.</Prosa>
     </Card>
   )
@@ -1637,10 +1643,13 @@ const DENVER_DOMAINS: { key: string; label: string; milestones: Milestone[] }[] 
 ]
 
 function DenverCalc() {
-  const [ageMo, setAgeMo] = useState(12)
+  // Teks mentah supaya usia yang belum diisi tidak terbaca 0 bulan.
+  const [ageText, setAgeText] = useState('12')
+  const denverAge = validateDenverAge(parseNumberField(ageText))
+  const ageMo = denverAge.ok ? denverAge.data.ageMonths : 0
   const [results, setResults] = useState<Record<string, 'pass' | 'fail' | 'na'>>({})
 
-  const domainFlags = DENVER_DOMAINS.map((d) => {
+  const domainFlags = !denverAge.ok ? [] : DENVER_DOMAINS.map((d) => {
     const applicable = d.milestones.filter((m) => m.ageMo <= ageMo)
     // "Caution/delay" — a milestone expected well below the child's current
     // age (>=6 months behind) marked as failed.
@@ -1655,8 +1664,11 @@ function DenverCalc() {
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="A simplified developmental screen — representative milestones per domain, not the full Denver II instrument" />
-      <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+      <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
 
+      {!denverAge.ok && (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{denverAge.reason}. No milestones are shown until the age is valid.</p>
+      )}
       {domainFlags.map(({ domain, applicable }) => (
         <div key={domain.key} className="mt-4">
           <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>

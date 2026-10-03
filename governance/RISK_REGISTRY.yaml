@@ -300,9 +300,13 @@ risks:
       (scripts/uji/centor-paradise-fletcher.mts) with every classification threshold moved unchanged and pinned at its
       boundary; Centor age and Fletcher thresholds now keep the raw field text so an empty field is rejected instead of
       being read as 0 (an empty Fletcher form used to show "Normal", an empty Centor age added a point, 1e999 episodes
-      met the Paradise criteria). Next: the rest of the numeric calculators (5 counted on 2026-10-03 still read
-      +e.target.value without a domain function and are not in an open PR: WhoGrowth, WhoNeonate, CdcAnthropometry,
-      BallardSoap, Denver; the first three use reference tables). Noted, not changed: the Broca-Lorentz page
+      met the Paradise criteria). BallardSoapCalc and DenverCalc got input validation only (validateBallardInputs, validateDenverAge;
+      scripts/uji/ballard-denver-inputs.mts): their reference tables, the Ballard-to-gestational-age interpolation, the
+      Lubchenco percentiles, the SOAP text and the Denver milestone list are untouched. An empty 5-minute APGAR used to be
+      read as 0 and made the auto-drafted SOAP note write "severe depression, needs further resuscitation & NICU
+      referral"; the form now keeps raw text and refuses empty fields. Next: the rest of the numeric calculators (3
+      counted on 2026-10-03 still read +e.target.value without a domain function and are not in an open PR: WhoGrowth,
+      WhoNeonate, CdcAnthropometry, all reference-table calculators). Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -331,3 +335,6 @@ risks:
       - src/domains/clinical-calculators/engine/paradise.ts
       - src/domains/clinical-calculators/engine/fletcher.ts
       - scripts/uji/centor-paradise-fletcher.mts
+      - src/domains/clinical-calculators/engine/ballardInputs.ts
+      - src/domains/clinical-calculators/engine/denverAge.ts
+      - scripts/uji/ballard-denver-inputs.mts
