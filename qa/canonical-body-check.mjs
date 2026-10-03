@@ -14,9 +14,11 @@ try {
       await page.setViewportSize({ width, height })
       await page.goto(URL, { timeout: 180000 })  // server dev Vite dingin bisa lambat
       await page.evaluate((t) => document.documentElement.classList.toggle('dark', t === 'dark'), theme)
-      const stats = page.getByText(/structures · \d+k triangles/)
+      const stats = page.getByText(/loaded · \d+k triangles/)
       await stats.waitFor({ timeout: 60000 })
-      assert.match(await stats.textContent(), /^3,877 structures/, 'male structure count')
+      await page.getByText('3,877 structures', { exact: true }).waitFor()  // jumlah struktur tubuh (header)
+      // muatan awal (mode Light, sistem default) ≤ 80.000 segitiga per tubuh
+      assert(parseInt((await stats.textContent()).match(/(\d+)k triangles/)[1], 10) <= 80, 'initial web load over 80k triangles')
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow')
       // tubuh tanpa data sumber tetap tidak bisa dipilih; tubuh pediatrik ICRP bisa
       assert(await page.getByRole('tab', { name: /Pregnancy/ }).isDisabled(), 'placeholder body must be disabled')
@@ -56,17 +58,21 @@ try {
       const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
       assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
       await page.getByRole('button', { name: 'Stop measuring' }).click()
+      // pemuatan bertahap: struktur saraf (sistem belum dimuat) tetap bisa dicari, sistemnya dimuat lalu dipilih
+      await page.getByLabel('Find a structure').fill('sciatic nerve')
+      await page.getByRole('button', { name: /^sciatic nerve/i }).first().click()
+      await page.getByText(/^ADULT\.MALE\.NERVOUS\.SCIATIC_NERVE\.[LR]$/).waitFor({ timeout: 60000 })
       // koreksi label usus v010: "Sigmoid colon" Z-Anatomy kini Rectum (BodyParts3D)
       await page.getByLabel('Find a structure').fill('rectum')
       await page.getByRole('button', { name: /^rectum/i }).first().click()
       await page.getByText(/^ADULT\.MALE\.DIGESTIVE\.RECTUM$/).waitFor()
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
-      await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })
+      await page.getByText(/^8\d\d structures$/).waitFor({ timeout: 60000 })
       // varian ICRP 145: tubuh perempuan referensi lengkap (rangka aksial, lambung, saluran napas)
       await page.getByRole('radio', { name: 'ICRP reference' }).click()
       await page.getByText(/stature 163 cm/).waitFor({ timeout: 60000 })
-      await page.getByText(/^93 structures · \d+k triangles/).waitFor({ timeout: 60000 })
+      await page.getByText(/^93 structures$/).waitFor({ timeout: 60000 })
       await page.getByLabel('Find a structure').fill('ribs')
       await page.getByRole('button', { name: /^ribs cortical/i }).first().click()
       await page.getByText(/^ICRP\.ADULT\.FEMALE\.SKELETAL\.RIBS_CORTICAL$/).waitFor()
@@ -75,11 +81,11 @@ try {
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()
       await page.getByText(/stature 138 cm/).waitFor({ timeout: 60000 })
-      await page.getByText(/^140 structures · \d+k triangles/).waitFor({ timeout: 60000 })
+      await page.getByText(/^140 structures$/).waitFor({ timeout: 60000 })
       await page.getByRole('tab', { name: /^Neonate/ }).click()
       await page.getByText(/stature 48 cm/).waitFor({ timeout: 60000 })
       await page.screenshot({ path: `/private/tmp/canonical-neonate-${width}-${theme}.png`, fullPage: true })
-      console.log(JSON.stringify({ width, theme, male: 3877, last_loaded: (await page.getByText(/structures · \d+k/).textContent()) }))
+      console.log(JSON.stringify({ width, theme, male: 3877, last_loaded: (await page.getByText(/loaded · \d+k/).textContent()) }))
     }
   }
   assert.deepEqual(errors, [])

@@ -1,0 +1,105 @@
+{
+ "budget": 80000,
+ "default_systems": [
+  "cardiovascular",
+  "digestive",
+  "reproductive",
+  "respiratory",
+  "skeletal",
+  "surface",
+  "urinary"
+ ],
+ "bodies": [
+  {
+   "body": "adult_female",
+   "light_lod": "LOD4",
+   "initial_tris": 77222,
+   "all_systems_tris": 127077
+  },
+  {
+   "body": "adult_male",
+   "light_lod": "LOD4",
+   "initial_tris": 79723,
+   "all_systems_tris": 135711
+  },
+  {
+   "body": "icrp_adult_female",
+   "light_lod": "LOD3",
+   "initial_tris": 40252,
+   "all_systems_tris": 64974
+  },
+  {
+   "body": "icrp_adult_male",
+   "light_lod": "LOD3",
+   "initial_tris": 39750,
+   "all_systems_tris": 65822
+  },
+  {
+   "body": "module_tissue_lymph_node",
+   "light_lod": "LOD3",
+   "initial_tris": 0,
+   "all_systems_tris": 18562
+  },
+  {
+   "body": "pediatric_adolescent_female",
+   "light_lod": "LOD3",
+   "initial_tris": 39120,
+   "all_systems_tris": 61590
+  },
+  {
+   "body": "pediatric_adolescent_male",
+   "light_lod": "LOD3",
+   "initial_tris": 35660,
+   "all_systems_tris": 56212
+  },
+  {
+   "body": "pediatric_child_10y_female",
+   "light_lod": "LOD3",
+   "initial_tris": 36178,
+   "all_systems_tris": 57230
+  },
+  {
+   "body": "pediatric_child_10y_male",
+   "light_lod": "LOD3",
+   "initial_tris": 34908,
+   "all_systems_tris": 56374
+  },
+  {
+   "body": "pediatric_child_5y_female",
+   "light_lod": "LOD3",
+   "initial_tris": 43714,
+   "all_systems_tris": 67130
+  },
+  {
+   "body": "pediatric_child_5y_male",
+   "light_lod": "LOD3",
+   "initial_tris": 43002,
+   "all_systems_tris": 66106
+  },
+  {
+   "body": "pediatric_infant_female",
+   "light_lod": "LOD3",
+   "initial_tris": 33516,
+   "all_systems_tris": 55606
+  },
+  {
+   "body": "pediatric_infant_male",
+   "light_lod": "LOD3",
+   "initial_tris": 32274,
+   "all_systems_tris": 53920
+  },
+  {
+   "body": "pediatric_neonate_female",
+   "light_lod": "LOD3",
+   "initial_tris": 40094,
+   "all_systems_tris": 61490
+  },
+  {
+   "body": "pediatric_neonate_male",
+   "light_lod": "LOD3",
+   "initial_tris": 39544,
+   "all_systems_tris": 60822
+  }
+ ],
+ "ok": true
+}

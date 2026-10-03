@@ -28,7 +28,8 @@ interface BodyEntry {
   structures: number
   variants?: Array<{ body_id: string; structures: number; stature_m: number; label?: string; status?: string; source?: string }>
 }
-interface BodyMatrix { bodies: BodyEntry[]; files: string[] }
+// light_lod: LOD ringan per berkas tubuh (LOD4 = budget ≤ 80.000 segitiga tampilan awal bila tersedia)
+interface BodyMatrix { bodies: BodyEntry[]; files: string[]; light_lod?: Record<string, string> }
 
 // jangkar landmark sumber (Z-Anatomy), dikelompokkan per struktur inang; koordinat sudah Y-up
 interface AnchorIndex { by_structure: Record<string, Array<{ id: string; name: string; p: [number, number, number]; s: string }>> }
@@ -104,7 +105,8 @@ export function CanonicalBody() {
   const [error, setError] = useState('')
   const [entryId, setEntryId] = useState('HUMAN.ADULT.MALE')
   const [variantId, setVariantId] = useState<string | null>(null)
-  const [lod, setLod] = useState<'LOD2' | 'LOD3'>(() => (window.matchMedia('(max-width: 767px)').matches ? 'LOD3' : 'LOD2'))
+  // default ringan di semua layar: muatan awal tiap tubuh ≤ 80.000 segitiga (gerbang check_web_budget.py)
+  const [detail, setDetail] = useState<'light' | 'detailed'>('light')
   const [enabled, setEnabled] = useState<Set<string>>(DEFAULT_ON)
   const [mode, setMode] = useState<Mode>('normal')
   const [section, setSection] = useState<Section>('none')
@@ -148,6 +150,7 @@ export function CanonicalBody() {
   // tubuh yang benar-benar dimuat: varian terpilih (pediatrik) atau entri itu sendiri (dewasa)
   const bodyId = variants.length ? (variants.find((v) => v.body_id === variantId) ?? variants[0]).body_id : entryId
   const activeVariant = variants.find((v) => v.body_id === bodyId)
+  const lod = detail === 'detailed' ? 'LOD2' : (matrix?.light_lod?.[fileTag(bodyId)] ?? 'LOD3')
   const systems = useMemo(() => {
     const tag = fileTag(bodyId)
     return (matrix?.files ?? []).filter((f) => f.startsWith(tag + '.')).map((f) => f.slice(tag.length + 1))
@@ -222,25 +225,37 @@ export function CanonicalBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // ── muat ulang GLB saat tubuh / LOD berubah ─────────────────────────────────
+  // ── muat GLB bertahap: tubuh/LOD baru → kosongkan; lalu hanya sistem yang aktif dimuat ──
+  // (muatan awal = sistem default ≤ 80.000 segitiga; sistem lain dimuat saat dinyalakan)
+  const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0 })
+  const pendingSelect = useRef<string | null>(null)
   useEffect(() => {
     const s = sceneRef.current
     if (!s || !systems.length) return
-    let cancelled = false
-    setLoading(true); setPicked(null); selectedRef.current = null
-    s.root.traverse((o) => {
-      if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
-    })
-    s.root.clear(); s.groups.clear(); s.byId.clear()
+    const L = loadState.current
+    const key = `${bodyId}|${lod}`
+    const reset = L.key !== key
+    if (reset) {
+      L.key = key; L.gen += 1; L.loaded = new Set(); L.tris = 0
+      setPicked(null); selectedRef.current = null
+      s.root.traverse((o) => {
+        if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
+      })
+      s.root.clear(); s.groups.clear(); s.byId.clear()
+    }
+    const todo = systems.filter((sys) => enabled.has(sys) && !L.loaded.has(sys))
+    if (!todo.length) return
+    todo.forEach((sys) => L.loaded.add(sys))
+    const gen = L.gen
+    setLoading(true)
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     const tag = fileTag(bodyId)
     const t0 = performance.now()
-    Promise.allSettled(systems.map(async (sys) => {
+    Promise.allSettled(todo.map(async (sys) => {
       const g = await loader.loadAsync(`${BASE}${tag}.${sys}.${lod}.glb`)
       return { sys, scene: g.scene }
     })).then((results) => {
-      if (cancelled) return
-      let tris = 0
+      if (gen !== loadState.current.gen) return  // tubuh/LOD sudah berganti
       for (const r of results) {
         if (r.status !== 'fulfilled') continue
         const { sys, scene } = r.value
@@ -250,25 +265,27 @@ export function CanonicalBody() {
             o.material = (o.material as THREE.Material).clone()
             o.userData.baseOpacity = sys === 'surface' ? 0.12 : 1
             const geo = o.geometry
-            tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3
+            L.tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3
             if (sys === 'surface') o.raycast = () => {}  // kulit tembus pandang tidak menghalangi ketukan
           }
         })
         s.groups.set(sys, scene)
         s.root.add(scene)
       }
-      const failed = results.filter((r) => r.status === 'rejected').length
-      if (failed) setError(`${failed} system file(s) could not be loaded.`)
-      setStats({ structures: s.byId.size, tris: Math.round(tris), ms: Math.round(performance.now() - t0) })
-      bodyBox.current = new THREE.Box3().setFromObject(s.root)
-      frame()
+      const failed = results.filter((r) => r.status === 'rejected')
+      results.forEach((r, i) => { if (r.status === 'rejected') L.loaded.delete(todo[i]) })
+      if (failed.length) setError(`${failed.length} system file(s) could not be loaded.`)
+      setStats({ structures: s.byId.size, tris: Math.round(L.tris), ms: Math.round(performance.now() - t0) })
+      if (reset) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
       applyVisibility()
       applyDisperse(disperse)
       setLoading(false)
+      const want = pendingSelect.current
+      const o = want ? s.byId.get(want) : undefined
+      if (o) { pendingSelect.current = null; select(o); focusOn(o) }
     })
-    return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyId, lod, systems])
+  }, [bodyId, lod, systems, enabled])
 
   useEffect(() => { applyVisibility() })  // sistem, mode, pilihan
 
@@ -418,19 +435,22 @@ export function CanonicalBody() {
     s.invalidate()
   }, [landmarks])
 
+  // indeks pencarian seluruh tubuh (termasuk sistem yang belum dimuat): [id, nama, lateralitas, sistem]
+  const [index, setIndex] = useState<Array<[string, string, string, string]>>([])
+  useEffect(() => {
+    setIndex([])
+    fetch(`${BASE}${fileTag(bodyId)}.index.json`).then((r) => (r.ok ? r.json() : [])).then(setIndex).catch(() => setIndex([]))
+  }, [bodyId])
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const s = sceneRef.current
-    if (q.length < 2 || !s) return []
-    const out: Array<{ id: string; name: string }> = []
-    for (const [id, o] of s.byId) {
-      const name = String(o.userData.canonical_name ?? id)
-      if (name.toLowerCase().includes(q) || id.toLowerCase().includes(q)) out.push({ id, name: `${name}${o.userData.panacea_laterality === 'left' ? ' (left)' : o.userData.panacea_laterality === 'right' ? ' (right)' : ''}` })
+    if (q.length < 2) return []
+    const out: Array<{ id: string; name: string; system: string }> = []
+    for (const [id, name, lat, system] of index) {
+      if (name.toLowerCase().includes(q) || id.toLowerCase().includes(q)) out.push({ id, system, name: `${name}${lat === 'left' ? ' (left)' : lat === 'right' ? ' (right)' : ''}` })
       if (out.length >= 8) break
     }
     return out
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, stats])
+  }, [query, index])
 
   const toggle = (sys: string) => setEnabled((prev) => {
     const n = new Set(prev); if (n.has(sys)) n.delete(sys); else n.add(sys); return n
@@ -502,10 +522,10 @@ export function CanonicalBody() {
             </button>
           </div>
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
-            {(['LOD3', 'LOD2'] as const).map((l) => (
-              <button key={l} onClick={() => setLod(l)} aria-pressed={lod === l}
-                className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold ${lod === l ? 'bg-[#f2f4f6] text-[#0b0c0e]' : 'text-white/80'}`}>
-                {l === 'LOD3' ? 'Light' : 'Detailed'}
+            {(['light', 'detailed'] as const).map((l) => (
+              <button key={l} onClick={() => setDetail(l)} aria-pressed={detail === l}
+                className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold ${detail === l ? 'bg-[#f2f4f6] text-[#0b0c0e]' : 'text-white/80'}`}>
+                {l === 'light' ? 'Light' : 'Detailed'}
               </button>
             ))}
           </div>
@@ -518,7 +538,7 @@ export function CanonicalBody() {
         {loading && <div className="absolute inset-0 grid place-items-center text-sm font-bold text-white/80">Loading anatomy…</div>}
         {!loading && stats.structures > 0 && (
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70">
-            {stats.structures.toLocaleString('en')} structures · {Math.round(stats.tris / 1000)}k triangles · {stats.ms} ms
+            {stats.structures.toLocaleString('en')} loaded · {Math.round(stats.tris / 1000)}k triangles · {stats.ms} ms
           </div>
         )}
       </div>
@@ -582,11 +602,10 @@ export function CanonicalBody() {
                   <button
                     className="min-h-[44px] w-full px-4 text-left text-sm capitalize hover:bg-neutral-500/10"
                     onClick={() => {
+                      setQuery('')
+                      if (m.system && !enabled.has(m.system)) toggle(m.system)
                       const o = sceneRef.current?.byId.get(m.id)
-                      if (!o) return
-                      const sys = String(o.userData.panacea_system ?? '')
-                      if (sys && !enabled.has(sys)) toggle(sys)
-                      select(o); focusOn(o); setQuery('')
+                      if (o) { select(o); focusOn(o) } else pendingSelect.current = m.id  // pilih setelah sistemnya dimuat
                     }}
                   >
                     {m.name}

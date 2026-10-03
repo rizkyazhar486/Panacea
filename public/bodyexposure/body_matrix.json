@@ -391,5 +391,9 @@
   "pediatric_neonate_male.skeletal",
   "pediatric_neonate_male.surface",
   "pediatric_neonate_male.urinary"
- ]
+ ],
+ "light_lod": {
+  "adult_male": "LOD4",
+  "adult_female": "LOD4"
+ }
 }

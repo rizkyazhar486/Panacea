@@ -100,3 +100,14 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
   - No soft-tissue skinning yet.
   - The scapulothoracic and atlantoaxial joints are not separate bones.
   - No rigs yet for the other bodies, and no posing in the app.
+
+## Web polygon budget: initial load ≤ 80,000 triangles per body (2026-10-04)
+
+- New **LOD4** (`export_web_lods.py --lods LOD4`): per-system triangle budgets. Within each system every structure keeps a floor of 8 triangles, so none disappear, and the rest is shared in proportion to surface area. The default-visible systems (surface, skeletal, cardiovascular, respiratory, digestive, urinary, reproductive) sum to ≤ 80,000 triangles per body.
+- Non-manifold edges (for example the cavernous sinus and falx cerebri sheets) blocked collapse decimation. LOD4 export splits those edges on a temporary copy, with identical vertex positions. The master is unchanged.
+- Measured: adult male initial load 79,723 triangles (all systems 135,711), adult female 77,222. Paediatric and ICRP bodies already fit at LOD3 (32,000–44,000). Shape error per structure is in `web/lod_report.json`; for example, the scapula has 0.2 mm mean and 0.9 mm max.
+- **App:**
+  - Light (default on every screen) uses LOD4 where it exists.
+  - Systems now load incrementally: only enabled systems on first load, others when switched on.
+  - Search uses a per-body index (`<tag>.index.json`), so structures in unloaded systems are still found; selecting one loads its system first.
+- **Gates:** `pipeline/check_web_budget.py` counts triangles from the published GLBs and fails above 80,000. The browser check asserts the initial load is ≤ 80k and covers lazy loading (sciatic nerve from the unloaded nervous system).

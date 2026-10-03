@@ -15,6 +15,36 @@
   "LOD3": {
    "target_ratio": 0.04,
    "min_tris": 60
+  },
+  "LOD4": {
+   "system_budget_tris": {
+    "skeletal": 26000,
+    "cardiovascular": 25000,
+    "surface": 8000,
+    "digestive": 8000,
+    "respiratory": 5000,
+    "urinary": 2500,
+    "reproductive": 2500,
+    "muscular": 24000,
+    "nervous": 12000,
+    "joint": 8000,
+    "lymphatic": 3000,
+    "fascia": 3000,
+    "sensory": 3000,
+    "endocrine": 1500,
+    "visceral_unclassified": 1000
+   },
+   "min_tris": 8,
+   "initial_load_systems": [
+    "cardiovascular",
+    "digestive",
+    "reproductive",
+    "respiratory",
+    "skeletal",
+    "surface",
+    "urinary"
+   ],
+   "allocation": "per system: floor + remainder proportional to surface area"
   }
  },
  "files": [
@@ -7091,6 +7121,1728 @@
      "MODULE.TISSUE.LYMPH_NODE.EFFERENT_LYMPH_NODE",
      0.056,
      0.228
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD4",
+   "file": "adult_male.cardiovascular.LOD4.glb",
+   "structures": 677,
+   "tris_master": 3861429,
+   "tris_lod": 28393,
+   "bytes_raw": 1827420,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.CARDIOVASCULAR.CENTRAL_RETINAL_ARTERY.L",
+     0.114,
+     1.277
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.CENTRAL_RETINAL_ARTERY.R",
+     0.104,
+     1.78
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.RIGHT_SUPERIOR_INTERCOSTAL_VEIN",
+     0.744,
+     12.547
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.BASILAR_VENOUS_PLEXUS",
+     2.553,
+     10.265
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.LEFT_SUPERIOR_INTERCOSTAL_VEIN",
+     1.21,
+     18.537
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_INTERCOSTAL_ARTERIES.R",
+     2.205,
+     33.849
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_INTERCOSTAL_ARTERIES.L",
+     2.177,
+     22.818
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_INFERIOR_CEREBELLAR_ARTERY.L",
+     0.286,
+     2.218
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_INFERIOR_CEREBELLAR_ARTERY.R",
+     0.316,
+     2.218
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_CEREBRAL_ARTERY.L",
+     0.488,
+     5.589
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.POSTERIOR_CEREBRAL_ARTERY.R",
+     0.404,
+     5.589
+    ],
+    [
+     "ADULT.MALE.CARDIOVASCULAR.PERICALLOSAL_ARTERY.L",
+     0.442,
+     3.073
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "digestive",
+   "lod": "LOD4",
+   "file": "adult_male.digestive.LOD4.glb",
+   "structures": 77,
+   "tris_master": 452019,
+   "tris_lod": 7863,
+   "bytes_raw": 312844,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.DIGESTIVE.GREATER_OMENTUM",
+     0.133,
+     0.777
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.PANCREATIC_DUCT",
+     0.136,
+     2.246
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.JEJUNUM_AND_ILEUM",
+     1.119,
+     4.33
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.DESCENDING_AND_SIGMOID_COLON",
+     0.618,
+     2.645
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.GINGIVA",
+     0.689,
+     4.324
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.ASCENDING_COLON",
+     0.605,
+     2.659
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.TRANSVERSE_COLON",
+     0.6,
+     2.723
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.OESOPHAGUS",
+     0.293,
+     1.435
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.MESOCOLON",
+     0.242,
+     1.452
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.LIVER",
+     0.28,
+     1.17
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.ACCESSORY_PANCREATIC_DUCT",
+     0.088,
+     0.702
+    ],
+    [
+     "ADULT.MALE.DIGESTIVE.MUCOSA_OF_STOMACH",
+     0.411,
+     1.363
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "endocrine",
+   "lod": "LOD4",
+   "file": "adult_male.endocrine.LOD4.glb",
+   "structures": 10,
+   "tris_master": 11308,
+   "tris_lod": 1489,
+   "bytes_raw": 45516,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.ENDOCRINE.SUPRARENAL_GLAND.L",
+     0.068,
+     0.227
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+     0.077,
+     0.372
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.SUPRARENAL_GLAND.R",
+     0.076,
+     0.289
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.ADENOHYPOPHYSIS",
+     0.181,
+     0.691
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.PINEAL_GLAND",
+     0.146,
+     0.375
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.NEUROHYPOPHYSIS",
+     0.148,
+     0.552
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.INFERIOR_PARATHYROID_GLAND.L",
+     0.191,
+     0.471
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.INFERIOR_PARATHYROID_GLAND.R",
+     0.191,
+     0.471
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.SUPERIOR_PARATHYROID_GLAND.L",
+     0.216,
+     0.521
+    ],
+    [
+     "ADULT.MALE.ENDOCRINE.SUPERIOR_PARATHYROID_GLAND.R",
+     0.216,
+     0.521
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "fascia",
+   "lod": "LOD4",
+   "file": "adult_male.fascia.LOD4.glb",
+   "structures": 93,
+   "tris_master": 309469,
+   "tris_lod": 2909,
+   "bytes_raw": 236736,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.FASCIA.ILIOTIBIAL_TRACT.L",
+     6.912,
+     31.245
+    ],
+    [
+     "ADULT.MALE.FASCIA.ILIOTIBIAL_TRACT.R",
+     6.837,
+     31.608
+    ],
+    [
+     "ADULT.MALE.FASCIA.EPICRANIAL_APONEUROSIS.L",
+     7.078,
+     45.858
+    ],
+    [
+     "ADULT.MALE.FASCIA.EPICRANIAL_APONEUROSIS.R",
+     7.078,
+     45.858
+    ],
+    [
+     "ADULT.MALE.FASCIA.FASCIA_LATA.R",
+     0.849,
+     4.799
+    ],
+    [
+     "ADULT.MALE.FASCIA.FASCIA_LATA.L",
+     0.849,
+     4.294
+    ],
+    [
+     "ADULT.MALE.FASCIA.INVESTING_ABDOMINAL_FASCIA.R",
+     0.818,
+     6.416
+    ],
+    [
+     "ADULT.MALE.FASCIA.INVESTING_ABDOMINAL_FASCIA.L",
+     0.81,
+     6.456
+    ],
+    [
+     "ADULT.MALE.FASCIA.CRURAL_FASCIA.R",
+     1.179,
+     4.468
+    ],
+    [
+     "ADULT.MALE.FASCIA.CRURAL_FASCIA.L",
+     1.264,
+     5.581
+    ],
+    [
+     "ADULT.MALE.FASCIA.MEDIAL_FEMORAL_INTERMUSCULAR_SEPTUM.R",
+     0.879,
+     3.109
+    ],
+    [
+     "ADULT.MALE.FASCIA.MEDIAL_FEMORAL_INTERMUSCULAR_SEPTUM.L",
+     0.79,
+     3.698
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "joint",
+   "lod": "LOD4",
+   "file": "adult_male.joint.LOD4.glb",
+   "structures": 413,
+   "tris_master": 358055,
+   "tris_lod": 7775,
+   "bytes_raw": 933772,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.JOINT.INTEROSSEOUS_MEMBRANE_OF_LEG.R",
+     0.733,
+     4.354
+    ],
+    [
+     "ADULT.MALE.JOINT.INTEROSSEOUS_MEMBRANE_OF_LEG.L",
+     0.733,
+     4.354
+    ],
+    [
+     "ADULT.MALE.JOINT.INTERTRANSVERSE_LIGAMENTS.R",
+     9.008,
+     78.88
+    ],
+    [
+     "ADULT.MALE.JOINT.INTERTRANSVERSE_LIGAMENTS.L",
+     7.316,
+     66.667
+    ],
+    [
+     "ADULT.MALE.JOINT.POSTERIOR_LONGITUDINAL_LIGAMENT",
+     0.309,
+     1.473
+    ],
+    [
+     "ADULT.MALE.JOINT.EXTERNAL_INTERCOSTAL_MEMBRANE.R",
+     0.292,
+     2.217
+    ],
+    [
+     "ADULT.MALE.JOINT.EXTERNAL_INTERCOSTAL_MEMBRANE.L",
+     0.343,
+     4.708
+    ],
+    [
+     "ADULT.MALE.JOINT.POSTERIOR_SACRO_ILIAC_LIGAMENT.R",
+     4.304,
+     26.655
+    ],
+    [
+     "ADULT.MALE.JOINT.POSTERIOR_SACRO_ILIAC_LIGAMENT.L",
+     3.924,
+     26.746
+    ],
+    [
+     "ADULT.MALE.JOINT.ANTERIOR_LONGITUDINAL_LIGAMENT",
+     0.304,
+     2.305
+    ],
+    [
+     "ADULT.MALE.JOINT.ZONA_ORBICULARIS.R",
+     0.264,
+     1.049
+    ],
+    [
+     "ADULT.MALE.JOINT.ZONA_ORBICULARIS.L",
+     0.277,
+     1.26
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD4",
+   "file": "adult_male.lymphatic.LOD4.glb",
+   "structures": 163,
+   "tris_master": 127682,
+   "tris_lod": 2836,
+   "bytes_raw": 359136,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.LYMPHATIC.LEFT_LOBE_OF_THYMUS",
+     0.186,
+     0.749
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.RIGHT_LOBE_OF_THYMUS",
+     0.179,
+     1.008
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.INTRAPULMONARY_NODES",
+     0.693,
+     1.305
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.PARACOLIC_SUPERIOR_MESENTERIC_NODES",
+     0.673,
+     1.37
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.JUXTA_INTESTINAL_MESENTERIC_NODES",
+     0.676,
+     1.313
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.INTERCOSTAL_NODES.L",
+     0.69,
+     1.34
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.INTERCOSTAL_NODES.R",
+     0.686,
+     1.34
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.INFERIOR_TRACHEOBRONCHIAL_NODES",
+     0.688,
+     1.343
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.JUXTA_OESOPHAGEAL_NODES",
+     0.686,
+     1.32
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.PARATRACHEAL_THORACIC_NODES",
+     0.688,
+     1.319
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.PREVERTEBRAL_NODES",
+     0.691,
+     1.324
+    ],
+    [
+     "ADULT.MALE.LYMPHATIC.LATERAL_COMMON_ILIAC_NODES",
+     0.678,
+     1.325
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "muscular",
+   "lod": "LOD4",
+   "file": "adult_male.muscular.LOD4.glb",
+   "structures": 1292,
+   "tris_master": 2941878,
+   "tris_lod": 23926,
+   "bytes_raw": 3063612,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.MUSCULAR.EXTERNAL_INTERCOSTAL_MUSCLES.L",
+     8.681,
+     47.441
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.EXTERNAL_INTERCOSTAL_MUSCLES.R",
+     8.681,
+     47.441
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.INTERNAL_INTERCOSTAL_MUSCLES.L",
+     8.158,
+     47.723
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.INTERNAL_INTERCOSTAL_MUSCLES.R",
+     8.158,
+     47.723
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.DIAPHRAGM",
+     0.937,
+     4.588
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.INNERMOST_INTERCOSTAL_MUSCLES.L",
+     4.663,
+     30.475
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.INNERMOST_INTERCOSTAL_MUSCLES.R",
+     4.663,
+     30.475
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.TRANSVERSUS_ABDOMINIS_MUSCLE.L",
+     1.514,
+     6.997
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.TRANSVERSUS_ABDOMINIS_MUSCLE.R",
+     1.514,
+     6.997
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.EXTERNAL_ABDOMINAL_OBLIQUE_MUSCLE.L",
+     1.447,
+     19.291
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.EXTERNAL_ABDOMINAL_OBLIQUE_MUSCLE.R",
+     1.447,
+     19.291
+    ],
+    [
+     "ADULT.MALE.MUSCULAR.INTERNAL_ABDOMINAL_OBLIQUE_MUSCLE.L",
+     8.377,
+     95.64
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "nervous",
+   "lod": "LOD4",
+   "file": "adult_male.nervous.LOD4.glb",
+   "structures": 549,
+   "tris_master": 2268489,
+   "tris_lod": 14167,
+   "bytes_raw": 1360292,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.NERVOUS.WHITE_MATTER_OF_TELENCEPHALON",
+     3.436,
+     15.535
+    ],
+    [
+     "ADULT.MALE.NERVOUS.WHITE_MATTER_OF_TELENCEPHALON.R",
+     3.559,
+     15.074
+    ],
+    [
+     "ADULT.MALE.NERVOUS.ZONULAR_FIBRES.R",
+     0.149,
+     0.538
+    ],
+    [
+     "ADULT.MALE.NERVOUS.INTERCOSTAL_NERVES.L",
+     0.8,
+     15.473
+    ],
+    [
+     "ADULT.MALE.NERVOUS.INTERCOSTAL_NERVES.R",
+     0.646,
+     9.815
+    ],
+    [
+     "ADULT.MALE.NERVOUS.VAGUS_NERVE_X.R",
+     1.672,
+     13.599
+    ],
+    [
+     "ADULT.MALE.NERVOUS.FACIAL_NERVE_VII.L",
+     1.812,
+     18.18
+    ],
+    [
+     "ADULT.MALE.NERVOUS.FACIAL_NERVE_VII.R",
+     1.687,
+     20.706
+    ],
+    [
+     "ADULT.MALE.NERVOUS.OLFACTORY_NERVE_I.L",
+     0.388,
+     5.523
+    ],
+    [
+     "ADULT.MALE.NERVOUS.OLFACTORY_NERVE_I.R",
+     0.384,
+     5.523
+    ],
+    [
+     "ADULT.MALE.NERVOUS.GANGLIA_OF_SYMPATHETIC_TRUNK.L",
+     0.45,
+     0.879
+    ],
+    [
+     "ADULT.MALE.NERVOUS.GANGLIA_OF_SYMPATHETIC_TRUNK.R",
+     0.449,
+     0.901
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "reproductive",
+   "lod": "LOD4",
+   "file": "adult_male.reproductive.LOD4.glb",
+   "structures": 14,
+   "tris_master": 19519,
+   "tris_lod": 2484,
+   "bytes_raw": 69960,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.REPRODUCTIVE.DUCTUS_DEFERENS.L",
+     0.266,
+     1.171
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.DUCTUS_DEFERENS.R",
+     0.266,
+     1.171
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.GLANS_PENIS",
+     0.175,
+     0.568
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.TESTIS",
+     0.173,
+     0.498
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.TESTIS.L",
+     0.173,
+     0.498
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.CORPUS_CAVERNOSUM_OF_PENIS",
+     0.061,
+     0.413
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.EJACULATORY_DUCT.L",
+     0.148,
+     0.426
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.EJACULATORY_DUCT.R",
+     0.148,
+     0.426
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.CORPUS_SPONGIOSUM_OF_PENIS",
+     0.093,
+     0.305
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.PROSTATE",
+     0.158,
+     0.381
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.EPIDIDYMIS.L",
+     0.224,
+     0.763
+    ],
+    [
+     "ADULT.MALE.REPRODUCTIVE.EPIDIDYMIS.R",
+     0.224,
+     0.763
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "respiratory",
+   "lod": "LOD4",
+   "file": "adult_male.respiratory.LOD4.glb",
+   "structures": 49,
+   "tris_master": 273197,
+   "tris_lod": 4886,
+   "bytes_raw": 208592,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.RESPIRATORY.PLEURA",
+     0.267,
+     1.31
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.MUCOSA_OF_NASAL_CAVITY",
+     1.054,
+     7.492
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG",
+     0.61,
+     5.365
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG",
+     0.475,
+     2.2
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.SUPERIOR_SEGMENTAL_BRONCHUS_OF_RIGHT_LUNG_BVI",
+     4.274,
+     33.452
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG",
+     0.465,
+     6.004
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG",
+     0.491,
+     2.03
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.APICOPOSTERIOR_SEGMENTAL_BRONCHUS_OF_LEFT_LUNG_BI_BII",
+     8.961,
+     43.31
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG",
+     0.43,
+     2.082
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.APICAL_SEGMENTAL_BRONCHUS_OF_RIGHT_LUNG_BI",
+     3.698,
+     20.29
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.MEDIAL_BASAL_SEGMENTAL_BRONCHUS_OF_LEFT_LUNG_BVII",
+     3.646,
+     16.957
+    ],
+    [
+     "ADULT.MALE.RESPIRATORY.ANTERIOR_SEGMENTAL_BRONCHUS_OF_RIGHT_LUNG_BIII",
+     5.019,
+     29.627
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "sensory",
+   "lod": "LOD4",
+   "file": "adult_male.sensory.LOD4.glb",
+   "structures": 44,
+   "tris_master": 146398,
+   "tris_lod": 2894,
+   "bytes_raw": 137672,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.SENSORY.ANTERIOR_CHAMBER_OF_EYEBALL.L",
+     0.113,
+     0.476
+    ],
+    [
+     "ADULT.MALE.SENSORY.ANTERIOR_CHAMBER_OF_EYEBALL.R",
+     0.112,
+     0.4
+    ],
+    [
+     "ADULT.MALE.SENSORY.VESTIBULE.L",
+     0.404,
+     1.76
+    ],
+    [
+     "ADULT.MALE.SENSORY.VESTIBULE.R",
+     0.398,
+     2.099
+    ],
+    [
+     "ADULT.MALE.SENSORY.POSTERIOR_SEGMENT_OF_EYEBALL.L",
+     0.114,
+     0.368
+    ],
+    [
+     "ADULT.MALE.SENSORY.POSTERIOR_SEGMENT_OF_EYEBALL.R",
+     0.114,
+     0.368
+    ],
+    [
+     "ADULT.MALE.SENSORY.RETINA.L",
+     0.133,
+     0.374
+    ],
+    [
+     "ADULT.MALE.SENSORY.RETINA.R",
+     0.118,
+     0.328
+    ],
+    [
+     "ADULT.MALE.SENSORY.COCHLEA.L",
+     0.424,
+     1.177
+    ],
+    [
+     "ADULT.MALE.SENSORY.COCHLEA.R",
+     0.394,
+     1.249
+    ],
+    [
+     "ADULT.MALE.SENSORY.SUSPENSORY_LIGAMENT_OF_EYEBALL.L",
+     0.187,
+     0.662
+    ],
+    [
+     "ADULT.MALE.SENSORY.SUSPENSORY_LIGAMENT_OF_EYEBALL.R",
+     0.187,
+     0.662
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "skeletal",
+   "lod": "LOD4",
+   "file": "adult_male.skeletal.LOD4.glb",
+   "structures": 232,
+   "tris_master": 617288,
+   "tris_lod": 25770,
+   "bytes_raw": 1094984,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.SKELETAL.SCAPULA.L",
+     0.23,
+     0.936
+    ],
+    [
+     "ADULT.MALE.SKELETAL.SCAPULA.R",
+     0.23,
+     0.936
+    ],
+    [
+     "ADULT.MALE.SKELETAL.MANDIBLE",
+     0.441,
+     2.536
+    ],
+    [
+     "ADULT.MALE.SKELETAL.TEMPORAL_BONE.L",
+     0.612,
+     3.034
+    ],
+    [
+     "ADULT.MALE.SKELETAL.TEMPORAL_BONE.R",
+     0.611,
+     3.034
+    ],
+    [
+     "ADULT.MALE.SKELETAL.COSTAL_CARTILAGE_OF_SEVENTH_RIB.L",
+     0.284,
+     1.078
+    ],
+    [
+     "ADULT.MALE.SKELETAL.COSTAL_CARTILAGE_OF_SEVENTH_RIB.R",
+     0.299,
+     1.078
+    ],
+    [
+     "ADULT.MALE.SKELETAL.SACRUM",
+     0.496,
+     2.232
+    ],
+    [
+     "ADULT.MALE.SKELETAL.SIXTH_RIB.L",
+     0.268,
+     0.945
+    ],
+    [
+     "ADULT.MALE.SKELETAL.SIXTH_RIB.R",
+     0.268,
+     0.945
+    ],
+    [
+     "ADULT.MALE.SKELETAL.ETHMOID_BONE",
+     0.768,
+     3.453
+    ],
+    [
+     "ADULT.MALE.SKELETAL.SEVENTH_RIB.L",
+     0.268,
+     1.425
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "surface",
+   "lod": "LOD4",
+   "file": "adult_male.surface.LOD4.glb",
+   "structures": 256,
+   "tris_master": 135201,
+   "tris_lod": 7833,
+   "bytes_raw": 914660,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.SURFACE.HAIRS_OF_HEAD",
+     2.414,
+     16.871
+    ],
+    [
+     "ADULT.MALE.SURFACE.DORSAL_SURFACES_OF_DIGITS_OF_HAND.L",
+     3.187,
+     22.101
+    ],
+    [
+     "ADULT.MALE.SURFACE.DORSAL_SURFACES_OF_DIGITS_OF_HAND.R",
+     3.187,
+     22.101
+    ],
+    [
+     "ADULT.MALE.SURFACE.PALMAR_SURFACES_OF_DIGITS_OF_HAND.L",
+     3.155,
+     14.993
+    ],
+    [
+     "ADULT.MALE.SURFACE.PALMAR_SURFACES_OF_DIGITS_OF_HAND.R",
+     3.155,
+     14.993
+    ],
+    [
+     "ADULT.MALE.SURFACE.NAIL_PLATE.L",
+     1.616,
+     5.556
+    ],
+    [
+     "ADULT.MALE.SURFACE.NAIL_PLATE.R",
+     1.616,
+     5.556
+    ],
+    [
+     "ADULT.MALE.SURFACE.PLANTAR_SURFACES_OF_DIGITS_OF_FOOT.L",
+     2.993,
+     15.318
+    ],
+    [
+     "ADULT.MALE.SURFACE.PLANTAR_SURFACES_OF_DIGITS_OF_FOOT.R",
+     2.993,
+     15.318
+    ],
+    [
+     "ADULT.MALE.SURFACE.NAIL_PLATE_FOOT.L",
+     1.422,
+     5.624
+    ],
+    [
+     "ADULT.MALE.SURFACE.NAIL_PLATE_FOOT.R",
+     1.422,
+     5.624
+    ],
+    [
+     "ADULT.MALE.SURFACE.ANTERIOR_REGION_OF_THIGH.L",
+     0.561,
+     2.599
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.MALE",
+   "system": "urinary",
+   "lod": "LOD4",
+   "file": "adult_male.urinary.LOD4.glb",
+   "structures": 8,
+   "tris_master": 19980,
+   "tris_lod": 2494,
+   "bytes_raw": 60064,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.MALE.URINARY.URETER.R",
+     0.201,
+     0.754
+    ],
+    [
+     "ADULT.MALE.URINARY.URINARY_BLADDER",
+     0.103,
+     0.375
+    ],
+    [
+     "ADULT.MALE.URINARY.KIDNEY.L",
+     0.135,
+     0.431
+    ],
+    [
+     "ADULT.MALE.URINARY.URETER.L",
+     0.201,
+     0.916
+    ],
+    [
+     "ADULT.MALE.URINARY.URETHRA",
+     0.279,
+     1.101
+    ],
+    [
+     "ADULT.MALE.URINARY.KIDNEY.R",
+     0.135,
+     0.393
+    ],
+    [
+     "ADULT.MALE.URINARY.RENAL_PELVIS.L",
+     0.332,
+     1.23
+    ],
+    [
+     "ADULT.MALE.URINARY.RENAL_PELVIS.R",
+     0.328,
+     1.713
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "cardiovascular",
+   "lod": "LOD4",
+   "file": "adult_female.cardiovascular.LOD4.glb",
+   "structures": 135,
+   "tris_master": 483740,
+   "tris_lod": 24942,
+   "bytes_raw": 816132,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.LONG_POSTERIOR_CILIARY_ARTERY.L",
+     1.098,
+     4.506
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.LONG_POSTERIOR_CILIARY_ARTERY.R",
+     1.098,
+     4.507
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.OPTHALMIC_ARTERY.L",
+     0.199,
+     0.784
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.OPTHALMIC_ARTERY.R",
+     0.165,
+     1.072
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.RIGHT_VENTRICLE",
+     0.079,
+     0.274
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.INTERVENTRICULAR_SEPTUM",
+     0.069,
+     0.287
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.SUPERIOR_OPHTHALMIC_VEIN.L",
+     0.111,
+     0.567
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.SUPERIOR_OPHTHALMIC_VEIN.R",
+     0.217,
+     0.843
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.TRICUSPID_VALVE",
+     0.081,
+     0.468
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA_B",
+     0.046,
+     0.269
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.LEFT_VENTRICLE",
+     0.053,
+     0.162
+    ],
+    [
+     "ADULT.FEMALE.CARDIOVASCULAR.RIGHT_CARDIAC_ATRIUM",
+     0.062,
+     0.288
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "digestive",
+   "lod": "LOD4",
+   "file": "adult_female.digestive.LOD4.glb",
+   "structures": 52,
+   "tris_master": 160364,
+   "tris_lod": 7997,
+   "bytes_raw": 263384,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.DIGESTIVE.CAPSULE_OF_THE_LIVER",
+     0.133,
+     0.517
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.ILEUM",
+     0.549,
+     2.304
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.DIAPHRAGMATIC_SURFACE_OF_LIVER",
+     0.175,
+     0.894
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.JEJENUM",
+     0.455,
+     2.001
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.BARE_AREA_OF_LIVER",
+     0.205,
+     1.049
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.CAUDATE_LOBE",
+     0.25,
+     1.612
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.VENTRAL_PANCREATIC_DUCT",
+     0.52,
+     2.878
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.TRANSVERSE_COLON",
+     0.346,
+     1.804
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.DESCENDING_COLON",
+     0.296,
+     2.031
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.SPHINCTER_OF_HEPTOPANCREATIC_AMPULLA",
+     0.807,
+     1.638
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.BODY_OF_PANCREAS",
+     0.342,
+     1.626
+    ],
+    [
+     "ADULT.FEMALE.DIGESTIVE.HEAD_OF_PANCREAS",
+     0.476,
+     2.633
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "joint",
+   "lod": "LOD4",
+   "file": "adult_female.joint.LOD4.glb",
+   "structures": 28,
+   "tris_master": 22436,
+   "tris_lod": 7988,
+   "bytes_raw": 208720,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.JOINT.MENISCUS.L",
+     0.023,
+     0.318
+    ],
+    [
+     "ADULT.FEMALE.JOINT.MENISCUS.R",
+     0.023,
+     0.318
+    ],
+    [
+     "ADULT.FEMALE.JOINT.ANTEROLATERAL_LIGAMENT_OF_KNEE.L",
+     0.034,
+     0.165
+    ],
+    [
+     "ADULT.FEMALE.JOINT.ANTEROLATERAL_LIGAMENT_OF_KNEE.R",
+     0.034,
+     0.165
+    ],
+    [
+     "ADULT.FEMALE.JOINT.FIBULAR_COLLATERAL_LIGAMENT.L",
+     0.025,
+     0.126
+    ],
+    [
+     "ADULT.FEMALE.JOINT.FIBULAR_COLLATERAL_LIGAMENT.R",
+     0.027,
+     0.126
+    ],
+    [
+     "ADULT.FEMALE.JOINT.TIBIAL_COLLATERAL_LIGAMENT.L",
+     0.016,
+     0.061
+    ],
+    [
+     "ADULT.FEMALE.JOINT.TIBIAL_COLLATERAL_LIGAMENT.R",
+     0.016,
+     0.061
+    ],
+    [
+     "ADULT.FEMALE.JOINT.PATELLAR_LIGAMENT.L",
+     0.012,
+     0.067
+    ],
+    [
+     "ADULT.FEMALE.JOINT.PATELLAR_LIGAMENT.R",
+     0.012,
+     0.067
+    ],
+    [
+     "ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT_OF_KNEE.L",
+     0.059,
+     0.22
+    ],
+    [
+     "ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT_OF_KNEE.R",
+     0.059,
+     0.22
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "lymphatic",
+   "lod": "LOD4",
+   "file": "adult_female.lymphatic.LOD4.glb",
+   "structures": 7,
+   "tris_master": 12408,
+   "tris_lod": 2992,
+   "bytes_raw": 71900,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.LYMPHATIC.DIAPHRAGMATIC_SURFACE_OF_SPLEEN",
+     0.048,
+     0.164
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.THYMUS_LOBE.L",
+     0.037,
+     0.174
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.GASTRIC_SURFACE_OF_SPLEEN",
+     0.033,
+     0.271
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.THYMUS_LOBE.R",
+     0.032,
+     0.169
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.HILUM_OF_SPLEEN",
+     0.065,
+     0.283
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.RENAL_SURFACE_OF_SPLEEN",
+     0.055,
+     0.286
+    ],
+    [
+     "ADULT.FEMALE.LYMPHATIC.COLIC_SURFACE_OF_SPLEEN",
+     0.102,
+     0.322
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "muscular",
+   "lod": "LOD4",
+   "file": "adult_female.muscular.LOD4.glb",
+   "structures": 4,
+   "tris_master": 25360,
+   "tris_lod": 24000,
+   "bytes_raw": 442796,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.MUSCULAR.RECTUS_FEMORIS.L",
+     0.0,
+     0.0
+    ],
+    [
+     "ADULT.FEMALE.MUSCULAR.RECTUS_FEMORIS.R",
+     0.0,
+     0.0
+    ],
+    [
+     "ADULT.FEMALE.MUSCULAR.TENDON_OF_QUADRICEPS_FEMORIS.L",
+     0.004,
+     0.019
+    ],
+    [
+     "ADULT.FEMALE.MUSCULAR.TENDON_OF_QUADRICEPS_FEMORIS.R",
+     0.004,
+     0.019
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "nervous",
+   "lod": "LOD4",
+   "file": "adult_female.nervous.LOD4.glb",
+   "structures": 302,
+   "tris_master": 953876,
+   "tris_lod": 11912,
+   "bytes_raw": 877812,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.NERVOUS.WHITE_MATTER_OF_FOREBRAIN.R",
+     7.296,
+     37.293
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.WHITE_MATTER_OF_FOREBRAIN.L",
+     7.408,
+     46.942
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.SUPERIOR_FRONTAL_GYRUS.R",
+     1.206,
+     5.092
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.SUPERIOR_FRONTAL_GYRUS.L",
+     1.274,
+     5.031
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.WHITE_MATTER_OF_HINDBRAIN.R",
+     1.857,
+     12.036
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.WHITE_MATTER_OF_HINDBRAIN.L",
+     1.944,
+     10.801
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.MIDDLE_FRONTAL_GYRUS.R",
+     1.105,
+     4.804
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.MIDDLE_FRONTAL_GYRUS.L",
+     1.171,
+     4.745
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.LATERAL_HEMISPHERE_OF_CEREBELLUM.R",
+     1.127,
+     4.812
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.LATERAL_HEMISPHERE_OF_CEREBELLUM.L",
+     1.033,
+     4.643
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.PRECENTRAL_GYRUS.R",
+     0.931,
+     3.329
+    ],
+    [
+     "ADULT.FEMALE.NERVOUS.PRECENTRAL_GYRUS.L",
+     0.905,
+     3.904
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "reproductive",
+   "lod": "LOD4",
+   "file": "adult_female.reproductive.LOD4.glb",
+   "structures": 54,
+   "tris_master": 1018508,
+   "tris_lod": 2878,
+   "bytes_raw": 178504,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAMMARY_FAT.R",
+     11.307,
+     81.715
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAMMARY_LOBES.L",
+     9.675,
+     28.721
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAMMARY_LOBES.R",
+     9.705,
+     28.232
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAMMARY_FAT.L",
+     11.829,
+     93.743
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.SUSPENSORY_LIGAMENTS_OF_BREAST.R",
+     20.376,
+     47.928
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.SUSPENSORY_LIGAMENTS_OF_BREAST.L",
+     16.55,
+     46.23
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAIN_LACTIFEROUS_DUCTS.L",
+     23.869,
+     41.647
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.MAIN_LACTIFEROUS_DUCTS.R",
+     23.606,
+     41.64
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.BROAD_LIGAMENT",
+     1.524,
+     11.627
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.UTEROVESICAL_POUCH",
+     1.495,
+     6.959
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.AREOLA.L",
+     5.879,
+     14.274
+    ],
+    [
+     "ADULT.FEMALE.REPRODUCTIVE.AREOLA.R",
+     5.871,
+     14.209
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "respiratory",
+   "lod": "LOD4",
+   "file": "adult_female.respiratory.LOD4.glb",
+   "structures": 71,
+   "tris_master": 400715,
+   "tris_lod": 5003,
+   "bytes_raw": 274632,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.RESPIRATORY.BRONCHIAL_CARTILAGE",
+     1.392,
+     9.939
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.TRACHEAL_CARTILAGE",
+     1.784,
+     6.817
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.SUPEROMEDIAL_SEGMENT.L",
+     0.207,
+     0.824
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.ANTEROLATERAL_SEGMENT.L",
+     0.27,
+     1.278
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.THYROID_CARTILAGE",
+     0.892,
+     6.164
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.CARINA",
+     2.336,
+     10.207
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.HILUM.R",
+     1.344,
+     6.212
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.CRICOID_CARTILAGE",
+     2.453,
+     7.487
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.EPIGLOTIC_CARTILAGE",
+     0.738,
+     1.853
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.POSTEROSUPERIOR_SEGMENT.R",
+     0.259,
+     0.785
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.ANTERIOR_BRONCHOPULMONARY_SEGM.R",
+     0.266,
+     1.129
+    ],
+    [
+     "ADULT.FEMALE.RESPIRATORY.ANTEROSUPERIOR_SEGMENT.R",
+     0.286,
+     1.01
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "sensory",
+   "lod": "LOD4",
+   "file": "adult_female.sensory.LOD4.glb",
+   "structures": 62,
+   "tris_master": 890684,
+   "tris_lod": 2963,
+   "bytes_raw": 239552,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.SENSORY.CILIARY_BODY.L",
+     0.444,
+     1.655
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.CILIARY_BODY.R",
+     0.772,
+     2.523
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.CILIARY_MUSCLE.L",
+     0.169,
+     0.506
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.CILIARY_MUSCLE.R",
+     0.175,
+     0.547
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.TRABECULAR_MESHWORK.L",
+     0.15,
+     0.859
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.TRABECULAR_MESHWORK.R",
+     0.087,
+     0.435
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.VITREOUS_HUMOR.L",
+     0.271,
+     0.935
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.VITREOUS_HUMOR.R",
+     0.275,
+     0.955
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.SCHLEMMS_CANAL.L",
+     0.035,
+     0.149
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.SCHLEMMS_CANAL.R",
+     0.038,
+     0.185
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.CORNEA.L",
+     0.369,
+     1.645
+    ],
+    [
+     "ADULT.FEMALE.SENSORY.CORNEA.R",
+     0.344,
+     1.789
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD4",
+   "file": "adult_female.skeletal.LOD4.glb",
+   "structures": 38,
+   "tris_master": 116940,
+   "tris_lod": 25970,
+   "bytes_raw": 550644,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.SKELETAL.SACRUM",
+     0.182,
+     1.011
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ILIUM_COMPACT_BONE.L",
+     0.097,
+     0.378
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ILIUM_COMPACT_BONE.R",
+     0.084,
+     0.36
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.FEMUR.L",
+     0.069,
+     0.29
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.FEMUR.R",
+     0.067,
+     0.29
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ILIUM_SPONGY_BONE.L",
+     0.089,
+     0.354
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ILIUM_SPONGY_BONE.R",
+     0.089,
+     0.352
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ISCHIUM_COMPACT_BONE.L",
+     0.129,
+     0.583
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.ISCHIUM_COMPACT_BONE.R",
+     0.124,
+     0.633
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.PUBIS_COMPACT_BONE.L",
+     0.132,
+     0.813
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.PUBIS_COMPACT_BONE.R",
+     0.126,
+     0.983
+    ],
+    [
+     "ADULT.FEMALE.SKELETAL.TIBIA.L",
+     0.041,
+     0.222
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "surface",
+   "lod": "LOD4",
+   "file": "adult_female.surface.LOD4.glb",
+   "structures": 1,
+   "tris_master": 124348,
+   "tris_lod": 8000,
+   "bytes_raw": 195172,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.SURFACE.SKIN",
+     0.228,
+     1.024
+    ]
+   ]
+  },
+  {
+   "body": "HUMAN.ADULT.FEMALE",
+   "system": "urinary",
+   "lod": "LOD4",
+   "file": "adult_female.urinary.LOD4.glb",
+   "structures": 87,
+   "tris_master": 258494,
+   "tris_lod": 2440,
+   "bytes_raw": 214124,
+   "error_mm_largest_structures": [
+    [
+     "ADULT.FEMALE.URINARY.RENAL_COLUMN.L",
+     1.922,
+     8.492
+    ],
+    [
+     "ADULT.FEMALE.URINARY.FUNDUS_OF_URINARY_BLADDER_BASE",
+     0.468,
+     2.245
+    ],
+    [
+     "ADULT.FEMALE.URINARY.RENAL_COLUMN.R",
+     1.74,
+     11.008
+    ],
+    [
+     "ADULT.FEMALE.URINARY.URETER.L",
+     4.969,
+     41.209
+    ],
+    [
+     "ADULT.FEMALE.URINARY.OUTER_CORTEX_OF_KIDNEY.R",
+     0.668,
+     2.263
+    ],
+    [
+     "ADULT.FEMALE.URINARY.OUTER_CORTEX_OF_KIDNEY.L",
+     0.555,
+     2.219
+    ],
+    [
+     "ADULT.FEMALE.URINARY.URETER.R",
+     8.966,
+     57.686
+    ],
+    [
+     "ADULT.FEMALE.URINARY.FUNDUS_OF_URINARY_BLADDER_DOME",
+     0.404,
+     1.858
+    ],
+    [
+     "ADULT.FEMALE.URINARY.KIDNEY_CAPSULE.L",
+     0.304,
+     1.881
+    ],
+    [
+     "ADULT.FEMALE.URINARY.KIDNEY_CAPSULE.R",
+     0.332,
+     1.386
+    ],
+    [
+     "ADULT.FEMALE.URINARY.HILUM_OF_KIDNEY.L",
+     1.969,
+     6.592
+    ],
+    [
+     "ADULT.FEMALE.URINARY.HILUM_OF_KIDNEY.R",
+     2.597,
+     10.064
     ]
    ]
   }
