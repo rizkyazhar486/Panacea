@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { sofaScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,9 +49,16 @@ const sofaKode = kodeDari(sofa)
 for (const bawaan of ['useState(350)', 'useState(180)', 'useState(0.8)', 'useState(15)', 'useState(1.0)']) {
   assert.ok(!sofaKode.includes(bawaan), `a measurement default is back in SOFA: ${bawaan}`)
 }
-assert.ok(/const band = lengkap \? mortalityBand\(total\) : null/.test(sofaKode),
-  'SOFA still prints an estimated mortality for measurements nobody took')
-assert.ok(/\{lengkap && \([\s\S]{0,120}<ScoreTrend/.test(sofa), 'SOFA still records a trend point')
+// Sejak perhitungan dipindah ke domain/sofaScore, pita mortalitas dan total hanya ada bila kelima nilai sah. Dua pernyataan
+// teks-sumber lama diganti dengan padanannya, ditambah pemeriksaan perilaku pada mesin (lebih kuat dari regex).
+assert.ok(/const band = res\.band/.test(sofaKode) && /const lengkap = res\.total !== null/.test(sofaKode),
+  'SOFA page no longer takes its band/completeness from the validated engine')
+assert.ok(/\{lengkap && total !== null && \([\s\S]{0,120}<ScoreTrend/.test(sofa), 'SOFA still records a trend point')
+{
+  const tanpaUkur = sofaScore({ pf: NaN, plt: NaN, bili: NaN, creat: NaN, gcs: NaN, supported: false, cv: 0 })
+  assert.equal(tanpaUkur.band, null, 'SOFA still prints an estimated mortality for measurements nobody took')
+  assert.equal(tanpaUkur.total, null, 'SOFA still totals measurements nobody took')
+}
 // Yang berbentuk penilaian TETAP terjawab.
 assert.ok(/const \[cv, setCv\] = useState<CvLevel>\(0\)/.test(sofaKode),
   'the cardiovascular level was made unanswered; "no hypotension" is an assessment')

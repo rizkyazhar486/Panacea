@@ -55,3 +55,5 @@ export { sleepDebt, sanitizeNights, validateNeed, validateHours, SLEEP_RANGES, M
 export type { Night, SleepDebtResult, SleepDebtTone, SleepInputResult } from './engine/sleepDebt'
 export { serumOsmolality, osmBand, gapBand, OSM_RANGES } from './engine/serumOsmolality'
 export type { OsmInput, OsmResult, OsmTone } from './engine/serumOsmolality'
+export { sofaScore, respPts, coagPts, liverPts, renalPts, cnsPts, mortalityBand as sofaMortalityBand, SOFA_RANGES } from './engine/sofaScore'
+export type { SofaInput, SofaResult, SofaBand, CvLevel } from './engine/sofaScore'
