@@ -232,17 +232,28 @@
   font-weight: 900;
 }
 .dark .pmd-slider-footer { color: rgba(226,232,240,.4); }
-.pmd-slider-dots { display: flex; gap: 5px; }
+/* Titik tetap 7px secara visual, tetapi area tekannya 26px (WCAG 2.2 target size >= 24px): titik digambar oleh ::before,
+   tombolnya sendiri transparan. Diukur di 390x844: sebelumnya lebar tombol 7px (aktif 20px). */
+.pmd-slider-dots { display: flex; gap: 0; }
 .pmd-slider-dots button {
-  width: 7px;
-  height: 7px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
   padding: 0;
   border: 0;
+  border-radius: 999px;
+  background: transparent;
+}
+.pmd-slider-dots button::before {
+  content: "";
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   background: rgba(100,116,139,.28);
   transition: width 180ms ease, background 180ms ease;
 }
-.pmd-slider-dots button[aria-current] { width: 20px; background: #22d3ee; }
+.pmd-slider-dots button[aria-current]::before { width: 20px; background: #22d3ee; }
 
 .pmd-capability-feed {
   border: 1px solid rgba(148,163,184,.14);
