@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, meanArterialPressure, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1150,9 +1150,7 @@ function MidParentalCalc() {
   const [fatherCm, setFatherCm] = useState(170)
   const [motherCm, setMotherCm] = useState(158)
   const [childSex, setChildSex] = useState<'M' | 'F'>('M')
-  const mph = childSex === 'M' ? (fatherCm + motherCm + 13) / 2 : (fatherCm + motherCm - 13) / 2
-  const rangeLo = mph - 8.5
-  const rangeHi = mph + 8.5
+  const mph = midParentalHeight(fatherCm, motherCm, childSex)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Estimated adult target height for a child from both parents' heights" />
@@ -1161,10 +1159,14 @@ function MidParentalCalc() {
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
         <Field label="Child's Sex"><SegButtons value={childSex} onChange={setChildSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
+      {mph.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
+        <div className="text-2xl font-black text-ink">{mph.data.targetCm.toFixed(1)} cm</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {mph.data.rangeLoCm.toFixed(0)}–{mph.data.rangeHiCm.toFixed(0)} cm)</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mph.reason}. No target height is shown until both heights are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (father's height + mother's height + 13) / 2. Female: (father's height + mother's height − 13) / 2. The ±8.5 cm range covers about 90% of the genetic target — a child far outside this range needs an endocrine/nutritional evaluation.</Prosa>
     </Card>
   )
@@ -1360,15 +1362,19 @@ function FourScoreCalc() {
 /* ══════════════════ MCDONALD'S RULE (FUNDAL HEIGHT) ══════════════════ */
 function McDonaldCalc() {
   const [fundalCm, setFundalCm] = useState(28)
-  const gaWeeksEst = fundalCm // McDonald's rule: fundal height (cm) ≈ GA (weeks), valid ~20-36 weeks
+  const mcdonald = mcdonaldGestationalAge(fundalCm)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimate gestational age from fundal height (20-36 weeks)" />
       <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
+      {mcdonald.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
+        <div className="text-2xl font-black text-ink">≈ {mcdonald.data.gestationalWeeks} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mcdonald.reason}. No estimate is shown outside that range.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks, singleton pregnancy with normal fetal growth. A deviation &gt;3 cm from the true gestational age (from LMP/ultrasound) needs further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple pregnancy).</Prosa>
     </Card>
   )

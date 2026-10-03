@@ -19,3 +19,7 @@ export { meanArterialPressure, SYSTOLIC_MMHG, DIASTOLIC_MMHG } from './engine/me
 export type { MapResult, MapTone } from './engine/meanArterialPressure'
 export { idealBodyWeight, dailyCalories, IBW_HEIGHT_CM, KCAL_PER_KG } from './engine/idealBodyWeight'
 export type { IdealBodyWeightResult, DailyCaloriesResult, IbwSex, IbwFormula, ActivityLevel } from './engine/idealBodyWeight'
+export { midParentalHeight, PARENT_HEIGHT_CM, TARGET_RANGE_CM } from './engine/midParentalHeight'
+export type { MidParentalResult } from './engine/midParentalHeight'
+export { mcdonaldGestationalAge, MCDONALD_FUNDAL_CM } from './engine/mcdonaldRule'
+export type { McdonaldResult } from './engine/mcdonaldRule'
