@@ -40,6 +40,12 @@ try {
       await page.waitForTimeout(400)
       await page.screenshot({ path: `/private/tmp/canonical-disperse-${width}-${theme}.png`, fullPage: true })
       await page.getByLabel('Disperse systems').fill('0')
+      // kupas lapisan: kulit → otot → tulang, lalu kembali utuh
+      await page.getByLabel('Peel layers').fill('2')
+      await page.getByText('Muscle & fascia removed').waitFor()
+      await page.screenshot({ path: `/private/tmp/canonical-peel-${width}-${theme}.png`, fullPage: true })
+      await page.getByLabel('Peel layers').fill('0')
+      await page.getByText('All layers').waitFor()
       await page.getByTestId('canonical-body-canvas').scrollIntoViewIfNeeded()
       await page.getByRole('button', { name: 'Measure', exact: true }).click()
       const cv = await page.getByTestId('canonical-body-canvas').boundingBox()
