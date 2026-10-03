@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconDrop } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { DRINKS, parseNumberField, widmarkBac } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alcohol Unit & BAC Estimator — pure arithmetic, no external API. Uses the
@@ -17,38 +18,15 @@ import { getDemo } from '../lib/profile'
 // truly safe BAC for driving is zero, regardless of what this shows.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ETHANOL_DENSITY = 0.789 // g/mL
-
-interface Drink { label: string; icon: string; volumeMl: number; abv: number }
-const DRINKS: Drink[] = [
-  { label: 'Beer (330 ml, 5%)', icon: '🍺', volumeMl: 330, abv: 5 },
-  { label: 'Beer, strong (330 ml, 8%)', icon: '🍺', volumeMl: 330, abv: 8 },
-  { label: 'Wine (150 ml, 12%)', icon: '🍷', volumeMl: 150, abv: 12 },
-  { label: 'Spirits, single (30 ml, 40%)', icon: '🥃', volumeMl: 30, abv: 40 },
-  { label: 'Cocktail (250 ml, 15%)', icon: '🍹', volumeMl: 250, abv: 15 },
-]
-
-function gramsOf(d: Drink): number {
-  return (d.volumeMl * (d.abv / 100)) * ETHANOL_DENSITY
-}
-
 export function AlcoholCalculator() {
   const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
-  const [weightKg, setWeightKg] = useState(() => getDemo().weightKg || 70)
-  const [picked, setPicked] = useState<Record<string, number>>({})
+  // Teks mentah: berat kosong tetap "belum diisi" (NaN); minuman kosong = 0 gelas (nilai sah).
+  const [weightKg, setWeightKg] = useState(() => String(getDemo().weightKg || 70))
+  const [picked, setPicked] = useState<Record<string, string>>({})
   const [hoursElapsed, setHoursElapsed] = useState(1)
 
-  const totalGrams = useMemo(
-    () => DRINKS.reduce((s, d) => s + (picked[d.label] ?? 0) * gramsOf(d), 0),
-    [picked],
-  )
-  const totalUnitsUK = totalGrams / 8 // UK unit = 8g pure alcohol
-  const totalStandardUS = totalGrams / 14 // US standard drink = 14g pure alcohol
-
-  const r = sex === 'M' ? 0.68 : 0.55
-  const beta = 0.15 // ‰ per hour, average elimination rate
-  const bacPermille = Math.max(0, totalGrams / (r * weightKg) - beta * hoursElapsed)
-  const bacPercent = bacPermille / 10
+  const counts = Object.fromEntries(DRINKS.map((d) => [d.label, picked[d.label]?.trim() ? parseNumberField(picked[d.label]) : 0]))
+  const res = widmarkBac({ sex, weightKg: parseNumberField(weightKg), hours: hoursElapsed, counts })
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -72,7 +50,7 @@ export function AlcoholCalculator() {
             </select>
           </Field>
           <Field label="Body weight (kg)">
-            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => setWeightKg(e.target.value)} />
           </Field>
         </div>
       </Card>
@@ -86,7 +64,7 @@ export function AlcoholCalculator() {
                 className={inputClass}
                 type="number" min={0} inputMode="numeric"
                 value={picked[d.label] ?? ''}
-                onChange={(e) => setPicked((s) => ({ ...s, [d.label]: Number(e.target.value) || 0 }))}
+                onChange={(e) => setPicked((s) => ({ ...s, [d.label]: e.target.value }))}
                 placeholder="0"
               />
             </Field>
@@ -98,21 +76,27 @@ export function AlcoholCalculator() {
         </Field>
       </Card>
 
-      {totalGrams > 0 && (
+      {!res.ok && (
+        <Card className="!p-5">
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        </Card>
+      )}
+
+      {res.ok && res.data.totalGrams > 0 && (
         <Card className="!p-5">
           <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Estimate</div>
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
-              <div className="text-2xl font-black text-brand-dark">{totalUnitsUK.toFixed(1)}</div>
+              <div className="text-2xl font-black text-brand-dark">{res.data.unitsUK.toFixed(1)}</div>
               <div className="text-[11px] text-neutral-500">UK units (8g each)</div>
             </div>
             <div>
-              <div className="text-2xl font-black text-brand-dark">{totalStandardUS.toFixed(1)}</div>
+              <div className="text-2xl font-black text-brand-dark">{res.data.standardUS.toFixed(1)}</div>
               <div className="text-[11px] text-neutral-500">US standard drinks (14g each)</div>
             </div>
           </div>
           <div className="mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{bacPermille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-700">({bacPercent.toFixed(3)}% BAC)</span></div>
+            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{res.data.permille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-700">({res.data.percent.toFixed(3)}% BAC)</span></div>
             <p className="mt-1 text-[11px] leading-relaxed text-amber-700/80 dark:text-amber-300/80">
               Estimated blood alcohol concentration right now, {hoursElapsed}h after you started drinking. Legal
               driving limits vary by country and this estimate can be meaningfully off in either direction —

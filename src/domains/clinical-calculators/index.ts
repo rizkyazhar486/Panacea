@@ -47,3 +47,5 @@ export { lightsCriteria, LIGHTS_RANGES, PROTEIN_RATIO_CUTOFF, LDH_RATIO_CUTOFF, 
 export type { LightsInput, LightsResult, LightsCriterion } from './engine/lightsCriteria'
 export { charlsonIndex, charlsonAgePoints, CHARLSON_CONDITIONS, CHARLSON_AGE } from './engine/charlson'
 export type { CharlsonResult } from './engine/charlson'
+export { widmarkBac, gramsOf, DRINKS, BAC_RANGES, WIDMARK_R, ETHANOL_DENSITY_G_PER_ML, ELIMINATION_PERMILLE_PER_H } from './engine/widmarkBac'
+export type { BacInput, BacResult, Drink } from './engine/widmarkBac'
