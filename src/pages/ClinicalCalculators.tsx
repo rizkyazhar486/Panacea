@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, fluidBalance, hollidaySegar, interpretAbg, ivDrip, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, fluidBalance, hollidaySegar, interpretAbg, ivDrip, meanArterialPressure, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -821,12 +821,7 @@ function NaegeleCalc() {
 function MapCalc() {
   const [sys, setSys] = useState(120)
   const [dia, setDia] = useState(80)
-  const map = (sys + 2 * dia) / 3
-  const interp = map < 60
-    ? { l: 'Very low', tone: 'critical' as const, note: 'Organ perfusion at risk of being impaired — evaluate for shock/hypoperfusion.' }
-    : map <= 100
-    ? { l: 'Normal', tone: 'normal' as const, note: 'Generally sufficient for organ perfusion (target MAP ≥65 in septic shock).' }
-    : { l: 'High', tone: 'low' as const, note: 'Evaluate for hypertension / hypertensive crisis if very high.' }
+  const mapResult = meanArterialPressure(sys, dia)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Mean Arterial Pressure (MAP)" subtitle="Average organ perfusion pressure" />
@@ -834,13 +829,17 @@ function MapCalc() {
         <Field label="Systolic (mmHg)"><input className={inputClass} type="number" value={sys} onChange={(e) => setSys(+e.target.value)} /></Field>
         <Field label="Diastolic (mmHg)"><input className={inputClass} type="number" value={dia} onChange={(e) => setDia(+e.target.value)} /></Field>
       </div>
+      {mapResult.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{map.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mmHg</span></div>
-          <Badge tone={interp.tone}>{interp.l}</Badge>
+          <div className="text-2xl font-black text-ink">{mapResult.data.map.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mmHg</span></div>
+          <Badge tone={mapResult.data.tone}>{mapResult.data.label}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{mapResult.data.note}</p>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mapResult.reason}. No MAP is shown until both values are valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">MAP = (Systolic + 2×Diastolic) / 3.</p>
     </Card>
   )

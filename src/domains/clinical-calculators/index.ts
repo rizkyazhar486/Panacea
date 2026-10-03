@@ -15,3 +15,5 @@ export {
 export type { SodiumCorrectionResult, PotassiumResult, PotassiumTone } from './engine/electrolyteCorrection'
 export { interpretAbg, ABG_RANGES } from './engine/bloodGas'
 export type { AbgInput, AbgResult } from './engine/bloodGas'
+export { meanArterialPressure, SYSTOLIC_MMHG, DIASTOLIC_MMHG } from './engine/meanArterialPressure'
+export type { MapResult, MapTone } from './engine/meanArterialPressure'

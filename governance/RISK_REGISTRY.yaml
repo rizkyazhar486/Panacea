@@ -292,8 +292,8 @@ risks:
       a Severe badge). AbgCalc followed through interpretAbg, scripts/uji/blood-gas-interpretation.mts, with the stepwise logic and its
       text moved unchanged and the delta-ratio and Winter thresholds pinned at their boundaries; pH/PaCO2/HCO3
       consistency checking is deliberately not added because it would be a new clinical feature). Next: the rest of
-      the numeric calculators (14 calculators counted on 2026-10-03 still read +e.target.value without a domain function: WhoGrowth,
-      WhoNeonate, CdcAnthropometry, BallardSoap, Naegele, Map, Centor, Broca, MidParental, Fletcher, McDonald,
+      the numeric calculators (13 calculators remain after MAP moved to meanArterialPressure, scripts/uji/mean-arterial-pressure.mts; counted on 2026-10-03, they still read +e.target.value without a domain function: WhoGrowth,
+      WhoNeonate, CdcAnthropometry, BallardSoap, Naegele, Centor, Broca, MidParental, Fletcher, McDonald,
       Paradise, Denver, BrocaLorentzCalorie), moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
