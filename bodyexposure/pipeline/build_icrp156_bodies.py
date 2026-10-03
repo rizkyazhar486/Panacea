@@ -1,4 +1,4 @@
-"""Tubuh pediatrik kanonik dari ICRP Publication 156 (paediatric mesh-type reference computational phantoms).
+"""Tubuh kanonik dari ICRP: pediatrik (Publication 156) dan dewasa referensi (Publication 145, --only AM,AF).
 
   Blender -b -P bodyexposure/pipeline/build_icrp156_bodies.py -- [--only 00M,05F]
 
@@ -18,15 +18,17 @@ from mathutils import Vector, Matrix
 ROOT = os.path.expanduser("~/Documents/Panaceamed.id/bodyexposure")
 SRC = f"{ROOT}/sources/icrp156"
 OUT = f"{ROOT}/bodies"
-MASTER = f"{ROOT}/PANACEA_HUMAN_MASTER_v007.blend"
+MASTER = f"{ROOT}/PANACEA_HUMAN_MASTER_v007.blend"  # hanya sumber material PAN_*
 STAGES = {"00": ("NEONATE", "newborn"), "01": ("INFANT", "1 year"), "05": ("CHILD_5Y", "5 years"),
-          "10": ("CHILD_10Y", "10 years"), "15": ("ADOLESCENT", "15 years")}
+          "10": ("CHILD_10Y", "10 years"), "15": ("ADOLESCENT", "15 years"),
+          "A": ("ADULT", "adult")}  # ICRP Publication 145 (MRCP_AM / MRCP_AF), konvensi grup sama
+SRC145 = f"{ROOT}/sources/icrp145"
 SEX = {"M": "MALE", "F": "FEMALE"}
 
-DROP = re.compile(r"(_-?\d+um\b|_-?\d+um_|spongiosa|medullary|contents|\(air\)|^RST$|Teeth_retention|^Skin_(40|100)um)", re.I)
+DROP = re.compile(r"(_-?\d+um\b|_-?\d+um_|spongiosa|medullary|contents|\(air\)|^Air_remaining$|^RST$|Teeth_retention|^Skin_(40|100)um)", re.I)
 SYSTEMS = [  # (pola, sistem, bahan)
-    (r"cortical$|^cartilage", "skeletal", "PAN_Bone"),  # semua grup tulang ICRP berakhiran _cortical
-    (r"enamel|dentin|cementum|pulp", "digestive", "PAN_Enamel"),
+    (r"cortical|^cartilage", "skeletal", "PAN_Bone"),  # grup tulang ICRP: …_cortical (dewasa juga …_cortical_surrounding_…)
+    (r"enamel|dentin|cementum|pulp|^teeth$", "digestive", "PAN_Enamel"),
     (r"blood_in_large_arteries", "cardiovascular", "PAN_Artery"),
     (r"blood_in_large_veins", "cardiovascular", "PAN_Vein"),
     (r"heart", "cardiovascular", "PAN_Myocardium"),
@@ -41,6 +43,12 @@ SYSTEMS = [  # (pola, sistem, bahan)
     (r"^muscle$", "muscular", "PAN_Muscle"),
     (r"skin", "surface", "PAN_Skin"),
 ]
+
+
+# kode saluran napas ICRP (Human Respiratory Tract Model, Publication 66) → nama anatomis
+AIRWAY = {"ET1": "Extrathoracic airway ET1 (anterior nasal passage)",
+          "ET2": "Extrathoracic airway ET2 (posterior nasal passage, pharynx, larynx)",
+          "BB1": "Bronchi (BB region)", "BB": "Bronchi (BB region)"}
 
 
 def snake(s):
@@ -70,13 +78,15 @@ def classify(label):
 
 
 def build(code):
-    age, sx = code[:2], code[2]
+    age, sx = code[:-1], code[-1]
     stage, age_label = STAGES[age]
-    body_id = f"PEDIATRIC.{stage}.{SEX[sx]}"
+    adult = age == "A"
+    body_id = f"ICRP.ADULT.{SEX[sx]}" if adult else f"PEDIATRIC.{stage}.{SEX[sx]}"
+    pub = "ICRP Publication 145, adult mesh-type reference computational phantom" if adult else "ICRP Publication 156, paediatric mesh-type reference computational phantom"
     bpy.ops.wm.read_factory_settings(use_empty=True)
     with bpy.data.libraries.load(MASTER, link=False) as (src, dst):
         dst.materials = [m for m in src.materials if m.startswith("PAN_")]
-    V, groups = parse(f"{SRC}/MRCP_{code}.obj")
+    V, groups = parse(f"{SRC145 if adult else SRC}/MRCP_{code}.obj")
     zmin = min(v[2] for v in V) * 0.01
     coll = bpy.data.collections.new(body_id); bpy.context.scene.collection.children.link(coll)
     kept = dropped = 0
@@ -98,6 +108,7 @@ def build(code):
         lat = "left" if re.search(r"_left(?=_|$)", label, re.I) else "right" if re.search(r"_right(?=_|$)", label, re.I) else "unpaired"
         name = re.sub(r"_(left|right)(?=_|$)", "", label, flags=re.I)  # kata sisi bisa di tengah nama
         name = re.sub(r"_surface$", "", name).replace("_", " ").replace("(AI)", "").strip()
+        name = AIRWAY.get(name, name)
         # label sisi sumber diuji terhadap geometri (+X = kiri subjek); bila bertentangan dikoreksi & dicatat
         cx = sum(v[0] for v in verts) / len(verts)
         side_fix = None
@@ -117,12 +128,12 @@ def build(code):
         coll.objects.link(ob)
         meta = {"panacea_structure_id": sid, "panacea_body_id": body_id, "canonical_name": name,
                 "panacea_system": sysn, "panacea_laterality": lat, "panacea_laterality_source": "name",
-                "panacea_source": f"ICRP Publication 156, paediatric mesh-type reference computational phantom MRCP_{code} ({age_label}, {SEX[sx].lower()})",
-                "panacea_license": "ICRP Publication 156 reference phantom data; redistribution in Panacea cleared by the project owner (2026-10-03)",
+                "panacea_source": f"{pub} MRCP_{code} ({age_label}, {SEX[sx].lower()})",
+                "panacea_license": f"{pub.split(',')[0]} reference phantom data; redistribution in Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes)",
                 "panacea_source_raw_name": raw, "panacea_icrp_organ_id": int(organ_id),
                 "panacea_accuracy_status": "source_backed", "panacea_review_status": "review_required",
-                "panacea_developmental_stage": stage.lower(), "panacea_age": age_label,
-                "biological_sex_applicability": SEX[sx].lower(), "panacea_version": "body_v008",
+                "panacea_developmental_stage": stage.lower(), "panacea_age": age_label, "panacea_version": "body_v010",
+                "biological_sex_applicability": SEX[sx].lower(),
                 "panacea_educational_only": True}
         if side_fix:
             meta["panacea_laterality_source"] = "geometry_override"; meta["panacea_qa_note"] = side_fix
@@ -133,7 +144,7 @@ def build(code):
         kept += 1
     coll["panacea_body_id"] = body_id
     coll["panacea_body_status"] = "source_backed"
-    coll["panacea_body_source"] = f"ICRP Publication 156 MRCP_{code} (CT-based reference phantom, adjusted to ICRP Publication 89 reference values)"
+    coll["panacea_body_source"] = f"{pub.split(',')[0]} MRCP_{code} (CT-based reference phantom, adjusted to ICRP Publication 89 reference values)"
     coll["panacea_body_frame"] = "+Z superior, +X subject left, -Y anterior, metres, feet at z=0 (verified: sternum -Y, liver -X)"
     coll["panacea_stature_m"] = round(max(v[2] for v in V) * 0.01 - zmin, 4)
     os.makedirs(OUT, exist_ok=True)
@@ -144,7 +155,7 @@ def build(code):
 
 if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    only = argv[argv.index("--only") + 1].split(",") if "--only" in argv else [f"{a}{s}" for a in STAGES for s in "MF"]
+    only = argv[argv.index("--only") + 1].split(",") if "--only" in argv else [f"{a}{s}" for a in STAGES if a != "A" for s in "MF"]  # dewasa: --only AM,AF
     res = [build(c) for c in only]
     rp = f"{ROOT}/bodies/build_report.json"
     old = {r["body"]: r for r in json.load(open(rp))} if os.path.exists(rp) else {}

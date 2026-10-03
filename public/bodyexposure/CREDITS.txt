@@ -18,3 +18,9 @@ pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Referen
                removed; laterality corrected where the source label contradicted the
                geometry (15-year female ovaries). Redistribution in Panacea cleared
                by the project owner (2026-10-03).
+
+icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
+               Computational Phantoms (2020), ICRP. Reference adult male (176 cm)
+               and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
+               reference values. Dosimetry-only layers removed. Redistribution in
+               Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).

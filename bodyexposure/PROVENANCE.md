@@ -242,3 +242,22 @@ Registration showed that three Z-Anatomy gut labels do not match the geometry (`
 The old IDs are kept in `panacea_previous_ids`. One structure was added: the external anal sphincter (FMA21930). The
 BodyParts3D caecum was **not** added because 60% of it lies inside the Z-Anatomy small-intestine mesh. The caecum
 stays an open gap.
+
+## ICRP Publication 145 adult reference phantoms (v011)
+
+Source: ICRP Publication 145, *Adult Mesh-type Reference Computational Phantoms* (2020), electronic files
+`MRCP_AM` and `MRCP_AF`, polygon-mesh version (https://www.icrp.org/docs/P145%20Electronic%20files.zip). Built with the
+same pipeline as the paediatric bodies (`pipeline/build_icrp156_bodies.py -- --only AM,AF`). The coordinate convention
+matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Redistribution falls under the
+owner's 2026-10-03 clearance of ICRP-derived meshes.
+
+These are **separate, internally consistent bodies**, published as an "ICRP reference" variant of the adult male and
+adult female entries. They are not grafted onto the Z-Anatomy male or the HuBMAP female. Mixing two individuals'
+anatomy in one body would itself be invented anatomy. The ICRP female supplies everything the HuBMAP female lacks:
+the axial skeleton (cranium, spine, ribs, sternum), stomach, oesophagus, oral cavity, airways, pituitary and thyroid.
+Both bodies pass the gross-anatomy gate with no exceptions (`qa_reports/gross_icrp_adult_*.json`). Statures are 176 cm
+and 163 cm, the Publication 89 reference values.
+
+Limits, inherited from the source's dosimetry purpose: bones are grouped by region (for example "Ribs cortical" covers
+all ribs), and the skeletal muscle is a single tissue mesh. Airway regions follow the ICRP Human Respiratory Tract
+Model names (ET1, ET2, BB); the display names spell out what those regions are.

@@ -63,6 +63,14 @@ try {
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })
+      // varian ICRP 145: tubuh perempuan referensi lengkap (rangka aksial, lambung, saluran napas)
+      await page.getByRole('radio', { name: 'ICRP reference' }).click()
+      await page.getByText(/stature 163 cm/).waitFor({ timeout: 60000 })
+      await page.getByText(/^93 structures · \d+k triangles/).waitFor({ timeout: 60000 })
+      await page.getByLabel('Find a structure').fill('ribs')
+      await page.getByRole('button', { name: /^ribs cortical/i }).first().click()
+      await page.getByText(/^ICRP\.ADULT\.FEMALE\.SKELETAL\.RIBS_CORTICAL$/).waitFor()
+      await page.getByText(/Source: ICRP Publication 145/).waitFor()
       // anak: varian 5 th & 10 th, laki-laki & perempuan
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()

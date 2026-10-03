@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T21:42:06",
-  "master": "PANACEA_HUMAN_MASTER_v010.blend",
+  "generated": "2026-10-03T23:04:46",
+  "master": "PANACEA_HUMAN_MASTER_v011.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -188,6 +188,174 @@
    "verts": 10046,
    "tris": 19980,
    "open_meshes": 5,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 160904,
+   "tris": 322024,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|digestive": {
+   "structures": 19,
+   "verts": 42415,
+   "tris": 84738,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 5907,
+   "tris": 11794,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 38395,
+   "tris": 74158,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 244111,
+   "tris": 489246,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 6521,
+   "tris": 13034,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 7089,
+   "tris": 14158,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 12394,
+   "tris": 24760,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 15126,
+   "tris": 30212,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|skeletal": {
+   "structures": 20,
+   "verts": 230815,
+   "tris": 461140,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 38485,
+   "tris": 76966,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 9584,
+   "tris": 19136,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 216834,
+   "tris": 433944,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|digestive": {
+   "structures": 19,
+   "verts": 38960,
+   "tris": 77828,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|endocrine": {
+   "structures": 5,
+   "verts": 6380,
+   "tris": 12736,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 37149,
+   "tris": 71666,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|muscular": {
+   "structures": 1,
+   "verts": 261642,
+   "tris": 524344,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|nervous": {
+   "structures": 2,
+   "verts": 6684,
+   "tris": 13360,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|reproductive": {
+   "structures": 7,
+   "verts": 3326,
+   "tris": 6624,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|respiratory": {
+   "structures": 6,
+   "verts": 10656,
+   "tris": 21288,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|sensory": {
+   "structures": 10,
+   "verts": 15126,
+   "tris": 30212,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|skeletal": {
+   "structures": 20,
+   "verts": 173932,
+   "tris": 347256,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|surface": {
+   "structures": 1,
+   "verts": 41002,
+   "tris": 82000,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|urinary": {
+   "structures": 9,
+   "verts": 8267,
+   "tris": 16490,
+   "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
   "MODULE.TISSUE.LYMPH_NODE|lymphatic": {

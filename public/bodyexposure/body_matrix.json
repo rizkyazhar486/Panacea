@@ -1,6 +1,6 @@
 {
  "generated": "2026-10-03",
- "master": "PANACEA_HUMAN_MASTER_v010.blend",
+ "master": "PANACEA_HUMAN_MASTER_v011.blend",
  "bodies": [
   {
    "body_id": "HUMAN.ADULT.MALE",
@@ -25,7 +25,24 @@
     "reproductive": 14,
     "sensory": 44
    },
-   "variants": []
+   "variants": [
+    {
+     "body_id": "HUMAN.ADULT.MALE",
+     "structures": 3877,
+     "stature_m": 1.7437,
+     "label": "Z-Anatomy",
+     "status": "source_backed",
+     "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 \u2014 Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae)"
+    },
+    {
+     "body_id": "ICRP.ADULT.MALE",
+     "structures": 93,
+     "stature_m": 1.76,
+     "label": "ICRP reference",
+     "status": "source_backed",
+     "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    }
+   ]
   },
   {
    "body_id": "HUMAN.ADULT.FEMALE",
@@ -48,7 +65,24 @@
     "muscular": 4,
     "surface": 1
    },
-   "variants": []
+   "variants": [
+    {
+     "body_id": "HUMAN.ADULT.FEMALE",
+     "structures": 841,
+     "stature_m": 1.6667,
+     "label": "Visible Human (HuBMAP)",
+     "status": "source_backed_partial",
+     "source": "HuBMAP CCF 3D Reference Object Library, VH_Female (NLM Visible Human female): VH_F_United v1.1 + Spinal_Cord v1.2 + mammary glands v1.3 + vasculature v1.4, CC BY 4.0"
+    },
+    {
+     "body_id": "ICRP.ADULT.FEMALE",
+     "structures": 93,
+     "stature_m": 1.6302,
+     "label": "ICRP reference",
+     "status": "source_backed",
+     "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    }
+   ]
   },
   {
    "body_id": "HUMAN.PREGNANT",
@@ -212,6 +246,30 @@
   "adult_male.skeletal",
   "adult_male.surface",
   "adult_male.urinary",
+  "icrp_adult_female.cardiovascular",
+  "icrp_adult_female.digestive",
+  "icrp_adult_female.endocrine",
+  "icrp_adult_female.lymphatic",
+  "icrp_adult_female.muscular",
+  "icrp_adult_female.nervous",
+  "icrp_adult_female.reproductive",
+  "icrp_adult_female.respiratory",
+  "icrp_adult_female.sensory",
+  "icrp_adult_female.skeletal",
+  "icrp_adult_female.surface",
+  "icrp_adult_female.urinary",
+  "icrp_adult_male.cardiovascular",
+  "icrp_adult_male.digestive",
+  "icrp_adult_male.endocrine",
+  "icrp_adult_male.lymphatic",
+  "icrp_adult_male.muscular",
+  "icrp_adult_male.nervous",
+  "icrp_adult_male.reproductive",
+  "icrp_adult_male.respiratory",
+  "icrp_adult_male.sensory",
+  "icrp_adult_male.skeletal",
+  "icrp_adult_male.surface",
+  "icrp_adult_male.urinary",
   "module_tissue_lymph_node.lymphatic",
   "pediatric_adolescent_female.cardiovascular",
   "pediatric_adolescent_female.digestive",

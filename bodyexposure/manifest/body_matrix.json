@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T21:42:06",
-  "master": "PANACEA_HUMAN_MASTER_v010.blend",
+  "generated": "2026-10-03T23:04:46",
+  "master": "PANACEA_HUMAN_MASTER_v011.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -9,7 +9,26 @@
  },
  "bodies": [
   {
-   "variants": [],
+   "variants": [
+    {
+     "body_id": "HUMAN.ADULT.MALE",
+     "file": null,
+     "structures": 3877,
+     "stature_m": 1.7437,
+     "label": "Z-Anatomy",
+     "status": "source_backed",
+     "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 — Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae)"
+    },
+    {
+     "body_id": "ICRP.ADULT.MALE",
+     "file": "bodies/PANACEA_BODY_ICRP_ADULT_MALE.blend",
+     "structures": 93,
+     "stature_m": 1.76,
+     "label": "ICRP reference",
+     "status": "source_backed",
+     "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    }
+   ],
    "redistribution": null,
    "body_id": "HUMAN.ADULT.MALE",
    "status": "source_backed",
@@ -36,7 +55,26 @@
    }
   },
   {
-   "variants": [],
+   "variants": [
+    {
+     "body_id": "HUMAN.ADULT.FEMALE",
+     "file": null,
+     "structures": 841,
+     "stature_m": 1.6667,
+     "label": "Visible Human (HuBMAP)",
+     "status": "source_backed_partial",
+     "source": "HuBMAP CCF 3D Reference Object Library, VH_Female (NLM Visible Human female): VH_F_United v1.1 + Spinal_Cord v1.2 + mammary glands v1.3 + vasculature v1.4, CC BY 4.0"
+    },
+    {
+     "body_id": "ICRP.ADULT.FEMALE",
+     "file": "bodies/PANACEA_BODY_ICRP_ADULT_FEMALE.blend",
+     "structures": 93,
+     "stature_m": 1.6302,
+     "label": "ICRP reference",
+     "status": "source_backed",
+     "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    }
+   ],
    "redistribution": null,
    "body_id": "HUMAN.ADULT.FEMALE",
    "status": "source_backed_partial",

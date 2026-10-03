@@ -71,3 +71,10 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Three Z-Anatomy gut labels are corrected from geometry and landmarks: "Sigmoid colon" → **Rectum**, "Jejunum" → **Jejunum and ileum**, "Descending colon" → **Descending and sigmoid colon**. Old IDs are kept in `panacea_previous_ids`.
 - Added: **external anal sphincter** (BodyParts3D). Not added: the **caecum**, which would sit 60% inside the existing small-intestine mesh. It stays an open dependency.
 - The male gross-anatomy gate still passes. The adult male now has 3,877 structures. The structure manifest was also regenerated: the committed copy predated the paediatric left/right ID fix and now matches the shipped GLBs.
+
+## v011: ICRP Publication 145 adult reference bodies (2026-10-03)
+
+- Added `ICRP.ADULT.MALE` (176 cm) and `ICRP.ADULT.FEMALE` (163 cm), 93 structures each, linked into the master and published as the **"ICRP reference" variant** of the adult entries. The default variants stay Z-Anatomy (male) and Visible Human/HuBMAP (female).
+- This closes the adult female's axial-skeleton and upper-GI gap with a complete, internally consistent body, not by grafting anatomy from another individual.
+- Gross-anatomy gate: both pass. App: variant selector on the adult tabs; the browser check covers the ICRP female (163 cm, 93 structures, ribs searchable).
+- Builder fixes found on the adult data: drop "Air remaining", classify "Teeth" and "Cranium cortical surrounding frontal sinus", readable ICRP airway names.

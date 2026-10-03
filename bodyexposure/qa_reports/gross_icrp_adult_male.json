@@ -1,0 +1,80 @@
+{
+ "body": "ICRP.ADULT.MALE",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 32,
+    "documented_exceptions": 0,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.0526
+  },
+  {
+   "check": "spleen_on_left",
+   "ok": true,
+   "detail": 0.0861
+  },
+  {
+   "check": "heart_left_of_midline",
+   "ok": true,
+   "detail": 0.0262
+  },
+  {
+   "check": "stomach_on_left",
+   "ok": true,
+   "detail": 0.0479
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "detail": {
+    "brain": 1.668,
+    "heart": 1.336,
+    "liver": 1.232,
+    "kidney": 1.184,
+    "bladder": 0.934
+   }
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "heart_within_ribcage_height",
+   "ok": true,
+   "detail": {
+    "heart_z": 1.336,
+    "ribs_z": [
+     1.13,
+     1.483
+    ]
+   }
+  },
+  {
+   "check": "brain_within_cranium_bounds",
+   "ok": true,
+   "detail": "bbox containment"
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "MALE.DIGESTIVE.LIVER|MALE.CARDIOVASCULAR.HEART_WALL": 0.0,
+    "MALE.DIGESTIVE.LIVER|MALE.DIGESTIVE.STOMACH_WALL": 0.0,
+    "MALE.CARDIOVASCULAR.HEART_WALL|MALE.RESPIRATORY.LUNG.L": 0.0,
+    "MALE.CARDIOVASCULAR.HEART_WALL|MALE.RESPIRATORY.LUNG.R": 0.0,
+    "MALE.URINARY.KIDNEY_CORTEX.L|MALE.LYMPHATIC.SPLEEN": 0.0,
+    "MALE.DIGESTIVE.LIVER|MALE.URINARY.KIDNEY_CORTEX.R": 0.0,
+    "MALE.URINARY.URINARY_BLADDER_WALL|MALE.DIGESTIVE.RECTUM_WALL": 0.0
+   }
+  }
+ ],
+ "failures": []
+}

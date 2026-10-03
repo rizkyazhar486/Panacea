@@ -39,12 +39,19 @@ def run(out=OUT):
             ms = [o for o in c.all_objects if o.type == 'MESH']
             # tubuh tertaut (satu .blend per varian) dicatat lewat empty ROOT-nya
             linked = [{"body_id": e.get("panacea_body_id"), "file": e.get("panacea_body_file"),
-                       "structures": e.get("panacea_structures"), "stature_m": e.get("panacea_stature_m")}
+                       "structures": e.get("panacea_structures"), "stature_m": e.get("panacea_stature_m"),
+                       **{k: e[f"panacea_variant_{k}"] for k in ("label", "status", "source") if f"panacea_variant_{k}" in e}}
                       for e in c.objects if e.type == 'EMPTY' and e.instance_type == 'COLLECTION' and e.get("panacea_body_file")]
+            if ms and linked:
+                # entri dewasa: tubuh asli di master + varian tertaut (mis. ICRP) → tubuh asli jadi varian pertama
+                zs = [(o.matrix_world @ Vector(k)).z for o in ms for k in o.bound_box]
+                linked.insert(0, {"body_id": c["panacea_body_id"], "file": None, "structures": len(ms),
+                                  "stature_m": round(max(zs) - min(zs), 4), "label": c.get("panacea_variant_label"),
+                                  "status": c.get("panacea_body_status"), "source": c.get("panacea_body_source")})
             bodies.append({"variants": linked, "redistribution": c.get("panacea_redistribution"),
                 "body_id": c["panacea_body_id"], "status": c.get("panacea_body_status"), "source": c.get("panacea_body_source"),
                 "frame": c.get("panacea_body_frame"), "source_requirement": c.get("panacea_source_requirement"),
-                "structures": len(ms) + sum(v["structures"] or 0 for v in linked), "verts": sum(len(o.data.vertices) for o in ms),
+                "structures": len(ms) if ms and linked else len(ms) + sum(v["structures"] or 0 for v in linked), "verts": sum(len(o.data.vertices) for o in ms),
                 "systems": dict(collections.Counter(o.get("panacea_system", "?") for o in ms)),
             })
     structs, qa = [], collections.defaultdict(lambda: collections.Counter())

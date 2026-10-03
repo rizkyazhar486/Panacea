@@ -26,7 +26,7 @@ interface BodyEntry {
   source_requirement: string | null
   redistribution?: string | null
   structures: number
-  variants?: Array<{ body_id: string; structures: number; stature_m: number }>
+  variants?: Array<{ body_id: string; structures: number; stature_m: number; label?: string; status?: string; source?: string }>
 }
 interface BodyMatrix { bodies: BodyEntry[]; files: string[] }
 
@@ -82,8 +82,10 @@ const PEEL_LABELS = ['All layers', 'Skin removed', 'Muscle & fascia removed', 'B
 const DEFAULT_ON = new Set(['surface', 'skeletal', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'reproductive'])
 
 // ID tubuh → awalan berkas (HUMAN.ADULT.MALE → adult_male)
-// label varian: 'PEDIATRIC.CHILD_5Y.FEMALE' → '5 y · Female'
-function variantLabel(id: string) {
+// label varian: pakai label eksplisit dari matriks bila ada (mis. dewasa: sumber), selain itu
+// diturunkan dari ID: 'PEDIATRIC.CHILD_5Y.FEMALE' → '5 y · Female'
+function variantLabel(id: string, label?: string) {
+  if (label) return label
   const [, stage, sex] = id.split('.')
   const age = stage.match(/_(\d+)Y$/)?.[1]
   return `${age ? `${age} y · ` : ''}${sex.charAt(0)}${sex.slice(1).toLowerCase()}`
@@ -466,17 +468,17 @@ export function CanonicalBody() {
             {variants.map((v) => (
               <button key={v.body_id} role="radio" aria-checked={v.body_id === bodyId} onClick={() => setVariantId(v.body_id)}
                 className={`min-h-[40px] rounded-full border px-3.5 text-[13px] font-bold ${v.body_id === bodyId ? 'border-brand bg-brand-100 text-brand-dark dark:bg-emerald-400/15 dark:text-emerald-200' : 'border-neutral-500/30 opacity-70'}`}>
-                {variantLabel(v.body_id)}
+                {variantLabel(v.body_id, v.label)}
               </button>
             ))}
           </div>
         )}
         {body && (
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-neutral-600 dark:text-neutral-300">
-            <Badge tone={statusTone(body.status)}>{body.status.replaceAll('_', ' ')}</Badge>
+            <Badge tone={statusTone(activeVariant?.status ?? body.status)}>{(activeVariant?.status ?? body.status).replaceAll('_', ' ')}</Badge>
             <span>{(activeVariant?.structures ?? body.structures).toLocaleString('en')} structures</span>
             {activeVariant && <span>· stature {Math.round(activeVariant.stature_m * 100)} cm</span>}
-            {body.source && <span className="min-w-0 truncate">· {body.source}</span>}
+            {(activeVariant?.source ?? body.source) && <span className="min-w-0 truncate">· {activeVariant?.source ?? body.source}</span>}
           </div>
         )}
       </Card>

@@ -1,5 +1,19 @@
 [
  {
+  "body": "ICRP.ADULT.FEMALE",
+  "kept": 93,
+  "dropped": 80,
+  "stature_m": 1.6302,
+  "file": "PANACEA_BODY_ICRP_ADULT_FEMALE.blend"
+ },
+ {
+  "body": "ICRP.ADULT.MALE",
+  "kept": 93,
+  "dropped": 80,
+  "stature_m": 1.76,
+  "file": "PANACEA_BODY_ICRP_ADULT_MALE.blend"
+ },
+ {
   "body": "PEDIATRIC.ADOLESCENT.FEMALE",
   "kept": 129,
   "stature_m": 1.61,
