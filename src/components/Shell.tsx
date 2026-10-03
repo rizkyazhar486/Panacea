@@ -167,6 +167,7 @@ const KATALOG: Nav[] = [
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien'], group: 'Health' },
+  { to: '/body-exposure/canonical', label: 'Canonical Human Bodies', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
