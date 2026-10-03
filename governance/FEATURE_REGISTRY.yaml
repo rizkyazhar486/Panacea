@@ -234,8 +234,8 @@ features:
     technical_risk: medium
     clinical_risk: high
     provenance_required: true
-    tests: [scripts/uji/physiological-runtime.mts, scripts/uji/longitudinal-physiology-pipeline.mts, scripts/uji/cerebral-perfusion-coupling.mts, scripts/uji/fick-oxygen-extraction.mts]
+    tests: [scripts/uji/physiological-runtime.mts, scripts/uji/longitudinal-physiology-pipeline.mts, scripts/uji/cerebral-perfusion-coupling.mts, scripts/uji/fick-oxygen-extraction.mts, scripts/uji/personalization-gate.mts]
     observability: [deterministic_provenance_ids, reality_error_ledger, explicit_reality_gap]
-    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    known_gaps: [limited_domain_coupling_coverage, no_curated_parameter_declarations_for_personalization, no_qualified_clinical_validation, limited_projection_wiring]
     next_actions: [route_additional_domain_couplings_through_runtime, connect_model_derived_state_to_existing_projections_without_writeback, validate_models_against_external_reference_data]
     last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583

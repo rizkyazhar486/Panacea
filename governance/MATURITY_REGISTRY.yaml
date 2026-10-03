@@ -138,7 +138,8 @@ workflows:
       - "src/lib/physiology/longitudinalBoundary.ts admits only measured/imported/clinician-entered longitudinal events as patient-derived physiological boundaries"
       - "scripts/uji/physiological-runtime.mts covers duplicate producers, unit mismatch, unsupported truth classes, missing boundaries, cycles, deterministic provenance and speculative-boundary rejection"
       - "scripts/uji/longitudinal-physiology-pipeline.mts proves canonical state -> oxygen transport -> model-derived Reality Error prediction without writing model output back into patient truth"
+      - "src/domains/physiology/engine/personalizationGate.ts + scripts/uji/personalization-gate.mts: structural eligibility gate for personalizing a model parameter (declared meaning source, identifiable observation kinds, distinct usable observations, quantified uncertainty, provenance, bounded relative step, rollback version, held-out validation). It ships no parameter declarations and no consumer, so no personalization happens yet; a blocked decision never returns the proposed value"
       - "adfaf2d5 adds fail-closed Fick oxygen extraction; 93bfdbcc adds bounded cerebral-perfusion coupling, both explicitly model-derived with source-backed educational boundaries"
-    known_gaps: [limited_domain_coupling_coverage, no_patient_specific_parameter_identifiability_contract, no_qualified_clinical_validation, limited_projection_wiring]
+    known_gaps: [limited_domain_coupling_coverage, no_curated_parameter_declarations_for_personalization, no_qualified_clinical_validation, limited_projection_wiring]
     next_action: integrate_next_source_backed_couplings_through_shared_runtime_then_project_without_patient_truth_writeback
     last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
