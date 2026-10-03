@@ -435,7 +435,7 @@
   "SHIN.L": {
    "X": [
     -135,
-    10
+    0
    ],
    "Y": [
     0,
@@ -483,8 +483,8 @@
     150
    ],
    "Y": [
-    -80,
-    80
+    0,
+    160
    ],
    "Z": [
     0,
@@ -494,8 +494,8 @@
   },
   "HAND.L": {
    "X": [
-    -80,
-    70
+    -70,
+    80
    ],
    "Y": [
     0,
@@ -505,7 +505,7 @@
     -30,
     20
    ],
-   "positive_X": "extension"
+   "positive_X": "flexion"
   },
   "THIGH.R": {
    "X": [
@@ -525,7 +525,7 @@
   "SHIN.R": {
    "X": [
     -135,
-    10
+    0
    ],
    "Y": [
     0,
@@ -573,8 +573,8 @@
     150
    ],
    "Y": [
-    -80,
-    80
+    -160,
+    0
    ],
    "Z": [
     0,
@@ -584,8 +584,8 @@
   },
   "HAND.R": {
    "X": [
-    -80,
-    70
+    -70,
+    80
    ],
    "Y": [
     0,
@@ -595,7 +595,7 @@
     -20,
     30
    ],
-   "positive_X": "extension"
+   "positive_X": "flexion"
   }
  },
  "rom_source": "AAOS normal values (Greene & Heckman 1994)",
@@ -734,14 +734,6 @@
     "CLAVICLE.R via nearest segment (22 mm)"
    ],
    [
-    "ADULT.MALE.JOINT.COSTOTRANSVERSE_LIGAMENT.L",
-    "SPINE.T6 via nearest segment (24 mm)"
-   ],
-   [
-    "ADULT.MALE.JOINT.COSTOTRANSVERSE_LIGAMENT.R",
-    "SPINE.T6 via nearest segment (24 mm)"
-   ],
-   [
     "ADULT.MALE.JOINT.CRICOPHARYNGEAL_LIGAMENT.L",
     "SPINE.C6 via nearest segment (26 mm)"
    ],
@@ -776,14 +768,6 @@
    [
     "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.R",
     "FOOT.R via nearest segment (22 mm)"
-   ],
-   [
-    "ADULT.MALE.JOINT.INTRA_ARTICULAR_LIGAMENT_OF_HEAD_OF_RIB",
-    "SPINE.T6 via nearest segment (18 mm)"
-   ],
-   [
-    "ADULT.MALE.JOINT.INTRA_ARTICULAR_LIGAMENT_OF_HEAD_OF_RIB.R",
-    "SPINE.T6 via nearest segment (18 mm)"
    ],
    [
     "ADULT.MALE.JOINT.MEDIAN_CRICOTHYROID_LIGAMENT",
@@ -838,14 +822,6 @@
     "FOREARM.R via nearest segment (6 mm)"
    ],
    [
-    "ADULT.MALE.JOINT.RADIATE_LIGAMENT_OF_HEAD_OF_RIB.L",
-    "SPINE.T7 via nearest segment (22 mm)"
-   ],
-   [
-    "ADULT.MALE.JOINT.RADIATE_LIGAMENT_OF_HEAD_OF_RIB.R",
-    "SPINE.T7 via nearest segment (22 mm)"
-   ],
-   [
     "ADULT.MALE.JOINT.SUPERIOR_PUBIC_LIGAMENT",
     "PELVIS via nearest segment (54 mm)"
    ],
@@ -860,6 +836,8 @@
   ],
   "multi_segment_rigid_approximation": [
    "ADULT.MALE.JOINT.ANTERIOR_LONGITUDINAL_LIGAMENT",
+   "ADULT.MALE.JOINT.COSTOTRANSVERSE_LIGAMENT.L",
+   "ADULT.MALE.JOINT.COSTOTRANSVERSE_LIGAMENT.R",
    "ADULT.MALE.JOINT.EXTERNAL_INTERCOSTAL_MEMBRANE.L",
    "ADULT.MALE.JOINT.EXTERNAL_INTERCOSTAL_MEMBRANE.R",
    "ADULT.MALE.JOINT.INTERCLAVICULAR_LIGAMENT.L",
@@ -869,9 +847,13 @@
    "ADULT.MALE.JOINT.INTERSPINOUS_LIGAMENTS",
    "ADULT.MALE.JOINT.INTERTRANSVERSE_LIGAMENTS.L",
    "ADULT.MALE.JOINT.INTERTRANSVERSE_LIGAMENTS.R",
+   "ADULT.MALE.JOINT.INTRA_ARTICULAR_LIGAMENT_OF_HEAD_OF_RIB",
+   "ADULT.MALE.JOINT.INTRA_ARTICULAR_LIGAMENT_OF_HEAD_OF_RIB.R",
    "ADULT.MALE.JOINT.LIGAMENTA_FLAVA",
    "ADULT.MALE.JOINT.NUCHAL_LIGAMENT",
    "ADULT.MALE.JOINT.POSTERIOR_LONGITUDINAL_LIGAMENT",
+   "ADULT.MALE.JOINT.RADIATE_LIGAMENT_OF_HEAD_OF_RIB.L",
+   "ADULT.MALE.JOINT.RADIATE_LIGAMENT_OF_HEAD_OF_RIB.R",
    "ADULT.MALE.JOINT.SUPRASPINOUS_LIGAMENT"
   ]
  }

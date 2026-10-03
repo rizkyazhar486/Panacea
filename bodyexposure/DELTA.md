@@ -81,9 +81,22 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 ## P5: adult male skeletal rig (2026-10-04)
 
-- `pipeline/build_rig.py` builds `bodies/PANACEA_RIG_ADULT_MALE.blend` (local, not committed: .blend). The master and the web export pipeline are untouched.
-- **Joint centres from source geometry, ISB definitions (Wu et al. 2002, 2005):** hip and shoulder by sphere fit on the femoral and humeral heads (femoral radius 23.8 mm, RMS 1.2 mm); knee and elbow at the epicondyle midpoint; ankle at the malleolus midpoint; wrist at the styloid-tip midpoint; spine at intervertebral disc centroids. Values and methods are in `manifest/rig_adult_male.json`.
-- **39 bones; all 645 skeletal and joint meshes rigidly bound.** Rule-based binding; 39 nearest-segment assignments are listed for review. 14 multi-segment ligaments are flagged: rigid binding is only an approximation for them.
-- **ROM limits:** AAOS normal values (Greene & Heckman 1994) as local rotation limits. The sign of each axis is set numerically on the rig.
-- **QA** (`pipeline/check_rig_pose.py` → `qa_reports/rig_pose_adult_male.json`): a test pose keeps every mesh with its bone; a 170° knee request is clamped to 132.8° (135° AAOS limit minus the rest angle); hip flexion moves the knee anteriorly. Left/right segment lengths match within 0.01 mm.
-- Not yet: soft-tissue skinning (muscle and skin deformation), scapulothoracic and atlantoaxial joints as separate bones, rigs for the other bodies, and posing in the app.
+- `pipeline/build_rig.py` builds `bodies/PANACEA_RIG_ADULT_MALE.blend` (local .blend, not committed). The master and the web export pipeline are untouched.
+- **Joint centres from source geometry, ISB definitions (Wu et al. 2002, 2005):** hip and shoulder by sphere fit on the femoral and humeral heads (femoral radius 23.8 mm, RMS 1.2 mm); knee and elbow at the epicondyle midpoint; ankle at the malleolus midpoint; wrist at the styloid-tip midpoint; spine at intervertebral disc centroids. Values and methods are in `manifest/rig_adult_male.json`. An independent recomputation agreed within 1–6 mm.
+- **39 bones; all 645 skeletal and joint meshes rigidly bound.** 33 nearest-segment assignments are listed for review. Multi-segment ligaments, including the costotransverse and rib-head ligaments, are flagged: rigid binding is only an approximation for them.
+- **ROM limits are mostly AAOS normal values** (Greene & Heckman 1994) as local rotation limits, with the sign of each axis tested numerically on the rig. Deviations:
+  - Forearm rotation is measured from the anatomical rest pose, which is full supination: pronation 0–160°, equal to AAOS 80 + 80 about neutral.
+  - Shoulder adduction is 0, because the arm is already against the trunk; horizontal adduction is not modelled.
+  - The clavicle and spine have no limits.
+- **QA** (`pipeline/check_rig_pose.py` → `qa_reports/rig_pose_adult_male.json`) checks:
+  - a 170° knee request clamps to 132.8°;
+  - hip flexion moves the knee anteriorly;
+  - wrist flexion moves the hand anteriorly;
+  - the pronation limit moves the anterior forearm medially;
+  - no mesh ends up more than 25 cm from its bone. This only catches gross misbinding (wrong segment or side). Ribs, costal cartilages and the sternum are excluded.
+- **Known limits:**
+  - The patella is bound to the thigh, though it actually tracks the tibia.
+  - Ribs are bound to their vertebrae and the sternum to T4, so posing thoracic segments individually would separate the cage.
+  - No soft-tissue skinning yet.
+  - The scapulothoracic and atlantoaxial joints are not separate bones.
+  - No rigs yet for the other bodies, and no posing in the app.

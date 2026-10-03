@@ -13,5 +13,16 @@
  "rom_clamped": true,
  "right_knee_anterior_y_m": -0.4,
  "meshes_far_from_bone": [],
+ "wrist_flexion_moves_hand_anterior": true,
+ "forearm_pronation_limit_moves_anterior_point_medially": true,
+ "hand_X_limits": [
+  -70,
+  80
+ ],
+ "forearm_Y_limits": [
+  -160,
+  0
+ ],
+ "note": "Centroid-to-bone distance only catches gross misbinding (wrong segment or side); ribs, costal cartilages and sternum are excluded because they are lever arms of their vertebrae.",
  "ok": true
 }

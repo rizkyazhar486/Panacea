@@ -193,7 +193,7 @@ def assign(o):
     b = min(cands, key=lambda b: seg_dist(c, b)); return b.name, f"nearest segment ({seg_dist(c, b) * 1000:.0f} mm)"
 
 
-SPANNING = re.compile(r"LONGITUDINAL_LIGAMENT|SUPRASPINOUS|INTERSPINOUS|NUCHAL|INTERCOSTAL_MEMBRANE|LIGAMENTA_FLAVA|INTERTRANSVERSE|INTERCLAVICULAR")
+SPANNING = re.compile(r"LONGITUDINAL_LIGAMENT|SUPRASPINOUS|INTERSPINOUS|NUCHAL|INTERCOSTAL_MEMBRANE|LIGAMENTA_FLAVA|INTERTRANSVERSE|INTERCLAVICULAR|COSTOTRANSVERSE|HEAD_OF_RIB")
 binding, review, spanning = {}, [], []
 targets = [o for o in ob if o.type == 'MESH' and o.get("panacea_body_id") == "HUMAN.ADULT.MALE" and o.get("panacea_system") in ("skeletal", "joint")]
 for o in targets:
@@ -211,10 +211,13 @@ for o in targets:
 # ── batas ROM (AAOS) dengan tanda sumbu ditentukan numerik ─────────────────────
 ROM = {  # tulang: {gerak: derajat}
     "THIGH": {"flexion": 120, "extension": 30, "abduction": 45, "adduction": 30, "internal_rotation": 45, "external_rotation": 45},
-    "SHIN": {"flexion": 135, "extension": 10},
+    "SHIN": {"flexion": 135, "extension": 0},
     "FOOT": {"flexion": 50, "extension": 20},  # fleksi plantar 50, dorsofleksi 20 (sendi talokrural)
+    # aduksi 0: lengan di sisi badan sudah menempel trunkus (aduksi horizontal tidak dimodelkan)
     "UPPER_ARM": {"flexion": 180, "extension": 60, "abduction": 180, "adduction": 0, "internal_rotation": 70, "external_rotation": 90},
-    "FOREARM": {"flexion": 150, "extension": 0, "internal_rotation": 80, "external_rotation": 80},  # rotasi = pronasi/supinasi
+    # rotasi lengan bawah = pronasi/supinasi. AAOS: 80/80 dari posisi netral (ibu jari ke atas); posisi istirahat
+    # anatomis = supinasi penuh, jadi dari istirahat: pronasi 0→160, supinasi 0 (diverifikasi: radius distal lateral dari ulna)
+    "FOREARM": {"flexion": 150, "extension": 0, "internal_rotation": 160, "external_rotation": 0},
     "HAND": {"flexion": 80, "extension": 70, "abduction": 20, "adduction": 30},  # abduksi = deviasi radial, aduksi = deviasi ulnar
 }
 
@@ -237,7 +240,6 @@ for s in SIDES:
         d = moved(pb, 'X', 10, tip) - np.array(pb.bone.tail_local[:])
         if base == "SHIN": flex_pos = d[1] > 0
         elif base == "FOOT": flex_pos = d[2] < 0
-        elif base in ("HAND",): flex_pos = d[1] > 0  # telapak menghadap anterior: fleksi pergelangan = ke anterior? lihat catatan
         else: flex_pos = d[1] < 0
         fl, ex = rom.get("flexion", 0), rom.get("extension", 0)
         lim["X"] = [-ex, fl] if flex_pos else [-fl, ex]
