@@ -49,3 +49,5 @@ export { charlsonIndex, charlsonAgePoints, CHARLSON_CONDITIONS, CHARLSON_AGE } f
 export type { CharlsonResult } from './engine/charlson'
 export { widmarkBac, gramsOf, DRINKS, BAC_RANGES, WIDMARK_R, ETHANOL_DENSITY_G_PER_ML, ELIMINATION_PERMILLE_PER_H } from './engine/widmarkBac'
 export type { BacInput, BacResult, Drink } from './engine/widmarkBac'
+export { hydrationTarget, HYDRATION_RANGES, INTENSITY_ML_PER_HOUR, ML_PER_KG, HOT_CLIMATE_ML, PREGNANCY_ML, BREASTFEEDING_ML, ML_PER_GLASS } from './engine/hydrationTarget'
+export type { HydrationInput, HydrationResult, HydrationIntensity, HydrationRow } from './engine/hydrationTarget'
