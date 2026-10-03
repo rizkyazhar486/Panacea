@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { buildFailureEvidence, failureEvidencePaths } from './body3d-failure-evidence.mjs'
+import { buildFailureEvidence, failureEvidencePaths, formatSmokeFailureLog } from './body3d-failure-evidence.mjs'
 
 const observed = {
   collected: true,
@@ -127,4 +127,89 @@ test('skrip_gerbang_menyimpan_bukti_lalu_melempar_ulang_galat_aslinya', () => {
   assert.doesNotMatch(script, /page\.screenshot\s*\(/)
   // Pencatat event WebGL hanya mengamati: tidak boleh mengubah pemulihan konteks aplikasi.
   assert.doesNotMatch(script, /webglcontext(lost|restored)[\s\S]{0,200}preventDefault/)
+})
+
+const smoke = (overrides = {}) =>
+  formatSmokeFailureLog({
+    failure: 'canvas health timed out after 10000ms',
+    failureContext: { hash: '#/body-explorer?folds=open', folds: [{ word: 'Anatomy', open: true }, { word: 'Physiology', open: false }] },
+    pageErrors: ['TypeError: x is undefined'],
+    probe: { responsive: false, evaluateMs: null },
+    elapsedMs: 30_912.4,
+    ...overrides,
+  })
+const parse = (line) => JSON.parse(line.slice('BODY3D_SMOKE_FAILURE '.length))
+
+test('log_kegagalan_smoke_memuat_galat_hash_lipatan_dan_responsivitas', () => {
+  const line = smoke()
+  assert.ok(line.startsWith('BODY3D_SMOKE_FAILURE '), 'penanda baris harus ada agar mudah dicari di log job')
+  assert.ok(!line.includes('\n'), 'harus satu baris')
+  const report = parse(line)
+  assert.equal(report.schema, 'body3d-smoke-failure-log/v1')
+  assert.equal(report.failure, 'canvas health timed out after 10000ms')
+  assert.equal(report.elapsedMs, 30912)
+  assert.equal(report.hash, '#/body-explorer?folds=open')
+  assert.deepEqual(report.folds, [{ word: 'Anatomy', open: true }, { word: 'Physiology', open: false }])
+  assert.deepEqual(report.pageErrors, ['TypeError: x is undefined'])
+  assert.equal(report.responsive, false)
+  assert.equal(report.probeMs, null)
+})
+
+test('tanpa_kegagalan_tidak_ada_log', () => {
+  for (const failure of [null, undefined, '', 0, {}]) assert.equal(smoke({ failure }), '', `failure=${String(failure)}`)
+})
+
+test('probe_responsif_dan_macet_hanya_berbeda_pada_probe', () => {
+  const macet = parse(smoke({ probe: { responsive: false, evaluateMs: null } }))
+  const responsif = parse(smoke({ probe: { responsive: true, evaluateMs: 42.4 } }))
+  assert.equal(macet.responsive, false)
+  assert.equal(responsif.responsive, true)
+  assert.equal(responsif.probeMs, 42)
+  assert.deepEqual({ ...responsif, responsive: null, probeMs: null }, { ...macet, responsive: null, probeMs: null })
+})
+
+test('galat_probe_selain_timeout_tidak_dilaporkan_sebagai_macet', () => {
+  const report = parse(smoke({ probe: { responsive: null, evaluateMs: null, error: 'page.evaluate: Execution context was destroyed' } }))
+  assert.equal(report.responsive, null, 'galat bukan timeout: tidak boleh dibaca macet (false) maupun responsif (true)')
+  assert.equal(report.probeError, 'page.evaluate: Execution context was destroyed')
+  assert.equal(parse(smoke({ probe: { responsive: false, evaluateMs: null } })).probeError, null)
+  assert.equal(parse(smoke({ probe: { responsive: null, evaluateMs: null, error: 'x'.repeat(2000) } })).probeError.length, 301)
+})
+
+test('probe_yang_tidak_dijalankan_tidak_dilaporkan_sebagai_responsif', () => {
+  for (const probe of [undefined, null, {}, { responsive: 'ya' }, { responsive: 1 }]) {
+    assert.equal(parse(smoke({ probe })).responsive, null, `probe=${JSON.stringify(probe)}`)
+  }
+})
+
+test('log_kegagalan_dibatasi_dan_tahan_masukan_buruk', () => {
+  const report = parse(smoke({
+    failure: 'x'.repeat(5000),
+    pageErrors: Array.from({ length: 100 }, (_, i) => `err-${i}-${'y'.repeat(2000)}`),
+    failureContext: { hash: 'h'.repeat(5000), folds: Array.from({ length: 500 }, () => ({ word: 'w'.repeat(500), open: true })) },
+  }))
+  assert.ok(report.failure.length <= 601)
+  assert.ok(report.hash.length <= 201)
+  assert.equal(report.pageErrors.length, 20)
+  assert.ok(report.pageErrors.every((e) => e.length <= 301))
+  assert.equal(report.folds.length, 20)
+  assert.ok(report.folds.every((f) => f.word.length <= 41))
+  // Masukan bukan-daftar atau konteks hilang tidak boleh melempar.
+  const aman = parse(smoke({ pageErrors: 'bukan daftar', failureContext: null, elapsedMs: NaN }))
+  assert.deepEqual(aman.pageErrors, [])
+  assert.equal(aman.hash, null)
+  assert.deepEqual(aman.folds, [])
+  assert.equal(aman.elapsedMs, null)
+})
+
+test('smoke_v2_memanggil_probe_dan_mencetak_log_saat_gagal', () => {
+  const source = readFileSync(new URL('./body3d-mobile-smoke-v2.mjs', import.meta.url), 'utf8')
+  assert.match(source, /import \{ formatSmokeFailureLog \} from '\.\/body3d-failure-evidence\.mjs'/)
+  assert.match(source, /responsiveProbe = await withTimeout\(page\.evaluate\(\(\) => performance\.now\(\)\), 'responsiveness probe', 3_000\)/)
+  assert.match(source, /if \(failureLog\) console\.error\(failureLog\)/)
+  assert.match(source, /\/timed out\/\.test\(probeError\.message\)/, 'hanya timeout yang boleh dibaca sebagai macet')
+  // Probe harus dijalankan sebelum evaluate konteks (yang bisa menunggu 20 detik pada halaman macet).
+  assert.ok(source.indexOf("'responsiveness probe'") < source.indexOf('failureContext = await page.evaluate'))
+  // Gerbang tidak boleh dilemahkan: tidak ada penelan galat baru di sekitar asersi, galat asli tetap dilempar ulang.
+  assert.match(source, /throw error\n\} finally \{/)
 })

@@ -46,3 +46,28 @@ export function buildFailureEvidence({ error, elapsedMs, url, page, consoleMessa
       .map((e) => ({ type: clip(e?.type, 24), atMs: Number.isFinite(e?.atMs) ? Math.round(e.atMs) : null })),
   }
 }
+
+const MAX_LOG_FOLDS = 20
+
+// Satu baris log untuk kegagalan smoke Body3D. Artefak CI tidak selalu bisa diunduh, sedangkan log job selalu bisa dibaca,
+// jadi ringkasan yang sama dicetak ke stderr. `probe.responsive === false` berarti halaman tidak menjawab evaluate dalam
+// batas waktu (utas utama macet), bedanya dengan canvas yang memang rusak. Hanya diagnostik; tidak mengubah lulus/gagal.
+export function formatSmokeFailureLog({ failure, failureContext, pageErrors, probe, elapsedMs }) {
+  if (typeof failure !== 'string' || failure === '') return ''
+  const context = failureContext && typeof failureContext === 'object' ? failureContext : null
+  const folds = context ? asList(context.folds).slice(0, MAX_LOG_FOLDS) : []
+  const report = {
+    schema: 'body3d-smoke-failure-log/v1',
+    failure: clip(failure, 600),
+    elapsedMs: Number.isFinite(elapsedMs) ? Math.round(elapsedMs) : null,
+    hash: context ? clip(context.hash, 200) : null,
+    folds: folds.map((f) => ({ word: clip(f?.word, 40), open: f?.open === true })),
+    pageErrors: asList(pageErrors).slice(-MAX_ERRORS).map((e) => clip(e, MAX_ENTRY)),
+    // null: probe tidak dijalankan, bukan "responsif".
+    responsive: probe && typeof probe.responsive === 'boolean' ? probe.responsive : null,
+    probeMs: probe && Number.isFinite(probe.evaluateMs) ? Math.round(probe.evaluateMs) : null,
+    // Galat probe selain timeout (mis. halaman error): bukan bukti macet, jadi dilaporkan terpisah dari `responsive`.
+    probeError: probe && typeof probe.error === 'string' ? clip(probe.error, MAX_ENTRY) : null,
+  }
+  return `BODY3D_SMOKE_FAILURE ${JSON.stringify(report)}`
+}
