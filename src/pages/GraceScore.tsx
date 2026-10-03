@@ -5,6 +5,7 @@ import { IconHeart } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { graceScore, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GRACE Score (in-hospital mortality) — Granger, C.B., et al. (2003),
@@ -17,51 +18,6 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 // Pure lookup-table arithmetic, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function agePts(v: number): number {
-  if (v < 30) return 0
-  if (v < 40) return 8
-  if (v < 50) return 25
-  if (v < 60) return 41
-  if (v < 70) return 58
-  if (v < 80) return 75
-  if (v < 90) return 91
-  return 100
-}
-function hrPts(v: number): number {
-  if (v < 50) return 0
-  if (v < 70) return 3
-  if (v < 90) return 9
-  if (v < 110) return 15
-  if (v < 150) return 24
-  if (v < 200) return 38
-  return 46
-}
-function sbpPts(v: number): number {
-  if (v < 80) return 58
-  if (v < 100) return 53
-  if (v < 120) return 43
-  if (v < 140) return 34
-  if (v < 160) return 24
-  if (v < 200) return 10
-  return 0
-}
-function creatPts(v: number): number {
-  if (v < 0.4) return 1
-  if (v < 0.8) return 4
-  if (v < 1.2) return 7
-  if (v < 1.6) return 10
-  if (v < 2.0) return 13
-  if (v < 4.0) return 21
-  return 28
-}
-const KILLIP_PTS = [0, 20, 39, 59] // class I-IV
-
-function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; mortality: string } {
-  if (score <= 108) return { label: 'Low risk', tone: 'brand', mortality: '<1% in-hospital mortality' }
-  if (score <= 140) return { label: 'Intermediate risk', tone: 'low', mortality: '1-3% in-hospital mortality' }
-  return { label: 'High risk', tone: 'critical', mortality: '>3% in-hospital mortality' }
-}
-
 export function GraceScore() {
   // GRACE menentukan waktu strategi invasif pada sindrom koroner akut.
   // Halaman ini dahulu terbuka pada usia 60 (atau 30 dari getDemo()), nadi
@@ -73,26 +29,20 @@ export function GraceScore() {
   // jawaban yang SAH dan bernilai nol; keempatnya tetap seperti semula.
   // Yang dihapus hanya keempat pengukurannya.
   const tersimpan = getDemoTersimpan()
-  const [age, setAge] = useState(() => (tersimpan.age && tersimpan.age > 0 ? tersimpan.age : 0))
-  const [hr, setHr] = useState(0)
-  const [sbp, setSbp] = useState(0)
-  const [creat, setCreat] = useState(0)
+  const [age, setAge] = useState(() => (tersimpan.age && tersimpan.age > 0 ? String(tersimpan.age) : ''))
+  const [hr, setHr] = useState('')
+  const [sbp, setSbp] = useState('')
+  const [creat, setCreat] = useState('')
   const [killip, setKillip] = useState(0)
   const [arrest, setArrest] = useState(false)
   const [stDev, setStDev] = useState(false)
   const [markers, setMarkers] = useState(false)
 
-  const belum: string[] = []
-  if (!(age > 0)) belum.push('age')
-  if (!(hr > 0)) belum.push('heart rate')
-  if (!(sbp > 0)) belum.push('systolic BP')
-  if (!(creat > 0)) belum.push('creatinine')
-  const lengkap = belum.length === 0
-
-  const score =
-    agePts(age) + hrPts(hr) + sbpPts(sbp) + creatPts(creat) + KILLIP_PTS[killip] +
-    (arrest ? 39 : 0) + (stDev ? 28 : 0) + (markers ? 14 : 0)
-  const result = lengkap ? band(score) : null
+  const res = graceScore({ age: parseNumberField(age), hr: parseNumberField(hr), sbp: parseNumberField(sbp), creat: parseNumberField(creat), killip, arrest, stDev, markers })
+  const belum = res.missing
+  const lengkap = res.score !== null
+  const score = res.score
+  const result = res.band
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -102,16 +52,16 @@ export function GraceScore() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mencakup seluruh rentang sindrom koroner akut (STEMI, NSTEMI, angina tidak stabil) dan lebih dianjurkan dalam panduan ESC untuk menentukan waktu strategi invasif — melengkapi skor TIMI yang khusus untuk UA/NSTEMI.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
-            <input className={inputClass} type="number" min={18} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={18} value={age} onChange={(e) => setAge(e.target.value)} />
           </Field>
           <Field label="Heart rate (bpm)">
-            <input className={inputClass} type="number" min={0} value={hr || ''} onChange={(e) => setHr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={hr} onChange={(e) => setHr(e.target.value)} />
           </Field>
           <Field label="Systolic BP (mmHg)">
-            <input className={inputClass} type="number" min={0} value={sbp || ''} onChange={(e) => setSbp(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={sbp} onChange={(e) => setSbp(e.target.value)} />
           </Field>
           <Field label="Creatinine (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={creat || ''} onChange={(e) => setCreat(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={creat} onChange={(e) => setCreat(e.target.value)} />
           </Field>
           <Field label="Killip class">
             <select className={inputClass} value={killip} onChange={(e) => setKillip(Number(e.target.value))}>
@@ -140,7 +90,7 @@ export function GraceScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">GRACE Score</div>
-        {lengkap && result !== null ? (
+        {lengkap && result !== null && score !== null ? (
           <>
             <div className="mt-2 flex items-center gap-3">
               <span className="text-3xl font-black text-brand-dark">{score}</span>
@@ -154,7 +104,8 @@ export function GraceScore() {
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No score yet. Still needed: {belum.join(', ')}.
+            No score yet.{belum.length > 0 && <> Still needed: {belum.join(', ')}.</>}
+            {res.invalid.map((m) => <span key={m} role="alert" className="block font-semibold text-amber-700 dark:text-amber-300">{m}</span>)}
             {' '}Killip I with no arrest, no ST deviation and no raised biomarkers is a real answer worth zero points
             and stays as it is — but the four measurements are not answers until someone takes them, and this score
             can move the timing of an invasive strategy.
