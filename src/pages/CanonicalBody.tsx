@@ -24,6 +24,7 @@ interface BodyEntry {
   status: string
   source: string | null
   source_requirement: string | null
+  redistribution?: string | null
   structures: number
 }
 interface BodyMatrix { bodies: BodyEntry[]; files: string[] }
@@ -339,19 +340,20 @@ export function CanonicalBody() {
         />
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Body">
           {(matrix?.bodies ?? []).map((b) => {
-            const available = b.structures > 0
+            // tersedia hanya bila berkas web tubuh ini benar-benar diterbitkan
+            const available = (matrix?.files ?? []).some((f) => f.startsWith(fileTag(b.body_id) + '.'))
             return (
               <button
                 key={b.body_id}
                 role="tab"
                 aria-selected={b.body_id === bodyId}
                 disabled={!available}
-                title={available ? undefined : b.source_requirement ?? 'Source data required'}
+                title={available ? undefined : b.redistribution ?? b.source_requirement ?? 'Source data required'}
                 onClick={() => available && setBodyId(b.body_id)}
                 className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-bold transition ${b.body_id === bodyId ? 'border-brand bg-brand text-white' : available ? 'border-neutral-500/30 bg-neutral-500/10' : 'cursor-not-allowed border-dashed border-neutral-500/30 opacity-55'}`}
               >
                 {BODY_LABEL[b.body_id] ?? b.body_id}
-                {!available && <span className="ml-1.5 text-[11px] font-semibold">· not yet</span>}
+                {!available && <span className="ml-1.5 text-[11px] font-semibold">· {b.structures > 0 ? 'licence review' : 'not yet'}</span>}
               </button>
             )
           })}

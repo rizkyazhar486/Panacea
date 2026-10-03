@@ -37,10 +37,14 @@ def run(out=OUT):
     for c in root.children:
         if "panacea_body_id" in c:
             ms = [o for o in c.all_objects if o.type == 'MESH']
-            bodies.append({
+            # tubuh tertaut (satu .blend per varian) dicatat lewat empty ROOT-nya
+            linked = [{"body_id": e.get("panacea_body_id"), "file": e.get("panacea_body_file"),
+                       "structures": e.get("panacea_structures"), "stature_m": e.get("panacea_stature_m")}
+                      for e in c.objects if e.type == 'EMPTY' and e.instance_type == 'COLLECTION' and e.get("panacea_body_file")]
+            bodies.append({"variants": linked, "redistribution": c.get("panacea_redistribution"),
                 "body_id": c["panacea_body_id"], "status": c.get("panacea_body_status"), "source": c.get("panacea_body_source"),
                 "frame": c.get("panacea_body_frame"), "source_requirement": c.get("panacea_source_requirement"),
-                "structures": len(ms), "verts": sum(len(o.data.vertices) for o in ms),
+                "structures": len(ms) + sum(v["structures"] or 0 for v in linked), "verts": sum(len(o.data.vertices) for o in ms),
                 "systems": dict(collections.Counter(o.get("panacea_system", "?") for o in ms)),
             })
     structs, qa = [], collections.defaultdict(lambda: collections.Counter())
