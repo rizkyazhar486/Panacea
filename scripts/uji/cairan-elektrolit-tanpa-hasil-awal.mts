@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { fena as fenaEngine } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIGA TERAKHIR DARI PENYISIRAN, DAN YANG SATU MENGELUARKAN VOLUME.
@@ -26,8 +27,10 @@ const fenaKode = kodeDari(fena)
 for (const b of ['useState(20)', 'useState(2.0)', 'useState(140)', 'useState(60)']) {
   assert.ok(!fenaKode.includes(b), `a laboratory default is back in FeNa: ${b}`)
 }
-assert.ok(/const result = lengkap \? interpret\(fena\) : null/.test(fenaKode),
+// Perilaku, bukan teks: tanpa sampel urin+plasma berpasangan mesin domain tidak memberi angka maupun pita.
+assert.equal(fenaEngine({ urineNa: Number.NaN, plasmaNa: Number.NaN, urineCr: Number.NaN, plasmaCr: Number.NaN }).ok, false,
   'FeNa still names a differential diagnosis without a paired urine and plasma sample')
+assert.ok(fenaKode.includes('{res.ok ? ('), 'the page no longer gates the FeNa result on the domain function')
 // "Sedang memakai diuretik" adalah jawaban, bukan pengukuran.
 assert.ok(/const \[onDiuretics, setOnDiuretics\] = useState\(false\)/.test(fenaKode),
   'the diuretic question was made unanswered; unticked means no, and it changes how the result is read')
@@ -36,7 +39,8 @@ const hitungFena = (una: number, pcr: number, pna: number, ucr: number) => (una 
 assert.ok(Math.abs(hitungFena(20, 2.0, 140, 60) - 0.476) < 0.001,
   'the old defaults no longer give 0.48%; re-read this gate')
 assert.ok(hitungFena(20, 2.0, 140, 60) < 1, 'the old defaults no longer fall in the prerenal band; re-read this gate')
-assert.ok(/\(urineNa \* plasmaCr\) \/ denom \* 100/.test(fenaKode), 'the page no longer applies the FeNa formula')
+const viaMesin = fenaEngine({ urineNa: 20, plasmaCr: 2, plasmaNa: 140, urineCr: 60 })
+assert.ok(viaMesin.ok && Math.abs(viaMesin.data.fena - hitungFena(20, 2.0, 140, 60)) < 1e-12, 'the domain engine no longer applies the FeNa formula')
 
 // ── LDL (Friedewald 1972) ──────────────────────────────────────────────────
 const ldl = baca('LdlCalculator.tsx')
