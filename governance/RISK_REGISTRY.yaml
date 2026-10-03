@@ -279,11 +279,14 @@ risks:
     mitigation: >-
       2026-10-02: CKD-EPI now calls the validated egfrCkdEpi2021 (creatinine 0.1-25 mg/dL, age 18-120), shows the
       reason and no number when input is invalid, and derives the KDIGO stage from the unrounded value
-      (scripts/uji/egfr-ckd-epi-2021.mts, with sabotage-checked tests). Remaining calculators are still unvalidated;
-      fix them one at a time, dose/volume-like first (PedsDoseCalc, ParklandCalc, BurnCalc, HollidaySegarCalc,
+      (scripts/uji/egfr-ckd-epi-2021.mts, with sabotage-checked tests). 2026-10-03: ParklandCalc and BurnCalc now call the validated
+      parklandFluid (weight 0.5-300 kg, %TBSA 0-100; src/domains/clinical-calculators/engine/parkland.ts,
+      scripts/uji/parkland-fluid.mts). Remaining calculators are still unvalidated;
+      fix them one at a time, dose/volume-like first (PedsDoseCalc, HollidaySegarCalc,
       IvDripCalc, FluidBalanceCalc, NaCorrectionCalc, AbgCalc), moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
       - src/lib/longevity.ts
       - src/pages/ClinicalCalculators.tsx
       - scripts/uji/egfr-ckd-epi-2021.mts
+      - scripts/uji/parkland-fluid.mts
