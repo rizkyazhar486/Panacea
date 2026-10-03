@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -133,6 +134,8 @@ export function CanonicalBody() {
     groups: Map<string, THREE.Group>
     byId: Map<string, THREE.Object3D>
     invalidate: () => void
+    /** Muatan GLB yang tiba sesudah komponen dilepas tidak punya pemilik; lihat lib/gltfSesudahLepas. */
+    penjaga: PenjagaMuatan
   } | null>(null)
   const selectedRef = useRef<string | null>(null)
 
@@ -178,7 +181,8 @@ export function CanonicalBody() {
     let dirty = true
     const invalidate = () => { dirty = true }
     controls.addEventListener('change', invalidate)
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate }
+    const penjaga = penjagaMuatan()
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga }
 
     const resize = () => {
       const w = mount.clientWidth, h = mount.clientHeight
@@ -210,6 +214,7 @@ export function CanonicalBody() {
     renderer.domElement.addEventListener('pointerdown', onDown)
     renderer.domElement.addEventListener('pointerup', onUp)
     return () => {
+      penjaga.lepas()
       ro.disconnect()
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
@@ -255,6 +260,8 @@ export function CanonicalBody() {
       const g = await loader.loadAsync(`${BASE}${tag}.${sys}.${lod}.glb`)
       return { sys, scene: g.scene }
     })).then((results) => {
+      // Komponen sudah dilepas: scene-nya mati dan tidak ada yang akan membuang muatan ini, jadi buang di sini.
+      if (!s.penjaga.hidup) { for (const r of results) if (r.status === 'fulfilled') s.penjaga.terima(r.value.scene); return }
       if (gen !== loadState.current.gen) return  // tubuh/LOD sudah berganti
       for (const r of results) {
         if (r.status !== 'fulfilled') continue
