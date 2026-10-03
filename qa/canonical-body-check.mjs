@@ -16,7 +16,7 @@ try {
       await page.evaluate((t) => document.documentElement.classList.toggle('dark', t === 'dark'), theme)
       const stats = page.getByText(/structures · \d+k triangles/)
       await stats.waitFor({ timeout: 60000 })
-      assert.match(await stats.textContent(), /^3,876 structures/, 'male structure count')
+      assert.match(await stats.textContent(), /^3,877 structures/, 'male structure count')
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow')
       // tubuh tanpa data sumber tetap tidak bisa dipilih; tubuh pediatrik ICRP bisa
       assert(await page.getByRole('tab', { name: /Pregnancy/ }).isDisabled(), 'placeholder body must be disabled')
@@ -56,6 +56,10 @@ try {
       const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
       assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
       await page.getByRole('button', { name: 'Stop measuring' }).click()
+      // koreksi label usus v010: "Sigmoid colon" Z-Anatomy kini Rectum (BodyParts3D)
+      await page.getByLabel('Find a structure').fill('rectum')
+      await page.getByRole('button', { name: /^rectum/i }).first().click()
+      await page.getByText(/^ADULT\.MALE\.DIGESTIVE\.RECTUM$/).waitFor()
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })
@@ -67,7 +71,7 @@ try {
       await page.getByRole('tab', { name: /^Neonate/ }).click()
       await page.getByText(/stature 48 cm/).waitFor({ timeout: 60000 })
       await page.screenshot({ path: `/private/tmp/canonical-neonate-${width}-${theme}.png`, fullPage: true })
-      console.log(JSON.stringify({ width, theme, male: 3876, last_loaded: (await page.getByText(/structures · \d+k/).textContent()) }))
+      console.log(JSON.stringify({ width, theme, male: 3877, last_loaded: (await page.getByText(/structures · \d+k/).textContent()) }))
     }
   }
   assert.deepEqual(errors, [])

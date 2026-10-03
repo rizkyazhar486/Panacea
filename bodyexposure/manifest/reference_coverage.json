@@ -69,8 +69,8 @@
     "gallbladder": 1,
     "pancreas": 8,
     "small intestine": 2,
-    "large intestine": 5,
-    "rectum and anus": 0
+    "large intestine": 4,
+    "rectum and anus": 1
    },
    "urinary": {
     "kidney": 8,
@@ -191,7 +191,6 @@
  "missing": {
   "HUMAN.ADULT.MALE": [
    "cardiovascular: capillaries",
-   "digestive: rectum and anus",
    "integumentary: hair",
    "integumentary: sebaceous gland",
    "integumentary: sweat gland",

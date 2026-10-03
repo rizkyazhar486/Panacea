@@ -65,7 +65,7 @@ disc in `qa_vertices_pushed_out_of_bone`.
 
 `TA2.csv` (Z-Anatomy repository, CC BY-SA 4.0) supplies the TA2 ID, Latin name and French name
 through `pipeline/annotate_ta2.py`. Matching is exact on the English name only, with no fuzzy
-matching, because a wrong Latin label is worse than none. Coverage: male 3,489 / 3,876; female
+matching, because a wrong Latin label is worse than none. Coverage: male 3,489 / 3,876 (v009); female
 259 / 841 (HuBMAP naming departs from TA more often).
 
 ## Intervertebral discs (superseded reconstruction)
@@ -220,3 +220,25 @@ The owner's "Panaceamed Resources" folder (71 files, registered 2026-10-03 in `m
 entirely AI-generated: ChatGPT images and Tripo meshes or multiview inputs. It sets the view layout, the peel order
 and the coverage checklists (see `references/README.md`). It contributes no geometry, landmarks or measurements to
 any canonical body, and it is not redistributed with the app.
+
+## BodyParts3D 4.0 (adult male gut audit, v010)
+
+Source: BodyParts3D 4.0 "partof" release, DBCLS (https://dbarchive.biosciencedbc.jp/en/bodyparts3d/). The OBJ headers say
+CC BY-SA 2.1 Japan; the DBCLS licence page now says CC BY 4.0. Attribution follows the stricter of the two.
+
+BodyParts3D is the source Z-Anatomy was built from. It was registered to the canonical male frame in two steps:
+1. A global similarity fit on 277 structures present in both datasets (`manifest/bp3d_frame.json`).
+2. A rigid ICP on the pelvis: sacrum, coccyx, both hip bones and the urinary bladder (`manifest/bp3d_icp.json`). The
+   median reference surface distance fell from 7.4 mm to 1.1 mm.
+
+Registration showed that three Z-Anatomy gut labels do not match the geometry (`manifest/bp3d_label_audit.json`):
+
+| Z-Anatomy label | Relabelled to | Evidence |
+|---|---|---|
+| Sigmoid colon | Rectum | 97% of vertices on the BodyParts3D rectum; spans S3 (z 0.925 m) to below the pelvic diaphragm |
+| Jejunum | Jejunum and ileum | 46% jejunum, 33% ileum |
+| Descending colon | Descending and sigmoid colon | lower end turns to the midline below the pelvic brim |
+
+The old IDs are kept in `panacea_previous_ids`. One structure was added: the external anal sphincter (FMA21930). The
+BodyParts3D caecum was **not** added because 60% of it lies inside the Z-Anatomy small-intestine mesh. The caecum
+stays an open gap.

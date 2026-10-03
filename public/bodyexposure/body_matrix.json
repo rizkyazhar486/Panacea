@@ -1,19 +1,19 @@
 {
- "generated": "2026-10-03T14:53:30",
- "master": "PANACEA_HUMAN_MASTER_v009.blend",
+ "generated": "2026-10-03",
+ "master": "PANACEA_HUMAN_MASTER_v010.blend",
  "bodies": [
   {
    "body_id": "HUMAN.ADULT.MALE",
    "status": "source_backed",
-   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 \u2014 Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae)",
+   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 \u2014 Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae) + external anal sphincter from BodyParts3D 4.0 (DBCLS); three gut labels corrected against BodyParts3D (see PROVENANCE.md)",
    "source_requirement": null,
    "redistribution": null,
-   "structures": 3876,
+   "structures": 3877,
    "systems": {
     "surface": 256,
     "skeletal": 232,
     "joint": 413,
-    "muscular": 1291,
+    "muscular": 1292,
     "fascia": 93,
     "cardiovascular": 677,
     "lymphatic": 163,

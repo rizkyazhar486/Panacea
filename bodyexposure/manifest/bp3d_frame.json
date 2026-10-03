@@ -1,0 +1,213 @@
+{
+ "source": "BodyParts3D 4.0 partof (DBCLS)",
+ "maps": "BP3D obj coordinates (mm) -> canonical male frame (m)",
+ "scale": 0.0009983706661110677,
+ "rotation": [
+  [
+   0.9999999129629239,
+   -0.0003764981935327446,
+   0.00017978669268758576
+  ],
+  [
+   0.00037858632084022346,
+   0.9999307861852028,
+   -0.011759230903395972
+  ],
+  [
+   -0.0001753469197722373,
+   0.011759297944689329,
+   0.9999308416912167
+  ]
+ ],
+ "translation_m": [
+  2.8097166790167383e-05,
+  0.10903224423373552,
+  0.07318628925698589
+ ],
+ "pairs_total": 321,
+ "pairs_inliers": 277,
+ "residual_m": {
+  "median": 0.009110084618245902,
+  "p95": 0.023081223201394142,
+  "max": 0.0267139434662671
+ },
+ "worst_inliers": [
+  [
+   "urinary bladder",
+   0.0267
+  ],
+  [
+   "right superior cerebellar artery",
+   0.0264
+  ],
+  [
+   "left superior cerebellar artery",
+   0.0261
+  ],
+  [
+   "right obturator internus",
+   0.026
+  ],
+  [
+   "left obturator internus",
+   0.026
+  ],
+  [
+   "right hip bone",
+   0.0258
+  ],
+  [
+   "left hip bone",
+   0.0258
+  ],
+  [
+   "right sclera",
+   0.0253
+  ]
+ ],
+ "local_offsets": {
+  "FMA14544": {
+   "name": "rectum",
+   "neighbours": [
+    "appendicular artery",
+    "urinary bladder",
+    "sacrum",
+    "right hip bone",
+    "left hip bone",
+    "right external iliac vein",
+    "left external iliac vein",
+    "right lateral circumflex femoral artery",
+    "left lateral circumflex femoral artery",
+    "right obturator internus",
+    "left obturator internus"
+   ],
+   "offset_m": [
+    0.0005733547149780919,
+    -0.010546831406172158,
+    -0.01138345467914567
+   ],
+   "neighbour_residual_before_median_m": 0.020588359936101593,
+   "neighbour_residual_after_median_m": 0.01176098697158802,
+   "elements": [
+    "FJ2571"
+   ]
+  },
+  "FMA7208": {
+   "name": "ileum",
+   "neighbours": [
+    "descending colon",
+    "superior mesenteric artery",
+    "ileocolic artery",
+    "appendicular artery",
+    "urinary bladder",
+    "sacrum",
+    "right hip bone",
+    "left hip bone",
+    "right external iliac vein",
+    "left external iliac vein",
+    "right inferior epigastric artery",
+    "left inferior epigastric artery",
+    "right superficial epigastric artery",
+    "left superficial epigastric artery",
+    "left common iliac vein",
+    "right psoas major",
+    "left psoas major"
+   ],
+   "offset_m": [
+    -0.0007109158312348915,
+    -0.0075532485357459175,
+    -0.0047999099013158
+   ],
+   "neighbour_residual_before_median_m": 0.018321790754532774,
+   "neighbour_residual_after_median_m": 0.017268933802288566,
+   "elements": [
+    "FJ2574",
+    "FJ2575",
+    "FJ2576",
+    "FJ2577",
+    "FJ2578",
+    "FJ2579",
+    "FJ2580",
+    "FJ2581",
+    "FJ2582",
+    "FJ2583",
+    "FJ2584",
+    "FJ2585",
+    "FJ2586",
+    "FJ2587",
+    "FJ2588",
+    "FJ2589",
+    "FJ2590",
+    "FJ2591",
+    "FJ2592",
+    "FJ2593",
+    "FJ2594",
+    "FJ2595",
+    "FJ2596",
+    "FJ2597",
+    "FJ2598",
+    "FJ2599",
+    "FJ2600",
+    "FJ2601",
+    "FJ2602",
+    "FJ2603",
+    "FJ2604",
+    "FJ2605"
+   ]
+  },
+  "FMA14541": {
+   "name": "cecum",
+   "neighbours": [
+    "ascending colon",
+    "superior mesenteric artery",
+    "ileocolic artery",
+    "appendicular artery",
+    "urinary bladder",
+    "sacrum",
+    "right hip bone",
+    "right external iliac vein",
+    "left external iliac vein",
+    "right inferior epigastric artery",
+    "left inferior epigastric artery",
+    "right superficial epigastric artery",
+    "left common iliac vein",
+    "right obturator internus",
+    "right psoas major"
+   ],
+   "offset_m": [
+    -0.0004018437242432604,
+    -0.008355970102382395,
+    -0.004465416398927613
+   ],
+   "neighbour_residual_before_median_m": 0.018321790754532774,
+   "neighbour_residual_after_median_m": 0.01769933306465566,
+   "elements": [
+    "FJ2599"
+   ]
+  },
+  "FMA21930": {
+   "name": "external anal sphincter",
+   "neighbours": [
+    "urinary bladder",
+    "sacrum",
+    "right lateral circumflex femoral artery",
+    "left lateral circumflex femoral artery",
+    "right obturator internus",
+    "left obturator internus"
+   ],
+   "offset_m": [
+    0.00010343422973699279,
+    -0.009185731449576991,
+    -0.016824617799748105
+   ],
+   "neighbour_residual_before_median_m": 0.021759736646924863,
+   "neighbour_residual_after_median_m": 0.009989979881114983,
+   "elements": [
+    "FJ1450",
+    "FJ1450M",
+    "FJ2543",
+    "FJ2548"
+   ]
+  }
+ }
+}

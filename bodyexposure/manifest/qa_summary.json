@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T15:30:14",
-  "master": "PANACEA_HUMAN_MASTER_v009.blend",
+  "generated": "2026-10-03T21:42:06",
+  "master": "PANACEA_HUMAN_MASTER_v010.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -135,10 +135,10 @@
    "nonmanifold_meshes": 0
   },
   "HUMAN.ADULT.MALE|muscular": {
-   "structures": 1291,
-   "verts": 1472207,
-   "tris": 2940410,
-   "open_meshes": 44,
+   "structures": 1292,
+   "verts": 1473197,
+   "tris": 2941878,
+   "open_meshes": 45,
    "nonmanifold_meshes": 30
   },
   "HUMAN.ADULT.MALE|nervous": {
@@ -261,9 +261,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.ADOLESCENT.FEMALE|skeletal": {
-   "structures": 25,
-   "verts": 167427,
-   "tris": 334438,
+   "structures": 23,
+   "verts": 166783,
+   "tris": 333158,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -275,9 +275,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.ADOLESCENT.FEMALE|urinary": {
-   "structures": 7,
-   "verts": 2561,
-   "tris": 5094,
+   "structures": 9,
+   "verts": 3205,
+   "tris": 6374,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -345,9 +345,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.ADOLESCENT.MALE|skeletal": {
-   "structures": 25,
-   "verts": 173898,
-   "tris": 347544,
+   "structures": 23,
+   "verts": 173324,
+   "tris": 346404,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -359,9 +359,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.ADOLESCENT.MALE|urinary": {
-   "structures": 7,
-   "verts": 2929,
-   "tris": 5830,
+   "structures": 9,
+   "verts": 3503,
+   "tris": 6970,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -429,9 +429,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_10Y.FEMALE|skeletal": {
-   "structures": 25,
-   "verts": 162481,
-   "tris": 324468,
+   "structures": 23,
+   "verts": 161597,
+   "tris": 322708,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -443,9 +443,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_10Y.FEMALE|urinary": {
-   "structures": 7,
-   "verts": 4258,
-   "tris": 8488,
+   "structures": 9,
+   "verts": 5142,
+   "tris": 10248,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -513,9 +513,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_10Y.MALE|skeletal": {
-   "structures": 25,
-   "verts": 152364,
-   "tris": 304164,
+   "structures": 23,
+   "verts": 151480,
+   "tris": 302404,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -527,9 +527,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_10Y.MALE|urinary": {
-   "structures": 7,
-   "verts": 4527,
-   "tris": 9026,
+   "structures": 9,
+   "verts": 5411,
+   "tris": 10786,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -597,9 +597,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_5Y.FEMALE|skeletal": {
-   "structures": 25,
-   "verts": 197121,
-   "tris": 393912,
+   "structures": 23,
+   "verts": 196188,
+   "tris": 392054,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -611,9 +611,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_5Y.FEMALE|urinary": {
-   "structures": 7,
-   "verts": 3443,
-   "tris": 6858,
+   "structures": 9,
+   "verts": 4376,
+   "tris": 8716,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -681,9 +681,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_5Y.MALE|skeletal": {
-   "structures": 25,
-   "verts": 188325,
-   "tris": 376238,
+   "structures": 23,
+   "verts": 187392,
+   "tris": 374380,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -695,9 +695,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.CHILD_5Y.MALE|urinary": {
-   "structures": 7,
-   "verts": 3367,
-   "tris": 6706,
+   "structures": 9,
+   "verts": 4300,
+   "tris": 8564,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -765,9 +765,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.INFANT.FEMALE|skeletal": {
-   "structures": 26,
-   "verts": 192024,
-   "tris": 383728,
+   "structures": 24,
+   "verts": 191318,
+   "tris": 382324,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -779,9 +779,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.INFANT.FEMALE|urinary": {
-   "structures": 7,
-   "verts": 4489,
-   "tris": 8950,
+   "structures": 9,
+   "verts": 5195,
+   "tris": 10354,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -849,9 +849,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.INFANT.MALE|skeletal": {
-   "structures": 26,
-   "verts": 177816,
-   "tris": 355238,
+   "structures": 24,
+   "verts": 177110,
+   "tris": 353834,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -863,9 +863,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.INFANT.MALE|urinary": {
-   "structures": 7,
-   "verts": 4279,
-   "tris": 8530,
+   "structures": 9,
+   "verts": 4985,
+   "tris": 9934,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -933,9 +933,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.NEONATE.FEMALE|skeletal": {
-   "structures": 28,
-   "verts": 290651,
-   "tris": 580890,
+   "structures": 26,
+   "verts": 288048,
+   "tris": 575692,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -947,9 +947,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.NEONATE.FEMALE|urinary": {
-   "structures": 7,
-   "verts": 10750,
-   "tris": 21472,
+   "structures": 9,
+   "verts": 13353,
+   "tris": 26670,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -1017,9 +1017,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.NEONATE.MALE|skeletal": {
-   "structures": 28,
-   "verts": 285618,
-   "tris": 570820,
+   "structures": 26,
+   "verts": 283015,
+   "tris": 565622,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   },
@@ -1031,9 +1031,9 @@
    "nonmanifold_meshes": 0
   },
   "PEDIATRIC.NEONATE.MALE|urinary": {
-   "structures": 7,
-   "verts": 9166,
-   "tris": 18304,
+   "structures": 9,
+   "verts": 11769,
+   "tris": 23502,
    "open_meshes": 0,
    "nonmanifold_meshes": 0
   }

@@ -2,6 +2,8 @@ Body Exposure canonical bodies (web derivatives, LOD2/LOD3)
 ===========================================================
 
 adult_male.*  — derived from Z-Anatomy (BodyParts3D, DBCLS), CC BY-SA 4.0.
+               External anal sphincter: BodyParts3D, (c) The Database Center for Life Science,
+               CC Attribution-Share Alike 2.1 Japan (now also offered under CC BY 4.0).
                 Includes Panacea-reconstructed intervertebral discs and pericardium
                 (derivatives, same licence). See bodyexposure/PROVENANCE.md.
 adult_female.* — derived from HuBMAP CCF 3D Reference Object Library, VH_Female

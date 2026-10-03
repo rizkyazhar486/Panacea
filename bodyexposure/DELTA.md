@@ -64,3 +64,10 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - 71 owner-supplied reference files were registered (`manifest/references.json`, `references/README.md`). All are AI-generated (ChatGPT or Tripo), so they serve as **art direction and scope only**. No geometry was merged.
 - The reference 12-system checklist was run against the inventory (`manifest/reference_coverage.json`). Adult male 58/67, adult female 41/67.
 - New open dependencies: the male **rectum, anal canal, ileum and caecum** (absent from Z-Anatomy too), and the female **axial skeleton and upper GI tract** (absent from HuBMAP VH_F).
+
+## v010: adult male gut audit against BodyParts3D 4.0 (2026-10-03)
+
+- BodyParts3D 4.0, the source Z-Anatomy was built from, is registered to the male frame. Global fit on 277 shared structures, then pelvic ICP: median surface distance 1.1 mm.
+- Three Z-Anatomy gut labels are corrected from geometry and landmarks: "Sigmoid colon" → **Rectum**, "Jejunum" → **Jejunum and ileum**, "Descending colon" → **Descending and sigmoid colon**. Old IDs are kept in `panacea_previous_ids`.
+- Added: **external anal sphincter** (BodyParts3D). Not added: the **caecum**, which would sit 60% inside the existing small-intestine mesh. It stays an open dependency.
+- The male gross-anatomy gate still passes. The adult male now has 3,877 structures. The structure manifest was also regenerated: the committed copy predated the paediatric left/right ID fix and now matches the shipped GLBs.

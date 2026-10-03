@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T15:30:14",
-  "master": "PANACEA_HUMAN_MASTER_v009.blend",
+  "generated": "2026-10-03T21:42:06",
+  "master": "PANACEA_HUMAN_MASTER_v010.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -780,7 +780,7 @@
   },
   {
    "id": "ANCHOR.ADULT_MALE.ANTERIOR_SACRAL_FORAMINA.R",
-   "anchor_of": "ADULT.MALE.DIGESTIVE.SIGMOID_COLON",
+   "anchor_of": "ADULT.MALE.DIGESTIVE.RECTUM",
    "landmark": "Anterior sacral foramina",
    "kind": "point_landmark",
    "surface_distance_mm": 0.58,
@@ -3146,7 +3146,7 @@
   },
   {
    "id": "ANCHOR.ADULT_MALE.COMMON_ILIAC_NODES.L",
-   "anchor_of": "ADULT.MALE.DIGESTIVE.DESCENDING_COLON",
+   "anchor_of": "ADULT.MALE.DIGESTIVE.DESCENDING_AND_SIGMOID_COLON",
    "landmark": "Common iliac nodes",
    "kind": "point_landmark",
    "surface_distance_mm": 0.209,
@@ -10566,7 +10566,7 @@
   },
   {
    "id": "ANCHOR.ADULT_MALE.PARIETAL_PELVIC_LYMPH_NODES.L",
-   "anchor_of": "ADULT.MALE.DIGESTIVE.DESCENDING_COLON",
+   "anchor_of": "ADULT.MALE.DIGESTIVE.DESCENDING_AND_SIGMOID_COLON",
    "landmark": "Parietal pelvic lymph nodes",
    "kind": "point_landmark",
    "surface_distance_mm": 0.129,

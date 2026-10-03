@@ -37,11 +37,12 @@ organ shapes, but the canonical bodies keep their CT-, cryosection- and BodyPart
 `pipeline/check_reference_coverage.py` matches the reference organ names, not shapes, against the source-backed
 inventory and writes [`manifest/reference_coverage.json`](../manifest/reference_coverage.json).
 
-- **Adult male: 58 of 67 items present.** The gross-anatomy gaps are the **rectum and anal canal**, the **ileum and
-  caecum**, and the bulbourethral gland. Z-Anatomy, the male source, has none of them, as confirmed by a
-  name search of `Startup.blend`, so they need another source. The original BodyParts3D release is the first
-  candidate. The other gaps are microscopic or not meshed in any source: hair, sweat and sebaceous glands,
-  capillaries, smooth-muscle layers, red bone marrow and lymphatic vessels.
+- **Adult male: 59 of 67 items present (v010).** The v009 run reported the rectum, ileum and caecum as missing. A
+  BodyParts3D audit showed the rectum and ileum were present under other Z-Anatomy labels, which are now corrected
+  (see PROVENANCE.md, "BodyParts3D 4.0"). The external anal sphincter was added. The caecum is still absent but is
+  not in this checklist. The bulbourethral gland is not in BodyParts3D 4.0. The other gaps are microscopic or not
+  meshed in any source: hair, sweat and sebaceous glands, capillaries, smooth-muscle layers, red bone marrow and
+  lymphatic vessels.
 - **Adult female: 41 of 67 items present.** The HuBMAP VH_Female organ library has no skull, vertebral column,
   ribs, sternum, stomach, oral cavity, pharynx, nasal cavity, ear, pituitary, parathyroid or urethra. These are real
   source gaps, not extraction errors. Filling them needs a female source with an axial skeleton and upper GI tract.
