@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, meanArterialPressure, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, meanArterialPressure, midParentalHeight, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1150,9 +1150,7 @@ function MidParentalCalc() {
   const [fatherCm, setFatherCm] = useState(170)
   const [motherCm, setMotherCm] = useState(158)
   const [childSex, setChildSex] = useState<'M' | 'F'>('M')
-  const mph = childSex === 'M' ? (fatherCm + motherCm + 13) / 2 : (fatherCm + motherCm - 13) / 2
-  const rangeLo = mph - 8.5
-  const rangeHi = mph + 8.5
+  const mph = midParentalHeight(fatherCm, motherCm, childSex)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Estimated adult target height for a child from both parents' heights" />
@@ -1161,10 +1159,14 @@ function MidParentalCalc() {
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
         <Field label="Child's Sex"><SegButtons value={childSex} onChange={setChildSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
+      {mph.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
+        <div className="text-2xl font-black text-ink">{mph.data.targetCm.toFixed(1)} cm</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {mph.data.lowCm.toFixed(0)}–{mph.data.highCm.toFixed(0)} cm)</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mph.reason}. No target height is shown until both values are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (father's height + mother's height + 13) / 2. Female: (father's height + mother's height − 13) / 2. The ±8.5 cm range covers about 90% of the genetic target — a child far outside this range needs an endocrine/nutritional evaluation.</Prosa>
     </Card>
   )
@@ -1179,19 +1181,8 @@ function FletcherCalc() {
   const [t3000, setT3000] = useState(20)
   // Complete (AAO-HNS 4-frequency) average adds 3000Hz — captures noise-
   // induced/occupational hearing-loss notches that the classic 3-frequency
-  // Fletcher index (500/1000/2000Hz) alone can miss.
-  const index = mode === 'basic' ? (t500 + t1000 + t2000) / 3 : (t500 + t1000 + t2000 + t3000) / 4
-  const cls = index < 26
-    ? { l: 'Normal', tone: 'normal' as const }
-    : index < 41
-    ? { l: 'Mild hearing loss', tone: 'low' as const }
-    : index < 56
-    ? { l: 'Moderate hearing loss', tone: 'low' as const }
-    : index < 71
-    ? { l: 'Moderately severe hearing loss', tone: 'critical' as const }
-    : index < 91
-    ? { l: 'Severe hearing loss', tone: 'critical' as const }
-    : { l: 'Profound (total) hearing loss', tone: 'critical' as const }
+  // Fletcher index (500/1000/2000Hz alone) can miss.
+  const fl = fletcherIndex(mode, t500, t1000, t2000, t3000)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Pure-tone average threshold — hearing loss grade classification" />
@@ -1202,12 +1193,16 @@ function FletcherCalc() {
         <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(+e.target.value)} /></Field>
         {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(+e.target.value)} /></Field>}
       </div>
+      {fl.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{index.toFixed(1)} dB</div>
-          <Badge tone={cls.tone}>{cls.l}</Badge>
+          <div className="text-2xl font-black text-ink">{fl.data.index.toFixed(1)} dB</div>
+          <Badge tone={fl.data.tone}>{fl.data.label}</Badge>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{fl.reason}. No index is shown until every threshold is valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">
         {mode === 'basic' ? 'Fletcher Index = average threshold at 500+1000+2000 Hz.' : 'Complete (AAO-HNS 4-frequency) = average threshold at 500+1000+2000+3000 Hz — more sensitive to noise/occupational notches.'} &lt;26dB normal · 26-40 mild · 41-55 moderate · 56-70 moderately severe · 71-90 severe · &gt;90 profound.
       </p>

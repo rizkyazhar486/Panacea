@@ -19,3 +19,7 @@ export { meanArterialPressure, SYSTOLIC_MMHG, DIASTOLIC_MMHG } from './engine/me
 export type { MapResult, MapTone } from './engine/meanArterialPressure'
 export { idealBodyWeight, dailyCalories, IBW_HEIGHT_CM, KCAL_PER_KG } from './engine/idealBodyWeight'
 export type { IdealBodyWeightResult, DailyCaloriesResult, IbwSex, IbwFormula, ActivityLevel } from './engine/idealBodyWeight'
+export { midParentalHeight, PARENT_HEIGHT_CM } from './engine/midParentalHeight'
+export type { MidParentalResult } from './engine/midParentalHeight'
+export { fletcherIndex, THRESHOLD_DB } from './engine/fletcherIndex'
+export type { FletcherResult, FletcherMode, FletcherTone } from './engine/fletcherIndex'

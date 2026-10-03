@@ -293,9 +293,11 @@ risks:
       text moved unchanged and the delta-ratio and Winter thresholds pinned at their boundaries; pH/PaCO2/HCO3
       consistency checking is deliberately not added because it would be a new clinical feature). MapCalc, BrocaCalc and BrocaLorentzCalorieCalc followed through meanArterialPressure/idealBodyWeight/dailyCalories,
       scripts/uji/map-ideal-body-weight.mts; Broca had been copied into two pages and is now one source, and the MAP
-      thresholds are pinned at their boundaries. Next: the rest of the numeric calculators (11 counted on 2026-10-03
-      still read +e.target.value without a domain function: WhoGrowth, WhoNeonate, CdcAnthropometry, BallardSoap,
-      Naegele, Centor, MidParental, Fletcher, McDonald, Paradise, Denver). Noted, not changed: the Broca-Lorentz page
+      thresholds are pinned at their boundaries. MidParentalCalc and FletcherCalc followed through midParentalHeight/fletcherIndex,
+      scripts/uji/mid-parental-fletcher.mts (formulas and class thresholds moved unchanged, pinned at every boundary; empty
+      parent height used to show a 85.5 cm target). Next: the rest of the numeric calculators (9 still read +e.target.value
+      without a domain function: WhoGrowth, WhoNeonate, CdcAnthropometry, BallardSoap, Naegele, Centor, McDonald, Paradise,
+      Denver). Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
