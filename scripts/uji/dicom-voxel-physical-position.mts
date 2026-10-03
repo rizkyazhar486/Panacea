@@ -56,6 +56,17 @@ test('negatif: kursor NaN -> indeks 0 dan mm null, bukan indeks NaN', () => {
   const p = posisiFisikVoxel(volume(SAH), Number.NaN, 2, 2)
   assert.equal(p.xIndex, 0); assert.equal(p.mm, null)
 })
+test('negatif: kursor hingga di luar volume -> mm null tetapi indeks dijepit ke tepi', () => {
+  for (const [x, y, z] of [[-1, 2, 2], [5, 2, 2], [2, -1, 2], [2, 5, 2], [2, 2, -1], [2, 2, 5], [-50, 500, 2]]) {
+    const p = posisiFisikVoxel(volume(SAH), x, y, z)
+    assert.equal(p.mm, null, `${x},${y},${z}`)
+    assert.ok(p.xIndex >= 0 && p.xIndex <= 4 && p.yIndex >= 0 && p.yIndex <= 4 && p.zIndex >= 0 && p.zIndex <= 4)
+  }
+})
+test('batas: tepi sah (0 dan 4, serta 4.4 yang dibulatkan ke 4) tetap punya mm', () => {
+  for (const [x, y, z] of [[0, 0, 0], [4, 4, 4], [4.4, 2, 2], [-0.4, 2, 2]]) assert.notEqual(posisiFisikVoxel(volume(SAH), x, y, z).mm, null, `${x},${y},${z}`)
+  assert.equal(posisiFisikVoxel(volume(SAH), 4.6, 2, 2).mm, null)
+})
 // pasangan: hanya beda pada kondisi yang diuji
 test('pasangan: volume identik, hanya asalSpasi.baris berbeda -> sah vs null', () => {
   assert.notEqual(posisiFisikVoxel(volume(SAH), 1, 1, 1).mm, null)

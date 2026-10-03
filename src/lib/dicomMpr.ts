@@ -347,10 +347,12 @@ export interface PosisiFisikVoxel {
 
 const jepit = (nilai: number, jumlah: number) => (Number.isFinite(nilai) ? Math.max(0, Math.min(jumlah - 1, Math.round(nilai))) : 0)
 
+const dalamVolume = (nilai: number, jumlah: number) => Math.round(nilai) >= 0 && Math.round(nilai) <= jumlah - 1
+
 /**
  * Posisi voxel di bawah kursor dan, bila jaraknya sah, koordinat lokal dalam milimeter
  * (pusat volume = 0; Y naik ke atas). Jarak yang diasumsikan (1 mm pengganti), tidak
- * terbaca, atau tanpa catatan asal TIDAK dipakai: hasil `mm` menjadi null supaya UI
+ * terbaca, tanpa catatan asal, atau kursor di luar volume TIDAK dipakai: hasil `mm` menjadi null supaya UI
  * menampilkan "tidak diketahui", bukan pengukuran buatan.
  */
 export function posisiFisikVoxel(volume: VolumeMpr, x: number, y: number, iris: number): PosisiFisikVoxel {
@@ -360,6 +362,9 @@ export function posisiFisikVoxel(volume: VolumeMpr, x: number, y: number, iris: 
   const asal = volume.asalSpasi
   const sah =
     [x, y, iris].every(Number.isFinite) &&
+    // Indeks di luar volume tetap dijepit untuk menggambar, tetapi bukan posisi terukur:
+    // milimeter dari voxel tepi akan terbaca seolah kursor ada di dalam volume.
+    dalamVolume(x, volume.kolom) && dalamVolume(y, volume.baris) && dalamVolume(iris, volume.kedalaman) &&
     [volume.jarakKolomMm, volume.jarakBarisMm, volume.jarakIrisMm].every((v) => Number.isFinite(v) && v > 0) &&
     asal != null && asal.baris === 'dicom' && asal.kolom === 'dicom' && asal.iris !== 'asumsi'
   if (!sah) return { xIndex, yIndex, zIndex, mm: null }
