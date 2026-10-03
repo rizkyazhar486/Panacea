@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { parklandVolumes } from '../domains/clinical-calculators'
+import { hollidaySegar, parklandVolumes, pedsDose } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -718,27 +718,25 @@ function QsofaCalc() {
 /* ══════════════════ HOLLIDAY-SEGAR MAINTENANCE FLUID ══════════════════ */
 function HollidaySegarCalc() {
   const [weight, setWeight] = useState(20)
-  function mlPerDay(w: number): number {
-    if (w <= 10) return w * 100
-    if (w <= 20) return 1000 + (w - 10) * 50
-    return 1500 + (w - 20) * 20
-  }
-  const daily = mlPerDay(weight)
-  const hourly = daily / 24
+  const fluid = hollidaySegar(weight)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Holliday-Segar (Maintenance Fluid)" subtitle="Classic 4-2-1 formula (Holliday & Segar, 1957)" />
       <Field label="Body Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+      {fluid.ok ? (
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{daily.toFixed(0)}</div>
+          <div className="text-xl font-black text-ink">{fluid.data.mlPerDay.toFixed(0)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL / 24 hours</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{hourly.toFixed(1)}</div>
+          <div className="text-xl font-black text-ink">{fluid.data.mlPerHour.toFixed(1)}</div>
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL / hour (maintenance rate)</div>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{fluid.reason}. No volume is shown until the value is valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10 kg: 100 mL/kg · Second 10 kg: +50 mL/kg · Each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</Prosa>
     </Card>
   )
@@ -1508,9 +1506,7 @@ function PedsDoseCalc() {
   const [freqPerDay, setFreqPerDay] = useState(3)
   const [concMgMl, setConcMgMl] = useState(125 / 5) // e.g. amoxicillin syrup 125mg/5mL
 
-  const totalDailyMg = weight * doseMgKg
-  const perDoseMg = totalDailyMg / freqPerDay
-  const perDoseMl = perDoseMg / concMgMl
+  const dose = pedsDose(weight, doseMgKg, freqPerDay, concMgMl)
 
   return (
     <Card>
@@ -1521,11 +1517,15 @@ function PedsDoseCalc() {
         <Field label="Frequency (times/day)"><input className={inputClass} type="number" value={freqPerDay} onChange={(e) => setFreqPerDay(+e.target.value)} /></Field>
         <Field label="Syrup Concentration (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
       </div>
+      {dose.ok ? (
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{dose.data.totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{dose.data.perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{dose.data.perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{dose.reason}. No dose is shown until all four values are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose (mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide mg/dose across the number of sachets per the prescribed frequency. ALWAYS check against the adult maximum dose & formulary — this calculator does not replace clinical judgment or an official drug reference.</Prosa>
     </Card>
   )
