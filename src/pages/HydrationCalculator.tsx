@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconActivity } from '../components/icons'
 import { getHealthCache, hasHealth } from '../lib/profile'
+import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Daily Hydration Calculator — pure arithmetic, no external API. Baseline is
@@ -19,19 +20,16 @@ import { getHealthCache, hasHealth } from '../lib/profile'
 // should always override a generic calculator.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Intensity = 'none' | 'light' | 'moderate' | 'intense'
-const INTENSITY_ML_PER_HOUR: Record<Intensity, number> = { none: 0, light: 400, moderate: 600, intense: 800 }
-
 function deviceWeight(): number | undefined {
   const v = getHealthCache().weightKg
   return typeof v === 'number' && v > 0 ? v : undefined
 }
 
 export function HydrationCalculator() {
-  const [weightKg, setWeightKg] = useState(() => deviceWeight() ?? 70)
+  const [weightKg, setWeightKg] = useState(() => String(deviceWeight() ?? 70))
   const [weightFromDevice, setWeightFromDevice] = useState(hasHealth('weightKg'))
-  const [exerciseMin, setExerciseMin] = useState(0)
-  const [intensity, setIntensity] = useState<Intensity>('moderate')
+  const [exerciseMin, setExerciseMin] = useState('0')
+  const [intensity, setIntensity] = useState<HydrationIntensity>('moderate')
   const [hotClimate, setHotClimate] = useState(false)
   const [pregnant, setPregnant] = useState(false)
   const [breastfeeding, setBreastfeeding] = useState(false)
@@ -42,29 +40,18 @@ export function HydrationCalculator() {
   useEffect(() => {
     const resync = () => {
       const w = deviceWeight()
-      if (w) { setWeightKg(w); setWeightFromDevice(true) }
+      if (w) { setWeightKg(String(w)); setWeightFromDevice(true) }
     }
     window.addEventListener('focus', resync)
     window.addEventListener('panacea:health-updated', resync)
     return () => { window.removeEventListener('focus', resync); window.removeEventListener('panacea:health-updated', resync) }
   }, [])
 
-  const baseMl = weightKg * 33
-  const exerciseMl = (exerciseMin / 60) * INTENSITY_ML_PER_HOUR[intensity]
-  const climateMl = hotClimate ? 500 : 0
-  const pregnancyMl = pregnant ? 300 : 0
-  const breastfeedingMl = breastfeeding ? 700 : 0
-  const totalMl = baseMl + exerciseMl + climateMl + pregnancyMl + breastfeedingMl
-  const totalL = totalMl / 1000
-  const glasses = Math.round(totalMl / 250)
-
-  const rows = [
-    { label: 'Baseline (33 mL/kg body weight)', ml: baseMl },
-    { label: `Exercise (${exerciseMin} min, ${intensity})`, ml: exerciseMl },
-    { label: 'Hot/humid climate', ml: climateMl },
-    { label: 'Pregnancy', ml: pregnancyMl },
-    { label: 'Breastfeeding', ml: breastfeedingMl },
-  ].filter((r) => r.ml > 0)
+  // Teks mentah: berat kosong tetap "belum diisi" (NaN); menit olahraga kosong = 0 menit (nilai sah).
+  const res = hydrationTarget({
+    weightKg: parseNumberField(weightKg), exerciseMin: exerciseMin.trim() ? parseNumberField(exerciseMin) : 0,
+    intensity, hotClimate, pregnant, breastfeeding,
+  })
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -82,13 +69,13 @@ export function HydrationCalculator() {
       <Card className="!p-5">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={<>Body weight (kg) {weightFromDevice && <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-dark">From Health Profile</span>}</>}>
-            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => { setWeightKg(Number(e.target.value) || 0); setWeightFromDevice(false) }} />
+            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => { setWeightKg(e.target.value); setWeightFromDevice(false) }} />
           </Field>
           <Field label="Exercise today (minutes)">
-            <input className={inputClass} type="number" min={0} max={600} value={exerciseMin} onChange={(e) => setExerciseMin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} max={600} value={exerciseMin} onChange={(e) => setExerciseMin(e.target.value)} />
           </Field>
           <Field label="Exercise intensity">
-            <select className={inputClass} value={intensity} onChange={(e) => setIntensity(e.target.value as Intensity)}>
+            <select className={inputClass} value={intensity} onChange={(e) => setIntensity(e.target.value as HydrationIntensity)}>
               <option value="none">No exercise</option>
               <option value="light">Light (easy walk, gentle yoga)</option>
               <option value="moderate">Moderate (jog, cycling, gym session)</option>
@@ -110,23 +97,29 @@ export function HydrationCalculator() {
       </Card>
 
       <Card className="!p-5">
+        {!res.ok ? (
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        ) : (
+          <>
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your estimated daily target</div>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-3xl font-black text-brand-dark">{totalL.toFixed(1)} L</span>
-          <span className="text-sm font-semibold text-neutral-500">≈ {glasses} glasses (250 mL each)</span>
+          <span className="text-3xl font-black text-brand-dark">{res.data.totalL.toFixed(1)} L</span>
+          <span className="text-sm font-semibold text-neutral-500">≈ {res.data.glasses} glasses (250 mL each)</span>
         </div>
         <div className="mt-4 space-y-1.5">
-          {rows.map((r) => (
+          {res.data.rows.map((r) => (
             <div key={r.label} className="flex items-center gap-2 text-[12px]">
               <span className="w-52 shrink-0 truncate text-neutral-500">{r.label}</span>
               <span className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-100">
-                <span className="block h-full rounded-full bg-sky-400" style={{ width: `${(r.ml / totalMl) * 100}%` }} />
+                <span className="block h-full rounded-full bg-sky-400" style={{ width: `${(r.ml / res.data.totalMl) * 100}%` }} />
               </span>
               <span className="w-14 shrink-0 text-right font-semibold text-neutral-600">{Math.round(r.ml)} mL</span>
             </div>
           ))}
         </div>
         <Prosa kelas="mt-3 text-[11px] text-neutral-500">Sudah termasuk air dari semua minuman dan makanan (sekitar 20% asupan biasanya berasal dari makanan). Sebarkan asupannya sepanjang hari, bukan diminum sekaligus.</Prosa>
+          </>
+        )}
       </Card>
     </div>
   )
