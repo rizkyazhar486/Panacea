@@ -16,13 +16,21 @@ from mathutils.bvhtree import BVHTree
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = argv[argv.index("--out") + 1]
-objs = {o.name: o for o in bpy.context.scene.objects if o.type == 'MESH'}
-body = next(iter(objs.values()))["panacea_body_id"]
+BODY = argv[argv.index("--body") + 1] if "--body" in argv else None
+objs = {o.name: o for o in bpy.context.scene.objects if o.type == 'MESH' and "panacea_body_id" in o
+        and (BODY is None or o["panacea_body_id"] == BODY)}
+body = BODY or next(iter(objs.values()))["panacea_body_id"]
+
+
+def offset(o):
+    """Offset tampilan tubuh (empty ROOT) — koordinat kanonik = dunia − offset."""
+    p = o.parent
+    return p.matrix_world.translation.copy() if p is not None and "panacea_display_offset_m" in p else Vector()
 
 
 def cen(o):
     M = o.matrix_world
-    return sum((M @ v.co for v in o.data.vertices), Vector()) / len(o.data.vertices)
+    return sum((M @ v.co for v in o.data.vertices), Vector()) / len(o.data.vertices) - offset(o)
 
 
 def find(pat):
@@ -67,12 +75,23 @@ for n, o in objs.items():
     x = cen(o).x
     if n.endswith(".L") and x < -0.003: bad.append((n, round(x, 4)))
     if n.endswith(".R") and x > 0.003: bad.append((n, round(x, 4)))
-check("laterality_suffix_matches_side", not bad, bad[:10] or f"{sum(1 for n in objs if n.endswith(('.L','.R')))} paired structures consistent")
+# konflik yang sudah ditinjau & dicatat (panacea_qa_note) dilaporkan terpisah; gagal hanya bila tak terjelaskan
+unexplained = [b for b in bad if not objs[b[0]].get("panacea_qa_note")]
+check("laterality_suffix_matches_side", not unexplained,
+      {"paired": sum(1 for n in objs if n.endswith(('.L', '.R'))), "documented_exceptions": len(bad) - len(unexplained),
+       "unexplained": unexplained[:10]})
 
 # 2 organ asimetris
-def one(p):
-    r = find(p); return r[0] if r else None
-liver, spleen, heart, stomach = one(r"\.LIVER$"), one(r"\.SPLEEN$"), one(r"HEART_WALL$"), one(r"\.STOMACH_WALL$")
+def one(*pats):
+    for p in pats:
+        r = find(p)
+        if r:
+            return max(r, key=lambda o: len(o.data.vertices))
+    return None
+liver = one(r"\.LIVER$", r"DIGESTIVE\.CAPSULE_OF_THE_LIVER$")
+spleen = one(r"\.SPLEEN$")
+heart = one(r"HEART_WALL$", r"CARDIOVASCULAR\.LEFT_VENTRICLE$")
+stomach = one(r"\.STOMACH_WALL$", r"DIGESTIVE\.STOMACH$")
 if liver: check("liver_on_right", cen(liver).x < 0, round(cen(liver).x, 4))
 if spleen: check("spleen_on_left", cen(spleen).x > 0, round(cen(spleen).x, 4))
 if heart: check("heart_left_of_midline", cen(heart).x > -0.005, round(cen(heart).x, 4))
@@ -80,8 +99,9 @@ if stomach: check("stomach_on_left", cen(stomach).x > 0, round(cen(stomach).x, 4
 
 # 3 urutan vertikal
 z = lambda o: cen(o).z if o else None
-brain, bladder = one(r"\.BRAIN$"), one(r"URINARY_BLADDER_WALL$")
-kidneys = find(r"KIDNEY_CORTEX\.[LR]$") or find(r"KIDNEY.*CORTEX")
+brain = one(r"\.BRAIN$", r"WHITE_MATTER_OF_TELENCEPHALON$", r"NERVOUS\.CORPUS_CALLOSUM\.[LR]$")
+bladder = one(r"URINARY_BLADDER_WALL$", r"URINARY\.URINARY_BLADDER$", r"FUNDUS_OF_URINARY_BLADDER_DOME$")
+kidneys = find(r"KIDNEY_CORTEX\.[LR]$") or find(r"URINARY\.KIDNEY\.[LR]$") or find(r"KIDNEY_CAPSULE\.[LR]$")
 zs = {"brain": z(brain), "heart": z(heart), "liver": z(liver), "kidney": (sum(z(k) for k in kidneys) / len(kidneys)) if kidneys else None, "bladder": z(bladder)}
 order_ok = all(zs[a] is not None and zs[b] is not None and zs[a] > zs[b] for a, b in [("brain", "heart"), ("heart", "liver"), ("liver", "bladder"), ("kidney", "bladder")])
 check("vertical_organ_order", order_ok, {k: (round(v, 3) if v else None) for k, v in zs.items()})
@@ -89,24 +109,27 @@ feet = min((o.matrix_world @ Vector(c)).z for o in objs.values() for c in o.boun
 check("feet_on_ground", abs(feet) < 0.005, round(feet, 4))
 
 # 4 relasi rongga
-ribs = one(r"RIBS_CORTICAL$")
+ribs = find(r"RIBS_CORTICAL$") or find(r"SKELETAL\.\w+_RIB\.[LR]$")
 if ribs and heart:
-    rz = [(ribs.matrix_world @ Vector(c)).z for c in ribs.bound_box]
+    rz = [(r.matrix_world @ Vector(c)).z for r in ribs for c in r.bound_box]
     check("heart_within_ribcage_height", min(rz) < z(heart) < max(rz), {"heart_z": round(z(heart), 3), "ribs_z": [round(min(rz), 3), round(max(rz), 3)]})
-cranium = one(r"CRANIUM_CORTICAL$")
+cranium = find(r"CRANIUM_CORTICAL$") or find(r"SKELETAL\.(FRONTAL_BONE|OCCIPITAL_BONE|PARIETAL_BONE\.[LR]|SPHENOID_BONE|TEMPORAL_BONE\.[LR])$")
 if cranium and brain:
-    cb = [cranium.matrix_world @ Vector(c) for c in cranium.bound_box]; bb = [brain.matrix_world @ Vector(c) for c in brain.bound_box]
+    cb = [cr.matrix_world @ Vector(c) for cr in cranium for c in cr.bound_box]; bb = [brain.matrix_world @ Vector(c) for c in brain.bound_box]
     inside = all(min(p[i] for p in cb) - 0.002 <= min(p[i] for p in bb) and max(p[i] for p in bb) <= max(p[i] for p in cb) + 0.002 for i in range(3))
     check("brain_within_cranium_bounds", inside, "bbox containment")
 
 # 5 interpenetrasi organ besar
-pairs = [(r"\.LIVER$", r"HEART_WALL$"), (r"\.LIVER$", r"STOMACH_WALL$"), (r"HEART_WALL$", r"LUNG\.L$"), (r"HEART_WALL$", r"LUNG\.R$"),
-         (r"KIDNEY_CORTEX\.L$", r"\.SPLEEN$"), (r"\.LIVER$", r"KIDNEY_CORTEX\.R$"), (r"URINARY_BLADDER_WALL$", r"RECTUM_WALL$")]
+LIV = (r"\.LIVER$", r"DIGESTIVE\.CAPSULE_OF_THE_LIVER$"); HRT = (r"HEART_WALL$", r"CARDIOVASCULAR\.LEFT_VENTRICLE$")
+LL = (r"LUNG\.L$", r"INFERIOR_LOBE_OF_LEFT_LUNG$"); LR = (r"LUNG\.R$", r"INFERIOR_LOBE_OF_RIGHT_LUNG$")
+KL = (r"KIDNEY_CORTEX\.L$", r"URINARY\.KIDNEY\.L$", r"OUTER_CORTEX_OF_KIDNEY\.L$"); KR = (r"KIDNEY_CORTEX\.R$", r"URINARY\.KIDNEY\.R$", r"OUTER_CORTEX_OF_KIDNEY\.R$")
+STO = (r"\.STOMACH_WALL$", r"DIGESTIVE\.STOMACH$"); BLD = (r"URINARY_BLADDER_WALL$", r"URINARY\.URINARY_BLADDER$"); REC = (r"RECTUM_WALL$", r"DIGESTIVE\.RECTUM$", r"SIGMOID_COLON$")
+pairs = [(LIV, HRT), (LIV, STO), (HRT, LL), (HRT, LR), (KL, (r"\.SPLEEN$",)), (LIV, KR), (BLD, REC)]
 pen = {}
 for a, b in pairs:
-    A, Bo = one(a), one(b)
+    A, Bo = one(*a), one(*b)
     if A and Bo:
-        f = inside_frac(A, Bo); pen[f"{A.name.split('.')[-1]}|{Bo.name.split('.', 3)[-1]}"] = f
+        f = inside_frac(A, Bo); pen[f"{A.name.split('.', 2)[-1]}|{Bo.name.split('.', 2)[-1]}"] = f
 check("no_gross_organ_interpenetration", all(v <= 0.05 for v in pen.values()), pen)
 json.dump(res, open(OUT, "w"), indent=1)
 print("QA", body, "failures:", res["failures"])

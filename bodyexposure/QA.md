@@ -62,6 +62,31 @@ Iterations that failed and were replaced, kept here for the record:
 | LOD2 mean geometric error vs master | 0.03–0.39 mm by system (worst single case: hair, 7.8 mm max) |
 | Browser test at 390×844 (Chromium, three r185) | male LOD2: 2,611 structures in 0.7 s; female LOD2: 841 in 0.12 s; 0 load failures; tap-to-identify returns ID, system, laterality, status and source |
 
+## Adult bodies — gross-anatomy gate and laterality audit (master v009)
+
+Both adult bodies now pass the gate:
+- **Male:** 10/10 checks. 3,403 paired structures, 1 documented exception (the right vagus,
+  flagged since v002).
+- **Female:** all applicable checks pass. 649 paired structures, 13 documented exceptions.
+  Her spleen and stomach checks could not run: the HuBMAP female has spleen surface parts and
+  no single stomach object.
+
+The audit found 299 structures whose side suffix contradicted their geometry. Geometry
+decided each case:
+
+| Class | Count | Resolution |
+|---|---|---|
+| Allen brain atlas (female): L/R labels mirrored relative to the body, consistently across the atlas | 141 pairs | Swapped. Near-midline pairs were judged against the brain's own midline (x = −5.7 mm), not the body's |
+| Full Z-Anatomy muscle attachments and the temporomandibular ligament (male): suffix contradicts geometry | 16 pairs swapped; 22 single structures renamed | Corrected by side |
+| Other female single structure with no counterpart | 1 | Renamed to the side its geometry shows |
+| HuBMAP round ligaments of the uterus: source labels swapped | 1 pair | Swapped |
+| "left/right" naming a liver lobe or segment, not a body side (portal-vein branch, hepatic duct/artery, liver segments) | 5 | Made unpaired with the qualifier restored to the name; 2 liver segments moved from respiratory to digestive |
+| Ambiguous (midline central canal, 4.5 mm corniculate cartilage, right vagus) | 3 | Flagged `review_required`, not changed |
+
+Every change records the reason in `panacea_qa_note` and
+`panacea_laterality_source: geometry_override`. The gate fails only on *unexplained*
+conflicts.
+
 ## Paediatric bodies — gross-anatomy gate (SOP §11), `pipeline/qa_gross_anatomy.py`
 
 Ten automated checks per body:

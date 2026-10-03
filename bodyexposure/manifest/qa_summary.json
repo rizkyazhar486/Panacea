@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T11:30:45",
-  "master": "PANACEA_HUMAN_MASTER_v008.blend",
+  "generated": "2026-10-03T15:30:14",
+  "master": "PANACEA_HUMAN_MASTER_v009.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -16,10 +16,10 @@
    "nonmanifold_meshes": 0
   },
   "HUMAN.ADULT.FEMALE|digestive": {
-   "structures": 50,
-   "verts": 79981,
-   "tris": 156006,
-   "open_meshes": 49,
+   "structures": 52,
+   "verts": 82287,
+   "tris": 160364,
+   "open_meshes": 51,
    "nonmanifold_meshes": 0
   },
   "HUMAN.ADULT.FEMALE|joint": {
@@ -58,10 +58,10 @@
    "nonmanifold_meshes": 2
   },
   "HUMAN.ADULT.FEMALE|respiratory": {
-   "structures": 73,
-   "verts": 205696,
-   "tris": 405073,
-   "open_meshes": 66,
+   "structures": 71,
+   "verts": 203390,
+   "tris": 400715,
+   "open_meshes": 64,
    "nonmanifold_meshes": 2
   },
   "HUMAN.ADULT.FEMALE|sensory": {

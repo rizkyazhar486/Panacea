@@ -31,6 +31,25 @@ try {
       // ketuk di kanvas tidak boleh melempar galat; mode isolate
       await page.getByRole('button', { name: 'isolate' }).click()
       await page.screenshot({ path: `/private/tmp/canonical-${width}-${theme}.png`, fullPage: true })
+      // alat interaksi: potongan, dispersi, ukur
+      await page.getByRole('button', { name: 'normal' }).click()
+      await page.getByRole('radio', { name: 'sagittal' }).click()
+      await page.getByLabel('Section position').fill('0.3')
+      await page.getByRole('radio', { name: 'Off' }).click()
+      await page.getByLabel('Disperse systems').fill('1')
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `/private/tmp/canonical-disperse-${width}-${theme}.png`, fullPage: true })
+      await page.getByLabel('Disperse systems').fill('0')
+      await page.getByTestId('canonical-body-canvas').scrollIntoViewIfNeeded()
+      await page.getByRole('button', { name: 'Measure', exact: true }).click()
+      const cv = await page.getByTestId('canonical-body-canvas').boundingBox()
+      for (const fy of [0.3, 0.45]) {  // dada → abdomen; di garis tengah 0.6 jatuh di celah antarpaha
+        await page.mouse.click(cv.x + cv.width / 2, cv.y + cv.height * fy)
+        await page.waitForTimeout(250)
+      }
+      const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
+      assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
+      await page.getByRole('button', { name: 'Stop measuring' }).click()
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })

@@ -1,0 +1,49 @@
+{
+ "body": "HUMAN.ADULT.FEMALE",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 649,
+    "documented_exceptions": 13,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.0307
+  },
+  {
+   "check": "heart_left_of_midline",
+   "ok": true,
+   "detail": 0.0629
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "detail": {
+    "brain": 1.596,
+    "heart": 1.228,
+    "liver": 1.133,
+    "kidney": 1.039,
+    "bladder": 0.814
+   }
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "DIGESTIVE.CAPSULE_OF_THE_LIVER|CARDIOVASCULAR.LEFT_VENTRICLE": 0.003,
+    "DIGESTIVE.CAPSULE_OF_THE_LIVER|URINARY.OUTER_CORTEX_OF_KIDNEY.R": 0.0
+   }
+  }
+ ],
+ "failures": []
+}
