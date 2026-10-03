@@ -57,3 +57,5 @@ export { serumOsmolality, osmBand, gapBand, OSM_RANGES } from './engine/serumOsm
 export type { OsmInput, OsmResult, OsmTone } from './engine/serumOsmolality'
 export { sofaScore, respPts, coagPts, liverPts, renalPts, cnsPts, mortalityBand as sofaMortalityBand, SOFA_RANGES } from './engine/sofaScore'
 export type { SofaInput, SofaResult, SofaBand, CvLevel } from './engine/sofaScore'
+export { correctedCalcium, calciumBand, CA_RANGES, PAYNE_SLOPE, PAYNE_REFERENCE_ALBUMIN_G_DL } from './engine/correctedCalcium'
+export type { CorrectedCalciumInput, CorrectedCalciumResult, CalciumBand, CalciumTone } from './engine/correctedCalcium'

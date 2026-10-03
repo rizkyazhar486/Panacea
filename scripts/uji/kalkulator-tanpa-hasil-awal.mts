@@ -20,20 +20,22 @@ const kodeDari = (s: string) => s.split('\n').filter((b) => !b.trim().startsWith
 // ── Corrected Calcium (Payne 1973) ─────────────────────────────────────────
 const ca = baca('CorrectedCalcium.tsx')
 const caKode = kodeDari(ca)
-assert.ok(/useState\(0\)[\s\S]{0,120}useState\(0\)/.test(caKode),
+assert.ok(/useState\(''\)[\s\S]{0,120}useState\(''\)/.test(caKode),
   'calcium or albumin has a starting value again; both are laboratory results')
-assert.ok(!/useState\(8\.0\)/.test(caKode) && !/useState\(2\.5\)/.test(caKode),
+assert.ok(!/useState\(8\.0\)/.test(caKode) && !/useState\(2\.5\)/.test(caKode) && !/useState\('8/.test(caKode) && !/useState\('2\.5'/.test(caKode),
   'the 8.0 mg/dL calcium or 2.5 g/dL albumin default is back')
-assert.ok(/const lengkap = totalCa > 0 && albumin > 0/.test(caKode), 'the page computes without both values')
-assert.ok(/const totalBand = lengkap \? band\(totalCa\) : null/.test(caKode),
-  'band() can still be called on an empty field, where it answers "Severe hypocalcemia"')
+assert.ok(/correctedCalcium\(\{ totalCa: parseNumberField\(totalCa\), albumin: parseNumberField\(albumin\) \}\)/.test(caKode),
+  'the page computes without going through the validated domain function')
+assert.ok(!/\|\| 0\)/.test(caKode), 'an empty calcium or albumin field reads as 0 again')
 assert.ok(/Nothing is calculated yet/.test(ca), 'the page no longer says it is waiting')
 assert.ok(/an empty field is not a value of zero/.test(ca), 'the page no longer explains why')
 
-// Rumus Payne ditulis ulang di sini, bukan dicerminkan dari halamannya.
+// Rumus Payne ditulis ulang di sini, bukan dicerminkan dari mesinnya; kini hidup di domain.
 const payne = (total: number, alb: number) => total + 0.8 * (4.0 - alb)
 assert.ok(Math.abs(payne(7.6, 2.0) - 9.2) < 1e-9, 'the Payne correction is not what this gate thinks it is')
-assert.ok(/totalCa \+ 0\.8 \* \(4\.0 - albumin\)/.test(caKode), 'the page no longer applies the Payne correction')
+const caEngine = kodeDari(readFileSync(new URL('../../src/domains/clinical-calculators/engine/correctedCalcium.ts', import.meta.url), 'utf8'))
+assert.ok(/totalCa \+ PAYNE_SLOPE \* \(PAYNE_REFERENCE_ALBUMIN_G_DL - albumin\)/.test(caEngine) && /PAYNE_SLOPE = 0\.8/.test(caEngine) && /PAYNE_REFERENCE_ALBUMIN_G_DL = 4\.0/.test(caEngine),
+  'the engine no longer applies the Payne correction')
 
 // ── MELD-Na (Kamath 2001; Kim 2008; OPTN 2016) ─────────────────────────────
 const meld = baca('MeldScore.tsx')
