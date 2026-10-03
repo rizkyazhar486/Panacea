@@ -62,7 +62,20 @@ Iterations that failed and were replaced, kept here for the record:
 | LOD2 mean geometric error vs master | 0.03–0.39 mm by system (worst single case: hair, 7.8 mm max) |
 | Browser test at 390×844 (Chromium, three r185) | male LOD2: 2,611 structures in 0.7 s; female LOD2: 841 in 0.12 s; 0 load failures; tap-to-identify returns ID, system, laterality, status and source |
 
-## Defects found in this pass and fixed
+## Pass v007
+
+- **Joint capsule reconstruction: attempted and rejected.** Distance-rule attachment regions
+  produced a cap over the femoral head and acetabulum instead of a sleeve from the
+  acetabular rim to the intertrochanteric line. The objects were deleted, not shipped. Real
+  source capsules were then found in the full Z-Anatomy model and used instead.
+- Knee, reviewed anterior and posterior: the cruciate ligaments cross in the intercondylar
+  notch; the menisci sit on the tibial plateau; the collateral and popliteofibular ligaments
+  are in place.
+- Femur and hip bone attachments: the vastus intermedius origin covers the anterior shaft,
+  the iliacus origin the iliac fossa, and the adductor and pectineus origins the pubic region.
+- Source discs: 0 vertices left inside bone after correction (14–33 % before).
+
+## Defects found in the previous pass and fixed
 
 1. **Female frame mismatch.** The spinal cord and breast tissue added later sat 1.2 m to the
    side and 0.67 m low. They were imported at source coordinates while the rest of the

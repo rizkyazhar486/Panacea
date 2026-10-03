@@ -1,8 +1,8 @@
 [
  {
   "file": "adult_female.cardiovascular.LOD0.glb",
-  "bytes_raw": 6917484,
-  "bytes_packed": 1446404,
+  "bytes_raw": 6925676,
+  "bytes_packed": 1454596,
   "nodes": 135,
   "names_preserved": true,
   "extensions": [
@@ -14,8 +14,8 @@
  },
  {
   "file": "adult_female.cardiovascular.LOD1.glb",
-  "bytes_raw": 3653400,
-  "bytes_packed": 868468,
+  "bytes_raw": 3661592,
+  "bytes_packed": 876660,
   "nodes": 135,
   "names_preserved": true,
   "extensions": [
@@ -27,8 +27,8 @@
  },
  {
   "file": "adult_female.cardiovascular.LOD2.glb",
-  "bytes_raw": 1677492,
-  "bytes_packed": 509404,
+  "bytes_raw": 1685684,
+  "bytes_packed": 517596,
   "nodes": 135,
   "names_preserved": true,
   "extensions": [
@@ -40,8 +40,8 @@
  },
  {
   "file": "adult_female.cardiovascular.LOD3.glb",
-  "bytes_raw": 857896,
-  "bytes_packed": 356604,
+  "bytes_raw": 866088,
+  "bytes_packed": 364796,
   "nodes": 135,
   "names_preserved": true,
   "extensions": [
@@ -53,8 +53,8 @@
  },
  {
   "file": "adult_female.digestive.LOD0.glb",
-  "bytes_raw": 1572196,
-  "bytes_packed": 474700,
+  "bytes_raw": 1576524,
+  "bytes_packed": 479024,
   "nodes": 50,
   "names_preserved": true,
   "extensions": [
@@ -66,8 +66,8 @@
  },
  {
   "file": "adult_female.digestive.LOD1.glb",
-  "bytes_raw": 850216,
-  "bytes_packed": 290948,
+  "bytes_raw": 854544,
+  "bytes_packed": 295276,
   "nodes": 50,
   "names_preserved": true,
   "extensions": [
@@ -79,8 +79,8 @@
  },
  {
   "file": "adult_female.digestive.LOD2.glb",
-  "bytes_raw": 420724,
-  "bytes_packed": 177756,
+  "bytes_raw": 425048,
+  "bytes_packed": 182084,
   "nodes": 50,
   "names_preserved": true,
   "extensions": [
@@ -92,8 +92,8 @@
  },
  {
   "file": "adult_female.digestive.LOD3.glb",
-  "bytes_raw": 236352,
-  "bytes_packed": 127412,
+  "bytes_raw": 240676,
+  "bytes_packed": 131736,
   "nodes": 50,
   "names_preserved": true,
   "extensions": [
@@ -105,8 +105,8 @@
  },
  {
   "file": "adult_female.joint.LOD0.glb",
-  "bytes_raw": 278456,
-  "bytes_packed": 110620,
+  "bytes_raw": 279756,
+  "bytes_packed": 111916,
   "nodes": 28,
   "names_preserved": true,
   "extensions": [
@@ -118,8 +118,8 @@
  },
  {
   "file": "adult_female.joint.LOD1.glb",
-  "bytes_raw": 178040,
-  "bytes_packed": 84284,
+  "bytes_raw": 179340,
+  "bytes_packed": 85580,
   "nodes": 28,
   "names_preserved": true,
   "extensions": [
@@ -131,8 +131,8 @@
  },
  {
   "file": "adult_female.joint.LOD2.glb",
-  "bytes_raw": 118412,
-  "bytes_packed": 67704,
+  "bytes_raw": 119708,
+  "bytes_packed": 69004,
   "nodes": 28,
   "names_preserved": true,
   "extensions": [
@@ -144,8 +144,8 @@
  },
  {
   "file": "adult_female.joint.LOD3.glb",
-  "bytes_raw": 90256,
-  "bytes_packed": 60080,
+  "bytes_raw": 91552,
+  "bytes_packed": 61380,
   "nodes": 28,
   "names_preserved": true,
   "extensions": [
@@ -157,8 +157,8 @@
  },
  {
   "file": "adult_female.lymphatic.LOD0.glb",
-  "bytes_raw": 133252,
-  "bytes_packed": 45624,
+  "bytes_raw": 133560,
+  "bytes_packed": 45932,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -170,8 +170,8 @@
  },
  {
   "file": "adult_female.lymphatic.LOD1.glb",
-  "bytes_raw": 76448,
-  "bytes_packed": 30872,
+  "bytes_raw": 76756,
+  "bytes_packed": 31180,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -183,8 +183,8 @@
  },
  {
   "file": "adult_female.lymphatic.LOD2.glb",
-  "bytes_raw": 42020,
-  "bytes_packed": 21604,
+  "bytes_raw": 42328,
+  "bytes_packed": 21912,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -196,8 +196,8 @@
  },
  {
   "file": "adult_female.lymphatic.LOD3.glb",
-  "bytes_raw": 26188,
-  "bytes_packed": 17200,
+  "bytes_raw": 26496,
+  "bytes_packed": 17508,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -261,8 +261,8 @@
  },
  {
   "file": "adult_female.nervous.LOD0.glb",
-  "bytes_raw": 10774100,
-  "bytes_packed": 2771312,
+  "bytes_raw": 10786668,
+  "bytes_packed": 2783880,
   "nodes": 302,
   "names_preserved": true,
   "extensions": [
@@ -276,8 +276,8 @@
  },
  {
   "file": "adult_female.nervous.LOD1.glb",
-  "bytes_raw": 6024136,
-  "bytes_packed": 1710352,
+  "bytes_raw": 6036704,
+  "bytes_packed": 1722920,
   "nodes": 302,
   "names_preserved": true,
   "extensions": [
@@ -291,8 +291,8 @@
  },
  {
   "file": "adult_female.nervous.LOD2.glb",
-  "bytes_raw": 3341864,
-  "bytes_packed": 1109756,
+  "bytes_raw": 3354432,
+  "bytes_packed": 1122324,
   "nodes": 302,
   "names_preserved": true,
   "extensions": [
@@ -306,8 +306,8 @@
  },
  {
   "file": "adult_female.nervous.LOD3.glb",
-  "bytes_raw": 2222536,
-  "bytes_packed": 849732,
+  "bytes_raw": 2235104,
+  "bytes_packed": 862300,
   "nodes": 302,
   "names_preserved": true,
   "extensions": [
@@ -321,8 +321,8 @@
  },
  {
   "file": "adult_female.reproductive.LOD0.glb",
-  "bytes_raw": 20414788,
-  "bytes_packed": 3853576,
+  "bytes_raw": 20418708,
+  "bytes_packed": 3857484,
   "nodes": 54,
   "names_preserved": true,
   "extensions": [
@@ -334,8 +334,8 @@
  },
  {
   "file": "adult_female.reproductive.LOD1.glb",
-  "bytes_raw": 9690352,
-  "bytes_packed": 2071840,
+  "bytes_raw": 9694272,
+  "bytes_packed": 2075752,
   "nodes": 54,
   "names_preserved": true,
   "extensions": [
@@ -347,8 +347,8 @@
  },
  {
   "file": "adult_female.reproductive.LOD2.glb",
-  "bytes_raw": 4039624,
-  "bytes_packed": 930096,
+  "bytes_raw": 4043548,
+  "bytes_packed": 934008,
   "nodes": 54,
   "names_preserved": true,
   "extensions": [
@@ -360,8 +360,8 @@
  },
  {
   "file": "adult_female.reproductive.LOD3.glb",
-  "bytes_raw": 1711272,
-  "bytes_packed": 444780,
+  "bytes_raw": 1715192,
+  "bytes_packed": 448692,
   "nodes": 54,
   "names_preserved": true,
   "extensions": [
@@ -373,8 +373,8 @@
  },
  {
   "file": "adult_female.respiratory.LOD0.glb",
-  "bytes_raw": 5749032,
-  "bytes_packed": 1091912,
+  "bytes_raw": 5750252,
+  "bytes_packed": 1093132,
   "nodes": 73,
   "names_preserved": true,
   "extensions": [
@@ -386,8 +386,8 @@
  },
  {
   "file": "adult_female.respiratory.LOD1.glb",
-  "bytes_raw": 2553064,
-  "bytes_packed": 624332,
+  "bytes_raw": 2554284,
+  "bytes_packed": 625552,
   "nodes": 73,
   "names_preserved": true,
   "extensions": [
@@ -399,8 +399,8 @@
  },
  {
   "file": "adult_female.respiratory.LOD2.glb",
-  "bytes_raw": 1153124,
-  "bytes_packed": 341268,
+  "bytes_raw": 1154344,
+  "bytes_packed": 342488,
   "nodes": 73,
   "names_preserved": true,
   "extensions": [
@@ -412,8 +412,8 @@
  },
  {
   "file": "adult_female.respiratory.LOD3.glb",
-  "bytes_raw": 572624,
-  "bytes_packed": 220844,
+  "bytes_raw": 573844,
+  "bytes_packed": 222064,
   "nodes": 73,
   "names_preserved": true,
   "extensions": [
@@ -425,8 +425,8 @@
  },
  {
   "file": "adult_female.sensory.LOD0.glb",
-  "bytes_raw": 9082272,
-  "bytes_packed": 2041924,
+  "bytes_raw": 9086576,
+  "bytes_packed": 2046228,
   "nodes": 62,
   "names_preserved": true,
   "extensions": [
@@ -440,8 +440,8 @@
  },
  {
   "file": "adult_female.sensory.LOD1.glb",
-  "bytes_raw": 4650592,
-  "bytes_packed": 1121632,
+  "bytes_raw": 4654896,
+  "bytes_packed": 1125936,
   "nodes": 62,
   "names_preserved": true,
   "extensions": [
@@ -455,8 +455,8 @@
  },
  {
   "file": "adult_female.sensory.LOD2.glb",
-  "bytes_raw": 1990452,
-  "bytes_packed": 541112,
+  "bytes_raw": 1994756,
+  "bytes_packed": 545416,
   "nodes": 62,
   "names_preserved": true,
   "extensions": [
@@ -470,8 +470,8 @@
  },
  {
   "file": "adult_female.sensory.LOD3.glb",
-  "bytes_raw": 899676,
-  "bytes_packed": 294132,
+  "bytes_raw": 903980,
+  "bytes_packed": 298436,
   "nodes": 62,
   "names_preserved": true,
   "extensions": [
@@ -485,8 +485,8 @@
  },
  {
   "file": "adult_female.skeletal.LOD0.glb",
-  "bytes_raw": 1156712,
-  "bytes_packed": 353344,
+  "bytes_raw": 1158260,
+  "bytes_packed": 354892,
   "nodes": 38,
   "names_preserved": true,
   "extensions": [
@@ -498,8 +498,8 @@
  },
  {
   "file": "adult_female.skeletal.LOD1.glb",
-  "bytes_raw": 631860,
-  "bytes_packed": 217596,
+  "bytes_raw": 633408,
+  "bytes_packed": 219144,
   "nodes": 38,
   "names_preserved": true,
   "extensions": [
@@ -511,8 +511,8 @@
  },
  {
   "file": "adult_female.skeletal.LOD2.glb",
-  "bytes_raw": 314872,
-  "bytes_packed": 133220,
+  "bytes_raw": 316420,
+  "bytes_packed": 134768,
   "nodes": 38,
   "names_preserved": true,
   "extensions": [
@@ -524,8 +524,8 @@
  },
  {
   "file": "adult_female.skeletal.LOD3.glb",
-  "bytes_raw": 179364,
-  "bytes_packed": 96456,
+  "bytes_raw": 180912,
+  "bytes_packed": 98004,
   "nodes": 38,
   "names_preserved": true,
   "extensions": [
@@ -537,8 +537,8 @@
  },
  {
   "file": "adult_female.surface.LOD0.glb",
-  "bytes_raw": 1495244,
-  "bytes_packed": 277344,
+  "bytes_raw": 1495364,
+  "bytes_packed": 277460,
   "nodes": 1,
   "names_preserved": true,
   "extensions": [
@@ -550,8 +550,8 @@
  },
  {
   "file": "adult_female.surface.LOD1.glb",
-  "bytes_raw": 749128,
-  "bytes_packed": 144992,
+  "bytes_raw": 749248,
+  "bytes_packed": 145108,
   "nodes": 1,
   "names_preserved": true,
   "extensions": [
@@ -563,8 +563,8 @@
  },
  {
   "file": "adult_female.surface.LOD2.glb",
-  "bytes_raw": 301472,
-  "bytes_packed": 61936,
+  "bytes_raw": 301588,
+  "bytes_packed": 62056,
   "nodes": 1,
   "names_preserved": true,
   "extensions": [
@@ -576,8 +576,8 @@
  },
  {
   "file": "adult_female.surface.LOD3.glb",
-  "bytes_raw": 122376,
-  "bytes_packed": 27512,
+  "bytes_raw": 122496,
+  "bytes_packed": 27632,
   "nodes": 1,
   "names_preserved": true,
   "extensions": [
@@ -589,8 +589,8 @@
  },
  {
   "file": "adult_female.urinary.LOD0.glb",
-  "bytes_raw": 2570684,
-  "bytes_packed": 766576,
+  "bytes_raw": 2571508,
+  "bytes_packed": 767400,
   "nodes": 87,
   "names_preserved": true,
   "extensions": [
@@ -602,8 +602,8 @@
  },
  {
   "file": "adult_female.urinary.LOD1.glb",
-  "bytes_raw": 1401164,
-  "bytes_packed": 473964,
+  "bytes_raw": 1401988,
+  "bytes_packed": 474788,
   "nodes": 87,
   "names_preserved": true,
   "extensions": [
@@ -615,8 +615,8 @@
  },
  {
   "file": "adult_female.urinary.LOD2.glb",
-  "bytes_raw": 696932,
-  "bytes_packed": 292360,
+  "bytes_raw": 697756,
+  "bytes_packed": 293184,
   "nodes": 87,
   "names_preserved": true,
   "extensions": [
@@ -628,8 +628,8 @@
  },
  {
   "file": "adult_female.urinary.LOD3.glb",
-  "bytes_raw": 398464,
-  "bytes_packed": 213084,
+  "bytes_raw": 399288,
+  "bytes_packed": 213908,
   "nodes": 87,
   "names_preserved": true,
   "extensions": [
@@ -641,8 +641,8 @@
  },
  {
   "file": "adult_male.cardiovascular.LOD0.glb",
-  "bytes_raw": 37493612,
-  "bytes_packed": 8702244,
+  "bytes_raw": 37603780,
+  "bytes_packed": 8812412,
   "nodes": 677,
   "names_preserved": true,
   "extensions": [
@@ -654,8 +654,8 @@
  },
  {
   "file": "adult_male.cardiovascular.LOD1.glb",
-  "bytes_raw": 19999668,
-  "bytes_packed": 5101304,
+  "bytes_raw": 20109836,
+  "bytes_packed": 5211472,
   "nodes": 677,
   "names_preserved": true,
   "extensions": [
@@ -667,8 +667,8 @@
  },
  {
   "file": "adult_male.cardiovascular.LOD2.glb",
-  "bytes_raw": 9394404,
-  "bytes_packed": 2764128,
+  "bytes_raw": 9504572,
+  "bytes_packed": 2874296,
   "nodes": 677,
   "names_preserved": true,
   "extensions": [
@@ -680,8 +680,8 @@
  },
  {
   "file": "adult_male.cardiovascular.LOD3.glb",
-  "bytes_raw": 5064884,
-  "bytes_packed": 1764784,
+  "bytes_raw": 5175052,
+  "bytes_packed": 1874952,
   "nodes": 677,
   "names_preserved": true,
   "extensions": [
@@ -693,8 +693,8 @@
  },
  {
   "file": "adult_male.digestive.LOD0.glb",
-  "bytes_raw": 4731884,
-  "bytes_packed": 1243644,
+  "bytes_raw": 4737436,
+  "bytes_packed": 1249192,
   "nodes": 77,
   "names_preserved": true,
   "extensions": [
@@ -706,8 +706,8 @@
  },
  {
   "file": "adult_male.digestive.LOD1.glb",
-  "bytes_raw": 2447908,
-  "bytes_packed": 710308,
+  "bytes_raw": 2453456,
+  "bytes_packed": 715856,
   "nodes": 77,
   "names_preserved": true,
   "extensions": [
@@ -719,8 +719,8 @@
  },
  {
   "file": "adult_male.digestive.LOD2.glb",
-  "bytes_raw": 1081296,
-  "bytes_packed": 370204,
+  "bytes_raw": 1086844,
+  "bytes_packed": 375752,
   "nodes": 77,
   "names_preserved": true,
   "extensions": [
@@ -732,8 +732,8 @@
  },
  {
   "file": "adult_male.digestive.LOD3.glb",
-  "bytes_raw": 532704,
-  "bytes_packed": 226908,
+  "bytes_raw": 538252,
+  "bytes_packed": 232456,
   "nodes": 77,
   "names_preserved": true,
   "extensions": [
@@ -745,8 +745,8 @@
  },
  {
   "file": "adult_male.endocrine.LOD0.glb",
-  "bytes_raw": 128932,
-  "bytes_packed": 46808,
+  "bytes_raw": 130544,
+  "bytes_packed": 48420,
   "nodes": 10,
   "names_preserved": true,
   "extensions": [
@@ -758,8 +758,8 @@
  },
  {
   "file": "adult_male.endocrine.LOD1.glb",
-  "bytes_raw": 77776,
-  "bytes_packed": 32916,
+  "bytes_raw": 79384,
+  "bytes_packed": 34528,
   "nodes": 10,
   "names_preserved": true,
   "extensions": [
@@ -771,8 +771,8 @@
  },
  {
   "file": "adult_male.endocrine.LOD2.glb",
-  "bytes_raw": 48504,
-  "bytes_packed": 24728,
+  "bytes_raw": 50116,
+  "bytes_packed": 26336,
   "nodes": 10,
   "names_preserved": true,
   "extensions": [
@@ -784,8 +784,8 @@
  },
  {
   "file": "adult_male.endocrine.LOD3.glb",
-  "bytes_raw": 31064,
-  "bytes_packed": 19836,
+  "bytes_raw": 32672,
+  "bytes_packed": 21448,
   "nodes": 10,
   "names_preserved": true,
   "extensions": [
@@ -797,112 +797,112 @@
  },
  {
   "file": "adult_male.fascia.LOD0.glb",
-  "bytes_raw": 1579168,
-  "bytes_packed": 430680,
-  "nodes": 39,
+  "bytes_raw": 3174576,
+  "bytes_packed": 903776,
+  "nodes": 93,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 39
+  "extras_on_nodes": 93
  },
  {
   "file": "adult_male.fascia.LOD1.glb",
-  "bytes_raw": 846028,
-  "bytes_packed": 253444,
-  "nodes": 39,
+  "bytes_raw": 1743008,
+  "bytes_packed": 555632,
+  "nodes": 93,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 39
+  "extras_on_nodes": 93
  },
  {
   "file": "adult_male.fascia.LOD2.glb",
-  "bytes_raw": 402704,
-  "bytes_packed": 144032,
-  "nodes": 39,
+  "bytes_raw": 864900,
+  "bytes_packed": 335080,
+  "nodes": 93,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 39
+  "extras_on_nodes": 93
  },
  {
   "file": "adult_male.fascia.LOD3.glb",
-  "bytes_raw": 209516,
-  "bytes_packed": 94948,
-  "nodes": 39,
+  "bytes_raw": 479496,
+  "bytes_packed": 235160,
+  "nodes": 93,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 39
+  "extras_on_nodes": 93
  },
  {
   "file": "adult_male.joint.LOD0.glb",
-  "bytes_raw": 374880,
-  "bytes_packed": 125200,
-  "nodes": 23,
+  "bytes_raw": 4400640,
+  "bytes_packed": 1593340,
+  "nodes": 413,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 23
+  "extras_on_nodes": 413
  },
  {
   "file": "adult_male.joint.LOD1.glb",
-  "bytes_raw": 210912,
-  "bytes_packed": 85204,
-  "nodes": 23,
+  "bytes_raw": 2761936,
+  "bytes_packed": 1192008,
+  "nodes": 413,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 23
+  "extras_on_nodes": 413
  },
  {
   "file": "adult_male.joint.LOD2.glb",
-  "bytes_raw": 112196,
-  "bytes_packed": 60568,
-  "nodes": 23,
+  "bytes_raw": 1779180,
+  "bytes_packed": 945100,
+  "nodes": 413,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 23
+  "extras_on_nodes": 413
  },
  {
   "file": "adult_male.joint.LOD3.glb",
-  "bytes_raw": 72448,
-  "bytes_packed": 50400,
-  "nodes": 23,
+  "bytes_raw": 1284280,
+  "bytes_packed": 818904,
+  "nodes": 413,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
    "KHR_materials_clearcoat"
   ],
-  "extras_on_nodes": 23
+  "extras_on_nodes": 413
  },
  {
   "file": "adult_male.lymphatic.LOD0.glb",
-  "bytes_raw": 1573344,
-  "bytes_packed": 573048,
+  "bytes_raw": 1597564,
+  "bytes_packed": 597268,
   "nodes": 163,
   "names_preserved": true,
   "extensions": [
@@ -914,8 +914,8 @@
  },
  {
   "file": "adult_male.lymphatic.LOD1.glb",
-  "bytes_raw": 993232,
-  "bytes_packed": 419072,
+  "bytes_raw": 1017452,
+  "bytes_packed": 443292,
   "nodes": 163,
   "names_preserved": true,
   "extensions": [
@@ -927,8 +927,8 @@
  },
  {
   "file": "adult_male.lymphatic.LOD2.glb",
-  "bytes_raw": 673732,
-  "bytes_packed": 334548,
+  "bytes_raw": 697952,
+  "bytes_packed": 358768,
   "nodes": 163,
   "names_preserved": true,
   "extensions": [
@@ -940,8 +940,8 @@
  },
  {
   "file": "adult_male.lymphatic.LOD3.glb",
-  "bytes_raw": 472856,
-  "bytes_packed": 283852,
+  "bytes_raw": 497076,
+  "bytes_packed": 308072,
   "nodes": 163,
   "names_preserved": true,
   "extensions": [
@@ -953,60 +953,68 @@
  },
  {
   "file": "adult_male.muscular.LOD0.glb",
-  "bytes_raw": 19485168,
-  "bytes_packed": 5500164,
-  "nodes": 470,
+  "bytes_raw": 32156888,
+  "bytes_packed": 9686828,
+  "nodes": 1291,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
-   "KHR_materials_clearcoat"
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
   ],
-  "extras_on_nodes": 470
+  "extras_on_nodes": 1291
  },
  {
   "file": "adult_male.muscular.LOD1.glb",
-  "bytes_raw": 10303392,
-  "bytes_packed": 3192256,
-  "nodes": 470,
+  "bytes_raw": 17721756,
+  "bytes_packed": 6156884,
+  "nodes": 1291,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
-   "KHR_materials_clearcoat"
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
   ],
-  "extras_on_nodes": 470
+  "extras_on_nodes": 1291
  },
  {
   "file": "adult_male.muscular.LOD2.glb",
-  "bytes_raw": 4797184,
-  "bytes_packed": 1780612,
-  "nodes": 470,
+  "bytes_raw": 9182876,
+  "bytes_packed": 4010388,
+  "nodes": 1291,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
-   "KHR_materials_clearcoat"
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
   ],
-  "extras_on_nodes": 470
+  "extras_on_nodes": 1291
  },
  {
   "file": "adult_male.muscular.LOD3.glb",
-  "bytes_raw": 2508672,
-  "bytes_packed": 1181796,
-  "nodes": 470,
+  "bytes_raw": 5440624,
+  "bytes_packed": 3047872,
+  "nodes": 1291,
   "names_preserved": true,
   "extensions": [
    "KHR_mesh_quantization",
    "EXT_meshopt_compression",
-   "KHR_materials_clearcoat"
+   "KHR_materials_clearcoat",
+   "KHR_materials_transmission",
+   "KHR_materials_ior"
   ],
-  "extras_on_nodes": 470
+  "extras_on_nodes": 1291
  },
  {
   "file": "adult_male.nervous.LOD0.glb",
-  "bytes_raw": 22717852,
-  "bytes_packed": 5893400,
+  "bytes_raw": 22795760,
+  "bytes_packed": 5971312,
   "nodes": 549,
   "names_preserved": true,
   "extensions": [
@@ -1020,8 +1028,8 @@
  },
  {
   "file": "adult_male.nervous.LOD1.glb",
-  "bytes_raw": 12064348,
-  "bytes_packed": 3450252,
+  "bytes_raw": 12142260,
+  "bytes_packed": 3528164,
   "nodes": 549,
   "names_preserved": true,
   "extensions": [
@@ -1035,8 +1043,8 @@
  },
  {
   "file": "adult_male.nervous.LOD2.glb",
-  "bytes_raw": 5686108,
-  "bytes_packed": 1926144,
+  "bytes_raw": 5764020,
+  "bytes_packed": 2004052,
   "nodes": 549,
   "names_preserved": true,
   "extensions": [
@@ -1050,8 +1058,8 @@
  },
  {
   "file": "adult_male.nervous.LOD3.glb",
-  "bytes_raw": 3046540,
-  "bytes_packed": 1286552,
+  "bytes_raw": 3124452,
+  "bytes_packed": 1364464,
   "nodes": 549,
   "names_preserved": true,
   "extensions": [
@@ -1065,8 +1073,8 @@
  },
  {
   "file": "adult_male.reproductive.LOD0.glb",
-  "bytes_raw": 218284,
-  "bytes_packed": 73232,
+  "bytes_raw": 220284,
+  "bytes_packed": 75232,
   "nodes": 14,
   "names_preserved": true,
   "extensions": [
@@ -1078,8 +1086,8 @@
  },
  {
   "file": "adult_male.reproductive.LOD1.glb",
-  "bytes_raw": 121812,
-  "bytes_packed": 48044,
+  "bytes_raw": 123812,
+  "bytes_packed": 50044,
   "nodes": 14,
   "names_preserved": true,
   "extensions": [
@@ -1091,8 +1099,8 @@
  },
  {
   "file": "adult_male.reproductive.LOD2.glb",
-  "bytes_raw": 68344,
-  "bytes_packed": 33636,
+  "bytes_raw": 70344,
+  "bytes_packed": 35636,
   "nodes": 14,
   "names_preserved": true,
   "extensions": [
@@ -1104,8 +1112,8 @@
  },
  {
   "file": "adult_male.reproductive.LOD3.glb",
-  "bytes_raw": 43476,
-  "bytes_packed": 26808,
+  "bytes_raw": 45476,
+  "bytes_packed": 28808,
   "nodes": 14,
   "names_preserved": true,
   "extensions": [
@@ -1117,8 +1125,8 @@
  },
  {
   "file": "adult_male.respiratory.LOD0.glb",
-  "bytes_raw": 2793776,
-  "bytes_packed": 778540,
+  "bytes_raw": 2798476,
+  "bytes_packed": 783240,
   "nodes": 49,
   "names_preserved": true,
   "extensions": [
@@ -1130,8 +1138,8 @@
  },
  {
   "file": "adult_male.respiratory.LOD1.glb",
-  "bytes_raw": 1474240,
-  "bytes_packed": 444112,
+  "bytes_raw": 1478944,
+  "bytes_packed": 448812,
   "nodes": 49,
   "names_preserved": true,
   "extensions": [
@@ -1143,8 +1151,8 @@
  },
  {
   "file": "adult_male.respiratory.LOD2.glb",
-  "bytes_raw": 674696,
-  "bytes_packed": 234188,
+  "bytes_raw": 679396,
+  "bytes_packed": 238888,
   "nodes": 49,
   "names_preserved": true,
   "extensions": [
@@ -1156,8 +1164,8 @@
  },
  {
   "file": "adult_male.respiratory.LOD3.glb",
-  "bytes_raw": 340148,
-  "bytes_packed": 143096,
+  "bytes_raw": 344852,
+  "bytes_packed": 147796,
   "nodes": 49,
   "names_preserved": true,
   "extensions": [
@@ -1169,8 +1177,8 @@
  },
  {
   "file": "adult_male.sensory.LOD0.glb",
-  "bytes_raw": 1510644,
-  "bytes_packed": 443796,
+  "bytes_raw": 1516932,
+  "bytes_packed": 450084,
   "nodes": 44,
   "names_preserved": true,
   "extensions": [
@@ -1184,8 +1192,8 @@
  },
  {
   "file": "adult_male.sensory.LOD1.glb",
-  "bytes_raw": 807684,
-  "bytes_packed": 263496,
+  "bytes_raw": 813972,
+  "bytes_packed": 269780,
   "nodes": 44,
   "names_preserved": true,
   "extensions": [
@@ -1199,8 +1207,8 @@
  },
  {
   "file": "adult_male.sensory.LOD2.glb",
-  "bytes_raw": 381168,
-  "bytes_packed": 150176,
+  "bytes_raw": 387452,
+  "bytes_packed": 156464,
   "nodes": 44,
   "names_preserved": true,
   "extensions": [
@@ -1214,8 +1222,8 @@
  },
  {
   "file": "adult_male.sensory.LOD3.glb",
-  "bytes_raw": 201884,
-  "bytes_packed": 101572,
+  "bytes_raw": 208168,
+  "bytes_packed": 107856,
   "nodes": 44,
   "names_preserved": true,
   "extensions": [
@@ -1229,8 +1237,8 @@
  },
  {
   "file": "adult_male.skeletal.LOD0.glb",
-  "bytes_raw": 6694836,
-  "bytes_packed": 1942652,
+  "bytes_raw": 6708820,
+  "bytes_packed": 1956636,
   "nodes": 232,
   "names_preserved": true,
   "extensions": [
@@ -1242,8 +1250,8 @@
  },
  {
   "file": "adult_male.skeletal.LOD1.glb",
-  "bytes_raw": 3738160,
-  "bytes_packed": 1210632,
+  "bytes_raw": 3752148,
+  "bytes_packed": 1224620,
   "nodes": 232,
   "names_preserved": true,
   "extensions": [
@@ -1255,8 +1263,8 @@
  },
  {
   "file": "adult_male.skeletal.LOD2.glb",
-  "bytes_raw": 1957320,
-  "bytes_packed": 761944,
+  "bytes_raw": 1971308,
+  "bytes_packed": 775932,
   "nodes": 232,
   "names_preserved": true,
   "extensions": [
@@ -1268,8 +1276,8 @@
  },
  {
   "file": "adult_male.skeletal.LOD3.glb",
-  "bytes_raw": 1156352,
-  "bytes_packed": 558196,
+  "bytes_raw": 1170340,
+  "bytes_packed": 572180,
   "nodes": 232,
   "names_preserved": true,
   "extensions": [
@@ -1281,8 +1289,8 @@
  },
  {
   "file": "adult_male.surface.LOD0.glb",
-  "bytes_raw": 2613476,
-  "bytes_packed": 908304,
+  "bytes_raw": 2652236,
+  "bytes_packed": 947064,
   "nodes": 256,
   "names_preserved": true,
   "extensions": [
@@ -1294,8 +1302,8 @@
  },
  {
   "file": "adult_male.surface.LOD1.glb",
-  "bytes_raw": 1880428,
-  "bytes_packed": 732916,
+  "bytes_raw": 1919188,
+  "bytes_packed": 771676,
   "nodes": 256,
   "names_preserved": true,
   "extensions": [
@@ -1307,8 +1315,8 @@
  },
  {
   "file": "adult_male.surface.LOD2.glb",
-  "bytes_raw": 1406152,
-  "bytes_packed": 619856,
+  "bytes_raw": 1444912,
+  "bytes_packed": 658616,
   "nodes": 256,
   "names_preserved": true,
   "extensions": [
@@ -1320,8 +1328,8 @@
  },
  {
   "file": "adult_male.surface.LOD3.glb",
-  "bytes_raw": 1077436,
-  "bytes_packed": 538696,
+  "bytes_raw": 1116196,
+  "bytes_packed": 577456,
   "nodes": 256,
   "names_preserved": true,
   "extensions": [
@@ -1333,8 +1341,8 @@
  },
  {
   "file": "adult_male.urinary.LOD0.glb",
-  "bytes_raw": 194736,
-  "bytes_packed": 60920,
+  "bytes_raw": 195796,
+  "bytes_packed": 61980,
   "nodes": 8,
   "names_preserved": true,
   "extensions": [
@@ -1346,8 +1354,8 @@
  },
  {
   "file": "adult_male.urinary.LOD1.glb",
-  "bytes_raw": 104560,
-  "bytes_packed": 37456,
+  "bytes_raw": 105620,
+  "bytes_packed": 38516,
   "nodes": 8,
   "names_preserved": true,
   "extensions": [
@@ -1359,8 +1367,8 @@
  },
  {
   "file": "adult_male.urinary.LOD2.glb",
-  "bytes_raw": 50028,
-  "bytes_packed": 22792,
+  "bytes_raw": 51088,
+  "bytes_packed": 23852,
   "nodes": 8,
   "names_preserved": true,
   "extensions": [
@@ -1372,8 +1380,8 @@
  },
  {
   "file": "adult_male.urinary.LOD3.glb",
-  "bytes_raw": 28180,
-  "bytes_packed": 16764,
+  "bytes_raw": 29240,
+  "bytes_packed": 17824,
   "nodes": 8,
   "names_preserved": true,
   "extensions": [
@@ -1385,8 +1393,8 @@
  },
  {
   "file": "module_tissue_lymph_node.lymphatic.LOD0.glb",
-  "bytes_raw": 2299240,
-  "bytes_packed": 621684,
+  "bytes_raw": 2299568,
+  "bytes_packed": 622016,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -1398,8 +1406,8 @@
  },
  {
   "file": "module_tissue_lymph_node.lymphatic.LOD1.glb",
-  "bytes_raw": 1154496,
-  "bytes_packed": 322744,
+  "bytes_raw": 1154828,
+  "bytes_packed": 323076,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -1411,8 +1419,8 @@
  },
  {
   "file": "module_tissue_lymph_node.lymphatic.LOD2.glb",
-  "bytes_raw": 477072,
-  "bytes_packed": 144756,
+  "bytes_raw": 477404,
+  "bytes_packed": 145088,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [
@@ -1424,8 +1432,8 @@
  },
  {
   "file": "module_tissue_lymph_node.lymphatic.LOD3.glb",
-  "bytes_raw": 343980,
-  "bytes_packed": 108156,
+  "bytes_raw": 344312,
+  "bytes_packed": 108488,
   "nodes": 7,
   "names_preserved": true,
   "extensions": [

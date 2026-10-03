@@ -16,7 +16,7 @@ try {
       await page.evaluate((t) => document.documentElement.classList.toggle('dark', t === 'dark'), theme)
       const stats = page.getByText(/structures · \d+k triangles/)
       await stats.waitFor({ timeout: 60000 })
-      assert.match(await stats.textContent(), /^2,611 structures/, 'male structure count')
+      assert.match(await stats.textContent(), /^3,876 structures/, 'male structure count')
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow')
       // tubuh yang belum punya data sumber tidak bisa dipilih
       assert(await page.getByRole('tab', { name: /Neonate/ }).isDisabled(), 'placeholder body must be disabled')
@@ -25,13 +25,15 @@ try {
       await page.getByRole('button', { name: /^femur/i }).first().click()
       await page.getByText(/^ADULT\.MALE\.SKELETAL\.FEMUR\.[LR]$/).waitFor()
       await page.getByText(/Source: Z-Anatomy/).waitFor()
+      await page.getByText('Os femoris').waitFor()  // nama Latin TA2
+      await page.getByText(/Landmarks on this structure \(\d+\)/).waitFor()
       // ketuk di kanvas tidak boleh melempar galat; mode isolate
       await page.getByRole('button', { name: 'isolate' }).click()
       await page.screenshot({ path: `/private/tmp/canonical-${width}-${theme}.png`, fullPage: true })
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures · /).waitFor({ timeout: 60000 })
-      console.log(JSON.stringify({ width, theme, male: 2611, female: (await page.getByText(/structures · \d+k/).textContent()) }))
+      console.log(JSON.stringify({ width, theme, male: 3876, female: (await page.getByText(/structures · \d+k/).textContent()) }))
     }
   }
   assert.deepEqual(errors, [])

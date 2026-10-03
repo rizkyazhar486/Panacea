@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-10-03T04:17:01",
-  "master": "PANACEA_HUMAN_MASTER_v006.blend",
+  "generated": "2026-10-03T11:00:51",
+  "master": "PANACEA_HUMAN_MASTER_v007.blend",
   "blender": "5.2.2 LTS",
   "units": "metres",
   "frame": "+Z superior, +X subject left, -Y anterior",
@@ -11,17 +11,17 @@
   {
    "body_id": "HUMAN.ADULT.MALE",
    "status": "source_backed",
-   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0",
+   "source": "Z-Anatomy (BodyParts3D, DBCLS) adult male, CC BY-SA 4.0 — Panacea web export + 1,238 structures from the full Z-Anatomy model (joints, ligaments, menisci, capsules, discs, muscle attachments, bursae, tendon sheaths, fasciae)",
    "frame": "+Z superior, +X subject left, -Y anterior, metres, feet at z=0",
    "source_requirement": null,
-   "structures": 2611,
-   "verts": 5017255,
+   "structures": 3876,
+   "verts": 5813434,
    "systems": {
     "surface": 256,
     "skeletal": 232,
-    "joint": 23,
-    "muscular": 470,
-    "fascia": 39,
+    "joint": 413,
+    "muscular": 1291,
+    "fascia": 93,
     "cardiovascular": 677,
     "lymphatic": 163,
     "nervous": 549,
