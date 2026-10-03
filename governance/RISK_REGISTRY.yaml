@@ -304,9 +304,16 @@ risks:
       scripts/uji/ballard-denver-inputs.mts): their reference tables, the Ballard-to-gestational-age interpolation, the
       Lubchenco percentiles, the SOAP text and the Denver milestone list are untouched. An empty 5-minute APGAR used to be
       read as 0 and made the auto-drafted SOAP note write "severe depression, needs further resuscitation & NICU
-      referral"; the form now keeps raw text and refuses empty fields. Next: the rest of the numeric calculators (3
-      counted on 2026-10-03 still read +e.target.value without a domain function and are not in an open PR: WhoGrowth,
-      WhoNeonate, CdcAnthropometry, all reference-table calculators). Noted, not changed: the Broca-Lorentz page
+      referral"; the form now keeps raw text and refuses empty fields. WhoGrowthCalc, WhoNeonateCalc and CdcAnthropometryCalc got input validation only (validateWhoGrowthInputs,
+      validateNeonateInputs, validateCdcInputs; scripts/uji/growth-inputs.mts): the computation and result JSX moved
+      verbatim into child components rendered only for valid input (0 of 160 original lines missing; 13 of 13 valid input
+      sets render identical text before and after, measured in a browser), the reference tables, interpolation,
+      z-score and BMI classes and the masked-stunting, >10% loss and day-14 warnings are untouched. The old pages showed
+      Infinity or NaN for an empty height, birth weight 0 and CDC age 1000. Inventory after this change (a scan of every
+      type=number input, not only the +e.target.value pattern my first count used): 24 calculators take numeric
+      input; all now go through a domain function except SirirajCalc, which parses with Number(e.target.value) || 0 so an
+      empty diastolic pressure is silently read as 0 (next slice), and NaegeleCalc, which is in open PR #2226 held for
+      clinical sign-off. Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -338,3 +345,5 @@ risks:
       - src/domains/clinical-calculators/engine/ballardInputs.ts
       - src/domains/clinical-calculators/engine/denverAge.ts
       - scripts/uji/ballard-denver-inputs.mts
+      - src/domains/clinical-calculators/engine/growthInputs.ts
+      - scripts/uji/growth-inputs.mts
