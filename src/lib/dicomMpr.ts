@@ -351,7 +351,8 @@ const jepit = (nilai: number, jumlah: number) => (Number.isFinite(nilai) ? Math.
  * Posisi voxel di bawah kursor dan, bila jaraknya sah, koordinat lokal dalam milimeter
  * (pusat volume = 0; Y naik ke atas). Jarak yang diasumsikan (1 mm pengganti), tidak
  * terbaca, atau tanpa catatan asal TIDAK dipakai: hasil `mm` menjadi null supaya UI
- * menampilkan "tidak diketahui", bukan pengukuran buatan.
+ * menampilkan "tidak diketahui", bukan pengukuran buatan. Kursor di luar volume juga
+ * memberi `mm: null` (indeks tetap dijepit ke tepi).
  */
 export function posisiFisikVoxel(volume: VolumeMpr, x: number, y: number, iris: number): PosisiFisikVoxel {
   const xIndex = jepit(x, volume.kolom)
@@ -360,6 +361,8 @@ export function posisiFisikVoxel(volume: VolumeMpr, x: number, y: number, iris: 
   const asal = volume.asalSpasi
   const sah =
     [x, y, iris].every(Number.isFinite) &&
+    // Kursor di luar volume dijepit ke voxel tepi hanya untuk indeks; milimeter tepi tidak boleh tampil sebagai posisi kursor.
+    Math.round(x) === xIndex && Math.round(y) === yIndex && Math.round(iris) === zIndex &&
     [volume.jarakKolomMm, volume.jarakBarisMm, volume.jarakIrisMm].every((v) => Number.isFinite(v) && v > 0) &&
     asal != null && asal.baris === 'dicom' && asal.kolom === 'dicom' && asal.iris !== 'asumsi'
   if (!sah) return { xIndex, yIndex, zIndex, mm: null }
