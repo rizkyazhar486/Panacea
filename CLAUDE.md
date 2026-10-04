@@ -1,6 +1,6 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
-Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
+Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. **North star produk yang tidak berubah:** [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) — satu patient identity/state longitudinal yang sederhana, terpadu, provenance-aware dan dipercaya lintas daily life, poli, ward, OR, ICU, serta follow-up. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
 
 1. Instruksi eksplisit terbaru dari pemilik repo.
 2. Batas keselamatan/keamanan/privasi/provenance di §8 (tidak boleh dilemahkan).
@@ -282,7 +282,7 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 | Apa pun yang luas / "lanjut" | `PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
 | Klaim ilmiah/klinis, R&D, novelty | `PANACEA_CONSTITUTION.md`, `DOCS/ACADEMIC-ACCURACY-GATE.md` |
 | Model manusia, fisiologi, simulasi, coupling | `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/PHYSIOLOGICAL-RUNTIME.md` |
-| Data pasien, wearable, device, EMR | `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
+| Data pasien, wearable, device, EMR | `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
 | Body Exposure / 3D / atlas | `DOCS/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `PANACEA_OWNER_DIRECTIVES.md` |
 | Visit OS / realtime / WebRTC | bagian "Visit OS" di `PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
 | Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |
