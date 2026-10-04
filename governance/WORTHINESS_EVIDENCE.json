@@ -88,16 +88,20 @@
     },
     {
       "id": "resilience-survivability",
-      "status": "partial",
+      "status": "implemented-partial",
       "evidence_level": "E1",
       "score": null,
       "evidence": [
         "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
         "src/domains/clinical-operations/model/careAccessOrchestrator.ts",
-        "scripts/qa/care-access-orchestrator.test.mjs"
+        "src/domains/clinical-operations/model/clinicalEpisodeResilience.ts",
+        "src/lib/secureCareOutbox.ts",
+        "scripts/qa/care-access-orchestrator.test.mjs",
+        "scripts/qa/clinical-episode-resilience.test.mjs",
+        "scripts/qa/secure-care-outbox.test.mjs"
       ],
-      "blocker": "Rural/offline rules are modeled but not field-tested under real connectivity failure.",
-      "next_experiment": "Offline/store-and-forward failure drill with reconciliation and duplicate-prevention checks."
+      "blocker": "Encrypted offline persistence, idempotent replay and fail-closed episode transport are represented at repository level; real network degradation, restart/recovery, multi-device conflict and disaster-recovery behavior are not yet field-validated.",
+      "next_experiment": "Run a controlled disconnect/reconnect and browser-restart drill on the clinical wedge, verify encrypted queue survival, exact-patient reconciliation, duplicate suppression and server acknowledgement, then repeat under a real low-bandwidth setting."
     },
     {
       "id": "economic-purchasing-value",
