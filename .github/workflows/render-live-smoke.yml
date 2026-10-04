@@ -32,12 +32,12 @@ jobs:
           VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
         run: |
           set -euo pipefail
-          expected_sha="$(git log -1 --format=%H -- server)"
+          expected_sha="$(git rev-parse HEAD)"
           if [ -z "$expected_sha" ]; then
-            echo 'No canonical server-source commit could be resolved.' >&2
+            echo 'No canonical checkout revision could be resolved.' >&2
             exit 1
           fi
-          echo "Expected latest server-source revision: $expected_sha"
+          echo "Canonical checkout revision: $expected_sha"
           base="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
           if [ -z "$base" ]; then
             echo 'VITE_API_URL/SERVER_URL is not configured.' >&2
@@ -52,26 +52,7 @@ jobs:
             code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
             health_code=$(curl -sS --max-time 90 -o /tmp/health.json -w '%{http_code}' "$health_endpoint" || true)
             if [ "$code" = '200' ] && [ "$health_code" = '200' ]; then
-              if EXPECTED_SHA="$expected_sha" node - <<'NODE'
-          const fs = require('node:fs')
-          const body = JSON.parse(fs.readFileSync('/tmp/capabilities.json', 'utf8'))
-          const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'))
-          const expected = process.env.EXPECTED_SHA || ''
-          if (!expected || health.build?.commit !== expected) process.exit(4)
-          if (body.backend !== 'render-control-plane') process.exit(2)
-          for (const kind of ['ont-basecalling', 'pharmcat', 'sv-calling']) {
-            if (!body.jobKinds?.includes(kind)) process.exit(3)
-          }
-          const revision = body.runtime?.revision || ''
-          if (revision && expected && revision !== expected) process.exit(4)
-          console.log(JSON.stringify({
-            backend: body.backend,
-            configured: body.configured,
-            provider: body.provider,
-            runtime: body.runtime,
-            jobKinds: body.jobKinds,
-          }))
-          NODE
+              if node scripts/qa/verify-render-revision.mjs /tmp/capabilities.json /tmp/health.json "$expected_sha"
               then
                 ok='yes'
                 break
