@@ -34,20 +34,23 @@ const payer = {
 
 test('remote diagnostic route can remain continuous while specimen is in transit', () => {
   const result = evaluateCareAccessOrchestration({ payer, diagnostics: [remoteLab] })
-  assert.equal(result.diagnosticContinuityReady, true)
-  assert.equal(result.claimReady, true)
-  assert.equal(result.priority, 'ready')
-  assert.equal(result.nextOperationalAction, 'Claim packet is ready for authorized submission')
+  assert.equal(result.diagnosticContinuity.state, 'intact')
+  assert.equal(result.financialWorkflow.claimSubmissionReady, true)
+  assert.equal(result.financialWorkflow.state, 'ready')
+  assert.equal(result.financialWorkflow.nextAdministrativeAction, 'Claim packet is ready for authorized submission')
 })
 
-test('missing remote destination or custody blocks operational continuity', () => {
+test('diagnostic continuity gap does not masquerade as a clinical-care block', () => {
   const result = evaluateCareAccessOrchestration({
     payer,
     diagnostics: [{ ...remoteLab, destinationConfigured: false, chainOfCustodyComplete: false }],
   })
-  assert.equal(result.priority, 'blocked')
-  assert.equal(result.diagnosticContinuityReady, false)
-  assert.deepEqual(result.blockedDiagnosticIds, ['lab-route-1'])
+  assert.equal(result.diagnosticContinuity.state, 'gap')
+  assert.deepEqual(result.diagnosticContinuity.blockedDiagnosticIds, ['lab-route-1'])
+  assert.equal(result.clinicalCare.authority, 'outside-orchestrator')
+  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
+  assert.equal(result.clinicalCare.diagnosticStateMayAuthorizeTreatment, false)
+  assert.equal(result.financialWorkflow.state, 'ready')
 })
 
 test('result returned from referral lab must be linked back to the same patient state', () => {
@@ -55,29 +58,30 @@ test('result returned from referral lab must be linked back to the same patient 
     payer,
     diagnostics: [{ ...remoteLab, state: 'result-returned', resultLinkedToPatientState: false }],
   })
-  assert.equal(result.priority, 'blocked')
-  assert.equal(result.diagnosticContinuityReady, false)
+  assert.equal(result.diagnosticContinuity.state, 'gap')
 })
 
-test('active coverage without a payer adapter fails closed instead of pretending universal reimbursement', () => {
+test('active coverage without a payer adapter blocks only the financial workflow', () => {
   const result = evaluateCareAccessOrchestration({
     payer: { ...payer, payerAdapterConfigured: false },
     diagnostics: [],
   })
-  assert.equal(result.priority, 'blocked')
-  assert.equal(result.claimReady, false)
-  assert.equal(result.nextOperationalAction, 'Configure the jurisdiction/payer reimbursement adapter')
+  assert.equal(result.financialWorkflow.state, 'blocked')
+  assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  assert.equal(result.financialWorkflow.nextAdministrativeAction, 'Configure the jurisdiction/payer reimbursement adapter')
+  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
   assert.ok(result.warnings.includes('Payer adapter is not configured'))
 })
 
-test('preauthorization requirement prevents claim-ready state until approved', () => {
+test('preauthorization requirement prevents claim submission until approved', () => {
   const result = evaluateCareAccessOrchestration({
     payer: { ...payer, preauthorization: 'required' },
     diagnostics: [],
   })
-  assert.equal(result.priority, 'attention')
-  assert.equal(result.claimReady, false)
-  assert.equal(result.nextOperationalAction, 'Resolve coverage eligibility and preauthorization state')
+  assert.equal(result.financialWorkflow.state, 'attention')
+  assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  assert.equal(result.financialWorkflow.preauthorizationReady, false)
+  assert.equal(result.financialWorkflow.nextAdministrativeAction, 'Resolve coverage eligibility and preauthorization state')
 })
 
 test('missing signed record or provenance never becomes a clean claim', () => {
@@ -88,12 +92,13 @@ test('missing signed record or provenance never becomes a clean claim', () => {
     },
     diagnostics: [],
   })
-  assert.equal(result.priority, 'attention')
-  assert.equal(result.claimReady, false)
-  assert.deepEqual(result.missingClaimEvidence, ['signed clinical record', 'provenance'])
+  assert.equal(result.financialWorkflow.state, 'attention')
+  assert.equal(result.financialWorkflow.claimEvidenceReady, false)
+  assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  assert.deepEqual(result.financialWorkflow.missingClaimEvidence, ['signed clinical record', 'provenance'])
 })
 
-test('self-pay path is explicit and does not masquerade as insurance claim readiness', () => {
+test('self-pay path is explicit and never masquerades as insurer claim readiness', () => {
   const result = evaluateCareAccessOrchestration({
     payer: {
       ...payer,
@@ -106,7 +111,36 @@ test('self-pay path is explicit and does not masquerade as insurance claim readi
     },
     diagnostics: [],
   })
-  assert.equal(result.priority, 'ready')
-  assert.equal(result.claimReady, false)
-  assert.equal(result.nextOperationalAction, 'Proceed with transparent self-pay estimate and settlement workflow')
+  assert.equal(result.financialWorkflow.state, 'ready')
+  assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  assert.equal(result.financialWorkflow.nextAdministrativeAction, 'Proceed with transparent self-pay estimate and settlement workflow')
+  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
+})
+
+test('inactive coverage cannot be interpreted as denial of clinically indicated care', () => {
+  const result = evaluateCareAccessOrchestration({
+    payer: { ...payer, coverage: 'inactive' },
+    diagnostics: [],
+  })
+  assert.equal(result.financialWorkflow.state, 'blocked')
+  assert.equal(result.clinicalCare.authority, 'outside-orchestrator')
+  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
+})
+
+test('payment denial is an administrative attention state, not clinical authority', () => {
+  const result = evaluateCareAccessOrchestration({
+    payer: { ...payer, payment: 'denied' },
+    diagnostics: [],
+  })
+  assert.equal(result.financialWorkflow.state, 'attention')
+  assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  assert.match(result.financialWorkflow.nextAdministrativeAction, /resubmission or appeal/)
+  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
+})
+
+test('legacy top-level blocked/ready fields are absent to prevent semantic misuse', () => {
+  const result = evaluateCareAccessOrchestration({ payer, diagnostics: [] })
+  assert.equal('priority' in result, false)
+  assert.equal('claimReady' in result, false)
+  assert.equal('diagnosticContinuityReady' in result, false)
 })
