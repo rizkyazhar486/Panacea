@@ -47,9 +47,24 @@ export interface PoliPatientFlow {
 const MINUTE_MS = 60_000
 const DAY_MS = 24 * 60 * MINUTE_MS
 
-function parsedTime(value: string): number | null {
+function parsedTime(value: unknown): number | null {
+  if (typeof value !== 'string') return null
+  // Require a real calendar timestamp with an explicit timezone, not Date.parse coercion.
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(value)
+  if (!match) return null
+  const [year, month, day, hour, minute, second, offsetHour, offsetMinute] = match.slice(1).map(part => Number(part ?? 0))
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  if (month < 1 || month > 12 || day < 1 || day > days[month - 1] || hour > 23 || minute > 59 || second > 59 ||
+    offsetHour > 14 || offsetMinute > 59 || (offsetHour === 14 && offsetMinute !== 0)) return null
   const parsed = Date.parse(value)
   return Number.isFinite(parsed) ? parsed : null
+}
+
+/** Observations are available only once their recorded time is reached. */
+export function isClinicalObservationAvailableAt(value: unknown, atMs: number): boolean {
+  const time = parsedTime(value)
+  return Number.isFinite(atMs) && time !== null && time <= atMs
 }
 
 function ageAt(dob: string, nowIso: string): number | null {
@@ -74,7 +89,8 @@ export function derivePoliPatientFlow(input: PoliPatientFlowInput, nowIso: strin
     ...(input.record ? [input.record.updatedAt] : []),
   ]
   const parsed = timestamps.map((value) => ({ value, ms: parsedTime(value) }))
-  const invalidTimestampCount = parsed.filter((item) => item.ms === null).length
+  // A future observation is not available evidence at this workflow's evaluation time.
+  const invalidTimestampCount = parsed.filter((item) => item.ms === null || item.ms > nowMs).length
   const valid = parsed.filter((item): item is { value: string; ms: number } => item.ms !== null && item.ms <= nowMs)
   valid.sort((a, b) => b.ms - a.ms)
 
@@ -86,16 +102,19 @@ export function derivePoliPatientFlow(input: PoliPatientFlowInput, nowIso: strin
     ageMs <= DAY_MS ? 'today' :
     'historical'
 
-  const hasCriticalResult = input.supportiveSignals.some((signal) => signal.flag === 'critical')
-  const hasVitals = input.vitalTimestamps.length > 0
-  const record = input.record
+  const availableAt = (value: string) => isClinicalObservationAvailableAt(value, nowMs)
+  const supportiveSignals = input.supportiveSignals.filter(signal => availableAt(signal.takenAt))
+  const hasCriticalFlag = input.supportiveSignals.some(signal => signal.flag === 'critical')
+  const hasCriticalResult = supportiveSignals.some(signal => signal.flag === 'critical')
+  const hasVitals = input.vitalTimestamps.some(availableAt)
+  const record = input.record && availableAt(input.record.updatedAt) ? input.record : undefined
   const proposedPlanCount = record?.proposedPlanCount ?? 0
 
   let priority: PoliFlowPriority
   let nextAction: string
-  if (hasCriticalResult) {
+  if (hasCriticalFlag) {
     priority = 'critical'
-    nextAction = 'Review critical result now'
+    nextAction = hasCriticalResult ? 'Review critical result now' : 'Review critical flag and reconcile timestamp/provenance'
   } else if (invalidTimestampCount > 0) {
     priority = 'data-gap'
     nextAction = 'Reconcile timestamp and provenance gap'
@@ -108,10 +127,10 @@ export function derivePoliPatientFlow(input: PoliPatientFlowInput, nowIso: strin
   } else if (!record) {
     priority = 'data-gap'
     nextAction = 'Open AI-EMR: history and physical exam'
-  } else if (!record.physicalExamClinicianVerified) {
+  } else if (record.physicalExamClinicianVerified !== true) {
     priority = 'review'
     nextAction = 'Clinician review of physical exam'
-  } else if (!record.recordClinicianSigned) {
+  } else if (record.recordClinicianSigned !== true) {
     priority = 'review'
     nextAction = 'Review and sign the encounter'
   } else if (proposedPlanCount > 0) {
@@ -122,7 +141,7 @@ export function derivePoliPatientFlow(input: PoliPatientFlowInput, nowIso: strin
     nextAction = 'Continue longitudinal monitoring and follow-up'
   }
 
-  const categories = [...new Set(input.supportiveSignals.map((signal) => signal.category).filter(Boolean))]
+  const categories = [...new Set(supportiveSignals.map((signal) => signal.category).filter(Boolean))]
   const dataSources = [
     ...(input.historyItemCount > 0 ? ['Longitudinal history'] : []),
     ...(hasVitals ? ['Vitals'] : []),

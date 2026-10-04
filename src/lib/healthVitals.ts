@@ -93,6 +93,9 @@ export interface Vitals {
   headphoneAudioDb?: number
   // Provenance — shown in the UI so a user always knows where a number came
   // from and how old it is, rather than seeing an unexplained prefilled field.
+  /** Local snapshot ownership; never inferred from the selected clinical patient. */
+  subjectId?: string
+  ownerAccountId?: string
   source?: string
   measuredAt?: string
   syncedAt?: string
@@ -128,6 +131,7 @@ export function getVitals(): Vitals {
 export function mergeVitals(patch: Vitals): Vitals {
   const clean: Vitals = {}
   for (const [k, v] of Object.entries(patch)) {
+    if (k === 'subjectId' || k === 'ownerAccountId') continue
     if (typeof v === 'number') {
       if (Number.isFinite(v) && v > 0) (clean as Record<string, unknown>)[k] = v
     } else if (typeof v === 'string' && v) {
@@ -136,7 +140,22 @@ export function mergeVitals(patch: Vitals): Vitals {
   }
   if (!Object.keys(clean).length) return getVitals()
 
-  const next: Vitals = { ...getVitals(), ...clean, syncedAt: new Date().toISOString() }
+  // An import belongs to the remembered self account, never the active clinic patient.
+  let subjectId: string | undefined
+  let ownerAccountId: string | undefined
+  try {
+    const session = JSON.parse(localStorage.getItem('panaceamed.session.v1') || 'null')
+    const age = Date.now() - session?.loginAt
+    if (typeof session?.loginAt === 'number' && Number.isFinite(age) && age >= 0 && age <= 7 * 86400000 &&
+      typeof session?.account?.id === 'string' && session.account.id.trim() &&
+      typeof session?.account?.patientId === 'string' && session.account.patientId.trim()) {
+      ownerAccountId = session.account.id
+      subjectId = session.account.patientId
+    }
+  } catch { /* Unbound data cannot authorize a patient projection. */ }
+  const previous = getVitals()
+  const sameOwner = previous.subjectId === subjectId && previous.ownerAccountId === ownerAccountId
+  const next: Vitals = { ...(sameOwner ? previous : {}), ...clean, subjectId, ownerAccountId, syncedAt: new Date().toISOString() }
   try {
     const raw = JSON.stringify(next)
     localStorage.setItem(KEY, raw)

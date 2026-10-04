@@ -65,3 +65,34 @@ autopilot_handoff (2026-10-03 evening; owner asleep, routine "Panacea — autono
 - Avatar spike (read-only, no code): `public/bodyexposure` holds 10 fixed-shape body sets (adult male/female, ICRP adult, ICRP paediatric neonate to 15 y); no morph targets and no skins. Size-driven personalisation would need scaling per region marked as an estimate; sets of different ages cannot be blended (different topology). Needs an owner design decision.
 - Measured UX baseline: 114 routes at 390x844 on a production build: 0 horizontal overflow, 0 load failures, 0 page errors; the Home slider dots were the one confirmed small-target defect (fixed in #2247).
 
+
+
+## Live reconciliation — 2026-10-05 Asia/Jakarta
+
+This checkpoint supersedes stale status/next-action claims above, not their historical evidence.
+No `.agents/` control plane exists; this canonical continuation record plus the existing registries
+are retained as the durable state rather than creating duplicate governance.
+
+- Canonical main inspected: `e40955fc1b7d9c4fd2d90b67bcbb886a1ecc301c` (#2261).
+- #2260 and #2258 are merged (merge commits `7ac9231b` and `1a28f9c0` respectively).
+- Highest-yield candidate: #2262 `fix/poli-patient-observation-scope`. Its old head
+  `85f731b8c5ae50382490fc2aaad0d3d6f309bd0e` is NOT accepted: Stabilization run
+  `37229459775`, job `111515874729` failed at Body3D Vessels click (20-second stability/visibility
+  wait, responsive=true, no page errors). Do not label this a confirmed flake or bypass it.
+- Independent review identified two additional gaps: account-global wearable cache could cross
+  account identity; Date.parse accepted nonexistent dates. Follow-up closes both with explicit
+  snapshot ownership and strict real-calendar timestamps. Regressions failed before the fix.
+- Local evidence on the follow-up tree: 13 focused tests, production build (510 QA tests),
+  657/657 deterministic files, architecture lint and ratchet (725 baseline entries) passed.
+  Real Chromium headless-shell 390x844 Visit smoke passed future exclusion, current observation,
+  foreign/missing owner rejection, valid own wearable, critical flag reconciliation and consent
+  reset without overflow/page errors. Local evidence does not substitute for new-head GitHub CI.
+- Review: independent code/security inspection found no important follow-up blocker. No clinical
+  equation, clinical validation, deployment or external wearable-adapter validation is claimed.
+- Next exact action: inspect #2262 current head and latest main; require fresh Validate changes,
+  complete Stabilization, Body3D, Clinical Evidence and security gates. Investigate any red job.
+  Merge with expected head only after accepted; verify merged content on main, then reassess.
+- Completion accounting: no weighted accepted denominator exists here. Overall percentage and
+  efficiency are unmeasured. This candidate is not counted complete until accepted and merged.
+- Residual follow-up: audit other legacy personal caches/history for cross-account ownership;
+  do not infer that this Visit-specific boundary fixes every browser health projection.

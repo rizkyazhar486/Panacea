@@ -8,6 +8,8 @@ import { backendEnabled } from '../lib/api'
 import { useLiveHeartRate } from '../lib/useLiveHeartRate'
 import { useVitals } from '../lib/useVitals'
 import { resolveVisitRuntimeIdentity } from '../lib/visitRuntimeIdentity'
+import { isClinicalObservationAvailableAt } from '../domains/clinical-operations'
+import { selectProductionHealthStoreSlice } from '../lib/productionHealthStoreSelector'
 import {
   buildAiEmrVisitContext,
   createVisitOperatingSession,
@@ -90,7 +92,7 @@ function AuthenticatedVisitCommandCenter({
 }: VisitCommandCenterProps & { clinicianId: string; subjectId: string }) {
   const { state, activePatient, account } = useStore()
   const reduceMotion = useReducedMotion()
-  const synced = useVitals()
+  const accountVitals = useVitals()
   const liveHeart = useLiveHeartRate()
   const visitId = 'visit-' + safeToken((recordId || activePatient.id) + '-' + new Date().toISOString().slice(0, 10))
   const cameraRoom = 'visit-' + safeToken(recordId || activePatient.id)
@@ -100,6 +102,21 @@ function AuthenticatedVisitCommandCenter({
   )
   const [liveTrace, setLiveTrace] = useState<number[]>([])
   const [clock, setClock] = useState(() => new Date().toISOString())
+  const healthScope = useMemo(() => {
+    const store = { ...state, account }
+    try { return selectProductionHealthStoreSlice(store, subjectId, 'personal-plus-clinical') }
+    catch { return selectProductionHealthStoreSlice(store, subjectId, 'clinical-only') }
+  }, [account, state, subjectId])
+  // The signed-in clinician's watch is not automatically the selected patient's device.
+  // Import time cannot stand in for an unknown measurement time in a clinical visit.
+  const synced: typeof accountVitals = healthScope.personalStoresIncluded &&
+    accountVitals.subjectId === subjectId && accountVitals.ownerAccountId === account?.id &&
+    isClinicalObservationAvailableAt(accountVitals.measuredAt, Date.parse(clock)) ? accountVitals : {}
+  const liveSampleBelongsToVisit = visit.subjectId === subjectId && visit.clinicianId === clinicianId &&
+    visit.consent.clinicalData.granted && (visit.phase === 'live' || visit.phase === 'paused') &&
+    liveHeart.isLive && isClinicalObservationAvailableAt(liveHeart.lastSampleAt, Date.now())
+
+
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date().toISOString()), 15_000)
@@ -112,25 +129,25 @@ function AuthenticatedVisitCommandCenter({
   }, [clinicianId, subjectId, visitId])
 
   const latestClinical = useMemo(() => {
-    const rows = (state.vitals[activePatient.id] ?? [])
-      .filter((item) => Number.isFinite(Date.parse(item.takenAt)))
+    const rows = healthScope.clinicalVitals
+      .filter((item) => isClinicalObservationAvailableAt(item.takenAt, Date.parse(clock)))
       .slice()
       .sort((a, b) => Date.parse(a.takenAt) - Date.parse(b.takenAt))
     return rows[rows.length - 1]
-  }, [activePatient.id, state.vitals])
+  }, [clock, healthScope.clinicalVitals])
 
   const clinicalTrace = useMemo(
-    () => (state.vitals[activePatient.id] ?? [])
-      .filter((item) => finite(item.heartRate) && Number.isFinite(Date.parse(item.takenAt)))
+    () => healthScope.clinicalVitals
+      .filter((item) => finite(item.heartRate) && isClinicalObservationAvailableAt(item.takenAt, Date.parse(clock)))
       .slice(-16)
       .map((item) => item.heartRate),
-    [activePatient.id, state.vitals],
+    [clock, healthScope.clinicalVitals],
   )
 
   useEffect(() => {
-    if (!liveHeart.isLive || !liveHeart.lastSampleAt || !finite(liveHeart.bpm) || liveHeart.bpm <= 0) return
+    if (!liveSampleBelongsToVisit || !liveHeart.lastSampleAt || !finite(liveHeart.bpm) || liveHeart.bpm <= 0) return
     setLiveTrace((current) => [...current, liveHeart.bpm].slice(-32))
-  }, [liveHeart.bpm, liveHeart.isLive, liveHeart.lastSampleAt, liveHeart.sampleSequence])
+  }, [liveHeart.bpm, liveHeart.lastSampleAt, liveHeart.sampleSequence, liveSampleBelongsToVisit])
 
   useEffect(() => {
     if (visit.phase === 'ended') return
@@ -195,11 +212,11 @@ function AuthenticatedVisitCommandCenter({
         return current
       }
     })
-  }, [liveHeart.bpm, liveHeart.isLive, liveHeart.lastSampleAt, liveHeart.sampleSequence])
+  }, [liveHeart.bpm, liveHeart.lastSampleAt, liveHeart.sampleSequence, liveSampleBelongsToVisit])
 
   useEffect(() => {
     const source = synced.source?.trim()
-    const measuredAt = synced.measuredAt || synced.syncedAt
+    const measuredAt = synced.measuredAt
     if (!source || source === 'Manual' || !measuredAt || !Number.isFinite(Date.parse(measuredAt))) return
     setVisit((current) => {
       if (current.phase === 'ended') return current
@@ -282,7 +299,7 @@ function AuthenticatedVisitCommandCenter({
 
   const heartRate = finite(liveByMetric.get('heart-rate')?.value)
     ? liveByMetric.get('heart-rate')!.value
-    : liveHeart.isLive && liveHeart.bpm > 0
+    : liveSampleBelongsToVisit && liveHeart.bpm > 0
     ? liveHeart.bpm
     : finite(latestClinical?.heartRate)
       ? latestClinical.heartRate
@@ -459,7 +476,7 @@ function AuthenticatedVisitCommandCenter({
           <div className="absolute inset-x-4 bottom-4 z-10 rounded-[18px] border border-white/10 bg-black/55 px-3 py-2.5 backdrop-blur-xl">
             <div className="flex items-center justify-between gap-3">
               <span className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/35">
-                {liveHeart.isLive ? 'BLE heart rate · live' : trace.length > 1 ? 'Recorded heart-rate history' : 'Waiting for heart-rate samples'}
+                {liveSampleBelongsToVisit ? 'BLE heart rate · live' : trace.length > 1 ? 'Recorded heart-rate history' : 'Waiting for heart-rate samples'}
               </span>
               <span className="shrink-0 text-[9px] font-black text-white/50">{trace.length} samples</span>
             </div>
@@ -510,7 +527,7 @@ function AuthenticatedVisitCommandCenter({
             disabled={!liveHeart.bleSupported || liveHeart.bleStatus === 'connecting'}
             className="min-h-10 shrink-0 rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60 disabled:opacity-35"
           >
-            {liveHeart.bleStatus === 'connected' ? 'BLE HR · ' + liveHeart.bpm + ' bpm' : liveHeart.bleStatus === 'connecting' ? 'Connecting BLE…' : liveHeart.bleSupported ? 'Connect BLE HR' : 'BLE unavailable'}
+            {liveHeart.bleStatus === 'connected' ? liveSampleBelongsToVisit ? 'BLE HR · ' + liveHeart.bpm + ' bpm' : 'BLE HR connected · awaiting visit consent' : liveHeart.bleStatus === 'connecting' ? 'Connecting BLE…' : liveHeart.bleSupported ? 'Connect BLE HR' : 'BLE unavailable'}
           </button>
           <Link to="/health-data/tutorial" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">Health Sync</Link>
           <Link to="/emr" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">AI-EMR</Link>
@@ -549,6 +566,7 @@ export function VisitCommandCenter(props: VisitCommandCenterProps) {
 
   return (
     <AuthenticatedVisitCommandCenter
+      key={JSON.stringify([identity.clinicianId, identity.subjectId, props.recordId ?? null])}
       {...props}
       clinicianId={identity.clinicianId}
       subjectId={identity.subjectId}

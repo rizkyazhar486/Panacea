@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { derivePoliPatientFlow } from '../../src/domains/clinical-operations/model/poliPatientFlow.ts'
+import { derivePoliPatientFlow, isClinicalObservationAvailableAt } from '../../src/domains/clinical-operations/model/poliPatientFlow.ts'
 
 const now = '2026-10-04T09:00:00.000Z'
 const base = {
@@ -66,4 +66,65 @@ test('invalid timestamps are surfaced as provenance gaps', () => {
 
 test('invalid evaluation clock is rejected', () => {
   assert.throws(() => derivePoliPatientFlow(base, 'invalid'), /valid timestamp/)
+})
+
+test('future observations cannot satisfy current workflow availability', () => {
+  const input = { ...base, vitalTimestamps: ['2026-10-05T08:55:00.000Z'], supportiveSignals: [{ takenAt: '2026-10-05T08:55:00.000Z', category: 'Future lab', flag: 'normal' }] }
+  const before = structuredClone(input)
+  const row = derivePoliPatientFlow(input, now)
+  assert.equal(row.priority, 'data-gap')
+  assert.equal(row.invalidTimestampCount, 2)
+  assert.ok(!row.dataSources.includes('Vitals'))
+  assert.ok(!row.dataSources.includes('Future lab'))
+  assert.deepEqual(input, before)
+})
+
+test('a future or invalid critical flag retains urgent review without claiming a current critical result', () => {
+  for (const takenAt of ['2026-10-05T08:55:00.000Z', 'invalid']) {
+    const row = derivePoliPatientFlow({ ...base, supportiveSignals: [{ takenAt, category: 'Lab', flag: 'critical' }] }, now)
+    assert.equal(row.priority, 'critical')
+    assert.equal(row.hasCriticalResult, false)
+    assert.equal(row.invalidTimestampCount, 1)
+    assert.match(row.nextAction, /critical flag.*reconcile/i)
+  }
+})
+
+test('future or malformed record timestamps cannot expose diagnosis or signed workflow state', () => {
+  for (const updatedAt of ['2026-10-05T08:58:00.000Z', 'invalid']) {
+    const row = derivePoliPatientFlow({ ...base, record: { ...base.record, updatedAt, primaryDiagnosis: 'Future diagnosis', proposedPlanCount: 3 } }, now)
+    assert.equal(row.priority, 'data-gap')
+    assert.equal(row.invalidTimestampCount, 1)
+    assert.equal(row.primaryDiagnosis, undefined)
+    assert.equal(row.proposedPlanCount, 0)
+    assert.ok(!row.dataSources.includes('AI-EMR'))
+  }
+})
+
+test('malformed timestamp types and coerced clinical review flags never become routine evidence', () => {
+  assert.throws(() => derivePoliPatientFlow(base, 1), /valid timestamp/)
+  const row = derivePoliPatientFlow({ ...base, vitalTimestamps: [1] }, now)
+  assert.equal(row.priority, 'data-gap')
+  assert.equal(row.invalidTimestampCount, 1)
+  for (const flag of ['false', 1, null]) {
+    assert.equal(derivePoliPatientFlow({ ...base, record: { ...base.record, physicalExamClinicianVerified: flag } }, now).priority, 'review')
+    assert.equal(derivePoliPatientFlow({ ...base, record: { ...base.record, recordClinicianSigned: flag } }, now).priority, 'review')
+  }
+})
+
+test('board and visit telemetry share a finite point-in-time observation guard', () => {
+  const at = Date.parse(now)
+  assert.equal(isClinicalObservationAvailableAt(now, at), true)
+  assert.equal(isClinicalObservationAvailableAt('2026-10-04T08:55:00.000Z', at), true)
+  for (const value of ['2026-10-05T08:55:00.000Z', 'invalid', null, 1, false]) assert.equal(isClinicalObservationAvailableAt(value, at), false)
+  assert.equal(isClinicalObservationAvailableAt(now, Number.NaN), false)
+})
+
+
+test('parseable malformed calendar timestamps cannot become present observations', () => {
+  const at = Date.parse(now)
+  for (const value of ['1', '2026-09-31T12:00:00.000Z', '2026-02-29T00:00:00Z', '2026-10-01T24:00:00Z', '2026-10-01', '2026-10-01T09:00:00+14:01']) {
+    assert.equal(isClinicalObservationAvailableAt(value, at), false, value)
+    assert.equal(derivePoliPatientFlow({ ...base, vitalTimestamps: [value] }, now).priority, 'data-gap', value)
+  }
+  for (const value of ['2024-02-29T00:00:00Z', '2026-10-04T16:00:00+07:00', '2026-10-04T09:00:00.000Z']) assert.equal(isClinicalObservationAvailableAt(value, at), true, value)
 })
