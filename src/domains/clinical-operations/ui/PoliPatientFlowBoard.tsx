@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Prosa } from '../../../components/Prosa'
 import type { PoliFlowPriority, PoliPatientFlow } from '../model/poliPatientFlow'
 
 interface PoliPatientFlowBoardProps {
@@ -9,6 +8,17 @@ interface PoliPatientFlowBoardProps {
 }
 
 const CONTINUUM = ['Daily life', 'Outpatient', 'Ward', 'Operating room', 'ICU', 'Home / follow-up']
+
+function CompactContext({ children, className }: { children: string; className: string }) {
+  return (
+    <details className={className}>
+      <summary className="cursor-pointer list-none font-inherit after:ml-1 after:text-[9px] after:opacity-60 after:content-['ⓘ']">
+        <span className="line-clamp-1">{children}</span>
+      </summary>
+      <div className="mt-1">{children}</div>
+    </details>
+  )
+}
 
 function priorityClass(priority: PoliFlowPriority) {
   if (priority === 'critical') return 'border-red-400/35 bg-red-400/10 text-red-100'
@@ -57,9 +67,9 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
               One OS · outpatient command board
             </div>
             <h1 className="mt-1 text-xl font-black tracking-[-.035em] sm:text-2xl">Poli patient flow</h1>
-            <Prosa kelas="mt-2 text-sm leading-relaxed text-white/55">
+            <CompactContext className="mt-2 text-sm leading-relaxed text-white/55">
               One patient state across everyday life and every care setting. This board organizes workflow; it does not autonomously diagnose, triage, prescribe, or sign clinical decisions.
-            </Prosa>
+            </CompactContext>
           </div>
           <div className="grid min-w-[220px] grid-cols-3 gap-2 text-center">
             {[
@@ -83,9 +93,9 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
             </div>
           ))}
         </div>
-        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-white/35">
+        <CompactContext className="mt-2 text-[10px] leading-relaxed text-white/35">
           Architecture target: wearables and home sensors, clinic devices, ward monitors, OR/anesthesia systems, ICU devices, laboratory, imaging, medication and follow-up reconcile into the same provenance-aware longitudinal state.
-        </Prosa>
+        </CompactContext>
       </header>
 
       {rows.length === 0 ? (
