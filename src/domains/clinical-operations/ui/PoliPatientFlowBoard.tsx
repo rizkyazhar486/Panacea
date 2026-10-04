@@ -102,7 +102,7 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
         <div className="p-6 text-center sm:p-10">
           <div className="text-base font-black">No patients in the clinical store yet</div>
           <p className="mx-auto mt-2 max-w-xl text-sm text-white/45">
-            Add a patient in AI-EMR. The poli board will use the same patient identity instead of creating a second list.
+            Add a patient in AI-EMR; the poli board reuses the same patient identity rather than creating another list.
           </p>
           <Link to="/emr" className="mt-4 inline-flex min-h-10 items-center rounded-full bg-white px-4 text-xs font-black text-black">
             Open AI-EMR
