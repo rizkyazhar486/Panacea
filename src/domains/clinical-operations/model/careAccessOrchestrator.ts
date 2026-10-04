@@ -2,7 +2,8 @@ export type CoverageState = 'unknown' | 'self-pay' | 'active' | 'inactive'
 export type PreauthorizationState = 'unknown' | 'not-required' | 'required' | 'requested' | 'approved' | 'denied'
 export type PaymentState = 'not-submitted' | 'submitted' | 'adjudicating' | 'approved' | 'partially-approved' | 'paid' | 'denied'
 export type DiagnosticRouteState = 'local' | 'referral-required' | 'in-transit' | 'processing-remote' | 'result-returned'
-export type OrchestrationPriority = 'blocked' | 'attention' | 'ready'
+export type FinancialWorkflowState = 'blocked' | 'attention' | 'ready'
+export type DiagnosticContinuityState = 'gap' | 'intact'
 
 export interface ClaimEvidenceState {
   patientIdentityResolved: boolean
@@ -39,13 +40,30 @@ export interface CareAccessOrchestrationInput {
   diagnostics: readonly DiagnosticReferralState[]
 }
 
-export interface CareAccessOrchestrationResult {
-  priority: OrchestrationPriority
-  nextOperationalAction: string
-  claimReady: boolean
-  diagnosticContinuityReady: boolean
-  missingClaimEvidence: string[]
+export interface ClinicalCareBoundary {
+  authority: 'outside-orchestrator'
+  financialStateMayDenyCare: false
+  diagnosticStateMayAuthorizeTreatment: false
+}
+
+export interface DiagnosticContinuityResult {
+  state: DiagnosticContinuityState
   blockedDiagnosticIds: string[]
+}
+
+export interface FinancialWorkflowResult {
+  state: FinancialWorkflowState
+  nextAdministrativeAction: string
+  claimEvidenceReady: boolean
+  claimSubmissionReady: boolean
+  preauthorizationReady: boolean
+  missingClaimEvidence: string[]
+}
+
+export interface CareAccessOrchestrationResult {
+  clinicalCare: ClinicalCareBoundary
+  diagnosticContinuity: DiagnosticContinuityResult
+  financialWorkflow: FinancialWorkflowResult
   warnings: string[]
 }
 
@@ -60,7 +78,7 @@ const CLAIM_EVIDENCE_LABELS: ReadonlyArray<[keyof ClaimEvidenceState, string]> =
   ['provenanceComplete', 'provenance'],
 ]
 
-function diagnosticRouteReady(route: DiagnosticReferralState): boolean {
+function diagnosticRouteContinuityIntact(route: DiagnosticReferralState): boolean {
   if (!route.orderRecorded || !route.specimenOrStudyIdentityResolved) return false
   if (route.localCapabilityAvailable) return route.resultLinkedToPatientState || route.state === 'local'
   return (
@@ -74,13 +92,33 @@ function diagnosticRouteReady(route: DiagnosticReferralState): boolean {
   )
 }
 
+function financialResult(
+  state: FinancialWorkflowState,
+  nextAdministrativeAction: string,
+  claimEvidenceReady: boolean,
+  claimSubmissionReady: boolean,
+  preauthorizationReady: boolean,
+  missingClaimEvidence: string[],
+): FinancialWorkflowResult {
+  return {
+    state,
+    nextAdministrativeAction,
+    claimEvidenceReady,
+    claimSubmissionReady,
+    preauthorizationReady,
+    missingClaimEvidence,
+  }
+}
+
 /**
- * Operational orchestrator for care access, diagnostics and reimbursement.
+ * Administrative/logistics orchestrator for one care episode.
  *
- * It never decides what test/treatment is clinically indicated and never
- * invents payer approval. Its job is to expose administrative/logistics gaps
- * so a clinically authorized plan can move without losing patient identity,
- * provenance, diagnostic continuity or reimbursement evidence.
+ * Safety boundary:
+ * - financial workflow state never authorizes or denies clinically indicated care;
+ * - diagnostic continuity state never determines treatment;
+ * - payer denial, missing adapter, or missing claim evidence blocks only the
+ *   corresponding administrative workflow;
+ * - this function never invents payer approval or clinical documentation.
  */
 export function evaluateCareAccessOrchestration(
   input: CareAccessOrchestrationInput,
@@ -90,19 +128,27 @@ export function evaluateCareAccessOrchestration(
     .map(([, label]) => label)
 
   const blockedDiagnosticIds = input.diagnostics
-    .filter((route) => !diagnosticRouteReady(route))
+    .filter((route) => !diagnosticRouteContinuityIntact(route))
     .map((route) => route.id)
 
-  const diagnosticContinuityReady = blockedDiagnosticIds.length === 0
+  const diagnosticContinuity: DiagnosticContinuityResult = {
+    state: blockedDiagnosticIds.length === 0 ? 'intact' : 'gap',
+    blockedDiagnosticIds,
+  }
+
+  const claimEvidenceReady = missingClaimEvidence.length === 0
   const coverageAllowsClaim = input.payer.coverage === 'active'
   const preauthorizationReady =
     input.payer.preauthorization === 'not-required' ||
     input.payer.preauthorization === 'approved'
-  const claimReady =
+  const baseClaimSubmissionReady =
     coverageAllowsClaim &&
     input.payer.payerAdapterConfigured &&
     preauthorizationReady &&
-    missingClaimEvidence.length === 0
+    claimEvidenceReady
+  const claimSubmissionReady =
+    baseClaimSubmissionReady &&
+    input.payer.payment === 'not-submitted'
 
   const warnings: string[] = []
   if (input.payer.coverage === 'unknown') warnings.push('Coverage status is unknown')
@@ -112,99 +158,96 @@ export function evaluateCareAccessOrchestration(
   if (input.payer.payment === 'denied') warnings.push('Submitted claim/payment was denied')
   if (blockedDiagnosticIds.length) warnings.push('One or more diagnostic routes have continuity gaps')
 
-  if (!diagnosticContinuityReady) {
-    return {
-      priority: 'blocked',
-      nextOperationalAction: 'Resolve diagnostic referral, transport, identity, or result-linkage gap',
-      claimReady,
-      diagnosticContinuityReady,
-      missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
+  let financialWorkflow: FinancialWorkflowResult
 
   if (input.payer.coverage === 'self-pay') {
-    return {
-      priority: 'ready',
-      nextOperationalAction: 'Proceed with transparent self-pay estimate and settlement workflow',
-      claimReady: false,
-      diagnosticContinuityReady,
-      missingClaimEvidence: [],
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
-
-  if (input.payer.coverage !== 'active') {
-    return {
-      priority: 'blocked',
-      nextOperationalAction: 'Resolve coverage or payment responsibility before claim submission',
-      claimReady: false,
-      diagnosticContinuityReady,
+    financialWorkflow = financialResult(
+      'ready',
+      'Proceed with transparent self-pay estimate and settlement workflow',
+      claimEvidenceReady,
+      false,
+      false,
       missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
-
-  if (!input.payer.payerAdapterConfigured) {
-    return {
-      priority: 'blocked',
-      nextOperationalAction: 'Configure the jurisdiction/payer reimbursement adapter',
-      claimReady: false,
-      diagnosticContinuityReady,
+    )
+  } else if (input.payer.coverage !== 'active') {
+    financialWorkflow = financialResult(
+      'blocked',
+      'Resolve coverage or payment responsibility before claim submission',
+      claimEvidenceReady,
+      false,
+      false,
       missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
-
-  if (input.payer.preauthorization === 'required' || input.payer.preauthorization === 'requested' || input.payer.preauthorization === 'unknown') {
-    return {
-      priority: 'attention',
-      nextOperationalAction: 'Resolve coverage eligibility and preauthorization state',
-      claimReady: false,
-      diagnosticContinuityReady,
+    )
+  } else if (!input.payer.payerAdapterConfigured) {
+    financialWorkflow = financialResult(
+      'blocked',
+      'Configure the jurisdiction/payer reimbursement adapter',
+      claimEvidenceReady,
+      false,
+      preauthorizationReady,
       missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
-
-  if (input.payer.preauthorization === 'denied') {
-    return {
-      priority: 'blocked',
-      nextOperationalAction: 'Review payer denial and authorized alternatives with responsible staff',
-      claimReady: false,
-      diagnosticContinuityReady,
+    )
+  } else if (input.payer.preauthorization === 'denied') {
+    financialWorkflow = financialResult(
+      'blocked',
+      'Review payer denial and authorized administrative alternatives with responsible staff',
+      claimEvidenceReady,
+      false,
+      false,
       missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
-  }
-
-  if (missingClaimEvidence.length > 0) {
-    return {
-      priority: 'attention',
-      nextOperationalAction: 'Complete claim evidence without fabricating missing clinical documentation',
-      claimReady: false,
-      diagnosticContinuityReady,
+    )
+  } else if (
+    input.payer.preauthorization === 'required' ||
+    input.payer.preauthorization === 'requested' ||
+    input.payer.preauthorization === 'unknown'
+  ) {
+    financialWorkflow = financialResult(
+      'attention',
+      'Resolve coverage eligibility and preauthorization state',
+      claimEvidenceReady,
+      false,
+      false,
       missingClaimEvidence,
-      blockedDiagnosticIds,
-      warnings,
-    }
+    )
+  } else if (input.payer.payment === 'denied') {
+    financialWorkflow = financialResult(
+      'attention',
+      'Review claim denial, adjudication evidence and authorized resubmission or appeal path',
+      claimEvidenceReady,
+      false,
+      true,
+      missingClaimEvidence,
+    )
+  } else if (!claimEvidenceReady) {
+    financialWorkflow = financialResult(
+      'attention',
+      'Complete claim evidence without fabricating missing clinical documentation',
+      false,
+      false,
+      true,
+      missingClaimEvidence,
+    )
+  } else {
+    financialWorkflow = financialResult(
+      'ready',
+      input.payer.payment === 'not-submitted'
+        ? 'Claim packet is ready for authorized submission'
+        : 'Track adjudication, reconciliation and settlement',
+      true,
+      claimSubmissionReady,
+      true,
+      [],
+    )
   }
 
   return {
-    priority: 'ready',
-    nextOperationalAction: input.payer.payment === 'not-submitted'
-      ? 'Claim packet is ready for authorized submission'
-      : 'Track adjudication, reconciliation and settlement',
-    claimReady,
-    diagnosticContinuityReady,
-    missingClaimEvidence,
-    blockedDiagnosticIds,
+    clinicalCare: {
+      authority: 'outside-orchestrator',
+      financialStateMayDenyCare: false,
+      diagnosticStateMayAuthorizeTreatment: false,
+    },
+    diagnosticContinuity,
+    financialWorkflow,
     warnings,
   }
 }
