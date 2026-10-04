@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { isIntentConsentActive, validateIntentEvent } from '../../src/lib/neuralIntent.ts'
+import { isIntentConsentActive, validateIntentEvent, canProjectIntent, projectIntentToDigitalBody } from '../../src/lib/neuralIntent.ts'
 import { createPersonalAvatarCaptureSession, recordPersonalAvatarFrame, preparePersonalAvatarReconstruction, PERSONAL_AVATAR_CAPTURE_VIEWS } from '../../src/lib/personalAvatar.ts'
 const at = '2026-10-04T12:00:00.000Z'
 const intentConsent = { granted: true, purposes: ['personal-visualization'], grantedAt: at }
@@ -35,4 +35,13 @@ test('reconstruction rechecks imported consent while preserving capture-only con
   assert.throws(() => preparePersonalAvatarReconstruction(session), /consent/)
   for (const patch of [{ granted: 'false' }, { allowReconstruction: 'false' }, { purpose: 'unsupported' }, { rawFrameRetention: 'persistent' }]) assert.throws(() => preparePersonalAvatarReconstruction({ ...session, consent: { ...avatarConsent, ...patch } }))
   assert.equal(preparePersonalAvatarReconstruction({ ...session, consent: avatarConsent }).captureViewIds.length, 9)
+})
+
+test('future intent evidence cannot enter an earlier clinical or visual projection', () => {
+  const future = { ...event, capturedAt: '2026-10-05T12:00:00.000Z', receivedAt: '2026-10-05T12:00:00.000Z', consent: { ...intentConsent, purposes: ['personal-visualization', 'clinical-support', 'ai-context'] } }
+  for (const purpose of future.consent.purposes) {
+    assert.equal(canProjectIntent(future, purpose, Date.parse(at)), false)
+    assert.equal(projectIntentToDigitalBody(future, purpose, Date.parse(at)), null)
+    assert.equal(canProjectIntent(future, purpose, Date.parse(future.capturedAt)), true)
+  }
 })

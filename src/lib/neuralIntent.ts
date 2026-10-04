@@ -197,6 +197,7 @@ export function canProjectIntent(
   validateIntentEvent(event)
   if (event.status === 'rejected') return false
   if (!isIntentConsentActive(event.consent, purpose, atMs)) return false
+  if (parseIso(event.capturedAt, 'event.capturedAt') > atMs) return false
   if (event.evidenceClass === 'simulated' && (purpose === 'clinical-support' || purpose === 'ai-context')) {
     return false
   }
