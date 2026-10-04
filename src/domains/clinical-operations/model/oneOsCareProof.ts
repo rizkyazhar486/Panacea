@@ -39,6 +39,7 @@ export interface OneOsProofResult {
   sourceCount: number
   fragmentCount: number
   unresolvedFragmentCount: number
+  duplicateFragmentIds: string[]
   trustworthyFragmentCount: number
   trustCoverage: number | null
   requiredDataClassCount: number
@@ -80,7 +81,10 @@ function trustworthyFragment(
   fragment: OneOsEvidenceFragment,
   targetPatientId: string,
   evaluatedAtMs: number,
+  duplicateFragmentIds: ReadonlySet<string>,
 ): boolean {
+  const fragmentId = fragment.id.trim()
+  const fragmentIdentityValid = fragmentId !== '' && !duplicateFragmentIds.has(fragmentId)
   const recordedAtMs = Date.parse(fragment.recordedAt)
   const timestampValid = Number.isFinite(recordedAtMs) && recordedAtMs <= evaluatedAtMs
   const identityValid = fragment.patientId.trim() !== '' && fragment.patientId === targetPatientId
@@ -95,6 +99,7 @@ function trustworthyFragment(
     )
 
   return Boolean(
+    fragmentIdentityValid &&
     timestampValid &&
     identityValid &&
     sourceValid &&
@@ -120,8 +125,20 @@ export function evaluateOneOsCareProof(input: OneOsProofInput): OneOsProofResult
   const evaluatedAtMs = Date.parse(input.evaluatedAt)
   if (!Number.isFinite(evaluatedAtMs)) throw new Error('evaluatedAt must be a valid timestamp')
 
+  const fragmentIdCounts = new Map<string, number>()
+  for (const fragment of input.fragments) {
+    const fragmentId = fragment.id.trim()
+    if (!fragmentId) continue
+    fragmentIdCounts.set(fragmentId, (fragmentIdCounts.get(fragmentId) ?? 0) + 1)
+  }
+  const duplicateFragmentIds = new Set(
+    [...fragmentIdCounts.entries()]
+      .filter(([, count]) => count > 1)
+      .map(([fragmentId]) => fragmentId),
+  )
+
   const trusted = input.fragments.filter((fragment) =>
-    trustworthyFragment(fragment, targetPatientId, evaluatedAtMs),
+    trustworthyFragment(fragment, targetPatientId, evaluatedAtMs, duplicateFragmentIds),
   )
   const unresolvedFragmentCount = input.fragments.length - trusted.length
 
@@ -181,6 +198,7 @@ export function evaluateOneOsCareProof(input: OneOsProofInput): OneOsProofResult
     sourceCount,
     fragmentCount: input.fragments.length,
     unresolvedFragmentCount,
+    duplicateFragmentIds: [...duplicateFragmentIds],
     trustworthyFragmentCount: trusted.length,
     trustCoverage: ratio(trusted.length, input.fragments.length),
     requiredDataClassCount,
