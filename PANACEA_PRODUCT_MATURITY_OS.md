@@ -31,9 +31,13 @@ The objective is not model persuasion. It is to make continued investment ration
 
 All maturity work also follows [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Overall system maturity is bounded by the weakest critical dimension:
 
-`S_system = min(architecture, orchestration, infrastructure, human value, economic value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth, compactness)`.
+`S_system = min(architecture, orchestration, infrastructure, human value, economic value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth, compactness, universal human acceptability)`.
 
 No weighted average may hide a weak critical dimension. Optimize the weakest bottleneck while preserving the current wedge.
+
+## Universal human acceptance gate
+
+All current and future work must also follow [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md). Universality is a weakest-link property across accessibility, language, literacy, culture/worldview, life stage, ability, affordability, connectivity, device, role, jurisdiction, agency and dignity. The active wedge is the first validation vehicle; do not create separate product silos for each population.
 
 ## Current product wedge lock
 
