@@ -12,12 +12,28 @@
 // - satuan: dari JENIS_LAB; butir jenis tak dikenal dilewati, bukan ditebak;
 // - kepercayaan ingest diberikan pemanggil, tidak dikarang dari angkanya.
 import { JENIS_LAB, type ButirLab } from './lab.ts'
+import { tanggalKalenderSah } from './tanggal.ts'
 import type { ConsentEnvelope, LongitudinalEvent } from './panaceaLongitudinalState.ts'
 
 export interface LabBridgeContext {
   consent: ConsentEnvelope
   receivedAt: string
   confidence: number
+}
+
+function duplicateResultIds(rows: readonly ButirLab[]): Set<string> {
+  const seen = new Set<string>()
+  const duplicates = new Set<string>()
+  for (const row of rows) {
+    if (typeof row?.id !== 'string') continue
+    if (seen.has(row.id)) duplicates.add(row.id)
+    seen.add(row.id)
+  }
+  return duplicates
+}
+
+function validResultId(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(value)
 }
 
 export function labLogToLongitudinalEvents(
@@ -30,9 +46,12 @@ export function labLogToLongitudinalEvents(
   const penerimaan = Date.parse(context.receivedAt)
   for (const [jenis, daftar] of Object.entries(lab)) {
     const j = JENIS_LAB.find((x) => x.id === jenis)
+    const duplicateIds = duplicateResultIds(daftar)
     for (const b of daftar) {
+      if (!b || !validResultId(b.id)) { skipped.push({ jenis, id: b?.id ?? '', reason: 'invalid-record' }); continue }
       if (!j) { skipped.push({ jenis, id: b.id, reason: 'unknown-lab-type' }); continue }
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal) || !Number.isFinite(b.nilai) || b.nilai <= 0) { skipped.push({ jenis, id: b.id, reason: 'invalid-record' }); continue }
+      if (duplicateIds.has(b.id)) { skipped.push({ jenis, id: b.id, reason: 'duplicate-result-id' }); continue }
+      if (!tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || b.nilai <= 0) { skipped.push({ jenis, id: b.id, reason: 'invalid-record' }); continue }
       const recordedAt = `${b.tanggal}T00:00:00.000Z`
       // Tanggal ambil darah bisa "hari ini" di zona waktu pengguna tetapi besok di UTC.
       if (Date.parse(recordedAt) > penerimaan + 5 * 60_000) { skipped.push({ jenis, id: b.id, reason: 'future-date' }); continue }
@@ -75,8 +94,6 @@ export interface LabBodyExposureSignal {
   jenisId: string
 }
 
-const TANGGAL_LAB = /^\d{4}-\d{2}-\d{2}$/
-
 /**
  * Project the newest valid analyte per known type into overlay signals.
  * Unknown types, non-positive values, bad dates, and future draws (vs nowISO)
@@ -95,9 +112,10 @@ export function labLogToBodyExposureSignals(
   for (const jenis of JENIS_LAB) {
     const daftar = lab[jenis.id]
     if (!Array.isArray(daftar) || daftar.length === 0) continue
+    const duplicateIds = duplicateResultIds(daftar)
     let best: ButirLab | null = null
     for (const b of daftar) {
-      if (!b || !TANGGAL_LAB.test(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
+      if (!b || !validResultId(b.id) || duplicateIds.has(b.id) || !tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
       const t = Date.parse(`${b.tanggal}T00:00:00.000Z`)
       if (!Number.isFinite(t) || t > nowMs) continue
       if (!best || b.tanggal > best.tanggal) best = b
@@ -119,4 +137,3 @@ export function labLogToBodyExposureSignals(
     .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt) || a.jenisId.localeCompare(b.jenisId))
     .slice(0, Math.floor(max))
 }
-

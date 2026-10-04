@@ -21,6 +21,12 @@ const ID_JENIS = /^[a-z0-9_-]{1,32}$/
 const ID_BUTIR = /^[A-Za-z0-9_-]{1,64}$/
 const TANGGAL = /^\d{4}-\d{2}-\d{2}$/
 
+function tanggalKalenderSah(value: unknown): value is string {
+  if (typeof value !== 'string' || !TANGGAL.test(value)) return false
+  const ms = Date.parse(`${value}T00:00:00.000Z`)
+  return Number.isFinite(ms) && new Date(ms).toISOString().slice(0, 10) === value
+}
+
 export function validasiLogLab(masukan: unknown, sekarang: Date): LogLab {
   if (!masukan || typeof masukan !== 'object' || Array.isArray(masukan)) throw new Error('lab log must be an object')
   const entri = Object.entries(masukan as Record<string, unknown>)
@@ -33,10 +39,13 @@ export function validasiLogLab(masukan: unknown, sekarang: Date): LogLab {
     if (!Array.isArray(daftar)) throw new Error(`lab type ${jenis} must be a list`)
     if (daftar.length > MAKS_BUTIR_PER_JENIS) throw new Error(`too many results for ${jenis}`)
     const bersih: ButirLabServer[] = []
+    const seenIds = new Set<string>()
     for (const b of daftar) {
       const x = b as Partial<ButirLabServer>
       if (!x || typeof x.id !== 'string' || !ID_BUTIR.test(x.id)) throw new Error(`invalid result id in ${jenis}`)
-      if (typeof x.tanggal !== 'string' || !TANGGAL.test(x.tanggal) || Number.isNaN(Date.parse(`${x.tanggal}T00:00:00Z`))) throw new Error(`invalid date in ${jenis}`)
+      if (seenIds.has(x.id)) throw new Error(`duplicate result id in ${jenis}`)
+      seenIds.add(x.id)
+      if (!tanggalKalenderSah(x.tanggal)) throw new Error(`invalid date in ${jenis}`)
       if (x.tanggal > batas || x.tanggal < '1900-01-01') throw new Error(`date out of range in ${jenis}`)
       if (typeof x.nilai !== 'number' || !Number.isFinite(x.nilai) || x.nilai <= 0) throw new Error(`invalid value in ${jenis}`)
       // Rentang rujukan dari lembar lab: opsional, angka hingga, bawah < atas.
