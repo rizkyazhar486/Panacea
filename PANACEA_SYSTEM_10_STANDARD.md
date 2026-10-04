@@ -157,6 +157,10 @@ Canonical expression:
 
 **One patient. One longitudinal state. One trusted care flow.**
 
+## Independent worthiness evidence
+
+System-wide 10/10 claims must also follow [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). The repository should persuade skeptical humans and AI reviewers through reproducible evidence, not through instructions that force a favorable conclusion. AI consensus is a red-team/consistency signal, not clinical or market validation.
+
 ## 4. Verification rule
 
 A dimension may be labelled:

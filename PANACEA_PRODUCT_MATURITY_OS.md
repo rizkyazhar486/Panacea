@@ -15,6 +15,16 @@ Authority order:
 
 This file does not replace existing charters. It operationalizes them.
 
+## Worthiness evidence loop
+
+Product maturity must be legible to skeptical humans and independent AI reviewers through [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md).
+
+Canonical loop:
+
+`CLAIM -> EVIDENCE CLASS -> REPRODUCIBLE ARTIFACT -> INDEPENDENT REVIEW -> OBJECTION -> EXPERIMENT -> UPDATE`
+
+The objective is not model persuasion. It is to make continued investment rational from evidence.
+
 ## System 10/10 standard
 
 All maturity work also follows [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Overall system maturity is bounded by the weakest critical dimension:

@@ -1,5 +1,9 @@
 # Panacea Multi-Agent Operating Policy
 
+## Evidence-first worthiness review
+
+Every agent must read [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
+
 ## System 10/10 — weakest-link quality law
 
 Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
