@@ -79,15 +79,19 @@ const CLAIM_EVIDENCE_LABELS: ReadonlyArray<[keyof ClaimEvidenceState, string]> =
 ]
 
 function diagnosticRouteContinuityIntact(route: DiagnosticReferralState): boolean {
-  if (!route.orderRecorded || !route.specimenOrStudyIdentityResolved) return false
-  if (route.localCapabilityAvailable) return route.resultLinkedToPatientState || route.state === 'local'
+  if (route.orderRecorded !== true || route.specimenOrStudyIdentityResolved !== true) return false
+  if (route.localCapabilityAvailable === true) {
+    return route.state === 'local' ||
+      (route.state === 'result-returned' && route.resultLinkedToPatientState === true)
+  }
+  if (route.localCapabilityAvailable !== false) return false
   return (
-    route.destinationConfigured &&
-    route.chainOfCustodyComplete &&
+    route.destinationConfigured === true &&
+    route.chainOfCustodyComplete === true &&
     (
       route.state === 'in-transit' ||
       route.state === 'processing-remote' ||
-      (route.state === 'result-returned' && route.resultLinkedToPatientState)
+      (route.state === 'result-returned' && route.resultLinkedToPatientState === true)
     )
   )
 }
@@ -124,7 +128,7 @@ export function evaluateCareAccessOrchestration(
   input: CareAccessOrchestrationInput,
 ): CareAccessOrchestrationResult {
   const missingClaimEvidence = CLAIM_EVIDENCE_LABELS
-    .filter(([key]) => !input.payer.evidence[key])
+    .filter(([key]) => input.payer.evidence[key] !== true)
     .map(([, label]) => label)
 
   const blockedDiagnosticIds = input.diagnostics
@@ -143,7 +147,7 @@ export function evaluateCareAccessOrchestration(
     input.payer.preauthorization === 'approved'
   const baseClaimSubmissionReady =
     coverageAllowsClaim &&
-    input.payer.payerAdapterConfigured &&
+    input.payer.payerAdapterConfigured === true &&
     preauthorizationReady &&
     claimEvidenceReady
   const claimSubmissionReady =
@@ -153,14 +157,30 @@ export function evaluateCareAccessOrchestration(
   const warnings: string[] = []
   if (input.payer.coverage === 'unknown') warnings.push('Coverage status is unknown')
   if (input.payer.coverage === 'inactive') warnings.push('Coverage is inactive')
-  if (coverageAllowsClaim && !input.payer.payerAdapterConfigured) warnings.push('Payer adapter is not configured')
+  if (coverageAllowsClaim && input.payer.payerAdapterConfigured !== true) warnings.push('Payer adapter is not configured')
   if (input.payer.preauthorization === 'denied') warnings.push('Preauthorization was denied')
   if (input.payer.payment === 'denied') warnings.push('Submitted claim/payment was denied')
   if (blockedDiagnosticIds.length) warnings.push('One or more diagnostic routes have continuity gaps')
 
   let financialWorkflow: FinancialWorkflowResult
 
-  if (input.payer.coverage === 'self-pay') {
+  // TypeScript unions do not validate imported runtime payloads.
+  const payerStateValid =
+    ['unknown', 'self-pay', 'active', 'inactive'].includes(input.payer.coverage) &&
+    ['unknown', 'not-required', 'required', 'requested', 'approved', 'denied'].includes(input.payer.preauthorization) &&
+    ['not-submitted', 'submitted', 'adjudicating', 'approved', 'partially-approved', 'paid', 'denied'].includes(input.payer.payment)
+
+  if (!payerStateValid) {
+    warnings.push('Payer workflow contains an unsupported state')
+    financialWorkflow = financialResult(
+      'blocked',
+      'Resolve unsupported payer workflow state before administrative action',
+      claimEvidenceReady,
+      false,
+      false,
+      missingClaimEvidence,
+    )
+  } else if (input.payer.coverage === 'self-pay') {
     financialWorkflow = financialResult(
       'ready',
       'Proceed with transparent self-pay estimate and settlement workflow',
@@ -178,7 +198,7 @@ export function evaluateCareAccessOrchestration(
       false,
       missingClaimEvidence,
     )
-  } else if (!input.payer.payerAdapterConfigured) {
+  } else if (input.payer.payerAdapterConfigured !== true) {
     financialWorkflow = financialResult(
       'blocked',
       'Configure the jurisdiction/payer reimbursement adapter',

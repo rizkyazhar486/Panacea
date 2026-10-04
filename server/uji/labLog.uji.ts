@@ -23,6 +23,8 @@ for (const tanggal of ['2026-02-29', '2026-02-30', '2026-04-31', '1900-02-29']) 
   assert.throws(() => validasiLogLab({ gdp: [{ id: 'a', tanggal, nilai: 1 }] }, kini), /invalid date/)
 }
 assert.equal(validasiLogLab({ gdp: [{ id: 'leap', tanggal: '2024-02-29', nilai: 1 }] }, kini).gdp[0].tanggal, '2024-02-29')
+assert.throws(() => validasiLogLab({ gdp: [ok.gdp[0], { ...ok.gdp[0], tanggal: '2026-09-21' }] }, kini), /duplicate result id/)
+assert.doesNotThrow(() => validasiLogLab({ gdp: [ok.gdp[0]], hb: [ok.gdp[0]] }, kini), 'IDs are scoped to each analyte')
 assert.doesNotThrow(() => validasiLogLab({ gdp: [{ id: 'a', tanggal: '2026-09-26', nilai: 1 }] }, kini))
 // Cap waktu.
 assert.throws(() => validasiCapWaktu('2026-09-25T07:00:00Z', kini))

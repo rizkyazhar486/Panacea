@@ -71,3 +71,29 @@ test('direct and nutrition writes reject impossible dates; legacy invalid rows s
     else delete globalThis.localStorage
   }
 })
+
+test('ambiguous result IDs cannot silently discard one observation during canonical ingestion', () => {
+  for (const second of [row('2026-09-20'), { ...row('2026-09-20'), nilai: 110 }]) {
+    const lab = { gdp: [row('2026-09-01'), second] }
+    const before = structuredClone(lab)
+    assert.throws(() => validasiLogLab(lab, new Date(now)), /duplicate result id/)
+    const result = labLogToLongitudinalEvents(lab, 'patient-1', context)
+    assert.deepEqual(result.events, [])
+    assert.deepEqual(result.skipped.map(s => s.reason), ['duplicate-result-id', 'duplicate-result-id'])
+    assert.deepEqual(labLogToBodyExposureSignals(lab, { nowISO: now }), [])
+    assert.deepEqual(lab, before)
+  }
+  const scoped = { gdp: [row('2026-09-01')], hb: [{ ...row('2026-09-01'), nilai: 14 }] }
+  assert.doesNotThrow(() => validasiLogLab(scoped, new Date(now)))
+  assert.equal(labLogToLongitudinalEvents(scoped, 'patient-1', context).events.length, 2)
+})
+
+test('unambiguous lab observations survive next to duplicated or malformed legacy identities', () => {
+  const valid = { ...row('2026-09-22'), id: 'valid' }
+  const lab = { gdp: [row('2026-09-01'), row('2026-09-20'), valid, { ...row('2026-09-23'), id: '' }] }
+  const result = labLogToLongitudinalEvents(lab, 'patient-1', context)
+  assert.equal(result.events.length, 1)
+  assert.equal(result.events[0].id, 'lab:patient-1:gdp:valid')
+  assert.equal(result.skipped.length, 3)
+  assert.equal(labLogToBodyExposureSignals(lab, { nowISO: now })[0].id, 'lab-overlay:gdp:valid')
+})

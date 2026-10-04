@@ -21,6 +21,21 @@ export interface LabBridgeContext {
   confidence: number
 }
 
+function duplicateResultIds(rows: readonly ButirLab[]): Set<string> {
+  const seen = new Set<string>()
+  const duplicates = new Set<string>()
+  for (const row of rows) {
+    if (typeof row?.id !== 'string') continue
+    if (seen.has(row.id)) duplicates.add(row.id)
+    seen.add(row.id)
+  }
+  return duplicates
+}
+
+function validResultId(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(value)
+}
+
 export function labLogToLongitudinalEvents(
   lab: Record<string, readonly ButirLab[]>,
   subjectId: string,
@@ -31,8 +46,11 @@ export function labLogToLongitudinalEvents(
   const penerimaan = Date.parse(context.receivedAt)
   for (const [jenis, daftar] of Object.entries(lab)) {
     const j = JENIS_LAB.find((x) => x.id === jenis)
+    const duplicateIds = duplicateResultIds(daftar)
     for (const b of daftar) {
+      if (!b || !validResultId(b.id)) { skipped.push({ jenis, id: b?.id ?? '', reason: 'invalid-record' }); continue }
       if (!j) { skipped.push({ jenis, id: b.id, reason: 'unknown-lab-type' }); continue }
+      if (duplicateIds.has(b.id)) { skipped.push({ jenis, id: b.id, reason: 'duplicate-result-id' }); continue }
       if (!tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || b.nilai <= 0) { skipped.push({ jenis, id: b.id, reason: 'invalid-record' }); continue }
       const recordedAt = `${b.tanggal}T00:00:00.000Z`
       // Tanggal ambil darah bisa "hari ini" di zona waktu pengguna tetapi besok di UTC.
@@ -94,9 +112,10 @@ export function labLogToBodyExposureSignals(
   for (const jenis of JENIS_LAB) {
     const daftar = lab[jenis.id]
     if (!Array.isArray(daftar) || daftar.length === 0) continue
+    const duplicateIds = duplicateResultIds(daftar)
     let best: ButirLab | null = null
     for (const b of daftar) {
-      if (!b || !tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
+      if (!b || !validResultId(b.id) || duplicateIds.has(b.id) || !tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
       const t = Date.parse(`${b.tanggal}T00:00:00.000Z`)
       if (!Number.isFinite(t) || t > nowMs) continue
       if (!best || b.tanggal > best.tanggal) best = b
