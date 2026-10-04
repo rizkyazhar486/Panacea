@@ -7,7 +7,27 @@ const workflow = readFileSync(
   'utf8',
 )
 
-test('live Render smoke fails closed unless /api/health reports the exact deployed commit', () => {
+test('live Render smoke binds provenance to the latest canonical server-source commit', () => {
+  assert.match(
+    workflow,
+    /uses: actions\/checkout@v4[\s\S]*fetch-depth:\s*0/,
+    'provenance resolution needs full canonical history, not a shallow checkout',
+  )
+  assert.match(
+    workflow,
+    /expected_sha="\$\(git log -1 --format=%H -- server\)"/,
+    'expected deployment provenance must resolve from the latest commit that changed server source',
+  )
+  assert.match(
+    workflow,
+    /if \[ -z "\$expected_sha" \]; then[\s\S]*exit 1[\s\S]*fi/,
+    'missing server-source provenance must fail closed',
+  )
+  assert.doesNotMatch(
+    workflow,
+    /EXPECTED_SHA:\s*\$\{\{\s*github\.sha\s*\}\}/,
+    'workflow-only or frontend-only commits must not be misidentified as backend deployment revisions',
+  )
   assert.match(
     workflow,
     /health_endpoint="\$\{base%\/\}\/api\/health"/,
@@ -21,6 +41,6 @@ test('live Render smoke fails closed unless /api/health reports the exact deploy
   assert.match(
     workflow,
     /if \(!expected \|\| health\.build\?\.commit !== expected\) process\.exit\(4\)/,
-    'the deployed build commit must exactly equal github.sha and missing provenance must fail closed',
+    'the deployed build commit must exactly equal the resolved server-source SHA and missing provenance must fail closed',
   )
 })
