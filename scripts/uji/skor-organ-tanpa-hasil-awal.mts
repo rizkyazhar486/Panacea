@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { childPugh, sofaScore } from '../../src/domains/clinical-calculators/index.ts'
+import { childPugh, maddreyScore, sofaScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,8 +32,15 @@ const madKode = kodeDari(mad)
 for (const bawaan of ['useState(8.0)', 'useState(22)', 'useState(12)']) {
   assert.ok(!madKode.includes(bawaan), `a laboratory default is back in Maddrey: ${bawaan}`)
 }
-assert.ok(/const severe = lengkap && df >= 32/.test(madKode),
-  'Maddrey can call a patient severe again without a single laboratory value')
+// Sejak perhitungan dipindah ke domain/maddreyScore, "berat" hanya ada bila ketiga nilai sah. Regex teks-sumber lama diganti
+// padanannya, ditambah pemeriksaan perilaku pada mesin (lebih kuat dari regex).
+assert.ok(/const severe = res\.severe === true/.test(madKode) && /const lengkap = res\.df !== null/.test(madKode),
+  'Maddrey page no longer takes its severity/completeness from the validated engine')
+{
+  const tanpaLab = maddreyScore({ bilirubin: NaN, patientPt: NaN, controlPt: NaN })
+  assert.equal(tanpaLab.severe, null, 'Maddrey can call a patient severe again without a single laboratory value')
+  assert.equal(tanpaLab.df, null, 'Maddrey still computes a discriminant function from values nobody measured')
+}
 assert.ok(/\{lengkap && \([\s\S]{0,80}<ScoreTrend/.test(mad), 'Maddrey still records a trend point')
 assert.ok(/opened alarming rather than reassuring/.test(mad), 'the page no longer explains which way it used to err')
 
@@ -41,7 +48,11 @@ assert.ok(/opened alarming rather than reassuring/.test(mad), 'the page no longe
 const df = (bili: number, pt: number, kontrol: number) => 4.6 * (pt - kontrol) + bili
 assert.equal(df(8, 22, 12), 54, 'the old defaults no longer give 54; re-read this gate')
 assert.ok(df(8, 22, 12) >= 32, 'the old defaults no longer cross the steroid threshold; re-read this gate')
-assert.ok(/4\.6 \* ptDiff \+ bilirubin/.test(madKode), 'the page no longer applies the Maddrey formula')
+// Rumus kini ada di mesin: ia harus sama dengan rumus independen di atas pada beberapa tuple (bukan lagi regex pada halaman).
+for (const [b, pt, k] of [[8, 22, 12], [3, 14, 12], [1, 12, 12], [20, 30, 13]] as const) {
+  const r = maddreyScore({ bilirubin: b, patientPt: pt, controlPt: k })
+  assert.ok(r.df !== null && Math.abs(r.df - df(b, pt, k)) < 1e-9, `the engine no longer applies the Maddrey formula for ${[b, pt, k]}`)
+}
 
 // ── SOFA (Vincent 1996) ────────────────────────────────────────────────────
 const sofa = baca('SofaScore.tsx')
