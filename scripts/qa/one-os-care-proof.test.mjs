@@ -64,6 +64,18 @@ test('pending review and absent provenance fail closed instead of inflating trus
   assert.deepEqual(result.missingRequiredDataClasses, ['laboratory'])
 })
 
+test('rejected review state never enters trusted context even when review is not otherwise required', () => {
+  const result = evaluateOneOsCareProof({
+    targetPatientId: 'patient-1',
+    evaluatedAt: at,
+    requiredDataClasses: ['vitals'],
+    fragments: [fragment({ reviewState: 'rejected' })],
+  })
+  assert.equal(result.trustCoverage, 0)
+  assert.equal(result.completenessCoverage, 0)
+  assert.equal(result.unresolvedFragmentCount, 1)
+})
+
 test('wrong patient identity and future timestamps do not enter the trusted patient context', () => {
   const result = evaluateOneOsCareProof({
     targetPatientId: 'patient-1',

@@ -87,9 +87,12 @@ function trustworthyFragment(
   const sourceValid = fragment.sourceId.trim() !== ''
   const dataClassValid = fragment.dataClass.trim() !== ''
   const reviewValid =
-    !fragment.requiresClinicalReview ||
-    fragment.reviewState === 'verified' ||
-    fragment.reviewState === 'signed'
+    fragment.reviewState !== 'rejected' &&
+    (
+      !fragment.requiresClinicalReview ||
+      fragment.reviewState === 'verified' ||
+      fragment.reviewState === 'signed'
+    )
 
   return Boolean(
     timestampValid &&
@@ -120,8 +123,7 @@ export function evaluateOneOsCareProof(input: OneOsProofInput): OneOsProofResult
   const trusted = input.fragments.filter((fragment) =>
     trustworthyFragment(fragment, targetPatientId, evaluatedAtMs),
   )
-  const trustedIds = new Set(trusted.map((fragment) => fragment.id))
-  const unresolvedFragmentCount = input.fragments.filter((fragment) => !trustedIds.has(fragment.id)).length
+  const unresolvedFragmentCount = input.fragments.length - trusted.length
 
   const sourceCount = new Set(
     input.fragments
