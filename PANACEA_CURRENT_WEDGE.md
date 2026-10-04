@@ -8,6 +8,27 @@ This is not Panaceamed's final scope. It is the present product wedge used to pr
 
 Change this wedge only by explicit owner direction or after its proof boundary is reached and recorded.
 
+## Compact product law
+
+The product must remain **one, compact, simple, strong, sharp and minimal** even as the underlying healthcare system becomes deeper.
+
+Canonical expression:
+
+**One patient. One longitudinal state. One trusted care flow.**
+
+Design law:
+
+**Maximum orchestration depth, minimum visible complexity.**
+
+A solution may add internal capability, but it must not fragment the user experience. New work should normally:
+- reduce handoffs, repeated entry or context switching;
+- collapse multiple technical steps into one clear workflow;
+- preserve one dominant next action per surface;
+- hide implementation complexity behind progressive disclosure;
+- reuse the same canonical patient state instead of exposing subsystem boundaries.
+
+If a technically correct solution makes the product feel broader, noisier or harder to understand, redesign the projection before expanding further.
+
 ## 1. The current problem to solve
 
 Healthcare already has consumer wearables, wellness dashboards, AI chat assistants, EMRs, laboratories, imaging systems, hospital systems and payer systems. Panaceamed should not try to win by reproducing every one of them at once.

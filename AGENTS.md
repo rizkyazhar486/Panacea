@@ -2,7 +2,7 @@
 
 ## Current execution wedge — read before broad work
 
-Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
+Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
 
 ## One OS longitudinal care doctrine — immutable product north star
 

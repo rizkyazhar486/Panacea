@@ -16,6 +16,8 @@ Panaceamed exists to make fragmented healthcare function as **one simple, truste
 
 The user must not carry the complexity of the healthcare system. Backend complexity may be deep; clinician and patient surfaces should remain compact, minimal, legible and action-oriented.
 
+The permanent presentation law is **maximum orchestration depth, minimum visible complexity**. Panacea should become more capable internally while feeling smaller, clearer and more decisive externally. The canonical compact expression is: **One patient. One longitudinal state. One trusted care flow.**
+
 ## 2. One patient, one identity, one longitudinal state
 
 There must never be a second patient truth merely because care moves between applications, facilities, rooms, devices or time periods.
