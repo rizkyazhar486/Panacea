@@ -10,6 +10,12 @@ This doctrine records the owner's immutable raw target for Panaceamed. It sits b
 
 The immutable One OS target is governed by [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Architecture, orchestration, infrastructure, humanitarian value, economic purchasing value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are all first-class quality dimensions. A strong dimension may not compensate for a weak critical one.
 
+## Universal human acceptance
+
+The One OS north star also follows [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md): the same governed longitudinal truth should remain useful and dignified across materially different humans and care environments through adaptive presentation and boundary adapters. Universal does not mean identical UI or a claim that every person will prefer the product.
+
+**Any human. Any care setting. One trusted longitudinal care flow — adapted locally, governed consistently, and kept simple.**
+
 ## 1. Immutable raw target
 
 Panaceamed exists to make fragmented healthcare function as **one simple, trusted, longitudinal, integrated operating system**.
