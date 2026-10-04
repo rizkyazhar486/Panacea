@@ -13,9 +13,13 @@ The repository owner's latest explicit instruction remains the highest product-d
 
 **Human-observability doctrine:** [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md) defines the universal longitudinal observation-and-action layer. It formalizes continuous human-state intelligence as purpose-authorized observability, not covert surveillance: measured/recorded truth, derived/inferred/simulated state, data lineage, uncertainty, blind spots, consent, review, actions and outcomes must remain reconstructable and governed across every Panacea surface.
 
+**One OS longitudinal-care doctrine:** [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) is the immutable product north star: one patient identity, one provenance-aware longitudinal state, and one simple trusted orchestration layer spanning daily life, outpatient care, ward, operating room, ICU and follow-up. Features and models may change; this integration target does not.
+
 ---
 
 ## 1. Mission
+
+**Immutable product north star:** Panaceamed must make fragmented healthcare behave as one simple, trusted, longitudinal operating system. The canonical product doctrine is [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Clinical, AI-EMR, device, hospital, patient and educational surfaces are projections of one governed patient state, not independent product islands.
 
 Panacea is not merely a health application. It is intended to become a continuously improving health, biomedical, clinical, education, research, and human-performance operating system that converts trustworthy evidence and validated observations into useful understanding, safer action, testable hypotheses, and new knowledge.
 
