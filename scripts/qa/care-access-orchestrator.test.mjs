@@ -144,3 +144,90 @@ test('legacy top-level blocked/ready fields are absent to prevent semantic misus
   assert.equal('claimReady' in result, false)
   assert.equal('diagnosticContinuityReady' in result, false)
 })
+
+test('each claim evidence field requires literal true without mutating input', () => {
+  for (const key of Object.keys(evidence)) {
+    for (const value of [false, 'false', 'true', 1, {}, null, undefined]) {
+      const input = { payer: { ...payer, evidence: { ...evidence, [key]: value } }, diagnostics: [] }
+      const before = structuredClone(input)
+      const result = evaluateCareAccessOrchestration(input)
+      assert.equal(result.financialWorkflow.claimEvidenceReady, false, key)
+      assert.equal(result.financialWorkflow.claimSubmissionReady, false, key)
+      assert.equal(result.financialWorkflow.missingClaimEvidence.length, 1, key)
+      assert.deepEqual(input, before)
+    }
+  }
+})
+
+test('adapter capability requires literal true', () => {
+  for (const value of [false, 'false', 'true', 1, {}, null, undefined]) {
+    const result = evaluateCareAccessOrchestration({
+      payer: { ...payer, payerAdapterConfigured: value }, diagnostics: [],
+    })
+    assert.equal(result.financialWorkflow.state, 'blocked')
+    assert.equal(result.financialWorkflow.claimSubmissionReady, false)
+  }
+})
+
+test('unsupported payer enums block administration without acquiring clinical authority', () => {
+  for (const key of ['coverage', 'preauthorization', 'payment']) {
+    for (const value of ['unsupported', '', null, undefined, true]) {
+      const result = evaluateCareAccessOrchestration({
+        payer: { ...payer, [key]: value }, diagnostics: [],
+      })
+      assert.equal(result.financialWorkflow.state, 'blocked', key)
+      assert.equal(result.financialWorkflow.claimSubmissionReady, false, key)
+      assert.equal(result.financialWorkflow.preauthorizationReady, false, key)
+      assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
+      assert.equal(result.clinicalCare.diagnosticStateMayAuthorizeTreatment, false)
+      assert.ok(result.warnings.includes('Payer workflow contains an unsupported state'))
+    }
+  }
+})
+
+test('remote continuity requires literal recorded identity, destination and custody evidence', () => {
+  for (const key of ['orderRecorded', 'specimenOrStudyIdentityResolved', 'destinationConfigured', 'chainOfCustodyComplete']) {
+    for (const value of [false, 'false', 'true', 1, null, undefined]) {
+      const result = evaluateCareAccessOrchestration({
+        payer, diagnostics: [{ ...remoteLab, [key]: value }],
+      })
+      assert.equal(result.diagnosticContinuity.state, 'gap', key)
+      assert.deepEqual(result.diagnosticContinuity.blockedDiagnosticIds, ['lab-route-1'])
+    }
+  }
+})
+
+test('unknown local capability never substitutes for a validated route', () => {
+  for (const value of ['false', 'true', 1, null, undefined]) {
+    const result = evaluateCareAccessOrchestration({
+      payer, diagnostics: [{ ...remoteLab, localCapabilityAvailable: value }],
+    })
+    assert.equal(result.diagnosticContinuity.state, 'gap')
+  }
+})
+
+test('local and remote returned results require literal linkage evidence', () => {
+  for (const localCapabilityAvailable of [true, false]) {
+    for (const value of [false, 'false', 'true', 1, null, undefined, true]) {
+      const result = evaluateCareAccessOrchestration({
+        payer, diagnostics: [{
+          ...remoteLab, localCapabilityAvailable,
+          state: 'result-returned', resultLinkedToPatientState: value,
+        }],
+      })
+      assert.equal(result.diagnosticContinuity.state, value === true ? 'intact' : 'gap')
+    }
+  }
+})
+
+test('local capability accepts local work but never legitimizes contradictory or unknown route state', () => {
+  for (const state of ['local', 'in-transit', 'processing-remote', 'referral-required', 'unsupported']) {
+    const result = evaluateCareAccessOrchestration({
+      payer, diagnostics: [{
+        ...remoteLab, localCapabilityAvailable: true,
+        resultLinkedToPatientState: true, state,
+      }],
+    })
+    assert.equal(result.diagnosticContinuity.state, state === 'local' ? 'intact' : 'gap')
+  }
+})
