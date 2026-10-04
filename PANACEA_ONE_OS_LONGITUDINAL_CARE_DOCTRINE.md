@@ -6,6 +6,10 @@
 
 This doctrine records the owner's immutable raw target for Panaceamed. It sits beneath the Panacea Constitution and alongside the Computational Human Platform, Human Observability Doctrine, Humanity 10 Charter and Invictus Principle. Features, pages, models and visual modules may evolve; this target does not.
 
+## System quality target
+
+The immutable One OS target is governed by [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Architecture, orchestration, infrastructure, humanitarian value, economic purchasing value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are all first-class quality dimensions. A strong dimension may not compensate for a weak critical one.
+
 ## 1. Immutable raw target
 
 Panaceamed exists to make fragmented healthcare function as **one simple, trusted, longitudinal, integrated operating system**.

@@ -1,5 +1,10 @@
 # Panacea Multi-Agent Operating Policy
 
+## System 10/10 — weakest-link quality law
+
+Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
+
+
 ## Current execution wedge — read before broad work
 
 Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.

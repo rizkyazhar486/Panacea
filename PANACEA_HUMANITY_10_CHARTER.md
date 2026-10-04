@@ -39,6 +39,10 @@ Any feature, model, simulation, workflow, or integration should be judged agains
 
 ---
 
+## System-wide 10/10 relationship
+
+Humanity 10/10 is one critical dimension of the broader [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). System-wide excellence is conjunctive: humanitarian value cannot compensate for weak architecture, trust, resilience, economics, unity, depth or compactness, and those dimensions cannot compensate for weak human benefit.
+
 ## 2. Humanity 10/10 score
 
 For product-level prioritization, maintain a normalized score:

@@ -15,6 +15,14 @@ Authority order:
 
 This file does not replace existing charters. It operationalizes them.
 
+## System 10/10 standard
+
+All maturity work also follows [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Overall system maturity is bounded by the weakest critical dimension:
+
+`S_system = min(architecture, orchestration, infrastructure, human value, economic value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth, compactness)`.
+
+No weighted average may hide a weak critical dimension. Optimize the weakest bottleneck while preserving the current wedge.
+
 ## Current product wedge lock
 
 The active execution wedge is [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md): **Longitudinal Clinical Encounter Orchestrator** for outpatient/primary-care workflows, including rural/offline diagnostic referral and reimbursement evidence as parts of the same episode.
