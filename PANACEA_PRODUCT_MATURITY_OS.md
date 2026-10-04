@@ -15,6 +15,16 @@ Authority order:
 
 This file does not replace existing charters. It operationalizes them.
 
+## Current product wedge lock
+
+The active execution wedge is [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md): **Longitudinal Clinical Encounter Orchestrator** for outpatient/primary-care workflows, including rural/offline diagnostic referral and reimbursement evidence as parts of the same episode.
+
+Until this wedge is proven against a predefined baseline, default implementation must deepen this one workflow rather than expand unrelated product breadth. Consumer wearable chat/coaching is not the primary wedge; large consumer ecosystems can commoditize that layer. Panacea must prove orchestration, provenance, clinician workflow, referral continuity, patient understanding and reimbursement readiness.
+
+Canonical discipline:
+
+`EXPLORE BROADLY -> SHIP NARROWLY -> MEASURE -> DEEPEN -> REPEAT`
+
 ## Current phase
 Default development phase:
 

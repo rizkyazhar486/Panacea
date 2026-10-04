@@ -49,6 +49,12 @@ Raw data must not become clinical truth merely because it arrived from a device 
 
 Preferred healthcare interoperability contracts include HL7 FHIR R4, HL7 v2 where required, DICOM/DICOMweb, IHE device profiles, IEEE 11073 device semantics and standard clinical terminology/codes where appropriate. Vendor support is never claimed without a validated adapter and fixtures.
 
+## 5. Current proof wedge
+
+The immutable One OS vision is deliberately broader than the current shipping scope. The active wedge is defined in [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md): one outpatient/primary-care longitudinal clinical episode, from pre-visit context through clinician-controlled encounter, diagnostics/referral, patient explanation, reimbursement evidence and follow-up.
+
+This prevents the long-term platform vision from becoming simultaneous feature sprawl. Panacea should earn expansion by proving one workflow materially better.
+
 ## 5. Poli patient board is a primary clinical anchor
 
 Visit OS must expose a compact outpatient patient-flow board that answers before a clinician opens a chart:

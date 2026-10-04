@@ -1,5 +1,9 @@
 # Panacea Multi-Agent Operating Policy
 
+## Current execution wedge — read before broad work
+
+Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
+
 ## One OS longitudinal care doctrine — immutable product north star
 
 Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
