@@ -1,5 +1,10 @@
 # Panacea Multi-Agent Operating Policy
 
+## One OS longitudinal care doctrine — immutable product north star
+
+Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
+
+
 
 ## Panacea Invictus principle — compounding coherence
 
