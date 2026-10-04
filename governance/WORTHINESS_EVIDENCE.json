@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "updated_for_commit": "635c843ad30dca9577a8c26966a88083e7aac11e",
+  "scoring_rule": "Scores stay null until measured. 10/10 is prohibited without dimension-specific acceptance evidence.",
+  "evidence_levels": {
+    "E0": "hypothesis",
+    "E1": "repository evidence",
+    "E2": "measured workflow evidence",
+    "E3": "field evidence",
+    "E4": "external validation"
+  },
+  "dimensions": [
+    {
+      "id": "problem-reality",
+      "status": "hypothesis",
+      "evidence_level": "E0",
+      "score": null,
+      "evidence": [
+        "PANACEA_CURRENT_WEDGE.md",
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
+      ],
+      "blocker": "Needs a curated external problem-evidence packet and direct workflow observations.",
+      "next_experiment": "Document baseline workflow pain from outpatient/primary-care settings, including rural referral and data-return failures."
+    },
+    {
+      "id": "clinical-human-utility",
+      "status": "implemented-not-validated",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "src/domains/clinical-operations/model/oneOsCareProof.ts",
+        "scripts/qa/one-os-care-proof.test.mjs"
+      ],
+      "blocker": "No prospective field outcome or comprehension benchmark yet.",
+      "next_experiment": "Run predefined clinician/patient workflow and comprehension benchmark."
+    },
+    {
+      "id": "workflow-advantage",
+      "status": "implemented-not-measured",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "src/domains/clinical-operations/model/poliPatientFlow.ts",
+        "src/domains/clinical-operations/ui/PoliPatientFlowBoard.tsx",
+        "src/pages/VisitOS.tsx"
+      ],
+      "blocker": "No comparative time/step benchmark yet.",
+      "next_experiment": "Compare baseline vs Panacea encounter preparation time and interaction steps."
+    },
+    {
+      "id": "trustworthiness",
+      "status": "implemented-not-field-validated",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "src/domains/clinical-operations/model/oneOsCareProof.ts",
+        "scripts/qa/one-os-care-proof.test.mjs"
+      ],
+      "blocker": "Structural trust rules exist; external audit and real workflow verification remain pending.",
+      "next_experiment": "Audit identity, provenance, normalization, review-state and stale/conflict handling on representative cases."
+    },
+    {
+      "id": "architecture-coherence",
+      "status": "implemented",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md",
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "PANACEA_SYSTEM_10_STANDARD.md"
+      ],
+      "blocker": "Needs architecture review against deployed runtime behavior and duplicate-state inventory.",
+      "next_experiment": "Independent architecture review plus runtime trace of one patient across relevant surfaces."
+    },
+    {
+      "id": "interoperability",
+      "status": "partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "src/lib/panaceaLongitudinalState.ts",
+        "src/lib/longitudinalSnapshot.ts"
+      ],
+      "blocker": "Standards-aware design exists; jurisdiction/vendor adapters and conformance evidence are incomplete.",
+      "next_experiment": "Select one real standards-based source and complete adapter + fixtures + round-trip validation."
+    },
+    {
+      "id": "resilience-survivability",
+      "status": "implemented-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "src/domains/clinical-operations/model/careAccessOrchestrator.ts",
+        "src/domains/clinical-operations/model/clinicalEpisodeResilience.ts",
+        "src/lib/secureCareOutbox.ts",
+        "scripts/qa/care-access-orchestrator.test.mjs",
+        "scripts/qa/clinical-episode-resilience.test.mjs",
+        "scripts/qa/secure-care-outbox.test.mjs"
+      ],
+      "blocker": "Encrypted offline persistence, idempotent replay and fail-closed episode transport are represented at repository level; real network degradation, restart/recovery, multi-device conflict and disaster-recovery behavior are not yet field-validated.",
+      "next_experiment": "Run a controlled disconnect/reconnect and browser-restart drill on the clinical wedge, verify encrypted queue survival, exact-patient reconciliation, duplicate suppression and server acknowledgement, then repeat under a real low-bandwidth setting."
+    },
+    {
+      "id": "economic-purchasing-value",
+      "status": "hypothesis",
+      "evidence_level": "E0",
+      "score": null,
+      "evidence": [
+        "PANACEA_SYSTEM_10_STANDARD.md",
+        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
+      ],
+      "blocker": "No buyer-specific willingness-to-pay, implementation cost or measured ROI evidence.",
+      "next_experiment": "Run buyer discovery and workflow-cost baseline for clinician, clinic/Puskesmas, hospital and payer segments."
+    },
+    {
+      "id": "differentiation",
+      "status": "thesis-defined",
+      "evidence_level": "E0",
+      "score": null,
+      "evidence": [
+        "PANACEA_CURRENT_WEDGE.md",
+        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
+      ],
+      "blocker": "Needs formal benchmark against realistic tool combinations, not feature comparison.",
+      "next_experiment": "Benchmark end-to-end episode coordination against existing EMR + wearable + AI + referral + payer workflow."
+    },
+    {
+      "id": "compactness",
+      "status": "implemented-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_CURRENT_WEDGE.md",
+        "src/domains/clinical-operations/ui/PoliPatientFlowBoard.tsx",
+        "scripts/qa/compact-product-law.test.mjs"
+      ],
+      "blocker": "No measured cognitive-load/usability comparison yet.",
+      "next_experiment": "Usability test: task success, time, clicks, context switches, comprehension."
+    },
+    {
+      "id": "defensibility",
+      "status": "hypothesis",
+      "evidence_level": "E0",
+      "score": null,
+      "evidence": [
+        "PANACEA_INVICTUS_PRINCIPLE.md",
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
+      ],
+      "blocker": "Compounding moat is architectural thesis until deployment learning and integration depth are demonstrated.",
+      "next_experiment": "Track integration depth, switching cost, reusable primitives and deployment-specific learning across pilots."
+    },
+    {
+      "id": "global-adaptability",
+      "status": "architecture-target",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "src/domains/clinical-operations/model/careAccessOrchestrator.ts"
+      ],
+      "blocker": "No multi-jurisdiction payer/terminology/conformance deployments yet.",
+      "next_experiment": "Implement and validate two materially different jurisdiction/payer boundary adapters without forking the core."
+    },
+    {
+      "id": "universal-human-acceptance",
+      "status": "target-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md",
+        "governance/UNIVERSAL_HUMAN_ACCEPTANCE.json"
+      ],
+      "blocker": "Universal design doctrine and matrix exist, but representative subgroup validation is not yet complete.",
+      "next_experiment": "Run the current clinical wedge through the universal acceptance matrix, starting with accessibility, low-literacy, rural/offline and multi-language testing."
+    },
+    {
+      "id": "validated-vertical-depth",
+      "status": "implemented-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md",
+        "src/lib/biology/verticalBiologyGraph.ts",
+        "src/lib/biology/verticalDepthEvidence.ts",
+        "src/lib/biology/cardiovascularVerticalLineage.ts",
+        "src/lib/biology/physiologyVerticalProjection.ts",
+        "src/lib/physiology/realityGapRegistry.ts",
+        "scripts/qa/vertical-depth-evidence.test.mjs",
+        "scripts/uji/vertical-biological-graph.mts",
+        "scripts/uji/physiology-vertical-projection.mts"
+      ],
+      "blocker": "The repository now has executable no-hollow-gap and 10/10 eligibility gates, but current cardiovascular lineages still expose explicit cell-state and post-translational gaps and lack external validation/outcome-feedback evidence for the declared scope.",
+      "next_experiment": "Close one source-backed vertical gap in the cardiovascular slice without inventing patient-specific state, then run the same graph through real-input integration, projection, workflow/field evaluation and external validation."
+    },
+    {
+      "id": "evidence-maturity",
+      "status": "repository-evidence",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md",
+        "PANACEA_SYSTEM_10_STANDARD.md",
+        "governance/WORTHINESS_EVIDENCE.json"
+      ],
+      "blocker": "Most dimensions remain E0/E1; E2-E4 evidence is still sparse.",
+      "next_experiment": "Promote the current wedge through E2 workflow benchmark, then E3 field pilot, then independent E4 review."
+    }
+  ]
+}

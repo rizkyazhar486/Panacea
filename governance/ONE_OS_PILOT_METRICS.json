@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "protocol": "docs/pilots/ONE_OS_RURAL_FIELD_PILOT.md",
+  "privacy_rule": "Public-repository pilot exports must contain no direct patient identifiers, raw clinical narratives, images, credentials or raw clinical payloads.",
+  "modes": [
+    "baseline",
+    "one-os"
+  ],
+  "metrics": [
+    {
+      "id": "chart-prep-seconds",
+      "unit": "seconds",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    },
+    {
+      "id": "interaction-count",
+      "unit": "count",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    },
+    {
+      "id": "context-switch-count",
+      "unit": "count",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    },
+    {
+      "id": "duplicate-entry-count",
+      "unit": "count",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    },
+    {
+      "id": "trusted-completeness",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "trusted-required-data-classes",
+      "denominator": "required-data-classes"
+    },
+    {
+      "id": "trust-coverage",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "trustworthy-reconciled-fragments",
+      "denominator": "evaluated-fragments"
+    },
+    {
+      "id": "understanding",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "correct-responses",
+      "denominator": "scored-responses"
+    },
+    {
+      "id": "resilience-success-rate",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "drills-without-silent-loss-or-corruption",
+      "denominator": "attempted-resilience-drills"
+    },
+    {
+      "id": "result-return-rate",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "referred-results-returned-to-initiating-episode",
+      "denominator": "completed-referred-tests"
+    },
+    {
+      "id": "diagnostic-turnaround-seconds",
+      "unit": "seconds",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    },
+    {
+      "id": "first-pass-clean-claim-rate",
+      "unit": "ratio",
+      "direction": "higher-is-better",
+      "numerator": "claims-accepted-without-preventable-correction",
+      "denominator": "submitted-claims"
+    },
+    {
+      "id": "payment-cycle-seconds",
+      "unit": "seconds",
+      "direction": "lower-is-better",
+      "numerator": null,
+      "denominator": null
+    }
+  ],
+  "evidence_promotion": {
+    "E1": "repository tests and deterministic fixtures",
+    "E2": "predefined measured workflow/usability evidence",
+    "E3": "authorized prospective real-world field evidence",
+    "E4": "independent external validation or replication"
+  }
+}

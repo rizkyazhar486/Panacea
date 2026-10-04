@@ -1,5 +1,33 @@
 # Panacea Multi-Agent Operating Policy
 
+## Evidence-first worthiness review
+
+The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
+
+Every agent must read [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
+
+## Universal human acceptance — maximal universality without false claims
+
+Every agent must read [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md) and [`governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`](governance/UNIVERSAL_HUMAN_ACCEPTANCE.json). Preserve one canonical patient truth while adapting language, accessibility, literacy level, role, connectivity, device and jurisdiction. Do not claim unanimous human preference or universal validation from internal tests. The universality target is no unnecessary exclusion, preserved agency/dignity and evidence-backed adaptability.
+
+## System 10/10 — weakest-link quality law
+
+Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
+
+
+## Current execution wedge — read before broad work
+
+Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
+
+## One OS longitudinal care doctrine — immutable product north star
+
+Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
+
+**Global access/reimbursement rule:** clinical care, diagnostic logistics and reimbursement are coordinated as one episode, but no single payer protocol is assumed universal. Use a canonical internal coverage/claim state plus tested jurisdiction/payer adapters; remote/offline diagnostic referral must preserve patient identity, provenance, chain of custody and result return to the same longitudinal state. Financial optimization never authorizes fabricated clinical evidence or denial of care based only on profitability.
+
+**Permanent proof obligation:** do not treat architecture or feature count as success. Work must move toward demonstrable evidence that One/Invictus can reconcile fragmented longitudinal data into care workflow that is faster, more complete, more trustworthy and easier to understand. Speed and understanding claims require explicit comparative measurement; completeness and trust must fail closed on identity/provenance/time/normalization/review gaps. The canonical formulas and acceptance rules live in the One OS doctrine.
+
+
 
 ## Panacea Invictus principle — compounding coherence
 

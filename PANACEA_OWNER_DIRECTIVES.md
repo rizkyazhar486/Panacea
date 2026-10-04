@@ -1,5 +1,12 @@
 # Panaceamed.id — Claude Code working contract
 
+## Current wedge lock — 2026-10-04
+
+The owner's latest product-sharpening direction is codified in [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Do not confuse the long-term One OS vision with simultaneous implementation of every possible feature. The present execution focus is one real, high-friction workflow: outpatient/primary-care longitudinal clinical orchestration, including fragmented wearable/EMR/vital/lab data, clinician review, remote diagnostic referral, patient explanation, reimbursement evidence and follow-up.
+
+Large consumer ecosystems can increasingly provide wearable summaries and AI health coaching; Panacea must not make generic wearable chat its differentiation. Prove the harder system problem identified by clinical workflow evidence: reliable integration, provenance, liability-aware review, reimbursement, referral continuity and low-friction care delivery.
+
+
 ## Invictus compounding-depth authority — 2026-09-28
 
 For every broad continuation, architecture decision, major feature proposal, Computational Human task, Human Observability task, Body Exposure/simulation task, or future-model expansion, Claude Code must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).

@@ -15,6 +15,40 @@ Authority order:
 
 This file does not replace existing charters. It operationalizes them.
 
+## Worthiness evidence loop
+
+Current evidence state is tracked in [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json) and presented neutrally through [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md). Every material change should update the relevant evidence level, blocker and next experiment rather than inflate an aggregate score.
+
+Product maturity must be legible to skeptical humans and independent AI reviewers through [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md).
+
+Canonical loop:
+
+`CLAIM -> EVIDENCE CLASS -> REPRODUCIBLE ARTIFACT -> INDEPENDENT REVIEW -> OBJECTION -> EXPERIMENT -> UPDATE`
+
+The objective is not model persuasion. It is to make continued investment rational from evidence.
+
+## System 10/10 standard
+
+All maturity work also follows [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Overall system maturity is bounded by the weakest critical dimension:
+
+`S_system = min(architecture, orchestration, infrastructure, human value, economic value, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth, compactness, universal human acceptability)`.
+
+No weighted average may hide a weak critical dimension. Optimize the weakest bottleneck while preserving the current wedge.
+
+## Universal human acceptance gate
+
+All current and future work must also follow [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md). Universality is a weakest-link property across accessibility, language, literacy, culture/worldview, life stage, ability, affordability, connectivity, device, role, jurisdiction, agency and dignity. The active wedge is the first validation vehicle; do not create separate product silos for each population.
+
+## Current product wedge lock
+
+The active execution wedge is [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md): **Longitudinal Clinical Encounter Orchestrator** for outpatient/primary-care workflows, including rural/offline diagnostic referral and reimbursement evidence as parts of the same episode.
+
+Until this wedge is proven against a predefined baseline, default implementation must deepen this one workflow rather than expand unrelated product breadth. Consumer wearable chat/coaching is not the primary wedge; large consumer ecosystems can commoditize that layer. Panacea must prove orchestration, provenance, clinician workflow, referral continuity, patient understanding and reimbursement readiness.
+
+Canonical discipline:
+
+`EXPLORE BROADLY -> SHIP NARROWLY -> MEASURE -> DEEPEN -> REPEAT`
+
 ## Current phase
 Default development phase:
 
