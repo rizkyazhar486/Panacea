@@ -6,6 +6,10 @@ The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PA
 
 Every agent must read [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
 
+## Universal human acceptance — maximal universality without false claims
+
+Every agent must read [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md) and [`governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`](governance/UNIVERSAL_HUMAN_ACCEPTANCE.json). Preserve one canonical patient truth while adapting language, accessibility, literacy level, role, connectivity, device and jurisdiction. Do not claim unanimous human preference or universal validation from internal tests. The universality target is no unnecessary exclusion, preserved agency/dignity and evidence-backed adaptability.
+
 ## System 10/10 — weakest-link quality law
 
 Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
