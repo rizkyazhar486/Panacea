@@ -6,6 +6,22 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.purpose_consent_index_integrity
+    category: privacy
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Imported consent indices could substitute a different purpose, hide a stored revocation,
+      or use array order instead of decision time to authorize longitudinal data access.
+    mitigation: >-
+      2026-10-05: purposeConsentLedger validates decision actions/purposes and index-to-record
+      identity, purpose and completeness at use time. Invalid ledgers deny authorization and
+      expose a denied status without rewriting history. Temporal decisions are independent of
+      persisted array order; simultaneous contradictory decisions resolve to revocation.
+      Valid regrant, capture-interval restrictions and subject/purpose isolation are preserved.
+      This is a repository-level boundary, not external security or legal validation.
+    evidence: [src/lib/purposeConsentLedger.ts, scripts/qa/purpose-consent-integrity.test.mjs, scripts/uji/purpose-consent-ledger.mts]
+
   - risk_id: risk.fragmented_patient_truth
     category: data_integrity
     severity: high

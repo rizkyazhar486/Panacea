@@ -23,13 +23,25 @@ export interface PurposeConsentLedger {
 }
 
 function parseIso(value: string, field: string) {
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must be a valid ISO timestamp`)
   const timestamp = Date.parse(value)
   if (!Number.isFinite(timestamp)) throw new Error(`${field} must be a valid ISO timestamp`)
   return timestamp
 }
 
 function assertNonBlank(value: string, field: string) {
-  if (!value.trim()) throw new Error(`${field} must not be blank`)
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must not be blank`)
+}
+
+const PURPOSES: readonly ConsentPurpose[] = ['personal-visualization', 'clinical-support', 'ai-context', 'research-export']
+
+function validateDecision(decision: PurposeConsentDecision) {
+  if (!decision || typeof decision !== 'object') throw new Error('invalid consent decision')
+  assertNonBlank(decision.id, 'decision.id')
+  assertNonBlank(decision.subjectId, 'decision.subjectId')
+  if (!PURPOSES.includes(decision.purpose)) throw new Error('unknown consent purpose')
+  if (decision.action !== 'grant' && decision.action !== 'revoke') throw new Error('unknown consent action')
+  parseIso(decision.decidedAt, 'decision.decidedAt')
 }
 
 export function createPurposeConsentLedger(): PurposeConsentLedger {
@@ -40,9 +52,7 @@ export function appendPurposeConsentDecision(
   ledger: PurposeConsentLedger,
   decision: PurposeConsentDecision,
 ): PurposeConsentLedger {
-  assertNonBlank(decision.id, 'decision.id')
-  assertNonBlank(decision.subjectId, 'decision.subjectId')
-  parseIso(decision.decidedAt, 'decision.decidedAt')
+  validateDecision(decision)
 
   const normalized: PurposeConsentDecision = {
     ...decision,
@@ -75,9 +85,26 @@ function decisionsForPurpose(
   purpose: ConsentPurpose,
   subjectId: string,
 ) {
-  return (ledger.decisionIdsByPurpose[purpose] ?? [])
-    .map((id) => ledger.decisionsById[id])
-    .filter((decision): decision is PurposeConsentDecision => Boolean(decision) && decision.subjectId === subjectId)
+  if (!PURPOSES.includes(purpose)) throw new Error('unknown consent purpose')
+  assertNonBlank(subjectId, 'subjectId')
+  for (const record of [ledger.decisionsById, ledger.decisionIdsByPurpose]) {
+    if (!record || typeof record !== 'object' || Array.isArray(record)) throw new Error('invalid consent ledger')
+  }
+  const ids = ledger.decisionIdsByPurpose[purpose] ?? []
+  if (!Array.isArray(ids) || new Set(ids).size !== ids.length) throw new Error('invalid consent index')
+  const indexed = new Set(ids)
+  for (const id of ids) {
+    const decision = ledger.decisionsById[id]
+    validateDecision(decision)
+    if (decision.id !== id || decision.purpose !== purpose) throw new Error('consent index does not match decision')
+  }
+  // Missing index entries must not silently erase a revocation from history.
+  for (const [id, decision] of Object.entries(ledger.decisionsById)) {
+    validateDecision(decision)
+    if (decision.id !== id) throw new Error('consent identity does not match record')
+    if (decision.purpose === purpose && !indexed.has(id)) throw new Error('incomplete consent index')
+  }
+  return ids.map((id) => ledger.decisionsById[id]).filter((decision) => decision.subjectId === subjectId)
 }
 
 function latestDecisionAt(
@@ -86,8 +113,12 @@ function latestDecisionAt(
 ) {
   let latest: PurposeConsentDecision | undefined
   for (const decision of decisions) {
-    if (Date.parse(decision.decidedAt) <= atMs) latest = decision
-    else break
+    const time = Date.parse(decision.decidedAt)
+    if (time > atMs) continue
+    const latestTime = latest ? Date.parse(latest.decidedAt) : Number.NEGATIVE_INFINITY
+    // Persisted index order is not authority. At an ambiguous equal time,
+    // revocation wins rather than an arbitrary decision ID authorizing use.
+    if (time > latestTime || (time === latestTime && decision.action === 'revoke')) latest = decision
   }
   return latest
 }
@@ -106,17 +137,21 @@ export function isEventPurposeAuthorized(
   purpose: ConsentPurpose,
   at = Date.now(),
 ) {
-  if (!isConsentActive(event.consent, purpose, at)) return false
-  const decisions = decisionsForPurpose(ledger, purpose, event.subjectId)
-  if (!decisions.length) return true
+  try {
+    if (!isConsentActive(event.consent, purpose, at)) return false
+    const capturedAt = parseIso(event.recordedAt, 'event.recordedAt')
+    if (capturedAt > at) return false
+    assertNonBlank(event.subjectId, 'event.subjectId')
+    const decisions = decisionsForPurpose(ledger, purpose, event.subjectId)
+    if (!decisions.length) return true
 
-  const current = latestDecisionAt(decisions, at)
-  if (!current || current.action !== 'grant') return false
+    const current = latestDecisionAt(decisions, at)
+    if (!current || current.action !== 'grant') return false
 
-  const capturedAt = Date.parse(event.recordedAt)
-  const captureDecision = latestDecisionAt(decisions, capturedAt)
-  if (captureDecision?.action === 'revoke') return false
-  return true
+    const captureDecision = latestDecisionAt(decisions, capturedAt)
+    if (captureDecision?.action === 'revoke') return false
+    return true
+  } catch { return false }
 }
 
 export function filterStateByPurposeConsent(
@@ -155,7 +190,9 @@ export function purposeConsentStatus(
   at = new Date().toISOString(),
 ) {
   const atMs = parseIso(at, 'at')
-  const decisions = decisionsForPurpose(ledger, purpose, subjectId)
+  let decisions: PurposeConsentDecision[]
+  try { decisions = decisionsForPurpose(ledger, purpose, subjectId) }
+  catch { return { purpose, decisionCount: 0, latestDecision: null, ledgerAuthorized: false } }
   const latest = latestDecisionAt(decisions, atMs)
   return {
     purpose,
