@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "scoring_rule": "All scores remain null until measured. Universal 10/10 requires representative validation; aggregate averages cannot hide subgroup failure.",
+  "dimensions": [
+    {
+      "id": "accessibility",
+      "status": "target",
+      "score": null,
+      "blocker": "No complete WCAG 2.2 AA conformance audit or representative assistive-technology evaluation yet.",
+      "next_experiment": "Run keyboard, focus, screen-reader, contrast, zoom and mobile accessibility audit on the current clinical wedge."
+    },
+    {
+      "id": "language-localization",
+      "status": "target",
+      "score": null,
+      "blocker": "No systematic multi-locale workflow validation yet.",
+      "next_experiment": "Validate the same critical encounter flow in at least two languages and stress-test locale-sensitive date, number and unit presentation."
+    },
+    {
+      "id": "health-digital-literacy",
+      "status": "target",
+      "score": null,
+      "blocker": "No low-literacy comprehension study yet.",
+      "next_experiment": "Test patient instructions and next-step comprehension across low, average and high health-literacy cohorts."
+    },
+    {
+      "id": "cultural-worldview-respect",
+      "status": "target",
+      "score": null,
+      "blocker": "No representative cross-cultural review yet.",
+      "next_experiment": "Conduct structured review for avoidable cultural assumptions, stigmatizing language and coercive defaults."
+    },
+    {
+      "id": "life-stage-suitability",
+      "status": "target",
+      "score": null,
+      "blocker": "Clinical applicability varies by age and has not been validated across life stages.",
+      "next_experiment": "Define age/life-stage applicability boundaries for the current wedge and test only supported populations."
+    },
+    {
+      "id": "ability-inclusion",
+      "status": "target",
+      "score": null,
+      "blocker": "No representative evaluation across sensory, motor, cognitive and communication differences.",
+      "next_experiment": "Run assisted usability sessions and accessibility tests for critical tasks."
+    },
+    {
+      "id": "affordability-low-resource",
+      "status": "target",
+      "score": null,
+      "blocker": "No measured deployment-cost and affordability evidence across low-resource settings.",
+      "next_experiment": "Model and field-test minimum viable hardware, connectivity and operating cost for clinic/Puskesmas deployment."
+    },
+    {
+      "id": "offline-low-bandwidth",
+      "status": "partial",
+      "score": null,
+      "blocker": "Offline continuity is modeled but not validated under real network degradation.",
+      "next_experiment": "Run disconnect/reconnect drills with queued actions, duplicate prevention and result reconciliation."
+    },
+    {
+      "id": "device-independence",
+      "status": "target",
+      "score": null,
+      "blocker": "Current device/browser support matrix is not yet complete.",
+      "next_experiment": "Test the wedge on representative low-end mobile, desktop and constrained-browser environments."
+    },
+    {
+      "id": "role-adaptability",
+      "status": "partial",
+      "score": null,
+      "blocker": "Role-aware projections are architectural targets with incomplete comparative usability evidence.",
+      "next_experiment": "Validate patient, clinician and operations views over the same episode without duplicate truth."
+    },
+    {
+      "id": "jurisdiction-adaptability",
+      "status": "partial",
+      "score": null,
+      "blocker": "No two-jurisdiction end-to-end validation yet.",
+      "next_experiment": "Implement two materially different payer/regulatory adapters against the same canonical episode model."
+    },
+    {
+      "id": "agency-consent",
+      "status": "partial",
+      "score": null,
+      "blocker": "Governance doctrine exists but representative consent comprehension and revocation UX remain under-evaluated.",
+      "next_experiment": "Test purpose explanation, grant, refusal and revocation comprehension with representative users."
+    },
+    {
+      "id": "dignity-non-stigmatization",
+      "status": "target",
+      "score": null,
+      "blocker": "No structured dignity and stigma review across conditions and populations yet.",
+      "next_experiment": "Review critical copy and workflows for stigmatizing, paternalistic or exploitative patterns with representative stakeholders."
+    }
+  ]
+}
