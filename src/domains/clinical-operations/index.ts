@@ -31,4 +31,15 @@ export {
   type PreauthorizationState,
 } from './model/careAccessOrchestrator'
 
+export {
+  evaluateClinicalEpisodeResilience,
+  type ClinicalEpisodeResilienceInput,
+  type ClinicalEpisodeResilienceResult,
+  type ClinicalEpisodeTransportEvent,
+  type EpisodeConnectivity,
+  type EpisodeDeliveryState,
+  type EpisodeResilienceState,
+  type EpisodeTransportKind,
+} from './model/clinicalEpisodeResilience'
+
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
