@@ -104,6 +104,7 @@ export const FITUR_DARI_HUB: Fitur[] = [
   { to: '/sports-science', nama: 'Science & KPIs', apa: 'The evidence and key metrics behind your numbers', kw: 'sports science kpi evidence metrics', grup: 'Fitness' },
   { to: '/shape-forming', nama: 'Shape Forming', apa: 'A structured body-recomposition program', kw: 'shape forming body recomposition program', grup: 'Fitness' },
   { to: '/sports-scores', nama: 'Live Scores', apa: 'Real-time scores for your favorite teams & leagues', kw: 'live scores sports scoreboard football f1 motogp', grup: 'Fitness' },
+  { to: '/body-exposure/canonical', nama: 'Canonical Human Bodies', apa: 'Source-backed adult male and female anatomy with per-structure provenance', kw: 'body exposure canonical anatomy anatomi tubuh kanonik male female pria wanita 3d provenance sumber visible human', grup: 'Learn & Look Up' },
   { to: '/chatbot', nama: 'AI Chatbot', apa: 'Ask a health question and get a sourced, plain-language answer', kw: 'chatbot ai tanya chat asisten pertanyaan kesehatan', grup: 'Learn & Look Up' },
   { to: '/evidence', nama: 'Clinical Evidence', apa: 'The published evidence behind a treatment or claim', kw: 'evidence bukti klinis jurnal studi penelitian guideline pedoman', grup: 'Learn & Look Up' },
   { to: '/trials', nama: 'Clinical Trials Finder', apa: 'Find trials you may be eligible to join', kw: 'clinical trials uji klinis penelitian rekrutmen eligible peserta', grup: 'Learn & Look Up' },

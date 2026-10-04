@@ -293,13 +293,28 @@ risks:
       text moved unchanged and the delta-ratio and Winter thresholds pinned at their boundaries; pH/PaCO2/HCO3
       consistency checking is deliberately not added because it would be a new clinical feature). MapCalc, BrocaCalc and BrocaLorentzCalorieCalc followed through meanArterialPressure/idealBodyWeight/dailyCalories,
       scripts/uji/map-ideal-body-weight.mts; Broca had been copied into two pages and is now one source, and the MAP
-      thresholds are pinned at their boundaries. NaegeleCalc followed through naegele (scripts/uji/naegele-gestational-age.mts): UTC calendar arithmetic with an
-      injected clock, real-date validation, and a CORRECTED gestational-age sign — the old page added the cycle
-      adjustment to GA while the EDD already used it, so GA on the EDD day was 294 days for a 35-day cycle and 266 for
-      a 21-day cycle instead of 280; the new test pins GA = 40w0d on the EDD for every cycle 20-60. This is a clinical
-      output change that needs clinical sign-off. Next: the rest of the numeric calculators (10 counted on
-      2026-10-03 still read +e.target.value without a domain function: WhoGrowth, WhoNeonate, CdcAnthropometry,
-      BallardSoap, Centor, MidParental, Fletcher, McDonald, Paradise, Denver). Noted, not changed: the Broca-Lorentz page
+      thresholds are pinned at their boundaries. MidParentalCalc and McDonaldCalc followed through midParentalHeight/mcdonaldGestationalAge
+      (scripts/uji/mid-parental-mcdonald.mts), formulas and constants unchanged; McDonald now refuses fundal heights
+      outside the 20-36 cm range its own page text states. NaegeleCalc followed through naegele (scripts/uji/naegele-gestational-age.mts): UTC calendar arithmetic with an injected clock, real-date validation and a CORRECTED gestational-age sign (GA = 40w0d on the EDD for every cycle 20-60); this is a clinical output change that needs clinical sign-off. CentorCalc, ParadiseCalc and FletcherCalc followed through centorMcIsaac/paradiseCriteria/fletcherIndex
+      (scripts/uji/centor-paradise-fletcher.mts) with every classification threshold moved unchanged and pinned at its
+      boundary; Centor age and Fletcher thresholds now keep the raw field text so an empty field is rejected instead of
+      being read as 0 (an empty Fletcher form used to show "Normal", an empty Centor age added a point, 1e999 episodes
+      met the Paradise criteria). BallardSoapCalc and DenverCalc got input validation only (validateBallardInputs, validateDenverAge;
+      scripts/uji/ballard-denver-inputs.mts): their reference tables, the Ballard-to-gestational-age interpolation, the
+      Lubchenco percentiles, the SOAP text and the Denver milestone list are untouched. An empty 5-minute APGAR used to be
+      read as 0 and made the auto-drafted SOAP note write "severe depression, needs further resuscitation & NICU
+      referral"; the form now keeps raw text and refuses empty fields. WhoGrowthCalc, WhoNeonateCalc and CdcAnthropometryCalc got input validation only (validateWhoGrowthInputs,
+      validateNeonateInputs, validateCdcInputs; scripts/uji/growth-inputs.mts): the computation and result JSX moved
+      verbatim into child components rendered only for valid input (0 of 160 original lines missing; 13 of 13 valid input
+      sets render identical text before and after, measured in a browser), the reference tables, interpolation,
+      z-score and BMI classes and the masked-stunting, >10% loss and day-14 warnings are untouched. The old pages showed
+      Infinity or NaN for an empty height, birth weight 0 and CDC age 1000. Inventory after this change (a scan of every
+      type=number input, not only the +e.target.value pattern my first count used): 24 calculators take numeric
+      input; all now go through a domain function including NaegeleCalc (clinical sign-off pending). SirirajCalc, the one my first count missed because it parsed with Number(e.target.value) || 0 (an empty
+      diastolic pressure was read as 0 and showed a score of -12, "Suggests ISCHAEMIC stroke"), now goes through
+      sirirajStrokeScore (scripts/uji/siriraj-stroke-score.mts): expression, +/-1 thresholds, labels, CT-scan warning
+      and source are unchanged, and the float arithmetic is shown not to misclassify at the thresholds over 8664
+      combinations. Noted, not changed: the Broca-Lorentz page
       text says 25 kcal/kg basal while the factors it applies are 30/35/40; that needs clinical-nutrition review, moving each formula into src/domains with its own
       positive and negative tests.
     evidence:
@@ -321,5 +336,19 @@ risks:
       - src/domains/clinical-calculators/engine/meanArterialPressure.ts
       - src/domains/clinical-calculators/engine/idealBodyWeight.ts
       - scripts/uji/map-ideal-body-weight.mts
+      - src/domains/clinical-calculators/engine/midParentalHeight.ts
+      - src/domains/clinical-calculators/engine/mcdonaldRule.ts
+      - scripts/uji/mid-parental-mcdonald.mts
+      - src/domains/clinical-calculators/engine/centor.ts
+      - src/domains/clinical-calculators/engine/paradise.ts
+      - src/domains/clinical-calculators/engine/fletcher.ts
+      - scripts/uji/centor-paradise-fletcher.mts
+      - src/domains/clinical-calculators/engine/ballardInputs.ts
+      - src/domains/clinical-calculators/engine/denverAge.ts
+      - scripts/uji/ballard-denver-inputs.mts
+      - src/domains/clinical-calculators/engine/growthInputs.ts
+      - scripts/uji/growth-inputs.mts
+      - src/domains/clinical-calculators/engine/sirirajStrokeScore.ts
+      - scripts/uji/siriraj-stroke-score.mts
       - src/domains/clinical-calculators/engine/naegele.ts
       - scripts/uji/naegele-gestational-age.mts

@@ -1,0 +1,86 @@
+[
+ {
+  "body": "ICRP.ADULT.FEMALE",
+  "kept": 93,
+  "dropped": 80,
+  "stature_m": 1.6302,
+  "file": "PANACEA_BODY_ICRP_ADULT_FEMALE.blend"
+ },
+ {
+  "body": "ICRP.ADULT.MALE",
+  "kept": 93,
+  "dropped": 80,
+  "stature_m": 1.76,
+  "file": "PANACEA_BODY_ICRP_ADULT_MALE.blend"
+ },
+ {
+  "body": "PEDIATRIC.ADOLESCENT.FEMALE",
+  "kept": 129,
+  "stature_m": 1.61,
+  "file": "PANACEA_BODY_PEDIATRIC_ADOLESCENT_FEMALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.ADOLESCENT.MALE",
+  "kept": 129,
+  "stature_m": 1.6696,
+  "file": "PANACEA_BODY_PEDIATRIC_ADOLESCENT_MALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.CHILD_10Y.FEMALE",
+  "kept": 140,
+  "stature_m": 1.3808,
+  "file": "PANACEA_BODY_PEDIATRIC_CHILD_10Y_FEMALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.CHILD_10Y.MALE",
+  "kept": 140,
+  "stature_m": 1.3797,
+  "file": "PANACEA_BODY_PEDIATRIC_CHILD_10Y_MALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.CHILD_5Y.FEMALE",
+  "kept": 119,
+  "stature_m": 1.0906,
+  "file": "PANACEA_BODY_PEDIATRIC_CHILD_5Y_FEMALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.CHILD_5Y.MALE",
+  "kept": 119,
+  "stature_m": 1.0902,
+  "file": "PANACEA_BODY_PEDIATRIC_CHILD_5Y_MALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.INFANT.FEMALE",
+  "kept": 110,
+  "stature_m": 0.76,
+  "file": "PANACEA_BODY_PEDIATRIC_INFANT_FEMALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.INFANT.MALE",
+  "kept": 110,
+  "stature_m": 0.76,
+  "file": "PANACEA_BODY_PEDIATRIC_INFANT_MALE.blend",
+  "dropped": 90
+ },
+ {
+  "body": "PEDIATRIC.NEONATE.FEMALE",
+  "kept": 102,
+  "stature_m": 0.4817,
+  "file": "PANACEA_BODY_PEDIATRIC_NEONATE_FEMALE.blend",
+  "dropped": 88
+ },
+ {
+  "body": "PEDIATRIC.NEONATE.MALE",
+  "kept": 102,
+  "stature_m": 0.4813,
+  "file": "PANACEA_BODY_PEDIATRIC_NEONATE_MALE.blend",
+  "dropped": 88
+ }
+]

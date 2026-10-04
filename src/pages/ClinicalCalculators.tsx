@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { correctedSodiumKatz, dailyCalories, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, meanArterialPressure, naegele, parklandVolumes, pedsDose, potassiumAssessment } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, naegele, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, sirirajStrokeScore, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -290,12 +290,7 @@ function whzFromHeight(heightCm: number, sex: 'M' | 'F'): { m: number; sd: numbe
   return { m, sd }
 }
 
-function WhoGrowthCalc() {
-  const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [ageMo, setAgeMo] = useState(12)
-  const [weight, setWeight] = useState(9.6)
-  const [height, setHeight] = useState(75.7)
-
+function WhoGrowthResults({ sex, ageMonths: ageMo, weightKg: weight, lengthCm: height }: { sex: 'M' | 'F'; ageMonths: number; weightKg: number; lengthCm: number }) {
   const wM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_M[sex])
   const wSD = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_SD[sex])
   const hM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_HEIGHT_M[sex])
@@ -323,15 +318,7 @@ function WhoGrowthCalc() {
   }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesia's Child Anthropometry Standard (Permenkes 2/2020)" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
-        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Age (WAZ)</div>
@@ -376,6 +363,33 @@ function WhoGrowthCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for clinical decisions, compare against the official WHO/KMS growth chart or the MCH handbook per the Child Anthropometry Standard (Permenkes RI No. 2/2020).</Prosa>
+    </>
+  )
+}
+
+function WhoGrowthCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (BMI Infinity, z-score ekstrem).
+  const [ageText, setAgeText] = useState('12')
+  const [weightText, setWeightText] = useState('9.6')
+  const [heightText, setHeightText] = useState('75.7')
+
+  const inputs = validateWhoGrowthInputs(parseNumberField(ageText), parseNumberField(weightText), parseNumberField(heightText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesia's Child Anthropometry Standard (Permenkes 2/2020)" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weightText} onChange={(e) => setWeightText(e.target.value)} /></Field>
+        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={heightText} onChange={(e) => setHeightText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <WhoGrowthResults {...inputs.data} sex={sex} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No z-scores are shown until age, weight and length are valid.</p>
+      )}
     </Card>
   )
 }
@@ -391,11 +405,7 @@ const NEONATE_DAYS = [0, 3, 5, 7, 10, 14, 21, 30]
 const NEONATE_PCT_OF_BW = [100, 93, 91, 95, 100, 105, 112, 120]
 const NEONATE_PCT_SD = [0, 3, 3.5, 3, 2.5, 3, 4, 5]
 
-function WhoNeonateCalc() {
-  const [birthWeightG, setBirthWeightG] = useState(3200)
-  const [days, setDays] = useState(5)
-  const [currentWeightG, setCurrentWeightG] = useState(2950)
-
+function WhoNeonateResults({ birthWeightG, days, currentWeightG }: { birthWeightG: number; days: number; currentWeightG: number }) {
   const expectedPct = interp(days, NEONATE_DAYS, NEONATE_PCT_OF_BW)
   const sdPct = interp(days, NEONATE_DAYS, NEONATE_PCT_SD)
   const expectedG = (birthWeightG * expectedPct) / 100
@@ -409,14 +419,7 @@ function WhoNeonateCalc() {
   const chartData = NEONATE_DAYS.map((d, i) => ({ d, pctMedian: NEONATE_PCT_OF_BW[i] }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & return to birth weight" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
-        <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
-        <Field label="Current Weight (g)"><input className={inputClass} type="number" value={currentWeightG} onChange={(e) => setCurrentWeightG(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{lossFromBirth >= 0 ? lossFromBirth.toFixed(1) : '0'}%</div>
@@ -454,6 +457,31 @@ function WhoNeonateCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">A physiologic loss of up to about 7-10% of birth weight by day 3-5 is normal (extravascular fluid loss), and birth weight is usually regained by around day 10-14. This estimate is simplified from standard reference points — compare against the official neonate chart (WHO/Fenton) for borderline cases.</Prosa>
+    </>
+  )
+}
+
+function WhoNeonateCalc() {
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (berat lahir 0 → "NaN SD").
+  const [birthText, setBirthText] = useState('3200')
+  const [daysText, setDaysText] = useState('5')
+  const [currentText, setCurrentText] = useState('2950')
+
+  const inputs = validateNeonateInputs(parseNumberField(birthText), parseNumberField(daysText), parseNumberField(currentText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & return to birth weight" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthText} onChange={(e) => setBirthText(e.target.value)} /></Field>
+        <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={daysText} onChange={(e) => setDaysText(e.target.value)} /></Field>
+        <Field label="Current Weight (g)"><input className={inputClass} type="number" value={currentText} onChange={(e) => setCurrentText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <WhoNeonateResults {...inputs.data} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No weight trajectory is shown until birth weight, age and current weight are valid.</p>
+      )}
     </Card>
   )
 }
@@ -479,12 +507,7 @@ function cdcBmiClass(bmi: number, ageYr: number, sex: 'M' | 'F'): { l: string; t
   return { l: 'Obese (≥P95)', tone: 'critical' }
 }
 
-function CdcAnthropometryCalc() {
-  const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [ageYr, setAgeYr] = useState(10)
-  const [weight, setWeight] = useState(32)
-  const [height, setHeight] = useState(138)
-
+function CdcAnthropometryResults({ sex, ageYears: ageYr, weightKg: weight, heightCm: height }: { sex: 'M' | 'F'; ageYears: number; weightKg: number; heightCm: number }) {
   const bmi = weight / (height / 100) ** 2
   const cls = cdcBmiClass(bmi, ageYr, sex)
   const p85 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P85[sex])
@@ -498,15 +521,7 @@ function CdcAnthropometryCalc() {
   }))
 
   return (
-    <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
-        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-      </div>
-
+    <>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div className="text-2xl font-black text-ink">{bmi.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg/m²</span></div>
@@ -530,6 +545,33 @@ function CdcAnthropometryCalc() {
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the full pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</Prosa>
+    </>
+  )
+}
+
+function CdcAnthropometryCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (tinggi 0 → BMI Infinity).
+  const [ageText, setAgeText] = useState('10')
+  const [weightText, setWeightText] = useState('32')
+  const [heightText, setHeightText] = useState('138')
+
+  const inputs = validateCdcInputs(parseNumberField(ageText), parseNumberField(weightText), parseNumberField(heightText))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weightText} onChange={(e) => setWeightText(e.target.value)} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" step="0.1" value={heightText} onChange={(e) => setHeightText(e.target.value)} /></Field>
+      </div>
+
+      {inputs.ok ? (
+        <CdcAnthropometryResults {...inputs.data} sex={sex} />
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{inputs.reason}. No BMI classification is shown until age, weight and height are valid.</p>
+      )}
     </Card>
   )
 }
@@ -591,30 +633,32 @@ const PHYSICAL_CRITERIA: { key: string; label: string; opts: { v: number; l: str
 function BallardSoapCalc() {
   const [neuro, setNeuro] = useState<Record<string, number>>({ posture: 2, squareWindow: 2, armRecoil: 1, poplitealAngle: 2, scarfSign: 1, heelToEar: 1 })
   const [phys, setPhys] = useState<Record<string, number>>({ skin: 2, lanugo: 1, plantar: 2, breast: 2, eyeEar: 2, genitals: 2 })
-  const [apgar1, setApgar1] = useState(8)
-  const [apgar5, setApgar5] = useState(9)
-  const [birthWeightG, setBirthWeightG] = useState(3000)
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 (Apgar 0 = depresi berat, berat lahir 0 = SGA).
+  const [apgar1, setApgar1] = useState('8')
+  const [apgar5, setApgar5] = useState('9')
+  const [birthWeightG, setBirthWeightG] = useState('3000')
   const [babyName, setBabyName] = useState('')
   const [sex, setSex] = useState<'M' | 'F'>('M')
 
   const total = Object.values(neuro).reduce((a, b) => a + b, 0) + Object.values(phys).reduce((a, b) => a + b, 0)
   const gaWeeks = ballardScoreToGA(total)
-  const lub = lubchencoClass(gaWeeks, birthWeightG)
+  const neonate = validateBallardInputs(parseNumberField(birthWeightG), parseNumberField(apgar1), parseNumberField(apgar5))
+  const lub = neonate.ok ? lubchencoClass(gaWeeks, neonate.data.birthWeightG) : null
 
-  const soapNote = `SOAP — Neonatal Assessment${babyName ? ` (${babyName})` : ''}
-Sex: ${sex === 'M' ? 'Male' : 'Female'} · Birth Weight: ${birthWeightG} g
+  const soapNote = !neonate.ok || !lub ? '' : `SOAP — Neonatal Assessment${babyName ? ` (${babyName})` : ''}
+Sex: ${sex === 'M' ? 'Male' : 'Female'} · Birth Weight: ${neonate.data.birthWeightG} g
 
 S (Subjective): Newborn, maturity and immediate postnatal adaptation assessment performed.
 
 O (Objective):
-- APGAR at 1 min: ${apgar1}/10, at 5 min: ${apgar5}/10
+- APGAR at 1 min: ${neonate.data.apgar1}/10, at 5 min: ${neonate.data.apgar5}/10
 - New Ballard Score total: ${total} → estimated gestational age ${gaWeeks.toFixed(1)} weeks
 - Birth weight classification for gestational age (Lubchenco): ${lub.l}
 
 A (Assessment):
 - ${gaWeeks < 37 ? 'Preterm' : gaWeeks > 42 ? 'Post-term' : 'Term'} (Ballard estimate ${gaWeeks.toFixed(1)} weeks)
 - ${lub.l}
-- 5-minute APGAR ${apgar5 >= 7 ? 'good, adequate neonatal adaptation' : apgar5 >= 4 ? 'needs close observation' : 'severe depression, needs further resuscitation & NICU referral'}
+- 5-minute APGAR ${neonate.data.apgar5 >= 7 ? 'good, adequate neonatal adaptation' : neonate.data.apgar5 >= 4 ? 'needs close observation' : 'severe depression, needs further resuscitation & NICU referral'}
 
 P (Plan):
 - Manage per gestational age & birth weight classification (rooming-in if stable; NICU observation if preterm/SGA/low APGAR)
@@ -630,11 +674,11 @@ P (Plan):
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(e.target.value)} /></Field>
         <Field label="APGAR 1' / 5'">
           <div className="flex gap-1.5">
-            <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(+e.target.value)} />
-            <input className={inputClass} type="number" min={0} max={10} value={apgar5} onChange={(e) => setApgar5(+e.target.value)} />
+            <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(e.target.value)} />
+            <input className={inputClass} type="number" min={0} max={10} value={apgar5} onChange={(e) => setApgar5(e.target.value)} />
           </div>
         </Field>
       </div>
@@ -667,15 +711,19 @@ P (Plan):
           <div className="text-[10px] font-bold uppercase text-neutral-500">Gestational Age</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
+          {lub ? <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge> : <span className="text-sm font-black text-neutral-400">—</span>}
           <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Lubchenco</div>
         </div>
       </div>
 
+      {neonate.ok ? (
       <div className="mt-4">
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{neonate.reason}. No classification or SOAP note is shown until birth weight and both APGAR scores are valid.</p>
+      )}
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">The gestational age estimate & Lubchenco classification are simplified from standard reference points — check against the official table/chart for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.</Prosa>
     </Card>
   )
@@ -890,15 +938,11 @@ function SirirajCalc() {
   const [conscious, setConscious] = useState(0)   // 0 alert, 1 drowsy/stupor, 2 semicoma/coma
   const [vomiting, setVomiting] = useState(0)
   const [headache, setHeadache] = useState(0)     // within 2 hours
-  const [dbp, setDbp] = useState(90)
+  // Teks mentah supaya TD diastolik yang belum diisi tidak terbaca 0 (skor bergeser −9 poin, condong "iskemik").
+  const [dbp, setDbp] = useState('90')
   const [atheroma, setAtheroma] = useState(0)     // DM, angina, claudication
 
-  const score = 2.5 * conscious + 2 * vomiting + 2 * headache + 0.1 * dbp - 3 * atheroma - 12
-  const rounded = Math.round(score * 100) / 100
-  const verdict =
-    score > 1 ? { l: 'Suggests HAEMORRHAGIC stroke', tone: 'critical' as const }
-    : score < -1 ? { l: 'Suggests ISCHAEMIC stroke', tone: 'low' as const }
-    : { l: 'Indeterminate — imaging required', tone: 'high' as const }
+  const siriraj = sirirajStrokeScore({ consciousness: conscious, vomiting, headache, diastolicMmHg: parseNumberField(dbp), atheroma })
 
   return (
     <Card>
@@ -922,7 +966,7 @@ function SirirajCalc() {
         </div>
         <Field label="Diastolic blood pressure (mmHg)">
           <input className={inputClass} type="number" value={dbp}
-            onChange={(e) => setDbp(Number(e.target.value) || 0)} />
+            onChange={(e) => setDbp(e.target.value)} />
         </Field>
         <div>
           <div className="text-[12px] font-bold text-ink dark:text-ink">Atheroma markers</div>
@@ -932,16 +976,20 @@ function SirirajCalc() {
         </div>
       </div>
 
+      {siriraj.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
-          <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{siriraj.data.rounded > 0 ? '+' : ''}{siriraj.data.rounded}</span>
         </div>
-        <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
+        <div className="mt-1"><Badge tone={siriraj.data.tone}>{siriraj.data.label}</Badge></div>
         <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-          (2.5 × {conscious}) + (2 × {vomiting}) + (2 × {headache}) + (0.1 × {dbp}) − (3 × {atheroma}) − 12
+          (2.5 × {conscious}) + (2 × {vomiting}) + (2 × {headache}) + (0.1 × {siriraj.data.diastolicMmHg}) − (3 × {atheroma}) − 12
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{siriraj.reason}. No Siriraj score is shown until the diastolic pressure is valid.</p>
+      )}
 
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
         <li><b>This does not replace a CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
@@ -1024,18 +1072,9 @@ function CentorCalc() {
   const [noCough, setNoCough] = useState(false)
   const [tenderNodes, setTenderNodes] = useState(false)
   const [exudate, setExudate] = useState(false)
-  const [age, setAge] = useState(30)
-  const ageAdj = age < 15 ? 1 : age >= 45 ? -1 : 0
-  const total = [fever, noCough, tenderNodes, exudate].filter(Boolean).length + ageAdj
-  const interp = total <= 0
-    ? { l: 'Very low risk (1-2.5%)', tone: 'normal' as const, note: 'No swab/empiric antibiotics needed.' }
-    : total === 1
-    ? { l: 'Low risk (5-10%)', tone: 'normal' as const, note: 'Antibiotics generally not needed.' }
-    : total === 2
-    ? { l: 'Moderate risk (11-17%)', tone: 'low' as const, note: 'Consider a rapid strep test/culture before antibiotics.' }
-    : total === 3
-    ? { l: 'High risk (28-35%)', tone: 'low' as const, note: 'Strep testing recommended; treat if positive.' }
-    : { l: 'Very high risk (51-53%)', tone: 'critical' as const, note: 'Consider empiric antibiotics (e.g. penicillin) or a rapid test first per local policy.' }
+  // Teks mentah supaya usia yang belum diisi tidak terbaca 0 (yang menambah satu poin sebagai anak).
+  const [age, setAge] = useState('30')
+  const centor = centorMcIsaac({ fever, noCough, tenderNodes, exudate }, parseNumberField(age))
   const Row = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1050,15 +1089,19 @@ function CentorCalc() {
         <Row label="Absence of cough" checked={noCough} onChange={setNoCough} />
         <Row label="Tender anterior cervical lymphadenopathy" checked={tenderNodes} onChange={setTenderNodes} />
         <Row label="Tonsillar exudate/swelling" checked={exudate} onChange={setExudate} />
-        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(e.target.value)} /></Field>
       </div>
+      {centor.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}</div>
-          <Badge tone={interp.tone}>{interp.l}</Badge>
+          <div className="text-2xl font-black text-ink">{centor.data.score}</div>
+          <Badge tone={centor.data.tone}>{centor.data.label}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{centor.data.note}</p>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{centor.reason}. No score is shown until the age is valid.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
     </Card>
   )
@@ -1144,9 +1187,7 @@ function MidParentalCalc() {
   const [fatherCm, setFatherCm] = useState(170)
   const [motherCm, setMotherCm] = useState(158)
   const [childSex, setChildSex] = useState<'M' | 'F'>('M')
-  const mph = childSex === 'M' ? (fatherCm + motherCm + 13) / 2 : (fatherCm + motherCm - 13) / 2
-  const rangeLo = mph - 8.5
-  const rangeHi = mph + 8.5
+  const mph = midParentalHeight(fatherCm, motherCm, childSex)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Estimated adult target height for a child from both parents' heights" />
@@ -1155,10 +1196,14 @@ function MidParentalCalc() {
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
         <Field label="Child's Sex"><SegButtons value={childSex} onChange={setChildSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
+      {mph.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
+        <div className="text-2xl font-black text-ink">{mph.data.targetCm.toFixed(1)} cm</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {mph.data.rangeLoCm.toFixed(0)}–{mph.data.rangeHiCm.toFixed(0)} cm)</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mph.reason}. No target height is shown until both heights are valid.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (father's height + mother's height + 13) / 2. Female: (father's height + mother's height − 13) / 2. The ±8.5 cm range covers about 90% of the genetic target — a child far outside this range needs an endocrine/nutritional evaluation.</Prosa>
     </Card>
   )
@@ -1167,41 +1212,35 @@ function MidParentalCalc() {
 /* ══════════════════ FLETCHER INDEX (HEARING LOSS) ══════════════════ */
 function FletcherCalc() {
   const [mode, setMode] = useState<'basic' | 'complete'>('basic')
-  const [t500, setT500] = useState(20)
-  const [t1000, setT1000] = useState(20)
-  const [t2000, setT2000] = useState(20)
-  const [t3000, setT3000] = useState(20)
+  const [t500, setT500] = useState('20')
+  const [t1000, setT1000] = useState('20')
+  const [t2000, setT2000] = useState('20')
+  const [t3000, setT3000] = useState('20')
+  // Teks mentah supaya kolom yang belum diisi tidak terbaca 0 dB dan tampil sebagai "Normal".
   // Complete (AAO-HNS 4-frequency) average adds 3000Hz — captures noise-
   // induced/occupational hearing-loss notches that the classic 3-frequency
   // Fletcher index (500/1000/2000Hz) alone can miss.
-  const index = mode === 'basic' ? (t500 + t1000 + t2000) / 3 : (t500 + t1000 + t2000 + t3000) / 4
-  const cls = index < 26
-    ? { l: 'Normal', tone: 'normal' as const }
-    : index < 41
-    ? { l: 'Mild hearing loss', tone: 'low' as const }
-    : index < 56
-    ? { l: 'Moderate hearing loss', tone: 'low' as const }
-    : index < 71
-    ? { l: 'Moderately severe hearing loss', tone: 'critical' as const }
-    : index < 91
-    ? { l: 'Severe hearing loss', tone: 'critical' as const }
-    : { l: 'Profound (total) hearing loss', tone: 'critical' as const }
+  const fletcher = fletcherIndex(mode, parseNumberField(t500), parseNumberField(t1000), parseNumberField(t2000), parseNumberField(t3000))
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Pure-tone average threshold — hearing loss grade classification" />
       <SegButtons value={mode} onChange={setMode} options={[{ v: 'basic', l: 'Basic (3-frequency)' }, { v: 'complete', l: 'Complete (4-frequency, AAO-HNS)' }]} />
       <div className={`mt-3 grid gap-2 ${mode === 'basic' ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
-        <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
-        <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(+e.target.value)} /></Field>
-        <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(+e.target.value)} /></Field>
-        {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(+e.target.value)} /></Field>}
+        <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(e.target.value)} /></Field>
+        <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(e.target.value)} /></Field>
+        <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(e.target.value)} /></Field>
+        {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(e.target.value)} /></Field>}
       </div>
+      {fletcher.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{index.toFixed(1)} dB</div>
-          <Badge tone={cls.tone}>{cls.l}</Badge>
+          <div className="text-2xl font-black text-ink">{fletcher.data.indexDb.toFixed(1)} dB</div>
+          <Badge tone={fletcher.data.tone}>{fletcher.data.label}</Badge>
         </div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{fletcher.reason}. No classification is shown until every threshold is filled in.</p>
+      )}
       <p className="mt-3 text-[10px] text-neutral-500">
         {mode === 'basic' ? 'Fletcher Index = average threshold at 500+1000+2000 Hz.' : 'Complete (AAO-HNS 4-frequency) = average threshold at 500+1000+2000+3000 Hz — more sensitive to noise/occupational notches.'} &lt;26dB normal · 26-40 mild · 41-55 moderate · 56-70 moderately severe · 71-90 severe · &gt;90 profound.
       </p>
@@ -1354,15 +1393,19 @@ function FourScoreCalc() {
 /* ══════════════════ MCDONALD'S RULE (FUNDAL HEIGHT) ══════════════════ */
 function McDonaldCalc() {
   const [fundalCm, setFundalCm] = useState(28)
-  const gaWeeksEst = fundalCm // McDonald's rule: fundal height (cm) ≈ GA (weeks), valid ~20-36 weeks
+  const mcdonald = mcdonaldGestationalAge(fundalCm)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimate gestational age from fundal height (20-36 weeks)" />
       <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
+      {mcdonald.ok ? (
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
+        <div className="text-2xl font-black text-ink">≈ {mcdonald.data.gestationalWeeks} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
+      ) : (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{mcdonald.reason}. No estimate is shown outside that range.</p>
+      )}
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks, singleton pregnancy with normal fetal growth. A deviation &gt;3 cm from the true gestational age (from LMP/ultrasound) needs further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple pregnancy).</Prosa>
     </Card>
   )
@@ -1374,7 +1417,7 @@ function ParadiseCalc() {
   const [y2, setY2] = useState(0)
   const [y3, setY3] = useState(0)
   const [documented, setDocumented] = useState(false)
-  const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
+  const paradise = paradiseCriteria(y1, y2, y3, documented)
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indication for tonsillectomy in recurrent pharyngitis/tonsillitis (Paradise et al., 1984)" />
@@ -1388,7 +1431,11 @@ function ParadiseCalc() {
         <div className="text-sm font-bold text-ink">Every episode well documented (fever &gt;38.3°C, tonsillar exudate, tender cervical lymphadenopathy, or positive streptococcal culture)</div>
       </label>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-        <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
+        {paradise.ok ? (
+          <Badge tone={paradise.data.meetsCriteria ? 'critical' : 'normal'}>{paradise.data.meetsCriteria ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
+        ) : (
+          <p role="status" className="text-xs font-bold text-neutral-600">{paradise.reason}. No result is shown until all three counts are valid.</p>
+        )}
         <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with each episode well documented. This is one indication; the decision to proceed with tonsillectomy remains individualized together with an ENT physician.</Prosa>
       </div>
     </Card>
@@ -1632,10 +1679,13 @@ const DENVER_DOMAINS: { key: string; label: string; milestones: Milestone[] }[] 
 ]
 
 function DenverCalc() {
-  const [ageMo, setAgeMo] = useState(12)
+  // Teks mentah supaya usia yang belum diisi tidak terbaca 0 bulan.
+  const [ageText, setAgeText] = useState('12')
+  const denverAge = validateDenverAge(parseNumberField(ageText))
+  const ageMo = denverAge.ok ? denverAge.data.ageMonths : 0
   const [results, setResults] = useState<Record<string, 'pass' | 'fail' | 'na'>>({})
 
-  const domainFlags = DENVER_DOMAINS.map((d) => {
+  const domainFlags = !denverAge.ok ? [] : DENVER_DOMAINS.map((d) => {
     const applicable = d.milestones.filter((m) => m.ageMo <= ageMo)
     // "Caution/delay" — a milestone expected well below the child's current
     // age (>=6 months behind) marked as failed.
@@ -1650,8 +1700,11 @@ function DenverCalc() {
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="A simplified developmental screen — representative milestones per domain, not the full Denver II instrument" />
-      <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+      <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageText} onChange={(e) => setAgeText(e.target.value)} /></Field>
 
+      {!denverAge.ok && (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{denverAge.reason}. No milestones are shown until the age is valid.</p>
+      )}
       {domainFlags.map(({ domain, applicable }) => (
         <div key={domain.key} className="mt-4">
           <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>

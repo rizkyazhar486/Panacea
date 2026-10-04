@@ -1,0 +1,20 @@
+{
+ "method": "Each vertex (every 5th) of the Z-Anatomy mesh is assigned to the nearest BodyParts3D 4.0 part after registration (bp3d_frame.json + pelvic ICP in bp3d_icp.json). Shares are fractions of sampled vertices; far_gt_1cm = fraction farther than 1 cm from every listed part.",
+ "bp3d_parts": ["cecum", "ascending colon", "transverse colon", "descending colon", "rectum", "jejunum", "ileum"],
+ "note": "BodyParts3D 4.0 has no separate sigmoid colon mesh.",
+ "z_anatomy_meshes": {
+  "Ascending colon": {"shares": {"ascending colon": 0.96, "cecum": 0.03, "jejunum": 0.02}, "far_gt_1cm": 0.43},
+  "Transverse colon": {"shares": {"transverse colon": 0.76, "ascending colon": 0.12, "jejunum": 0.06, "descending colon": 0.05}, "far_gt_1cm": 0.46},
+  "Descending colon": {"shares": {"descending colon": 0.90, "rectum": 0.09, "transverse colon": 0.01}, "far_gt_1cm": 0.38},
+  "Sigmoid colon": {"shares": {"rectum": 0.97, "descending colon": 0.03}, "far_gt_1cm": 0.0},
+  "Jejunum": {"shares": {"jejunum": 0.46, "ileum": 0.33, "descending colon": 0.11, "transverse colon": 0.04, "cecum": 0.03, "ascending colon": 0.03}, "far_gt_1cm": 0.16}
+ },
+ "landmarks_m": {"rectum_mesh_z": [0.808, 0.925], "lower_sacroiliac_joint_z": 0.913, "sacrococcygeal_symphysis_z": [0.861, 0.866], "pelvic_diaphragm_iliococcygeus_z": [0.824, 0.868], "pubic_symphysis_z": [0.835, 0.854]},
+ "decisions": {
+  "Sigmoid colon -> Rectum": "Geometry is the BodyParts3D rectum and spans S3 to below the pelvic diaphragm.",
+  "Jejunum -> Jejunum and ileum": "Mesh covers both source parts; not split because 16% of vertices are over 1 cm from either.",
+  "Descending colon -> Descending and sigmoid colon": "Lower end turns medially to the midline below the pelvic brim.",
+  "Caecum not added": "60% of the BodyParts3D caecum vertices fall inside the Z-Anatomy small-intestine mesh.",
+  "External anal sphincter added": "Pelvic ICP median 1.1 mm; overlap with rectum 9.5% vs 22% inside the source itself."
+ }
+}

@@ -182,6 +182,7 @@ import { lookupGene } from './mygene.js'
 import { findRelatedDrugs } from './rxnorm.js'
 import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
+import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
 
 const app = express()
@@ -1586,8 +1587,7 @@ app.post('/api/ai/operator', requireAuth, (req, res) => {
 // Daily AI briefing → emailed to the owner. Triggered by a scheduled GET with a
 // secret key (e.g. a free Render Cron Job). No login needed; protected by token.
 app.get('/api/cron/daily-briefing', async (req, res) => {
-  const secret = process.env.CRON_SECRET
-  if (!secret || req.query.key !== secret) return res.status(403).json({ error: 'forbidden' })
+  if (!cronAuthorized(req, process.env.CRON_SECRET)) return res.status(403).json({ error: 'forbidden' })
   if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   try {
     const { text, pending } = await generateOperatorBriefing()

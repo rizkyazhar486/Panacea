@@ -1,0 +1,30 @@
+{
+ "region": "pelvis",
+ "ileum_region": "pelvis",
+ "junction_gap_m": {
+  "rectosigmoid junction": 0.0,
+  "caecum to ascending colon": 0.0,
+  "appendix base on caecum": 0.0088,
+  "sphincter around rectum/anal canal": 0.0,
+  "terminal ileum to caecum": 0.0
+ },
+ "inside_fraction": {
+  "rectum in URINARY_BLADDER": 0.048,
+  "rectum in SACRUM": 0.0,
+  "rectum in COCCYX": 0.0,
+  "ileum in URINARY_BLADDER": 0.0,
+  "ileum in HIP_BONE.R": 0.0,
+  "ileum in SIGMOID_COLON": 0.0,
+  "cecum in HIP_BONE.R": 0.0,
+  "cecum in ASCENDING_COLON": 0.038,
+  "rectum in SIGMOID_COLON": 0.241,
+  "external anal sphincter in SIGMOID_COLON": 0.095,
+  "ileum in ASCENDING_COLON": 0.0,
+  "ileum in JEJUNUM": 0.107,
+  "cecum in JEJUNUM": 0.596
+ },
+ "inside_fraction_within_source": {
+  "ileum in BP3D jejunum": 0.005,
+  "external anal sphincter in BP3D rectum": 0.224
+ }
+}

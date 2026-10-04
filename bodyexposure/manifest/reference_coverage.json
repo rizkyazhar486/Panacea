@@ -1,0 +1,231 @@
+{
+ "reference": "Body Exposure 2D Organ.png (AI-generated checklist; names only)",
+ "counts": {
+  "HUMAN.ADULT.MALE": {
+   "integumentary": {
+    "skin": 256,
+    "hair": 0,
+    "nail": 4,
+    "sweat gland": 0,
+    "sebaceous gland": 0
+   },
+   "skeletal": {
+    "skull": 5,
+    "vertebral column": 52,
+    "ribs": 48,
+    "sternum": 2,
+    "limb bones": 6
+   },
+   "muscular": {
+    "skeletal muscle": 772,
+    "cardiac muscle": 13,
+    "smooth muscle (organ walls)": 0
+   },
+   "nervous": {
+    "brain": 22,
+    "spinal cord": 3,
+    "cranial nerves": 26,
+    "spinal nerves": 22,
+    "eye": 34
+   },
+   "endocrine": {
+    "hypothalamus": 1,
+    "pituitary": 2,
+    "pineal": 1,
+    "thyroid": 19,
+    "parathyroid": 4,
+    "adrenal": 4,
+    "pancreas": 8,
+    "thymus": 2
+   },
+   "cardiovascular": {
+    "heart": 16,
+    "arteries": 358,
+    "veins": 140,
+    "capillaries": 0
+   },
+   "lymphatic": {
+    "lymph nodes": 158,
+    "lymphatic vessels": 0,
+    "spleen": 1,
+    "thymus": 2,
+    "tonsils": 4,
+    "red bone marrow": 0
+   },
+   "respiratory": {
+    "nasal cavity": 3,
+    "pharynx": 3,
+    "larynx": 7,
+    "trachea": 5,
+    "lungs": 64,
+    "diaphragm": 16
+   },
+   "digestive": {
+    "mouth / tongue / teeth": 25,
+    "salivary glands": 16,
+    "oesophagus": 2,
+    "stomach": 2,
+    "liver": 9,
+    "gallbladder": 1,
+    "pancreas": 8,
+    "small intestine": 2,
+    "large intestine": 4,
+    "rectum and anus": 1
+   },
+   "urinary": {
+    "kidney": 8,
+    "ureter": 2,
+    "urinary bladder": 1,
+    "urethra": 1
+   },
+   "reproductive_male": {
+    "testis": 2,
+    "epididymis": 2,
+    "seminal vesicle": 2,
+    "prostate": 1,
+    "bulbourethral gland": 0,
+    "penis": 9
+   },
+   "sensory": {
+    "eye": 34,
+    "ear": 26,
+    "nose": 18,
+    "tongue": 1,
+    "skin": 256
+   }
+  },
+  "HUMAN.ADULT.FEMALE": {
+   "integumentary": {
+    "skin": 1,
+    "hair": 0,
+    "nail": 0,
+    "sweat gland": 0,
+    "sebaceous gland": 0
+   },
+   "skeletal": {
+    "skull": 0,
+    "vertebral column": 0,
+    "ribs": 0,
+    "sternum": 0,
+    "limb bones": 12
+   },
+   "muscular": {
+    "skeletal muscle": 20,
+    "cardiac muscle": 17,
+    "smooth muscle (organ walls)": 0
+   },
+   "nervous": {
+    "brain": 18,
+    "spinal cord": 29,
+    "cranial nerves": 2,
+    "spinal nerves": 0,
+    "eye": 16
+   },
+   "endocrine": {
+    "hypothalamus": 2,
+    "pituitary": 0,
+    "pineal": 2,
+    "thyroid": 1,
+    "parathyroid": 0,
+    "adrenal": 1,
+    "pancreas": 9,
+    "thymus": 2
+   },
+   "cardiovascular": {
+    "heart": 25,
+    "arteries": 48,
+    "veins": 56,
+    "capillaries": 0
+   },
+   "lymphatic": {
+    "lymph nodes": 0,
+    "lymphatic vessels": 0,
+    "spleen": 5,
+    "thymus": 2,
+    "tonsils": 0,
+    "red bone marrow": 0
+   },
+   "respiratory": {
+    "nasal cavity": 0,
+    "pharynx": 0,
+    "larynx": 2,
+    "trachea": 2,
+    "lungs": 1,
+    "diaphragm": 2
+   },
+   "digestive": {
+    "mouth / tongue / teeth": 0,
+    "salivary glands": 0,
+    "oesophagus": 1,
+    "stomach": 0,
+    "liver": 12,
+    "gallbladder": 1,
+    "pancreas": 9,
+    "small intestine": 6,
+    "large intestine": 7,
+    "rectum and anus": 1
+   },
+   "urinary": {
+    "kidney": 8,
+    "ureter": 4,
+    "urinary bladder": 4,
+    "urethra": 0
+   },
+   "reproductive_female": {
+    "ovary": 4,
+    "uterine tube": 9,
+    "uterus": 8,
+    "cervix": 1,
+    "vagina": 2,
+    "mammary gland": 6
+   },
+   "sensory": {
+    "eye": 14,
+    "ear": 0,
+    "nose": 0,
+    "tongue": 0,
+    "skin": 1
+   }
+  }
+ },
+ "missing": {
+  "HUMAN.ADULT.MALE": [
+   "cardiovascular: capillaries",
+   "integumentary: hair",
+   "integumentary: sebaceous gland",
+   "integumentary: sweat gland",
+   "lymphatic: lymphatic vessels",
+   "lymphatic: red bone marrow",
+   "muscular: smooth muscle (organ walls)",
+   "reproductive_male: bulbourethral gland"
+  ],
+  "HUMAN.ADULT.FEMALE": [
+   "cardiovascular: capillaries",
+   "digestive: mouth / tongue / teeth",
+   "digestive: salivary glands",
+   "digestive: stomach",
+   "endocrine: parathyroid",
+   "endocrine: pituitary",
+   "integumentary: hair",
+   "integumentary: nail",
+   "integumentary: sebaceous gland",
+   "integumentary: sweat gland",
+   "lymphatic: lymph nodes",
+   "lymphatic: lymphatic vessels",
+   "lymphatic: red bone marrow",
+   "lymphatic: tonsils",
+   "muscular: smooth muscle (organ walls)",
+   "nervous: spinal nerves",
+   "respiratory: nasal cavity",
+   "respiratory: pharynx",
+   "sensory: ear",
+   "sensory: nose",
+   "sensory: tongue",
+   "skeletal: ribs",
+   "skeletal: skull",
+   "skeletal: sternum",
+   "skeletal: vertebral column",
+   "urinary: urethra"
+  ]
+ }
+}

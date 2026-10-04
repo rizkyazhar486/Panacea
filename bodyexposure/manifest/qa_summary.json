@@ -1,0 +1,1209 @@
+{
+ "meta": {
+  "generated": "2026-10-03T23:04:46",
+  "master": "PANACEA_HUMAN_MASTER_v011.blend",
+  "blender": "5.2.2 LTS",
+  "units": "metres",
+  "frame": "+Z superior, +X subject left, -Y anterior",
+  "educational_only": true
+ },
+ "by_body_system": {
+  "HUMAN.ADULT.FEMALE|cardiovascular": {
+   "structures": 135,
+   "verts": 333300,
+   "tris": 483740,
+   "open_meshes": 118,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|digestive": {
+   "structures": 52,
+   "verts": 82287,
+   "tris": 160364,
+   "open_meshes": 51,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|joint": {
+   "structures": 28,
+   "verts": 11630,
+   "tris": 22436,
+   "open_meshes": 14,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|lymphatic": {
+   "structures": 7,
+   "verts": 6501,
+   "tris": 12408,
+   "open_meshes": 5,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|muscular": {
+   "structures": 4,
+   "verts": 12760,
+   "tris": 25360,
+   "open_meshes": 4,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|nervous": {
+   "structures": 302,
+   "verts": 478001,
+   "tris": 953876,
+   "open_meshes": 79,
+   "nonmanifold_meshes": 56
+  },
+  "HUMAN.ADULT.FEMALE|reproductive": {
+   "structures": 54,
+   "verts": 1138112,
+   "tris": 1018508,
+   "open_meshes": 44,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|respiratory": {
+   "structures": 71,
+   "verts": 203390,
+   "tris": 400715,
+   "open_meshes": 64,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|sensory": {
+   "structures": 62,
+   "verts": 448708,
+   "tris": 890684,
+   "open_meshes": 22,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.FEMALE|skeletal": {
+   "structures": 38,
+   "verts": 59062,
+   "tris": 116940,
+   "open_meshes": 24,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 62176,
+   "tris": 124348,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.FEMALE|urinary": {
+   "structures": 87,
+   "verts": 131966,
+   "tris": 258494,
+   "open_meshes": 82,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.MALE|cardiovascular": {
+   "structures": 677,
+   "verts": 1949614,
+   "tris": 3861429,
+   "open_meshes": 664,
+   "nonmanifold_meshes": 8
+  },
+  "HUMAN.ADULT.MALE|digestive": {
+   "structures": 77,
+   "verts": 226412,
+   "tris": 452019,
+   "open_meshes": 13,
+   "nonmanifold_meshes": 1
+  },
+  "HUMAN.ADULT.MALE|endocrine": {
+   "structures": 10,
+   "verts": 5728,
+   "tris": 11308,
+   "open_meshes": 2,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.MALE|fascia": {
+   "structures": 93,
+   "verts": 158885,
+   "tris": 309469,
+   "open_meshes": 59,
+   "nonmanifold_meshes": 10
+  },
+  "HUMAN.ADULT.MALE|joint": {
+   "structures": 413,
+   "verts": 182528,
+   "tris": 358055,
+   "open_meshes": 33,
+   "nonmanifold_meshes": 25
+  },
+  "HUMAN.ADULT.MALE|lymphatic": {
+   "structures": 163,
+   "verts": 65165,
+   "tris": 127682,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "HUMAN.ADULT.MALE|muscular": {
+   "structures": 1292,
+   "verts": 1473197,
+   "tris": 2941878,
+   "open_meshes": 45,
+   "nonmanifold_meshes": 30
+  },
+  "HUMAN.ADULT.MALE|nervous": {
+   "structures": 549,
+   "verts": 1143803,
+   "tris": 2268489,
+   "open_meshes": 294,
+   "nonmanifold_meshes": 70
+  },
+  "HUMAN.ADULT.MALE|reproductive": {
+   "structures": 14,
+   "verts": 9822,
+   "tris": 19519,
+   "open_meshes": 5,
+   "nonmanifold_meshes": 1
+  },
+  "HUMAN.ADULT.MALE|respiratory": {
+   "structures": 49,
+   "verts": 137836,
+   "tris": 273197,
+   "open_meshes": 37,
+   "nonmanifold_meshes": 5
+  },
+  "HUMAN.ADULT.MALE|sensory": {
+   "structures": 44,
+   "verts": 73442,
+   "tris": 146398,
+   "open_meshes": 10,
+   "nonmanifold_meshes": 4
+  },
+  "HUMAN.ADULT.MALE|skeletal": {
+   "structures": 232,
+   "verts": 309033,
+   "tris": 617288,
+   "open_meshes": 13,
+   "nonmanifold_meshes": 9
+  },
+  "HUMAN.ADULT.MALE|surface": {
+   "structures": 256,
+   "verts": 68913,
+   "tris": 135201,
+   "open_meshes": 42,
+   "nonmanifold_meshes": 2
+  },
+  "HUMAN.ADULT.MALE|urinary": {
+   "structures": 8,
+   "verts": 10046,
+   "tris": 19980,
+   "open_meshes": 5,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 160904,
+   "tris": 322024,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|digestive": {
+   "structures": 19,
+   "verts": 42415,
+   "tris": 84738,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 5907,
+   "tris": 11794,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 38395,
+   "tris": 74158,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 244111,
+   "tris": 489246,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 6521,
+   "tris": 13034,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 7089,
+   "tris": 14158,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 12394,
+   "tris": 24760,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 15126,
+   "tris": 30212,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|skeletal": {
+   "structures": 20,
+   "verts": 230815,
+   "tris": 461140,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 38485,
+   "tris": 76966,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 9584,
+   "tris": 19136,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 216834,
+   "tris": 433944,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|digestive": {
+   "structures": 19,
+   "verts": 38960,
+   "tris": 77828,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|endocrine": {
+   "structures": 5,
+   "verts": 6380,
+   "tris": 12736,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 37149,
+   "tris": 71666,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|muscular": {
+   "structures": 1,
+   "verts": 261642,
+   "tris": 524344,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|nervous": {
+   "structures": 2,
+   "verts": 6684,
+   "tris": 13360,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|reproductive": {
+   "structures": 7,
+   "verts": 3326,
+   "tris": 6624,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|respiratory": {
+   "structures": 6,
+   "verts": 10656,
+   "tris": 21288,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|sensory": {
+   "structures": 10,
+   "verts": 15126,
+   "tris": 30212,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|skeletal": {
+   "structures": 20,
+   "verts": 173932,
+   "tris": 347256,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|surface": {
+   "structures": 1,
+   "verts": 41002,
+   "tris": 82000,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "ICRP.ADULT.MALE|urinary": {
+   "structures": 9,
+   "verts": 8267,
+   "tris": 16490,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "MODULE.TISSUE.LYMPH_NODE|lymphatic": {
+   "structures": 7,
+   "verts": 125312,
+   "tris": 254292,
+   "open_meshes": 4,
+   "nonmanifold_meshes": 2
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 121810,
+   "tris": 243784,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|digestive": {
+   "structures": 52,
+   "verts": 151001,
+   "tris": 301290,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 1584,
+   "tris": 3148,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 35381,
+   "tris": 68130,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 189298,
+   "tris": 379480,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 2994,
+   "tris": 5980,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 1715,
+   "tris": 3402,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 10736,
+   "tris": 21428,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 49512,
+   "tris": 98984,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|skeletal": {
+   "structures": 23,
+   "verts": 166783,
+   "tris": 333158,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 24647,
+   "tris": 49290,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 3205,
+   "tris": 6374,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 97409,
+   "tris": 194994,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|digestive": {
+   "structures": 52,
+   "verts": 120865,
+   "tris": 241018,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|endocrine": {
+   "structures": 5,
+   "verts": 2548,
+   "tris": 5076,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 35525,
+   "tris": 68418,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|muscular": {
+   "structures": 1,
+   "verts": 162061,
+   "tris": 325022,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|nervous": {
+   "structures": 2,
+   "verts": 6329,
+   "tris": 12650,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|reproductive": {
+   "structures": 7,
+   "verts": 1566,
+   "tris": 3104,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|respiratory": {
+   "structures": 6,
+   "verts": 8830,
+   "tris": 17616,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|sensory": {
+   "structures": 10,
+   "verts": 49512,
+   "tris": 98984,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|skeletal": {
+   "structures": 23,
+   "verts": 173324,
+   "tris": 346404,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|surface": {
+   "structures": 1,
+   "verts": 33131,
+   "tris": 66258,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.ADOLESCENT.MALE|urinary": {
+   "structures": 9,
+   "verts": 3503,
+   "tris": 6970,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 93131,
+   "tris": 186430,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|digestive": {
+   "structures": 63,
+   "verts": 138797,
+   "tris": 276810,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 4490,
+   "tris": 8960,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 36785,
+   "tris": 70938,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 163697,
+   "tris": 328382,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 4188,
+   "tris": 8368,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 2693,
+   "tris": 5358,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 10840,
+   "tris": 21636,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 54848,
+   "tris": 109656,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|skeletal": {
+   "structures": 23,
+   "verts": 161597,
+   "tris": 322708,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|surface": {
+   "structures": 1,
+   "verts": 28753,
+   "tris": 57502,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 5142,
+   "tris": 10248,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 93111,
+   "tris": 186390,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|digestive": {
+   "structures": 63,
+   "verts": 136305,
+   "tris": 271826,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|endocrine": {
+   "structures": 5,
+   "verts": 4489,
+   "tris": 8958,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 36785,
+   "tris": 70938,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|muscular": {
+   "structures": 1,
+   "verts": 168853,
+   "tris": 338738,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|nervous": {
+   "structures": 2,
+   "verts": 4199,
+   "tris": 8390,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|reproductive": {
+   "structures": 7,
+   "verts": 3095,
+   "tris": 6162,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|respiratory": {
+   "structures": 6,
+   "verts": 9964,
+   "tris": 19884,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|sensory": {
+   "structures": 10,
+   "verts": 54848,
+   "tris": 109656,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|skeletal": {
+   "structures": 23,
+   "verts": 151480,
+   "tris": 302404,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|surface": {
+   "structures": 1,
+   "verts": 26861,
+   "tris": 53718,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_10Y.MALE|urinary": {
+   "structures": 9,
+   "verts": 5411,
+   "tris": 10786,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 89360,
+   "tris": 178884,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|digestive": {
+   "structures": 42,
+   "verts": 194355,
+   "tris": 387774,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 2513,
+   "tris": 5006,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 36301,
+   "tris": 69970,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 180287,
+   "tris": 361700,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 4723,
+   "tris": 9438,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 1140,
+   "tris": 2252,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 8987,
+   "tris": 17930,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 68110,
+   "tris": 136180,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|skeletal": {
+   "structures": 23,
+   "verts": 196188,
+   "tris": 392054,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|surface": {
+   "structures": 1,
+   "verts": 43690,
+   "tris": 87376,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 4376,
+   "tris": 8716,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 89065,
+   "tris": 178294,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|digestive": {
+   "structures": 42,
+   "verts": 200612,
+   "tris": 400288,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|endocrine": {
+   "structures": 5,
+   "verts": 2513,
+   "tris": 5006,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 36301,
+   "tris": 69970,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|muscular": {
+   "structures": 1,
+   "verts": 176674,
+   "tris": 354406,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|nervous": {
+   "structures": 2,
+   "verts": 4382,
+   "tris": 8756,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|reproductive": {
+   "structures": 7,
+   "verts": 1253,
+   "tris": 2478,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|respiratory": {
+   "structures": 6,
+   "verts": 9232,
+   "tris": 18420,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|sensory": {
+   "structures": 10,
+   "verts": 68110,
+   "tris": 136180,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|skeletal": {
+   "structures": 23,
+   "verts": 187392,
+   "tris": 374380,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|surface": {
+   "structures": 1,
+   "verts": 37263,
+   "tris": 74522,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.CHILD_5Y.MALE|urinary": {
+   "structures": 9,
+   "verts": 4300,
+   "tris": 8564,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 87261,
+   "tris": 174698,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|digestive": {
+   "structures": 32,
+   "verts": 86584,
+   "tris": 172600,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 972,
+   "tris": 1924,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 34866,
+   "tris": 67100,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 165375,
+   "tris": 331562,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 6669,
+   "tris": 13330,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 1455,
+   "tris": 2882,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 7510,
+   "tris": 14992,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 65088,
+   "tris": 130136,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|skeletal": {
+   "structures": 24,
+   "verts": 191318,
+   "tris": 382324,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|surface": {
+   "structures": 1,
+   "verts": 28602,
+   "tris": 57200,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 5195,
+   "tris": 10354,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 87166,
+   "tris": 174508,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|digestive": {
+   "structures": 32,
+   "verts": 85265,
+   "tris": 169962,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|endocrine": {
+   "structures": 5,
+   "verts": 972,
+   "tris": 1924,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 34866,
+   "tris": 67100,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|muscular": {
+   "structures": 1,
+   "verts": 159748,
+   "tris": 320412,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|nervous": {
+   "structures": 2,
+   "verts": 6762,
+   "tris": 13516,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|reproductive": {
+   "structures": 7,
+   "verts": 1218,
+   "tris": 2408,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|respiratory": {
+   "structures": 6,
+   "verts": 7099,
+   "tris": 14170,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|sensory": {
+   "structures": 10,
+   "verts": 65088,
+   "tris": 130136,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|skeletal": {
+   "structures": 24,
+   "verts": 177110,
+   "tris": 353834,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|surface": {
+   "structures": 1,
+   "verts": 29021,
+   "tris": 58038,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.INFANT.MALE|urinary": {
+   "structures": 9,
+   "verts": 4985,
+   "tris": 9934,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|cardiovascular": {
+   "structures": 4,
+   "verts": 77549,
+   "tris": 155274,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|digestive": {
+   "structures": 22,
+   "verts": 59150,
+   "tris": 117892,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|endocrine": {
+   "structures": 5,
+   "verts": 2685,
+   "tris": 5350,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|lymphatic": {
+   "structures": 9,
+   "verts": 35543,
+   "tris": 68454,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|muscular": {
+   "structures": 1,
+   "verts": 149354,
+   "tris": 299840,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|nervous": {
+   "structures": 2,
+   "verts": 3313,
+   "tris": 6618,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|reproductive": {
+   "structures": 7,
+   "verts": 4571,
+   "tris": 9114,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|respiratory": {
+   "structures": 6,
+   "verts": 11805,
+   "tris": 23582,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|sensory": {
+   "structures": 10,
+   "verts": 75026,
+   "tris": 150012,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|skeletal": {
+   "structures": 26,
+   "verts": 288048,
+   "tris": 575692,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|surface": {
+   "structures": 1,
+   "verts": 41905,
+   "tris": 83806,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.FEMALE|urinary": {
+   "structures": 9,
+   "verts": 13353,
+   "tris": 26670,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|cardiovascular": {
+   "structures": 4,
+   "verts": 77520,
+   "tris": 155216,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|digestive": {
+   "structures": 22,
+   "verts": 58876,
+   "tris": 117344,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|endocrine": {
+   "structures": 5,
+   "verts": 2685,
+   "tris": 5350,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|lymphatic": {
+   "structures": 9,
+   "verts": 35543,
+   "tris": 68454,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|muscular": {
+   "structures": 1,
+   "verts": 147990,
+   "tris": 296992,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|nervous": {
+   "structures": 2,
+   "verts": 3234,
+   "tris": 6460,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|reproductive": {
+   "structures": 7,
+   "verts": 3163,
+   "tris": 6298,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|respiratory": {
+   "structures": 6,
+   "verts": 10984,
+   "tris": 21940,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|sensory": {
+   "structures": 10,
+   "verts": 75026,
+   "tris": 150012,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|skeletal": {
+   "structures": 26,
+   "verts": 283015,
+   "tris": 565622,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|surface": {
+   "structures": 1,
+   "verts": 42991,
+   "tris": 85978,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  },
+  "PEDIATRIC.NEONATE.MALE|urinary": {
+   "structures": 9,
+   "verts": 11769,
+   "tris": 23502,
+   "open_meshes": 0,
+   "nonmanifold_meshes": 0
+  }
+ }
+}

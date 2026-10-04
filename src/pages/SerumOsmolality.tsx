@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { parseNumberField, serumOsmolality } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Serum Osmolality & Osmolal Gap — standard calculated osmolality formula
@@ -17,31 +18,16 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 // preferred divisor). Pure arithmetic, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function gapBand(gap: number): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (gap > 20) return { label: 'Markedly elevated gap', tone: 'critical' }
-  if (gap > 10) return { label: 'Elevated gap', tone: 'low' }
-  if (gap >= -10) return { label: 'Normal gap', tone: 'brand' }
-  return { label: 'Negative gap — recheck values/units', tone: 'low' }
-}
-
-function osmBand(osm: number): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (osm < 275) return { label: 'Hypo-osmolal', tone: 'low' }
-  if (osm <= 295) return { label: 'Normal', tone: 'brand' }
-  if (osm <= 320) return { label: 'Hyperosmolal', tone: 'low' }
-  return { label: 'Severely hyperosmolal', tone: 'critical' }
-}
-
 export function SerumOsmolality() {
-  const [na, setNa] = useState(140)
-  const [glucose, setGlucose] = useState(90)
-  const [bun, setBun] = useState(14)
-  const [ethanol, setEthanol] = useState(0)
-  const [measured, setMeasured] = useState(0)
+  // Teks mentah: Na/glukosa/BUN kosong tetap "belum diisi" (NaN). Etanol dan osmolalitas terukur opsional: kosong = tidak diberikan.
+  const [na, setNa] = useState('140')
+  const [glucose, setGlucose] = useState('90')
+  const [bun, setBun] = useState('14')
+  const [ethanol, setEthanol] = useState('')
+  const [measured, setMeasured] = useState('')
 
-  const calculated = 2 * na + glucose / 18 + bun / 2.8 + (ethanol > 0 ? ethanol / 3.7 : 0)
-  const gap = measured > 0 ? measured - calculated : null
-  const cBand = osmBand(calculated)
-  const gBand = gap != null ? gapBand(gap) : null
+  const optional = (t: string) => (t.trim() === '' ? undefined : parseNumberField(t))
+  const res = serumOsmolality({ na: parseNumberField(na), glucose: parseNumberField(glucose), bun: parseNumberField(bun), ethanol: optional(ethanol), measured: optional(measured) })
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -55,46 +41,52 @@ export function SerumOsmolality() {
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Sodium (mEq/L)">
-            <input className={inputClass} type="number" min={0} value={na || ''} onChange={(e) => setNa(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={na} onChange={(e) => setNa(e.target.value)} />
           </Field>
           <Field label="Glucose (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={glucose || ''} onChange={(e) => setGlucose(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={glucose} onChange={(e) => setGlucose(e.target.value)} />
           </Field>
           <Field label="BUN (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={bun || ''} onChange={(e) => setBun(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={bun} onChange={(e) => setBun(e.target.value)} />
           </Field>
           <Field label="Ethanol (mg/dL, optional)">
-            <input className={inputClass} type="number" min={0} value={ethanol || ''} onChange={(e) => setEthanol(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={ethanol} onChange={(e) => setEthanol(e.target.value)} />
           </Field>
           <Field label="Measured osmolality (mOsm/kg, optional)">
-            <input className={inputClass} type="number" min={0} value={measured || ''} onChange={(e) => setMeasured(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={measured} onChange={(e) => setMeasured(e.target.value)} />
           </Field>
         </div>
       </Card>
 
       <Card className="!p-5">
+        {!res.ok ? (
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        ) : (
+          <>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated osmolality</div>
-            <div className="mt-1 text-2xl font-black text-brand-dark">{calculated.toFixed(0)}</div>
+            <div className="mt-1 text-2xl font-black text-brand-dark">{res.data.calculated.toFixed(0)}</div>
             <div className="text-[11px] text-neutral-500">mOsm/kg</div>
-            <Badge tone={cBand.tone}>{cBand.label}</Badge>
+            <Badge tone={res.data.band.tone}>{res.data.band.label}</Badge>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Osmolal gap</div>
-            {gap != null ? (
+            {res.data.gap != null ? (
               <>
-                <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{gap.toFixed(0)}</div>
+                <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{res.data.gap.toFixed(0)}</div>
                 <div className="text-[11px] text-neutral-500">mOsm/kg</div>
-                {gBand && <Badge tone={gBand.tone}>{gBand.label}</Badge>}
+                {res.data.gapBand && <Badge tone={res.data.gapBand.tone}>{res.data.gapBand.label}</Badge>}
               </>
             ) : (
               <p className="mt-1 text-[12px] text-neutral-500">Enter the measured osmolality to calculate the gap.</p>
             )}
           </div>
         </div>
-        {gap != null && gap > 10 && (
+        {res.data.gap != null && res.data.gap > 10 && (
           <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Widened osmolal gap — in the appropriate clinical setting (decreased consciousness, unexplained metabolic acidosis), consider toxic-alcohol poisoning and send confirmatory levels; treatment (fomepizole) should not wait for confirmation when suspicion is strong.</Prosa>
+        )}
+          </>
         )}
       </Card>
 

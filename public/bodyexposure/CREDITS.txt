@@ -1,0 +1,26 @@
+Body Exposure canonical bodies (web derivatives, LOD2/LOD3)
+===========================================================
+
+adult_male.*  — derived from Z-Anatomy (BodyParts3D, DBCLS), CC BY-SA 4.0.
+               External anal sphincter: BodyParts3D, (c) The Database Center for Life Science,
+               CC Attribution-Share Alike 2.1 Japan (now also offered under CC BY 4.0).
+                Includes Panacea-reconstructed intervertebral discs and pericardium
+                (derivatives, same licence). See bodyexposure/PROVENANCE.md.
+adult_female.* — derived from HuBMAP CCF 3D Reference Object Library, VH_Female
+                (NLM Visible Human female), CC BY 4.0.
+module_tissue_lymph_node.* — HuBMAP CCF library lymph node tissue model, CC BY 4.0.
+
+Educational models. Not patient-specific anatomy and not a clinical tool.
+
+pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Reference
+               Computational Phantoms (2024), ICRP. Newborn, 1, 5, 10 and 15 years,
+               male and female; CT-based reference phantoms. Dosimetry-only layers
+               removed; laterality corrected where the source label contradicted the
+               geometry (15-year female ovaries). Redistribution in Panacea cleared
+               by the project owner (2026-10-03).
+
+icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
+               Computational Phantoms (2020), ICRP. Reference adult male (176 cm)
+               and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
+               reference values. Dosimetry-only layers removed. Redistribution in
+               Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).

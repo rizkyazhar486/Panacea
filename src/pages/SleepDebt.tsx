@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
@@ -7,6 +7,7 @@ import { IconMoon } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { getHealthCache, hasHealth } from '../lib/profile'
+import { parseNumberField, sanitizeNights, sleepDebt, validateHours, type Night } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sleep Debt Calculator — tracks the rolling gap between how much sleep you
@@ -17,18 +18,19 @@ import { getHealthCache, hasHealth } from '../lib/profile'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LS_KEY = 'pmd_sleepdebt_v1'
-interface Night { date: string; hours: number }
 function load(): Night[] {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]') as Night[] } catch { return [] }
+  // Catatan tersimpan yang rusak dibuang (bukan dihitung); lihat sanitizeNights.
+  try { return sanitizeNights(JSON.parse(localStorage.getItem(LS_KEY) || '[]')).nights } catch { return [] }
 }
 
 export function SleepDebt() {
-  const [need, setNeed] = useState(8)
+  // Teks mentah: kolom kosong tetap "belum diisi" (NaN), bukan 0 jam yang sah.
+  const [need, setNeed] = useState('8')
   const [nights, setNights] = useState<Night[]>(load)
   const today = hariIni()
   const [hours, setHours] = useState(() => {
     const v = getHealthCache().sleepH
-    return typeof v === 'number' && v > 0 ? v : 7
+    return String(typeof v === 'number' && v > 0 ? v : 7)
   })
   const sleepFromDevice = hasHealth('sleepH')
 
@@ -36,23 +38,23 @@ export function SleepDebt() {
     try { localStorage.setItem(LS_KEY, JSON.stringify(nights)) } catch { /* ignore */ }
   }, [nights])
 
+  const hoursChecked = validateHours(parseNumberField(hours))
   const logNight = () => {
-    setNights((prev) => [{ date: today, hours }, ...prev.filter((n) => n.date !== today)].sort((a, b) => b.date.localeCompare(a.date)))
+    if (!hoursChecked.ok) return
+    const h = parseNumberField(hours)
+    setNights((prev) => [{ date: today, hours: h }, ...prev.filter((n) => n.date !== today)].sort((a, b) => b.date.localeCompare(a.date)))
   }
   const removeNight = (date: string) => setNights((prev) => prev.filter((n) => n.date !== date))
 
   // Rolling 14-day debt (need − actual, only counting nights logged).
-  const last14 = useMemo(() => nights.slice(0, 14), [nights])
-  const debt = last14.reduce((s, n) => s + (need - n.hours), 0)
-  const avg = last14.length ? last14.reduce((s, n) => s + n.hours, 0) / last14.length : 0
+  const res = sleepDebt(parseNumberField(need), nights)
+  const last14 = nights.slice(0, 14)
+  const needH = parseNumberField(need)
 
   const chart = [...last14].reverse().map((n) => ({
     label: n.date.slice(5),
     hours: n.hours,
   }))
-
-  const tone: 'brand' | 'low' | 'critical' = debt <= 2 ? 'brand' : debt <= 8 ? 'low' : 'critical'
-  const verdict = debt <= 2 ? 'Well-rested — minimal debt' : debt <= 8 ? 'Mild sleep debt — protect your next few nights' : 'Significant sleep debt — prioritize recovery sleep'
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -63,31 +65,36 @@ export function SleepDebt() {
         <div className="mt-3 grid grid-cols-2 gap-3">
           <label className="text-[12px] font-semibold text-neutral-500">
             My nightly sleep need (hours)
-            <input className={`${inputClass} mt-1`} type="number" step="0.5" min={5} max={11} value={need || ''} onChange={(e) => setNeed(Number(e.target.value) || 0)} />
+            <input className={`${inputClass} mt-1`} type="number" step="0.5" min={5} max={11} value={need} onChange={(e) => setNeed(e.target.value)} />
           </label>
           <label className="text-[12px] font-semibold text-neutral-500">
             Last night I slept (hours){sleepFromDevice && ' — from your device'}
-            <input className={`${inputClass} mt-1`} type="number" step="0.25" min={0} max={16} value={hours || ''} onChange={(e) => setHours(Number(e.target.value) || 0)} />
+            <input className={`${inputClass} mt-1`} type="number" step="0.25" min={0} max={16} value={hours} onChange={(e) => setHours(e.target.value)} />
           </label>
         </div>
         {sleepFromDevice && (
           <p className="mt-2 text-[11px] text-neutral-500">Prefilled from your synced sleep data — adjust it if last night was different from what synced.</p>
         )}
-        <button onClick={logNight} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Log last night ({today})</button>
+        {!hoursChecked.ok && <p role="alert" className="mt-2 text-[12px] font-semibold text-amber-700 dark:text-amber-300">{hoursChecked.reason}</p>}
+        <button onClick={logNight} disabled={!hoursChecked.ok} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Log last night ({today})</button>
       </Card>
 
       <Card className="!p-5">
+        {!res.ok ? (
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        ) : (
+          <>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">14-night debt</div>
-            <div className="mt-1 text-3xl font-black text-brand-dark">{debt > 0 ? '−' : '+'}{Math.abs(debt).toFixed(1)}h</div>
+            <div className="mt-1 text-3xl font-black text-brand-dark">{res.data.debt > 0 ? '−' : '+'}{Math.abs(res.data.debt).toFixed(1)}h</div>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Avg nightly sleep</div>
-            <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{avg.toFixed(1)}h</div>
+            <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{res.data.avg.toFixed(1)}h</div>
           </div>
         </div>
-        <div className="mt-3"><Badge tone={tone}>{verdict}</Badge></div>
+        <div className="mt-3"><Badge tone={res.data.tone}>{res.data.verdict}</Badge></div>
         {chart.length >= 2 && (
           <div className="mt-4 h-40">
             <ResponsiveContainer width="100%" height="100%">
@@ -96,13 +103,15 @@ export function SleepDebt() {
                 <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
                 <YAxis domain={[0, 12]} tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <ReferenceLine y={need} stroke="#00BF63" strokeDasharray="5 4" label={{ value: 'need', fontSize: 10, fill: '#00BF63' }} />
+                <ReferenceLine y={needH} stroke="#00BF63" strokeDasharray="5 4" label={{ value: 'need', fontSize: 10, fill: '#00BF63' }} />
                 <Line type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3 }} name="hours slept" />
               </LineChart>
             </ResponsiveContainer>
           </div>
         )}
-        {last14.length > 0 && <CopyNote text={`Sleep: 14-night debt ${debt > 0 ? '−' : '+'}${Math.abs(debt).toFixed(1)}h, average ${avg.toFixed(1)}h/night (need ${need}h) — ${verdict.toLowerCase()}`} />}
+        {last14.length > 0 && <CopyNote text={`Sleep: 14-night debt ${res.data.debt > 0 ? '−' : '+'}${Math.abs(res.data.debt).toFixed(1)}h, average ${res.data.avg.toFixed(1)}h/night (need ${needH}h) — ${res.data.verdict.toLowerCase()}`} />}
+          </>
+        )}
       </Card>
 
       {nights.length > 0 && (
@@ -112,7 +121,7 @@ export function SleepDebt() {
             {nights.slice(0, 14).map((n) => (
               <div key={n.date} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
                 <span className="font-black text-ink dark:text-ink">{n.hours}h</span>
-                <span className={`flex-1 ${n.hours >= need ? 'text-brand-dark' : 'text-neutral-500'}`}>{n.date} · {n.hours >= need ? 'met your need' : `${(need - n.hours).toFixed(1)}h short`}</span>
+                <span className={`flex-1 ${res.ok && n.hours >= needH ? 'text-brand-dark' : 'text-neutral-500'}`}>{n.date}{res.ok && ` · ${n.hours >= needH ? 'met your need' : `${(needH - n.hours).toFixed(1)}h short`}`}</span>
                 <button onClick={() => removeNight(n.date)} aria-label="Delete" className="font-bold text-neutral-500 hover:text-red-500">✕</button>
               </div>
             ))}
