@@ -177,6 +177,25 @@
       "next_experiment": "Run the current clinical wedge through the universal acceptance matrix, starting with accessibility, low-literacy, rural/offline and multi-language testing."
     },
     {
+      "id": "validated-vertical-depth",
+      "status": "implemented-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md",
+        "src/lib/biology/verticalBiologyGraph.ts",
+        "src/lib/biology/verticalDepthEvidence.ts",
+        "src/lib/biology/cardiovascularVerticalLineage.ts",
+        "src/lib/biology/physiologyVerticalProjection.ts",
+        "src/lib/physiology/realityGapRegistry.ts",
+        "scripts/qa/vertical-depth-evidence.test.mjs",
+        "scripts/uji/vertical-biological-graph.mts",
+        "scripts/uji/physiology-vertical-projection.mts"
+      ],
+      "blocker": "The repository now has executable no-hollow-gap and 10/10 eligibility gates, but current cardiovascular lineages still expose explicit cell-state and post-translational gaps and lack external validation/outcome-feedback evidence for the declared scope.",
+      "next_experiment": "Close one source-backed vertical gap in the cardiovascular slice without inventing patient-specific state, then run the same graph through real-input integration, projection, workflow/field evaluation and external validation."
+    },
+    {
       "id": "evidence-maturity",
       "status": "repository-evidence",
       "evidence_level": "E1",
