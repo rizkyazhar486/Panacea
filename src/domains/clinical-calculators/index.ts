@@ -63,3 +63,5 @@ export { childPugh, classify as childPughClass, bilirubinPts as cpBilirubinPts, 
 export type { CpInput, CpResult, CpClass, CpLevel } from './engine/childPugh'
 export { maddreyScore, MADDREY_RANGES, DF_COEFFICIENT, SEVERE_DF_THRESHOLD } from './engine/maddreyScore'
 export type { MaddreyInput, MaddreyResult } from './engine/maddreyScore'
+export { naegele, CYCLE_LENGTH_DAYS, LMP_YEAR, MAX_DISPLAY_GA_DAYS } from './engine/naegele'
+export type { NaegeleResult } from './engine/naegele'

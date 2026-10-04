@@ -295,8 +295,7 @@ risks:
       scripts/uji/map-ideal-body-weight.mts; Broca had been copied into two pages and is now one source, and the MAP
       thresholds are pinned at their boundaries. MidParentalCalc and McDonaldCalc followed through midParentalHeight/mcdonaldGestationalAge
       (scripts/uji/mid-parental-mcdonald.mts), formulas and constants unchanged; McDonald now refuses fundal heights
-      outside the 20-36 cm range its own page text states. NaegeleCalc is in open PR #2226, held for clinical sign-off
-      because it corrects a gestational-age sign. CentorCalc, ParadiseCalc and FletcherCalc followed through centorMcIsaac/paradiseCriteria/fletcherIndex
+      outside the 20-36 cm range its own page text states. NaegeleCalc followed through naegele (scripts/uji/naegele-gestational-age.mts): UTC calendar arithmetic with an injected clock, real-date validation and a CORRECTED gestational-age sign (GA = 40w0d on the EDD for every cycle 20-60); this is a clinical output change that needs clinical sign-off. CentorCalc, ParadiseCalc and FletcherCalc followed through centorMcIsaac/paradiseCriteria/fletcherIndex
       (scripts/uji/centor-paradise-fletcher.mts) with every classification threshold moved unchanged and pinned at its
       boundary; Centor age and Fletcher thresholds now keep the raw field text so an empty field is rejected instead of
       being read as 0 (an empty Fletcher form used to show "Normal", an empty Centor age added a point, 1e999 episodes
@@ -311,8 +310,7 @@ risks:
       z-score and BMI classes and the masked-stunting, >10% loss and day-14 warnings are untouched. The old pages showed
       Infinity or NaN for an empty height, birth weight 0 and CDC age 1000. Inventory after this change (a scan of every
       type=number input, not only the +e.target.value pattern my first count used): 24 calculators take numeric
-      input; all now go through a domain function except NaegeleCalc, which is in open PR #2226 held for clinical
-      sign-off. SirirajCalc, the one my first count missed because it parsed with Number(e.target.value) || 0 (an empty
+      input; all now go through a domain function including NaegeleCalc (clinical sign-off pending). SirirajCalc, the one my first count missed because it parsed with Number(e.target.value) || 0 (an empty
       diastolic pressure was read as 0 and showed a score of -12, "Suggests ISCHAEMIC stroke"), now goes through
       sirirajStrokeScore (scripts/uji/siriraj-stroke-score.mts): expression, +/-1 thresholds, labels, CT-scan warning
       and source are unchanged, and the float arithmetic is shown not to misclassify at the thresholds over 8664
@@ -352,3 +350,5 @@ risks:
       - scripts/uji/growth-inputs.mts
       - src/domains/clinical-calculators/engine/sirirajStrokeScore.ts
       - scripts/uji/siriraj-stroke-score.mts
+      - src/domains/clinical-calculators/engine/naegele.ts
+      - scripts/uji/naegele-gestational-age.mts

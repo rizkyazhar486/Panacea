@@ -10,7 +10,7 @@ import { api, backendEnabled } from '../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, sirirajStrokeScore, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
+import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, naegele, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, sirirajStrokeScore, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../lib/longevity'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -829,18 +829,9 @@ function ParklandCalc() {
 function NaegeleCalc() {
   const [lmp, setLmp] = useState('')
   const [cycleLen, setCycleLen] = useState(28)
-  let edd: Date | null = null
-  let gaWeeks = 0
-  let gaDays = 0
-  if (lmp) {
-    const lmpDate = new Date(lmp)
-    const cycleAdj = cycleLen - 28
-    edd = new Date(lmpDate)
-    edd.setDate(edd.getDate() + 280 + cycleAdj)
-    const diffDays = Math.floor((Date.now() - lmpDate.getTime()) / 86400000) + cycleAdj
-    gaWeeks = Math.floor(diffDays / 7)
-    gaDays = diffDays % 7
-  }
+  // Jam disuntik ke fungsi murni; disimpan per pemasangan agar tampilan stabil selama halaman terbuka.
+  const [nowMs] = useState(() => Date.now())
+  const result = lmp ? naegele(lmp, cycleLen, nowMs) : null
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Estimated due date (EDD) & gestational age from LMP" />
@@ -848,15 +839,18 @@ function NaegeleCalc() {
         <Field label="LMP (last menstrual period)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
         <Field label="Menstrual Cycle Length (days)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
       </div>
-      {edd && (
+      {result && !result.ok && (
+        <p role="status" className="mt-4 text-xs font-bold text-neutral-600">{result.reason}. No due date is shown until both values are valid.</p>
+      )}
+      {result?.ok && (
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-base font-black text-ink">{edd.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <div className="text-base font-black text-ink">{new Date(`${result.data.eddIso}T00:00:00Z`).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</div>
             <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Due Date (EDD)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-base font-black text-ink">{gaWeeks}wk {gaDays}d</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Current Gestational Age</div>
+            <div className="text-base font-black text-ink">{result.data.gestationalAge ? `${result.data.gestationalAge.weeks}wk ${result.data.gestationalAge.days}d` : '—'}</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">{result.data.gestationalAgeHidden === 'beyond-limit' ? 'Gestational age not shown (LMP over 45 weeks ago)' : result.data.gestationalAgeHidden === 'not-started' ? 'Gestational age not shown (cycle-adjusted start is still ahead)' : 'Current Gestational Age'}</div>
           </div>
         </div>
       )}
