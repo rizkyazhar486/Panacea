@@ -32,6 +32,11 @@ export interface ScientificModel {
 }
 
 export const BUKTI: Record<string, EvidenceReference> = {
+  'van-iterson-alveolar-2018': {
+    id: 'van-iterson-alveolar-2018', tahun: 2018, pmid: '30103021', pmcid: 'PMC6269087', doi: '10.1016/j.cardfail.2018.08.001',
+    sitasi: 'Van Iterson EH, Smith JR, Olson TP. Alveolar air and O2 uptake during exercise in patients with heart failure. J Card Fail. 2018;24(10):695-705.',
+    populasi: '35 adults with heart failure; Appendix equations used as provenance only, not validation of Panacea scenarios', konfigurasi: ['umum'],
+  },
   'elso-vv-2021': {
     id: 'elso-vv-2021', tahun: 2021, pmid: '33965970', doi: '10.1097/MAT.0000000000001432', pmcid: 'PMC8315725',
     sitasi: 'Tonna JE et al. Management of Adult Patients Supported with VV ECMO: Guideline from ELSO. ASAIO J 2021;67(6):601-610',
@@ -110,6 +115,22 @@ export const BUKTI: Record<string, EvidenceReference> = {
 }
 
 export const MODEL: Record<string, ScientificModel> = {
+  'alveolar-ventilation-budget': {
+    id: 'alveolar-ventilation-budget', nama: 'Steady-state alveolar ventilation budget', sistem: 'respiratory',
+    persamaan: 'VE = VT·f/1000; VDdot = VD·f/1000; VA = (VT−VD)·f/1000; VE = VA + VDdot',
+    satuan: { VT: 'mL BTPS', VD: 'mL BTPS', f: '1/min', VE: 'L/min BTPS', VDdot: 'L/min BTPS', VA: 'L/min BTPS' },
+    asumsi: ['Synthetic adult teaching scenario, not measured patient data', 'Physiological dead-space volume supplied explicitly; no disease-specific value inferred', 'Steady state; no breath-cycle or transient kinetics'],
+    rentang: 'Teaching envelope: VT 200–1000 mL; VD 0–900 mL with VD < VT; f 4–40/min; not normal ranges',
+    bukti: ['van-iterson-alveolar-2018'], status: 'terverifikasi-teks-lengkap',
+  },
+  'alveolar-gas-budget': {
+    id: 'alveolar-gas-budget', nama: 'Ideal alveolar CO2/O2 budget', sistem: 'respiratory',
+    persamaan: 'PACO2 = 0.863·VCO2/VA; PIO2 = FiO2·(PB−47); PAO2 = PIO2−PACO2·[FiO2+(1−FiO2)/RQ]',
+    satuan: { PACO2: 'mmHg', VCO2: 'mL/min STPD', VA: 'L/min BTPS', PIO2: 'mmHg', PAO2: 'mmHg', PB: 'mmHg', FiO2: 'fraction', RQ: 'ratio' },
+    asumsi: ['Sea level PB 760 mmHg, 37 °C saturated gas; conventional 0.863 conversion', 'Inspired CO2 negligible; steady-state RER equals supplied RQ', 'FiO2 correction retained, including FiO2=1 limit', 'Alveolar tension is not arterial tension or SpO2; no shunt, diffusion or regional V/Q model', 'Uncertainty unknown (null); clinical/expert validation absent'],
+    rentang: 'Teaching envelope: VCO2 50–1000 mL/min STPD, FiO2 0.21–1, RQ 0.7–1; impossible mixtures rejected',
+    bukti: ['van-iterson-alveolar-2018'], status: 'terverifikasi-teks-lengkap',
+  },
   'sirkulasi-tergumpal': {
     id: 'sirkulasi-tergumpal', nama: 'Lumped-parameter circulation (time-varying elastance)', sistem: 'kardiovaskular',
     persamaan: 'P_ch = e(t)·Ees·(V−V0) + (1−e(t))·Ped(V);  P = (V − Vu)/C;  Q = ΔP/R;  valves as diodes',
