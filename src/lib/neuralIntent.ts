@@ -104,10 +104,11 @@ const BODY_STATE_BY_EVIDENCE: Readonly<Record<IntentEvidenceClass, DigitalBodyIn
 }
 
 function assertNonBlank(value: string | undefined, field: string): asserts value is string {
-  if (!value?.trim()) throw new Error(`${field} must not be blank`)
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must not be blank`)
 }
 
 function parseIso(value: string, field: string) {
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must be a valid ISO timestamp`)
   const timestamp = Date.parse(value)
   if (!Number.isFinite(timestamp)) throw new Error(`${field} must be a valid ISO timestamp`)
   return timestamp
@@ -119,12 +120,17 @@ function assertUnitInterval(value: number, field: string) {
   }
 }
 
+const INTENT_PURPOSES: readonly IntentPurpose[] = ['personal-visualization', 'rehab-tracking', 'clinical-support', 'ai-context']
+
 function validateConsent(consent: IntentConsent) {
+  if (!consent || typeof consent.granted !== 'boolean' || !Array.isArray(consent.purposes) || consent.purposes.some(purpose => !INTENT_PURPOSES.includes(purpose))) {
+    throw new Error('intent consent requires a literal boolean and supported purpose array')
+  }
   const grantedAt = parseIso(consent.grantedAt, 'consent.grantedAt')
-  if (consent.expiresAt && parseIso(consent.expiresAt, 'consent.expiresAt') <= grantedAt) {
+  if (consent.expiresAt !== undefined && parseIso(consent.expiresAt, 'consent.expiresAt') <= grantedAt) {
     throw new Error('consent.expiresAt must be after consent.grantedAt')
   }
-  if (consent.revokedAt && parseIso(consent.revokedAt, 'consent.revokedAt') < grantedAt) {
+  if (consent.revokedAt !== undefined && parseIso(consent.revokedAt, 'consent.revokedAt') < grantedAt) {
     throw new Error('consent.revokedAt must not be before consent.grantedAt')
   }
 }
@@ -172,13 +178,15 @@ export function isIntentConsentActive(
   atMs = Date.now(),
 ) {
   if (!Number.isFinite(atMs)) throw new Error('atMs must be finite')
-  if (!consent.granted || !consent.purposes.includes(purpose)) return false
-
-  const grantedAt = parseIso(consent.grantedAt, 'consent.grantedAt')
-  if (atMs < grantedAt) return false
-  if (consent.revokedAt && atMs >= parseIso(consent.revokedAt, 'consent.revokedAt')) return false
-  if (consent.expiresAt && atMs >= parseIso(consent.expiresAt, 'consent.expiresAt')) return false
-  return true
+  try {
+    validateConsent(consent)
+    if (consent.granted !== true || !INTENT_PURPOSES.includes(purpose) || !consent.purposes.includes(purpose)) return false
+    const grantedAt = parseIso(consent.grantedAt, 'consent.grantedAt')
+    if (atMs < grantedAt) return false
+    if (consent.revokedAt !== undefined && atMs >= parseIso(consent.revokedAt, 'consent.revokedAt')) return false
+    if (consent.expiresAt !== undefined && atMs >= parseIso(consent.expiresAt, 'consent.expiresAt')) return false
+    return true
+  } catch { return false }
 }
 
 export function canProjectIntent(
@@ -189,6 +197,7 @@ export function canProjectIntent(
   validateIntentEvent(event)
   if (event.status === 'rejected') return false
   if (!isIntentConsentActive(event.consent, purpose, atMs)) return false
+  if (parseIso(event.capturedAt, 'event.capturedAt') > atMs) return false
   if (event.evidenceClass === 'simulated' && (purpose === 'clinical-support' || purpose === 'ai-context')) {
     return false
   }

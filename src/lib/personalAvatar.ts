@@ -67,11 +67,19 @@ export const PERSONAL_AVATAR_TRUTH_BOUNDARY =
   'Camera reconstruction may approximate external appearance, body habitus, posture and surface geometry. It must not be presented as patient-specific internal anatomy, a clinical measurement, diagnosis, operative target or imaging-derived truth.'
 
 function assertIso(value: string, field: string) {
-  if (!Number.isFinite(Date.parse(value))) throw new Error(`${field} must be a valid ISO timestamp`)
+  if (typeof value !== 'string' || !value.trim() || !Number.isFinite(Date.parse(value))) throw new Error(`${field} must be a valid ISO timestamp`)
 }
 
 function assertNonBlank(value: string, field: string) {
-  if (!value.trim()) throw new Error(`${field} must not be blank`)
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must not be blank`)
+}
+
+function validateCaptureConsent(consent: PersonalAvatarCaptureConsent) {
+  if (!consent || typeof consent.granted !== 'boolean' || typeof consent.allowReconstruction !== 'boolean' ||
+    consent.purpose !== 'personal-avatar-reconstruction' || consent.rawFrameRetention !== 'ephemeral') {
+    throw new Error('camera-avatar consent must explicitly declare capture, reconstruction, purpose and ephemeral retention')
+  }
+  assertIso(consent.grantedAt, 'consent.grantedAt')
 }
 
 export function createPersonalAvatarCaptureSession(input: {
@@ -83,13 +91,13 @@ export function createPersonalAvatarCaptureSession(input: {
   assertNonBlank(input.id, 'id')
   assertNonBlank(input.subjectId, 'subjectId')
   assertIso(input.createdAt, 'createdAt')
-  assertIso(input.consent.grantedAt, 'consent.grantedAt')
+  validateCaptureConsent(input.consent)
   return {
     id: input.id.trim(),
     subjectId: input.subjectId.trim(),
     createdAt: input.createdAt,
     status: input.consent.granted ? 'capturing' : 'consent-required',
-    consent: { ...input.consent, rawFrameRetention: 'ephemeral' },
+    consent: { ...input.consent },
     frames: {},
   }
 }
@@ -98,7 +106,8 @@ export function recordPersonalAvatarFrame(
   session: PersonalAvatarCaptureSession,
   frame: PersonalAvatarCaptureFrame,
 ): PersonalAvatarCaptureSession {
-  if (!session.consent.granted) throw new Error('camera-avatar capture requires explicit consent')
+  validateCaptureConsent(session.consent)
+  if (session.consent.granted !== true) throw new Error('camera-avatar capture requires explicit consent')
   if (!PERSONAL_AVATAR_CAPTURE_VIEWS.some((view) => view.id === frame.viewId)) {
     throw new Error('unknown camera-avatar capture view')
   }
@@ -137,7 +146,8 @@ export function buildPersonalAvatarQaGrid(session: PersonalAvatarCaptureSession)
 export function preparePersonalAvatarReconstruction(
   session: PersonalAvatarCaptureSession,
 ): PersonalAvatarReconstructionRequest {
-  if (!session.consent.granted || !session.consent.allowReconstruction) {
+  validateCaptureConsent(session.consent)
+  if (session.consent.granted !== true || session.consent.allowReconstruction !== true) {
     throw new Error('explicit avatar-reconstruction consent is required')
   }
   const missing = personalAvatarMissingViews(session)
