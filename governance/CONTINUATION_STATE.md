@@ -96,3 +96,23 @@ are retained as the durable state rather than creating duplicate governance.
   efficiency are unmeasured. This candidate is not counted complete until accepted and merged.
 - Residual follow-up: audit other legacy personal caches/history for cross-account ownership;
   do not infer that this Visit-specific boundary fixes every browser health projection.
+
+## Verified integration checkpoint — 2026-10-05 Asia/Jakarta
+
+- #2262 merged at canonical main `921f3f4bd0b02a356602013128ef521b1a1ecd86`.
+  Its tree exactly equals accepted head `cd34881ced06d986e87fe879518d3843c343df65`.
+- Exact-head GitHub gates passed: Validate 37230447466; Stabilization 37230447504;
+  Body3D 37230447533; Clinical 37230447444; Security Enforcement 37230447467;
+  Security Inventory 37230447458. No valid gate was weakened.
+- Visit evidence now rejects foreign/unbound account wearable snapshots and unavailable or
+  malformed observations; consent resets across patient selection. Review fixes are merged.
+- Next candidate: Visit kernel replay boundary. Retained samples must match session subject/visit
+  and satisfy capturedAt <= receivedAt <= evaluation/review time. Strict calendar timestamps
+  reuse the unchanged medical-device envelope validator in a shared kernel.
+- Five adversarial regressions failed before fixes; independent review found no important blocker.
+  Pre-sync production build, 657/657 deterministic files, architecture and ratchet passed.
+  Candidate remains uncompleted pending synchronized checks, exact-head CI, merge/main evidence.
+- Deployment evidence: Vercel latest READY production metadata references `103bd6008356b2770a92c3b316d364d898809742`;
+  repository push-policy success is not proof these changes are deployed. No PostHog telemetry observed.
+- Overall previous/current percentage, weighted delta and efficiency remain unmeasured: no
+  authoritative weighted completion denominator. Count accepted functionality, never invent a percentage.
