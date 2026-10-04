@@ -108,10 +108,12 @@ test('strong calorie-verified longitudinal season can reach Mythic Immortal', ()
 })
 
 test('clan contribution uses AI-sized stars with a daily anti-grind cap', () => {
+  // The cap uses the user's local calendar day, as do season windows.
+  const localTime = (day, hour) => new Date(2026, 8, day, hour).toISOString()
   const efforts = [
-    { workoutId: 'a', startedAt: '2026-09-20T08:00:00Z', calories: 800, kcalPerKg: 10, stars: 3, size: 'legendary', victoryScore: 100, components: {}, rationale: [] },
-    { workoutId: 'b', startedAt: '2026-09-20T18:00:00Z', calories: 800, kcalPerKg: 10, stars: 3, size: 'legendary', victoryScore: 100, components: {}, rationale: [] },
-    { workoutId: 'c', startedAt: '2026-09-21T08:00:00Z', calories: 400, kcalPerKg: 5, stars: 2, size: 'heroic', victoryScore: 67, components: {}, rationale: [] },
+    { workoutId: 'a', startedAt: localTime(20, 8), calories: 800, kcalPerKg: 10, stars: 3, size: 'legendary', victoryScore: 100, components: {}, rationale: [] },
+    { workoutId: 'b', startedAt: localTime(20, 18), calories: 800, kcalPerKg: 10, stars: 3, size: 'legendary', victoryScore: 100, components: {}, rationale: [] },
+    { workoutId: 'c', startedAt: localTime(21, 8), calories: 400, kcalPerKg: 5, stars: 2, size: 'heroic', victoryScore: 67, components: {}, rationale: [] },
   ]
   assert.equal(clanStarContribution(efforts, 4), 6)
 })

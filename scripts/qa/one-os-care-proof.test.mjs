@@ -95,6 +95,55 @@ test('blank or duplicate fragment ids fail closed instead of inflating trust cov
   assert.equal(blank.completenessCoverage, 0)
 })
 
+test('imported truthy evidence cannot inflate One OS trust coverage', () => {
+  for (const key of ['provenancePresent', 'normalized']) {
+    for (const value of [false, 'false', 'true', 1, {}, null, undefined]) {
+      const input = {
+        targetPatientId: 'patient-1', evaluatedAt: at, requiredDataClasses: ['vitals'],
+        fragments: [fragment({ [key]: value })],
+      }
+      const before = structuredClone(input)
+      const result = evaluateOneOsCareProof(input)
+      assert.equal(result.trustCoverage, 0, key)
+      assert.equal(result.completenessCoverage, 0, key)
+      assert.equal(result.unresolvedFragmentCount, 1, key)
+      assert.deepEqual(input, before)
+    }
+  }
+})
+
+test('review requirements and states must be explicitly supported', () => {
+  for (const requiresClinicalReview of [false, true, 'false', 'true', 0, 1, null, undefined]) {
+    for (const reviewState of ['not-required', 'pending', 'verified', 'signed', 'rejected', 'unsupported', null, undefined]) {
+      const result = evaluateOneOsCareProof({
+        targetPatientId: 'patient-1', evaluatedAt: at, requiredDataClasses: ['vitals'],
+        fragments: [fragment({ requiresClinicalReview, reviewState })],
+      })
+      const supported = ['not-required', 'pending', 'verified', 'signed'].includes(reviewState)
+      const trusted = supported && (requiresClinicalReview === false ||
+        (requiresClinicalReview === true && ['verified', 'signed'].includes(reviewState)))
+      assert.equal(result.trustCoverage, trusted ? 1 : 0)
+      assert.equal(result.completenessCoverage, trusted ? 1 : 0)
+    }
+  }
+})
+
+test('malformed imported fragment identities and timestamps fail closed without throwing', () => {
+  const invalid = [null, undefined, true, 1, 'fragment']
+  for (const key of ['id', 'patientId', 'sourceId', 'dataClass', 'recordedAt']) {
+    for (const value of [null, undefined, true, 1, {}, []]) invalid.push(fragment({ [key]: value }))
+  }
+  for (const value of invalid) {
+    const result = evaluateOneOsCareProof({
+      targetPatientId: 'patient-1', evaluatedAt: at, requiredDataClasses: ['vitals'], fragments: [value],
+    })
+    assert.equal(result.trustCoverage, 0)
+    assert.equal(result.completenessCoverage, 0)
+    assert.equal(result.unresolvedFragmentCount, 1)
+    assert.deepEqual(result.duplicateFragmentIds, [])
+  }
+})
+
 test('rejected review state never enters trusted context even when review is not otherwise required', () => {
   const result = evaluateOneOsCareProof({
     targetPatientId: 'patient-1',

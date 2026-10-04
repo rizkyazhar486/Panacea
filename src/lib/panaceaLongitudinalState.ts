@@ -138,17 +138,27 @@ const DOMAIN_BY_SURFACE: Readonly<Record<PanaceaSurface, readonly LongitudinalDo
 }
 
 const CLINICIAN_REVIEW_DOMAINS = new Set<LongitudinalDomain>(['lab', 'symptom', 'medication', 'clinical-note'])
+const CONSENT_PURPOSES: readonly ConsentPurpose[] = ['personal-visualization', 'clinical-support', 'ai-context', 'research-export']
+const LONGITUDINAL_DOMAINS = new Set<LongitudinalDomain>(Object.values(DOMAIN_BY_SURFACE).flat())
+const SOURCE_KINDS: readonly LongitudinalProvenance['sourceKind'][] = ['manual', 'wearable', 'clinical-system', 'device', 'derived', 'import']
+const REVIEW_STATES: readonly ReviewState[] = ['not-required', 'pending', 'accepted', 'rejected']
 const DAY_MS = 86_400_000
 const NUMERIC_EPSILON = 1e-9
 
 function parseIso(value: string, field: string) {
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must be a valid ISO timestamp`)
   const timestamp = Date.parse(value)
   if (!Number.isFinite(timestamp)) throw new Error(`${field} must be a valid ISO timestamp`)
   return timestamp
 }
 
 function assertNonBlank(value: string, field: string) {
-  if (!value.trim()) throw new Error(`${field} must not be blank`)
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${field} must not be blank`)
+}
+
+function validConsentShape(consent: ConsentEnvelope): boolean {
+  return !!consent && typeof consent.granted === 'boolean' && Array.isArray(consent.purposes) &&
+    consent.purposes.every(purpose => CONSENT_PURPOSES.includes(purpose))
 }
 
 function uniqueNonBlank(values: readonly string[] = []) {
@@ -190,6 +200,10 @@ function sameLongitudinalEvent(left: LongitudinalEvent, right: LongitudinalEvent
  * measurement is clinically correct, diagnostic, or appropriate for treatment.
  */
 export function validateLongitudinalEvent(event: LongitudinalEvent) {
+  if (!LONGITUDINAL_DOMAINS.has(event.domain)) throw new Error('event.domain is not a known longitudinal domain')
+  if (!SOURCE_KINDS.includes(event.provenance.sourceKind)) throw new Error('provenance.sourceKind is not a known source kind')
+  if (!REVIEW_STATES.includes(event.review.state)) throw new Error('review.state is not a known review state')
+  if (!validConsentShape(event.consent)) throw new Error('consent must use a boolean grant and supported purpose list')
   if (event.semanticState !== undefined) {
     if (!SEMANTIC_STATES.includes(event.semanticState)) throw new Error('event.semanticState is not a known semantic state')
     // AI tidak pernah diam-diam menjadi kebenaran klinis: 'clinician-reviewed' butuh tinjauan diterima
@@ -246,12 +260,22 @@ export function createLongitudinalPatientState(subjectId: string, at = new Date(
 }
 
 export function isConsentActive(consent: ConsentEnvelope, purpose: ConsentPurpose, at = Date.now()) {
-  if (!consent.granted || !consent.purposes.includes(purpose)) return false
-  const grantedAt = parseIso(consent.grantedAt, 'consent.grantedAt')
-  if (at < grantedAt) return false
-  if (consent.revokedAt && at >= parseIso(consent.revokedAt, 'consent.revokedAt')) return false
-  if (consent.expiresAt && at >= parseIso(consent.expiresAt, 'consent.expiresAt')) return false
-  return true
+  if (!validConsentShape(consent) || consent.granted !== true || !consent.purposes.includes(purpose) || !Number.isFinite(at)) return false
+  try {
+    const grantedAt = parseIso(consent.grantedAt, 'consent.grantedAt')
+    if (at < grantedAt) return false
+    if (consent.revokedAt !== undefined && at >= parseIso(consent.revokedAt, 'consent.revokedAt')) return false
+    if (consent.expiresAt !== undefined && at >= parseIso(consent.expiresAt, 'consent.expiresAt')) return false
+    return true
+  } catch { return false }
+}
+
+function validEventForAccess(event: LongitudinalEvent, at: number): boolean {
+  try {
+    validateLongitudinalEvent(event)
+    if (event.semanticState === 'clinician-reviewed' && Date.parse(event.review.reviewedAt ?? '') > at) return false
+    return Number.isFinite(at) && Date.parse(event.recordedAt) <= at
+  } catch { return false }
 }
 
 export function requiresClinicianReview(event: LongitudinalEvent) {
@@ -264,29 +288,35 @@ function hasClinicalTruthState(event: LongitudinalEvent) {
   return event.semanticState !== undefined && CLINICAL_TRUTH_STATES.has(event.semanticState)
 }
 
+function hasEffectiveClinicalReview(event: LongitudinalEvent, at: number): boolean {
+  if (!requiresClinicianReview(event)) return true
+  return event.review.state === 'accepted' && Date.parse(event.review.reviewedAt ?? '') <= at
+}
+
 function isEventVisibleOnSurface(
   event: LongitudinalEvent,
   surface: PanaceaSurface,
   purpose: ConsentPurpose,
   atMs: number,
 ) {
-  if (Date.parse(event.recordedAt) > atMs || !isConsentActive(event.consent, purpose, atMs)) return false
+  if (!validEventForAccess(event, atMs) || !isConsentActive(event.consent, purpose, atMs)) return false
   if (surface === 'clinical' || surface === 'ai-emr') {
     if (!hasClinicalTruthState(event)) return false
-    if (requiresClinicianReview(event) && event.review.state !== 'accepted') return false
+    if (!hasEffectiveClinicalReview(event, atMs)) return false
   }
   if (surface === 'ai-chatbot' && event.review.state === 'rejected') return false
   return true
 }
 
 export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()) {
+  if (!validEventForAccess(event, at)) return false
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
   if (!hasClinicalTruthState(event)) return false
-  if (!requiresClinicianReview(event)) return true
-  return event.review.state === 'accepted'
+  return hasEffectiveClinicalReview(event, at)
 }
 
 export function canEnterAiContext(event: LongitudinalEvent, at = Date.now()) {
+  if (!validEventForAccess(event, at)) return false
   if (!isConsentActive(event.consent, 'ai-context', at)) return false
   if (event.review.state === 'rejected') return false
   return true
@@ -453,6 +483,11 @@ export function projectStateToSurface(
     const snapshot = metricSnapshotAt(state, metric, atMs)
     if (!snapshot || !domains.has(snapshot.domain)) continue
 
+    if (!validEventForAccess(snapshot.latest, atMs)) {
+      blockedByTruthClass += 1
+      continue
+    }
+
     if (!isConsentActive(snapshot.latest.consent, purpose, atMs)) {
       blockedByConsent += 1
       continue
@@ -464,7 +499,7 @@ export function projectStateToSurface(
     }
 
     if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(snapshot.latest)) {
-      if (snapshot.latest.review.state !== 'accepted') {
+      if (!hasEffectiveClinicalReview(snapshot.latest, atMs)) {
         pendingClinicalReview += 1
         continue
       }
