@@ -196,6 +196,7 @@ const KATALOG: Nav[] = [
   { to: '/second-opinion', label: 'Second Opinion', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical', label: 'Clinical Data', icon: IconHeart, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Clinical & AI' },
+  { to: '/poli', label: 'Poli Flow', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/clinical-hub', label: '🩺 More clinical & AI tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
@@ -272,7 +273,7 @@ export const SEMUA_TUJUAN = NAV_UNTUK_PENGATURAN
 
 // Pages that show the active-patient context. Patients see only their own data
 // (no selector); doctors manage patients via the selector.
-const PATIENT_PAGES = ['/clinical', '/chatbot', '/emr', '/planning']
+const PATIENT_PAGES = ['/clinical', '/chatbot', '/emr', '/planning', '/poli']
 
 const roleLabel: Record<Role, string> = {
   pasien: 'Customer/Patient',
