@@ -161,6 +161,18 @@
       "next_experiment": "Implement and validate two materially different jurisdiction/payer boundary adapters without forking the core."
     },
     {
+      "id": "universal-human-acceptance",
+      "status": "target-partial",
+      "evidence_level": "E1",
+      "score": null,
+      "evidence": [
+        "PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md",
+        "governance/UNIVERSAL_HUMAN_ACCEPTANCE.json"
+      ],
+      "blocker": "Universal design doctrine and matrix exist, but representative subgroup validation is not yet complete.",
+      "next_experiment": "Run the current clinical wedge through the universal acceptance matrix, starting with accessibility, low-literacy, rural/offline and multi-language testing."
+    },
+    {
       "id": "evidence-maturity",
       "status": "repository-evidence",
       "evidence_level": "E1",
