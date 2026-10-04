@@ -18,6 +18,7 @@ const expected = [
   'defensibility',
   'global-adaptability',
   'universal-human-acceptance',
+  'validated-vertical-depth',
   'evidence-maturity',
 ]
 
