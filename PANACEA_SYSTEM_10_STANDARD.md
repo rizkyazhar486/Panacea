@@ -135,6 +135,8 @@ One patient should remain one patient across wearable, home, clinic, ward, OR, I
 Depth means validated domain and workflow competence, not more content. Each selected vertical must progress through:
 **real input → normalized state → domain logic → integration → validation → projection → outcome feedback.**
 
+Executable depth acceptance is enforced by `src/lib/biology/verticalDepthEvidence.ts`: explicit biological gaps, missing evidence classes, absent outcome feedback or non-external validation keep the declared slice below 10/10. The current cardiovascular graph intentionally remains partial while its explicit cell-state and post-translational gaps remain open.
+
 ### Breadth 10/10
 Breadth is valuable only when it is:
 - justified by real workflows;
