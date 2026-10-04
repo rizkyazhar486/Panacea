@@ -476,26 +476,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // When a backend is configured, hydrate clinical data from the server on login.
-  const hydratedFor = useRef<string>('')
   useEffect(() => {
-    const email = state.account?.email
-    if (!backendEnabled || !email || hydratedFor.current === email) return
-    hydratedFor.current = email
+    const owner = state.account ? { ...state.account } : null
+    if (!backendEnabled || !owner?.email) return
+    let cancelled = false
+    const belongsToSession = (current: Account | null) =>
+      !cancelled && !!current && current.id === owner.id && current.patientId === owner.patientId &&
+      current.email === owner.email && current.role === owner.role && current.loggedAt === owner.loggedAt
     api
       .clinical()
       .then((data) =>
-        setState((st) => ({
+        setState((st) => belongsToSession(st.account) ? ({
           ...st,
           patients: normalisasiDaftarPasien(data.patients).length ? normalisasiDaftarPasien(data.patients) : st.patients,
           vitals: { ...st.vitals, ...(data.vitals ?? {}) },
           supportive: { ...st.supportive, ...(data.supportive ?? {}) },
           records: { ...st.records, ...(data.records ?? {}) },
           education: { ...st.education, ...(data.education ?? {}) },
-        })),
+        }) : st),
       )
-      .catch(() => {
-        hydratedFor.current = '' // allow retry on next change
-      })
+      .catch(() => {})
     // Pull synced preferences (notifications, security toggles, model, doctor
     // name, STR verification). The server never stores the API key, so the
     // local key is kept. STR status is restored onto the account so a verified
@@ -505,6 +505,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then((remote) => {
         if (remote && Object.keys(remote).length) {
           setState((st) => {
+            if (!belongsToSession(st.account)) return st
             const next = { ...st, settings: { ...st.settings, ...remote } }
             if (remote.strStatus && st.account?.role === 'dokter') {
               next.account = { ...st.account, strStatus: remote.strStatus as Account['strStatus'] }
@@ -522,9 +523,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     // the header balance stays accurate (e.g. after server-side AI charges).
     api
       .wallet()
-      .then((w) => setState((st) => ({ ...st, wallet: { ...st.wallet, balance: w.balance } })))
+      .then((w) => setState((st) => belongsToSession(st.account) ? ({ ...st, wallet: { ...st.wallet, balance: w.balance } }) : st))
       .catch(() => {})
-  }, [state.account?.email])
+    return () => { cancelled = true }
+  }, [state.account?.id, state.account?.patientId, state.account?.email, state.account?.role, state.account?.loggedAt])
 
   // #9: multi-user social feed — pull posts from the server on login and poll so
   // posts/likes from other users appear near-realtime. Local-only (offline) posts
