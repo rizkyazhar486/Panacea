@@ -112,8 +112,64 @@ A release claiming progress toward One OS should demonstrate, with maturity-appr
 9. no PHI, secret or credential is committed to the public repository;
 10. growth improves integration depth rather than multiplying islands.
 
-## 11. Relationship to Invictus
+## 11. Permanent proof obligation — the pure concept must be demonstrated
+
+Panacea must not merely **look integrated**. The standing product obligation is:
+
+> **Prove that One/Invictus can take fragmented longitudinal data and produce care that is faster, more complete, more trustworthy, and easier to understand.**
+
+This is a falsifiable target, not a marketing sentence. Each dimension must have its own evidence and must remain **unmeasured** until the relevant benchmark or pilot data exist.
+
+### 11.1 Faster
+
+Measure a predefined workflow before and after One OS using the same task definition and comparable users/cases.
+
+**Time reduction (%) = ((T_baseline - T_OneOS) / T_baseline) × 100**
+
+A secondary workflow-friction measure may use:
+
+**Step reduction (%) = ((S_baseline - S_OneOS) / S_baseline) × 100**
+
+Do not claim speed from fewer visible screens alone. Capture actual task-completion time and/or interaction steps.
+
+### 11.2 More complete
+
+Completeness is requirement-relative, never a vague "more data" claim. For a predefined encounter/workflow protocol:
+
+**Completeness coverage = trusted required data classes present / required data classes**
+
+Only reconciled fragments with correct patient identity, valid time, normalization, provenance, and required review state count toward trusted completeness. Missing data remains missing.
+
+### 11.3 More trustworthy
+
+Trust is structural before it is reputational. For the evaluated context:
+
+**Trust coverage = trustworthy reconciled fragments / evaluated fragments**
+
+A fragment is structurally trustworthy only when its patient identity, source, timestamp, provenance, normalization and required clinical review state pass. This metric does not prove clinical correctness by itself; it proves that the system is not hiding unresolved data-quality/review gaps.
+
+### 11.4 Easier to understand
+
+Use a predefined comprehension/task-success instrument for clinicians and/or patients.
+
+**Understanding (%) = correct responses / total scored responses × 100**
+
+**Understanding gain (percentage points) = U_OneOS - U_baseline**
+
+Readability scores or UI aesthetics may be supporting evidence, but do not replace measured comprehension.
+
+### 11.5 No composite score may hide a failed dimension
+
+Do not collapse these four dimensions into one flattering weighted score. A fast workflow with poor trust is not successful; a complete record that nobody understands is not successful.
+
+The executable measurement contract lives in `src/domains/clinical-operations/model/oneOsCareProof.ts`. It must fail closed on invalid benchmark inputs and must not invent speed or comprehension gains when no comparative measurement was supplied.
+
+## 12. Relationship to Invictus
 
 Invictus is the compounding clinical-orchestration kernel direction inside this One OS target. Models, sensors and compute may change and deepen it, but model power does not redefine the product.
+
+Its permanent execution loop is therefore:
+
+**Fragmented longitudinal observations → governed reconciliation → compact clinical context → bounded orchestration → human review where required → outcome/understanding measurement → longitudinal learning**
 
 **One patient. One longitudinal state. One trusted healthcare operating system.**

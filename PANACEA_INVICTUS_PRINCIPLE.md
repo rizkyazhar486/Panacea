@@ -20,6 +20,8 @@ A failed applicable gate constrains total Invictus maturity regardless of model 
 
 Invictus serves the immutable One OS target in [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md): one simple, trusted, provenance-aware longitudinal patient state coordinated across everyday life and every care setting. Model power, feature growth or visualization depth may deepen this target but may not redefine it.
 
+The first-order proof target is operational and falsifiable: fragmented longitudinal inputs must be reconciled into a compact governed context that can be shown, with explicit benchmarks, to reduce workflow time/friction, improve requirement-relative completeness, preserve structural trust, and improve clinician/patient understanding. Unmeasured dimensions remain unmeasured; no composite score may compensate for a failed trust or safety gate.
+
 Panaceamed must compound into a uniquely coherent computational model of human state and health rather than accumulate disconnected features.
 
 "Invictus" is an engineering direction, not a claim that Panaceamed is literally unbeatable, infallible, omniscient, or clinically validated beyond evidence. Its purpose is to make the platform increasingly difficult to substitute because each validated layer improves the usefulness of the other layers.
