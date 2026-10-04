@@ -24,17 +24,18 @@ Let each verified dimension score be in `[0,10]`:
 - `U` = unity / integration / one-patient-state coherence;
 - `D` = validated vertical depth;
 - `B` = justified breadth and global applicability;
-- `C` = compactness, simplicity and cognitive efficiency.
+- `C` = compactness, simplicity and cognitive efficiency;
+- `Q` = universal human acceptability and adaptability.
 
 The primary system law is:
 
-**S_system = min(A, O, I, H, E, P, R, T, F, U, D, B, C)**
+**S_system = min(A, O, I, H, E, P, R, T, F, U, D, B, C, Q)**
 
 A high score in one area cannot compensate for a weak critical area.
 
 A system-wide 10/10 state is accepted only when every applicable dimension-specific acceptance gate passes:
 
-**System10Accepted = G_A ∧ G_O ∧ G_I ∧ G_H ∧ G_E ∧ G_P ∧ G_R ∧ G_T ∧ G_F ∧ G_U ∧ G_D ∧ G_B ∧ G_C**
+**System10Accepted = G_A ∧ G_O ∧ G_I ∧ G_H ∧ G_E ∧ G_P ∧ G_R ∧ G_T ∧ G_F ∧ G_U ∧ G_D ∧ G_B ∧ G_C ∧ G_Q**
 
 Unknown or unmeasured dimensions remain unknown/unmeasured and may not be promoted to 10/10 by assumption.
 
@@ -140,6 +141,9 @@ Breadth is valuable only when it is:
 - not purchased at the cost of shallow core workflows.
 
 The target is **broad capability compressed into one coherent operating system**, not many shallow mini-apps.
+
+### Universal human acceptability 10/10
+Must follow [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md). Universal does not mean one rigid interface or unanimous preference. It means no unnecessary exclusion and evidence-backed adaptability across language, literacy, ability, age/life-stage, resource level, connectivity, device, role, culture/worldview and jurisdiction while preserving consent, dignity and canonical patient truth.
 
 ### Compactness 10/10
 The external experience should remain:
