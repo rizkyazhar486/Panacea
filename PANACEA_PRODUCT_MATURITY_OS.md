@@ -17,6 +17,8 @@ This file does not replace existing charters. It operationalizes them.
 
 ## Worthiness evidence loop
 
+Current evidence state is tracked in [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json) and presented neutrally through [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md). Every material change should update the relevant evidence level, blocker and next experiment rather than inflate an aggregate score.
+
 Product maturity must be legible to skeptical humans and independent AI reviewers through [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md).
 
 Canonical loop:

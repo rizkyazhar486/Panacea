@@ -2,6 +2,8 @@
 
 ## Evidence-first worthiness review
 
+The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
+
 Every agent must read [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
 
 ## System 10/10 — weakest-link quality law
