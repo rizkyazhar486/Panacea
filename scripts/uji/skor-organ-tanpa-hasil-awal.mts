@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { sofaScore } from '../../src/domains/clinical-calculators/index.ts'
+import { childPugh, sofaScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,8 +71,15 @@ const cpKode = kodeDari(cp)
 for (const bawaan of ['useState(1.5)', 'useState(3.2)', 'useState(1.4)']) {
   assert.ok(!cpKode.includes(bawaan), `a laboratory default is back in Child-Pugh: ${bawaan}`)
 }
-assert.ok(/const cls = lengkap \? classify\(pts\) : null/.test(cpKode),
-  'Child-Pugh still prints a class and a survival figure without the laboratory values')
+// Sejak perhitungan dipindah ke domain/childPugh, kelas dan total hanya ada bila ketiga nilai lab sah. Regex teks-sumber lama
+// diganti padanannya, ditambah pemeriksaan perilaku pada mesin (lebih kuat dari regex).
+assert.ok(/const cls = res\.cls/.test(cpKode) && /const lengkap = res\.pts !== null/.test(cpKode),
+  'Child-Pugh page no longer takes its class/completeness from the validated engine')
+{
+  const tanpaLab = childPugh({ bilirubin: NaN, albumin: NaN, inr: NaN, ascites: 1, enceph: 1 })
+  assert.equal(tanpaLab.cls, null, 'Child-Pugh still prints a class and a survival figure without the laboratory values')
+  assert.equal(tanpaLab.pts, null, 'Child-Pugh still totals laboratory values nobody drew')
+}
 // Asites dan ensefalopati berskala 1-3; 1 berarti "tidak ada" -- jawaban sah.
 for (const tetap of ['ascites, setAscites] = useState<Level>(1)', 'enceph, setEnceph] = useState<Level>(1)']) {
   assert.ok(cpKode.includes(tetap), `a valid one-point clinical finding was removed from Child-Pugh: ${tetap}`)
