@@ -110,6 +110,7 @@ function AuthenticatedVisitCommandCenter({
   // The signed-in clinician's watch is not automatically the selected patient's device.
   // Import time cannot stand in for an unknown measurement time in a clinical visit.
   const synced: typeof accountVitals = healthScope.personalStoresIncluded &&
+    accountVitals.subjectId === subjectId && accountVitals.ownerAccountId === account?.id &&
     isClinicalObservationAvailableAt(accountVitals.measuredAt, Date.parse(clock)) ? accountVitals : {}
   const liveSampleBelongsToVisit = visit.subjectId === subjectId && visit.clinicianId === clinicianId &&
     visit.consent.clinicalData.granted && (visit.phase === 'live' || visit.phase === 'paused') &&

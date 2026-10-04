@@ -48,7 +48,15 @@ const MINUTE_MS = 60_000
 const DAY_MS = 24 * 60 * MINUTE_MS
 
 function parsedTime(value: unknown): number | null {
-  if (typeof value !== 'string' || !value.trim()) return null
+  if (typeof value !== 'string') return null
+  // Require a real calendar timestamp with an explicit timezone, not Date.parse coercion.
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(value)
+  if (!match) return null
+  const [year, month, day, hour, minute, second, offsetHour, offsetMinute] = match.slice(1).map(part => Number(part ?? 0))
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  if (month < 1 || month > 12 || day < 1 || day > days[month - 1] || hour > 23 || minute > 59 || second > 59 ||
+    offsetHour > 14 || offsetMinute > 59 || (offsetHour === 14 && offsetMinute !== 0)) return null
   const parsed = Date.parse(value)
   return Number.isFinite(parsed) ? parsed : null
 }

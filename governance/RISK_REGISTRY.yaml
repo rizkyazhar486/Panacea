@@ -22,6 +22,31 @@ risks:
       This is a repository-level boundary, not external security or legal validation.
     evidence: [src/lib/purposeConsentLedger.ts, scripts/qa/purpose-consent-integrity.test.mjs, scripts/uji/purpose-consent-ledger.mts]
 
+  - risk_id: risk.visit_observation_identity_time
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Browser-global wearable caches could be attributed to a selected clinical patient or to a
+      different account after logout/login. Parseable malformed or future observation timestamps
+      could also satisfy present workflow availability.
+    mitigation: >-
+      PR #2262 binds Visit personal snapshots to persisted account and subject ownership; fresh
+      imports derive ownership from a valid remembered self session, ignore supplied owner fields,
+      and never carry a foreign or unbound cache into an authenticated partial import. Legacy
+      unbound snapshots remain unavailable in Visit until a fresh authenticated import. Clinical
+      observations require a real calendar timestamp with explicit timezone at or before the
+      evaluation clock. Runtime consent resets on clinician/patient/encounter change. These are
+      local client integrity controls, not server authorization or vendor-device validation;
+      unrelated legacy personal-history stores still require their own account-isolation audit.
+    evidence:
+      - src/lib/healthVitals.ts
+      - src/components/VisitCommandCenter.tsx
+      - src/domains/clinical-operations/model/poliPatientFlow.ts
+      - scripts/qa/health-vitals-owner.test.mjs
+      - scripts/qa/poli-patient-flow.test.mjs
+      - scripts/qa/poli-patient-temporal-smoke.mjs
+
   - risk_id: risk.fragmented_patient_truth
     category: data_integrity
     severity: high

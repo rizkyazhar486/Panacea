@@ -118,3 +118,13 @@ test('board and visit telemetry share a finite point-in-time observation guard',
   for (const value of ['2026-10-05T08:55:00.000Z', 'invalid', null, 1, false]) assert.equal(isClinicalObservationAvailableAt(value, at), false)
   assert.equal(isClinicalObservationAvailableAt(now, Number.NaN), false)
 })
+
+
+test('parseable malformed calendar timestamps cannot become present observations', () => {
+  const at = Date.parse(now)
+  for (const value of ['1', '2026-09-31T12:00:00.000Z', '2026-02-29T00:00:00Z', '2026-10-01T24:00:00Z', '2026-10-01', '2026-10-01T09:00:00+14:01']) {
+    assert.equal(isClinicalObservationAvailableAt(value, at), false, value)
+    assert.equal(derivePoliPatientFlow({ ...base, vitalTimestamps: [value] }, now).priority, 'data-gap', value)
+  }
+  for (const value of ['2024-02-29T00:00:00Z', '2026-10-04T16:00:00+07:00', '2026-10-04T09:00:00.000Z']) assert.equal(isClinicalObservationAvailableAt(value, at), true, value)
+})

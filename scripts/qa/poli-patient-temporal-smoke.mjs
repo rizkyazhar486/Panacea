@@ -28,7 +28,7 @@ export async function verifyPoliPatientTemporalScope(page, url) {
     state.vitals = { 'qa-empty': [vital('future-only', future, 199)], 'qa-current': [vital('current', now, 71), vital('future', future, 199)] }
     state.supportive = { 'qa-flag': [{ id: 'qa-flag', takenAt: future, category: 'Lab', name: 'Synthetic future flag', value: 'QA', flag: 'critical' }] }
     localStorage.setItem('panaceamed.state.v3', JSON.stringify(state))
-    localStorage.setItem('pmd_vitals_v1', JSON.stringify({ heartRate: 173, source: 'QA own wearable', measuredAt: now, syncedAt: now }))
+    localStorage.setItem('pmd_vitals_v1', JSON.stringify({ subjectId: 'qa-self', ownerAccountId: 'qa-doctor', heartRate: 173, source: 'QA own wearable', measuredAt: now, syncedAt: now }))
   })
   await page.reload()
   const board = page.locator('[data-poli-patient-flow]')
@@ -46,6 +46,24 @@ export async function verifyPoliPatientTemporalScope(page, url) {
   assert.doesNotMatch(await heartRate(), /199|173/)
   assert.match(await row('QA Future critical flag').innerText(), /Review critical flag and reconcile timestamp\/provenance/)
   await row('QA Own wearable').getByRole('button', { name: 'QA Own wearable', exact: true }).click()
+  await center.getByText('QA Own wearable', { exact: true }).waitFor()
+  assert.match(await heartRate(), /173/)
+  // A prior account's cache and unbound legacy imports cannot become this patient's truth.
+  for (const ownership of [{ subjectId: 'qa-self', ownerAccountId: 'other-doctor' }, {}]) {
+    await page.evaluate(ownership => {
+      const cached = JSON.parse(localStorage.getItem('pmd_vitals_v1'))
+      delete cached.subjectId; delete cached.ownerAccountId
+      localStorage.setItem('pmd_vitals_v1', JSON.stringify({ ...cached, ...ownership }))
+    }, ownership)
+    await page.reload()
+    await center.getByText('QA Own wearable', { exact: true }).waitFor()
+    assert.doesNotMatch(await heartRate(), /173/)
+  }
+  await page.evaluate(() => {
+    const cached = JSON.parse(localStorage.getItem('pmd_vitals_v1'))
+    localStorage.setItem('pmd_vitals_v1', JSON.stringify({ ...cached, subjectId: 'qa-self', ownerAccountId: 'qa-doctor' }))
+  })
+  await page.reload()
   await center.getByText('QA Own wearable', { exact: true }).waitFor()
   assert.match(await heartRate(), /173/)
   await center.getByRole('button', { name: 'Confirm consent', exact: true }).click()
