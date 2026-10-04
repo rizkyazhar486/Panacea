@@ -64,6 +64,37 @@ test('pending review and absent provenance fail closed instead of inflating trus
   assert.deepEqual(result.missingRequiredDataClasses, ['laboratory'])
 })
 
+test('blank or duplicate fragment ids fail closed instead of inflating trust coverage', () => {
+  const duplicate = evaluateOneOsCareProof({
+    targetPatientId: 'patient-1',
+    evaluatedAt: at,
+    requiredDataClasses: ['vitals'],
+    fragments: [
+      fragment({ id: 'dup', sourceId: 'wearable-a' }),
+      fragment({ id: 'dup', sourceId: 'wearable-b' }),
+    ],
+  })
+
+  assert.deepEqual(duplicate.duplicateFragmentIds, ['dup'])
+  assert.equal(duplicate.trustworthyFragmentCount, 0)
+  assert.equal(duplicate.unresolvedFragmentCount, 2)
+  assert.equal(duplicate.trustCoverage, 0)
+  assert.equal(duplicate.completenessCoverage, 0)
+
+  const blank = evaluateOneOsCareProof({
+    targetPatientId: 'patient-1',
+    evaluatedAt: at,
+    requiredDataClasses: ['vitals'],
+    fragments: [fragment({ id: '   ' })],
+  })
+
+  assert.deepEqual(blank.duplicateFragmentIds, [])
+  assert.equal(blank.trustworthyFragmentCount, 0)
+  assert.equal(blank.unresolvedFragmentCount, 1)
+  assert.equal(blank.trustCoverage, 0)
+  assert.equal(blank.completenessCoverage, 0)
+})
+
 test('rejected review state never enters trusted context even when review is not otherwise required', () => {
   const result = evaluateOneOsCareProof({
     targetPatientId: 'patient-1',
