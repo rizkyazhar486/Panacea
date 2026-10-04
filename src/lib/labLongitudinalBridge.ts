@@ -12,6 +12,7 @@
 // - satuan: dari JENIS_LAB; butir jenis tak dikenal dilewati, bukan ditebak;
 // - kepercayaan ingest diberikan pemanggil, tidak dikarang dari angkanya.
 import { JENIS_LAB, type ButirLab } from './lab.ts'
+import { tanggalKalenderSah } from './tanggal.ts'
 import type { ConsentEnvelope, LongitudinalEvent } from './panaceaLongitudinalState.ts'
 
 export interface LabBridgeContext {
@@ -32,7 +33,7 @@ export function labLogToLongitudinalEvents(
     const j = JENIS_LAB.find((x) => x.id === jenis)
     for (const b of daftar) {
       if (!j) { skipped.push({ jenis, id: b.id, reason: 'unknown-lab-type' }); continue }
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal) || !Number.isFinite(b.nilai) || b.nilai <= 0) { skipped.push({ jenis, id: b.id, reason: 'invalid-record' }); continue }
+      if (!tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || b.nilai <= 0) { skipped.push({ jenis, id: b.id, reason: 'invalid-record' }); continue }
       const recordedAt = `${b.tanggal}T00:00:00.000Z`
       // Tanggal ambil darah bisa "hari ini" di zona waktu pengguna tetapi besok di UTC.
       if (Date.parse(recordedAt) > penerimaan + 5 * 60_000) { skipped.push({ jenis, id: b.id, reason: 'future-date' }); continue }
@@ -75,8 +76,6 @@ export interface LabBodyExposureSignal {
   jenisId: string
 }
 
-const TANGGAL_LAB = /^\d{4}-\d{2}-\d{2}$/
-
 /**
  * Project the newest valid analyte per known type into overlay signals.
  * Unknown types, non-positive values, bad dates, and future draws (vs nowISO)
@@ -97,7 +96,7 @@ export function labLogToBodyExposureSignals(
     if (!Array.isArray(daftar) || daftar.length === 0) continue
     let best: ButirLab | null = null
     for (const b of daftar) {
-      if (!b || !TANGGAL_LAB.test(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
+      if (!b || !tanggalKalenderSah(b.tanggal) || !Number.isFinite(b.nilai) || !(b.nilai > 0)) continue
       const t = Date.parse(`${b.tanggal}T00:00:00.000Z`)
       if (!Number.isFinite(t) || t > nowMs) continue
       if (!best || b.tanggal > best.tanggal) best = b
@@ -119,4 +118,3 @@ export function labLogToBodyExposureSignals(
     .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt) || a.jenisId.localeCompare(b.jenisId))
     .slice(0, Math.floor(max))
 }
-
