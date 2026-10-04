@@ -26,7 +26,9 @@ Do **not** assume Panacea is worth building because the owner or another model s
 2. `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`
 3. `PANACEA_SYSTEM_10_STANDARD.md`
 4. `PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`
-5. `governance/WORTHINESS_EVIDENCE.json`
+5. `PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`
+6. `governance/WORTHINESS_EVIDENCE.json`
+7. `governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`
 
 ## Executable evidence already present
 
@@ -37,6 +39,8 @@ Do **not** assume Panacea is worth building because the owner or another model s
 - Longitudinal patient state: `src/lib/panaceaLongitudinalState.ts`
 - Shared longitudinal projection: `src/lib/longitudinalSnapshot.ts`
 - Deterministic tests: `scripts/qa/one-os-care-proof.test.mjs`, `scripts/qa/care-access-orchestrator.test.mjs`, `scripts/qa/current-wedge-lock.test.mjs`, `scripts/qa/compact-product-law.test.mjs`
+
+The universal-human acceptance matrix is tracked in `governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`; subgroup scores remain null until measured.
 
 These artifacts show implementation intent and repository-level behavior. They do **not** by themselves prove clinical outcome, market demand, buyer ROI or global deployment readiness.
 
