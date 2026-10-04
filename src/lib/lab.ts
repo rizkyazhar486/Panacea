@@ -1,3 +1,5 @@
+import { tanggalKalenderSah } from './tanggal.ts'
+
 // Hasil laboratorium yang dimasukkan sendiri, beserta rentang rujukannya.
 //
 // MENGAPA TERPISAH DARI VITALS. Angka dari perangkat masuk sendiri berkali-kali
@@ -135,7 +137,7 @@ export function ambilLab(): Simpanan {
     const bersih: Simpanan = {}
     for (const [jenis, daftar] of Object.entries(d as Simpanan)) {
       if (!Array.isArray(daftar)) continue
-      bersih[jenis] = daftar.filter((b) => b && typeof b.tanggal === 'string' && typeof b.nilai === 'number' && Number.isFinite(b.nilai))
+      bersih[jenis] = daftar.filter((b) => b && tanggalKalenderSah(b.tanggal) && typeof b.nilai === 'number' && Number.isFinite(b.nilai))
     }
     return bersih
   } catch {
@@ -170,6 +172,7 @@ export function gantiDariServer(s: Simpanan, cap: string): void {
 }
 
 export function tambahLab(jenis: string, tanggal: string, nilai: number, rujukan?: { bawah?: number; atas?: number }): void {
+  if (!tanggalKalenderSah(tanggal)) return
   const s = ambilLab()
   const daftar = s[jenis] ?? []
   daftar.push({
@@ -189,7 +192,7 @@ export function tambahLab(jenis: string, tanggal: string, nilai: number, rujukan
  * instead of a parallel browser-only sheet.
  */
 export function tetapkanLabPadaTanggal(jenis: string, tanggal: string, nilai: number): void {
-  if (!(nilai > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return
+  if (!(nilai > 0) || !tanggalKalenderSah(tanggal)) return
   if (!JENIS_LAB.some((j) => j.id === jenis)) return
   const s = ambilLab()
   const daftar = [...(s[jenis] ?? [])]
@@ -261,7 +264,7 @@ export function proyeksikanNilaiNutrisiKeLabKanonic(
 ): { written: string[]; skipped: string[] } {
   const written: string[] = []
   const skipped: string[] = []
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || !values || typeof values !== 'object') {
+  if (!tanggalKalenderSah(tanggal) || !values || typeof values !== 'object') {
     return { written, skipped: Object.keys(values ?? {}) }
   }
   for (const [kunci, mentah] of Object.entries(values)) {
@@ -285,7 +288,7 @@ export function proyeksikanNilaiNutrisiKeLabKanonic(
 /** Read synced lab values for a draw date as Nutrition camelCase keys. */
 export function nilaiNutrisiDariLabKanonic(tanggal: string, opts: { tepat?: boolean } = {}): Record<string, number> {
   const keluar: Record<string, number> = {}
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return keluar
+  if (!tanggalKalenderSah(tanggal)) return keluar
   for (const [jenis, kunci] of Object.entries(JENIS_LAB_KE_NUTRISI)) {
     const daftar = ambilLab()[jenis] ?? []
     const n = opts.tepat
@@ -309,12 +312,12 @@ export interface BarisLabNutrisi {
 export function gabungLabNutrisiDenganKanonic(lokal: readonly BarisLabNutrisi[]): BarisLabNutrisi[] {
   const perTanggal = new Map<string, Record<string, number>>()
   for (const row of lokal) {
-    if (!row?.date || !/^\d{4}-\d{2}-\d{2}$/.test(row.date)) continue
+    if (!row?.date || !tanggalKalenderSah(row.date)) continue
     perTanggal.set(row.date, { ...(row.values ?? {}) })
   }
   for (const daftar of Object.values(ambilLab())) {
     for (const b of daftar ?? []) {
-      if (!b?.tanggal || !/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal) || !(b.nilai > 0)) continue
+      if (!b?.tanggal || !tanggalKalenderSah(b.tanggal) || !(b.nilai > 0)) continue
       if (!perTanggal.has(b.tanggal)) perTanggal.set(b.tanggal, {})
     }
   }
@@ -386,7 +389,7 @@ export function periksaMasukanLab(jenis: JenisLab, teks: string, tanggal: string
   if (!/^\d+(\.\d+)?$/.test(bersih)) return { ok: false, alasan: 'Use a plain number, e.g. 5.4 — no units or symbols.' }
   const nilai = Number(bersih)
   if (!Number.isFinite(nilai) || nilai <= 0) return { ok: false, alasan: 'The value must be greater than zero.' }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || Number.isNaN(Date.parse(`${tanggal}T00:00:00Z`))) {
+  if (!tanggalKalenderSah(tanggal)) {
     return { ok: false, alasan: 'Choose the date the blood was taken.' }
   }
   if (tanggal > hariIniISO) return { ok: false, alasan: 'The collection date cannot be in the future.' }
