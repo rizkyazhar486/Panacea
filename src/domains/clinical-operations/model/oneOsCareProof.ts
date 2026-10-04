@@ -67,6 +67,10 @@ function normalizeClass(value: string) {
   return value.trim().toLowerCase()
 }
 
+function evidenceText(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
 function finitePositive(value: number, label: string) {
   if (!Number.isFinite(value) || value <= 0) throw new Error(`${label} must be a finite positive number`)
 }
@@ -83,19 +87,20 @@ function trustworthyFragment(
   evaluatedAtMs: number,
   duplicateFragmentIds: ReadonlySet<string>,
 ): boolean {
-  const fragmentId = fragment.id.trim()
+  if (!fragment || typeof fragment !== 'object') return false
+  const fragmentId = evidenceText(fragment.id)
   const fragmentIdentityValid = fragmentId !== '' && !duplicateFragmentIds.has(fragmentId)
-  const recordedAtMs = Date.parse(fragment.recordedAt)
+  const recordedAtMs = typeof fragment.recordedAt === 'string' ? Date.parse(fragment.recordedAt) : NaN
   const timestampValid = Number.isFinite(recordedAtMs) && recordedAtMs <= evaluatedAtMs
-  const identityValid = fragment.patientId.trim() !== '' && fragment.patientId === targetPatientId
-  const sourceValid = fragment.sourceId.trim() !== ''
-  const dataClassValid = fragment.dataClass.trim() !== ''
+  const identityValid = evidenceText(fragment.patientId) !== '' && fragment.patientId === targetPatientId
+  const sourceValid = evidenceText(fragment.sourceId) !== ''
+  const dataClassValid = evidenceText(fragment.dataClass) !== ''
   const reviewValid =
-    fragment.reviewState !== 'rejected' &&
+    ['not-required', 'pending', 'verified', 'signed'].includes(fragment.reviewState) &&
     (
-      !fragment.requiresClinicalReview ||
-      fragment.reviewState === 'verified' ||
-      fragment.reviewState === 'signed'
+      fragment.requiresClinicalReview === false ||
+      (fragment.requiresClinicalReview === true &&
+        (fragment.reviewState === 'verified' || fragment.reviewState === 'signed'))
     )
 
   return Boolean(
@@ -104,8 +109,8 @@ function trustworthyFragment(
     identityValid &&
     sourceValid &&
     dataClassValid &&
-    fragment.provenancePresent &&
-    fragment.normalized &&
+    fragment.provenancePresent === true &&
+    fragment.normalized === true &&
     reviewValid,
   )
 }
@@ -127,7 +132,7 @@ export function evaluateOneOsCareProof(input: OneOsProofInput): OneOsProofResult
 
   const fragmentIdCounts = new Map<string, number>()
   for (const fragment of input.fragments) {
-    const fragmentId = fragment.id.trim()
+    const fragmentId = evidenceText(fragment?.id)
     if (!fragmentId) continue
     fragmentIdCounts.set(fragmentId, (fragmentIdCounts.get(fragmentId) ?? 0) + 1)
   }
@@ -144,7 +149,7 @@ export function evaluateOneOsCareProof(input: OneOsProofInput): OneOsProofResult
 
   const sourceCount = new Set(
     input.fragments
-      .map((fragment) => fragment.sourceId.trim())
+      .map((fragment) => evidenceText(fragment?.sourceId))
       .filter(Boolean),
   ).size
 
