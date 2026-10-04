@@ -17,8 +17,9 @@ test('system 10 standard is wired into core product authority documents', () => 
 
 test('system 10 standard uses a weakest-link law and preserves permissioned observability', () => {
   const standard = read('PANACEA_SYSTEM_10_STANDARD.md')
-  assert.match(standard, /S_system = min\(A, O, I, H, E, P, R, T, F, U, D, B, C\)/)
+  assert.match(standard, /S_system = min\(A, O, I, H, E, P, R, T, F, U, D, B, C, Q\)/)
   assert.match(standard, /permissioned Human Observability/)
+  assert.match(standard, /PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD\.md/)
   assert.match(standard, /One patient\. One longitudinal state\. One trusted care flow\./)
   assert.match(standard, /10\/10 system ambition → one 10\/10 wedge/)
 })
