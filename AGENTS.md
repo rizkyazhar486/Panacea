@@ -4,6 +4,8 @@
 
 Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
 
+**Global access/reimbursement rule:** clinical care, diagnostic logistics and reimbursement are coordinated as one episode, but no single payer protocol is assumed universal. Use a canonical internal coverage/claim state plus tested jurisdiction/payer adapters; remote/offline diagnostic referral must preserve patient identity, provenance, chain of custody and result return to the same longitudinal state. Financial optimization never authorizes fabricated clinical evidence or denial of care based only on profitability.
+
 **Permanent proof obligation:** do not treat architecture or feature count as success. Work must move toward demonstrable evidence that One/Invictus can reconcile fragmented longitudinal data into care workflow that is faster, more complete, more trustworthy and easier to understand. Speed and understanding claims require explicit comparative measurement; completeness and trust must fail closed on identity/provenance/time/normalization/review gaps. The canonical formulas and acceptance rules live in the One OS doctrine.
 
 

@@ -17,4 +17,18 @@ export {
   type OneOsWorkflowBenchmark,
 } from './model/oneOsCareProof'
 
+export {
+  evaluateCareAccessOrchestration,
+  type CareAccessOrchestrationInput,
+  type CareAccessOrchestrationResult,
+  type ClaimEvidenceState,
+  type CoverageState,
+  type DiagnosticReferralState,
+  type DiagnosticRouteState,
+  type OrchestrationPriority,
+  type PayerOrchestrationState,
+  type PaymentState,
+  type PreauthorizationState,
+} from './model/careAccessOrchestrator'
+
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'

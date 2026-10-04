@@ -164,6 +164,60 @@ Do not collapse these four dimensions into one flattering weighted score. A fast
 
 The executable measurement contract lives in `src/domains/clinical-operations/model/oneOsCareProof.ts`. It must fail closed on invalid benchmark inputs and must not invent speed or comprehension gains when no comparative measurement was supplied.
 
+## 12. Global care-access, reimbursement and rural diagnostics architecture
+
+Panacea One OS must treat **clinical care, diagnostic logistics and payment/reimbursement as one coordinated episode**, while keeping their authorities distinct. A patient should not need separate disconnected workflows for clinical truth, specimen referral, payer authorization and settlement.
+
+### 12.1 Universal means canonical core + jurisdiction adapters
+
+There is no single reimbursement protocol that can honestly be called universal across every country and payer. Panacea therefore uses a **canonical financial/coverage state** internally and jurisdiction/payer adapters at the boundary.
+
+The preferred interoperable financial vocabulary is aligned where practical with HL7 FHIR concepts such as Coverage, CoverageEligibilityRequest/Response, Claim, ClaimResponse, ExplanationOfBenefit, PaymentNotice and PaymentReconciliation. National clearinghouse formats, insurer APIs, government schemes and manual/offline processes attach through adapters without becoming the canonical patient truth.
+
+A payer integration is not "supported" until its adapter, validation fixtures, authorization rules, error handling, reconciliation and audit trail have been tested for that jurisdiction.
+
+### 12.2 Reimbursement must derive from care evidence, not duplicate it
+
+The reimbursement packet should be assembled from the same governed encounter state:
+
+**patient/coverage identity → encounter → signed clinical record → coded diagnosis → coded services/items → supporting lab/imaging/procedure evidence → authorization state → claim → adjudication → reconciliation → payment**
+
+Missing clinical evidence remains missing. Financial pressure must never cause Panacea to invent a diagnosis, procedure, supporting attachment, signature or provenance.
+
+### 12.3 Rural/offline-first diagnostic continuity
+
+For remote facilities and low-connectivity environments, the operating system must support store-and-forward and eventual synchronization without creating a second patient identity.
+
+When a test cannot be performed locally:
+
+**clinical order → specimen/study identity → local collection → chain of custody → transport/referral destination → remote processing → verified result → return to the same longitudinal patient state → clinician review → patient explanation → claim/reimbursement evidence**
+
+The remote laboratory or referral hospital is a processing node in the same longitudinal episode, not a new silo. Offline capture must retain timestamps, actor/device/source, units, specimen/study identity and provenance so later synchronization is auditable.
+
+### 12.4 Operational optimization target
+
+The goal is not simply "more patients" or "more revenue." The target is safe throughput with lower friction and faster cash conversion while preserving care quality.
+
+Useful measured outcomes include:
+
+**Clinical throughput = completed clinically appropriate encounters / clinician productive time**
+
+**Diagnostic turnaround time = verified result time - order/collection time** (define the chosen start point explicitly)
+
+**First-pass clean-claim rate = claims accepted without preventable documentation/coding correction / submitted claims**
+
+**Payment cycle time = settled payment time - authorized claim submission time**
+
+**Cost-to-collect = reimbursement operations cost / collected reimbursement**
+
+These are operational metrics; they do not override clinical safety, patient access, outcome quality or equity.
+
+### 12.5 Rural equity gate
+
+Optimization must not preferentially discard patients because they are remote, poorly connected, uninsured or operationally expensive. The orchestrator should expose the constraint — transport, connectivity, missing analyzer, referral delay, payer gap — and route the episode to the safest feasible next operational step.
+
+The executable first slice is `src/domains/clinical-operations/model/careAccessOrchestrator.ts`: it fail-closes on missing payer adapters, unresolved claim evidence and broken remote diagnostic continuity. It does not decide what test or treatment is clinically indicated.
+
 ## 12. Relationship to Invictus
 
 Invictus is the compounding clinical-orchestration kernel direction inside this One OS target. Models, sensors and compute may change and deepen it, but model power does not redefine the product.
