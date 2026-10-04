@@ -112,6 +112,8 @@ The owner's "surveillance" shorthand is implemented only as **permissioned Human
 - device/vendor outage does not collapse the entire care episode;
 - disaster/recovery procedures are tested at the maturity level claimed.
 
+Executable repository-level transport gates currently include `src/domains/clinical-operations/model/clinicalEpisodeResilience.ts` and `src/lib/secureCareOutbox.ts`. They strengthen E1 evidence only; they do not constitute field or disaster-recovery validation.
+
 ### Trust 10/10
 Trust must be structural:
 - evidence and source identity;
