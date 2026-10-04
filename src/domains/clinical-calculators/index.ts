@@ -61,3 +61,5 @@ export { graceScore, graceBand, agePts as graceAgePts, hrPts as graceHrPts, sbpP
 export type { GraceInput, GraceResult, GraceBand } from './engine/graceScore'
 export { childPugh, classify as childPughClass, bilirubinPts as cpBilirubinPts, albuminPts as cpAlbuminPts, inrPts as cpInrPts, CP_RANGES } from './engine/childPugh'
 export type { CpInput, CpResult, CpClass, CpLevel } from './engine/childPugh'
+export { correctedCalcium, calciumBand, CALCIUM_RANGES } from './engine/correctedCalcium'
+export type { CalciumInput, CalciumResult, CalciumBand } from './engine/correctedCalcium'
