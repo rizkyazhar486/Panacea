@@ -34,6 +34,9 @@ test('unsupported consent purpose shapes never authorize clinical or AI use', ()
     assert.equal(isConsentActive(e.consent, 'ai-context', ms), false)
     assert.equal(canEnterAiContext(e, ms), false)
     assert.equal(canEnterClinicalRecord(e, ms), false)
+    const state = { ...createLongitudinalPatientState('p', at), eventsById: { e }, metricEventIds: { 'heart-rate': ['e'] } }
+    assert.equal(projectStateToSurface(state, 'clinical', at).metrics.length, 0)
+    assert.equal(projectStateToSurface(state, 'ai-chatbot', at).metrics.length, 0)
   }
 })
 
@@ -81,4 +84,19 @@ test('surface projection and direct access share the same fail-closed boundary',
   assert.equal(validateLongitudinalEvent(future), true, 'ingestion preserves its existing five-minute clock tolerance')
   assert.equal(canEnterAiContext(future, Date.parse('2026-10-04T10:00:00.000Z')), false)
   assert.equal(canEnterClinicalRecord(future, Date.parse('2026-10-04T10:00:00.000Z')), false)
+})
+
+test('later clinician decisions cannot authorize an earlier clinical point-in-time view', () => {
+  for (const semanticState of ['imported', 'clinician-reviewed']) {
+    const e = event({ domain: 'lab', metric: 'lab.gdp', semanticState,
+      review: { state: 'accepted', reviewerId: 'clinician-1', reviewedAt: '2026-10-04T12:00:00.000Z' } })
+    const state = ingestLongitudinalEvent(createLongitudinalPatientState('p', at), e).state
+    assert.equal(canEnterClinicalRecord(e, ms), false)
+    assert.equal(projectStateToSurface(state, 'clinical', at).metrics.length, 0)
+    assert.equal(projectStateToSurface(state, 'ai-emr', at).metrics.length, 0)
+    const reviewedAt = '2026-10-04T12:00:00.000Z'
+    assert.equal(canEnterClinicalRecord(e, Date.parse(reviewedAt)), true)
+    assert.equal(projectStateToSurface(state, 'clinical', reviewedAt).metrics.length, 1)
+    if (semanticState === 'clinician-reviewed') assert.equal(canEnterAiContext(e, ms), false)
+  }
 })

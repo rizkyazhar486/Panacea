@@ -273,6 +273,7 @@ export function isConsentActive(consent: ConsentEnvelope, purpose: ConsentPurpos
 function validEventForAccess(event: LongitudinalEvent, at: number): boolean {
   try {
     validateLongitudinalEvent(event)
+    if (event.semanticState === 'clinician-reviewed' && Date.parse(event.review.reviewedAt ?? '') > at) return false
     return Number.isFinite(at) && Date.parse(event.recordedAt) <= at
   } catch { return false }
 }
@@ -287,6 +288,11 @@ function hasClinicalTruthState(event: LongitudinalEvent) {
   return event.semanticState !== undefined && CLINICAL_TRUTH_STATES.has(event.semanticState)
 }
 
+function hasEffectiveClinicalReview(event: LongitudinalEvent, at: number): boolean {
+  if (!requiresClinicianReview(event)) return true
+  return event.review.state === 'accepted' && Date.parse(event.review.reviewedAt ?? '') <= at
+}
+
 function isEventVisibleOnSurface(
   event: LongitudinalEvent,
   surface: PanaceaSurface,
@@ -296,7 +302,7 @@ function isEventVisibleOnSurface(
   if (!validEventForAccess(event, atMs) || !isConsentActive(event.consent, purpose, atMs)) return false
   if (surface === 'clinical' || surface === 'ai-emr') {
     if (!hasClinicalTruthState(event)) return false
-    if (requiresClinicianReview(event) && event.review.state !== 'accepted') return false
+    if (!hasEffectiveClinicalReview(event, atMs)) return false
   }
   if (surface === 'ai-chatbot' && event.review.state === 'rejected') return false
   return true
@@ -306,8 +312,7 @@ export function canEnterClinicalRecord(event: LongitudinalEvent, at = Date.now()
   if (!validEventForAccess(event, at)) return false
   if (!isConsentActive(event.consent, 'clinical-support', at)) return false
   if (!hasClinicalTruthState(event)) return false
-  if (!requiresClinicianReview(event)) return true
-  return event.review.state === 'accepted'
+  return hasEffectiveClinicalReview(event, at)
 }
 
 export function canEnterAiContext(event: LongitudinalEvent, at = Date.now()) {
@@ -478,6 +483,11 @@ export function projectStateToSurface(
     const snapshot = metricSnapshotAt(state, metric, atMs)
     if (!snapshot || !domains.has(snapshot.domain)) continue
 
+    if (!validEventForAccess(snapshot.latest, atMs)) {
+      blockedByTruthClass += 1
+      continue
+    }
+
     if (!isConsentActive(snapshot.latest.consent, purpose, atMs)) {
       blockedByConsent += 1
       continue
@@ -489,7 +499,7 @@ export function projectStateToSurface(
     }
 
     if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(snapshot.latest)) {
-      if (snapshot.latest.review.state !== 'accepted') {
+      if (!hasEffectiveClinicalReview(snapshot.latest, atMs)) {
         pendingClinicalReview += 1
         continue
       }
