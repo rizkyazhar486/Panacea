@@ -5,6 +5,7 @@ import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { maddreyScore, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Maddrey's Discriminant Function — Maddrey, W.C., et al. (1978),
@@ -26,19 +27,16 @@ export function MaddreyScore() {
   // tentang mortalitas 30-50% tanpa terapi, pertimbangan kortikosteroid, dan
   // kalimat siap salin. Sebuah diagnosis hepatitis alkoholik berat untuk
   // pasien yang tidak ada.
-  const [bilirubin, setBilirubin] = useState(0)
-  const [patientPt, setPatientPt] = useState(0)
-  const [controlPt, setControlPt] = useState(0)
+  const [bilirubin, setBilirubin] = useState('')
+  const [patientPt, setPatientPt] = useState('')
+  const [controlPt, setControlPt] = useState('')
 
-  const belum: string[] = []
-  if (!(bilirubin > 0)) belum.push('total bilirubin')
-  if (!(patientPt > 0)) belum.push('patient PT')
-  if (!(controlPt > 0)) belum.push('control PT')
-  const lengkap = belum.length === 0
-
-  const ptDiff = patientPt - controlPt
-  const df = 4.6 * ptDiff + bilirubin
-  const severe = lengkap && df >= 32
+  const res = maddreyScore({ bilirubin: parseNumberField(bilirubin), patientPt: parseNumberField(patientPt), controlPt: parseNumberField(controlPt) })
+  const belum = res.missing
+  const lengkap = res.df !== null
+  const df = res.df ?? 0
+  const ptDiff = res.ptDiff ?? 0
+  const severe = res.severe === true
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -48,13 +46,13 @@ export function MaddreyScore() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Pemicu klasik di sisi tempat tidur untuk mempertimbangkan terapi kortikosteroid pada hepatitis alkoholik — persimpangan klinis yang berbeda dari MELD-Na maupun Child-Pugh. Memakai waktu protrombin dalam detik di atas nilai kontrol laboratorium Anda, persis seperti saat divalidasi semula.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Total bilirubin (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin || ''} onChange={(e) => setBilirubin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin} onChange={(e) => setBilirubin(e.target.value)} />
           </Field>
           <Field label="Patient PT (seconds)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={patientPt || ''} onChange={(e) => setPatientPt(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={patientPt} onChange={(e) => setPatientPt(e.target.value)} />
           </Field>
           <Field label="Control PT (seconds)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={controlPt || ''} onChange={(e) => setControlPt(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={controlPt} onChange={(e) => setControlPt(e.target.value)} />
           </Field>
         </div>
       </Card>
@@ -77,7 +75,8 @@ export function MaddreyScore() {
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No discriminant function yet. Still needed: {belum.join(', ')}.
+            No discriminant function yet.{belum.length > 0 && <> Still needed: {belum.join(', ')}.</>}
+            {res.invalid.map((m) => <span key={m} role="alert" className="block font-semibold text-amber-700 dark:text-amber-300">{m}</span>)}
             {' '}This one opened alarming rather than reassuring: bilirubin 8.0 with a PT of 22 seconds against a
             control of 12 gives DF 54, above the threshold of 32, so the page used to diagnose severe alcoholic
             hepatitis — and raise corticosteroids — for a patient nobody had worked up.
