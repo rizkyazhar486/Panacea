@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Prosa } from '../../../components/Prosa'
 import type { PoliFlowPriority, PoliPatientFlow } from '../model/poliPatientFlow'
 
 interface PoliPatientFlowBoardProps {
@@ -47,7 +48,7 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
       id="poli-patient-flow"
       data-poli-patient-flow="v1"
       aria-label="Outpatient longitudinal patient flow"
-      className="overflow-hidden rounded-[34px] border border-white/10 bg-[#05070a] text-white shadow-[0_24px_90px_rgba(0,0,0,.24)]"
+      className="dark overflow-hidden rounded-[34px] border border-white/10 bg-[#05070a] text-white shadow-[0_24px_90px_rgba(0,0,0,.24)]"
     >
       <header className="border-b border-white/10 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -56,9 +57,9 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
               One OS · outpatient command board
             </div>
             <h1 className="mt-1 text-xl font-black tracking-[-.035em] sm:text-2xl">Poli patient flow</h1>
-            <p className="mt-2 text-sm leading-relaxed text-white/55">
+            <Prosa kelas="mt-2 text-sm leading-relaxed text-white/55">
               One patient state across everyday life and every care setting. This board organizes workflow; it does not autonomously diagnose, triage, prescribe, or sign clinical decisions.
-            </p>
+            </Prosa>
           </div>
           <div className="grid min-w-[220px] grid-cols-3 gap-2 text-center">
             {[
@@ -82,9 +83,9 @@ export function PoliPatientFlowBoard({ rows, activePatientId, onSelect }: PoliPa
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-white/35">
+        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-white/35">
           Architecture target: wearables and home sensors, clinic devices, ward monitors, OR/anesthesia systems, ICU devices, laboratory, imaging, medication and follow-up reconcile into the same provenance-aware longitudinal state.
-        </p>
+        </Prosa>
       </header>
 
       {rows.length === 0 ? (
