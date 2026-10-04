@@ -130,6 +130,9 @@ jobs:
           PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
         run: node scripts/qa/panacea-os-mobile-smoke.mjs
 
+      - name: Poli patient identity and temporal mobile smoke
+        run: node scripts/qa/poli-patient-temporal-smoke.mjs
+
       - name: Priority 2 UI/UX mobile 320x568 smoke
         env:
           UIUX_MOBILE_QA_ORIGIN: http://127.0.0.1:4173

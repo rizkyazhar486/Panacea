@@ -1,5 +1,6 @@
 export {
   derivePoliPatientFlow,
+  isClinicalObservationAvailableAt,
   type PoliDataFreshness,
   type PoliFlowPriority,
   type PoliPatientFlow,
