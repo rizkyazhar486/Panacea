@@ -1,4 +1,6 @@
 import { getVitals, type Vitals } from './healthVitals'
+import { allowsPersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
+import { readPersonalHealthStorageScope } from '../domains/personal-health/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Riwayat angka tubuh, dan rentang kebiasaan Anda sendiri.
@@ -50,6 +52,25 @@ export interface HariVitals {
 // (termasuk dari tab lain), cache otomatis tidak cocok dan diparse ulang.
 let cachedRaw: string | null | undefined
 let cachedHistory: HariVitals[] | undefined
+let cachedKey: string | undefined
+
+function historyKey(scope: PersonalHealthStorageScope): string {
+  return `pmd_riwayat_vitals_scope_v1:${scope.kind === 'account' ? scope.token : 'anonymous'}`
+}
+
+function matchesHistoryOwner(v: { ownerAccountId?: string; subjectId?: string }, scope: PersonalHealthStorageScope): boolean {
+  if (scope.kind === 'invalid') return false
+  return scope.kind === 'account'
+    ? v.ownerAccountId === scope.accountId && v.subjectId === scope.subjectId
+    : v.ownerAccountId === undefined && v.subjectId === undefined
+}
+
+function serializeHistory(history: HariVitals[], scope: PersonalHealthStorageScope): string {
+  return JSON.stringify({ version: 1, history,
+    ownerAccountId: scope.kind === 'account' ? scope.accountId : undefined,
+    subjectId: scope.kind === 'account' ? scope.subjectId : undefined,
+  })
+}
 
 function kunciTanggalLokal(d = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0')
@@ -58,11 +79,20 @@ function kunciTanggalLokal(d = new Date()): string {
 
 export function ambilRiwayat(): HariVitals[] {
   try {
-    const raw = localStorage.getItem(KUNCI)
-    if (raw === cachedRaw && cachedHistory) return cachedHistory.slice()
+    const scope = readPersonalHealthStorageScope()
+    if (scope.kind === 'invalid' || !allowsPersonalHealthStorageScope(scope)) return []
+    const key = historyKey(scope)
+    const scopedRaw = localStorage.getItem(key)
+    // Unowned legacy history stays available anonymously, never adopted at sign-in.
+    const raw = scopedRaw ?? (scope.kind === 'anonymous' ? localStorage.getItem(KUNCI) : null)
+    if (key === cachedKey && raw === cachedRaw && cachedHistory) return cachedHistory.slice()
 
-    const arr = raw ? JSON.parse(raw) : []
+    const value = raw ? JSON.parse(raw) : null
+    const arr = scopedRaw !== null
+      ? value && value.version === 1 && matchesHistoryOwner(value, scope) ? value.history : []
+      : scope.kind === 'anonymous' ? value : []
     const parsed = Array.isArray(arr) ? arr.filter((h) => h && typeof h.tanggal === 'string' && h.nilai) : []
+    cachedKey = key
     cachedRaw = raw
     cachedHistory = parsed
     return parsed.slice()
@@ -86,6 +116,10 @@ export function ambilRiwayat(): HariVitals[] {
  * tanpa tercatat.
  */
 export function catatRiwayat(v: Vitals = getVitals()): void {
+  const scope = readPersonalHealthStorageScope()
+  // The deferred mergeVitals callback carries its original owner, not the new session.
+  if (!allowsPersonalHealthStorageScope(scope) || !matchesHistoryOwner(v, scope)) return
+  const key = historyKey(scope)
   const angka: Record<string, number> = {}
   for (const [k, val] of Object.entries(v)) {
     if (typeof val === 'number' && Number.isFinite(val) && val > 0) angka[k] = val
@@ -99,8 +133,9 @@ export function catatRiwayat(v: Vitals = getVitals()): void {
 
   const penuh = riwayat.slice(-MAKS_HARI)
   try {
-    const raw = JSON.stringify(penuh)
-    localStorage.setItem(KUNCI, raw)
+    const raw = serializeHistory(penuh, scope)
+    localStorage.setItem(key, raw)
+    cachedKey = key
     cachedRaw = raw
     cachedHistory = penuh
   } catch {
@@ -108,8 +143,9 @@ export function catatRiwayat(v: Vitals = getVitals()): void {
     // riwayat tidak boleh menggagalkan penyimpanan angka hari ini.
     try {
       const ringkas = riwayat.slice(-Math.floor(MAKS_HARI / 2))
-      const raw = JSON.stringify(ringkas)
-      localStorage.setItem(KUNCI, raw)
+      const raw = serializeHistory(ringkas, scope)
+      localStorage.setItem(key, raw)
+      cachedKey = key
       cachedRaw = raw
       cachedHistory = ringkas
     } catch { /* menyerah, tanpa mengganggu apa pun */ }
