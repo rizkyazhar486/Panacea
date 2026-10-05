@@ -86,7 +86,7 @@ export function hasHealth(field: 'vo2max' | 'restingHr' | 'hrvMs' | 'sleepH' | '
 // Profile cache (and the shared demo) so other pages see them too. Server sync
 // still happens when the user opens /health-data and saves.
 export function pushBiometrics(patch: { vo2max?: number; restingHr?: number; hrvMs?: number; sleepH?: number; weightKg?: number }): void {
-  const clean = Object.fromEntries(Object.entries(patch).filter(([, v]) => typeof v === 'number' && v > 0))
+  const clean = Object.fromEntries(Object.entries(patch).filter(([, v]) => typeof v === 'number' && Number.isFinite(v) && v > 0))
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* ignore */ }
   mergeDemoStored(clean as Partial<Demo>, 'biometric-edit')

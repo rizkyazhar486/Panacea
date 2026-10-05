@@ -32,7 +32,7 @@ Object.defineProperty(globalThis, 'window', {
   configurable: true,
 })
 
-const { mergeDemoStored, getDemoTersimpan, broadcastHealthUpdate } = await import('../../src/lib/profile.ts')
+const { mergeDemoStored, getDemoTersimpan, broadcastHealthUpdate, pushBiometrics, getHealthCache } = await import('../../src/lib/profile.ts')
 
 mergeDemoStored({ restingHr: 54 }, 'test-device')
 const stored = getDemoTersimpan()
@@ -46,6 +46,23 @@ const merged = getDemoTersimpan()
 assert.equal(merged.age, 42)
 assert.equal(merged.weightKg, 81)
 assert.equal(merged.restingHr, 54, 'partial sync must preserve already-known good values')
+
+pushBiometrics({ restingHr: 60, vo2max: 42 })
+assert.equal(getHealthCache().restingHr, 60)
+assert.equal(getDemoTersimpan().vo2max, 42)
+for (const value of [Infinity, -Infinity, NaN, 0, -1]) {
+  const healthBefore = storage.getItem('pmd_health_profile')
+  const demoBefore = storage.getItem('pmd_profile')
+  const eventsBefore = events.length
+  pushBiometrics({ restingHr: value })
+  assert.equal(storage.getItem('pmd_health_profile'), healthBefore, 'invalid biometric must not overwrite the saved health value')
+  assert.equal(storage.getItem('pmd_profile'), demoBefore, 'invalid biometric must not mutate demographics')
+  assert.equal(events.length, eventsBefore, 'rejected biometric must not publish a data update')
+}
+pushBiometrics({ restingHr: Infinity, weightKg: 82 })
+assert.equal(getHealthCache().restingHr, 60, 'invalid field in a mixed patch must preserve the last finite value')
+assert.equal(getHealthCache().weightKg, 82)
+assert.equal(getDemoTersimpan().weightKg, 82)
 
 const before = events.length
 broadcastHealthUpdate(['workouts', 'health'], 'test-bus')
