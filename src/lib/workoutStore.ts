@@ -9,10 +9,37 @@
 // riwayat lama setiap kali seseorang mengekspor tujuh hari terakhir.
 
 import { broadcastHealthUpdate } from './profile'
+import { readPersonalHealthStorageScope } from '../domains/personal-health/index.ts'
+import { allowsPersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 import type { ImportedWorkout, HrNotification, HrPoint } from './workoutImport'
 
 const KEY_W = 'pmd_workouts_v1'
 const KEY_N = 'pmd_hr_notifications_v1'
+
+type StorageContext = { key: string; scope: PersonalHealthStorageScope }
+function scopedKey(legacyKey: string, scope: PersonalHealthStorageScope): string {
+  return scope.kind === 'account' ? `${legacyKey}:scope_v1:${scope.token}` : legacyKey
+}
+function storageContext(legacyKey: string): StorageContext | null {
+  const scope = readPersonalHealthStorageScope()
+  if (scope.kind === 'invalid' || !allowsPersonalHealthStorageScope(scope)) return null
+  return { scope, key: scopedKey(legacyKey, scope) }
+}
+
+function storedItems(raw: string | null, scope: PersonalHealthStorageScope): unknown[] {
+  const value = raw ? JSON.parse(raw) : []
+  // Existing unowned arrays remain anonymous; they cannot acquire an account at sign-in.
+  if (scope.kind === 'anonymous') return Array.isArray(value) ? value : []
+  return scope.kind === 'account' && value?.version === 1
+    && value.ownerAccountId === scope.accountId && value.subjectId === scope.subjectId
+    && Array.isArray(value.items) ? value.items : []
+}
+
+function serializeItems(items: unknown[], scope: PersonalHealthStorageScope): string {
+  return JSON.stringify(scope.kind === 'account'
+    ? { version: 1, ownerAccountId: scope.accountId, subjectId: scope.subjectId, items }
+    : items)
+}
 
 /** Batas jumlah tersimpan — deret per menit membuat tiap sesi cukup besar. */
 const MAX_WORKOUTS = 200
@@ -24,8 +51,10 @@ const MAX_NOTIFS = 100
 // pengulangan itu dapat memblokir main thread di iPhone. Cache ini aman karena
 // ia selalu dibandingkan dengan string mentah localStorage: perubahan dari
 // tab lain atau kode lama otomatis membuat cache tidak cocok dan diparse ulang.
+let cachedWorkoutKey: string | undefined
 let cachedWorkoutRaw: string | null | undefined
 let cachedWorkouts: ImportedWorkout[] | undefined
+let cachedNotifKey: string | undefined
 let cachedNotifRaw: string | null | undefined
 let cachedNotifs: HrNotification[] | undefined
 
@@ -168,14 +197,18 @@ function normalisasiWorkout(w: unknown): ImportedWorkout | null {
 }
 
 export function getWorkouts(): ImportedWorkout[] {
-  try {
-    const raw = localStorage.getItem(KEY_W)
-    if (raw === cachedWorkoutRaw && cachedWorkouts) return cachedWorkouts.slice()
+  const context = storageContext(KEY_W)
+  return context ? readWorkouts(context) : []
+}
 
-    const v = raw ? JSON.parse(raw) : []
-    const parsed = Array.isArray(v)
-      ? v.map(normalisasiWorkout).filter((w): w is ImportedWorkout => w !== null)
-      : []
+function readWorkouts(context: StorageContext): ImportedWorkout[] {
+  try {
+    const raw = localStorage.getItem(context.key)
+    if (context.key === cachedWorkoutKey && raw === cachedWorkoutRaw && cachedWorkouts) return cachedWorkouts.slice()
+
+    const parsed = storedItems(raw, context.scope)
+      .map(normalisasiWorkout).filter((w): w is ImportedWorkout => w !== null)
+    cachedWorkoutKey = context.key
     cachedWorkoutRaw = raw
     cachedWorkouts = parsed
     // Kembalikan salinan array dangkal agar consumer yang melakukan sort/splice
@@ -190,14 +223,18 @@ export function getWorkouts(): ImportedWorkout[] {
 }
 
 export function getHrNotifications(): HrNotification[] {
-  try {
-    const raw = localStorage.getItem(KEY_N)
-    if (raw === cachedNotifRaw && cachedNotifs) return cachedNotifs.slice()
+  const context = storageContext(KEY_N)
+  return context ? readHrNotifications(context) : []
+}
 
-    const v = raw ? JSON.parse(raw) : []
-    const parsed = Array.isArray(v)
-      ? v.map(normalisasiNotif).filter((n): n is HrNotification => n !== null)
-      : []
+function readHrNotifications(context: StorageContext): HrNotification[] {
+  try {
+    const raw = localStorage.getItem(context.key)
+    if (context.key === cachedNotifKey && raw === cachedNotifRaw && cachedNotifs) return cachedNotifs.slice()
+
+    const parsed = storedItems(raw, context.scope)
+      .map(normalisasiNotif).filter((n): n is HrNotification => n !== null)
+    cachedNotifKey = context.key
     cachedNotifRaw = raw
     cachedNotifs = parsed
     return parsed.slice()
@@ -210,13 +247,14 @@ export function getHrNotifications(): HrNotification[] {
 
 /** Menggabungkan hasil impor dengan yang sudah tersimpan. Mengembalikan jumlah yang benar-benar baru. */
 export function mergeWorkouts(incoming: ImportedWorkout[]): number {
-  if (!incoming.length) return 0
+  const context = storageContext(KEY_W)
+  if (!context || !incoming.length) return 0
   const aman = incoming
     .map(normalisasiWorkout)
     .filter((w): w is ImportedWorkout => w !== null)
   if (!aman.length) return 0
 
-  const cur = getWorkouts()
+  const cur = readWorkouts(context)
   const byId = new Map(cur.map((w) => [w.id, w]))
   let baru = 0
   for (const w of aman) {
@@ -226,9 +264,11 @@ export function mergeWorkouts(incoming: ImportedWorkout[]): number {
   const next = [...byId.values()]
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     .slice(0, MAX_WORKOUTS)
+  if (storageContext(KEY_W)?.key !== context.key) return 0
   try {
-    const raw = JSON.stringify(next)
-    localStorage.setItem(KEY_W, raw)
+    const raw = serializeItems(next, context.scope)
+    localStorage.setItem(context.key, raw)
+    cachedWorkoutKey = context.key
     cachedWorkoutRaw = raw
     cachedWorkouts = next
   } catch { /* kuota penuh — pertahankan cache storage lama */ }
@@ -237,13 +277,14 @@ export function mergeWorkouts(incoming: ImportedWorkout[]): number {
 }
 
 export function mergeHrNotifications(incoming: HrNotification[]): number {
-  if (!incoming.length) return 0
+  const context = storageContext(KEY_N)
+  if (!context || !incoming.length) return 0
   const aman = incoming
     .map(normalisasiNotif)
     .filter((n): n is HrNotification => n !== null)
   if (!aman.length) return 0
 
-  const cur = getHrNotifications()
+  const cur = readHrNotifications(context)
   const key = (n: HrNotification) => `${n.mulai}|${n.jenis}`
   const byKey = new Map(cur.map((n) => [key(n), n]))
   let baru = 0
@@ -254,9 +295,11 @@ export function mergeHrNotifications(incoming: HrNotification[]): number {
   const next = [...byKey.values()]
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     .slice(0, MAX_NOTIFS)
+  if (storageContext(KEY_N)?.key !== context.key) return 0
   try {
-    const raw = JSON.stringify(next)
-    localStorage.setItem(KEY_N, raw)
+    const raw = serializeItems(next, context.scope)
+    localStorage.setItem(context.key, raw)
+    cachedNotifKey = context.key
     cachedNotifRaw = raw
     cachedNotifs = next
   } catch { /* kuota penuh — pertahankan cache storage lama */ }
@@ -265,7 +308,12 @@ export function mergeHrNotifications(incoming: HrNotification[]): number {
 }
 
 export function clearWorkouts() {
-  try { localStorage.removeItem(KEY_W); localStorage.removeItem(KEY_N) } catch { /* abaikan */ }
+  const workoutContext = storageContext(KEY_W)
+  if (!workoutContext) return
+  const notifKey = scopedKey(KEY_N, workoutContext.scope)
+  try { localStorage.removeItem(workoutContext.key); localStorage.removeItem(notifKey) } catch { /* abaikan */ }
+  cachedWorkoutKey = workoutContext.key
+  cachedNotifKey = notifKey
   cachedWorkoutRaw = null
   cachedWorkouts = []
   cachedNotifRaw = null
