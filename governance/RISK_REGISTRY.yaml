@@ -6,6 +6,22 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.personal_vitals_history_ownership
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Global personal vitals history could expose a foreign account baseline; a deferred
+      mergeVitals callback could record its original owner's snapshot after session replacement.
+    mitigation: >-
+      Versioned history envelopes are scoped to remembered account and patient and checked
+      against the mounted scope. Foreign or unowned authenticated snapshots are rejected.
+      Cache identity includes namespace and raw envelope; anonymous legacy history is preserved
+      without adopting it at sign-in. Quota fallback retains ownership metadata. Daily sampling,
+      retention and percentile semantics remain unchanged. Clinical chronology, global profile
+      and workout stores, manual asynchronous imports and API auth continuity need further audits.
+    evidence: [src/lib/riwayatVitals.ts, src/domains/personal-health/adapters/storageScope.ts, scripts/qa/vitals-history-owner.test.mjs]
+
   - risk_id: risk.device_sync_session_continuity
     category: patient_data_integrity
     severity: high
@@ -20,8 +36,8 @@ risks:
       personal-health scope guard. Session changes reject late profile, workout and alert
       results without publishing them; a new session gets independent initial/throttle state.
       An old completion cannot release a newer run's in-flight guard. This does not repair
-      legacy global profile/workout/history storage, manual HealthProfile import callbacks,
-      or the deferred vitals-history writer; those require separate ownership audits.
+      legacy global profile/workout storage or manual HealthProfile import callbacks.
+      The separate history ownership mitigation is tracked by risk.personal_vitals_history_ownership.
       Technical regression coverage is not clinical validation or production-device proof.
     evidence: [src/lib/autoIsi.ts, scripts/qa/device-sync-session.test.mjs]
 

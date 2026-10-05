@@ -2,30 +2,33 @@
 
 ### Current checkpoint — 2026-10-05, total verified completion directive
 
-- Live canonical main: `3982779b60cf370d45c8ec8a2906b616839eb68a`, squash of #2271.
-  Its tree `974866828486fb7bd956b6c657dff1bc9eba32a5` matches accepted PR head
-  `adbe9649e9666b5366b17bf1eead4fd8ca35544b`. Exact-head Validate (both jobs),
-  Stabilization (both jobs), Body 3D, Clinical Evidence and both Security gates passed.
-  Review is recorded at that exact head; expected-head squash merge succeeded.
-- Independent local verification of that same tree: build (524 QA tests), 664/664 uji,
-  architecture boundaries/ratchet and focused data-sync regression passed.
-  Canonical post-merge acceptance remains separate evidence: inspect its current runs.
-  Clinical Evidence run `37357986508` cancelled during checkout, before validation;
-  its cancelled job was retried rather than treating the skipped clinical step as green.
-- Active bounded repair: `fix/sync-reject-stale-device-responses`, based on that main.
-  RED: delayed A profile applied after remembered/mounted session became B.
-  Root cause: async autoIsi responses and module-global success/in-flight flags lacked
-  starting-session binding. Ten targeted regressions, 534/534 QA tests, 664/664 uji,
-  production build, TypeScript and architecture/ratchet pass locally. Exact-head
-  review/CI/merge/canonical verification remain required before completion.
-- Follow-up P0 candidates, not yet repaired: legacy `pmd_health_profile`/`pmd_profile`
-  direct reads/writes, workout/alert ownership, manual HealthProfile async callbacks,
-  and `mergeVitals`' deferred global vitals-history write. Do not claim all personal
-  stores are isolated because labs/current vitals or automatic sync are guarded.
-- Open PR audit at start: 15 PRs including #2271; #2271's two changed files had no
-  overlap with the other 14. Re-query live PRs before any next modification.
-- No completion percentage or fixed-point claim is supported. Revalidate every stored
-  SHA/status against GitHub before resuming; older checkpoint sections are historical.
+- Live main: `265b226fc9cb735f2aa19f367b2f908dc7ffefad`, expected-head squash of #2272.
+  Tree `ebfea2f7e15a7fa04030c8ca246d262853f75ffa` equals accepted sync head
+  `da9e038f91249b40a89c74b0ff0d0611329d8efb`. All six exact-head workflows passed,
+  including complete Stabilization and Body 3D. Post-merge main workflows remain
+  outstanding; do not count #2272 as verified closure until those finish successfully.
+- #2271 is verified on main `3982779b60cf370d45c8ec8a2906b616839eb68a`: all six
+  canonical workflows passed. The Clinical Evidence checkout cancellation was retried;
+  job `111927627021` passed. Same-tree local build, 664/664 uji and architecture passed.
+- Active P0 repair: PR #2273, `fix/history-bind-personal-vitals`. Original head
+  `5a94bb294b2acb3044a8a2d2426d50079fc4df43` has tree
+  `ba6212593aa5bf3ad77aa1d7f2ed9a1080649c1a`. RED demonstrated cross-account history
+  reads and the real deferred mergeVitals writer carrying A into B. Scoped, owned
+  envelopes reject foreign snapshots and preserve unowned legacy history anonymously.
+  New scope reads use a domain adapter; no architecture-baseline expansion.
+- Integration with #2272 was tested before synchronization: 22 targeted regressions,
+  546/546 QA tests in successful production build, 664/664 uji, TypeScript and
+  architecture/ratchet passed. The history branch now synchronizes with the new main;
+  capture its new exact head and require fresh CI, review, merge and canonical evidence.
+- Remaining P0 candidates: global profile/health-profile and workout/alert ownership,
+  manual HealthProfile async load/import/save callbacks, and API in-memory bearer-token
+  continuity versus cross-tab token replacement. History isolation does not establish
+  source chronology, device correctness or clinical validation.
+- Stale PR inventory: non-drafts #1827/#1745/#1713 require SYNC and equivalence review;
+  drafts #1877/#1770/#1768/#1767/#1758/#1681/#1001/#925/#760/#651/#395 require scope
+  review. No draft was proven obsolete or closed. Re-query status/overlap before action.
+- No completion percentage or fixed-point claim is supported. Verify every stored SHA
+  and check against live GitHub; historical checkpoints below are not live truth.
 
 
 Updated 2026-10-03 (autonomous Final Convergence session; autopilot handoff section added at the end). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
