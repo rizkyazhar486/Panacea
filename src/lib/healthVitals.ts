@@ -11,6 +11,7 @@
 // stays on the device (localStorage); nothing is uploaded by this module.
 
 import { broadcastHealthUpdate } from './profile'
+import { allowsPersonalHealthStorageScope, matchesPersonalHealthAccount, parsePersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 
 export interface Vitals {
   // Katalog metrik server kini memuat 113 entri; menuliskannya satu per satu di
@@ -109,14 +110,35 @@ const KEY = 'pmd_vitals_v1'
 let cachedRaw: string | null | undefined
 let cachedVitals: Vitals | undefined
 
-export function getVitals(): Vitals {
+function personalHealthStorageScope(): PersonalHealthStorageScope {
+  try { return parsePersonalHealthStorageScope(localStorage.getItem('panaceamed.session.v1'), Date.now()) }
+  catch { return { kind: 'invalid' } }
+}
+
+function belongsToScope(v: Vitals, scope: PersonalHealthStorageScope): boolean {
+  if (scope.kind === 'invalid') return false
+  if (scope.kind === 'anonymous') return v.ownerAccountId === undefined && v.subjectId === undefined
+  return v.ownerAccountId === scope.accountId && v.subjectId === scope.subjectId
+}
+
+function vitalsKey(scope: PersonalHealthStorageScope): string {
+  return scope.kind === 'account' ? `pmd_vitals_scope_v1:${scope.token}` : 'pmd_vitals_scope_v1:anonymous'
+}
+
+export function getVitals(expected?: { id?: string; patientId?: string } | null): Vitals {
   try {
-    const raw = localStorage.getItem(KEY)
-    if (raw === cachedRaw && cachedVitals) return { ...cachedVitals }
+    const scope = personalHealthStorageScope()
+    if (!allowsPersonalHealthStorageScope(scope)) return {}
+    if (expected !== undefined && !matchesPersonalHealthAccount(scope, expected)) return {}
+    if (scope.kind === 'invalid') return {}
+    // Explicitly owned pre-upgrade snapshots remain readable only by that owner.
+    const raw = localStorage.getItem(vitalsKey(scope)) ?? localStorage.getItem(KEY)
+    if (raw === cachedRaw && cachedVitals) return belongsToScope(cachedVitals, scope) ? { ...cachedVitals } : {}
     const parsed = raw ? (JSON.parse(raw) as Vitals) : {}
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
     cachedRaw = raw
     cachedVitals = parsed
-    return { ...parsed }
+    return belongsToScope(parsed, scope) ? { ...parsed } : {}
   } catch {
     cachedRaw = undefined
     cachedVitals = undefined
@@ -129,6 +151,8 @@ export function getVitals(): Vitals {
  * so a partial export never wipes previously known good values with undefined.
  */
 export function mergeVitals(patch: Vitals): Vitals {
+  const scope = personalHealthStorageScope()
+  if (!allowsPersonalHealthStorageScope(scope) || scope.kind === 'invalid') return {}
   const clean: Vitals = {}
   for (const [k, v] of Object.entries(patch)) {
     if (k === 'subjectId' || k === 'ownerAccountId') continue
@@ -141,24 +165,14 @@ export function mergeVitals(patch: Vitals): Vitals {
   if (!Object.keys(clean).length) return getVitals()
 
   // An import belongs to the remembered self account, never the active clinic patient.
-  let subjectId: string | undefined
-  let ownerAccountId: string | undefined
-  try {
-    const session = JSON.parse(localStorage.getItem('panaceamed.session.v1') || 'null')
-    const age = Date.now() - session?.loginAt
-    if (typeof session?.loginAt === 'number' && Number.isFinite(age) && age >= 0 && age <= 7 * 86400000 &&
-      typeof session?.account?.id === 'string' && session.account.id.trim() &&
-      typeof session?.account?.patientId === 'string' && session.account.patientId.trim()) {
-      ownerAccountId = session.account.id
-      subjectId = session.account.patientId
-    }
-  } catch { /* Unbound data cannot authorize a patient projection. */ }
+  const subjectId = scope.kind === 'account' ? scope.subjectId : undefined
+  const ownerAccountId = scope.kind === 'account' ? scope.accountId : undefined
   const previous = getVitals()
   const sameOwner = previous.subjectId === subjectId && previous.ownerAccountId === ownerAccountId
   const next: Vitals = { ...(sameOwner ? previous : {}), ...clean, subjectId, ownerAccountId, syncedAt: new Date().toISOString() }
   try {
     const raw = JSON.stringify(next)
-    localStorage.setItem(KEY, raw)
+    localStorage.setItem(vitalsKey(scope), raw)
     cachedRaw = raw
     cachedVitals = next
   } catch { /* ignore; leave cache aligned with persisted storage */ }
@@ -177,7 +191,13 @@ export function mergeVitals(patch: Vitals): Vitals {
 }
 
 export function clearVitals(): void {
-  try { localStorage.removeItem(KEY) } catch { /* ignore */ }
+  try {
+    const scope = personalHealthStorageScope()
+    if (!allowsPersonalHealthStorageScope(scope) || scope.kind === 'invalid') return
+    localStorage.removeItem(vitalsKey(scope))
+    const legacy = JSON.parse(localStorage.getItem(KEY) || '{}')
+    if (belongsToScope(legacy, scope)) localStorage.removeItem(KEY)
+  } catch { /* ignore */ }
   cachedRaw = null
   cachedVitals = {}
   broadcastHealthUpdate()

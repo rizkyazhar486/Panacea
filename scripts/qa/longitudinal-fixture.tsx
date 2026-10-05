@@ -21,6 +21,7 @@ function Controls() {
     <button onClick={() => mergeVitals({ heartRate: 76, measuredAt: '2026-09-20T08:00:00.000Z', source: 'QA wearable' })}>Change vitals</button>
     <button onClick={() => store.login({ ...store.account!, email: 'second@localhost.test', patientId: 'p2', role: 'dokter' })}>Switch patient</button>
     <button onClick={() => store.logout()}>Logout</button>
+    <button onClick={() => store.login({ email: 'local@localhost.test', name: 'Local QA', role: 'pasien', isSubscriber: false, loggedAt: new Date().toISOString() })}>Local patient login</button>
   </>
 }
 createRoot(document.getElementById('root')!).render(<StoreProvider><LongitudinalStateProvider>

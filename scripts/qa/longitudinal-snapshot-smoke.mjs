@@ -7,7 +7,7 @@ try {
   page.on('pageerror', error => errors.push(error.message))
   await page.addInitScript(() => {
     localStorage.clear()
-    localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account: { email: 'qa@localhost.test', name: 'Snapshot QA', role: 'dokter', patientId: 'p1', isSubscriber: false, loggedAt: new Date().toISOString() }, loginAt: Date.now() }))
+    localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account: { id: 'qa-account', email: 'qa@localhost.test', name: 'Snapshot QA', role: 'dokter', patientId: 'p1', isSubscriber: false, loggedAt: new Date().toISOString() }, loginAt: Date.now() }))
   })
   await page.goto(`${process.env.LONGITUDINAL_QA_ORIGIN || 'http://127.0.0.1:5180'}/scripts/qa/longitudinal-fixture.html`)
   await page.locator('[data-consumer]').first().waitFor()
@@ -43,6 +43,15 @@ try {
   await page.getByText('Logout', { exact: true }).click()
   await page.waitForFunction(() => document.querySelector('[data-consumer]').dataset.subject === '')
   for (const s of await read()) assert.deepEqual(s.events, [])
+
+  // Offline/local login still promises device-local persistence. It must receive
+  // a stable account/subject identity before personal lab/vital caches are usable.
+  await page.getByText('Local patient login', { exact: true }).click()
+  const localSession = await page.evaluate(() => JSON.parse(localStorage.getItem('panaceamed.session.v1')))
+  assert.ok(localSession?.account?.id, 'local patient login must persist a stable account id')
+  assert.ok(localSession?.account?.patientId, 'local patient login must persist a stable patient id')
+  await page.getByText('Change lab', { exact: true }).click()
+  await page.waitForFunction(() => document.querySelector('[data-consumer]').textContent.includes('lab.gdp'))
   assert.deepEqual(errors, [])
   console.log('Three real React consumers: identical snapshot, one rebuild per lab revision, no rebuild for settings, live vital update, patient/logout isolation passed')
 } finally { await browser.close() }

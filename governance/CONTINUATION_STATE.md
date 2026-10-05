@@ -161,3 +161,59 @@ are retained as the durable state rather than creating duplicate governance.
   Local fixes preserve numeric glyphs and reject empty/oversized comparisons without partial
   scores; deterministic and 390x844 fixture-based UI rejection/recovery checks passed.
   Provider OCR accuracy and original-photo benchmark remain unmeasured; keep draft until accepted.
+
+### Canonical stabilization verification and cache isolation lane — 2026-10-05
+
+- Canonical main `9aaea0b9ad020b9c99174d4c98bf71a66a454ba1` contains the expected
+  squash of #2263. Its tree `b73a0250739185adbfa84148f585e29e62be80b9` is identical
+  to accepted PR head `546f612a73769ebc60cdef17035c13542a3df6e9`.
+- All six post-merge workflows succeeded on that exact main SHA: Stabilization
+  37311143383, Body 3D 37311143407, Clinical Evidence 37311143321, Security
+  Enforcement 37311143450, Pages 37311143348, Vercel Prebuilt 37311143341.
+  Workflow success is not proof of a separately observed production deployment.
+- #2268 OCR audit advanced to `dbe500e589b6ee8fa7363c99d62d6374f53485d7`, with
+  current main as a parent and unchanged clinical confirmation. Local build,
+  664/664 uji files, architecture, ratchet, and 390x844 rejection/recovery checks
+  passed; independent engineering review found no important blocker. Exact-head
+  acceptance is running. Provider/dataset accuracy remains unmeasured.
+- New P0 reproduction: unowned lab cache and foreign wearable snapshots survived
+  session replacement and could become the next patient's longitudinal evidence
+  or lab upload. Real-browser two-tab tests additionally reproduced stale UI writes
+  into the new session. No real patient data or live server mutations were used.
+- Repair under validation: account+patient-scoped envelopes, ownership-checked reads,
+  preserved legacy/anonymous copies, invalid-session rejection, and mounted UI identity
+  checks at shared read/write boundaries. Expected-account projection reads no longer
+  infer ownership from the current React label. Targeted regressions are passing;
+  full validation, independent final review, exact-head CI and merge remain required.
+- Existing owner-test and Nutrition hydration fixture now target the active envelope;
+  their original behavioral assertions remain intact. No safety gate was disabled.
+- Next audit: other legacy personal stores, especially health-profile hydration,
+  asynchronous imports and vital-history ownership. This cache repair does not claim
+  every personal-data store or all One OS integration is verified complete.
+
+
+### OCR merge + personal-cache acceptance repair — 2026-10-05
+
+- Canonical main is `8f2d1ab8890a6bc2482dfa0c347872e985cc1ee4`, the verified squash merge of #2268.
+  #2268 entered main only after its synchronized head `dbe500e589b6ee8fa7363c99d62d6374f53485d7`
+  passed Validate, Stabilization, Body 3D, Clinical Evidence, Security Enforcement and Security Inventory.
+- #2270 remains the active P0 safety candidate. Its first exact-head Shared Longitudinal Snapshot run
+  failed in the real-browser consumer smoke while deterministic longitudinal snapshot coverage passed.
+- Root cause was acceptance-fixture identity drift: the remembered QA account omitted stable `account.id`,
+  while the new ownership boundary intentionally requires exact `account.id + patientId` before personal
+  lab/vital cache reads or writes. Production fail-closed behavior was retained unchanged.
+- The fixture now carries a stable QA account id; branch ancestry was then synchronized with current main
+  by merge commit `6acfd00a1b385b49199fa4734df453ce6984012a` without force-push. The main advance and #2270
+  changed-file sets were disjoint; current ancestry was verified `behind_by=0` before this checkpoint update.
+- Do not count #2270 complete from local or prior-head evidence. Fresh exact-head Shared Longitudinal Snapshot,
+  Validate, Stabilization, Body 3D, Clinical Evidence and Security gates must all pass on the final candidate,
+  followed by expected-head merge and canonical-main verification.
+
+
+### Local/offline health identity regression — 2026-10-05
+
+- Review of #2270 found a real compatibility blocker beyond the original fixture drift: the local/offline login path could create a patient session without stable `account.id`, while the personal-health ownership boundary correctly rejects any cache scope lacking exact `account.id + patientId`.
+- TDD RED was captured on exact head `c769cc829919e3b30a4f5ba0a8886c86802919ce`: Shared Longitudinal Snapshot run `37320528490` failed in the real-browser consumer step with `local patient login must persist a stable account id`. The deterministic snapshot step passed, isolating the failure to login/session ownership.
+- Production repair commit `601acf40693108739c21d2869ccfd39204a7abc3` normalizes only local/offline patient/doctor fallback identities at the store login boundary. Server-provided ids remain authoritative; ambiguous personal cache sessions remain fail-closed; legacy unowned payloads are not adopted.
+- Local identities use an explicit `local:` namespace plus the full normalized email to avoid the legacy truncated-key collision class. Patient subject identity is then derived from that stable account id; local doctors receive the same `p1` subject convention used by the server adapter.
+- Final completion still requires GREEN on the browser regression and fresh exact-head Validate, Stabilization, Body 3D, Clinical Evidence, Security Enforcement, Security Inventory, plus Shared Longitudinal Snapshot, followed by expected-head merge and canonical-main verification.
