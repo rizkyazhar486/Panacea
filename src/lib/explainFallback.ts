@@ -104,6 +104,8 @@ function untukStruktur(rawName: string): string {
   ].join('\n\n')
 }
 
+export { kalimatPertama } from '../domains/body-exposure/engine/kalimatPertama'
+
 /**
  * Membangun penjelasan tertulis untuk apa pun yang sedang dipilih.
  *

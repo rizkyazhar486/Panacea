@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent, type RefObject } from 'react'
+import { Link } from 'react-router-dom'
 
 /**
  * Exploded-human cinematic for the public landing page.
@@ -122,7 +123,8 @@ export function ScrollCinematic() {
           ))}
         </div>
 
-        <div className="pointer-events-none absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 text-white/45">
+        <div className="pointer-events-none absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 text-white/45">
+          <Link to="/body-explorer" className="pointer-events-auto min-h-11 rounded-full border border-white/20 bg-black/40 px-3 text-[11px] font-bold text-white">Open the atlas</Link>
           <span className="text-[9px] font-bold uppercase tracking-[0.28em]">Scroll to dissect</span>
           <span className="anatomy-scroll-arrow text-sm">↓</span>
         </div>
