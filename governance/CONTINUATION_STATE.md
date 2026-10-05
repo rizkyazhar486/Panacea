@@ -2,30 +2,50 @@
 
 ### Current checkpoint — 2026-10-05, total verified completion directive
 
-- Live canonical main: `3982779b60cf370d45c8ec8a2906b616839eb68a`, squash of #2271.
-  Its tree `974866828486fb7bd956b6c657dff1bc9eba32a5` matches accepted PR head
-  `adbe9649e9666b5366b17bf1eead4fd8ca35544b`. Exact-head Validate (both jobs),
-  Stabilization (both jobs), Body 3D, Clinical Evidence and both Security gates passed.
-  Review is recorded at that exact head; expected-head squash merge succeeded.
-- Independent local verification of that same tree: build (524 QA tests), 664/664 uji,
-  architecture boundaries/ratchet and focused data-sync regression passed.
-  Canonical post-merge acceptance remains separate evidence: inspect its current runs.
-  Clinical Evidence run `37357986508` cancelled during checkout, before validation;
-  its cancelled job was retried rather than treating the skipped clinical step as green.
-- Active bounded repair: `fix/sync-reject-stale-device-responses`, based on that main.
-  RED: delayed A profile applied after remembered/mounted session became B.
-  Root cause: async autoIsi responses and module-global success/in-flight flags lacked
-  starting-session binding. Ten targeted regressions, 534/534 QA tests, 664/664 uji,
-  production build, TypeScript and architecture/ratchet pass locally. Exact-head
-  review/CI/merge/canonical verification remain required before completion.
-- Follow-up P0 candidates, not yet repaired: legacy `pmd_health_profile`/`pmd_profile`
-  direct reads/writes, workout/alert ownership, manual HealthProfile async callbacks,
-  and `mergeVitals`' deferred global vitals-history write. Do not claim all personal
-  stores are isolated because labs/current vitals or automatic sync are guarded.
-- Open PR audit at start: 15 PRs including #2271; #2271's two changed files had no
-  overlap with the other 14. Re-query live PRs before any next modification.
-- No completion percentage or fixed-point claim is supported. Revalidate every stored
-  SHA/status against GitHub before resuming; older checkpoint sections are historical.
+- Live main: `6e9d8c6d9942beb27d46ca8881d6103c34340efc`, expected-head squash of #2273.
+  Tree `8700de0c4aa8becfbebbb43a0a6b0f59d3ca0dfb` equals accepted history head
+  `f686b1d6de2f49d44ed64091e56c90a90316c8e0`. All six exact-head workflows passed,
+  including full/server Stabilization and Body 3D; technical review recorded at that head.
+  Canonical post-merge evidence is outstanding; history is not yet verified closure.
+- #2272 is verified on main `265b226fc9cb735f2aa19f367b2f908dc7ffefad`: all six
+  canonical workflows passed, including Body 3D run `37361304663` and full/server
+  Stabilization run `37361304676`. Tree equals the accepted head; parent is #2271 main.
+- #2271 is verified on main `3982779b60cf370d45c8ec8a2906b616839eb68a`: all six
+  canonical workflows passed. Clinical checkout cancellation was retried; job
+  `111927627021` passed. Same-tree local build, 664/664 uji and architecture passed.
+- Active P0 repair: PR #2274, `fix/api-session-continuity`, previous head
+  `e8d90c15509cd6fa6ae9a95c1908514eabec941f` and tree
+  `c9d9bcc090655fe0965c5d59a936117e84f3aa2d`. Seven original RED regressions proved
+  stale bearer/response/logout failures. Review reproduced and repaired Shell's immediate
+  local session removal during logout. Sixteen targeted tests and final build (550 QA),
+  664/664 uji and architecture passed on that API-only tree.
+- The API branch synchronizes with the newly merged history main. Final combined code
+  passes 38 targeted tests, production build (562 QA), TypeScript and architecture/ratchet;
+  a real API → sync → vitals → history fixture preserves A/B baselines and rejects late
+  A responses without state mutation. Combined 664-file rerun remains outstanding.
+  Capture the new exact head and require fresh CI/review/merge/main evidence.
+- Live PR audit: #2274's source/test files do not overlap remaining PRs. Non-drafts
+  #1827/#1745/#1713/#1681 require SYNC and equivalence review; drafts
+  #1877/#1770/#1768/#1767/#1758/#1001/#925/#760/#651/#395 need scope review.
+  No obsolete closure is proven. Re-query status and overlap before each action.
+
+Live completion ledger (effort/risk are engineering estimates, not completion scores):
+
+| Priority / problem | Impact | Dependency / owner / overlap | Effort / regression risk | Validation / contribution |
+| --- | --- | --- | --- | --- |
+| P0 API request/logout continuity | Wrong-session responses or erased replacement token | #2274; history main sync; no active file overlap | Small / high shared boundary | 16 regressions + full exact-head/main acceptance; yes |
+| P0 global profile/health-profile ownership | Foreign calculator prefills and partial merges | Scope adapter now on main; unowned; no equivalent active PR found | Medium / high | Account/subject/cache isolation, UI wiring, full acceptance; yes |
+| P0 manual HealthProfile async context | Late load/import/save may relabel old form data | API guard + scoped profile; unowned | Medium / high | Real delayed callbacks and session/form replacement; yes |
+| P0 workout/alert ownership | Foreign timelines and health evidence | Scope adapter; unowned | Small-medium / medium | Reads/merges/clear, stale mounted scope, real import, main acceptance; yes |
+| P1 stale valuable PRs | Integration debt and inaccessible unmerged scope | Four non-drafts plus ten drafts; own original lanes | Per-PR / variable | Latest-main equivalence, ancestry, overlap and exact-head gates; yes if still in scope |
+| P2 disconnected longitudinal features | Existing workflow cannot rejoin patient truth | Needs bounded reachability audit; unowned | Unknown / variable | Real input → domain → persistence → output/action tests; candidate only |
+| P3 Body Exposure source/depth gaps | Educational placeholders cannot establish mature anatomy quality | Issue #626 / registry / named reference atlases; expert evidence where needed | Large / high scientific assurance | Source-specific anatomy/interaction/mobile/provenance review; candidate only |
+| P4 existing large bundles | Load/memory cost | Build warns; profiling required before change | Unknown / measured first | Representative startup/frame/load measurements + acceptance; candidate only |
+
+- Internal tasks remain; no completion percentage or fixed-point claim is supported.
+  History/source chronology, clinical review, real device provenance and live deployment
+  health are not established by these engineering tests. Every stored SHA/check must be
+  verified against GitHub on resumption; sections below are historical, not live truth.
 
 
 Updated 2026-10-03 (autonomous Final Convergence session; autopilot handoff section added at the end). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
