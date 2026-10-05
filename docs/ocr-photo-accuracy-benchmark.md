@@ -26,6 +26,10 @@ Accuracy = \max(0, 1 - ErrorRate)
 
 The implementation also calculates **numeric-token accuracy**, using the same edit-distance formulation over ordered numeric tokens. This is important for clinical documents because a single wrong digit can be more consequential than several typographic errors elsewhere.
 
+Numeric tokens retain Unicode numeric glyphs, superscripts, signs and separators without conversion. This is a text-agreement measure, not semantic validation of measurements or units. When the human reference has no numeric tokens, the numeric metric is unassessed (N/A); CER/WER still detect invented numeric text. An empty human reference is rejected.
+
+The local interactive audit rejects input longer than 16,384 UTF-16 code units or a character comparison exceeding 1,000,000 edit-distance cells. These are engineering work limits, not clinical or accuracy thresholds. Oversized comparisons show an unavailable message with no partial or truncated score; larger benchmark datasets require a separately bounded offline runner.
+
 ## Benchmark protocol for real photos
 
 1. Use original, de-identified or appropriately consented report photos covering different devices, lighting, skew, blur, table density, decimal separators, units, and Indonesian/English labels.

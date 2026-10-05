@@ -209,11 +209,14 @@ export function modelRujukan(kunci: string): OrganModel | undefined {
 }
 
 const UTAMA: OrganModel[] = [
-  { id: 'jantung-ruang', focusKey: 'heart', label: 'Heart', scientificName: 'Cor', accent: '#ee7c6a', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 14, berkas: 'atlas/jantung-ruang.glb' },
+  { id: 'jantung-ruang', focusKey: 'heart', label: 'Heart', scientificName: 'Cor', accent: '#ee7c6a', illustrated: false, hotspots: [], sumber: 'hubmap', jumlahBagian: 14, berkas: 'atlas/jantung-ruang.glb' },
   { id: 'paru', focusKey: 'lungs', label: 'Lungs', scientificName: 'Pulmo', accent: '#d98a8a', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 13, berkas: 'atlas/paru.glb' },
-  { id: 'nefrologi', focusKey: 'kidneys', label: 'Kidneys', scientificName: 'Ren', accent: '#b08fbf', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 14, berkas: 'atlas/nefrologi.glb' },
+  { id: 'bilier', focusKey: 'liver', label: 'Liver & biliary', scientificName: 'Hepar', accent: '#8d4a3a', illustrated: false, hotspots: [], sumber: 'hubmap', jumlahBagian: 40, berkas: 'atlas/bilier.glb' },
+  { id: 'nefrologi', focusKey: 'kidneys', label: 'Kidney & urinary tract', scientificName: 'Ren', accent: '#b08fbf', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 14, berkas: 'atlas/nefrologi.glb' },
   { id: 'tiroid', focusKey: 'thyroid', label: 'Thyroid', scientificName: 'Glandula thyroidea', accent: '#d9a441', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 10, berkas: 'atlas/tiroid.glb' },
   { id: 'telinga', focusKey: 'ear', label: 'Ear', scientificName: 'Auris', accent: '#c99277', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 21, berkas: 'atlas/telinga.glb' },
+  { id: 'kulit', focusKey: 'skin', label: 'Skin', scientificName: 'Integumentum', accent: '#c99277', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 5, berkas: 'atlas/kulit.glb' },
+  { id: 'payudara', focusKey: 'breast', label: 'Breast', scientificName: 'Mamma', accent: '#c58f9a', illustrated: false, hotspots: [], sumber: 'hubmap', jumlahBagian: 16, berkas: 'atlas/payudara.glb' },
   { id: 'obgin', focusKey: 'obgin', label: 'Female pelvis', scientificName: 'Pelvis feminina', accent: '#c58f9a', illustrated: false, hotspots: [], sumber: 'hubmap', jumlahBagian: 9, berkas: 'atlas/obgin.glb' },
 ]
 
@@ -230,6 +233,16 @@ export function modelForFocus(focusKey: string): OrganModel | undefined {
   return modelRujukan(focusKey) ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
 }
 
+/** Satu baris di layar pertama. Lisensi lengkap ada di catatanModel dan di bagian sumber. */
+export function barisAsal(m: OrganModel): string {
+  const n = m.jumlahBagian
+  const hitung = n == null ? '' : `${n} structures · `
+  if (m.sumber === 'z-anatomy') return `${hitung}Z-Anatomy · not this person · revision unpinned`
+  if (m.sumber === 'hubmap') return `${hitung}Visible Human female · not this person · revision unpinned`
+  if (m.sumber === 'bodyparts3d') return `${hitung}BodyParts3D · not this person · revision unpinned`
+  return 'Shape approximation · not verified anatomy'
+}
+
 /** Satu kalimat asal, sesuai berkas yang benar-benar dimuat. */
 export function catatanModel(m: OrganModel): string {
   const n = m.jumlahBagian
@@ -239,7 +252,21 @@ export function catatanModel(m: OrganModel): string {
     return `${hitung}Reference cut from Z-Anatomy (CC BY-SA 4.0), the same family as the full-body figure. ${batas}`
   }
   if (m.sumber === 'hubmap') {
-    return `${hitung}Reference cut from the HuBMAP Visible Human female pelvis (CC BY 4.0). ${batas} The male BodyParts3D figure does not include these organs.`
+    const organ = m.id === 'obgin'
+      ? 'female pelvis'
+      : m.id === 'payudara'
+        ? 'female breast'
+        : m.id === 'jantung-ruang'
+          ? 'female heart'
+          : m.id === 'bilier'
+            ? 'female liver, biliary tree and pancreas'
+            : 'female reference'
+    const tambahan = m.id === 'obgin'
+      ? ' The male BodyParts3D figure does not include these organs.'
+      : m.id === 'payudara'
+        ? ' The male BodyParts3D figure does not include this organ.'
+        : ''
+    return `${hitung}Reference cut from the HuBMAP Visible Human ${organ} (CC BY 4.0). ${batas}${tambahan}`
   }
   if (m.sumber === 'bodyparts3d') {
     return `${hitung}Reference cut from BodyParts3D 4.0 (CC BY 4.0). ${batas}`

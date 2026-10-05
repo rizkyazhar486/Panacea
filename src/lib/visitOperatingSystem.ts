@@ -1,3 +1,4 @@
+import { isValidIsoTimestamp } from '../shared/kernel/isoTimestamp.ts'
 import {
   isConsentActive,
   type ConsentEnvelope,
@@ -212,6 +213,7 @@ function assertNonBlank(value: string, field: string) {
 }
 
 function parseIso(value: string, field: string) {
+  if (!isValidIsoTimestamp(value)) throw new Error(`${field} must be a valid ISO timestamp`)
   const parsed = Date.parse(value)
   if (!Number.isFinite(parsed)) throw new Error(`${field} must be a valid ISO timestamp`)
   return parsed
@@ -576,6 +578,13 @@ export function visitObservationFreshness(receivedAt: string, now: string): {
   }
 }
 
+function observationTimeAvailableAt(observation: VisitDeviceObservation, atMs: number): boolean {
+  if (!isValidIsoTimestamp(observation.capturedAt) || !isValidIsoTimestamp(observation.receivedAt)) return false
+  const capturedMs = Date.parse(observation.capturedAt)
+  const receivedMs = Date.parse(observation.receivedAt)
+  return Number.isFinite(capturedMs) && Number.isFinite(receivedMs) && capturedMs <= receivedMs && receivedMs <= atMs
+}
+
 export function buildAiEmrVisitContext(
   state: VisitOperatingState,
   generatedAt: string,
@@ -584,7 +593,11 @@ export function buildAiEmrVisitContext(
   // Recheck at read time: retained samples must not outlive their consent.
   const clinicalConsentActive = isConsentActive(state.consent.clinicalData, 'clinical-support', generatedMs)
   const observations = (clinicalConsentActive ? Object.values(state.latestByMetric) : [])
-    .filter((observation): observation is VisitDeviceObservation => Boolean(observation))
+    .filter((observation): observation is VisitDeviceObservation => {
+      if (!observation || observation.subjectId !== state.subjectId || observation.visitId !== state.visitId) return false
+      // Retained state must not expose a later observation in an earlier context/replay.
+      return observationTimeAvailableAt(observation, generatedMs)
+    })
     .map((observation) => {
       const freshness = visitObservationFreshness(observation.receivedAt, generatedAt)
       return {
@@ -659,8 +672,11 @@ export function promoteObservationToClinicalRecord(
   }
   const sample = state.latestByMetric[metric]
   if (!sample) throw new Error(`no live observation is available for ${metric}`)
-  if (reviewedMs < parseIso(sample.receivedAt, 'sample.receivedAt')) {
-    throw new Error('reviewedAt must not be earlier than observation receipt')
+  if (sample.subjectId !== state.subjectId || sample.visitId !== state.visitId) {
+    throw new Error('observation identity must match the patient and visit before promotion')
+  }
+  if (!observationTimeAvailableAt(sample, reviewedMs)) {
+    throw new Error('observation capture/receipt timestamps must be valid; reviewedAt must not be earlier than observation receipt')
   }
   const device = state.devices[sample.deviceId]
   if (!device) throw new Error('observation device is no longer registered')

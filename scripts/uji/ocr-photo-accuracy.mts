@@ -45,4 +45,25 @@ assert.equal(
 const noNumbers = calculateOcrPhotoAccuracy('negative', 'negative')
 assert.equal(noNumbers.numericToken, null)
 
+// Numeric glyphs and signs must never disappear from the critical-token audit.
+for (const [candidate, reference] of [
+  ['WBC 12 ×10³/L', 'WBC 12 ×10⁹/L'],
+  ['value 1', 'value −1'],
+  ['value 1', 'value ⁻1'],
+  ['value ١', 'value ٢'],
+]) {
+  const report = calculateOcrPhotoAccuracy(candidate, reference)
+  assert.equal(report.numericToken?.errors, 1)
+  assert.ok((report.numericToken?.accuracy ?? 1) < 1)
+  assert.equal(calculateOcrPhotoAccuracy(reference, reference).numericToken?.errors, 0)
+}
+
+assert.throws(() => calculateOcrPhotoAccuracy('a'.repeat(1001), 'b'.repeat(1000)), /budget/)
+assert.equal(calculateOcrPhotoAccuracy('a'.repeat(1000), 'b'.repeat(1000)).character.errors, 1000)
+assert.throws(() => calculateOcrPhotoAccuracy('x'.repeat(16385), 'x'), /length/)
+assert.equal(calculateOcrPhotoAccuracy('x'.repeat(16384), 'x').character.errors, 16383)
+assert.throws(() => calculateOcrPhotoAccuracy('Hb 12', ' \n '), /reference/)
+assert.equal(calculateOcrPhotoAccuracy('', 'Hb 12').character.errorRate, 1)
+assert.equal(calculateOcrPhotoAccuracy('invented 999', 'negative').numericToken, null)
+
 console.log('ocr-photo-accuracy: ok')

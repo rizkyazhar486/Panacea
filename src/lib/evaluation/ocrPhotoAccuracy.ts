@@ -26,6 +26,13 @@ export interface OcrPhotoAccuracyReport {
   numericToken: OcrAccuracyMetric | null
 }
 
+// Engineering work limits, not OCR quality or clinical acceptance thresholds.
+// Reject the whole comparison rather than score a silently truncated report.
+const MAX_INPUT_LENGTH = 16_384
+const MAX_EDIT_CELLS = 1_000_000
+
+export class OcrPhotoAccuracyError extends Error {}
+
 export function normalizeOcrBenchmarkText(value: string): string {
   return value
     .normalize('NFC')
@@ -81,7 +88,10 @@ function wordTokens(value: string): string[] {
 
 function numericTokens(value: string): string[] {
   return Array.from(
-    value.matchAll(/(?:<=|>=|<|>|≤|≥)?\s*[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)/g),
+    // Preserve numeric glyphs (including superscripts/non-ASCII digits),
+    // signs and separators exactly. This compares text, never converts units
+    // or interprets an ambiguous decimal as a measured clinical value.
+    value.matchAll(/(?:<=|>=|<|>|≤|≥)?\s*[+\-−﹣－⁺⁻]?(?:\p{N}+(?:[.,٫٬]\p{N}+)*|[.,٫]\p{N}+)/gu),
     (match) => match[0].replace(/\s+/g, ''),
   )
 }
@@ -94,8 +104,12 @@ export function calculateOcrPhotoAccuracy(
   candidateText: string,
   groundTruthText: string,
 ): OcrPhotoAccuracyReport {
+  if (candidateText.length > MAX_INPUT_LENGTH || groundTruthText.length > MAX_INPUT_LENGTH) {
+    throw new OcrPhotoAccuracyError('Audit unavailable: input length exceeds the local comparison limit. No score calculated.')
+  }
   const candidate = normalizeOcrBenchmarkText(candidateText)
   const reference = normalizeOcrBenchmarkText(groundTruthText)
+  if (!reference) throw new OcrPhotoAccuracyError('Audit unavailable: a nonempty human reference is required.')
 
   const referenceChars = Array.from(reference)
   const candidateChars = Array.from(candidate)
@@ -104,13 +118,19 @@ export function calculateOcrPhotoAccuracy(
   const referenceNumbers = numericTokens(reference)
   const candidateNumbers = numericTokens(candidate)
 
+  if (referenceChars.length * candidateChars.length > MAX_EDIT_CELLS) {
+    throw new OcrPhotoAccuracyError('Audit unavailable: comparison exceeds the local work budget. No score calculated.')
+  }
+
   const characterErrors = levenshtein(referenceChars, candidateChars)
   const wordErrors = levenshtein(referenceWords, candidateWords)
 
   return {
     character: metric(characterErrors, referenceChars.length, candidateChars.length),
     word: metric(wordErrors, referenceWords.length, candidateWords.length),
-    numericToken: referenceNumbers.length || candidateNumbers.length
+    // Without reference numeric tokens there is no numeric denominator.
+    // Invented numbers are still measured by CER/WER, never scored as 0/0.
+    numericToken: referenceNumbers.length
       ? metric(
           levenshtein(referenceNumbers, candidateNumbers),
           referenceNumbers.length,

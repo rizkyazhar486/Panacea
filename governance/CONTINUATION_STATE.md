@@ -96,3 +96,68 @@ are retained as the durable state rather than creating duplicate governance.
   efficiency are unmeasured. This candidate is not counted complete until accepted and merged.
 - Residual follow-up: audit other legacy personal caches/history for cross-account ownership;
   do not infer that this Visit-specific boundary fixes every browser health projection.
+
+## Verified integration checkpoint — 2026-10-05 Asia/Jakarta
+
+- #2262 merged at canonical main `921f3f4bd0b02a356602013128ef521b1a1ecd86`.
+  Its tree exactly equals accepted head `cd34881ced06d986e87fe879518d3843c343df65`.
+- Exact-head GitHub gates passed: Validate 37230447466; Stabilization 37230447504;
+  Body3D 37230447533; Clinical 37230447444; Security Enforcement 37230447467;
+  Security Inventory 37230447458. No valid gate was weakened.
+- Visit evidence now rejects foreign/unbound account wearable snapshots and unavailable or
+  malformed observations; consent resets across patient selection. Review fixes are merged.
+- Next candidate: Visit kernel replay boundary. Retained samples must match session subject/visit
+  and satisfy capturedAt <= receivedAt <= evaluation/review time. Strict calendar timestamps
+  reuse the unchanged medical-device envelope validator in a shared kernel.
+- Five adversarial regressions failed before fixes; independent review found no important blocker.
+  Pre-sync production build, 657/657 deterministic files, architecture and ratchet passed.
+  Candidate remains uncompleted pending synchronized checks, exact-head CI, merge/main evidence.
+- Deployment evidence: Vercel latest READY production metadata references `103bd6008356b2770a92c3b316d364d898809742`;
+  repository push-policy success is not proof these changes are deployed. No PostHog telemetry observed.
+- Overall previous/current percentage, weighted delta and efficiency remain unmeasured: no
+  authoritative weighted completion denominator. Count accepted functionality, never invent a percentage.
+
+## Stabilization repair checkpoint — 2026-10-05 Asia/Jakarta
+
+- NOT_READY: PR #2263 still requires fresh exact-head GitHub gates, accepted merge and canonical-main proof.
+- Live main `641123ef5a7bcd9898fe677bbd8ccd921c79e3aa` is an ancestor of the synchronized candidate.
+  Main advancement through #2269 was incorporated without rewriting shared PR history.
+- Prior head `b487aeebaf100d9a0b9e957853791ab70ae0db38` failed Stabilization run `37296787213`
+  at mobile canvas size 325x420 (minimum 480px), and Body3D run `37296787205` because a global
+  organ canvas locator matched two legitimate viewers. Both failures were reproduced locally.
+- Minimal repairs retain a 480px stage minimum and scope the organ smoke to the labelled reference
+  viewer, selecting the canonical Heart, Liver & biliary and Kidney & urinary tract close-ups.
+  Mesh, WebGL, download failure, page error and horizontal overflow checks remain enforced.
+- Synchronized local tree passed production build (515 QA tests), 663/663 deterministic files,
+  architecture lint (19 existing ignored violations) and ratchet (725 baseline entries).
+- Browser 390x844: canvas 325x480, bounded DPR 1.49846, healthy WebGL, unobstructed center,
+  orbit/progressive loading/biomechanics checks passed. Three organ sources loaded with HTTP 200
+  and positive meshes, no page errors or horizontal overflow. Independent engineering review
+  found no important blocker; Visit replay 5/5 and envelope/adapters/FHIR 29/29 passed separately.
+- No geometry/assets, clinical equations or clinical-release claims changed. Engineering review
+  is not qualified human clinical validation. Deployment, patient-specific avatar accuracy and
+  overall completion percentage remain unmeasured.
+- Next exact action: publish the synchronized candidate; inspect all new-head gates and causal
+  logs, recheck live main/head/overlap, merge with expected head only when fully accepted, then
+  verify canonical ancestry/content and post-merge acceptance before selecting the next task.
+
+## Remaining acceptance repair — 2026-10-05
+
+- Head `998e1022862531c3dfc38f1349ab386de8b589f7` passed Validate `37307441995`,
+  full/server Stabilization `37307442040`, Clinical `37307442069`, Security Enforcement
+  `37307442032` and Inventory `37307441979`. Body3D `37307441916` passed the organ,
+  abdomen, ventilation and arterial gates, then failed on duplicate global Spleen buttons.
+- Scope Spleen to the existing Lymph node stations group; retain all 65-station/159-mesh,
+  selection, deselection, source-limit, hit-testing, overflow and error assertions.
+- Local remaining gates passed lymphatic, hepatobiliary, skeletal, lesion, gland, moving
+  panels and controls. Topbar reproduced a clipped training breadcrumb (188px in 172px);
+  wrap semantic hierarchy headings within two lines at <=430px without shrinking controls.
+  Training hierarchy fits 320/390/430px; existing overlap and share export smokes passed.
+  Share-font provider requests failed locally: font fidelity remains unverified there.
+- Independent engineering review found no important blocker. Long-title/enlarged-text
+  accessibility is not fully proven. New-head CI, merge and canonical proof remain required.
+- Next bounded candidate: draft #2268 OCR audit. Reproduced false-perfect numeric scores
+  for superscript exponent/Unicode-minus errors and unbounded synchronous edit-distance work.
+  Local fixes preserve numeric glyphs and reject empty/oversized comparisons without partial
+  scores; deterministic and 390x844 fixture-based UI rejection/recovery checks passed.
+  Provider OCR accuracy and original-photo benchmark remain unmeasured; keep draft until accepted.
