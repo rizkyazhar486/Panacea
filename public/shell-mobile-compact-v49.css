@@ -96,6 +96,13 @@
     font-size: .9rem !important;
   }
 
+  /* Preserve every breadcrumb level when the toolbar has only a narrow
+     title slot. Wrapping keeps the existing readable type and controls. */
+  header.kaca.panacea-command-bar h1[data-navigation-hierarchy] {
+    white-space: normal !important;
+    max-height: 2.2em !important;
+  }
+
   header.kaca.panacea-command-bar :where(
     .header-icon-btn,
     button[aria-label^='Search'],

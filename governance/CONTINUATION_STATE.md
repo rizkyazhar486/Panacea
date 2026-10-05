@@ -140,3 +140,24 @@ are retained as the durable state rather than creating duplicate governance.
 - Next exact action: publish the synchronized candidate; inspect all new-head gates and causal
   logs, recheck live main/head/overlap, merge with expected head only when fully accepted, then
   verify canonical ancestry/content and post-merge acceptance before selecting the next task.
+
+## Remaining acceptance repair — 2026-10-05
+
+- Head `998e1022862531c3dfc38f1349ab386de8b589f7` passed Validate `37307441995`,
+  full/server Stabilization `37307442040`, Clinical `37307442069`, Security Enforcement
+  `37307442032` and Inventory `37307441979`. Body3D `37307441916` passed the organ,
+  abdomen, ventilation and arterial gates, then failed on duplicate global Spleen buttons.
+- Scope Spleen to the existing Lymph node stations group; retain all 65-station/159-mesh,
+  selection, deselection, source-limit, hit-testing, overflow and error assertions.
+- Local remaining gates passed lymphatic, hepatobiliary, skeletal, lesion, gland, moving
+  panels and controls. Topbar reproduced a clipped training breadcrumb (188px in 172px);
+  wrap semantic hierarchy headings within two lines at <=430px without shrinking controls.
+  Training hierarchy fits 320/390/430px; existing overlap and share export smokes passed.
+  Share-font provider requests failed locally: font fidelity remains unverified there.
+- Independent engineering review found no important blocker. Long-title/enlarged-text
+  accessibility is not fully proven. New-head CI, merge and canonical proof remain required.
+- Next bounded candidate: draft #2268 OCR audit. Reproduced false-perfect numeric scores
+  for superscript exponent/Unicode-minus errors and unbounded synchronous edit-distance work.
+  Local fixes preserve numeric glyphs and reject empty/oversized comparisons without partial
+  scores; deterministic and 390x844 fixture-based UI rejection/recovery checks passed.
+  Provider OCR accuracy and original-photo benchmark remain unmeasured; keep draft until accepted.
