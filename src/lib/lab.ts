@@ -124,6 +124,8 @@ export const JENIS_LAB: JenisLab[] = [
     sumber: 'Usual serum range used by the Nutrition tracker; varies by laboratory and time of day',
     catatan: 'Not a stimulation-test result and not a diagnosis.',
   },
+  { id: 'bun', nama: 'Blood urea nitrogen', satuan: 'mg/dL', bawah: 7, atas: 20, sumber: 'Usual adult range used by the Nutrition hemodialysis tracker; varies by laboratory' },
+  { id: 'ggt', nama: 'GGT', satuan: 'U/L', bawah: 5, atas: 40, sumber: 'Usual adult range used by the Nutrition tracker; varies by laboratory' },
 ]
 
 const KUNCI = 'pmd_lab_v1'
@@ -242,6 +244,8 @@ export const KUNCI_NUTRISI_KE_JENIS_LAB: Readonly<Record<string, string>> = {
   homocysteine: 'homosistein',
   inr: 'inr',
   cortisol: 'kortisol',
+  bun: 'bun',
+  ggt: 'ggt',
 }
 
 /** Nutrition protocols sometimes type platelets or WBC per µL. Those magnitudes must not enter the ×10⁹/L or 10³/µL catalog. */

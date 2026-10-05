@@ -126,10 +126,11 @@ export function ZAnatomySystemExplorer({ onHighlight, onFocusRegion, onEnableLay
     return (Object.keys(SYSTEM_LABEL) as AtlasSystemId[]).filter((id) => present.has(id))
   }, [manifest])
 
+  const searchingAll = query.trim().length > 0
   const systemEntries = useMemo(() => {
     const q = query.trim().toLocaleLowerCase()
     return compiled.nodes
-      .filter((entry) => entry.node.system === system)
+      .filter((entry) => searchingAll || entry.node.system === system)
       .filter((entry) => {
         if (!q) return true
         const node = entry.node
@@ -144,9 +145,9 @@ export function ZAnatomySystemExplorer({ onHighlight, onFocusRegion, onEnableLay
         const scale = SCALE_ORDER[a.node.scale] - SCALE_ORDER[b.node.scale]
         return scale || a.node.label.localeCompare(b.node.label)
       })
-  }, [compiled.nodes, system, query, byId])
+  }, [compiled.nodes, system, query, searchingAll, byId])
 
-  const selected = compiled.nodes.find((entry) => entry.node.id === selectedId && entry.node.system === system)
+  const selected = compiled.nodes.find((entry) => entry.node.id === selectedId)
     ?? systemEntries.find((entry) => entry.node.scale !== 'organism')
     ?? systemEntries[0]
     ?? null
@@ -171,6 +172,7 @@ export function ZAnatomySystemExplorer({ onHighlight, onFocusRegion, onEnableLay
 
   function inspect(entry: CompiledAtlasNode) {
     const node = entry.node
+    if (node.system !== system) setSystem(node.system)
     setSelectedId(node.id)
 
     if (node.geometryStatus === 'reference-only' || node.geometryStatus === 'planned') {
@@ -243,7 +245,7 @@ export function ZAnatomySystemExplorer({ onHighlight, onFocusRegion, onEnableLay
 
         <div className="border-b border-neutral-200 p-3 dark:border-white/10 xl:border-b-0 xl:border-r">
           <label htmlFor="z-anatomy-system-search" className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Hierarchy</label>
-          <input id="z-anatomy-system-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${SYSTEM_LABEL[system]}…`} className="mt-2 min-h-11 w-full rounded-xl border border-neutral-200 bg-transparent px-3 text-xs text-ink outline-none transition focus:border-brand dark:border-white/10 dark:text-white" />
+          <input id="z-anatomy-system-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search every system…" className="mt-2 min-h-11 w-full rounded-xl border border-neutral-200 bg-transparent px-3 text-xs text-ink outline-none transition focus:border-brand dark:border-white/10 dark:text-white" />
           <div className="mt-3 max-h-[520px] space-y-1.5 overflow-y-auto pr-1">
             {systemEntries.map((entry) => {
               const node = entry.node
@@ -254,7 +256,7 @@ export function ZAnatomySystemExplorer({ onHighlight, onFocusRegion, onEnableLay
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="text-[10px] font-black text-ink dark:text-white">{node.label}</div>
-                      <div className="mt-0.5 text-[8px] font-bold uppercase tracking-wide text-neutral-400">{node.scale} · {node.laterality}</div>
+                      <div className="mt-0.5 text-[8px] font-bold uppercase tracking-wide text-neutral-400">{searchingAll ? `${SYSTEM_LABEL[node.system]} · ` : ''}{node.scale} · {node.laterality}</div>
                     </div>
                     <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[8px] font-black ${STATUS_CLASS[node.geometryStatus]}`}>{STATUS_LABEL[node.geometryStatus]}</span>
                   </div>

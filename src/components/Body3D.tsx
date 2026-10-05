@@ -237,6 +237,8 @@ interface Props {
   unfold: number
   dissect: number
   onPick: (rawName: string, label: string) => void
+  /** Replaces the default tall stage so a caller can keep one fact in the same viewport. */
+  stageClassName?: string
 }
 
 function latarGradasi(atas: number, bawah: number): THREE.Texture {
@@ -325,6 +327,7 @@ export function Body3D({
   unfold,
   dissect,
   onPick,
+  stageClassName,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
@@ -874,7 +877,7 @@ export function Body3D({
   const hasLoadedLayer = ANATOMY_LAYERS.some((def) => Boolean(groupsRef.current[def.key]))
 
   return (
-    <div className="relative -mx-5 -mt-5 mb-3 h-[68vh] max-h-[820px] min-h-[480px] overflow-hidden rounded-t-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
+    <div className={stageClassName ?? 'relative -mx-5 -mt-5 mb-3 h-[68vh] max-h-[820px] min-h-[480px] overflow-hidden rounded-t-2xl bg-gradient-to-b from-neutral-900 to-neutral-950'}>
       <div ref={containerRef} className="h-full w-full touch-none" />
       {fatal && (
         <div className="absolute inset-0 flex items-center justify-center p-5">

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { Fold } from '../shared/ui/Fold'
+import { foldsOpenForSession } from '../shared/ui/foldsPreference'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
@@ -12,7 +13,7 @@ import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
-import { penjelasanTertulis } from '../lib/explainFallback'
+import { kalimatPertama, penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
@@ -585,6 +586,15 @@ export function BodyExplorer() {
     }
   }
 
+  const laboratoriumTerbuka = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return foldsOpenForSession(window.location.hash, window.sessionStorage)
+    } catch {
+      return foldsOpenForSession(window.location.hash, null)
+    }
+  }, [])
+
   return (
     <div data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" className="space-y-4">
       <SectionTitle
@@ -624,11 +634,22 @@ export function BodyExplorer() {
           dissect={dissect}
           motion={motion}
           onPick={onPickStructure}
+          stageClassName="relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950"
         />
 
         <p className="mt-1 text-center text-[10px] text-neutral-400">
           Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
         </p>
+        <p id="fakta-atlas" className="mx-auto mt-2 max-w-md text-center text-[13px] font-semibold leading-snug text-ink dark:text-white">
+          {selectedLabel || 'Reference atlas'}
+        </p>
+        <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-relaxed text-neutral-500">
+          {selectedLabel
+            ? (kalimatPertama(explanation) || 'No written fact is available for this name.')
+            : 'Search or tap a structure. This is reference geometry, and the upstream cut is not pinned to a source commit.'}
+        </p>
+        <details id="laboratorium-atlas" open={laboratoriumTerbuka || undefined} className="mt-3 rounded-xl border border-neutral-200 dark:border-white/10">
+          <summary className="min-h-11 cursor-pointer list-none px-3 py-2 text-xs font-bold text-neutral-500">Laboratory</summary>
         <Fold label="Modality">
         {/* Modalitas pencitraan — deret tunggal tepat di bawah viewer, karena
             inilah yang paling sering diganti saat mengamati satu struktur. */}
@@ -1385,6 +1406,7 @@ export function BodyExplorer() {
         </div>
 
         </Fold>
+        </details>
 
         {/* Empat paragraf sumber & sangkalan dulu tergelar penuh di kaki
             halaman dan itu bagian paling berisik dari layar ini. Atribusi CC
@@ -1419,6 +1441,8 @@ export function BodyExplorer() {
         </details>
       </Card>
 
+      <details className="rounded-2xl border border-neutral-200 dark:border-white/10">
+        <summary className="min-h-11 cursor-pointer list-none px-3 py-2 text-xs font-bold text-neutral-500">Medicine</summary>
       <Card>
         <SectionTitle
           icon={<IconStethoscope />}
@@ -1497,6 +1521,7 @@ export function BodyExplorer() {
           insert; ask a doctor or pharmacist about your own medications and doses.
         </p>
       </Card>
+      </details>
     </div>
   )
 }

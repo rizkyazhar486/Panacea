@@ -40,6 +40,8 @@ assert.ok(
 
 const explorerSource = readFileSync(new URL('../../src/pages/bodyhub/ZAnatomySystemExplorer.tsx', import.meta.url), 'utf8')
 assert.match(explorerSource, /Z-Anatomy system map/)
+assert.match(explorerSource, /Search every system/)
+assert.match(explorerSource, /searchingAll \|\| entry\.node\.system === system/, 'a typed query must search every system, not only the selected one')
 assert.match(explorerSource, /WHOLE_BODY_ATLAS/)
 assert.match(explorerSource, /RESPIRATORY_ATLAS_NODES/)
 assert.match(explorerSource, /compileAtlasAgainstSource/)

@@ -42,14 +42,14 @@
     "6262": {
       "symbol": "RYR2",
       "verification": "verified",
-      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
-      "verifiedOn": "2026-10-02"
+      "verifiedVia": "NCBI Gene esummary db=gene id=6262 on 2026-10-05: name RYR2, organism Homo sapiens, nomenclaturestatus Official. Matches the 2026-10-02 owner check.",
+      "verifiedOn": "2026-10-05"
     },
     "7134": {
       "symbol": "TNNC1",
       "verification": "verified",
-      "verifiedVia": "Manual check on NCBI Gene by the repository owner (reported in session); not independently re-fetched by the agent",
-      "verifiedOn": "2026-10-02"
+      "verifiedVia": "NCBI Gene esummary db=gene id=7134 on 2026-10-05: name TNNC1, organism Homo sapiens, nomenclaturestatus Official. Matches the 2026-10-02 owner check.",
+      "verifiedOn": "2026-10-05"
     }
   }
 }
