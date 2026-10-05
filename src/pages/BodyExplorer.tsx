@@ -401,7 +401,7 @@ export function BodyExplorer() {
   const modelDekat = paksaDekat === 'tubuh'
     ? null
     : (paksaDekat ? modelRujukan(paksaDekat) : null) ?? modelDariStruktur
-  const kelasPanggung = 'relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950'
+  const kelasPanggung = 'relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[480px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950'
 
   function pickRenderMode(mode: RenderMode) {
     setRenderMode(mode)
@@ -677,7 +677,7 @@ export function BodyExplorer() {
             <p className="mt-1 truncate text-[10px] text-neutral-400">{barisAsal(modelDekat)}</p>
           )}
         </div>
-        <div className={kelasPanggung}>
+        <div role="region" aria-label="Reference anatomy viewer" className={kelasPanggung}>
           {modelDekat ? (
             <>
               <button

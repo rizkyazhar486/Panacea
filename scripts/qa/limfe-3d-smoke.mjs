@@ -112,7 +112,7 @@ try {
 
   // Menunjuk model harus benar-benar memilih sesuatu.
   await page.getByRole('button', { name: 'Lymphoid organs', exact: true }).click()
-  await page.getByRole('button', { name: 'Spleen', exact: true }).click()
+  await page.getByRole('group', { name: 'Lymph node stations', exact: true }).getByRole('button', { name: 'Spleen', exact: true }).click()
   await page.waitForTimeout(1200)
   const kotak = await canvas.boundingBox()
   await page.mouse.click(kotak.x + kotak.width / 2, kotak.y + kotak.height / 2)

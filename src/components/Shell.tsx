@@ -434,7 +434,7 @@ export function Shell({ children }: { children: ReactNode }) {
   if (!account && loc.pathname === '/body-explorer') {
     if (masukDariAtlas) return <Login onBack={() => setMasukDariAtlas(false)} />
     return (
-      <div className="min-h-screen bg-[#070b10] text-white">
+      <div className="dark min-h-screen bg-[#070b10] text-white">
         <header className="flex items-center justify-between gap-3 px-3 py-2">
           <Link to="/" className="min-h-11 text-sm font-black tracking-tight">Panaceamed.id</Link>
           <button type="button" onClick={() => setMasukDariAtlas(true)} className="min-h-11 rounded-full border border-white/15 px-3 text-xs font-bold">Sign in</button>
