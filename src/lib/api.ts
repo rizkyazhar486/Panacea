@@ -258,12 +258,21 @@ export const api = {
       return toAccount(r.user)
     }),
   logout: async () => {
-    const identity = requestIdentity()
+    requestIdentity()
+    const generation = authGeneration
+    const token = authToken
+    const session = localStorage.getItem('panaceamed.session.v1')
     try {
       return await req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' })
     } finally {
       // An old logout cannot delete the token established by a newer login/tab.
-      try { if (requestIdentity() === identity) setAuthToken(null) } catch { /* session replaced */ }
+      try {
+        const rememberedSession = localStorage.getItem('panaceamed.session.v1')
+        // Shell removes its own remembered session immediately, before this request settles.
+        if (authGeneration === generation && authToken === token
+          && localStorage.getItem(TOKEN_KEY) === token
+          && (rememberedSession === session || rememberedSession === null)) setAuthToken(null)
+      } catch { /* session unavailable: never delete an unknown replacement token */ }
     }
   },
   wallet: () =>

@@ -136,3 +136,23 @@ test('anonymous public requests remain usable without a bearer token',async () =
   assert.deepEqual(await client.api.health(),{ok:true});
   assert.equal(calls[0].options.headers.authorization,undefined)
 })
+
+test('Shell-style immediate local logout still clears its original bearer', async () => {
+  const wait = deferred()
+  globalThis.fetch = () => wait.promise
+  const running = client.api.logout()
+  memory.delete('panaceamed.session.v1')
+  wait.resolve(response({ ok: true }))
+  await assert.rejects(running, /Session/)
+  assert.equal(memory.has('pmd-token'), false)
+})
+
+test('same-token cross-tab remembered login replacement is not erased by old logout', async () => {
+  const wait = deferred()
+  globalThis.fetch = () => wait.promise
+  const running = client.api.logout()
+  memory.set('panaceamed.session.v1', 'renewed-session-A')
+  wait.resolve(response({ ok: true }))
+  await assert.rejects(running, /Session/)
+  assert.equal(memory.get('pmd-token'), 'token-A')
+})
