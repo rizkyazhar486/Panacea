@@ -47,6 +47,7 @@ const TEKS: Record<string, [string, string]> = {
   kalsium: ['Calcium', 'mg/dL'], fosfor: ['Phosphorus', 'mg/dL'],
   folat: ['Folate', 'ng/mL'], bilirubin: ['Bilirubin', 'mg/dL'],
   homosistein: ['Homocysteine', 'umol/L'], inr: ['INR', 'ratio'], kortisol: ['Cortisol', 'ug/dL'],
+  bun: ['Blood urea nitrogen', 'mg/dL'], ggt: ['GGT', 'U/L'],
 }
 
 export function kodeUntuk(jenis: string) {

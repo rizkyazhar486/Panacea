@@ -37,9 +37,11 @@ const ok = proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', {
   cortisol: 12,
   inr: 1,
   bun: 14,
+  ggt: 28,
+  systolic: 120,
 })
-assert.deepEqual(ok.written.sort(), ['bilirubin', 'calcium', 'cortisol', 'folate', 'glucose', 'homocysteine', 'inr', 'ldl', 'phosphorus', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
-assert.deepEqual(ok.skipped, ['bun'], 'uncatalogued keys stay Nutrition-local')
+assert.deepEqual(ok.written.sort(), ['bilirubin', 'bun', 'calcium', 'cortisol', 'folate', 'ggt', 'glucose', 'homocysteine', 'inr', 'ldl', 'phosphorus', 'potassium', 'sodium', 'totalCholesterol', 'vitD'].sort())
+assert.deepEqual(ok.skipped, ['systolic'], 'blood pressure stays a vital, not a serum lab')
 assert.equal(nilaiLabPadaTanggal('gdp', '2026-09-28'), 98)
 assert.equal(nilaiLabPadaTanggal('chol', '2026-09-28'), 190)
 assert.equal(nilaiLabPadaTanggal('vitd', '2026-09-28'), 32)
@@ -59,6 +61,10 @@ assert.equal(balik.bilirubin, 0.8)
 assert.equal(balik.homocysteine, 9)
 assert.equal(balik.cortisol, 12)
 assert.equal(balik.inr, 1)
+assert.equal(balik.bun, 14)
+assert.equal(balik.ggt, 28)
+assert.equal(nilaiLabPadaTanggal('bun', '2026-09-28'), 14)
+assert.equal(nilaiLabPadaTanggal('ggt', '2026-09-28'), 28)
 assert.equal(nilaiLabPadaTanggal('folat', '2026-09-28'), 12)
 assert.equal(nilaiLabPadaTanggal('kalsium', '2026-09-28'), 9.4)
 
@@ -66,7 +72,8 @@ assert.equal(nilaiLabPadaTanggal('kalsium', '2026-09-28'), 9.4)
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('kemarin', { glucose: 90 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: 0 }).written, [])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { glucose: -1 }).skipped, ['glucose'])
-assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { bun: 14 }).skipped, ['bun'])
+assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { systolic: 120 }).skipped, ['systolic'])
+assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { bun: 0 }).skipped, ['bun'])
 assert.deepEqual(proyeksikanNilaiNutrisiKeLabKanonic('2026-09-28', { inr: 0, cortisol: Number.NaN }).skipped.sort(), ['cortisol', 'inr'])
 {
   const sebelum = ambilLab().trombosit?.length ?? 0
