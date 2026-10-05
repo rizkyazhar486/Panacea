@@ -298,3 +298,39 @@ are retained as the durable state rather than creating duplicate governance.
   #1770, #1768, #1767, #1758, #1001, #925, #760, #651, #395. No obsolete PR is closed
   without current evidence. Clinical/vendor/chronology assurance and observed
   production health remain unestablished. No completion fixed-point claim.
+
+### Validation runtime interruption — 2026-10-05
+
+- Canonical main rechecked: fc122cd80051db7b6e1aa4f5bd1fbefb2539c4b5, accepted
+  #2274 tree e10a81ea1dc1ad1bf41133479129aae4215a9bf3. API exact-head six workflows
+  succeeded before expected-head squash. Fresh canonical workflows are queued;
+  do not count API canonical verification complete until they succeed.
+- #2275 current remote head 5c01403f253bf12b6f09069be900284cf5fe1665, tree 0d76417c071cbc2681d9200eebf62f13d3c445ec,
+  is synchronized with canonical main, mergeable, and remains unmerged. All six fresh
+  exact-head workflows are queued. Prior-head successes are stale. Combined 41 API/
+  device/workout regressions and 12 vitals-history regressions passed, but the new
+  combined build/uji commands had not returned final status before interruption.
+- Concrete execution blocker: exec-server transport disconnected; recovery timed out
+  after 25 seconds. A subsequent minimal pwd command also did not return. No test
+  result is inferred from the interruption, and no additional merge is authorized
+  by stale/local-only evidence. Recover runtime, inspect processes, and rerun invalidated
+  validation without weakening CI or bypassing protection.
+- Local import worktree: /workspace/scratch/99f2c12efa12/Panacea-import,
+  branch fix/import-session-continuity, committed integration bc1e1a7c6331e3931686c2a2b9516a132cafd047,
+  tree df8aa83a557b65fd85f7c1dfb4f1d85a2c669fcd. This import change is NOT on a remote
+  branch. Eight real adapter/parser/storage regressions, 569-QA build and 664 uji
+  passed before synchronizing API/main; independent review found no bounded blocker.
+  Combined-tree validation remains outstanding.
+- Uncommitted follow-up in that worktree adds longitudinal-health-import-fixture.html,
+  longitudinal-health-import-fixture.tsx, longitudinal-health-import-smoke.mjs and extends
+  longitudinal-snapshot-acceptance.yml to run mounted HealthProfile tests. Syntax check
+  passed; browser execution has NOT been observed. Local Playwright library exists but
+  its Chromium executable is absent. Do not claim this browser test passed.
+- Recovery order: inspect live GitHub main/heads/runs/reviews; recover local worktrees;
+  finish #2274 canonical checks; rerun #2275 combined build/uji and require all fresh CI;
+  expected-head merge and verify canonical main; synchronize import branch, run new
+  mounted UI acceptance, review exact head, merge safely, verify main. Then repair
+  HealthProfile load/save and demographic/health-profile ownership (remaining P0),
+  broader AppState tenancy, and continue stale-PR and completion-ledger audit.
+- Status is a concrete validation safety stop, not verified internal completion and
+  not a claim that only external product blockers remain. No deployment health claim.
