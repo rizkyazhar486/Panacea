@@ -44,6 +44,8 @@ export const ALIAS_LAB: Readonly<Record<string, readonly string[]>> = {
   homosistein: ['homocysteine', 'homosistein'],
   inr: ['international normalized ratio', 'inr'],
   kortisol: ['cortisol', 'kortisol'],
+  bun: ['blood urea nitrogen', 'bun', 'ureum'],
+  ggt: ['gamma-glutamyl transferase', 'gamma gt', 'ggt'],
   hb: ['hemoglobin', 'haemoglobin', 'hgb', 'hb'],
 }
 

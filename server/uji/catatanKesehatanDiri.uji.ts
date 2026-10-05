@@ -120,16 +120,30 @@ assert.throws(() => susunPatchDiary(profil, { removeFoodIds: [] }), /diary paylo
 assert.throws(() => susunPatchDiary(profil, { removeSleepIds: Array.from({ length: 101 }, (_, i) => `x${i}`) }), /too many removed ids/)
 
 const nisanPenuh = Array.from({ length: MAKS_NISAN }, (_, i) => `n${i}`)
-const nisanBaru = susunPatchDiary({ diaryRemovedFoods: nisanPenuh, diaryFoods: [] }, { removeFoodIds: ['nbaru'] })
-const nisanHasil = nisanBaru.diaryRemovedFoods as string[]
-assert.equal(nisanHasil.length, MAKS_NISAN)
-assert.equal(nisanHasil.includes('n0'), false)
-assert.equal(nisanHasil.includes('nbaru'), true)
-const nisanKedaluwarsa = susunPatchDiary(
-  { diaryRemovedFoods: nisanHasil, diaryFoods: [] },
+assert.throws(
+  () => susunPatchDiary({ diaryRemovedFoods: nisanPenuh, diaryFoods: [] }, { removeFoodIds: ['nbaru'] }),
+  /deletion memory is full/,
+)
+const nisanUtuh = { diaryRemovedFoods: nisanPenuh, diaryFoods: [] as unknown[] }
+assert.throws(
+  () => susunPatchDiary(nisanUtuh, { removeFoodIds: ['nbaru'] }),
+  /deletion memory is full/,
+)
+assert.equal((nisanUtuh.diaryRemovedFoods as string[]).includes('n0'), true)
+assert.equal((nisanUtuh.diaryFoods as unknown[]).length, 0)
+const nisanUlang = susunPatchDiary({ diaryRemovedFoods: nisanPenuh, diaryFoods: [] }, { removeFoodIds: ['n0'] })
+assert.equal((nisanUlang.diaryRemovedFoods as string[]).length, MAKS_NISAN)
+assert.equal((nisanUlang.diaryRemovedFoods as string[]).includes('n0'), true)
+const nisanTetap = susunPatchDiary(
+  { diaryRemovedFoods: nisanPenuh, diaryFoods: [] },
   { foods: [{ id: 'n0', date: '2026-09-28', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 0 }] },
 )
-assert.equal((nisanKedaluwarsa.diaryFoods as { id: string }[])[0].id, 'n0')
+assert.equal((nisanTetap.diaryFoods as unknown[]).length, 0)
+const hampir = Array.from({ length: MAKS_NISAN - 1 }, (_, i) => `h${i}`)
+const nisanMuat = susunPatchDiary({ diaryRemovedFoods: hampir, diaryFoods: [] }, { removeFoodIds: ['hbaru'] })
+assert.equal((nisanMuat.diaryRemovedFoods as string[]).length, MAKS_NISAN)
+assert.equal((nisanMuat.diaryRemovedFoods as string[]).includes('h0'), true)
+assert.equal((nisanMuat.diaryRemovedFoods as string[]).includes('hbaru'), true)
 
 const disaring = buangKunciDiary({
   weightKg: 70,
@@ -256,5 +270,23 @@ assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 180
 assert.throws(() => susunPatchDiary(airTersimpan, { wellness: [{ date: '2026-09-28', waterMl: -5 }] }), /water/)
 assert.equal((airTersimpan.diaryWellness[0] as { waterMl: number }).waterMl, 1800)
 assert.equal((susunPatchDiary(airTersimpan, { wellness: [] }).diaryWellness as { date: string }[]).length, 2)
+const tidurNol = susunPatchDiary(
+  { diaryWellness: [{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }] },
+  { wellness: [{ date: '2026-09-28', sleepHr: 0 }] },
+)
+const tidurHari = tidurNol.diaryWellness as { date: string; waterMl?: number; sleepHr?: number }[]
+assert.equal(tidurHari.find((r) => r.date === '2026-09-28')?.sleepHr, undefined)
+assert.equal(tidurHari.find((r) => r.date === '2026-09-28')?.waterMl, 1800)
+const tidurIsi = susunPatchDiary(
+  { diaryWellness: [{ date: '2026-09-28', waterMl: 1800 }] },
+  { wellness: [{ date: '2026-09-28', sleepHr: 7 }] },
+)
+assert.equal((tidurIsi.diaryWellness as { sleepHr?: number }[])[0].sleepHr, 7)
+const tidurTetap = susunPatchDiary(
+  { diaryWellness: [{ date: '2026-09-28', sleepHr: 7, waterMl: 1800 }] },
+  { wellness: [{ date: '2026-09-28', sleepHr: 5 }] },
+)
+assert.equal((tidurTetap.diaryWellness as { sleepHr?: number }[])[0].sleepHr, 7)
+assert.equal((susunPatchDiary({ diaryWellness: [{ date: '2026-09-28', sleepHr: 7 }] }, { wellness: [{ date: '2026-09-28', sleepHr: 0, waterMl: 0 }] }).diaryWellness as unknown[]).length, 0)
 
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')

@@ -19,6 +19,7 @@ assert.match(shell, /pathname === '\/body-explorer'/, 'the reference atlas is re
 const explorer = readFileSync(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
 assert.match(explorer, /id="fakta-atlas"/, 'the one fact sits on the atlas viewport')
 assert.match(explorer, /stageClassName=/, 'the atlas stage leaves room for search and one fact')
+assert.match(explorer, /id="laboratorium-atlas"/, 'the dense laboratory stays behind one disclosure')
 assert.match(explorer, /upstream cut is not pinned/, 'the missing source revision stays visible')
 
 console.log('kalimat-pertama: one atlas fact, public body explorer, unpinned source stays stated')

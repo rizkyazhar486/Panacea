@@ -270,7 +270,8 @@ export function validasiIdDihapus(masukan: unknown): string[] {
 function simpanNisan(ada: readonly string[], tambahan: readonly string[]): string[] {
   const keluar = [...ada]
   for (const id of tambahan) if (!keluar.includes(id)) keluar.push(id)
-  return keluar.slice(-MAKS_NISAN)
+  if (keluar.length > MAKS_NISAN) throw new Error('deletion memory is full')
+  return keluar
 }
 
 /** One night stays one row. A new id for the same date replaces the stored night and names the id that must not return. */
@@ -315,12 +316,13 @@ export function gabungDiaryFoods(
   return gabung.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id)).slice(0, MAKS_MAKANAN)
 }
 
-/** Same date keeps an existing sleep value. Water may rise, and zero clears that day's water without dropping sleep. */
+/** Same date keeps an existing sleep value. Zero clears that night's sleep without dropping water. Water may rise, and zero clears that day's water without dropping sleep. */
 export function gabungDiaryWellness(tersimpan: readonly CatatanWellnessServer[], masuk: readonly CatatanWellnessServer[]): CatatanWellnessServer[] {
   const byDate = new Map(tersimpan.map((r) => [r.date, { ...r }]))
   for (const row of masuk) {
     const ada = byDate.get(row.date) ?? { date: row.date }
-    if (ada.sleepHr == null && row.sleepHr != null) ada.sleepHr = row.sleepHr
+    if (row.sleepHr === 0) delete ada.sleepHr
+    else if (ada.sleepHr == null && row.sleepHr != null) ada.sleepHr = row.sleepHr
     if (row.waterMl === 0) delete ada.waterMl
     else if (row.waterMl != null && (ada.waterMl == null || row.waterMl > ada.waterMl)) ada.waterMl = row.waterMl
     if (ada.sleepHr == null && ada.waterMl == null) byDate.delete(row.date)

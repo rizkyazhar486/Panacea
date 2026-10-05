@@ -3,6 +3,7 @@ import { penjelasanOrgan } from './organExplain'
 import { SISTEM_FISIOLOGI } from './physiology'
 import { ORGAN_FOCUS } from './organFocus'
 import { humanizeStructureName } from '../components/Body3D'
+import { jenisDariNamaStruktur } from '../domains/body-exposure/engine/jenisStruktur'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PENJELASAN YANG SELALU ADA.
@@ -81,19 +82,7 @@ function untukSistem(label: string): string | null {
  */
 function untukStruktur(rawName: string): string {
   const rapi = humanizeStructureName(rawName)
-  const n = rawName.toLowerCase()
-  const jenis =
-    /muscle/.test(n) ? 'a skeletal muscle — it produces movement by shortening across a joint'
-    : /nerve|plexus|ganglion/.test(n) ? 'part of the nervous system — it carries signals rather than producing force'
-    : /artery|arteria|aorta/.test(n) ? 'an artery — it carries blood away from the heart, under pressure'
-    : /vein|vena/.test(n) ? 'a vein — it returns blood towards the heart, at low pressure, and usually has valves'
-    : /bone|vertebra|rib|costa|femur|humerus|tibia|fibula|ulna|radius|scapula|clavicle|sternum/.test(n) ? 'a bone — structural support, a lever for muscles, and a store of calcium'
-    : /cartilage/.test(n) ? 'cartilage — it bears load and lets surfaces glide, and it has almost no blood supply, which is why it heals poorly'
-    : /tendon/.test(n) ? 'a tendon — it transmits muscle force to bone and stores elastic energy'
-    : /ligament/.test(n) ? 'a ligament — it joins bone to bone and limits how far a joint can travel'
-    : /node|lymph/.test(n) ? 'part of the lymphatic system — it filters tissue fluid and hosts the immune response'
-    : /gland/.test(n) ? 'a gland — it secretes, either into a duct or directly into the blood'
-    : 'an anatomical structure in the human body'
+  const jenis = jenisDariNamaStruktur(rawName) || 'an anatomical structure in the human body'
   const sisi = /\.l$/.test(rawName) ? ' This is the LEFT one; the body has a matching structure on the right.'
     : /\.r$/.test(rawName) ? ' This is the RIGHT one; the body has a matching structure on the left.'
     : ''

@@ -38,6 +38,18 @@ const airNol = tampilkanWellness(
 )
 assert.equal(airNol['2026-09-28'].waterMl, 0)
 assert.equal(airNol['2026-09-28'].sleepHr, 7)
+const tidurNol = tampilkanWellness(
+  [{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }],
+  { '2026-09-28': { date: '2026-09-28', waterMl: 1800, sleepHr: 0 } },
+)
+assert.equal(tidurNol['2026-09-28'].sleepHr, 0)
+assert.equal(tidurNol['2026-09-28'].waterMl, 1800)
+assert.deepEqual(wellnessBelumAda([{ date: '2026-09-28', waterMl: 1800, sleepHr: 7 }], {
+  '2026-09-28': { date: '2026-09-28', waterMl: 1800, sleepHr: 0 },
+}), [{ date: '2026-09-28', sleepHr: 0 }])
+assert.deepEqual(wellnessBelumAda([], {
+  '2026-09-28': { date: '2026-09-28', sleepHr: 0 },
+}), [])
 const airNaik = tampilkanWellness(
   [{ date: '2026-09-28', waterMl: 1800 }],
   { '2026-09-28': { date: '2026-09-28', waterMl: 500 } },
