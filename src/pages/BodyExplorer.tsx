@@ -14,7 +14,7 @@ import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
 import { kalimatPertama, penjelasanTertulis } from '../lib/explainFallback'
-import { daftarModelRujukan, modelRujukan, catatanModel, type OrganModel } from '../lib/organModels'
+import { daftarModelRujukan, modelRujukan, barisAsal, type OrganModel } from '../lib/organModels'
 import { jenisDariNamaStruktur } from '../domains/body-exposure/engine/jenisStruktur'
 import { kunciMilikOrgan } from '../domains/body-exposure/engine/faktaMilikOrgan'
 import { IconChevronRight } from '../components/icons'
@@ -674,7 +674,7 @@ export function BodyExplorer() {
             ))}
           </div>
           {modelDekat && (
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">{catatanModel(modelDekat)}</p>
+            <p className="mt-1 truncate text-[10px] text-neutral-400">{barisAsal(modelDekat)}</p>
           )}
         </div>
         <div className={kelasPanggung}>

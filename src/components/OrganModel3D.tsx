@@ -9,6 +9,39 @@ import { body3dPixelRatio } from '../lib/body3dQuality'
 import { disposeOwnedObject3DResources } from '../lib/bodyExposure/threeOwnedResourceDisposal'
 import { jalurModel, type OrganModel } from '../lib/organModels'
 import { namaBagianAtlas } from '../domains/body-exposure/engine/namaBagianAtlas'
+import { selubungAtlas } from '../domains/body-exposure/engine/selubungAtlas'
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+
+function rapikanPermukaan(mesh: THREE.Mesh) {
+  const awal = mesh.geometry
+  if (!awal?.isBufferGeometry) return
+  let geom = awal
+  try {
+    const las = mergeVertices(awal, 1e-4)
+    if (las !== awal) {
+      mesh.geometry = las
+      awal.dispose()
+      geom = las
+    }
+  } catch {
+    geom = awal
+  }
+  geom.computeVertexNormals()
+  const nama = String(mesh.userData.originalName || mesh.name || '')
+  if (!selubungAtlas(nama)) return
+  const daftar = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+  for (const mat of daftar) {
+    const m = mat as THREE.MeshStandardMaterial
+    if (!m || !('opacity' in m)) continue
+    m.transparent = true
+    m.opacity = 0.22
+    m.depthWrite = false
+    m.polygonOffset = true
+    m.polygonOffsetFactor = 1
+    m.polygonOffsetUnits = 1
+    m.needsUpdate = true
+  }
+}
 
 function namaBagianKena(obj: THREE.Object3D | null): string {
   let cur = obj
@@ -20,8 +53,7 @@ function namaBagianKena(obj: THREE.Object3D | null): string {
   return ''
 }
 
-// Penampil satu organ dari dekat. Lihat src/lib/organModels.ts untuk asal
-// modelnya dan kenapa bagiannya ditandai titik, bukan lewat raycast nama.
+// Penampil satu organ dari dekat. Nama bagian datang dari ketukan pada mesh.
 
 interface Props {
   organ: OrganModel
@@ -131,6 +163,9 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
             }
           })
         }
+        group.traverse((obj) => {
+          if ((obj as THREE.Mesh).isMesh) rapikanPermukaan(obj as THREE.Mesh)
+        })
         // Model dinormalkan ke ukuran & titik pusat yang sama, karena berkas
         // aslinya tidak sepakat soal skala — tanpa ini ginjal bisa datang
         // sebesar otak.
