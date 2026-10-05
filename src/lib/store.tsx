@@ -184,6 +184,25 @@ function legacySelfPatientId(email: string): string {
   return 'self-' + email.replace(/[^a-z0-9]/gi, '').slice(0, 16)
 }
 
+// Server-backed auth supplies a stable user id. Local/offline fallback must
+// supply an equally stable, explicitly namespaced identity before personal
+// health caches are allowed to read or write. Use the full normalized email
+// (not the legacy truncated patient key) so two local accounts cannot alias.
+function normalizeLocalHealthIdentity(account: Account): Account {
+  const serverId = account.id?.trim()
+  if (serverId) {
+    return serverId === account.id ? account : { ...account, id: serverId }
+  }
+  if (account.role !== 'pasien' && account.role !== 'dokter') return account
+
+  const email = account.email.trim().toLowerCase()
+  if (!email) return account
+  const identified: Account = { ...account, id: `local:${encodeURIComponent(email)}` }
+  return account.role === 'dokter' && !account.patientId?.trim()
+    ? { ...identified, patientId: 'p1' }
+    : identified
+}
+
 function pindahkanKunciPasien<T>(map: Record<string, T>, dari: string, ke: string): Record<string, T> {
   if (dari === ke || !(dari in map) || ke in map) return map
   const berikut = { ...map, [ke]: map[dari] }
@@ -690,11 +709,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       login: (account) =>
         setState((st) => {
+          const identifiedAccount = normalizeLocalHealthIdentity(account)
           // A patient gets their OWN record, built from registration details
           // (no dummy data). Doctors start with an empty patient list.
-          if (account.role === 'pasien') {
-            const self = patientFromAccount(account)
-            const legacyId = legacySelfPatientId(account.email)
+          if (identifiedAccount.role === 'pasien') {
+            const self = patientFromAccount(identifiedAccount)
+            const legacyId = legacySelfPatientId(identifiedAccount.email)
             const stableAda = st.patients.some((p) => p.id === self.id)
             const legacyAda = legacyId !== self.id && st.patients.some((p) => p.id === legacyId)
             const patients = stableAda
@@ -702,7 +722,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : legacyAda
                 ? st.patients.map((p) => (p.id === legacyId ? { ...p, ...self } : p))
                 : [...st.patients, self]
-            const acc = { ...account, patientId: self.id }
+            const acc = { ...identifiedAccount, patientId: self.id }
             saveSession(acc) // remember login for 7 days
             return {
               ...st,
@@ -721,8 +741,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               activePatientId: self.id,
             }
           }
-          saveSession(account) // remember login for 7 days
-          return { ...st, account }
+          saveSession(identifiedAccount) // remember login for 7 days
+          return { ...st, account: identifiedAccount }
         }),
       logout: () => { clearSession(); return setState((st) => ({ ...st, account: null })) },
       syncWalletBalance: (balance) =>
