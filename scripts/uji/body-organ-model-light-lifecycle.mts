@@ -31,7 +31,7 @@ assert.match(source, /role="alert"/, 'fatal WebGL/source failures must be announ
 assert.match(source, /renderer\.domElement\.setAttribute\('aria-hidden', 'true'\)/, 'raw canvas must not duplicate the accessible viewer surface')
 
 // Sumber nyata tetap sumber nyata.
-assert.match(source, /folderModel\(organ\).*organ\.id.*\.glb/s, 'source-backed GLB loading must remain intact')
+assert.match(source, /jalurModel\(organ\)/, 'source-backed GLB loading must remain intact through the canonical model-path resolver')
 assert.doesNotMatch(source, /BoxGeometry|CapsuleGeometry|CylinderGeometry|synthetic anatomy/i, 'light lifecycle fix must not fabricate replacement anatomy')
 
 console.log('body organ model LIGHT lifecycle invariants: ok')
