@@ -14,6 +14,9 @@ import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
 import { kalimatPertama, penjelasanTertulis } from '../lib/explainFallback'
+import { daftarModelRujukan, modelRujukan, catatanModel, type OrganModel } from '../lib/organModels'
+import { jenisDariNamaStruktur } from '../domains/body-exposure/engine/jenisStruktur'
+import { kunciMilikOrgan } from '../domains/body-exposure/engine/faktaMilikOrgan'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
@@ -44,6 +47,17 @@ const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
 const OrganDossier = lazy(() => import('./bodyhub/OrganDossier'))
+const OrganModel3D = lazy(() => import('../components/OrganModel3D'))
+
+function OrganDekat({ organ }: { organ: OrganModel }) {
+  return (
+    <div className="absolute inset-0">
+      <Suspense fallback={<p className="px-3 py-2 text-xs text-neutral-300">Opening the reference organ…</p>}>
+        <OrganModel3D organ={organ} tinggiClass="h-full" />
+      </Suspense>
+    </div>
+  )
+}
 const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
 // Ruang kardiovaskular: figur pembuluh tersendiri dengan aliran dan lesi, jadi
 // dimuat hanya ketika tabnya dibuka — GLB-nya 3,6 MB.
@@ -277,6 +291,7 @@ export function BodyExplorer() {
   const [phenotypes, setPhenotypes] = useState<OntologyTerm[]>([])
   const [explanation, setExplanation] = useState('')
   const [selectedLabel, setSelectedLabel] = useState('')
+  const [namaMentah, setNamaMentah] = useState<string | null>(null)
 
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
@@ -372,6 +387,21 @@ export function BodyExplorer() {
   // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
   // hasilnya identik, tidak peduli dari mana orang datang.
   const [clinicalOrgan, setClinicalOrgan] = useState<{ key: string; label: string } | null>(null)
+  const [paksaDekat, setPaksaDekat] = useState<string | 'tubuh' | null>(null)
+  const modelDariStruktur = useMemo(() => {
+    const kunci = namaMentah
+      ? kunciMilikOrgan(
+          namaMentah,
+          jenisDariNamaStruktur(namaMentah) || 'an anatomical structure in the human body',
+          ORGAN_FOCUS.map((o) => ({ key: o.key, keywords: o.keywords })),
+        )
+      : clinicalOrgan?.key ?? null
+    return kunci ? modelRujukan(kunci) ?? null : null
+  }, [namaMentah, clinicalOrgan])
+  const modelDekat = paksaDekat === 'tubuh'
+    ? null
+    : (paksaDekat ? modelRujukan(paksaDekat) : null) ?? modelDariStruktur
+  const kelasPanggung = 'relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950'
 
   function pickRenderMode(mode: RenderMode) {
     setRenderMode(mode)
@@ -387,6 +417,8 @@ export function BodyExplorer() {
     // potongan CT, bukan ilustrasi berwarna.
     const effectiveKind: ImageKind = kind ?? imageKindForMode(renderMode)
     setSelectedLabel(label)
+    setNamaMentah(rawNameUntukPenjelasan ?? null)
+    setPaksaDekat(null)
     setQuestion('')
     setLoading(true)
     // Penjelasan tertulis dipasang SEKARANG, bukan sesudah menunggu jaringan.
@@ -622,20 +654,58 @@ export function BodyExplorer() {
             }}
           />
         </div>
-        <Body3D
-          layers={layers}
-          highlighted={highlighted}
-          focusKeywords={focusKeywords}
-          renderMode={renderMode}
-          ctWindow={CT_WINDOWS.find((w) => w.key === ctWindowKey) ?? CT_WINDOWS[0]}
-          slicePlane={slicePlane}
-          slicePos={slicePos}
-          unfold={unfold}
-          dissect={dissect}
-          motion={motion}
-          onPick={onPickStructure}
-          stageClassName="relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950"
-        />
+        <div id="organ-dekat" className="mb-2">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Organ close-up</p>
+          <div className="-mx-1 mt-1 flex gap-1 overflow-x-auto pb-1">
+            {daftarModelRujukan().map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                aria-pressed={modelDekat?.id === o.id}
+                onClick={() => setPaksaDekat(o.id)}
+                className={`min-h-11 shrink-0 rounded-full border px-3 text-xs font-bold ${
+                  modelDekat?.id === o.id
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                }`}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          {modelDekat && (
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">{catatanModel(modelDekat)}</p>
+          )}
+        </div>
+        <div className={kelasPanggung}>
+          {modelDekat ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setPaksaDekat('tubuh')}
+                className="absolute left-2 top-2 z-10 min-h-11 rounded-full border border-white/20 bg-black/60 px-3 text-xs font-bold text-white"
+              >
+                Whole body
+              </button>
+              <OrganDekat key={modelDekat.id} organ={modelDekat} />
+            </>
+          ) : (
+            <Body3D
+              layers={layers}
+              highlighted={highlighted}
+              focusKeywords={focusKeywords}
+              renderMode={renderMode}
+              ctWindow={CT_WINDOWS.find((w) => w.key === ctWindowKey) ?? CT_WINDOWS[0]}
+              slicePlane={slicePlane}
+              slicePos={slicePos}
+              unfold={unfold}
+              dissect={dissect}
+              motion={motion}
+              onPick={onPickStructure}
+              stageClassName="absolute inset-0"
+            />
+          )}
+        </div>
 
         <p className="mt-1 text-center text-[10px] text-neutral-400">
           Drag to rotate · scroll or pinch to zoom · tap any structure to identify it

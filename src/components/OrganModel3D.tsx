@@ -7,7 +7,18 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { body3dPixelRatio } from '../lib/body3dQuality'
 import { disposeOwnedObject3DResources } from '../lib/bodyExposure/threeOwnedResourceDisposal'
-import { folderModel, type OrganModel } from '../lib/organModels'
+import { jalurModel, type OrganModel } from '../lib/organModels'
+import { namaBagianAtlas } from '../domains/body-exposure/engine/namaBagianAtlas'
+
+function namaBagianKena(obj: THREE.Object3D | null): string {
+  let cur = obj
+  while (cur) {
+    const nama = namaBagianAtlas(String(cur.userData.originalName || cur.name || ''))
+    if (nama) return nama
+    cur = cur.parent
+  }
+  return ''
+}
 
 // Penampil satu organ dari dekat. Lihat src/lib/organModels.ts untuk asal
 // modelnya dan kenapa bagiannya ditandai titik, bukan lewat raycast nama.
@@ -17,9 +28,11 @@ interface Props {
   /** Hotspot yang sedang dipilih, kalau ada. */
   selected?: string | null
   onSelect?: (hotspotId: string | null) => void
+  /** Tinggi wadah. Dossier memakai 300px; viewer atlas memakai tinggi panggung. */
+  tinggiClass?: string
 }
 
-export function OrganModel3D({ organ, selected, onSelect }: Props) {
+export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300px]' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [pct, setPct] = useState(0)
@@ -29,6 +42,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
   // tajam, bisa dibaca pembaca layar, dan sasaran sentuhnya cukup besar di
   // ponsel tanpa ikut membesar saat model diperbesar.
   const [layar, setLayar] = useState<Record<string, { x: number; y: number; depan: boolean }>>({})
+  const [bagian, setBagian] = useState('')
   const onSelectRef = useRef(onSelect)
   onSelectRef.current = onSelect
 
@@ -41,6 +55,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     setLoading(true)
     setPct(0)
     setFatal('')
+    setBagian('')
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100)
@@ -97,7 +112,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     const loader = new GLTFLoader()
     loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
-      `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
+      `${import.meta.env.BASE_URL}${jalurModel(organ)}`,
       (gltf) => {
         // Berkas bisa selesai terurai SETELAH komponen dilepas; adegan yang
         // sudah tidak dipasang itu harus dibuang di sini, tak ada yang lain akan.
@@ -106,6 +121,16 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
           return
         }
         group = gltf.scene
+        const nodes = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
+        if (nodes) {
+          gltf.scene.traverse((obj) => {
+            const assoc = gltf.parser.associations.get(obj) as { nodes?: number } | undefined
+            const nodeIndex = assoc?.nodes
+            if (nodeIndex !== undefined && nodes[nodeIndex]?.name) {
+              obj.userData.originalName = nodes[nodeIndex].name
+            }
+          })
+        }
         // Model dinormalkan ke ukuran & titik pusat yang sama, karena berkas
         // aslinya tidak sepakat soal skala — tanpa ini ginjal bisa datang
         // sebesar otak.
@@ -144,8 +169,29 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
 
     // Berhenti berputar begitu pengguna menyentuh — memutar sendiri itu
     // undangan, bukan sesuatu yang harus dilawan saat orang mau mengarahkan.
-    const stopAuto = () => { controls.autoRotate = false }
-    renderer.domElement.addEventListener('pointerdown', stopAuto)
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
+    let tekan: { x: number; y: number } | null = null
+    const onDown = (e: PointerEvent) => {
+      controls.autoRotate = false
+      tekan = { x: e.clientX, y: e.clientY }
+    }
+    const onUp = (e: PointerEvent) => {
+      if (!tekan || !group) return
+      const dx = e.clientX - tekan.x
+      const dy = e.clientY - tekan.y
+      tekan = null
+      if (dx * dx + dy * dy > 64) return
+      const rect = renderer.domElement.getBoundingClientRect()
+      if (rect.width < 2 || rect.height < 2) return
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+      raycaster.setFromCamera(pointer, camera)
+      const kena = raycaster.intersectObject(group, true).find((h) => (h.object as THREE.Mesh).isMesh)
+      setBagian(namaBagianKena(kena?.object ?? null))
+    }
+    renderer.domElement.addEventListener('pointerdown', onDown)
+    renderer.domElement.addEventListener('pointerup', onUp)
 
     const v = new THREE.Vector3()
     let layarTerakhir: TitikLayar | null = null
@@ -180,7 +226,8 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
-      renderer.domElement.removeEventListener('pointerdown', stopAuto)
+      renderer.domElement.removeEventListener('pointerdown', onDown)
+      renderer.domElement.removeEventListener('pointerup', onUp)
       controls.dispose()
       // Geometri, material, dan tekstur milik adegan ini dilepas dari GPU,
       // lalu konteksnya dilepas eksplisit: tanpa itu, membuka banyak organ
@@ -195,7 +242,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
 
   return (
     <div
-      className="relative h-[300px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-950"
+      className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-950 ${tinggiClass}`}
       role="region"
       aria-label={`${organ.label} source 3D model`}
       aria-busy={loading}
@@ -243,7 +290,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       )}
       {!loading && !fatal && (
         <p className="pointer-events-none absolute bottom-1.5 left-0 right-0 text-center text-[10px] text-neutral-500" aria-live="polite">
-          3D ready · drag to rotate · tap a marker to name the part
+          {bagian || '3D ready · drag to rotate · tap a part to name it'}
         </p>
       )}
     </div>

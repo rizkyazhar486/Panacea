@@ -53,7 +53,8 @@ export {
 
 export { kalimatPertama } from './engine/kalimatPertama'
 export { jenisDariNamaStruktur } from './engine/jenisStruktur'
-export { faktaMilikOrgan, type OrganFakta } from './engine/faktaMilikOrgan'
+export { faktaMilikOrgan, kunciMilikOrgan, type OrganFakta, type CalonOrgan } from './engine/faktaMilikOrgan'
+export { namaBagianAtlas } from './engine/namaBagianAtlas'
 export { classifyTissue, tissueShading, type TissueClass, type TissueShading } from './engine/tissueShading'
 export { matchBakedAo, aoToVertexColors, type AoLayerEntry, type AoMatch } from './engine/bakedAo'
 export { applyBakedAoToLayer } from './adapters/bakedAoLayer'

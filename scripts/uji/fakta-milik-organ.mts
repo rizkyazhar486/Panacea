@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { faktaMilikOrgan } from '../../src/domains/body-exposure/engine/faktaMilikOrgan.ts'
+import { faktaMilikOrgan, kunciMilikOrgan } from '../../src/domains/body-exposure/engine/faktaMilikOrgan.ts'
 
 const organ = [
   {
@@ -42,5 +42,27 @@ assert.equal(tulang, null, 'cartilage stays cartilage even when the name mention
 const laring = faktaMilikOrgan('Thyroid cartilage', 'an anatomical structure in the human body', organ)
 assert.match(laring ?? '', /belongs to the Larynx/)
 assert.doesNotMatch(laring ?? '', /butterfly-shaped/)
+
+const calon = [
+  { key: 'thyroid', keywords: ['thyroid'] },
+  { key: 'larynx', keywords: ['thyroid cartilage', 'larynx'] },
+  { key: 'stomach', keywords: ['stomach', 'eye'] },
+]
+assert.equal(
+  kunciMilikOrgan('Stomach', 'an anatomical structure in the human body', calon),
+  'stomach',
+)
+assert.equal(
+  kunciMilikOrgan('Stomach', 'a vein — it returns blood towards the heart, at low pressure, and usually has valves', calon),
+  null,
+  'the same name is refused when the structure is a vessel',
+)
+assert.equal(kunciMilikOrgan('Eye', 'an anatomical structure in the human body', calon), null, 'a keyword shorter than 4 letters does not match')
+assert.equal(
+  kunciMilikOrgan('Thyroid cartilage', 'an anatomical structure in the human body', calon),
+  'larynx',
+  'the longer keyword wins',
+)
+assert.equal(kunciMilikOrgan('', 'an anatomical structure in the human body', calon), null)
 
 console.log('fakta-milik-organ: organ parenchyma uses the written definition; vessels do not')
