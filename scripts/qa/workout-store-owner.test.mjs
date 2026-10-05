@@ -106,3 +106,36 @@ test('alert normalization cannot publish after its starting owner is replaced', 
   assert.equal(store.mergeHrNotifications([incoming]),0)
   assert.equal(memory.get(a),beforeA);assert.equal(memory.get(b),beforeB)
 })
+
+const { runPersonalHealthOperation } = await import('../../src/domains/personal-health/index.ts')
+test('aggregate rejects an already fulfilled response after same-owner session renewal', async () => {
+  login('A')
+  let rejectAlerts
+  const alerts = new Promise((_, reject) => { rejectAlerts = reject })
+  const pending = runPersonalHealthOperation(
+    () => Promise.all([Promise.resolve([workout('late')]), alerts.catch(() => [])]),
+    ([w,n]) => { store.mergeWorkouts(w); store.mergeHrNotifications(n) },
+  )
+  await Promise.resolve()
+  memory.set('panaceamed.session.v1', JSON.stringify({account:{id:'A',patientId:'A'},loginAt:now-1}))
+  const before = new Map(memory)
+  rejectAlerts(new Error('offline'))
+  await pending
+  assert.deepEqual(memory,before)
+  assert.deepEqual(store.getWorkouts(),[])
+})
+test('unchanged operation imports the available endpoint despite partial offline failure', async () => {
+  login('A')
+  await runPersonalHealthOperation(
+    () => Promise.all([Promise.resolve([workout('valid')]), Promise.reject(new Error('offline')).catch(() => [])]),
+    ([w,n]) => { store.mergeWorkouts(w); store.mergeHrNotifications(n) },
+  )
+  assert.equal(store.getWorkouts()[0].id,'valid')
+})
+test('operation denies stale mounted identity before loading and token renewal before publishing', async () => {
+  login('A'); bindPersonalHealthAccount({id:'B',patientId:'B'})
+  await runPersonalHealthOperation(() => { assert.fail('must not load') }, () => assert.fail('must not publish'))
+  bindPersonalHealthAccount({id:'A',patientId:'A'})
+  await runPersonalHealthOperation(async () => { memory.set('pmd-token','replacement'); return [workout('late')] }, w => store.mergeWorkouts(w))
+  assert.deepEqual(store.getWorkouts(),[])
+})

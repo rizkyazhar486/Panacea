@@ -1,3 +1,4 @@
+import { runPersonalHealthOperation } from '../domains/personal-health'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
@@ -45,16 +46,15 @@ export function WorkoutHistory() {
   useEffect(() => {
     if (!backendEnabled) return
     let hidup = true
-    Promise.all([
+    runPersonalHealthOperation(() => Promise.all([
       api.deviceWorkouts().catch(() => ({ workouts: [] as Record<string, unknown>[] })),
       api.deviceHrNotifications().catch(() => ({ notifications: [] as Record<string, unknown>[] })),
-    ])
-      .then(([w, n]) => {
+    ]), ([w, n], current) => {
         if (!hidup) return
         let baru = 0
         if (w.workouts.length) baru += mergeWorkouts(parseWorkouts(JSON.stringify({ data: { workouts: w.workouts } })))
-        if (n.notifications.length) baru += mergeHrNotifications(parseHrNotifications(JSON.stringify({ data: { heartRateNotifications: n.notifications } })))
-        if (baru) setTarikan((n2) => n2 + 1)
+        if (current() && n.notifications.length) baru += mergeHrNotifications(parseHrNotifications(JSON.stringify({ data: { heartRateNotifications: n.notifications } })))
+        if (current() && baru) setTarikan((n2) => n2 + 1)
       })
       .catch(() => { /* offline: yang tersimpan lokal tetap tampil */ })
     return () => { hidup = false }
