@@ -2,33 +2,50 @@
 
 ### Current checkpoint — 2026-10-05, total verified completion directive
 
-- Live main: `265b226fc9cb735f2aa19f367b2f908dc7ffefad`, expected-head squash of #2272.
-  Tree `ebfea2f7e15a7fa04030c8ca246d262853f75ffa` equals accepted sync head
-  `da9e038f91249b40a89c74b0ff0d0611329d8efb`. All six exact-head workflows passed,
-  including complete Stabilization and Body 3D. Post-merge main workflows remain
-  outstanding; do not count #2272 as verified closure until those finish successfully.
+- Live main: `6e9d8c6d9942beb27d46ca8881d6103c34340efc`, expected-head squash of #2273.
+  Tree `8700de0c4aa8becfbebbb43a0a6b0f59d3ca0dfb` equals accepted history head
+  `f686b1d6de2f49d44ed64091e56c90a90316c8e0`. All six exact-head workflows passed,
+  including full/server Stabilization and Body 3D; technical review recorded at that head.
+  Canonical post-merge evidence is outstanding; history is not yet verified closure.
+- #2272 is verified on main `265b226fc9cb735f2aa19f367b2f908dc7ffefad`: all six
+  canonical workflows passed, including Body 3D run `37361304663` and full/server
+  Stabilization run `37361304676`. Tree equals the accepted head; parent is #2271 main.
 - #2271 is verified on main `3982779b60cf370d45c8ec8a2906b616839eb68a`: all six
-  canonical workflows passed. The Clinical Evidence checkout cancellation was retried;
-  job `111927627021` passed. Same-tree local build, 664/664 uji and architecture passed.
-- Active P0 repair: PR #2273, `fix/history-bind-personal-vitals`. Original head
-  `5a94bb294b2acb3044a8a2d2426d50079fc4df43` has tree
-  `ba6212593aa5bf3ad77aa1d7f2ed9a1080649c1a`. RED demonstrated cross-account history
-  reads and the real deferred mergeVitals writer carrying A into B. Scoped, owned
-  envelopes reject foreign snapshots and preserve unowned legacy history anonymously.
-  New scope reads use a domain adapter; no architecture-baseline expansion.
-- Integration with #2272 was tested before synchronization: 22 targeted regressions,
-  546/546 QA tests in successful production build, 664/664 uji, TypeScript and
-  architecture/ratchet passed. The history branch now synchronizes with the new main;
-  capture its new exact head and require fresh CI, review, merge and canonical evidence.
-- Remaining P0 candidates: global profile/health-profile and workout/alert ownership,
-  manual HealthProfile async load/import/save callbacks, and API in-memory bearer-token
-  continuity versus cross-tab token replacement. History isolation does not establish
-  source chronology, device correctness or clinical validation.
-- Stale PR inventory: non-drafts #1827/#1745/#1713 require SYNC and equivalence review;
-  drafts #1877/#1770/#1768/#1767/#1758/#1681/#1001/#925/#760/#651/#395 require scope
-  review. No draft was proven obsolete or closed. Re-query status/overlap before action.
-- No completion percentage or fixed-point claim is supported. Verify every stored SHA
-  and check against live GitHub; historical checkpoints below are not live truth.
+  canonical workflows passed. Clinical checkout cancellation was retried; job
+  `111927627021` passed. Same-tree local build, 664/664 uji and architecture passed.
+- Active P0 repair: PR #2274, `fix/api-session-continuity`, previous head
+  `e8d90c15509cd6fa6ae9a95c1908514eabec941f` and tree
+  `c9d9bcc090655fe0965c5d59a936117e84f3aa2d`. Seven original RED regressions proved
+  stale bearer/response/logout failures. Review reproduced and repaired Shell's immediate
+  local session removal during logout. Sixteen targeted tests and final build (550 QA),
+  664/664 uji and architecture passed on that API-only tree.
+- The API branch synchronizes with the newly merged history main. Final combined code
+  passes 38 targeted tests, production build (562 QA), TypeScript and architecture/ratchet;
+  a real API → sync → vitals → history fixture preserves A/B baselines and rejects late
+  A responses without state mutation. Combined 664-file rerun remains outstanding.
+  Capture the new exact head and require fresh CI/review/merge/main evidence.
+- Live PR audit: #2274's source/test files do not overlap remaining PRs. Non-drafts
+  #1827/#1745/#1713/#1681 require SYNC and equivalence review; drafts
+  #1877/#1770/#1768/#1767/#1758/#1001/#925/#760/#651/#395 need scope review.
+  No obsolete closure is proven. Re-query status and overlap before each action.
+
+Live completion ledger (effort/risk are engineering estimates, not completion scores):
+
+| Priority / problem | Impact | Dependency / owner / overlap | Effort / regression risk | Validation / contribution |
+| --- | --- | --- | --- | --- |
+| P0 API request/logout continuity | Wrong-session responses or erased replacement token | #2274; history main sync; no active file overlap | Small / high shared boundary | 16 regressions + full exact-head/main acceptance; yes |
+| P0 global profile/health-profile ownership | Foreign calculator prefills and partial merges | Scope adapter now on main; unowned; no equivalent active PR found | Medium / high | Account/subject/cache isolation, UI wiring, full acceptance; yes |
+| P0 manual HealthProfile async context | Late load/import/save may relabel old form data | API guard + scoped profile; unowned | Medium / high | Real delayed callbacks and session/form replacement; yes |
+| P0 workout/alert ownership | Foreign timelines and health evidence | Scope adapter; unowned | Small-medium / medium | Reads/merges/clear, stale mounted scope, real import, main acceptance; yes |
+| P1 stale valuable PRs | Integration debt and inaccessible unmerged scope | Four non-drafts plus ten drafts; own original lanes | Per-PR / variable | Latest-main equivalence, ancestry, overlap and exact-head gates; yes if still in scope |
+| P2 disconnected longitudinal features | Existing workflow cannot rejoin patient truth | Needs bounded reachability audit; unowned | Unknown / variable | Real input → domain → persistence → output/action tests; candidate only |
+| P3 Body Exposure source/depth gaps | Educational placeholders cannot establish mature anatomy quality | Issue #626 / registry / named reference atlases; expert evidence where needed | Large / high scientific assurance | Source-specific anatomy/interaction/mobile/provenance review; candidate only |
+| P4 existing large bundles | Load/memory cost | Build warns; profiling required before change | Unknown / measured first | Representative startup/frame/load measurements + acceptance; candidate only |
+
+- Internal tasks remain; no completion percentage or fixed-point claim is supported.
+  History/source chronology, clinical review, real device provenance and live deployment
+  health are not established by these engineering tests. Every stored SHA/check must be
+  verified against GitHub on resumption; sections below are historical, not live truth.
 
 
 Updated 2026-10-03 (autonomous Final Convergence session; autopilot handoff section added at the end). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
@@ -251,26 +268,33 @@ are retained as the durable state rather than creating duplicate governance.
 
 ### Personal workout ownership lane — 2026-10-05
 
-- Live canonical main inspected at `6e9d8c6d9942beb27d46ca8881d6103c34340efc` (#2273).
-  #2271 non-finite biometric rejection and #2272 device-response session continuity
-  have successful canonical-main verification. #2273 owned vitals history is merged;
-  five canonical workflows passed, while Stabilization server acceptance was cancelled
-  with no steps executed and is queued after a targeted rerun. It is not counted green.
-- API #2274 exact head `30d07b738c98cf7818da8e20d736df6e6cc4427c` has five successful
-  workflows plus successful full Stabilization acceptance. Its cancelled, unstarted server
-  job was rerun and remains pending. Merge is held for fresh complete evidence.
-- Workout branch `fix/workouts-isolate-personal-history` scopes workouts/HR alerts to
-  validated account+patient envelopes, preserves unowned anonymous arrays, rejects
-  mounted-owner mismatches and guards writes against normalization-time replacement.
-  The connected WorkoutHistory aggregate now retains originating raw session+token
-  throughout both requests; same-owner session renewal discards previously fulfilled
-  responses before publication. 15 targeted tests passed; removing the publication guard
+- Live canonical main is `fc122cd80051db7b6e1aa4f5bd1fbefb2539c4b5` (#2274), with
+  accepted API tree `e10a81ea1dc1ad1bf41133479129aae4215a9bf3` unchanged by squash.
+  #2271 biometric rejection, #2272 device continuity, and #2273 owned vitals history
+  have successful canonical-main verification. Cancelled unstarted acceptance jobs
+  were rerun successfully; cancellation was never treated as a passing validator.
+- API #2274 exact head `30d07b738c98cf7818da8e20d736df6e6cc4427c` passed all six
+  workflows, received independent engineering review, and merged with expected-head
+  protection. Its fresh canonical post-merge checks remain pending at this checkpoint.
+- Workout #2275 scopes workouts/HR alerts to validated account+patient envelopes,
+  preserves unowned anonymous arrays, rejects mounted-owner mismatches, and guards
+  writes against normalization-time replacement. WorkoutHistory retains originating
+  raw session+token throughout its aggregate; same-owner renewal discards already
+  fulfilled responses before publication. 15 focused tests passed; guard mutation
   reproduced two failures. Independent engineering review found no bounded blocker.
-- Next gates: final committed-tree build/uji, exact-head CI, expected-head review/merge,
-  and canonical verification. Unmerged branches do not count as verified completion.
-- P0 residuals: HealthProfile asynchronous file/image import continuity and unowned
-  health-profile cache; shared profile hydration and broader AppState tenancy require
-  separate ownership review. Scoped workout/history stores do not close these gaps.
-- Existing stale PRs remain classified for audit, not silently superseded: #1827, #1745,
-  #1713, #1681 and drafts #1877, #1770, #1768, #1767, #1758, #1001, #925, #760, #651, #395.
-  Check live heads/overlap before reconciliation. No deployment or clinical assurance claim.
+- Original-source build passed (561 QA), 664/664 uji, architecture and ratchet passed.
+  Branch is now synchronized with #2274/main by ordinary merge; source changes were
+  disjoint, continuation entries were reconciled without deleting prior checkpoints.
+  Combined-tree validation and new exact-head CI remain required before merge.
+- Next bounded repair prepared locally: HealthProfile file/image imports capture the
+  form origin and operation generation, read text once, reject replaced sessions and
+  prevent recognition upload after delayed FileReader completion. Eight regressions
+  passed; six failures reproduced without guards. Independent review found no bounded
+  blocker; build passed (569 QA), 664 uji passed. This is not yet merged or complete.
+- P0 residuals: HealthProfile load/save continuity, unowned health-profile/shared
+  demographic caches, other page caches, and broader AppState tenancy. Scoped
+  workout/history envelopes and import guards do not establish complete ownership.
+- Stale PRs retained for live audit: #1827, #1745, #1713, #1681 and drafts #1877,
+  #1770, #1768, #1767, #1758, #1001, #925, #760, #651, #395. No obsolete PR is closed
+  without current evidence. Clinical/vendor/chronology assurance and observed
+  production health remain unestablished. No completion fixed-point claim.
