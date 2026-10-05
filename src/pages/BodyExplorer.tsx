@@ -634,7 +634,7 @@ export function BodyExplorer() {
           dissect={dissect}
           motion={motion}
           onPick={onPickStructure}
-          stageClassName="relative mb-2 h-[calc(100svh-24.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950"
+          stageClassName="relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950"
         />
 
         <p className="mt-1 text-center text-[10px] text-neutral-400">

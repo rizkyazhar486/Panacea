@@ -4,6 +4,7 @@ import { SISTEM_FISIOLOGI } from './physiology'
 import { ORGAN_FOCUS } from './organFocus'
 import { humanizeStructureName } from '../components/Body3D'
 import { jenisDariNamaStruktur } from '../domains/body-exposure/engine/jenisStruktur'
+import { faktaMilikOrgan } from '../domains/body-exposure/engine/faktaMilikOrgan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PENJELASAN YANG SELALU ADA.
@@ -83,11 +84,15 @@ function untukSistem(label: string): string | null {
 function untukStruktur(rawName: string): string {
   const rapi = humanizeStructureName(rawName)
   const jenis = jenisDariNamaStruktur(rawName) || 'an anatomical structure in the human body'
+  const milik = faktaMilikOrgan(rapi, jenis, ORGAN_FOCUS.flatMap((o) => {
+    const pen = penjelasanOrgan(o.key)
+    return pen?.definisi ? [{ label: o.label, keywords: o.keywords, definisi: pen.definisi }] : []
+  }))
   const sisi = /\.l$/.test(rawName) ? ' This is the LEFT one; the body has a matching structure on the right.'
     : /\.r$/.test(rawName) ? ' This is the RIGHT one; the body has a matching structure on the left.'
     : ''
   return [
-    `**${rapi}** is ${jenis}.${sisi}`,
+    milik ? `**${milik}**${sisi}` : `**${rapi}** is ${jenis}.${sisi}`,
     'The name comes from the Terminologia Anatomica used by the 3D dataset, so it is the same term used in textbooks and operative notes.',
     'Any disease and phenotype terms retrieved below come from real medical ontologies and are matched to this structure by name.',
   ].join('\n\n')
