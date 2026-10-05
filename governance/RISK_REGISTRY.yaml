@@ -6,6 +6,23 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.api_session_continuity
+    category: privacy
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      A browser's in-memory bearer can diverge from a cross-tab remembered token; late
+      response decoding or logout cleanup can outlive the login that initiated the request.
+    mitigation: >-
+      Client requests require matching in-memory and remembered bearer and bind responses
+      to remembered session plus local auth generation. Session replacement or unavailable
+      storage fails closed before requests and after fetch/decoding. Logout cleanup preserves
+      replacement tokens while allowing Shell's immediate removal of its own session. Private
+      identities are compared without logging token/session payloads. These controls do not
+      undo server-accepted mutations, replace server authorization, or isolate stale form data
+      and remaining global profile/workout caches; those require independent audits.
+    evidence: [src/lib/api.ts, scripts/qa/api-session-continuity.test.mjs]
+
   - risk_id: risk.personal_vitals_history_ownership
     category: patient_data_integrity
     severity: high
