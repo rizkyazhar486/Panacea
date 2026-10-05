@@ -208,3 +208,12 @@ are retained as the durable state rather than creating duplicate governance.
 - Do not count #2270 complete from local or prior-head evidence. Fresh exact-head Shared Longitudinal Snapshot,
   Validate, Stabilization, Body 3D, Clinical Evidence and Security gates must all pass on the final candidate,
   followed by expected-head merge and canonical-main verification.
+
+
+### Local/offline health identity regression — 2026-10-05
+
+- Review of #2270 found a real compatibility blocker beyond the original fixture drift: the local/offline login path could create a patient session without stable `account.id`, while the personal-health ownership boundary correctly rejects any cache scope lacking exact `account.id + patientId`.
+- TDD RED was captured on exact head `c769cc829919e3b30a4f5ba0a8886c86802919ce`: Shared Longitudinal Snapshot run `37320528490` failed in the real-browser consumer step with `local patient login must persist a stable account id`. The deterministic snapshot step passed, isolating the failure to login/session ownership.
+- Production repair commit `601acf40693108739c21d2869ccfd39204a7abc3` normalizes only local/offline patient/doctor fallback identities at the store login boundary. Server-provided ids remain authoritative; ambiguous personal cache sessions remain fail-closed; legacy unowned payloads are not adopted.
+- Local identities use an explicit `local:` namespace plus the full normalized email to avoid the legacy truncated-key collision class. Patient subject identity is then derived from that stable account id; local doctors receive the same `p1` subject convention used by the server adapter.
+- Final completion still requires GREEN on the browser regression and fresh exact-head Validate, Stabilization, Body 3D, Clinical Evidence, Security Enforcement, Security Inventory, plus Shared Longitudinal Snapshot, followed by expected-head merge and canonical-main verification.
