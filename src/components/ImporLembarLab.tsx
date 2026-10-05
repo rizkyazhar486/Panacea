@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { JENIS_LAB, periksaMasukanLab, tambahLab } from '../lib/lab'
 import { PERINTAH_BACA_LEMBAR_LAB, uraikanLembarLab, type KandidatLab } from '../lib/imporLab'
 import { api, backendEnabled } from '../lib/api'
-import { calculateOcrPhotoAccuracy, ocrMetricPercent } from '../lib/ocrPhotoAccuracy'
+import { calculateOcrPhotoAccuracy, ocrMetricPercent } from '../lib/evaluation/ocrPhotoAccuracy'
 import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
 
 const hariIni = () => { const d = new Date(); const p = (x: number) => String(x).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}` }
