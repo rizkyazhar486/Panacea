@@ -166,7 +166,9 @@ let authToken: string | null = (() => {
     return null
   }
 })()
+let authGeneration = 0
 export function setAuthToken(token: string | null) {
+  authGeneration += 1
   authToken = token
   try {
     if (token) localStorage.setItem(TOKEN_KEY, token)
@@ -176,7 +178,23 @@ export function setAuthToken(token: string | null) {
   }
 }
 
+// A tab must never send its old bearer under a replacement remembered login.
+// This private identity is compared only; tokens/session payloads are never logged.
+function requestIdentity(): string {
+  try {
+    const rememberedToken = localStorage.getItem(TOKEN_KEY)
+    if (rememberedToken !== authToken) throw new Error('Session changed; reload before retrying.')
+    return JSON.stringify([authGeneration, authToken, localStorage.getItem('panaceamed.session.v1')])
+  } catch {
+    throw new Error('Session changed or unavailable; reload before retrying.')
+  }
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const identity = requestIdentity()
+  const ensureCurrent = () => {
+    if (requestIdentity() !== identity) throw new Error('Session changed; reload before retrying.')
+  }
   const res = await fetch(API + path, {
     credentials: 'include',
     headers: {
@@ -185,11 +203,15 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
     },
     ...init,
   })
+  ensureCurrent()
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
+    ensureCurrent()
     throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
   }
-  return res.json() as Promise<T>
+  const body = await res.json() as T
+  ensureCurrent()
+  return body
 }
 
 
@@ -235,8 +257,15 @@ export const api = {
       if (r.token) setAuthToken(r.token)
       return toAccount(r.user)
     }),
-  logout: () =>
-    req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }).finally(() => setAuthToken(null)),
+  logout: async () => {
+    const identity = requestIdentity()
+    try {
+      return await req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' })
+    } finally {
+      // An old logout cannot delete the token established by a newer login/tab.
+      try { if (requestIdentity() === identity) setAuthToken(null) } catch { /* session replaced */ }
+    }
+  },
   wallet: () =>
     req<{ balance: number; transactions: { id: string; type: string; amountPnc: number; note: string; at: string }[]; tokenToIdr: number }>(
       '/api/wallet',
