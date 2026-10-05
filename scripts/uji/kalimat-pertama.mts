@@ -6,6 +6,12 @@ const duaDuaPuluh = `${'a'.repeat(219)}.`
 const duaDuaSatu = `${'b'.repeat(221)}`
 
 assert.equal(kalimatPertama('**Femur** is a bone. More detail follows.'), 'Femur is a bone.', 'the first sentence is the viewport fact')
+assert.equal(
+  kalimatPertama('**What it is.** Paired organs of gas exchange sit in the chest. More follows.'),
+  'Paired organs of gas exchange sit in the chest.',
+  'a heading is not the fact the viewer reads',
+)
+assert.equal(kalimatPertama('What it is.'), 'What it is.', 'a heading with nothing after it is kept')
 assert.equal(kalimatPertama(''), '', 'empty text stays empty and is not replaced with a guess')
 assert.equal(kalimatPertama('   \n\t '), '', 'whitespace is not a fact')
 assert.equal(kalimatPertama(duaDuaPuluh), duaDuaPuluh, 'a 220-character sentence is kept whole')
@@ -13,7 +19,7 @@ assert.equal(kalimatPertama(duaDuaSatu).length, 220, 'one character past the lim
 assert.equal(kalimatPertama(duaDuaSatu).endsWith('…'), true)
 
 const tertulis = readFileSync(new URL('../../src/lib/explainFallback.ts', import.meta.url), 'utf8')
-assert.match(tertulis, /export \{ kalimatPertama \}/, 'the written explainer re-exports the one-sentence fact')
+assert.match(tertulis, /faktaMilikOrgan/, 'a named organ uses its written definition on the first screen')
 const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
 assert.match(shell, /pathname === '\/body-explorer'/, 'the reference atlas is reachable before sign-in')
 const explorer = readFileSync(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
