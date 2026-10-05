@@ -190,3 +190,21 @@ are retained as the durable state rather than creating duplicate governance.
 - Next audit: other legacy personal stores, especially health-profile hydration,
   asynchronous imports and vital-history ownership. This cache repair does not claim
   every personal-data store or all One OS integration is verified complete.
+
+
+### OCR merge + personal-cache acceptance repair — 2026-10-05
+
+- Canonical main is `8f2d1ab8890a6bc2482dfa0c347872e985cc1ee4`, the verified squash merge of #2268.
+  #2268 entered main only after its synchronized head `dbe500e589b6ee8fa7363c99d62d6374f53485d7`
+  passed Validate, Stabilization, Body 3D, Clinical Evidence, Security Enforcement and Security Inventory.
+- #2270 remains the active P0 safety candidate. Its first exact-head Shared Longitudinal Snapshot run
+  failed in the real-browser consumer smoke while deterministic longitudinal snapshot coverage passed.
+- Root cause was acceptance-fixture identity drift: the remembered QA account omitted stable `account.id`,
+  while the new ownership boundary intentionally requires exact `account.id + patientId` before personal
+  lab/vital cache reads or writes. Production fail-closed behavior was retained unchanged.
+- The fixture now carries a stable QA account id; branch ancestry was then synchronized with current main
+  by merge commit `6acfd00a1b385b49199fa4734df453ce6984012a` without force-push. The main advance and #2270
+  changed-file sets were disjoint; current ancestry was verified `behind_by=0` before this checkpoint update.
+- Do not count #2270 complete from local or prior-head evidence. Fresh exact-head Shared Longitudinal Snapshot,
+  Validate, Stabilization, Body 3D, Clinical Evidence and Security gates must all pass on the final candidate,
+  followed by expected-head merge and canonical-main verification.
