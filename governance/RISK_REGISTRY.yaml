@@ -6,6 +6,25 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.device_sync_session_continuity
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      An automatic wearable/profile fetch started in one login could publish its response
+      after account replacement or logout. Module-global success and in-flight flags could
+      also suppress the replacement account's initial sync.
+    mitigation: >-
+      The automatic sync runner binds each request/retry/continuation to its original
+      remembered account, patient, login and authentication token, using the existing mounted
+      personal-health scope guard. Session changes reject late profile, workout and alert
+      results without publishing them; a new session gets independent initial/throttle state.
+      An old completion cannot release a newer run's in-flight guard. This does not repair
+      legacy global profile/workout/history storage, manual HealthProfile import callbacks,
+      or the deferred vitals-history writer; those require separate ownership audits.
+      Technical regression coverage is not clinical validation or production-device proof.
+    evidence: [src/lib/autoIsi.ts, scripts/qa/device-sync-session.test.mjs]
+
   - risk_id: risk.purpose_consent_index_integrity
     category: privacy
     severity: high
