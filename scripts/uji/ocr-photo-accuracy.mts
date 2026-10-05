@@ -3,7 +3,7 @@ import {
   calculateOcrPhotoAccuracy,
   normalizeOcrBenchmarkText,
   ocrMetricPercent,
-} from '../../src/lib/ocrPhotoAccuracy.ts'
+} from '../../src/lib/evaluation/ocrPhotoAccuracy.ts'
 
 const exact = calculateOcrPhotoAccuracy(
   'Hemoglobin 14.2 g/dL\nLDL 110 mg/dL',
