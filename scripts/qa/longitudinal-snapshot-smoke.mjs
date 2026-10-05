@@ -7,7 +7,7 @@ try {
   page.on('pageerror', error => errors.push(error.message))
   await page.addInitScript(() => {
     localStorage.clear()
-    localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account: { email: 'qa@localhost.test', name: 'Snapshot QA', role: 'dokter', patientId: 'p1', isSubscriber: false, loggedAt: new Date().toISOString() }, loginAt: Date.now() }))
+    localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account: { id: 'qa-account', email: 'qa@localhost.test', name: 'Snapshot QA', role: 'dokter', patientId: 'p1', isSubscriber: false, loggedAt: new Date().toISOString() }, loginAt: Date.now() }))
   })
   await page.goto(`${process.env.LONGITUDINAL_QA_ORIGIN || 'http://127.0.0.1:5180'}/scripts/qa/longitudinal-fixture.html`)
   await page.locator('[data-consumer]').first().waitFor()
