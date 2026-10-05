@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { JENIS_LAB, periksaMasukanLab, tambahLab } from '../lib/lab'
 import { PERINTAH_BACA_LEMBAR_LAB, uraikanLembarLab, type KandidatLab } from '../lib/imporLab'
 import { api, backendEnabled } from '../lib/api'
+import { calculateOcrPhotoAccuracy, OcrPhotoAccuracyError, ocrMetricPercent } from '../lib/evaluation/ocrPhotoAccuracy'
 import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
+import { Prosa } from './Prosa'
 
 const hariIni = () => { const d = new Date(); const p = (x: number) => String(x).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}` }
 
@@ -18,7 +20,20 @@ export function ImporLembarLab() {
   const [pilih, setPilih] = useState<Record<string, boolean>>({})
   const [pesan, setPesan] = useState<string | null>(null)
   const [bacaFoto, setBacaFoto] = useState(false)
+  const [teksOcrMentah, setTeksOcrMentah] = useState('')
+  const [groundTruthOcr, setGroundTruthOcr] = useState('')
   const fotoRef = useRef<HTMLInputElement>(null)
+
+  const auditResult = useMemo(() => {
+    if (!teksOcrMentah || !groundTruthOcr.trim()) return { report: null, error: null }
+    try {
+      return { report: calculateOcrPhotoAccuracy(teksOcrMentah, groundTruthOcr), error: null }
+    } catch (error) {
+      if (!(error instanceof OcrPhotoAccuracyError)) throw error
+      return { report: null, error: error.message }
+    }
+  }, [groundTruthOcr, teksOcrMentah])
+  const auditOcr = auditResult.report
 
   const uraiDari = (sumber: string) => {
     const k = uraikanLembarLab(sumber)
@@ -58,6 +73,8 @@ export function ImporLembarLab() {
       return
     }
     setBacaFoto(true)
+    setTeksOcrMentah('')
+    setGroundTruthOcr('')
     setPesan('Reading photo…')
     try {
       const dataUrl = await new Promise<string>((res, rej) => {
@@ -78,6 +95,7 @@ export function ImporLembarLab() {
         setPesan('No text could be read from that photo. Crop to the results table, or paste the text instead.')
         return
       }
+      setTeksOcrMentah(teksBaca)
       setTeks(teksBaca)
       uraiDari(teksBaca)
       setPesan('Draft from photo — review every line, tick only what matches your report, then Save. Nothing is stored until you confirm.')
@@ -115,6 +133,57 @@ export function ImporLembarLab() {
             {bacaFoto ? 'Reading…' : 'Photo'}
           </button>
         </div>
+        {teksOcrMentah && (
+          <details className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/12" data-ocr-photo-accuracy>
+            <summary className="t-kecil cursor-pointer font-bold text-ink dark:text-white">OCR accuracy audit · original photo</summary>
+            <div className="mt-2 space-y-2">
+              <Prosa kelas="t-mikro text-neutral-500">
+                For a measured accuracy score, manually transcribe the same photo below as ground truth.
+                The reference stays in this browser and is not sent back to the OCR service. Provider confidence is not treated as accuracy.
+              </Prosa>
+              <p className="t-mikro text-neutral-500">Provider confidence is not measured accuracy; confirmation before saving remains required.</p>
+              <textarea
+                value={groundTruthOcr}
+                onChange={(e) => setGroundTruthOcr(e.target.value)}
+                rows={4}
+                aria-label="Human verified OCR ground truth"
+                placeholder="Human-verified transcription from this exact photo"
+                className="t-kecil w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
+              />
+              {auditOcr ? (
+                <div className="grid gap-2 sm:grid-cols-3" aria-label="OCR accuracy metrics">
+                  <div className="rounded-xl border border-neutral-200 p-2 dark:border-white/10">
+                    <div className="t-mikro font-bold text-neutral-500">Character accuracy</div>
+                    <div className="t-kecil mt-1 font-black text-ink dark:text-white">{ocrMetricPercent(auditOcr.character.accuracy)}%</div>
+                    <div className="t-mikro text-neutral-400">CER {ocrMetricPercent(auditOcr.character.errorRate)}% · {auditOcr.character.errors}/{auditOcr.character.referenceCount} edits</div>
+                  </div>
+                  <div className="rounded-xl border border-neutral-200 p-2 dark:border-white/10">
+                    <div className="t-mikro font-bold text-neutral-500">Word accuracy</div>
+                    <div className="t-kecil mt-1 font-black text-ink dark:text-white">{ocrMetricPercent(auditOcr.word.accuracy)}%</div>
+                    <div className="t-mikro text-neutral-400">WER {ocrMetricPercent(auditOcr.word.errorRate)}% · {auditOcr.word.errors}/{auditOcr.word.referenceCount} edits</div>
+                  </div>
+                  <div className="rounded-xl border border-neutral-200 p-2 dark:border-white/10">
+                    <div className="t-mikro font-bold text-neutral-500">Numeric-token accuracy</div>
+                    <div className="t-kecil mt-1 font-black text-ink dark:text-white">
+                      {auditOcr.numericToken ? `${ocrMetricPercent(auditOcr.numericToken.accuracy)}%` : 'N/A'}
+                    </div>
+                    <div className="t-mikro text-neutral-400">
+                      {auditOcr.numericToken
+                        ? `${auditOcr.numericToken.errors}/${auditOcr.numericToken.referenceCount} numeric edits`
+                        : 'No numeric tokens in reference'}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p role="status" className="t-mikro font-bold text-neutral-400">{auditResult.error ?? 'Enter the human reference transcription to calculate CER, WER, and numeric-token accuracy.'}</p>
+              )}
+              <Prosa kelas="t-mikro text-neutral-400">
+                CER = (substitutions + deletions + insertions) / reference characters; WER uses reference words.
+                Displayed accuracy = max(0, 1 − error rate). Numeric-token accuracy is reported separately because digit errors can be clinically important.
+              </Prosa>
+            </div>
+          </details>
+        )}
         {kandidat && kandidat.length > 0 && (
           <>
             <ul className="divide-y divide-neutral-100 dark:divide-white/10" aria-label="Results found">
