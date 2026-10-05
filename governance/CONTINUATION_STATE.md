@@ -1,5 +1,36 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
+### Current checkpoint — 2026-10-05, total verified completion directive
+
+- Live main: `265b226fc9cb735f2aa19f367b2f908dc7ffefad`, expected-head squash of #2272.
+  Tree `ebfea2f7e15a7fa04030c8ca246d262853f75ffa` equals accepted sync head
+  `da9e038f91249b40a89c74b0ff0d0611329d8efb`. All six exact-head workflows passed,
+  including complete Stabilization and Body 3D. Post-merge main workflows remain
+  outstanding; do not count #2272 as verified closure until those finish successfully.
+- #2271 is verified on main `3982779b60cf370d45c8ec8a2906b616839eb68a`: all six
+  canonical workflows passed. The Clinical Evidence checkout cancellation was retried;
+  job `111927627021` passed. Same-tree local build, 664/664 uji and architecture passed.
+- Active P0 repair: PR #2273, `fix/history-bind-personal-vitals`. Original head
+  `5a94bb294b2acb3044a8a2d2426d50079fc4df43` has tree
+  `ba6212593aa5bf3ad77aa1d7f2ed9a1080649c1a`. RED demonstrated cross-account history
+  reads and the real deferred mergeVitals writer carrying A into B. Scoped, owned
+  envelopes reject foreign snapshots and preserve unowned legacy history anonymously.
+  New scope reads use a domain adapter; no architecture-baseline expansion.
+- Integration with #2272 was tested before synchronization: 22 targeted regressions,
+  546/546 QA tests in successful production build, 664/664 uji, TypeScript and
+  architecture/ratchet passed. The history branch now synchronizes with the new main;
+  capture its new exact head and require fresh CI, review, merge and canonical evidence.
+- Remaining P0 candidates: global profile/health-profile and workout/alert ownership,
+  manual HealthProfile async load/import/save callbacks, and API in-memory bearer-token
+  continuity versus cross-tab token replacement. History isolation does not establish
+  source chronology, device correctness or clinical validation.
+- Stale PR inventory: non-drafts #1827/#1745/#1713 require SYNC and equivalence review;
+  drafts #1877/#1770/#1768/#1767/#1758/#1681/#1001/#925/#760/#651/#395 require scope
+  review. No draft was proven obsolete or closed. Re-query status/overlap before action.
+- No completion percentage or fixed-point claim is supported. Verify every stored SHA
+  and check against live GitHub; historical checkpoints below are not live truth.
+
+
 Updated 2026-10-03 (autonomous Final Convergence session; autopilot handoff section added at the end). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
 
 main_sha: cd4313961 (the #2227 merge). Its Stabilization and Body 3D acceptance runs were still in progress when this was written; the last head with all six workflows completed green was a090b6ac0 (#2225). Commits since 8606bade8: calculator input validation (#2217-#2224, #2227), the Body3D smoke failure log (#2225) and docs.
