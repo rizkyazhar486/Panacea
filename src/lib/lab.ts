@@ -1,4 +1,5 @@
 import { tanggalKalenderSah } from './tanggal.ts'
+import { allowsPersonalHealthStorageScope, matchesPersonalHealthAccount, parsePersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 
 // Hasil laboratorium yang dimasukkan sendiri, beserta rentang rujukannya.
 //
@@ -132,9 +133,31 @@ const KUNCI = 'pmd_lab_v1'
 
 type Simpanan = Record<string, ButirLab[]>
 
-export function ambilLab(): Simpanan {
+function storedLab(expected?: { id?: string; patientId?: string } | null): { log: Simpanan; diperbaruiPada: string | null } {
+  const scope = parsePersonalHealthStorageScope(localStorage.getItem('panaceamed.session.v1'), Date.now())
+  if (!allowsPersonalHealthStorageScope(scope)) return { log: {}, diperbaruiPada: null }
+  if (expected !== undefined && !matchesPersonalHealthAccount(scope, expected)) return { log: {}, diperbaruiPada: null }
+  if (scope.kind === 'invalid') return { log: {}, diperbaruiPada: null }
+  if (scope.kind === 'anonymous') {
+    const raw = localStorage.getItem('pmd_lab_scope_v1:anonymous')
+    if (raw !== null) {
+      const value = JSON.parse(raw)
+      if (!value || value.ownerAccountId !== undefined || value.subjectId !== undefined) return { log: {}, diperbaruiPada: null }
+      return { log: value.log, diperbaruiPada: typeof value.diperbaruiPada === 'string' ? value.diperbaruiPada : null }
+    }
+    return { log: JSON.parse(localStorage.getItem(KUNCI) || '{}'), diperbaruiPada: localStorage.getItem(KUNCI_DIPERBARUI) }
+  }
+  // Unowned legacy keys are preserved, never adopted by a remembered account.
+  const value = JSON.parse(localStorage.getItem(`pmd_lab_scope_v1:${scope.token}`) || 'null')
+  if (value?.ownerAccountId !== scope.accountId || value?.subjectId !== scope.subjectId) {
+    return { log: {}, diperbaruiPada: null }
+  }
+  return { log: value.log, diperbaruiPada: typeof value.diperbaruiPada === 'string' ? value.diperbaruiPada : null }
+}
+
+export function ambilLab(expected?: { id?: string; patientId?: string } | null): Simpanan {
   try {
-    const d = JSON.parse(localStorage.getItem(KUNCI) || '{}')
+    const d = storedLab(expected).log
     if (!d || typeof d !== 'object') return {}
     const bersih: Simpanan = {}
     for (const [jenis, daftar] of Object.entries(d as Simpanan)) {
@@ -152,13 +175,20 @@ export function ambilLab(): Simpanan {
 export const KUNCI_DIPERBARUI = 'pmd_lab_diperbarui_v1'
 
 export function labDiperbaruiPada(): string | null {
-  try { return localStorage.getItem(KUNCI_DIPERBARUI) } catch { return null }
+  try { return storedLab().diperbaruiPada } catch { return null }
 }
 
 function tulis(s: Simpanan, cap: string) {
   try {
-    localStorage.setItem(KUNCI, JSON.stringify(s))
-    localStorage.setItem(KUNCI_DIPERBARUI, cap)
+    const scope = parsePersonalHealthStorageScope(localStorage.getItem('panaceamed.session.v1'), Date.now())
+    if (!allowsPersonalHealthStorageScope(scope) || scope.kind === 'invalid') return
+    if (scope.kind === 'account') {
+      localStorage.setItem(`pmd_lab_scope_v1:${scope.token}`, JSON.stringify({
+        ownerAccountId: scope.accountId, subjectId: scope.subjectId, log: s, diperbaruiPada: cap,
+      }))
+      return
+    }
+    localStorage.setItem('pmd_lab_scope_v1:anonymous', JSON.stringify({ log: s, diperbaruiPada: cap }))
   } catch { /* kuota */ }
 }
 

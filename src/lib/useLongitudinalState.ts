@@ -9,7 +9,6 @@ import { subscribeDataUpdates } from './dataSync'
 import {
   createLongitudinalSnapshotCache,
   emptyLongitudinalServer,
-  sameLongitudinalPatient,
   sumberLabLongitudinal,
   sumberVitalsLongitudinal,
   sumberDeretLongitudinal,
@@ -26,7 +25,7 @@ type DeviceSeries = { selfVitals: SelfVital[]; vo2maxLog: Vo2MaxEntry[] }
 
 export function LongitudinalStateProvider({ children }: { children: ReactNode }) {
   const { state: app, account, lupakanCatatanDihapus } = useStore()
-  const [local, setLocal] = useState<LongitudinalSources['local']>(() => ({ owner: account, labs: ambilLab(), vitals: getVitals() }))
+  const [local, setLocal] = useState<LongitudinalSources['local']>(() => ({ owner: account, labs: ambilLab(account), vitals: getVitals(account) }))
   const [clinicalRevision, setClinicalRevision] = useState(0)
   const [server, setServer] = useState(emptyLongitudinalServer)
   const [labServer, setLabServer] = useState<LabServer | null>(null)
@@ -41,7 +40,6 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     removed: { foods: string[]; sleep: string[]; training: string[]; gps: string[] }
   } | null>(null)
   const [serverReady, setServerReady] = useState(false)
-  const adoptedLocal = useRef(Boolean(account))
   const migrasiSeries = useRef('')
   const unggahDiary = useRef('')
   const akunId = account ? `${account.id}|${account.email}|${account.patientId ?? ''}` : ''
@@ -54,27 +52,22 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   }, [akunId])
 
   useEffect(() => {
-    // Preserve first-login local data, never adopt it again for another session.
-    if (account && !adoptedLocal.current) {
-      adoptedLocal.current = true
-      setLocal({ owner: account, labs: ambilLab(), vitals: getVitals() })
-    }
+    // Persistent ownership is required; a new UI session cannot adopt legacy data.
+    setLocal({ owner: account, labs: ambilLab(account), vitals: getVitals(account) })
   }, [account])
 
   useEffect(() => {
     // Legacy local keys carry no patient id. Notifications cannot authorize
     // transferring their contents to another account; server sources are scoped.
-    const lab = () => setLocal(previous => previous.owner && !sameLongitudinalPatient(previous.owner, account)
-      ? previous : { ...previous, owner: account, labs: ambilLab() })
+    const lab = () => setLocal(previous => ({ ...previous, owner: account, labs: ambilLab(account) }))
     const health = () => {
-      setLocal(previous => previous.owner && !sameLongitudinalPatient(previous.owner, account)
-        ? previous : { ...previous, owner: account, vitals: getVitals() })
+      setLocal(previous => ({ ...previous, owner: account, vitals: getVitals(account) }))
       setClinicalRevision(v => v + 1)
     }
     const clinical = () => setClinicalRevision(v => v + 1)
     const storage = (event: StorageEvent) => {
-      if (event.key === null || event.key === 'pmd_lab_v1') lab()
-      if (event.key === null || event.key === 'pmd_vitals_v1') health()
+      if (event.key === null || event.key === 'pmd_lab_v1' || event.key.startsWith('pmd_lab_scope_v1:')) lab()
+      if (event.key === null || event.key === 'pmd_vitals_v1' || event.key.startsWith('pmd_vitals_scope_v1:')) health()
     }
     window.addEventListener('panacea:lab', lab)
     window.addEventListener(PERISTIWA_SINKRON, clinical)

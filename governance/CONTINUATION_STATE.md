@@ -161,3 +161,32 @@ are retained as the durable state rather than creating duplicate governance.
   Local fixes preserve numeric glyphs and reject empty/oversized comparisons without partial
   scores; deterministic and 390x844 fixture-based UI rejection/recovery checks passed.
   Provider OCR accuracy and original-photo benchmark remain unmeasured; keep draft until accepted.
+
+### Canonical stabilization verification and cache isolation lane — 2026-10-05
+
+- Canonical main `9aaea0b9ad020b9c99174d4c98bf71a66a454ba1` contains the expected
+  squash of #2263. Its tree `b73a0250739185adbfa84148f585e29e62be80b9` is identical
+  to accepted PR head `546f612a73769ebc60cdef17035c13542a3df6e9`.
+- All six post-merge workflows succeeded on that exact main SHA: Stabilization
+  37311143383, Body 3D 37311143407, Clinical Evidence 37311143321, Security
+  Enforcement 37311143450, Pages 37311143348, Vercel Prebuilt 37311143341.
+  Workflow success is not proof of a separately observed production deployment.
+- #2268 OCR audit advanced to `dbe500e589b6ee8fa7363c99d62d6374f53485d7`, with
+  current main as a parent and unchanged clinical confirmation. Local build,
+  664/664 uji files, architecture, ratchet, and 390x844 rejection/recovery checks
+  passed; independent engineering review found no important blocker. Exact-head
+  acceptance is running. Provider/dataset accuracy remains unmeasured.
+- New P0 reproduction: unowned lab cache and foreign wearable snapshots survived
+  session replacement and could become the next patient's longitudinal evidence
+  or lab upload. Real-browser two-tab tests additionally reproduced stale UI writes
+  into the new session. No real patient data or live server mutations were used.
+- Repair under validation: account+patient-scoped envelopes, ownership-checked reads,
+  preserved legacy/anonymous copies, invalid-session rejection, and mounted UI identity
+  checks at shared read/write boundaries. Expected-account projection reads no longer
+  infer ownership from the current React label. Targeted regressions are passing;
+  full validation, independent final review, exact-head CI and merge remain required.
+- Existing owner-test and Nutrition hydration fixture now target the active envelope;
+  their original behavioral assertions remain intact. No safety gate was disabled.
+- Next audit: other legacy personal stores, especially health-profile hydration,
+  asynchronous imports and vital-history ownership. This cache repair does not claim
+  every personal-data store or all One OS integration is verified complete.

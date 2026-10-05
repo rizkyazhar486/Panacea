@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
@@ -430,6 +431,11 @@ const Ctx = createContext<Store | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(load)
+
+  useLayoutEffect(() => {
+    bindPersonalHealthAccount(state.account)
+    return () => bindPersonalHealthAccount(null)
+  }, [state.account])
 
   // Rekam yang dikembalikan server adalah canonical: identitas penandatangan,
   // waktu tanda tangan, dan verifikasi fisik dicap server, bukan dipercaya dari klien.

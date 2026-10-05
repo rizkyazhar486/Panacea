@@ -24,7 +24,8 @@ test('partial wearable updates never reattribute another account or unbound cach
     assert.equal(b.heartRate, undefined)
     assert.equal(b.weightKg, 68)
     assert.equal(mergeVitals({ heartRate: 72 }).weightKg, 68)
-    values.set('pmd_vitals_v1', JSON.stringify({ heartRate: 199 }))
+    // Corrupt the active namespace, rather than an unrelated quarantined legacy key.
+    values.set(`pmd_vitals_scope_v1:${encodeURIComponent(JSON.stringify(['doctor-b', 'patient-b']))}`, JSON.stringify({ heartRate: 199 }))
     assert.equal(mergeVitals({ weightKg: 70 }).heartRate, undefined)
     values.delete('panaceamed.session.v1')
     const anonymous = mergeVitals({ heartRate: 60, subjectId: 'patient-b', ownerAccountId: 'doctor-b' })

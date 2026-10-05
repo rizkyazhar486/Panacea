@@ -102,10 +102,12 @@ assert.match(page, /account lab log/)
 assert.match(page, /not a diagnosis/)
 
 // Hydration: canonical-only draw date surfaces in Nutrition camelCase keys.
-store['pmd_lab_v1'] = JSON.stringify({
+// Hydrate the active anonymous envelope after the preceding writes; the
+// unowned legacy key is now preserved rather than overriding scoped data.
+store['pmd_lab_scope_v1:anonymous'] = JSON.stringify({ log: {
   gdp: [{ id: 'g1', tanggal: '2026-09-20', nilai: 95 }],
   chol: [{ id: 'c1', tanggal: '2026-09-20', nilai: 185 }],
-})
+} })
 assert.equal(nilaiNutrisiDariLabKanonic('2026-09-20').glucose, 95)
 assert.equal(nilaiNutrisiDariLabKanonic('2026-09-20').totalCholesterol, 185)
 {
