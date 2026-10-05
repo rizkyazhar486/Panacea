@@ -11,8 +11,8 @@
 import { chromium } from '@playwright/test'
 
 const url = process.env.ORGAN3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
-// Satu organ per berkas sumber yang berbeda; semuanya terkompresi meshopt.
-const ORGAN = ['Heart', 'Liver', 'Kidneys']
+// Tiga potongan rujukan berbeda dari jalur close-up kanonik.
+const ORGAN = ['Heart', 'Liver & biliary', 'Kidney & urinary tract']
 
 const browser = await chromium.launch({
   headless: true,
@@ -39,7 +39,7 @@ page.setDefaultTimeout(60_000)
 const pageErrors = []
 page.on('pageerror', (e) => pageErrors.push(e.message))
 const unduhan = []
-page.on('response', (r) => { if (/\/organs\/.*\.glb/.test(r.url())) unduhan.push([r.url().split('/').pop(), r.status()]) })
+page.on('response', (r) => { if (/\/(?:organs|organs-atlas|atlas)\/.*\.glb/.test(r.url())) unduhan.push([r.url().split('/').pop(), r.status()]) })
 
 let gagal = null
 try {
@@ -48,9 +48,12 @@ try {
   await page.waitForTimeout(1500)
 
   for (const organ of ORGAN) {
-    await page.getByRole('button', { name: organ, exact: true }).first().click()
+    await page.locator('#organ-dekat').getByRole('button', { name: organ, exact: true }).click()
 
-    const canvas = page.locator('canvas[data-organ-model3d="true"]')
+    // Dossier dan close-up boleh hidup bersamaan; buktikan viewer yang dipilih,
+    // bukan kanvas pertama atau model lama di panel lain.
+    const viewer = page.getByRole('region', { name: 'Reference anatomy viewer', exact: true })
+    const canvas = viewer.locator('canvas[data-organ-model3d="true"]')
     await canvas.waitFor({ state: 'attached' })
 
     const sehat = await canvas.evaluate((n) => {

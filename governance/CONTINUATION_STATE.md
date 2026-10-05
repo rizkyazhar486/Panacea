@@ -116,3 +116,27 @@ are retained as the durable state rather than creating duplicate governance.
   repository push-policy success is not proof these changes are deployed. No PostHog telemetry observed.
 - Overall previous/current percentage, weighted delta and efficiency remain unmeasured: no
   authoritative weighted completion denominator. Count accepted functionality, never invent a percentage.
+
+## Stabilization repair checkpoint — 2026-10-05 Asia/Jakarta
+
+- NOT_READY: PR #2263 still requires fresh exact-head GitHub gates, accepted merge and canonical-main proof.
+- Live main `641123ef5a7bcd9898fe677bbd8ccd921c79e3aa` is an ancestor of the synchronized candidate.
+  Main advancement through #2269 was incorporated without rewriting shared PR history.
+- Prior head `b487aeebaf100d9a0b9e957853791ab70ae0db38` failed Stabilization run `37296787213`
+  at mobile canvas size 325x420 (minimum 480px), and Body3D run `37296787205` because a global
+  organ canvas locator matched two legitimate viewers. Both failures were reproduced locally.
+- Minimal repairs retain a 480px stage minimum and scope the organ smoke to the labelled reference
+  viewer, selecting the canonical Heart, Liver & biliary and Kidney & urinary tract close-ups.
+  Mesh, WebGL, download failure, page error and horizontal overflow checks remain enforced.
+- Synchronized local tree passed production build (515 QA tests), 663/663 deterministic files,
+  architecture lint (19 existing ignored violations) and ratchet (725 baseline entries).
+- Browser 390x844: canvas 325x480, bounded DPR 1.49846, healthy WebGL, unobstructed center,
+  orbit/progressive loading/biomechanics checks passed. Three organ sources loaded with HTTP 200
+  and positive meshes, no page errors or horizontal overflow. Independent engineering review
+  found no important blocker; Visit replay 5/5 and envelope/adapters/FHIR 29/29 passed separately.
+- No geometry/assets, clinical equations or clinical-release claims changed. Engineering review
+  is not qualified human clinical validation. Deployment, patient-specific avatar accuracy and
+  overall completion percentage remain unmeasured.
+- Next exact action: publish the synchronized candidate; inspect all new-head gates and causal
+  logs, recheck live main/head/overlap, merge with expected head only when fully accepted, then
+  verify canonical ancestry/content and post-merge acceptance before selecting the next task.
