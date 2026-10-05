@@ -6,7 +6,7 @@ import { SISTEM_FISIOLOGI } from '../../lib/physiology'
 import { ORGAN_FOCUS } from '../../lib/organFocus'
 import type { AnatomyLayer } from '../../components/Body3D'
 import OrganClinicalPanel from './OrganClinicalPanel'
-import { modelForFocus, modelIlustrasi, ILUSTRASI } from '../../lib/organModels'
+import { modelForFocus, modelIlustrasi, ILUSTRASI, catatanModel } from '../../lib/organModels'
 import OrganModel3D from '../../components/OrganModel3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,21 +188,7 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
             {/* Asal model dinyatakan di layar. Aplikasi kedokteran harus bisa
                 mengatakan dari mana gambarnya datang, dan model bangkitan AI
                 adalah pendekatan bentuk, bukan geometri terverifikasi. */}
-            <p className="text-[10px] leading-relaxed text-neutral-400">
-              {model.sumber === 'bodyparts3d' ? (
-                <>
-                  Detailed organ view — {model.jumlahBagian === 1 ? 'one named structure' : `${model.jumlahBagian} individually named structures`} cut from BodyParts3D 4.0
-                  (Database Center for Life Science, CC BY 4.0), the same reference anatomy as the full-body figure
-                  above. Real human reference geometry, not an artistic impression.
-                </>
-              ) : (
-                <>
-                  Detailed organ view — an AI-generated model (Tripo), used with the owner’s permission. It is a shape
-                  approximation for recognising form and position, not verified anatomy. The full-body figure above uses
-                  BodyParts3D, which is derived from real human data.
-                </>
-              )}
-            </p>
+            <p className="text-[10px] leading-relaxed text-neutral-400">{catatanModel(model)}</p>
             {ilustrasi && <div className="grid grid-cols-2 gap-2">
               {ILUSTRASI.map((il) => (
                 <figure key={il.key} className="overflow-hidden rounded-xl bg-neutral-50 dark:bg-white/5">

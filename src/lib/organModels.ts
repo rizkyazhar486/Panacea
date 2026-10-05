@@ -45,17 +45,24 @@ export interface OrganModel {
   illustrated: boolean
   /**
    * Dari mana geometrinya datang. 'ai' = model bangkitan Tripo di /organs/;
-   * 'bodyparts3d' = potongan anatomi rujukan nyata di /organs-atlas/, dibangun
-   * oleh scripts/atlasOrgan.mjs. Bedanya dinyatakan di layar, bukan disamarkan.
+   * 'bodyparts3d' = potongan BodyParts3D; 'z-anatomy' dan 'hubmap' adalah
+   * modul atlas yang sudah dikemas di /atlas/. Bedanya dinyatakan di layar.
    */
-  sumber?: 'ai' | 'bodyparts3d'
-  /** Jumlah mesh bernama di dalam berkas — hanya untuk model bodyparts3d. */
+  sumber?: 'ai' | 'bodyparts3d' | 'z-anatomy' | 'hubmap'
+  /** Jumlah mesh bernama di dalam berkas. */
   jumlahBagian?: number
+  /** Jalur di bawah public/, bila berkasnya bukan organs-atlas/<id>.glb. */
+  berkas?: string
 }
 
 /** Folder publik tempat berkas .glb organ ini berada. */
 export function folderModel(m: OrganModel): string {
-  return m.sumber === 'bodyparts3d' ? 'organs-atlas' : 'organs'
+  return m.sumber === 'bodyparts3d' && !m.berkas ? 'organs-atlas' : 'organs'
+}
+
+/** Jalur berkas yang benar-benar dimuat. Modul atlas tidak boleh jatuh ke folder AI. */
+export function jalurModel(m: OrganModel): string {
+  return m.berkas ?? `${folderModel(m)}/${m.id}.glb`
 }
 
 import { ORGAN_ATLAS } from './organAtlas.gen'
@@ -193,13 +200,51 @@ export const ORGAN_MODELS: OrganModel[] = [
 ]
 
 /**
- * Model organ untuk satu sasaran. Potongan BodyParts3D DIDAHULUKAN atas model
- * bangkitan AI: keduanya sama-sama menampilkan organ dari dekat, tapi hanya
- * yang pertama merupakan geometri manusia rujukan, dan tiap bagiannya bernama.
+ * Potongan rujukan saja. Model bangkitan AI tidak masuk layar pertama.
+ * `kunci` boleh id berkas atau focusKey organ.
  */
+export function modelRujukan(kunci: string): OrganModel | undefined {
+  if (!kunci.trim()) return undefined
+  return daftarModelRujukan().find((m) => m.focusKey === kunci || m.id === kunci)
+}
+
+const UTAMA: OrganModel[] = [
+  { id: 'jantung-ruang', focusKey: 'heart', label: 'Heart', scientificName: 'Cor', accent: '#ee7c6a', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 14, berkas: 'atlas/jantung-ruang.glb' },
+  { id: 'paru', focusKey: 'lungs', label: 'Lungs', scientificName: 'Pulmo', accent: '#d98a8a', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 13, berkas: 'atlas/paru.glb' },
+  { id: 'nefrologi', focusKey: 'kidneys', label: 'Kidneys', scientificName: 'Ren', accent: '#b08fbf', illustrated: false, hotspots: [], sumber: 'bodyparts3d', jumlahBagian: 14, berkas: 'atlas/nefrologi.glb' },
+  { id: 'tiroid', focusKey: 'thyroid', label: 'Thyroid', scientificName: 'Glandula thyroidea', accent: '#d9a441', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 10, berkas: 'atlas/tiroid.glb' },
+  { id: 'telinga', focusKey: 'ear', label: 'Ear', scientificName: 'Auris', accent: '#c99277', illustrated: false, hotspots: [], sumber: 'z-anatomy', jumlahBagian: 21, berkas: 'atlas/telinga.glb' },
+  { id: 'obgin', focusKey: 'obgin', label: 'Female pelvis', scientificName: 'Pelvis feminina', accent: '#c58f9a', illustrated: false, hotspots: [], sumber: 'hubmap', jumlahBagian: 9, berkas: 'atlas/obgin.glb' },
+]
+
+/** Setiap potongan rujukan yang boleh ditampilkan sebagai organ dari dekat. */
+export function daftarModelRujukan(): OrganModel[] {
+  const sudah = new Set(UTAMA.map((m) => m.focusKey))
+  return [
+    ...UTAMA,
+    ...ORGAN_ATLAS.filter((m) => m.sumber === 'bodyparts3d' && !sudah.has(m.focusKey)),
+  ]
+}
+
 export function modelForFocus(focusKey: string): OrganModel | undefined {
-  return ORGAN_ATLAS.find((m) => m.focusKey === focusKey)
-    ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
+  return modelRujukan(focusKey) ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
+}
+
+/** Satu kalimat asal, sesuai berkas yang benar-benar dimuat. */
+export function catatanModel(m: OrganModel): string {
+  const n = m.jumlahBagian
+  const hitung = n == null ? '' : n === 1 ? 'One named structure. ' : `${n} named structures. `
+  const batas = 'It is not this person’s anatomy, and the source revision of the cut is not pinned.'
+  if (m.sumber === 'z-anatomy') {
+    return `${hitung}Reference cut from Z-Anatomy (CC BY-SA 4.0), the same family as the full-body figure. ${batas}`
+  }
+  if (m.sumber === 'hubmap') {
+    return `${hitung}Reference cut from the HuBMAP Visible Human female pelvis (CC BY 4.0). ${batas} The male BodyParts3D figure does not include these organs.`
+  }
+  if (m.sumber === 'bodyparts3d') {
+    return `${hitung}Reference cut from BodyParts3D 4.0 (CC BY 4.0). ${batas}`
+  }
+  return 'AI-generated shape approximation (Tripo). It is not verified anatomy. The full-body figure uses reference anatomy.'
 }
 
 /** Model bangkitan AI saja — dipakai untuk mencari ilustrasi /organs/<id>/. */
