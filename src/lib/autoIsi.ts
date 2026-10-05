@@ -4,6 +4,7 @@ import { getDemoTersimpan, mergeDemoStored, mergeHealthCache, type Demo } from '
 import { nilaiWajar, saringProfil, KE_DEMO } from './autoIsiFilter'
 import { parseWorkouts, parseHrNotifications } from './workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from './workoutStore'
+import { allowsPersonalHealthStorageScope, parsePersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auto-isi lintas fitur.
@@ -48,6 +49,17 @@ let sudahJalan = false
 let pemantauTerpasang = false
 let sedangJalan: Promise<number> | null = null
 let lastTriggeredAt = 0
+let activeSession: string | null = null
+
+// Private run identity: never log the remembered session or authentication token.
+function deviceSyncSession(): string | null {
+  try {
+    const raw = localStorage.getItem('panaceamed.session.v1')
+    const scope = parsePersonalHealthStorageScope(raw, Date.now())
+    if (scope.kind !== 'account' || !allowsPersonalHealthStorageScope(scope)) return null
+    return JSON.stringify([raw, localStorage.getItem('pmd-token')])
+  } catch { return null }
+}
 
 function bacaStatus(): AutoSyncStatus {
   const fallback: AutoSyncStatus = {
@@ -83,9 +95,10 @@ function denganBatasWaktu<T>(promise: Promise<T>, ms = REQUEST_TIMEOUT_MS): Prom
   ])
 }
 
-async function cobaUlang<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+async function cobaUlang<T>(fn: () => Promise<T>, attempts = 3, current: () => boolean): Promise<T> {
   let terakhir: unknown
   for (let i = 0; i < attempts; i++) {
+    if (!current()) throw new Error('sync_session_changed')
     try {
       return await denganBatasWaktu(fn())
     } catch (e) {
@@ -101,10 +114,11 @@ async function cobaUlang<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
  * menulis atau storage backend baru bangun. Kosong dianggap "belum ada jawaban"
  * dan dicoba lagi; tidak pernah dianggap perintah untuk mengosongkan layar.
  */
-async function tarikProfilDenganRetry(): Promise<Record<string, unknown>> {
+async function tarikProfilDenganRetry(current: () => boolean): Promise<Record<string, unknown>> {
   let lastEmpty: Record<string, unknown> = {}
   let lastError: unknown
   for (let i = 0; i < 3; i++) {
+    if (!current()) return {}
     try {
       const p = await denganBatasWaktu(api.getHealthProfile()) as Record<string, unknown>
       if (p && typeof p === 'object') {
@@ -191,7 +205,7 @@ function terapkanProfil(profil: Record<string, unknown>): number {
  * bungkus kembali ke {data:{workouts}} agar parser manual yang sudah teruji bisa
  * dipakai ulang; tidak ada format kedua yang perlu dipelihara.
  */
-async function tarikWorkoutDanNotifikasi(): Promise<{
+async function tarikWorkoutDanNotifikasi(current: () => boolean): Promise<{
   workoutsPulled: number
   notificationsPulled: number
   errors: string[]
@@ -201,9 +215,11 @@ async function tarikWorkoutDanNotifikasi(): Promise<{
   let notificationsPulled = 0
 
   const [w, n] = await Promise.allSettled([
-    cobaUlang(() => api.deviceWorkouts(), 2),
-    cobaUlang(() => api.deviceHrNotifications(), 2),
+    cobaUlang(() => api.deviceWorkouts(), 2, current),
+    cobaUlang(() => api.deviceHrNotifications(), 2, current),
   ])
+
+  if (!current()) return { workoutsPulled: 0, notificationsPulled: 0, errors: [] }
 
   if (w.status === 'fulfilled') {
     workoutsPulled = w.value.count ?? w.value.workouts.length
@@ -260,6 +276,16 @@ function pasangPemantau() {
  */
 export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
   if (!backendEnabled) return 0
+  const session = deviceSyncSession()
+  if (session === null) return 0
+  // A new login must not inherit a previous account's success, throttle or promise.
+  if (session !== activeSession) {
+    activeSession = session
+    sudahJalan = false
+    lastTriggeredAt = 0
+    sedangJalan = null
+  }
+  const current = () => activeSession === session && deviceSyncSession() === session
   pasangPemantau()
 
   // Jangan membuat beberapa request identik saat focus + online + visibility
@@ -271,7 +297,7 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
   if (sudahJalan && paksa && nowMs - lastTriggeredAt < MIN_TRIGGER_GAP_MS) return 0
   lastTriggeredAt = nowMs
 
-  sedangJalan = (async () => {
+  const run = (async () => {
     const attemptAt = new Date().toISOString()
     tulisStatus({ state: 'syncing', lastAttempt: attemptAt, errors: [] })
 
@@ -285,14 +311,17 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
     let profileMeaningful = false
 
     try {
-      const profil = await tarikProfilDenganRetry()
+      const profil = await tarikProfilDenganRetry(current)
+      if (!current()) return 0
       jumlah = terapkanProfil(profil)
       profileMeaningful = jumlah > 0
     } catch (e) {
       errors.push(`profile: ${String((e as Error)?.message ?? 'unavailable')}`)
     }
 
-    const sekunder = await tarikWorkoutDanNotifikasi()
+    if (!current()) return 0
+    const sekunder = await tarikWorkoutDanNotifikasi(current)
+    if (!current()) return 0
     errors.push(...sekunder.errors)
 
     const adaData = profileMeaningful || sekunder.workoutsPulled > 0 || sekunder.notificationsPulled > 0
@@ -315,10 +344,11 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
     // panggilan biasa berikutnya juga masih boleh mencoba tanpa menunggu timer.
     return jumlah
   })().finally(() => {
-    sedangJalan = null
+    // A late old run must not release the newer session's in-flight guard.
+    if (sedangJalan === run) sedangJalan = null
   })
-
-  return sedangJalan
+  sedangJalan = run
+  return run
 }
 
 /** Dipanggil setelah unggah/sinkronisasi manual agar tidak perlu memuat ulang. */

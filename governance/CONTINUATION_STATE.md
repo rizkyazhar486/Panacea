@@ -1,5 +1,33 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
+### Current checkpoint — 2026-10-05, total verified completion directive
+
+- Live canonical main: `3982779b60cf370d45c8ec8a2906b616839eb68a`, squash of #2271.
+  Its tree `974866828486fb7bd956b6c657dff1bc9eba32a5` matches accepted PR head
+  `adbe9649e9666b5366b17bf1eead4fd8ca35544b`. Exact-head Validate (both jobs),
+  Stabilization (both jobs), Body 3D, Clinical Evidence and both Security gates passed.
+  Review is recorded at that exact head; expected-head squash merge succeeded.
+- Independent local verification of that same tree: build (524 QA tests), 664/664 uji,
+  architecture boundaries/ratchet and focused data-sync regression passed.
+  Canonical post-merge acceptance remains separate evidence: inspect its current runs.
+  Clinical Evidence run `37357986508` cancelled during checkout, before validation;
+  its cancelled job was retried rather than treating the skipped clinical step as green.
+- Active bounded repair: `fix/sync-reject-stale-device-responses`, based on that main.
+  RED: delayed A profile applied after remembered/mounted session became B.
+  Root cause: async autoIsi responses and module-global success/in-flight flags lacked
+  starting-session binding. Ten targeted regressions, 534/534 QA tests, 664/664 uji,
+  production build, TypeScript and architecture/ratchet pass locally. Exact-head
+  review/CI/merge/canonical verification remain required before completion.
+- Follow-up P0 candidates, not yet repaired: legacy `pmd_health_profile`/`pmd_profile`
+  direct reads/writes, workout/alert ownership, manual HealthProfile async callbacks,
+  and `mergeVitals`' deferred global vitals-history write. Do not claim all personal
+  stores are isolated because labs/current vitals or automatic sync are guarded.
+- Open PR audit at start: 15 PRs including #2271; #2271's two changed files had no
+  overlap with the other 14. Re-query live PRs before any next modification.
+- No completion percentage or fixed-point claim is supported. Revalidate every stored
+  SHA/status against GitHub before resuming; older checkpoint sections are historical.
+
+
 Updated 2026-10-03 (autonomous Final Convergence session; autopilot handoff section added at the end). Sequencing per `docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md` (weakest important system first); gap sources `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml`, `governance/RND_BACKLOG.yaml`. Every number below was measured in this session; re-measure before relying on it.
 
 main_sha: cd4313961 (the #2227 merge). Its Stabilization and Body 3D acceptance runs were still in progress when this was written; the last head with all six workflows completed green was a090b6ac0 (#2225). Commits since 8606bade8: calculator input validation (#2217-#2224, #2227), the Body3D smoke failure log (#2225) and docs.
