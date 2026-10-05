@@ -248,3 +248,29 @@ are retained as the durable state rather than creating duplicate governance.
 - Production repair commit `601acf40693108739c21d2869ccfd39204a7abc3` normalizes only local/offline patient/doctor fallback identities at the store login boundary. Server-provided ids remain authoritative; ambiguous personal cache sessions remain fail-closed; legacy unowned payloads are not adopted.
 - Local identities use an explicit `local:` namespace plus the full normalized email to avoid the legacy truncated-key collision class. Patient subject identity is then derived from that stable account id; local doctors receive the same `p1` subject convention used by the server adapter.
 - Final completion still requires GREEN on the browser regression and fresh exact-head Validate, Stabilization, Body 3D, Clinical Evidence, Security Enforcement, Security Inventory, plus Shared Longitudinal Snapshot, followed by expected-head merge and canonical-main verification.
+
+### Personal workout ownership lane — 2026-10-05
+
+- Live canonical main inspected at `6e9d8c6d9942beb27d46ca8881d6103c34340efc` (#2273).
+  #2271 non-finite biometric rejection and #2272 device-response session continuity
+  have successful canonical-main verification. #2273 owned vitals history is merged;
+  five canonical workflows passed, while Stabilization server acceptance was cancelled
+  with no steps executed and is queued after a targeted rerun. It is not counted green.
+- API #2274 exact head `30d07b738c98cf7818da8e20d736df6e6cc4427c` has five successful
+  workflows plus successful full Stabilization acceptance. Its cancelled, unstarted server
+  job was rerun and remains pending. Merge is held for fresh complete evidence.
+- Workout branch `fix/workouts-isolate-personal-history` scopes workouts/HR alerts to
+  validated account+patient envelopes, preserves unowned anonymous arrays, rejects
+  mounted-owner mismatches and guards writes against normalization-time replacement.
+  The connected WorkoutHistory aggregate now retains originating raw session+token
+  throughout both requests; same-owner session renewal discards previously fulfilled
+  responses before publication. 15 targeted tests passed; removing the publication guard
+  reproduced two failures. Independent engineering review found no bounded blocker.
+- Next gates: final committed-tree build/uji, exact-head CI, expected-head review/merge,
+  and canonical verification. Unmerged branches do not count as verified completion.
+- P0 residuals: HealthProfile asynchronous file/image import continuity and unowned
+  health-profile cache; shared profile hydration and broader AppState tenancy require
+  separate ownership review. Scoped workout/history stores do not close these gaps.
+- Existing stale PRs remain classified for audit, not silently superseded: #1827, #1745,
+  #1713, #1681 and drafts #1877, #1770, #1768, #1767, #1758, #1001, #925, #760, #651, #395.
+  Check live heads/overlap before reconciliation. No deployment or clinical assurance claim.
