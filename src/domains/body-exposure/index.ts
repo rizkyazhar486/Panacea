@@ -51,6 +51,7 @@ export {
   type ExplodeVec3,
 } from './engine/explodedLayout'
 
+export { kalimatPertama } from './engine/kalimatPertama'
 export { classifyTissue, tissueShading, type TissueClass, type TissueShading } from './engine/tissueShading'
 export { matchBakedAo, aoToVertexColors, type AoLayerEntry, type AoMatch } from './engine/bakedAo'
 export { applyBakedAoToLayer } from './adapters/bakedAoLayer'

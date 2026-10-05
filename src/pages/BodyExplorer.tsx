@@ -12,7 +12,7 @@ import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
-import { penjelasanTertulis } from '../lib/explainFallback'
+import { kalimatPertama, penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
@@ -624,10 +624,19 @@ export function BodyExplorer() {
           dissect={dissect}
           motion={motion}
           onPick={onPickStructure}
+          stageClassName="relative mb-2 h-[calc(100svh-24.5rem)] max-h-[560px] min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950"
         />
 
         <p className="mt-1 text-center text-[10px] text-neutral-400">
           Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
+        </p>
+        <p id="fakta-atlas" className="mx-auto mt-2 max-w-md text-center text-[13px] font-semibold leading-snug text-ink dark:text-white">
+          {selectedLabel || 'Reference atlas'}
+        </p>
+        <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-relaxed text-neutral-500">
+          {selectedLabel
+            ? (kalimatPertama(explanation) || 'No written fact is available for this name.')
+            : 'Search or tap a structure. This is reference geometry, and the upstream cut is not pinned to a source commit.'}
         </p>
         <Fold label="Modality">
         {/* Modalitas pencitraan — deret tunggal tepat di bawah viewer, karena

@@ -309,6 +309,7 @@ export function Shell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('panacea:cari', on)
   }, [])
   const [bantuanBuka, setBantuanBuka] = useState(false)
+  const [masukDariAtlas, setMasukDariAtlas] = useState(false)
 
   // Kembali mengikuti ALUR HALAMAN, bukan sekadar satu langkah mundur di
   // riwayat. Alasannya ada di lib/alurHalaman.ts: riwayat sering tidak seperti
@@ -427,6 +428,21 @@ export function Shell({ children }: { children: ReactNode }) {
   // Shell karena leluhurnya di sini memakai stacking context sendiri —
   // jadi baris ini melewati Shell sepenuhnya untuk rute ini saja.
   if (loc.pathname === '/design-demo') return <>{children}</>
+
+  // The reference atlas is educational geometry, not a patient record.
+  // It stays reachable before sign-in so the first screen is the body, not the marketing page.
+  if (!account && loc.pathname === '/body-explorer') {
+    if (masukDariAtlas) return <Login onBack={() => setMasukDariAtlas(false)} />
+    return (
+      <div className="min-h-screen bg-[#070b10] text-white">
+        <header className="flex items-center justify-between gap-3 px-3 py-2">
+          <Link to="/" className="min-h-11 text-sm font-black tracking-tight">Panaceamed.id</Link>
+          <button type="button" onClick={() => setMasukDariAtlas(true)} className="min-h-11 rounded-full border border-white/15 px-3 text-xs font-bold">Sign in</button>
+        </header>
+        <main className="px-3 pb-8">{children}</main>
+      </div>
+    )
+  }
 
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
