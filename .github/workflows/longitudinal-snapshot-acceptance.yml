@@ -7,6 +7,8 @@ on:
       - 'src/lib/longitudinalSnapshot.ts'
       - 'src/lib/store.tsx'
       - 'src/main.tsx'
+      - 'src/pages/HealthProfile.tsx'
+      - 'src/domains/personal-health/**'
       - 'scripts/qa/longitudinal-*'
       - 'scripts/uji/longitudinal-snapshot.mts'
       - '.github/workflows/longitudinal-snapshot-acceptance.yml'
@@ -17,6 +19,8 @@ on:
       - 'src/lib/longitudinalSnapshot.ts'
       - 'src/lib/store.tsx'
       - 'src/main.tsx'
+      - 'src/pages/HealthProfile.tsx'
+      - 'src/domains/personal-health/**'
       - 'scripts/qa/longitudinal-*'
       - 'scripts/uji/longitudinal-snapshot.mts'
       - '.github/workflows/longitudinal-snapshot-acceptance.yml'
@@ -48,3 +52,4 @@ jobs:
             sleep 1
           done
           node scripts/qa/longitudinal-snapshot-smoke.mjs
+          node scripts/qa/longitudinal-health-import-smoke.mjs

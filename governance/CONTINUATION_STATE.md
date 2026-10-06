@@ -324,3 +324,28 @@ are retained as the durable state rather than creating duplicate governance.
   are underway; fresh canonical acceptance remains outstanding. Do not infer observed
   deployment health from workflow success. Keep remaining profile/load/save and wider
   AppState ownership gaps in the P0 ledger.
+
+### Reconstructed HealthProfile import guard — 2026-10-06
+
+- Prepared branch fix/import-session-continuity depends on #2275's accepted workout
+  tree; do not duplicate its scope in a main-targeted PR before that dependency lands.
+- Fresh reconstruction binds file/image imports to the mounted form account,
+  original remembered session/token and operation generation. Text is read once;
+  image recognition cannot begin after a stale FileReader completion. Results,
+  errors and cleanup from invalidated imports cannot update a replacement form.
+- Eight deterministic adapter/parser/store regressions passed. Real mounted
+  HealthProfile browser acceptance passed cross-owner file/unmount rejection,
+  same-owner session renewal without unmount, valid current import, and blocked
+  delayed image recognition. In an isolated baseline checkout, the same browser
+  regression reproduced a real A-to-B workout write before the guard.
+- Production build passed (587 QA), 664/664 uji files passed, architecture and
+  ratchet passed. Independent engineering review found no bounded blocker, subject
+  to final exact-head CI and canonical verification. Browser acceptance is wired
+  into the existing longitudinal snapshot workflow without removing its coverage.
+- HealthProfile load/save continuity, shared/global profile and other page caches,
+  broader tenancy, chronology/vendor accuracy and qualified clinical assurance
+  remain outside this bounded import repair. An image request legitimately started
+  before replacement may remain in flight; its late result is rejected.
+- Next: finish #2275 exact-head gates, expected-head merge, verify canonical main;
+  synchronize this dependent branch, create its PR and require fresh seven-workflow
+  evidence including mounted UI acceptance. Unmerged code remains incomplete.
