@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { toPublicAiFailure, validateAiProxyRequest } from '../src/aiRequestPolicy.js'
-import { buildSyntheticClinicalContext, resetSyntheticClinicalRagForTests } from '../src/syntheticClinicalRag.js'
+import { buildSyntheticClinicalContext, resetSyntheticClinicalRagForTests } from '../src/domains/clinical/syntheticClinicalRag.js'
 
 const valid = validateAiProxyRequest({
   model: 'claude-sonnet-4-6',

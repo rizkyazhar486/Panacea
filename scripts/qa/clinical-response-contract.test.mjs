@@ -48,8 +48,10 @@ test('clinical-photo vision separates visible facts from unseen examination', ()
 })
 
 test('detailed clinical output has adequate generation headroom', () => {
-  assert.match(ai, /callClaude\(settings, msgs, sysExtra, '', 3600\)/)
-  assert.match(ai, /callClaude\(settings, msgs, EMR_FRAMEWORK, '', 4096\)/)
+  assert.match(ai, /callClaude\(\s*settings,\s*msgs,\s*sysExtra,\s*'',\s*3600,/)
+  assert.match(ai, /purpose: 'chatbot'/)
+  assert.match(ai, /callClaude\(\s*settings,\s*msgs,\s*EMR_FRAMEWORK,\s*'',\s*4096,/)
+  assert.match(ai, /purpose: 'ai-emr'/)
   assert.match(serverAi, /max_tokens: 2600/)
 })
 
