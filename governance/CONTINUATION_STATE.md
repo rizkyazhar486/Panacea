@@ -298,3 +298,29 @@ are retained as the durable state rather than creating duplicate governance.
   #1770, #1768, #1767, #1758, #1001, #925, #760, #651, #395. No obsolete PR is closed
   without current evidence. Clinical/vendor/chronology assurance and observed
   production health remain unestablished. No completion fixed-point claim.
+
+### Recovery and workout acceptance fixture — 2026-10-06
+
+- Live main remains fc122cd80051db7b6e1aa4f5bd1fbefb2539c4b5; #2275 remains open at
+  5c01403f253bf12b6f09069be900284cf5fe1665 before this repair. No overlapping open PR
+  owns the share-card smoke initializer or its new regression test.
+- Execution runtime recovered, but old local checkouts and unpublished import work are
+  absent. GitHub work was restored by cloning. The previously local HealthProfile
+  repair must be reconstructed and validated anew; old review is not acceptance of
+  code that is absent from this checkout.
+- Exact-head Body 3D run 37366674818 failed at share-card export: the actual fixture
+  lacked stable account/subject identity and seeded an unowned global workout array.
+  New production ownership checks correctly denied that setup. Repair seeds the same
+  mounted QA account's versioned envelope; no production safety guard or export
+  assertion was weakened. Real fixture initializer + workout store tests reproduced
+  one failure before repair and pass current-owner visibility/foreign-owner rejection.
+- Independent read-only engineering review found no bounded blocker. Actual browser
+  export and new exact-head CI remain required. Production build passed (579 QA),
+  664/664 uji files passed, architecture and ratchet passed. Real mobile browser
+  smoke passed: export canvas generated, share chip excluded, and footer/text
+  separation preserved. Font-provider requests failed locally, so the existing
+  smoke explicitly did not certify font loading; no assertion was removed.
+- Main's interrupted jobs were cancelled, without validator failures. Targeted reruns
+  are underway; fresh canonical acceptance remains outstanding. Do not infer observed
+  deployment health from workflow success. Keep remaining profile/load/save and wider
+  AppState ownership gaps in the P0 ledger.

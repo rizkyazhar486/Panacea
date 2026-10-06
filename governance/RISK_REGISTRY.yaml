@@ -6,6 +6,22 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.personal_workout_history_ownership
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Unowned workout and heart-rate alert arrays can be read or cleared by another
+      account, and aggregate responses can outlive the login that initiated them.
+    mitigation: >-
+      Candidate PR 2275 uses validated account-plus-subject envelopes, mounted-scope
+      checks and originating session/token continuity for aggregate publication.
+      Anonymous legacy arrays are preserved without adoption. Browser acceptance
+      fixtures now use the same owned schema; final exact-head CI and canonical
+      verification remain pending. Manual HealthProfile imports, global profiles and
+      broader tenancy remain independently unresolved.
+    evidence: [src/lib/workoutStore.ts, src/pages/WorkoutHistory.tsx, src/domains/personal-health/adapters/operation.ts, scripts/qa/workout-store-owner.test.mjs, scripts/qa/share-card-owner-fixture.test.mjs]
+
   - risk_id: risk.api_session_continuity
     category: privacy
     severity: high
