@@ -41,9 +41,13 @@ const tema = process.env.SHARE_QA_THEME || 'light'
 const browser = await chromium.launch({ headless: true, executablePath: process.env.SHARE_QA_CHROME || undefined })
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })
 await context.addInitScript((payload) => {
-  const account = { email: 'share-qa@localhost.test', name: 'Share QA', role: 'pasien', isSubscriber: false, loggedAt: new Date().toISOString(), sex: 'L', dob: '1995-01-01' }
+  const account = { id: 'share-qa-account', patientId: 'share-qa-patient', email: 'share-qa@localhost.test', name: 'Share QA', role: 'pasien', isSubscriber: false, loggedAt: new Date().toISOString(), sex: 'L', dob: '1995-01-01' }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
-  localStorage.setItem('pmd_workouts_v1', JSON.stringify([payload]))
+  // This fixture is owned by the same account/subject as the mounted application.
+  const scope = encodeURIComponent(JSON.stringify([account.id, account.patientId]))
+  localStorage.setItem(`pmd_workouts_v1:scope_v1:${scope}`, JSON.stringify({
+    version: 1, ownerAccountId: account.id, subjectId: account.patientId, items: [payload],
+  }))
   // Tema diuji pada dua sisi: kartu ini memakai warna teks terang, jadi latar
   // yang diukur harus ikut gelap -- kalau tidak, gambar keluar abu-abu di atas
   // putih dan nyaris tak terbaca.
