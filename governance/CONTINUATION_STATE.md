@@ -349,3 +349,10 @@ are retained as the durable state rather than creating duplicate governance.
 - Next: finish #2275 exact-head gates, expected-head merge, verify canonical main;
   synchronize this dependent branch, create its PR and require fresh seven-workflow
   evidence including mounted UI acceptance. Unmerged code remains incomplete.
+
+### Canonical workout merge and dependent import synchronization — 2026-10-06
+
+- #2275 merged with expected head d24b058115f637fa93967cc30c3d566008dfad18 after all six exact-head workflows succeeded and independent review had no unresolved blocker.
+- Canonical main 7f22f1a88e679570d729a4e0bff8ed7d8f428d09 has accepted tree e4772a342bb59c46f1aa65d38dadf13713202eff and expected parent fc122cd80051db7b6e1aa4f5bd1fbefb2539c4b5. Post-merge workflows are running; canonical verification remains outstanding.
+- Import branch merged canonical main without rewriting published history. Squash ancestry produced four conflicts; preserved the reviewed import additions after checking each conflict against the accepted dependency tree. Fresh validation and seven exact-head workflows remain required before acceptance.
+- #2274 canonical workflows have all succeeded. P0 profile/cache ownership and HealthProfile load/save continuity remain next independent work; no completion fixed-point claim.
