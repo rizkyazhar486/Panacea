@@ -314,7 +314,14 @@ export function HealthProfile() {
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
-          <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
+          <Button onClick={() => {
+            const input = fileRef.current
+            if (!input) return
+            // Clear only on the user's new picker action. Stale async cleanup stays
+            // guarded below so it cannot clear a newer selection.
+            input.value = ''
+            input.click()
+          }} className="!px-4">Choose export file…</Button>
           <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
           <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
