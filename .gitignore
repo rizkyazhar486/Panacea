@@ -63,3 +63,8 @@ artifacts/
 # sisa sesi, bukan sesuatu yang ingin dibagikan.
 *.tmp.mjs
 *.tmp.js
+
+# Pinned synthetic clinical RAG artifact: provenance stays in Git; the 75 MB
+# JSONL and interrupted downloads are reproducible build/runtime artifacts.
+server/data/clinical-rag/*.jsonl
+server/data/clinical-rag/*.partial

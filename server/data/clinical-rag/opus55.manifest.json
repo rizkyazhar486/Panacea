@@ -1,0 +1,36 @@
+{
+  "id": "nisten_opus55_doctor_patient",
+  "dataset": "nisten/opus5-5-doctor-patient-conversations-all-human-diseases",
+  "revision": "59b4f0a01688ede69fbdc37a14b961ff232668e1",
+  "filename": "opus5-5diseaseconversations.jsonl",
+  "downloadUrl": "https://huggingface.co/datasets/nisten/opus5-5-doctor-patient-conversations-all-human-diseases/resolve/59b4f0a01688ede69fbdc37a14b961ff232668e1/opus5-5diseaseconversations.jsonl",
+  "sha256": "f828c30cee7006a3cf5b88909f9b865688f98b11d4c886108b9b9a39e5402e0b",
+  "bytes": 75312131,
+  "records": 2194,
+  "retrievalFields": [
+    "name",
+    "aliases",
+    "search",
+    "description",
+    "icd10",
+    "body_systems",
+    "pubmed_refs",
+    "common_mistakes",
+    "differential_diagnosis",
+    "executive_summary"
+  ],
+  "excludedFromPrompt": [
+    "conversation",
+    "clinician_persona",
+    "patient_scenario",
+    "related_drugs",
+    "drug_interactions",
+    "food_interactions"
+  ],
+  "safety": {
+    "truthClass": "synthetic-research-context",
+    "mayWritePatientTruth": false,
+    "mayBeSoleClinicalEvidence": false,
+    "primarySourceVerificationRequired": true
+  }
+}

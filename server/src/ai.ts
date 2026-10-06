@@ -2,7 +2,8 @@ import type { Request, Response } from 'express'
 import type { User } from './store.js'
 import { balance, credit, getStats, listManualTopups, listDoctors, getAudit } from './store.js'
 import { config } from './config.js'
-import { toPublicAiFailure, validateAiProxyRequest } from './aiRequestPolicy.js'
+import { MAX_AI_SYSTEM_CHARS, toPublicAiFailure, validateAiProxyRequest } from './aiRequestPolicy.js'
+import { buildSyntheticClinicalContext } from './syntheticClinicalRag.js'
 
 // Server-side Claude proxy — keeps the Anthropic key on the server so AI works
 // for every signed-in user without anyone pasting a key in the browser.
@@ -207,14 +208,42 @@ export async function aiMessages(req: Request, res: Response) {
   }
   const body = checked.value
   try {
+    let system = body.system
+    let knowledge: Record<string, unknown> | undefined
+
+    if (body.clinicalKnowledgeQuery && body.clinicalKnowledgePurpose) {
+      try {
+        const grounding = await buildSyntheticClinicalContext(
+          body.clinicalKnowledgeQuery,
+          body.clinicalKnowledgePurpose,
+        )
+        const remaining = MAX_AI_SYSTEM_CHARS - system.length - 2
+        if (grounding && remaining >= 512) {
+          system += `\n\n${grounding.context.slice(0, remaining)}`
+          knowledge = {
+            sourceId: grounding.sourceId,
+            revision: grounding.revision,
+            truthClass: grounding.truthClass,
+            purpose: grounding.purpose,
+            hitCount: grounding.hitCount,
+            hits: grounding.hits,
+          }
+        }
+      } catch (error) {
+        // Synthetic RAG is supplemental. A missing/corrupt third-party artifact
+        // must never make the core Chatbot or AI-EMR unavailable.
+        console.warn('[clinical-rag] supplemental retrieval unavailable:', error instanceof Error ? error.message : 'unknown_error')
+      }
+    }
+
     const text = await callAnthropic(
       body.model || 'claude-sonnet-4-6',
-      body.system,
+      system,
       body.messages as Msg[],
       body.maxTokens,
       body.json,
     )
-    res.json({ text })
+    res.json({ text, ...(knowledge ? { knowledge } : {}) })
   } catch (e) {
     respondWithSafeAiFailure(res, e)
   }

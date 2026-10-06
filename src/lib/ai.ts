@@ -79,10 +79,22 @@ async function callClaude(
   systemExtra = '',
   modelOverride = '',
   maxTokens = 2048,
+  clinicalKnowledge?: { query: string; purpose: 'chatbot' | 'ai-emr' },
 ): Promise<string> {
   const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
   const model = modelOverride || settings.model
-  const { text } = await api.aiMessages({ model, system, messages, max_tokens: maxTokens })
+  const { text } = await api.aiMessages({
+    model,
+    system,
+    messages,
+    max_tokens: maxTokens,
+    ...(clinicalKnowledge
+      ? {
+          clinical_knowledge_query: clinicalKnowledge.query,
+          clinical_knowledge_purpose: clinicalKnowledge.purpose,
+        }
+      : {}),
+  })
   return text || '(no response)'
 }
 
@@ -98,7 +110,15 @@ export async function sendChat(
   try {
     // Full clinical syntheses (case workup / image follow-up / "what is this?")
     // need enough headroom for the complete anamnesis→assessment→plan contract.
-    return await callClaude(settings, msgs, sysExtra, '', 3600)
+    const knowledgeQuery = [...history].reverse().find((m) => m.role === 'user')?.content.slice(-2000) || ''
+    return await callClaude(
+      settings,
+      msgs,
+      sysExtra,
+      '',
+      3600,
+      knowledgeQuery ? { query: knowledgeQuery, purpose: 'chatbot' } : undefined,
+    )
   } catch (e) {
     // Surface a clear message when the server-side rate limit is hit, rather
     // than silently dropping to scripted text.
@@ -223,7 +243,20 @@ export async function draftEMR(
     },
   ]
   try {
-    const raw = await callClaude(settings, msgs, EMR_FRAMEWORK, '', 4096)
+    const knowledgeQuery = history
+      .filter((m) => m.role === 'user')
+      .slice(-4)
+      .map((m) => m.content)
+      .join('\n')
+      .slice(-2000)
+    const raw = await callClaude(
+      settings,
+      msgs,
+      EMR_FRAMEWORK,
+      '',
+      4096,
+      knowledgeQuery ? { query: knowledgeQuery, purpose: 'ai-emr' } : undefined,
+    )
     return normalizeEMRDraft(extractJson(raw))
   } catch {
     return demoDraft(ctx)
