@@ -3,7 +3,7 @@ import type { User } from './store.js'
 import { balance, credit, getStats, listManualTopups, listDoctors, getAudit } from './store.js'
 import { config } from './config.js'
 import { MAX_AI_SYSTEM_CHARS, toPublicAiFailure, validateAiProxyRequest } from './aiRequestPolicy.js'
-import { buildSyntheticClinicalContext } from './syntheticClinicalRag.js'
+import { buildSyntheticClinicalContext } from './domains/clinical/syntheticClinicalRag.js'
 
 // Server-side Claude proxy — keeps the Anthropic key on the server so AI works
 // for every signed-in user without anyone pasting a key in the browser.

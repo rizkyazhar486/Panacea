@@ -1,6 +1,6 @@
 {
   "id": "nisten_opus55_doctor_patient",
-  "name": "Opus 5.5 Doctor-Patient Conversations \u2014 All Human Diseases",
+  "name": "Opus 5.5 Doctor-Patient Conversations — All Human Diseases",
   "category": "clinical-data",
   "kind": [
     "dataset"
@@ -27,13 +27,13 @@
   "license": {
     "status": "CHECK_REQUIRED",
     "identifier": "Apache-2.0 in current Hub metadata; README prose still says MIT",
-    "commercialUse": "ALLOWED",
+    "commercialUse": "CONDITIONAL",
     "attributionRequired": true,
     "shareAlike": false,
-    "scope": "Both Apache-2.0 and MIT are permissive and allow commercial use, but the dataset page currently exposes inconsistent license labels. Panacea preserves attribution and treats the exact license identifier as unresolved until the publisher makes the card internally consistent.",
+    "scope": "Apache-2.0 in current Hub metadata and MIT in README prose are each permissive, but the dataset page is internally inconsistent. Panacea therefore treats downstream commercial redistribution/use as conditional on re-verifying the publisher's canonical license labeling at the pinned revision; attribution is preserved either way.",
     "verificationUrl": "https://huggingface.co/datasets/nisten/opus5-5-doctor-patient-conversations-all-human-diseases",
     "verifiedAt": null,
-    "notes": "Do not remove source attribution. Re-check license metadata before redistributing the raw dataset or packaging it into a separately distributed model/artifact."
+    "notes": "Do not remove source attribution. Re-check the dataset card before commercial redistribution or packaging; Panacea does not treat the current inconsistent labels as a VERIFIED license state."
   },
   "validation": {
     "level": "RESEARCH",
@@ -49,7 +49,7 @@
   "adapter": {
     "status": "PROTOTYPE",
     "normalizedTarget": "SyntheticClinicalRetrievalHint",
-    "module": "server/src/syntheticClinicalRag.ts",
+    "module": "server/src/domains/clinical/syntheticClinicalRag.ts",
     "notes": "Local lexical top-k retrieval for Chatbot and AI-EMR. Returned context is marked synthetic-research-only and contains provenance plus PubMed leads. It is additive context only and never writes canonical patient state."
   },
   "trust": {
