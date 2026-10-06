@@ -57,6 +57,14 @@ try {
   },payload.replace('Running','Cycling'))
   assert.deepEqual(await page.evaluate(async()=> (await import('/src/lib/workoutStore.ts')).getWorkouts()),beforeRenewal,'same-owner renewal must reject late file without unmounting')
   await page.evaluate(()=>{File.prototype.text=window.originalFileText})
+  const retryInput=page.locator('input[type=file]').first()
+  assert.equal(await retryInput.evaluate(el=>el.files?.[0]?.name),'renewal.json','stale file remains selected until the user explicitly retries')
+  const chooserPromise=page.waitForEvent('filechooser')
+  await page.getByText('Choose export file…',{exact:true}).click()
+  const chooser=await chooserPromise
+  assert.equal(await retryInput.evaluate(el=>el.files?.length),0,'new picker action must clear stale selection before choosing again')
+  await chooser.setFiles({name:'renewal.json',mimeType:'application/json',buffer:Buffer.from(payload.replace('Running','Cycling'))})
+  await page.waitForFunction(async expected=>(await import('/src/lib/workoutStore.ts')).getWorkouts().length===expected,beforeRenewal.length+1)
   await page.evaluate(async()=>{
     window.visionCalls=0
     const {api}=await import('/src/lib/api.ts')
@@ -73,5 +81,5 @@ try {
   })
   assert.equal(await page.evaluate(()=>window.visionCalls),0,'delayed image must not initiate replacement-session AI upload')
   assert.deepEqual(errors,[])
-  console.log('Real HealthProfile: delayed cross-owner file/unmount rejected, current file imported, delayed image upload blocked')
+  console.log('Real HealthProfile: delayed cross-owner file/unmount rejected, current and same-file retry imported, delayed image upload blocked')
 } finally {await browser.close()}
