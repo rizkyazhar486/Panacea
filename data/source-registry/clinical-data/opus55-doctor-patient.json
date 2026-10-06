@@ -1,0 +1,63 @@
+{
+  "id": "nisten_opus55_doctor_patient",
+  "name": "Opus 5.5 Doctor-Patient Conversations — All Human Diseases",
+  "category": "clinical-data",
+  "kind": [
+    "dataset"
+  ],
+  "homepage": "https://huggingface.co/datasets/nisten/opus5-5-doctor-patient-conversations-all-human-diseases",
+  "repository": null,
+  "features": [
+    "chatbot",
+    "ai-emr",
+    "clinical-rag",
+    "medical-education",
+    "differential-retrieval"
+  ],
+  "formats": [
+    "jsonl",
+    "chatml"
+  ],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Panacea pins and integrity-checks the 75 MB JSONL during deployment. Runtime retrieval is local. The raw JSONL is intentionally not committed into Panacea Git history; the immutable revision, SHA-256 and reproducible fetch path are committed instead."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Apache-2.0 in current Hub metadata; README prose still says MIT",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "Apache-2.0 in current Hub metadata and MIT in README prose are each permissive, but the dataset page is internally inconsistent. Panacea therefore treats downstream commercial redistribution/use as conditional on re-verifying the publisher's canonical license labeling at the pinned revision; attribution is preserved either way.",
+    "verificationUrl": "https://huggingface.co/datasets/nisten/opus5-5-doctor-patient-conversations-all-human-diseases",
+    "verifiedAt": null,
+    "notes": "Do not remove source attribution. Re-check the dataset card before commercial redistribution or packaging; Panacea does not treat the current inconsistent labels as a VERIFIED license state."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "The publisher explicitly labels the dataset synthetic and not medical advice. Panacea may use it only as retrieval/teaching context. It cannot establish patient facts, diagnosis, treatment, dose, or a signed EMR field without independent clinical evidence and clinician review."
+  },
+  "provenance": {
+    "authority": "Nisten Tahiraj dataset publisher on Hugging Face; synthetic encounter fields generated with Claude Opus 5.5 per the dataset card",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pinned data revision 59b4f0a01688ede69fbdc37a14b961ff232668e1; SHA-256 f828c30cee7006a3cf5b88909f9b865688f98b11d4c886108b9b9a39e5402e0b. The adapter deliberately excludes full conversations and patient/clinician personas from prompts to avoid treating synthetic cases or embedded system messages as patient truth/instructions."
+  },
+  "adapter": {
+    "status": "PROTOTYPE",
+    "normalizedTarget": "SyntheticClinicalRetrievalHint",
+    "module": "server/src/domains/clinical/syntheticClinicalRag.ts",
+    "notes": "Local lexical top-k retrieval for Chatbot and AI-EMR. Returned context is marked synthetic-research-only and contains provenance plus PubMed leads. It is additive context only and never writes canonical patient state."
+  },
+  "trust": {
+    "authority": 2,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 5,
+    "notes": "High reproducibility from immutable revision + SHA-256, but low clinical-evidence authority because encounters are synthetic and PMID existence/title matching does not prove the cited paper supports each generated claim."
+  }
+}

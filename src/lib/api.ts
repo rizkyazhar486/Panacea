@@ -423,9 +423,22 @@ export const api = {
     system: string
     messages: { role: 'user' | 'assistant'; content: string }[]
     max_tokens?: number
+    /** Optional local synthetic-research retrieval; never canonical patient truth. */
+    clinical_knowledge_query?: string
+    clinical_knowledge_purpose?: 'chatbot' | 'ai-emr'
     /** Reply will be machine-parsed — ask the provider for a bare JSON object. */
     json?: boolean
-  }) => req<{ text: string }>('/api/ai/messages', { method: 'POST', body: JSON.stringify(payload) }),
+  }) => req<{
+    text: string
+    knowledge?: {
+      sourceId: string
+      revision: string
+      truthClass: 'synthetic-research-context'
+      purpose: 'chatbot' | 'ai-emr'
+      hitCount: number
+      hits: { name: string; icd10: string; score: number }[]
+    }
+  }>('/api/ai/messages', { method: 'POST', body: JSON.stringify(payload) }),
   aiOperator: (mode: 'briefing' | 'content' | 'social' | 'seo' | 'ads' | 'ops') =>
     req<{ text: string; mode: string; pending?: { topups: number; topupIdr: number; doctors: number } }>(
       '/api/ai/operator',

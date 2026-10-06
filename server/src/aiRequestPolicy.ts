@@ -18,6 +18,8 @@ export type ValidAiProxyRequest = {
   messages: ValidatedAiMessage[]
   maxTokens: number
   json: boolean
+  clinicalKnowledgeQuery?: string
+  clinicalKnowledgePurpose?: 'chatbot' | 'ai-emr'
 }
 
 export type AiPolicyFailure = {
@@ -32,7 +34,7 @@ export type AiPolicyResult =
   | AiPolicyFailure
 
 const MAX_MESSAGES = 48
-const MAX_SYSTEM_CHARS = 16_000
+export const MAX_AI_SYSTEM_CHARS = 16_000
 const MAX_TEXT_CHARS = 64_000
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 const MAX_BLOCKS_PER_MESSAGE = 12
@@ -65,12 +67,29 @@ export function validateAiProxyRequest(input: unknown): AiPolicyResult {
   if (body.model !== undefined && (typeof body.model !== 'string' || !ALLOWED_REQUEST_MODELS.has(body.model))) {
     return fail(400, 'unsupported_model')
   }
+
+  const knowledgeQueryRaw = body.clinical_knowledge_query
+  const knowledgePurposeRaw = body.clinical_knowledge_purpose
+  let clinicalKnowledgeQuery: string | undefined
+  let clinicalKnowledgePurpose: 'chatbot' | 'ai-emr' | undefined
+  if (knowledgeQueryRaw !== undefined || knowledgePurposeRaw !== undefined) {
+    if (typeof knowledgeQueryRaw !== 'string' || !knowledgeQueryRaw.trim()) {
+      return fail(400, 'clinical_knowledge_query_required')
+    }
+    if (knowledgeQueryRaw.length > 2_000) return fail(413, 'clinical_knowledge_query_too_large')
+    if (knowledgePurposeRaw !== 'chatbot' && knowledgePurposeRaw !== 'ai-emr') {
+      return fail(400, 'invalid_clinical_knowledge_purpose')
+    }
+    clinicalKnowledgeQuery = knowledgeQueryRaw.trim()
+    clinicalKnowledgePurpose = knowledgePurposeRaw
+  }
+
   const system = typeof body.system === 'string' ? body.system : ''
-  if (system.length > MAX_SYSTEM_CHARS) return fail(413, 'system_prompt_too_large')
+  if (system.length > MAX_AI_SYSTEM_CHARS) return fail(413, 'system_prompt_too_large')
   if (!Array.isArray(body.messages) || body.messages.length === 0) return fail(400, 'messages_required')
   if (body.messages.length > MAX_MESSAGES) return fail(413, 'too_many_messages')
 
-  let textChars = system.length
+  let textChars = system.length + (clinicalKnowledgeQuery?.length ?? 0)
   let imageBytes = 0
   const messages: ValidatedAiMessage[] = []
 
@@ -135,6 +154,8 @@ export function validateAiProxyRequest(input: unknown): AiPolicyResult {
       model: typeof body.model === 'string' ? body.model : undefined,
       system,
       messages,
+      clinicalKnowledgeQuery,
+      clinicalKnowledgePurpose,
       maxTokens: Number.isFinite(requestedTokens)
         ? Math.min(Math.max(Math.floor(requestedTokens), 256), 8192)
         : 2048,

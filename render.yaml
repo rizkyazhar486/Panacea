@@ -9,13 +9,18 @@ services:
     runtime: node
     plan: free
     rootDir: server
-    buildCommand: npm install
+    buildCommand: npm install && node ../scripts/fetch-opus55-clinical-dataset.mjs --optional
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
         value: '20'
+      # Synthetic Opus 5.5 data is retrieval/teaching context only. The build
+      # fetch is integrity-pinned and optional so a third-party outage cannot
+      # block the core deployment.
+      - key: PANACEA_SYNTHETIC_CLINICAL_RAG
+        value: 'true'
       - key: COOKIE_SECURE
         value: 'true'
       # Must list EVERY frontend origin that calls the API (comma-separated, no
