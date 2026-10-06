@@ -213,20 +213,24 @@ export async function aiMessages(req: Request, res: Response) {
 
     if (body.clinicalKnowledgeQuery && body.clinicalKnowledgePurpose) {
       try {
-        const grounding = await buildSyntheticClinicalContext(
-          body.clinicalKnowledgeQuery,
-          body.clinicalKnowledgePurpose,
-        )
         const remaining = MAX_AI_SYSTEM_CHARS - system.length - 2
-        if (grounding && remaining >= 512) {
-          system += `\n\n${grounding.context.slice(0, remaining)}`
-          knowledge = {
-            sourceId: grounding.sourceId,
-            revision: grounding.revision,
-            truthClass: grounding.truthClass,
-            purpose: grounding.purpose,
-            hitCount: grounding.hitCount,
-            hits: grounding.hits,
+        if (remaining >= 512) {
+          const grounding = await buildSyntheticClinicalContext(
+            body.clinicalKnowledgeQuery,
+            body.clinicalKnowledgePurpose,
+            undefined,
+            remaining,
+          )
+          if (grounding) {
+            system += `\n\n${grounding.context}`
+            knowledge = {
+              sourceId: grounding.sourceId,
+              revision: grounding.revision,
+              truthClass: grounding.truthClass,
+              purpose: grounding.purpose,
+              hitCount: grounding.hitCount,
+              hits: grounding.hits,
+            }
           }
         }
       } catch (error) {
