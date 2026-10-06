@@ -6,6 +6,22 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.health_file_import_session_continuity
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Delayed file/image imports can publish into a replacement login or initiate
+      image recognition after ownership changes during local file reading.
+    mitigation: >-
+      Prepared import branch captures form ownership, raw session/token, mount
+      lifetime and import generation. Read-once text and recognition boundary
+      checks reject stale publication and upload initiation. Deterministic and
+      real mounted browser regressions passed; final exact-head CI and canonical
+      verification remain required. This does not certify unchanged HealthProfile
+      load/save, global profiles, broader tenancy or clinical/vendor accuracy.
+    evidence: [src/domains/personal-health/adapters/operation.ts, src/domains/personal-health/adapters/fileImport.ts, src/pages/HealthProfile.tsx, scripts/qa/health-file-session.test.mjs, scripts/qa/longitudinal-health-import-smoke.mjs]
+
   - risk_id: risk.personal_workout_history_ownership
     category: patient_data_integrity
     severity: high

@@ -1,3 +1,4 @@
+import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../domains/personal-health'
 import { useEffect, useRef, useState } from 'react'
 import { Fold } from '../shared/ui/Fold'
 import { Prosa } from '../components/Prosa'
@@ -72,6 +73,13 @@ export function HealthProfile() {
   const [err, setErr] = useState('')
   const [note, setNote] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const importGeneration = useRef(0)
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false; importGeneration.current += 1 }
+  }, [account?.id, account?.patientId])
 
   // Load: server first (per-user), else local. Re-pull from the server on mount
   // AND whenever the tab regains focus, so data pushed from the phone (via the
@@ -150,27 +158,26 @@ export function HealthProfile() {
    * "AI belum aktif" dari "gambar tidak terbaca" — dua hal yang butuh saran
    * berbeda bagi pengguna.
    */
-  async function bacaGambarBia(file: File): Promise<ImportResult> {
+  async function bacaGambarBia(file: File, current: () => boolean): Promise<ImportResult> {
     setNote('Reading image…')
-    const dataUrl = await new Promise<string>((res, rej) => {
-      const fr = new FileReader()
-      fr.onload = () => res(String(fr.result))
-      fr.onerror = () => rej(new Error('read_failed'))
-      fr.readAsDataURL(file)
+    const teks = await readPersonalHealthImage(file, current, async (dataUrl) => {
+      try {
+        const r = await api.aiVision(dataUrl, PERINTAH_BACA)
+        return r.text ?? ''
+      } catch (e) {
+        const msg = String((e as Error)?.message ?? '')
+        throw new Error(/503|not_configured/.test(msg) ? 'ai_not_configured' : 'ai_failed')
+      }
     })
-    let teks: string
-    try {
-      const r = await api.aiVision(dataUrl, PERINTAH_BACA)
-      teks = r.text ?? ''
-    } catch (e) {
-      const msg = String((e as Error)?.message ?? '')
-      throw new Error(/503|not_configured/.test(msg) ? 'ai_not_configured' : 'ai_failed')
-    }
+    if (teks === null) throw new Error('stale_import')
     return bacaTeksBia(teks)
   }
 
   async function onImport(file?: File) {
     if (!file) return
+    const generation = ++importGeneration.current
+    const current = capturePersonalHealthOperation(account ?? null, () => mounted.current && importGeneration.current === generation)
+    if (!current()) return
     if (file.size > MAX_IMPORT_BYTES) {
       setNote(''); setErr(`File too large (${(file.size / 1048576).toFixed(0)} MB, max 60 MB). For large Apple Health exports, enter the key values manually.`)
       if (fileRef.current) fileRef.current.value = ''
@@ -183,14 +190,9 @@ export function HealthProfile() {
       // adalah SATU-SATUNYA bentuk data yang bisa dibawa keluar penggunanya.
       // Menolak gambar berarti menyuruh mereka mengetik ulang delapan belas
       // angka dari layar yang sudah ada di tangan.
-      const gambar = /^image\//.test(file.type) || /\.(jpe?g|png|webp|heic)$/i.test(file.name)
-      let r: ImportResult
-      if (gambar) {
-        r = await bacaGambarBia(file)
-      } else {
-        const text = await file.text()
-        r = parseHealthFile(file.name, text)
-      }
+      const prepared = await readPersonalHealthFile(file, current, parseHealthFile, bacaGambarBia)
+      if (!prepared || !current()) return
+      const { values: r, text, image: gambar } = prepared
       const keys = Object.keys(r).filter((k) => k !== 'source')
       if (!keys.length) {
         setNote('')
@@ -221,11 +223,13 @@ export function HealthProfile() {
       // "latest value of a metric", so they go to their own store instead of
       // being flattened away.
       // Tangkapan layar tidak memuat sesi latihan; lewati saja.
-      const text = gambar ? '' : await file.text()
       const w = parseWorkouts(text)
       const n = parseHrNotifications(text)
+      if (!current()) return
       const wBaru = mergeWorkouts(w)
+      if (!current()) return
       const nBaru = mergeHrNotifications(n)
+      if (!current()) return
       const extra = [
         wBaru ? `${wBaru} new workouts` : '',
         nBaru ? `${nBaru} heart-rate alerts` : '',
@@ -233,6 +237,7 @@ export function HealthProfile() {
 
       setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app.${extra ? ` Plus ${extra}.` : ''} Review, then press Save.`)
     } catch (e) {
+      if (!current()) return
       setNote('')
       const m = (e as Error)?.message
       setErr(m === 'ai_not_configured'
@@ -240,7 +245,7 @@ export function HealthProfile() {
         : m === 'ai_failed' ? 'Could not read that image. Try again, or enter the numbers by hand below.'
         : 'Failed to read the file.')
     } finally {
-      if (fileRef.current) fileRef.current.value = ''
+      if (current() && fileRef.current) fileRef.current.value = ''
     }
   }
 
@@ -309,7 +314,14 @@ export function HealthProfile() {
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
-          <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
+          <Button onClick={() => {
+            const input = fileRef.current
+            if (!input) return
+            // Clear only on the user's new picker action. Stale async cleanup stays
+            // guarded below so it cannot clear a newer selection.
+            input.value = ''
+            input.click()
+          }} className="!px-4">Choose export file…</Button>
           <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
           <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
