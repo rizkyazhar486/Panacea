@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/components/AtlasViewer3D.tsx'
+      - 'src/components/bodyhub/AtlasViewer3D.tsx'
       - 'src/lib/cardioFlow.ts'
       - 'src/lib/gltfSesudahLepas.ts'
       - 'scripts/qa/atlasviewer-*'
@@ -15,6 +16,7 @@ on:
     branches: [main]
     paths:
       - 'src/components/AtlasViewer3D.tsx'
+      - 'src/components/bodyhub/AtlasViewer3D.tsx'
       - 'src/lib/cardioFlow.ts'
       - 'src/lib/gltfSesudahLepas.ts'
       - 'scripts/qa/atlasviewer-*'
