@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import AtlasViewer3D from '../../src/components/AtlasViewer3D'
+import AtlasViewer3D from '../../src/components/bodyhub/AtlasViewer3D'
 import { partsForModule } from '../../src/lib/systemAtlas.gen'
 import { FLOW_PATHS } from '../../src/lib/cardioFlow'
 import '../../src/index.css'
