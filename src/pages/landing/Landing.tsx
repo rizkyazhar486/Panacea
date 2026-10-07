@@ -18,6 +18,10 @@ import {
   IconHospital,
   IconPill,
   IconChartUp,
+  IconCpu,
+  IconActivity,
+  IconMicroscope,
+  IconArticle,
 } from '../../components/icons'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { MedicalNews } from '../../components/MedicalNews'
@@ -76,13 +80,13 @@ const FEATURES = [
   { icon: IconShield, title: 'AI-EMR for clinicians', text: 'For licensed clinicians and institutions (STR/NPWP). A doctor reviews the record. Interaction flags are technical checks, not a certified clinical decision.' },
 ]
 
-const ROLES = [
-  ['Customer / Patient', 'Healthy living dashboard, disease education, nutrition & AI Longevity, consultations, pharmacy & nearest facilities.'],
-  ['Doctor', 'Full AI-EMR (SOAP), per-patient clinical data, planning & consultations.'],
-  ['Contributor', 'Write, sell & request verification for medical content.'],
-  ['Verifier', 'Specialists/professors + AI verify content.'],
-  ['Admin', 'Services, automated support & pharmacy catalog management.'],
-  ['Owner', 'Switch access modes & monitor company profitability.'],
+const ROLES: { title: string; desc: string; icon: typeof IconCpu }[] = [
+  { title: 'Customer / Patient', desc: 'Healthy living dashboard, disease education, nutrition & AI Longevity, consultations, pharmacy & nearest facilities.', icon: IconHeart },
+  { title: 'Doctor', desc: 'Full AI-EMR (SOAP), per-patient clinical data, planning & consultations.', icon: IconStethoscope },
+  { title: 'Contributor', desc: 'Write, sell & request verification for medical content.', icon: IconArticle },
+  { title: 'Verifier', desc: 'Specialists/professors + AI verify content.', icon: IconShield },
+  { title: 'Admin', desc: 'Services, automated support & pharmacy catalog management.', icon: IconHospital },
+  { title: 'Owner', desc: 'Switch access modes & monitor company profitability.', icon: IconStore },
 ]
 
 const WHATS_NEW = [
@@ -145,17 +149,17 @@ const STEM_CELLS: { type: string; emoji: string; short: string; body: string; us
     body: "Adult cells (e.g. skin/blood) are \"reprogrammed\" back into a pluripotent state (Yamanaka, Nobel Prize 2012). Combines the power of embryonic cells WITHOUT the embryo ethics issue, and can be personalized (from the patient's own cells → minimal rejection).",
     use: 'Personalized medicine, drug testing, anti-aging & reprogramming research' },
 ]
-const ROBOTICS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
-  { type: 'Robotic Surgery', emoji: '🤖', short: 'Micro-precision',
+const ROBOTICS: { type: string; icon: typeof IconCpu; short: string; body: string; use: string }[] = [
+  { type: 'Robotic Surgery', icon: IconCpu, short: 'Micro-precision',
     body: 'Systems like da Vinci (since ~2000) let surgeons operate through tiny incisions using precision robotic arms, tremor filtering, and 3D vision. The result: smaller wounds, less pain, and faster recovery.',
     use: 'Urology, gynecology, cardiac & digestive surgery' },
-  { type: 'Prosthetics & Exoskeletons', emoji: '🦾', short: 'Bionic',
+  { type: 'Prosthetics & Exoskeletons', icon: IconActivity, short: 'Bionic',
     body: "Bionic hands and legs controlled by nerve/muscle signals (myoelectric), plus robotic exoskeletons that help stroke and spinal-injury patients walk again — restoring mobility and independence.",
     use: 'Rehabilitation, amputation, spinal nerve injury' },
-  { type: 'Nanorobots & Microrobots', emoji: '🧫', short: 'Cellular scale',
+  { type: 'Nanorobots & Microrobots', icon: IconMicroscope, short: 'Cellular scale',
     body: 'Micro/nano-scale robots (still in early research and trial stages) designed to deliver drugs directly to target cells — such as tumors — or clear blood vessels, minimizing side effects to healthy tissue. The frontier of precision medicine.',
     use: 'Targeted drug delivery, intra-body diagnostics' },
-  { type: 'Rehabilitation & Care Robots', emoji: '💗', short: 'Companion',
+  { type: 'Rehabilitation & Care Robots', icon: IconHeart, short: 'Companion',
     body: 'Repetitive-motion therapy robots for post-stroke recovery, elderly-companion robots (monitoring falls, reminding about medication), and telepresence for remote doctor visits — expanding access to care.',
     use: 'Physiotherapy, elderly care, telemedicine' },
 ]
@@ -435,13 +439,13 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             </p>
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ROLES.map(([t, d], i) => (
-              <Reveal key={t} delay={(i % 3) * 90}>
+            {ROLES.map((r, i) => (
+              <Reveal key={r.title} delay={(i % 3) * 90}>
                 <div className="liquid-glass flex h-full items-start gap-3 rounded-2xl p-5 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-12px_rgba(0,191,99,0.22)]">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconUsers size={18} /></span>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><r.icon size={18} /></span>
                   <div>
-                    <h3 className="font-bold text-ink">{t}</h3>
-                    <p className="mt-0.5 text-sm leading-relaxed text-neutral-600">{d}</p>
+                    <h3 className="font-bold text-ink">{r.title}</h3>
+                    <p className="mt-0.5 text-sm leading-relaxed text-neutral-600">{r.desc}</p>
                   </div>
                 </div>
               </Reveal>
@@ -620,7 +624,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               <Reveal key={r.type} delay={(i % 2) * 80}>
                 <div className="liquid-glass flex h-full flex-col rounded-2xl p-5">
                   <div className="flex items-center gap-2">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{r.emoji}</span>
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark"><r.icon size={18} /></span>
                     <div>
                       <div className="font-extrabold text-ink">{r.type}</div>
                       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-dark">{r.short}</div>
