@@ -329,3 +329,86 @@ export const IconActivity = ({ size = 20, className = '' }: P) => (
 export const IconAlertTriangle = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}><path d="M12 3.5 2.5 20h19L12 3.5Z" /><path d="M12 10v4M12 17.5h.01" /></svg>
 )
+
+export const IconDna = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M2 15c6.667-6 13.333 0 20-6" />
+    <path d="M9 22c1.8-2 2.5-4 2.8-6" />
+    <path d="M15 2c-1.8 2-2.5 4-2.8 6" />
+    <path d="m17 6-2.5-2.5" />
+    <path d="m14 8-1-1" />
+    <path d="m7 18 2.5 2.5" />
+    <path d="m3.5 14.5.5.5" />
+    <path d="m20 9 .5.5" />
+    <path d="m6.5 12.5 1 1" />
+    <path d="m16.5 10.5 1 1" />
+    <path d="m10 16 1 1" />
+  </svg>
+)
+
+export const IconBot = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="3" y="11" width="18" height="10" rx="2" />
+    <circle cx="12" cy="5" r="2" />
+    <path d="M12 7v4" />
+    <line x1="8" y1="16" x2="8.01" y2="16" strokeWidth={2.5} />
+    <line x1="16" y1="16" x2="16.01" y2="16" strokeWidth={2.5} />
+  </svg>
+)
+
+export const IconMicroscope = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M6 18h8" />
+    <path d="M3 22h18" />
+    <path d="M14 22a7 7 0 1 0 0-14h-1" />
+    <path d="M9 14h2" />
+    <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" />
+    <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />
+  </svg>
+)
+
+export const IconMail = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+)
+
+export const IconInstagram = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+)
+
+export const IconCheckCircle = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+)
+
+export const IconInfo = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 16v-4M12 8h.01" />
+  </svg>
+)
+
+export const IconExternalLink = ({ size = 18, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+)
+
+export const IconCpu = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" />
+    <path d="M15 2v2M9 2v2M20 15h2M20 9h2M9 20v2M15 20v2M2 9h2M2 15h2" />
+  </svg>
+)
+

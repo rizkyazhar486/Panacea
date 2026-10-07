@@ -19,12 +19,12 @@ html.dark body:has(.hero-video-scrim) header.sticky a{color:#dce7e1!important}
 body:has(.hero-video-scrim) section:has(.hero-video-scrim){min-height:min(860px,88svh);display:flex;align-items:center;background:#eaf2ed;padding-top:clamp(64px,10vw,112px)!important;padding-bottom:clamp(64px,10vw,112px)!important}
 html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim){background:#03100a}
 body:has(.hero-video-scrim) section:has(.hero-video-scrim) video{opacity:.86;transform:scale(1.01);filter:saturate(.9) contrast(1.03)}
-body:has(.hero-video-scrim) .hero-video-scrim{background:linear-gradient(180deg,rgba(245,249,247,.76) 0%,rgba(245,249,247,.48) 42%,rgba(245,249,247,.92) 100%),radial-gradient(circle at 50% 34%,rgba(0,191,99,.08),transparent 44%)}
-html.dark body:has(.hero-video-scrim) .hero-video-scrim{background:linear-gradient(180deg,rgba(2,8,5,.54) 0%,rgba(2,8,5,.42) 45%,rgba(2,8,5,.88) 100%),radial-gradient(circle at 50% 36%,rgba(0,191,99,.13),transparent 46%)}
+body:has(.hero-video-scrim) .hero-video-scrim{background:rgba(245,249,247,.72)}
+html.dark body:has(.hero-video-scrim) .hero-video-scrim{background:rgba(2,8,5,.6)}
 body:has(.hero-video-scrim) section:has(.hero-video-scrim) .orb{display:none!important}
 body:has(.hero-video-scrim) section:has(.hero-video-scrim) h1{max-width:980px;margin-inline:auto;color:#0f172a!important;text-wrap:balance}
 html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) h1{color:#f8fafc!important}
-body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{color:#405047!important;line-height:1.62}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{color:#26332b!important;line-height:1.62}
 html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{color:#d2ddd7!important}
 body:has(.hero-video-scrim) section:has(.hero-video-scrim) .liquid-glass{border:0!important;background:rgba(255,255,255,.72)!important;box-shadow:none!important}
 html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) .liquid-glass{background:rgba(4,12,8,.72)!important}
