@@ -3,7 +3,9 @@ import { createRoot } from 'react-dom/client'
 import AtlasViewer3D from '../../src/components/bodyhub/AtlasViewer3D'
 import { partsForModule } from '../../src/lib/systemAtlas.gen'
 import { FLOW_PATHS } from '../../src/lib/cardioFlow'
-import '../../src/index.css'
+// Keep this renderer fixture independent from the full Tailwind/app stylesheet.
+// The assertions below target WebGL output; importing index.css makes Vite scan
+// the entire application source tree before DOMContentLoaded.
 
 function Fixture() {
   const [module, setModule] = useState('mata')
