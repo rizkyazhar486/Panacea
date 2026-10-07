@@ -82,7 +82,9 @@ try {
   }
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 844 })
-    await page.goto(process.env.ATLAS_QA_URL || 'http://127.0.0.1:5180/scripts/qa/atlasviewer-fixture.html')
+    // The acceptance target is the renderer, not unrelated late page-load resources.
+    // DOM readiness is followed by explicit canvas, GLB, draw, idle and recovery assertions below.
+    await page.goto(process.env.ATLAS_QA_URL || 'http://127.0.0.1:5180/scripts/qa/atlasviewer-fixture.html', { waitUntil: 'domcontentloaded' })
     await canvas.waitFor()
     for (const module of ['mata', 'nefrologi', 'jantung-ruang']) {
       const beforeLoad = await draws()
