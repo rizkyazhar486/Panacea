@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 
 const gesture = await readFile(new URL('../../src/lib/interaction/gesture.ts', import.meta.url), 'utf8')
 const slidable = await readFile(new URL('../../src/components/SlidableRail.tsx', import.meta.url), 'utf8')
-const assistive = await readFile(new URL('../../src/components/FabNavigasi.tsx', import.meta.url), 'utf8')
+const assistive = await readFile(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
 const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx', import.meta.url), 'utf8')
 const model = await readFile(new URL('../../src/lib/interaction/assistive.ts', import.meta.url), 'utf8')
 

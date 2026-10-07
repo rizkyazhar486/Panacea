@@ -4,8 +4,8 @@ import { auditSurfaceSourceAcceptance } from '../../src/lib/anatomy/surfaceSourc
 import { partsForModule } from '../../src/lib/systemAtlas.gen'
 
 const specialty = await readFile(new URL('../../src/pages/bodyhub/SpecialtyLab.tsx', import.meta.url), 'utf8')
-const bodyExplorer = await readFile(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
-const viewer = await readFile(new URL('../../src/components/AtlasViewer3D.tsx', import.meta.url), 'utf8')
+const bodyExplorer = await readFile(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
+const viewer = await readFile(new URL('../../src/components/bodyhub/AtlasViewer3D.tsx', import.meta.url), 'utf8')
 
 const audit = auditSurfaceSourceAcceptance()
 assert.equal(audit.reachable, true, `skin/body-surface module must be shipped: ${audit.blockers.join(', ')}`)

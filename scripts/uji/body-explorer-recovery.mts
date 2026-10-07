@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const body = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
+const body = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
 const precision = readFileSync('src/pages/bodyhub/WholeBodyPrecisionLab.tsx', 'utf8')
 
 assert.match(body, /FeatureErrorBoundary/, 'Body Explorer must isolate heavy panel failures')

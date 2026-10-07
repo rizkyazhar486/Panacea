@@ -1,0 +1,103 @@
+import { useState } from 'react'
+import { Prosa } from '../../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
+import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { IconActivity } from '../../../components/icons'
+import { getDemo } from '../../../lib/profile'
+import { aaGradient, parseNumberField } from '../../../domains/clinical-calculators'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Alveolar-arterial (A-a) Oxygen Gradient — standard pulmonary physiology:
+//   Alveolar gas equation: PAO2 = FiO2 × (Patm − PH2O) − PaCO2 / RQ
+//     with PH2O = 47 mmHg at body temperature and RQ ≈ 0.8.
+//   A-a gradient = PAO2 − PaO2.
+//   Age-adjusted expected gradient ≈ (age/4) + 4 (common bedside rule).
+// Distinguishes hypoxemia WITH a normal gradient (hypoventilation, low FiO2 —
+// lungs fine, drive/altitude problem) from hypoxemia with an ELEVATED
+// gradient (V/Q mismatch, shunt, diffusion limitation — a lung problem).
+// Pure arithmetic, no external API.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function AaGradient() {
+  // Teks mentah: kolom kosong tetap "belum diisi" (NaN), bukan 0 yang sah.
+  const [fio2, setFio2] = useState('21')
+  const [pao2, setPao2] = useState('90')
+  const [paco2, setPaco2] = useState('40')
+  const [age, setAge] = useState(() => String(getDemo().age || 40))
+  const [patm, setPatm] = useState('760')
+
+  const res = aaGradient({ fio2: parseNumberField(fio2), pao2: parseNumberField(pao2), paco2: parseNumberField(paco2), age: parseNumberField(age), patm: parseNumberField(patm) })
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="A-a Oxygen Gradient" subtitle="Published alveolar gas equation — decision-support arithmetic, not a clinically validated Panacea decision" />
+        <BatasKlaimSkorTerbit />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A normal gradient with hypoxemia points toward hypoventilation or low inspired oxygen (the lungs themselves may be fine); a widened gradient points toward a lung problem — V/Q mismatch, shunt, or diffusion limitation. Requires an arterial blood gas.</Prosa>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <Field label="FiO₂ (%)">
+            <input className={inputClass} type="number" min={21} max={100} value={fio2} onChange={(e) => setFio2(e.target.value)} />
+          </Field>
+          <Field label="PaO₂ (mmHg)">
+            <input className={inputClass} type="number" min={0} value={pao2} onChange={(e) => setPao2(e.target.value)} />
+          </Field>
+          <Field label="PaCO₂ (mmHg)">
+            <input className={inputClass} type="number" min={0} value={paco2} onChange={(e) => setPaco2(e.target.value)} />
+          </Field>
+          <Field label="Age (years)">
+            <input className={inputClass} type="number" min={0} value={age} onChange={(e) => setAge(e.target.value)} />
+          </Field>
+          <Field label="Atmospheric pressure (mmHg)">
+            <input className={inputClass} type="number" min={400} max={800} value={patm} onChange={(e) => setPatm(e.target.value)} />
+          </Field>
+        </div>
+        <p className="mt-2 text-[11px] text-neutral-500">Atmospheric pressure defaults to sea level (760 mmHg) — lower it for altitude (e.g. ~630 at 1,600 m).</p>
+      </Card>
+
+      <Card className="!p-5">
+        {!res.ok ? (
+          <p role="alert" className="text-sm font-semibold text-amber-700 dark:text-amber-300">{res.reason}</p>
+        ) : (
+          <>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">PAO₂ (alveolar)</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{res.data.alveolar.toFixed(0)}</div>
+            <div className="text-[11px] text-neutral-500">mmHg</div>
+          </div>
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">A-a gradient</div>
+            <div className="mt-1 text-2xl font-black text-brand-dark">{res.data.gradient.toFixed(0)}</div>
+            <div className="text-[11px] text-neutral-500">mmHg</div>
+          </div>
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Expected for age</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">≤{res.data.expectedForAge.toFixed(0)}</div>
+            <div className="text-[11px] text-neutral-500">mmHg (≈ age/4 + 4)</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          <Badge tone={res.data.elevated ? 'critical' : 'brand'}>{res.data.elevated ? 'Elevated gradient' : 'Normal gradient'}</Badge>
+        </div>
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+          {res.data.elevated
+            ? 'Elevated for age — suggests a pulmonary cause: V/Q mismatch (PE, pneumonia, COPD), shunt (severe consolidation, intracardiac), or diffusion limitation (fibrosis, emphysema). A shunt classically fails to correct with 100% oxygen.'
+            : 'Within the age-expected range — if the patient is hypoxemic, think hypoventilation (sedatives, neuromuscular weakness, CO₂ retention) or low inspired oxygen (altitude) rather than an intrinsic lung problem.'}
+        </p>
+        {res.data.supplementalOxygen && (
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Aturan gradien harapan umur/4 + 4 diturunkan pada udara ruangan — dengan oksigen tambahan, gradien normalnya melebar jauh, jadi tafsirkan dengan hati-hati (sebagian rujukan memberi kelonggaran sekitar 5-7 mmHg tiap kenaikan FiO₂ 10%).</Prosa>
+        )}
+          </>
+        )}
+      </Card>
+
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
+        Alveolar gas equation with PH₂O = 47 mmHg, RQ = 0.8 (standard physiology; see Sarkar et al.,
+        <i> Lung India</i> 2017 for review). Decision-support estimate — interpret with the full ABG,
+        clinical picture, and imaging.
+      </div>
+    </div>
+  )
+}
+
+export default AaGradient

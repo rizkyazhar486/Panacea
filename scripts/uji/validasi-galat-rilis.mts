@@ -66,7 +66,7 @@ assert.throws(() => susunPenilaian(bukuServer, 'uji', { ...dasar, benar: false, 
 assert.deepEqual(susunPenilaian(bukuServer, 'uji', { ...dasar, benar: false, galat: ['missed-critical-finding', 'missed-critical-finding'] }, idP, new Date()).galat, ['missed-critical-finding'])
 
 // 7. UI menampilkan klaim rilis & negatif palsu berbahaya.
-const ui = readFileSync('src/components/StudiValidasiKlinis.tsx', 'utf8')
+const ui = readFileSync('src/components/clinical/StudiValidasiKlinis.tsx', 'utf8')
 assert.match(ui, /data-klaim-rilis=\{rilis\.klaim\}/, 'klaim rilis tidak ditampilkan')
 assert.match(ui, /data-galat-berbahaya/)
 assert.match(ui, /if \(f\.benar === false && !f\.galat\.length\)/)

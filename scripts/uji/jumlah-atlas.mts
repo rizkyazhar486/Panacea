@@ -64,8 +64,8 @@ assert.equal(
   'exactly one helper node is expected in skeletal.glb; the exclusion list no longer matches the file')
 
 // ── 4. Layarnya harus memakai manifes, bukan angka yang diketik ──────────
-const halaman = readFileSync(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
-assert.ok(/import jumlahAtlas from '\.\.\/data\/jumlahAtlas\.json'/.test(halaman),
+const halaman = readFileSync(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
+assert.ok(/import jumlahAtlas from '\.\.\/\.\.\/data\/jumlahAtlas\.json'/.test(halaman),
   'BodyExplorer no longer reads the generated manifest')
 // Bukan "ungkapannya ada di suatu tempat": jumlah per sistem dipakai DUA kali
 // di halaman ini — sekali untuk menjumlah yang terlihat, sekali di dalam chip.

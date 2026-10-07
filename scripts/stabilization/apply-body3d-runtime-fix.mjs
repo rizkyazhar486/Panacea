@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
-const path = new URL('../../src/components/Body3D.tsx', import.meta.url)
+const path = new URL('../../src/components/bodyhub/Body3D.tsx', import.meta.url)
 let source = await readFile(path, 'utf8')
 
 function replaceOnce(label, search, replacement) {

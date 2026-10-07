@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises'
 
 const systemPrompt = await readFile(new URL('../../src/lib/systemPrompt.ts', import.meta.url), 'utf8')
 const ai = await readFile(new URL('../../src/lib/ai.ts', import.meta.url), 'utf8')
-const chatbot = await readFile(new URL('../../src/pages/Chatbot.tsx', import.meta.url), 'utf8')
-const emr = await readFile(new URL('../../src/pages/EMR.tsx', import.meta.url), 'utf8')
+const chatbot = await readFile(new URL('../../src/pages/clinical/Chatbot.tsx', import.meta.url), 'utf8')
+const emr = await readFile(new URL('../../src/pages/clinical/EMR.tsx', import.meta.url), 'utf8')
 const serverAi = await readFile(new URL('../../server/src/ai.ts', import.meta.url), 'utf8')
 
 test('clinical response contract forbids fabricated real-patient findings', () => {

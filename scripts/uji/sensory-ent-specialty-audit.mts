@@ -31,9 +31,9 @@ assert.ok(byModule.get('mata')?.resolvedExactNames.includes('Optic part of left 
 assert.ok(byModule.get('mata')?.resolvedExactNames.includes('Optic part of right retina'))
 
 const root = process.cwd()
-const bodyExplorer = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const bodyExplorer = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
-assert.match(bodyExplorer, /lazy\(\(\) => import\('\.\/bodyhub\/SpecialtyLab'\)\)/)
+assert.match(bodyExplorer, /lazy\(\(\) => import\('\.\/SpecialtyLab'\)\)/)
 assert.match(bodyExplorer, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /<AtlasViewer3D/)
 assert.match(specialty, /modul: \['neurologi', 'medula-spinalis', 'mata', 'tht', 'telinga'\]/)

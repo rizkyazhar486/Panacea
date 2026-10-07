@@ -67,9 +67,9 @@ assert.equal(aaGradient({ ...base, paco2: parseNumberField('  ') }).ok, false)
 assert.deepEqual(run({ fio2: 5, pao2: -1 }), { ok: false, reason: 'FiO2 must be 21–100 %' })
 
 // Halaman: raw-text, memakai fungsi domain, tidak ada rumus/parse lama.
-const src = readFileSync('src/pages/AaGradient.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/AaGradient.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { aaGradient, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { aaGradient, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.equal(src.match(/parseNumberField\(/g)?.length, 5)
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0 pada parsing')
 assert.ok(!/paco2\s*\/\s*0\.8/.test(src), 'rumus tidak boleh disalin ke halaman')

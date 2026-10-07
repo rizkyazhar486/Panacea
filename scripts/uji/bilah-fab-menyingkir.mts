@@ -87,14 +87,14 @@ assert.doesNotMatch(hook, /padaKetukan[\s\S]{0,400}preventDefault/,
   'top 64px — exactly the invisible-layer bug this reveal zone was built to avoid')
 
 // ── 7. FAB ikut menyingkir bersama bilahnya ──────────────────────────────
-const fab = readFileSync(new URL('../../src/components/FabNavigasi.tsx', import.meta.url), 'utf8')
+const fab = readFileSync(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
 assert.match(fab, /tersembunyi/, 'the assistive orb no longer accepts the hidden state, so it stays while the bar leaves')
 assert.match(fab, /const menyingkir = tersembunyi && !buka && !menggeser/,
   'the orb either hides unconditionally — cancelling an open menu or a drag mid-gesture — or no longer hides at all')
 assert.match(fab, /pointerEvents: menyingkir \? 'none' : undefined/,
   'a hidden orb still catches pointer events, so an invisible button sits over the page content')
 
-const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
+const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 assert.match(shell, /tersembunyi=\{keadaanBilah === 'hidden'\}/,
   'Shell no longer passes the command-bar state to the orb, so the two stopped moving together')
 

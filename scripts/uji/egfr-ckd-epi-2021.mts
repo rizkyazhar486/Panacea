@@ -131,8 +131,8 @@ for (const rel of readdirSync('src', { recursive: true }) as string[]) {
   if (/(?<![\w.])0\.9938(?![\d])/.test(isi) && /(?<![\w.])142(?![\d.])/.test(isi)) penyalin.push(path)
 }
 assert.deepEqual(penyalin, [], `rumus CKD-EPI 2021 harus dipakai dari lib/longevity.ts, bukan disalin:\n  ${penyalin.join('\n  ')}`)
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
-assert.match(halaman, /import \{ egfrCkdEpi2021[^}]*\} from '\.\.\/lib\/longevity'/, 'halaman harus memakai egfrCkdEpi2021')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
+assert.match(halaman, /import \{ egfrCkdEpi2021[^}]*\} from '\.\.\/\.\.\/lib\/longevity'/, 'halaman harus memakai egfrCkdEpi2021')
 assert.match(halaman, /egfrCkdEpi2021\(scr, age, sex === 'F'\)/)
 assert.match(halaman, /egfr\.ok \?/, 'halaman harus bercabang pada hasil tervalidasi')
 assert.match(halaman, /\{egfr\.alasan\}/, 'masukan tidak valid harus menampilkan alasannya')

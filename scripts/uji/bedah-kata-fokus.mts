@@ -59,7 +59,7 @@ const jumlahCocok = (kata: string) => nama.filter((n) => cocok(n, kata)).length
 // Kalau Body3D suatu hari beralih ke pencocokan frasa atau kata utuh, gerbang
 // ini akan diam-diam menguji perilaku yang sudah tidak ada lagi.
 {
-  const sumber = readFileSync('src/components/Body3D.tsx', 'utf8')
+  const sumber = readFileSync('src/components/bodyhub/Body3D.tsx', 'utf8')
   assert.ok(
     /keywords\.some\(\(k\) => name\.toLowerCase\(\)\.includes\(k\)\)/.test(sumber),
     'Body3D no longer matches focus keywords by lowercase substring; this gate must be updated to match it',

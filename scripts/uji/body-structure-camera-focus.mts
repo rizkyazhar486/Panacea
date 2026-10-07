@@ -44,13 +44,13 @@ assert.equal(
   'infinite source bounds must fail closed instead of moving the camera',
 )
 
-const renderer = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
+const renderer = readFileSync(new URL('../../src/components/bodyhub/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(renderer, /bodyStructureCameraFocus/, 'shared renderer must use the deterministic source-bounds focus pose')
 assert.match(renderer, /if \(!pose\) return/, 'shared renderer must leave the current camera unchanged when bounds are invalid')
 assert.match(renderer, /dblclick/, 'focus must be reachable through an explicit double-activation gesture')
 assert.match(renderer, /panaceaContext !== true/, 'context envelope must never become a focus target')
 
-const canonicalBody = readFileSync(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+const canonicalBody = readFileSync(new URL('../../src/components/bodyhub/Body3D.tsx', import.meta.url), 'utf8')
 assert.match(
   canonicalBody,
   /bodyStructureCameraFocus/,

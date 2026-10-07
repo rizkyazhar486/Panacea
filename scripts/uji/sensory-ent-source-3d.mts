@@ -4,7 +4,7 @@ import { auditSensoryEntTarget, SENSORY_ENT_TARGETS } from '../../src/lib/anatom
 import { ATLAS_MODULE_INFO, partsForModule } from '../../src/lib/systemAtlas.gen'
 
 const panel = await readFile(new URL('../../src/pages/bodyhub/InderaPanel.tsx', import.meta.url), 'utf8')
-const viewer = await readFile(new URL('../../src/components/AtlasViewer3D.tsx', import.meta.url), 'utf8')
+const viewer = await readFile(new URL('../../src/components/bodyhub/AtlasViewer3D.tsx', import.meta.url), 'utf8')
 
 const earTarget = SENSORY_ENT_TARGETS.find((target) => target.module === 'telinga')
 assert.ok(earTarget, 'middle-inner-ear sensory target must be registered')

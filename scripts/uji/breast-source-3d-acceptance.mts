@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { ATLAS_MODULE_INFO, partsForModule } from '../../src/lib/systemAtlas.gen'
 
 const specialty = await readFile(new URL('../../src/pages/bodyhub/SpecialtyLab.tsx', import.meta.url), 'utf8')
-const bodyExplorer = await readFile(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const bodyExplorer = await readFile(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
 const atlasGenerator = await readFile(new URL('../atlasSystem.mjs', import.meta.url), 'utf8')
 
 const moduleId = 'payudara'

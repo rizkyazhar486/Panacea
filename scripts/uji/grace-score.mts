@@ -65,9 +65,9 @@ for (const age of [25, 45, 65, 85, 95]) for (const hr of [45, 80, 120, 180, 220]
 assert.equal(n, 5 * 5 * 5 * 5 * 4 * 8)
 
 // Halaman.
-const src = readFileSync('src/pages/GraceScore.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/GraceScore.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { graceScore, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { graceScore, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src))
 assert.ok(!/function (age|hr|sbp|creat)Pts|const KILLIP_PTS|function band/.test(src), 'tabel tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{lengkap && result !== null && score !== null ? ('))

@@ -2,9 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const main = readFileSync('src/main.tsx', 'utf8')
-const shell = readFileSync('src/components/Shell.tsx', 'utf8')
+const shell = readFileSync('src/components/layout/Shell.tsx', 'utf8')
 const catalog = readFileSync('src/lib/katalogFitur.ts', 'utf8')
-const allFeatures = readFileSync('src/pages/SemuaFitur.tsx', 'utf8')
+const allFeatures = readFileSync('src/pages/dashboard/SemuaFitur.tsx', 'utf8')
 
 function routePath(value: string): string {
   const trimmed = value.trim()

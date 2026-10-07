@@ -38,7 +38,7 @@ for (const r of [validateWhoGrowthInputs(NaN, 1, 1), validateNeonateInputs(NaN, 
 assert.deepEqual(validateCdcInputs(10, 32, 138), validateCdcInputs(10, 32, 138), 'deterministik')
 
 // ── Halaman: teks mentah, anak hanya dirender bila sah, isi klinis dan tabel tidak diubah ──
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /validateWhoGrowthInputs\(parseNumberField\(ageText\), parseNumberField\(weightText\), parseNumberField\(heightText\)\)/)
 assert.match(halaman, /validateNeonateInputs\(parseNumberField\(birthText\), parseNumberField\(daysText\), parseNumberField\(currentText\)\)/)
 assert.match(halaman, /validateCdcInputs\(parseNumberField\(ageText\), parseNumberField\(weightText\), parseNumberField\(heightText\)\)/)

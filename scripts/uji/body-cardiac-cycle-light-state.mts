@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync(new URL('../../src/components/CardiacCycle3D.tsx', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../src/components/bodyhub/CardiacCycle3D.tsx', import.meta.url), 'utf8')
 
 assert.match(source, /role="region"/, 'cardiac WebGL must expose a labelled region')
 assert.match(source, /aria-label="Animated cardiac cycle 3D visualization"/, 'cardiac WebGL region must be named')

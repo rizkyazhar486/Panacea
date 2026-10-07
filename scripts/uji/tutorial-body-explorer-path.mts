@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 
-const src = readFileSync(new URL('../../src/pages/Tutorial.tsx', import.meta.url), 'utf8')
+const src = readFileSync(new URL('../../src/pages/dashboard/Tutorial.tsx', import.meta.url), 'utf8')
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean) {
   if (syarat) { lulus++; console.log('ok    ', nama) }

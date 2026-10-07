@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 
 const lab = await readFile(new URL('../../src/pages/bodyhub/RadiologyReconstructionLab.tsx', import.meta.url), 'utf8')
 const engine = await readFile(new URL('../../src/pages/bodyhub/BiomedicalEngineLab.tsx', import.meta.url), 'utf8')
-const explorer = await readFile(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const explorer = await readFile(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
 
 // Reachability: Body Exposure -> Biomedical engine -> Imaging 3D -> workstation.
 assert.match(explorer, /const BiomedicalEngineLab = lazy/, 'Body Exposure must keep the biomedical engine lazy route')

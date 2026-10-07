@@ -351,6 +351,10 @@ input:focus, textarea:focus, select:focus {
   background: linear-gradient(to bottom, rgba(12, 20, 16, 0.88) 0%, rgba(12, 20, 16, 0.82) 55%, #0c1410 100%);
 }
 
+.cta-fullwidth-emerald {
+  background: #0b7a4b !important;
+}
+
 /* Liquid-glass surface — layered translucency, soft inner highlight + saturated
    backdrop blur for a tactile, premium card. */
 .liquid-glass {
@@ -681,13 +685,11 @@ input:focus, textarea:focus, select:focus {
   100% { background-position: 400% 50%; }
 }
 
-/* "Flying in" entrance — the DailyQuoteBanner rises into its resting
-   position from below. It must never travel upward through the command bar:
-   the banner is intentionally parked below that bar so navigation remains
-   visible and clickable for the entire entrance animation, not only at rest. */
+/* "Flying in" entrance — a popup arriving from above with a slight tilt and
+   overshoot, not a plain fade. Used by DailyQuoteBanner. */
 @keyframes fly-in-drop {
-  0% { opacity: 0; transform: translateY(24px) scale(0.94) rotate(2deg); }
-  60% { opacity: 1; transform: translateY(4px) scale(1.015) rotate(0.5deg); }
+  0% { opacity: 0; transform: translateY(-64px) scale(0.92) rotate(-3deg); }
+  60% { opacity: 1; transform: translateY(6px) scale(1.015) rotate(0.5deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
 }
 .reduce-motion .fly-in-drop { animation: none !important; }
@@ -2925,4 +2927,19 @@ h1 {
      dari warnanya. */
   color: color-mix(in oklab, var(--pmd-nada) 74%, #fff);
   background: color-mix(in oklab, var(--pmd-nada) 13%, transparent);
+}
+
+/* Sections that are dark in BOTH themes: the light-mode remap of text-emerald-*
+   (to #047857) makes their accent text dark-on-dark. Restore the light tints. */
+:root:not(.dark) .gelap-tetap .text-emerald-200 { color: #a7f3d0; }
+:root:not(.dark) .gelap-tetap .text-emerald-300 { color: #6ee7b7; }
+
+/* Primary hero CTA: the global neumorphic control layer (v46/v48) forces every
+   button to a white pill, which leaves the one primary action visually equal to
+   its secondary. Opt-in via data-cta="primary" restores the brand fill. */
+html:not(.dark) body button[data-cta="primary"] {
+  color: #fff !important;
+  background: #0b7a4b !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 30px -8px rgba(0,191,99,.5) !important;
 }

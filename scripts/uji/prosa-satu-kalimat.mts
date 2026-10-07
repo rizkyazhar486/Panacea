@@ -102,7 +102,7 @@ assert.ok(
 )
 
 /** Komponen disclosure harus tetap ada dan tetap memasang kontrolnya. */
-const prosa = readFileSync(new URL('../../src/components/Prosa.tsx', import.meta.url), 'utf8')
+const prosa = readFileSync(new URL('../../src/components/ui/Prosa.tsx', import.meta.url), 'utf8')
 assert.match(prosa, /aria-label=\{buka \? 'Hide context' : 'Show context'\}/, 'Prosa kehilangan kontrol disclosure-nya')
 assert.match(prosa, /WebkitLineClamp/, 'Prosa berhenti memotong teks panjang, jadi ia tidak lagi menyembunyikan apa pun')
 

@@ -141,9 +141,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/PencarianGlobal.tsx",
+    "from": "src/components/layout/PencarianGlobal.tsx",
     "to": "src/pages/ClinicalHub.tsx",
-    "unresolvedTo": "../pages/ClinicalHub",
+    "unresolvedTo": "../../pages/ClinicalHub",
     "dependencyTypes": [
       "local",
       "dynamic-import"
@@ -155,9 +155,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/PencarianGlobal.tsx",
+    "from": "src/components/layout/PencarianGlobal.tsx",
     "to": "src/pages/FitnessHub.tsx",
-    "unresolvedTo": "../pages/FitnessHub",
+    "unresolvedTo": "../../pages/FitnessHub",
     "dependencyTypes": [
       "local",
       "dynamic-import"
@@ -169,9 +169,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/PencarianGlobal.tsx",
+    "from": "src/components/layout/PencarianGlobal.tsx",
     "to": "src/pages/WellnessHub.tsx",
-    "unresolvedTo": "../pages/WellnessHub",
+    "unresolvedTo": "../../pages/WellnessHub",
     "dependencyTypes": [
       "local",
       "dynamic-import"
@@ -211,9 +211,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/Shell.tsx",
+    "from": "src/components/layout/Shell.tsx",
     "to": "src/pages/Landing.tsx",
-    "unresolvedTo": "../pages/Landing",
+    "unresolvedTo": "../../pages/Landing",
     "dependencyTypes": [
       "local",
       "import"
@@ -225,9 +225,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/Shell.tsx",
+    "from": "src/components/layout/Shell.tsx",
     "to": "src/pages/Login.tsx",
-    "unresolvedTo": "../pages/Login",
+    "unresolvedTo": "../../pages/Login",
     "dependencyTypes": [
       "local",
       "import"

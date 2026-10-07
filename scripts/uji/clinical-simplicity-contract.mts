@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const clinical = readFileSync('src/pages/ClinicalHub.tsx', 'utf8')
+const clinical = readFileSync('src/pages/clinical/ClinicalHub.tsx', 'utf8')
 
 // The clinical landing is a command surface, not a dashboard of equally
 // weighted glass cards. Complex visual anatomy remains behind Body Explorer.

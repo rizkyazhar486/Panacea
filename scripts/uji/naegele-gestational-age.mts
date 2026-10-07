@@ -74,7 +74,7 @@ assert.equal(ok('1900-01-01', 28, at('2026-10-01')).gestationalAgeHidden, 'beyon
 assert.deepEqual(naegele('2026-01-10', 28, at('2026-06-01')), naegele('2026-01-10', 28, at('2026-06-01')), 'deterministik')
 
 // Halaman memakai fungsi kanonik, jam disuntik, dan tidak menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /naegele\(lmp, cycleLen, nowMs\)/)
 assert.match(halaman, /useState\(\(\) => Date\.now\(\)\)/)
 assert.match(halaman, /result\?\.ok &&/); assert.match(halaman, /!result\.ok &&/); assert.match(halaman, /\{result\.reason\}/)

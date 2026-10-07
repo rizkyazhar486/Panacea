@@ -22,7 +22,7 @@ import { YANG_BELUM_DIMILIKI_PANACEA, KALOLUMEN } from '../../src/lib/rujukanKal
 
 const baca = (rel: string) => readFileSync(new URL(rel, import.meta.url), 'utf8')
 const dicom = baca('../../src/lib/dicom.ts')
-const radiologi = baca('../../src/pages/Radiology.tsx')
+const radiologi = baca('../../src/pages/bodyhub/Radiology.tsx')
 const panel = baca('../../src/pages/bodyhub/PencitraanVolumetrikPanel.tsx')
 
 // ── 1. Apakah Panacea benar-benar membaca DICOM? Diperiksa, bukan diandaikan ─

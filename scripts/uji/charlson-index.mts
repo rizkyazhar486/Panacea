@@ -73,9 +73,9 @@ assert.deepEqual(charlsonIndex(parseNumberField(''), { mets: true }), GALAT)
 assert.equal('data' in charlsonIndex(parseNumberField(' '), {}), false)
 
 // Halaman.
-const src = readFileSync('src/pages/CharlsonIndex.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/CharlsonIndex.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src))
 assert.ok(!/Math\.pow\(|agePts\(|const CONDITIONS/.test(src), 'rumus/bobot tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok ? ('))

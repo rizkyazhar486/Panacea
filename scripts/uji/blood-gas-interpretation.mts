@@ -85,7 +85,7 @@ assert.deepEqual(run({ ph: +'' }), { ok: false, reason: 'pH must be 6.5–8' })
 assert.deepEqual(run({}), run({}), 'deterministik')
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /interpretAbg\(\{ ph, paco2, hco3, na, cl, albumin \}\)/)
 assert.match(halaman, /abg\.ok \?/)
 assert.match(halaman, /\{abg\.reason\}/)

@@ -25,11 +25,11 @@ const url = process.env.KENDALI_QA_URL || 'http://127.0.0.1:4173/#/body-explorer
 
 // ── Temukan panel SVG bertuas dari sumbernya ─────────────────────────────
 function temukanPanel() {
-  const src = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
+  const src = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
   const awal = src.indexOf('const PANEL_TABS')
   const blok = src.slice(awal, src.indexOf('\n]', awal))
   const tabs = [...blok.matchAll(/key: '([^']+)', label: '([^']+)'/g)].map((m) => ({ key: m[1], label: m[2] }))
-  const lazy = [...src.matchAll(/const (\w+) = lazy\(\(\) => import\('\.\/bodyhub\/(\w+)'/g)]
+  const lazy = [...src.matchAll(/const (\w+) = lazy\(\(\) => import\('\.\/(\w+)'/g)]
   const berkasKomponen = new Map(lazy.map((m) => [m[1], m[2]]))
   const keluar = []
   for (const t of tabs) {

@@ -68,7 +68,7 @@ assert.match(controlsSource, /do not synthesize, correct or clinically interpret
 assert.doesNotMatch(controlsSource, /\bfetch\s*\(/, 'nutrition journal controls must remain local and offline-capable')
 assert.doesNotMatch(controlsSource, /axios|XMLHttpRequest|WebSocket/, 'nutrition data controls must not acquire a hidden network path')
 
-const hubSource = readFileSync(new URL('../../src/pages/PusatGizi.tsx', import.meta.url), 'utf8')
+const hubSource = readFileSync(new URL('../../src/pages/bodyhub/PusatGizi.tsx', import.meta.url), 'utf8')
 assert.match(hubSource, /NutritionDataControls/)
 assert.match(hubSource, /id: 'data'/)
 assert.match(hubSource, /Local journal import\/export, validation and recovery controls/)

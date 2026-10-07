@@ -36,9 +36,9 @@ for (const f of ['addPatientRemote', 'addVitalRemote', 'addSupportiveRemote', 's
   assert.doesNotMatch(store, new RegExp(`api\\.${f}\\([^)]*\\)\\.catch\\(\\(\\) => \\{\\}\\)`), `${f} kembali ditelan diam-diam`)
 }
 assert.match(store, /kurasSinkronKlinis\([^)]*\)\n\s*const on = \(\) => void kurasSinkronKlinis\([^)]*\)[\s\S]{0,120}window\.addEventListener\('online', on\)/, 'antrean klinis tidak dikuras saat muat/online')
-for (const hal of ['src/pages/EMR.tsx', 'src/pages/Dashboard.tsx']) assert.match(readFileSync(hal, 'utf8'), /<StatusSinkronKlinis \/>/, `${hal} tidak menampilkan status sinkron klinis`)
+for (const hal of ['src/pages/clinical/EMR.tsx', 'src/pages/dashboard/Dashboard.tsx']) assert.match(readFileSync(hal, 'utf8'), /<StatusSinkronKlinis \/>/, `${hal} tidak menampilkan status sinkron klinis`)
 const api = readFileSync('src/lib/api.ts', 'utf8')
-const emr = readFileSync('src/pages/EMR.tsx', 'utf8')
+const emr = readFileSync('src/pages/clinical/EMR.tsx', 'utf8')
 assert.match(api, /saveRecordRemote:[\s\S]{0,180}record:\s*EMRRecord/, 'API belum mengetik balasan record canonical server')
 assert.match(store, /sinkronKlinis\('record',[\s\S]{0,180}terimaBalasanKlinis/, 'saveRecord tidak merekonsiliasi balasan canonical server')
 assert.match(store, /record\.patientId !== op\.patientId/, 'balasan canonical server tidak dibatasi ke pasien operasi yang sama')

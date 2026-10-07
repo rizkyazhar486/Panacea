@@ -42,8 +42,8 @@ console.log('body alpha genome atlas guards: ok');
 // Modul wajib yang tidak terpasang di mana pun tetap nol bagi pengguna: seluruh
 // berkasnya lengkap, tesnya hijau, dan tidak ada satu pun layar yang membukanya.
 // Persis itu yang terjadi pada atlas ini sejak menit pertama ia digabungkan.
-const explorer = fs.readFileSync('src/pages/BodyExplorer.tsx', 'utf8');
-if (!explorer.includes("import('./bodyhub/AlphaGenomeAtlas')")) throw new Error('Alpha Genome Atlas is not loaded by Body Explorer');
+const explorer = fs.readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8');
+if (!explorer.includes("import('./AlphaGenomeAtlas')")) throw new Error('Alpha Genome Atlas is not loaded by Body Explorer');
 if (!explorer.includes("{ key: 'genom-alfa', label: 'Genome atlas' }")) throw new Error('Alpha Genome Atlas has no tab a user can select');
 if (!explorer.includes("panelTab === 'genom-alfa'")) throw new Error('Alpha Genome Atlas tab renders nothing');
 

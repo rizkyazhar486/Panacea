@@ -26,7 +26,7 @@ test('Home capability surface is search-first and not a gradient card mosaic', a
 })
 
 test('Assistive Touch opens as an orb-anchored spatial control rather than a generic panel', async () => {
-  const fab = await source('src/components/FabNavigasi.tsx')
+  const fab = await source('src/components/layout/FabNavigasi.tsx')
 
   assert.doesNotMatch(fab, /Context commands/)
   assert.doesNotMatch(fab, />⚙</)

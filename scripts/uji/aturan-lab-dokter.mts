@@ -37,7 +37,7 @@ const lama = nilai([obs('1', '2024-06-01', 9.4)])
 assert.equal(lama.state, 'stale', 'HbA1c 2024 dianggap segar — umur dihitung dari waktu diterima, bukan waktu diukur')
 assert.equal(nilai([]).state, 'missing')
 
-const ui = readFileSync('src/components/RencanaHarianDokter.tsx', 'utf8')
+const ui = readFileSync('src/components/clinical/RencanaHarianDokter.tsx', 'utf8')
 assert.match(ui, /evidenceRef/, 'formulir aturan lab tidak meminta rujukan bukti')
 assert.match(ui, /evaluasiAturanLab\(/, 'tampilan dokter tidak mengevaluasi aturan lab')
 console.log('aturan-lab-dokter: bukti wajib, verifikator dari server, umur dari waktu ukur, dievaluasi kernel di peramban dokter')

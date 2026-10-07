@@ -9,7 +9,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs'
 
-const SUMBER = 'src/pages/ClinicalCalculators.tsx'
+const SUMBER = 'src/pages/clinical/ClinicalCalculators.tsx'
 const TUJUAN = 'src/lib/daftarKalkulatorKlinis.ts'
 
 const isi = readFileSync(SUMBER, 'utf8')

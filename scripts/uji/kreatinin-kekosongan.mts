@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const src = readFileSync(new URL('../../src/pages/CreatinineClearance.tsx', import.meta.url), 'utf8')
+const src = readFileSync(new URL('../../src/pages/clinical/scores/CreatinineClearance.tsx', import.meta.url), 'utf8')
 const kode = src.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // Rumus Cockcroft-Gault, ditulis ulang di sini supaya gerbang ini tidak

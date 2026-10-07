@@ -102,8 +102,8 @@ for (const klaim of [/injury risk/i, /readiness score/i, /guaranteed/i, /diagnos
 
 // ── 6. Terpasang di suatu tempat yang bisa dibuka ──────────────────────────
 // Halaman yang tidak dirujuk siapa pun bernilai nol, betapapun benarnya.
-const pusat = readFileSync('src/pages/PusatLatihan.tsx', 'utf8')
-assert.match(pusat, /import\('\.\/OrganizerLatihan'\)/, 'the organizer is not loaded by the Training hub')
+const pusat = readFileSync('src/pages/fitness/PusatLatihan.tsx', 'utf8')
+assert.match(pusat, /import\('\.\.\/OrganizerLatihan'\)/, 'the organizer is not loaded by the Training hub')
 assert.match(pusat, /id: 'organizer'/, 'the organizer has no tab a user can select')
 
 console.log('Weekly organizer: push/pull/legs/abs scheduled around recorded runs, rules verified across every selectable combination, load and clinical boundaries held')

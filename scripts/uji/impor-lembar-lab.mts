@@ -119,7 +119,7 @@ assert.deepEqual(uraikanLembarLab('Hemoglobin normal\nLeukosit dalam batas'), []
 console.log('impor-lembar-lab: nama ID/EN, koma desimal, rentang dua sisi saja, satuan berbeda ditandai tidak diimpor')
 {
   const { readFileSync } = await import('node:fs')
-  const ui = readFileSync('src/components/ImporLembarLab.tsx', 'utf8')
+  const ui = readFileSync('src/components/clinical/ImporLembarLab.tsx', 'utf8')
   assert.match(ui, /disabled=\{!!k\.masalah\}/, 'kandidat bersatuan berbeda bisa dicentang')
   assert.match(ui, /Object\.fromEntries\(k\.map\(\(x\) => \[x\.jenisId, false\]\)\)/, 'kandidat tercentang otomatis — angka tersimpan tanpa konfirmasi pengguna')
   assert.match(ui, /periksaMasukanLab\(jenis, String\(k\.nilai\), tanggal, hariIni\(\)\)/, 'impor melewati pemeriksa masukan lab')

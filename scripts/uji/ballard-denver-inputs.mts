@@ -29,7 +29,7 @@ for (const salah of [undefined, null, '12'] as unknown as number[]) assert.equal
 assert.equal('data' in (validateDenverAge(1000) as object), false)
 
 // ── Halaman: teks mentah, gerbang validasi, dan isi klinis lama tidak diubah ──
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /validateBallardInputs\(parseNumberField\(birthWeightG\), parseNumberField\(apgar1\), parseNumberField\(apgar5\)\)/)
 assert.match(halaman, /const \[apgar5, setApgar5\] = useState\('9'\)/); assert.match(halaman, /const \[birthWeightG, setBirthWeightG\] = useState\('3000'\)/)
 assert.match(halaman, /const soapNote = !neonate\.ok \|\| !lub \? '' :/)

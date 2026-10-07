@@ -74,7 +74,7 @@ assert.ok(/No structure with that name is in the geometry/.test(komponen),
   'the empty state no longer says the name is absent from the geometry')
 
 // ── 6. Terpasang di atas modelnya, bukan di tab lain ──────────────────────
-const halaman = readFileSync(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
 const sebelumModel = halaman.slice(0, halaman.indexOf('<Body3D'))
 assert.ok(/<CariStrukturCepat/.test(sebelumModel),
   'the search box is no longer mounted above the 3D model; finding something again means leaving the picture')

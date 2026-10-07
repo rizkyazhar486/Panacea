@@ -121,8 +121,8 @@ assert.match(panel, /offered for CT only/i, 'HU presets must be scoped to CT on 
 }
 
 // ── 7. Terpasang dan bisa dibuka ──────────────────────────────────────────
-const explorer = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
-assert.match(explorer, /import\('\.\/bodyhub\/PencitraanVolumetrikPanel'\)/, 'not loaded by Body Explorer')
+const explorer = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
+assert.match(explorer, /import\('\.\/PencitraanVolumetrikPanel'\)/, 'not loaded by Body Explorer')
 assert.match(explorer, /\{ key: 'pencitraan-volumetrik', label: 'DICOM → 3D' \}/, 'no tab a user can select')
 assert.match(explorer, /panelTab === 'pencitraan-volumetrik'/, 'the tab renders nothing')
 assert.match(readFileSync('src/lib/bodyExplorerTabGroups.ts', 'utf8'), /'pencitraan-volumetrik':/, 'unclassified tab')

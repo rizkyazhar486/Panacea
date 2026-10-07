@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 
 const os = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
-const atlas = readFileSync('src/components/BodyAllSystems3D.tsx', 'utf8')
+const atlas = readFileSync('src/components/bodyhub/BodyAllSystems3D.tsx', 'utf8')
 const physiology = readFileSync('src/pages/bodyhub/AtlasPhysiologyBridgePanel.tsx', 'utf8')
 const pathophysiology = readFileSync('src/pages/bodyhub/PathophysiologyNetworkPanel.tsx', 'utf8')
 const pharmacology = readFileSync('src/pages/bodyhub/PharmacologyMechanismPanel.tsx', 'utf8')

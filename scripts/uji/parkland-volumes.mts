@@ -37,8 +37,8 @@ assert.deepEqual(parklandVolumes(70, 20), parklandVolumes(70, 20))
 assert.equal(4 * +'' * 20, 0)
 
 // Halaman memakai fungsi kanonik dan tidak menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
-assert.match(halaman, /from '\.\.\/domains\/clinical-calculators'/)
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
+assert.match(halaman, /from '\.\.\/\.\.\/domains\/clinical-calculators'/)
 assert.match(halaman, /parklandVolumes\(weight, tbsa\)/)
 assert.match(halaman, /parkland\.ok \?/)
 assert.match(halaman, /\{parkland\.reason\}/)

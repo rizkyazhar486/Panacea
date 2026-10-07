@@ -34,8 +34,8 @@ test('simplicity contract preserves safety and progressive disclosure', async ()
 
 
 test('Body Exposure spatial mode removes the floating assistive control', async () => {
-  const shell = await source('src/components/Shell.tsx')
-  const fab = await source('src/components/FabNavigasi.tsx')
+  const shell = await source('src/components/layout/Shell.tsx')
+  const fab = await source('src/components/layout/FabNavigasi.tsx')
 
   assert.match(
     shell,

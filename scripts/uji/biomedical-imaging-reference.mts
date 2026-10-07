@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const lab = readFileSync(new URL('../../src/pages/bodyhub/BiomedicalEngineLab.tsx', import.meta.url), 'utf8')
-const body = readFileSync(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+const body = readFileSync(new URL('../../src/components/bodyhub/Body3D.tsx', import.meta.url), 'utf8')
 
 // The imaging surface must stay reachable from the already-mounted Biomedical Engine.
 assert.match(lab, /type View = 'engine' \| 'imaging'/)

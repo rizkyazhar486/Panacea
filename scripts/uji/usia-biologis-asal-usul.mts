@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const berkas = new URL('../../src/pages/BiologicalAge.tsx', import.meta.url)
+const berkas = new URL('../../src/pages/bodyhub/BiologicalAge.tsx', import.meta.url)
 const src = readFileSync(berkas, 'utf8')
 const kode = src.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 

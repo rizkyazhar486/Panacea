@@ -139,25 +139,16 @@ html:not(.dark).pmd-liquid-actions-v45 :where(
   input[type='submit'],
   input[type='reset']
 ) {
-  border-color: rgba(13,39,26,.07) !important;
-  /* `!important` di sini WAJIB, dan bukan sekadar kerapian: latar di bawah
-     dipaksa dengan `!important`, sehingga tombol ini SELALU tergambar terang.
-     Ketika warna teksnya tidak ikut dipaksa, ia kalah dari utility seperti
-     `text-white` yang dipakai komponen berpermukaan gelap — dan pasangan
-     latar/teks terbelah: latar terang, teks putih, tulisannya hilang.
-     Itu benar-benar terjadi pada hasil pencarian global di mode terang, yang
-     panelnya `bg-slate-900` sehingga isinya memang memakai `text-white`.
-     Aturannya sederhana: yang memaksa latar harus ikut memaksa tintanya.
+  border-color: rgba(13,39,26,.10) !important;
+  /* Flat solid: latar putih/off-white tanpa gradasi neumorphic.
+     Warna teks wajib dipaksa bersamaan dengan latar — lihat komentar
+     di atas (mode gelap) untuk alasan lengkapnya.
      Penjaganya: scripts/uji/kontras-kendali-terang.mts. */
   color: #18221d !important;
-  background:
-    radial-gradient(120% 120% at 18% -18%, rgba(255,255,255,.96), transparent 55%),
-    linear-gradient(145deg, #f8f9f8, #e8eae9) !important;
+  background: #ffffff !important;
   box-shadow:
-    -10px -10px 28px rgba(255,255,255,.74),
-    9px 10px 24px rgba(13,39,26,.08),
-    inset -12px -12px 34px rgba(255,255,255,.30),
-    inset 10px 10px 30px rgba(13,39,26,.045) !important;
+    0 1px 3px rgba(13,39,26,.08),
+    0 1px 2px rgba(13,39,26,.04) !important;
 }
 
 /* Memaksa `color` pada TOMBOLNYA saja ternyata belum cukup, dan alasannya
@@ -193,13 +184,10 @@ html.pmd-liquid-actions-v45 :where(
 ) {
   color: var(--pmd-ref-ink-on-green) !important;
   border-color: rgba(255,255,255,.30) !important;
-  background:
-    radial-gradient(130% 120% at 22% -18%, rgba(255,255,255,.42), transparent 48%),
-    linear-gradient(180deg, #32dc70 0%, var(--pmd-ref-green) 58%, #1fbd57 100%) !important;
+  background: var(--pmd-ref-green) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.54),
-    inset 0 -5px 10px rgba(0,74,30,.13),
-    0 12px 28px rgba(37,209,98,.22) !important;
+    0 2px 6px rgba(37,209,98,.30),
+    0 1px 2px rgba(0,0,0,.08) !important;
 }
 
 /* Selected/toggled controls use a glass bubble rather than a flat fill. */
@@ -228,16 +216,12 @@ html:not(.dark).pmd-liquid-actions-v45 :where(
   button[aria-current='page'],
   [role='tab'][aria-selected='true']
 ) {
-  color: #112019 !important;
-  background:
-    radial-gradient(circle at 30% 18%, rgba(255,255,255,.90) 0 7%, rgba(255,255,255,.36) 15%, transparent 32%),
-    radial-gradient(120% 120% at 78% 88%, rgba(37,209,98,.20), transparent 62%),
-    linear-gradient(145deg, rgba(255,255,255,.84), rgba(230,238,233,.72)) !important;
+  /* Active/selected tab: solid brand green — tegas, mudah dibaca, klinisial. */
+  color: #ffffff !important;
+  background: #0b7a4b !important;
   box-shadow:
-    -8px -8px 24px rgba(255,255,255,.72),
-    9px 10px 28px rgba(13,39,26,.09),
-    inset 0 1px 0 rgba(255,255,255,.92),
-    0 0 0 1px rgba(37,209,98,.15) !important;
+    0 2px 8px rgba(11,122,75,.25),
+    0 1px 2px rgba(0,0,0,.06) !important;
 }
 
 /* Header, quick-nav and theme controls: same material language, no blue glow. */

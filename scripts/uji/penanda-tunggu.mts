@@ -23,9 +23,9 @@ import { readFileSync } from 'node:fs'
 
 const orb = readFileSync(new URL('../../src/components/ThinkingOrb.tsx', import.meta.url), 'utf8')
 const orbCss = readFileSync(new URL('../../src/components/thinking-orb.css', import.meta.url), 'utf8')
-const rangka = readFileSync(new URL('../../src/components/Rangka.tsx', import.meta.url), 'utf8')
+const rangka = readFileSync(new URL('../../src/components/layout/Rangka.tsx', import.meta.url), 'utf8')
 const main = readFileSync(new URL('../../src/main.tsx', import.meta.url), 'utf8')
-const chatbot = readFileSync(new URL('../../src/pages/Chatbot.tsx', import.meta.url), 'utf8')
+const chatbot = readFileSync(new URL('../../src/pages/clinical/Chatbot.tsx', import.meta.url), 'utf8')
 
 // ── 1. Orb tidak boleh mengaku tahu kemajuan ─────────────────────────────
 assert.ok(!/role="progressbar"|aria-valuenow|aria-valuemax/.test(orb),

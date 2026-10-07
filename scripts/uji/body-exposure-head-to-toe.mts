@@ -24,8 +24,8 @@ for (const id of ['retina', 'optic-nerve', 'larynx', 'carotids', 'mitral', 'left
 // active /body-explorer implementation. Do not make this test require the later
 // HRA/digital-twin replacement: that would silently force the restored UI away
 // from the version the product owner asked to preserve.
-const bodyPage = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
-assert.match(bodyPage, /from '\.\.\/components\/Body3D'/, 'active Body Exposure must use the original shared Body3D viewer')
+const bodyPage = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
+assert.match(bodyPage, /from '\.\.\/\.\.\/components\/Body3D'/, 'active Body Exposure must use the original shared Body3D viewer')
 assert.match(bodyPage, /const PhysiologySection = lazy/)
 assert.match(bodyPage, /const CardioLab = lazy/)
 assert.match(bodyPage, /const SpecialtyLab = lazy/)
@@ -45,7 +45,7 @@ assert.match(bodyPage, /Diseases/)
 assert.match(bodyPage, /Study/)
 assert.match(bodyPage, /satu simulasi tubuh yang utuh/, 'Claude shared-body design contract should remain documented in the active page')
 
-const body3d = readFileSync('src/components/Body3D.tsx', 'utf8')
+const body3d = readFileSync('src/components/bodyhub/Body3D.tsx', 'utf8')
 const physiologyWaveData = readFileSync('src/lib/motionWave.ts', 'utf8')
 assert.match(body3d, /GLTFLoader/)
 assert.match(body3d, /MeshoptDecoder/)

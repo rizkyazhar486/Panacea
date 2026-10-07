@@ -118,7 +118,7 @@ assert.match(settings, /Quiet hours/)
 assert.match(settings, /Interruption budget/)
 assert.match(settings, /Test device/)
 
-const notificationPage = readFileSync('src/pages/Notifications.tsx', 'utf8')
+const notificationPage = readFileSync('src/pages/dashboard/Notifications.tsx', 'utf8')
 assert.match(notificationPage, /SmartNotificationSettings/)
 assert.match(
   notificationPage,
@@ -126,7 +126,7 @@ assert.match(
   'notification fallback copy should still state that local smart evaluation/history remains available when the backend is offline',
 )
 
-const appStatus = readFileSync('src/components/AppStatus.tsx', 'utf8')
+const appStatus = readFileSync('src/components/layout/AppStatus.tsx', 'utf8')
 assert.match(appStatus, /SmartNotificationOrchestrator/)
 
 const serviceWorker = readFileSync('public/sw.js', 'utf8')

@@ -81,9 +81,9 @@ for (const pf of [50, 150, 250, 350, 450]) for (const sup of [false, true]) for 
 assert.equal(n, 5 * 2 * 5 * 5 * 5 * 5 * 2)
 
 // Halaman.
-const src = readFileSync('src/pages/SofaScore.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/SofaScore.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { parseNumberField, sofaScore, type CvLevel } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { parseNumberField, sofaScore, type CvLevel } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/function (resp|coag|liver|renal|cns)Pts|function mortalityBand/.test(src), 'ambang tidak boleh disalin ke halaman')
 assert.ok(lines.some((l) => l.includes("{r.pts ?? '—'}")), 'subskor yang belum sah harus tampil sebagai —')

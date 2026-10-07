@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const emr = readFileSync('src/pages/EMR.tsx', 'utf8')
+const emr = readFileSync('src/pages/clinical/EMR.tsx', 'utf8')
 const api = readFileSync('src/lib/api.ts', 'utf8')
 
 assert.match(api, /recordEncounters:\s*\(patientId: string\)/)

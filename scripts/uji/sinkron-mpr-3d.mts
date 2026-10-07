@@ -29,7 +29,7 @@ assert.match(ui, /penanda=\{kursorKeKotak\(kursor, keadaan\.volume\)\}/, '3D tid
 assert.equal((ui.match(/<PlaneViewer /g) ?? []).length, 3, 'bukan tiga bidang MPR')
 assert.equal((ui.match(/onPick=\{\([a-z], [a-z]\) => setKursor\(/g) ?? []).length, 3, 'bidang tidak berbagi satu kursor')
 // Satu implementasi penampil MPR untuk /radiology dan Imaging.
-const rad = readFileSync('src/pages/Radiology.tsx', 'utf8')
-assert.match(rad, /import \{ PlaneViewer \} from '\.\.\/components\/PlaneViewerMpr'/)
+const rad = readFileSync('src/pages/bodyhub/Radiology.tsx', 'utf8')
+assert.match(rad, /import \{ PlaneViewer \} from '\.\.\/\.\.\/components\/PlaneViewerMpr'/)
 assert.doesNotMatch(rad, /function PlaneViewer\(/, 'penampil MPR terduplikasi di Radiology')
 console.log('sinkron-mpr-3d: kursor MPR = voksel yang sama di 3D (tulang 900 HU), 3 bidang berbagi satu kursor, satu penampil MPR')

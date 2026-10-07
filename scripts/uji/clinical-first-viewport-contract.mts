@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const clinical = readFileSync(new URL('../../src/pages/ClinicalHub.tsx', import.meta.url), 'utf8')
+const clinical = readFileSync(new URL('../../src/pages/clinical/ClinicalHub.tsx', import.meta.url), 'utf8')
 
 const patient = clinical.indexOf('<ClinicalPatientContext />')
 const ask = clinical.indexOf('aria-label="Ask and record"')

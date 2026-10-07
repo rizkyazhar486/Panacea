@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const source = await readFile(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+const source = await readFile(new URL('../../src/components/bodyhub/Body3D.tsx', import.meta.url), 'utf8')
 
 assert.match(source, /const \[retryNonce, setRetryNonce\] = useState\(0\)/)
 assert.match(source, /\}, \[layers, retryNonce\]\)/)

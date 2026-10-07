@@ -3,11 +3,11 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = process.cwd()
-const command = readFileSync(join(root, 'src/components/VisitCommandCenter.tsx'), 'utf8')
-const chat = readFileSync(join(root, 'src/components/ConsultChat.tsx'), 'utf8')
+const command = readFileSync(join(root, 'src/components/clinical/VisitCommandCenter.tsx'), 'utf8')
+const chat = readFileSync(join(root, 'src/components/clinical/ConsultChat.tsx'), 'utf8')
 const liveHr = readFileSync(join(root, 'src/lib/useLiveHeartRate.ts'), 'utf8')
-const emr = readFileSync(join(root, 'src/pages/EMR.tsx'), 'utf8')
-const clinical = readFileSync(join(root, 'src/pages/ClinicalHub.tsx'), 'utf8')
+const emr = readFileSync(join(root, 'src/pages/clinical/EMR.tsx'), 'utf8')
+const clinical = readFileSync(join(root, 'src/pages/clinical/ClinicalHub.tsx'), 'utf8')
 const main = readFileSync(join(root, 'src/main.tsx'), 'utf8')
 
 for (const token of [

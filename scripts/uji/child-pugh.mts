@@ -60,9 +60,9 @@ for (const bilirubin of [0.5, 1.99, 2, 2.5, 3, 3.01, 10]) for (const albumin of 
 assert.equal(n, 7 * 7 * 7 * 9)
 
 // Halaman.
-const src = readFileSync('src/pages/ChildPughScore.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/ChildPughScore.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { childPugh, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { childPugh, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src))
 assert.ok(!/function (bilirubin|albumin|inr)Pts|function classify/.test(src), 'ambang tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{lengkap && cls !== null && pts !== null ? ('))

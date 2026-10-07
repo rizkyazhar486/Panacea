@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const landing = readFileSync('src/pages/Landing.tsx', 'utf8')
+const landing = readFileSync('src/pages/landing/Landing.tsx', 'utf8')
 
 for (const marker of [
   'InteractiveAura',

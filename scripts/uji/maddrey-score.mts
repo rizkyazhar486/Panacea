@@ -61,9 +61,9 @@ for (const bilirubin of [0.5, 2, 8, 20, 55]) for (const patientPt of [8, 12, 15,
 assert.equal(n, 5 * 6 * 4)
 
 // Halaman.
-const src = readFileSync('src/pages/MaddreyScore.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/MaddreyScore.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { maddreyScore, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { maddreyScore, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src))
 assert.ok(!/4\.6 \*|df >= 32/.test(src.replace(/\(≥32\)|\(<32\)/g, '')), 'rumus/ambang tidak boleh disalin ke halaman')
 assert.ok(lines.includes('const severe = res.severe === true'))

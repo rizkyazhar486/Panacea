@@ -49,7 +49,7 @@ assert.equal('data' in (fluidBalance({ ...nol, ivIn: -5 }) as object), false)
 assert.deepEqual(fluidBalance({ ...nol, ivIn: 10 }), fluidBalance({ ...nol, ivIn: 10 }), 'deterministik')
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /ivDrip\(volumeMl, hours, dropFactor\)/)
 assert.match(halaman, /fluidBalance\(\{ oralIn, ivIn, otherIn, urineOut, drainOut, insensibleOut: insensible, otherOut \}\)/)
 assert.match(halaman, /drip\.ok \?/)

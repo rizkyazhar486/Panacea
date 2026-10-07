@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs'
 // PASIEN.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const src = readFileSync(new URL('../../src/pages/PediatricDkaCalculator.tsx', import.meta.url), 'utf8')
+const src = readFileSync(new URL('../../src/pages/clinical/scores/PediatricDkaCalculator.tsx', import.meta.url), 'utf8')
 const kode = src.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // ── 1. Berat, dehidrasi dan kalium dimulai kosong ──────────────────────────
