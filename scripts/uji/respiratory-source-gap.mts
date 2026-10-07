@@ -30,7 +30,25 @@ for (const entry of report.entries) {
   }
 }
 
+const canonicalLobeSources = new Map([
+  ['right-upper-lobe', 'Superior lobe of right lung'],
+  ['right-middle-lobe', 'Middle lobe of right lung'],
+  ['right-lower-lobe', 'Inferior lobe of right lung'],
+  ['left-upper-lobe', 'Superior lobe of left lung'],
+  ['left-lower-lobe', 'Inferior lobe of left lung'],
+] as const)
+for (const [structureId, sourceName] of canonicalLobeSources) {
+  const entry = report.entries.find((candidate) => candidate.structureId === structureId)
+  assert.equal(entry?.coverage, 'source-node-present', `${structureId} must resolve from the shipped visceral source catalogue.`)
+  assert.ok(entry?.exactSourceNames.includes(sourceName), `${structureId} must retain its exact canonical source name: ${sourceName}`)
+}
+
 const missing = respiratoryMissingStructureIds(report)
+assert.deepEqual(missing, [
+  'right-horizontal-fissure',
+  'right-oblique-fissure',
+  'left-oblique-fissure',
+], 'after canonical lobe-name resolution, only the three fissures remain absent from the shipped source-node catalogue')
 assert.deepEqual(missing, [...missing].sort((a, b) => {
   const ai = report.entries.findIndex((entry) => entry.structureId === a)
   const bi = report.entries.findIndex((entry) => entry.structureId === b)
