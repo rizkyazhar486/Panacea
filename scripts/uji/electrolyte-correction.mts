@@ -55,7 +55,7 @@ assert.equal('data' in (kp(0) as object), false)
 assert.equal((4.0 - +'') * 200, 800)
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /correctedSodiumKatz\(measuredNa, glucose\)/)
 assert.match(halaman, /potassiumAssessment\(measuredK\)/)
 assert.match(halaman, /sodium\.ok \?/)

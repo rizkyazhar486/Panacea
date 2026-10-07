@@ -27,7 +27,7 @@ assert.equal(r4.ok, false, 'asumsi 1 mm dipakai sebagai ukuran — angka mm pals
 assert.equal(skalaIrisanTunggal({}).sah, false)
 assert.equal(skalaIrisanTunggal({ jarakPiksel: [0.7, 0.7] }).sah, true)
 
-const ui = readFileSync('src/pages/Radiology.tsx', 'utf8')
+const ui = readFileSync('src/pages/bodyhub/Radiology.tsx', 'utf8')
 assert.match(ui, /skala=\{volume \? skalaBidang\(volume, 'cross-row'\)/, 'bidang silang tidak memakai skala bidangnya sendiri')
 // Tampilan ukur kini di penampil MPR bersama (dipakai /radiology dan Imaging).
 assert.match(readFileSync('src/components/PlaneViewerMpr.tsx', 'utf8'), /hasilUkur\.ok \? `\$\{hasilUkur\.mm\.toFixed\(1\)\} mm/)

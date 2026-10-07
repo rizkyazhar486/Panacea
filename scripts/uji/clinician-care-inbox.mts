@@ -89,7 +89,7 @@ assert.equal(noPlan.requiresHumanReview,true)
 assert.match(CLINICIAN_INBOX_SAFETY_CONTRACT,/not diagnosis/)
 assert.match(CLINICIAN_INBOX_SAFETY_CONTRACT,/human-review required/)
 
-const ui=readFileSync('src/components/LabPasienUntukDokter.tsx','utf8')
+const ui=readFileSync('src/components/clinical/LabPasienUntukDokter.tsx','utf8')
 assert.match(ui,/buildClinicianContinuousCareDigest/)
 assert.match(ui,/data-clinician-care-inbox/)
 assert.match(ui,/no bulk diagnosis, prescription or treatment action/)

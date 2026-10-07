@@ -1,0 +1,761 @@
+import { useState, useEffect } from 'react'
+import { StatusSinkronKlinis } from '../../components/StatusSinkronKlinis'
+import { Link } from 'react-router-dom'
+import { useStore, uid } from '../../lib/store'
+import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
+import { IconHeart, IconShield, IconPlus, IconSparkle } from '../../components/icons'
+import { computeBmi, ageFromDob } from '../../lib/anthro'
+import { GrowthChart } from '../../components/GrowthChart'
+import { api, backendEnabled } from '../../lib/api'
+import { detectDrift, driftSummary } from '../../lib/physiologicalDrift'
+import { ResilienceQuoteCard } from '../../components/ResilienceQuoteCard'
+import { ManualClinicalFlowsheet } from '../../components/ManualClinicalFlowsheet'
+import type { VitalSign, Patient } from '../../lib/types'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+
+/* ═══════════════════════════════════════════
+   LOCAL TYPES
+   ═══════════════════════════════════════════ */
+
+interface SupportiveResult {
+  id: string
+  takenAt: string
+  category: string
+  name: string
+  value: string
+  unit: string
+  reference?: string
+  flag?: 'normal' | 'high' | 'low' | 'critical'
+}
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════ */
+
+// Real clock, not a fabricated mood — the only thing this greeting knows is
+// what time it actually is right now.
+function greeting(): string {
+  const h = new Date().getHours()
+  if (h < 5) return 'Still up'
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
+function fmt(iso: string): string {
+  return new Date(iso).toLocaleString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function computeLongevity(
+  p: { chronicConditions: string[]; riskFlags: string[] },
+  latest: VitalSign | undefined,
+  supportive: SupportiveResult[],
+): { score: number; band: string } {
+  let score = 100
+  score -= p.chronicConditions.length * 8
+  score -= p.riskFlags.includes('elderly') ? 6 : 0
+  score -= p.riskFlags.includes('immunocompromised') ? 8 : 0
+  if (latest) {
+    if (latest.systolic >= 140) score -= 8
+    if (latest.spo2 < 95) score -= 8
+    if (latest.glucose && latest.glucose >= 200) score -= 6
+  }
+  score -= supportive.filter((s) => s.flag === 'high' || s.flag === 'critical').length * 3
+  score = Math.max(20, Math.min(100, score))
+  const band = score >= 80 ? 'Optimal' : score >= 60 ? 'Needs attention' : 'High priority'
+  return { score, band }
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATED LONGEVITY RING
+   ═══════════════════════════════════════════ */
+
+function LongevityRing({ score, band }: { score: number; band: string }) {
+  const [animated, setAnimated] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(score), 200)
+    return () => clearTimeout(t)
+  }, [score])
+
+  const r = 48
+  const c = 2 * Math.PI * r
+  const offset = c - (animated / 100) * c
+  const color = score >= 80 ? '#00BF63' : score >= 60 ? '#f59e0b' : '#FF3131'
+  const glow =
+    score >= 80
+      ? '0 0 24px rgba(0,191,99,0.3)'
+      : score >= 60
+        ? '0 0 24px rgba(245,158,11,0.3)'
+        : '0 0 24px rgba(255,49,49,0.3)'
+
+  return (
+    <div
+      className="relative flex shrink-0 items-center justify-center"
+      role="meter"
+      aria-valuenow={score}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Longevity Score: ${score} — ${band}`}
+    >
+      <svg width="112" height="112" className="-rotate-90" style={{ filter: `drop-shadow(${glow})` }}>
+        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="9" />
+        <circle
+          cx="56" cy="56" r={r} fill="none" stroke={color}
+          strokeWidth="9" strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 1.6s cubic-bezier(0.22, 1, 0.36, 1)' }}
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <span className="text-[28px] font-black leading-none tabular-nums" style={{ color }}>{animated}</span>
+        <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">{band}</span>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   AREA SPARKLINE
+   ═══════════════════════════════════════════ */
+
+function Spark({ values, color }: { values: number[]; color: string }) {
+  if (values.length < 2) return null
+  const w = 72
+  const h = 26
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const span = max - min || 1
+  const pts = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * w
+      const y = h - ((v - min) / span) * (h - 4) - 2
+      return `${x.toFixed(1)},${y.toFixed(1)}`
+    })
+    .join(' ')
+  const lastY = h - ((values[values.length - 1] - min) / span) * (h - 4) - 2
+  const gradId = `spk-${color.replace('#', '')}`
+  return (
+    <svg width={w} height={h} className="overflow-visible" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={`0,${h} ${pts} ${w},${h}`} fill={`url(#${gradId})`} />
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={w} cy={lastY} r="2.5" fill={color} />
+    </svg>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   BMI VISUAL GAUGE
+   ═══════════════════════════════════════════ */
+
+function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: string }) {
+  const pct = Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
+  const color = tone === 'high' || tone === 'critical' ? '#FF3131' : tone === 'low' ? '#f59e0b' : '#00BF63'
+
+  return (
+    <div className="w-full space-y-3">
+      <div className="relative h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+        <div className="absolute inset-y-0 left-0 w-[30%] bg-blue-100/60" />
+        <div className="absolute inset-y-0 left-[30%] w-[20%] bg-green-100/60" />
+        <div className="absolute inset-y-0 left-[50%] w-[20%] bg-amber-100/60" />
+        <div className="absolute inset-y-0 left-[70%] w-[30%] bg-red-100/60" />
+        <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out" style={{ left: `calc(${pct}% - 6px)` }}>
+          <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
+        </div>
+      </div>
+      <div className="flex justify-between text-[10px] font-semibold text-neutral-300">
+        <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
+      </div>
+      <div className="text-center">
+        <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
+        <span className="ml-1 text-xs text-neutral-500">kg/m²</span>
+      </div>
+      <div className="text-center">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        <Badge tone={tone as any}>{kesan}</Badge>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   VITAL FEED CARD
+   ═══════════════════════════════════════════ */
+
+function VitalCard({ label, value, unit, series, tone }: { label: string; value: string; unit: string; series: number[]; tone: 'normal' | 'high' }) {
+  const accent = tone === 'high' ? '#FF3131' : '#00BF63'
+  const bg = tone === 'high' ? 'rgba(255,49,49,0.03)' : 'rgba(0,191,99,0.03)'
+  const border = tone === 'high' ? 'rgba(255,49,49,0.1)' : 'rgba(0,191,99,0.08)'
+
+  return (
+    <div
+      className="tile-inset group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+      style={{ background: bg, borderColor: border }}
+      role="status"
+      aria-label={`${label}: ${value} ${unit}`}
+    >
+      <div className="absolute left-0 top-0 h-full w-[3px] transition-all duration-300 group-hover:w-[5px]" style={{ background: `linear-gradient(180deg, ${accent}, ${accent}66)` }} />
+      <div className="flex items-start justify-between pl-2">
+        <div>
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: accent, boxShadow: `0 0 6px ${accent}66` }} />
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{label}</span>
+          </div>
+          <div className="mt-2.5 flex items-baseline gap-1">
+            <span className={`num-carved text-[26px] font-black leading-none tabular-nums ${tone === 'high' ? '' : 'text-ink dark:text-white'}`} style={tone === 'high' ? { color: '#FF3131' } : undefined}>{value}</span>
+            <span className="text-[10px] font-medium text-neutral-500">{unit}</span>
+          </div>
+        </div>
+        <div className="mt-1 opacity-70 transition-opacity group-hover:opacity-100">
+          <Spark values={series} color={accent} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   PHYSIOLOGICAL DRIFT
+   ═══════════════════════════════════════════ */
+
+// Shows nothing until there's a real baseline (5+ prior readings) and a real
+// statistical deviation (z-score) — no placeholder "everything looks fine"
+// message, since that would imply a check happened when it didn't yet.
+function DriftPanel({ vitals }: { vitals: VitalSign[] }) {
+  const findings = detectDrift(vitals)
+  if (findings.length === 0) return null
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="border-b border-neutral-100 px-5 py-4">
+        <SectionTitle
+          icon={<IconSparkle size={18} />}
+          title="Physiological Drift"
+          subtitle="Compared to this patient's own recent baseline — not a population norm"
+        />
+        <BatasKlaimKesehatan permukaan="care.dashboard-insights" />
+      </div>
+      <div className="space-y-2 p-5">
+        {findings.map((f) => (
+          <div
+            key={f.key}
+            className="rounded-xl border p-3"
+            style={{
+              background: f.severity === 'drift' ? 'rgba(255,49,49,0.04)' : 'rgba(245,158,11,0.05)',
+              borderColor: f.severity === 'drift' ? 'rgba(255,49,49,0.12)' : 'rgba(245,158,11,0.15)',
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-ink">{f.label}</span>
+              <Badge tone={f.severity === 'drift' ? 'high' : 'low'}>
+                {f.severity === 'drift' ? 'Drifting' : 'Watch'}
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-neutral-600">{driftSummary(f)}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   SUPPORTIVE RESULT CARD
+   ═══════════════════════════════════════════ */
+
+function SupportiveCard({ r }: { r: SupportiveResult }) {
+  const palette: Record<string, { bg: string; dot: string }> = {
+    normal: { bg: 'rgba(0,191,99,0.04)', dot: '#00BF63' },
+    high: { bg: 'rgba(255,49,49,0.04)', dot: '#FF3131' },
+    low: { bg: 'rgba(245,158,11,0.04)', dot: '#f59e0b' },
+    critical: { bg: 'rgba(255,49,49,0.08)', dot: '#FF3131' },
+  }
+  const s = palette[r.flag ?? 'normal']
+  const flagLabel = r.flag === 'high' ? 'High' : r.flag === 'low' ? 'Low' : r.flag === 'critical' ? 'Critical' : 'Normal'
+
+  return (
+    <div className="group flex items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200 hover:shadow-sm" style={{ background: s.bg, borderColor: `${s.dot}12` }}>
+      <span className="mt-0.5 inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: s.dot, boxShadow: `0 0 8px ${s.dot}44` }} />
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-semibold">{r.name}</span>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <Badge tone={(r.flag ?? 'normal') as any}>{flagLabel}</Badge>
+          <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{SUPPORTIVE_CAT_LABEL[r.category] ?? r.category}</span>
+        </div>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-500">
+          <span className="font-bold" style={{ color: s.dot }}>{r.value} {r.unit}</span>
+          <span>Reference: {r.reference || '—'}</span>
+        </div>
+      </div>
+      <span className="shrink-0 text-[10px] tabular-nums text-neutral-300">{fmt(r.takenAt)}</span>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   ADD PATIENT FORM
+   ═══════════════════════════════════════════ */
+
+function AddPatientForm({ onAdd }: { onAdd: (p: Patient) => void }) {
+  const [f, setF] = useState({
+    name: '', sex: 'L', age: '40', heightCm: '165',
+    weightKg: '60', bloodType: '', conditions: '', allergies: '',
+  })
+  const colors = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#FF3131', '#f59e0b']
+
+  function submit() {
+    if (!f.name.trim()) return
+    const year = new Date().getFullYear() - (Number(f.age) || 30)
+    onAdd({
+      id: uid(),
+      name: f.name.trim(),
+      sex: f.sex as 'L' | 'P',
+      dob: `${year}-01-01`,
+      mrn: 'PMD-' + uid().slice(0, 6).toUpperCase(),
+      heightCm: Number(f.heightCm) || 165,
+      weightKg: Number(f.weightKg) || 60,
+      bloodType: f.bloodType.trim() || undefined,
+      allergies: f.allergies.split(',').map((a) => a.trim()).filter(Boolean),
+      chronicConditions: f.conditions.split(',').map((c) => c.trim()).filter(Boolean),
+      riskFlags: [],
+      avatarColor: colors[Math.floor(Math.random() * colors.length)],
+    })
+    setF({ name: '', sex: 'L', age: '40', heightCm: '165', weightKg: '60', bloodType: '', conditions: '', allergies: '' })
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Field label="Name"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Patient name" autoFocus /></Field>
+      <Field label="Sex">
+        <select className={inputClass} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
+          <option value="L">Male</option><option value="P">Female</option>
+        </select>
+      </Field>
+      <Field label="Age"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
+      <Field label="Blood Type"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
+      <Field label="Height (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
+      <Field label="Weight (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
+      <Field label="Chronic Conditions"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="comma separated" /></Field>
+      <Field label="Allergies"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="comma separated" /></Field>
+      <div className="flex items-end sm:col-span-2 lg:col-span-4">
+        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Save Patient</Button>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   ADD VITAL FORM
+   ═══════════════════════════════════════════ */
+
+function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
+  const [f, setF] = useState<Record<string, string>>({
+    sys: '120', dia: '80', hr: '78', rr: '16', temp: '36.6', spo2: '98', glu: '',
+  })
+  const fields: [string, string][] = [
+    ['sys', 'Systolic'], ['dia', 'Diastolic'], ['hr', 'Pulse'],
+    ['rr', 'RR'], ['temp', 'Temp'], ['spo2', 'SpO₂'], ['glu', 'Blood Glucose'],
+  ]
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      {fields.map(([k, label]) => (
+        <Field key={k} label={label}>
+          <input className={inputClass} type="number" value={f[k] ?? ''} onChange={(e) => setF({ ...f, [k]: e.target.value })} />
+        </Field>
+      ))}
+      <div className="flex items-end">
+        <Button onClick={() => onAdd({
+          id: uid(), takenAt: new Date().toISOString(),
+          systolic: Number(f.sys), diastolic: Number(f.dia),
+          heartRate: Number(f.hr), respRate: Number(f.rr),
+          tempC: Number(f.temp), spo2: Number(f.spo2),
+          glucose: f.glu ? Number(f.glu) : undefined,
+        })}>Save</Button>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   AI CLINICAL INSIGHT
+   ═══════════════════════════════════════════ */
+const INSIGHT_SYSTEM = `You are Panaceamed's educational clinical draft assistant for licensed clinicians. Based on the vital signs & supportive test data provided, write ONE short paragraph (max 3 sentences) with a concise technical summary in English, then 3 concrete action recommendations (using "• "). Be honest if the data isn't sufficient for a strong conclusion. This is a support draft, not a final diagnosis or clinically validated decision — the doctor still decides.`
+
+function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; vitals: VitalSign[]; supportive: SupportiveResult[] }) {
+  const [text, setText] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const latest = vitals[vitals.length - 1]
+
+  async function requestInsight() {
+    setBusy(true); setErr(''); setText('')
+    const vitalsLine = latest
+      ? `BP ${latest.systolic}/${latest.diastolic} mmHg, pulse ${latest.heartRate}/min, RR ${latest.respRate}/min, temp ${latest.tempC}°C, SpO2 ${latest.spo2}%${latest.glucose ? `, blood glucose ${latest.glucose} mg/dL` : ''}`
+      : 'no vital signs recorded yet'
+    const labsLine = supportive.length
+      ? supportive.slice(0, 8).map((s) => `${s.name} ${s.value}${s.unit ?? ''}${s.flag && s.flag !== 'normal' ? ` (${s.flag})` : ''}`).join('; ')
+      : 'no supportive results recorded yet'
+    const context = `Patient: ${patient.name}, ${patient.sex === 'L' ? 'male' : 'female'}, ${ageFromDob(patient.dob)} years old. Chronic conditions: ${patient.chronicConditions.join(', ') || '-'}. Allergies: ${patient.allergies.join(', ') || '-'}.\nLatest vital signs: ${vitalsLine}.\nLatest supportive results: ${labsLine}.`
+    try {
+      const r = await api.aiMessages({ model: 'claude-sonnet-4-6', system: INSIGHT_SYSTEM, messages: [{ role: 'user', content: context }], max_tokens: 500 })
+      setText(r.text)
+    } catch {
+      setErr('AI Clinical Insight failed to load. Make sure the server & AI key are active.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl p-5 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
+      <div className="flex items-center gap-2">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
+        <div>
+          <div className="text-sm font-black">AI Clinical Insight</div>
+          <div className="text-[10px] font-semibold text-ink/60">Powered by Panaceamed AI · Beta</div>
+        </div>
+      </div>
+
+      {text ? (
+        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-ink/90">{text}</div>
+      ) : (
+        <p className="mt-3 text-[13px] leading-relaxed text-ink/70">
+          Ask AI to summarize this patient's latest vital signs & supportive results into a brief clinical analysis and action recommendations.
+        </p>
+      )}
+      {err && <p className="mt-2 text-[11px] text-ink/80">{err}</p>}
+
+      <button
+        onClick={requestInsight}
+        disabled={busy}
+        className="mt-4 w-full rounded-xl bg-white/15 py-2.5 text-xs font-bold text-white transition hover:bg-white/25 disabled:opacity-50"
+      >
+        {busy ? 'Analyzing…' : text ? '🔄 Re-analyze' : 'Request AI Analysis →'}
+      </button>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   MAIN DASHBOARD
+   ═══════════════════════════════════════════ */
+
+// Kunci kategori penunjang TERSIMPAN di rekam medis dan dibandingkan dengan
+// ===, jadi ia tetap data; hanya labelnya yang dialihkan. Sebelum ini kuncinya
+// dirender mentah sehingga "Radiologi" dan "Lainnya" tampil di layar.
+const SUPPORTIVE_CAT_LABEL: Record<string, string> = {
+  Lab: 'Lab', EKG: 'ECG', Radiologi: 'Radiology', Lainnya: 'Other',
+}
+
+export function Dashboard() {
+  const { state, activePatient, addVital, addPatient, addSupportive } = useStore()
+  const p = activePatient
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const vitals: VitalSign[] = (state.vitals[p.id] ?? []) as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supportive: SupportiveResult[] = (state.supportive[p.id] ?? []) as any
+  const latest = vitals[vitals.length - 1]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anthro: any = computeBmi(p.weightKg, p.heightCm)
+  const [showAdd, setShowAdd] = useState(false)
+  const [showAddPatient, setShowAddPatient] = useState(false)
+
+  const longevity = computeLongevity(p, latest, supportive)
+  const hasPatient = p.id !== 'none'
+
+  /* ── Empty State ── */
+  if (!hasPatient) {
+    return (
+      <div className="mx-auto max-w-xl space-y-10 py-16">
+        <div className="text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
+            <IconHeart size={34} className="text-ink" />
+          </div>
+          <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
+          <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
+            Add your first patient to monitor vital signs, anthropometry, and clinical data — all integrated to support quality longevity.
+          </p>
+        </div>
+        <Card className="overflow-hidden">
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="New Patient" /></div>
+          <div className="p-5"><AddPatientForm onAdd={(np) => addPatient(np)} /></div>
+        </Card>
+      </div>
+    )
+  }
+
+  /* ── Main Layout ── */
+  return (
+    <div className="space-y-5">
+      <StatusSinkronKlinis />
+
+      {/* Story-like Quick Actions */}
+      <div className="flex items-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <button onClick={() => setShowAddPatient((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-neutral-200 px-4 py-2 text-[11px] font-semibold text-neutral-500 transition-all duration-200 hover:border-[#00BF63] hover:text-[#00BF63] hover:bg-[rgba(0,191,99,0.05)] active:scale-[0.97]">
+          <IconPlus size={13} /> New Patient
+        </button>
+        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
+          <IconHeart size={13} /> Record Vitals
+        </button>
+        <a href="#manual-icu-flowsheet" className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85">
+          ICU Flowsheet
+        </a>
+        <Link
+          to="/clinical-hub"
+          title="Open visual clinical workspace"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85"
+        >
+          Visual Clinical →
+        </Link>
+        {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
+      </div>
+
+      {/* Add Patient Drawer */}
+      {showAddPatient && (
+        <Card className="overflow-hidden">
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Add Patient" /></div>
+          <div className="p-5"><AddPatientForm onAdd={(np) => { addPatient(np); setShowAddPatient(false) }} /></div>
+        </Card>
+      )}
+
+      {/* Patient Profile Hero — an atmospheric banner instead of a flat tint,
+          built from real patient data (name, vitals, conditions). Nothing
+          drawn here is decorative fabrication: the glow color and the
+          "signal" chips are the patient's own avatar color and latest
+          recorded vitals. */}
+      <div className="prism-rays relative overflow-hidden rounded-2xl" style={{ background: '#0b191e' }}>
+        {/* Layered radial glow — a deep-space feel using the patient's own
+            accent color plus the brand green, not arbitrary decoration. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(120% 90% at 15% -10%, ${p.avatarColor}3d 0%, transparent 55%),
+              radial-gradient(90% 70% at 100% 0%, rgba(0,191,99,0.28) 0%, transparent 60%),
+              radial-gradient(140% 100% at 50% 120%, rgba(0,0,0,0.4) 0%, transparent 60%)
+            `,
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '18px 18px' }}
+        />
+
+        <div className="relative px-5 pb-5 pt-6 text-white">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">{greeting()}</span>
+            <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
+              <IconShield size={11} className="text-[#5be08a]" /> Confidential
+            </span>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-4">
+              <span
+                className="grid h-20 w-20 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-ink transition-transform duration-300 hover:scale-[1.04]"
+                style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 28px ${p.avatarColor}55, 0 0 0 1px rgba(255,255,255,0.15)` }}
+              >
+                {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
+              </span>
+              <div className="pb-1">
+                <h2 className="text-[22px] font-black leading-tight tracking-tight text-white">{p.name}</h2>
+                <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-white/60">
+                  <span>{p.sex === 'L' ? 'Male' : 'Female'}</span>
+                  <span className="text-white/25">·</span>
+                  <span>{ageFromDob(p.dob)} years old</span>
+                  {p.bloodType && (<><span className="text-white/25">·</span><span className="font-semibold text-white/80">Type {p.bloodType}</span></>)}
+                  <span className="text-white/25">·</span>
+                  <span className="font-mono text-xs text-white/50">{p.mrn}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-1 rounded-2xl bg-white/[0.06] px-4 py-3 backdrop-blur-sm sm:items-end">
+              <LongevityRing score={longevity.score} band={longevity.band} />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Longevity Score</span>
+            </div>
+          </div>
+
+          {/* Live signal strip — same real numbers as the Vital Signs card
+              below, surfaced here so the hero isn't just a name plate. */}
+          {latest && (
+            <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
+              {[
+                { label: 'BP', value: `${latest.systolic}/${latest.diastolic}` },
+                { label: 'Pulse', value: `${latest.heartRate}` },
+                { label: 'SpO₂', value: `${latest.spo2}%` },
+                { label: 'Temp', value: `${latest.tempC}°C` },
+                { label: 'RR', value: `${latest.respRate}/min` },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-center backdrop-blur-sm">
+                  <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/40">{s.label}</div>
+                  <div className="mt-0.5 text-sm font-bold tabular-nums text-white">{s.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-5 flex flex-wrap gap-1.5">
+            {p.chronicConditions.length === 0 && p.allergies.length === 0 ? (
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(0,191,99,0.16)', color: '#7ce8a4' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />No chronic conditions / allergies recorded
+              </span>
+            ) : (
+              <>
+                {p.chronicConditions.map((c) => (
+                  <span key={c} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(255,49,49,0.14)', color: '#ff8a8a' }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#FF3131' }} />{c}
+                  </span>
+                ))}
+                {p.allergies.map((a) => (
+                  <span key={a} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(245,158,11,0.16)', color: '#fbc36f' }}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Allergy: {a}
+                  </span>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* A quiet nudge, shown only when this patient actually has a real
+          chronic condition on record — never presumed, never shown to
+          someone with nothing logged. Fighting something long-term is
+          different from an ordinary checkup, and the app should say so
+          once, not pretend it's the same. */}
+      {p.chronicConditions.length > 0 && (
+        <div className="space-y-2">
+          <ResilienceQuoteCard />
+          <a href="#/resilience-stories" className="block text-center text-xs font-bold text-[#00BF63] hover:underline">
+            Read real stories of people who fought back →
+          </a>
+        </div>
+      )}
+
+      {/* Manual bedside ICU charting — mirrors the paper flowsheet structure
+          without copying patient-identifying values from the reference photos.
+          Structured core vitals reuse the canonical vital timeline; all other
+          manually entered fields use the existing supportive-result store. */}
+      <ManualClinicalFlowsheet
+        onAddVital={(vital) => addVital(p.id, vital)}
+        onAddSupportive={(result) => addSupportive(p.id, result)}
+      />
+
+      {/* AI Clinical Insight */}
+      {backendEnabled && <AiClinicalInsight patient={p} vitals={vitals} supportive={supportive} />}
+
+      {/* Add Vital Collapsible — FIX: tidak pakai style pada Card */}
+      {showAdd && (
+        <Card className="overflow-hidden">
+          <div className="h-[3px]" style={{ background: 'linear-gradient(90deg, #00BF63, #00BF6340, transparent)' }} />
+          <div className="border-b border-neutral-100 px-5 py-3" style={{ background: 'rgba(0,191,99,0.02)' }}>
+            <SectionTitle icon={<IconHeart size={18} />} title="Record New Vital Signs" />
+          </div>
+          <div className="p-5"><AddVital onAdd={(v) => { addVital(p.id, v); setShowAdd(false) }} /></div>
+        </Card>
+      )}
+
+      {/* Vitals Feed Grid */}
+      <Card className="overflow-hidden">
+        <div className="border-b border-neutral-100 px-5 py-4">
+          <SectionTitle icon={<IconHeart size={20} />} title="Vital Signs" subtitle="Continuous monitoring — longevity support" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 p-5 lg:grid-cols-3">
+          <VitalCard label="Blood Pressure" value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'} unit="mmHg" series={vitals.map((v) => v.systolic)} tone={latest && latest.systolic >= 140 ? 'high' : 'normal'} />
+          <VitalCard label="Pulse" value={latest ? `${latest.heartRate}` : '—'} unit="x/min" series={vitals.map((v) => v.heartRate)} tone={latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'} />
+          <VitalCard label="Resp. Rate" value={latest ? `${latest.respRate}` : '—'} unit="x/min" series={vitals.map((v) => v.respRate)} tone={latest && latest.respRate > 20 ? 'high' : 'normal'} />
+          <VitalCard label="Temperature" value={latest ? `${latest.tempC}` : '—'} unit="°C" series={vitals.map((v) => v.tempC)} tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'} />
+          <VitalCard label="SpO₂" value={latest ? `${latest.spo2}` : '—'} unit="%" series={vitals.map((v) => v.spo2)} tone={latest && latest.spo2 < 95 ? 'high' : 'normal'} />
+          <VitalCard label="Blood Glucose" value={latest?.glucose ? `${latest.glucose}` : '—'} unit="mg/dL" series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)} tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'} />
+        </div>
+        {latest && (
+          <div className="border-t border-neutral-50 px-5 py-2.5">
+            <p className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+              <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00BF63] animate-pulse" />
+              Last updated {fmt(latest.takenAt)}
+            </p>
+          </div>
+        )}
+      </Card>
+
+      {/* Physiological Drift — compares the latest reading to the patient's
+          OWN recent baseline, not a population threshold. See lib/physiologicalDrift.ts
+          for why this uses real z-scores instead of any invented "healthspan" score. */}
+      <DriftPanel vitals={vitals} />
+
+      {/* Anthropometry + BMI Gauge */}
+      <Card className="overflow-hidden">
+        <div className="border-b border-neutral-100 px-5 py-4">
+          <SectionTitle icon={<IconSparkle size={18} />} title="Anthropometry" subtitle="Asia-Pacific cut-off" />
+        </div>
+        <div className="grid gap-8 p-5 lg:grid-cols-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
+              <span className="text-sm text-neutral-500">Height</span>
+              <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-500">cm</span></span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
+              <span className="text-sm text-neutral-500">Weight</span>
+              <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-500">kg</span></span>
+            </div>
+            <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
+              <p className="text-[11px] leading-relaxed text-neutral-500">
+                <IconSparkle size={11} className="mr-1 inline text-[#00BF63]" />
+                Full WHO/CDC Z-scores (weight-for-age, height-for-age, weight-for-height) are computed by AI during workup in AI-EMR.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="w-full">
+              <BmiGauge bmi={Number(anthro.bmi) || 0} kesan={String(anthro.kesan || '')} tone={String(anthro.tone || 'normal')} />
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Growth Chart */}
+      <Card className="overflow-hidden">
+        <div className="border-b border-neutral-100 px-5 py-4">
+          <SectionTitle
+            icon={<IconSparkle size={18} />}
+            title="Growth & BMI Chart"
+            subtitle={ageFromDob(p.dob) <= 19 ? 'Child/adolescent growth curve (WHO/CDC) — weight-for-age · height-for-age · BMI-for-age' : 'Adult BMI classification (Asia-Pacific)'}
+          />
+        </div>
+        <div className="p-5">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <GrowthChart patient={p as any} ageYears={ageFromDob(p.dob)} />
+        </div>
+      </Card>
+
+      {/* Supportive Results — Card Stream */}
+      <Card className="overflow-hidden">
+        <div className="border-b border-neutral-100 px-5 py-4">
+          <SectionTitle icon={<IconShield size={20} />} title="Supportive Results" subtitle="Lab · ECG · Radiology — longevity support" />
+        </div>
+        <div className="space-y-2 p-5">
+          {supportive.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.03)' }}>
+                <IconShield size={22} className="text-neutral-300" />
+              </div>
+              <p className="text-sm text-neutral-500">No supportive results yet.</p>
+            </div>
+          ) : (
+            supportive.map((r) => <SupportiveCard key={r.id} r={r} />)
+          )}
+        </div>
+      </Card>
+    </div>
+  )
+}

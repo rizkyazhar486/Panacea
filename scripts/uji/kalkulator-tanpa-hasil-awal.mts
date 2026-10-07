@@ -1,3 +1,4 @@
+import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
@@ -14,7 +15,7 @@ import { readFileSync } from 'node:fs'
 // nilai bawaan, tetapi bilirubin 2,0 terbaca sebagai hasil lab seseorang.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const baca = (nama: string) => readFileSync(new URL(`../../src/pages/${nama}`, import.meta.url), 'utf8')
+const baca = (nama: string) => bacaSumber('pages', nama)
 const kodeDari = (s: string) => s.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // ── Corrected Calcium (Payne 1973) ─────────────────────────────────────────

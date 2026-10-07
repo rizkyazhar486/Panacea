@@ -4,8 +4,8 @@ import { FITUR_DARI_HUB } from '../../src/lib/katalogFitur.ts'
 
 const main = await readFile(new URL('../../src/main.tsx', import.meta.url), 'utf8')
 const home = await readFile(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
-const shell = await readFile(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
-const fab = await readFile(new URL('../../src/components/FabNavigasi.tsx', import.meta.url), 'utf8')
+const shell = await readFile(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
+const fab = await readFile(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
 const css = await readFile(new URL('../../src/styles/superpage-convergence.css', import.meta.url), 'utf8')
 
 let failed = false

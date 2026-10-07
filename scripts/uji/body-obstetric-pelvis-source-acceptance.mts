@@ -33,9 +33,9 @@ assert.ok(obgin.every((part) => part.triangles > 0), 'obgin: female-reference mo
 assert.deepEqual([...new Set(obgin.map((part) => part.source))], ['hra-female'])
 
 const root = process.cwd()
-const body = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const body = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
-assert.match(body, /lazy\(\(\) => import\('\.\/bodyhub\/SpecialtyLab'\)\)/)
+assert.match(body, /lazy\(\(\) => import\('\.\/SpecialtyLab'\)\)/)
 assert.match(body, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /<AtlasViewer3D/)
 assert.match(specialty, /modul: \['obstetri', 'obgin', 'payudara'\]/)

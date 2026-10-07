@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const home = readFileSync('src/pages/Beranda.tsx', 'utf8')
+const home = readFileSync('src/pages/dashboard/Beranda.tsx', 'utf8')
 const match = home.match(/function HomeLoadingCard[\s\S]*?\n}\n\nfunction DeferredHomeBlock/)
 assert.ok(match, 'HomeLoadingCard source block must exist')
 const loadingCard = match[0]

@@ -22,7 +22,7 @@ for (const id of ['penis', 'erectile-tissue', 'testis', 'epididymis', 'deferent-
   assert.ok(reproductive.targets.some((target) => target.id === id), `missing whole-body male reproductive target: ${id}`)
 }
 
-const viewer = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
+const viewer = readFileSync(new URL('../../src/components/bodyhub/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(viewer, /contextNamesByFile/)
 assert.match(viewer, /surfaceSystem/)
 assert.match(viewer, /surface\.glb/)

@@ -66,7 +66,7 @@ assert.deepEqual(resolveBodySemanticRepresentation('tissue', {
   reason: 'source-load-failed',
 })
 
-const atlas = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
+const atlas = readFileSync(new URL('../../src/components/bodyhub/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(atlas, /fittedCameraDistance \/ cameraDistance/)
 assert.match(atlas, /onSemanticZoomChange/)
 assert.match(atlas, /controls\.addEventListener\('change', onControlChange\)/)

@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises'
 const [taxonomy, hiddenFeatures, allFeatures, entryPoints] = await Promise.all([
   readFile(new URL('../../src/lib/productSpaces.ts', import.meta.url), 'utf8'),
   readFile(new URL('../../src/lib/fiturTersembunyi.ts', import.meta.url), 'utf8'),
-  readFile(new URL('../../src/pages/SemuaFitur.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../../src/pages/dashboard/SemuaFitur.tsx', import.meta.url), 'utf8'),
   readFile(new URL('../../src/lib/featureEntryPoints.ts', import.meta.url), 'utf8'),
 ])
 

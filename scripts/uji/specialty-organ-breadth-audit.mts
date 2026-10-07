@@ -35,9 +35,9 @@ for (const audit of audits) {
 // must mount SpecialtyLab, SpecialtyLab must expose the exact modules, and the same
 // surface must use the real atlas WebGL viewer rather than prose-only cards.
 const root = process.cwd()
-const bodyExplorer = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const bodyExplorer = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
-assert.match(bodyExplorer, /lazy\(\(\) => import\('\.\/bodyhub\/SpecialtyLab'\)\)/)
+assert.match(bodyExplorer, /lazy\(\(\) => import\('\.\/SpecialtyLab'\)\)/)
 assert.match(bodyExplorer, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /<AtlasViewer3D/)
 assert.match(specialty, /BodyParts3D 4\.0 .*CC BY 4\.0/)

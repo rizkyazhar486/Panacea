@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 
-const src = readFileSync(new URL('../../src/components/ui.tsx', import.meta.url), 'utf8')
+const src = readFileSync(new URL('../../src/components/ui/ui.tsx', import.meta.url), 'utf8')
 
 let lulus = 0
 let gagal = 0

@@ -67,7 +67,7 @@ for (const id of ['penis', 'erectile-tissue', 'testis', 'epididymis', 'deferent-
   assert.ok(reproductive.targets.some((target) => target.id === id), `missing male reproductive source target: ${id}`)
 }
 
-const component = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
+const component = readFileSync(new URL('../../src/components/bodyhub/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(component, /muatAtlas/)
 assert.match(component, /namaAtlas/)
 assert.match(component, /OrbitControls/)

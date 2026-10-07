@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const api = readFileSync('src/lib/api.ts', 'utf8')
-const kunjungan = readFileSync('src/components/KunjunganEmr.tsx', 'utf8')
+const kunjungan = readFileSync('src/components/clinical/KunjunganEmr.tsx', 'utf8')
 
 assert.match(api, /recordEncounters:\s*\(patientId: string\)/, 'typed client API daftar encounter hilang')
 assert.match(api, /\/api\/clinical\/records\//, 'client tidak menunjuk endpoint multi-encounter server')

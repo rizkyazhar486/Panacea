@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync(new URL('../../src/components/CardioAtlas3D.tsx', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../src/components/bodyhub/CardioAtlas3D.tsx', import.meta.url), 'utf8')
 
 assert.match(source, /role="tablist"/, 'cardiovascular mode chooser must expose a tablist')
 assert.equal((source.match(/role="tab"/g) ?? []).length, 2, 'both 3D modes must be tabs')

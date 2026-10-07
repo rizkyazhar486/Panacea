@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises'
 const page = await readFile(new URL('../../src/pages/DoctorReviewChecklist.tsx', import.meta.url), 'utf8')
 const model = await readFile(new URL('../../src/domains/clinical-review/model/doctorReviewChecklist.ts', import.meta.url), 'utf8')
 const main = await readFile(new URL('../../src/main.tsx', import.meta.url), 'utf8')
-const hub = await readFile(new URL('../../src/pages/ClinicalHub.tsx', import.meta.url), 'utf8')
+const hub = await readFile(new URL('../../src/pages/clinical/ClinicalHub.tsx', import.meta.url), 'utf8')
 
 test('doctor review is a non-blocking review-only workflow', () => {
   assert.match(model, /'open' \| 'reviewed'/)

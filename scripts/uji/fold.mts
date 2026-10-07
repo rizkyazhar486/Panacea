@@ -58,7 +58,7 @@ assert.match(css, /fold__summary:focus-visible/, 'summary keeps a visible keyboa
 assert.match(css, /prefers-reduced-motion: reduce/, 'chevron motion respects reduced motion')
 
 // Pemakaian di Body Explorer: tiga lipatan satu kata; satu kanvas 3D utama.
-const page = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
+const page = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
 for (const w of ['Modality', 'Ask', 'Explore']) assert.match(page, new RegExp(`<Fold label="${w}">`), `Body Explorer folds ${w}`)
 assert.equal((page.match(/<Body3D\b/g) ?? []).length, 1, 'Body Explorer renders exactly one main 3D projection')
 // Home: ringkasan harian, alat esensial dan tujuh kategori tetap terlihat (kontrak hierarki Home);
@@ -67,11 +67,11 @@ const home = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 for (const w of ['Recovery', 'Widgets', 'Live', 'Stories', 'Deck']) assert.match(home, new RegExp(`<Fold label="${w}">`), `Home folds ${w}`)
 assert.doesNotMatch(home, /<Fold label="[A-Za-z]+"><(HomeHealthBrief|HomeVisualLanding|HomeEssentialTools|SuperPageLauncher) \/>/, 'the first-viewport hierarchy (status, actions, tools, categories) is never folded')
 // Clinical: Ask, aksi utama, proyeksi tubuh dan rujukan tetap terlihat; bagian sekunder dilipat satu kata.
-const clinical = readFileSync('src/pages/ClinicalHub.tsx', 'utf8')
+const clinical = readFileSync('src/pages/clinical/ClinicalHub.tsx', 'utf8')
 for (const w of ['Calculators', 'Research', 'Patient', 'Depth', 'Guide', 'Capabilities']) assert.match(clinical, new RegExp(`<Fold label="${w}">`), `Clinical folds ${w}`)
 assert.doesNotMatch(clinical, /<Fold label="[A-Za-z]+">\s*<PersonalBodyUnifiedSurface/, 'the body projection is the main surface and is never folded')
 // Learn: hasil pencarian bukti tidak boleh tersembunyi di lipatan tertutup.
-const learn = readFileSync('src/pages/MedStudyHub.tsx', 'utf8')
+const learn = readFileSync('src/pages/medstudy/MedStudyHub.tsx', 'utf8')
 assert.match(learn, /<Fold label="Topics" defaultOpen=\{params\.has\('bagian'\)\}>/, 'Learn opens Topics itself when an evidence query sets `bagian`')
 assert.match(learn, /<Fold label="Planner">/, 'Learn folds the study planner')
 assert.match(learn, /<MedicalLibraryWorkbench onRun=\{runEvidenceQuery\} \/>/, 'the library search stays the visible main surface')
@@ -79,7 +79,7 @@ const bench = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
 for (const w of ['Guide', 'Appraisal']) assert.match(bench, new RegExp(`<Fold label="${w}">`), `the library workbench folds ${w}`)
 assert.doesNotMatch(bench, /<Fold label="[A-Za-z]+">\s*<div className="mt-3 rounded-\[22px\] bg-neutral-950/, 'the generated query and its search/save actions are never folded')
 // Health > Body: satu hero (skor + tipe tubuh) lalu empat lipatan satu kata; formulir pengukuran dilipat.
-const comp = readFileSync('src/pages/BodyComposition.tsx', 'utf8')
+const comp = readFileSync('src/pages/bodyhub/BodyComposition.tsx', 'utf8')
 for (const w of ['Measurements', 'Analysis', 'Screening', 'Markers']) assert.match(comp, new RegExp(`<Fold label="${w}">`), `Body folds ${w}`)
 assert.ok(comp.indexOf('Composition Score') < comp.indexOf('<Fold label="Measurements">'), 'the score hero comes before every fold')
 assert.doesNotMatch(comp, /<Fold label="[A-Za-z]+">\s*\{\/\* Score \+ bento header/, 'the score hero is never folded')
@@ -98,7 +98,7 @@ assert.doesNotMatch(comp, /<Fold label="[A-Za-z]+">\s*\{\/\* Score \+ bento head
   void mkDetails
 }
 // Nutrition: angka hari ini adalah hero; pencatatan, kalkulator dan sumber dilipat; lompatan membuka lipatan.
-const gizi = readFileSync('src/pages/Nutrition.tsx', 'utf8')
+const gizi = readFileSync('src/pages/bodyhub/Nutrition.tsx', 'utf8')
 for (const w of ['Longevity', 'Log', 'Calculators', 'Sources']) assert.match(gizi, new RegExp(`<Fold label="${w}">`), `Nutrition folds ${w}`)
 assert.ok(gizi.indexOf('<PanelAngka angka={angkaHariIni} />') < gizi.indexOf('<Fold label="Longevity">'), "today's numbers come before every fold")
 assert.match(gizi, /openFoldsAround\(el\)/, 'anchor jumps (lompat) open the fold that holds their target')
@@ -114,7 +114,7 @@ for (const w of ['Components', 'Matches', 'Ladder', 'Promotion', 'Scoring', 'Sea
 assert.ok(liga.indexOf('Current rank') < liga.indexOf('<Fold label="Components"'), 'the rank hero comes before every fold')
 assert.ok(liga.indexOf('AI victory index') < liga.indexOf('<Fold label="Matches">'), 'the victory index stays outside the folds')
 // Longevity: skor + usia biologis adalah hero; enam bagian lain dilipat satu kata.
-const umur = readFileSync('src/pages/Longevity.tsx', 'utf8')
+const umur = readFileSync('src/pages/bodyhub/Longevity.tsx', 'utf8')
 for (const w of ['Evidence', 'Pillars', 'Projection', 'Labs', 'Testing', 'Sources']) assert.match(umur, new RegExp(`<Fold label="${w}">`), `Longevity folds ${w}`)
 assert.ok(umur.indexOf('Biological Age (est.)') < umur.indexOf('<Fold label="Evidence">'), 'the score hero comes before every fold')
 // VitaPulse: ringkasan waktu-nyata adalah hero; tujuh bagian lain dan video dilipat satu kata.
@@ -139,7 +139,7 @@ assert.equal((eksposur.match(/<UnifiedHumanSimulationProjector/g) ?? []).length,
 const proyektor = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 assert.match(proyektor, /<Fold label="Scan"><PersonalAvatarCameraCapture \/><\/Fold>/, 'the projector folds the camera capture panel as Scan')
 // Atlas 3D: daftar target sumber dilipat, tetapi hitungan dan catatan target hilang tetap terlihat (batas kebenaran).
-const atlas3d = readFileSync('src/components/BodyAllSystems3D.tsx', 'utf8')
+const atlas3d = readFileSync('src/components/bodyhub/BodyAllSystems3D.tsx', 'utf8')
 const lipatSumber = atlas3d.indexOf('<Fold label="Sources">')
 assert.ok(lipatSumber >= 0, 'the atlas folds its source target list as Sources')
 assert.ok(atlas3d.indexOf('selected.targets.map', lipatSumber) > lipatSumber && atlas3d.indexOf('selected.targets.map', lipatSumber) < atlas3d.indexOf('</Fold>', lipatSumber), 'the target cards live inside the Sources fold')

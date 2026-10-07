@@ -76,7 +76,7 @@ assert.equal(broadcastTypes.filter((type) => type === 'panacea:health-updated').
 assert.equal(broadcastTypes.filter((type) => type === 'panacea:data-updated').length, 2, 'clearing training data must broadcast one additional structured refresh')
 assert.deepEqual(getWorkouts(), [])
 
-const component = readFileSync('src/components/CatatanLatihan.tsx', 'utf8')
+const component = readFileSync('src/components/fitness/CatatanLatihan.tsx', 'utf8')
 for (const eventName of ['panacea:health-updated', 'storage', 'focus']) {
   assert.match(component, new RegExp(`addEventListener\\('${eventName}'`), `Today Training must subscribe to ${eventName}`)
   assert.match(component, new RegExp(`removeEventListener\\('${eventName}'`), `Today Training must clean up ${eventName}`)

@@ -68,7 +68,7 @@ import {
 // akan kembali pada muat halaman berikutnya di hari yang sama.
 {
   const src = readFileSync(
-    new URL('../../src/components/DailyQuoteBanner.tsx', import.meta.url),
+    new URL('../../src/components/dashboard/DailyQuoteBanner.tsx', import.meta.url),
     'utf8',
   )
 

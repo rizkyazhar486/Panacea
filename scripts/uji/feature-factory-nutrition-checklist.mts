@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const hub = await readFile(new URL('../../src/pages/PusatGizi.tsx', import.meta.url), 'utf8')
+const hub = await readFile(new URL('../../src/pages/bodyhub/PusatGizi.tsx', import.meta.url), 'utf8')
 const checklist = await readFile(new URL('../../src/pages/NutritionChecklist.tsx', import.meta.url), 'utf8')
 
 assert.match(hub, /id: 'checklist', label: 'Checklist'/, 'Nutrition hub must expose the checklist as a real reachable tab.')
-assert.match(hub, /import\('\.\/NutritionChecklist'\)/, 'Checklist must remain lazy-loaded with the other nutrition subfeatures.')
+assert.match(hub, /import\('\.\.\/NutritionChecklist'\)/, 'Checklist must remain lazy-loaded with the other nutrition subfeatures.')
 assert.match(hub, /id: 'data', label: 'Data'/, 'Checklist integration must preserve the existing Nutrition Data controls tab.')
-assert.match(hub, /import\('\.\/NutritionDataControls'\)/, 'Nutrition Data controls must remain lazy-loaded after checklist integration.')
+assert.match(hub, /import\('\.\.\/NutritionDataControls'\)/, 'Nutrition Data controls must remain lazy-loaded after checklist integration.')
 
 assert.match(checklist, /Safety checklist · not a diet-quality score/)
 assert.match(checklist, /aria-label="Nutrition data safety checklist"/)

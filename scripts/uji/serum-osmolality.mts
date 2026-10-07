@@ -59,9 +59,9 @@ assert.deepEqual(run({ measured: 0 }), { ok: false, reason: 'Measured osmolality
 assert.deepEqual(run({ na: 0, glucose: -1 }), { ok: false, reason: 'Na must be 90–200 mmol/L' }) // urutan terdokumentasi
 
 // Halaman.
-const src = readFileSync('src/pages/SerumOsmolality.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/SerumOsmolality.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { parseNumberField, serumOsmolality } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { parseNumberField, serumOsmolality } from '../../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src))
 assert.ok(!/2 \* na|function gapBand|function osmBand|\/ 18|\/ 2\.8/.test(src), 'rumus tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok ? ('))

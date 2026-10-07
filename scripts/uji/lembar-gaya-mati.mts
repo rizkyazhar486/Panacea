@@ -20,7 +20,7 @@ import postcss from 'postcss'
 // benar dimuat aplikasi.
 //
 // "Dimuat" diukur dari graf impor yang berawal di src/main.tsx, bukan dari
-// seluruh folder src: berkas yatim seperti src/pages/Beranda.tsx masih ada di
+// seluruh folder src: berkas yatim seperti src/pages/dashboard/Beranda.tsx masih ada di
 // repo dan masih memakai kelas-kelas lama itu, tetapi tidak pernah dirender.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -122,7 +122,7 @@ const hasil = semuaCss.map(({ f, css }) => {
   assert.equal(mati.deklarasiHidup, 0, 'pengukur gagal mengenali lapisan yang seluruhnya menyasar kelas tak terender')
   const hidup = nilaiLembar('uji-hidup.css', 'body { margin: 0 } .x:not(.kelas-yang-tidak-pernah-dirender) { color: red }', () => false)
   assert.ok(hidup.deklarasiHidup >= 1, 'pengukur salah menyatakan aturan elemen/`:not()` sebagai mati')
-  assert.ok(terjangkau.has(resolve(AKAR, 'src/pages/Home.tsx')), 'graf impor tidak mencapai Home — pola impor dinamis tidak lagi terbaca')
+  assert.ok(terjangkau.has(resolve(AKAR, 'src/pages/dashboard/Home.tsx')), 'graf impor tidak mencapai Home — pola impor dinamis tidak lagi terbaca')
 }
 
 assert.ok(lembarTertaut.length > 0, 'index.html tidak lagi menautkan lembar gaya apa pun — pola pencariannya perlu diperbarui')

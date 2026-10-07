@@ -45,7 +45,7 @@ assert.ok(daftar.some((m) => m.id === 'obgin'))
 assert.equal(daftar.some((m) => m.sumber === 'ai'), false)
 assert.match(catatanModel(daftar.find((m) => m.id === 'obgin')!), /female pelvis/)
 
-const layar = readFileSync(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const layar = readFileSync(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
 assert.match(layar, /id="organ-dekat"/, 'the organ close-up row sits above the atlas viewer')
 assert.match(layar, /Organ close-up/)
 assert.match(layar, /Whole body/, 'the organ view can return to the same body')

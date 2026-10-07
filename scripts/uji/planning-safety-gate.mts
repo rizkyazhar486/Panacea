@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const planning = readFileSync(new URL('../../src/pages/Planning.tsx', import.meta.url), 'utf8')
+const planning = readFileSync(new URL('../../src/pages/clinical/Planning.tsx', import.meta.url), 'utf8')
 
 // A hard safety gate is only real if the clinical commit path calls it.
 // Merely rendering a red badge is not an authorization boundary.
 assert.ok(
-  /import\s+\{[^}]*evaluatePlanSafety[^}]*\}\s+from\s+['"]\.\.\/lib\/cdss['"]/.test(planning),
+  /import\s+\{[^}]*evaluatePlanSafety[^}]*\}\s+from\s+['"](?:\.\.\/)+lib\/cdss['"]/.test(planning),
   'Planning must import the deterministic CDSS verification gate',
 )
 assert.ok(

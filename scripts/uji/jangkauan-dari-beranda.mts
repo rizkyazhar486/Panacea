@@ -22,7 +22,7 @@ import { gabungKatalog, saringPeran, rutaKanonik } from '../../src/lib/katalogLe
 // tentang layar yang diklaimnya.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
+const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 
 const SEMUA_PERAN = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 

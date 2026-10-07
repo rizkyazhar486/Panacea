@@ -1,3 +1,4 @@
+import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
@@ -23,7 +24,7 @@ import { readFileSync } from 'node:fs'
 // baru saja diperbaiki membiarkan contoh yang baik ikut lapuk.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const baca = (n: string) => readFileSync(new URL(`../../src/pages/${n}`, import.meta.url), 'utf8')
+const baca = (n: string) => bacaSumber('pages', n)
 const kodeDari = (s: string) => s.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // ── Braden: tidak boleh lagi menyatakan enam temuan positif ────────────────

@@ -1,3 +1,4 @@
+import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { childPugh, maddreyScore, sofaScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
@@ -23,7 +24,7 @@ import { readFileSync } from 'node:fs'
 // menggawatkan membuat orang bertindak. Keduanya sama-sama karangan.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const baca = (n: string) => readFileSync(new URL(`../../src/pages/${n}`, import.meta.url), 'utf8')
+const baca = (n: string) => bacaSumber('pages', n)
 const kodeDari = (s: string) => s.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // ── Maddrey (Maddrey 1978) ─────────────────────────────────────────────────

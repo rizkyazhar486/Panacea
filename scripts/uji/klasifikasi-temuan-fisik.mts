@@ -30,6 +30,6 @@ assert.deepEqual(
   ['normal', 'normal', 'normal', 'normal'],
   'English-language exam note left a documented system as "unchecked"',
 )
-assert.match(readFileSync('src/pages/EMR.tsx', 'utf8'), /statusSistemFisik\(sys\.key, note, exam\)/, 'EMR memakai klasifikasi salinan sendiri')
-assert.doesNotMatch(readFileSync('src/pages/EMR.tsx', 'utf8'), /abnormal \? \('abnormal' as const\) : \('normal' as const\)/)
+assert.match(readFileSync('src/pages/clinical/EMR.tsx', 'utf8'), /statusSistemFisik\(sys\.key, note, exam\)/, 'EMR memakai klasifikasi salinan sendiri')
+assert.doesNotMatch(readFileSync('src/pages/clinical/EMR.tsx', 'utf8'), /abnormal \? \('abnormal' as const\) : \('normal' as const\)/)
 console.log('klasifikasi-temuan-fisik: murmur/edema terdokumentasi = temuan; normal hanya dengan penanda eksplisit; sisanya "recorded"')

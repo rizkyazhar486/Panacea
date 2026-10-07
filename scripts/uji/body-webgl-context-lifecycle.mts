@@ -28,7 +28,7 @@ lifecycle.dispose()
 lifecycle.handleRestored()
 assert.equal(restoredCount, 1, 'disposed renderers must not restart after context restoration')
 
-const renderer = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
+const renderer = readFileSync(new URL('../../src/components/bodyhub/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(renderer, /webglcontextlost/)
 assert.match(renderer, /webglcontextrestored/)
 assert.match(renderer, /contextLifecycle\.dispose\(\)/)

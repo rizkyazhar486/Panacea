@@ -42,10 +42,10 @@ assert.equal(reviewIntervalFor(50), 14)
 
 const wrappers = [
   ['src/pages/Learn.tsx', /LifeLibraryWorkbench/],
-  ['src/pages/KnowledgeBridge.tsx', /KnowledgeBridgeWorkbench/],
-  ['src/pages/MedStudyHub.tsx', /StudyCommandCenter/],
-  ['src/pages/MedStudyHub.tsx', /MedicalLibraryWorkbench/],
-  ['src/pages/MedStudyHub.tsx', /bagian.*evidence/],
+  ['src/pages/medstudy/KnowledgeBridge.tsx', /KnowledgeBridgeWorkbench/],
+  ['src/pages/medstudy/MedStudyHub.tsx', /StudyCommandCenter/],
+  ['src/pages/medstudy/MedStudyHub.tsx', /MedicalLibraryWorkbench/],
+  ['src/pages/medstudy/MedStudyHub.tsx', /bagian.*evidence/],
   ['src/pages/EdukasiAwam.tsx', /HealthLiteracyCoach/],
   ['src/pages/LifeStory.tsx', /StoryReflectionStudio/],
   ['src/pages/ResilienceStories.tsx', /ResilienceActionLab/],

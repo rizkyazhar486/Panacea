@@ -48,7 +48,7 @@ assert.equal(150 / +'' / 25, Infinity)
 assert.equal(50 / +'', Infinity)
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /hollidaySegar\(weight\)/)
 assert.match(halaman, /pedsDose\(weight, doseMgKg, freqPerDay, concMgMl\)/)
 assert.match(halaman, /fluid\.ok \?/)

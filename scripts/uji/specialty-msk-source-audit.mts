@@ -26,7 +26,7 @@ for (const audit of audits) {
 }
 
 const root = process.cwd()
-const bodyExplorer = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const bodyExplorer = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
 assert.match(bodyExplorer, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /Musculoskeletal.*ortopedi.*lutut/s)

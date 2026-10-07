@@ -17,11 +17,11 @@ assert.match(bacaDokter, /aksi: 'dibaca-dokter'/, 'pembacaan dokter tidak lagi d
 assert.ok(bacaDokter.indexOf("aksi: 'dibaca-dokter'") < bacaDokter.indexOf('res.json('), 'data dikirim sebelum audit dicatat')
 assert.match(srv, /Satu izin aktif per dokter/, 'berbagi ulang menumpuk izin ganda')
 
-const ui = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+const ui = readFileSync('src/components/clinical/LabPasienUntukDokter.tsx', 'utf8')
 assert.match(ui, /patient-transcribed from lab reports/, 'tampilan dokter tidak lagi menyatakan angka disalin pasien')
 assert.match(ui, /not coded/, 'tampilan dokter menyembunyikan bahwa sebagian hasil tidak berkode')
-assert.match(readFileSync('src/pages/ClinicalHub.tsx', 'utf8'), /account\?\.role === 'dokter' && <LabPasienUntukDokter \/>/)
-assert.match(readFileSync('src/components/BagikanLabKeDokter.tsx', 'utf8'), /Revoke/, 'pasien tidak bisa mencabut izin')
+assert.match(readFileSync('src/pages/clinical/ClinicalHub.tsx', 'utf8'), /account\?\.role === 'dokter' && <LabPasienUntukDokter \/>/)
+assert.match(readFileSync('src/components/clinical/BagikanLabKeDokter.tsx', 'utf8'), /Revoke/, 'pasien tidak bisa mencabut izin')
 
 // Kecerdasan longitudinal di tampilan dokter: mesin tren yang sama dengan sisi
 // pasien, pergeseran berkelanjutan diurutkan paling atas, bukan tabel angka mati.
@@ -59,7 +59,7 @@ assert.match(ui, /resourceType === 'Observation'/, 'tampilan dokter mengolah Pro
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))
 assert.doesNotThrow(() => buildBodyClinicalFindings(null))
-for (const f of ['src/components/ClinicalPatientContext.tsx', 'src/components/BodyExposurePatientOverlay.tsx']) {
+for (const f of ['src/components/clinical/ClinicalPatientContext.tsx', 'src/components/BodyExposurePatientOverlay.tsx']) {
   assert.match(readFileSync(f, 'utf8'), /record\.physicalExam\?\.perSystem/, `${f}: physicalExam tanpa pengaman lagi`)
 }
 console.log('lab-fhir-dokter: rute terautentikasi, dokter terverifikasi + izin + audit-sebelum-data, asal disalin-pasien terlihat, Clinical tidak roboh tanpa pemeriksaan')

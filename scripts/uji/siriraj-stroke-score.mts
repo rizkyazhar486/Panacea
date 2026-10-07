@@ -49,7 +49,7 @@ assert.deepEqual(run({ diastolicMmHg: parseNumberField('') }), GD)
 assert.deepEqual(run({}), run({}), 'deterministik')
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang, dan isi klinis tidak berubah.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 const baris = halaman.split('\n').map((l) => l.trim())
 assert.ok(baris.includes("const siriraj = sirirajStrokeScore({ consciousness: conscious, vomiting, headache, diastolicMmHg: parseNumberField(dbp), atheroma })"))
 assert.match(halaman, /const \[dbp, setDbp\] = useState\('90'\)/); assert.match(halaman, /onChange=\{\(e\) => setDbp\(e\.target\.value\)\}/)

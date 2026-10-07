@@ -26,7 +26,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const deck = readFileSync(new URL('../../src/components/HomeCommandDeck.tsx', import.meta.url), 'utf8')
-const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
+const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../../src/styles/command-bar.css', import.meta.url), 'utf8')
 
 // ── 1. Tidak boleh ada pemotongan diam-diam pada indeks ──────────────────

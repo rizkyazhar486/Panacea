@@ -9,11 +9,11 @@ const main = readFileSync(join(root, 'src/main.tsx'), 'utf8')
 const expected = [
   { id: 'health-profile', route: '/health-data', file: 'src/pages/HealthProfile.tsx', markers: ['api.getHealthProfile', 'parseHealthFile', 'mergeVitals'] },
   { id: 'readiness', route: '/readiness', file: 'src/pages/Readiness.tsx', markers: ['buildRecoveryRecordedChecklist', 'averagePrevious', 'localStorage.setItem'] },
-  { id: 'clinical-calculators', route: '/clinical-calculators', file: 'src/pages/ClinicalCalculators.tsx', markers: ['ApgarCalc', 'GcsCalc', 'ALAT_DI_HALAMAN'] },
+  { id: 'clinical-calculators', route: '/clinical-calculators', file: 'src/pages/clinical/ClinicalCalculators.tsx', markers: ['ApgarCalc', 'GcsCalc', 'ALAT_DI_HALAMAN'] },
   { id: 'calculator-hub', route: '/calculator-hub', file: 'src/pages/CalculatorHub.tsx', markers: ['ALAT_DI_HALAMAN', 'tautanAlat', 'useMemo'] },
   { id: 'self-assessment-toolkit', route: '/self-assessment-toolkit', file: 'src/pages/SelfAssessmentToolkit.tsx', markers: ['TelomereQuiz', 'InflammationScore', 'useState'] },
-  { id: 'sports-scores', route: '/sports-scores', file: 'src/pages/SportsScores.tsx', markers: ['api.getSportsScores', 'saveSportsFavorites', 'backendEnabled'] },
-  { id: 'osce-ukmppd', route: '/osce-ukmppd', file: 'src/pages/OsceUkmppd.tsx', markers: ['hitungKasus', 'sinonimUntuk', 'RIWAYAT_OSCE'] },
+  { id: 'sports-scores', route: '/sports-scores', file: 'src/pages/fitness/SportsScores.tsx', markers: ['api.getSportsScores', 'saveSportsFavorites', 'backendEnabled'] },
+  { id: 'osce-ukmppd', route: '/osce-ukmppd', file: 'src/pages/medstudy/OsceUkmppd.tsx', markers: ['hitungKasus', 'sinonimUntuk', 'RIWAYAT_OSCE'] },
 ] as const
 
 for (const item of expected) {

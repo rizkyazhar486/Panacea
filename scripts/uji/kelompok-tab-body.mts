@@ -18,7 +18,7 @@ import {
 // berkas ini menjaga sifat yang membuat itu aman: pengurutan menurut kelompok
 // tidak boleh menambah, menghilangkan, atau menggandakan satu tab pun.
 
-const sumber = await readFile(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const sumber = await readFile(new URL('../../src/pages/bodyhub/BodyExplorer.tsx', import.meta.url), 'utf8')
 
 /** Kunci tab dibaca dari PANEL_TABS, bukan didaftar ulang di sini. */
 const blok = sumber.slice(sumber.indexOf('const PANEL_TABS'), sumber.indexOf('\n]', sumber.indexOf('const PANEL_TABS')))

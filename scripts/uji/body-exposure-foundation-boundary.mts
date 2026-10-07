@@ -4,9 +4,9 @@ import { resolve } from 'node:path'
 
 const os = readFileSync(resolve('src/pages/BodyExposureOS.tsx'), 'utf8')
 const projector = readFileSync(resolve('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx'), 'utf8')
-const explorerPage = readFileSync(resolve('src/pages/BodyExplorer.tsx'), 'utf8')
+const explorerPage = readFileSync(resolve('src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const routes = readFileSync(resolve('src/main.tsx'), 'utf8')
-const body3d = readFileSync(resolve('src/components/BodyAllSystems3D.tsx'), 'utf8')
+const body3d = readFileSync(resolve('src/components/bodyhub/BodyAllSystems3D.tsx'), 'utf8')
 const visualFirstRuntime = readFileSync(resolve('public/panacea-visual-first-v43.js'), 'utf8')
 const visualFirstStyles = readFileSync(resolve('public/panacea-visual-first-v43.css'), 'utf8')
 const liquidRuntime = readFileSync(resolve('public/panacea-liquid-actions-v45.js'), 'utf8')

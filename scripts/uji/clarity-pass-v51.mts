@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 const home = readFileSync(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
 const intent = readFileSync(new URL('../../src/styles/home-intent-motion.css', import.meta.url), 'utf8')
 const recovery = readFileSync(new URL('../../src/components/HomeRecoveryVisuals.tsx', import.meta.url), 'utf8')
-const clinical = readFileSync(new URL('../../src/pages/ClinicalHub.tsx', import.meta.url), 'utf8')
+const clinical = readFileSync(new URL('../../src/pages/clinical/ClinicalHub.tsx', import.meta.url), 'utf8')
 const forYou = readFileSync(new URL('../../src/pages/ForYouHub.tsx', import.meta.url), 'utf8')
 const zoneNav = readFileSync(new URL('../../src/components/PanaceaZoneNav.tsx', import.meta.url), 'utf8')
 

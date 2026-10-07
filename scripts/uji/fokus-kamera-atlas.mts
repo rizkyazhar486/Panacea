@@ -2,7 +2,7 @@
 // matrixAutoUpdate=false), permintaan fokus membuka atlas, status jujur.
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-const f = readFileSync('src/components/BodyAllSystems3D.tsx', 'utf8')
+const f = readFileSync('src/components/bodyhub/BodyAllSystems3D.tsx', 'utf8')
 const proyeksi = f.slice(f.indexOf('function projectMatchedSourceMeshes'), f.indexOf('function disposeProjectedMaterials'))
 const iAuto = proyeksi.indexOf('projected.matrixAutoUpdate = false'), iPaksa = proyeksi.indexOf('projected.updateMatrixWorld(true)'), iBatas = proyeksi.indexOf('bounds.expandByObject(projected)')
 assert.ok(iAuto > 0 && iPaksa > iAuto && iBatas > iPaksa, 'batas proyeksi dihitung dari matrixWorld basi (kubus ±1): kamera seluruh tubuh salah bingkai')

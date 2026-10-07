@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync(new URL('../../src/components/AtlasViewer3D.tsx', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../src/components/bodyhub/AtlasViewer3D.tsx', import.meta.url), 'utf8')
 
 // Specialty atlas must use the same 4K/adaptive pixel budget as Body3D.
 assert.match(source, /body3dPixelRatio/)

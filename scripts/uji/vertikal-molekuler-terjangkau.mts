@@ -13,11 +13,11 @@ import { auditEmptyScales } from '../../src/lib/bodyMultiscaleBridge.ts'
 // begitu sesuatu dipasang ke antarmuka.
 
 const panel = readFileSync('src/pages/bodyhub/VertikalMolekulerPanel.tsx', 'utf8')
-const explorer = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
+const explorer = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
 const kelompok = readFileSync('src/lib/bodyExplorerTabGroups.ts', 'utf8')
 
 // ── 1. Benar-benar bisa dibuka ──────────────────────────────────────────────
-assert.match(explorer, /import\('\.\/bodyhub\/VertikalMolekulerPanel'\)/, 'Body Explorer does not load the panel')
+assert.match(explorer, /import\('\.\/VertikalMolekulerPanel'\)/, 'Body Explorer does not load the panel')
 assert.match(explorer, /\{ key: 'vertikal-molekuler', label: 'Tissue → gene' \}/, 'no tab a user can select')
 assert.match(explorer, /panelTab === 'vertikal-molekuler'/, 'the tab renders nothing')
 assert.match(kelompok, /'vertikal-molekuler':/, 'unclassified tab drifts to the trailing group')

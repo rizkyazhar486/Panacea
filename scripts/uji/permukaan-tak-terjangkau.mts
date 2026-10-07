@@ -167,7 +167,7 @@ const DIKETAHUI: readonly string[] = [
 {
   assert.ok(takTerjangkau.length > 0, 'the detector found nothing at all; it is probably broken')
   assert.ok(
-    dirujuk('src/pages/BodyExplorer.tsx'),
+    dirujuk('src/pages/bodyhub/BodyExplorer.tsx'),
     'a surface known to be routed reads as unreferenced; the detector is broken',
   )
 }

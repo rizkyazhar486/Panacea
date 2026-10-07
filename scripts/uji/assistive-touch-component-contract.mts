@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 
-const source = await readFile(new URL('../../src/components/FabNavigasi.tsx', import.meta.url), 'utf8')
+const source = await readFile(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
 const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx', import.meta.url), 'utf8')
 
 const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)

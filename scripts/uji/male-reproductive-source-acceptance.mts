@@ -36,9 +36,9 @@ for (const paired of ['testes', 'epididymides', 'seminal-vesicles', 'deferent-du
 }
 
 const root = process.cwd()
-const body = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const body = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
-assert.match(body, /lazy\(\(\) => import\('\.\/bodyhub\/SpecialtyLab'\)\)/)
+assert.match(body, /lazy\(\(\) => import\('\.\/SpecialtyLab'\)\)/)
 assert.match(body, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /label: 'Urogenital', modul: \['urogenital', 'prostat'\]/)
 assert.match(specialty, /<AtlasViewer3D/)

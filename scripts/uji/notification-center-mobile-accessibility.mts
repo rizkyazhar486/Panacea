@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const page = readFileSync('src/pages/Notifications.tsx', 'utf8')
+const page = readFileSync('src/pages/dashboard/Notifications.tsx', 'utf8')
 
 // Notification filters are a single named control set and expose their selected
 // state. Visual colour alone must never be the only indication of which filter

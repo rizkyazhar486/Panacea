@@ -70,9 +70,9 @@ assert.deepEqual(run({ serumLdh: parseNumberField(' ') }), { ok: false, reason: 
 assert.deepEqual(run({ pleuralProtein: 0, pleuralLdh: -5 }), { ok: false, reason: 'Pleural protein must be 0.1–15 g/dL' }) // urutan terdokumentasi
 
 // Halaman.
-const src = readFileSync('src/pages/LightsCriteria.tsx', 'utf8')
+const src = readFileSync('src/pages/clinical/scores/LightsCriteria.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { lightsCriteria, parseNumberField } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { lightsCriteria, parseNumberField } from '../../../domains/clinical-calculators'"))
 assert.equal(src.match(/parseNumberField\(/g)?.length, 5)
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/proteinRatio|ldhRatio|ldhVsUln/.test(src), 'rumus tidak boleh disalin ke halaman')

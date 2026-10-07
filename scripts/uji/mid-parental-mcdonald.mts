@@ -37,7 +37,7 @@ assert.equal('data' in (mcdonaldGestationalAge(0) as object), false)
 assert.equal(+'', 0)
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /midParentalHeight\(fatherCm, motherCm, childSex\)/)
 assert.match(halaman, /mcdonaldGestationalAge\(fundalCm\)/)
 for (const re of [/mph\.ok \?/, /mcdonald\.ok \?/, /\{mph\.reason\}/, /\{mcdonald\.reason\}/]) assert.match(halaman, re)

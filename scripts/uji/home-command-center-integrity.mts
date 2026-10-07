@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { emptyHomeDailyState, homeDailyStateSignature, parseHomeDailyState } from '../../src/lib/homeCrossTabDailyState.ts'
 
-const home = readFileSync('src/pages/Beranda.tsx', 'utf8')
-const routedHome = readFileSync('src/pages/Home.tsx', 'utf8')
+const home = readFileSync('src/pages/dashboard/Beranda.tsx', 'utf8')
+const routedHome = readFileSync('src/pages/dashboard/Home.tsx', 'utf8')
 const activeHome = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const activeHomeHero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const activeHomeIntent = readFileSync('src/styles/home-intent-motion.css', 'utf8')

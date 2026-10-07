@@ -1,3 +1,4 @@
+import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { graceScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
@@ -22,7 +23,7 @@ import { readFileSync } from 'node:fs'
 // di rumah sakit.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const baca = (n: string) => readFileSync(new URL(`../../src/pages/${n}`, import.meta.url), 'utf8')
+const baca = (n: string) => bacaSumber('pages', n)
 const kodeDari = (s: string) => s.split('\n').filter((b) => !b.trim().startsWith('//') && !b.trim().startsWith('*')).join('\n')
 
 // ── NEWS2 (RCP 2017) ───────────────────────────────────────────────────────

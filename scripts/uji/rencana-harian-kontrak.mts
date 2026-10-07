@@ -60,7 +60,7 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   assert.match(potong("app.post('/api/clinician/lab-shares/:id/care-plan'"), /susunRencana\(req\.body, pasien\.id, u\.id, kini\)/, 'identitas rencana diambil dari payload')
   assert.match(potong("app.get('/api/care/plans'"), /izinBerlaku\(listLabShares\(\)\.find\(\(i\) => i\.id === p\.izinId\)/, 'rencana tetap tampil setelah izin dicabut')
   assert.match(potong("app.post('/api/care/reports'"), /izinBerlaku\(/, 'laporan diterima setelah izin dicabut')
-  const dokterUi = readFileSync('src/components/RencanaHarianDokter.tsx', 'utf8')
+  const dokterUi = readFileSync('src/components/clinical/RencanaHarianDokter.tsx', 'utf8')
   assert.match(dokterUi, /submitDailyAnamnesis\(plan, r\)/, 'prioritas laporan dipercaya dari pasien, bukan dihitung ulang kernel')
   assert.match(readFileSync('src/components/CekHarian.tsx', 'utf8'), /Not an emergency service/, 'cek harian kehilangan batas "bukan layanan darurat"')
   // Kegagalan muat() awal TIDAK BOLEH `if (!data) return null` menelan pesan

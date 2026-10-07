@@ -63,7 +63,7 @@ assert.equal('data' in (idealBodyWeight(0, 'M', 'broca') as object), false)
 assert.deepEqual(dailyCalories(165, 'F', 'lorentz', 'berat'), dailyCalories(165, 'F', 'lorentz', 'berat'), 'deterministik')
 
 // Halaman memakai fungsi kanonik; rumus tidak lagi disalin (Broca sebelumnya ada di dua halaman).
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /meanArterialPressure\(sys, dia\)/)
 assert.match(halaman, /idealBodyWeight\(height, sex, 'broca'\)/)
 assert.match(halaman, /dailyCalories\(height, sex, formula, activity\)/)

@@ -15,7 +15,7 @@ test('One OS doctrine is wired into the constitutional and agent authority chain
 })
 
 test('Visit OS exposes the poli board and stable poli route', () => {
-  const visit = read('src/pages/VisitOS.tsx')
+  const visit = read('src/pages/clinical/VisitOS.tsx')
   const main = read('src/main.tsx')
   assert.match(visit, /PoliPatientFlowBoard/)
   assert.match(visit, /derivePoliPatientFlow/)

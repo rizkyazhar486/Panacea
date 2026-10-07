@@ -89,7 +89,7 @@ assert.equal('data' in (fletcherIndex('basic', NaN, 20, 20, undefined) as object
 assert.equal(lama((+'' + +'' + +'') / 3), 'Normal'); assert.equal(fletcherIndex('basic', parseNumberField(''), parseNumberField(''), parseNumberField(''), undefined).ok, false)
 
 // Halaman memakai fungsi kanonik, tanpa menghitung ulang.
-const halaman = readFileSync('src/pages/ClinicalCalculators.tsx', 'utf8')
+const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /centorMcIsaac\(\{ fever, noCough, tenderNodes, exudate \}, parseNumberField\(age\)\)/)
 assert.match(halaman, /paradiseCriteria\(y1, y2, y3, documented\)/)
 assert.match(halaman, /fletcherIndex\(mode, parseNumberField\(t500\), parseNumberField\(t1000\), parseNumberField\(t2000\), parseNumberField\(t3000\)\)/)

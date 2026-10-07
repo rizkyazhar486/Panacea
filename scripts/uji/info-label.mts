@@ -36,9 +36,9 @@ assert.match(css, /info-label__button \{[^}]*width: 44px; height: 44px/, 'i butt
 assert.match(css, /info-label__button:focus-visible/, 'i button keeps a visible keyboard focus ring')
 assert.match(css, /prefers-reduced-motion: no-preference/, 'motion is opt-in via prefers-reduced-motion')
 // Pemakaian di SectionTitle: tombol i hanya muncul bila `info` ada, dan info menggantikan subtitle.
-const ui = readFileSync('src/components/ui.tsx', 'utf8')
+const ui = readFileSync('src/components/ui/ui.tsx', 'utf8')
 assert.match(ui, /\{!info && subtitle &&/, 'info replaces the subtitle on the main surface')
 assert.match(ui, /\{info && \(\s*<button/, 'the i button renders only when info is provided')
 assert.match(ui, /aria-controls=\{infoOpen \? infoId : undefined\}/, 'aria-controls only points at a panel that exists')
-assert.match(readFileSync('src/pages/BodyExplorer.tsx', 'utf8'), /<SectionTitle[\s\S]{0,300}?\binfo="/, 'Body Explorer uses the one-word + i pattern')
+assert.match(readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8'), /<SectionTitle[\s\S]{0,300}?\binfo="/, 'Body Explorer uses the one-word + i pattern')
 console.log('InfoLabel verified: collapsed by default, labelled, unique ids, 44px floor, focus ring, reduced-motion safe.')

@@ -53,7 +53,7 @@ assert.deepEqual(resolveVisitRuntimeIdentity(account('dokter'), '   '), {
 })
 
 const commandCenter = readFileSync(
-  new URL('../../src/components/VisitCommandCenter.tsx', import.meta.url),
+  new URL('../../src/components/clinical/VisitCommandCenter.tsx', import.meta.url),
   'utf8',
 )
 assert.match(

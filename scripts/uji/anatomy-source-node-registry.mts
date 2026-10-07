@@ -72,7 +72,7 @@ const restored = getEffectiveAnatomySourceNodeSnapshot().find((bundle) => bundle
 assert.equal(anatomySourceNodeOrigin('skeletal.glb'), 'generated-index')
 assert.ok((restored?.names.length ?? 0) > 2, 'clearing runtime data should restore the generated GLB index')
 
-const body3dSource = readFileSync(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+const body3dSource = readFileSync(new URL('../../src/components/bodyhub/Body3D.tsx', import.meta.url), 'utf8')
 assert.match(
   body3dSource,
   /publishAnatomySourceNodes\(def\.file, sourceNodeNames\)/,

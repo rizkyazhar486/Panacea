@@ -94,7 +94,7 @@ for (const wajib of ['glucose', 'hba1c', 'totalCholesterol', 'ldl', 'hdl', 'albu
   assert.ok(KUNCI_NUTRISI_KE_JENIS_LAB[wajib], `${wajib} missing from Nutrition→canonical map`)
 }
 
-const page = readFileSync('src/pages/Nutrition.tsx', 'utf8')
+const page = readFileSync('src/pages/bodyhub/Nutrition.tsx', 'utf8')
 assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(editDate, vals\)/)
 assert.match(page, /proyeksikanNilaiNutrisiKeLabKanonic\(nl\.date, nl\.values\)/)
 assert.match(page, /gabungLabNutrisiDenganKanonic/)

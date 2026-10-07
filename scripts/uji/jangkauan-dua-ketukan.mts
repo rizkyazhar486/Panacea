@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { bacaSumber } from '../lib/sumberAsli.mjs'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SETIAP LAYAR HARUS TERJANGKAU DALAM DUA KETUKAN.
@@ -23,12 +24,12 @@ import { readFileSync } from 'node:fs'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const main = readFileSync(new URL('../../src/main.tsx', import.meta.url), 'utf8')
-const shell = readFileSync(new URL('../../src/components/Shell.tsx', import.meta.url), 'utf8')
+const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 /* Tiga hub ini dimuat PencarianGlobal saat kotaknya dibuka, jadi isinya ikut
    masuk indeks. Membandingkan rute hanya dengan Shell akan melaporkan fitur
    yang sebenarnya sudah dapat dicari sebagai hilang. */
 const hub = ['FitnessHub', 'WellnessHub', 'ClinicalHub']
-  .map((nama) => readFileSync(new URL(`../../src/pages/${nama}.tsx`, import.meta.url), 'utf8'))
+  .map((nama) => bacaSumber('pages', nama))
   .join('\n')
 
 /** Rute yang benar-benar memasang sebuah layar. */

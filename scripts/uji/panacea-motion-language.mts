@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { PANACEA_MOTION, panaceaMotionStyle } from '../../src/lib/panaceaMotionLanguage'
 
-const reveal = await readFile(new URL('../../src/components/Reveal.tsx', import.meta.url), 'utf8')
-const landing = await readFile(new URL('../../src/pages/Landing.tsx', import.meta.url), 'utf8')
+const reveal = await readFile(new URL('../../src/components/ui/Reveal.tsx', import.meta.url), 'utf8')
+const landing = await readFile(new URL('../../src/pages/landing/Landing.tsx', import.meta.url), 'utf8')
 
 assert.deepEqual(Object.keys(PANACEA_MOTION).sort(), ['explode', 'glass', 'kinetic', 'rise', 'soft'])
 for (const [name, preset] of Object.entries(PANACEA_MOTION)) {

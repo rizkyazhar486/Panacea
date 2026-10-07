@@ -16,7 +16,7 @@ assert.equal(audit.blockers.length, 0, `imunologi: ${audit.blockers.join(', ')}`
 assert.ok(audit.renderEligible, 'imunologi: source-backed render gate failed')
 
 const root = process.cwd()
-const body = readFileSync(join(root, 'src/pages/BodyExplorer.tsx'), 'utf8')
+const body = readFileSync(join(root, 'src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const specialty = readFileSync(join(root, 'src/pages/bodyhub/SpecialtyLab.tsx'), 'utf8')
 assert.match(body, /key: 'spesialisasi', label: 'Specialty labs'/)
 assert.match(specialty, /<AtlasViewer3D/)

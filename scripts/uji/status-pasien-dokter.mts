@@ -27,6 +27,6 @@ assert.deepEqual(teks.sort(), [
 const lab = Object.values(state.eventsById).find((e) => e.domain === 'lab')!
 assert.equal(lab.consent.expiresAt, izin.berakhir, 'izin klinis tidak berakhir bersama izin berbagi pasien')
 assert.equal(canEnterClinicalRecord(lab, kini.getTime()), false, 'lab salinan pasien masuk rekam klinis tanpa tinjauan')
-assert.match(readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8'), /timelineHarian\(state, 30, labels, 'dokter'\)/)
+assert.match(readFileSync('src/components/clinical/LabPasienUntukDokter.tsx', 'utf8'), /timelineHarian\(state, 30, labels, 'dokter'\)/)
 assert.match(readFileSync('server/src/index.ts', 'utf8'), /dibuat: izin\.dibuat, berakhir: izin\.berakhir/)
 console.log('status-pasien-dokter: dokter melihat timeline kanonik yang sama dari sumber server, izin berakhir bersama izin berbagi')
