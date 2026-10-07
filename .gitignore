@@ -68,3 +68,8 @@ artifacts/
 # JSONL and interrupted downloads are reproducible build/runtime artifacts.
 server/data/clinical-rag/*.jsonl
 server/data/clinical-rag/*.partial
+
+# Keadaan lokal alat ruflo/swarm, bukan isi repositori.
+.claude-flow/
+.swarm/
+ruvector.db
