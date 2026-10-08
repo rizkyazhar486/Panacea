@@ -19,6 +19,10 @@ Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM
 
 Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
 
+## Outcome delivery — prove completed work, not feature inventory
+
+For new clinic, Visit OS, AI-EMR, referral, reimbursement, follow-up and commercialization work, also apply [Verified Outcome Delivery design](docs/superpowers/specs/2026-10-08-panacea-verified-outcome-delivery-design.md). Choose one auditable, clinically governed outpatient episode; define its eligible denominator, authorized actors, concrete evidence and pending/escalation states. Demonstrate real workflow completion, never equate draft AI output with signed care, and measure service economics only after truthful comparative evidence. The video's "sell outcomes, not software" and "$1/$6" framing is inspiration, not a validated forecast. Do not weaken higher-priority safety, identity, provenance, privacy, consent, human-signoff or exact-head CI requirements.
+
 ## One OS longitudinal care doctrine — immutable product north star
 
 Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
