@@ -43,6 +43,28 @@ for (const [structureId, sourceName] of canonicalLobeSources) {
   assert.ok(entry?.exactSourceNames.includes(sourceName), `${structureId} must retain its exact canonical source name: ${sourceName}`)
 }
 
+
+const leftOnlyReport = assessRespiratorySourceCoverage([{
+  file: 'visceral.glb',
+  names: ['Upper lobe of left lung', 'Lower lobe of left lung', 'Superior lobe of left lung', 'Inferior lobe of left lung'],
+}])
+for (const id of ['right-upper-lobe', 'right-lower-lobe', 'right-middle-lobe']) {
+  assert.equal(leftOnlyReport.entries.find((entry) => entry.structureId === id)?.coverage, 'source-node-missing', `${id} must not resolve contralateral lung geometry`)
+}
+for (const id of ['left-upper-lobe', 'left-lower-lobe']) {
+  assert.equal(leftOnlyReport.entries.find((entry) => entry.structureId === id)?.coverage, 'source-node-present', `${id} must resolve the corresponding left lung geometry`)
+}
+const rightOnlyReport = assessRespiratorySourceCoverage([{
+  file: 'visceral.glb',
+  names: ['Upper lobe of right lung', 'Lower lobe of right lung', 'Superior lobe of right lung', 'Inferior lobe of right lung', 'Middle lobe of right lung'],
+}])
+for (const id of ['left-upper-lobe', 'left-lower-lobe']) {
+  assert.equal(rightOnlyReport.entries.find((entry) => entry.structureId === id)?.coverage, 'source-node-missing', `${id} must not resolve contralateral lung geometry`)
+}
+for (const id of ['right-upper-lobe', 'right-middle-lobe', 'right-lower-lobe']) {
+  assert.equal(rightOnlyReport.entries.find((entry) => entry.structureId === id)?.coverage, 'source-node-present', `${id} must resolve the corresponding right lung geometry`)
+}
+
 for (const id of ['visceral-pleura', 'parietal-pleura']) {
   const entry = report.entries.find((candidate) => candidate.structureId === id)
   assert.equal(entry?.coverage, 'source-node-missing', `${id} must not resolve from generic Pleura geometry`)
