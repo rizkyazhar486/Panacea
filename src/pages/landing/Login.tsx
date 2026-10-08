@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { hariIni } from '../../lib/tanggal'
 import { useStore, uid, OWNER_EMAIL } from '../../lib/store'
 import { Wordmark } from '../../components/Logo'
-import { Button, inputClass } from '../../components/ui'
+import { inputClass } from '../../components/ui'
 import { IconSun, IconMoon } from '../../components/icons'
 import { api, backendEnabled, renderGoogleButton, type Health } from '../../lib/api'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
@@ -21,12 +21,14 @@ const ROLES: { id: Role; title: string; desc: string }[] = [
   { id: 'owner', title: 'Manajemen / Owner', desc: 'Pemantauan metrik operasional dan pertumbuhan platform.' },
 ]
 
-/* ── Tiny helpers ────────────────────────────────────────── */
+/* ── Form Field Helper (Static, Clean, No Gimmicks) ────────── */
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">{label}</label>
+      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+        {label} {required && <span className="text-accent">*</span>}
+      </label>
       {children}
     </div>
   )
@@ -44,27 +46,11 @@ function Mini({ label, value, onChange, placeholder, numeric }: {
   )
 }
 
-function Collapse({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-900/40">
-      <button type="button" onClick={() => setOpen(v => !v)}
-        className="flex min-h-[44px] w-full items-center justify-between px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200">
-        <span>{title}</span>
-        <span className="text-[10px] transition-transform duration-200"
-          style={{ transform: open ? 'rotate(180deg)' : '' }}>▼</span>
-      </button>
-      {open && <div className="space-y-3 border-t border-neutral-100 dark:border-neutral-800 px-3 py-3">{children}</div>}
-    </div>
-  )
-}
-
 /* ── Main Login ──────────────────────────────────────────── */
 
 export function Login({ onBack }: { onBack?: () => void }) {
   const { login, sendEmail, state } = useStore()
   const [role, setRole] = useState<Role>('pasien')
-  /** Pemilih peran hanya muncul bila diminta atau bila beralih ke klinisi. */
   const [pilihPeran, setPilihPeran] = useState(false)
   const [f, setF] = useState({
     email: '', name: '', sex: 'L' as 'L' | 'P', dob: '',
@@ -88,6 +74,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const simple = role === 'admin' || role === 'owner'
   const cur = ROLES.find(r => r.id === role)!
 
+  // Form validation for primary button enable/disable
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())
+  const isNameValid = f.name.trim().length >= 2
+  const isStrValid = !clinical || f.str.trim().length >= 4
+  const isFormValid = isEmailValid && isNameValid && isStrValid && consent
+
   useEffect(() => { roleRef.current = role }, [role])
   useEffect(() => { consentRef.current = consent }, [consent])
 
@@ -109,7 +101,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
         } catch {
           if (batal) return
           setServerNotice(i === 0
-            ? 'Menghubungkan ke layanan server… instans gratis memerlukan waktu sekitar 50 detik untuk aktif.'
+            ? 'Menghubungkan ke layanan server… instans gratis memerlukan beberapa saat untuk aktif.'
             : 'Masih menunggu respon server…')
           await new Promise((r) => setTimeout(r, 8000))
         }
@@ -131,7 +123,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }).catch(() => setError('Gagal memuat tombol Google Sign-In.'))
   }, [health, login])
 
-  /* shared consent guard for OTP sub-components */
   function consentOk() {
     if (!consent) { setError('Harap setujui Syarat Layanan & Kebijakan Privasi.'); return false }
     if (clinical && !f.str.trim()) { setError('Nomor STR wajib diisi untuk peran tenaga medis ini.'); return false }
@@ -191,84 +182,82 @@ export function Login({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid h-screen lg:grid-cols-2 bg-white dark:bg-[#070908] text-ink dark:text-neutral-100 overflow-hidden">
       {/* ── Brand panel (desktop) ─────────────────── */}
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-10 text-white lg:flex">
+      <div className="relative hidden flex-col justify-between h-full overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] dark:from-[#041c11] dark:via-[#02130b] dark:to-[#010a06] dark:border-r dark:border-white/10 p-10 lg:p-12 text-white lg:flex">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="orb absolute -left-16 top-10 h-72 w-72 rounded-full bg-white/15 blur-3xl" />
-          <div className="orb absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
-          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:40px_40px]" />
+          <div className="orb absolute -left-16 top-10 h-72 w-72 rounded-full bg-white/15 dark:bg-emerald-500/10 blur-3xl" />
+          <div className="orb absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-900/30 dark:bg-emerald-950/40 blur-3xl" style={{ animationDelay: '-8s' }} />
+          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] dark:[background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:40px_40px]" />
         </div>
         <div className="relative"><Wordmark size={40} onDark /></div>
         <div className="relative">
           <h1 className="text-4xl font-extrabold leading-tight">
             AI-EMR & Longevity Medis{' '}
-            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Ditinjau oleh Klinisi</span>
+            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white dark:from-white dark:via-emerald-300 dark:to-white bg-clip-text text-transparent">Ditinjau oleh Klinisi</span>
           </h1>
           <BatasKlaimKesehatan
             permukaan="care.login"
-            className="mt-3 max-w-md text-[12px] leading-snug text-white/70"
+            className="mt-3 max-w-md text-[12px] leading-snug text-white/70 dark:text-emerald-200/70"
           />
-          <p className="mt-3 max-w-md text-white/85 text-sm leading-relaxed">
+          <p className="mt-3 max-w-md text-white/85 dark:text-neutral-300 text-sm leading-relaxed">
             AI mendukung anamnesis & edukasi kesehatan dengan peninjauan klinisi berizin. Rekam medis terstruktur,
             pemantauan vitalitas berkelanjutan untuk ketahanan hidup sehat.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             {['AI-EMR Terpadu', 'Estimasi Longevity', 'Pemantauan Vitalitas', 'Farmasi Digital'].map(t => (
-              <span key={t} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
+              <span key={t} className="rounded-full border border-white/20 bg-white/10 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-white/70">⚕️ AI mendukung analisis data medis dan tidak menggantikan keputusan klinisi berizin.</p>
+        <p className="relative text-xs text-white/70 dark:text-neutral-400">⚕️ AI mendukung analisis data medis dan tidak menggantikan keputusan klinisi berizin.</p>
       </div>
 
-      {/* ── Form panel ────────────────────────────── */}
-      <div className="relative flex items-center justify-center p-6">
+      {/* ── Form panel (scrollable with max-width) ── */}
+      <div className="relative flex flex-col items-center justify-start h-full overflow-y-auto px-6 py-10 sm:px-10 sm:py-12">
         <button onClick={() => setTheme(toggleTheme())}
-          className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 shadow-sm transition hover:text-brand-dark dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-brand"
+          className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 shadow-sm transition hover:text-brand-dark dark:border-white/15 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-emerald-400"
           aria-label="Toggle theme">
           {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
         </button>
 
-        <div className="w-full max-w-md space-y-5">
+        <div className="w-full max-w-[440px] my-auto space-y-5">
           <div className="lg:hidden"><Wordmark size={34} /></div>
           {onBack && (
-            <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark transition-colors dark:text-neutral-400 dark:hover:text-brand">
+            <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark transition-colors dark:text-neutral-400 dark:hover:text-emerald-400">
               ← Kembali ke Beranda
             </button>
           )}
 
           <div>
-            <h2 className="text-2xl font-extrabold text-ink">Masuk ke Akun Anda</h2>
+            <h2 className="text-2xl font-extrabold text-ink dark:text-white">Masuk ke Akun Anda</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Cukup gunakan email dan nama. Informasi klinis atau riwayat tambahan dapat dilengkapi nanti.</p>
           </div>
 
-          {/* ── Peran: Segmented switch (Pasien vs Klinisi) ────────── */}
+          {/* ── Peran: Segmented switch (Warna hijau tegas & ghost, tidak putih) ── */}
           <div className="space-y-3">
-            <div className="flex rounded-2xl bg-neutral-100 p-1 dark:bg-neutral-800/80 border border-neutral-200/60 dark:border-neutral-700/50">
+            <div className="login-role-switch" role="tablist">
               <button
                 type="button"
+                role="tab"
+                aria-selected={role === 'pasien' && !pilihPeran}
+                data-active={role === 'pasien' && !pilihPeran ? 'true' : 'false'}
                 onClick={() => { setRole('pasien'); setPilihPeran(false) }}
-                className={`flex-1 min-h-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  role === 'pasien' && !pilihPeran
-                    ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-white'
-                    : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
-                }`}
+                className="login-role-tab"
               >
                 <span>👤</span>
                 <span>Pasien & Publik</span>
               </button>
               <button
                 type="button"
+                role="tab"
+                aria-selected={pilihPeran || role !== 'pasien'}
+                data-active={pilihPeran || role !== 'pasien' ? 'true' : 'false'}
                 onClick={() => {
                   if (role === 'pasien') setRole('dokter')
                   setPilihPeran(true)
                 }}
-                className={`flex-1 min-h-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  pilihPeran || role !== 'pasien'
-                    ? 'bg-brand text-white shadow-sm'
-                    : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
-                }`}
+                className="login-role-tab"
               >
                 <span>🩺</span>
                 <span>Klinisi / Medis (STR)</span>
@@ -276,28 +265,31 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </div>
 
             {(pilihPeran || role !== 'pasien') && (
-              <div className="space-y-2 rounded-2xl border border-neutral-200 bg-neutral-50/80 p-3.5 dark:border-neutral-800 dark:bg-neutral-900/60">
+              <div className="space-y-2.5 rounded-2xl border border-neutral-200 bg-neutral-50/80 p-3.5 dark:border-white/10 dark:bg-white/[0.03]">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                     Pilih Peran Medis
                   </label>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Kredensial STR Diperlukan</span>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Kredensial STR Diperlukan</span>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
-                  {ROLES.filter(r => r.id !== 'pasien').map(r => (
-                    <button
-                      key={r.id}
-                      type="button"
-                      onClick={() => setRole(r.id)}
-                      className={`min-h-[44px] rounded-xl border px-2 py-1 text-center text-[11px] font-bold leading-snug transition ${
-                        role === r.id
-                          ? 'border-brand bg-brand-50 text-brand-dark dark:border-brand dark:bg-brand/10 dark:text-brand'
-                          : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
-                      }`}
-                    >
-                      {r.title}
-                    </button>
-                  ))}
+                  {ROLES.filter(r => r.id !== 'pasien').map(r => {
+                    const isSelected = role === r.id
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setRole(r.id)}
+                        className={`min-h-[44px] rounded-xl border px-2 py-1 text-center text-[11px] font-bold leading-snug transition-all ${
+                          isSelected
+                            ? 'border-brand bg-brand text-white shadow-sm dark:bg-brand dark:text-[#041a0d]'
+                            : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
+                        }`}
+                      >
+                        {r.title}
+                      </button>
+                    )
+                  })}
                 </div>
                 <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">{cur.desc}</p>
               </div>
@@ -308,7 +300,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {health?.googleClientId
             ? <div ref={gbtn} className="flex justify-center" />
             : <button onClick={doLogin}
-                className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50 active:scale-[0.99] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700">
+                className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50 active:scale-[0.99] dark:border-white/12 dark:bg-white/[0.06] dark:text-neutral-100 dark:hover:bg-white/[0.10]">
                 <GoogleG /> Masuk dengan Google
               </button>
           }
@@ -317,13 +309,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
               email={f.email} setEmail={v => setF(p => ({ ...p, email: v }))} onLogin={finish} />
           )}
 
-          {/* ── Consent ────────────────────────── */}
-          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-neutral-200/70 bg-neutral-50/60 p-3 text-[12px] leading-snug text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-300">
+          {/* ── Consent Checkbox ───────────────────── */}
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3 text-[12px] leading-snug text-neutral-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-neutral-300">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 shrink-0 rounded accent-[#00BF63]" />
             <span>Saya menyetujui{' '}
               <button type="button" onClick={() => setShowLegal(true)}
-                className="font-bold text-brand-dark underline dark:text-brand hover:opacity-85">Syarat Layanan & Kebijakan Privasi</button>.
+                className="font-bold text-emerald-700 underline dark:text-emerald-400 hover:opacity-85">Syarat Layanan & Kebijakan Privasi</button>.
               AI adalah asisten suportif, bukan pengganti konsultasi langsung dengan dokter.</span>
           </label>
 
@@ -337,77 +329,89 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
           {/* ── Server notice (gentle informative) ── */}
           {serverNotice && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/70 p-3 text-xs text-blue-800 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300">
+            <div className="flex items-start gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-50/70 p-3 text-xs text-emerald-900 dark:border-emerald-500/20 dark:bg-emerald-950/30 dark:text-emerald-300">
               <span className="shrink-0 text-base leading-none">ℹ️</span>
               <span className="leading-relaxed">{serverNotice}</span>
             </div>
           )}
 
           {backendEnabled && (
-            <div className="flex items-center gap-2 text-[11px] font-semibold text-brand-dark dark:text-brand">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
               <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
               <span>Layanan Server Aktif{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}{health?.features.payments ? ' · Pembayaran' : ''}</span>
             </div>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-neutral-400">
+          <div className="flex items-center gap-3 text-xs text-neutral-400 dark:text-neutral-500">
             <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
             <span>atau lengkapi formulir manual</span>
             <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
           </div>
 
-          {/* ── Adaptive form fields ───────────── */}
-          <div className="space-y-3">
-            <Field label="Alamat Email">
+          {/* ── Adaptive form fields (Static, Clean, No Gimmicky Animations) ── */}
+          <div className="space-y-3.5">
+            <Field label="Alamat Email" required>
               <input className={inputClass} value={f.email}
                 onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" placeholder="nama@email.com" />
             </Field>
-            <Field label="Nama Lengkap">
+
+            <Field label="Nama Lengkap" required>
               <input className={inputClass} value={f.name}
                 onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Nama lengkap Anda" />
             </Field>
 
-            {!simple && (
-              <Collapse title="Data Tambahan untuk Akurasi Vitalitas (Opsional)">
-                <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-                  Usia dan jenis kelamin biologis digunakan untuk memperkirakan denyut jantung maksimal dan kebutuhan energi harian. Tanpa data ini, estimasi akan menggunakan nilai rata-rata umum.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Jenis Kelamin</label>
-                    <select className={inputClass} value={f.sex}
-                      onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
-                      <option value="L">Laki-laki</option>
-                      <option value="P">Perempuan</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Tanggal Lahir</label>
-                    <input className={inputClass} value={f.dob}
-                      onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
-                      max={hariIni()} />
-                    {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark dark:text-brand">Usia: {ageFromDob(f.dob)} tahun</p>}
-                  </div>
-                </div>
-              </Collapse>
-            )}
-
             {/* STR — clinical roles */}
             {clinical && (
-              <>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                    Nomor STR <span className="text-accent">*</span>
-                  </label>
-                  <input className={inputClass} value={f.str}
-                    onChange={e => setF(p => ({ ...p, str: e.target.value }))}
-                    placeholder="Wajib diisi — Nomor STR atau sertifikat kompetensi" />
-                  <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
-                    {role === 'dokter' ? 'Modul AI-EMR hanya diperuntukkan bagi klinisi berizin.' : 'Wajib bagi tenaga medis, akademisi, dan kontributor berizin.'}
-                  </p>
-                </div>
+              <Field label="Nomor STR / Sertifikat Kompetensi" required>
+                <input className={inputClass} value={f.str}
+                  onChange={e => setF(p => ({ ...p, str: e.target.value }))}
+                  placeholder="Wajib diisi — Nomor STR atau sertifikat kompetensi" />
+                <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                  {role === 'dokter' ? 'Modul AI-EMR hanya diperuntukkan bagi klinisi berizin.' : 'Wajib bagi tenaga medis, akademisi, dan kontributor berizin.'}
+                </p>
+              </Field>
+            )}
 
-                <Collapse title="Riwayat Pendidikan & Kredensial Medis">
+            {/* Data Tambahan: Native clean details (No weird buttons or floating capsule animations) */}
+            {!simple && (
+              <details className="group rounded-2xl border border-neutral-200 bg-neutral-50/50 dark:border-white/10 dark:bg-white/[0.02] p-3.5 text-xs">
+                <summary className="cursor-pointer font-bold text-neutral-700 dark:text-neutral-300 list-none flex items-center justify-between select-none">
+                  <span>Data Tambahan untuk Akurasi Vitalitas (Opsional)</span>
+                  <span className="text-[10px] text-neutral-400 transition-transform group-open:rotate-180">▼</span>
+                </summary>
+                <div className="mt-3 space-y-3 pt-3 border-t border-neutral-200/60 dark:border-white/10">
+                  <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                    Usia dan jenis kelamin biologis digunakan untuk memperkirakan denyut jantung maksimal dan kebutuhan energi harian secara lebih presisi.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Jenis Kelamin</label>
+                      <select className={inputClass} value={f.sex}
+                        onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Tanggal Lahir</label>
+                      <input className={inputClass} value={f.dob}
+                        onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
+                        max={hariIni()} />
+                      {f.dob && <p className="mt-0.5 text-[11px] text-emerald-600 dark:text-emerald-400">Usia: {ageFromDob(f.dob)} tahun</p>}
+                    </div>
+                  </div>
+                </div>
+              </details>
+            )}
+
+            {/* Clinical education credentials: clean native details */}
+            {clinical && (
+              <details className="group rounded-2xl border border-neutral-200 bg-neutral-50/50 dark:border-white/10 dark:bg-white/[0.02] p-3.5 text-xs">
+                <summary className="cursor-pointer font-bold text-neutral-700 dark:text-neutral-300 list-none flex items-center justify-between select-none">
+                  <span>Riwayat Pendidikan & Kredensial Medis (Opsional)</span>
+                  <span className="text-[10px] text-neutral-400 transition-transform group-open:rotate-180">▼</span>
+                </summary>
+                <div className="mt-3 space-y-3 pt-3 border-t border-neutral-200/60 dark:border-white/10">
                   {role === 'kontributor' && (
                     <div className="grid grid-cols-2 gap-2">
                       <Mini label="Gelar Akademik" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="dr., Sp.PD" />
@@ -427,27 +431,50 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     <input type="file" accept="application/pdf"
                       onChange={e => setF(p => ({ ...p, pdfName: e.target.files?.[0]?.name ?? '' }))}
                       className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
-                    {f.pdfName && <p className="mt-1 text-[11px] text-brand-dark dark:text-brand">✓ {f.pdfName}</p>}
+                    {f.pdfName && <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">✓ {f.pdfName}</p>}
                   </div>
                   <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Berkas akan ditinjau sebelum otorisasi penuh diaktifkan.</p>
-                </Collapse>
-              </>
+                </div>
+              </details>
             )}
 
-            {/* Optional pasien details */}
+            {/* Optional patient details: clean native details */}
             {role === 'pasien' && (
-              <Collapse title="Informasi Tambahan Pasien (Opsional)">
-                <div className="grid grid-cols-2 gap-2">
-                  <Mini label="Profesi / Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan swasta" />
+              <details className="group rounded-2xl border border-neutral-200 bg-neutral-50/50 dark:border-white/10 dark:bg-white/[0.02] p-3.5 text-xs">
+                <summary className="cursor-pointer font-bold text-neutral-700 dark:text-neutral-300 list-none flex items-center justify-between select-none">
+                  <span>Informasi Tambahan Pasien (Opsional)</span>
+                  <span className="text-[10px] text-neutral-400 transition-transform group-open:rotate-180">▼</span>
+                </summary>
+                <div className="mt-3 space-y-3 pt-3 border-t border-neutral-200/60 dark:border-white/10">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Mini label="Profesi / Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan swasta" />
+                  </div>
+                  <Mini label="Riwayat Kesehatan Singkat" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Riwayat hipertensi keluarga, alergi, dll." />
                 </div>
-                <Mini label="Riwayat Kesehatan Singkat" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Riwayat hipertensi keluarga, alergi, dll." />
-              </Collapse>
+              </details>
             )}
           </div>
 
-          <Button onClick={doLogin} className="w-full min-h-[44px]">
-            {role === 'pasien' ? 'Masuk ke Akun Sekarang' : `Masuk sebagai ${cur.title}`}
-          </Button>
+          {/* ── Primary Submit Button (Distinct Green When Enabled, Gray Disabled, Never Plain White) ── */}
+          <button
+            type="button"
+            onClick={doLogin}
+            disabled={!isFormValid}
+            className="login-submit-btn flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full text-sm font-black transition-all"
+          >
+            {!consent
+              ? 'Centang Persetujuan untuk Lanjut'
+              : !isEmailValid
+              ? 'Lengkapi Alamat Email yang Benar'
+              : !isNameValid
+              ? 'Lengkapi Nama Lengkap Anda'
+              : clinical && !isStrValid
+              ? 'Masukkan Nomor STR Medis'
+              : role === 'pasien'
+              ? 'Masuk ke Akun Sekarang →'
+              : `Masuk sebagai ${cur.title} →`}
+          </button>
+
           <p className="text-center text-[11px] text-neutral-500 dark:text-neutral-400">
             🔒 Seluruh data terenkripsi dan terlindungi di bawah UU Perlindungan Data Pribadi (UU PDP No. 27/2022).
           </p>
@@ -496,14 +523,14 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
         <input className={inputClass} value={email} onChange={e => setEmail(e.target.value)}
           type="email" placeholder="nama@email.com" disabled={sent} />
         {!sent
-          ? <Button onClick={start} disabled={busy} className="shrink-0 min-h-[44px]">{busy ? '…' : 'Kirim Kode'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500 hover:text-neutral-700 min-h-[44px]">Ganti</button>}
+          ? <button onClick={start} disabled={busy} type="button" className="shrink-0 min-h-[44px] px-4 rounded-xl bg-brand text-white font-bold text-xs disabled:opacity-50">{busy ? '…' : 'Kirim Kode'}</button>
+          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} type="button" className="shrink-0 px-2 text-xs font-semibold text-neutral-500 hover:text-neutral-700 min-h-[44px]">Ganti</button>}
       </div>
       {sent && (
         <div className="mt-2 flex gap-2">
           <input className={inputClass} value={code} onChange={e => setCode(e.target.value)}
             inputMode="numeric" placeholder="6 digit kode" />
-          <Button onClick={verify} disabled={busy} className="shrink-0 min-h-[44px]">{busy ? '…' : 'Verifikasi'}</Button>
+          <button onClick={verify} disabled={busy} type="button" className="shrink-0 min-h-[44px] px-4 rounded-xl bg-brand text-white font-bold text-xs disabled:opacity-50">{busy ? '…' : 'Verifikasi'}</button>
         </div>
       )}
       {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark dark:text-brand">{msg}</p>}
@@ -518,7 +545,7 @@ function LegalModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" onClick={onClose}>
       <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
         onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-ink">Persetujuan Klinis, Privasi & Ketentuan Layanan</h3>
+        <h3 className="text-lg font-bold text-ink dark:text-white">Persetujuan Klinis, Privasi & Ketentuan Layanan</h3>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <p><b>Informed Consent.</b> Interaksi dengan asisten AI bersifat edukatif dan suportif untuk membantu analisis kesehatan, bukan diagnosis medis akhir. Diagnosis resmi dan keputusan terapi tetap memerlukan verifikasi langsung oleh dokter berizin.</p>
           <p><b>Privasi (UU Perlindungan Data Pribadi No. 27/2022).</b> Data kesehatan Anda adalah data pribadi spesifik yang disimpan terenkripsi dengan audit log akses yang ketat. Anda memiliki hak penuh untuk mengakses, memperbarui, atau menghapus riwayat data Anda kapan saja.</p>
@@ -526,7 +553,8 @@ function LegalModal({ onClose }: { onClose: () => void }) {
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Ketentuan lengkap dapat diakses kembali melalui menu "Privasi & Legalitas" setelah Anda masuk.</p>
         </div>
         <button onClick={onClose}
-          className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-3 text-sm font-bold text-white shadow-md hover:opacity-95 min-h-[44px]">
+          type="button"
+          className="mt-5 w-full rounded-full bg-brand hover:opacity-95 py-3 text-sm font-bold text-white shadow-md min-h-[44px]">
           Saya Mengerti & Setuju
         </button>
       </div>
