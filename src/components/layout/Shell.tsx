@@ -296,6 +296,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [spacesOpen, setSpacesOpen] = useState(false)
+  const [userMenuBuka, setUserMenuBuka] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -396,8 +398,22 @@ export function Shell({ children }: { children: ReactNode }) {
   // independently so global actions never disappear with the chrome.
   const keadaanBilah = useCommandBar(bilahAtas)
 
-  // Route changes close only the compact command dropdown and record local use.
-  useEffect(() => { setSpacesOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
+  // Route changes close compact command dropdown, user menu, and record local use.
+  useEffect(() => {
+    setSpacesOpen(false)
+    setUserMenuBuka(false)
+    trackVisit(loc.pathname)
+  }, [loc.pathname])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuBuka(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -633,6 +649,77 @@ export function Shell({ children }: { children: ReactNode }) {
                 ))}
               </div>
             )}
+
+            {/* Menu Akun Pengguna & Logout */}
+            <div className="relative shrink-0" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuBuka((prev) => !prev)}
+                className="flex items-center gap-1.5 rounded-full border border-black/5 bg-white p-1 pr-2.5 text-xs font-bold shadow-sm transition hover:border-brand/40 hover:bg-neutral-50 dark:border-white/10 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+                aria-label="Menu akun pengguna"
+                aria-expanded={userMenuBuka}
+              >
+                <span
+                  className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-black shadow-inner"
+                  style={{ backgroundColor: '#00BF63', color: '#0c1410' }}
+                >
+                  {account.name.slice(0, 2).toUpperCase()}
+                </span>
+                <span className="hidden max-w-[80px] truncate sm:inline text-neutral-800 dark:text-neutral-200">
+                  {account.name.split(' ')[0]}
+                </span>
+                <span className="text-[10px] text-neutral-400">▾</span>
+              </button>
+
+              {userMenuBuka && (
+                <div
+                  className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-2 shadow-2xl dark:border-white/15 dark:bg-neutral-900"
+                  style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
+                >
+                  <div className="border-b border-black/5 px-3 py-2.5 dark:border-white/10">
+                    <div className="text-sm font-extrabold text-ink truncate">{account.name}</div>
+                    <div className="text-[11px] text-neutral-500 truncate">{account.email}</div>
+                    <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      {roleLabel[account.role] ?? account.role}
+                    </div>
+                  </div>
+
+                  <div className="py-1">
+                    <NavLink
+                      to="/profile"
+                      onClick={() => setUserMenuBuka(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <IconUser size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Profil Saya</span>
+                    </NavLink>
+                    <NavLink
+                      to="/settings"
+                      onClick={() => setUserMenuBuka(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <IconSettings size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Pengaturan Akun</span>
+                    </NavLink>
+                  </div>
+
+                  <div className="border-t border-black/5 pt-1 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuBuka(false)
+                        doLogout()
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/40"
+                    >
+                      <IconLogout size={16} />
+                      <span>Keluar dari Akun (Log Out)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
