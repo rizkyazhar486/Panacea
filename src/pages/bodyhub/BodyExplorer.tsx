@@ -401,7 +401,26 @@ export function BodyExplorer() {
   const modelDekat = paksaDekat === 'tubuh'
     ? null
     : (paksaDekat ? modelRujukan(paksaDekat) : null) ?? modelDariStruktur
-  const kelasPanggung = 'relative mb-2 h-[calc(100svh-26.5rem)] max-h-[560px] min-h-[480px] overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950'
+  const [studioBackdrop, setStudioBackdrop] = useState<'studio-dark' | 'clinical-slate'>('studio-dark')
+
+  function triggerCamera(action: 'zoomIn' | 'zoomOut' | 'reset' | 'front' | 'back') {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('panacea:body3d-camera', { detail: { action } }))
+    }
+  }
+
+  function toggleBackdrop(theme: 'studio-dark' | 'clinical-slate') {
+    setStudioBackdrop(theme)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('panacea:body3d-camera', { detail: { action: 'backdrop', backdrop: theme } }))
+    }
+  }
+
+  const kelasPanggung = `relative mb-2 h-[calc(100svh-26.5rem)] max-h-[580px] min-h-[480px] overflow-hidden rounded-2xl transition-colors duration-300 ${
+    studioBackdrop === 'clinical-slate'
+      ? 'bg-gradient-to-b from-slate-800 to-slate-900'
+      : 'bg-gradient-to-b from-neutral-900 to-neutral-950'
+  }`
 
   function pickRenderMode(mode: RenderMode) {
     setRenderMode(mode)
@@ -655,18 +674,21 @@ export function BodyExplorer() {
           />
         </div>
         <div id="organ-dekat" className="mb-2">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Organ close-up</p>
-          <div className="-mx-1 mt-1 flex gap-1 overflow-x-auto pb-1">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Organ close-up</p>
+            <span className="text-[10px] text-neutral-400">Scroll horizontal →</span>
+          </div>
+          <div className="no-scrollbar -mx-1 mt-1 flex gap-1.5 overflow-x-auto pb-1 scroll-smooth">
             {daftarModelRujukan().map((o) => (
               <button
                 key={o.id}
                 type="button"
                 aria-pressed={modelDekat?.id === o.id}
                 onClick={() => setPaksaDekat(o.id)}
-                className={`min-h-11 shrink-0 rounded-full border px-3 text-xs font-bold ${
+                className={`min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold transition ${
                   modelDekat?.id === o.id
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                    ? 'border-brand bg-brand text-white shadow-sm'
+                    : 'border-neutral-200 bg-white/50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:border-white/20'
                 }`}
               >
                 {o.label}
@@ -678,6 +700,89 @@ export function BodyExplorer() {
           )}
         </div>
         <div role="region" aria-label="Reference anatomy viewer" className={kelasPanggung}>
+          {/* Backdrop Studio Switcher */}
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/60 p-1 text-[11px] font-medium text-white shadow-lg backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => toggleBackdrop('studio-dark')}
+              aria-pressed={studioBackdrop === 'studio-dark'}
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                studioBackdrop === 'studio-dark'
+                  ? 'bg-white/25 text-white shadow-sm'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Studio Dark
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleBackdrop('clinical-slate')}
+              aria-pressed={studioBackdrop === 'clinical-slate'}
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                studioBackdrop === 'clinical-slate'
+                  ? 'bg-slate-700/80 text-white shadow-sm'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Clinical Slate
+            </button>
+          </div>
+
+          {/* Floating Camera HUD Controls */}
+          <div
+            role="toolbar"
+            aria-label="3D Viewport Controls"
+            className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/65 p-1 text-white shadow-xl backdrop-blur-md"
+          >
+            <button
+              type="button"
+              title="Zoom In"
+              aria-label="Zoom In"
+              onClick={() => triggerCamera('zoomIn')}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-base font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              title="Zoom Out"
+              aria-label="Zoom Out"
+              onClick={() => triggerCamera('zoomOut')}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-base font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+            >
+              −
+            </button>
+            <div className="h-4 w-px bg-white/20" />
+            <button
+              type="button"
+              title="Pandangan Depan (Anterior)"
+              aria-label="Pandangan Depan (Anterior)"
+              onClick={() => triggerCamera('front')}
+              className="rounded-full px-2.5 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/20 hover:text-white active:scale-95"
+            >
+              Depan
+            </button>
+            <button
+              type="button"
+              title="Pandangan Belakang (Posterior)"
+              aria-label="Pandangan Belakang (Posterior)"
+              onClick={() => triggerCamera('back')}
+              className="rounded-full px-2.5 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/20 hover:text-white active:scale-95"
+            >
+              Belakang
+            </button>
+            <div className="h-4 w-px bg-white/20" />
+            <button
+              type="button"
+              title="Reset View"
+              aria-label="Reset View"
+              onClick={() => triggerCamera('reset')}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+            >
+              ↺
+            </button>
+          </div>
+
           {modelDekat ? (
             <>
               <button

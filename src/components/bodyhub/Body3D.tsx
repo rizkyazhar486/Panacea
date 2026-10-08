@@ -523,6 +523,56 @@ export function Body3D({
       else stopRendering()
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
+
+    const onCameraCommand = (e: Event) => {
+      const custom = e as CustomEvent<{ action?: 'zoomIn' | 'zoomOut' | 'reset' | 'front' | 'back' | 'backdrop'; backdrop?: string }>
+      const action = custom.detail?.action
+      const ctrl = controlsRef.current
+      const cam = cameraRef.current
+      if (!ctrl || !cam) return
+
+      if (action === 'zoomIn') {
+        ctrl.dollyIn(1.2)
+        ctrl.update()
+        requestRender()
+      } else if (action === 'zoomOut') {
+        ctrl.dollyOut(1.2)
+        ctrl.update()
+        requestRender()
+      } else if (action === 'reset' && homeFramingRef.current) {
+        const home = homeFramingRef.current
+        cam.position.copy(home.position)
+        ctrl.target.copy(home.target)
+        ctrl.minDistance = home.minDistance
+        ctrl.maxDistance = home.maxDistance
+        ctrl.update()
+        requestRender()
+      } else if (action === 'front' && homeFramingRef.current) {
+        const target = ctrl.target
+        const dist = cam.position.distanceTo(target)
+        cam.position.set(target.x, target.y + 0.05, target.z + dist)
+        ctrl.update()
+        requestRender()
+      } else if (action === 'back' && homeFramingRef.current) {
+        const target = ctrl.target
+        const dist = cam.position.distanceTo(target)
+        cam.position.set(target.x, target.y + 0.05, target.z - dist)
+        ctrl.update()
+        requestRender()
+      } else if (action === 'backdrop') {
+        const scene = sceneRef.current
+        const backdropMode = (custom.detail as { backdrop?: string } | undefined)?.backdrop
+        if (scene) {
+          latarRef.current?.dispose()
+          latarRef.current = backdropMode === 'clinical-slate'
+            ? latarGradasi(0x242d38, 0x12171e)
+            : latarGradasi(0x141922, 0x05070b)
+          scene.background = latarRef.current
+          requestRender()
+        }
+      }
+    }
+    window.addEventListener('panacea:body3d-camera', onCameraCommand)
     requestRender()
 
     return () => {
@@ -532,6 +582,7 @@ export function Body3D({
       controls.removeEventListener('change', requestRender)
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('panacea:body3d-camera', onCameraCommand)
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
@@ -629,11 +680,11 @@ export function Body3D({
                 const center = box.getCenter(new THREE.Vector3())
                 const size = box.getSize(new THREE.Vector3())
                 const height = Math.max(size.y, 0.1)
-                const dist = height * 1.7
+                const dist = height * 1.38
                 camera.position.set(
-                  center.x + dist * 0.26,
-                  center.y + height * 0.06,
-                  center.z + dist * 0.96,
+                  center.x + dist * 0.22,
+                  center.y + height * 0.04,
+                  center.z + dist * 0.94,
                 )
                 camera.near = Math.max(dist / 100, 0.01)
                 camera.far = dist * 20

@@ -1,13 +1,64 @@
 /* Ruang lega, huruf besar, satu fokus. Ringkasan memenuhi lantai sentuh 44px. */
-.fold { border-top: 1px solid rgba(255,255,255,.1); margin-top: 8px; }
-.fold__summary {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  min-height: 56px; padding: 12px 0; cursor: pointer; list-style: none;
+.fold {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  margin-top: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  overflow: hidden;
 }
+
+.dark .fold {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.fold:hover {
+  border-color: rgba(0, 191, 99, 0.3);
+}
+
+.fold__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 14px 22px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background-color 160ms ease;
+}
+
 .fold__summary::-webkit-details-marker { display: none; }
+.fold__summary:hover {
+  background-color: rgba(0, 0, 0, 0.015);
+}
+.dark .fold__summary:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
 .fold__summary:focus-visible { outline: 3px solid rgba(59,130,246,.5); outline-offset: 2px; border-radius: 8px; }
-.fold__word { font-size: 1.125rem; font-weight: 500; letter-spacing: .01em; }
-.fold__chevron { width: 10px; height: 10px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); opacity: .6; transition: transform .18s ease; }
+.fold__word { font-size: 1.125rem; font-weight: 700; letter-spacing: -.01em; color: #0f172a; }
+.dark .fold__word { color: #f1f5f9; }
+
+.fold__chevron {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: .6;
+  transition: transform .18s ease;
+  color: #64748b;
+}
+
+.dark .fold__chevron { color: #94a3b8; }
 .fold[open] > .fold__summary .fold__chevron { transform: rotate(-135deg); }
-.fold__body { padding: 8px 0 24px; }
+.fold[open] > .fold__summary { border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
+.dark .fold[open] > .fold__summary { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.fold__body { padding: 18px 22px 26px; }
+
 @media (prefers-reduced-motion: reduce) { .fold__chevron { transition: none; } }

@@ -119,3 +119,27 @@
   gap: 4px;
   text-align: center;
 }
+
+/* Light mode adaptation: clean white action buttons and crisp contrast */
+html:not(.dark) .panacea-intent-hero {
+  border-block-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-intent-action {
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+html:not(.dark) .panacea-intent-action__icon {
+  background: rgba(0, 0, 0, 0.04);
+  color: #00BF63;
+}
+
+html:not(.dark) .panacea-intent-action:hover,
+html:not(.dark) .panacea-intent-action:focus-visible {
+  border-color: rgba(0, 191, 99, 0.4);
+  background: #f0fdf4;
+}

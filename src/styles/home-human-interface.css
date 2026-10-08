@@ -488,3 +488,69 @@
     transition: none;
   }
 }
+
+/* Light mode adaptation: clean text and surfaces */
+html:not(.dark) .panacea-instrument-strip,
+html:not(.dark) .panacea-command-surface {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-command-surface {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+html:not(.dark) .panacea-command-search {
+  color: #0f172a;
+  border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+html:not(.dark) .panacea-command-search::placeholder {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-command-search:focus {
+  border-bottom-color: #00BF63;
+}
+
+html:not(.dark) .panacea-command-index-toggle {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-command-index-toggle:hover {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-command-results {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+html:not(.dark) .panacea-command-result {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+html:not(.dark) .panacea-command-result-meta {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-bento-tile {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+html:not(.dark) .panacea-bento-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  background: #f8fafc;
+}
+
+html:not(.dark) .panacea-bento-count {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-bento-tile[data-open='true'] .panacea-bento-count {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-bento-items {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}

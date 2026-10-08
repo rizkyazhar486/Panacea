@@ -753,7 +753,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       setMode: (role) =>
         setState((st) => {
-          if (!st.account?.isOwner) return st // only the owner can switch modes
+          if (!st.account) return st
+          // Allow mode switching for platform owner or during local development/demo
+          if (!st.account.isOwner && backendEnabled) return st
           return {
             ...st,
             account: { ...st.account, role },

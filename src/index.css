@@ -181,11 +181,12 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Surfaces */
 .dark .bg-white { background-color: #17191c !important; }
-/* Pengecualian: tombol yang SENGAJA putih dengan teks gelap (CTA utama,
+/* Pengecualian: tombol/elemen interaktif yang SENGAJA putih dengan teks gelap (CTA utama,
    "Ask →"). Memetakan latarnya ke #17191c sementara teksnya tetap hitam
    menghasilkan hitam di atas hitam — tombolnya lenyap. Terukur di Clinical:
-   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibiarkan putih. */
-.dark .bg-white:is(.text-black, .text-ink, .text-neutral-900, .text-neutral-950, .text-slate-900, .text-slate-950) {
+   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibatasi pada elemen interaktif
+   (button, a, [role="button"]) agar kartu atau panel tidak ikut terpaksa menjadi putih. */
+.dark .bg-white:is(button.text-black, a.text-black, [role='button'].text-black, button.text-ink, a.text-ink, [role='button'].text-ink, button.text-neutral-900, a.text-neutral-900, [role='button'].text-neutral-900, button.text-neutral-950, a.text-neutral-950, [role='button'].text-neutral-950, button.text-slate-900, a.text-slate-900, [role='button'].text-slate-900, button.text-slate-950, a.text-slate-950, [role='button'].text-slate-950) {
   background-color: #fff !important;
   color: #0c1410 !important;
 }
@@ -2991,105 +2992,15 @@ html:not(.dark) body button[data-cta="primary"] {
   box-shadow: 0 10px 30px -8px rgba(0,191,99,.5) !important;
 }
 
-/* ── Login screen role switcher & submit button ────────── */
-.login-role-switch {
-  display: flex;
-  padding: 4px;
-  border-radius: 16px;
-  background-color: #f1f5f3 !important;
-  border: 1px solid rgba(13, 39, 26, 0.08) !important;
-}
-.dark .login-role-switch {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
-.login-role-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  border: none !important;
-  box-shadow: none !important;
-  cursor: pointer;
-}
-.login-role-tab:not([data-active="true"]) {
-  background: transparent !important;
-  color: #64748b !important;
-}
-.dark .login-role-tab:not([data-active="true"]) {
-  background: transparent !important;
-  color: #94a3b8 !important;
-}
-.login-role-tab:not([data-active="true"]):hover {
-  color: #0f172a !important;
-  background: rgba(0, 0, 0, 0.03) !important;
-}
-.dark .login-role-tab:not([data-active="true"]):hover {
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-.login-role-tab[data-active="true"] {
-  background: #00BF63 !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.35) !important;
-}
-.dark .login-role-tab[data-active="true"] {
-  background: #00BF63 !important;
-  color: #041a0d !important;
-  font-weight: 800;
-  box-shadow: 0 4px 18px rgba(0, 191, 99, 0.45) !important;
+
+
+/* Matikan morph capsule layer berlebih */
+#pmd-liquid-morph-layer,
+.pmd-liquid-morph-orb {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
-button.login-submit-btn {
-  background: #00BF63 !important;
-  color: #ffffff !important;
-  border-color: transparent !important;
-  box-shadow: 0 6px 20px rgba(0, 191, 99, 0.35) !important;
-}
-.dark button.login-submit-btn {
-  background: #00BF63 !important;
-  color: #041a0d !important;
-  font-weight: 800;
-  box-shadow: 0 6px 22px rgba(0, 191, 99, 0.45) !important;
-}
-button.login-submit-btn:disabled {
-  background: #e2e8f0 !important;
-  color: #94a3b8 !important;
-  box-shadow: none !important;
-  cursor: not-allowed !important;
-  opacity: 0.65 !important;
-}
-.dark button.login-submit-btn:disabled {
-  background: #1e293b !important;
-  color: #64748b !important;
-  box-shadow: none !important;
-}
-
-/* CTA Jelajahi Atlas Tubuh 3D di Landing Page (selalu putih bertinta gelap di kanvas gelap) */
-.cta-atlas-btn {
-  background-color: #ffffff !important;
-  color: #05140b !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 191, 99, 0.2) !important;
-}
-.cta-atlas-btn:hover {
-  background-color: #f0fdf4 !important;
-  color: #031008 !important;
-}
-.cta-atlas-btn :is(span, svg) {
-  color: #05140b !important;
-}
-.dark .cta-atlas-btn {
-  background-color: #ffffff !important;
-  color: #05140b !important;
-}
-.dark .cta-atlas-btn :is(span, svg) {
-  color: #05140b !important;
-}
 
 

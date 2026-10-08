@@ -70,51 +70,12 @@
   const morphLabel = morph.querySelector('.pmd-liquid-morph-label')
   let morphTimer = 0
 
-  const showPress = (event, element) => {
-    if (reduceMotion) return
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX || rect.left + rect.width / 2
-    const y = event.clientY || rect.top + rect.height / 2
-    pressLayer.style.setProperty('--pmd-press-left', `${x}px`)
-    pressLayer.style.setProperty('--pmd-press-top', `${y}px`)
-    pressLayer.style.setProperty('--pmd-press-size', `${clamp(Math.max(rect.width, rect.height) * 1.55, 54, 180)}px`)
-    pressLayer.classList.remove('is-active')
-    void pressLayer.offsetWidth
-    pressLayer.classList.add('is-active')
+  const showPress = (_event, _element) => {
+    // Disabled: over-the-top ripple effect removed for calm, professional clinical UX
   }
 
-  const showMorph = (element) => {
-    if (reduceMotion || lowMemory || !(element instanceof HTMLElement)) return
-    const rect = element.getBoundingClientRect()
-    if (rect.width < 2 || rect.height < 2 || rect.bottom < 0 || rect.top > window.innerHeight) return
-
-    const label = labelOf(element)
-    const vw = Math.max(320, window.innerWidth)
-    const vh = Math.max(480, window.innerHeight)
-    const targetWidth = clamp(Math.max(rect.width * 1.55, 220), 220, Math.min(420, vw - 24))
-    const targetHeight = clamp(Math.max(rect.height * 1.75, 72), 72, 112)
-    const targetLeft = clamp(rect.left + rect.width / 2 - targetWidth / 2, 12, vw - targetWidth - 12)
-    const targetTop = clamp(rect.top + rect.height / 2 - targetHeight / 2, 12, vh - targetHeight - 12)
-
-    morph.style.setProperty('--pmd-morph-start-left', `${rect.left}px`)
-    morph.style.setProperty('--pmd-morph-start-top', `${rect.top}px`)
-    morph.style.setProperty('--pmd-morph-start-width', `${rect.width}px`)
-    morph.style.setProperty('--pmd-morph-start-height', `${rect.height}px`)
-    morph.style.setProperty('--pmd-morph-left', `${targetLeft}px`)
-    morph.style.setProperty('--pmd-morph-top', `${targetTop}px`)
-    morph.style.setProperty('--pmd-morph-width', `${targetWidth}px`)
-    morph.style.setProperty('--pmd-morph-height', `${targetHeight}px`)
-    morph.style.setProperty('--pmd-morph-radius-start', `${Math.min(rect.width, rect.height) / 2}px`)
-    if (morphLabel) morphLabel.textContent = label
-
-    window.clearTimeout(morphTimer)
-    morph.classList.remove('is-active', 'is-leaving')
-    void morph.offsetWidth
-    morph.classList.add('is-active')
-    morphTimer = window.setTimeout(() => {
-      morph.classList.add('is-leaving')
-      morphTimer = window.setTimeout(() => morph.classList.remove('is-active', 'is-leaving'), 220)
-    }, 520)
+  const showMorph = (_element) => {
+    // Disabled: disruptive floating morph capsule that obstructed UI on click
   }
 
   const release = (element) => {
@@ -133,7 +94,6 @@
     const py = clamp(((event.clientY - rect.top) / Math.max(1, rect.height)) * 100, 0, 100)
     element.style.setProperty('--pmd-action-x', `${px.toFixed(2)}%`)
     element.style.setProperty('--pmd-action-y', `${py.toFixed(2)}%`)
-    showPress(event, element)
   }, { capture: true, passive: true })
 
   document.addEventListener('pointerup', (event) => {
@@ -153,7 +113,6 @@
     const element = event.target.closest(ACTION_SELECTOR)
     if (!isEligible(element)) return
     mark(element)
-    showMorph(element)
     window.requestAnimationFrame(() => syncState(element))
   }, { capture: true })
 
