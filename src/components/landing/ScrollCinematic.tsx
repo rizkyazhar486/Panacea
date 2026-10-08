@@ -94,11 +94,10 @@ export function ScrollCinematic() {
             <div className="flex items-center gap-3">
               <Link
                 to="/body-explorer"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-black !text-black shadow-xl shadow-black/40 transition hover:-translate-y-0.5 hover:bg-emerald-50 sm:text-sm"
-                style={{ color: '#090d0b' }}
+                className="cta-atlas-btn group inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-black transition-all duration-200 hover:-translate-y-0.5 active:scale-95 sm:text-sm"
               >
-                <span style={{ color: '#090d0b' }}>Jelajahi Atlas Tubuh 3D</span>
-                <span className="font-extrabold text-emerald-700 transition group-hover:translate-x-0.5" aria-hidden="true" style={{ color: '#047857' }}>
+                <span>Jelajahi Atlas Tubuh 3D</span>
+                <span className="font-black transition-transform group-hover:translate-x-1" aria-hidden="true">
                   →
                 </span>
               </Link>

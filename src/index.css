@@ -3070,3 +3070,26 @@ button.login-submit-btn:disabled {
   box-shadow: none !important;
 }
 
+/* CTA Jelajahi Atlas Tubuh 3D di Landing Page (selalu putih bertinta gelap di kanvas gelap) */
+.cta-atlas-btn {
+  background-color: #ffffff !important;
+  color: #05140b !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 191, 99, 0.2) !important;
+}
+.cta-atlas-btn:hover {
+  background-color: #f0fdf4 !important;
+  color: #031008 !important;
+}
+.cta-atlas-btn :is(span, svg) {
+  color: #05140b !important;
+}
+.dark .cta-atlas-btn {
+  background-color: #ffffff !important;
+  color: #05140b !important;
+}
+.dark .cta-atlas-btn :is(span, svg) {
+  color: #05140b !important;
+}
+
+
