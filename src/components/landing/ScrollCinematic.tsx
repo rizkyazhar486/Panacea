@@ -8,23 +8,17 @@ import { Link } from 'react-router-dom'
  * SVG/CSS keeps the first load light and preserves a reduced-motion fallback.
  */
 const ACTS = [
-  { key: 'whole', label: 'Whole Body', eyebrow: 'YOUR BODY', title: 'One body. Every layer.' },
-  { key: 'exploded', label: 'Exploded Anatomy', eyebrow: 'EXPLORE', title: 'See what lives beneath.' },
-  { key: 'systems', label: 'Connected Systems', eyebrow: 'UNDERSTAND', title: 'Systems move together.' },
-  { key: 'unified', label: 'Longitudinal State', eyebrow: 'PANACEAMED', title: 'One continuous health state.' },
+  { key: 'whole', label: 'Seluruh Tubuh', eyebrow: 'ATLAS ANATOMI DIGITAL', title: 'Satu Tubuh. Seluruh Sistem Terhubung.' },
+  { key: 'exploded', label: 'Eksplorasi Organ', eyebrow: 'PERSPEKTIF MULTI-LAYER', title: 'Pahami Keterkaitan Organ Vital.' },
+  { key: 'systems', label: 'Sistem Fisiologis', eyebrow: 'JARINGAN METABOLISME', title: 'Sistem Tubuh Bergerak Selaras.' },
+  { key: 'unified', label: 'Digital Health Twin', eyebrow: 'DIGITAL BODY TWIN', title: 'Satu Representasi Kesehatan Terpadu.' },
 ] as const
 
 type Stage = (typeof ACTS)[number]['key']
 
-function clamp01(n: number) {
-  return Math.min(1, Math.max(0, n))
-}
-
 export function ScrollCinematic() {
-  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeStage, setActiveStage] = useState<Stage>('exploded')
   const sceneRef = useRef<HTMLDivElement>(null)
-  const actRefs = useRef<(HTMLDivElement | null)[]>([])
-  const dotRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
@@ -35,98 +29,81 @@ export function ScrollCinematic() {
     return () => media.removeEventListener?.('change', sync)
   }, [])
 
-  useEffect(() => {
-    if (reduced) return
-    let raf = 0
-    const update = () => {
-      if (raf) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        const track = trackRef.current
-        const scene = sceneRef.current
-        if (!track || !scene) return
-
-        const rect = track.getBoundingClientRect()
-        const total = rect.height - window.innerHeight
-        const progress = total > 0 ? clamp01(-rect.top / total) : 0
-        const stageIndex = Math.min(ACTS.length - 1, Math.floor(progress * ACTS.length))
-        scene.dataset.stage = ACTS[stageIndex].key
-        scene.style.setProperty('--cinematic-progress', String(progress))
-
-        ACTS.forEach((_, i) => {
-          const copy = actRefs.current[i]
-          const dot = dotRefs.current[i]
-          if (!copy) return
-          const center = (i + 0.5) / ACTS.length
-          const distance = Math.abs(progress - center)
-          const opacity = clamp01(1 - distance / 0.16)
-          copy.style.opacity = String(opacity)
-          copy.style.transform = `translate3d(0, ${(center - progress) * 105}px, 0)`
-          if (dot) {
-            dot.style.opacity = i === stageIndex ? '1' : '0.28'
-            dot.style.transform = i === stageIndex ? 'scale(1.5)' : 'scale(1)'
-          }
-        })
-      })
-    }
-
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [reduced])
-
-  if (reduced) {
-    return (
-      <section className="dark anatomy-cinematic relative h-[760px] overflow-hidden bg-[#02050a] text-white" aria-label="Human body overview">
-        <AnatomyScene stage="exploded" reduced />
-        <div className="pointer-events-none absolute inset-x-5 top-12 z-20 text-center">
-          <p className="text-[9px] font-bold uppercase tracking-[0.32em] text-cyan-100/70">PANACEAMED · YOUR BODY</p>
-          <h2 className="mt-2 text-3xl font-black tracking-[-0.05em] sm:text-5xl">One body. Every layer.</h2>
-        </div>
-      </section>
-    )
-  }
+  const currentAct = ACTS.find((a) => a.key === activeStage) ?? ACTS[1]
 
   return (
-    <section ref={trackRef} className="anatomy-cinematic relative" style={{ height: '360vh' }} aria-label="Interactive human anatomy cinematic">
-      <div className="dark sticky top-0 h-[100svh] overflow-hidden bg-[#02050a] text-white">
-        <AnatomyScene stage="whole" sceneRef={sceneRef} />
+    <section className="relative px-4 py-8 sm:px-6 sm:py-12 lg:px-8" aria-label="Atlas Anatomi Digital">
+      <div className="mx-auto max-w-6xl">
+        <div className="dark relative overflow-hidden rounded-[2.5rem] border border-emerald-500/20 bg-gradient-to-b from-[#02050a] via-[#040d11] to-[#02050a] text-white shadow-2xl shadow-emerald-950/20 sm:rounded-[3rem]">
+          {/* Subtle ambient lighting glows */}
+          <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl" />
 
-        <div className="pointer-events-none absolute inset-0 z-20">
-          {ACTS.map((act, i) => (
-            <div
-              key={act.key}
-              ref={(el) => { actRefs.current[i] = el }}
-              className="absolute inset-x-5 top-[9svh] text-center sm:inset-x-10 sm:top-[10svh]"
-              style={{ opacity: i === 0 ? 1 : 0, willChange: 'opacity, transform' }}
-            >
-              <p className="text-[9px] font-bold uppercase tracking-[0.32em] text-cyan-100/70 sm:text-[10px]">{act.eyebrow}</p>
-              <h2 className="mt-2 text-[clamp(1.7rem,5vw,4.3rem)] font-black leading-none tracking-[-0.055em] text-white">{act.title}</h2>
+          {/* Header Card */}
+          <div className="relative z-20 px-6 pt-10 text-center sm:px-12 sm:pt-14">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.2em] text-emerald-300">
+              ATLAS ANATOMI DIGITAL · PERSPEKTIF MULTI-LAYER
+            </span>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-5xl">
+              Satu Tubuh. <span className="font-serif-display italic text-emerald-400">Seluruh Sistem Terhubung.</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm leading-relaxed text-cyan-100/75 sm:text-base">
+              Pantau keterkaitan organ vital, metabolisme, dan biomarker klinis Anda dalam satu representasi tubuh longitudinal terpadu.
+            </p>
+
+            {/* Interactive Layer Switcher Tabs */}
+            <div className="mx-auto mt-6 inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 p-1.5 backdrop-blur-md sm:gap-2">
+              {ACTS.map((act, i) => (
+                <button
+                  key={act.key}
+                  type="button"
+                  onClick={() => setActiveStage(act.key)}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all duration-300 sm:px-5 sm:py-2 ${
+                    activeStage === act.key
+                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/40 scale-105'
+                      : 'text-neutral-300 hover:text-white'
+                  }`}
+                >
+                  <span className="mr-1.5 opacity-80">{i === 0 ? '🧍' : i === 1 ? '🫀' : i === 2 ? '⚡' : '🧬'}</span>
+                  {act.label}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="pointer-events-none absolute right-4 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-3 sm:right-8">
-          {ACTS.map((act, i) => (
-            <span
-              key={act.key}
-              ref={(el) => { dotRefs.current[i] = el }}
-              className="h-1.5 w-1.5 rounded-full bg-white transition-[opacity,transform] duration-300"
-              style={{ opacity: i === 0 ? 1 : 0.28 }}
-              title={act.label}
-            />
-          ))}
-        </div>
+          {/* Anatomical Visual Stage */}
+          <div className="relative h-[520px] w-full overflow-hidden sm:h-[620px] lg:h-[660px]">
+            <AnatomyScene stage={activeStage} reduced={reduced} sceneRef={sceneRef} />
 
-        <div className="pointer-events-none absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 text-white/45">
-          <Link to="/body-explorer" className="pointer-events-auto min-h-11 rounded-full border border-white/20 bg-black/40 px-3 text-[11px] font-bold text-white">Open the atlas</Link>
-          <span className="text-[9px] font-bold uppercase tracking-[0.28em]">Scroll to dissect</span>
-          <span className="anatomy-scroll-arrow text-sm">↓</span>
+            {/* Current layer caption pill */}
+            <div className="pointer-events-none absolute bottom-4 inset-x-4 z-20 flex justify-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-4 py-1.5 text-[11px] font-semibold text-emerald-200 backdrop-blur-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {currentAct.title}
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Controls & High-contrast CTA */}
+          <div className="relative z-20 flex flex-col items-center justify-between gap-4 border-t border-white/10 bg-black/40 px-6 py-5 backdrop-blur-md sm:flex-row sm:px-10">
+            <div className="flex items-center gap-2 text-xs text-neutral-300">
+              <span className="text-emerald-400">✦</span>
+              <span>Interaktif: pilih lapisan di atas atau gerakkan kursor untuk eksplorasi sudut pandang</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Link
+                to="/body-explorer"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-black !text-black shadow-xl shadow-black/40 transition hover:-translate-y-0.5 hover:bg-emerald-50 sm:text-sm"
+                style={{ color: '#090d0b' }}
+              >
+                <span style={{ color: '#090d0b' }}>Jelajahi Atlas Tubuh 3D</span>
+                <span className="font-extrabold text-emerald-700 transition group-hover:translate-x-0.5" aria-hidden="true" style={{ color: '#047857' }}>
+                  →
+                </span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -166,18 +143,18 @@ function AnatomyScene({ stage, reduced = false, sceneRef }: { stage: Stage; redu
       <Particles />
       <OrbitRings />
 
-      <div className="anatomy-stage absolute left-1/2 top-[54%] h-[min(70svh,720px)] w-[min(92vw,760px)] -translate-x-1/2 -translate-y-1/2 [perspective:1200px]">
+      <div className="anatomy-stage absolute left-1/2 top-[54%] h-[82%] max-h-[500px] w-[min(90vw,480px)] -translate-x-1/2 -translate-y-1/2 [perspective:1200px]">
         <div className="anatomy-tilt h-full w-full"><HumanAnatomy /></div>
       </div>
 
-      <div className="anatomy-label anatomy-label-brain">BRAIN</div>
-      <div className="anatomy-label anatomy-label-lungs">LUNGS</div>
-      <div className="anatomy-label anatomy-label-heart">HEART</div>
-      <div className="anatomy-label anatomy-label-liver">LIVER</div>
-      <div className="anatomy-label anatomy-label-kidneys">KIDNEYS</div>
-      <div className="anatomy-label anatomy-label-skeleton">SKELETON</div>
-      <div className="anatomy-label anatomy-label-neuro">NEURO</div>
-      <div className="anatomy-label anatomy-label-vascular">VASCULAR</div>
+      <div className="anatomy-label anatomy-label-brain">OTAK</div>
+      <div className="anatomy-label anatomy-label-lungs">PARU-PARU</div>
+      <div className="anatomy-label anatomy-label-heart">JANTUNG</div>
+      <div className="anatomy-label anatomy-label-liver">HATI</div>
+      <div className="anatomy-label anatomy-label-kidneys">GINJAL</div>
+      <div className="anatomy-label anatomy-label-skeleton">RANGKA</div>
+      <div className="anatomy-label anatomy-label-neuro">SARAF</div>
+      <div className="anatomy-label anatomy-label-vascular">VASKULAR</div>
     </div>
   )
 }
@@ -280,10 +257,10 @@ export function ScrollCinematicStyles() {
       .anatomy-scene[data-stage='systems'] .anatomy-brain{transform:translate(-142px,-56px) rotate(-11deg) scale(1.14)}.anatomy-scene[data-stage='systems'] .anatomy-lungs{transform:translate(152px,-30px) rotate(8deg) scale(1.1)}.anatomy-scene[data-stage='systems'] .anatomy-heart{transform:translate(-164px,34px) rotate(-13deg) scale(1.18)}.anatomy-scene[data-stage='systems'] .anatomy-liver{transform:translate(155px,41px) rotate(11deg) scale(1.14)}.anatomy-scene[data-stage='systems'] .anatomy-kidneys{transform:translate(-139px,87px) rotate(-8deg) scale(1.13)}.anatomy-scene[data-stage='systems'] .anatomy-digestive{transform:translate(150px,104px) rotate(9deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-neuro{transform:translate(-69px,3px) scale(1.025);filter:drop-shadow(0 0 10px rgba(196,181,253,.6))}.anatomy-scene[data-stage='systems'] .anatomy-vascular{transform:translate(71px,-1px) scale(1.025);filter:drop-shadow(0 0 10px rgba(103,232,249,.58))}.anatomy-scene[data-stage='systems'] .anatomy-skeleton{transform:scale(.96);opacity:.5}
       .anatomy-scene[data-stage='unified'] .anatomy-part{transform:translate(0,0) scale(1)}.anatomy-scene[data-stage='unified'] .anatomy-envelope{opacity:.44;transform:scale(1)}.anatomy-scene[data-stage='unified'] .anatomy-skeleton{opacity:.56}.anatomy-scene[data-stage='unified'] .anatomy-neuro,.anatomy-scene[data-stage='unified'] .anatomy-vascular{filter:drop-shadow(0 0 11px rgba(103,232,249,.56))}.anatomy-scene[data-stage='unified'] .anatomy-floor{transform:scaleX(1.18);opacity:.95}
       .anatomy-label{position:absolute;z-index:12;padding:.35rem .55rem;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(4,10,18,.48);backdrop-filter:blur(14px);color:rgba(236,254,255,.78);font-size:8px;font-weight:800;letter-spacing:.18em;opacity:0;transform:translateY(8px);transition:opacity 500ms ease 380ms,transform 500ms cubic-bezier(.16,1,.3,1) 380ms}.anatomy-scene[data-stage='exploded'] .anatomy-label,.anatomy-scene[data-stage='systems'] .anatomy-label{opacity:1;transform:translateY(0)}
-      .anatomy-label-brain{left:calc(50% - 180px);top:25%}.anatomy-label-lungs{left:calc(50% + 105px);top:34%}.anatomy-label-heart{left:calc(50% - 196px);top:44%}.anatomy-label-liver{left:calc(50% + 115px);top:50%}.anatomy-label-kidneys{left:calc(50% - 185px);top:57%}.anatomy-label-skeleton{left:calc(50% - 34px);top:75%}.anatomy-label-neuro{left:calc(50% - 126px);top:69%}.anatomy-label-vascular{left:calc(50% + 75px);top:68%}
+      .anatomy-label-brain{left:calc(50% - 160px);top:22%}.anatomy-label-lungs{left:calc(50% + 115px);top:33%}.anatomy-label-heart{left:calc(50% - 180px);top:43%}.anatomy-label-liver{left:calc(50% + 120px);top:49%}.anatomy-label-kidneys{left:calc(50% - 170px);top:56%}.anatomy-label-skeleton{left:calc(50% - 32px);top:75%}.anatomy-label-neuro{left:calc(50% - 120px);top:68%}.anatomy-label-vascular{left:calc(50% + 80px);top:68%}
       .anatomy-ring{animation:anatomyOrbit 22s linear infinite;box-shadow:0 0 40px rgba(34,211,238,.03) inset}.anatomy-ring-2{animation-direction:reverse;animation-duration:17s}.anatomy-ring-3{animation-duration:12s}.anatomy-particle{opacity:.26;box-shadow:0 0 8px rgba(103,232,249,.65);animation:anatomyParticle 5s ease-in-out infinite alternate}.anatomy-scroll-arrow{animation:anatomyChevron 1.6s ease-in-out infinite}
       @keyframes anatomyOrbit{from{transform:rotate(0deg) scaleX(1)}50%{transform:rotate(180deg) scaleX(.78)}to{transform:rotate(360deg) scaleX(1)}}@keyframes anatomyParticle{from{transform:translate3d(0,0,0);opacity:.12}to{transform:translate3d(0,-16px,0);opacity:.52}}@keyframes anatomyChevron{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(5px);opacity:1}}
-      @media(max-width:640px){.anatomy-stage{width:min(124vw,690px)!important;top:55%!important}.anatomy-label{font-size:7px;padding:.28rem .42rem}.anatomy-label-brain{left:9%;top:29%}.anatomy-label-lungs{left:auto;right:8%;top:36%}.anatomy-label-heart{left:7%;top:46%}.anatomy-label-liver{left:auto;right:7%;top:51%}.anatomy-label-kidneys{left:8%;top:59%}.anatomy-label-skeleton{left:44%;top:76%}.anatomy-label-neuro{left:15%;top:69%}.anatomy-label-vascular{left:auto;right:12%;top:68%}.anatomy-scene[data-stage='systems'] .anatomy-brain{transform:translate(-108px,-46px) rotate(-10deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-lungs{transform:translate(112px,-24px) rotate(7deg) scale(1.08)}.anatomy-scene[data-stage='systems'] .anatomy-heart{transform:translate(-118px,28px) rotate(-11deg) scale(1.15)}.anatomy-scene[data-stage='systems'] .anatomy-liver{transform:translate(116px,37px) rotate(9deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-kidneys{transform:translate(-103px,70px) rotate(-7deg) scale(1.1)}.anatomy-scene[data-stage='systems'] .anatomy-digestive{transform:translate(110px,84px) rotate(8deg) scale(1.1)}}
+      @media(max-width:640px){.anatomy-stage{width:min(90vw,440px)!important;height:82%!important;top:53%!important}.anatomy-label{font-size:7px;padding:.26rem .4rem}.anatomy-label-brain{left:6%;top:23%}.anatomy-label-lungs{left:auto;right:6%;top:33%}.anatomy-label-heart{left:5%;top:43%}.anatomy-label-liver{left:auto;right:5%;top:49%}.anatomy-label-kidneys{left:6%;top:56%}.anatomy-label-skeleton{left:calc(50% - 24px);top:75%}.anatomy-label-neuro{left:10%;top:68%}.anatomy-label-vascular{left:auto;right:10%;top:68%}.anatomy-scene[data-stage='systems'] .anatomy-brain{transform:translate(-108px,-46px) rotate(-10deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-lungs{transform:translate(112px,-24px) rotate(7deg) scale(1.08)}.anatomy-scene[data-stage='systems'] .anatomy-heart{transform:translate(-118px,28px) rotate(-11deg) scale(1.15)}.anatomy-scene[data-stage='systems'] .anatomy-liver{transform:translate(116px,37px) rotate(9deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-kidneys{transform:translate(-103px,70px) rotate(-7deg) scale(1.1)}.anatomy-scene[data-stage='systems'] .anatomy-digestive{transform:translate(110px,84px) rotate(8deg) scale(1.1)}}
       .reduce-motion .anatomy-part,.reduce-motion .anatomy-envelope,.reduce-motion .anatomy-tilt,.reduce-motion .anatomy-label{transition:none!important}.reduce-motion .anatomy-ring,.reduce-motion .anatomy-particle,.reduce-motion .anatomy-scroll-arrow{animation:none!important}
     `}</style>
   )
