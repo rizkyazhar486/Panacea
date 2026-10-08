@@ -254,10 +254,35 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
         if (layarBerubah(layarTerakhir, next)) { layarTerakhir = next; setLayar(next) }
       }
     }
+    const onCameraCommand = (e: Event) => {
+      const custom = e as CustomEvent<{ action?: string }>
+      const action = custom.detail?.action
+      if (action === 'zoomIn') {
+        controls.dollyIn(1.2)
+        controls.update()
+      } else if (action === 'zoomOut') {
+        controls.dollyOut(1.2)
+        controls.update()
+      } else if (action === 'reset') {
+        camera.position.set(0, 0.4, 4.6)
+        controls.target.set(0, 0, 0)
+        controls.update()
+      } else if (action === 'front') {
+        const dist = camera.position.distanceTo(controls.target)
+        camera.position.set(0, 0.2, dist)
+        controls.update()
+      } else if (action === 'back') {
+        const dist = camera.position.distanceTo(controls.target)
+        camera.position.set(0, 0.2, -dist)
+        controls.update()
+      }
+    }
+    window.addEventListener('panacea:body3d-camera', onCameraCommand)
     const loopTerjaga = mulaiLoopTerjaga(renderer.domElement.parentElement ?? renderer.domElement, animate)
 
     return () => {
       disposed = true
+      window.removeEventListener('panacea:body3d-camera', onCameraCommand)
       loopTerjaga.hentikan()
       ro.disconnect()
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)

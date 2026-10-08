@@ -181,11 +181,12 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Surfaces */
 .dark .bg-white { background-color: #17191c !important; }
-/* Pengecualian: tombol yang SENGAJA putih dengan teks gelap (CTA utama,
+/* Pengecualian: tombol/elemen interaktif yang SENGAJA putih dengan teks gelap (CTA utama,
    "Ask →"). Memetakan latarnya ke #17191c sementara teksnya tetap hitam
    menghasilkan hitam di atas hitam — tombolnya lenyap. Terukur di Clinical:
-   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibiarkan putih. */
-.dark .bg-white:is(.text-black, .text-ink, .text-neutral-900, .text-neutral-950, .text-slate-900, .text-slate-950) {
+   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibatasi pada elemen interaktif
+   (button, a, [role="button"]) agar kartu atau panel tidak ikut terpaksa menjadi putih. */
+.dark .bg-white:is(button.text-black, a.text-black, [role='button'].text-black, button.text-ink, a.text-ink, [role='button'].text-ink, button.text-neutral-900, a.text-neutral-900, [role='button'].text-neutral-900, button.text-neutral-950, a.text-neutral-950, [role='button'].text-neutral-950, button.text-slate-900, a.text-slate-900, [role='button'].text-slate-900, button.text-slate-950, a.text-slate-950, [role='button'].text-slate-950) {
   background-color: #fff !important;
   color: #0c1410 !important;
 }
@@ -2990,3 +2991,16 @@ html:not(.dark) body button[data-cta="primary"] {
   border-color: transparent !important;
   box-shadow: 0 10px 30px -8px rgba(0,191,99,.5) !important;
 }
+
+
+
+/* Matikan morph capsule layer berlebih */
+#pmd-liquid-morph-layer,
+.pmd-liquid-morph-orb {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+
