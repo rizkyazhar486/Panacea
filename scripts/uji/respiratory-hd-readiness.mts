@@ -9,8 +9,8 @@ assert.deepEqual(readiness.mandatoryReferenceUrls.sort(), [
   'https://github.com/thebuggeddev/anatomy',
 ].sort())
 assert.equal(readiness.requiredStructures, 17)
-assert.equal(readiness.sourceNodePresent, 12)
-assert.equal(readiness.sourceNodeMissing, 3)
+assert.equal(readiness.sourceNodePresent, 10)
+assert.equal(readiness.sourceNodeMissing, 5)
 assert.equal(readiness.referenceOnly, 2)
 assert.equal(readiness.licensedAcquisitionCandidateCount, 0)
 assert.deepEqual(readiness.renderProfileIds, ['mobile-safe', 'desktop-balanced', 'desktop-hd'])
@@ -21,16 +21,18 @@ const actionCounts = Object.fromEntries(
   [...new Set(readiness.entries.map((entry) => entry.nextAction))]
     .map((action) => [action, readiness.entries.filter((entry) => entry.nextAction === action).length]),
 )
-assert.equal(actionCounts['review-existing-source-node'], 12)
+assert.equal(actionCounts['review-existing-source-node'], 10)
 assert.equal(actionCounts['acquire-licensed-source'] ?? 0, 0)
 assert.equal(actionCounts['derive-reference-from-lobe-masks'], 3)
 assert.equal(actionCounts['keep-reference-only'], 2)
-assert.equal(actionCounts['source-research-required'] ?? 0, 0)
+assert.equal(actionCounts['source-research-required'] ?? 0, 2)
 
 assert.deepEqual(readiness.unresolvedDirectProductionSourceIds, [
   'right-horizontal-fissure',
   'right-oblique-fissure',
   'left-oblique-fissure',
+  'visceral-pleura',
+  'parietal-pleura',
 ])
 assert.deepEqual(readiness.derivedFissureReferenceIds.sort(), [
   'left-oblique-fissure',

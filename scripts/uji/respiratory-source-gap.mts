@@ -43,12 +43,30 @@ for (const [structureId, sourceName] of canonicalLobeSources) {
   assert.ok(entry?.exactSourceNames.includes(sourceName), `${structureId} must retain its exact canonical source name: ${sourceName}`)
 }
 
+for (const id of ['visceral-pleura', 'parietal-pleura']) {
+  const entry = report.entries.find((candidate) => candidate.structureId === id)
+  assert.equal(entry?.coverage, 'source-node-missing', `${id} must not resolve from generic Pleura geometry`)
+  assert.deepEqual(entry?.exactSourceNames, [])
+}
+const genericPleura = assessRespiratorySourceCoverage([{ file: 'visceral.glb', names: ['Pleura'] }])
+for (const id of ['visceral-pleura', 'parietal-pleura']) {
+  assert.equal(genericPleura.entries.find((entry) => entry.structureId === id)?.coverage, 'source-node-missing', `${id} must fail closed for generic Pleura`)
+}
+const distinctPleura = assessRespiratorySourceCoverage([{ file: 'visceral.glb', names: ['Visceral pleura', 'Parietal pleura'] }])
+for (const [id, sourceName] of [['visceral-pleura', 'Visceral pleura'], ['parietal-pleura', 'Parietal pleura']] as const) {
+  const entry = distinctPleura.entries.find((candidate) => candidate.structureId === id)
+  assert.equal(entry?.coverage, 'source-node-present')
+  assert.deepEqual(entry?.exactSourceNames, [sourceName])
+}
+
 const missing = respiratoryMissingStructureIds(report)
 assert.deepEqual(missing, [
   'right-horizontal-fissure',
   'right-oblique-fissure',
   'left-oblique-fissure',
-], 'after canonical lobe-name resolution, only the three fissures remain absent from the shipped source-node catalogue')
+  'visceral-pleura',
+  'parietal-pleura',
+], 'only three fissures and two distinct pleural layers remain absent from the shipped source-node catalogue')
 assert.deepEqual(missing, [...missing].sort((a, b) => {
   const ai = report.entries.findIndex((entry) => entry.structureId === a)
   const bi = report.entries.findIndex((entry) => entry.structureId === b)

@@ -30,8 +30,8 @@ export const RESPIRATORY_SOURCE_LOOKUPS: readonly RespiratoryLookupContract[] = 
   { structureId: 'right-horizontal-fissure', file: 'visceral.glb', hints: ['right horizontal fissure', 'horizontal fissure'] },
   { structureId: 'right-oblique-fissure', file: 'visceral.glb', hints: ['right oblique fissure', 'oblique fissure'] },
   { structureId: 'left-oblique-fissure', file: 'visceral.glb', hints: ['left oblique fissure', 'oblique fissure'] },
-  { structureId: 'visceral-pleura', file: 'visceral.glb', hints: ['visceral pleura', 'pleura'] },
-  { structureId: 'parietal-pleura', file: 'visceral.glb', hints: ['parietal pleura', 'pleura'] },
+  { structureId: 'visceral-pleura', file: 'visceral.glb', hints: ['visceral pleura'] },
+  { structureId: 'parietal-pleura', file: 'visceral.glb', hints: ['parietal pleura'] },
   { structureId: 'diaphragm', file: 'muscular.glb', hints: ['diaphragm'] },
   { structureId: 'thoracic-wall', file: 'skeletal.glb', hints: ['rib', 'sternum', 'thoracic vertebra'] },
 ] as const
