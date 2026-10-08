@@ -20,8 +20,8 @@ interface RespiratoryLookupContract {
  */
 export const RESPIRATORY_SOURCE_LOOKUPS: readonly RespiratoryLookupContract[] = [
   { structureId: 'trachea', file: 'visceral.glb', hints: ['trachea'] },
-  { structureId: 'right-main-bronchus', file: 'visceral.glb', hints: ['right main bronch', 'right bronchus', 'bronch'] },
-  { structureId: 'left-main-bronchus', file: 'visceral.glb', hints: ['left main bronch', 'left bronchus', 'bronch'] },
+  { structureId: 'right-main-bronchus', file: 'visceral.glb', hints: ['right main bronch', 'right bronchus'] },
+  { structureId: 'left-main-bronchus', file: 'visceral.glb', hints: ['left main bronch', 'left bronchus'] },
   { structureId: 'right-upper-lobe', file: 'visceral.glb', hints: ['right upper lobe', 'upper lobe of right lung', 'superior lobe of right lung'] },
   { structureId: 'right-middle-lobe', file: 'visceral.glb', hints: ['right middle lobe', 'middle lobe of right lung'] },
   { structureId: 'right-lower-lobe', file: 'visceral.glb', hints: ['right lower lobe', 'lower lobe of right lung', 'inferior lobe of right lung'] },
