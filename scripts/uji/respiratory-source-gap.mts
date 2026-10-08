@@ -30,6 +30,34 @@ for (const entry of report.entries) {
   }
 }
 
+
+const bronchialSourceReport = assessRespiratorySourceCoverage([{
+  file: 'visceral.glb',
+  names: [
+    'Right main bronchus',
+    'Left main bronchus',
+    'Right superior lobar bronchus',
+    'Left inferior lobar bronchus',
+    'Anterior segmental bronchus of left lung (BIII)',
+  ],
+}])
+for (const [id, expectedName] of [
+  ['right-main-bronchus', 'Right main bronchus'],
+  ['left-main-bronchus', 'Left main bronchus'],
+] as const) {
+  const entry = bronchialSourceReport.entries.find((candidate) => candidate.structureId === id)
+  assert.equal(entry?.coverage, 'source-node-present', `${id} must resolve from an explicitly sided main bronchus`)
+  assert.deepEqual(entry?.exactSourceNames, [expectedName], `${id} must not absorb contralateral or segmental geometry`)
+}
+for (const [onlyName, missingId] of [
+  ['Left main bronchus', 'right-main-bronchus'],
+  ['Right main bronchus', 'left-main-bronchus'],
+] as const) {
+  const unilateralReport = assessRespiratorySourceCoverage([{ file: 'visceral.glb', names: [onlyName] }])
+  assert.equal(unilateralReport.entries.find((entry) => entry.structureId === missingId)?.coverage, 'source-node-missing',
+    `${missingId} must fail closed when only the opposite main bronchus exists`)
+}
+
 const canonicalLobeSources = new Map([
   ['right-upper-lobe', 'Superior lobe of right lung'],
   ['right-middle-lobe', 'Middle lobe of right lung'],
