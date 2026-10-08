@@ -22,6 +22,15 @@ import {
   IconActivity,
   IconMicroscope,
   IconArticle,
+  IconDna,
+  IconMail,
+  IconInstagram,
+  IconTikTok,
+  IconLinkedIn,
+  IconBuilding,
+  IconBookmark,
+  IconComment,
+  IconGlobe,
 } from '../../components/icons'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { MedicalNews } from '../../components/MedicalNews'
@@ -29,18 +38,13 @@ import { ScrollCinematic, ScrollCinematicStyles } from '../../components/ScrollC
 import { PricingSection } from '../../components/PricingSection'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
+const BRAND_POSTER = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='720' viewBox='0 0 1280 720'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23021a10'/><stop offset='50%' stop-color='%23063520'/><stop offset='100%' stop-color='%2301130a'/></linearGradient></defs><rect width='100%' height='100%' fill='url(%23bg)'/><circle cx='640' cy='360' r='140' fill='%2300BF63' opacity='0.18' filter='blur(50px)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='32' font-weight='800' fill='%23ffffff' opacity='0.95'>PANACEAMED</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='700' fill='%2334d399' letter-spacing='5'>AI-EMR &amp; LONGEVITY OS</text></svg>`
+
+const HISTORY_POSTER = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='720' viewBox='0 0 1280 720'><defs><linearGradient id='hbg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%230b1410'/><stop offset='50%' stop-color='%23132e22'/><stop offset='100%' stop-color='%2306150e'/></linearGradient></defs><rect width='100%' height='100%' fill='url(%23hbg)'/><circle cx='640' cy='360' r='140' fill='%2300BF63' opacity='0.15' filter='blur(50px)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='30' font-weight='800' fill='%23ffffff' opacity='0.95'>A HISTORY OF LONGEVITY</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='700' fill='%2334d399' letter-spacing='4'>FROM ANCIENT CIVILIZATIONS TO AI</text></svg>`
+
 /**
  * Video yang hanya berputar SAAT TERLIHAT.
- *
- * Enam kartu era masing-masing memuat satu video ber-autoplay. Sebelumnya
- * keenamnya mulai mengunduh dan berputar bersamaan begitu halaman dibuka —
- * pada paket data seluler itu puluhan megabita yang tidak diminta siapa pun,
- * dan pada telepon kelas menengah enam pemutar sekaligus membuat guliran
- * tersendat. preload="none" saja tidak menolong, sebab autoPlay membatalkannya.
- *
- * Yang di bawah memutar video hanya ketika kartunya benar-benar berada di
- * layar, dan menghentikannya begitu lewat. Perilaku ini juga yang membuat
- * tumpukan kartu terbaca: yang bergerak selalu era yang sedang dibaca.
+ * Menghindari beban unduhan bersamaan dan layar hitam pada perangkat seluler.
  */
 function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
   const acuan = useRef<HTMLVideoElement>(null)
@@ -65,127 +69,448 @@ function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
       loop
       playsInline
       preload="none"
+      poster={HISTORY_POSTER}
       aria-label={`Mood of the ${judul} era`}
-      className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover"
+      className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover shadow-inner"
     />
   )
 }
 
 const FEATURES = [
-  { icon: IconUsers, title: 'Healthy Living Dashboard', text: 'A Strava/TikTok-style social network: share activities, healthy habits & longevity articles. Photos, short videos, profiles, bookmarks.' },
-  { icon: IconHeart, title: 'Longevity estimate', text: 'Log diet, exercise, hydration, sleep and sun. The longevity number is a technical estimate, not a clinically validated age.' },
-  { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI interviews the patient (SOCRATES method); results flow automatically into the Subjective/Objective fields of the AI-EMR, accessible only to doctors.' },
-  { icon: IconStethoscope, title: 'Consultations, Pharmacy & Facilities', text: 'AI consultation (Rp49,000) → referral to specialist doctors; pharmacy with prescription fulfillment; nearest healthcare facilities via GPS for emergencies.' },
-  { icon: IconStore, title: 'Medical Knowledge Hub', text: 'Discover & share curated medical notes, journals, and articles. Pricing set by the authors; watermarked PDFs protect contributors.' },
-  { icon: IconShield, title: 'AI-EMR for clinicians', text: 'For licensed clinicians and institutions (STR/NPWP). A doctor reviews the record. Interaction flags are technical checks, not a certified clinical decision.' },
+  {
+    icon: IconUsers,
+    title: 'Healthy Living Dashboard',
+    subtitle: 'Jejaring sosial gaya hidup sehat',
+    text: 'Jejaring sosial gaya hidup sehat: bagikan rutinitas kebugaran, kebiasaan nutrisi, dan video edukasi kesehatan 30 detik bersama komunitas peduli healthspan.',
+  },
+  {
+    icon: IconHeart,
+    title: 'AI Longevity Calculator',
+    subtitle: 'Estimasi longevity & usia biologis',
+    text: 'Pantau kebiasaan nutrisi, aktivitas fisik, hidrasi, dan pola tidur harian. Angka longevity merupakan estimasi teknis gaya hidup, bukan diagnosis usia klinis.',
+  },
+  {
+    icon: IconChat,
+    title: 'AI Chatbot → AI-EMR',
+    subtitle: 'Anamnesis terstruktur SOCRATES',
+    text: 'AI memandu wawancara awal pasien (metode SOCRATES); hasil anamnesis mengalir otomatis ke kolom Subjektif/Objektif AI-EMR yang dapat ditinjau dan divalidasi langsung oleh dokter.',
+  },
+  {
+    icon: IconStethoscope,
+    title: 'Consultations, Pharmacy & Facilities',
+    subtitle: 'Radar faskes & tebus resep digital',
+    text: 'Telekonsultasi dokter spesialis mulai Rp49.000, tebus resep obat resmi diantar ke rumah, serta radar GPS instan pencari IGD rumah sakit terdekat saat darurat.',
+  },
+  {
+    icon: IconStore,
+    title: 'Medical Knowledge Hub',
+    subtitle: 'Jurnal riset & royalti PanaceaToken',
+    text: 'Akses ribuan modul klinis, catatan medis, dan jurnal riset terkurasi. Penulis terlindungi sistem watermark dokumen otomatis dengan royalti langsung berbasis PanaceaToken.',
+  },
+  {
+    icon: IconShield,
+    title: 'AI-EMR for clinicians',
+    subtitle: 'Rekam medis SatuSehat / FHIR',
+    text: 'Dirancang untuk praktisi medis berizin (STR) dan faskes. Dokter meninjau rekam medis secara berdaulat; deteksi interaksi obat merupakan evaluasi teknis, bukan sertifikasi keputusan klinis mandiri.',
+  },
 ]
 
-const ROLES: { title: string; desc: string; icon: typeof IconCpu }[] = [
-  { title: 'Customer / Patient', desc: 'Healthy living dashboard, disease education, nutrition & AI Longevity, consultations, pharmacy & nearest facilities.', icon: IconHeart },
-  { title: 'Doctor', desc: 'Full AI-EMR (SOAP), per-patient clinical data, planning & consultations.', icon: IconStethoscope },
-  { title: 'Contributor', desc: 'Write, sell & request verification for medical content.', icon: IconArticle },
-  { title: 'Verifier', desc: 'Specialists/professors + AI verify content.', icon: IconShield },
-  { title: 'Admin', desc: 'Services, automated support & pharmacy catalog management.', icon: IconHospital },
-  { title: 'Owner', desc: 'Switch access modes & monitor company profitability.', icon: IconStore },
+const ROLES = [
+  // ── Untuk Pasien & Keluarga (3 Kartu Pilar) ──────────────────────
+  {
+    id: 'patient-core',
+    category: 'patients' as const,
+    title: 'Customer / Patient',
+    tagline: 'Pintu Gerbang Kesehatan Personal',
+    desc: 'Dasbor gaya hidup sehat, edukasi medis terpercaya, pelacak nutrisi & usia biologis, telekonsultasi, serta radar faskes darurat.',
+    icon: IconHeart,
+    badge: 'Akses Utama Pasien',
+    points: [
+      'Profil rekam medis terpadu untuk Anda dan seluruh anggota keluarga',
+      'Manajemen riwayat penyakit, imunisasi, dan riwayat alergi aman',
+      'Satu akun terintegrasi untuk seluruh ekosistem layanan Panacea',
+    ],
+  },
+  {
+    id: 'patient-longevity',
+    category: 'patients' as const,
+    title: 'AI Longevity & Gaya Hidup Sehat',
+    tagline: 'Pemantauan Healthspan Longitudinal',
+    desc: 'Pelacak biomarker harian: nutrisi seimbang, kualitas tidur, aktivitas fisik, hidrasi, dan estimasi usia biologis terukur.',
+    icon: IconChartUp,
+    badge: 'Pencegahan Preventif',
+    points: [
+      'Siklus evaluasi longevity 30 hari berbasis bukti sains mutakhir',
+      'Rekomendasi nutrisi harian & pelacak paparan sinar matahari terarah',
+      'Komunitas gaya hidup sehat untuk berbagi kebiasaan dan resep bernutrisi',
+    ],
+  },
+  {
+    id: 'patient-care',
+    category: 'patients' as const,
+    title: 'Telekonsultasi, Farmasi & Radar GPS',
+    tagline: 'Respons Medis Cepat 24/7',
+    desc: 'Anamnesis AI terstruktur SOCRATES sebelum temu spesialis, tebus resep digital, dan radar fasilitas darurat.',
+    icon: IconHospital,
+    badge: 'Akses Faskes & Darurat',
+    points: [
+      'Anamnesis mandiri hemat hingga 70% waktu administrasi di klinik',
+      'Tebus resep obat resmi dikirim langsung dari apotek mitra terdekat',
+      'Radar GPS instan pencari IGD rumah sakit & panggilan ambulans darurat',
+    ],
+  },
+
+  // ── Untuk Dokter & Faskes (3 Kartu Pilar) ────────────────────────
+  {
+    id: 'doctor-core',
+    category: 'doctors' as const,
+    title: 'Doctor',
+    tagline: 'Praktisi Medis Berizin (STR)',
+    desc: 'Sistem rekam medis AI-EMR lengkap (SOAP), data klinis per pasien terpadu, perencanaan terapi, dan telekonsultasi.',
+    icon: IconStethoscope,
+    badge: 'Praktik Mandiri & Spesialis',
+    points: [
+      'Transkripsi anamnesis otomatis terstruktur ke Subjective SOAP',
+      'Evaluasi diferensial komprehensif berbasis bukti medis mutakhir',
+      'Kedaulatan verifikasi manusia (Human-in-the-loop Sovereign Control)',
+    ],
+  },
+  {
+    id: 'doctor-institution',
+    category: 'doctors' as const,
+    title: 'Klinik & Institusi Rumah Sakit',
+    tagline: 'Integrasi Antrean & SatuSehat',
+    desc: 'Tata kelola operasional terintegrasi: antrean rawat jalan, manajemen farmasi, dan sinkronisasi standar Kemenkes.',
+    icon: IconHospital,
+    badge: 'Kemitraan Faskes B2B',
+    points: [
+      'Jembatan interoperabilitas resmi Kemenkes SATUSEHAT (FHIR v4)',
+      'Tata kelola katalog obat, resep elektronik, dan rekam medis terpadu',
+      'Audit log kepatuhan data medis berstandar UU PDP No. 27/2022',
+    ],
+  },
+  {
+    id: 'doctor-cds',
+    category: 'doctors' as const,
+    title: 'Clinical Decision Support & Skoring',
+    tagline: 'Pencegahan Insiden Medis',
+    desc: 'Evaluasi keselamatan pasien real-time dengan 34 kalkulator skoring klinis internasional dan deteksi interaksi obat.',
+    icon: IconCpu,
+    badge: 'Evidence-Based Safety',
+    points: [
+      'Peringatan instan interaksi obat dan kontraindikasi alergi pasien',
+      '34 skor internasional terstandar (APGAR, GCS, CURB-65, NIHSS, dll.)',
+      'Ekspor resume medis terstandar untuk transfer rujukan faskes',
+    ],
+  },
+
+  // ── Ekosistem & Verifikasi (3 Kartu Pilar) ───────────────────────
+  {
+    id: 'contributor-core',
+    category: 'ecosystem' as const,
+    title: 'Contributor',
+    tagline: 'Penulis Medis & Peneliti',
+    desc: 'Tulis, publikasikan, dan ajukan verifikasi pakar untuk modul dan materi riset medis berkeadilan.',
+    icon: IconArticle,
+    badge: 'Publikasi Berkeadilan',
+    points: [
+      'Terbitkan modul klinis, catatan ilmiah, dan panduan edukasi',
+      'Watermark proteksi hak cipta dokumen otomatis untuk kontributor',
+      'Royalti langsung mengalir setiap kali materi diakses atau dibeli',
+    ],
+  },
+  {
+    id: 'verifier-core',
+    category: 'ecosystem' as const,
+    title: 'Verifier',
+    tagline: 'Dewan Penelaah Pakar',
+    desc: 'Dokter spesialis menelaah keabsahan klinis materi melalui audit evidence-based medicine.',
+    icon: IconShield,
+    badge: 'Audit Keabsahan Ilmiah',
+    points: [
+      'Dokter spesialis menelaah keabsahan sitasi literatur medis',
+      'Verifikasi terstruktur untuk cross-check literatur global terpercaya',
+      'Stempel telaah resmi menjamin kepatuhan evidence-based medicine',
+    ],
+  },
+  {
+    id: 'token-core',
+    category: 'ecosystem' as const,
+    title: 'PanaceaToken',
+    tagline: 'Ekonomi Token Berkeadilan',
+    desc: 'Instrumen deposit dan utilitas royalti riset medis berkeadilan.',
+    icon: IconStore,
+    badge: 'Ekonomi Utilitas Medis',
+    points: [
+      'Nilai utilitas stabil: 1 PNC = Rp1.000 untuk transaksi materi riset',
+      'Pembayaran royalti instan dan otomatis kepada kontributor terverifikasi',
+      'Akses materi eksklusif dan jurnal medis terkurasi tanpa perantara',
+    ],
+  },
 ]
 
 const WHATS_NEW = [
-  '"Panacea Healthy Living" social dashboard — photos & 30-second videos, profiles, reposts, private bookmarks.',
-  'AI-powered Longevity Calculator (30-day subscription, Rp49,000/month).',
-  'Pharmacy with prescription fulfillment/scanning + unified Transaction History (filterable by type).',
-  'Nearest healthcare facilities via GPS (hospitals, clinics & pharmacies) for emergencies.',
-  'Medical Knowledge Hub — discover & share curated notes, journals, and articles with PanaceaToken.',
+  'Dasbor sosial "Healthy Living Dashboard" — berbagi foto & video 30 detik, profil kesehatan, dan bookmark privat.',
+  'Kalkulator usia biologis "AI Longevity Calculator" (akses 30 hari penuh, terjangkau Rp49.000/bulan).',
+  'Farmasi digital dengan tebus & pindai resep dokter + Riwayat Transaksi terpadu.',
+  'Radar faskes darurat via GPS (rumah sakit, klinik & apotek siaga 24 jam).',
+  'Pusat Pengetahuan Medis "Medical Knowledge Hub" — temukan & bagikan modul, jurnal, dan catatan klinis dengan PanaceaToken.',
 ]
 
 const STATS: { node: React.ReactNode; label: string }[] = [
-  { node: <CountUp to={6} suffix=" Roles" />, label: 'Unified user ecosystem' },
-  { node: <CountUp to={100} suffix="%" />, label: 'Doctor-verified (AI-in-the-loop)' },
-  { node: <CountUp to={30} suffix=" Days" />, label: 'AI Longevity cycle' },
-  { node: <span>24/7</span>, label: 'Access & Emergency SOS' },
+  { node: <CountUp to={6} suffix=" Peran" />, label: 'Ekosistem Pengguna Terpadu' },
+  { node: <CountUp to={100} suffix="%" />, label: 'Supervisi Klinisi (Human-in-the-Loop)' },
+  { node: <CountUp to={30} suffix=" Hari" />, label: 'Siklus Evaluasi AI Longevity' },
+  { node: <span>24/7</span>, label: 'Akses Siaga & Radar Darurat SOS' },
 ]
 
 const MARQUEE = [
-  { icon: IconHospital, label: 'Nearest Facilities' },
-  { icon: IconPill, label: 'Digital Pharmacy' },
-  { icon: IconStethoscope, label: 'Doctor Consultations' },
+  { icon: IconHospital, label: 'Fasilitas Kesehatan Terdekat' },
+  { icon: IconPill, label: 'Farmasi Digital' },
+  { icon: IconStethoscope, label: 'Konsultasi Dokter' },
   { icon: IconHeart, label: 'AI Longevity Calculator' },
-  { icon: IconStore, label: 'Medical Content' },
+  { icon: IconStore, label: 'Pusat Pengetahuan Medis' },
   { icon: IconShield, label: 'AI-EMR for clinicians' },
-  { icon: IconChartUp, label: 'Healthspan Tracking' },
+  { icon: IconChartUp, label: 'Pemantauan Healthspan' },
 ]
+
+function renderEraGlyph(era: string, fallback: string) {
+  if (era === 'Zaman Para Nabi') {
+    return (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="#fde68a"
+        stroke="#fde68a"
+        strokeWidth="0.5"
+        className="text-amber-200 drop-shadow-[0_0_8px_rgba(253,230,138,0.85)]"
+        aria-label="Bulan Sabit Emas Zaman Para Nabi"
+      >
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+      </svg>
+    )
+  }
+  if (era === 'Mesir Kuno') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-300">
+        <path d="M12 2a4 4 0 0 0-4 4c0 3 4 7 4 7s4-4 4-7a4 4 0 0 0-4-4Z" />
+        <path d="M5 12h14" />
+        <path d="M12 12v10" />
+      </svg>
+    )
+  }
+  if (era === 'Yunani-Romawi') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-700 dark:text-emerald-300">
+        <path d="M4 22h16" />
+        <path d="M4 6h16" />
+        <path d="M6 6v16" />
+        <path d="M10 6v16" />
+        <path d="M14 6v16" />
+        <path d="M18 6v16" />
+        <path d="M3 6 12 2l9 4" />
+      </svg>
+    )
+  }
+  if (era === 'Dinasti Tiongkok') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-700 dark:text-emerald-300">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+      </svg>
+    )
+  }
+  if (era === 'Kekaisaran Mongol') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-700 dark:text-amber-300">
+        <circle cx="12" cy="12" r="10" />
+        <path d="m4.93 4.93 4.24 4.24" />
+        <path d="m14.83 9.17 4.24-4.24" />
+        <path d="m14.83 14.83 4.24 4.24" />
+        <path d="m9.17 14.83-4.24 4.24" />
+        <circle cx="12" cy="12" r="4" />
+      </svg>
+    )
+  }
+  if (era === 'Masa Keemasan Islam') {
+    return <IconStethoscope size={20} className="text-emerald-600 dark:text-emerald-300" />
+  }
+  return <span className="text-lg font-serif">{fallback}</span>
+}
 
 // ── History of longevity, anti-aging, wellness & healthcare systems ──────────────
 const HISTORY_ERAS: { era: string; when: string; emoji: string; title: string; body: string; video?: string }[] = [
-  { era: 'Ancient Egypt', when: '≈3000–300 BCE', emoji: '𓂀', title: 'Pharaohs & Medical Papyri',
-    body: 'The Edwin Smith and Ebers papyri recorded prescriptions, surgery, and hygiene. Pharaohs pursued eternal life through mummification; Imhotep was revered as a physician. Cosmetics & oils (moringa, honey) became the earliest anti-aging remedies.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091507_583431ed-8898-4dfa-b8f9-c5b0dbbe2f60.mp4' },
-  { era: 'Age of the Prophets', when: '≈2000 BCE–632 CE', emoji: '☾', title: 'Prophetic Tradition & Hygiene',
-    body: 'Prophetic teachings emphasized ablution/cleanliness, periodic fasting, honey & black seed, and moderate eating ("a third for food, a third for drink, a third for breath"). These principles of prevention and moderation align closely with modern longevity science.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091443_997b4cca-33e8-4172-a8bf-196145536064.mp4' },
-  { era: 'Greco-Roman', when: '≈500 BCE–500 CE', emoji: '🏛️', title: 'Hippocrates & Galen',
-    body: 'Hippocrates: "let food be thy medicine" and the Hippocratic Oath (medical ethics). Galen systematized physiology. The Romans built aqueducts, bathhouses, and public sanitation — the first public health system.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091602_57f19059-6460-40e3-a9eb-05fcdf9d0fee.mp4' },
-  { era: 'Chinese Dynasties', when: '≈200 BCE–1912 CE', emoji: '🐉', title: 'Qi, Herbs & Elixirs of Longevity',
-    body: 'The Huangdi Neijing laid the foundations of TCM. Emperors sought an "elixir of immortality" (some, ironically, containing mercury). Qigong, acupuncture, ginseng, and yin-yang balance formed a holistic approach to healthspan.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091631_5438f5ac-1e17-4937-b4a9-01346777ee0c.mp4' },
-  { era: 'Mongol Empire', when: '≈1206–1368 CE', emoji: '🏹', title: 'Cross-Cultural Medicine',
-    body: 'The Pax Mongolica connected Persian, Chinese, and Arab physicians along the Silk Road — exchanging surgical, pharmaceutical, and quarantine knowledge. Mobile hospitals and soldier fitness standards were early forms of "performance medicine".', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091728_c9ef0932-4b2b-46fc-ae0b-a33a276529ac.mp4' },
-  { era: 'Islamic Golden Age', when: '≈800–1300 CE', emoji: '⚕️', title: 'Ibn Sina & Hospitals (Bimaristan)',
-    body: "Ibn Sina's Al-Qanun (Canon of Medicine) remained the world's reference for 600 years. Al-Razi pioneered clinical record-keeping. The Bimaristan — hospitals with medical records, pharmacies, and specializations — was the forerunner of modern healthcare systems.",
-    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091759_7444344d-fd5c-47c7-a0a5-d551e686742f.mp4' },
+  {
+    era: 'Mesir Kuno',
+    when: '≈3000–300 SM',
+    emoji: '𓂀',
+    title: 'Firaun & Papirus Medis',
+    body: 'Papirus Edwin Smith dan Ebers mencatat resep obat, bedah, dan sanitasi. Firaun mendambakan hidup abadi lewat mumifikasi; Imhotep dihormati sebagai tabib utama. Minyak atsiri (kelor, madu) menjadi formula anti-penuaan paling awal dalam sejarah peradaban.',
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091507_583431ed-8898-4dfa-b8f9-c5b0dbbe2f60.mp4',
+  },
+  {
+    era: 'Zaman Para Nabi',
+    when: '≈2000 SM–632 M',
+    emoji: '☾',
+    title: 'Tradisi Kenabian & Higienitas',
+    body: 'Ajaran para nabi menekankan wudu dan kebersihan tubuh, puasa berkala, madu, habbatussauda, dan pola makan terukur ("sepertiga makanan, sepertiga minuman, sepertiga napas"). Prinsip pencegahan dan moderasi ini terbukti selaras dengan sains longevity modern.',
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091443_997b4cca-33e8-4172-a8bf-196145536064.mp4',
+  },
+  {
+    era: 'Yunani-Romawi',
+    when: '≈500 SM–500 M',
+    emoji: '🏛️',
+    title: 'Hippocrates & Galen',
+    body: 'Hippocrates mengajarkan "jadikan makananmu sebagai obat" dan meletakkan sumpah etika kedokteran (Hippocratic Oath). Galen menyusun fisiologi tubuh. Bangsa Romawi membangun akuaduk air bersih dan pemandian umum — fondasi awal sanitasi kesehatan publik.',
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091602_57f19059-6460-40e3-a9eb-05fcdf9d0fee.mp4',
+  },
+  {
+    era: 'Dinasti Tiongkok',
+    when: '≈200 SM–1912 M',
+    emoji: '🐉',
+    title: 'Qi, Herbal & Eliksir Panjang Umur',
+    body: 'Kitab Huangdi Neijing meletakkan dasar pengobatan tradisional Tiongkok (TCM). Qigong, akupunktur, ginseng, dan keseimbangan yin-yang membentuk pendekatan holistik untuk menjaga vitalitas dan keselarasan energi tubuh (healthspan).',
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091631_5438f5ac-1e17-4937-b4a9-01346777ee0c.mp4',
+  },
+  {
+    era: 'Kekaisaran Mongol',
+    when: '≈1206–1368 M',
+    emoji: '🏹',
+    title: 'Pertukaran Kedokteran Antar-Bangsa',
+    body: 'Pax Mongolica menghubungkan tabib Persia, Tiongkok, dan Arab di sepanjang Jalur Sutra — saling bertukar ilmu bedah, farmasi, dan karantina. Rumah sakit bergerak serta standar kebugaran prajurit menjadi bentuk awal "performance medicine".',
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091728_c9ef0932-4b2b-46fc-ae0b-a33a276529ac.mp4',
+  },
+  {
+    era: 'Masa Keemasan Islam',
+    when: '≈800–1300 M',
+    emoji: '⚕️',
+    title: 'Ibnu Sina & Rumah Sakit Bimaristan',
+    body: "Kitab Al-Qanun fi at-Tibb karya Ibnu Sina menjadi rujukan kedokteran dunia selama 600 tahun. Al-Razi memelopori pencatatan rekam medis klinis. Bimaristan — rumah sakit dengan resep, farmasi, dan bangsal spesialis — menjadi cikal bakal sistem rumah sakit modern.",
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091759_7444344d-fd5c-47c7-a0a5-d551e686742f.mp4',
+  },
 ]
+
 const HISTORY_MODERN: { decade: string; title: string; body: string }[] = [
-  { decade: '1900–1950', title: 'Antibiotics & Vaccines', body: 'Penicillin (Fleming, 1928), mass vaccination, and sanitation dramatically extended life expectancy. Focus: infectious disease.' },
-  { decade: '1960–1980', title: 'Medical Records & Evidence-Based Medicine', body: 'The first electronic medical record (the Problem-Oriented Medical Record). Randomized trials became the gold standard. The birth of gerontology.' },
-  { decade: '1990–2000', title: 'Genomics & Telomeres', body: 'The Human Genome Project. Discovery of telomerase (molecular anti-aging). The internet began transforming access to health information.' },
-  { decade: '2000–2010', title: 'EHR & Interoperability Standards', body: 'Widespread adoption of Electronic Health Records. HL7 v2/v3 and the birth of FHIR (2011) — the data-exchange standard now underpinning digital health.' },
-  { decade: '2010–2020', title: 'Wearables & Longevity Science', body: 'Apple Watch, WHOOP, CGMs. Research into senolytics, NAD+, rapamycin, fasting. Longevity moved from the fringe into mainstream science (Sinclair, Attia).' },
-  { decade: '2020–present', title: 'AI in Medicine + FHIR', body: 'AI for diagnosis, patient interviews, and image interpretation; medical LLMs. FHIR unifies data so AI and patients speak the same language. Panaceamed.id was born here: AI + doctor verification + measurable longevity.' },
+  { decade: '1900–1950', title: 'Antibiotik & Vaksinasi Massal', body: 'Penemuan penisilin oleh Alexander Fleming (1928), vaksinasi massal, dan sanitasi publik melipatgandakan angka harapan hidup global, membebaskan peradaban dari ancaman epidemi mematikan.' },
+  { decade: '1960–1980', title: 'Rekam Medis & Evidence-Based Medicine', body: 'Lahirnya rekam medis elektronik pertama (Problem-Oriented Medical Record). Uji klinis acak (RCT) menjadi baku emas kebenaran ilmiah, bersamaan dengan lahirnya disiplin gerontologi.' },
+  { decade: '1990–2000', title: 'Genomika & Biologi Telomer', body: 'Proyek Genom Manusia (Human Genome Project) berhasil memetakan DNA manusia. Penemuan telomerase membuka tabir penuaan seluler dan internet mulai mendemokratisasi akses literatur medis.' },
+  { decade: '2000–2010', title: 'Standar Interoperabilitas Rekam Medis', body: 'Penerapan massal Electronic Health Records (EHR). Kelahiran standar HL7® FHIR (2011) yang kini menjadi protokol universal pertukaran data medis digital terenkripsi.' },
+  { decade: '2010–2020', title: 'Sensor Tubuh & Riset Healthspan', body: 'Era smartwatch, biomarker sensor, dan CGM. Riset senolitik, NAD+, dan puasa intermiten membawa ilmu longevity dari laboratorium ke arus utama sains preventif.' },
+  { decade: '2020–Kini', title: 'Integrasi AI Medis + SATUSEHAT FHIR', body: 'Kecerdasan artifisial membantu wawancara anamnesis dan analisis penunjang; FHIR menyatukan data pasien secara utuh. Panaceamed.id hadir: sinergi AI teruji, verifikasi dokter berizin, dan pemantauan longevity terukur.' },
 ]
-const STEM_CELLS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
-  { type: 'Somatic (Adult)', emoji: '🩹', short: 'Multipotent',
-    body: 'Stem cells already present in the adult body — bone marrow, fat, umbilical cord blood. Multipotent (limited to a few cell types from their tissue of origin). The safest, and already routinely used clinically (e.g. bone marrow transplants for leukemia).',
-    use: 'Blood cell therapy, orthopedics, wound healing' },
-  { type: 'Embryonic', emoji: '🌱', short: 'Pluripotent',
-    body: 'Derived from early embryonic blastocysts; pluripotent — able to become ALMOST any cell type in the body. Extremely powerful for research & regeneration, but raises ethical considerations and immune/tumor rejection risks.',
-    use: 'Developmental research, disease modeling, organ regeneration' },
-  { type: 'iPSC (Induced Pluripotent)', emoji: '🔄', short: 'Pluripotent (engineered)',
-    body: "Adult cells (e.g. skin/blood) are \"reprogrammed\" back into a pluripotent state (Yamanaka, Nobel Prize 2012). Combines the power of embryonic cells WITHOUT the embryo ethics issue, and can be personalized (from the patient's own cells → minimal rejection).",
-    use: 'Personalized medicine, drug testing, anti-aging & reprogramming research' },
+
+const STEM_CELLS: { type: string; icon: typeof IconActivity; short: string; body: string; use: string }[] = [
+  {
+    type: 'Sel Punca Somatik (Dewasa)',
+    icon: IconActivity,
+    short: 'Multipoten',
+    body: 'Ditemukan pada sumsum tulang, jaringan lemak, dan darah tali pusat. Bertaraf multipoten dan terbukti sangat aman digunakan secara rutin dalam praktik klinis (misal: transplantasi sumsum tulang).',
+    use: 'Terapi darah, ortopedi, penyembuhan luka kronis',
+  },
+  {
+    type: 'Sel Punca Embrionik',
+    icon: IconMicroscope,
+    short: 'Pluripoten',
+    body: 'Berasal dari blastokista awal; mampu berdiferensiasi menjadi hampir seluruh jenis sel tubuh. Sangat bernilai untuk riset regenerasi organ, namun memiliki pertimbangan etika serta risiko penolakan imun.',
+    use: 'Riset perkembangan, pemodelan penyakit, regenerasi organ',
+  },
+  {
+    type: 'iPSC (Induced Pluripotent)',
+    icon: IconDna,
+    short: 'Pluripoten Rekayasa',
+    body: 'Sel dewasa (kulit/darah) diprogram ulang kembali ke fase pluripotensi (Yamanaka, Peraih Nobel 2012). Menggabungkan keunggulan pluripotensi sel embrionik tanpa isu etika dan minim risiko penolakan imun.',
+    use: 'Kedokteran presisi, uji efikasi obat, riset peremajaan seluler',
+  },
 ]
+
 const ROBOTICS: { type: string; icon: typeof IconCpu; short: string; body: string; use: string }[] = [
-  { type: 'Robotic Surgery', icon: IconCpu, short: 'Micro-precision',
-    body: 'Systems like da Vinci (since ~2000) let surgeons operate through tiny incisions using precision robotic arms, tremor filtering, and 3D vision. The result: smaller wounds, less pain, and faster recovery.',
-    use: 'Urology, gynecology, cardiac & digestive surgery' },
-  { type: 'Prosthetics & Exoskeletons', icon: IconActivity, short: 'Bionic',
-    body: "Bionic hands and legs controlled by nerve/muscle signals (myoelectric), plus robotic exoskeletons that help stroke and spinal-injury patients walk again — restoring mobility and independence.",
-    use: 'Rehabilitation, amputation, spinal nerve injury' },
-  { type: 'Nanorobots & Microrobots', icon: IconMicroscope, short: 'Cellular scale',
-    body: 'Micro/nano-scale robots (still in early research and trial stages) designed to deliver drugs directly to target cells — such as tumors — or clear blood vessels, minimizing side effects to healthy tissue. The frontier of precision medicine.',
-    use: 'Targeted drug delivery, intra-body diagnostics' },
-  { type: 'Rehabilitation & Care Robots', icon: IconHeart, short: 'Companion',
-    body: 'Repetitive-motion therapy robots for post-stroke recovery, elderly-companion robots (monitoring falls, reminding about medication), and telepresence for remote doctor visits — expanding access to care.',
-    use: 'Physiotherapy, elderly care, telemedicine' },
+  {
+    type: 'Bedah Robotik Presisi',
+    icon: IconCpu,
+    short: 'Mikro-presisi',
+    body: 'Sistem seperti da Vinci memungkinkan dokter bedah mengoperasi organ melalui sayatan mikro dengan filtrasi tremor tangan dan visualisasi 3D definisi tinggi. Hasilnya: luka minimal, nyeri berkurang, dan masa pulih jauh lebih cepat.',
+    use: 'Urologi, ginekologi, bedah jantung & pencernaan',
+  },
+  {
+    type: 'Prostetik Bionik & Eksoskeleton',
+    icon: IconActivity,
+    short: 'Bionik Adaptif',
+    body: 'Tangan dan kaki bionik yang dikendalikan oleh sinyal saraf motorik pasien, ditambah baju zirah robotik (exoskeleton) yang membantu pasien stroke dan cedera tulang belakang kembali berjalan secara mandiri.',
+    use: 'Rehabilitasi medik, pemulihan stroke, cedera saraf',
+  },
+  {
+    type: 'Nanorobotik & Skala Seluler',
+    icon: IconMicroscope,
+    short: 'Skala Seluler',
+    body: 'Robot skala mikro/nano (dalam fase uji klinis) yang dirancang untuk mengantarkan molekul obat langsung ke sel target kanker tanpa merusak sel sehat di sekitarnya. Puncak kedokteran presisi masa depan.',
+    use: 'Penghantaran obat tertarget, navigasi intravaskular',
+  },
+  {
+    type: 'Robot Terapi & Pendamping Perawatan',
+    icon: IconHeart,
+    short: 'Pendamping Perawatan',
+    body: 'Robot fisioterapi gerakan repetitif untuk pemulihan motorik pasca-stroke, robot pendamping lansia (pemantau jatuh & pengingat jadwal obat), serta stasiun telepresence dokter jarak jauh.',
+    use: 'Fisioterapi, perawatan geriatri, telemedisin',
+  },
 ]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [promo, setPromo] = useState<Health['promo'] | null>(null)
+  const [roleTab, setRoleTab] = useState<'patients' | 'doctors' | 'ecosystem'>('patients')
+  const [scienceTab, setScienceTab] = useState<'eras' | 'modern' | 'stem' | 'robotics' | 'all'>('eras')
+  const [activeEra, setActiveEra] = useState(0)
+
   useEffect(() => {
     if (backendEnabled) api.health().then((h) => setPromo(h.promo ?? null)).catch(() => {})
   }, [])
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Early-bird promo — 75% off for the first registrants */}
-      {promo && promo.slotsLeft > 0 && (
-        <button onClick={onMasuk} className="block w-full bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] px-4 py-2.5 text-center text-sm font-bold text-white hover:brightness-110">
-          🎉 {promo.discountPct}% off ALL services for the first {promo.limit} sign-ups — only {promo.slotsLeft} spots left! Sign up now →
-        </button>
-      )}
-      {/* Glass header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-8">
-        <div className="min-w-0 shrink"><Wordmark size={32} /></div>
-        <a href="#pricing" className="hidden shrink-0 text-sm font-bold text-neutral-600 transition hover:text-brand-dark sm:inline">Pricing</a>
+    <div className="min-h-screen bg-white text-ink dark:bg-black dark:text-neutral-100">
+      {/* ── [1] CLINICAL TRUST DOCK (KEPATUHAN MEDIS & PRIVASI DATA) ── */}
+      <div className="dark relative z-40 w-full border-b border-emerald-500/20 bg-gradient-to-r from-[#02180e] via-[#043320] to-[#02180e] px-4 py-2 shadow-inner">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 text-center text-xs font-medium text-emerald-100 sm:gap-3">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/25 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest shadow-sm"
+            style={{ color: '#6ee7b7' }}
+          >
+            <IconShield size={12} className="shrink-0" />
+            Kepatuhan Medis
+          </span>
+          <span className="tracking-wide">
+            Interoperabilitas <b>SATUSEHAT (HL7® FHIR)</b>
+            <span className="mx-2 opacity-40">·</span>
+            Perlindungan Data Medis <b>UU PDP No. 27/2022</b>
+            <span className="mx-2 hidden opacity-40 sm:inline">·</span>
+            <span className="hidden sm:inline">Verifikasi STR Klinisi Berizin</span>
+          </span>
+        </div>
+      </div>
+
+      {/* ── FLOATING GLASS NAVBAR ─────────────────────────────────── */}
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-black/5 bg-white/85 px-4 py-3 backdrop-blur-2xl dark:border-white/10 dark:bg-black/85 sm:px-8">
+        <div className="min-w-0 shrink">
+          <Wordmark size={32} />
+        </div>
+        <nav className="hidden items-center gap-6 text-sm font-semibold text-neutral-600 dark:text-neutral-300 lg:flex">
+          <a href="#features" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+            Kapabilitas Platform
+          </a>
+          <a href="#roles" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+            Profil Pengguna
+          </a>
+          <a href="#pricing" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+            Tarif &amp; Layanan
+          </a>
+          <a href="#science" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+            Eksplorasi Sains
+          </a>
+        </nav>
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-600 transition hover:text-brand-dark"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-600 transition hover:bg-neutral-100 hover:text-brand-dark dark:border-white/10 dark:text-neutral-300 dark:hover:bg-neutral-800"
             title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
@@ -193,17 +518,16 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </button>
           <button
             onClick={onMasuk}
-            className="min-h-[44px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-5 py-2.5 text-sm font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95 sm:px-6 sm:text-base"
+            className="min-h-[42px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-5 py-2 text-sm font-extrabold text-white shadow-md shadow-brand/20 transition hover:brightness-105 active:scale-95 sm:px-6"
           >
-            Sign In<span className="hidden sm:inline"> / Sign Up</span>
+            Masuk <span className="hidden sm:inline">/ Daftar Gratis</span>
           </button>
         </div>
       </header>
 
-      {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-28">
-        {/* Cinematic brand film (Higgsfield) behind the hero, softened by a
-            white gradient so the original template text stays readable. */}
+      {/* ── [2] HERO SPLIT: "THE AI CLINIC FOR LONGITUDINAL HEALTH" ── */}
+      <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20 lg:py-24">
+        {/* Cinematic brand film (Higgsfield) behind the hero */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <video
             src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
@@ -216,60 +540,188 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <div className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl" style={{ animationDelay: '-6s' }} />
         </div>
 
-        <div className="relative mx-auto max-w-5xl text-center">
-          <Reveal>
-            <div className="liquid-glass mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-600">Longevity Medical-AI · Ready to Use</span>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="grid items-center gap-12 lg:grid-cols-12">
+            {/* Sisi Kiri (Value Proposition) */}
+            <div className="text-center lg:col-span-6 lg:text-left">
+              <Reveal>
+                <div className="liquid-glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 shadow-sm">
+                  <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 dark:text-neutral-200">
+                    SISTEM DUKUNGAN KLINIS &amp; KESEHATAN PREVENTIF
+                  </span>
+                </div>
+              </Reveal>
+
+              <Reveal delay={80}>
+                <h1 className="mt-5 text-4xl font-black leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+                  Platform AI-EMR &amp; Rekam Medis Modern untuk{' '}
+                  <span className="font-serif-display bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text italic text-transparent">
+                    Kesehatan &amp; Longevity Anda
+                  </span>
+                </h1>
+                <BatasKlaimKesehatan permukaan="care.landing" className="mt-3.5 max-w-xl text-[12px] leading-snug text-neutral-500" />
+              </Reveal>
+
+              <Reveal delay={160}>
+                <p className="mt-5 max-w-xl text-neutral-600 dark:text-neutral-300 sm:text-lg leading-relaxed">
+                  AI menyusun anamnesis terstruktur awal; dokter berizin menelaah rekam medis. Tingkatkan rentang hidup sehat (<b>healthspan</b>) Anda melalui evaluasi klinis preventif, deteksi dini risiko, dan panduan gaya hidup berbasis bukti.
+                </p>
+              </Reveal>
+
+              <Reveal delay={240}>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 lg:justify-start">
+                  <button
+                    onClick={onMasuk}
+                    className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-3 pl-7 pr-3 font-extrabold text-white shadow-[0_10px_30px_-8px_rgba(0,191,99,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
+                  >
+                    <span className="relative z-10 text-sm sm:text-base">Mulai Konsultasi Gratis</span>
+                    <span className="relative z-10 grid h-8 w-8 place-items-center rounded-full bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                    </span>
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  </button>
+                  <a
+                    href="#roles"
+                    className="flex items-center rounded-full border border-black/10 bg-white/70 px-6 py-3 font-bold text-neutral-700 shadow-sm backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-neutral-800/70 dark:text-neutral-200"
+                  >
+                    Solusi Dokter &amp; Faskes
+                  </a>
+                </div>
+              </Reveal>
+
+              {/* Micro Trust Badges */}
+              <Reveal delay={280}>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-black/5 pt-5 dark:border-white/10 lg:justify-start">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    <IconShield size={14} className="text-emerald-600 dark:text-emerald-400" />
+                    34 Skoring Klinis Standar
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    <IconCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                    Enkripsi Data Medis End-to-End
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    <IconStethoscope size={14} className="text-emerald-600 dark:text-emerald-400" />
+                    Interoperabilitas SatuSehat
+                  </span>
+                </div>
+              </Reveal>
             </div>
-          </Reveal>
-          <Reveal delay={80}>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              The Practical AI Clinic for
-              <br />
-              <span className="font-serif-display bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text italic text-transparent">
-                Your Access to Healthcare
-              </span>
-            </h1>
-            <BatasKlaimKesehatan permukaan="care.landing" className="mt-3 max-w-xl text-[12px] leading-snug text-neutral-500" />
-          </Reveal>
-          <Reveal delay={160}>
-            <p className="mx-auto mt-5 max-w-2xl text-neutral-600 sm:text-lg">
-              AI handles intake & education; licensed clinicians can review. We extend <b>healthspan</b> — not just
-              lifespan — through careful clinical tooling, early prevention, and lifestyle tracking.
-            </p>
-          </Reveal>
-          <Reveal delay={240}>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              {/* Nested 'button-in-button' CTA with magnetic icon physics */}
-              <button
-                onClick={onMasuk}
-                className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2 pl-7 pr-2 font-bold text-white shadow-[0_10px_30px_-8px_rgba(0,191,99,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
-              >
-                <span className="relative z-10 text-base">Sign Up Free Now</span>
-                <span className="relative z-10 grid h-9 w-9 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-                </span>
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              </button>
-              <a
-                href="#about"
-                className="flex items-center rounded-full border border-black/10 bg-white/60 px-8 py-3.5 font-bold text-brand-dark shadow-sm backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-white"
-              >
-                Learn More
-              </a>
+
+            {/* Sisi Kanan (Interactive Live Card Showcase) */}
+            <div className="lg:col-span-6">
+              <Reveal delay={200}>
+                <div className="relative mx-auto max-w-xl rounded-3xl border border-black/10 bg-white/80 p-5 shadow-2xl backdrop-blur-2xl dark:border-white/15 dark:bg-black/70 sm:p-6">
+                  <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3.5 dark:border-white/10">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="whitespace-nowrap font-mono text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                        Clinical OS · Sesi Aktif
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <span className="whitespace-nowrap rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                        HL7® FHIR
+                      </span>
+                      <span className="whitespace-nowrap rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300">
+                        SOCRATES
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3.5">
+                    {/* Stacked Card 1: AI Clinical Intake Parser */}
+                    <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
+                          <IconChat size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                          <span className="whitespace-nowrap">AI Intake Parser (SOCRATES)</span>
+                        </div>
+                        <span className="shrink-0 whitespace-nowrap text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Perekaman Aktif</span>
+                      </div>
+                      <div className="mt-2.5 space-y-2 text-xs">
+                        <div className="rounded-xl bg-neutral-100/80 p-2.5 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-400">Keluhan Pasien:</span>
+                          <p className="mt-0.5 font-medium leading-relaxed">"Jantung berdebar dan sesak ringan pasca lari pagi 5km."</p>
+                        </div>
+                        <div className="rounded-xl border border-emerald-500/20 bg-emerald-50/70 p-2.5 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Terjemahan SOAP (Subjektif):</span>
+                          <p className="mt-0.5 text-[11px] font-medium leading-relaxed">Onset akut, palpitasi teratur pasca-latihan, tanpa riwayat syncope sebelumnya.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stacked Card 2: Longevity Biomarkers Dial */}
+                    <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
+                          <IconHeart size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                          <span className="whitespace-nowrap">Biomarker &amp; Healthspan</span>
+                        </div>
+                        <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                          Skor: 94/100
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Usia Kronologis</div>
+                          <div className="text-2xl font-black text-ink">42 <span className="text-xs font-normal text-neutral-500">thn</span></div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Usia Biologis</div>
+                          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">36.4 <span className="text-xs font-normal">thn</span></div>
+                        </div>
+                      </div>
+                      <div className="mt-2.5">
+                        <div className="flex justify-between text-[11px] font-bold">
+                          <span className="text-neutral-500">Keunggulan Healthspan</span>
+                          <span className="text-emerald-600 dark:text-emerald-400">+5.6 thn</span>
+                        </div>
+                        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+                          <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" />
+                        </div>
+                        <div className="mt-2 flex justify-between text-[10px] text-neutral-500">
+                          <span>HRV: 68 ms</span>
+                          <span>Tidur: 8.4 jam</span>
+                          <span>Aktivitas: 8.200 langkah</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stacked Card 3: Persetujuan Dokter Berizin */}
+                    <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
+                          <IconStethoscope size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                          <span className="whitespace-nowrap">Verifikasi Klinisi &amp; STR</span>
+                        </div>
+                        <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                          <IconCheck size={11} /> STR Valid
+                        </span>
+                      </div>
+                      <div className="mt-2.5 flex items-center justify-between gap-3 text-xs">
+                        <div className="min-w-0">
+                          <div className="whitespace-nowrap font-bold text-neutral-800 dark:text-neutral-200">dr. Sp.PD (Spesialis Penyakit Dalam)</div>
+                          <div className="whitespace-nowrap text-[11px] text-neutral-500">Rekam Medis EMR Ditandatangani &amp; Terarsip</div>
+                        </div>
+                        <div className="shrink-0 whitespace-nowrap rounded-lg border border-dashed border-emerald-500/40 bg-emerald-50/70 px-2.5 py-1 text-center text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                          Dokter Berdaulat
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
 
           {/* Stat band — glassmorphism */}
-          <Reveal delay={320}>
-            <div className="mx-auto mt-14 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+          <Reveal delay={300}>
+            <div className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
               {STATS.map((s, i) => (
-                <div
-                  key={i}
-                  className="liquid-glass rounded-2xl p-4"
-                >
-                  <div className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
+                <div key={i} className="liquid-glass rounded-2xl p-4 text-center shadow-sm">
+                  <div className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-2xl font-black text-transparent sm:text-3xl">
                     {s.node}
                   </div>
                   <div className="mt-1 text-[11px] font-semibold leading-tight text-neutral-500">{s.label}</div>
@@ -277,57 +729,25 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               ))}
             </div>
           </Reveal>
-          <p className="mt-5 text-xs text-neutral-500">AI supports, but never replaces, licensed clinicians.</p>
-
-          {/* Trust & Authority strip — the #1 pattern for health products */}
-          <Reveal delay={360}>
-            <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
-              {[
-                { icon: IconStethoscope, label: 'Clinician review when you consult' },
-                { icon: IconShield, label: 'PDP Law compliant' },
-                { icon: IconCheck, label: 'FHIR data standard' },
-                { icon: IconHeart, label: 'Measurable longevity' },
-              ].map((t) => (
-                <span key={t.label} className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600">
-                  <t.icon size={16} className="text-brand-dark" /> {t.label}
-                </span>
-              ))}
-            </div>
-          </Reveal>
+          <p className="mt-4 text-center text-xs text-neutral-500">AI mendukung proses evaluasi, namun tidak pernah menggantikan pertimbangan dokter berizin.</p>
         </div>
       </section>
 
-      {/* ── SCROLL-CINEMATIC OVERTURE, SESUDAH HERO ─────────────
-          Urutan ini DIBALIK, dan itu perbaikan yang paling menentukan pada
-          halaman ini.
-
-          Sebelumnya sinematik berdiri paling atas dan menempati jalur setinggi
-          400vh — empat layar penuh. Akibatnya pengunjung baru mendarat di
-          bidang hijau berisi satu judul melayang, tanpa satu pun kalimat yang
-          menjelaskan ini aplikasi apa dan tanpa tombol selain "Sign In" di
-          pojok. Seluruh isi yang meyakinkan — judul, kalimat penjelas, tombol
-          daftar, angka, dan lencana kepercayaan — berada sekitar 3.400 px di
-          bawahnya. Orang yang datang dari tautan lalu menggulir sekali dan
-          masih melihat hijau kosong akan menutup halamannya, dan ia tidak
-          keliru: tidak ada yang ditawarkan kepadanya di sana.
-
-          Sinematiknya TIDAK DIHAPUS. Ia tetap utuh, hanya tidak lagi menjadi
-          pintu tol: yang ingin melihatnya tinggal menggulir, yang datang untuk
-          mendaftar sudah menemukan tombolnya di layar pertama. */}
+      {/* ── SCROLL-CINEMATIC OVERTURE ─────────────────────────── */}
       <ScrollCinematicStyles />
       <ScrollCinematic />
 
-           {/* Marquee strip */}
+      {/* Marquee strip */}
       <style>{`#panacea-track{animation:panaceaGo 45s linear infinite!important}@keyframes panaceaGo{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
-      <div className="relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white/80 to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white/80 to-transparent" />
-        <div id="panacea-track" className="flex w-max" onMouseEnter={e=>e.currentTarget.style.animationPlayState='paused'} onMouseLeave={e=>e.currentTarget.style.animationPlayState='running'}>
-          {[0,1,2].map(g=>(
-            <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g!==0}>
-              {MARQUEE.map((m,i)=>(
-                <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-500">
-                  <m.icon size={18} className="text-brand-dark" /> {m.label}
+      <div className="relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur dark:border-white/5 dark:bg-black/40">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white/80 to-transparent dark:from-black/80" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white/80 to-transparent dark:from-black/80" />
+        <div id="panacea-track" className="flex w-max" onMouseEnter={(e) => (e.currentTarget.style.animationPlayState = 'paused')} onMouseLeave={(e) => (e.currentTarget.style.animationPlayState = 'running')}>
+          {[0, 1, 2].map((g) => (
+            <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g !== 0}>
+              {MARQUEE.map((m, i) => (
+                <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-500 dark:text-neutral-300">
+                  <m.icon size={18} className="text-brand-dark dark:text-emerald-400" /> {m.label}
                 </span>
               ))}
             </div>
@@ -335,117 +755,492 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
       </div>
 
-      {/* ── FEATURED BRAND FILM ──────────────────────────────── */}
+      {/* ── FEATURED BRAND FILM (Black Video Glitch Safeguard) ──── */}
       <section className="px-6 py-16 sm:px-10">
-        <div className="mx-auto grid max-w-5xl gap-5 lg:grid-cols-2">
-          {/* Self-hosted Remotion logo animation (code-based, free) */}
+        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
+          {/* Brand Intro Film Card with fallback gradient and poster */}
           <Reveal>
-            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
-              <video src={`${import.meta.env.BASE_URL}media/brand-intro.mp4`} autoPlay muted loop playsInline className="aspect-video w-full bg-[#06120c] object-cover" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
+              <video
+                src={`${import.meta.env.BASE_URL}media/brand-intro.mp4`}
+                autoPlay muted loop playsInline
+                poster={BRAND_POSTER}
+                className="aspect-video w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Sekilas Platform</span>
+                </div>
+                <h3 className="mt-1 text-lg font-bold sm:text-xl">Panaceamed: AI-EMR &amp; Longevity OS</h3>
+              </div>
             </div>
           </Reveal>
-          {/* Cinematic nature film */}
+          {/* Higgsfield Nature Film */}
           <Reveal delay={80}>
-            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
+            <div className="relative overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
               <video
                 src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
                 autoPlay muted loop playsInline
+                poster={BRAND_POSTER}
                 className="aspect-video w-full object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-ink">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                 <h2 className="text-xl font-extrabold sm:text-2xl">
-                  Nature. Humanity. <span className="font-serif-display italic text-emerald-300">Vitality.</span>
+                  Alam. Kemanusiaan. <span className="font-serif-display italic text-emerald-300">Vitalitas.</span>
                 </h2>
-                <p className="mt-1 max-w-xl text-[13px] text-ink/80">Extending healthspan through science — adding life to your years.</p>
+                <p className="mt-1 max-w-xl text-[13px] text-white/80">Memperpanjang healthspan berbasis sains — menambah kualitas hidup pada setiap tahun usia Anda.</p>
               </div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
-      <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
+      {/* ── CHAPTER 01 / KAPABILITAS PLATFORM ───────────────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+      <section id="features" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+        <div id="about" />
         <Reveal className="text-center">
-          <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">About Us</span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">What is <span className="font-serif-display italic text-brand-dark">Panaceamed.id</span>?</h2>
-          <p className="mx-auto mt-3 max-w-3xl text-neutral-600">
-            An <b>AI-EMR</b> platform and <b>medical knowledge hub</b> in one. AI conducts the patient intake &
-            supporting analysis through a chatbot, which then flows into a medical record <b>verified and signed
-            by a human doctor</b>. Our vision: <b>a practical AI clinic for the future of your healthcare.</b>
+          <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-black/5 bg-neutral-100/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 shadow-sm dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-300">
+            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">01</span>
+            <span className="h-2 w-px bg-neutral-300 dark:bg-neutral-600" />
+            <span>Kapabilitas Platform</span>
+          </div>
+          <div>
+            <span className="rounded-full border border-brand/30 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+              Arsitektur Inti
+            </span>
+          </div>
+          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink">
+            Apa itu <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Panaceamed.id</span>?
+          </h2>
+          <p className="mx-auto mt-3 max-w-3xl text-neutral-600 dark:text-neutral-300 sm:text-base leading-relaxed">
+            Platform <b>AI-EMR</b> dan <b>pusat pengetahuan medis</b> terpadu. AI memfasilitasi wawancara awal &amp;
+            analisis pendukung melalui chatbot, yang kemudian dialirkan ke rekam medis yang <b>ditelaah dan disahkan
+            oleh dokter berizin</b>. Visi kami: <b>platform rekam medis terpadu untuk masa depan kesehatan Anda.</b>
           </p>
         </Reveal>
 
-        {/* DEK YANG DAPAT DIGESER DI TELEPON, kisi di layar lebar.
-            Keenam kartu ini masing-masing memuat satu paragraf penuh; ditumpuk
-            menurun pada layar 390 px keenamnya menjadi kolom setinggi lebih
-            dari empat layar, dan pembaca harus melewati seluruh isinya untuk
-            sampai ke bagian berikutnya. Sebagai dek, keenamnya menempati satu
-            layar dan yang tidak diminati cukup dilewati dengan satu geseran.
-
-            Kartu berikutnya sengaja MENGINTIP di tepi kanan: dek yang kartunya
-            pas selebar layar tidak memberi tanda apa pun bahwa masih ada yang
-            lain di sebelahnya, dan yang tidak tampak tidak pernah digeser.
-
-            INTIPAN SAJA TIDAK CUKUP DI SINI, dan itu baru ketahuan dari
-            tangkapan layarnya. Kartunya berlatar kaca putih di atas bagian yang
-            juga putih, sehingga tepi kartu kedua yang mengintip tidak
-            menghasilkan garis yang terlihat — petunjuknya ada secara geometri
-            tetapi tidak ada secara penglihatan. Karena itu jumlah sisanya
-            ditulis sebagai kalimat, hanya pada layar sempit tempat deknya
-            memang berlaku.
-
-            Lebarnya 74vw, bukan cqw. Percobaan pertama memakai 78cqw dan
-            hasilnya 300 px karena tidak ada leluhur ber-container-type di
-            cabang ini sehingga cqw jatuh ke batas max-w — kartu kedua mulai di
-            412 px, yakni di luar layar 390 px, dan intipan yang seluruh
-            gunanya menandakan "masih ada lagi" tidak pernah terjadi. Terukur
-            ulang: kartu kedua kini mulai sebelum tepi kanan. */}
-        <div className="geser-aman mt-12 sm:!m-0 sm:grid sm:gap-5 sm:overflow-visible lg:grid-cols-3 sm:grid-cols-2">
-          {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={(i % 3) * 90} className="w-[74vw] max-w-[300px] sm:w-auto sm:max-w-none">
-              <div role="button" tabIndex={0} onClick={onMasuk} onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
-                className="liquid-glass group relative h-full cursor-pointer overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition group-hover:bg-brand/20" />
-                <div className="relative flex items-start justify-between">
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-dark shadow-inner">
-                    <f.icon size={22} />
-                  </span>
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-neutral-500 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" /></svg>
+        {/* The Asymmetric Bento Grid */}
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* KARTU BESAR (2 Kolom): AI Chatbot → AI-EMR */}
+          <Reveal className="md:col-span-2 lg:col-span-2">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-emerald-50/50 via-white to-white p-7 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand/10 dark:border-white/10 dark:from-emerald-950/20 dark:via-neutral-900 dark:to-neutral-900"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                      <IconChat size={22} />
+                    </span>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Mesin Anamnesis Awal</span>
+                      <h3 className="text-xl font-extrabold text-ink sm:text-2xl">AI Chatbot → AI-EMR</h3>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                    Metode SOCRATES
                   </span>
                 </div>
-                <h3 className="relative mt-4 font-bold text-ink">{f.title}</h3>
-                <p className="relative mt-1 text-sm leading-relaxed text-neutral-600">{f.text}</p>
+
+                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Anamnesis terstruktur <b>meringankan beban administrasi klinisi</b>. AI memandu wawancara pasien awal dengan protokol SOCRATES; hasil anamnesis terpetakan otomatis ke kolom Subjektif/Objektif AI-EMR untuk ditelaah dan divalidasi langsung oleh dokter berizin.
+                </p>
+
+                {/* Live Auto-Generate SOAP Preview */}
+                <div className="mt-5 rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-black/50">
+                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-400">
+                    Pratinjau Format SOAP Terstruktur:
+                  </div>
+                  <div className="mt-2.5 grid gap-2 sm:grid-cols-2 text-xs">
+                    <div className="rounded-xl bg-neutral-100/70 p-2.5 dark:bg-neutral-800/70">
+                      <b className="text-emerald-700 dark:text-emerald-400">[S] Subjektif:</b> Riwayat keluhan, timeline onset, &amp; faktor pencetus terpetakan otomatis.
+                    </div>
+                    <div className="rounded-xl bg-neutral-100/70 p-2.5 dark:bg-neutral-800/70">
+                      <b className="text-blue-700 dark:text-blue-400">[O] Objektif:</b> Tanda vital terstandar &amp; integrasi data lab terverifikasi.
+                    </div>
+                    <div className="rounded-xl bg-neutral-100/70 p-2.5 dark:bg-neutral-800/70">
+                      <b className="text-purple-700 dark:text-purple-400">[A] Asesmen:</b> Diagnosis banding evidens klinis dengan batasan klaim.
+                    </div>
+                    <div className="rounded-xl bg-neutral-100/70 p-2.5 dark:bg-neutral-800/70">
+                      <b className="text-amber-700 dark:text-amber-400">[P] Plan:</b> Rencana terapi &amp; rekomendasi rujukan ditandatangani dokter berizin.
+                    </div>
+                  </div>
+                </div>
               </div>
-            </Reveal>
-          ))}
+
+              <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-black/5 pt-4 dark:border-white/10">
+                <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-bold text-brand-dark dark:bg-emerald-950 dark:text-emerald-300">
+                  ✓ Supervisi Penuh Dokter Berizin
+                </span>
+                <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                  Standar HL7® FHIR
+                </span>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* KARTU TINGGI (1 Kolom): AI Longevity Calculator */}
+          <Reveal delay={90} className="md:col-span-1 lg:col-span-1 lg:row-span-2">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-gradient-to-br from-white to-neutral-50 p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl dark:border-white/10 dark:from-neutral-900 dark:to-neutral-950"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                    <IconHeart size={22} />
+                  </span>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Estimasi Usia Biologis
+                  </span>
+                </div>
+
+                <h3 className="mt-5 text-xl font-extrabold text-ink dark:text-white">AI Longevity Calculator</h3>
+                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Pantau biomarker gaya hidup: nutrisi, hidrasi, kualitas tidur, dan aktivitas fisik harian. Dapatkan estimasi usia biologis terukur untuk menjaga vitalitas tubuh Anda secara optimal. (Catatan: estimasi teknis gaya hidup, bukan diagnosis klinis).
+                </p>
+
+                {/* Dial Gauge Preview */}
+                <div className="mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-50/50 p-4 text-center dark:bg-emerald-950/30">
+                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                    Indikator Usia Biologis
+                  </div>
+                  <div className="mt-2 text-3xl font-black text-ink dark:text-white">
+                    36.4 <span className="text-sm font-semibold text-emerald-600">thn</span>
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                    +5.6 thn Keunggulan Healthspan
+                  </div>
+
+                  <div className="mt-4 space-y-2 text-left text-xs">
+                    <div>
+                      <div className="flex justify-between text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                        <span>Pola Nutrisi Seimbang</span>
+                        <span className="font-bold text-emerald-600">88%</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+                        <div className="h-full w-[88%] rounded-full bg-emerald-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                        <span>Aktivitas &amp; Langkah Kaki</span>
+                        <span className="font-bold text-emerald-600">92%</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+                        <div className="h-full w-[92%] rounded-full bg-emerald-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                        <span>Kualitas Tidur &amp; Pemulihan</span>
+                        <span className="font-bold text-emerald-600">84%</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+                        <div className="h-full w-[84%] rounded-full bg-emerald-500" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-black/5 pt-4 text-[11px] font-medium text-neutral-500 dark:border-white/10">
+                Siklus evaluasi terarah 30 hari untuk optimalisasi kesehatan longitudinal.
+              </div>
+            </div>
+          </Reveal>
+
+          {/* KARTU KECIL: Radar Faskes & Resep GPS */}
+          <Reveal delay={120}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl dark:border-white/10 dark:bg-neutral-900"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                    <IconStethoscope size={22} />
+                  </span>
+                  <span className="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950 dark:text-red-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                    Respons Cepat Medis
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-lg font-extrabold text-ink">Consultations, Pharmacy &amp; Facilities</h3>
+                <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Telekonsultasi dokter spesialis mulai Rp49.000, tebus resep obat resmi diantar ke rumah, dan radar GPS instan pencari IGD rumah sakit terdekat saat darurat.
+                </p>
+
+                {/* Mini Radar Dot Animation */}
+                <div className="mt-4 rounded-xl border border-black/5 bg-neutral-50 p-3 dark:border-white/5 dark:bg-neutral-800/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 font-semibold text-neutral-700 dark:text-neutral-200">
+                      <IconHospital size={14} className="text-emerald-600 dark:text-emerald-400" /> RS Darurat Terdekat
+                    </span>
+                    <span className="font-mono text-emerald-600 dark:text-emerald-400">1.2 km</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 font-semibold text-neutral-700 dark:text-neutral-200">
+                      <IconPill size={14} className="text-emerald-600 dark:text-emerald-400" /> Apotek Mitra Panacea
+                    </span>
+                    <span className="font-mono text-emerald-600 dark:text-emerald-400">400 m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-black/5 pt-3 text-[11px] font-semibold text-neutral-500 dark:border-white/10">
+                Panggilan cepat SOS &amp; tebus resep digital resmi
+              </div>
+            </div>
+          </Reveal>
+
+          {/* KARTU SEDANG: Knowledge Hub & Token Royalti */}
+          <Reveal delay={150}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl dark:border-white/10 dark:bg-neutral-900"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                    <IconStore size={22} />
+                  </span>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    PanaceaToken
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-lg font-extrabold text-ink">Medical Knowledge Hub</h3>
+                <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Akses ribuan modul klinis, catatan medis, dan jurnal riset terkurasi. Penulis terlindungi sistem watermark dokumen otomatis dengan royalti langsung berbasis PanaceaToken.
+                </p>
+
+                {/* Preview dokumen ber-watermark */}
+                <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-50/40 p-3 text-xs dark:bg-emerald-950/30">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-200">
+                    <IconArticle size={14} className="text-emerald-700 dark:text-emerald-400" /> Jurnal: Terapi Mitokondria &amp; Longevity
+                  </div>
+                  <div className="mt-0.5 text-[10px] text-emerald-700 dark:text-emerald-400">
+                    Watermark Perlindungan Penulis · Royalti PNC Otomatis
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-black/5 pt-3 text-[11px] font-semibold text-neutral-500 dark:border-white/10">
+                Ekonomi token transparan untuk dokter &amp; peneliti
+              </div>
+            </div>
+          </Reveal>
+
+          {/* KARTU SOSIAL: Healthy Living Dashboard */}
+          <Reveal delay={180}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl dark:border-white/10 dark:bg-neutral-900"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                    <IconUsers size={22} />
+                  </span>
+                  <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                    Komunitas &amp; Gaya Hidup
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-lg font-extrabold text-ink">Healthy Living Dashboard</h3>
+                <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Jejaring sosial gaya hidup sehat interaktif: bagikan rutinitas kebugaran, kebiasaan nutrisi, dan video edukasi kesehatan 30 detik bersama komunitas peduli healthspan.
+                </p>
+
+                {/* Social Card Feed Snippet */}
+                <div className="mt-4 rounded-xl border border-black/5 bg-neutral-50 p-2.5 dark:bg-neutral-800/60 text-xs">
+                  <div className="flex items-center gap-1.5 font-semibold text-neutral-800 dark:text-neutral-200">
+                    <IconActivity size={14} className="text-emerald-600 dark:text-emerald-400" /> Lari Pagi 5.2 km · Zone 2 Cardio
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-3 text-[10px] text-neutral-500">
+                    <span className="inline-flex items-center gap-1"><IconHeart size={12} className="text-rose-500" /> 142 Suka</span>
+                    <span className="inline-flex items-center gap-1"><IconComment size={12} className="text-emerald-600 dark:text-emerald-400" /> 18 Komentar</span>
+                    <span className="inline-flex items-center gap-1"><IconBookmark size={12} className="text-amber-500" /> 34 Disimpan</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-black/5 pt-3 text-[11px] font-semibold text-neutral-500 dark:border-white/10">
+                Interaksi positif gaya hidup sehat &amp; kebiasaan produktif
+              </div>
+            </div>
+          </Reveal>
+
+          {/* KARTU TATA KELOLA MEDIS: AI-EMR for clinicians */}
+          <Reveal delay={210} className="md:col-span-2 lg:col-span-2">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onMasuk}
+              onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+              className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-gradient-to-br from-white to-neutral-50 p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl dark:border-white/10 dark:from-neutral-900 dark:to-neutral-950"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                      <IconShield size={22} />
+                    </span>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Tata Kelola Klinis</span>
+                      <h3 className="text-xl font-extrabold text-ink dark:text-white sm:text-2xl">AI-EMR for clinicians</h3>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Interoperabilitas SATUSEHAT
+                  </span>
+                </div>
+
+                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Dirancang untuk dokter berizin (STR) dan fasilitas kesehatan. Mengotomatisasi resume SOAP klinis, evaluasi interaksi obat teknis, dan sinkronisasi standar SATUSEHAT Kemenkes (HL7® FHIR) guna memangkas beban administrasi.
+                </p>
+
+                <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/5 bg-neutral-100/70 p-3 text-xs dark:bg-neutral-800/70">
+                  <span className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-300">
+                    <IconCheck size={14} /> Jembatan SatuSehat FHIR Aktif
+                  </span>
+                  <span className="text-neutral-400">•</span>
+                  <span className="text-neutral-700 dark:text-neutral-300">Peringatan Interaksi Obat Otomatis</span>
+                  <span className="text-neutral-400">•</span>
+                  <span className="text-neutral-700 dark:text-neutral-300">Tanda Tangan Digital Dokter Sah</span>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-black/5 pt-4 text-[11px] font-medium text-neutral-500 dark:border-white/10">
+                Menjunjung kedaulatan klinisi penuh — AI sebagai alat bantu pembuat keputusan, bukan pengganti praktisi.
+              </div>
+            </div>
+          </Reveal>
         </div>
-        <p className="mt-3 text-center text-xs font-semibold text-neutral-500 sm:hidden">
-          Swipe for {FEATURES.length - 1} more features →
-        </p>
       </section>
 
-      {/* ── ROLES ────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-50 via-white to-[#e1eae3] px-6 py-20 sm:px-10">
+      {/* ── CHAPTER 02 / USER PERSONAS & GOVERNANCE ─────────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+      <section id="roles" className="relative overflow-hidden bg-gradient-to-b from-[#f4f8f5] via-[#edf5f0] to-[#f4f8f5] px-6 py-24 border-y border-emerald-500/15 dark:border-white/5 dark:from-[#030d07] dark:via-[#06150d] dark:to-[#030d07] sm:px-10">
         <div className="orb pointer-events-none absolute right-10 top-10 h-60 w-60 rounded-full bg-brand/15 blur-3xl" />
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark backdrop-blur">Business Model</span>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">One platform, <span className="font-serif-display italic text-brand-dark">many roles</span></h2>
-            <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
-              Subscriptions (individuals & hospitals) plus a token economy: buyers deposit <b>PanaceaToken</b>,
-              authors earn royalties, and all content is verified by specialists & AI.
+            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/70 dark:text-emerald-300">
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">02</span>
+              <span className="h-2 w-px bg-emerald-300 dark:bg-emerald-700" />
+              <span>Profil Pengguna &amp; Tata Kelola</span>
+            </div>
+            <div>
+              <span className="rounded-full border border-brand/20 bg-white/80 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark backdrop-blur dark:bg-neutral-800 dark:text-emerald-300">
+                Pengalaman Pengguna &amp; Peran
+              </span>
+            </div>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink dark:text-white">
+              Satu Platform, <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Berbagai Peran Klinis</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-neutral-600 dark:text-neutral-300">
+              Pengalaman antarmuka terpersonalisasi untuk pasien dan dokter, disokong oleh ekosistem kontributor terpercaya dan <b>PanaceaToken</b>.
             </p>
+
+            {/* Segmented Persona Tabs */}
+            <div className="mx-auto mt-8 inline-flex rounded-full border border-black/10 bg-white/80 p-1.5 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-neutral-800">
+              <button
+                onClick={() => setRoleTab('patients')}
+                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                  roleTab === 'patients'
+                    ? 'bg-brand text-white shadow-md'
+                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                }`}
+              >
+                Untuk Pasien &amp; Keluarga
+              </button>
+              <button
+                onClick={() => setRoleTab('doctors')}
+                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                  roleTab === 'doctors'
+                    ? 'bg-brand text-white shadow-md'
+                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                }`}
+              >
+                Untuk Dokter &amp; Faskes
+              </button>
+              <button
+                onClick={() => setRoleTab('ecosystem')}
+                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                  roleTab === 'ecosystem'
+                    ? 'bg-brand text-white shadow-md'
+                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                }`}
+              >
+                Ekosistem &amp; Verifikasi
+              </button>
+            </div>
           </Reveal>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ROLES.map((r, i) => (
-              <Reveal key={r.title} delay={(i % 3) * 90}>
-                <div className="liquid-glass flex h-full items-start gap-3 rounded-2xl p-5 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-12px_rgba(0,191,99,0.22)]">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><r.icon size={18} /></span>
+
+          {/* Interactive Role Display based on Tab — Always 3 balanced cards */}
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {ROLES.filter((r) => r.category === roleTab).map((r, i) => (
+              <Reveal key={r.title} delay={i * 90}>
+                <div className="group flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/50 hover:shadow-xl dark:border-white/10 dark:bg-neutral-900">
                   <div>
-                    <h3 className="font-bold text-ink">{r.title}</h3>
-                    <p className="mt-0.5 text-sm leading-relaxed text-neutral-600">{r.desc}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                        <r.icon size={22} />
+                      </span>
+                      <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                        {r.badge}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-4 text-xl font-extrabold text-ink">{r.title}</h3>
+                    <div className="mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      {r.tagline}
+                    </div>
+
+                    <p className="mt-2.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+                      {r.desc}
+                    </p>
+
+                    <ul className="mt-5 space-y-2.5 border-t border-black/5 pt-4 dark:border-white/10">
+                      {r.points.map((pt, pi) => (
+                        <li key={pi} className="flex items-start gap-2 text-xs text-neutral-700 dark:text-neutral-300">
+                          <span className="mt-0.5 font-bold text-emerald-600 dark:text-emerald-400">✓</span>
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-between border-t border-black/5 pt-4 text-[11px] font-semibold text-neutral-500 dark:border-white/10">
+                    <span>FHIR &amp; Panacea Engine</span>
+                    <button
+                      onClick={onMasuk}
+                      className="rounded-full bg-neutral-100 px-3.5 py-1 text-xs font-bold text-neutral-800 transition hover:bg-brand hover:text-white dark:bg-neutral-800 dark:text-neutral-200"
+                    >
+                      Coba Akses →
+                    </button>
                   </div>
                 </div>
               </Reveal>
@@ -454,260 +1249,527 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
       </section>
 
-      {/* ── HARGA & LAYANAN (dark bento-grid pricing) ─────────────── */}
+      {/* ── CHAPTER 03 / TARIF & LAYANAN BERLANGGANAN ────────────── */}
       <PricingSection onMasuk={onMasuk} promo={promo} />
 
-      {/* ── WHAT'S NEW ────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-        <Reveal className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
-            <IconSparkle size={13} /> What's New
-          </span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Latest <span className="font-serif-display italic text-brand-dark">Updates</span></h2>
-        </Reveal>
-        <ul className="mt-8 space-y-3">
-          {WHATS_NEW.map((w, i) => (
-            <Reveal key={w} as="li" delay={i * 70}>
-              <div className="liquid-glass flex items-start gap-3 rounded-2xl p-4 transition hover:translate-x-1 hover:border-brand/30">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-white"><IconCheck size={16} /></span>
-                <span className="text-sm text-neutral-700">{w}</span>
-              </div>
-            </Reveal>
-          ))}
-        </ul>
+      {/* ── CHAPTER 04 / INTELIJEN & WAWASAN TERKINI ─────────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#f8faf9] via-white to-[#f4f7f5] px-6 py-20 dark:border-white/5 dark:from-[#030d07] dark:via-[#05140b] dark:to-[#030d07] sm:px-10">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-emerald-100/40 blur-3xl dark:bg-emerald-950/20" />
+          <div className="orb absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-brand-50/50 blur-3xl dark:bg-brand-950/15" style={{ animationDelay: '-6s' }} />
+        </div>
+
+        <div className="relative mx-auto max-w-4xl">
+          <Reveal className="text-center">
+            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-50/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 shadow-sm dark:border-amber-500/30 dark:bg-amber-950/70 dark:text-amber-300">
+              <span className="font-mono text-amber-600 dark:text-amber-400 font-extrabold">04</span>
+              <span className="h-2 w-px bg-amber-300 dark:bg-amber-700" />
+              <span>Intelijen &amp; Wawasan Terkini</span>
+            </div>
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                <IconSparkle size={13} /> Wawasan &amp; Pembaruan Sistem
+              </span>
+            </div>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink">
+              Pembaruan Terkini di <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Panaceamed</span>
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-neutral-600 dark:text-neutral-300">
+              Pembaruan sistem berkala, rilis kapabilitas klinis, dan integrasi modul medis terkini.
+            </p>
+          </Reveal>
+          <ul className="mt-8 space-y-3">
+            {WHATS_NEW.map((w, i) => (
+              <Reveal key={w} as="li" delay={i * 70}>
+                <div className="liquid-glass flex items-start gap-3.5 rounded-2xl p-4 transition hover:translate-x-1 hover:border-brand/30">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-white shadow-sm">
+                    <IconCheck size={16} />
+                  </span>
+                  <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{w}</span>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+
+        {/* Medical News & Innovation rotating widget */}
+        <MedicalNews />
       </section>
 
-      {/* ── MEDICAL NEWS & INNOVATION (editorial, rotating) ─────── */}
-      <MedicalNews />
-
-      {/* ── LONGEVITY & HEALTHCARE HISTORY ──────────────────── */}
-      {/* overflow-hidden DIPINDAH dari section ke pembungkus orb di dalamnya.
-          Kartu era di bawah memakai position:sticky, dan sticky yang berada di
-          dalam leluhur ber-overflow-hidden menempel pada kotak guliran leluhur
-          itu, bukan pada layar — akibatnya ia tampak tidak menempel sama
-          sekali. Orbnya tetap terkurung karena pembungkusnya sendiri yang kini
-          memotong. */}
-      <section className="relative px-6 py-20 sm:px-10">
+      {/* ── CHAPTER 04 / THE LONGEVITY & SCIENCE ODYSSEY ─────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+      <section id="science" className="relative overflow-hidden bg-gradient-to-b from-[#f8faf9] via-[#edf5f0]/60 to-[#f8faf9] px-6 py-24 border-y border-emerald-500/15 dark:border-white/5 dark:from-[#030d07] dark:via-[#06150d] dark:to-[#030d07] sm:px-10">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl" />
           <div className="orb absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl" style={{ animationDelay: '-8s' }} />
         </div>
-        <div className="relative mx-auto max-w-4xl">
+        <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">A Legacy Thousands of Years Old</span>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">A History of <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Health</h2>
-            <Prosa kelas="mx-auto mt-3 max-w-2xl text-neutral-600">From the pharaohs, the prophets, the Greco-Roman world, and the dynasties of China, to the Mongol empire — the pursuit of a long and healthy life is as old as civilization itself. Panaceamed.id continues it with science &amp; AI.</Prosa>
-          </Reveal>
+            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/70 dark:text-emerald-300">
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">05</span>
+              <span className="h-2 w-px bg-emerald-300 dark:bg-emerald-700" />
+              <span>Ekspedisi Sains &amp; Longevity</span>
+            </div>
+            <div>
+              <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+                Warisan Ribuan Tahun Peradaban
+              </span>
+            </div>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink dark:text-white">
+              Evolusi Sains Medis &amp; <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Eksplorasi Longevity</span>
+            </h2>
+            <Prosa kelas="mx-auto mt-3 max-w-2xl text-neutral-600 dark:text-neutral-300">
+              Dari papirus era Firaun, tradisi kenabian, kedokteran Yunani-Romawi, hingga perintis sel punca dan presisi robotik — pencarian kesehatan optimal adalah warisan peradaban yang kini diakselerasi Panaceamed.id bersama AI.
+            </Prosa>
 
-          {/* Self-hosted Remotion animated timeline (code-based, free) */}
-          <Reveal delay={80}>
-            <div className="mt-8 overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
-              <video src={`${import.meta.env.BASE_URL}media/history.mp4`} autoPlay muted loop playsInline className="aspect-video w-full bg-[#06120c] object-cover" />
+            {/* Chapter Tabs Controller */}
+            <div className="mx-auto mt-8 flex flex-wrap justify-center gap-2">
+              {[
+                { id: 'eras', label: 'Warisan Kedokteran (6 Era)' },
+                { id: 'modern', label: 'Era Modern & FHIR' },
+                { id: 'stem', label: 'Frontier Sel Punca' },
+                { id: 'robotics', label: 'Presisi Robotik Medis' },
+                { id: 'all', label: 'Semua Bab (Lengkap)' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setScienceTab(tab.id as typeof scienceTab)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-sm ${
+                    scienceTab === tab.id
+                      ? 'bg-brand text-white shadow-brand/20'
+                      : 'border border-black/5 bg-white/70 text-neutral-600 hover:bg-neutral-100 dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </Reveal>
 
-          {/* Ancient eras — KARTU BERTUMPUK.
-              Enam era, masing-masing satu paragraf penuh beserta satu video,
-              berjajar menurun menjadi kolom yang sangat panjang; pembacanya
-              melewati keenamnya sekaligus dan tidak satu pun sempat menjadi
-              pusat perhatian. Bertumpuk, tiap kartu menempel di tempat yang
-              sama sampai kartu berikutnya naik menutupinya — satu era menguasai
-              layar pada satu waktu, dan urutan zamannya terasa sebagai gerakan
-              maju, bukan sebagai daftar.
+          {/* Self-hosted animated timeline video with safeguard poster */}
+          {(scienceTab === 'eras' || scienceTab === 'all') && (
+            <Reveal delay={80}>
+              <div className="mt-8 overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
+                <video
+                  src={`${import.meta.env.BASE_URL}media/history.mp4`}
+                  autoPlay muted loop playsInline
+                  poster={HISTORY_POSTER}
+                  className="aspect-video w-full bg-[#06120c] object-cover"
+                />
+              </div>
+            </Reveal>
+          )}
 
-              Puncak menempelnya bertambah 12 px tiap kartu sehingga tepi kartu
-              di bawahnya tetap mengintip; tanpa itu tumpukan terlihat seperti
-              satu kartu yang isinya berganti-ganti sendiri. */}
-          <ol className="mt-10 list-none">
-            {HISTORY_ERAS.map((e, i) => (
-              <li
-                key={e.era}
-                className="tumpuk-kartu"
-                style={{ top: `calc(4.5rem + ${i * 12}px)`, zIndex: i + 1 }}
-              >
-                {/* TANPA liquid-glass, dan ini bukan pilihan selera. Kartu kaca yang
-                      menempel di atas kartu kaca lain membuat tiga paragraf saling
-                      menembus sekaligus — terlihat jelas pada tangkapan layar di
-                      390 px: judul era Yunani-Romawi, Mesir, dan Cina bertumpuk pada
-                      baris yang sama dan tidak satu pun terbaca. Menambahkan
-                      bg-white/95 di sebelah liquid-glass tidak menolong karena kelas
-                      itu memasang latarnya sendiri. Tumpukan menuntut latar pekat. */}
-                <div className="mb-4 flex gap-4 rounded-2xl border border-black/5 bg-white p-5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-neutral-900">
-                  <div className="flex shrink-0 flex-col items-center">
-                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl">{e.emoji}</span>
-                    <span className="mt-2 text-[10px] font-black tabular-nums text-neutral-400">{i + 1}/{HISTORY_ERAS.length}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-baseline gap-2">
-                      <h3 className="text-base font-extrabold text-ink">{e.title}</h3>
-                      <span className="text-[11px] font-bold text-brand-dark">{e.era}</span>
-                      <span className="text-[10px] text-neutral-500">· {e.when}</span>
+          {/* Ancient eras — Interactive Split Stepper */}
+          {(scienceTab === 'eras' || scienceTab === 'all') && (
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+              {/* Left: Era Stepper Navigation (5 cols) */}
+              <div className="space-y-2.5 lg:col-span-5">
+                <div className="mb-2 text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                  Pilih Era Sejarah (1–{HISTORY_ERAS.length})
+                </div>
+                {HISTORY_ERAS.map((e, i) => (
+                  <button
+                    key={e.era}
+                    onClick={() => setActiveEra(i)}
+                    className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all ${
+                      activeEra === i
+                        ? 'border-2 border-emerald-500 bg-white shadow-md shadow-emerald-500/10 dark:bg-neutral-900'
+                        : 'border border-black/5 bg-white/70 hover:bg-white hover:border-emerald-300/60 dark:border-white/10 dark:bg-neutral-900/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl ${
+                        activeEra === i ? 'bg-emerald-500 text-white' : 'bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300'
+                      }`}>
+                        {renderEraGlyph(e.era, e.emoji)}
+                      </span>
+                      <div>
+                        <div className="text-sm font-extrabold text-ink">{e.era}</div>
+                        <div className="text-xs text-neutral-500 dark:text-neutral-400">{e.title}</div>
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.body}</p>
-                    {e.video && <VideoSaatTerlihat src={e.video} judul={e.era} />}
+                    <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                      {e.when}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Right: Active Era Viewport Showcase (7 cols) */}
+              <div className="lg:col-span-7">
+                <div className="sticky top-24 rounded-3xl border border-black/5 bg-white p-6 shadow-xl shadow-black/5 dark:border-white/10 dark:bg-neutral-900">
+                  <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 dark:border-white/10">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-2xl dark:bg-emerald-950">
+                        {renderEraGlyph(HISTORY_ERAS[activeEra].era, HISTORY_ERAS[activeEra].emoji)}
+                      </span>
+                      <div>
+                        <h3 className="text-base font-extrabold text-ink sm:text-lg">{HISTORY_ERAS[activeEra].title}</h3>
+                        <div className="text-xs font-bold text-brand-dark dark:text-emerald-400">
+                          {HISTORY_ERAS[activeEra].era} · <span className="text-neutral-500 font-medium">{HISTORY_ERAS[activeEra].when}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-neutral-100 px-3 py-1 font-mono text-xs font-black text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                      {activeEra + 1} / {HISTORY_ERAS.length}
+                    </span>
+                  </div>
+
+                  <div className="mt-4">
+                    {HISTORY_ERAS[activeEra].video && (
+                      <VideoSaatTerlihat
+                        key={HISTORY_ERAS[activeEra].video}
+                        src={HISTORY_ERAS[activeEra].video}
+                        judul={HISTORY_ERAS[activeEra].era}
+                      />
+                    )}
+                  </div>
+
+                  <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                    {HISTORY_ERAS[activeEra].body}
+                  </p>
+
+                  {/* Stepper Navigation Buttons */}
+                  <div className="mt-5 flex items-center justify-between border-t border-black/5 pt-4 dark:border-white/10">
+                    <button
+                      onClick={() => setActiveEra((prev) => (prev > 0 ? prev - 1 : HISTORY_ERAS.length - 1))}
+                      className="rounded-full border border-black/10 px-4 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-100 dark:border-white/10 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                    >
+                      ← Era Sebelumnya
+                    </button>
+                    <button
+                      onClick={() => setActiveEra((prev) => (prev < HISTORY_ERAS.length - 1 ? prev + 1 : 0))}
+                      className="rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-110"
+                    >
+                      Era Berikutnya →
+                    </button>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ol>
+              </div>
+            </div>
+          )}
 
-          {/* Modern per-decade */}
-          <Reveal className="mt-12 text-center">
-            <h3 className="text-2xl font-extrabold">The Modern Era — <span className="font-serif-display italic text-brand-dark">Decade by Decade</span></h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">From antibiotics & medical records, to wearables, the FHIR data standard, and AI in medicine.</p>
-          </Reveal>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {HISTORY_MODERN.map((m, i) => (
-              <Reveal key={m.decade} delay={(i % 3) * 80}>
-                <div className="liquid-glass h-full rounded-2xl p-5">
-                  <div className="text-xs font-black text-brand-dark">{m.decade}</div>
-                  <div className="mt-1 font-bold text-ink">{m.title}</div>
-                  <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">{m.body}</p>
+          {/* Modern per-decade & FHIR Explainer */}
+          {(scienceTab === 'modern' || scienceTab === 'all') && (
+            <>
+              <Reveal className="mt-14 text-center">
+                <h3 className="text-2xl font-extrabold text-ink">Era Modern — <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Dekade demi Dekade</span></h3>
+                <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">Dari penemuan antibiotik &amp; rekam medis, sensor tubuh pintar, standar data FHIR, hingga kecerdasan artifisial.</p>
+              </Reveal>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {HISTORY_MODERN.map((m, i) => (
+                  <Reveal key={m.decade} delay={(i % 3) * 80}>
+                    <div className="liquid-glass h-full rounded-2xl p-5 shadow-sm">
+                      <div className="text-xs font-black text-brand-dark dark:text-emerald-400">{m.decade}</div>
+                      <div className="mt-1 font-bold text-ink">{m.title}</div>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{m.body}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+
+              {/* FHIR explainer */}
+              <Reveal delay={80}>
+                <div className="mt-8 rounded-3xl border border-brand/30 bg-gradient-to-br from-brand-50 to-emerald-100/40 p-6 dark:from-emerald-950/40 dark:to-neutral-900 shadow-sm">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:text-emerald-300">Apa itu Standar FHIR?</div>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">
+                    <b>FHIR</b> (Fast Healthcare Interoperability Resources) adalah standar internasional yang memungkinkan data kesehatan —
+                    rekam medis, hasil lab, resep obat, tanda vital — dapat dibaca secara aman lintas rumah sakit, klinik, dan aplikasi AI dalam satu "bahasa terpadu".
+                    Ini adalah fondasi yang memastikan rekam medis AI-EMR dan pemantauan longevity di Panaceamed.id aman, portabel, dan siap tersinkronisasi ke SATUSEHAT Kemenkes.
+                  </p>
                 </div>
               </Reveal>
-            ))}
-          </div>
-
-          {/* FHIR explainer */}
-          <Reveal delay={80}>
-            <div className="mt-8 rounded-2xl border border-brand/20 bg-brand-50 p-6">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">What is FHIR?</div>
-              <p className="mt-1.5 text-sm leading-relaxed text-neutral-700">
-                <b>FHIR</b> (Fast Healthcare Interoperability Resources) is the global standard that lets health data —
-                medical records, labs, medications, vital signs — be read across hospitals, apps, &amp; AI in one shared "language".
-                It's the foundation that makes AI-EMR &amp; measurable longevity at Panaceamed.id safe, portable, &amp; collaborative.
-              </p>
-            </div>
-          </Reveal>
+            </>
+          )}
 
           {/* Stem cells — the frontier of regenerative longevity */}
-          <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">The Regenerative Frontier</span>
-            <h3 className="mt-3 text-2xl font-extrabold">Stem Cells (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
-              Anti-aging's biggest promise: replacing damaged cells &amp; rejuvenating tissue. Three main types, from the most established to the most cutting-edge.
-            </p>
-          </Reveal>
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {STEM_CELLS.map((s, i) => (
-              <Reveal key={s.type} delay={(i % 3) * 80}>
-                <div className="liquid-glass flex h-full flex-col rounded-2xl p-5">
-                  <div className="flex items-center gap-2">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{s.emoji}</span>
-                    <div>
-                      <div className="font-extrabold text-ink">{s.type}</div>
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-dark">{s.short}</div>
-                    </div>
-                  </div>
-                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
-                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Applications:</b> {s.use}</div>
-                </div>
+          {(scienceTab === 'stem' || scienceTab === 'all') && (
+            <>
+              <Reveal className="mt-14 text-center">
+                <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+                  Frontier Kedokteran Regeneratif
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-ink">Sains Sel Punca (<span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Stem Cells</span>)</h3>
+                <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
+                  Potensi terbesar sains anti-penuaan: regenerasi sel yang rusak dan peremajaan jaringan tubuh. Tiga kategori utama dari yang paling matang secara klinis hingga riset terdepan.
+                </p>
               </Reveal>
-            ))}
-          </div>
-          <Reveal delay={80}>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
-              Potential vs. clinical maturity: <b>potential</b> is highest for embryonic &amp; iPSC (pluripotent) cells, while <b>clinical maturity</b> is highest for somatic cells.
-              Partial reprogramming research (Yamanaka factors) is now exploring <i>reversing the cell's biological clock</i> — the frontier of longevity science.
-              <br /><span className="opacity-70">For educational purposes only; stem cell therapy must be performed at licensed facilities &amp; in accordance with regulations.</span>
-            </p>
-          </Reveal>
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                {STEM_CELLS.map((s, i) => (
+                  <Reveal key={s.type} delay={(i % 3) * 80}>
+                    <div className="liquid-glass flex h-full flex-col justify-between rounded-2xl p-5 shadow-sm">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300">
+                            <s.icon size={20} />
+                          </span>
+                          <div>
+                            <div className="font-extrabold text-ink">{s.type}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-dark dark:text-emerald-400">{s.short}</div>
+                          </div>
+                        </div>
+                        <p className="mt-2.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{s.body}</p>
+                      </div>
+                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                        <b className="text-neutral-800 dark:text-neutral-100">Penerapan:</b> {s.use}
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+              <Reveal delay={80}>
+                <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
+                  Potensi vs. kematangan klinis: <b>potensi</b> paling tinggi ada pada sel pluripoten (iPSC &amp; embrionik), sementara <b>kematangan klinis</b> saat ini paling tinggi pada sel somatik dewasa.
+                  Riset reprogramming parsial (faktor Yamanaka) kini membuka jalan untuk membalikkan jam biologis seluler — batas terdepan ilmu longevity.
+                  <br /><span className="opacity-70">Hanya untuk tujuan edukasi ilmiah; terapi sel punca wajib dilakukan di fasilitas kesehatan berizin resmi sesuai regulasi Kemenkes.</span>
+                </p>
+              </Reveal>
+            </>
+          )}
 
           {/* Robotics in medicine */}
-          <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Machine Precision</span>
-            <h3 className="mt-3 text-2xl font-extrabold">Robotics in <span className="font-serif-display italic text-brand-dark">Medicine</span></h3>
-            <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">From precision surgical arms to nanorobots inside blood vessels — machines extend a doctor's reach, making care safer, less invasive, &amp; more affordable.</Prosa>
-          </Reveal>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {ROBOTICS.map((r, i) => (
-              <Reveal key={r.type} delay={(i % 2) * 80}>
-                <div className="liquid-glass flex h-full flex-col rounded-2xl p-5">
-                  <div className="flex items-center gap-2">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark"><r.icon size={18} /></span>
-                    <div>
-                      <div className="font-extrabold text-ink">{r.type}</div>
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-dark">{r.short}</div>
-                    </div>
-                  </div>
-                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{r.body}</p>
-                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Applications:</b> {r.use}</div>
-                </div>
+          {(scienceTab === 'robotics' || scienceTab === 'all') && (
+            <>
+              <Reveal className="mt-14 text-center">
+                <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+                  Presisi Robotik Medis
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-ink">Robotik dalam <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Dunia Medis</span></h3>
+                <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
+                  Dari lengan bedah mikro hingga navigasi intravaskular — mesin memperluas kapabilitas dokter, menjadikan penanganan medis lebih presisi, minim sayatan, dan mempercepat pemulihan pasien.
+                </Prosa>
               </Reveal>
-            ))}
-          </div>
-          <Reveal delay={80}>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
-              Robotics combined with <b>AI</b> (surgical navigation, real-time image analysis) &amp; <b>FHIR</b> (connected data) —
-              a pairing that defines Panaceamed.id's direction: technology that strengthens, rather than replaces, clinicians.
-              <br /><span className="opacity-70">Some technologies (nanorobots) are still in the research/clinical-trial stage.</span>
-            </p>
-          </Reveal>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {ROBOTICS.map((r, i) => (
+                  <Reveal key={r.type} delay={(i % 2) * 80}>
+                    <div className="liquid-glass flex h-full flex-col justify-between rounded-2xl p-5 shadow-sm">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300">
+                            <r.icon size={18} />
+                          </span>
+                          <div>
+                            <div className="font-extrabold text-ink">{r.type}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-dark dark:text-emerald-400">{r.short}</div>
+                          </div>
+                        </div>
+                        <p className="mt-2.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{r.body}</p>
+                      </div>
+                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                        <b className="text-neutral-800 dark:text-neutral-100">Penerapan:</b> {r.use}
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+              <Reveal delay={80}>
+                <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
+                  Sinergi robotik bersama <b>AI</b> (navigasi operasi real-time) dan <b>FHIR</b> (data terintegrasi) —
+                  mendefinisikan visi Panaceamed.id: teknologi yang memperkuat, bukan menggantikan, praktisi klinis berizin.
+                  <br /><span className="opacity-70">Sebagian teknologi (nanorobotik) masih berada dalam fase riset dan uji klinis lanjutan.</span>
+                </p>
+              </Reveal>
+            </>
+          )}
         </div>
       </section>
 
-      {/* ── ABOUT US & CONTACT ─────────────────────────────────────── */}
-      <section className="px-6 py-12 sm:px-10">
+      {/* ── INSTITUTIONAL GOVERNANCE & CORPORATE CONTACT ─────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+      <section id="about-us" className="border-t border-black/5 bg-[#fafcfb] px-6 py-20 dark:border-white/10 dark:bg-[#030d07] sm:px-10">
         <Reveal>
-          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-3">
+          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2.5rem] border border-black/5 bg-gradient-to-br from-white via-neutral-50/50 to-white p-8 shadow-sm dark:border-white/10 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 lg:grid-cols-3">
             <div>
-              <h2 className="text-2xl font-extrabold">About Us</h2>
-              <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600">Panaceamed.id is Indonesia's health & longevity superapp: AI handles initial intake & education, licensed doctors review it. Our mission is to make quality healthcare, chronic-disease monitoring, and current longevity science affordable for everyone — backed by responsible AI and compliance with Indonesia's Personal Data Protection Law (UU PDP).</Prosa>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:text-emerald-400">Tata Kelola Institusional</span>
+              <h2 className="mt-1 text-2xl font-extrabold text-ink dark:text-white">Tentang Panaceamed</h2>
+              <Prosa baris={8} kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                Panaceamed.id adalah platform integrasi data klinis dan kesehatan preventif jangka panjang: sistem AI-EMR memfasilitasi anamnesis awal terstruktur, dokter berizin melakukan telaah rekam medis. Misi kami menghadirkan layanan kesehatan presisi, pemantauan penyakit kronis, dan sains longevity teruji yang dapat diakses secara merata — berlandaskan kepatuhan penuh terhadap UU Perlindungan Data Pribadi (UU PDP No. 27/2022).
+              </Prosa>
+              <div className="mt-5 flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span>Terdaftar &amp; Mematuhi Regulasi Faskes RI</span>
+              </div>
             </div>
-            <div className="rounded-2xl bg-brand-50 p-5">
-              <h3 className="font-bold">Contact Us</h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li><span className="text-neutral-500">Email:</span> <a href="mailto:index.meds@gmail.com" className="font-semibold text-brand-dark hover:underline">index.meds@gmail.com</a></li>
-                <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
-                <li><span className="text-neutral-500">TikTok:</span> <a href="https://tiktok.com/@Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
+            <div className="rounded-3xl border border-brand/20 bg-brand-50/60 p-6 dark:bg-emerald-950/30">
+              <h3 className="font-extrabold text-ink dark:text-white">Kontak Korporat &amp; Faskes</h3>
+              <ul className="mt-4 space-y-3.5 text-sm">
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    <IconMail size={16} />
+                  </span>
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Dukungan Pengguna</span>
+                    <a href="mailto:support@panaceamed.id" className="font-bold text-brand-dark hover:underline dark:text-emerald-400">support@panaceamed.id</a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    <IconHospital size={16} />
+                  </span>
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Kemitraan Faskes</span>
+                    <a href="mailto:partnership@panaceamed.id" className="font-bold text-brand-dark hover:underline dark:text-emerald-400">partnership@panaceamed.id</a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    <IconBuilding size={16} />
+                  </span>
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Badan Hukum &amp; Kantor</span>
+                    <span className="font-semibold text-ink dark:text-neutral-200">PT Panacea Digital Nusantara</span>
+                    <span className="block text-xs text-neutral-600 dark:text-neutral-400">SCBD, Jl. Jend. Sudirman, Jakarta Selatan</span>
+                  </div>
+                </li>
               </ul>
             </div>
-            <div className="rounded-2xl bg-neutral-50 p-5">
-              <h3 className="font-bold">Founder Contact</h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li><span className="text-neutral-500">Name:</span> <b>Rizky Muhammad Azrissal</b></li>
-                <li><span className="text-neutral-500">Email:</span> <a href="mailto:Rizkyazhar486@gmail.com" className="font-semibold text-brand-dark hover:underline">Rizkyazhar486@gmail.com</a></li>
-                <li><span className="text-neutral-500">Phone:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
-                <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Rizkyazr4" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Rizkyazr4</a></li>
+            <div className="rounded-3xl border border-black/5 bg-neutral-50/80 p-6 dark:border-white/5 dark:bg-neutral-800/60">
+              <h3 className="font-extrabold text-ink dark:text-white">Direksi Riset &amp; Kanal Resmi</h3>
+              <ul className="mt-4 space-y-3.5 text-sm">
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    <IconStethoscope size={16} />
+                  </span>
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Lead Research</span>
+                    <b className="text-ink dark:text-white">Rizky Muhammad Azrissal</b>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    <IconGlobe size={16} />
+                  </span>
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Kanal Media Sosial Resmi</span>
+                    <div className="mt-2 space-y-2">
+                      <a
+                        href="https://instagram.com/Panaceamed.id"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs font-semibold text-neutral-700 hover:text-emerald-600 dark:text-neutral-300 dark:hover:text-emerald-400"
+                      >
+                        <IconInstagram size={14} className="text-emerald-600 dark:text-emerald-400" />
+                        <span>Instagram: <span className="font-bold">@Panaceamed.id</span></span>
+                      </a>
+                      <a
+                        href="https://tiktok.com/@Panaceamed.id"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs font-semibold text-neutral-700 hover:text-emerald-600 dark:text-neutral-300 dark:hover:text-emerald-400"
+                      >
+                        <IconTikTok size={14} className="text-emerald-600 dark:text-emerald-400" />
+                        <span>TikTok: <span className="font-bold">@Panaceamed.id</span></span>
+                      </a>
+                      <a
+                        href="https://linkedin.com/company/panaceamed"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs font-semibold text-neutral-700 hover:text-emerald-600 dark:text-neutral-300 dark:hover:text-emerald-400"
+                      >
+                        <IconLinkedIn size={14} className="text-emerald-600 dark:text-emerald-400" />
+                        <span>LinkedIn: <span className="font-bold">PT Panacea Digital Nusantara</span></span>
+                      </a>
+                    </div>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>
         </Reveal>
       </section>
 
-      {/* ── FINAL CTA ─────────────────────────────────────────── */}
-      <section className="px-6 pb-24 sm:px-10">
+      {/* ── FINAL CONVERSION CALL TO ACTION ──────────────────────── */}
+      <section className="px-6 pb-20 sm:px-10">
         <Reveal>
-          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] px-8 py-16 text-center shadow-2xl shadow-brand/30">
-            <div className="orb pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/15 blur-3xl" />
-            <div className="orb pointer-events-none absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
+          <div className="dark relative mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#00BF63] via-[#0b7a4b] to-[#043d24] px-8 py-16 text-center shadow-2xl shadow-brand/30">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-black/25" />
             <div className="relative">
-              <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">Start your <span className="font-serif-display italic">healthspan</span> journey</h2>
-              <p className="mx-auto mt-3 max-w-xl text-ink/85">
-                Free to try — choose your role and explore AI-assisted intake with optional clinician review.
+              <h2 className="text-3xl font-extrabold text-white sm:text-5xl tracking-tight">
+                Mulai Perjalanan <span className="font-serif-display italic drop-shadow-md" style={{ color: '#fef08a' }}>Kesehatan &amp; Usia Produktif</span> Anda
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-emerald-100 sm:text-base leading-relaxed">
+                Mulai gratis — jelajahi anamnesis terstruktur berbasis AI dengan verifikasi dan pengawasan dokter berizin.
               </p>
               <button
+                type="button"
                 onClick={onMasuk}
-                className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-8 pr-2 font-bold text-brand-dark shadow-[0_12px_30px_-8px_rgba(0,0,0,0.35)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
+                className="cta-banner-btn group mt-8 inline-flex items-center gap-3 rounded-full py-3.5 pl-8 pr-3 font-extrabold shadow-2xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+                style={{
+                  backgroundColor: '#ffffff',
+                  backgroundImage: 'none',
+                  color: '#052e16',
+                  boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8)',
+                }}
               >
-                <span>Sign In &amp; Try Now</span>
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-white transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                <span className="text-base font-black tracking-tight" style={{ color: '#052e16' }}>Mulai Gratis Sekarang</span>
+                <span
+                  className="cta-arrow-circle grid h-9 w-9 place-items-center rounded-full text-white transition-transform duration-300 group-hover:translate-x-1"
+                  style={{ backgroundColor: '#059669', color: '#ffffff' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </span>
               </button>
+
+              {/* Trust & compliance reassurance */}
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-emerald-100">
+                <span className="flex items-center gap-1.5"><IconCheck size={14} className="text-emerald-300" /> Akses Evaluasi Mandiri Tanpa Biaya</span>
+                <span className="flex items-center gap-1.5"><IconCheck size={14} className="text-emerald-300" /> Kepatuhan UU PDP No. 27/2022</span>
+                <span className="flex items-center gap-1.5"><IconCheck size={14} className="text-emerald-300" /> Standar HL7® FHIR Kemenkes</span>
+              </div>
             </div>
           </div>
         </Reveal>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-black/5 bg-white px-6 py-8 sm:px-10">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
-          <Wordmark size={28} />
-          <p className="text-xs text-neutral-500">
-            © {new Date().getFullYear()} Panaceamed.id · Longevity Medical-AI · AI supports, but never
-            replaces, licensed clinicians.
-          </p>
+      {/* ── ENTERPRISE INSTITUTIONAL FOOTER ───────────────────────── */}
+      <footer className="border-t border-black/5 bg-neutral-50/80 px-6 py-14 dark:border-white/10 dark:bg-neutral-950 sm:px-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-10 md:grid-cols-4">
+            <div className="md:col-span-1">
+              <Wordmark size={30} />
+              <p className="mt-3 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+                Panaceamed.id — AI-EMR &amp; Longevity OS Platform. Menghubungkan teknologi anamnesis presisi dengan pengawasan langsung dokter berizin.
+              </p>
+              <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Seluruh Sistem Beroperasi Normal</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Platform &amp; Solusi</h4>
+              <ul className="mt-3 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
+                <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI Intake (SOCRATES)</a></li>
+                <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI Longevity Calculator</a></li>
+                <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI-EMR for Clinicians</a></li>
+                <li><a href="#pricing" className="hover:text-brand-dark dark:hover:text-emerald-400">34 Skoring Medis Standar</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Standar &amp; Keamanan</h4>
+              <ul className="mt-3 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
+                <li><span>Pertukaran Data HL7® FHIR</span></li>
+                <li><span>Kepatuhan UU PDP No. 27/2022</span></li>
+                <li><span>Interoperabilitas SATUSEHAT Kemenkes</span></li>
+                <li><span>Ekonomi PanaceaToken</span></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Pemberitahuan Klinis &amp; Legal</h4>
+              <p className="mt-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                Keluaran teknis (Technical output). Belum ditinjau klinisi atau divalidasi klinis kecuali telah disahkan oleh dokter berizin. AI mendukung, namun tidak pernah menggantikan dokter berizin.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-black/5 pt-8 text-center text-xs text-neutral-500 dark:border-white/10 dark:text-neutral-400 sm:flex-row sm:text-left">
+            <p>© {new Date().getFullYear()} PT Panacea Digital Nusantara. Hak cipta dilindungi undang-undang.</p>
+            <p>Dibangun dengan presisi untuk masa depan kesehatan &amp; healthspan manusia.</p>
+          </div>
         </div>
       </footer>
     </div>
