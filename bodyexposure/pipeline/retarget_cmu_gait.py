@@ -190,7 +190,7 @@ for name, subj, trial in CLIPS:
     clamped = {}
     base_z = arm.location.z; bobs = []
     for j, t in enumerate(idx):
-        fr = j + 1
+        fr = j  # frame 0 → waktu glTF 0; kunci terakhir = pose awal pada t = siklus (loop tanpa jeda)
         for side in ("L", "R"):
             vals = {}
             for key in CLAMP:
@@ -206,7 +206,7 @@ for name, subj, trial in CLIPS:
             setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
         bobs.append(float(np.interp(t, np.arange(len(bob)), bob)) * unit_m * (leg_rig / leg_src))
     # kontak lantai: tinggi kaki terendah per frame pada pelvis dasar
-    sc = bpy.context.scene; sc.frame_start, sc.frame_end = 1, len(idx); sc.render.fps = FPS_OUT
+    sc = bpy.context.scene; sc.frame_start, sc.frame_end = 0, len(idx) - 1; sc.render.fps = FPS_OUT
     feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith("FOOT.")]
     def lowest_now():
         dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
@@ -215,36 +215,37 @@ for name, subj, trial in CLIPS:
             for i in range(0, len(vs), 7): low = min(low, (M @ vs[i].co).z)
         return low
     base_low = []
-    for fr in range(1, len(idx) + 1):
+    for fr in range(0, len(idx)):
         sc.frame_set(fr); base_low.append(lowest_now())
     if name == "WALK":  # selalu ada kaki menumpu: pelvis diturunkan/dinaikkan agar kaki terendah tepat di lantai
         zs = [-l for l in base_low]
-    else:  # lari punya fase melayang: naik-turun dari mocap, digeser agar titik terendah siklus tepat di lantai
+    else:  # lari punya fase melayang: naik-turun dari mocap (dikoreksi drift seperti sudut), digeser agar titik terendah siklus di lantai
+        n1 = len(bobs) - 1; bobs = [b - (bobs[-1] - bobs[0]) * k / n1 for k, b in enumerate(bobs)]
         c = -min(l + b for l, b in zip(base_low, bobs)); zs = [b + c for b in bobs]
-    for fr, z in enumerate(zs, start=1):
+    for fr, z in enumerate(zs, start=0):
         arm.location.z = base_z + z; arm.keyframe_insert("location", index=2, frame=fr)
     arm.location.z = base_z
     # ── QA siklus ini ───────────────────────────────────────────────────────
     lowest = []
-    for fr in range(1, len(idx) + 1):
+    for fr in range(0, len(idx)):
         sc.frame_set(fr); lowest.append(lowest_now())
     rngs = {key: [round(min(r[f"{key}.{s}"] for r in A[start:start + period + 1] for s in "LR"), 1),
                   round(max(r[f"{key}.{s}"] for r in A[start:start + period + 1] for s in "LR"), 1)] for key in CLAMP}
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from rig_contact_qa import sweep
-    contact = sweep(sc, list(range(1, len(idx) + 1, 2)), lambda at: name.lower())
+    contact = sweep(sc, list(range(0, len(idx), 2)), lambda at: name.lower())
     loop_err = max(abs(sample(f"{key}.{s}", idx[0]) - sample(f"{key}.{s}", idx[-1])) for key in CLAMP for s in "LR")
     drift_max = max(abs(v) for v in drift.values())
     report["clips"][name] = {
         "subject": subj, "trial": trial, "source_fps": 120, "cycle_start_frame": start, "cycle_frames_120fps": period,
-        "cycle_s": round(period / 120, 3), "frames_24fps": len(idx), "loop_seam_max_deg": round(loop_err, 2),
+        "cycle_s": round(period / 120, 3), "frames_24fps": len(idx), "keys_start_at_s": 0.0, "loop_seam_max_deg": round(loop_err, 2),
         "loop_drift_corrected_max_deg": round(drift_max, 2),
         "joint_angle_range_deg": rngs, "clamped_samples": clamped,
         "leg_length_m": {"rig": round(leg_rig, 3), "source": round(leg_src, 3)},
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}
     # rentang frame manual (bukan dari handle Bezier) & interpolasi linear: sampel 24 fps rapat, tanpa overshoot
-    act.use_frame_range = True; act.frame_start, act.frame_end = 1, len(idx)
+    act.use_frame_range = True; act.frame_start, act.frame_end = 0, len(idx) - 1
     fcs = act.fcurves if hasattr(act, "fcurves") else [fc for l in act.layers for st in l.strips for cb in st.channelbags for fc in cb.fcurves]
     for fc in fcs:
         for kp in fc.keyframe_points: kp.interpolation = 'LINEAR'
