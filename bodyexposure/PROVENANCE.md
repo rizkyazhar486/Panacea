@@ -274,3 +274,22 @@ EIA-0196217." The acknowledgement appears in the app's Motion panel and in `publ
 
 Truth class: **measured-retargeted**. This is the recorded motion of another person, mapped onto the Z-Anatomy
 skeleton. It is not the motion of the anatomy shown and not patient biomechanics.
+
+## Female rig source survey (2026-10-09) — no production import
+
+Checked against the publishers' pages on 2026-10-09; nothing below was downloaded or imported.
+
+| Candidate | Verified | Consequence for a female rig |
+|---|---|---|
+| BodyParts3D 4.0 (DBCLS) | The database description states "a three-dimensional whole-body model for an adult human male". Licence is CC BY. Download page offers `isa_BP3D_4.0_obj_99.zip` (136 MB) and `partof_BP3D_4.0_obj_99.zip` (62 MB), 99 % polygon-reduced. Nothing on either page mentions female. | **Male only.** It must not be used or relabelled as female anatomy. It remains the male gut-audit source. |
+| NLM Visible Human Female | Cryosection and CT images (about 40 GB, 0.33 mm spacing), no registration. NLM Terms and Conditions require "Courtesy of the U.S. National Library of Medicine", forbid implying NLM endorsement, and require either current data or a clear notice that it is not current. Commercial use is not prohibited, but NLM gives no legal advice. | Images, not meshes: every bone would need our own segmentation, then review. The HuBMAP `VH_Female` mesh already published here derives from the same subject, but has no axial skeleton. |
+| DIR-Lab 4DCT | Published as a public lung-registration benchmark (10 cases, 10 respiratory phases, landmark pairs). **Licence and redistribution terms NOT VERIFIED**: the site did not respond to the fetch. | Research and validation use only until the terms are read. Not a source of production geometry. |
+| ICRP Publication 145 `MRCP_AF` (already published, v011) | Complete female body with axial skeleton, airways and lungs. Bones are grouped by region (for example "Ribs cortical" is one mesh). | Cannot drive a per-bone rig: individual vertebrae, ribs and limb bones are not separate objects. |
+
+**Result:** no currently available, licensed source supplies individually separated female bones. Splitting the ICRP
+regional meshes would mean inventing the boundaries between neighbouring bones, which this project does not do.
+`clinically_reviewed` stays `false` for every body.
+
+Unblocking options that stay within the rules: (1) a mesh set with separated female bones and a confirmed licence;
+(2) segmenting the Visible Human Female CT ourselves, then having a qualified anatomist review it; (3) a published
+ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms before any 4DCT use.
