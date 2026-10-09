@@ -5,7 +5,7 @@
  * adalah kewarasan masukan (bukan ambang klinis). Kolom kosong ditolak, bukan dibaca 0: halaman lama menampilkan BMI "Infinity"
  * untuk tinggi 0, "NaN SD" untuk berat lahir 0, dan z-score ekstrem untuk berat kosong.
  */
-import { inRange } from './inputs'
+import { inRange, parseNumberField } from './inputs'
 
 export const WHO_AGE_MONTHS = { min: 0, max: 60 } as const
 export const WHO_WEIGHT_KG = { min: 0.5, max: 60 } as const
@@ -39,4 +39,13 @@ export function validateNeonateInputs(birthWeightG: number, days: number, curren
 export function validateCdcInputs(ageYears: number, weightKg: number, heightCm: number): GrowthInputsResult<{ ageYears: number; weightKg: number; heightCm: number }> {
   const problem = firstProblem([['Age', ageYears, CDC_AGE_YEARS, 'years'], ['Weight', weightKg, CDC_WEIGHT_KG, 'kg'], ['Height', heightCm, CDC_HEIGHT_CM, 'cm']])
   return problem ? { ok: false, reason: problem } : { ok: true, data: { ageYears, weightKg, heightCm } }
+}
+
+/**
+ * Satu kunjungan pelacak pertumbuhan dari teks kolom. Usia kosong BUKAN 0 bulan (bayi baru lahir adalah pengukuran sah, bukan
+ * "belum diisi"): dulu halaman membaca usia kosong sebagai 0 dan mencatat kunjungan lahir tanpa ada yang mengetik usia.
+ */
+export function parseWhoVisit(ageText: string, weightText: string, heightText: string): GrowthInputsResult<{ ageMo: number; weightKg: number; heightCm: number }> {
+  const r = validateWhoGrowthInputs(parseNumberField(ageText), parseNumberField(weightText), parseNumberField(heightText))
+  return r.ok ? { ok: true, data: { ageMo: r.data.ageMonths, weightKg: r.data.weightKg, heightCm: r.data.lengthCm } } : r
 }

@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconChartUp } from '../components/icons'
+import { parseWhoVisit } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child Growth Tracker — longitudinal weight-for-age & height-for-age
@@ -54,9 +55,11 @@ function zClass(z: number): { label: string; tone: 'brand' | 'low' | 'critical' 
 
 export function ChildGrowthTracker() {
   const [state, setState] = useState(load)
-  const [ageMo, setAgeMo] = useState(0)
-  const [weightKg, setWeightKg] = useState(0)
-  const [heightCm, setHeightCm] = useState(0)
+  // Teks mentah: usia kosong bukan 0 bulan; mesin domain menolak kosong/di luar rentang dengan alasan.
+  const [ageText, setAgeText] = useState('')
+  const [weightText, setWeightText] = useState('')
+  const [heightText, setHeightText] = useState('')
+  const [visitError, setVisitError] = useState<string | null>(null)
 
   function persist(next: typeof state) {
     setState(next)
@@ -64,11 +67,13 @@ export function ChildGrowthTracker() {
   }
 
   function addVisit() {
-    if (weightKg <= 0 || heightCm <= 0) return
-    const visit: Visit = { id: Math.random().toString(36).slice(2), ageMo, weightKg, heightCm }
+    const parsed = parseWhoVisit(ageText, weightText, heightText)
+    if (!parsed.ok) { setVisitError(parsed.reason); return }
+    setVisitError(null)
+    const visit: Visit = { id: Math.random().toString(36).slice(2), ...parsed.data }
     const visits = [...state.visits, visit].sort((a, b) => a.ageMo - b.ageMo)
     persist({ ...state, visits })
-    setWeightKg(0); setHeightCm(0)
+    setAgeText(''); setWeightText(''); setHeightText('')
   }
 
   function removeVisit(id: string) {
@@ -119,16 +124,17 @@ export function ChildGrowthTracker() {
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Log a visit</div>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Age (months)">
-            <input className={inputClass} type="number" min={0} max={60} value={ageMo || ''} onChange={(e) => setAgeMo(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} max={60} value={ageText} onChange={(e) => setAgeText(e.target.value)} />
           </Field>
           <Field label="Weight (kg)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={weightText} onChange={(e) => setWeightText(e.target.value)} />
           </Field>
           <Field label="Height (cm)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={heightCm || ''} onChange={(e) => setHeightCm(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={heightText} onChange={(e) => setHeightText(e.target.value)} />
           </Field>
         </div>
-        <Button onClick={addVisit} disabled={weightKg <= 0 || heightCm <= 0} className="mt-3 w-full sm:w-auto">Add visit</Button>
+        {visitError !== null && <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{visitError}.</p>}
+        <Button onClick={addVisit} className="mt-3 w-full sm:w-auto">Add visit</Button>
 
         {state.visits.length > 0 && (
           <div className="mt-4 space-y-1.5">
