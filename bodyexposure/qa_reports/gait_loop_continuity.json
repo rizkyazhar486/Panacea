@@ -1,0 +1,148 @@
+{
+ "source": "/Users/rizkyazhar/.claude/jobs/76008e85/tmp/gait_fixed_decoded.glb",
+ "clips": {
+  "RUN": {
+   "duration_s": 0.75,
+   "keys": 19,
+   "rotation_channels": 14,
+   "animated_rotation_channels": 10,
+   "max_seam_deg": 0.0,
+   "worst_seam_bone": "UPPER_ARM.R",
+   "max_omega_jump_deg_s": 250.7,
+   "worst_omega_jump_bone": "SHIN.R",
+   "median_omega_jump_deg_s": 85.1,
+   "seam_jump_over_interior_p95": {
+    "UPPER_ARM.L": 0.85,
+    "FOREARM.L": 0.87,
+    "UPPER_ARM.R": 0.14,
+    "FOREARM.R": 0.19,
+    "THIGH.L": 0.28,
+    "SHIN.L": 0.37,
+    "FOOT.L": 0.22,
+    "THIGH.R": 0.65,
+    "SHIN.R": 0.52,
+    "FOOT.R": 0.09
+   },
+   "seam_jump_over_interior_max": {
+    "UPPER_ARM.L": 0.83,
+    "FOREARM.L": 0.77,
+    "UPPER_ARM.R": 0.1,
+    "FOREARM.R": 0.14,
+    "THIGH.L": 0.23,
+    "SHIN.L": 0.33,
+    "FOOT.L": 0.17,
+    "THIGH.R": 0.49,
+    "SHIN.R": 0.37,
+    "FOOT.R": 0.05
+   },
+   "bones_seam_jump_above_interior_max": [],
+   "median_mean_angular_speed_deg_s": 153.7,
+   "translation": {
+    "RIG.ADULT_MALE": {
+     "drift_m": 0.0,
+     "vel_jump_m_s": 0.3326,
+     "range_m": [
+      0.0,
+      0.0784,
+      0.0
+     ]
+    }
+   },
+   "ankle_stance": {
+    "intervals": 7,
+    "mean_ap_velocity_m_s": -2.577,
+    "cv": 0.194,
+    "p10_p90_m_s": [
+     -2.92,
+     -2.11
+    ],
+    "note": "EXPERIMENTAL. In-place clip: a supporting ankle moves backward relative to the pelvis, so foot sliding can only be judged against a root speed that the viewer does not yet apply. Stance is approximated by ankle height (no toe or heel bone), which also admits swing intervals in WALK; read the RUN figure with care and treat WALK as not verified"
+   }
+  },
+  "WALK": {
+   "duration_s": 1.0833,
+   "keys": 27,
+   "rotation_channels": 14,
+   "animated_rotation_channels": 10,
+   "max_seam_deg": 0.0,
+   "worst_seam_bone": "THIGH.L",
+   "max_omega_jump_deg_s": 132.1,
+   "worst_omega_jump_bone": "SHIN.L",
+   "median_omega_jump_deg_s": 24.2,
+   "seam_jump_over_interior_p95": {
+    "UPPER_ARM.L": 0.43,
+    "FOREARM.L": 0.06,
+    "UPPER_ARM.R": 0.21,
+    "FOREARM.R": 0.62,
+    "THIGH.L": 0.57,
+    "SHIN.L": 0.51,
+    "FOOT.L": 0.13,
+    "THIGH.R": 0.21,
+    "SHIN.R": 0.35,
+    "FOOT.R": 0.09
+   },
+   "seam_jump_over_interior_max": {
+    "UPPER_ARM.L": 0.27,
+    "FOREARM.L": 0.04,
+    "UPPER_ARM.R": 0.14,
+    "FOREARM.R": 0.48,
+    "THIGH.L": 0.33,
+    "SHIN.L": 0.35,
+    "FOOT.L": 0.12,
+    "THIGH.R": 0.12,
+    "SHIN.R": 0.12,
+    "FOOT.R": 0.08
+   },
+   "bones_seam_jump_above_interior_max": [],
+   "median_mean_angular_speed_deg_s": 95.0,
+   "translation": {
+    "RIG.ADULT_MALE": {
+     "drift_m": 0.0,
+     "vel_jump_m_s": 0.1211,
+     "range_m": [
+      0.0,
+      0.0507,
+      0.0
+     ]
+    }
+   },
+   "ankle_stance": {
+    "intervals": 31,
+    "mean_ap_velocity_m_s": -0.604,
+    "cv": 2.121,
+    "p10_p90_m_s": [
+     -1.39,
+     2.1
+    ],
+    "note": "EXPERIMENTAL. In-place clip: a supporting ankle moves backward relative to the pelvis, so foot sliding can only be judged against a root speed that the viewer does not yet apply. Stance is approximated by ankle height (no toe or heel bone), which also admits swing intervals in WALK; read the RUN figure with care and treat WALK as not verified"
+   }
+  }
+ },
+ "transition_pose_jump": {
+  "ROM->RUN": {
+   "max_deg": 117.0,
+   "worst_bone": "FOREARM.L"
+  },
+  "ROM->WALK": {
+   "max_deg": 68.8,
+   "worst_bone": "SHIN.R"
+  },
+  "RUN->ROM": {
+   "max_deg": 117.0,
+   "worst_bone": "FOREARM.L"
+  },
+  "RUN->WALK": {
+   "max_deg": 102.4,
+   "worst_bone": "FOREARM.L"
+  },
+  "WALK->ROM": {
+   "max_deg": 68.8,
+   "worst_bone": "SHIN.R"
+  },
+  "WALK->RUN": {
+   "max_deg": 102.4,
+   "worst_bone": "FOREARM.L"
+  }
+ },
+ "transition_note": "pose jump between the first keys of two clips; the viewer currently cuts between clips without a crossfade, so this is the visible pop at a switch"
+}
