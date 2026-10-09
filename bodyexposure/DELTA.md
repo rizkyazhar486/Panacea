@@ -105,9 +105,25 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 - New **LOD4** (`export_web_lods.py --lods LOD4`): per-system triangle budgets. Within each system every structure keeps a floor of 8 triangles, so none disappear, and the rest is shared in proportion to surface area. The default-visible systems (surface, skeletal, cardiovascular, respiratory, digestive, urinary, reproductive) sum to ≤ 80,000 triangles per body.
 - Non-manifold edges (for example the cavernous sinus and falx cerebri sheets) blocked collapse decimation. LOD4 export splits those edges on a temporary copy, with identical vertex positions. The master is unchanged.
-- Measured: adult male initial load 79,723 triangles (all systems 135,711), adult female 77,222. Paediatric and ICRP bodies already fit at LOD3 (32,000–44,000). Shape error per structure is in `web/lod_report.json`; for example, the scapula has 0.2 mm mean and 0.9 mm max.
+- Measured, after the bbox-escape gate below: adult male initial load 77,956 triangles (all systems 133,412), adult female 77,922 (127,661). Paediatric and ICRP bodies already fit at LOD3 (32,000–44,000). Shape error per structure is in `web/lod_report.json`; for example, the scapula has 0.2 mm mean and 0.9 mm max.
 - **App:**
   - Light (default on every screen) uses LOD4 where it exists.
   - Systems now load incrementally: only enabled systems on first load, others when switched on.
   - Search uses a per-body index (`<tag>.index.json`), so structures in unloaded systems are still found; selecting one loads its system first.
 - **Gates:** `pipeline/check_web_budget.py` counts triangles from the published GLBs and fails above 80,000. The browser check asserts the initial load is ≤ 80k and covers lazy loading (sciatic nerve from the unloaded nervous system).
+
+## Decimation safety gate and 2M render proxy (2026-10-09)
+
+- **Bbox-escape gate** (`pipeline/lod_budget.py`): collapse decimation can move vertices outside a structure's own bounding box. On non-manifold meshes whose edges were split, it can explode them by tens of metres; the cavernous sinus reached 49 m at some ratios. Any structure that leaves its source bbox by more than max(3 mm, 5 % of its diagonal) is fixed in steps:
+  1. the decimation ratio is relaxed (×2, ×4, ×8);
+  2. if that fails, the unsplit mesh is used;
+  3. if that also fails, the structure is not decimated.
+  The extra triangles are absorbed by the other structures in the same system. `export_web_lods.py` then refuses to write any GLB that still escapes.
+- The re-exported LOD4 replaces the earlier one. That earlier one was not exploded (no mesh over 1 m), but some thin vessels sat up to about 15 mm outside their bbox. To stay at or under 80k without loosening the tolerance, the adult male gets tighter non-vascular budgets: its 677 vessels need about 45,800 triangles. Skeletal error is still small (scapula 0.37 mm mean, 2 mm max).
+- **2M render proxy** (`pipeline/build_render_proxy.py` → `bodies/PANACEA_RENDER_2M_ADULT_MALE.blend`, local; report `manifest/render_proxy_adult_male.json`):
+  - 11,541,912 → 2,022,441 triangles over 3,877 structures. The budget is 2,000,000; the overshoot comes from structures the bbox gate relaxed.
+  - Shape error: median of per-structure mean 0.055 mm; 95th percentile of per-structure max 1.046 mm. The worst outliers are thin attachment-area meshes, listed in the report.
+  - Smart UV on all 3,877 structures.
+  - 42 tissue materials upgraded to procedural PBR derived from geometry: object-space albedo and roughness variation, micro bump, and cavity darkening from pointiness. This is appearance only, not measured tissue texture; each material carries `panacea_material_note`. No fibre direction, pores or patterns were invented.
+- **8K render** (`pipeline/render_8k.py`, 7680×4320): anterior deep view (translucent skin) beside the muscle layer. The JPEG is in `renders/`; the 16-bit PNG stays local.
+- Not yet: baked texture maps (the procedural materials are resolution-independent, so 8K renders need no texture files), proxies for the other bodies, and animation.
