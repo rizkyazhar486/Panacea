@@ -77,4 +77,7 @@ assert.ok(lines.includes('{!res.ok ? ('), 'halaman harus bercabang pada hasil te
 assert.ok(lines.some((l) => l.includes('{res.reason}')))
 assert.equal(lines.filter((l) => l.includes('res.data.')).length >= 6, true)
 
+// Regresi: umur bawaan (45/40) tidak boleh disulihkan; hanya umur tersimpan.
+assert.ok(!/\bgetDemo\(\)/.test(src) && src.includes('getDemoTersimpan()'), 'halaman tidak boleh memakai getDemo()')
+
 console.log('aa-gradient: hand values, boundaries, fail-closed input ranges, empty PaO2 no longer reads as elevated')

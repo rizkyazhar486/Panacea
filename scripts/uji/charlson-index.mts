@@ -82,4 +82,7 @@ assert.ok(lines.includes('{!res.ok ? ('))
 assert.ok(lines.some((l) => l.includes('{res.reason}')))
 assert.ok(lines.includes('const res = charlsonIndex(parseNumberField(age), checked)'))
 
+// Regresi: umur bawaan (45/40) tidak boleh disulihkan; hanya umur tersimpan.
+assert.ok(!/\bgetDemo\(\)/.test(src) && src.includes('getDemoTersimpan()'), 'halaman tidak boleh memakai getDemo()')
+
 console.log('charlson-index: independent survival reference, exclusive pairs, exact age/tone cutoffs, 11264-case old-page regression, empty age fails closed')
