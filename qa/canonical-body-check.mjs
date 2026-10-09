@@ -113,6 +113,17 @@ try {
       await page.getByRole('button', { name: /^ribs cortical/i }).first().click()
       await page.getByText(/^ICRP\.ADULT\.FEMALE\.SKELETAL\.RIBS_CORTICAL$/).waitFor()
       await page.getByText(/Source: ICRP Publication 145/).waitFor()
+      // varian tungkai bawah Visible Human Female (Denver): satu individu, bukan atlas, hanya panggul sampai kaki
+      await page.getByRole('radio', { name: 'Visible Human lower limb (Denver)' }).click()
+      await page.getByText(/^128 structures$/).waitFor({ timeout: 60000 })
+      await page.getByText(/pelvis to feet only/).waitFor()
+      await page.getByTestId('variant-individual').getByText(/One individual from source data/).waitFor()
+      assert(!(await page.getByText(/stature \d+ cm/).count()), 'partial body must not show a stature')
+      await page.getByLabel('Find a structure').fill('femur')
+      await page.getByRole('button', { name: /^femur/i }).first().click()
+      await page.getByText(/^VHF_LOWER_LIMB\.ADULT\.FEMALE\.SKELETAL\.FEMUR\.[LR]$/).waitFor({ timeout: 60000 })
+      await page.getByText(/Source: Andreassen et al/).waitFor()
+      await page.screenshot({ path: `/private/tmp/canonical-vhf-lower-limb-${width}-${theme}.png`, fullPage: true })
       // anak: varian 5 th & 10 th, laki-laki & perempuan
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()

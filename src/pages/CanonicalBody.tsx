@@ -29,7 +29,7 @@ interface BodyEntry {
   source_requirement: string | null
   redistribution?: string | null
   structures: number
-  variants?: Array<{ body_id: string; structures: number; stature_m: number; label?: string; status?: string; source?: string }>
+  variants?: Array<{ body_id: string; structures: number; stature_m?: number | null; label?: string; status?: string; source?: string; coverage?: string; individual?: string }>
 }
 // light_lod: LOD ringan per berkas tubuh (LOD4 = budget ≤ 80.000 segitiga tampilan awal bila tersedia)
 // motion: rig beranimasi per berkas tubuh (GLB kerangka + timeline JSON berlabel simulasi)
@@ -720,8 +720,10 @@ export function CanonicalBody() {
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-neutral-600 dark:text-neutral-300">
             <Badge tone={statusTone(activeVariant?.status ?? body.status)}>{(activeVariant?.status ?? body.status).replaceAll('_', ' ')}</Badge>
             <span>{(activeVariant?.structures ?? body.structures).toLocaleString('en')} structures</span>
-            {activeVariant && <span>· stature {Math.round(activeVariant.stature_m * 100)} cm</span>}
+            {typeof activeVariant?.stature_m === 'number' && <span>· stature {Math.round(activeVariant.stature_m * 100)} cm</span>}
+            {activeVariant?.coverage && <span>· {activeVariant.coverage}</span>}
             {(activeVariant?.source ?? body.source) && <span className="min-w-0 truncate">· {activeVariant?.source ?? body.source}</span>}
+            {activeVariant?.individual && <span className="basis-full" data-testid="variant-individual">{activeVariant.individual}</span>}
           </div>
         )}
       </Card>
@@ -944,7 +946,7 @@ export function CanonicalBody() {
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
         Adult male: Z-Anatomy / BodyParts3D (CC BY-SA 4.0), with reconstructed intervertebral discs and pericardium.
-        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Neonate to adolescent: ICRP
+        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Lower-limb variant: University of Denver segmentation of the same donor (CC BY 4.0), courtesy of the U.S. National Library of Medicine. Neonate to adolescent: ICRP
         Publication 156 paediatric reference phantoms, built from CT images of real children. Bodies marked “not yet”
         need source anatomy that this project does not have; they are not built by scaling an adult body.
       </p>
