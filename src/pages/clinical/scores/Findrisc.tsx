@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
+import { findrisc as hitungFindrisc, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FINDRISC — Finnish Diabetes Risk Score. Lindström, J. & Tuomilehto, J.
@@ -13,21 +14,6 @@ import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
 // widely used, validated diabetes-prevention screening tools worldwide.
 // Pure checklist scoring, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
-
-function agePts(a: number): number { return a < 45 ? 0 : a <= 54 ? 2 : a <= 64 ? 3 : 4 }
-function bmiPts(bmi: number): number { return bmi < 25 ? 0 : bmi <= 30 ? 1 : 3 }
-function waistPts(cm: number, sex: 'M' | 'F'): number {
-  if (sex === 'M') return cm < 94 ? 0 : cm <= 102 ? 3 : 4
-  return cm < 80 ? 0 : cm <= 88 ? 3 : 4
-}
-
-function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; risk: string } {
-  if (score < 7) return { label: 'Low', tone: 'brand', risk: '~1% develop diabetes within 10 years' }
-  if (score <= 11) return { label: 'Slightly elevated', tone: 'brand', risk: '~4% develop diabetes within 10 years' }
-  if (score <= 14) return { label: 'Moderate', tone: 'low', risk: '~17% develop diabetes within 10 years' }
-  if (score <= 20) return { label: 'High', tone: 'critical', risk: '~33% develop diabetes within 10 years' }
-  return { label: 'Very high', tone: 'critical', risk: '~50% develop diabetes within 10 years' }
-}
 
 export function Findrisc() {
   // Usia 45, IMT 24 dan lingkar pinggang 90 adalah tiga PENGUKURAN, bukan
@@ -41,12 +27,13 @@ export function Findrisc() {
   // keduanya pertanyaan ya/tidak yang jawabannya bernilai nol poin, sama
   // seperti kotak centang yang tidak dicentang.
   const demo = getDemoTersimpan()
-  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
-  const [bmi, setBmi] = useState(() => {
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [ageText, setAge] = useState(demo.age && demo.age > 0 ? String(demo.age) : '')
+  const [bmiText, setBmi] = useState(() => {
     const w = demo.weightKg, h = demo.heightCm
-    return w && w > 0 && h && h > 0 ? +(w / ((h / 100) ** 2)).toFixed(1) : 0
+    return w && w > 0 && h && h > 0 ? (w / ((h / 100) ** 2)).toFixed(1) : ''
   })
-  const [waist, setWaist] = useState(0)
+  const [waistText, setWaist] = useState('')
   const [sex, setSex] = useState<'M' | 'F'>(demo.sex === 'F' ? 'F' : 'M')
   const [active, setActive] = useState(true)
   const [veg, setVeg] = useState(true)
@@ -54,16 +41,14 @@ export function Findrisc() {
   const [highGlucose, setHighGlucose] = useState(false)
   const [family, setFamily] = useState<0 | 3 | 5>(0)
 
-  const belum: string[] = []
-  if (!(age > 0)) belum.push('age')
-  if (!(bmi > 0)) belum.push('BMI')
-  if (!(waist > 0)) belum.push('waist circumference')
-  const lengkap = belum.length === 0
-
-  const score =
-    agePts(age) + bmiPts(bmi) + waistPts(waist, sex) +
-    (active ? 0 : 2) + (veg ? 0 : 1) + (bpMed ? 2 : 0) + (highGlucose ? 5 : 0) + family
-  const result = lengkap ? band(score) : null
+  const hasil = hitungFindrisc({
+    age: parseNumberField(ageText), bmi: parseNumberField(bmiText), waist: parseNumberField(waistText),
+    sex, active, veg, bpMed, highGlucose, family,
+  })
+  const belum = hasil.missing
+  const lengkap = hasil.score !== null
+  const score = hasil.score ?? 0
+  const result = hasil.band
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -73,7 +58,7 @@ export function Findrisc() {
         <BatasKlaimKesehatan permukaan="screening.findrisc" />
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
-            <input className={inputClass} type="number" value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" value={ageText} onChange={(e) => setAge(e.target.value)} />
           </Field>
           <Field label="Sex">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
@@ -82,10 +67,10 @@ export function Findrisc() {
             </select>
           </Field>
           <Field label="BMI (kg/m²)">
-            <input className={inputClass} type="number" step="0.1" value={bmi || ''} onChange={(e) => setBmi(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" value={bmiText} onChange={(e) => setBmi(e.target.value)} />
           </Field>
           <Field label="Waist circumference (cm)">
-            <input className={inputClass} type="number" value={waist || ''} onChange={(e) => setWaist(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" value={waistText} onChange={(e) => setWaist(e.target.value)} />
           </Field>
         </div>
         <div className="mt-3 space-y-2">
@@ -109,6 +94,9 @@ export function Findrisc() {
             </select>
           </Field>
         </div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       <Card className="!p-5">
@@ -127,7 +115,7 @@ export function Findrisc() {
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No score yet. Still needed: {belum.join(', ')}.
+            No score yet. {belum.length > 0 ? `Still needed: ${belum.join(', ')}.` : 'Check the highlighted values above.'}
             {' '}The lifestyle questions above are already answered and worth zero points, but age, BMI and waist are
             measurements — filling them in would produce a ten-year diabetes percentage for a body nobody measured.
           </p>
