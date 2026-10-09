@@ -83,3 +83,5 @@ export { news2, news2Band, NEWS2_RANGES, rrPoints, spo2Points, sbpPoints as news
 export type { News2Input, News2Result, News2Band, News2Row } from './engine/news2'
 export { fena, fenaBand, FENA_RANGES } from './engine/fena'
 export type { FenaInput, FenaResult, FenaBand } from './engine/fena'
+export { cockcroftGault, cgBand, devineIbwKg, CG_RANGES } from './engine/cockcroftGault'
+export type { CgInput, CgResult, CgBand, CgSex, CgWeightBasis } from './engine/cockcroftGault'
