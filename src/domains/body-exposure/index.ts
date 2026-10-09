@@ -75,6 +75,8 @@ export {
   FRAME_BUDGET_MS,
   frameStats,
   nextAutoPreset,
+  stepAuto,
+  type AutoState,
   initialPreset,
   effectivePixelRatio,
   type QualityPreset,

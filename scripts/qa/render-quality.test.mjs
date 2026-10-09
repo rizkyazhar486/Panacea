@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, QUALITY_PRESETS } from '../../src/domains/body-exposure/engine/renderQuality.ts'
+import { frameStats, nextAutoPreset, stepAuto, initialPreset, effectivePixelRatio, QUALITY_PRESETS } from '../../src/domains/body-exposure/engine/renderQuality.ts'
 
 const steady = (ms, n = 100) => Array.from({ length: n }, () => ms)
 
@@ -67,4 +67,40 @@ test('pixel_ratio_dibatasi_preset', () => {
   assert.equal(effectivePixelRatio(3, 'performance'), 1)
   assert.equal(effectivePixelRatio(1, 'ultra'), 1)
   assert.equal(effectivePixelRatio(Number.NaN, 'balanced'), 1)
+})
+
+const S0 = (preset) => ({ preset, overBudget: 0, atVsync: 0 })
+
+test('histeresis_satu_hentakan_tidak_menurunkan', () => {
+  const a = stepAuto(S0('ultra'), frameStats(steady(40)))
+  assert.deepEqual(a, { preset: 'ultra', overBudget: 1, atVsync: 0 })
+  const b = stepAuto(a, frameStats(steady(16)))   // pulih: hitungan direset
+  assert.equal(b.preset, 'ultra'); assert.equal(b.overBudget, 0)
+})
+
+test('histeresis_dua_evaluasi_lambat_menurunkan', () => {
+  const a = stepAuto(stepAuto(S0('ultra'), frameStats(steady(40))), frameStats(steady(40)))
+  assert.deepEqual(a, { preset: 'balanced', overBudget: 0, atVsync: 0 })
+})
+
+test('histeresis_pulih_di_layar_60hz_setelah_tiga_evaluasi_vsync', () => {
+  let s = S0('performance')
+  for (let k = 0; k < 2; k++) s = stepAuto(s, frameStats(steady(1000 / 60)))
+  assert.equal(s.preset, 'performance')
+  s = stepAuto(s, frameStats(steady(1000 / 60)))
+  assert.equal(s.preset, 'balanced')
+})
+
+test('histeresis_batas_atas_dan_bawah', () => {
+  let s = S0('ultra')
+  for (let k = 0; k < 5; k++) s = stepAuto(s, frameStats(steady(16)))
+  assert.equal(s.preset, 'ultra')
+  s = S0('performance')
+  for (let k = 0; k < 5; k++) s = stepAuto(s, frameStats(steady(40)))
+  assert.equal(s.preset, 'performance')
+})
+
+test('histeresis_tanpa_statistik_tidak_berubah', () => {
+  const s = { preset: 'balanced', overBudget: 1, atVsync: 2 }
+  assert.equal(stepAuto(s, null), s)
 })

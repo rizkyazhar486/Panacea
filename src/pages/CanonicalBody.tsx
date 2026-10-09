@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
+import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -201,7 +201,8 @@ export function CanonicalBody() {
     const root = new THREE.Group(); scene.add(root)
     // pencahayaan lingkungan studio netral (prosedural, tanpa aset luar) untuk preset ultra/balanced
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const room = new RoomEnvironment()
+    const envTex = pmrem.fromScene(room, 0.04).texture
     const applyQuality = (p: QualityPreset) => {
       renderer.setPixelRatio(effectivePixelRatio(window.devicePixelRatio, p))
       scene.environment = QUALITY_PRESETS[p].environment ? envTex : null
@@ -228,6 +229,7 @@ export function CanonicalBody() {
     // frame time hanya dari frame yang dirender berturut-turut (render sesuai kebutuhan: jeda bukan beban GPU)
     const samples: number[] = []
     let renderedLast = false, lastEval = 0
+    let autoState: AutoState = { preset: qualityRef.current.active, overBudget: 0, atVsync: 0 }
     const timer = new THREE.Timer(); timer.connect(document)  // Page Visibility: tab tersembunyi tidak menumpuk waktu
 
     const resize = () => {
@@ -253,8 +255,9 @@ export function CanonicalBody() {
         const st = frameStats(samples); setFps(st)
         const q = qualityRef.current
         if (q.choice === 'auto') {
-          const next = nextAutoPreset(q.active, st)
-          if (next !== q.active) { q.active = next; applyQuality(next); setQualityActive(next); samples.length = 0 }
+          const prev = q.active
+          autoState = stepAuto({ ...autoState, preset: prev }, st)
+          if (autoState.preset !== prev) { q.active = autoState.preset; applyQuality(autoState.preset); setQualityActive(autoState.preset); samples.length = 0 }
         }
       }
     })
@@ -289,7 +292,7 @@ export function CanonicalBody() {
     return () => {
       penjaga.lepas()
       timer.disconnect()
-      envTex.dispose(); pmrem.dispose()
+      envTex.dispose(); pmrem.dispose(); room.dispose()
       ro.disconnect()
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
@@ -725,7 +728,7 @@ export function CanonicalBody() {
           </div>
         )}
         {fps && (  // frame time terukur dari render kontinu (rata-rata & 1 % terendah), juga saat mode gerak
-          <div className="pointer-events-none absolute right-3 top-14 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70" data-testid="fps-readout">
+          <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70" data-testid="fps-readout">
             {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}
           </div>
         )}

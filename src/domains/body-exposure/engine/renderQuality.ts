@@ -46,6 +46,27 @@ export function nextAutoPreset(current: QualityPreset, stats: FrameStats | null)
   return current
 }
 
+export interface AutoState { preset: QualityPreset; overBudget: number; atVsync: number }
+
+/**
+ * Langkah Auto dengan histeresis (dipanggil tiap evaluasi ±2 s):
+ * - turun satu tingkat setelah 2 evaluasi berturut-turut p95 > anggaran 30 FPS (satu hentakan, mis. memuat GLB,
+ *   tidak menurunkan kualitas);
+ * - naik satu tingkat setelah 3 evaluasi berturut-turut p95 ≤ 1,1 × anggaran 60 FPS (menempel vsync 60 Hz; tanpa ini
+ *   layar 60 Hz tak pernah pulih setelah turun).
+ * Tanpa statistik → state tidak berubah.
+ */
+export function stepAuto(state: AutoState, stats: FrameStats | null): AutoState {
+  if (!stats) return state
+  const order: QualityPreset[] = ['performance', 'balanced', 'ultra']
+  const i = order.indexOf(state.preset)
+  const over = stats.p95Ms > FRAME_BUDGET_MS.fps30 ? state.overBudget + 1 : 0
+  const vsync = stats.p95Ms <= FRAME_BUDGET_MS.fps60 * 1.1 ? state.atVsync + 1 : 0
+  if (over >= 2 && i > 0) return { preset: order[i - 1], overBudget: 0, atVsync: 0 }
+  if (vsync >= 3 && i < order.length - 1) return { preset: order[i + 1], overBudget: 0, atVsync: 0 }
+  return { preset: state.preset, overBudget: over, atVsync: vsync }
+}
+
 /** Preset awal sebelum ada pengukuran: layar sempit / DPR tinggi mulai dari balanced. Input tidak valid → performance. */
 export function initialPreset(viewportWidth: number, devicePixelRatio: number): QualityPreset {
   if (!Number.isFinite(viewportWidth) || viewportWidth <= 0 || !Number.isFinite(devicePixelRatio) || devicePixelRatio <= 0) return 'performance'

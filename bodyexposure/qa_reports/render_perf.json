@@ -6,7 +6,8 @@
  "caveats": [
   "Headless rAF caps at 60 fps",
   "A concurrent headless Blender job was running during measurement; 1% lows are affected",
-  "One machine only (Apple M4); no mid-range desktop or phone measured"
+  "One machine only (Apple M4); no mid-range desktop or phone measured",
+  "Desktop numbers differ between runs (57/53/59 fps here vs ~42 fps in the independent dev-build run): treat them as indicative, not as a benchmark."
  ],
  "results": [
   {
@@ -69,5 +70,24 @@
     523
    ]
   }
- ]
+ ],
+ "independent_check": {
+  "by": "independent reviewer (Sonnet 5.5), 2026-10-09",
+  "conditions": "same Apple M4, Chrome headless ANGLE Metal, DPR 2, Vite dev build (unminified), no concurrent Blender job",
+  "results": [
+   {
+    "viewport": "1440x900",
+    "ultra": "42 fps / 1% low 30",
+    "balanced": "42 / 30",
+    "performance": "45 / 30"
+   },
+   {
+    "viewport": "390x844",
+    "ultra": "60 / 60",
+    "balanced": "59 / 30",
+    "performance": "60 / 60"
+   }
+  ],
+  "finding": "At 1440x900 the presets barely differ: the bottleneck is CPU-side (about 645 rig meshes = draw calls in Motion mode), not pixel count. Lowering the preset does not help that scene much; reducing draw calls would."
+ }
 }
