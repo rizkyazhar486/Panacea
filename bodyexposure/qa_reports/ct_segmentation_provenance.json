@@ -1,0 +1,435 @@
+{
+ "tool": "TotalSegmentator (task total, Apache-2.0)",
+ "input": "Denver 'Aligned CT-DICOM' (NLM Visible Human Female CT), HU = stored value - 1024 (offset inferred from intensity peaks, not stated in the files), resampled to 1.5 mm isotropic",
+ "cleaning": "largest connected component; Taubin smoothing 10 iterations (0.5, -0.53)",
+ "transform_ct_to_denver": {
+  "R": [
+   [
+    0.998587,
+    0.047702,
+    -0.02344
+   ],
+   [
+    -0.048054,
+    0.998737,
+    -0.0147
+   ],
+   [
+    0.022709,
+    0.015806,
+    0.999617
+   ]
+  ],
+  "t_mm": [
+   807.045,
+   680.775,
+   9.495
+  ]
+ },
+ "bones": {
+  "skull": {
+   "voxels": 222914,
+   "components": 8,
+   "largest_component_fraction": 0.9999,
+   "volume_cm3": 752.3,
+   "triangles": 232244
+  },
+  "sternum": {
+   "voxels": 14498,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 48.9,
+   "triangles": 15672
+  },
+  "costal_cartilages": {
+   "voxels": 39812,
+   "components": 18,
+   "largest_component_fraction": 0.7195,
+   "volume_cm3": 96.7,
+   "triangles": 50540
+  },
+  "clavicula_left": {
+   "voxels": 8147,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 27.5,
+   "triangles": 10428
+  },
+  "clavicula_right": {
+   "voxels": 9437,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 31.8,
+   "triangles": 10940
+  },
+  "scapula_left": {
+   "voxels": 24783,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 83.6,
+   "triangles": 37024
+  },
+  "scapula_right": {
+   "voxels": 26237,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 88.5,
+   "triangles": 38420
+  },
+  "humerus_left": {
+   "voxels": 49542,
+   "components": 3,
+   "largest_component_fraction": 0.9999,
+   "volume_cm3": 167.2,
+   "triangles": 34840
+  },
+  "humerus_right": {
+   "voxels": 45488,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 153.5,
+   "triangles": 32896
+  },
+  "vertebrae_C1": {
+   "voxels": 4988,
+   "components": 3,
+   "largest_component_fraction": 0.9996,
+   "volume_cm3": 16.8,
+   "triangles": 8484
+  },
+  "vertebrae_C2": {
+   "voxels": 5302,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 17.9,
+   "triangles": 7986
+  },
+  "vertebrae_C3": {
+   "voxels": 3331,
+   "components": 2,
+   "largest_component_fraction": 0.9997,
+   "volume_cm3": 11.2,
+   "triangles": 6086
+  },
+  "vertebrae_C4": {
+   "voxels": 3135,
+   "components": 2,
+   "largest_component_fraction": 0.9997,
+   "volume_cm3": 10.6,
+   "triangles": 6138
+  },
+  "vertebrae_C5": {
+   "voxels": 3460,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.7,
+   "triangles": 6898
+  },
+  "vertebrae_C6": {
+   "voxels": 3761,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 12.7,
+   "triangles": 7168
+  },
+  "vertebrae_C7": {
+   "voxels": 5032,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 17.0,
+   "triangles": 8112
+  },
+  "vertebrae_T1": {
+   "voxels": 6365,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 21.5,
+   "triangles": 9158
+  },
+  "vertebrae_T2": {
+   "voxels": 6441,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 21.7,
+   "triangles": 9352
+  },
+  "vertebrae_T3": {
+   "voxels": 6345,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 21.4,
+   "triangles": 9180
+  },
+  "vertebrae_T4": {
+   "voxels": 6489,
+   "components": 2,
+   "largest_component_fraction": 0.9815,
+   "volume_cm3": 21.5,
+   "triangles": 9300
+  },
+  "vertebrae_T5": {
+   "voxels": 6536,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 22.1,
+   "triangles": 9394
+  },
+  "vertebrae_T6": {
+   "voxels": 6945,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 23.4,
+   "triangles": 9536
+  },
+  "vertebrae_T7": {
+   "voxels": 7544,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 25.5,
+   "triangles": 9788
+  },
+  "vertebrae_T8": {
+   "voxels": 7989,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 27.0,
+   "triangles": 10188
+  },
+  "vertebrae_T9": {
+   "voxels": 8281,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 27.9,
+   "triangles": 10448
+  },
+  "vertebrae_T10": {
+   "voxels": 9959,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 33.6,
+   "triangles": 11480
+  },
+  "vertebrae_T11": {
+   "voxels": 10771,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 36.4,
+   "triangles": 11908
+  },
+  "vertebrae_T12": {
+   "voxels": 12327,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 41.6,
+   "triangles": 12812
+  },
+  "vertebrae_L1": {
+   "voxels": 14333,
+   "components": 2,
+   "largest_component_fraction": 0.9999,
+   "volume_cm3": 48.4,
+   "triangles": 14784
+  },
+  "vertebrae_L2": {
+   "voxels": 20645,
+   "components": 14,
+   "largest_component_fraction": 0.7865,
+   "volume_cm3": 54.8,
+   "triangles": 16868
+  },
+  "vertebrae_L3": {
+   "voxels": 33858,
+   "components": 3,
+   "largest_component_fraction": 0.9981,
+   "volume_cm3": 114.1,
+   "triangles": 34982
+  },
+  "vertebrae_L4": {
+   "voxels": 18962,
+   "components": 2,
+   "largest_component_fraction": 0.9999,
+   "volume_cm3": 64.0,
+   "triangles": 18940
+  },
+  "vertebrae_L5": {
+   "voxels": 18853,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 63.6,
+   "triangles": 19684
+  },
+  "rib_left_1": {
+   "voxels": 2646,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 8.9,
+   "triangles": 6708
+  },
+  "rib_left_2": {
+   "voxels": 3270,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.0,
+   "triangles": 8308
+  },
+  "rib_left_3": {
+   "voxels": 3366,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.4,
+   "triangles": 9242
+  },
+  "rib_left_4": {
+   "voxels": 3839,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 13.0,
+   "triangles": 9870
+  },
+  "rib_left_5": {
+   "voxels": 4659,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 15.7,
+   "triangles": 10480
+  },
+  "rib_left_6": {
+   "voxels": 5510,
+   "components": 4,
+   "largest_component_fraction": 0.8535,
+   "volume_cm3": 15.9,
+   "triangles": 10436
+  },
+  "rib_left_7": {
+   "voxels": 5349,
+   "components": 4,
+   "largest_component_fraction": 0.8093,
+   "volume_cm3": 14.6,
+   "triangles": 9432
+  },
+  "rib_left_8": {
+   "voxels": 4929,
+   "components": 2,
+   "largest_component_fraction": 0.8418,
+   "volume_cm3": 14.0,
+   "triangles": 8692
+  },
+  "rib_left_9": {
+   "voxels": 3837,
+   "components": 2,
+   "largest_component_fraction": 0.9792,
+   "volume_cm3": 12.7,
+   "triangles": 8484
+  },
+  "rib_left_10": {
+   "voxels": 3502,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.8,
+   "triangles": 8434
+  },
+  "rib_left_11": {
+   "voxels": 2567,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 8.7,
+   "triangles": 7078
+  },
+  "rib_left_12": {
+   "voxels": 1360,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 4.6,
+   "triangles": 4124
+  },
+  "rib_right_1": {
+   "voxels": 2803,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 9.5,
+   "triangles": 7098
+  },
+  "rib_right_2": {
+   "voxels": 3081,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 10.4,
+   "triangles": 7932
+  },
+  "rib_right_3": {
+   "voxels": 3343,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.3,
+   "triangles": 8876
+  },
+  "rib_right_4": {
+   "voxels": 3957,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 13.4,
+   "triangles": 9750
+  },
+  "rib_right_5": {
+   "voxels": 4898,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 16.5,
+   "triangles": 10428
+  },
+  "rib_right_6": {
+   "voxels": 5169,
+   "components": 5,
+   "largest_component_fraction": 0.9897,
+   "volume_cm3": 17.3,
+   "triangles": 10822
+  },
+  "rib_right_7": {
+   "voxels": 6173,
+   "components": 2,
+   "largest_component_fraction": 0.9232,
+   "volume_cm3": 19.2,
+   "triangles": 11440
+  },
+  "rib_right_8": {
+   "voxels": 4241,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 14.3,
+   "triangles": 9650
+  },
+  "rib_right_9": {
+   "voxels": 4286,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 14.5,
+   "triangles": 9932
+  },
+  "rib_right_10": {
+   "voxels": 3354,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 11.3,
+   "triangles": 8636
+  },
+  "rib_right_11": {
+   "voxels": 2633,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 8.9,
+   "triangles": 7310
+  },
+  "rib_right_12": {
+   "voxels": 1493,
+   "components": 1,
+   "largest_component_fraction": 1.0,
+   "volume_cm3": 5.0,
+   "triangles": 4302
+  }
+ },
+ "versions": {
+  "TotalSegmentator": "2.18.0",
+  "nnunetv2": "2.8.1",
+  "torch": "2.14.1"
+ }
+}

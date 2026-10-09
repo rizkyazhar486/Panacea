@@ -946,7 +946,7 @@ export function CanonicalBody() {
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
         Adult male: Z-Anatomy / BodyParts3D (CC BY-SA 4.0), with reconstructed intervertebral discs and pericardium.
-        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Lower-limb variant: University of Denver segmentation of the same donor (CC BY 4.0), courtesy of the U.S. National Library of Medicine. Neonate to adolescent: ICRP
+        Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Skeleton variant: University of Denver segmentation of the same donor (CC BY 4.0) plus CT bones segmented with TotalSegmentator (Apache-2.0), courtesy of the U.S. National Library of Medicine. Neonate to adolescent: ICRP
         Publication 156 paediatric reference phantoms, built from CT images of real children. Bodies marked “not yet”
         need source anatomy that this project does not have; they are not built by scaling an adult body.
       </p>
