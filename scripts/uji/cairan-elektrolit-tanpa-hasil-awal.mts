@@ -1,6 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { resuscitation, maintenanceFluid, correctedSodium, naCorrectionRate, potassiumDeficit } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIGA TERAKHIR DARI PENYISIRAN, DAN YANG SATU MENGELUARKAN VOLUME.
@@ -72,6 +73,16 @@ assert.ok(/useState<'adult-sepsis' \| 'peds-shock' \| 'burns'>\('adult-sepsis'\)
 // Parkland ditulis ulang: 4 mL x kg x %TBSA.
 const parkland = (kg: number, tbsa: number) => 4 * kg * tbsa
 assert.equal(parkland(70, 20), 5600, 'the old defaults no longer give 5600 mL; re-read this gate')
-assert.ok(/4 \* weightKg \* tbsaPct/.test(cairanKode), 'the page no longer applies the Parkland formula')
+// Rumus kini berada di mesin domain; gerbang memeriksa kode mesin DAN perilakunya.
+const motor = readFileSync(new URL('../../src/domains/clinical-calculators/engine/fluidElectrolytes.ts', import.meta.url), 'utf8')
+assert.ok(/4 \* w \* v\.ok\.tbsaPct/.test(motor), 'the engine no longer applies the Parkland formula')
+assert.ok(/resuscitation\(/.test(cairanKode), 'the page no longer uses the domain engine')
+const r = resuscitation('burns', 70, 20)
+assert.ok(r.ok && r.ml === 5600, 'engine Parkland differs from the independent rewrite')
+assert.equal(resuscitation('burns', NaN, NaN).ok, false, 'a burns volume was produced from empty fields')
+assert.equal(maintenanceFluid(NaN).ok, false, 'a maintenance rate was produced from an empty weight')
+assert.equal(correctedSodium(NaN, NaN).ok, false, 'a corrected sodium was produced from empty fields')
+assert.equal(naCorrectionRate(NaN, NaN, 'M').ok, false, 'a sodium correction rate was produced from empty fields')
+assert.equal(potassiumDeficit(NaN, NaN).ok, false, 'a potassium deficit was produced from empty fields')
 
 console.log('cairan-elektrolit-tanpa-hasil-awal: ok')
