@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { creatinineClearance, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cockcroft-Gault Creatinine Clearance — Cockcroft, D.W. & Gault, M.H. (1976),
@@ -20,20 +21,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // actual weight is >20-30% above ideal.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function idealBodyWeight(heightCm: number, sex: 'M' | 'F'): number {
-  const heightIn = heightCm / 2.54
-  const inchesOver5ft = Math.max(0, heightIn - 60)
-  return (sex === 'M' ? 50 : 45.5) + 2.3 * inchesOver5ft
-}
-
-function band(crcl: number): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (crcl >= 90) return { label: 'Normal', tone: 'brand' }
-  if (crcl >= 60) return { label: 'Mildly reduced', tone: 'brand' }
-  if (crcl >= 30) return { label: 'Moderately reduced — many drugs need dose adjustment', tone: 'low' }
-  if (crcl >= 15) return { label: 'Severely reduced — significant dose adjustment needed', tone: 'critical' }
-  return { label: 'Kidney failure — many drugs contraindicated or need major adjustment', tone: 'critical' }
-}
-
 export function CreatinineClearance() {
   // Bacaan TERSIMPAN, bukan getDemo(). getDemo() memadukan DEMO_DEFAULT ke
   // profil kosong, sehingga halaman ini dahulu terbuka dengan usia 30, berat
@@ -41,31 +28,30 @@ export function CreatinineClearance() {
   // mencetak "107 mL/min - Normal" beserta kalimat siap salin untuk rekam
   // medis. Tidak satu pun angka itu berasal dari orang yang membacanya.
   const demo = getDemoTersimpan()
-  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
-  const [weightKg, setWeightKg] = useState(demo.weightKg && demo.weightKg > 0 ? demo.weightKg : 0)
-  const [heightCm, setHeightCm] = useState(demo.heightCm && demo.heightCm > 0 ? demo.heightCm : 0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const stored = (n: number | undefined) => (n && n > 0 ? String(n) : '')
+  const [ageText, setAge] = useState(stored(demo.age))
+  const [weightText, setWeightKg] = useState(stored(demo.weightKg))
+  const [heightText, setHeightCm] = useState(stored(demo.heightCm))
   const [sex, setSex] = useState<'M' | 'F'>(demo.sex === 'F' ? 'F' : 'M')
   // Kreatinin serum TIDAK punya nilai awal yang bisa dibela. Ia hasil
   // laboratorium; satu-satunya jalan masuknya adalah diketik.
-  const [scr, setScr] = useState(0)
+  const [scrText, setScr] = useState('')
   const [weightBasis, setWeightBasis] = useState<'actual' | 'ideal'>('actual')
 
-  const ibw = heightCm > 0 ? idealBodyWeight(heightCm, sex) : 0
-  const useWeight = weightBasis === 'ideal' ? ibw : weightKg
-  // Kekosongan BUKAN nol. Sebelum ini, mengosongkan kolom kreatinin membuat
-  // crcl menjadi 0, dan band(0) menjawab "Kidney failure -- many drugs
-  // contraindicated": kolom kosong ditampilkan sebagai gagal ginjal berat,
-  // lengkap dengan tombol menyalinnya ke catatan.
-  const bisaHitung = scr > 0 && age > 0 && useWeight > 0
-  const crcl = bisaHitung ? ((140 - age) * useWeight * (sex === 'F' ? 0.85 : 1)) / (72 * scr) : null
-  const obese = weightKg > 0 && ibw > 0 && weightKg > ibw * 1.25
-  const bandInfo = crcl !== null ? band(crcl) : null
-
-  const belum: string[] = []
-  if (!(age > 0)) belum.push('age')
-  if (!(weightKg > 0)) belum.push('weight')
-  if (weightBasis === 'ideal' && !(heightCm > 0)) belum.push('height')
-  if (!(scr > 0)) belum.push('serum creatinine')
+  // Kekosongan BUKAN nol: kolom kreatinin kosong dahulu menjadi crcl 0 dan
+  // dipita "Kidney failure". Mesin domain kini menolak kosong dan di luar
+  // rentang dengan alasan bernama, tanpa angka.
+  const age = parseNumberField(ageText)
+  const weightKg = parseNumberField(weightText)
+  const heightCm = parseNumberField(heightText)
+  const scr = parseNumberField(scrText)
+  const hasil = creatinineClearance({ age, weightKg, heightCm, scr, sex, basis: weightBasis })
+  const { crcl, band: bandInfo, ibwKg, usedWeightKg } = hasil
+  const ibw = ibwKg ?? 0
+  const useWeight = usedWeightKg ?? 0
+  const obese = hasil.obese
+  const belum = hasil.missing
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -75,7 +61,7 @@ export function CreatinineClearance() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Banyak brosur obat dan nomogram dosis menetapkan penyesuaian dosis ginjal justru dengan rumus ini, bukan dengan eGFR — keduanya punya perannya masing-masing dan tidak dapat saling menggantikan.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
-            <input className={inputClass} type="number" min={18} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={18} max={120} value={ageText} onChange={(e) => setAge(e.target.value)} />
           </Field>
           <Field label="Sex">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
@@ -84,13 +70,13 @@ export function CreatinineClearance() {
             </select>
           </Field>
           <Field label="Weight (kg)">
-            <input className={inputClass} type="number" min={20} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={20} max={400} value={weightText} onChange={(e) => setWeightKg(e.target.value)} />
           </Field>
           <Field label="Height (cm)">
-            <input className={inputClass} type="number" min={100} value={heightCm || ''} onChange={(e) => setHeightCm(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={100} max={250} value={heightText} onChange={(e) => setHeightCm(e.target.value)} />
           </Field>
           <Field label="Serum creatinine (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0.1} value={scr || ''} onChange={(e) => setScr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0.1} max={20} value={scrText} onChange={(e) => setScr(e.target.value)} />
           </Field>
           <Field label="Weight basis">
             <select className={inputClass} value={weightBasis} onChange={(e) => setWeightBasis(e.target.value as 'actual' | 'ideal')}>
@@ -99,6 +85,9 @@ export function CreatinineClearance() {
             </select>
           </Field>
         </div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
         {obese && weightBasis === 'actual' && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
             Actual weight is {'>'}25% above ideal body weight ({ibw.toFixed(0)}kg) — actual-weight CrCl may
@@ -119,7 +108,7 @@ export function CreatinineClearance() {
             {ibw > 0 && <p className="mt-2 text-[12px] text-neutral-500">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>}
             <CopyNote text={`CrCl (Cockcroft-Gault) ${crcl.toFixed(0)} mL/min using ${weightBasis} body weight (age ${age}, ${sex === 'M' ? 'male' : 'female'}, ${useWeight.toFixed(0)} kg, SCr ${scr} mg/dL) — ${bandInfo.label.toLowerCase()} [Cockcroft & Gault 1976]`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             No clearance is shown yet. Still needed: {belum.join(', ')}.
             {' '}Serum creatinine has no default — it is a laboratory result, and an empty field is not a value.

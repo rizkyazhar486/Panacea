@@ -77,3 +77,5 @@ export { correctedCalcium, calciumBand, CA_RANGES } from './engine/correctedCalc
 export type { CorrectedCalciumResult, CaBand } from './engine/correctedCalcium'
 export { qtc, qtcBand, QTC_RANGES } from './engine/qtc'
 export type { QtcResult, QtcBand, QtcSex } from './engine/qtc'
+export { creatinineClearance, crclBand, crclIdealBodyWeight, CRCL_RANGES, FEMALE_FACTOR, OBESE_RATIO } from './engine/creatinineClearance'
+export type { CrclInput, CrclResult, CrclBand, CrclSex, CrclBasis } from './engine/creatinineClearance'
