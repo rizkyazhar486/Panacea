@@ -702,6 +702,10 @@ input:focus, textarea:focus, select:focus {
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
 }
 .reduce-motion .fly-in-drop { animation: none !important; }
+/* Preferensi OS juga harus dihormati, bukan hanya toggle di dalam aplikasi:
+   tanpa ini spanduk harian meluncur melewati bilah atas selama 0,7 dtk bagi
+   pengguna "reduce motion", dan gerbang bilah-atas menangkapnya di tengah jalan. */
+@media (prefers-reduced-motion: reduce) { .fly-in-drop { animation: none !important; } }
 
 /* Cahaya dibiaskan lewat prisma — motif langsung diminta lewat referensi
    (piramida kaca yang memecah satu berkas cahaya jadi pita pelangi). Dipakai
