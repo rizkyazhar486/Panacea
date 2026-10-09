@@ -89,3 +89,5 @@ export { findrisc, findriscBand, agePts as findriscAgePts, bmiPts as findriscBmi
 export type { FindriscInput, FindriscResult, FindriscBand, FindriscSex, FindriscFamily } from './engine/findrisc'
 export { caffeineAtBedtime, caffeineBand, decayCurve as caffeineDecayCurve, CAFFEINE_DRINKS, CAFFEINE_RANGES } from './engine/caffeineSleep'
 export type { CaffeineInput, CaffeineResult, CaffeineBand, CaffeineDrink } from './engine/caffeineSleep'
+export { packYearScreen, PACK_YEAR_RANGES, USPSTF_2021 } from './engine/packYearScreen'
+export type { PackYearInput, PackYearResult, PackYearStatus } from './engine/packYearScreen'

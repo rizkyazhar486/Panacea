@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconShield } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { packYearScreen, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alcohol & Tobacco Use Screening — two short, validated clinical instruments:
@@ -26,13 +27,16 @@ export function SubstanceUseScreen() {
   const [cage, setCage] = useState<boolean[]>(Array(4).fill(false))
   const cageScore = cage.filter(Boolean).length
 
-  const [cigsPerDay, setCigsPerDay] = useState(0)
-  const [yearsSmoked, setYearsSmoked] = useState(0)
-  const [quitYearsAgo, setQuitYearsAgo] = useState(0)
-  const [age, setAge] = useState(0)
-  const packYears = (cigsPerDay / 20) * yearsSmoked
-  const currentOrRecentQuitter = quitYearsAgo <= 15
-  const screeningEligible = packYears >= 20 && age >= 50 && age <= 80 && currentOrRecentQuitter && cigsPerDay > 0
+  // Teks mentah: kolom kosong = belum diisi, bukan 0. "Years since quitting" harus diketik (0 = masih merokok).
+  const [cigsText, setCigsText] = useState('')
+  const [yearsText, setYearsText] = useState('')
+  const [ageText, setAgeText] = useState('')
+  const [quitText, setQuitText] = useState('')
+  const hasil = packYearScreen({
+    cigsPerDay: parseNumberField(cigsText), yearsSmoked: parseNumberField(yearsText),
+    age: parseNumberField(ageText), quitYearsAgo: parseNumberField(quitText),
+  })
+  const packYears = hasil.packYears ?? 0
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -64,29 +68,35 @@ export function SubstanceUseScreen() {
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Pack-Year Calculator (tobacco)</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="Cigarettes per day (while still smoking)">
-            <input className={inputClass} type="number" min={0} value={cigsPerDay || ''} onChange={(e) => setCigsPerDay(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={cigsText} onChange={(e) => setCigsText(e.target.value)} />
           </Field>
           <Field label="Years smoked">
-            <input className={inputClass} type="number" min={0} value={yearsSmoked || ''} onChange={(e) => setYearsSmoked(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={yearsText} onChange={(e) => setYearsText(e.target.value)} />
           </Field>
           <Field label="Current age">
-            <input className={inputClass} type="number" min={0} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={ageText} onChange={(e) => setAgeText(e.target.value)} />
           </Field>
           <Field label="Years since quitting (0 if still smoking)">
-            <input className={inputClass} type="number" min={0} value={quitYearsAgo || ''} onChange={(e) => setQuitYearsAgo(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={quitText} onChange={(e) => setQuitText(e.target.value)} />
           </Field>
         </div>
-        {cigsPerDay > 0 && yearsSmoked > 0 && (
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
+        {hasil.status === null && hasil.invalid.length === 0 && (
+          <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">No result yet. Still needed: {hasil.missing.join(', ')}. Enter 0 for years since quitting if you still smoke; an empty field is not a value.</p>
+        )}
+        {hasil.status !== null && (
           <div className="mt-4 rounded-xl bg-neutral-50 p-4 dark:bg-white/5">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-brand-dark">{packYears.toFixed(1)}</span>
               <span className="text-sm font-semibold text-neutral-500">pack-years</span>
             </div>
-            {screeningEligible ? (
+            {hasil.status === 'eligible' ? (
               <Prosa kelas="mt-2 text-[13px] leading-relaxed text-rose-600 dark:text-rose-300">Memenuhi kriteria USPSTF 2021 untuk penapisan kanker paru dengan CT dosis rendah setiap tahun (umur 50-80 tahun, ≥20 bungkus-tahun, masih merokok atau berhenti dalam 15 tahun terakhir) — layak dibicarakan dengan tenaga medis bila belum menjalani penapisan.</Prosa>
             ) : (
               <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-                {packYears >= 20 ? 'Meets the pack-year threshold, but age or quit-date criteria are not yet met for USPSTF screening eligibility.' : 'Below the ≥20 pack-year threshold used for lung cancer screening eligibility — quitting still meaningfully reduces risk at any pack-year total.'}
+                {hasil.status === 'pack-years-met-other-criteria-not' ? 'Meets the pack-year threshold, but age or quit-date criteria are not yet met for USPSTF screening eligibility.' : 'Below the ≥20 pack-year threshold used for lung cancer screening eligibility — quitting still meaningfully reduces risk at any pack-year total.'}
               </p>
             )}
           </div>
