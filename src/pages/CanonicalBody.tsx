@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
+import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -132,7 +132,9 @@ export function CanonicalBody() {
   const [motionTl, setMotionTl] = useState<MotionTimeline | null>(null)
   const [motionUi, setMotionUi] = useState<{ timeS: number; playing: boolean; speed: MotionSpeed }>({ timeS: 0, playing: true, speed: 1 })
   const motionClock = useRef<MotionClock>({ timeS: 0, playing: true, speed: 1, loop: true })
-  const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string } | null>(null)
+  const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string; clips: THREE.AnimationClip[]; lib: MotionTimeline[] } | null>(null)
+  const [motionLib, setMotionLib] = useState<MotionTimeline[]>([])
+  const [clipName, setClipName] = useState('ROM')
   const motionOnRef = useRef(false)
   const motionLoadGen = useRef(0)
   const [motionDraws, setMotionDraws] = useState(0)
@@ -321,8 +323,8 @@ export function CanonicalBody() {
   const motionInfo = matrix?.motion?.[fileTag(bodyId)]
   const disposeMotion = () => {
     const s = sceneRef.current, m = motionRefs.current
-    if (m) m.group.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
-    s?.motionRoot.clear(); motionRefs.current = null; setMotionTl(null)
+    if (m) { m.mixer.stopAllAction(); m.group.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } }) }
+    s?.motionRoot.clear(); motionRefs.current = null; setMotionTl(null); setMotionLib([])
   }
   // tubuh tanpa rig: matikan gerak dan lepaskan rig sebelumnya dari memori GPU
   useEffect(() => { if (!motionInfo) { setMotionOn(false); disposeMotion() } }, [motionInfo])
@@ -334,7 +336,7 @@ export function CanonicalBody() {
       s.animate = null; s.motionRoot.visible = false; s.root.visible = true; s.invalidate(); return
     }
     let cancelled = false
-    const show = (tl: MotionTimeline) => {
+    const show = (tl: MotionTimeline, frameCamera: boolean) => {
       const m = motionRefs.current
       if (!m || cancelled) return
       s.root.visible = false; s.motionRoot.visible = true
@@ -353,6 +355,7 @@ export function CanonicalBody() {
         }
         return moved
       }
+      if (!frameCamera) { s.invalidate(); return }
       // seluruh rig (termasuk lengan terangkat) muat: jarak dari FOV vertikal & horizontal + margin 15 %
       const box = new THREE.Box3().setFromObject(m.group); const c = box.getCenter(new THREE.Vector3()); const sz = box.getSize(new THREE.Vector3())
       const vfov = THREE.MathUtils.degToRad(s.camera.fov); const hfov = 2 * Math.atan(Math.tan(vfov / 2) * s.camera.aspect)
@@ -361,9 +364,21 @@ export function CanonicalBody() {
       const dist = Math.max(reach / Math.tan(vfov / 2), span / 2 / Math.tan(hfov / 2)) * 1.15
       s.controls.target.set(c.x, c.y + sz.y * 0.1, c.z); s.camera.position.set(c.x, c.y + sz.y * 0.1, c.z + dist); s.controls.update(); s.invalidate()
     }
+    // ganti klip: action mixer baru, jam direset; kamera dibingkai hanya pada pemuatan pertama
+    const activate = (name: string, frameCamera: boolean) => {
+      const m = motionRefs.current
+      if (!m) return
+      const tl = m.lib.find((c) => c.clip === name) ?? m.lib[0]
+      const clip = m.clips.find((c) => c.name === tl.clip)
+      if (!clip) return
+      m.mixer.stopAllAction(); m.mixer.clipAction(clip).play()
+      motionClock.current = { timeS: 0, playing: true, speed: motionClock.current.speed, loop: true }
+      m.mixer.setTime(0)
+      setMotionUi({ timeS: 0, playing: true, speed: motionClock.current.speed })
+      setMotionTl(tl); show(tl, frameCamera)
+    }
     const key = motionInfo.glb
-    const ready = motionRefs.current?.key === key && motionTl
-    if (ready) { show(motionTl); return () => { cancelled = true } }
+    if (motionRefs.current?.key === key) { activate(clipName, false); return () => { cancelled = true } }
     setLoading(true)
     const gen = ++motionLoadGen.current
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
@@ -371,26 +386,26 @@ export function CanonicalBody() {
       .then(([g, raw]) => {
         if (cancelled) return
         const drop = () => g.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
-        const parsed = parseMotionTimeline(raw)
-        if (!parsed.ok) { drop(); setError(`Motion timeline rejected: ${parsed.error}`); setMotionOn(false); return }
-        const clip = g.animations.find((a) => a.name === parsed.timeline.clip)
-        if (!clip) { drop(); setError('Motion clip missing from the rig file.'); setMotionOn(false); return }
+        const parsed = parseMotionLibrary(raw)
+        if (!parsed.ok) { drop(); setError(`Motion library rejected: ${parsed.error}`); setMotionOn(false); return }
+        const missing = parsed.clips.filter((c) => !g.animations.some((a) => a.name === c.clip))
+        if (missing.length) { drop(); setError(`Motion clip missing from the rig file: ${missing.map((c) => c.clip).join(', ')}`); setMotionOn(false); return }
         disposeMotion()
         s.motionRoot.add(g.scene)
         // satu draw call per (tulang × material), bukan per struktur: ±825 → ±100 (mesh asli disembunyikan)
         const merge = mergeRigMeshes(g.scene)
         setMotionDraws(merge.mergedMeshes)
-        const mixer = new THREE.AnimationMixer(g.scene); mixer.clipAction(clip).play()
-        motionRefs.current = { group: g.scene, mixer, key }
-        motionClock.current = { timeS: 0, playing: true, speed: 1, loop: true }
-        setMotionTl(parsed.timeline); show(parsed.timeline)
+        const mixer = new THREE.AnimationMixer(g.scene)
+        motionRefs.current = { group: g.scene, mixer, key, clips: g.animations, lib: parsed.clips }
+        setMotionLib(parsed.clips)
+        activate(clipName, true)
       })
       .catch(() => { if (!cancelled) { setError('Motion rig could not be loaded.'); setMotionOn(false) } })
       // overlay dilepas oleh pemuatan gerak terakhir saja (toggle cepat), dan tidak bila sistem statis masih dimuat
       .finally(() => { if (motionLoadGen.current === gen && !loadState.current.inflight) setLoading(false) })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionOn, motionInfo])
+  }, [motionOn, motionInfo, clipName])
 
   const motionControl = (patch: Partial<MotionClock>) => {
     motionClock.current = { ...motionClock.current, ...patch }
@@ -744,11 +759,19 @@ export function CanonicalBody() {
         {motionOn && motionTl && (
           <div className="border-t border-white/10 bg-black/60 p-3 text-white" data-testid="motion-panel">
             <div className="flex flex-wrap items-center gap-2 text-[12px]">
-              <span className="rounded-full bg-[#ffd166] px-2 py-0.5 text-[10px] font-bold uppercase text-[#0b0c0e]">Simulation</span>
+              <span className="rounded-full bg-[#ffd166] px-2 py-0.5 text-[10px] font-bold uppercase text-[#0b0c0e]">{motionTl.truthClass === 'simulated' ? 'Simulation' : 'Recorded motion'}</span>
               <span className="font-bold capitalize" data-testid="motion-movement">{activeMovement?.name ?? 'rest'}</span>
               <span className="text-white/60">{motionUi.timeS.toFixed(1)} / {motionTl.durationS.toFixed(1)} s</span>
               {fps && <span className="text-white/60" data-testid="fps-readout">· {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}</span>}
             </div>
+            {motionLib.length > 1 && (
+              <div className="mt-2 flex flex-wrap gap-1.5" role="radiogroup" aria-label="Motion clip">
+                {motionLib.map((c) => (
+                  <button key={c.clip} role="radio" aria-checked={c.clip === motionTl.clip} onClick={() => setClipName(c.clip)}
+                    className={`min-h-[34px] rounded-full px-3 text-[12px] font-bold ${c.clip === motionTl.clip ? 'bg-[#f2f4f6] text-[#0b0c0e]' : 'bg-white/10 text-white/80'}`}>{c.labelShort}</button>
+                ))}
+              </div>
+            )}
             <div className="mt-2 flex items-center gap-2">
               <button onClick={() => motionControl({ playing: !motionUi.playing })} className="min-h-[36px] rounded-full bg-white/10 px-3 text-[12px] font-bold">
                 {motionUi.playing ? 'Pause' : 'Play'}
@@ -762,7 +785,7 @@ export function CanonicalBody() {
                 ))}
               </div>
             </div>
-            <p className="mt-1.5 text-[11px] leading-snug text-white/65">{motionTl.label}. Skeleton and joints only; muscles and skin are not rigged yet.{motionDraws > 0 && <span data-testid="motion-draws"> · {motionDraws} draw groups</span>}</p>
+            <p className="mt-1.5 text-[11px] leading-snug text-white/65">{motionTl.label}. Skeleton and joints only; muscles and skin are not rigged yet.{motionTl.acknowledgement && <> {motionTl.acknowledgement}</>}{motionDraws > 0 && <span data-testid="motion-draws"> · {motionDraws} draw groups</span>}</p>
           </div>
         )}
       </div>

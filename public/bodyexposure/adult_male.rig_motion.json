@@ -1,0 +1,137 @@
+{
+ "clips": [
+  {
+   "clip": "ROM",
+   "label_short": "Range of motion",
+   "fps": 24,
+   "frames": 794,
+   "source": "AAOS normal range of motion (Greene & Heckman 1994)",
+   "truth_class": "simulated",
+   "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
+   "movements": [
+    {
+     "name": "shoulder flexion",
+     "start_s": 0.041667,
+     "end_s": 3.041667,
+     "note": "120 of AAOS 180: glenohumeral share by the 2:1 scapulohumeral rhythm (Inman et al. 1944); no scapulothoracic joint yet"
+    },
+    {
+     "name": "shoulder abduction",
+     "start_s": 3.041667,
+     "end_s": 6.041667,
+     "note": "90 of AAOS 180: no scapulothoracic joint yet"
+    },
+    {
+     "name": "elbow flexion",
+     "start_s": 6.041667,
+     "end_s": 9.041667,
+     "note": "AAOS 150"
+    },
+    {
+     "name": "forearm pronation",
+     "start_s": 9.041667,
+     "end_s": 12.041667,
+     "note": "120 of 160 (AAOS 80+80 from supinated rest): beyond ~120 the lunate meets the ulnar head because the TFCC disc is not modelled and the distal axis point is approximate"
+    },
+    {
+     "name": "wrist flexion",
+     "start_s": 12.041667,
+     "end_s": 15.041667,
+     "note": "AAOS 80"
+    },
+    {
+     "name": "wrist extension",
+     "start_s": 15.041667,
+     "end_s": 18.041667,
+     "note": "AAOS 70"
+    },
+    {
+     "name": "hip flexion (knee flexed)",
+     "start_s": 18.041667,
+     "end_s": 21.041667,
+     "note": "AAOS hip 120, knee flexed"
+    },
+    {
+     "name": "hip abduction",
+     "start_s": 21.041667,
+     "end_s": 24.041667,
+     "note": "AAOS 45"
+    },
+    {
+     "name": "knee flexion",
+     "start_s": 24.041667,
+     "end_s": 27.041667,
+     "note": "AAOS 135"
+    },
+    {
+     "name": "ankle plantarflexion",
+     "start_s": 27.041667,
+     "end_s": 30.041667,
+     "note": "AAOS 50"
+    },
+    {
+     "name": "ankle dorsiflexion",
+     "start_s": 30.041667,
+     "end_s": 33.041667,
+     "note": "AAOS 20"
+    }
+   ],
+   "qa": {
+    "angle_within_limits": true,
+    "max_bone_penetration_mm": 1.31
+   }
+  },
+  {
+   "clip": "WALK",
+   "label_short": "Walk",
+   "fps": 24,
+   "frames": 28,
+   "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+   "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+   "truth_class": "measured-retargeted",
+   "label": "Recorded walking of another person (CMU subject 07, trial 07_01), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics",
+   "movements": [
+    {
+     "name": "walking cycle",
+     "start_s": 0.041667,
+     "end_s": 1.125,
+     "note": "one gait cycle, 1.092 s"
+    }
+   ],
+   "qa": {
+    "max_bone_penetration_mm": 0.61,
+    "lowest_foot_point_m": {
+     "min": -0.0,
+     "max": 0.0
+    },
+    "loop_drift_corrected_max_deg": 4.58
+   }
+  },
+  {
+   "clip": "RUN",
+   "label_short": "Run",
+   "fps": 24,
+   "frames": 20,
+   "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+   "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+   "truth_class": "measured-retargeted",
+   "label": "Recorded running of another person (CMU subject 09, trial 09_02), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics",
+   "movements": [
+    {
+     "name": "running cycle",
+     "start_s": 0.041667,
+     "end_s": 0.791667,
+     "note": "one gait cycle, 0.75 s"
+    }
+   ],
+   "qa": {
+    "max_bone_penetration_mm": 1.32,
+    "lowest_foot_point_m": {
+     "min": -0.0,
+     "max": 0.0872
+    },
+    "loop_drift_corrected_max_deg": 12.39
+   }
+  }
+ ]
+}

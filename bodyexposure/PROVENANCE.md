@@ -261,3 +261,16 @@ and 163 cm, the Publication 89 reference values.
 Limits, inherited from the source's dosimetry purpose: bones are grouped by region (for example "Ribs cortical" covers
 all ribs), and the skeletal muscle is a single tissue mesh. Airway regions follow the ICRP Human Respiratory Tract
 Model names (ET1, ET2, BB); the display names spell out what those regions are.
+
+## CMU Graphics Lab Motion Capture Database (walk and run clips)
+
+Source: mocap.cs.cmu.edu, subject 07 trial 01 (walk) and subject 09 trial 02 (run), ASF/AMC files at 120 fps,
+downloaded 2026-10-09.
+
+Licence, read from the site on 2026-10-09: "free for all uses … You may include this data in commercially-sold
+products, but you may not resell this data directly, even in converted form." Required acknowledgement: "The data
+used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF
+EIA-0196217." The acknowledgement appears in the app's Motion panel and in `public/bodyexposure/CREDITS.txt`.
+
+Truth class: **measured-retargeted**. This is the recorded motion of another person, mapped onto the Z-Anatomy
+skeleton. It is not the motion of the anatomy shown and not patient biomechanics.

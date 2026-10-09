@@ -48,7 +48,9 @@ bad = [o.name for o in meshes if escapes_bbox(o, dg)]
 if bad:
     raise SystemExit(f"bbox escape: {bad[:5]}")
 
-act = arm.animation_data.action; act.name = "ROM"
+if arm.animation_data and arm.animation_data.action and "ROM" not in bpy.data.actions:
+    arm.animation_data.action.name = "ROM"
+GAIT = json.load(open(arg("--gait"))) if arg("--gait") else None
 bpy.ops.object.select_all(action='DESELECT')
 arm.select_set(True)
 for o in meshes:
@@ -58,12 +60,24 @@ os.makedirs(os.path.dirname(OUT), exist_ok=True)
 sc = bpy.context.scene
 bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=True, export_apply=True, export_extras=True,
                           export_yup=True, export_texcoords=False, export_normals=True, export_animations=True,
-                          export_frame_range=True, export_force_sampling=True, export_skins=False, export_materials='EXPORT')
+                          export_frame_range=False, export_force_sampling=True, export_animation_mode='ACTIONS', export_skins=False, export_materials='EXPORT')
 tl = json.load(open(arg("--timeline")))
 # kunci glTF dari Blender: frame f → waktu f/fps (frame 1 = 1/24 s); timeline memakai skala yang sama, durasi = frames/fps
-json.dump({"clip": "ROM", "fps": tl["fps"], "frames": tl["frames"] + 1, "source": "AAOS normal range of motion (Greene & Heckman 1994)",
-           "truth_class": "simulated", "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
-           "movements": [{"name": t["movement"], "start_s": round(t["frames"][0] / tl["fps"], 6), "end_s": round(t["frames"][2] / tl["fps"], 6), "note": t["note"]} for t in tl["timeline"]],
-           "qa": {"angle_within_limits": tl["angle_within_limits"], "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in tl["bone_contact_overlap"])}},
-          open(arg("--timeline-out"), "w"), indent=1)
+clips = [{"clip": "ROM", "label_short": "Range of motion", "fps": tl["fps"], "frames": tl["frames"] + 1,
+          "source": "AAOS normal range of motion (Greene & Heckman 1994)", "truth_class": "simulated",
+          "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
+          "movements": [{"name": t["movement"], "start_s": round(t["frames"][0] / tl["fps"], 6), "end_s": round(t["frames"][2] / tl["fps"], 6), "note": t["note"]} for t in tl["timeline"]],
+          "qa": {"angle_within_limits": tl["angle_within_limits"], "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in tl["bone_contact_overlap"])}}]
+if GAIT:
+    for name, short, verb in (("WALK", "Walk", "walking"), ("RUN", "Run", "running")):
+        g = GAIT["clips"].get(name)
+        if not g:
+            continue
+        n = g["frames_24fps"]
+        clips.append({"clip": name, "label_short": short, "fps": 24, "frames": n + 1, "source": GAIT["source"],
+                      "acknowledgement": GAIT["acknowledgement"], "truth_class": "measured-retargeted",
+                      "label": f"Recorded {verb} of another person (CMU subject {g['subject']}, trial {g['trial']}), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics",
+                      "movements": [{"name": f"{verb} cycle", "start_s": round(1 / 24, 6), "end_s": round(n / 24, 6), "note": f"one gait cycle, {g['cycle_s']} s"}],
+                      "qa": {"max_bone_penetration_mm": g["max_bone_penetration_mm"], "lowest_foot_point_m": g["lowest_foot_point_m"], "loop_drift_corrected_max_deg": g["loop_drift_corrected_max_deg"]}})
+json.dump({"clips": clips}, open(arg("--timeline-out"), "w"), indent=1)
 print("RIGGLB", OUT, "tris", got, "meshes", len(meshes), "fixed", len(fixed), os.path.getsize(OUT))

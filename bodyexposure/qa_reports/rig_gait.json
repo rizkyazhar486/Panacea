@@ -1,0 +1,584 @@
+{
+ "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+ "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+ "truth_class": "measured motion of another individual (CMU subject), retargeted and ROM-clamped; not patient biomechanics",
+ "clips": {
+  "WALK": {
+   "subject": "07",
+   "trial": "07_01",
+   "source_fps": 120,
+   "cycle_start_frame": 90,
+   "cycle_frames_120fps": 131,
+   "cycle_s": 1.092,
+   "frames_24fps": 27,
+   "loop_seam_max_deg": 0.0,
+   "loop_drift_corrected_max_deg": 4.58,
+   "joint_angle_range_deg": {
+    "hip_flex": [
+     -32.5,
+     36.4
+    ],
+    "hip_abd": [
+     -6.6,
+     5.0
+    ],
+    "knee_flex": [
+     0.0,
+     69.9
+    ],
+    "ankle_dorsi": [
+     -22.0,
+     21.3
+    ],
+    "shoulder_flex": [
+     -24.6,
+     26.0
+    ],
+    "elbow_flex": [
+     2.6,
+     48.2
+    ]
+   },
+   "clamped_samples": {
+    "knee_flex.L": 4,
+    "ankle_dorsi.R": 1,
+    "hip_flex.L": 1,
+    "knee_flex.R": 3,
+    "hip_flex.R": 1
+   },
+   "leg_length_m": {
+    "rig": 0.794,
+    "source": 0.809
+   },
+   "lowest_foot_point_m": {
+    "min": -0.0,
+    "max": 0.0
+   },
+   "max_bone_penetration_mm": 0.61,
+   "bone_contact": [
+    {
+     "pair": [
+      "FEMUR.L",
+      "TIBIA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "ULNA.L"
+     ],
+     "max_penetration_mm": 0.4,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "RADIUS.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "HIP_BONE.L"
+     ],
+     "max_penetration_mm": 0.45,
+     "at_frame": 9,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "SCAPULA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "CLAVICLE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "ULNA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.03,
+     "at_frame": 3,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FIBULA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.55,
+     "at_frame": 3,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "LUNATE_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "SCAPHOID_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "ULNA.L",
+      "LUNATE_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "ULNA.L",
+      "TRIQUETRUM_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "TIBIA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "ULNA.R"
+     ],
+     "max_penetration_mm": 0.39,
+     "at_frame": 9,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "RADIUS.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "HIP_BONE.R"
+     ],
+     "max_penetration_mm": 0.44,
+     "at_frame": 21,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "SCAPULA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "CLAVICLE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "ULNA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.11,
+     "at_frame": 7,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FIBULA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.61,
+     "at_frame": 7,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "LUNATE_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "SCAPHOID_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "ULNA.R",
+      "LUNATE_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "ULNA.R",
+      "TRIQUETRUM_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "walk"
+    }
+   ]
+  },
+  "RUN": {
+   "subject": "09",
+   "trial": "09_02",
+   "source_fps": 120,
+   "cycle_start_frame": 3,
+   "cycle_frames_120fps": 90,
+   "cycle_s": 0.75,
+   "frames_24fps": 19,
+   "loop_seam_max_deg": 0.0,
+   "loop_drift_corrected_max_deg": 12.39,
+   "joint_angle_range_deg": {
+    "hip_flex": [
+     -34.4,
+     39.8
+    ],
+    "hip_abd": [
+     -8.5,
+     13.7
+    ],
+    "knee_flex": [
+     4.9,
+     113.8
+    ],
+    "ankle_dorsi": [
+     -36.6,
+     23.1
+    ],
+    "shoulder_flex": [
+     -47.6,
+     10.3
+    ],
+    "elbow_flex": [
+     72.9,
+     129.4
+    ]
+   },
+   "clamped_samples": {
+    "ankle_dorsi.L": 3,
+    "hip_flex.L": 1,
+    "ankle_dorsi.R": 1,
+    "hip_flex.R": 2
+   },
+   "leg_length_m": {
+    "rig": 0.794,
+    "source": 0.861
+   },
+   "lowest_foot_point_m": {
+    "min": -0.0,
+    "max": 0.0872
+   },
+   "max_bone_penetration_mm": 1.32,
+   "bone_contact": [
+    {
+     "pair": [
+      "FEMUR.L",
+      "TIBIA.L"
+     ],
+     "max_penetration_mm": 1.32,
+     "at_frame": 11,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "ULNA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "RADIUS.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "HIP_BONE.L"
+     ],
+     "max_penetration_mm": 0.43,
+     "at_frame": 5,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "SCAPULA.L"
+     ],
+     "max_penetration_mm": 0.24,
+     "at_frame": 13,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.L",
+      "CLAVICLE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "ULNA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.11,
+     "at_frame": 19,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FIBULA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.61,
+     "at_frame": 19,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "LUNATE_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.L",
+      "SCAPHOID_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "ULNA.L",
+      "LUNATE_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "ULNA.L",
+      "TRIQUETRUM_BONE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "TIBIA.R"
+     ],
+     "max_penetration_mm": 1.31,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "ULNA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "RADIUS.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "HIP_BONE.R"
+     ],
+     "max_penetration_mm": 0.45,
+     "at_frame": 13,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "SCAPULA.R"
+     ],
+     "max_penetration_mm": 0.31,
+     "at_frame": 5,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "HUMERUS.R",
+      "CLAVICLE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "ULNA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.09,
+     "at_frame": 9,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FIBULA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.59,
+     "at_frame": 9,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "LUNATE_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "RADIUS.R",
+      "SCAPHOID_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "ULNA.R",
+      "LUNATE_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "ULNA.R",
+      "TRIQUETRUM_BONE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 1,
+     "movement": "run"
+    }
+   ]
+  }
+ }
+}
