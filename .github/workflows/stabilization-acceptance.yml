@@ -123,6 +123,14 @@ jobs:
       - name: Respiratory gas budget mobile interaction smoke
         run: node scripts/qa/alveolar-gas-budget-smoke.mjs
 
+      # Existing WebGL browser contract must execute in CI, not just exist in scripts/qa.
+      # This catches missing bronchial mesh bindings and frozen phase colouring
+      # that TypeScript and respiratory model-unit tests cannot detect.
+      - name: Respiratory segmental ventilation 3D E2E smoke
+        env:
+          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
+        run: node scripts/qa/ventilasi-bronkus-3d-smoke.mjs
+
       - name: Panacea OS Daily mobile 390x844 smoke
         env:
           PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
