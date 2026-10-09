@@ -67,3 +67,5 @@ export { naegele, CYCLE_LENGTH_DAYS, LMP_YEAR, MAX_DISPLAY_GA_DAYS } from './eng
 export type { NaegeleResult } from './engine/naegele'
 export { glasgowBlatchford, GBS_RANGES, GBS_FLAG_POINTS, bunPoints, hgbPoints, sbpPoints } from './engine/glasgowBlatchford'
 export type { GbsInput, GbsResult, GbsFlag, GbsSex } from './engine/glasgowBlatchford'
+export { meldNa, MELD_RANGES } from './engine/meldNa'
+export type { MeldInput, MeldResult } from './engine/meldNa'
