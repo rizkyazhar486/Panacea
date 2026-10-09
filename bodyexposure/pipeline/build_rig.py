@@ -85,6 +85,7 @@ def extreme(name, axis, mode):
 
 
 jc, meta = {}, {}
+AXIS = {}  # sumbu fleksi anatomis ISB: medial → lateral (garis epikondilus / maleolus)
 for s in SIDES:
     jc[f"HIP.{s}"], meta[f"HIP.{s}"] = head_centre("FEMUR", "Head of femur", s)
     jc[f"SHOULDER.{s}"], meta[f"SHOULDER.{s}"] = head_centre("HUMERUS", "Head of humerus", s)
@@ -92,8 +93,10 @@ for s in SIDES:
                                   ("ELBOW", "HUMERUS", "Medial epicondyle of humerus", "Lateral epicondyle of humerus", "midpoint of humeral epicondyles")]:
         (pa, da), (pb, db) = landmark(a, P + bone, s), landmark(b, P + bone, s)
         jc[f"{key}.{s}"] = (pa + pb) / 2; meta[f"{key}.{s}"] = {"method": defn, "mirror_snap_mm": round(max(da, db) * 1000, 2)}
+        AXIS[f"{key}.{s}"] = (pb - pa) / np.linalg.norm(pb - pa)
     (pm, dm), (pl, dl) = landmark("Medial malleolus", P + "TIBIA", s), landmark("Lateral malleolus", P + "FIBULA", s)
     jc[f"ANKLE.{s}"] = (pm + pl) / 2; meta[f"ANKLE.{s}"] = {"method": "midpoint of medial and lateral malleoli", "mirror_snap_mm": round(max(dm, dl) * 1000, 2)}
+    AXIS[f"ANKLE.{s}"] = (pl - pm) / np.linalg.norm(pl - pm)
     rs, us = extreme(f"{P}RADIUS.{s}", 2, "min"), extreme(f"{P}ULNA.{s}", 2, "min")
     jc[f"WRIST.{s}"] = (rs + us) / 2; meta[f"WRIST.{s}"] = {"method": "midpoint of radial and ulnar styloid tips (most distal vertices)"}
     jc[f"HAND_END.{s}"] = extreme(f"{P}THIRD_METACARPAL_BONE.{s}", 2, "min"); meta[f"HAND_END.{s}"] = {"method": "distal end of third metacarpal"}
@@ -109,6 +112,16 @@ skull = [n for n in ob.keys() if re.match(P + r"(FRONTAL_BONE|PARIETAL_BONE\.[LR
 top = max((extreme(n, 2, "max") for n in skull), key=lambda v: v[2])
 jc["VERTEX"] = np.array([0.0, top[1], top[2]]); meta["VERTEX"] = {"method": "highest point of the calvaria, midsagittal"}
 jc["PELVIS_CENTRE"] = (jc["HIP.L"] + jc["HIP.R"]) / 2; meta["PELVIS_CENTRE"] = {"method": "midpoint of hip joint centres"}
+# opsional: pusat engsel siku/pergelangan kaki yang disempurnakan (fit_hinge_centres.py; geser ⟂ sumbu, ±12 mm per arah)
+HINGE_NOTE = None
+if "--hinges" in argv:
+    ref = json.load(open(argv[argv.index("--hinges") + 1]))["hinges"]
+    for k, r in ref.items():
+        jc[k] = np.array(r["refined_centre_m"])
+        meta[k] = dict(meta[k], refined="surface-congruence hinge fit", shift_mm=r["shift_mm"],
+                       max_penetration_mm=[r["max_penetration_mm_isb"], r["max_penetration_mm_refined"]])
+    HINGE_NOTE = {k: {"shift_mm": r["shift_mm"], "max_penetration_mm_isb": r["max_penetration_mm_isb"],
+                      "max_penetration_mm_refined": r["max_penetration_mm_refined"]} for k, r in ref.items()}
 
 # ── armature ──────────────────────────────────────────────────────────────────
 arm_d = bpy.data.armatures.new("RIG.ADULT_MALE"); arm = bpy.data.objects.new("RIG.ADULT_MALE", arm_d)
@@ -142,6 +155,16 @@ for s in SIDES:
     bone(f"THIGH.{s}", jc[f"HIP.{s}"], jc[f"KNEE.{s}"], "PELVIS")
     bone(f"SHIN.{s}", jc[f"KNEE.{s}"], jc[f"ANKLE.{s}"], f"THIGH.{s}", connect=True)
     bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"TOE_END.{s}"], f"SHIN.{s}", connect=True)
+# sumbu fleksi lutut, siku, pergelangan kaki = garis epikondilus / maleolus (ISB, Wu dkk. 2002/2005), bukan sekadar
+# tegak lurus tulang ke anterior: X lokal tulang distal diarahkan ke sumbu itu (diproyeksikan ⟂ tulang).
+AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE"}
+axis_dev = {}
+for s in SIDES:
+    for bn, key in AXIS_BONE.items():
+        b = eb[f"{bn}.{s}"]; y = (b.tail - b.head).normalized()
+        x = Vector(AXIS[f"{key}.{s}"].tolist()); x = (x - y * x.dot(y)).normalized()
+        old_x = b.x_axis.copy(); b.align_roll(x.cross(y))
+        axis_dev[f"{bn}.{s}"] = round(math.degrees(old_x.angle(b.x_axis)), 1)
 bpy.ops.object.mode_set(mode='OBJECT')
 
 # ── ikatan kaku: tiap mesh rangka/sendi → satu tulang rig ────────────────────
@@ -289,7 +312,11 @@ bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(OUT))
 json.dump({"body": "HUMAN.ADULT.MALE", "frame": "+Z superior, +X subject left, -Y anterior, metres",
            "joint_centres_m": {k: [round(float(x), 4) for x in v] for k, v in jc.items()}, "joint_centre_methods": meta,
            "segments_mm": seglen, "rom_limits_deg_local": limits_report,
-           "rom_source": "AAOS normal values (Greene & Heckman 1994)", "binding": {k: len(v) for k, v in binding.items()}, "qa": qa},
+           "rom_source": "AAOS normal values (Greene & Heckman 1994)",
+           "flexion_axis": "knee, elbow and ankle flexion about the epicondylar / malleolar line (ISB); others perpendicular to the bone, anterior roll",
+           "flexion_axis_change_deg": axis_dev,
+           "flexion_axes": {k: [round(float(x), 5) for x in v] for k, v in AXIS.items()},
+           "hinge_refinement": HINGE_NOTE, "binding": {k: len(v) for k, v in binding.items()}, "qa": qa},
           open(REPORT, "w"), indent=1)
 print("RIG", len(arm_d.bones), "bones;", qa["bound_meshes"], "/", qa["meshes_considered"], "meshes bound;", len(review), "for review")
 print("SYM", sym); print("PROX", prox)

@@ -1,0 +1,194 @@
+{
+ "frames": 793,
+ "fps": 24,
+ "timeline": [
+  {
+   "movement": "shoulder flexion",
+   "frames": [
+    1,
+    37,
+    73
+   ],
+   "target_deg": 180,
+   "note": "AAOS 180"
+  },
+  {
+   "movement": "shoulder abduction",
+   "frames": [
+    73,
+    109,
+    145
+   ],
+   "target_deg": 90,
+   "note": "90 of AAOS 180: no scapulothoracic joint yet"
+  },
+  {
+   "movement": "elbow flexion",
+   "frames": [
+    145,
+    181,
+    217
+   ],
+   "target_deg": 150,
+   "note": "AAOS 150"
+  },
+  {
+   "movement": "forearm pronation",
+   "frames": [
+    217,
+    253,
+    289
+   ],
+   "target_deg": 160,
+   "note": "AAOS 80+80 from supinated rest"
+  },
+  {
+   "movement": "wrist flexion",
+   "frames": [
+    289,
+    325,
+    361
+   ],
+   "target_deg": 80,
+   "note": "AAOS 80"
+  },
+  {
+   "movement": "wrist extension",
+   "frames": [
+    361,
+    397,
+    433
+   ],
+   "target_deg": 70,
+   "note": "AAOS 70"
+  },
+  {
+   "movement": "hip flexion (knee flexed)",
+   "frames": [
+    433,
+    469,
+    505
+   ],
+   "target_deg": 120,
+   "note": "AAOS hip 120, knee flexed"
+  },
+  {
+   "movement": "hip abduction",
+   "frames": [
+    505,
+    541,
+    577
+   ],
+   "target_deg": 45,
+   "note": "AAOS 45"
+  },
+  {
+   "movement": "knee flexion",
+   "frames": [
+    577,
+    613,
+    649
+   ],
+   "target_deg": 135,
+   "note": "AAOS 135"
+  },
+  {
+   "movement": "ankle plantarflexion",
+   "frames": [
+    649,
+    685,
+    721
+   ],
+   "target_deg": 50,
+   "note": "AAOS 50"
+  },
+  {
+   "movement": "ankle dorsiflexion",
+   "frames": [
+    721,
+    757,
+    793
+   ],
+   "target_deg": 20,
+   "note": "AAOS 20"
+  }
+ ],
+ "rest_joint_deg": {
+  "knee": 2.9,
+  "elbow": 9.9
+ },
+ "max_joint_excursion_deg": {
+  "knee": 129.6,
+  "elbow": 150.0,
+  "hip": 120.0,
+  "shoulder": 180.0
+ },
+ "angle_within_limits": true,
+ "bone_contact_overlap": [
+  {
+   "movement": "knee flexion",
+   "pair": [
+    "FEMUR.L",
+    "TIBIA.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.15
+  },
+  {
+   "movement": "elbow flexion",
+   "pair": [
+    "HUMERUS.L",
+    "ULNA.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.0
+  },
+  {
+   "movement": "hip flexion (knee flexed)",
+   "pair": [
+    "FEMUR.R",
+    "HIP_BONE.R"
+   ],
+   "penetration_mm_rest": 0.19,
+   "penetration_mm_peak": 0.7
+  },
+  {
+   "movement": "shoulder abduction",
+   "pair": [
+    "HUMERUS.L",
+    "SCAPULA.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.0
+  },
+  {
+   "movement": "ankle plantarflexion",
+   "pair": [
+    "TIBIA.L",
+    "TALUS.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.67
+  },
+  {
+   "movement": "elbow flexion",
+   "pair": [
+    "HUMERUS.L",
+    "RADIUS.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.0
+  },
+  {
+   "movement": "ankle dorsiflexion",
+   "pair": [
+    "TIBIA.L",
+    "TALUS.L"
+   ],
+   "penetration_mm_rest": 0.0,
+   "penetration_mm_peak": 0.0
+  }
+ ],
+ "no_new_bone_penetration": true,
+ "ok": true
+}

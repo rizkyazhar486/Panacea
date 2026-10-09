@@ -127,3 +127,17 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
   - 42 tissue materials upgraded to procedural PBR derived from geometry: object-space albedo and roughness variation, micro bump, and cavity darkening from pointiness. This is appearance only, not measured tissue texture; each material carries `panacea_material_note`. No fibre direction, pores or patterns were invented.
 - **8K render** (`pipeline/render_8k.py`, 7680×4320): anterior deep view (translucent skin) beside the muscle layer. The JPEG is in `renders/`; the 16-bit PNG stays local.
 - Not yet: baked texture maps (the procedural materials are resolution-independent, so 8K renders need no texture files), proxies for the other bodies, and animation.
+
+## Rig axes, hinge fit and ROM animation (2026-10-09)
+
+- **Flexion axes (ISB):** knee, elbow and ankle now rotate about the femoral-epicondyle, humeral-epicondyle and malleolar lines, not simply perpendicular to the bone. The axes change by 3.6°, 8.4° and 36.3°; the last is the known obliquity of the talocrural axis.
+- **Hinge centre fit** (`pipeline/fit_hinge_centres.py` → `manifest/rig_hinge_refinement.json`): the ISB epicondyle and malleolus midpoints are coordinate-system landmarks, not the functional hinge. Starting from the ISB centre, each hinge centre is moved only in the plane perpendicular to its axis, within ±12 mm per direction on a 2 mm grid, to minimise bone-into-bone penetration across the AAOS range.
+  - Elbow: moved 14.4 mm anteriorly and distally, towards the trochlea–capitulum centre. Penetration fell from 9.07 to 0.23 mm.
+  - Ankle: moved 12.2 mm, mostly distally, consistent with the talocrural axis passing just below the malleolar tips. Penetration fell from 4.23 to 0.78 mm.
+  - Values are mirrored on the right side.
+- **ROM animation** (`pipeline/animate_rom.py` → `bodies/PANACEA_RIG_ADULT_MALE_ROM.blend`, local; preview `renders/rom_preview_1280x720.mp4`):
+  - 793 frames at 24 fps, 11 movements; each joint goes 0 → its AAOS limit → 0. No other kinematics are used.
+  - Two deliberate deviations: shoulder abduction is limited to 90° (no scapulothoracic joint yet), and hip flexion is performed with the knee flexed, as AAOS measures it.
+  - QA (`qa_reports/rig_rom_animation.json`): peak excursions are knee 129.6°, elbow 150.0°, hip 120.0° and shoulder 180.0°, all within limits.
+  - Maximum bone-into-bone penetration at movement peaks is ≤ 0.7 mm (limit 1.5 mm). Articular cartilage is not modelled.
+- Not yet: gait or other recorded motion (needs an open motion-capture dataset), video → rig retargeting, and soft-tissue deformation.
