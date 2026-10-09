@@ -35,7 +35,7 @@ export type { BallardInputsResult } from './engine/ballardInputs'
 export { validateDenverAge, DENVER_AGE_MONTHS } from './engine/denverAge'
 export type { DenverAgeResult } from './engine/denverAge'
 export {
-  validateWhoGrowthInputs, validateNeonateInputs, validateCdcInputs,
+  validateWhoGrowthInputs, validateNeonateInputs, validateCdcInputs, parseWhoVisit,
   WHO_AGE_MONTHS, WHO_WEIGHT_KG, WHO_LENGTH_CM, NEONATE_AGE_DAYS, NEONATE_WEIGHT_G, CDC_AGE_YEARS, CDC_WEIGHT_KG, CDC_HEIGHT_CM,
 } from './engine/growthInputs'
 export type { GrowthInputsResult } from './engine/growthInputs'
