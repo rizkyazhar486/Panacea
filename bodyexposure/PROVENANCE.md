@@ -163,6 +163,34 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
 - **Not merged with the male.** The two bodies are separate subjects; combining them would
   need a registration transform that no source provides.
 
+## VHF_LOWER_LIMB.ADULT.FEMALE — source_backed_partial (v012)
+
+- **Source:** Andreassen TE, Hume DR, Hamilton LD, Walker KE, Higinbotham SE, Shelburne KB. "Three-dimensional lower
+  extremity musculoskeletal geometry of the Visible Human Female and Male." *Scientific Data* 10:34 (2023),
+  doi:10.1038/s41597-022-01905-2. Data: University of Denver Center for Orthopaedic Biomechanics,
+  doi:10.56902/COB.vh.2022.0, "Final 3D STL Models" (smoothed). Segmented from the NLM Visible Human Female cryosections.
+- **Licence:** CC BY 4.0 (stated in the dataset README). Required: cite the two papers listed in that README; images courtesy of
+  the U.S. National Library of Medicine. Obtained from the owner's download (2026-10-10); copied to `sources/du_vhf/`.
+- **Content:** 128 structures, left and right: 15 bones per side set (hip bone, femur, patella, tibia, fibula, 7 tarsals, a combined
+  metatarsal-and-phalanx mesh) plus sacrum and coccyx, 8 articular cartilages, 4 knee ligaments (ACL, PCL, MCL, LCL) and 38 muscles per
+  side. **Lower extremity and pelvis only**: no spine, ribs, skull or upper limb.
+- **Changes made:** STL (mm) merged by 0.1 mm to connected meshes; rotated 180° about Z into the canonical frame (+X subject left,
+  −Y anterior, +Z superior), converted to metres, centred on the midpoint of the two hip bones, lowest point at z = 0. Frame checked from
+  geometry: patella anterior to femur on both sides, every "Left" object at +X (the build aborts otherwise). Source spellings
+  normalised (Calcaneous → Calcaneus, Illiacus → Iliacus, Quadratis → Quadratus, Semitendonosus → Semitendinosus); "Peroneus longus"
+  is named "Fibularis (peroneus) longus".
+- **Not split:** the source forefoot mesh is labelled "Phalanges"; a top-view render shows metatarsal shafts and toe bones in one
+  mesh with a coarse toe segmentation, so it is named "Metatarsals and phalanges (combined)". Bone boundaries are not in the source.
+- **Separate body, not grafted.** Like the ICRP variants, it is its own internally consistent body. Both this set and the HuBMAP
+  `VH_Female` come from the same cadaver, but they use different segmentations, so they are not merged. Cross-check
+  (`pipeline/check_vhf_lower_limb_vs_hubmap.py`, `qa_reports/vhf_lower_limb_vs_hubmap.json`): after one rigid fit on the left
+  femur, tibia, fibula and patella lie 3.6–3.8 mm median from the HuBMAP surfaces (p95 6–8 mm), and 2.5 mm when fitted per bone.
+  That supports "same subject, different segmentation", not agreement at sub-millimetre level.
+- **Geometry QA** (`qa_reports/vhf_lower_limb_build.json`): 2.34 M triangles in total, 0 non-manifold edges, 3 meshes with open
+  boundaries (left forefoot, left talar cartilage, right talus). `clinically_reviewed` stays false.
+- This supersedes the "no source supplies individually separated female bones" result of the female rig source survey below, for
+  the lower extremity only. The female spine, ribs, skull and upper limb remain without separated-bone sources.
+
 ## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
 
 - **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*

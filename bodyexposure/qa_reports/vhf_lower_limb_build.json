@@ -1,0 +1,781 @@
+{
+ "summary": {
+  "body": "VHF_LOWER_LIMB.ADULT.FEMALE",
+  "structures": 128,
+  "extent_m": 1.1666,
+  "file": "PANACEA_BODY_VHF_LOWER_LIMB_ADULT_FEMALE.blend",
+  "open_boundary": 3,
+  "nonmanifold": 0,
+  "tris_total": 2335383
+ },
+ "structures": [
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.CALCANEUS.L",
+   "tris": 17472,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.COCCYX",
+   "tris": 2342,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.CUBOID.L",
+   "tris": 4926,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.FEMUR.L",
+   "tris": 91886,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.FIBULA.L",
+   "tris": 18918,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.INTERMEDIATE_CUNEIFORM.L",
+   "tris": 2328,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.LATERAL_CUNEIFORM.L",
+   "tris": 2698,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.MEDIAL_CUNEIFORM.L",
+   "tris": 4090,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.NAVICULAR.L",
+   "tris": 4610,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.PATELLA.L",
+   "tris": 6524,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+   "tris": 99308,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L",
+   "tris": 34936,
+   "boundary_edges": 12,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.SACRUM",
+   "tris": 51074,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.TALUS.L",
+   "tris": 11074,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.TIBIA.L",
+   "tris": 59456,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.DISTAL_FEMORAL_ARTICULAR_CARTILAGE.L",
+   "tris": 28144,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.FEMORAL_HEAD_ARTICULAR_CARTILAGE.L",
+   "tris": 16574,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.PATELLAR_ARTICULAR_CARTILAGE.L",
+   "tris": 6574,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.ACETABULAR_ARTICULAR_CARTILAGE.L",
+   "tris": 45930,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.TALAR_ARTICULAR_CARTILAGE.L",
+   "tris": 39987,
+   "boundary_edges": 3,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.DISTAL_TIBIAL_ARTICULAR_CARTILAGE.L",
+   "tris": 2708,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.LATERAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.L",
+   "tris": 3810,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.MEDIAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.L",
+   "tris": 5772,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.L",
+   "tris": 3606,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.LATERAL_COLLATERAL_LIGAMENT_FIBULAR_COLLATERAL.L",
+   "tris": 2050,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.MEDIAL_COLLATERAL_LIGAMENT_TIBIAL_COLLATERAL.L",
+   "tris": 4284,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.POSTERIOR_CRUCIATE_LIGAMENT.L",
+   "tris": 3814,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_BREVIS.L",
+   "tris": 11120,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_LONGUS.L",
+   "tris": 12440,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_MAGNUS.L",
+   "tris": 31500,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.BICEPS_FEMORIS_LONG_HEAD.L",
+   "tris": 17786,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.BICEPS_FEMORIS_SHORT_HEAD.L",
+   "tris": 12238,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.EXTENSOR_DIGITORUM_LONGUS.L",
+   "tris": 8852,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.EXTENSOR_HALLUCIS_LONGUS.L",
+   "tris": 4062,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FLEXOR_DIGITORUM_LONGUS.L",
+   "tris": 6264,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FLEXOR_HALLUCIS_LONGUS.L",
+   "tris": 9216,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GASTROCNEMIUS_LATERAL_HEAD.L",
+   "tris": 11314,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GASTROCNEMIUS_MEDIAL_HEAD.L",
+   "tris": 19858,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+   "tris": 45776,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+   "tris": 30072,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+   "tris": 16994,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GRACILIS.L",
+   "tris": 13356,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ILIACUS.L",
+   "tris": 22330,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.INFERIOR_GEMELLUS.L",
+   "tris": 1154,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.OBTURATOR_EXTERNUS.L",
+   "tris": 14558,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.OBTURATOR_INTERNUS.L",
+   "tris": 18262,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PECTINEUS.L",
+   "tris": 44456,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FIBULARIS_PERONEUS_LONGUS.L",
+   "tris": 16216,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PIRIFORMIS.L",
+   "tris": 6486,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PLANTARIS.L",
+   "tris": 1880,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.POPLITEUS.L",
+   "tris": 3056,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PSOAS_MAJOR.L",
+   "tris": 19692,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.QUADRATUS_FEMORIS.L",
+   "tris": 5392,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.RECTUS_FEMORIS.L",
+   "tris": 16282,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SARTORIUS.L",
+   "tris": 18894,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SEMIMEMBRANOSUS.L",
+   "tris": 20610,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SEMITENDINOSUS.L",
+   "tris": 13626,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SOLEUS.L",
+   "tris": 28452,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SUPERIOR_GEMELLUS.L",
+   "tris": 904,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TENSOR_FASCIAE_LATAE.L",
+   "tris": 9282,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TIBIALIS_ANTERIOR.L",
+   "tris": 12420,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TIBIALIS_POSTERIOR.L",
+   "tris": 10622,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_INTERMEDIUS.L",
+   "tris": 37284,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_LATERALIS.L",
+   "tris": 42150,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_MEDIALIS.L",
+   "tris": 27300,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.CALCANEUS.R",
+   "tris": 17574,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.CUBOID.R",
+   "tris": 5042,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.FEMUR.R",
+   "tris": 89466,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.FIBULA.R",
+   "tris": 19480,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.INTERMEDIATE_CUNEIFORM.R",
+   "tris": 2314,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.LATERAL_CUNEIFORM.R",
+   "tris": 2808,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.MEDIAL_CUNEIFORM.R",
+   "tris": 4216,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.NAVICULAR.R",
+   "tris": 4498,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.PATELLA.R",
+   "tris": 6588,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+   "tris": 98422,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R",
+   "tris": 36202,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.TALUS.R",
+   "tris": 10674,
+   "boundary_edges": 6,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.TIBIA.R",
+   "tris": 60362,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.DISTAL_FEMORAL_ARTICULAR_CARTILAGE.R",
+   "tris": 24628,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.FEMORAL_HEAD_ARTICULAR_CARTILAGE.R",
+   "tris": 22948,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.PATELLAR_ARTICULAR_CARTILAGE.R",
+   "tris": 5666,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.ACETABULAR_ARTICULAR_CARTILAGE.R",
+   "tris": 12912,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.TALAR_ARTICULAR_CARTILAGE.R",
+   "tris": 4484,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.DISTAL_TIBIAL_ARTICULAR_CARTILAGE.R",
+   "tris": 3524,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.LATERAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.R",
+   "tris": 5104,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.MEDIAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.R",
+   "tris": 6494,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.R",
+   "tris": 4296,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.LATERAL_COLLATERAL_LIGAMENT_FIBULAR_COLLATERAL.R",
+   "tris": 2022,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.MEDIAL_COLLATERAL_LIGAMENT_TIBIAL_COLLATERAL.R",
+   "tris": 3110,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.JOINT.POSTERIOR_CRUCIATE_LIGAMENT.R",
+   "tris": 3612,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_BREVIS.R",
+   "tris": 10938,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_LONGUS.R",
+   "tris": 12850,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ADDUCTOR_MAGNUS.R",
+   "tris": 31630,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.BICEPS_FEMORIS_LONG_HEAD.R",
+   "tris": 17434,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.BICEPS_FEMORIS_SHORT_HEAD.R",
+   "tris": 11098,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.EXTENSOR_DIGITORUM_LONGUS.R",
+   "tris": 9920,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.EXTENSOR_HALLUCIS_LONGUS.R",
+   "tris": 3674,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FLEXOR_DIGITORUM_LONGUS.R",
+   "tris": 6282,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FLEXOR_HALLUCIS_LONGUS.R",
+   "tris": 9074,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GASTROCNEMIUS_LATERAL_HEAD.R",
+   "tris": 12038,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GASTROCNEMIUS_MEDIAL_HEAD.R",
+   "tris": 19080,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+   "tris": 48436,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+   "tris": 26158,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+   "tris": 15914,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.GRACILIS.R",
+   "tris": 13012,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.ILIACUS.R",
+   "tris": 20536,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.INFERIOR_GEMELLUS.R",
+   "tris": 2078,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.OBTURATOR_EXTERNUS.R",
+   "tris": 15444,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.OBTURATOR_INTERNUS.R",
+   "tris": 25500,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PECTINEUS.R",
+   "tris": 6470,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.FIBULARIS_PERONEUS_LONGUS.R",
+   "tris": 16506,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PIRIFORMIS.R",
+   "tris": 6188,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PLANTARIS.R",
+   "tris": 1672,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.POPLITEUS.R",
+   "tris": 3100,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.PSOAS_MAJOR.R",
+   "tris": 17756,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.QUADRATUS_FEMORIS.R",
+   "tris": 69148,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.RECTUS_FEMORIS.R",
+   "tris": 15296,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SARTORIUS.R",
+   "tris": 19524,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SEMIMEMBRANOSUS.R",
+   "tris": 19864,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SEMITENDINOSUS.R",
+   "tris": 13716,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SOLEUS.R",
+   "tris": 28560,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.SUPERIOR_GEMELLUS.R",
+   "tris": 1060,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TENSOR_FASCIAE_LATAE.R",
+   "tris": 9328,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TIBIALIS_ANTERIOR.R",
+   "tris": 11886,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.TIBIALIS_POSTERIOR.R",
+   "tris": 9954,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_INTERMEDIUS.R",
+   "tris": 35670,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_LATERALIS.R",
+   "tris": 40734,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "VHF_LOWER_LIMB.ADULT.FEMALE.MUSCULAR.VASTUS_MEDIALIS.R",
+   "tris": 24358,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  }
+ ]
+}
