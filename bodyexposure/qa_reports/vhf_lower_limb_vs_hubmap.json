@@ -1,0 +1,24 @@
+{
+ "residual_rotation_deg_after_axis_map": 9.67,
+ "femur_L (fit)": {
+  "median_mm": 2.5,
+  "p95_mm": 11.5
+ },
+ "tibia_L (femur transform)": {
+  "median_mm": 3.8,
+  "p95_mm": 8.4
+ },
+ "fibula_L (femur transform)": {
+  "median_mm": 3.8,
+  "p95_mm": 6.9
+ },
+ "patella_L (femur transform)": {
+  "median_mm": 3.6,
+  "p95_mm": 5.9
+ },
+ "tibia_L (own fit)": {
+  "median_mm": 2.5,
+  "p95_mm": 4.1
+ },
+ "note": "One rigid transform fitted on the left femur is applied to the other left-leg bones; own-fit rows refit per bone."
+}

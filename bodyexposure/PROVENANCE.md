@@ -163,6 +163,59 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
 - **Not merged with the male.** The two bodies are separate subjects; combining them would
   need a registration transform that no source provides.
 
+## VHF_LOWER_LIMB.ADULT.FEMALE — source_backed_partial (v012)
+
+**What this is:** one individual, not an atlas. The donor of the NLM Visible Human Female was a 59-year-old woman, 62 in (157 cm),
+88 kg, BMI 36 (Andreassen et al. 2023). The paper notes disrupted anatomy in the female specimen and that some
+structures (patellar tendon, complete Achilles tendon) were left out of the dataset. This body must never be labelled "reference
+adult female", "average" or patient-specific. `clinically_reviewed` is false for every structure (owner decision of 2026-10-09,
+PR #2303: no anatomist review for this step; unreviewed, not reviewed).
+
+- **Source:** Andreassen TE, Hume DR, Hamilton LD, Walker KE, Higinbotham SE, Shelburne KB. "Three-dimensional lower
+  extremity musculoskeletal geometry of the Visible Human Female and Male." *Scientific Data* 10:34 (2023),
+  doi:10.1038/s41597-022-01905-2. Data: University of Denver Center for Orthopaedic Biomechanics,
+  doi:10.56902/COB.vh.2022.0, "Final 3D STL Models" (smoothed). Manual segmentation of the NLM Visible Human Female cryosections
+  in ScanIP v. S-2021.06 (Simpleware, Synopsys), using Netter and Fleckenstein et al. as references. Obtained from the owner's
+  download (2026-10-10); copied to `sources/du_vhf/`.
+- **Licence terms read from the official pages on 2026-10-10:**
+  - *Denver collection* (digitalcommons.du.edu/visiblehuman): "This work is licensed under a Creative Commons Attribution 4.0
+    International License". Data are supplied "as is"; the University of Denver and the Center for Orthopaedic Biomechanics accept no
+    liability. Required citation: the 2023 Scientific Data paper above. The collection's own README also asks for the second paper
+    (Andreassen et al., arXiv:2209.06948). Commercial use and redistribution are allowed with attribution.
+  - *NLM Visible Human images* (nlm.nih.gov/research/visible/getting_data.html and the NLM Terms and Conditions): no licence or
+    registration is required since July 2019. Terms: acknowledge NLM with "Courtesy of the U.S. National Library of Medicine"; do not imply
+    NLM endorsement; when redistributing, keep the data current or state clearly that it may not reflect NLM's latest data. NLM
+    gives no warranty and no legal advice on third-party rights. Commercial use is not prohibited. The NLM page gives no donor
+    biography beyond thanking the donors; age and habitus above come from the Denver paper.
+  - These terms permit the use made here. If either page changes, re-read before the next release.
+- **Coverage (checked against the Denver collection before any CT work):** pelvis to ankle only: 28 bones (13 per side plus sacrum
+  and coccyx), 16 cartilages, 8 ligaments, 76 muscles. The collection also lists 2 fat geometries, which are not in the folder
+  received. Not covered, so still open for CT segmentation: lumbar and thoracic spine, ribs, sternum, skull, shoulder girdle and the
+  whole upper limb.
+- **Changes made:** STL (mm) merged by 0.1 mm to connected meshes; rotated 180° about Z into the canonical frame (+X subject left,
+  −Y anterior, +Z superior), converted to metres, centred on the midpoint of the two hip bones, lowest point at z = 0. Frame checked from
+  geometry: patella anterior to femur on both sides, every "Left" object at +X (the build aborts otherwise). Source spellings
+  normalised (Calcaneous → Calcaneus, Illiacus → Iliacus, Quadratis → Quadratus, Semitendonosus → Semitendinosus); "Peroneus longus"
+  is named "Fibularis (peroneus) longus".
+- **Not split:** the source forefoot mesh is labelled "Phalanges"; a top-view render shows metatarsal shafts and toe bones in one
+  mesh with a coarse toe segmentation, so it is named "Metatarsals and phalanges (combined)". Bone boundaries are not in the source.
+- **Separate body, not grafted.** Like the ICRP variants, it is its own internally consistent body. Both this set and the HuBMAP
+  `VH_Female` come from the same cadaver, but they use different segmentations, so they are not merged. Cross-check
+  (`pipeline/check_vhf_lower_limb_vs_hubmap.py`, `qa_reports/vhf_lower_limb_vs_hubmap.json`): after one rigid fit on the left
+  femur, tibia, fibula and patella lie 3.6–3.8 mm median from the HuBMAP surfaces (p95 6–8 mm), and 2.5 mm when fitted per bone.
+  That supports "same subject, different segmentation", not agreement at sub-millimetre level.
+- **Geometry QA** (`qa_reports/vhf_lower_limb_build.json`): 2.34 M triangles in total, 0 non-manifold edges, 3 meshes with open
+  boundaries (left forefoot, left talar cartilage, right talus).
+- **Rig** (`pipeline/build_rig_lower_limb.py`, `animate_rom_lower_limb.py`; reports `manifest/rig_vhf_lower_limb*.json`,
+  `qa_reports/rig_vhf_lower_limb_rom.json`): hip, knee and ankle joint centres from geometry only (no labelled landmarks); ankle
+  centre refined by surface-congruence fit (shift 13.4 and 17.0 mm, bone overlap 6.9 → 0.6 mm and 6.5 → 0.4 mm). Bones and
+  cartilages are bound rigidly (44 meshes); the 4 knee ligaments and 76 muscles are not rigged. ROM limits are AAOS values; the
+  animation reaches them except on the right side, where bone contact exceeds 1.5 mm: hip adduction 25 (AAOS 30), hip external
+  rotation 40 (45), ankle dorsiflexion 15 (20). The cause (donor anatomy or right hip-centre error) is not determined. After
+  these caps the largest bone overlap in the sweep is 1.0 mm.
+- This supersedes the "no source supplies individually separated female bones" result of the female rig source survey below, for
+  the lower extremity only. The female spine, ribs, skull and upper limb remain without separated-bone sources.
+
 ## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
 
 - **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*
