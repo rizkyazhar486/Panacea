@@ -33,12 +33,13 @@ export function parseMotionTimeline(raw: unknown): ParseResult {
   const durationS = (r.frames - 1) / r.fps
   const movements: MotionMovement[] = []
   let prevEnd = 0
+  const tol = 0.5 / r.fps  // pembulatan waktu sub-frame (setengah frame) diterima, lebih dari itu ditolak
   for (const m of r.movements as unknown[]) {
     const x = (m ?? {}) as Record<string, unknown>
     if (!isStr(x.name) || !isNum(x.start_s) || !isNum(x.end_s)) return { ok: false, error: 'movement needs name, start_s, end_s' }
     if (x.end_s <= x.start_s) return { ok: false, error: `movement "${x.name}" has non-positive duration` }
-    if (x.start_s < prevEnd - 1e-6) return { ok: false, error: `movement "${x.name}" overlaps the previous one` }
-    if (x.end_s > durationS + 1e-6) return { ok: false, error: `movement "${x.name}" ends after the clip` }
+    if (x.start_s < prevEnd - tol) return { ok: false, error: `movement "${x.name}" overlaps the previous one` }
+    if (x.end_s > durationS + tol) return { ok: false, error: `movement "${x.name}" ends after the clip` }
     movements.push({ name: x.name, startS: x.start_s, endS: x.end_s, note: isStr(x.note) ? x.note : '' })
     prevEnd = x.end_s
   }

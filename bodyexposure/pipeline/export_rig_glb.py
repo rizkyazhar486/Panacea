@@ -60,9 +60,10 @@ bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=True,
                           export_yup=True, export_texcoords=False, export_normals=True, export_animations=True,
                           export_frame_range=True, export_force_sampling=True, export_skins=False, export_materials='EXPORT')
 tl = json.load(open(arg("--timeline")))
-json.dump({"clip": "ROM", "fps": tl["fps"], "frames": tl["frames"], "source": "AAOS normal range of motion (Greene & Heckman 1994)",
+# kunci glTF dari Blender: frame f → waktu f/fps (frame 1 = 1/24 s); timeline memakai skala yang sama, durasi = frames/fps
+json.dump({"clip": "ROM", "fps": tl["fps"], "frames": tl["frames"] + 1, "source": "AAOS normal range of motion (Greene & Heckman 1994)",
            "truth_class": "simulated", "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
-           "movements": [{"name": t["movement"], "start_s": round((t["frames"][0] - 1) / tl["fps"], 3), "end_s": round((t["frames"][2] - 1) / tl["fps"], 3), "note": t["note"]} for t in tl["timeline"]],
+           "movements": [{"name": t["movement"], "start_s": round(t["frames"][0] / tl["fps"], 6), "end_s": round(t["frames"][2] / tl["fps"], 6), "note": t["note"]} for t in tl["timeline"]],
            "qa": {"angle_within_limits": tl["angle_within_limits"], "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in tl["bone_contact_overlap"])}},
           open(arg("--timeline-out"), "w"), indent=1)
 print("RIGGLB", OUT, "tris", got, "meshes", len(meshes), "fixed", len(fixed), os.path.getsize(OUT))

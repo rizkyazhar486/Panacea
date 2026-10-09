@@ -7,7 +7,8 @@
 Gerakan hanya dari batas ROM AAOS yang tersimpan di rig (Greene & Heckman 1994), tidak ada kinematika karangan:
 tiap sendi bergerak 0 → batas → 0. Pengecualian yang disengaja (rig belum punya sendi skapulotorakal): fleksi bahu
 dibatasi 120° (porsi glenohumeral pada ritme skapulohumeral 2:1, Inman dkk. 1944; tanpa rotasi skapula, 180° membuat
-skapula menembus humerus ±10 mm) dan abduksi bahu 90°. Fleksi panggul dilakukan dengan lutut menekuk, sesuai cara
+skapula menembus humerus ±10 mm), abduksi bahu 90°, dan pronasi 120° (di atas ±120° lunatum menyentuh kaput ulna:
+diskus TFCC tidak dimodelkan, titik distal sumbu pronasi masih pendekatan). Fleksi panggul dilakukan dengan lutut menekuk, sesuai cara
 pengukuran AAOS (paha belakang tidak membatasi).
 QA per frame: (1) sudut sendi efektif ≤ batas + 1° (lutut, siku: sudut antar tulang; panggul, bahu: perubahan arah
 tulang dari istirahat); (2) kedalaman penetrasi maksimum antar tulang yang berartikulasi
@@ -40,8 +41,8 @@ MOVES = [
      "120 of AAOS 180: glenohumeral share by the 2:1 scapulohumeral rhythm (Inman et al. 1944); no scapulothoracic joint yet"),
     ("shoulder abduction", [("UPPER_ARM.L", "Z", "abduction", 90), ("UPPER_ARM.R", "Z", "abduction", 90)], "90 of AAOS 180: no scapulothoracic joint yet"),
     ("elbow flexion", [("FOREARM.L", "X", "flexion", 150), ("FOREARM.R", "X", "flexion", 150)], "AAOS 150"),
-    ("forearm pronation", [("FOREARM_ROT.L", "Y", "pronation", 160), ("FOREARM_ROT.R", "Y", "pronation", 160)],
-     "AAOS 80+80 from supinated rest; radius rotates about the ulna (radial head to ulnar head axis)"),
+    ("forearm pronation", [("FOREARM_ROT.L", "Y", "pronation", 120), ("FOREARM_ROT.R", "Y", "pronation", 120)],
+     "120 of 160 (AAOS 80+80 from supinated rest): beyond ~120 the lunate meets the ulnar head because the TFCC disc is not modelled and the distal axis point is approximate"),
     ("wrist flexion", [("HAND.L", "X", "flexion", 80), ("HAND.R", "X", "flexion", 80)], "AAOS 80"),
     ("wrist extension", [("HAND.L", "X", "extension", 70), ("HAND.R", "X", "extension", 70)], "AAOS 70"),
     ("hip flexion (knee flexed)", [("THIGH.R", "X", "flexion", 120), ("SHIN.R", "X", "flexion", 120)], "AAOS hip 120, knee flexed"),
@@ -134,14 +135,16 @@ def inside(tb, p):
 
 
 PAIRS_C = [("FEMUR", "TIBIA"), ("HUMERUS", "ULNA"), ("HUMERUS", "RADIUS"), ("FEMUR", "HIP_BONE"), ("HUMERUS", "SCAPULA"),
-           ("HUMERUS", "CLAVICLE"), ("RADIUS", "ULNA"), ("TIBIA", "TALUS"), ("FIBULA", "TALUS"), ("RADIUS", "LUNATE"), ("RADIUS", "SCAPHOID")]
+           ("HUMERUS", "CLAVICLE"), ("RADIUS", "ULNA"), ("TIBIA", "TALUS"), ("FIBULA", "TALUS"),
+           ("RADIUS", "LUNATE_BONE"), ("RADIUS", "SCAPHOID_BONE"), ("ULNA", "LUNATE_BONE"), ("ULNA", "TRIQUETRUM_BONE")]
 frames = sorted(set(list(range(1, frame + 1, 12)) + [t["frames"][1] for t in timeline]))
 contact = []
 for side in ("L", "R"):
     for a0, b0 in PAIRS_C:
         a, b = f"{S}{a0}.{side}", f"{S}{b0}.{side}"
-        if a not in bpy.data.objects or b not in bpy.data.objects:
-            continue
+        missing = [n for n in (a, b) if n not in bpy.data.objects]
+        if missing:  # pasangan yang tak ditemukan adalah kesalahan QA, bukan dilewati diam-diam
+            raise SystemExit(f"contact pair object missing: {missing}")
         worst, at = 0.0, 1
         for f in frames:
             sc.frame_set(f); d = max(depth(a, b), depth(b, a))  # dua arah

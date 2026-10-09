@@ -48,6 +48,16 @@ test('menolak_gerakan_melewati_klip', () => {
   assert.deepEqual(r, { ok: false, error: 'movement "a" ends after the clip' })
 })
 
+test('menerima_akhir_gerakan_dalam_setengah_frame_pembulatan', () => {
+  const r = parseMotionTimeline({ ...valid, movements: [{ name: 'a', start_s: 0, end_s: 4 + 0.4 / 24 }] })
+  assert.equal(r.ok, true)
+})
+
+test('menolak_akhir_gerakan_lebih_dari_setengah_frame', () => {
+  const r = parseMotionTimeline({ ...valid, movements: [{ name: 'a', start_s: 0, end_s: 4 + 0.6 / 24 }] })
+  assert.deepEqual(r, { ok: false, error: 'movement "a" ends after the clip' })
+})
+
 test('menolak_bukan_objek', () => {
   assert.deepEqual(parseMotionTimeline(null), { ok: false, error: 'timeline must be an object' })
 })

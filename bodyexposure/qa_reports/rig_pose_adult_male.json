@@ -16,8 +16,8 @@
  "wrist_flexion_moves_hand_anterior": true,
  "forearm_pronation_limit_moves_anterior_point_medially": true,
  "hand_X_limits": [
-  -70,
-  80
+  -80,
+  70
  ],
  "forearm_Y_limits": [
   -160,

@@ -1,4 +1,4 @@
-"""Penyempurnaan pusat engsel siku & pergelangan kaki berbasis kesesuaian permukaan tulang (geometri sumber).
+"""Penyempurnaan pusat engsel siku, pergelangan kaki & pergelangan tangan berbasis kesesuaian permukaan tulang (geometri sumber).
 
   Blender -b bodyexposure/PANACEA_HUMAN_MASTER_v011.blend -P bodyexposure/pipeline/fit_hinge_centres.py -- \
       --rig bodyexposure/manifest/rig_adult_male.json --out bodyexposure/manifest/rig_hinge_refinement.json
@@ -20,6 +20,8 @@ S = "ADULT.MALE.SKELETAL."
 HINGES = {  # kunci: (tulang induk, tulang anak, rentang sudut [deg] dalam arah anatomis, titik distal untuk tanda)
     "ELBOW": (["HUMERUS"], ["ULNA", "RADIUS"], (0, 150), "WRIST", "anterior"),     # fleksi: tangan ke anterior
     "ANKLE": (["TIBIA", "FIBULA"], ["TALUS"], (-20, 50), "TOE_END", "inferior"),   # plantar fleksi (+): jari ke inferior
+    # pergelangan: baris karpal proksimal terhadap radius & ulna; fleksi (+) = tangan ke anterior (telapak menghadap depan)
+    "WRIST": (["RADIUS", "ULNA"], ["SCAPHOID_BONE", "LUNATE_BONE", "TRIQUETRUM_BONE"], (-70, 80), "HAND_END", "anterior"),
 }
 JC = {k: np.array(v) for k, v in RIG["joint_centres_m"].items()}
 

@@ -99,6 +99,7 @@ for s in SIDES:
     AXIS[f"ANKLE.{s}"] = (pl - pm) / np.linalg.norm(pl - pm)
     rs, us = extreme(f"{P}RADIUS.{s}", 2, "min"), extreme(f"{P}ULNA.{s}", 2, "min")
     jc[f"WRIST.{s}"] = (rs + us) / 2; meta[f"WRIST.{s}"] = {"method": "midpoint of radial and ulnar styloid tips (most distal vertices)"}
+    AXIS[f"WRIST.{s}"] = (us - rs) / np.linalg.norm(us - rs)  # fleksi pergelangan ≈ garis stiloid radius–ulna
     # sumbu pronasi–supinasi: pusat kaput radius (proksimal) → pusat kaput ulna (distal); radius berputar mengelilingi
     # ulna, ulna tetap pada sendi humeroulnar. Lengan tergantung (posisi anatomis): proksimal = z maksimum.
     Vr, Vu = verts(f"{P}RADIUS.{s}"), verts(f"{P}ULNA.{s}")
@@ -119,7 +120,7 @@ skull = [n for n in ob.keys() if re.match(P + r"(FRONTAL_BONE|PARIETAL_BONE\.[LR
 top = max((extreme(n, 2, "max") for n in skull), key=lambda v: v[2])
 jc["VERTEX"] = np.array([0.0, top[1], top[2]]); meta["VERTEX"] = {"method": "highest point of the calvaria, midsagittal"}
 jc["PELVIS_CENTRE"] = (jc["HIP.L"] + jc["HIP.R"]) / 2; meta["PELVIS_CENTRE"] = {"method": "midpoint of hip joint centres"}
-# opsional: pusat engsel siku/pergelangan kaki yang disempurnakan (fit_hinge_centres.py; geser ⟂ sumbu, ±12 mm per arah)
+# opsional: pusat engsel siku/pergelangan kaki/pergelangan tangan yang disempurnakan (fit_hinge_centres.py; geser ⟂ sumbu, ±12 mm per arah)
 HINGE_NOTE = None
 if "--hinges" in argv:
     ref = json.load(open(argv[argv.index("--hinges") + 1]))["hinges"]
@@ -165,7 +166,7 @@ for s in SIDES:
     bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"TOE_END.{s}"], f"SHIN.{s}", connect=True)
 # sumbu fleksi lutut, siku, pergelangan kaki = garis epikondilus / maleolus (ISB, Wu dkk. 2002/2005), bukan sekadar
 # tegak lurus tulang ke anterior: X lokal tulang distal diarahkan ke sumbu itu (diproyeksikan ⟂ tulang).
-AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE"}
+AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE", "HAND": "WRIST"}
 axis_dev = {}
 for s in SIDES:
     for bn, key in AXIS_BONE.items():
@@ -323,7 +324,7 @@ json.dump({"body": "HUMAN.ADULT.MALE", "frame": "+Z superior, +X subject left, -
            "joint_centres_m": {k: [round(float(x), 4) for x in v] for k, v in jc.items()}, "joint_centre_methods": meta,
            "segments_mm": seglen, "rom_limits_deg_local": limits_report,
            "rom_source": "AAOS normal values (Greene & Heckman 1994)",
-           "flexion_axis": "knee, elbow and ankle flexion about the epicondylar / malleolar line (ISB); others perpendicular to the bone, anterior roll",
+           "flexion_axis": "knee, elbow, ankle and wrist flexion about the epicondylar / malleolar / styloid line (ISB); others perpendicular to the bone, anterior roll",
            "flexion_axis_change_deg": axis_dev,
            "flexion_axes": {k: [round(float(x), 5) for x in v] for k, v in AXIS.items()},
            "hinge_refinement": HINGE_NOTE, "binding": {k: len(v) for k, v in binding.items()}, "qa": qa},

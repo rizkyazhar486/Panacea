@@ -249,7 +249,13 @@ export function CanonicalBody() {
 
   // ── mode gerak: rig kerangka beranimasi menggantikan tampilan statis (hanya tubuh yang punya rig) ──
   const motionInfo = matrix?.motion?.[fileTag(bodyId)]
-  useEffect(() => { if (!motionInfo) setMotionOn(false) }, [motionInfo])
+  const disposeMotion = () => {
+    const s = sceneRef.current, m = motionRefs.current
+    if (m) m.group.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
+    s?.motionRoot.clear(); motionRefs.current = null; setMotionTl(null)
+  }
+  // tubuh tanpa rig: matikan gerak dan lepaskan rig sebelumnya dari memori GPU
+  useEffect(() => { if (!motionInfo) { setMotionOn(false); disposeMotion() } }, [motionInfo])
   useEffect(() => {
     const s = sceneRef.current
     motionOnRef.current = motionOn
@@ -263,15 +269,17 @@ export function CanonicalBody() {
       if (!m || cancelled) return
       s.root.visible = false; s.motionRoot.visible = true
       const dur = tl.durationS
-      let lastUi = -1
+      let lastUi = -1, lastPlaying = motionClock.current.playing
       s.animate = (dt) => {
         const r = advanceClock(motionClock.current, dt, dur)
         if (!r.ok) return false
         const moved = r.clock.timeS !== motionClock.current.timeS
         motionClock.current = r.clock
-        m.mixer.setTime(r.clock.timeS)
-        if (Math.abs(r.clock.timeS - lastUi) >= 0.1 || !r.clock.playing) {  // UI ±10 Hz, bukan tiap frame
-          lastUi = r.clock.timeS; setMotionUi({ timeS: r.clock.timeS, playing: r.clock.playing, speed: r.clock.speed })
+        if (moved) m.mixer.setTime(r.clock.timeS)
+        // UI ±10 Hz selama berjalan; saat dijeda hanya sekali (bukan setState tiap frame)
+        if ((moved && Math.abs(r.clock.timeS - lastUi) >= 0.1) || r.clock.playing !== lastPlaying) {
+          lastUi = r.clock.timeS; lastPlaying = r.clock.playing
+          setMotionUi({ timeS: r.clock.timeS, playing: r.clock.playing, speed: r.clock.speed })
         }
         return moved
       }
@@ -279,7 +287,8 @@ export function CanonicalBody() {
       const box = new THREE.Box3().setFromObject(m.group); const c = box.getCenter(new THREE.Vector3()); const sz = box.getSize(new THREE.Vector3())
       const vfov = THREE.MathUtils.degToRad(s.camera.fov); const hfov = 2 * Math.atan(Math.tan(vfov / 2) * s.camera.aspect)
       const reach = (sz.y * 1.35) / 2  // lengan terangkat ±180° menambah tinggi di atas kepala
-      const dist = Math.max(reach / Math.tan(vfov / 2), (sz.x * 1.6) / 2 / Math.tan(hfov / 2)) * 1.15
+      const span = Math.max(sz.x * 1.6, sz.y)  // abduksi 90° → bentang lengan ≈ tinggi badan
+      const dist = Math.max(reach / Math.tan(vfov / 2), span / 2 / Math.tan(hfov / 2)) * 1.15
       s.controls.target.set(c.x, c.y + sz.y * 0.1, c.z); s.camera.position.set(c.x, c.y + sz.y * 0.1, c.z + dist); s.controls.update(); s.invalidate()
     }
     const key = motionInfo.glb
@@ -290,18 +299,21 @@ export function CanonicalBody() {
     Promise.all([loader.loadAsync(`${BASE}${motionInfo.glb}`), fetch(`${BASE}${motionInfo.timeline}`).then((r) => (r.ok ? r.json() : null))])
       .then(([g, raw]) => {
         if (cancelled) return
+        const drop = () => g.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
         const parsed = parseMotionTimeline(raw)
-        if (!parsed.ok) { setError(`Motion timeline rejected: ${parsed.error}`); setMotionOn(false); return }
+        if (!parsed.ok) { drop(); setError(`Motion timeline rejected: ${parsed.error}`); setMotionOn(false); return }
         const clip = g.animations.find((a) => a.name === parsed.timeline.clip)
-        if (!clip) { setError('Motion clip missing from the rig file.'); setMotionOn(false); return }
-        s.motionRoot.clear(); s.motionRoot.add(g.scene)
+        if (!clip) { drop(); setError('Motion clip missing from the rig file.'); setMotionOn(false); return }
+        disposeMotion()
+        s.motionRoot.add(g.scene)
         const mixer = new THREE.AnimationMixer(g.scene); mixer.clipAction(clip).play()
         motionRefs.current = { group: g.scene, mixer, key }
         motionClock.current = { timeS: 0, playing: true, speed: 1, loop: true }
         setMotionTl(parsed.timeline); show(parsed.timeline)
       })
       .catch(() => { if (!cancelled) { setError('Motion rig could not be loaded.'); setMotionOn(false) } })
-      .finally(() => { if (!cancelled) setLoading(false) })
+      // overlay selalu dilepas (juga bila dibatalkan), kecuali pemuatan sistem statis masih berjalan
+      .finally(() => { if (!loadState.current.inflight) setLoading(false) })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionOn, motionInfo])
