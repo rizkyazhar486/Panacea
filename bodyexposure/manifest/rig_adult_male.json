@@ -18,9 +18,9 @@
    0.4555
   ],
   "ELBOW.L": [
-   0.2185,
-   0.0261,
-   1.1013
+   0.2182,
+   0.0281,
+   1.1033
   ],
   "ANKLE.L": [
    0.074,
@@ -73,9 +73,9 @@
    0.4556
   ],
   "ELBOW.R": [
-   -0.2184,
-   0.0261,
-   1.1013
+   -0.2181,
+   0.0281,
+   1.1033
   ],
   "ANKLE.R": [
    -0.074,
@@ -264,28 +264,28 @@
    "method": "midpoint of humeral epicondyles",
    "mirror_snap_mm": 0.05,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 2.8,
+   "shift_mm": 14.4,
    "max_penetration_mm": [
-    0.23,
-    0.0
+    9.07,
+    0.23
    ]
   },
   "ANKLE.L": {
    "method": "midpoint of medial and lateral malleoli",
    "mirror_snap_mm": 0.05,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 0.0,
+   "shift_mm": 12.2,
    "max_penetration_mm": [
-    0.78,
+    4.23,
     0.78
    ]
   },
   "WRIST.L": {
    "method": "midpoint of radial and ulnar styloid tips (most distal vertices)",
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 0.0,
+   "shift_mm": 7.2,
    "max_penetration_mm": [
-    0.0,
+    4.84,
     0.0
    ]
   },
@@ -324,28 +324,28 @@
    "method": "midpoint of humeral epicondyles",
    "mirror_snap_mm": 0.0,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 2.8,
+   "shift_mm": 14.4,
    "max_penetration_mm": [
-    0.23,
-    0.0
+    9.07,
+    0.24
    ]
   },
   "ANKLE.R": {
    "method": "midpoint of medial and lateral malleoli",
    "mirror_snap_mm": 0.0,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 0.0,
+   "shift_mm": 12.2,
    "max_penetration_mm": [
-    0.78,
+    4.23,
     0.78
    ]
   },
   "WRIST.R": {
    "method": "midpoint of radial and ulnar styloid tips (most distal vertices)",
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 0.0,
+   "shift_mm": 7.2,
    "max_penetration_mm": [
-    0.0,
+    4.84,
     0.0
    ]
   },
@@ -470,13 +470,13 @@
   "SPINE.C2": 34.9,
   "HEAD": 153.0,
   "CLAVICLE.L": 167.9,
-  "UPPER_ARM.L": 286.0,
-  "FOREARM.L": 257.5,
+  "UPPER_ARM.L": 283.9,
+  "FOREARM.L": 259.9,
   "FOREARM_ROT.L": 229.6,
   "HAND.L": 85.0,
   "CLAVICLE.R": 167.9,
-  "UPPER_ARM.R": 285.9,
-  "FOREARM.R": 257.6,
+  "UPPER_ARM.R": 283.9,
+  "FOREARM.R": 259.9,
   "FOREARM_ROT.R": 229.6,
   "HAND.R": 85.0,
   "THIGH.L": 405.9,
@@ -702,7 +702,7 @@
  "flexion_axis": "knee, elbow, ankle and wrist flexion about the epicondylar / malleolar / styloid line (ISB); others perpendicular to the bone, anterior roll",
  "flexion_axis_change_deg": {
   "SHIN.L": 3.7,
-  "FOREARM.L": 8.1,
+  "FOREARM.L": 8.2,
   "FOOT.L": 43.3,
   "HAND.L": 7.2,
   "SHIN.R": 3.7,
@@ -754,33 +754,33 @@
  },
  "hinge_refinement": {
   "ELBOW.L": {
-   "shift_mm": 2.8,
-   "max_penetration_mm_isb": 0.23,
-   "max_penetration_mm_refined": 0.0
+   "shift_mm": 14.4,
+   "max_penetration_mm_isb": 9.07,
+   "max_penetration_mm_refined": 0.23
   },
   "ANKLE.L": {
-   "shift_mm": 0.0,
-   "max_penetration_mm_isb": 0.78,
+   "shift_mm": 12.2,
+   "max_penetration_mm_isb": 4.23,
    "max_penetration_mm_refined": 0.78
   },
   "WRIST.L": {
-   "shift_mm": 0.0,
-   "max_penetration_mm_isb": 0.0,
+   "shift_mm": 7.2,
+   "max_penetration_mm_isb": 4.84,
    "max_penetration_mm_refined": 0.0
   },
   "ELBOW.R": {
-   "shift_mm": 2.8,
-   "max_penetration_mm_isb": 0.23,
-   "max_penetration_mm_refined": 0.0
+   "shift_mm": 14.4,
+   "max_penetration_mm_isb": 9.07,
+   "max_penetration_mm_refined": 0.24
   },
   "ANKLE.R": {
-   "shift_mm": 0.0,
-   "max_penetration_mm_isb": 0.78,
+   "shift_mm": 12.2,
+   "max_penetration_mm_isb": 4.23,
    "max_penetration_mm_refined": 0.78
   },
   "WRIST.R": {
-   "shift_mm": 0.0,
-   "max_penetration_mm_isb": 0.0,
+   "shift_mm": 7.2,
+   "max_penetration_mm_isb": 4.84,
    "max_penetration_mm_refined": 0.0
   }
  },
@@ -872,12 +872,12 @@
     "SCAPULA": 26.7
    },
    "ELBOW.L": {
-    "HUMERUS": 0.2,
-    "ULNA": 8.9
+    "HUMERUS": 1.8,
+    "ULNA": 11.4
    },
    "ELBOW.R": {
-    "HUMERUS": 0.2,
-    "ULNA": 8.9
+    "HUMERUS": 1.8,
+    "ULNA": 11.4
    },
    "WRIST.L": {
     "RADIUS": 11.8
@@ -963,11 +963,11 @@
    ],
    [
     "ADULT.MALE.JOINT.OBLIQUE_CORD.L",
-    "FOREARM.L via nearest segment (9 mm)"
+    "FOREARM.L via nearest segment (8 mm)"
    ],
    [
     "ADULT.MALE.JOINT.OBLIQUE_CORD.R",
-    "FOREARM.R via nearest segment (9 mm)"
+    "FOREARM.R via nearest segment (8 mm)"
    ],
    [
     "ADULT.MALE.JOINT.POPLITEOFIBULAR_LIGAMENT.L",

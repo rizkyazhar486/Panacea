@@ -135,11 +135,12 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
   | Hinge | Shift | Penetration before → after |
   |---|---|---|
-  | Elbow | 2.8 mm | 0.23 → 0.0 mm |
-  | Ankle | 0.0 mm | 0.78 → 0.78 mm |
-  | Wrist (proximal carpal row against radius and ulna) | 0.0 mm | 0.0 → 0.0 mm |
+  | Elbow | 14.4 mm | 9.07 → 0.23 mm |
+  | Ankle | 12.2 mm | 4.23 → 0.78 mm |
+  | Wrist (proximal carpal row against radius and ulna) | 7.2 mm | 4.84 → 0.0 mm |
 
   - The elbow and ankle shifts reach the edge of the search window, so they are bounded results, not converged optima.
+  - The chain is reproducible with `pipeline/rig_chain.sh`, which always starts from the ISB rig. A fit run on an already-refined rig compounds the shift and is rejected.
   - An independent circle fit puts the centre of curvature of the distal humerus and the talar dome 5.8 mm and 4.9 mm from the refined centres, against 11.3 mm and 16.5 mm from the ISB centres.
   - The fit's nearest-normal penetration test is unreliable for thin parallel bones. A pronation-axis fit was tried and rejected because it made radius–ulna overlap worse under the parity test.
 - **Pronation axis:** a new bone `FOREARM_ROT` runs from the radial head centre to the ulnar head centre. The radius, the distal radio-ulnar joint and the hand follow it, so the radius rotates about the ulna and the ulna stays on the humeroulnar hinge. Before this fix, rotating the whole forearm drove the ulna up to 7.9 mm into the humerus.

@@ -115,7 +115,7 @@
  ],
  "rest_joint_deg": {
   "knee": 2.9,
-  "elbow": 10.3
+  "elbow": 11.0
  },
  "max_joint_excursion_deg": {
   "knee": 129.6,
