@@ -81,5 +81,10 @@ export { meldNa, meldBand, MELD_RANGES } from './engine/meldNa'
 export type { MeldInput, MeldResult, MeldBand } from './engine/meldNa'
 export { news2, news2Band, NEWS2_RANGES, rrPoints, spo2Points, sbpPoints as news2SbpPoints, hrPoints, tempPoints } from './engine/news2'
 export type { News2Input, News2Result, News2Band, News2Row } from './engine/news2'
+<<<<<<< HEAD
 export { fena, fenaBand, FENA_RANGES } from './engine/fena'
 export type { FenaInput, FenaResult, FenaBand } from './engine/fena'
+=======
+export { cockcroftGault, cgBand, devineIbwKg, CG_RANGES } from './engine/cockcroftGault'
+export type { CgInput, CgResult, CgBand, CgSex, CgWeightBasis } from './engine/cockcroftGault'
+>>>>>>> 8bfc525e9 (fix(calculators): Cockcroft-Gault input validation via clinical-calculators domain)
