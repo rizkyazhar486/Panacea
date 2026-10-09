@@ -171,8 +171,8 @@ stated extremal or centroid rule, recorded in `panacea_anchor_method`.
   doi:10.56902/COB.vh.2022.0, "Final 3D STL Models" (smoothed). Segmented from the NLM Visible Human Female cryosections.
 - **Licence:** CC BY 4.0 (stated in the dataset README). Required: cite the two papers listed in that README; images courtesy of
   the U.S. National Library of Medicine. Obtained from the owner's download (2026-10-10); copied to `sources/du_vhf/`.
-- **Content:** 128 structures, left and right: 15 bones per side set (hip bone, femur, patella, tibia, fibula, 7 tarsals, a combined
-  metatarsal-and-phalanx mesh) plus sacrum and coccyx, 8 articular cartilages, 4 knee ligaments (ACL, PCL, MCL, LCL) and 38 muscles per
+- **Content:** 128 structures, left and right: 13 bones per side (hip bone, femur, patella, tibia, fibula, 7 tarsals, a combined
+  metatarsal-and-phalanx mesh) plus an unpaired sacrum and coccyx, 8 articular cartilages, 4 knee ligaments (ACL, PCL, MCL, LCL) and 38 muscles per
   side. **Lower extremity and pelvis only**: no spine, ribs, skull or upper limb.
 - **Changes made:** STL (mm) merged by 0.1 mm to connected meshes; rotated 180° about Z into the canonical frame (+X subject left,
   −Y anterior, +Z superior), converted to metres, centred on the midpoint of the two hip bones, lowest point at z = 0. Frame checked from
