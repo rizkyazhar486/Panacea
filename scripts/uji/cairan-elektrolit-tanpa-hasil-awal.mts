@@ -28,7 +28,7 @@ const fenaKode = kodeDari(fena)
 for (const b of ['useState(20)', 'useState(2.0)', 'useState(140)', 'useState(60)']) {
   assert.ok(!fenaKode.includes(b), `a laboratory default is back in FeNa: ${b}`)
 }
-assert.ok(/const result = lengkap \? interpret\(fena\) : null/.test(fenaKode),
+assert.ok(/const result = hasil\.band/.test(fenaKode),
   'FeNa still names a differential diagnosis without a paired urine and plasma sample')
 // "Sedang memakai diuretik" adalah jawaban, bukan pengukuran.
 assert.ok(/const \[onDiuretics, setOnDiuretics\] = useState\(false\)/.test(fenaKode),
@@ -38,7 +38,7 @@ const hitungFena = (una: number, pcr: number, pna: number, ucr: number) => (una 
 assert.ok(Math.abs(hitungFena(20, 2.0, 140, 60) - 0.476) < 0.001,
   'the old defaults no longer give 0.48%; re-read this gate')
 assert.ok(hitungFena(20, 2.0, 140, 60) < 1, 'the old defaults no longer fall in the prerenal band; re-read this gate')
-assert.ok(/\(urineNa \* plasmaCr\) \/ denom \* 100/.test(fenaKode), 'the page no longer applies the FeNa formula')
+assert.ok(/fena\(\{ urineNa, plasmaCr, plasmaNa, urineCr \}\)/.test(fenaKode), 'the page no longer uses the FeNa domain engine')
 
 // ── LDL (Friedewald 1972) ──────────────────────────────────────────────────
 const ldl = baca('LdlCalculator.tsx')
