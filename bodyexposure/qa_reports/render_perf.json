@@ -1,0 +1,73 @@
+{
+ "measured": "2026-10-09",
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+ "browser": "Chrome headless (ANGLE Metal), deviceScaleFactor 2",
+ "scenario": "Adult male Motion mode playing (continuous render), 6 s per preset after switching",
+ "caveats": [
+  "Headless rAF caps at 60 fps",
+  "A concurrent headless Blender job was running during measurement; 1% lows are affected",
+  "One machine only (Apple M4); no mid-range desktop or phone measured"
+ ],
+ "results": [
+  {
+   "viewport": "1440x900",
+   "preset": "ultra",
+   "fps_mean": 57,
+   "fps_1pct_low": 30,
+   "canvas_px": [
+    2828,
+    1116
+   ]
+  },
+  {
+   "viewport": "1440x900",
+   "preset": "balanced",
+   "fps_mean": 53,
+   "fps_1pct_low": 20,
+   "canvas_px": [
+    2121,
+    837
+   ]
+  },
+  {
+   "viewport": "1440x900",
+   "preset": "performance",
+   "fps_mean": 59,
+   "fps_1pct_low": 30,
+   "canvas_px": [
+    1414,
+    558
+   ]
+  },
+  {
+   "viewport": "390x844",
+   "preset": "ultra",
+   "fps_mean": 60,
+   "fps_1pct_low": 60,
+   "canvas_px": [
+    728,
+    1046
+   ]
+  },
+  {
+   "viewport": "390x844",
+   "preset": "balanced",
+   "fps_mean": 58,
+   "fps_1pct_low": 30,
+   "canvas_px": [
+    546,
+    784
+   ]
+  },
+  {
+   "viewport": "390x844",
+   "preset": "performance",
+   "fps_mean": 59,
+   "fps_1pct_low": 30,
+   "canvas_px": [
+    364,
+    523
+   ]
+  }
+ ]
+}

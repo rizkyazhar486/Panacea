@@ -3,9 +3,10 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed } from '../domains/body-exposure'
+import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -133,6 +134,12 @@ export function CanonicalBody() {
   const motionClock = useRef<MotionClock>({ timeS: 0, playing: true, speed: 1, loop: true })
   const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string } | null>(null)
   const motionOnRef = useRef(false)
+  const motionLoadGen = useRef(0)
+  // ── kualitas render: preset + auto dari frame time terukur (engine/renderQuality) ──
+  const [qualityChoice, setQualityChoice] = useState<QualityChoice>('auto')
+  const [qualityActive, setQualityActive] = useState<QualityPreset>(() => initialPreset(window.innerWidth, window.devicePixelRatio))
+  const [fps, setFps] = useState<FrameStats | null>(null)
+  const qualityRef = useRef<{ choice: QualityChoice; active: QualityPreset }>({ choice: 'auto', active: qualityActive })
 
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
@@ -146,6 +153,7 @@ export function CanonicalBody() {
     /** Dipanggil tiap frame dengan dt (detik); true = adegan berubah dan perlu dirender. */
     animate: ((dt: number) => boolean) | null
     motionRoot: THREE.Group
+    applyQuality: (p: QualityPreset) => void
     /** Muatan GLB yang tiba sesudah komponen dilepas tidak punya pemilik; lihat lib/gltfSesudahLepas. */
     penjaga: PenjagaMuatan
   } | null>(null)
@@ -189,13 +197,27 @@ export function CanonicalBody() {
     const key = new THREE.DirectionalLight(0xfff4ea, 2.2); key.position.set(-2, 3, 3); scene.add(key)
     const rim = new THREE.DirectionalLight(0xcfe3ff, 1.2); rim.position.set(2, 2, -3); scene.add(rim)
     const root = new THREE.Group(); scene.add(root)
+    // pencahayaan lingkungan studio netral (prosedural, tanpa aset luar) untuk preset ultra/balanced
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const applyQuality = (p: QualityPreset) => {
+      renderer.setPixelRatio(effectivePixelRatio(window.devicePixelRatio, p))
+      scene.environment = QUALITY_PRESETS[p].environment ? envTex : null
+      scene.environmentIntensity = 0.55
+      const w = mount.clientWidth, h = mount.clientHeight; renderer.setSize(w, h)
+      dirty = true
+    }
     const motionRoot = new THREE.Group(); motionRoot.visible = false; scene.add(motionRoot)
     // render sesuai kebutuhan: hanya saat kamera bergerak atau adegan berubah (hemat baterai ponsel)
     let dirty = true
     const invalidate = () => { dirty = true }
     controls.addEventListener('change', invalidate)
     const penjaga = penjagaMuatan()
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot }
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality }
+    applyQuality(qualityRef.current.active)
+    // frame time hanya dari frame yang dirender berturut-turut (render sesuai kebutuhan: jeda bukan beban GPU)
+    const samples: number[] = []
+    let renderedLast = false, lastEval = 0
     const timer = new THREE.Timer(); timer.connect(document)  // Page Visibility: tab tersembunyi tidak menumpuk waktu
 
     const resize = () => {
@@ -207,9 +229,20 @@ export function CanonicalBody() {
       timer.update(now); const dt = timer.getDelta()  // detik waktu nyata: gerak tidak bergantung laju frame layar
       controls.update()  // redaman memicu event 'change' selama kamera masih bergerak
       if (sceneRef.current?.animate?.(dt)) dirty = true
-      if (!dirty) return
+      if (!dirty) { renderedLast = false; return }
       dirty = false
+      if (renderedLast) { samples.push(dt * 1000); if (samples.length > 240) samples.shift() }
       renderer.render(scene, camera)
+      renderedLast = true
+      if (now - lastEval > 2000 && samples.length >= 30) {  // evaluasi tiap ±2 s selama ada render kontinu
+        lastEval = now
+        const st = frameStats(samples); setFps(st)
+        const q = qualityRef.current
+        if (q.choice === 'auto') {
+          const next = nextAutoPreset(q.active, st)
+          if (next !== q.active) { q.active = next; applyQuality(next); setQualityActive(next); samples.length = 0 }
+        }
+      }
     })
 
     // identifikasi struktur dengan ketukan (bukan seretan)
@@ -232,6 +265,7 @@ export function CanonicalBody() {
     return () => {
       penjaga.lepas()
       timer.disconnect()
+      envTex.dispose(); pmrem.dispose()
       ro.disconnect()
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
@@ -246,6 +280,12 @@ export function CanonicalBody() {
     // select bersifat stabil (hanya memakai ref)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const q = qualityRef.current; q.choice = qualityChoice
+    const target = qualityChoice === 'auto' ? q.active : qualityChoice
+    q.active = target; setQualityActive(target); sceneRef.current?.applyQuality(target)
+  }, [qualityChoice])
 
   // ── mode gerak: rig kerangka beranimasi menggantikan tampilan statis (hanya tubuh yang punya rig) ──
   const motionInfo = matrix?.motion?.[fileTag(bodyId)]
@@ -295,6 +335,7 @@ export function CanonicalBody() {
     const ready = motionRefs.current?.key === key && motionTl
     if (ready) { show(motionTl); return () => { cancelled = true } }
     setLoading(true)
+    const gen = ++motionLoadGen.current
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     Promise.all([loader.loadAsync(`${BASE}${motionInfo.glb}`), fetch(`${BASE}${motionInfo.timeline}`).then((r) => (r.ok ? r.json() : null))])
       .then(([g, raw]) => {
@@ -312,8 +353,8 @@ export function CanonicalBody() {
         setMotionTl(parsed.timeline); show(parsed.timeline)
       })
       .catch(() => { if (!cancelled) { setError('Motion rig could not be loaded.'); setMotionOn(false) } })
-      // overlay selalu dilepas (juga bila dibatalkan), kecuali pemuatan sistem statis masih berjalan
-      .finally(() => { if (!loadState.current.inflight) setLoading(false) })
+      // overlay dilepas oleh pemuatan gerak terakhir saja (toggle cepat), dan tidak bila sistem statis masih dimuat
+      .finally(() => { if (motionLoadGen.current === gen && !loadState.current.inflight) setLoading(false) })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionOn, motionInfo])
@@ -652,6 +693,11 @@ export function CanonicalBody() {
             {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
           </div>
         )}
+        {fps && (  // frame time terukur dari render kontinu (rata-rata & 1 % terendah), juga saat mode gerak
+          <div className="pointer-events-none absolute right-3 top-14 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70" data-testid="fps-readout">
+            {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}
+          </div>
+        )}
         {loading && <div className="absolute inset-0 grid place-items-center text-sm font-bold text-white/80">Loading anatomy…</div>}
         {!loading && !motionOn && stats.structures > 0 && (
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70">
@@ -686,6 +732,19 @@ export function CanonicalBody() {
 
       <Card>
         <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">
+              Graphics quality{qualityChoice === 'auto' && <span className="normal-case"> · now {qualityActive}</span>}
+            </p>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Graphics quality">
+              {(['auto', 'ultra', 'balanced', 'performance'] as QualityChoice[]).map((k) => (
+                <button key={k} role="radio" aria-checked={qualityChoice === k} onClick={() => setQualityChoice(k)}
+                  className={`min-h-[40px] rounded-full border px-3.5 text-[13px] font-bold capitalize ${qualityChoice === k ? 'border-brand bg-brand-100 text-brand-dark dark:bg-emerald-400/15 dark:text-emerald-200' : 'border-neutral-500/30 opacity-70'}`}>
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Section plane</p>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Section plane">

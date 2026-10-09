@@ -70,3 +70,15 @@ export {
   type MotionClock,
   type MotionSpeed,
 } from './engine/motionTimeline'
+export {
+  QUALITY_PRESETS,
+  FRAME_BUDGET_MS,
+  frameStats,
+  nextAutoPreset,
+  initialPreset,
+  effectivePixelRatio,
+  type QualityPreset,
+  type QualityChoice,
+  type QualitySettings,
+  type FrameStats,
+} from './engine/renderQuality'
