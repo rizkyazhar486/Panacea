@@ -132,3 +132,26 @@ test('scrub_dijepit_dan_menolak_nan', () => {
   assert.equal(scrubToTime(Number.NaN, 4), null)
   assert.equal(scrubToTime(0.5, 0), null)
 })
+
+// ── peralihan antar klip ──────────────────────────────────────────────────────
+import { crossfadeWeight, CROSSFADE_S } from '../../src/domains/body-exposure/engine/motionTimeline.ts'
+
+test('crossfade_mulai_di_0_dan_selesai_di_1_pada_batas', () => {
+  assert.equal(crossfadeWeight(0), 0)
+  assert.equal(crossfadeWeight(CROSSFADE_S), 1)
+  assert.equal(crossfadeWeight(CROSSFADE_S / 2), 0.5)  // smootherstep simetris
+})
+
+test('crossfade_naik_monoton_dan_dijepit_di_luar_rentang', () => {
+  let prev = -1
+  for (let i = 0; i <= 20; i++) { const w = crossfadeWeight((i / 20) * CROSSFADE_S); assert.ok(w >= prev && w >= 0 && w <= 1); prev = w }
+  assert.equal(crossfadeWeight(10), 1)
+  assert.equal(crossfadeWeight(-0.1), 0)  // waktu negatif: tetap klip lama
+})
+
+test('crossfade_masukan_tidak_valid_gagal_aman_ke_klip_baru', () => {
+  assert.equal(crossfadeWeight(Number.NaN), 1)
+  assert.equal(crossfadeWeight(Number.POSITIVE_INFINITY), 1)
+  assert.equal(crossfadeWeight(0.1, 0), 1)   // durasi nol
+  assert.equal(crossfadeWeight(0.1, -1), 1)  // durasi negatif
+})

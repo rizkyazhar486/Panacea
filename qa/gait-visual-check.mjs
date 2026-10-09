@@ -26,6 +26,29 @@ try {
   await page.getByRole('button', { name: 'Motion', exact: true }).click()
   await page.getByTestId('motion-panel').waitFor({ timeout: 60000 })
   const cvs = page.getByTestId('canonical-body-canvas'), slider = page.getByLabel('Motion timeline')
+  // peralihan klip: dari pose ROM yang dijeda ke WALK, lalu WALK → RUN. Lonjakan pose "potong keras" = selisih pose lama vs pose awal klip baru
+  // (diukur setelah crossfade selesai); dengan crossfade, bingkai sesaat setelah klik harus lebih dekat ke pose lama daripada potong keras.
+  out.transitions = {}
+  const popTest = async (label, fromName, toName, fromFrac) => {
+    await page.getByRole('radio', { name: fromName, exact: true }).click()
+    await page.getByRole('button', { name: 'Pause', exact: true }).click().catch(() => {})
+    await slider.fill(String(fromFrac)); await page.waitForTimeout(300)
+    const old = await cvs.screenshot()
+    await page.getByRole('radio', { name: toName, exact: true }).click()
+    await page.waitForTimeout(40)
+    const early = await cvs.screenshot()  // ≈ 40 ms setelah peralihan: bobot klip baru ≈ 0,02
+    await page.waitForTimeout(700)        // crossfade 0,3 s selesai
+    await page.getByRole('button', { name: 'Pause', exact: true }).click().catch(() => {})
+    await slider.fill('0'); await page.waitForTimeout(300)
+    const fresh = await cvs.screenshot()  // pose awal klip baru tanpa pencampuran
+    const hard = await diffPct(page, old, fresh), soft = await diffPct(page, old, early)
+    out.transitions[label] = { hard_cut_pop_pct: +hard.toFixed(3), first_frame_after_switch_pct: +soft.toFixed(3) }
+    assert(hard > 0.3, `${label}: poses too similar to test the crossfade (${hard.toFixed(3)}%)`)
+    // tangkapan layar memakan >100 ms dari 300 ms crossfade, jadi bingkai pertama yang terlihat sudah sebagian bercampur: syaratnya lebih kecil dari potong keras
+    assert(soft < hard * 0.9, `${label}: no blend visible at the switch (${soft.toFixed(3)}% vs hard cut ${hard.toFixed(3)}%)`)
+  }
+  await popTest('ROM->WALK', 'Range of motion', 'Walk', 0.3)
+  await popTest('WALK->RUN', 'Walk', 'Run', 0.5)
   for (const [label, name] of [['WALK', 'Walk'], ['RUN', 'Run']]) {
     await page.getByRole('radio', { name, exact: true }).click()
     await page.getByText('Recorded motion', { exact: true }).waitFor()

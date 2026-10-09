@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
+import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -132,7 +132,9 @@ export function CanonicalBody() {
   const [motionTl, setMotionTl] = useState<MotionTimeline | null>(null)
   const [motionUi, setMotionUi] = useState<{ timeS: number; playing: boolean; speed: MotionSpeed }>({ timeS: 0, playing: true, speed: 1 })
   const motionClock = useRef<MotionClock>({ timeS: 0, playing: true, speed: 1, loop: true })
-  const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string; clips: THREE.AnimationClip[]; lib: MotionTimeline[] } | null>(null)
+  const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string; clips: THREE.AnimationClip[]; lib: MotionTimeline[]; current?: string } | null>(null)
+  // peralihan antar klip: pose terakhir klip lama (kuaternion & posisi tulang) dicampur ke klip baru selama CROSSFADE_S
+  const motionFade = useRef<{ from: Map<THREE.Object3D, { q: THREE.Quaternion; p: THREE.Vector3 }>; elapsedS: number } | null>(null)
   const [motionLib, setMotionLib] = useState<MotionTimeline[]>([])
   const [clipName, setClipName] = useState('ROM')
   const motionOnRef = useRef(false)
@@ -345,9 +347,16 @@ export function CanonicalBody() {
       s.animate = (dt) => {
         const r = advanceClock(motionClock.current, dt, dur)
         if (!r.ok) return false
-        const moved = r.clock.timeS !== motionClock.current.timeS
+        const fading = motionFade.current
+        const moved = r.clock.timeS !== motionClock.current.timeS || !!fading
         motionClock.current = r.clock
         if (moved) m.mixer.setTime(r.clock.timeS)
+        if (fading) {
+          fading.elapsedS += dt
+          const w = crossfadeWeight(fading.elapsedS)
+          for (const [o, f] of fading.from) { o.quaternion.slerpQuaternions(f.q, o.quaternion, w); o.position.lerpVectors(f.p, o.position, w) }
+          if (w >= 1) motionFade.current = null
+        }
         // UI ±10 Hz selama berjalan; saat dijeda hanya sekali (bukan setState tiap frame)
         if ((moved && Math.abs(r.clock.timeS - lastUi) >= 0.1) || r.clock.playing !== lastPlaying) {
           lastUi = r.clock.timeS; lastPlaying = r.clock.playing
@@ -371,6 +380,16 @@ export function CanonicalBody() {
       const tl = m.lib.find((c) => c.clip === name) ?? m.lib[0]
       const clip = m.clips.find((c) => c.name === tl.clip)
       if (!clip) return
+      // pose terakhir klip lama (hanya bila benar-benar berganti klip) untuk peralihan halus
+      motionFade.current = null
+      if (m.current && m.current !== tl.clip) {
+        const from = new Map<THREE.Object3D, { q: THREE.Quaternion; p: THREE.Vector3 }>()
+        // nama track 'NAMA.quaternion' → NAMA (nama tulang sudah disanitasi loader, tanpa titik)
+        const names = new Set(m.clips.flatMap((c) => c.tracks.map((t) => t.name.slice(0, t.name.lastIndexOf('.')))))
+        names.forEach((n) => { const o = m.group.getObjectByName(n); if (o) from.set(o, { q: o.quaternion.clone(), p: o.position.clone() }) })
+        if (from.size) motionFade.current = { from, elapsedS: 0 }
+      }
+      m.current = tl.clip
       m.mixer.stopAllAction(); m.mixer.clipAction(clip).play()
       motionClock.current = { timeS: 0, playing: true, speed: motionClock.current.speed, loop: true }
       m.mixer.setTime(0)

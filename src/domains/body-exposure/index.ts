@@ -71,6 +71,8 @@ export {
   type MotionMovement,
   type MotionClock,
   type MotionSpeed,
+  CROSSFADE_S,
+  crossfadeWeight,
 } from './engine/motionTimeline'
 export {
   QUALITY_PRESETS,
