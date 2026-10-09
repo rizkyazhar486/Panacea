@@ -61,11 +61,13 @@ export { matchBakedAo, aoToVertexColors, type AoLayerEntry, type AoMatch } from 
 export { applyBakedAoToLayer } from './adapters/bakedAoLayer'
 export {
   parseMotionTimeline,
+  parseMotionLibrary,
   movementAt,
   advanceClock,
   scrubToTime,
   MOTION_SPEEDS,
   type MotionTimeline,
+  type MotionTruthClass,
   type MotionMovement,
   type MotionClock,
   type MotionSpeed,

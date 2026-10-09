@@ -91,66 +91,11 @@ for f in range(1, frame + 1, 2):
 angle_ok = all(maxdev[k] <= LIM[k] + 1 for k in LIM)
 
 
-def tree(name):
-    o = bpy.data.objects[name]; dg = bpy.context.evaluated_depsgraph_get(); M = o.matrix_world
-    me = o.evaluated_get(dg).data
-    return BVHTree.FromPolygons([M @ v.co for v in me.vertices], [p.vertices[:] for p in me.polygons])
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from rig_contact_qa import sweep  # noqa: E402  (QA kontak bersama dengan retarget gait)
 
-
-S = "ADULT.MALE.SKELETAL."
-CONTACT = [("knee flexion", S + "FEMUR.L", S + "TIBIA.L"), ("elbow flexion", S + "HUMERUS.L", S + "ULNA.L"),
-           ("hip flexion (knee flexed)", S + "FEMUR.R", S + "HIP_BONE.R"), ("shoulder abduction", S + "HUMERUS.L", S + "SCAPULA.L"),
-           ("ankle plantarflexion", S + "TIBIA.L", S + "TALUS.L"), ("wrist flexion", S + "RADIUS.L", S + "LUNATE.L")]
-peak_of = {t["movement"]: t["frames"][1] for t in timeline}
-def depth(a, b):
-    """Kedalaman maksimum (m) verteks tulang a yang berada di dalam permukaan tulang b."""
-    oa = bpy.data.objects[a]; dg = bpy.context.evaluated_depsgraph_get(); M = oa.matrix_world
-    tb = tree(b); me = oa.evaluated_get(dg).data
-    V = [M @ v.co for v in me.vertices]
-    # semua verteks A di dalam bbox B (bukan hanya segitiga yang bersilangan: verteks yang terbenam penuh ikut terhitung)
-    ob = bpy.data.objects[b]; Mb = ob.matrix_world; vb = [Mb @ v.co for v in ob.evaluated_get(dg).data.vertices]
-    lo = [min(v[i] for v in vb) for i in range(3)]; hi = [max(v[i] for v in vb) for i in range(3)]
-    # di-dalam ditentukan dengan paritas 3 sinar (mayoritas), bukan arah normal terdekat: pada tulang pipih (skapula)
-    # titik yang menembus sampai sisi seberang punya normal terdekat yang menghadap keluar → salah dianggap di luar
-    worst = 0.0
-    for p in V:
-        if not all(lo[i] <= p[i] <= hi[i] for i in range(3)): continue
-        if inside(tb, p): worst = max(worst, tb.find_nearest(p)[3])
-    return worst
-
-
-DIRS = [Vector((1, 0.013, 0.007)).normalized(), Vector((-0.011, 1, 0.017)).normalized(), Vector((0.009, -0.015, -1)).normalized()]
-
-
-def inside(tb, p):
-    votes = 0
-    for d in DIRS:
-        q, k = p.copy(), 0
-        for _ in range(64):
-            h = tb.ray_cast(q, d)
-            if h[0] is None: break
-            k += 1; q = h[0] + d * 1e-5
-        votes += k % 2
-    return votes >= 2
-
-
-PAIRS_C = [("FEMUR", "TIBIA"), ("HUMERUS", "ULNA"), ("HUMERUS", "RADIUS"), ("FEMUR", "HIP_BONE"), ("HUMERUS", "SCAPULA"),
-           ("HUMERUS", "CLAVICLE"), ("RADIUS", "ULNA"), ("TIBIA", "TALUS"), ("FIBULA", "TALUS"),
-           ("RADIUS", "LUNATE_BONE"), ("RADIUS", "SCAPHOID_BONE"), ("ULNA", "LUNATE_BONE"), ("ULNA", "TRIQUETRUM_BONE")]
 frames = sorted(set(list(range(1, frame + 1, 12)) + [t["frames"][1] for t in timeline]))
-contact = []
-for side in ("L", "R"):
-    for a0, b0 in PAIRS_C:
-        a, b = f"{S}{a0}.{side}", f"{S}{b0}.{side}"
-        missing = [n for n in (a, b) if n not in bpy.data.objects]
-        if missing:  # pasangan yang tak ditemukan adalah kesalahan QA, bukan dilewati diam-diam
-            raise SystemExit(f"contact pair object missing: {missing}")
-        worst, at = 0.0, 1
-        for f in frames:
-            sc.frame_set(f); d = max(depth(a, b), depth(b, a))  # dua arah
-            if d > worst: worst, at = d, f
-        mov = next((t["movement"] for t in timeline if t["frames"][0] <= at <= t["frames"][2]), "rest")
-        contact.append({"pair": [f"{a0}.{side}", f"{b0}.{side}"], "max_penetration_mm": round(worst * 1000, 2), "at_frame": at, "movement": mov})
+contact = sweep(sc, frames, lambda at: next((t["movement"] for t in timeline if t["frames"][0] <= at <= t["frames"][2]), "rest"))
 contact_ok = all(c["max_penetration_mm"] <= 1.5 for c in contact)
 sc.frame_set(1)
 arm["panacea_animation"] = "ROM demonstration from AAOS limits (see qa_reports/rig_rom_animation.json)"

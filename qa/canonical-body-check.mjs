@@ -83,6 +83,15 @@ try {
       const mc = await page.getByTestId('canonical-body-canvas').boundingBox()
       await page.mouse.click(mc.x + mc.width / 2, mc.y + mc.height * 0.42)
       await page.getByText(/^ADULT\.MALE\.(SKELETAL|JOINT)\./).first().waitFor({ timeout: 20000 })
+      // klip berjalan dari motion capture CMU: kelas kebenaran "Recorded motion", bergerak saat diputar
+      await page.getByRole('radio', { name: 'Walk', exact: true }).click()
+      await page.getByText('Recorded motion', { exact: true }).waitFor()
+      await page.getByTestId('motion-movement').filter({ hasText: /walking cycle/i }).waitFor()
+      const wA = await page.getByTestId('canonical-body-canvas').screenshot(); await page.waitForTimeout(400); const wB = await page.getByTestId('canonical-body-canvas').screenshot()
+      assert(!wA.equals(wB), 'walk clip: canvas did not change while playing')
+      await page.screenshot({ path: `/private/tmp/canonical-walk-${width}-${theme}.png`, fullPage: true })
+      await page.getByRole('radio', { name: 'Range of motion', exact: true }).click()
+      await page.getByText('Simulation', { exact: true }).waitFor()
       await page.getByRole('button', { name: 'Stop motion' }).click()
       await page.getByTestId('motion-panel').waitFor({ state: 'detached' })
       // pemuatan bertahap: struktur saraf (sistem belum dimuat) tetap bisa dicari, sistemnya dimuat lalu dipilih

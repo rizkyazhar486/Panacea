@@ -2,12 +2,19 @@
 // Murni & deterministik: tanpa DOM, tanpa Date.now(); dt disuntikkan pemanggil.
 
 export interface MotionMovement { name: string; startS: number; endS: number; note: string }
+// simulated: dihasilkan dari aturan (mis. batas ROM AAOS); measured-retargeted: rekaman gerak individu LAIN yang
+// dipetakan ke rig ini (bukan biomekanika pasien). Kelas lain ditolak.
+export type MotionTruthClass = 'simulated' | 'measured-retargeted'
+const TRUTH_CLASSES: readonly MotionTruthClass[] = ['simulated', 'measured-retargeted']
+
 export interface MotionTimeline {
   clip: string
+  labelShort: string
+  acknowledgement: string
   fps: number
   durationS: number
   source: string
-  truthClass: 'simulated'
+  truthClass: MotionTruthClass
   label: string
   movements: MotionMovement[]
 }
@@ -27,7 +34,8 @@ export function parseMotionTimeline(raw: unknown): ParseResult {
   if (!isNum(r.fps) || r.fps <= 0) return { ok: false, error: 'fps must be a positive number' }
   if (!isNum(r.frames) || r.frames < 2) return { ok: false, error: 'frames must be at least 2' }
   if (!isStr(r.source)) return { ok: false, error: 'source missing' }
-  if (r.truth_class !== 'simulated') return { ok: false, error: 'truth_class must be "simulated"' }
+  if (!TRUTH_CLASSES.includes(r.truth_class as MotionTruthClass)) return { ok: false, error: 'truth_class must be "simulated" or "measured-retargeted"' }
+  if (r.truth_class === 'measured-retargeted' && !isStr(r.acknowledgement)) return { ok: false, error: 'measured motion needs a source acknowledgement' }
   if (!isStr(r.label)) return { ok: false, error: 'label missing' }
   if (!Array.isArray(r.movements) || r.movements.length === 0) return { ok: false, error: 'movements missing' }
   const durationS = (r.frames - 1) / r.fps
@@ -43,7 +51,22 @@ export function parseMotionTimeline(raw: unknown): ParseResult {
     movements.push({ name: x.name, startS: x.start_s, endS: x.end_s, note: isStr(x.note) ? x.note : '' })
     prevEnd = x.end_s
   }
-  return { ok: true, timeline: { clip: r.clip, fps: r.fps, durationS, source: r.source, truthClass: 'simulated', label: r.label, movements } }
+  return { ok: true, timeline: { clip: r.clip, labelShort: isStr(r.label_short) ? r.label_short : r.clip, acknowledgement: isStr(r.acknowledgement) ? r.acknowledgement : '',
+    fps: r.fps, durationS, source: r.source, truthClass: r.truth_class as MotionTruthClass, label: r.label, movements } }
+}
+
+/** Pustaka klip ({clips: [...]}): tidak kosong, nama unik, setiap klip valid — satu klip cacat menolak seluruhnya. */
+export function parseMotionLibrary(raw: unknown): { ok: true; clips: MotionTimeline[] } | { ok: false; error: string } {
+  const list = (raw as { clips?: unknown } | null)?.clips
+  if (!Array.isArray(list) || list.length === 0) return { ok: false, error: 'library needs a non-empty clips array' }
+  const clips: MotionTimeline[] = []
+  for (const c of list) {
+    const r = parseMotionTimeline(c)
+    if (!r.ok) return { ok: false, error: `clip ${clips.length + 1}: ${r.error}` }
+    if (clips.some((x) => x.clip === r.timeline.clip)) return { ok: false, error: `duplicate clip "${r.timeline.clip}"` }
+    clips.push(r.timeline)
+  }
+  return { ok: true, clips }
 }
 
 /** Gerakan yang aktif pada waktu t (detik); null di luar semua gerakan atau bila t tidak valid. */

@@ -399,7 +399,7 @@
  "motion": {
   "adult_male": {
    "glb": "adult_male.rig_rom.glb",
-   "timeline": "adult_male.rig_rom.json"
+   "timeline": "adult_male.rig_motion.json"
   }
  }
 }

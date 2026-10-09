@@ -186,3 +186,24 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
   - The originals stay hidden but are kept for metadata and focus, and merged triangles map back to their source structure for picking.
   - An independent check found the per-structure world bounding boxes identical to the originals within 1.5×10⁻⁸ m at 12 clip frames, and picking identical in 550 of 550 rays.
   - At 1440×900 the clip ran at about 60 fps (the headless vsync cap) across all presets, up from about 42 fps before merging, on the same machine with a dev build. Toggling Motion does not leak GPU buffers, and switching body frees the rig.
+
+## Walk and run from motion capture (2026-10-09)
+
+- `pipeline/retarget_cmu_gait.py` retargets CMU motion capture onto the adult male rig. It runs forward kinematics on the ASF/AMC files with the CMU convention.
+  - Thigh and upper-arm angles are measured against world vertical, because the rig pelvis is upright and static while the CMU pelvis tilts 3–11°. The heading comes from the root on each frame.
+  - Knee, ankle and elbow angles are measured between segments.
+  - One gait cycle is extracted, using the period of the right knee angle refined ±3 frames for the smallest seam, and resampled to 24 fps. The remaining end-minus-start difference is spread linearly over the cycle: 4.58° for walking and 12.39° for running.
+  - Signs come from the ROM manifest, and angles are clamped to the AAOS limits.
+  - The motion runs treadmill-style in place.
+- **Walk** (subject 07/01): cycle 1.092 s.
+  - Knee flexion 0.0–69.9°. Thigh angle -32.5 to 36.4° from vertical.
+  - The pelvis height is set on each frame so the lowest foot point is exactly on the floor (-0.0–0.0 m).
+  - Maximum bone penetration 0.61 mm.
+- **Run** (subject 09/02): cycle 0.75 s.
+  - Knee flexion up to 113.8°.
+  - The mocap pelvis bounce is kept and scaled by leg-length ratio, then shifted so the cycle's lowest point touches the floor. The flight phase is kept, with feet up to 0.0872 m off the floor.
+  - Maximum bone penetration 1.32 mm.
+- **Export:** the rig GLB now carries three clips (ROM, WALK, RUN), packed with `gltfpack -af 0`. Without that flag, gltfpack's default 30 Hz resampling shifts the 24 fps keys. The timeline library `adult_male.rig_motion.json` has one entry per clip.
+- **App:** the Motion panel has a clip selector. The badge reads Simulation for the ROM clip and Recorded motion for the CMU clips, and the CMU acknowledgement is shown.
+  - `parseMotionLibrary` rejects an empty library, a duplicate clip, a defective clip, an unknown truth class, or a measured clip without attribution (20 tests).
+- **Not yet:** foot-locking IK (the stance foot slides back as on a treadmill), pelvis rotation, and spine motion.

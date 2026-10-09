@@ -1,9 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime } from '../../src/domains/body-exposure/engine/motionTimeline.ts'
+import { parseMotionTimeline, parseMotionLibrary, movementAt, advanceClock, scrubToTime } from '../../src/domains/body-exposure/engine/motionTimeline.ts'
 
-const published = JSON.parse(readFileSync(new URL('../../public/bodyexposure/adult_male.rig_rom.json', import.meta.url), 'utf8'))
+const library = JSON.parse(readFileSync(new URL('../../public/bodyexposure/adult_male.rig_motion.json', import.meta.url), 'utf8'))
+const published = library.clips[0]
 const valid = {
   clip: 'ROM', fps: 24, frames: 97, source: 'AAOS', truth_class: 'simulated', label: 'demo',
   movements: [{ name: 'a', start_s: 0, end_s: 2, note: '' }, { name: 'b', start_s: 2, end_s: 4, note: 'n' }],
@@ -24,9 +25,30 @@ test('menerima_timeline_minimal_valid', () => {
   assert.equal(r.timeline.durationS, 4)
 })
 
-test('menolak_kelas_kebenaran_bukan_simulated', () => {
+test('menolak_kelas_kebenaran_di_luar_daftar', () => {
   const r = parseMotionTimeline({ ...valid, truth_class: 'measured' })
-  assert.deepEqual(r, { ok: false, error: 'truth_class must be "simulated"' })
+  assert.deepEqual(r, { ok: false, error: 'truth_class must be "simulated" or "measured-retargeted"' })
+  assert.equal(parseMotionTimeline({ ...valid, truth_class: 'patient' }).ok, false)
+})
+
+test('menerima_gerak_terukur_dengan_atribusi_dan_menolak_tanpa_atribusi', () => {
+  const m = { ...valid, truth_class: 'measured-retargeted', acknowledgement: 'mocap.cs.cmu.edu' }
+  assert.equal(parseMotionTimeline(m).timeline.truthClass, 'measured-retargeted')
+  assert.deepEqual(parseMotionTimeline({ ...m, acknowledgement: '' }), { ok: false, error: 'measured motion needs a source acknowledgement' })
+})
+
+test('pustaka_terbitan_valid_dengan_rom_jalan_lari', () => {
+  const r = parseMotionLibrary(library)
+  assert.equal(r.ok, true)
+  assert.deepEqual(r.clips.map((c) => c.clip), ['ROM', 'WALK', 'RUN'])
+  assert.deepEqual(r.clips.map((c) => c.truthClass), ['simulated', 'measured-retargeted', 'measured-retargeted'])
+})
+
+test('pustaka_menolak_kosong_duplikat_dan_klip_cacat', () => {
+  assert.equal(parseMotionLibrary({ clips: [] }).ok, false)
+  assert.equal(parseMotionLibrary(null).ok, false)
+  assert.deepEqual(parseMotionLibrary({ clips: [valid, valid] }), { ok: false, error: 'duplicate clip "ROM"' })
+  assert.deepEqual(parseMotionLibrary({ clips: [valid, { ...valid, clip: 'X', fps: 0 }] }), { ok: false, error: 'clip 2: fps must be a positive number' })
 })
 
 test('menolak_tanpa_sumber', () => {

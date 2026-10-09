@@ -24,3 +24,8 @@ icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
                and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
                reference values. Dosimetry-only layers removed. Redistribution in
                Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).
+
+adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
+               Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
+               The data used in this project was obtained from mocap.cs.cmu.edu.
+               The database was created with funding from NSF EIA-0196217.

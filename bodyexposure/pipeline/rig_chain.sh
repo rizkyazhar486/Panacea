@@ -14,7 +14,10 @@ run $M -P $P/build_rig.py -- --out $R/PANACEA_RIG_ADULT_MALE.blend --report $MAN
 run $R/PANACEA_RIG_ADULT_MALE.blend -P $P/check_rig_pose.py -- --rom $MAN/rig_adult_male.json --out $QA/rig_pose_adult_male.json
 PV=(); [[ "${1:-}" == "--preview" ]] && PV=(--preview $ROOT/renders/rom_preview_1280x720.mp4)
 run $R/PANACEA_RIG_ADULT_MALE.blend -P $P/animate_rom.py -- --rom $MAN/rig_adult_male.json --out $R/PANACEA_RIG_ADULT_MALE_ROM.blend --report $QA/rig_rom_animation.json $PV
+# gerak berjalan & berlari dari motion capture CMU (sources/cmu_mocap: 07.asf/07_01.amc, 09.asf/09_02.amc)
+run $R/PANACEA_RIG_ADULT_MALE_ROM.blend -P $P/retarget_cmu_gait.py -- --rom $MAN/rig_adult_male.json --src $ROOT/sources/cmu_mocap --clips WALK:07:07_01,RUN:09:09_02 --out $R/PANACEA_RIG_ADULT_MALE_GAIT.blend --report $QA/rig_gait.json
 RAW=$(mktemp -d)
-run $R/PANACEA_RIG_ADULT_MALE_ROM.blend -P $P/export_rig_glb.py -- --out $RAW/adult_male.rig_rom.glb --timeline $QA/rig_rom_animation.json --timeline-out public/bodyexposure/adult_male.rig_rom.json
-npx -y gltfpack -i $RAW/adult_male.rig_rom.glb -o public/bodyexposure/adult_male.rig_rom.glb -c -kn -km -ke >/dev/null
+run $R/PANACEA_RIG_ADULT_MALE_GAIT.blend -P $P/export_rig_glb.py -- --out $RAW/adult_male.rig_rom.glb --timeline $QA/rig_rom_animation.json --gait $QA/rig_gait.json --timeline-out public/bodyexposure/adult_male.rig_motion.json
+# -af 0: jangan resample animasi (default gltfpack 30 Hz menggeser kunci 24 fps klip gait)
+npx -y gltfpack -i $RAW/adult_male.rig_rom.glb -o public/bodyexposure/adult_male.rig_rom.glb -c -kn -km -ke -af 0 >/dev/null
 echo "CHAIN done"
