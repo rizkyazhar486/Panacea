@@ -65,3 +65,5 @@ export { maddreyScore, MADDREY_RANGES, DF_COEFFICIENT, SEVERE_DF_THRESHOLD } fro
 export type { MaddreyInput, MaddreyResult } from './engine/maddreyScore'
 export { naegele, CYCLE_LENGTH_DAYS, LMP_YEAR, MAX_DISPLAY_GA_DAYS } from './engine/naegele'
 export type { NaegeleResult } from './engine/naegele'
+export { referenceChangeValue, judgeSerialChange, RCV_Z, CV_PERCENT_RANGE } from './engine/referenceChangeValue'
+export type { RcvInput, RcvResult, RcvVerdict } from './engine/referenceChangeValue'
