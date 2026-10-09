@@ -17,7 +17,7 @@ KEYS = ["panacea_structure_id", "canonical_name", "panacea_body_id", "panacea_sy
         "panacea_laterality_source", "panacea_position_side", "panacea_region", "panacea_source", "panacea_license",
         "panacea_source_raw_name", "panacea_accuracy_status", "panacea_review_status", "panacea_reference", "panacea_method",
         "panacea_known_limitations", "panacea_qa_note", "panacea_version", "biological_sex_applicability",
-        "panacea_kind", "panacea_ta2_id", "panacea_latin_name", "panacea_name_fr", "panacea_ta2_match", "panacea_source_group"]
+        "panacea_kind", "panacea_ta2_id", "panacea_latin_name", "panacea_name_fr", "panacea_ta2_match", "panacea_source_group", "panacea_individual", "panacea_clinically_reviewed"]
 
 
 def mesh_stats(o):

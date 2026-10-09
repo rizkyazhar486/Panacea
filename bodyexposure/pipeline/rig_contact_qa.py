@@ -16,6 +16,12 @@ PAIRS = [("FEMUR", "TIBIA"), ("HUMERUS", "ULNA"), ("HUMERUS", "RADIUS"), ("FEMUR
 DIRS = [Vector((1, 0.013, 0.007)).normalized(), Vector((-0.011, 1, 0.017)).normalized(), Vector((0.009, -0.015, -1)).normalized()]
 
 
+def configure(prefix, pairs):
+    """Ganti awalan nama tulang dan daftar pasangan untuk tubuh lain (mis. tungkai bawah perempuan); bawaan = laki-laki dewasa."""
+    global S, PAIRS
+    S, PAIRS = prefix, pairs
+
+
 def _world(name):
     o = bpy.data.objects[name]; dg = bpy.context.evaluated_depsgraph_get(); M = o.matrix_world
     me = o.evaluated_get(dg).data

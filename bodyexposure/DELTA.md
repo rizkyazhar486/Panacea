@@ -215,7 +215,10 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
   4 knee ligaments and 38 muscles per side. Built as `VHF_LOWER_LIMB.ADULT.FEMALE` (`pipeline/build_vhf_lower_limb.py`), a separate body,
   not merged into the HuBMAP female.
 - This is the first female source with per-bone meshes, so a female **lower-limb** rig (hip, knee, ankle) is now possible.
-  Not yet done: rig, web export, app variant. The female spine, ribs, skull and upper limb are still blocked.
+  The female spine, ribs, skull and upper limb are still open (the owner approved CT segmentation for them on 2026-10-09, PR #2303; not started).
+- **Labelled as one individual**, not an atlas: 59-year-old donor, 157 cm, 88 kg (Andreassen et al. 2023). Licence terms of the Denver collection (CC BY 4.0) and NLM (attribution, no endorsement, currency notice) were re-read from the official pages on 2026-10-10 and recorded in PROVENANCE.md.
+- **Lower-limb rig** (hip, knee, ankle; bones and cartilages bound, ligaments and muscles not): ankle hinge refined (bone overlap 6.9 → 0.6 mm left, 6.5 → 0.4 mm right). ROM animation passes the 1.5 mm contact gate (largest 1.0 mm); on the right side three movements are capped below AAOS (hip adduction 25, hip external rotation 40, ankle dorsiflexion 15) because bone contact exceeds the gate beyond those angles. Cause undetermined.
+- Not yet done: web export and app variant.
 - Not imported (reviewed, not needed or not usable): the NIH 3D lung and main-bronchus files (HuBMAP Visible Human Female, already in the
   adult female), the nnU-Net lung-vessel model (licence not stated in the folder), and the CT/cryosection image stacks (not meshes).
 

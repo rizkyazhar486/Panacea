@@ -20,6 +20,8 @@ OUT = f"{ROOT}/bodies"
 MASTER = f"{ROOT}/PANACEA_HUMAN_MASTER_v007.blend"  # hanya sumber material PAN_*
 BODY_ID = "VHF_LOWER_LIMB.ADULT.FEMALE"
 PUB = "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry"
+INDIVIDUAL = ("single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); "
+              "not an atlas, not a reference adult female, not patient-specific")
 LICENSE = "CC BY 4.0 (University of Denver Center for Orthopaedic Biomechanics), doi:10.56902/COB.vh.2022.0; underlying images courtesy of the U.S. National Library of Medicine"
 
 # ejaan sumber → nama anatomis (Terminologia Anatomica bila berbeda). Tidak ada nama yang diubah artinya.
@@ -125,7 +127,7 @@ def main():
                 "panacea_source": f"{PUB}; file {fname}", "panacea_license": LICENSE, "panacea_source_raw_name": raw,
                 "panacea_accuracy_status": "source_backed", "panacea_review_status": "review_required",
                 "panacea_version": "body_v012", "biological_sex_applicability": "female", "panacea_educational_only": True,
-                "panacea_kind": kind.lower(),
+                "panacea_kind": kind.lower(), "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
                 "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific."}
         if raw == "Bone_Phalanges":
             meta["panacea_qa_note"] = ("Source provides the forefoot as one mesh labelled 'Phalanges'. Its extent (129 mm, starting at the tarsometatarsal level) "
@@ -147,6 +149,7 @@ def main():
     coll["panacea_body_id"] = BODY_ID
     coll["panacea_body_status"] = "source_backed_partial"
     coll["panacea_body_source"] = f"{PUB}; {LICENSE}"
+    coll["panacea_individual"] = INDIVIDUAL
     coll["panacea_body_frame"] = "+Z superior, +X subject left, -Y anterior, metres, lowest point z=0 (rotation 180 deg about Z from the source frame; patella anterior to femur verified)"
     coll["panacea_extent_m"] = round(max(zs) - min(zs), 4)
     os.makedirs(OUT, exist_ok=True)
