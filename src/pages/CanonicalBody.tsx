@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats } from '../domains/body-exposure'
+import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -154,6 +154,8 @@ export function CanonicalBody() {
     animate: ((dt: number) => boolean) | null
     motionRoot: THREE.Group
     applyQuality: (p: QualityPreset) => void
+    /** Transisi kamera halus (berbasis waktu) ke pose; null = lompat langsung. */
+    flyTo: (pose: CameraPose, durationS: number | null) => void
     /** Muatan GLB yang tiba sesudah komponen dilepas tidak punya pemilik; lihat lib/gltfSesudahLepas. */
     penjaga: PenjagaMuatan
   } | null>(null)
@@ -213,7 +215,15 @@ export function CanonicalBody() {
     const invalidate = () => { dirty = true }
     controls.addEventListener('change', invalidate)
     const penjaga = penjagaMuatan()
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality }
+    let tween: CameraTween | null = null
+    const poseNow = (): CameraPose => ({ position: camera.position.toArray(), target: controls.target.toArray(), up: camera.up.toArray() })
+    const setPose = (p: CameraPose) => { camera.up.set(...p.up); camera.position.set(...p.position); controls.target.set(...p.target); camera.lookAt(controls.target) }
+    const flyTo = (pose: CameraPose, durationS: number | null) => {
+      if (durationS === null || durationS <= 0) { tween = null; setPose(pose); controls.update(); dirty = true; return }
+      tween = { from: poseNow(), to: pose, elapsedS: 0, durationS }; dirty = true
+    }
+    controls.addEventListener('start', () => { tween = null })  // sentuhan pengguna membatalkan transisi
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality, flyTo }
     applyQuality(qualityRef.current.active)
     // frame time hanya dari frame yang dirender berturut-turut (render sesuai kebutuhan: jeda bukan beban GPU)
     const samples: number[] = []
@@ -229,6 +239,10 @@ export function CanonicalBody() {
       timer.update(now); const dt = timer.getDelta()  // detik waktu nyata: gerak tidak bergantung laju frame layar
       controls.update()  // redaman memicu event 'change' selama kamera masih bergerak
       if (sceneRef.current?.animate?.(dt)) dirty = true
+      if (tween) {
+        const r = stepTween(tween, dt)
+        if (r.ok) { setPose(r.pose); tween = r.done ? null : r.tween; dirty = true } else tween = null
+      }
       if (!dirty) { renderedLast = false; return }
       dirty = false
       if (renderedLast) { samples.push(dt * 1000); if (samples.length > 240) samples.shift() }
@@ -260,8 +274,18 @@ export function CanonicalBody() {
       while (o && !o.userData.panacea_structure_id) o = o.parent
       if (o) select(o)
     }
+    // ketuk ganda: fokus halus ke struktur di bawah penunjuk
+    const onDbl = (e: MouseEvent) => {
+      const r = renderer.domElement.getBoundingClientRect()
+      ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
+      ray.setFromCamera(ptr, camera)
+      let o: THREE.Object3D | null = ray.intersectObject(motionOnRef.current ? motionRoot : root, true).find((h) => h.object.visible)?.object ?? null
+      while (o && !o.userData.panacea_structure_id) o = o.parent
+      if (o) focusOn(o)
+    }
     renderer.domElement.addEventListener('pointerdown', onDown)
     renderer.domElement.addEventListener('pointerup', onUp)
+    renderer.domElement.addEventListener('dblclick', onDbl)
     return () => {
       penjaga.lepas()
       timer.disconnect()
@@ -270,6 +294,7 @@ export function CanonicalBody() {
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
       renderer.domElement.removeEventListener('pointerup', onUp)
+      renderer.domElement.removeEventListener('dblclick', onDbl)
       for (const g of [root, motionRoot]) g.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
@@ -367,6 +392,17 @@ export function CanonicalBody() {
   }
   const activeMovement = motionTl ? movementAt(motionTl, motionUi.timeS) : null
 
+  // preset kamera anatomis: transisi halus 0,6 s ke tampilan yang memuat seluruh subjek yang sedang tampil
+  const goToView = (v: AnatomicalView) => {
+    const s = sceneRef.current
+    if (!s) return
+    const box = new THREE.Box3().setFromObject(motionOnRef.current ? s.motionRoot : s.root)
+    if (box.isEmpty()) return
+    const pose = viewPose(v, box.getCenter(new THREE.Vector3()).toArray(), box.getSize(new THREE.Vector3()).toArray(), s.camera.fov, s.camera.aspect)
+    if (pose) s.flyTo(pose, 0.6)
+  }
+  const VIEW_LABEL: Record<AnatomicalView, string> = { anterior: 'Anterior', posterior: 'Posterior', left: 'Left lateral', right: 'Right lateral', superior: 'Superior', inferior: 'Inferior', 'three-quarter': '3/4' }
+
   // ── muat GLB bertahap: tubuh/LOD baru → kosongkan; lalu hanya sistem yang aktif dimuat ──
   // (muatan awal = sistem default ≤ 80.000 segitiga; sistem lain dimuat saat dinyalakan)
   const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0, inflight: 0 })
@@ -444,11 +480,8 @@ export function CanonicalBody() {
     if (!s) return
     const box = new THREE.Box3().setFromObject(s.root)
     if (box.isEmpty()) return
-    const c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3())
-    s.controls.target.copy(c)
-    s.camera.position.set(c.x, c.y, c.z + Math.max(size.y, size.x * s.camera.aspect) * 1.9)
-    s.controls.update()
-    s.invalidate()
+    const pose = viewPose('anterior', box.getCenter(new THREE.Vector3()).toArray(), box.getSize(new THREE.Vector3()).toArray(), s.camera.fov, s.camera.aspect)
+    if (pose) s.flyTo(pose, null)
   }
 
   function focusOn(o: THREE.Object3D) {
@@ -458,9 +491,7 @@ export function CanonicalBody() {
     const c = box.getCenter(new THREE.Vector3())
     const r = Math.max(box.getSize(new THREE.Vector3()).length(), 0.08)
     const dir = s.camera.position.clone().sub(s.controls.target).normalize()
-    s.controls.target.copy(c)
-    s.camera.position.copy(c.clone().add(dir.multiplyScalar(r * 3.2)))
-    s.invalidate()
+    s.flyTo({ position: c.clone().add(dir.multiplyScalar(r * 3.2)).toArray(), target: c.toArray(), up: s.camera.up.toArray() }, 0.6)
   }
 
   // ── potongan: satu bidang kliping global (sagital x, koronal z [anterior +z], aksial y) ──
@@ -732,6 +763,17 @@ export function CanonicalBody() {
 
       <Card>
         <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">View</p>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Anatomical view">
+              {ANATOMICAL_VIEWS.map((v) => (
+                <button key={v} onClick={() => goToView(v)}
+                  className="min-h-[40px] rounded-full border border-neutral-500/30 px-3.5 text-[13px] font-bold">
+                  {VIEW_LABEL[v]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">
               Graphics quality{qualityChoice === 'auto' && <span className="normal-case"> · now {qualityActive}</span>}

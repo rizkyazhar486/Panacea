@@ -82,3 +82,13 @@ export {
   type QualitySettings,
   type FrameStats,
 } from './engine/renderQuality'
+export {
+  ANATOMICAL_VIEWS,
+  viewPose,
+  smootherstep,
+  stepTween,
+  type AnatomicalView,
+  type CameraPose,
+  type CameraTween,
+  type Vec3,
+} from './engine/cameraViews'

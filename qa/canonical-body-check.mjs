@@ -58,6 +58,15 @@ try {
       const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
       assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
       await page.getByRole('button', { name: 'Stop measuring' }).click()
+      // preset kamera anatomis: transisi halus mengubah sudut pandang, lalu kembali ke anterior
+      const cv0 = await page.getByTestId('canonical-body-canvas').screenshot()
+      await page.getByRole('button', { name: 'Posterior', exact: true }).click()
+      await page.waitForTimeout(900)
+      const cv1 = await page.getByTestId('canonical-body-canvas').screenshot()
+      assert(!cv0.equals(cv1), 'camera view: posterior did not change the canvas')
+      await page.screenshot({ path: `/private/tmp/canonical-posterior-${width}-${theme}.png`, fullPage: true })
+      await page.getByRole('button', { name: 'Anterior', exact: true }).click()
+      await page.waitForTimeout(900)
       // mode gerak: rig ROM beranimasi (simulasi berlabel), jam berbasis waktu, scrub ke gerakan tertentu
       await page.getByRole('button', { name: 'Motion', exact: true }).click()
       await page.getByTestId('motion-panel').waitFor({ timeout: 60000 })
