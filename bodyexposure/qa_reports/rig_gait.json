@@ -11,6 +11,7 @@
    "cycle_frames_120fps": 131,
    "cycle_s": 1.092,
    "frames_24fps": 27,
+   "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 4.58,
    "joint_angle_range_deg": {
@@ -62,7 +63,7 @@
       "TIBIA.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -71,7 +72,7 @@
       "ULNA.L"
      ],
      "max_penetration_mm": 0.4,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -80,7 +81,7 @@
       "RADIUS.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -89,7 +90,7 @@
       "HIP_BONE.L"
      ],
      "max_penetration_mm": 0.45,
-     "at_frame": 9,
+     "at_frame": 8,
      "movement": "walk"
     },
     {
@@ -98,7 +99,7 @@
       "SCAPULA.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -107,7 +108,7 @@
       "CLAVICLE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -116,7 +117,7 @@
       "ULNA.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -125,7 +126,7 @@
       "TALUS.L"
      ],
      "max_penetration_mm": 0.03,
-     "at_frame": 3,
+     "at_frame": 2,
      "movement": "walk"
     },
     {
@@ -134,7 +135,7 @@
       "TALUS.L"
      ],
      "max_penetration_mm": 0.55,
-     "at_frame": 3,
+     "at_frame": 2,
      "movement": "walk"
     },
     {
@@ -143,7 +144,7 @@
       "LUNATE_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -152,7 +153,7 @@
       "SCAPHOID_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -161,7 +162,7 @@
       "LUNATE_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -170,7 +171,7 @@
       "TRIQUETRUM_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -179,7 +180,7 @@
       "TIBIA.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -188,7 +189,7 @@
       "ULNA.R"
      ],
      "max_penetration_mm": 0.39,
-     "at_frame": 9,
+     "at_frame": 8,
      "movement": "walk"
     },
     {
@@ -197,7 +198,7 @@
       "RADIUS.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -206,7 +207,7 @@
       "HIP_BONE.R"
      ],
      "max_penetration_mm": 0.44,
-     "at_frame": 21,
+     "at_frame": 20,
      "movement": "walk"
     },
     {
@@ -215,7 +216,7 @@
       "SCAPULA.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -224,7 +225,7 @@
       "CLAVICLE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -233,7 +234,7 @@
       "ULNA.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -242,7 +243,7 @@
       "TALUS.R"
      ],
      "max_penetration_mm": 0.11,
-     "at_frame": 7,
+     "at_frame": 6,
      "movement": "walk"
     },
     {
@@ -251,7 +252,7 @@
       "TALUS.R"
      ],
      "max_penetration_mm": 0.61,
-     "at_frame": 7,
+     "at_frame": 6,
      "movement": "walk"
     },
     {
@@ -260,7 +261,7 @@
       "LUNATE_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -269,7 +270,7 @@
       "SCAPHOID_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -278,7 +279,7 @@
       "LUNATE_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -287,7 +288,7 @@
       "TRIQUETRUM_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "walk"
     }
    ]
@@ -300,6 +301,7 @@
    "cycle_frames_120fps": 90,
    "cycle_s": 0.75,
    "frames_24fps": 19,
+   "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 12.39,
    "joint_angle_range_deg": {
@@ -339,8 +341,8 @@
     "source": 0.861
    },
    "lowest_foot_point_m": {
-    "min": -0.0,
-    "max": 0.0872
+    "min": 0.0,
+    "max": 0.0827
    },
    "max_bone_penetration_mm": 1.32,
    "bone_contact": [
@@ -350,7 +352,7 @@
       "TIBIA.L"
      ],
      "max_penetration_mm": 1.32,
-     "at_frame": 11,
+     "at_frame": 10,
      "movement": "run"
     },
     {
@@ -359,7 +361,7 @@
       "ULNA.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -368,7 +370,7 @@
       "RADIUS.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -377,7 +379,7 @@
       "HIP_BONE.L"
      ],
      "max_penetration_mm": 0.43,
-     "at_frame": 5,
+     "at_frame": 4,
      "movement": "run"
     },
     {
@@ -386,7 +388,7 @@
       "SCAPULA.L"
      ],
      "max_penetration_mm": 0.24,
-     "at_frame": 13,
+     "at_frame": 12,
      "movement": "run"
     },
     {
@@ -395,7 +397,7 @@
       "CLAVICLE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -404,7 +406,7 @@
       "ULNA.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -413,7 +415,7 @@
       "TALUS.L"
      ],
      "max_penetration_mm": 0.11,
-     "at_frame": 19,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -422,7 +424,7 @@
       "TALUS.L"
      ],
      "max_penetration_mm": 0.61,
-     "at_frame": 19,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -431,7 +433,7 @@
       "LUNATE_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -440,7 +442,7 @@
       "SCAPHOID_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -449,7 +451,7 @@
       "LUNATE_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -458,7 +460,7 @@
       "TRIQUETRUM_BONE.L"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -467,7 +469,7 @@
       "TIBIA.R"
      ],
      "max_penetration_mm": 1.31,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -476,7 +478,7 @@
       "ULNA.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -485,7 +487,7 @@
       "RADIUS.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -494,7 +496,7 @@
       "HIP_BONE.R"
      ],
      "max_penetration_mm": 0.45,
-     "at_frame": 13,
+     "at_frame": 12,
      "movement": "run"
     },
     {
@@ -503,7 +505,7 @@
       "SCAPULA.R"
      ],
      "max_penetration_mm": 0.31,
-     "at_frame": 5,
+     "at_frame": 4,
      "movement": "run"
     },
     {
@@ -512,7 +514,7 @@
       "CLAVICLE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -521,7 +523,7 @@
       "ULNA.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -530,7 +532,7 @@
       "TALUS.R"
      ],
      "max_penetration_mm": 0.09,
-     "at_frame": 9,
+     "at_frame": 8,
      "movement": "run"
     },
     {
@@ -539,7 +541,7 @@
       "TALUS.R"
      ],
      "max_penetration_mm": 0.59,
-     "at_frame": 9,
+     "at_frame": 8,
      "movement": "run"
     },
     {
@@ -548,7 +550,7 @@
       "LUNATE_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -557,7 +559,7 @@
       "SCAPHOID_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -566,7 +568,7 @@
       "LUNATE_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     },
     {
@@ -575,7 +577,7 @@
       "TRIQUETRUM_BONE.R"
      ],
      "max_penetration_mm": 0.0,
-     "at_frame": 1,
+     "at_frame": 0,
      "movement": "run"
     }
    ]

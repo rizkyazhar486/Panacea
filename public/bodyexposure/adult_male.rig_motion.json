@@ -85,7 +85,7 @@
    "clip": "WALK",
    "label_short": "Walk",
    "fps": 24,
-   "frames": 28,
+   "frames": 27,
    "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
    "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
    "truth_class": "measured-retargeted",
@@ -93,8 +93,8 @@
    "movements": [
     {
      "name": "walking cycle",
-     "start_s": 0.041667,
-     "end_s": 1.125,
+     "start_s": 0.0,
+     "end_s": 1.083333,
      "note": "one gait cycle, 1.092 s"
     }
    ],
@@ -111,7 +111,7 @@
    "clip": "RUN",
    "label_short": "Run",
    "fps": 24,
-   "frames": 20,
+   "frames": 19,
    "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
    "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
    "truth_class": "measured-retargeted",
@@ -119,16 +119,16 @@
    "movements": [
     {
      "name": "running cycle",
-     "start_s": 0.041667,
-     "end_s": 0.791667,
+     "start_s": 0.0,
+     "end_s": 0.75,
      "note": "one gait cycle, 0.75 s"
     }
    ],
    "qa": {
     "max_bone_penetration_mm": 1.32,
     "lowest_foot_point_m": {
-     "min": -0.0,
-     "max": 0.0872
+     "min": 0.0,
+     "max": 0.0827
     },
     "loop_drift_corrected_max_deg": 12.39
    }

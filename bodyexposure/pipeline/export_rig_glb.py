@@ -73,11 +73,11 @@ if GAIT:
         g = GAIT["clips"].get(name)
         if not g:
             continue
-        n = g["frames_24fps"]
-        clips.append({"clip": name, "label_short": short, "fps": 24, "frames": n + 1, "source": GAIT["source"],
+        n = g["frames_24fps"]  # kunci di frame 0 … n−1 → waktu 0 … (n−1)/24 = satu siklus; kunci terakhir = pose awal
+        clips.append({"clip": name, "label_short": short, "fps": 24, "frames": n, "source": GAIT["source"],
                       "acknowledgement": GAIT["acknowledgement"], "truth_class": "measured-retargeted",
                       "label": f"Recorded {verb} of another person (CMU subject {g['subject']}, trial {g['trial']}), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics",
-                      "movements": [{"name": f"{verb} cycle", "start_s": round(1 / 24, 6), "end_s": round(n / 24, 6), "note": f"one gait cycle, {g['cycle_s']} s"}],
+                      "movements": [{"name": f"{verb} cycle", "start_s": 0.0, "end_s": round((n - 1) / 24, 6), "note": f"one gait cycle, {g['cycle_s']} s"}],
                       "qa": {"max_bone_penetration_mm": g["max_bone_penetration_mm"], "lowest_foot_point_m": g["lowest_foot_point_m"], "loop_drift_corrected_max_deg": g["loop_drift_corrected_max_deg"]}})
 json.dump({"clips": clips}, open(arg("--timeline-out"), "w"), indent=1)
 print("RIGGLB", OUT, "tris", got, "meshes", len(meshes), "fixed", len(fixed), os.path.getsize(OUT))

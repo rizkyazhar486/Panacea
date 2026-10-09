@@ -1,0 +1,42 @@
+{
+ "url": "http://localhost:5199/qa/canonical-body.html",
+ "viewport": [
+  1440,
+  900
+ ],
+ "clips": {
+  "WALK": {
+   "timeline_max": 1,
+   "seam_diff_pct": 0.0046,
+   "pose_step_diff_pct": [
+    1.344,
+    1.544,
+    1.473,
+    1.675,
+    1.384,
+    1.51,
+    0.947
+   ],
+   "fps_mean": 60,
+   "fps_1pct_low": 60,
+   "draw_groups": 147
+  },
+  "RUN": {
+   "timeline_max": 1,
+   "seam_diff_pct": 0,
+   "pose_step_diff_pct": [
+    1.698,
+    1.534,
+    1.613,
+    1.49,
+    1.738,
+    1.467,
+    1.63
+   ],
+   "fps_mean": 60,
+   "fps_1pct_low": 60,
+   "draw_groups": 147
+  }
+ },
+ "page_errors": []
+}
