@@ -77,3 +77,5 @@ export { correctedCalcium, calciumBand, CA_RANGES } from './engine/correctedCalc
 export type { CorrectedCalciumResult, CaBand } from './engine/correctedCalcium'
 export { qtc, qtcBand, QTC_RANGES } from './engine/qtc'
 export type { QtcResult, QtcBand, QtcSex } from './engine/qtc'
+export { meldNa, meldBand, MELD_RANGES } from './engine/meldNa'
+export type { MeldInput, MeldResult, MeldBand } from './engine/meldNa'

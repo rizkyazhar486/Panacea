@@ -4,6 +4,7 @@ import { IconActivity } from '../../../components/icons'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { meldNa as hitungMeld, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELD-Na Score — end-stage liver disease severity & transplant priority.
@@ -20,14 +21,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // Final score bounded [6, 40]. Pure arithmetic, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; mortality: string } {
-  if (score >= 40) return { label: 'Extremely high priority', tone: 'critical', mortality: '~71% 3-month mortality' }
-  if (score >= 30) return { label: 'Very high priority', tone: 'critical', mortality: '~53% 3-month mortality' }
-  if (score >= 20) return { label: 'High priority', tone: 'critical', mortality: '~20% 3-month mortality' }
-  if (score >= 10) return { label: 'Moderate priority', tone: 'low', mortality: '~6% 3-month mortality' }
-  return { label: 'Low priority', tone: 'brand', mortality: '~2% 3-month mortality' }
-}
-
 export function MeldScore() {
   // Keempat angka ini hasil laboratorium, dan tidak satu pun punya nilai awal
   // yang bisa dibela. Halaman ini dahulu terbuka pada bilirubin 2,0 / INR 1,5
@@ -40,31 +33,23 @@ export function MeldScore() {
   // kosong menjadi 1,0, sehingga halaman kosong menghasilkan MELD 6 --
   // "Low priority, ~2% 3-month mortality". Kekosongan tampil sebagai kabar
   // baik yang spesifik.
-  const [bilirubin, setBilirubin] = useState(0)
-  const [inr, setInr] = useState(0)
-  const [creatinine, setCreatinine] = useState(0)
-  const [sodium, setSodium] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [bilirubinText, setBilirubin] = useState('')
+  const [inrText, setInr] = useState('')
+  const [creatinineText, setCreatinine] = useState('')
+  const [sodiumText, setSodium] = useState('')
   const [dialysis, setDialysis] = useState(false)
 
-  const belum: string[] = []
-  if (!(bilirubin > 0)) belum.push('total bilirubin')
-  if (!(inr > 0)) belum.push('INR')
-  if (!dialysis && !(creatinine > 0)) belum.push('creatinine')
-  if (!(sodium > 0)) belum.push('sodium')
-  const lengkap = belum.length === 0
-
-  const bili = Math.max(bilirubin, 1.0)
-  const inrB = Math.max(inr, 1.0)
-  const creat = dialysis ? 4.0 : Math.min(Math.max(creatinine, 1.0), 4.0)
-  const na = Math.min(Math.max(sodium, 125), 137)
-
-  const meldRaw = 3.78 * Math.log(bili) + 11.2 * Math.log(inrB) + 9.57 * Math.log(creat) + 6.43
-  const meld = Math.min(Math.max(meldRaw, 6), 40)
-
-  const meldNaRaw = meld > 11 ? meld + 1.32 * (137 - na) - 0.033 * meld * (137 - na) : meld
-  const meldNa = Math.min(Math.max(meldNaRaw, 6), 40)
-
-  const bandInfo = lengkap ? band(meldNa) : null
+  const bilirubin = parseNumberField(bilirubinText)
+  const inr = parseNumberField(inrText)
+  const creatinine = parseNumberField(creatinineText)
+  const sodium = parseNumberField(sodiumText)
+  const hasil = hitungMeld({ bilirubin, inr, creatinine, sodium, dialysis })
+  const belum = hasil.missing
+  const lengkap = hasil.meldNa !== null
+  const meld = hasil.meld ?? 0
+  const meldNa = hasil.meldNa ?? 0
+  const bandInfo = hasil.band
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -77,22 +62,25 @@ export function MeldScore() {
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Total bilirubin (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin || ''} onChange={(e) => setBilirubin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={bilirubinText} onChange={(e) => setBilirubin(e.target.value)} />
           </Field>
           <Field label="INR">
-            <input className={inputClass} type="number" step="0.1" min={0} value={inr || ''} onChange={(e) => setInr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={inrText} onChange={(e) => setInr(e.target.value)} />
           </Field>
           <Field label="Creatinine (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={creatinine || ''} onChange={(e) => setCreatinine(Number(e.target.value) || 0)} disabled={dialysis} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={creatinineText} onChange={(e) => setCreatinine(e.target.value)} disabled={dialysis} />
           </Field>
           <Field label="Sodium (mEq/L)">
-            <input className={inputClass} type="number" min={100} value={sodium || ''} onChange={(e) => setSodium(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={100} value={sodiumText} onChange={(e) => setSodium(e.target.value)} />
           </Field>
         </div>
         <label className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
           <input type="checkbox" checked={dialysis} onChange={(e) => setDialysis(e.target.checked)} className="h-4 w-4 rounded" />
           On dialysis ≥2x in the past week (or ≥24h continuous CRRT)
         </label>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       <Card className="!p-5">
@@ -107,7 +95,7 @@ export function MeldScore() {
             <p className="mt-2 text-[12px] text-neutral-500">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
             <CopyNote text={`MELD-Na ${meldNa.toFixed(0)} (bilirubin ${bilirubin} mg/dL, INR ${inr}, creatinine ${dialysis ? '4.0 [on dialysis]' : creatinine + ' mg/dL'}, Na ${sodium} mEq/L) — ${bandInfo.label.toLowerCase()}, est. ${bandInfo.mortality} [Kamath 2001; Kim 2008; OPTN 2016]`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             No score yet. Still needed: {belum.join(', ')}.
             {' '}These are laboratory results; none of them has a default. The formula floors each value at 1.0,

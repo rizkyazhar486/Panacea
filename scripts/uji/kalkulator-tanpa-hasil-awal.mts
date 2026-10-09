@@ -1,6 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { meldNa as hitungMeld } from '../../src/domains/clinical-calculators/index.ts'
 import { correctedCalcium } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -50,11 +51,14 @@ const meldKode = kodeDari(meld)
 for (const bawaan of ['useState(2.0)', 'useState(1.5)', 'useState(1.2)', 'useState(135)']) {
   assert.ok(!meldKode.includes(bawaan), `a laboratory default is back in MELD: ${bawaan}`)
 }
-assert.ok(/const lengkap = belum\.length === 0/.test(meldKode), 'MELD no longer tracks what is missing')
-assert.ok(/const bandInfo = lengkap \? band\(meldNa\) : null/.test(meldKode),
+assert.ok(/const lengkap = hasil\.meldNa !== null/.test(meldKode), 'MELD no longer tracks what is missing')
+assert.ok(/const bandInfo = hasil\.band/.test(meldKode) && /hitungMeld\(/.test(meldKode), 'the MELD page no longer takes its band from the engine')
+assert.equal(hitungMeld({ bilirubin: NaN, inr: NaN, creatinine: NaN, sodium: NaN, dialysis: false }).band, null,
   'MELD still bands a score built from floored empty fields')
-assert.ok(/if \(!dialysis && !\(creatinine > 0\)\) belum\.push\('creatinine'\)/.test(meldKode),
-  'creatinine is required even on dialysis, or not required at all — neither is right')
+assert.deepEqual(hitungMeld({ bilirubin: 2, inr: 1.5, creatinine: NaN, sodium: 135, dialysis: false }).missing, ['creatinine'],
+  'creatinine is not required off dialysis')
+assert.notEqual(hitungMeld({ bilirubin: 2, inr: 1.5, creatinine: NaN, sodium: 135, dialysis: true }).meldNa, null,
+  'creatinine is required even on dialysis')
 
 // Yang paling penting: titik tren TIDAK boleh tersimpan dari halaman kosong.
 assert.ok(/\{lengkap && \([\s\S]{0,80}<ScoreTrend/.test(meld),
