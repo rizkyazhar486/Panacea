@@ -5,8 +5,8 @@ const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx',
 
 const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
 
-chk('Assistive Touch consumes shared gesture kernel', source.includes("from '../lib/interaction/gesture'"))
-chk('Assistive Touch consumes validated preference model', source.includes("from '../lib/interaction/assistive'"))
+chk('Assistive Touch consumes shared gesture kernel', source.includes("from '../../lib/interaction/gesture'"))
+chk('Assistive Touch consumes validated preference model', source.includes("from '../../lib/interaction/assistive'"))
 chk('Assistive command pages use shared SlidableRail', source.includes('<SlidableRail'))
 chk('Assistive Touch has a stable accessible name', source.includes('aria-label="Panacea Assistive Touch"'))
 chk('Assistive Touch exposes semantic marker', source.includes('data-pmd-assistive="true"'))
