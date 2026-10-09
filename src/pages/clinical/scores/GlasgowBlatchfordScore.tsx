@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { glasgowBlatchford, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Glasgow-Blatchford Score (GBS) — Blatchford, O., et al. (2000), Lancet,
@@ -14,31 +15,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // scoring, no external API. BUN cutoffs below use mg/dL (US units); original
 // UK study used mmol/L urea (≈ mg/dL / 2.8).
 // ─────────────────────────────────────────────────────────────────────────────
-
-function bunPts(v: number): number {
-  if (v < 18.2) return 0
-  if (v < 22.4) return 2
-  if (v < 28) return 3
-  if (v < 70) return 4
-  return 6
-}
-function hgbPts(v: number, sex: 'M' | 'F'): number {
-  if (sex === 'M') {
-    if (v >= 13) return 0
-    if (v >= 12) return 1
-    if (v >= 10) return 3
-    return 6
-  }
-  if (v >= 12) return 0
-  if (v >= 10) return 1
-  return 6
-}
-function sbpPts(v: number): number {
-  if (v >= 110) return 0
-  if (v >= 100) return 1
-  if (v >= 90) return 2
-  return 3
-}
 
 export function GlasgowBlatchfordScore() {
   // Ini yang paling tajam di antara semuanya.
@@ -53,23 +29,18 @@ export function GlasgowBlatchfordScore() {
   // Kotak centangnya (melena, sinkop, gagal jantung, penyakit hati) tetap
   // seperti semula: tidak dicentang berarti "tidak ada", dan itu jawaban.
   // Yang dihapus hanya ketiga pengukurannya.
-  const [bun, setBun] = useState(0)
-  const [hgb, setHgb] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [bun, setBun] = useState('')
+  const [hgb, setHgb] = useState('')
   const [sex, setSex] = useState<'M' | 'F'>(() => (getDemoTersimpan().sex === 'F' ? 'F' : 'M'))
-  const [sbp, setSbp] = useState(0)
+  const [sbp, setSbp] = useState('')
   const [flags, setFlags] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setFlags((c) => ({ ...c, [key]: !c[key] }))
 
-  const belum: string[] = []
-  if (!(bun > 0)) belum.push('blood urea')
-  if (!(hgb > 0)) belum.push('haemoglobin')
-  if (!(sbp > 0)) belum.push('systolic BP')
-  const lengkap = belum.length === 0
-
-  const flagPts: Record<string, number> = { hr: 1, melena: 1, syncope: 2, hepatic: 2, cardiac: 2 }
-  const flagScore = Object.entries(flags).reduce((sum, [k, v]) => sum + (v ? flagPts[k] ?? 0 : 0), 0)
-
-  const score = bunPts(bun) + hgbPts(hgb, sex) + sbpPts(sbp) + flagScore
+  const hasil = glasgowBlatchford({ bun: parseNumberField(bun), hgb: parseNumberField(hgb), sbp: parseNumberField(sbp), sex, flags })
+  const belum = hasil.missing
+  const lengkap = hasil.score !== null
+  const score = hasil.score ?? 0
   const lowRisk = lengkap && score === 0
 
   return (
@@ -80,10 +51,10 @@ export function GlasgowBlatchfordScore() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Calculated before endoscopy, from clinical and laboratory data alone. A score of 0 marks patients low-risk enough that some guidelines support outpatient management without admission or urgent endoscopy.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="BUN (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={bun || ''} onChange={(e) => setBun(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={bun} onChange={(e) => setBun(e.target.value)} />
           </Field>
           <Field label="Hemoglobin (g/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={hgb || ''} onChange={(e) => setHgb(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={hgb} onChange={(e) => setHgb(e.target.value)} />
           </Field>
           <Field label="Sex">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
@@ -92,7 +63,7 @@ export function GlasgowBlatchfordScore() {
             </select>
           </Field>
           <Field label="Systolic BP (mmHg)">
-            <input className={inputClass} type="number" min={0} value={sbp || ''} onChange={(e) => setSbp(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={sbp} onChange={(e) => setSbp(e.target.value)} />
           </Field>
         </div>
       </Card>
@@ -125,6 +96,9 @@ export function GlasgowBlatchfordScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Glasgow-Blatchford Score</div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
         {lengkap ? (
           <>
             <div className="mt-2 flex items-center gap-3">
@@ -140,7 +114,7 @@ export function GlasgowBlatchfordScore() {
             </p>
             <CopyNote text={`Glasgow-Blatchford ${score} (BUN ${bun}, Hgb ${hgb} ${sex}, SBP ${sbp}) — ${lowRisk ? 'very low risk: outpatient management may be appropriate' : 'admission and inpatient endoscopy warranted'} [Blatchford 2000]`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             No score yet. Still needed: {belum.join(', ')}.
             {' '}A score of zero here is not a mild result — it is the threshold some guidelines use to send a patient

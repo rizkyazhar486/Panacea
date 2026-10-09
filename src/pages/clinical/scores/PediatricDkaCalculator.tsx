@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { pediatricDka, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pediatric Diabetic Ketoacidosis (DKA) fluid, electrolyte & insulin
@@ -24,12 +25,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // institution's protocol and a supervising clinician.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function holliday(weightKg: number): number {
-  if (weightKg <= 10) return 100 * weightKg
-  if (weightKg <= 20) return 1000 + 50 * (weightKg - 10)
-  return 1500 + 20 * (weightKg - 20)
-}
-
 export function PediatricDkaCalculator() {
   // Halaman ini mengeluarkan DOSIS, bukan sekadar skor.
   //
@@ -47,38 +42,26 @@ export function PediatricDkaCalculator() {
   // dicentang. Dan 0,05 U/kg/jam bukan pengukuran tentang pasien melainkan
   // PILIHAN PROTOKOL antara 0,05 dan 0,1 -- sebuah setelan, dengan nilai
   // awal yang sah.
-  const [weightKg, setWeightKg] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [weightText, setWeightKg] = useState('')
   const [shock, setShock] = useState(false)
-  const [dehydrationPct, setDehydrationPct] = useState(0)
-  const [potassiumMeq, setPotassiumK] = useState(0)
-  const [insulinRateUKgHr, setInsulinRate] = useState(0.05)
+  const [dehydrationText, setDehydrationPct] = useState('')
+  const [potassiumText, setPotassiumK] = useState('')
+  const [insulinText, setInsulinRate] = useState('0.05')
 
-  const belum: string[] = []
-  if (!(weightKg > 0)) belum.push('weight')
-  if (!(dehydrationPct > 0)) belum.push('dehydration estimate')
-  const bisaCairan = belum.length === 0
-  const adaKalium = potassiumMeq > 0
+  const weightKg = parseNumberField(weightText)
+  const dehydrationPct = parseNumberField(dehydrationText)
+  const potassiumMeq = parseNumberField(potassiumText)
+  const insulinRateUKgHr = parseNumberField(insulinText)
+  const hasil = pediatricDka({ weightKg, dehydrationPct, potassiumMeq, insulinRateUKgHr, shock })
+  const belum = hasil.missing.filter((m) => m === 'weight' || m === 'dehydration estimate')
+  const bisaCairan = hasil.fluids !== null
+  const adaKalium = hasil.kBand !== null
+  const kBand = hasil.kBand
+  const { bolusMlPerKg = 0, bolusMl = 0, deficitMl = 0, maintenance48hMl = 0, netAfterBolusMl = 0, total48hMl = 0, ratePerHr = 0 } = hasil.fluids ?? {}
+  const insulinRateUHr = hasil.insulinUHr
 
-  const bolusMlPerKg = shock ? 20 : 10
-  const bolusMl = bolusMlPerKg * weightKg
-
-  const dailyMaintenanceMl = holliday(weightKg)
-  const maintenance48hMl = dailyMaintenanceMl * 2
-  const deficitMl = (dehydrationPct / 100) * weightKg * 1000
-  const total48hMl = deficitMl + maintenance48hMl
-  const netAfterBolusMl = Math.max(0, total48hMl - bolusMl)
-  const ratePerHr = netAfterBolusMl / 48
-
-  const insulinRateUHr = insulinRateUKgHr * weightKg
-
-  const kBand = useMemo(() => {
-    if (!(potassiumMeq > 0)) return null
-    if (potassiumMeq < 3.5) return { label: 'Hypokalemic — hold insulin until K rechecked / replete first', tone: 'critical' as const }
-    if (potassiumMeq > 5.5) return { label: 'Hyperkalemic — hold added KCl/KPO4 until urine output confirmed & K falls', tone: 'critical' as const }
-    return { label: 'Normokalemic — standard 20 mEq/L KCl + 20 mEq/L KPO4 split', tone: 'brand' as const }
-  }, [potassiumMeq])
-
-  const summary = `Pediatric DKA fluids: BB ${weightKg}kg, ${shock ? 'shock' : 'no shock'} → bolus ${bolusMlPerKg}mL/kg = ${bolusMl.toFixed(0)}mL; deficit ${dehydrationPct}% x ${weightKg}kg x 1000 = ${deficitMl.toFixed(0)}mL; maintenance (Holliday-Segar) x2 = ${maintenance48hMl.toFixed(0)}mL; total 48h = ${total48hMl.toFixed(0)}mL − bolus = ${netAfterBolusMl.toFixed(0)}mL → rate ${ratePerHr.toFixed(1)} mL/hr. K: ${kBand ? kBand.label : 'not measured'}. Insulin: ${insulinRateUKgHr} U/kg/hr = ${insulinRateUHr.toFixed(2)} U/hr IV.`
+  const summary = `Pediatric DKA fluids: BB ${weightKg}kg, ${shock ? 'shock' : 'no shock'} → bolus ${bolusMlPerKg}mL/kg = ${bolusMl.toFixed(0)}mL; deficit ${dehydrationPct}% x ${weightKg}kg x 1000 = ${deficitMl.toFixed(0)}mL; maintenance (Holliday-Segar) x2 = ${maintenance48hMl.toFixed(0)}mL; total 48h = ${total48hMl.toFixed(0)}mL − bolus = ${netAfterBolusMl.toFixed(0)}mL → rate ${ratePerHr.toFixed(1)} mL/hr. K: ${kBand ? kBand.label : 'not measured'}. Insulin: ${insulinRateUHr === null ? 'rate not set' : `${insulinRateUKgHr} U/kg/hr = ${insulinRateUHr.toFixed(2)} U/hr IV`}.`
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -89,16 +72,19 @@ export function PediatricDkaCalculator() {
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <Field label="Weight (kg)">
-            <input className={inputClass} type="number" min={1} step={0.1} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={1} step={0.1} value={weightText} onChange={(e) => setWeightKg(e.target.value)} />
           </Field>
           <Field label="Dehydration estimate (%)">
-            <input className={inputClass} type="number" min={0} max={15} step={1} value={dehydrationPct || ''} onChange={(e) => setDehydrationPct(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} max={15} step={1} value={dehydrationText} onChange={(e) => setDehydrationPct(e.target.value)} />
           </Field>
         </div>
         <label className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
           <input type="checkbox" checked={shock} onChange={(e) => setShock(e.target.checked)} className="h-4 w-4 rounded" />
           Shock present (hypotension / poor perfusion)
         </label>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       <Card className="!p-5">
@@ -131,7 +117,7 @@ export function PediatricDkaCalculator() {
 
         <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">3. Potassium</div>
         <Field label="Measured serum K (mEq/L)">
-          <input className={inputClass} type="number" step={0.1} min={0} value={potassiumMeq || ''} onChange={(e) => setPotassiumK(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" step={0.1} min={0} value={potassiumText} onChange={(e) => setPotassiumK(e.target.value)} />
         </Field>
         <div className="mt-2">
           {kBand !== null
@@ -141,10 +127,10 @@ export function PediatricDkaCalculator() {
 
         <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">4. Insulin (IV infusion, no bolus)</div>
         <Field label="Insulin rate (U/kg/hr)">
-          <input className={inputClass} type="number" step={0.01} min={0.01} max={0.1} value={insulinRateUKgHr || ''} onChange={(e) => setInsulinRate(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" step={0.01} min={0.01} max={0.1} value={insulinText} onChange={(e) => setInsulinRate(e.target.value)} />
         </Field>
         {bisaCairan
-          ? <div className="mt-1 text-2xl font-black text-brand-dark">{insulinRateUHr.toFixed(2)} U/hr IV</div>
+          ? <div className="mt-1 text-2xl font-black text-brand-dark">{insulinRateUHr === null ? 'No insulin rate yet' : `${insulinRateUHr.toFixed(2)} U/hr IV`}</div>
           : <div className="mt-1 text-[12.5px] text-neutral-600 dark:text-neutral-300">U/hr cannot be shown without a weight; the rate above is per kilogram.</div>}
 
         {bisaCairan && adaKalium && <div className="mt-4"><CopyNote text={summary} /></div>}

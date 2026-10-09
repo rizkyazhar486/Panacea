@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconHeart } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { ldlFriedewald, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LDL Cholesterol (calculated) — Friedewald, W.T., et al. (1972), Clin Chem,
@@ -16,32 +17,25 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // Pure arithmetic, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ldlBand(v: number): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (v < 100) return { label: 'Optimal (<100)', tone: 'brand' }
-  if (v < 130) return { label: 'Near optimal (100-129)', tone: 'brand' }
-  if (v < 160) return { label: 'Borderline high (130-159)', tone: 'low' }
-  if (v < 190) return { label: 'High (160-189)', tone: 'critical' }
-  return { label: 'Very high (≥190)', tone: 'critical' }
-}
-
 export function LdlCalculator() {
   // Kolesterol total 200, HDL 50 dan trigliserida 150 memberi LDL 120 --
   // sebuah hasil lipid lengkap dengan pitanya, di layar yang belum menerima
   // satu pun nilai. Ketiganya hasil laboratorium.
-  const [totalChol, setTotalChol] = useState(0)
-  const [hdl, setHdl] = useState(0)
-  const [tg, setTg] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [totalText, setTotalChol] = useState('')
+  const [hdlText, setHdl] = useState('')
+  const [tgText, setTg] = useState('')
 
-  const belum: string[] = []
-  if (!(totalChol > 0)) belum.push('total cholesterol')
-  if (!(hdl > 0)) belum.push('HDL')
-  if (!(tg > 0)) belum.push('triglycerides')
-  const lengkap = belum.length === 0
-
-  const tgTooHigh = tg >= 400
-  const ldl = totalChol - hdl - tg / 5
-  const nonHdl = totalChol - hdl
-  const band = lengkap ? ldlBand(ldl) : null
+  const totalChol = parseNumberField(totalText)
+  const hdl = parseNumberField(hdlText)
+  const tg = parseNumberField(tgText)
+  const hasil = ldlFriedewald({ totalChol, hdl, tg })
+  const belum = hasil.missing
+  const lengkap = hasil.complete
+  const tgTooHigh = hasil.tgTooHigh === true
+  const ldl = hasil.ldl
+  const nonHdl = hasil.nonHdl ?? 0
+  const band = hasil.band
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -51,15 +45,18 @@ export function LdlCalculator() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Most laboratories report LDL calculated with this formula, not measured directly: LDL = Total − HDL − Triglycerides/5. The TG/5 term estimates VLDL and no longer holds at high triglycerides.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="Total cholesterol (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={totalChol || ''} onChange={(e) => setTotalChol(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={totalText} onChange={(e) => setTotalChol(e.target.value)} />
           </Field>
           <Field label="HDL (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={hdl || ''} onChange={(e) => setHdl(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={hdlText} onChange={(e) => setHdl(e.target.value)} />
           </Field>
           <Field label="Triglycerides (mg/dL)">
-            <input className={inputClass} type="number" min={0} value={tg || ''} onChange={(e) => setTg(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={tgText} onChange={(e) => setTg(e.target.value)} />
           </Field>
         </div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
         {tgTooHigh && (
           <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Triglycerides ≥400 mg/dL — the Friedewald formula does not apply here. Request a direct LDL measurement (or the Martin-Hopkins calculation); the non-HDL value below remains valid.</Prosa>
         )}
@@ -67,7 +64,7 @@ export function LdlCalculator() {
 
       <Card className="!p-5">
         {!lengkap ? (
-          <p className="text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          hasil.invalid.length > 0 ? null : <p className="text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             Nothing calculated yet. Still needed: {belum.join(', ')}.
             {' '}All three come off a lipid panel. Total cholesterol 200 with HDL 50 and triglycerides 150 gives an
             LDL of 120 — a complete lipid result, with its band, on a screen that had received no values at all.
@@ -79,6 +76,8 @@ export function LdlCalculator() {
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated LDL</div>
             {tgTooHigh ? (
               <p className="mt-1 text-[12px] font-semibold text-neutral-500">Not valid at TG ≥400</p>
+            ) : ldl === null ? (
+              <p className="mt-1 text-[12px] font-semibold text-neutral-500">Not valid: TG/5 is not below total − HDL. Request a direct LDL.</p>
             ) : (
               <>
                 <div className="mt-1 text-2xl font-black text-brand-dark">{ldl.toFixed(0)}</div>
@@ -99,7 +98,7 @@ export function LdlCalculator() {
           e.g. {'<'}70 mg/dL (or lower) is commonly targeted after a cardiovascular event. Discuss
           individual goals with the treating clinician.
         </p>
-        <CopyNote text={tgTooHigh ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg} >=400 so Friedewald LDL not valid — direct LDL advised)` : `LDL ${ldl.toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band ? band.label : ''}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
+        <CopyNote text={tgTooHigh || ldl === null ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg}: Friedewald LDL not valid — direct LDL advised)` : `LDL ${(ldl ?? 0).toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band ? band.label : ''}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
         </>
         )}
       </Card>

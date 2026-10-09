@@ -58,6 +58,19 @@ try {
       const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
       assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
       await page.getByRole('button', { name: 'Stop measuring' }).click()
+      // mode gerak: rig ROM beranimasi (simulasi berlabel), jam berbasis waktu, scrub ke gerakan tertentu
+      await page.getByRole('button', { name: 'Motion', exact: true }).click()
+      await page.getByTestId('motion-panel').waitFor({ timeout: 60000 })
+      await page.getByText('Simulation', { exact: true }).waitFor()
+      const cvs = page.getByTestId('canonical-body-canvas')
+      const shotA = await cvs.screenshot(); await page.waitForTimeout(700); const shotB = await cvs.screenshot()
+      assert(!shotA.equals(shotB), 'motion: canvas did not change while playing')
+      await page.getByLabel('Motion timeline').fill('0.591')
+      await page.getByTestId('motion-movement').filter({ hasText: /hip flexion/i }).waitFor()
+      await page.getByRole('button', { name: 'Play', exact: true }).waitFor()  // scrub menjeda
+      await page.screenshot({ path: `/private/tmp/canonical-motion-${width}-${theme}.png`, fullPage: true })
+      await page.getByRole('button', { name: 'Stop motion' }).click()
+      await page.getByTestId('motion-panel').waitFor({ state: 'detached' })
       // pemuatan bertahap: struktur saraf (sistem belum dimuat) tetap bisa dicari, sistemnya dimuat lalu dipilih
       await page.getByLabel('Find a structure').fill('sciatic nerve')
       await page.getByRole('button', { name: /^sciatic nerve/i }).first().click()

@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, parseNumberField } from '../domains/clinical-calculators'
+import type { ResusScenario } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fluid & Electrolyte Calculators — maintenance (Holliday-Segar), fluid
@@ -15,29 +17,30 @@ import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
 
 type Tab = 'maintenance' | 'resuscitation' | 'electrolytes'
 
-function holliday(weightKg: number): number {
-  if (weightKg <= 10) return 100 * weightKg
-  if (weightKg <= 20) return 1000 + 50 * (weightKg - 10)
-  return 1500 + 20 * (weightKg - 20)
+/** Alasan penolakan masukan (bukan "belum diisi"), dipakai oleh semua sub-kalkulator. */
+function Penolakan({ r }: { r: { ok: boolean; invalid?: readonly string[] } }) {
+  return !r.ok && r.invalid && r.invalid.length > 0
+    ? <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-600">{r.invalid.join('; ')}.</p>
+    : null
 }
 
 function MaintenanceFluid() {
   // Berat badan tidak punya nilai awal yang bisa dibela di halaman yang
   // mengeluarkan mL/jam. 70 kg dahulu mencetak laju rumatan lengkap dengan
   // jatah natrium dan kalium harian, siap disalin.
-  const [weightKg, setWeightKg] = useState(0)
-  const adaBerat = weightKg > 0
-  const dailyMl = holliday(weightKg)
-  const hourlyMl = dailyMl / 24
-  const naMeq = weightKg <= 10 ? 3 * weightKg : weightKg <= 20 ? 30 + 2 * (weightKg - 10) : 50 + (weightKg - 20)
-  const kMeq = weightKg <= 10 ? 2 * weightKg : weightKg <= 20 ? 20 + 1 * (weightKg - 10) : 30 + 0.5 * (weightKg - 20)
+  const [weightText, setWeightKg] = useState('')
+  const weightKg = parseNumberField(weightText)
+  const m = maintenanceFluid(weightKg)
+  const adaBerat = m.ok
+  const { dailyMl = 0, hourlyMl = 0, naMeq = 0, kMeq = 0 } = m.ok ? m : {}
   const summary = `Maintenance fluid (Holliday-Segar), BB ${weightKg}kg: ${dailyMl.toFixed(0)} mL/day (${hourlyMl.toFixed(1)} mL/hr). Na ~${naMeq.toFixed(0)} mEq/day, K ~${kMeq.toFixed(0)} mEq/day.`
   return (
     <Card className="!p-5">
       <Prosa kelas="text-[13px] text-neutral-500">Rumus Holliday-Segar "4-2-1" — kebutuhan cairan rumatan harian menurut berat badan, beserta perkiraan jatah elektrolit harian (2-3 mEq/kg Na, 1-2 mEq/kg K, dibatasi kasar menurut kelompok baku di bawah).</Prosa>
       <Field label="Weight (kg)">
-        <input className={inputClass} type="number" min={1} step={0.1} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+        <input className={inputClass} type="number" min={1} step={0.1} value={weightText} onChange={(e) => setWeightKg(e.target.value)} />
       </Field>
+      <Penolakan r={m} />
       {adaBerat ? (
         <>
           <div className="mt-3 grid grid-cols-2 gap-3">
@@ -58,7 +61,7 @@ function MaintenanceFluid() {
           </div>
         </>
       ) : (
-        <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+        !m.ok && m.invalid.length > 0 ? null : <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           Enter a weight. A page that answers in mL/hr has no defensible starting body — 70 kg used to print a
           full maintenance rate with daily sodium and potassium allowances, ready to copy.
         </p>
@@ -73,27 +76,21 @@ function FluidResuscitation() {
   // 5600 mL beserta laju per jam, untuk pasien yang tidak ada. Pilihan
   // skenario TETAP punya nilai awal -- ia memilih rumus mana yang dipakai,
   // bukan mengukur sesuatu tentang pasien.
-  const [weightKg, setWeightKg] = useState(0)
+  const [weightText, setWeightKg] = useState('')
   const [scenario, setScenario] = useState<'adult-sepsis' | 'peds-shock' | 'burns'>('adult-sepsis')
-  const [tbsaPct, setTbsaPct] = useState(0)
-  const adaBerat = weightKg > 0
-  const adaTbsa = scenario !== 'burns' || tbsaPct > 0
-  const bisaHitung = adaBerat && adaTbsa
-
-  const result = useMemo(() => {
-    if (scenario === 'adult-sepsis') {
-      const ml = 30 * weightKg
-      return { label: '30 mL/kg crystalloid bolus (Surviving Sepsis Campaign) over the first 3h, reassess perfusion', ml, extra: null as string | null }
-    }
-    if (scenario === 'peds-shock') {
-      const ml = 20 * weightKg
-      return { label: '20 mL/kg isotonic crystalloid bolus (PALS), reassess after each bolus, repeat as needed', ml, extra: null }
-    }
-    // Parkland formula for burns
-    const total = 4 * weightKg * tbsaPct
-    const first8h = total / 2
-    return { label: `Parkland formula: 4 mL x ${weightKg}kg x ${tbsaPct}% TBSA — first half over 8h from time of burn, remainder over next 16h`, ml: total, extra: `First 8h: ${first8h.toFixed(0)} mL (${(first8h / 8).toFixed(0)} mL/hr) · Next 16h: ${first8h.toFixed(0)} mL (${(first8h / 16).toFixed(0)} mL/hr)` }
-  }, [scenario, weightKg, tbsaPct])
+  const [tbsaText, setTbsaPct] = useState('')
+  const weightKg = parseNumberField(weightText)
+  const tbsaPct = parseNumberField(tbsaText)
+  const r = resuscitation(scenario as ResusScenario, weightKg, tbsaPct)
+  const adaBerat = !Number.isNaN(weightKg)
+  const bisaHitung = r.ok
+  const result = r.ok
+    ? scenario === 'adult-sepsis'
+      ? { label: '30 mL/kg crystalloid bolus (Surviving Sepsis Campaign) over the first 3h, reassess perfusion', ml: r.ml, extra: null as string | null }
+      : scenario === 'peds-shock'
+        ? { label: '20 mL/kg isotonic crystalloid bolus (PALS), reassess after each bolus, repeat as needed', ml: r.ml, extra: null }
+        : { label: `Parkland formula: 4 mL x ${weightKg}kg x ${tbsaPct}% TBSA — first half over 8h from time of burn, remainder over next 16h`, ml: r.ml, extra: `First 8h: ${(r.first8hMl ?? 0).toFixed(0)} mL (${((r.first8hMl ?? 0) / 8).toFixed(0)} mL/hr) · Next 16h: ${(r.next16hMl ?? 0).toFixed(0)} mL (${((r.next16hMl ?? 0) / 16).toFixed(0)} mL/hr)` }
+    : { label: '', ml: 0, extra: null as string | null }
 
   const summary = `Fluid resuscitation (${scenario}), BB ${weightKg}kg${scenario === 'burns' ? `, TBSA ${tbsaPct}%` : ''}: ${result.ml.toFixed(0)} mL total. ${result.label}${result.extra ? ' — ' + result.extra : ''}`
 
@@ -107,21 +104,22 @@ function FluidResuscitation() {
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Weight (kg)">
-          <input className={inputClass} type="number" min={1} step={0.1} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" min={1} step={0.1} value={weightText} onChange={(e) => setWeightKg(e.target.value)} />
         </Field>
         {scenario === 'burns' && (
           <Field label="TBSA burned (%)">
-            <input className={inputClass} type="number" min={1} max={100} value={tbsaPct || ''} onChange={(e) => setTbsaPct(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={1} max={100} value={tbsaText} onChange={(e) => setTbsaPct(e.target.value)} />
           </Field>
         )}
       </div>
+      <Penolakan r={r} />
       {bisaHitung ? (
         <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
           <div className="text-[11px] font-bold text-neutral-500">{result.label}</div>
           <div className="mt-1 text-2xl font-black text-brand-dark">{result.ml.toFixed(0)} mL</div>
           {result.extra && <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">{result.extra}</div>}
         </div>
-      ) : (
+      ) : !r.ok && r.invalid.length > 0 ? null : (
         <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           {adaBerat ? 'Enter the burned surface area.' : 'Enter a weight.'}{' '}
           At 70 kg with 20% TBSA the Parkland formula gave 5600 mL and an hourly rate — a resuscitation volume for
@@ -141,26 +139,32 @@ function Electrolytes() {
   // sendiri: natrium terkoreksi dari Na 130 dan glukosa 400; laju koreksi
   // dari Na 120 menuju 130 pada 70 kg; dan defisit kalium dari K 3,0. Semua
   // itu nilai laboratorium.
-  const [measuredNa, setMeasuredNa] = useState(0)
-  const [glucose, setGlucose] = useState(0)
-  const adaNaTerkoreksi = measuredNa > 0 && glucose > 0
-  const correctedNa = measuredNa + 1.6 * ((glucose - 100) / 100)
+  const [measuredNaText, setMeasuredNa] = useState('')
+  const [glucoseText, setGlucose] = useState('')
+  const measuredNa = parseNumberField(measuredNaText)
+  const glucose = parseNumberField(glucoseText)
+  const cna = correctedSodium(measuredNa, glucose)
+  const adaNaTerkoreksi = cna.ok
+  const correctedNa = cna.ok ? cna.correctedNa : 0
 
-  const [currentNa, setCurrentNa] = useState(0)
-  const [targetNa, setTargetNa] = useState(0)
-  const [weightKgR, setWeightKgR] = useState(0)
+  const [currentNaText, setCurrentNa] = useState('')
+  // Natrium target belum dipakai rumus mana pun (masukan lama dipertahankan apa adanya).
+  const [targetNaText, setTargetNa] = useState('')
+  const [weightRText, setWeightKgR] = useState('')
   const [sexR, setSexR] = useState<'M' | 'F'>('M')
-  const tbw = weightKgR * (sexR === 'M' ? 0.6 : 0.5)
-  const naChangePerL = (140 - currentNa) / (tbw + 1) // simplified Adrogue-Madias with 1L infusate Na=140 (0.9% saline)
-  const litersFor10 = naChangePerL !== 0 ? 10 / naChangePerL : 0
+  const currentNa = parseNumberField(currentNaText)
+  const weightKgR = parseNumberField(weightRText)
+  const rate = naCorrectionRate(currentNa, weightKgR, sexR)
+  const adaLajuNa = rate.ok
+  const { tbw = 0, naChangePerL = 0, litersFor10 = 0 } = rate.ok ? rate : {}
 
-  const adaLajuNa = currentNa > 0 && weightKgR > 0
-
-  const [currentK, setCurrentK] = useState(0)
-  const [weightKgK, setWeightKgK] = useState(0)
-  const adaDefisitK = currentK > 0 && weightKgK > 0
-  const kDeficitLow = (4.0 - currentK) * weightKgK * 0.3 // illustrative deficit range, ~0.2-0.4 mEq/kg per 0.1 drop below 4
-  const kDeficitHigh = (4.0 - currentK) * weightKgK * 0.6
+  const [currentKText, setCurrentK] = useState('')
+  const [weightKText, setWeightKgK] = useState('')
+  const currentK = parseNumberField(currentKText)
+  const weightKgK = parseNumberField(weightKText)
+  const kd = potassiumDeficit(currentK, weightKgK)
+  const adaDefisitK = kd.ok
+  const { lowMeq = 0, highMeq = 0 } = kd.ok ? kd : {}
 
   return (
     <Card className="!p-5">
@@ -174,13 +178,16 @@ function Electrolytes() {
         <div className="mt-4">
           <p className="text-[13px] text-neutral-500">Adjusts measured sodium for hyperglycemia-driven osmotic dilution — Katz formula: +1.6 mEq/L Na for every 100 mg/dL glucose above 100.</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Measured Na (mEq/L)"><input className={inputClass} type="number" value={measuredNa || ''} onChange={(e) => setMeasuredNa(Number(e.target.value) || 0)} /></Field>
-            <Field label="Glucose (mg/dL)"><input className={inputClass} type="number" value={glucose || ''} onChange={(e) => setGlucose(Number(e.target.value) || 0)} /></Field>
+            <Field label="Measured Na (mEq/L)"><input className={inputClass} type="number" value={measuredNaText} onChange={(e) => setMeasuredNa(e.target.value)} /></Field>
+            <Field label="Glucose (mg/dL)"><input className={inputClass} type="number" value={glucoseText} onChange={(e) => setGlucose(e.target.value)} /></Field>
           </div>
-          <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
-            <div className="text-[11px] font-bold text-neutral-500">Corrected sodium</div>
-            <div className="text-2xl font-black text-brand-dark">{correctedNa.toFixed(1)} mEq/L</div>
-          </div>
+          <Penolakan r={cna} />
+          {adaNaTerkoreksi ? (
+            <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Corrected sodium</div>
+              <div className="text-2xl font-black text-brand-dark">{correctedNa.toFixed(1)} mEq/L</div>
+            </div>
+          ) : <p className="mt-3 text-[12.5px] text-neutral-600 dark:text-neutral-300">Enter measured sodium and glucose.</p>}
           {adaNaTerkoreksi && <div className="mt-3"><CopyNote text={`Corrected Na = ${measuredNa} + 1.6 x ((${glucose}-100)/100) = ${correctedNa.toFixed(1)} mEq/L [Katz formula]`} /></div>}
         </div>
       )}
@@ -189,9 +196,9 @@ function Electrolytes() {
         <div className="mt-4">
           <Prosa kelas="text-[13px] text-neutral-500">A simplified Adrogue-Madias estimate — how much serum Na rises per liter of 0.9% saline (Na 154 mEq/L) given. Correction of chronic hyponatremia must not exceed 8-10 mEq/L per 24 hours to avoid osmotic demyelination.</Prosa>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Current Na (mEq/L)"><input className={inputClass} type="number" value={currentNa || ''} onChange={(e) => setCurrentNa(Number(e.target.value) || 0)} /></Field>
-            <Field label="Target Na (mEq/L)"><input className={inputClass} type="number" value={targetNa || ''} onChange={(e) => setTargetNa(Number(e.target.value) || 0)} /></Field>
-            <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKgR || ''} onChange={(e) => setWeightKgR(Number(e.target.value) || 0)} /></Field>
+            <Field label="Current Na (mEq/L)"><input className={inputClass} type="number" value={currentNaText} onChange={(e) => setCurrentNa(e.target.value)} /></Field>
+            <Field label="Target Na (mEq/L)"><input className={inputClass} type="number" value={targetNaText} onChange={(e) => setTargetNa(e.target.value)} /></Field>
+            <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightRText} onChange={(e) => setWeightKgR(e.target.value)} /></Field>
             <Field label="Sex">
               <select className={inputClass} value={sexR} onChange={(e) => setSexR(e.target.value as 'M' | 'F')}>
                 <option value="M">Male</option>
@@ -199,11 +206,14 @@ function Electrolytes() {
               </select>
             </Field>
           </div>
-          <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
-            <div className="text-[11px] font-bold text-neutral-500">Estimated rise per 1L of 0.9% saline</div>
-            <div className="text-2xl font-black text-brand-dark">{naChangePerL.toFixed(2)} mEq/L</div>
-            <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">≈ {litersFor10.toFixed(2)} L to raise Na by 10 mEq/L — target ≤8-10 mEq/L per 24h</div>
-          </div>
+          <Penolakan r={rate} />
+          {adaLajuNa ? (
+            <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Estimated rise per 1L of 0.9% saline</div>
+              <div className="text-2xl font-black text-brand-dark">{naChangePerL.toFixed(2)} mEq/L</div>
+              <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">≈ {litersFor10.toFixed(2)} L to raise Na by 10 mEq/L — target ≤8-10 mEq/L per 24h</div>
+            </div>
+          ) : <p className="mt-3 text-[12.5px] text-neutral-600 dark:text-neutral-300">Enter current sodium and weight.</p>}
           {adaLajuNa && <div className="mt-3"><CopyNote text={`Estimated Na rise ≈ ${naChangePerL.toFixed(2)} mEq/L per 1L 0.9% saline (TBW ${tbw.toFixed(1)}L). Cap correction at 8-10 mEq/L/24h.`} /></div>}
         </div>
       )}
@@ -212,14 +222,17 @@ function Electrolytes() {
         <div className="mt-4">
           <Prosa kelas="text-[13px] text-neutral-500">Rentang perkiraan defisit kalium total tubuh pada hipokalemia di bawah 4,0 mEq/L sebagai gambaran (hubungan defisit dengan K serum terkenal tidak linear — ini perkiraan kasar sebagai titik mulai perencanaan koreksi, bukan pengukuran yang tepat).</Prosa>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Current K (mEq/L)"><input className={inputClass} type="number" step={0.1} value={currentK || ''} onChange={(e) => setCurrentK(Number(e.target.value) || 0)} /></Field>
-            <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKgK || ''} onChange={(e) => setWeightKgK(Number(e.target.value) || 0)} /></Field>
+            <Field label="Current K (mEq/L)"><input className={inputClass} type="number" step={0.1} value={currentKText} onChange={(e) => setCurrentK(e.target.value)} /></Field>
+            <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKText} onChange={(e) => setWeightKgK(e.target.value)} /></Field>
           </div>
-          <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
-            <div className="text-[11px] font-bold text-neutral-500">Estimated total-body deficit</div>
-            <div className="text-2xl font-black text-brand-dark">{Math.max(0, kDeficitLow).toFixed(0)}–{Math.max(0, kDeficitHigh).toFixed(0)} mEq</div>
-          </div>
-          {adaDefisitK && <div className="mt-3"><CopyNote text={`Estimated K deficit ${Math.max(0, kDeficitLow).toFixed(0)}-${Math.max(0, kDeficitHigh).toFixed(0)} mEq (K ${currentK}, BB ${weightKgK}kg) — repletion estimate only, recheck levels serially during replacement.`} /></div>}
+          <Penolakan r={kd} />
+          {adaDefisitK ? (
+            <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Estimated total-body deficit</div>
+              <div className="text-2xl font-black text-brand-dark">{lowMeq.toFixed(0)}–{highMeq.toFixed(0)} mEq</div>
+            </div>
+          ) : <p className="mt-3 text-[12.5px] text-neutral-600 dark:text-neutral-300">Enter current potassium and weight.</p>}
+          {adaDefisitK && <div className="mt-3"><CopyNote text={`Estimated K deficit ${lowMeq.toFixed(0)}-${highMeq.toFixed(0)} mEq (K ${currentK}, BB ${weightKgK}kg) — repletion estimate only, recheck levels serially during replacement.`} /></div>}
         </div>
       )}
     </Card>
