@@ -1,5 +1,6 @@
+import { chk } from './check.mjs'
 import { periksaDaftarSurah, periksaSurah, TOTAL_SURAH, TOTAL_AYAT_HAFS } from '../../src/lib/kitab.ts'
-const chk=(n:string,c:boolean,x='')=>console.log(c?'PASS':'FAIL',n,x)
+
 const S=(n:number,j:number)=>({nomor:n,nama:'x',namaArab:'س',arti:'x',jumlahAyat:j,tempat:'Meccan'})
 // Daftar sah: 114 surah, total 6236.
 const sah=[...Array(113)].map((_,i)=>S(i+1,55)); sah.push(S(114,6236-113*55))

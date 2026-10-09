@@ -1,5 +1,6 @@
+import { chk } from './check.mjs'
 import { ringkas, pekanBerjalan, tinjauanJatuhTempo, type Keadaan, type Komitmen } from '../../src/lib/perubahan.ts'
-const chk=(n:string,c:boolean,x='')=>console.log(c?'PASS':'FAIL',n,x)
+
 const hariLalu=(n:number)=>new Date(Date.now()-n*86400_000).toISOString()
 const K=(mulaiHariLalu:number):Komitmen=>({sasaran:'Run 5 km',wilayah:'physical',ukuran:'5 km no walking',
   pembatal:'still under 3 km at week 8',kapan:'Tue/Thu 6am',dimana:'park',minimum:'shoes on, 10 min walk',
