@@ -11,7 +11,8 @@ export function framinghamCVD(p: {
   treatedBP: boolean; smoker: boolean; diabetic: boolean
 }): number | null {
   const { age, sex, totChol, hdl, sbp } = p
-  if (!(age > 0 && totChol > 0 && hdl > 0 && sbp > 0)) return null
+  // Number.isFinite: Infinity lolos `> 0` dan menghasilkan 100% palsu — fail-closed.
+  if (![age, totChol, hdl, sbp].every((v) => Number.isFinite(v) && v > 0)) return null
   const ln = Math.log
   let L: number, s0: number, mean: number
   if (sex === 'M') {
