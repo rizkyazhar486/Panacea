@@ -12,6 +12,7 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { GoogleG } from './loginSvgs'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
+import { Prosa } from '../../components/Prosa'
 
 /* ── Form Field Helper ────────────────────────────────────────── */
 
@@ -246,10 +247,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
             permukaan="care.login"
             className="mt-3 max-w-md text-[12px] leading-snug text-white/70 dark:text-emerald-200/70"
           />
-          <p className="mt-3 max-w-md text-white/85 dark:text-neutral-300 text-sm leading-relaxed">
+          <Prosa kelas="mt-3 max-w-md text-white/85 dark:text-neutral-300 text-sm leading-relaxed" baris={4}>
             AI mendukung anamnesis &amp; edukasi kesehatan dengan peninjauan klinisi berizin. Rekam medis terstruktur,
             pemantauan vitalitas berkelanjutan untuk ketahanan hidup sehat.
-          </p>
+          </Prosa>
           <div className="mt-6 flex flex-wrap gap-2">
             {LOGIN_PILLS.map(t => (
               <span
