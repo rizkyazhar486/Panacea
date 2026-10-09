@@ -48,17 +48,20 @@ assert.equal(plan.length, gapReport.missing)
 
 const currentMissing = plan.map((entry) => entry.structureId)
 assert.deepEqual(currentMissing, [
-  'right-upper-lobe',
-  'right-lower-lobe',
-  'left-upper-lobe',
-  'left-lower-lobe',
   'right-horizontal-fissure',
   'right-oblique-fissure',
   'left-oblique-fissure',
+  'visceral-pleura',
+  'parietal-pleura',
 ])
 
-for (const lobeId of ['right-upper-lobe', 'right-lower-lobe', 'left-upper-lobe', 'left-lower-lobe']) {
-  const entry = plan.find((candidate) => candidate.structureId === lobeId)
+// Present shipped lobes need review, not reacquisition. Preserve the acquisition
+// branch with an empty source snapshot so missing lobes still have a lawful lead.
+const emptySourcePlan = buildRespiratoryAcquisitionPlan(assessRespiratorySourceCoverage([]))
+for (const lobeId of totalSegmentator.targetStructureIds) {
+  assert.equal(gapReport.entries.find((entry) => entry.structureId === lobeId)?.coverage, 'source-node-present')
+  assert.equal(plan.some((entry) => entry.structureId === lobeId), false, `${lobeId} must not be reacquired when its source exists.`)
+  const entry = emptySourcePlan.find((candidate) => candidate.structureId === lobeId)
   assert.ok(entry)
   assert.equal(entry.unresolvedForProduction, false, `${lobeId} should have a licensed segmentation-tool acquisition candidate.`)
   assert.ok(entry.productionCandidateIds.includes('totalsegmentator-total-lung-lobes'))
@@ -69,9 +72,11 @@ assert.deepEqual(unresolved, [
   'right-horizontal-fissure',
   'right-oblique-fissure',
   'left-oblique-fissure',
+  'visceral-pleura',
+  'parietal-pleura',
 ])
 
-for (const fissureId of unresolved) {
+for (const fissureId of ['right-horizontal-fissure', 'right-oblique-fissure', 'left-oblique-fissure']) {
   const entry = plan.find((candidate) => candidate.structureId === fissureId)
   assert.ok(entry)
   assert.equal(entry.productionCandidateIds.length, 0)
@@ -79,11 +84,21 @@ for (const fissureId of unresolved) {
   assert.ok(entry.blockedCandidateIds.includes('fissureseg-stanford-research-lead'))
 }
 
+for (const pleuraId of ['visceral-pleura', 'parietal-pleura']) {
+  const entry = plan.find((candidate) => candidate.structureId === pleuraId)
+  assert.ok(entry)
+  assert.deepEqual(entry.candidates, [], `${pleuraId} must not inherit a generic or lobe acquisition candidate.`)
+  assert.deepEqual(entry.productionCandidateIds, [])
+  assert.deepEqual(entry.researchOnlyCandidateIds, [])
+  assert.deepEqual(entry.blockedCandidateIds, [])
+  assert.equal(entry.unresolvedForProduction, true)
+}
+
 console.log(JSON.stringify({
   respiratoryAcquisition: {
     missingNamedStructures: plan.length,
     licensedProductionCandidatesAvailableFor: plan.filter((entry) => !entry.unresolvedForProduction).map((entry) => entry.structureId),
-    unresolvedProductionFissures: unresolved,
+    unresolvedProductionStructures: unresolved,
     nonCommercialResearchReference: 'UNC-Robotics/Med-RAD',
     blockedUntilLicenseVerified: 'Devanish31/fissureSeg',
   },

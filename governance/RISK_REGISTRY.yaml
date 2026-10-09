@@ -6,6 +6,25 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.respiratory_source_identity
+    category: anatomy_provenance
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Unsided bronchial and generic pleural lookup fallbacks could report the
+      wrong structure as source-backed, while superior/inferior lobe names in
+      the shipped catalogue were incorrectly reported missing.
+    mitigation: >-
+      Candidate resolver uses sided main-bronchus and canonical lobe hints and
+      refuses generic Pleura for distinct pleural layers. Source, readiness and
+      acquisition contracts agree on ten present, five missing and two
+      reference-only structures. Empty-source tests preserve acquisition
+      candidates for genuinely missing lobes. This is named-source coverage,
+      not verified rendering or anatomical validation; asset provenance and
+      qualified review remain required. Exact-head CI and integration remain
+      pending for this candidate.
+    evidence: [src/lib/anatomy/respiratoryAtlasGap.ts, scripts/uji/respiratory-source-gap.mts, scripts/uji/respiratory-hd-readiness.mts, scripts/uji/respiratory-acquisition-registry.mts]
+
   - risk_id: risk.contract_test_false_success
     category: validation_integrity
     severity: high
