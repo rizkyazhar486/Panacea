@@ -75,3 +75,5 @@ export { ldlFriedewald, ldlBand, LDL_RANGES, FRIEDEWALD_TG_LIMIT } from './engin
 export type { LdlInput, LdlResult, LdlBand } from './engine/ldlFriedewald'
 export { correctedCalcium, calciumBand, CA_RANGES } from './engine/correctedCalcium'
 export type { CorrectedCalciumResult, CaBand } from './engine/correctedCalcium'
+export { qtc, qtcBand, QTC_RANGES } from './engine/qtc'
+export type { QtcResult, QtcBand, QtcSex } from './engine/qtc'

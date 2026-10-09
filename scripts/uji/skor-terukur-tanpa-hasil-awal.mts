@@ -2,6 +2,7 @@ import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { graceScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
+import { qtc as hitungQtc } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PENGUKURAN YANG BELUM DIAMBIL BUKAN JAWABAN.
@@ -47,8 +48,10 @@ const qtc = baca('QTcCalculator.tsx')
 const qtcKode = kodeDari(qtc)
 assert.ok(!/useState\(400\)/.test(qtcKode) && !/useState\(60\)/.test(qtcKode),
   'the QT 400 ms / 60 bpm defaults are back')
-assert.ok(/const primaryBand = lengkap \? band\(primary, sex\) : null/.test(qtcKode),
-  'QTc still bands a correction computed from nothing')
+assert.ok(/const primaryBand = hasil\.band/.test(qtcKode) && /qtc\(\{ qtMs, hr, sex \}\)/.test(qtcKode), 'the QTc page no longer takes its band from the engine')
+assert.equal(hitungQtc({ qtMs: NaN, hr: NaN, sex: 'M' }).band, null, 'QTc still bands a correction computed from nothing')
+assert.equal(hitungQtc({ qtMs: 400, hr: NaN, sex: 'M' }).bazett, null, 'a QTc was produced without a heart rate')
+assert.equal(hitungQtc({ qtMs: NaN, hr: 60, sex: 'M' }).bazett, null, 'a QTc was produced without a QT interval')
 assert.ok(/\{lengkap && \([\s\S]{0,80}<ScoreTrend/.test(qtc), 'QTc still records a trend point')
 assert.ok(/getDemoTersimpan/.test(qtcKode) && !/\bgetDemo\s*\(/.test(qtcKode),
   'QTc still takes sex from getDemo(), which answers male for an empty profile')
@@ -60,7 +63,10 @@ const bazett = (qtMs: number, hr: number) => (qtMs / 1000) / Math.sqrt(60 / hr) 
 assert.ok(Math.abs(bazett(400, 60) - 400) < 1e-9,
   'Bazett at 60 bpm no longer returns the QT unchanged; re-read this gate')
 assert.ok(Math.abs(bazett(400, 100) - 516.4) < 0.1, 'Bazett is not what this gate thinks it is')
-assert.ok(/qtSec \/ Math\.sqrt\(rrSec\) \* 1000/.test(qtcKode), 'the page no longer applies Bazett')
+const qtcMotor = readFileSync(new URL('../../src/domains/clinical-calculators/engine/qtc.ts', import.meta.url), 'utf8')
+assert.ok(/qtSec \/ Math\.sqrt\(rrSec\) \* 1000/.test(qtcMotor), 'the engine no longer applies Bazett')
+const b400 = hitungQtc({ qtMs: 400, hr: 60, sex: 'M' }).bazett
+assert.ok(b400 !== null && Math.abs(b400 - 400) < 1e-9, 'at 60 bpm Bazett must equal the QT exactly (RR = 1 s)')
 
 // ── GRACE (Granger 2003) ───────────────────────────────────────────────────
 const grace = baca('GraceScore.tsx')
