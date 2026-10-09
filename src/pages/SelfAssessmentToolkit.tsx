@@ -3,7 +3,8 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconGauge } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
+import { waistHeightRatio, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Self-Assessment Toolkit — four small real self-assessment tools in one
@@ -140,26 +141,36 @@ function AgingFlowchart() {
 }
 
 function WaistHeightRatio() {
-  const [waist, setWaist] = useState(80)
-  const [height, setHeight] = useState(() => getDemo().heightCm || 170)
-  const ratio = waist / height
-  const band: { label: string; tone: 'brand' | 'low' | 'critical' } =
-    ratio < 0.5 ? { label: 'Lower risk', tone: 'brand' } : ratio < 0.6 ? { label: 'Increased risk', tone: 'low' } : { label: 'High risk', tone: 'critical' }
+  // Tinggi hanya dari profil TERSIMPAN; kosong tetap kosong (bukan 170 cm bawaan).
+  const [waistText, setWaist] = useState('')
+  const [heightText, setHeight] = useState(() => { const h = getDemoTersimpan().heightCm; return h && h > 0 ? String(h) : '' })
+  const hasil = waistHeightRatio({ waist: parseNumberField(waistText), height: parseNumberField(heightText) })
   return (
     <Card className="!p-5">
       <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Rasio lingkar pinggang terhadap tinggi badan — beberapa penelitian menemukan pedoman "keep your waist under half your height" lebih sederhana dan lebih baik dalam memperkirakan risiko kardiometabolik daripada IMT saja, karena ia langsung menangkap lemak pusat (viseral).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Waist circumference (cm)">
-          <input className={inputClass} type="number" min={40} max={200} value={waist} onChange={(e) => setWaist(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" inputMode="decimal" value={waistText} onChange={(e) => setWaist(e.target.value)} />
         </Field>
         <Field label="Height (cm)">
-          <input className={inputClass} type="number" min={100} max={230} value={height} onChange={(e) => setHeight(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" inputMode="decimal" value={heightText} onChange={(e) => setHeight(e.target.value)} />
         </Field>
       </div>
+      {hasil.invalid.length > 0 && (
+        <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+      )}
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">{ratio.toFixed(2)}</div>
-        <Badge tone={band.tone}>{band.label}</Badge>
-        <div className="mt-1 text-[11px] text-neutral-500">Target: below 0.5</div>
+        {hasil.ratio !== null && hasil.band ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{hasil.ratio.toFixed(2)}</div>
+            <Badge tone={hasil.band.tone}>{hasil.band.label}</Badge>
+            <div className="mt-1 text-[11px] text-neutral-500">Target: below 0.5</div>
+          </>
+        ) : (
+          <div className="text-[12.5px] text-neutral-500">
+            {hasil.missing.length > 0 ? `No result yet. Still needed: ${hasil.missing.join(', ')}` : 'No result: fix the value above.'}
+          </div>
+        )}
       </div>
     </Card>
   )
