@@ -1,7 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { resuscitation, maintenanceFluid, correctedSodium, naCorrectionRate, potassiumDeficit } from '../../src/domains/clinical-calculators/index.ts'
+import { ldlFriedewald, resuscitation, maintenanceFluid, correctedSodium, naCorrectionRate, potassiumDeficit } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIGA TERAKHIR DARI PENYISIRAN, DAN YANG SATU MENGELUARKAN VOLUME.
@@ -46,10 +46,19 @@ const ldlKode = kodeDari(ldl)
 for (const b of ['useState(200)', 'useState(50)', 'useState(150)']) {
   assert.ok(!ldlKode.includes(b), `a lipid default is back in the LDL calculator: ${b}`)
 }
-assert.ok(/const band = lengkap \? ldlBand\(ldl\) : null/.test(ldlKode), 'LDL still bands a value computed from nothing')
-assert.ok(/totalChol - hdl - tg \/ 5/.test(ldlKode), 'the page no longer applies Friedewald')
+const ldlMotor = readFileSync(new URL('../../src/domains/clinical-calculators/engine/ldlFriedewald.ts', import.meta.url), 'utf8')
+const ldlMotorKode = kodeDari(ldlMotor)
+assert.ok(/ldlFriedewald\(/.test(ldlKode) && /const band = hasil\.band/.test(ldlKode), 'the LDL page no longer takes its band from the engine')
+// Perilaku: pita hanya untuk masukan lengkap dan sah — nilai kosong tidak pernah punya pita.
+assert.equal(ldlFriedewald({ totalChol: NaN, hdl: NaN, tg: NaN }).band, null, 'LDL still bands a value computed from nothing')
+assert.equal(ldlFriedewald({ totalChol: 200, hdl: 50, tg: NaN }).ldl, null, 'LDL was produced without triglycerides')
+assert.ok(/totalChol - hdl - tg \/ 5/.test(ldlMotorKode), 'the engine no longer applies Friedewald')
+const f = ldlFriedewald({ totalChol: 200, hdl: 50, tg: 150 })
+assert.ok(f.ldl === 120 && f.nonHdl === 150, 'engine Friedewald differs from the independent rewrite (200-50-150/5 = 120)')
 // Peringatan TG >= 400 harus bertahan: ia benar dan penting.
-assert.ok(/tg >= 400/.test(ldlKode), 'the Friedewald validity limit at TG >= 400 was dropped')
+assert.ok(/FRIEDEWALD_TG_LIMIT = 400/.test(ldlMotorKode) && /tg >= FRIEDEWALD_TG_LIMIT/.test(ldlMotorKode), 'the Friedewald validity limit at TG >= 400 was dropped')
+assert.equal(ldlFriedewald({ totalChol: 300, hdl: 40, tg: 400 }).ldl, null, 'LDL was calculated at TG >= 400')
+assert.equal(ldlFriedewald({ totalChol: 300, hdl: 40, tg: 399 }).ldl !== null, true, 'LDL was withheld below TG 400')
 
 // ── FluidCalculators ───────────────────────────────────────────────────────
 const cairan = baca('FluidCalculators.tsx')

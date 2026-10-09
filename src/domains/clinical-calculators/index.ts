@@ -71,3 +71,5 @@ export { pediatricDka, kaliumBand, hollidaySegarDailyMl, DKA_RANGES, HYPOKALEMIA
 export type { DkaInput, DkaResult, DkaFluids, KBand } from './engine/pediatricDka'
 export { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, FLUID_RANGES, RESUS_SCENARIOS } from './engine/fluidElectrolytes'
 export type { ResusScenario } from './engine/fluidElectrolytes'
+export { ldlFriedewald, ldlBand, LDL_RANGES, FRIEDEWALD_TG_LIMIT } from './engine/ldlFriedewald'
+export type { LdlInput, LdlResult, LdlBand } from './engine/ldlFriedewald'
