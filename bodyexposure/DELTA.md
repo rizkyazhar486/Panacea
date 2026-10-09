@@ -168,3 +168,21 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
     - Selecting a bone in motion mode shows its details, but there is no highlight.
     - The rig's camera framing assumes the default 30° field of view.
 - Not yet: gait or other recorded motion (needs an open motion-capture dataset), video → rig retargeting, scapulothoracic, atlantoaxial and TFCC modelling, and soft-tissue deformation.
+
+## Rendering, camera and motion performance (2026-10-09)
+
+- **Graphics quality presets** (`engine/renderQuality.ts`, 16 tests): Ultra, Balanced, Performance and Auto.
+  - Each preset caps the pixel ratio (2 / 1.5 / 1). Ultra and Balanced add neutral studio image-based lighting from three.js `RoomEnvironment`, which is procedural and needs no external asset.
+  - Auto starts from the viewport width. It steps down after 2 consecutive evaluations with p95 frame time above the 30 fps budget, and steps up after 3 consecutive evaluations at the 60 Hz vsync bound, so a single hitch does not degrade quality and a 60 Hz display can recover.
+  - Frame time is sampled only between consecutive rendered frames, because the page renders on demand.
+  - Measurements with caveats are in `qa_reports/render_perf.json`.
+- **Anatomical camera** (`engine/cameraViews.ts`, 14 tests):
+  - Views: anterior, posterior, left and right lateral, superior, inferior and 3/4. Each is framed by projecting the subject's bounding box onto the screen axes for the camera's field of view and aspect. This also fixes the initial framing, which had multiplied width by aspect.
+  - Up is always +Y, as OrbitControls requires. Superior and inferior sit 3° off the pole.
+  - Transitions run for 0.6 s on real elapsed time. The camera direction is interpolated on a sphere around the target, so opposite views orbit rather than pass through the body.
+  - User input cancels a transition. Focusing a structure is animated, and double-clicking focuses the structure under the pointer.
+- **Motion-mode draw calls** (`adapters/mergeRigMeshes.ts`, 8 tests):
+  - The 825 rig mesh objects are merged per bone × material into 147 draw groups after loading. Quantised positions are dequantised first.
+  - The originals stay hidden but are kept for metadata and focus, and merged triangles map back to their source structure for picking.
+  - An independent check found the per-structure world bounding boxes identical to the originals within 1.5×10⁻⁸ m at 12 clip frames, and picking identical in 550 of 550 rays.
+  - At 1440×900 the clip ran at about 60 fps (the headless vsync cap) across all presets, up from about 42 fps before merging, on the same machine with a dev build. Toggling Motion does not leak GPU buffers, and switching body frees the rig.
