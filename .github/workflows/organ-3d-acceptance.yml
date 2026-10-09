@@ -147,7 +147,8 @@ jobs:
           KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
-          BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+          BILAH_QA_URL: http://127.0.0.1:4173/#/
+          BILAH_QA_URL_LATIHAN: http://127.0.0.1:4173/#/latihan?t=pelatih
           SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
         run: |
           set -e

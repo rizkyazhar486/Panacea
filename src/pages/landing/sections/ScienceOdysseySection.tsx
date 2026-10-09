@@ -266,9 +266,9 @@ export function ScienceOdysseySection() {
                 <h3 className="mt-3 text-2xl font-extrabold text-ink">
                   Sains Sel Punca (<span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Stem Cells</span>)
                 </h3>
-                <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
+                <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
                   Potensi terbesar sains anti-penuaan: regenerasi sel yang rusak dan peremajaan jaringan tubuh. Tiga kategori utama dari yang paling matang secara klinis hingga riset terdepan.
-                </p>
+                </Prosa>
               </Reveal>
               <div className="mt-6 grid gap-4 lg:grid-cols-3">
                 {STEM_CELLS.map((s, i) => (

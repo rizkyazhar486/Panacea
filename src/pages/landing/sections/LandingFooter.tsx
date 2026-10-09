@@ -1,4 +1,5 @@
 import { Wordmark } from '../../../components/Logo'
+import { Prosa } from '../../../components/Prosa'
 
 export function LandingFooter() {
   return (
@@ -38,9 +39,9 @@ export function LandingFooter() {
 
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Pemberitahuan Klinis &amp; Legal</h4>
-            <p className="mt-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400" baris={4}>
               Keluaran teknis (Technical output). Belum ditinjau klinisi atau divalidasi klinis kecuali telah disahkan oleh dokter berizin. AI mendukung, namun tidak pernah menggantikan dokter berizin.
-            </p>
+            </Prosa>
           </div>
         </div>
 

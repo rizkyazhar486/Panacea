@@ -378,9 +378,16 @@ export function Shell({ children }: { children: ReactNode }) {
   // bawahnya juga tidak bisa ditekan sampai spanduknya ditutup. Angka tetap
   // tidak dipakai di sini: tinggi bilah berubah menurut lebar layar dan isi
   // judulnya, dan tebakan yang meleset mengembalikan tumpang-tindih yang sama.
+  // State (bukan useRef): bilah baru ada setelah login/onboarding selesai, dan
+  // efek ber-deps [] yang jalan sekali saat mount tidak pernah mengukurnya.
   const bilahAtas = useRef<HTMLElement | null>(null)
+  const [bilahEl, setBilahEl] = useState<HTMLElement | null>(null)
+  const pasangBilah = useCallback((el: HTMLElement | null) => {
+    bilahAtas.current = el
+    setBilahEl(el)
+  }, [])
   useEffect(() => {
-    const el = bilahAtas.current
+    const el = bilahEl
     if (!el) return
     const ukur = () => {
       document.documentElement.style.setProperty('--tinggi-bilah-atas', `${Math.round(el.getBoundingClientRect().height)}px`)
@@ -390,7 +397,7 @@ export function Shell({ children }: { children: ReactNode }) {
     const pengamat = new ResizeObserver(ukur)
     pengamat.observe(el)
     return () => pengamat.disconnect()
-  }, [])
+  }, [bilahEl])
 
   useEffect(() => pasangKilau(), [])
   const account = state.account
@@ -436,6 +443,16 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])
+
+  // Harus berada SEBELUM return awal di bawah: hook yang dipanggil setelah
+  // return kondisional membuat React crash ("rendered more hooks") saat rute
+  // berpindah antara /design-demo atau Login dan halaman biasa.
+  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
+  useEffect(() => {
+    const onLogout = () => doLogout()
+    window.addEventListener('panacea:logout', onLogout)
+    return () => window.removeEventListener('panacea:logout', onLogout)
+  }, [])
 
 
 
@@ -502,12 +519,6 @@ export function Shell({ children }: { children: ReactNode }) {
       ).join(' › ')
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
-  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
-  useEffect(() => {
-    const onLogout = () => doLogout()
-    window.addEventListener('panacea:logout', onLogout)
-    return () => window.removeEventListener('panacea:logout', onLogout)
-  }, [])
   // Beranda ringkas — the user's most-used services (ranked by visit history),
   // shown on the home route only.
   const homeServices = rankByUsage(
@@ -536,7 +547,7 @@ export function Shell({ children }: { children: ReactNode }) {
             menelan klik milik isi halaman di bawahnya. */}
         <div className="panacea-command-bar-reveal-zone" aria-hidden />
         <header
-          ref={bilahAtas}
+          ref={pasangBilah}
           data-panacea-command-bar={keadaanBilah}
           className="kaca panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
         >

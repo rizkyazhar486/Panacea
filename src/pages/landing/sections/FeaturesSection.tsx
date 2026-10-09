@@ -1,4 +1,5 @@
 import { Reveal } from '../../../components/Reveal'
+import { Prosa } from '../../../components/Prosa'
 import {
   IconChat,
   IconHeart,
@@ -131,9 +132,9 @@ export function FeaturesSection({ onMasuk }: FeaturesSectionProps) {
                 </div>
 
                 <h3 className="mt-5 text-xl font-extrabold text-ink dark:text-white">AI Longevity Calculator</h3>
-                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                <Prosa kelas="mt-2 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   Pantau biomarker gaya hidup: nutrisi, hidrasi, kualitas tidur, dan aktivitas fisik harian. Dapatkan estimasi usia biologis terukur untuk menjaga vitalitas tubuh Anda secara optimal. (Catatan: estimasi teknis gaya hidup, bukan diagnosis klinis).
-                </p>
+                </Prosa>
 
                 {/* Dial Gauge Preview */}
                 <div className="mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-50/50 p-4 text-center dark:bg-emerald-950/30">
@@ -253,9 +254,9 @@ export function FeaturesSection({ onMasuk }: FeaturesSectionProps) {
                 </div>
 
                 <h3 className="mt-4 text-lg font-extrabold text-ink">Medical Knowledge Hub</h3>
-                <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                <Prosa kelas="mt-2 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   Akses ribuan modul klinis, catatan medis, dan jurnal riset terkurasi. Penulis terlindungi sistem watermark dokumen otomatis dengan royalti langsung berbasis PanaceaToken.
-                </p>
+                </Prosa>
 
                 {/* Preview dokumen ber-watermark */}
                 <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-50/40 p-3 text-xs dark:bg-emerald-950/30">
@@ -342,9 +343,9 @@ export function FeaturesSection({ onMasuk }: FeaturesSectionProps) {
                   </span>
                 </div>
 
-                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                <Prosa kelas="mt-3 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   Dirancang untuk dokter berizin (STR) dan fasilitas kesehatan. Mengotomatisasi resume SOAP klinis, evaluasi interaksi obat teknis, dan sinkronisasi standar SATUSEHAT Kemenkes (HL7® FHIR) guna memangkas beban administrasi.
-                </p>
+                </Prosa>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/5 bg-neutral-100/70 p-3 text-xs dark:bg-neutral-800/70">
                   <span className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-300">
