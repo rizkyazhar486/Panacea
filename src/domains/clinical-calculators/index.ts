@@ -73,3 +73,5 @@ export { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, pot
 export type { ResusScenario } from './engine/fluidElectrolytes'
 export { ldlFriedewald, ldlBand, LDL_RANGES, FRIEDEWALD_TG_LIMIT } from './engine/ldlFriedewald'
 export type { LdlInput, LdlResult, LdlBand } from './engine/ldlFriedewald'
+export { correctedCalcium, calciumBand, CA_RANGES } from './engine/correctedCalcium'
+export type { CorrectedCalciumResult, CaBand } from './engine/correctedCalcium'
