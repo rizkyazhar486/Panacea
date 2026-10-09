@@ -44,7 +44,6 @@ const DIKETAHUI: ReadonlyArray<readonly [string, number]> = [
   ['src/pages/clinical/scores/AaGradient.tsx', 1],
   ['src/pages/AlcoholCalculator.tsx', 2],
   ['src/pages/AnalisisPro.tsx', 1],
-  ['src/pages/bodyhub/BloodDonation.tsx', 2],
   ['src/pages/BodyBattery.tsx', 1],
   ['src/pages/clinical/scores/CharlsonIndex.tsx', 1],
   ['src/pages/fitness/EnduranceTools.tsx', 3],

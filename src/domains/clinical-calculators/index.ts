@@ -93,3 +93,5 @@ export { packYearScreen, PACK_YEAR_RANGES, USPSTF_2021 } from './engine/packYear
 export type { PackYearInput, PackYearResult, PackYearStatus } from './engine/packYearScreen'
 export { cvdRisk, fib4, fib4Band, ostIndex, ostBand, RISK_RANGES } from './engine/riskScreens'
 export type { CvdInput, CvdResult, Fib4Input, Fib4Result, Fib4Band, OstInput, OstResult } from './engine/riskScreens'
+export { bloodDonationScreen, DONATION_RANGES, DONATION_INTERVAL_WEEKS } from './engine/bloodDonationScreen'
+export type { DonationInput, DonationResult } from './engine/bloodDonationScreen'
