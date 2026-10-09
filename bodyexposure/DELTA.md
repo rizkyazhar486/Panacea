@@ -128,16 +128,26 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - **8K render** (`pipeline/render_8k.py`, 7680×4320): anterior deep view (translucent skin) beside the muscle layer. The JPEG is in `renders/`; the 16-bit PNG stays local.
 - Not yet: baked texture maps (the procedural materials are resolution-independent, so 8K renders need no texture files), proxies for the other bodies, and animation.
 
-## Rig axes, hinge fit and ROM animation (2026-10-09)
+## Rig axes, hinge fit, pronation axis and ROM animation (2026-10-09)
 
-- **Flexion axes (ISB):** knee, elbow and ankle now rotate about the femoral-epicondyle, humeral-epicondyle and malleolar lines, not simply perpendicular to the bone. The axes change by 3.6°, 8.4° and 36.3°; the last is the known obliquity of the talocrural axis.
+- **Flexion axes (ISB):** knee, elbow and ankle now rotate about the femoral-epicondyle, humeral-epicondyle and malleolar lines, not simply perpendicular to the bone. Measured as the angle between lines, the axes change by 3.7°, 8.1° and 43.2° (right side; the left mirrors it).
 - **Hinge centre fit** (`pipeline/fit_hinge_centres.py` → `manifest/rig_hinge_refinement.json`): the ISB epicondyle and malleolus midpoints are coordinate-system landmarks, not the functional hinge. Starting from the ISB centre, each hinge centre is moved only in the plane perpendicular to its axis, within ±12 mm per direction on a 2 mm grid, to minimise bone-into-bone penetration across the AAOS range.
-  - Elbow: moved 14.4 mm anteriorly and distally, towards the trochlea–capitulum centre. Penetration fell from 9.07 to 0.23 mm.
-  - Ankle: moved 12.2 mm, mostly distally, consistent with the talocrural axis passing just below the malleolar tips. Penetration fell from 4.23 to 0.78 mm.
-  - Values are mirrored on the right side.
+  - Elbow: moved 14.4 mm, mostly anteriorly and distally. Penetration fell from 9.07 to 0.23 mm.
+  - Ankle: moved 12.2 mm, mostly distally. Penetration fell from 4.23 to 0.78 mm.
+  - Both shifts reach the edge of the search window, so they are bounded results, not converged optima.
+  - An independent circle fit to the distal humeral profile and the talar dome puts the centre of curvature 5.8 mm and 4.9 mm from the refined centres, against 11.3 mm and 16.5 mm from the ISB centres.
+- **Pronation axis:** a new bone `FOREARM_ROT` runs from the radial head centre (proximal 12 mm of the radius) to the ulnar head centre (distal 15 mm of the ulna). The radius, the distal radio-ulnar joint and the hand follow it, so the radius rotates about the ulna and the ulna stays on the humeroulnar hinge. Before this fix, rotating the whole forearm drove the ulna up to 7.9 mm into the humerus during pronation.
 - **ROM animation** (`pipeline/animate_rom.py` → `bodies/PANACEA_RIG_ADULT_MALE_ROM.blend`, local; preview `renders/rom_preview_1280x720.mp4`):
-  - 793 frames at 24 fps, 11 movements; each joint goes 0 → its AAOS limit → 0. No other kinematics are used.
-  - Two deliberate deviations: shoulder abduction is limited to 90° (no scapulothoracic joint yet), and hip flexion is performed with the knee flexed, as AAOS measures it.
-  - QA (`qa_reports/rig_rom_animation.json`): peak excursions are knee 129.6°, elbow 150.0°, hip 120.0° and shoulder 180.0°, all within limits.
-  - Maximum bone-into-bone penetration at movement peaks is ≤ 0.7 mm (limit 1.5 mm). Articular cartilage is not modelled.
-- Not yet: gait or other recorded motion (needs an open motion-capture dataset), video → rig retargeting, and soft-tissue deformation.
+  - 793 frames at 24 fps, 11 movements; each joint goes 0 → limit → 0, using AAOS normal values except where noted.
+  - Shoulder flexion is capped at 120° and shoulder abduction at 90°. With no scapulothoracic joint, these are the glenohumeral share of the AAOS 180° under the 2:1 scapulohumeral rhythm (Inman et al. 1944). Without scapular rotation, 180° drives the scapula about 10 mm into the humerus.
+  - Hip flexion is performed with the knee flexed, as AAOS measures it.
+  - QA (`qa_reports/rig_rom_animation.json`): peak excursions are knee 129.6°, elbow 150.0°, hip 120.0° and shoulder 120.0°.
+  - Penetration is measured for 11 articulating pairs on both sides, in both directions, using 3-ray parity for inside tests, every 12 frames plus every movement peak.
+  - Maximum penetration is 1.31 mm (FEMUR.L/TIBIA.L, knee flexion); the limit is 1.5 mm. Articular cartilage is not modelled.
+- **In the app** (Canonical Body → Adult male → Motion):
+  - The rig (`adult_male.rig_rom.glb`, 645 bone and joint meshes, 32,936 triangles, meshopt, 1.4 MB) plays the clip labelled **Simulation**.
+  - Controls: play/pause, timeline scrub and 0.25–2× speed. The panel sits below the canvas, so it does not cover the anatomy.
+  - Time comes from `THREE.Timer` real elapsed time with Page Visibility, not frame counts; `engine/motionTimeline.ts` has 15 positive and negative unit tests.
+  - The browser check confirms the canvas changes while playing and that scrubbing reaches the named movement.
+  - Skeleton and joints only: muscles and skin are not rigged.
+- Not yet: gait or other recorded motion (needs an open motion-capture dataset), video → rig retargeting, scapulothoracic and atlantoaxial joints, and soft-tissue deformation.

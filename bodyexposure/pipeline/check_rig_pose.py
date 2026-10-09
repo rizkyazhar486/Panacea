@@ -35,18 +35,18 @@ knee = ang("THIGH.L", "SHIN.L")
 # arah: fleksi pergelangan (HAND.R +60 fleksi) → ujung tangan ke anterior relatif lengan bawah istirahat
 hand_tip_y = (M @ P["HAND.R"].tail).y; wrist_y = (M @ P["HAND.R"].head).y
 # pronasi: lengan bawah kanan diputar 90° ke arah pronasi → titik anterior distal bergerak ke medial
-s_pr = 1 if ROM["FOREARM.R"]["Y"][1] > 0 else -1
+s_pr = 1 if ROM["FOREARM_ROT.R"]["Y"][1] > 0 else -1
 P["FOREARM.L"].rotation_euler = (0, 0, 0); bpy.context.view_layer.update()
-before = (M @ P["FOREARM.R"].matrix @ Vector((0, P["FOREARM.R"].length, 0.03))).x
-P["FOREARM.R"].rotation_euler = (0, math.radians(90 * s_pr), 0); bpy.context.view_layer.update()
-after = (M @ P["FOREARM.R"].matrix @ Vector((0, P["FOREARM.R"].length, 0.03))).x
+before = (M @ P["FOREARM_ROT.R"].matrix @ Vector((0, P["FOREARM_ROT.R"].length, 0.03))).x
+P["FOREARM_ROT.R"].rotation_mode = 'XYZ'; P["FOREARM_ROT.R"].rotation_euler = (0, math.radians(90 * s_pr), 0); bpy.context.view_layer.update()
+after = (M @ P["FOREARM_ROT.R"].matrix @ Vector((0, P["FOREARM_ROT.R"].length, 0.03))).x
 pronation_medial = after > before  # sisi kanan: medial = x naik (menuju garis tengah)
 res = {"pose_deg": POSE, "left_knee_rest_deg": round(rest_knee, 1), "left_knee_after_170_request_deg": round(knee, 1),
        "rom_clamped": knee <= 135 + rest_knee + 0.5, "right_knee_anterior_y_m": round((M @ P["THIGH.R"].tail).y, 3),
        "meshes_far_from_bone": far, "wrist_flexion_moves_hand_anterior": hand_tip_y < wrist_y - 0.02,
        "forearm_pronation_limit_moves_anterior_point_medially": pronation_medial,
-       "hand_X_limits": ROM["HAND.R"]["X"], "forearm_Y_limits": ROM["FOREARM.R"]["Y"],
+       "hand_X_limits": ROM["HAND.R"]["X"], "forearm_Y_limits": ROM["FOREARM_ROT.R"]["Y"],
        "note": "Centroid-to-bone distance only catches gross misbinding (wrong segment or side); ribs, costal cartilages and sternum are excluded because they are lever arms of their vertebrae."}
 res["ok"] = (res["rom_clamped"] and not far and res["right_knee_anterior_y_m"] < -0.1 and res["wrist_flexion_moves_hand_anterior"]
-             and pronation_medial and ROM["HAND.R"]["X"] == [-70, 80] and ROM["HAND.R"]["positive_X"] == "flexion" and max(abs(x) for x in ROM["FOREARM.R"]["Y"]) == 160)
+             and pronation_medial and ROM["HAND.R"]["X"] == [-70, 80] and ROM["HAND.R"]["positive_X"] == "flexion" and max(abs(x) for x in ROM["FOREARM_ROT.R"]["Y"]) == 160)
 json.dump(res, open(OUT, "w"), indent=1); print("RIGPOSE", json.dumps({k: res[k] for k in ("ok", "left_knee_after_170_request_deg", "rom_clamped", "right_knee_anterior_y_m", "wrist_flexion_moves_hand_anterior", "forearm_pronation_limit_moves_anterior_point_medially", "hand_X_limits", "forearm_Y_limits")}), "far:", far[:5])

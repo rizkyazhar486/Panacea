@@ -1,0 +1,80 @@
+{
+ "clip": "ROM",
+ "fps": 24,
+ "frames": 793,
+ "source": "AAOS normal range of motion (Greene & Heckman 1994)",
+ "truth_class": "simulated",
+ "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
+ "movements": [
+  {
+   "name": "shoulder flexion",
+   "start_s": 0.0,
+   "end_s": 3.0,
+   "note": "120 of AAOS 180: glenohumeral share by the 2:1 scapulohumeral rhythm (Inman et al. 1944); no scapulothoracic joint yet"
+  },
+  {
+   "name": "shoulder abduction",
+   "start_s": 3.0,
+   "end_s": 6.0,
+   "note": "90 of AAOS 180: no scapulothoracic joint yet"
+  },
+  {
+   "name": "elbow flexion",
+   "start_s": 6.0,
+   "end_s": 9.0,
+   "note": "AAOS 150"
+  },
+  {
+   "name": "forearm pronation",
+   "start_s": 9.0,
+   "end_s": 12.0,
+   "note": "AAOS 80+80 from supinated rest; radius rotates about the ulna (radial head to ulnar head axis)"
+  },
+  {
+   "name": "wrist flexion",
+   "start_s": 12.0,
+   "end_s": 15.0,
+   "note": "AAOS 80"
+  },
+  {
+   "name": "wrist extension",
+   "start_s": 15.0,
+   "end_s": 18.0,
+   "note": "AAOS 70"
+  },
+  {
+   "name": "hip flexion (knee flexed)",
+   "start_s": 18.0,
+   "end_s": 21.0,
+   "note": "AAOS hip 120, knee flexed"
+  },
+  {
+   "name": "hip abduction",
+   "start_s": 21.0,
+   "end_s": 24.0,
+   "note": "AAOS 45"
+  },
+  {
+   "name": "knee flexion",
+   "start_s": 24.0,
+   "end_s": 27.0,
+   "note": "AAOS 135"
+  },
+  {
+   "name": "ankle plantarflexion",
+   "start_s": 27.0,
+   "end_s": 30.0,
+   "note": "AAOS 50"
+  },
+  {
+   "name": "ankle dorsiflexion",
+   "start_s": 30.0,
+   "end_s": 33.0,
+   "note": "AAOS 20"
+  }
+ ],
+ "qa": {
+  "angle_within_limits": true,
+  "max_bone_penetration_mm": 1.31
+ }
+}

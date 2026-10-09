@@ -9,8 +9,8 @@
     37,
     73
    ],
-   "target_deg": 180,
-   "note": "AAOS 180"
+   "target_deg": 120,
+   "note": "120 of AAOS 180: glenohumeral share by the 2:1 scapulohumeral rhythm (Inman et al. 1944); no scapulothoracic joint yet"
   },
   {
    "movement": "shoulder abduction",
@@ -40,7 +40,7 @@
     289
    ],
    "target_deg": 160,
-   "note": "AAOS 80+80 from supinated rest"
+   "note": "AAOS 80+80 from supinated rest; radius rotates about the ulna (radial head to ulnar head axis)"
   },
   {
    "movement": "wrist flexion",
@@ -121,72 +121,171 @@
   "knee": 129.6,
   "elbow": 150.0,
   "hip": 120.0,
-  "shoulder": 180.0
+  "shoulder": 120.0
  },
  "angle_within_limits": true,
  "bone_contact_overlap": [
   {
-   "movement": "knee flexion",
    "pair": [
     "FEMUR.L",
     "TIBIA.L"
    ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.15
+   "max_penetration_mm": 1.31,
+   "at_frame": 625,
+   "movement": "knee flexion"
   },
   {
-   "movement": "elbow flexion",
    "pair": [
     "HUMERUS.L",
     "ULNA.L"
    ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.0
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
   },
   {
-   "movement": "hip flexion (knee flexed)",
-   "pair": [
-    "FEMUR.R",
-    "HIP_BONE.R"
-   ],
-   "penetration_mm_rest": 0.19,
-   "penetration_mm_peak": 0.7
-  },
-  {
-   "movement": "shoulder abduction",
-   "pair": [
-    "HUMERUS.L",
-    "SCAPULA.L"
-   ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.0
-  },
-  {
-   "movement": "ankle plantarflexion",
-   "pair": [
-    "TIBIA.L",
-    "TALUS.L"
-   ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.67
-  },
-  {
-   "movement": "elbow flexion",
    "pair": [
     "HUMERUS.L",
     "RADIUS.L"
    ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.0
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
   },
   {
-   "movement": "ankle dorsiflexion",
+   "pair": [
+    "FEMUR.L",
+    "HIP_BONE.L"
+   ],
+   "max_penetration_mm": 0.19,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "SCAPULA.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "CLAVICLE.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.L",
+    "ULNA.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
    "pair": [
     "TIBIA.L",
     "TALUS.L"
    ],
-   "penetration_mm_rest": 0.0,
-   "penetration_mm_peak": 0.0
+   "max_penetration_mm": 0.8,
+   "at_frame": 685,
+   "movement": "ankle plantarflexion"
+  },
+  {
+   "pair": [
+    "FIBULA.L",
+    "TALUS.L"
+   ],
+   "max_penetration_mm": 0.61,
+   "at_frame": 757,
+   "movement": "ankle dorsiflexion"
+  },
+  {
+   "pair": [
+    "FEMUR.R",
+    "TIBIA.R"
+   ],
+   "max_penetration_mm": 1.07,
+   "at_frame": 481,
+   "movement": "hip flexion (knee flexed)"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "ULNA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "RADIUS.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "FEMUR.R",
+    "HIP_BONE.R"
+   ],
+   "max_penetration_mm": 0.71,
+   "at_frame": 469,
+   "movement": "hip flexion (knee flexed)"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "SCAPULA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "CLAVICLE.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.R",
+    "ULNA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "TIBIA.R",
+    "TALUS.R"
+   ],
+   "max_penetration_mm": 0.8,
+   "at_frame": 685,
+   "movement": "ankle plantarflexion"
+  },
+  {
+   "pair": [
+    "FIBULA.R",
+    "TALUS.R"
+   ],
+   "max_penetration_mm": 0.61,
+   "at_frame": 757,
+   "movement": "ankle dorsiflexion"
   }
  ],
  "no_new_bone_penetration": true,

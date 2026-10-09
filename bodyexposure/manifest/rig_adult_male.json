@@ -32,6 +32,16 @@
    -0.014,
    0.856
   ],
+  "RADIAL_HEAD.L": [
+   0.2381,
+   0.029,
+   1.0879
+  ],
+  "ULNAR_HEAD.L": [
+   0.2462,
+   -0.0134,
+   0.8624
+  ],
   "HAND_END.L": [
    0.2713,
    -0.0348,
@@ -76,6 +86,16 @@
    -0.2646,
    -0.014,
    0.856
+  ],
+  "RADIAL_HEAD.R": [
+   -0.2381,
+   0.029,
+   1.0879
+  ],
+  "ULNAR_HEAD.R": [
+   -0.2462,
+   -0.0134,
+   0.8624
   ],
   "HAND_END.R": [
    -0.2713,
@@ -263,6 +283,12 @@
   "WRIST.L": {
    "method": "midpoint of radial and ulnar styloid tips (most distal vertices)"
   },
+  "RADIAL_HEAD.L": {
+   "method": "centroid of the proximal 12 mm of the radius (radial head)"
+  },
+  "ULNAR_HEAD.L": {
+   "method": "centroid of the distal 15 mm of the ulna (ulnar head)"
+  },
   "HAND_END.L": {
    "method": "distal end of third metacarpal"
   },
@@ -310,6 +336,12 @@
   },
   "WRIST.R": {
    "method": "midpoint of radial and ulnar styloid tips (most distal vertices)"
+  },
+  "RADIAL_HEAD.R": {
+   "method": "centroid of the proximal 12 mm of the radius (radial head)"
+  },
+  "ULNAR_HEAD.R": {
+   "method": "centroid of the distal 15 mm of the ulna (ulnar head)"
   },
   "HAND_END.R": {
    "method": "distal end of third metacarpal"
@@ -428,10 +460,12 @@
   "CLAVICLE.L": 167.9,
   "UPPER_ARM.L": 283.9,
   "FOREARM.L": 255.2,
+  "FOREARM_ROT.L": 229.6,
   "HAND.L": 90.1,
   "CLAVICLE.R": 167.9,
   "UPPER_ARM.R": 283.9,
   "FOREARM.R": 255.2,
+  "FOREARM_ROT.R": 229.6,
   "HAND.R": 90.1,
   "THIGH.L": 405.9,
   "SHIN.L": 387.7,
@@ -507,7 +541,7 @@
     0
    ],
    "Y": [
-    -160,
+    0,
     0
    ],
    "Z": [
@@ -515,6 +549,21 @@
     0
    ],
    "positive_X": "extension"
+  },
+  "FOREARM_ROT.L": {
+   "X": [
+    0,
+    0
+   ],
+   "Y": [
+    0,
+    160
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "flexion"
   },
   "HAND.L": {
    "X": [
@@ -597,6 +646,21 @@
     150
    ],
    "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "flexion"
+  },
+  "FOREARM_ROT.R": {
+   "X": [
+    0,
+    0
+   ],
+   "Y": [
     -160,
     0
    ],
@@ -625,9 +689,9 @@
  "rom_source": "AAOS normal values (Greene & Heckman 1994)",
  "flexion_axis": "knee, elbow and ankle flexion about the epicondylar / malleolar line (ISB); others perpendicular to the bone, anterior roll",
  "flexion_axis_change_deg": {
-  "SHIN.L": 176.3,
-  "FOREARM.L": 171.9,
-  "FOOT.L": 136.7,
+  "SHIN.L": 3.7,
+  "FOREARM.L": 8.1,
+  "FOOT.L": 43.3,
   "SHIN.R": 3.7,
   "FOREARM.R": 8.1,
   "FOOT.R": 43.2
@@ -690,8 +754,8 @@
   "PELVIS": 31,
   "CLAVICLE.L": 12,
   "CLAVICLE.R": 12,
-  "FOREARM.L": 12,
-  "FOREARM.R": 12,
+  "FOREARM.L": 7,
+  "FOREARM.R": 7,
   "SHIN.L": 28,
   "SHIN.R": 28,
   "SPINE.T9": 11,
@@ -705,6 +769,8 @@
   "HAND.L": 69,
   "HAND.R": 69,
   "HEAD": 48,
+  "FOREARM_ROT.L": 5,
+  "FOREARM_ROT.R": 5,
   "SPINE.T6": 11,
   "SPINE.C6": 6,
   "SPINE.T11": 7,
@@ -732,6 +798,7 @@
    "CLAVICLE": 0.0,
    "UPPER_ARM": 0.02,
    "FOREARM": 0.02,
+   "FOREARM_ROT": 0.0,
    "HAND": 0.0,
    "THIGH": 0.0,
    "SHIN": 0.0,
@@ -902,11 +969,11 @@
    ],
    [
     "ADULT.MALE.JOINT.QUADRATE_LIGAMENT.L",
-    "FOREARM.L via nearest segment (11 mm)"
+    "FOREARM_ROT.L via nearest segment (11 mm)"
    ],
    [
     "ADULT.MALE.JOINT.QUADRATE_LIGAMENT.R",
-    "FOREARM.R via nearest segment (11 mm)"
+    "FOREARM_ROT.R via nearest segment (11 mm)"
    ],
    [
     "ADULT.MALE.JOINT.SUPERIOR_PUBIC_LIGAMENT",
