@@ -89,5 +89,43 @@
    }
   ],
   "finding": "At 1440x900 the presets barely differ: the bottleneck is CPU-side (about 645 rig meshes = draw calls in Motion mode), not pixel count. Lowering the preset does not help that scene much; reducing draw calls would."
+ },
+ "after_rig_merge": {
+  "measured": "2026-10-09",
+  "change": "Motion-mode rig meshes merged per bone x material (~825 -> <200 draw groups)",
+  "conditions": "Apple M4, Chrome headless ANGLE Metal, DPR 2, Vite dev build; another Chrome instance at ~100% CPU on the same machine",
+  "results": [
+   {
+    "viewport": "1440x900",
+    "preset": "ultra",
+    "readout": "60 fps \u00b7 1% low 60 \u00b7 ultra"
+   },
+   {
+    "viewport": "1440x900",
+    "preset": "balanced",
+    "readout": "59 fps \u00b7 1% low 30 \u00b7 balanced"
+   },
+   {
+    "viewport": "1440x900",
+    "preset": "performance",
+    "readout": "60 fps \u00b7 1% low 60 \u00b7 performance"
+   },
+   {
+    "viewport": "390x844",
+    "preset": "ultra",
+    "readout": "60 fps \u00b7 1% low 60 \u00b7 ultra"
+   },
+   {
+    "viewport": "390x844",
+    "preset": "balanced",
+    "readout": "60 fps \u00b7 1% low 60 \u00b7 balanced"
+   },
+   {
+    "viewport": "390x844",
+    "preset": "performance",
+    "readout": "60 fps \u00b7 1% low 60 \u00b7 performance"
+   }
+  ],
+  "note": "Values sit at the 60 fps vsync/headless cap, so the true headroom is not measured; the earlier independent dev-build baseline at 1440x900 was ~42 fps."
  }
 }

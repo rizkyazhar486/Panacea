@@ -94,3 +94,4 @@ export {
   type CameraTween,
   type Vec3,
 } from './engine/cameraViews'
+export { mergeRigMeshes, structureAtFace, type MergeResult, type MergedRange } from './adapters/mergeRigMeshes'

@@ -78,6 +78,11 @@ try {
       await page.getByTestId('motion-movement').filter({ hasText: /hip flexion/i }).waitFor()
       await page.getByRole('button', { name: 'Play', exact: true }).waitFor()  // scrub menjeda
       await page.screenshot({ path: `/private/tmp/canonical-motion-${width}-${theme}.png`, fullPage: true })
+      // mesh rig digabung per tulang × material; ketukan tetap memilih struktur asal (rentang segitiga)
+      assert(parseInt(await page.getByTestId('motion-draws').textContent().then((t) => t.match(/(\d+)/)[1]), 10) < 200, 'motion: rig meshes not merged')
+      const mc = await page.getByTestId('canonical-body-canvas').boundingBox()
+      await page.mouse.click(mc.x + mc.width / 2, mc.y + mc.height * 0.42)
+      await page.getByText(/^ADULT\.MALE\.(SKELETAL|JOINT)\./).first().waitFor({ timeout: 20000 })
       await page.getByRole('button', { name: 'Stop motion' }).click()
       await page.getByTestId('motion-panel').waitFor({ state: 'detached' })
       // pemuatan bertahap: struktur saraf (sistem belum dimuat) tetap bisa dicari, sistemnya dimuat lalu dipilih

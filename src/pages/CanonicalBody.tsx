@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
+import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -135,6 +135,7 @@ export function CanonicalBody() {
   const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string } | null>(null)
   const motionOnRef = useRef(false)
   const motionLoadGen = useRef(0)
+  const [motionDraws, setMotionDraws] = useState(0)
   // ── kualitas render: preset + auto dari frame time terukur (engine/renderQuality) ──
   const [qualityChoice, setQualityChoice] = useState<QualityChoice>('auto')
   const [qualityActive, setQualityActive] = useState<QualityPreset>(() => initialPreset(window.innerWidth, window.devicePixelRatio))
@@ -273,7 +274,7 @@ export function CanonicalBody() {
       ray.setFromCamera(ptr, camera)
       const hit = ray.intersectObject(motionOnRef.current ? motionRoot : root, true).find((h) => h.object.visible)
       if (measuringRef.current) { if (hit) addMeasurePoint(hit.point); return }
-      let o: THREE.Object3D | null = hit?.object ?? null
+      let o: THREE.Object3D | null = (hit && structureAtFace(hit.object, hit.faceIndex)) ?? hit?.object ?? null
       while (o && !o.userData.panacea_structure_id) o = o.parent
       if (o) select(o)
     }
@@ -282,7 +283,8 @@ export function CanonicalBody() {
       const r = renderer.domElement.getBoundingClientRect()
       ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
       ray.setFromCamera(ptr, camera)
-      let o: THREE.Object3D | null = ray.intersectObject(motionOnRef.current ? motionRoot : root, true).find((h) => h.object.visible)?.object ?? null
+      const h = ray.intersectObject(motionOnRef.current ? motionRoot : root, true).find((x) => x.object.visible)
+      let o: THREE.Object3D | null = (h && structureAtFace(h.object, h.faceIndex)) ?? h?.object ?? null
       while (o && !o.userData.panacea_structure_id) o = o.parent
       if (o) focusOn(o)
     }
@@ -375,6 +377,9 @@ export function CanonicalBody() {
         if (!clip) { drop(); setError('Motion clip missing from the rig file.'); setMotionOn(false); return }
         disposeMotion()
         s.motionRoot.add(g.scene)
+        // satu draw call per (tulang × material), bukan per struktur: ±825 → ±100 (mesh asli disembunyikan)
+        const merge = mergeRigMeshes(g.scene)
+        setMotionDraws(merge.mergedMeshes)
         const mixer = new THREE.AnimationMixer(g.scene); mixer.clipAction(clip).play()
         motionRefs.current = { group: g.scene, mixer, key }
         motionClock.current = { timeS: 0, playing: true, speed: 1, loop: true }
@@ -727,15 +732,12 @@ export function CanonicalBody() {
             {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
           </div>
         )}
-        {fps && (  // frame time terukur dari render kontinu (rata-rata & 1 % terendah), juga saat mode gerak
-          <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70" data-testid="fps-readout">
-            {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}
-          </div>
-        )}
         {loading && <div className="absolute inset-0 grid place-items-center text-sm font-bold text-white/80">Loading anatomy…</div>}
         {!loading && !motionOn && stats.structures > 0 && (
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70">
             {stats.structures.toLocaleString('en')} loaded · {Math.round(stats.tris / 1000)}k triangles · {stats.ms} ms
+            {/* frame time terukur dari render kontinu (rata-rata & 1 % terendah) */}
+            {fps && <span data-testid="fps-readout"> · {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}</span>}
           </div>
         )}
         {/* panel gerak di bawah kanvas: tidak menutupi anatomi */}
@@ -745,6 +747,7 @@ export function CanonicalBody() {
               <span className="rounded-full bg-[#ffd166] px-2 py-0.5 text-[10px] font-bold uppercase text-[#0b0c0e]">Simulation</span>
               <span className="font-bold capitalize" data-testid="motion-movement">{activeMovement?.name ?? 'rest'}</span>
               <span className="text-white/60">{motionUi.timeS.toFixed(1)} / {motionTl.durationS.toFixed(1)} s</span>
+              {fps && <span className="text-white/60" data-testid="fps-readout">· {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}</span>}
             </div>
             <div className="mt-2 flex items-center gap-2">
               <button onClick={() => motionControl({ playing: !motionUi.playing })} className="min-h-[36px] rounded-full bg-white/10 px-3 text-[12px] font-bold">
@@ -759,7 +762,7 @@ export function CanonicalBody() {
                 ))}
               </div>
             </div>
-            <p className="mt-1.5 text-[11px] leading-snug text-white/65">{motionTl.label}. Skeleton and joints only; muscles and skin are not rigged yet.</p>
+            <p className="mt-1.5 text-[11px] leading-snug text-white/65">{motionTl.label}. Skeleton and joints only; muscles and skin are not rigged yet.{motionDraws > 0 && <span data-testid="motion-draws"> · {motionDraws} draw groups</span>}</p>
           </div>
         )}
       </div>
