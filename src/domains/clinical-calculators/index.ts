@@ -87,3 +87,5 @@ export { cockcroftGault, cgBand, devineIbwKg, CG_RANGES } from './engine/cockcro
 export type { CgInput, CgResult, CgBand, CgSex, CgWeightBasis } from './engine/cockcroftGault'
 export { findrisc, findriscBand, agePts as findriscAgePts, bmiPts as findriscBmiPts, waistPts as findriscWaistPts, FINDRISC_RANGES } from './engine/findrisc'
 export type { FindriscInput, FindriscResult, FindriscBand, FindriscSex, FindriscFamily } from './engine/findrisc'
+export { stopBang, stopBangBand, STOP_BANG_RANGES, STOP_KEYS } from './engine/stopBang'
+export type { StopBangInput, StopBangResult, StopBangBand, StopBangSex, StopKey } from './engine/stopBang'

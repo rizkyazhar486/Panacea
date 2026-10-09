@@ -1,7 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { findrisc as findriscMotor } from '../../src/domains/clinical-calculators/index.ts'
+import { stopBang as stopBangMotor, findrisc as findriscMotor } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NOL YANG PALING BERBAHAYA ADALAH NOL YANG BERARTI "PULANGKAN SAJA".
@@ -71,9 +71,11 @@ const sb = baca('SleepApneaScreen.tsx')
 const sbKode = kodeDari(sb)
 assert.ok(!/useState\(demo\.sex === 'M'\)/.test(sbKode),
   'sex again defaults to male, handing every user a BANG point they did not answer for')
-assert.ok(/const male = sex === 'M'/.test(sbKode), 'the sex answer is no longer explicit')
-assert.ok(/const band = lengkap \? bandFor\(total\) : null/.test(sbKode),
-  'STOP-BANG still bands a total that includes an unanswered sex point')
+// Mesin domain: jenis kelamin belum dijawab menahan skor (dulu diam-diam laki-laki = +1 poin BANG).
+const sbMotor = stopBangMotor({ age: 40, bmi: 25, neckCm: 35, sex: '', stop: { snoring: false, tired: false, observed: false, pressure: false } })
+assert.equal(sbMotor.total, null, 'STOP-BANG still bands a total that includes an unanswered sex point')
+assert.deepEqual(sbMotor.missing, ['sex'])
+assert.ok(/stopBang\(\{/.test(sbKode) && /const band = hasil\.band/.test(sbKode), 'the page does not use the domain engine')
 assert.ok(/<option value="">Not answered<\/option>/.test(sb), 'there is no way to leave sex unanswered')
 assert.ok(/useState<Record<string, boolean>>\(\{\}\)/.test(sbKode),
   'the four STOP questions were dragged into being required; unticked means no, worth zero')
