@@ -10,9 +10,11 @@ export function OnboardingTour() {
   })
   if (!show) return null
   const close = () => {
-    try { localStorage.setItem(KEY, '1') } catch { /* ignore */ }
+    try {
+      localStorage.setItem(KEY, '1')
+      localStorage.setItem(PROMPT_KEY, '1')
+    } catch { /* ignore */ }
     setShow(false)
-    window.dispatchEvent(new Event('panacea:onboarded'))
   }
 
   const steps = [
@@ -76,19 +78,41 @@ export function AssessmentPrompt() {
   if (!show) return null
   function dismiss() { try { localStorage.setItem(PROMPT_KEY, '1') } catch { /* ignore */ }; setShow(false) }
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="Initial assessment prompt">
-      <div className="w-full max-w-md rounded-t-3xl bg-white p-6 text-center shadow-2xl sm:rounded-3xl">
-        <div className="text-4xl">🧪</div>
-        <div className="mt-2 text-xl font-black text-ink">Before you start training…</div>
-        <p className="mt-2 text-sm text-neutral-500">
-          Complete the <b>Initial Assessment</b> (2-3 minutes): movement patterns, pain, baseline strength & left-right asymmetry.
-          This helps make your training program safer and more effective from day one.
-        </p>
-        <a href="#/assessment" onClick={dismiss} className="mt-5 block w-full rounded-2xl py-3.5 text-center text-base font-bold text-white transition active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
-          Complete Now →
-        </a>
-        <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-500">Maybe later</button>
+    <div
+      className="fixed bottom-6 right-6 z-40 max-w-sm rounded-3xl border border-emerald-500/20 bg-white/95 p-4 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/95"
+      role="region"
+      aria-label="Initial assessment prompt"
+    >
+      <div className="flex items-start gap-3">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-xl dark:bg-emerald-950/60">🧪</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-bold text-ink">Before you start training…</div>
+          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Selesaikan <b>Initial Assessment</b> (2-3 menit) untuk personalisasi program latihan Anda.
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <a
+              href="#/assessment"
+              onClick={dismiss}
+              className="rounded-xl bg-brand px-3 py-1.5 text-xs font-bold text-white transition hover:brightness-105"
+            >
+              Mulai Sekarang →
+            </a>
+            <button
+              onClick={dismiss}
+              className="rounded-xl px-2.5 py-1.5 text-xs font-semibold text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+            >
+              Nanti saja
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={dismiss}
+          className="shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+          aria-label="Tutup prompt asesmen"
+        >
+          ✕
+        </button>
       </div>
     </div>
   )

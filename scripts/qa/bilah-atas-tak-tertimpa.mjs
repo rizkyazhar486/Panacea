@@ -11,7 +11,10 @@
 // hanya terlihat kalau benar-benar dilihat.
 import { chromium } from '@playwright/test'
 
-const url = process.env.BILAH_QA_URL || 'http://127.0.0.1:4173/#/latihan?t=pelatih'
+// Spanduk harian kini hanya dipasang di Beranda, jadi tumpang-tindihnya diuji
+// di sana; hierarki judul (langkah 4) tetap diuji di halaman Latihan.
+const url = process.env.BILAH_QA_URL || 'http://127.0.0.1:4173/#/'
+const urlLatihan = process.env.BILAH_QA_URL_LATIHAN || 'http://127.0.0.1:4173/#/latihan?t=pelatih'
 
 const browser = await chromium.launch({ headless: true })
 const context = await browser.newContext({
@@ -106,6 +109,8 @@ try {
   // 4. Konteks lokasi harus terbaca utuh pada 390px. Category page tetap
   // hadir sebagai level pertama; ponsel boleh memakai short label yang sama
   // maknanya, tanpa membuat taxonomy baru atau membuang level konteks.
+  await page.goto(urlLatihan, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('header.kaca h1[data-navigation-hierarchy="v1"]', { state: 'visible' })
   const hierarki = page.locator('header.kaca h1[data-navigation-hierarchy="v1"]').first()
   await hierarki.waitFor({ state: 'visible' })
   const infoHierarki = await hierarki.evaluate((node) => ({

@@ -26,9 +26,9 @@
 
 .panacea-instrument-strip {
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.10) !important;
+  border: 1px solid rgba(255,255,255,.10);
   border-radius: clamp(24px, 4vw, 32px);
-  padding: clamp(12px, 2.4vw, 18px) !important;
+  padding: clamp(12px, 2.4vw, 18px);
   background:
     linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
     rgba(8, 12, 10, .58);
@@ -574,4 +574,73 @@
   .pmd-superpage-arrow {
     transition: none !important;
   }
+}
+
+/* Light mode adaptation: clean white surfaces and readable contrast */
+html:not(.dark) .panacea-instrument-strip {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .panacea-instrument-head .panacea-instrument-date {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-status {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html:not(.dark) .panacea-signal-ring {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+html:not(.dark) .panacea-signal-ring-track {
+  stroke: rgba(0, 0, 0, 0.07);
+}
+
+html:not(.dark) .panacea-signal-ring-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-signal-ring-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-signal-ring-meta {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-instrument-mini,
+html:not(.dark) .panacea-instrument-checkin {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini-label {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-mini-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-unit {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-instrument-checkin {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini:hover,
+html:not(.dark) .panacea-instrument-checkin:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  background: #f0fdf4;
 }

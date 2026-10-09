@@ -152,12 +152,44 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
       .map((x) => x.f)
   }, [q, katalog])
 
+  const aksi = useMemo(() => {
+    const t = q.trim().toLowerCase()
+    if (!t) return []
+    const list: { id: string; label: string; desc: string; ikon: string; eksekusi: () => void }[] = []
+    if ('logout'.includes(t) || 'keluar'.includes(t) || 'sign out'.includes(t)) {
+      list.push({
+        id: 'aksi-logout',
+        label: 'Keluar dari Akun (Log Out)',
+        desc: 'Akhiri sesi aktif Anda di perangkat ini',
+        ikon: '🚪',
+        eksekusi: () => {
+          tutup()
+          window.dispatchEvent(new Event('panacea:logout'))
+        },
+      })
+    }
+    if ('settings'.includes(t) || 'pengaturan'.includes(t) || 'profil'.includes(t) || 'akun'.includes(t)) {
+      list.push({
+        id: 'aksi-settings',
+        label: 'Pengaturan Akun & Profil',
+        desc: 'Kelola preferensi akun, sandi, dan data klinis',
+        ikon: '⚙️',
+        eksekusi: () => {
+          tutup()
+          nav('/settings')
+        },
+      })
+    }
+    return list
+  }, [q, tutup, nav])
+
   const semua = useMemo(() => [
-    ...fitur.map((f) => ({ jenis: 'fitur' as const, kunci: f.to, ke: f.to, f })),
-    ...orang.map((o) => ({ jenis: 'orang' as const, kunci: 'u' + o.id, ke: `/jelajah?orang=${encodeURIComponent(o.name)}`, o })),
-    ...tagar.map((h) => ({ jenis: 'tagar' as const, kunci: 't' + h.tag, ke: `/jelajah?tag=${h.tag}`, h })),
-    ...isi.map((x, i) => ({ jenis: 'isi' as const, kunci: `i${i}-${x.ke}`, ke: x.ke, x })),
-  ], [fitur, orang, tagar, isi])
+    ...aksi.map((a) => ({ jenis: 'aksi' as const, kunci: a.id, ke: '', a })),
+    ...fitur.map((f) => ({ jenis: 'fitur' as const, kunci: f.to, ke: f.to, f, a: undefined })),
+    ...orang.map((o) => ({ jenis: 'orang' as const, kunci: 'u' + o.id, ke: `/jelajah?orang=${encodeURIComponent(o.name)}`, o, a: undefined })),
+    ...tagar.map((h) => ({ jenis: 'tagar' as const, kunci: 't' + h.tag, ke: `/jelajah?tag=${h.tag}`, h, a: undefined })),
+    ...isi.map((x, i) => ({ jenis: 'isi' as const, kunci: `i${i}-${x.ke}`, ke: x.ke, x, a: undefined })),
+  ], [aksi, fitur, orang, tagar, isi])
 
   const pergi = useCallback((ke: string) => { tutup(); setQ(''); nav(ke) }, [nav, tutup])
 
@@ -165,7 +197,15 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
     if (e.key === 'Escape') { tutup(); return }
     if (e.key === 'ArrowDown') { e.preventDefault(); setSorot((i) => Math.min(i + 1, semua.length - 1)) }
     if (e.key === 'ArrowUp') { e.preventDefault(); setSorot((i) => Math.max(i - 1, 0)) }
-    if (e.key === 'Enter' && semua[sorot]) { e.preventDefault(); pergi(semua[sorot].ke) }
+    if (e.key === 'Enter' && semua[sorot]) {
+      e.preventDefault()
+      const item = semua[sorot]
+      if (item.jenis === 'aksi' && item.a) {
+        item.a.eksekusi()
+      } else {
+        pergi(item.ke)
+      }
+    }
   }
 
   if (!buka) return null
@@ -203,6 +243,30 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
               <p className="px-3 py-6 text-center text-[12px] text-slate-500">
                 Nothing matches "{q}".
               </p>
+            )}
+
+            {aksi.length > 0 && (
+              <div className="mb-2">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-rose-400">Tindakan Perintah</div>
+                {aksi.map((a) => (
+                  <button
+                    key={a.id}
+                    onClick={a.eksekusi}
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition ${
+                      semua[sorot]?.kunci === a.id ? 'bg-rose-500/25 ring-1 ring-rose-500/50' : 'hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">{a.ikon}</span>
+                      <div>
+                        <div className="text-[13px] font-bold text-white">{a.label}</div>
+                        <div className="text-[11px] text-slate-400">{a.desc}</div>
+                      </div>
+                    </div>
+                    <span className="rounded bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300">Enter ↵</span>
+                  </button>
+                ))}
+              </div>
             )}
 
             {fitur.length > 0 && (

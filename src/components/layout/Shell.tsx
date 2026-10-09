@@ -56,6 +56,7 @@ import { DailyQuoteBanner } from '../DailyQuoteBanner'
 import { OnboardingTour, AssessmentPrompt } from '../OnboardingTour'
 import { api, backendEnabled } from '../../lib/api'
 import { trackVisit, rankByUsage } from '../../lib/usage'
+import { promptInstall } from '../../lib/pwa'
 import type { Role } from '../../lib/types'
 import { NAV_UNTUK_PENGATURAN } from '../../data/navPengaturan'
 import { ambilTersembunyi, saring, langgananFitur } from '../../lib/fiturTersembunyi'
@@ -296,6 +297,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [spacesOpen, setSpacesOpen] = useState(false)
+  const [userMenuBuka, setUserMenuBuka] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -375,9 +378,16 @@ export function Shell({ children }: { children: ReactNode }) {
   // bawahnya juga tidak bisa ditekan sampai spanduknya ditutup. Angka tetap
   // tidak dipakai di sini: tinggi bilah berubah menurut lebar layar dan isi
   // judulnya, dan tebakan yang meleset mengembalikan tumpang-tindih yang sama.
+  // State (bukan useRef): bilah baru ada setelah login/onboarding selesai, dan
+  // efek ber-deps [] yang jalan sekali saat mount tidak pernah mengukurnya.
   const bilahAtas = useRef<HTMLElement | null>(null)
+  const [bilahEl, setBilahEl] = useState<HTMLElement | null>(null)
+  const pasangBilah = useCallback((el: HTMLElement | null) => {
+    bilahAtas.current = el
+    setBilahEl(el)
+  }, [])
   useEffect(() => {
-    const el = bilahAtas.current
+    const el = bilahEl
     if (!el) return
     const ukur = () => {
       document.documentElement.style.setProperty('--tinggi-bilah-atas', `${Math.round(el.getBoundingClientRect().height)}px`)
@@ -387,7 +397,7 @@ export function Shell({ children }: { children: ReactNode }) {
     const pengamat = new ResizeObserver(ukur)
     pengamat.observe(el)
     return () => pengamat.disconnect()
-  }, [])
+  }, [bilahEl])
 
   useEffect(() => pasangKilau(), [])
   const account = state.account
@@ -396,8 +406,22 @@ export function Shell({ children }: { children: ReactNode }) {
   // independently so global actions never disappear with the chrome.
   const keadaanBilah = useCommandBar(bilahAtas)
 
-  // Route changes close only the compact command dropdown and record local use.
-  useEffect(() => { setSpacesOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
+  // Route changes close compact command dropdown, user menu, and record local use.
+  useEffect(() => {
+    setSpacesOpen(false)
+    setUserMenuBuka(false)
+    trackVisit(loc.pathname)
+  }, [loc.pathname])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuBuka(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -420,6 +444,16 @@ export function Shell({ children }: { children: ReactNode }) {
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])
 
+  // Harus berada SEBELUM return awal di bawah: hook yang dipanggil setelah
+  // return kondisional membuat React crash ("rendered more hooks") saat rute
+  // berpindah antara /design-demo atau Login dan halaman biasa.
+  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
+  useEffect(() => {
+    const onLogout = () => doLogout()
+    window.addEventListener('panacea:logout', onLogout)
+    return () => window.removeEventListener('panacea:logout', onLogout)
+  }, [])
+
 
 
   // Halaman demo mandiri: butuh kanvas penuh sendiri (video layar penuh,
@@ -434,12 +468,34 @@ export function Shell({ children }: { children: ReactNode }) {
   if (!account && loc.pathname === '/body-explorer') {
     if (masukDariAtlas) return <Login onBack={() => setMasukDariAtlas(false)} />
     return (
-      <div className="dark min-h-screen bg-[#070b10] text-white">
-        <header className="flex items-center justify-between gap-3 px-3 py-2">
-          <Link to="/" className="min-h-11 text-sm font-black tracking-tight">Panaceamed.id</Link>
-          <button type="button" onClick={() => setMasukDariAtlas(true)} className="min-h-11 rounded-full border border-white/15 px-3 text-xs font-bold">Sign in</button>
+      <div className={`min-h-screen transition-colors ${theme === 'dark' ? 'dark bg-[#070b10] text-white' : 'bg-neutral-50 text-neutral-900'}`}>
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/85 px-4 py-2.5 backdrop-blur-xl dark:border-white/10 dark:bg-[#070b10]/85 sm:px-6">
+          <Link to="/" className="flex items-center gap-2 min-h-11 text-ink dark:text-white transition hover:opacity-90">
+            <LogoMark size={24} />
+            <span className="text-base font-black tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>
+              Panaceamed<span className="text-brand">.id</span>
+            </span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTheme(toggleTheme())}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 transition hover:bg-neutral-100 hover:text-brand-dark dark:border-white/15 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-emerald-400"
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMasukDariAtlas(true)}
+              className="min-h-[40px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-brand/20 transition hover:brightness-105 active:scale-95"
+            >
+              Masuk / Sign In
+            </button>
+          </div>
         </header>
-        <main className="px-3 pb-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 lg:px-8 pb-12">{children}</main>
       </div>
     )
   }
@@ -463,7 +519,6 @@ export function Shell({ children }: { children: ReactNode }) {
       ).join(' › ')
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
-  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
   // Beranda ringkas — the user's most-used services (ranked by visit history),
   // shown on the home route only.
   const homeServices = rankByUsage(
@@ -475,7 +530,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="pmd-spectral-shell relative flex min-h-screen">
-      <DailyQuoteBanner />
+      {onHome && <DailyQuoteBanner />}
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
         <LogoMark size={28} />
@@ -492,7 +547,7 @@ export function Shell({ children }: { children: ReactNode }) {
             menelan klik milik isi halaman di bawahnya. */}
         <div className="panacea-command-bar-reveal-zone" aria-hidden />
         <header
-          ref={bilahAtas}
+          ref={pasangBilah}
           data-panacea-command-bar={keadaanBilah}
           className="kaca panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
         >
@@ -633,6 +688,178 @@ export function Shell({ children }: { children: ReactNode }) {
                 ))}
               </div>
             )}
+
+            {/* Menu Akun Pengguna & Logout */}
+            <div className="relative shrink-0" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuBuka((prev) => !prev)}
+                className={`group flex items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
+                  userMenuBuka
+                    ? 'border-brand ring-2 ring-brand/30 dark:border-brand/70'
+                    : 'border-black/10 hover:border-black/20 dark:border-white/15 dark:hover:border-white/30'
+                }`}
+                aria-label="Menu akun dan keluar"
+                title="Akun & Pengaturan (Klik untuk menu)"
+                aria-expanded={userMenuBuka}
+              >
+                {/* Avatar dengan titik indikator aktif */}
+                <div className="relative">
+                  <span
+                    className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-black shadow-inner transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: '#00BF63', color: '#0c1410' }}
+                  >
+                    {account.name.slice(0, 2).toUpperCase()}
+                  </span>
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-neutral-900" />
+                </div>
+
+                <div className="flex flex-col items-start text-left leading-none">
+                  <span className="max-w-[84px] truncate font-bold text-neutral-800 dark:text-neutral-100 sm:max-w-[110px]">
+                    {account.name.split(' ')[0]}
+                  </span>
+                  <span className="hidden text-[9px] font-semibold capitalize text-neutral-400 dark:text-neutral-500 sm:inline">
+                    {roleLabel[account.role] ? roleLabel[account.role].split(' ')[0] : account.role}
+                  </span>
+                </div>
+
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`text-neutral-400 transition-transform duration-200 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 ${
+                    userMenuBuka ? 'rotate-180 text-brand' : ''
+                  }`}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {userMenuBuka && (
+                <div
+                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
+                  style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
+                >
+                  {/* Profil Header */}
+                  <div className="flex items-center gap-3 border-b border-black/5 p-3 dark:border-white/10">
+                    <div className="relative">
+                      <span
+                        className="grid h-10 w-10 place-items-center rounded-2xl text-xs font-black shadow-inner"
+                        style={{ backgroundColor: '#00BF63', color: '#0c1410' }}
+                      >
+                        {account.name.slice(0, 2).toUpperCase()}
+                      </span>
+                      <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-neutral-900" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-extrabold text-ink">{account.name}</div>
+                      <div className="truncate text-[11px] text-neutral-500">{account.email}</div>
+                      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                        {roleLabel[account.role] ?? account.role}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Navigasi Profil & Pengaturan */}
+                  <div className="py-1.5">
+                    <NavLink
+                      to="/profile"
+                      onClick={() => setUserMenuBuka(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <IconUser size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Profil &amp; Rekam Medis</span>
+                    </NavLink>
+                    <NavLink
+                      to="/settings"
+                      onClick={() => setUserMenuBuka(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <IconSettings size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Pengaturan Akun</span>
+                    </NavLink>
+                  </div>
+
+                  {/* Switch Role / Ganti Peran */}
+                  <div className="border-t border-black/5 px-2 py-2 dark:border-white/10">
+                    <div className="mb-1.5 flex items-center justify-between px-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                      <span>Ganti Peran Aktif</span>
+                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-semibold text-neutral-500 dark:bg-neutral-800">Cepat</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      {([
+                        { r: 'pasien', label: 'Pasien', icon: '🩺' },
+                        { r: 'dokter', label: 'Dokter', icon: '👨‍⚕️' },
+                        { r: 'verifikator', label: 'Verifikator', icon: '🔍' },
+                        { r: 'kontributor', label: 'Kontributor', icon: '✍️' },
+                      ] as const).map(({ r, label, icon }) => {
+                        const isCur = account.role === r
+                        return (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={() => {
+                              setMode(r as Role)
+                            }}
+                            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-[11px] font-semibold transition ${
+                              isCur
+                                ? 'bg-emerald-50 text-emerald-800 font-bold dark:bg-emerald-950/70 dark:text-emerald-300 ring-1 ring-emerald-500/40'
+                                : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
+                            }`}
+                          >
+                            <span>{icon}</span>
+                            <span>{label}</span>
+                            {isCur && <span className="ml-auto text-[10px] text-emerald-600 dark:text-emerald-400">✓</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Pasang Aplikasi (PWA) */}
+                  <div className="border-t border-black/5 p-1.5 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuBuka(false)
+                        promptInstall()
+                      }}
+                      className="flex w-full items-center justify-between rounded-2xl border border-black/5 bg-neutral-50/80 px-3 py-2 text-xs font-bold text-neutral-700 transition hover:bg-neutral-100 hover:border-black/10 dark:border-white/10 dark:bg-neutral-800/60 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">📲</span>
+                        <span>Pasang Aplikasi (Install App)</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-neutral-400">PWA</span>
+                    </button>
+                  </div>
+
+                  {/* Tombol Logout */}
+                  <div className="border-t border-black/5 p-1.5 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuBuka(false)
+                        doLogout()
+                      }}
+                      className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
+                    >
+                      <div className="flex items-center gap-2">
+                        <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
+                        <span>Keluar dari Akun (Log Out)</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-rose-500/80">Keluar ↵</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
@@ -684,8 +911,8 @@ export function Shell({ children }: { children: ReactNode }) {
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >
-          {onHome && <PeringatanPenyimpanan />}
-          {onHome && <InstallBanner />}
+          {onHome && account.role === 'owner' && <PeringatanPenyimpanan />}
+          {onHome && <div className="lg:hidden"><InstallBanner /></div>}
           {onHome && homeServices.length > 0 && (
             <div className="mb-5 hidden lg:block">
               <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-500">
@@ -744,7 +971,7 @@ export function Shell({ children }: { children: ReactNode }) {
         />
       )}
 
-      {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
+      {onHome && ['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
       <ContactService buka={bantuanBuka} onTutup={() => setBantuanBuka(false)} />
     </div>

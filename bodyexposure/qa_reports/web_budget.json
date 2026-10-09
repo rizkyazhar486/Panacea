@@ -13,14 +13,14 @@
   {
    "body": "adult_female",
    "light_lod": "LOD4",
-   "initial_tris": 77222,
-   "all_systems_tris": 127077
+   "initial_tris": 77922,
+   "all_systems_tris": 127661
   },
   {
    "body": "adult_male",
    "light_lod": "LOD4",
-   "initial_tris": 79723,
-   "all_systems_tris": 135711
+   "initial_tris": 77956,
+   "all_systems_tris": 133412
   },
   {
    "body": "icrp_adult_female",

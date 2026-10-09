@@ -1,15 +1,20 @@
 :root {
   --pmd-space-section: clamp(1.35rem, 3.1vw, 2.6rem);
   --pmd-space-major: clamp(1.8rem, 4vw, 3.5rem);
+  --pmd-surface: #ffffff;
+  --pmd-line: rgba(0, 0, 0, .08);
+  --pmd-muted: rgba(100, 116, 139, .75);
+}
+
+.dark {
   --pmd-surface: #05070a;
   --pmd-line: rgba(255, 255, 255, .085);
   --pmd-muted: rgba(255, 255, 255, .42);
 }
 
 nav[aria-label="Panacea super pages"] {
-  position: sticky;
-  top: max(.5rem, env(safe-area-inset-top));
-  z-index: 45;
+  position: relative;
+  z-index: 10;
 }
 
 .panacea-liquid-home {

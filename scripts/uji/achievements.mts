@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 // Achievement conditions are plain arithmetic over a real, already-logged
 // workout array — this checks that arithmetic, and that a popup fires only
 // once per condition (newlyUnlocked), never fabricating progress.
@@ -10,7 +11,7 @@ const simpanan = new Map<string, string>()
 
 const { evaluateWorkoutAchievements, evaluateAthleteAchievements, newlyUnlocked } = await import('../../src/lib/achievements.ts')
 
-const chk = (n: string, c: boolean, x = '') => console.log(c ? 'PASS' : 'FAIL', n, x)
+
 
 function log(entries: { date: string; sets: number; reps: number; weight: number }[]) { return entries }
 

@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 import { readFile } from 'node:fs/promises'
 
 const gesture = await readFile(new URL('../../src/lib/interaction/gesture.ts', import.meta.url), 'utf8')
@@ -6,7 +7,7 @@ const assistive = await readFile(new URL('../../src/components/layout/FabNavigas
 const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx', import.meta.url), 'utf8')
 const model = await readFile(new URL('../../src/lib/interaction/assistive.ts', import.meta.url), 'utf8')
 
-const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
 
 chk('gesture constants match approved interaction contract', gesture.includes('tapTolerancePx: 10') && gesture.includes('swipeDistancePx: 38') && gesture.includes('swipeMaxDurationMs: 420') && gesture.includes('longPressMs: 650') && gesture.includes('doubleTapMs: 280'))
 chk('slidable rail leaves touch to native browser scrolling', slidable.includes("event.pointerType === 'touch'") && slidable.includes('WebkitOverflowScrolling'))

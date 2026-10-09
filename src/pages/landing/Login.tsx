@@ -2,31 +2,26 @@ import { useEffect, useRef, useState } from 'react'
 import { hariIni } from '../../lib/tanggal'
 import { useStore, uid, OWNER_EMAIL } from '../../lib/store'
 import { Wordmark } from '../../components/Logo'
-import { Button, inputClass } from '../../components/ui'
+import { inputClass } from '../../components/ui'
 import { IconSun, IconMoon } from '../../components/icons'
 import { api, backendEnabled, renderGoogleButton, type Health } from '../../lib/api'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { GoogleG } from './loginSvgs'
+import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
+import './login.css'
+import { Prosa } from '../../components/Prosa'
 
-const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
+/* ── Form Field Helper ────────────────────────────────────────── */
 
-const ROLES: { id: Role; title: string; desc: string }[] = [
-  { id: 'pasien', title: 'Customer / Patient', desc: 'Healthy living dashboard, AI Chatbot, education, nutrition & Longevity, consultations, pharmacy & healthcare facilities' },
-  { id: 'dokter', title: 'Doctor', desc: 'AI-EMR, Planning, patient consultations' },
-  { id: 'kontributor', title: 'Contributor / Writer', desc: 'Write, edit & upload material to verifiers' },
-  { id: 'verifikator', title: 'Verifier', desc: 'AI + Subspecialist/Professor reviews journals' },
-  { id: 'admin', title: 'Admin (Support)', desc: 'Handle complaints via AI + humans' },
-  { id: 'owner', title: 'Owner', desc: 'View company monetary profit' },
-]
-
-/* ── Tiny helpers ────────────────────────────────────────── */
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
-    <div>
-      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{label}</label>
+    <div className="w-full">
+      <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
+        {label} {required && <span className="text-emerald-600 dark:text-emerald-400 font-black">*</span>}
+      </label>
       {children}
     </div>
   )
@@ -36,35 +31,25 @@ function Mini({ label, value, onChange, placeholder, numeric }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean
 }) {
   return (
-    <div>
-      <label className="mb-1 block text-[11px] font-semibold text-neutral-500">{label}</label>
-      <input className={inputClass} value={value} onChange={e => onChange(e.target.value)}
-        placeholder={placeholder} inputMode={numeric ? 'numeric' : undefined} />
+    <div className="w-full">
+      <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">{label}</label>
+      <input
+        className={inputClass}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        inputMode={numeric ? 'numeric' : undefined}
+      />
     </div>
   )
 }
 
-function Collapse({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50/50">
-      <button type="button" onClick={() => setOpen(v => !v)}
-        className="flex w-full items-center justify-between px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-neutral-500 hover:text-neutral-700">
-        {title}
-        <span className="text-[10px] transition-transform duration-200"
-          style={{ transform: open ? 'rotate(180deg)' : '' }}>▼</span>
-      </button>
-      {open && <div className="space-y-3 border-t border-neutral-100 px-3 py-3">{children}</div>}
-    </div>
-  )
-}
-
-/* ── Main Login ──────────────────────────────────────────── */
+/* ── Main Login ──────────────────────────────────────────────── */
 
 export function Login({ onBack }: { onBack?: () => void }) {
   const { login, sendEmail, state } = useStore()
+  const [authMode, setAuthMode] = useState<'masuk' | 'daftar'>('masuk')
   const [role, setRole] = useState<Role>('pasien')
-  /** Pemilih peran hanya muncul bila diminta. Lihat catatan "Peran" di bawah. */
   const [pilihPeran, setPilihPeran] = useState(false)
   const [f, setF] = useState({
     email: '', name: '', sex: 'L' as 'L' | 'P', dob: '',
@@ -73,6 +58,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     tahunLulus: '', spesialis: '', subspesialis: '', pdfName: '',
   })
   const [error, setError] = useState('')
+  const [serverNotice, setServerNotice] = useState('')
   const [consent, setConsent] = useState(false)
   const [showLegal, setShowLegal] = useState(false)
   const [theme, setTheme] = useState<Theme>(getTheme)
@@ -86,20 +72,21 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const clinical = STR_ROLES.includes(role)
   const simple = role === 'admin' || role === 'owner'
   const cur = ROLES.find(r => r.id === role)!
+  const hasOptionalFields = authMode === 'daftar' && !simple && (clinical || role === 'pasien')
+
+  // Form validation
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())
+  const isNameValid = f.name.trim().length >= 2
+  const isStrValid = !clinical || f.str.trim().length >= 4
+  const isFormValid = authMode === 'masuk'
+    ? isEmailValid && consent
+    : isEmailValid && isNameValid && isStrValid && consent
 
   useEffect(() => { roleRef.current = role }, [role])
   useEffect(() => { consentRef.current = consent }, [consent])
 
   useEffect(() => {
     if (!backendEnabled) return
-    /* SERVER YANG SEDANG TIDUR BUKAN SERVER YANG MATI.
-       Render mematikan instans gratis setelah lima belas menit tanpa
-       permintaan, dan permintaan pertama sesudah itu baru dijawab sekitar
-       lima puluh detik kemudian. Percobaan tunggal hampir selalu gagal pada
-       pembukaan pertama hari itu, lalu aplikasi menyatakan "backend
-       unreachable" — dan yang dibaca pemakainya adalah aplikasinya rusak,
-       padahal ia hanya perlu menunggu. Dicoba tiga kali dengan jeda, dan
-       selama menunggu ia mengatakan apa yang sedang terjadi. */
     let batal = false
     const coba = async () => {
       for (let i = 0; i < 3; i++) {
@@ -107,19 +94,21 @@ export function Login({ onBack }: { onBack?: () => void }) {
           const h = await api.health()
           if (batal) return
           setHealth(h)
-          setError(h.penyimpanan === 'berkas'
-            ? 'The server is running without a persistent database (MONGODB_URI is not set). Accounts and data stored on the server will be LOST on the next redeploy — including any account created now.'
-            : '')
+          if (h.penyimpanan === 'berkas') {
+            setServerNotice('Sesi aktif dalam mode penyimpanan berkas/lokal.')
+          } else {
+            setServerNotice('')
+          }
           return
         } catch {
           if (batal) return
-          setError(i === 0
-            ? 'Contacting the server… the free instance sleeps after 15 minutes and needs about 50 seconds to wake.'
-            : 'Still waiting for the server to wake…')
+          setServerNotice(i === 0
+            ? 'Menghubungkan ke layanan server…'
+            : 'Masih menunggu respon server…')
           await new Promise((r) => setTimeout(r, 8000))
         }
       }
-      if (!batal) setError('The server could not be reached — the app is running in local mode. Data is still saved on this device.')
+      if (!batal) setServerNotice('Layanan server belum terhubung — aplikasi berjalan dalam mode lokal.')
     }
     void coba()
     return () => { batal = true }
@@ -128,17 +117,33 @@ export function Login({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     if (!health?.googleClientId || !gbtn.current) return
     renderGoogleButton(gbtn.current, health.googleClientId, cred => {
-      if (!consentRef.current) { setError('Please agree to the Terms & Privacy Policy.'); return }
+      if (!consentRef.current) {
+        setError('Harap setujui Syarat Layanan & Kebijakan Privasi terlebih dahulu.')
+        return
+      }
+      setError('')
       api.googleLogin(cred, roleRef.current)
-        .then(a => login({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: a.role === 'owner', consentAt: new Date().toISOString(), strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none' }))
-        .catch(() => setError('Google verification failed.'))
-    }).catch(() => setError('Failed to load Google Sign-In.'))
+        .then(a => login({
+          ...a,
+          isOwner: a.email.toLowerCase() === OWNER_EMAIL,
+          isSubscriber: a.role === 'owner',
+          consentAt: new Date().toISOString(),
+          strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
+        }))
+        .catch(() => setError('Verifikasi akun Google gagal.'))
+    }).catch(() => setError('Gagal memuat tombol Google Sign-In.'))
   }, [health, login])
 
-  /* shared consent guard for OTP sub-components */
   function consentOk() {
-    if (!consent) { setError('Please agree to the Terms & Privacy Policy.'); return false }
-    if (clinical && !f.str.trim()) { setError('An STR number is required for this role.'); return false }
+    if (!consent) {
+      setError('Harap setujui Syarat Layanan & Kebijakan Privasi.')
+      return false
+    }
+    if (clinical && !f.str.trim()) {
+      setError('Nomor STR wajib diisi untuk peran tenaga medis ini.')
+      return false
+    }
+    setError('')
     return true
   }
 
@@ -154,8 +159,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }
     sendEmail({
       id: uid(), to: acc.email,
-      subject: 'Welcome to Panaceamed.id',
-      body: `Hello ${acc.name}, your account (${acc.role}) is now active.`,
+      subject: 'Selamat Datang di Panaceamed.id',
+      body: `Halo ${acc.name}, akun Anda (${acc.role}) telah aktif dan siap digunakan.`,
       at: new Date().toISOString(),
     })
   }
@@ -165,10 +170,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
     const email = (f.email.trim() || 'user@gmail.com').toLowerCase()
     const isOwner = email === OWNER_EMAIL
     if (role === 'admin' && !isOwner && !state.adminEmails.includes(email)) {
-      setError('This email is not yet authorized as Admin.'); return
+      setError('Email ini belum terdaftar dengan otorisasi Admin.')
+      return
     }
+    setError('')
     const acc: Account = {
-      email, name: f.name.trim() || 'Panaceamed User', role,
+      email, name: f.name.trim() || 'Pengguna Panacea', role,
       isSubscriber: role === 'owner', loggedAt: new Date().toISOString(),
       sex: simple ? undefined : f.sex,
       dob: simple || !f.dob ? undefined : f.dob,
@@ -192,232 +199,450 @@ export function Login({ onBack }: { onBack?: () => void }) {
     finish(acc)
   }
 
+  function doDemoLogin() {
+    setConsent(true)
+    setError('')
+    const isOwner = role === 'owner'
+    const acc: Account = {
+      email: isOwner ? OWNER_EMAIL : 'demo.user@panaceamed.id',
+      name: role === 'pasien' ? 'Pengguna Demo' : role === 'owner' ? 'Owner Panacea' : 'dr. Demo Klinisi',
+      role,
+      isSubscriber: isOwner,
+      loggedAt: new Date().toISOString(),
+      str: clinical ? '31.1.1.100.1.23.123456' : undefined,
+      strStatus: clinical ? 'verified' : 'none',
+      consentAt: new Date().toISOString(),
+      isOwner,
+    }
+    if (backendEnabled) {
+      api.devLogin(acc.email, acc.name, role)
+        .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
+        .catch(() => finish(acc))
+      return
+    }
+    finish(acc)
+  }
+
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* ── Brand panel (desktop) ─────────────────── */}
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-10 text-white lg:flex">
+    <div className="login-page-root grid h-screen lg:grid-cols-2 overflow-hidden">
+      {/* ── Brand panel (desktop) ─────────────────────────────────── */}
+      <div className="relative hidden flex-col justify-between h-full overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] dark:from-[#041c11] dark:via-[#02130b] dark:to-[#010a06] dark:border-r dark:border-white/10 p-10 lg:p-12 text-white lg:flex">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="orb absolute -left-16 top-10 h-72 w-72 rounded-full bg-white/15 blur-3xl" />
-          <div className="orb absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
-          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:40px_40px]" />
+          <div className="orb absolute -left-16 top-10 h-72 w-72 rounded-full bg-white/15 dark:bg-emerald-500/10 blur-3xl" />
+          <div
+            className="orb absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-900/30 dark:bg-emerald-950/40 blur-3xl"
+            style={{ animationDelay: '-8s' }}
+          />
+          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] dark:[background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:40px_40px]" />
         </div>
         <div className="relative"><Wordmark size={40} onDark /></div>
         <div className="relative">
           <h1 className="text-4xl font-extrabold leading-tight">
-            Longevity Medical-AI{' '}
-            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">clinicians can review</span>
+            AI-EMR &amp; Longevity Medis{' '}
+            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white dark:from-white dark:via-emerald-300 dark:to-white bg-clip-text text-transparent">
+              Ditinjau oleh Klinisi
+            </span>
           </h1>
           <BatasKlaimKesehatan
             permukaan="care.login"
-            className="mt-3 max-w-md text-[12px] leading-snug text-white/70"
+            className="mt-3 max-w-md text-[12px] leading-snug text-white/70 dark:text-emerald-200/70"
           />
-          <p className="mt-3 max-w-md text-ink/85">
-            AI handles history-taking & education; licensed clinicians can review. Tokenized medical records,
-            continuous monitoring for healthspan.
-          </p>
+          <Prosa kelas="mt-3 max-w-md text-white/85 dark:text-neutral-300 text-sm leading-relaxed" baris={4}>
+            AI mendukung anamnesis &amp; edukasi kesehatan dengan peninjauan klinisi berizin. Rekam medis terstruktur,
+            pemantauan vitalitas berkelanjutan untuk ketahanan hidup sehat.
+          </Prosa>
           <div className="mt-6 flex flex-wrap gap-2">
-            {['AI-EMR for clinicians', 'Longevity estimate', 'Health tracking', 'Digital Pharmacy'].map(t => (
-              <span key={t} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
+            {LOGIN_PILLS.map(t => (
+              <span
+                key={t}
+                className="rounded-full border border-white/20 bg-white/10 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300 px-3 py-1 text-xs font-semibold backdrop-blur-md"
+              >
+                {t}
+              </span>
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-ink/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
+        <p className="relative text-xs text-white/70 dark:text-neutral-400">
+          ⚕️ AI mendukung analisis data medis dan tidak menggantikan keputusan klinisi berizin.
+        </p>
       </div>
 
-      {/* ── Form panel ────────────────────────────── */}
-      <div className="relative flex items-center justify-center p-6">
-        <button onClick={() => setTheme(toggleTheme())}
-          className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 shadow-sm transition hover:text-brand-dark"
-          aria-label="Toggle theme">
-          {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
-        </button>
+      {/* ── Form panel (Clean, never clipped at top) ──── */}
+      <div className="login-form-panel relative flex flex-col items-center h-full overflow-y-auto px-6 sm:px-10">
+        <div className="w-full max-w-[440px] my-auto py-8">
+          {/* Top bar controls */}
+          <div className="flex items-center justify-between mb-4">
+            {onBack ? (
+              <button
+                onClick={onBack}
+                className="inline-flex min-h-[36px] items-center text-xs font-bold text-neutral-500 hover:text-brand-dark transition-colors dark:text-neutral-400 dark:hover:text-emerald-400"
+              >
+                ← Kembali ke Beranda
+              </button>
+            ) : <div />}
 
-        <div className="w-full max-w-md space-y-5">
-          <div className="lg:hidden"><Wordmark size={34} /></div>
-          {onBack && <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Back</button>}
+            <button
+              onClick={() => setTheme(toggleTheme())}
+              className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 shadow-sm transition hover:text-brand-dark dark:border-white/15 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-emerald-400"
+              aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+              {theme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="lg:hidden"><Wordmark size={32} /></div>
+
+          {/* ── Mode Auth: Masuk vs Daftar Baru ─────────────────── */}
+          <div className="flex rounded-full border border-neutral-200/80 bg-neutral-100/80 p-1 dark:border-white/10 dark:bg-white/[0.04]">
+            <button
+              type="button"
+              onClick={() => { setAuthMode('masuk'); setError('') }}
+              className={`flex-1 rounded-full py-2 text-xs font-bold transition duration-150 ${
+                authMode === 'masuk'
+                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              Masuk ke Akun
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthMode('daftar'); setError('') }}
+              className={`flex-1 rounded-full py-2 text-xs font-bold transition duration-150 ${
+                authMode === 'daftar'
+                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              Daftar Baru
+            </button>
+          </div>
 
           <div>
-            <h2 className="text-2xl font-extrabold">Sign in or sign up</h2>
-            <p className="mt-1 text-sm text-neutral-500">Just an email and a name. The rest can follow later.</p>
-          </div>
-
-          {/* ── Peran ──────────────────────────────────────────────────────
-              Pemilih peran DISEMBUNYIKAN sampai diminta, dan bawaannya pasien.
-
-              Sebelumnya enam peran dipajang lebih dahulu, sehingga layar
-              pertama aplikasi kesehatan menuntut orang memilih jati dirinya
-              di antara enam istilah -- "kontributor", "verifikator" -- yang
-              tidak berarti apa-apa bagi orang yang sekadar ingin mencatat
-              tekanan darahnya. Hampir semua pemakai adalah pasien; yang bukan
-              pasien tahu persis bahwa dirinya bukan, dan mereka justru yang
-              paling mudah menemukan satu tautan. */}
-          {pilihPeran ? (
-            <div className="space-y-2">
-              <div className="grid grid-cols-3 gap-2">
-                {ROLES.map(r => (
-                  <button key={r.id} onClick={() => setRole(r.id)}
-                    className={`min-h-[44px] rounded-xl border px-2 text-center text-[11px] font-bold leading-tight transition
-                      ${role === r.id ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'}`}>
-                    {r.title.split(' (')[0]}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[11px] leading-relaxed text-neutral-500">{cur.desc}</p>
-            </div>
-          ) : (
-            <button type="button" onClick={() => setPilihPeran(true)}
-              className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-dashed border-neutral-300 px-3 text-[12px] font-bold text-neutral-500 transition hover:border-brand hover:text-brand-dark">
-              I am a doctor, writer, or verifier →
-            </button>
-          )}
-
-          {/* ── Quick login ────────────────────── */}
-          {health?.googleClientId
-            ? <div ref={gbtn} className="flex justify-center" />
-            : <button onClick={doLogin}
-                className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50 active:scale-[0.99]">
-                <GoogleG /> Sign in with Google
-              </button>
-          }
-          {health?.features.otpEmail && (
-            <EmailOtpLogin role={role} consentOk={consentOk} name={f.name} str={f.str}
-              email={f.email} setEmail={v => setF(p => ({ ...p, email: v }))} onLogin={finish} />
-          )}
-
-          {/* ── Consent ────────────────────────── */}
-          <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
-            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
-            <span>I agree to the{' '}
-              {/* Sengaja tetap sebesar barisnya: ini tautan DI DALAM kalimat,
-                  dan membesarkannya menjadi 44 px akan merusak paragraf yang
-                  memuatnya. */}
-              {/* Tombol TIDAK DAPAT dibuat display:inline. Baik lewat kelas
-                  maupun lewat gaya sebaris, peramban tetap melaporkannya
-                  inline-block: kendali formulir adalah kotak inline atomik dan
-                  dijadikan blok oleh peramban. Diukur, bukan diduga — dua
-                  percobaan menyetelnya gagal berturut-turut.
-
-                  Karena itu pemeriksa sasaran sentuh tidak boleh memakai
-                  "display === inline" sebagai tanda tautan dalam kalimat; yang
-                  dipakai adalah apakah ia duduk di dalam kalimat yang lebih
-                  panjang daripada dirinya sendiri. */}
-              <button type="button" onClick={() => setShowLegal(true)}
-                className="font-bold text-brand-dark underline">Terms & Privacy Policy</button>.
-              AI is a support, not a replacement for a doctor.</span>
-          </label>
-
-          {error && <p className="text-xs text-accent">{error}</p>}
-          {backendEnabled && (
-            <p className="text-[11px] font-semibold text-brand-dark">
-              ● Server active{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}{health?.features.payments ? ' · Payments' : ''}
+            <h2 className="text-2xl font-black tracking-tight text-ink dark:text-white">
+              {authMode === 'masuk' ? 'Masuk ke Akun Anda' : 'Buat Akun Panaceamed'}
+            </h2>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+              {authMode === 'masuk'
+                ? 'Pintu gerbang rekam medis & kesehatan longevity presisi.'
+                : 'Pilih peran dan daftarkan diri untuk akses rekam medis digital.'}
             </p>
-          )}
-
-          <div className="flex items-center gap-3 text-xs text-neutral-500">
-            <span className="h-px flex-1 bg-neutral-200" /> or fill it in yourself <span className="h-px flex-1 bg-neutral-200" />
           </div>
 
-          {/* ── Adaptive form fields ───────────── */}
-          <div className="space-y-3">
-            <Field label="Email">
-              <input className={inputClass} value={f.email}
-                onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" />
-            </Field>
-            <Field label="Name">
-              <input className={inputClass} value={f.name}
-                onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Nama Anda" />
-            </Field>
+          {/* ── Peran: Segmented switch (Hanya di mode Daftar Baru) ── */}
+          {authMode === 'daftar' && (
+            <div className="space-y-2.5">
+              <div className="login-role-switch" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={role === 'pasien' && !pilihPeran}
+                  data-active={role === 'pasien' && !pilihPeran ? 'true' : 'false'}
+                  onClick={() => { setRole('pasien'); setPilihPeran(false) }}
+                  className="login-role-tab"
+                >
+                  <span>👤</span>
+                  <span>Pasien &amp; Publik</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={pilihPeran || role !== 'pasien'}
+                  data-active={pilihPeran || role !== 'pasien' ? 'true' : 'false'}
+                  onClick={() => {
+                    if (role === 'pasien') setRole('dokter')
+                    setPilihPeran(true)
+                  }}
+                  className="login-role-tab"
+                >
+                  <span>🩺</span>
+                  <span>Klinisi / Medis (STR)</span>
+                </button>
+              </div>
 
-            {/* Jenis kelamin dan tanggal lahir — DIMINTA, BUKAN DIWAJIBKAN.
-                Keduanya benar-benar dipakai, dan karena itu SEBABNYA ditulis
-                di sini alih-alih dibiarkan sebagai dua kotak tanpa keterangan.
-                Formulir yang meminta tanggal lahir tanpa menyebutkan untuk apa
-                terbaca sebagai pengumpulan data, dan orang menjawabnya asal
-                atau berhenti mendaftar -- keduanya lebih buruk daripada
-                membiarkannya kosong dengan jujur. */}
-            {!simple && (
-              <Collapse title="For more accurate numbers (optional)">
-                <p className="text-[11px] leading-relaxed text-neutral-500">
-                  Age and sex are used to estimate maximum heart rate and daily energy needs. Without
-                  them those numbers fall back to generic values and will drift from your actual
-                  situation. No other part of the app is locked behind this.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Sex</label>
-                    <select className={inputClass} value={f.sex}
-                      onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
-                      <option value="L">Male</option>
-                      <option value="P">Female</option>
-                    </select>
+              {/* Sub-role pills: Distinct selected state with solid emerald & checkmark */}
+              {(pilihPeran || role !== 'pasien') && (
+                <div className="space-y-2 rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                      Peran Medis Aktif:
+                    </span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                      Kredensial STR Diperlukan
+                    </span>
                   </div>
-                  <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Date of birth</label>
-                    <input className={inputClass} value={f.dob}
-                      onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
-                      max={hariIni()} />
-                    {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Age: {ageFromDob(f.dob)} years</p>}
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {ROLES.filter(r => r.id !== 'pasien').map(r => {
+                      const isSelected = role === r.id
+                      return (
+                        <button
+                          key={r.id}
+                          type="button"
+                          onClick={() => setRole(r.id)}
+                          data-selected={isSelected ? 'true' : 'false'}
+                          className="login-subrole-btn"
+                        >
+                          {isSelected && <span className="text-[12px] font-black">✓</span>}
+                          <span>{r.title}</span>
+                        </button>
+                      )
+                    })}
                   </div>
-                </div>
-              </Collapse>
-            )}
-
-            {/* STR — clinical roles */}
-            {clinical && (
-              <>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                    STR No. <span className="text-accent">*</span>
-                  </label>
-                  <input className={inputClass} value={f.str}
-                    onChange={e => setF(p => ({ ...p, str: e.target.value }))}
-                    placeholder="Required — STR / practice certificate" />
-                  <p className="mt-1 text-[11px] text-neutral-500">
-                    {role === 'dokter' ? 'AI-EMR is only for certified clinicians.' : 'Required for certified clinicians / academics.'}
+                  <p className="text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
+                    {cur.desc}
                   </p>
                 </div>
+              )}
+            </div>
+          )}
 
-                <Collapse title="Education & Credentials History">
-                  {role === 'kontributor' && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <Mini label="Title" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="Dr., Dr. Sp.PD" />
-                      <Mini label="Specialty" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Internal Medicine" />
-                    </div>
-                  )}
-                  {role === 'verifikator' && (
-                    <Mini label="Subspecialty" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterology-Hepatology" />
-                  )}
-                  <Mini label="Expertise" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Preventive cardiology, longevity" />
-                  <div className="grid grid-cols-2 gap-2">
-                    <Mini label="University" value={f.universitas} onChange={v => setF(p => ({ ...p, universitas: v }))} placeholder="Universitas Indonesia" />
-                    <Mini label="Graduation Year" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Upload Credentials (PDF)</label>
-                    <input type="file" accept="application/pdf"
-                      onChange={e => setF(p => ({ ...p, pdfName: e.target.files?.[0]?.name ?? '' }))}
-                      className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
-                    {f.pdfName && <p className="mt-1 text-[11px] text-brand-dark">✓ {f.pdfName}</p>}
-                  </div>
-                  <p className="text-[11px] text-neutral-500">Reviewed by AI-Agent & approved by Owner before full access.</p>
-                </Collapse>
-              </>
+          {/* ── Google One-Click Login ────────────────────────────── */}
+          {health?.googleClientId ? (
+            <div ref={gbtn} className="flex justify-center" />
+          ) : (
+            <div className="space-y-1.5">
+              <button
+                type="button"
+                onClick={doDemoLogin}
+                className="login-google-btn flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full px-4 py-2.5 text-xs font-bold shadow-xs active:scale-[0.99]"
+              >
+                <GoogleG />
+                <span>Masuk Cepat dengan Akun Demo</span>
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  Demo
+                </span>
+              </button>
+              <p className="text-center text-[10.5px] text-neutral-400">
+                Google OAuth belum diset di .env — klik untuk masuk instan dengan akun simulasi.
+              </p>
+            </div>
+          )}
+
+          {health?.features.otpEmail && (
+            <EmailOtpLogin
+              role={role}
+              consentOk={consentOk}
+              name={f.name}
+              str={f.str}
+              email={f.email}
+              setEmail={v => setF(p => ({ ...p, email: v }))}
+              onLogin={finish}
+            />
+          )}
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
+            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+            <span>atau {authMode === 'masuk' ? 'masuk dengan email' : 'daftar dengan email'}</span>
+            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+          </div>
+
+          {/* ── Core Essential Inputs Only ────────────────────────── */}
+          <div className="space-y-3">
+            <Field label="Alamat Email" required>
+              <input
+                className={inputClass}
+                value={f.email}
+                onChange={e => {
+                  setF(p => ({ ...p, email: e.target.value }))
+                  if (error) setError('')
+                }}
+                type="email"
+                placeholder="nama@email.com"
+                autoComplete="email"
+              />
+            </Field>
+
+            {authMode === 'daftar' && (
+              <Field label="Nama Lengkap" required>
+                <input
+                  className={inputClass}
+                  value={f.name}
+                  onChange={e => {
+                    setF(p => ({ ...p, name: e.target.value }))
+                    if (error) setError('')
+                  }}
+                  placeholder={role === 'pasien' ? 'Nama lengkap Anda' : 'dr. Nama Lengkap, Sp.X'}
+                  autoComplete="name"
+                />
+              </Field>
             )}
 
-            {/* Optional pasien details — collapsed by default */}
-            {role === 'pasien' && (
-              <Collapse title="Additional details (optional)">
-                <div className="grid grid-cols-2 gap-2">
-                  <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Office worker" />
-                </div>
-                <Mini label="Health history" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="High blood pressure in the family, etc." />
-              </Collapse>
+            {/* STR — Only shown in register mode for clinical roles */}
+            {authMode === 'daftar' && clinical && (
+              <Field label="Nomor STR / Kredensial Medis" required>
+                <input
+                  className={inputClass}
+                  value={f.str}
+                  onChange={e => {
+                    setF(p => ({ ...p, str: e.target.value }))
+                    if (error) setError('')
+                  }}
+                  placeholder="Contoh: 31.1.1.100.1.23.123456"
+                />
+              </Field>
             )}
           </div>
 
-          <Button onClick={doLogin} className="w-full">{role === 'pasien' ? 'Sign In' : `Sign in as ${cur.title}`}</Button>
-          <p className="text-center text-[11px] text-neutral-500">⚕️ Data is protected under the Personal Data Protection Law.</p>
+          {/* ── Progressive Disclosure: Optional Extra Details (Sebelum Submit) ─ */}
+          {hasOptionalFields && (
+            <details className="group rounded-2xl border border-neutral-200/70 bg-neutral-50/40 dark:border-white/10 dark:bg-white/[0.02] p-3 text-xs">
+              <summary className="cursor-pointer font-bold text-neutral-600 dark:text-neutral-400 list-none flex items-center justify-between select-none hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <span>▸ Lengkapi data profil opsional (dapat diisi nanti)</span>
+                <span className="text-[10px] text-neutral-400 transition-transform group-open:rotate-180">▼</span>
+              </summary>
+              <div className="mt-3 space-y-3 pt-3 border-t border-neutral-200/60 dark:border-white/10">
+                {/* Optional biological parameters */}
+                {!simple && (
+                  <div>
+                    <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                      Usia dan jenis kelamin membantu kalibrasi estimasi denyut jantung maksimal dan energi harian.
+                    </p>
+                    <div className="mt-2 grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Jenis Kelamin</label>
+                        <select
+                          className={inputClass}
+                          value={f.sex}
+                          onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}
+                        >
+                          <option value="L">Laki-laki</option>
+                          <option value="P">Perempuan</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Tanggal Lahir</label>
+                        <input
+                          className={inputClass}
+                          value={f.dob}
+                          onChange={e => setF(p => ({ ...p, dob: e.target.value }))}
+                          type="date"
+                          max={hariIni()}
+                        />
+                        {f.dob && <p className="mt-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">Usia: {ageFromDob(f.dob)} tahun</p>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional clinical education details */}
+                {clinical && (
+                  <div className="space-y-2.5 border-t border-neutral-200/60 dark:border-white/10 pt-2.5">
+                    <p className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-300">Riwayat Akademik &amp; Kredensial Medis:</p>
+                    {role === 'kontributor' && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Mini label="Gelar Akademik" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="dr., Sp.PD" />
+                        <Mini label="Spesialisasi" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Penyakit Dalam" />
+                      </div>
+                    )}
+                    {role === 'verifikator' && (
+                      <Mini label="Subspesialisasi" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterohepatologi" />
+                    )}
+                    <Mini label="Bidang Keahlian" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Kardiologi, longevity" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Mini label="Universitas / Almamater" value={f.universitas} onChange={v => setF(p => ({ ...p, universitas: v }))} placeholder="Universitas Indonesia" />
+                      <Mini label="Tahun Kelulusan" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Unggah Berkas Kredensial (PDF)</label>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={e => setF(p => ({ ...p, pdfName: e.target.files?.[0]?.name ?? '' }))}
+                        className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white"
+                      />
+                      {f.pdfName && <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">✓ {f.pdfName}</p>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional patient details */}
+                {role === 'pasien' && (
+                  <div className="space-y-2 border-t border-neutral-200/60 dark:border-white/10 pt-2.5">
+                    <Mini label="Profesi / Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan, Wiraswasta, dll." />
+                    <Mini label="Riwayat Kesehatan Singkat" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Riwayat alergi, hipertensi keluarga, dll." />
+                  </div>
+                )}
+              </div>
+            </details>
+          )}
+
+          {/* ── Checkbox Persetujuan ──────────────────────────────── */}
+          <div className="space-y-1.5">
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3 text-[12px] leading-snug text-neutral-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-neutral-300">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={e => {
+                  setConsent(e.target.checked)
+                  if (e.target.checked && error.includes('setujui')) setError('')
+                }}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded accent-[#00BF63]"
+              />
+              <span>
+                Saya menyetujui{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowLegal(true)}
+                  className="font-bold text-emerald-700 underline dark:text-emerald-400 hover:opacity-85"
+                >
+                  Syarat Layanan &amp; Kebijakan Privasi
+                </button>
+                . AI adalah asisten analitis suportif, bukan pengganti konsultasi langsung dengan dokter.
+              </span>
+            </label>
+
+            {/* Inline subtle error when consent or form issue occurs */}
+            {error && (
+              <div className="flex items-center gap-1.5 px-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
+                <span>⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+          </div>
+
+          {/* ── Primary Submit Button ─────────────────────────────── */}
+          <button
+            type="button"
+            onClick={doLogin}
+            disabled={!isFormValid}
+            className="login-submit-btn flex w-full items-center justify-center gap-2 rounded-full py-3"
+          >
+            {!consent
+              ? 'Centang Persetujuan untuk Lanjut'
+              : !isEmailValid
+              ? 'Lengkapi Alamat Email yang Benar'
+              : authMode === 'daftar' && !isNameValid
+              ? 'Lengkapi Nama Lengkap Anda'
+              : authMode === 'daftar' && clinical && !isStrValid
+              ? 'Masukkan Nomor STR Medis'
+              : authMode === 'masuk'
+              ? 'Masuk ke Akun Sekarang →'
+              : `Daftar sebagai ${cur.title} →`}
+          </button>
+
+          {/* ── Footer Micro-Badges & Status (Clean, Non-Disruptive) ─ */}
+          <div className="pt-2 text-center space-y-1">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              🔒 Mode lokal aman · Terenkripsi &amp; Patuh UU PDP No. 27/2022
+            </p>
+            {backendEnabled && (
+              <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>
+                  Layanan Server Aktif{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}
+                </span>
+                {serverNotice && (
+                  <span className="text-neutral-400" title={serverNotice}>
+                    (Penyimpanan Lokal Aman)
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
         </div>
 
         {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
@@ -426,7 +651,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
   )
 }
 
-/* ── Email OTP ───────────────────────────────────────────── */
+/* ── Email OTP ───────────────────────────────────────────────── */
 
 function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }: {
   role: Role; name: string; str: string; email: string;
@@ -439,77 +664,134 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
 
   async function start() {
     if (!consentOk()) return
-    if (!email.trim()) { setMsg('Enter your email.'); return }
+    if (!email.trim()) { setMsg('Harap masukkan alamat email Anda.'); return }
     setBusy(true); setMsg('')
-    try { await api.emailOtpStart(email.trim()); setSent(true); setMsg('Code sent to your email.') }
-    catch { setMsg('Failed to send code.') } finally { setBusy(false) }
+    try {
+      await api.emailOtpStart(email.trim())
+      setSent(true)
+      setMsg('Kode verifikasi telah dikirim ke email Anda.')
+    } catch {
+      setMsg('Gagal mengirim kode verifikasi.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   async function verify() {
-    if (!code.trim()) { setMsg('Enter the code from your email.'); return }
+    if (!code.trim()) { setMsg('Harap masukkan kode dari email Anda.'); return }
     setBusy(true); setMsg('')
     try {
-      const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Panaceamed User', role)
-      onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
+      const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Pengguna Panacea', role)
+      onLogin({
+        ...a,
+        isOwner: a.email.toLowerCase() === OWNER_EMAIL,
+        isSubscriber: role === 'owner',
+        sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
-        strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
-    } catch { setMsg('Incorrect or expired code.') } finally { setBusy(false) }
+        strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
+        consentAt: new Date().toISOString(),
+      })
+    } catch {
+      setMsg('Kode verifikasi salah atau sudah kedaluwarsa.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
-    <div className="rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
-      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">✉️ Quick sign-in with Email (Free OTP)</div>
+    <div className="rounded-2xl border border-brand/20 bg-brand-50/50 p-3 dark:border-brand/30 dark:bg-brand/10">
+      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark dark:text-brand">
+        ✉️ Masuk Cepat via Kode Email (OTP Gratis)
+      </div>
       <div className="flex gap-2">
-        <input className={inputClass} value={email} onChange={e => setEmail(e.target.value)}
-          type="email" placeholder="email@you.com" disabled={sent} />
-        {!sent
-          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send Code'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
+        <input
+          className={inputClass}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          type="email"
+          placeholder="nama@email.com"
+          disabled={sent}
+        />
+        {!sent ? (
+          <button
+            onClick={start}
+            disabled={busy}
+            type="button"
+            className="shrink-0 min-h-[40px] px-4 rounded-xl bg-brand text-white font-bold text-xs disabled:opacity-50"
+          >
+            {busy ? '…' : 'Kirim Kode'}
+          </button>
+        ) : (
+          <button
+            onClick={() => { setSent(false); setCode(''); setMsg('') }}
+            type="button"
+            className="shrink-0 px-2 text-xs font-semibold text-neutral-500 hover:text-neutral-700 min-h-[40px]"
+          >
+            Ganti
+          </button>
+        )}
       </div>
       {sent && (
         <div className="mt-2 flex gap-2">
-          <input className={inputClass} value={code} onChange={e => setCode(e.target.value)}
-            inputMode="numeric" placeholder="6-digit code" />
-          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verify'}</Button>
+          <input
+            className={inputClass}
+            value={code}
+            onChange={e => setCode(e.target.value)}
+            inputMode="numeric"
+            placeholder="6 digit kode"
+          />
+          <button
+            onClick={verify}
+            disabled={busy}
+            type="button"
+            className="shrink-0 min-h-[40px] px-4 rounded-xl bg-brand text-white font-bold text-xs disabled:opacity-50"
+          >
+            {busy ? '…' : 'Verifikasi'}
+          </button>
         </div>
       )}
-      {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
+      {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark dark:text-brand">{msg}</p>}
     </div>
   )
 }
 
-/* ── Legal modal ─────────────────────────────────────────── */
+/* ── Legal Modal ─────────────────────────────────────────────── */
 
 function LegalModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
-        onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">Consent, Privacy & Terms</h3>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
-          <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
-          <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
-          <p><b>Terms.</b> AI-EMR is only for medical professionals with a verified STR/SIP. Pharmacy services are subject to licensed pharmacists and BPOM regulations. In an emergency, use the Emergency SOS feature and contact the nearest healthcare facility.</p>
-          <p className="text-xs text-neutral-500">The full version is available in the "Privacy & Legal" menu after signing in.</p>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+        onClick={e => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-bold text-ink dark:text-white">
+          Persetujuan Klinis, Privasi &amp; Ketentuan Layanan
+        </h3>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <p>
+            <b>Informed Consent.</b> Interaksi dengan asisten AI bersifat edukatif dan suportif untuk membantu analisis kesehatan, bukan diagnosis medis akhir. Diagnosis resmi dan keputusan terapi tetap memerlukan verifikasi langsung oleh dokter berizin.
+          </p>
+          <p>
+            <b>Privasi (UU Perlindungan Data Pribadi No. 27/2022).</b> Data kesehatan Anda adalah data pribadi spesifik yang disimpan terenkripsi dengan audit log akses yang ketat. Anda memiliki hak penuh untuk mengakses, memperbarui, atau menghapus riwayat data Anda kapan saja.
+          </p>
+          <p>
+            <b>Ketentuan Profesi.</b> Modul AI-EMR khusus diperuntukkan bagi klinisi terdaftar dengan STR/SIP aktif. Layanan kefarmasian tunduk pada regulasi BPOM dan pengawasan apoteker berlisensi. Dalam situasi darurat medis, gunakan fitur Darurat SOS atau segera hubungi IGD rumah sakit terdekat.
+          </p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            Ketentuan lengkap dapat diakses kembali melalui menu "Privasi &amp; Legalitas" setelah Anda masuk.
+          </p>
         </div>
-        <button onClick={onClose}
-          className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2.5 text-sm font-bold text-white">
-          I Understand
+        <button
+          onClick={onClose}
+          type="button"
+          className="mt-5 w-full rounded-full bg-brand hover:opacity-95 py-3 text-sm font-bold text-white shadow-md min-h-[44px]"
+        >
+          Saya Mengerti &amp; Setuju
         </button>
       </div>
     </div>
-  )
-}
-
-/* ── Google "G" SVG ──────────────────────────────────────── */
-
-function GoogleG() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 48 48">
-      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5Z" />
-      <path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.3h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.1-3.8 6.5-9.5 6.5-16.2Z" />
-      <path fill="#FBBC05" d="M10.3 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4l-7.8-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.5 10.5l7.8-6.1Z" />
-      <path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.5 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.9l-7.8 6.1C6.4 42.6 14.6 48 24 48Z" />
-    </svg>
   )
 }

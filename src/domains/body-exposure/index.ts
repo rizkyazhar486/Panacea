@@ -59,3 +59,26 @@ export { selubungAtlas } from './engine/selubungAtlas'
 export { classifyTissue, tissueShading, type TissueClass, type TissueShading } from './engine/tissueShading'
 export { matchBakedAo, aoToVertexColors, type AoLayerEntry, type AoMatch } from './engine/bakedAo'
 export { applyBakedAoToLayer } from './adapters/bakedAoLayer'
+export {
+  parseMotionTimeline,
+  movementAt,
+  advanceClock,
+  scrubToTime,
+  MOTION_SPEEDS,
+  type MotionTimeline,
+  type MotionMovement,
+  type MotionClock,
+  type MotionSpeed,
+} from './engine/motionTimeline'
+export {
+  QUALITY_PRESETS,
+  FRAME_BUDGET_MS,
+  frameStats,
+  nextAutoPreset,
+  initialPreset,
+  effectivePixelRatio,
+  type QualityPreset,
+  type QualityChoice,
+  type QualitySettings,
+  type FrameStats,
+} from './engine/renderQuality'

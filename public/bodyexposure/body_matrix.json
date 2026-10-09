@@ -395,5 +395,11 @@
  "light_lod": {
   "adult_male": "LOD4",
   "adult_female": "LOD4"
+ },
+ "motion": {
+  "adult_male": {
+   "glb": "adult_male.rig_rom.glb",
+   "timeline": "adult_male.rig_rom.json"
+  }
  }
 }

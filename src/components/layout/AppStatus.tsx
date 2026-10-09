@@ -22,16 +22,36 @@ export function AppStatus() {
     }
   }, [])
 
+  const [syncDismissed, setSyncDismissed] = useState(() => {
+    try { return sessionStorage.getItem('pmd_sync_dismissed') === '1' } catch { return false }
+  })
+
   useEffect(() => {
     const onSync = (event: Event) => {
       const detail = (event as CustomEvent<AutoSyncStatus>).detail
       if (!detail) return
-      if (detail.state === 'partial' || detail.state === 'offline') setSyncIssue(detail)
-      else if (detail.state === 'ok') setSyncIssue(null)
+      if (detail.state === 'partial' || detail.state === 'offline') {
+        try {
+          if (sessionStorage.getItem('pmd_sync_dismissed') === '1') return
+        } catch {}
+        setSyncIssue(detail)
+      } else if (detail.state === 'ok') {
+        setSyncIssue(null)
+      }
     }
     window.addEventListener('panacea:auto-sync', onSync)
     return () => window.removeEventListener('panacea:auto-sync', onSync)
   }, [])
+
+  useEffect(() => {
+    if (!syncIssue) return
+    const timer = setTimeout(() => {
+      setSyncDismissed(true)
+      try { sessionStorage.setItem('pmd_sync_dismissed', '1') } catch {}
+      setSyncIssue(null)
+    }, 4500)
+    return () => clearTimeout(timer)
+  }, [syncIssue])
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
@@ -65,14 +85,24 @@ export function AppStatus() {
         </div>
       )}
 
-      {syncIssue && !offline && (
-        <div className="fixed bottom-20 left-1/2 z-[60] flex w-[min(92vw,560px)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-amber-200/20 bg-[#10130f]/95 px-4 py-3 text-xs text-white shadow-2xl backdrop-blur-xl">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-300 shadow-[0_0_12px_rgba(252,211,77,.55)]" />
+      {syncIssue && !offline && !syncDismissed && (
+        <div className="fixed bottom-4 left-4 z-40 flex max-w-sm items-center gap-2.5 rounded-2xl border border-amber-300/20 bg-neutral-900/90 px-3.5 py-2 text-xs text-white shadow-xl backdrop-blur-md">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
           <div className="min-w-0 flex-1">
-            <div className="font-bold">Automatic sync is temporarily incomplete</div>
-            <div className="mt-0.5 text-white/60">PanaceaMed is keeping your last known-good data and will retry automatically when the connection recovers.</div>
+            <span className="font-semibold text-amber-200">Sinkronisasi lokal tertunda</span>
+            <span className="ml-1 text-[11px] text-white/60">— data tersimpan aman</span>
           </div>
-          <button onClick={() => setSyncIssue(null)} className="shrink-0 text-white/45 hover:text-white" aria-label="Close sync notice">✕</button>
+          <button
+            onClick={() => {
+              setSyncDismissed(true)
+              try { sessionStorage.setItem('pmd_sync_dismissed', '1') } catch {}
+              setSyncIssue(null)
+            }}
+            className="shrink-0 text-white/50 hover:text-white"
+            aria-label="Tutup notifikasi sinkronisasi"
+          >
+            ✕
+          </button>
         </div>
       )}
 

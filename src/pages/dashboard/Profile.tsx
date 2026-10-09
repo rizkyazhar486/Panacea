@@ -3,7 +3,8 @@ import { useStore } from '../../lib/store'
 import { HealthSnapshot } from '../../components/HealthSnapshot'
 import { PostCard } from '../Feed'
 import { compressImage, readAsDataUrl } from '../../lib/upload'
-import { IconX } from '../../components/icons'
+import { IconX, IconLogout } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
 import { Portal } from '../../components/Portal'
 import { PersonalBodyUnifiedSurface } from '../../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../../components/SurfaceGuide'
@@ -35,7 +36,11 @@ export function Profile() {
 }
 
 function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
-  const { state, updateProfile } = useStore()
+  const { state, updateProfile, logout } = useStore()
+  const doLogout = () => {
+    if (backendEnabled) api.logout().catch(() => {})
+    logout()
+  }
   const [tab, setTab] = useState<Tab>('posts')
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<ProfileEdit>({})
@@ -209,6 +214,18 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
         ) : (
           list.map((p) => <PostCard key={p.id} post={p} viewerEmail={email} viewerName={account.name} />)
         )}
+      </div>
+
+      {/* Tombol Keluar dari Akun */}
+      <div className="mt-8 border-t border-black/5 pt-6 pb-4 dark:border-white/10">
+        <button
+          type="button"
+          onClick={doLogout}
+          className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/50 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40"
+        >
+          <IconLogout size={16} />
+          <span>Keluar dari Akun (Log Out)</span>
+        </button>
       </div>
     </div>
   )

@@ -3,8 +3,10 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
+import { parseMotionTimeline, movementAt, advanceClock, scrubToTime, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, nextAutoPreset, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -30,7 +32,8 @@ interface BodyEntry {
   variants?: Array<{ body_id: string; structures: number; stature_m: number; label?: string; status?: string; source?: string }>
 }
 // light_lod: LOD ringan per berkas tubuh (LOD4 = budget ≤ 80.000 segitiga tampilan awal bila tersedia)
-interface BodyMatrix { bodies: BodyEntry[]; files: string[]; light_lod?: Record<string, string> }
+// motion: rig beranimasi per berkas tubuh (GLB kerangka + timeline JSON berlabel simulasi)
+interface BodyMatrix { bodies: BodyEntry[]; files: string[]; light_lod?: Record<string, string>; motion?: Record<string, { glb: string; timeline: string }> }
 
 // jangkar landmark sumber (Z-Anatomy), dikelompokkan per struktur inang; koordinat sudah Y-up
 interface AnchorIndex { by_structure: Record<string, Array<{ id: string; name: string; p: [number, number, number]; s: string }>> }
@@ -124,6 +127,19 @@ export function CanonicalBody() {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({ structures: 0, tris: 0, ms: 0 })
   const [anchors, setAnchors] = useState<AnchorIndex | null>(null)
+  // ── gerak rig (kerangka beranimasi); jam berbasis waktu nyata, lihat engine/motionTimeline ──
+  const [motionOn, setMotionOn] = useState(false)
+  const [motionTl, setMotionTl] = useState<MotionTimeline | null>(null)
+  const [motionUi, setMotionUi] = useState<{ timeS: number; playing: boolean; speed: MotionSpeed }>({ timeS: 0, playing: true, speed: 1 })
+  const motionClock = useRef<MotionClock>({ timeS: 0, playing: true, speed: 1, loop: true })
+  const motionRefs = useRef<{ group: THREE.Group; mixer: THREE.AnimationMixer; key: string } | null>(null)
+  const motionOnRef = useRef(false)
+  const motionLoadGen = useRef(0)
+  // ── kualitas render: preset + auto dari frame time terukur (engine/renderQuality) ──
+  const [qualityChoice, setQualityChoice] = useState<QualityChoice>('auto')
+  const [qualityActive, setQualityActive] = useState<QualityPreset>(() => initialPreset(window.innerWidth, window.devicePixelRatio))
+  const [fps, setFps] = useState<FrameStats | null>(null)
+  const qualityRef = useRef<{ choice: QualityChoice; active: QualityPreset }>({ choice: 'auto', active: qualityActive })
 
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
@@ -134,6 +150,10 @@ export function CanonicalBody() {
     groups: Map<string, THREE.Group>
     byId: Map<string, THREE.Object3D>
     invalidate: () => void
+    /** Dipanggil tiap frame dengan dt (detik); true = adegan berubah dan perlu dirender. */
+    animate: ((dt: number) => boolean) | null
+    motionRoot: THREE.Group
+    applyQuality: (p: QualityPreset) => void
     /** Muatan GLB yang tiba sesudah komponen dilepas tidak punya pemilik; lihat lib/gltfSesudahLepas. */
     penjaga: PenjagaMuatan
   } | null>(null)
@@ -177,23 +197,52 @@ export function CanonicalBody() {
     const key = new THREE.DirectionalLight(0xfff4ea, 2.2); key.position.set(-2, 3, 3); scene.add(key)
     const rim = new THREE.DirectionalLight(0xcfe3ff, 1.2); rim.position.set(2, 2, -3); scene.add(rim)
     const root = new THREE.Group(); scene.add(root)
+    // pencahayaan lingkungan studio netral (prosedural, tanpa aset luar) untuk preset ultra/balanced
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const applyQuality = (p: QualityPreset) => {
+      renderer.setPixelRatio(effectivePixelRatio(window.devicePixelRatio, p))
+      scene.environment = QUALITY_PRESETS[p].environment ? envTex : null
+      scene.environmentIntensity = 0.55
+      const w = mount.clientWidth, h = mount.clientHeight; renderer.setSize(w, h)
+      dirty = true
+    }
+    const motionRoot = new THREE.Group(); motionRoot.visible = false; scene.add(motionRoot)
     // render sesuai kebutuhan: hanya saat kamera bergerak atau adegan berubah (hemat baterai ponsel)
     let dirty = true
     const invalidate = () => { dirty = true }
     controls.addEventListener('change', invalidate)
     const penjaga = penjagaMuatan()
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga }
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality }
+    applyQuality(qualityRef.current.active)
+    // frame time hanya dari frame yang dirender berturut-turut (render sesuai kebutuhan: jeda bukan beban GPU)
+    const samples: number[] = []
+    let renderedLast = false, lastEval = 0
+    const timer = new THREE.Timer(); timer.connect(document)  // Page Visibility: tab tersembunyi tidak menumpuk waktu
 
     const resize = () => {
       const w = mount.clientWidth, h = mount.clientHeight
       renderer.setSize(w, h); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix(); invalidate()
     }
     const ro = new ResizeObserver(resize); ro.observe(mount); resize()
-    renderer.setAnimationLoop(() => {
+    renderer.setAnimationLoop((now) => {
+      timer.update(now); const dt = timer.getDelta()  // detik waktu nyata: gerak tidak bergantung laju frame layar
       controls.update()  // redaman memicu event 'change' selama kamera masih bergerak
-      if (!dirty) return
+      if (sceneRef.current?.animate?.(dt)) dirty = true
+      if (!dirty) { renderedLast = false; return }
       dirty = false
+      if (renderedLast) { samples.push(dt * 1000); if (samples.length > 240) samples.shift() }
       renderer.render(scene, camera)
+      renderedLast = true
+      if (now - lastEval > 2000 && samples.length >= 30) {  // evaluasi tiap ±2 s selama ada render kontinu
+        lastEval = now
+        const st = frameStats(samples); setFps(st)
+        const q = qualityRef.current
+        if (q.choice === 'auto') {
+          const next = nextAutoPreset(q.active, st)
+          if (next !== q.active) { q.active = next; applyQuality(next); setQualityActive(next); samples.length = 0 }
+        }
+      }
     })
 
     // identifikasi struktur dengan ketukan (bukan seretan)
@@ -205,7 +254,7 @@ export function CanonicalBody() {
       const r = renderer.domElement.getBoundingClientRect()
       ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
       ray.setFromCamera(ptr, camera)
-      const hit = ray.intersectObject(root, true).find((h) => h.object.visible)
+      const hit = ray.intersectObject(motionOnRef.current ? motionRoot : root, true).find((h) => h.object.visible)
       if (measuringRef.current) { if (hit) addMeasurePoint(hit.point); return }
       let o: THREE.Object3D | null = hit?.object ?? null
       while (o && !o.userData.panacea_structure_id) o = o.parent
@@ -215,11 +264,13 @@ export function CanonicalBody() {
     renderer.domElement.addEventListener('pointerup', onUp)
     return () => {
       penjaga.lepas()
+      timer.disconnect()
+      envTex.dispose(); pmrem.dispose()
       ro.disconnect()
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
       renderer.domElement.removeEventListener('pointerup', onUp)
-      root.traverse((o) => {
+      for (const g of [root, motionRoot]) g.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
       renderer.dispose()
@@ -230,9 +281,95 @@ export function CanonicalBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const q = qualityRef.current; q.choice = qualityChoice
+    const target = qualityChoice === 'auto' ? q.active : qualityChoice
+    q.active = target; setQualityActive(target); sceneRef.current?.applyQuality(target)
+  }, [qualityChoice])
+
+  // ── mode gerak: rig kerangka beranimasi menggantikan tampilan statis (hanya tubuh yang punya rig) ──
+  const motionInfo = matrix?.motion?.[fileTag(bodyId)]
+  const disposeMotion = () => {
+    const s = sceneRef.current, m = motionRefs.current
+    if (m) m.group.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
+    s?.motionRoot.clear(); motionRefs.current = null; setMotionTl(null)
+  }
+  // tubuh tanpa rig: matikan gerak dan lepaskan rig sebelumnya dari memori GPU
+  useEffect(() => { if (!motionInfo) { setMotionOn(false); disposeMotion() } }, [motionInfo])
+  useEffect(() => {
+    const s = sceneRef.current
+    motionOnRef.current = motionOn
+    if (!s) return
+    if (!motionOn || !motionInfo) {
+      s.animate = null; s.motionRoot.visible = false; s.root.visible = true; s.invalidate(); return
+    }
+    let cancelled = false
+    const show = (tl: MotionTimeline) => {
+      const m = motionRefs.current
+      if (!m || cancelled) return
+      s.root.visible = false; s.motionRoot.visible = true
+      const dur = tl.durationS
+      let lastUi = -1, lastPlaying = motionClock.current.playing
+      s.animate = (dt) => {
+        const r = advanceClock(motionClock.current, dt, dur)
+        if (!r.ok) return false
+        const moved = r.clock.timeS !== motionClock.current.timeS
+        motionClock.current = r.clock
+        if (moved) m.mixer.setTime(r.clock.timeS)
+        // UI ±10 Hz selama berjalan; saat dijeda hanya sekali (bukan setState tiap frame)
+        if ((moved && Math.abs(r.clock.timeS - lastUi) >= 0.1) || r.clock.playing !== lastPlaying) {
+          lastUi = r.clock.timeS; lastPlaying = r.clock.playing
+          setMotionUi({ timeS: r.clock.timeS, playing: r.clock.playing, speed: r.clock.speed })
+        }
+        return moved
+      }
+      // seluruh rig (termasuk lengan terangkat) muat: jarak dari FOV vertikal & horizontal + margin 15 %
+      const box = new THREE.Box3().setFromObject(m.group); const c = box.getCenter(new THREE.Vector3()); const sz = box.getSize(new THREE.Vector3())
+      const vfov = THREE.MathUtils.degToRad(s.camera.fov); const hfov = 2 * Math.atan(Math.tan(vfov / 2) * s.camera.aspect)
+      const reach = (sz.y * 1.35) / 2  // lengan terangkat ±180° menambah tinggi di atas kepala
+      const span = Math.max(sz.x * 1.6, sz.y)  // abduksi 90° → bentang lengan ≈ tinggi badan
+      const dist = Math.max(reach / Math.tan(vfov / 2), span / 2 / Math.tan(hfov / 2)) * 1.15
+      s.controls.target.set(c.x, c.y + sz.y * 0.1, c.z); s.camera.position.set(c.x, c.y + sz.y * 0.1, c.z + dist); s.controls.update(); s.invalidate()
+    }
+    const key = motionInfo.glb
+    const ready = motionRefs.current?.key === key && motionTl
+    if (ready) { show(motionTl); return () => { cancelled = true } }
+    setLoading(true)
+    const gen = ++motionLoadGen.current
+    const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+    Promise.all([loader.loadAsync(`${BASE}${motionInfo.glb}`), fetch(`${BASE}${motionInfo.timeline}`).then((r) => (r.ok ? r.json() : null))])
+      .then(([g, raw]) => {
+        if (cancelled) return
+        const drop = () => g.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => x.dispose()) } })
+        const parsed = parseMotionTimeline(raw)
+        if (!parsed.ok) { drop(); setError(`Motion timeline rejected: ${parsed.error}`); setMotionOn(false); return }
+        const clip = g.animations.find((a) => a.name === parsed.timeline.clip)
+        if (!clip) { drop(); setError('Motion clip missing from the rig file.'); setMotionOn(false); return }
+        disposeMotion()
+        s.motionRoot.add(g.scene)
+        const mixer = new THREE.AnimationMixer(g.scene); mixer.clipAction(clip).play()
+        motionRefs.current = { group: g.scene, mixer, key }
+        motionClock.current = { timeS: 0, playing: true, speed: 1, loop: true }
+        setMotionTl(parsed.timeline); show(parsed.timeline)
+      })
+      .catch(() => { if (!cancelled) { setError('Motion rig could not be loaded.'); setMotionOn(false) } })
+      // overlay dilepas oleh pemuatan gerak terakhir saja (toggle cepat), dan tidak bila sistem statis masih dimuat
+      .finally(() => { if (motionLoadGen.current === gen && !loadState.current.inflight) setLoading(false) })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionOn, motionInfo])
+
+  const motionControl = (patch: Partial<MotionClock>) => {
+    motionClock.current = { ...motionClock.current, ...patch }
+    const c = motionClock.current
+    setMotionUi({ timeS: c.timeS, playing: c.playing, speed: c.speed })
+    motionRefs.current?.mixer.setTime(c.timeS); sceneRef.current?.invalidate()
+  }
+  const activeMovement = motionTl ? movementAt(motionTl, motionUi.timeS) : null
+
   // ── muat GLB bertahap: tubuh/LOD baru → kosongkan; lalu hanya sistem yang aktif dimuat ──
   // (muatan awal = sistem default ≤ 80.000 segitiga; sistem lain dimuat saat dinyalakan)
-  const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0 })
+  const loadState = useRef({ key: '', gen: 0, loaded: new Set<string>(), tris: 0, inflight: 0 })
   const pendingSelect = useRef<string | null>(null)
   useEffect(() => {
     const s = sceneRef.current
@@ -241,18 +378,21 @@ export function CanonicalBody() {
     const key = `${bodyId}|${lod}`
     const reset = L.key !== key
     if (reset) {
-      L.key = key; L.gen += 1; L.loaded = new Set(); L.tris = 0
-      setPicked(null); selectedRef.current = null
+      L.key = key; L.gen += 1; L.loaded = new Set(); L.tris = 0; L.inflight = 0
+      setPicked(null); selectedRef.current = null; pendingSelect.current = null; setError('')
       s.root.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
       s.root.clear(); s.groups.clear(); s.byId.clear()
     }
     const todo = systems.filter((sys) => enabled.has(sys) && !L.loaded.has(sys))
-    if (!todo.length) return
+    if (!todo.length) {
+      if (reset) { setLoading(false); setStats({ structures: 0, tris: 0, ms: 0 }); bodyBox.current = null }  // semua sistem mati
+      return
+    }
     todo.forEach((sys) => L.loaded.add(sys))
     const gen = L.gen
-    setLoading(true)
+    L.inflight += 1; setLoading(true)
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     const tag = fileTag(bodyId)
     const t0 = performance.now()
@@ -263,6 +403,7 @@ export function CanonicalBody() {
       // Komponen sudah dilepas: scene-nya mati dan tidak ada yang akan membuang muatan ini, jadi buang di sini.
       if (!s.penjaga.hidup) { for (const r of results) if (r.status === 'fulfilled') s.penjaga.terima(r.value.scene); return }
       if (gen !== loadState.current.gen) return  // tubuh/LOD sudah berganti
+      L.inflight -= 1
       for (const r of results) {
         if (r.status !== 'fulfilled') continue
         const { sys, scene } = r.value
@@ -282,14 +423,16 @@ export function CanonicalBody() {
       const failed = results.filter((r) => r.status === 'rejected')
       results.forEach((r, i) => { if (r.status === 'rejected') L.loaded.delete(todo[i]) })
       if (failed.length) setError(`${failed.length} system file(s) could not be loaded.`)
+      else if (!L.inflight) setError('')
       setStats({ structures: s.byId.size, tris: Math.round(L.tris), ms: Math.round(performance.now() - t0) })
-      if (reset) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
+      if (reset || !bodyBox.current) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
       applyVisibility()
       applyDisperse(disperse)
-      setLoading(false)
+      if (!L.inflight) setLoading(false)  // overlay hilang hanya setelah semua pemuatan selesai
       const want = pendingSelect.current
       const o = want ? s.byId.get(want) : undefined
       if (o) { pendingSelect.current = null; select(o); focusOn(o) }
+      else if (want && failed.length) pendingSelect.current = null
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bodyId, lod, systems, enabled])
@@ -521,6 +664,14 @@ export function CanonicalBody() {
               </button>
             ))}
           </div>
+          {motionInfo && (
+            <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
+              <button onClick={() => { setMotionOn((m) => !m); setMeasuring(false); setDisperse(0) }} aria-pressed={motionOn}
+                className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold ${motionOn ? 'bg-[#ffd166] text-[#0b0c0e]' : 'text-white/80'}`}>
+                {motionOn ? 'Stop motion' : 'Motion'}
+              </button>
+            </div>
+          )}
           {/* alat ukur di toolbar kanvas: tetap terlihat saat mengetuk anatomi (tidak menggulir keluar) */}
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
             <button onClick={() => { setMeasuring((m) => !m); setDisperse(0) }} aria-pressed={measuring}
@@ -542,16 +693,58 @@ export function CanonicalBody() {
             {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
           </div>
         )}
+        {fps && (  // frame time terukur dari render kontinu (rata-rata & 1 % terendah), juga saat mode gerak
+          <div className="pointer-events-none absolute right-3 top-14 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70" data-testid="fps-readout">
+            {Math.round(fps.fpsMean)} fps · 1% low {Math.round(fps.fps1Low)} · {qualityActive}
+          </div>
+        )}
         {loading && <div className="absolute inset-0 grid place-items-center text-sm font-bold text-white/80">Loading anatomy…</div>}
-        {!loading && stats.structures > 0 && (
+        {!loading && !motionOn && stats.structures > 0 && (
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[11px] text-white/70">
             {stats.structures.toLocaleString('en')} loaded · {Math.round(stats.tris / 1000)}k triangles · {stats.ms} ms
+          </div>
+        )}
+        {/* panel gerak di bawah kanvas: tidak menutupi anatomi */}
+        {motionOn && motionTl && (
+          <div className="border-t border-white/10 bg-black/60 p-3 text-white" data-testid="motion-panel">
+            <div className="flex flex-wrap items-center gap-2 text-[12px]">
+              <span className="rounded-full bg-[#ffd166] px-2 py-0.5 text-[10px] font-bold uppercase text-[#0b0c0e]">Simulation</span>
+              <span className="font-bold capitalize" data-testid="motion-movement">{activeMovement?.name ?? 'rest'}</span>
+              <span className="text-white/60">{motionUi.timeS.toFixed(1)} / {motionTl.durationS.toFixed(1)} s</span>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <button onClick={() => motionControl({ playing: !motionUi.playing })} className="min-h-[36px] rounded-full bg-white/10 px-3 text-[12px] font-bold">
+                {motionUi.playing ? 'Pause' : 'Play'}
+              </button>
+              <input type="range" min={0} max={1} step={0.001} value={motionUi.timeS / motionTl.durationS} aria-label="Motion timeline" className="min-w-0 flex-1"
+                onChange={(e) => { const t = scrubToTime(Number(e.target.value), motionTl.durationS); if (t !== null) motionControl({ timeS: t, playing: false }) }} />
+              <div className="flex rounded-full bg-white/10 p-0.5" role="radiogroup" aria-label="Motion speed">
+                {MOTION_SPEEDS.map((v) => (
+                  <button key={v} role="radio" aria-checked={motionUi.speed === v} onClick={() => motionControl({ speed: v })}
+                    className={`min-h-[32px] rounded-full px-2 text-[11px] font-bold ${motionUi.speed === v ? 'bg-[#f2f4f6] text-[#0b0c0e]' : 'text-white/75'}`}>{v}×</button>
+                ))}
+              </div>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-snug text-white/65">{motionTl.label}. Skeleton and joints only; muscles and skin are not rigged yet.</p>
           </div>
         )}
       </div>
 
       <Card>
         <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">
+              Graphics quality{qualityChoice === 'auto' && <span className="normal-case"> · now {qualityActive}</span>}
+            </p>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Graphics quality">
+              {(['auto', 'ultra', 'balanced', 'performance'] as QualityChoice[]).map((k) => (
+                <button key={k} role="radio" aria-checked={qualityChoice === k} onClick={() => setQualityChoice(k)}
+                  className={`min-h-[40px] rounded-full border px-3.5 text-[13px] font-bold capitalize ${qualityChoice === k ? 'border-brand bg-brand-100 text-brand-dark dark:bg-emerald-400/15 dark:text-emerald-200' : 'border-neutral-500/30 opacity-70'}`}>
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Section plane</p>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Section plane">

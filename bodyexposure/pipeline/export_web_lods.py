@@ -11,6 +11,8 @@ Kompresi meshopt dilakukan sesudahnya dengan gltfpack (lihat README).
 """
 import bpy, bmesh, sys, os, json, argparse
 from mathutils.bvhtree import BVHTree
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lod_budget import tri_count, allocate, split_nonmanifold, escapes_bbox, fix_escapes
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ap = argparse.ArgumentParser()
@@ -24,17 +26,19 @@ LODS = {"LOD0": (0.50, 400), "LOD1": (0.25, 200), "LOD2": (0.10, 120), "LOD3": (
 # LOD4 = budget per SISTEM untuk tampilan web ringan. Sistem yang tampil default di aplikasi (DEFAULT_ON di
 # CanonicalBody.tsx) berjumlah ≤ 80.000 segitiga per tubuh = muatan awal; sistem lain dimuat saat dinyalakan.
 # Di dalam sistem: lantai per struktur (tidak ada struktur yang hilang) + sisa ∝ luas permukaan.
-# pembuluh darah: 677 struktur tabung, minimum yang bisa dicapai collapse ≈ 25.000 → diberi jatah sesuai kenyataan
-BUDGET = {"LOD4": ({"skeletal": 26000, "cardiovascular": 25000, "surface": 8000, "digestive": 8000, "respiratory": 5000,
-                    "urinary": 2500, "reproductive": 2500,  # = 77.000 (muatan awal)
+# pembuluh darah: 677 struktur tabung pada tubuh laki-laki; agar tak ada verteks lolos bbox (fix_escapes) perlu
+# ≈ 38.000 segitiga → jatah sesuai kenyataan, sistem default lain disesuaikan agar muatan awal ≤ 80.000
+BUDGET = {"LOD4": ({"skeletal": 20000, "cardiovascular": 38000, "surface": 6000, "digestive": 6000, "respiratory": 3500,
+                    "urinary": 2000, "reproductive": 2000,  # = 77.500 (muatan awal)
                     "muscular": 24000, "nervous": 12000, "joint": 8000, "lymphatic": 3000, "fascia": 3000,
                     "sensory": 3000, "endocrine": 1500, "visceral_unclassified": 1000}, 8)}
+# per tubuh: laki-laki (3.877 struktur, 677 pembuluh terkunci ≈ 45.000) → sistem default lain lebih ketat
+BODY_BUDGET = {"HUMAN.ADULT.MALE": {"skeletal": 16000, "surface": 5000, "digestive": 5000, "respiratory": 3000,
+                                    "urinary": 1800, "reproductive": 1800}}
 DEFAULT_ON = {"surface", "skeletal", "cardiovascular", "respiratory", "digestive", "urinary", "reproductive"}
 SAMPLE = 400  # verteks master yang diuji per struktur untuk galat
 
 
-def tri_count(me):
-    return sum(len(p.vertices) - 2 for p in me.polygons)
 
 
 def lod_error(src_obj, eval_obj, dg):
@@ -48,25 +52,6 @@ def lod_error(src_obj, eval_obj, dg):
     ds = [tree.find_nearest(M @ vs[i].co)[3] for i in range(0, len(vs), step)]
     ds = [d for d in ds if d is not None]
     return (sum(ds) / len(ds), max(ds)) if ds else (0.0, 0.0)
-
-
-def allocate(objs, budget, floor):
-    """Jatah segitiga per struktur: lantai + sisa ∝ luas permukaan, dibatasi jumlah aslinya."""
-    area = {o.name: max(sum(p.area for p in o.data.polygons), 1e-9) for o in objs}
-    tris = {o.name: tri_count(o.data) for o in objs}
-    alloc = {n: min(tris[n], floor) for n in tris}
-    free = budget - sum(alloc.values())
-    for _ in range(6):  # distribusikan ulang kelebihan dari struktur yang sudah mentok jumlah aslinya
-        open_ = [n for n in tris if alloc[n] < tris[n]]
-        tot = sum(area[n] for n in open_)
-        if free <= 0 or not open_:
-            break
-        add = {n: free * area[n] / tot for n in open_}
-        used = 0
-        for n in open_:
-            new = min(tris[n], alloc[n] + add[n]); used += new - alloc[n]; alloc[n] = new
-        free -= used
-    return {n: alloc[n] / max(tris[n], 1) for n in tris}
 
 
 def export_glb(objs, path):
@@ -94,7 +79,7 @@ def main():
             o.hide_set(False); o.hide_viewport = False
             bodies.setdefault(o["panacea_body_id"], {}).setdefault(o.get("panacea_system", "other"), []).append(o)
     report = {"lods": {k: {"target_ratio": r, "min_tris": m} for k, (r, m) in LODS.items()}
-              | {k: {"system_budget_tris": b, "min_tris": m, "initial_load_systems": sorted(DEFAULT_ON),
+              | {k: {"system_budget_tris": b, "body_overrides": BODY_BUDGET, "min_tris": m, "initial_load_systems": sorted(DEFAULT_ON),
                      "allocation": "per system: floor + remainder proportional to surface area"} for k, (b, m) in BUDGET.items()},
               "files": []}
     dg = bpy.context.evaluated_depsgraph_get()
@@ -110,28 +95,35 @@ def main():
                 # pisahkan edge itu pada SALINAN mesh (posisi verteks identik), kembalikan sesudah ekspor
                 for sobjs in systems.values():
                     for o in sobjs:
-                        bm = bmesh.new(); bm.from_mesh(o.data)
-                        nm = [e for e in bm.edges if len(e.link_faces) > 2]
-                        if nm:
-                            bmesh.ops.split_edges(bm, edges=nm); me = o.data.copy(); bm.to_mesh(me)
-                            swapped.append((o, o.data)); o.data = me
-                        bm.free()
+                        orig = split_nonmanifold(o)
+                        if orig is not None:
+                            swapped.append((o, orig))
                 for sysn, sobjs in systems.items():
-                    budget = budgets.get(sysn, 1000)
+                    budget = BODY_BUDGET.get(body, {}).get(sysn, budgets.get(sysn, 1000))
                     if sum(tri_count(o.data) for o in sobjs) <= budget:
                         ratios.update({o.name: 1.0 for o in sobjs}); continue
                     r = allocate(sobjs, budget, floor)
-                    # collapse tidak tepat sasaran (tabung/mesh kecil punya batas bawah): ukur, koreksi sampai 3×
-                    for _ in range(3):
-                        mods = []
+                    unsplit_sys = {o.name: orig for o, orig in swapped if o in sobjs and o.data is not orig}
+                    # ukur hasil nyata: collapse tidak tepat sasaran, dan struktur yang lolos bbox diperbaiki
+                    # (fix_escapes menaikkan rasionya); kelebihan diserap struktur lain di sistem yang sama.
+                    for _ in range(5):
                         for o in sobjs:
                             m = o.modifiers.new("PAN_LOD", 'DECIMATE'); m.decimate_type = 'COLLAPSE'; m.ratio = r[o.name]
-                            m.use_collapse_triangulate = True; mods.append((o, m))
+                            m.use_collapse_triangulate = True
                         bpy.context.view_layer.update(); dg.update()
-                        got = sum(len(o.evaluated_get(dg).data.polygons) for o in sobjs)
-                        for o, m in mods: o.modifiers.remove(m)
+                        fixed = {n for n, _ in fix_escapes(sobjs, dg, unsplit_sys)}
+                        tri = {o.name: len(o.evaluated_get(dg).data.polygons) for o in sobjs}
+                        r = {o.name: (o.modifiers["PAN_LOD"].ratio if o.modifiers.get("PAN_LOD") else 1.0) for o in sobjs}
+                        for o in sobjs:
+                            m = o.modifiers.get("PAN_LOD")
+                            if m: o.modifiers.remove(m)
+                        got = sum(tri.values())
                         if got <= budget: break
-                        r = {n: v * budget / got * 0.97 for n, v in r.items()}
+                        locked = fixed | {n for n, v in r.items() if v >= 1.0}
+                        free_t = got - sum(tri[n] for n in locked)
+                        if free_t <= 0: break
+                        scale = max(0.05, (budget - sum(tri[n] for n in locked)) / free_t) * 0.97
+                        r = {n: (v if n in locked else v * scale) for n, v in r.items()}
                     ratios.update(r)
                 ratio = floor = None
             else:
@@ -146,6 +138,13 @@ def main():
                         m.use_collapse_triangulate = True
                         mods.append((o, m))
                 bpy.context.view_layer.update(); dg.update()
+                unsplit = {o.name: orig for o, orig in swapped if o in objs}
+                fixed = fix_escapes(objs, dg, unsplit)
+                for o, orig in list(swapped):  # mesh yang dikembalikan ke aslinya tidak perlu dipulihkan lagi
+                    if o.data is orig: swapped.remove((o, orig))
+                exploded = [o.name for o in objs if escapes_bbox(o, dg)]
+                if exploded:  # gerbang keras: GLB tidak boleh berisi verteks di luar bbox struktur aslinya
+                    raise SystemExit(f"LOD {lod} {sysn}: decimation escaped source bbox for {exploded[:5]}")
                 src_t = sum(tri_count(o.data) for o in objs)
                 out_t, errs = 0, []
                 for o in objs:
@@ -157,12 +156,13 @@ def main():
                     errs.append((o.name, round(mean * 1000, 3), round(mx * 1000, 3)))
                 path = os.path.join(a.out, f"{tag}.{sysn}.{lod}.glb")
                 export_glb(objs, path)
-                for o, m in mods:
-                    o.modifiers.remove(m)
+                for o, _ in mods:  # modifier bisa sudah dihapus fix_escapes ("not decimated")
+                    m = o.modifiers.get("PAN_LOD")
+                    if m: o.modifiers.remove(m)
                 report["files"].append({"body": body, "system": sysn, "lod": lod, "file": os.path.basename(path),
                                         "structures": len(objs), "tris_master": src_t, "tris_lod": out_t,
                                         "bytes_raw": os.path.getsize(path),
-                                        "error_mm_largest_structures": errs})
+                                        "error_mm_largest_structures": errs, "bbox_escape_fixed": fixed})
                 print("EXPORT", os.path.basename(path), len(objs), src_t, "->", out_t, os.path.getsize(path))
             for o, orig in swapped:
                 tmp = o.data; o.data = orig; bpy.data.meshes.remove(tmp)

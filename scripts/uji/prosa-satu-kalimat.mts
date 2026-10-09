@@ -34,7 +34,7 @@ import { join } from 'node:path'
  * TURUNKAN angka ini setiap kali prosa dipindahkan ke balik disclosure.
  * JANGAN PERNAH menaikkannya untuk membuat uji hijau.
  */
-const BATAS = 329
+const BATAS = 328
 
 const src = fileURLToPath(new URL('../../src/', import.meta.url))
 

@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand: #00bf63;
   --color-brand-dark: #0b7a4b;
@@ -179,12 +181,14 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Surfaces */
 .dark .bg-white { background-color: #17191c !important; }
-/* Pengecualian: tombol yang SENGAJA putih dengan teks gelap (CTA utama,
+/* Pengecualian: tombol/elemen interaktif yang SENGAJA putih dengan teks gelap (CTA utama,
    "Ask →"). Memetakan latarnya ke #17191c sementara teksnya tetap hitam
    menghasilkan hitam di atas hitam — tombolnya lenyap. Terukur di Clinical:
-   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibiarkan putih. */
-.dark .bg-white:is(.text-black, .text-ink, .text-neutral-900, .text-neutral-950, .text-slate-900, .text-slate-950) {
+   tombol Ask nyaris tak terlihat. Pasangan putih+teks-gelap dibatasi pada elemen interaktif
+   (button, a, [role="button"]) agar kartu atau panel tidak ikut terpaksa menjadi putih. */
+.dark .bg-white:is(button.text-black, a.text-black, [role='button'].text-black, button.text-ink, a.text-ink, [role='button'].text-ink, button.text-neutral-900, a.text-neutral-900, [role='button'].text-neutral-900, button.text-neutral-950, a.text-neutral-950, [role='button'].text-neutral-950, button.text-slate-900, a.text-slate-900, [role='button'].text-slate-900, button.text-slate-950, a.text-slate-950, [role='button'].text-slate-950) {
   background-color: #fff !important;
+  color: #0c1410 !important;
 }
 .dark .bg-white\/95 { background-color: rgba(23, 25, 28, 0.95) !important; }
 .dark .bg-white\/90 { background-color: rgba(23, 25, 28, 0.9) !important; }
@@ -217,6 +221,11 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    terukur 2,15:1. Keping terpilih di Med Study jatuh tepat ke sana. */
 .dark .bg-brand.text-ink,
 .dark .bg-brand .text-ink { color: var(--color-ink) !important; }
+.dark .bg-white.text-black,
+.dark .bg-white .text-black,
+.dark .bg-white.text-ink,
+.dark .bg-white .text-ink,
+.dark .bg-white.\!text-black { color: #0c1410 !important; }
 .dark .text-neutral-900,
 .dark .text-neutral-800,
 .dark .text-neutral-700 { color: #e6ece8 !important; }
@@ -693,6 +702,10 @@ input:focus, textarea:focus, select:focus {
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
 }
 .reduce-motion .fly-in-drop { animation: none !important; }
+/* Preferensi OS juga harus dihormati, bukan hanya toggle di dalam aplikasi:
+   tanpa ini spanduk harian meluncur melewati bilah atas selama 0,7 dtk bagi
+   pengguna "reduce motion", dan gerbang bilah-atas menangkapnya di tengah jalan. */
+@media (prefers-reduced-motion: reduce) { .fly-in-drop { animation: none !important; } }
 
 /* Cahaya dibiaskan lewat prisma — motif langsung diminta lewat referensi
    (piramida kaca yang memecah satu berkas cahaya jadi pita pelangi). Dipakai
@@ -2807,6 +2820,45 @@ h1 {
   color: #ffffff !important;
 }
 
+.cta-banner-btn,
+.dark .cta-banner-btn,
+html.dark .cta-banner-btn,
+html.pmd-liquid-actions-v45 button.cta-banner-btn,
+html.dark.pmd-liquid-actions-v45 button.cta-banner-btn,
+button.cta-banner-btn {
+  background: #ffffff !important;
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #052e16 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+.cta-banner-btn span,
+.dark .cta-banner-btn span,
+html.dark .cta-banner-btn span,
+html.pmd-liquid-actions-v45 button.cta-banner-btn span,
+html.dark.pmd-liquid-actions-v45 button.cta-banner-btn span {
+  color: #052e16 !important;
+}
+
+.cta-banner-btn .cta-arrow-circle,
+.dark .cta-banner-btn .cta-arrow-circle,
+html.dark .cta-banner-btn .cta-arrow-circle,
+html.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle,
+html.dark.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle {
+  background: #059669 !important;
+  background-image: none !important;
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+.cta-banner-btn .cta-arrow-circle svg,
+.dark .cta-banner-btn .cta-arrow-circle svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
 /* Hijau muda mode gelap bocor ke mode terang di atas keping bg-brand-100
    (1,08:1 di /athlete dan /recovery). Aturan lama ada tetapi dikalahkan
    aturan .bg-ink yang ditulis belakangan. */
@@ -2943,3 +2995,16 @@ html:not(.dark) body button[data-cta="primary"] {
   border-color: transparent !important;
   box-shadow: 0 10px 30px -8px rgba(0,191,99,.5) !important;
 }
+
+
+
+/* Matikan morph capsule layer berlebih */
+#pmd-liquid-morph-layer,
+.pmd-liquid-morph-orb {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+

@@ -1,5 +1,6 @@
+import { chk } from './check.mjs'
 import { periksaBacaan, PENGANTAR } from '../../src/lib/kitab.ts'
-const chk=(n:string,c:boolean,x='')=>console.log(c?'PASS':'FAIL',n,x)
+
 const B=(t:string)=>({rujukan:'X 1:1',teks:t,edisi:'e'})
 chk('bacaan sah lolos', periksaBacaan(B('In the beginning was the Word')).utuh)
 chk('bacaan kosong ditolak', !periksaBacaan(B('')).utuh)
