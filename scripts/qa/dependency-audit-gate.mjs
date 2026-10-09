@@ -75,18 +75,29 @@ export function evaluateAudit({ audit, workspace, policy, now }) {
   if (audit.error) return unusable('npm audit returned an error instead of a report')
   const vulnerabilities = audit.vulnerabilities
   const summary = audit.metadata?.vulnerabilities
-  if (!vulnerabilities || typeof vulnerabilities !== 'object' || !summary || typeof summary !== 'object') {
+  if (!vulnerabilities || typeof vulnerabilities !== 'object' || Array.isArray(vulnerabilities)
+    || !summary || typeof summary !== 'object' || Array.isArray(summary)) {
     return unusable('audit output has no vulnerabilities/metadata sections')
   }
-  if (!Number.isFinite(summary.high) || !Number.isFinite(summary.critical)) {
-    return unusable('audit summary has no numeric high/critical counts')
+  if (![summary.high, summary.critical].every((count) => Number.isSafeInteger(count) && count >= 0)) {
+    return unusable('audit summary high/critical counts must be non-negative safe integers')
   }
 
   const advisories = new Map()
   for (const [name, entry] of Object.entries(vulnerabilities)) {
-    for (const item of entry?.via ?? []) {
-      if (!item || typeof item !== 'object') continue
-      if (!(item.severity in SEVERITY_RANK)) return unusable(`advisory for ${name} has an unknown severity`)
+    // Missing/malformed `via` is not proof of an empty dependency audit.
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || !Array.isArray(entry.via)) {
+      return unusable(`vulnerability for ${name} must be an object with a via array`)
+    }
+    for (const item of entry.via) {
+      // npm represents indirect dependency links as package names.
+      if (typeof item === 'string' && item.trim()) continue
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        return unusable(`advisory for ${name} must be an object or a non-empty dependency name`)
+      }
+      if (typeof item.severity !== 'string' || !Object.hasOwn(SEVERITY_RANK, item.severity)) {
+        return unusable(`advisory for ${name} has an unknown severity`)
+      }
       const pkg = item.name ?? name
       const id = advisoryId(item)
       advisories.set(`${pkg}|${id}`, { pkg, id, severity: item.severity, title: item.title ?? '', range: item.range ?? '' })

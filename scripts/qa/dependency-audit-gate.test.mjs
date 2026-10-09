@@ -30,6 +30,45 @@ const accept = (id, workspace = 'server', expires = '2026-12-31') => ({
 const policyAccepting = (ids, workspace, expires) => ({ ...EMPTY_POLICY, accepted: ids.map((id) => accept(id, workspace, expires)) })
 const run = (audit, policy = EMPTY_POLICY, workspace = 'server', now = NOW) => evaluateAudit({ audit, workspace, policy, now })
 
+test('hitungan_high_critical_wajib_bilangan_bulat_nonnegatif_aman', () => {
+  const clean = { vulnerabilities: {}, metadata: { vulnerabilities: { high: 0, critical: 0 } } }
+  assert.equal(run(clean).kind, 'pass')
+  for (const field of ['high', 'critical']) {
+    for (const value of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, '0', null]) {
+      const audit = structuredClone(clean)
+      audit.metadata.vulnerabilities[field] = value
+      const result = run(audit)
+      assert.equal(result.ok, false, `${field}=${String(value)}`)
+      assert.equal(result.kind, 'unusable')
+      assert.match(result.errors[0], /non-negative safe integers/)
+    }
+  }
+})
+
+test('struktur_laporan_rusak_tidak_boleh_dilewati_sebagai_audit_bersih', () => {
+  const clean = { vulnerabilities: {}, metadata: { vulnerabilities: { high: 0, critical: 0 } } }
+  const inputs = [
+    { ...clean, vulnerabilities: [] },
+    { ...clean, metadata: { vulnerabilities: [] } },
+    ...[null, [], 'bad', {}, { via: null }, { via: 'axios' }, { via: {} },
+      { via: [null] }, { via: [42] }, { via: [[]] }, { via: [''] },
+      { via: [{ severity: 'toString' }] }, { via: [{ severity: 'constructor' }] },
+    ].map((entry) => ({ ...clean, vulnerabilities: { axios: entry } })),
+  ]
+  for (const audit of inputs) {
+    const snapshot = JSON.stringify(audit)
+    const result = run(audit)
+    assert.equal(result.ok, false, snapshot)
+    assert.equal(result.kind, 'unusable', snapshot)
+    assert.equal(result.errors.length, 1)
+    assert.deepEqual(result.accepted, [])
+    assert.equal(JSON.stringify(audit), snapshot, 'input remains unchanged')
+  }
+  // npm uses strings for transitive dependencies; preserve that valid shape.
+  assert.equal(run({ ...clean, vulnerabilities: { wrapper: { via: ['axios'] } } }).kind, 'pass')
+  assert.equal(run({ ...clean, vulnerabilities: { wrapper: { via: [] } } }).kind, 'pass')
+})
+
 test('menolak_audit_server_sebelum_perbaikan_dan_menyebut_setiap_advisory_high', () => {
   const result = run(fixture('server-before-2210'))
   assert.equal(result.ok, false)
@@ -219,6 +258,18 @@ test('cli_exit_1_dan_menyebut_paket_pada_audit_server_sebelum_perbaikan', () => 
   assert.match(r.stderr, /FAIL high axios GHSA-c29m-xwm3-cm6r/)
   assert.match(r.stderr, /FAIL high ip-address GHSA-mwp4-54f8-5fhr/)
   assert.doesNotMatch(r.stdout, /OK:/)
+})
+
+test('cli_exit_2_tanpa_pesan_OK_untuk_laporan_parseable_tetapi_rusak', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dep-audit-shape-'))
+  const file = join(dir, 'audit.json')
+  for (const vulnerabilities of [[], { axios: {} }, { axios: { via: [null] } }]) {
+    writeFileSync(file, JSON.stringify({ vulnerabilities, metadata: { vulnerabilities: { high: 0, critical: 0 } } }))
+    const result = cli('--workspace', 'server', '--file', file, '--policy', policyFile, '--now', '2026-10-02')
+    assert.equal(result.status, 2, result.stderr)
+    assert.match(result.stderr, /UNUSABLE:/)
+    assert.doesNotMatch(result.stdout, /OK:/)
+  }
 })
 
 test('cli_exit_2_pada_berkas_audit_hilang_rusak_atau_argumen_kurang', () => {
