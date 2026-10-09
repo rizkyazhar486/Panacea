@@ -3,7 +3,8 @@ import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
+import { zone2HeartRate, validateGripKg, parseNumberField } from '../domains/clinical-calculators'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
@@ -18,16 +19,23 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 type Tab = 'grip' | 'balance' | 'zone2' | 'micro' | 'squats'
 
 function GripStrength() {
-  const [kg, setKg] = useState(30)
+  // Teks mentah: tanpa nilai awal (30 kg bawaan dulu bisa tersimpan sebagai pengukuran di grafik tren).
+  const [kgText, setKgText] = useState('')
+  const grip = validateGripKg(parseNumberField(kgText))
   return (
     <>
       <Card className="!p-5">
-        <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Grip strength is one of the simplest, most consistently reproduced markers of healthy aging — measure it with a hand dynamometer if you have one, or log the reading from a grip-strength machine at your gym.</Prosa>
+        <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Grip strength is one of the simplest, most consistently reproduced markers of healthy aging — measure it with a hand dynamometer if you have one.</Prosa>
         <Field label="Grip strength (kg)">
-          <input className={`${inputClass} mt-1`} type="number" min={0} max={100} value={kg} onChange={(e) => setKg(Number(e.target.value) || 0)} />
+          <input className={`${inputClass} mt-1`} type="number" min={0} max={100} value={kgText} onChange={(e) => setKgText(e.target.value)} />
         </Field>
+        {kgText.trim() !== '' && !grip.ok && <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-600">{grip.reason}.</p>}
       </Card>
-      <ScoreTrend storageKey="pmd_grip_strength_v1" scoreName="Grip Strength" total={kg} maxScore={80} detail={`${kg} kg`} />
+      {grip.ok ? (
+        <ScoreTrend storageKey="pmd_grip_strength_v1" scoreName="Grip Strength" total={grip.kg} maxScore={80} detail={`${grip.kg} kg`} />
+      ) : (
+        <p className="px-1 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">Enter a measured grip strength to log a reading. Nothing is pre-filled, because a saved value becomes part of your trend.</p>
+      )}
     </>
   )
 }
@@ -60,21 +68,28 @@ function BalanceTest() {
 }
 
 function Zone2Checker() {
-  const [age, setAge] = useState(() => getDemo().age || 30)
+  // Profil TERSIMPAN, bukan getDemo(): getDemo() mengisi usia 30 bawaan sehingga rentang bpm tampil untuk orang yang belum
+  // mengisi usia. Teks mentah: kolom kosong = belum diisi, bukan usia 0.
+  const tersimpan = getDemoTersimpan().age
+  const [ageText, setAgeText] = useState(() => (typeof tersimpan === 'number' && tersimpan > 0 ? String(tersimpan) : ''))
   // HRmaks memakai Tanaka, Monahan & Seals (2001), J Am Coll Cardiol 37(1):153-6
   // (208 - 0,7 x usia) — 220 - usia meleset makin jauh pada usia lanjut.
   // Batas zona 2 = 60-70% HRmaks mengikuti ACSM (Garber et al., 2011).
-  const hrMaks = 208 - 0.7 * age
-  const lower = Math.round(hrMaks * 0.6)
-  const upper = Math.round(hrMaks * 0.7)
+  const zone = zone2HeartRate(parseNumberField(ageText))
   return (
     <Card className="!p-5">
       <Field label="Age">
-        <input className={inputClass} type="number" min={10} max={100} value={age} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+        <input className={inputClass} type="number" min={10} max={100} value={ageText} onChange={(e) => setAgeText(e.target.value)} />
       </Field>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">{lower}-{upper} bpm</div>
-        <div className="text-[11px] text-neutral-500">Estimated Zone 2 range (60-70% of 220−age)</div>
+        {zone.ok ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{zone.lower}-{zone.upper} bpm</div>
+            <div className="text-[11px] text-neutral-500">Estimated Zone 2 range (60-70% of estimated max HR, Tanaka: 208 − 0.7 × age)</div>
+          </>
+        ) : (
+          <div role={ageText.trim() === '' ? undefined : 'alert'} className="text-[12.5px] font-semibold text-neutral-600 dark:text-neutral-300">{ageText.trim() === '' ? 'Enter your age to see an estimated range.' : `${zone.reason}.`}</div>
+        )}
       </div>
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Zone 2 is light cardio at a pace that still allows conversation — a practical field check: you can still breathe comfortably through your nose. This is the foundation of most endurance training and metabolic health, not a "no pain no gain" zone.</Prosa>
     </Card>

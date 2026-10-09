@@ -1,6 +1,6 @@
 {
   "catatan": "Jumlah `(Number|parseFloat|parseInt)(...) || 0` per berkas di src/**/*.tsx. Hanya boleh turun; lihat scripts/uji/angka-kosong-ratchet.mts.",
-  "total": 82,
+  "total": 80,
   "berkas": {
     "src/components/clinical/StudiValidasiKlinis.tsx": 1,
     "src/components/UbinPenutupImpl.tsx": 1,
@@ -22,7 +22,7 @@
     "src/pages/LatihanBeban.tsx": 2,
     "src/pages/MacroLab.tsx": 7,
     "src/pages/Marketplace.tsx": 1,
-    "src/pages/MovementToolkit.tsx": 3,
+    "src/pages/MovementToolkit.tsx": 1,
     "src/pages/NutritionToolkit.tsx": 2,
     "src/pages/OwnerAnalytics.tsx": 16,
     "src/pages/PredictiveModelsToolkit.tsx": 8,
