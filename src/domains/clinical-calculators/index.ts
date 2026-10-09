@@ -87,3 +87,5 @@ export { cockcroftGault, cgBand, devineIbwKg, CG_RANGES } from './engine/cockcro
 export type { CgInput, CgResult, CgBand, CgSex, CgWeightBasis } from './engine/cockcroftGault'
 export { findrisc, findriscBand, agePts as findriscAgePts, bmiPts as findriscBmiPts, waistPts as findriscWaistPts, FINDRISC_RANGES } from './engine/findrisc'
 export type { FindriscInput, FindriscResult, FindriscBand, FindriscSex, FindriscFamily } from './engine/findrisc'
+export { caffeineAtBedtime, caffeineBand, decayCurve as caffeineDecayCurve, CAFFEINE_DRINKS, CAFFEINE_RANGES } from './engine/caffeineSleep'
+export type { CaffeineInput, CaffeineResult, CaffeineBand, CaffeineDrink } from './engine/caffeineSleep'

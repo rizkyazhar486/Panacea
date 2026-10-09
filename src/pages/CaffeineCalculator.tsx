@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconMoon } from '../components/icons'
+import { caffeineAtBedtime, CAFFEINE_DRINKS as DRINKS, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Caffeine Half-Life & Sleep Impact Calculator — pure first-order elimination
@@ -13,50 +14,25 @@ import { IconMoon } from '../components/icons'
 // pick their own half-life within that range rather than assuming one value.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface Drink { label: string; icon: string; mg: number }
-const DRINKS: Drink[] = [
-  { label: 'Brewed coffee (240 ml)', icon: '☕', mg: 95 },
-  { label: 'Espresso shot', icon: '☕', mg: 63 },
-  { label: 'Black tea (240 ml)', icon: '🍵', mg: 47 },
-  { label: 'Green tea (240 ml)', icon: '🍵', mg: 28 },
-  { label: 'Energy drink (250 ml can)', icon: '🥤', mg: 80 },
-  { label: 'Cola (330 ml can)', icon: '🥤', mg: 34 },
-]
-
-function decayCurve(doseMg: number, halfLifeH: number, hoursOut: number): number[] {
-  const points: number[] = []
-  for (let h = 0; h <= hoursOut; h++) points.push(doseMg * Math.pow(0.5, h / halfLifeH))
-  return points
-}
-
 export function CaffeineCalculator() {
-  const [customMg, setCustomMg] = useState(0)
-  const [picked, setPicked] = useState<Record<string, number>>({})
+  // Teks mentah: kosong = tidak minum (0), tetapi nilai tak masuk akal ditolak oleh mesin, bukan diubah diam-diam jadi 0.
+  const [customText, setCustomText] = useState('')
+  const [picked, setPicked] = useState<Record<string, string>>({})
   const [consumedAt, setConsumedAt] = useState(() => {
     const d = new Date(); return `${String(d.getHours()).padStart(2, '0')}:00`
   })
   const [bedtime, setBedtime] = useState('22:30')
   const [halfLife, setHalfLife] = useState(5)
 
-  const totalDose = useMemo(
-    () => Object.entries(picked).reduce((s, [k, n]) => s + n * (DRINKS.find((d) => d.label === k)?.mg ?? 0), 0) + customMg,
-    [picked, customMg],
-  )
-
-  const hoursUntilBed = useMemo(() => {
-    const [ch, cm] = consumedAt.split(':').map(Number)
-    const [bh, bm] = bedtime.split(':').map(Number)
-    let diff = (bh * 60 + bm - (ch * 60 + cm)) / 60
-    if (diff < 0) diff += 24
-    return diff
-  }, [consumedAt, bedtime])
-
-  const remainingAtBed = totalDose * Math.pow(0.5, hoursUntilBed / halfLife)
-  const pctAtBed = totalDose > 0 ? (remainingAtBed / totalDose) * 100 : 0
-  // Rough, commonly-cited rule of thumb: aim for <~12.5% of peak dose (roughly
-  // 3 half-lives) remaining at bedtime for minimal sleep-architecture impact.
-  const hoursTo12pct = halfLife * 3
-  const curve = decayCurve(totalDose, halfLife, 16)
+  const hasil = useMemo(() => caffeineAtBedtime({
+    servings: Object.fromEntries(Object.entries(picked).map(([k, v]) => [k, parseNumberField(v)])),
+    customMg: parseNumberField(customText), consumedAt, bedtime, halfLifeH: halfLife,
+  }), [picked, customText, consumedAt, bedtime, halfLife])
+  const totalDose = hasil.totalDoseMg ?? 0
+  const remainingAtBed = hasil.remainingMg ?? 0
+  const pctAtBed = hasil.pctAtBed ?? 0
+  const hoursTo12pct = hasil.hoursTo12pct ?? halfLife * 3
+  const curve = hasil.curve
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -81,7 +57,7 @@ export function CaffeineCalculator() {
                 className={inputClass}
                 type="number" min={0} inputMode="numeric"
                 value={picked[d.label] ?? ''}
-                onChange={(e) => setPicked((s) => ({ ...s, [d.label]: Number(e.target.value) || 0 }))}
+                onChange={(e) => { const v = e.target.value; setPicked((s) => ({ ...s, [d.label]: v })) }}
                 placeholder="0 servings"
               />
             </Field>
@@ -89,7 +65,7 @@ export function CaffeineCalculator() {
         </div>
         <div className="mt-2">
           <Field label="Extra caffeine — custom (mg)">
-            <input className={inputClass} type="number" min={0} value={customMg || ''} onChange={(e) => setCustomMg(Number(e.target.value) || 0)} placeholder="0" />
+            <input className={inputClass} type="number" min={0} value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder="0" />
           </Field>
         </div>
       </Card>
@@ -104,7 +80,11 @@ export function CaffeineCalculator() {
         </div>
       </Card>
 
-      {totalDose > 0 && (
+      {hasil.invalid.length > 0 && (
+        <p role="alert" className="text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+      )}
+
+      {hasil.invalid.length === 0 && totalDose > 0 && (
         <>
           <Card className="!p-5">
             <div className="text-xs font-black uppercase tracking-wide text-neutral-500">At your bedtime</div>
@@ -113,9 +93,9 @@ export function CaffeineCalculator() {
               <span className="text-sm font-semibold text-neutral-500">mg still active ({pctAtBed.toFixed(0)}% of {totalDose}mg consumed)</span>
             </div>
             <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-              {pctAtBed > 25
+              {hasil.band === 'high'
                 ? `That's likely enough residual caffeine to disrupt sleep onset and deep-sleep quality for many people. A common rule of thumb is to stop caffeine roughly ${hoursTo12pct.toFixed(1)}h before bed (~3 half-lives) so under 12.5% remains.`
-                : pctAtBed > 12.5
+                : hasil.band === 'near'
                   ? 'Getting close to a level unlikely to meaningfully affect most people\'s sleep, but sensitive individuals may still notice lighter sleep.'
                   : 'Low enough that most people won\'t notice a sleep effect from this alone — though everyone\'s sensitivity differs.'}
             </p>
