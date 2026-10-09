@@ -2,6 +2,7 @@ import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { graceScore } from '../../src/domains/clinical-calculators/index.ts'
 import { readFileSync } from 'node:fs'
+import { news2 as hitungNews2 } from '../../src/domains/clinical-calculators/index.ts'
 import { qtc as hitungQtc } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -33,9 +34,13 @@ const newsKode = kodeDari(news)
 for (const bawaan of ['useState(16)', 'useState(98)', 'useState(120)', 'useState(37.0)']) {
   assert.ok(!newsKode.includes(bawaan), `a vital-sign default is back in NEWS2: ${bawaan}`)
 }
-assert.ok(/const lengkap = belum\.length === 0/.test(newsKode), 'NEWS2 no longer tracks what is missing')
-assert.ok(/const result = lengkap \? band\(total, anyThree\) : null/.test(newsKode),
-  'NEWS2 still bands a total built from unmeasured observations')
+assert.ok(/const lengkap = hasil\.total !== null/.test(newsKode), 'NEWS2 no longer tracks what is missing')
+assert.ok(/const result = hasil\.band/.test(newsKode) && /news2\(\{/.test(newsKode), 'the NEWS2 page no longer takes its band from the engine')
+// Perilaku: set pengamatan kosong tidak pernah punya skor atau pita — dulu enam angka nol berjumlah 0 dan terbaca "Low risk".
+const kosongNews = hitungNews2({ rr: NaN, spo2: NaN, sbp: NaN, hr: NaN, temp: NaN, onOxygen: false, alert: true })
+assert.equal(kosongNews.band, null, 'NEWS2 still bands a total built from unmeasured observations')
+assert.equal(kosongNews.total, null, 'NEWS2 produced a total from unmeasured observations')
+assert.equal(hitungNews2({ rr: 16, spo2: 98, sbp: 120, hr: NaN, temp: 37, onOxygen: false, alert: true }).total, null, 'NEWS2 scored without a pulse')
 assert.ok(/\{lengkap && \([\s\S]{0,80}<ScoreTrend/.test(news),
   'NEWS2 still records a trend point for a patient nobody assessed')
 assert.ok(/routine monitoring/i.test(news), 'NEWS2 no longer explains why a zero score is not reassurance')
