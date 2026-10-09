@@ -1,6 +1,7 @@
+import { chk } from './check.mjs'
 const { edgeState, nextIndex, scrollBehavior, clampScrollTarget } = await import('../../src/lib/interaction/slidable.ts')
 
-const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
 
 const start = edgeState(0, 300, 900)
 chk('rail start cannot scroll left', start.canLeft === false)

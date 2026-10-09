@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 // Life Story chapters are real age-bracket math from a real date of birth —
 // this checks that math, and that grouping/ordering behaves as a reader
 // would expect (chronological, empty chapters skipped). Also checks that
@@ -7,7 +8,7 @@
 import { chapterForAge, groupIntoChapters, lifeEventToStoryItem, careEpisodeToStoryItems, domainCounts } from '../../src/lib/lifeStory.ts'
 import type { LifeEvent, CareEpisode } from '../../src/lib/types.ts'
 
-const chk = (n: string, c: boolean, x = '') => console.log(c ? 'PASS' : 'FAIL', n, x)
+
 
 chk('age 5 falls in Origin', chapterForAge(5).name === 'Origin')
 chk('age 12 (boundary) still Origin', chapterForAge(12).name === 'Origin')
