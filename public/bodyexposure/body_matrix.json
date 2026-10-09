@@ -81,6 +81,16 @@
      "label": "ICRP reference",
      "status": "source_backed",
      "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    },
+    {
+     "body_id": "VHF_LOWER_LIMB.ADULT.FEMALE",
+     "structures": 128,
+     "label": "Visible Human lower limb (Denver)",
+     "status": "source_backed_partial",
+     "source": "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; CC BY 4.0 (University of Denver Center for Orthopaedic Biomechanics), doi:10.56902/COB.vh.2022.0; underlying images courtesy of the U.S. National Library of Medicine",
+     "stature_m": null,
+     "coverage": "pelvis to feet only",
+     "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Bones, cartilage, knee ligaments and muscles from pelvis to feet; no spine, ribs, skull or arms. Not clinically reviewed."
     }
    ]
   },
@@ -390,11 +400,15 @@
   "pediatric_neonate_male.sensory",
   "pediatric_neonate_male.skeletal",
   "pediatric_neonate_male.surface",
-  "pediatric_neonate_male.urinary"
+  "pediatric_neonate_male.urinary",
+  "vhf_lower_limb_adult_female.joint",
+  "vhf_lower_limb_adult_female.muscular",
+  "vhf_lower_limb_adult_female.skeletal"
  ],
  "light_lod": {
   "adult_male": "LOD4",
-  "adult_female": "LOD4"
+  "adult_female": "LOD4",
+  "vhf_lower_limb_adult_female": "LOD4"
  },
  "motion": {
   "adult_male": {
