@@ -25,7 +25,7 @@ icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
                reference values. Dosimetry-only layers removed. Redistribution in
                Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).
 
-vhf_lower_limb_adult_female.* — Visible Human Female lower-extremity musculoskeletal geometry
+vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoskeletal geometry
                (pelvis to feet), University of Denver Center for Orthopaedic Biomechanics,
                CC BY 4.0, doi:10.56902/COB.vh.2022.0. Cite: Andreassen TE, Hume DR, Hamilton LD,
                Walker KE, Higinbotham SE, Shelburne KB. Three Dimensional Lower Extremity
@@ -34,6 +34,10 @@ vhf_lower_limb_adult_female.* — Visible Human Female lower-extremity musculosk
                Female cryosections: Courtesy of the U.S. National Library of Medicine. Not endorsed
                by NLM or the University of Denver. Rotated, centred and decimated for the web;
                this data may not reflect NLM's most current Visible Human data.
+               Skull, spine, ribs, sternum, clavicles, scapulae and humeri: machine segmentation of the
+               Visible Human Female CT with TotalSegmentator (task "total", Apache-2.0; Wasserthal J et al.,
+               Radiology: Artificial Intelligence 2023, doi:10.1148/ryai.230024), smoothed and decimated;
+               checked against the Denver segmentation for femur, hip bone and sacrum only.
                One individual (donor 59 y, 157 cm, 88 kg), not an atlas. Not clinically reviewed.
 
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture

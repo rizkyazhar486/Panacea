@@ -83,14 +83,14 @@
      "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
     },
     {
-     "body_id": "VHF_LOWER_LIMB.ADULT.FEMALE",
-     "structures": 128,
-     "label": "Visible Human lower limb (Denver)",
+     "body_id": "VHF_DENVER_CT.ADULT.FEMALE",
+     "structures": 184,
+     "label": "Visible Human skeleton (Denver + CT)",
      "status": "source_backed_partial",
-     "source": "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; CC BY 4.0 (University of Denver Center for Orthopaedic Biomechanics), doi:10.56902/COB.vh.2022.0; underlying images courtesy of the U.S. National Library of Medicine",
+     "source": "University of Denver manual segmentation (Andreassen et al. 2023) + TotalSegmentator on the NLM Visible Human Female CT; CC BY 4.0 / Apache-2.0",
      "stature_m": null,
-     "coverage": "pelvis to feet only",
-     "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Bones, cartilage, knee ligaments and muscles from pelvis to feet; no spine, ribs, skull or arms. Not clinically reviewed."
+     "coverage": "skeleton without forearms and hands; muscles, cartilage and ligaments pelvis to feet",
+     "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Pelvis-to-feet bones, cartilage, knee ligaments and muscles are manual segmentations (Univ. of Denver); skull, spine, ribs, sternum, clavicles, scapulae and humeri are machine-segmented from the CT (TotalSegmentator) and were checked against Denver only for femur, hip bone and sacrum. Not clinically reviewed."
     }
    ]
   },
@@ -401,14 +401,14 @@
   "pediatric_neonate_male.skeletal",
   "pediatric_neonate_male.surface",
   "pediatric_neonate_male.urinary",
-  "vhf_lower_limb_adult_female.joint",
-  "vhf_lower_limb_adult_female.muscular",
-  "vhf_lower_limb_adult_female.skeletal"
+  "vhf_denver_ct_adult_female.joint",
+  "vhf_denver_ct_adult_female.muscular",
+  "vhf_denver_ct_adult_female.skeletal"
  ],
  "light_lod": {
   "adult_male": "LOD4",
   "adult_female": "LOD4",
-  "vhf_lower_limb_adult_female": "LOD4"
+  "vhf_denver_ct_adult_female": "LOD4"
  },
  "motion": {
   "adult_male": {

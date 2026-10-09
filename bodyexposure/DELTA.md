@@ -218,7 +218,19 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
   The female spine, ribs, skull and upper limb are still open (the owner approved CT segmentation for them on 2026-10-09, PR #2303; not started).
 - **Labelled as one individual**, not an atlas: 59-year-old donor, 157 cm, 88 kg (Andreassen et al. 2023). Licence terms of the Denver collection (CC BY 4.0) and NLM (attribution, no endorsement, currency notice) were re-read from the official pages on 2026-10-10 and recorded in PROVENANCE.md.
 - **Lower-limb rig** (hip, knee, ankle; bones and cartilages bound, ligaments and muscles not): ankle hinge refined (bone overlap 6.9 → 0.6 mm left, 6.5 → 0.4 mm right). ROM animation passes the 1.5 mm contact gate (largest 1.0 mm); on the right side three movements are capped below AAOS (hip adduction 25, hip external rotation 40, ankle dorsiflexion 15) because bone contact exceeds the gate beyond those angles. Cause undetermined.
-- Not yet done: web export and app variant.
+- Web export and app variant: published the same day (#2312), then superseded by the combined variant in v013.
 - Not imported (reviewed, not needed or not usable): the NIH 3D lung and main-bronchus files (HuBMAP Visible Human Female, already in the
   adult female), the nnU-Net lung-vessel model (licence not stated in the folder), and the CT/cryosection image stacks (not meshes).
+
+
+
+## v013: Visible Human Female skeleton from CT + Denver (2026-10-10)
+
+- Segmented the Visible Human Female CT with TotalSegmentator (open `total` task), validated against Denver's manual segmentation on femur, hip bone and
+  sacrum (median 0.6 to 2.9 mm), and published 56 CT-derived bones (skull, spine, ribs, sternum, clavicles, scapulae, humeri) together with the 128 Denver structures
+  as one variant, "Visible Human skeleton (Denver + CT)", 184 structures. It replaces the lower-limb-only variant of the same day. The adult female now has a
+  complete axial skeleton and shoulder girdle for the first time; forearms and hands are still missing.
+- Every CT structure is marked `model_segmented`, unreviewed, with the exact method on the structure; 56 bones have no measured accuracy.
+- Known gaps: fragmented left ribs 6 to 8 and vertebra L2, no costal cartilage, no radius, ulna or hand bones.
+- Rig, motion and gross-anatomy gate for this body are not done.
 

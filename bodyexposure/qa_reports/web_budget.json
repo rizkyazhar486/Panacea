@@ -101,10 +101,10 @@
    "all_systems_tris": 60822
   },
   {
-   "body": "vhf_lower_limb_adult_female",
+   "body": "vhf_denver_ct_adult_female",
    "light_lod": "LOD4",
-   "initial_tris": 19972,
-   "all_systems_tris": 51864
+   "initial_tris": 19912,
+   "all_systems_tris": 51804
   }
  ],
  "ok": true
