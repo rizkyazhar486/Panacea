@@ -65,3 +65,5 @@ export { maddreyScore, MADDREY_RANGES, DF_COEFFICIENT, SEVERE_DF_THRESHOLD } fro
 export type { MaddreyInput, MaddreyResult } from './engine/maddreyScore'
 export { naegele, CYCLE_LENGTH_DAYS, LMP_YEAR, MAX_DISPLAY_GA_DAYS } from './engine/naegele'
 export type { NaegeleResult } from './engine/naegele'
+export { glasgowBlatchford, GBS_RANGES, GBS_FLAG_POINTS, bunPoints, hgbPoints, sbpPoints } from './engine/glasgowBlatchford'
+export type { GbsInput, GbsResult, GbsFlag, GbsSex } from './engine/glasgowBlatchford'
