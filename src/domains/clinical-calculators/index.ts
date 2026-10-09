@@ -69,3 +69,5 @@ export { glasgowBlatchford, GBS_RANGES, GBS_FLAG_POINTS, bunPoints, hgbPoints, s
 export type { GbsInput, GbsResult, GbsFlag, GbsSex } from './engine/glasgowBlatchford'
 export { pediatricDka, kaliumBand, hollidaySegarDailyMl, DKA_RANGES, HYPOKALEMIA_BELOW, HYPERKALEMIA_ABOVE } from './engine/pediatricDka'
 export type { DkaInput, DkaResult, DkaFluids, KBand } from './engine/pediatricDka'
+export { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, FLUID_RANGES, RESUS_SCENARIOS } from './engine/fluidElectrolytes'
+export type { ResusScenario } from './engine/fluidElectrolytes'
