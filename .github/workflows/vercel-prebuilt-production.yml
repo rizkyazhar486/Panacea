@@ -37,7 +37,8 @@ jobs:
       - name: Batch this push for the next Vercel release
         run: |
           echo "## Vercel production release" >> "$GITHUB_STEP_SUMMARY"
-          echo "Release status: **QUEUED — NOT DEPLOYED** for commit ${GITHUB_SHA}." >> "$GITHUB_STEP_SUMMARY"\n          echo "This main push was batched, not failed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Release status: **QUEUED — NOT DEPLOYED** for commit ${GITHUB_SHA}." >> "$GITHUB_STEP_SUMMARY"
+          echo "This main push was batched, not failed." >> "$GITHUB_STEP_SUMMARY"
           echo "The newest main will deploy on the next 6-hour release window." >> "$GITHUB_STEP_SUMMARY"
           echo "For an intentional immediate release, use workflow_dispatch or include \`[deploy-vercel]\` in the commit message." >> "$GITHUB_STEP_SUMMARY"
 
