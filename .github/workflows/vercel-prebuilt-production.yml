@@ -28,6 +28,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   push-policy:
@@ -41,7 +42,27 @@ jobs:
           echo "The newest main will deploy on the next 6-hour release window." >> "$GITHUB_STEP_SUMMARY"
           echo "For an intentional immediate release, use workflow_dispatch or include \`[deploy-vercel]\` in the commit message." >> "$GITHUB_STEP_SUMMARY"
 
+  release-gates:
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout release revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify exact revision acceptance
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_GATE_WAIT_SECONDS: 1200
+        run: node scripts/qa/vercel-release-gate.mjs
+
   deploy:
+    needs: release-gates
     if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -94,6 +115,12 @@ jobs:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: vercel build --prod --scope=panaceamed --token="$VERCEL_TOKEN"
 
+      - name: Recheck exact revision acceptance
+        id: release-recheck
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/qa/vercel-release-gate.mjs
+
       - name: Deploy prebuilt artifact to production
         id: deploy
         shell: bash
@@ -139,7 +166,9 @@ jobs:
         run: |
           echo "## Vercel production" >> "$GITHUB_STEP_SUMMARY"
           echo "Commit built: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.deploy.outputs.deferred }}" = "true" ]; then
+          if [ "${{ steps.release-recheck.outcome }}" != "success" ]; then
+            echo "Status: **BLOCKED — exact-revision acceptance was not established**" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.deploy.outputs.deferred }}" = "true" ]; then
             echo "Status: **DEFERRED — Vercel free daily deployment quota reached**" >> "$GITHUB_STEP_SUMMARY"
             echo "Code/build status: **valid**" >> "$GITHUB_STEP_SUMMARY"
             echo "The next scheduled or manually dispatched run will retry the newest main." >> "$GITHUB_STEP_SUMMARY"

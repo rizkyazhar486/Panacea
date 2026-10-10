@@ -1,5 +1,42 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
+### Current checkpoint — 2026-10-10, exact-revision release safety
+
+- Canonical main observed: `a5b646dfc80a30d975ec00ec7c60b407e321572f`,
+  expected-head squash of #2348. Parent is `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`;
+  tree `067d187178e9337eced666861bf92b96943d737c` equals accepted referral head
+  `976de5c2688ebe62eee2a57063ee382f7fb4893a`. All nine exact-head checks passed,
+  with independent AI technical review recorded as COMMENTED. This is engineering
+  review, not clinical approval. Canonical post-merge acceptance is still pending.
+- Independent production observation at 10:47 UTC: Render health and capabilities
+  returned HTTP 200, both reporting `a5b646dfc80a30d975ec00ec7c60b407e321572f`.
+  `verify-render-revision.mjs` passed on that canonical checkout with matching
+  server source tree `690c61d4fda615baf351ab9b24e47c3ce140af98`.
+  Render smoke run `38045865511` passed. This verifies backend revision/health,
+  not clinical behavior, real Mongo restart or configured genomics compute workers
+  (worker configured=false). Vercel push deployment was skipped/batched.
+- Active root integration outcome: exact-revision Vercel guard. Every deploy trigger
+  requires current-main acceptance/security/dependency/evidence/3D jobs, complete
+  run/job provenance and a second check after build. Missing/pending CI may be
+  observed for up to 1,200 seconds; terminal failures and ambiguous attempt order
+  block. The script has 74 passing targeted tests and independent review; final
+  combined build, CI, merge and deployment evidence remain outstanding here.
+- Ownership: root branch `fix/vercel-exact-revision-gate`; #2343/#2344 own separate
+  deployment-reporting changes in the same workflow. Re-query those PRs and preserve
+  their work during integration. Claude's anatomical assets, gait and visualization
+  branches remain untouched. No human clinical approval or patient-data operation
+  was performed in this session.
+- Next independent outcome: `fix/lab-collection-date-integrity`, local unpublished
+  head `47c7ebe2370b41a505412c8cc6d0ed6733021e2c`, based on the referral merge.
+  It rejects calendar rollover, clock overflow and ambiguous timezone-less lab
+  timestamps while preserving valid date-only/UTC forms and temporal bounds.
+  Targeted tests, server typecheck/build/full suite and six calendar tests passed;
+  final synchronized review/publication/exact-head CI/integration remain pending.
+- Remaining independent evidence gaps: real Mongo restart/reload behavior for #2347;
+  canonical post-merge/production revision checks; release-reporting PR ownership;
+  qualified clinical review. The historical checkpoints below retain their original
+  evidence and must not be treated as current repository truth.
+
 ### Current checkpoint — 2026-10-10, referral closure integrity
 
 - Baseline main: `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`; #2347's

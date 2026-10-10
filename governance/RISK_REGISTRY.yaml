@@ -6,6 +6,31 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.production_release_exact_revision
+    category: validation_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Scheduled, manual and immediate Vercel releases could deploy without passing
+      safety and acceptance evidence for the exact current-main revision.
+    mitigation: >-
+      Candidate release guard checks five workflow gates and six required jobs,
+      exact SHA/main/run/attempt provenance, complete pagination and fresh main/run
+      snapshots. Timestamp ambiguity and terminal failures block; bounded waiting
+      only observes pending/missing workflows. A credential-free prerequisite and
+      immediate post-build recheck protect every deployment path. Dependency audit
+      now runs on every main push to supply exact-revision evidence. Deterministic
+      positive/negative tests and independent technical review passed; exact-head
+      CI, integration and actual production revision verification remain required.
+      Observed CI acceptance is not an atomic release lock or clinical approval.
+    evidence:
+      - scripts/qa/vercel-release-gate.mjs
+      - scripts/qa/vercel-release-gate.test.mjs
+      - scripts/qa/vercel-release-workflow.test.mjs
+      - .github/workflows/vercel-prebuilt-production.yml
+      - .github/workflows/dependency-audit.yml
+      - docs/VERCEL_RELEASE_GATES.md
+
   - risk_id: risk.referral_linked_result_integrity
     category: patient_data_integrity
     severity: high
