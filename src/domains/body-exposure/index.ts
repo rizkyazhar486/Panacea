@@ -114,3 +114,6 @@ export {
   type ApprovalContext,
 } from './engine/structureReview'
 export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
+export { createPresentationLighting } from './adapters/studioLighting'
+export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
+export { type PresentationLighting } from './engine/presentationLighting'
