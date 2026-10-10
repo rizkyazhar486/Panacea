@@ -30,9 +30,10 @@ Fix in this PR: the last pose of the old clip is captured and blended into the n
 
 ## Not verified
 
-- **Foot sliding**: NOT VERIFIED. The clips are in place and the viewer applies no root speed. The rig has no heel/toe
-  bone, so stance is only approximated by ankle height; the WALK figure is inconclusive, the RUN figure (7 intervals) is indicative only.
+- **Foot sliding, WALK (measured, upper bound):** `check_foot_slide.py` tracks a rigid toe marker on the foot mesh of the rig in Blender. Over 3 stance phases (29 frames) the toe stays within 11 mm RMS and 30 mm at most of a straight line at one common forward speed of 1.34 m/s, which is a plausible walking speed. This is an upper bound, not the true slide: the rig has no toe or heel bone, so the rigid toe marker also rolls with the foot. The heel marker has only one 4-frame stance phase and its fit (0.49 m/s) is not reliable. Report: `qa_reports/gait_foot_slide.json`.
+- **Foot sliding, RUN: NOT VERIFIED.** Only one 3-frame heel stance phase and none at the toe were detected, too few to fit a speed.
 - Animation in a physical sense (ground reaction, centre of mass) is not modelled. The motion is CMU motion capture of one other
   person, retargeted and range-limited; it is not patient biomechanics.
+- The viewer applies no root speed to the in-place clips, so on screen the feet do move relative to the ground; the figures above say how well a root speed could remove that.
 - Real-GPU frame rate: the 48–60 fps figures come from software rendering in headless Chrome.
 - `clinically_reviewed` is false; nothing here is clinical validation.
