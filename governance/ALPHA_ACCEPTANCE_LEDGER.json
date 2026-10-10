@@ -532,12 +532,15 @@
    "pillar": "Platform Reliability",
    "criterion": "Audit dependensi menolak laporan rusak",
    "acceptance": "Gerbang audit dependensi gagal pada laporan malformed",
-   "status": "NOT_CHECKED",
+   "status": "VERIFIED",
    "evidence": [
-    "PR #2301 terbuka (milik agen lain)"
+    "Kode: scripts/qa/dependency-audit-gate.mjs (PR #2212, diperketat #2329 -> main 522c682); dijalankan .github/workflows/dependency-audit.yml untuk workspace web dan server.",
+    "Tes: scripts/qa/dependency-audit-gate.test.mjs 33/33 lulus lokal (node --test, 2026-10-10), termasuk laporan kosong, error npm, tanpa vulnerabilities/metadata, via tidak berbentuk array, hitungan ringkasan bertentangan dengan severity, advisory tak teratribusi, severity konflik/tak dikenal, kebijakan longgar.",
+    "Uji CLI lokal (Sonnet Cloud, 2026-10-10): berkas bukan JSON utuh -> exit 2; {\"error\":...} -> UNUSABLE exit 2; laporan bersih berpasangan -> OK exit 0.",
+    "Batas: yang diuji adalah penolakan bentuk laporan dan penerimaan yang kedaluwarsa; kebenaran data advisory tetap bergantung pada npm audit. Bukan penilaian klinis."
    ],
    "owner": "Sol",
-   "note": ""
+   "note": "PR #2301 tidak lagi relevan; pekerjaan mendarat lewat #2212/#2329."
   }
  ]
 }
