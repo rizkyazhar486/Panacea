@@ -417,13 +417,16 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Modul belum tervalidasi berlabel jelas",
    "acceptance": "Modul tanpa tinjauan anatomi berlabel (clinically_reviewed=false) dan tidak diklaim akurat secara klinis",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "bodyexposure/DELTA.md",
-    "manifest clinically_reviewed"
+    "manifest clinically_reviewed",
+    "Audit data independen (Sonnet Cloud, main 61938d6e0, three GLTFLoader + MeshoptDecoder atas public/bodyexposure, tanpa rig): 17.728 struktur bernama di 390 GLB; panacea_review_status = review_required pada 17.728 (100%); panacea_clinically_reviewed === true pada 0; false eksplisit 788; flag tidak ada 16.940 (dibaca sebagai belum ditinjau).",
+    "src/domains/body-exposure/engine/reviewLabel.ts + scripts/uji/body-review-label.mts (merge #2357, 0e3bab807): hanya true eksplisit tanpa review_required yang berlabel 'Clinically reviewed'; flag hilang, false, bertipe lain, atau review_required = 'Not clinically reviewed' (fail closed; 9 nilai kotor, negatif berpasangan). CanonicalBody menampilkan label ini pada panel struktur terpilih.",
+    "grep atas CanonicalBody.tsx, domains/body-exposure, dan Body3D.tsx: tidak ada teks yang mengklaim akurat/tervalidasi klinis."
    ],
    "owner": "Local",
-   "note": ""
+   "note": "Batas: terverifikasi untuk data GLB publik dan halaman kanonik Body Exposure; halaman lain (BodyHub dll.) belum diaudit teksnya. Ini label status, bukan tinjauan klinis: tidak ada struktur yang ditinjau, clinically_reviewed tetap false."
   },
   {
    "id": "D10",
