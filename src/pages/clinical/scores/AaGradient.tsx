@@ -3,7 +3,7 @@ import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 import { IconActivity } from '../../../components/icons'
-import { getDemo } from '../../../lib/profile'
+import { getDemoTersimpan } from '../../../lib/profile'
 import { aaGradient, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ export function AaGradient() {
   const [fio2, setFio2] = useState('21')
   const [pao2, setPao2] = useState('90')
   const [paco2, setPaco2] = useState('40')
-  const [age, setAge] = useState(() => String(getDemo().age || 40))
+  const [age, setAge] = useState(() => { const a = getDemoTersimpan().age; return a && a > 0 ? String(a) : '' })
   const [patm, setPatm] = useState('760')
 
   const res = aaGradient({ fio2: parseNumberField(fio2), pao2: parseNumberField(pao2), paco2: parseNumberField(paco2), age: parseNumberField(age), patm: parseNumberField(patm) })

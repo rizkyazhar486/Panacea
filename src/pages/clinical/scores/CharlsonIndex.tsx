@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { IconActivity } from '../../../components/icons'
-import { getDemo } from '../../../lib/profile'
+import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../../../domains/clinical-calculators'
@@ -18,7 +18,7 @@ import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../../../d
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CharlsonIndex() {
-  const [age, setAge] = useState(() => String(getDemo().age || 45))
+  const [age, setAge] = useState(() => { const a = getDemoTersimpan().age; return a && a > 0 ? String(a) : '' })
   const [checked, setChecked] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setChecked((c) => ({ ...c, [key]: !c[key] }))
 
