@@ -4,6 +4,7 @@
 // Validasi di batas kepercayaan: klien tidak dipercaya. Baris tidak lengkap
 // atau angka non-positif ditolak, bukan diisi nol.
 import type { CatatanSelfVitalServer, CatatanVo2Server } from './keadaanLongitudinal.js'
+import { isRealCalendarDate } from './shared/calendarDate.js'
 
 export const MAKS_SELF_VITAL = 50
 export const MAKS_VO2 = 50
@@ -76,7 +77,6 @@ export function bacaVo2maxLog(profil: Record<string, unknown> | undefined | null
   }
 }
 
-const TANGGAL = /^\d{4}-\d{2}-\d{2}$/
 export const MAKS_TIDUR = 60
 export const MAKS_MAKANAN = 200
 export const MAKS_WELLNESS = 60
@@ -132,7 +132,7 @@ export interface CatatanGpsServer {
 }
 
 function tanggalSah(v: unknown): string | null {
-  if (typeof v !== 'string' || !TANGGAL.test(v) || !Number.isFinite(Date.parse(v))) return null
+  if (typeof v !== 'string' || !isRealCalendarDate(v)) return null
   return v
 }
 

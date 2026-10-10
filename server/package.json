@@ -33,7 +33,7 @@
     "uji:product-atc": "export PANACEA_DATA_FILE=\"${TMPDIR:-/tmp}/panacea-uji-$$.json\"; tsx uji/productAtcCrosswalk.uji.ts",
     "uji:health-webhook-repro": "export PANACEA_DATA_FILE=\"${TMPDIR:-/tmp}/panacea-uji-$$.json\"; tsx uji/healthWebhookRepro.uji.ts",
     "uji:health-webhook": "export PANACEA_DATA_FILE=\"${TMPDIR:-/tmp}/panacea-uji-$$.json\"; tsx uji/healthWebhook.uji.ts && tsx uji/healthWebhookRepro.uji.ts",
-    "uji:restricted-capability": "tsx uji/restrictedCapability.uji.ts",
+    "uji:restricted-capability": "tsx uji/restrictedCapability.uji.ts && tsx uji/calendarDate.uji.ts",
     "uji:build-info": "tsx uji/buildInfo.uji.ts",
     "uji:health-alerts": "export PANACEA_DATA_FILE=\"${TMPDIR:-/tmp}/panacea-uji-$$.json\"; tsx uji/healthAlerts.uji.ts",
     "uji:alert-stamp-order": "tsx uji/alertStampOrder.uji.ts",

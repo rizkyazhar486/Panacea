@@ -1,3 +1,4 @@
+import { isRealCalendarDate } from './calendarDate.js'
 // Kerangka umum akses kapabilitas terbatas: peran + lisensi profesional + audit.
 // Netral terhadap isi kapabilitas — tidak tahu apa yang dilindungi, hanya SIAPA
 // yang boleh. Fitur riset berisiko wajib melewati gerbang ini sebelum dirilis.
@@ -44,11 +45,9 @@ export type DenyReason =
 
 export type Decision = { allow: true } | { allow: false; reason: DenyReason }
 
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
-
 function licenceProblem(l: Licence | undefined, today: string): 'not-verified' | 'expired' | null {
   if (!l || l.status !== 'verified') return 'not-verified'
-  if (!l.expiresOn || !ISO_DATE.test(l.expiresOn)) return 'expired' // tanggal hilang/rusak = tidak boleh dianggap berlaku
+  if (!l.expiresOn || !isRealCalendarDate(l.expiresOn)) return 'expired' // tanggal hilang/rusak = tidak boleh dianggap berlaku
   return l.expiresOn < today ? 'expired' : null // hari terakhir masih berlaku
 }
 
