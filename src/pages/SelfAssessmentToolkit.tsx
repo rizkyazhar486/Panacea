@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconGauge } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { waistToHeight, WAIST_CM, WHTR_HEIGHT_CM, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Self-Assessment Toolkit — four small real self-assessment tools in one
@@ -140,26 +141,34 @@ function AgingFlowchart() {
 }
 
 function WaistHeightRatio() {
-  const [waist, setWaist] = useState(80)
-  const [height, setHeight] = useState(() => getDemo().heightCm || 170)
-  const ratio = waist / height
-  const band: { label: string; tone: 'brand' | 'low' | 'critical' } =
-    ratio < 0.5 ? { label: 'Lower risk', tone: 'brand' } : ratio < 0.6 ? { label: 'Increased risk', tone: 'low' } : { label: 'High risk', tone: 'critical' }
+  // Teks mentah: kolom kosong tetap kosong (bukan 0) dan ditolak engine dengan alasan.
+  const [waist, setWaist] = useState('80')
+  const [height, setHeight] = useState(() => String(getDemo().heightCm || 170))
+  const result = waistToHeight(parseNumberField(waist), parseNumberField(height))
   return (
     <Card className="!p-5">
       <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Rasio lingkar pinggang terhadap tinggi badan — beberapa penelitian menemukan pedoman "keep your waist under half your height" lebih sederhana dan lebih baik dalam memperkirakan risiko kardiometabolik daripada IMT saja, karena ia langsung menangkap lemak pusat (viseral).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Waist circumference (cm)">
-          <input className={inputClass} type="number" min={40} max={200} value={waist} onChange={(e) => setWaist(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" min={WAIST_CM.min} max={WAIST_CM.max} value={waist} onChange={(e) => setWaist(e.target.value)} />
         </Field>
         <Field label="Height (cm)">
-          <input className={inputClass} type="number" min={100} max={230} value={height} onChange={(e) => setHeight(Number(e.target.value) || 0)} />
+          <input className={inputClass} type="number" min={WHTR_HEIGHT_CM.min} max={WHTR_HEIGHT_CM.max} value={height} onChange={(e) => setHeight(e.target.value)} />
         </Field>
       </div>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">{ratio.toFixed(2)}</div>
-        <Badge tone={band.tone}>{band.label}</Badge>
-        <div className="mt-1 text-[11px] text-neutral-500">Target: below 0.5</div>
+        {result.ok ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{result.data.ratio.toFixed(2)}</div>
+            <Badge tone={result.data.tone}>{result.data.label}</Badge>
+            <div className="mt-1 text-[11px] text-neutral-500">Target: below 0.5</div>
+          </>
+        ) : (
+          <>
+            <div className="text-sm font-bold text-ink">No result yet</div>
+            <div className="mt-1 text-[11px] text-neutral-500">{result.reason}</div>
+          </>
+        )}
       </div>
     </Card>
   )
