@@ -14,7 +14,7 @@ import argparse, glob, json, os
 ap = argparse.ArgumentParser()
 ap.add_argument("--manifest", required=True); ap.add_argument("--entry", required=True)
 ap.add_argument("--label", required=True); ap.add_argument("--coverage", default=""); ap.add_argument("--individual", default="")
-ap.add_argument("--light-lod", default="LOD4"); ap.add_argument("--source", default="", help="teks sumber untuk tampilan (bawaan: sumber dari manifest)"); ap.add_argument("--replace", default="", help="body_id de una varian lama yang digantikan (dihapus dari matriks, manifest, dan berkas web)")
+ap.add_argument("--light-lod", default="LOD4"); ap.add_argument("--motion-glb", default=""); ap.add_argument("--motion-json", default=""); ap.add_argument("--source", default="", help="teks sumber untuk tampilan (bawaan: sumber dari manifest)"); ap.add_argument("--replace", default="", help="body_id de una varian lama yang digantikan (dihapus dari matriks, manifest, dan berkas web)")
 a = ap.parse_args()
 
 new_m = json.load(open(os.path.join(a.manifest, "body_matrix.json")))["bodies"]
@@ -53,5 +53,7 @@ entry["variants"] = [v for v in entry.get("variants", []) if v["body_id"] not in
 M["files"] = sorted((set(M["files"]) | {f"{tag}.{s}" for s in systems}) - {f for f in M["files"] if old_tag and f.startswith(old_tag + ".")})
 if old_tag: M.get("light_lod", {}).pop(old_tag, None)
 M.setdefault("light_lod", {})[tag] = a.light_lod
+if a.motion_glb:  # klip gerak varian (rig + pustaka klip), dibaca pemutar lewat matrix.motion[<tag>]
+    M.setdefault("motion", {})[tag] = {"glb": a.motion_glb, "timeline": a.motion_json}
 json.dump(M, open(mp, "w"), indent=1)  # sama dengan format berkas yang ada (ASCII-escaped)
 print("REGISTERED", bid, "tag", tag, "systems", systems, "structures", nb["structures"])

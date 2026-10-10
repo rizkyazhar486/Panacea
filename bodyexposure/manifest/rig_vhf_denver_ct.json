@@ -1,0 +1,372 @@
+{
+ "body": "VHF_DENVER_CT.ADULT.FEMALE",
+ "frame": "+Z superior, +X subject left, -Y anterior, metres",
+ "joint_centres_m": {
+  "HIP.L": [
+   0.0986,
+   -0.0281,
+   0.8753
+  ],
+  "KNEE.L": [
+   0.0637,
+   -0.0041,
+   0.5022
+  ],
+  "ANKLE.L": [
+   0.028,
+   0.0133,
+   0.1291
+  ],
+  "TOE_END.L": [
+   0.0219,
+   -0.1233,
+   0.0098
+  ],
+  "HIP.R": [
+   -0.097,
+   -0.018,
+   0.875
+  ],
+  "KNEE.R": [
+   -0.0772,
+   0.0112,
+   0.5007
+  ],
+  "ANKLE.R": [
+   -0.0414,
+   0.0296,
+   0.1213
+  ],
+  "TOE_END.R": [
+   -0.055,
+   -0.1102,
+   0.0044
+  ],
+  "PELVIS_CENTRE": [
+   0.0008,
+   -0.023,
+   0.8751
+  ],
+  "SACRUM_TOP": [
+   0.0173,
+   0.0435,
+   0.9952
+  ]
+ },
+ "joint_centre_methods": {
+  "HIP.L": {
+   "method": "least-squares sphere fit on femoral-head articular cartilage",
+   "radius_mm": 23.6,
+   "rms_mm": 0.89,
+   "vertices": 8287,
+   "acetabular_sphere_centre_distance_mm": 1.2,
+   "acetabular_radius_mm": 24.6
+  },
+  "KNEE.L": {
+   "method": "midpoint of the medial and lateral extremes of the distal 60 mm of the femur along its principal mediolateral axis",
+   "width_mm": 81.5
+  },
+  "ANKLE.L": {
+   "method": "midpoint of the malleolar tips: lowest point of the most medial 8 mm of the distal tibia and of the most lateral 8 mm of the distal fibula",
+   "intermalleolar_mm": 51.7,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 13.4,
+   "max_penetration_mm": [
+    6.87,
+    0.57
+   ]
+  },
+  "TOE_END.L": {
+   "method": "most anterior vertex of the forefoot mesh"
+  },
+  "HIP.R": {
+   "method": "least-squares sphere fit on femoral-head articular cartilage",
+   "radius_mm": 22.5,
+   "rms_mm": 1.17,
+   "vertices": 11476,
+   "acetabular_sphere_centre_distance_mm": 1.1,
+   "acetabular_radius_mm": 26.3
+  },
+  "KNEE.R": {
+   "method": "midpoint of the medial and lateral extremes of the distal 60 mm of the femur along its principal mediolateral axis",
+   "width_mm": 80.0
+  },
+  "ANKLE.R": {
+   "method": "midpoint of the malleolar tips: lowest point of the most medial 8 mm of the distal tibia and of the most lateral 8 mm of the distal fibula",
+   "intermalleolar_mm": 52.3,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 17.0,
+   "max_penetration_mm": [
+    6.52,
+    0.41
+   ]
+  },
+  "TOE_END.R": {
+   "method": "most anterior vertex of the forefoot mesh"
+  },
+  "PELVIS_CENTRE": {
+   "method": "midpoint of hip joint centres"
+  },
+  "SACRUM_TOP": {
+   "method": "highest sacral vertex (pelvis bone tail)"
+  }
+ },
+ "segments_mm": {
+  "PELVIS": 138.2,
+  "THIGH.L": 375.5,
+  "SHIN.L": 375.2,
+  "FOOT.L": 181.5,
+  "THIGH.R": 375.9,
+  "SHIN.R": 381.6,
+  "FOOT.R": 182.8
+ },
+ "rom_limits_deg_local": {
+  "THIGH.L": {
+   "X": [
+    -30,
+    120
+   ],
+   "Y": [
+    -45,
+    45
+   ],
+   "Z": [
+    -30,
+    45
+   ],
+   "positive_X": "flexion",
+   "positive_Z": "abduction",
+   "positive_Y": "internal_rotation"
+  },
+  "SHIN.L": {
+   "X": [
+    0,
+    135
+   ],
+   "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "flexion"
+  },
+  "FOOT.L": {
+   "X": [
+    -20,
+    50
+   ],
+   "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "flexion"
+  },
+  "THIGH.R": {
+   "X": [
+    -30,
+    120
+   ],
+   "Y": [
+    -45,
+    45
+   ],
+   "Z": [
+    -45,
+    30
+   ],
+   "positive_X": "flexion",
+   "positive_Z": "adduction",
+   "positive_Y": "external_rotation"
+  },
+  "SHIN.R": {
+   "X": [
+    -135,
+    0
+   ],
+   "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "extension"
+  },
+  "FOOT.R": {
+   "X": [
+    -50,
+    20
+   ],
+   "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "extension"
+  }
+ },
+ "rom_source": "AAOS normal values (Greene & Heckman 1994)",
+ "flexion_axis": "knee and ankle flexion about the femoral mediolateral extreme line / intermalleolar line; hip perpendicular to the bone, anterior roll",
+ "flexion_axis_change_deg": {
+  "SHIN.L": 9.2,
+  "FOOT.L": 37.5,
+  "SHIN.R": 0.6,
+  "FOOT.R": 55.5
+ },
+ "hinge_refinement": {
+  "ANKLE.L": {
+   "shift_mm": 13.4,
+   "max_penetration_mm_isb": 6.87,
+   "max_penetration_mm_refined": 0.57
+  },
+  "ANKLE.R": {
+   "shift_mm": 17.0,
+   "max_penetration_mm_isb": 6.52,
+   "max_penetration_mm_refined": 0.41
+  }
+ },
+ "flexion_axes": {
+  "KNEE.L": [
+   0.98635,
+   -0.16354,
+   -0.01912
+  ],
+  "ANKLE.L": [
+   0.7517,
+   0.57954,
+   -0.31476
+  ],
+  "KNEE.R": [
+   -0.99997,
+   0.00668,
+   -0.00247
+  ],
+  "ANKLE.R": [
+   -0.55824,
+   0.78375,
+   -0.27223
+  ]
+ },
+ "binding": {
+  "PELVIS": 6,
+  "THIGH.L": 5,
+  "THIGH.R": 5,
+  "SHIN.L": 5,
+  "SHIN.R": 5,
+  "FOOT.L": 9,
+  "FOOT.R": 9
+ },
+ "qa": {
+  "left_right_length_difference_mm": {
+   "THIGH": 0.4,
+   "SHIN": 6.39,
+   "FOOT": 1.28
+  },
+  "joint_centre_to_articulating_bone_surface_mm": {
+   "HIP.L": {
+    "FEMUR": 20.5,
+    "HIP_BONE_OS_COXAE": 24.4
+   },
+   "HIP.R": {
+    "FEMUR": 17.7,
+    "HIP_BONE_OS_COXAE": 23.8
+   },
+   "KNEE.L": {
+    "FEMUR": 3.8,
+    "TIBIA": 19.4
+   },
+   "KNEE.R": {
+    "FEMUR": 4.8,
+    "TIBIA": 19.0
+   },
+   "ANKLE.L": {
+    "TIBIA": 28.1,
+    "TALUS": 0.4
+   },
+   "ANKLE.R": {
+    "TIBIA": 28.8,
+    "TALUS": 5.2
+   }
+  },
+  "bound_meshes": 44,
+  "meshes_considered": 108,
+  "not_rigged": [
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.LATERAL_COLLATERAL_LIGAMENT_FIBULAR_COLLATERAL.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.LATERAL_COLLATERAL_LIGAMENT_FIBULAR_COLLATERAL.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.MEDIAL_COLLATERAL_LIGAMENT_TIBIAL_COLLATERAL.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.MEDIAL_COLLATERAL_LIGAMENT_TIBIAL_COLLATERAL.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.POSTERIOR_CRUCIATE_LIGAMENT.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.JOINT.POSTERIOR_CRUCIATE_LIGAMENT.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CLAVICLE.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CLAVICLE.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HUMERUS.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HUMERUS.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_1.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_1.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_10.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_10.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_11.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_11.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_12.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_12.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_2.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_2.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_3.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_3.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_4.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_4.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_5.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_5.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_6.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_6.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_7.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_7.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_8.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_8.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_9.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_9.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SCAPULA.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SCAPULA.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SKULL_CRANIUM_AND_MANDIBLE_ONE_MESH",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.STERNUM",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C1",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C2",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C3",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C4",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C5",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C6",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C7",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L1",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L2",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L3",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L4",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L5",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T1",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T10",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T11",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T12",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T2",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T3",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T4",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T5",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T6",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T7",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T8",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T9"
+  ],
+  "not_rigged_reason": "knee ligaments span the joint and need soft skinning; muscles are not rigged; CT-derived upper-body bones (if present) are outside this lower-limb rig"
+ }
+}

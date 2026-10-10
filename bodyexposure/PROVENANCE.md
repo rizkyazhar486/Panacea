@@ -243,6 +243,11 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
 - **Not available:** radius, ulna and hand bones (only in a task that needs a commercial licence), foot and lower-leg bones beyond Denver's. The scan shows
   disrupted anatomy (fluid-filled lungs, cadaver posture); the assembled skeleton stands 1.71 m, more than the recorded 157 cm, because the donor lay supine with
   the feet extended, so no stature is shown.
+- **Motion shown for this variant:** a range-of-motion simulation (AAOS limits; truth class `simulated`) of the hip, knee and ankle, from the same rig as the lower-limb
+  body (rig rebuilt on this body; joint centres and limits are identical). Only pelvis, legs and feet move: the CT bones above the pelvis, the muscles and the
+  knee ligaments stay still and are not shown in motion mode. Right-side caps below AAOS (hip adduction 25, hip external rotation 40, ankle dorsiflexion 15 degrees)
+  carry over. No walk or run for this body (the CMU retarget is built for the male full-body rig). Reports: `manifest/rig_vhf_denver_ct.json`,
+  `qa_reports/rig_vhf_denver_ct_rom.json` (largest bone overlap 1.0 mm).
 - The CT, mask meshes and the model weights stay local; only the decimated web GLBs are published. Provenance per bone: `qa_reports/ct_segmentation_provenance.json`.
 
 ## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)

@@ -17,7 +17,7 @@ argv = sys.argv[sys.argv.index("--") + 1:]
 arg = lambda k: argv[argv.index(k) + 1]
 RIG = json.load(open(arg("--rig"))); OUT = arg("--out")
 LOWER_LIMB = "--profile" in argv and argv[argv.index("--profile") + 1] == "lower_limb"  # tungkai bawah perempuan (Denver)
-S = "VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL." if LOWER_LIMB else "ADULT.MALE.SKELETAL."
+S = (argv[argv.index("--body") + 1] if "--body" in argv else "VHF_LOWER_LIMB.ADULT.FEMALE") + ".SKELETAL." if LOWER_LIMB else "ADULT.MALE.SKELETAL."
 HINGES_LL = {"ANKLE": (["TIBIA", "FIBULA"], ["TALUS"], (-20, 50), "TOE_END", "inferior")}  # hanya pergelangan kaki: lutut/panggul tanpa penetrasi
 HINGES = HINGES_LL if LOWER_LIMB else {  # kunci: (tulang induk, tulang anak, rentang sudut [deg] dalam arah anatomis, titik distal untuk tanda)
     "ELBOW": (["HUMERUS"], ["ULNA", "RADIUS"], (0, 150), "WRIST", "anterior"),     # fleksi: tangan ke anterior

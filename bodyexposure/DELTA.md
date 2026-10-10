@@ -234,3 +234,8 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Known gaps: fragmented left ribs 6 to 8 and vertebra L2, no costal cartilage, no radius, ulna or hand bones.
 - Rig, motion and gross-anatomy gate for this body are not done.
 
+## v013b: motion for the Visible Human Female skeleton (2026-10-10)
+
+- The lower-limb ROM simulation (hip, knee, ankle; AAOS limits) now plays for the "Visible Human skeleton (Denver + CT)" variant of the adult female: 44 rigid bones and cartilages, 14 draw groups, 207 KB. Only pelvis, legs and feet move; the label says so. Contact gate 1.5 mm passes (largest 1.0 mm); right-side caps as before.
+- Rig scripts take `--body` / `--arm`, `register_variant_body.py` registers motion. Walk/run for this body is not done.
+
