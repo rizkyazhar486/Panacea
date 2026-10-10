@@ -1,0 +1,348 @@
+{
+  "scope": "reference-only web lighting; renderer identified per viewport; not hardware FPS, physical-phone or GPU memory validation",
+  "reports": [
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "loadedMs": 4110.978292,
+      "stats": "1,313 loaded · 78k triangles · 181 ms",
+      "glbRequests": 7,
+      "measured": {
+        "drawingBuffer": [
+          364,
+          523
+        ],
+        "cssSize": [
+          364,
+          523
+        ],
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "jsHeapUsedBytes": 83820558
+      },
+      "captures": [
+        {
+          "file": "390-light-standard.png",
+          "sha256": "2e6ce6a3fbdb17c1659acde624e3563174d81d41d760b79a6151c58fa5fef912",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "bf7a9418c78db708e2f2fd1017aa8e43c4bee844f74799e3e8832537889de31f"
+          }
+        },
+        {
+          "file": "390-light-studio.png",
+          "sha256": "3ed781e0715e21728f75273eb487f21ab22b6488d350556e601cf19f0c931100",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "353e745b791ad17b41916239d7ea74ad36453e77489a54c18bfcaf84e4f30d21"
+          }
+        },
+        {
+          "file": "390-light-exposure.png",
+          "sha256": "868587bd2edc4630b1890ac00d8c3a134728b15b229960257181bd76fbac6f09",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "dfa0b330e0e0fa5e4dcd59e354f89be1eb8666659ea497478fea7caa2b53bc20"
+          }
+        },
+        {
+          "file": "390-light-reset.png",
+          "sha256": "2e6ce6a3fbdb17c1659acde624e3563174d81d41d760b79a6151c58fa5fef912",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "bf7a9418c78db708e2f2fd1017aa8e43c4bee844f74799e3e8832537889de31f"
+          }
+        },
+        {
+          "file": "390-light-performance.png",
+          "sha256": "01162ac58c191fdd4876435778c84eb9513cebff5aec054447e5ba16c0fe72f9",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "24ae7c1bb3df12e50d3d13d094ab906994fac57559ed804373030d74ae625197"
+          }
+        },
+        {
+          "file": "390-light-studio-lateral.png",
+          "sha256": "6242092ec761f1a0846739607ef26d2e0d173d1ce5957226689ffde692e6281d",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "d20137118cdeac0cd42a50396a829b644cd72149edcb8322215bd5c95a76158d"
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "loadedMs": 1649.9074999999975,
+      "stats": "1,313 loaded · 78k triangles · 217 ms",
+      "glbRequests": 7,
+      "measured": {
+        "drawingBuffer": [
+          364,
+          523
+        ],
+        "cssSize": [
+          364,
+          523
+        ],
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "jsHeapUsedBytes": 52857276
+      },
+      "captures": [
+        {
+          "file": "390-dark-standard.png",
+          "sha256": "dc39b9bb21ebe5039105f8dc28e4fe5e097162a02e362ae77272b02826953732",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "6ccf7fb2de9e4cb6d45fa17901bd1df74b0141efb7e431add06ea2a1e90b8c97"
+          }
+        },
+        {
+          "file": "390-dark-studio.png",
+          "sha256": "6592f1e7d8fe970b66feb17bc364e23ee5abb0f6ee229156d0de484ed0a33a18",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "afbb963619dda2c052b8271c964039bbe4daccc92779a6055123f81175e62549"
+          }
+        },
+        {
+          "file": "390-dark-exposure.png",
+          "sha256": "4bd66e46867a17b95b2a1712f1b6dd28c6bf5dde9f1822f30c323b1bb512d9e7",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "f1987ac5c320169da6b79e7c3f0fb1f5ea1dd8f6ebb158e0156e6dc17a36bb75"
+          }
+        },
+        {
+          "file": "390-dark-reset.png",
+          "sha256": "dc39b9bb21ebe5039105f8dc28e4fe5e097162a02e362ae77272b02826953732",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "6ccf7fb2de9e4cb6d45fa17901bd1df74b0141efb7e431add06ea2a1e90b8c97"
+          }
+        },
+        {
+          "file": "390-dark-performance.png",
+          "sha256": "ffe5d4fecf56a158275021328a83c5cd67094451f8739bc9de30ba0a755c3872",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "fb29027108d562e67d2dac848415a2d850b941ae727b9f5442c21b011f42947c"
+          }
+        },
+        {
+          "file": "390-dark-studio-lateral.png",
+          "sha256": "bec46d18cde0bb3f9a8a93fbafd6c4497e6516e5b3e92cfa7e0890288a46a39f",
+          "width": 728,
+          "height": 1048,
+          "scenePixels": {
+            "height": 968,
+            "sha256": "4680ab5daf60afcc558613005f6b0be0fb41416c9ce2f7448e659be66c959bb1"
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "theme": "light",
+      "loadedMs": 1829.0339590000003,
+      "stats": "1,313 loaded · 78k triangles · 268 ms",
+      "glbRequests": 7,
+      "measured": {
+        "drawingBuffer": [
+          1414,
+          558
+        ],
+        "cssSize": [
+          1414,
+          558
+        ],
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "jsHeapUsedBytes": 53392339
+      },
+      "captures": [
+        {
+          "file": "1440-light-standard.png",
+          "sha256": "73871bfe5a9a51111932eacf2b18cbe4c082827ac0fb58f8edafeefd8b99f0db",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "68b0db14d8c735616ac4493248c029e59b4d1faa707f8b7e6ac5e747e180afad"
+          }
+        },
+        {
+          "file": "1440-light-studio.png",
+          "sha256": "2df48e0cef600e5f672395f38e8876cc32a006c015187894d5a3588c0f06f813",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "55d557f95be5fc2b98fee3cf69cfb89a7141b5963b052abc32a23ab512abb7bc"
+          }
+        },
+        {
+          "file": "1440-light-exposure.png",
+          "sha256": "479d17b06c8e9b512bec62787f900eddce44de02ee8b68648badf3a3bf84a65e",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "80f769d771e37f5261f825ad1ffec99c5857fdd4432075c65c076048d1000b89"
+          }
+        },
+        {
+          "file": "1440-light-reset.png",
+          "sha256": "001e771287ddd62390e4711c29b7e007719b6fd3ec53daf3a83ff4aae2ef380d",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "68b0db14d8c735616ac4493248c029e59b4d1faa707f8b7e6ac5e747e180afad"
+          }
+        },
+        {
+          "file": "1440-light-performance.png",
+          "sha256": "dd26c2532d5ce2e174bbcfb3577c78f62fa69cb26954470ee51a35b47f9bead9",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "d5c753837887a1c1c3c62ed3a27925376a2d0c809a05bb29c9adef52b38581b6"
+          }
+        },
+        {
+          "file": "1440-light-studio-lateral.png",
+          "sha256": "9a74d0dc70ab597de5a241da1c2a48b49b7c624f469227d99fbe45cd8ed838c4",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "b16c7fb5b2f5009e9f7f7bc1c71feeba8a9ed19ba0d95e7776bd52eb0248afc2"
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "theme": "dark",
+      "loadedMs": 1833.463499999998,
+      "stats": "1,313 loaded · 78k triangles · 221 ms",
+      "glbRequests": 7,
+      "measured": {
+        "drawingBuffer": [
+          1414,
+          558
+        ],
+        "cssSize": [
+          1414,
+          558
+        ],
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "jsHeapUsedBytes": 54089021
+      },
+      "captures": [
+        {
+          "file": "1440-dark-standard.png",
+          "sha256": "0c063d44e55376a35f33de29244eb6e175efab0ac3bc1363955b2271f4aed8a5",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "1300196b049131cd54f4793a98516a49537e65dfa5a0c4071c9ea71d1c47a94f"
+          }
+        },
+        {
+          "file": "1440-dark-studio.png",
+          "sha256": "d2595aa2c9b7965ae64365051add91f053e10e6016c83e45dbddbb5a9440d181",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "f855960c8766be82bce3e55c62593f8e69433bf5d0f8e07c4461f61b7ac60225"
+          }
+        },
+        {
+          "file": "1440-dark-exposure.png",
+          "sha256": "34836d7d6cb4a2cb1804e670fef507646edbc4ed10906a27aef75a61f3bee73a",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "34ae8fff24be776e734c3f339850ba18d31908ab7311127577a7a8d690b051af"
+          }
+        },
+        {
+          "file": "1440-dark-reset.png",
+          "sha256": "adc5c3137fdb9de6166641f0ada5f4098b4b6d8637f436db516d07a61231ada2",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "1300196b049131cd54f4793a98516a49537e65dfa5a0c4071c9ea71d1c47a94f"
+          }
+        },
+        {
+          "file": "1440-dark-performance.png",
+          "sha256": "906807b1bba08c012edc57f53ad62f7da633dcf0b7d7aed693a56d006a50a2a2",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "714557e8db76f03bc3da152a987319344b5beee2580b1544200b2d8a19f41c1a"
+          }
+        },
+        {
+          "file": "1440-dark-studio-lateral.png",
+          "sha256": "510fb0d3eea885b9d41167aa1e85bf5a9bcb4ffae36d176c1314b714a142de3e",
+          "width": 2828,
+          "height": 1118,
+          "scenePixels": {
+            "height": 1038,
+            "sha256": "9717ddbe241df43fba4c14c9103fa3de9b4a426d33d6ed989e43516a32c97ac2"
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "state": "loading-settings-preserved"
+    },
+    {
+      "state": "empty",
+      "errors": []
+    },
+    {
+      "state": "error",
+      "errors": []
+    }
+  ]
+}

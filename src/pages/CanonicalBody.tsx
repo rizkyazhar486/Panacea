@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+import { createPresentationLighting, AnatomicalLightingControls, type PresentationLighting } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
@@ -146,6 +147,8 @@ export function CanonicalBody() {
   const [qualityActive, setQualityActive] = useState<QualityPreset>(() => initialPreset(window.innerWidth, window.devicePixelRatio))
   const [fps, setFps] = useState<FrameStats | null>(null)
   const qualityRef = useRef<{ choice: QualityChoice; active: QualityPreset }>({ choice: 'auto', active: qualityActive })
+  const [lighting, setLighting] = useState<PresentationLighting>({ mode: 'standard', exposureEV: 0 })
+  const lightingRef = useRef(lighting)
 
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
@@ -160,6 +163,7 @@ export function CanonicalBody() {
     animate: ((dt: number) => boolean) | null
     motionRoot: THREE.Group
     applyQuality: (p: QualityPreset) => void
+    applyLighting: (value: PresentationLighting) => void
     /** Transisi kamera halus (berbasis waktu) ke pose; null = lompat langsung. */
     flyTo: (pose: CameraPose, durationS: number | null) => void
     /** Muatan GLB yang tiba sesudah komponen dilepas tidak punya pemilik; lihat lib/gltfSesudahLepas. */
@@ -201,9 +205,10 @@ export function CanonicalBody() {
     const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 50)
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
-    scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1410, 1.4))
-    const key = new THREE.DirectionalLight(0xfff4ea, 2.2); key.position.set(-2, 3, 3); scene.add(key)
-    const rim = new THREE.DirectionalLight(0xcfe3ff, 1.2); rim.position.set(2, 2, -3); scene.add(rim)
+    const lightRig = createPresentationLighting(scene, camera, renderer)
+    const applyLighting = (value: PresentationLighting) => {
+      if (lightRig.apply(value.mode, value.exposureEV)) dirty = true
+    }
     const root = new THREE.Group(); scene.add(root)
     // pencahayaan lingkungan studio netral (prosedural, tanpa aset luar) untuk preset ultra/balanced
     const pmrem = new THREE.PMREMGenerator(renderer)
@@ -212,7 +217,7 @@ export function CanonicalBody() {
     const applyQuality = (p: QualityPreset) => {
       renderer.setPixelRatio(effectivePixelRatio(window.devicePixelRatio, p))
       scene.environment = QUALITY_PRESETS[p].environment ? envTex : null
-      scene.environmentIntensity = 0.55
+      applyLighting(lightingRef.current)
       const w = mount.clientWidth, h = mount.clientHeight; renderer.setSize(w, h)
       dirty = true
     }
@@ -230,7 +235,7 @@ export function CanonicalBody() {
       tween = { from: poseNow(), to: pose, elapsedS: 0, durationS }; dirty = true
     }
     controls.addEventListener('start', () => { tween = null })  // sentuhan pengguna membatalkan transisi
-    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality, flyTo }
+    sceneRef.current = { renderer, camera, controls, root, groups: new Map(), byId: new Map(), invalidate, penjaga, animate: null, motionRoot, applyQuality, applyLighting, flyTo }
     applyQuality(qualityRef.current.active)
     // frame time hanya dari frame yang dirender berturut-turut (render sesuai kebutuhan: jeda bukan beban GPU)
     const samples: number[] = []
@@ -254,6 +259,7 @@ export function CanonicalBody() {
       if (!dirty) { renderedLast = false; return }
       dirty = false
       if (renderedLast) { samples.push(dt * 1000); if (samples.length > 240) samples.shift() }
+      lightRig.update(controls.target)
       renderer.render(scene, camera)
       renderedLast = true
       if (now - lastEval > 2000 && samples.length >= 30) {  // evaluasi tiap ±2 s selama ada render kontinu
@@ -299,6 +305,7 @@ export function CanonicalBody() {
     return () => {
       penjaga.lepas()
       timer.disconnect()
+      lightRig.dispose()
       envTex.dispose(); pmrem.dispose(); room.dispose()
       ro.disconnect()
       renderer.setAnimationLoop(null)
@@ -321,6 +328,11 @@ export function CanonicalBody() {
     const target = qualityChoice === 'auto' ? q.active : qualityChoice
     q.active = target; setQualityActive(target); sceneRef.current?.applyQuality(target)
   }, [qualityChoice])
+
+  useEffect(() => {
+    lightingRef.current = lighting
+    sceneRef.current?.applyLighting(lighting)
+  }, [lighting])
 
   // ── mode gerak: rig kerangka beranimasi menggantikan tampilan statis (hanya tubuh yang punya rig) ──
   const motionInfo = matrix?.motion?.[fileTag(bodyId)]
@@ -731,8 +743,7 @@ export function CanonicalBody() {
       </Card>
 
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#07080b]">
-        <div ref={mountRef} className="h-[62vh] min-h-[420px] w-full" data-testid="canonical-body-canvas" />
-        <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start gap-2">
+        <div className="flex flex-wrap items-start gap-2 border-b border-white/10 p-3" role="group" aria-label="Anatomy viewer tools" data-testid="canonical-body-tools">
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
             {(['normal', 'ghost', 'isolate'] as Mode[]).map((m) => (
               <button key={m} onClick={() => setMode(m)} aria-pressed={mode === m}
@@ -765,6 +776,7 @@ export function CanonicalBody() {
             ))}
           </div>
         </div>
+        <div ref={mountRef} className="h-[62vh] min-h-[420px] w-full" data-testid="canonical-body-canvas" />
         {measuring && (
           <div className="pointer-events-none absolute inset-x-3 bottom-12 text-center text-[12px] font-bold text-[#7ee0ff]">
             {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
@@ -838,6 +850,9 @@ export function CanonicalBody() {
                 </button>
               ))}
             </div>
+          </div>
+          <div>
+            <AnatomicalLightingControls value={lighting} onChange={update => setLighting(current => ({ ...current, ...update }))} />
           </div>
           <div>
             <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Section plane</p>
