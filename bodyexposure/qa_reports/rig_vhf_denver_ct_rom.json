@@ -123,7 +123,7 @@
   }
  ],
  "max_joint_excursion_deg": {
-  "knee": 133.0,
+  "knee": 134.6,
   "hip": 120.0
  },
  "angle_within_limits": true,
@@ -142,9 +142,9 @@
     "FEMUR.L",
     "HIP_BONE_OS_COXAE.L"
    ],
-   "max_penetration_mm": 0.77,
-   "at_frame": 397,
-   "movement": "hip external rotation"
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "hip flexion (knee flexed)"
   },
   {
    "pair": [
@@ -169,18 +169,18 @@
     "TIBIA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 0.7,
-   "at_frame": 565,
-   "movement": "ankle plantarflexion"
+   "max_penetration_mm": 4.33,
+   "at_frame": 613,
+   "movement": "ankle dorsiflexion"
   },
   {
    "pair": [
     "FIBULA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 0.0,
-   "at_frame": 1,
-   "movement": "hip flexion (knee flexed)"
+   "max_penetration_mm": 1.96,
+   "at_frame": 613,
+   "movement": "ankle dorsiflexion"
   },
   {
    "pair": [
@@ -196,9 +196,9 @@
     "FEMUR.R",
     "HIP_BONE_OS_COXAE.R"
    ],
-   "max_penetration_mm": 1.0,
-   "at_frame": 253,
-   "movement": "hip adduction"
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "hip flexion (knee flexed)"
   },
   {
    "pair": [
@@ -223,20 +223,20 @@
     "TIBIA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 0.0,
-   "at_frame": 1,
-   "movement": "hip flexion (knee flexed)"
+   "max_penetration_mm": 2.44,
+   "at_frame": 613,
+   "movement": "ankle dorsiflexion"
   },
   {
    "pair": [
     "FIBULA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 0.91,
+   "max_penetration_mm": 3.28,
    "at_frame": 613,
    "movement": "ankle dorsiflexion"
   }
  ],
- "no_new_bone_penetration": true,
- "ok": true
+ "no_new_bone_penetration": false,
+ "ok": false
 }

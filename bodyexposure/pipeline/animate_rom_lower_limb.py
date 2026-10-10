@@ -15,7 +15,9 @@ import rig_contact_qa  # noqa: E402
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 arg = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
-ROM = json.load(open(arg("--rom")))["rom_limits_deg_local"]
+_RIG = json.load(open(arg("--rom")))
+ROM = _RIG["rom_limits_deg_local"]
+NEUTRAL = _RIG.get("neutral_local_deg", {})  # sudut lokal pose netral berdiri (rig dari kadaver telentang tidak netral saat istirahat)
 OUT, REPORT = os.path.abspath(arg("--out")), arg("--report")
 arm = bpy.data.objects["RIG.VHF_LOWER_LIMB"]; P = arm.pose.bones
 FPS, SEG = 24, 36  # frame per setengah gerakan (0 → batas)
@@ -46,8 +48,9 @@ MOVES = [
 AX = {"X": 0, "Y": 1, "Z": 2}
 
 
+base = lambda bone: [math.radians(NEUTRAL.get(bone, {}).get(ax, 0.0)) for ax in "XYZ"]
 for pb in P:
-    pb.rotation_mode = 'XYZ'; pb.rotation_euler = (0, 0, 0)
+    pb.rotation_mode = 'XYZ'; pb.rotation_euler = base(pb.name)  # klip mulai dari pose NETRAL, bukan dari pose istirahat kadaver
     pb.keyframe_insert("rotation_euler", frame=1)
 frame, timeline = 1, []
 for name, parts, note in MOVES:
@@ -56,7 +59,7 @@ for name, parts, note in MOVES:
         pb = P[bone]
         sg = sign_for(bone, axis, mov)
         for f, d in ((start, 0), (peak, deg), (end, 0)):
-            e = [0.0, 0.0, 0.0]; e[AX[axis]] = math.radians(sg * d)
+            e = base(bone); e[AX[axis]] += math.radians(sg * d)
             pb.rotation_euler = e; pb.keyframe_insert("rotation_euler", frame=f)
     timeline.append({"movement": name, "frames": [start, peak, end], "target_deg": {b: d for b, _, _, d in parts}, "note": note})
     frame = end

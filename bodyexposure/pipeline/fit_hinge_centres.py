@@ -8,7 +8,7 @@ pusat troklea–kapitulum (siku) dan talus (talokrural). Di sini pusat engsel di
 (sumbu tetap garis epikondilus/maleolus), dalam kisi ±12 mm per arah (≤ 17 mm total) langkah 2 mm, untuk meminimalkan penetrasi maksimum tulang
 anak ke tulang induk di sepanjang rentang ROM AAOS. Hasil (pergeseran mm, penetrasi sebelum/sesudah) dibaca build_rig.py.
 """
-import bpy, json, math, sys
+import bpy, json, math, os, sys
 import numpy as np
 from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
@@ -16,6 +16,7 @@ from mathutils.bvhtree import BVHTree
 argv = sys.argv[sys.argv.index("--") + 1:]
 arg = lambda k: argv[argv.index(k) + 1]
 RIG = json.load(open(arg("--rig"))); OUT = arg("--out")
+CONTACT = "--metric" in argv and argv[argv.index("--metric") + 1] == "contact"
 LOWER_LIMB = "--profile" in argv and argv[argv.index("--profile") + 1] == "lower_limb"  # tungkai bawah perempuan (Denver)
 S = (argv[argv.index("--body") + 1] if "--body" in argv else "VHF_LOWER_LIMB.ADULT.FEMALE") + ".SKELETAL." if LOWER_LIMB else "ADULT.MALE.SKELETAL."
 HINGES_LL = {"ANKLE": (["TIBIA", "FIBULA"], ["TALUS"], (-20, 50), "TOE_END", "inferior")}  # hanya pergelangan kaki: lutut/panggul tanpa penetrasi
@@ -26,6 +27,14 @@ HINGES = HINGES_LL if LOWER_LIMB else {  # kunci: (tulang induk, tulang anak, re
     "WRIST": (["RADIUS", "ULNA"], ["SCAPHOID_BONE", "LUNATE_BONE", "TRIQUETRUM_BONE"], (-70, 80), "HAND_END", "anterior"),
 }
 JC = {k: np.array(v) for k, v in RIG["joint_centres_m"].items()}
+# rig dengan batas ROM bergeser (rig perempuan) memiliki rotasi 0 di LUAR batas, sehingga constraint menahan tulang di pose non-istirahat: mesh terbaca sudah
+# bergeser dari pusat sendi di manifest. Matikan semua constraint & pose agar mesh = geometri sumber (istirahat sebenarnya).
+for _o in bpy.data.objects:
+    if _o.type == 'ARMATURE':
+        for _pb in _o.pose.bones:
+            _pb.rotation_mode = 'XYZ'; _pb.rotation_euler = (0, 0, 0)
+            for _c in _pb.constraints: _c.mute = True
+bpy.context.view_layer.update()
 
 
 def mesh_world(name):
@@ -40,6 +49,8 @@ def rot(axis, deg):
 res = {}
 for side in ("L", "R"):
     for key, (parents, children, (a0, a1), distal, direction) in HINGES.items():
+        if LOWER_LIMB and key == "ANKLE":  # rentang fleksi plantar (sasaran) relatif terhadap pose istirahat kadaver: plantar_rel = plantar_abs + dorsi_istirahat
+            dr = RIG["rest_offsets_deg"][side]["ankle_dorsi"]; a0, a1 = -20 + dr, 50 + dr
         c0 = JC[f"{key}.{side}"]
         # sumbu: garis epikondilus/maleolus dari manifest rig (titik medial/lateral tidak disimpan → arah dari X lokal)
         ax = np.array(RIG["flexion_axes"][f"{key}.{side}"])
@@ -67,9 +78,37 @@ for side in ("L", "R"):
                             worst = dist
             return worst
 
+        STEP, SPAN = 0.002, 0.012
+        if CONTACT and key == "ANKLE":
+            # metrik kontak 3-sinar dua arah (sama dengan gerbang QA animasi), bukan normal-terdekat satu arah: yang kedua melewatkan tumpang tindih
+            # yang tertangkap QA (di rig perempuan, talus menembus maleolus 2,5 mm pada netral padahal fit lama melaporkan 0). Semua verteks, grid 3 mm (±9 mm), 6 sudut.
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from rig_contact_qa import inside
+            parents3 = []
+            for pn in parents:
+                V, F = mesh_world(f"{S}{pn}.{side}"); lo_, hi_ = V.min(0), V.max(0)
+                parents3.append((V, BVHTree.FromPolygons([Vector(v) for v in V], F), lo_, hi_))  # semua verteks: sampel jarang melewatkan titik tembus yang dalam dan sempit
+            CV, CF = mesh_world(f"{S}{children[0]}.{side}")
+            sub = np.arange(len(CV))
+            angles = np.linspace(a0, a1, 6)
+
+            def max_pen(c):
+                worst = 0.0
+                for ang in angles:
+                    R = rot(ax, sgn * ang); Pc = (CV - c) @ R.T + c
+                    tc = BVHTree.FromPolygons([Vector(v) for v in Pc], CF); clo, chi = Pc.min(0), Pc.max(0)
+                    for Vs, tp, lo_, hi_ in parents3:
+                        for p_ in Pc[sub]:
+                            if (p_ >= lo_).all() and (p_ <= hi_).all() and inside(tp, Vector(p_)):
+                                worst = max(worst, tp.find_nearest(Vector(p_))[3])
+                        for q_ in Vs:
+                            if (q_ >= clo).all() and (q_ <= chi).all() and inside(tc, Vector(q_)):
+                                worst = max(worst, tc.find_nearest(Vector(q_))[3])
+                return worst
+            STEP, SPAN = 0.003, 0.009
         base = max_pen(c0); best = (base, 0.0, c0)
-        for du in np.arange(-0.012, 0.0121, 0.002):
-            for dw in np.arange(-0.012, 0.0121, 0.002):
+        for du in np.arange(-SPAN, SPAN + 1e-6, STEP):
+            for dw in np.arange(-SPAN, SPAN + 1e-6, STEP):
                 c = c0 + du * u + dw * w
                 m = max_pen(c)
                 shift = math.hypot(du, dw)

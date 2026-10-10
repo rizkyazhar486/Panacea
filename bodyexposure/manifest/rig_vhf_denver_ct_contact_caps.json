@@ -1,0 +1,114 @@
+{
+ "gate_mm": 1.5,
+ "step_deg": 5,
+ "caps": {
+  "hip_flexion.L": {
+   "aaos_deg": 120,
+   "cap_deg": 120,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_flexion.R": {
+   "aaos_deg": 120,
+   "cap_deg": 120,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_extension.L": {
+   "aaos_deg": 30,
+   "cap_deg": 30,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_extension.R": {
+   "aaos_deg": 30,
+   "cap_deg": 30,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_abduction.L": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_abduction.R": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_adduction.L": {
+   "aaos_deg": 30,
+   "cap_deg": 30,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_adduction.R": {
+   "aaos_deg": 30,
+   "cap_deg": 30,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_internal_rotation.L": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_internal_rotation.R": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_external_rotation.L": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "hip_external_rotation.R": {
+   "aaos_deg": 45,
+   "cap_deg": 45,
+   "penetration_at_aaos_mm": 0.05,
+   "penetration_at_cap_mm": 0.05
+  },
+  "knee_flexion.L": {
+   "aaos_deg": 135,
+   "cap_deg": 135,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "knee_flexion.R": {
+   "aaos_deg": 135,
+   "cap_deg": 135,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "ankle_plantarflexion.L": {
+   "aaos_deg": 50,
+   "cap_deg": 50,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "ankle_plantarflexion.R": {
+   "aaos_deg": 50,
+   "cap_deg": 50,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
+  },
+  "ankle_dorsiflexion.L": {
+   "aaos_deg": 20,
+   "cap_deg": 0,
+   "penetration_at_aaos_mm": 2.81,
+   "penetration_at_cap_mm": 2.47
+  },
+  "ankle_dorsiflexion.R": {
+   "aaos_deg": 20,
+   "cap_deg": 10,
+   "penetration_at_aaos_mm": 2.25,
+   "penetration_at_cap_mm": 1.45
+  }
+ }
+}

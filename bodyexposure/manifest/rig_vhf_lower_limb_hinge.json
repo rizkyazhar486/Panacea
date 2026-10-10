@@ -8,16 +8,16 @@
     0.1405
    ],
    "refined_centre_m": [
-    0.028,
-    0.0133,
-    0.1291
+    0.0321,
+    0.0127,
+    0.1377
    ],
-   "shift_mm": 13.4,
-   "max_penetration_mm_isb": 6.87,
-   "max_penetration_mm_refined": 0.57,
+   "shift_mm": 4.2,
+   "max_penetration_mm_isb": 0.57,
+   "max_penetration_mm_refined": 0.2,
    "range_deg": [
-    -20,
-    50
+    -61.86,
+    8.14
    ]
   },
   "ANKLE.R": {
@@ -27,16 +27,16 @@
     0.1328
    ],
    "refined_centre_m": [
-    -0.0414,
-    0.0296,
-    0.1213
+    -0.0531,
+    0.0253,
+    0.1328
    ],
-   "shift_mm": 17.0,
-   "max_penetration_mm_isb": 6.52,
-   "max_penetration_mm_refined": 0.41,
+   "shift_mm": 0.0,
+   "max_penetration_mm_isb": 0.0,
+   "max_penetration_mm_refined": 0.0,
    "range_deg": [
-    -20,
-    50
+    -61.25,
+    8.75
    ]
   }
  }
