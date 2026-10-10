@@ -144,6 +144,14 @@ try {
       await page.getByTestId('motion-movement').filter({ hasText: /hip flexion/i }).waitFor()
       assert(parseInt(await page.getByTestId('motion-draws').textContent().then((t) => t.match(/(\d+)/)[1]), 10) < 200, 'female motion: rig meshes not merged')
       await page.screenshot({ path: `/private/tmp/canonical-vhf-motion-${width}-${theme}.png`, fullPage: true })
+      // WALK/RUN perempuan: gerak CMU yang dipindahkan ke rangka ini (berlabel, bukan terukur pada individu ini), kanvas bergerak, sambungan loop tertutup
+      for (const name of ['Walk', 'Run']) {
+        await page.getByRole('radio', { name, exact: true }).click()
+        await page.getByText('Recorded motion', { exact: true }).waitFor()
+        await page.getByText(/pelvis, legs and feet only/).waitFor()
+        const ga = await fc.screenshot(); await page.waitForTimeout(1200); const gb = await fc.screenshot()
+        assert(!ga.equals(gb), `female ${name}: canvas did not change while playing`)
+      }
       await page.getByRole('button', { name: 'Stop motion' }).click()
       await page.getByTestId('motion-panel').waitFor({ state: 'detached' })
       // halaman sumber & provenans statis: tautan ada, halaman termuat, tidak ada sumber luar

@@ -41,34 +41,36 @@
     ]
    },
    "clamped_samples": {
-    "ankle_dorsi.L": 27,
-    "ankle_dorsi.R": 25,
-    "knee_flex.L": 3
+    "knee_flex.L": 4,
+    "ankle_dorsi.R": 1,
+    "hip_flex.L": 1,
+    "knee_flex.R": 3,
+    "hip_flex.R": 1
    },
    "rest_offsets_deg": {
     "L": {
      "hip_flex": -3.7,
      "hip_abd": -5.3,
-     "knee_flex": -1.0,
-     "ankle_dorsi": -38.5
+     "knee_flex": -1.9,
+     "ankle_dorsi": -41.9
     },
     "R": {
      "hip_flex": -4.5,
      "hip_abd": -3.0,
-     "knee_flex": -1.7,
-     "ankle_dorsi": -37.1
+     "knee_flex": -2.6,
+     "ankle_dorsi": -41.5
     }
    },
    "coverage": "pelvis, legs and feet only",
    "leg_length_m": {
-    "rig": 0.751,
+    "rig": 0.744,
     "source": 0.809
    },
    "lowest_foot_point_m": {
     "min": -0.0,
     "max": 0.0
    },
-   "max_bone_penetration_mm": 2.17,
+   "max_bone_penetration_mm": 0.0,
    "bone_contact": [
     {
      "pair": [
@@ -111,8 +113,8 @@
       "TIBIA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.02,
-     "at_frame": 20,
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
      "movement": "walk"
     },
     {
@@ -174,8 +176,8 @@
       "FIBULA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 2.17,
-     "at_frame": 8,
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
      "movement": "walk"
     }
    ]
@@ -218,34 +220,35 @@
     ]
    },
    "clamped_samples": {
-    "ankle_dorsi.L": 14,
-    "ankle_dorsi.R": 14,
-    "hip_flex.L": 1
+    "ankle_dorsi.L": 3,
+    "hip_flex.L": 1,
+    "ankle_dorsi.R": 1,
+    "hip_flex.R": 2
    },
    "rest_offsets_deg": {
     "L": {
      "hip_flex": -3.7,
      "hip_abd": -5.3,
-     "knee_flex": -1.0,
-     "ankle_dorsi": -38.5
+     "knee_flex": -1.9,
+     "ankle_dorsi": -41.9
     },
     "R": {
      "hip_flex": -4.5,
      "hip_abd": -3.0,
-     "knee_flex": -1.7,
-     "ankle_dorsi": -37.1
+     "knee_flex": -2.6,
+     "ankle_dorsi": -41.5
     }
    },
    "coverage": "pelvis, legs and feet only",
    "leg_length_m": {
-    "rig": 0.751,
+    "rig": 0.744,
     "source": 0.861
    },
    "lowest_foot_point_m": {
     "min": 0.0,
-    "max": 0.1476
+    "max": 0.0737
    },
-   "max_bone_penetration_mm": 2.17,
+   "max_bone_penetration_mm": 0.07,
    "bone_contact": [
     {
      "pair": [
@@ -288,7 +291,7 @@
       "TIBIA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.04,
+     "max_penetration_mm": 0.07,
      "at_frame": 4,
      "movement": "run"
     },
@@ -351,8 +354,8 @@
       "FIBULA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 2.17,
-     "at_frame": 4,
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
      "movement": "run"
     }
    ]
