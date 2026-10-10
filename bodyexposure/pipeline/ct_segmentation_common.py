@@ -1,6 +1,6 @@
 """Masker TotalSegmentator (NIfTI 1,5 mm, afin diag(−1,5, −1,5, 1,5)) → mesh permukaan, dipakai validasi dan impor.
 
-Pembersihan yang diterapkan dan dilaporkan (bukan diam-diam): komponen terhubung terbesar saja (butiran liar model dibuang) dan
+Pembersihan yang diterapkan dan dilaporkan (bukan diam-diam): hanya butiran kecil (< 1 cm3) yang dibuang; pecahan yang lebih besar dipertahankan karena itu keluaran model yang didukung CT (kehilangan 15–20 % rusuk/vertebra bila hanya komponen terbesar), dan
 pemulusan Taubin 10 iterasi (λ=0,5, μ=−0,53; mempertahankan volume) untuk anak tangga voksel 1,5 mm. Koordinat keluaran: mm, +X kanan
 subjek, +Y anterior, +Z superior (kerangka CT = kerangka STL Denver hingga translasi).
 """
@@ -11,6 +11,7 @@ from scipy.ndimage import label
 from skimage.measure import marching_cubes
 
 SPACING = 1.5
+MIN_KEEP_CM3 = 1.0  # pecahan di bawah ini dibuang sebagai butiran
 
 
 def _taubin(V, F, it=10, lam=0.5, mu=-0.53):
@@ -31,7 +32,9 @@ def mask_mesh(seg_dir, name):
     lab, k = label(m)
     sizes = np.bincount(lab.ravel())[1:]
     info.update({"components": int(k), "largest_component_fraction": round(float(sizes.max() / sizes.sum()), 4)})
-    m = lab == (1 + int(sizes.argmax()))
+    keep = [j + 1 for j, n in enumerate(sizes) if n * SPACING ** 3 / 1000.0 >= MIN_KEEP_CM3 or j == int(sizes.argmax())]
+    info.update({"fragments_kept": len(keep), "specks_dropped": int(k) - len(keep)})
+    m = np.isin(lab, keep)
     V, F, _, _ = marching_cubes(m.astype(np.uint8), 0.5, spacing=(SPACING,) * 3)
     V = _taubin(V, F)
     info["volume_cm3"] = round(float(m.sum()) * SPACING ** 3 / 1000.0, 1)

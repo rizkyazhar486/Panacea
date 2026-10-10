@@ -22,6 +22,7 @@ _argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 _arg = lambda k, d=None: _argv[_argv.index(k) + 1] if k in _argv else d
 BODY_ID = _arg("--body-id", "VHF_LOWER_LIMB.ADULT.FEMALE")  # --body-id VHF_DENVER_CT.ADULT.FEMALE --ct <dir STL TotalSegmentator> → tubuh gabungan
 CT_DIR = os.path.expanduser(_arg("--ct")) if _arg("--ct") else None
+VERSION = _arg("--version", "body_v012")  # versi aset: naik bila geometri berubah (catatan tinjauan klinis lama otomatis tidak berlaku)
 PUB = "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry"
 INDIVIDUAL = ("single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); "
               "not an atlas, not a reference adult female, not patient-specific")
@@ -163,7 +164,7 @@ def main():
                 "panacea_license": LICENSE, "panacea_source_raw_name": raw[3:] if is_ct else raw,
                 "panacea_method": CT_METHOD if is_ct else "manual segmentation of the cryosections (Denver, ScanIP S-2021.06)",
                 "panacea_accuracy_status": "model_segmented" if is_ct else "source_backed", "panacea_review_status": "review_required",
-                "panacea_version": "body_v012", "biological_sex_applicability": "female", "panacea_educational_only": True,
+                "panacea_version": VERSION, "biological_sex_applicability": "female", "panacea_educational_only": True,
                 "panacea_kind": kind.lower(), "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
                 "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific." + (" The scan shows disrupted anatomy; a model can mislabel or fragment bones." if is_ct else "")}
         if raw == "Bone_Phalanges":

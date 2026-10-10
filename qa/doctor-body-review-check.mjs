@@ -28,7 +28,7 @@ try {
     await page.locator('select[aria-label="Status"]').selectOption('model')
     await page.getByLabel('Find a structure').fill('rib 5')
     await page.getByRole('button', { name: /^rib 5/i }).first().click()
-    await page.getByText(/Machine segmentation: the model output has no measured accuracy/).waitFor()
+    await page.getByText(/Machine segmentation: accuracy is unmeasured/).waitFor()
     await page.getByText(/^0 of 8 required checks done\.$/).waitFor()  // metode model: butir method_check ikut wajib
     // keputusan "confirmed" tanpa butir lengkap ditolak
     await page.getByRole('radio', { name: /Anatomy confirmed/ }).click()

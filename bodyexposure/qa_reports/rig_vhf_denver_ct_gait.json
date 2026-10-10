@@ -1,0 +1,361 @@
+{
+ "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+ "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+ "truth_class": "measured motion of another individual (CMU subject), retargeted and ROM-clamped; not patient biomechanics",
+ "clips": {
+  "WALK": {
+   "subject": "07",
+   "trial": "07_01",
+   "source_fps": 120,
+   "cycle_start_frame": 90,
+   "cycle_frames_120fps": 131,
+   "cycle_s": 1.092,
+   "frames_24fps": 27,
+   "keys_start_at_s": 0.0,
+   "loop_seam_max_deg": 0.0,
+   "loop_drift_corrected_max_deg": 4.58,
+   "joint_angle_range_deg": {
+    "hip_flex": [
+     -32.5,
+     36.4
+    ],
+    "hip_abd": [
+     -6.6,
+     5.0
+    ],
+    "knee_flex": [
+     0.0,
+     69.9
+    ],
+    "ankle_dorsi": [
+     -22.0,
+     21.3
+    ],
+    "shoulder_flex": [
+     -24.6,
+     26.0
+    ],
+    "elbow_flex": [
+     2.6,
+     48.2
+    ]
+   },
+   "clamped_samples": {
+    "ankle_dorsi.L": 27,
+    "ankle_dorsi.R": 25,
+    "knee_flex.L": 3
+   },
+   "rest_offsets_deg": {
+    "L": {
+     "hip_flex": -3.7,
+     "hip_abd": -5.3,
+     "knee_flex": -1.0,
+     "ankle_dorsi": -38.5
+    },
+    "R": {
+     "hip_flex": -4.5,
+     "hip_abd": -3.0,
+     "knee_flex": -1.7,
+     "ankle_dorsi": -37.1
+    }
+   },
+   "coverage": "pelvis, legs and feet only",
+   "leg_length_m": {
+    "rig": 0.751,
+    "source": 0.809
+   },
+   "lowest_foot_point_m": {
+    "min": -0.0,
+    "max": 0.0
+   },
+   "max_bone_penetration_mm": 2.17,
+   "bone_contact": [
+    {
+     "pair": [
+      "FEMUR.L",
+      "TIBIA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "HIP_BONE_OS_COXAE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "PATELLA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "FIBULA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.02,
+     "at_frame": 20,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FIBULA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "TIBIA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "HIP_BONE_OS_COXAE.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "PATELLA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "FIBULA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "walk"
+    },
+    {
+     "pair": [
+      "FIBULA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 2.17,
+     "at_frame": 8,
+     "movement": "walk"
+    }
+   ]
+  },
+  "RUN": {
+   "subject": "09",
+   "trial": "09_02",
+   "source_fps": 120,
+   "cycle_start_frame": 3,
+   "cycle_frames_120fps": 90,
+   "cycle_s": 0.75,
+   "frames_24fps": 19,
+   "keys_start_at_s": 0.0,
+   "loop_seam_max_deg": 0.0,
+   "loop_drift_corrected_max_deg": 12.39,
+   "joint_angle_range_deg": {
+    "hip_flex": [
+     -34.4,
+     39.8
+    ],
+    "hip_abd": [
+     -8.5,
+     13.7
+    ],
+    "knee_flex": [
+     4.9,
+     113.8
+    ],
+    "ankle_dorsi": [
+     -36.6,
+     23.1
+    ],
+    "shoulder_flex": [
+     -47.6,
+     10.3
+    ],
+    "elbow_flex": [
+     72.9,
+     129.4
+    ]
+   },
+   "clamped_samples": {
+    "ankle_dorsi.L": 14,
+    "ankle_dorsi.R": 14,
+    "hip_flex.L": 1
+   },
+   "rest_offsets_deg": {
+    "L": {
+     "hip_flex": -3.7,
+     "hip_abd": -5.3,
+     "knee_flex": -1.0,
+     "ankle_dorsi": -38.5
+    },
+    "R": {
+     "hip_flex": -4.5,
+     "hip_abd": -3.0,
+     "knee_flex": -1.7,
+     "ankle_dorsi": -37.1
+    }
+   },
+   "coverage": "pelvis, legs and feet only",
+   "leg_length_m": {
+    "rig": 0.751,
+    "source": 0.861
+   },
+   "lowest_foot_point_m": {
+    "min": 0.0,
+    "max": 0.1476
+   },
+   "max_bone_penetration_mm": 2.17,
+   "bone_contact": [
+    {
+     "pair": [
+      "FEMUR.L",
+      "TIBIA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "HIP_BONE_OS_COXAE.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.L",
+      "PATELLA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "FIBULA.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.04,
+     "at_frame": 4,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FIBULA.L",
+      "TALUS.L"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "TIBIA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "HIP_BONE_OS_COXAE.R"
+     ],
+     "max_penetration_mm": 0.02,
+     "at_frame": 14,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FEMUR.R",
+      "PATELLA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "FIBULA.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "TIBIA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 0.0,
+     "at_frame": 0,
+     "movement": "run"
+    },
+    {
+     "pair": [
+      "FIBULA.R",
+      "TALUS.R"
+     ],
+     "max_penetration_mm": 2.17,
+     "at_frame": 4,
+     "movement": "run"
+    }
+   ]
+  }
+ }
+}
