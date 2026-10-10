@@ -216,7 +216,8 @@ export function majukanRujukan(k: Konteks, a: Actor, id: string, m: MajuRujukan)
     } else {
       // Verifikasi ulang identitas dan jejak: label closed saja bukan bukti penutupan.
       const h = k.hasil.get(rec.resultId)
-      if (!h || h.id !== rec.resultId || h.tenantId !== rec.tenantId || h.patientId !== rec.patientId || h.status !== 'closed') {
+      if (!h || h.id !== rec.resultId || h.tenantId !== rec.tenantId || h.patientId !== rec.patientId || h.status !== 'closed'
+        || !Array.isArray(h.trail) || h.trail.some((e) => !e || typeof e !== 'object' || Array.isArray(e))) {
         return gagal('linked-result-invalid', 'linked result is not valid and closed')
       }
       const jejakHasil = verifyTrail(resultLifecycle, h.id, h.trail)

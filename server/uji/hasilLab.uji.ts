@@ -252,6 +252,11 @@ assert.equal(lanjut.trail.length, 1)
   const kasus: [string, ((r: HasilLabRekam) => HasilLabRekam | undefined) | undefined, ((r: RujukanRekam) => RujukanRekam)?][] = [
     ['hasil closed dengan jejak sah', undefined],
     ['label closed tanpa jejak penutupan', (r) => ({ ...r, trail: [] })],
+    ['jejak hasil hilang', (r) => ({ ...r, trail: undefined as unknown as HasilLabRekam['trail'] })],
+    ['jejak hasil null', (r) => ({ ...r, trail: null as unknown as HasilLabRekam['trail'] })],
+    ['jejak hasil bukan array', (r) => ({ ...r, trail: {} as HasilLabRekam['trail'] })],
+    ['entri jejak hasil null', (r) => ({ ...r, trail: [null] as unknown as HasilLabRekam['trail'] })],
+    ['entri jejak hasil array', (r) => ({ ...r, trail: [[]] as unknown as HasilLabRekam['trail'] })],
     ['aktor pada jejak closed diubah', (r) => ({ ...r, trail: r.trail.map((e, i) => i === 0 ? { ...e, actorId: 'penyusup' } : e) })],
     ['pasien berubah setelah hasil ditautkan', (r) => ({ ...r, patientId: 'p-B' })],
     ['tenant berubah setelah hasil ditautkan', (r) => ({ ...r, tenantId: 'klinik-lain' })],
