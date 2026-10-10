@@ -221,6 +221,40 @@ export interface RencanaJetLag {
   catatan: string[]
 }
 
+/** Rentang zona waktu nyata: UTC−12 … UTC+14. */
+export const JETLAG_TZ = { min: -12, max: 14 } as const
+/** Planner hanya menyusun persiapan sampai 4 hari (lihat rencanaJetLag). */
+export const JETLAG_HARI_SIAP = { min: 0, max: 4 } as const
+
+export type MasukanJetLagMentah = { asal: string; tujuan: string; bangun: string; siap: string }
+export type MasukanJetLag = { tzAsal: number; tzTujuan: number; jamBangunBiasa: string; hariPersiapan: number }
+export type HasilMasukanJetLag = { ok: true; masukan: MasukanJetLag } | { ok: false; problems: string[] }
+
+/**
+ * Validasi teks mentah form jet lag. Dulu kolom kosong dibaca 0 (`Number('') || 0`) dan jam bangun rusak
+ * diam-diam diganti 07:00, sehingga rencana tampil untuk zona UTC+0 yang tidak pernah diketik pengguna.
+ * Kosong / bukan angka / di luar rentang → ditolak dengan alasan; tidak ada nilai tebakan.
+ */
+export function periksaMasukanJetLag(mentah: MasukanJetLagMentah): HasilMasukanJetLag {
+  const problems: string[] = []
+  const angka = (teks: string): number => (teks.trim() === '' ? Number.NaN : Number(teks))
+  const tz = (teks: string, nama: string): number => {
+    const v = angka(teks)
+    if (!Number.isFinite(v)) problems.push(`${nama} time zone is required (a number such as 7 or −5)`)
+    else if (v < JETLAG_TZ.min || v > JETLAG_TZ.max) problems.push(`${nama} time zone must be between UTC${JETLAG_TZ.min} and UTC+${JETLAG_TZ.max}`)
+    return v
+  }
+  const tzAsal = tz(mentah.asal, 'Origin')
+  const tzTujuan = tz(mentah.tujuan, 'Destination')
+  const jam = mentah.bangun.match(/^(\d{2}):(\d{2})$/)
+  if (!jam || Number(jam[1]) > 23 || Number(jam[2]) > 59) problems.push('Usual wake time is required (HH:MM)')
+  const siap = angka(mentah.siap)
+  if (!Number.isInteger(siap)) problems.push('Preparation days must be a whole number')
+  else if (siap < JETLAG_HARI_SIAP.min || siap > JETLAG_HARI_SIAP.max) problems.push(`Preparation days must be ${JETLAG_HARI_SIAP.min}–${JETLAG_HARI_SIAP.max}`)
+  if (problems.length) return { ok: false, problems }
+  return { ok: true, masukan: { tzAsal, tzTujuan, jamBangunBiasa: mentah.bangun, hariPersiapan: siap } }
+}
+
 /**
  * Adjustment plan jam biologis dari zona waktu asal dan tujuan.
  *
