@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "records": [],
+  "note": "Review records from the doctor workspace (/doctor-review/body), added by pull request. A record approves a structure only for the exact asset version it names, only if it is a confirmed decision with every required check and only if the reviewer is in clinical_review_authorizations.json. No records exist yet."
+}

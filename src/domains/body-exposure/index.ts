@@ -99,3 +99,17 @@ export {
   type Vec3,
 } from './engine/cameraViews'
 export { mergeRigMeshes, structureAtFace, type MergeResult, type MergedRange } from './adapters/mergeRigMeshes'
+export {
+  STRUCTURE_REVIEW_CHECKLIST,
+  MAX_NOTES,
+  requiredCheckIds,
+  reviewReadiness,
+  buildReviewRecord,
+  recordApproves,
+  type StructureMethod,
+  type ReviewDecision,
+  type StructureReviewCheck,
+  type StructureReviewRecord,
+  type ReviewInput,
+  type ApprovalContext,
+} from './engine/structureReview'
