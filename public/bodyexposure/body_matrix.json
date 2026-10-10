@@ -89,7 +89,7 @@
      "status": "source_backed_partial",
      "source": "University of Denver manual segmentation (Andreassen et al. 2023) + TotalSegmentator and threshold segmentation of the NLM Visible Human Female CT; CC BY 4.0 / Apache-2.0",
      "stature_m": null,
-     "coverage": "skeleton with forearm and hand bones (hand as one mesh; right ulna incomplete); muscles, cartilage and ligaments pelvis to feet",
+     "coverage": "skeleton with forearm and hand bones (hand as one mesh; right forearm bones incomplete); muscles, cartilage and ligaments pelvis to feet",
      "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Pelvis-to-feet bones, cartilage, knee ligaments and muscles are manual segmentations (Univ. of Denver); skull, spine, ribs, sternum, clavicles, scapulae and humeri are machine-segmented from the CT (TotalSegmentator); radius, ulna and the hand bones are threshold-segmented from the native-resolution CT (algorithmic, no reference measurement). Not clinically reviewed."
     }
    ]

@@ -217472,6 +217472,524 @@
    }
   },
   {
+   "panacea_structure_id": "FETUS.DIGESTIVE.GALLBLADDER",
+   "canonical_name": "Gallbladder",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "digestive",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 9 (gallbladder)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "gallbladder",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0196,
+    -0.0178,
+    0.032
+   ],
+   "bbox_max_m": [
+    -0.0052,
+    0.001,
+    0.0496
+   ],
+   "material": "PAN_Gallbladder",
+   "mesh": {
+    "verts": 1528,
+    "tris": 3052,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.DIGESTIVE.LIVER",
+   "canonical_name": "Liver",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "digestive",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 2 (liver)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "liver",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0338,
+    -0.0314,
+    0.0306
+   ],
+   "bbox_max_m": [
+    0.0338,
+    0.0277,
+    0.0735
+   ],
+   "material": "PAN_Organ",
+   "mesh": {
+    "verts": 26154,
+    "tris": 52304,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.DIGESTIVE.STOMACH",
+   "canonical_name": "Stomach",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "digestive",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 3 (stomach)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "stomach",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0074,
+    -0.0126,
+    0.041
+   ],
+   "bbox_max_m": [
+    0.0301,
+    0.0204,
+    0.0697
+   ],
+   "material": "PAN_Intestine",
+   "mesh": {
+    "verts": 5606,
+    "tris": 11208,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
+   "canonical_name": "Adrenal gland",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "endocrine",
+   "panacea_kind": "organ",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 10 (adrenal glands)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "adrenal glands",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0105,
+    0.0165,
+    0.0517
+   ],
+   "bbox_max_m": [
+    0.0187,
+    0.0243,
+    0.0556
+   ],
+   "material": "PAN_Gland",
+   "mesh": {
+    "verts": 330,
+    "tris": 656,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
+   "canonical_name": "Adrenal gland",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "endocrine",
+   "panacea_kind": "organ",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 10 (adrenal glands)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "adrenal glands",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0151,
+    0.0143,
+    0.0509
+   ],
+   "bbox_max_m": [
+    -0.0054,
+    0.0235,
+    0.0587
+   ],
+   "material": "PAN_Gland",
+   "mesh": {
+    "verts": 564,
+    "tris": 1124,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.LYMPHATIC.SPLEEN",
+   "canonical_name": "Spleen",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "lymphatic",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 4 (spleen)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "spleen",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0122,
+    0.0082,
+    0.0494
+   ],
+   "bbox_max_m": [
+    0.032,
+    0.0271,
+    0.0669
+   ],
+   "material": "PAN_Lymph",
+   "mesh": {
+    "verts": 2254,
+    "tris": 4504,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.LYMPHATIC.THYMUS",
+   "canonical_name": "Thymus",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "lymphatic",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 8 (thymus)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "thymus",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0113,
+    -0.0181,
+    0.0838
+   ],
+   "bbox_max_m": [
+    0.0174,
+    -0.0008,
+    0.1005
+   ],
+   "material": "PAN_Lymph",
+   "mesh": {
+    "verts": 3412,
+    "tris": 6820,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.RESPIRATORY.LUNG.L",
+   "canonical_name": "Lung",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "respiratory",
+   "panacea_kind": "organ",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "lungs",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0021,
+    -0.0241,
+    0.059
+   ],
+   "bbox_max_m": [
+    0.0309,
+    0.0309,
+    0.1026
+   ],
+   "material": "PAN_Lung",
+   "mesh": {
+    "verts": 11376,
+    "tris": 22744,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.RESPIRATORY.LUNG.R",
+   "canonical_name": "Lung",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "respiratory",
+   "panacea_kind": "organ",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "lungs",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0301,
+    -0.024,
+    0.0607
+   ],
+   "bbox_max_m": [
+    0.0024,
+    0.0314,
+    0.1042
+   ],
+   "material": "PAN_Lung",
+   "mesh": {
+    "verts": 14960,
+    "tris": 29924,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.URINARY.BLADDER",
+   "canonical_name": "Bladder",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "urinary",
+   "panacea_kind": "organ",
+   "panacea_laterality": "unpaired",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 7 (bladder)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "bladder",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0092,
+    -0.0162,
+    0.0
+   ],
+   "bbox_max_m": [
+    0.0097,
+    0.0027,
+    0.0276
+   ],
+   "material": "PAN_Organ",
+   "mesh": {
+    "verts": 3618,
+    "tris": 7232,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.URINARY.RENAL_PARENCHYMA.L",
+   "canonical_name": "Renal parenchyma",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "urinary",
+   "panacea_kind": "organ",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 6 (kidney parenchyma)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "kidney parenchyma",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0089,
+    0.01,
+    0.0202
+   ],
+   "bbox_max_m": [
+    0.0271,
+    0.0295,
+    0.0518
+   ],
+   "material": "PAN_Organ",
+   "mesh": {
+    "verts": 5046,
+    "tris": 10088,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.URINARY.RENAL_PARENCHYMA.R",
+   "canonical_name": "Renal parenchyma",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "urinary",
+   "panacea_kind": "organ",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 6 (kidney parenchyma)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "kidney parenchyma",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0264,
+    0.0084,
+    0.0256
+   ],
+   "bbox_max_m": [
+    -0.0059,
+    0.0296,
+    0.0557
+   ],
+   "material": "PAN_Organ",
+   "mesh": {
+    "verts": 5330,
+    "tris": 10656,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.URINARY.RENAL_PELVIS.L",
+   "canonical_name": "Renal pelvis",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "urinary",
+   "panacea_kind": "organ",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 5 (kidney pelvis)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "kidney pelvis",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    0.0114,
+    0.0166,
+    0.0299
+   ],
+   "bbox_max_m": [
+    0.0196,
+    0.0243,
+    0.0459
+   ],
+   "material": "PAN_Duct",
+   "mesh": {
+    "verts": 812,
+    "tris": 1620,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "FETUS.URINARY.RENAL_PELVIS.R",
+   "canonical_name": "Renal pelvis",
+   "panacea_body_id": "FETUS",
+   "panacea_system": "urinary",
+   "panacea_kind": "organ",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 5 (kidney pelvis)",
+   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
+   "panacea_source_raw_name": "kidney pelvis",
+   "panacea_accuracy_status": "source_backed",
+   "panacea_review_status": "review_required",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
+   "panacea_version": "body_v014",
+   "biological_sex_applicability": "unspecified",
+   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
+   "panacea_clinically_reviewed": false,
+   "bbox_min_m": [
+    -0.0196,
+    0.0144,
+    0.0317
+   ],
+   "bbox_max_m": [
+    -0.0098,
+    0.0243,
+    0.0495
+   ],
+   "material": "PAN_Duct",
+   "mesh": {
+    "verts": 960,
+    "tris": 1916,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
    "panacea_structure_id": "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ACETABULAR_ARTICULAR_CARTILAGE.L",
    "canonical_name": "Acetabular articular cartilage",
    "panacea_body_id": "VHF_DENVER_CT.ADULT.FEMALE",
@@ -221604,14 +222122,14 @@
     0.9101
    ],
    "bbox_max_m": [
-    0.2145,
-    -0.0309,
-    1.0858
+    0.2107,
+    -0.0493,
+    1.0535
    ],
    "material": "PAN_Bone",
    "mesh": {
-    "verts": 96709,
-    "tris": 193978,
+    "verts": 94134,
+    "tris": 188824,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -222277,13 +222795,13 @@
    ],
    "bbox_max_m": [
     0.2556,
-    0.047,
-    1.2073
+    0.0469,
+    1.1994
    ],
    "material": "PAN_Bone",
    "mesh": {
-    "verts": 29836,
-    "tris": 59780,
+    "verts": 29499,
+    "tris": 59102,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -222303,7 +222821,7 @@
    "panacea_review_status": "review_required",
    "panacea_method": "threshold segmentation (HU > 250, distance-transform watershed, label propagation along the shaft) of the native-resolution Visible Human Female CT (0.72 x 0.72 x 1.0 mm), Taubin-smoothed; algorithmic, not a trained model and not manual; not reviewed. Accuracy was not measured against a reference. Script segment_ct_forearm_hand.py, report qa_reports/vhf_forearm_hand.json",
    "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific. The scan shows disrupted anatomy; a model can mislabel or fragment bones.",
-   "panacea_qa_note": "The proximal end reaches the humerus; the elbow joint surface is ragged where the cortex is thin and was not smoothed over.",
+   "panacea_qa_note": "Proximal end is INCOMPLETE: the recovered bone stops 21.8 mm short of the humerus. In the CT the right arm is cut by the edge of the scanned block (flat lateral boundary of the soft tissue in the axial slices) and the bone runs out of the image there; see qa_reports/vhf_right_forearm_slices.png. The missing part is not in the data and is not reconstructed.",
    "panacea_version": "body_v014",
    "biological_sex_applicability": "female",
    "panacea_individual": "single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); not an atlas, not a reference adult female, not patient-specific",
@@ -222315,13 +222833,13 @@
    ],
    "bbox_max_m": [
     -0.1769,
-    0.066,
-    1.211
+    0.0513,
+    1.1724
    ],
    "material": "PAN_Bone",
    "mesh": {
-    "verts": 29812,
-    "tris": 59748,
+    "verts": 23506,
+    "tris": 47032,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -223568,19 +224086,19 @@
    "panacea_individual": "single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); not an atlas, not a reference adult female, not patient-specific",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
-    0.2072,
-    -0.0592,
+    0.1995,
+    -0.06,
     1.0493
    ],
    "bbox_max_m": [
     0.2538,
-    0.0729,
-    1.2059
+    0.0728,
+    1.2
    ],
    "material": "PAN_Bone",
    "mesh": {
-    "verts": 32063,
-    "tris": 64262,
+    "verts": 33574,
+    "tris": 67280,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -223600,7 +224118,7 @@
    "panacea_review_status": "review_required",
    "panacea_method": "threshold segmentation (HU > 250, distance-transform watershed, label propagation along the shaft) of the native-resolution Visible Human Female CT (0.72 x 0.72 x 1.0 mm), Taubin-smoothed; algorithmic, not a trained model and not manual; not reviewed. Accuracy was not measured against a reference. Script segment_ct_forearm_hand.py, report qa_reports/vhf_forearm_hand.json",
    "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific. The scan shows disrupted anatomy; a model can mislabel or fragment bones.",
-   "panacea_qa_note": "Proximal end is INCOMPLETE: the recovered bone stops 44.0 mm short of the humerus. Near the elbow the bone touches a thin bright artefact along the skin surface of the CT block, which the segmentation removes together with thin cortex.",
+   "panacea_qa_note": "Proximal end is INCOMPLETE: the recovered bone stops 64.4 mm short of the humerus. In the CT the right arm is cut by the edge of the scanned block (flat lateral boundary of the soft tissue in the axial slices) and the bone runs out of the image there; see qa_reports/vhf_right_forearm_slices.png. The missing part is not in the data and is not reconstructed.",
    "panacea_version": "body_v014",
    "biological_sex_applicability": "female",
    "panacea_individual": "single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); not an atlas, not a reference adult female, not patient-specific",
@@ -223612,13 +224130,13 @@
    ],
    "bbox_max_m": [
     -0.1939,
-    0.0467,
-    1.1482
+    0.0414,
+    1.1273
    ],
    "material": "PAN_Bone",
    "mesh": {
-    "verts": 16733,
-    "tris": 33506,
+    "verts": 15455,
+    "tris": 30950,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -224507,524 +225025,6 @@
    "mesh": {
     "verts": 5224,
     "tris": 10448,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.DIGESTIVE.GALLBLADDER",
-   "canonical_name": "Gallbladder",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "digestive",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 9 (gallbladder)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "gallbladder",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0196,
-    -0.0178,
-    0.032
-   ],
-   "bbox_max_m": [
-    -0.0052,
-    0.001,
-    0.0496
-   ],
-   "material": "PAN_Gallbladder",
-   "mesh": {
-    "verts": 1528,
-    "tris": 3052,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.DIGESTIVE.LIVER",
-   "canonical_name": "Liver",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "digestive",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 2 (liver)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "liver",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0338,
-    -0.0314,
-    0.0306
-   ],
-   "bbox_max_m": [
-    0.0338,
-    0.0277,
-    0.0735
-   ],
-   "material": "PAN_Organ",
-   "mesh": {
-    "verts": 26154,
-    "tris": 52304,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.DIGESTIVE.STOMACH",
-   "canonical_name": "Stomach",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "digestive",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 3 (stomach)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "stomach",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0074,
-    -0.0126,
-    0.041
-   ],
-   "bbox_max_m": [
-    0.0301,
-    0.0204,
-    0.0697
-   ],
-   "material": "PAN_Intestine",
-   "mesh": {
-    "verts": 5606,
-    "tris": 11208,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
-   "canonical_name": "Adrenal gland",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "endocrine",
-   "panacea_kind": "organ",
-   "panacea_laterality": "left",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 10 (adrenal glands)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "adrenal glands",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0105,
-    0.0165,
-    0.0517
-   ],
-   "bbox_max_m": [
-    0.0187,
-    0.0243,
-    0.0556
-   ],
-   "material": "PAN_Gland",
-   "mesh": {
-    "verts": 330,
-    "tris": 656,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
-   "canonical_name": "Adrenal gland",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "endocrine",
-   "panacea_kind": "organ",
-   "panacea_laterality": "right",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 10 (adrenal glands)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "adrenal glands",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0151,
-    0.0143,
-    0.0509
-   ],
-   "bbox_max_m": [
-    -0.0054,
-    0.0235,
-    0.0587
-   ],
-   "material": "PAN_Gland",
-   "mesh": {
-    "verts": 564,
-    "tris": 1124,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.LYMPHATIC.SPLEEN",
-   "canonical_name": "Spleen",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "lymphatic",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 4 (spleen)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "spleen",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0122,
-    0.0082,
-    0.0494
-   ],
-   "bbox_max_m": [
-    0.032,
-    0.0271,
-    0.0669
-   ],
-   "material": "PAN_Lymph",
-   "mesh": {
-    "verts": 2254,
-    "tris": 4504,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.LYMPHATIC.THYMUS",
-   "canonical_name": "Thymus",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "lymphatic",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 8 (thymus)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "thymus",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0113,
-    -0.0181,
-    0.0838
-   ],
-   "bbox_max_m": [
-    0.0174,
-    -0.0008,
-    0.1005
-   ],
-   "material": "PAN_Lymph",
-   "mesh": {
-    "verts": 3412,
-    "tris": 6820,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.RESPIRATORY.LUNG.L",
-   "canonical_name": "Lung",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "respiratory",
-   "panacea_kind": "organ",
-   "panacea_laterality": "left",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "lungs",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0021,
-    -0.0241,
-    0.059
-   ],
-   "bbox_max_m": [
-    0.0309,
-    0.0309,
-    0.1026
-   ],
-   "material": "PAN_Lung",
-   "mesh": {
-    "verts": 11376,
-    "tris": 22744,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.RESPIRATORY.LUNG.R",
-   "canonical_name": "Lung",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "respiratory",
-   "panacea_kind": "organ",
-   "panacea_laterality": "right",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "lungs",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0301,
-    -0.024,
-    0.0607
-   ],
-   "bbox_max_m": [
-    0.0024,
-    0.0314,
-    0.1042
-   ],
-   "material": "PAN_Lung",
-   "mesh": {
-    "verts": 14960,
-    "tris": 29924,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.URINARY.BLADDER",
-   "canonical_name": "Bladder",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "urinary",
-   "panacea_kind": "organ",
-   "panacea_laterality": "unpaired",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 7 (bladder)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "bladder",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0092,
-    -0.0162,
-    0.0
-   ],
-   "bbox_max_m": [
-    0.0097,
-    0.0027,
-    0.0276
-   ],
-   "material": "PAN_Organ",
-   "mesh": {
-    "verts": 3618,
-    "tris": 7232,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.URINARY.RENAL_PARENCHYMA.L",
-   "canonical_name": "Renal parenchyma",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "urinary",
-   "panacea_kind": "organ",
-   "panacea_laterality": "left",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 6 (kidney parenchyma)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "kidney parenchyma",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0089,
-    0.01,
-    0.0202
-   ],
-   "bbox_max_m": [
-    0.0271,
-    0.0295,
-    0.0518
-   ],
-   "material": "PAN_Organ",
-   "mesh": {
-    "verts": 5046,
-    "tris": 10088,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.URINARY.RENAL_PARENCHYMA.R",
-   "canonical_name": "Renal parenchyma",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "urinary",
-   "panacea_kind": "organ",
-   "panacea_laterality": "right",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 6 (kidney parenchyma)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "kidney parenchyma",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0264,
-    0.0084,
-    0.0256
-   ],
-   "bbox_max_m": [
-    -0.0059,
-    0.0296,
-    0.0557
-   ],
-   "material": "PAN_Organ",
-   "mesh": {
-    "verts": 5330,
-    "tris": 10656,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.URINARY.RENAL_PELVIS.L",
-   "canonical_name": "Renal pelvis",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "urinary",
-   "panacea_kind": "organ",
-   "panacea_laterality": "left",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 5 (kidney pelvis)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "kidney pelvis",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    0.0114,
-    0.0166,
-    0.0299
-   ],
-   "bbox_max_m": [
-    0.0196,
-    0.0243,
-    0.0459
-   ],
-   "material": "PAN_Duct",
-   "mesh": {
-    "verts": 812,
-    "tris": 1620,
-    "boundary_edges": 0,
-    "nonmanifold_edges": 0
-   }
-  },
-  {
-   "panacea_structure_id": "FETUS.URINARY.RENAL_PELVIS.R",
-   "canonical_name": "Renal pelvis",
-   "panacea_body_id": "FETUS",
-   "panacea_system": "urinary",
-   "panacea_kind": "organ",
-   "panacea_laterality": "right",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 5 (kidney pelvis)",
-   "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
-   "panacea_source_raw_name": "kidney pelvis",
-   "panacea_accuracy_status": "source_backed",
-   "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
-   "biological_sex_applicability": "unspecified",
-   "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
-   "panacea_clinically_reviewed": false,
-   "bbox_min_m": [
-    -0.0196,
-    0.0144,
-    0.0317
-   ],
-   "bbox_max_m": [
-    -0.0098,
-    0.0243,
-    0.0495
-   ],
-   "material": "PAN_Duct",
-   "mesh": {
-    "verts": 960,
-    "tris": 1916,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }

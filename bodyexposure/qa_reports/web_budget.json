@@ -109,9 +109,10 @@
   {
    "body": "vhf_denver_ct_adult_female",
    "light_lod": "LOD4",
-   "initial_tris": 19648,
-   "all_systems_tris": 51540
+   "initial_tris": 19594,
+   "all_systems_tris": 51486
   }
  ],
+ "failures": [],
  "ok": true
 }
