@@ -4,8 +4,8 @@ Branch: `codex/cinematic-render-qa`, based on `e7792290`.
 
 ## Ownership and integration
 
-Only the new `pipeline/render_cinematic.py`, this handoff and its QA evidence are owned
-by this change. Claude's viewer, physiology, CT segmentation, provenance and ontology
+The `pipeline/render_cinematic.py`, this handoff, its QA evidence and
+`qa/validate-cinematic-reports.mjs` are owned by this branch. Claude's viewer, physiology, CT segmentation, provenance and ontology
 work remain in their existing worktrees. Cherry-pick the commit after reviewing it;
 no shared working-tree files need replacement. No merge or push is performed here.
 
@@ -90,3 +90,51 @@ depth and SHA-256 hashes were independently checked for all nine committed image
 Anterior/lateral skeleton and layered master frames were visually inspected.
 No frontend files changed, so frontend build/browser tests were not run for this
 pipeline-only increment. HDR lighting and GPU success paths remain untested.
+
+## Camera-relative studio lighting increment
+
+`--lighting studio` adds neutral disk-shaped area key/fill/rim lights. Light
+positions and diameters scale with world-space stature; wattage scales with its
+square to preserve similar illumination at different body sizes. Camera-relative
+placement supports existing anatomical views. Geometry and tissue materials are
+not edited. The temporary rig, exposure and world are restored between captures;
+each new report records restoration checks, actual wattage, size and position.
+Existing licensed HDR input is retained when supplied.
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender -b /absolute/path/to/PANACEA_HUMAN_MASTER_v011.blend \
+  -P bodyexposure/pipeline/render_cinematic.py -- \
+  --out bodyexposure/qa_reports/cinematic-studio-balanced \
+  --lighting studio --compare --compare-mode lighting --samples 32 --time-limit 30
+
+node qa/validate-cinematic-reports.mjs bodyexposure/qa_reports/cinematic-studio-balanced
+```
+
+`--compare-mode lighting` holds sampling settings and denoising fixed, rendering
+the original lighting/exposure first, then the studio rig. Studio exposure defaults
+to −1.5 EV; `--exposure` overrides it. In a lighting comparison this override
+affects only the studio capture. In the default quality comparison it applies to
+both captures. Original lighting remains the default for backward compatibility.
+The time cap and adaptive sampler can produce different actual sample counts;
+the JSON records sample **limits**, not measured per-pixel sample counts.
+
+v011 CPU result at 960×540 / 32-sample limit: original 27.605 s, studio 30.059 s.
+These timings include cache/synchronization effects. Actual evidence is in
+`qa_reports/cinematic-studio-balanced/`. The initial 0 EV capture was visually
+too bright; it remains recoverable under
+`/tmp/panacea-lighting-diagnostics.fatnGq/initial-zero-ev` and is not included in git.
+The balanced capture was visually inspected; this is a lighting iteration, not
+measured photorealism or anatomical validation.
+
+The reusable Node verifier checks PNG signatures, hashes, dimensions, 16-bit depth,
+review-inventory totals, paired lighting comparisons, matching sampling settings,
+positive finite light parameters and restoration flags where recorded. Both
+anterior and lateral skeleton views test multi-view temporary-state restoration.
+Non-finite `--exposure nan` was rejected by Blender with exit code 2 before output
+creation. Studio lighting has been tested on CPU; GPU/HDR combinations and 8K
+production acceptance remain untested.
+
+Final code passed a two-view CPU smoke render using factory startup and the
+cleaned skeleton. Fifteen committed captures passed the reusable verifier;
+JavaScript syntax and Git whitespace checks passed. No package installations or
+frontend changes were needed for this increment.
