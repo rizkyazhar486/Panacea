@@ -37,7 +37,7 @@ jobs:
       - name: Batch this push for the next Vercel release
         run: |
           echo "## Vercel production release" >> "$GITHUB_STEP_SUMMARY"
-          echo "Release status: **QUEUED — NOT DEPLOYED** for commit `${GITHUB_SHA}`." >> "$GITHUB_STEP_SUMMARY"\n          echo "This main push was batched, not failed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Release status: **QUEUED — NOT DEPLOYED** for commit ${GITHUB_SHA}." >> "$GITHUB_STEP_SUMMARY"\n          echo "This main push was batched, not failed." >> "$GITHUB_STEP_SUMMARY"
           echo "The newest main will deploy on the next 6-hour release window." >> "$GITHUB_STEP_SUMMARY"
           echo "For an intentional immediate release, use workflow_dispatch or include \`[deploy-vercel]\` in the commit message." >> "$GITHUB_STEP_SUMMARY"
 
@@ -171,7 +171,7 @@ jobs:
               "workflow_run": os.environ["WORKFLOW_RUN_URL"],
           }
           Path(os.environ["EVIDENCE_PATH"]).write_text(
-              json.dumps(record, indent=2) + "\\n", encoding="utf-8"
+              json.dumps(record, indent=2) + chr(10), encoding="utf-8"
           )
           print(json.dumps(record))
           PY
