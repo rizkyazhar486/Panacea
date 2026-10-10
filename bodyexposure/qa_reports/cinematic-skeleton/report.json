@@ -1,0 +1,81 @@
+{
+  "source_blend": "/Users/rizkyazhar/Documents/Panaceamed.id/bodyexposure/body_v001_skeleton_cleaned.blend",
+  "blender_version": "5.2.2 LTS",
+  "profile": "preview",
+  "benchmark": "body-qa",
+  "device_backend": "CPU",
+  "devices": [],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 277,
+    "source_polygons": 701812,
+    "meshes_without_uv": 229,
+    "meshes_without_material": 6,
+    "review_status_counts": {
+      "unspecified": 277
+    }
+  },
+  "renders": [
+    {
+      "variant": "before",
+      "path": "body-qa_c0_preview_before.png",
+      "sha256": "35956dbbffd5e1ac47486e0d1907b0705b2b07ff95bb9b51b8a1e1d5450d0528",
+      "render_seconds": 0.612,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": false,
+      "denoising": false
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c0_preview_after.png",
+      "sha256": "ea0255c6390f91efa68a27015d4c81ecb5d356b700399595279ddcc1f0606081",
+      "render_seconds": 1.679,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true
+    },
+    {
+      "variant": "before",
+      "path": "body-qa_c1_preview_before.png",
+      "sha256": "a0826bf5af1bcec48940c2ec5dae8bad34c6cce87f1a683165d75cf19e166aa1",
+      "render_seconds": 0.28,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": false,
+      "denoising": false
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c1_preview_after.png",
+      "sha256": "859009309dfd9b7c0ebb0b751b4db215c036c819920f357ca7446fbdfecfd6b9",
+      "render_seconds": 1.314,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation, browser FPS or memory measurement performed.",
+    "Before/after isolates adaptive sampling and denoising at identical sample limits."
+  ]
+}
