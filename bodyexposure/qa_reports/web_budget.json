@@ -23,6 +23,12 @@
    "all_systems_tris": 133412
   },
   {
+   "body": "atlas_nervous_mni152",
+   "light_lod": "LOD4",
+   "initial_tris": 68859,
+   "all_systems_tris": 200462
+  },
+  {
    "body": "fetus",
    "light_lod": "LOD3",
    "initial_tris": 6022,

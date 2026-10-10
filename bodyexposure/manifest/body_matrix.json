@@ -257,6 +257,18 @@
    "structures": 0,
    "verts": 0,
    "systems": {}
+  },
+  {
+   "variants": [],
+   "redistribution": null,
+   "body_id": "ATLAS.NERVOUS.MNI152",
+   "status": "placeholder",
+   "source": null,
+   "frame": null,
+   "source_requirement": "Template atlas in MNI152 space (not a body): needs the Clinical Neuroanatomy Atlas public data release.",
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
   }
  ]
 }

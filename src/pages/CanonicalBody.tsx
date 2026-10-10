@@ -66,11 +66,13 @@ const BODY_LABEL: Record<string, string> = {
   'PEDIATRIC.CHILD': 'Child',
   'PEDIATRIC.ADOLESCENT': 'Adolescent',
   'HUMAN.OLDER_ADULT': 'Older adult',
+  'ATLAS.NERVOUS.MNI152': 'Nervous atlas (MNI)',
 }
 const SYSTEM_LABEL: Record<string, string> = {
   surface: 'Skin', skeletal: 'Bones', joint: 'Joints', muscular: 'Muscles', fascia: 'Fascia',
   cardiovascular: 'Heart & vessels', nervous: 'Nervous', respiratory: 'Respiratory', digestive: 'Digestive',
   urinary: 'Urinary', endocrine: 'Endocrine', reproductive: 'Reproductive', lymphatic: 'Lymphatic', sensory: 'Eye & ear',
+  tracts: 'White-matter tracts', peripheral: 'Cranial & peripheral nerves', territories: 'Arterial territories', spinal: 'Spinal cord',
 }
 // arah dispersi per sistem (kolom lateral, kelipatan tinggi tubuh): P_disp = P0 + d · E · w
 // orientasi tidak berubah; E = 0 mengembalikan setiap struktur tepat ke posisi anatomisnya
@@ -87,6 +89,9 @@ const PEEL_LAYER: Record<string, number> = { surface: 0, fascia: 1, muscular: 1,
 const PEEL_LABELS = ['All layers', 'Skin removed', 'Muscle & fascia removed', 'Bones removed']
 
 const DEFAULT_ON = new Set(['surface', 'skeletal', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'reproductive'])
+// modul atlas saraf (ruang template MNI, bukan tubuh individu): yang tampil awal hanya parenkim saraf pusat (pembuluh, jaras, saraf tepi dan teritori menyusul saat dinyalakan) (gerbang check_web_budget.py membaca himpunan ini)
+const ATLAS_ON = new Set(['nervous'])
+const defaultSystems = (entry: string) => (entry.startsWith('ATLAS.') ? ATLAS_ON : DEFAULT_ON)
 
 // ID tubuh → awalan berkas (HUMAN.ADULT.MALE → adult_male)
 // label varian: pakai label eksplisit dari matriks bila ada (mis. dewasa: sumber), selain itu
@@ -720,7 +725,7 @@ export function CanonicalBody() {
                 aria-selected={b.body_id === entryId}
                 disabled={!available}
                 title={available ? undefined : b.redistribution ?? b.source_requirement ?? 'Source data required'}
-                onClick={() => { if (available) { setEntryId(b.body_id); setVariantId(null) } }}
+                onClick={() => { if (available) { setEntryId(b.body_id); setVariantId(null); setEnabled(new Set(defaultSystems(b.body_id))) } }}
                 className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-bold transition ${b.body_id === entryId ? 'border-brand bg-brand text-white' : available ? 'border-neutral-500/30 bg-neutral-500/10' : 'cursor-not-allowed border-dashed border-neutral-500/30 opacity-55'}`}
               >
                 {BODY_LABEL[b.body_id] ?? b.body_id}
