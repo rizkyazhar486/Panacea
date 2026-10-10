@@ -389,13 +389,14 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "WALK/RUN: selip kaki terukur dan dalam batas terdokumen",
    "acceptance": "Selip kaki diukur dari rig dan berada dalam kriteria teknis yang ditetapkan",
-   "status": "NOT_CHECKED",
+   "status": "REPORTED",
    "evidence": [
     "bodyexposure/qa_reports/gait_foot_slide.json (WALK tumit RMS 24,5 mm; RUN belum terverifikasi)",
-    "Basis ukur yang ada (bodyexposure/qa_reports/gait_foot_slide.json, dari Local, belum direproduksi): WALK tumit 1 fase tumpu / 4 bingkai, RMS 24,5 mm, maks 32,5 mm; WALK jari 3 fase / 29 bingkai, RMS 11,2 mm; RUN tumit 1 fase / 3 bingkai, RMS 0,6 mm; RUN jari 0 fase tumpu (tidak terukur)"
+    "Basis ukur yang ada (bodyexposure/qa_reports/gait_foot_slide.json, dari Local, belum direproduksi): WALK tumit 1 fase tumpu / 4 bingkai, RMS 24,5 mm, maks 32,5 mm; WALK jari 3 fase / 29 bingkai, RMS 11,2 mm; RUN tumit 1 fase / 3 bingkai, RMS 0,6 mm; RUN jari 0 fase tumpu (tidak terukur)",
+    "src/domains/body-exposure/engine/gaitFootMetrics.ts + scripts/uji/body-gait-foot-metrics.mts: penilaian selip terhadap kriteria eksplisit (placeholder penelitian RMS ≤ 15 mm, maks ≤ 30 mm, ≥ 3 fase tumpu; bukan dari literatur, bukan tervalidasi klinis). Atas data qa_reports yang ada: WALK jari DALAM kriteria; WALK tumit, RUN tumit (masing-masing 1 fase) dan RUN jari (0 fase) TIDAK TERUKUR. Asimetri kiri-kanan (|L−R| dan 100·|L−R|/mean(|L|,|R|)) tersedia, belum ada data kiri/kanan terpisah dari rig."
    ],
    "owner": "Local",
-   "note": "Ambang lulus belum ditetapkan siapa pun, jadi tidak ada angka yang bisa dinilai lulus atau gagal; status tetap NOT_CHECKED. Statistik tipis: WALK tumit hanya 1 fase tumpu dan RUN jari 0 fase. Keputusan yang dibutuhkan dari Local/Sol: ambang RMS dan maks (mm) per klip, serta jumlah minimum fase tumpu agar sebuah ukuran dianggap sah."
+   "note": "Kriteria kini terdokumen sebagai placeholder penelitian yang bisa diatur, jadi satu ukuran (WALK jari) dapat dinilai; tiga ukuran lain tidak terukur karena fase tumpu terlalu sedikit. Tidak VERIFIED: angka basis belum direproduksi independen dan RUN tidak terukur. Keputusan pemilik: tetapkan atau ganti ambang, dan perbaiki penanda tumit/jari (rig tanpa tulang tumit/jari) atau tambah fase tumpu."
   },
   {
    "id": "D8",
