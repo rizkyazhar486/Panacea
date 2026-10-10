@@ -25,9 +25,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | Status | Jumlah |
 |---|---|
 | VERIFIED | 11 |
-| REPORTED | 7 |
+| REPORTED | 10 |
 | NOT_CHECKED | 14 |
-| NOT_STARTED | 10 |
+| NOT_STARTED | 7 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
@@ -50,9 +50,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 |---|---|---|---|---|---|
 | B1 | Aturan evaluasi penutupan hasil (model murni) | Hasil tertutup hanya bila bukti dicatat orang; bukti sistem tidak menutup; penyebut nol = tidak terukur | VERIFIED | Sonnet | PR #2310 (merge 2ba5c734d); scripts/qa/result-closure.test.mjs: 17 tes, 24 mutan terbunuh; Hanya model; belum terhubung ke backend atau UI. |
 | B2 | Penyimpanan hasil lab persisten di server | Hasil yang diterima tetap ada setelah restart; PostgreSQL bila kompatibel dengan infrastruktur repo | NOT_STARTED | Sol | Menunggu kontrak data dari Sol. |
-| B3 | State hasil received→pending_review→reviewed→communicated→closed | Transisi hanya sesuai urutan; transisi tak sah ditolak dengan alasan | NOT_STARTED | Sol | Menunggu kontrak data dari Sol. |
-| B4 | Setiap perubahan status diaudit | Setiap transisi mencatat pelaku, peran, waktu, dan status sebelum/sesudah; log tidak dapat diubah oleh pelaku | NOT_STARTED | Sol | Menunggu kontrak data dari Sol. |
-| B5 | RBAC pada hasil | Hanya peran berwenang dan pasien sendiri yang membaca; peran/tenant lain ditolak (tes negatif) | NOT_STARTED | Sol | Menunggu kontrak data dari Sol. |
+| B3 | State hasil received→pending_review→reviewed→communicated→closed | Transisi hanya sesuai urutan; transisi tak sah ditolak dengan alasan | REPORTED | Sol | src/domains/clinical-operations/model/resultLifecycle.ts; scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi); Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir. |
+| B4 | Setiap perubahan status diaudit | Setiap transisi mencatat pelaku, peran, waktu, dan status sebelum/sesudah; log tidak dapat diubah oleh pelaku | REPORTED | Sol | src/domains/clinical-operations/model/resultLifecycle.ts; scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi); Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir. |
+| B5 | RBAC pada hasil | Hanya peran berwenang dan pasien sendiri yang membaca; peran/tenant lain ditolak (tes negatif) | REPORTED | Sol | src/domains/clinical-operations/model/resultLifecycle.ts; scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi); Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir. |
 | B6 | Lifecycle rujukan terpisah | Rujukan memiliki state, transisi, dan audit sendiri | NOT_STARTED | Sol | Menunggu kontrak data dari Sol. |
 | B7 | UI tinjauan klinisi atas hasil | Klinisi dapat meninjau hasil dan mengubah state lewat API; UI memakai kontrak backend | NOT_STARTED | Sonnet (setelah kontrak tersedia) | Menunggu kontrak data dari Sol. |
 | B8 | Komunikasi hasil ke pasien tercatat | Pengiriman penjelasan tercatat sebagai bukti oleh orang, bukan notifikasi otomatis | NOT_STARTED | Sol/Sonnet | Menunggu kontrak data dari Sol. |

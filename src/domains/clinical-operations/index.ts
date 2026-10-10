@@ -61,3 +61,18 @@ export {
   type ResultClosureState,
   type ResultInvalidReason,
 } from './model/resultClosure'
+
+export {
+  RESULT_STATUSES,
+  canReadResult,
+  transitionResult,
+  verifyResultAuditTrail,
+  type AuditTrailIssue,
+  type ResultActor,
+  type ResultActorRole,
+  type ResultAuditEntry,
+  type ResultStatus,
+  type TransitionInput,
+  type TransitionRejection,
+  type TransitionResult,
+} from './model/resultLifecycle'
