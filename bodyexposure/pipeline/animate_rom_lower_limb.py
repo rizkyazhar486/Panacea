@@ -31,19 +31,16 @@ def sign_for(bone, axis, movement):
     return 1 if ROM[bone][f"positive_{axis}"] == movement else -1
 
 
-MOVES = [
+MOVES = [  # semua sasaran = nilai AAOS penuh dari pose NETRAL; batas yang dibatasi kontak dibuktikan ada oleh scan_contact_limits.py (tidak ada pada rig ini)
     ("hip flexion (knee flexed)", [("THIGH.L", "X", "flexion", 120), ("SHIN.L", "X", "flexion", 120), ("THIGH.R", "X", "flexion", 120), ("SHIN.R", "X", "flexion", 120)], "AAOS hip 120, knee flexed"),
     ("hip extension", [("THIGH.L", "X", "extension", 30), ("THIGH.R", "X", "extension", 30)], "AAOS 30"),
     ("hip abduction", [("THIGH.L", "Z", "abduction", 45), ("THIGH.R", "Z", "abduction", 45)], "AAOS 45"),
-    ("hip adduction", [("THIGH.L", "Z", "adduction", 30), ("THIGH.R", "Z", "adduction", 25)],
-     "AAOS 30; right side 25: femur meets the right hip bone 4.0 mm deep at 30 degrees but 1.0 mm at 25 (left side clear at 30). Cause not determined (donor anatomy or right hip-centre error)"),
+    ("hip adduction", [("THIGH.L", "Z", "adduction", 30), ("THIGH.R", "Z", "adduction", 30)], "AAOS 30"),
     ("hip internal rotation", [("THIGH.L", "Y", "internal_rotation", 45), ("THIGH.R", "Y", "internal_rotation", 45)], "AAOS 45"),
-    ("hip external rotation", [("THIGH.L", "Y", "external_rotation", 45), ("THIGH.R", "Y", "external_rotation", 40)],
-     "AAOS 45; right side 40: femur meets the right hip bone 2.9 mm deep at 45 degrees but 0.4 mm at 40 (left side 0.8 at 45). Cause not determined"),
+    ("hip external rotation", [("THIGH.L", "Y", "external_rotation", 45), ("THIGH.R", "Y", "external_rotation", 45)], "AAOS 45"),
     ("knee flexion", [("SHIN.L", "X", "flexion", 135), ("SHIN.R", "X", "flexion", 135)], "AAOS 135"),
     ("ankle plantarflexion", [("FOOT.L", "X", "flexion", 50), ("FOOT.R", "X", "flexion", 50)], "AAOS 50"),
-    ("ankle dorsiflexion", [("FOOT.L", "X", "extension", 20), ("FOOT.R", "X", "extension", 15)],
-     "AAOS 20; right side 15: fibula meets the right talus 2.2 mm deep at 20 degrees but 0.9 mm at 15 (left side clear at 20). Cause not determined"),
+    ("ankle dorsiflexion", [("FOOT.L", "X", "extension", 20), ("FOOT.R", "X", "extension", 20)], "AAOS 20"),
 ]
 AX = {"X": 0, "Y": 1, "Z": 2}
 

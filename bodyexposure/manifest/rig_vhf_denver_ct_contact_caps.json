@@ -89,8 +89,8 @@
   "ankle_plantarflexion.L": {
    "aaos_deg": 50,
    "cap_deg": 50,
-   "penetration_at_aaos_mm": 0.0,
-   "penetration_at_cap_mm": 0.0
+   "penetration_at_aaos_mm": 0.24,
+   "penetration_at_cap_mm": 0.24
   },
   "ankle_plantarflexion.R": {
    "aaos_deg": 50,
@@ -100,15 +100,15 @@
   },
   "ankle_dorsiflexion.L": {
    "aaos_deg": 20,
-   "cap_deg": 0,
-   "penetration_at_aaos_mm": 2.81,
-   "penetration_at_cap_mm": 2.47
+   "cap_deg": 20,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
   },
   "ankle_dorsiflexion.R": {
    "aaos_deg": 20,
-   "cap_deg": 10,
-   "penetration_at_aaos_mm": 2.25,
-   "penetration_at_cap_mm": 1.45
+   "cap_deg": 20,
+   "penetration_at_aaos_mm": 0.0,
+   "penetration_at_cap_mm": 0.0
   }
  }
 }

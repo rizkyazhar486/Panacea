@@ -52,9 +52,9 @@
    ],
    "target_deg": {
     "THIGH.L": 30,
-    "THIGH.R": 25
+    "THIGH.R": 30
    },
-   "note": "AAOS 30; right side 25: femur meets the right hip bone 4.0 mm deep at 30 degrees but 1.0 mm at 25 (left side clear at 30). Cause not determined (donor anatomy or right hip-centre error)"
+   "note": "AAOS 30"
   },
   {
    "movement": "hip internal rotation",
@@ -78,9 +78,9 @@
    ],
    "target_deg": {
     "THIGH.L": 45,
-    "THIGH.R": 40
+    "THIGH.R": 45
    },
-   "note": "AAOS 45; right side 40: femur meets the right hip bone 2.9 mm deep at 45 degrees but 0.4 mm at 40 (left side 0.8 at 45). Cause not determined"
+   "note": "AAOS 45"
   },
   {
    "movement": "knee flexion",
@@ -117,13 +117,13 @@
    ],
    "target_deg": {
     "FOOT.L": 20,
-    "FOOT.R": 15
+    "FOOT.R": 20
    },
-   "note": "AAOS 20; right side 15: fibula meets the right talus 2.2 mm deep at 20 degrees but 0.9 mm at 15 (left side clear at 20). Cause not determined"
+   "note": "AAOS 20"
   }
  ],
  "max_joint_excursion_deg": {
-  "knee": 134.6,
+  "knee": 134.0,
   "hip": 120.0
  },
  "angle_within_limits": true,
@@ -169,18 +169,18 @@
     "TIBIA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 4.33,
-   "at_frame": 613,
-   "movement": "ankle dorsiflexion"
+   "max_penetration_mm": 0.24,
+   "at_frame": 541,
+   "movement": "ankle plantarflexion"
   },
   {
    "pair": [
     "FIBULA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 1.96,
-   "at_frame": 613,
-   "movement": "ankle dorsiflexion"
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "hip flexion (knee flexed)"
   },
   {
    "pair": [
@@ -196,9 +196,9 @@
     "FEMUR.R",
     "HIP_BONE_OS_COXAE.R"
    ],
-   "max_penetration_mm": 0.0,
-   "at_frame": 1,
-   "movement": "hip flexion (knee flexed)"
+   "max_penetration_mm": 0.05,
+   "at_frame": 397,
+   "movement": "hip external rotation"
   },
   {
    "pair": [
@@ -223,20 +223,20 @@
     "TIBIA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 2.44,
-   "at_frame": 613,
-   "movement": "ankle dorsiflexion"
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "hip flexion (knee flexed)"
   },
   {
    "pair": [
     "FIBULA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 3.28,
-   "at_frame": 613,
-   "movement": "ankle dorsiflexion"
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "hip flexion (knee flexed)"
   }
  ],
- "no_new_bone_penetration": false,
- "ok": false
+ "no_new_bone_penetration": true,
+ "ok": true
 }
