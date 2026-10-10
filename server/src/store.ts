@@ -96,6 +96,9 @@ export interface Clinical {
   tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
   /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
   kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
+  /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
+  hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
+  rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
 }
 
 export interface VisitMembership {
@@ -869,6 +872,21 @@ export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHas
   save()
 }
 export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+/** Port penyimpanan modul labResults: tulis lewat save() sehingga ikut berkas/Mongo yang sama. */
+export function repoHasilLab() {
+  return {
+    get: (id: string) => ensureClinical().hasilLab?.[id],
+    put: (rec: import('./modules/labResults/service/labResultsService.js').HasilLabRekam) => { (ensureClinical().hasilLab ??= {})[rec.id] = rec; save() },
+    all: () => Object.values(ensureClinical().hasilLab ?? {}),
+  }
+}
+export function repoRujukan() {
+  return {
+    get: (id: string) => ensureClinical().rujukanKlinis?.[id],
+    put: (rec: import('./modules/labResults/service/labResultsService.js').RujukanRekam) => { (ensureClinical().rujukanKlinis ??= {})[rec.id] = rec; save() },
+    all: () => Object.values(ensureClinical().rujukanKlinis ?? {}),
+  }
+}
 export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
 export function getRecordHistory(patientId: string, recordId?: string): any[] {
   return daftarRiwayatEncounter(ensureClinical(), patientId, recordId)
