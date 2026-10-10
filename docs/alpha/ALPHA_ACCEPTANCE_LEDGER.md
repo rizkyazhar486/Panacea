@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 18 / 43 = 41.9%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 19 / 43 = 44.2%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,8 +24,8 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 18 |
-| REPORTED | 7 |
+| VERIFIED | 19 |
+| REPORTED | 6 |
 | NOT_CHECKED | 14 |
 | NOT_STARTED | 3 |
 | BLOCKED | 0 |
@@ -70,12 +70,12 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang terpisah; tidak menghentikan pekerjaan teknis. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |
 
-## Body Exposure Alpha (3 / 10)
+## Body Exposure Alpha (4 / 10)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
 | D1 | Viewer 3D merender semua panel | Check wajib Body 3D Render Acceptance hijau pada main | VERIFIED | Sol (CI) / Local | Workflow organ-3d-acceptance.yml; hijau pada main 4b2009a1f |
-| D2 | Pemuatan GLB valid | GLB dewasa laki-laki dan LOD memuat tanpa error halaman | REPORTED | Local | bodyexposure/qa_reports/web_budget.json; bodyexposure/qa_reports/gait_visual_browser.json (page_errors: []); Laporan ada; belum direproduksi independen oleh Cloud. |
+| D2 | Pemuatan GLB valid | GLB dewasa laki-laki dan LOD memuat tanpa error halaman | VERIFIED | Local | bodyexposure/qa_reports/web_budget.json; bodyexposure/qa_reports/gait_visual_browser.json (page_errors: []); Reproduksi independen (Sonnet Cloud, scripts/qa/glb-load-all.mjs, main d050d3c9f): 382 GLB di public/bodyexposure didekode (three + meshopt) tanpa galat — 20.454 mesh, 6.757.490 segitiga, 62,5 MB; tanpa mesh kosong, tanpa koordinat bukan-hingga (sampel). Kontrol negatif: GLB terpotong dan GLB berkepala salah sama-sama gagal dengan nama berkas dan pesan; Halaman kanonik memuat 77 berkas tanpa galat halaman di 390×844 dan 1440×900, tema terang/gelap (lihat D5); Laporan ada; belum direproduksi independen oleh Cloud. Yang diverifikasi adalah keterbacaan/dekode semua GLB publik, bukan kebenaran anatomi, dan bukan kinerja pada GPU nyata. |
 | D3 | Anatomi seluruh tubuh dewasa laki-laki lulus gerbang kasar | gross_adult_male lulus | REPORTED | Local | bodyexposure/qa_reports/gross_adult_male.json; Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gross-reproduce.py, dari GLB publik LOD3 tanpa Blender): 3877 struktur, 3403 berpasangan (sama dengan laporan Local); hati x=-0,012, limpa +0,085, lambung +0,038; kaki y=-0,0004 m. Lateralitas: 6 pelanggaran pada metrik bbox-center, 5 di antaranya ≤2,1 mm dari garis tengah (artefak metrik kasar) dan 1 (VAGUS_NERVE_X.R, +20 mm) setara satu pengecualian terdokumen Local; Direproduksi sebagian saja (lateralitas, sisi organ, kaki). Interpenetrasi, rongga iga, dan kranium belum direproduksi, jadi tetap REPORTED. |
 | D4 | Rangka perempuan (Visible Human/Denver) lulus gerbang kasar | gross_vhf_denver_ct lulus; lisensi CC BY 4.0 tercatat | REPORTED | Local | bodyexposure/qa_reports/gross_vhf_denver_ct.json; bodyexposure/PROVENANCE.md (lisensi dibaca 2026-10-10) |
 | D5 | Layer visibility dan navigasi dasar | Orbit, pilih mesh, dan layer dapat dioperasikan lewat uji browser | VERIFIED | Sonnet (verifikasi) / Local | qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK; Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual); Cakupan asersi: pencarian→pilih struktur→panel provenans, mode isolate, potongan sagittal, dispersi sistem, kupas lapisan kulit→otot→tulang, ukur dua titik, preset kamera, ganti tubuh; Verifikasi fungsional; kecepatan bingkai di sandbox (5–7 fps, tanpa GPU) bukan penilaian performa. |
