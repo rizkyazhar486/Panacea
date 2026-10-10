@@ -6,6 +6,22 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.referral_linked_result_integrity
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Referral closure trusted a linked result's closed label even when its audit
+      trail contradicted that label or its patient/tenant identity changed after linking.
+    mitigation: >-
+      The closure guard rechecks result id, patient, tenant and a complete hash-chained
+      lifecycle ending in closed. Paired regressions cover a legitimate closed result,
+      forged status, altered audit actor, identity drift, missing result and an open result;
+      rejected closure preserves both records. Engineering validation does not certify
+      clinical workflow rules or establish clinical approval. Exact-head CI, review,
+      integration and deployment evidence are required before release closure.
+    evidence: [server/src/modules/labResults/service/labResultsService.ts, server/uji/hasilLab.uji.ts, docs/alpha/LAB_REFERRAL_API_CONTRACT.md]
+
   - risk_id: risk.respiratory_source_identity
     category: anatomy_provenance
     severity: high
