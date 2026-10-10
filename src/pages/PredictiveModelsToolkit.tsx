@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconGauge } from '../components/icons'
-import { getDemo } from '../lib/profile'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19,7 +18,8 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 type Tab = 'autophagy' | 'cortisol' | 'sauna' | 'nova' | 'glycemic' | 'healthspan'
 
 function AutophagyTiming() {
-  const [weightKg, setWeightKg] = useState(() => getDemo().weightKg || 70)
+  // Tidak ada kolom berat: rumus di bawah tidak memakainya. Kolom yang tampak
+  // menentukan hasil padahal tidak (dulu bernilai 70 kg dari getDemo()) menipu.
   const [bodyFatPct, setBodyFatPct] = useState(20)
   const [lastMealHoursAgo, setLastMealHoursAgo] = useState(2)
   // Illustrative model: glycogen stores ~ liver glycogen (~100-120g) depleted
@@ -34,7 +34,6 @@ function AutophagyTiming() {
   return (
     <Card className="!p-5">
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} /></Field>
         <Field label="Body fat %"><input className={inputClass} type="number" value={bodyFatPct} onChange={(e) => setBodyFatPct(Number(e.target.value) || 0)} /></Field>
         <Field label="Hours since last meal"><input className={inputClass} type="number" value={lastMealHoursAgo} onChange={(e) => setLastMealHoursAgo(Number(e.target.value) || 0)} /></Field>
       </div>
