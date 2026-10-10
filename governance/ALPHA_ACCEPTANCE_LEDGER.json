@@ -310,10 +310,11 @@
    "acceptance": "gross_adult_male lulus",
    "status": "REPORTED",
    "evidence": [
-    "bodyexposure/qa_reports/gross_adult_male.json"
+    "bodyexposure/qa_reports/gross_adult_male.json",
+    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gross-reproduce.py, dari GLB publik LOD3 tanpa Blender): 3877 struktur, 3403 berpasangan (sama dengan laporan Local); hati x=-0,012, limpa +0,085, lambung +0,038; kaki y=-0,0004 m. Lateralitas: 6 pelanggaran pada metrik bbox-center, 5 di antaranya ≤2,1 mm dari garis tengah (artefak metrik kasar) dan 1 (VAGUS_NERVE_X.R, +20 mm) setara satu pengecualian terdokumen Local"
    ],
    "owner": "Local",
-   "note": ""
+   "note": "Direproduksi sebagian saja (lateralitas, sisi organ, kaki). Interpenetrasi, rongga iga, dan kranium belum direproduksi, jadi tetap REPORTED."
   },
   {
    "id": "D4",
