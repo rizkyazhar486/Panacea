@@ -26,6 +26,7 @@ export const GROUPS = [
       { to: '/chatbot', name: 'Ask Health', kw: 'health question ai clinical assistant' },
       { to: '/emr', name: 'AI-EMR', kw: 'medical record longitudinal care documentation' },
       { to: '/doctor-review', name: 'Doctor Review Checklist', kw: 'doctor human review checklist clinical notes provenance safety' },
+      { to: '/doctor-review/lab-results', name: 'Lab Result Review', kw: 'lab result review queue clinician communicate close backend audit' },
       { to: '/doctor-review/body', name: 'Body Structure Review', kw: 'doctor review checklist anatomy body structure clinical review ledger body exposure' },
       { to: '/clinical-calculators', name: 'Calculators & Lab', kw: 'calculator laboratory clinical score' },
       { to: '/learn', name: 'Learn & Look Up', kw: 'learn lookup study reference' },
@@ -160,6 +161,15 @@ export function ClinicalHub() {
               className="mt-4 flex min-h-[48px] items-center justify-between border-y border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
             >
               <span>Doctor Review Checklist</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review/lab-results"
+              className="flex min-h-[48px] items-center justify-between border-b border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Lab Result Review</span>
               <span aria-hidden>→</span>
             </Link>
           )}
