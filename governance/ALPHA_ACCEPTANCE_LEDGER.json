@@ -345,13 +345,16 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Rangka perempuan (Visible Human/Denver) lulus gerbang kasar",
    "acceptance": "gross_vhf_denver_ct lulus; lisensi CC BY 4.0 tercatat",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "bodyexposure/qa_reports/gross_vhf_denver_ct.json",
-    "bodyexposure/PROVENANCE.md (lisensi dibaca 2026-10-10)"
+    "bodyexposure/PROVENANCE.md (lisensi dibaca 2026-10-10)",
+    "Reproduksi independen (Sonnet Cloud, scripts/qa/glb-skeleton-check.mjs, main a68b6faf5) pada GLB publik vhf_denver_ct_adult_female.skeletal.LOD4.glb (84 struktur, tanpa Blender): 7/7 pemeriksaan lulus — lateralitas 56 struktur berpasangan 0 pelanggaran; kolumna C1..L5 (24 ruas) berurutan atas-ke-bawah (C1 y=1,556 m, L5 y=1,002 m); tengkorak di atas C1 (1,610 > 1,556); sakrum di bawah L5 (0,945 < 1,002); 12 iga tiap sisi; sternum di depan T6 (z 0,055 > -0,054); kaki di lantai (min y -0,0008 m). Nilai selaras dengan laporan Local (C1 1,555, L5 0,999, sakrum 0,955)",
+    "Kontrol negatif (salinan GLB yang dirusak): iga 12 kiri diganti nama → gagal 'dua_belas_iga_tiap_sisi'; nama C1 dan L5 ditukar → gagal 'kolumna_vertebralis_atas_ke_bawah'; sakrum dihapus → gagal 'sakrum_di_bawah_l5'",
+    "Lisensi CC BY 4.0 (University of Denver, doi:10.56902/COB.vh.2022.0) tercatat pada 736 struktur (audit provenans D8, main 7190a6c72)"
    ],
    "owner": "Local",
-   "note": ""
+   "note": " Pemeriksaan kasar posisi/jumlah, bukan akurasi segmentasi (tidak ada ground truth Dice). GLB publik LOD4 memuat 84 struktur rangka (56 berpasangan); laporan Local mencakup 156 pasangan dari berkas .blend — selisih cakupan, bukan selisih hasil. Tidak diklaim akurat secara klinis; clinically_reviewed tetap false."
   },
   {
    "id": "D5",
