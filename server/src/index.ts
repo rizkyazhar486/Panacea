@@ -843,9 +843,10 @@ const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientI
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   addAudit(u, 'clinical.read')
-  const c = getClinical()
+  // Hasil lab dan rujukan hanya keluar lewat rute RBAC modul labResults, bukan lewat simpanan klinis mentah.
+  const { hasilLab: _hl, rujukanKlinis: _rk, ...c } = getClinical()
   // Hash kode tautan tidak pernah keluar dari server.
-  const { kodeTaut: _k, hasilLab: _hl, rujukanKlinis: _rk, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
+  const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
   res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
