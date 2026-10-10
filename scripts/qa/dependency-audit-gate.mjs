@@ -89,6 +89,11 @@ export function evaluateAudit({ audit, workspace, policy, now }) {
     if (!entry || typeof entry !== 'object' || Array.isArray(entry) || !Array.isArray(entry.via)) {
       return unusable(`vulnerability for ${name} must be an object with a via array`)
     }
+    // A reported blocking package cannot coexist with a zero count for its severity.
+    // Check before attribution/acceptance, including npm's transitive string links.
+    if (['high', 'critical'].includes(entry.severity) && summary[entry.severity] === 0) {
+      return unusable(`vulnerability for ${name} has ${entry.severity} severity that contradicts summary count zero`)
+    }
     for (const item of entry.via) {
       // npm represents indirect dependency links as package names.
       if (typeof item === 'string' && item.trim()) continue
@@ -100,8 +105,35 @@ export function evaluateAudit({ audit, workspace, policy, now }) {
       }
       const pkg = item.name ?? name
       const id = advisoryId(item)
-      advisories.set(`${pkg}|${id}`, { pkg, id, severity: item.severity, title: item.title ?? '', range: item.range ?? '' })
+      const key = `${pkg}|${id}`
+      const previous = advisories.get(key)
+      if (previous && previous.severity !== item.severity) {
+        return unusable(`advisory for ${pkg} ${id} has conflicting severities`)
+      }
+      advisories.set(key, { pkg, id, severity: item.severity, title: item.title ?? '', range: item.range ?? '' })
     }
+  }
+
+  // npm links indirect vulnerabilities by package name. Attribute each reported
+  // blocking package independently; another accepted package is not its evidence.
+  for (const [name, entry] of Object.entries(vulnerabilities)) {
+    if (!['high', 'critical'].includes(entry.severity)) continue
+    const pending = [name]
+    const visited = new Set()
+    let attributed = false
+    while (pending.length) {
+      const linked = pending.pop()
+      if (visited.has(linked)) continue
+      visited.add(linked)
+      if (!Object.hasOwn(vulnerabilities, linked)) {
+        return unusable(`vulnerability for ${name} has no attributable ${entry.severity} advisory: missing dependency ${linked}`)
+      }
+      for (const item of vulnerabilities[linked].via) {
+        if (typeof item === 'string') pending.push(item)
+        else if (item.severity === entry.severity) attributed = true
+      }
+    }
+    if (!attributed) return unusable(`vulnerability for ${name} has no attributable ${entry.severity} advisory`)
   }
 
   const blocking = [...advisories.values()].filter((a) => policy.fail_on.includes(a.severity))
