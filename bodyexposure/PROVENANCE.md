@@ -229,17 +229,26 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   such as `appendicular_bones` were not used), nnunetv2 2.8.1, torch 2.14.1, device MPS. Citation: Wasserthal J et al., Radiology: Artificial Intelligence
   2023, doi:10.1148/ryai.230024. Usage statistics reporting was switched off in the tool's config after the first start (that first run may have sent one count).
 - **Input:** Denver "Aligned CT-DICOM" (NLM Visible Human Female CT), 1,727 slices, 0.7227 mm in plane, 1 mm slice spacing (stated in the tags). The files
-  are not in Hounsfield units: the stored values were mapped as HU = value - 1024, an offset **inferred** from the intensity peaks (air about 0, fat about 920,
-  soft tissue about 1,030), not stated in the files. Resampled to 1.5 mm isotropic before inference (a full-resolution run exhausted memory). Orientation was
+  are not in Hounsfield units: the stored values were mapped as HU = value - 1024. That mapping is verified (`pipeline/check_ct_hu_calibration.py`,
+  `qa_reports/ct_hu_calibration.json`): room air outside the body measures -997 to -1000 HU on four slices (air is -1000 HU by definition), and the fat
+  and soft-tissue histogram peaks sit at -110 and +30 HU, 140 HU apart, as expected. Liver +36 and aorta +43 HU are plausible for this donor. This
+  is not a phantom calibration; the scale is checked at two points (air, and fat against soft tissue). Resampled to 1.5 mm isotropic before inference
+  (a full-resolution run exhausted memory; a native-resolution crop run later gave no better result, see below). Orientation was
   read from the images (heart on the image right, spine posterior, slice 0 at the feet).
-- **Cleaning:** largest connected component per bone; Taubin smoothing (10 iterations). Transform from CT to the Denver frame: ICP on the left femur
+- **Cleaning:** specks under 1 cm3 are dropped; every larger fragment is kept (keeping only the largest piece threw away 15 to 20 % of some ribs and 21 % of L2).
+  Taubin smoothing (10 iterations). Transform from CT to the Denver frame: ICP on the left femur
   (3.2 degrees, translation about 807, 681, 9 mm), applied to every CT bone; the lumbar spine meets the Denver sacrum in the render.
 - **Accuracy (the only ground truth available):** surface distance to Denver's manual meshes after fitting, median / p95: femur L 1.2 / 3.0 mm, femur R
   2.1 / 5.3, hip bone L 1.7 / 3.8, hip bone R 1.5 / 4.1, sacrum 2.9 / 11.0 (common transform); per-bone fits 0.6 to 2.0 mm median.
   `qa_reports/ct_segmentation_vs_denver.json`. Nothing is measured for the other 56 bones: their accuracy is unknown.
-- **Known defects:** left ribs 6 to 8 and vertebra L2 are fragmented in the model output (largest piece 81 to 85 % of the mask; L2 79 % with 14 pieces), so
-  those meshes are incomplete. The costal-cartilage mask came out in 18 pieces (largest 72 %) and is NOT published. The model's "prostate" label on this female
-  subject is wrong for the subject (the model was trained mostly on living, male-dominated CT) and no soft-tissue or organ output of the model is used.
+- **Fragmented bones, investigated (v013):** left ribs 6 to 8, right rib 7 and vertebra L2 come out of the model in two or three significant pieces.
+  A rerun on a native-resolution crop (0.72 x 0.72 x 1 mm, the model resamples it itself) did not fix it: L2 improved (91 % in the largest piece), left ribs
+  5 to 8 got worse. Filling the gaps from the CT is not possible: the pieces are 15 to 30 mm apart and the tissue between them is soft-tissue density
+  (connecting L2 needs a threshold of 60 HU, rib 7 of 10 HU, ribs 6 and 8 cannot be connected at all), so bone-density bridging added 0 voxels
+  (`pipeline/repair_ct_bone_masks.py`, `qa_reports/ct_mask_repair.json`, `ct_fragment_gap_analysis.json`). Whether these gaps are model misses or real
+  discontinuities of this cadaver cannot be decided from the data and was not guessed: the pieces are published as they are, with the gaps. The costal-cartilage
+  mask came out in 18 pieces (largest 72 %) and is NOT published. The model's "prostate" label on this female subject is wrong for the subject (the model was trained
+  mostly on living, male-dominated CT) and no soft-tissue or organ output of the model is used.
 - **Not available:** radius, ulna and hand bones (only in a task that needs a commercial licence), foot and lower-leg bones beyond Denver's. The scan shows
   disrupted anatomy (fluid-filled lungs, cadaver posture); the assembled skeleton stands 1.71 m, more than the recorded 157 cm, because the donor lay supine with
   the feet extended, so no stature is shown.

@@ -254,3 +254,9 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - New page `/#/doctor-review/body` (doctor and owner accounts): pick a body, filter the structures, tick the checklist for one structure, create a review record to copy or download. Reads `<body>.review.json` registries (6,295 structures, 1 MB in total, loaded one body at a time). It writes nothing and cannot mark anything reviewed.
 - Ledger rule in one pure function (`recordApproves`): confirmed decision, every required check, exact asset version, reviewer on the owner's authorised list, valid non-future time. Ledger and authorisation files exist and are empty, so 0 structures are reviewed. Tests (positive and negative) and a ledger check in CI make a hand-set reviewed flag fail. See `docs/body-exposure/CLINICAL_REVIEW_LEDGER.md`.
 
+## CT segmentation: HU check, fragment investigation and kept fragments (v013, 2026-10-10)
+
+- HU = stored - 1024 verified against room air (-997 to -1000 HU) and the fat/soft-tissue peaks (140 HU apart). Native-resolution crop rerun: no better (L2 91 % largest piece vs 79 %, but left ribs 5 to 8 worse).
+- Bone-density bridging between the fragments of L2 and left ribs 6 to 8 adds 0 voxels (gaps 15 to 30 mm, soft-tissue density between), so no anatomy is added. The meshes now keep every fragment of 1 cm3 or more instead of only the largest piece: L2 +25 % volume, left ribs 6 to 8 +14 to 23 %. Body version v013; review registries regenerated (a record for the old geometry would not apply).
+- Remaining blocker: the gaps themselves. They need either better source data or a reviewer's judgement on whether they are real.
+
