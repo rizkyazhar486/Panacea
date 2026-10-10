@@ -25,9 +25,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | Status | Jumlah |
 |---|---|
 | VERIFIED | 21 |
-| REPORTED | 5 |
+| REPORTED | 6 |
 | NOT_CHECKED | 13 |
-| NOT_STARTED | 3 |
+| NOT_STARTED | 2 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
@@ -65,7 +65,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | C1 | Validasi masukan pada kalkulator yang dimigrasi | Kolom kosong = "belum diisi" (bukan 0); di luar rentang ditolak dengan alasan; tes positif, negatif, dan batas; mutasi terbunuh | VERIFIED | Sonnet | PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314 dan 7 mesin sebelumnya di src/domains/clinical-calculators/engine; scripts/uji/*.mts per mesin; Rentang adalah batas kewajaran, bukan ambang klinis. |
 | C2 | Ratchet "kolom kosong → 0" mencapai nol | governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0 | NOT_STARTED | Sonnet | Baseline 147 → 80 (28 berkas) di main 4b2009a1f; Sisa 80 belum diklasifikasikan klinis vs non-klinis. |
 | C3 | Penandaan batas klaim pada kalkulator klinis | Setiap permukaan kalkulator terdaftar dan menampilkan batas klaim (bukan keputusan klinis tervalidasi) | VERIFIED | Sonnet | scripts/uji/clinical-claim-maturity.mts (bagian npm run uji, check CI `validate`) |
-| C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | NOT_STARTED | Sonnet | Label batas klaim ada, tetapi belum ada registri status review per fungsi. |
+| C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | REPORTED | Sonnet | governance/CALCULATOR_REVIEW_REGISTRY.json; src/domains/clinical-calculators/engine/reviewRegistry.ts; scripts/uji/calculator-review-registry.mts; Registri 43 mesin kalkulator, semuanya PENDING_CLINICAL_REVIEW dengan clinically_reviewed=false; uji menolak mesin tanpa entri, entri yatim/ganda, dan status ditinjau tanpa peninjau, tanggal ISO, atau bukti. Belum VERIFIED: menunggu CI hijau pada head PR. Ini label status, bukan tinjauan klinis; tidak ada peninjau yang ditunjuk (C6). |
 | C5 | Regression suite kalkulator berjalan di CI | Tes kalkulator termasuk dalam check wajib `validate` dan merah bila gagal | VERIFIED | Sonnet | npm run uji (681/681 pada 4b2009a1f); check wajib `validate` |
 | C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang terpisah; tidak menghentikan pekerjaan teknis. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |

@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "note": "Semua mesin belum ditinjau klinisi (Alpha C4/C6). Ubah ke CLINICALLY_REVIEWED hanya dengan peninjau teridentifikasi, tanggal, dan bukti nyata.",
+  "exempt": [
+    "ballardInputs",
+    "growthInputs",
+    "inputs",
+    "movementInputs"
+  ],
+  "entries": [
+    {
+      "id": "aaGradient",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "bloodDonationScreen",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "bloodGas",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "caffeineSleep",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "centor",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "charlson",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "childPugh",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "cockcroftGault",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "correctedCalcium",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "denverAge",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "electrolyteCorrection",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "fena",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "findrisc",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "fletcher",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "fluidBalance",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "fluidElectrolytes",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "glasgowBlatchford",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "graceScore",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "hollidaySegar",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "hydrationTarget",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "idealBodyWeight",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "ivDrip",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "ldlFriedewald",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "lightsCriteria",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "maddreyScore",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "mcdonaldRule",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "meanArterialPressure",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "meldNa",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "midParentalHeight",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "naegele",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "news2",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "packYearScreen",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "paradise",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "parkland",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "pediatricDka",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "pedsDose",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "qtc",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "riskScreens",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "serumOsmolality",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "sirirajStrokeScore",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "sleepDebt",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "sofaScore",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
+      "id": "widmarkBac",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    }
+  ]
+}
