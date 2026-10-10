@@ -71,8 +71,8 @@ const sb = baca('SleepApneaScreen.tsx')
 const sbKode = kodeDari(sb)
 assert.ok(!/useState\(demo\.sex === 'M'\)/.test(sbKode),
   'sex again defaults to male, handing every user a BANG point they did not answer for')
-assert.ok(/const male = sex === 'M'/.test(sbKode), 'the sex answer is no longer explicit')
-assert.ok(/const band = lengkap \? bandFor\(total\) : null/.test(sbKode),
+assert.ok(/stopBang\(\{[\s\S]*?\bsex,/.test(sbKode), 'the explicit sex answer is no longer passed to the STOP-BANG engine')
+assert.ok(/const band = res\.ok \? BANDS\[res\.band\] : null/.test(sbKode),
   'STOP-BANG still bands a total that includes an unanswered sex point')
 assert.ok(/<option value="">Not answered<\/option>/.test(sb), 'there is no way to leave sex unanswered')
 assert.ok(/useState<Record<string, boolean>>\(\{\}\)/.test(sbKode),
