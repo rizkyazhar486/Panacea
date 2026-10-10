@@ -138,3 +138,13 @@ Final code passed a two-view CPU smoke render using factory startup and the
 cleaned skeleton. Fifteen committed captures passed the reusable verifier;
 JavaScript syntax and Git whitespace checks passed. No package installations or
 frontend changes were needed for this increment.
+
+## Release scope
+
+The release branch `feat/body-cinematic-lighting` integrates this work onto the
+current upstream main without changing Claude's working trees. This increment is
+an offline graphics pipeline, not a replacement for the React/Three.js viewer.
+Pushing the branch does not change panaceamed.id: the repository requires a
+reviewed PR and its production deployment workflow after merge. Live viewer
+lighting controls remain a separate, unimplemented increment. The maturity
+registry records only measured offline evidence and leaves clinical status intact.
