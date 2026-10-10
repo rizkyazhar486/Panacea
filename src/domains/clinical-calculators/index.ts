@@ -97,3 +97,6 @@ export { bloodDonationScreen, DONATION_RANGES, DONATION_INTERVAL_WEEKS } from '.
 export type { DonationInput, DonationResult } from './engine/bloodDonationScreen'
 export { zone2HeartRate, validateGripKg, ZONE2_AGE_YEARS, GRIP_KG } from './engine/movementInputs'
 export type { Zone2Result, GripResult } from './engine/movementInputs'
+export { auditReviewRegistry, reviewStateOf } from './model/reviewStatus'
+export type { CalculatorReviewEntry, ReviewRecord, ReviewState, ReviewRegistryAudit } from './model/reviewStatus'
+export { CALCULATOR_REVIEW_REGISTRY } from './data/reviewRegistry'

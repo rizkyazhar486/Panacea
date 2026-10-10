@@ -238,10 +238,13 @@
    "pillar": "Clinical Calculators",
    "criterion": "Status review klinis eksplisit per fungsi",
    "acceptance": "Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "src/domains/clinical-calculators/data/reviewRegistry.ts",
+    "scripts/uji/calculator-review-status.mts"
+   ],
    "owner": "Sonnet",
-   "note": "Label batas klaim ada, tetapi belum ada registri status review per fungsi."
+   "note": "Registri memuat semua mesin engine/ sebagai PENDING_CLINICAL_REVIEW, clinicallyReviewed=false; gerbang gagal bila mesin baru tak terdaftar atau klaim ditinjau tanpa peninjau/tanggal/bukti. Belum VERIFIED: menunggu konfirmasi independen dan tinjauan klinisi (C6)."
   },
   {
    "id": "C5",
