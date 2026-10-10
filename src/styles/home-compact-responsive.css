@@ -644,3 +644,52 @@ html:not(.dark) .panacea-instrument-checkin:hover {
   border-color: rgba(0, 191, 99, 0.35);
   background: #f0fdf4;
 }
+
+/* Lantai ukuran teks Home di ponsel: 11px. Terukur di 390x844 sebelum perubahan ini: 155 teks berukuran 8-9,5px dan 219 dari
+   280 teks terlihat di bawah 11px. Hanya ukuran huruf yang naik; tata letak, warna, dan bentuk tidak diubah. !important karena
+   beberapa kelas di atas memakai !important dan utilitas Tailwind berukuran arbitrer (text-[Npx]) harus kalah oleh lantai ini. */
+@media (max-width: 760px) {
+  .panacea-liquid-home .text-\[8px\],
+  .panacea-liquid-home .text-\[8\.5px\],
+  .panacea-liquid-home .text-\[9px\],
+  .panacea-liquid-home .text-\[9\.5px\],
+  .panacea-liquid-home .text-\[10px\],
+  .panacea-liquid-home .text-\[10\.5px\],
+  .panacea-liquid-home small.pmd-one-line,
+  .panacea-liquid-home .pmd-recovery-cue,
+  .panacea-liquid-home .pmd-section-kicker,
+  .panacea-liquid-home .panacea-instrument-date,
+  .panacea-liquid-home .panacea-instrument-unit,
+  .panacea-liquid-home .panacea-signal-ring-kicker,
+  .panacea-liquid-home .widget-instrument-kicker-v5,
+  .panacea-liquid-home .widget-instrument-count-v5,
+  .panacea-liquid-home .pmd-recovery-label,
+  .panacea-liquid-home .pmd-vf-copy:not(.t-kecil),
+  .panacea-liquid-home .panacea-instrument-checkin,
+  .panacea-liquid-home .home-fun-mini__head > div > span,
+  .panacea-liquid-home .home-fun-mini__head > button,
+  .panacea-liquid-home .panacea-instrument-mini-label,
+  .panacea-liquid-home .pmd-superpage-copy small {
+    font-size: 11px !important;
+  }
+  /* t-kecil juga fluid (clamp 11-14px di index.css); kurva yang sama menaikkan tombol yang ditekan di bawah 11px oleh aturan lain. */
+  .panacea-liquid-home .t-kecil {
+    font-size: clamp(11px, 9.35px + 0.517cqw, 14px) !important;
+  }
+  /* t-mikro bersifat fluid (clamp 10-12px di index.css): kurva yang sama dengan lantai 11px supaya nilai yang sudah lebih besar tidak pernah mengecil. */
+  .panacea-liquid-home .t-mikro {
+    font-size: clamp(11px, 8.9px + 0.345cqw, 12px) !important;
+  }
+  /* Pengecualian terukur: pada 11px "0/4 signals" menyentuh busur cincin; 10px masih muat di dalam cincin. */
+  .panacea-liquid-home .panacea-signal-ring-meta {
+    font-size: 10px !important;
+  }
+}
+
+/* Layar sangat sempit: sub-label satu baris di kartu "Seven categories" terpotong elipsis pada 11px di 360px, jadi diberi 10px
+   (tetap naik dari 8,5px). */
+@media (max-width: 380px) {
+  .panacea-liquid-home small.pmd-one-line {
+    font-size: 10px !important;
+  }
+}
