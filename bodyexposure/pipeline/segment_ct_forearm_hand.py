@@ -35,6 +35,11 @@ S = 1.5 / PX             # piksel asli per voksel 1,5 mm
 EXCLUDE = ("humerus", "scapula", "clavicula", "rib", "vertebrae", "sacrum", "hip", "femur", "skull", "sternum", "costal")
 MIN_VOX = 1500
 PROX_GAP_OK_MM = 15  # celah ke humerus yang masih dianggap ujung proksimal lengkap (ruang sendi siku + kerapuhan korteks tipis); perkiraan
+MAX_GAP = 80          # irisan tanpa tulang yang masih diizinkan sebelum pelacakan berakhir
+REACQ_MM = 12         # jarak maksimum komponen kandidat ke pusat yang diekstrapolasi
+REACQ_MIN_PX = 300    # luas minimum komponen yang boleh ditangkap kembali (piksel 0,72 mm)
+AREA_DROP = 0.45      # penampang < 45% median irisan terakhir = tulang hilang
+K_LOST = 60           # irisan yang dipakai memperkirakan pusat tulang yang sedang hilang
 K_TRACK = 20  # irisan terakhir yang dipakai memperkirakan pusat tulang berikutnya
 GROW_PX = 4  # pertumbuhan lateral maksimum per irisan 1 mm (lengan miring ±30°, olekranon melebar); perkiraan
 TUBE_MM = 16  # jari-jari tabung proksimal di sekitar poros radius/ulna (olekranon ±20 mm lebar); perkiraan
@@ -146,32 +151,57 @@ def split_forearm(m, z0, z1, vol):
     rr, cc = np.mgrid[:m.shape[0], :m.shape[1]]
     out[:, :, zs + 1:] = 0
     st2 = ndi.generate_binary_structure(2, 1)
-    track = {lid: [] for lid in (1, 2)}  # (irisan, baris, kolom) pusat massa tiap tulang pada irisan terakhir
+    track = {1: [], 2: []}   # (irisan, baris, kolom, luas) tiap tulang pada irisan yang berhasil dilacak
     for z in range(zs - K_TRACK, zs + 1):
         for lid in (1, 2):
             pts = np.argwhere(out[:, :, z] == lid)
-            if len(pts): track[lid].append((z, *pts.mean(0)))
+            if len(pts): track[lid].append((z, *pts.mean(0), len(pts)))
+    lost = {1: False, 2: False}; lost_since = {1: 0, 2: 0}; frag_start = None
     for z in range(zs + 1, m.shape[2]):
-        prev = out[:, :, z - 1]
-        if not (prev > 0).any(): break
-        near = ndi.binary_dilation(prev > 0, iterations=GROW_PX)
-        tube = np.zeros(m.shape[:2], bool)
-        for lid in (1, 2):
-            tr = np.array(track[lid][-K_TRACK:])
-            if len(tr) < 3: continue
-            fr = np.polyfit(tr[:, 0], tr[:, 1], 1); fc = np.polyfit(tr[:, 0], tr[:, 2], 1)  # pusat diperkirakan dari K_TRACK irisan terakhir (tulang melengkung)
-            tube |= np.hypot((rr - np.polyval(fr, z)) * PX, (cc - np.polyval(fc, z)) * PX) <= TUBE_MM
-        mz = m[:, :, z] & (vol[:, :, z] > HU_PROX)
-        mz = ndi.binary_opening(mz, structure=st2, iterations=2)
-        mk = mz & near & tube
-        if not mk.any(): break
+        mz = ndi.binary_opening(m[:, :, z] & (vol[:, :, z] > HU_PROX), structure=st2, iterations=2)
+        lab2, n2 = ndi.label(mz)
+        markers = np.zeros(m.shape[:2], np.int32); tube_all = np.zeros(m.shape[:2], bool); near_all = np.zeros(m.shape[:2], bool)
+        pred = {}
+        for lid in (1, 2, 4):
+            if lid == 4 and frag_start is None: continue
+            tr = np.array(track.setdefault(lid, [])[-(K_LOST if lid != 4 and lost[lid] else K_TRACK):])  # tulang hilang: garis dari poros bersih yang lebih panjang
+            if len(tr) < 1 or z - tr[-1, 0] > MAX_GAP or (len(tr) < 3 and lid != 4): continue  # sudah hilang terlalu lama: berakhir
+            if len(tr) < 3: pred[lid] = (tr[-1, 1], tr[-1, 2])  # serpihan baru: pusat irisan terakhir
+            else:
+                fr = np.polyfit(tr[:, 0], tr[:, 1], 1); fc = np.polyfit(tr[:, 0], tr[:, 2], 1)  # pusat diperkirakan dari irisan terakhir (tulang melengkung)
+                pred[lid] = (np.polyval(fr, z), np.polyval(fc, z))
+            tube_all |= np.hypot((rr - pred[lid][0]) * PX, (cc - pred[lid][1]) * PX) <= TUBE_MM
+            if lid == 4 or not lost[lid]:
+                prev = out[:, :, z - 1] == lid
+                near_all |= ndi.binary_dilation(prev, iterations=GROW_PX); markers[prev & mz & tube_all] = lid
+        lost_ids = [lid for lid in (1, 2) if lid in pred and lost[lid]]
+        if lost_ids and frag_start is None:
+            # Tulang yang hilang muncul kembali sebagai komponen kompak dekat garis poros yang diekstrapolasi. Identitasnya (radius atau ulna) TIDAK dapat
+            # ditentukan dengan andal setelah celah beberapa cm (jarak ke kedua prediksi hampir sama), maka diberi label sendiri (4), bukan ditebak.
+            for c in range(1, n2 + 1):
+                comp = lab2 == c
+                if int(comp.sum()) < REACQ_MIN_PX or (markers[comp] != 0).any(): continue
+                cy, cx = np.argwhere(comp).mean(0)
+                dd = min(np.hypot((cy - pred[l][0]) * PX, (cx - pred[l][1]) * PX) for l in lost_ids)
+                if dd <= REACQ_MM:
+                    markers[comp] = 4; near_all |= comp; frag_start = int(z); track[4] = []; break
+        if not markers.any(): continue
+        mk = mz & (near_all | (markers > 0)) & tube_all
         e = ndi.distance_transform_edt(mk)
-        out[:, :, z] = watershed(-e, prev * mk, mask=mk)
-        for lid in (1, 2):
-            pts = np.argwhere(out[:, :, z] == lid)
-            if len(pts) >= 20: track[lid].append((z, *pts.mean(0)))
+        w = watershed(-e, markers * mk, mask=mk)
+        for lid in list(pred) + ([4] if frag_start == z and 4 not in pred else []):
+            n_px = int((w == lid).sum())
+            if lid != 4 and not lost[lid]:
+                trl = np.array(track[lid][-K_TRACK:])
+                # luas penampang runtuh (< AREA_DROP × median irisan terakhir): tulang tidak lagi terlihat utuh di CT (mis. korteks terpotong tepi blok CT)
+                if len(trl) >= 10 and n_px < AREA_DROP * np.median(trl[:, 3]):
+                    lost[lid] = True; lost_since[lid] = int(z); continue
+            if lid in (1, 2) and lost[lid]: continue
+            if n_px >= 20:
+                out[:, :, z][w == lid] = lid; track.setdefault(lid, []).append((z, *np.argwhere(w == lid).mean(0), n_px))
+    gaps = {"fragment_first_slice": frag_start, "lost_from_slice": {"radius": lost_since[1] if lost[1] else None, "ulna": lost_since[2] if lost[2] else None}}
     return out, {"shaft_seed_slice": int(zm), "distal_shaft_area_vox": [round(x) for x in dist], "distal_over_proximal_area": [round(r, 2) for r in ratio], "radius_seed_is_second": bool(swap),
-                 "tube_mm": TUBE_MM, "hu_proximal": HU_PROX, "grow_px_per_slice": GROW_PX, "track_slices": K_TRACK, "label_voxels": {k: int((out == v).sum()) for k, v in (("radius", 1), ("ulna", 2), ("hand_bones", 3))}}
+                 "tube_mm": TUBE_MM, "hu_proximal": HU_PROX, "grow_px_per_slice": GROW_PX, "track_slices": K_TRACK, "tracking": gaps, "label_voxels": {k: int((out == v).sum()) for k, v in (("radius", 1), ("ulna", 2), ("hand_bones", 3), ("forearm_fragment", 4))}}
 
 
 def mesh_label(mask, org, R, t):
@@ -218,15 +248,17 @@ def main():
         info = {"native_crop_shape": list(vol.shape), "origin_rcz": list(org), "mask_voxels": int(m.sum()), "elbow_cut_slice": zc, "two_bone_shaft_slices": [int(z0), int(z1)]}
         labels, split = split_forearm(m, z0, z1, vol)
         info.update(split)
-        np.save(os.path.join(a.work, f"mask_{side}.npy"), m); np.save(os.path.join(a.work, f"labels_{side}.npy"), labels)
+        np.save(os.path.join(a.work, f"mask_{side}.npy"), m); np.save(os.path.join(a.work, f"labels_{side}.npy"), labels); np.save(os.path.join(a.work, f"hu_{side}.npy"), vol)
         info["meshes"] = {}
         hd = ndi.distance_transform_edt(~(hl == (np.argmax(np.bincount(hl.ravel())[1:]) + 1)), sampling=(PX, PX, DZ))  # jarak ke humerus
-        for name, lid in (("radius", 1), ("ulna", 2), ("hand_bones", 3)):
+        for name, lid in (("radius", 1), ("ulna", 2), ("hand_bones", 3), ("forearm_fragment", 4)):
+            if lid == 4:  # serpihan proksimal yang identitasnya tidak dapat ditentukan: dicatat, TIDAK diekspor sebagai struktur bernama
+                info["unresolved_proximal_fragment_voxels"] = int((labels == 4).sum()); continue
             V, F, vi = mesh_label(labels == lid, org, R, t)
             write_stl(os.path.join(a.out, f"{name}_{side}.stl"), V, F)
             zz = np.argwhere(labels == lid)[:, 2]
             vi = vi | {"triangles": int(len(F)), "slices_covered": [int(zz.min()), int(zz.max())]}
-            if lid != 3:  # kelengkapan ujung proksimal: celah antara ujung atas tulang dan humerus (siku)
+            if lid in (1, 2):  # kelengkapan ujung proksimal: celah antara ujung atas tulang dan humerus (siku)
                 top = labels == lid; top[:, :, :int(zz.max()) - 2] = False
                 vi["gap_to_humerus_mm"] = round(float(hd[top].min()), 1)
                 vi["proximal_end_complete"] = vi["gap_to_humerus_mm"] <= PROX_GAP_OK_MM

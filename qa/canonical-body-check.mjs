@@ -116,7 +116,7 @@ try {
       // varian Visible Human Female (Denver + CT): satu individu, bukan atlas; tulang kerangka tubuh dari CT (mesin), tungkai bawah manual (Denver)
       await page.getByRole('radio', { name: 'Visible Human skeleton (Denver + CT)' }).click()
       await page.getByText(/^190 structures$/).waitFor({ timeout: 60000 })
-      await page.getByText(/forearm and hand bones \(hand as one mesh; right ulna incomplete\)/).waitFor()
+      await page.getByText(/forearm and hand bones \(hand as one mesh; right forearm bones incomplete\)/).waitFor()
       await page.getByTestId('variant-individual').getByText(/One individual from source data/).waitFor()
       assert(!(await page.getByText(/stature \d+ cm/).count()), 'partial body must not show a stature')
       await page.getByLabel('Find a structure').fill('femur')

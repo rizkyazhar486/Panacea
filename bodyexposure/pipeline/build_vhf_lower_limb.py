@@ -86,8 +86,9 @@ def arm_note(stem):
         return ("Carpals, metacarpals and phalanges are ONE mesh: individual bones were not separated (joint gaps are too small for an automatic split, and no manual "
                 "segmentation exists). Wrist boundary with the radius and ulna is approximate.")
     if info and not info.get("proximal_end_complete", True):
-        return (f"Proximal end is INCOMPLETE: the recovered bone stops {info['gap_to_humerus_mm']} mm short of the humerus. Near the elbow the bone touches a thin bright "
-                "artefact along the skin surface of the CT block, which the segmentation removes together with thin cortex.")
+        return (f"Proximal end is INCOMPLETE: the recovered bone stops {info['gap_to_humerus_mm']} mm short of the humerus. In the CT the right arm is cut by the "
+                "edge of the scanned block (flat lateral boundary of the soft tissue in the axial slices) and the bone runs out of the image there; see "
+                "qa_reports/vhf_right_forearm_slices.png. The missing part is not in the data and is not reconstructed.")
     return "The proximal end reaches the humerus; the elbow joint surface is ragged where the cortex is thin and was not smoothed over."
 
 
