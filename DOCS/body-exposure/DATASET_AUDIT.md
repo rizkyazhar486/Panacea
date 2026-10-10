@@ -26,6 +26,19 @@ Status date: 2026-10-10. Only facts checked on the source page or repository are
 | `wasserth/nnUNet_cust`, `wasserth/MONAI` | Apache-2.0 forks of nnU-Net and MONAI. | Tooling only. Use upstream releases, not these forks (last pushed 2025 and 2021). |
 | `wasserth/dipy` | Fork of dipy, GitHub reports no licence; last pushed 2018. | Do not use; upstream dipy is the maintained source (licence to be read there). |
 
+## Dataset completion: primary sources (checked 2026-10-10)
+| Gap | Source | Checked facts | Status |
+|---|---|---|---|
+| Fetal body | KCL fetal body MRI atlas (`~/Downloads/fetal_body_mri_atlas`) | CC0 1.0 (LICENSE and README). 3T T2w atlas of 17 fetuses with 10 organ ROIs (lungs, liver, stomach, spleen, kidney pelvis and parenchyma, bladder, thymus, gallbladder, adrenals) plus a lung-lobe parcellation. | This is the atlas already used for the fetus body in PR #2336. It has no skeleton, skin, brain or heart, so it does not close the fetal-skeleton/skin gap, and it holds no maternal anatomy (uterus, placenta), so it does not close the pregnancy gap. |
+| Respiratory motion | TCIA 4D-Lung | Collection page states CC BY 3.0 (commercial use allowed with attribution). The MONAI Physio repository (Apache-2.0) redistributes a converted subset as GitHub release assets; the data licence remains the TCIA one. | Candidate. Not downloaded. Needs deformable registration and a mapping from image motion to our lung and rib meshes; the result would be image-derived motion of a different individual, labelled as such. |
+| Respiratory motion | POPI-model (`open-vv/popi-model`) | Six 4D-CT sets with landmarks; terms are attribution to the Léon Bérard Cancer Center and CREATIS plus citation of Vandemeulebroucke 2007. No SPDX licence on the repository. | Candidate for validating registration error only. Commercial-use terms are not stated, so unverified; ask the maintainers before any redistribution. |
+| Respiratory motion | DIR-Lab 4D-CT | The data pages gave no licence text when fetched. | **Unverified.** Do not use until terms are obtained. |
+| Cardiac motion | ACDC cine-MRI | The challenge pages gave no licence text when fetched; I have not confirmed the terms. | **Unverified.** Do not use until the licence and commercial-use terms are read from the original download. |
+| Cardiac geometry | KCL heart model (Zenodo 4590294, 4593739) and CHOP-Valve4D (via MONAI Physio releases) | Referenced in the pasted MONAI Physio downloader; Zenodo and release licences not yet read. | **Unverified.** |
+| `Imaging Cancer.tcia` | NBIA manifest of series UIDs | Lists series UIDs only; the collection and licence cannot be told from the manifest. | **Unverified.** Needs the NBIA Data Retriever to resolve, then the collection licence. |
+| Older adult | none found | Imaging collections list ages but no cleared source of age-representative whole-body geometry has been identified. | Remains unavailable. |
+| Female forearm/hand | NLM Visible Human Female | The VHF images cover the whole body; our current segmentation (Denver + CT) does not include forearms and hands. | Candidate: segment them from the original VHF images. Must stay `model_segmented` until reviewed. A male proxy may only be labelled `reference_stand_in`, never female. |
+
 ## Local files in ~/Downloads
 - Slicer segmentation-mask folders (~2 GB each, "Final" and "Smoothed"): contents not yet compared with the Denver data already processed.
 - MRI-Male*, CT before/after freezing, Five/Six slices: sample slices of about 100 KB to 18 MB; cannot build 3D anatomy.
