@@ -275,3 +275,7 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Not done: individual hand bones, rig/motion for the arms (motion stays pelvis, legs and feet only).
 ## Ontology crosswalk (Uberon / FMA)
 - New `engine/ontologyCrosswalk.ts` (fail-closed: empty or malformed ids and conflicting rows are rejected), `pipeline/publish_ontology_crosswalk.mjs`, published `ontology.adult_female.json` (618 of 841 structures) and an "Ontology:" line in the structure panel. Tests: `scripts/qa/ontology-crosswalk.test.mjs`.
+
+## Nervous-system atlas module (ATLAS.NERVOUS.MNI152)
+- New `pipeline/build_nervous_mni_module.py` builds a separate template module from the public edition of the Clinical Neuroanatomy Atlas (556 structures, CC BY-SA 4.0 with per-mesh sources), in MNI152 coordinates and not registered to any body. Axis mapping is verified per structure against the atlas manifest bounding boxes. `check_web_budget.py` reads `ATLAS_ON` for atlas modules (initial load 68.9k triangles) and `export_web_lods.py` carries the module budgets. The viewer gets a "Nervous atlas (MNI)" tab and labels for the extra systems. Tests: `scripts/qa/nervous-atlas-module.test.mjs`.
+- Left out on licence grounds: 30 FreeSurfer aseg label meshes (no licence stated for the label file). Left out for viewing: the opaque brain envelope.

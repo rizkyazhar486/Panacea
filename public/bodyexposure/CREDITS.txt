@@ -47,6 +47,18 @@ fetus.*      — SVRTK fetal MRI atlas repository, King's College London, Centre
                Population average of 17 normal fetuses (25 to 28 weeks per the preprint), organs only, not an individual.
                Marching-cubes surfaces, smoothed and decimated for the web. Not clinically reviewed.
 
+atlas_nervous_mni152.* — Clinical Neuroanatomy Atlas v1.0.3, public edition (Batuhan Ayci, 2026;
+               https://github.com/aycibatuhan/nervous-system-atlas; generated data CC BY-SA 4.0, code Apache-2.0).
+               The combined layer is distributed under CC BY-SA 4.0 (share-alike). Each mesh keeps its source and licence in its
+               metadata: Z-Anatomy 167 and arterial territories 38 and FastSurfer CerebNet cerebellum 25 and HCP1065 tracts 80
+               (CC BY-SA 4.0); BodyParts3D 46 (CC BY 4.0, The Database Center for Life Science); CerebrA 62, Harvard AAN 8 and
+               a cerebral artery mesh 1 (CC0 1.0); MASSP 68 (Apache-2.0); hypothalamus 32, MIAL thalamus 14, CIT168 4, locus
+               coeruleus meta mask 4 and VENAT 7 (CC BY 4.0). Template space MNI152NLin2009cAsym (Fonov et al. 2011).
+               Changes made here: GLB to canonical axes (+Z superior, +X left, -Y anterior, metres), meshes merged per
+               structure, renamed, recoloured, decimated for the web. Not registered to any Body Exposure body.
+               Left out: 30 FreeSurfer aseg label meshes (no licence stated) and the opaque brain envelope.
+               Template atlas, not an individual. Not clinically reviewed.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.
