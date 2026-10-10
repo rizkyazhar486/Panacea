@@ -21,6 +21,10 @@ Status date: 2026-10-10. Only facts checked on the source page or repository are
 | OpenSim models (`opensim-org/opensim-models`) | GitHub reports no licence for the repository; individual models carry their own terms. | Read each model's licence before use. Potential value: musculoskeletal ROM and muscle paths to cross-check our rig. |
 | FIPAT TA2 front matter (Dalhousie) | PDF not read. | **Unverified.** Terminology reference only. |
 | `apps.humanatlas.io/api`, ASCT+B crosswalks | Local CSVs: female 874 rows, male 850, combined 2,305, with Uberon/FMA IDs. | Next step: map our structure IDs to ontology IDs (no new geometry). |
+| `wasserth/TotalSegmentator` | Apache-2.0 (code). | Already used for CT bones with the open `total` weights; restricted-licence tasks stay unused. Its MR models are unverified for licence and have not been used. |
+| `wasserth/MyelinAge` | Apache-2.0; infant MRI myelin-age prediction. | No use: no anatomy geometry. |
+| `wasserth/nnUNet_cust`, `wasserth/MONAI` | Apache-2.0 forks of nnU-Net and MONAI. | Tooling only. Use upstream releases, not these forks (last pushed 2025 and 2021). |
+| `wasserth/dipy` | Fork of dipy, GitHub reports no licence; last pushed 2018. | Do not use; upstream dipy is the maintained source (licence to be read there). |
 
 ## Local files in ~/Downloads
 - Slicer segmentation-mask folders (~2 GB each, "Final" and "Smoothed"): contents not yet compared with the Denver data already processed.
