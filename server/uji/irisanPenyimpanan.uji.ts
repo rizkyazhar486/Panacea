@@ -429,4 +429,37 @@ const memoriJejak = { audit: jejak.audit }
 pasangIrisan(memoriJejak, muatLengkapLama!.data)
 assert.equal(memoriJejak.audit.length, 2, 'muat versi lengkap menghapus jejak audit yang masih di dokumen inti')
 
+// Hasil lab + rujukan (modul labResults) harus selamat dari simpan/muat irisan Mongo — di produksi, bidang
+// klinis yang tidak terdaftar di irisan hilang saat restart (kunci 'clinical' dikeluarkan dari dokumen inti).
+{
+  const rekamHasil = { id: 'lab-1', tenantId: 'praktik', patientId: 'p1', status: 'closed', item: { name: 'Hemoglobin', value: 13.2, collectedAt: '2026-10-09' }, provenance: { source: 'manual-entry', recordedBy: 'd1', recordedAt: '2026-10-10T08:00:00.000Z' }, trail: [{ seq: 1, subjectId: 'lab-1', actorId: 'd1', role: 'clinician', at: '2026-10-10T08:01:00.000Z', from: 'received', to: 'pending_review', prevHash: '0'.repeat(64), hash: 'h1' }], communication: { channel: 'phone', note: 'ok', at: '2026-10-10T08:02:00.000Z', by: 'd1' } }
+  const rekamRujukan = { id: 'ref-1', tenantId: 'praktik', patientId: 'p1', status: 'requested', kind: 'lab', reason: 'cek', toFacility: 'Lab X', trail: [] }
+  const denganHasil = { clinical: { ...klinis, hasilLab: { 'lab-1': rekamHasil, 'lab-2': { ...rekamHasil, id: 'lab-2', patientId: 'p2', status: 'received', trail: [] } }, rujukanKlinis: { 'ref-1': rekamRujukan } } }
+  const dbHasil = dbPalsu()
+  await simpanIrisan(dbHasil, denganHasil)
+  assert.equal(dbHasil.isi(KOLEKSI_IRISAN.hasilLab).length, 2, 'hasil lab tidak punya dokumen sendiri di irisan')
+  assert.equal(dbHasil.isi(KOLEKSI_IRISAN.rujukanKlinis).length, 1, 'rujukan tidak punya dokumen sendiri di irisan')
+  assert.equal(dbHasil.isi(KOLEKSI_IRISAN.hasilLab).find((d) => d._id === 'lab-1')?.patientId, 'p1', 'bidang tidak di tingkat atas, tidak bisa diindeks per pasien')
+  const muatHasil = await muatIrisan(dbHasil)
+  assert.equal(muatHasil?.lengkap, true)
+  assert.deepEqual(muatHasil?.data.clinical?.hasilLab?.['lab-1'], rekamHasil, 'hasil lab berubah setelah simpan/muat (jejak audit harus utuh)')
+  assert.deepEqual(muatHasil?.data.clinical?.rujukanKlinis, { 'ref-1': rekamRujukan })
+  assert.equal(Object.keys(muatHasil?.data.clinical?.hasilLab ?? {}).length, 2)
+  // Restart penuh: keadaan memori dipasang ulang dari irisan, lalu disimpan lagi tanpa kehilangan apa pun.
+  const memori: Record<string, unknown> = {}
+  pasangIrisan(memori, muatHasil!.data)
+  await simpanIrisan(dbHasil, memori)
+  assert.deepEqual((await muatIrisan(dbHasil))?.data.clinical?.hasilLab?.['lab-1'], rekamHasil, 'hasil lab hilang setelah satu siklus restart')
+  // Negatif: simpanan tanpa hasil lab tidak memunculkan bidang kosong (bentuk lama utuh) dan tidak menghapus rekam lain.
+  const dbTanpa = dbPalsu()
+  await simpanIrisan(dbTanpa, { clinical: klinis })
+  const tanpa = (await muatIrisan(dbTanpa))?.data.clinical
+  assert.equal('hasilLab' in (tanpa ?? {}), false); assert.equal('rujukanKlinis' in (tanpa ?? {}), false)
+  assert.deepEqual(tanpa, klinis)
+  // Rekam yang dihapus dari memori ikut hilang dari irisan (tidak ada sisa yatim).
+  const { 'lab-2': _hapus, ...sisa } = denganHasil.clinical.hasilLab
+  await simpanIrisan(dbHasil, { clinical: { ...denganHasil.clinical, hasilLab: sisa } })
+  assert.deepEqual(dbHasil.isi(KOLEKSI_IRISAN.hasilLab).map((d) => d._id), ['lab-1'])
+}
+
 console.log('irisanPenyimpanan: dokumen inti tidak lagi menyimpan keadaan')
