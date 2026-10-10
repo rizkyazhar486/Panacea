@@ -260,3 +260,8 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Bone-density bridging between the fragments of L2 and left ribs 6 to 8 adds 0 voxels (gaps 15 to 30 mm, soft-tissue density between), so no anatomy is added. The meshes now keep every fragment of 1 cm3 or more instead of only the largest piece: L2 +25 % volume, left ribs 6 to 8 +14 to 23 %. Body version v013; review registries regenerated (a record for the old geometry would not apply).
 - Remaining blocker: the gaps themselves. They need either better source data or a reviewer's judgement on whether they are real.
 
+
+## VHF forearm and hand bones (body v014)
+- New `pipeline/segment_ct_forearm_hand.py`: radius, ulna and hand bones of both arms from the native-resolution Visible Human Female CT (the Denver manual segmentation is lower-extremity only and TotalSegmentator `total` has no such classes). `build_vhf_lower_limb.py` now ingests them as `threshold_segmented`; the review registry classes them as method `other`.
+- Female body 184 -> 190 structures; skeletal LOD4 initial load 19,648 triangles (budget 80,000). Right ulna is incomplete (44 mm short of the humerus); the hand is one mesh per side. Details in PROVENANCE.md and `qa_reports/vhf_forearm_hand.json`.
+- Not done: individual hand bones, rig/motion for the arms (motion stays pelvis, legs and feet only).

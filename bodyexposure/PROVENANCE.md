@@ -389,3 +389,13 @@ regional meshes would mean inventing the boundaries between neighbouring bones, 
 Unblocking options that stay within the rules: (1) a mesh set with separated female bones and a confirmed licence;
 (2) segmenting the Visible Human Female CT ourselves, then having a qualified anatomist review it; (3) a published
 ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms before any 4DCT use.
+
+## VHF forearm and hand bones (image-derived, not a stand-in)
+
+- **Source:** the NLM Visible Human Female CT (Denver "Aligned CT-DICOM", CC BY 4.0) at its native resolution, 0.72 x 0.72 x 1.0 mm. The Denver manual segmentation covers the lower extremity only and TotalSegmentator `total` (open weights) has no radius, ulna or hand-bone classes, but the CT itself contains both forearms and hands, so these bones are taken directly from the image. No male geometry is used.
+- **Method (algorithmic, not a trained model and not manual):** `pipeline/segment_ct_forearm_hand.py` thresholds HU > 250 at native resolution, removes the already segmented bones, splits radius, ulna and hand with a distance-transform watershed seeded at mid-shaft, then follows each bone up the forearm slice by slice (HU > 450 with a 2D opening, because a thin bright artefact runs along the skin surface of the CT block above the clean shaft). Taubin smoothing, same CT-to-Denver transform as the other CT bones. Class: `threshold_segmented` (registry method `other`).
+- **Radius versus ulna** is decided by the larger distal cross-section (distal radius epiphysis); the proximal cross-section was tried first and rejected because the proximal slices are contaminated. Left arm ratio 319 : 58 px, right arm 319 : 237 px (weaker; confirmed visually from the wrist).
+- **Completeness (qa_reports/vhf_forearm_hand.json):** left radius and ulna and the right radius reach the humerus (gap 1.0 to 1.4 mm); the **right ulna is incomplete**: it stops 44.0 mm short of the humerus (proximal 120 slices missing at the skin-surface artefact). The elbow ends of the others are ragged where the cortex is thin.
+- **Hand bones are one mesh per side** (carpals, metacarpals, phalanges). Automatic separation gave 47 to 49 segments for about 29 expected bones and was not accepted as labelling, so no individual hand bone is named. The wrist boundary with the radius and ulna is approximate.
+- **Not measured:** no reference segmentation exists for these bones, so no Dice or surface distance is reported. Alignment between the native crop and the 1.5 mm frame assumes the scipy-zoom axis mapping (verified by correlation 0.9995 of resampled slices; sub-voxel offsets up to 0.75 mm are possible).
+- `clinically_reviewed` remains false.
