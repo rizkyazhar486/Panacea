@@ -1,0 +1,509 @@
+{
+ "version": 1,
+ "approvedBy": "Product Owner (arahan eksekusi 2026-10-10)",
+ "scope": [
+  "Panacea One OS: alur klinis longitudinal dari identitas pasien hingga tindak lanjut",
+  "Lab & Referral Closure: penerimaan, penyimpanan persisten, review klinisi, komunikasi, penutupan terverifikasi",
+  "Clinical Calculators: fungsi, validasi, regression, penandaan status review",
+  "Body Exposure Alpha: anatomi seluruh tubuh bertahap, interaksi 3D, layer dasar, navigasi, WALK/RUN teruji; modul belum tervalidasi berlabel",
+  "Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment"
+ ],
+ "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase.",
+ "baseline": {
+  "mainSha": "4b2009a1fd66a70522dc2bfe78ded03ca5c2a295",
+  "date": "2026-10-10",
+  "note": "Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik."
+ },
+ "statuses": [
+  "VERIFIED",
+  "REPORTED",
+  "NOT_CHECKED",
+  "NOT_STARTED",
+  "BLOCKED",
+  "PENDING_CLINICAL_REVIEW"
+ ],
+ "criteria": [
+  {
+   "id": "A1",
+   "pillar": "Panacea One OS",
+   "criterion": "Satu identitas pasien dan satu state longitudinal",
+   "acceptance": "Satu pasien uji memiliki satu identitas; encounter, anamnesis, dan hasil merujuk ID yang sama (diuji lewat API, bukan UI saja)",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A2",
+   "pillar": "Panacea One OS",
+   "criterion": "Encounter dibuat dan dipersist di backend",
+   "acceptance": "Encounter yang dibuat tetap ada setelah restart server dan dapat dibaca ulang oleh pengguna berwenang",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A3",
+   "pillar": "Panacea One OS",
+   "criterion": "Anamnesis tercatat dengan provenance",
+   "acceptance": "Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A4",
+   "pillar": "Panacea One OS",
+   "criterion": "Pemeriksaan dikendalikan klinisi",
+   "acceptance": "Entri pemeriksaan hanya dapat dibuat/diubah oleh peran klinisi terotorisasi; peran lain ditolak (tes negatif)",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A5",
+   "pillar": "Panacea One OS",
+   "criterion": "Dokumentasi berbantuan AI berstatus draf",
+   "acceptance": "Keluaran AI tersimpan sebagai draf, tidak pernah sebagai catatan bertanda tangan, sampai klinisi teridentifikasi menyetujui",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A6",
+   "pillar": "Panacea One OS",
+   "criterion": "Persetujuan dan tanda tangan klinisi",
+   "acceptance": "Rencana klinis menjadi aktif hanya setelah tanda tangan klinisi; percobaan tanpa tanda tangan ditolak dan tercatat",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A7",
+   "pillar": "Panacea One OS",
+   "criterion": "Tindak lanjut terjadwal",
+   "acceptance": "Tindak lanjut dapat dibuat dari rencana bertanda tangan dan muncul pada daftar kerja pemilik yang benar",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "A8",
+   "pillar": "Panacea One OS",
+   "criterion": "Satu perjalanan E2E lulus",
+   "acceptance": "Satu skenario terskrip dari identitas hingga tindak lanjut lulus di CI dengan persistensi nyata (bukan mock UI)",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
+   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+  },
+  {
+   "id": "B1",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Aturan evaluasi penutupan hasil (model murni)",
+   "acceptance": "Hasil tertutup hanya bila bukti dicatat orang; bukti sistem tidak menutup; penyebut nol = tidak terukur",
+   "status": "VERIFIED",
+   "evidence": [
+    "PR #2310 (merge 2ba5c734d)",
+    "scripts/qa/result-closure.test.mjs: 17 tes, 24 mutan terbunuh"
+   ],
+   "owner": "Sonnet",
+   "note": "Hanya model; belum terhubung ke backend atau UI."
+  },
+  {
+   "id": "B2",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Penyimpanan hasil lab persisten di server",
+   "acceptance": "Hasil yang diterima tetap ada setelah restart; PostgreSQL bila kompatibel dengan infrastruktur repo",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B3",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "State hasil received→pending_review→reviewed→communicated→closed",
+   "acceptance": "Transisi hanya sesuai urutan; transisi tak sah ditolak dengan alasan",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B4",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Setiap perubahan status diaudit",
+   "acceptance": "Setiap transisi mencatat pelaku, peran, waktu, dan status sebelum/sesudah; log tidak dapat diubah oleh pelaku",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B5",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "RBAC pada hasil",
+   "acceptance": "Hanya peran berwenang dan pasien sendiri yang membaca; peran/tenant lain ditolak (tes negatif)",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B6",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Lifecycle rujukan terpisah",
+   "acceptance": "Rujukan memiliki state, transisi, dan audit sendiri",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B7",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "UI tinjauan klinisi atas hasil",
+   "acceptance": "Klinisi dapat meninjau hasil dan mengubah state lewat API; UI memakai kontrak backend",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sonnet (setelah kontrak tersedia)",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B8",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Komunikasi hasil ke pasien tercatat",
+   "acceptance": "Pengiriman penjelasan tercatat sebagai bukti oleh orang, bukan notifikasi otomatis",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol/Sonnet",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "B9",
+   "pillar": "Lab & Referral Closure",
+   "criterion": "Metrik penutupan dihitung dari backend",
+   "acceptance": "Rasio penutupan memakai data server (bukan localStorage) dan tidak terukur bila penyebut nol",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": "Menunggu kontrak data dari Sol."
+  },
+  {
+   "id": "C1",
+   "pillar": "Clinical Calculators",
+   "criterion": "Validasi masukan pada kalkulator yang dimigrasi",
+   "acceptance": "Kolom kosong = \"belum diisi\" (bukan 0); di luar rentang ditolak dengan alasan; tes positif, negatif, dan batas; mutasi terbunuh",
+   "status": "VERIFIED",
+   "evidence": [
+    "PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314 dan 7 mesin sebelumnya di src/domains/clinical-calculators/engine",
+    "scripts/uji/*.mts per mesin"
+   ],
+   "owner": "Sonnet",
+   "note": "Rentang adalah batas kewajaran, bukan ambang klinis."
+  },
+  {
+   "id": "C2",
+   "pillar": "Clinical Calculators",
+   "criterion": "Ratchet \"kolom kosong → 0\" mencapai nol",
+   "acceptance": "governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0",
+   "status": "NOT_STARTED",
+   "evidence": [
+    "Baseline 147 → 80 (28 berkas) di main 4b2009a1f"
+   ],
+   "owner": "Sonnet",
+   "note": "Sisa 80 belum diklasifikasikan klinis vs non-klinis."
+  },
+  {
+   "id": "C3",
+   "pillar": "Clinical Calculators",
+   "criterion": "Penandaan batas klaim pada kalkulator klinis",
+   "acceptance": "Setiap permukaan kalkulator terdaftar dan menampilkan batas klaim (bukan keputusan klinis tervalidasi)",
+   "status": "VERIFIED",
+   "evidence": [
+    "scripts/uji/clinical-claim-maturity.mts (bagian npm run uji, check CI `validate`)"
+   ],
+   "owner": "Sonnet",
+   "note": ""
+  },
+  {
+   "id": "C4",
+   "pillar": "Clinical Calculators",
+   "criterion": "Status review klinis eksplisit per fungsi",
+   "acceptance": "Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin",
+   "status": "NOT_STARTED",
+   "evidence": [],
+   "owner": "Sonnet",
+   "note": "Label batas klaim ada, tetapi belum ada registri status review per fungsi."
+  },
+  {
+   "id": "C5",
+   "pillar": "Clinical Calculators",
+   "criterion": "Regression suite kalkulator berjalan di CI",
+   "acceptance": "Tes kalkulator termasuk dalam check wajib `validate` dan merah bila gagal",
+   "status": "VERIFIED",
+   "evidence": [
+    "npm run uji (681/681 pada 4b2009a1f)",
+    "check wajib `validate`"
+   ],
+   "owner": "Sonnet",
+   "note": ""
+  },
+  {
+   "id": "C6",
+   "pillar": "Clinical Calculators",
+   "criterion": "Rentang masukan ditinjau klinisi",
+   "acceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator",
+   "status": "PENDING_CLINICAL_REVIEW",
+   "evidence": [],
+   "owner": "Klinisi (belum ditunjuk)",
+   "note": "Gerbang terpisah; tidak menghentikan pekerjaan teknis."
+  },
+  {
+   "id": "C7",
+   "pillar": "Clinical Calculators",
+   "criterion": "Halaman kalkulator diverifikasi di 390×844",
+   "acceptance": "Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih",
+   "status": "VERIFIED",
+   "evidence": [
+    "Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314"
+   ],
+   "owner": "Sonnet",
+   "note": "Hanya halaman yang saya ubah."
+  },
+  {
+   "id": "D1",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Viewer 3D merender semua panel",
+   "acceptance": "Check wajib Body 3D Render Acceptance hijau pada main",
+   "status": "VERIFIED",
+   "evidence": [
+    "Workflow organ-3d-acceptance.yml; hijau pada main 4b2009a1f"
+   ],
+   "owner": "Sol (CI) / Local",
+   "note": ""
+  },
+  {
+   "id": "D2",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Pemuatan GLB valid",
+   "acceptance": "GLB dewasa laki-laki dan LOD memuat tanpa error halaman",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/qa_reports/web_budget.json",
+    "bodyexposure/qa_reports/gait_visual_browser.json (page_errors: [])"
+   ],
+   "owner": "Local",
+   "note": "Laporan ada; belum direproduksi independen oleh Cloud."
+  },
+  {
+   "id": "D3",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Anatomi seluruh tubuh dewasa laki-laki lulus gerbang kasar",
+   "acceptance": "gross_adult_male lulus",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/qa_reports/gross_adult_male.json"
+   ],
+   "owner": "Local",
+   "note": ""
+  },
+  {
+   "id": "D4",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Rangka perempuan (Visible Human/Denver) lulus gerbang kasar",
+   "acceptance": "gross_vhf_denver_ct lulus; lisensi CC BY 4.0 tercatat",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/qa_reports/gross_vhf_denver_ct.json",
+    "bodyexposure/PROVENANCE.md (lisensi dibaca 2026-10-10)"
+   ],
+   "owner": "Local",
+   "note": ""
+  },
+  {
+   "id": "D5",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Layer visibility dan navigasi dasar",
+   "acceptance": "Orbit, pilih mesh, dan layer dapat dioperasikan lewat uji browser",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sonnet (verifikasi) / Local",
+   "note": ""
+  },
+  {
+   "id": "D6",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "WALK/RUN: kontinuitas loop",
+   "acceptance": "Jahitan loop rotasi ≤ batas teknis terdokumen; kecepatan batas dilaporkan",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/qa_reports/gait_loop_continuity.json (seam 0,0°)",
+    "bodyexposure/qa_reports/gait_visual_browser.json"
+   ],
+   "owner": "Local",
+   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental."
+  },
+  {
+   "id": "D7",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "WALK/RUN: selip kaki terukur dan dalam batas terdokumen",
+   "acceptance": "Selip kaki diukur dari rig dan berada dalam kriteria teknis yang ditetapkan",
+   "status": "NOT_CHECKED",
+   "evidence": [
+    "bodyexposure/qa_reports/gait_foot_slide.json (WALK tumit RMS 24,5 mm; RUN belum terverifikasi)"
+   ],
+   "owner": "Local",
+   "note": "Kriteria teknis belum ditetapkan, jadi tidak bisa dinyatakan lulus."
+  },
+  {
+   "id": "D8",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Provenance dan lisensi seluruh aset terpublikasi",
+   "acceptance": "Setiap aset publik punya sumber, lisensi, dan atribusi terbaca dari halaman resmi",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/PROVENANCE.md",
+    "scripts/uji/body-asset-provenance.mts"
+   ],
+   "owner": "Local",
+   "note": ""
+  },
+  {
+   "id": "D9",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Modul belum tervalidasi berlabel jelas",
+   "acceptance": "Modul tanpa tinjauan anatomi berlabel (clinically_reviewed=false) dan tidak diklaim akurat secara klinis",
+   "status": "REPORTED",
+   "evidence": [
+    "bodyexposure/DELTA.md",
+    "manifest clinically_reviewed"
+   ],
+   "owner": "Local",
+   "note": ""
+  },
+  {
+   "id": "D10",
+   "pillar": "Body Exposure Alpha",
+   "criterion": "Viewer responsif di 390×844",
+   "acceptance": "Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main",
+   "status": "NOT_CHECKED",
+   "evidence": [
+    "Ada smoke mobile: scripts/qa/body3d-mobile-smoke-v2.mjs"
+   ],
+   "owner": "Sonnet (verifikasi)",
+   "note": ""
+  },
+  {
+   "id": "E1",
+   "pillar": "Platform Reliability",
+   "criterion": "Autentikasi",
+   "acceptance": "Akses tanpa identitas ditolak; sesi tidak dapat dipalsukan (tes negatif)",
+   "status": "REPORTED",
+   "evidence": [
+    "server/uji/authAccess.uji.ts"
+   ],
+   "owner": "Sol",
+   "note": "Belum direproduksi oleh Cloud."
+  },
+  {
+   "id": "E2",
+   "pillar": "Platform Reliability",
+   "criterion": "Otorisasi (RBAC) untuk data klinis",
+   "acceptance": "Peran yang salah ditolak pada setiap rute data klinis",
+   "status": "NOT_CHECKED",
+   "evidence": [
+    "server/uji/aksesKlinis.uji.ts"
+   ],
+   "owner": "Sol",
+   "note": ""
+  },
+  {
+   "id": "E3",
+   "pillar": "Platform Reliability",
+   "criterion": "Audit trail perubahan klinis",
+   "acceptance": "Setiap perubahan klinis tercatat dengan pelaku dan waktu",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": ""
+  },
+  {
+   "id": "E4",
+   "pillar": "Platform Reliability",
+   "criterion": "Perlindungan data pasien",
+   "acceptance": "Tidak ada PHI di log/repo; retensi dan consent sesuai kebijakan",
+   "status": "NOT_CHECKED",
+   "evidence": [],
+   "owner": "Sol",
+   "note": ""
+  },
+  {
+   "id": "E5",
+   "pillar": "Platform Reliability",
+   "criterion": "Home responsif 390×844",
+   "acceptance": "Tanpa scroll horizontal; label ≥ 11 px (dua pengecualian 10 px terdokumen)",
+   "status": "VERIFIED",
+   "evidence": [
+    "PR #2321 (merge c85a91761): 0 elemen < 10 px dari 158; scripts/uji/home-teks-minimum.mts"
+   ],
+   "owner": "Sonnet",
+   "note": ""
+  },
+  {
+   "id": "E6",
+   "pillar": "Platform Reliability",
+   "criterion": "Check CI wajib hijau pada exact head sebelum merge",
+   "acceptance": "8 check wajib hijau pada head yang di-merge",
+   "status": "VERIFIED",
+   "evidence": [
+    "Setiap merge sesi ini (PR #2297–#2321) diperiksa pada exact head"
+   ],
+   "owner": "Sol/Sonnet",
+   "note": ""
+  },
+  {
+   "id": "E7",
+   "pillar": "Platform Reliability",
+   "criterion": "Deployment staging terverifikasi",
+   "acceptance": "SHA yang berjalan di staging/produksi sama dengan SHA main dan smoke perjalanan kritis lulus",
+   "status": "NOT_CHECKED",
+   "evidence": [
+    "Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen"
+   ],
+   "owner": "Sol",
+   "note": ""
+  },
+  {
+   "id": "E8",
+   "pillar": "Platform Reliability",
+   "criterion": "Security Baseline hijau pada main",
+   "acceptance": "Security Baseline Enforcement hijau pada main",
+   "status": "VERIFIED",
+   "evidence": [
+    "Workflow security-baseline-enforcement.yml hijau pada main 4b2009a1f"
+   ],
+   "owner": "Sol (CI)",
+   "note": ""
+  },
+  {
+   "id": "E9",
+   "pillar": "Platform Reliability",
+   "criterion": "Audit dependensi menolak laporan rusak",
+   "acceptance": "Gerbang audit dependensi gagal pada laporan malformed",
+   "status": "NOT_CHECKED",
+   "evidence": [
+    "PR #2301 terbuka (milik agen lain)"
+   ],
+   "owner": "Sol",
+   "note": ""
+  }
+ ]
+}
