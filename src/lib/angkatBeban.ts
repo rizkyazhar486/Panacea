@@ -24,6 +24,42 @@ export interface SesiAngkat {
   catatan?: string
 }
 
+// Batas kewajaran masukan (bukan ambang klinis): menolak salah ketik dan data
+// tersimpan yang rusak, bukan menilai kemampuan seseorang.
+export const BATAS_ULANGAN = { min: 1, maks: 100 } as const
+export const BATAS_KG = { minEksklusif: 0, maks: 1000 } as const
+const PANJANG_GERAKAN_MAKS = 60
+
+export function setSah(x: unknown): x is SetAngkat {
+  if (!x || typeof x !== 'object') return false
+  const { ulangan, kg } = x as Record<string, unknown>
+  return typeof ulangan === 'number' && Number.isInteger(ulangan)
+    && ulangan >= BATAS_ULANGAN.min && ulangan <= BATAS_ULANGAN.maks
+    && typeof kg === 'number' && Number.isFinite(kg)
+    && kg > BATAS_KG.minEksklusif && kg <= BATAS_KG.maks
+}
+
+/** Tanggal kalender nyata YYYY-MM-DD (bolak-balik, agar 2026-02-30 ditolak) dan tidak di masa depan. */
+function tanggalSah(t: string, sekarang: number): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false
+  const ms = Date.parse(`${t}T00:00:00Z`)
+  if (!Number.isFinite(ms) || new Date(ms).toISOString().slice(0, 10) !== t) return false
+  return ms <= sekarang
+}
+
+/** Alasan penolakan sesi, atau null bila sah. `sekarang` disuntikkan agar deterministik. */
+export function alasanSesiDitolak(s: SesiAngkat, sekarang: number): string | null {
+  const g = typeof s.gerakan === 'string' ? s.gerakan.trim() : ''
+  if (!g) return 'movement name is required'
+  if (g.length > PANJANG_GERAKAN_MAKS) return `movement name must be at most ${PANJANG_GERAKAN_MAKS} characters`
+  if (typeof s.tanggal !== 'string' || !tanggalSah(s.tanggal, sekarang)) return 'date must be a real date, not in the future'
+  if (!Array.isArray(s.set) || s.set.length === 0) return 'at least one set is required'
+  if (!s.set.every(setSah)) {
+    return `every set needs whole reps ${BATAS_ULANGAN.min}–${BATAS_ULANGAN.maks} and a weight above 0 up to ${BATAS_KG.maks} kg`
+  }
+  return null
+}
+
 function aman(x: unknown): x is SesiAngkat {
   if (!x || typeof x !== 'object') return false
   const s = x as Record<string, unknown>
@@ -34,13 +70,18 @@ export function ambilSesi(): SesiAngkat[] {
   try {
     const raw = localStorage.getItem(KUNCI)
     const arr = raw ? JSON.parse(raw) : []
-    return Array.isArray(arr) ? arr.filter(aman) : []
+    // Set rusak (NaN/negatif/bukan angka dari penyimpanan lama) dibuang agar tidak meracuni volume dan rekor.
+    return Array.isArray(arr)
+      ? arr.filter(aman).map((x) => ({ ...x, set: x.set.filter(setSah) })).filter((x) => x.set.length > 0)
+      : []
   } catch {
     return []
   }
 }
 
-export function simpanSesi(s: SesiAngkat): SesiAngkat[] {
+export function simpanSesi(s: SesiAngkat, sekarang = Date.now()): SesiAngkat[] {
+  // Fail-closed: sesi tak sah tidak ditulis; daftar tersimpan dikembalikan apa adanya.
+  if (alasanSesiDitolak(s, sekarang)) return ambilSesi()
   const semua = [s, ...ambilSesi().filter((x) => x.id !== s.id)].slice(0, 500)
   try { localStorage.setItem(KUNCI, JSON.stringify(semua)) } catch { /* penuh: biarkan */ }
   return semua
