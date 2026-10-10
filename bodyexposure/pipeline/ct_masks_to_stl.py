@@ -16,7 +16,7 @@ from ct_segmentation_common import mask_mesh, write_stl
 ap = argparse.ArgumentParser(); ap.add_argument("--seg", required=True); ap.add_argument("--validation", required=True); ap.add_argument("--out", required=True)
 a = ap.parse_args()
 T = json.load(open(a.validation))["transform_ct_to_denver"]; R = np.array(T["R"]); t = np.array(T["t_mm"])
-NAMES = (["skull", "sternum", "costal_cartilages", "clavicula_left", "clavicula_right", "scapula_left", "scapula_right", "humerus_left", "humerus_right"]
+NAMES = (["skull", "sternum", "clavicula_left", "clavicula_right", "scapula_left", "scapula_right", "humerus_left", "humerus_right"]
          + [f"vertebrae_C{i}" for i in range(1, 8)] + [f"vertebrae_T{i}" for i in range(1, 13)] + [f"vertebrae_L{i}" for i in range(1, 6)]
          + [f"rib_{s}_{i}" for s in ("left", "right") for i in range(1, 13)])
 os.makedirs(a.out, exist_ok=True)
