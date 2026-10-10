@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 19 / 43 = 44.2%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 20 / 43 = 46.5%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,9 +24,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 19 |
+| VERIFIED | 20 |
 | REPORTED | 6 |
-| NOT_CHECKED | 14 |
+| NOT_CHECKED | 13 |
 | NOT_STARTED | 3 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
@@ -85,7 +85,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | D9 | Modul belum tervalidasi berlabel jelas | Modul tanpa tinjauan anatomi berlabel (clinically_reviewed=false) dan tidak diklaim akurat secara klinis | REPORTED | Local | bodyexposure/DELTA.md; manifest clinically_reviewed |
 | D10 | Viewer responsif di 390×844 | Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main | VERIFIED | Sonnet (verifikasi) | qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK; Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual); Asersi scrollWidth ≤ innerWidth pada 390×844 dan batas ≤ 80 ribu segitiga muatan awal (terukur 40 ribu); Hanya halaman kanonik (/body-exposure/canonical via qa/canonical-body.html). |
 
-## Platform Reliability (3 / 9)
+## Platform Reliability (4 / 9)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
@@ -97,5 +97,5 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | E6 | Check CI wajib hijau pada exact head sebelum merge | 8 check wajib hijau pada head yang di-merge | VERIFIED | Sol/Sonnet | Setiap merge sesi ini (PR #2297–#2321) diperiksa pada exact head |
 | E7 | Deployment staging terverifikasi | SHA yang berjalan di staging/produksi sama dengan SHA main dan smoke perjalanan kritis lulus | NOT_CHECKED | Sol | Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen |
 | E8 | Security Baseline hijau pada main | Security Baseline Enforcement hijau pada main | VERIFIED | Sol (CI) | Workflow security-baseline-enforcement.yml hijau pada main 4b2009a1f |
-| E9 | Audit dependensi menolak laporan rusak | Gerbang audit dependensi gagal pada laporan malformed | NOT_CHECKED | Sol | PR #2301 terbuka (milik agen lain) |
+| E9 | Audit dependensi menolak laporan rusak | Gerbang audit dependensi gagal pada laporan malformed | VERIFIED | Sol | Kode: scripts/qa/dependency-audit-gate.mjs (PR #2212, diperketat #2329 -> main 522c682); dijalankan .github/workflows/dependency-audit.yml untuk workspace web dan server.; Tes: scripts/qa/dependency-audit-gate.test.mjs 33/33 lulus lokal (node --test, 2026-10-10), termasuk laporan kosong, error npm, tanpa vulnerabilities/metadata, via tidak berbentuk array, hitungan ringkasan bertentangan dengan severity, advisory tak teratribusi, severity konflik/tak dikenal, kebijakan longgar.; Uji CLI lokal (Sonnet Cloud, 2026-10-10): berkas bukan JSON utuh -> exit 2; {"error":...} -> UNUSABLE exit 2; laporan bersih berpasangan -> OK exit 0.; Batas: yang diuji adalah penolakan bentuk laporan dan penerimaan yang kedaluwarsa; kebenaran data advisory tetap bergantung pada npm audit. Bukan penilaian klinis.; PR #2301 tidak lagi relevan; pekerjaan mendarat lewat #2212/#2329. |
 
