@@ -407,3 +407,10 @@ regional meshes would mean inventing the boundaries between neighbouring bones, 
 Unblocking options that stay within the rules: (1) a mesh set with separated female bones and a confirmed licence;
 (2) segmenting the Visible Human Female CT ourselves, then having a qualified anatomist review it; (3) a published
 ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms before any 4DCT use.
+
+## VHF lower-limb rig: neutral-centred ROM and WALK/RUN (female)
+
+- Rig limits are AAOS ranges (Greene & Heckman 1994) centred on the neutral standing pose using measured rest offsets of this skeleton. The earlier right-side contact "caps" were artefacts of a mis-centred rest pose; all nine full-AAOS movements now pass contact QA (largest overlap 0.24 mm, gate 1.5 mm). Truth class: `simulated`.
+- WALK (1.092 s) and RUN (0.75 s) are CMU motion-capture trials (subjects 07 and 09, another person) retargeted to this skeleton and clamped to the rig limits. Truth class: `measured-retargeted`; this is transferred motion for an individual who was never captured, not patient-measured gait. Legs and pelvis only; the rest of the skeleton, muscles and ligaments do not move.
+- QA: loop seam 0.0 deg for both clips, joint angular speed jump at the seam below the interior maximum, foot floor offset 0 mm, penetration at most 0.07 mm. WALK heel slide RMS 5.0 mm / max 7.7 mm (upper bound, rigid markers, no toe bone). RUN has flight phases, so no stance slide figure is reported. Reports: `qa_reports/gait_loop_continuity_vhf_female.json`, `gait_foot_slide_vhf_female.json`, `rig_vhf_denver_ct_gait.json`.
+- `clinically_reviewed` remains false.
