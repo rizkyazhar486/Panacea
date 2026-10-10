@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 9 / 43 = 20.9%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 11 / 43 = 25.6%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,9 +24,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 9 |
+| VERIFIED | 11 |
 | REPORTED | 7 |
-| NOT_CHECKED | 16 |
+| NOT_CHECKED | 14 |
 | NOT_STARTED | 10 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
@@ -70,7 +70,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang terpisah; tidak menghentikan pekerjaan teknis. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |
 
-## Body Exposure Alpha (1 / 10)
+## Body Exposure Alpha (3 / 10)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
@@ -78,12 +78,12 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | D2 | Pemuatan GLB valid | GLB dewasa laki-laki dan LOD memuat tanpa error halaman | REPORTED | Local | bodyexposure/qa_reports/web_budget.json; bodyexposure/qa_reports/gait_visual_browser.json (page_errors: []); Laporan ada; belum direproduksi independen oleh Cloud. |
 | D3 | Anatomi seluruh tubuh dewasa laki-laki lulus gerbang kasar | gross_adult_male lulus | REPORTED | Local | bodyexposure/qa_reports/gross_adult_male.json |
 | D4 | Rangka perempuan (Visible Human/Denver) lulus gerbang kasar | gross_vhf_denver_ct lulus; lisensi CC BY 4.0 tercatat | REPORTED | Local | bodyexposure/qa_reports/gross_vhf_denver_ct.json; bodyexposure/PROVENANCE.md (lisensi dibaca 2026-10-10) |
-| D5 | Layer visibility dan navigasi dasar | Orbit, pilih mesh, dan layer dapat dioperasikan lewat uji browser | NOT_CHECKED | Sonnet (verifikasi) / Local | - |
-| D6 | WALK/RUN: kontinuitas loop | Jahitan loop rotasi ≤ batas teknis terdokumen; kecepatan batas dilaporkan | REPORTED | Local | bodyexposure/qa_reports/gait_loop_continuity.json (seam 0,0°); bodyexposure/qa_reports/gait_visual_browser.json; Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. |
+| D5 | Layer visibility dan navigasi dasar | Orbit, pilih mesh, dan layer dapat dioperasikan lewat uji browser | VERIFIED | Sonnet (verifikasi) / Local | qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK; Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual); Cakupan asersi: pencarian→pilih struktur→panel provenans, mode isolate, potongan sagittal, dispersi sistem, kupas lapisan kulit→otot→tulang, ukur dua titik, preset kamera, ganti tubuh; Verifikasi fungsional; kecepatan bingkai di sandbox (5–7 fps, tanpa GPU) bukan penilaian performa. |
+| D6 | WALK/RUN: kontinuitas loop | Jahitan loop rotasi ≤ batas teknis terdokumen; kecepatan batas dilaporkan | REPORTED | Local | bodyexposure/qa_reports/gait_loop_continuity.json (seam 0,0°); bodyexposure/qa_reports/gait_visual_browser.json; Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label "Recorded motion" (pemeriksaan fungsional, bukan kualitas gait). |
 | D7 | WALK/RUN: selip kaki terukur dan dalam batas terdokumen | Selip kaki diukur dari rig dan berada dalam kriteria teknis yang ditetapkan | NOT_CHECKED | Local | bodyexposure/qa_reports/gait_foot_slide.json (WALK tumit RMS 24,5 mm; RUN belum terverifikasi); Kriteria teknis belum ditetapkan, jadi tidak bisa dinyatakan lulus. |
 | D8 | Provenance dan lisensi seluruh aset terpublikasi | Setiap aset publik punya sumber, lisensi, dan atribusi terbaca dari halaman resmi | REPORTED | Local | bodyexposure/PROVENANCE.md; scripts/uji/body-asset-provenance.mts |
 | D9 | Modul belum tervalidasi berlabel jelas | Modul tanpa tinjauan anatomi berlabel (clinically_reviewed=false) dan tidak diklaim akurat secara klinis | REPORTED | Local | bodyexposure/DELTA.md; manifest clinically_reviewed |
-| D10 | Viewer responsif di 390×844 | Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main | NOT_CHECKED | Sonnet (verifikasi) | Ada smoke mobile: scripts/qa/body3d-mobile-smoke-v2.mjs |
+| D10 | Viewer responsif di 390×844 | Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main | VERIFIED | Sonnet (verifikasi) | qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK; Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual); Asersi scrollWidth ≤ innerWidth pada 390×844 dan batas ≤ 80 ribu segitiga muatan awal (terukur 40 ribu); Hanya halaman kanonik (/body-exposure/canonical via qa/canonical-body.html). |
 
 ## Platform Reliability (3 / 9)
 

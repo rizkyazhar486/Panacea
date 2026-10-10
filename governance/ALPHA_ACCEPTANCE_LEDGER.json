@@ -333,10 +333,14 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Layer visibility dan navigasi dasar",
    "acceptance": "Orbit, pilih mesh, dan layer dapat dioperasikan lewat uji browser",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK",
+    "Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual)",
+    "Cakupan asersi: pencarian→pilih struktur→panel provenans, mode isolate, potongan sagittal, dispersi sistem, kupas lapisan kulit→otot→tulang, ukur dua titik, preset kamera, ganti tubuh"
+   ],
    "owner": "Sonnet (verifikasi) / Local",
-   "note": ""
+   "note": "Verifikasi fungsional; kecepatan bingkai di sandbox (5–7 fps, tanpa GPU) bukan penilaian performa."
   },
   {
    "id": "D6",
@@ -349,7 +353,7 @@
     "bodyexposure/qa_reports/gait_visual_browser.json"
    ],
    "owner": "Local",
-   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental."
+   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label \"Recorded motion\" (pemeriksaan fungsional, bukan kualitas gait)."
   },
   {
    "id": "D7",
@@ -394,12 +398,14 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Viewer responsif di 390×844",
    "acceptance": "Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main",
-   "status": "NOT_CHECKED",
+   "status": "VERIFIED",
    "evidence": [
-    "Ada smoke mobile: scripts/qa/body3d-mobile-smoke-v2.mjs"
+    "qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK",
+    "Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual)",
+    "Asersi scrollWidth ≤ innerWidth pada 390×844 dan batas ≤ 80 ribu segitiga muatan awal (terukur 40 ribu)"
    ],
    "owner": "Sonnet (verifikasi)",
-   "note": ""
+   "note": "Hanya halaman kanonik (/body-exposure/canonical via qa/canonical-body.html)."
   },
   {
    "id": "E1",
