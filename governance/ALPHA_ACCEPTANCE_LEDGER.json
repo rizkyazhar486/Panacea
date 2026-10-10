@@ -317,13 +317,15 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Pemuatan GLB valid",
    "acceptance": "GLB dewasa laki-laki dan LOD memuat tanpa error halaman",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "bodyexposure/qa_reports/web_budget.json",
-    "bodyexposure/qa_reports/gait_visual_browser.json (page_errors: [])"
+    "bodyexposure/qa_reports/gait_visual_browser.json (page_errors: [])",
+    "Reproduksi independen (Sonnet Cloud, scripts/qa/glb-load-all.mjs, main d050d3c9f): 382 GLB di public/bodyexposure didekode (three + meshopt) tanpa galat — 20.454 mesh, 6.757.490 segitiga, 62,5 MB; tanpa mesh kosong, tanpa koordinat bukan-hingga (sampel). Kontrol negatif: GLB terpotong dan GLB berkepala salah sama-sama gagal dengan nama berkas dan pesan",
+    "Halaman kanonik memuat 77 berkas tanpa galat halaman di 390×844 dan 1440×900, tema terang/gelap (lihat D5)"
    ],
    "owner": "Local",
-   "note": "Laporan ada; belum direproduksi independen oleh Cloud."
+   "note": "Laporan ada; belum direproduksi independen oleh Cloud. Yang diverifikasi adalah keterbacaan/dekode semua GLB publik, bukan kebenaran anatomi, dan bukan kinerja pada GPU nyata."
   },
   {
    "id": "D3",
