@@ -113,3 +113,4 @@ export {
   type ReviewInput,
   type ApprovalContext,
 } from './engine/structureReview'
+export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'

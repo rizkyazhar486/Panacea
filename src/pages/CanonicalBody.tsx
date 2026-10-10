@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
-import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
+import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -44,6 +44,7 @@ interface Picked {
   system: string
   laterality: string
   status: string
+  review: ReviewLabel
   source: string
   license: string
   latin?: string
@@ -635,7 +636,7 @@ export function CanonicalBody() {
     setPicked({
       id: u.panacea_structure_id, name: u.canonical_name ?? u.panacea_structure_id, system: u.panacea_system ?? '',
       laterality: u.panacea_laterality ?? '', status: u.panacea_accuracy_status ?? '', source: u.panacea_source ?? '',
-      license: u.panacea_license ?? '', latin: u.panacea_latin_name, ta2: u.panacea_ta2_id, note: u.panacea_qa_note,
+      license: u.panacea_license ?? '', review: reviewLabel(u), latin: u.panacea_latin_name, ta2: u.panacea_ta2_id, note: u.panacea_qa_note,
     })
   }
 
@@ -916,6 +917,7 @@ export function CanonicalBody() {
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-lg font-black capitalize text-ink dark:text-white">{picked.name}</h3>
               <Badge tone={statusTone(picked.status)}>{picked.status.replaceAll('_', ' ')}</Badge>
+              <Badge tone={picked.review.reviewed ? 'normal' : 'neutral'}><span data-review-label>{picked.review.text}</span></Badge>
             </div>
             {picked.latin && (
               <p className="text-sm italic text-neutral-700 dark:text-neutral-200">
