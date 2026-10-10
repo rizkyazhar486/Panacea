@@ -91,3 +91,5 @@ export { caffeineAtBedtime, caffeineBand, decayCurve as caffeineDecayCurve, CAFF
 export type { CaffeineInput, CaffeineResult, CaffeineBand, CaffeineDrink } from './engine/caffeineSleep'
 export { packYearScreen, PACK_YEAR_RANGES, USPSTF_2021 } from './engine/packYearScreen'
 export type { PackYearInput, PackYearResult, PackYearStatus } from './engine/packYearScreen'
+export { cvdRisk, fib4, fib4Band, ostIndex, ostBand, RISK_RANGES } from './engine/riskScreens'
+export type { CvdInput, CvdResult, Fib4Input, Fib4Result, Fib4Band, OstInput, OstResult } from './engine/riskScreens'
