@@ -422,3 +422,9 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 - **Hand bones are one mesh per side** (carpals, metacarpals, phalanges). Automatic separation gave 47 to 49 segments for about 29 expected bones and was not accepted as labelling, so no individual hand bone is named. The wrist boundary with the radius and ulna is approximate.
 - **Not measured:** no reference segmentation exists for these bones, so no Dice or surface distance is reported. Alignment between the native crop and the 1.5 mm frame assumes the scipy-zoom axis mapping (verified by correlation 0.9995 of resampled slices; sub-voxel offsets up to 0.75 mm are possible).
 - `clinically_reviewed` remains false.
+## Ontology identifiers (Uberon / FMA) for the HuBMAP Visible Human female body
+
+- `public/bodyexposure/ontology.adult_female.json` maps structures of `HUMAN.ADULT.FEMALE` to Uberon/FMA ids using the HuBMAP / HRA ASCT+B 3D-model crosswalk table (`crosswalkfemale.csv`, 874 rows). Matching is by the exact source node name; the CSV is not copied into the repository, its SHA-256 and row count are stored in the output.
+- 618 of 841 structures are mapped. 1 row has no id in the source (`VH_F_vertebra`) and is rejected, not guessed; 256 rows name grouping nodes or structures that are not in this body and are counted only. Structures without a row show no ontology line.
+- The male crosswalk (`crosswalkmale.csv`, 850 rows) matches 0 of the 3,877 male structures (the male body comes from Z-Anatomy, whose names differ), so no male mapping is published.
+- The licence of the crosswalk table was not confirmed from a machine-readable source; only identifiers and labels are used, attributed to HuBMAP / HRA.

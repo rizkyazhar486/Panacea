@@ -129,6 +129,7 @@ export function CanonicalBody() {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({ structures: 0, tris: 0, ms: 0 })
   const [anchors, setAnchors] = useState<AnchorIndex | null>(null)
+  const [ontology, setOntology] = useState<Record<string, { id: string; label: string }> | null>(null)
   // ── gerak rig (kerangka beranimasi); jam berbasis waktu nyata, lihat engine/motionTimeline ──
   const [motionOn, setMotionOn] = useState(false)
   const [motionTl, setMotionTl] = useState<MotionTimeline | null>(null)
@@ -184,6 +185,14 @@ export function CanonicalBody() {
   const variants = (body?.variants ?? []).filter((v) => hasFiles(v.body_id))
   // tubuh yang benar-benar dimuat: varian terpilih (pediatrik) atau entri itu sendiri (dewasa)
   const bodyId = variants.length ? (variants.find((v) => v.body_id === variantId) ?? variants[0]).body_id : entryId
+
+  // ID ontologi (Uberon/FMA) per tubuh bila ada; tubuh tanpa berkas tidak menampilkan baris ontologi (tidak ada tebakan)
+  useEffect(() => {
+    let live = true
+    setOntology(null)
+    fetch(`${BASE}ontology.${fileTag(bodyId)}.json`).then((r) => (r.ok ? r.json() : null)).then((j) => { if (live && j?.map) setOntology(j.map) }).catch(() => {})
+    return () => { live = false }
+  }, [bodyId])
   const activeVariant = variants.find((v) => v.body_id === bodyId)
   const lod = detail === 'detailed' ? 'LOD2' : (matrix?.light_lod?.[fileTag(bodyId)] ?? 'LOD3')
   const systems = useMemo(() => {
@@ -937,6 +946,11 @@ export function CanonicalBody() {
             {picked.latin && (
               <p className="text-sm italic text-neutral-700 dark:text-neutral-200">
                 {picked.latin}{picked.ta2 && <span className="not-italic text-neutral-500"> · TA2 {picked.ta2}</span>}
+              </p>
+            )}
+            {ontology?.[picked.id] && (
+              <p data-testid="ontology-id" className="text-[13px] text-neutral-600 dark:text-neutral-300">
+                Ontology: <span className="font-mono">{ontology[picked.id].id}</span>{ontology[picked.id].label ? ` · ${ontology[picked.id].label}` : ''}
               </p>
             )}
             <p className="break-all font-mono text-[11px] text-neutral-500">{picked.id}</p>
