@@ -415,7 +415,13 @@ risks:
       (scripts/qa/dependency-audit-gate.mjs, governance/dependency-audit-policy.json,
       .github/workflows/dependency-audit.yml) now fails on any high/critical advisory without an explicit,
       expiring, reasoned acceptance; it runs weekly and on every lockfile or policy change, and treats empty or
-      malformed audit output as a failure. Residual and accepted for now, both moderate: gaxios -> uuid (only uuid
+      malformed audit output as a failure. A 2026-10-09 candidate repair closes false-clean verdicts for
+      negative/unsafe high-critical counts, array-shaped sections, malformed via entries and inherited
+      prototype severity names. A 2026-10-10 extension rejects explicit high/critical package severity
+      paired with a zero summary count and requires per-package reachable advisory attribution before
+      acceptance, including cycle-safe npm transitive links and rejection of missing targets and conflicting
+      duplicate advisory severities. Regression and CLI rejection cases are included; exact-head CI and
+      integration are still pending. Residual and accepted for now, both moderate: gaxios -> uuid (only uuid
       v3/v5/v6 with a caller-supplied buffer is affected and gaxios uses v4; the fix needs a google-auth-library
       9 -> 10 major bump) and react-router < 7.18 (open redirect via backslash in Link/useNavigate and the SSR-only
       deserializeErrors; the app is a client-only HashRouter SPA and the fix needs the v7 migration). Moderate
