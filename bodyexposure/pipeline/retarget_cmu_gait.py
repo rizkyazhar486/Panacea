@@ -28,6 +28,9 @@ ROM = json.load(open(arg("--rom")))
 LIM = ROM["rom_limits_deg_local"]
 SRC, OUT, REPORT = arg("--src"), os.path.abspath(arg("--out")), arg("--report")
 CLIPS = [c.split(":") for c in arg("--clips").split(",")]
+ARM_NAME = arg("--arm", "RIG.ADULT_MALE")     # tungkai bawah perempuan: --arm RIG.VHF_LOWER_LIMB --body VHF_DENVER_CT.ADULT.FEMALE
+BODY = arg("--body")                          # None = pasangan kontak laki-laki bawaan rig_contact_qa
+COVERAGE = arg("--coverage", "")
 FPS_OUT = 24  # sama dengan klip ROM: waktu kunci glTF = frame / fps scene (satu nilai untuk semua klip)
 
 
@@ -151,7 +154,17 @@ def refine_period(A, start, period, keys):
 
 
 # ── terapkan ke rig ─────────────────────────────────────────────────────────
-arm = bpy.data.objects["RIG.ADULT_MALE"]; P = arm.pose.bones
+arm = bpy.data.objects[ARM_NAME]; P = arm.pose.bones
+HAS_ARMS = "UPPER_ARM.L" in P and "FOREARM.L" in P  # rig tungkai bawah tidak punya lengan: ayunan lengan tidak dibuat
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rig_contact_qa  # noqa: E402
+if BODY:
+    rig_contact_qa.configure(BODY + ".SKELETAL.", [("FEMUR", "TIBIA"), ("FEMUR", "HIP_BONE_OS_COXAE"), ("FEMUR", "PATELLA"), ("TIBIA", "FIBULA"), ("TIBIA", "TALUS"), ("FIBULA", "TALUS")])
+
+
+# offset istirahat rig terhadap berdiri netral (derajat anatomis), diukur dari geometri rig oleh build_rig_lower_limb.py dan dipakai juga untuk menggeser
+# batas ROM; rig perempuan berasal dari kadaver telentang (pergelangan kaki ±38° plantarfleksi), jadi sudut lokal = sudut anatomis sasaran − offset istirahat
+REST = {side: (ROM["rest_offsets_deg"][side] if BODY else {"hip_flex": 0.0, "hip_abd": 0.0, "knee_flex": 0.0, "ankle_dorsi": 0.0}) for side in "LR"}
 if arm.animation_data and arm.animation_data.action:  # klip ROM yang sudah ada tetap disimpan bersama klip gait
     arm.animation_data.action.name = "ROM"; arm.animation_data.action.use_fake_user = True
 sg = lambda b, mov: 1 if LIM[b]["positive_X"] == mov else -1
@@ -194,16 +207,19 @@ for name, subj, trial in CLIPS:
         for side in ("L", "R"):
             vals = {}
             for key in CLAMP:
-                v = sample(f"{key}.{side}", t); lo, hi = CLAMP[key]
+                if not HAS_ARMS and key in ("shoulder_flex", "elbow_flex"):
+                    continue
+                v = sample(f"{key}.{side}", t); lo, hi = CLAMP[key]   # jepit pada rentang anatomis mutlak (AAOS), BARU kurangi offset istirahat
                 if v < lo or v > hi: clamped[f"{key}.{side}"] = clamped.get(f"{key}.{side}", 0) + 1
-                vals[key] = min(max(v, lo), hi)
+                vals[key] = min(max(v, lo), hi) - REST[side].get(key, 0.0)
             def setb(b, x=0.0, z=0.0):
                 P[b].rotation_euler = (math.radians(x), 0, math.radians(z)); P[b].keyframe_insert("rotation_euler", frame=fr)
             setb(f"THIGH.{side}", sg(f"THIGH.{side}", "flexion") * vals["hip_flex"], zsign(f"THIGH.{side}") * vals["hip_abd"])
             setb(f"SHIN.{side}", sg(f"SHIN.{side}", "flexion") * vals["knee_flex"])
             setb(f"FOOT.{side}", sg(f"FOOT.{side}", "extension") * vals["ankle_dorsi"])  # FOOT: ekstensi = dorsofleksi
-            setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
-            setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
+            if HAS_ARMS:
+                setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
+                setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
         bobs.append(float(np.interp(t, np.arange(len(bob)), bob)) * unit_m * (leg_rig / leg_src))
     # kontak lantai: tinggi kaki terendah per frame pada pelvis dasar
     sc = bpy.context.scene; sc.frame_start, sc.frame_end = 0, len(idx) - 1; sc.render.fps = FPS_OUT
@@ -232,8 +248,7 @@ for name, subj, trial in CLIPS:
     rngs = {key: [round(min(r[f"{key}.{s}"] for r in A[start:start + period + 1] for s in "LR"), 1),
                   round(max(r[f"{key}.{s}"] for r in A[start:start + period + 1] for s in "LR"), 1)] for key in CLAMP}
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from rig_contact_qa import sweep
-    contact = sweep(sc, list(range(0, len(idx), 2)), lambda at: name.lower())
+    contact = rig_contact_qa.sweep(sc, list(range(0, len(idx), 2)), lambda at: name.lower())
     loop_err = max(abs(sample(f"{key}.{s}", idx[0]) - sample(f"{key}.{s}", idx[-1])) for key in CLAMP for s in "LR")
     drift_max = max(abs(v) for v in drift.values())
     report["clips"][name] = {
@@ -241,6 +256,7 @@ for name, subj, trial in CLIPS:
         "cycle_s": round(period / 120, 3), "frames_24fps": len(idx), "keys_start_at_s": 0.0, "loop_seam_max_deg": round(loop_err, 2),
         "loop_drift_corrected_max_deg": round(drift_max, 2),
         "joint_angle_range_deg": rngs, "clamped_samples": clamped,
+        "rest_offsets_deg": ({sd: {k: round(v, 1) for k, v in REST[sd].items()} for sd in "LR"} if BODY else None), "coverage": COVERAGE or None,
         "leg_length_m": {"rig": round(leg_rig, 3), "source": round(leg_src, 3)},
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}

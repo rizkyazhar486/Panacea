@@ -14,7 +14,7 @@ import argparse, glob, json, os
 ap = argparse.ArgumentParser()
 ap.add_argument("--manifest", required=True); ap.add_argument("--entry", required=True)
 ap.add_argument("--label", required=True); ap.add_argument("--coverage", default=""); ap.add_argument("--individual", default="")
-ap.add_argument("--light-lod", default="LOD4"); ap.add_argument("--motion-glb", default=""); ap.add_argument("--motion-json", default=""); ap.add_argument("--source", default="", help="teks sumber untuk tampilan (bawaan: sumber dari manifest)"); ap.add_argument("--replace", default="", help="body_id de una varian lama yang digantikan (dihapus dari matriks, manifest, dan berkas web)")
+ap.add_argument("--light-lod", default="LOD4"); ap.add_argument("--update-entry", action="store_true", help="entri = tubuh itu sendiri (mis. FETUS): perbarui status, sumber, jumlah struktur dan hapus alasan placeholder"); ap.add_argument("--motion-glb", default=""); ap.add_argument("--motion-json", default=""); ap.add_argument("--source", default="", help="teks sumber untuk tampilan (bawaan: sumber dari manifest)"); ap.add_argument("--replace", default="", help="body_id de una varian lama yang digantikan (dihapus dari matriks, manifest, dan berkas web)")
 a = ap.parse_args()
 
 new_m = json.load(open(os.path.join(a.manifest, "body_matrix.json")))["bodies"]
@@ -50,6 +50,9 @@ var["stature_m"] = None  # tubuh parsial: tinggi badan tidak ditampilkan
 if a.coverage: var["coverage"] = a.coverage
 if a.individual: var["individual"] = a.individual
 entry["variants"] = [v for v in entry.get("variants", []) if v["body_id"] not in (bid, a.replace)] + [var]
+if a.update_entry:
+    assert entry["body_id"] == bid, "--update-entry requires the entry to be the body itself"
+    entry.update({"status": nb["status"], "source": a.source or nb["source"], "structures": nb["structures"], "systems": nb["systems"], "source_requirement": None})
 M["files"] = sorted((set(M["files"]) | {f"{tag}.{s}" for s in systems}) - {f for f in M["files"] if old_tag and f.startswith(old_tag + ".")})
 if old_tag: M.get("light_lod", {}).pop(old_tag, None)
 M.setdefault("light_lod", {})[tag] = a.light_lod

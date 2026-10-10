@@ -1,0 +1,108 @@
+{
+  "source_blend": "/Users/rizkyazhar/Documents/Panaceamed.id/bodyexposure/PANACEA_HUMAN_MASTER_v011.blend",
+  "blender_version": "5.2.2 LTS",
+  "profile": "preview",
+  "benchmark": "layered",
+  "compare_mode": "lighting",
+  "device_backend": "CPU",
+  "devices": [],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 3003,
+    "source_polygons": 9284861,
+    "meshes_without_uv": 1137,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 3003
+    },
+    "suppressed_display_instances": [
+      "ICRP.ADULT.MALE.ROOT",
+      "ICRP.ADULT.FEMALE.ROOT",
+      "PEDIATRIC.NEONATE.MALE.ROOT",
+      "PEDIATRIC.NEONATE.FEMALE.ROOT",
+      "PEDIATRIC.INFANT.MALE.ROOT",
+      "PEDIATRIC.INFANT.FEMALE.ROOT",
+      "PEDIATRIC.CHILD_5Y.MALE.ROOT",
+      "PEDIATRIC.CHILD_5Y.FEMALE.ROOT",
+      "PEDIATRIC.CHILD_10Y.MALE.ROOT",
+      "PEDIATRIC.CHILD_10Y.FEMALE.ROOT",
+      "PEDIATRIC.ADOLESCENT.MALE.ROOT",
+      "PEDIATRIC.ADOLESCENT.FEMALE.ROOT"
+    ]
+  },
+  "renders": [
+    {
+      "variant": "before",
+      "path": "layered_preview_before.png",
+      "sha256": "d0ddc66e8e80697af8b5c20cd90e0d1b4976207a2f41485ab9eaca3daa508254",
+      "render_seconds": 27.605,
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "original",
+      "exposure_ev": -3.0,
+      "lighting_state_restored": true,
+      "studio_lights": []
+    },
+    {
+      "variant": "after",
+      "path": "layered_preview_after.png",
+      "sha256": "28b9adf2191ddc2dec6ad7132fdada4e4e13fd049daa4e9aa59a1b6c753bd98d",
+      "render_seconds": 30.059,
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 526.0509033203125,
+          "diameter_metres": 1.1111968755722046,
+          "location_metres": [
+            -2.5893564224243164,
+            -0.6909164786338806,
+            2.019294500350952
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 131.51272583007812,
+          "diameter_metres": 1.5385801792144775,
+          "location_metres": [
+            0.34600260853767395,
+            -2.5118160247802734,
+            1.1523091793060303
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 350.7005920410156,
+          "diameter_metres": 0.7692900896072388,
+          "location_metres": [
+            2.031280040740967,
+            0.5604445338249207,
+            1.8382295370101929
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation, browser FPS or memory measurement performed.",
+    "Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.",
+    "Timings include scene synchronization and sequential cache effects."
+  ]
+}

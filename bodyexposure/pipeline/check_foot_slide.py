@@ -1,6 +1,7 @@
 """Selip kaki klip WALK/RUN dari mesh rig di Blender (heel & toe sebagai penanda kaku pada tulang kaki).
 
   Blender -b bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend -P bodyexposure/pipeline/check_foot_slide.py -- --out bodyexposure/qa_reports/gait_foot_slide.json
+  (tubuh lain: tambahkan --arm RIG.VHF_LOWER_LIMB --body VHF_DENVER_CT.ADULT.FEMALE)
 
 Klip berjalan di tempat. Selip diukur terhadap kecepatan akar maju v yang SEHARUSNYA dipakai pemutar: untuk setiap kaki, penanda (tumit = titik
 paling belakang, jari = titik paling depan pada mesh kaki saat istirahat) dianggap menapak bila tingginya < 15 mm di atas lantai pada klip.
@@ -13,9 +14,13 @@ from mathutils import Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 OUT = argv[argv.index("--out") + 1]
-arm = bpy.data.objects["RIG.ADULT_MALE"]; sc = bpy.context.scene
+def opt(k, d):
+    return argv[argv.index(k) + 1] if k in argv else d
+
+
+arm = bpy.data.objects[opt("--arm", "RIG.ADULT_MALE")]; sc = bpy.context.scene
 dg = bpy.context.evaluated_depsgraph_get()
-FOOT_SKEL = "ADULT.MALE.SKELETAL."
+FOOT_SKEL = opt("--body", "ADULT.MALE") + ".SKELETAL."
 res = {"method": __doc__.strip().splitlines()[0], "clips": {}}
 for clip in ("WALK", "RUN"):
     act = bpy.data.actions.get(clip)

@@ -40,6 +40,13 @@ vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoske
                checked against the Denver segmentation for femur, hip bone and sacrum only.
                One individual (donor 59 y, 157 cm, 88 kg), not an atlas. Not clinically reviewed.
 
+fetus.*      — SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
+               (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), CC0 1.0. Uus A, Hall M, Grigorescu I, et al.
+               Automated body organ segmentation, volumetry and population-averaged atlas for 3D motion-corrected
+               T2-weighted fetal body MRI. Scientific Reports 14:6637 (2024), doi:10.1038/s41598-024-57087-x.
+               Population average of 17 normal fetuses (25 to 28 weeks per the preprint), organs only, not an individual.
+               Marching-cubes surfaces, smoothed and decimated for the web. Not clinically reviewed.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.
