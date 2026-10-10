@@ -62,6 +62,8 @@ test('mesin_tinjauan_memakai_metode_yang_benar_pada_tubuh_denver_ct', () => {
   const r = registries.find((x) => x.tag === 'vhf_denver_ct_adult_female')
   assert.equal(r.rows.filter((x) => x[5] === 'model_segmented').length, 56)
   assert.equal(r.rows.filter((x) => x[5] === 'manual_segmentation').length, 128)
+  // radius, ulna dan tulang tangan dari ambang HU pada CT resolusi asli: bukan model, bukan manual, bukan pengganti → metode 'other'
+  assert.deepEqual(r.rows.filter((x) => x[5] === 'other').map((x) => x[0].split('.').slice(-2).join('.')).sort(), ['HAND_BONES.L', 'HAND_BONES.R', 'RADIUS.L', 'RADIUS.R', 'ULNA.L', 'ULNA.R'])
 })
 
 test('halaman_dokter_terpasang_dan_tidak_menyetujui_sendiri', async () => {

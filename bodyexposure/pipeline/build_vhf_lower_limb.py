@@ -69,6 +69,28 @@ CT_METHOD = ("machine segmentation (TotalSegmentator, task total) of the Visible
              "not measured for this bone")
 
 
+ARM_STEMS = re.compile(r"(radius|ulna|hand_bones)_(left|right)$")
+ARM_METHOD = ("threshold segmentation (HU > 250, distance-transform watershed, label propagation along the shaft) of the native-resolution Visible Human Female CT "
+              "(0.72 x 0.72 x 1.0 mm), Taubin-smoothed; algorithmic, not a trained model and not manual; not reviewed. Accuracy was not measured against a reference. "
+              "Script segment_ct_forearm_hand.py, report qa_reports/vhf_forearm_hand.json")
+_ARM_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "qa_reports", "vhf_forearm_hand.json")  # laporan versi repo (yang dilacak git)
+ARM_REPORT = json.load(open(_ARM_JSON)) if os.path.exists(_ARM_JSON) else None
+
+
+def arm_note(stem):
+    """catatan kelengkapan dari laporan segmentasi (celah ke humerus di ujung proksimal)."""
+    m = ARM_STEMS.match(stem)
+    if not m or not ARM_REPORT: return None
+    info = ARM_REPORT["arms"].get(m.group(2), {}).get("meshes", {}).get(m.group(1))
+    if m.group(1) == "hand_bones":
+        return ("Carpals, metacarpals and phalanges are ONE mesh: individual bones were not separated (joint gaps are too small for an automatic split, and no manual "
+                "segmentation exists). Wrist boundary with the radius and ulna is approximate.")
+    if info and not info.get("proximal_end_complete", True):
+        return (f"Proximal end is INCOMPLETE: the recovered bone stops {info['gap_to_humerus_mm']} mm short of the humerus. Near the elbow the bone touches a thin bright "
+                "artefact along the skin surface of the CT block, which the segmentation removes together with thin cortex.")
+    return "The proximal end reaches the humerus; the elbow joint surface is ragged where the cortex is thin and was not smoothed over."
+
+
 def ct_name(stem):
     """vertebrae_C3 → ('Vertebra C3', 'unpaired'); rib_left_5 → ('Rib 5', 'left'); clavicula_left → ('Clavicle', 'left')."""
     m = re.match(r"rib_(left|right)_(\d+)$", stem)
@@ -77,6 +99,8 @@ def ct_name(stem):
     if m: return f"Vertebra {m.group(1)}", "unpaired"
     m = re.match(r"(clavicula|scapula|humerus)_(left|right)$", stem)
     if m: return {"clavicula": "Clavicle"}.get(m.group(1), m.group(1).capitalize()), m.group(2)
+    m = re.match(r"(radius|ulna|hand_bones)_(left|right)$", stem)
+    if m: return {"radius": "Radius", "ulna": "Ulna", "hand_bones": "Hand bones"}[m.group(1)], m.group(2)
     return {"skull": "Skull (cranium and mandible, one mesh)", "sternum": "Sternum"}[stem], "unpaired"
 
 
@@ -160,10 +184,10 @@ def main():
         bm.free()
         meta = {"panacea_structure_id": sid, "panacea_body_id": BODY_ID, "canonical_name": name, "panacea_system": sysn,
                 "panacea_laterality": lat, "panacea_laterality_source": "source_label_verified_by_geometry",
-                "panacea_source": (f"TotalSegmentator on the NLM Visible Human Female CT (Denver aligned CT, CC BY 4.0); file {fname}" if is_ct else f"{PUB}; file {fname}"),
+                "panacea_source": ((f"Threshold segmentation of the NLM Visible Human Female CT (Denver aligned CT, CC BY 4.0); file {fname}" if ARM_STEMS.match(raw[3:]) else f"TotalSegmentator on the NLM Visible Human Female CT (Denver aligned CT, CC BY 4.0); file {fname}") if is_ct else f"{PUB}; file {fname}"),
                 "panacea_license": LICENSE, "panacea_source_raw_name": raw[3:] if is_ct else raw,
-                "panacea_method": CT_METHOD if is_ct else "manual segmentation of the cryosections (Denver, ScanIP S-2021.06)",
-                "panacea_accuracy_status": "model_segmented" if is_ct else "source_backed", "panacea_review_status": "review_required",
+                "panacea_method": (ARM_METHOD if ARM_STEMS.match(raw[3:]) else CT_METHOD) if is_ct else "manual segmentation of the cryosections (Denver, ScanIP S-2021.06)",
+                "panacea_accuracy_status": ("threshold_segmented" if ARM_STEMS.match(raw[3:]) else "model_segmented") if is_ct else "source_backed", "panacea_review_status": "review_required",
                 "panacea_version": VERSION, "biological_sex_applicability": "female", "panacea_educational_only": True,
                 "panacea_kind": kind.lower(), "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
                 "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific." + (" The scan shows disrupted anatomy; a model can mislabel or fragment bones." if is_ct else "")}
@@ -171,6 +195,8 @@ def main():
             meta["panacea_qa_note"] = ("Source provides the forefoot as one mesh labelled 'Phalanges'. Its extent (129 mm, starting at the tarsometatarsal level) "
                                        "and a top-view render show metatarsal shafts and toe bones together, so it is named accordingly. Not split because the bone boundaries "
                                        "are not in the source; the toe segmentation is coarse (holes between toes).")
+        if is_ct and arm_note(raw[3:]):
+            meta["panacea_qa_note"] = arm_note(raw[3:])
         if raw == "Bone_Pelvis":
             meta["panacea_qa_note"] = "One mesh per side for the whole hip bone (ilium, ischium, pubis); sacrum and coccyx are separate."
         for k, v in meta.items():
