@@ -228,6 +228,10 @@ function toAccount(u: BackendUser): Account {
 }
 
 export const api = {
+  // Hasil lab (B7): kontrak server adalah otoritas; body advance dibangun oleh domains/lab-results.
+  labResultsList: (patientId?: string) => req<unknown>(`/api/lab-results${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`),
+  labResultAdvance: (id: string, body: { to: string; expectedStatus: string; communication?: { channel: string; note: string } }) =>
+    req<unknown>(`/api/lab-results/${encodeURIComponent(id)}/advance`, { method: 'POST', body: JSON.stringify(body) }),
   health: () => req<Health>('/api/health'),
   promo: () => req<{ limit: number; used: number; slotsLeft: number; discountPct: number; eligible: boolean }>('/api/promo'),
   me: () => req<{ user: BackendUser }>('/api/auth/me').then((r) => toAccount(r.user)),
