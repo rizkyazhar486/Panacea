@@ -31,7 +31,7 @@
      "name": "hip adduction",
      "start_s": 9.041667,
      "end_s": 12.041667,
-     "note": "AAOS 30; right side 25: femur meets the right hip bone 4.0 mm deep at 30 degrees but 1.0 mm at 25 (left side clear at 30). Cause not determined (donor anatomy or right hip-centre error)"
+     "note": "AAOS 30"
     },
     {
      "name": "hip internal rotation",
@@ -43,7 +43,7 @@
      "name": "hip external rotation",
      "start_s": 15.041667,
      "end_s": 18.041667,
-     "note": "AAOS 45; right side 40: femur meets the right hip bone 2.9 mm deep at 45 degrees but 0.4 mm at 40 (left side 0.8 at 45). Cause not determined"
+     "note": "AAOS 45"
     },
     {
      "name": "knee flexion",
@@ -61,12 +61,64 @@
      "name": "ankle dorsiflexion",
      "start_s": 24.041667,
      "end_s": 27.041667,
-     "note": "AAOS 20; right side 15: fibula meets the right talus 2.2 mm deep at 20 degrees but 0.9 mm at 15 (left side clear at 20). Cause not determined"
+     "note": "AAOS 20"
     }
    ],
    "qa": {
     "angle_within_limits": true,
-    "max_bone_penetration_mm": 1.0
+    "max_bone_penetration_mm": 0.24
+   }
+  },
+  {
+   "clip": "WALK",
+   "label_short": "Walk",
+   "fps": 24,
+   "frames": 27,
+   "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+   "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+   "truth_class": "measured-retargeted",
+   "label": "Recorded walking of another person (CMU subject 07, trial 07_01), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics; pelvis, legs and feet only; the skeleton above the pelvis, muscles and ligaments do not move",
+   "movements": [
+    {
+     "name": "walking cycle",
+     "start_s": 0.0,
+     "end_s": 1.083333,
+     "note": "one gait cycle, 1.092 s"
+    }
+   ],
+   "qa": {
+    "max_bone_penetration_mm": 0.0,
+    "lowest_foot_point_m": {
+     "min": -0.0,
+     "max": 0.0
+    },
+    "loop_drift_corrected_max_deg": 4.58
+   }
+  },
+  {
+   "clip": "RUN",
+   "label_short": "Run",
+   "fps": 24,
+   "frames": 19,
+   "source": "CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu)",
+   "acknowledgement": "The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.",
+   "truth_class": "measured-retargeted",
+   "label": "Recorded running of another person (CMU subject 09, trial 09_02), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics; pelvis, legs and feet only; the skeleton above the pelvis, muscles and ligaments do not move",
+   "movements": [
+    {
+     "name": "running cycle",
+     "start_s": 0.0,
+     "end_s": 0.75,
+     "note": "one gait cycle, 0.75 s"
+    }
+   ],
+   "qa": {
+    "max_bone_penetration_mm": 0.07,
+    "lowest_foot_point_m": {
+     "min": 0.0,
+     "max": 0.0737
+    },
+    "loop_drift_corrected_max_deg": 12.39
    }
   }
  ]

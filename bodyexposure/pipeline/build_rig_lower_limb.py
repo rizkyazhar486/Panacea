@@ -9,7 +9,8 @@ lengan. Pusat sendi memakai definisi ISB (Wu dkk. 2002, J Biomech 35:543) dari g
   lutut           : titik tengah titik ekstrem medial–lateral femur distal (sumbu PCA; pendekatan epikondilus transversal)
   pergelangan kaki: titik tengah ujung maleolus medial (tibia distal) dan lateral (fibula distal): titik terendah lempeng 8 mm paling medial/lateral
 Kartilago artikular mengikuti tulangnya. Ligamen lutut (melintasi sendi) dan otot TIDAK ikut dirig (butuh skinning lunak).
-Batas ROM: nilai normal AAOS (Greene & Heckman 1994); tanda sumbu ditentukan numerik, bukan diasumsikan.
+Batas ROM: nilai normal AAOS (Greene & Heckman 1994), berlaku dari pose NETRAL berdiri (bukan dari pose istirahat kadaver telentang, yang
+pergelangan kakinya ±38° plantarfleksi); offset istirahat diukur dari geometri rig dan batas lokal digeser sebesar itu. Tanda sumbu ditentukan numerik.
 Pusat pergelangan kaki disempurnakan dengan fit kongruensi permukaan (--hinges, fit_hinge_centres.py --profile lower_limb); lutut dan panggul memakai pusat ISB apa adanya.
 """
 import bpy, json, math, os, re, sys
@@ -119,6 +120,12 @@ for s in SIDES:
     bone(f"THIGH.{s}", jc[f"HIP.{s}"], jc[f"KNEE.{s}"], "PELVIS")
     bone(f"SHIN.{s}", jc[f"KNEE.{s}"], jc[f"ANKLE.{s}"], f"THIGH.{s}", connect=True)
     bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"TOE_END.{s}"], f"SHIN.{s}", connect=True)
+# tulang kaki: arah Y dibuat TEGAK LURUS sumbu pergelangan kaki (vektor ke jari diproyeksikan ke bidang ⟂ sumbu), supaya X lokal = sumbu maleolus yang
+# sebenarnya. Tanpa ini X lokal diproyeksikan ⟂ tulang dan menyimpang 36–53° dari garis maleolus: sendi berputar pada sumbu yang salah, sehingga fit engsel
+# dan QA kontak tidak sejalan. Panjang tulang tetap; geometri tidak berubah (mesh hanya terikat ke bingkai tulang).
+for s in SIDES:
+    fb = eb[f"FOOT.{s}"]; ax_ = Vector(AXIS[f"ANKLE.{s}"].tolist()); length_ = (fb.tail - fb.head).length
+    y_ = fb.tail - fb.head; y_ = (y_ - ax_ * y_.dot(ax_)).normalized(); fb.tail = fb.head + y_ * length_
 axis_dev = {}
 for s in SIDES:
     for bn, key in {"SHIN": "KNEE", "FOOT": "ANKLE"}.items():
@@ -159,6 +166,20 @@ def moved(pb, axis, ang, probe):
     return np.array((M0 @ Matrix.Rotation(math.radians(ang), 4, axis) @ probe)[:])
 
 
+def rest_offsets(side):
+    """Pose istirahat rig (kadaver telentang) terhadap berdiri netral, diukur dari geometri rig, dalam derajat anatomis: panggul fleksi/abduksi,
+    lutut fleksi, pergelangan kaki dorsofleksi (negatif = fleksi plantar). Kerangka dunia: +Z atas, −Y anterior, +X kiri subjek."""
+    sx = 1.0 if side == "L" else -1.0
+    v = lambda n: np.array((arm_d.bones[f"{n}.{side}"].tail_local - arm_d.bones[f"{n}.{side}"].head_local)[:]) * np.array([sx, 1, 1])
+    th, sh = v("THIGH"), v("SHIN")
+    ft = (jc[f"TOE_END.{side}"] - jc[f"ANKLE.{side}"]) * np.array([sx, 1, 1])  # kaki: dari titik jari sebenarnya (tulang kaki tegak lurus sumbu, bukan searah jari)
+    fl = lambda x: math.degrees(math.atan2(-x[1], -x[2]))
+    return {"hip_flex": fl(th), "hip_abd": math.degrees(math.atan2(th[0], -th[2])), "knee_flex": fl(th) - fl(sh),
+            "ankle_dorsi": -math.degrees(math.atan2(-ft[2], -ft[1])) - fl(sh)}
+
+
+REST = {sd: rest_offsets(sd) for sd in SIDES}
+neutral_local = {}  # sudut lokal (derajat) tempat pose netral: batas AAOS berlaku dari NETRAL, bukan dari pose istirahat kadaver
 limits_report = {}
 for s in SIDES:
     for base, rom in ROM.items():
@@ -185,6 +206,19 @@ for s in SIDES:
             ir, er = rom["internal_rotation"], rom["external_rotation"]
             lim["Y"] = [-er, ir] if ir_pos else [-ir, er]
             pos["positive_Y"] = "internal_rotation" if ir_pos else "external_rotation"
+        # netral lokal = −tanda × offset istirahat (tanda = arah sumbu lokal untuk gerak anatomis positif)
+        nl = {"X": 0.0, "Y": 0.0, "Z": 0.0}
+        sx_s = 1.0 if flex_pos else -1.0  # tanda sumbu X lokal untuk fleksi (panggul, lutut) atau fleksi plantar (kaki)
+        if base == "THIGH":
+            nl["X"] = -sx_s * REST[s]["hip_flex"]
+            if "positive_Z" in pos: nl["Z"] = -(1.0 if pos["positive_Z"] == "abduction" else -1.0) * REST[s]["hip_abd"]
+        elif base == "SHIN":
+            nl["X"] = -sx_s * REST[s]["knee_flex"]
+        elif base == "FOOT":
+            nl["X"] = sx_s * REST[s]["ankle_dorsi"]  # dorsofleksi anatomis positif = −tanda plantar
+        for ax in "XZ":
+            lim[ax] = [lim[ax][0] + nl[ax], lim[ax][1] + nl[ax]]
+        neutral_local[pb.name] = {ax: round(nl[ax], 2) for ax in "XYZ"}
         c = pb.constraints.new('LIMIT_ROTATION'); c.owner_space = 'LOCAL'
         for ax in "XYZ":
             lo, hi = lim[ax]
@@ -217,7 +251,7 @@ arm["panacea_rig_definition"] = "ISB-style joint centres from source geometry (n
 bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(OUT))
 json.dump({"body": BODY, "frame": "+Z superior, +X subject left, -Y anterior, metres",
            "joint_centres_m": {k: [round(float(x), 4) for x in v] for k, v in jc.items()}, "joint_centre_methods": meta,
-           "segments_mm": seglen, "rom_limits_deg_local": limits_report, "rom_source": "AAOS normal values (Greene & Heckman 1994)",
+           "segments_mm": seglen, "rom_limits_deg_local": limits_report, "rest_offsets_deg": {sd: {k: round(v, 2) for k, v in REST[sd].items()} for sd in SIDES}, "neutral_local_deg": neutral_local, "rom_source": "AAOS normal values (Greene & Heckman 1994)",
            "flexion_axis": "knee and ankle flexion about the femoral mediolateral extreme line / intermalleolar line; hip perpendicular to the bone, anterior roll",
            "flexion_axis_change_deg": axis_dev, "hinge_refinement": HINGE_NOTE, "flexion_axes": {k: [round(float(x), 5) for x in v] for k, v in AXIS.items()},
            "binding": {k: len(v) for k, v in binding.items()}, "qa": qa}, open(REPORT, "w"), indent=1)
