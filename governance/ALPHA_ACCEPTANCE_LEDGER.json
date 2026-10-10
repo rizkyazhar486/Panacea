@@ -402,10 +402,11 @@
    "status": "REPORTED",
    "evidence": [
     "bodyexposure/PROVENANCE.md",
-    "scripts/uji/body-asset-provenance.mts"
+    "scripts/uji/body-asset-provenance.mts",
+    "Audit independen parsial (Sonnet Cloud, scripts/qa/glb-provenance-audit.mjs, main 1ee18b373): 17.676 struktur bernama di 380 GLB publik (tanpa rig) semuanya membawa panacea_source, panacea_license, dan panacea_accuracy_status — 0 tanpa metadata. Lisensi: CC BY-SA 4.0 (11.625), CC BY 4.0 (2.537), ICRP 156/145 'redistribusi dibebaskan pemilik proyek 2026-10-03' (2.772), Denver CC BY 4.0 (736). Akurasi: source_backed 17.344, model_segmented 224, source_backed_corrected 93, review_required 12, approximate 3. Kontrol negatif: GLB dengan satu panacea_license dihapus gagal dengan nama berkas dan struktur"
    ],
    "owner": "Local",
-   "note": ""
+   "note": " Terverifikasi hanya kelengkapan metadata di data. Belum diperiksa: halaman atribusi resmi di aplikasi, dan keabsahan lisensi itu sendiri; lisensi ICRP bersandar pada pernyataan pemilik proyek, bukan teks lisensi yang diverifikasi independen. Tetap REPORTED."
   },
   {
    "id": "D9",
