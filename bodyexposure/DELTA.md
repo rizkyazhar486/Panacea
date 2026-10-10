@@ -268,3 +268,8 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - The Fetus tab is no longer a placeholder: 14 organ structures from the King's College London population-average fetal MRI atlas (CC0 1.0; 17 fetuses, 25 to 28 weeks per the preprint), as source-backed partial. Organs only; labelled as an atlas, not an individual. Orientation proven from anatomy, gross-anatomy gate passes. Full detail 164 k triangles; initial load 6,022 triangles.
 - Still blocked: pregnancy (ICRP pregnant-female phantoms in public consultation, no electronic files confirmed), a fetus with skeleton and skin, and older adults. See `docs/body-exposure/LIFECYCLE_SOURCE_AUDIT.md`.
 
+
+## VHF forearm and hand bones (body v014)
+- New `pipeline/segment_ct_forearm_hand.py`: radius, ulna and hand bones of both arms from the native-resolution Visible Human Female CT (the Denver manual segmentation is lower-extremity only and TotalSegmentator `total` has no such classes). `build_vhf_lower_limb.py` now ingests them as `threshold_segmented`; the review registry classes them as method `other`.
+- Female body 184 -> 190 structures; skeletal LOD4 initial load 19,648 triangles (budget 80,000). Right radius and ulna are incomplete (21.8 and 64.4 mm short of the humerus; the CT block cuts the arm there, evidence in qa_reports/vhf_right_forearm_slices.png); the hand is one mesh per side. Details in PROVENANCE.md and `qa_reports/vhf_forearm_hand.json`.
+- Not done: individual hand bones, rig/motion for the arms (motion stays pelvis, legs and feet only).
