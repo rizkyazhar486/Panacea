@@ -260,3 +260,7 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Bone-density bridging between the fragments of L2 and left ribs 6 to 8 adds 0 voxels (gaps 15 to 30 mm, soft-tissue density between), so no anatomy is added. The meshes now keep every fragment of 1 cm3 or more instead of only the largest piece: L2 +25 % volume, left ribs 6 to 8 +14 to 23 %. Body version v013; review registries regenerated (a record for the old geometry would not apply).
 - Remaining blocker: the gaps themselves. They need either better source data or a reviewer's judgement on whether they are real.
 
+## Dynamic physiology source audit (2026-10-10)
+
+- Breathing and heartbeat: no acquired motion and no validated simulation exist in Body Exposure. Audited TCIA 4D-Lung (CC BY 3.0, 20 radiotherapy patients, 10 phases: licence allows attributed reuse, but deformable registration would have to be run and validated first), DIR-Lab (site unreachable, terms unread) and ACDC (terms not stated, two phases only). No simulation was built because every parameter would be invented. See `docs/body-exposure/DYNAMIC_PHYSIOLOGY_SOURCE_AUDIT.md`.
+
