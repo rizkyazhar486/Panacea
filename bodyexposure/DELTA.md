@@ -243,3 +243,9 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 - `qa_gross_anatomy.py --no-organs` (explicit flag; the organ-order check is recorded as not applicable, not skipped silently) plus new skeletal checks: vertebral column C1 to L5 ordered top to bottom, skull above C1, sacrum below L5, 12 ribs on each side, sternum anterior to the spine. `VHF_DENVER_CT.ADULT.FEMALE` passes all of them: 156 paired structures with correct laterality, no failures (`qa_reports/gross_vhf_denver_ct.json`). These are coarse position and count checks, not a measure of segmentation accuracy.
 
+## Provenance page, LOD1 download files and a camera fix (2026-10-10)
+
+- `public/bodyexposure/provenance.html`: a self-contained static page (no scripts, no external resources, light/dark, no horizontal scroll at 390 px) built from PROVENANCE.md, CREDITS.txt and the file list by `pipeline/publish_provenance_page.py`; linked from the viewer footer as "Sources and provenance". It carries no new claims.
+- Published LOD1 (the most detailed level) for the Visible Human skeleton only: 4.1 MB, listed on that page. The viewer does not load LOD1, so site load is unchanged. LOD0/LOD1 of the other bodies (about 108 MB) stay unpublished.
+- Bug fixed: selecting a structure that is not in the motion rig (for example a rib on the female skeleton, whose rig is lower limb only) and then starting Motion left an empty canvas, because the camera fly-to for the selection kept running and pulled the camera away from the rig. Motion framing now cancels that transition. Regression assertion added to `qa/canonical-body-check.mjs` (found while stabilising: the female motion check failed two runs in three before the fix, three runs in three pass after).
+
