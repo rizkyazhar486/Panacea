@@ -164,7 +164,9 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
-import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
+import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
+import { repoHasilLab, repoRujukan } from './store.js'
+import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
@@ -841,7 +843,8 @@ const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientI
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   addAudit(u, 'clinical.read')
-  const c = getClinical()
+  // Hasil lab dan rujukan hanya keluar lewat rute RBAC modul labResults, bukan lewat simpanan klinis mentah.
+  const { hasilLab: _hl, rujukanKlinis: _rk, ...c } = getClinical()
   // Hash kode tautan tidak pernah keluar dari server.
   const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
   res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
@@ -890,6 +893,16 @@ app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
   if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
   addAudit(u, 'emr.encounters.read', String(req.params.patientId))
   res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Hasil lab + rujukan: siklus hidup teraudit, backend sumber kebenaran (lihat modules/labResults).
+pasangRuteHasilLab(app, {
+  requireAuth,
+  isOwner: (u) => isOwner(u as User),
+  idPasienDiri,
+  pasienTertaut: (userId) => Object.values(getTautan()).filter((t) => t.userId === userId).map((t) => t.patientId),
+  konteks: () => ({ hasil: repoHasilLab(), rujukan: repoRujukan(), now: () => new Date(), newId: (p) => `${p}-${randomUUID()}` }),
+  audit: (u, aksi, target) => addAudit(u as User, aksi, target),
 })
 
 // Tautan pasien praktik -> akun pasien, disetujui pasien lewat kode sekali pakai.
