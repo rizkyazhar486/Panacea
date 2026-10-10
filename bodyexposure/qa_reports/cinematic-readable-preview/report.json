@@ -1,0 +1,53 @@
+{
+  "source_blend": "/Users/rizkyazhar/Documents/Panaceamed.id/bodyexposure/PANACEA_HUMAN_MASTER_v011.blend",
+  "blender_version": "5.2.2 LTS",
+  "profile": "preview",
+  "benchmark": "layered",
+  "device_backend": "CPU",
+  "devices": [],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 3003,
+    "source_polygons": 9284861,
+    "meshes_without_uv": 1137,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 3003
+    },
+    "suppressed_display_instances": [
+      "ICRP.ADULT.MALE.ROOT",
+      "ICRP.ADULT.FEMALE.ROOT",
+      "PEDIATRIC.NEONATE.MALE.ROOT",
+      "PEDIATRIC.NEONATE.FEMALE.ROOT",
+      "PEDIATRIC.INFANT.MALE.ROOT",
+      "PEDIATRIC.INFANT.FEMALE.ROOT",
+      "PEDIATRIC.CHILD_5Y.MALE.ROOT",
+      "PEDIATRIC.CHILD_5Y.FEMALE.ROOT",
+      "PEDIATRIC.CHILD_10Y.MALE.ROOT",
+      "PEDIATRIC.CHILD_10Y.FEMALE.ROOT",
+      "PEDIATRIC.ADOLESCENT.MALE.ROOT",
+      "PEDIATRIC.ADOLESCENT.FEMALE.ROOT"
+    ]
+  },
+  "renders": [
+    {
+      "variant": "after",
+      "path": "layered_preview_after.png",
+      "sha256": "afa6b647e47d90ce80fd0a6d5ddbdbd7d6bea3f094255eac864ee781a6d9e4e2",
+      "render_seconds": 29.139,
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation, browser FPS or memory measurement performed.",
+    "Before/after isolates adaptive sampling and denoising at identical sample limits."
+  ]
+}
