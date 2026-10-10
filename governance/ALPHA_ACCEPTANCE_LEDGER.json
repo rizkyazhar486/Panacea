@@ -131,30 +131,30 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "State hasil received→pending_review→reviewed→communicated→closed",
    "acceptance": "Transisi hanya sesuai urutan; transisi tak sah ditolak dengan alasan",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": ["src/domains/clinical-operations/model/resultLifecycle.ts", "scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi)"],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir."
   },
   {
    "id": "B4",
    "pillar": "Lab & Referral Closure",
    "criterion": "Setiap perubahan status diaudit",
    "acceptance": "Setiap transisi mencatat pelaku, peran, waktu, dan status sebelum/sesudah; log tidak dapat diubah oleh pelaku",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": ["src/domains/clinical-operations/model/resultLifecycle.ts", "scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi)"],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir."
   },
   {
    "id": "B5",
    "pillar": "Lab & Referral Closure",
    "criterion": "RBAC pada hasil",
    "acceptance": "Hanya peran berwenang dan pasien sendiri yang membaca; peran/tenant lain ditolak (tes negatif)",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": ["src/domains/clinical-operations/model/resultLifecycle.ts", "scripts/qa/result-lifecycle.test.mjs: 11 tes positif/negatif/batas (belum diuji mutasi)"],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Hanya model murni (belum ada persistensi server, route, atau UI); kontrak data Sol tetap acuan akhir."
   },
   {
    "id": "B6",
