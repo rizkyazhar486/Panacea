@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Body Exposure sources and provenance</title>
+<meta name="description" content="Where every Body Exposure anatomical model comes from, its licence, method and limits.">
+<style>
+:root{--bg:#fff;--fg:#14181f;--mut:#566170;--line:#d9dee6;--accent:#0a7d5a;--code:#f3f5f8}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d11;--fg:#e8ecf2;--mut:#9aa6b6;--line:#2a3140;--accent:#4fd1a1;--code:#151a22}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:24px 16px 64px;overflow-wrap:anywhere}
+h1{font-size:1.7rem;margin:.2em 0 .4em}h2{margin-top:2em;border-top:1px solid var(--line);padding-top:1em;font-size:1.25rem}h3{font-size:1.05rem}
+a{color:var(--accent)}code,pre{background:var(--code);border-radius:6px;font-size:.88em}code{padding:.1em .35em;overflow-wrap:anywhere}pre{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.note{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;color:var(--mut)}
+</style></head><body><main>
+<p><a href="../#/body-exposure/canonical">&larr; Back to Body Exposure</a></p>
+<h1>Body Exposure: sources and provenance</h1>
+<div class="note"><strong>Educational models.</strong> Nothing here is patient-specific anatomy or a clinical tool, and no structure has been clinically reviewed
+(<code>clinically_reviewed</code> is false everywhere). Bodies built from one donor are labelled as that individual, not as an atlas.
+Structures marked <em>model segmented</em> were produced by a machine segmentation model and have no measured accuracy unless stated.</div>
+<h2>Downloads: Visible Human skeleton (Denver + CT)</h2>
+<table><thead><tr><th>File</th><th>Content</th><th>Size</th></tr></thead><tbody><tr><td><a href="vhf_denver_ct_adult_female.joint.LOD1.glb">vhf_denver_ct_adult_female.joint.LOD1.glb</a></td><td>LOD1 (joint)</td><td>361 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.joint.LOD2.glb">vhf_denver_ct_adult_female.joint.LOD2.glb</a></td><td>LOD2 (joint)</td><td>180 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.joint.LOD3.glb">vhf_denver_ct_adult_female.joint.LOD3.glb</a></td><td>LOD3 (joint)</td><td>104 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.joint.LOD4.glb">vhf_denver_ct_adult_female.joint.LOD4.glb</a></td><td>LOD4 (joint)</td><td>93 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.muscular.LOD1.glb">vhf_denver_ct_adult_female.muscular.LOD1.glb</a></td><td>LOD1 (muscular)</td><td>1.6 MB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.muscular.LOD2.glb">vhf_denver_ct_adult_female.muscular.LOD2.glb</a></td><td>LOD2 (muscular)</td><td>772 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.muscular.LOD3.glb">vhf_denver_ct_adult_female.muscular.LOD3.glb</a></td><td>LOD3 (muscular)</td><td>411 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.muscular.LOD4.glb">vhf_denver_ct_adult_female.muscular.LOD4.glb</a></td><td>LOD4 (muscular)</td><td>276 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.rig_rom.glb">vhf_denver_ct_adult_female.rig_rom.glb</a></td><td>rig and range-of-motion clip</td><td>207 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.skeletal.LOD1.glb">vhf_denver_ct_adult_female.skeletal.LOD1.glb</a></td><td>LOD1 (skeletal)</td><td>2.1 MB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.skeletal.LOD2.glb">vhf_denver_ct_adult_female.skeletal.LOD2.glb</a></td><td>LOD2 (skeletal)</td><td>968 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.skeletal.LOD3.glb">vhf_denver_ct_adult_female.skeletal.LOD3.glb</a></td><td>LOD3 (skeletal)</td><td>505 KB</td></tr><tr><td><a href="vhf_denver_ct_adult_female.skeletal.LOD4.glb">vhf_denver_ct_adult_female.skeletal.LOD4.glb</a></td><td>LOD4 (skeletal)</td><td>283 KB</td></tr></tbody></table><p>LOD1 is the most detailed published level of the skeleton variant; the viewer itself loads LOD2 to LOD4. All files are glTF binary (GLB), meshopt-compressed; each node name is a structure ID and its extras carry the source and method.</p>
+<h2>Credits and licences</h2>
+<pre>Body Exposure canonical bodies (web derivatives, LOD2/LOD3)
+===========================================================
+
+adult_male.*  — derived from Z-Anatomy (BodyParts3D, DBCLS), CC BY-SA 4.0.
+               External anal sphincter: BodyParts3D, (c) The Database Center for Life Science,
+               CC Attribution-Share Alike 2.1 Japan (now also offered under CC BY 4.0).
+                Includes Panacea-reconstructed intervertebral discs and pericardium
+                (derivatives, same licence). See bodyexposure/PROVENANCE.md.
+adult_female.* — derived from HuBMAP CCF 3D Reference Object Library, VH_Female
+                (NLM Visible Human female), CC BY 4.0.
+module_tissue_lymph_node.* — HuBMAP CCF library lymph node tissue model, CC BY 4.0.
+
+Educational models. Not patient-specific anatomy and not a clinical tool.
+
+pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Reference
+               Computational Phantoms (2024), ICRP. Newborn, 1, 5, 10 and 15 years,
+               male and female; CT-based reference phantoms. Dosimetry-only layers
+               removed; laterality corrected where the source label contradicted the
+               geometry (15-year female ovaries). Redistribution in Panacea cleared
+               by the project owner (2026-10-03).
+
+icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
+               Computational Phantoms (2020), ICRP. Reference adult male (176 cm)
+               and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
+               reference values. Dosimetry-only layers removed. Redistribution in
+               Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).
+
+vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoskeletal geometry
+               (pelvis to feet), University of Denver Center for Orthopaedic Biomechanics,
+               CC BY 4.0, doi:10.56902/COB.vh.2022.0. Cite: Andreassen TE, Hume DR, Hamilton LD,
+               Walker KE, Higinbotham SE, Shelburne KB. Three Dimensional Lower Extremity
+               Musculoskeletal Geometry of the Visible Human Female and Male. Scientific Data
+               10:34 (2023), doi:10.1038/s41597-022-01905-2. Segmented from the NLM Visible Human
+               Female cryosections: Courtesy of the U.S. National Library of Medicine. Not endorsed
+               by NLM or the University of Denver. Rotated, centred and decimated for the web;
+               this data may not reflect NLM&#x27;s most current Visible Human data.
+               Skull, spine, ribs, sternum, clavicles, scapulae and humeri: machine segmentation of the
+               Visible Human Female CT with TotalSegmentator (task &quot;total&quot;, Apache-2.0; Wasserthal J et al.,
+               Radiology: Artificial Intelligence 2023, doi:10.1148/ryai.230024), smoothed and decimated;
+               checked against the Denver segmentation for femur, hip bone and sacrum only.
+               One individual (donor 59 y, 157 cm, 88 kg), not an atlas. Not clinically reviewed.
+
+adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
+               Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
+               The data used in this project was obtained from mocap.cs.cmu.edu.
+               The database was created with funding from NSF EIA-0196217.
+</pre>
+<h2>Detailed provenance notes</h2>
+<h1>Provenance</h1>
+<h2>HUMAN.ADULT.MALE — source_backed</h2>
+<ul>
+<li><strong>Source:</strong> Z-Anatomy, the libre 3D atlas of anatomy, itself derived from BodyParts3D
+  (DBCLS, Mitsuhashi et al. 2009, doi:10.1093/nar/gkn613). Taken from this repo's existing
+  <code>public/anatomy/{skeletal,muscular,cardiovascular,nervous,visceral,lymphoid,surface}.glb</code>.</li>
+<li><strong>Licence:</strong> CC BY-SA 4.0 (Z-Anatomy). Derivatives of these meshes stay CC BY-SA 4.0.</li>
+<li><strong>Changes made:</strong></li>
+<li>Removed importer helper objects ("HOW TO…", "Take a picture") and wrapper empties.</li>
+<li>Applied all object transforms into mesh data (world coordinates), flipping normals where
+    the source transform was mirrored; merged exact duplicate vertices (≤ 1 µm); dissolved
+    degenerate faces. Pivots moved to each structure's bounding-box centre.</li>
+<li>Routed every structure into anatomical system collections, assigned semantic IDs and
+    <code>panacea_*</code> metadata.</li>
+<li>Laterality: taken from the source <code>.l/.r</code> suffix where present; otherwise paired
+    structures were assigned by the sign of their vertex centroid (+X = subject left);
+    single unpaired structures carry no side.</li>
+<li><strong>Corrections to the source</strong>, each recorded on the object as <code>panacea_qa_note</code>:<ul>
+<li><code>Eyelashes.l/.r</code> had swapped sides relative to the eyebrows; corrected.</li>
+<li><code>Vagus nerve (X).r</code> merges the thoracic/abdominal vagal continuation of both sides;
+  left as-is and flagged <code>review_required</code> (splitting it needs a reference-backed
+  segmentation).</li>
+</ul>
+</li>
+<li>Material library replaced with physically based <code>PAN_*</code> materials (subsurface, coat,
+    transmission). Pulmonary arteries are shown blue and pulmonary veins red, following the
+    oxygenation colour convention used in Netter.</li>
+</ul>
+<h2>Structures from the full Z-Anatomy model (in HUMAN.ADULT.MALE) — source_backed</h2>
+<p>Panacea's original web export (<code>public/anatomy/*.glb</code>) contained 2,431 of the 4,567 meshes in
+Z-Anatomy's full model (<code>Startup.blend</code> from <code>Z-Anatomy.zip</code>, Z-Anatomy/Models-of-human-anatomy,
+CC BY-SA 4.0, downloaded 2026-10-03). The full model uses the same coordinate frame: the left
+femur's bounds match to 0.1 mm. Using <code>pipeline/extract_zanatomy.py</code> (headless) and <code>pipeline/merge_zanatomy_extra.py</code>, 1,238
+missing structures were added, with modifiers applied (subdivision, solidify) and in world
+coordinates:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Muscle origin areas (<code>.o</code>) / insertion areas (<code>.e</code>)</td>
+<td>351 / 354</td>
+</tr>
+<tr>
+<td>Ligaments</td>
+<td>304</td>
+</tr>
+<tr>
+<td>Bursae / tendon sheaths</td>
+<td>78 / 38</td>
+</tr>
+<tr>
+<td>Fascia sheets and intermuscular septa</td>
+<td>54</td>
+</tr>
+<tr>
+<td>Joint capsules</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Cartilages and menisci</td>
+<td>31</td>
+</tr>
+<tr>
+<td>Intervertebral discs and nuclei pulposi</td>
+<td>23 + 23</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>.o</code>/<code>.e</code> reading comes from the source's own material names (<code>Origin-*</code>, <code>End-*</code>).</p>
+<p>Dropped:
+- 24 exact duplicates of structures already present (0.0 mm apart);
+- collection icons;
+- label leader lines (2-vertex <code>.j</code>/<code>.i</code> objects, hook-driven; their raw vertices do not lie
+  on the named landmark, so they were not used as anchors);
+- reference lines (pelvic inlet and outlet, eyeball axes and meridians).</p>
+<h2>Intervertebral discs (in HUMAN.ADULT.MALE) — source_backed_corrected</h2>
+<p>The source discs replace the earlier Panacea reconstruction. The source shape is primary
+evidence; a reconstruction is not. The source discs overlapped the adjacent vertebral bodies
+(14–33 % of their vertices lay inside bone), so each one was pushed out to the bone surface
++0.15 mm with the same routine the reconstruction used. The moved-vertex count is stored per
+disc in <code>qa_vertices_pushed_out_of_bone</code>.</p>
+<h2>Terminologia Anatomica 2</h2>
+<p><code>TA2.csv</code> (Z-Anatomy repository, CC BY-SA 4.0) supplies the TA2 ID, Latin name and French name
+through <code>pipeline/annotate_ta2.py</code>. Matching is exact on the English name only, with no fuzzy
+matching, because a wrong Latin label is worse than none. Coverage: male 3,489 / 3,876 (v009); female
+259 / 841 (HuBMAP naming departs from TA more often).</p>
+<h2>Intervertebral discs (superseded reconstruction)</h2>
+<ul>
+<li><strong>Method:</strong> <code>pipeline/build_intervertebral_discs.py</code>. Each disc fills the space between the
+  source vertebral endplates. The endplates are detected as the connected face patch on the
+  vertebral body; the outline is the 2D convex hull of both endplates; the surfaces follow
+  the endplate heights with a 0.15 mm gap; any vertex left inside bone is pushed back out
+  to the bone surface. No external dimensions are imposed.</li>
+<li><strong>Reference rule:</strong> a disc occupies the space between adjacent vertebral bodies (Gray's
+  Anatomy, vertebral column). Check: the discs make up 25.6 % of the C2–L5 column path,
+  matching Gray's "about one quarter".</li>
+<li><strong>Limitations:</strong> the convex outline slightly overfills the posterior concavity; the annulus
+  fibrosus and nucleus pulposus are not separated.</li>
+</ul>
+<h2>Pericardium (in HUMAN.ADULT.MALE) — approximate</h2>
+<ul>
+<li><strong>Method:</strong> <code>pipeline/build_pericardium.py</code>. Takes the union of the source heart chambers,
+  the coronary sinus, the roots of the great vessels and the epicardial vessels, then:</li>
+<li>voxel remesh at 3 mm, morphological closing at 6 mm, and a 3.5 mm outward offset;</li>
+<li>cut at the top of the pulmonary-trunk bifurcation (superior reflection) and where it
+    enters the diaphragm.</li>
+<li><strong>Reference:</strong> Gray's Anatomy, middle mediastinum. The sac encloses the heart and the great
+  vessel roots, reflects at about the pulmonary-trunk bifurcation and start of the aortic
+  arch, and rests on the central tendon of the diaphragm.</li>
+<li><strong>Limitations:</strong> the fibrous and parietal serous layers are one surface, with no wall
+  thickness; reflections around the pulmonary veins and the oblique and transverse sinuses
+  are not modelled.</li>
+</ul>
+<h2>Lung correction (source_backed_corrected)</h2>
+<p>The source lungs intrude into the space occupied by the source heart (confirmed by a
+three-ray parity test: 17–24 of about 450 sampled ventricle vertices lie inside the left
+upper lobe). Lung vertices lying inside the pericardial sac were moved onto its surface
+plus 0.8 mm, which produces the cardiac impression. Vertices within 4 mm of the sac's cut
+edges were left alone, because the inside/outside test is unreliable there. Each lobe
+records how many vertices moved in <code>panacea_qa_note</code>.</p>
+<h2>Source objects with lost names</h2>
+<p>Three source objects had non-ASCII names that did not survive export:
+- <code>????????</code> — identified by morphology as the <strong>probable</strong> epicardial veins of the right
+  ventricle (anterior cardiac veins plus right marginal vein). Flagged <code>review_required</code>.
+- <code>?x.l</code> / <code>?x.r</code> — a small paired artery running front-to-back beside the nasal septum at
+  palate level. <strong>Not identified</strong>; stored as <code>UNIDENTIFIED_PARASEPTAL_ARTERY_NASAL_FLOOR</code>.</p>
+<h2>Label anchors — approximate</h2>
+<p>Sixteen <code>ANCHOR.ADULT_MALE.*</code> empties (femoral head, greater trochanter, ASIS, tibial plateau,
+tibial tuberosity, both malleoli, humeral head; left and right). Each is computed from a
+stated extremal or centroid rule, recorded in <code>panacea_anchor_method</code>.</p>
+<h2>HUMAN.ADULT.FEMALE — source_backed_partial</h2>
+<ul>
+<li><strong>Source:</strong> HuBMAP Consortium, CCF 3D Reference Object Library, VH_Female
+  (<code>VH_Female/v1.1/VH_F_United.glb</code>), from the NLM Visible Human female. Brain parcellation
+  from the Allen Human Brain Reference Atlas, as packaged in that file.
+  https://github.com/hubmapconsortium/ccf-3d-reference-object-library</li>
+<li><strong>Licence:</strong> CC BY 4.0. Downloaded 2026-10-03.</li>
+<li><strong>Changes made:</strong></li>
+<li>Removed 116 non-anatomical objects (tissue-sampling "extraction site" blocks, spleen
+    sample grids, landmark markers).</li>
+<li>Shifted the body so the feet sit at z = 0 (the source is centred on the origin). No
+    rotation was needed: the source already uses +X subject left and −Y anterior, verified
+    from heart/liver/spleen/kidney positions.</li>
+<li>Semantic IDs, metadata and <code>PAN_*</code> materials as for the male. System assignment was
+    inferred from source names and is marked <code>panacea_system_assignment: inferred</code>.</li>
+<li><strong>Additional parts merged (2026-10-03),</strong> only structures absent from VH_F_United, placed with
+  the same body transform:</li>
+<li><code>v1.2/VH_F_Spinal_Cord.glb</code>: 29 spinal cord segments, C1–S4;</li>
+<li><code>v1.3/VH_F_mammary_gland_L/R.glb</code>: lobes, lactiferous ducts and sinuses, nipple, areola,
+    areolar tubercles, mammary fat, suspensory (Cooper's) ligaments;</li>
+<li><code>v1.4/3d-vh-f-blood-vasculature.glb</code>: 2 new vessels.</li>
+</ul>
+<p>The other 108 objects in those files duplicated structures already present and were
+  dropped. Alignment check: the cord lies posterior to the aortic arch, and the breast
+  lobes are anterior to the chest wall.
+- <strong>System routing audit:</strong> keyword routing had collisions, all corrected:
+  - "bladder" in gallbladder;
+  - "papilla" in the heart's papillary muscles;
+  - "renal" in the liver's renal impression;
+  - laryngeal cartilages and femoral condyles filed under joint;
+  - hepatic, uterine and sigmoid vessels filed under their organs instead of
+    cardiovascular;
+  - "uter" in "outer cortex of kidney".</p>
+<p>The male master had the same gallbladder error, plus the suprarenal gland under urinary;
+  both are fixed.
+- <strong>Embedded laterality:</strong> 69 kidney sub-parts were named like <code>major calyx L a</code>. They now
+  carry the side as laterality (<code>MAJOR_CALYX_A.L</code>).
+- <strong>Coverage:</strong> thoracic, abdominal and pelvic organs (including uterus, cervix, tubes,
+  ovaries and their ligaments), heart with coronaries, airway, kidneys with internal
+  structure, eyes, knees, female bony pelvis, brain. <strong>Not present:</strong> full skeleton, most
+  musculature, peripheral nerves. (Spinal cord and breast tissue were added afterwards; see above.)
+- <strong>Not merged with the male.</strong> The two bodies are separate subjects; combining them would
+  need a registration transform that no source provides.</p>
+<h2>VHF_LOWER_LIMB.ADULT.FEMALE — source_backed_partial (v012)</h2>
+<p><strong>What this is:</strong> one individual, not an atlas. The donor of the NLM Visible Human Female was a 59-year-old woman, 62 in (157 cm),
+88 kg, BMI 36 (Andreassen et al. 2023). The paper notes disrupted anatomy in the female specimen and that some
+structures (patellar tendon, complete Achilles tendon) were left out of the dataset. This body must never be labelled "reference
+adult female", "average" or patient-specific. <code>clinically_reviewed</code> is false for every structure (owner decision of 2026-10-09,
+PR #2303: no anatomist review for this step; unreviewed, not reviewed).</p>
+<ul>
+<li><strong>Source:</strong> Andreassen TE, Hume DR, Hamilton LD, Walker KE, Higinbotham SE, Shelburne KB. "Three-dimensional lower
+  extremity musculoskeletal geometry of the Visible Human Female and Male." <em>Scientific Data</em> 10:34 (2023),
+  doi:10.1038/s41597-022-01905-2. Data: University of Denver Center for Orthopaedic Biomechanics,
+  doi:10.56902/COB.vh.2022.0, "Final 3D STL Models" (smoothed). Manual segmentation of the NLM Visible Human Female cryosections
+  in ScanIP v. S-2021.06 (Simpleware, Synopsys), using Netter and Fleckenstein et al. as references. Obtained from the owner's
+  download (2026-10-10); copied to <code>sources/du_vhf/</code>.</li>
+<li><strong>Licence terms read from the official pages on 2026-10-10:</strong></li>
+<li><em>Denver collection</em> (digitalcommons.du.edu/visiblehuman): "This work is licensed under a Creative Commons Attribution 4.0
+    International License". Data are supplied "as is"; the University of Denver and the Center for Orthopaedic Biomechanics accept no
+    liability. Required citation: the 2023 Scientific Data paper above. The collection's own README also asks for the second paper
+    (Andreassen et al., arXiv:2209.06948). Commercial use and redistribution are allowed with attribution.</li>
+<li><em>NLM Visible Human images</em> (nlm.nih.gov/research/visible/getting_data.html and the NLM Terms and Conditions): no licence or
+    registration is required since July 2019. Terms: acknowledge NLM with "Courtesy of the U.S. National Library of Medicine"; do not imply
+    NLM endorsement; when redistributing, keep the data current or state clearly that it may not reflect NLM's latest data. NLM
+    gives no warranty and no legal advice on third-party rights. Commercial use is not prohibited. The NLM page gives no donor
+    biography beyond thanking the donors; age and habitus above come from the Denver paper.</li>
+<li>These terms permit the use made here. If either page changes, re-read before the next release.</li>
+<li><strong>Coverage (checked against the Denver collection before any CT work):</strong> pelvis to ankle only: 28 bones (13 per side plus sacrum
+  and coccyx), 16 cartilages, 8 ligaments, 76 muscles. The collection also lists 2 fat geometries, which are not in the folder
+  received. Not covered, so still open for CT segmentation: lumbar and thoracic spine, ribs, sternum, skull, shoulder girdle and the
+  whole upper limb.</li>
+<li><strong>Changes made:</strong> STL (mm) merged by 0.1 mm to connected meshes; rotated 180° about Z into the canonical frame (+X subject left,
+  −Y anterior, +Z superior), converted to metres, centred on the midpoint of the two hip bones, lowest point at z = 0. Frame checked from
+  geometry: patella anterior to femur on both sides, every "Left" object at +X (the build aborts otherwise). Source spellings
+  normalised (Calcaneous → Calcaneus, Illiacus → Iliacus, Quadratis → Quadratus, Semitendonosus → Semitendinosus); "Peroneus longus"
+  is named "Fibularis (peroneus) longus".</li>
+<li><strong>Not split:</strong> the source forefoot mesh is labelled "Phalanges"; a top-view render shows metatarsal shafts and toe bones in one
+  mesh with a coarse toe segmentation, so it is named "Metatarsals and phalanges (combined)". Bone boundaries are not in the source.</li>
+<li><strong>Separate body, not grafted.</strong> Like the ICRP variants, it is its own internally consistent body. Both this set and the HuBMAP
+  <code>VH_Female</code> come from the same cadaver, but they use different segmentations, so they are not merged. Cross-check
+  (<code>pipeline/check_vhf_lower_limb_vs_hubmap.py</code>, <code>qa_reports/vhf_lower_limb_vs_hubmap.json</code>): after one rigid fit on the left
+  femur, tibia, fibula and patella lie 3.6–3.8 mm median from the HuBMAP surfaces (p95 6–8 mm), and 2.5 mm when fitted per bone.
+  That supports "same subject, different segmentation", not agreement at sub-millimetre level.</li>
+<li><strong>Geometry QA</strong> (<code>qa_reports/vhf_lower_limb_build.json</code>): 2.34 M triangles in total, 0 non-manifold edges, 3 meshes with open
+  boundaries (left forefoot, left talar cartilage, right talus).</li>
+<li><strong>Rig</strong> (<code>pipeline/build_rig_lower_limb.py</code>, <code>animate_rom_lower_limb.py</code>; reports <code>manifest/rig_vhf_lower_limb*.json</code>,
+  <code>qa_reports/rig_vhf_lower_limb_rom.json</code>): hip, knee and ankle joint centres from geometry only (no labelled landmarks); ankle
+  centre refined by surface-congruence fit (shift 13.4 and 17.0 mm, bone overlap 6.9 → 0.6 mm and 6.5 → 0.4 mm). Bones and
+  cartilages are bound rigidly (44 meshes); the 4 knee ligaments and 76 muscles are not rigged. ROM limits are AAOS values; the
+  animation reaches them except on the right side, where bone contact exceeds 1.5 mm: hip adduction 25 (AAOS 30), hip external
+  rotation 40 (45), ankle dorsiflexion 15 (20). The cause (donor anatomy or right hip-centre error) is not determined. After
+  these caps the largest bone overlap in the sweep is 1.0 mm.</li>
+<li>This supersedes the "no source supplies individually separated female bones" result of the female rig source survey below, for
+  the lower extremity only. The female spine, ribs, skull and upper limb remain without separated-bone sources.</li>
+</ul>
+<h2>VHF_DENVER_CT.ADULT.FEMALE — source_backed_partial (v013): Denver lower limb + CT-segmented skeleton</h2>
+<p>Same individual as the section above (Visible Human Female donor, 59 y, 157 cm recorded, 88 kg), one body in one frame, with two methods per structure
+(each structure carries <code>panacea_method</code> and its own accuracy status). Approved by the owner on 2026-10-09 (PR #2303: segment the Visible Human Female CT;
+no anatomist review required for this step; the result is unreviewed, <code>clinically_reviewed</code> false).</p>
+<ul>
+<li><strong>Manual (Denver):</strong> the 128 lower-extremity structures of the previous section, status <code>source_backed</code>.</li>
+<li><strong>Machine (TotalSegmentator):</strong> 56 bones, status <code>model_segmented</code>: skull (cranium and mandible in one mesh), vertebrae C1 to L5, ribs 1 to 12 on both
+  sides, sternum, clavicles, scapulae, humeri. Femur, hip bone and sacrum are NOT taken from the model: Denver's manual segmentation is used.</li>
+<li><strong>Tool:</strong> TotalSegmentator 2.18.0 (code and the default <code>total</code> model are Apache-2.0, read from the project README on 2026-10-10; commercial-licence tasks
+  such as <code>appendicular_bones</code> were not used), nnunetv2 2.8.1, torch 2.14.1, device MPS. Citation: Wasserthal J et al., Radiology: Artificial Intelligence
+  2023, doi:10.1148/ryai.230024. Usage statistics reporting was switched off in the tool's config after the first start (that first run may have sent one count).</li>
+<li><strong>Input:</strong> Denver "Aligned CT-DICOM" (NLM Visible Human Female CT), 1,727 slices, 0.7227 mm in plane, 1 mm slice spacing (stated in the tags). The files
+  are not in Hounsfield units: the stored values were mapped as HU = value - 1024, an offset <strong>inferred</strong> from the intensity peaks (air about 0, fat about 920,
+  soft tissue about 1,030), not stated in the files. Resampled to 1.5 mm isotropic before inference (a full-resolution run exhausted memory). Orientation was
+  read from the images (heart on the image right, spine posterior, slice 0 at the feet).</li>
+<li><strong>Cleaning:</strong> largest connected component per bone; Taubin smoothing (10 iterations). Transform from CT to the Denver frame: ICP on the left femur
+  (3.2 degrees, translation about 807, 681, 9 mm), applied to every CT bone; the lumbar spine meets the Denver sacrum in the render.</li>
+<li><strong>Accuracy (the only ground truth available):</strong> surface distance to Denver's manual meshes after fitting, median / p95: femur L 1.2 / 3.0 mm, femur R
+  2.1 / 5.3, hip bone L 1.7 / 3.8, hip bone R 1.5 / 4.1, sacrum 2.9 / 11.0 (common transform); per-bone fits 0.6 to 2.0 mm median.
+  <code>qa_reports/ct_segmentation_vs_denver.json</code>. Nothing is measured for the other 56 bones: their accuracy is unknown.</li>
+<li><strong>Known defects:</strong> left ribs 6 to 8 and vertebra L2 are fragmented in the model output (largest piece 81 to 85 % of the mask; L2 79 % with 14 pieces), so
+  those meshes are incomplete. The costal-cartilage mask came out in 18 pieces (largest 72 %) and is NOT published. The model's "prostate" label on this female
+  subject is wrong for the subject (the model was trained mostly on living, male-dominated CT) and no soft-tissue or organ output of the model is used.</li>
+<li><strong>Not available:</strong> radius, ulna and hand bones (only in a task that needs a commercial licence), foot and lower-leg bones beyond Denver's. The scan shows
+  disrupted anatomy (fluid-filled lungs, cadaver posture); the assembled skeleton stands 1.71 m, more than the recorded 157 cm, because the donor lay supine with
+  the feet extended, so no stature is shown.</li>
+<li><strong>Motion shown for this variant:</strong> a range-of-motion simulation (AAOS limits; truth class <code>simulated</code>) of the hip, knee and ankle, from the same rig as the lower-limb
+  body (rig rebuilt on this body; joint centres and limits are identical). Only pelvis, legs and feet move: the CT bones above the pelvis, the muscles and the
+  knee ligaments stay still and are not shown in motion mode. Right-side caps below AAOS (hip adduction 25, hip external rotation 40, ankle dorsiflexion 15 degrees)
+  carry over. No walk or run for this body (the CMU retarget is built for the male full-body rig). Reports: <code>manifest/rig_vhf_denver_ct.json</code>,
+  <code>qa_reports/rig_vhf_denver_ct_rom.json</code> (largest bone overlap 1.0 mm).</li>
+<li>The CT, mask meshes and the model weights stay local; only the decimated web GLBs are published. Provenance per bone: <code>qa_reports/ct_segmentation_provenance.json</code>.</li>
+</ul>
+<h2>Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)</h2>
+<ul>
+<li><strong>Source:</strong> ICRP Publication 156, <em>Paediatric Mesh-type Reference Computational Phantoms</em>
+  (2024), polygon-mesh OBJ files from <code>P156 Electronic files.zip</code>
+  (https://www.icrp.org/publication.asp?id=ICRP+Publication+156). Ten phantoms: newborn and
+  1, 5, 10 and 15 years, male and female. They are built from CT images of real people and
+  adjusted to the ICRP Publication 89 reference values. They are <strong>not</strong> scaled adults.</li>
+<li><strong>Retrieval:</strong> HTTP range requests on the 11.8 GB archive fetched only the README and the
+  ten OBJ/MTL pairs.</li>
+<li><strong>Licence:</strong> neither the ICRP page nor the README states redistribution terms. The project
+  owner cleared redistribution in Panacea on 2026-10-03. The web derivatives are published in
+  <code>public/bodyexposure/pediatric_*</code>; the master body <code>.blend</code> files stay local (size).</li>
+<li><strong>Laterality correction:</strong> the 15-year female phantom labels its ovaries with swapped
+  sides; the builder corrects this from geometry and records it on the objects.</li>
+<li><strong>Conversion</strong> (<code>pipeline/build_icrp156_bodies.py</code>): cm → m, feet to z = 0, no rotation
+  needed. Verified on the 5-year-old male: sternum at −Y, liver at −X, the master's
+  convention.</li>
+<li><strong>Kept:</strong> 102–140 anatomical surfaces per body.</li>
+<li><strong>Dropped:</strong> 88–90 dosimetry-only groups per body (µm target layers, spongiosa and
+  medulla, lumen and air contents, residual soft tissue).</li>
+<li><strong>Measured statures:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Age</th>
+<th>Male</th>
+<th>Female</th>
+<th>ICRP reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Newborn</td>
+<td>48.1 cm</td>
+<td>48.2 cm</td>
+<td>51 cm</td>
+</tr>
+<tr>
+<td>1 year</td>
+<td>76.0 cm</td>
+<td>76.0 cm</td>
+<td>76 cm</td>
+</tr>
+<tr>
+<td>5 years</td>
+<td>109.0 cm</td>
+<td>109.1 cm</td>
+<td>109 cm</td>
+</tr>
+<tr>
+<td>10 years</td>
+<td>138.0 cm</td>
+<td>138.1 cm</td>
+<td>138 cm</td>
+</tr>
+<tr>
+<td>15 years</td>
+<td>167.0 cm</td>
+<td>161.0 cm</td>
+<td>167 / 161 cm</td>
+</tr>
+</tbody>
+</table>
+<p>The newborn phantom has flexed legs, which explains the shorter standing height.
+- <strong>In the master:</strong> each variant is linked as a library collection (one <code>.blend</code> per body)
+  under <code>PEDIATRIC.NEONATE</code>, <code>PEDIATRIC.INFANT</code>, <code>PEDIATRIC.CHILD</code> (5 and 10 y) and
+  <code>PEDIATRIC.ADOLESCENT</code>.</p>
+<h2>Placeholders</h2>
+<p><code>HUMAN.PREGNANT</code>, <code>FETUS</code>, <code>PEDIATRIC.TODDLER</code> and <code>HUMAN.OLDER_ADULT</code> exist as empty root collections. Each records the source data it needs
+(<code>panacea_source_requirement</code>). No geometry was fabricated, and none was produced by scaling
+or inflating an adult body.</p>
+<h2>Considered and not used: thebuggeddev/anatomy</h2>
+<p>The owner pointed to https://github.com/thebuggeddev/anatomy (inspected 2026-10-03). Its nine
+organ models (brain, eyeball, heart, intestine, kidneys, liver, lungs, pancreas, skin) are
+each a single mesh named <code>tripo_node_&lt;uuid&gt;</code>: output of the Tripo AI text/image-to-3D
+generator. The repository has no licence file and no attribution, and the meshes have no
+internal anatomy. Under this project's reference standard, generated geometry is not
+evidence for anatomy, so none of it was merged. Source-backed versions of all nine organs
+already exist in the canonical bodies.</p>
+<h2>Owner reference set (art direction only)</h2>
+<p>The owner's "Panaceamed Resources" folder (71 files, registered 2026-10-03 in <code>manifest/references.json</code>) is
+entirely AI-generated: ChatGPT images and Tripo meshes or multiview inputs. It sets the view layout, the peel order
+and the coverage checklists (see <code>references/README.md</code>). It contributes no geometry, landmarks or measurements to
+any canonical body, and it is not redistributed with the app.</p>
+<h2>BodyParts3D 4.0 (adult male gut audit, v010)</h2>
+<p>Source: BodyParts3D 4.0 "partof" release, DBCLS (https://dbarchive.biosciencedbc.jp/en/bodyparts3d/). The OBJ headers say
+CC BY-SA 2.1 Japan; the DBCLS licence page now says CC BY 4.0. Attribution follows the stricter of the two.</p>
+<p>BodyParts3D is the source Z-Anatomy was built from. It was registered to the canonical male frame in two steps:
+1. A global similarity fit on 277 structures present in both datasets (<code>manifest/bp3d_frame.json</code>).
+2. A rigid ICP on the pelvis: sacrum, coccyx, both hip bones and the urinary bladder (<code>manifest/bp3d_icp.json</code>). The
+   median reference surface distance fell from 7.4 mm to 1.1 mm.</p>
+<p>Registration showed that three Z-Anatomy gut labels do not match the geometry (<code>manifest/bp3d_label_audit.json</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Z-Anatomy label</th>
+<th>Relabelled to</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sigmoid colon</td>
+<td>Rectum</td>
+<td>97% of vertices on the BodyParts3D rectum; spans S3 (z 0.925 m) to below the pelvic diaphragm</td>
+</tr>
+<tr>
+<td>Jejunum</td>
+<td>Jejunum and ileum</td>
+<td>46% jejunum, 33% ileum</td>
+</tr>
+<tr>
+<td>Descending colon</td>
+<td>Descending and sigmoid colon</td>
+<td>lower end turns to the midline below the pelvic brim</td>
+</tr>
+</tbody>
+</table>
+<p>The old IDs are kept in <code>panacea_previous_ids</code>. One structure was added: the external anal sphincter (FMA21930). The
+BodyParts3D caecum was <strong>not</strong> added because 60% of it lies inside the Z-Anatomy small-intestine mesh. The caecum
+stays an open gap.</p>
+<h2>ICRP Publication 145 adult reference phantoms (v011)</h2>
+<p>Source: ICRP Publication 145, <em>Adult Mesh-type Reference Computational Phantoms</em> (2020), electronic files
+<code>MRCP_AM</code> and <code>MRCP_AF</code>, polygon-mesh version (https://www.icrp.org/docs/P145%20Electronic%20files.zip). Built with the
+same pipeline as the paediatric bodies (<code>pipeline/build_icrp156_bodies.py -- --only AM,AF</code>). The coordinate convention
+matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Redistribution falls under the
+owner's 2026-10-03 clearance of ICRP-derived meshes.</p>
+<p>These are <strong>separate, internally consistent bodies</strong>, published as an "ICRP reference" variant of the adult male and
+adult female entries. They are not grafted onto the Z-Anatomy male or the HuBMAP female. Mixing two individuals'
+anatomy in one body would itself be invented anatomy. The ICRP female supplies everything the HuBMAP female lacks:
+the axial skeleton (cranium, spine, ribs, sternum), stomach, oesophagus, oral cavity, airways, pituitary and thyroid.
+Both bodies pass the gross-anatomy gate with no exceptions (<code>qa_reports/gross_icrp_adult_*.json</code>). Statures are 176 cm
+and 163 cm, the Publication 89 reference values.</p>
+<p>Limits, inherited from the source's dosimetry purpose: bones are grouped by region (for example "Ribs cortical" covers
+all ribs), and the skeletal muscle is a single tissue mesh. Airway regions follow the ICRP Human Respiratory Tract
+Model names (ET1, ET2, BB); the display names spell out what those regions are.</p>
+<h2>CMU Graphics Lab Motion Capture Database (walk and run clips)</h2>
+<p>Source: mocap.cs.cmu.edu, subject 07 trial 01 (walk) and subject 09 trial 02 (run), ASF/AMC files at 120 fps,
+downloaded 2026-10-09.</p>
+<p>Licence, read from the site on 2026-10-09: "free for all uses … You may include this data in commercially-sold
+products, but you may not resell this data directly, even in converted form." Required acknowledgement: "The data
+used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF
+EIA-0196217." The acknowledgement appears in the app's Motion panel and in <code>public/bodyexposure/CREDITS.txt</code>.</p>
+<p>Truth class: <strong>measured-retargeted</strong>. This is the recorded motion of another person, mapped onto the Z-Anatomy
+skeleton. It is not the motion of the anatomy shown and not patient biomechanics.</p>
+<h2>Female rig source survey (2026-10-09) — no production import</h2>
+<p>Checked against the publishers' pages on 2026-10-09; nothing below was downloaded or imported.</p>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Verified</th>
+<th>Consequence for a female rig</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BodyParts3D 4.0 (DBCLS)</td>
+<td>The database description states "a three-dimensional whole-body model for an adult human male". Licence is CC BY. Download page offers <code>isa_BP3D_4.0_obj_99.zip</code> (136 MB) and <code>partof_BP3D_4.0_obj_99.zip</code> (62 MB), 99 % polygon-reduced. Nothing on either page mentions female.</td>
+<td><strong>Male only.</strong> It must not be used or relabelled as female anatomy. It remains the male gut-audit source.</td>
+</tr>
+<tr>
+<td>NLM Visible Human Female</td>
+<td>Cryosection and CT images (about 40 GB, 0.33 mm spacing), no registration. NLM Terms and Conditions require "Courtesy of the U.S. National Library of Medicine", forbid implying NLM endorsement, and require either current data or a clear notice that it is not current. Commercial use is not prohibited, but NLM gives no legal advice.</td>
+<td>Images, not meshes: every bone would need our own segmentation, then review. The HuBMAP <code>VH_Female</code> mesh already published here derives from the same subject, but has no axial skeleton.</td>
+</tr>
+<tr>
+<td>DIR-Lab 4DCT</td>
+<td>Published as a public lung-registration benchmark (10 cases, 10 respiratory phases, landmark pairs). <strong>Licence and redistribution terms NOT VERIFIED</strong>: the site did not respond to the fetch.</td>
+<td>Research and validation use only until the terms are read. Not a source of production geometry.</td>
+</tr>
+<tr>
+<td>ICRP Publication 145 <code>MRCP_AF</code> (already published, v011)</td>
+<td>Complete female body with axial skeleton, airways and lungs. Bones are grouped by region (for example "Ribs cortical" is one mesh).</td>
+<td>Cannot drive a per-bone rig: individual vertebrae, ribs and limb bones are not separate objects.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result:</strong> no currently available, licensed source supplies individually separated female bones. Splitting the ICRP
+regional meshes would mean inventing the boundaries between neighbouring bones, which this project does not do.
+<code>clinically_reviewed</code> stays <code>false</code> for every body.</p>
+<p>Unblocking options that stay within the rules: (1) a mesh set with separated female bones and a confirmed licence;
+(2) segmenting the Visible Human Female CT ourselves, then having a qualified anatomist review it; (3) a published
+ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms before any 4DCT use.</p>
+</main></body></html>

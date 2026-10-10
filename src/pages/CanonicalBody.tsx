@@ -371,7 +371,8 @@ export function CanonicalBody() {
       const reach = (sz.y * 1.35) / 2  // lengan terangkat ±180° menambah tinggi di atas kepala
       const span = Math.max(sz.x * 1.6, sz.y)  // abduksi 90° → bentang lengan ≈ tinggi badan
       const dist = Math.max(reach / Math.tan(vfov / 2), span / 2 / Math.tan(hfov / 2)) * 1.15
-      s.controls.target.set(c.x, c.y + sz.y * 0.1, c.z); s.camera.position.set(c.x, c.y + sz.y * 0.1, c.z + dist); s.controls.update(); s.invalidate()
+      // lewat flyTo(…, null): membatalkan transisi kamera yang masih berjalan (mis. terbang ke struktur terpilih) agar tidak menarik kamera menjauhi rig
+      s.flyTo({ position: [c.x, c.y + sz.y * 0.1, c.z + dist], target: [c.x, c.y + sz.y * 0.1, c.z], up: [0, 1, 0] }, null); s.invalidate()
     }
     // ganti klip: action mixer baru, jam direset; kamera dibingkai hanya pada pemuatan pertama
     const activate = (name: string, frameCamera: boolean) => {
@@ -948,7 +949,8 @@ export function CanonicalBody() {
         Adult male: Z-Anatomy / BodyParts3D (CC BY-SA 4.0), with reconstructed intervertebral discs and pericardium.
         Adult female: HuBMAP VH_Female from the NLM Visible Human female (CC BY 4.0). Skeleton variant: University of Denver segmentation of the same donor (CC BY 4.0) plus CT bones segmented with TotalSegmentator (Apache-2.0), courtesy of the U.S. National Library of Medicine. Neonate to adolescent: ICRP
         Publication 156 paediatric reference phantoms, built from CT images of real children. Bodies marked “not yet”
-        need source anatomy that this project does not have; they are not built by scaling an adult body.
+        need source anatomy that this project does not have; they are not built by scaling an adult body.{' '}
+        <a className="underline" href={`${BASE}provenance.html`} target="_blank" rel="noopener">Sources and provenance</a>
       </p>
     </div>
   )

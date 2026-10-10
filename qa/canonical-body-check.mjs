@@ -134,7 +134,11 @@ try {
       await page.getByText('Simulation', { exact: true }).waitFor()
       await page.getByText(/pelvis, legs and feet only/).waitFor()
       const fc = page.getByTestId('canonical-body-canvas')
-      const fa = await fc.screenshot(); await page.waitForTimeout(700); const fb = await fc.screenshot()
+      await page.getByTestId('motion-draws').waitFor({ timeout: 60000 })  // rig sudah digabung & dirender sebelum membandingkan bingkai
+      // regresi: memilih struktur di luar rig (iga) lalu masuk mode gerak tidak boleh menyisakan kanvas kosong (transisi kamera lama menarik kamera menjauhi rig)
+      const lit = await page.evaluate(async (b64) => { const i = new Image(); await new Promise((r) => { i.onload = r; i.src = 'data:image/png;base64,' + b64 }); const c = document.createElement('canvas'); c.width = i.width; c.height = i.height; const g = c.getContext('2d'); g.drawImage(i, 0, 0); const d = g.getImageData(0, 150, i.width, i.height - 150).data; let n = 0; for (let k = 0; k < d.length; k += 4) if (d[k] + d[k + 1] + d[k + 2] > 150) n++; return n / (d.length / 4) }, (await fc.screenshot()).toString('base64'))
+      assert(lit > 0.003, `female motion: rig not visible after selecting a structure outside the rig (${(lit * 100).toFixed(2)}% lit)`)
+      const fa = await fc.screenshot(); await page.waitForTimeout(1500); const fb = await fc.screenshot()  // 1,5 dtk: CPU bersaing (CI/dev server dingin) tidak membuat tes goyah
       assert(!fa.equals(fb), 'female motion: canvas did not change while playing')
       await page.getByLabel('Motion timeline').fill('0.05')
       await page.getByTestId('motion-movement').filter({ hasText: /hip flexion/i }).waitFor()
@@ -142,6 +146,14 @@ try {
       await page.screenshot({ path: `/private/tmp/canonical-vhf-motion-${width}-${theme}.png`, fullPage: true })
       await page.getByRole('button', { name: 'Stop motion' }).click()
       await page.getByTestId('motion-panel').waitFor({ state: 'detached' })
+      // halaman sumber & provenans statis: tautan ada, halaman termuat, tidak ada sumber luar
+      const prov = page.getByRole('link', { name: 'Sources and provenance' })
+      const href = await prov.getAttribute('href')
+      assert(/bodyexposure\/provenance\.html$/.test(href), `provenance link href: ${href}`)
+      const pr = await page.request.get(new globalThis.URL(href, page.url()).toString())
+      assert.equal(pr.status(), 200, 'provenance page not served')
+      const ptxt = await pr.text()
+      assert(/clinically_reviewed/.test(ptxt) && /Visible Human skeleton/.test(ptxt) && !/(src|href)="https?:\/\//.test(ptxt), 'provenance page content')
       // anak: varian 5 th & 10 th, laki-laki & perempuan
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()
