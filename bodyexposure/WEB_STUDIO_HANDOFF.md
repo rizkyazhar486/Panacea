@@ -6,6 +6,9 @@ Branch `feat/body-studio-viewer`, based on upstream main `0e3bab80`, is independ
 of the offline Cycles PR #2360. Work was isolated in the Codex worktree; Claude's
 dirty source/data/QA files and PRs #2338/#2353 were inspected and not changed.
 The additive domain exports must be retained alongside concurrent ontology work.
+Before publication, upstream merged Claude's #2338. The branch was rebased onto
+`1dda7e71` without conflicts; its neutral-centred female WALK/RUN rig is preserved.
+Architecture/build/full-suite gates were rerun on that integration.
 
 Open **Canonical Human Bodies** in the existing navigation, or the existing
 `/#/body-exposure/canonical` route. Lighting controls sit below Graphics quality.
@@ -78,6 +81,13 @@ The fast Studio→exposure→quality interaction initially caught a stale-field
 overwrite. Mode/exposure updates now patch independent fields through functional
 React state updates; reset updates both atomically. Exact scene-pixel reset and
 quality-retention assertions were retained and passed after the fix.
+
+`qa/studio-motion-check.mjs` additionally passed on the rebased female VHF rig:
+Studio remained selected through body/variant switches, WALK and RUN each changed
+actual canvas pixels over 1.2 seconds, the recorded-motion/partial-coverage labels
+remained present, and Stop motion exited cleanly with no page errors. Four actual
+frames and hashes are in `qa_reports/web-studio-motion/`. This compatibility check
+does not establish clinical gait, foot-slide accuracy or animation continuity.
 
 Local architecture lint and ratchet passed. Build runs passed 707 QA tests and
 compiled the production bundle; the full deterministic suite passed 686 files.
