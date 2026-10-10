@@ -121,50 +121,66 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "Penyimpanan hasil lab persisten di server",
    "acceptance": "Hasil yang diterima tetap ada setelah restart; PostgreSQL bila kompatibel dengan infrastruktur repo",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): intake oleh dokter terverifikasi lalu restart proses: 1 hasil, status closed, jejak 4 entri tetap ada (mode berkas)",
+    "irisanPenyimpanan.uji: simpan → muat → pasang → simpan → muat utuh untuk hasil_lab dan rujukan_klinis (tata letak Mongo beririsan, via dbPalsu); 6 mutan simpan/muat terbunuh"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Tidak memakai PostgreSQL: penyimpanan klinis yang ada (berkas/Mongo) dipakai, tanpa database baru. Mongo sungguhan tidak diuji (tanpa akses); produksi perlu dipastikan memakai mode irisan. Sebelum #2347, mode irisan akan kehilangan data ini saat restart (cacat ditemukan dan diperbaiki sebelum ada pemakaian). Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B3",
    "pillar": "Lab & Referral Closure",
    "criterion": "State hasil received→pending_review→reviewed→communicated→closed",
    "acceptance": "Transisi hanya sesuai urutan; transisi tak sah ditolak dengan alasan",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): melompat ke reviewed → 409 not-allowed-step; komunikasi tanpa bukti → 400; perjalanan penuh received→closed berhasil",
+    "hasilLab.uji: tepi maju-satu-langkah, mundur/lompat/status tak dikenal ditolak dengan alasan, penolakan tidak mengubah status maupun jejak; 22 mutan aturan penting terbunuh"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Hanya satu langkah maju; reviewed hanya klinisi terotorisasi; communicated wajib bukti kanal+catatan; closed hanya oleh orang. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B4",
    "pillar": "Lab & Referral Closure",
    "criterion": "Setiap perubahan status diaudit",
    "acceptance": "Setiap transisi mencatat pelaku, peran, waktu, dan status sebelum/sesudah; log tidak dapat diubah oleh pelaku",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Setiap transisi menulis entri {seq, actorId, role, at, from, to, prevHash, hash}; verifyTrail mendeteksi seq-gap, chain-broken, time-regression, hash-mismatch, wrong-subject; rekam dengan jejak rusak ditolak (trail-corrupt).",
+    "Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): audit server mencatat labresult.received/advanced/read dan penolakannya"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Tidak ada endpoint yang mengubah jejak. Rantai hash membuat pengubahan terdeteksi, tetapi bukan penyimpanan WORM: pihak dengan akses langsung ke penyimpanan bisa menulis ulang seluruh rantai (tidak ada jangkar eksternal). Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B5",
    "pillar": "Lab & Referral Closure",
    "criterion": "RBAC pada hasil",
    "acceptance": "Hanya peran berwenang dan pasien sendiri yang membaca; peran/tenant lain ditolak (tes negatif)",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): pasien lain → 404 (tidak membocorkan keberadaan); pasien memajukan hasil → 403; metrik oleh pasien → 403; /api/clinical tidak membawa koleksi hasil",
+    "hasilLab.uji: pasien hanya miliknya, tenant lain, sistem, peran kontributor/verifikator, owner dipetakan ke admin (bukan klinisi), tes berpasangan tiap aturan"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Dokter yang belum terverifikasi STR diperlakukan sebagai pasien oleh requireAuth sehingga ditolak. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B6",
    "pillar": "Lab & Referral Closure",
    "criterion": "Lifecycle rujukan terpisah",
    "acceptance": "Rujukan memiliki state, transisi, dan audit sendiri",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Siklus rujukan terpisah requested→accepted→scheduled→completed→result_returned→closed plus declined/cancelled, mesin dan jejak audit hash-berantai sendiri; result_returned butuh hasil lab pasien yang sama (atau catatan untuk rujukan non-lab); closed butuh hasil terkait sudah closed; tolak/batal wajib alasan.",
+    "Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): rujukan lab sampai closed setelah hasil terkait closed",
+    "Penutupan rujukan diperketat oleh PR #2348 (Codex, main a5b646dfc): hasil terkait diverifikasi ulang (id, pasien, tenant, jejak audit utuh berakhir closed); label closed saja tidak cukup; penolakan tidak mengubah rujukan. Ditinjau AI independen; tidak ada persetujuan klinis manusia"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Rujukan tidak berbagi status dengan hasil, hanya menautkannya. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B7",
@@ -181,20 +197,26 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "Komunikasi hasil ke pasien tercatat",
    "acceptance": "Pengiriman penjelasan tercatat sebagai bukti oleh orang, bukan notifikasi otomatis",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). communicated hanya bisa dicatat oleh klinisi/perawat (bukan sistem/admin/pasien) dengan {channel, note, at, by}; tanpa bukti → evidence-required.",
+    "Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): komunikasi tanpa bukti → 400, dengan bukti → communicated"
+   ],
    "owner": "Sol/Sonnet",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Yang terverifikasi hanya pencatatan bukti komunikasi oleh orang di backend. Pengiriman pesan ke pasien dan UI-nya belum ada. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B9",
    "pillar": "Lab & Referral Closure",
    "criterion": "Metrik penutupan dihitung dari backend",
    "acceptance": "Rasio penutupan memakai data server (bukan localStorage) dan tidak terukur bila penyebut nol",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): GET /api/lab-results/metrics?dueHours=24 → total 1, closed 1, closureRate 1, oldestOpenHours null, overdue 0, corrupt 0",
+    "hasilLab.uji: penyebut nol → closureRate null; tanpa dueHours overdue null; rekam berjejak rusak dihitung terpisah (corrupt); dueHours 0/NaN/negatif ditolak"
+   ],
    "owner": "Sol",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Dihitung dari data server; tidak ada ambang yang dikarang server. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "C1",
