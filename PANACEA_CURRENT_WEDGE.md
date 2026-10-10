@@ -142,6 +142,12 @@ Required dimensions remain separate:
 
 No favorable claim is allowed for a dimension that has not been measured.
 
+## 7. Verified outcome delivery: software plus accountable service
+
+The owner-provided 2026-10-08 strategy reference reframes PanaceaMed as **delivering verified workflow outcomes, not merely selling access to software**. The implementation design is [Verified Outcome Delivery](docs/superpowers/specs/2026-10-08-panacea-verified-outcome-delivery-design.md). Within the current outpatient wedge, success means a governed episode moves to an evidenced, appropriately signed state—or remains honestly pending, blocked or escalated—with patient identity, consent, clinical authority and provenance intact.
+
+Do not equate AI-generated drafts, dashboards or feature counts with completed work. Sell and measure attributable administrative/service completion, not guaranteed clinical recovery, payer approval or an unverified revenue multiple. This refinement does **not** change the selected wedge or authorize a new patient-truth store, page or clinical autonomy.
+
 ## 7. Expansion rule
 
 Broader platform work becomes justified when at least one of these is true:
