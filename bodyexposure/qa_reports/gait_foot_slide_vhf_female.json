@@ -1,0 +1,29 @@
+{
+ "method": "Selip kaki klip WALK/RUN dari mesh rig di Blender (heel & toe sebagai penanda kaku pada tulang kaki).",
+ "clips": {
+  "WALK": {
+   "heel": {
+    "stance_phases": 2,
+    "stance_frames": 6,
+    "common_forward_speed_m_s": 1.149,
+    "slide_rms_mm": 5.0,
+    "slide_max_mm": 7.7
+   },
+   "toe": {
+    "stance_phases": 1,
+    "stance_frames": 5,
+    "common_forward_speed_m_s": 1.318,
+    "slide_rms_mm": 7.6,
+    "slide_max_mm": 12.9
+   }
+  },
+  "RUN": {
+   "heel": {
+    "stance_phases": 0
+   },
+   "toe": {
+    "stance_phases": 0
+   }
+  }
+ }
+}

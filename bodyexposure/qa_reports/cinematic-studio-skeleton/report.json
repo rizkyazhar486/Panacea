@@ -1,0 +1,162 @@
+{
+  "source_blend": "/Users/rizkyazhar/Documents/Panaceamed.id/bodyexposure/body_v001_skeleton_cleaned.blend",
+  "blender_version": "5.2.2 LTS",
+  "profile": "preview",
+  "benchmark": "body-qa",
+  "compare_mode": "lighting",
+  "device_backend": "CPU",
+  "devices": [],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 277,
+    "source_polygons": 701812,
+    "meshes_without_uv": 229,
+    "meshes_without_material": 6,
+    "review_status_counts": {
+      "unspecified": 277
+    },
+    "suppressed_display_instances": []
+  },
+  "renders": [
+    {
+      "variant": "before",
+      "path": "body-qa_c0_preview_before.png",
+      "sha256": "9448b49604e624273ca31a15acf077848a7c0acbe8988259dd55d2804d9b94bc",
+      "render_seconds": 1.82,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 15.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "original",
+      "exposure_ev": -2.5,
+      "lighting_state_restored": true,
+      "studio_lights": []
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c0_preview_after.png",
+      "sha256": "fdaaf533bc3f41f0715b7965c810cb932ac7b34878dd1a22171a7477c3af3603",
+      "render_seconds": 1.769,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 15.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 517.90771484375,
+          "diameter_metres": 1.102562665939331,
+          "location_metres": [
+            -1.5266252756118774,
+            -2.2173783779144287,
+            1.9598901271820068
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 129.4769287109375,
+          "diameter_metres": 1.5266252756118774,
+          "location_metres": [
+            1.8658753633499146,
+            -1.708503246307373,
+            1.1117653846740723
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 345.2718200683594,
+          "diameter_metres": 0.7633126378059387,
+          "location_metres": [
+            1.1873751878738403,
+            1.6839969158172607,
+            1.8750791549682617
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "before",
+      "path": "body-qa_c1_preview_before.png",
+      "sha256": "31dfb2a88c4d0ac39fd575f32a4890904dda5d3acccbed21cd319594f2d142ff",
+      "render_seconds": 1.471,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 15.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "original",
+      "exposure_ev": -2.5,
+      "lighting_state_restored": true,
+      "studio_lights": []
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c1_preview_after.png",
+      "sha256": "cbac3b5f1fe2ae7e8a96cdde0e7efad1ae7c3117f424ab46743e94d246808c59",
+      "render_seconds": 1.109,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 15.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key.001",
+          "energy_watts": 517.90771484375,
+          "diameter_metres": 1.102562665939331,
+          "location_metres": [
+            2.205125331878662,
+            -1.5388782024383545,
+            1.9598910808563232
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill.001",
+          "energy_watts": 129.4769287109375,
+          "diameter_metres": 1.5266252756118774,
+          "location_metres": [
+            1.696250319480896,
+            1.8536224365234375,
+            1.1117660999298096
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim.001",
+          "energy_watts": 345.2718200683594,
+          "diameter_metres": 0.7633126378059387,
+          "location_metres": [
+            -1.696250319480896,
+            1.1751222610473633,
+            1.8750786781311035
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation, browser FPS or memory measurement performed.",
+    "Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.",
+    "Timings include scene synchronization and sequential cache effects."
+  ]
+}

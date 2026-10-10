@@ -146,5 +146,15 @@ if find(r"SKELETAL\.VERTEBRA_C1$"):
     missing = [f"RIB_{i}.{sd}" for i in range(1, 13) for sd in "LR" if not find(rf"SKELETAL\.RIB_{i}\.{sd}$")]
     check("twelve_ribs_each_side", not missing, {"missing": missing})
     if st and t6: check("sternum_anterior_to_spine", cen(st[0]).y < cen(t6[0]).y - 0.08, {"sternum_y": round(cen(st[0]).y, 3), "t6_y": round(cen(t6[0]).y, 3)})
+# janin atlas (organ saja): relasi antar-organ terukur; heart/brain tidak ada sehingga urutan vertikal umum tidak berlaku
+if body == "FETUS":
+    lungs, thymus = find(r"RESPIRATORY\.LUNG\.[LR]$"), one(r"\.THYMUS$")
+    kid = find(r"URINARY\.RENAL_PARENCHYMA\.[LR]$"); bl = one(r"URINARY\.BLADDER$")
+    if lungs and liver: check("lungs_above_liver", all(cen(l).z > cen(liver).z for l in lungs), {"lungs_z": [round(cen(l).z, 3) for l in lungs], "liver_z": round(cen(liver).z, 3)})
+    if thymus and liver: check("thymus_above_liver", cen(thymus).z > cen(liver).z, round(cen(thymus).z, 3))
+    if kid and liver: check("kidneys_posterior_to_liver", all(cen(k).y > cen(liver).y for k in kid), {"kidneys_y": [round(cen(k).y, 3) for k in kid], "liver_y": round(cen(liver).y, 3)})
+    if kid and stomach: check("stomach_anterior_to_kidneys", all(cen(stomach).y < cen(k).y for k in kid), round(cen(stomach).y, 3))
+    if kid and bl: check("bladder_below_kidneys", all(cen(bl).z < cen(k).z for k in kid), round(cen(bl).z, 3))
+    if len(lungs) == 2: check("both_lungs_present_and_paired", {o.name[-1] for o in lungs} == {"L", "R"}, [o.name[-1] for o in lungs])
 json.dump(res, open(OUT, "w"), indent=1)
 print("QA", body, "failures:", res["failures"])
