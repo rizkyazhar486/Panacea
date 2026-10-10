@@ -4,6 +4,8 @@ import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconMoon } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
 import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
+import { stopBang, parseNumberField } from '../domains/clinical-calculators'
+import type { StopBangBand } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STOP-BANG — published obstructive sleep apnea (OSA) risk screening tool
@@ -20,10 +22,10 @@ const ITEMS: { key: string; letter: string; label: string }[] = [
   { key: 'pressure', letter: 'P', label: 'Do you have, or are you being treated for, high blood Pressure?' },
 ]
 
-function bandFor(score: number): { label: string; tone: 'brand' | 'low' | 'critical'; desc: string } {
-  if (score <= 2) return { label: 'Low risk', tone: 'brand', desc: 'Low probability of moderate-to-severe OSA on this screen.' }
-  if (score <= 4) return { label: 'Intermediate risk', tone: 'low', desc: 'Intermediate probability — discuss with a clinician; further testing (e.g. home sleep apnea test or polysomnography) may be warranted, especially if BMI/neck circumference/male gender criteria are also present.' }
-  return { label: 'High risk', tone: 'critical', desc: 'High probability of moderate-to-severe OSA — referral for a sleep study (polysomnography or validated home sleep apnea test) is recommended.' }
+const BANDS: Record<StopBangBand, { label: string; tone: 'brand' | 'low' | 'critical'; desc: string }> = {
+  low: { label: 'Low risk', tone: 'brand', desc: 'Low probability of moderate-to-severe OSA on this screen.' },
+  intermediate: { label: 'Intermediate risk', tone: 'low', desc: 'Intermediate probability — discuss with a clinician; further testing (e.g. home sleep apnea test or polysomnography) may be warranted, especially if BMI/neck circumference/male gender criteria are also present.' },
+  high: { label: 'High risk', tone: 'critical', desc: 'High probability of moderate-to-severe OSA — referral for a sleep study (polysomnography or validated home sleep apnea test) is recommended.' },
 }
 
 export function SleepApneaScreen() {
@@ -36,23 +38,18 @@ export function SleepApneaScreen() {
   // STOP-BANG satu poin memindahkan ambang 3 dan 5.
   const demo = getDemoTersimpan()
   const [answers, setAnswers] = useState<Record<string, boolean>>({})
-  const [bmi, setBmi] = useState(() => (demo.weightKg && demo.weightKg > 0 && demo.heightCm && demo.heightCm > 0
-    ? +(demo.weightKg / Math.pow(demo.heightCm / 100, 2)).toFixed(1) : 0))
-  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
-  const [neckCm, setNeckCm] = useState(0)
+  // Teks mentah: kolom kosong tetap "belum diisi" (NaN), tidak pernah 0.
+  const [bmiText, setBmiText] = useState(() => (demo.weightKg && demo.weightKg > 0 && demo.heightCm && demo.heightCm > 0
+    ? (demo.weightKg / Math.pow(demo.heightCm / 100, 2)).toFixed(1) : ''))
+  const [ageText, setAgeText] = useState(demo.age && demo.age > 0 ? String(demo.age) : '')
+  const [neckText, setNeckText] = useState('')
   const [sex, setSex] = useState<'M' | 'F' | ''>(demo.sex === 'M' || demo.sex === 'F' ? demo.sex : '')
-  const male = sex === 'M'
 
-  const stopScore = ITEMS.reduce((s, it) => s + (answers[it.key] ? 1 : 0), 0)
-  const bangScore = (bmi > 35 ? 1 : 0) + (age > 50 ? 1 : 0) + (neckCm > 40 ? 1 : 0) + (male ? 1 : 0)
-  const total = stopScore + bangScore
-  const belum: string[] = []
-  if (sex === '') belum.push('sex')
-  if (!(age > 0)) belum.push('age')
-  if (!(bmi > 0)) belum.push('BMI')
-  if (!(neckCm > 0)) belum.push('neck circumference')
-  const lengkap = belum.length === 0
-  const band = lengkap ? bandFor(total) : null
+  const res = stopBang({
+    stop: ITEMS.map((it) => !!answers[it.key]),
+    bmi: parseNumberField(bmiText), ageYears: parseNumberField(ageText), neckCm: parseNumberField(neckText), sex,
+  })
+  const band = res.ok ? BANDS[res.band] : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -78,13 +75,13 @@ export function SleepApneaScreen() {
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">BANG</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="B — BMI (kg/m²)">
-            <input className={inputClass} type="number" step="0.1" value={bmi || ''} onChange={(e) => setBmi(Number(e.target.value) || 0)} placeholder="e.g. 24.5" />
+            <input className={inputClass} type="number" step="0.1" value={bmiText} onChange={(e) => setBmiText(e.target.value)} placeholder="e.g. 24.5" />
           </Field>
           <Field label="A — Age (years)">
-            <input className={inputClass} type="number" value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" value={ageText} onChange={(e) => setAgeText(e.target.value)} />
           </Field>
           <Field label="N — Neck circumference (cm)">
-            <input className={inputClass} type="number" value={neckCm || ''} onChange={(e) => setNeckCm(Number(e.target.value) || 0)} placeholder="measure around the neck" />
+            <input className={inputClass} type="number" value={neckText} onChange={(e) => setNeckText(e.target.value)} placeholder="measure around the neck" />
           </Field>
           <Field label="G — Gender">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F' | '')}>
@@ -98,23 +95,23 @@ export function SleepApneaScreen() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
-        {lengkap && band !== null ? (
+        {res.ok && band !== null ? (
           <>
             <div className="mt-2 flex items-center gap-3">
-              <span className="text-3xl font-black text-brand-dark">{total}/8</span>
+              <span className="text-3xl font-black text-brand-dark">{res.ok ? res.total : 0}/8</span>
               <div>
                 <Badge tone={band.tone}>{band.label}</Badge>
                 <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
               </div>
             </div>
             <div className="mt-3 flex gap-4 text-[11px] text-neutral-500">
-              <span>STOP: {stopScore}/4</span>
-              <span>BANG: {bangScore}/4</span>
+              <span>STOP: {res.ok ? res.stopScore : 0}/4</span>
+              <span>BANG: {res.ok ? res.bangScore : 0}/4</span>
             </div>
           </>
         ) : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            No score yet. Still needed: {belum.join(', ')}.
+            No score yet.{!res.ok && res.missing.length > 0 && ` Still needed: ${res.missing.join(', ')}.`}{!res.ok && res.invalid.length > 0 && ` Check the value for: ${res.invalid.join(', ')}.`}
             {' '}The four STOP questions above are already answered — unticked means no, worth zero. Sex is different:
             it carries a BANG point on its own, and an unanswered profile used to default to male, quietly handing
             everyone that point.
