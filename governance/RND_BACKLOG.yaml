@@ -48,6 +48,17 @@ items:
     evidence_needed: [current_routes, imports, state_ownership, services, persistence]
     outputs: [integration_candidates, safe_reconciliation_tasks]
 
+  - id: rnd.fetal_atlas_parcel_identity
+    title: Resolve numeric identities before admitting fetal atlas lung lobes
+    type: research
+    status: source_mapping_required
+    priority: evidence_triggered
+    reason: The pinned lungs_multi mask contains nine regions; overlap and geometry cannot prove label names.
+    evidence_needed: [authoritative_numeric_label_mapping, atlas_volume_inspection, measured_lod_error, qualified_clinical_review]
+    outputs: [named_source_backed_fetal_regions, existing_fetus_manifest_integration]
+    engineering_evidence: DOCS/body-exposure/FETAL_PARCEL_QA.md
+    clinical_validation: pending
+
   - id: rnd.external_evidence_scan
     title: Evidence and technology refresh
     type: research
