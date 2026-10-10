@@ -105,6 +105,10 @@ try {
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
       await page.getByText(/^8\d\d structures$/).waitFor({ timeout: 60000 })
+      // ID ontologi dari crosswalk HuBMAP/HRA tampil untuk struktur yang dipetakan
+      await page.getByLabel('Find a structure').fill('aortic valve')
+      await page.getByRole('button', { name: /^aortic valve/i }).first().click()
+      await page.getByTestId('ontology-id').getByText('UBERON:0002137').waitFor({ timeout: 60000 })
       // varian ICRP 145: tubuh perempuan referensi lengkap (rangka aksial, lambung, saluran napas)
       await page.getByRole('radio', { name: 'ICRP reference' }).click()
       await page.getByText(/stature 163 cm/).waitFor({ timeout: 60000 })
@@ -122,6 +126,7 @@ try {
       await page.getByLabel('Find a structure').fill('femur')
       await page.getByRole('button', { name: /^femur/i }).first().click()
       await page.getByText(/^VHF_DENVER_CT\.ADULT\.FEMALE\.SKELETAL\.FEMUR\.[LR]$/).waitFor({ timeout: 60000 })
+      assert.equal(await page.getByTestId('ontology-id').count(), 0, 'a structure without a crosswalk row must not show an ontology id')
       await page.getByText(/Source: Andreassen et al/).waitFor()
       // radius dari CT resolusi asli: ambang HU, bukan model dan bukan tulang laki-laki; statusnya terbaca di panel
       await page.getByLabel('Find a structure').fill('radius')
