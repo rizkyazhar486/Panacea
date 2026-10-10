@@ -23,7 +23,7 @@ This is a **workflow control**, not a clinical judgement. Values are stored exac
 `requested → accepted → scheduled → completed → result_returned → closed`, with `declined`/`cancelled` exits.
 - Create: authorized clinician. `declined`/`cancelled` need `closeReason`.
 - `result_returned`: needs `resultId` of a lab result of the same patient, or `returnNote` for non-lab referrals.
-- `closed`: authorized clinician; if a result is linked it must already be `closed`.
+- `closed`: authorized clinician; a linked result must still match its id, patient and tenant, and its intact audit trail must end in `closed`. A `closed` label alone is insufficient; invalid linked evidence returns `linked-result-invalid` without changing the referral or audit trail.
 
 ## Endpoints (all require auth)
 | Method & path | Body / query | Success |

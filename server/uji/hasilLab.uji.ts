@@ -229,6 +229,12 @@ assert.equal(lanjut.trail.length, 1)
   const r3 = ok(s.buatRujukan(k, dok, { patientId: 'p-A', kind: 'specialist', reason: 'konsul', toFacility: 'Poli Y' }))
   for (const [to, who] of [['accepted', dok], ['scheduled', dok], ['completed', dok]] as const) { waktu(1000); ok(s.majukanRujukan(k, who, r3.id, { to })) }
   waktu(1000); assert.equal(ok(s.majukanRujukan(k, dok, r3.id, { to: 'result_returned', returnNote: 'Balasan konsul diterima' })).returnNote, 'Balasan konsul diterima')
+  const denganCatatan = structuredClone(k.rujukan.get(r3.id)!)
+  k.rujukan.put({ ...denganCatatan, returnNote: undefined })
+  const tanpaCatatan = structuredClone(k.rujukan.get(r3.id))
+  tolak(s.majukanRujukan(k, dok, r3.id, { to: 'closed' }), 'linked-result-invalid')
+  assert.deepEqual(k.rujukan.get(r3.id), tanpaCatatan, 'bukti balasan hilang: tidak boleh menutup atau menambah jejak')
+  k.rujukan.put(denganCatatan)
   waktu(1000); assert.equal(ok(s.majukanRujukan(k, dok, r3.id, { to: 'closed' })).status, 'closed')
   // akses
   tolak(s.bacaRujukan(k, pasienB, ref.id), 'not-found'); assert.ok(s.bacaRujukan(k, pasienA, ref.id).ok)
@@ -238,6 +244,57 @@ assert.equal(lanjut.trail.length, 1)
   tolak(s.majukanRujukan(k, pasienA, r4.id, { to: 'cancelled', closeReason: 'ingin batal' }), 'role-not-permitted') // pasien tak berhak membatalkan
   tolak(s.majukanRujukan(k, pasienB, r4.id, { to: 'cancelled', closeReason: 'x' }), 'not-found')
   assert.equal(k.rujukan.get(r4.id)?.status, 'requested')
+}
+
+// Penutupan rujukan memverifikasi ulang hasil terkait, bukan mempercayai label closed.
+// Mutasi setelah result_returned meniru rekam tersimpan yang rusak tanpa mengubah rujukan.
+{
+  const kasus: [string, ((r: HasilLabRekam) => HasilLabRekam | undefined) | undefined, ((r: RujukanRekam) => RujukanRekam)?][] = [
+    ['hasil closed dengan jejak sah', undefined],
+    ['label closed tanpa jejak penutupan', (r) => ({ ...r, trail: [] })],
+    ['jejak hasil hilang', (r) => ({ ...r, trail: undefined as unknown as HasilLabRekam['trail'] })],
+    ['jejak hasil null', (r) => ({ ...r, trail: null as unknown as HasilLabRekam['trail'] })],
+    ['jejak hasil bukan array', (r) => ({ ...r, trail: {} as HasilLabRekam['trail'] })],
+    ['entri jejak hasil null', (r) => ({ ...r, trail: [null] as unknown as HasilLabRekam['trail'] })],
+    ['entri jejak hasil array', (r) => ({ ...r, trail: [[]] as unknown as HasilLabRekam['trail'] })],
+    ['aktor pada jejak closed diubah', (r) => ({ ...r, trail: r.trail.map((e, i) => i === 0 ? { ...e, actorId: 'penyusup' } : e) })],
+    ['pasien berubah setelah hasil ditautkan', (r) => ({ ...r, patientId: 'p-B' })],
+    ['tenant berubah setelah hasil ditautkan', (r) => ({ ...r, tenantId: 'klinik-lain' })],
+    ['id hasil berubah setelah ditautkan', (r) => ({ ...r, id: 'lab-lain' })],
+    ['hasil hilang setelah ditautkan', () => undefined],
+    ['hasil belum closed', (r) => ({ ...r, status: 'communicated', trail: r.trail.slice(0, -1) })],
+    ['tautan hasil hilang setelah result_returned', undefined, (r) => ({ ...r, resultId: undefined })],
+    ['tautan hasil kosong setelah result_returned', undefined, (r) => ({ ...r, resultId: '' })],
+  ]
+  for (const [nama, ubah, ubahRujukan] of kasus) {
+    const k = ctx()
+    const hasil = ok(s.terimaHasil(k, dok, { patientId: 'p-A', item: butir, source: 'lab-intake' }))
+    for (const [to, extra] of [['pending_review', {}], ['reviewed', {}], ['communicated', { communication: { channel: 'phone', note: 'Hasil disampaikan' } }], ['closed', {}]] as const) {
+      waktu(1000); ok(s.majukanHasil(k, dok, hasil.id, { to, ...extra }))
+    }
+    const ref = ok(s.buatRujukan(k, dok, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }))
+    for (const to of ['accepted', 'scheduled', 'completed', 'result_returned'] as const) {
+      waktu(1000); ok(s.majukanRujukan(k, dok, ref.id, { to, ...(to === 'result_returned' ? { resultId: hasil.id } : {}) }))
+    }
+    if (ubah) {
+      const diganti = ubah(structuredClone(k.hasil.get(hasil.id)!))
+      if (diganti) k.hasil.raw.set(hasil.id, diganti)
+      else k.hasil.raw.delete(hasil.id)
+    }
+    if (ubahRujukan) k.rujukan.put(ubahRujukan(structuredClone(k.rujukan.get(ref.id)!)))
+    const sebelum = structuredClone(k.rujukan.get(ref.id))
+    const hasilSebelum = structuredClone(k.hasil.all())
+    waktu(1000)
+    const r = s.majukanRujukan(k, dok, ref.id, { to: 'closed' })
+    if (!ubah && !ubahRujukan) {
+      assert.equal(ok(r).status, 'closed', nama)
+      assert.deepEqual(verifyTrail(referralLifecycle, ref.id, ok(r).trail), { ok: true, status: 'closed' })
+    } else {
+      tolak(r, 'linked-result-invalid')
+      assert.deepEqual(k.rujukan.get(ref.id), sebelum, `${nama}: rujukan dan jejak tidak boleh berubah`)
+    }
+    assert.deepEqual(k.hasil.all(), hasilSebelum, `${nama}: verifikasi tidak boleh menulis hasil lab`)
+  }
 }
 
 // ── pemetaan pengguna -> aktor (fail closed, owner bukan klinisi) ───────────

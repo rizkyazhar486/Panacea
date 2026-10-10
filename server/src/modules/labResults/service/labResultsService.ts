@@ -209,10 +209,20 @@ export function majukanRujukan(k: Konteks, a: Actor, id: string, m: MajuRujukan)
     } else if (note && rec.kind !== 'lab') tambahan.returnNote = note
     else return gagal('evidence-required')
   }
-  if (to === 'closed' && rec.resultId) {
-    // Penutupan rujukan terverifikasi: hasil yang kembali harus sudah ditutup di siklus hasilnya.
-    const h = k.hasil.get(rec.resultId)
-    if (!h || h.status !== 'closed') return gagal('linked-result-invalid', 'linked result is not closed')
+  if (to === 'closed') {
+    // Bukti yang hilang setelah result_returned tidak boleh dilewati saat penutupan.
+    if (!rec.resultId) {
+      if (rec.kind === 'lab' || !str(rec.returnNote, MAKS_CATATAN)) return gagal('linked-result-invalid', 'returned evidence is missing')
+    } else {
+      // Verifikasi ulang identitas dan jejak: label closed saja bukan bukti penutupan.
+      const h = k.hasil.get(rec.resultId)
+      if (!h || h.id !== rec.resultId || h.tenantId !== rec.tenantId || h.patientId !== rec.patientId || h.status !== 'closed'
+        || !Array.isArray(h.trail) || h.trail.some((e) => !e || typeof e !== 'object' || Array.isArray(e))) {
+        return gagal('linked-result-invalid', 'linked result is not valid and closed')
+      }
+      const jejakHasil = verifyTrail(resultLifecycle, h.id, h.trail)
+      if (!jejakHasil.ok || jejakHasil.status !== 'closed') return gagal('linked-result-invalid', 'linked result is not valid and closed')
+    }
   }
   if (to === 'declined' || to === 'cancelled') {
     const alasan = str(m.closeReason, MAKS_CATATAN)

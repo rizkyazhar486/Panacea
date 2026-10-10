@@ -1,5 +1,30 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
+### Current checkpoint — 2026-10-10, referral closure integrity
+
+- Baseline main: `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`; #2347's
+  Mongo slice persistence fix was merged by another contributor during inspection.
+  Its nine candidate checks passed; this does not establish real Mongo restart
+  recovery or retroactively establish a missing review record.
+- Branch `fix/referral-linked-result-integrity` repairs a reproduced integrity
+  failure: a linked result with a forged `closed` status and empty audit trail could
+  close a referral, while result metrics classified that same record as corrupt.
+  Closure now rechecks id, tenant, patient and an intact lifecycle ending in closed;
+  missing lab links and missing non-lab return notes fail closed without writes.
+- The original and missing-evidence regressions both failed before their fixes.
+  Final targeted tests passed twice, server typecheck/build/full tests passed,
+  architecture and ratchet passed, production build passed (699 QA tests), and
+  root deterministic tests passed (685/685 files). Independent AI technical
+  review found no remaining blocker in this scope; it is not clinical approval.
+- Exact-head CI, repository review recording, integration and deployment remain
+  pending. Do not count this branch as integrated or shipped until live evidence
+  supports those stages. Clinical workflow sign-off remains pending.
+- Next independent P0/P2: calendar validation accepts `2026-02-30`; scheduled/manual
+  Vercel release lacks an exact-revision prerequisite for required safety/acceptance
+  checks. Active #2343/#2344 own release reporting in the same workflow; preserve
+  their delta when wiring a release gate. Body Exposure assets remain in Claude's
+  active branches. Older sections below are historical and must be refreshed.
+
 ### Current checkpoint — 2026-10-05, total verified completion directive
 
 - Live main: `6e9d8c6d9942beb27d46ca8881d6103c34340efc`, expected-head squash of #2273.
