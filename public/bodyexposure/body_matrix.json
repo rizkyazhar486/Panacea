@@ -106,13 +106,30 @@
   },
   {
    "body_id": "FETUS",
-   "status": "placeholder",
-   "source": null,
-   "source_requirement": "Fetus comes with the ICRP pregnant-female phantoms (not yet released).",
+   "status": "source_backed_partial",
+   "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+   "source_requirement": null,
    "redistribution": null,
-   "structures": 0,
-   "systems": {},
-   "variants": []
+   "structures": 14,
+   "systems": {
+    "respiratory": 2,
+    "digestive": 3,
+    "lymphatic": 2,
+    "urinary": 5,
+    "endocrine": 2
+   },
+   "variants": [
+    {
+     "body_id": "FETUS",
+     "structures": 14,
+     "label": "Atlas, 25 to 28 weeks",
+     "status": "source_backed_partial",
+     "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+     "stature_m": null,
+     "coverage": "organs only: no skeleton, skin, brain, heart or gut",
+     "individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Not clinically reviewed."
+    }
+   ]
   },
   {
    "body_id": "PEDIATRIC.NEONATE",
@@ -256,6 +273,11 @@
   "adult_male.skeletal",
   "adult_male.surface",
   "adult_male.urinary",
+  "fetus.digestive",
+  "fetus.endocrine",
+  "fetus.lymphatic",
+  "fetus.respiratory",
+  "fetus.urinary",
   "icrp_adult_female.cardiovascular",
   "icrp_adult_female.digestive",
   "icrp_adult_female.endocrine",
@@ -408,7 +430,8 @@
  "light_lod": {
   "adult_male": "LOD4",
   "adult_female": "LOD4",
-  "vhf_denver_ct_adult_female": "LOD4"
+  "vhf_denver_ct_adult_female": "LOD4",
+  "fetus": "LOD3"
  },
  "motion": {
   "adult_male": {

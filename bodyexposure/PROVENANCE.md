@@ -259,6 +259,24 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   `qa_reports/rig_vhf_denver_ct_rom.json` (largest bone overlap 1.0 mm).
 - The CT, mask meshes and the model weights stay local; only the decimated web GLBs are published. Provenance per bone: `qa_reports/ct_segmentation_provenance.json`.
 
+## FETUS — source_backed_partial (v014): organ atlas, not an individual
+
+- **Source:** SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
+  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (stated in the repository's README and LICENSE; the article is CC BY 4.0).
+  Uus A, Hall M, Grigorescu I, et al. *Scientific Reports* 14:6637 (2024), doi:10.1038/s41598-024-57087-x. Read on 2026-10-10.
+- **What it is:** a population-average atlas of **17 normal fetuses** (3T, T2-weighted, TE 180 ms), 0.75 mm isotropic, with 10 organ labels. The
+  repository does not state a gestational age; the preprint (PMC10312818) states 25 to 28 weeks. It is not one fetus and not a reference fetus.
+- **Used:** 14 meshes from the 10 labels: lungs (left and right), liver, stomach, spleen, renal parenchyma and renal pelvis (left and right), bladder, thymus,
+  gallbladder, adrenal glands (left and right). **Not used:** the lung-lobe parcellation file (its label names are not provided in the repository).
+- **Orientation proven, not trusted:** the header says RAS. The signs of the axes were decided from anatomy (liver right of spleen, stomach anterior to kidney, thorax above
+  abdomen) and the build stops if a mirror would be needed; the result is the same 180-degree rotation about Z as the Denver data, no mirror.
+- **Splitting:** kidneys and adrenal glands are two connected pieces each. The two lungs are one connected label and are split at a sagittal plane found by 2-means on x
+  (left 14.0 cm3, right 20.3 cm3); this is stated on the structure.
+- **Not in this body:** skeleton, skin, brain, heart, bowel. The body is organs only (extent 10.4 cm, 164 k triangles at full detail), so it is **not** a whole-body fetus.
+- **Checks:** gross-anatomy gate passes (liver right, spleen and stomach left, lungs and thymus above liver, kidneys posterior to liver, stomach anterior to kidneys, bladder
+  below kidneys, both lungs paired): `qa_reports/gross_fetus_atlas.json`. Meshes are marching-cubes surfaces with volume-preserving smoothing, so the 0.75 mm voxel steps remain visible.
+- `clinically_reviewed` is false. A fetal body with skeleton and skin still needs a source (the ICRP pregnant-female phantoms are in public consultation).
+
 ## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
 
 - **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*
