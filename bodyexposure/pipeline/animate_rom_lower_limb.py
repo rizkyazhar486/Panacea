@@ -19,7 +19,7 @@ ROM = json.load(open(arg("--rom")))["rom_limits_deg_local"]
 OUT, REPORT = os.path.abspath(arg("--out")), arg("--report")
 arm = bpy.data.objects["RIG.VHF_LOWER_LIMB"]; P = arm.pose.bones
 FPS, SEG = 24, 36  # frame per setengah gerakan (0 → batas)
-rig_contact_qa.configure("VHF_LOWER_LIMB.ADULT.FEMALE.SKELETAL.",
+rig_contact_qa.configure(arg("--body", "VHF_LOWER_LIMB.ADULT.FEMALE") + ".SKELETAL.",
                          [("FEMUR", "TIBIA"), ("FEMUR", "HIP_BONE_OS_COXAE"), ("FEMUR", "PATELLA"), ("TIBIA", "FIBULA"),
                           ("TIBIA", "TALUS"), ("FIBULA", "TALUS")])
 

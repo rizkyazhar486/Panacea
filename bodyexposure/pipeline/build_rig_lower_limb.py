@@ -20,7 +20,8 @@ from mathutils.bvhtree import BVHTree
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = argv[argv.index("--out") + 1]
 REPORT = argv[argv.index("--report") + 1]
-B = "VHF_LOWER_LIMB.ADULT.FEMALE."
+BODY = argv[argv.index("--body") + 1] if "--body" in argv else "VHF_LOWER_LIMB.ADULT.FEMALE"  # tubuh gabungan Denver+CT: --body VHF_DENVER_CT.ADULT.FEMALE
+B = BODY + "."
 S = B + "SKELETAL."
 J = B + "JOINT."
 SIDES = ("L", "R")
@@ -135,7 +136,7 @@ RULES = [
     (r"SKELETAL\.(TALUS|CALCANEUS|CUBOID|NAVICULAR|MEDIAL_CUNEIFORM|INTERMEDIATE_CUNEIFORM|LATERAL_CUNEIFORM|METATARSALS)|TALAR_ARTICULAR", "FOOT"),
 ]
 binding, unbound = {}, []
-targets = [o for o in ob if o.type == 'MESH' and o.get("panacea_body_id") == "VHF_LOWER_LIMB.ADULT.FEMALE" and o.get("panacea_system") in ("skeletal", "joint")]
+targets = [o for o in ob if o.type == 'MESH' and o.get("panacea_body_id") == BODY and o.get("panacea_system") in ("skeletal", "joint")]
 for o in targets:
     n = o.name; side = n[-1] if n[-2:] in (".L", ".R") else None
     base = next((b for pat, b in RULES if re.search(pat, n)), None)
@@ -202,7 +203,7 @@ for key, pair in {"HIP": ("FEMUR", "HIP_BONE_OS_COXAE"), "KNEE": ("FEMUR", "TIBI
 seglen = {b.name: round(b.length * 1000, 1) for b in arm_d.bones}
 qa = {"left_right_length_difference_mm": sym, "joint_centre_to_articulating_bone_surface_mm": prox,
       "bound_meshes": sum(len(v) for v in binding.values()), "meshes_considered": len(targets), "not_rigged": unbound,
-      "not_rigged_reason": "knee ligaments span the joint and need soft skinning; 76 muscles are not rigged"}
+      "not_rigged_reason": "knee ligaments span the joint and need soft skinning; muscles are not rigged; CT-derived upper-body bones (if present) are outside this lower-limb rig"}
 
 keep = {arm.name} | {o.name for o in targets if o.parent == arm}
 for o in list(ob):
@@ -214,7 +215,7 @@ for c in list(bpy.data.collections):
 bpy.ops.outliner.orphans_purge(do_recursive=True)
 arm["panacea_rig_definition"] = "ISB-style joint centres from source geometry (no labelled landmarks); rigid bone binding; AAOS ROM limits"
 bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(OUT))
-json.dump({"body": "VHF_LOWER_LIMB.ADULT.FEMALE", "frame": "+Z superior, +X subject left, -Y anterior, metres",
+json.dump({"body": BODY, "frame": "+Z superior, +X subject left, -Y anterior, metres",
            "joint_centres_m": {k: [round(float(x), 4) for x in v] for k, v in jc.items()}, "joint_centre_methods": meta,
            "segments_mm": seglen, "rom_limits_deg_local": limits_report, "rom_source": "AAOS normal values (Greene & Heckman 1994)",
            "flexion_axis": "knee and ankle flexion about the femoral mediolateral extreme line / intermalleolar line; hip perpendicular to the bone, anterior roll",

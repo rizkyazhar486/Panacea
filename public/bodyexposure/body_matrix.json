@@ -414,6 +414,10 @@
   "adult_male": {
    "glb": "adult_male.rig_rom.glb",
    "timeline": "adult_male.rig_motion.json"
+  },
+  "vhf_denver_ct_adult_female": {
+   "glb": "vhf_denver_ct_adult_female.rig_rom.glb",
+   "timeline": "vhf_denver_ct_adult_female.rig_motion.json"
   }
  }
 }

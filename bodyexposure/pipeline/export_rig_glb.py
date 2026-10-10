@@ -16,7 +16,7 @@ from lod_budget import tri_count, allocate, split_nonmanifold, escapes_bbox, fix
 argv = sys.argv[sys.argv.index("--") + 1:]
 arg = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
 OUT, BUDGET = os.path.abspath(arg("--out")), int(arg("--budget", "34000"))
-arm = bpy.data.objects["RIG.ADULT_MALE"]
+arm = bpy.data.objects[arg("--arm", "RIG.ADULT_MALE")]  # tungkai bawah perempuan: --arm RIG.VHF_LOWER_LIMB
 meshes = [o for o in bpy.data.objects if o.type == 'MESH']
 for o in meshes:
     o.hide_set(False); o.hide_viewport = False
@@ -65,7 +65,7 @@ tl = json.load(open(arg("--timeline")))
 # kunci glTF dari Blender: frame f → waktu f/fps (frame 1 = 1/24 s); timeline memakai skala yang sama, durasi = frames/fps
 clips = [{"clip": "ROM", "label_short": "Range of motion", "fps": tl["fps"], "frames": tl["frames"] + 1,
           "source": "AAOS normal range of motion (Greene & Heckman 1994)", "truth_class": "simulated",
-          "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
+          "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)" + (f"; {arg('--coverage')}" if arg("--coverage") else ""),
           "movements": [{"name": t["movement"], "start_s": round(t["frames"][0] / tl["fps"], 6), "end_s": round(t["frames"][2] / tl["fps"], 6), "note": t["note"]} for t in tl["timeline"]],
           "qa": {"angle_within_limits": tl["angle_within_limits"], "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in tl["bone_contact_overlap"])}}]
 if GAIT:

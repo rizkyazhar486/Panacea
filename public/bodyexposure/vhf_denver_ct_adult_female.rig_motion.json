@@ -1,0 +1,73 @@
+{
+ "clips": [
+  {
+   "clip": "ROM",
+   "label_short": "Range of motion",
+   "fps": 24,
+   "frames": 650,
+   "source": "AAOS normal range of motion (Greene & Heckman 1994)",
+   "truth_class": "simulated",
+   "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion); pelvis, legs and feet only; the skeleton above the pelvis, muscles and ligaments do not move",
+   "movements": [
+    {
+     "name": "hip flexion (knee flexed)",
+     "start_s": 0.041667,
+     "end_s": 3.041667,
+     "note": "AAOS hip 120, knee flexed"
+    },
+    {
+     "name": "hip extension",
+     "start_s": 3.041667,
+     "end_s": 6.041667,
+     "note": "AAOS 30"
+    },
+    {
+     "name": "hip abduction",
+     "start_s": 6.041667,
+     "end_s": 9.041667,
+     "note": "AAOS 45"
+    },
+    {
+     "name": "hip adduction",
+     "start_s": 9.041667,
+     "end_s": 12.041667,
+     "note": "AAOS 30; right side 25: femur meets the right hip bone 4.0 mm deep at 30 degrees but 1.0 mm at 25 (left side clear at 30). Cause not determined (donor anatomy or right hip-centre error)"
+    },
+    {
+     "name": "hip internal rotation",
+     "start_s": 12.041667,
+     "end_s": 15.041667,
+     "note": "AAOS 45"
+    },
+    {
+     "name": "hip external rotation",
+     "start_s": 15.041667,
+     "end_s": 18.041667,
+     "note": "AAOS 45; right side 40: femur meets the right hip bone 2.9 mm deep at 45 degrees but 0.4 mm at 40 (left side 0.8 at 45). Cause not determined"
+    },
+    {
+     "name": "knee flexion",
+     "start_s": 18.041667,
+     "end_s": 21.041667,
+     "note": "AAOS 135"
+    },
+    {
+     "name": "ankle plantarflexion",
+     "start_s": 21.041667,
+     "end_s": 24.041667,
+     "note": "AAOS 50"
+    },
+    {
+     "name": "ankle dorsiflexion",
+     "start_s": 24.041667,
+     "end_s": 27.041667,
+     "note": "AAOS 20; right side 15: fibula meets the right talus 2.2 mm deep at 20 degrees but 0.9 mm at 15 (left side clear at 20). Cause not determined"
+    }
+   ],
+   "qa": {
+    "angle_within_limits": true,
+    "max_bone_penetration_mm": 1.0
+   }
+  }
+ ]
+}
