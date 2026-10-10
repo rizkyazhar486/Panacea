@@ -351,10 +351,11 @@
    "status": "REPORTED",
    "evidence": [
     "bodyexposure/qa_reports/gait_loop_continuity.json (seam 0,0°)",
-    "bodyexposure/qa_reports/gait_visual_browser.json"
+    "bodyexposure/qa_reports/gait_visual_browser.json",
+    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gait-seam-reproduce.mjs): animasi WALK dan RUN pada GLB publik adult_male.rig_rom.glb didekode (three + meshopt); sudut jahitan kunci pertama vs terakhir = 0,0000° pada semua 14 kanal rotasi, selisih posisi 0 m. Kontrol negatif: membandingkan kunci pertama dengan kunci ke-2 menghasilkan nilai taknol"
    ],
    "owner": "Local",
-   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label \"Recorded motion\" (pemeriksaan fungsional, bukan kualitas gait)."
+   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label \"Recorded motion\" (pemeriksaan fungsional, bukan kualitas gait). Jahitan nol sebagian hasil konstruksi (selisih akhir-awal disebar linear: 4,58° WALK, 12,39° RUN per DELTA.md), jadi bukan bukti kehalusan gerak; lompatan kecepatan sudut (RUN maks 250,7 °/dtk) belum direproduksi dan ambang 'batas teknis terdokumen' belum ditemukan. Tetap REPORTED."
   },
   {
    "id": "D7",
