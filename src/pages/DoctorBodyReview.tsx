@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import { Prosa } from '../components/Prosa'
 import { STRUCTURE_REVIEW_CHECKLIST, buildReviewRecord, recordApproves, reviewReadiness, type ReviewDecision, type StructureMethod, type StructureReviewRecord } from '../domains/body-exposure'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/`
@@ -127,7 +128,7 @@ export function DoctorBodyReview() {
       <main className="mx-auto w-full max-w-3xl space-y-5 py-10">
         <p className="text-xs font-black uppercase tracking-[.14em] text-white/45">Doctor surface</p>
         <h1 className="text-3xl font-black tracking-[-.04em]">Body structure review</h1>
-        <p className="max-w-2xl text-sm leading-6 text-white/60">This workspace is reserved for the doctor team. Engineering and automated validation continue independently of this human-review surface.</p>
+        <Prosa kelas="max-w-2xl text-sm leading-6 text-white/60">{'This workspace is reserved for the doctor team. Engineering and automated validation continue independently of this human-review surface.'}</Prosa>
         <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center border-b border-white/30 text-sm font-black">Back to Clinical →</Link>
       </main>
     )
@@ -141,10 +142,7 @@ export function DoctorBodyReview() {
           <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">Structure review checklist</h1>
           <div className="flex gap-4 text-xs font-black text-white/50"><Link to="/doctor-review" className="hover:text-white">General checklist →</Link><Link to="/body-exposure/canonical" className="hover:text-white">Viewer →</Link></div>
         </div>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-white/55">
-          Check one anatomical structure at a time against the data it came from. A record you create here is a proposal: it changes nothing by itself.
-          A structure counts as clinically reviewed only when a confirmed record for its exact asset version, from a reviewer on the owner&apos;s authorised list, is merged into the review ledger.
-        </p>
+        <Prosa kelas="mt-3 max-w-3xl text-sm leading-6 text-white/55">{"Check one anatomical structure at a time against the data it came from. A record you create here is a proposal: it changes nothing by itself. A structure counts as clinically reviewed only when a confirmed record for its exact asset version, from a reviewer on the owner's authorised list, is merged into the review ledger."}</Prosa>
       </header>
 
       {error && <p role="alert" className="border-l-2 border-amber-300/60 pl-4 text-sm text-amber-100/80">{error}</p>}
@@ -201,7 +199,7 @@ export function DoctorBodyReview() {
               <div><dt className="text-[10px] font-black uppercase tracking-[.12em] text-white/35">Asset version</dt><dd className="font-mono text-xs">{row[6]}</dd></div>
               <div className="sm:col-span-2"><dt className="text-[10px] font-black uppercase tracking-[.12em] text-white/35">Source on the structure</dt><dd className="break-words text-white/70">{registry.sources[row[7]] || 'not stated'}</dd></div>
             </dl>
-            {method === 'model_segmented' && <p className="mt-3 border-l-2 border-amber-300/60 pl-4 text-xs leading-5 text-amber-100/80">Machine segmentation: the model output has no measured accuracy unless stated in PROVENANCE.md. Check it against the images, not only the surface.</p>}
+            {method === 'model_segmented' && <p className="mt-3 border-l-2 border-amber-300/60 pl-4 text-xs leading-5 text-amber-100/80">Machine segmentation: accuracy is unmeasured unless PROVENANCE.md says otherwise; check it against the images.</p>}
           </div>
 
           <fieldset className="divide-y divide-white/10 border-y border-white/10">
