@@ -154,6 +154,17 @@ try {
       assert.equal(pr.status(), 200, 'provenance page not served')
       const ptxt = await pr.text()
       assert(/clinically_reviewed/.test(ptxt) && /Visible Human skeleton/.test(ptxt) && !/(src|href)="https?:\/\//.test(ptxt), 'provenance page content')
+      // janin: atlas MRI rata-rata populasi (organ saja), bukan satu individu
+      await page.getByRole('tab', { name: /^Fetus/ }).click()
+      await page.getByText(/^14 structures$/).waitFor({ timeout: 60000 })
+      await page.getByText(/organs only: no skeleton, skin, brain, heart or gut/).waitFor()
+      await page.getByTestId('variant-individual').getByText(/Population-average atlas of 17 normal fetuses/).waitFor()
+      assert(!(await page.getByText(/stature \d+ cm/).count()), 'fetus atlas must not show a stature')
+      await page.getByLabel('Find a structure').fill('liver')
+      await page.getByRole('button', { name: /^liver/i }).first().click()
+      await page.getByText(/^FETUS\.DIGESTIVE\.LIVER$/).waitFor({ timeout: 60000 })
+      await page.getByText(/Source: SVRTK fetal MRI atlas/).waitFor()
+      await page.screenshot({ path: `/private/tmp/canonical-fetus-${width}-${theme}.png`, fullPage: true })
       // anak: varian 5 th & 10 th, laki-laki & perempuan
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()

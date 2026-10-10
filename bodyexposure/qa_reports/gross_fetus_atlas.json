@@ -1,0 +1,92 @@
+{
+ "body": "FETUS",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 8,
+    "documented_exceptions": 0,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.0042
+  },
+  {
+   "check": "spleen_on_left",
+   "ok": true,
+   "detail": 0.0237
+  },
+  {
+   "check": "stomach_on_left",
+   "ok": true,
+   "detail": 0.0185
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "not_applicable": "body has no organs (--no-organs)"
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "LIVER|STOMACH": 0.033
+   }
+  },
+  {
+   "check": "lungs_above_liver",
+   "ok": true,
+   "detail": {
+    "lungs_z": [
+     0.078,
+     0.079
+    ],
+    "liver_z": 0.054
+   }
+  },
+  {
+   "check": "thymus_above_liver",
+   "ok": true,
+   "detail": 0.092
+  },
+  {
+   "check": "kidneys_posterior_to_liver",
+   "ok": true,
+   "detail": {
+    "kidneys_y": [
+     0.02,
+     0.019
+    ],
+    "liver_y": -0.005
+   }
+  },
+  {
+   "check": "stomach_anterior_to_kidneys",
+   "ok": true,
+   "detail": 0.004
+  },
+  {
+   "check": "bladder_below_kidneys",
+   "ok": true,
+   "detail": 0.014
+  },
+  {
+   "check": "both_lungs_present_and_paired",
+   "ok": true,
+   "detail": [
+    "L",
+    "R"
+   ]
+  }
+ ],
+ "failures": []
+}

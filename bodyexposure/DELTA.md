@@ -263,4 +263,8 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 ## Dynamic physiology source audit (2026-10-10)
 
 - Breathing and heartbeat: no acquired motion and no validated simulation exist in Body Exposure. Audited TCIA 4D-Lung (CC BY 3.0, 20 radiotherapy patients, 10 phases: licence allows attributed reuse, but deformable registration would have to be run and validated first), DIR-Lab (site unreachable, terms unread) and ACDC (terms not stated, two phases only). No simulation was built because every parameter would be invented. See `docs/body-exposure/DYNAMIC_PHYSIOLOGY_SOURCE_AUDIT.md`.
+## v014: fetus organ atlas (2026-10-10)
+
+- The Fetus tab is no longer a placeholder: 14 organ structures from the King's College London population-average fetal MRI atlas (CC0 1.0; 17 fetuses, 25 to 28 weeks per the preprint), as source-backed partial. Organs only; labelled as an atlas, not an individual. Orientation proven from anatomy, gross-anatomy gate passes. Full detail 164 k triangles; initial load 6,022 triangles.
+- Still blocked: pregnancy (ICRP pregnant-female phantoms in public consultation, no electronic files confirmed), a fetus with skeleton and skin, and older adults. See `docs/body-exposure/LIFECYCLE_SOURCE_AUDIT.md`.
 
