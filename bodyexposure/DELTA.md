@@ -239,3 +239,7 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - The lower-limb ROM simulation (hip, knee, ankle; AAOS limits) now plays for the "Visible Human skeleton (Denver + CT)" variant of the adult female: 44 rigid bones and cartilages, 14 draw groups, 207 KB. Only pelvis, legs and feet move; the label says so. Contact gate 1.5 mm passes (largest 1.0 mm); right-side caps as before.
 - Rig scripts take `--body` / `--arm`, `register_variant_body.py` registers motion. Walk/run for this body is not done.
 
+## Gross-anatomy gate for the Visible Human Female skeleton (2026-10-10)
+
+- `qa_gross_anatomy.py --no-organs` (explicit flag; the organ-order check is recorded as not applicable, not skipped silently) plus new skeletal checks: vertebral column C1 to L5 ordered top to bottom, skull above C1, sacrum below L5, 12 ribs on each side, sternum anterior to the spine. `VHF_DENVER_CT.ADULT.FEMALE` passes all of them: 156 paired structures with correct laterality, no failures (`qa_reports/gross_vhf_denver_ct.json`). These are coarse position and count checks, not a measure of segmentation accuracy.
+

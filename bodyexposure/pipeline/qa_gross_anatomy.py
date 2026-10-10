@@ -17,6 +17,7 @@ from mathutils.bvhtree import BVHTree
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = argv[argv.index("--out") + 1]
 BODY = argv[argv.index("--body") + 1] if "--body" in argv else None
+NO_ORGANS = "--no-organs" in argv  # tubuh kerangka: pemeriksaan organ dicatat tidak berlaku (bukan dilewati diam-diam)
 objs = {o.name: o for o in bpy.context.scene.objects if o.type == 'MESH' and "panacea_body_id" in o
         and (BODY is None or o["panacea_body_id"] == BODY)}
 body = BODY or next(iter(objs.values()))["panacea_body_id"]
@@ -104,7 +105,10 @@ bladder = one(r"URINARY_BLADDER_WALL$", r"URINARY\.URINARY_BLADDER$", r"FUNDUS_O
 kidneys = find(r"KIDNEY_CORTEX\.[LR]$") or find(r"URINARY\.KIDNEY\.[LR]$") or find(r"KIDNEY_CAPSULE\.[LR]$")
 zs = {"brain": z(brain), "heart": z(heart), "liver": z(liver), "kidney": (sum(z(k) for k in kidneys) / len(kidneys)) if kidneys else None, "bladder": z(bladder)}
 order_ok = all(zs[a] is not None and zs[b] is not None and zs[a] > zs[b] for a, b in [("brain", "heart"), ("heart", "liver"), ("liver", "bladder"), ("kidney", "bladder")])
-check("vertical_organ_order", order_ok, {k: (round(v, 3) if v else None) for k, v in zs.items()})
+if NO_ORGANS:
+    res["checks"].append({"check": "vertical_organ_order", "ok": True, "not_applicable": "body has no organs (--no-organs)"})
+else:
+    check("vertical_organ_order", order_ok, {k: (round(v, 3) if v else None) for k, v in zs.items()})
 feet = min((o.matrix_world @ Vector(c)).z for o in objs.values() for c in o.bound_box)
 check("feet_on_ground", abs(feet) < 0.005, round(feet, 4))
 
@@ -131,5 +135,16 @@ for a, b in pairs:
     if A and Bo:
         f = inside_frac(A, Bo); pen[f"{A.name.split('.', 2)[-1]}|{Bo.name.split('.', 2)[-1]}"] = f
 check("no_gross_organ_interpenetration", all(v <= 0.05 for v in pen.values()), pen)
+# kerangka (bila ada vertebra): urutan kolom, tengkorak, 12 iga per sisi, sternum anterior, sakrum di bawah L5
+if find(r"SKELETAL\.VERTEBRA_C1$"):
+    names = [f"C{i}" for i in range(1, 8)] + [f"T{i}" for i in range(1, 13)] + [f"L{i}" for i in range(1, 6)]
+    vz = [z(find(rf"SKELETAL\.VERTEBRA_{n}$")[0]) for n in names]
+    check("vertebral_column_ordered_top_to_bottom", all(a > b for a, b in zip(vz, vz[1:])), {"c1_z": round(vz[0], 3), "l5_z": round(vz[-1], 3)})
+    sk = find(r"SKELETAL\.SKULL"); sac = find(r"SKELETAL\.SACRUM$"); st = find(r"SKELETAL\.STERNUM$"); t6 = find(r"SKELETAL\.VERTEBRA_T6$")
+    if sk: check("skull_above_c1", z(sk[0]) > vz[0], {"skull_z": round(z(sk[0]), 3), "c1_z": round(vz[0], 3)})
+    if sac: check("sacrum_below_l5", z(sac[0]) < vz[-1], {"sacrum_z": round(z(sac[0]), 3), "l5_z": round(vz[-1], 3)})
+    missing = [f"RIB_{i}.{sd}" for i in range(1, 13) for sd in "LR" if not find(rf"SKELETAL\.RIB_{i}\.{sd}$")]
+    check("twelve_ribs_each_side", not missing, {"missing": missing})
+    if st and t6: check("sternum_anterior_to_spine", cen(st[0]).y < cen(t6[0]).y - 0.08, {"sternum_y": round(cen(st[0]).y, 3), "t6_y": round(cen(t6[0]).y, 3)})
 json.dump(res, open(OUT, "w"), indent=1)
 print("QA", body, "failures:", res["failures"])
