@@ -138,6 +138,7 @@ const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ defa
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
 const DoctorReviewChecklist = lazy(() => import('./pages/DoctorReviewChecklist').then((m) => ({ default: m.DoctorReviewChecklist })))
+const DoctorBodyReview = lazy(() => import('./pages/DoctorBodyReview').then((m) => ({ default: m.DoctorBodyReview })))
 const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) => ({ default: m.LongevityScience })))
 const SelfAssessmentToolkit = lazy(() => import('./pages/SelfAssessmentToolkit').then((m) => ({ default: m.SelfAssessmentToolkit })))
 const BodyToolkit = lazy(() => import('./pages/BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
@@ -212,6 +213,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/owner" element={<Owner />} />
               <Route path="/clinical" element={<Dashboard />} />
               <Route path="/doctor-review" element={<DoctorReviewChecklist />} />
+              <Route path="/doctor-review/body" element={<DoctorBodyReview />} />
               <Route path="/social" element={<Home />} />
               <Route path="/community" element={<Community />} />
               <Route path="/feed" element={<Feed />} />

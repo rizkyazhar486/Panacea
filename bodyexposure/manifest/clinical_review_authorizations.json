@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "authorized_reviewers": [],
+  "note": "Maintained by the repository owner. A review record counts only if its reviewer_id is listed here. Empty means nobody is authorised, so no structure is clinically reviewed. Do not add an identifier without verified qualification evidence kept outside this repository."
+}

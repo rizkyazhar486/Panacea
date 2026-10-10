@@ -74,7 +74,7 @@ export function DoctorReviewChecklist() {
             <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">Review Checklist</h1>
             <Prosa kelas="mt-3 max-w-2xl text-sm leading-6 text-white/55">{'Review means inspect, document, and leave human notes. There is no approve/reject control on this page. Automated safety, provenance, privacy, and CI gates remain separate and continue to run independently.'}</Prosa>
           </div>
-          <Link to="/clinical-hub" className="text-xs font-black text-white/50 hover:text-white">Clinical →</Link>
+          <div className="flex gap-4"><Link to="/doctor-review/body" className="text-xs font-black text-white/50 hover:text-white">Body structures →</Link><Link to="/clinical-hub" className="text-xs font-black text-white/50 hover:text-white">Clinical →</Link></div>
         </div>
       </header>
 
