@@ -50,13 +50,18 @@ SIMPLE = {
 LOBES = {"lung_upper_lobe_left": "Superior lobe of left lung", "lung_lower_lobe_left": "Inferior lobe of left lung", "lung_upper_lobe_right": "Superior lobe of right lung",
          "lung_middle_lobe_right": "Middle lobe of right lung", "lung_lower_lobe_right": "Inferior lobe of right lung"}
 NOT_PUBLISHED = {
-    "prostate": "the label is defined for male anatomy; in a female subject it is empty or wrong, so it is never published",
+    "prostate": "the label is defined for male anatomy; in a female subject it is empty or wrong, so it is not published for women (see MALE_ONLY)",
     "kidney_cyst_left": "pathology label, not normal anatomy", "kidney_cyst_right": "pathology label, not normal anatomy",
 }
 
 
-def classify(key):
-    """TotalSegmentator kelas → (nama, sistem, bahan, jenis, lateralitas) atau None bila tidak diterbitkan. KeyError bila kelas tidak dikenal."""
+MALE_ONLY = {"prostate": ("Prostate", "reproductive", "PAN_Gland", "gland", "unpaired")}
+
+
+def classify(key, sex=None):
+    """TotalSegmentator kelas → (nama, sistem, bahan, jenis, lateralitas) atau None bila tidak diterbitkan. KeyError bila kelas tidak dikenal.
+    sex 'm'/'f' dari meta.csv: kelas khusus laki-laki (prostat) hanya diterbitkan untuk subjek laki-laki."""
+    if key in MALE_ONLY: return MALE_ONLY[key] if sex == "m" else None
     if key in NOT_PUBLISHED: return None
     if key in LOBES: return (LOBES[key], "respiratory", "PAN_Lung", "lung", "left" if key.endswith("left") else "right")
     m = re.match(r"rib_(left|right)_(\d+)$", key)

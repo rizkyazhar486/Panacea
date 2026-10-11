@@ -38,13 +38,36 @@ test('struktur_terpotong_tepi_pindai_dicatat_dan_lateralitas_cocok_nama', () => 
 test('entri_matriks_menyatakan_satu_individu_parsial_tanpa_tinggi_badan', async () => {
   const m = await read('public/bodyexposure/body_matrix.json')
   const e = m.bodies.find((b) => b.body_id === 'HUMAN.OLDER_ADULT')
-  assert.equal(e.status, 'source_backed_partial'); assert.equal(e.variants.length, 1)
-  const v = e.variants[0]
+  assert.equal(e.status, 'source_backed_partial'); assert.equal(e.variants.length, 2)
+  const v = e.variants.find((x) => x.body_id === BODY)
   assert.equal(v.body_id, BODY); assert.equal(v.stature_m, null)       // tubuh parsial: tidak ada tinggi badan
   assert.match(v.individual, /73 years/); assert.match(v.individual, /not an atlas and not a reference older adult/); assert.match(v.individual, /Not clinically reviewed/)
   assert.match(v.coverage, /partial body/)
   assert.equal(m.light_lod.tsd_s0196_older_adult_female, 'LOD4')
   assert.equal(m.bodies.find((b) => b.body_id === 'HUMAN.PREGNANT').variants.length, 0)   // kehamilan tetap kosong: tidak ada pengganti
+})
+
+const MALE = 'TSD_S0327.OLDER_ADULT.MALE'
+const maleRows = (await read('bodyexposure/manifest/structures.json')).structures.filter((s) => s.panacea_body_id === MALE)
+const maleBuild = await read('bodyexposure/qa_reports/tsd_s0327_build.json')
+const maleMesh = await read('bodyexposure/qa_reports/tsd_s0327_mesh_provenance.json')
+
+test('lansia_laki_laki_108_struktur_prostat_hanya_pada_subjek_laki_laki', () => {
+  assert.equal(maleRows.length, 108)
+  assert.ok(maleRows.every((s) => s.biological_sex_applicability === 'male' && s.panacea_accuracy_status === 'expert_refined_segmentation'))
+  assert.ok(maleRows.some((s) => s.panacea_source_raw_name === 'prostate'), 'prostate belongs to the male subject')
+  assert.ok(!structures.some((s) => s.panacea_source_raw_name === 'prostate'), 'prostate must not appear in the female subject')
+  for (const k of ['brain', 'vertebrae_C1', 'vertebrae_C6']) assert.ok(maleBuild.summary.empty_classes.includes(k), k)   // kepala dan leher atas di luar pindaian
+  const skull = maleMesh.structures.skull; assert.ok(skull.touches_ct_border && skull.volume_cm3 < 60)   // hanya serpihan tengkorak yang terpotong, bukan kepala
+})
+
+test('varian_laki_laki_parsial_tanpa_tinggi_badan_dan_keduanya_di_entri_lansia', async () => {
+  const m = await read('public/bodyexposure/body_matrix.json')
+  const e = m.bodies.find((b) => b.body_id === 'HUMAN.OLDER_ADULT')
+  assert.deepEqual(e.variants.map((v) => v.body_id).sort(), [MALE, BODY].sort())
+  const v = e.variants.find((x) => x.body_id === MALE)
+  assert.equal(v.stature_m, null); assert.match(v.individual, /72 years/); assert.match(v.individual, /not an atlas and not a reference older adult/)
+  assert.match(v.coverage, /partial body/); assert.equal(m.light_lod.tsd_s0327_older_adult_male, 'LOD4')
 })
 
 test('muatan_awal_dalam_anggaran_dan_registri_metode_other', async () => {
@@ -53,4 +76,6 @@ test('muatan_awal_dalam_anggaran_dan_registri_metode_other', async () => {
   assert.ok(row.initial_tris > 0 && row.initial_tris <= wb.budget)
   const rev = await read('public/bodyexposure/tsd_s0196_older_adult_female.review.json')
   assert.equal(rev.rows.length, 111); assert.ok(rev.rows.every((r) => r[5] === 'other'))
+  const row2 = wb.bodies.find((b) => b.body === 'tsd_s0327_older_adult_male'); assert.ok(row2.initial_tris > 0 && row2.initial_tris <= wb.budget)
+  const rev2 = await read('public/bodyexposure/tsd_s0327_older_adult_male.review.json'); assert.equal(rev2.rows.length, 108); assert.ok(rev2.rows.every((r) => r[5] === 'other'))
 })

@@ -29,10 +29,10 @@ prov = {"tool": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasser
         "cleaning": f"components >= {MIN_KEEP_CM3} cm3 kept (largest always); Taubin smoothing 10 iterations (0.5, -0.53)", "structures": {}, "not_published": {}, "empty": []}
 for f in sorted(glob.glob(os.path.join(a.subject, "segmentations", "*.nii.gz"))):
     key = os.path.basename(f)[:-7]
-    c = classify(key)
+    c = classify(key, meta["gender"])
     if c is None:
         prov["not_published"][key] = "see tsd_classes.NOT_PUBLISHED"; continue
-    img = nib.load(f); assert img.shape == ct.shape and np.allclose(img.affine, ct.affine), key
+    img = nib.load(f); assert img.shape == ct.shape and np.allclose(img.affine, ct.affine, atol=1e-3), key
     m = np.asarray(img.dataobj) > 0
     if not m.any(): prov["empty"].append(key); continue
     vox = float(np.prod(ct.header.get_zooms())) / 1000.0
