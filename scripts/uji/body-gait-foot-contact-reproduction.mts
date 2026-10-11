@@ -27,10 +27,24 @@ assert.deepEqual(m.clips.WALK.toe.phases_by_side, { L: ['22-25+0-9'], R: ['9-22'
 // penanda tumit tidak pernah menapak terhadap SATU lantai klip (laporan Blender lama menemukan 1 fase karena lantai per-penanda)
 for (const rep of [m, f]) for (const clip of ['WALK', 'RUN']) assert.equal(rep.clips[clip].heel.stance_phases, 0, `tumit ${clip} tidak boleh punya fase tumpu`)
 
+// Penanda PLANTAR (simpul terendah di seperempat posterior/anterior kaki pada pose awal) benar-benar menapak, tidak seperti simpul ekstrem
+// yang berada setinggi pergelangan. Jantan WALK: dua fase tiap penanda, selip <= 16,6 mm; tumit lepas lebih dulu daripada jari (pola tumpu).
+const hp = m.clips.WALK.heelPlantar, tp = m.clips.WALK.toePlantar
+assert.equal(hp.stance_phases, 2, 'tumit plantar jantan: satu fase per kaki'); assert.equal(tp.stance_phases, 2, 'jari plantar jantan: satu fase per kaki')
+assert.ok(hp.slide_max_mm <= 17 && tp.slide_max_mm <= 17, 'selip maks penanda plantar jantan <= 17 mm'); assert.ok(hp.slide_rms_mm < 9 && tp.slide_rms_mm < 9, 'RMS selip penanda plantar jantan < 9 mm')
+assert.ok(hp.stance_frames < tp.stance_frames, 'tumit lepas sebelum jari (tumit menapak lebih singkat daripada jari)')
+assert.deepEqual(hp.phases_by_side.L[0].split('+')[0], '22-25', 'tumpu kiri dimulai bingkai 22 (melintasi jahitan loop)')
+// Betina (tulang CT tanpa jaringan telapak): penanda plantar tidak menapak, dan itu dicatat sebagai batasan geometri sumber, bukan dipalsukan.
+assert.equal(f.clips.WALK.heelPlantar.stance_phases, 0); assert.equal(f.clips.WALK.toePlantar.stance_phases, 0)
+assert.ok(f.clips.WALK.sole.stance_phases >= 1, 'betina: titik terendah kaki tetap menapak (kontak ada, hanya landmark yang tidak)')
+
 // vonis terhadap kriteria penelitian (apa adanya)
 const v = (rep: any, clip: string, k: string) => evaluateFootSlide(rep.clips[clip][k], C)
 assert.deepEqual(v(m, 'WALK', 'toe'), { status: 'exceeds', criteria: C, failed: ['peak'] }, 'jari WALK jantan: RMS 12,6 <= 15 tetapi maks 32,2 > 30')
 assert.equal((v(m, 'WALK', 'heel') as any).reason, 'no_stance')
+assert.equal(v(m, 'WALK', 'heelPlantar').status, 'within', 'tumit plantar jantan: RMS 7,8 <= 15 dan maks 16,6 <= 30 (placeholder)')
+assert.equal(v(m, 'WALK', 'toePlantar').status, 'within')
+assert.equal((v(f, 'WALK', 'heelPlantar') as any).reason, 'no_stance')
 assert.equal((v(m, 'RUN', 'toe') as any).reason, 'no_stance')
 assert.equal((v(m, 'RUN', 'sole') as any).reason, 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
 assert.equal((v(f, 'WALK', 'toe') as any).reason, 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
@@ -38,4 +52,4 @@ assert.equal((v(f, 'WALK', 'toe') as any).reason, 'too_few_phases', 'betina: han
 assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).status, 'within')
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata
 assert.ok(m.clips.WALK.sole.slide_rms_mm > 4 * m.clips.WALK.toe.slide_rms_mm, 'sol lebih besar dari jari (derau pergantian simpul), dicatat sebagai batasan metode')
-console.log('body-gait-foot-contact-reproduction: laporan = jalan ulang; loop tertutup dihitung benar; jari WALK jantan 2 fase melampaui maks 30 mm (placeholder); 6 ukuran lain tidak terukur')
+console.log('body-gait-foot-contact-reproduction: laporan = jalan ulang; loop tertutup dihitung benar; jari ekstrem WALK jantan melampaui maks 30 mm, penanda plantar jantan dalam kriteria (placeholder); RUN dan betina tidak terukur')

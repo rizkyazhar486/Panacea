@@ -35,14 +35,18 @@ const v = new THREE.Vector3()
 // Sumbu: +Y atas, +Z anterior (dibuktikan oleh jari kaki di +Z pada pose awal: bbox kaki z -0.092..0.137 dengan jari di +).
 root.updateMatrixWorld(true)
 const marker = {}
+// Penanda ekstrem (simpul paling posterior/anterior) bisa berada jauh di atas telapak (mis. ligamen/jaringan setinggi pergelangan), jadi tidak mewakili
+// titik yang menapak. Penanda PLANTAR = simpul TERENDAH di dalam seperempat posterior (tumit) atau anterior (jari) panjang kaki pada pose awal.
+const PLANTAR_FRACTION = 0.25
 for (const side of ['L', 'R']) {
-  let heel = null, toe = null
-  for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
-    world(mesh, i, v)
-    if (!heel || v.z < heel.z) heel = { mesh, i, z: v.z }
-    if (!toe || v.z > toe.z) toe = { mesh, i, z: v.z }
-  }
-  marker[side] = { heel, toe }
+  const all = []
+  for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); all.push({ mesh, i, y: v.y, z: v.z }) }
+  const zmin = Math.min(...all.map((p) => p.z)), zmax = Math.max(...all.map((p) => p.z)), len = zmax - zmin
+  const pick = (cands, better) => cands.reduce((a, b) => (better(b, a) ? b : a))
+  const heel = pick(all, (b, a) => b.z < a.z), toe = pick(all, (b, a) => b.z > a.z)
+  const heelPlantar = pick(all.filter((p) => p.z <= zmin + PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))
+  const toePlantar = pick(all.filter((p) => p.z >= zmax - PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
+  marker[side] = { heel, toe, heelPlantar, toePlantar, footLength_m: len }
 }
 
 function sample(clip) {
@@ -58,7 +62,7 @@ function sample(clip) {
       let lowest = Infinity, lowestZ = 0
       for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); if (v.y < lowest) { lowest = v.y; lowestZ = v.z } }
       const mk = {}
-      for (const name of ['heel', 'toe']) { world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
+      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar']) { world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
       row[side] = { lowest, lowestZ, ...mk }
     }
     rows.push(row)
@@ -94,17 +98,17 @@ function fit(groups) {
   return { stance_phases: groups.length, stance_frames: groups.reduce((a, g) => a + g.t.length, 0), common_forward_speed_m_s: +Math.abs(vel).toFixed(3), slide_rms_mm: +(rms * 1000).toFixed(1), slide_max_mm: +(Math.max(...res.map(Math.abs)) * 1000).toFixed(1) }
 }
 
-const report = { method: 'single clip-wide floor; heel/toe = extreme vertices at rest pose; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)', contact_threshold_mm: CONTACT_M * 1000, clips: {} }
+const report = { method: 'single clip-wide floor; heel/toe = extreme vertices at rest pose; heelPlantar/toePlantar = lowest vertex within the posterior/anterior quarter of the foot at rest; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)', contact_threshold_mm: CONTACT_M * 1000, clips: {} }
 for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name === 'RUN')) {
   let rows = sample(clip)
   // loop tertutup bila seluruh nilai kaki relatif panggul di bingkai terakhir sama dengan bingkai pertama (< 0,5 mm)
-  const rel = (r) => ['L', 'R'].flatMap((sd) => [r[sd].lowest, r[sd].toe.y, r[sd].heel.y, r[sd].toe.z - r.pelvisZ, r[sd].heel.z - r.pelvisZ])
+  const rel = (r) => ['L', 'R'].flatMap((sd) => [r[sd].lowest, r[sd].toe.y, r[sd].heel.y, r[sd].toePlantar.y, r[sd].heelPlantar.y, r[sd].toe.z - r.pelvisZ, r[sd].heel.z - r.pelvisZ])
   const closed = rel(rows[0]).every((x, i) => Math.abs(x - rel(rows.at(-1))[i]) < 0.0005)
   if (closed) rows = rows.slice(0, -1)
   const N = rows.length
   const floor = Math.min(...rows.flatMap((r) => ['L', 'R'].map((s) => r[s].lowest)))
-  const out = { frames: N, loop_closed_duplicate_end_frame_dropped: closed, floor_m: +floor.toFixed(4) }
-  for (const kind of ['heel', 'toe', 'sole']) {
+  const out = { frames: N, foot_length_m: +marker.L.footLength_m.toFixed(3), loop_closed_duplicate_end_frame_dropped: closed, floor_m: +floor.toFixed(4) }
+  for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'sole']) {
     const groups = []; const per = {}
     for (const side of ['L', 'R']) {
       const h = rows.map((r) => (kind === 'sole' ? r[side].lowest : r[side][kind].y) - floor)
