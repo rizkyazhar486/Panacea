@@ -545,3 +545,12 @@ are retained as the durable state rather than creating duplicate governance.
 
 - Compartment filtering previously exposed only the first eight matching proteins, leaving the rest unreachable without already knowing their identifiers. Reuse the unchanged published 1,310 HEK293T protein rows with bounded eight-row pages, exact total/range, native previous/next controls, and query/location resets. This is cultured-cell source navigation, not measured body/tissue anatomy or clinical approval. No new dataset or conversion.
 - All 11 OpenCell tests and TypeScript pass. New coverage reconstructs every matching row across all 17 published compartments without repeats or altered source values, preserves exact identifier/location intersection and idle behavior, and handles stale/invalid page requests. Full combined build, exact-head automation, integration and deployment remain pending.
+
+
+### INVICTUS release repair — actual Vercel environment caller (2026-10-11)
+
+- Canonical baseline: `cfe4c6242480b9e093dcec70846a11c382fd3749`. Five engineering increments are integrated; frontend production is not verified. Alpha remains 25/43 technically VERIFIED; no clinical approval is inferred.
+- Preserve both failed releases: runs `38161822494` (source `81c6fab`) and `38163946515` (source `cfe4c624`). Both failed during prebuilt build before deployment because CLI setup changed tracked `.gitignore`; neither shipped.
+- The first repair's test modeled the environment filename rather than the actual caller argument. CLI 59.11.7 `pullEnvRecords` calls `addToGitIgnore(rootPath, ".env*")` when downloading `.env.local`. Its exact-line check appends `.env*` despite equivalent existing Git ignore rules.
+- Add the literal `.env*` before the public `!.env.example` exception, retain `.vercel`, and use configured `npm ci` installation. Update the real-Git regression fixture to the actual caller arguments and verify the public example remains permitted. Keep the strict actual-checkout manifest and dirty-source rejection unchanged.
+- Six source-manifest tests pass locally. An extracted pinned-CLI helper reproduces the old source mutation and clean corrected source. Exact-head CI, merge, corrected deployment, and live revision verification remain pending until recorded by the PR and actual release run.
