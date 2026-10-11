@@ -291,3 +291,6 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 ## Cell scale (OpenCell)
 - `engine/openCellIndex.ts`, `ui/OpenCellPanel.tsx`, `pipeline/publish_opencell_index.mjs` and `public/bodyexposure/opencell_index.json` (1,310 proteins, CC BY-SA 4.0): a "Cell scale" lookup under the viewer that is loaded on demand and states that the data come from cultured HEK293T cells.
+
+## Procedural heartbeat
+- `engine/cardiacCycle.ts` (Wiggers-type cycle, adjustable rate, explicit parameters), a "Heartbeat" button with a rate slider for adult bodies with heart chambers, and the labelled illustrative note. No dataset is used.

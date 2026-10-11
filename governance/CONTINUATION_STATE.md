@@ -1,3 +1,7 @@
+### A2 forward synchronization with delivered Body Exposure — 2026-10-11
+
+- Canonical main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's #2394 illustrative heartbeat. Forward merge preserves its implementation and labels; A2 runtime/tests are unchanged. Fresh exact-head automated checks follow this synchronization; no additional AI review is requested and no clinical approval or deployment is claimed.
+
 ### A2 synchronized implementation — 2026-10-11
 
 - Canonical main cfc604eb95684647be09f7b17eefeb2f41b0d933 advances existing contributor Body Exposure, lab UI and calculator work; canonical Alpha is 24/43. Ordinary forward merge preserves those files and regenerates the Alpha document from combined JSON. A2 candidate is 25/43, not canonical completion until integrated.

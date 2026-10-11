@@ -132,3 +132,5 @@ export { DATA_GAPS, GAP_STATUS_LABEL, validateGaps, type DataGap, type GapKind, 
 
 export { OpenCellPanel } from './ui/OpenCellPanel'
 export { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS, LOCALISATION_LABEL, type OpenCellProtein, type PublishedOpenCell } from './engine/openCellIndex'
+
+export { cardiacStateAt, validateParams as validateCardiacParams, phaseDurations, DEFAULT_PARAMS as DEFAULT_CARDIAC_PARAMS, DEFAULT_HR, HR_MIN as CARDIAC_HR_MIN, HR_MAX as CARDIAC_HR_MAX, PHASE_LABEL as CARDIAC_PHASE_LABEL, type CardiacParams, type CardiacState, type CardiacPhase } from './engine/cardiacCycle'
