@@ -1,3 +1,10 @@
+### Canonical E1 completion and next resolver task — 2026-10-11
+
+- Canonical main 512de7c39d6029a4a9b06c50231a7eea7ad597e1 integrates #2381 with parent 397157fb9da7ea53b8eee2b88d3b97feb750ae7e. Accepted tree d53a23e2ae567847e082d267cc0131627a60c0f6 matches exact head d963f7e71f7453ea715d4c404f40b3e756f5d556; all ten checks passed (Validate, Stabilization, Body 3D, Mongo, Render backend, Security inventory/enforcement, Clinical Evidence) plus CodeRabbit. Independent AI COMMENT 5481894786 is engineering review, not human clinical approval.
+- E1 real-HTTP rejection acceptance is integrated; canonical Alpha is 23/43 VERIFIED. Post-merge CI was pending when this checkpoint was written. No runtime auth code changed and no new production revision is claimed. Backend health reread still reports healthy mongo/tuntas-v1 on 3e690b1; E7 remains NOT_CHECKED.
+- Next #2356 preserves the existing one-file resolver fix and contributor commits while synchronizing with canonical main. Independent Node24.19 reproduction: six calendar tests pass on #2354 head 3ef55c9; removing registration, restoring static import or removing the complete patch each fails ERR_MODULE_NOT_FOUND for server/src/shared/calendarDate.js. Restoring source passes 6/6. Currentmain with/without the patch passes 6/6. No assertions or runtime date guards change. Fresh exact-head CI/review remain required for this synchronization.
+- Remaining independent backend backlog: E2 broader clinical HTTP RBAC evidence and A1–A2 identity/encounter persistence. E3 remains active draft #2367; frontend #2351/#2369 and date #2354 ownership are preserved. Unpublished Vite dependency patch remains outside this task; release #2349 is not production delivery.
+
 ### E1 synchronization — 2026-10-11
 
 - PR #2381 initial head 9f9f863e056c92afb06251411ede57308219eb99 received independent AI engineering COMMENT; local full server suite and architecture/ratchet passed. Required CI was still running, not counted as complete.
