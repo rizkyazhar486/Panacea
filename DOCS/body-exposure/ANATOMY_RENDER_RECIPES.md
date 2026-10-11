@@ -11,6 +11,20 @@ Use the existing anatomical BLEND sources without modifying or saving them. Outp
 
 Run from the repository root; replace the source and output paths with local paths. On this Apple Silicon workstation, use `METAL`. Other supported backends are CPU, CUDA, OPTIX, HIP and ONEAPI; unavailable GPUs fail explicitly.
 
+For repeated female renders, first append just the existing female meshes into an isolated BLEND. This avoids opening the master’s unrelated linked body lineup for every frame. Geometry, material data, transforms and anatomical identities are retained; this operation does not decimate, rig, smooth or invent anatomy. External texture paths stay attached to the original local resources.
+
+```sh
+blender -b --factory-startup --python-exit-code 1 \
+  -P bodyexposure/pipeline/extract_render_body.py -- \
+  --source /path/to/PANACEA_HUMAN_MASTER_v011.blend \
+  --body-id HUMAN.ADULT.FEMALE --prefix ADULT.FEMALE. --camera-prefix CAM.FEMALE. \
+  --frame-camera CAM.FEMALE.ANTERIOR_34.R \
+  --out /tmp/female-isolated-new
+# Use /tmp/female-isolated-new/anatomy_render_body.blend in the render recipes below.
+```
+
+The optional `--frame-camera` keeps the selected camera’s source viewing direction and fits a 16:9 orthographic plate around the actual body bounds. This changes presentation only; anatomy transforms and geometry remain unchanged. Other copied cameras retain their original settings.
+
 ```sh
 # Adult female: preserves the existing female_layered staging and materials.
 blender -b /path/to/PANACEA_HUMAN_MASTER_v011.blend --python-exit-code 1 \
