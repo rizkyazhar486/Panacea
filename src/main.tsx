@@ -33,6 +33,7 @@ const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => (
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const CanonicalBody = lazy(() => import('./pages/CanonicalBody').then((m) => ({ default: m.CanonicalBody })))
+const FetalParcelInspector = lazy(() => import('./pages/FetalParcelInspector').then((m) => ({ default: m.FetalParcelInspector })))
 const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))
 // Dua halaman ini sudah rampung dan sudah punya ujinya, tetapi tidak pernah
 // dipasang ke rute mana pun sehingga tidak ada satu pun jalan menuju ke sana.
@@ -395,6 +396,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/nutrition" element={<Navigate to="/gizi?t=makan" replace />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
               <Route path="/body-exposure/canonical" element={<CanonicalBody />} />
+              <Route path="/body-exposure/fetal-dataset" element={<FetalParcelInspector />} />
               <Route path="/radiology" element={<Radiology />} />
               <Route path="/frontier-health" element={<FrontierHealthOS />} />
               <Route path="/knowledge-bridge" element={<KnowledgeBridge />} />
