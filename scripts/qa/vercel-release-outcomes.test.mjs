@@ -28,16 +28,19 @@ function run(script, env) {
 }
 
 const cases = [
-  ['build failure', 'skipped', 'skipped', '', '', 'FAILED_OR_UNVERIFIED', 'FAILED'],
+  ['build failure', 'skipped', 'skipped', '', '', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'skipped'],
   ['deploy failure', 'failure', 'skipped', '', '', 'FAILED_OR_UNVERIFIED', 'FAILED'],
   ['cancelled deploy', 'cancelled', 'skipped', '', '', 'FAILED_OR_UNVERIFIED', 'FAILED'],
   ['failed smoke', 'success', 'failure', url, 'false', 'FAILED_OR_UNVERIFIED', 'UNVERIFIED'],
   ['missing URL', 'success', 'success', '', 'false', 'FAILED_OR_UNVERIFIED', 'UNVERIFIED'],
   ['quota deferral', 'success', 'skipped', '', 'true', 'DEFERRED_QUOTA', 'DEFERRED'],
   ['deployment smoke passed', 'success', 'success', url, 'false', 'DEPLOYED_SMOKE_VERIFIED', 'DEPLOYED'],
+  ['failed acceptance recheck', 'skipped', 'skipped', '', '', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'failure'],
+  ['cancelled acceptance recheck', 'skipped', 'skipped', '', '', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'cancelled'],
+  ['unproven acceptance with reported deploy success', 'success', 'success', url, 'false', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'failure'],
 ]
 
-for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus] of cases) {
+for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus, recheck = 'success'] of cases) {
   test(`actual release scripts report ${label} without false shipment`, () => {
     const root = mkdtempSync(join(tmpdir(), 'panacea-release-outcomes-'))
     try {
@@ -46,6 +49,7 @@ for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus
       run(runBlock('Write machine-readable release evidence'), {
         DEPLOYMENT_SHA: sha, DEPLOYMENT_URL: deploymentUrl, DEPLOYMENT_DEFERRED: deferred,
         DEPLOY_STEP_OUTCOME: deploy, SMOKE_STEP_OUTCOME: smoke,
+        RELEASE_RECHECK_OUTCOME: recheck,
         WORKFLOW_RUN_URL: 'https://github.com/example/repo/actions/runs/123', EVIDENCE_PATH: evidencePath,
       })
       const record = JSON.parse(readFileSync(evidencePath, 'utf8'))
@@ -54,9 +58,11 @@ for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus
       assert.equal(record.deployment_url, deploymentUrl || null)
       assert.equal(record.deploy_step, deploy)
       assert.equal(record.smoke_step, smoke)
+      assert.equal(record.release_recheck, recheck)
       const bindings = {
         'steps.deploy.outputs.deferred': deferred, 'steps.deploy.outcome': deploy,
         'steps.smoke.outcome': smoke, 'steps.deploy.outputs.url': deploymentUrl,
+        'steps.release-recheck.outcome': recheck,
       }
       const script = runBlock('Deployment summary').replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, (_, key) => {
         assert.ok(Object.hasOwn(bindings, key), `unknown expression: ${key}`)
