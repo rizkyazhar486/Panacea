@@ -69,7 +69,7 @@ export function PerfusionChainPanel() {
       <div className="mt-2 grid grid-cols-2 gap-2">
         {FIELDS.map((id) => (
           <label key={id} className="flex flex-col justify-end text-[13px] font-bold">{SCENARIO_LABEL[id].label} ({SCENARIO_LABEL[id].unit})
-            <input inputMode="decimal" autoComplete="off" value={text[id]} aria-label={SCENARIO_LABEL[id].label}
+            <input inputMode="decimal" autoComplete="off" value={text[id]} aria-label={`Scenario: ${SCENARIO_LABEL[id].label}`}
               onChange={(e) => setText((t) => ({ ...t, [id]: e.target.value }))}
               className="mt-1 min-h-[44px] w-full rounded-xl border border-neutral-300 bg-white px-2 dark:border-white/20 dark:bg-neutral-900" />
           </label>

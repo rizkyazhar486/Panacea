@@ -20,14 +20,14 @@ try {
         await panel.locator('summary').click()
         // label riset terlihat dan semua kolom mulai kosong; tidak ada hasil sebelum diisi
         await panel.getByText(/Research and education only/).waitFor()
-        for (const name of Object.keys(values)) assert.equal(await page.getByLabel(name, { exact: true }).inputValue(), '', `${name} must start blank`)
+        for (const name of Object.keys(values)) assert.equal(await page.getByLabel(`Scenario: ${name}`, { exact: true }).inputValue(), '', `${name} must start blank`)
         await panel.getByText(/Enter all six values/).waitFor()
         assert.equal(await panel.locator('svg').count(), 0, 'no diagram before the inputs are complete')
         // mengisi satu per satu: pesan menyusut, tidak ada angka sebelum lengkap
         const names = Object.keys(values)
-        for (const name of names.slice(0, -1)) await page.getByLabel(name, { exact: true }).fill(values[name])
+        for (const name of names.slice(0, -1)) await page.getByLabel(`Scenario: ${name}`, { exact: true }).fill(values[name])
         await panel.getByText(/Still missing: intracranial pressure/).waitFor()
-        await page.getByLabel('Intracranial pressure', { exact: true }).fill(values['Intracranial pressure'])
+        await page.getByLabel('Scenario: Intracranial pressure', { exact: true }).fill(values['Intracranial pressure'])
         await panel.getByText('5.60 L/min').waitFor()
         await panel.getByText('90.0 mmHg', { exact: true }).waitFor()
         await panel.getByText('80.0 mmHg', { exact: true }).waitFor()
@@ -35,16 +35,16 @@ try {
         const anim = await panel.locator('svg animate').count()
         assert(reducedMotion === 'reduce' ? anim === 0 : anim > 0, `animation count ${anim} with reducedMotion=${reducedMotion}`)
         // input mustahil memberi peringatan, bukan angka; ICP = MAP tidak punya gradien positif
-        await page.getByLabel('End-systolic volume', { exact: true }).fill('200')
+        await page.getByLabel('Scenario: End-systolic volume', { exact: true }).fill('200')
         await panel.getByRole('alert').getByText(/End-systolic volume must be between/).waitFor()
         assert.equal(await panel.locator('svg').count(), 0, 'no diagram for invalid input')
-        await page.getByLabel('End-systolic volume', { exact: true }).fill('50')
-        await page.getByLabel('Intracranial pressure', { exact: true }).fill('90')
+        await page.getByLabel('Scenario: End-systolic volume', { exact: true }).fill('50')
+        await page.getByLabel('Scenario: Intracranial pressure', { exact: true }).fill('90')
         await panel.getByText(/no positive driving gradient/).waitFor()
-        await page.getByLabel('Intracranial pressure', { exact: true }).fill('10')
+        await page.getByLabel('Scenario: Intracranial pressure', { exact: true }).fill('10')
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `horizontal overflow at ${width}`)
         // semua kontrol cukup besar untuk sentuhan
-        for (const name of names) { const box = await page.getByLabel(name, { exact: true }).boundingBox(); assert(box.height >= 44, `${name} touch target ${box.height}px`) }
+        for (const name of names) { const box = await page.getByLabel(`Scenario: ${name}`, { exact: true }).boundingBox(); assert(box.height >= 44, `${name} touch target ${box.height}px`) }
         if (reducedMotion === 'no-preference') await page.screenshot({ path: `/private/tmp/perfusion-${width}-${theme}.png`, fullPage: true })
         await ctx.close()
       }
