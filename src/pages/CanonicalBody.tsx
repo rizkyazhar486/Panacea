@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
+import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
@@ -106,6 +106,16 @@ function variantLabel(id: string, label?: string) {
 // paru yang digerakkan model napas: parenkim saja (bukan bronkus, trakea, pleura); hanya tubuh dewasa (data sumber: pasien dewasa)
 const isLung = (u: Record<string, unknown>) => u.panacea_system === 'respiratory' && /(^lung$)|(lobe of (left|right) lung)/i.test(String(u.canonical_name ?? ''))
 const BREATHING_BODIES = /^(HUMAN\.ADULT|ICRP\.ADULT)\./
+// jantung ilustratif: ruang (bila ada) atau seluruh jantung; hanya tubuh dewasa (nilai bawaan model = kisaran dewasa)
+const HEARTBEAT_BODIES = /^(HUMAN\.ADULT|ICRP\.ADULT|TSD_[A-Z0-9]+\.OLDER_ADULT)\./
+const heartPart = (u: Record<string, unknown>): 'ventricle' | 'atrium' | 'whole' | null => {
+  if (u.panacea_system !== 'cardiovascular') return null
+  const n = String(u.canonical_name ?? '')
+  if (/^(left|right) ventricle$/i.test(n)) return 'ventricle'
+  if (/^(left|right) atrium$/i.test(n)) return 'atrium'
+  if (/^(heart wall|blood in heart chamber|heart \(all chambers, one mesh\))$/i.test(n)) return 'whole'
+  return null
+}
 const fileTag = (bodyId: string) => bodyId.replace('HUMAN.', '').replaceAll('.', '_').toLowerCase()
 
 function statusTone(s: string): 'normal' | 'low' | 'neutral' {
@@ -141,6 +151,10 @@ export function CanonicalBody() {
   const [respModel, setRespModel] = useState<RespiratoryModel | null>(null)
   const [breathing, setBreathing] = useState(false)
   const [lungCount, setLungCount] = useState(0)
+  const [heartOn, setHeartOn] = useState(false)
+  const [heartCount, setHeartCount] = useState(0)
+  const [heartRate, setHeartRate] = useState(DEFAULT_CARDIAC_PARAMS.hrBpm)
+  const [heartReadout, setHeartReadout] = useState<CardiacState | null>(null)
   const [breathReadout, setBreathReadout] = useState<{ cycle: number; volumeMl: number; si: number } | null>(null)
   const [ontology, setOntology] = useState<Record<string, { id: string; label: string }> | null>(null)
   // ── gerak rig (kerangka beranimasi); jam berbasis waktu nyata, lihat engine/motionTimeline ──
@@ -498,7 +512,7 @@ export function CanonicalBody() {
       s.root.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
-      s.root.clear(); s.groups.clear(); s.byId.clear(); setLungCount(0); setBreathing(false)
+      s.root.clear(); s.groups.clear(); s.byId.clear(); setLungCount(0); setBreathing(false); setHeartCount(0); setHeartOn(false)
     }
     const todo = systems.filter((sys) => enabled.has(sys) && !L.loaded.has(sys))
     if (!todo.length) {
@@ -541,6 +555,7 @@ export function CanonicalBody() {
       else if (!L.inflight) setError('')
       setStats({ structures: s.byId.size, tris: Math.round(L.tris), ms: Math.round(performance.now() - t0) })
       setLungCount([...s.byId.values()].filter((o) => isLung(o.userData)).length)
+      setHeartCount([...s.byId.values()].filter((o) => heartPart(o.userData) !== null).length)
       if (reset || !bodyBox.current) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
       applyVisibility()
       applyDisperse(disperse)
@@ -711,6 +726,34 @@ export function CanonicalBody() {
     }
   }, [breathing, respModel, bodyId, loading, lungCount])
 
+  // jantung ilustratif: siklus prosedural (bukan data pasien); ruang diskalakan menurut volumenya, kembali ke bentuk awal saat dimatikan
+  useEffect(() => {
+    const s = sceneRef.current
+    if (!heartOn || !s || loading || !HEARTBEAT_BODIES.test(bodyId)) return
+    const all = [...s.byId.values()].map((o) => ({ o, part: heartPart(o.userData) })).filter((x): x is { o: THREE.Object3D; part: 'ventricle' | 'atrium' | 'whole' } => x.part !== null)
+    const hasChambers = all.some((x) => x.part !== 'whole')
+    const parts = all.filter((x) => (hasChambers ? x.part !== 'whole' : x.part === 'whole'))
+    if (!parts.length) return
+    const rest = parts.map((x) => ({ ...x, p: x.o.position.clone(), sc: x.o.scale.clone() }))
+    const centre = new THREE.Vector3(); for (const r of rest) centre.add(r.p); centre.divideScalar(rest.length)
+    const t0 = performance.now(); let raf = 0; let lastReadout = 0
+    const params = { ...DEFAULT_CARDIAC_PARAMS, hrBpm: heartRate }
+    const tick = () => {
+      const now = performance.now()
+      const st = cardiacStateAt(params, (now - t0) / 1000)
+      for (const r of rest) {
+        const k = r.part === 'ventricle' ? st.ventricleScale : r.part === 'atrium' ? st.atriumScale : st.wholeHeartScale
+        r.o.scale.copy(r.sc).multiplyScalar(k)
+        r.o.position.copy(r.p).sub(centre).multiplyScalar(k).add(centre)
+      }
+      s.invalidate()
+      if (now - lastReadout >= 250) { lastReadout = now; setHeartReadout(st) }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => { cancelAnimationFrame(raf); for (const r of rest) { r.o.position.copy(r.p); r.o.scale.copy(r.sc) } s.invalidate(); setHeartReadout(null) }
+  }, [heartOn, heartRate, bodyId, loading, heartCount])
+
   const landmarks = useMemo(() => {
     if (!picked || !anchors) return []
     return anchors.by_structure[picked.id] ?? []
@@ -840,6 +883,20 @@ export function CanonicalBody() {
               </button>
             </div>
           )}
+          {heartCount > 0 && HEARTBEAT_BODIES.test(bodyId) && (
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
+              <button onClick={() => setHeartOn((b) => !b)} aria-pressed={heartOn} disabled={motionOn}
+                className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold disabled:opacity-40 ${heartOn ? 'bg-[#ff9aa8] text-[#0b0c0e]' : 'text-white/80'}`}>
+                {heartOn ? 'Stop heartbeat' : 'Heartbeat'}
+              </button>
+              {heartOn && (
+                <label className="flex items-center gap-2 pr-2 text-[11px] font-bold text-white/80">Rate
+                  <input type="range" min={40} max={180} step={1} value={heartRate} onChange={(e) => setHeartRate(Number(e.target.value))} aria-label="Heart rate" className="w-24" />
+                  <span data-testid="heart-rate-value">{heartRate} bpm</span>
+                </label>
+              )}
+            </div>
+          )}
           {/* alat ukur di toolbar kanvas: tetap terlihat saat mengetuk anatomi (tidak menggulir keluar) */}
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
             <button onClick={() => { setMeasuring((m) => !m); setDisperse(0) }} aria-pressed={measuring}
@@ -861,6 +918,12 @@ export function CanonicalBody() {
           <p data-testid="breathing-note" className="border-t border-white/10 bg-black/60 px-3 py-2 text-[11px] leading-snug text-white/70">
             {respModel.label} Source: {respModel.source} ({respModel.licence}). Playback is {Math.round(60 / DEFAULT_BREATH_PERIOD_S)} breaths per minute, a viewer setting: the CT does not record the breathing rate.
             {breathReadout && <span data-testid="breathing-readout"> Model at {Math.round(breathReadout.cycle * 100)} % of the breath: lung volume {Math.round(breathReadout.volumeMl).toLocaleString('en')} mL (mean of the source patients), superior-inferior size ×{breathReadout.si.toFixed(3)}.</span>}
+          </p>
+        )}
+        {heartOn && (
+          <p data-testid="heartbeat-note" className="border-t border-white/10 bg-black/60 px-3 py-2 text-[11px] leading-snug text-white/70">
+            Illustrative procedural model, not this body's measured heartbeat, not patient-specific and not clinically validated: textbook adult volumes (end-diastolic 120 mL, end-systolic 50 mL, ejection fraction {Math.round(DEFAULT_CARDIAC_PARAMS.edvMl > 0 ? ((DEFAULT_CARDIAC_PARAMS.edvMl - DEFAULT_CARDIAC_PARAMS.esvMl) / DEFAULT_CARDIAC_PARAMS.edvMl) * 100 : 0)} %), timing from a simple Wiggers-cycle rule. Chambers are scaled by their volume; valves and vessels do not move.
+            {heartReadout && <span data-testid="heartbeat-readout"> {CARDIAC_PHASE_LABEL[heartReadout.phase]} · ventricular volume {Math.round(heartReadout.ventricleMl)} mL.</span>}
           </p>
         )}
         {measuring && (
