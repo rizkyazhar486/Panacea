@@ -1,3 +1,13 @@
+### A2 real HTTP restart acceptance candidate — 2026-10-11
+
+- Baseline canonical main 9c4414cf79b64d42c8c7e3855874d9455a047c7e has Alpha 23/43. Candidate A2 changes only encounter tests, its ledger evidence/generated document and this checkpoint; runtime code and other criteria remain unchanged.
+- Actual HTTP owner verification, clinician signing/closing, authenticated server provenance and a second application process reproduce preserved closed snapshot plus unsigned successor. Paired anonymous/foreign/unverified/mismatched/unsigned negatives preserve data. Mongo/providers are disabled and all identities/data are synthetic; clinically_reviewed remains false.
+- Targeted and full server suites, build, server typecheck, standalone strict fixture typecheck pass. Actual closeEncounter persistence removal fails the named post-restart assertion; restored source passed clean suites. Independent engineering review and required fresh exact-head CI/integration remain separate gates; canonical A2 is not credited until integration.
+- #2356 resolver integrated as canonical 9c4414cf79b64d42c8c7e3855874d9455a047c7e, parent 512de7c, accepted tree 00f1dfc1760bd57d26a8a229dfa5fae807805ca7 matching head d260ef2; all eight exact-head checks passed with independent AI COMMENT 5481915822. Canonical E1 main 512de7c has successful build, full/render acceptance, Mongo, server, security, clinical evidence and live genomics smoke checks. Deployment runs are skipped/cancelled, not delivery; no new production revision is claimed.
+- Next independent foundation: A1 actual shared patient identity across history, encounter and lab data; E2 broader HTTP RBAC. Active E3 #2367, frontend #2351/#2369 and date #2354 ownership stay preserved. E7 remains NOT_CHECKED.
+
+- A1 read-only diagnosis at this revision: same-ID cross-API fixture is feasible, but /api/keadaan-longitudinal excludes persistent clinical.hasilLab and intake validates patientId syntax without checking existing patient/encounter linkage. A2 does not close those aggregate/integrity gaps. Controlled existing-patient isolation reproduction denied p1 to two separate accounts and admitted only a doctor-linked account; no P0 exposure was reproduced.
+
 ### Canonical E1 completion and next resolver task — 2026-10-11
 
 - Canonical main 512de7c39d6029a4a9b06c50231a7eea7ad597e1 integrates #2381 with parent 397157fb9da7ea53b8eee2b88d3b97feb750ae7e. Accepted tree d53a23e2ae567847e082d267cc0131627a60c0f6 matches exact head d963f7e71f7453ea715d4c404f40b3e756f5d556; all ten checks passed (Validate, Stabilization, Body 3D, Mongo, Render backend, Security inventory/enforcement, Clinical Evidence) plus CodeRabbit. Independent AI COMMENT 5481894786 is engineering review, not human clinical approval.

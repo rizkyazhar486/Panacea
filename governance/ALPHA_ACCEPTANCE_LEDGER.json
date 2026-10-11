@@ -38,10 +38,14 @@
    "pillar": "Panacea One OS",
    "criterion": "Encounter dibuat dan dipersist di backend",
    "acceptance": "Encounter yang dibuat tetap ada setelah restart server dan dapat dibaca ulang oleh pengguna berwenang",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/encounterHttpRestart.uji.ts, imported by rekamEncounter.uji.ts in mandatory server npm run uji: actual application HTTP with temporary file persistence, random session secret and synthetic identities. Configured owner verifies doctor through the real API after an unverified-doctor denial; verified doctor creates patient, signs record with authenticated server-stamped identity/time/provenance, and closes encounter.",
+    "Application process exits before a new process starts on the same isolated file. Original doctor token reads the exact closed encounter and complete provenance, original signed record and distinct unsigned successor; current pointer and patient identity persist. Anonymous, unrelated patient and unverified doctor reads/writes/close are rejected 401/403; record/patient mismatch is rejected 400; even a verified doctor cannot close unsigned successor (409). Rejections leave snapshots and records unchanged.",
+    "Targeted HTTP/encounter fixture, full server npm run uji, server typecheck/build and standalone strict fixture typecheck pass. Removing actual closeEncounter snapshot persistence fails the named post-restart assertion; production source restored before final clean suites. Independent AI engineering review reproduced the actual HTTP restart fixture successfully and found no substantive bounded finding; this is not human clinical approval."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "Technical encounter persistence acceptance in actual file-mode application processes, not Mongo encounter restart evidence, production patient-care verification, A1 longitudinal closure, A3/E2 completeness or human clinical authorization. Synthetic signing remains clinically_reviewed=false; clinician identity is obtained through the controlled owner-verification workflow."
   },
   {
    "id": "A3",
