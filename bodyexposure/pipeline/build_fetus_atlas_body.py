@@ -5,12 +5,23 @@
 Masukan: keluaran fetal_atlas_to_stl.py (STL mm dalam kerangka kanonik + provenance.json dengan bukti orientasi). Konversi: mm → m, x,y dipusatkan pada kotak
 pembatas organ, titik terendah di z = 0 (janin tidak punya kaki; bukan "kaki di lantai"). Material PAN_* dari master.
 """
+import argparse
 import bpy, bmesh, json, os, re, sys, glob
 from mathutils import Vector, Matrix
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-STL = os.path.expanduser(argv[argv.index("--stl") + 1])
-ROOT = os.path.expanduser("~/Documents/Panaceamed.id/bodyexposure")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--stl", required=True)
+parser.add_argument("--material-master", default=os.path.join(ROOT, "PANACEA_HUMAN_MASTER_v007.blend"))
+parser.add_argument("--out", default=os.path.join(ROOT, "bodies/PANACEA_BODY_FETUS_ATLAS.blend"))
+parser.add_argument("--report", default=os.path.join(ROOT, "qa_reports/fetus_atlas_build.json"))
+options = parser.parse_args(argv)
+STL = os.path.expanduser(options.stl)
+path = os.path.abspath(os.path.expanduser(options.out))
+report_path = os.path.abspath(os.path.expanduser(options.report))
+if os.path.exists(path) or os.path.exists(report_path):
+    raise SystemExit("output or report already exists; refusing to overwrite")
 BODY_ID = "FETUS"
 PROV = json.load(open(os.path.join(STL, "provenance.json")))
 SYSTEM = {"lungs": ("respiratory", "PAN_Lung"), "liver": ("digestive", "PAN_Organ"), "stomach": ("digestive", "PAN_Intestine"), "gallbladder": ("digestive", "PAN_Gallbladder"),
@@ -29,7 +40,7 @@ def snake(s):
 
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
-with bpy.data.libraries.load(os.path.join(ROOT, "PANACEA_HUMAN_MASTER_v007.blend"), link=False) as (src, dst):
+with bpy.data.libraries.load(os.path.expanduser(options.material_master), link=False) as (src, dst):
     dst.materials = [m for m in src.materials if m.startswith("PAN_")]
 meshes = {}
 for key, info in PROV["structures"].items():
@@ -45,6 +56,7 @@ for key, (info, me) in meshes.items():
     me.transform(Matrix.Translation((-cx, -cy, -zmin)))
     sysn, mat = SYSTEM[info["name"]]; nm = NAME.get(info["name"], info["name"].capitalize()); side = info["side"]
     lat = {"L": "left", "R": "right"}.get(side, "unpaired")
+    source_group = info.get("source_labels")
     sid = f"{BODY_ID}.{snake(sysn)}.{snake(nm)}" + (f".{side}" if side else "")
     # lateralidade diuji terhadap geometri: +X = kiri subjek
     mx = sum(v.co.x for v in me.vertices) / len(me.vertices)
@@ -57,9 +69,15 @@ for key, (info, me) in meshes.items():
     meta = {"panacea_structure_id": sid, "panacea_body_id": BODY_ID, "canonical_name": nm, "panacea_system": sysn, "panacea_laterality": lat,
             "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry", "panacea_source": f"{SRC}; label {info['label']} ({info['name']})",
             "panacea_license": LICENSE, "panacea_source_raw_name": info["name"], "panacea_method": METHOD, "panacea_accuracy_status": "source_backed",
-            "panacea_review_status": "review_required", "panacea_version": "body_v014", "biological_sex_applicability": "unspecified", "panacea_educational_only": True,
+            "panacea_review_status": "review_required", "panacea_version": "body_v015" if PROV.get("lung_group_evidence") else "body_v014", "biological_sex_applicability": "unspecified", "panacea_educational_only": True,
             "panacea_kind": "organ", "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
-            "panacea_known_limitations": ("Population-average atlas label, not any real fetus; one 3T T2w protocol; " + ("left and right lungs are one connected label and are split at a sagittal plane; " if info["name"] == "lungs" else "") + "organs only.")}
+            "panacea_known_limitations": ("Population-average atlas label, not any real fetus; one 3T T2w protocol; " +
+                (("left/right lungs use source label groups; individual lobe identity remains unresolved; the multi-region and older organ masks differ; " if source_group else
+                  "left and right lungs are one connected label and are split at a sagittal plane; ") if info["name"] == "lungs" else "") + "organs only.")}
+    if source_group:
+        meta.update({"panacea_source": f"{SRC}; {info['source_file']}; source labels {source_group}; grouping {info['grouping_source']}",
+                     "panacea_laterality_source": "pinned_svrtk_source_label_group_verified_by_geometry",
+                     "panacea_source_labels": source_group, "panacea_source_file": info["source_file"]})
     for k, v in meta.items(): ob[k] = v
     report.append({"id": sid, "volume_cm3": info["volume_cm3"], "tris": sum(len(p.vertices) - 2 for p in me.polygons)})
 bpy.context.view_layer.update()
@@ -68,8 +86,10 @@ coll["panacea_body_id"] = BODY_ID; coll["panacea_body_status"] = "source_backed_
 coll["panacea_individual"] = INDIVIDUAL
 coll["panacea_body_frame"] = "+Z superior, +X subject left, -Y anterior, metres, lowest organ point at z=0; axis signs proven from anatomy (liver right of spleen, stomach anterior to kidney, thorax above abdomen), no mirror needed"
 coll["panacea_extent_m"] = round(max(zs) - min(zs), 4)
-path = f"{ROOT}/bodies/PANACEA_BODY_FETUS_ATLAS.blend"; os.makedirs(os.path.dirname(path), exist_ok=True)
+os.makedirs(os.path.dirname(path), exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=path)
 res = {"body": BODY_ID, "structures": len(report), "extent_m": coll["panacea_extent_m"], "tris_total": sum(r["tris"] for r in report), "file": os.path.basename(path)}
-json.dump({"summary": res, "structures": report, "orientation_checks": PROV["orientation_checks"]}, open(f"{ROOT}/qa_reports/fetus_atlas_build.json", "w"), indent=1)
+os.makedirs(os.path.dirname(report_path), exist_ok=True)
+json.dump({"summary": res, "structures": report, "orientation_checks": PROV["orientation_checks"],
+           "lung_group_evidence": PROV.get("lung_group_evidence"), "clinical_validation": "pending"}, open(report_path, "w"), indent=1)
 print("BODY", res)

@@ -26,12 +26,32 @@
    "detail": 0.0185
   },
   {
-   "check": "vertical_organ_order",
+   "check": "fetal_source_organ_order",
    "ok": true,
-   "not_applicable": "body has no organs (--no-organs)"
+   "detail": {
+    "scope": "partial fetal source atlas",
+    "not_represented": [
+     "brain",
+     "heart",
+     "skeleton"
+    ],
+    "centroids_z_m": {
+     "liver": 0.0535668209195137,
+     "bladder": 0.014317800290882587,
+     "thymus": 0.09200343489646912,
+     "kidney.L": 0.03728871792554855,
+     "lung.L": 0.07757755368947983,
+     "kidney.R": 0.04027672857046127,
+     "lung.R": 0.07908333837985992
+    },
+    "missing_required_organs": [],
+    "invalid_centroids": [],
+    "order_violations": [],
+    "clinical_validation": "pending"
+   }
   },
   {
-   "check": "feet_on_ground",
+   "check": "lowest_organ_point_on_ground",
    "ok": true,
    "detail": 0.0
   },
@@ -39,7 +59,7 @@
    "check": "no_gross_organ_interpenetration",
    "ok": true,
    "detail": {
-    "LIVER|STOMACH": 0.033
+    "LIVER|STOMACH": 0.037
    }
   },
   {
@@ -66,7 +86,7 @@
      0.02,
      0.019
     ],
-    "liver_y": -0.005
+    "liver_y": -0.006
    }
   },
   {

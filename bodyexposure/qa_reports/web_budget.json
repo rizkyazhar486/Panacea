@@ -31,8 +31,8 @@
   {
    "body": "fetus",
    "light_lod": "LOD3",
-   "initial_tris": 6022,
-   "all_systems_tris": 6594
+   "initial_tris": 6278,
+   "all_systems_tris": 6850
   },
   {
    "body": "icrp_adult_female",

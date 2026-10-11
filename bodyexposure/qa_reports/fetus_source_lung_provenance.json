@@ -1,0 +1,206 @@
+{
+ "source": "SVRTK fetal MRI atlas repository, King's College London CDB (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+ "atlas": "population average, 17 normal fetuses, 3T T2w",
+ "voxel_mm": 0.75,
+ "orientation_header": "RAS",
+ "orientation_checks": {
+  "liver_right_of_spleen": true,
+  "stomach_anterior_to_kidney": true,
+  "lungs_above_liver": true,
+  "liver_above_bladder": true,
+  "thymus_above_liver": true
+ },
+ "axis_signs_to_canonical": {
+  "x": -1.0,
+  "y": -1.0,
+  "z": 1.0
+ },
+ "structures": {
+  "lungs.L": {
+   "label": 1,
+   "name": "lungs",
+   "side": "L",
+   "volume_cm3": 15.33,
+   "triangles": 27248,
+   "split": "pinned SVRTK source label group; no sagittal split",
+   "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
+   "source_labels": [
+    1,
+    2
+   ],
+   "grouping_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
+   "individual_lobe_identity": "unresolved"
+  },
+  "lungs.R": {
+   "label": 1,
+   "name": "lungs",
+   "side": "R",
+   "volume_cm3": 20.22,
+   "triangles": 31834,
+   "split": "pinned SVRTK source label group; no sagittal split",
+   "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
+   "source_labels": [
+    3,
+    4,
+    5
+   ],
+   "grouping_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
+   "individual_lobe_identity": "unresolved"
+  },
+  "liver": {
+   "label": 2,
+   "name": "liver",
+   "side": null,
+   "volume_cm3": 58.45,
+   "triangles": 52304,
+   "split": "single structure"
+  },
+  "stomach": {
+   "label": 3,
+   "name": "stomach",
+   "side": null,
+   "volume_cm3": 6.9,
+   "triangles": 11208,
+   "split": "single structure"
+  },
+  "spleen": {
+   "label": 4,
+   "name": "spleen",
+   "side": null,
+   "volume_cm3": 1.64,
+   "triangles": 4504,
+   "split": "single structure"
+  },
+  "kidney_pelvis.L": {
+   "label": 5,
+   "name": "kidney pelvis",
+   "side": "L",
+   "volume_cm3": 0.41,
+   "triangles": 1620,
+   "split": "two connected components"
+  },
+  "kidney_pelvis.R": {
+   "label": 5,
+   "name": "kidney pelvis",
+   "side": "R",
+   "volume_cm3": 0.46,
+   "triangles": 1916,
+   "split": "two connected components"
+  },
+  "kidney_parenchyma.L": {
+   "label": 6,
+   "name": "kidney parenchyma",
+   "side": "L",
+   "volume_cm3": 4.95,
+   "triangles": 10088,
+   "split": "two connected components"
+  },
+  "kidney_parenchyma.R": {
+   "label": 6,
+   "name": "kidney parenchyma",
+   "side": "R",
+   "volume_cm3": 4.88,
+   "triangles": 10656,
+   "split": "two connected components"
+  },
+  "bladder": {
+   "label": 7,
+   "name": "bladder",
+   "side": null,
+   "volume_cm3": 4.43,
+   "triangles": 7232,
+   "split": "single structure"
+  },
+  "thymus": {
+   "label": 8,
+   "name": "thymus",
+   "side": null,
+   "volume_cm3": 2.62,
+   "triangles": 6820,
+   "split": "single structure"
+  },
+  "gallbladder": {
+   "label": 9,
+   "name": "gallbladder",
+   "side": null,
+   "volume_cm3": 0.92,
+   "triangles": 3052,
+   "split": "single structure"
+  },
+  "adrenal_glands.L": {
+   "label": 10,
+   "name": "adrenal glands",
+   "side": "L",
+   "volume_cm3": 0.11,
+   "triangles": 656,
+   "split": "two connected components"
+  },
+  "adrenal_glands.R": {
+   "label": 10,
+   "name": "adrenal glands",
+   "side": "R",
+   "volume_cm3": 0.2,
+   "triangles": 1124,
+   "split": "two connected components"
+  }
+ },
+ "lung_group_evidence": {
+  "source_label_groups": {
+   "L": [
+    1,
+    2
+   ],
+   "R": [
+    3,
+    4,
+    5
+   ]
+  },
+  "grouping_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
+  "exclusion_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-lung-segmentation.sh#L280-L281",
+  "source_revision": "7d75fa96162245326f7046bb4df0a41cdeaf7f5c",
+  "excluded_labels": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "individual_lobe_identity": "unresolved",
+  "clinical_validation": "pending",
+  "voxel_counts": {
+   "L": 36334,
+   "R": 47926
+  },
+  "centroids_ras_mm": {
+   "L": [
+    -16.41300148762403,
+    -8.605289241024181,
+    20.281991477123483
+   ],
+   "R": [
+    14.754624677652146,
+    -5.636265316029039,
+    21.187435084742134
+   ]
+  },
+  "parcel_mask_sha256": "5d81b6f91bcc2a6d6e64dfcd97a3099cfdc30cd9826f29d297b3c6983aceee54",
+  "organ_mask_sha256": "4b7bade32fac95a80c622f535c05f6a6f8eab8f1e32ba093cc742b1a5dc6c8b7",
+  "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
+  "older_whole_lung_voxels": 81411,
+  "overlap_with_older_lung_voxels": 76484,
+  "outside_older_lung_voxels": 7776,
+  "older_lung_not_in_parcels_voxels": 4927
+ },
+ "bbox_mm_canonical": {
+  "min": [
+   -35.0,
+   -34.2,
+   -59.2
+  ],
+  "max": [
+   32.7,
+   29.3,
+   45.1
+  ]
+ }
+}

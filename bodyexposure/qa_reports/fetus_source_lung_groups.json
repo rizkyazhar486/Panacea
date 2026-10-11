@@ -1,0 +1,136 @@
+{
+ "summary": {
+  "body": "FETUS",
+  "structures": 14,
+  "extent_m": 0.1043,
+  "tris_total": 170262,
+  "file": "PANACEA_BODY_FETUS_ATLAS.blend"
+ },
+ "structures": [
+  {
+   "id": "FETUS.RESPIRATORY.LUNG.L",
+   "volume_cm3": 15.33,
+   "tris": 27248
+  },
+  {
+   "id": "FETUS.RESPIRATORY.LUNG.R",
+   "volume_cm3": 20.22,
+   "tris": 31834
+  },
+  {
+   "id": "FETUS.DIGESTIVE.LIVER",
+   "volume_cm3": 58.45,
+   "tris": 52304
+  },
+  {
+   "id": "FETUS.DIGESTIVE.STOMACH",
+   "volume_cm3": 6.9,
+   "tris": 11208
+  },
+  {
+   "id": "FETUS.LYMPHATIC.SPLEEN",
+   "volume_cm3": 1.64,
+   "tris": 4504
+  },
+  {
+   "id": "FETUS.URINARY.RENAL_PELVIS.L",
+   "volume_cm3": 0.41,
+   "tris": 1620
+  },
+  {
+   "id": "FETUS.URINARY.RENAL_PELVIS.R",
+   "volume_cm3": 0.46,
+   "tris": 1916
+  },
+  {
+   "id": "FETUS.URINARY.RENAL_PARENCHYMA.L",
+   "volume_cm3": 4.95,
+   "tris": 10088
+  },
+  {
+   "id": "FETUS.URINARY.RENAL_PARENCHYMA.R",
+   "volume_cm3": 4.88,
+   "tris": 10656
+  },
+  {
+   "id": "FETUS.URINARY.BLADDER",
+   "volume_cm3": 4.43,
+   "tris": 7232
+  },
+  {
+   "id": "FETUS.LYMPHATIC.THYMUS",
+   "volume_cm3": 2.62,
+   "tris": 6820
+  },
+  {
+   "id": "FETUS.DIGESTIVE.GALLBLADDER",
+   "volume_cm3": 0.92,
+   "tris": 3052
+  },
+  {
+   "id": "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
+   "volume_cm3": 0.11,
+   "tris": 656
+  },
+  {
+   "id": "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
+   "volume_cm3": 0.2,
+   "tris": 1124
+  }
+ ],
+ "orientation_checks": {
+  "liver_right_of_spleen": true,
+  "stomach_anterior_to_kidney": true,
+  "lungs_above_liver": true,
+  "liver_above_bladder": true,
+  "thymus_above_liver": true
+ },
+ "lung_group_evidence": {
+  "source_label_groups": {
+   "L": [
+    1,
+    2
+   ],
+   "R": [
+    3,
+    4,
+    5
+   ]
+  },
+  "grouping_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
+  "exclusion_source": "https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-lung-segmentation.sh#L280-L281",
+  "source_revision": "7d75fa96162245326f7046bb4df0a41cdeaf7f5c",
+  "excluded_labels": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "individual_lobe_identity": "unresolved",
+  "clinical_validation": "pending",
+  "voxel_counts": {
+   "L": 36334,
+   "R": 47926
+  },
+  "centroids_ras_mm": {
+   "L": [
+    -16.41300148762403,
+    -8.605289241024181,
+    20.281991477123483
+   ],
+   "R": [
+    14.754624677652146,
+    -5.636265316029039,
+    21.187435084742134
+   ]
+  },
+  "parcel_mask_sha256": "5d81b6f91bcc2a6d6e64dfcd97a3099cfdc30cd9826f29d297b3c6983aceee54",
+  "organ_mask_sha256": "4b7bade32fac95a80c622f535c05f6a6f8eab8f1e32ba093cc742b1a5dc6c8b7",
+  "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
+  "older_whole_lung_voxels": 81411,
+  "overlap_with_older_lung_voxels": 76484,
+  "outside_older_lung_voxels": 7776,
+  "older_lung_not_in_parcels_voxels": 4927
+ },
+ "clinical_validation": "pending"
+}
