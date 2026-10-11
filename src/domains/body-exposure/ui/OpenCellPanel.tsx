@@ -39,7 +39,11 @@ export function OpenCellPanel({ baseUrl }: { baseUrl: string }) {
     <details className="rounded-2xl border border-neutral-200 p-3 text-sm dark:border-white/10" data-testid="opencell-panel" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary className="cursor-pointer font-bold">Cell scale: where a protein sits inside a cell</summary>
       <p className="mt-2 text-[13px] text-neutral-600 dark:text-neutral-300">Measured in cultured HEK293T cells, not in the tissue or body shown above.</p>
-      {error && <p className="mt-2 text-[13px] text-amber-800 dark:text-amber-200" role="alert">{error}</p>}
+      {error && <div className="mt-2 space-y-2">
+        <p className="text-[13px] text-amber-800 dark:text-amber-200" role="alert">{error}</p>
+        <button type="button" aria-label="Retry cell-scale data load" onClick={() => setError('')}
+          className="min-h-[44px] rounded-xl border px-3 text-[13px] font-bold">Retry</button>
+      </div>}
       {open && !index && !error && <p className="mt-2 text-[13px]">Loading cell-scale data…</p>}
       {index && (
         <div className="mt-2 space-y-2">
