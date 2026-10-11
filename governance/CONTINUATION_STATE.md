@@ -1,8 +1,13 @@
+### E1 synchronization — 2026-10-11
+
+- PR #2381 initial head 9f9f863e056c92afb06251411ede57308219eb99 received independent AI engineering COMMENT; local full server suite and architecture/ratchet passed. Required CI was still running, not counted as complete.
+- Another contributor integrated #2377 as canonical main ed081e5c44bd414aefd34082ffe290f898cfaf54. Its three observer files do not overlap E1. Ordinary forward synchronization preserves all contributor code; fresh exact-head CI/review remain required. E7 remains NOT_CHECKED.
+
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
 ### Current checkpoint — 2026-10-11, easy-first E1 authentication acceptance
 
-- Inspected canonical main `7c2d3374c14e7dec50bb0f74aca7b17e34776b05`; canonical
+- Inspected canonical main `ed081e5c44bd414aefd34082ffe290f898cfaf54`; canonical
   Alpha remains 22/43 until candidate E1 evidence is integrated. Claim: Sol E1 on
   isolated `test/auth-session-http`; no overlap with active auth test file PRs.
 - E1 adds real HTTP negative/positive session evidence to existing mandatory
