@@ -23,6 +23,18 @@
    "all_systems_tris": 133412
   },
   {
+   "body": "atlas_nervous_mni152",
+   "light_lod": "LOD4",
+   "initial_tris": 68859,
+   "all_systems_tris": 200462
+  },
+  {
+   "body": "fetus",
+   "light_lod": "LOD3",
+   "initial_tris": 6022,
+   "all_systems_tris": 6594
+  },
+  {
    "body": "icrp_adult_female",
    "light_lod": "LOD3",
    "initial_tris": 40252,
@@ -103,9 +115,10 @@
   {
    "body": "vhf_denver_ct_adult_female",
    "light_lod": "LOD4",
-   "initial_tris": 19916,
-   "all_systems_tris": 51808
+   "initial_tris": 19594,
+   "all_systems_tris": 51486
   }
  ],
+ "failures": [],
  "ok": true
 }
