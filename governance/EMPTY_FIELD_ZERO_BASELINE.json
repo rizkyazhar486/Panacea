@@ -19,7 +19,7 @@
     "src/pages/HealthPerformanceLeague.tsx": 1,
     "src/pages/HealthSimulator.tsx": 1,
     "src/pages/LatihanBeban.tsx": 2,
-    "src/pages/MacroLab.tsx": 7,
+    "src/pages/MacroLab.tsx": 4,
     "src/pages/Marketplace.tsx": 1,
     "src/pages/MovementToolkit.tsx": 1,
     "src/pages/NutritionToolkit.tsx": 2,

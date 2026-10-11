@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 24 / 43 = 55.8%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 25 / 43 = 58.1%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,19 +24,19 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 24 |
+| VERIFIED | 25 |
 | REPORTED | 6 |
-| NOT_CHECKED | 11 |
+| NOT_CHECKED | 10 |
 | NOT_STARTED | 1 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
-## Panacea One OS (0 / 8)
+## Panacea One OS (1 / 8)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
 | A1 | Satu identitas pasien dan satu state longitudinal | Satu pasien uji memiliki satu identitas; encounter, anamnesis, dan hasil merujuk ID yang sama (diuji lewat API, bukan UI saja) | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
-| A2 | Encounter dibuat dan dipersist di backend | Encounter yang dibuat tetap ada setelah restart server dan dapat dibaca ulang oleh pengguna berwenang | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
+| A2 | Encounter dibuat dan dipersist di backend | Encounter yang dibuat tetap ada setelah restart server dan dapat dibaca ulang oleh pengguna berwenang | VERIFIED | Sol (backend) / Sonnet (UI setelah kontrak) | server/uji/encounterHttpRestart.uji.ts, imported by rekamEncounter.uji.ts in mandatory server npm run uji: actual application HTTP with temporary file persistence, random session secret and synthetic identities. Configured owner verifies doctor through the real API after an unverified-doctor denial; verified doctor creates patient, signs record with authenticated server-stamped identity/time/provenance, and closes encounter.; Application process exits before a new process starts on the same isolated file. Original doctor token reads the exact closed encounter and complete provenance, original signed record and distinct unsigned successor; current pointer and patient identity persist. Anonymous, unrelated patient and unverified doctor reads/writes/close are rejected 401/403; record/patient mismatch is rejected 400; even a verified doctor cannot close unsigned successor (409). Rejections leave snapshots and records unchanged.; Targeted HTTP/encounter fixture, full server npm run uji, server typecheck/build and standalone strict fixture typecheck pass. Removing actual closeEncounter snapshot persistence fails the named post-restart assertion; production source restored before final clean suites. Independent AI engineering review reproduced the actual HTTP restart fixture successfully and found no substantive bounded finding; this is not human clinical approval.; Technical encounter persistence acceptance in actual file-mode application processes, not Mongo encounter restart evidence, production patient-care verification, A1 longitudinal closure, A3/E2 completeness or human clinical authorization. Synthetic signing remains clinically_reviewed=false; clinician identity is obtained through the controlled owner-verification workflow. |
 | A3 | Anamnesis tercatat dengan provenance | Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
 | A4 | Pemeriksaan dikendalikan klinisi | Entri pemeriksaan hanya dapat dibuat/diubah oleh peran klinisi terotorisasi; peran lain ditolak (tes negatif) | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
 | A5 | Dokumentasi berbantuan AI berstatus draf | Keluaran AI tersimpan sebagai draf, tidak pernah sebagai catatan bertanda tangan, sampai klinisi teridentifikasi menyetujui | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
