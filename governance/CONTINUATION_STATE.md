@@ -1,3 +1,10 @@
+### Body Exposure compartment filtering and mobile CI diagnosis — 2026-10-11
+
+- Canonical main observed: 28df18e7a9daa2741ba1903db40e7c01a86be77d, preserving Claude's calculator export. #2403 implements location-only browsing and combined identifier/location filtering over the existing 1,310 OpenCell HEK293T proteins and 17 published locations; all annotation grades remain visible. No new dataset, geometry, clinical approval or production release is claimed.
+- Eight regression tests pass; typecheck and build passed before the calculator-export synchronization. Fresh synchronized automation remains required. Local browser reached Vessels and the biomechanics tab, then failed atlas-label visibility; an independent blank-page check reproduces zero-width font metrics in this local Chromium environment, so local browser acceptance is not claimed.
+- Two exact-head downstream CI runs failed the Vessels normal click despite #2390's viewport reveal. Diagnostic-only commits now capture control/ancestor geometry without forcing clicks, changing timeouts or removing checks: #2390 head 968df174ad68d88b5e61792aa329269630d6d470 and #2383 head 1011a1ed03826fb0628c6b94b8965fc9e28400d6. Required source fixes and fresh current-main checks are outstanding before integration.
+- Unmerged chain: #2390 → #2396 → #2383 → #2397 → #2399 → #2403. E2 remains REPORTED; canonical Alpha remains 24/43 at this observation. Human acceptance belongs to the owner's team. Configured production release is pending; no background execution is promised.
+
 ### Lab/referral HTTP authorization implementation — 2026-10-11
 
 - Follows serialized #2390 → #2396 → #2383 → #2397. New fixture extends the mandatory existing hasilLab suite with nine actual HTTP route decisions, stored own/foreign patient data, effective unverified doctor limits, owner-versus-clinician separation, authenticated provenance and exact no-mutation assertions for all rejected calls. No runtime route, role or clinical threshold changes.
