@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
@@ -52,6 +52,33 @@ test('real Git fixture records exact checkout, ignored output, edits and untrack
     writeFileSync(join(root, 'input.txt'), 'original\n')
     writeFileSync(join(root, 'unexpected.txt'), 'untracked input\n')
     assert.equal(readFrontendGitState(root).dirty, true)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('Vercel link and environment output leave a committed release source clean', () => {
+  const root = mkdtempSync(join(tmpdir(), 'panacea-vercel-source-'))
+  const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  try {
+    git('init', '-q')
+    const target = join(root, '.gitignore')
+    writeFileSync(target, readFileSync(new URL('../../.gitignore', import.meta.url)))
+    git('add', '.')
+    git('-c', 'user.name=Build fixture', '-c', 'user.email=build@localhost.test', 'commit', '-qm', 'fixture')
+    const commit = git('rev-parse', 'HEAD')
+    // Vercel CLI 59.11.7 addToGitIgnore checks exact lines, not Git's pattern
+    // semantics. Link adds .vercel; its environment download adds .env.local.
+    for (const name of ['.vercel', '.env.local']) {
+      const before = readFileSync(target, 'utf8')
+      if (!before.split('\n').includes(name)) writeFileSync(target, `${before}${name}\n`)
+    }
+    mkdirSync(join(root, '.vercel'))
+    writeFileSync(join(root, '.vercel/project.json'), '{}\n')
+    writeFileSync(join(root, '.env.local'), 'FIXTURE_ONLY=synthetic\n')
+    assert.equal(git('check-ignore', '.vercel/project.json', '.env.local'), '.vercel/project.json\n.env.local')
+    assert.equal(readFrontendGitState(root).dirty, false, 'CLI setup must not change committed ignore rules')
+    assert.equal(writeFrontendBuildInfo(root, commit).commitSha, commit, 'the clean configured release must still pass')
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
