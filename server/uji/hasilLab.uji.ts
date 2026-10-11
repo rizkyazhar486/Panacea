@@ -318,3 +318,5 @@ console.log('hasilLab.uji: ok')
 
 // Real HTTP lab/referral role and patient-ownership boundaries.
 await import("./labReferralHttpRbac.uji.js")
+// Real HTTP lab-log and clinician lab-share role, ownership and revocation boundaries.
+await import("./labShareHttpRbac.uji.js")
