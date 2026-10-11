@@ -1,3 +1,35 @@
+### A2 forward synchronization with delivered Body Exposure — 2026-10-11
+
+- Canonical main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's #2394 illustrative heartbeat. Forward merge preserves its implementation and labels; A2 runtime/tests are unchanged. Fresh exact-head automated checks follow this synchronization; no additional AI review is requested and no clinical approval or deployment is claimed.
+
+### A2 synchronized implementation — 2026-10-11
+
+- Canonical main cfc604eb95684647be09f7b17eefeb2f41b0d933 advances existing contributor Body Exposure, lab UI and calculator work; canonical Alpha is 24/43. Ordinary forward merge preserves those files and regenerates the Alpha document from combined JSON. A2 candidate is 25/43, not canonical completion until integrated.
+- Earlier A2 head 24355c49b5c271154b08a76dd8b5f8b674b74aea passed all ten exact-head checks. Those checks are historical after synchronization; current-head automated gates must pass again. New AI review rounds are deferred under the owner's latest directive; no human or clinical review is claimed.
+- RBAC populated-patient test candidate remains isolated; E2 stays REPORTED. No deployment or clinical authorization is claimed. Reuse existing anatomy resources; no large dataset download is planned.
+
+### A2 real HTTP restart acceptance candidate — 2026-10-11
+
+- Baseline canonical main 9c4414cf79b64d42c8c7e3855874d9455a047c7e has Alpha 23/43. Candidate A2 changes only encounter tests, its ledger evidence/generated document and this checkpoint; runtime code and other criteria remain unchanged.
+- Actual HTTP owner verification, clinician signing/closing, authenticated server provenance and a second application process reproduce preserved closed snapshot plus unsigned successor. Paired anonymous/foreign/unverified/mismatched/unsigned negatives preserve data. Mongo/providers are disabled and all identities/data are synthetic; clinically_reviewed remains false.
+- Targeted and full server suites, build, server typecheck, standalone strict fixture typecheck pass. Actual closeEncounter persistence removal fails the named post-restart assertion; restored source passed clean suites. Independent engineering review and required fresh exact-head CI/integration remain separate gates; canonical A2 is not credited until integration.
+- #2356 resolver integrated as canonical 9c4414cf79b64d42c8c7e3855874d9455a047c7e, parent 512de7c, accepted tree 00f1dfc1760bd57d26a8a229dfa5fae807805ca7 matching head d260ef2; all eight exact-head checks passed with independent AI COMMENT 5481915822. Canonical E1 main 512de7c has successful build, full/render acceptance, Mongo, server, security, clinical evidence and live genomics smoke checks. Deployment runs are skipped/cancelled, not delivery; no new production revision is claimed.
+- Next independent foundation: A1 actual shared patient identity across history, encounter and lab data; E2 broader HTTP RBAC. Active E3 #2367, frontend #2351/#2369 and date #2354 ownership stay preserved. E7 remains NOT_CHECKED.
+
+- A1 read-only diagnosis at this revision: same-ID cross-API fixture is feasible, but /api/keadaan-longitudinal excludes persistent clinical.hasilLab and intake validates patientId syntax without checking existing patient/encounter linkage. A2 does not close those aggregate/integrity gaps. Controlled existing-patient isolation reproduction denied p1 to two separate accounts and admitted only a doctor-linked account; no P0 exposure was reproduced.
+
+### Serialized integration contract — 2026-10-11
+
+- Merge order: existing mobile Vessels control fix #2390, then protein lookup #2396, then A2 encounter fixture #2383. Each downstream candidate contains its upstream implementation before exact-head automated CI. Before every merge, current-main merge-tree must equal the accepted candidate tree; any new source delta requires synchronization and fresh checks. No concurrent main merge or forced update.
+- Vercel connector inspection of configured panaceamed/panacea returned scope 403; no local authenticated Vercel CLI is available. Existing GitHub production workflow remains the authorized deployment route; production is pending, not inferred from build success.
+
+### Body Exposure protein lookup implementation — 2026-10-11
+
+- Baseline main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's illustrative heartbeat #2394; ownership and simulation labels are preserved. Canonical Alpha is 24/43; no criterion changes in this task.
+- Reused the existing OpenCell index (1,310 proteins). Inventory found 1,196 existing GLB derivatives; no anatomical datasets were downloaded or regenerated. Malformed name/UniProt metadata previously passed parsing and crashed protein search; nullable-string guards now reject it. Exact, case-insensitive Ensembl lookup enables existing stable identifiers, without partial-ID matches.
+- Regression assertions failed before each fix and passed afterward (7 OpenCell tests; 15 including synchronized heartbeat tests). Full frontend suite passed 692/692, full build and architecture/ratchet passed on pre-heartbeat baseline; a final synchronized candidate receives fresh automated CI. Actual published measurements, licences and clinical-review states are unchanged; no production deployment is claimed.
+- A2 #2383 and isolated populated-patient RBAC remain pending integration. Latest owner directive defers new AI/human review rounds; required automated checks and branch protections remain intact. Partial lab/referral fixture in its isolated worktree is unfinished and not release code.
+
 ### Canonical E1 completion and next resolver task — 2026-10-11
 
 - Canonical main 512de7c39d6029a4a9b06c50231a7eea7ad597e1 integrates #2381 with parent 397157fb9da7ea53b8eee2b88d3b97feb750ae7e. Accepted tree d53a23e2ae567847e082d267cc0131627a60c0f6 matches exact head d963f7e71f7453ea715d4c404f40b3e756f5d556; all ten checks passed (Validate, Stabilization, Body 3D, Mongo, Render backend, Security inventory/enforcement, Clinical Evidence) plus CodeRabbit. Independent AI COMMENT 5481894786 is engineering review, not human clinical approval.

@@ -218,6 +218,10 @@ risks:
       (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
       browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
       that still model the person independently).
+      2026-10-11: actual synthetic HTTP clinician signing/closing and file-mode process restart
+      reproduce encounter provenance and unsigned successor (A2 candidate only). Persistent clinical.hasilLab
+      remains outside /api/keadaan-longitudinal; lab-result intake checks patientId syntax without existing
+      patient/encounter linkage. Shared-ID API evidence alone does not close unified aggregate readiness.
     evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
 
   - risk_id: risk.feature_sprawl
