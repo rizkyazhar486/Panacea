@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { createPresentationLighting, AnatomicalLightingControls, type PresentationLighting } from '../domains/body-exposure'
+import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
@@ -103,6 +103,9 @@ function variantLabel(id: string, label?: string) {
   return `${age ? `${age} y · ` : ''}${sex.charAt(0)}${sex.slice(1).toLowerCase()}`
 }
 
+// paru yang digerakkan model napas: parenkim saja (bukan bronkus, trakea, pleura); hanya tubuh dewasa (data sumber: pasien dewasa)
+const isLung = (u: Record<string, unknown>) => u.panacea_system === 'respiratory' && /(^lung$)|(lobe of (left|right) lung)/i.test(String(u.canonical_name ?? ''))
+const BREATHING_BODIES = /^(HUMAN\.ADULT|ICRP\.ADULT)\./
 const fileTag = (bodyId: string) => bodyId.replace('HUMAN.', '').replaceAll('.', '_').toLowerCase()
 
 function statusTone(s: string): 'normal' | 'low' | 'neutral' {
@@ -134,6 +137,10 @@ export function CanonicalBody() {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({ structures: 0, tris: 0, ms: 0 })
   const [anchors, setAnchors] = useState<AnchorIndex | null>(null)
+  const [respModel, setRespModel] = useState<RespiratoryModel | null>(null)
+  const [breathing, setBreathing] = useState(false)
+  const [lungCount, setLungCount] = useState(0)
+  const [breathReadout, setBreathReadout] = useState<{ cycle: number; volumeMl: number; si: number } | null>(null)
   const [ontology, setOntology] = useState<Record<string, { id: string; label: string }> | null>(null)
   // ── gerak rig (kerangka beranimasi); jam berbasis waktu nyata, lihat engine/motionTimeline ──
   const [motionOn, setMotionOn] = useState(false)
@@ -183,6 +190,7 @@ export function CanonicalBody() {
       .then(setMatrix)
       .catch((e) => setError(`Body index could not be loaded (${e.message}).`))
     fetch(`${BASE}anchors_adult_male.json`).then((r) => (r.ok ? r.json() : null)).then(setAnchors).catch(() => setAnchors(null))
+    fetch(`${BASE}respiration_model.json`).then((r) => (r.ok ? r.json() : null)).then((j) => { const p = parseRespiratoryModel(j); setRespModel(p.ok ? p.model : null) }).catch(() => setRespModel(null))
   }, [])
 
   const body = matrix?.bodies.find((b) => b.body_id === entryId)
@@ -489,7 +497,7 @@ export function CanonicalBody() {
       s.root.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
       })
-      s.root.clear(); s.groups.clear(); s.byId.clear()
+      s.root.clear(); s.groups.clear(); s.byId.clear(); setLungCount(0); setBreathing(false)
     }
     const todo = systems.filter((sys) => enabled.has(sys) && !L.loaded.has(sys))
     if (!todo.length) {
@@ -531,6 +539,7 @@ export function CanonicalBody() {
       if (failed.length) setError(`${failed.length} system file(s) could not be loaded.`)
       else if (!L.inflight) setError('')
       setStats({ structures: s.byId.size, tris: Math.round(L.tris), ms: Math.round(performance.now() - t0) })
+      setLungCount([...s.byId.values()].filter((o) => isLung(o.userData)).length)
       if (reset || !bodyBox.current) { bodyBox.current = new THREE.Box3().setFromObject(s.root); frame() }
       applyVisibility()
       applyDisperse(disperse)
@@ -666,6 +675,41 @@ export function CanonicalBody() {
     })
   }
 
+  // napas: skala dan geser paru dari model CT 4D (pasien lain), dipindahkan ke tubuh ini; kembali ke posisi awal saat dimatikan atau tubuh berganti
+  useEffect(() => {
+    const s = sceneRef.current
+    if (!breathing || !respModel || !s || loading || !BREATHING_BODIES.test(bodyId)) return
+    const lungs = [...s.byId.values()].filter((o) => isLung(o.userData))
+    if (!lungs.length) return
+    const rest = lungs.map((o) => ({ o, p: o.position.clone(), sc: o.scale.clone() }))
+    const centre = new THREE.Vector3()
+    for (const r of rest) centre.add(r.p)
+    centre.divideScalar(rest.length)   // pusat bersama dalam koordinat lokal induk (semua paru satu grup sistem)
+    const t0 = performance.now()
+    let raf = 0
+    let lastReadout = 0
+    const tick = () => {
+      const smp = sampleRespiration(respModel, cycleAt((performance.now() - t0) / 1000, DEFAULT_BREATH_PERIOD_S))
+      // kanonik (X kiri, Y posterior, Z superior) → three (X, Y atas, Z anterior): skala (lr, si, ap), geser (lr, si, −posterior)
+      const S = new THREE.Vector3(smp.scale[0], smp.scale[2], smp.scale[1])
+      const sh = new THREE.Vector3(smp.centroidShiftMm[0], smp.centroidShiftMm[2], -smp.centroidShiftMm[1]).multiplyScalar(0.001)
+      for (const r of rest) {
+        r.o.scale.copy(r.sc).multiply(S)
+        r.o.position.copy(r.p).sub(centre).multiply(S).add(centre).add(sh)
+      }
+      s.invalidate()
+      const now = performance.now()
+      if (now - lastReadout >= 250) { lastReadout = now; setBreathReadout({ cycle: cycleAt((now - t0) / 1000, DEFAULT_BREATH_PERIOD_S), volumeMl: smp.volumeMl, si: smp.scale[2] }) }  // leluasa: 4 kali per detik, bukan tiap frame
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(raf)
+      for (const r of rest) { r.o.position.copy(r.p); r.o.scale.copy(r.sc) }
+      s.invalidate(); setBreathReadout(null)
+    }
+  }, [breathing, respModel, bodyId, loading, lungCount])
+
   const landmarks = useMemo(() => {
     if (!picked || !anchors) return []
     return anchors.by_structure[picked.id] ?? []
@@ -754,6 +798,19 @@ export function CanonicalBody() {
             {activeVariant?.individual && <span className="basis-full" data-testid="variant-individual">{activeVariant.individual}</span>}
           </div>
         )}
+        <details className="mt-3 text-[13px] text-neutral-700 dark:text-neutral-200" data-testid="data-gaps">
+          <summary className="cursor-pointer font-bold">What is missing and why ({DATA_GAPS.length})</summary>
+          <ul className="mt-2 space-y-2">
+            {DATA_GAPS.map((g) => (
+              <li key={g.id} className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
+                <p className="font-bold">{g.label} <Badge tone="neutral">{GAP_STATUS_LABEL[g.status]}</Badge></p>
+                <p>{g.reason}</p>
+                <p className="text-neutral-500 dark:text-neutral-400">To unblock: {g.unblock}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[12px] text-neutral-500">Nothing on this list is replaced by a scaled adult model or invented motion.</p>
+        </details>
       </Card>
 
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#07080b]">
@@ -774,6 +831,14 @@ export function CanonicalBody() {
               </button>
             </div>
           )}
+          {respModel && lungCount > 0 && BREATHING_BODIES.test(bodyId) && (
+            <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
+              <button onClick={() => setBreathing((b) => !b)} aria-pressed={breathing} disabled={motionOn}
+                className={`min-h-[36px] rounded-full px-3 text-[12px] font-bold disabled:opacity-40 ${breathing ? 'bg-[#9be7a5] text-[#0b0c0e]' : 'text-white/80'}`}>
+                {breathing ? 'Stop breathing' : 'Breathing'}
+              </button>
+            </div>
+          )}
           {/* alat ukur di toolbar kanvas: tetap terlihat saat mengetuk anatomi (tidak menggulir keluar) */}
           <div className="pointer-events-auto flex rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur">
             <button onClick={() => { setMeasuring((m) => !m); setDisperse(0) }} aria-pressed={measuring}
@@ -791,6 +856,12 @@ export function CanonicalBody() {
           </div>
         </div>
         <div ref={mountRef} className="h-[62vh] min-h-[420px] w-full" data-testid="canonical-body-canvas" />
+        {breathing && respModel && (
+          <p data-testid="breathing-note" className="border-t border-white/10 bg-black/60 px-3 py-2 text-[11px] leading-snug text-white/70">
+            {respModel.label} Source: {respModel.source} ({respModel.licence}). Playback is {Math.round(60 / DEFAULT_BREATH_PERIOD_S)} breaths per minute, a viewer setting: the CT does not record the breathing rate.
+            {breathReadout && <span data-testid="breathing-readout"> Model at {Math.round(breathReadout.cycle * 100)} % of the breath: lung volume {Math.round(breathReadout.volumeMl).toLocaleString('en')} mL (mean of the source patients), superior-inferior size ×{breathReadout.si.toFixed(3)}.</span>}
+          </p>
+        )}
         {measuring && (
           <div className="pointer-events-none absolute inset-x-3 bottom-12 text-center text-[12px] font-bold text-[#7ee0ff]">
             {measureMm === null ? 'Tap two points on the anatomy' : `${measureMm.toFixed(1)} mm · straight line`}
