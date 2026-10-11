@@ -68,7 +68,14 @@ tsd_s0196_older_adult_female.* — TotalSegmentator dataset v2.0.1 (Wasserthal J
                structures in CT images. Radiology: Artificial Intelligence 2023; Zenodo 10047292), CC BY 4.0. One 73-year-old female
                subject (s0196): reference segmentations made with iterative nnU-Net and corrected by a radiologist; CT resampled to
                1.5 mm and cropped by the dataset authors. Marching-cubes surfaces, smoothed and decimated for the web. Partial body
-               (head to upper thighs), 16 structures cut by the scan border. Not an atlas, not clinically reviewed.
+               (neck to upper thighs, a cut piece of the skull), 16 structures cut by the scan border. Not an atlas, not clinically reviewed.
+               Second subject tsd_s0327_older_adult_male.* (s0327, male, 72 years): same dataset and method, lower neck to upper thighs,
+               21 structures cut by the scan border, only a cut piece of the skull.
+
+opencell_index.json — OpenCell (Chan Zuckerberg Biohub; "OpenCell on AWS", https://registry.opendata.aws/czb-opencell), CC BY-SA 4.0
+               (share-alike: this file is distributed under the same licence). Cho NH, Cheveralls KC, Brunner AD, et al. Science 375:eabi6983
+               (2022). Localisation of 1,310 endogenously tagged proteins and their abundance in cultured HEK293T cells; measured in a cell
+               line, not in the tissue or body shown. Not clinically reviewed.
 
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.

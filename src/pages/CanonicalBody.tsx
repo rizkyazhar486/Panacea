@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
+import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
@@ -117,6 +117,7 @@ function statusTone(s: string): 'normal' | 'low' | 'neutral' {
 export function CanonicalBody() {
   const [matrix, setMatrix] = useState<BodyMatrix | null>(null)
   const [error, setError] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
   const [entryId, setEntryId] = useState('HUMAN.ADULT.MALE')
   const [variantId, setVariantId] = useState<string | null>(null)
   // default ringan di semua layar: muatan awal tiap tubuh ≤ 80.000 segitiga (gerbang check_web_budget.py)
@@ -191,7 +192,7 @@ export function CanonicalBody() {
       .catch((e) => setError(`Body index could not be loaded (${e.message}).`))
     fetch(`${BASE}anchors_adult_male.json`).then((r) => (r.ok ? r.json() : null)).then(setAnchors).catch(() => setAnchors(null))
     fetch(`${BASE}respiration_model.json`).then((r) => (r.ok ? r.json() : null)).then((j) => { const p = parseRespiratoryModel(j); setRespModel(p.ok ? p.model : null) }).catch(() => setRespModel(null))
-  }, [])
+  }, [retryCount])
 
   const body = matrix?.bodies.find((b) => b.body_id === entryId)
   const hasFiles = (id: string) => (matrix?.files ?? []).some((f) => f.startsWith(fileTag(id) + '.'))
@@ -550,7 +551,7 @@ export function CanonicalBody() {
       else if (want && failed.length) pendingSelect.current = null
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyId, lod, systems, enabled])
+  }, [bodyId, lod, systems, enabled, retryCount])
 
   useEffect(() => { applyVisibility() })  // sistem, mode, pilihan
 
@@ -970,7 +971,24 @@ export function CanonicalBody() {
         </div>
       </Card>
 
-      {error && <Card><p className="text-sm text-red-700 dark:text-red-300">{error}</p></Card>}
+      {error && (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p role="alert" className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => {
+                setError('')
+                setRetryCount((count) => count + 1)
+              }}
+              className="min-h-10 rounded-full border border-brand px-4 text-sm font-semibold text-brand disabled:cursor-wait disabled:opacity-50"
+            >
+              Retry existing anatomy assets
+            </button>
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div className="flex flex-wrap gap-2" aria-label="Body systems">
@@ -1051,6 +1069,8 @@ export function CanonicalBody() {
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Tap a structure in the body, or search for one by name.</p>
         )}
       </Card>
+
+      <OpenCellPanel baseUrl={BASE} />
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
         Adult male: Z-Anatomy / BodyParts3D (CC BY-SA 4.0), with reconstructed intervertebral discs and pericardium.

@@ -119,6 +119,12 @@
    "all_systems_tris": 117382
   },
   {
+   "body": "tsd_s0327_older_adult_male",
+   "light_lod": "LOD4",
+   "initial_tris": 70926,
+   "all_systems_tris": 119414
+  },
+  {
    "body": "vhf_denver_ct_adult_female",
    "light_lod": "LOD4",
    "initial_tris": 19594,

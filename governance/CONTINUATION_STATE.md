@@ -1,3 +1,9 @@
+### A2 synchronized implementation — 2026-10-11
+
+- Canonical main cfc604eb95684647be09f7b17eefeb2f41b0d933 advances existing contributor Body Exposure, lab UI and calculator work; canonical Alpha is 24/43. Ordinary forward merge preserves those files and regenerates the Alpha document from combined JSON. A2 candidate is 25/43, not canonical completion until integrated.
+- Earlier A2 head 24355c49b5c271154b08a76dd8b5f8b674b74aea passed all ten exact-head checks. Those checks are historical after synchronization; current-head automated gates must pass again. New AI review rounds are deferred under the owner's latest directive; no human or clinical review is claimed.
+- RBAC populated-patient test candidate remains isolated; E2 stays REPORTED. No deployment or clinical authorization is claimed. Reuse existing anatomy resources; no large dataset download is planned.
+
 ### A2 real HTTP restart acceptance candidate — 2026-10-11
 
 - Baseline canonical main 9c4414cf79b64d42c8c7e3855874d9455a047c7e has Alpha 23/43. Candidate A2 changes only encounter tests, its ledger evidence/generated document and this checkpoint; runtime code and other criteria remain unchanged.

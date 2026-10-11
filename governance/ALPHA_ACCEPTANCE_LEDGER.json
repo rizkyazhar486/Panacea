@@ -192,10 +192,13 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "UI tinjauan klinisi atas hasil",
    "acceptance": "Klinisi dapat meninjau hasil dan mengubah state lewat API; UI memakai kontrak backend",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "src/pages/LabResultReview.tsx (/doctor-review/lab-results, #2351): antrean hasil lab untuk dokter/owner di atas kontrak backend #2346 (api.labResultsList/labResultAdvance); model murni src/domains/lab-results/model/labResultQueue.ts dengan scripts/uji/lab-result-queue.mts (positif, negatif berpasangan, batas, tanpa efek samping).",
+    "qa/lab-result-review-clinician-e2e.mjs: server NYATA + Chromium 390x844. Dokter belum terverifikasi ditolak server (>=400) dan tidak boleh memverifikasi dirinya sendiri (403); pemilik memverifikasi lewat /api/doctors/:id/verify (200); klinisi lalu memajukan satu hasil received→pending_review→reviewed→communicated→closed lewat UI. Dijalankan lokal pada server baru: \"OK status closed steps 4\"."
+   ],
    "owner": "Sonnet (setelah kontrak tersedia)",
-   "note": "Menunggu kontrak data dari Sol."
+   "note": "Belum VERIFIED: E2E dijalankan lokal (bukan gerbang CI), dan verifikasi STR dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi nyata. Aturan alur lab belum ditinjau klinis; server tetap otoritas atas siapa yang boleh menandai reviewed."
   },
   {
    "id": "B8",
@@ -265,10 +268,14 @@
    "pillar": "Clinical Calculators",
    "criterion": "Status review klinis eksplisit per fungsi",
    "acceptance": "Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "governance/CALCULATOR_REVIEW_REGISTRY.json: 43 mesin kalkulator, semuanya PENDING_CLINICAL_REVIEW dengan clinically_reviewed=false; 4 modul pembantu dikecualikan eksplisit dengan alasan.",
+    "src/domains/clinical-calculators/engine/reviewRegistry.ts + scripts/uji/calculator-review-registry.mts (bagian npm run uji, dijalankan di CI): menolak mesin tanpa entri, entri yatim/ganda, dan status ditinjau tanpa peninjau, tanggal ISO, atau bukti.",
+    "Sabotase: berkas engine baru tanpa entri → uji gagal dengan nama (\"zzSabotage: engine-without-review-entry\"); dihapus kembali → lulus."
+   ],
    "owner": "Sonnet",
-   "note": "Label batas klaim ada, tetapi belum ada registri status review per fungsi."
+   "note": "VERIFIED hanya untuk kriteria penandaan yang dapat diperiksa mesin. Ini label status, BUKAN tinjauan klinis: tidak ada peninjau yang ditunjuk dan semua mesin tetap clinically_reviewed=false (C6 tetap PENDING_CLINICAL_REVIEW)."
   },
   {
    "id": "C5",
