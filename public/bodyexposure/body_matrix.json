@@ -237,13 +237,24 @@
   },
   {
    "body_id": "HUMAN.OLDER_ADULT",
-   "status": "placeholder",
-   "source": null,
-   "source_requirement": "No open age-specific (\u226565 y) whole-body anatomical phantom found.",
+   "status": "source_backed_partial",
+   "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0; one 73-year-old female subject",
+   "source_requirement": null,
    "redistribution": null,
    "structures": 0,
    "systems": {},
-   "variants": []
+   "variants": [
+    {
+     "body_id": "TSD_S0196.OLDER_ADULT.FEMALE",
+     "structures": 111,
+     "label": "73 y female (head to upper thighs)",
+     "status": "source_backed_partial",
+     "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
+     "stature_m": null,
+     "coverage": "partial body: head (skull only, no brain), torso and upper thighs; no limbs below mid-thigh, no forearms, no skin",
+     "individual": "One individual from the dataset (subject s0196: female, 73 years, CT angiography neck to leg, pathology label none), not an atlas and not a reference older adult. Segmentations are model-assisted and corrected by a radiologist, CT resampled to 1.5 mm and cropped by the dataset authors; 16 structures are cut by the scan border. Not clinically reviewed."
+    }
+   ]
   },
   {
    "variants": [
@@ -461,6 +472,16 @@
   "pediatric_neonate_male.skeletal",
   "pediatric_neonate_male.surface",
   "pediatric_neonate_male.urinary",
+  "tsd_s0196_older_adult_female.cardiovascular",
+  "tsd_s0196_older_adult_female.digestive",
+  "tsd_s0196_older_adult_female.endocrine",
+  "tsd_s0196_older_adult_female.joint",
+  "tsd_s0196_older_adult_female.lymphatic",
+  "tsd_s0196_older_adult_female.muscular",
+  "tsd_s0196_older_adult_female.nervous",
+  "tsd_s0196_older_adult_female.respiratory",
+  "tsd_s0196_older_adult_female.skeletal",
+  "tsd_s0196_older_adult_female.urinary",
   "vhf_denver_ct_adult_female.joint",
   "vhf_denver_ct_adult_female.muscular",
   "vhf_denver_ct_adult_female.skeletal"
@@ -470,7 +491,8 @@
   "adult_female": "LOD4",
   "vhf_denver_ct_adult_female": "LOD4",
   "fetus": "LOD3",
-  "atlas_nervous_mni152": "LOD4"
+  "atlas_nervous_mni152": "LOD4",
+  "tsd_s0196_older_adult_female": "LOD4"
  },
  "motion": {
   "adult_male": {

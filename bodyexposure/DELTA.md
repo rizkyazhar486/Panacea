@@ -282,3 +282,6 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 ## Respiratory motion and missing-data states
 - `pipeline/respiratory_4dlung.py` derives a breathing model from TCIA 4D-Lung (CC BY 3.0; 4 of 6 cases pass the checks) into `public/bodyexposure/respiration_model.json`; `engine/respiratoryMotion.ts` validates it fail-closed and samples it periodically; the viewer has a "Breathing" button for adult bodies with lungs. ACDC and DIR-Lab stay blocked until their terms are verified.
 - `engine/dataGaps.ts` and the "What is missing and why" disclosure state what is not available (heartbeat, pregnancy, older adult, fetal skeleton/skin, individual hand bones, right forearm near the elbow, clinical review) instead of showing a scaled or invented substitute.
+
+## Older adult (individual, partial)
+- New `tsd_classes.py`, `tsd_masks_to_stl.py`, `build_tsd_body.py`: one 73-year-old woman from the TotalSegmentator dataset (CC BY 4.0), 111 structures, partial body (head to upper thighs), registered as the variant of `HUMAN.OLDER_ADULT`. The data-gaps list now says what is still missing for older adults.
