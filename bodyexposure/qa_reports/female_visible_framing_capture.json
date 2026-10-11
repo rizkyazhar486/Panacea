@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "blender_version": "5.2.2 LTS",
+  "input_artifacts": [
+    {
+      "path": "/private/tmp/panacea-female-isolated-v011-framed/anatomy_render_body.blend",
+      "bytes": 143292642,
+      "sha256": "cb1d1e55547734dfdf8b64bfc850590892a93d2d8cea5af3f6c0e2e610aec8c0"
+    },
+    {
+      "path": "/private/tmp/panacea-visible-framing-frozen-20261011/render_cinematic.py",
+      "bytes": 14895,
+      "sha256": "201c68d9334ae970d7c23b77c510b2d7589b991adeeef3232a8add41d5df998c"
+    },
+    {
+      "path": "/private/tmp/panacea-visible-framing-frozen-20261011/render_benchmarks.py",
+      "bytes": 8331,
+      "sha256": "17dde5d6379aa73d5025e11f328ddb134a9d9b04c2740e3360b0cd83c7a733bc"
+    },
+    {
+      "path": "/private/tmp/panacea-visible-framing-frozen-20261011/render_camera.py",
+      "bytes": 2099,
+      "sha256": "cb444acc81355e9cc7c4e86e85d951c45735bf467c6c68e25a7bbc45d0b220b0"
+    }
+  ],
+  "inputs_unchanged": true,
+  "clinical_validation": "pending",
+  "profile": "preview",
+  "benchmark": "female_layered",
+  "device_backend": "METAL",
+  "devices": [
+    "Apple M4 (GPU - 10 cores)"
+  ],
+  "audit": {
+    "visible_meshes": 841,
+    "source_polygons": 4467873,
+    "meshes_without_uv": 833,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 841
+    },
+    "suppressed_display_instances": []
+  },
+  "renders": [
+    {
+      "variant": "after",
+      "path": "female_layered_preview_after.png",
+      "sha256": "b6edf0da1e6bbb8ad4cabe0d9a09f4ed5e4ca645a4083c3b2f29363b5c2981d6",
+      "render_seconds": 11.451,
+      "process_memory": {
+        "peak_rss_bytes": 1127038976,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 500.0087890625,
+          "diameter_metres": 1.0833427906036377,
+          "location_metres": [
+            -2.5303804874420166,
+            -0.6165890097618103,
+            1.9690513610839844
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 125.002197265625,
+          "diameter_metres": 1.5000131130218506,
+          "location_metres": [
+            0.3313995599746704,
+            -2.3918445110321045,
+            1.1237984895706177
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 333.33917236328125,
+          "diameter_metres": 0.7500065565109253,
+          "location_metres": [
+            1.9744319915771484,
+            0.6034049987792969,
+            1.7925245761871338
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation or browser FPS measurement performed.",
+    "RSS is the OS process-lifetime high-water mark, not GPU memory or per-frame allocation.",
+    "Sample limits are requested ceilings; adaptive sampling/time limits may stop earlier.",
+    "External linked libraries and unpacked textures are not inventoried by this report.",
+    "Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.",
+    "Timings include scene synchronization and sequential cache effects."
+  ],
+  "camera_framing": {
+    "mode": "visible_meshes",
+    "camera": "CAM.FEMALE.ANTERIOR_34.R",
+    "mesh_count": 841,
+    "margin": 1.1,
+    "ortho_scale": 3.299872636795044
+  }
+}

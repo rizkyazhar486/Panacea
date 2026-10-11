@@ -13,6 +13,7 @@ workflow with a skipped required job, or a superseded run cannot authorize relea
 | `clinical-evidence.yml` | `clinical-evidence` |
 | `security-baseline-enforcement.yml` | `enforce` |
 | `dependency-audit.yml` | `dependency-audit` |
+| `mongo-persistence.yml` | `mongo-persistence` |
 
 Evidence must identify the exact SHA, main branch, run, latest attempt and required
 job. The verifier reads all bounded API pages, pins job reads to the run attempt,
@@ -40,3 +41,7 @@ Vercel quota deferral and deployment concurrency remain in effect.
 Gate passage is technical evidence. It does not supply qualified clinical review,
 clinical-use authorization, a successful deployment, or production revision proof.
 Verify deployment execution, live smoke results and deployed revision separately.
+
+The retained release evidence includes the post-build acceptance recheck outcome.
+If that check fails, is cancelled or never runs, the artifact reports
+`BLOCKED_RELEASE_GATES`; deploy/smoke outputs alone cannot establish shipment.

@@ -1,4 +1,5 @@
 import { fetchLeagueScoreboard, UNAVAILABLE } from '../src/sports'
+await import('./meetFeeHttp.uji.js')
 
 let lulus = 0
 let gagal = 0

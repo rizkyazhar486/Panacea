@@ -6,6 +6,29 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.mongo_save_order_and_shutdown_drain
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Shutdown could exit while a Mongo write was active. Concurrent snapshots
+      could let an older slice deletion erase newer lab/referral records.
+    mitigation: >-
+      Candidate serializes full in-process Mongo saves and drains active, queued
+      and during-await mutations while preserving debounce and failure diagnostics.
+      Six regressions execute actual production scheduling functions and real slice
+      transforms; baseline substitution fails four. Synthetic real-Mongo writer/
+      reader application restart checks persistence, identity and audit hashes, with
+      file fallback rejected. Independent technical review passed. Exact-head CI,
+      canonical integration and production verification remain required; this is
+      not cross-process transaction isolation or recovery of previously lost data.
+    evidence:
+      - server/src/store.ts
+      - scripts/qa/mongo-save-drain.test.mjs
+      - server/uji/mongoRestart.uji.ts
+      - .github/workflows/mongo-persistence.yml
+      - docs/MONGO_PERSISTENCE_ACCEPTANCE.md
+
   - risk_id: risk.production_release_exact_revision
     category: validation_integrity
     severity: high
@@ -14,13 +37,13 @@ risks:
       Scheduled, manual and immediate Vercel releases could deploy without passing
       safety and acceptance evidence for the exact current-main revision.
     mitigation: >-
-      Candidate release guard checks five workflow gates and six required jobs,
+      Candidate release guard checks six workflow gates and seven required jobs,
       exact SHA/main/run/attempt provenance, complete pagination and fresh main/run
       snapshots. Timestamp ambiguity and terminal failures block; bounded waiting
       only observes pending/missing workflows. A credential-free prerequisite and
       immediate post-build recheck protect every deployment path. Dependency audit
       now runs on every main push to supply exact-revision evidence. Deterministic
-      positive/negative tests and independent technical review passed; exact-head
+      positive/negative tests passed on this synchronized candidate; exact-head
       CI, integration and actual production revision verification remain required.
       Observed CI acceptance is not an atomic release lock or clinical approval.
     evidence:
@@ -220,6 +243,10 @@ risks:
       (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
       browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
       that still model the person independently).
+      2026-10-11: actual synthetic HTTP clinician signing/closing and file-mode process restart
+      reproduce encounter provenance and unsigned successor (A2 candidate only). Persistent clinical.hasilLab
+      remains outside /api/keadaan-longitudinal; lab-result intake checks patientId syntax without existing
+      patient/encounter linkage. Shared-ID API evidence alone does not close unified aggregate readiness.
     evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
 
   - risk_id: risk.feature_sprawl
@@ -475,11 +502,20 @@ risks:
       2.0.8. The application uses hop-count trust (1), not the affected subnet configuration; exploitability
       of the deployed proxy topology has not been established. Exact-head CI, review, merge and deployed
       dependency verification remain required; this entry does not claim production remediation.
+      2026-10-11 candidate remediation: current canonical frontend build-tree audit found five
+      high advisories in browserslist, nanoid, postcss, source-map-js and Vite. Compatible
+      transitive patches plus Vite 7.3.7/React plugin 5.2.0 remove all high/critical without
+      security exceptions. Explicit targets preserve the previous supported browser baseline.
+      Before/after fixtures reproduce the policy failure and pass. Production-only frontend
+      and server audits have no high/critical; moderate Router/uuid warnings remain.
+      Required current-source build/regression, exact-head CI and integration are pending; owner-directed engineering does not request AI peer review.
     evidence:
       - scripts/qa/dependency-audit-gate.mjs
       - scripts/qa/dependency-audit-gate.test.mjs
       - server/uji/proxyAddr.uji.mjs
       - scripts/qa/fixtures/dependency-audit/server-before-2210.json
+      - scripts/qa/fixtures/dependency-audit/root-before-2376.json
+      - scripts/qa/fixtures/dependency-audit/root-patched-2026-10-11.json
       - governance/dependency-audit-policy.json
       - .github/workflows/dependency-audit.yml
 

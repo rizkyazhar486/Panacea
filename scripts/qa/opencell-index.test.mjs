@@ -1,0 +1,131 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import { buildOpenCellIndex, parseOpenCellIndex, searchProteins, searchProteinPage, OPENCELL_PAGE_SIZE, LOCALISATIONS } from '../../src/domains/body-exposure/engine/openCellIndex.ts'
+
+const L = (gene, ensg, g3 = 'cytoplasmic', g2 = '', g1 = '') => ({ target_name: gene, ensg_id: ensg, annotations_grade_3: g3, annotations_grade_2: g2, annotations_grade_1: g1 })
+const A = (ensg, over = {}) => ({ gene_name: 'X', ensg_id: ensg, uniprot_id: 'P1', protein_name: 'Name', hek_rna_tpm: '10', hek_protein_conc_nm: '5', hek_protein_copy_number: '1000', ...over })
+const E1 = 'ENSG00000075624', E2 = 'ENSG00000184009', E3 = 'ENSG00000111111'
+
+test('baris_valid_digabung_dengan_kelimpahan_dan_anotasi_dipecah_per_tingkat', () => {
+  const r = buildOpenCellIndex([L('ACTB', E1, 'membrane;cytoskeleton', 'cytoplasmic', '')], [A(E1)])
+  assert.equal(r.rejected.length, 0); assert.equal(r.proteins.length, 1)
+  assert.deepEqual(r.proteins[0].grade3, ['membrane', 'cytoskeleton']); assert.deepEqual(r.proteins[0].grade2, ['cytoplasmic']); assert.deepEqual(r.proteins[0].grade1, [])
+  assert.equal(r.proteins[0].proteinNm, 5); assert.equal(r.proteins[0].uniprot, 'P1')
+})
+
+test('protein_tanpa_baris_kelimpahan_tetap_ada_dengan_nilai_null_bukan_nol', () => {
+  const r = buildOpenCellIndex([L('ACTB', E1)], [])
+  assert.equal(r.withoutAbundance, 1); assert.equal(r.proteins[0].rnaTpm, null); assert.equal(r.proteins[0].proteinNm, null); assert.equal(r.proteins[0].copyNumber, null)
+  const r2 = buildOpenCellIndex([L('ACTB', E1)], [A(E1, { hek_protein_conc_nm: '' })])
+  assert.equal(r2.proteins[0].proteinNm, null); assert.equal(r2.proteins[0].rnaTpm, 10)
+})
+
+test('id_ensembl_salah_anotasi_asing_dan_angka_tidak_sah_ditolak_dengan_alasan', () => {
+  for (const bad of ['ENSG123', 'ensg00000075624', '', 'ENSG000000756245']) { const r = buildOpenCellIndex([L('G', bad)], []); assert.equal(r.proteins.length, 0, bad); assert.match(r.rejected[0].reason, /Ensembl/) }
+  const r = buildOpenCellIndex([L('G', E1, 'nucleus_party')], []); assert.match(r.rejected[0].reason, /vocabulary/); assert.equal(r.proteins.length, 0)
+  for (const v of ['-1', 'NaN', 'abc', 'Infinity']) { const x = buildOpenCellIndex([L('G', E1)], [A(E1, { hek_rna_tpm: v })]); assert.match(x.rejected[0].reason, /non-negative/, v); assert.equal(x.proteins.length, 0) }
+  assert.equal(buildOpenCellIndex([L('G', E1)], [A(E1, { hek_rna_tpm: '0' })]).proteins[0].rnaTpm, 0)   // batas: nol sah
+  assert.equal(buildOpenCellIndex([L('', E1)], []).rejected[0].reason, 'empty gene name')
+})
+
+test('id_ganda_ditolak_dan_hasil_terurut_menurut_nama_gen', () => {
+  const r = buildOpenCellIndex([L('ZZZ', E1), L('AAA', E2), L('AAA2', E1)], [])
+  assert.deepEqual(r.proteins.map((p) => p.gene), ['AAA', 'ZZZ']); assert.deepEqual(r.rejected, [{ gene: 'AAA2', reason: 'duplicate Ensembl id' }])
+})
+
+test('pencarian_awalan_dulu_lalu_substring_uniprot_persis_dan_kueri_kosong_kosong', () => {
+  const ps = buildOpenCellIndex([L('ACTB', E1), L('CACTA', E2), L('ZZZ', E3)], [A(E1, { protein_name: 'Actin' }), A(E2, { protein_name: 'Other' }), A(E3, { uniprot_id: 'Q9X', protein_name: 'Beta actin binder' })]).proteins
+  assert.deepEqual(searchProteins(ps, 'act').map((p) => p.gene), ['ACTB', 'CACTA', 'ZZZ'])   // awalan, substring gen, lalu nama protein
+  assert.deepEqual(searchProteins(ps, 'q9x').map((p) => p.gene), ['ZZZ'])
+  assert.deepEqual(searchProteins(ps, ` ${E1.toLowerCase()} `).map((p) => p.gene), ['ACTB'])
+  assert.deepEqual(searchProteins(ps, E1.slice(0, -1)), []) // Ensembl requires the exact stable identifier
+  assert.deepEqual(searchProteins(ps, 'q9'), [])                                              // UniProt hanya cocok persis
+  assert.deepEqual(searchProteins(ps, '   '), []); assert.deepEqual(searchProteins(ps, 'act', 0), []); assert.equal(searchProteins(ps, 'act', 1).length, 1)
+})
+
+test('indeks_terbit_valid_cc_by_sa_dan_ditolak_bila_lisensi_hilang_atau_data_rusak', async () => {
+  const pub = JSON.parse(await readFile(new URL('../../public/bodyexposure/opencell_index.json', import.meta.url), 'utf8'))
+  const ok = parseOpenCellIndex(pub); assert.equal(ok.ok, true, ok.error)
+  assert.equal(pub.proteins.length, 1310); assert.deepEqual(pub.rejected, []); assert.match(pub.source_files.localisation.sha256, /^[0-9a-f]{64}$/)
+  assert.match(pub.citation, /Cho NH/); assert.ok(searchProteins(pub.proteins, 'ACTB').some((p) => p.gene === 'ACTB'))
+  const used = new Set(pub.proteins.flatMap((p) => [...p.grade3, ...p.grade2, ...p.grade1])); for (const u of used) assert.ok(LOCALISATIONS.includes(u), u)
+  assert.equal(parseOpenCellIndex({ ...pub, licence: 'CC BY 4.0' }).ok, false)                  // tanpa share-alike ditolak
+  assert.equal(parseOpenCellIndex({ ...pub, citation: ' ' }).ok, false)
+  assert.equal(parseOpenCellIndex({ ...pub, proteins: [{ ...pub.proteins[0], ensg: 'bad' }] }).ok, false)
+  assert.equal(parseOpenCellIndex({ ...pub, proteins: [{ ...pub.proteins[0], rnaTpm: -1 }] }).ok, false)
+  assert.equal(parseOpenCellIndex({ ...pub, proteins: [pub.proteins[0], pub.proteins[0]] }).ok, false)
+  assert.equal(parseOpenCellIndex(null).ok, false)
+})
+
+
+test('metadata_protein_rusak_ditolak_sebelum_pencarian_atau_render', async () => {
+  const pub = JSON.parse(await readFile(new URL('../../public/bodyexposure/opencell_index.json', import.meta.url), 'utf8'))
+  const protein = pub.proteins[0]
+  for (const [field, value] of [
+    ['name', { unexpected: 'object' }], ['name', 42], ['name', []], ['name', undefined],
+    ['uniprot', {}], ['uniprot', 42], ['uniprot', []], ['uniprot', undefined],
+    ['gene', '   '], ['ensg', { toString: () => protein.ensg }],
+  ]) {
+    const result = parseOpenCellIndex({ ...pub, proteins: [{ ...protein, [field]: value }] })
+    assert.equal(result.ok, false, `malformed ${field} must fail at the data boundary`)
+  }
+  const valid = parseOpenCellIndex({ ...pub, proteins: [{ ...protein, name: null, uniprot: null }] })
+  assert.equal(valid.ok, true, valid.error)
+  assert.doesNotThrow(() => searchProteins(valid.index.proteins, 'unmatched'))
+  assert.ok(searchProteins(pub.proteins, 'ACTB').some(p => p.gene === 'ACTB'))
+})
+
+test('filter_lokasi_memakai_semua_tingkat_anotasi_dan_tetap_menghormati_pencarian_id', () => {
+  const proteins = buildOpenCellIndex([
+    L('ACTB', E1, 'cytoplasmic'), L('AAA', E2, 'membrane', 'cytoplasmic'), L('ZZZ', E3, 'membrane', '', 'cytoplasmic'),
+  ], []).proteins
+  assert.deepEqual(searchProteins(proteins, '', 8, 'cytoplasmic').map(p => p.gene), ['AAA', 'ACTB', 'ZZZ'])
+  assert.deepEqual(searchProteins(proteins, '', 1, 'cytoplasmic').map(p => p.gene), ['AAA'])
+  assert.deepEqual(searchProteins(proteins, E1, 8, 'cytoplasmic').map(p => p.gene), ['ACTB'])
+  assert.deepEqual(searchProteins(proteins, E1, 8, 'membrane'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8, 'mitochondria'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8, 'unknown_location'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8), []) // preserve the unfiltered idle state
+})
+
+
+test('every published compartment row remains reachable without repeats or changed source values', async () => {
+  const pub = JSON.parse(await readFile(new URL('../../public/bodyexposure/opencell_index.json', import.meta.url), 'utf8'))
+  for (const location of LOCALISATIONS) {
+    const expected = searchProteins(pub.proteins, '', pub.proteins.length, location)
+    const first = searchProteinPage(pub.proteins, '', 0, location)
+    assert.equal(first.total, expected.length)
+    const reached = []
+    for (let page = 0; page < first.pageCount; page++) {
+      const result = searchProteinPage(pub.proteins, '', page, location)
+      assert.equal(result.page, page)
+      assert.ok(result.proteins.length > 0 && result.proteins.length <= OPENCELL_PAGE_SIZE)
+      assert.equal(result.offset, page * OPENCELL_PAGE_SIZE)
+      reached.push(...result.proteins)
+    }
+    assert.deepEqual(reached, expected, location)
+    assert.equal(new Set(reached.map(p => p.ensg)).size, reached.length)
+    for (const p of reached) assert.equal(pub.proteins.find(source => source.ensg === p.ensg), p)
+  }
+})
+
+test('protein pages preserve exact identifier and location intersections and the empty idle state', () => {
+  const proteins = buildOpenCellIndex([L('ACTB', E1), L('ZZZ', E2, 'membrane')], [A(E1)]).proteins
+  assert.deepEqual(searchProteinPage(proteins, E1.toLowerCase(), 100, 'cytoplasmic').proteins, [proteins[0]])
+  assert.equal(searchProteinPage(proteins, E1, 0, 'membrane').total, 0)
+  assert.equal(searchProteinPage(proteins, 'p1').total, 1)
+  assert.equal(searchProteinPage(proteins, '', 0).total, 0)
+  assert.equal(searchProteinPage(proteins, '', 100).pageCount, 0)
+})
+
+test('stale and invalid page requests cannot strand filtered results on a blank page', () => {
+  const proteins = Array.from({ length: 10 }, (_, i) => ({ ...buildOpenCellIndex([L('ACTB', E1)], []).proteins[0], ensg: `ENSG${String(i).padStart(11, '0')}` }))
+  const last = searchProteinPage(proteins, 'act', 99)
+  assert.equal(last.page, 1); assert.equal(last.proteins.length, 2); assert.equal(last.offset, 8)
+  for (const page of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    const first = searchProteinPage(proteins, 'act', page)
+    assert.equal(first.page, 0); assert.equal(first.proteins.length, 8)
+  }
+  assert.equal(searchProteinPage([], 'act', 99).page, 0)
+})

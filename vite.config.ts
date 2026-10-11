@@ -8,6 +8,8 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   build: {
+    // Preserve the Vite 5 browser baseline when upgrading the build tool.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     rollupOptions: {
       output: {
         // Split rarely-changing vendor code into its own chunk so returning

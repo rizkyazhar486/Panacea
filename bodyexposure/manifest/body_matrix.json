@@ -73,6 +73,16 @@
      "label": "ICRP reference",
      "status": "source_backed",
      "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    },
+    {
+     "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+     "structures": 4,
+     "stature_m": null,
+     "label": "Main bronchi reference (HRA)",
+     "status": "source_backed_partial",
+     "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976, CC BY 4.0",
+     "coverage": "Four main-bronchus/cartilage components in their source coordinates; a separate reference, unregistered to the whole-body model.",
+     "individual": "Visible Human female source; standalone HRA organ reference"
     }
    ],
    "redistribution": null,
@@ -250,10 +260,22 @@
    "variants": [],
    "redistribution": null,
    "body_id": "HUMAN.OLDER_ADULT",
+   "status": "source_backed_partial",
+   "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0; one 73-year-old female subject",
+   "frame": null,
+   "source_requirement": null,
+   "structures": 0,
+   "verts": 0,
+   "systems": {}
+  },
+  {
+   "variants": [],
+   "redistribution": null,
+   "body_id": "ATLAS.NERVOUS.MNI152",
    "status": "placeholder",
    "source": null,
    "frame": null,
-   "source_requirement": "No open age-specific (≥65 y) whole-body anatomical phantom found.",
+   "source_requirement": "Template atlas in MNI152 space (not a body): needs the Clinical Neuroanatomy Atlas public data release.",
    "structures": 0,
    "verts": 0,
    "systems": {}

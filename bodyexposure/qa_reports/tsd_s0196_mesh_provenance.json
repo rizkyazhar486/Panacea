@@ -1,0 +1,1044 @@
+{
+ "tool": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: Artificial Intelligence 2023; Zenodo 10047292, CC BY 4.0), subject mesh export",
+ "subject": "s0196",
+ "meta": {
+  "image_id": "s0196",
+  "age": "73.00",
+  "gender": "f",
+  "institute": "I",
+  "study_type": "ct angiography neck-thx-abd-pelvis-leg",
+  "split": "train",
+  "manufacturer": "siemens",
+  "scanner_model": "somatom definition as+",
+  "kvp": "120",
+  "pathology": "no_pathology",
+  "pathology_location": "no_location"
+ },
+ "ct_shape": [
+  295,
+  295,
+  367
+ ],
+ "voxel_mm": [
+  1.5,
+  1.5,
+  1.5
+ ],
+ "ct_extent_mm": [
+  442,
+  442,
+  550
+ ],
+ "cleaning": "components >= 1.0 cm3 kept (largest always); Taubin smoothing 10 iterations (0.5, -0.53)",
+ "structures": {
+  "adrenal_gland_left": {
+   "voxels": 487,
+   "volume_cm3": 1.6,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9939,
+   "triangles": 1390,
+   "touches_ct_border": false
+  },
+  "adrenal_gland_right": {
+   "voxels": 647,
+   "volume_cm3": 2.2,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 1676,
+   "touches_ct_border": false
+  },
+  "aorta": {
+   "voxels": 149312,
+   "volume_cm3": 503.9,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 75720,
+   "touches_ct_border": false
+  },
+  "atrial_appendage_left": {
+   "voxels": 2976,
+   "volume_cm3": 10.0,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 3836,
+   "touches_ct_border": false
+  },
+  "autochthon_left": {
+   "voxels": 100382,
+   "volume_cm3": 338.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 63160,
+   "touches_ct_border": true
+  },
+  "autochthon_right": {
+   "voxels": 96549,
+   "volume_cm3": 325.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 63084,
+   "touches_ct_border": true
+  },
+  "brachiocephalic_trunk": {
+   "voxels": 3018,
+   "volume_cm3": 10.2,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 3748,
+   "touches_ct_border": false
+  },
+  "brachiocephalic_vein_left": {
+   "voxels": 2364,
+   "volume_cm3": 8.0,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 4292,
+   "touches_ct_border": false
+  },
+  "brachiocephalic_vein_right": {
+   "voxels": 1323,
+   "volume_cm3": 4.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 1760,
+   "touches_ct_border": false
+  },
+  "clavicula_left": {
+   "voxels": 6097,
+   "volume_cm3": 20.6,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9997,
+   "triangles": 8782,
+   "touches_ct_border": false
+  },
+  "clavicula_right": {
+   "voxels": 7395,
+   "volume_cm3": 25.0,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 9824,
+   "touches_ct_border": false
+  },
+  "colon": {
+   "voxels": 279182,
+   "volume_cm3": 942.2,
+   "components": 21,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9991,
+   "triangles": 160882,
+   "touches_ct_border": false
+  },
+  "common_carotid_artery_left": {
+   "voxels": 1468,
+   "volume_cm3": 5.0,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.8717,
+   "triangles": 2932,
+   "touches_ct_border": false
+  },
+  "common_carotid_artery_right": {
+   "voxels": 1706,
+   "volume_cm3": 5.8,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9994,
+   "triangles": 4062,
+   "touches_ct_border": false
+  },
+  "costal_cartilages": {
+   "voxels": 21631,
+   "volume_cm3": 73.0,
+   "components": 51,
+   "fragments_kept": 10,
+   "largest_component_fraction": 0.3599,
+   "triangles": 48894,
+   "touches_ct_border": false
+  },
+  "duodenum": {
+   "voxels": 14196,
+   "volume_cm3": 47.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 13940,
+   "touches_ct_border": false
+  },
+  "esophagus": {
+   "voxels": 6782,
+   "volume_cm3": 22.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 11960,
+   "touches_ct_border": false
+  },
+  "femur_left": {
+   "voxels": 29453,
+   "volume_cm3": 99.4,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 17248,
+   "touches_ct_border": true
+  },
+  "femur_right": {
+   "voxels": 26635,
+   "volume_cm3": 89.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 15908,
+   "touches_ct_border": true
+  },
+  "gallbladder": {
+   "voxels": 2891,
+   "volume_cm3": 9.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 3908,
+   "touches_ct_border": false
+  },
+  "gluteus_maximus_left": {
+   "voxels": 135871,
+   "volume_cm3": 458.6,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 56040,
+   "touches_ct_border": true
+  },
+  "gluteus_maximus_right": {
+   "voxels": 137674,
+   "volume_cm3": 464.6,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 55904,
+   "touches_ct_border": true
+  },
+  "gluteus_medius_left": {
+   "voxels": 54383,
+   "volume_cm3": 183.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 31220,
+   "touches_ct_border": false
+  },
+  "gluteus_medius_right": {
+   "voxels": 51277,
+   "volume_cm3": 173.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 30600,
+   "touches_ct_border": false
+  },
+  "gluteus_minimus_left": {
+   "voxels": 11340,
+   "volume_cm3": 38.3,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 13552,
+   "touches_ct_border": false
+  },
+  "gluteus_minimus_right": {
+   "voxels": 12531,
+   "volume_cm3": 42.3,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 14216,
+   "touches_ct_border": false
+  },
+  "heart": {
+   "voxels": 147988,
+   "volume_cm3": 499.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 69628,
+   "touches_ct_border": false
+  },
+  "hip_left": {
+   "voxels": 80753,
+   "volume_cm3": 272.5,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 66694,
+   "touches_ct_border": true
+  },
+  "hip_right": {
+   "voxels": 76429,
+   "volume_cm3": 257.9,
+   "components": 5,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9999,
+   "triangles": 63802,
+   "touches_ct_border": true
+  },
+  "humerus_left": {
+   "voxels": 17394,
+   "volume_cm3": 58.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 12568,
+   "touches_ct_border": true
+  },
+  "humerus_right": {
+   "voxels": 16567,
+   "volume_cm3": 55.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 11488,
+   "touches_ct_border": true
+  },
+  "iliac_artery_left": {
+   "voxels": 3702,
+   "volume_cm3": 12.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 7552,
+   "touches_ct_border": false
+  },
+  "iliac_artery_right": {
+   "voxels": 3858,
+   "volume_cm3": 13.0,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 7894,
+   "touches_ct_border": false
+  },
+  "iliac_vena_left": {
+   "voxels": 7892,
+   "volume_cm3": 26.6,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 11520,
+   "touches_ct_border": false
+  },
+  "iliac_vena_right": {
+   "voxels": 5530,
+   "volume_cm3": 18.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 8772,
+   "touches_ct_border": false
+  },
+  "iliopsoas_left": {
+   "voxels": 46283,
+   "volume_cm3": 156.2,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 40224,
+   "touches_ct_border": true
+  },
+  "iliopsoas_right": {
+   "voxels": 42823,
+   "volume_cm3": 144.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 36682,
+   "touches_ct_border": true
+  },
+  "inferior_vena_cava": {
+   "voxels": 18155,
+   "volume_cm3": 61.3,
+   "components": 3,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.7761,
+   "triangles": 16036,
+   "touches_ct_border": false
+  },
+  "kidney_left": {
+   "voxels": 37942,
+   "volume_cm3": 128.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 24252,
+   "touches_ct_border": false
+  },
+  "kidney_right": {
+   "voxels": 34736,
+   "volume_cm3": 117.2,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 21884,
+   "touches_ct_border": false
+  },
+  "liver": {
+   "voxels": 304621,
+   "volume_cm3": 1028.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 92562,
+   "touches_ct_border": false
+  },
+  "lung_lower_lobe_left": {
+   "voxels": 97849,
+   "volume_cm3": 330.2,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 56570,
+   "touches_ct_border": false
+  },
+  "lung_lower_lobe_right": {
+   "voxels": 140806,
+   "volume_cm3": 475.2,
+   "components": 6,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 62628,
+   "touches_ct_border": false
+  },
+  "lung_middle_lobe_right": {
+   "voxels": 78499,
+   "volume_cm3": 264.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 38072,
+   "touches_ct_border": false
+  },
+  "lung_upper_lobe_left": {
+   "voxels": 132365,
+   "volume_cm3": 446.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 60666,
+   "touches_ct_border": false
+  },
+  "lung_upper_lobe_right": {
+   "voxels": 143930,
+   "volume_cm3": 485.8,
+   "components": 4,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 54956,
+   "touches_ct_border": false
+  },
+  "pancreas": {
+   "voxels": 17205,
+   "volume_cm3": 58.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 16150,
+   "touches_ct_border": false
+  },
+  "portal_vein_and_splenic_vein": {
+   "voxels": 3797,
+   "volume_cm3": 12.8,
+   "components": 6,
+   "fragments_kept": 3,
+   "largest_component_fraction": 0.4546,
+   "triangles": 7930,
+   "touches_ct_border": false
+  },
+  "pulmonary_vein": {
+   "voxels": 6326,
+   "volume_cm3": 21.4,
+   "components": 3,
+   "fragments_kept": 3,
+   "largest_component_fraction": 0.5174,
+   "triangles": 10538,
+   "touches_ct_border": false
+  },
+  "rib_left_1": {
+   "voxels": 1748,
+   "volume_cm3": 5.9,
+   "components": 7,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9298,
+   "triangles": 4200,
+   "touches_ct_border": false
+  },
+  "rib_left_10": {
+   "voxels": 2605,
+   "volume_cm3": 8.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 7038,
+   "touches_ct_border": false
+  },
+  "rib_left_11": {
+   "voxels": 1507,
+   "volume_cm3": 5.1,
+   "components": 4,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9947,
+   "triangles": 4532,
+   "touches_ct_border": false
+  },
+  "rib_left_12": {
+   "voxels": 196,
+   "volume_cm3": 0.7,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9949,
+   "triangles": 816,
+   "touches_ct_border": false
+  },
+  "rib_left_2": {
+   "voxels": 2127,
+   "volume_cm3": 7.2,
+   "components": 5,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.6653,
+   "triangles": 6036,
+   "touches_ct_border": false
+  },
+  "rib_left_3": {
+   "voxels": 3060,
+   "volume_cm3": 10.3,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9997,
+   "triangles": 8134,
+   "touches_ct_border": false
+  },
+  "rib_left_4": {
+   "voxels": 4177,
+   "volume_cm3": 14.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 10072,
+   "touches_ct_border": false
+  },
+  "rib_left_5": {
+   "voxels": 4555,
+   "volume_cm3": 15.4,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9991,
+   "triangles": 10450,
+   "touches_ct_border": false
+  },
+  "rib_left_6": {
+   "voxels": 5555,
+   "volume_cm3": 18.7,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9991,
+   "triangles": 11558,
+   "touches_ct_border": false
+  },
+  "rib_left_7": {
+   "voxels": 5535,
+   "volume_cm3": 18.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 11036,
+   "touches_ct_border": false
+  },
+  "rib_left_8": {
+   "voxels": 5074,
+   "volume_cm3": 17.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 10554,
+   "touches_ct_border": false
+  },
+  "rib_left_9": {
+   "voxels": 3997,
+   "volume_cm3": 13.5,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9995,
+   "triangles": 9036,
+   "touches_ct_border": false
+  },
+  "rib_right_1": {
+   "voxels": 1735,
+   "volume_cm3": 5.9,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9988,
+   "triangles": 4784,
+   "touches_ct_border": false
+  },
+  "rib_right_10": {
+   "voxels": 2651,
+   "volume_cm3": 8.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 6858,
+   "touches_ct_border": false
+  },
+  "rib_right_11": {
+   "voxels": 1730,
+   "volume_cm3": 5.8,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9994,
+   "triangles": 4750,
+   "touches_ct_border": false
+  },
+  "rib_right_12": {
+   "voxels": 111,
+   "volume_cm3": 0.4,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 464,
+   "touches_ct_border": false
+  },
+  "rib_right_2": {
+   "voxels": 2434,
+   "volume_cm3": 8.2,
+   "components": 5,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9955,
+   "triangles": 6376,
+   "touches_ct_border": false
+  },
+  "rib_right_3": {
+   "voxels": 3415,
+   "volume_cm3": 11.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 8744,
+   "touches_ct_border": false
+  },
+  "rib_right_4": {
+   "voxels": 4120,
+   "volume_cm3": 13.9,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9998,
+   "triangles": 9868,
+   "touches_ct_border": false
+  },
+  "rib_right_5": {
+   "voxels": 4737,
+   "volume_cm3": 16.0,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9987,
+   "triangles": 10604,
+   "touches_ct_border": false
+  },
+  "rib_right_6": {
+   "voxels": 5771,
+   "volume_cm3": 19.5,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9998,
+   "triangles": 11606,
+   "touches_ct_border": false
+  },
+  "rib_right_7": {
+   "voxels": 6007,
+   "volume_cm3": 20.3,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9997,
+   "triangles": 11512,
+   "touches_ct_border": false
+  },
+  "rib_right_8": {
+   "voxels": 4956,
+   "volume_cm3": 16.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 10212,
+   "touches_ct_border": false
+  },
+  "rib_right_9": {
+   "voxels": 4168,
+   "volume_cm3": 14.1,
+   "components": 4,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9971,
+   "triangles": 8996,
+   "touches_ct_border": false
+  },
+  "sacrum": {
+   "voxels": 36001,
+   "volume_cm3": 121.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 40774,
+   "touches_ct_border": false
+  },
+  "scapula_left": {
+   "voxels": 23663,
+   "volume_cm3": 79.9,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9999,
+   "triangles": 38742,
+   "touches_ct_border": false
+  },
+  "scapula_right": {
+   "voxels": 23362,
+   "volume_cm3": 78.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 39262,
+   "touches_ct_border": false
+  },
+  "skull": {
+   "voxels": 9146,
+   "volume_cm3": 30.9,
+   "components": 8,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.9023,
+   "triangles": 12396,
+   "touches_ct_border": true
+  },
+  "small_bowel": {
+   "voxels": 250610,
+   "volume_cm3": 845.8,
+   "components": 20,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9999,
+   "triangles": 183164,
+   "touches_ct_border": false
+  },
+  "spinal_cord": {
+   "voxels": 22002,
+   "volume_cm3": 74.3,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 26868,
+   "touches_ct_border": true
+  },
+  "spleen": {
+   "voxels": 44876,
+   "volume_cm3": 151.5,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 24352,
+   "touches_ct_border": false
+  },
+  "sternum": {
+   "voxels": 15641,
+   "volume_cm3": 52.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 15824,
+   "touches_ct_border": false
+  },
+  "stomach": {
+   "voxels": 35247,
+   "volume_cm3": 119.0,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 23172,
+   "touches_ct_border": false
+  },
+  "subclavian_artery_left": {
+   "voxels": 1211,
+   "volume_cm3": 4.1,
+   "components": 2,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.6912,
+   "triangles": 2852,
+   "touches_ct_border": false
+  },
+  "subclavian_artery_right": {
+   "voxels": 2050,
+   "volume_cm3": 6.9,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 3868,
+   "touches_ct_border": false
+  },
+  "superior_vena_cava": {
+   "voxels": 6625,
+   "volume_cm3": 22.4,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 6880,
+   "touches_ct_border": false
+  },
+  "thyroid_gland": {
+   "voxels": 2490,
+   "volume_cm3": 8.4,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 4160,
+   "touches_ct_border": false
+  },
+  "trachea": {
+   "voxels": 5111,
+   "volume_cm3": 17.2,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9988,
+   "triangles": 7932,
+   "touches_ct_border": false
+  },
+  "urinary_bladder": {
+   "voxels": 92179,
+   "volume_cm3": 311.1,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 30320,
+   "touches_ct_border": false
+  },
+  "vertebrae_C3": {
+   "voxels": 507,
+   "volume_cm3": 1.7,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.998,
+   "triangles": 1224,
+   "touches_ct_border": true
+  },
+  "vertebrae_C4": {
+   "voxels": 2168,
+   "volume_cm3": 7.3,
+   "components": 8,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9913,
+   "triangles": 4668,
+   "touches_ct_border": true
+  },
+  "vertebrae_C5": {
+   "voxels": 2871,
+   "volume_cm3": 9.7,
+   "components": 8,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9921,
+   "triangles": 6284,
+   "touches_ct_border": false
+  },
+  "vertebrae_C6": {
+   "voxels": 3243,
+   "volume_cm3": 10.9,
+   "components": 10,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9954,
+   "triangles": 6714,
+   "touches_ct_border": false
+  },
+  "vertebrae_C7": {
+   "voxels": 4796,
+   "volume_cm3": 16.2,
+   "components": 6,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9983,
+   "triangles": 7942,
+   "touches_ct_border": false
+  },
+  "vertebrae_L1": {
+   "voxels": 8671,
+   "volume_cm3": 29.3,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 13082,
+   "touches_ct_border": false
+  },
+  "vertebrae_L2": {
+   "voxels": 11946,
+   "volume_cm3": 40.3,
+   "components": 5,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9996,
+   "triangles": 14552,
+   "touches_ct_border": false
+  },
+  "vertebrae_L3": {
+   "voxels": 13232,
+   "volume_cm3": 44.7,
+   "components": 3,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9997,
+   "triangles": 14796,
+   "touches_ct_border": false
+  },
+  "vertebrae_L4": {
+   "voxels": 12950,
+   "volume_cm3": 43.7,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9997,
+   "triangles": 14256,
+   "touches_ct_border": false
+  },
+  "vertebrae_L5": {
+   "voxels": 12312,
+   "volume_cm3": 41.6,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9989,
+   "triangles": 14062,
+   "touches_ct_border": false
+  },
+  "vertebrae_S1": {
+   "voxels": 8800,
+   "volume_cm3": 29.7,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 9360,
+   "touches_ct_border": false
+  },
+  "vertebrae_T1": {
+   "voxels": 5471,
+   "volume_cm3": 18.5,
+   "components": 6,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9858,
+   "triangles": 8340,
+   "touches_ct_border": false
+  },
+  "vertebrae_T10": {
+   "voxels": 7119,
+   "volume_cm3": 24.0,
+   "components": 19,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9908,
+   "triangles": 9440,
+   "touches_ct_border": false
+  },
+  "vertebrae_T11": {
+   "voxels": 6759,
+   "volume_cm3": 22.8,
+   "components": 1,
+   "fragments_kept": 1,
+   "largest_component_fraction": 1.0,
+   "triangles": 9696,
+   "touches_ct_border": false
+  },
+  "vertebrae_T12": {
+   "voxels": 8881,
+   "volume_cm3": 30.0,
+   "components": 2,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9991,
+   "triangles": 11182,
+   "touches_ct_border": false
+  },
+  "vertebrae_T2": {
+   "voxels": 4396,
+   "volume_cm3": 14.8,
+   "components": 14,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.987,
+   "triangles": 7626,
+   "touches_ct_border": false
+  },
+  "vertebrae_T3": {
+   "voxels": 3701,
+   "volume_cm3": 12.5,
+   "components": 7,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9968,
+   "triangles": 7972,
+   "touches_ct_border": false
+  },
+  "vertebrae_T4": {
+   "voxels": 5287,
+   "volume_cm3": 17.8,
+   "components": 8,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9964,
+   "triangles": 8876,
+   "touches_ct_border": false
+  },
+  "vertebrae_T5": {
+   "voxels": 5067,
+   "volume_cm3": 17.1,
+   "components": 9,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9972,
+   "triangles": 8992,
+   "touches_ct_border": false
+  },
+  "vertebrae_T6": {
+   "voxels": 5165,
+   "volume_cm3": 17.4,
+   "components": 9,
+   "fragments_kept": 1,
+   "largest_component_fraction": 0.9804,
+   "triangles": 8964,
+   "touches_ct_border": false
+  },
+  "vertebrae_T7": {
+   "voxels": 5696,
+   "volume_cm3": 19.2,
+   "components": 12,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.8142,
+   "triangles": 10480,
+   "touches_ct_border": false
+  },
+  "vertebrae_T8": {
+   "voxels": 6960,
+   "volume_cm3": 23.5,
+   "components": 8,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.9336,
+   "triangles": 12008,
+   "touches_ct_border": false
+  },
+  "vertebrae_T9": {
+   "voxels": 10552,
+   "volume_cm3": 35.6,
+   "components": 19,
+   "fragments_kept": 2,
+   "largest_component_fraction": 0.6437,
+   "triangles": 14190,
+   "touches_ct_border": false
+  }
+ },
+ "not_published": {
+  "kidney_cyst_left": "see tsd_classes.NOT_PUBLISHED",
+  "kidney_cyst_right": "see tsd_classes.NOT_PUBLISHED",
+  "prostate": "see tsd_classes.NOT_PUBLISHED"
+ },
+ "empty": [
+  "brain",
+  "vertebrae_C1",
+  "vertebrae_C2"
+ ]
+}

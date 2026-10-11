@@ -61,3 +61,6 @@ assert.match(indexSource, /getRecordHistory\(patientId, recordId\)/, 'history be
 assert.match(indexSource, /record_patient_mismatch/, 'server belum menolak record yang mengaku milik pasien lain')
 
 console.log('rekamEncounter: multi-encounter per pasien, migrasi legacy, exact-id update, latest pointer, scoped archive')
+
+// Actual HTTP creation, authorization and file persistence across process restart.
+await import('./encounterHttpRestart.uji.js')

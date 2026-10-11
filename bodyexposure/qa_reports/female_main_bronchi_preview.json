@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "source_blend": "/tmp/panacea-female-main-bronchi-source-v004/female_main_bronchi.blend",
+  "blender_version": "5.2.2 LTS",
+  "input_artifacts": [
+    {
+      "path": "/private/tmp/panacea-female-main-bronchi-source-v004/female_main_bronchi.blend",
+      "bytes": 1412478,
+      "sha256": "e2176155e8e3e77d55aae7e27e832f9a133bcf29f02aa474e6bf1ba4a839c149"
+    },
+    {
+      "path": "/Users/rizkyazhar/.codex/worktrees/female-respiratory-source/bodyexposure/pipeline/render_cinematic.py",
+      "bytes": 14895,
+      "sha256": "201c68d9334ae970d7c23b77c510b2d7589b991adeeef3232a8add41d5df998c"
+    },
+    {
+      "path": "/Users/rizkyazhar/.codex/worktrees/female-respiratory-source/bodyexposure/pipeline/render_body_file.py",
+      "bytes": 2737,
+      "sha256": "b5e1604b309567de3e294280e976937c7033c5c3db6c5774a412aa915b1f3071"
+    },
+    {
+      "path": "/Users/rizkyazhar/.codex/worktrees/female-respiratory-source/bodyexposure/pipeline/render_camera.py",
+      "bytes": 2099,
+      "sha256": "cb444acc81355e9cc7c4e86e85d951c45735bf467c6c68e25a7bbc45d0b220b0"
+    }
+  ],
+  "inputs_unchanged": true,
+  "clinical_validation": "pending",
+  "profile": "preview",
+  "benchmark": "body-qa",
+  "compare_mode": null,
+  "device_backend": "METAL",
+  "devices": [
+    "Apple M4 (GPU - 10 cores)"
+  ],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 4,
+    "source_polygons": 33865,
+    "meshes_without_uv": 4,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 4
+    },
+    "suppressed_display_instances": []
+  },
+  "renders": [
+    {
+      "variant": "after",
+      "path": "body-qa_c0_preview_after.png",
+      "sha256": "4c94ff2f22b042a787ed56b62a4d34aa36dec351197560fc004180a87a482e03",
+      "render_seconds": 17.646,
+      "process_memory": {
+        "peak_rss_bytes": 967589888,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 0.5372469425201416,
+          "diameter_metres": 0.03551109507679939,
+          "location_metres": [
+            -0.04929983615875244,
+            0.017857134342193604,
+            0.5437714457511902
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 0.1343117356300354,
+          "diameter_metres": 0.049169208854436874,
+          "location_metres": [
+            0.05996507406234741,
+            0.03424687683582306,
+            0.5164552330970764
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 0.35816460847854614,
+          "diameter_metres": 0.024584604427218437,
+          "location_metres": [
+            0.0381120890378952,
+            0.14351177215576172,
+            0.5410398840904236
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c1_preview_after.png",
+      "sha256": "bb90ac3ca615294d9050cf1a3a84dfea0117287792475c477e9516d896fc23d8",
+      "render_seconds": 60.888,
+      "process_memory": {
+        "peak_rss_bytes": 1144504320,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key.001",
+          "energy_watts": 0.5372469425201416,
+          "diameter_metres": 0.03551109507679939,
+          "location_metres": [
+            0.07089156657457352,
+            0.03971012309193611,
+            0.5437714457511902
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill.001",
+          "energy_watts": 0.1343117356300354,
+          "diameter_metres": 0.049169208854436874,
+          "location_metres": [
+            0.05450183153152466,
+            0.14897502958774567,
+            0.5164552330970764
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim.001",
+          "energy_watts": 0.35816460847854614,
+          "diameter_metres": 0.024584604427218437,
+          "location_metres": [
+            -0.054763078689575195,
+            0.12712204456329346,
+            0.5410398244857788
+          ]
+        }
+      ]
+    }
+  ],
+  "camera_framing": {
+    "mode": "visible_meshes",
+    "camera": "c1",
+    "mesh_count": 4,
+    "margin": 1.1,
+    "ortho_scale": 0.10683686286211014
+  },
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation or browser FPS measurement performed.",
+    "RSS is the OS process-lifetime high-water mark, not GPU memory or per-frame allocation.",
+    "Sample limits are requested ceilings; adaptive sampling/time limits may stop earlier.",
+    "External linked libraries and unpacked textures are not inventoried by this report.",
+    "Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.",
+    "Timings include scene synchronization and sequential cache effects."
+  ]
+}

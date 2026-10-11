@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconRun } from '../components/icons'
 import {
-  ambilSesi, simpanSesi, hapusSesi, volumeSesi, rekorPerGerakan, volumeMingguan, epley,
+  ambilSesi, simpanSesi, alasanSesiDitolak, hapusSesi, volumeSesi, rekorPerGerakan, volumeMingguan, epley,
   type SesiAngkat, type SetAngkat,
 } from '../lib/angkatBeban'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
@@ -33,6 +33,7 @@ export function LatihanBeban() {
   const [gerakan, setGerakan] = useState('')
   const [tanggal, setTanggal] = useState(hariIni)
   const [set, setSet] = useState<SetAngkat[]>(KOSONG)
+  const [galat, setGalat] = useState<string | null>(null)
 
   const rekor = useMemo(() => rekorPerGerakan(semua), [semua])
   const mingguan = useMemo(() => volumeMingguan(semua), [semua])
@@ -45,7 +46,11 @@ export function LatihanBeban() {
   function simpan() {
     const isi = set.filter((s) => s.ulangan > 0 && s.kg > 0)
     if (!gerakan.trim() || !isi.length) return
-    setSemua(simpanSesi({ id: `${Date.now()}`, tanggal, gerakan: gerakan.trim(), set: isi }))
+    const sesi = { id: `${Date.now()}`, tanggal, gerakan: gerakan.trim(), set: isi }
+    const alasan = alasanSesiDitolak(sesi, Date.now())
+    setGalat(alasan)
+    if (alasan) return
+    setSemua(simpanSesi(sesi))
     setGerakan('')
     setSet(KOSONG)
   }
@@ -108,6 +113,7 @@ export function LatihanBeban() {
           className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-brand text-[13px] font-black text-white disabled:opacity-40">
           Save session
         </button>
+        {galat && <p role="alert" className="mt-1.5 text-[11px] font-bold text-red-600 dark:text-red-400">Not saved: {galat}.</p>}
       </Card>
 
       {adaVolume && (
