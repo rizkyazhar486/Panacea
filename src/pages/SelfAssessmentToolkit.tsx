@@ -3,7 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconGauge } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { waistToHeight, WAIST_CM, WHTR_HEIGHT_CM, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -142,8 +142,13 @@ function AgingFlowchart() {
 
 function WaistHeightRatio() {
   // Teks mentah: kolom kosong tetap kosong (bukan 0) dan ditolak engine dengan alasan.
-  const [waist, setWaist] = useState('80')
-  const [height, setHeight] = useState(() => String(getDemo().heightCm || 170))
+  // Pinggang tidak punya sumber tersimpan, dan tinggi hanya dari profil yang benar-benar disimpan: nilai bawaan
+  // (80 cm / 170 cm) menyajikan rasio untuk orang yang tidak ada.
+  const [waist, setWaist] = useState('')
+  const [height, setHeight] = useState(() => {
+    const tinggi = getDemoTersimpan().heightCm
+    return tinggi && tinggi > 0 ? String(tinggi) : ''
+  })
   const result = waistToHeight(parseNumberField(waist), parseNumberField(height))
   return (
     <Card className="!p-5">
