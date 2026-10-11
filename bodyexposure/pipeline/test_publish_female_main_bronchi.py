@@ -28,7 +28,11 @@ class PublishBronchiTests(unittest.TestCase):
         self.report['output_artifacts'] = []
         self.report_path = self.prepared/'report.json'
         self.save_report()
-        doc = {'asset': {'version': '2.0'}, 'nodes': [{'extras': r} for r in self.report['structures']]}
+        ontology = json.loads((Path(__file__).parents[2]/'public/bodyexposure/ontology.adult_female_main_bronchi_reference.json').read_text())['map']
+        doc = {'asset': {'version': '2.0'}, 'nodes': [{'extras': r | {
+            'ontologyid': ontology[r['panacea_structure_id']]['id'],
+            'label': ontology[r['panacea_structure_id']]['label'],
+        }} for r in self.report['structures']]}
         chunk = json.dumps(doc).encode()
         chunk += b' ' * (-len(chunk) % 4)
         self.packed = self.prepared/'packed.glb'
@@ -74,6 +78,18 @@ class PublishBronchiTests(unittest.TestCase):
         target.write_text('previous human trial evidence')
         before = self.snapshot()
         with self.assertRaises(FileExistsError): self.publish()
+        self.assertEqual(self.snapshot(), before)
+
+    def test_missing_source_ontology_cannot_partially_publish(self):
+        before = self.snapshot()
+        blob = self.packed.read_bytes()
+        size = struct.unpack_from('<I', blob, 12)[0]
+        doc = json.loads(blob[20:20+size])
+        del doc['nodes'][0]['extras']['ontologyid']
+        chunk = json.dumps(doc).encode()
+        chunk += b' ' * (-len(chunk) % 4)
+        self.packed.write_bytes(struct.pack('<III', 0x46546C67, 2, 20+len(chunk)) + struct.pack('<II', len(chunk), 0x4E4F534A) + chunk)
+        with self.assertRaises(ValueError): self.publish()
         self.assertEqual(self.snapshot(), before)
 
     def test_fresh_publication_then_retry_preserves_all_files(self):

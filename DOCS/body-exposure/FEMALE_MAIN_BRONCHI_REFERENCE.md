@@ -20,6 +20,10 @@ in the 841-component whole-body female.
   source positions; each is 1,217,600 bytes with meshopt compression.
 - IDs begin `REFERENCE.VH_FEMALE.RESPIRATORY.` and the variant body ID is
   `HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE`.
+- All four ontology mappings come directly from `ontologyid` and `label` in
+  the pinned source GLB node extras: right/left bronchi `UBERON:0002177` /
+  `UBERON:0002178`, right/left cartilage `FMA:13143` / `FMA:13144`.
+  The existing atlas search and selected-structure panel display these IDs.
 - Clinical validation remains **pending**. This is an educational source
   reference, with no added segmentation, registration or medical acceptance.
 

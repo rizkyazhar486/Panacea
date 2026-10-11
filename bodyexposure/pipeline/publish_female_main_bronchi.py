@@ -5,6 +5,7 @@ Only this reference's files, its manifest rows and the female reference variant 
 """
 import argparse
 import json
+import re
 from pathlib import Path
 import shutil
 import struct
@@ -65,9 +66,16 @@ def publish(prepared, packed, repo):
             matrix.setdefault('light_lod',{})[TAG] = 'LOD3'
     pub = repo/'public/bodyexposure'
     evidence_path = repo/'bodyexposure/qa_reports/female_main_bronchi_reference.json'
-    targets = [pub/name for name in names] + [pub/f'{TAG}.index.json', pub/f'{TAG}.review.json', evidence_path]
+    ontology_path = pub/f'ontology.{TAG}.json'
+    targets = [pub/name for name in names] + [pub/f'{TAG}.index.json', pub/f'{TAG}.review.json', ontology_path, evidence_path]
     if any(p.exists() for p in targets):
         raise FileExistsError('Reference output already exists; refusing replacement')
+    ontology_map = {}
+    for item in metadata:
+        identifier, label = item.get('ontologyid'), item.get('label')
+        if not isinstance(identifier, str) or not re.fullmatch(r'(?:UBERON|FMA):\d+', identifier) or not isinstance(label, str) or not label.strip():
+            raise ValueError('Expected the four existing ontology identifiers/labels in source GLB extras')
+        ontology_map[item['panacea_structure_id']] = {'id': identifier, 'label': label}
     # All validation finishes before publishing any files.
     manifest['structures'].extend(rows)
     manifest['count'] = len(manifest['structures'])
@@ -81,6 +89,10 @@ def publish(prepared, packed, repo):
         p.write_text(json.dumps(matrix,indent=1,ensure_ascii='\\u' in original)+ ('\n' if original.endswith('\n') else ''))
     (pub/f'{TAG}.index.json').write_text(json.dumps(sorted(index),separators=(',',':'))+'\n')
     (pub/f'{TAG}.review.json').write_text(json.dumps(review,separators=(',',':'))+'\n')
+    ontology_path.write_text(json.dumps({'schema': 1, 'body_id': BODY_ID,
+        'source': SOURCE + '; ontologyid and label fields retained from the pinned source GLB node extras',
+        'source_sha256': SOURCE_SHA256, 'license': 'CC BY 4.0', 'matched_structures': 4,
+        'structures_total': 4, 'map': ontology_map},indent=2)+'\n')
     evidence = report | {'packed_artifact': packed_record, 'published_files': names,
                          'packing': 'gltfpack 1.3.0 -c -kn -km -ke -noq; no requested simplification or position quantization',
                          'runtime_variant': variant}

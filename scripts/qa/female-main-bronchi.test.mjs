@@ -34,6 +34,19 @@ test('standalone reference keeps whole-body female and adds four pending source 
  const review=await json(`public/bodyexposure/${tag}.review.json`)
  assert.equal(review.body_id,bodyId)
  assert.deepEqual(new Set(review.rows.map(r=>r[0])),ids)
+ const ontology=await json(`public/bodyexposure/ontology.${tag}.json`)
+ assert.equal(ontology.source_sha256,evidence.input_artifacts[0].sha256)
+ assert.deepEqual(new Set(Object.keys(ontology.map)),ids)
+ const expected={
+  'MAIN_BRONCHUS.R':'UBERON:0002177','MAIN_BRONCHUS.L':'UBERON:0002178',
+  'MAIN_BRONCHUS_CARTILAGE.R':'FMA:13143','MAIN_BRONCHUS_CARTILAGE.L':'FMA:13144',
+ }
+ for(const mesh of meshes){
+  const data=meta(mesh),entry=ontology.map[data.panacea_structure_id]
+  assert.equal(entry.id,expected[data.panacea_structure_id.replace('REFERENCE.VH_FEMALE.RESPIRATORY.','')])
+  assert.equal(entry.id,data.ontologyid)
+  assert.equal(entry.label,data.label)
+ }
 })
 
 test('decoded web geometry retains every source component, face count and source bounds',()=>{
