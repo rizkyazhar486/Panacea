@@ -2,10 +2,29 @@ import hashlib
 from pathlib import Path
 import tempfile
 import unittest
-from render_artifacts import claim_output, fingerprint, process_memory, verify_unchanged
+from render_artifacts import claim_output, fingerprint, process_memory, verify_unchanged, validate_body_selection
 
 
 class RenderArtifactsTests(unittest.TestCase):
+    def test_body_selection_retains_exact_existing_ids(self):
+        rows = [{'type': 'MESH', 'body_id': 'FETUS', 'structure_id': 'FETUS.LUNG.L'}]
+        self.assertEqual(validate_body_selection(rows, 'FETUS'), ['FETUS.LUNG.L'])
+        self.assertEqual(rows[0]['structure_id'], 'FETUS.LUNG.L')
+
+    def test_empty_mixed_body_and_nonmesh_selections_rejected(self):
+        for rows in [[], [{'type': 'MESH', 'body_id': 'OTHER', 'structure_id': 'OTHER.LUNG'}],
+                     [{'type': 'EMPTY', 'body_id': 'FETUS', 'structure_id': 'FETUS.ROOT'}]]:
+            with self.assertRaises(ValueError):
+                validate_body_selection(rows, 'FETUS')
+
+    def test_missing_invalid_and_duplicate_source_ids_rejected(self):
+        for sid in [None, '', ' ', 22]:
+            with self.assertRaises(ValueError):
+                validate_body_selection([{'type': 'MESH', 'body_id': 'FETUS', 'structure_id': sid}], 'FETUS')
+        row = {'type': 'MESH', 'body_id': 'FETUS', 'structure_id': 'FETUS.LUNG.L'}
+        with self.assertRaises(ValueError):
+            validate_body_selection([row, row], 'FETUS')
+
     def test_saved_source_has_exact_digest_and_size(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / 'source.blend'
