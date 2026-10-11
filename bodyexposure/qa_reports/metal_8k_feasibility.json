@@ -1,0 +1,77 @@
+{
+  "scope": "GPU/8K output-path feasibility only; not 512-sample quality or clinical validation",
+  "clinical_validation": "pending",
+  "peak_memory_measured": false,
+  "runs": [
+    {
+      "source_blend": "PANACEA_HUMAN_MASTER_v011.blend",
+      "source_blend_hash_at_capture": null,
+      "source_report_sha256": "01056abde641052e007b702183ba4437c84eded07f46d2f73223b5ebaafa6472",
+      "blender_version": "5.2.2 LTS",
+      "backend": "METAL",
+      "devices": [
+        "Apple M4 (GPU - 10 cores)"
+      ],
+      "visible_meshes": 841,
+      "source_polygons": 4467873,
+      "captures": [
+        {
+          "path": "female_layered_cinematic_after.png",
+          "sha256": "cf02cafa4719899e0cae4b16c477340f03c0e4a025bf3e910624566d4735e749",
+          "render_seconds": 455.236,
+          "sample_limit": 1,
+          "time_limit_seconds": 2.0,
+          "lighting": "studio",
+          "lighting_state_restored": true,
+          "width": 7680,
+          "height": 4320,
+          "png_bit_depth": 16,
+          "png_color_type": 6,
+          "bytes": 19747957
+        }
+      ]
+    },
+    {
+      "source_blend": "body_v001_skeleton_cleaned.blend",
+      "source_blend_hash_at_capture": null,
+      "source_report_sha256": "67693e74b54892f19c941c6e04b88d82c56aef8bc862124e419b434cf5cc3c75",
+      "blender_version": "5.2.2 LTS",
+      "backend": "METAL",
+      "devices": [
+        "Apple M4 (GPU - 10 cores)"
+      ],
+      "visible_meshes": 277,
+      "source_polygons": 701812,
+      "captures": [
+        {
+          "path": "body-qa_c0_cinematic_after.png",
+          "sha256": "10c6884a82b4e7899408b4208a7c0316c696f1a677c6b67055290f3acbb923c2",
+          "render_seconds": 271.871,
+          "sample_limit": 1,
+          "time_limit_seconds": 2.0,
+          "lighting": "studio",
+          "lighting_state_restored": true,
+          "width": 7680,
+          "height": 4320,
+          "png_bit_depth": 16,
+          "png_color_type": 6,
+          "bytes": 12466761
+        },
+        {
+          "path": "body-qa_c1_cinematic_after.png",
+          "sha256": "c539afe9e3860397fc6731d71ad1937187672d2f0648373cfe6a38f3007f4964",
+          "render_seconds": 211.762,
+          "sample_limit": 1,
+          "time_limit_seconds": 2.0,
+          "lighting": "studio",
+          "lighting_state_restored": true,
+          "width": 7680,
+          "height": 4320,
+          "png_bit_depth": 16,
+          "png_color_type": 6,
+          "bytes": 7429508
+        }
+      ]
+    }
+  ]
+}

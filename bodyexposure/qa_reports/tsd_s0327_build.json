@@ -1,0 +1,705 @@
+{
+ "summary": {
+  "body": "TSD_S0327.OLDER_ADULT.MALE",
+  "subject": "s0327",
+  "age": 72,
+  "sex": "male",
+  "structures": 108,
+  "extent_m": 0.6439,
+  "tris_total": 2735042,
+  "empty_classes": [
+   "brain",
+   "vertebrae_C1",
+   "vertebrae_C2",
+   "vertebrae_C3",
+   "vertebrae_C4",
+   "vertebrae_C5",
+   "vertebrae_C6"
+  ],
+  "not_published": [
+   "kidney_cyst_left",
+   "kidney_cyst_right"
+  ],
+  "cut_by_scan_border": [
+   "autochthon_left",
+   "autochthon_right",
+   "clavicula_left",
+   "clavicula_right",
+   "common_carotid_artery_left",
+   "common_carotid_artery_right",
+   "femur_left",
+   "femur_right",
+   "gluteus_maximus_left",
+   "gluteus_maximus_right",
+   "humerus_left",
+   "humerus_right",
+   "rib_left_1",
+   "rib_right_1",
+   "scapula_left",
+   "scapula_right",
+   "skull",
+   "spinal_cord",
+   "thyroid_gland",
+   "vertebrae_C7",
+   "vertebrae_T1"
+  ],
+  "laterality_near_midline": [
+   [
+    "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+    -0.001
+   ]
+  ],
+  "open_boundary": 0,
+  "nonmanifold": 0
+ },
+ "structures": [
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.L",
+   "tris": 2416,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.R",
+   "tris": 2616,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.AORTA",
+   "tris": 45652,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.LEFT_ATRIAL_APPENDAGE",
+   "tris": 4196,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.L",
+   "tris": 75320,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.R",
+   "tris": 76484,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_TRUNK",
+   "tris": 2404,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+   "tris": 5340,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.R",
+   "tris": 2068,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.CLAVICLE.L",
+   "tris": 10224,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.CLAVICLE.R",
+   "tris": 6536,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.COLON",
+   "tris": 137948,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.COMMON_CAROTID_ARTERY.L",
+   "tris": 3252,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.COMMON_CAROTID_ARTERY.R",
+   "tris": 1948,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.JOINT.COSTAL_CARTILAGES_ALL_ONE_MESH",
+   "tris": 84712,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.DUODENUM",
+   "tris": 13948,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.ESOPHAGUS",
+   "tris": 13864,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.L",
+   "tris": 29536,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.R",
+   "tris": 28880,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.GALLBLADDER",
+   "tris": 7288,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+   "tris": 59464,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+   "tris": 63824,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+   "tris": 40096,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+   "tris": 39396,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+   "tris": 19496,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+   "tris": 19520,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.HEART_ALL_CHAMBERS_ONE_MESH",
+   "tris": 91708,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+   "tris": 86244,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+   "tris": 87916,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HUMERUS.L",
+   "tris": 12628,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HUMERUS.R",
+   "tris": 17988,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.L",
+   "tris": 8024,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.R",
+   "tris": 8300,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.L",
+   "tris": 12920,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.R",
+   "tris": 10852,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.L",
+   "tris": 54226,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.R",
+   "tris": 52720,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA",
+   "tris": 20288,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.L",
+   "tris": 17896,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.R",
+   "tris": 17992,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.LIVER",
+   "tris": 104290,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG.L",
+   "tris": 90984,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG.R",
+   "tris": 80046,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG.R",
+   "tris": 43626,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG.L",
+   "tris": 81836,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG.R",
+   "tris": 43614,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.PANCREAS",
+   "tris": 16496,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PORTAL_VEIN_AND_SPLENIC_VEIN",
+   "tris": 7856,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.REPRODUCTIVE.PROSTATE",
+   "tris": 5892,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PULMONARY_VEINS_ONE_MESH",
+   "tris": 13338,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_1.L",
+   "tris": 6124,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_10.L",
+   "tris": 9552,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_11.L",
+   "tris": 8166,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_12.L",
+   "tris": 5054,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_2.L",
+   "tris": 8944,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_3.L",
+   "tris": 11406,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_4.L",
+   "tris": 10814,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_5.L",
+   "tris": 12744,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_6.L",
+   "tris": 13114,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_7.L",
+   "tris": 10084,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_8.L",
+   "tris": 10238,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_9.L",
+   "tris": 12326,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_1.R",
+   "tris": 6496,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_10.R",
+   "tris": 8818,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_11.R",
+   "tris": 7102,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_12.R",
+   "tris": 2192,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_2.R",
+   "tris": 9312,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_3.R",
+   "tris": 10148,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_4.R",
+   "tris": 11312,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_5.R",
+   "tris": 13246,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_6.R",
+   "tris": 13282,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_7.R",
+   "tris": 12928,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_8.R",
+   "tris": 11928,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.RIB_9.R",
+   "tris": 9396,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SACRUM",
+   "tris": 60520,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.L",
+   "tris": 44440,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.R",
+   "tris": 37574,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SKULL",
+   "tris": 8916,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.SMALL_BOWEL_JEJUNUM_AND_ILEUM",
+   "tris": 145192,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.NERVOUS.SPINAL_CORD",
+   "tris": 25838,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.LYMPHATIC.SPLEEN",
+   "tris": 27844,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.STERNUM",
+   "tris": 17544,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.STOMACH",
+   "tris": 23176,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.L",
+   "tris": 5484,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.R",
+   "tris": 3748,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUPERIOR_VENA_CAVA",
+   "tris": 8640,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+   "tris": 12234,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.TRACHEA",
+   "tris": 12500,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.URINARY.URINARY_BLADDER",
+   "tris": 11252,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_C7",
+   "tris": 1472,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L1",
+   "tris": 18400,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L2",
+   "tris": 20714,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L3",
+   "tris": 23350,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L4",
+   "tris": 23100,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L5",
+   "tris": 21796,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_S1",
+   "tris": 14428,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T1",
+   "tris": 7874,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T10",
+   "tris": 13492,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T11",
+   "tris": 14004,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T12",
+   "tris": 15630,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T2",
+   "tris": 11448,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T3",
+   "tris": 11348,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T4",
+   "tris": 11430,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T5",
+   "tris": 11888,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T6",
+   "tris": 12144,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T7",
+   "tris": 12550,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T8",
+   "tris": 12876,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_T9",
+   "tris": 13362,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  }
+ ]
+}

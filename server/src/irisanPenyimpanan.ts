@@ -44,6 +44,8 @@ export const KOLEKSI_IRISAN = {
   rekam: 'rekam_pasien',
   kodeTaut: 'kode_taut',
   tautan: 'tautan_pasien',
+  hasilLab: 'hasil_lab',
+  rujukanKlinis: 'rujukan_klinis',
   posts: 'pos',
   settings: 'pengaturan',
   connectAkun: 'connect_akun',
@@ -107,6 +109,9 @@ export interface KlinisTersimpan {
   encounters: Record<string, unknown>
   tautan: Record<string, unknown>
   kodeTaut: Record<string, unknown>[]
+  /** Hasil lab dan rujukan (modul labResults): satu dokumen per rekam; hanya ada bila ada isinya. */
+  hasilLab?: Record<string, unknown>
+  rujukanKlinis?: Record<string, unknown>
 }
 
 export interface IrisanData {
@@ -180,6 +185,8 @@ const INDEKS: Record<string, Record<string, number>[]> = {
   [KOLEKSI_IRISAN.users]: [{ email: 1 }],
   [KOLEKSI_IRISAN.kodeTaut]: [{ patientId: 1 }],
   [KOLEKSI_IRISAN.tautan]: [{ userId: 1 }],
+  [KOLEKSI_IRISAN.hasilLab]: [{ patientId: 1 }, { status: 1 }],
+  [KOLEKSI_IRISAN.rujukanKlinis]: [{ patientId: 1 }, { status: 1 }],
   [KOLEKSI_IRISAN.posts]: [{ authorEmail: 1 }],
   [KOLEKSI_IRISAN.connectAkun]: [{ status: 1 }],
   [KOLEKSI_IRISAN.connectLaporan]: [{ pelaporEmail: 1 }, { terlaporEmail: 1 }],
@@ -372,6 +379,8 @@ export function susunDokumen(keadaan: Record<string, unknown>): Record<string, D
       _id: id,
       ...(salinData(isi) as Record<string, unknown>),
     })),
+    [KOLEKSI_IRISAN.hasilLab]: dokumenRekamPerId(clinical.hasilLab),
+    [KOLEKSI_IRISAN.rujukanKlinis]: dokumenRekamPerId(clinical.rujukanKlinis),
     [KOLEKSI_IRISAN.posts]: dokumenDaftar(keadaan.posts as unknown[] | undefined, (i) => String(i.id ?? '')),
     [KOLEKSI_IRISAN.settings]: Object.entries(settings).map(([id, nilai]) => ({ _id: id, nilai: salinData(nilai) })),
     [KOLEKSI_IRISAN.connectAkun]: Object.entries(peta(connect.akun)).map(([email, isi]) => ({
@@ -408,6 +417,13 @@ export function susunDokumen(keadaan: Record<string, unknown>): Record<string, D
     [KOLEKSI_IRISAN.butirRekam]: susunButir(peta(keadaan.clinical)),
     [KOLEKSI_IRISAN.rekamObjek]: susunObjek(peta(keadaan.clinical)),
   }
+}
+
+/** Satu dokumen per rekam (id = _id) dengan bidangnya di tingkat atas agar bisa diindeks per pasien/status. */
+function dokumenRekamPerId(nilai: unknown): DokumenIrisan[] {
+  return Object.entries(peta(nilai)).flatMap(([id, isi]) => (
+    id && isi && typeof isi === 'object' && !Array.isArray(isi) ? [{ ...(salinData(isi) as Record<string, unknown>), _id: id }] : []
+  ))
 }
 
 function dokumenSampel(nilai: unknown): DokumenIrisan[] {
@@ -476,6 +492,15 @@ function gabungLab(koleksi: Record<string, Record<string, unknown>[]>): IrisanDa
   }
 }
 
+function rekamPerId(dokumen: Record<string, unknown>[]): Record<string, unknown> {
+  const hasil: Record<string, unknown> = {}
+  for (const doc of dokumen) {
+    const id = String(doc._id ?? '')
+    if (id) hasil[id] = tanpaMeta(doc)
+  }
+  return hasil
+}
+
 function gabungKlinis(koleksi: Record<string, Record<string, unknown>[]>): KlinisTersimpan {
   const klinis = klinisKosong()
   const pakaiButir = Object.prototype.hasOwnProperty.call(koleksi, KOLEKSI_IRISAN.butirRekam)
@@ -528,6 +553,11 @@ function gabungKlinis(koleksi: Record<string, Record<string, unknown>[]>): Klini
     if (id) klinis.tautan[id] = tanpaMeta(doc)
   }
   klinis.kodeTaut = urut(koleksi[KOLEKSI_IRISAN.kodeTaut] ?? []).map(tanpaMeta)
+  // Bidang opsional: hanya dipasang bila ada isinya, sehingga simpanan lama tanpa koleksi ini tidak berubah bentuk.
+  const hasilLab = rekamPerId(koleksi[KOLEKSI_IRISAN.hasilLab] ?? [])
+  if (Object.keys(hasilLab).length) klinis.hasilLab = hasilLab
+  const rujukanKlinis = rekamPerId(koleksi[KOLEKSI_IRISAN.rujukanKlinis] ?? [])
+  if (Object.keys(rujukanKlinis).length) klinis.rujukanKlinis = rujukanKlinis
   return klinis
 }
 
@@ -793,7 +823,7 @@ export async function muatIrisan(db: DbIrisan): Promise<HasilMuatIrisan | null> 
   }
   const profil = { ...seri, ...gabungProfil(koleksi) }
   if (versi === VERSI_IRISAN_PROFIL) return { data: profil, lengkap: false }
-  for (const nama of [KOLEKSI_IRISAN.creatorSubs, KOLEKSI_IRISAN.manualTopups, KOLEKSI_IRISAN.applications, KOLEKSI_IRISAN.validasiLedger, KOLEKSI_IRISAN.feedback, KOLEKSI_IRISAN.meets, KOLEKSI_IRISAN.clubs, KOLEKSI_IRISAN.secondOpinions, KOLEKSI_IRISAN.facilityPrices, KOLEKSI_IRISAN.visitMemberships, KOLEKSI_IRISAN.butirRekam, KOLEKSI_IRISAN.rekamObjek, KOLEKSI_IRISAN.hrSamples]) {
+  for (const nama of [KOLEKSI_IRISAN.creatorSubs, KOLEKSI_IRISAN.manualTopups, KOLEKSI_IRISAN.applications, KOLEKSI_IRISAN.validasiLedger, KOLEKSI_IRISAN.feedback, KOLEKSI_IRISAN.meets, KOLEKSI_IRISAN.clubs, KOLEKSI_IRISAN.secondOpinions, KOLEKSI_IRISAN.facilityPrices, KOLEKSI_IRISAN.visitMemberships, KOLEKSI_IRISAN.butirRekam, KOLEKSI_IRISAN.rekamObjek, KOLEKSI_IRISAN.hrSamples, KOLEKSI_IRISAN.hasilLab, KOLEKSI_IRISAN.rujukanKlinis]) {
     koleksi[nama] = await bacaKoleksi(db, nama)
   }
   const sisa = { ...profil, ...gabungSisa(koleksi) }

@@ -113,3 +113,22 @@ export {
   type ReviewInput,
   type ApprovalContext,
 } from './engine/structureReview'
+export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
+export { createPresentationLighting } from './adapters/studioLighting'
+export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
+export { type PresentationLighting } from './engine/presentationLighting'
+
+export {
+  cycleAt,
+  DEFAULT_BREATH_PERIOD_S,
+  parseRespiratoryModel,
+  sampleRespiration,
+  type ParseRespiratory,
+  type RespirationSample,
+  type RespiratoryModel,
+} from './engine/respiratoryMotion'
+
+export { DATA_GAPS, GAP_STATUS_LABEL, validateGaps, type DataGap, type GapKind, type GapStatus } from './engine/dataGaps'
+
+export { OpenCellPanel } from './ui/OpenCellPanel'
+export { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS, LOCALISATION_LABEL, type OpenCellProtein, type PublishedOpenCell } from './engine/openCellIndex'
