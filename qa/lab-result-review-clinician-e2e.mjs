@@ -2,6 +2,7 @@
 // Jalankan: backend (OWNER_EMAIL=owner-qa@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5188 PANACEA_DATA_FILE=<tmp> PORT=18788 npx tsx src/index.ts)
 //   + VITE_API_URL=http://127.0.0.1:18788 npx vite --port 5188, lalu
 //   PLAYWRIGHT_MODULE=<path> CHROME=<path chrome> node qa/lab-result-review-clinician-e2e.mjs
+// Butuh server BARU (status verifikasi dokter tersimpan di server; jalan kedua pada server yang sama gagal pada asersi 'dokter belum terverifikasi').
 // Pemilik memverifikasi STR dokter lewat rute server resmi (/api/doctors/:id/verify); ini fixture uji, bukan bukti kualifikasi nyata.
 import assert from 'node:assert/strict'
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
