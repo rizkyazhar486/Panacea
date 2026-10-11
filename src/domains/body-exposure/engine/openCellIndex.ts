@@ -86,6 +86,18 @@ export function searchProteins(proteins: readonly OpenCellProtein[], query: stri
   return [...starts, ...rest].slice(0, limit)
 }
 
+export const OPENCELL_PAGE_SIZE = 8
+
+/** Browse every matching source row while keeping each mobile result page bounded. */
+export function searchProteinPage(proteins: readonly OpenCellProtein[], query: string, page = 0, location: Localisation | null = null) {
+  const matches = searchProteins(proteins, query, proteins.length, location)
+  const pageCount = Math.ceil(matches.length / OPENCELL_PAGE_SIZE)
+  const requested = Number.isSafeInteger(page) && page >= 0 ? page : 0
+  const current = Math.min(requested, Math.max(0, pageCount - 1))
+  const offset = current * OPENCELL_PAGE_SIZE
+  return { proteins: matches.slice(offset, offset + OPENCELL_PAGE_SIZE), total: matches.length, page: current, pageCount, offset }
+}
+
 export interface PublishedOpenCell { schema: 1; kind: 'opencell_index'; licence: string; citation: string; limitations: string; proteins: OpenCellProtein[] }
 export type ParseOpenCell = { ok: true; index: PublishedOpenCell } | { ok: false; error: string }
 
