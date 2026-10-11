@@ -5,6 +5,7 @@ import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } fro
 import { verifyMaterial } from '../lib/ai'
 import { ButtonGroup } from '../components/Carousel'
 import { downloadWatermarkedPdf } from '../lib/pdf'
+import { validateMaterialPrice } from '../domains/marketplace/engine/materialPrice'
 import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
 
 const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
@@ -219,9 +220,16 @@ function UploadPanel({
   })
   const fileRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
+  const [priceProblem, setPriceProblem] = useState('')
 
   async function submit() {
     if (!f.title.trim() || !f.fileName) return
+    const price = validateMaterialPrice(f.price)
+    if (!price.ok) {
+      setPriceProblem(price.problem)
+      return
+    }
+    setPriceProblem('')
     setBusy(true)
     const m: Material = {
       id: uid(),
@@ -234,7 +242,7 @@ function UploadPanel({
       authorName,
       fileType: f.fileType,
       fileName: f.fileName,
-      priceTokens: Number(f.price) || 0,
+      priceTokens: price.priceTokens,
       status: 'pending-ai',
       createdAt: new Date().toISOString(),
       downloads: 0,
@@ -279,7 +287,8 @@ function UploadPanel({
           </select>
         </Field>
         <Field label="Unit purchase price (PNC)">
-          <input className={inputClass} type="number" min={0} value={f.price} onChange={(e) => setF({ ...f, price: Number(e.target.value) })} />
+          <input className={inputClass} type="number" min={0} value={Number.isNaN(f.price) ? '' : f.price} onChange={(e) => setF({ ...f, price: e.target.value === '' ? NaN : Number(e.target.value) })} />
+          {priceProblem && <p role="alert" className="mt-1 text-xs text-red-600">{priceProblem}</p>}
         </Field>
         <Field label="Author subscription price (PNC/mo · 0 = disabled)">
           <input className={inputClass} type="number" min={0} value={subPrice} onChange={(e) => onSubPrice(Number(e.target.value))} />
