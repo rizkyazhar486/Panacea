@@ -4,7 +4,10 @@
  * kosong seolah-olah ketinggian laut. Rentang = kewajaran masukan (bukan ambang fisiologis; ambang 27 °C/30 menit
  * dan 1500 m tetap di `lib/enduranceTools`).
  */
-import { inRange } from '../../clinical-calculators/engine/inputs'
+// Local numeric guard avoids importing another domain's private engine.
+// Same finite-number + inclusive bounds semantics as the existing guard.
+const inRange = (x: unknown, min: number, max: number): x is number =>
+  typeof x === 'number' && Number.isFinite(x) && x >= min && x <= max
 
 export const HEAT_TEMP_C = { min: 0, max: 60 } as const
 export const HEAT_MINUTES = { min: 1, max: 1440 } as const

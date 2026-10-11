@@ -966,6 +966,7 @@ app.post('/api/clinical/education', requireAuth, (req, res) => {
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.education.save', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
@@ -976,6 +977,7 @@ app.post('/api/clinical/vital', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
   addVital(patientId, vitalTercap)
+  addAudit(pencatat, 'clinical.vital.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
@@ -986,6 +988,7 @@ app.post('/api/clinical/supportive', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
   addSupportive(patientId, resultTercap)
+  addAudit(pencatat, 'clinical.supportive.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
@@ -993,6 +996,7 @@ app.post('/api/clinical/patient', requireAuth, (req, res) => {
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
   if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.patient.create', String((patient as { id?: unknown })?.id ?? ''))
   res.json({ ok: true })
 })
 
