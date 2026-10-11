@@ -114,6 +114,9 @@ jobs:
           BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
         run: node scripts/qa/body3d-mobile-smoke-v2.mjs
 
+      - name: OpenCell failed-source recovery
+        run: node scripts/qa/opencell-load-recovery-smoke.mjs
+
       - name: Body Exposure rendered WebGL visual artifact
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open

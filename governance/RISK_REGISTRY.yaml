@@ -477,11 +477,20 @@ risks:
       2.0.8. The application uses hop-count trust (1), not the affected subnet configuration; exploitability
       of the deployed proxy topology has not been established. Exact-head CI, review, merge and deployed
       dependency verification remain required; this entry does not claim production remediation.
+      2026-10-11 candidate remediation: current canonical frontend build-tree audit found five
+      high advisories in browserslist, nanoid, postcss, source-map-js and Vite. Compatible
+      transitive patches plus Vite 7.3.7/React plugin 5.2.0 remove all high/critical without
+      security exceptions. Explicit targets preserve the previous supported browser baseline.
+      Before/after fixtures reproduce the policy failure and pass. Production-only frontend
+      and server audits have no high/critical; moderate Router/uuid warnings remain.
+      Required current-source build/regression, exact-head CI and integration are pending; owner-directed engineering does not request AI peer review.
     evidence:
       - scripts/qa/dependency-audit-gate.mjs
       - scripts/qa/dependency-audit-gate.test.mjs
       - server/uji/proxyAddr.uji.mjs
       - scripts/qa/fixtures/dependency-audit/server-before-2210.json
+      - scripts/qa/fixtures/dependency-audit/root-before-2376.json
+      - scripts/qa/fixtures/dependency-audit/root-patched-2026-10-11.json
       - governance/dependency-audit-policy.json
       - .github/workflows/dependency-audit.yml
 

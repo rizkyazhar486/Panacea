@@ -25,6 +25,8 @@ blender -b --factory-startup --python-exit-code 1 \
 
 The optional `--frame-camera` keeps the selected camera’s source viewing direction and fits a 16:9 orthographic plate around the actual body bounds. This changes presentation only; anatomy transforms and geometry remain unchanged. Other copied cameras retain their original settings.
 
+Add `--frame-visible` to a render command to centre the plate on meshes visible after benchmark staging. Hidden tissue modules then do not enlarge the frame. The existing viewing direction is retained; the camera switches to orthographic projection with a 10% margin. Geometry and mesh transforms remain unchanged. The render report records this presentation adjustment and fingerprints the camera helper.
+
 ```sh
 # Adult female: preserves the existing female_layered staging and materials.
 blender -b /path/to/PANACEA_HUMAN_MASTER_v011.blend --python-exit-code 1 \
