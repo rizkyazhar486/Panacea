@@ -294,3 +294,5 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 ## Procedural heartbeat
 - `engine/cardiacCycle.ts` (Wiggers-type cycle, adjustable rate, explicit parameters), a "Heartbeat" button with a rate slider for adult bodies with heart chambers, and the labelled illustrative note. No dataset is used.
+## Fetal growth references
+- `pipeline/build_fetal_reference_tables.py` (WHO 2017 Tables 6-15 and INTERGROWTH-21st HC/BPD/AC/FL), `engine/fetalBiometry.ts`, a "Fetal growth" panel and `fetal_reference_tables.json`; regression tests against published values. The data-gaps entry for pregnancy and fetal development now distinguishes biometry (available) from 3D anatomy (still missing).

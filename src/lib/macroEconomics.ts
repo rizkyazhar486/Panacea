@@ -197,6 +197,7 @@ export interface TradeInput {
 }
 
 export interface TradeAnalysis {
+  ok: true
   balanceUsdBn: number
   balancePctGdp: number
   tradeOpennessPct: number
@@ -204,13 +205,23 @@ export interface TradeAnalysis {
   caution: string
 }
 
-export function analyseTrade(t: TradeInput): TradeAnalysis {
+/** Masukan yang tidak sah → alasan, bukan angka tebakan. Kosong/NaN dulu terbaca 0 dan GDP 0 menghasilkan "Surplus 0,0%". */
+export interface TradeRejected { ok: false; problems: string[] }
+
+const finiteNonNegative = (x: number) => Number.isFinite(x) && x >= 0
+
+export function analyseTrade(t: TradeInput): TradeAnalysis | TradeRejected {
+  const problems: string[] = []
+  if (!finiteNonNegative(t.exportsUsdBn)) problems.push('exports must be a number of 0 or more')
+  if (!finiteNonNegative(t.importsUsdBn)) problems.push('imports must be a number of 0 or more')
+  if (!(Number.isFinite(t.gdpUsdBn) && t.gdpUsdBn > 0)) problems.push('GDP must be a number greater than 0')
+  if (problems.length > 0) return { ok: false, problems }
   const balanceUsdBn = t.exportsUsdBn - t.importsUsdBn
-  const balancePctGdp = t.gdpUsdBn > 0 ? (balanceUsdBn / t.gdpUsdBn) * 100 : 0
-  const tradeOpennessPct = t.gdpUsdBn > 0 ? ((t.exportsUsdBn + t.importsUsdBn) / t.gdpUsdBn) * 100 : 0
+  const balancePctGdp = (balanceUsdBn / t.gdpUsdBn) * 100
+  const tradeOpennessPct = ((t.exportsUsdBn + t.importsUsdBn) / t.gdpUsdBn) * 100
 
   return {
-    balanceUsdBn, balancePctGdp, tradeOpennessPct,
+    ok: true, balanceUsdBn, balancePctGdp, tradeOpennessPct,
     verdict: balanceUsdBn >= 0
       ? `Surplus ${balancePctGdp.toFixed(1)}% dari PDB.`
       : `Defisit ${Math.abs(balancePctGdp).toFixed(1)}% dari PDB.`,
