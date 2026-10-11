@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { api, backendEnabled, GalatApi } from '../lib/api'
@@ -20,6 +20,11 @@ export function LabResultReview() {
   const authorized = account?.role === 'dokter' || Boolean(account?.isOwner)
   const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [busy, setBusy] = useState<string | null>(null)
+  // Prevent repeat taps before React has rendered the busy state.
+  const actionInFlight = useRef(false)
+  const [cooldownRows, setCooldownRows] = useState<Record<string, boolean>>({})
+  const cooldownTimers = useRef<number[]>([])
+  useEffect(() => () => { for (const timer of cooldownTimers.current) window.clearTimeout(timer) }, [])
   const [notice, setNotice] = useState<string | null>(null)
   const [comm, setComm] = useState<{ channel: string; note: string }>({ channel: COMMUNICATION_CHANNELS[0], note: '' })
 
@@ -36,32 +41,38 @@ export function LabResultReview() {
   const rows: QueueRow[] = useMemo(() => (load.state === 'ready' ? buildQueue(load.records, new Date()) : []), [load])
 
   const advance = async (row: QueueRow) => {
-    if (busy) return
+    if (busy || actionInFlight.current || cooldownRows[row.id]) return
     const built = buildAdvance(row, comm)
     if (!built.ok) { setNotice(built.reason === 'note-too-long' ? `Note is limited to ${MAX_NOTE} characters.` : ERROR_TEXT['evidence-required']); return }
-    setBusy(row.id); setNotice(null)
+    actionInFlight.current = true; setBusy(row.id); setNotice(null)
     try {
       await api.labResultAdvance(row.id, built.request)
+      // The same screen coordinate becomes a different clinical action after refresh.
+      // Ignore repeat physical taps on this result for 1.5 seconds after success.
+      setCooldownRows((prev) => ({ ...prev, [row.id]: true }))
+      cooldownTimers.current.push(window.setTimeout(() => {
+        setCooldownRows((prev) => { const next = { ...prev }; delete next[row.id]; return next })
+      }, 1500))
       if (built.request.communication) setComm((c) => ({ ...c, note: '' }))
     } catch (e) {
       setNotice(e instanceof GalatApi ? (ERROR_TEXT[e.message] ?? 'The server rejected this step.') : 'Could not reach the server.')
     } finally {
-      await refresh(); setBusy(null)
+      try { await refresh() } finally { setBusy(null); actionInFlight.current = false }
     }
   }
 
   if (!authorized) {
     return (
-      <main className="mx-auto w-full max-w-3xl space-y-5 py-10">
+      <section aria-label="Lab review access" className="mx-auto w-full max-w-3xl space-y-5 py-10 text-slate-900">
         <h1 className="text-3xl font-black tracking-[-.04em]">Lab result review</h1>
-        <p className="max-w-2xl text-sm leading-6 text-white/60">This queue is reserved for clinicians.</p>
-        <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center border-b border-white/30 text-sm font-black">Back to Clinical →</Link>
-      </main>
+        <p className="max-w-2xl text-sm leading-6 text-slate-600">This queue is reserved for clinicians.</p>
+        <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center border-b border-slate-500 text-sm font-black">Back to Clinical →</Link>
+      </section>
     )
   }
 
   return (
-    <main className="dark mx-auto w-full max-w-4xl space-y-6 pb-24 text-white">
+    <section aria-label="Lab result review" className="dark mx-auto w-full max-w-4xl space-y-6 rounded-xl bg-slate-950 px-4 pb-24 pt-6 text-white sm:px-6">
       <header className="border-b border-white/10 pb-5">
         <p className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-200/65">Doctor workspace · workflow only</p>
         <h1 className="mt-2 text-3xl font-black tracking-[-.05em] sm:text-4xl">Lab result review</h1>
@@ -105,9 +116,9 @@ export function LabResultReview() {
                     </label>
                   </div>
                 )}
-                <button type="button" disabled={busy !== null || (r.nextStatus === 'communicated' && !comm.note.trim())} onClick={() => void advance(r)}
+                <button type="button" disabled={busy !== null || Boolean(cooldownRows[r.id]) || (r.nextStatus === 'communicated' && !comm.note.trim())} onClick={() => void advance(r)}
                   className="min-h-[44px] border-b border-emerald-200/60 text-sm font-black text-emerald-100 disabled:opacity-40">
-                  {busy === r.id ? 'Saving…' : ACTION_LABEL[r.nextStatus]}
+                  {busy === r.id ? 'Saving…' : cooldownRows[r.id] ? 'Wait before next step…' : ACTION_LABEL[r.nextStatus]}
                 </button>
               </div>
             )}
@@ -115,6 +126,6 @@ export function LabResultReview() {
         ))}
       </ul>
       <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/50 hover:text-white">Clinical →</Link>
-    </main>
+    </section>
   )
 }
