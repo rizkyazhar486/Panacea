@@ -539,12 +539,14 @@
    "pillar": "Platform Reliability",
    "criterion": "Audit dependensi menolak laporan rusak",
    "acceptance": "Gerbang audit dependensi gagal pada laporan malformed",
-   "status": "NOT_CHECKED",
+   "status": "VERIFIED",
    "evidence": [
-    "PR #2301 terbuka (milik agen lain)"
+    "scripts/qa/dependency-audit-gate.mjs + scripts/qa/dependency-audit-gate.test.mjs (main d1f5244cc+): node --test 33/33 lulus; dipanggil dari .github/workflows/dependency-audit.yml untuk workspace web dan server.",
+    "Uji CLI independen (Sonnet Cloud): JSON terpotong, {\"error\":...}, dan berkas kosong semuanya exit 2; laporan bersih berpasangan exit 0.",
+    "Sabotase: gerbang dengan cek `audit.error` dimatikan gagal pada tes 'kunci_error_pada_laporan_yang_tampak_lengkap_tetap_gagal_tertutup'; dengan cek bentuk-objek dimatikan gagal pada 'input_audit_rusak_gagal_tertutup_bukan_lolos'."
    ],
    "owner": "Sol",
-   "note": ""
+   "note": "Batas: yang diverifikasi adalah penolakan bentuk laporan (rusak, kosong, berisi galat), bukan kebenaran data advisory npm. Gerbang belum dijalankan terhadap npm audit nyata di sesi ini (jaringan)."
   }
  ]
 }
