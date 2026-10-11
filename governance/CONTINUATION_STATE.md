@@ -1,3 +1,8 @@
+### Serialized integration contract — 2026-10-11
+
+- Merge order: existing mobile Vessels control fix #2390, then protein lookup #2396, then A2 encounter fixture #2383. Each downstream candidate contains its upstream implementation before exact-head automated CI. Before every merge, current-main merge-tree must equal the accepted candidate tree; any new source delta requires synchronization and fresh checks. No concurrent main merge or forced update.
+- Vercel connector inspection of configured panaceamed/panacea returned scope 403; no local authenticated Vercel CLI is available. Existing GitHub production workflow remains the authorized deployment route; production is pending, not inferred from build success.
+
 ### Body Exposure protein lookup implementation — 2026-10-11
 
 - Baseline main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's illustrative heartbeat #2394; ownership and simulation labels are preserved. Canonical Alpha is 24/43; no criterion changes in this task.
