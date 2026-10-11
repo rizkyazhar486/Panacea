@@ -7,9 +7,13 @@ import { getDemo } from '../../lib/profile'
 import {
   lajuKeringat, rencanaBahanBakar, hitungFtp, panduanDaya, saranIf,
   aklimatisasiPanas, aklimatisasiKetinggian, penaltiKetinggian,
-  type Segmen, type TesFtp, type PaparanPanas, type PaparanKetinggian,
+  type TesFtp, type PaparanPanas, type PaparanKetinggian,
 } from '../../lib/enduranceTools'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import {
+  readAltitudeExposure, readAltitudeMeters, readBodyWeight, readFuelDuration, readHeatExposure,
+  readOptionalTemperature, readPowerGuideInputs, readSegments, readSweatTest, type SegmentDraft,
+} from '../../lib/endurance/inputs'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alat Endurance — bahan bakar, FTP, panduan daya, aklimatisasi.
@@ -73,6 +77,9 @@ export function EnduranceTools() {
 
 // ── Bahan bakar ─────────────────────────────────────────────────────────────
 
+// Kunci ('mudah' | 'sedang' | 'berat') adalah data yang dibandingkan dengan ===; hanya labelnya yang diterjemahkan.
+const INTENSITAS_LABEL = { mudah: 'Easy', sedang: 'Moderate', berat: 'Hard' } as const
+
 function TabBahanBakar() {
   const demo = useMemo(() => getDemo(), [])
   const [durasi, setDurasi] = useState('180')
@@ -84,20 +91,31 @@ function TabBahanBakar() {
   const [sesudah, setSesudah] = useState('')
   const [menitUji, setMenitUji] = useState('60')
   const [minum, setMinum] = useState('500')
+  // Berat badan tampil sebagai kolom yang bisa diubah, bukan angka bawaan yang diam-diam dipakai.
+  const [berat, setBerat] = useState(String(demo.weightKg))
 
-  const keringat = useMemo(() => lajuKeringat({
-    beratSebelumKg: Number(sebelum), beratSesudahKg: Number(sesudah),
-    durasiMenit: Number(menitUji), minumMl: Number(minum),
-  }), [sebelum, sesudah, menitUji, minum])
+  const ujiKeringat = useMemo(() => readSweatTest({ before: sebelum, after: sesudah, minutes: menitUji, drunk: minum }), [sebelum, sesudah, menitUji, minum])
+  const keringat = useMemo(() => (ujiKeringat.ok ? lajuKeringat({
+    beratSebelumKg: ujiKeringat.value.beforeKg, beratSesudahKg: ujiKeringat.value.afterKg,
+    durasiMenit: ujiKeringat.value.minutes, minumMl: ujiKeringat.value.drunkMl,
+  }) : null), [ujiKeringat])
+  const keringatMulai = sebelum.trim() !== '' || sesudah.trim() !== ''
 
-  const rencana = useMemo(() => rencanaBahanBakar({
-    durasiMenit: Number(durasi) || 0,
-    intensitas,
-    beratKg: demo.weightKg || 65,
-    lajuKeringatMlPerJam: keringat?.mlPerJam,
-    suhuC: Number(suhu) || undefined,
-    perutSensitif: sensitif,
-  }), [durasi, intensitas, demo, keringat, suhu, sensitif])
+  const { rencana, masalah } = useMemo(() => {
+    const durasiOk = readFuelDuration(durasi)
+    const suhuOk = readOptionalTemperature(suhu)
+    const beratOk = readBodyWeight(berat)
+    if (!durasiOk.ok) return { rencana: null, masalah: durasiOk.reason }
+    if (!suhuOk.ok) return { rencana: null, masalah: suhuOk.reason }
+    if (!beratOk.ok) return { rencana: null, masalah: beratOk.reason }
+    return {
+      masalah: null,
+      rencana: rencanaBahanBakar({
+        durasiMenit: durasiOk.value, intensitas, beratKg: beratOk.value,
+        lajuKeringatMlPerJam: keringat?.mlPerJam, suhuC: suhuOk.value, perutSensitif: sensitif,
+      }),
+    }
+  }, [durasi, intensitas, berat, keringat, suhu, sensitif])
 
   return (
     <div className="space-y-4">
@@ -115,6 +133,7 @@ function TabBahanBakar() {
           <Field label="Session duration (min)"><input className={inputClass} inputMode="numeric" value={menitUji} onChange={(e) => setMenitUji(e.target.value)} /></Field>
           <Field label="Total drunk (mL)"><input className={inputClass} inputMode="numeric" value={minum} onChange={(e) => setMinum(e.target.value)} /></Field>
         </div>
+        {keringatMulai && !ujiKeringat.ok && <p className="mt-3 text-sm text-amber-800 dark:text-amber-200" role="alert">{ujiKeringat.reason}</p>}
         {keringat && (
           <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -130,13 +149,14 @@ function TabBahanBakar() {
         <SectionTitle icon={<IconRun />} title="Plan for one session" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="Duration (min)"><input className={inputClass} inputMode="numeric" value={durasi} onChange={(e) => setDurasi(e.target.value)} /></Field>
-          <Field label="Temperature (°C)"><input className={inputClass} inputMode="numeric" value={suhu} onChange={(e) => setSuhu(e.target.value)} /></Field>
+          <Field label="Temperature (°C, optional)"><input className={inputClass} inputMode="numeric" value={suhu} onChange={(e) => setSuhu(e.target.value)} /></Field>
+          <Field label="Body weight (kg)"><input className={inputClass} inputMode="decimal" value={berat} onChange={(e) => setBerat(e.target.value)} /></Field>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {(['mudah', 'sedang', 'berat'] as const).map((i) => (
             <button key={i} onClick={() => setIntensitas(i)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${intensitas === i ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'}`}>
-              {i}
+              {INTENSITAS_LABEL[i]}
             </button>
           ))}
           <button onClick={() => setSensitif((v) => !v)}
@@ -145,10 +165,12 @@ function TabBahanBakar() {
           </button>
         </div>
 
+        {masalah && <p className="mt-4 text-sm text-amber-800 dark:text-amber-200" role="alert">{masalah}</p>}
+        {rencana && (<>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Stat label="Carbohydrate" value={`${rencana.karboPerJamGram}`} sub="g/jam" />
+          <Stat label="Carbohydrate" value={`${rencana.karboPerJamGram}`} sub="g/h" />
           <Stat label="Fluid" value={`${rencana.cairanPerJamMl}`} sub="mL/h" />
-          <Stat label="Sodium" value={`${rencana.natriumPerJamMg}`} sub="mg/jam" />
+          <Stat label="Sodium" value={`${rencana.natriumPerJamMg}`} sub="mg/h" />
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <Stat label="Total carbohydrate" value={`${rencana.totalKarboGram} g`} />
@@ -181,6 +203,7 @@ function TabBahanBakar() {
             ))}
           </div>
         )}
+        </>)}
       </Card>
     </div>
   )
@@ -260,22 +283,26 @@ function TabPanduan() {
   const [ftp, setFtp] = useState('238')
   const [massa, setMassa] = useState(String((demo.weightKg || 65) + 9))
   const [durasiJam, setDurasiJam] = useState('2')
-  const [segmen, setSegmen] = useState<Segmen[]>([
-    { nama: 'Opening flat', jarakKm: 20, gradienPct: 0 },
-    { nama: 'Climb', jarakKm: 8, gradienPct: 7 },
-    { nama: 'Descent', jarakKm: 8, gradienPct: -6 },
-    { nama: 'Closing flat', jarakKm: 14, gradienPct: 0 },
+  // Kolom segmen disimpan sebagai teks mentah supaya bisa dikosongkan dan diketik ulang.
+  const [segmen, setSegmen] = useState<SegmentDraft[]>([
+    { nama: 'Opening flat', jarak: '20', gradien: '0' },
+    { nama: 'Climb', jarak: '8', gradien: '7' },
+    { nama: 'Descent', jarak: '8', gradien: '-6' },
+    { nama: 'Closing flat', jarak: '14', gradien: '0' },
   ])
 
-  const anjuran = useMemo(() => saranIf(Number(durasiJam) || 2), [durasiJam])
+  const masukan = useMemo(() => readPowerGuideInputs({ ftp, mass: massa, hours: durasiJam }), [ftp, massa, durasiJam])
+  const rute = useMemo(() => readSegments(segmen), [segmen])
+  const anjuran = useMemo(() => (masukan.ok ? saranIf(masukan.value.durationHours) : null), [masukan])
   const [targetIf, setTargetIf] = useState<number | null>(null)
-  const ifDipakai = targetIf ?? anjuran.if
+  const ifDipakai = targetIf ?? anjuran?.if ?? null
+  const masalah = !masukan.ok ? masukan.reason : !rute.ok ? rute.reason : null
 
-  const hasil = useMemo(() => panduanDaya({
-    segmen, ftp: Number(ftp) || 200, targetIf: ifDipakai, massaTotalKg: Number(massa) || 75,
-  }), [segmen, ftp, ifDipakai, massa])
+  const hasil = useMemo(() => (masukan.ok && rute.ok && ifDipakai !== null ? panduanDaya({
+    segmen: rute.value, ftp: masukan.value.ftpWatt, targetIf: ifDipakai, massaTotalKg: masukan.value.totalMassKg,
+  }) : null), [masukan, rute, ifDipakai])
 
-  const ubah = (i: number, patch: Partial<Segmen>) =>
+  const ubah = (i: number, patch: Partial<SegmentDraft>) =>
     setSegmen((s) => s.map((x, j) => (j === i ? { ...x, ...patch } : x)))
 
   return (
@@ -294,13 +321,13 @@ function TabPanduan() {
           <Field label="Estimated hours"><input className={inputClass} inputMode="decimal" value={durasiJam} onChange={(e) => { setDurasiJam(e.target.value); setTargetIf(null) }} /></Field>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-          Total weight = body + bike + gear. {anjuran.ket}
+          Total weight = body + bike + gear.{anjuran ? ` ${anjuran.ket}` : ''}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-xs text-neutral-500">Target intensity</span>
           {[0.65, 0.73, 0.8, 0.85, 0.95].map((v) => (
             <button key={v} onClick={() => setTargetIf(v)}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-bold tabular-nums ${Math.abs(ifDipakai - v) < 0.001 ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-neutral-500'}`}>
+              className={`rounded-lg border px-2.5 py-1 text-xs font-bold tabular-nums ${ifDipakai !== null && Math.abs(ifDipakai - v) < 0.001 ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-neutral-500'}`}>
               {v.toFixed(2)}
             </button>
           ))}
@@ -314,8 +341,8 @@ function TabPanduan() {
             <div key={i} className="rounded-lg border border-white/10 p-2.5">
               <div className="grid grid-cols-3 gap-2">
                 <Field label="Name"><input className={inputClass + ' !text-xs'} value={s.nama} onChange={(e) => ubah(i, { nama: e.target.value })} /></Field>
-                <Field label="Distance (km)"><input className={inputClass + ' !text-xs'} inputMode="decimal" value={String(s.jarakKm)} onChange={(e) => ubah(i, { jarakKm: Number(e.target.value) || 0 })} /></Field>
-                <Field label="Gradient (%)"><input className={inputClass + ' !text-xs'} inputMode="decimal" value={String(s.gradienPct)} onChange={(e) => ubah(i, { gradienPct: Number(e.target.value) || 0 })} /></Field>
+                <Field label="Distance (km)"><input className={inputClass + ' !text-xs'} inputMode="decimal" value={s.jarak} onChange={(e) => ubah(i, { jarak: e.target.value })} /></Field>
+                <Field label="Gradient (%)"><input className={inputClass + ' !text-xs'} inputMode="decimal" value={s.gradien} onChange={(e) => ubah(i, { gradien: e.target.value })} /></Field>
               </div>
               {segmen.length > 1 && (
                 <button onClick={() => setSegmen((x) => x.filter((_, j) => j !== i))}
@@ -324,14 +351,16 @@ function TabPanduan() {
             </div>
           ))}
         </div>
-        <button onClick={() => setSegmen((s) => [...s, { nama: `Segmen ${s.length + 1}`, jarakKm: 5, gradienPct: 0 }])}
+        <button onClick={() => setSegmen((s) => [...s, { nama: `Segment ${s.length + 1}`, jarak: '5', gradien: '0' }])}
           className="mt-2 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-neutral-600">
-          + Tambah segmen
+          + Add segment
         </button>
       </Card>
 
       <Card>
         <SectionTitle icon={<IconRun />} title="Target power" />
+        {masalah && <p className="mt-2 text-sm text-amber-800 dark:text-amber-200" role="alert">{masalah}</p>}
+        {hasil && (<>
         <div className="mt-2 space-y-2">
           {hasil.segmen.map((s, i) => (
             <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -341,14 +370,14 @@ function TabPanduan() {
               </div>
               <div className="mt-0.5 flex flex-wrap gap-x-3 text-[11px] text-neutral-500">
                 <span>{s.pctFtp}% FTP</span><span>{s.jarakKm} km @ {s.gradienPct}%</span>
-                <span>≈ {s.perkiraanKmh} km/j</span><span>≈ {s.perkiraanMenit.toFixed(0)} menit</span>
+                <span>≈ {s.perkiraanKmh} km/h</span><span>≈ {s.perkiraanMenit.toFixed(0)} min</span>
               </div>
               <p className="mt-1 text-sm leading-relaxed text-neutral-500">{s.catatan}</p>
             </div>
           ))}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <Stat label="Estimated total" value={`${Math.floor(hasil.totalMenit / 60)}j ${Math.round(hasil.totalMenit % 60)}m`} />
+          <Stat label="Estimated total" value={`${Math.floor(hasil.totalMenit / 60)}h ${Math.round(hasil.totalMenit % 60)}m`} />
           <Stat label="Distance" value={`${hasil.totalKm} km`} />
         </div>
         <div className="mt-3 space-y-1.5">
@@ -356,6 +385,7 @@ function TabPanduan() {
             <p key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed text-amber-900 dark:text-amber-100/90">{p}</p>
           ))}
         </div>
+        </>)}
       </Card>
     </div>
   )
@@ -374,14 +404,20 @@ function TabAklimatisasi() {
 
   const statusPanas = useMemo(() => aklimatisasiPanas(panas), [panas])
   const statusTinggi = useMemo(() => aklimatisasiKetinggian(tinggi), [tinggi])
-  const penalti = useMemo(() => penaltiKetinggian(Number(tMeter) || 0), [tMeter])
+  // Pratinjau memakai ketinggian saja; mencatat paparan memerlukan semua kolom sah. Kolom kosong tidak pernah tercatat sebagai 0.
+  const ketinggian = useMemo(() => readAltitudeMeters(tMeter), [tMeter])
+  const penalti = useMemo(() => (ketinggian.ok ? penaltiKetinggian(ketinggian.value) : null), [ketinggian])
+  const paparanPanas = useMemo(() => readHeatExposure(pSuhu, pMenit), [pSuhu, pMenit])
+  const paparanTinggi = useMemo(() => readAltitudeExposure(tMeter, tJam), [tMeter, tJam])
 
   const tambahPanas = () => {
-    const next = [...panas, { tanggal: tglHariIni, suhuC: Number(pSuhu) || 0, menit: Number(pMenit) || 0 }]
+    if (!paparanPanas.ok) return
+    const next = [...panas, { tanggal: tglHariIni, suhuC: paparanPanas.value.suhuC, menit: paparanPanas.value.menit }]
     setPanas(next); simpan(KEY_PANAS, next)
   }
   const tambahTinggi = () => {
-    const next = [...tinggi, { tanggal: tglHariIni, meter: Number(tMeter) || 0, jam: Number(tJam) || 0 }]
+    if (!paparanTinggi.ok) return
+    const next = [...tinggi, { tanggal: tglHariIni, meter: paparanTinggi.value.meter, jam: paparanTinggi.value.jam }]
     setTinggi(next); simpan(KEY_TINGGI, next)
   }
 
@@ -397,10 +433,11 @@ function TabAklimatisasi() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Temperature (°C)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={pSuhu} onChange={(e) => setPSuhu(e.target.value)} /></Field>
           <Field label="Minutes"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={pMenit} onChange={(e) => setPMenit(e.target.value)} /></Field>
-          <div className="flex items-end"><button onClick={tambahPanas} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white">Log today</button></div>
+          <div className="flex items-end"><button onClick={tambahPanas} disabled={!paparanPanas.ok} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-40">Log today</button></div>
         </div>
+        {!paparanPanas.ok && <p className="mt-1.5 text-[11px] text-amber-800 dark:text-amber-200" role="alert">{paparanPanas.reason}</p>}
         <p className="mt-1.5 text-[11px] text-slate-500">
-          {panas.length} exposures logged. Only sessions above 27 °C and at least 30 minutes count —
+          {panas.length} {panas.length === 1 ? 'exposure' : 'exposures'} logged. Only sessions above 27 °C and at least 30 minutes count —
           below that the stimulus is too weak to trigger adaptation.
         </p>
       </Card>
@@ -415,16 +452,19 @@ function TabAklimatisasi() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Altitude (m)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={tMeter} onChange={(e) => setTMeter(e.target.value)} /></Field>
           <Field label="Hours spent there"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={tJam} onChange={(e) => setTJam(e.target.value)} /></Field>
-          <div className="flex items-end"><button onClick={tambahTinggi} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white">Log today</button></div>
+          <div className="flex items-end"><button onClick={tambahTinggi} disabled={!paparanTinggi.ok} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-40">Log today</button></div>
         </div>
-        <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-neutral-500">Aerobic capacity loss at {tMeter} m</span>
-            <span className="text-lg font-semibold tabular-nums text-ink">−{penalti.pctVo2Turun}%</span>
+        {!paparanTinggi.ok && <p className="mt-1.5 text-[11px] text-amber-800 dark:text-amber-200" role="alert">{paparanTinggi.reason}</p>}
+        {penalti && (
+          <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm text-neutral-500">Aerobic capacity loss at {tMeter} m</span>
+              <span className="text-lg font-semibold tabular-nums text-ink">−{penalti.pctVo2Turun}%</span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{penalti.ket}</p>
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-neutral-500">{penalti.ket}</p>
-        </div>
-        <p className="mt-2 text-[11px] text-slate-500">{tinggi.length} paparan tercatat. Di bawah 1500 m tidak dihitung.</p>
+        )}
+        <p className="mt-2 text-[11px] text-slate-500">{tinggi.length} {tinggi.length === 1 ? 'exposure' : 'exposures'} logged. Below 1500 m they are not counted.</p>
       </Card>
     </div>
   )
