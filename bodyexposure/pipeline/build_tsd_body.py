@@ -17,6 +17,7 @@ OUT = f"{ROOT}/bodies"
 _argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 _arg = lambda k, d=None: _argv[_argv.index(k) + 1] if k in _argv else d
 STL = os.path.expanduser(_arg("--stl")); BODY_ID = _arg("--body-id"); VERSION = _arg("--version", "body_v001")
+LAT_TOL_M = 0.02
 SOURCE = ("TotalSegmentator dataset v2.0.1 (Wasserthal et al., Radiology: Artificial Intelligence 2023; Zenodo 10047292), reference segmentations: made with iterative nnU-Net "
           "and corrected by a radiologist; CC BY 4.0")
 METHOD = ("reference segmentation of the dataset (model-assisted, expert-corrected), CT resampled to 1.5 mm and cropped to the segmented region by the dataset authors; "
@@ -44,7 +45,7 @@ def main():
     age, sex = int(float(meta["age"])), {"f": "female", "m": "male"}[meta["gender"]]
     items = []
     for key in sorted(prov["structures"]):
-        name, sysn, mat, kind, lat = classify(key)
+        name, sysn, mat, kind, lat = classify(key, meta["gender"])
         me = load_stl(f"{STL}/{key}.stl")
         bm = bmesh.new(); bm.from_mesh(me); bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4); bm.to_mesh(me); bm.free()
         me.transform(Matrix(((-0.001, 0, 0, 0), (0, -0.001, 0, 0), (0, 0, 0.001, 0), (0, 0, 0, 1))))
@@ -55,7 +56,7 @@ def main():
     cx = (min(c.x for c in allv) + max(c.x for c in allv)) / 2; cy = (min(c.y for c in allv) + max(c.y for c in allv)) / 2
     zmin = min(v.co.z for *_r, me in items for v in me.vertices)
     coll = bpy.data.collections.new(BODY_ID); bpy.context.scene.collection.children.link(coll)
-    seen, report, bad = set(), [], []
+    seen, report, bad, near_mid = set(), [], [], []
     for key, name, sysn, mat, kind, lat, me in items:
         me.transform(Matrix.Translation((-cx, -cy, -zmin)))
         unpaired = lat == "unpaired"
@@ -64,7 +65,10 @@ def main():
         seen.add(sid); me.name = sid
         ob = bpy.data.objects.new(sid, me)
         bb = [Vector(v) for v in ob.bound_box]; ctr = (bb[0] + bb[6]) / 2
-        if not unpaired and ((lat == "left" and ctr.x < 0) or (lat == "right" and ctr.x > 0)): bad.append((sid, round(ctr.x, 3)))
+        # lateralitas terhadap geometri (+X = kiri): salah tanda lebih dari LAT_TOL_M dihentikan; struktur yang melintasi garis tengah (mis. vena brakiosefalika kiri)
+        # boleh berpusat di dekat garis tengah dan hanya dicatat
+        if not unpaired and ((lat == "left" and ctr.x < 0) or (lat == "right" and ctr.x > 0)):
+            (bad if abs(ctr.x) > LAT_TOL_M else near_mid).append((sid, round(ctr.x, 4)))
         me.transform(Matrix.Translation(-ctr)); ob.location = ctr
         for p in me.polygons: p.use_smooth = True
         me.materials.append(bpy.data.materials[mat if mat in bpy.data.materials else "PAN_Organ"])
@@ -101,7 +105,7 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=path)
     res = {"body": BODY_ID, "subject": prov["subject"], "age": age, "sex": sex, "structures": len(report), "extent_m": coll["panacea_extent_m"], "tris_total": sum(r["tris"] for r in report),
            "empty_classes": prov["empty"], "not_published": sorted(prov["not_published"]), "cut_by_scan_border": sorted(k for k, v in prov["structures"].items() if v["touches_ct_border"]),
-           "open_boundary": sum(r["boundary_edges"] > 0 for r in report), "nonmanifold": sum(r["nonmanifold_edges"] > 0 for r in report)}
+           "laterality_near_midline": near_mid, "open_boundary": sum(r["boundary_edges"] > 0 for r in report), "nonmanifold": sum(r["nonmanifold_edges"] > 0 for r in report)}
     json.dump({"summary": res, "structures": report}, open(f"{ROOT}/qa_reports/tsd_{prov['subject']}_build.json", "w"), indent=1)
     print("BODY", {k: v for k, v in res.items() if k not in ("cut_by_scan_border",)}, "cut:", len(res["cut_by_scan_border"]))
 

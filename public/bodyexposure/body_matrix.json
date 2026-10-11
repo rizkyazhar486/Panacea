@@ -245,13 +245,23 @@
    "systems": {},
    "variants": [
     {
-     "body_id": "TSD_S0196.OLDER_ADULT.FEMALE",
-     "structures": 111,
-     "label": "73 y female (head to upper thighs)",
+     "body_id": "TSD_S0327.OLDER_ADULT.MALE",
+     "structures": 108,
+     "label": "72 y male (neck to upper thighs)",
      "status": "source_backed_partial",
      "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
      "stature_m": null,
-     "coverage": "partial body: head (skull only, no brain), torso and upper thighs; no limbs below mid-thigh, no forearms, no skin",
+     "coverage": "partial body: lower neck, torso and upper thighs; only a cut piece of the skull, no brain, no limbs below mid-thigh, no forearms, no skin",
+     "individual": "One individual from the dataset (subject s0327: male, 72 years, CT angiography neck to leg, pathology label none), not an atlas and not a reference older adult. Segmentations are model-assisted and corrected by a radiologist, CT resampled to 1.5 mm and cropped by the dataset authors; 21 structures are cut by the scan border. Not clinically reviewed."
+    },
+    {
+     "body_id": "TSD_S0196.OLDER_ADULT.FEMALE",
+     "structures": 111,
+     "label": "73 y female (neck to upper thighs)",
+     "status": "source_backed_partial",
+     "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
+     "stature_m": null,
+     "coverage": "partial body: neck, torso and upper thighs; only a cut piece of the skull, no brain, no limbs below mid-thigh, no forearms, no skin",
      "individual": "One individual from the dataset (subject s0196: female, 73 years, CT angiography neck to leg, pathology label none), not an atlas and not a reference older adult. Segmentations are model-assisted and corrected by a radiologist, CT resampled to 1.5 mm and cropped by the dataset authors; 16 structures are cut by the scan border. Not clinically reviewed."
     }
    ]
@@ -482,6 +492,17 @@
   "tsd_s0196_older_adult_female.respiratory",
   "tsd_s0196_older_adult_female.skeletal",
   "tsd_s0196_older_adult_female.urinary",
+  "tsd_s0327_older_adult_male.cardiovascular",
+  "tsd_s0327_older_adult_male.digestive",
+  "tsd_s0327_older_adult_male.endocrine",
+  "tsd_s0327_older_adult_male.joint",
+  "tsd_s0327_older_adult_male.lymphatic",
+  "tsd_s0327_older_adult_male.muscular",
+  "tsd_s0327_older_adult_male.nervous",
+  "tsd_s0327_older_adult_male.reproductive",
+  "tsd_s0327_older_adult_male.respiratory",
+  "tsd_s0327_older_adult_male.skeletal",
+  "tsd_s0327_older_adult_male.urinary",
   "vhf_denver_ct_adult_female.joint",
   "vhf_denver_ct_adult_female.muscular",
   "vhf_denver_ct_adult_female.skeletal"
@@ -492,7 +513,8 @@
   "vhf_denver_ct_adult_female": "LOD4",
   "fetus": "LOD3",
   "atlas_nervous_mni152": "LOD4",
-  "tsd_s0196_older_adult_female": "LOD4"
+  "tsd_s0196_older_adult_female": "LOD4",
+  "tsd_s0327_older_adult_male": "LOD4"
  },
  "motion": {
   "adult_male": {
