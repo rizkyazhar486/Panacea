@@ -61,3 +61,7 @@ cut-position and opacity adjustment, and restoring defaults. A temporary 300%
 zoom trial exercised the narrow single-column layout; browser zoom was restored
 to 100%. This was an isolated local component trial, without production auth
 changes, and is not medical acceptance or a mobile-device performance benchmark.
+The new route is registered in both product navigation/search catalogs. The
+inspector uses the shared late-GLB disposal guard and progressive-disclosure
+prose while keeping the pending-review summary visible. All three initially
+failing integration checks passed after these fixes; their checks were retained.

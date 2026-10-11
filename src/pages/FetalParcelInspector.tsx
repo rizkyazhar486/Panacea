@@ -4,6 +4,8 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { penjagaMuatan } from '../lib/gltfSesudahLepas'
+import { Prosa } from '../components/ui/Prosa'
 import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../domains/body-exposure'
 import './fetalParcelInspector.css'
 
@@ -40,6 +42,7 @@ export function FetalParcelInspector() {
     const host = canvasHost.current
     if (!host || !dataset) return
     let disposed = false
+    const penjaga = penjagaMuatan()
     const scene = new THREE.Scene()
     scene.background = new THREE.Color('#101b29')
     const camera = new THREE.PerspectiveCamera(38, 1, 0.001, 10)
@@ -83,7 +86,7 @@ export function FetalParcelInspector() {
     controls.addEventListener('change', render)
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     loader.load(`${BASE}${dataset.asset}`, gltf => {
-      if (disposed) { gltf.scene.traverse(ob => { if (ob instanceof THREE.Mesh) { ob.geometry.dispose(); (Array.isArray(ob.material) ? ob.material : [ob.material]).forEach(m => m.dispose()) } }); return }
+      if (!penjaga.terima(gltf.scene)) return
       let failure = ''
       gltf.scene.traverse(ob => {
         if (!(ob instanceof THREE.Mesh)) return
@@ -125,7 +128,7 @@ export function FetalParcelInspector() {
     }
     renderer.domElement.addEventListener('pointerdown', pointerDown); renderer.domElement.addEventListener('pointerup', pick)
     return () => {
-      disposed = true; sceneRef.current = null; observer.disconnect(); controls.dispose()
+      penjaga.lepas(); disposed = true; sceneRef.current = null; observer.disconnect(); controls.dispose()
       renderer.domElement.removeEventListener('pointerdown', pointerDown); renderer.domElement.removeEventListener('pointerup', pick)
       scene.traverse(ob => { if (ob instanceof THREE.Mesh) { ob.geometry.dispose(); (Array.isArray(ob.material) ? ob.material : [ob.material]).forEach(m => m.dispose()) } })
       renderer.dispose(); renderer.domElement.remove()
@@ -153,8 +156,8 @@ export function FetalParcelInspector() {
 
   return <main className="fetal-parcel-inspector">
     <header><Link to="/body-exposure/canonical">← Body Exposure atlas</Link><h1>Fetal segmentation dataset</h1>
-      <p>Nine numeric regions from the KCL population-average MRI atlas. Individual anatomical identities remain unresolved. Clinical review pending.</p>
-      <p className="fpi-note">Colours distinguish source labels. Display cuts and transparency change the view only. No named lobes are added to the canonical atlas.</p>
+      <p>KCL population-average MRI · nine numeric regions · anatomical identities unresolved · clinical review pending.</p>
+      <Prosa kelas="fpi-note">Colours distinguish source labels. Display cuts and transparency change the view only. No named lobes are added to the canonical atlas.</Prosa>
     </header>
     {error && <p role="alert">{error}</p>}
     <div className="fpi-layout">
@@ -165,7 +168,7 @@ export function FetalParcelInspector() {
         <label>Display cut <select value={section} onChange={e => setSection(e.target.value as Section)}>{(['off', 'sagittal', 'coronal', 'axial'] as const).map(value => <option key={value}>{value}</option>)}</select></label>
         {section !== 'off' && <label>Cut position <input aria-label="Cut position" type="range" min="0" max="100" value={cut} onChange={e => setCut(Number(e.target.value))} /></label>}
         <label>Surface opacity <input type="range" min="0.15" max="1" step="0.05" value={opacity} onChange={e => setOpacity(Number(e.target.value))} /></label>
-        <p className="fpi-note">+X subject left · +Y superior · +Z anterior. Metres, source origin retained. Cuts expose open display surfaces; underlying meshes remain closed.</p>
+        <Prosa kelas="fpi-note">+X subject left · +Y superior · +Z anterior. Metres, source origin retained. Cuts expose open display surfaces; underlying meshes remain closed.</Prosa>
       </section>
       <section className="fpi-panel" aria-label="Source regions">
         <div className="fpi-controls"><button onClick={() => { setVisible([1,2,3,4,5]); setIsolate(false) }}>Show labels 1–5</button><button onClick={() => { setVisible([1,2,3,4,5,6,7,8,9]); setIsolate(false) }}>Show all nine</button></div>
