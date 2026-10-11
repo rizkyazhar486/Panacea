@@ -3,7 +3,9 @@ import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, ReferenceLine } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
+import { parseNumberField, validateFraminghamInput } from '../domains/clinical-calculators'
+import type { FraminghamField } from '../domains/clinical-calculators'
 import { framinghamCVD, cvdBand } from '../lib/riskModels'
 import { CopyNote } from '../components/CopyNote'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
@@ -58,28 +60,36 @@ const LEVERS: Lever[] = [
 ]
 
 export function HealthSimulator() {
-  const demo = getDemo()
-  const [b, setB] = useState<Baseline>({
-    age: demo.age || 45, sex: demo.sex || 'M', totChol: 200, hdl: 50, sbp: 140,
-    treatedBP: false, smoker: false, diabetic: false,
+  // Kolom angka mulai kosong; usia hanya diprefill dari profil yang benar-benar tersimpan (bukan getDemo()).
+  const [txt, setTxt] = useState<Record<FraminghamField, string>>(() => {
+    const saved = getDemoTersimpan().age
+    return { age: typeof saved === 'number' && Number.isFinite(saved) ? String(saved) : '', totChol: '', hdl: '', sbp: '' }
   })
+  const [flags, setFlags] = useState({ sex: (getDemoTersimpan().sex === 'F' ? 'F' : 'M') as 'M' | 'F', treatedBP: false, smoker: false, diabetic: false })
   const [active, setActive] = useState<Record<string, boolean>>({})
 
-  const applicable = LEVERS.filter((l) => l.applies(b))
+  const input = validateFraminghamInput({
+    age: parseNumberField(txt.age), totChol: parseNumberField(txt.totChol), hdl: parseNumberField(txt.hdl), sbp: parseNumberField(txt.sbp),
+  })
+  const b: Baseline | null = input.ok ? { ...input.value, ...flags } : null
+
+  const applicable = b ? LEVERS.filter((l) => l.applies(b)) : []
   const simulated = useMemo(() => {
+    if (!b) return null
     let s = { ...b }
     for (const l of LEVERS) if (active[l.id] && l.applies(b)) s = l.apply(s)
     return s
   }, [b, active])
 
-  const baseRisk = framinghamCVD(b)
-  const simRisk = framinghamCVD(simulated)
+  const baseRisk = b ? framinghamCVD(b) : null
+  const simRisk = simulated ? framinghamCVD(simulated) : null
 
   // Life Timeline — project the same published equation across future ages
   // (Framingham published age range is 30-74, so we cap the projection there).
   // Biomarkers are held constant: this isolates the effect of the interventions
   // themselves rather than guessing how labs drift, which keeps it honest.
   const timeline = useMemo(() => {
+    if (!b || !simulated) return []
     const start = Math.max(30, Math.round(b.age))
     const pts: { age: number; current: number | null; withChanges: number | null }[] = []
     for (let a = start; a <= 74; a += Math.max(1, a === start ? 0 : 5)) {
@@ -93,14 +103,16 @@ export function HealthSimulator() {
     }
     return pts
   }, [b, simulated])
-  const hasIntervention = Object.entries(active).some(([id, on]) => on && LEVERS.find((l) => l.id === id)?.applies(b))
+  const hasIntervention = !!b && Object.entries(active).some(([id, on]) => on && LEVERS.find((l) => l.id === id)?.applies(b))
   const valid = baseRisk != null && simRisk != null
   const delta = valid ? simRisk! - baseRisk! : 0
   const relReduction = valid && baseRisk! > 0 ? (1 - simRisk! / baseRisk!) * 100 : 0
 
-  const num = (label: string, key: keyof Baseline, step = 1) => (
+  const problems = input.ok ? {} : input.problems
+  const num = (label: string, key: FraminghamField) => (
     <Field label={label}>
-      <input className={inputClass} type="number" step={step} value={(b[key] as number) || ''} onChange={(e) => setB((x) => ({ ...x, [key]: Number(e.target.value) || 0 }))} />
+      <input className={inputClass} type="number" inputMode="decimal" step={1} value={txt[key]} aria-invalid={!!problems[key]} onChange={(e) => setTxt((x) => ({ ...x, [key]: e.target.value }))} />
+      {problems[key] && <p role="alert" className="mt-1 text-[11px] font-semibold text-red-600">{problems[key]}</p>}
     </Field>
   )
 
@@ -111,9 +123,9 @@ export function HealthSimulator() {
         <BatasKlaimKesehatan permukaan="longevity.health-simulator" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enter your current numbers, then toggle published-model levers and watch estimated 10-year cardiovascular risk move. Every number comes from Framingham (D'Agostino 2008) — a technical estimate to discuss with a clinician, not a personal prognosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
-          {num('Age (years)', 'age')}
+          {num('Age (years, 30–74)', 'age')}
           <Field label="Sex">
-            <select className={inputClass} value={b.sex} onChange={(e) => setB((x) => ({ ...x, sex: e.target.value as 'M' | 'F' }))}>
+            <select className={inputClass} value={flags.sex} onChange={(e) => setFlags((x) => ({ ...x, sex: e.target.value as 'M' | 'F' }))}>
               <option value="M">Male</option>
               <option value="F">Female</option>
             </select>
@@ -124,13 +136,13 @@ export function HealthSimulator() {
         </div>
         <div className="mt-3 flex flex-wrap gap-3">
           <label className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
-            <input type="checkbox" className="h-4 w-4 rounded" checked={b.smoker} onChange={(e) => setB((x) => ({ ...x, smoker: e.target.checked }))} /> Current smoker
+            <input type="checkbox" className="h-4 w-4 rounded" checked={flags.smoker} onChange={(e) => setFlags((x) => ({ ...x, smoker: e.target.checked }))} /> Current smoker
           </label>
           <label className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
-            <input type="checkbox" className="h-4 w-4 rounded" checked={b.diabetic} onChange={(e) => setB((x) => ({ ...x, diabetic: e.target.checked }))} /> Diabetes
+            <input type="checkbox" className="h-4 w-4 rounded" checked={flags.diabetic} onChange={(e) => setFlags((x) => ({ ...x, diabetic: e.target.checked }))} /> Diabetes
           </label>
           <label className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
-            <input type="checkbox" className="h-4 w-4 rounded" checked={b.treatedBP} onChange={(e) => setB((x) => ({ ...x, treatedBP: e.target.checked }))} /> On BP treatment
+            <input type="checkbox" className="h-4 w-4 rounded" checked={flags.treatedBP} onChange={(e) => setFlags((x) => ({ ...x, treatedBP: e.target.checked }))} /> On BP treatment
           </label>
         </div>
       </Card>
@@ -138,7 +150,7 @@ export function HealthSimulator() {
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Try changing your future</div>
         <div className="mt-3 space-y-2">
-          {applicable.length === 0 && <p className="text-[12px] text-neutral-500">Your current profile has no modifiable levers in this model — great baseline.</p>}
+          {b && applicable.length === 0 && <p className="text-[12px] text-neutral-500">Your current profile has no modifiable levers in this model — great baseline.</p>}
           {applicable.map((l) => (
             <label key={l.id} className="flex items-start gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded" checked={!!active[l.id]} onChange={() => setActive((a) => ({ ...a, [l.id]: !a[l.id] }))} />
@@ -177,7 +189,7 @@ export function HealthSimulator() {
             <CopyNote text={`Framingham 10-yr CVD risk ${baseRisk!.toFixed(1)}% → ${simRisk!.toFixed(1)}% with modifiable changes (${relReduction.toFixed(0)}% relative reduction) [D'Agostino 2008]`} />
           </>
         ) : (
-          <p className="mt-2 text-[12px] text-neutral-500">Enter valid cholesterol, HDL, and blood-pressure values to simulate.</p>
+          <p className="mt-2 text-[12px] text-neutral-500">No estimate yet — fill in age, total cholesterol, HDL and systolic BP within the ranges shown.</p>
         )}
       </Card>
 
