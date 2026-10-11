@@ -164,7 +164,9 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
-import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
+import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
+import { repoHasilLab, repoRujukan } from './store.js'
+import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
@@ -715,6 +717,11 @@ app.post('/api/meets', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Meet>
   if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  // Match the Club Hub form's whole-rupiah limit. Free means an explicit 0;
+  // absent, coercible or negative input must never silently publish a free meet.
+  if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
+    return res.status(400).json({ error: 'invalid_fee' })
+  }
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -726,7 +733,7 @@ app.post('/api/meets', requireAuth, (req, res) => {
     time: String(b.time).slice(0, 5),
     durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
-    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
     lat: Number(b.lat) || 0,
     lng: Number(b.lng) || 0,
@@ -841,7 +848,8 @@ const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientI
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   addAudit(u, 'clinical.read')
-  const c = getClinical()
+  // Hasil lab dan rujukan hanya keluar lewat rute RBAC modul labResults, bukan lewat simpanan klinis mentah.
+  const { hasilLab: _hl, rujukanKlinis: _rk, ...c } = getClinical()
   // Hash kode tautan tidak pernah keluar dari server.
   const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
   res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
@@ -890,6 +898,16 @@ app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
   if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
   addAudit(u, 'emr.encounters.read', String(req.params.patientId))
   res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Hasil lab + rujukan: siklus hidup teraudit, backend sumber kebenaran (lihat modules/labResults).
+pasangRuteHasilLab(app, {
+  requireAuth,
+  isOwner: (u) => isOwner(u as User),
+  idPasienDiri,
+  pasienTertaut: (userId) => Object.values(getTautan()).filter((t) => t.userId === userId).map((t) => t.patientId),
+  konteks: () => ({ hasil: repoHasilLab(), rujukan: repoRujukan(), now: () => new Date(), newId: (p) => `${p}-${randomUUID()}` }),
+  audit: (u, aksi, target) => addAudit(u as User, aksi, target),
 })
 
 // Tautan pasien praktik -> akun pasien, disetujui pasien lewat kode sekali pakai.
@@ -953,6 +971,7 @@ app.post('/api/clinical/education', requireAuth, (req, res) => {
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.education.save', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
@@ -963,6 +982,7 @@ app.post('/api/clinical/vital', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
   addVital(patientId, vitalTercap)
+  addAudit(pencatat, 'clinical.vital.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
@@ -973,6 +993,7 @@ app.post('/api/clinical/supportive', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
   addSupportive(patientId, resultTercap)
+  addAudit(pencatat, 'clinical.supportive.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
@@ -980,6 +1001,7 @@ app.post('/api/clinical/patient', requireAuth, (req, res) => {
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
   if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.patient.create', String((patient as { id?: unknown })?.id ?? ''))
   res.json({ ok: true })
 })
 

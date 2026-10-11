@@ -229,17 +229,26 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   such as `appendicular_bones` were not used), nnunetv2 2.8.1, torch 2.14.1, device MPS. Citation: Wasserthal J et al., Radiology: Artificial Intelligence
   2023, doi:10.1148/ryai.230024. Usage statistics reporting was switched off in the tool's config after the first start (that first run may have sent one count).
 - **Input:** Denver "Aligned CT-DICOM" (NLM Visible Human Female CT), 1,727 slices, 0.7227 mm in plane, 1 mm slice spacing (stated in the tags). The files
-  are not in Hounsfield units: the stored values were mapped as HU = value - 1024, an offset **inferred** from the intensity peaks (air about 0, fat about 920,
-  soft tissue about 1,030), not stated in the files. Resampled to 1.5 mm isotropic before inference (a full-resolution run exhausted memory). Orientation was
+  are not in Hounsfield units: the stored values were mapped as HU = value - 1024. That mapping is verified (`pipeline/check_ct_hu_calibration.py`,
+  `qa_reports/ct_hu_calibration.json`): room air outside the body measures -997 to -1000 HU on four slices (air is -1000 HU by definition), and the fat
+  and soft-tissue histogram peaks sit at -110 and +30 HU, 140 HU apart, as expected. Liver +36 and aorta +43 HU are plausible for this donor. This
+  is not a phantom calibration; the scale is checked at two points (air, and fat against soft tissue). Resampled to 1.5 mm isotropic before inference
+  (a full-resolution run exhausted memory; a native-resolution crop run later gave no better result, see below). Orientation was
   read from the images (heart on the image right, spine posterior, slice 0 at the feet).
-- **Cleaning:** largest connected component per bone; Taubin smoothing (10 iterations). Transform from CT to the Denver frame: ICP on the left femur
+- **Cleaning:** specks under 1 cm3 are dropped; every larger fragment is kept (keeping only the largest piece threw away 15 to 20 % of some ribs and 21 % of L2).
+  Taubin smoothing (10 iterations). Transform from CT to the Denver frame: ICP on the left femur
   (3.2 degrees, translation about 807, 681, 9 mm), applied to every CT bone; the lumbar spine meets the Denver sacrum in the render.
 - **Accuracy (the only ground truth available):** surface distance to Denver's manual meshes after fitting, median / p95: femur L 1.2 / 3.0 mm, femur R
   2.1 / 5.3, hip bone L 1.7 / 3.8, hip bone R 1.5 / 4.1, sacrum 2.9 / 11.0 (common transform); per-bone fits 0.6 to 2.0 mm median.
   `qa_reports/ct_segmentation_vs_denver.json`. Nothing is measured for the other 56 bones: their accuracy is unknown.
-- **Known defects:** left ribs 6 to 8 and vertebra L2 are fragmented in the model output (largest piece 81 to 85 % of the mask; L2 79 % with 14 pieces), so
-  those meshes are incomplete. The costal-cartilage mask came out in 18 pieces (largest 72 %) and is NOT published. The model's "prostate" label on this female
-  subject is wrong for the subject (the model was trained mostly on living, male-dominated CT) and no soft-tissue or organ output of the model is used.
+- **Fragmented bones, investigated (v013):** left ribs 6 to 8, right rib 7 and vertebra L2 come out of the model in two or three significant pieces.
+  A rerun on a native-resolution crop (0.72 x 0.72 x 1 mm, the model resamples it itself) did not fix it: L2 improved (91 % in the largest piece), left ribs
+  5 to 8 got worse. Filling the gaps from the CT is not possible: the pieces are 15 to 30 mm apart and the tissue between them is soft-tissue density
+  (connecting L2 needs a threshold of 60 HU, rib 7 of 10 HU, ribs 6 and 8 cannot be connected at all), so bone-density bridging added 0 voxels
+  (`pipeline/repair_ct_bone_masks.py`, `qa_reports/ct_mask_repair.json`, `ct_fragment_gap_analysis.json`). Whether these gaps are model misses or real
+  discontinuities of this cadaver cannot be decided from the data and was not guessed: the pieces are published as they are, with the gaps. The costal-cartilage
+  mask came out in 18 pieces (largest 72 %) and is NOT published. The model's "prostate" label on this female subject is wrong for the subject (the model was trained
+  mostly on living, male-dominated CT) and no soft-tissue or organ output of the model is used.
 - **Not available:** radius, ulna and hand bones (only in a task that needs a commercial licence), foot and lower-leg bones beyond Denver's. The scan shows
   disrupted anatomy (fluid-filled lungs, cadaver posture); the assembled skeleton stands 1.71 m, more than the recorded 157 cm, because the donor lay supine with
   the feet extended, so no stature is shown.
@@ -249,6 +258,24 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   carry over. No walk or run for this body (the CMU retarget is built for the male full-body rig). Reports: `manifest/rig_vhf_denver_ct.json`,
   `qa_reports/rig_vhf_denver_ct_rom.json` (largest bone overlap 1.0 mm).
 - The CT, mask meshes and the model weights stay local; only the decimated web GLBs are published. Provenance per bone: `qa_reports/ct_segmentation_provenance.json`.
+
+## FETUS — source_backed_partial (v014): organ atlas, not an individual
+
+- **Source:** SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
+  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (stated in the repository's README and LICENSE; the article is CC BY 4.0).
+  Uus A, Hall M, Grigorescu I, et al. *Scientific Reports* 14:6637 (2024), doi:10.1038/s41598-024-57087-x. Read on 2026-10-10.
+- **What it is:** a population-average atlas of **17 normal fetuses** (3T, T2-weighted, TE 180 ms), 0.75 mm isotropic, with 10 organ labels. The
+  repository does not state a gestational age; the preprint (PMC10312818) states 25 to 28 weeks. It is not one fetus and not a reference fetus.
+- **Used:** 14 meshes from the 10 labels: lungs (left and right), liver, stomach, spleen, renal parenchyma and renal pelvis (left and right), bladder, thymus,
+  gallbladder, adrenal glands (left and right). **Not used:** the lung-lobe parcellation file (its label names are not provided in the repository).
+- **Orientation proven, not trusted:** the header says RAS. The signs of the axes were decided from anatomy (liver right of spleen, stomach anterior to kidney, thorax above
+  abdomen) and the build stops if a mirror would be needed; the result is the same 180-degree rotation about Z as the Denver data, no mirror.
+- **Splitting:** kidneys and adrenal glands are two connected pieces each. The two lungs are one connected label and are split at a sagittal plane found by 2-means on x
+  (left 14.0 cm3, right 20.3 cm3); this is stated on the structure.
+- **Not in this body:** skeleton, skin, brain, heart, bowel. The body is organs only (extent 10.4 cm, 164 k triangles at full detail), so it is **not** a whole-body fetus.
+- **Checks:** gross-anatomy gate passes (liver right, spleen and stomach left, lungs and thymus above liver, kidneys posterior to liver, stomach anterior to kidneys, bladder
+  below kidneys, both lungs paired): `qa_reports/gross_fetus_atlas.json`. Meshes are marching-cubes surfaces with volume-preserving smoothing, so the 0.75 mm voxel steps remain visible.
+- `clinically_reviewed` is false. A fetal body with skeleton and skin still needs a source (the ICRP pregnant-female phantoms are in public consultation).
 
 ## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
 
@@ -380,3 +407,83 @@ regional meshes would mean inventing the boundaries between neighbouring bones, 
 Unblocking options that stay within the rules: (1) a mesh set with separated female bones and a confirmed licence;
 (2) segmenting the Visible Human Female CT ourselves, then having a qualified anatomist review it; (3) a published
 ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms before any 4DCT use.
+
+## VHF lower-limb rig: neutral-centred ROM and WALK/RUN (female)
+
+- Rig limits are AAOS ranges (Greene & Heckman 1994) centred on the neutral standing pose using measured rest offsets of this skeleton. The earlier right-side contact "caps" were artefacts of a mis-centred rest pose; all nine full-AAOS movements now pass contact QA (largest overlap 0.24 mm, gate 1.5 mm). Truth class: `simulated`.
+- WALK (1.092 s) and RUN (0.75 s) are CMU motion-capture trials (subjects 07 and 09, another person) retargeted to this skeleton and clamped to the rig limits. Truth class: `measured-retargeted`; this is transferred motion for an individual who was never captured, not patient-measured gait. Legs and pelvis only; the rest of the skeleton, muscles and ligaments do not move.
+- QA: loop seam 0.0 deg for both clips, joint angular speed jump at the seam below the interior maximum, foot floor offset 0 mm, penetration at most 0.07 mm. WALK heel slide RMS 5.0 mm / max 7.7 mm (upper bound, rigid markers, no toe bone). RUN has flight phases, so no stance slide figure is reported. Reports: `qa_reports/gait_loop_continuity_vhf_female.json`, `gait_foot_slide_vhf_female.json`, `rig_vhf_denver_ct_gait.json`.
+## VHF forearm and hand bones (image-derived, not a stand-in)
+
+- **Source:** the NLM Visible Human Female CT (Denver "Aligned CT-DICOM", CC BY 4.0) at its native resolution, 0.72 x 0.72 x 1.0 mm. The Denver manual segmentation covers the lower extremity only and TotalSegmentator `total` (open weights) has no radius, ulna or hand-bone classes, but the CT itself contains both forearms and hands, so these bones are taken directly from the image. No male geometry is used.
+- **Method (algorithmic, not a trained model and not manual):** `pipeline/segment_ct_forearm_hand.py` thresholds HU > 250 at native resolution, removes the already segmented bones, splits radius, ulna and hand with a distance-transform watershed seeded at mid-shaft, then follows each bone up the forearm slice by slice (HU > 450 with a 2D opening, because a thin bright artefact runs along the skin surface of the CT block above the clean shaft). Taubin smoothing, same CT-to-Denver transform as the other CT bones. Class: `threshold_segmented` (registry method `other`).
+- **Radius versus ulna** is decided by the larger distal cross-section (distal radius epiphysis); the proximal cross-section was tried first and rejected because the proximal slices are contaminated. Left arm ratio 319 : 58 px, right arm 319 : 237 px (weaker; confirmed visually from the wrist).
+- **Completeness (qa_reports/vhf_forearm_hand.json, slice evidence in qa_reports/vhf_right_forearm_slices.png):** the left radius and ulna reach the humerus (gap 1.0 mm). The **right radius stops 21.8 mm and the right ulna 64.4 mm short of the humerus**. The axial slices show why: the CT block cuts the right arm along a flat lateral edge, the ulna is reduced to a sliver at that edge from about slice 250 and both bones run out of the image, so the missing part is not in the data and was not reconstructed. A first version of this mesh reached the humerus, but its proximal part had mislabelled bone (an olecranon-like fragment attached to the radius) and was removed; an unresolved 1,837-voxel proximal fragment near slice 311 (identity not decidable after the gap) is recorded in the report and not exported. The elbow ends of the left bones are ragged where the cortex is thin.
+- **Hand bones are one mesh per side** (carpals, metacarpals, phalanges). Automatic separation gave 47 to 49 segments for about 29 expected bones and was not accepted as labelling, so no individual hand bone is named. The wrist boundary with the radius and ulna is approximate.
+- **Not measured:** no reference segmentation exists for these bones, so no Dice or surface distance is reported. Alignment between the native crop and the 1.5 mm frame assumes the scipy-zoom axis mapping (verified by correlation 0.9995 of resampled slices; sub-voxel offsets up to 0.75 mm are possible).
+- `clinically_reviewed` remains false.
+## Ontology identifiers (Uberon / FMA) for the HuBMAP Visible Human female body
+
+- `public/bodyexposure/ontology.adult_female.json` maps structures of `HUMAN.ADULT.FEMALE` to Uberon/FMA ids using the HuBMAP / HRA ASCT+B 3D-model crosswalk table (`crosswalkfemale.csv`, 874 rows). Matching is by the exact source node name; the CSV is not copied into the repository, its SHA-256 and row count are stored in the output.
+- 618 of 841 structures are mapped. 1 row has no id in the source (`VH_F_vertebra`) and is rejected, not guessed; 256 rows name grouping nodes or structures that are not in this body and are counted only. Structures without a row show no ontology line.
+- The male crosswalk (`crosswalkmale.csv`, 850 rows) matches 0 of the 3,877 male structures (the male body comes from Z-Anatomy, whose names differ), so no male mapping is published.
+- The licence of the crosswalk table was not confirmed from a machine-readable source; only identifiers and labels are used, attributed to HuBMAP / HRA.
+
+## ATLAS.NERVOUS.MNI152 — atlas_template (module, v001): public nervous-system atlas in MNI space
+
+- **What it is:** a template atlas (average of 152 brains, MNI152NLin2009cAsym), not a body and not an individual. It is a separate module in the viewer and is **not registered to any Body Exposure body**; the original MNI centroid (mm) of every structure is kept in its metadata (`panacea_mni_centroid_mm`).
+- **Source:** the public edition of the Clinical Neuroanatomy Atlas v1.0.3 (Batuhan Ayci; release asset `atlas-data-v1.0.3.tar.gz`, SHA-256 `728a29ab97bfd0703dc1e01769c6d48ac34287500d1bb79544d8f6f858423db7`). Code Apache-2.0, generated data CC BY-SA 4.0; the combined layer here is CC BY-SA 4.0 (share-alike). Per-mesh sources and licences are in the structure metadata and in `public/bodyexposure/CREDITS.txt`.
+- **Selection:** the atlas manifest lists 587 meshes, none flagged non-commercial or no-redistribution. 30 meshes (`mni_aseg`, FreeSurfer aseg labels on the template, no licence stated for the label file) and the opaque brain envelope are left out; 556 structures are published.
+- **Axes:** atlas GLB vertices are MNI RAS millimetres written as (x, y, z) glTF; Blender imports them as (x, -z, y). Canonical = (-x, -y, z) x 0.001 (rotation, determinant +1). The build checks every structure: its transformed bounding box, mapped back to MNI, must match the atlas manifest bounding box within 0.7 mm, otherwise the build stops. Laterality is checked against geometry (+X is subject left); one structure (`VAGUS_NERVE_X_RIGHT.R`, centre 19.5 mm left of the midline, landmark-affine alignment) is within the 30 mm midline tolerance and is recorded in `qa_reports/nervous_mni_build.json`.
+- **Alignment classes (556 meshes):** 223 defined natively on the template, 62 warped from the symmetric template, 58 read from FSL MNI152NLin6 without resampling, and **213 Z-Anatomy/BodyParts3D meshes placed into MNI space by a landmark affine (mean landmark error 3.31 mm, surface RMS 12.45 mm, p95 24.85 mm): approximate**. Peripheral nerves and the spinal cord belong to the last group.
+- **Loading:** seven systems (nervous 254, spinal cord 19, peripheral and cranial nerves 125, vessels 54, tracts 62, arterial territories 38, meninges 4). Only the brain parenchyma (cerebrum, cerebellum, brainstem, diencephalon, basal ganglia, ventricles) loads at first (about 68.9k triangles at LOD4, budget 80k); the spinal cord is its own system so the first camera frame is the brain and not the 1.8 m extent; the nervous LOD4 file exceeds its 52k allocation because meshes that would leave their bounding box are given more triangles.
+- `clinically_reviewed` remains false; truth class `atlas_template` (registry method `other`).
+## Breathing model (respiration_model.json): measured in other patients, transferred
+
+- **Source:** TCIA 4D-Lung (Hugo et al., VCU): respiratory-gated fan-beam CT of lung-cancer patients, 10 phase bins (0-90 %), 0.977 x 0.977 x 3 mm. Licence CC BY 3.0 (collection page). The NIfTI copies come from the MONAI Physio 2026.07.1 release assets (Part 1: six patients; SHA of the unpacked data is not recorded because the assets are not versioned by hash). ACDC and DIR-Lab are **not** used (terms not verified).
+- **Method (`pipeline/respiratory_4dlung.py`):** lungs are segmented per phase by HU < -400 inside the body, separated from the trachea by a 6 mm morphological opening (distance-transform form) and the two largest components are kept. Per phase: lung volume, LR/AP/SI extents (scale) and centroid shift in canonical axes (physical LPS coordinates). Phases are rotated so the smallest lung volume (end-expiration) is index 0, then averaged over the cases that pass the checks.
+- **Checks defined before running (a case is rejected if it fails, reason recorded):** 10 phases of equal size; end-expiratory volume 1.0-7.0 L; volume change 2-45 %; extent scale 0.85-1.25. **4 of 6 cases pass** (100, 104, 107, 109); 103 (volume change 89.8 %) and 106 (end-expiratory volume 908 mL, extent scale 0.49) are rejected. Mask overlays: `qa_reports/respiration_4dlung_masks.png`; per-case numbers: `qa_reports/respiration_4dlung.json`.
+- **Result:** mean lung volume change 22.3 % (case range 14.6 to 31.8 %); superior-inferior size up to x1.083, centroid shift up to 7.9 mm inferior, left-right size up to x1.019, anterior-posterior up to x1.006.
+- **How it is shown:** a "Breathing" button on adult bodies that have lung meshes (adult male, ICRP adult). Lungs are scaled and shifted about their common centre; the viewer states it is measured in other patients and transferred, shows source and licence, and states that the 4 s breath period is a playback setting because the gated CT does not record it. Not offered for the fetus, children or bodies without lungs (the source patients are adults).
+- **Not modelled:** diaphragm, ribs and heart motion separately, lung deformation (no deformable registration), breathing rate, or this body's own motion. Patients have lung cancer and are breathing freely (not guided). Segmentation was not checked against the manual contours that exist for the collection.
+- `clinically_reviewed` remains false; truth class `measured-transferred`.
+
+## HUMAN.OLDER_ADULT: TSD_S0196.OLDER_ADULT.FEMALE — source_backed_partial (v001): one 73-year-old woman
+
+- **Source:** TotalSegmentator dataset v2.0.1 (Zenodo 10047292, CC BY 4.0; Wasserthal et al., Radiology: AI 2023), subject `s0196` (female, 73 years, CT angiography neck to leg, pathology label `no_pathology`, Siemens SOMATOM Definition AS+). Metadata from the dataset's `meta.csv`. 1,228 CT subjects exist; 459 are 70 or older. Only the subject files were downloaded (HTTP range reads of the zip), not the 23.6 GB archive.
+- **What the geometry is:** the dataset's reference segmentations (iterative nnU-Net, corrected by a radiologist), exported by `pipeline/tsd_masks_to_stl.py` and `build_tsd_body.py`; class map and the reasons for classes left out are in `pipeline/tsd_classes.py`. Class `expert_refined_segmentation` (registry method `other`): not manual from scratch and not reviewed here.
+- **Coverage is partial:** the dataset CTs are resampled to 1.5 mm and cropped to the segmented region. This subject covers the neck to the upper thighs plus a cut piece of the skull (32 cm3; extent 0.55 m). Brain, C1 and C2 are empty (not in the crop). 16 structures touch the scan border (femora, humeri, skull and others) and carry the note "Cut by the edge of the scanned region". No skin, no forearms, no limbs below mid-thigh. No stature is shown.
+- **Not published:** `prostate` (male label, empty or wrong in a woman) and the two kidney cyst labels (pathology). 111 structures are published: 60 bones, 10 muscles, 18 vessels, 8 digestive, 6 respiratory (5 lobes and trachea), 3 urinary, 3 endocrine, spleen, spinal cord and costal cartilages.
+- **Frame:** NIfTI affine RAS mm; canonical = (-x, -y, z) x 0.001; XY centred on the midpoint of the hip bones; z = 0 at the lowest scanned point (the thigh cut), which is not a standing height. Laterality is checked against geometry.
+- **Limits:** one individual, not an age-representative reference; a woman only. Whole-body and male older adults are not available from this subject. Initial web load 68,898 triangles at LOD4.
+- `clinically_reviewed` remains false.
+
+## HUMAN.OLDER_ADULT second individual: TSD_S0327.OLDER_ADULT.MALE — source_backed_partial (v001): one 72-year-old man
+
+- **Source and method:** as for the 73-year-old woman above (TotalSegmentator dataset v2.0.1, CC BY 4.0; subject `s0327`: male, 72 years, CT angiography neck to leg, pathology label `no_pathology`, Siemens SOMATOM Definition AS+). Same scripts; `tsd_classes.classify` now takes the subject's sex so `prostate` is published for this man and still withheld for the woman.
+- **Coverage:** lower neck to upper thighs (extent 0.64 m). Empty in the dataset crop: brain and C1 to C6; the skull is only a cut piece (29 cm3, touches the scan border). 21 structures touch the scan border and carry the "Cut by the edge of the scanned region" note. 108 structures published. No stature.
+- **Scan orientation:** the dataset affine of this subject has a 3.5 degree in-plane rotation (the patient lay slightly turned); the geometry keeps it, it is not levelled.
+- **Laterality check:** against geometry with a 20 mm midline tolerance; the left brachiocephalic vein (it crosses the midline) is centred 1 mm on the other side and is listed in `qa_reports/tsd_s0327_build.json`.
+- **Limits:** one man, not an age-representative reference. `clinically_reviewed` remains false.
+
+## Cell scale: OpenCell protein localisation (opencell_index.json) — measured in a cell line
+
+- **Source:** OpenCell (Chan Zuckerberg Biohub). The licence was read from the AWS Open Data registry entry: **CC BY-SA 4.0**, citation "OpenCell on AWS was accessed on DATE from https://registry.opendata.aws/czb-opencell"; the OpenCell website's download page is script-rendered and states no terms in what could be read. Files used: `opencell-localization-annotations.csv` (1,310 proteins) and `opencell-protein-abundance.csv` (19,250 genes; HEK293T RNA TPM, protein concentration nM, copies per cell), from the owner's Downloads; SHA-256 and row counts are stored in the output, the CSVs are not copied into the repository.
+- **Method:** `pipeline/publish_opencell_index.mjs` with `engine/openCellIndex.ts`: join by Ensembl id, fail-closed validation (Ensembl format, 17-term localisation vocabulary, non-negative finite numbers, no duplicate ids). Result: 1,310 proteins, 0 rejected, 9 without an abundance row (shown as "not measured", never as zero).
+- **What it is:** where each tagged protein sits inside a cultured HEK293T cell (grade 3 = most prominent annotation, grade 1 = weakest), with RNA and protein abundance in the same cells. **It is not the localisation or abundance in the displayed tissue or body.** The viewer panel says so, shows the licence and the citation, and offers search by gene or protein name.
+- **Not used:** the OpenCell interaction and library metadata tables (not needed for this panel).
+- `clinically_reviewed` is not applicable to this lookup panel; nothing here is a clinical statement.
+
+## Heartbeat (procedural, illustrative): not measured, not patient-specific
+
+- **What it is:** `engine/cardiacCycle.ts`, a mathematical model of one heartbeat: isovolumic contraction, ejection, isovolumic relaxation, rapid filling, diastasis and atrial systole. Mechanical systole lasts 0.34 x sqrt(RR) seconds (a Bazett-type rule, at most 60 % of the cycle); ventricular volume falls from end-diastolic to end-systolic by a cosine ejection and refills in three steps (0.7, 0.9, 1.0 of the stroke volume); atrial volume is the reservoir, conduit and booster pattern. Defaults are textbook adult values for illustration: end-diastolic 120 mL, end-systolic 50 mL (ejection fraction 58 %), atrial 30 to 65 mL, rate 70 bpm (slider 40 to 180).
+- **How it is shown:** a "Heartbeat" button on adult bodies that have heart chambers (male, female HuBMAP, ICRP adults, the two older adults). Ventricles and atria are scaled by the cube root of their volume about their common centre; where only a whole-heart mesh exists, it is scaled by the whole-heart volume. Valves, vessels and the conduction system do not move. The viewer states that it is illustrative and not this body's measured heartbeat, not patient-specific and not clinically validated.
+- **Why a model and not a dataset:** no cardiac cine dataset with a verified licence is used (ACDC states no licence; see DATASET_AUDIT.md). The engine takes its parameters explicitly so a measured dataset can replace the defaults later without changing the viewer.
+- **Not modelled:** valve motion, blood flow, wall thickening, torsion, arrhythmia, the individual's real volumes. Truth class: simulated (illustrative).
+- `clinically_reviewed` remains false.
+## Fetal growth references (fetal_reference_tables.json): published tables, not a model
+
+- **Sources (read 2026-10-11):** WHO Fetal Growth Charts (Kiserud et al., PLOS Medicine 2017, CC BY; Tables 6 BPD outer-inner, 7 HC, 8 AC, 9 FL, 11 EFW, 14 EFW female, 15 EFW male; 14 to 40 weeks; 1,387 low-risk singleton pregnancies, 10 countries; quantile regression, percentiles 2.5 to 97.5, EFW with Hadlock's third formula) and the INTERGROWTH-21st fetal growth standards (Papageorghiou et al., Lancet 2014; Oxford PDFs for HC, BPD, AC, FL: centiles 3 to 97 and values at z = -3 to +3; 14 to 40 weeks; eight urban areas in Brazil, China, India, Italy, Kenya, Oman, the UK and the USA). The table PDFs print the citation as "Villar et al"; the volume and pages are those of Papageorghiou et al. (checked on PubMed/DOI). Terms of reuse for the INTERGROWTH tables are not stated on the download page; the tables carry "(c) University of Oxford" and are attributed. INTERGROWTH-21st has no EFW in these tables, and the viewer says so.
+- **Build (`pipeline/build_fetal_reference_tables.py`):** every value is parsed from the source files (SHA-256 recorded) with checks: 27 weekly rows per table, increasing percentiles, increasing medians by age, equal z spacing (SD) per week, 50th centile equal to z 0.
+- **Method in the engine (`engine/fetalBiometry.ts`):** WHO: linear interpolation between the published percentiles, bounds stated outside 2.5 to 97.5 (or 5 to 95 for EFW by sex). INTERGROWTH: linear interpolation of the z-score between the published z values, percentile = normal CDF of z; this reproduces the published 3rd/5th/10th/90th/95th/97th centiles within 0.35 percentile points at every week and measure (tested). Ages between weeks are interpolated linearly between neighbouring published weeks and flagged; ages outside 14+0 to 40+0 weeks and unsupported measures give an explicit "not available".
+- **Not included:** embryologic milestones (a different kind of reference), sex-specific INTERGROWTH, the Hadlock EFW formula, charts below 14 weeks. Output is a position against a reference only; interpretation needs a qualified clinician.

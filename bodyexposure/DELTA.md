@@ -249,3 +249,50 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Published LOD1 (the most detailed level) for the Visible Human skeleton only: 4.1 MB, listed on that page. The viewer does not load LOD1, so site load is unchanged. LOD0/LOD1 of the other bodies (about 108 MB) stay unpublished.
 - Bug fixed: selecting a structure that is not in the motion rig (for example a rib on the female skeleton, whose rig is lower limb only) and then starting Motion left an empty canvas, because the camera fly-to for the selection kept running and pulled the camera away from the rig. Motion framing now cancels that transition. Regression assertion added to `qa/canonical-body-check.mjs` (found while stabilising: the female motion check failed two runs in three before the fix, three runs in three pass after).
 
+## Doctor workspace: structure review checklist (2026-10-10)
+
+- New page `/#/doctor-review/body` (doctor and owner accounts): pick a body, filter the structures, tick the checklist for one structure, create a review record to copy or download. Reads `<body>.review.json` registries (6,295 structures, 1 MB in total, loaded one body at a time). It writes nothing and cannot mark anything reviewed.
+- Ledger rule in one pure function (`recordApproves`): confirmed decision, every required check, exact asset version, reviewer on the owner's authorised list, valid non-future time. Ledger and authorisation files exist and are empty, so 0 structures are reviewed. Tests (positive and negative) and a ledger check in CI make a hand-set reviewed flag fail. See `docs/body-exposure/CLINICAL_REVIEW_LEDGER.md`.
+
+## CT segmentation: HU check, fragment investigation and kept fragments (v013, 2026-10-10)
+
+- HU = stored - 1024 verified against room air (-997 to -1000 HU) and the fat/soft-tissue peaks (140 HU apart). Native-resolution crop rerun: no better (L2 91 % largest piece vs 79 %, but left ribs 5 to 8 worse).
+- Bone-density bridging between the fragments of L2 and left ribs 6 to 8 adds 0 voxels (gaps 15 to 30 mm, soft-tissue density between), so no anatomy is added. The meshes now keep every fragment of 1 cm3 or more instead of only the largest piece: L2 +25 % volume, left ribs 6 to 8 +14 to 23 %. Body version v013; review registries regenerated (a record for the old geometry would not apply).
+- Remaining blocker: the gaps themselves. They need either better source data or a reviewer's judgement on whether they are real.
+
+## Dynamic physiology source audit (2026-10-10)
+
+- Breathing and heartbeat: no acquired motion and no validated simulation exist in Body Exposure. Audited TCIA 4D-Lung (CC BY 3.0, 20 radiotherapy patients, 10 phases: licence allows attributed reuse, but deformable registration would have to be run and validated first), DIR-Lab (site unreachable, terms unread) and ACDC (terms not stated, two phases only). No simulation was built because every parameter would be invented. See `docs/body-exposure/DYNAMIC_PHYSIOLOGY_SOURCE_AUDIT.md`.
+## v014: fetus organ atlas (2026-10-10)
+
+- The Fetus tab is no longer a placeholder: 14 organ structures from the King's College London population-average fetal MRI atlas (CC0 1.0; 17 fetuses, 25 to 28 weeks per the preprint), as source-backed partial. Organs only; labelled as an atlas, not an individual. Orientation proven from anatomy, gross-anatomy gate passes. Full detail 164 k triangles; initial load 6,022 triangles.
+- Still blocked: pregnancy (ICRP pregnant-female phantoms in public consultation, no electronic files confirmed), a fetus with skeleton and skin, and older adults. See `docs/body-exposure/LIFECYCLE_SOURCE_AUDIT.md`.
+
+
+## VHF forearm and hand bones (body v014)
+- New `pipeline/segment_ct_forearm_hand.py`: radius, ulna and hand bones of both arms from the native-resolution Visible Human Female CT (the Denver manual segmentation is lower-extremity only and TotalSegmentator `total` has no such classes). `build_vhf_lower_limb.py` now ingests them as `threshold_segmented`; the review registry classes them as method `other`.
+- Female body 184 -> 190 structures; skeletal LOD4 initial load 19,648 triangles (budget 80,000). Right radius and ulna are incomplete (21.8 and 64.4 mm short of the humerus; the CT block cuts the arm there, evidence in qa_reports/vhf_right_forearm_slices.png); the hand is one mesh per side. Details in PROVENANCE.md and `qa_reports/vhf_forearm_hand.json`.
+- Not done: individual hand bones, rig/motion for the arms (motion stays pelvis, legs and feet only).
+## Ontology crosswalk (Uberon / FMA)
+- New `engine/ontologyCrosswalk.ts` (fail-closed: empty or malformed ids and conflicting rows are rejected), `pipeline/publish_ontology_crosswalk.mjs`, published `ontology.adult_female.json` (618 of 841 structures) and an "Ontology:" line in the structure panel. Tests: `scripts/qa/ontology-crosswalk.test.mjs`.
+
+## Nervous-system atlas module (ATLAS.NERVOUS.MNI152)
+- New `pipeline/build_nervous_mni_module.py` builds a separate template module from the public edition of the Clinical Neuroanatomy Atlas (556 structures, CC BY-SA 4.0 with per-mesh sources), in MNI152 coordinates and not registered to any body. Axis mapping is verified per structure against the atlas manifest bounding boxes. `check_web_budget.py` reads `ATLAS_ON` for atlas modules (initial load 68.9k triangles) and `export_web_lods.py` carries the module budgets. The viewer gets a "Nervous atlas (MNI)" tab and labels for the extra systems. Tests: `scripts/qa/nervous-atlas-module.test.mjs`.
+- Left out on licence grounds: 30 FreeSurfer aseg label meshes (no licence stated for the label file). Left out for viewing: the opaque brain envelope.
+## Respiratory motion and missing-data states
+- `pipeline/respiratory_4dlung.py` derives a breathing model from TCIA 4D-Lung (CC BY 3.0; 4 of 6 cases pass the checks) into `public/bodyexposure/respiration_model.json`; `engine/respiratoryMotion.ts` validates it fail-closed and samples it periodically; the viewer has a "Breathing" button for adult bodies with lungs. ACDC and DIR-Lab stay blocked until their terms are verified.
+- `engine/dataGaps.ts` and the "What is missing and why" disclosure state what is not available (heartbeat, pregnancy, older adult, fetal skeleton/skin, individual hand bones, right forearm near the elbow, clinical review) instead of showing a scaled or invented substitute.
+
+## Older adult (individual, partial)
+- New `tsd_classes.py`, `tsd_masks_to_stl.py`, `build_tsd_body.py`: one 73-year-old woman from the TotalSegmentator dataset (CC BY 4.0), 111 structures, partial body (neck to upper thighs, a cut piece of the skull), registered as the variant of `HUMAN.OLDER_ADULT`. The data-gaps list now says what is still missing for older adults.
+
+## Older adult: second individual (male, 72 y)
+- Subject s0327 of the TotalSegmentator dataset added as the second variant of `HUMAN.OLDER_ADULT` (108 structures, lower neck to upper thighs). The class map is sex-aware (prostate only for men); the builder allows a 20 mm midline tolerance for midline-crossing structures. No whole-body or head-inclusive older adult exists yet.
+
+## Cell scale (OpenCell)
+- `engine/openCellIndex.ts`, `ui/OpenCellPanel.tsx`, `pipeline/publish_opencell_index.mjs` and `public/bodyexposure/opencell_index.json` (1,310 proteins, CC BY-SA 4.0): a "Cell scale" lookup under the viewer that is loaded on demand and states that the data come from cultured HEK293T cells.
+
+## Procedural heartbeat
+- `engine/cardiacCycle.ts` (Wiggers-type cycle, adjustable rate, explicit parameters), a "Heartbeat" button with a rate slider for adult bodies with heart chambers, and the labelled illustrative note. No dataset is used.
+## Fetal growth references
+- `pipeline/build_fetal_reference_tables.py` (WHO 2017 Tables 6-15 and INTERGROWTH-21st HC/BPD/AC/FL), `engine/fetalBiometry.ts`, a "Fetal growth" panel and `fetal_reference_tables.json`; regression tests against published values. The data-gaps entry for pregnancy and fetal development now distinguishes biometry (available) from 3D anatomy (still missing).
