@@ -288,3 +288,6 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 
 ## Older adult: second individual (male, 72 y)
 - Subject s0327 of the TotalSegmentator dataset added as the second variant of `HUMAN.OLDER_ADULT` (108 structures, lower neck to upper thighs). The class map is sex-aware (prostate only for men); the builder allows a 20 mm midline tolerance for midline-crossing structures. No whole-body or head-inclusive older adult exists yet.
+
+## Cell scale (OpenCell)
+- `engine/openCellIndex.ts`, `ui/OpenCellPanel.tsx`, `pipeline/publish_opencell_index.mjs` and `public/bodyexposure/opencell_index.json` (1,310 proteins, CC BY-SA 4.0): a "Cell scale" lookup under the viewer that is loaded on demand and states that the data come from cultured HEK293T cells.
