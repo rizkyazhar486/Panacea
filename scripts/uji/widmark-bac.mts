@@ -72,4 +72,9 @@ assert.ok(lines.includes('{!res.ok && ('))
 assert.ok(lines.some((l) => l.includes('{res.reason}')))
 assert.ok(lines.includes('{res.ok && res.data.totalGrams > 0 && ('))
 
+// Regresi: profil bawaan (pria 70 kg) tidak boleh disulihkan; hanya profil tersimpan, dan jenis kelamin kosong ditolak mesin.
+assert.ok(!/\bgetDemo\(\)/.test(src) && src.includes('getDemoTersimpan()'), 'halaman tidak boleh memakai getDemo()')
+assert.ok(!/\|\|\s*(70|'M')/.test(src), 'tanpa bawaan 70 kg / pria')
+assert.deepEqual(run({ sex: '' as 'M' }), { ok: false, reason: 'Sex must be M or F' })
+
 console.log('widmark-bac: hand values, sex/weight pairs, floor at zero, fail-closed weight/hours/counts, negative counts no longer lower BAC')

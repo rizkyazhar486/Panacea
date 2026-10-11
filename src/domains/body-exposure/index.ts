@@ -117,3 +117,21 @@ export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
 export { createPresentationLighting } from './adapters/studioLighting'
 export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
 export { type PresentationLighting } from './engine/presentationLighting'
+
+export {
+  cycleAt,
+  DEFAULT_BREATH_PERIOD_S,
+  parseRespiratoryModel,
+  sampleRespiration,
+  type ParseRespiratory,
+  type RespirationSample,
+  type RespiratoryModel,
+} from './engine/respiratoryMotion'
+
+export { DATA_GAPS, GAP_STATUS_LABEL, validateGaps, type DataGap, type GapKind, type GapStatus } from './engine/dataGaps'
+
+export { OpenCellPanel } from './ui/OpenCellPanel'
+export { searchStructures, type StructureSearchRow, type StructureSearchMatch, type StructureOntology } from './engine/structureSearch'
+export { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS, LOCALISATION_LABEL, type OpenCellProtein, type PublishedOpenCell } from './engine/openCellIndex'
+
+export { cardiacStateAt, validateParams as validateCardiacParams, phaseDurations, DEFAULT_PARAMS as DEFAULT_CARDIAC_PARAMS, DEFAULT_HR, HR_MIN as CARDIAC_HR_MIN, HR_MAX as CARDIAC_HR_MAX, PHASE_LABEL as CARDIAC_PHASE_LABEL, type CardiacParams, type CardiacState, type CardiacPhase } from './engine/cardiacCycle'

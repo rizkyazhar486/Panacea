@@ -84,13 +84,13 @@
     },
     {
      "body_id": "VHF_DENVER_CT.ADULT.FEMALE",
-     "structures": 184,
+     "structures": 190,
      "label": "Visible Human skeleton (Denver + CT)",
      "status": "source_backed_partial",
-     "source": "University of Denver manual segmentation (Andreassen et al. 2023) + TotalSegmentator on the NLM Visible Human Female CT; CC BY 4.0 / Apache-2.0",
+     "source": "University of Denver manual segmentation (Andreassen et al. 2023) + TotalSegmentator and threshold segmentation of the NLM Visible Human Female CT; CC BY 4.0 / Apache-2.0",
      "stature_m": null,
-     "coverage": "skeleton without forearms and hands; muscles, cartilage and ligaments pelvis to feet",
-     "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Pelvis-to-feet bones, cartilage, knee ligaments and muscles are manual segmentations (Univ. of Denver); skull, spine, ribs, sternum, clavicles, scapulae and humeri are machine-segmented from the CT (TotalSegmentator) and were checked against Denver only for femur, hip bone and sacrum. Not clinically reviewed."
+     "coverage": "skeleton with forearm and hand bones (hand as one mesh; right forearm bones incomplete); muscles, cartilage and ligaments pelvis to feet",
+     "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Pelvis-to-feet bones, cartilage, knee ligaments and muscles are manual segmentations (Univ. of Denver); skull, spine, ribs, sternum, clavicles, scapulae and humeri are machine-segmented from the CT (TotalSegmentator); radius, ulna and the hand bones are threshold-segmented from the native-resolution CT (algorithmic, no reference measurement). Not clinically reviewed."
     }
    ]
   },
@@ -107,7 +107,7 @@
   {
    "body_id": "FETUS",
    "status": "source_backed_partial",
-   "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+   "source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; CC0 1.0 Universal (repository); article CC BY 4.0",
    "source_requirement": null,
    "redistribution": null,
    "structures": 14,
@@ -124,7 +124,7 @@
      "structures": 14,
      "label": "Atlas, 25 to 28 weeks",
      "status": "source_backed_partial",
-     "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+     "source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; CC0 1.0 Universal (repository); article CC BY 4.0",
      "stature_m": null,
      "coverage": "organs only: no skeleton, skin, brain, heart or gut",
      "individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Not clinically reviewed."
@@ -237,13 +237,65 @@
   },
   {
    "body_id": "HUMAN.OLDER_ADULT",
-   "status": "placeholder",
-   "source": null,
-   "source_requirement": "No open age-specific (\u226565 y) whole-body anatomical phantom found.",
+   "status": "source_backed_partial",
+   "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0; one 73-year-old female subject",
+   "source_requirement": null,
    "redistribution": null,
    "structures": 0,
    "systems": {},
-   "variants": []
+   "variants": [
+    {
+     "body_id": "TSD_S0327.OLDER_ADULT.MALE",
+     "structures": 108,
+     "label": "72 y male (neck to upper thighs)",
+     "status": "source_backed_partial",
+     "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
+     "stature_m": null,
+     "coverage": "partial body: lower neck, torso and upper thighs; only a cut piece of the skull, no brain, no limbs below mid-thigh, no forearms, no skin",
+     "individual": "One individual from the dataset (subject s0327: male, 72 years, CT angiography neck to leg, pathology label none), not an atlas and not a reference older adult. Segmentations are model-assisted and corrected by a radiologist, CT resampled to 1.5 mm and cropped by the dataset authors; 21 structures are cut by the scan border. Not clinically reviewed."
+    },
+    {
+     "body_id": "TSD_S0196.OLDER_ADULT.FEMALE",
+     "structures": 111,
+     "label": "73 y female (neck to upper thighs)",
+     "status": "source_backed_partial",
+     "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
+     "stature_m": null,
+     "coverage": "partial body: neck, torso and upper thighs; only a cut piece of the skull, no brain, no limbs below mid-thigh, no forearms, no skin",
+     "individual": "One individual from the dataset (subject s0196: female, 73 years, CT angiography neck to leg, pathology label none), not an atlas and not a reference older adult. Segmentations are model-assisted and corrected by a radiologist, CT resampled to 1.5 mm and cropped by the dataset authors; 16 structures are cut by the scan border. Not clinically reviewed."
+    }
+   ]
+  },
+  {
+   "variants": [
+    {
+     "body_id": "ATLAS.NERVOUS.MNI152",
+     "structures": 556,
+     "label": "Public atlas, MNI152 template",
+     "status": "atlas_template",
+     "source": "Clinical Neuroanatomy Atlas v1.0.3, public edition (Batuhan Ayci; data CC BY-SA 4.0), built from open datasets: Z-Anatomy, BodyParts3D, HCP1065 tracts, CerebrA, MASSP, FastSurfer CerebNet and others, each with its own licence",
+     "stature_m": null,
+     "coverage": "nervous system and brain vessels in template space; not registered to any body",
+     "individual": "Template atlas in MNI152NLin2009cAsym space (average of 152 brains), not an individual and not a body. 213 meshes are Z-Anatomy/BodyParts3D geometry placed into MNI space by a landmark affine (surface RMS 12.45 mm), approximate. Not clinically reviewed."
+    }
+   ],
+   "redistribution": null,
+   "body_id": "ATLAS.NERVOUS.MNI152",
+   "status": "atlas_template",
+   "source": "Clinical Neuroanatomy Atlas v1.0.3, public edition (Batuhan Ayci; data CC BY-SA 4.0), built from open datasets: Z-Anatomy, BodyParts3D, HCP1065 tracts, CerebrA, MASSP, FastSurfer CerebNet and others, each with its own licence",
+   "frame": null,
+   "source_requirement": null,
+   "structures": 556,
+   "verts": 0,
+   "systems": {
+    "nervous": 254,
+    "peripheral": 125,
+    "spinal": 19,
+    "fascia": 4,
+    "cardiovascular": 54,
+    "territories": 38,
+    "tracts": 62
+   }
   }
  ],
  "files": [
@@ -273,6 +325,13 @@
   "adult_male.skeletal",
   "adult_male.surface",
   "adult_male.urinary",
+  "atlas_nervous_mni152.cardiovascular",
+  "atlas_nervous_mni152.fascia",
+  "atlas_nervous_mni152.nervous",
+  "atlas_nervous_mni152.peripheral",
+  "atlas_nervous_mni152.spinal",
+  "atlas_nervous_mni152.territories",
+  "atlas_nervous_mni152.tracts",
   "fetus.digestive",
   "fetus.endocrine",
   "fetus.lymphatic",
@@ -423,6 +482,27 @@
   "pediatric_neonate_male.skeletal",
   "pediatric_neonate_male.surface",
   "pediatric_neonate_male.urinary",
+  "tsd_s0196_older_adult_female.cardiovascular",
+  "tsd_s0196_older_adult_female.digestive",
+  "tsd_s0196_older_adult_female.endocrine",
+  "tsd_s0196_older_adult_female.joint",
+  "tsd_s0196_older_adult_female.lymphatic",
+  "tsd_s0196_older_adult_female.muscular",
+  "tsd_s0196_older_adult_female.nervous",
+  "tsd_s0196_older_adult_female.respiratory",
+  "tsd_s0196_older_adult_female.skeletal",
+  "tsd_s0196_older_adult_female.urinary",
+  "tsd_s0327_older_adult_male.cardiovascular",
+  "tsd_s0327_older_adult_male.digestive",
+  "tsd_s0327_older_adult_male.endocrine",
+  "tsd_s0327_older_adult_male.joint",
+  "tsd_s0327_older_adult_male.lymphatic",
+  "tsd_s0327_older_adult_male.muscular",
+  "tsd_s0327_older_adult_male.nervous",
+  "tsd_s0327_older_adult_male.reproductive",
+  "tsd_s0327_older_adult_male.respiratory",
+  "tsd_s0327_older_adult_male.skeletal",
+  "tsd_s0327_older_adult_male.urinary",
   "vhf_denver_ct_adult_female.joint",
   "vhf_denver_ct_adult_female.muscular",
   "vhf_denver_ct_adult_female.skeletal"
@@ -431,7 +511,10 @@
   "adult_male": "LOD4",
   "adult_female": "LOD4",
   "vhf_denver_ct_adult_female": "LOD4",
-  "fetus": "LOD3"
+  "fetus": "LOD3",
+  "atlas_nervous_mni152": "LOD4",
+  "tsd_s0196_older_adult_female": "LOD4",
+  "tsd_s0327_older_adult_male": "LOD4"
  },
  "motion": {
   "adult_male": {

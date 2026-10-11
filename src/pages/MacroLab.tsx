@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconToken } from '../components/icons'
+import { parseNumberField } from '../domains/clinical-calculators'
 import {
   BLOC_LABEL, COUNTRIES, DATA_AS_OF, DATA_SOURCES, gdpPerCapitaUsd,
   rateImpact, simulatePolicy, analyseTrade,
@@ -331,7 +332,7 @@ function TradeTab() {
   const [im, setIm] = useState('237')
   const [gdp, setGdp] = useState('1400')
   const a = useMemo(() => analyseTrade({
-    exportsUsdBn: Number(ex) || 0, importsUsdBn: Number(im) || 0, gdpUsdBn: Number(gdp) || 0,
+    exportsUsdBn: parseNumberField(ex), importsUsdBn: parseNumberField(im), gdpUsdBn: parseNumberField(gdp),
   }), [ex, im, gdp])
 
   return (
@@ -345,6 +346,12 @@ function TradeTab() {
         </div>
       </Card>
 
+      {!a.ok ? (
+        <Card className="!p-4">
+          <p className="text-[12.5px] text-neutral-600 dark:text-neutral-300">No result yet.</p>
+          {a.problems.map((m) => <p key={m} role="alert" className="text-[12px] font-semibold text-amber-700 dark:text-amber-300">{m}</p>)}
+        </Card>
+      ) : (
       <Card className="!p-4">
         <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
@@ -368,6 +375,7 @@ function TradeTab() {
           <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{a.caution}</p>
         </div>
       </Card>
+      )}
     </>
   )
 }
