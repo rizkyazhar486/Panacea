@@ -80,6 +80,11 @@ atlas_nervous_mni152.* — Clinical Neuroanatomy Atlas v1.0.3, public edition (B
                structure, renamed, recoloured, decimated for the web. Not registered to any Body Exposure body.
                Left out: 30 FreeSurfer aseg label meshes (no licence stated) and the opaque brain envelope.
                Template atlas, not an individual. Not clinically reviewed.
+respiration_model.json — breathing model from 4D-CT of lung-cancer patients, TCIA collection &quot;4D-Lung&quot; (Hugo et al., Virginia Commonwealth
+               University), CC BY 3.0, via the MONAI Physio 2026.07.1 release mirror. Hugo GD, Weiss E, Sleeman WC, et al.
+               Med Phys 44(2):762-771 (2017); Clark K, et al. J Digit Imaging 26(6):1045-1057 (2013). Four of six downloaded
+               cases passed the plausibility checks; lung size and position per breath phase are averaged and transferred to adult
+               bodies as a labelled simulation, not measured motion of the displayed body. Not clinically reviewed.
 
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
@@ -594,5 +599,15 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 <li><strong>Alignment classes (556 meshes):</strong> 223 defined natively on the template, 62 warped from the symmetric template, 58 read from FSL MNI152NLin6 without resampling, and <strong>213 Z-Anatomy/BodyParts3D meshes placed into MNI space by a landmark affine (mean landmark error 3.31 mm, surface RMS 12.45 mm, p95 24.85 mm): approximate</strong>. Peripheral nerves and the spinal cord belong to the last group.</li>
 <li><strong>Loading:</strong> seven systems (nervous 254, spinal cord 19, peripheral and cranial nerves 125, vessels 54, tracts 62, arterial territories 38, meninges 4). Only the brain parenchyma (cerebrum, cerebellum, brainstem, diencephalon, basal ganglia, ventricles) loads at first (about 68.9k triangles at LOD4, budget 80k); the spinal cord is its own system so the first camera frame is the brain and not the 1.8 m extent; the nervous LOD4 file exceeds its 52k allocation because meshes that would leave their bounding box are given more triangles.</li>
 <li><code>clinically_reviewed</code> remains false; truth class <code>atlas_template</code> (registry method <code>other</code>).</li>
+</ul>
+<h2>Breathing model (respiration_model.json): measured in other patients, transferred</h2>
+<ul>
+<li><strong>Source:</strong> TCIA 4D-Lung (Hugo et al., VCU): respiratory-gated fan-beam CT of lung-cancer patients, 10 phase bins (0-90 %), 0.977 x 0.977 x 3 mm. Licence CC BY 3.0 (collection page). The NIfTI copies come from the MONAI Physio 2026.07.1 release assets (Part 1: six patients; SHA of the unpacked data is not recorded because the assets are not versioned by hash). ACDC and DIR-Lab are <strong>not</strong> used (terms not verified).</li>
+<li><strong>Method (<code>pipeline/respiratory_4dlung.py</code>):</strong> lungs are segmented per phase by HU &lt; -400 inside the body, separated from the trachea by a 6 mm morphological opening (distance-transform form) and the two largest components are kept. Per phase: lung volume, LR/AP/SI extents (scale) and centroid shift in canonical axes (physical LPS coordinates). Phases are rotated so the smallest lung volume (end-expiration) is index 0, then averaged over the cases that pass the checks.</li>
+<li><strong>Checks defined before running (a case is rejected if it fails, reason recorded):</strong> 10 phases of equal size; end-expiratory volume 1.0-7.0 L; volume change 2-45 %; extent scale 0.85-1.25. <strong>4 of 6 cases pass</strong> (100, 104, 107, 109); 103 (volume change 89.8 %) and 106 (end-expiratory volume 908 mL, extent scale 0.49) are rejected. Mask overlays: <code>qa_reports/respiration_4dlung_masks.png</code>; per-case numbers: <code>qa_reports/respiration_4dlung.json</code>.</li>
+<li><strong>Result:</strong> mean lung volume change 22.3 % (case range 14.6 to 31.8 %); superior-inferior size up to x1.083, centroid shift up to 7.9 mm inferior, left-right size up to x1.019, anterior-posterior up to x1.006.</li>
+<li><strong>How it is shown:</strong> a "Breathing" button on adult bodies that have lung meshes (adult male, ICRP adult). Lungs are scaled and shifted about their common centre; the viewer states it is measured in other patients and transferred, shows source and licence, and states that the 4 s breath period is a playback setting because the gated CT does not record it. Not offered for the fetus, children or bodies without lungs (the source patients are adults).</li>
+<li><strong>Not modelled:</strong> diaphragm, ribs and heart motion separately, lung deformation (no deformable registration), breathing rate, or this body's own motion. Patients have lung cancer and are breathing freely (not guided). Segmentation was not checked against the manual contours that exist for the collection.</li>
+<li><code>clinically_reviewed</code> remains false; truth class <code>measured-transferred</code>.</li>
 </ul>
 </main></body></html>

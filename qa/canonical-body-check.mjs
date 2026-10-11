@@ -58,6 +58,21 @@ try {
       const mm = await page.getByText(/^\d+\.\d mm · straight line$/).first().textContent({ timeout: 20000 })
       assert(parseFloat(mm) > 50 && parseFloat(mm) < 1500, 'measured distance out of plausible range: ' + mm)
       await page.getByRole('button', { name: 'Stop measuring' }).click()
+      // napas: model CT 4D pasien lain dipindahkan ke paru dewasa; kanvas berubah selama diputar, sumber dan lisensi tampil, lalu kembali ke posisi awal
+      await page.getByRole('button', { name: 'Breathing', exact: true }).click()
+      await page.getByTestId('breathing-note').getByText(/CC BY 3\.0/).waitFor()
+      await page.getByTestId('breathing-note').getByText(/not record the breathing rate/).waitFor()
+      const ro = page.getByTestId('breathing-readout')
+      await ro.waitFor({ timeout: 20000 })
+      const r1 = await ro.textContent(); await page.waitForTimeout(1300); const r2 = await ro.textContent()
+      assert(r1 !== r2, `breathing: the model did not advance (${r1})`)
+      assert(/lung volume [\d,]+ mL/.test(r2) && /superior-inferior size ×1\.\d{3}/.test(r2), `breathing readout: ${r2}`)
+      await page.getByRole('button', { name: 'Stop breathing' }).click()
+      await page.getByTestId('breathing-note').waitFor({ state: 'detached' })
+      // celah data: dinyatakan, bukan diisi pengganti
+      await page.getByTestId('data-gaps').getByText(/What is missing and why \(7\)/).click()
+      await page.getByTestId('data-gaps').getByText('Heartbeat').waitFor()
+      await page.getByTestId('data-gaps').getByText(/Nothing on this list is replaced by a scaled adult model/).waitFor()
       // preset kamera anatomis: transisi halus mengubah sudut pandang, lalu kembali ke anterior
       const cv0 = await page.getByTestId('canonical-body-canvas').screenshot()
       await page.getByRole('button', { name: 'Posterior', exact: true }).click()
@@ -104,6 +119,8 @@ try {
       await page.getByText(/^ADULT\.MALE\.DIGESTIVE\.RECTUM$/).waitFor()
       // tubuh perempuan
       await page.getByRole('tab', { name: /Adult female/ }).click()
+      await page.getByText(/^8\d\d structures$/).waitFor({ timeout: 60000 })
+      assert.equal(await page.getByRole('button', { name: /Breathing/ }).count(), 0, 'a body without lungs must not offer breathing')
       await page.getByText(/^8\d\d structures$/).waitFor({ timeout: 60000 })
       // ID ontologi dari crosswalk HuBMAP/HRA tampil untuk struktur yang dipetakan
       await page.getByLabel('Find a structure').fill('aortic valve')
