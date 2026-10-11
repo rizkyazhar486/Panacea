@@ -38,7 +38,7 @@ export function FetalGrowthPanel({ baseUrl }: { baseUrl: string }) {
   return (
     <details className="rounded-2xl border border-neutral-200 p-3 text-sm dark:border-white/10" data-testid="fetal-growth-panel" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary className="cursor-pointer font-bold">Fetal growth: where a measurement sits against published references</summary>
-      <p className="mt-2 text-[13px] text-neutral-600 dark:text-neutral-300">Fetal biometry from 14+0 to 40+0 weeks. This places one measurement against a published reference; it is not a diagnosis and needs a qualified clinician.</p>
+      <p className="mt-2 text-[13px] text-neutral-600 dark:text-neutral-300">Places one fetal measurement (14+0 to 40+0 weeks) against a published reference, as a position only that needs a qualified clinician.</p>
       {error && <p className="mt-2 text-[13px] text-amber-800 dark:text-amber-200" role="alert">{error}</p>}
       {open && !tables && !error && <p className="mt-2 text-[13px]">Loading reference tables…</p>}
       {tables && (
