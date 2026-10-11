@@ -6,6 +6,29 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.mongo_save_order_and_shutdown_drain
+    category: patient_data_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Shutdown could exit while a Mongo write was active. Concurrent snapshots
+      could let an older slice deletion erase newer lab/referral records.
+    mitigation: >-
+      Candidate serializes full in-process Mongo saves and drains active, queued
+      and during-await mutations while preserving debounce and failure diagnostics.
+      Six regressions execute actual production scheduling functions and real slice
+      transforms; baseline substitution fails four. Synthetic real-Mongo writer/
+      reader application restart checks persistence, identity and audit hashes, with
+      file fallback rejected. Independent technical review passed. Exact-head CI,
+      canonical integration and production verification remain required; this is
+      not cross-process transaction isolation or recovery of previously lost data.
+    evidence:
+      - server/src/store.ts
+      - scripts/qa/mongo-save-drain.test.mjs
+      - server/uji/mongoRestart.uji.ts
+      - .github/workflows/mongo-persistence.yml
+      - docs/MONGO_PERSISTENCE_ACCEPTANCE.md
+
   - risk_id: risk.referral_linked_result_integrity
     category: patient_data_integrity
     severity: high
@@ -195,6 +218,10 @@ risks:
       (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
       browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
       that still model the person independently).
+      2026-10-11: actual synthetic HTTP clinician signing/closing and file-mode process restart
+      reproduce encounter provenance and unsigned successor (A2 candidate only). Persistent clinical.hasilLab
+      remains outside /api/keadaan-longitudinal; lab-result intake checks patientId syntax without existing
+      patient/encounter linkage. Shared-ID API evidence alone does not close unified aggregate readiness.
     evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
 
   - risk_id: risk.feature_sprawl

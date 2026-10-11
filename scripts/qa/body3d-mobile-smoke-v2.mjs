@@ -210,6 +210,7 @@ try {
   if (viewport.documentScrollWidth > viewport.width + 2) throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
 
   const vessels = page.getByRole('button', { name: /^Vessels\b/ }).first()
+  await revealInViewport(vessels, 'Vessels layer control')
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveState = await progressiveLoading.evaluate((node) => {
@@ -339,6 +340,17 @@ try {
   failureContext = await page.evaluate(() => ({
     hash: window.location.hash,
     folds: [...document.querySelectorAll('details.fold')].map((d) => ({ word: d.querySelector('.fold__word')?.textContent ?? null, open: d.open })),
+    vessels: [...document.querySelectorAll('button')].filter((node) => /^Vessels\b/.test(node.getAttribute('aria-label') ?? node.textContent ?? '')).map((node) => {
+      const rect = node.getBoundingClientRect()
+      const style = getComputedStyle(node)
+      const ancestors = []
+      for (let parent = node.parentElement; parent && ancestors.length < 8; parent = parent.parentElement) {
+        const r = parent.getBoundingClientRect()
+        const s = getComputedStyle(parent)
+        ancestors.push({ tag: parent.tagName, className: parent.className, rect: { x: r.x, y: r.y, width: r.width, height: r.height }, display: s.display, visibility: s.visibility, contentVisibility: s.contentVisibility, overflow: s.overflow, scrollTop: parent.scrollTop })
+      }
+      return { rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height }, display: style.display, visibility: style.visibility, ancestors }
+    }),
   })).catch(() => null)
   throw error
 } finally {

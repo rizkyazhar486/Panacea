@@ -35,7 +35,7 @@ def tris(path):
     return count
 
 
-def audit(directory, defaults, budget):
+def audit(directory, defaults, budget, atlas_defaults=frozenset()):
     directory = Path(directory)
     matrix = json.loads((directory / "body_matrix.json").read_text())
     files = matrix.get("files", [])
@@ -59,7 +59,8 @@ def audit(directory, defaults, budget):
                 counts[system] = tris(directory / filename)
             except (OSError, ValueError, KeyError, IndexError, struct.error) as exc:
                 failures.append(f"{filename}: {exc}")
-        initial = sum(n for system, n in counts.items() if system in defaults)
+        active = atlas_defaults if tag.startswith('atlas_') and atlas_defaults else defaults  # modul atlas punya sistem default sendiri (ATLAS_ON)
+        initial = sum(n for system, n in counts.items() if system in active)
         rows.append({"body": tag, "light_lod": lod, "initial_tris": initial,
                      "all_systems_tris": sum(counts.values())})
         if initial > budget:
@@ -83,8 +84,10 @@ def main():
     defaults = set(re.findall(r"'(\w+)'", match.group(1)))
     if not defaults:
         parser.error("viewer default systems are empty")
+    atlas_match = re.search(r"ATLAS_ON = new Set\(\[(.*?)\]\)", source)
+    atlas_defaults = set(re.findall(r"'(\w+)'", atlas_match.group(1))) if atlas_match else set()
     try:
-        report = audit(args.dir, defaults, args.budget)
+        report = audit(args.dir, defaults, args.budget, atlas_defaults)
     except (OSError, ValueError, KeyError, TypeError) as exc:
         report = {"ok": False, "failures": [str(exc)], "bodies": []}
     output = Path(args.out)

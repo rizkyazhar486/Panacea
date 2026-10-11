@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { IconDrop } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { DRINKS, parseNumberField, widmarkBac } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19,14 +19,17 @@ import { DRINKS, parseNumberField, widmarkBac } from '../domains/clinical-calcul
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AlcoholCalculator() {
-  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
+  // Hanya profil yang benar-benar disimpan: tanpa itu, BAC dihitung untuk pria 70 kg yang tidak pernah ada
+  // (dan r pria 0.68 menaksir BAC perempuan terlalu rendah). Kosong = "belum diisi" -> mesin menolak.
+  const tersimpan = getDemoTersimpan()
+  const [sex, setSex] = useState<'' | 'M' | 'F'>(() => (tersimpan.sex === 'M' || tersimpan.sex === 'F' ? tersimpan.sex : ''))
   // Teks mentah: berat kosong tetap "belum diisi" (NaN); minuman kosong = 0 gelas (nilai sah).
-  const [weightKg, setWeightKg] = useState(() => String(getDemo().weightKg || 70))
+  const [weightKg, setWeightKg] = useState(() => (tersimpan.weightKg && tersimpan.weightKg > 0 ? String(tersimpan.weightKg) : ''))
   const [picked, setPicked] = useState<Record<string, string>>({})
   const [hoursElapsed, setHoursElapsed] = useState(1)
 
   const counts = Object.fromEntries(DRINKS.map((d) => [d.label, picked[d.label]?.trim() ? parseNumberField(picked[d.label]) : 0]))
-  const res = widmarkBac({ sex, weightKg: parseNumberField(weightKg), hours: hoursElapsed, counts })
+  const res = widmarkBac({ sex: sex as 'M' | 'F', weightKg: parseNumberField(weightKg), hours: hoursElapsed, counts })
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -44,7 +47,8 @@ export function AlcoholCalculator() {
       <Card className="!p-5">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Jenis kelamin biologis (untuk tetapan r)">
-            <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
+            <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as '' | 'M' | 'F')}>
+              <option value="">Select…</option>
               <option value="M">Male (r ≈ 0.68)</option>
               <option value="F">Female (r ≈ 0.55)</option>
             </select>

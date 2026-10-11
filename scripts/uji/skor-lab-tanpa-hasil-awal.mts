@@ -71,9 +71,11 @@ const sb = baca('SleepApneaScreen.tsx')
 const sbKode = kodeDari(sb)
 assert.ok(!/useState\(demo\.sex === 'M'\)/.test(sbKode),
   'sex again defaults to male, handing every user a BANG point they did not answer for')
-assert.ok(/const male = sex === 'M'/.test(sbKode), 'the sex answer is no longer explicit')
-assert.ok(/const band = lengkap \? bandFor\(total\) : null/.test(sbKode),
-  'STOP-BANG still bands a total that includes an unanswered sex point')
+// Skor kini dihitung mesin stopBang (scripts/uji/stop-bang.mts membuktikan sex '' → missing, tanpa skor); halaman hanya
+// boleh meneruskan jawaban jenis kelamin apa adanya dan menampilkan pita hanya bila mesin memberinya.
+assert.ok(/bmi: parseNumberField\(bmiText\).*sex,/s.test(sbKode), 'the sex answer is no longer passed explicitly to the engine')
+assert.ok(/const band = hasil\.band !== null \? BANDS\[hasil\.band\] : null/.test(sbKode),
+  'STOP-BANG shows a band the engine did not give (e.g. with an unanswered sex point)')
 assert.ok(/<option value="">Not answered<\/option>/.test(sb), 'there is no way to leave sex unanswered')
 assert.ok(/useState<Record<string, boolean>>\(\{\}\)/.test(sbKode),
   'the four STOP questions were dragged into being required; unticked means no, worth zero')

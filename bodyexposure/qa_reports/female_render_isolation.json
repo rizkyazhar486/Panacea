@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "body_id": "HUMAN.ADULT.FEMALE",
+  "operation": "append existing meshes; preserve geometry, transforms, materials and anatomical metadata",
+  "source_fingerprint": {
+    "bytes": 448932859,
+    "sha256": "c224433cc98bfeb704dd81b214d5a822e576068f3575ec886f40a765d8fd0652"
+  },
+  "output_fingerprint": {
+    "bytes": 143292642,
+    "sha256": "cb1d1e55547734dfdf8b64bfc850590892a93d2d8cea5af3f6c0e2e610aec8c0"
+  },
+  "source_meshes": 841,
+  "source_polygons": 4467873,
+  "source_cameras": [
+    "CAM.FEMALE.ANTERIOR",
+    "CAM.FEMALE.ANTERIOR_34.R",
+    "CAM.FEMALE.DETAIL.TRUNK"
+  ],
+  "reframed_plate_camera": "CAM.FEMALE.ANTERIOR_34.R",
+  "source_unchanged": true,
+  "clinical_validation": "pending",
+  "renders": [
+    {
+      "variant": "after",
+      "path": "female_layered_preview_after.png",
+      "sha256": "9bc0c0c2b7137637a9f6d4f0eab443aa4a971ddbc57fe9fe3e03e0b48ac6396a",
+      "render_seconds": 17.571,
+      "process_memory": {
+        "peak_rss_bytes": 1500561408,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        960,
+        540
+      ],
+      "sample_limit": 32,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 500.0087890625,
+          "diameter_metres": 1.0833427906036377,
+          "location_metres": [
+            -2.5303804874420166,
+            -0.6165890097618103,
+            1.9690513610839844
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 125.002197265625,
+          "diameter_metres": 1.5000131130218506,
+          "location_metres": [
+            0.3313995599746704,
+            -2.3918445110321045,
+            1.1237984895706177
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 333.33917236328125,
+          "diameter_metres": 0.7500065565109253,
+          "location_metres": [
+            1.9744319915771484,
+            0.6034049987792969,
+            1.7925245761871338
+          ]
+        }
+      ]
+    }
+  ],
+  "full_master_preview_sha256": "4abe0fa627c8d13b422d78aa45fee330ae6d4fbb1b644646da4f5a1d47e4f5a5",
+  "same_preview_image_hash": false,
+  "limitations": [
+    "This is an isolated rendering copy, not new anatomical evidence.",
+    "Optional plate framing changes camera presentation only; meshes retain their source transforms.",
+    "External textures retain their original paths; the copy is not a portable packaged asset."
+  ]
+}
