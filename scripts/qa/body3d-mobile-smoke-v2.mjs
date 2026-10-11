@@ -99,12 +99,32 @@ async function assertNoFatal(label) {
   }
 }
 
+// Playwright's click actionability ("visible, enabled and stable") is requestAnimationFrame-based. Under software WebGL the first
+// frames of the heavy anatomy scene can take tens of seconds on a slow runner; JavaScript stays responsive but no frame is delivered,
+// so a click started in that window times out as "waiting for element to be stable". Wait for frames to flow first, with a named
+// failure, instead of letting the 20 s click budget absorb the render stall.
+async function waitForAnimationFrames(page, label, frames = 10, timeoutMs = 120_000) {
+  try {
+    await page.waitForFunction(
+      (needed) => new Promise((resolve) => {
+        let seen = 0
+        const tick = () => { seen += 1; if (seen >= needed) resolve(true); else requestAnimationFrame(tick) }
+        requestAnimationFrame(tick)
+      }),
+      frames,
+      { timeout: timeoutMs },
+    )
+  } catch (error) {
+    throw new Error(`${label}: the page delivered fewer than ${frames} animation frames within ${timeoutMs}ms (${error.message.split('\n')[0]})`)
+  }
+}
+
 async function revealInViewport(locator, label) {
   const geometry = await locator.evaluate(async (node) => {
     // First reveal the control on the document's vertical axis. A horizontally
     // scrollable parent may still sit far below the viewport, so centering that
     // parent alone is not enough for a real mobile tap target.
-    node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
+    node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' })
     await new Promise((resolve) => requestAnimationFrame(resolve))
     await new Promise((resolve) => requestAnimationFrame(resolve))
 
@@ -118,7 +138,7 @@ async function revealInViewport(locator, label) {
       const maxScrollLeft = Math.max(0, rail.scrollWidth - rail.clientWidth)
       rail.scrollTo({
         left: Math.max(0, Math.min(maxScrollLeft, centeredLeft)),
-        behavior: 'auto',
+        behavior: 'instant',
       })
       await new Promise((resolve) => requestAnimationFrame(resolve))
       await new Promise((resolve) => requestAnimationFrame(resolve))
@@ -163,7 +183,7 @@ try {
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   const canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
 
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
@@ -210,6 +230,7 @@ try {
   if (viewport.documentScrollWidth > viewport.width + 2) throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
 
   const vessels = page.getByRole('button', { name: /^Vessels\b/ }).first()
+  await waitForAnimationFrames(page, 'Before the Vessels layer control')
   await revealInViewport(vessels, 'Vessels layer control')
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
@@ -252,6 +273,7 @@ try {
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
   const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
+  await waitForAnimationFrames(page, 'Before the Reference group control')
   await revealInViewport(referenceGroup, 'Reference group control')
   await referenceGroup.click()
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
