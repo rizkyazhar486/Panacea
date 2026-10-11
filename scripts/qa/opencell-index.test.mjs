@@ -38,6 +38,8 @@ test('pencarian_awalan_dulu_lalu_substring_uniprot_persis_dan_kueri_kosong_koson
   const ps = buildOpenCellIndex([L('ACTB', E1), L('CACTA', E2), L('ZZZ', E3)], [A(E1, { protein_name: 'Actin' }), A(E2, { protein_name: 'Other' }), A(E3, { uniprot_id: 'Q9X', protein_name: 'Beta actin binder' })]).proteins
   assert.deepEqual(searchProteins(ps, 'act').map((p) => p.gene), ['ACTB', 'CACTA', 'ZZZ'])   // awalan, substring gen, lalu nama protein
   assert.deepEqual(searchProteins(ps, 'q9x').map((p) => p.gene), ['ZZZ'])
+  assert.deepEqual(searchProteins(ps, ` ${E1.toLowerCase()} `).map((p) => p.gene), ['ACTB'])
+  assert.deepEqual(searchProteins(ps, E1.slice(0, -1)), []) // Ensembl requires the exact stable identifier
   assert.deepEqual(searchProteins(ps, 'q9'), [])                                              // UniProt hanya cocok persis
   assert.deepEqual(searchProteins(ps, '   '), []); assert.deepEqual(searchProteins(ps, 'act', 0), []); assert.equal(searchProteins(ps, 'act', 1).length, 1)
 })
@@ -54,4 +56,22 @@ test('indeks_terbit_valid_cc_by_sa_dan_ditolak_bila_lisensi_hilang_atau_data_rus
   assert.equal(parseOpenCellIndex({ ...pub, proteins: [{ ...pub.proteins[0], rnaTpm: -1 }] }).ok, false)
   assert.equal(parseOpenCellIndex({ ...pub, proteins: [pub.proteins[0], pub.proteins[0]] }).ok, false)
   assert.equal(parseOpenCellIndex(null).ok, false)
+})
+
+
+test('metadata_protein_rusak_ditolak_sebelum_pencarian_atau_render', async () => {
+  const pub = JSON.parse(await readFile(new URL('../../public/bodyexposure/opencell_index.json', import.meta.url), 'utf8'))
+  const protein = pub.proteins[0]
+  for (const [field, value] of [
+    ['name', { unexpected: 'object' }], ['name', 42], ['name', []], ['name', undefined],
+    ['uniprot', {}], ['uniprot', 42], ['uniprot', []], ['uniprot', undefined],
+    ['gene', '   '], ['ensg', { toString: () => protein.ensg }],
+  ]) {
+    const result = parseOpenCellIndex({ ...pub, proteins: [{ ...protein, [field]: value }] })
+    assert.equal(result.ok, false, `malformed ${field} must fail at the data boundary`)
+  }
+  const valid = parseOpenCellIndex({ ...pub, proteins: [{ ...protein, name: null, uniprot: null }] })
+  assert.equal(valid.ok, true, valid.error)
+  assert.doesNotThrow(() => searchProteins(valid.index.proteins, 'unmatched'))
+  assert.ok(searchProteins(pub.proteins, 'ACTB').some(p => p.gene === 'ACTB'))
 })

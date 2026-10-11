@@ -41,7 +41,7 @@ export function OpenCellPanel({ baseUrl }: { baseUrl: string }) {
       {index && (
         <div className="mt-2 space-y-2">
           <label className="block text-[13px] font-bold" htmlFor="opencell-q">Find a protein</label>
-          <input id="opencell-q" value={query} onChange={(e) => { setQuery(e.target.value); setPicked(null) }} placeholder={`Gene or protein name, e.g. ACTB (${index.proteins.length.toLocaleString('en')} proteins)`}
+          <input id="opencell-q" value={query} onChange={(e) => { setQuery(e.target.value); setPicked(null) }} placeholder={`Gene, protein, Ensembl or UniProt ID (${index.proteins.length.toLocaleString('en')} proteins)`}
             className="min-h-[44px] w-full rounded-xl border border-neutral-300 bg-white px-3 text-[14px] dark:border-white/15 dark:bg-white/5" />
           {query.trim() && hits.length === 0 && <p className="text-[13px]" data-testid="opencell-empty">No protein matches “{query.trim()}” in the {index.proteins.length.toLocaleString('en')} that were tagged.</p>}
           {!picked && hits.length > 0 && (
