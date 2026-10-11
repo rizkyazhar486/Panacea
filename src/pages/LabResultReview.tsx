@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { api, backendEnabled, GalatApi } from '../lib/api'
@@ -76,7 +77,8 @@ export function LabResultReview() {
       <header className="border-b border-white/10 pb-5">
         <p className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-200/65">Doctor workspace · workflow only</p>
         <h1 className="mt-2 text-3xl font-black tracking-[-.05em] sm:text-4xl">Lab result review</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">Moves a result through review, communication and closure. Every step is audited on the server. It does not interpret values; reference ranges are shown only as recorded.</p>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">Review, communicate and close results; every step is audited.</p>
+        <Prosa kelas="mt-1 max-w-2xl text-xs leading-5 text-white/45">It does not interpret values. Reference ranges are shown only as recorded, and the server decides who may review.</Prosa>
       </header>
 
       {!backendEnabled && <p role="status" className="text-sm text-white/60">The server is not connected in this build, so there are no results to show.</p>}
