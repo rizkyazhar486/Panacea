@@ -31,6 +31,16 @@ def claim_output(path):
     return path
 
 
+def validate_body_selection(rows, body_id):
+    """Keep an isolated copy within the source body's existing mesh identities."""
+    if not rows or any(row['type'] != 'MESH' or row['body_id'] != body_id for row in rows):
+        raise ValueError('Selection must contain only meshes from the requested body')
+    ids = [row['structure_id'] for row in rows]
+    if any(not isinstance(sid, str) or not sid.strip() for sid in ids) or len(set(ids)) != len(ids):
+        raise ValueError('Source meshes require unique existing structure identities')
+    return ids
+
+
 def process_memory():
     """OS process high-water RSS; neither GPU allocation nor per-frame memory."""
     try:
