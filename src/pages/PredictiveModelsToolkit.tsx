@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconGauge } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { autophagyTiming, parseNumberField } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Predictive Models Toolkit — six small, real mathematical models in one
@@ -19,29 +20,30 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 type Tab = 'autophagy' | 'cortisol' | 'sauna' | 'nova' | 'glycemic' | 'healthspan'
 
 function AutophagyTiming() {
-  const [weightKg, setWeightKg] = useState(() => getDemo().weightKg || 70)
-  const [bodyFatPct, setBodyFatPct] = useState(20)
-  const [lastMealHoursAgo, setLastMealHoursAgo] = useState(2)
+  // Teks mentah: kolom kosong = belum diisi (bukan 0). Berat tidak masuk rumus; ditampilkan sebagai konteks saja.
+  const [weightText, setWeightText] = useState(() => String(getDemo().weightKg || 70))
+  const [bodyFatText, setBodyFatText] = useState('20')
+  const [mealText, setMealText] = useState('2')
   // Illustrative model: glycogen stores ~ liver glycogen (~100-120g) depleted
   // over roughly 12-16h at typical resting glucose utilization, faster with
   // lower body fat / higher activity. This is a rough population-average
   // heuristic, not a measurement of the user's actual glycogen or autophagy.
-  const leanMassFactor = 1 - bodyFatPct / 100
-  const baseHours = 14 - leanMassFactor * 2
-  const hoursRemaining = Math.max(0, baseHours - lastMealHoursAgo)
-  const autophagyStarted = hoursRemaining <= 0
+  const r = autophagyTiming({ bodyFatPct: parseNumberField(bodyFatText), hoursSinceMeal: parseNumberField(mealText) })
+  const reasons = [...r.missing.map((m) => `${m} is required`), ...r.invalid]
 
   return (
     <Card className="!p-5">
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} /></Field>
-        <Field label="Body fat %"><input className={inputClass} type="number" value={bodyFatPct} onChange={(e) => setBodyFatPct(Number(e.target.value) || 0)} /></Field>
-        <Field label="Hours since last meal"><input className={inputClass} type="number" value={lastMealHoursAgo} onChange={(e) => setLastMealHoursAgo(Number(e.target.value) || 0)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightText} onChange={(e) => setWeightText(e.target.value)} /></Field>
+        <Field label="Body fat %"><input className={inputClass} type="number" value={bodyFatText} onChange={(e) => setBodyFatText(e.target.value)} /></Field>
+        <Field label="Hours since last meal"><input className={inputClass} type="number" value={mealText} onChange={(e) => setMealText(e.target.value)} /></Field>
       </div>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        {autophagyStarted
+        {r.hoursRemaining === null
+          ? <><div className="text-lg font-black text-neutral-500">No estimate yet</div><div className="text-[11px] text-neutral-500">{reasons.join(' · ')}</div></>
+          : r.started
           ? <div className="text-lg font-black text-brand-dark">Likely in early autophagy range</div>
-          : <><div className="text-2xl font-black text-brand-dark">~{hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
+          : <><div className="text-2xl font-black text-brand-dark">~{r.hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
       </div>
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">An illustrative estimate, based on typical liver-glycogen depletion time (roughly 12-16 hours of fasting, varying with body composition and activity) — not a measurement of your glycogen or autophagy state, which can only be assessed in a research lab.</Prosa>
     </Card>
