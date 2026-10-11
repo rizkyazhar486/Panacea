@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
+import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, FetalGrowthPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
@@ -1133,6 +1133,7 @@ export function CanonicalBody() {
         )}
       </Card>
 
+      <FetalGrowthPanel baseUrl={BASE} />
       <OpenCellPanel baseUrl={BASE} />
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
