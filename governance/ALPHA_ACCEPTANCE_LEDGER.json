@@ -480,10 +480,12 @@
    "evidence": [
     "server/uji/rbacKlinis.uji.ts (terdaftar di server `npm run uji`): menjalankan server nyata (berkas data sementara, port bebas, login dev) dan memanggil 15 rute /api/clinical* sebagai anonim, pasien, dan dokter tanpa STR terverifikasi: anonim 401 di semua; pasien dan dokter tanpa STR ditolak sesuai matriks (403/404 sebelum efek; rute 200 hanya memuat data sendiri, diperiksa tidak bocor); id pasien asing 403 vs id sendiri 200 (berpasangan).",
     "Kelengkapan: pemindai rute di index.ts gagal bila ada rute /api/clinical* yang tidak ada di matriks.",
-    "Sabotase (masing-masing gagal dengan nama): penjaga kepemilikan /vital dimatikan → 'pasien: POST /api/clinical/vital'; requireAuth dihapus dari /links → 'anonim harus 401: GET /api/clinical/links'; rute baru tanpa keputusan → 'rute klinis tanpa keputusan RBAC di matriks: GET /api/clinical/rahasia'."
+    "Sabotase (masing-masing gagal dengan nama): penjaga kepemilikan /vital dimatikan → 'pasien: POST /api/clinical/vital'; requireAuth dihapus dari /links → 'anonim harus 401: GET /api/clinical/links'; rute baru tanpa keputusan → 'rute klinis tanpa keputusan RBAC di matriks: GET /api/clinical/rahasia'.",
+    "server/uji/rbacKlinis.uji.ts: fase HTTP tambahan setelah matriks 15 rute memverifikasi dokter melalui endpoint owner yang sah, membuat pasien praktik p1 dengan rekam privat nyata, menolak pembacaan/daftar kedua pasien tanpa tautan, menguji dua identitas self-u-<userId> dengan baca/tulis sendiri 200 dan akses silang 403, lalu membuktikan kode tautan dokter hanya memberi akses ke akun penebus; akun lain tetap 403 tanpa tautan.",
+    "Sabotase tambahan: penjaga kepemilikan sementara mengizinkan pasien asing yang benar-benar tersimpan. Matriks id asing yang belum ada tetap lulus, tetapi fase baru gagal tepat pada unlinked patient cannot read existing private p1. Penjaga runtime dipulihkan sebelum uji bersih targeted/full server, typecheck, build, dan typecheck ketat fixture lulus."
    ],
    "owner": "Sol",
-   "note": "Belum VERIFIED: hanya /api/clinical* yang dicakup. Belum diperiksa dengan pemanggil nyata: /api/lab-log, /api/care, rute hasil lab/rujukan (punya uji lifecycle sendiri, bukan uji HTTP RBAC), dan jalur positif klinisi terverifikasi STR (butuh alur verifikasi STR di server uji). Kolom 'dokter' di sini = dokter tanpa STR, diperlakukan sebagai pasien oleh requireAuth."
+   "note": "Belum VERIFIED: matriks utama hanya /api/clinical* dan dokter tanpa STR; fase tambahan membuktikan jalur positif dokter terverifikasi, pasien tersimpan privat, identitas diri terpisah dan tautan eksplisit. Belum dicakup menyeluruh melalui HTTP: /api/lab-log, /api/care, serta semua rute hasil lab/rujukan dan peran terkait. Verifikasi akun dokter sintetis bukan penilaian klinis manusia atau izin patient-care."
   },
   {
    "id": "E3",

@@ -1,3 +1,9 @@
+### Populated clinical-patient authorization regression — 2026-10-11
+
+- This test-only increment follows #2390 → #2396 → #2383; its candidate contains their exact implementations before automated CI. It preserves the existing 15-route clinical matrix and verifies an actually populated private p1, two independent self identities, reciprocal read/write denials and clinician-issued link access restricted to its redeeming account. Authorized before/after reads assert rejected writes preserve exact records.
+- Existing-patient admission mutation passed the old absent-patient matrix but failed the new populated-p1 denial. Runtime source was restored. Targeted/full server tests, typecheck/build, strict fixture typecheck and architecture/ratchet passed; synchronized runtime test passes. Current-main child-exit cleanup fix and retry options are preserved.
+- E2 remains REPORTED; broader lab/care HTTP coverage is still required. No runtime clinical feature, criterion promotion, human review or production deployment is claimed. Final integration requires fresh automated gates and current-main merge-tree equality, serialized after its upstream tasks.
+
 ### A2 forward synchronization with delivered Body Exposure — 2026-10-11
 
 - Canonical main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's #2394 illustrative heartbeat. Forward merge preserves its implementation and labels; A2 runtime/tests are unchanged. Fresh exact-head automated checks follow this synchronization; no additional AI review is requested and no clinical approval or deployment is claimed.
