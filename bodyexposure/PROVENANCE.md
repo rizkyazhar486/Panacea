@@ -465,3 +465,11 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 - **Scan orientation:** the dataset affine of this subject has a 3.5 degree in-plane rotation (the patient lay slightly turned); the geometry keeps it, it is not levelled.
 - **Laterality check:** against geometry with a 20 mm midline tolerance; the left brachiocephalic vein (it crosses the midline) is centred 1 mm on the other side and is listed in `qa_reports/tsd_s0327_build.json`.
 - **Limits:** one man, not an age-representative reference. `clinically_reviewed` remains false.
+
+## Cell scale: OpenCell protein localisation (opencell_index.json) — measured in a cell line
+
+- **Source:** OpenCell (Chan Zuckerberg Biohub). The licence was read from the AWS Open Data registry entry: **CC BY-SA 4.0**, citation "OpenCell on AWS was accessed on DATE from https://registry.opendata.aws/czb-opencell"; the OpenCell website's download page is script-rendered and states no terms in what could be read. Files used: `opencell-localization-annotations.csv` (1,310 proteins) and `opencell-protein-abundance.csv` (19,250 genes; HEK293T RNA TPM, protein concentration nM, copies per cell), from the owner's Downloads; SHA-256 and row counts are stored in the output, the CSVs are not copied into the repository.
+- **Method:** `pipeline/publish_opencell_index.mjs` with `engine/openCellIndex.ts`: join by Ensembl id, fail-closed validation (Ensembl format, 17-term localisation vocabulary, non-negative finite numbers, no duplicate ids). Result: 1,310 proteins, 0 rejected, 9 without an abundance row (shown as "not measured", never as zero).
+- **What it is:** where each tagged protein sits inside a cultured HEK293T cell (grade 3 = most prominent annotation, grade 1 = weakest), with RNA and protein abundance in the same cells. **It is not the localisation or abundance in the displayed tissue or body.** The viewer panel says so, shows the licence and the citation, and offers search by gene or protein name.
+- **Not used:** the OpenCell interaction and library metadata tables (not needed for this panel).
+- `clinically_reviewed` is not applicable to this lookup panel; nothing here is a clinical statement.

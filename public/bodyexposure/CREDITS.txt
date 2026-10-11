@@ -72,6 +72,11 @@ tsd_s0196_older_adult_female.* — TotalSegmentator dataset v2.0.1 (Wasserthal J
                Second subject tsd_s0327_older_adult_male.* (s0327, male, 72 years): same dataset and method, lower neck to upper thighs,
                21 structures cut by the scan border, only a cut piece of the skull.
 
+opencell_index.json — OpenCell (Chan Zuckerberg Biohub; "OpenCell on AWS", https://registry.opendata.aws/czb-opencell), CC BY-SA 4.0
+               (share-alike: this file is distributed under the same licence). Cho NH, Cheveralls KC, Brunner AD, et al. Science 375:eabi6983
+               (2022). Localisation of 1,310 endogenously tagged proteins and their abundance in cultured HEK293T cells; measured in a cell
+               line, not in the tissue or body shown. Not clinically reviewed.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.

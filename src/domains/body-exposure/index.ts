@@ -129,3 +129,6 @@ export {
 } from './engine/respiratoryMotion'
 
 export { DATA_GAPS, GAP_STATUS_LABEL, validateGaps, type DataGap, type GapKind, type GapStatus } from './engine/dataGaps'
+
+export { OpenCellPanel } from './ui/OpenCellPanel'
+export { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS, LOCALISATION_LABEL, type OpenCellProtein, type PublishedOpenCell } from './engine/openCellIndex'
