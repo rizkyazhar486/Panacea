@@ -16,6 +16,9 @@ yarn-error.log*
 /public/build-info.json.tmp
 # Vercel CLI checks these literal entries before adding them to this file.
 .vercel
+# `vercel link` still printed 'added it to .gitignore' on main cfe4c6242 even with .vercel and .env.local present: the CLI appends this
+# exact glob when it is not a literal line, which dirties the release checkout and fails scripts/write-frontend-build-info.mjs.
+.env*.local
 
 # backend
 server/data.json
