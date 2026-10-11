@@ -1,0 +1,31 @@
+{
+  "source": "upstream #2338, base 1dda7e71",
+  "scope": "studio lighting compatibility with reference rig, not patient-specific gait or clinical validation",
+  "viewport": [
+    390,
+    844
+  ],
+  "captures": [
+    {
+      "clip": "Walk",
+      "file": "walk-a.png",
+      "sha256": "25fb180dc82372691a5b05373d211a172dbd1ed52549569149e58c69e0702b95"
+    },
+    {
+      "clip": "Walk",
+      "file": "walk-b.png",
+      "sha256": "046e6587c71535e4abc84b3137d78d979a2b98061d2f8109f46d67dee7367dd3"
+    },
+    {
+      "clip": "Run",
+      "file": "run-a.png",
+      "sha256": "13aea3cf0bfd44c3836f6043374ae4810404522349b4d31f21f5bc989be5eb60"
+    },
+    {
+      "clip": "Run",
+      "file": "run-b.png",
+      "sha256": "3417cf59aa249f72a3a6324f94aab8a939d62a797e6c359417abd6e30601fa8e"
+    }
+  ],
+  "errors": []
+}

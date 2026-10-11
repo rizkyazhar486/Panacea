@@ -34,7 +34,9 @@ BUDGET = {"LOD4": ({"skeletal": 20000, "cardiovascular": 38000, "surface": 6000,
                     "sensory": 3000, "endocrine": 1500, "visceral_unclassified": 1000}, 8)}
 # per tubuh: laki-laki (3.877 struktur, 677 pembuluh terkunci ≈ 45.000) → sistem default lain lebih ketat
 BODY_BUDGET = {"HUMAN.ADULT.MALE": {"skeletal": 16000, "surface": 5000, "digestive": 5000, "respiratory": 3000,
-                                    "urinary": 1800, "reproductive": 1800}}
+                                    "urinary": 1800, "reproductive": 1800},
+               # modul atlas saraf (ruang MNI): sistem default-nya hanya saraf pusat (ATLAS_ON di CanonicalBody.tsx) ≤ 80.000; LOD4 saraf melampaui jatahnya karena perbaikan bbox
+               "ATLAS.NERVOUS.MNI152": {"nervous": 52000, "cardiovascular": 20000, "tracts": 40000, "peripheral": 40000, "territories": 15000, "fascia": 5000, "spinal": 9000}}
 DEFAULT_ON = {"surface", "skeletal", "cardiovascular", "respiratory", "digestive", "urinary", "reproductive"}
 SAMPLE = 400  # verteks master yang diuji per struktur untuk galat
 

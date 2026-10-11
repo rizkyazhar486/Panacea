@@ -1,0 +1,254 @@
+{
+ "schema": 1,
+ "kind": "respiratory_motion_model",
+ "truth_class": "measured-transferred",
+ "label": "Breathing from 4D-CT of other patients: lung size and position change over one breath, averaged over cases and transferred to this body. Not this body's measured motion.",
+ "source": "TCIA 4D-Lung (Hugo et al., VCU), 4 patients, 10 gated phases",
+ "licence": "CC BY 3.0",
+ "citation": "Hugo GD, Weiss E, Sleeman WC, et al. A longitudinal four-dimensional computed tomography and cone beam computed tomography dataset for image-guided radiation therapy research in lung cancer. Med Phys 44(2):762-771 (2017). TCIA 4D-Lung, https://www.cancerimagingarchive.net/collection/4d-lung/ (CC BY 3.0). Clark K, et al. The Cancer Imaging Archive (TCIA). J Digit Imaging 26(6):1045-1057 (2013).",
+ "cases": [
+  "100_HM10395",
+  "104_HM10395",
+  "107_HM10395",
+  "109_HM10395"
+ ],
+ "cases_rejected": [
+  {
+   "case": "103_HM10395",
+   "reason": "volume change 89.8 % outside 2-45 %",
+   "volume_ml": [
+    2804.0,
+    2686.0,
+    2337.0,
+    1994.0,
+    1733.0,
+    1516.0,
+    1477.0,
+    1848.0,
+    2352.0,
+    2680.0
+   ]
+  },
+  {
+   "case": "106_HM10395",
+   "reason": "end-expiratory volume 908 mL outside 1000-7000; volume change 53.2 % outside 2-45 %; extent scale 0.49-1.01 outside 0.85-1.25",
+   "volume_ml": [
+    1388.0,
+    1391.0,
+    1020.0,
+    927.0,
+    927.0,
+    908.0,
+    942.0,
+    1036.0,
+    1041.0,
+    1331.0
+   ]
+  }
+ ],
+ "reference": "phase 0 = end-expiration of each case (smallest lung volume); phases are 10 % bins of one breath, aligned this way before averaging",
+ "limitations": "Lung segmentation by HU threshold (< -400 HU) with a 6 mm opening, no manual check against contours. The CT does not give the breathing period, so playback speed is a viewer setting. Only lung size and position are modelled, not the diaphragm, ribs or heart separately. Patients have lung cancer; one breath of free breathing.",
+ "phases": [
+  {
+   "phase_index": 0,
+   "volume_ml": 2481.5,
+   "volume_sd_ml": 550.9,
+   "scale_lr_ap_si": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "scale_sd": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "phase_index": 1,
+   "volume_ml": 2560.6,
+   "volume_sd_ml": 568.9,
+   "scale_lr_ap_si": [
+    0.9972,
+    0.9998,
+    1.0043
+   ],
+   "scale_sd": [
+    0.0032,
+    0.0037,
+    0.0198
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    0.68,
+    1.89,
+    -1.64
+   ]
+  },
+  {
+   "phase_index": 2,
+   "volume_ml": 2671.9,
+   "volume_sd_ml": 595.6,
+   "scale_lr_ap_si": [
+    0.9989,
+    0.9998,
+    1.0309
+   ],
+   "scale_sd": [
+    0.0042,
+    0.0037,
+    0.0236
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.23,
+    2.36,
+    -3.53
+   ]
+  },
+  {
+   "phase_index": 3,
+   "volume_ml": 2833.0,
+   "volume_sd_ml": 621.3,
+   "scale_lr_ap_si": [
+    1.0078,
+    0.9998,
+    1.049
+   ],
+   "scale_sd": [
+    0.01,
+    0.0038,
+    0.0376
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.49,
+    2.32,
+    -5.61
+   ]
+  },
+  {
+   "phase_index": 4,
+   "volume_ml": 2994.3,
+   "volume_sd_ml": 720.0,
+   "scale_lr_ap_si": [
+    1.0169,
+    1.0009,
+    1.083
+   ],
+   "scale_sd": [
+    0.014,
+    0.0054,
+    0.0396
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.37,
+    1.93,
+    -7.9
+   ]
+  },
+  {
+   "phase_index": 5,
+   "volume_ml": 3027.9,
+   "volume_sd_ml": 762.9,
+   "scale_lr_ap_si": [
+    1.019,
+    1.005,
+    1.0641
+   ],
+   "scale_sd": [
+    0.0145,
+    0.0033,
+    0.0188
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.53,
+    1.88,
+    -7.75
+   ]
+  },
+  {
+   "phase_index": 6,
+   "volume_ml": 2933.9,
+   "volume_sd_ml": 727.5,
+   "scale_lr_ap_si": [
+    1.0162,
+    1.0062,
+    1.0349
+   ],
+   "scale_sd": [
+    0.0141,
+    0.0051,
+    0.0153
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.76,
+    1.63,
+    -5.82
+   ]
+  },
+  {
+   "phase_index": 7,
+   "volume_ml": 2776.9,
+   "volume_sd_ml": 643.4,
+   "scale_lr_ap_si": [
+    1.0104,
+    1.0034,
+    1.0226
+   ],
+   "scale_sd": [
+    0.0107,
+    0.0072,
+    0.0082
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    1.93,
+    0.91,
+    -3.87
+   ]
+  },
+  {
+   "phase_index": 8,
+   "volume_ml": 2631.9,
+   "volume_sd_ml": 593.0,
+   "scale_lr_ap_si": [
+    1.0052,
+    1.0035,
+    1.0107
+   ],
+   "scale_sd": [
+    0.0071,
+    0.0061,
+    0.0063
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    0.98,
+    0.21,
+    -1.89
+   ]
+  },
+  {
+   "phase_index": 9,
+   "volume_ml": 2553.0,
+   "volume_sd_ml": 572.7,
+   "scale_lr_ap_si": [
+    1.0034,
+    1.0012,
+    0.9998
+   ],
+   "scale_sd": [
+    0.0042,
+    0.002,
+    0.0108
+   ],
+   "centroid_shift_mm_lr_ap_si": [
+    0.44,
+    -0.1,
+    -0.66
+   ]
+  }
+ ],
+ "volume_change_pct_mean": 22.3
+}

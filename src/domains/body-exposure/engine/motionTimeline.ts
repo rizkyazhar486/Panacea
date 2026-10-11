@@ -98,3 +98,16 @@ export function scrubToTime(fraction: number, durationS: number): number | null 
   if (!isNum(fraction) || !isNum(durationS) || durationS <= 0) return null
   return Math.min(Math.max(fraction, 0), 1) * durationS
 }
+
+/** Lama peralihan antar klip (detik): pose terakhir klip lama dicampur ke klip baru agar tidak ada lonjakan pose. */
+export const CROSSFADE_S = 0.3
+
+/**
+ * Bobot klip baru (0..1) setelah elapsedS detik waktu nyata sejak peralihan, kurva smootherstep.
+ * Nilai tidak valid → 1 (gagal-aman: tampilkan klip baru, jangan menahan pose lama); negatif → 0.
+ */
+export function crossfadeWeight(elapsedS: number, durationS: number = CROSSFADE_S): number {
+  if (!isNum(elapsedS) || !isNum(durationS) || durationS <= 0) return 1
+  const x = Math.min(Math.max(elapsedS / durationS, 0), 1)
+  return x * x * x * (x * (x * 6 - 15) + 10)
+}

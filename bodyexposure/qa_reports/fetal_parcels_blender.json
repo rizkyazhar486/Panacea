@@ -1,0 +1,89 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "clinical_validation": "pending",
+  "runtime_admission": "blocked_label_identity_unresolved",
+  "regions": [
+    {
+      "id": "parcel_01",
+      "vertices": 7017,
+      "triangles": 14050,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 5.7633054985570425e-06
+    },
+    {
+      "id": "parcel_02",
+      "vertices": 8628,
+      "triangles": 17264,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 9.52106973081559e-06
+    },
+    {
+      "id": "parcel_03",
+      "vertices": 9069,
+      "triangles": 18150,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 1.0768554285142108e-05
+    },
+    {
+      "id": "parcel_04",
+      "vertices": 5648,
+      "triangles": 11316,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 5.149740967313383e-06
+    },
+    {
+      "id": "parcel_05",
+      "vertices": 5336,
+      "triangles": 10684,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 4.243360000429306e-06
+    },
+    {
+      "id": "parcel_06",
+      "vertices": 3865,
+      "triangles": 7730,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 2.810953533053115e-06
+    },
+    {
+      "id": "parcel_07",
+      "vertices": 14749,
+      "triangles": 29534,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 1.9390871857409675e-05
+    },
+    {
+      "id": "parcel_08",
+      "vertices": 1972,
+      "triangles": 3940,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 7.330255010852661e-07
+    },
+    {
+      "id": "parcel_09",
+      "vertices": 1306,
+      "triangles": 2608,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "volume_m3": 4.543242846113171e-07
+    }
+  ],
+  "artifacts": {
+    "fetal_parcels_QA.glb": {
+      "bytes": 2086956,
+      "sha256": "63505eedb8867bbd0a6f7abf646edbffc19357eaf5e622871b21604a8b62bb13"
+    },
+    "fetal_parcels_QA.blend": {
+      "bytes": 2662066,
+      "sha256": "f3baa221c9fa8c528f730a67c0993886f86fb215644b95c29a0b2e1f9da2e0da"
+    }
+  }
+}
