@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parseServingField, sanitizeServings } from '../domains/personal-health/engine/dietServings'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Carbon-Footprint Diet Calculator — estimates the greenhouse-gas footprint of
@@ -35,7 +36,7 @@ const FOODS: FoodItem[] = [
 type Servings = Record<string, number>
 const KEY = 'pmd_carbon_diet_v1'
 function load(): Servings {
-  try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
+  try { return sanitizeServings(JSON.parse(localStorage.getItem(KEY) || '{}'), FOODS.map((f) => f.key)) } catch { return {} }
 }
 
 // Reference points (kg CO2e/year, food only) from the same Our World in Data
@@ -51,6 +52,17 @@ const REFERENCE = [
 
 export function CarbonDiet() {
   const [servings, setServings] = useState<Servings>(load)
+  // Teks mentah per kolom: nilai tak sah ditandai, tidak diam-diam menjadi 0 atau ikut dihitung.
+  const [raw, setRaw] = useState<Record<string, string>>(() => Object.fromEntries(Object.entries(load()).map(([k, v]) => [k, String(v)])))
+  const [invalid, setInvalid] = useState<Record<string, string>>({})
+
+  function onServing(key: string, text: string) {
+    setRaw((r) => ({ ...r, [key]: text }))
+    const p = parseServingField(text)
+    setInvalid((m) => { const { [key]: _drop, ...rest } = m; return p.ok ? rest : { ...rest, [key]: p.reason === 'negative' ? 'Cannot be negative' : p.reason === 'too_many' ? 'Max 100 servings/week' : 'Enter a number' } })
+    // Nilai tak sah mempertahankan angka sah terakhir tidak diperlukan: dikecualikan dari total sampai diperbaiki.
+    setServings((s) => ({ ...s, [key]: p.ok ? p.value : 0 }))
+  }
 
   useEffect(() => {
     const t = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(servings)) } catch { /* ignore */ } }, 400)
@@ -88,11 +100,13 @@ export function CarbonDiet() {
                 className={inputClass}
                 type="number"
                 min={0}
-                inputMode="numeric"
-                value={servings[f.key] ?? ''}
-                onChange={(e) => setServings((s) => ({ ...s, [f.key]: Number(e.target.value) || 0 }))}
+                inputMode="decimal"
+                value={raw[f.key] ?? ''}
+                onChange={(e) => onServing(f.key, e.target.value)}
+                aria-invalid={invalid[f.key] ? true : undefined}
                 placeholder="0"
               />
+              {invalid[f.key] && <span role="alert" className="mt-1 block text-[11px] font-semibold text-red-600">{invalid[f.key]} — excluded from the total</span>}
             </Field>
           ))}
         </div>
