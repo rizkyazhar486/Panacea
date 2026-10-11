@@ -63,3 +63,6 @@ assert.match(otpSource, /roleForLogin\(existing, b\.role\)/)
 assert.match(otpSource, /emailCodes\.delete\(email\)/)
 
 console.log('Authentication privilege, session-cookie, and OTP security boundaries verified.')
+
+// Verify production middleware over actual HTTP, not only source assertions.
+await import('./authSessionHttp.uji.js')

@@ -1,0 +1,38 @@
+{
+ "vertebrae_L2": {
+  "significant_fragments": 3,
+  "gap_mm_to_main": [
+   18.0,
+   15.0
+  ],
+  "highest_HU_threshold_that_connects_all": 60
+ },
+ "rib_left_6": {
+  "significant_fragments": 2,
+  "gap_mm_to_main": [
+   20.5
+  ],
+  "highest_HU_threshold_that_connects_all": null
+ },
+ "rib_left_7": {
+  "significant_fragments": 2,
+  "gap_mm_to_main": [
+   16.6
+  ],
+  "highest_HU_threshold_that_connects_all": 10
+ },
+ "rib_left_8": {
+  "significant_fragments": 2,
+  "gap_mm_to_main": [
+   29.6
+  ],
+  "highest_HU_threshold_that_connects_all": null
+ },
+ "rib_right_7": {
+  "significant_fragments": 2,
+  "gap_mm_to_main": [
+   21.5
+  ],
+  "highest_HU_threshold_that_connects_all": null
+ }
+}
