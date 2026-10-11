@@ -9,6 +9,7 @@ import {
   aklimatisasiPanas, aklimatisasiKetinggian, penaltiKetinggian,
   type Segmen, type TesFtp, type PaparanPanas, type PaparanKetinggian,
 } from '../../lib/enduranceTools'
+import { parseNumberField, validateHeatExposure, validateAltitude, validateAltitudeExposure } from '../../domains/sport'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -374,14 +375,19 @@ function TabAklimatisasi() {
 
   const statusPanas = useMemo(() => aklimatisasiPanas(panas), [panas])
   const statusTinggi = useMemo(() => aklimatisasiKetinggian(tinggi), [tinggi])
-  const penalti = useMemo(() => penaltiKetinggian(Number(tMeter) || 0), [tMeter])
+  const altitude = useMemo(() => validateAltitude(parseNumberField(tMeter)), [tMeter])
+  const penalti = useMemo(() => (altitude.ok ? penaltiKetinggian(altitude.value) : null), [altitude])
+  const heatCheck = validateHeatExposure(parseNumberField(pSuhu), parseNumberField(pMenit))
+  const altCheck = validateAltitudeExposure(parseNumberField(tMeter), parseNumberField(tJam))
 
   const tambahPanas = () => {
-    const next = [...panas, { tanggal: tglHariIni, suhuC: Number(pSuhu) || 0, menit: Number(pMenit) || 0 }]
+    if (!heatCheck.ok) return
+    const next = [...panas, { tanggal: tglHariIni, ...heatCheck.value }]
     setPanas(next); simpan(KEY_PANAS, next)
   }
   const tambahTinggi = () => {
-    const next = [...tinggi, { tanggal: tglHariIni, meter: Number(tMeter) || 0, jam: Number(tJam) || 0 }]
+    if (!altCheck.ok) return
+    const next = [...tinggi, { tanggal: tglHariIni, ...altCheck.value }]
     setTinggi(next); simpan(KEY_TINGGI, next)
   }
 
@@ -397,8 +403,9 @@ function TabAklimatisasi() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Temperature (°C)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={pSuhu} onChange={(e) => setPSuhu(e.target.value)} /></Field>
           <Field label="Minutes"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={pMenit} onChange={(e) => setPMenit(e.target.value)} /></Field>
-          <div className="flex items-end"><button onClick={tambahPanas} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white">Log today</button></div>
+          <div className="flex items-end"><button onClick={tambahPanas} disabled={!heatCheck.ok} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-40">Log today</button></div>
         </div>
+        {!heatCheck.ok && <p role="status" className="mt-1.5 text-[11px] text-amber-300">{heatCheck.reason}</p>}
         <p className="mt-1.5 text-[11px] text-slate-500">
           {panas.length} exposures logged. Only sessions above 27 °C and at least 30 minutes count —
           below that the stimulus is too weak to trigger adaptation.
@@ -415,14 +422,21 @@ function TabAklimatisasi() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Altitude (m)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={tMeter} onChange={(e) => setTMeter(e.target.value)} /></Field>
           <Field label="Hours spent there"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={tJam} onChange={(e) => setTJam(e.target.value)} /></Field>
-          <div className="flex items-end"><button onClick={tambahTinggi} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white">Log today</button></div>
+          <div className="flex items-end"><button onClick={tambahTinggi} disabled={!altCheck.ok} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-40">Log today</button></div>
         </div>
+        {!altCheck.ok && <p role="status" className="mt-1.5 text-[11px] text-amber-300">{altCheck.reason}</p>}
         <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-neutral-500">Aerobic capacity loss at {tMeter} m</span>
-            <span className="text-lg font-semibold tabular-nums text-ink">−{penalti.pctVo2Turun}%</span>
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-neutral-500">{penalti.ket}</p>
+          {penalti ? (
+            <>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="text-sm text-neutral-500">Aerobic capacity loss at {tMeter} m</span>
+                <span className="text-lg font-semibold tabular-nums text-ink">−{penalti.pctVo2Turun}%</span>
+              </div>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">{penalti.ket}</p>
+            </>
+          ) : (
+            <p className="text-sm leading-relaxed text-neutral-500">No estimate yet — {altitude.ok ? '' : altitude.reason}.</p>
+          )}
         </div>
         <p className="mt-2 text-[11px] text-slate-500">{tinggi.length} paparan tercatat. Di bawah 1500 m tidak dihitung.</p>
       </Card>
