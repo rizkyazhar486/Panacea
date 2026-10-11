@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 27 / 43 = 62.8%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 28 / 43 = 65.1%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -31,7 +31,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
-## Panacea One OS (2 / 8)
+## Panacea One OS (3 / 8)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
