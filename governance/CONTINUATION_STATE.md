@@ -2,7 +2,10 @@
 
 ### Current checkpoint — 2026-10-11, Mongo write ordering and drain
 
-- Live canonical baseline: `716483bf5cd3753ab57dd5dab37444adfad92b02`.
+- Latest synchronized canonical baseline: `3a4a7629b3763124f376142ec94210b891dc9d6d`.
+  Initial inspected baseline was `716483bf5cd3753ab57dd5dab37444adfad92b02`.
+  Main advanced with #2374 during CI; its independent foot-contact work is preserved.
+  Candidate is synchronized forward and requires fresh exact-head CI.
   Repository evidence was refreshed after the previous session; intervening
   Body Exposure and clinical RBAC work is preserved. #2349 still has historical
   head `66697f6bf801b91e028cc1d6d6bcbec31eb533b9` and needs latest-main
