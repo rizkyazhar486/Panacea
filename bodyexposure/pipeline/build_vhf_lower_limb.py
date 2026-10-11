@@ -1,6 +1,6 @@
 """Tubuh kanonik: tungkai bawah Visible Human Female (Univ. of Denver, CC BY 4.0).
 
-  Blender -b -P bodyexposure/pipeline/build_vhf_lower_limb.py
+  Blender -b -P bodyexposure/pipeline/build_vhf_lower_limb.py [-- --body-id VHF_DENVER_CT.ADULT.FEMALE --ct <dir STL dari ct_masks_to_stl.py>]
 
 Sumber: sources/du_vhf/final_stl/{Left,Right}/VHF_<sisi>_<jenis>_<nama>_smooth.stl, dari Andreassen dkk., "Three-dimensional
 lower extremity musculoskeletal geometry of the Visible Human Female and Male", Scientific Data 2023
@@ -18,7 +18,11 @@ ROOT = os.path.expanduser("~/Documents/Panaceamed.id/bodyexposure")
 SRC = f"{ROOT}/sources/du_vhf/final_stl"
 OUT = f"{ROOT}/bodies"
 MASTER = f"{ROOT}/PANACEA_HUMAN_MASTER_v007.blend"  # hanya sumber material PAN_*
-BODY_ID = "VHF_LOWER_LIMB.ADULT.FEMALE"
+_argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+_arg = lambda k, d=None: _argv[_argv.index(k) + 1] if k in _argv else d
+BODY_ID = _arg("--body-id", "VHF_LOWER_LIMB.ADULT.FEMALE")  # --body-id VHF_DENVER_CT.ADULT.FEMALE --ct <dir STL TotalSegmentator> → tubuh gabungan
+CT_DIR = os.path.expanduser(_arg("--ct")) if _arg("--ct") else None
+VERSION = _arg("--version", "body_v012")  # versi aset: naik bila geometri berubah (catatan tinjauan klinis lama otomatis tidak berlaku)
 PUB = "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry"
 INDIVIDUAL = ("single individual from source data: Visible Human Female donor, 59 y, 62 in (157 cm), 88 kg, BMI 36 (Andreassen et al. 2023); "
               "not an atlas, not a reference adult female, not patient-specific")
@@ -60,6 +64,47 @@ def pretty(raw):  # Muscle_AdductorLongus → "Adductor longus"
     return " ".join([words[0]] + [w.lower() for w in words[1:]])
 
 
+CT_METHOD = ("machine segmentation (TotalSegmentator, task total) of the Visible Human Female CT, 1.5 mm, largest connected component, Taubin-smoothed; "
+             "not reviewed. Accuracy was measured only for femur, hip bone and sacrum against the Denver manual segmentation (median 0.6-2.9 mm); "
+             "not measured for this bone")
+
+
+ARM_STEMS = re.compile(r"(radius|ulna|hand_bones)_(left|right)$")
+ARM_METHOD = ("threshold segmentation (HU > 250, distance-transform watershed, label propagation along the shaft) of the native-resolution Visible Human Female CT "
+              "(0.72 x 0.72 x 1.0 mm), Taubin-smoothed; algorithmic, not a trained model and not manual; not reviewed. Accuracy was not measured against a reference. "
+              "Script segment_ct_forearm_hand.py, report qa_reports/vhf_forearm_hand.json")
+_ARM_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "qa_reports", "vhf_forearm_hand.json")  # laporan versi repo (yang dilacak git)
+ARM_REPORT = json.load(open(_ARM_JSON)) if os.path.exists(_ARM_JSON) else None
+
+
+def arm_note(stem):
+    """catatan kelengkapan dari laporan segmentasi (celah ke humerus di ujung proksimal)."""
+    m = ARM_STEMS.match(stem)
+    if not m or not ARM_REPORT: return None
+    info = ARM_REPORT["arms"].get(m.group(2), {}).get("meshes", {}).get(m.group(1))
+    if m.group(1) == "hand_bones":
+        return ("Carpals, metacarpals and phalanges are ONE mesh: individual bones were not separated (joint gaps are too small for an automatic split, and no manual "
+                "segmentation exists). Wrist boundary with the radius and ulna is approximate.")
+    if info and not info.get("proximal_end_complete", True):
+        return (f"Proximal end is INCOMPLETE: the recovered bone stops {info['gap_to_humerus_mm']} mm short of the humerus. In the CT the right arm is cut by the "
+                "edge of the scanned block (flat lateral boundary of the soft tissue in the axial slices) and the bone runs out of the image there; see "
+                "qa_reports/vhf_right_forearm_slices.png. The missing part is not in the data and is not reconstructed.")
+    return "The proximal end reaches the humerus; the elbow joint surface is ragged where the cortex is thin and was not smoothed over."
+
+
+def ct_name(stem):
+    """vertebrae_C3 → ('Vertebra C3', 'unpaired'); rib_left_5 → ('Rib 5', 'left'); clavicula_left → ('Clavicle', 'left')."""
+    m = re.match(r"rib_(left|right)_(\d+)$", stem)
+    if m: return f"Rib {m.group(2)}", m.group(1)
+    m = re.match(r"vertebrae_([CTL]\d+)$", stem)
+    if m: return f"Vertebra {m.group(1)}", "unpaired"
+    m = re.match(r"(clavicula|scapula|humerus)_(left|right)$", stem)
+    if m: return {"clavicula": "Clavicle"}.get(m.group(1), m.group(1).capitalize()), m.group(2)
+    m = re.match(r"(radius|ulna|hand_bones)_(left|right)$", stem)
+    if m: return {"radius": "Radius", "ulna": "Ulna", "hand_bones": "Hand bones"}[m.group(1)], m.group(2)
+    return {"skull": "Skull (cranium and mandible, one mesh)", "sternum": "Sternum"}[stem], "unpaired"
+
+
 def load_stl(path):
     before = set(bpy.data.objects)
     bpy.ops.wm.stl_import(filepath=path)
@@ -83,6 +128,16 @@ def main():
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)  # 0,1 mm dalam satuan sumber (mm)
         bm.to_mesh(me); bm.free()
         meshes.append((side, raw, os.path.basename(f), me))
+    if CT_DIR:
+        for f in sorted(glob.glob(f"{CT_DIR}/*.stl")):
+            stem = os.path.basename(f)[:-4]
+            if stem == "costal_cartilages":
+                continue  # masker terpecah (18 bagian, komponen terbesar hanya 72 %): tidak dipublikasikan
+            me = load_stl(f)
+            bm = bmesh.new(); bm.from_mesh(me)
+            bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
+            bm.to_mesh(me); bm.free()
+            meshes.append(("CT", "CT_" + stem, os.path.basename(f), me))
     # garis tengah tubuh = titik tengah kedua tulang pinggul (satuan sumber, mm); sumbu X/Y dipusatkan di sana
     ctr = {sd: Vector((0, 0, 0)) for sd in ("Left", "Right")}
     for sd, raw, _, me in meshes:
@@ -98,14 +153,20 @@ def main():
     coll = bpy.data.collections.new(BODY_ID); bpy.context.scene.collection.children.link(coll)
     report, bad_side, seen = [], [], set()
     for side, raw, fname, me in meshes:
-        kind = raw.split("_", 1)[0]
+        is_ct = side == "CT"
+        kind = "Bone" if is_ct else raw.split("_", 1)[0]
         sysn, matname = KIND[kind]
         me.transform(Matrix.Translation((0, 0, -zmin)))
-        name = pretty(raw)
-        unpaired = raw in ("Bone_Sacrum", "Bone_Coccyx")
-        lat = "unpaired" if unpaired else side.lower()
+        if is_ct:
+            name, lat = ct_name(raw[3:]); unpaired = lat == "unpaired"
+        else:
+            name = pretty(raw)
+            unpaired = raw in ("Bone_Sacrum", "Bone_Coccyx")
+            lat = "unpaired" if unpaired else side.lower()
         cx = sum(v.co.x for v in me.vertices) / len(me.vertices)
         if not unpaired and ((lat == "left" and cx < 0) or (lat == "right" and cx > 0)):  # +X = kiri subjek
+            bad_side.append((fname, round(cx, 4)))
+        if is_ct and not unpaired and ((lat == "left" and cx < 0) or (lat == "right" and cx > 0)):
             bad_side.append((fname, round(cx, 4)))
         sid = f"{BODY_ID}.{snake(sysn)}.{snake(name)}" + {"left": ".L", "right": ".R"}.get(lat, "")
         if sid in seen:
@@ -123,16 +184,20 @@ def main():
         boundary = sum(1 for e in bm.edges if e.is_boundary); nonman = sum(1 for e in bm.edges if not e.is_manifold and not e.is_boundary)
         bm.free()
         meta = {"panacea_structure_id": sid, "panacea_body_id": BODY_ID, "canonical_name": name, "panacea_system": sysn,
-                "panacea_laterality": lat, "panacea_laterality_source": "source_folder_verified_by_geometry",
-                "panacea_source": f"{PUB}; file {fname}", "panacea_license": LICENSE, "panacea_source_raw_name": raw,
-                "panacea_accuracy_status": "source_backed", "panacea_review_status": "review_required",
-                "panacea_version": "body_v012", "biological_sex_applicability": "female", "panacea_educational_only": True,
+                "panacea_laterality": lat, "panacea_laterality_source": "source_label_verified_by_geometry",
+                "panacea_source": ((f"Threshold segmentation of the NLM Visible Human Female CT (Denver aligned CT, CC BY 4.0); file {fname}" if ARM_STEMS.match(raw[3:]) else f"TotalSegmentator on the NLM Visible Human Female CT (Denver aligned CT, CC BY 4.0); file {fname}") if is_ct else f"{PUB}; file {fname}"),
+                "panacea_license": LICENSE, "panacea_source_raw_name": raw[3:] if is_ct else raw,
+                "panacea_method": (ARM_METHOD if ARM_STEMS.match(raw[3:]) else CT_METHOD) if is_ct else "manual segmentation of the cryosections (Denver, ScanIP S-2021.06)",
+                "panacea_accuracy_status": ("threshold_segmented" if ARM_STEMS.match(raw[3:]) else "model_segmented") if is_ct else "source_backed", "panacea_review_status": "review_required",
+                "panacea_version": VERSION, "biological_sex_applicability": "female", "panacea_educational_only": True,
                 "panacea_kind": kind.lower(), "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
-                "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific."}
+                "panacea_known_limitations": "Segmented from one cadaver (Visible Human Female); smoothed surface; not patient-specific." + (" The scan shows disrupted anatomy; a model can mislabel or fragment bones." if is_ct else "")}
         if raw == "Bone_Phalanges":
             meta["panacea_qa_note"] = ("Source provides the forefoot as one mesh labelled 'Phalanges'. Its extent (129 mm, starting at the tarsometatarsal level) "
                                        "and a top-view render show metatarsal shafts and toe bones together, so it is named accordingly. Not split because the bone boundaries "
                                        "are not in the source; the toe segmentation is coarse (holes between toes).")
+        if is_ct and arm_note(raw[3:]):
+            meta["panacea_qa_note"] = arm_note(raw[3:])
         if raw == "Bone_Pelvis":
             meta["panacea_qa_note"] = "One mesh per side for the whole hip bone (ilium, ischium, pubis); sacrum and coccyx are separate."
         for k, v in meta.items():

@@ -1,0 +1,34 @@
+name: Body Exposure assets
+
+on:
+  pull_request:
+    paths:
+      - 'public/bodyexposure/**'
+      - 'bodyexposure/pipeline/check_web_budget.py'
+      - 'bodyexposure/pipeline/test_web_budget.py'
+      - 'src/pages/CanonicalBody.tsx'
+      - '.github/workflows/body-exposure-assets.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/bodyexposure/**'
+      - 'bodyexposure/pipeline/check_web_budget.py'
+      - 'bodyexposure/pipeline/test_web_budget.py'
+      - 'src/pages/CanonicalBody.tsx'
+      - '.github/workflows/body-exposure-assets.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  asset-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify budget checker regressions
+        run: python3 -m unittest discover -s bodyexposure/pipeline -p test_web_budget.py
+      - name: Verify viewer assets and initial triangle budgets
+        run: python3 bodyexposure/pipeline/check_web_budget.py --out /tmp/body-exposure-web-budget.json

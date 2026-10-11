@@ -96,6 +96,9 @@ export interface Clinical {
   tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
   /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
   kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
+  /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
+  hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
+  rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
 }
 
 export interface VisitMembership {
@@ -339,6 +342,7 @@ let db: DB = {
 // the process falls back to data.json, which still keeps a full copy.
 let mongoCol: any = null
 let saveTimer: ReturnType<typeof setTimeout> | null = null
+let mongoSaveTail: Promise<void> = Promise.resolve()
 let irisanAktif = false
 
 function loadFile() {
@@ -389,7 +393,7 @@ function simpanSekarang() {
   // Mongo (permanent), debounced to coalesce rapid writes.
   if (mongoCol) {
     if (saveTimer) clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => { saveTimer = null; void simpanMongo() }, 400)
+    saveTimer = setTimeout(() => { saveTimer = null; void antrikanSimpanMongo() }, 400)
   }
 }
 
@@ -409,6 +413,17 @@ export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catata
   }
   try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n') }
   catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message) }
+}
+
+/** Serialize snapshots: an older slice deletion must never follow a newer save. */
+function antrikanSimpanMongo(): Promise<void> {
+  mongoSaveTail = mongoSaveTail.then(simpanMongo).catch((e: unknown) => {
+    // simpanMongo handles I/O failures; serialization/setup failures must also
+    // remain observable without poisoning every subsequent queued save.
+    catatGagal(e)
+    console.error('[store] MongoDB save queue failed:', (e as Error).message)
+  })
+  return mongoSaveTail
 }
 
 async function simpanMongo(): Promise<void> {
@@ -436,7 +451,15 @@ async function simpanMongo(): Promise<void> {
 /** Tulis segera simpan yang masih tertunda (dipanggil saat SIGTERM/deploy). */
 export async function flushStore(): Promise<void> {
   flushSimpan()
-  if (mongoCol && saveTimer) { clearTimeout(saveTimer); saveTimer = null; await simpanMongo() }
+  if (!mongoCol) return
+  while (true) {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; antrikanSimpanMongo() }
+    const pending = mongoSaveTail
+    await pending
+    // Include mutations queued while an active write was awaited.
+    flushSimpan()
+    if (!saveTimer && pending === mongoSaveTail) return
+  }
 }
 
 // Call once at boot before serving requests.
@@ -474,7 +497,7 @@ export async function initStore() {
       if (irisan.data.connect) muatConnect(irisan.data.connect as unknown as Parameters<typeof muatConnect>[0])
       irisanAktif = irisan.lengkap
     }
-    if (!irisanAktif) await simpanMongo()
+    if (!irisanAktif) await antrikanSimpanMongo()
     console.log(irisanAktif
       ? '[store] MongoDB connected — every stored collection is outside the core document'
       : '[store] MongoDB connected — full split did not commit; core document still holds the remainder')
@@ -869,6 +892,21 @@ export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHas
   save()
 }
 export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+/** Port penyimpanan modul labResults: tulis lewat save() sehingga ikut berkas/Mongo yang sama. */
+export function repoHasilLab() {
+  return {
+    get: (id: string) => ensureClinical().hasilLab?.[id],
+    put: (rec: import('./modules/labResults/service/labResultsService.js').HasilLabRekam) => { (ensureClinical().hasilLab ??= {})[rec.id] = rec; save() },
+    all: () => Object.values(ensureClinical().hasilLab ?? {}),
+  }
+}
+export function repoRujukan() {
+  return {
+    get: (id: string) => ensureClinical().rujukanKlinis?.[id],
+    put: (rec: import('./modules/labResults/service/labResultsService.js').RujukanRekam) => { (ensureClinical().rujukanKlinis ??= {})[rec.id] = rec; save() },
+    all: () => Object.values(ensureClinical().rujukanKlinis ?? {}),
+  }
+}
 export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
 export function getRecordHistory(patientId: string, recordId?: string): any[] {
   return daftarRiwayatEncounter(ensureClinical(), patientId, recordId)

@@ -1,0 +1,69 @@
+{
+ "body": "VHF_DENVER_CT.ADULT.FEMALE",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 156,
+    "documented_exceptions": 0,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "vertical_organ_order",
+   "ok": true,
+   "not_applicable": "body has no organs (--no-organs)"
+  },
+  {
+   "check": "feet_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {}
+  },
+  {
+   "check": "vertebral_column_ordered_top_to_bottom",
+   "ok": true,
+   "detail": {
+    "c1_z": 1.555,
+    "l5_z": 0.999
+   }
+  },
+  {
+   "check": "skull_above_c1",
+   "ok": true,
+   "detail": {
+    "skull_z": 1.625,
+    "c1_z": 1.555
+   }
+  },
+  {
+   "check": "sacrum_below_l5",
+   "ok": true,
+   "detail": {
+    "sacrum_z": 0.955,
+    "l5_z": 0.999
+   }
+  },
+  {
+   "check": "twelve_ribs_each_side",
+   "ok": true,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "check": "sternum_anterior_to_spine",
+   "ok": true,
+   "detail": {
+    "sternum_y": -0.059,
+    "t6_y": 0.056
+   }
+  }
+ ],
+ "failures": []
+}

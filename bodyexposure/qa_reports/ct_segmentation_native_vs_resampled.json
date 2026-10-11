@@ -1,0 +1,146 @@
+{
+ "vertebrae_T12": {
+  "resampled_1p5mm_linear": {
+   "components": 1,
+   "largest": 1.0,
+   "cm3": 41.6
+  },
+  "native_crop": {
+   "components": 1,
+   "largest": 1.0,
+   "cm3": 43.0
+  }
+ },
+ "vertebrae_L1": {
+  "resampled_1p5mm_linear": {
+   "components": 2,
+   "largest": 1.0,
+   "cm3": 48.4
+  },
+  "native_crop": {
+   "components": 2,
+   "largest": 1.0,
+   "cm3": 48.9
+  }
+ },
+ "vertebrae_L2": {
+  "resampled_1p5mm_linear": {
+   "components": 14,
+   "largest": 0.786,
+   "cm3": 69.7
+  },
+  "native_crop": {
+   "components": 28,
+   "largest": 0.908,
+   "cm3": 60.5
+  }
+ },
+ "vertebrae_L3": {
+  "resampled_1p5mm_linear": {
+   "components": 3,
+   "largest": 0.998,
+   "cm3": 114.3
+  },
+  "native_crop": {
+   "components": 5,
+   "largest": 1.0,
+   "cm3": 124.0
+  }
+ },
+ "rib_left_5": {
+  "resampled_1p5mm_linear": {
+   "components": 1,
+   "largest": 1.0,
+   "cm3": 15.7
+  },
+  "native_crop": {
+   "components": 4,
+   "largest": 0.724,
+   "cm3": 17.5
+  }
+ },
+ "rib_left_6": {
+  "resampled_1p5mm_linear": {
+   "components": 4,
+   "largest": 0.854,
+   "cm3": 18.6
+  },
+  "native_crop": {
+   "components": 2,
+   "largest": 0.605,
+   "cm3": 17.8
+  }
+ },
+ "rib_left_7": {
+  "resampled_1p5mm_linear": {
+   "components": 4,
+   "largest": 0.809,
+   "cm3": 18.1
+  },
+  "native_crop": {
+   "components": 5,
+   "largest": 0.435,
+   "cm3": 15.8
+  }
+ },
+ "rib_left_8": {
+  "resampled_1p5mm_linear": {
+   "components": 2,
+   "largest": 0.842,
+   "cm3": 16.6
+  },
+  "native_crop": {
+   "components": 4,
+   "largest": 0.704,
+   "cm3": 15.5
+  }
+ },
+ "rib_left_9": {
+  "resampled_1p5mm_linear": {
+   "components": 2,
+   "largest": 0.979,
+   "cm3": 12.9
+  },
+  "native_crop": {
+   "components": 4,
+   "largest": 0.835,
+   "cm3": 11.6
+  }
+ },
+ "rib_right_6": {
+  "resampled_1p5mm_linear": {
+   "components": 5,
+   "largest": 0.99,
+   "cm3": 17.4
+  },
+  "native_crop": {
+   "components": 1,
+   "largest": 1.0,
+   "cm3": 17.0
+  }
+ },
+ "rib_right_7": {
+  "resampled_1p5mm_linear": {
+   "components": 2,
+   "largest": 0.923,
+   "cm3": 20.8
+  },
+  "native_crop": {
+   "components": 4,
+   "largest": 0.949,
+   "cm3": 18.1
+  }
+ },
+ "rib_right_8": {
+  "resampled_1p5mm_linear": {
+   "components": 1,
+   "largest": 1.0,
+   "cm3": 14.3
+  },
+  "native_crop": {
+   "components": 6,
+   "largest": 0.928,
+   "cm3": 15.4
+  }
+ }
+}

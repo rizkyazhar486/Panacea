@@ -16,7 +16,7 @@ from lod_budget import tri_count, allocate, split_nonmanifold, escapes_bbox, fix
 argv = sys.argv[sys.argv.index("--") + 1:]
 arg = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
 OUT, BUDGET = os.path.abspath(arg("--out")), int(arg("--budget", "34000"))
-arm = bpy.data.objects["RIG.ADULT_MALE"]
+arm = bpy.data.objects[arg("--arm", "RIG.ADULT_MALE")]  # tungkai bawah perempuan: --arm RIG.VHF_LOWER_LIMB
 meshes = [o for o in bpy.data.objects if o.type == 'MESH']
 for o in meshes:
     o.hide_set(False); o.hide_viewport = False
@@ -65,7 +65,7 @@ tl = json.load(open(arg("--timeline")))
 # kunci glTF dari Blender: frame f → waktu f/fps (frame 1 = 1/24 s); timeline memakai skala yang sama, durasi = frames/fps
 clips = [{"clip": "ROM", "label_short": "Range of motion", "fps": tl["fps"], "frames": tl["frames"] + 1,
           "source": "AAOS normal range of motion (Greene & Heckman 1994)", "truth_class": "simulated",
-          "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)",
+          "label": "Range-of-motion demonstration from AAOS normal limits (educational simulation, not measured motion)" + (f"; {arg('--coverage')}" if arg("--coverage") else ""),
           "movements": [{"name": t["movement"], "start_s": round(t["frames"][0] / tl["fps"], 6), "end_s": round(t["frames"][2] / tl["fps"], 6), "note": t["note"]} for t in tl["timeline"]],
           "qa": {"angle_within_limits": tl["angle_within_limits"], "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in tl["bone_contact_overlap"])}}]
 if GAIT:
@@ -76,7 +76,7 @@ if GAIT:
         n = g["frames_24fps"]  # kunci di frame 0 … n−1 → waktu 0 … (n−1)/24 = satu siklus; kunci terakhir = pose awal
         clips.append({"clip": name, "label_short": short, "fps": 24, "frames": n, "source": GAIT["source"],
                       "acknowledgement": GAIT["acknowledgement"], "truth_class": "measured-retargeted",
-                      "label": f"Recorded {verb} of another person (CMU subject {g['subject']}, trial {g['trial']}), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics",
+                      "label": f"Recorded {verb} of another person (CMU subject {g['subject']}, trial {g['trial']}), retargeted to this skeleton and clamped to AAOS limits; treadmill-style, not patient biomechanics" + (f"; {arg('--coverage')}" if arg("--coverage") else ""),
                       "movements": [{"name": f"{verb} cycle", "start_s": 0.0, "end_s": round((n - 1) / 24, 6), "note": f"one gait cycle, {g['cycle_s']} s"}],
                       "qa": {"max_bone_penetration_mm": g["max_bone_penetration_mm"], "lowest_foot_point_m": g["lowest_foot_point_m"], "loop_drift_corrected_max_deg": g["loop_drift_corrected_max_deg"]}})
 json.dump({"clips": clips}, open(arg("--timeline-out"), "w"), indent=1)

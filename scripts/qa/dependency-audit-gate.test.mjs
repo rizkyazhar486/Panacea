@@ -30,6 +30,45 @@ const accept = (id, workspace = 'server', expires = '2026-12-31') => ({
 const policyAccepting = (ids, workspace, expires) => ({ ...EMPTY_POLICY, accepted: ids.map((id) => accept(id, workspace, expires)) })
 const run = (audit, policy = EMPTY_POLICY, workspace = 'server', now = NOW) => evaluateAudit({ audit, workspace, policy, now })
 
+test('hitungan_high_critical_wajib_bilangan_bulat_nonnegatif_aman', () => {
+  const clean = { vulnerabilities: {}, metadata: { vulnerabilities: { high: 0, critical: 0 } } }
+  assert.equal(run(clean).kind, 'pass')
+  for (const field of ['high', 'critical']) {
+    for (const value of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, '0', null]) {
+      const audit = structuredClone(clean)
+      audit.metadata.vulnerabilities[field] = value
+      const result = run(audit)
+      assert.equal(result.ok, false, `${field}=${String(value)}`)
+      assert.equal(result.kind, 'unusable')
+      assert.match(result.errors[0], /non-negative safe integers/)
+    }
+  }
+})
+
+test('struktur_laporan_rusak_tidak_boleh_dilewati_sebagai_audit_bersih', () => {
+  const clean = { vulnerabilities: {}, metadata: { vulnerabilities: { high: 0, critical: 0 } } }
+  const inputs = [
+    { ...clean, vulnerabilities: [] },
+    { ...clean, metadata: { vulnerabilities: [] } },
+    ...[null, [], 'bad', {}, { via: null }, { via: 'axios' }, { via: {} },
+      { via: [null] }, { via: [42] }, { via: [[]] }, { via: [''] },
+      { via: [{ severity: 'toString' }] }, { via: [{ severity: 'constructor' }] },
+    ].map((entry) => ({ ...clean, vulnerabilities: { axios: entry } })),
+  ]
+  for (const audit of inputs) {
+    const snapshot = JSON.stringify(audit)
+    const result = run(audit)
+    assert.equal(result.ok, false, snapshot)
+    assert.equal(result.kind, 'unusable', snapshot)
+    assert.equal(result.errors.length, 1)
+    assert.deepEqual(result.accepted, [])
+    assert.equal(JSON.stringify(audit), snapshot, 'input remains unchanged')
+  }
+  // npm uses strings for transitive dependencies; preserve that valid shape.
+  assert.equal(run({ ...clean, vulnerabilities: { wrapper: { via: ['axios'] } } }).kind, 'pass')
+  assert.equal(run({ ...clean, vulnerabilities: { wrapper: { via: [] } } }).kind, 'pass')
+})
+
 test('menolak_audit_server_sebelum_perbaikan_dan_menyebut_setiap_advisory_high', () => {
   const result = run(fixture('server-before-2210'))
   assert.equal(result.ok, false)
@@ -40,6 +79,124 @@ test('menolak_audit_server_sebelum_perbaikan_dan_menyebut_setiap_advisory_high',
   // Advisory moderate pada paket yang sama tidak boleh ikut menggagalkan; hanya dilaporkan sebagai peringatan.
   assert.ok(result.warnings.some((w) => w.id === 'GHSA-vh66-26gq-q6x8' && w.severity === 'moderate'))
   assert.ok(!result.failures.some((f) => f.id === 'GHSA-vh66-26gq-q6x8'))
+})
+
+test('severity_paket_high_critical_tidak_boleh_disembunyikan_oleh_ringkasan_nol', () => {
+  for (const severity of ['high', 'critical']) {
+    for (const via of [[], ['missing-package']]) {
+      const audit = {
+        vulnerabilities: { foo: { severity, via } },
+        metadata: { vulnerabilities: { high: 0, critical: 0 } },
+      }
+      const snapshot = JSON.stringify(audit)
+      const result = run(audit)
+      assert.equal(result.ok, false, snapshot)
+      assert.equal(result.kind, 'unusable')
+      assert.match(result.errors[0], /contradicts summary/)
+      assert.equal(JSON.stringify(audit), snapshot)
+    }
+  }
+})
+
+test('tautan_transitif_ke_advisory_tetap_ditolak_atau_diterima_sesuai_kebijakan', () => {
+  const id = 'GHSA-aaaa-bbbb-cccc'
+  for (const severity of ['high', 'critical']) {
+    const audit = {
+      vulnerabilities: {
+        wrapper: { severity, via: ['foo'] },
+        foo: { severity, via: [{ name: 'foo', severity, url: `https://github.com/advisories/${id}` }] },
+      },
+      metadata: { vulnerabilities: { high: 0, critical: 0, [severity]: 2 } },
+    }
+    assert.equal(run(audit).kind, 'vulnerable')
+    const accepted = run(audit, policyAccepting([id]))
+    assert.equal(accepted.kind, 'pass')
+    assert.equal(accepted.accepted.length, 1)
+    // Even a separately accepted advisory cannot conceal a contradictory package severity.
+    audit.metadata.vulnerabilities[severity] = 0
+    assert.equal(run(audit, policyAccepting([id])).kind, 'unusable')
+  }
+})
+
+const MASKING_ID = 'GHSA-aaaa-bbbb-cccc'
+const maskedReport = (severity, via) => ({
+  vulnerabilities: {
+    foo: { severity, via },
+    middle: { severity, via: via.includes('middle') ? ['missing-package'] : ['bar'] },
+    bar: { severity, via: [{ name: 'bar', severity, url: `https://github.com/advisories/${MASKING_ID}` }] },
+  },
+  metadata: { vulnerabilities: { high: 0, critical: 0, [severity]: 3 } },
+})
+
+test('advisory_diterima_tidak_boleh_menutupi_paket_lain_tanpa_atribusi', () => {
+  for (const severity of ['high', 'critical']) {
+    for (const via of [[], ['missing-package'], ['middle'], ['toString']]) {
+      const audit = maskedReport(severity, via)
+      const snapshot = JSON.stringify(audit)
+      const result = run(audit, policyAccepting([MASKING_ID]))
+      assert.equal(result.ok, false, snapshot)
+      assert.equal(result.kind, 'unusable')
+      assert.match(result.errors[0], /no attributable .* advisory/)
+      assert.equal(JSON.stringify(audit), snapshot)
+    }
+  }
+})
+
+test('atribusi_multihop_dan_tautan_bersama_mempertahankan_penerimaan_dan_deduplikasi', () => {
+  for (const severity of ['high', 'critical']) {
+    const audit = maskedReport(severity, ['middle'])
+    audit.vulnerabilities.middle.via = ['bar']
+    audit.vulnerabilities.peer = { severity, via: ['middle'] }
+    audit.metadata.vulnerabilities[severity] = 4
+    const denied = run(audit)
+    assert.equal(denied.kind, 'vulnerable')
+    assert.equal(denied.failures.length, 1)
+    const accepted = run(audit, policyAccepting([MASKING_ID]))
+    assert.equal(accepted.kind, 'pass')
+    assert.equal(accepted.accepted.length, 1)
+    // A matching advisory cannot legitimize an additional unresolved link.
+    audit.vulnerabilities.foo.via.push('missing-package')
+    assert.equal(run(audit, policyAccepting([MASKING_ID])).kind, 'unusable')
+  }
+})
+
+test('atribusi_menghentikan_siklus_dan_mencocokkan_severity_yang_dilaporkan', () => {
+  const audit = maskedReport('critical', ['middle'])
+  audit.vulnerabilities.middle.via = ['foo']
+  assert.equal(run(audit, policyAccepting([MASKING_ID])).kind, 'unusable')
+  audit.vulnerabilities.middle.via.push('bar')
+  assert.equal(run(audit, policyAccepting([MASKING_ID])).kind, 'pass')
+  audit.vulnerabilities.bar.via[0].severity = 'high'
+  assert.equal(run(audit, policyAccepting([MASKING_ID])).kind, 'unusable')
+})
+
+const duplicateReport = (severities) => ({
+  vulnerabilities: {
+    foo: { severity: 'critical', via: severities.map((severity) => ({
+      name: 'foo', severity, url: 'https://github.com/advisories/GHSA-dddd-eeee-ffff',
+    })) },
+    bar: { severity: 'critical', via: [{ name: 'bar', severity: 'critical', url: `https://github.com/advisories/${MASKING_ID}` }] },
+  },
+  metadata: { vulnerabilities: { high: 0, critical: 2 } },
+})
+
+test('severity_advisory_duplikat_bertentangan_gagal_tertutup_dalam_kedua_urutan', () => {
+  for (const severities of [['critical', 'moderate'], ['moderate', 'critical']]) {
+    const result = run(duplicateReport(severities), policyAccepting([MASKING_ID]))
+    assert.equal(result.ok, false)
+    assert.equal(result.kind, 'unusable')
+    assert.match(result.errors[0], /conflicting severities/)
+  }
+})
+
+test('advisory_duplikat_identik_tetap_dideduplikasi_dan_mematuhi_kebijakan', () => {
+  const audit = duplicateReport(['critical', 'critical'])
+  const partial = run(audit, policyAccepting([MASKING_ID]))
+  assert.equal(partial.kind, 'vulnerable')
+  assert.equal(partial.failures.length, 1)
+  const accepted = run(audit, policyAccepting([MASKING_ID, 'GHSA-dddd-eeee-ffff']))
+  assert.equal(accepted.kind, 'pass')
+  assert.equal(accepted.accepted.length, 2)
 })
 
 test('menerima_audit_server_setelah_perbaikan_dan_tetap_melaporkan_sisa_moderate', () => {
@@ -219,6 +376,65 @@ test('cli_exit_1_dan_menyebut_paket_pada_audit_server_sebelum_perbaikan', () => 
   assert.match(r.stderr, /FAIL high axios GHSA-c29m-xwm3-cm6r/)
   assert.match(r.stderr, /FAIL high ip-address GHSA-mwp4-54f8-5fhr/)
   assert.doesNotMatch(r.stdout, /OK:/)
+})
+
+test('cli_exit_2_tanpa_pesan_OK_untuk_laporan_parseable_tetapi_rusak', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dep-audit-shape-'))
+  const file = join(dir, 'audit.json')
+  for (const vulnerabilities of [[], { axios: {} }, { axios: { via: [null] } }]) {
+    writeFileSync(file, JSON.stringify({ vulnerabilities, metadata: { vulnerabilities: { high: 0, critical: 0 } } }))
+    const result = cli('--workspace', 'server', '--file', file, '--policy', policyFile, '--now', '2026-10-02')
+    assert.equal(result.status, 2, result.stderr)
+    assert.match(result.stderr, /UNUSABLE:/)
+    assert.doesNotMatch(result.stdout, /OK:/)
+  }
+})
+
+test('cli_exit_2_tanpa_OK_untuk_severity_paket_yang_bertentangan_dengan_ringkasan', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dep-audit-severity-'))
+  const file = join(dir, 'audit.json')
+  for (const severity of ['high', 'critical']) {
+    for (const via of [[], ['missing-package']]) {
+      writeFileSync(file, JSON.stringify({
+        vulnerabilities: { foo: { severity, via } },
+        metadata: { vulnerabilities: { high: 0, critical: 0 } },
+      }))
+      const result = cli('--workspace', 'server', '--file', file, '--policy', policyFile, '--now', '2026-10-02')
+      assert.equal(result.status, 2, result.stderr)
+      assert.match(result.stderr, /UNUSABLE:.*contradicts summary/)
+      assert.doesNotMatch(result.stdout, /OK:/)
+    }
+  }
+})
+
+test('cli_exit_2_tanpa_OK_untuk_paket_tanpa_atribusi_yang_tertutup_penerimaan_lain', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dep-audit-attribution-'))
+  const file = join(dir, 'audit.json')
+  const policy = join(dir, 'policy.json')
+  writeFileSync(policy, JSON.stringify(policyAccepting([MASKING_ID])))
+  for (const severity of ['high', 'critical']) {
+    for (const via of [[], ['missing-package'], ['middle']]) {
+      writeFileSync(file, JSON.stringify(maskedReport(severity, via)))
+      const result = cli('--workspace', 'server', '--file', file, '--policy', policy, '--now', '2026-10-02')
+      assert.equal(result.status, 2, result.stderr)
+      assert.match(result.stderr, /UNUSABLE:.*no attributable/)
+      assert.doesNotMatch(result.stdout, /OK:/)
+    }
+  }
+})
+
+test('cli_exit_2_tanpa_OK_untuk_advisory_duplikat_dengan_severity_bertentangan', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dep-audit-duplicate-'))
+  const file = join(dir, 'audit.json')
+  const policy = join(dir, 'policy.json')
+  writeFileSync(policy, JSON.stringify(policyAccepting([MASKING_ID])))
+  for (const severities of [['critical', 'moderate'], ['moderate', 'critical']]) {
+    writeFileSync(file, JSON.stringify(duplicateReport(severities)))
+    const result = cli('--workspace', 'server', '--file', file, '--policy', policy, '--now', '2026-10-02')
+    assert.equal(result.status, 2, result.stderr)
+    assert.match(result.stderr, /UNUSABLE:.*conflicting severities/)
+    assert.doesNotMatch(result.stdout, /OK:/)
+  }
 })
 
 test('cli_exit_2_pada_berkas_audit_hilang_rusak_atau_argumen_kurang', () => {
