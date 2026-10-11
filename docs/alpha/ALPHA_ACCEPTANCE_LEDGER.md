@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 21 / 43 = 48.8%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 22 / 43 = 51.2%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,9 +24,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 21 |
+| VERIFIED | 22 |
 | REPORTED | 5 |
-| NOT_CHECKED | 13 |
+| NOT_CHECKED | 12 |
 | NOT_STARTED | 3 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
@@ -85,7 +85,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | D9 | Modul belum tervalidasi berlabel jelas | Modul tanpa tinjauan anatomi berlabel (clinically_reviewed=false) dan tidak diklaim akurat secara klinis | VERIFIED | Local | bodyexposure/DELTA.md; manifest clinically_reviewed; Audit data independen (Sonnet Cloud, main 61938d6e0, three GLTFLoader + MeshoptDecoder atas public/bodyexposure, tanpa rig): 17.728 struktur bernama di 390 GLB; panacea_review_status = review_required pada 17.728 (100%); panacea_clinically_reviewed === true pada 0; false eksplisit 788; flag tidak ada 16.940 (dibaca sebagai belum ditinjau).; src/domains/body-exposure/engine/reviewLabel.ts + scripts/uji/body-review-label.mts (merge #2357, 0e3bab807): hanya true eksplisit tanpa review_required yang berlabel 'Clinically reviewed'; flag hilang, false, bertipe lain, atau review_required = 'Not clinically reviewed' (fail closed; 9 nilai kotor, negatif berpasangan). CanonicalBody menampilkan label ini pada panel struktur terpilih.; grep atas CanonicalBody.tsx, domains/body-exposure, dan Body3D.tsx: tidak ada teks yang mengklaim akurat/tervalidasi klinis.; Batas: terverifikasi untuk data GLB publik dan halaman kanonik Body Exposure; halaman lain (BodyHub dll.) belum diaudit teksnya. Ini label status, bukan tinjauan klinis: tidak ada struktur yang ditinjau, clinically_reviewed tetap false. |
 | D10 | Viewer responsif di 390×844 | Halaman Body Exposure tanpa scroll horizontal dan tanpa error di 390×844 pada build main | VERIFIED | Sonnet (verifikasi) | qa/canonical-body-check.mjs dijalankan Sonnet Cloud pada main 505c64339 (dev server Vite, Chromium swiftshader, host luar diblokir): lulus pada 390×844 dan 1440×900, tema terang dan gelap; keluaran OK; Catatan: skrip ini belum menjadi gerbang CI (hanya dijalankan manual); Asersi scrollWidth ≤ innerWidth pada 390×844 dan batas ≤ 80 ribu segitiga muatan awal (terukur 40 ribu); Hanya halaman kanonik (/body-exposure/canonical via qa/canonical-body.html). |
 
-## Platform Reliability (3 / 9)
+## Platform Reliability (4 / 9)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
@@ -97,5 +97,5 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | E6 | Check CI wajib hijau pada exact head sebelum merge | 8 check wajib hijau pada head yang di-merge | VERIFIED | Sol/Sonnet | Setiap merge sesi ini (PR #2297–#2321) diperiksa pada exact head |
 | E7 | Deployment staging terverifikasi | SHA yang berjalan di staging/produksi sama dengan SHA main dan smoke perjalanan kritis lulus | NOT_CHECKED | Sol | Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen |
 | E8 | Security Baseline hijau pada main | Security Baseline Enforcement hijau pada main | VERIFIED | Sol (CI) | Workflow security-baseline-enforcement.yml hijau pada main 4b2009a1f |
-| E9 | Audit dependensi menolak laporan rusak | Gerbang audit dependensi gagal pada laporan malformed | NOT_CHECKED | Sol | PR #2301 terbuka (milik agen lain) |
+| E9 | Audit dependensi menolak laporan rusak | Gerbang audit dependensi gagal pada laporan malformed | VERIFIED | Sol | scripts/qa/dependency-audit-gate.mjs + scripts/qa/dependency-audit-gate.test.mjs (main d1f5244cc+): node --test 33/33 lulus; dipanggil dari .github/workflows/dependency-audit.yml untuk workspace web dan server.; Uji CLI independen (Sonnet Cloud): JSON terpotong, {"error":...}, dan berkas kosong semuanya exit 2; laporan bersih berpasangan exit 0.; Sabotase: gerbang dengan cek `audit.error` dimatikan gagal pada tes 'kunci_error_pada_laporan_yang_tampak_lengkap_tetap_gagal_tertutup'; dengan cek bentuk-objek dimatikan gagal pada 'input_audit_rusak_gagal_tertutup_bukan_lolos'.; Batas: yang diverifikasi adalah penolakan bentuk laporan (rusak, kosong, berisi galat), bukan kebenaran data advisory npm. Gerbang belum dijalankan terhadap npm audit nyata di sesi ini (jaringan). |
 
