@@ -473,3 +473,11 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 - **What it is:** where each tagged protein sits inside a cultured HEK293T cell (grade 3 = most prominent annotation, grade 1 = weakest), with RNA and protein abundance in the same cells. **It is not the localisation or abundance in the displayed tissue or body.** The viewer panel says so, shows the licence and the citation, and offers search by gene or protein name.
 - **Not used:** the OpenCell interaction and library metadata tables (not needed for this panel).
 - `clinically_reviewed` is not applicable to this lookup panel; nothing here is a clinical statement.
+
+## Heartbeat (procedural, illustrative): not measured, not patient-specific
+
+- **What it is:** `engine/cardiacCycle.ts`, a mathematical model of one heartbeat: isovolumic contraction, ejection, isovolumic relaxation, rapid filling, diastasis and atrial systole. Mechanical systole lasts 0.34 x sqrt(RR) seconds (a Bazett-type rule, at most 60 % of the cycle); ventricular volume falls from end-diastolic to end-systolic by a cosine ejection and refills in three steps (0.7, 0.9, 1.0 of the stroke volume); atrial volume is the reservoir, conduit and booster pattern. Defaults are textbook adult values for illustration: end-diastolic 120 mL, end-systolic 50 mL (ejection fraction 58 %), atrial 30 to 65 mL, rate 70 bpm (slider 40 to 180).
+- **How it is shown:** a "Heartbeat" button on adult bodies that have heart chambers (male, female HuBMAP, ICRP adults, the two older adults). Ventricles and atria are scaled by the cube root of their volume about their common centre; where only a whole-heart mesh exists, it is scaled by the whole-heart volume. Valves, vessels and the conduction system do not move. The viewer states that it is illustrative and not this body's measured heartbeat, not patient-specific and not clinically validated.
+- **Why a model and not a dataset:** no cardiac cine dataset with a verified licence is used (ACDC states no licence; see DATASET_AUDIT.md). The engine takes its parameters explicitly so a measured dataset can replace the defaults later without changing the viewer.
+- **Not modelled:** valve motion, blood flow, wall thickening, torsion, arrhythmia, the individual's real volumes. Truth class: simulated (illustrative).
+- `clinically_reviewed` remains false.
