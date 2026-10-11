@@ -18,6 +18,18 @@
 
 - A1 read-only diagnosis at this revision: same-ID cross-API fixture is feasible, but /api/keadaan-longitudinal excludes persistent clinical.hasilLab and intake validates patientId syntax without checking existing patient/encounter linkage. A2 does not close those aggregate/integrity gaps. Controlled existing-patient isolation reproduction denied p1 to two separate accounts and admitted only a doctor-linked account; no P0 exposure was reproduced.
 
+### Serialized integration contract — 2026-10-11
+
+- Merge order: existing mobile Vessels control fix #2390, then protein lookup #2396, then A2 encounter fixture #2383. Each downstream candidate contains its upstream implementation before exact-head automated CI. Before every merge, current-main merge-tree must equal the accepted candidate tree; any new source delta requires synchronization and fresh checks. No concurrent main merge or forced update.
+- Vercel connector inspection of configured panaceamed/panacea returned scope 403; no local authenticated Vercel CLI is available. Existing GitHub production workflow remains the authorized deployment route; production is pending, not inferred from build success.
+
+### Body Exposure protein lookup implementation — 2026-10-11
+
+- Baseline main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's illustrative heartbeat #2394; ownership and simulation labels are preserved. Canonical Alpha is 24/43; no criterion changes in this task.
+- Reused the existing OpenCell index (1,310 proteins). Inventory found 1,196 existing GLB derivatives; no anatomical datasets were downloaded or regenerated. Malformed name/UniProt metadata previously passed parsing and crashed protein search; nullable-string guards now reject it. Exact, case-insensitive Ensembl lookup enables existing stable identifiers, without partial-ID matches.
+- Regression assertions failed before each fix and passed afterward (7 OpenCell tests; 15 including synchronized heartbeat tests). Full frontend suite passed 692/692, full build and architecture/ratchet passed on pre-heartbeat baseline; a final synchronized candidate receives fresh automated CI. Actual published measurements, licences and clinical-review states are unchanged; no production deployment is claimed.
+- A2 #2383 and isolated populated-patient RBAC remain pending integration. Latest owner directive defers new AI/human review rounds; required automated checks and branch protections remain intact. Partial lab/referral fixture in its isolated worktree is unfinished and not release code.
+
 ### Canonical E1 completion and next resolver task — 2026-10-11
 
 - Canonical main 512de7c39d6029a4a9b06c50231a7eea7ad597e1 integrates #2381 with parent 397157fb9da7ea53b8eee2b88d3b97feb750ae7e. Accepted tree d53a23e2ae567847e082d267cc0131627a60c0f6 matches exact head d963f7e71f7453ea715d4c404f40b3e756f5d556; all ten checks passed (Validate, Stabilization, Body 3D, Mongo, Render backend, Security inventory/enforcement, Clinical Evidence) plus CodeRabbit. Independent AI COMMENT 5481894786 is engineering review, not human clinical approval.

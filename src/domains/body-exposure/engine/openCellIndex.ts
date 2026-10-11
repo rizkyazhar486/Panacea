@@ -72,7 +72,7 @@ export function buildOpenCellIndex(loc: readonly LocRow[], abundance: readonly A
   return { proteins, rejected, withoutAbundance }
 }
 
-/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein / UniProt (substring). Kueri kosong → daftar kosong. */
+/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein (substring) / Ensembl dan UniProt (ID persis). Kueri kosong → daftar kosong. */
 export function searchProteins(proteins: readonly OpenCellProtein[], query: string, limit = 12): OpenCellProtein[] {
   const q = query.trim().toLowerCase()
   if (!q || limit <= 0) return []
@@ -80,7 +80,7 @@ export function searchProteins(proteins: readonly OpenCellProtein[], query: stri
   for (const p of proteins) {
     const g = p.gene.toLowerCase()
     if (g.startsWith(q)) starts.push(p)
-    else if (g.includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.uniprot ?? '').toLowerCase() === q) rest.push(p)
+    else if (g.includes(q) || (p.name ?? '').toLowerCase().includes(q) || p.ensg.toLowerCase() === q || (p.uniprot ?? '').toLowerCase() === q) rest.push(p)
   }
   return [...starts, ...rest].slice(0, limit)
 }
@@ -97,7 +97,8 @@ export function parseOpenCellIndex(raw: unknown): ParseOpenCell {
   if (!Array.isArray(r.proteins) || r.proteins.length === 0) return { ok: false, error: 'proteins missing' }
   const seen = new Set<string>()
   for (const p of r.proteins as OpenCellProtein[]) {
-    if (!p || !ENSG.test(String(p.ensg)) || typeof p.gene !== 'string' || !p.gene) return { ok: false, error: 'protein with invalid gene or Ensembl id' }
+    if (!p || typeof p.ensg !== 'string' || !ENSG.test(p.ensg) || typeof p.gene !== 'string' || !p.gene.trim()) return { ok: false, error: 'protein with invalid gene or Ensembl id' }
+    for (const k of ['name', 'uniprot'] as const) if (p[k] !== null && typeof p[k] !== 'string') return { ok: false, error: `${p.gene}: bad ${k}` }
     if (seen.has(p.ensg)) return { ok: false, error: `duplicate ${p.ensg}` }
     seen.add(p.ensg)
     for (const k of ['grade3', 'grade2', 'grade1'] as const) if (!Array.isArray(p[k]) || !p[k].every((x) => KNOWN.has(x))) return { ok: false, error: `${p.gene}: bad ${k}` }
