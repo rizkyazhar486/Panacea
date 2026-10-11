@@ -93,6 +93,11 @@ try {
   assert.deepEqual((sesudah.patients ?? []).map((x: { id: string }) => x.id), [diri], 'hanya rekam milik sendiri yang terlihat')
   console.log(`rbacKlinis: ${Object.keys(MATRIX).length} rute klinis; anonim 401, pasien dan dokter tanpa STR ditolak sesuai matriks; id asing 403 vs id sendiri 200`)
 } finally {
+  // Tunggu proses anak benar-benar keluar sebelum menghapus direktori: server yang masih menulis berkas data membuat rmSync gagal ENOTEMPTY (CI #2369).
+  const keluar = new Promise<void>((res) => { if (child.exitCode !== null || child.signalCode !== null) res(); else child.once('exit', () => res()) })
   child.kill('SIGTERM')
-  rmSync(dir, { recursive: true, force: true })
+  await Promise.race([keluar, new Promise<void>((res) => setTimeout(res, 5000))])
+  if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+  await keluar
+  rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 })
 }
