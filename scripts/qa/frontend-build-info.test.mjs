@@ -68,8 +68,9 @@ test('Vercel link and environment output leave a committed release source clean'
     git('-c', 'user.name=Build fixture', '-c', 'user.email=build@localhost.test', 'commit', '-qm', 'fixture')
     const commit = git('rev-parse', 'HEAD')
     // Vercel CLI 59.11.7 addToGitIgnore checks exact lines, not Git's pattern
-    // semantics. Link adds .vercel; its environment download adds .env.local.
-    for (const name of ['.vercel', '.env.local']) {
+    // semantics. Link passes .vercel; pullEnvRecords passes the .env* pattern
+    // when downloading .env.local (the filename and ignore argument differ).
+    for (const name of ['.vercel', '.env*']) {
       const before = readFileSync(target, 'utf8')
       if (!before.split('\n').includes(name)) writeFileSync(target, `${before}${name}\n`)
     }
@@ -77,6 +78,7 @@ test('Vercel link and environment output leave a committed release source clean'
     writeFileSync(join(root, '.vercel/project.json'), '{}\n')
     writeFileSync(join(root, '.env.local'), 'FIXTURE_ONLY=synthetic\n')
     assert.equal(git('check-ignore', '.vercel/project.json', '.env.local'), '.vercel/project.json\n.env.local')
+    assert.throws(() => git('check-ignore', '.env.example'), /Command failed/, 'the public environment example must remain usable')
     assert.equal(readFrontendGitState(root).dirty, false, 'CLI setup must not change committed ignore rules')
     assert.equal(writeFrontendBuildInfo(root, commit).commitSha, commit, 'the clean configured release must still pass')
   } finally {
