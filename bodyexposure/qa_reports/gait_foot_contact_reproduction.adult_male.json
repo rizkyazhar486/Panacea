@@ -1,9 +1,10 @@
 {
- "method": "single clip-wide floor; heel/toe = extreme vertices at rest pose; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)",
+ "method": "single clip-wide floor; heel/toe = extreme vertices at rest pose; heelPlantar/toePlantar = lowest vertex within the posterior/anterior quarter of the foot at rest; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)",
  "contact_threshold_mm": 15,
  "clips": {
   "RUN": {
    "frames": 18,
+   "foot_length_m": 0.229,
    "loop_closed_duplicate_end_frame_dropped": true,
    "floor_m": 0.0006,
    "heel": {
@@ -14,6 +15,20 @@
     }
    },
    "toe": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    }
+   },
+   "heelPlantar": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    }
+   },
+   "toePlantar": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
@@ -36,6 +51,7 @@
   },
   "WALK": {
    "frames": 26,
+   "foot_length_m": 0.229,
    "loop_closed_duplicate_end_frame_dropped": true,
    "floor_m": -0.0008,
    "heel": {
@@ -57,6 +73,36 @@
      ],
      "R": [
       "9-22"
+     ]
+    }
+   },
+   "heelPlantar": {
+    "stance_phases": 2,
+    "stance_frames": 13,
+    "common_forward_speed_m_s": 1.243,
+    "slide_rms_mm": 7.8,
+    "slide_max_mm": 16.6,
+    "phases_by_side": {
+     "L": [
+      "22-25+0-4"
+     ],
+     "R": [
+      "7-10"
+     ]
+    }
+   },
+   "toePlantar": {
+    "stance_phases": 2,
+    "stance_frames": 24,
+    "common_forward_speed_m_s": 1.296,
+    "slide_rms_mm": 8.7,
+    "slide_max_mm": 16.6,
+    "phases_by_side": {
+     "L": [
+      "22-25+0-8"
+     ],
+     "R": [
+      "8-18"
      ]
     }
    },
