@@ -1,4 +1,38 @@
+### E1 synchronization — 2026-10-11
+
+- PR #2381 initial head 9f9f863e056c92afb06251411ede57308219eb99 received independent AI engineering COMMENT; local full server suite and architecture/ratchet passed. Required CI was still running, not counted as complete.
+- Another contributor integrated #2377 as canonical main ed081e5c44bd414aefd34082ffe290f898cfaf54. Its three observer files do not overlap E1. Ordinary forward synchronization preserves all contributor code; fresh exact-head CI/review remain required. E7 remains NOT_CHECKED.
+
 # PANACEA AUTONOMOUS CONTINUATION STATE
+
+### Current checkpoint — 2026-10-11, easy-first E1 authentication acceptance
+
+- Inspected canonical main `ed081e5c44bd414aefd34082ffe290f898cfaf54`; canonical
+  Alpha remains 22/43 until candidate E1 evidence is integrated. Claim: Sol E1 on
+  isolated `test/auth-session-http`; no overlap with active auth test file PRs.
+- E1 adds real HTTP negative/positive session evidence to existing mandatory
+  authAccess test, with no production authentication code change. Eight invalid
+  session classes, cookie/bearer, two endpoints, paired stored identities and
+  production dev-login disabled all pass; three named mutants fail. Full server
+  build/typecheck/tests and independent AI review pass. Exact-head CI and merge pending.
+- #2376 integrated at `3e690b17196b150459c4f138d14c39a863184467`, accepted head
+  `4509159e9bb111ec3423d58da394718588775c99` had 10/10 successful checks; merge
+  tree equals tested tree `ab010eea0b25b8cd39919fd86c2862bbeec50da3`.
+  Render health and capabilities now report that intended revision; helper checks
+  identical server source `94aad15276b123c886ecc29d581f69dbd1c9a8c7`, Mongo mode
+  and healthy sliced persistence. Genomics worker remains configured=false.
+  No production patient write, frontend revision or complete E7 journey is claimed.
+- Prepared Vite 7 dependency patch removes seven high build-tree advisories locally
+  without waivers but remains unpublished. Local Chromium zero glyph metrics also
+  reproduce on a minimal page without the app, so failed smokes are environment
+  evidence, not a demonstrated Vite regression. Defer this frontend workstream under
+  the new easy-first ownership lanes; current unpatched dependency policy fails.
+- #2349's refreshed Mongo release contracts pass 89/89 locally after #2376; publication
+  awaits dependency security acceptance. Shared calendar helper changes overlap #2354,
+  so the date branch remains unpublished. Other active contributor branches preserved.
+- Next easiest existing infrastructure candidate: #2377 production browser checks;
+  its old-head greens are historical until synchronized/revalidated. E3 #2367 remains draft.
+  Clinical authorization stays separate, and historical checkpoints below are retained.
 
 ### Current checkpoint — 2026-10-11, Mongo write ordering and drain
 
