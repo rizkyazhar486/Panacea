@@ -653,6 +653,12 @@ export function BodyExplorer() {
         title="Body Explorer"
         info="A real 3D anatomy model. Tap any bone, muscle, vessel, nerve, or organ to inspect it, rotate with one finger, and pinch to zoom."
       />
+      <Link
+        to="/body-exposure/canonical"
+        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-brand/50 bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/15"
+      >
+        Open canonical whole-body 3D atlas →
+      </Link>
       <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
         {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir

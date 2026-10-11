@@ -13,9 +13,9 @@
    0.5022
   ],
   "ANKLE.L": [
-   0.028,
-   0.0133,
-   0.1291
+   0.035,
+   0.0074,
+   0.1348
   ],
   "TOE_END.L": [
    0.0219,
@@ -33,9 +33,9 @@
    0.5007
   ],
   "ANKLE.R": [
-   -0.0414,
-   0.0296,
-   0.1213
+   -0.0551,
+   0.0229,
+   0.1299
   ],
   "TOE_END.R": [
    -0.055,
@@ -70,10 +70,10 @@
    "method": "midpoint of the malleolar tips: lowest point of the most medial 8 mm of the distal tibia and of the most lateral 8 mm of the distal fibula",
    "intermalleolar_mm": 51.7,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 13.4,
+   "shift_mm": 6.7,
    "max_penetration_mm": [
-    6.87,
-    0.57
+    2.19,
+    0.25
    ]
   },
   "TOE_END.L": {
@@ -95,10 +95,10 @@
    "method": "midpoint of the malleolar tips: lowest point of the most medial 8 mm of the distal tibia and of the most lateral 8 mm of the distal fibula",
    "intermalleolar_mm": 52.3,
    "refined": "surface-congruence hinge fit",
-   "shift_mm": 17.0,
+   "shift_mm": 4.2,
    "max_penetration_mm": [
-    6.52,
-    0.41
+    2.25,
+    0.0
    ]
   },
   "TOE_END.R": {
@@ -114,25 +114,25 @@
  "segments_mm": {
   "PELVIS": 138.2,
   "THIGH.L": 375.5,
-  "SHIN.L": 375.2,
-  "FOOT.L": 181.5,
+  "SHIN.L": 368.7,
+  "FOOT.L": 181.3,
   "THIGH.R": 375.9,
-  "SHIN.R": 381.6,
-  "FOOT.R": 182.8
+  "SHIN.R": 371.7,
+  "FOOT.R": 183.0
  },
  "rom_limits_deg_local": {
   "THIGH.L": {
    "X": [
-    -30,
-    120
+    -26.328490383441252,
+    123.67150961655875
    ],
    "Y": [
     -45,
     45
    ],
    "Z": [
-    -30,
-    45
+    -24.654245216046153,
+    50.34575478395385
    ],
    "positive_X": "flexion",
    "positive_Z": "abduction",
@@ -140,46 +140,46 @@
   },
   "SHIN.L": {
    "X": [
-    0,
-    135
+    1.873926443180034,
+    136.87392644318004
    ],
    "Y": [
     0,
     0
    ],
    "Z": [
-    0,
-    0
+    0.0,
+    0.0
    ],
    "positive_X": "flexion"
   },
   "FOOT.L": {
    "X": [
-    -20,
-    50
+    -61.935014543144156,
+    8.064985456855844
    ],
    "Y": [
     0,
     0
    ],
    "Z": [
-    0,
-    0
+    0.0,
+    0.0
    ],
    "positive_X": "flexion"
   },
   "THIGH.R": {
    "X": [
-    -30,
-    120
+    -25.544149557288435,
+    124.45585044271157
    ],
    "Y": [
     -45,
     45
    ],
    "Z": [
-    -45,
-    30
+    -48.032348889587716,
+    26.96765111041228
    ],
    "positive_X": "flexion",
    "positive_Z": "adduction",
@@ -187,53 +187,99 @@
   },
   "SHIN.R": {
    "X": [
-    -135,
-    0
+    -137.64773030743044,
+    -2.647730307430441
    ],
    "Y": [
     0,
     0
    ],
    "Z": [
-    0,
-    0
+    0.0,
+    0.0
    ],
    "positive_X": "extension"
   },
   "FOOT.R": {
    "X": [
-    -50,
-    20
+    -8.481435673788333,
+    61.51856432621167
    ],
    "Y": [
     0,
     0
    ],
    "Z": [
-    0,
-    0
+    0.0,
+    0.0
    ],
    "positive_X": "extension"
+  }
+ },
+ "rest_offsets_deg": {
+  "L": {
+   "hip_flex": -3.67,
+   "hip_abd": -5.35,
+   "knee_flex": -1.87,
+   "ankle_dorsi": -41.94
+  },
+  "R": {
+   "hip_flex": -4.46,
+   "hip_abd": -3.03,
+   "knee_flex": -2.65,
+   "ankle_dorsi": -41.52
+  }
+ },
+ "neutral_local_deg": {
+  "THIGH.L": {
+   "X": 3.67,
+   "Y": 0.0,
+   "Z": 5.35
+  },
+  "SHIN.L": {
+   "X": 1.87,
+   "Y": 0.0,
+   "Z": 0.0
+  },
+  "FOOT.L": {
+   "X": -41.94,
+   "Y": 0.0,
+   "Z": 0.0
+  },
+  "THIGH.R": {
+   "X": 4.46,
+   "Y": 0.0,
+   "Z": -3.03
+  },
+  "SHIN.R": {
+   "X": -2.65,
+   "Y": 0.0,
+   "Z": 0.0
+  },
+  "FOOT.R": {
+   "X": 41.52,
+   "Y": 0.0,
+   "Z": 0.0
   }
  },
  "rom_source": "AAOS normal values (Greene & Heckman 1994)",
  "flexion_axis": "knee and ankle flexion about the femoral mediolateral extreme line / intermalleolar line; hip perpendicular to the bone, anterior roll",
  "flexion_axis_change_deg": {
-  "SHIN.L": 9.2,
-  "FOOT.L": 37.5,
-  "SHIN.R": 0.6,
-  "FOOT.R": 55.5
+  "SHIN.L": 9.3,
+  "FOOT.L": 60.8,
+  "SHIN.R": 0.5,
+  "FOOT.R": 77.3
  },
  "hinge_refinement": {
   "ANKLE.L": {
-   "shift_mm": 13.4,
-   "max_penetration_mm_isb": 6.87,
-   "max_penetration_mm_refined": 0.57
+   "shift_mm": 6.7,
+   "max_penetration_mm_isb": 2.19,
+   "max_penetration_mm_refined": 0.25
   },
   "ANKLE.R": {
-   "shift_mm": 17.0,
-   "max_penetration_mm_isb": 6.52,
-   "max_penetration_mm_refined": 0.41
+   "shift_mm": 4.2,
+   "max_penetration_mm_isb": 2.25,
+   "max_penetration_mm_refined": 0.0
   }
  },
  "flexion_axes": {
@@ -270,8 +316,8 @@
  "qa": {
   "left_right_length_difference_mm": {
    "THIGH": 0.4,
-   "SHIN": 6.39,
-   "FOOT": 1.28
+   "SHIN": 3.02,
+   "FOOT": 1.62
   },
   "joint_centre_to_articulating_bone_surface_mm": {
    "HIP.L": {
@@ -291,12 +337,12 @@
     "TIBIA": 19.0
    },
    "ANKLE.L": {
-    "TIBIA": 28.1,
-    "TALUS": 0.4
+    "TIBIA": 20.4,
+    "TALUS": 8.0
    },
    "ANKLE.R": {
-    "TIBIA": 28.8,
-    "TALUS": 5.2
+    "TIBIA": 18.6,
+    "TALUS": 10.4
    }
   },
   "bound_meshes": 44,

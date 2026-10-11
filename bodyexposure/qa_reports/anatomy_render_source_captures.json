@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "captures": [
+    {
+      "source_blend": "PANACEA_BODY_FETUS_ATLAS.blend",
+      "source_fingerprint": {
+        "bytes": 4008005,
+        "sha256": "b6acef63722629d4f0c75070c8d90e2f9ca6b4ab77d0815b252d57685ebf820f"
+      },
+      "profile": "desktop",
+      "benchmark": "body-qa",
+      "device_backend": "METAL",
+      "devices": [
+        "Apple M4 (GPU - 10 cores)"
+      ],
+      "visible_meshes": 14,
+      "source_polygons": 170262,
+      "clinical_validation": "pending",
+      "renders": [
+        {
+          "path": "body-qa_c0_desktop_after.png",
+          "sha256": "4600dc49fbba633194a8c298251ae6ed3a7f92b2ffede080b1839d5bdac9baca",
+          "resolution": [
+            1920,
+            1080
+          ],
+          "sample_limit": 32,
+          "time_limit_seconds": 0.0,
+          "render_seconds": 76.632,
+          "process_memory": {
+            "peak_rss_bytes": 1881686016,
+            "scope": "process_lifetime_high_water_rss",
+            "gpu_memory_bytes": null
+          }
+        },
+        {
+          "path": "body-qa_c1_desktop_after.png",
+          "sha256": "d6c0bfeee23d5f6ae38988276a516b45ee9862b9551740d8ddbbd53985daddd6",
+          "resolution": [
+            1920,
+            1080
+          ],
+          "sample_limit": 32,
+          "time_limit_seconds": 0.0,
+          "render_seconds": 67.788,
+          "process_memory": {
+            "peak_rss_bytes": 1881686016,
+            "scope": "process_lifetime_high_water_rss",
+            "gpu_memory_bytes": null
+          }
+        }
+      ]
+    },
+    {
+      "source_blend": "PANACEA_HUMAN_MASTER_v011.blend",
+      "source_fingerprint": {
+        "bytes": 448932859,
+        "sha256": "c224433cc98bfeb704dd81b214d5a822e576068f3575ec886f40a765d8fd0652"
+      },
+      "profile": "preview",
+      "benchmark": "female_layered",
+      "device_backend": "METAL",
+      "devices": [
+        "Apple M4 (GPU - 10 cores)"
+      ],
+      "visible_meshes": 841,
+      "source_polygons": 4467873,
+      "clinical_validation": "pending",
+      "renders": [
+        {
+          "path": "female_layered_preview_after.png",
+          "sha256": "4abe0fa627c8d13b422d78aa45fee330ae6d4fbb1b644646da4f5a1d47e4f5a5",
+          "resolution": [
+            960,
+            540
+          ],
+          "sample_limit": 32,
+          "time_limit_seconds": 0.0,
+          "render_seconds": 41.712,
+          "process_memory": {
+            "peak_rss_bytes": 1458733056,
+            "scope": "process_lifetime_high_water_rss",
+            "gpu_memory_bytes": null
+          }
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Actual offline captures; images remain local outside initial web assets.",
+    "Sample limits are requested ceilings, not measured completed samples.",
+    "Host RSS is process-lifetime high-water memory, not GPU allocation.",
+    "No external anatomical or clinical acceptance claimed."
+  ]
+}

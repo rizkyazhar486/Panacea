@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { hariIni } from '../../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
 import { IconDrop } from '../../components/icons'
-import { getDemo } from '../../lib/profile'
+import { getDemoTersimpan } from '../../lib/profile'
+import { bloodDonationScreen, parseNumberField } from '../../domains/clinical-calculators'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -16,7 +17,6 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LS_KEY = 'pmd_blood_donation_v1'
-const INTERVAL_WEEKS = 12 // typical minimum interval between whole-blood donations
 
 interface Saved { lastDonation: string; weightKg: number; age: number }
 function load(): Partial<Saved> {
@@ -29,40 +29,35 @@ function persist(s: Partial<Saved>) {
 
 export function BloodDonation() {
   const saved = load()
-  const [age, setAge] = useState(() => saved.age ?? getDemo().age ?? 30)
-  const [weightKg, setWeightKg] = useState(() => saved.weightKg ?? getDemo().weightKg ?? 60)
+  // Profil TERSIMPAN, bukan getDemo(): getDemo() memadukan usia 30 / 60-70 kg bawaan sehingga halaman terbuka dengan "Likely
+  // eligible" untuk orang yang belum mengisi apa pun. Teks mentah: kolom kosong = belum diisi, bukan usia 0.
+  const profil = getDemoTersimpan()
+  const awal = (n: number | undefined) => (typeof n === 'number' && n > 0 ? String(n) : '')
+  const [ageText, setAgeText] = useState(() => awal(saved.age ?? profil.age))
+  const [weightText, setWeightText] = useState(() => awal(saved.weightKg ?? profil.weightKg))
   const [lastDonation, setLastDonation] = useState(saved.lastDonation || '')
   const [pregnant, setPregnant] = useState(false)
   const [recentIllness, setRecentIllness] = useState(false)
   const [recentTattoo, setRecentTattoo] = useState(false)
   const [chronicCondition, setChronicCondition] = useState(false)
 
-  const update = (patch: Partial<Saved>) => {
-    const next = { age, weightKg, lastDonation, ...patch }
-    persist(next)
+  const update = (patch: { age?: string; weightKg?: string; lastDonation?: string }) => {
+    const num = (t: string) => { const n = parseNumberField(t); return Number.isFinite(n) ? n : undefined }
+    persist({
+      age: num(patch.age ?? ageText), weightKg: num(patch.weightKg ?? weightText),
+      lastDonation: patch.lastDonation ?? lastDonation,
+    })
   }
 
-  const nextEligible = useMemo(() => {
-    if (!lastDonation) return null
-    const d = new Date(lastDonation)
-    d.setDate(d.getDate() + INTERVAL_WEEKS * 7)
-    return d
-  }, [lastDonation])
-
-  const daysUntilEligible = nextEligible ? Math.ceil((nextEligible.getTime() - Date.now()) / 86400000) : 0
-  const intervalOk = !nextEligible || daysUntilEligible <= 0
-
-  const blockers: string[] = []
-  if (age < 17) blockers.push('Below the typical minimum donation age (17).')
-  if (age > 65) blockers.push('Above the typical routine maximum age (65) — some blood banks still accept regular repeat donors older than this with a doctor\'s clearance.')
-  if (weightKg < 50) blockers.push('Below the typical minimum weight (50 kg).')
-  if (!intervalOk) blockers.push(`Too soon since your last donation — typically ${INTERVAL_WEEKS} weeks are required between whole-blood donations.`)
-  if (pregnant) blockers.push('Currently pregnant or recently gave birth — donation is deferred during and for some months after pregnancy.')
-  if (recentIllness) blockers.push('Currently feeling unwell, feverish, or on antibiotics — wait until fully recovered.')
-  if (recentTattoo) blockers.push('Recent tattoo, piercing, or acupuncture (commonly a 3-6 month deferral, depending on local rules and whether it was done at a licensed/sterile facility).')
-  if (chronicCondition) blockers.push('An uncontrolled chronic condition or one your clinician hasn\'t cleared you for — check with them first.')
-
-  const likelyEligible = blockers.length === 0
+  const hasil = bloodDonationScreen({
+    age: parseNumberField(ageText), weightKg: parseNumberField(weightText), lastDonation,
+    now: new Date().toISOString(), pregnant, recentIllness, recentTattoo, chronicCondition,
+  })
+  const blockers = hasil.blockers
+  const likelyEligible = hasil.likelyEligible === true
+  const daysUntilEligible = hasil.daysUntilEligible ?? 0
+  const nextEligible = hasil.nextEligibleDate ? new Date(`${hasil.nextEligibleDate}T00:00:00Z`) : null
+  const intervalOk = daysUntilEligible <= 0
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -79,15 +74,18 @@ export function BloodDonation() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Age">
-            <input className={inputClass} type="number" min={0} max={120} value={age} onChange={(e) => { const v = Number(e.target.value) || 0; setAge(v); update({ age: v }) }} />
+            <input className={inputClass} type="number" min={0} max={120} value={ageText} onChange={(e) => { setAgeText(e.target.value); update({ age: e.target.value }) }} />
           </Field>
           <Field label="Weight (kg)">
-            <input className={inputClass} type="number" min={0} max={250} value={weightKg} onChange={(e) => { const v = Number(e.target.value) || 0; setWeightKg(v); update({ weightKg: v }) }} />
+            <input className={inputClass} type="number" min={0} max={250} value={weightText} onChange={(e) => { setWeightText(e.target.value); update({ weightKg: e.target.value }) }} />
           </Field>
         </div>
         <Field label="Date of your last whole-blood donation (leave blank if never / not applicable)">
           <input className={`${inputClass} mt-1`} type="date" value={lastDonation} onChange={(e) => { setLastDonation(e.target.value); update({ lastDonation: e.target.value }) }} max={hariIni()} />
         </Field>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
         <div className="mt-3 space-y-2">
           {[
             ['Currently pregnant or gave birth in the last few months', pregnant, setPregnant],
@@ -106,7 +104,11 @@ export function BloodDonation() {
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
         <div className="mt-2 flex items-center gap-3">
+          {hasil.likelyEligible === null ? (
+          <p className="text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">No result yet. {hasil.missing.length > 0 ? `Still needed: ${hasil.missing.join(', ')}.` : 'Check the highlighted values above.'} An empty field is not a value.</p>
+        ) : (
           <Badge tone={likelyEligible ? 'brand' : 'critical'}>{likelyEligible ? 'Likely eligible' : 'Likely not eligible right now'}</Badge>
+        )}
         </div>
         {blockers.length > 0 && (
           <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
@@ -115,10 +117,10 @@ export function BloodDonation() {
         )}
         {nextEligible && !intervalOk && (
           <p className="mt-2 text-[12px] font-semibold text-neutral-500">
-            Next eligible by interval: {nextEligible.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} (~{daysUntilEligible} days)
+            Next eligible by interval: {nextEligible.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })} (~{daysUntilEligible} days)
           </p>
         )}
-        {likelyEligible && (
+        {hasil.likelyEligible === true && (
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
             You'll still go through the on-site health check and hemoglobin test — this just means
             nothing here rules you out in advance.
