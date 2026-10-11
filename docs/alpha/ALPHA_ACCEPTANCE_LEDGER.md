@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 23 / 43 = 53.5%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 24 / 43 = 55.8%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,10 +24,10 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 23 |
+| VERIFIED | 24 |
 | REPORTED | 6 |
 | NOT_CHECKED | 11 |
-| NOT_STARTED | 2 |
+| NOT_STARTED | 1 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
@@ -58,14 +58,14 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | B8 | Komunikasi hasil ke pasien tercatat | Pengiriman penjelasan tercatat sebagai bukti oleh orang, bukan notifikasi otomatis | VERIFIED | Sol/Sonnet | Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). communicated hanya bisa dicatat oleh klinisi/perawat (bukan sistem/admin/pasien) dengan {channel, note, at, by}; tanpa bukti → evidence-required.; Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): komunikasi tanpa bukti → 400, dengan bukti → communicated; Yang terverifikasi hanya pencatatan bukti komunikasi oleh orang di backend. Pengiriman pesan ke pasien dan UI-nya belum ada. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false. |
 | B9 | Metrik penutupan dihitung dari backend | Rasio penutupan memakai data server (bukan localStorage) dan tidak terukur bila penyebut nol | VERIFIED | Sol | Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): GET /api/lab-results/metrics?dueHours=24 → total 1, closed 1, closureRate 1, oldestOpenHours null, overdue 0, corrupt 0; hasilLab.uji: penyebut nol → closureRate null; tanpa dueHours overdue null; rekam berjejak rusak dihitung terpisah (corrupt); dueHours 0/NaN/negatif ditolak; Dihitung dari data server; tidak ada ambang yang dikarang server. Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false. |
 
-## Clinical Calculators (4 / 7)
+## Clinical Calculators (5 / 7)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
 | C1 | Validasi masukan pada kalkulator yang dimigrasi | Kolom kosong = "belum diisi" (bukan 0); di luar rentang ditolak dengan alasan; tes positif, negatif, dan batas; mutasi terbunuh | VERIFIED | Sonnet | PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314 dan 7 mesin sebelumnya di src/domains/clinical-calculators/engine; scripts/uji/*.mts per mesin; Rentang adalah batas kewajaran, bukan ambang klinis. |
 | C2 | Ratchet "kolom kosong → 0" mencapai nol | governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0 | NOT_STARTED | Sonnet | Baseline 147 → 80 (28 berkas) di main 4b2009a1f; Sisa 80 belum diklasifikasikan klinis vs non-klinis. |
 | C3 | Penandaan batas klaim pada kalkulator klinis | Setiap permukaan kalkulator terdaftar dan menampilkan batas klaim (bukan keputusan klinis tervalidasi) | VERIFIED | Sonnet | scripts/uji/clinical-claim-maturity.mts (bagian npm run uji, check CI `validate`) |
-| C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | NOT_STARTED | Sonnet | Label batas klaim ada, tetapi belum ada registri status review per fungsi. |
+| C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | VERIFIED | Sonnet | governance/CALCULATOR_REVIEW_REGISTRY.json: 43 mesin kalkulator, semuanya PENDING_CLINICAL_REVIEW dengan clinically_reviewed=false; 4 modul pembantu dikecualikan eksplisit dengan alasan.; src/domains/clinical-calculators/engine/reviewRegistry.ts + scripts/uji/calculator-review-registry.mts (bagian npm run uji, dijalankan di CI): menolak mesin tanpa entri, entri yatim/ganda, dan status ditinjau tanpa peninjau, tanggal ISO, atau bukti.; Sabotase: berkas engine baru tanpa entri → uji gagal dengan nama ("zzSabotage: engine-without-review-entry"); dihapus kembali → lulus.; VERIFIED hanya untuk kriteria penandaan yang dapat diperiksa mesin. Ini label status, BUKAN tinjauan klinis: tidak ada peninjau yang ditunjuk dan semua mesin tetap clinically_reviewed=false (C6 tetap PENDING_CLINICAL_REVIEW). |
 | C5 | Regression suite kalkulator berjalan di CI | Tes kalkulator termasuk dalam check wajib `validate` dan merah bila gagal | VERIFIED | Sonnet | npm run uji (681/681 pada 4b2009a1f); check wajib `validate` |
 | C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang terpisah; tidak menghentikan pekerjaan teknis. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |
