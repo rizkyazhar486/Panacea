@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type LongitudinalEvent } from '../../src/lib/panaceaLongitudinalState.ts'
-import { createRealityErrorLedger } from '../../src/lib/physiology/realityErrorLedger.ts'
+import { comparePredictionToObservation, createRealityErrorLedger } from '../../src/lib/physiology/realityErrorLedger.ts'
 import { runCanonicalCerebralPerfusionPressure, runCanonicalMeanArterialPressure } from '../../src/lib/physiology/canonicalPressureFlow.ts'
 import { SVR_UNIT } from '../../src/lib/physiology/pressureFlowCoupling.ts'
 
@@ -43,6 +43,18 @@ assert.equal(cpp.lineage.length, 6)
 assert.deepEqual(state, before, 'pipeline must not write model output into patient truth')
 assert.deepEqual(ledger, beforeLedger, 'ledger update is immutable')
 for (const source of cpp.lineage) assert.deepEqual(source.event, state.eventsById[source.event.id], 'source event kept intact')
+
+// 2b. Reality Error: the MAP prediction is scored against a later directly observed MAP; the model is wrong by the signed difference,
+// and neither canonical truth nor the earlier ledger is rewritten.
+const observedMap: LongitudinalEvent<number> = { ...events[0], id: 'observed-map', metric: 'arterial.mean_pressure', unit: 'mmHg', value: 87, semanticState: 'measured', recordedAt: asOf, provenance: { ...events[0].provenance, capturedAt: asOf, receivedAt: asOf } }
+const compared = comparePredictionToObservation(mapResult.ledger, mapResult.prediction.id, observedMap, { matchToleranceMs: 0, comparisonCreatedAt: asOf })
+assert.equal(compared.ledger.statusByPredictionId[mapResult.prediction.id], 'matched')
+assert.ok(Math.abs(compared.comparison.signedError - (87 - 90)) < 1e-12, 'signed error is observed minus predicted')
+assert.equal(compared.comparison.standardizedResidual, null, 'no sigma on either side -> no invented residual')
+assert.equal(mapResult.ledger.statusByPredictionId[mapResult.prediction.id], 'pending', 'earlier ledger stays immutable')
+for (const bad of [{ semanticState: 'simulated' }, { semanticState: 'ai-draft' }, { unit: 'kPa' }, { metric: 'arterial.systolic_pressure' }] as const) {
+  assert.throws(() => comparePredictionToObservation(mapResult.ledger, mapResult.prediction.id, { ...observedMap, ...bad } as LongitudinalEvent<number>, { matchToleranceMs: 0, comparisonCreatedAt: asOf }), /./, JSON.stringify(bad))
+}
 
 // 3. Un-measured boundaries fail closed instead of receiving defaults.
 for (const missing of ['systemic.vascular_resistance', 'venous.central_pressure']) {
