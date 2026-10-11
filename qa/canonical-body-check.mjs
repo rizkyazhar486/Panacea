@@ -75,7 +75,7 @@ try {
       const hro = page.getByTestId('heartbeat-readout'); await hro.waitFor({ timeout: 20000 })
       const seenHr = new Set(); for (let i = 0; i < 4; i++) { seenHr.add(await hro.textContent()); await page.waitForTimeout(330) }
       assert(seenHr.size >= 2, `heartbeat: the cycle did not advance (${[...seenHr].join(' | ')})`)
-      await page.getByLabel('Heart rate').fill('120')
+      await page.getByLabel('Heart rate', { exact: true }).fill('120')
       await page.getByTestId('heart-rate-value').getByText('120 bpm').waitFor()
       await page.getByRole('button', { name: 'Stop heartbeat' }).click()
       await page.getByTestId('heartbeat-note').waitFor({ state: 'detached' })

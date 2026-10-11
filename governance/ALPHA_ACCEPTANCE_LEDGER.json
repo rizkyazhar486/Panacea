@@ -192,13 +192,13 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "UI tinjauan klinisi atas hasil",
    "acceptance": "Klinisi dapat meninjau hasil dan mengubah state lewat API; UI memakai kontrak backend",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "src/pages/LabResultReview.tsx (/doctor-review/lab-results, #2351): antrean hasil lab untuk dokter/owner di atas kontrak backend #2346 (api.labResultsList/labResultAdvance); model murni src/domains/lab-results/model/labResultQueue.ts dengan scripts/uji/lab-result-queue.mts (positif, negatif berpasangan, batas, tanpa efek samping).",
-    "qa/lab-result-review-clinician-e2e.mjs: server NYATA + Chromium 390x844. Dokter belum terverifikasi ditolak server (>=400) dan tidak boleh memverifikasi dirinya sendiri (403); pemilik memverifikasi lewat /api/doctors/:id/verify (200); klinisi lalu memajukan satu hasil received→pending_review→reviewed→communicated→closed lewat UI. Dijalankan lokal pada server baru: \"OK status closed steps 4\"."
+    "qa/lab-result-review-clinician-e2e.mjs dijalankan sebagai gerbang CI wajib (#2432, merge a88cf6e0d672590fcf1a28da5500ac7a1155bf3f; scripts/qa/lab-result-review-e2e-gate.mjs di Stabilization Acceptance; scripts/uji/lab-review-e2e-gerbang.mts menjaga langkahnya): server NYATA + Chromium 390x844. Dokter belum terverifikasi ditolak server (>=400) dan tidak boleh memverifikasi dirinya sendiri (403); pemilik memverifikasi lewat /api/doctors/:id/verify (200); klinisi memajukan satu hasil received→pending_review→reviewed→communicated→closed lewat UI. Bukti log CI: run 38166657927, job 114550504193."
    ],
    "owner": "Sonnet (setelah kontrak tersedia)",
-   "note": "Belum VERIFIED: E2E dijalankan lokal (bukan gerbang CI), dan verifikasi STR dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi nyata. Aturan alur lab belum ditinjau klinis; server tetap otoritas atas siapa yang boleh menandai reviewed."
+   "note": "VERIFIED hanya untuk perilaku teknis alur UI→API (gerbang CI). Verifikasi STR dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi nyata; aturan alur lab belum ditinjau klinis; server tetap otoritas atas siapa yang boleh menandai reviewed."
   },
   {
    "id": "B8",
