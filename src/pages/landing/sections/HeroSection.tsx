@@ -38,7 +38,7 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
       </div>
 
       <div className="relative mx-auto max-w-7xl">
-        <div className="grid items-center gap-12 lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
           {/* Sisi Kiri (Value Proposition) */}
           <div className="text-center lg:col-span-6 lg:text-left">
             <Reveal>
