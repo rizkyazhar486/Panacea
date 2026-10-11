@@ -69,6 +69,16 @@ try {
       assert(/lung volume [\d,]+ mL/.test(r2) && /superior-inferior size ×1\.\d{3}/.test(r2), `breathing readout: ${r2}`)
       await page.getByRole('button', { name: 'Stop breathing' }).click()
       await page.getByTestId('breathing-note').waitFor({ state: 'detached' })
+      // jantung ilustratif: siklus prosedural berlabel; ruang bergerak, laju dapat diatur, kembali ke awal saat dimatikan
+      await page.getByRole('button', { name: 'Heartbeat', exact: true }).click()
+      await page.getByTestId('heartbeat-note').getByText(/Illustrative procedural model, not this body's measured heartbeat, not patient-specific and not clinically validated/).waitFor()
+      const hro = page.getByTestId('heartbeat-readout'); await hro.waitFor({ timeout: 20000 })
+      const seenHr = new Set(); for (let i = 0; i < 4; i++) { seenHr.add(await hro.textContent()); await page.waitForTimeout(330) }
+      assert(seenHr.size >= 2, `heartbeat: the cycle did not advance (${[...seenHr].join(' | ')})`)
+      await page.getByLabel('Heart rate').fill('120')
+      await page.getByTestId('heart-rate-value').getByText('120 bpm').waitFor()
+      await page.getByRole('button', { name: 'Stop heartbeat' }).click()
+      await page.getByTestId('heartbeat-note').waitFor({ state: 'detached' })
       // celah data: dinyatakan, bukan diisi pengganti
       await page.getByTestId('data-gaps').getByText(/What is missing and why \(7\)/).click()
       await page.getByTestId('data-gaps').getByText('Heartbeat').waitFor()
@@ -137,6 +147,7 @@ try {
       // varian Visible Human Female (Denver + CT): satu individu, bukan atlas; tulang kerangka tubuh dari CT (mesin), tungkai bawah manual (Denver)
       await page.getByRole('radio', { name: 'Visible Human skeleton (Denver + CT)' }).click()
       await page.getByText(/^190 structures$/).waitFor({ timeout: 60000 })
+      assert.equal(await page.getByRole('button', { name: /Heartbeat/ }).count(), 0, 'a skeleton body without heart chambers must not offer a heartbeat')
       await page.getByText(/forearm and hand bones \(hand as one mesh; right forearm bones incomplete\)/).waitFor()
       await page.getByTestId('variant-individual').getByText(/One individual from source data/).waitFor()
       assert(!(await page.getByText(/stature \d+ cm/).count()), 'partial body must not show a stature')
