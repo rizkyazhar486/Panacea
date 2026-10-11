@@ -91,6 +91,8 @@ export { caffeineAtBedtime, caffeineBand, decayCurve as caffeineDecayCurve, CAFF
 export type { CaffeineInput, CaffeineResult, CaffeineBand, CaffeineDrink } from './engine/caffeineSleep'
 export { packYearScreen, PACK_YEAR_RANGES, USPSTF_2021 } from './engine/packYearScreen'
 export type { PackYearInput, PackYearResult, PackYearStatus } from './engine/packYearScreen'
+export { stopBang, stopBangBand, STOP_BANG_RANGES, STOP_BANG_THRESHOLDS } from './engine/stopBang'
+export type { StopBangBand, StopBangInput, StopBangResult } from './engine/stopBang'
 export { cvdRisk, fib4, fib4Band, ostIndex, ostBand, RISK_RANGES } from './engine/riskScreens'
 export type { CvdInput, CvdResult, Fib4Input, Fib4Result, Fib4Band, OstInput, OstResult } from './engine/riskScreens'
 export { bloodDonationScreen, DONATION_RANGES, DONATION_INTERVAL_WEEKS } from './engine/bloodDonationScreen'
