@@ -717,6 +717,11 @@ app.post('/api/meets', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Meet>
   if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  // Match the Club Hub form's whole-rupiah limit. Free means an explicit 0;
+  // absent, coercible or negative input must never silently publish a free meet.
+  if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
+    return res.status(400).json({ error: 'invalid_fee' })
+  }
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -728,7 +733,7 @@ app.post('/api/meets', requireAuth, (req, res) => {
     time: String(b.time).slice(0, 5),
     durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
-    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
     lat: Number(b.lat) || 0,
     lng: Number(b.lng) || 0,

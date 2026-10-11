@@ -7,7 +7,7 @@
   "frame": "+Z superior, +X subject left, -Y anterior",
   "educational_only": true
  },
- "count": 6111,
+ "count": 7094,
  "structures": [
   {
    "panacea_structure_id": "ADULT.FEMALE.CARDIOVASCULAR.ANTERIOR_CARDIAC_VEIN",
@@ -253770,6 +253770,150 @@
     "verts": 15162,
     "tris": 30320,
     "boundary_edges": 0,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.L",
+   "canonical_name": "Cartilage of left main bronchus",
+   "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+   "panacea_system": "respiratory",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "source_mesh_name",
+   "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+   "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+   "panacea_license": "CC BY 4.0",
+   "panacea_source_raw_name": "VH_F_cartilage_of_main_bronchus_L",
+   "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+   "panacea_accuracy_status": "model_segmented",
+   "panacea_review_status": "review_required",
+   "panacea_version": "body_v001",
+   "biological_sex_applicability": "female",
+   "panacea_clinically_reviewed": false,
+   "panacea_educational_only": true,
+   "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+   "bbox_min_m": [
+    -0.002182638505473733,
+    0.07580356299877167,
+    0.49073827266693115
+   ],
+   "bbox_max_m": [
+    0.045744914561510086,
+    0.10265914350748062,
+    0.5354741811752319
+   ],
+   "mesh": {
+    "verts": 30270,
+    "tris": 15142,
+    "boundary_edges": 30272,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.R",
+   "canonical_name": "Cartilage of right main bronchus",
+   "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+   "panacea_system": "respiratory",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "source_mesh_name",
+   "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+   "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+   "panacea_license": "CC BY 4.0",
+   "panacea_source_raw_name": "VH_F_cartilage_of_main_bronchus_R",
+   "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+   "panacea_accuracy_status": "model_segmented",
+   "panacea_review_status": "review_required",
+   "panacea_version": "body_v001",
+   "biological_sex_applicability": "female",
+   "panacea_clinically_reviewed": false,
+   "panacea_educational_only": true,
+   "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+   "bbox_min_m": [
+    -0.044529709964990616,
+    0.07393630594015121,
+    0.4810422360897064
+   ],
+   "bbox_max_m": [
+    -0.01115112192928791,
+    0.10199782997369766,
+    0.5319393277168274
+   ],
+   "mesh": {
+    "verts": 35707,
+    "tris": 17854,
+    "boundary_edges": 35708,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.L",
+   "canonical_name": "Left main bronchus",
+   "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+   "panacea_system": "respiratory",
+   "panacea_laterality": "left",
+   "panacea_laterality_source": "source_mesh_name",
+   "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+   "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+   "panacea_license": "CC BY 4.0",
+   "panacea_source_raw_name": "VH_F_left_main_bronchus",
+   "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+   "panacea_accuracy_status": "model_segmented",
+   "panacea_review_status": "review_required",
+   "panacea_version": "body_v001",
+   "biological_sex_applicability": "female",
+   "panacea_clinically_reviewed": false,
+   "panacea_educational_only": true,
+   "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+   "bbox_min_m": [
+    -0.0068596284836530685,
+    0.07333506643772125,
+    0.4909159243106842
+   ],
+   "bbox_max_m": [
+    0.046276114881038666,
+    0.10442360490560532,
+    0.535576581954956
+   ],
+   "mesh": {
+    "verts": 273,
+    "tris": 495,
+    "boundary_edges": 53,
+    "nonmanifold_edges": 0
+   }
+  },
+  {
+   "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.R",
+   "canonical_name": "Right main bronchus",
+   "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+   "panacea_system": "respiratory",
+   "panacea_laterality": "right",
+   "panacea_laterality_source": "source_mesh_name",
+   "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+   "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+   "panacea_license": "CC BY 4.0",
+   "panacea_source_raw_name": "VH_F_right_main_bronchus",
+   "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+   "panacea_accuracy_status": "model_segmented",
+   "panacea_review_status": "review_required",
+   "panacea_version": "body_v001",
+   "biological_sex_applicability": "female",
+   "panacea_clinically_reviewed": false,
+   "panacea_educational_only": true,
+   "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+   "bbox_min_m": [
+    -0.0465373657643795,
+    0.07388007640838623,
+    0.48094412684440613
+   ],
+   "bbox_max_m": [
+    -0.010999024845659733,
+    0.10177753865718842,
+    0.5332576036453247
+   ],
+   "mesh": {
+    "verts": 210,
+    "tris": 374,
+    "boundary_edges": 48,
     "nonmanifold_edges": 0
    }
   }
