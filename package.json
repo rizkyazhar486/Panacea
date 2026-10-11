@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node scripts/validate-capability-os.mjs && node --test scripts/qa/*.test.mjs && tsc -b && vite build",
+    "build": "node scripts/write-frontend-build-info.mjs && node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node scripts/validate-capability-os.mjs && node --test scripts/qa/*.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",

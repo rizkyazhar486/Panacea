@@ -1,3 +1,9 @@
+### Frontend build provenance implementation — 2026-10-11
+
+- Existing production page checks could not independently identify the frontend source revision. This isolated increment generates public/build-info.json during the existing production build, with only Git commit/tree hashes and an explicit dirty/unknown state. A configured GitHub revision must match a clean actual checkout; archives without Git retain unknown metadata rather than trusting an environment claim alone.
+- The source root must be the actual repository root. Generated metadata and Vercel local environment/output are ignored; no credential, patient data, clinical-review label or anatomical asset is published in the manifest. Existing build validators, tests, TypeScript and Vite remain intact. No E7 promotion or human acceptance is claimed.
+- Five focused tests pass, including real Git commit/dirty/untracked/ignored-output behavior, wrong revision, unknown source and unchanged earlier output after a rejected release. Full build, exact-head automation, integration and actual deployment remain pending. This branch follows #2403 and its already-published independent regression dependencies.
+
 ### Delivered encounter/Body dependencies and current resource-based increment — 2026-10-11
 
 - Canonical main 0232eea6bf403e61ffd8aa6e73bb4eee2675920d integrates #2383 with exact reconciled tree a0ca08eb05ac03d583f806a0880f5e2090f7cd6e and expected parent 2752d41912249c72e24a901b78b2ba503e2afaa1. All ten exact-head gates passed on 1011a1ed03826fb0628c6b94b8965fc9e28400d6. #2390 and #2396 are superseded: their four implementation blobs match canonical main, not additional PR merges. Canonical post-merge automation and production remain separate pending evidence.

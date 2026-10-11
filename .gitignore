@@ -10,6 +10,11 @@ npm-debug.log*
 yarn-error.log*
 .vite
 
+# Generated frontend revision metadata and local Vercel build/environment state.
+/public/build-info.json
+/public/build-info.json.tmp
+/.vercel/
+
 # backend
 server/data.json
 server/arsip/
