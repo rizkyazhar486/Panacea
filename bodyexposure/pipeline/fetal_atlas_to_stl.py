@@ -84,16 +84,20 @@ for l, n in NAMES.items():
     else:
         parts.append((None, np.isin(lab, keep), "single structure"))
     for side, pm, how in parts:
-        V, F, _, _ = marching_cubes(pm.astype(np.uint8), 0.5, spacing=(SP,) * 3)
+        V, F, _, _ = marching_cubes(pm.astype(np.uint8), 0.5, spacing=(SP,) * 3, gradient_direction="ascent")
         V = _taubin(V, F)
         P = nib.affines.apply_affine(aff, V / SP)  # indeks voksel → mm dunia (RAS) lewat afin penuh
         C = np.c_[sx * P[:, 0], sy * P[:, 1], sz * P[:, 2]]
+        tri = C[F] - C[0]
+        signed_volume = float(np.einsum("ij,ij->i", tri[:, 0], np.cross(tri[:, 1], tri[:, 2])).sum() / 6)
+        if not np.isfinite(signed_volume) or signed_volume <= 0:
+            raise SystemExit(f"{n}: outward positive-volume surface required")
         key = f"{n.replace(' ', '_')}{'.' + side if side else ''}"
         write_stl(os.path.join(a.out, key + ".stl"), C, F)
         with open(os.path.join(a.out, key + ".stl"), "r+b") as stream:
             stream.write(b"Panacea KCL fetal MRI organ atlas".ljust(80, b" "))
         allv.append(C)
-        prov["structures"][key] = {"label": l, "name": n, "side": side, "volume_cm3": round(float(pm.sum()) * SP ** 3 / 1000, 2), "triangles": int(len(F)), "split": how}
+        prov["structures"][key] = {"label": l, "name": n, "side": side, "volume_cm3": round(float(pm.sum()) * SP ** 3 / 1000, 2), "triangles": int(len(F)), "split": how, "signed_surface_volume_mm3": signed_volume, "surface_winding": "outward; marching_cubes gradient_direction=ascent"}
         if l == 1 and lung_masks is not None:
             prov["structures"][key].update({"source_file": prov["lung_group_evidence"]["source_file"],
                 "source_labels": prov["lung_group_evidence"]["source_label_groups"][side],

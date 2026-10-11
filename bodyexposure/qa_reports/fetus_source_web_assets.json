@@ -1,47 +1,47 @@
 {
  "body": "FETUS",
- "version": "body_v015",
+ "version": "body_v016",
  "clinical_validation": "pending",
  "files": {
   "fetus.digestive.LOD2.glb": {
-   "bytes": 41344,
-   "sha256": "ae4a4a4772506ec61e2ed63e9e70709356fd07894da5016273c304773acc29ea"
+   "bytes": 41296,
+   "sha256": "37b1468c22bcfc598999f58f611c256cb65db459a6a63010eb8239c5ea94d3df"
   },
   "fetus.digestive.LOD3.glb": {
-   "bytes": 21584,
-   "sha256": "51175a8b3fd5019b4ef5a0718115cdec7538f8af34263f05aaf5e31124faf4f6"
+   "bytes": 21568,
+   "sha256": "c4e21888b99cd62790cd8b386bccd9cbc2cdc07ea41e2648fa78b0563c6591f3"
   },
   "fetus.endocrine.LOD2.glb": {
-   "bytes": 6856,
-   "sha256": "5a7fc95c08f5f8e4abe0d8d88d2db59548443f14db53172988dfd816d1f3f9b7"
+   "bytes": 6836,
+   "sha256": "055c984b414badfa6dbfb4faba1e17957916776bf84ae601ca2905efe87b346b"
   },
   "fetus.endocrine.LOD3.glb": {
-   "bytes": 6156,
-   "sha256": "8761f52b6c7dc9dcaf6e6768cd016999667cffbfc37d681cb169016e7aa7f797"
+   "bytes": 6136,
+   "sha256": "81196e3c1afd804d4250325c8e98f362e665f0d8b9ca66e3b3e04ab7fc560778"
   },
   "fetus.lymphatic.LOD2.glb": {
-   "bytes": 11344,
-   "sha256": "06d7a8ddd903a9a23ed890f1ff4a93265fc11dfaacd124b886d87d57ae6d2f9b"
+   "bytes": 11352,
+   "sha256": "78bf516ea0c7cfcd2d88c4bd7502d79b9aaedc880df3185b4f3bd25fceb7ec91"
   },
   "fetus.lymphatic.LOD3.glb": {
-   "bytes": 7868,
-   "sha256": "77dba17dc8233122907c367a0c339e15a332c685d7d377dbac8617efb3f82be4"
+   "bytes": 7832,
+   "sha256": "d7146bd1609910ba9248c1758e3db00c55920b6228f4ad73dad7d290da3d0205"
   },
   "fetus.respiratory.LOD2.glb": {
-   "bytes": 35924,
-   "sha256": "b7cdc9df030e1e69ddb0f135e8fc8440efc74c9e273e8962063897eaf59ede8d"
+   "bytes": 35884,
+   "sha256": "30ecd80580ba4cfde0fc413a7e09c199e9d48e573eb68d2429d00408e0adc588"
   },
   "fetus.respiratory.LOD3.glb": {
-   "bytes": 18328,
-   "sha256": "14e5e626d375b0a01217f9d0fd811966270cef16220b4e79029d0ed38323378e"
+   "bytes": 18324,
+   "sha256": "54bfbf9bb945249b3cd2e47e7346f051ed67946cc6d77f5c65c554923e29f36a"
   },
   "fetus.urinary.LOD2.glb": {
-   "bytes": 28028,
-   "sha256": "77c044b9df3e59d95033c98a47a6314d87b506a1005687c871d9788b31c47fe3"
+   "bytes": 28032,
+   "sha256": "3c2ea44d24facccee2f381e00928a5296924ba46d2d74b46d05024049c384ea2"
   },
   "fetus.urinary.LOD3.glb": {
-   "bytes": 18464,
-   "sha256": "5a3c0a4f32afeefcac7a9507b8974ed52a1f128314a4bf8c89434d32b1c6c3fc"
+   "bytes": 18440,
+   "sha256": "3008fc58c3b1c259e6b0a8409ab3bbfb3b187c90c72bcde8362dc0694cb929a7"
   }
  }
 }

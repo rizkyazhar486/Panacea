@@ -10,71 +10,85 @@
   {
    "id": "FETUS.RESPIRATORY.LUNG.L",
    "volume_cm3": 15.33,
+   "signed_surface_volume_cm3": 15.307875243744848,
    "tris": 27248
   },
   {
    "id": "FETUS.RESPIRATORY.LUNG.R",
    "volume_cm3": 20.22,
+   "signed_surface_volume_cm3": 20.19822269625977,
    "tris": 31834
   },
   {
    "id": "FETUS.DIGESTIVE.LIVER",
    "volume_cm3": 58.45,
+   "signed_surface_volume_cm3": 58.43147177078877,
    "tris": 52304
   },
   {
    "id": "FETUS.DIGESTIVE.STOMACH",
    "volume_cm3": 6.9,
+   "signed_surface_volume_cm3": 6.893232104449427,
    "tris": 11208
   },
   {
    "id": "FETUS.LYMPHATIC.SPLEEN",
    "volume_cm3": 1.64,
+   "signed_surface_volume_cm3": 1.6292466433833093,
    "tris": 4504
   },
   {
    "id": "FETUS.URINARY.RENAL_PELVIS.L",
    "volume_cm3": 0.41,
+   "signed_surface_volume_cm3": 0.411594043050088,
    "tris": 1620
   },
   {
    "id": "FETUS.URINARY.RENAL_PELVIS.R",
    "volume_cm3": 0.46,
+   "signed_surface_volume_cm3": 0.45986221122710663,
    "tris": 1916
   },
   {
    "id": "FETUS.URINARY.RENAL_PARENCHYMA.L",
    "volume_cm3": 4.95,
+   "signed_surface_volume_cm3": 4.943502080147716,
    "tris": 10088
   },
   {
    "id": "FETUS.URINARY.RENAL_PARENCHYMA.R",
    "volume_cm3": 4.88,
+   "signed_surface_volume_cm3": 4.87530598476926,
    "tris": 10656
   },
   {
    "id": "FETUS.URINARY.BLADDER",
    "volume_cm3": 4.43,
+   "signed_surface_volume_cm3": 4.424855756446308,
    "tris": 7232
   },
   {
    "id": "FETUS.LYMPHATIC.THYMUS",
    "volume_cm3": 2.62,
+   "signed_surface_volume_cm3": 2.61755218907926,
    "tris": 6820
   },
   {
    "id": "FETUS.DIGESTIVE.GALLBLADDER",
    "volume_cm3": 0.92,
+   "signed_surface_volume_cm3": 0.9120312692600073,
    "tris": 3052
   },
   {
    "id": "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
    "volume_cm3": 0.11,
+   "signed_surface_volume_cm3": 0.10357853426939179,
    "tris": 656
   },
   {
    "id": "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
    "volume_cm3": 0.2,
+   "signed_surface_volume_cm3": 0.19215534193914324,
    "tris": 1124
   }
  ],

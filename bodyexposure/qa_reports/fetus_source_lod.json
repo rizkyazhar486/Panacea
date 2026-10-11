@@ -75,22 +75,22 @@
    "structures": 3,
    "tris_master": 66564,
    "tris_lod": 6654,
-   "bytes_raw": 127588,
+   "bytes_raw": 127556,
    "error_mm_largest_structures": [
     [
      "FETUS.DIGESTIVE.LIVER",
-     0.03,
-     0.157
+     0.031,
+     0.14
     ],
     [
      "FETUS.DIGESTIVE.STOMACH",
-     0.036,
+     0.037,
      0.169
     ],
     [
      "FETUS.DIGESTIVE.GALLBLADDER",
-     0.051,
-     0.22
+     0.053,
+     0.243
     ]
    ],
    "bbox_escape_fixed": []
@@ -103,7 +103,7 @@
    "structures": 2,
    "tris_master": 1780,
    "tris_lod": 240,
-   "bytes_raw": 9340,
+   "bytes_raw": 9316,
    "error_mm_largest_structures": [
     [
      "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
@@ -126,12 +126,12 @@
    "structures": 2,
    "tris_master": 11324,
    "tris_lod": 1132,
-   "bytes_raw": 25308,
+   "bytes_raw": 25288,
    "error_mm_largest_structures": [
     [
      "FETUS.LYMPHATIC.THYMUS",
-     0.038,
-     0.184
+     0.037,
+     0.18
     ],
     [
      "FETUS.LYMPHATIC.SPLEEN",
@@ -149,7 +149,7 @@
    "structures": 2,
    "tris_master": 59082,
    "tris_lod": 5906,
-   "bytes_raw": 111540,
+   "bytes_raw": 111520,
    "error_mm_largest_structures": [
     [
      "FETUS.RESPIRATORY.LUNG.R",
@@ -158,8 +158,8 @@
     ],
     [
      "FETUS.RESPIRATORY.LUNG.L",
-     0.035,
-     0.193
+     0.033,
+     0.162
     ]
    ],
    "bbox_escape_fixed": []
@@ -172,12 +172,12 @@
    "structures": 5,
    "tris_master": 31512,
    "tris_lod": 3146,
-   "bytes_raw": 68528,
+   "bytes_raw": 68476,
    "error_mm_largest_structures": [
     [
      "FETUS.URINARY.RENAL_PARENCHYMA.R",
-     0.041,
-     0.239
+     0.039,
+     0.165
     ],
     [
      "FETUS.URINARY.RENAL_PARENCHYMA.L",
@@ -187,17 +187,17 @@
     [
      "FETUS.URINARY.BLADDER",
      0.033,
-     0.179
+     0.171
     ],
     [
      "FETUS.URINARY.RENAL_PELVIS.R",
      0.05,
-     0.225
+     0.232
     ],
     [
      "FETUS.URINARY.RENAL_PELVIS.L",
-     0.053,
-     0.241
+     0.052,
+     0.231
     ]
    ],
    "bbox_escape_fixed": []
@@ -210,7 +210,7 @@
    "structures": 3,
    "tris_master": 66564,
    "tris_lod": 2662,
-   "bytes_raw": 55728,
+   "bytes_raw": 55692,
    "error_mm_largest_structures": [
     [
      "FETUS.DIGESTIVE.LIVER",
@@ -219,12 +219,12 @@
     ],
     [
      "FETUS.DIGESTIVE.STOMACH",
-     0.091,
+     0.09,
      0.465
     ],
     [
      "FETUS.DIGESTIVE.GALLBLADDER",
-     0.137,
+     0.136,
      0.675
     ]
    ],
@@ -238,7 +238,7 @@
    "structures": 2,
    "tris_master": 1780,
    "tris_lod": 120,
-   "bytes_raw": 7180,
+   "bytes_raw": 7160,
    "error_mm_largest_structures": [
     [
      "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
@@ -261,12 +261,12 @@
    "structures": 2,
    "tris_master": 11324,
    "tris_lod": 452,
-   "bytes_raw": 13064,
+   "bytes_raw": 13044,
    "error_mm_largest_structures": [
     [
      "FETUS.LYMPHATIC.THYMUS",
      0.101,
-     0.559
+     0.726
     ],
     [
      "FETUS.LYMPHATIC.SPLEEN",
@@ -284,16 +284,16 @@
    "structures": 2,
    "tris_master": 59082,
    "tris_lod": 2360,
-   "bytes_raw": 47700,
+   "bytes_raw": 47676,
    "error_mm_largest_structures": [
     [
      "FETUS.RESPIRATORY.LUNG.R",
-     0.079,
+     0.08,
      0.403
     ],
     [
      "FETUS.RESPIRATORY.LUNG.L",
-     0.084,
+     0.082,
      0.483
     ]
    ],
@@ -307,31 +307,31 @@
    "structures": 5,
    "tris_master": 31512,
    "tris_lod": 1256,
-   "bytes_raw": 34504,
+   "bytes_raw": 34448,
    "error_mm_largest_structures": [
     [
      "FETUS.URINARY.RENAL_PARENCHYMA.R",
-     0.104,
+     0.105,
      0.47
     ],
     [
      "FETUS.URINARY.RENAL_PARENCHYMA.L",
-     0.099,
-     0.447
+     0.098,
+     0.555
     ],
     [
      "FETUS.URINARY.BLADDER",
-     0.083,
+     0.084,
      0.399
     ],
     [
      "FETUS.URINARY.RENAL_PELVIS.R",
      0.145,
-     0.564
+     0.589
     ],
     [
      "FETUS.URINARY.RENAL_PELVIS.L",
-     0.139,
+     0.135,
      0.69
     ]
    ],

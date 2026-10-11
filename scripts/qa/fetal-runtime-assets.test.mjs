@@ -1,4 +1,5 @@
 import test from 'node:test'
+import { auditSurface } from './fetal-surface-validation.mjs'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -27,9 +28,11 @@ for (const lod of ['LOD2', 'LOD3']) test(`fetal ${lod}: source groups, complete 
       assert.ok(id, 'packed mesh retains semantic identity'); ids.push(id)
       assert.equal(data.panacea_clinically_reviewed, false)
       assert.equal(data.panacea_review_status, 'review_required')
-      assert.equal(data.panacea_version, 'body_v015')
+      assert.equal(data.panacea_version, 'body_v016')
       const positions = o.geometry.attributes.position
-      assert.ok(Array.from(positions.array).every(Number.isFinite))
+      assert.ok(o.matrixWorld.determinant() > 0, 'mesh world transform preserves orientation')
+      const coordinates = Array.from({ length: positions.count * 3 }, (_, i) => [positions.getX, positions.getY, positions.getZ][i % 3].call(positions, Math.floor(i / 3)))
+      auditSurface(coordinates, Array.from(o.geometry.index.array))
       triangles += (o.geometry.index?.count ?? positions.count) / 3
       if (system === 'respiratory') {
         const side = id.split('.').at(-1)

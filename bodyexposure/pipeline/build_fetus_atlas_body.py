@@ -6,6 +6,7 @@ Masukan: keluaran fetal_atlas_to_stl.py (STL mm dalam kerangka kanonik + provena
 pembatas organ, titik terendah di z = 0 (janin tidak punya kaki; bukan "kaki di lantai"). Material PAN_* dari master.
 """
 import argparse
+import math
 import bpy, bmesh, json, os, re, sys, glob
 from mathutils import Vector, Matrix
 
@@ -32,7 +33,7 @@ SRC = "SVRTK fetal MRI atlas repository (King's College London, Centre for the D
 LICENSE = "CC0 1.0 Universal (repository); article CC BY 4.0"
 INDIVIDUAL = ("Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. "
               "Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.")
-METHOD = "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing"
+METHOD = "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing"
 
 
 def snake(s):
@@ -47,7 +48,13 @@ for key, info in PROV["structures"].items():
     before = set(bpy.data.objects); bpy.ops.wm.stl_import(filepath=os.path.join(STL, key + ".stl"))
     ob = [o for o in bpy.data.objects if o not in before][0]; me = ob.data.copy(); bpy.data.objects.remove(ob)
     bm = bmesh.new(); bm.from_mesh(me); bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4); bm.to_mesh(me); bm.free()
-    me.transform(Matrix.Scale(0.001, 4)); meshes[key] = (info, me)
+    me.transform(Matrix.Scale(0.001, 4))
+    bm = bmesh.new(); bm.from_mesh(me)
+    volume = bm.calc_volume(signed=True); bm.free()
+    if not math.isfinite(volume) or volume <= 0:
+        raise SystemExit(f"{key}: imported STL must have positive outward volume")
+    info["signed_surface_volume_cm3_blender"] = volume * 1e6
+    meshes[key] = (info, me)
 allv = [v.co for _, me in meshes.values() for v in me.vertices]
 cx = (min(v.x for v in allv) + max(v.x for v in allv)) / 2; cy = (min(v.y for v in allv) + max(v.y for v in allv)) / 2; zmin = min(v.z for v in allv)
 coll = bpy.data.collections.new(BODY_ID); bpy.context.scene.collection.children.link(coll)
@@ -69,7 +76,7 @@ for key, (info, me) in meshes.items():
     meta = {"panacea_structure_id": sid, "panacea_body_id": BODY_ID, "canonical_name": nm, "panacea_system": sysn, "panacea_laterality": lat,
             "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry", "panacea_source": f"{SRC}; label {info['label']} ({info['name']})",
             "panacea_license": LICENSE, "panacea_source_raw_name": info["name"], "panacea_method": METHOD, "panacea_accuracy_status": "source_backed",
-            "panacea_review_status": "review_required", "panacea_version": "body_v015" if PROV.get("lung_group_evidence") else "body_v014", "biological_sex_applicability": "unspecified", "panacea_educational_only": True,
+            "panacea_review_status": "review_required", "panacea_version": "body_v016", "biological_sex_applicability": "unspecified", "panacea_educational_only": True,
             "panacea_kind": "organ", "panacea_individual": INDIVIDUAL, "panacea_clinically_reviewed": False,
             "panacea_known_limitations": ("Population-average atlas label, not any real fetus; one 3T T2w protocol; " +
                 (("left/right lungs use source label groups; individual lobe identity remains unresolved; the multi-region and older organ masks differ; " if source_group else
@@ -79,7 +86,7 @@ for key, (info, me) in meshes.items():
                      "panacea_laterality_source": "pinned_svrtk_source_label_group_verified_by_geometry",
                      "panacea_source_labels": source_group, "panacea_source_file": info["source_file"]})
     for k, v in meta.items(): ob[k] = v
-    report.append({"id": sid, "volume_cm3": info["volume_cm3"], "tris": sum(len(p.vertices) - 2 for p in me.polygons)})
+    report.append({"id": sid, "volume_cm3": info["volume_cm3"], "signed_surface_volume_cm3": info["signed_surface_volume_cm3_blender"], "tris": sum(len(p.vertices) - 2 for p in me.polygons)})
 bpy.context.view_layer.update()
 zs = [v.z for o in coll.objects for v in (o.matrix_world @ Vector(c) for c in o.bound_box)]
 coll["panacea_body_id"] = BODY_ID; coll["panacea_body_status"] = "source_backed_partial"; coll["panacea_body_source"] = f"{SRC}; {LICENSE}"

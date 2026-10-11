@@ -23,6 +23,8 @@
    "volume_cm3": 15.33,
    "triangles": 27248,
    "split": "pinned SVRTK source label group; no sagittal split",
+   "signed_surface_volume_mm3": 15307.873081930762,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent",
    "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
    "source_labels": [
     1,
@@ -38,6 +40,8 @@
    "volume_cm3": 20.22,
    "triangles": 31834,
    "split": "pinned SVRTK source label group; no sagittal split",
+   "signed_surface_volume_mm3": 20198.21980287431,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent",
    "source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
    "source_labels": [
     3,
@@ -53,7 +57,9 @@
    "side": null,
    "volume_cm3": 58.45,
    "triangles": 52304,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 58431.46350501652,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "stomach": {
    "label": 3,
@@ -61,7 +67,9 @@
    "side": null,
    "volume_cm3": 6.9,
    "triangles": 11208,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 6893.231131459939,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "spleen": {
    "label": 4,
@@ -69,7 +77,9 @@
    "side": null,
    "volume_cm3": 1.64,
    "triangles": 4504,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 1629.246408697828,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "kidney_pelvis.L": {
    "label": 5,
@@ -77,7 +87,9 @@
    "side": "L",
    "volume_cm3": 0.41,
    "triangles": 1620,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 411.5939924953598,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "kidney_pelvis.R": {
    "label": 5,
@@ -85,7 +97,9 @@
    "side": "R",
    "volume_cm3": 0.46,
    "triangles": 1916,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 459.86216367324397,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "kidney_parenchyma.L": {
    "label": 6,
@@ -93,7 +107,9 @@
    "side": "L",
    "volume_cm3": 4.95,
    "triangles": 10088,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 4943.501372854692,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "kidney_parenchyma.R": {
    "label": 6,
@@ -101,7 +117,9 @@
    "side": "R",
    "volume_cm3": 4.88,
    "triangles": 10656,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 4875.305285516784,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "bladder": {
    "label": 7,
@@ -109,7 +127,9 @@
    "side": null,
    "volume_cm3": 4.43,
    "triangles": 7232,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 4424.85514343151,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "thymus": {
    "label": 8,
@@ -117,7 +137,9 @@
    "side": null,
    "volume_cm3": 2.62,
    "triangles": 6820,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 2617.551787798193,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "gallbladder": {
    "label": 9,
@@ -125,7 +147,9 @@
    "side": null,
    "volume_cm3": 0.92,
    "triangles": 3052,
-   "split": "single structure"
+   "split": "single structure",
+   "signed_surface_volume_mm3": 912.0311529507762,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "adrenal_glands.L": {
    "label": 10,
@@ -133,7 +157,9 @@
    "side": "L",
    "volume_cm3": 0.11,
    "triangles": 656,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 103.5785189322275,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   },
   "adrenal_glands.R": {
    "label": 10,
@@ -141,7 +167,9 @@
    "side": "R",
    "volume_cm3": 0.2,
    "triangles": 1124,
-   "split": "two connected components"
+   "split": "two connected components",
+   "signed_surface_volume_mm3": 192.15531343867337,
+   "surface_winding": "outward; marching_cubes gradient_direction=ascent"
   }
  },
  "lung_group_evidence": {
