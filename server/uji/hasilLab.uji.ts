@@ -315,3 +315,6 @@ assert.equal(lanjut.trail.length, 1)
   assert.equal(jalan(), jalan())
 }
 console.log('hasilLab.uji: ok')
+
+// Real HTTP lab/referral role and patient-ownership boundaries.
+await import("./labReferralHttpRbac.uji.js")

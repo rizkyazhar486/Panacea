@@ -75,3 +75,16 @@ test('metadata_protein_rusak_ditolak_sebelum_pencarian_atau_render', async () =>
   assert.doesNotThrow(() => searchProteins(valid.index.proteins, 'unmatched'))
   assert.ok(searchProteins(pub.proteins, 'ACTB').some(p => p.gene === 'ACTB'))
 })
+
+test('filter_lokasi_memakai_semua_tingkat_anotasi_dan_tetap_menghormati_pencarian_id', () => {
+  const proteins = buildOpenCellIndex([
+    L('ACTB', E1, 'cytoplasmic'), L('AAA', E2, 'membrane', 'cytoplasmic'), L('ZZZ', E3, 'membrane', '', 'cytoplasmic'),
+  ], []).proteins
+  assert.deepEqual(searchProteins(proteins, '', 8, 'cytoplasmic').map(p => p.gene), ['AAA', 'ACTB', 'ZZZ'])
+  assert.deepEqual(searchProteins(proteins, '', 1, 'cytoplasmic').map(p => p.gene), ['AAA'])
+  assert.deepEqual(searchProteins(proteins, E1, 8, 'cytoplasmic').map(p => p.gene), ['ACTB'])
+  assert.deepEqual(searchProteins(proteins, E1, 8, 'membrane'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8, 'mitochondria'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8, 'unknown_location'), [])
+  assert.deepEqual(searchProteins(proteins, '', 8), []) // preserve the unfiltered idle state
+})

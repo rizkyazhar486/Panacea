@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LOCALISATION_LABEL, parseOpenCellIndex, searchProteins, type OpenCellProtein, type PublishedOpenCell } from '../engine/openCellIndex'
+import { LOCALISATIONS, LOCALISATION_LABEL, parseOpenCellIndex, searchProteins, type Localisation, type OpenCellProtein, type PublishedOpenCell } from '../engine/openCellIndex'
 
 // Skala sel: di mana sebuah protein berada di dalam sel (OpenCell, HEK293T). Dimuat malas saat dibuka; hanya menampilkan data terukur beserta batasnya.
 const fmt = (v: number | null, unit: string) => (v === null ? 'not measured' : `${v >= 100 ? Math.round(v).toLocaleString('en') : v.toPrecision(3)} ${unit}`)
@@ -18,6 +18,7 @@ export function OpenCellPanel({ baseUrl }: { baseUrl: string }) {
   const [index, setIndex] = useState<PublishedOpenCell | null>(null)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
+  const [location, setLocation] = useState<Localisation | null>(null)
   const [picked, setPicked] = useState<OpenCellProtein | null>(null)
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export function OpenCellPanel({ baseUrl }: { baseUrl: string }) {
     return () => { live = false }
   }, [open, index, error, baseUrl])
 
-  const hits = useMemo(() => (index ? searchProteins(index.proteins, query, 8) : []), [index, query])
+  const hits = useMemo(() => (index ? searchProteins(index.proteins, query, 8, location) : []), [index, query, location])
 
   return (
     <details className="rounded-2xl border border-neutral-200 p-3 text-sm dark:border-white/10" data-testid="opencell-panel" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
@@ -43,7 +44,14 @@ export function OpenCellPanel({ baseUrl }: { baseUrl: string }) {
           <label className="block text-[13px] font-bold" htmlFor="opencell-q">Find a protein</label>
           <input id="opencell-q" value={query} onChange={(e) => { setQuery(e.target.value); setPicked(null) }} placeholder={`Gene, protein, Ensembl or UniProt ID (${index.proteins.length.toLocaleString('en')} proteins)`}
             className="min-h-[44px] w-full rounded-xl border border-neutral-300 bg-white px-3 text-[14px] dark:border-white/15 dark:bg-white/5" />
-          {query.trim() && hits.length === 0 && <p className="text-[13px]" data-testid="opencell-empty">No protein matches “{query.trim()}” in the {index.proteins.length.toLocaleString('en')} that were tagged.</p>}
+          <label className="block text-[13px] font-bold" htmlFor="opencell-location">Filter by observed cell location</label>
+          <select id="opencell-location" value={location ?? ''} onChange={(e) => { setLocation((e.target.value || null) as Localisation | null); setPicked(null) }}
+            className="min-h-[44px] w-full rounded-xl border border-neutral-300 bg-white px-3 text-[14px] dark:border-white/15 dark:bg-neutral-900">
+            <option value="">All measured locations</option>
+            {LOCALISATIONS.map((value) => <option key={value} value={value}>{LOCALISATION_LABEL[value]}</option>)}
+          </select>
+          {location && <p className="text-[13px] text-neutral-600 dark:text-neutral-300">Matches any reported annotation grade; showing up to eight proteins.</p>}
+          {(query.trim() || location) && hits.length === 0 && <p className="text-[13px]" data-testid="opencell-empty">No tagged proteins match these search filters.</p>}
           {!picked && hits.length > 0 && (
             <ul className="flex flex-wrap gap-2">
               {hits.map((p) => (

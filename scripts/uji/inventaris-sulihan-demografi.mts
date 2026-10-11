@@ -52,7 +52,6 @@ const DIKETAHUI: ReadonlyArray<readonly [string, number]> = [
   ['src/pages/PapanAtlet.tsx', 1],
   ['src/pages/PerformanceLab.tsx', 2],
   ['src/pages/Rekomposisi.tsx', 1],
-  ['src/pages/SelfAssessmentToolkit.tsx', 1],
   ['src/pages/fitness/TrainingPhysiology.tsx', 1],
   ['src/pages/TrainingPlan.tsx', 3],
   ['src/pages/WorkoutHistory.tsx', 1],

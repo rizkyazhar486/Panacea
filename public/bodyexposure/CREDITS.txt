@@ -77,6 +77,12 @@ opencell_index.json — OpenCell (Chan Zuckerberg Biohub; "OpenCell on AWS", htt
                (2022). Localisation of 1,310 endogenously tagged proteins and their abundance in cultured HEK293T cells; measured in a cell
                line, not in the tissue or body shown. Not clinically reviewed.
 
+fetal_reference_tables.json — fetal biometry reference tables. (1) WHO Fetal Growth Charts: Kiserud T, Piaggio G, Carroli G, et al. PLOS Medicine
+               14(1):e1002220 (2017), doi:10.1371/journal.pmed.1002220, Creative Commons Attribution License; Tables 6-9, 11, 14, 15.
+               (2) INTERGROWTH-21st fetal growth standards: Papageorghiou AT, Ohuma EO, Altman DG, et al. Lancet 384(9946):869-879 (2014),
+               doi:10.1016/S0140-6736(14)61490-2; values transcribed from the public University of Oxford table PDFs (reuse terms are not
+               stated there; the tables carry "(c) University of Oxford"). Reference positions only, not a diagnosis. Not clinically reviewed.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.

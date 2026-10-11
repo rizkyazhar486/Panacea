@@ -1,3 +1,29 @@
+### Delivered encounter/Body dependencies and current resource-based increment — 2026-10-11
+
+- Canonical main 0232eea6bf403e61ffd8aa6e73bb4eee2675920d integrates #2383 with exact reconciled tree a0ca08eb05ac03d583f806a0880f5e2090f7cd6e and expected parent 2752d41912249c72e24a901b78b2ba503e2afaa1. All ten exact-head gates passed on 1011a1ed03826fb0628c6b94b8965fc9e28400d6. #2390 and #2396 are superseded: their four implementation blobs match canonical main, not additional PR merges. Canonical post-merge automation and production remain separate pending evidence.
+- The OpenCell compartment feature combines 17 published locations, all annotation grades and identifier search over the unchanged 1,310 cultured HEK293T proteins. Combined current-main source passes 23 protein/ontology/heartbeat tests, six source-render pipeline tests, 786/786 build QA tests, TypeScript and Vite build; the frontend uji suite passed 694/694 before ontology-only synchronization. No measured body-tissue mapping or human clinical acceptance is claimed.
+- #2397 and #2399 remain pending integration; their freshly reconciled real HTTP RBAC fixtures pass locally. E2 remains REPORTED. #2403 is serialized after those two existing regression outcomes and requires fresh automated gates. Root ownership is limited to these branches; active contributor anatomy and source assets are preserved.
+- Production is pending through the existing configured release workflow. No continuous background mechanism or complete product/clinical readiness is claimed. Refresh canonical Git/PR/workflow state before using these historical checkpoints.
+
+### Body Exposure compartment filtering and mobile CI diagnosis — 2026-10-11
+
+- Canonical main observed: 28df18e7a9daa2741ba1903db40e7c01a86be77d, preserving Claude's calculator export. #2403 implements location-only browsing and combined identifier/location filtering over the existing 1,310 OpenCell HEK293T proteins and 17 published locations; all annotation grades remain visible. No new dataset, geometry, clinical approval or production release is claimed.
+- Eight regression tests pass; typecheck and build passed before the calculator-export synchronization. Fresh synchronized automation remains required. Local browser reached Vessels and the biomechanics tab, then failed atlas-label visibility; an independent blank-page check reproduces zero-width font metrics in this local Chromium environment, so local browser acceptance is not claimed.
+- Two exact-head downstream CI runs failed the Vessels normal click despite #2390's viewport reveal. Diagnostic-only commits now capture control/ancestor geometry without forcing clicks, changing timeouts or removing checks: #2390 head 968df174ad68d88b5e61792aa329269630d6d470 and #2383 head 1011a1ed03826fb0628c6b94b8965fc9e28400d6. Required source fixes and fresh current-main checks are outstanding before integration.
+- Unmerged chain: #2390 → #2396 → #2383 → #2397 → #2399 → #2403. E2 remains REPORTED; canonical Alpha remains 24/43 at this observation. Human acceptance belongs to the owner's team. Configured production release is pending; no background execution is promised.
+
+### Lab/referral HTTP authorization implementation — 2026-10-11
+
+- Follows serialized #2390 → #2396 → #2383 → #2397. New fixture extends the mandatory existing hasilLab suite with nine actual HTTP route decisions, stored own/foreign patient data, effective unverified doctor limits, owner-versus-clinician separation, authenticated provenance and exact no-mutation assertions for all rejected calls. No runtime route, role or clinical threshold changes.
+- Targeted/full server suites, typecheck/build and strict fixture typecheck passed. Temporarily admitting every same-tenant patient in actual service ownership code failed the populated-subject exclusion assertion; source restored before clean target. Final synchronized candidate receives mandatory automated CI; E2 remains REPORTED with lab-log/share/care consent routes still outstanding.
+- No AI review round or human clinical acceptance is claimed. Existing resources and measurements remain intact. Deployment is pending through the configured GitHub release route; Vercel connector has scope 403, so direct connector deployment is unavailable. No future background execution is implied.
+
+### Populated clinical-patient authorization regression — 2026-10-11
+
+- This test-only increment follows #2390 → #2396 → #2383; its candidate contains their exact implementations before automated CI. It preserves the existing 15-route clinical matrix and verifies an actually populated private p1, two independent self identities, reciprocal read/write denials and clinician-issued link access restricted to its redeeming account. Authorized before/after reads assert rejected writes preserve exact records.
+- Existing-patient admission mutation passed the old absent-patient matrix but failed the new populated-p1 denial. Runtime source was restored. Targeted/full server tests, typecheck/build, strict fixture typecheck and architecture/ratchet passed; synchronized runtime test passes. Current-main child-exit cleanup fix and retry options are preserved.
+- E2 remains REPORTED; broader lab/care HTTP coverage is still required. No runtime clinical feature, criterion promotion, human review or production deployment is claimed. Final integration requires fresh automated gates and current-main merge-tree equality, serialized after its upstream tasks.
+
 ### A2 forward synchronization with delivered Body Exposure — 2026-10-11
 
 - Canonical main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's #2394 illustrative heartbeat. Forward merge preserves its implementation and labels; A2 runtime/tests are unchanged. Fresh exact-head automated checks follow this synchronization; no additional AI review is requested and no clinical approval or deployment is claimed.
