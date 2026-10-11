@@ -78,3 +78,26 @@ export function checkReviewRegistry(reg: ReviewRegistry, engineIds: readonly str
 export function reviewedCount(reg: ReviewRegistry): number {
   return reg.entries.filter((e) => checkEntry(e).length === 0 && e.clinically_reviewed).length
 }
+
+export interface PendingReviewRow { id: string; status: ReviewStatus; enginePath: string }
+export type PendingExport =
+  | { ok: true; rows: PendingReviewRow[]; csv: string }
+  | { ok: false; errors: string[] }
+
+const ENGINE_DIR = 'src/domains/clinical-calculators/engine'
+const csvCell = (v: string) => (/[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
+
+/**
+ * Daftar mesin yang masih menunggu tinjauan klinis, untuk diserahkan ke peninjau. Fail closed: registri yang tidak lolos
+ * `checkReviewRegistry` tidak diekspor (daftar yang salah lebih berbahaya daripada tidak ada). Mesin yang sudah sah ditinjau tidak ikut.
+ */
+export function exportPendingReviews(reg: ReviewRegistry, engineIds: readonly string[]): PendingExport {
+  const check = checkReviewRegistry(reg, engineIds)
+  if (!check.ok) return { ok: false, errors: check.errors }
+  const rows = reg.entries
+    .filter((e) => e.review_status === 'PENDING_CLINICAL_REVIEW')
+    .map((e) => ({ id: e.id, status: e.review_status, enginePath: `${ENGINE_DIR}/${e.id}.ts` }))
+    .sort((a, b) => a.id.localeCompare(b.id))
+  const csv = ['engine_id,review_status,engine_path', ...rows.map((r) => [r.id, r.status, r.enginePath].map(csvCell).join(','))].join('\n') + '\n'
+  return { ok: true, rows, csv }
+}
