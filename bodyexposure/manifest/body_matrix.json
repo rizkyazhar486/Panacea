@@ -250,10 +250,10 @@
    "variants": [],
    "redistribution": null,
    "body_id": "HUMAN.OLDER_ADULT",
-   "status": "placeholder",
-   "source": null,
+   "status": "source_backed_partial",
+   "source": "TotalSegmentator dataset v2.0.1 reference segmentations (Wasserthal et al., Radiology: AI 2023), CC BY 4.0; one 73-year-old female subject",
    "frame": null,
-   "source_requirement": "No open age-specific (≥65 y) whole-body anatomical phantom found.",
+   "source_requirement": null,
    "structures": 0,
    "verts": 0,
    "systems": {}

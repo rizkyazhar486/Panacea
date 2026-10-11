@@ -86,6 +86,12 @@ respiration_model.json — breathing model from 4D-CT of lung-cancer patients, T
                cases passed the plausibility checks; lung size and position per breath phase are averaged and transferred to adult
                bodies as a labelled simulation, not measured motion of the displayed body. Not clinically reviewed.
 
+tsd_s0196_older_adult_female.* — TotalSegmentator dataset v2.0.1 (Wasserthal J, et al. TotalSegmentator: robust segmentation of 104 anatomic
+               structures in CT images. Radiology: Artificial Intelligence 2023; Zenodo 10047292), CC BY 4.0. One 73-year-old female
+               subject (s0196): reference segmentations made with iterative nnU-Net and corrected by a radiologist; CT resampled to
+               1.5 mm and cropped by the dataset authors. Marching-cubes surfaces, smoothed and decimated for the web. Partial body
+               (head to upper thighs), 16 structures cut by the scan border. Not an atlas, not clinically reviewed.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.
@@ -609,5 +615,15 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 <li><strong>How it is shown:</strong> a "Breathing" button on adult bodies that have lung meshes (adult male, ICRP adult). Lungs are scaled and shifted about their common centre; the viewer states it is measured in other patients and transferred, shows source and licence, and states that the 4 s breath period is a playback setting because the gated CT does not record it. Not offered for the fetus, children or bodies without lungs (the source patients are adults).</li>
 <li><strong>Not modelled:</strong> diaphragm, ribs and heart motion separately, lung deformation (no deformable registration), breathing rate, or this body's own motion. Patients have lung cancer and are breathing freely (not guided). Segmentation was not checked against the manual contours that exist for the collection.</li>
 <li><code>clinically_reviewed</code> remains false; truth class <code>measured-transferred</code>.</li>
+</ul>
+<h2>HUMAN.OLDER_ADULT: TSD_S0196.OLDER_ADULT.FEMALE — source_backed_partial (v001): one 73-year-old woman</h2>
+<ul>
+<li><strong>Source:</strong> TotalSegmentator dataset v2.0.1 (Zenodo 10047292, CC BY 4.0; Wasserthal et al., Radiology: AI 2023), subject <code>s0196</code> (female, 73 years, CT angiography neck to leg, pathology label <code>no_pathology</code>, Siemens SOMATOM Definition AS+). Metadata from the dataset's <code>meta.csv</code>. 1,228 CT subjects exist; 459 are 70 or older. Only the subject files were downloaded (HTTP range reads of the zip), not the 23.6 GB archive.</li>
+<li><strong>What the geometry is:</strong> the dataset's reference segmentations (iterative nnU-Net, corrected by a radiologist), exported by <code>pipeline/tsd_masks_to_stl.py</code> and <code>build_tsd_body.py</code>; class map and the reasons for classes left out are in <code>pipeline/tsd_classes.py</code>. Class <code>expert_refined_segmentation</code> (registry method <code>other</code>): not manual from scratch and not reviewed here.</li>
+<li><strong>Coverage is partial:</strong> the dataset CTs are resampled to 1.5 mm and cropped to the segmented region. This subject covers the skull and neck to the upper thighs (extent 0.55 m). Brain, C1 and C2 are empty (not in the crop). 16 structures touch the scan border (femora, humeri, skull and others) and carry the note "Cut by the edge of the scanned region". No skin, no forearms, no limbs below mid-thigh. No stature is shown.</li>
+<li><strong>Not published:</strong> <code>prostate</code> (male label, empty or wrong in a woman) and the two kidney cyst labels (pathology). 111 structures are published: 60 bones, 10 muscles, 18 vessels, 8 digestive, 6 respiratory (5 lobes and trachea), 3 urinary, 3 endocrine, spleen, spinal cord and costal cartilages.</li>
+<li><strong>Frame:</strong> NIfTI affine RAS mm; canonical = (-x, -y, z) x 0.001; XY centred on the midpoint of the hip bones; z = 0 at the lowest scanned point (the thigh cut), which is not a standing height. Laterality is checked against geometry.</li>
+<li><strong>Limits:</strong> one individual, not an age-representative reference; a woman only. Whole-body and male older adults are not available from this subject. Initial web load 68,898 triangles at LOD4.</li>
+<li><code>clinically_reviewed</code> remains false.</li>
 </ul>
 </main></body></html>

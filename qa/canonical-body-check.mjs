@@ -211,6 +211,16 @@ try {
       await page.getByText(/Source: massp \(Apache-2\.0\); via Clinical Neuroanatomy Atlas v1\.0\.3/).waitFor({ timeout: 60000 })
       await page.getByText(/combined atlas layer CC BY-SA 4\.0/).waitFor()
       assert(!(await page.getByText(/stature \d+ cm/).count()), 'a template atlas must not show a stature')
+      // lansia: satu individu parsial dari dataset terbuka (tanpa tinggi badan); kehamilan tetap tidak tersedia, tidak ada pengganti
+      await page.getByRole('tab', { name: /Older adult/ }).click()
+      await page.getByText(/^111 structures$/).waitFor({ timeout: 90000 })
+      await page.getByText(/not an atlas and not a reference older adult/).waitFor()
+      assert(!(await page.getByText(/stature \d+ cm/).count()), 'a partial older-adult body must not show a stature')
+      assert(await page.getByRole('tab', { name: /Pregnancy/ }).isDisabled(), 'pregnancy must stay unavailable')
+      await page.getByLabel('Find a structure').fill('femur')
+      await page.getByRole('button', { name: /^femur/i }).first().click()
+      await page.getByText(/Source: TotalSegmentator dataset v2\.0\.1/).waitFor({ timeout: 60000 })
+      await page.getByText(/Cut by the edge of the scanned region: this structure is incomplete\./).waitFor()
       // anak: varian 5 th & 10 th, laki-laki & perempuan
       await page.getByRole('tab', { name: /^Child/ }).click()
       await page.getByRole('radio', { name: '10 y · Female' }).click()
