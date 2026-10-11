@@ -25,8 +25,8 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | Status | Jumlah |
 |---|---|
 | VERIFIED | 22 |
-| REPORTED | 5 |
-| NOT_CHECKED | 12 |
+| REPORTED | 6 |
+| NOT_CHECKED | 11 |
 | NOT_STARTED | 3 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
@@ -90,7 +90,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
 | E1 | Autentikasi | Akses tanpa identitas ditolak; sesi tidak dapat dipalsukan (tes negatif) | REPORTED | Sol | server/uji/authAccess.uji.ts; Belum direproduksi oleh Cloud. |
-| E2 | Otorisasi (RBAC) untuk data klinis | Peran yang salah ditolak pada setiap rute data klinis | NOT_CHECKED | Sol | server/uji/aksesKlinis.uji.ts |
+| E2 | Otorisasi (RBAC) untuk data klinis | Peran yang salah ditolak pada setiap rute data klinis | REPORTED | Sol | server/uji/rbacKlinis.uji.ts (terdaftar di server `npm run uji`): menjalankan server nyata (berkas data sementara, port bebas, login dev) dan memanggil 15 rute /api/clinical* sebagai anonim, pasien, dan dokter tanpa STR terverifikasi: anonim 401 di semua; pasien dan dokter tanpa STR ditolak sesuai matriks (403/404 sebelum efek; rute 200 hanya memuat data sendiri, diperiksa tidak bocor); id pasien asing 403 vs id sendiri 200 (berpasangan).; Kelengkapan: pemindai rute di index.ts gagal bila ada rute /api/clinical* yang tidak ada di matriks.; Sabotase (masing-masing gagal dengan nama): penjaga kepemilikan /vital dimatikan → 'pasien: POST /api/clinical/vital'; requireAuth dihapus dari /links → 'anonim harus 401: GET /api/clinical/links'; rute baru tanpa keputusan → 'rute klinis tanpa keputusan RBAC di matriks: GET /api/clinical/rahasia'.; Belum VERIFIED: hanya /api/clinical* yang dicakup. Belum diperiksa dengan pemanggil nyata: /api/lab-log, /api/care, rute hasil lab/rujukan (punya uji lifecycle sendiri, bukan uji HTTP RBAC), dan jalur positif klinisi terverifikasi STR (butuh alur verifikasi STR di server uji). Kolom 'dokter' di sini = dokter tanpa STR, diperlakukan sebagai pasien oleh requireAuth. |
 | E3 | Audit trail perubahan klinis | Setiap perubahan klinis tercatat dengan pelaku dan waktu | NOT_CHECKED | Sol | - |
 | E4 | Perlindungan data pasien | Tidak ada PHI di log/repo; retensi dan consent sesuai kebijakan | NOT_CHECKED | Sol | - |
 | E5 | Home responsif 390×844 | Tanpa scroll horizontal; label ≥ 11 px (dua pengecualian 10 px terdokumen) | VERIFIED | Sonnet | PR #2321 (merge c85a91761): 0 elemen < 10 px dari 158; scripts/uji/home-teks-minimum.mts |

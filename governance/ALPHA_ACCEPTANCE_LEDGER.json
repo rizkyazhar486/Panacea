@@ -459,12 +459,14 @@
    "pillar": "Platform Reliability",
    "criterion": "Otorisasi (RBAC) untuk data klinis",
    "acceptance": "Peran yang salah ditolak pada setiap rute data klinis",
-   "status": "NOT_CHECKED",
+   "status": "REPORTED",
    "evidence": [
-    "server/uji/aksesKlinis.uji.ts"
+    "server/uji/rbacKlinis.uji.ts (terdaftar di server `npm run uji`): menjalankan server nyata (berkas data sementara, port bebas, login dev) dan memanggil 15 rute /api/clinical* sebagai anonim, pasien, dan dokter tanpa STR terverifikasi: anonim 401 di semua; pasien dan dokter tanpa STR ditolak sesuai matriks (403/404 sebelum efek; rute 200 hanya memuat data sendiri, diperiksa tidak bocor); id pasien asing 403 vs id sendiri 200 (berpasangan).",
+    "Kelengkapan: pemindai rute di index.ts gagal bila ada rute /api/clinical* yang tidak ada di matriks.",
+    "Sabotase (masing-masing gagal dengan nama): penjaga kepemilikan /vital dimatikan → 'pasien: POST /api/clinical/vital'; requireAuth dihapus dari /links → 'anonim harus 401: GET /api/clinical/links'; rute baru tanpa keputusan → 'rute klinis tanpa keputusan RBAC di matriks: GET /api/clinical/rahasia'."
    ],
    "owner": "Sol",
-   "note": ""
+   "note": "Belum VERIFIED: hanya /api/clinical* yang dicakup. Belum diperiksa dengan pemanggil nyata: /api/lab-log, /api/care, rute hasil lab/rujukan (punya uji lifecycle sendiri, bukan uji HTTP RBAC), dan jalur positif klinisi terverifikasi STR (butuh alur verifikasi STR di server uji). Kolom 'dokter' di sini = dokter tanpa STR, diperlakukan sebagai pasien oleh requireAuth."
   },
   {
    "id": "E3",
