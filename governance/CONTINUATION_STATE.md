@@ -1,3 +1,10 @@
+### Delivered encounter/Body dependencies and current resource-based increment — 2026-10-11
+
+- Canonical main 0232eea6bf403e61ffd8aa6e73bb4eee2675920d integrates #2383 with exact reconciled tree a0ca08eb05ac03d583f806a0880f5e2090f7cd6e and expected parent 2752d41912249c72e24a901b78b2ba503e2afaa1. All ten exact-head gates passed on 1011a1ed03826fb0628c6b94b8965fc9e28400d6. #2390 and #2396 are superseded: their four implementation blobs match canonical main, not additional PR merges. Canonical post-merge automation and production remain separate pending evidence.
+- The OpenCell compartment feature combines 17 published locations, all annotation grades and identifier search over the unchanged 1,310 cultured HEK293T proteins. Combined current-main source passes 23 protein/ontology/heartbeat tests, six source-render pipeline tests, 786/786 build QA tests, TypeScript and Vite build; the frontend uji suite passed 694/694 before ontology-only synchronization. No measured body-tissue mapping or human clinical acceptance is claimed.
+- #2397 and #2399 remain pending integration; their freshly reconciled real HTTP RBAC fixtures pass locally. E2 remains REPORTED. #2403 is serialized after those two existing regression outcomes and requires fresh automated gates. Root ownership is limited to these branches; active contributor anatomy and source assets are preserved.
+- Production is pending through the existing configured release workflow. No continuous background mechanism or complete product/clinical readiness is claimed. Refresh canonical Git/PR/workflow state before using these historical checkpoints.
+
 ### Body Exposure compartment filtering and mobile CI diagnosis — 2026-10-11
 
 - Canonical main observed: 28df18e7a9daa2741ba1903db40e7c01a86be77d, preserving Claude's calculator export. #2403 implements location-only browsing and combined identifier/location filtering over the existing 1,310 OpenCell HEK293T proteins and 17 published locations; all annotation grades remain visible. No new dataset, geometry, clinical approval or production release is claimed.
