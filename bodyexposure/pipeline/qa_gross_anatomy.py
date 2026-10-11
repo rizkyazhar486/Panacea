@@ -11,6 +11,9 @@ Pemeriksaan (semua terukur, tanpa skor karangan):
      dilaporkan sebagai fraksi verteks organ A yang berada di dalam organ B.
 """
 import bpy, bmesh, json, sys, re
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fetal_gross_order import audit_order
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
@@ -105,12 +108,20 @@ bladder = one(r"URINARY_BLADDER_WALL$", r"URINARY\.URINARY_BLADDER$", r"FUNDUS_O
 kidneys = find(r"KIDNEY_CORTEX\.[LR]$") or find(r"URINARY\.KIDNEY\.[LR]$") or find(r"KIDNEY_CAPSULE\.[LR]$")
 zs = {"brain": z(brain), "heart": z(heart), "liver": z(liver), "kidney": (sum(z(k) for k in kidneys) / len(kidneys)) if kidneys else None, "bladder": z(bladder)}
 order_ok = all(zs[a] is not None and zs[b] is not None and zs[a] > zs[b] for a, b in [("brain", "heart"), ("heart", "liver"), ("liver", "bladder"), ("kidney", "bladder")])
-if NO_ORGANS:
+if body == "FETUS":
+    required = {"liver": liver, "bladder": one(r"URINARY\.BLADDER$"),
+                "thymus": one(r"\.THYMUS$")}
+    for side in "LR":
+        required[f"kidney.{side}"] = one(rf"URINARY\.RENAL_PARENCHYMA\.{side}$")
+        required[f"lung.{side}"] = one(rf"RESPIRATORY\.LUNG\.{side}$")
+    fetal_ok, fetal_detail = audit_order({key: z(obj) for key, obj in required.items()})
+    check("fetal_source_organ_order", fetal_ok, fetal_detail)
+elif NO_ORGANS:
     res["checks"].append({"check": "vertical_organ_order", "ok": True, "not_applicable": "body has no organs (--no-organs)"})
 else:
     check("vertical_organ_order", order_ok, {k: (round(v, 3) if v else None) for k, v in zs.items()})
 feet = min((o.matrix_world @ Vector(c)).z for o in objs.values() for c in o.bound_box)
-check("feet_on_ground", abs(feet) < 0.005, round(feet, 4))
+check("lowest_organ_point_on_ground" if body == "FETUS" else "feet_on_ground", abs(feet) < 0.005, round(feet, 4))
 
 # 4 relasi rongga
 ribs = find(r"RIBS_CORTICAL$") or find(r"SKELETAL\.\w+_RIB\.[LR]$")

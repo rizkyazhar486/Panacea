@@ -48,6 +48,17 @@ items:
     evidence_needed: [current_routes, imports, state_ownership, services, persistence]
     outputs: [integration_candidates, safe_reconciliation_tasks]
 
+  - id: rnd.fetal_atlas_parcel_identity
+    title: Resolve numeric identities before admitting fetal atlas lung lobes
+    type: research
+    status: individual_lobe_mapping_required
+    priority: evidence_triggered
+    reason: Whole-lung groups are pinned to SVRTK source (left 1–2, right 3–5); individual lobe names and labels 6–9 remain unresolved.
+    evidence_needed: [authoritative_numeric_label_mapping, atlas_volume_inspection, measured_lod_error, qualified_clinical_review]
+    outputs: [named_source_backed_fetal_regions, existing_fetus_manifest_integration]
+    engineering_evidence: DOCS/body-exposure/FETAL_PARCEL_QA.md
+    clinical_validation: pending
+
   - id: rnd.external_evidence_scan
     title: Evidence and technology refresh
     type: research

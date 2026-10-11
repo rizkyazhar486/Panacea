@@ -107,7 +107,7 @@
   {
    "body_id": "FETUS",
    "status": "source_backed_partial",
-   "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+   "source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; CC0 1.0 Universal (repository); article CC BY 4.0",
    "source_requirement": null,
    "redistribution": null,
    "structures": 14,
@@ -124,7 +124,7 @@
      "structures": 14,
      "label": "Atlas, 25 to 28 weeks",
      "status": "source_backed_partial",
-     "source": "SVRTK fetal MRI atlas, King's College London (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)",
+     "source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; CC0 1.0 Universal (repository); article CC BY 4.0",
      "stature_m": null,
      "coverage": "organs only: no skeleton, skin, brain, heart or gut",
      "individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Not clinically reviewed."
