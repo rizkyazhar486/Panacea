@@ -64,6 +64,14 @@ respiration_model.json — breathing model from 4D-CT of lung-cancer patients, T
                cases passed the plausibility checks; lung size and position per breath phase are averaged and transferred to adult
                bodies as a labelled simulation, not measured motion of the displayed body. Not clinically reviewed.
 
+tsd_s0196_older_adult_female.* — TotalSegmentator dataset v2.0.1 (Wasserthal J, et al. TotalSegmentator: robust segmentation of 104 anatomic
+               structures in CT images. Radiology: Artificial Intelligence 2023; Zenodo 10047292), CC BY 4.0. One 73-year-old female
+               subject (s0196): reference segmentations made with iterative nnU-Net and corrected by a radiologist; CT resampled to
+               1.5 mm and cropped by the dataset authors. Marching-cubes surfaces, smoothed and decimated for the web. Partial body
+               (neck to upper thighs, a cut piece of the skull), 16 structures cut by the scan border. Not an atlas, not clinically reviewed.
+               Second subject tsd_s0327_older_adult_male.* (s0327, male, 72 years): same dataset and method, lower neck to upper thighs,
+               21 structures cut by the scan border, only a cut piece of the skull.
+
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.

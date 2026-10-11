@@ -124,10 +124,11 @@
    "status": "VERIFIED",
    "evidence": [
     "Kode: server/src/modules/labResults/ (PR #2346 → main 35784c5c8; perbaikan irisan Mongo PR #2347 → main dcb40fdf7). Tes: server/uji/hasilLab.uji.ts + irisanPenyimpanan.uji.ts, dijalankan CI pada head yang sama (8/8 check wajib hijau). Uji HTTP lokal dengan server asli (Sonnet Cloud, 2026-10-10): intake oleh dokter terverifikasi lalu restart proses: 1 hasil, status closed, jejak 4 entri tetap ada (mode berkas)",
-    "irisanPenyimpanan.uji: simpan → muat → pasang → simpan → muat utuh untuk hasil_lab dan rujukan_klinis (tata letak Mongo beririsan, via dbPalsu); 6 mutan simpan/muat terbunuh"
+    "irisanPenyimpanan.uji: simpan → muat → pasang → simpan → muat utuh untuk hasil_lab dan rujukan_klinis (tata letak Mongo beririsan, via dbPalsu); 6 mutan simpan/muat terbunuh",
+    "PR #2376: head 4509159e9bb111ec3423d58da394718588775c99, 10/10 exact-head check lulus, ditinjau AI independen, terintegrasi main 3e690b17196b150459c4f138d14c39a863184467 (tree ab010eea0b25b8cd39919fd86c2862bbeec50da3). Workflow Mongo Persistence Acceptance menguji Mongo sungguhan berpinned digest dengan proses aplikasi tulis/baca terpisah, transisi hasil/rujukan nyata dan hash audit, tanpa fallback berkas. Health dan capabilities Render pada 2026-10-11 melaporkan revisi 3e690b1 yang sama, mode mongo/tuntas-v1 sehat; verify-render-revision.mjs memverifikasi server tree 94aad15276b123c886ecc29d581f69dbd1c9a8c7. Ini bukan uji transaksi pasien di produksi atau penerimaan E7."
    ],
    "owner": "Sol",
-   "note": "Tidak memakai PostgreSQL: penyimpanan klinis yang ada (berkas/Mongo) dipakai, tanpa database baru. Mongo sungguhan tidak diuji (tanpa akses); produksi perlu dipastikan memakai mode irisan. Sebelum #2347, mode irisan akan kehilangan data ini saat restart (cacat ditemukan dan diperbaiki sebelum ada pemakaian). Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
+   "note": "Tidak memakai PostgreSQL: penyimpanan klinis yang ada (berkas/Mongo) dipakai, tanpa database baru. Kesenjangan Mongo sungguhan yang dahulu belum diuji ditutup oleh #2376; mode irisan produksi teramati sehat. Antrean/drain hanya dalam satu proses, bukan transaksi lintas proses atau pemulihan data lama. Sebelum #2347, mode irisan akan kehilangan data ini saat restart (cacat ditemukan dan diperbaiki sebelum ada pemakaian). Kontrol alur kerja, bukan penilaian klinis; clinically_reviewed tetap false."
   },
   {
    "id": "B3",
@@ -393,10 +394,12 @@
    "evidence": [
     "bodyexposure/qa_reports/gait_foot_slide.json (WALK tumit RMS 24,5 mm; RUN belum terverifikasi)",
     "Basis ukur yang ada (bodyexposure/qa_reports/gait_foot_slide.json, dari Local, belum direproduksi): WALK tumit 1 fase tumpu / 4 bingkai, RMS 24,5 mm, maks 32,5 mm; WALK jari 3 fase / 29 bingkai, RMS 11,2 mm; RUN tumit 1 fase / 3 bingkai, RMS 0,6 mm; RUN jari 0 fase tumpu (tidak terukur)",
-    "src/domains/body-exposure/engine/gaitFootMetrics.ts + scripts/uji/body-gait-foot-metrics.mts: penilaian selip terhadap kriteria eksplisit (placeholder penelitian RMS ≤ 15 mm, maks ≤ 30 mm, ≥ 3 fase tumpu; bukan dari literatur, bukan tervalidasi klinis). Atas data qa_reports yang ada: WALK jari DALAM kriteria; WALK tumit, RUN tumit (masing-masing 1 fase) dan RUN jari (0 fase) TIDAK TERUKUR. Asimetri kiri-kanan (|L−R| dan 100·|L−R|/mean(|L|,|R|)) tersedia, belum ada data kiri/kanan terpisah dari rig."
+    "src/domains/body-exposure/engine/gaitFootMetrics.ts + scripts/uji/body-gait-foot-metrics.mts: penilaian selip terhadap kriteria eksplisit (placeholder penelitian RMS ≤ 15 mm, maks ≤ 30 mm, ≥ 3 fase tumpu; bukan dari literatur, bukan tervalidasi klinis). Atas data qa_reports yang ada: WALK jari DALAM kriteria; WALK tumit, RUN tumit (masing-masing 1 fase) dan RUN jari (0 fase) TIDAK TERUKUR. Asimetri kiri-kanan (|L−R| dan 100·|L−R|/mean(|L|,|R|)) tersedia, belum ada data kiri/kanan terpisah dari rig.",
+    "scripts/qa/glb-foot-contact-reproduce.mjs + bodyexposure/qa_reports/gait_foot_contact_reproduction.{adult_male,vhf_denver_ct_adult_female}.json + scripts/uji/body-gait-foot-contact-reproduction.mts: reproduksi independen dari GLB publik (tanpa Blender), laporan = jalan ulang (deterministik). WALK jari jantan: 2 fase tumpu / 28 bingkai (fase melintasi jahitan loop dihitung SATU kali dan bingkai duplikat dibuang; laporan lama menghitung 3/29), v 1,327 m/s, RMS 12,6 mm, maks 32,2 mm (laporan lama 11,2 / 29,9; selaras). Penanda TUMIT tidak pernah menapak terhadap satu lantai klip di WALK maupun RUN (laporan lama menemukan 1 fase karena lantai per-penanda) sehingga angka tumit 24,5 mm bukan ukuran kontak yang sah. RUN: tanpa fase tumpu berdasarkan penanda; definisi titik terendah memberi 1 fase (3 bingkai). Betina: jari WALK 1 fase (5 bingkai). Definisi sol (simpul terendah) berderau karena identitas simpul berpindah tumit/jari (RMS 57,8 mm) dan tidak dibaca sebagai selip.",
+    "Penanda PLANTAR (simpul terendah di seperempat posterior/anterior kaki pada pose awal; scripts/qa/glb-foot-contact-reproduce.mjs): simpul ekstrem lama berada setinggi pergelangan, bukan telapak. Jantan WALK dengan penanda plantar: tumit 2 fase / 13 bingkai, RMS 7,8 mm, maks 16,6 mm; jari 2 fase / 24 bingkai, RMS 8,7 mm, maks 16,6 mm; tumit lepas lebih dulu daripada jari. Akar: hanya ayunan vertikal (y -0,0615..-0,0108 m), tanpa drift z, loop tertutup. Betina (tulang CT tanpa jaringan telapak): penanda plantar tidak menapak, kontak hanya via titik terendah kaki; RUN: kaki kanan 3 bingkai (<15 mm), kaki kiri hanya 2 bingkai (< minimum 3), jadi tidak terukur. Blender tidak tersedia di sesi ini, jadi tidak ada perubahan rig/mesh; temuan adalah kesalahan metodologi landmark, bukan cacat geometri yang dapat diperbaiki tanpa mengarang struktur."
    ],
    "owner": "Local",
-   "note": "Kriteria kini terdokumen sebagai placeholder penelitian yang bisa diatur, jadi satu ukuran (WALK jari) dapat dinilai; tiga ukuran lain tidak terukur karena fase tumpu terlalu sedikit. Tidak VERIFIED: angka basis belum direproduksi independen dan RUN tidak terukur. Keputusan pemilik: tetapkan atau ganti ambang, dan perbaiki penanda tumit/jari (rig tanpa tulang tumit/jari) atau tambah fase tumpu."
+   "note": "Metodologi landmark dikoreksi: dengan penanda plantar, jantan WALK berada DALAM placeholder penelitian (RMS ≤ 15, maks ≤ 30 mm, ≥ 2 fase); penanda ekstrem lama melampaui maks (32,2 mm) karena bukan titik tumpu. Tetap REPORTED: ambang placeholder belum dibenarkan, rig tanpa tulang tumit/jari (penanda kaku ikut berguling, angka = batas atas), RUN dan betina tidak terukur."
   },
   {
    "id": "D8",
@@ -447,12 +450,15 @@
    "pillar": "Platform Reliability",
    "criterion": "Autentikasi",
    "acceptance": "Akses tanpa identitas ditolak; sesi tidak dapat dipalsukan (tes negatif)",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
-    "server/uji/authAccess.uji.ts"
+    "server/uji/authAccess.uji.ts",
+    "server/uji/authSessionHttp.uji.ts, dipanggil authAccess.uji.ts dalam server npm run uji: server aplikasi nyata, port loopback bebas, dua identitas sintetik tersimpan, berkas sementara dan secret JWT acak. Anonim 401; delapan kelas sesi tidak sah ditolak 401 pada /api/auth/me dan /api/clinical melalui bearer maupun cookie. Sesi Alice/Bob sah membaca identitas tepat; percobaan negatif tidak merusak sesi sah.",
+    "Token dengan identitas Bob diganti tetapi tanda tangan Alice dipertahankan, kunci salah, alg none, kedaluwarsa, malformed, signature terpotong, principal hilang/tidak dikenal semuanya ditolak. Bearer tidak sah tidak jatuh ke cookie sah. NODE_ENV=production menolak dev-login meskipun ALLOW_DEV_LOGIN=true dan tidak mengeluarkan cookie sesi.",
+    "Reproduksi independen AI: fixture HTTP lulus. Tiga sabotase sumber nyata masing-masing gagal dengan asersi bernama: jwt.decode menggantikan jwt.verify; gerbang production dev-login dihapus; fallback cookie setelah bearer tidak sah. Sumber autentikasi produksi dipulihkan tanpa perubahan."
    ],
    "owner": "Sol",
-   "note": "Belum direproduksi oleh Cloud."
+   "note": "Bukti autentikasi sesi internal lewat HTTP nyata; bukan klaim pentest menyeluruh atau verifikasi layanan Google/OTP eksternal. Fixture membatasi data sintetis dan menonaktifkan Mongo/provider email. Penilaian klinis tidak berubah."
   },
   {
    "id": "E2",

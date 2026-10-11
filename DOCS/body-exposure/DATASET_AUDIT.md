@@ -39,6 +39,13 @@ Status date: 2026-10-10. Only facts checked on the source page or repository are
 | Older adult | none found | Imaging collections list ages but no cleared source of age-representative whole-body geometry has been identified. | Remains unavailable. |
 | Female forearm/hand | NLM Visible Human Female | The VHF images cover the whole body; our current segmentation (Denver + CT) does not include forearms and hands. | Candidate: segment them from the original VHF images. Must stay `model_segmented` until reviewed. A male proxy may only be labelled `reference_stand_in`, never female. |
 
+## Older adult source found (2026-10-11)
+| Source | Checked facts | Status |
+|---|---|---|
+| TotalSegmentator dataset v2.0.1 (Zenodo 10047292) | Record states CC BY 4.0; 1,228 CT subjects with reference segmentations of 117 structures and `meta.csv` (age, sex, study type, pathology); 459 subjects are 70 or older. CTs are resampled to 1.5 mm and cropped to the segmented region, so coverage is partial. | Used: subject s0196 (73 y, female) published as a partial individual. Other subjects (for example male) can be added the same way. |
+| ACDC cine MRI | Challenge pages and mirrors disagree (Apache 2.0, MIT, no licence); original terms are research use on registration. | Blocked. |
+| DIR-Lab 4D-CT | No usage terms found. | Blocked. |
+
 ## Local files in ~/Downloads
 - Slicer segmentation-mask folders (~2 GB each, "Final" and "Smoothed"): contents not yet compared with the Denver data already processed.
 - MRI-Male*, CT before/after freezing, Five/Six slices: sample slices of about 100 KB to 18 MB; cannot build 3D anatomy.

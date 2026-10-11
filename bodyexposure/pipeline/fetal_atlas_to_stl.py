@@ -9,7 +9,8 @@ gestasi 25–28 minggu menurut pracetak medRxiv; repositori sendiri tidak menyeb
 Kerangka: header NIfTI RAS (+x kanan subjek, +y anterior, +z superior). Kerangka kanonik master: +X kiri, −Y anterior, +Z superior. Alih-alih mempercayai
 header, tanda tiap sumbu ditetapkan dari anatomi dan dihentikan bila memerlukan cermin: hati harus di kanan subjek dan limpa di kiri (sumbu x), lambung di anterior
 ginjal (sumbu y), paru-paru & timus di atas hati dan hati di atas kandung kemih (sumbu z). Organ berpasangan dipisah kiri/kanan dari komponen terhubung.
-Hanya label organ yang diberi nama di berkas colourmap yang dipakai; berkas parcelasi lobus paru tidak dipakai (nama label tidak disediakan di repositori).
+Default memakai label organ bernama dari colourmap. --source-lung-groups memakai kelompok label paru kiri/kanan yang dipastikan dari skrip resmi SVRTK;
+nama lobus individual belum dipastikan dan tidak diekspor.
 """
 import argparse, json, os, sys
 import numpy as np, nibabel as nib
@@ -19,7 +20,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ct_segmentation_common import _taubin, write_stl
 
 ap = argparse.ArgumentParser(); ap.add_argument("--atlas", required=True); ap.add_argument("--out", required=True)
+ap.add_argument("--source-lung-groups", action="store_true", help="use pinned SVRTK left/right source groups, not a sagittal split")
 a = ap.parse_args()
+if os.path.exists(a.out): raise SystemExit("output already exists; refusing to overwrite")
 img = nib.load(os.path.join(a.atlas, "reo-fetal-t2w-body-atlas-mask-body_organs-10.nii.gz"))
 M = np.rint(np.asarray(img.dataobj)).astype(np.int16); aff = img.affine; vox = np.abs(np.diag(aff)[:3])
 assert nib.aff2axcodes(aff) == ("R", "A", "S") and np.allclose(vox, 0.75, atol=1e-3), "unexpected atlas geometry"
@@ -45,13 +48,19 @@ if not (checks["lungs_above_liver"] and checks["liver_above_bladder"] and checks
 if det < 0: raise SystemExit(f"orientation evidence needs a mirror (det {det}); refusing to build: {checks}")
 prov = {"source": "SVRTK fetal MRI atlas repository, King's College London CDB (CC0 1.0); Uus et al., Sci Rep 14:6637 (2024)", "atlas": "population average, 17 normal fetuses, 3T T2w",
         "voxel_mm": SP, "orientation_header": "RAS", "orientation_checks": checks, "axis_signs_to_canonical": {"x": sx, "y": sy, "z": sz}, "structures": {}}
+lung_masks = None
+if a.source_lung_groups:
+    from fetal_lung_groups import load_groups
+    lung_masks, prov["lung_group_evidence"] = load_groups(a.atlas)
 os.makedirs(a.out, exist_ok=True)
 allv = []
 for l, n in NAMES.items():
     m = M == l; lab, k = label(m); sz_ = np.bincount(lab.ravel())[1:]
     keep = [j + 1 for j, s in enumerate(sz_) if s >= 0.02 * sz_.sum()]               # fragmen < 2 % volume = butiran
     parts = []
-    if l in PAIRED:
+    if l == 1 and lung_masks is not None:
+        parts = [(side, lung_masks[side], "pinned SVRTK source label group; no sagittal split") for side in ("L", "R")]
+    elif l in PAIRED:
         full = np.isin(lab, keep); xs = np.argwhere(full)[:, 0].astype(float)           # indeks x voksel (pasangan kiri/kanan terpisah sepanjang x)
         cs = sorted(keep, key=lambda j: -sz_[j - 1])
         if len(cs) >= 2:
@@ -75,14 +84,24 @@ for l, n in NAMES.items():
     else:
         parts.append((None, np.isin(lab, keep), "single structure"))
     for side, pm, how in parts:
-        V, F, _, _ = marching_cubes(pm.astype(np.uint8), 0.5, spacing=(SP,) * 3)
+        V, F, _, _ = marching_cubes(pm.astype(np.uint8), 0.5, spacing=(SP,) * 3, gradient_direction="ascent")
         V = _taubin(V, F)
         P = nib.affines.apply_affine(aff, V / SP)  # indeks voksel → mm dunia (RAS) lewat afin penuh
         C = np.c_[sx * P[:, 0], sy * P[:, 1], sz * P[:, 2]]
+        tri = C[F] - C[0]
+        signed_volume = float(np.einsum("ij,ij->i", tri[:, 0], np.cross(tri[:, 1], tri[:, 2])).sum() / 6)
+        if not np.isfinite(signed_volume) or signed_volume <= 0:
+            raise SystemExit(f"{n}: outward positive-volume surface required")
         key = f"{n.replace(' ', '_')}{'.' + side if side else ''}"
         write_stl(os.path.join(a.out, key + ".stl"), C, F)
+        with open(os.path.join(a.out, key + ".stl"), "r+b") as stream:
+            stream.write(b"Panacea KCL fetal MRI organ atlas".ljust(80, b" "))
         allv.append(C)
-        prov["structures"][key] = {"label": l, "name": n, "side": side, "volume_cm3": round(float(pm.sum()) * SP ** 3 / 1000, 2), "triangles": int(len(F)), "split": how}
+        prov["structures"][key] = {"label": l, "name": n, "side": side, "volume_cm3": round(float(pm.sum()) * SP ** 3 / 1000, 2), "triangles": int(len(F)), "split": how, "signed_surface_volume_mm3": signed_volume, "surface_winding": "outward; marching_cubes gradient_direction=ascent"}
+        if l == 1 and lung_masks is not None:
+            prov["structures"][key].update({"source_file": prov["lung_group_evidence"]["source_file"],
+                "source_labels": prov["lung_group_evidence"]["source_label_groups"][side],
+                "grouping_source": prov["lung_group_evidence"]["grouping_source"], "individual_lobe_identity": "unresolved"})
 Z = np.vstack(allv)
 prov["bbox_mm_canonical"] = {"min": Z.min(0).round(1).tolist(), "max": Z.max(0).round(1).tolist()}
 json.dump(prov, open(os.path.join(a.out, "provenance.json"), "w"), indent=1)

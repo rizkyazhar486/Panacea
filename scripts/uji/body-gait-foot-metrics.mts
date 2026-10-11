@@ -21,19 +21,20 @@ assert.deepEqual(footAsymmetry(null, s(1)), { ok: false, reason: 'missing' })
 assert.deepEqual(footAsymmetry(s('3' as any), s(1)), { ok: false, reason: 'not_finite' }, 'menolak_string')
 
 // penilaian selip: batas tepat lulus, ±1 langkah gagal
-const ok = { stance_phases: 3, slide_rms_mm: 15, slide_max_mm: 30 }
+const ok = { stance_phases: 2, slide_rms_mm: 15, slide_max_mm: 30 }
 assert.equal(evaluateFootSlide(ok, C).status, 'within', 'menerima_tepat_di_batas')
 assert.deepEqual(evaluateFootSlide({ ...ok, slide_rms_mm: 15.1 }, C), { status: 'exceeds', criteria: C, failed: ['rms'] })
 assert.deepEqual(evaluateFootSlide({ ...ok, slide_max_mm: 30.1 }, C), { status: 'exceeds', criteria: C, failed: ['peak'] })
 assert.deepEqual((evaluateFootSlide({ ...ok, slide_rms_mm: 99, slide_max_mm: 99 }, C) as any).failed, ['rms', 'peak'])
 // statistik tipis / data hilang = tidak terukur, bukan lulus
-assert.equal((evaluateFootSlide({ ...ok, stance_phases: 2 }, C) as any).reason, 'too_few_phases')
-assert.equal(evaluateFootSlide({ ...ok, stance_phases: 3 }, C).status, 'within', 'pasangan: hanya jumlah fase berbeda')
+assert.equal((evaluateFootSlide({ ...ok, stance_phases: 1 }, C) as any).reason, 'too_few_phases')
+assert.equal(evaluateFootSlide({ ...ok, stance_phases: 2 }, C).status, 'within', 'pasangan: hanya jumlah fase berbeda (batas bawah 2)')
+assert.equal(C.minStancePhases, 2, 'satu siklus tertutup hanya punya satu fase tumpu per kaki')
 assert.equal((evaluateFootSlide({ stance_phases: 0 }, C) as any).reason, 'no_stance')
 assert.equal((evaluateFootSlide(null, C) as any).reason, 'no_stance')
-assert.equal((evaluateFootSlide({ stance_phases: 3, slide_rms_mm: 1 }, C) as any).reason, 'missing_values')
-assert.equal((evaluateFootSlide({ stance_phases: 3, slide_rms_mm: NaN, slide_max_mm: 1 }, C) as any).reason, 'missing_values')
-assert.equal((evaluateFootSlide({ stance_phases: 3, slide_rms_mm: -1, slide_max_mm: 1 }, C) as any).reason, 'missing_values')
+assert.equal((evaluateFootSlide({ stance_phases: 2, slide_rms_mm: 1 }, C) as any).reason, 'missing_values')
+assert.equal((evaluateFootSlide({ stance_phases: 2, slide_rms_mm: NaN, slide_max_mm: 1 }, C) as any).reason, 'missing_values')
+assert.equal((evaluateFootSlide({ stance_phases: 2, slide_rms_mm: -1, slide_max_mm: 1 }, C) as any).reason, 'missing_values')
 assert.equal((evaluateFootSlide(ok, { ...C, provenance: '' }) as any).reason, 'invalid_criteria')
 assert.equal((evaluateFootSlide(ok, { ...C, maxRmsMm: NaN }) as any).reason, 'invalid_criteria')
 assert.match(C.provenance, /not clinically validated/)
