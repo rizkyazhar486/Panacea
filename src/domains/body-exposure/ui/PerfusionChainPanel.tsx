@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../../../components/ui/Prosa'
 import {
   DISPLAY_SCALE, EMPTY_SCENARIO, SCENARIO_LABEL, barFraction, evaluatePerfusionScenario,
   type PerfusionScenarioResult, type ScenarioFieldId, type ScenarioText,
@@ -96,7 +95,7 @@ export function PerfusionChainPanel() {
           </div>
         )}
       </div>
-      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Relations: CO = HR × (EDV − ESV); MAP = CO × SVR / 80 + CVP; CPP = MAP − ICP. Sources: NCBI Bookshelf NBK470455, NBK556075, NBK538226, NBK537271.</Prosa>
+      <p className="mt-2 text-[11px] text-neutral-500">Relations: CO = HR × (EDV − ESV); MAP = CO × SVR / 80 + CVP; CPP = MAP − ICP; sources: NCBI Bookshelf NBK470455, NBK556075, NBK538226, NBK537271.</p>
     </details>
   )
 }

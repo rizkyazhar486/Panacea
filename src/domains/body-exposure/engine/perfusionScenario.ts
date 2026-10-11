@@ -1,9 +1,13 @@
 // Skenario what-if untuk rantai jantung -> tekanan arteri rata-rata -> tekanan perfusi serebral.
 // Murni: tanpa DOM/jaringan. Semua masukan kosong sampai diisi; tidak ada nilai bawaan, rentang normal, atau status klinis.
 import { curahJantung, isiSekuncup } from '../../../lib/hemodinamik'
-import { parseNumberField } from '../../clinical-calculators/engine/inputs'
 import { deriveCerebralPerfusionPressure } from '../../../lib/physiology/cerebralPerfusionCoupling'
 import { deriveMeanArterialPressure } from '../../../lib/physiology/pressureFlowCoupling'
+
+/** Kolom kosong atau spasi menjadi NaN (bukan 0), sehingga "belum diisi" tidak pernah terbaca sebagai nilai sah. */
+function parseNumberField(text: string): number {
+  return text.trim() === '' ? Number.NaN : Number(text)
+}
 
 export type ScenarioFieldId = 'hr' | 'edv' | 'esv' | 'svr' | 'cvp' | 'icp'
 export type ScenarioText = Record<ScenarioFieldId, string>
