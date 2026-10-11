@@ -1,3 +1,9 @@
+### Lab/referral HTTP authorization implementation — 2026-10-11
+
+- Follows serialized #2390 → #2396 → #2383 → #2397. New fixture extends the mandatory existing hasilLab suite with nine actual HTTP route decisions, stored own/foreign patient data, effective unverified doctor limits, owner-versus-clinician separation, authenticated provenance and exact no-mutation assertions for all rejected calls. No runtime route, role or clinical threshold changes.
+- Targeted/full server suites, typecheck/build and strict fixture typecheck passed. Temporarily admitting every same-tenant patient in actual service ownership code failed the populated-subject exclusion assertion; source restored before clean target. Final synchronized candidate receives mandatory automated CI; E2 remains REPORTED with lab-log/share/care consent routes still outstanding.
+- No AI review round or human clinical acceptance is claimed. Existing resources and measurements remain intact. Deployment is pending through the configured GitHub release route; Vercel connector has scope 403, so direct connector deployment is unavailable. No future background execution is implied.
+
 ### Populated clinical-patient authorization regression — 2026-10-11
 
 - This test-only increment follows #2390 → #2396 → #2383; its candidate contains their exact implementations before automated CI. It preserves the existing 15-route clinical matrix and verifies an actually populated private p1, two independent self identities, reciprocal read/write denials and clinician-issued link access restricted to its redeeming account. Authorized before/after reads assert rejected writes preserve exact records.
