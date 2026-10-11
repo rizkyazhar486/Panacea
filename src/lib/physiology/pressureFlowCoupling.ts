@@ -49,6 +49,16 @@ function combine(...parts: Array<number | null>): number | null {
   return parts.every((part): part is number => part !== null) ? Math.hypot(...parts) : null
 }
 
+/** MAP = CO × SVR / 80 + CVP, with CO in L/min, SVR in dyn·s/cm⁵ and CVP in mmHg. Throws on inputs the identity cannot honestly support. */
+export function deriveMeanArterialPressure(cardiacOutputLMin: number, svrDynSCm5: number, cvpMmHg: number): number {
+  if (!(cardiacOutputLMin > 0) || !(svrDynSCm5 > 0) || !Number.isFinite(cvpMmHg)) {
+    throw new Error(`pressure-flow input outside supported bounds: CO=${cardiacOutputLMin}, SVR=${svrDynSCm5}, CVP=${cvpMmHg}`)
+  }
+  const map = (cardiacOutputLMin * svrDynSCm5) / WOOD_TO_DYNE_SECOND_CM5 + cvpMmHg
+  if (!Number.isFinite(map) || map <= 0) throw new Error('mean arterial pressure is not a positive finite value for these inputs')
+  return map
+}
+
 export function meanArterialPressureEngine(): DomainEngineContract<StepState> {
   return {
     id: 'hemodynamics.mean-arterial-pressure',
@@ -69,11 +79,7 @@ export function meanArterialPressureEngine(): DomainEngineContract<StepState> {
       const co = need(inputs, 'cardio.cardiac_output')
       const svr = need(inputs, 'systemic.vascular_resistance')
       const cvp = need(inputs, 'venous.central_pressure')
-      if (!(co.value > 0) || !(svr.value > 0) || !Number.isFinite(cvp.value)) {
-        throw new Error(`pressure-flow input outside supported bounds: CO=${co.value}, SVR=${svr.value}, CVP=${cvp.value}`)
-      }
-      const map = (co.value * svr.value) / WOOD_TO_DYNE_SECOND_CM5 + cvp.value
-      if (!Number.isFinite(map) || map <= 0) throw new Error('mean arterial pressure is not a positive finite value for these inputs')
+      const map = deriveMeanArterialPressure(co.value, svr.value, cvp.value)
       const sigma = combine(
         co.sigma === null ? null : (svr.value / WOOD_TO_DYNE_SECOND_CM5) * co.sigma,
         svr.sigma === null ? null : (co.value / WOOD_TO_DYNE_SECOND_CM5) * svr.sigma,

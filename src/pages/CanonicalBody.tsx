@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, FetalGrowthPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
+import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, FetalGrowthPanel, PerfusionChainPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { searchStructures } from '../domains/body-exposure'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
@@ -1128,6 +1128,7 @@ export function CanonicalBody() {
       </Card>
 
       <FetalGrowthPanel baseUrl={BASE} />
+      <PerfusionChainPanel />
       <OpenCellPanel baseUrl={BASE} />
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
