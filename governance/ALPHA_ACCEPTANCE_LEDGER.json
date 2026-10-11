@@ -56,10 +56,12 @@
    "pillar": "Panacea One OS",
    "criterion": "Anamnesis tercatat dengan provenance",
    "acceptance": "Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+       "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "REPORTED, not VERIFIED, because two parts of the acceptance are not met as written. (1) Versioning applies only to SIGNED records: an unsigned draft is edited in place and nothing is archived, so 'a change creates a new version, not an overwrite' is not true for drafts. (2) Provenance for non-clinician or AI-declared answers (asal 'AI') has a source and time but no author id (no olehId), so 'author' is present only for clinician-authored answers; a patient edit is labelled and archives the signed version it replaced, but the patient's identity is recorded on the archive (diarsipkanOleh), not on the answer. Decision for the ledger owner: either accept these as the intended model and promote, or change the runtime (version drafts; record the author id for patient/AI answers) and re-test. Not covered: Mongo mode, UI, AI-draft generation paths."
   },
   {
    "id": "A4",
