@@ -14,6 +14,10 @@ yarn-error.log*
 /public/build-info.json
 /public/build-info.json.tmp
 /.vercel/
+# Literal entries the Vercel CLI looks for. Without them `vercel link`/`vercel pull` append them to this file, which dirties
+# the release checkout and makes scripts/write-frontend-build-info.mjs refuse to build.
+.vercel
+.env*.local
 
 # backend
 server/data.json
