@@ -1,3 +1,5 @@
 export { readPersonalHealthStorageScope } from './adapters/storageScope.ts'
 export { runPersonalHealthOperation, capturePersonalHealthOperation } from './adapters/operation.ts'
 export { readPersonalHealthFile, readPersonalHealthImage } from './adapters/fileImport.ts'
+export { coffeeFluidMl, fastingElectrolytes, COFFEE_CUPS_MAX, FASTING_HOURS_MAX } from './engine/fastingHydration.ts'
+export type { NutritionEstimate } from './engine/fastingHydration.ts'
