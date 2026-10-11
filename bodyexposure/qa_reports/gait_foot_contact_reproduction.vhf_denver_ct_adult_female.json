@@ -1,0 +1,79 @@
+{
+ "method": "single clip-wide floor; heel/toe = extreme vertices at rest pose; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)",
+ "contact_threshold_mm": 15,
+ "clips": {
+  "RUN": {
+   "frames": 18,
+   "loop_closed_duplicate_end_frame_dropped": true,
+   "floor_m": -0.0005,
+   "heel": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    }
+   },
+   "toe": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    }
+   },
+   "sole": {
+    "stance_phases": 1,
+    "stance_frames": 3,
+    "common_forward_speed_m_s": 2.57,
+    "slide_rms_mm": 7.5,
+    "slide_max_mm": 10.6,
+    "phases_by_side": {
+     "L": [],
+     "R": [
+      "8-10"
+     ]
+    }
+   }
+  },
+  "WALK": {
+   "frames": 26,
+   "loop_closed_duplicate_end_frame_dropped": true,
+   "floor_m": -0.0006,
+   "heel": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    }
+   },
+   "toe": {
+    "stance_phases": 1,
+    "stance_frames": 5,
+    "common_forward_speed_m_s": 1.254,
+    "slide_rms_mm": 14,
+    "slide_max_mm": 26,
+    "phases_by_side": {
+     "L": [],
+     "R": [
+      "18-22"
+     ]
+    }
+   },
+   "sole": {
+    "stance_phases": 3,
+    "stance_frames": 31,
+    "common_forward_speed_m_s": 0.866,
+    "slide_rms_mm": 41.8,
+    "slide_max_mm": 83.5,
+    "phases_by_side": {
+     "L": [
+      "23-25+0-10"
+     ],
+     "R": [
+      "5-8",
+      "10-22"
+     ]
+    }
+   }
+  }
+ }
+}
