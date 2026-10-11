@@ -210,6 +210,7 @@ try {
   if (viewport.documentScrollWidth > viewport.width + 2) throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
 
   const vessels = page.getByRole('button', { name: /^Vessels\b/ }).first()
+  await revealInViewport(vessels, 'Vessels layer control')
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveState = await progressiveLoading.evaluate((node) => {
