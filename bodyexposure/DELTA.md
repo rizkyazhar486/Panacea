@@ -275,3 +275,16 @@ All 12 populated bodies pass (2 adults + 10 paediatric). See QA.md.
 - Not done: individual hand bones, rig/motion for the arms (motion stays pelvis, legs and feet only).
 ## Ontology crosswalk (Uberon / FMA)
 - New `engine/ontologyCrosswalk.ts` (fail-closed: empty or malformed ids and conflicting rows are rejected), `pipeline/publish_ontology_crosswalk.mjs`, published `ontology.adult_female.json` (618 of 841 structures) and an "Ontology:" line in the structure panel. Tests: `scripts/qa/ontology-crosswalk.test.mjs`.
+
+## Nervous-system atlas module (ATLAS.NERVOUS.MNI152)
+- New `pipeline/build_nervous_mni_module.py` builds a separate template module from the public edition of the Clinical Neuroanatomy Atlas (556 structures, CC BY-SA 4.0 with per-mesh sources), in MNI152 coordinates and not registered to any body. Axis mapping is verified per structure against the atlas manifest bounding boxes. `check_web_budget.py` reads `ATLAS_ON` for atlas modules (initial load 68.9k triangles) and `export_web_lods.py` carries the module budgets. The viewer gets a "Nervous atlas (MNI)" tab and labels for the extra systems. Tests: `scripts/qa/nervous-atlas-module.test.mjs`.
+- Left out on licence grounds: 30 FreeSurfer aseg label meshes (no licence stated for the label file). Left out for viewing: the opaque brain envelope.
+## Respiratory motion and missing-data states
+- `pipeline/respiratory_4dlung.py` derives a breathing model from TCIA 4D-Lung (CC BY 3.0; 4 of 6 cases pass the checks) into `public/bodyexposure/respiration_model.json`; `engine/respiratoryMotion.ts` validates it fail-closed and samples it periodically; the viewer has a "Breathing" button for adult bodies with lungs. ACDC and DIR-Lab stay blocked until their terms are verified.
+- `engine/dataGaps.ts` and the "What is missing and why" disclosure state what is not available (heartbeat, pregnancy, older adult, fetal skeleton/skin, individual hand bones, right forearm near the elbow, clinical review) instead of showing a scaled or invented substitute.
+
+## Older adult (individual, partial)
+- New `tsd_classes.py`, `tsd_masks_to_stl.py`, `build_tsd_body.py`: one 73-year-old woman from the TotalSegmentator dataset (CC BY 4.0), 111 structures, partial body (neck to upper thighs, a cut piece of the skull), registered as the variant of `HUMAN.OLDER_ADULT`. The data-gaps list now says what is still missing for older adults.
+
+## Older adult: second individual (male, 72 y)
+- Subject s0327 of the TotalSegmentator dataset added as the second variant of `HUMAN.OLDER_ADULT` (108 structures, lower neck to upper thighs). The class map is sex-aware (prostate only for men); the builder allows a 20 mm midline tolerance for midline-crossing structures. No whole-body or head-inclusive older adult exists yet.

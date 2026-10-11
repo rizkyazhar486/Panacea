@@ -43,7 +43,9 @@ export interface FootSlideCriteria {
 export const RESEARCH_FOOT_SLIDE_CRITERIA: FootSlideCriteria = {
   maxRmsMm: 15,
   maxPeakMm: 30,
-  minStancePhases: 3,
+  // Satu siklus WALK/RUN tertutup memuat tepat satu fase tumpu per kaki (fase yang melintasi jahitan loop dihitung SATU kali), jadi 2 adalah
+  // jumlah terbanyak yang mungkin dari satu siklus; 3 tidak pernah tercapai. Nilai 2 = kedua kaki terwakili.
+  minStancePhases: 2,
   provenance: 'engineering research placeholder; not from literature; not clinically validated',
 }
 
