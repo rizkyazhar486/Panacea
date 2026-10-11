@@ -27,6 +27,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -36,12 +38,18 @@ jobs:
           npm init -y >/dev/null
           npm install playwright@1.55.1 >/dev/null
           npx playwright install --with-deps chromium
+      - name: Resolve canonical main revision
+        id: main
+        run: |
+          git fetch --no-tags origin main
+          echo "sha=$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
       - name: Run production check
         id: check
         env:
           PROD_URL: ${{ github.event.inputs.prod_url || 'https://panaceamed.id' }}
           PROD_API_URL: ${{ vars.VITE_API_URL }}
-          EXPECT_SHA: ${{ github.sha }}
+          # Revisi main kanonik, bukan github.sha (pada pull_request itu adalah merge commit PR, bukan yang dideploy)
+          EXPECT_SHA: ${{ steps.main.outputs.sha }}
           OUT: production-check
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/pw/node_modules/playwright/index.mjs
         run: |
