@@ -217484,20 +217484,20 @@
    "panacea_source_raw_name": "gallbladder",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0196,
-    -0.0178,
+    -0.0182,
     0.032
    ],
    "bbox_max_m": [
     -0.0052,
-    0.001,
+    0.0007,
     0.0496
    ],
    "material": "PAN_Gallbladder",
@@ -217521,20 +217521,20 @@
    "panacea_source_raw_name": "liver",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0338,
-    -0.0314,
+    -0.0317,
     0.0306
    ],
    "bbox_max_m": [
     0.0338,
-    0.0277,
+    0.0274,
     0.0735
    ],
    "material": "PAN_Organ",
@@ -217558,20 +217558,20 @@
    "panacea_source_raw_name": "stomach",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     0.0074,
-    -0.0126,
+    -0.0129,
     0.041
    ],
    "bbox_max_m": [
     0.0301,
-    0.0204,
+    0.0201,
     0.0697
    ],
    "material": "PAN_Intestine",
@@ -217595,20 +217595,20 @@
    "panacea_source_raw_name": "adrenal glands",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     0.0105,
-    0.0165,
+    0.0162,
     0.0517
    ],
    "bbox_max_m": [
     0.0187,
-    0.0243,
+    0.0239,
     0.0556
    ],
    "material": "PAN_Gland",
@@ -217632,20 +217632,20 @@
    "panacea_source_raw_name": "adrenal glands",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0151,
-    0.0143,
+    0.014,
     0.0509
    ],
    "bbox_max_m": [
     -0.0054,
-    0.0235,
+    0.0232,
     0.0587
    ],
    "material": "PAN_Gland",
@@ -217669,20 +217669,20 @@
    "panacea_source_raw_name": "spleen",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     0.0122,
-    0.0082,
+    0.0079,
     0.0494
    ],
    "bbox_max_m": [
     0.032,
-    0.0271,
+    0.0268,
     0.0669
    ],
    "material": "PAN_Lymph",
@@ -217706,20 +217706,20 @@
    "panacea_source_raw_name": "thymus",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0113,
-    -0.0181,
+    -0.0184,
     0.0838
    ],
    "bbox_max_m": [
     0.0174,
-    -0.0008,
+    -0.0011,
     0.1005
    ],
    "material": "PAN_Lymph",
@@ -217737,32 +217737,37 @@
    "panacea_system": "respiratory",
    "panacea_kind": "organ",
    "panacea_laterality": "left",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
+   "panacea_laterality_source": "pinned_svrtk_source_label_group_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz; source labels [1, 2]; grouping https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
    "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
    "panacea_source_raw_name": "lungs",
+   "panacea_source_labels": [
+    1,
+    2
+   ],
+   "panacea_source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left/right lungs use source label groups; individual lobe identity remains unresolved; the multi-region and older organ masks differ; organs only.",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
-    0.0021,
-    -0.0241,
-    0.059
+    -0.0001,
+    -0.0206,
+    0.0591
    ],
    "bbox_max_m": [
-    0.0309,
-    0.0309,
-    0.1026
+    0.0316,
+    0.0313,
+    0.1032
    ],
    "material": "PAN_Lung",
    "mesh": {
-    "verts": 11376,
-    "tris": 22744,
+    "verts": 13616,
+    "tris": 27248,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -217774,32 +217779,38 @@
    "panacea_system": "respiratory",
    "panacea_kind": "organ",
    "panacea_laterality": "right",
-   "panacea_laterality_source": "connected_component_or_plane_verified_by_geometry",
-   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; label 1 (lungs)",
+   "panacea_laterality_source": "pinned_svrtk_source_label_group_verified_by_geometry",
+   "panacea_source": "SVRTK fetal MRI atlas repository (King's College London, Centre for the Developing Brain); Uus et al., Sci Rep 14:6637 (2024), doi:10.1038/s41598-024-57087-x; reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz; source labels [3, 4, 5]; grouping https://github.com/SVRTK/auto-proc-svrtk/blob/7d75fa96162245326f7046bb4df0a41cdeaf7f5c/scripts/auto-reporting-lung-volumetry-html.py#L162-L167",
    "panacea_license": "CC0 1.0 Universal (repository); article CC BY 4.0",
    "panacea_source_raw_name": "lungs",
+   "panacea_source_labels": [
+    3,
+    4,
+    5
+   ],
+   "panacea_source_file": "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
-   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left and right lungs are one connected label and are split at a sagittal plane; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
+   "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; left/right lungs use source label groups; individual lobe identity remains unresolved; the multi-region and older organ masks differ; organs only.",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
-    -0.0301,
-    -0.024,
-    0.0607
+    -0.0308,
+    -0.0229,
+    0.0606
    ],
    "bbox_max_m": [
-    0.0024,
-    0.0314,
-    0.1042
+    0.0028,
+    0.0317,
+    0.1043
    ],
    "material": "PAN_Lung",
    "mesh": {
-    "verts": 14960,
-    "tris": 29924,
+    "verts": 15903,
+    "tris": 31834,
     "boundary_edges": 0,
     "nonmanifold_edges": 0
    }
@@ -217817,20 +217828,20 @@
    "panacea_source_raw_name": "bladder",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0092,
-    -0.0162,
+    -0.0166,
     0.0
    ],
    "bbox_max_m": [
     0.0097,
-    0.0027,
+    0.0024,
     0.0276
    ],
    "material": "PAN_Organ",
@@ -217854,20 +217865,20 @@
    "panacea_source_raw_name": "kidney parenchyma",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     0.0089,
-    0.01,
+    0.0096,
     0.0202
    ],
    "bbox_max_m": [
     0.0271,
-    0.0295,
+    0.0292,
     0.0518
    ],
    "material": "PAN_Organ",
@@ -217891,20 +217902,20 @@
    "panacea_source_raw_name": "kidney parenchyma",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0264,
-    0.0084,
+    0.0081,
     0.0256
    ],
    "bbox_max_m": [
     -0.0059,
-    0.0296,
+    0.0292,
     0.0557
    ],
    "material": "PAN_Organ",
@@ -217928,20 +217939,20 @@
    "panacea_source_raw_name": "kidney pelvis",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     0.0114,
-    0.0166,
+    0.0163,
     0.0299
    ],
    "bbox_max_m": [
     0.0196,
-    0.0243,
+    0.024,
     0.0459
    ],
    "material": "PAN_Duct",
@@ -217965,20 +217976,20 @@
    "panacea_source_raw_name": "kidney pelvis",
    "panacea_accuracy_status": "source_backed",
    "panacea_review_status": "review_required",
-   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with volume-preserving smoothing",
+   "panacea_method": "organ parcellation of a population-average T2w MRI atlas (King's College London), marching-cubes surface with Taubin smoothing",
    "panacea_known_limitations": "Population-average atlas label, not any real fetus; one 3T T2w protocol; organs only.",
-   "panacea_version": "body_v014",
+   "panacea_version": "body_v016",
    "biological_sex_applicability": "unspecified",
    "panacea_individual": "Population-average atlas of 17 normal fetuses (3T T2-weighted MRI, 25 to 28 weeks gestational age according to the preprint), not an individual. Organs only: no skeleton, skin, brain, heart or gut. Not clinically reviewed.",
    "panacea_clinically_reviewed": false,
    "bbox_min_m": [
     -0.0196,
-    0.0144,
+    0.0141,
     0.0317
    ],
    "bbox_max_m": [
     -0.0098,
-    0.0243,
+    0.024,
     0.0495
    ],
    "material": "PAN_Duct",

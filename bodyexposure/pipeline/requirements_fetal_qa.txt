@@ -1,0 +1,5 @@
+# Reproduksi audit MRI/QA; lingkungan terpisah dari Blender dan Claude.
+numpy==2.5.4
+scipy==1.18.1
+nibabel==5.4.2
+scikit-image==0.26.0
