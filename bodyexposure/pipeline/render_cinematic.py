@@ -19,6 +19,7 @@ from mathutils import Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from render_artifacts import claim_output, fingerprint, process_memory, verify_unchanged
+from render_camera import frame_visible_meshes
 
 PROFILES = {
     'preview': (960, 540, 32, 0.10),
@@ -81,6 +82,7 @@ def main():
     parser.add_argument('--lighting', choices=('original', 'studio'), default='original')
     parser.add_argument('--exposure', type=float, help='AgX exposure; studio defaults to -1.5 EV')
     parser.add_argument('--hdri', type=Path)
+    parser.add_argument('--frame-visible', action='store_true', help='Fit the existing viewing direction to visible meshes only')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
     if not 1 <= args.scale <= 100 or (args.samples is not None and args.samples < 1) or not math.isfinite(args.time_limit) or args.time_limit < 0:
         parser.error('scale must be 1..100; samples must be positive; time limit must be nonnegative')
@@ -94,6 +96,8 @@ def main():
         parser.error('Load a saved source BLEND file before rendering')
     staging_script = Path(__file__).with_name('render_body_file.py' if args.bench == 'body-qa' else 'render_benchmarks.py')
     input_artifacts = [fingerprint(bpy.data.filepath), fingerprint(__file__), fingerprint(staging_script)]
+    if args.frame_visible:
+        input_artifacts.append(fingerprint(Path(__file__).with_name('render_camera.py')))
     if args.hdri:
         input_artifacts.append(fingerprint(args.hdri))
     output = claim_output(args.out)
@@ -148,6 +152,7 @@ def main():
             background = next(n for n in world.node_tree.nodes if n.type == 'BACKGROUND')
             world.node_tree.links.new(environment.outputs['Color'], background.inputs['Color'])
         visible = [o for o in scene.objects if o.type == 'MESH' and not o.hide_render]
+        camera_framing = frame_visible_meshes(scene, visible) if args.frame_visible else None
         audit = {
             'visible_meshes': len(visible),
             'source_polygons': sum(len(o.data.polygons) for o in visible),
@@ -229,6 +234,7 @@ def main():
             'device_backend': args.device, 'devices': devices,
             'hdri': str(args.hdri.resolve()) if args.hdri else None,
             'audit': audit, 'renders': records,
+            'camera_framing': camera_framing,
             'limitations': ['UV absence is informational for procedural materials.',
                              'No anatomical validation, deformation or browser FPS measurement performed.',
                              'RSS is the OS process-lifetime high-water mark, not GPU memory or per-frame allocation.',
