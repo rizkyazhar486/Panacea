@@ -1,0 +1,615 @@
+{
+  "purpose": "source_mri_display_context",
+  "clinical_validation": "pending",
+  "anatomical_identity": "unresolved",
+  "source": "https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas",
+  "source_revision": "74f11a186c709078d712bb2fd827bfa2b36e3407",
+  "license": "CC0-1.0",
+  "source_sha256": {
+    "t2": "75e234afd07b8dc8279b94f9d3ee2469cadaa4dec5e0df1ba6a1da96bcb92dcb",
+    "regions": "5d81b6f91bcc2a6d6e64dfcd97a3099cfdc30cd9826f29d297b3c6983aceee54"
+  },
+  "segmentation_manifest_sha256": "8e78884be6eba7de5b9a5c8e52970dd1359065a155d26283ef1594f37cbac39d",
+  "shape": [
+    245,
+    275,
+    304
+  ],
+  "affine_ras_mm": [
+    [
+      0.7499985567652254,
+      0.0011532524191133458,
+      -0.0009137061544488177,
+      -91.51939392089844
+    ],
+    [
+      -0.0011480295192004602,
+      0.7499869518934299,
+      0.004272472097636888,
+      -103.25543212890625
+    ],
+    [
+      0.0009202599099780403,
+      -0.004271065260546906,
+      0.7499872739741911,
+      -113.15020751953125
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mask_affine_ras_mm": [
+    [
+      0.7499985567651187,
+      0.0011532524195746957,
+      -0.0009137062414913667,
+      -91.51939392089844
+    ],
+    [
+      -0.001148029518737503,
+      0.7499869518914407,
+      0.004272472446945262,
+      -103.25543212890625
+    ],
+    [
+      0.0009202599975564008,
+      -0.004271065609721327,
+      0.749987273972095,
+      -113.15020751953125
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "crop_ijk_min": [
+    72,
+    88,
+    139
+  ],
+  "crop_ijk_max_exclusive": [
+    175,
+    181,
+    226
+  ],
+  "display_intensity_percentiles": [
+    1,
+    99
+  ],
+  "display_intensity_window": [
+    29.0,
+    4712.0
+  ],
+  "sampling": "native source-grid slices; no resampling; 8-bit display window only",
+  "overlay_alpha_selected": 0.55,
+  "overlay_alpha_other_labels": 0.18,
+  "regions": [
+    {
+      "source_label": 1,
+      "voxels": 13716,
+      "representative_voxel_ijk": [
+        97,
+        138,
+        185
+      ],
+      "point_ras_mm": [
+        -18.779420719406957,
+        0.9218157070874611,
+        25.09729637100648
+      ],
+      "images": [
+        {
+          "asset": "region-01-i.png",
+          "axis": 0,
+          "index": 97,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9782,
+          "sha256": "148da883002244962cf586fe55af081a50bc63959a63748ea05f93e7a9c766db"
+        },
+        {
+          "asset": "region-01-j.png",
+          "axis": 1,
+          "index": 138,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10077,
+          "sha256": "48217ec1fe6f7bdd56941a866068993bcdbd990192a664d6b8903612732df666"
+        },
+        {
+          "asset": "region-01-k.png",
+          "axis": 2,
+          "index": 185,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 11871,
+          "sha256": "3fe4040753f0b632bf5b2a773fb7f3706fd6b3b03c68005c35cb311272eafa0d"
+        }
+      ]
+    },
+    {
+      "source_label": 2,
+      "voxels": 22618,
+      "representative_voxel_ijk": [
+        102,
+        117,
+        174
+      ],
+      "point_ras_mm": [
+        -15.043595468683264,
+        -14.880647623344572,
+        16.941730027311763
+      ],
+      "images": [
+        {
+          "asset": "region-02-i.png",
+          "axis": 0,
+          "index": 102,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9783,
+          "sha256": "4ab42a8a74ad95893debbad18d09a31ca83239c285ff298f5471a31e2d185d53"
+        },
+        {
+          "asset": "region-02-j.png",
+          "axis": 1,
+          "index": 117,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9904,
+          "sha256": "ae52cca97546e3c25d0b2e3cb00a0471e63c896ce031a877fa8df6fac69ce167"
+        },
+        {
+          "asset": "region-02-k.png",
+          "axis": 2,
+          "index": 174,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 11931,
+          "sha256": "776c246cde6842ea284e25f4db422311bd67dec54a8bffd64a61eb05af154271"
+        }
+      ]
+    },
+    {
+      "source_label": 3,
+      "voxels": 25573,
+      "representative_voxel_ijk": [
+        141,
+        118,
+        175
+      ],
+      "point_ras_mm": [
+        14.206587791425179,
+        -14.171161350602333,
+        17.723336372514552
+      ],
+      "images": [
+        {
+          "asset": "region-03-i.png",
+          "axis": 0,
+          "index": 141,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10072,
+          "sha256": "ea5f8baa0215712a03b168bcb258dbf4373e747d579692236db2282314a6e7b0"
+        },
+        {
+          "asset": "region-03-j.png",
+          "axis": 1,
+          "index": 118,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10131,
+          "sha256": "91f08e3dd4a273c28aa1ceda996f3f007cdc7ed84c38993218f2d5e1bf6b57fa"
+        },
+        {
+          "asset": "region-03-k.png",
+          "axis": 2,
+          "index": 175,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 11916,
+          "sha256": "a887b023aac5b36bfd9d41c63ada866d0225c7fc48005ee6eddf6f3672b3201e"
+        }
+      ]
+    },
+    {
+      "source_label": 4,
+      "voxels": 12251,
+      "representative_voxel_ijk": [
+        141,
+        135,
+        195
+      ],
+      "point_ras_mm": [
+        14.20791895946114,
+        -1.3359337264612918,
+        32.65047374256909
+      ],
+      "images": [
+        {
+          "asset": "region-04-i.png",
+          "axis": 0,
+          "index": 141,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10100,
+          "sha256": "591d82fd8e68efaf2e2e15aeb5376d6b02f534af4b004c09f58914c14bd697ac"
+        },
+        {
+          "asset": "region-04-j.png",
+          "axis": 1,
+          "index": 135,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10197,
+          "sha256": "dd799738022cad7f88632c4f740856e0ad84c852f9a11a24b9efcf09b1748fda"
+        },
+        {
+          "asset": "region-04-k.png",
+          "axis": 2,
+          "index": 195,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 11154,
+          "sha256": "eb53775b339e8f29893878f5354138acaaef2c0425caf7cfbe82e3cbf4744c82"
+        }
+      ]
+    },
+    {
+      "source_label": 5,
+      "voxels": 10102,
+      "representative_voxel_ijk": [
+        144,
+        151,
+        174
+      ],
+      "point_ras_mm": [
+        16.495554497706053,
+        10.570691501225625,
+        16.83516472467224
+      ],
+      "images": [
+        {
+          "asset": "region-05-i.png",
+          "axis": 0,
+          "index": 144,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10071,
+          "sha256": "9652849a91e768ae50851d1249effb426d6fa12dc6ec62d8a3d9aa84fc788447"
+        },
+        {
+          "asset": "region-05-j.png",
+          "axis": 1,
+          "index": 151,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9200,
+          "sha256": "849ac3f1b61d71060ee356deb4f457f4cf7d5eb438d8929441598f6aca3b9e89"
+        },
+        {
+          "asset": "region-05-k.png",
+          "axis": 2,
+          "index": 174,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 12201,
+          "sha256": "5f60092e8b8bd9aa5909eefe97e1e211b9f6a8eaa17a8efe72491e2a317ab6b6"
+        }
+      ]
+    },
+    {
+      "source_label": 6,
+      "voxels": 6698,
+      "representative_voxel_ijk": [
+        121,
+        152,
+        196
+      ],
+      "point_ras_mm": [
+        -0.7733605908728975,
+        11.441077518208658,
+        33.309447708914405
+      ],
+      "images": [
+        {
+          "asset": "region-06-i.png",
+          "axis": 0,
+          "index": 121,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 11457,
+          "sha256": "0242d6befb30d1fc5c50ade1f8b65ea9ac4703f6a06bdbb16303925b1c2d3768"
+        },
+        {
+          "asset": "region-06-j.png",
+          "axis": 1,
+          "index": 152,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9066,
+          "sha256": "32be6f813bbd74ef1c558b83554a98441088e788b606e8da539181d58f34ce37"
+        },
+        {
+          "asset": "region-06-k.png",
+          "axis": 2,
+          "index": 196,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 10901,
+          "sha256": "4907af18421990341fe016fe8101710c4ea34ad3f887d8d6a146c8b6da70a15c"
+        }
+      ]
+    },
+    {
+      "source_label": 7,
+      "voxels": 46061,
+      "representative_voxel_ijk": [
+        116,
+        146,
+        179
+      ],
+      "point_ras_mm": [
+        -4.5147398845880815,
+        6.874263928784259,
+        20.580689143366556
+      ],
+      "images": [
+        {
+          "asset": "region-07-i.png",
+          "axis": 0,
+          "index": 116,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10509,
+          "sha256": "7814403a8bec54d19ea9de6e401402defa36ca340db47385539902351cf414b5"
+        },
+        {
+          "asset": "region-07-j.png",
+          "axis": 1,
+          "index": 146,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 9999,
+          "sha256": "35773dc3e18ca57cdb888a157770c30dace4f9538a3b72a29f3ade7b4a092cf3"
+        },
+        {
+          "asset": "region-07-k.png",
+          "axis": 2,
+          "index": 179,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 12077,
+          "sha256": "b9e2cc8b6a8526290145ed3f62afbe71dc8cb8ae686597b2162fded6b51efa35"
+        }
+      ]
+    },
+    {
+      "source_label": 8,
+      "voxels": 1771,
+      "representative_voxel_ijk": [
+        122,
+        133,
+        196
+      ],
+      "point_ras_mm": [
+        -0.04527383007082619,
+        -2.8098225972857023,
+        33.391518208774784
+      ],
+      "images": [
+        {
+          "asset": "region-08-i.png",
+          "axis": 0,
+          "index": 122,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 11599,
+          "sha256": "fd235529e7f65fd4efa1373777049a419ccc0ad9e6f518caf852c1c988d25dc6"
+        },
+        {
+          "asset": "region-08-j.png",
+          "axis": 1,
+          "index": 133,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10451,
+          "sha256": "963046725d1208b41f45c394eac919696f959bceed63dcb6d7234e9fbb38ded3"
+        },
+        {
+          "asset": "region-08-k.png",
+          "axis": 2,
+          "index": 196,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 10971,
+          "sha256": "d94ec873a9ae005fb3e1fec326ff24e584e1f02abe6a388d99f806203a133014"
+        }
+      ]
+    },
+    {
+      "source_label": 9,
+      "voxels": 1102,
+      "representative_voxel_ijk": [
+        118,
+        129,
+        201
+      ],
+      "point_ras_mm": [
+        -3.0544495975804296,
+        -5.783815926294437,
+        37.154857800048006
+      ],
+      "images": [
+        {
+          "asset": "region-09-i.png",
+          "axis": 0,
+          "index": 118,
+          "width": 93,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 1,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 11284,
+          "sha256": "7e3cdb265195e8fc8c4899c022b66368ab4540e74eb7f7593b4d361f8d168d4e"
+        },
+        {
+          "asset": "region-09-j.png",
+          "axis": 1,
+          "index": 129,
+          "width": 103,
+          "height": 87,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 2,
+            "row_direction": -1
+          },
+          "bytes": 10867,
+          "sha256": "63b82b6766608491d5cb79f90192f53c41254452aedb8dc7108e30f2efdf233b"
+        },
+        {
+          "asset": "region-09-k.png",
+          "axis": 2,
+          "index": 201,
+          "width": 103,
+          "height": 93,
+          "pixel_grid": {
+            "column_axis": 0,
+            "row_axis": 1,
+            "row_direction": -1
+          },
+          "bytes": 10486,
+          "sha256": "2eeb34acb936bda7d0a9190ba83c1d0306eeb7ff457f29dccad8113b9853e62d"
+        }
+      ]
+    }
+  ]
+}
