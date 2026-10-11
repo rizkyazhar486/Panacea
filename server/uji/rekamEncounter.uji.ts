@@ -66,3 +66,5 @@ console.log('rekamEncounter: multi-encounter per pasien, migrasi legacy, exact-i
 await import('./encounterHttpRestart.uji.js')
 // Alpha A1: one account id <-> one clinical id across record, encounter, lab, referral, care and the longitudinal read model.
 await import('./patientIdentityContinuity.uji.js')
+// Alpha A3: anamnesis provenance (author, time, source) and versioning over real HTTP.
+await import('./anamnesisProvenance.uji.js')
