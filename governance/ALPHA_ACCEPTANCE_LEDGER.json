@@ -28,10 +28,14 @@
    "pillar": "Panacea One OS",
    "criterion": "Satu identitas pasien dan satu state longitudinal",
    "acceptance": "Satu pasien uji memiliki satu identitas; encounter, anamnesis, dan hasil merujuk ID yang sama (diuji lewat API, bukan UI saja)",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+       "server/uji/patientIdentityContinuity.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2440, merge 1d193a9b; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with random session secret and synthetic identities. One test account maps to one clinical id (self-u-<userId>); creating the patient twice updates in place and leaves exactly one patient record; the signed record, encounter close and successor record, lab result and referral all carry that same patientId, and the signed record keeps the authenticated doctor as signer and as author of each anamnesis answer even when the client forges the signer.",
+       "The same run shows the daily check-in (anamnesis) plan and the patient's answer stored against the same account id, and /api/keadaan-longitudinal keyed by that id joining the clinical records, encounters and care plans with reports for the same patient. A second account sees none of it and cannot write, file, answer or link into another identity (403/404/400/409 as applicable); a record cannot be filed under a different patientId; a patient session can create only its own primary record. A practice patient joins exactly one account through a one-time clinician-issued code: patients cannot issue codes, spent codes and already-linked patients cannot be reused or shared, and access ends when the link is removed.",
+       "Seven route-guard mutants (record patient mismatch, patient writes any id, patient issues link codes, link ownership, spent-code reuse, second-account link, check-in ownership) each fail by name; an eighth (removing the self-id candidate check) is not caught on purpose because the next line independently blocks the same case. Server typecheck, build and full npm run uji passed. Test-only change; no runtime code was modified. This is not human clinical approval."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED only for technical identity continuity in file-mode application over HTTP. The clinical id (self-u-<userId>) and the care/longitudinal subject (the bare account id) are two deterministic forms of one identity, not one literal string. Lab results and referrals carry the same patientId but are served by their own RBAC routes, not inside /api/keadaan-longitudinal. Not covered: Mongo mode, legacy email-derived alias ids and email change, share expiry, and any UI. Doctor verification is a test fixture, not proof of qualification; clinically_reviewed stays false."
   },
   {
    "id": "A2",
