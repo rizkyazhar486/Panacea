@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { createPresentationLighting, AnatomicalLightingControls, parseRespiratoryModel, sampleRespiration, cycleAt, DEFAULT_BREATH_PERIOD_S, DATA_GAPS, GAP_STATUS_LABEL, OpenCellPanel, cardiacStateAt, DEFAULT_CARDIAC_PARAMS, CARDIAC_PHASE_LABEL, type CardiacState, type PresentationLighting, type RespiratoryModel } from '../domains/body-exposure'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { searchStructures } from '../domains/body-exposure'
 import { penjagaMuatan, type PenjagaMuatan } from '../lib/gltfSesudahLepas'
 import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../domains/body-exposure'
 
@@ -777,19 +778,12 @@ export function CanonicalBody() {
   // indeks pencarian seluruh tubuh (termasuk sistem yang belum dimuat): [id, nama, lateralitas, sistem]
   const [index, setIndex] = useState<Array<[string, string, string, string]>>([])
   useEffect(() => {
+    let live = true
     setIndex([])
-    fetch(`${BASE}${fileTag(bodyId)}.index.json`).then((r) => (r.ok ? r.json() : [])).then(setIndex).catch(() => setIndex([]))
+    fetch(`${BASE}${fileTag(bodyId)}.index.json`).then((r) => (r.ok ? r.json() : [])).then((rows) => { if (live) setIndex(rows) }).catch(() => { if (live) setIndex([]) })
+    return () => { live = false }
   }, [bodyId])
-  const matches = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (q.length < 2) return []
-    const out: Array<{ id: string; name: string; system: string }> = []
-    for (const [id, name, lat, system] of index) {
-      if (name.toLowerCase().includes(q) || id.toLowerCase().includes(q)) out.push({ id, system, name: `${name}${lat === 'left' ? ' (left)' : lat === 'right' ? ' (right)' : ''}` })
-      if (out.length >= 8) break
-    }
-    return out
-  }, [query, index])
+  const matches = useMemo(() => searchStructures(index, query, ontology), [query, index, ontology])
 
   const toggle = (sys: string) => setEnabled((prev) => {
     const n = new Set(prev); if (n.has(sys)) n.delete(sys); else n.add(sys); return n
@@ -1066,7 +1060,7 @@ export function CanonicalBody() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Find a structure, e.g. femur, mitral, ovary"
+            placeholder="Name, left/right, or ontology ID (Uberon/FMA)"
             aria-label="Find a structure"
             className="min-h-[44px] w-full rounded-2xl border border-neutral-500/30 bg-neutral-500/10 px-4 text-sm text-inherit"
           />
