@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS } from '../../src/domains/body-exposure/engine/openCellIndex.ts'
+import { buildOpenCellIndex, parseOpenCellIndex, searchProteins, searchProteinPage, OPENCELL_PAGE_SIZE, LOCALISATIONS } from '../../src/domains/body-exposure/engine/openCellIndex.ts'
 
 const L = (gene, ensg, g3 = 'cytoplasmic', g2 = '', g1 = '') => ({ target_name: gene, ensg_id: ensg, annotations_grade_3: g3, annotations_grade_2: g2, annotations_grade_1: g1 })
 const A = (ensg, over = {}) => ({ gene_name: 'X', ensg_id: ensg, uniprot_id: 'P1', protein_name: 'Name', hek_rna_tpm: '10', hek_protein_conc_nm: '5', hek_protein_copy_number: '1000', ...over })
@@ -87,4 +87,45 @@ test('filter_lokasi_memakai_semua_tingkat_anotasi_dan_tetap_menghormati_pencaria
   assert.deepEqual(searchProteins(proteins, '', 8, 'mitochondria'), [])
   assert.deepEqual(searchProteins(proteins, '', 8, 'unknown_location'), [])
   assert.deepEqual(searchProteins(proteins, '', 8), []) // preserve the unfiltered idle state
+})
+
+
+test('every published compartment row remains reachable without repeats or changed source values', async () => {
+  const pub = JSON.parse(await readFile(new URL('../../public/bodyexposure/opencell_index.json', import.meta.url), 'utf8'))
+  for (const location of LOCALISATIONS) {
+    const expected = searchProteins(pub.proteins, '', pub.proteins.length, location)
+    const first = searchProteinPage(pub.proteins, '', 0, location)
+    assert.equal(first.total, expected.length)
+    const reached = []
+    for (let page = 0; page < first.pageCount; page++) {
+      const result = searchProteinPage(pub.proteins, '', page, location)
+      assert.equal(result.page, page)
+      assert.ok(result.proteins.length > 0 && result.proteins.length <= OPENCELL_PAGE_SIZE)
+      assert.equal(result.offset, page * OPENCELL_PAGE_SIZE)
+      reached.push(...result.proteins)
+    }
+    assert.deepEqual(reached, expected, location)
+    assert.equal(new Set(reached.map(p => p.ensg)).size, reached.length)
+    for (const p of reached) assert.equal(pub.proteins.find(source => source.ensg === p.ensg), p)
+  }
+})
+
+test('protein pages preserve exact identifier and location intersections and the empty idle state', () => {
+  const proteins = buildOpenCellIndex([L('ACTB', E1), L('ZZZ', E2, 'membrane')], [A(E1)]).proteins
+  assert.deepEqual(searchProteinPage(proteins, E1.toLowerCase(), 100, 'cytoplasmic').proteins, [proteins[0]])
+  assert.equal(searchProteinPage(proteins, E1, 0, 'membrane').total, 0)
+  assert.equal(searchProteinPage(proteins, 'p1').total, 1)
+  assert.equal(searchProteinPage(proteins, '', 0).total, 0)
+  assert.equal(searchProteinPage(proteins, '', 100).pageCount, 0)
+})
+
+test('stale and invalid page requests cannot strand filtered results on a blank page', () => {
+  const proteins = Array.from({ length: 10 }, (_, i) => ({ ...buildOpenCellIndex([L('ACTB', E1)], []).proteins[0], ensg: `ENSG${String(i).padStart(11, '0')}` }))
+  const last = searchProteinPage(proteins, 'act', 99)
+  assert.equal(last.page, 1); assert.equal(last.proteins.length, 2); assert.equal(last.offset, 8)
+  for (const page of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    const first = searchProteinPage(proteins, 'act', page)
+    assert.equal(first.page, 0); assert.equal(first.proteins.length, 8)
+  }
+  assert.equal(searchProteinPage([], 'act', 99).page, 0)
 })
