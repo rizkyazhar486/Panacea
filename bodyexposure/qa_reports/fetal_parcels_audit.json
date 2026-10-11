@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "source": "https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas",
+  "license": "CC0-1.0",
+  "truth_class": "population_reference",
+  "clinical_validation": "pending",
+  "runtime_admission": "blocked_label_identity_unresolved",
+  "label_identity": "unresolved; numeric IDs are not anatomical names",
+  "canonical_frame": "+X subject left, -Y anterior, +Z superior; millimetres; source origin retained",
+  "source_sha256": {
+    "reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz": "5d81b6f91bcc2a6d6e64dfcd97a3099cfdc30cd9826f29d297b3c6983aceee54",
+    "reo-fetal-t2w-body-atlas-mask-body_organs-10.nii.gz": "4b7bade32fac95a80c622f535c05f6a6f8eab8f1e32ba093cc742b1a5dc6c8b7"
+  },
+  "shape": [
+    245,
+    275,
+    304
+  ],
+  "affine_ras": [
+    [
+      0.7499985567651187,
+      0.0011532524195746957,
+      -0.0009137062414913667,
+      -91.51939392089844
+    ],
+    [
+      -0.001148029518737503,
+      0.7499869518914407,
+      0.004272472446945262,
+      -103.25543212890625
+    ],
+    [
+      0.0009202599975564008,
+      -0.004271065609721327,
+      0.749987273972095,
+      -113.15020751953125
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "voxel_mm3": 0.421875,
+  "smoothing_iterations": 0,
+  "fragments_removed": 0,
+  "regions": [
+    {
+      "id": "parcel_01",
+      "source_label": 1,
+      "anatomical_name": null,
+      "voxels": 13716,
+      "components": 3,
+      "voxel_volume_mm3": 5786.4375,
+      "mesh_volume_relative_error": 0.0039977641683691,
+      "organ_label_overlap_voxels": {
+        "0": 2387,
+        "1": 11213,
+        "2": 116
+      },
+      "centroid_mm_canonical": [
+        18.963091589089828,
+        -1.1223760543772556,
+        25.25685795590846
+      ],
+      "triangles": 14050,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 5763.304687499993,
+      "stl_sha256": "c2eacb39714008994bee7d3d8555557586bdfd70f2294a1f1d322a8e72dd7b5a"
+    },
+    {
+      "id": "parcel_02",
+      "source_label": 2,
+      "anatomical_name": null,
+      "voxels": 22618,
+      "components": 1,
+      "voxel_volume_mm3": 9541.96875,
+      "mesh_volume_relative_error": 0.0021903646063599533,
+      "organ_label_overlap_voxels": {
+        "0": 1915,
+        "1": 20695,
+        "2": 2,
+        "4": 6
+      },
+      "centroid_mm_canonical": [
+        14.866576700653269,
+        14.504336778017972,
+        17.26513460989318
+      ],
+      "triangles": 17264,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 9521.068359375007,
+      "stl_sha256": "f799101249ca0be566b7548ca0fa14ed6c8f7370fca9551420d9a313e3727c0a"
+    },
+    {
+      "id": "parcel_03",
+      "source_label": 3,
+      "anatomical_name": null,
+      "voxels": 25573,
+      "components": 3,
+      "voxel_volume_mm3": 10788.609375,
+      "mesh_volume_relative_error": 0.0018590570784292409,
+      "organ_label_overlap_voxels": {
+        "0": 1595,
+        "1": 23956,
+        "2": 22
+      },
+      "centroid_mm_canonical": [
+        -14.310112583926042,
+        14.086234555132137,
+        17.353324715146414
+      ],
+      "triangles": 18150,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 10768.552734374998,
+      "stl_sha256": "8ce1bebeb89f913b4339ba4edf8d6da3e3f245c93be4938a066dc8732828034d"
+    },
+    {
+      "id": "parcel_04",
+      "source_label": 4,
+      "anatomical_name": null,
+      "voxels": 12251,
+      "components": 2,
+      "voxel_volume_mm3": 5168.390625,
+      "mesh_volume_relative_error": 0.0036085489619893216,
+      "organ_label_overlap_voxels": {
+        "0": 997,
+        "1": 11251,
+        "8": 3
+      },
+      "centroid_mm_canonical": [
+        -13.96063314084796,
+        1.0707040779639243,
+        32.59833822319999
+      ],
+      "triangles": 11316,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 5149.740234375001,
+      "stl_sha256": "5ae22b668cbc383af71986ef97b68e5f441a7fb8fd3ad77c31805ef198899f46"
+    },
+    {
+      "id": "parcel_05",
+      "source_label": 5,
+      "anatomical_name": null,
+      "voxels": 10102,
+      "components": 1,
+      "voxel_volume_mm3": 4261.78125,
+      "mesh_volume_relative_error": 0.004322576387513383,
+      "organ_label_overlap_voxels": {
+        "0": 706,
+        "1": 9369,
+        "2": 27
+      },
+      "centroid_mm_canonical": [
+        -16.84279514788038,
+        -10.217859869483533,
+        17.055058340773
+      ],
+      "triangles": 10684,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 4243.359375000003,
+      "stl_sha256": "3ab35aa7e4753d7c6d7a65771e18112bcaad90664cae249062130e9648574bea"
+    },
+    {
+      "id": "parcel_06",
+      "source_label": 6,
+      "anatomical_name": null,
+      "voxels": 6698,
+      "components": 2,
+      "voxel_volume_mm3": 2825.71875,
+      "mesh_volume_relative_error": 0.005225440429983443,
+      "organ_label_overlap_voxels": {
+        "0": 942,
+        "1": 356,
+        "8": 5400
+      },
+      "centroid_mm_canonical": [
+        1.0214300262553877,
+        -11.232368252671037,
+        33.08750291336446
+      ],
+      "triangles": 7730,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 2810.9531249999877,
+      "stl_sha256": "16069fb0731dcc0bfba80f22f6f5c67ac4da2da3b63948b3fe87fdd7aa9b3cbe"
+    },
+    {
+      "id": "parcel_07",
+      "source_label": 7,
+      "anatomical_name": null,
+      "voxels": 46061,
+      "components": 5,
+      "voxel_volume_mm3": 19431.984375,
+      "mesh_volume_relative_error": 0.002115853614410064,
+      "organ_label_overlap_voxels": {
+        "0": 45225,
+        "1": 635,
+        "2": 93,
+        "8": 108
+      },
+      "centroid_mm_canonical": [
+        4.28151169994544,
+        -6.790897820639714,
+        20.78715169767426
+      ],
+      "triangles": 29534,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 19390.869140624996,
+      "stl_sha256": "b716385be574a18c1decdf5d273956108528b37e639f652cd306bab73f6a210e"
+    },
+    {
+      "id": "parcel_08",
+      "source_label": 8,
+      "anatomical_name": null,
+      "voxels": 1771,
+      "components": 1,
+      "voxel_volume_mm3": 747.140625,
+      "mesh_volume_relative_error": 0.018892339544513,
+      "organ_label_overlap_voxels": {
+        "0": 1523,
+        "1": 248
+      },
+      "centroid_mm_canonical": [
+        -0.032513229591600634,
+        3.103768017552156,
+        33.480104299012936
+      ],
+      "triangles": 3940,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 733.0253906250003,
+      "stl_sha256": "e40f2c15162ba2000b88107bd923502c9da75e4b7fb46af05f02e1596b30c437"
+    },
+    {
+      "id": "parcel_09",
+      "source_label": 9,
+      "anatomical_name": null,
+      "voxels": 1102,
+      "components": 1,
+      "voxel_volume_mm3": 464.90625,
+      "mesh_volume_relative_error": 0.02276164549304002,
+      "organ_label_overlap_voxels": {
+        "0": 1088,
+        "1": 14
+      },
+      "centroid_mm_canonical": [
+        2.8476095047845007,
+        5.477908299635118,
+        37.02813810046953
+      ],
+      "triangles": 2608,
+      "nonmanifold_edges": 0,
+      "mesh_volume_mm3": 454.32421875000136,
+      "stl_sha256": "ccf5ad207d18747cc6b29ae6482dcfcec95658704f87aff7ae16adfdace3b408"
+    }
+  ],
+  "source_repository_revision": "74f11a186c709078d712bb2fd827bfa2b36e3407",
+  "source_readme_figure": "info/lungs2024-atlas.jpg"
+}

@@ -1,0 +1,193 @@
+{
+ "tool": "threshold + distance-transform watershed on native-resolution CT (algorithmic; not TotalSegmentator, not manual)",
+ "hu_threshold": 250,
+ "voxel_mm": [
+  0.722656,
+  0.722656,
+  1.0
+ ],
+ "transform_ct_to_denver": {
+  "R": [
+   [
+    0.998587,
+    0.047702,
+    -0.02344
+   ],
+   [
+    -0.048054,
+    0.998737,
+    -0.0147
+   ],
+   [
+    0.022709,
+    0.015806,
+    0.999617
+   ]
+  ],
+  "t_mm": [
+   807.045,
+   680.775,
+   9.495
+  ]
+ },
+ "arms": {
+  "right": {
+   "native_crop_shape": [
+    362,
+    201,
+    552
+   ],
+   "origin_rcz": [
+    134,
+    0,
+    879
+   ],
+   "mask_voxels": 264515,
+   "elbow_cut_slice": 337,
+   "two_bone_shaft_slices": [
+    151,
+    253
+   ],
+   "shaft_seed_slice": 202,
+   "distal_shaft_area_vox": [
+    319,
+    237
+   ],
+   "distal_over_proximal_area": [
+    0.49,
+    0.74
+   ],
+   "radius_seed_is_second": false,
+   "tube_mm": 16,
+   "hu_proximal": 450,
+   "grow_px_per_slice": 4,
+   "track_slices": 20,
+   "tracking": {
+    "fragment_first_slice": 311,
+    "lost_from_slice": {
+     "radius": 297,
+     "ulna": 252
+    }
+   },
+   "label_voxels": {
+    "radius": 35019,
+    "ulna": 21712,
+    "hand_bones": 100486,
+    "forearm_fragment": 1837
+   },
+   "meshes": {
+    "radius": {
+     "volume_cm3": 18.2,
+     "components": 1,
+     "triangles": 47032,
+     "slices_covered": [
+      152,
+      296
+     ],
+     "gap_to_humerus_mm": 21.8,
+     "proximal_end_complete": false
+    },
+    "ulna": {
+     "volume_cm3": 11.3,
+     "components": 1,
+     "triangles": 30950,
+     "slices_covered": [
+      152,
+      251
+     ],
+     "gap_to_humerus_mm": 64.4,
+     "proximal_end_complete": false
+    },
+    "hand_bones": {
+     "volume_cm3": 52.5,
+     "components": 2,
+     "triangles": 186296,
+     "slices_covered": [
+      8,
+      154
+     ]
+    }
+   },
+   "unresolved_proximal_fragment_voxels": 1837
+  },
+  "left": {
+   "native_crop_shape": [
+    384,
+    240,
+    515
+   ],
+   "origin_rcz": [
+    110,
+    433,
+    901
+   ],
+   "mask_voxels": 241820,
+   "elbow_cut_slice": 327,
+   "two_bone_shaft_slices": [
+    160,
+    278
+   ],
+   "shaft_seed_slice": 219,
+   "distal_shaft_area_vox": [
+    319,
+    58
+   ],
+   "distal_over_proximal_area": [
+    1.08,
+    0.08
+   ],
+   "radius_seed_is_second": false,
+   "tube_mm": 16,
+   "hu_proximal": 450,
+   "grow_px_per_slice": 4,
+   "track_slices": 20,
+   "tracking": {
+    "fragment_first_slice": null,
+    "lost_from_slice": {
+     "radius": 313,
+     "ulna": 314
+    }
+   },
+   "label_voxels": {
+    "radius": 35827,
+    "ulna": 44200,
+    "hand_bones": 100075,
+    "forearm_fragment": 0
+   },
+   "meshes": {
+    "radius": {
+     "volume_cm3": 18.7,
+     "components": 1,
+     "triangles": 59102,
+     "slices_covered": [
+      161,
+      312
+     ],
+     "gap_to_humerus_mm": 1.0,
+     "proximal_end_complete": true
+    },
+    "ulna": {
+     "volume_cm3": 23.1,
+     "components": 1,
+     "triangles": 67280,
+     "slices_covered": [
+      161,
+      313
+     ],
+     "gap_to_humerus_mm": 1.0,
+     "proximal_end_complete": true
+    },
+    "hand_bones": {
+     "volume_cm3": 52.3,
+     "components": 1,
+     "triangles": 188824,
+     "slices_covered": [
+      18,
+      163
+     ]
+    }
+   },
+   "unresolved_proximal_fragment_voxels": 0
+  }
+ }
+}
