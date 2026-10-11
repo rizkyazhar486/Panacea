@@ -7,6 +7,7 @@ import {
   panduanKursiRoda,
   type BacaanSpo2, type CatatanEkg, type KlasifikasiEkg,
 } from '../../lib/clinicalTrackers'
+import { parseNumberField, validateJetLagInput } from '../../domains/clinical-calculators'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -252,10 +253,12 @@ function TabJetLag() {
   const [bangun, setBangun] = useState('06:00')
   const [siap, setSiap] = useState('3')
 
-  const rencana = useMemo(() => rencanaJetLag({
-    tzAsal: Number(asal) || 0, tzTujuan: Number(tujuan) || 0,
-    jamBangunBiasa: bangun, hariPersiapan: Number(siap) || 0,
+  // Kolom kosong/di luar rentang → tanpa rencana (bukan UTC+0 tebakan); alasan ditampilkan.
+  const cek = useMemo(() => validateJetLagInput({
+    tzAsal: parseNumberField(asal), tzTujuan: parseNumberField(tujuan),
+    jamBangunBiasa: bangun, hariPersiapan: parseNumberField(siap),
   }), [asal, tujuan, bangun, siap])
+  const rencana = useMemo(() => (cek.ok ? rencanaJetLag(cek.value) : null), [cek])
 
   return (
     <div className="space-y-4">
@@ -268,10 +271,17 @@ function TabJetLag() {
           <Field label="Preparation days"><input className={inputClass} inputMode="numeric" value={siap} onChange={(e) => setSiap(e.target.value)} /></Field>
         </div>
         <p className="mt-2 text-[11px] text-slate-500">Jakarta UTC+7 · Singapore UTC+8 · London UTC+0/+1 · Tokyo UTC+9 · New York UTC−5/−4</p>
-        <p className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-neutral-600">{rencana.ringkas}</p>
+        {rencana ? (
+          <p className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-neutral-600">{rencana.ringkas}</p>
+        ) : (
+          <div role="status" className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/[0.08] p-3 text-sm leading-relaxed text-amber-100">
+            <div className="font-semibold">No plan yet</div>
+            <ul className="mt-1 list-disc pl-5">{!cek.ok && cek.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
+          </div>
+        )}
       </Card>
 
-      {rencana.langkah.length > 0 && (
+      {rencana && rencana.langkah.length > 0 && (
         <Card>
           <SectionTitle title="Daily steps" />
           <div className="mt-2 space-y-2">
@@ -289,7 +299,7 @@ function TabJetLag() {
         </Card>
       )}
 
-      {rencana.catatan.length > 0 && (
+      {rencana && rencana.catatan.length > 0 && (
         <Card>
           <SectionTitle title="Why the timing matters" />
           <div className="mt-2 space-y-2">
