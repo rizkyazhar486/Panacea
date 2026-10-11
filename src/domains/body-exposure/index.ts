@@ -137,3 +137,4 @@ export { buildOpenCellIndex, parseOpenCellIndex, searchProteins, LOCALISATIONS, 
 export { cardiacStateAt, validateParams as validateCardiacParams, phaseDurations, DEFAULT_PARAMS as DEFAULT_CARDIAC_PARAMS, DEFAULT_HR, HR_MIN as CARDIAC_HR_MIN, HR_MAX as CARDIAC_HR_MAX, PHASE_LABEL as CARDIAC_PHASE_LABEL, type CardiacParams, type CardiacState, type CardiacPhase } from './engine/cardiacCycle'
 export { FetalGrowthPanel } from './ui/FetalGrowthPanel'
 export { assessMeasurement, parseFetalTables, normalCdf, GA_MIN_WEEKS, GA_MAX_WEEKS, type Assessment, type AssessResult, type FetalTables, type MeasureId, type ReferenceId } from './engine/fetalBiometry'
+export { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset, type FetalParcelRegion } from './engine/fetalParcelInspection'

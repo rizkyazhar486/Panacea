@@ -1128,6 +1128,10 @@ export function CanonicalBody() {
       </Card>
 
       <FetalGrowthPanel baseUrl={BASE} />
+      <Card>
+        <a href="#/body-exposure/fetal-dataset" className="text-sm font-bold underline">Inspect fetal segmentation dataset</a>
+        <p className="mt-1 text-xs text-neutral-500">Nine numeric source regions, volume measurements and mask correspondence. Individual anatomy unresolved; clinical review pending.</p>
+      </Card>
       <OpenCellPanel baseUrl={BASE} />
 
       <p className="px-1 text-[11px] leading-relaxed text-neutral-500">
