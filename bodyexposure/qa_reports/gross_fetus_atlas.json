@@ -1,0 +1,112 @@
+{
+ "body": "FETUS",
+ "checks": [
+  {
+   "check": "laterality_suffix_matches_side",
+   "ok": true,
+   "detail": {
+    "paired": 8,
+    "documented_exceptions": 0,
+    "unexplained": []
+   }
+  },
+  {
+   "check": "liver_on_right",
+   "ok": true,
+   "detail": -0.0042
+  },
+  {
+   "check": "spleen_on_left",
+   "ok": true,
+   "detail": 0.0237
+  },
+  {
+   "check": "stomach_on_left",
+   "ok": true,
+   "detail": 0.0185
+  },
+  {
+   "check": "fetal_source_organ_order",
+   "ok": true,
+   "detail": {
+    "scope": "partial fetal source atlas",
+    "not_represented": [
+     "brain",
+     "heart",
+     "skeleton"
+    ],
+    "centroids_z_m": {
+     "liver": 0.0535668209195137,
+     "bladder": 0.014317800290882587,
+     "thymus": 0.09200343489646912,
+     "kidney.L": 0.03728872165083885,
+     "lung.L": 0.07757755368947983,
+     "kidney.R": 0.04027672857046127,
+     "lung.R": 0.07908333837985992
+    },
+    "missing_required_organs": [],
+    "invalid_centroids": [],
+    "order_violations": [],
+    "clinical_validation": "pending"
+   }
+  },
+  {
+   "check": "lowest_organ_point_on_ground",
+   "ok": true,
+   "detail": 0.0
+  },
+  {
+   "check": "no_gross_organ_interpenetration",
+   "ok": true,
+   "detail": {
+    "LIVER|STOMACH": 0.033
+   }
+  },
+  {
+   "check": "lungs_above_liver",
+   "ok": true,
+   "detail": {
+    "lungs_z": [
+     0.078,
+     0.079
+    ],
+    "liver_z": 0.054
+   }
+  },
+  {
+   "check": "thymus_above_liver",
+   "ok": true,
+   "detail": 0.092
+  },
+  {
+   "check": "kidneys_posterior_to_liver",
+   "ok": true,
+   "detail": {
+    "kidneys_y": [
+     0.02,
+     0.019
+    ],
+    "liver_y": -0.006
+   }
+  },
+  {
+   "check": "stomach_anterior_to_kidneys",
+   "ok": true,
+   "detail": 0.004
+  },
+  {
+   "check": "bladder_below_kidneys",
+   "ok": true,
+   "detail": 0.014
+  },
+  {
+   "check": "both_lungs_present_and_paired",
+   "ok": true,
+   "detail": [
+    "L",
+    "R"
+   ]
+  }
+ ],
+ "failures": []
+}

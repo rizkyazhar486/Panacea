@@ -48,3 +48,16 @@ export {
 } from './model/clinicalEpisodeResilience'
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
+
+export {
+  evaluateResultClosure,
+  type ClosureEvidence,
+  type ClosureFollowUp,
+  type ClosureStep,
+  type ResultClosureInput,
+  type ResultClosureItem,
+  type ResultClosureRecord,
+  type ResultClosureResult,
+  type ResultClosureState,
+  type ResultInvalidReason,
+} from './model/resultClosure'

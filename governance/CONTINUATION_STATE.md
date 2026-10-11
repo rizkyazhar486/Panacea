@@ -1,4 +1,107 @@
+### Canonical E1 completion and next resolver task — 2026-10-11
+
+- Canonical main 512de7c39d6029a4a9b06c50231a7eea7ad597e1 integrates #2381 with parent 397157fb9da7ea53b8eee2b88d3b97feb750ae7e. Accepted tree d53a23e2ae567847e082d267cc0131627a60c0f6 matches exact head d963f7e71f7453ea715d4c404f40b3e756f5d556; all ten checks passed (Validate, Stabilization, Body 3D, Mongo, Render backend, Security inventory/enforcement, Clinical Evidence) plus CodeRabbit. Independent AI COMMENT 5481894786 is engineering review, not human clinical approval.
+- E1 real-HTTP rejection acceptance is integrated; canonical Alpha is 23/43 VERIFIED. Post-merge CI was pending when this checkpoint was written. No runtime auth code changed and no new production revision is claimed. Backend health reread still reports healthy mongo/tuntas-v1 on 3e690b1; E7 remains NOT_CHECKED.
+- Next #2356 preserves the existing one-file resolver fix and contributor commits while synchronizing with canonical main. Independent Node24.19 reproduction: six calendar tests pass on #2354 head 3ef55c9; removing registration, restoring static import or removing the complete patch each fails ERR_MODULE_NOT_FOUND for server/src/shared/calendarDate.js. Restoring source passes 6/6. Currentmain with/without the patch passes 6/6. No assertions or runtime date guards change. Fresh exact-head CI/review remain required for this synchronization.
+- Remaining independent backend backlog: E2 broader clinical HTTP RBAC evidence and A1–A2 identity/encounter persistence. E3 remains active draft #2367; frontend #2351/#2369 and date #2354 ownership are preserved. Unpublished Vite dependency patch remains outside this task; release #2349 is not production delivery.
+
+### E1 synchronization — 2026-10-11
+
+- PR #2381 initial head 9f9f863e056c92afb06251411ede57308219eb99 received independent AI engineering COMMENT; local full server suite and architecture/ratchet passed. Required CI was still running, not counted as complete.
+- Another contributor integrated #2377 as canonical main ed081e5c44bd414aefd34082ffe290f898cfaf54. Its three observer files do not overlap E1. Ordinary forward synchronization preserves all contributor code; fresh exact-head CI/review remain required. E7 remains NOT_CHECKED.
+
 # PANACEA AUTONOMOUS CONTINUATION STATE
+
+### Current checkpoint — 2026-10-11, easy-first E1 authentication acceptance
+
+- Inspected canonical main `ed081e5c44bd414aefd34082ffe290f898cfaf54`; canonical
+  Alpha remains 22/43 until candidate E1 evidence is integrated. Claim: Sol E1 on
+  isolated `test/auth-session-http`; no overlap with active auth test file PRs.
+- E1 adds real HTTP negative/positive session evidence to existing mandatory
+  authAccess test, with no production authentication code change. Eight invalid
+  session classes, cookie/bearer, two endpoints, paired stored identities and
+  production dev-login disabled all pass; three named mutants fail. Full server
+  build/typecheck/tests and independent AI review pass. Exact-head CI and merge pending.
+- #2376 integrated at `3e690b17196b150459c4f138d14c39a863184467`, accepted head
+  `4509159e9bb111ec3423d58da394718588775c99` had 10/10 successful checks; merge
+  tree equals tested tree `ab010eea0b25b8cd39919fd86c2862bbeec50da3`.
+  Render health and capabilities now report that intended revision; helper checks
+  identical server source `94aad15276b123c886ecc29d581f69dbd1c9a8c7`, Mongo mode
+  and healthy sliced persistence. Genomics worker remains configured=false.
+  No production patient write, frontend revision or complete E7 journey is claimed.
+- Prepared Vite 7 dependency patch removes seven high build-tree advisories locally
+  without waivers but remains unpublished. Local Chromium zero glyph metrics also
+  reproduce on a minimal page without the app, so failed smokes are environment
+  evidence, not a demonstrated Vite regression. Defer this frontend workstream under
+  the new easy-first ownership lanes; current unpatched dependency policy fails.
+- #2349's refreshed Mongo release contracts pass 89/89 locally after #2376; publication
+  awaits dependency security acceptance. Shared calendar helper changes overlap #2354,
+  so the date branch remains unpublished. Other active contributor branches preserved.
+- Next easiest existing infrastructure candidate: #2377 production browser checks;
+  its old-head greens are historical until synchronized/revalidated. E3 #2367 remains draft.
+  Clinical authorization stays separate, and historical checkpoints below are retained.
+
+### Current checkpoint — 2026-10-11, Mongo write ordering and drain
+
+- Latest synchronized canonical baseline: `3a4a7629b3763124f376142ec94210b891dc9d6d`.
+  Initial inspected baseline was `716483bf5cd3753ab57dd5dab37444adfad92b02`.
+  Main advanced with #2374 during CI; its independent foot-contact work is preserved.
+  Candidate is synchronized forward and requires fresh exact-head CI.
+  Repository evidence was refreshed after the previous session; intervening
+  Body Exposure and clinical RBAC work is preserved. #2349 still has historical
+  head `66697f6bf801b91e028cc1d6d6bcbec31eb533b9` and needs latest-main
+  synchronization/revalidation before integration. Its prior green evidence
+  must not authorize a merge against this new baseline.
+- Confirmed P0 integrity defects: `flushStore` resolved while a Mongo save was
+  active, and overlapping saves let an older slice deletion erase a newer lab/
+  referral record. Actual production functions reproduced both defects.
+- Isolated branch `fix/mongo-save-drain` serializes in-process Mongo saves and
+  drains active/queued writes plus mutations arriving during the await. Six
+  deterministic tests pass; independent AI technical review passed and substituting
+  baseline functions caused four failures. Real Mongo application restart with
+  synthetic lab/referral data passed; initial fixture failures were diagnosed as
+  incorrect actor/initial-trail assumptions and corrected without weakening the
+  persistence or provenance assertions. Root build, server build/typecheck/full tests,
+  UI tests (687/687), architecture and ratchet passed. Direct-phase fixture guards
+  reject inherited database/URI/file settings before store initialization. Exact-head
+  CI and integration remain pending for the published tree.
+- Real Mongo evidence uses official image digest
+  `sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c`;
+  loopback-only disposable service, isolated random fixture DB, separate writer
+  and reader processes and no file fallback. A new main/PR workflow preserves
+  this acceptance. No production patient records or credentials were used.
+- Next independent prepared task: lab collection calendar/UTC validation in
+  unpublished `fix/lab-collection-date-integrity`, historical local head
+  `47c7ebe2370b41a505412c8cc6d0ed6733021e2c`. Synchronize and revalidate with
+  current main before publication. Clinical authorization remains human-controlled.
+- Limitations: this is single-process save ordering, not cross-process transaction
+  isolation or recovery of historical lost data. Production revision verification
+  for this candidate is outstanding. Historical checkpoints below remain unchanged.
+
+### Current checkpoint — 2026-10-10, referral closure integrity
+
+- Baseline main: `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`; #2347's
+  Mongo slice persistence fix was merged by another contributor during inspection.
+  Its nine candidate checks passed; this does not establish real Mongo restart
+  recovery or retroactively establish a missing review record.
+- Branch `fix/referral-linked-result-integrity` repairs a reproduced integrity
+  failure: a linked result with a forged `closed` status and empty audit trail could
+  close a referral, while result metrics classified that same record as corrupt.
+  Closure now rechecks id, tenant, patient and an intact lifecycle ending in closed;
+  missing lab links and missing non-lab return notes fail closed without writes.
+- The original and missing-evidence regressions both failed before their fixes.
+  Final targeted tests passed twice, server typecheck/build/full tests passed,
+  architecture and ratchet passed, production build passed (699 QA tests), and
+  root deterministic tests passed (685/685 files). Independent AI technical
+  review found no remaining blocker in this scope; it is not clinical approval.
+- Exact-head CI, repository review recording, integration and deployment remain
+  pending. Do not count this branch as integrated or shipped until live evidence
+  supports those stages. Clinical workflow sign-off remains pending.
+- Next independent P0/P2: calendar validation accepts `2026-02-30`; scheduled/manual
+  Vercel release lacks an exact-revision prerequisite for required safety/acceptance
+  checks. Active #2343/#2344 own release reporting in the same workflow; preserve
+  their delta when wiring a release gate. Body Exposure assets remain in Claude's
+  active branches. Older sections below are historical and must be refreshed.
 
 ### Current checkpoint — 2026-10-05, total verified completion directive
 
