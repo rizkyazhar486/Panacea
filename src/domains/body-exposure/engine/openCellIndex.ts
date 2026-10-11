@@ -72,12 +72,13 @@ export function buildOpenCellIndex(loc: readonly LocRow[], abundance: readonly A
   return { proteins, rejected, withoutAbundance }
 }
 
-/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein (substring) / Ensembl dan UniProt (ID persis). Kueri kosong → daftar kosong. */
-export function searchProteins(proteins: readonly OpenCellProtein[], query: string, limit = 12): OpenCellProtein[] {
+/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein (substring) / Ensembl dan UniProt (ID persis). Tanpa kueri dan filter → daftar kosong; filter lokasi memakai semua tingkat anotasi. */
+export function searchProteins(proteins: readonly OpenCellProtein[], query: string, limit = 12, location: Localisation | null = null): OpenCellProtein[] {
   const q = query.trim().toLowerCase()
-  if (!q || limit <= 0) return []
+  if ((!q && !location) || limit <= 0 || (location && !KNOWN.has(location))) return []
   const starts: OpenCellProtein[] = [], rest: OpenCellProtein[] = []
   for (const p of proteins) {
+    if (location && ![...p.grade3, ...p.grade2, ...p.grade1].includes(location)) continue
     const g = p.gene.toLowerCase()
     if (g.startsWith(q)) starts.push(p)
     else if (g.includes(q) || (p.name ?? '').toLowerCase().includes(q) || p.ensg.toLowerCase() === q || (p.uniprot ?? '').toLowerCase() === q) rest.push(p)
