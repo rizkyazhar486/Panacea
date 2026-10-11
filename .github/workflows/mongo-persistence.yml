@@ -1,0 +1,38 @@
+name: Mongo Persistence Acceptance
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'scripts/qa/mongo-save-drain.test.mjs'
+      - '.github/workflows/mongo-persistence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mongo-persistence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mongo:
+        image: mongo@sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+        working-directory: server
+      - name: Verify actual Mongo application restart
+        working-directory: server
+        env:
+          PANACEA_TEST_MONGO_URI: mongodb://127.0.0.1:27017
+        run: npx tsx uji/mongoRestart.uji.ts

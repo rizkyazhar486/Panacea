@@ -1,5 +1,42 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
+### Current checkpoint — 2026-10-11, Mongo write ordering and drain
+
+- Latest synchronized canonical baseline: `3a4a7629b3763124f376142ec94210b891dc9d6d`.
+  Initial inspected baseline was `716483bf5cd3753ab57dd5dab37444adfad92b02`.
+  Main advanced with #2374 during CI; its independent foot-contact work is preserved.
+  Candidate is synchronized forward and requires fresh exact-head CI.
+  Repository evidence was refreshed after the previous session; intervening
+  Body Exposure and clinical RBAC work is preserved. #2349 still has historical
+  head `66697f6bf801b91e028cc1d6d6bcbec31eb533b9` and needs latest-main
+  synchronization/revalidation before integration. Its prior green evidence
+  must not authorize a merge against this new baseline.
+- Confirmed P0 integrity defects: `flushStore` resolved while a Mongo save was
+  active, and overlapping saves let an older slice deletion erase a newer lab/
+  referral record. Actual production functions reproduced both defects.
+- Isolated branch `fix/mongo-save-drain` serializes in-process Mongo saves and
+  drains active/queued writes plus mutations arriving during the await. Six
+  deterministic tests pass; independent AI technical review passed and substituting
+  baseline functions caused four failures. Real Mongo application restart with
+  synthetic lab/referral data passed; initial fixture failures were diagnosed as
+  incorrect actor/initial-trail assumptions and corrected without weakening the
+  persistence or provenance assertions. Root build, server build/typecheck/full tests,
+  UI tests (687/687), architecture and ratchet passed. Direct-phase fixture guards
+  reject inherited database/URI/file settings before store initialization. Exact-head
+  CI and integration remain pending for the published tree.
+- Real Mongo evidence uses official image digest
+  `sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c`;
+  loopback-only disposable service, isolated random fixture DB, separate writer
+  and reader processes and no file fallback. A new main/PR workflow preserves
+  this acceptance. No production patient records or credentials were used.
+- Next independent prepared task: lab collection calendar/UTC validation in
+  unpublished `fix/lab-collection-date-integrity`, historical local head
+  `47c7ebe2370b41a505412c8cc6d0ed6733021e2c`. Synchronize and revalidate with
+  current main before publication. Clinical authorization remains human-controlled.
+- Limitations: this is single-process save ordering, not cross-process transaction
+  isolation or recovery of historical lost data. Production revision verification
+  for this candidate is outstanding. Historical checkpoints below remain unchanged.
+
 ### Current checkpoint — 2026-10-10, referral closure integrity
 
 - Baseline main: `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`; #2347's
