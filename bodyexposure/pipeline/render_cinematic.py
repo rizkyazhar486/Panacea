@@ -17,9 +17,13 @@ import types
 import bpy
 from mathutils import Vector
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from render_artifacts import claim_output, fingerprint, process_memory, verify_unchanged
+
 PROFILES = {
     'preview': (960, 540, 32, 0.10),
     'desktop': (1920, 1080, 128, 0.03),
+    'atlas': (3840, 2160, 256, 0.02),
     'cinematic': (7680, 4320, 512, 0.01),
 }
 
@@ -86,8 +90,13 @@ def main():
         parser.error('exposure must be finite')
     if args.compare_mode == 'lighting' and (not args.compare or args.lighting != 'studio'):
         parser.error('lighting comparison requires --compare --lighting studio')
-    output = Path(args.out).resolve()
-    output.mkdir(parents=True, exist_ok=True)
+    if not bpy.data.filepath:
+        parser.error('Load a saved source BLEND file before rendering')
+    staging_script = Path(__file__).with_name('render_body_file.py' if args.bench == 'body-qa' else 'render_benchmarks.py')
+    input_artifacts = [fingerprint(bpy.data.filepath), fingerprint(__file__), fingerprint(staging_script)]
+    if args.hdri:
+        input_artifacts.append(fingerprint(args.hdri))
+    output = claim_output(args.out)
     original_render = bpy.ops.render.render
     records = []
 
@@ -171,6 +180,8 @@ def main():
             applied_exposure = scene.view_settings.exposure
             view = f'_{scene.camera.name}' if args.bench == 'body-qa' else ''
             path = output / f'{args.bench}{view}_{args.profile}_{variant}.png'
+            if path.exists():
+                raise FileExistsError(f'Refusing to overwrite capture: {path}')
             scene.render.filepath = str(path)
             started = time.perf_counter()
             try:
@@ -184,6 +195,7 @@ def main():
                 scene.view_settings.exposure = original_exposure
             if render_result != {'FINISHED'}:
                 raise RuntimeError(f'Render did not finish: {render_result}')
+            verify_unchanged(input_artifacts)
             restored = (scene.world == original_world and
                         scene.view_settings.exposure == original_exposure and
                         all(light.hide_render == hidden for light, hidden in original_lights) and
@@ -194,6 +206,7 @@ def main():
                 'variant': variant, 'path': path.name,
                 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
                 'render_seconds': round(time.perf_counter() - started, 3),
+                'process_memory': process_memory(),
                 'resolution': [width * args.scale // 100, height * args.scale // 100],
                 'sample_limit': scene.cycles.samples,
                 'time_limit_seconds': scene.cycles.time_limit,
@@ -207,14 +220,20 @@ def main():
                                   'location_metres': list(light.location)} for light in lights],
             })
         report = {
+            'schema_version': 2,
             'source_blend': bpy.data.filepath, 'blender_version': bpy.app.version_string,
+            'input_artifacts': input_artifacts, 'inputs_unchanged': True,
+            'clinical_validation': 'pending',
             'profile': args.profile, 'benchmark': args.bench,
             'compare_mode': args.compare_mode if args.compare else None,
             'device_backend': args.device, 'devices': devices,
             'hdri': str(args.hdri.resolve()) if args.hdri else None,
             'audit': audit, 'renders': records,
             'limitations': ['UV absence is informational for procedural materials.',
-                             'No anatomical validation, deformation, browser FPS or memory measurement performed.',
+                             'No anatomical validation, deformation or browser FPS measurement performed.',
+                             'RSS is the OS process-lifetime high-water mark, not GPU memory or per-frame allocation.',
+                             'Sample limits are requested ceilings; adaptive sampling/time limits may stop earlier.',
+                             'External linked libraries and unpacked textures are not inventoried by this report.',
                              'Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.',
                              'Timings include scene synchronization and sequential cache effects.'],
         }
