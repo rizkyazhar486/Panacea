@@ -99,3 +99,5 @@ export { bloodDonationScreen, DONATION_RANGES, DONATION_INTERVAL_WEEKS } from '.
 export type { DonationInput, DonationResult } from './engine/bloodDonationScreen'
 export { zone2HeartRate, validateGripKg, ZONE2_AGE_YEARS, GRIP_KG } from './engine/movementInputs'
 export type { Zone2Result, GripResult } from './engine/movementInputs'
+export { waistHeightRatio, waistHeightRatioFromText, whtrBand, WHTR_WAIST_CM, WHTR_HEIGHT_CM, WHTR_THRESHOLDS } from './engine/waistHeightRatio'
+export type { WhtrBand, WhtrResult } from './engine/waistHeightRatio'
