@@ -3,6 +3,8 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconGauge } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parsePredictiveField, type PredictiveField } from '../domains/personal-health'
+import { autophagyTiming } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Predictive Models Toolkit — six small, real mathematical models in one
@@ -17,31 +19,47 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Tab = 'autophagy' | 'cortisol' | 'sauna' | 'nova' | 'glycemic' | 'healthspan'
 
+/** Kolom angka dengan teks mentah: kosong/tak sah tidak pernah diam-diam menjadi 0. */
+function useField(field: PredictiveField, initial: string) {
+  const [text, setText] = useState(initial)
+  return { text, setText, result: parsePredictiveField(field, text) }
+}
+
+function NoEstimate({ problems }: { problems: string[] }) {
+  return (
+    <div role="alert" className="mt-3 rounded-xl bg-amber-500/10 p-4 text-center">
+      <div className="text-lg font-black text-amber-800 dark:text-amber-300">No estimate yet</div>
+      {problems.map((m) => <div key={m} className="text-[11px] text-neutral-600 dark:text-neutral-300">{m}</div>)}
+    </div>
+  )
+}
+
+type Field_ = ReturnType<typeof useField>
+const numInput = (f: Field_) => <input className={inputClass} type="number" inputMode="decimal" value={f.text} onChange={(e) => f.setText(e.target.value)} aria-invalid={!f.result.ok} />
+const problemsOf = (...fs: Field_[]) => fs.flatMap((f) => (f.result.ok ? [] : [f.result.problem]))
+
 function AutophagyTiming() {
   // Tidak ada kolom berat: rumus di bawah tidak memakainya. Kolom yang tampak
   // menentukan hasil padahal tidak (dulu bernilai 70 kg dari getDemo()) menipu.
-  const [bodyFatPct, setBodyFatPct] = useState(20)
-  const [lastMealHoursAgo, setLastMealHoursAgo] = useState(2)
-  // Illustrative model: glycogen stores ~ liver glycogen (~100-120g) depleted
-  // over roughly 12-16h at typical resting glucose utilization, faster with
-  // lower body fat / higher activity. This is a rough population-average
-  // heuristic, not a measurement of the user's actual glycogen or autophagy.
-  const leanMassFactor = 1 - bodyFatPct / 100
-  const baseHours = 14 - leanMassFactor * 2
-  const hoursRemaining = Math.max(0, baseHours - lastMealHoursAgo)
-  const autophagyStarted = hoursRemaining <= 0
+  const fat = useField('bodyFatPct', '')
+  const meal = useField('hoursSinceMeal', '')
+  const problems = problemsOf(fat, meal)
+  const bodyFatPct = fat.result.ok ? fat.result.value : Number.NaN
+  const lastMealHoursAgo = meal.result.ok ? meal.result.value : Number.NaN
+  // Existing illustrative formula; missing inputs produce no numeric result.
+  const r = autophagyTiming({ bodyFatPct, hoursSinceMeal: lastMealHoursAgo })
 
   return (
     <Card className="!p-5">
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Body fat %"><input className={inputClass} type="number" value={bodyFatPct} onChange={(e) => setBodyFatPct(Number(e.target.value) || 0)} /></Field>
-        <Field label="Hours since last meal"><input className={inputClass} type="number" value={lastMealHoursAgo} onChange={(e) => setLastMealHoursAgo(Number(e.target.value) || 0)} /></Field>
+        <Field label="Body fat %">{numInput(fat)}</Field>
+        <Field label="Hours since last meal">{numInput(meal)}</Field>
       </div>
-      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        {autophagyStarted
-          ? <div className="text-lg font-black text-brand-dark">Likely in early autophagy range</div>
-          : <><div className="text-2xl font-black text-brand-dark">~{hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
-      </div>
+      {problems.length > 0 ? <NoEstimate problems={problems} /> : <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+        {r.started
+          ? <div className="text-lg font-black text-brand-dark">Illustrative model threshold reached</div>
+          : <><div className="text-2xl font-black text-brand-dark">~{r.hoursRemaining?.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">remaining to the illustrative model threshold</div></>}
+      </div>}
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">An illustrative estimate, based on typical liver-glycogen depletion time (roughly 12-16 hours of fasting, varying with body composition and activity) — not a measurement of your glycogen or autophagy state, which can only be assessed in a research lab.</Prosa>
     </Card>
   )
@@ -49,8 +67,11 @@ function AutophagyTiming() {
 
 function CortisolAwakening() {
   const [wakeTime, setWakeTime] = useState('06:30')
-  const [lightWithin, setLightWithin] = useState(30)
-  const [coffeeWithin, setCoffeeWithin] = useState(60)
+  const light = useField('lightWithinMin', '30')
+  const coffee = useField('coffeeWithinMin', '60')
+  const problems = problemsOf(light, coffee)
+  const lightWithin = light.result.ok ? light.result.value : 0
+  const coffeeWithin = coffee.result.ok ? coffee.result.value : 0
   const points = useMemo(() => {
     const pts: { min: number; level: number }[] = []
     for (let min = 0; min <= 120; min += 5) {
@@ -69,21 +90,24 @@ function CortisolAwakening() {
     <Card className="!p-5">
       <div className="grid grid-cols-3 gap-3">
         <Field label="Wake time"><input className={inputClass} type="time" value={wakeTime} onChange={(e) => setWakeTime(e.target.value)} /></Field>
-        <Field label="Daylight within (min)"><input className={inputClass} type="number" value={lightWithin} onChange={(e) => setLightWithin(Number(e.target.value) || 0)} /></Field>
-        <Field label="Coffee within (min)"><input className={inputClass} type="number" value={coffeeWithin} onChange={(e) => setCoffeeWithin(Number(e.target.value) || 0)} /></Field>
+        <Field label="Daylight within (min)">{numInput(light)}</Field>
+        <Field label="Coffee within (min)">{numInput(coffee)}</Field>
       </div>
-      <svg viewBox="0 0 300 100" className="mt-3 w-full">
+      {problems.length > 0 ? <NoEstimate problems={problems} /> : <><svg viewBox="0 0 300 100" className="mt-3 w-full">
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.min * 2.4},${100 - p.level}`).join(' ')} />
       </svg>
-      <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative shape from {wakeTime} · 0-120 min after waking</p>
+      <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative shape from {wakeTime} · 0-120 min after waking</p></>}
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">A simplified illustration of the well-documented cortisol awakening response (a natural rise that peaks around 30-45 minutes after waking) — not your measured cortisol level, which requires saliva or blood testing at several timepoints.</Prosa>
     </Card>
   )
 }
 
 function SaunaEquivalent() {
-  const [minutes, setMinutes] = useState(20)
-  const [tempC, setTempC] = useState(80)
+  const mins = useField('saunaMinutes', '20')
+  const temp = useField('saunaTempC', '80')
+  const problems = problemsOf(mins, temp)
+  const minutes = mins.result.ok ? mins.result.value : 0
+  const tempC = temp.result.ok ? temp.result.value : 0
   // Illustrative: published sauna studies show heart rates of ~100-150bpm at
   // 80°C sessions, comparable to a brisk walk/light jog. Rough linear scaling
   // by time and temperature above a resting baseline of 70°C sauna.
@@ -92,13 +116,13 @@ function SaunaEquivalent() {
   return (
     <Card className="!p-5">
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Session length (min)"><input className={inputClass} type="number" value={minutes} onChange={(e) => setMinutes(Number(e.target.value) || 0)} /></Field>
-        <Field label="Temperature (°C)"><input className={inputClass} type="number" value={tempC} onChange={(e) => setTempC(Number(e.target.value) || 0)} /></Field>
+        <Field label="Session length (min)">{numInput(mins)}</Field>
+        <Field label="Temperature (°C)">{numInput(temp)}</Field>
       </div>
-      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+      {problems.length > 0 ? <NoEstimate problems={problems} /> : <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
         <div className="text-2xl font-black text-brand-dark">≈ {equivalentWalkMin} min brisk walk</div>
         <div className="text-[11px] text-neutral-500">Estimated cardiovascular strain equivalence</div>
-      </div>
+      </div>}
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Based on published heart-rate data from sauna research (heart rate rises similarly to light-to-moderate aerobic exercise) — a rough comparison against population averages, not a measurement of your calories burned or fitness. Separately, regular sauna use (4-7 times a week) has been linked to lower cardiovascular-disease mortality in observational cohorts.</Prosa>
     </Card>
   )
@@ -138,7 +162,8 @@ const GI_FOODS = [
 ]
 function GlycemicOptimizer() {
   const [foodIdx, setFoodIdx] = useState(0)
-  const [grams, setGrams] = useState(150)
+  const gramsField = useField('foodGrams', '150')
+  const grams = gramsField.result.ok ? gramsField.result.value : 0
   const [addFiber, setAddFiber] = useState(false)
   const [addFat, setAddFat] = useState(false)
   const food = GI_FOODS[foodIdx]
@@ -155,16 +180,16 @@ function GlycemicOptimizer() {
             {GI_FOODS.map((f, i) => <option key={f.name} value={i}>{f.name}</option>)}
           </select>
         </Field>
-        <Field label="Amount (g)"><input className={inputClass} type="number" value={grams} onChange={(e) => setGrams(Number(e.target.value) || 0)} /></Field>
+        <Field label="Amount (g)">{numInput(gramsField)}</Field>
       </div>
       <div className="mt-3 flex gap-2">
         <button onClick={() => setAddFiber((v) => !v)} className={`flex-1 rounded-xl py-2 text-[12px] font-bold ${addFiber ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>+ Fiber (veg/salad)</button>
         <button onClick={() => setAddFat((v) => !v)} className={`flex-1 rounded-xl py-2 text-[12px] font-bold ${addFat ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>+ Fat/protein</button>
       </div>
-      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+      {!gramsField.result.ok ? <NoEstimate problems={[gramsField.result.problem]} /> : <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
         <div className="text-2xl font-black text-brand-dark">{gl.toFixed(1)}</div>
         <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]} glycemic load</Badge>
-      </div>
+      </div>}
       <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Glycemic load = (GI × carbohydrate per serving) / 100 — adding fiber or fat/protein before or alongside a high-GI food is well documented to blunt its glucose spike, and is modeled here as an illustrative reduction, not a measurement of your actual blood-sugar response.</Prosa>
     </Card>
   )
