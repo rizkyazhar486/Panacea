@@ -127,3 +127,6 @@ await import('./postsPrivacyHttp.uji.js')
 
 // Real HTTP: push subscriptions validated and capped, post/feedback text bounded, public price board without contributor emails.
 await import('./inputBoundsHttp.uji.js')
+
+// Connect privacy over real HTTP: consent first, no sensitive field in any user-facing response, server-side deck filters, radius validated, withdrawal erases.
+await import('./connectHttp.uji.js')
