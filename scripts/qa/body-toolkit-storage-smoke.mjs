@@ -8,6 +8,8 @@ const session = id => ({ account: { id, patientId: `self-${id}`, email: `${id}@l
 try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
   const page = await context.newPage()
+  // Exercise a genuinely late lazy route without changing its asset or assertions.
+  await page.route(/BodyToolkit-[^/]+\.js/, async route => { await new Promise(resolve => setTimeout(resolve, 250)); await route.continue() })
   const errors = []
   page.on('pageerror', e => errors.push(e.message))
   await page.goto(origin, { waitUntil: 'domcontentloaded' })
@@ -20,6 +22,7 @@ try {
   }, session('toolkit-a'))
   await page.goto(`${origin}/#/body-toolkit`, { waitUntil: 'domcontentloaded' })
   await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.getByRole('button', { name: 'Skincare Builder', exact: true }).waitFor()
   await page.getByRole('button', { name: 'Symptom Map', exact: true }).click()
   assert.equal(await page.getByText(/9\/10 ·/).count(), 0, 'unattributed legacy symptoms must never be adopted by an account')
   await page.getByRole('button', { name: 'Log entry', exact: true }).click()
@@ -33,6 +36,7 @@ try {
   await minutes.fill('120')
   await page.evaluate(s => localStorage.setItem('panaceamed.session.v1', JSON.stringify(s)), session('toolkit-b'))
   await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.getByRole('button', { name: 'Skincare Builder', exact: true }).waitFor()
   assert.equal(await page.getByRole('button', { name: '+ Cleanser', exact: true }).count(), 2, 'B cannot see A morning skincare')
   await page.getByRole('button', { name: 'Symptom Map', exact: true }).click()
   assert.equal(await page.getByText(/3\/10 ·/).count(), 0, 'account B cannot see A symptoms')
@@ -45,6 +49,7 @@ try {
   await other.evaluate(s => localStorage.setItem('panaceamed.session.v1', JSON.stringify(s)), session('toolkit-a'))
   await page.getByText('Session changed. Reopen this page after signing in.', { exact: true }).waitFor()
   await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.getByRole('button', { name: 'Skincare Builder', exact: true }).waitFor()
   assert.equal(await page.getByRole('button', { name: '+ Cleanser', exact: true }).count(), 1, 'A morning skincare restored')
   await page.getByRole('button', { name: 'NEAT Tracker', exact: true }).click()
   assert.equal(await minutes.inputValue(), '120', 'A data restored without B overwriting it')

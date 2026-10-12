@@ -605,3 +605,29 @@ risks:
       - scripts/uji/siriraj-stroke-score.mts
       - src/domains/clinical-calculators/engine/naegele.ts
       - scripts/uji/naegele-gestational-age.mts
+
+  - risk_id: risk.personal_toolkit_cross_account_cache
+    category: privacy
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Global browser keys exposed symptom logs, skincare routines, activity minutes
+      and recorded food quantities to another account using the same browser.
+      Legacy zeros in diet records cannot establish explicitly entered quantities.
+    mitigation: >-
+      Body Toolkit and Carbon Diet use existing account/self-subject identity scopes,
+      remount on identity change, hide expired or mismatched remembered sessions and
+      recheck scope before writes. Guests remain ephemeral. Unknown-owner legacy bytes
+      are retained without automatic adoption. Two-account client/cache regressions
+      exercise isolation, restoration and cross-tab mismatch. This is not encryption,
+      an XSS defense, a claim about all other browser caches or clinical validation.
+      Exact-head CI, integration and deployment evidence are recorded separately.
+    evidence:
+      - src/domains/personal-health/adapters/toolkitStorage.ts
+      - src/pages/BodyToolkit.tsx
+      - src/pages/CarbonDiet.tsx
+      - scripts/uji/body-toolkit-storage.mts
+      - scripts/qa/body-toolkit-storage-smoke.mjs
+      - scripts/qa/carbon-diet-input-smoke.mjs
+      - docs/BODY_TOOLKIT_STORAGE.md
+      - docs/CARBON_DIET_INPUTS.md
