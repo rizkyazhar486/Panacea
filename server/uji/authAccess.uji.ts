@@ -66,3 +66,6 @@ console.log('Authentication privilege, session-cookie, and OTP security boundari
 
 // Verify production middleware over actual HTTP, not only source assertions.
 await import('./authSessionHttp.uji.js')
+
+// Professional-role applications over real HTTP: owner-only decisions, a grant verifies, each application is decided once.
+await import('./applicationsHttp.uji.js')
