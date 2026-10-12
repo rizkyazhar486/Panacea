@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { deretMetrik, rentangPribadi } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
+import { localCalorieDay, loggedCaloriesToday } from '../domains/personal-health/engine/loggedCalories'
 import { riwayatMinum } from '../lib/kebiasaanHarian'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -209,23 +210,15 @@ export function UbinMuatanPekan() {
 // ubin ini hanya satu hal: seberapa banyak yang sudah Anda catat hari ini.
 export function UbinKaloriBanding() {
   const { state } = useStore()
-  const hariIni = new Date().toISOString().slice(0, 10)
-  const masuk = useMemo(() => {
-    let k = 0
-    for (const f of state.foods ?? []) if (f?.date === hariIni) k += Number(f.kcal) || 0
-    return Math.round(k)
-  }, [state.foods, hariIni])
-  const latihan = useMemo(() => {
-    let k = 0
-    for (const s of getWorkouts()) {
-      const t = Date.parse(s.mulai)
-      if (Number.isFinite(t) && new Date(t).toISOString().slice(0, 10) === hariIni) k += Number(s.kcal) || 0
-    }
-    return Math.round(k)
-  }, [hariIni])
+  const now = Date.now()
+  const day = localCalorieDay(now)
+  const workouts = getWorkouts()
+  const { food: masuk, training: latihan } = useMemo(
+    () => loggedCaloriesToday(state.foods ?? [], workouts, now), [state.foods, workouts, day],
+  )
 
-  if (masuk === 0 && latihan === 0) return null
-  const maks = Math.max(masuk, latihan, 1)
+  if (masuk.recorded + masuk.missing + latihan.recorded + latihan.missing === 0) return null
+  const maks = Math.max(masuk.total ?? 0, latihan.total ?? 0, 1)
 
   return (
     <section>
@@ -236,14 +229,15 @@ export function UbinKaloriBanding() {
             { nama: 'Food logged', nilai: masuk, kelas: 'bg-brand' },
             { nama: 'Training calories', nilai: latihan, kelas: 'bg-amber-500' },
           ].map((b) => (
-            <div key={b.nama}>
+            <div key={b.nama} data-logged-calories={b.nama}>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="t-mikro font-bold text-neutral-500">{b.nama}</span>
-                <span className="t-kecil font-black tabular-nums text-ink dark:text-white">{b.nilai} kkal</span>
+                <span className="t-kecil font-black tabular-nums text-ink dark:text-white">{b.nilai.total === null ? (b.nilai.overflow ? 'Total unavailable' : b.nilai.missing ? 'Calories unavailable' : 'Not logged') : `${Math.round(b.nilai.total)} kkal`}</span>
               </div>
-              <span className="mt-1 block h-2 rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
-                <span className={`block h-full rounded-full ${b.kelas}`} style={{ width: `${(b.nilai / maks) * 100}%` }} />
-              </span>
+              {b.nilai.total !== null && <span className="mt-1 block h-2 rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+                <span className={`block h-full rounded-full ${b.kelas}`} style={{ width: `${(b.nilai.total / maks) * 100}%` }} />
+              </span>}
+              {b.nilai.missing > 0 && <p className="t-mikro mt-1 text-neutral-400">{b.nilai.total !== null ? 'Partial logged subtotal. ' : ''}{b.nilai.missing} record(s) without usable calories.</p>}
             </div>
           ))}
         </div>

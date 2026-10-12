@@ -258,7 +258,7 @@
     "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767)."
    ],
    "owner": "Sonnet",
-   "note": "Kemajuan engineering parsial. Main 6cce707b0cdd0ec2e09ee2c95be9134bc275436c: pemindai asli angka-kosong-ratchet menghitung 4 kejadian di 2 berkas dari 837 TSX; belum nol. Sisa pada agregat durasi/kalori UbinTambahan dan durasi HealthPerformanceLeague memerlukan pelestarian nilai hilang di sumber, bukan sekadar penggantian sintaks. Kriteria tetap REPORTED; aturan deteksi dan persyaratan tidak diubah."
+   "note": "Kemajuan engineering parsial. Pemindai asli angka-kosong-ratchet pada revisi perbaikan kalori ini menghitung 2 kejadian di 2 berkas dari 837 TSX (sebelumnya 4). Kalori kosong tidak menjadi nol; nol eksplisit, subtotal parsial, overflow dan tanggal lokal diuji. Sisa durasi pada UbinTambahan dan HealthPerformanceLeague memerlukan provenance nilai diketahui/turunan/tidak diketahui dari sumber impor dan penyimpanan beserta consumer terkait. Kriteria tetap REPORTED; aturan deteksi dan persyaratan tidak diubah."
   },
   {
    "id": "C3",

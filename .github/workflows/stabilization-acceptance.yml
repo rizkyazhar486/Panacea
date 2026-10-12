@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Logged calories distinguish missing from zero (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          LOGGED_CALORIE_QA_ORIGIN: http://127.0.0.1:4173
+          LOGGED_CALORIE_QA_OUTPUT: artifacts/logged-calories
+        run: node scripts/qa/logged-calorie-smoke.mjs
+
+      - name: Upload logged calorie input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logged-calorie-boundaries
+          path: artifacts/logged-calories
+          if-no-files-found: ignore
+
       - name: Demo wallet withdrawal (synthetic client, 390x844)
         timeout-minutes: 5
         env:
