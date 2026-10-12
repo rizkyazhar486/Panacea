@@ -326,3 +326,6 @@ await import("./careHttpRbac.uji.js")
 await import("./shareExpiryHttp.uji.js")
 // Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
 await import("./secondOpinionHttpRbac.uji.js")
+
+// Lab & Referral Closure over real HTTP: closing evidence, linked-result re-verification, refusals with audit and no mutation.
+await import("./labReferralClosureHttp.uji.js")
