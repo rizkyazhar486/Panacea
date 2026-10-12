@@ -292,6 +292,20 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: Numeric display animation (actual component, missing/zero/reduced motion)
+        timeout-minutes: 5
+        env:
+          ANIMATION_QA_OUTPUT: artifacts/animated-number
+        run: node scripts/qa/animated-number-smoke.mjs
+
+      - name: Upload numeric display animation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: animated-number-boundaries
+          path: artifacts/animated-number
+          if-no-files-found: ignore
+
       - name: BMI calculation availability (synthetic client, 390x844)
         timeout-minutes: 5
         env:
