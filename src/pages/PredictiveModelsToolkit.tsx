@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconGauge } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { parsePredictiveField, type PredictiveField } from '../domains/personal-health'
+import { autophagyTiming } from '../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Predictive Models Toolkit — six small, real mathematical models in one
@@ -40,19 +41,13 @@ const problemsOf = (...fs: Field_[]) => fs.flatMap((f) => (f.result.ok ? [] : [f
 function AutophagyTiming() {
   // Tidak ada kolom berat: rumus di bawah tidak memakainya. Kolom yang tampak
   // menentukan hasil padahal tidak (dulu bernilai 70 kg dari getDemo()) menipu.
-  const fat = useField('bodyFatPct', '20')
-  const meal = useField('hoursSinceMeal', '2')
+  const fat = useField('bodyFatPct', '')
+  const meal = useField('hoursSinceMeal', '')
   const problems = problemsOf(fat, meal)
-  const bodyFatPct = fat.result.ok ? fat.result.value : 0
-  const lastMealHoursAgo = meal.result.ok ? meal.result.value : 0
-  // Illustrative model: glycogen stores ~ liver glycogen (~100-120g) depleted
-  // over roughly 12-16h at typical resting glucose utilization, faster with
-  // lower body fat / higher activity. This is a rough population-average
-  // heuristic, not a measurement of the user's actual glycogen or autophagy.
-  const leanMassFactor = 1 - bodyFatPct / 100
-  const baseHours = 14 - leanMassFactor * 2
-  const hoursRemaining = Math.max(0, baseHours - lastMealHoursAgo)
-  const autophagyStarted = hoursRemaining <= 0
+  const bodyFatPct = fat.result.ok ? fat.result.value : Number.NaN
+  const lastMealHoursAgo = meal.result.ok ? meal.result.value : Number.NaN
+  // Existing illustrative formula; missing inputs produce no numeric result.
+  const r = autophagyTiming({ bodyFatPct, hoursSinceMeal: lastMealHoursAgo })
 
   return (
     <Card className="!p-5">
@@ -61,9 +56,9 @@ function AutophagyTiming() {
         <Field label="Hours since last meal">{numInput(meal)}</Field>
       </div>
       {problems.length > 0 ? <NoEstimate problems={problems} /> : <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        {autophagyStarted
-          ? <div className="text-lg font-black text-brand-dark">Likely in early autophagy range</div>
-          : <><div className="text-2xl font-black text-brand-dark">~{hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
+        {r.started
+          ? <div className="text-lg font-black text-brand-dark">Illustrative model threshold reached</div>
+          : <><div className="text-2xl font-black text-brand-dark">~{r.hoursRemaining?.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">remaining to the illustrative model threshold</div></>}
       </div>}
       <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">An illustrative estimate, based on typical liver-glycogen depletion time (roughly 12-16 hours of fasting, varying with body composition and activity) — not a measurement of your glycogen or autophagy state, which can only be assessed in a research lab.</Prosa>
     </Card>

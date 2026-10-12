@@ -290,3 +290,6 @@ assert.equal((tidurTetap.diaryWellness as { sleepHr?: number }[])[0].sleepHr, 7)
 assert.equal((susunPatchDiary({ diaryWellness: [{ date: '2026-09-28', sleepHr: 7 }] }, { wellness: [{ date: '2026-09-28', sleepHr: 0, waterMl: 0 }] }).diaryWellness as unknown[]).length, 0)
 
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')
+
+// Real HTTP: personal-data routes (settings with server-owned keys, health profile, series, reminders) authorization and integrity.
+await import('./personalDataHttpRbac.uji.js')

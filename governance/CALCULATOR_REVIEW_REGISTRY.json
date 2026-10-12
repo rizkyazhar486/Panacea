@@ -17,6 +17,14 @@
       "evidence": null
     },
     {
+      "id": "autophagyTiming",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
       "id": "bloodDonationScreen",
       "review_status": "PENDING_CLINICAL_REVIEW",
       "clinically_reviewed": false,

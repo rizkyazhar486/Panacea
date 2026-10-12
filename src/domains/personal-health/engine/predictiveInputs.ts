@@ -6,7 +6,7 @@ export type FieldResult = { ok: true; value: number } | { ok: false; problem: st
 type Spec = { label: string; min: number; max: number; unit: string }
 
 export const PREDICTIVE_FIELDS = {
-  bodyFatPct: { label: 'Body fat', min: 2, max: 70, unit: '%' },
+  bodyFatPct: { label: 'Body fat', min: 3, max: 70, unit: '%' },
   hoursSinceMeal: { label: 'Hours since last meal', min: 0, max: 72, unit: 'h' },
   lightWithinMin: { label: 'Daylight within', min: 0, max: 240, unit: 'min' },
   coffeeWithinMin: { label: 'Coffee within', min: 0, max: 240, unit: 'min' },
