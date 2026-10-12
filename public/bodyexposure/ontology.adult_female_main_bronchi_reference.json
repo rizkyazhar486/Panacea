@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+  "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976; ontologyid and label fields retained from the pinned source GLB node extras",
+  "source_sha256": "c58e5b8fb61d982eb72f7385b6ce858e07e05766b0101ff0e15c7bc469cf60ff",
+  "license": "CC BY 4.0",
+  "matched_structures": 4,
+  "structures_total": 4,
+  "map": {
+    "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.L": {
+      "id": "FMA:13144",
+      "label": "Cartilage of left main bronchus"
+    },
+    "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.L": {
+      "id": "UBERON:0002178",
+      "label": "Left Main Bronchus"
+    },
+    "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.R": {
+      "id": "FMA:13143",
+      "label": "Cartilage of right main bronchus"
+    },
+    "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.R": {
+      "id": "UBERON:0002177",
+      "label": "Right Main Bronchus"
+    }
+  }
+}

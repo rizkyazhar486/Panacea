@@ -72,17 +72,30 @@ export function buildOpenCellIndex(loc: readonly LocRow[], abundance: readonly A
   return { proteins, rejected, withoutAbundance }
 }
 
-/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein (substring) / Ensembl dan UniProt (ID persis). Kueri kosong → daftar kosong. */
-export function searchProteins(proteins: readonly OpenCellProtein[], query: string, limit = 12): OpenCellProtein[] {
+/** Cari menurut nama gen (awalan lebih dulu), lalu nama protein (substring) / Ensembl dan UniProt (ID persis). Tanpa kueri dan filter → daftar kosong; filter lokasi memakai semua tingkat anotasi. */
+export function searchProteins(proteins: readonly OpenCellProtein[], query: string, limit = 12, location: Localisation | null = null): OpenCellProtein[] {
   const q = query.trim().toLowerCase()
-  if (!q || limit <= 0) return []
+  if ((!q && !location) || limit <= 0 || (location && !KNOWN.has(location))) return []
   const starts: OpenCellProtein[] = [], rest: OpenCellProtein[] = []
   for (const p of proteins) {
+    if (location && ![...p.grade3, ...p.grade2, ...p.grade1].includes(location)) continue
     const g = p.gene.toLowerCase()
     if (g.startsWith(q)) starts.push(p)
     else if (g.includes(q) || (p.name ?? '').toLowerCase().includes(q) || p.ensg.toLowerCase() === q || (p.uniprot ?? '').toLowerCase() === q) rest.push(p)
   }
   return [...starts, ...rest].slice(0, limit)
+}
+
+export const OPENCELL_PAGE_SIZE = 8
+
+/** Browse every matching source row while keeping each mobile result page bounded. */
+export function searchProteinPage(proteins: readonly OpenCellProtein[], query: string, page = 0, location: Localisation | null = null) {
+  const matches = searchProteins(proteins, query, proteins.length, location)
+  const pageCount = Math.ceil(matches.length / OPENCELL_PAGE_SIZE)
+  const requested = Number.isSafeInteger(page) && page >= 0 ? page : 0
+  const current = Math.min(requested, Math.max(0, pageCount - 1))
+  const offset = current * OPENCELL_PAGE_SIZE
+  return { proteins: matches.slice(offset, offset + OPENCELL_PAGE_SIZE), total: matches.length, page: current, pageCount, offset }
 }
 
 export interface PublishedOpenCell { schema: 1; kind: 'opencell_index'; licence: string; citation: string; limitations: string; proteins: OpenCellProtein[] }

@@ -29,6 +29,31 @@ risks:
       - .github/workflows/mongo-persistence.yml
       - docs/MONGO_PERSISTENCE_ACCEPTANCE.md
 
+  - risk_id: risk.production_release_exact_revision
+    category: validation_integrity
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Scheduled, manual and immediate Vercel releases could deploy without passing
+      safety and acceptance evidence for the exact current-main revision.
+    mitigation: >-
+      Candidate release guard checks six workflow gates and seven required jobs,
+      exact SHA/main/run/attempt provenance, complete pagination and fresh main/run
+      snapshots. Timestamp ambiguity and terminal failures block; bounded waiting
+      only observes pending/missing workflows. A credential-free prerequisite and
+      immediate post-build recheck protect every deployment path. Dependency audit
+      now runs on every main push to supply exact-revision evidence. Deterministic
+      positive/negative tests passed on this synchronized candidate; exact-head
+      CI, integration and actual production revision verification remain required.
+      Observed CI acceptance is not an atomic release lock or clinical approval.
+    evidence:
+      - scripts/qa/vercel-release-gate.mjs
+      - scripts/qa/vercel-release-gate.test.mjs
+      - scripts/qa/vercel-release-workflow.test.mjs
+      - .github/workflows/vercel-prebuilt-production.yml
+      - .github/workflows/dependency-audit.yml
+      - docs/VERCEL_RELEASE_GATES.md
+
   - risk_id: risk.referral_linked_result_integrity
     category: patient_data_integrity
     severity: high
@@ -477,11 +502,20 @@ risks:
       2.0.8. The application uses hop-count trust (1), not the affected subnet configuration; exploitability
       of the deployed proxy topology has not been established. Exact-head CI, review, merge and deployed
       dependency verification remain required; this entry does not claim production remediation.
+      2026-10-11 candidate remediation: current canonical frontend build-tree audit found five
+      high advisories in browserslist, nanoid, postcss, source-map-js and Vite. Compatible
+      transitive patches plus Vite 7.3.7/React plugin 5.2.0 remove all high/critical without
+      security exceptions. Explicit targets preserve the previous supported browser baseline.
+      Before/after fixtures reproduce the policy failure and pass. Production-only frontend
+      and server audits have no high/critical; moderate Router/uuid warnings remain.
+      Required current-source build/regression, exact-head CI and integration are pending; owner-directed engineering does not request AI peer review.
     evidence:
       - scripts/qa/dependency-audit-gate.mjs
       - scripts/qa/dependency-audit-gate.test.mjs
       - server/uji/proxyAddr.uji.mjs
       - scripts/qa/fixtures/dependency-audit/server-before-2210.json
+      - scripts/qa/fixtures/dependency-audit/root-before-2376.json
+      - scripts/qa/fixtures/dependency-audit/root-patched-2026-10-11.json
       - governance/dependency-audit-policy.json
       - .github/workflows/dependency-audit.yml
 

@@ -1,3 +1,46 @@
+### Integrated outcomes and actual release failure — 2026-10-11
+
+- Canonical 81c6fab275982022e2a7a3ebe3e8b446dad28b4d contains #2406 (actual frontend build manifest; 11 exact-head checks), #2416 (whole-rupiah meet API integrity; 13 exact-head checks) and #2417 (all measured OpenCell matches reachable; 8 exact-head checks). Resulting trees and parents were verified after each expected-head merge. Combined clean source build passed 805 QA tests plus TypeScript/Vite. Alpha remains 25/43; no criteria were promoted in these increments.
+- #2416 backend source b8a3dd7 and server tree 5e777aee894eda3ad2e0b554e1f292d55b922ffc were independently observed through cache-busted public health and Render smoke 38160909523. No authenticated production write was performed. OpenCell public resource is unchanged: 1,310 rows, SHA256 7f424a81b7e6137fce9caf06bd817614343e0d4c53eba336faa22f3ebb62080d, CC BY-SA 4.0.
+- Frontend release 38161822494 FAILED before deployment: Vercel CLI 59.11.7 adds literal .vercel/.env.local ignore lines, dirtying tracked .gitignore despite equivalent existing patterns. #2422 supplies the literal lines; actual extracted pinned CLI function reproduces two modifications/rejected release before, no modifications/accepted release after. Six manifest Git fixtures pass. The strict source guard remains intact; corrected exact-head CI/release remain pending. Local text-input/full component fixture failed in a browser that also cannot fill/type into a bare HTML input (font width zero); bounded mobile navigation/filter reset and all deterministic protein tests pass. No full local visual or clinical approval is claimed.
+
+### Dependency remediation synchronization — 2026-10-11
+
+- Revalidated canonical b8a3dd7 dependency lock against the live registry: five high, zero critical and four moderate findings in the full frontend build tree. High packages are browserslist, nanoid, postcss, source-map-js and Vite. Earlier seven-high audit remains historical in root-before-2376.json rather than being relabeled current.
+- Reuse the prepared compatible transitive patches and Vite 7.3.7/React plugin 5.2.0. Explicit build targets retain the previous supported-browser baseline. Canonical source/build manifest and all contributor assets/features are preserved. Current-source npm ci and live full frontend audit pass: zero high/critical, two moderate Router findings retained, with the existing policy unchanged. Fresh current-baseline and patched fixtures are recorded; Node requirements match the upgraded toolchain. Current-source build/regression, exact-head CI, integration and production remain pending; no security exception is removed or added and no human/AI approval is fabricated.
+
+### Frontend build provenance implementation — 2026-10-11
+
+- Existing production page checks could not independently identify the frontend source revision. This isolated increment generates public/build-info.json during the existing production build, with only Git commit/tree hashes and an explicit dirty/unknown state. A configured GitHub revision must match a clean actual checkout; archives without Git retain unknown metadata rather than trusting an environment claim alone.
+- The source root must be the actual repository root. Generated metadata and Vercel local environment/output are ignored; no credential, patient data, clinical-review label or anatomical asset is published in the manifest. Existing build validators, tests, TypeScript and Vite remain intact. No E7 promotion or human acceptance is claimed.
+- Five focused tests pass, including real Git commit/dirty/untracked/ignored-output behavior, wrong revision, unknown source and unchanged earlier output after a rejected release. The clean configured build passed on the earlier source; synchronization onto canonical d057aeb7dcbfdfcf0712eab85c22014c762cd7bf is being revalidated. #2403 was merged by another contributor as c0afdf1006328ab98b61880a5dc765ce0b0334c1 and carries the exact #2397/#2399 HTTP regression implementations (canonical blob comparison). Those two PRs are superseded, not additional merges. The separate #2410 mobile smoke repair is preserved; the unpushed alternative tap prototype is not included. Exact-head automation and deployment of this manifest remain pending; main d057aeb automatic acceptance passed, production deployment was skipped by push policy.
+
+### Delivered encounter/Body dependencies and current resource-based increment — 2026-10-11
+
+- Canonical main 0232eea6bf403e61ffd8aa6e73bb4eee2675920d integrates #2383 with exact reconciled tree a0ca08eb05ac03d583f806a0880f5e2090f7cd6e and expected parent 2752d41912249c72e24a901b78b2ba503e2afaa1. All ten exact-head gates passed on 1011a1ed03826fb0628c6b94b8965fc9e28400d6. #2390 and #2396 are superseded: their four implementation blobs match canonical main, not additional PR merges. Canonical post-merge automation and production remain separate pending evidence.
+- The OpenCell compartment feature combines 17 published locations, all annotation grades and identifier search over the unchanged 1,310 cultured HEK293T proteins. Combined current-main source passes 23 protein/ontology/heartbeat tests, six source-render pipeline tests, 786/786 build QA tests, TypeScript and Vite build; the frontend uji suite passed 694/694 before ontology-only synchronization. No measured body-tissue mapping or human clinical acceptance is claimed.
+- #2397 and #2399 remain pending integration; their freshly reconciled real HTTP RBAC fixtures pass locally. E2 remains REPORTED. #2403 is serialized after those two existing regression outcomes and requires fresh automated gates. Root ownership is limited to these branches; active contributor anatomy and source assets are preserved.
+- Production is pending through the existing configured release workflow. No continuous background mechanism or complete product/clinical readiness is claimed. Refresh canonical Git/PR/workflow state before using these historical checkpoints.
+
+### Body Exposure compartment filtering and mobile CI diagnosis — 2026-10-11
+
+- Canonical main observed: 28df18e7a9daa2741ba1903db40e7c01a86be77d, preserving Claude's calculator export. #2403 implements location-only browsing and combined identifier/location filtering over the existing 1,310 OpenCell HEK293T proteins and 17 published locations; all annotation grades remain visible. No new dataset, geometry, clinical approval or production release is claimed.
+- Eight regression tests pass; typecheck and build passed before the calculator-export synchronization. Fresh synchronized automation remains required. Local browser reached Vessels and the biomechanics tab, then failed atlas-label visibility; an independent blank-page check reproduces zero-width font metrics in this local Chromium environment, so local browser acceptance is not claimed.
+- Two exact-head downstream CI runs failed the Vessels normal click despite #2390's viewport reveal. Diagnostic-only commits now capture control/ancestor geometry without forcing clicks, changing timeouts or removing checks: #2390 head 968df174ad68d88b5e61792aa329269630d6d470 and #2383 head 1011a1ed03826fb0628c6b94b8965fc9e28400d6. Required source fixes and fresh current-main checks are outstanding before integration.
+- Unmerged chain: #2390 → #2396 → #2383 → #2397 → #2399 → #2403. E2 remains REPORTED; canonical Alpha remains 24/43 at this observation. Human acceptance belongs to the owner's team. Configured production release is pending; no background execution is promised.
+
+### Lab/referral HTTP authorization implementation — 2026-10-11
+
+- Follows serialized #2390 → #2396 → #2383 → #2397. New fixture extends the mandatory existing hasilLab suite with nine actual HTTP route decisions, stored own/foreign patient data, effective unverified doctor limits, owner-versus-clinician separation, authenticated provenance and exact no-mutation assertions for all rejected calls. No runtime route, role or clinical threshold changes.
+- Targeted/full server suites, typecheck/build and strict fixture typecheck passed. Temporarily admitting every same-tenant patient in actual service ownership code failed the populated-subject exclusion assertion; source restored before clean target. Final synchronized candidate receives mandatory automated CI; E2 remains REPORTED with lab-log/share/care consent routes still outstanding.
+- No AI review round or human clinical acceptance is claimed. Existing resources and measurements remain intact. Deployment is pending through the configured GitHub release route; Vercel connector has scope 403, so direct connector deployment is unavailable. No future background execution is implied.
+
+### Populated clinical-patient authorization regression — 2026-10-11
+
+- This test-only increment follows #2390 → #2396 → #2383; its candidate contains their exact implementations before automated CI. It preserves the existing 15-route clinical matrix and verifies an actually populated private p1, two independent self identities, reciprocal read/write denials and clinician-issued link access restricted to its redeeming account. Authorized before/after reads assert rejected writes preserve exact records.
+- Existing-patient admission mutation passed the old absent-patient matrix but failed the new populated-p1 denial. Runtime source was restored. Targeted/full server tests, typecheck/build, strict fixture typecheck and architecture/ratchet passed; synchronized runtime test passes. Current-main child-exit cleanup fix and retry options are preserved.
+- E2 remains REPORTED; broader lab/care HTTP coverage is still required. No runtime clinical feature, criterion promotion, human review or production deployment is claimed. Final integration requires fresh automated gates and current-main merge-tree equality, serialized after its upstream tasks.
+
 ### A2 forward synchronization with delivered Body Exposure — 2026-10-11
 
 - Canonical main f16e3fc49c0110e7dd9aeadbbaf229fcd58d380c includes Claude's #2394 illustrative heartbeat. Forward merge preserves its implementation and labels; A2 runtime/tests are unchanged. Fresh exact-head automated checks follow this synchronization; no additional AI review is requested and no clinical approval or deployment is claimed.
@@ -109,6 +152,45 @@
 - Limitations: this is single-process save ordering, not cross-process transaction
   isolation or recovery of historical lost data. Production revision verification
   for this candidate is outstanding. Historical checkpoints below remain unchanged.
+
+### Historical release-branch checkpoint retained from 2026-10-10
+
+### Current checkpoint — 2026-10-10, exact-revision release safety
+
+- Canonical main observed: `a5b646dfc80a30d975ec00ec7c60b407e321572f`,
+  expected-head squash of #2348. Parent is `dcb40fdf73461db86641a8a90fd1dac2f921fd9c`;
+  tree `067d187178e9337eced666861bf92b96943d737c` equals accepted referral head
+  `976de5c2688ebe62eee2a57063ee382f7fb4893a`. All nine exact-head checks passed,
+  with independent AI technical review recorded as COMMENTED. This is engineering
+  review, not clinical approval. Canonical post-merge acceptance is still pending.
+- Independent production observation at 10:47 UTC: Render health and capabilities
+  returned HTTP 200, both reporting `a5b646dfc80a30d975ec00ec7c60b407e321572f`.
+  `verify-render-revision.mjs` passed on that canonical checkout with matching
+  server source tree `690c61d4fda615baf351ab9b24e47c3ce140af98`.
+  Render smoke run `38045865511` passed. This verifies backend revision/health,
+  not clinical behavior, real Mongo restart or configured genomics compute workers
+  (worker configured=false). Vercel push deployment was skipped/batched.
+- Active root integration outcome: exact-revision Vercel guard. Every deploy trigger
+  requires current-main acceptance/security/dependency/evidence/3D jobs, complete
+  run/job provenance and a second check after build. Missing/pending CI may be
+  observed for up to 1,200 seconds; terminal failures and ambiguous attempt order
+  block. The script has 74 passing targeted tests and independent review; final
+  combined build, CI, merge and deployment evidence remain outstanding here.
+- Ownership: root branch `fix/vercel-exact-revision-gate`; #2343/#2344 own separate
+  deployment-reporting changes in the same workflow. Re-query those PRs and preserve
+  their work during integration. Claude's anatomical assets, gait and visualization
+  branches remain untouched. No human clinical approval or patient-data operation
+  was performed in this session.
+- Next independent outcome: `fix/lab-collection-date-integrity`, local unpublished
+  head `47c7ebe2370b41a505412c8cc6d0ed6733021e2c`, based on the referral merge.
+  It rejects calendar rollover, clock overflow and ambiguous timezone-less lab
+  timestamps while preserving valid date-only/UTC forms and temporal bounds.
+  Targeted tests, server typecheck/build/full suite and six calendar tests passed;
+  final synchronized review/publication/exact-head CI/integration remain pending.
+- Remaining independent evidence gaps: real Mongo restart/reload behavior for #2347;
+  canonical post-merge/production revision checks; release-reporting PR ownership;
+  qualified clinical review. The historical checkpoints below retain their original
+  evidence and must not be treated as current repository truth.
 
 ### Current checkpoint — 2026-10-10, referral closure integrity
 
@@ -491,3 +573,54 @@ are retained as the durable state rather than creating duplicate governance.
 - Canonical main 7f22f1a88e679570d729a4e0bff8ed7d8f428d09 has accepted tree e4772a342bb59c46f1aa65d38dadf13713202eff and expected parent fc122cd80051db7b6e1aa4f5bd1fbefb2539c4b5. Post-merge workflows are running; canonical verification remains outstanding.
 - Import branch merged canonical main without rewriting published history. Squash ancestry produced four conflicts; preserved the reviewed import additions after checking each conflict against the accepted dependency tree. Fresh validation and seven exact-head workflows remain required before acceptance.
 - #2274 canonical workflows have all succeeded. P0 profile/cache ownership and HealthProfile load/save continuity remain next independent work; no completion fixed-point claim.
+
+### Club meet fee API integrity — 2026-10-11
+
+- Follow-up to integrated #2412: the form already rejects invalid fees, but real POST /api/meets still coerced missing/blank/negative values into a shared free meet. A real isolated HTTP fixture reproduced the baseline (missing fee returned 200 instead of 400).
+- The API now accepts only numeric whole rupiah from 0 through the existing form limit of 10,000,000; zero remains an explicit free decision. Invalid fee returns 400 invalid_fee before constructing/persisting a meet. Authentication, server-controlled host identity, existing meetings and other fields remain unchanged.
+- Targeted actual HTTP fixture passes: anonymous write denial, 14 malformed/type/range inputs with exact unchanged shared collections, four explicit free/paid/boundary values, forged host ignored, and exact file persistence including existing seed records. Imported into the existing mandatory sports test before its external-provider mocks. Full server npm run uji, typecheck/build and strict standalone fixture typecheck pass. Exact-head CI/integration/backend deployment remain pending; no clinical or Alpha acceptance status is promoted.
+
+### OpenCell full-result navigation — 2026-10-11
+
+- Compartment filtering previously exposed only the first eight matching proteins, leaving the rest unreachable without already knowing their identifiers. Reuse the unchanged published 1,310 HEK293T protein rows with bounded eight-row pages, exact total/range, native previous/next controls, and query/location resets. This is cultured-cell source navigation, not measured body/tissue anatomy or clinical approval. No new dataset or conversion.
+- All 11 OpenCell tests and TypeScript pass. New coverage reconstructs every matching row across all 17 published compartments without repeats or altered source values, preserves exact identifier/location intersection and idle behavior, and handles stale/invalid page requests. Full combined build, exact-head automation, integration and deployment remain pending.
+
+
+### INVICTUS release repair — actual Vercel environment caller (2026-10-11)
+
+- Canonical baseline: `cfe4c6242480b9e093dcec70846a11c382fd3749`. Five engineering increments are integrated; frontend production is not verified. Alpha remains 25/43 technically VERIFIED; no clinical approval is inferred.
+- Preserve both failed releases: runs `38161822494` (source `81c6fab`) and `38163946515` (source `cfe4c624`). Both failed during prebuilt build before deployment because CLI setup changed tracked `.gitignore`; neither shipped.
+- The first repair's test modeled the environment filename rather than the actual caller argument. CLI 59.11.7 `pullEnvRecords` calls `addToGitIgnore(rootPath, ".env*")` when downloading `.env.local`. Its exact-line check appends `.env*` despite equivalent existing Git ignore rules.
+- Add the literal `.env*` before the public `!.env.example` exception, retain `.vercel`, and use configured `npm ci` installation. Update the real-Git regression fixture to the actual caller arguments and verify the public example remains permitted. Keep the strict actual-checkout manifest and dirty-source rejection unchanged.
+- Six source-manifest tests pass locally. An extracted pinned-CLI helper reproduces the old source mutation and clean corrected source. Exact-head CI, merge, corrected deployment, and live revision verification remain pending until recorded by the PR and actual release run.
+
+
+### INVICTUS technical delivery and next Body Exposure increment (2026-10-11)
+
+- Canonical release `c421bdb982d7d603cc8e1515f6747f02751966a6`, tree `5f91ca5e440e72f170eaf1f97946657521083bc7`, is independently PRODUCTION REVISION VERIFIED on both `https://panaceamed.id` and `https://panacea-a34rkyz7m-panaceamed.vercel.app`. Configured run `38166039077`, deploy job `114548690306`, evidence artifact `11712072185`: actual build, deploy and deployment-URL smoke succeeded. Separate cache-busted HTTP checks matched exact clean SHA/tree, all seven application scripts, next/previous protein navigation code, all 1,310 OpenCell rows and unchanged source hash, and byte-identical female bronchi metadata/GLBs. See #2428 for all resource hashes. This is technical delivery, not clinical or full human acceptance.
+- Source outcomes now integrated: #2426 actual environment-caller correction (eight exact-head checks), #2331 worker diagnostic privacy (twelve), and #2428 truthful release evidence (eight). #2343/#2344 are closed as superseded only after matching the canonical workflow blob; their historical CI was not relabeled. The earlier two failed deployments remain retained above. The other contributor integrated #2425 female bronchi after its nine head gates; no ownership is claimed here. Alpha remains 25/43 technically VERIFIED.
+- Next increment: a transient OpenCell source failure permanently retains an error with no retry control. The actual React component browser fixture reproduces the missing action, then the correction recovers through HTTP 503, malformed HTTP-200 source, and the unchanged published data. Validation rejects malformed data; explicit retries preserve licence, limitations and cultured-cell boundaries. Local fixture passes with three explicit requests and no page errors. Exact-head CI, integration and deployment of this increment are pending. The earlier local bare-text-input/font limitation is not converted into a full visual pass.
+
+### Exact-source automated release gate synchronization (2026-10-11)
+
+- Canonical baseline is independently delivered `c421bdb982d7d603cc8e1515f6747f02751966a6`; deployment run `38166039077` and public-domain clean SHA/tree/application/resource checks passed. Backend runtime is `dc6217af8cc60b9f293e51ad04dd5cbe6130ea37`, with the same current server source tree `2d226df360fe683b1fcaf67afae3d30a42eea00e`; health and public capabilities passed, anonymous job POST remained 401, and worker configuration remains false. No clinical approval is inferred.
+- Existing #2349 code is synchronized by a normal forward merge. Preserve the complete main records and dated historical branch checkpoints, the integrated truthful #2343/#2344 reporting, actual-source dirty guard, and every other contributor's feature. No new AI review round or human approval request is introduced.
+- Automatic release prerequisite verifies six exact-current-main workflow gates and seven required jobs, complete run/attempt/job provenance, and a fresh main/run snapshot; a second immediate check occurs after build before deploy. Only missing/pending CI is observed within a bounded wait. Failed/cancelled/skipped, stale, ambiguous or incomplete evidence blocks release. Every main push can acquire dependency-audit evidence; PR path filtering remains.
+- Local gate/workflow regressions, combined build, exact-head CI and integration are being executed. Production c421 is already delivered; this new guard is not yet production-validated. Active Body Exposure retry #2431 and B7 E2E #2432 change a separate stabilization workflow and must remain intact during integration. Alpha remains 25/43; human review stays pending.
+
+
+### Release gate candidate preserves integrated retry (2026-10-11)
+
+- Canonical `959226d20994d30023744ee53164b4970baaec01` integrates Body Exposure retry #2431, parent delivered `c421bdb9`, accepted tree `eec9fc07acca577cd22685f3e7f8c93304775085`. Eight exact-head checks passed, including the actual component/network recovery in mandatory mobile acceptance. Full build passed 820 QA tests, TypeScript and Vite. The new source is batched, not claimed deployed; public production remains independently verified c421. All seven c421 post-merge workflows completed successfully, including its real deployment.
+- Synchronize #2349 with that canonical source while retaining both the retry and gate records. Ninety-one focused gate/workflow/reporting regressions passed before synchronization; current full build passed 902 QA tests, TypeScript and Vite. Reexecute the combined release regressions and actual retry browser case, then require fresh exact-head CI on the synchronized branch. Clinical and Alpha status are not promoted.
+
+
+### Integrated exact-main release guard and router advisory remediation (2026-10-11)
+
+- Guard #2349 is integrated at canonical `40870137e239d1f8d6edbc8065ee927746400188`, parent `e6804e652ccb98453d691c0356ab5ad30c95a280`; independently fetched merged tree `acefeeb76cd063d89bf2b0eeccdd54936a787258` matches the locally tested latest-main merge candidate. Nine exact-head check runs on `6452942eae86749e1b261f3089387a9eba351433` passed; 91 release-specific tests and the combined 902-test QA/TypeScript/Vite build passed. The added pressure-flow runtime regression also passed with native Node 24 after an initial unsupported tsx invocation failed.
+- Guard main release run `38169063903` was intentionally BATCHED: push-policy succeeded, release-gates and deploy were skipped. This is not a new deployment. Current production remains independently verified `c421bdb982d7d603cc8e1515f6747f02751966a6`, run `38166039077`; independent deployment/domain script hashes, source manifest, 1,310-protein source and female-bronchi asset checks passed. Backend health/public capabilities returned `dc6217af8cc60b9f293e51ad04dd5cbe6130ea37`, the unchanged current server source tree; genomic worker remains unconfigured. Guard post-main Stabilization was cancelled after a newer contributor push; it is not a passing check.
+- Independent dependency continuation: two remaining moderate React Router advisories require v7 (GHSA-wrjc-x8rr-h8h6 and GHSA-337j-9hxr-rhxg); v6 patch updates do not remediate their advisory ranges. Upgrade only react-router-dom to exact 7.18.4 and its lockfile dependencies; preserve Node engine and explicit browser targets. Live full npm audit was 2 moderate, 0 high/critical before, and 0 reported advisories after. Retain all historical audit fixtures and store the new snapshot separately at `scripts/qa/fixtures/dependency-audit/root-router-patched-2026-10-11.json`. No audit exception or security threshold changes.
+- Local router evidence: 702/702 existing frontend test files, original 820-test QA/TypeScript/Vite build, then release-guard combined 902-test QA/TypeScript/Vite build; 35 dependency-policy regressions and the actual audit gate pass. An initially mistyped audit-gate path failed after the successful frontend suite; the corrected scripts/qa path passed separately. Actual built-app navigation passed parent/query restoration, in-app direct links, canonical title and mobile reduced-motion behavior. OpenCell browser recovery passed three explicit attempts, malformed-source denial and the unchanged 1,310 rows/provenance.
+- Full mobile shell smoke failed on 26px-wide navigation targets in this local browser; the identical failure occurred against the pre-upgrade canonical-equivalent c421 build, consistent with the previously reproduced local text/font environment limitation. Preserve both failures; do not claim a local mobile/visual pass or relax the 40px gate. Fresh required CI must supply its own result.
+- Preserve independently integrated fetal inspector #2434 and all source/identity restrictions. Latest-main combined build, exact-head CI, final integration and deployment of the router candidate remain pending at this checkpoint. Alpha remains 25/43 technically VERIFIED; clinical/anatomical human review remains pending. No new datasets downloaded.
+- Disk exhaustion blocked the first new worktree checkout. Remove only this session's clean integrated retry worktree and checked ignored reproducible build outputs; retain original source resources, all branches, uncommitted work, history and test logs. The isolated router worktree/install succeeded after cleanup.

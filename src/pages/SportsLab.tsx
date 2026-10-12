@@ -6,6 +6,7 @@ import {
   type Player, type Sport,
 } from '../lib/sportsAnalytics'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { validatePlayerEntry } from '../domains/sports-roster'
 
 // Sports Lab — roster entry, multi-agent valuation, and similarity search.
 //
@@ -216,29 +217,23 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
   const defs = SPORT_METRICS[sport]
   const [name, setName] = useState('')
   const [position, setPosition] = useState('')
-  const [age, setAge] = useState('25')
-  const [played, setPlayed] = useState('20')
-  const [missed, setMissed] = useState('2')
-  const [minutes, setMinutes] = useState('80')
+  const [age, setAge] = useState('')
+  const [played, setPlayed] = useState('')
+  const [missed, setMissed] = useState('')
+  const [minutes, setMinutes] = useState('')
   const [metrics, setMetrics] = useState<Record<string, string>>({})
+  const [problems, setProblems] = useState<Record<string, string>>({})
   const [open, setOpen] = useState(false)
 
   function submit() {
-    if (!name.trim()) return
-    const m: Record<string, number> = {}
-    for (const d of defs) m[d.key] = Number(metrics[d.key] ?? '') || 0
-    onAdd({
-      id: Math.random().toString(36).slice(2),
-      name: name.trim(), sport,
-      position: position.trim() || '—',
-      ageYears: Number(age) || 0,
-      matchesPlayed: Number(played) || 0,
-      matchesMissed: Number(missed) || 0,
-      minutesPerMatch: Number(minutes) || 0,
-      metrics: m,
-    })
-    setName(''); setPosition(''); setMetrics({})
+    const r = validatePlayerEntry({ name, position, age, played, missed, minutes, metrics }, defs)
+    if (!r.ok) { setProblems(r.problems); return }
+    setProblems({})
+    onAdd({ id: Math.random().toString(36).slice(2), sport, ...r.value })
+    setName(''); setPosition(''); setAge(''); setPlayed(''); setMissed(''); setMinutes(''); setMetrics({})
   }
+
+  const err = (k: string) => problems[k] ? <div role="alert" className="mt-1 text-[11px] font-bold text-red-600">{problems[k]}</div> : null
 
   return (
     <Card className="!p-4">
@@ -250,16 +245,16 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
       {open && (
         <div className="mt-3 space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Name"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} /></Field>
+            <Field label="Name"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />{err('name')}</Field>
             <Field label="Position"><input className={inputClass} placeholder="Forward" value={position} onChange={(e) => setPosition(e.target.value)} /></Field>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Age"><input className={inputClass} inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} /></Field>
-            <Field label="Minutes per match"><input className={inputClass} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value)} /></Field>
+            <Field label="Age"><input className={inputClass} inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} />{err('age')}</Field>
+            <Field label="Minutes per match"><input className={inputClass} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value)} />{err('minutes')}</Field>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Matches played"><input className={inputClass} inputMode="numeric" value={played} onChange={(e) => setPlayed(e.target.value)} /></Field>
-            <Field label="Matches missed (injury)"><input className={inputClass} inputMode="numeric" value={missed} onChange={(e) => setMissed(e.target.value)} /></Field>
+            <Field label="Matches played"><input className={inputClass} inputMode="numeric" value={played} onChange={(e) => setPlayed(e.target.value)} />{err('played')}</Field>
+            <Field label="Matches missed (injury)"><input className={inputClass} inputMode="numeric" value={missed} onChange={(e) => setMissed(e.target.value)} />{err('missed')}</Field>
           </div>
 
           <div className="pt-1 text-[11px] font-black uppercase tracking-wide text-neutral-500">{SPORT_LABEL[sport]} statistics</div>
@@ -267,6 +262,7 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
             <Field key={d.key} label={d.label}>
               <input className={inputClass} inputMode="decimal" placeholder={d.hint ?? `elite ≈ ${d.eliteAt}`}
                 value={metrics[d.key] ?? ''} onChange={(e) => setMetrics({ ...metrics, [d.key]: e.target.value })} />
+              {err(`metric:${d.key}`)}
             </Field>
           ))}
 

@@ -9,6 +9,7 @@ import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
 import { api, type BackendMeet, type BackendClub } from '../lib/api'
 import { useStore } from '../lib/store'
 import { geocode } from '../lib/geocode'
+import { parseMeetFee } from '../domains/club'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Club Hub — community sports & health clubs and scheduled meets, both fully
@@ -499,19 +500,21 @@ function HostMeetSheet({ email, initialDay, onClose, onCreated }: { email: strin
   const [time, setTime] = useState('06:00')
   const [durH, setDurH] = useState(1.5)
   const [cap, setCap] = useState(20)
-  const [feeRp, setFeeRp] = useState(0)
+  const [feeText, setFeeText] = useState('0')
+  const fee = parseMeetFee(feeText)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
   const submit = async () => {
     if (!title.trim() || !venue.trim()) { setError('Give it a title and a venue.'); return }
+    if (!fee.ok) { setError(fee.message); return }
     setSaving(true)
     setError('')
     try {
       const geo = await geocode([venue, address].filter(Boolean).join(', '))
       await api.createMeet({
         title: title.trim(), club: club.trim() || undefined, tag, venue: venue.trim(), address: address.trim(),
-        day, time, durH, cap, feeRp, emoji: EMOJI_BY_SPORT[tag] || '🏃', notes: [],
+        day, time, durH, cap, feeRp: fee.feeRp, emoji: EMOJI_BY_SPORT[tag] || '🏃', notes: [],
         lat: geo?.lat ?? 0, lng: geo?.lng ?? 0,
       })
       onCreated()
@@ -557,7 +560,8 @@ function HostMeetSheet({ email, initialDay, onClose, onCreated }: { email: strin
               <input className={`${inputClass} mt-1`} type="number" min={2} max={200} value={cap} onChange={(e) => setCap(Number(e.target.value) || 2)} />
             </label>
             <label className="col-span-2 text-[12px] font-bold text-neutral-500">Fee per person (Rp, 0 = free)
-              <input className={`${inputClass} mt-1`} type="number" min={0} step={5000} value={feeRp} onChange={(e) => setFeeRp(Number(e.target.value) || 0)} />
+              <input className={`${inputClass} mt-1`} type="number" min={0} step={5000} value={feeText} onChange={(e) => setFeeText(e.target.value)} aria-invalid={!fee.ok} />
+              {!fee.ok && <span className="mt-1 block text-[11px] font-semibold text-red-600 dark:text-red-300">{fee.message}</span>}
             </label>
           </div>
         </div>

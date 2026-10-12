@@ -38,13 +38,11 @@ class WorkerNotConfiguredError extends Error {}
 class WorkerRequestError extends Error {
   status: number
   code: string
-  detail?: unknown
 
-  constructor(status: number, code: string, message: string, detail?: unknown) {
+  constructor(status: number, code: string, message: string) {
     super(message)
     this.status = status
     this.code = code
-    this.detail = detail
   }
 }
 
@@ -129,12 +127,16 @@ function publicWorkerPayload(payload: WorkerPayload) {
 
 async function parseWorkerResponse(response: globalThis.Response) {
   const text = await response.text()
-  if (!text) return {} as WorkerPayload
+  let payload: unknown
   try {
-    return JSON.parse(text) as WorkerPayload
+    payload = JSON.parse(text)
   } catch {
-    return { message: text.slice(0, 2000) } as WorkerPayload
+    throw new WorkerRequestError(502, 'invalid_genomics_worker_response', 'Genomics worker returned an invalid response.')
   }
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new WorkerRequestError(502, 'invalid_genomics_worker_response', 'Genomics worker returned an invalid response.')
+  }
+  return payload as WorkerPayload
 }
 
 async function workerRequest(path: string, init: RequestInit = {}) {
@@ -152,22 +154,22 @@ async function workerRequest(path: string, init: RequestInit = {}) {
         ...(init.headers || {}),
       },
     })
-    const payload = await parseWorkerResponse(response)
     if (!response.ok) {
+      // Discard failed upstream bodies without exposing diagnostics or retaining a stream.
+      await response.body?.cancel().catch(() => {})
       throw new WorkerRequestError(
         response.status,
         'genomics_worker_error',
-        typeof payload.message === 'string' ? payload.message : `Genomics worker returned HTTP ${response.status}.`,
-        payload,
+        `Genomics worker returned HTTP ${response.status}.`,
       )
     }
-    return payload
+    return await parseWorkerResponse(response)
   } catch (error) {
     if (error instanceof WorkerRequestError || error instanceof WorkerNotConfiguredError) throw error
     if (error instanceof Error && error.name === 'AbortError') {
       throw new WorkerRequestError(504, 'genomics_worker_timeout', 'Genomics worker request timed out.')
     }
-    throw new WorkerRequestError(502, 'genomics_worker_unreachable', error instanceof Error ? error.message : 'Genomics worker could not be reached.')
+    throw new WorkerRequestError(502, 'genomics_worker_unreachable', 'Genomics worker could not be reached.')
   } finally {
     clearTimeout(timer)
   }
@@ -182,9 +184,9 @@ function respondError(res: Response, error: unknown) {
     })
   }
   if (error instanceof WorkerRequestError) {
-    return res.status(error.status).json({ error: error.code, message: error.message, detail: error.detail })
+    return res.status(error.status).json({ error: error.code, message: error.message })
   }
-  return res.status(500).json({ error: 'genomics_control_plane_error', message: error instanceof Error ? error.message : 'Unknown genomics control-plane error.' })
+  return res.status(500).json({ error: 'genomics_control_plane_error', message: 'Unexpected genomics control-plane error.' })
 }
 
 function authenticatedUserId(req: Request) {
@@ -253,7 +255,7 @@ export function attachGenomicsComputeRoutes(server: Server) {
       })
       const workerJobId = typeof payload.id === 'string' ? payload.id : typeof payload.jobId === 'string' ? payload.jobId : ''
       if (!workerJobId) {
-        throw new WorkerRequestError(502, 'invalid_genomics_worker_response', 'Genomics worker accepted the request but did not return a job id.', payload)
+        throw new WorkerRequestError(502, 'invalid_genomics_worker_response', 'Genomics worker accepted the request but did not return a job id.')
       }
       return res.status(202).json({
         jobHandle: encodeHandle({ v: HANDLE_VERSION, id: workerJobId, owner: ownerId }),

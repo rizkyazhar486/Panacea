@@ -75,12 +75,12 @@ try {
       const hro = page.getByTestId('heartbeat-readout'); await hro.waitFor({ timeout: 20000 })
       const seenHr = new Set(); for (let i = 0; i < 4; i++) { seenHr.add(await hro.textContent()); await page.waitForTimeout(330) }
       assert(seenHr.size >= 2, `heartbeat: the cycle did not advance (${[...seenHr].join(' | ')})`)
-      await page.getByLabel('Heart rate').fill('120')
+      await page.getByLabel('Heart rate', { exact: true }).fill('120')
       await page.getByTestId('heart-rate-value').getByText('120 bpm').waitFor()
       await page.getByRole('button', { name: 'Stop heartbeat' }).click()
       await page.getByTestId('heartbeat-note').waitFor({ state: 'detached' })
       // celah data: dinyatakan, bukan diisi pengganti
-      await page.getByTestId('data-gaps').getByText(/What is missing and why \(7\)/).click()
+      await page.getByTestId('data-gaps').getByText(/What is missing and why \(8\)/).click()
       await page.getByTestId('data-gaps').getByText('Heartbeat').waitFor()
       await page.getByTestId('data-gaps').getByText(/Nothing on this list is replaced by a scaled adult model/).waitFor()
       // preset kamera anatomis: transisi halus mengubah sudut pandang, lalu kembali ke anterior
@@ -222,6 +222,21 @@ try {
       await page.getByText(/Source: massp \(Apache-2\.0\); via Clinical Neuroanatomy Atlas v1\.0\.3/).waitFor({ timeout: 60000 })
       await page.getByText(/combined atlas layer CC BY-SA 4\.0/).waitFor()
       assert(!(await page.getByText(/stature \d+ cm/).count()), 'a template atlas must not show a stature')
+      // biometri janin terhadap acuan terbit: nilai persentil tepat dari tabel, keadaan tidak tersedia, sumber dan peringatan klinis tampil
+      const fg = page.getByTestId('fetal-growth-panel')
+      await fg.getByText('Fetal growth: where a measurement sits against published references').click()
+      await fg.getByLabel('Measured value').waitFor({ timeout: 60000 })
+      await fg.getByLabel('Gestational weeks').fill('40'); await fg.getByLabel('Measured value').fill('342')
+      await fg.getByTestId('fetal-result').getByText('50th percentile').waitFor()
+      await fg.getByTestId('fetal-result').getByText(/Kiserud/).waitFor()
+      await fg.getByTestId('fetal-result').getByText(/needs a qualified clinician|Interpretation needs a qualified clinician/).first().waitFor()
+      await fg.getByLabel('Gestational weeks').fill('13')
+      await fg.getByTestId('fetal-unavailable').getByText(/outside that range and no value is extrapolated/).waitFor()
+      await fg.getByLabel('Gestational weeks').fill('20'); await fg.getByLabel('Measured value').fill('172.48')
+      await fg.getByRole('radio', { name: 'INTERGROWTH-21st' }).click()
+      await fg.getByTestId('fetal-result').getByText('50th percentile').waitFor()
+      await fg.getByLabel('Measurement').selectOption('efw')
+      await fg.getByTestId('fetal-unavailable').getByText(/INTERGROWTH-21st publishes no estimated fetal weight standard/).waitFor()
       // skala sel (OpenCell, HEK293T): dimuat saat dibuka; hasil, batas data, dan keadaan kosong dinyatakan
       const oc = page.getByTestId('opencell-panel')
       await oc.getByText('Cell scale: where a protein sits inside a cell').click()

@@ -114,6 +114,9 @@ jobs:
           BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
         run: node scripts/qa/body3d-mobile-smoke-v2.mjs
 
+      - name: OpenCell failed-source recovery
+        run: node scripts/qa/opencell-load-recovery-smoke.mjs
+
       - name: Body Exposure rendered WebGL visual artifact
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
@@ -168,6 +171,33 @@ jobs:
           NAVIGATION_QA_ORIGIN: http://127.0.0.1:4173
           NAVIGATION_QA_OUTPUT: artifacts/uiux-mobile-390x844
         run: node scripts/qa/navigation-back-smoke.mjs
+
+      - name: C2 Framingham missing-input recovery (390x844)
+        timeout-minutes: 5
+        env:
+          HEALTH_SIMULATOR_QA_ORIGIN: http://127.0.0.1:4173
+          HEALTH_SIMULATOR_QA_OUTPUT: artifacts/health-simulator-inputs
+        run: node scripts/qa/health-simulator-input-smoke.mjs
+
+      - name: Upload Framingham input recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: framingham-input-recovery
+          path: artifacts/health-simulator-inputs
+          if-no-files-found: ignore
+
+      # Alpha B7: the clinician lab-result review queue against the REAL server (fresh data file, so the doctor-verification
+      # fixture starts clean) and Chromium 390x844. Fails by name: SERVER_TIDAK_SIAP, VITE_TIDAK_SIAP or E2E_GAGAL.
+      - name: Install server dependencies for the lab review E2E
+        working-directory: server
+        run: npm ci
+
+      - name: Alpha B7 clinician lab-result review E2E (real server, 390x844)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node scripts/qa/lab-result-review-e2e-gate.mjs
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()

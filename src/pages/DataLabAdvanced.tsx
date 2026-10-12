@@ -4,6 +4,8 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { CfpbComplaintRoutingLab } from '../components/finance/CfpbComplaintRoutingLab'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { getDemoTersimpan } from '../lib/profile'
+import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../domains/data-lab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data Lab Advanced — local data-processing tools and transparent research workspaces in one
@@ -90,37 +92,35 @@ function GlucoseVariability() {
 }
 
 function PhenoAgeCalc() {
-  const [f, setF] = useState({ albumin: 45, creatinine: 80, glucose: 5.0, crp: 1, lymphPct: 30, mcv: 90, rdw: 13, alkPhos: 70, wbc: 6, age: 35 })
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((s) => ({ ...s, [k]: Number(e.target.value) || 0 }))
-
-  const phenoAge = useMemo(() => {
-    const xb = -19.907 - 0.0336 * f.albumin + 0.0095 * f.creatinine + 0.1953 * f.glucose
-      + 0.0954 * Math.log(Math.max(f.crp, 0.01)) - 0.0120 * f.lymphPct + 0.0268 * f.mcv
-      + 0.3306 * f.rdw + 0.00188 * f.alkPhos + 0.0554 * f.wbc - 0.0804 * f.age
-    const M = 1 - Math.exp(-Math.exp(xb) * (Math.exp(0.0076927 * 120) - 1) / 0.0076927)
-    const clampedM = Math.min(0.9999, Math.max(0.0001, M))
-    const age = 141.50225 + Math.log(-0.00553 * Math.log(1 - clampedM)) / 0.09165
-    return Math.round(age * 10) / 10
-  }, [f])
+  const [t, setT] = useState<TeksPhenoAge>(() => {
+    const usia = getDemoTersimpan().age
+    return { usia: Number.isFinite(usia) ? String(usia) : '', albuminGL: '', kreatininUmolL: '', glukosaMmolL: '', crpMgL: '', limfositPersen: '', mcvFL: '', rdwPersen: '', alpUL: '', wbcRibu: '' }
+  })
+  const set = (k: KolomPhenoAge) => (e: React.ChangeEvent<HTMLInputElement>) => setT((s) => ({ ...s, [k]: e.target.value }))
+  // Satu jalur: validasi + mesin kanonik lib/longevity.phenoAge (koefisien terbitan Levine 2018, satuan dan rentang diperiksa).
+  const hasil = useMemo(() => hitungPhenoAgeDariTeks(t), [t])
+  const langkah: Partial<Record<KolomPhenoAge, string>> = { glukosaMmolL: '0.1', crpMgL: '0.1', rdwPersen: '0.1', wbcRibu: '0.1' }
 
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Rumus PhenoAge sebagaimana diterbitkan (Levine dkk. 2018) dari 9 penanda darah baku + umur kronologis. Masukkan nilai dari pemeriksaan terbaru (nilai bawaan yang tampil kira-kira lazim/sehat).</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Rumus PhenoAge sebagaimana diterbitkan (Levine dkk. 2018) dari 9 penanda darah baku + umur kronologis. Isi nilai dari pemeriksaan terbaru; kolom kosong tidak dihitung sebagai nol.</Prosa>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <Field label="Albumin (g/L)"><input className={inputClass} type="number" value={f.albumin} onChange={set('albumin')} /></Field>
-        <Field label="Creatinine (µmol/L)"><input className={inputClass} type="number" value={f.creatinine} onChange={set('creatinine')} /></Field>
-        <Field label="Glucose (mmol/L)"><input className={inputClass} type="number" step="0.1" value={f.glucose} onChange={set('glucose')} /></Field>
-        <Field label="CRP (mg/L)"><input className={inputClass} type="number" step="0.1" value={f.crp} onChange={set('crp')} /></Field>
-        <Field label="Lymphocyte %"><input className={inputClass} type="number" value={f.lymphPct} onChange={set('lymphPct')} /></Field>
-        <Field label="MCV (fL)"><input className={inputClass} type="number" value={f.mcv} onChange={set('mcv')} /></Field>
-        <Field label="RDW (%)"><input className={inputClass} type="number" step="0.1" value={f.rdw} onChange={set('rdw')} /></Field>
-        <Field label="Alk. Phosphatase (U/L)"><input className={inputClass} type="number" value={f.alkPhos} onChange={set('alkPhos')} /></Field>
-        <Field label="WBC (1000/µL)"><input className={inputClass} type="number" step="0.1" value={f.wbc} onChange={set('wbc')} /></Field>
-        <Field label="Chronological age"><input className={inputClass} type="number" value={f.age} onChange={set('age')} /></Field>
+        {PHENOAGE_KOLOM.map(({ key, label }) => (
+          <Field key={key} label={label}><input className={inputClass} type="number" inputMode="decimal" step={langkah[key] ?? '1'} value={t[key]} onChange={set(key)} /></Field>
+        ))}
       </div>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-3xl font-black text-brand-dark">{phenoAge}</div>
-        <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {f.age})</div>
+        {hasil.ok ? (
+          <>
+            <div className="text-3xl font-black text-brand-dark">{hasil.data.phenoAge}</div>
+            <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {t.usia})</div>
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-black text-neutral-500">No result yet</div>
+            <div role="alert" className="mt-1 text-[11px] text-neutral-500">{hasil.alasan}</div>
+          </>
+        )}
         <BatasKlaimKesehatan permukaan="lab.phenoage" />
       </div>
       <Prosa kelas="mt-2 text-[11px] text-neutral-500">Levine ME dkk., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Penerapan koefisien terbitannya sebaik yang kami mampu; bukan pengganti pemeriksaan laboratorium klinis tervalidasi, dan sebaiknya diperiksa silang dengan kalkulator PhenoAge lain.</Prosa>
@@ -129,19 +129,27 @@ function PhenoAgeCalc() {
 }
 
 function OmegaRatio() {
-  const [o6, setO6] = useState(12000)
-  const [o3, setO3] = useState(1500)
-  const ratio = o6 / Math.max(o3, 1)
-  const band = ratio <= 4 ? ['Favorable', 'brand'] : ratio <= 10 ? ['Moderate', 'low'] : ['High (pro-inflammatory tilt)', 'critical']
+  const [o6, setO6] = useState('')
+  const [o3, setO3] = useState('')
+  const r = rasioOmega(o6, o3)
   return (
     <Card className="!p-5">
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Omega-6 intake (mg/day, est.)"><input className={inputClass} type="number" value={o6} onChange={(e) => setO6(Number(e.target.value) || 0)} /></Field>
-        <Field label="Omega-3 intake (mg/day, est.)"><input className={inputClass} type="number" value={o3} onChange={(e) => setO3(Number(e.target.value) || 0)} /></Field>
+        <Field label="Omega-6 intake (mg/day, est.)"><input className={inputClass} type="number" inputMode="decimal" value={o6} onChange={(e) => setO6(e.target.value)} /></Field>
+        <Field label="Omega-3 intake (mg/day, est.)"><input className={inputClass} type="number" inputMode="decimal" value={o3} onChange={(e) => setO3(e.target.value)} /></Field>
       </div>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">{ratio.toFixed(1)} : 1</div>
-        <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]}</Badge>
+        {r.ok ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{r.data.ratio.toFixed(1)} : 1</div>
+            <Badge tone={r.data.nada}>{r.data.pita}</Badge>
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-black text-neutral-500">No ratio yet</div>
+            <div role="alert" className="mt-1 text-[11px] text-neutral-500">{o6 === '' && o3 === '' ? 'Enter both intakes.' : r.alasan}</div>
+          </>
+        )}
       </div>
       <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Western diets often sit at an omega-6:3 ratio of 15:1-20:1; traditional diets are estimated closer to 1:1-4:1. A lower ratio is thought to favor a less pro-inflammatory eicosanoid balance — this is an active area of research, not an agreed-upon clinical target.</Prosa>
     </Card>
@@ -181,12 +189,19 @@ interface Supp { name: string; doseMg: number; timeHour: number; halfLifeH: numb
 function SupplementCombiner() {
   const [supps, setSupps] = useState<Supp[]>([{ name: 'Caffeine', doseMg: 200, timeHour: 8, halfLifeH: 5, stimulant: true }])
   const [name, setName] = useState('')
-  const [dose, setDose] = useState(100)
-  const [time, setTime] = useState(8)
-  const [halfLife, setHalfLife] = useState(5)
+  const [dose, setDose] = useState('')
+  const [time, setTime] = useState('')
+  const [halfLife, setHalfLife] = useState('')
+  const [masalah, setMasalah] = useState<Partial<Record<keyof TeksSuplemen, string>>>({})
   const [stimulant, setStimulant] = useState(false)
 
-  const add = () => { if (!name.trim()) return; setSupps((s) => [...s, { name: name.trim(), doseMg: dose, timeHour: time, halfLifeH: halfLife, stimulant }]); setName('') }
+  const add = () => {
+    const r = periksaSuplemen({ nama: name, doseMg: dose, jam: time, paruhJam: halfLife })
+    if (!r.ok) { setMasalah(r.masalah); return }
+    setMasalah({})
+    setSupps((s) => [...s, { ...r.nilai, stimulant }])
+    setName(''); setDose(''); setTime(''); setHalfLife('')
+  }
   const remove = (i: number) => setSupps((s) => s.filter((_, x) => x !== i))
 
   const curve = useMemo(() => {
@@ -209,10 +224,11 @@ function SupplementCombiner() {
       <p className="text-[13px] text-neutral-500">Model each supplement/medication's approximate blood-concentration curve over 24h using its dose and half-life.</p>
       <div className="mt-3 grid grid-cols-4 gap-1.5">
         <input className={inputClass} placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className={inputClass} type="number" placeholder="mg" value={dose} onChange={(e) => setDose(Number(e.target.value) || 0)} />
-        <input className={inputClass} type="number" placeholder="hr taken" value={time} onChange={(e) => setTime(Number(e.target.value) || 0)} />
-        <input className={inputClass} type="number" placeholder="half-life h" value={halfLife} onChange={(e) => setHalfLife(Number(e.target.value) || 1)} />
+        <input className={inputClass} type="number" placeholder="mg" inputMode="decimal" value={dose} onChange={(e) => setDose(e.target.value)} />
+        <input className={inputClass} type="number" placeholder="hr taken" inputMode="decimal" value={time} onChange={(e) => setTime(e.target.value)} />
+        <input className={inputClass} type="number" placeholder="half-life h" inputMode="decimal" value={halfLife} onChange={(e) => setHalfLife(e.target.value)} />
       </div>
+      {Object.values(masalah).map((m) => <div key={m} role="alert" className="mt-1 text-[11px] font-bold text-red-600">{m}</div>)}
       <label className="mt-1.5 flex items-center gap-2 text-[12px] text-neutral-500">
         <input type="checkbox" checked={stimulant} onChange={(e) => setStimulant(e.target.checked)} className="h-4 w-4 accent-brand" /> This is a stimulant
       </label>
