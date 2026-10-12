@@ -14,6 +14,7 @@ import { rancangPanduan } from '../lib/crispr'
 import {
   PHAGE_RESEARCH_BOUNDARY,
   analyzePhageCampaign,
+  parsePhageCount,
   simulateVirtualPhage,
 } from '../lib/biology/phageResearchSandbox'
 import {
@@ -23,8 +24,8 @@ import {
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // Halaman ini menjelaskan MEKANISME, bukan keadaan seseorang. Tidak ada satu
-// pun angka di sini yang berasal dari pengguna, dan tidak satu pun boleh
-// dibaca sebagai "usia biologis" atau ramalan umur. Lihat pita batas di bawah.
+// pun simulasi di sini adalah pengukuran pasien atau ramalan umur. Hitungan
+// kampanye diisi pengguna atau dimuat sebagai contoh berlabel; bukan bukti klinis.
 
 const JENIS: Array<{ id: JenisSel; label: string; catatan: string }> = [
   { id: 'somatik', label: 'Somatic', catatan: 'No telomerase. Divides until the reserve runs out.' },
@@ -172,29 +173,26 @@ function KurvaBeban({ pembersihan }: { pembersihan: number }) {
 }
 
 function PhageResearchSandbox() {
-  const [designed, setDesigned] = useState(285)
-  const [assembled, setAssembled] = useState(285)
-  const [viable, setViable] = useState(16)
-  const [offTargetTested, setOffTargetTested] = useState(6)
-  const [offTargetGrowth, setOffTargetGrowth] = useState(0)
+  const [designed, setDesigned] = useState('')
+  const [assembled, setAssembled] = useState('')
+  const [viable, setViable] = useState('')
+  const [offTargetTested, setOffTargetTested] = useState('')
+  const [offTargetGrowth, setOffTargetGrowth] = useState('')
   const [selectivity, setSelectivity] = useState(82)
   const [evidence, setEvidence] = useState(72)
   const [robustness, setRobustness] = useState(55)
   const [novelty, setNovelty] = useState(35)
 
-  const campaign = useMemo(() => {
-    try {
-      return analyzePhageCampaign({
-        designed,
-        assembled,
-        viable,
-        offTargetHostsTested: offTargetTested,
-        offTargetHostsWithGrowth: offTargetGrowth,
-      })
-    } catch {
-      return null
-    }
+  const campaignInput = useMemo(() => {
+    const d = parsePhageCount(designed), a = parsePhageCount(assembled), v = parsePhageCount(viable)
+    const tested = parsePhageCount(offTargetTested), growth = parsePhageCount(offTargetGrowth)
+    if (d === null || a === null || v === null || tested === null || growth === null) return null
+    return { designed: d, assembled: a, viable: v, offTargetHostsTested: tested, offTargetHostsWithGrowth: growth }
   }, [designed, assembled, viable, offTargetTested, offTargetGrowth])
+  const campaign = useMemo(() => {
+    if (!campaignInput) return null
+    try { return analyzePhageCampaign(campaignInput) } catch { return null }
+  }, [campaignInput])
 
   const virtual = useMemo(() => simulateVirtualPhage({
     targetSelectivity: selectivity / 100,
@@ -223,6 +221,11 @@ function PhageResearchSandbox() {
       </div>
 
       <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">A · Campaign analyzer</p>
+      <p className="mt-1 text-xs text-neutral-500">Enter all five counts; 0 must be explicit. Missing counts do not establish zero growth or viability.</p>
+      <button type="button" className="mt-2 rounded-lg bg-neutral-100 px-3 py-2 text-xs font-bold dark:bg-white/10" onClick={() => {
+        setDesigned('285'); setAssembled('285'); setViable('16'); setOffTargetTested('6'); setOffTargetGrowth('0')
+      }}>Load illustrative campaign example</button>
+      <p className="mt-1 text-xs text-neutral-500">The example is an aggregate demonstration, not a patient result or a verified experiment.</p>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
         {[
           ['Designed', designed, setDesigned],
@@ -237,29 +240,33 @@ function PhageResearchSandbox() {
               type="number"
               min={0}
               step={1}
-              value={value as number}
-              onChange={(e) => (setter as (v: number) => void)(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+              max={Number.MAX_SAFE_INTEGER}
+              aria-label={String(label)}
+              aria-invalid={parsePhageCount(value) === null && value !== '' ? true : undefined}
+              placeholder="Not entered"
+              value={value as string}
+              onChange={(e) => (setter as (v: string) => void)(e.target.value)}
               className="mt-1 w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-[13px] font-bold text-ink dark:border-white/10 dark:text-white"
             />
           </label>
         ))}
       </div>
 
-      {campaign ? (
+      {campaign && campaignInput ? (
         <>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Angka nilai={(campaign.assemblyRate * 100).toFixed(1)} satuan="%" label="Assembly rate" />
-            <Angka nilai={(campaign.viabilityRate * 100).toFixed(1)} satuan="%" label="Viable / assembled" />
-            <Angka nilai={(campaign.overallYield * 100).toFixed(1)} satuan="%" label="Overall yield" />
-            <Angka nilai={(campaign.offTargetNoGrowthRate * 100).toFixed(1)} satuan="%" label="No-growth screen" />
+            <Angka nilai={campaignInput.designed > 0 ? (campaign.assemblyRate * 100).toFixed(1) : '—'} satuan={campaignInput.designed > 0 ? '%' : undefined} label="Assembly rate" />
+            <Angka nilai={campaignInput.assembled > 0 ? (campaign.viabilityRate * 100).toFixed(1) : '—'} satuan={campaignInput.assembled > 0 ? '%' : undefined} label="Viable / assembled" />
+            <Angka nilai={campaignInput.designed > 0 ? (campaign.overallYield * 100).toFixed(1) : '—'} satuan={campaignInput.designed > 0 ? '%' : undefined} label="Overall yield" />
+            <Angka nilai={campaignInput.offTargetHostsTested > 0 ? (campaign.offTargetNoGrowthRate * 100).toFixed(1) : '—'} satuan={campaignInput.offTargetHostsTested > 0 ? '%' : undefined} label="No-growth screen" />
           </div>
           <p className="mt-2 text-[11px] text-neutral-500">
-            95% Wilson interval: {(campaign.viabilityWilson95[0] * 100).toFixed(1)}–{(campaign.viabilityWilson95[1] * 100).toFixed(1)}% · viability = viable ÷ assembled × 100.
+            {campaignInput.assembled > 0 ? <>95% Wilson interval: {(campaign.viabilityWilson95[0] * 100).toFixed(1)}–{(campaign.viabilityWilson95[1] * 100).toFixed(1)}% · viability = viable ÷ assembled × 100.</> : 'No viability interval: no assembled observations.'}
           </p>
         </>
       ) : (
         <p className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-800 dark:text-amber-300">
-          Counts must satisfy viable ≤ assembled ≤ designed and off-target growth ≤ off-target tested.
+          Enter five exact non-negative whole counts satisfying viable ≤ assembled ≤ designed and off-target growth ≤ off-target tested.
         </p>
       )}
 
