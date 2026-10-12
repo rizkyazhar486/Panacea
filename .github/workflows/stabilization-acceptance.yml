@@ -292,6 +292,21 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: BMI calculation availability (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          BMI_QA_ORIGIN: http://127.0.0.1:4173
+          BMI_QA_OUTPUT: artifacts/bmi-availability
+        run: node scripts/qa/bmi-availability-smoke.mjs
+
+      - name: Upload BMI availability evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmi-calculation-availability
+          path: artifacts/bmi-availability
+          if-no-files-found: ignore
+
       # Alpha B7: the clinician lab-result review queue against the REAL server (fresh data file, so the doctor-verification
       # fixture starts clean) and Chromium 390x844. Fails by name: SERVER_TIDAK_SIAP, VITE_TIDAK_SIAP or E2E_GAGAL.
       - name: Install server dependencies for the lab review E2E
