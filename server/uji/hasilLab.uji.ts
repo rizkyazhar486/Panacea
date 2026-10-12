@@ -322,5 +322,7 @@ await import("./labReferralHttpRbac.uji.js")
 await import("./labShareHttpRbac.uji.js")
 // Real HTTP daily check-in (care plan / report) ownership, integrity, replacement and revocation.
 await import("./careHttpRbac.uji.js")
+// Real HTTP share expiry (end time moved into the past across a restart) on every dependent clinician, care and read-model route.
+await import("./shareExpiryHttp.uji.js")
 // Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
 await import("./secondOpinionHttpRbac.uji.js")
