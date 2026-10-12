@@ -5,7 +5,7 @@ import { IconStethoscope } from '../components/icons'
 import { CfpbComplaintRoutingLab } from '../components/finance/CfpbComplaintRoutingLab'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { getDemoTersimpan } from '../lib/profile'
-import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../domains/data-lab'
+import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, proyeksiTren, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../domains/data-lab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data Lab Advanced — local data-processing tools and transparent research workspaces in one
@@ -20,21 +20,10 @@ import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, PHENOAGE_KOLOM, ty
 
 type Tab = 'blood-trend' | 'glucose' | 'phenoage' | 'omega' | 'microbiome' | 'supplements' | 'vault' | 'cfpb'
 
-function linreg(xs: number[], ys: number[]): { slope: number; intercept: number } {
-  const n = xs.length
-  const sumX = xs.reduce((a, b) => a + b, 0), sumY = ys.reduce((a, b) => a + b, 0)
-  const sumXY = xs.reduce((a, x, i) => a + x * ys[i], 0)
-  const sumX2 = xs.reduce((a, x) => a + x * x, 0)
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX)
-  const intercept = (sumY - slope * sumX) / n
-  return { slope, intercept }
-}
-
 function BloodTrendForecaster() {
-  const [values, setValues] = useState(['90', '92', '95', '', ''])
-  const points = values.map((v, i) => ({ year: i, val: Number(v) })).filter((p) => p.val > 0 && values[p.year] !== '')
-  const reg = points.length >= 2 ? linreg(points.map((p) => p.year), points.map((p) => p.val)) : null
-  const projected = reg ? Array.from({ length: 5 }, (_, i) => Math.round((reg.slope * (values.length + i) + reg.intercept) * 10) / 10) : []
+  // Mulai kosong: contoh karangan (90, 92, 95) dulu langsung menampilkan proyeksi lima tahun seolah data pengguna.
+  const [values, setValues] = useState(['', '', '', '', ''])
+  const r = useMemo(() => proyeksiTren(values), [values])
 
   return (
     <Card className="!p-5">
@@ -42,17 +31,23 @@ function BloodTrendForecaster() {
       <div className="mt-3 grid grid-cols-5 gap-1.5">
         {values.map((v, i) => (
           <Field key={i} label={`Yr ${i + 1}`}>
-            <input className={inputClass} type="number" value={v} onChange={(e) => setValues((vs) => vs.map((x, j) => (j === i ? e.target.value : x)))} />
+            <input className={inputClass} type="number" inputMode="decimal" value={v} onChange={(e) => setValues((vs) => vs.map((x, j) => (j === i ? e.target.value : x)))} />
           </Field>
         ))}
       </div>
-      {reg && (
+      {!r.ok && (
+        <div role="alert" className="mt-3 rounded-xl bg-neutral-100 p-3">
+          <div className="text-[12px] font-bold text-neutral-600">No projection yet</div>
+          <p className="mt-1 text-[11px] text-neutral-500">{r.alasan}</p>
+        </div>
+      )}
+      {r.ok && (
         <div className="mt-3 rounded-xl bg-brand/10 p-3">
-          <div className="text-[12px] font-bold text-neutral-500">Projected next 5 years</div>
+          <div className="text-[12px] font-bold text-neutral-500">Projected next 5 years after Yr {r.data.indeksTerakhir + 1}</div>
           <div className="mt-1 flex flex-wrap gap-2">
-            {projected.map((p, i) => <Badge key={i} tone={reg.slope > 0 ? 'low' : 'brand'}>Yr+{i + 1}: {p}</Badge>)}
+            {r.data.proyeksi.map((p) => <Badge key={p.tahunKe} tone={r.data.kemiringanPerTahun > 0 ? 'low' : 'brand'}>Yr+{p.tahunKe}: {p.nilai ?? 'not meaningful'}</Badge>)}
           </div>
-          <p className="mt-2 text-[11px] text-neutral-500">Trend: {reg.slope > 0 ? '+' : ''}{(reg.slope).toFixed(2)}/year — a simple straight-line projection, not a physiological model; real biomarkers rarely move perfectly linearly.</p>
+          <p className="mt-2 text-[11px] text-neutral-500">Trend: {r.data.kemiringanPerTahun > 0 ? '+' : ''}{r.data.kemiringanPerTahun.toFixed(2)}/year from {r.data.n} values; scatter around the line ±{r.data.sisaSd.toFixed(1)} — a simple straight-line projection, not a physiological model; real biomarkers rarely move perfectly linearly.</p>
           <BatasKlaimKesehatan permukaan="lab.blood-trend" />
         </div>
       )}
