@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconToken } from '../components/icons'
 import { parseNumberField } from '../domains/clinical-calculators'
+import { validatePolicyInput, type PolicyField } from '../domains/macro-policy'
 import {
   BLOC_LABEL, COUNTRIES, DATA_AS_OF, DATA_SOURCES, gdpPerCapitaUsd,
   rateImpact, simulatePolicy, analyseTrade,
@@ -245,18 +246,19 @@ function RateTab() {
 
 /* ── Simulasi kebijakan ────────────────────────────────────────────────────── */
 function SimTab() {
-  const [startInflation, setStartInflation] = useState(6)
-  const [target, setTarget] = useState(2.5)
-  const [startRate, setStartRate] = useState(6)
-  const [gap, setGap] = useState(1)
+  const [text, setText] = useState<Record<PolicyField, string>>({ startInflationPct: '6', targetInflationPct: '2.5', startPolicyRatePct: '6', outputGapPct: '1' })
   const [quarters, setQuarters] = useState(12)
 
-  const data = useMemo(() => simulatePolicy({
-    startInflationPct: startInflation, targetInflationPct: target,
-    startPolicyRatePct: startRate, outputGapPct: gap,
+  const checked = useMemo(() => validatePolicyInput(text), [text])
+  const data = useMemo(() => checked.ok ? simulatePolicy({
+    startInflationPct: checked.value.startInflationPct, targetInflationPct: checked.value.targetInflationPct,
+    startPolicyRatePct: checked.value.startPolicyRatePct, outputGapPct: checked.value.outputGapPct,
     taylorInflationWeight: 0.5, taylorOutputWeight: 0.5,
     neutralRealRatePct: 1.5, quarters,
-  }), [startInflation, target, startRate, gap, quarters])
+  }) : null, [checked, quarters])
+  const problem = (k: PolicyField) => !checked.ok && checked.problems[k]
+    ? <div role="alert" className="mt-1 text-[11px] font-bold text-red-600">{checked.problems[k]}</div> : null
+  const setField = (k: PolicyField) => (e: { target: { value: string } }) => setText({ ...text, [k]: e.target.value })
 
   return (
     <>
@@ -264,20 +266,20 @@ function SimTab() {
         <SectionTitle icon={<IconToken size={18} />} title="Quarterly policy simulation" subtitle="A simple Taylor rule — not a forecast" />
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Field label="Starting inflation (%)">
-            <input className={inputClass} inputMode="decimal" value={startInflation}
-              onChange={(e) => setStartInflation(Number(e.target.value) || 0)} />
+            <input className={inputClass} inputMode="decimal" value={text.startInflationPct}
+              onChange={setField('startInflationPct')} />{problem('startInflationPct')}
           </Field>
           <Field label="Inflation target (%)">
-            <input className={inputClass} inputMode="decimal" value={target}
-              onChange={(e) => setTarget(Number(e.target.value) || 0)} />
+            <input className={inputClass} inputMode="decimal" value={text.targetInflationPct}
+              onChange={setField('targetInflationPct')} />{problem('targetInflationPct')}
           </Field>
           <Field label="Starting policy rate (%)">
-            <input className={inputClass} inputMode="decimal" value={startRate}
-              onChange={(e) => setStartRate(Number(e.target.value) || 0)} />
+            <input className={inputClass} inputMode="decimal" value={text.startPolicyRatePct}
+              onChange={setField('startPolicyRatePct')} />{problem('startPolicyRatePct')}
           </Field>
           <Field label="Output gap (%)">
-            <input className={inputClass} inputMode="decimal" value={gap}
-              onChange={(e) => setGap(Number(e.target.value) || 0)} />
+            <input className={inputClass} inputMode="decimal" value={text.outputGapPct}
+              onChange={setField('outputGapPct')} />{problem('outputGapPct')}
           </Field>
         </div>
         <div className="mt-2">
@@ -294,6 +296,7 @@ function SimTab() {
       </Card>
 
       <Card className="!p-4">
+        {data ? (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
@@ -308,6 +311,9 @@ function SimTab() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+        ) : (
+          <div className="rounded-xl bg-neutral-50 p-4 text-center text-[12px] font-bold text-neutral-500 dark:bg-white/5">No simulation yet. Fix the highlighted fields.</div>
+        )}
 
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">The equations used</div>

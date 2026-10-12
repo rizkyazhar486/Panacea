@@ -1,3 +1,7 @@
 export { readPersonalHealthStorageScope } from './adapters/storageScope.ts'
 export { runPersonalHealthOperation, capturePersonalHealthOperation } from './adapters/operation.ts'
 export { readPersonalHealthFile, readPersonalHealthImage } from './adapters/fileImport.ts'
+export { parsePredictiveField, PREDICTIVE_FIELDS } from './engine/predictiveInputs.ts'
+export type { FieldResult as PredictiveFieldResult, PredictiveField } from './engine/predictiveInputs.ts'
+export { coffeeFluidMl, fastingElectrolytes, FASTING_HYDRATION_REVIEW, COFFEE_CUPS_MAX, FASTING_HOURS_MAX } from './engine/fastingHydration.ts'
+export type { NutritionEstimate } from './engine/fastingHydration.ts'

@@ -1,0 +1,39 @@
+.fetal-parcel-inspector { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; color: #192b3b; font-family: system-ui, sans-serif; }
+.dark .fetal-parcel-inspector { color: #e1ebf3; }
+.fetal-parcel-inspector h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 700; margin: 14px 0 8px; }
+.fetal-parcel-inspector h2 { font-size: 20px; font-weight: 700; margin-top: 18px; }
+.fetal-parcel-inspector h3 { font-weight: 650; margin: 16px 0 8px; }
+.fetal-parcel-inspector p { line-height: 1.6; margin: 8px 0; }
+.fetal-parcel-inspector a { text-decoration: underline; }
+.fpi-note { font-size: 12px; opacity: .75; }
+.fetal-parcel-inspector .fpi-note button { min-height: 28px; padding: 0; }
+.fpi-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr); gap: 20px; margin: 20px 0; }
+.fpi-view, .fpi-panel { min-width: 0; border: 1px solid #8a9bad55; border-radius: 16px; padding: 14px; }
+.fpi-canvas { height: clamp(340px, 52vw, 560px); background: #101b29; border-radius: 10px; overflow: hidden; }
+.fpi-canvas canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+.fpi-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.fetal-parcel-inspector button, .fetal-parcel-inspector select { border: 1px solid #8a9bad88; border-radius: 9px; padding: 8px 12px; min-height: 40px; background: transparent; color: inherit; }
+.fetal-parcel-inspector button[aria-pressed=true] { border-color: #287d88; background: #287d881b; }
+.fetal-parcel-inspector button:focus-visible, .fetal-parcel-inspector input:focus-visible, .fetal-parcel-inspector select:focus-visible { outline: 2px solid #3198a5; outline-offset: 3px; }
+.fetal-parcel-inspector label { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; }
+.fetal-parcel-inspector input[type=range] { min-width: 0; flex: 1; }
+.fetal-parcel-inspector input[type=checkbox] { width: 18px; height: 18px; accent-color: #287d88; }
+.fpi-region-list { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.fpi-region-list > div { display: flex; align-items: center; gap: 8px; }
+.fpi-region-list button { display: flex; align-items: center; gap: 8px; flex: 1; text-align: left; }
+.fpi-region-list button span { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.fpi-region-list small { margin-left: auto; font-size: 11px; opacity: .7; }
+.fetal-parcel-inspector dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; font-size: 13px; margin: 14px 0; }
+.fetal-parcel-inspector dd { font-variant-numeric: tabular-nums; }
+.fetal-parcel-inspector table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.fetal-parcel-inspector th, .fetal-parcel-inspector td { text-align: left; border-bottom: 1px solid #8a9bad33; padding: 7px 2px; }
+.fetal-parcel-inspector td:last-child, .fetal-parcel-inspector th:last-child { text-align: right; }
+.fetal-parcel-inspector footer { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .fpi-layout { grid-template-columns: minmax(0, 1fr); } .fetal-parcel-inspector { padding: 18px 12px 36px; } .fpi-canvas { height: 380px; } }
+.fpi-mri { margin-block: 1.5rem; padding: 1rem; border: 1px solid #8a9bad55; border-radius: 12px; }
+.fpi-mri summary { cursor: pointer; min-height: 44px; font-weight: 600; }
+.fpi-mri-images { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; margin-block: 1rem; }
+.fpi-mri-images figure { margin: 0; min-width: 0; }
+.fpi-mri-images img { width: 100%; height: auto; image-rendering: pixelated; border-radius: 6px; }
+.fpi-mri-images figcaption { font-size: 0.85rem; margin-top: 0.5rem; }
+@media(max-width:760px) { .fpi-mri-images { grid-template-columns: 1fr; } }

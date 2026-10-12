@@ -186,6 +186,8 @@ import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
+import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
+import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -662,7 +664,10 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
   res.json({ price: p })
 })
 
-app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
+app.get('/api/posts', (req, res) => {
+  const pemirsa = currentUser(req)?.email
+  res.json({ posts: listPosts().map((p) => postUntukPemirsa(p, pemirsa, config.jwtSecret)) })
+})
 app.post('/api/posts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Post>
@@ -685,7 +690,7 @@ app.post('/api/posts', requireAuth, (req, res) => {
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, currentUser(req)?.email, config.jwtSecret) })
 })
 // Delete a post (owner-only).
 app.delete('/api/posts/:id', requireAuth, (req, res) => {
@@ -699,7 +704,7 @@ app.patch('/api/posts/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const p = updatePost(req.params.id, u.email, req.body as Partial<Post>)
   if (!p) return res.status(403).json({ error: 'forbidden' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 // Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.
 app.post('/api/posts/:id/react', requireAuth, (req, res) => {
@@ -708,7 +713,7 @@ app.post('/api/posts/:id/react', requireAuth, (req, res) => {
   if (!emoji) return res.status(400).json({ error: 'missing_emoji' })
   const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 
 // --- Club Hub meets (real, user-created — join counts are actual RSVPs) ---
@@ -717,6 +722,11 @@ app.post('/api/meets', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Meet>
   if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  // Match the Club Hub form's whole-rupiah limit. Free means an explicit 0;
+  // absent, coercible or negative input must never silently publish a free meet.
+  if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
+    return res.status(400).json({ error: 'invalid_fee' })
+  }
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -728,7 +738,7 @@ app.post('/api/meets', requireAuth, (req, res) => {
     time: String(b.time).slice(0, 5),
     durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
-    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
     lat: Number(b.lat) || 0,
     lng: Number(b.lng) || 0,
@@ -935,7 +945,7 @@ app.get('/api/clinical/links', requireAuth, (req, res) => {
 })
 app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const pid = String(req.params.patientId), t = getTautan()[pid]
+  const pid = String(req.params.patientId), semuaTautan = getTautan(), t = Object.prototype.hasOwnProperty.call(semuaTautan, pid) ? semuaTautan[pid] : undefined
   if (!t) return res.status(404).json({ error: 'not-linked' })
   if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
   hapusTautan(pid)
@@ -966,6 +976,7 @@ app.post('/api/clinical/education', requireAuth, (req, res) => {
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.education.save', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
@@ -976,6 +987,7 @@ app.post('/api/clinical/vital', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
   addVital(patientId, vitalTercap)
+  addAudit(pencatat, 'clinical.vital.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
@@ -986,6 +998,7 @@ app.post('/api/clinical/supportive', requireAuth, (req, res) => {
   const pencatat = (req as express.Request & { user: User }).user
   const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
   addSupportive(patientId, resultTercap)
+  addAudit(pencatat, 'clinical.supportive.add', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
@@ -993,6 +1006,7 @@ app.post('/api/clinical/patient', requireAuth, (req, res) => {
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
   if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
+  addAudit((req as express.Request & { user: User }).user, 'clinical.patient.create', String((patient as { id?: unknown })?.id ?? ''))
   res.json({ ok: true })
 })
 
@@ -1004,6 +1018,8 @@ app.get('/api/settings', requireAuth, (req, res) => {
 app.put('/api/settings', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
+  // Sebaran (...rest) mengubah larik menjadi {0:..,1:..}; tanpa pemeriksaan ini muatan non-objek diterima dan disimpan sebagai kunci sampah.
+  if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) return res.status(400).json({ error: 'invalid settings payload' })
   // Defensive: never persist the Anthropic API key server-side.
   const { apiKey: _drop, ...rest } = prefs as Record<string, unknown>
   // Entitlements and alert-cooldown stamps live in this same blob, so an
@@ -1889,14 +1905,15 @@ app.get('/api/reminders', requireAuth, (req, res) => {
 })
 app.post('/api/reminders', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const { medName, dose, timeOfDay, nextFireAt } = req.body as { medName?: string; dose?: string; timeOfDay?: string; nextFireAt?: string }
-  if (!medName?.trim() || !timeOfDay || !nextFireAt) return res.status(400).json({ error: 'missing_fields' })
-  const rem = addReminder(u.id, { medName: medName.trim(), dose: (dose ?? '').trim(), timeOfDay, nextFireAt, active: true })
+  let baru: ReturnType<typeof validasiPengingatBaru>
+  try { baru = validasiPengingatBaru(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
+  const rem = addReminder(u.id, { ...baru, active: true })
   res.json({ reminder: rem })
 })
 app.patch('/api/reminders/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const patch = req.body as Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>
+  let patch: ReturnType<typeof validasiTambalPengingat>
+  try { patch = validasiTambalPengingat(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
   const rem = updateReminder(u.id, req.params.id, patch)
   if (!rem) return res.status(404).json({ error: 'not_found' })
   res.json({ reminder: rem })

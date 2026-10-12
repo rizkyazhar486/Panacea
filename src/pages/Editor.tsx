@@ -4,7 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconBook, IconUpload, IconScissors, IconCheck, IconSparkle } from '../components/icons'
 import { verifyMaterial } from '../lib/ai'
-import { validateMaterialPrice } from '../domains/marketplace/engine/materialPrice'
+import { validateMaterialPrice } from '../domains/marketplace'
 import type { Material, MaterialCategory, ExamTrack } from '../lib/types'
 
 // English display labels for the stored (Indonesian) category/exam enum values.

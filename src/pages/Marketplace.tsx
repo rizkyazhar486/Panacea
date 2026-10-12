@@ -5,7 +5,7 @@ import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } fro
 import { verifyMaterial } from '../lib/ai'
 import { ButtonGroup } from '../components/Carousel'
 import { downloadWatermarkedPdf } from '../lib/pdf'
-import { validateMaterialPrice } from '../domains/marketplace/engine/materialPrice'
+import { validateMaterialPrice } from '../domains/marketplace'
 import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
 
 const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']

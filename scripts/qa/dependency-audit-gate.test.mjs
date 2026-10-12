@@ -471,3 +471,23 @@ test('workflow_menjalankan_gerbang_untuk_kedua_workspace_tanpa_menyamarkan_kegag
     assert.ok(active.includes(`'${path}'`), `perubahan pada ${path} harus memicu audit`)
   }
 })
+
+
+test('current frontend source audit fails on every unaccepted high package', () => {
+  const audit = fixture('root-current-main-b8a3dd7')
+  const result = run(audit, EMPTY_POLICY, 'root', new Date('2026-10-11T12:00:00Z'))
+  assert.equal(result.kind, 'vulnerable')
+  assert.deepEqual([...new Set(result.failures.map(f => f.pkg))].sort(), ['browserslist', 'nanoid', 'postcss', 'source-map-js', 'vite'])
+  assert.equal(audit.metadata.vulnerabilities.high, 5)
+})
+
+test('patched frontend audit passes without exemptions and retains moderate warnings', () => {
+  const audit = fixture('root-patched-2026-10-11')
+  const result = run(audit, EMPTY_POLICY, 'root', new Date('2026-10-11T12:00:00Z'))
+  assert.equal(result.kind, 'pass')
+  assert.deepEqual(result.accepted, [])
+  assert.equal(audit.metadata.vulnerabilities.high, 0)
+  assert.equal(audit.metadata.vulnerabilities.critical, 0)
+  assert.ok(result.warnings.length > 0)
+  assert.ok(result.warnings.every(w => w.severity === 'moderate'))
+})
