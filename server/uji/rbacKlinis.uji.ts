@@ -160,3 +160,6 @@ try {
   if (child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await exited }
   rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 })
 }
+
+// Reserved object-property names are never valid patient ids (every clinical, lab and referral entry point, no 5xx, nothing stored).
+await import('./reservedPatientIdsHttp.uji.js')
