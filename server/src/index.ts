@@ -941,7 +941,7 @@ app.get('/api/clinical/links', requireAuth, (req, res) => {
 })
 app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const pid = String(req.params.patientId), t = getTautan()[pid]
+  const pid = String(req.params.patientId), semuaTautan = getTautan(), t = Object.prototype.hasOwnProperty.call(semuaTautan, pid) ? semuaTautan[pid] : undefined
   if (!t) return res.status(404).json({ error: 'not-linked' })
   if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
   hapusTautan(pid)
