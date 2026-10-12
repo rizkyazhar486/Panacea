@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, Badge } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { getWorkouts } from '../lib/workoutStore'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 import {
   RANK_TIERS,
   calculateSeasonalRank,
@@ -49,22 +50,26 @@ function readHealthEvidence(): RankedHealthEvidence | undefined {
 }
 
 function readWorkoutEvidence(): RankedWorkoutEvidence[] {
-  return getWorkouts().map((workout) => ({
+  return getWorkouts().flatMap((workout) => {
+    const duration = workoutDurationSeconds(workout)
+    if (duration === null || duration <= 0) return []
+    return [{
     id: workout.id,
     startedAt: workout.mulai,
-    durationMinutes: Math.max(0, (Number(workout.durasi) || 0) / 60),
+    durationMinutes: duration / 60,
     activeKcal: typeof workout.kcal === 'number' ? workout.kcal : undefined,
     avgHr: typeof workout.avgHr === 'number' ? workout.avgHr : undefined,
     maxHr: typeof workout.maxHr === 'number' ? workout.maxHr : undefined,
     paceSecondsPerKm: typeof workout.paceSec === 'number' ? workout.paceSec : undefined,
     speedKmh: typeof workout.kecepatanKmh === 'number' ? workout.kecepatanKmh : undefined,
     rpe: typeof workout.rpe === 'number' ? workout.rpe : undefined,
-  }))
+    }]
+  })
 }
 
 const COMPONENT_META = [
   ['consistency', 'Consistency', 'Repeatable active days matter, but grinding extra sessions cannot dominate.'],
-  ['energy', 'Energy', 'Verified active calories are the base competitive currency, normalised to the person rather than compared raw.'],
+  ['energy', 'Energy', 'Recorded active calories are the base competitive currency, normalised to the person rather than compared raw.'],
   ['recovery', 'Recovery', 'Recovery/sleep context protects planned rest instead of rewarding unsafe suffering.'],
   ['progression', 'Progression', 'Comparable pace/speed evidence modifies the star only relative to your own recent baseline.'],
   ['evidence', 'Evidence', 'Source coverage determines how confidently the AI can size each effort star.'],
@@ -103,6 +108,10 @@ export function HealthPerformanceLeague() {
   )
 
   const daysLeft = daysUntilSeasonReset(new Date())
+  const excludedDurationCount = getWorkouts().filter(workout => {
+    const seconds = workoutDurationSeconds(workout)
+    return seconds === null || seconds <= 0
+  }).length
   const tierLabel = result.division ? `${result.currentTier.label} ${result.division}` : result.currentTier.label
 
   return (
@@ -165,7 +174,8 @@ export function HealthPerformanceLeague() {
                   <div className="mt-1 text-4xl font-black tabular-nums">{result.score}<span className="text-base text-white/35">/100</span></div>
                 </div>
                 <div className="text-right text-[11px] text-white/45">
-                  <div>{result.calorieVerifiedWorkoutCount}/{result.workoutCount} calorie-verified efforts</div>
+                  <div>{result.calorieVerifiedWorkoutCount}/{result.workoutCount} calorie-recorded efforts</div>
+                  {excludedDurationCount > 0 && <div>{excludedDurationCount} workouts without a known positive duration are not ranked.</div>}
                   <div>{result.eligibleWeeks} season weeks active</div>
                 </div>
               </div>
@@ -214,7 +224,7 @@ export function HealthPerformanceLeague() {
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-white/40">Recent matches</div>
             <h3 className="mt-1 text-lg font-black">Every effort earns a different-sized star</h3>
           </div>
-          <span className="text-[10px] font-bold text-white/40">0–3★ per verified effort</span>
+          <span className="text-[10px] font-bold text-white/40">0–3★ per eligible logged effort</span>
         </div>
         <div className="mt-4 grid gap-2">
           {result.effortWins.slice(-6).reverse().map((effort) => {
@@ -238,7 +248,7 @@ export function HealthPerformanceLeague() {
           })}
           {result.effortWins.length === 0 && (
             <div className="rounded-2xl border border-white/[.07] bg-white/[.025] p-4 text-[11px] text-white/45">
-              No season efforts yet. Import a workout with verified active calories to play the first match.
+              No season efforts yet. Import a workout with recorded active calories and a known positive duration to play the first match.
             </div>
           )}
         </div>
@@ -305,7 +315,7 @@ export function HealthPerformanceLeague() {
           <div className="mt-4 rounded-2xl border border-white/[.07] bg-black/35 p-3 font-mono text-[11px] leading-relaxed text-cyan-100/80">
             ★ = Q0.25[(kcal / kg / 4) × personal difficulty × internal load × progression × recovery protection × evidence confidence]
             <br />
-            max = 3.00★ per effort · no verified calories = 0★
+            max = 3.00★ per effort · no recorded calories = 0★
           </div>
           <div className="mt-3 space-y-2">
             {COMPONENT_META.map(([key, label, description]) => (

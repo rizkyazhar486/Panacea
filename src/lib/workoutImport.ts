@@ -47,6 +47,8 @@ export interface ImportedWorkout {
   selesai: string
   /** Detik. */
   durasi: number
+  /** Client-source provenance; unknown keeps numeric compatibility without claiming a recorded zero. */
+  durationSource?: 'source_field' | 'timestamps' | 'unknown'
   jarakKm?: number
   kcal?: number
   avgHr?: number
@@ -160,9 +162,13 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
 
     const durasiTerekam = qty(w?.duration)
     const durasiTurunan = akhirValid ? (t1 - t0) / 1000 : 0
-    const durasi = durasiTerekam != null && durasiTerekam > 0
-      ? durasiTerekam
-      : durasiTurunan > 0 ? durasiTurunan : 0
+    // Date TimeClip is a technical representability boundary, not a clinical limit.
+    // Reject a source duration whose projected end cannot be serialized; a real
+    // valid end may still supply timestamp-derived duration.
+    const sumberValid = durasiTerekam != null && durasiTerekam >= 0
+      && Number.isFinite(new Date(t0 + durasiTerekam * 1000).getTime())
+    const durasi = sumberValid ? durasiTerekam : durasiTurunan
+    const durationSource = sumberValid ? 'source_field' : akhirValid ? 'timestamps' : 'unknown'
 
     const jarakMentah = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
     const jarakKm = jarakMentah != null && jarakMentah > 0 ? jarakMentah : undefined
@@ -208,6 +214,7 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
       mulai: new Date(t0).toISOString(),
       selesai: akhirValid ? new Date(t1).toISOString() : new Date(t0 + durasi * 1000).toISOString(),
       durasi: Math.round(durasi),
+      durationSource,
       jarakKm: jarakKm != null ? +jarakKm.toFixed(2) : undefined,
       kcal: toKcal(w?.activeEnergyBurned) ?? toKcal(w?.totalEnergy),
       avgHr: avgHrMentah != null && avgHrMentah > 0 ? Math.round(avgHrMentah) : undefined,

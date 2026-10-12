@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { deretMetrik, rentangPribadi } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { localCalorieDay, loggedCaloriesToday } from '../domains/personal-health/engine/loggedCalories'
+import { weeklyWorkoutDurations } from '../domains/personal-health/engine/weeklyWorkoutDurations'
 import { riwayatMinum } from '../lib/kebiasaanHarian'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -150,36 +151,23 @@ export function UbinTidurDuaPekan() {
 // anjuran mingguan aktivitas sedang untuk orang dewasa (WHO) — disebut sebagai
 // anjuran, bukan sebagai nilai ujian.
 export function UbinMuatanPekan() {
-  const pekan = useMemo(() => {
-    const w = getWorkouts()
-    const out: number[] = []
-    for (let p = 7; p >= 0; p--) {
-      const akhir = Date.now() - p * 7 * 864e5
-      const mulai = akhir - 7 * 864e5
-      let menit = 0
-      for (const s of w) {
-        const t = Date.parse(s.mulai)
-        if (Number.isFinite(t) && t > mulai && t <= akhir) menit += (Number(s.durasi) || 0) / 60
-      }
-      out.push(Math.round(menit))
-    }
-    return out
-  }, [])
-
-  if (!pekan.some((x) => x > 0)) return null
-  const maks = Math.max(...pekan, 150)
+  const workouts = getWorkouts()
+  const pekan = useMemo(() => weeklyWorkoutDurations(workouts), [workouts])
+  if (!pekan.some(x => x.recorded + x.missing > 0)) return null
+  const maks = Math.max(...pekan.map(x => x.total ?? 0), 150)
   const ini = pekan[pekan.length - 1]
-  const lalu = pekan[pekan.length - 2] ?? 0
+  const lalu = pekan[pekan.length - 2]
+  const missing = pekan.reduce((sum, x) => sum + x.missing, 0)
 
   return (
     <section>
       <Kepala judul="Training minutes per week" ke="/latihan" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{ini}</span>
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{ini.total === null ? '—' : Math.round(ini.total)}</span>
           <span className="t-mikro font-bold text-neutral-400">minutes this week</span>
           <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-            {lalu > 0 ? `${ini >= lalu ? '+' : ''}${ini - lalu} vs last week` : '8 weeks'}
+            {ini.total !== null && lalu.total !== null && lalu.total > 0 && ini.missing === 0 && lalu.missing === 0 ? `${ini.total >= lalu.total ? '+' : ''}${Math.round(ini.total - lalu.total)} logged vs last week` : '8 weeks'}
           </span>
         </div>
         <span className="relative mt-2 flex h-14 items-end gap-[3px]" aria-hidden>
@@ -188,10 +176,12 @@ export function UbinMuatanPekan() {
             <span
               key={i}
               className={`flex-1 rounded-sm ${i === pekan.length - 1 ? 'bg-brand' : 'bg-neutral-300 dark:bg-white/20'}`}
-              style={{ height: m > 0 ? `${(m / maks) * 100}%` : '3px' }}
+              style={{ height: m.total === null ? 0 : m.total > 0 ? `${(m.total / maks) * 100}%` : '3px' }}
             />
           ))}
         </span>
+        {ini.total === null && <p className="t-mikro mt-1 text-neutral-400">{ini.overflow ? 'Duration total unavailable.' : ini.missing ? 'Duration unavailable for this week.' : 'No sessions logged this week.'}</p>}
+        {missing > 0 && <p className="t-mikro mt-1 text-neutral-400">{ini.total !== null && ini.missing > 0 ? 'Partial logged subtotal. ' : ''}{missing} session(s) across these weeks have no known duration.</p>}
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
           The dashed line at 150 minutes is the weekly moderate-activity recommendation for adults (WHO). Only sessions
           logged in this app are counted, so walking you never recorded does not appear here.
