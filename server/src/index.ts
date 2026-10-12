@@ -190,6 +190,7 @@ import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medica
 import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
 import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS } from './store.js'
+import { penandaLog } from './domains/observability/logIdentity.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -1032,7 +1033,7 @@ app.put('/api/settings', requireAuth, (req, res) => {
   // status. Only the server may set those.
   const { safe, rejected } = stripServerOwnedSettings(rest)
   if (rejected.length) {
-    console.warn(`[settings] ${u.email} attempted to write server-owned keys: ${rejected.join(', ')}`)
+    console.warn(`[settings] ${penandaLog(config.jwtSecret, u.email)} attempted to write server-owned keys: ${rejected.join(', ')}`)
   }
   try {
     saveSettings(u.id, safe)
@@ -1342,7 +1343,7 @@ app.post('/api/health-webhook/:token', (req, res) => {
   const workoutCount = Array.isArray((req.body as { data?: { workouts?: unknown[] } })?.data?.workouts)
     ? (req.body as { data: { workouts: unknown[] } }).data.workouts.length
     : 0
-  console.log(`[health-webhook] ${email}: groups=${metricNames.join(', ') || 'none'} workouts=${workoutCount} matched=${Object.keys(mapped).join(',') || 'none'}`)
+  console.log(`[health-webhook] ${penandaLog(config.jwtSecret, email)}: groups=${metricNames.join(', ') || 'none'} workouts=${workoutCount} matched=${Object.keys(mapped).join(',') || 'none'}`)
 
   try {
     // Series FIRST, and unconditionally. Health Auto Export sends one Data Type
@@ -2377,7 +2378,7 @@ semaiStudiValidasi()
 setInterval(() => {
   for (const email of jatuhTempoHapus()) {
     hapusAkunConnect(email)
-    console.log('[connect] akun dihapus karena kredit di bawah ambang:', email)
+    console.log('[connect] akun dihapus karena kredit di bawah ambang:', penandaLog(config.jwtSecret, email))
   }
 }, 3600_000)
 

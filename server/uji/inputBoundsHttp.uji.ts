@@ -83,3 +83,6 @@ try {
 } finally {
   await running.stop()
 }
+
+// Real HTTP: server log carries no email, name, MRN or clinical text; diagnostics use a stable opaque marker.
+await import('./logPrivacyHttp.uji.js')
