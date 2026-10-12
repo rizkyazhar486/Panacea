@@ -30,3 +30,10 @@
 .fetal-parcel-inspector td:last-child, .fetal-parcel-inspector th:last-child { text-align: right; }
 .fetal-parcel-inspector footer { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
 @media (max-width: 760px) { .fpi-layout { grid-template-columns: minmax(0, 1fr); } .fetal-parcel-inspector { padding: 18px 12px 36px; } .fpi-canvas { height: 380px; } }
+.fpi-mri { margin-block: 1.5rem; padding: 1rem; border: 1px solid #8a9bad55; border-radius: 12px; }
+.fpi-mri summary { cursor: pointer; min-height: 44px; font-weight: 600; }
+.fpi-mri-images { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; margin-block: 1rem; }
+.fpi-mri-images figure { margin: 0; min-width: 0; }
+.fpi-mri-images img { width: 100%; height: auto; image-rendering: pixelated; border-radius: 6px; }
+.fpi-mri-images figcaption { font-size: 0.85rem; margin-top: 0.5rem; }
+@media(max-width:760px) { .fpi-mri-images { grid-template-columns: 1fr; } }
