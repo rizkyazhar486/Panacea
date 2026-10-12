@@ -1,16 +1,25 @@
 // Lightweight anthropometry helpers (BMI + adult classification).
-// Full WHO/CDC z-scores for paediatrics are computed by the AI when a key is set;
-// this provides an instant client-side BMI interpretation for adults.
+// Adult BMI arithmetic only; pediatric reference curves and clinical interpretation
+// are separate. Calculation availability is not clinical validation.
 
 export interface AnthroResult {
   bmi: number
   kesan: string
   tone: 'low' | 'normal' | 'high' | 'critical'
+  /** Technical availability only, not clinical approval. false = berat/tinggi hilang atau tak sah: `bmi` (0) BUKAN pengukuran dan tidak boleh ditampilkan sebagai angka. */
+  valid: boolean
 }
 
 export function computeBmi(weightKg: number, heightCm: number): AnthroResult {
+  const unavailable: AnthroResult = { bmi: 0, kesan: 'Cannot be calculated', tone: 'normal', valid: false }
+  if (!Number.isFinite(weightKg) || weightKg <= 0 || !Number.isFinite(heightCm) || heightCm <= 0) return unavailable
   const h = heightCm / 100
-  const bmi = h > 0 ? weightKg / (h * h) : 0
+  const squareHeight = h * h
+  if (!Number.isFinite(squareHeight) || squareHeight <= 0) return unavailable
+  const bmi = weightKg / squareHeight
+  const rounded = Math.round(bmi * 10) / 10
+  // Finite inputs can still overflow, underflow or round to an impossible zero BMI.
+  if (!Number.isFinite(bmi) || bmi <= 0 || !Number.isFinite(rounded) || rounded <= 0) return unavailable
   let kesan = 'Cannot be calculated'
   let tone: AnthroResult['tone'] = 'normal'
   if (bmi > 0) {
@@ -32,7 +41,7 @@ export function computeBmi(weightKg: number, heightCm: number): AnthroResult {
       tone = 'critical'
     }
   }
-  return { bmi: Math.round(bmi * 10) / 10, kesan, tone }
+  return { bmi: rounded, kesan, tone, valid: true }
 }
 
 export function ageFromDob(dob: string): number {
