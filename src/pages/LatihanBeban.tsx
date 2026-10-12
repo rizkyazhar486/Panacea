@@ -3,8 +3,10 @@ import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconRun } from '../components/icons'
 import {
   ambilSesi, simpanSesi, alasanSesiDitolak, hapusSesi, volumeSesi, rekorPerGerakan, volumeMingguan, epley,
+  BATAS_ULANGAN, BATAS_KG,
   type SesiAngkat, type SetAngkat,
 } from '../lib/angkatBeban'
+import { parseStrengthDraft, type StrengthSetDraft } from '../domains/personal-health/engine/strengthDraft'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -26,13 +28,13 @@ function hariIni(): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-const KOSONG: SetAngkat[] = [{ ulangan: 0, kg: 0 }, { ulangan: 0, kg: 0 }, { ulangan: 0, kg: 0 }]
+const KOSONG: StrengthSetDraft[] = [{ ulangan: '', kg: '' }, { ulangan: '', kg: '' }, { ulangan: '', kg: '' }]
 
 export function LatihanBeban() {
   const [semua, setSemua] = useState<SesiAngkat[]>(ambilSesi)
   const [gerakan, setGerakan] = useState('')
   const [tanggal, setTanggal] = useState(hariIni)
-  const [set, setSet] = useState<SetAngkat[]>(KOSONG)
+  const [set, setSet] = useState<StrengthSetDraft[]>(KOSONG)
   const [galat, setGalat] = useState<string | null>(null)
 
   const rekor = useMemo(() => rekorPerGerakan(semua), [semua])
@@ -40,12 +42,12 @@ export function LatihanBeban() {
   const maks = Math.max(...mingguan.map((m) => m.volume), 1)
   const adaVolume = mingguan.some((m) => m.volume > 0)
 
-  const ubahSet = (i: number, medan: keyof SetAngkat, nilai: number) =>
+  const ubahSet = (i: number, medan: keyof StrengthSetDraft, nilai: string) =>
     setSet((s) => s.map((x, j) => (j === i ? { ...x, [medan]: nilai } : x)))
 
   function simpan() {
-    const isi = set.filter((s) => s.ulangan > 0 && s.kg > 0)
-    if (!gerakan.trim() || !isi.length) return
+    if (draft.kind !== 'valid') return
+    const isi = draft.sets
     const sesi = { id: `${Date.now()}`, tanggal, gerakan: gerakan.trim(), set: isi }
     const alasan = alasanSesiDitolak(sesi, Date.now())
     setGalat(alasan)
@@ -55,7 +57,8 @@ export function LatihanBeban() {
     setSet(KOSONG)
   }
 
-  const pratinjau = set.filter((s) => s.ulangan > 0 && s.kg > 0)
+  const draft = parseStrengthDraft(set)
+  const pratinjau = draft.sets
   const volumeBaru = pratinjau.reduce((a, s) => a + s.ulangan * s.kg, 0)
   const terberat = pratinjau.reduce<SetAngkat | null>((a, s) => (!a || s.kg > a.kg ? s : a), null)
   const ramal = terberat ? epley(terberat.kg, terberat.ulangan) : null
@@ -83,15 +86,15 @@ export function LatihanBeban() {
           {set.map((s, i) => (
             <div key={i} className="flex items-center gap-2">
               <span className="w-10 shrink-0 text-[11px] font-bold text-neutral-500">Set {i + 1}</span>
-              <input type="number" min={0} inputMode="numeric" value={s.ulangan || ''} placeholder="reps"
-                onChange={(e) => ubahSet(i, 'ulangan', Number(e.target.value) || 0)}
+              <input type="number" min={BATAS_ULANGAN.min} max={BATAS_ULANGAN.maks} step={1} inputMode="numeric" value={s.ulangan} placeholder="reps"
+                onChange={(e) => ubahSet(i, 'ulangan', e.target.value)}
                 className={inputClass} aria-label={`Reps for set ${i + 1}`} />
-              <input type="number" min={0} step="0.5" inputMode="decimal" value={s.kg || ''} placeholder="kg"
-                onChange={(e) => ubahSet(i, 'kg', Number(e.target.value) || 0)}
+              <input type="number" min={BATAS_KG.minEksklusif} max={BATAS_KG.maks} step="0.5" inputMode="decimal" value={s.kg} placeholder="kg"
+                onChange={(e) => ubahSet(i, 'kg', e.target.value)}
                 className={inputClass} aria-label={`Weight for set ${i + 1} in kilograms`} />
             </div>
           ))}
-          <button onClick={() => setSet((s) => [...s, { ulangan: 0, kg: 0 }])}
+          <button onClick={() => setSet((s) => [...s, { ulangan: '', kg: '' }])}
             className="flex h-9 items-center text-[12px] font-bold text-brand">+ set</button>
         </div>
 
@@ -109,7 +112,8 @@ export function LatihanBeban() {
           </div>
         )}
 
-        <button onClick={simpan} disabled={!gerakan.trim() || !volumeBaru}
+        {draft.kind === 'invalid' && <p role="status" className="mt-2 text-[11px] text-red-600 dark:text-red-400">{draft.reason}</p>}
+        <button onClick={simpan} disabled={!gerakan.trim() || draft.kind !== 'valid'}
           className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-brand text-[13px] font-black text-white disabled:opacity-40">
           Save session
         </button>

@@ -1,9 +1,8 @@
 {
   "catatan": "Jumlah `(Number|parseFloat|parseInt)(...) || 0` per berkas di src/**/*.tsx. Hanya boleh turun; lihat scripts/uji/angka-kosong-ratchet.mts.",
-  "total": 6,
+  "total": 4,
   "berkas": {
     "src/components/UbinTambahan.tsx": 3,
-    "src/pages/HealthPerformanceLeague.tsx": 1,
-    "src/pages/LatihanBeban.tsx": 2
+    "src/pages/HealthPerformanceLeague.tsx": 1
   }
 }

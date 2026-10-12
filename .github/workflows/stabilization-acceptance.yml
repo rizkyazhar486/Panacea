@@ -292,6 +292,21 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: Strength draft inputs (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          STRENGTH_QA_ORIGIN: http://127.0.0.1:4173
+          STRENGTH_QA_OUTPUT: artifacts/strength-drafts
+        run: node scripts/qa/strength-draft-smoke.mjs
+
+      - name: Upload strength draft evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strength-draft-inputs
+          path: artifacts/strength-drafts
+          if-no-files-found: ignore
+
       - name: Demo wallet withdrawal (synthetic client, 390x844)
         timeout-minutes: 5
         env:
