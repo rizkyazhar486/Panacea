@@ -163,3 +163,6 @@ try {
 
 // Reserved object-property names are never valid patient ids (every clinical, lab and referral entry point, no 5xx, nothing stored).
 await import('./reservedPatientIdsHttp.uji.js')
+
+// Alpha E2: one access decision for every registered route (table vs source vs a real server).
+await import('./routeAccessDecisions.uji.js')
