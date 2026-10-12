@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { coffeeFluidMl, fastingElectrolytes } from '../../src/domains/personal-health/engine/fastingHydration.ts'
+import { coffeeFluidMl, fastingElectrolytes, FASTING_HYDRATION_REVIEW } from '../../src/domains/personal-health/engine/fastingHydration.ts'
 import { parseNumberField } from '../../src/domains/clinical-calculators/engine/inputs.ts'
 
 // Positif: nilai tangan (koefisien dipindahkan tanpa perubahan dari halaman).
@@ -42,3 +42,16 @@ assert.match(halaman, /useState\(''\)[\s\S]*coffeeFluidMl\(parseNumberField\(cup
 assert.match(halaman, /fastingElectrolytes\(parseNumberField\(hours\)\)/)
 assert.doesNotMatch(halaman, /hours \* 60/, 'rumus elektrolit tidak boleh disalin kembali ke halaman')
 console.log('nutrition-puasa-kopi: OK')
+
+assert.deepEqual(FASTING_HYDRATION_REVIEW, {
+  status: 'PENDING_CLINICAL_REVIEW', clinically_reviewed: false, coefficient_evidence: 'UNVERIFIED',
+  reviewer: null, reviewed_at: null, evidence: null,
+})
+for (const bad of ['2', null, undefined, true, {}]) {
+  assert.equal(coffeeFluidMl(bad as unknown as number).ok, false)
+  assert.equal(fastingElectrolytes(bad as unknown as number).ok, false)
+}
+assert.match(halaman, /not intake targets or supplement doses/)
+assert.doesNotMatch(halaman, /Rough daily targets/)
+const workflow = readFileSync(new URL('../../.github/workflows/stabilization-acceptance.yml', import.meta.url), 'utf8')
+assert.match(workflow, /run: node scripts\/qa\/nutrition-input-smoke\.mjs/)

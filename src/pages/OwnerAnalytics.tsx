@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
 import { IconShield } from '../components/icons'
 import { useStore } from '../lib/store'
+import { validateAbInput, validateSampleSizeInput, validateSeoNumbers, validateCustomerEntry } from '../domains/owner-analytics'
 import {
   auditSeo, analyseAb, requiredSampleSize, segment, analyseSentiment,
   SEGMENT_LABEL, SEO_STATUS_LABEL, SENTIMENT_LABEL,
@@ -67,14 +68,15 @@ export function OwnerAnalytics() {
 
 /* ── SEO ───────────────────────────────────────────────────────────────────── */
 function SeoTab() {
+  // Numeric fields start blank: the page used to open on an invented audit (450 words, 8 images…).
+  // Toggles stay explicit choices; the audit only runs once every number is valid.
   const [i, setI] = useState({
-    title: 'Panaceamed — The Practical AI Clinic for Your Access to Healthcare',
-    metaDescription: '',
-    h1Count: 1, wordCount: 450, imagesTotal: 8, imagesWithAlt: 5,
-    hasCanonical: false, mobileFriendly: true, loadSeconds: 2.4,
-    internalLinks: 6, httpsEnabled: true, hasStructuredData: false,
+    title: '', metaDescription: '',
+    h1Count: '', wordCount: '', imagesTotal: '', imagesWithAlt: '', loadSeconds: '', internalLinks: '',
+    hasCanonical: false, mobileFriendly: false, httpsEnabled: false, hasStructuredData: false,
   })
-  const r = useMemo(() => auditSeo(i), [i])
+  const nums = useMemo(() => validateSeoNumbers(i), [i])
+  const r = useMemo(() => (nums.ok ? auditSeo({ ...i, ...nums.value }) : null), [i, nums])
   const set = (p: Partial<typeof i>) => setI({ ...i, ...p })
 
   return (
@@ -85,12 +87,12 @@ function SeoTab() {
           <Field label="Title tag"><input className={inputClass} value={i.title} onChange={(e) => set({ title: e.target.value })} /></Field>
           <Field label="Meta description"><input className={inputClass} value={i.metaDescription} onChange={(e) => set({ metaDescription: e.target.value })} /></Field>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="H1 count"><input className={inputClass} inputMode="numeric" value={i.h1Count} onChange={(e) => set({ h1Count: Number(e.target.value) || 0 })} /></Field>
-            <Field label="Word count"><input className={inputClass} inputMode="numeric" value={i.wordCount} onChange={(e) => set({ wordCount: Number(e.target.value) || 0 })} /></Field>
-            <Field label="Total images"><input className={inputClass} inputMode="numeric" value={i.imagesTotal} onChange={(e) => set({ imagesTotal: Number(e.target.value) || 0 })} /></Field>
-            <Field label="Images with alt"><input className={inputClass} inputMode="numeric" value={i.imagesWithAlt} onChange={(e) => set({ imagesWithAlt: Number(e.target.value) || 0 })} /></Field>
-            <Field label="Load time (seconds)"><input className={inputClass} inputMode="decimal" value={i.loadSeconds} onChange={(e) => set({ loadSeconds: Number(e.target.value) || 0 })} /></Field>
-            <Field label="Internal links"><input className={inputClass} inputMode="numeric" value={i.internalLinks} onChange={(e) => set({ internalLinks: Number(e.target.value) || 0 })} /></Field>
+            <Field label="H1 count"><input className={inputClass} inputMode="numeric" value={i.h1Count} onChange={(e) => set({ h1Count: e.target.value })} /></Field>
+            <Field label="Word count"><input className={inputClass} inputMode="numeric" value={i.wordCount} onChange={(e) => set({ wordCount: e.target.value })} /></Field>
+            <Field label="Total images"><input className={inputClass} inputMode="numeric" value={i.imagesTotal} onChange={(e) => set({ imagesTotal: e.target.value })} /></Field>
+            <Field label="Images with alt"><input className={inputClass} inputMode="numeric" value={i.imagesWithAlt} onChange={(e) => set({ imagesWithAlt: e.target.value })} /></Field>
+            <Field label="Load time (seconds)"><input className={inputClass} inputMode="decimal" value={i.loadSeconds} onChange={(e) => set({ loadSeconds: e.target.value })} /></Field>
+            <Field label="Internal links"><input className={inputClass} inputMode="numeric" value={i.internalLinks} onChange={(e) => set({ internalLinks: e.target.value })} /></Field>
           </div>
           {([['mobileFriendly', 'Mobile friendly'], ['httpsEnabled', 'HTTPS enabled'], ['hasCanonical', 'Canonical present'], ['hasStructuredData', 'Structured data present']] as const).map(([k, l]) => (
             <label key={k} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
@@ -101,7 +103,15 @@ function SeoTab() {
         </div>
       </Card>
 
-      <Card className="!p-4">
+      {!r && !nums.ok && (
+        <Card className="!p-4">
+          <div className="text-[12px] font-bold text-neutral-500">No audit yet</div>
+          <ul role="alert" className="mt-1 space-y-0.5 text-[11px] text-amber-800 dark:text-amber-300">
+            {nums.problems.map((m) => <li key={m}>{m}</li>)}
+          </ul>
+        </Card>
+      )}
+      {r && <Card className="!p-4">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Audit score</span>
           <span className="text-2xl font-black text-ink dark:text-ink">{r.score}<span className="text-sm text-neutral-500">/100</span></span>
@@ -119,28 +129,29 @@ function SeoTab() {
             </div>
           ))}
         </div>
-      </Card>
+      </Card>}
     </>
   )
 }
 
 /* ── A/B ───────────────────────────────────────────────────────────────────── */
 function AbTab() {
-  const [cv, setCv] = useState('4000')
-  const [cc, setCc] = useState('200')
-  const [vv, setVv] = useState('4000')
-  const [vc, setVc] = useState('232')
-  const [planned, setPlanned] = useState('4000')
-  const [baseline, setBaseline] = useState('5')
-  const [mde, setMde] = useState('1')
+  // All fields start blank: example numbers used to produce a "result" nobody had entered.
+  const [cv, setCv] = useState('')
+  const [cc, setCc] = useState('')
+  const [vv, setVv] = useState('')
+  const [vc, setVc] = useState('')
+  const [planned, setPlanned] = useState('')
+  const [baseline, setBaseline] = useState('')
+  const [mde, setMde] = useState('')
 
-  const r = useMemo(() => analyseAb({
-    controlVisitors: Number(cv) || 0, controlConversions: Number(cc) || 0,
-    variantVisitors: Number(vv) || 0, variantConversions: Number(vc) || 0,
-    plannedPerArm: Number(planned) || 0,
+  const ab = useMemo(() => validateAbInput({
+    controlVisitors: cv, controlConversions: cc, variantVisitors: vv, variantConversions: vc, plannedPerArm: planned,
   }), [cv, cc, vv, vc, planned])
+  const r = useMemo(() => (ab.ok ? analyseAb(ab.value) : null), [ab])
 
-  const need = useMemo(() => requiredSampleSize(Number(baseline) || 0, Number(mde) || 0), [baseline, mde])
+  const sample = useMemo(() => validateSampleSizeInput(baseline, mde), [baseline, mde])
+  const need = useMemo(() => (sample.ok ? requiredSampleSize(sample.value.baselinePct, sample.value.mdePp) : null), [sample])
 
   return (
     <>
@@ -153,8 +164,13 @@ function AbTab() {
         <div className="mt-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
             <span className="text-[12px] font-bold text-neutral-500">Needed per group</span>
-            <span className="text-xl font-black text-ink dark:text-ink">{need.toLocaleString('en-GB')}</span>
+            <span className="text-xl font-black text-ink dark:text-ink">{need === null ? '—' : need.toLocaleString('en-GB')}</span>
           </div>
+          {!sample.ok && (baseline !== '' || mde !== '') && (
+            <ul role="alert" className="mt-1 space-y-0.5 text-[11px] text-amber-800 dark:text-amber-300">
+              {sample.problems.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          )}
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
             At 80% power and a 5% significance level. Fix this number first, then run until it is
             reached.
@@ -174,7 +190,15 @@ function AbTab() {
           <Field label="Planned sample per group"><input className={inputClass} inputMode="numeric" value={planned} onChange={(e) => setPlanned(e.target.value)} /></Field>
         </div>
 
-        <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        {!r && !ab.ok && (
+          <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+            <div className="text-[12px] font-bold text-neutral-500">No result yet</div>
+            <ul role="alert" className="mt-1 space-y-0.5 text-[11px] text-amber-800 dark:text-amber-300">
+              {ab.problems.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          </div>
+        )}
+        {r && <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
             <span className="text-neutral-500">Control</span><span className="text-right font-bold text-ink dark:text-ink">{r.controlRate.toFixed(2)}%</span>
             <span className="text-neutral-500">Variant</span><span className="text-right font-bold text-ink dark:text-ink">{r.variantRate.toFixed(2)}%</span>
@@ -183,9 +207,9 @@ function AbTab() {
             <span className="text-neutral-500">95% confidence interval</span><span className="text-right font-bold text-ink dark:text-ink">{r.ciLowPp.toFixed(2)} … {r.ciHighPp.toFixed(2)} pp</span>
           </div>
           <div className="mt-2"><Badge tone={r.significant ? 'normal' : r.readyToCall ? 'neutral' : 'high'}>{r.verdict}</Badge></div>
-        </div>
+        </div>}
 
-        {r.warning && (
+        {r?.warning && (
           <div className="mt-3 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
             <div className="text-[11px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">Methodology warning</div>
             <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{r.warning}</p>
@@ -212,12 +236,13 @@ function SegmentTab() {
 
   const segs = useMemo(() => segment(rows), [rows])
 
+  const [problems, setProblems] = useState<string[]>([])
+
   function add() {
-    if (!name.trim()) return
-    const next = [...rows, {
-      id: Math.random().toString(36).slice(2), name: name.trim(),
-      daysSinceLastUse: Number(days) || 0, usesLast90Days: Number(uses) || 0, totalSpend: Number(spend) || 0,
-    }]
+    const v = validateCustomerEntry({ name, daysSinceLastUse: days, usesLast90Days: uses, totalSpend: spend })
+    if (!v.ok) { setProblems(v.problems); return }
+    setProblems([])
+    const next = [...rows, { id: Math.random().toString(36).slice(2), ...v.value }]
     setRows(next)
     try { localStorage.setItem(SEG_KEY, JSON.stringify(next)) } catch { /* ignore */ }
     setName(''); setDays(''); setUses(''); setSpend('')
@@ -234,6 +259,11 @@ function SegmentTab() {
             <Field label="Uses in 90 days"><input className={inputClass} inputMode="numeric" value={uses} onChange={(e) => setUses(e.target.value)} /></Field>
             <Field label="Total spend"><input className={inputClass} inputMode="numeric" value={spend} onChange={(e) => setSpend(e.target.value)} /></Field>
           </div>
+          {problems.length > 0 && (
+            <ul role="alert" className="space-y-0.5 text-[11px] text-amber-800 dark:text-amber-300">
+              {problems.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          )}
           <Button onClick={add}>Add</Button>
         </div>
       </Card>

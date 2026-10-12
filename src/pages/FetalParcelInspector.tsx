@@ -6,6 +6,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { Prosa } from '../components/ui/Prosa'
+import { FetalMriContext } from './FetalMriContext'
 import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../domains/body-exposure'
 import './fetalParcelInspector.css'
 
@@ -186,6 +187,7 @@ export function FetalParcelInspector() {
         </article>}
       </section>
     </div>
+    {dataset && <FetalMriContext dataset={dataset} selected={selected} />}
     {dataset && <footer><a href={dataset.source} target="_blank" rel="noopener noreferrer">KCL source atlas</a> · {dataset.license} · population reference · no smoothing or fragment removal<br />
       <a href={`${BASE}manifest.json`} download>Download source evidence</a> · <a href={`${BASE}${dataset.asset}`} download>Download numeric-region GLB</a>
     </footer>}

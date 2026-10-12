@@ -8,6 +8,11 @@
  */
 export type NutritionEstimate<T> = { ok: true; value: T } | { ok: false; problem: string }
 
+export const FASTING_HYDRATION_REVIEW = {
+  status: 'PENDING_CLINICAL_REVIEW', clinically_reviewed: false, coefficient_evidence: 'UNVERIFIED',
+  reviewer: null, reviewed_at: null, evidence: null,
+} as const
+
 export const COFFEE_CUPS_MAX = 15
 export const FASTING_HOURS_MAX = 72
 const ML_PER_CUP = 150
@@ -21,7 +26,7 @@ export function coffeeFluidMl(cups: number): NutritionEstimate<{ ml: number }> {
   return { ok: true, value: { ml: cups * ML_PER_CUP } }
 }
 
-/** Jam puasa 0–72 (boleh pecahan); target kasar mg natrium/kalium/magnesium dengan batas atas harian. */
+/** Jam puasa 0–72 (boleh pecahan); keluaran model ilustratif mg natrium/kalium/magnesium; bukan target asupan atau dosis. */
 export function fastingElectrolytes(hours: number): NutritionEstimate<{ sodiumMg: number; potassiumMg: number; magnesiumMg: number }> {
   if (!Number.isFinite(hours)) return tolak('Enter how many hours you have been fasting (0 to 72).')
   if (hours < 0 || hours > FASTING_HOURS_MAX) return tolak(`Fasting hours must be between 0 and ${FASTING_HOURS_MAX}.`)

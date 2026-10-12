@@ -101,3 +101,7 @@ export { zone2HeartRate, validateGripKg, ZONE2_AGE_YEARS, GRIP_KG } from './engi
 export type { Zone2Result, GripResult } from './engine/movementInputs'
 export { waistToHeight, WAIST_CM, WHTR_HEIGHT_CM } from './engine/waistToHeight'
 export type { WaistToHeightResult, WhtrTone } from './engine/waistToHeight'
+export { validateFraminghamInput, FRAMINGHAM_RANGE } from './engine/framinghamInputs'
+export type { FraminghamField, FraminghamValues, FraminghamInputResult } from './engine/framinghamInputs'
+export { autophagyTiming, AUTOPHAGY_RANGES } from './engine/autophagyTiming'
+export type { AutophagyTimingResult } from './engine/autophagyTiming'

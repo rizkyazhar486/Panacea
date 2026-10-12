@@ -6,6 +6,9 @@ import type { Actor, AuditEntry, TransitionRejection } from '../domain/lifecycle
 import { REFERRAL_STATUSES, RESULT_STATUSES, STAFF_READ_ROLES as STAFF_READ, referralLifecycle, resultLifecycle } from '../domain/definitions.js'
 import type { ReferralStatus, ResultStatus } from '../domain/definitions.js'
 
+// Nama yang diwarisi setiap objek (constructor, __proto__, ...) bukan id pasien yang sah.
+const idDicadangkan = (id: unknown): boolean => typeof id === 'string' && id in Object.prototype
+
 export const TENANT_PRAKTIK = 'praktik'
 export const CHANNEL_KOMUNIKASI = ['in-person', 'phone', 'portal-message', 'letter'] as const
 export type ChannelKomunikasi = (typeof CHANNEL_KOMUNIKASI)[number]
@@ -97,7 +100,7 @@ export function terimaHasil(k: Konteks, a: Actor, masukan: { patientId?: unknown
   const patientId = str(masukan.patientId, MAKS_ID)
   const item = validasiButir(masukan.item, now)
   const source = masukan.source === 'lab-intake' || masukan.source === 'manual-entry' ? masukan.source : undefined
-  if (!patientId || !item || !source) return gagal('invalid-input')
+  if (!patientId || !item || !source || idDicadangkan(patientId)) return gagal('invalid-input')
   const rec: HasilLabRekam = {
     id: k.newId('lab'), tenantId: a.tenantId, patientId, status: resultLifecycle.initial, item,
     provenance: { source, recordedBy: a.actorId, recordedAt: now.toISOString() }, trail: [],
@@ -180,7 +183,7 @@ export function buatRujukan(k: Konteks, a: Actor, m: { patientId?: unknown; kind
   if (a.role !== 'clinician' || a.authorizedClinician !== true) return gagal('forbidden')
   const patientId = str(m.patientId, MAKS_ID), reason = str(m.reason, MAKS_CATATAN), toFacility = str(m.toFacility, MAKS_NAMA)
   const kind = JENIS_RUJUKAN.find((j) => j === m.kind)
-  if (!patientId || !reason || !toFacility || !kind) return gagal('invalid-input')
+  if (!patientId || !reason || !toFacility || !kind || idDicadangkan(patientId)) return gagal('invalid-input')
   const rec: RujukanRekam = { id: k.newId('ref'), tenantId: a.tenantId, patientId, status: referralLifecycle.initial, kind, reason, toFacility, trail: [] }
   k.rujukan.put(rec)
   return { ok: true, value: rec }

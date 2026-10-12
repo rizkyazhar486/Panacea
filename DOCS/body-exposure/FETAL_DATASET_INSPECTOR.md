@@ -65,3 +65,6 @@ The new route is registered in both product navigation/search catalogs. The
 inspector uses the shared late-GLB disposal guard and progressive-disclosure
 prose while keeping the pending-review summary visible. All three initially
 failing integration checks passed after these fixes; their checks were retained.
+# MRI source context
+
+The expandable MRI panel follows the selected numeric region with three native-grid source planes. Source fingerprints, voxel accounting and reproduction are documented in [FETAL_MRI_CONTEXT.md](FETAL_MRI_CONTEXT.md).

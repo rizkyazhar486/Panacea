@@ -174,7 +174,7 @@ function ElectrolyteCalc() {
           <div role="alert" className="text-[11px] text-neutral-500">{hours.trim() === '' ? 'Enter your fasting hours to see rough targets.' : est.problem}</div>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Rough daily targets for longer fasts (above about 16 hours), when electrolyte loss without food intake can cause headache/weakness. Not medical advice — if you have kidney, heart, or blood pressure conditions, check with a healthcare provider before fasting or supplementing electrolytes.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Illustrative values from the existing formula, not intake targets or supplement doses. The coefficients and input range have not been clinically reviewed. These numbers do not establish your electrolyte losses or requirements. Ask a qualified clinician before fasting or supplementing, especially with kidney, heart, or blood pressure conditions.</Prosa>
     </Card>
   )
 }
