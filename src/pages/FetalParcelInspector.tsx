@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { penjagaMuatan } from '../lib/gltfSesudahLepas'
+import { buangSubtree, penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { Prosa } from '../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
 import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../domains/body-exposure'
@@ -103,6 +103,10 @@ export function FetalParcelInspector() {
         ob.visible = dataset.default_labels.includes(label)
         meshes.set(label, [...(meshes.get(label) ?? []), ob])
       })
+      if (failure || meshes.size !== 9) {
+        buangSubtree(gltf.scene); meshes.clear()
+        setError(failure || 'The dataset does not contain all nine regions'); return
+      }
       scene.add(gltf.scene)
       gltf.scene.updateMatrixWorld(true)
       // Referenced vertices only: packed GLBs may share a POSITION accessor.
@@ -114,7 +118,6 @@ export function FetalParcelInspector() {
         }
         regionBounds.set(label, box); bounds.union(box)
       }
-      if (failure || meshes.size !== 9) { setError(failure || 'The dataset does not contain all nine regions'); return }
       sceneRef.current = { meshes, render, fit, plane, bounds }; resize(); setLoaded(true)
     }, undefined, () => { if (!disposed) setError('Dataset geometry could not be loaded') })
     const raycaster = new THREE.Raycaster()
