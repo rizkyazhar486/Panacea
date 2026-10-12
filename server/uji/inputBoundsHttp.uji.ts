@@ -86,3 +86,6 @@ try {
 
 // Real HTTP: server log carries no email, name, MRN or clinical text; diagnostics use a stable opaque marker.
 await import('./logPrivacyHttp.uji.js')
+
+// Real HTTP: clinical, link, lab and referral writes carry the session actor and server time in the audit log (ledger E3 evidence).
+await import('./auditTrailHttp.uji.js')
