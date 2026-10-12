@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { stripTypeScriptTypes } from 'node:module'
 import { parseWithdrawAmount, WITHDRAW_INVALID } from '../../src/domains/wallet/index.ts'
 
 const tolak = { ok: false, reason: WITHDRAW_INVALID }
@@ -32,4 +33,27 @@ const store = readFileSync('src/lib/store.tsx', 'utf8')
 assert.match(store, /parseWithdrawAmount\(amount\)/)
 const billing = readFileSync('src/pages/Billing.tsx', 'utf8')
 assert.doesNotMatch(billing, /withdrawTokens\(Number\(withdraw\) \|\| 0/)
+
+// Exercise the production action in both configured modes. A server-backed
+// balance must never be debited by the offline demo action.
+const actionSource = store.slice(store.indexOf('withdrawTokens: (amount, bank) => {'), store.indexOf('      spendPnc:', store.indexOf('withdrawTokens: (amount, bank) => {')))
+const action = actionSource.replace(/^withdrawTokens:\s*/, '').replace(/,\s*$/, '')
+for (const enabled of [false, true]) {
+  let wallet = { balance: 100, transactions: [] as { amount: number; note: string }[] }
+  let writes = 0
+  const run = new Function('backendEnabled', 'parseWithdrawAmount', 'state', 'setState', 'uid', `return ${stripTypeScriptTypes(`(${action})`)}`)(
+    enabled, parseWithdrawAmount, { wallet }, (update: (s: { wallet: typeof wallet }) => { wallet: typeof wallet }) => { writes++; wallet = update({ wallet }).wallet }, () => 'synthetic-debit',
+  )
+  const result = run(25, 'BCA')
+  if (enabled) {
+    assert.equal(result.ok, false)
+    assert.equal(writes, 0)
+    assert.deepEqual(wallet, { balance: 100, transactions: [] })
+  } else {
+    assert.equal(result.ok, true)
+    assert.equal(wallet.balance, 75)
+    assert.equal(wallet.transactions[0].amount, -25)
+    assert.match(wallet.transactions[0].note, /Demo debit.*no bank payout requested/)
+  }
+}
 console.log('wallet-withdraw-amount: ok')

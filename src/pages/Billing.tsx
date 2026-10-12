@@ -85,9 +85,10 @@ export function Billing() {
             <ManualBankTransfer />
             {msg && <p className="text-xs font-semibold text-brand-dark">{msg}</p>}
 
-            {/* Withdraw to bank */}
-            <div className="mt-5 rounded-xl border border-neutral-200 p-4">
-              <div className="mb-2 text-sm font-bold">Withdraw Remaining Deposit to Bank</div>
+            {/* Offline demo ledger; real payouts use BackendWallet above. */}
+            {!backendEnabled && <div className="mt-5 rounded-xl border border-neutral-200 p-4">
+              <div className="mb-2 text-sm font-bold">Demo withdrawal</div>
+              <p className="mb-3 text-xs text-neutral-600">This simulation changes only your local demo balance. It does not send money or create a bank payout request.</p>
               <div className="flex flex-wrap items-end gap-3">
                 <div className="w-32">
                   <Field label="Amount (PNC)">
@@ -104,20 +105,21 @@ export function Billing() {
                 <Button
                   variant="outline"
                   onClick={() => {
+                    if (backendEnabled) return
                     const parsed = parseWithdrawAmount(withdraw)
                     if (!parsed.ok) {
                       setMsg(parsed.reason)
                       return
                     }
                     const r = withdrawTokens(parsed.amount, bank)
-                    setMsg(r.ok ? `Withdrawal of Rp${(parsed.amount * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
+                    setMsg(r.ok ? `Demo debit of ${parsed.amount} PNC recorded. No money was sent to ${bank}.` : r.reason ?? 'Failed.')
                     setTimeout(() => setMsg(''), 2800)
                   }}
                 >
-                  Withdraw to {bank}
+                  Simulate withdrawal to {bank}
                 </Button>
               </div>
-            </div>
+            </div>}
           </div>
         </Card>
 
