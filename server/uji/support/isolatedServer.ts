@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict'
 import { spawn, type ChildProcess } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -82,7 +82,16 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   const stop = async () => {
     try { await terminate() } finally { rmSync(directory, { recursive: true, force: true }) }
   }
-  const restart = async () => { await terminate(); await launch() }
+  // mutate: mengubah isi berkas data selagi proses berhenti (mis. memundurkan tanggal berakhir), agar waktu dapat diatur tanpa jam palsu.
+  const restart = async (mutate?: (data: any) => void) => {
+    await terminate()
+    if (mutate) {
+      const data = JSON.parse(readFileSync(dataFile, 'utf8'))
+      mutate(data)
+      writeFileSync(dataFile, JSON.stringify(data))
+    }
+    await launch()
+  }
   const call = async (method: string, path: string, token?: string, body?: unknown): Promise<CallResult> => {
     const response = await fetch(base + path, {
       method, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
