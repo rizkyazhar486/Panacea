@@ -247,6 +247,21 @@ jobs:
           path: artifacts/upload-price-inputs
           if-no-files-found: ignore
 
+      - name: Body Toolkit account-isolated storage (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          BODY_TOOLKIT_QA_ORIGIN: http://127.0.0.1:4173
+          BODY_TOOLKIT_QA_OUTPUT: artifacts/body-toolkit-storage
+        run: node scripts/qa/body-toolkit-storage-smoke.mjs
+
+      - name: Upload Body Toolkit isolation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: body-toolkit-storage-isolation
+          path: artifacts/body-toolkit-storage
+          if-no-files-found: ignore
+
       # Alpha B7: the clinician lab-result review queue against the REAL server (fresh data file, so the doctor-verification
       # fixture starts clean) and Chromium 390x844. Fails by name: SERVER_TIDAK_SIAP, VITE_TIDAK_SIAP or E2E_GAGAL.
       - name: Install server dependencies for the lab review E2E
