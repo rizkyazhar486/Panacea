@@ -258,10 +258,10 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
       const custom = e as CustomEvent<{ action?: string }>
       const action = custom.detail?.action
       if (action === 'zoomIn') {
-        controls.dollyIn(1.2)
+        controls.dollyIn(1 / 1.2)
         controls.update()
       } else if (action === 'zoomOut') {
-        controls.dollyOut(1.2)
+        controls.dollyOut(1 / 1.2)
         controls.update()
       } else if (action === 'reset') {
         camera.position.set(0, 0.4, 4.6)
