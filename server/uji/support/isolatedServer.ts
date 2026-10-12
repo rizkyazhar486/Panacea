@@ -25,7 +25,7 @@ function freePort(): Promise<number> {
   })
 }
 
-export async function startIsolatedServer(prefix: string, ownerEmail: string) {
+export async function startIsolatedServer(prefix: string, ownerEmail: string, options: { captureLogs?: boolean } = {}) {
   const directory = mkdtempSync(join(tmpdir(), `panacea-${prefix}-`))
   const secret = randomBytes(32).toString('hex')
   const dataFile = join(directory, 'data.json')
@@ -33,12 +33,13 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   let base = ''
   let failed = false
   let exited: Promise<void>
+  let logs = ''   // stdout+stderr semua proses (hanya bila captureLogs), untuk uji kebocoran data ke log
 
   const launch = async () => {
     const port = await freePort()
     failed = false
     child = spawn(process.execPath, ['--import', 'tsx', 'src/index.ts'], {
-      cwd: serverRoot, stdio: 'ignore', env: {
+      cwd: serverRoot, stdio: options.captureLogs ? ['ignore', 'pipe', 'pipe'] : 'ignore', env: {
         ...process.env, NODE_ENV: 'development', PORT: String(port), JWT_SECRET: secret,
         ALLOW_DEV_LOGIN: 'true', OWNER_EMAIL: ownerEmail, COOKIE_SECURE: 'false',
         PANACEA_DATA_FILE: dataFile, PANACEA_ARCHIVE_DIR: join(directory, 'archive'), MONGODB_URI: '',
@@ -49,6 +50,7 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
       },
     })
     const current = child
+    if (options.captureLogs) for (const stream of [current.stdout, current.stderr]) stream?.on('data', (chunk: Buffer) => { logs += chunk.toString('utf8') })
     exited = new Promise<void>(resolve => {
       current.once('exit', () => resolve())
       current.once('error', () => { failed = true; resolve() })
@@ -101,6 +103,6 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   }
   try {
     await launch()
-    return { call, stop, restart, dataFile }
+    return { call, stop, restart, dataFile, logs: () => logs }
   } catch (error) { await stop(); throw error }
 }
