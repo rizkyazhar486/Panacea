@@ -103,8 +103,8 @@ export function Billing() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const r = withdrawTokens(Number(withdraw) || 0, bank)
-                    setMsg(r.ok ? `Withdrawal of Rp${((withdraw || 0) * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
+                    const r = withdrawTokens(withdraw, bank)
+                    setMsg(r.ok ? `Withdrawal of Rp${(withdraw * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
                     setTimeout(() => setMsg(''), 2800)
                   }}
                 >
