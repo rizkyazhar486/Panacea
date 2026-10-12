@@ -124,3 +124,6 @@ console.log('Connect consent, identity minimization, retention, public-redaction
 
 // Real HTTP: the public feed carries no reactor emails (counts and "mine" preserved), redaction is output-only, owner-only edits whitelisted.
 await import('./postsPrivacyHttp.uji.js')
+
+// Real HTTP: push subscriptions validated and capped, post/feedback text bounded, public price board without contributor emails.
+await import('./inputBoundsHttp.uji.js')
