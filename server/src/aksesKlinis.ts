@@ -21,11 +21,19 @@ export function klinisiAtauPemilik(u: PenggunaAkses, pemilik: boolean): boolean 
   return pemilik || u.role === 'dokter' || u.role === 'owner'
 }
 
+/**
+ * Id pasien menjadi kunci objek polos di simpanan klinis. Nama yang diwarisi setiap objek (constructor, __proto__,
+ * toString, ...) bukan id yang sah: ia menembus pengecekan "ada/tidak ada" dan merusak penyimpanan (500) atau
+ * mengubah prototipe tabel.
+ */
+export const idPasienDicadangkan = (patientId: unknown): boolean => typeof patientId === 'string' && patientId in Object.prototype
+
 export function bolehAksesPasien(
   u: PenggunaAkses, patientId: string, pemilik: boolean,
   cariPemilikRekamDiri: (patientId: string) => { id: string } | undefined,
   tertaut?: (patientId: string) => boolean,
 ): boolean {
+  if (idPasienDicadangkan(patientId)) return false
   if (klinisiAtauPemilik(u, pemilik)) return true
   if (tertaut?.(patientId)) return true
   if (!patientId) return false
@@ -90,7 +98,7 @@ export function tebusKodeTaut(kode: string, pengguna: { id: string }, daftarKode
 
 /** Akses pasien lewat tautan eksplisit (selain rekam diri). */
 export function tertautKe(u: { id: string }, patientId: string, tautan: Record<string, TautanPasien> | undefined): boolean {
-  return Boolean(patientId && tautan?.[patientId]?.userId === u.id)
+  return Boolean(patientId && tautan && Object.prototype.hasOwnProperty.call(tautan, patientId) && tautan[patientId]?.userId === u.id)
 }
 
 /**
@@ -99,6 +107,6 @@ export function tertautKe(u: { id: string }, patientId: string, tautan: Record<s
  * dan melanggar batas privasi tautan yang eksplisit-disetujui-pasien).
  */
 export function statusTautanPasien(patientId: string, tautan: Record<string, TautanPasien> | undefined): { linked: boolean; linkedAt?: string } {
-  const t = tautan?.[patientId]
+  const t = tautan && Object.prototype.hasOwnProperty.call(tautan, patientId) ? tautan[patientId] : undefined
   return t ? { linked: true, linkedAt: t.ditautkanPada } : { linked: false }
 }
