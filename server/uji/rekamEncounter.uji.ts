@@ -71,3 +71,6 @@ await import('./anamnesisProvenanceVersioning.uji.js')
 
 // Alpha A8: one scripted journey from identity to follow-up with real persistence across a process restart.
 await import('./careJourneyRestart.uji.js')
+
+// Alpha A4-A6 characterization and review-claim integrity: no client-asserted clinical review, signed state only from a verified clinician.
+await import('./clinicalSigningIntegrity.uji.js')

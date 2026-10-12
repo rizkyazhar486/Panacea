@@ -123,6 +123,8 @@ function terapkanAsalIsian(lama: any | undefined, r: any, penulis: Penulis, kini
 
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
+  // Status tinjauan klinis milik server, bukan klien: belum ada peninjau terdaftar, jadi klaim "sudah ditinjau" tidak pernah disimpan.
+  if (r.clinically_reviewed !== undefined && r.clinically_reviewed !== false) r.clinically_reviewed = false
   const fisikLama = lama?.physicalExam ?? {}
   if (!penulis.klinisi) {
     // Cap tanda tangan hanya tetap bila cap itu sendiri identik DAN isi klinis
