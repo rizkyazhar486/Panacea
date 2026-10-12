@@ -72,6 +72,6 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
       if (!ready) await new Promise(resolve => setTimeout(resolve, 250))
     }
     assert.ok(ready, 'isolated server must start')
-    return { call, stop }
+    return { call, stop, dataFile: join(directory, 'data.json') }
   } catch (error) { await stop(); throw error }
 }

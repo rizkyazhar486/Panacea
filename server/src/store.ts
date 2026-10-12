@@ -1217,7 +1217,12 @@ export function rotateHealthWebhookToken(email: string): string {
   return token
 }
 export function emailForWebhookToken(token: string): string | undefined {
-  return db.healthWebhookTokens?.[token]
+  // The token comes straight from the URL of an unauthenticated route. Only an entry this server issued may match:
+  // an inherited property (constructor, __proto__, toString, ...) is truthy but is not a credential.
+  const tabel = db.healthWebhookTokens
+  if (!tabel || typeof token !== 'string' || !Object.prototype.hasOwnProperty.call(tabel, token)) return undefined
+  const email = tabel[token]
+  return typeof email === 'string' ? email : undefined
 }
 
 // Favorite sports teams a user follows, for score-change push notifications.
