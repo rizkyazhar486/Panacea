@@ -1203,6 +1203,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       sendEmail: (e) => setState((st) => ({ ...st, emails: [e, ...st.emails] })),
       withdrawTokens: (amount, bank) => {
+        if (backendEnabled) return { ok: false, reason: 'Use the server wallet to request a bank payout.' }
         const parsed = parseWithdrawAmount(amount)
         if (!parsed.ok) return { ok: false, reason: parsed.reason }
         if (state.wallet.balance < amount) return { ok: false, reason: 'Not enough balance.' }
@@ -1215,7 +1216,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'withdraw' as TxType,
                 amount: -amount,
-                note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('en-GB')})`,
+                note: `Demo debit: ${amount} PNC (${bank}); no bank payout requested`,
                 at: new Date().toISOString(),
               },
               ...st.wallet.transactions,
