@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { checkTokenAmount } from '../domains/wallet/engine/tokenAmount'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
@@ -1202,7 +1203,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       sendEmail: (e) => setState((st) => ({ ...st, emails: [e, ...st.emails] })),
       withdrawTokens: (amount, bank) => {
-        if (amount <= 0) return { ok: false, reason: 'Invalid amount.' }
+        const cek = checkTokenAmount(amount)
+        if (!cek.ok) return { ok: false, reason: cek.reason }
         if (state.wallet.balance < amount) return { ok: false, reason: 'Not enough balance.' }
         setState((st) => ({
           ...st,
@@ -1223,7 +1225,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return { ok: true }
       },
       spendPnc: (amount, note) => {
-        if (amount <= 0) return { ok: true }
+        if (amount === 0) return { ok: true }
+        const cek = checkTokenAmount(amount)
+        if (!cek.ok) return { ok: false, reason: 'invalid_amount' }
         if (state.wallet.balance < amount) return { ok: false, reason: 'insufficient_balance' }
         setState((st) => ({
           ...st,
