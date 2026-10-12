@@ -146,3 +146,6 @@ assert.deepEqual(sleepSessions[0], {
 })
 
 console.log('Health webhook parsing, unit, timezone, HR-series, and sleep-session invariants verified.')
+
+// Real HTTP: only server-issued tokens are accepted by the unauthenticated webhook (no inherited property names), rotation and secrecy.
+await import('./healthWebhookTokenHttp.uji.js')
