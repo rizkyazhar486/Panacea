@@ -155,3 +155,6 @@ assert.deepEqual(
 )
 
 console.log('Payment ownership, amount normalization, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
+
+// Clinical Calculators paywall over real HTTP (free first 50, 500 PNC once, no double charge).
+await import("./calculatorPaywallHttp.uji.js")
