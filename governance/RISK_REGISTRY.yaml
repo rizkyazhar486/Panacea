@@ -622,9 +622,10 @@ risks:
       exercise isolation, restoration and cross-tab mismatch. This is not encryption,
       an XSS defense, a claim about all other browser caches or clinical validation.
       Exact-head CI, integration and deployment evidence are recorded separately.
-      The strength-log key pmd_beban_v1 remains global; the separate raw-draft
-      input correction does not establish ownership for its historical records.
-      Scope the cache and its derived widgets before claiming their privacy closure.
+      Strength sessions and their derived Home widget now use the same attributable
+      scope, block stale reads/writes/deletes and retain unknown-owner legacy bytes
+      without adoption. Quota failure cannot invent a persisted session. This does
+      not close other global personal-health caches or establish server RBAC.
     evidence:
       - src/domains/personal-health/adapters/toolkitStorage.ts
       - src/pages/BodyToolkit.tsx
@@ -634,3 +635,8 @@ risks:
       - scripts/qa/carbon-diet-input-smoke.mjs
       - docs/BODY_TOOLKIT_STORAGE.md
       - docs/CARBON_DIET_INPUTS.md
+      - src/lib/angkatBeban.ts
+      - src/domains/personal-health/ui/usePersonalHealthCacheScope.ts
+      - scripts/uji/strength-cache-scope.mts
+      - scripts/qa/strength-cache-smoke.mjs
+      - docs/STRENGTH_LOG_STORAGE.md

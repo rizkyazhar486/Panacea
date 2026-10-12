@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '@playwright/test')
 const origin = process.env.STRENGTH_QA_ORIGIN || 'http://127.0.0.1:4173'
+const KEY = 'pmd_beban_v1:scope_v1:' + encodeURIComponent(JSON.stringify(['strength-test', 'self-strength-test']))
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) })
 try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
@@ -24,10 +25,10 @@ try {
   for(const value of ['2.5','101']){await reps.fill(value);assert.ok(await save.isDisabled())}
   await reps.fill('5')
   for(const value of ['0','-1','1000.1','1e309']){await kg.fill(value);assert.ok(await save.isDisabled())}
-  assert.equal(await page.evaluate(()=>localStorage.getItem('pmd_beban_v1')),null)
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),null)
   await kg.fill('100');await save.click()
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pmd_beban_v1')||'[]').length===1)
-  const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('pmd_beban_v1')))
+  await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)||'[]').length===1,KEY)
+  const rows=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY)
   assert.deepEqual(rows[0].set,[{ulangan:5,kg:100}])
   assert.equal(await reps.inputValue(),'')
   assert.deepEqual(errors,[])

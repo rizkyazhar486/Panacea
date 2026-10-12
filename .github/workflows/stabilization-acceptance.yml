@@ -292,6 +292,21 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: Strength cache ownership (synthetic client, Jakarta calendar)
+        timeout-minutes: 5
+        env:
+          STRENGTH_CACHE_QA_ORIGIN: http://127.0.0.1:4173
+          STRENGTH_CACHE_QA_OUTPUT: artifacts/strength-cache
+        run: node scripts/qa/strength-cache-smoke.mjs
+
+      - name: Upload strength cache evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strength-cache-ownership
+          path: artifacts/strength-cache
+          if-no-files-found: ignore
+
       - name: Longevity answered inputs and explicit zero (synthetic browser)
         timeout-minutes: 8
         env:

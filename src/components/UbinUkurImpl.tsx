@@ -7,6 +7,7 @@ import { ambilSesi, volumeMingguan, rekorPerGerakan } from '../lib/angkatBeban'
 import { api, backendEnabled } from '../lib/api'
 import type { MedReminder } from '../lib/types'
 import { BatasKlaimKesehatan } from './BatasKlaimKesehatan'
+import { usePersonalHealthCacheScope } from '../domains/personal-health/ui/usePersonalHealthCacheScope'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empat widget: obat, latihan beban, pengukuran berkala, dan jadwal skrining.
@@ -82,8 +83,9 @@ export function UbinObatPengingat() {
 
 // ── Latihan beban ──────────────────────────────────────────────────────────
 export function UbinBeban() {
+  const { allowed, identity } = usePersonalHealthCacheScope()
   const { pekan, rekor, sesiPekan } = useMemo(() => {
-    const semua = ambilSesi()
+    const semua = allowed ? ambilSesi() : []
     const pekan = volumeMingguan(semua, 8)
     const batas = Date.now() - 7 * 864e5
     return {
@@ -91,7 +93,7 @@ export function UbinBeban() {
       rekor: rekorPerGerakan(semua).slice(0, 3),
       sesiPekan: semua.filter((s) => Date.parse(s.tanggal) >= batas).length,
     }
-  }, [])
+  }, [allowed, identity])
 
   if (!pekan.some((p) => p.volume > 0)) return null
   const maks = Math.max(...pekan.map((p) => p.volume), 1)
