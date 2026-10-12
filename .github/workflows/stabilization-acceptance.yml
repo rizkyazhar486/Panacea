@@ -292,6 +292,23 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: Longevity answered inputs and explicit zero (synthetic browser)
+        timeout-minutes: 8
+        env:
+          PLAYWRIGHT_MODULE: '@playwright/test'
+          QA_URL: http://127.0.0.1:4173/
+          QA_ARTIFACT_DIR: artifacts/longevity-inputs
+          QA_SOFTWARE_RENDERING: '1'
+        run: node qa/longevity-check.mjs
+
+      - name: Upload Longevity input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longevity-answered-inputs
+          path: artifacts/longevity-inputs
+          if-no-files-found: ignore
+
       - name: Strength draft inputs (synthetic client, 390x844)
         timeout-minutes: 5
         env:
