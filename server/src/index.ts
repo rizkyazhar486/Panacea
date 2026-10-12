@@ -2078,7 +2078,12 @@ app.post('/api/connect/verifikasi', requireAuth, (req, res) => {
 
 app.post('/api/connect/radius', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  res.json({ radiusKm: setelRadius(u.email, Number((req.body ?? {}).km)) })
+  // Number(undefined|'abc') = NaN lolos Math.min/max sebagai NaN dan mematikan saringan radius (jarak > NaN selalu salah);
+  // Number(null) = 0 diam-diam menjadi 1 km. Hanya angka atau teks angka yang terhingga yang diterima.
+  const mentah = (req.body ?? {}).km
+  const km = typeof mentah === 'number' ? mentah : typeof mentah === 'string' && mentah.trim() !== '' ? Number(mentah) : NaN
+  if (!Number.isFinite(km)) return res.status(400).json({ error: 'km_tidak_sah' })
+  res.json({ radiusKm: setelRadius(u.email, km) })
 })
 
 // Deck: kartu calon kenalan yang sudah lolos verifikasi, blokir, kredit,
