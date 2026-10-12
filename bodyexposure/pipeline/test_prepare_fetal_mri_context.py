@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-from prepare_fetal_mri_context import prepare, representative_voxel, validate_grid
+from prepare_fetal_mri_context import FILES, prepare, representative_voxel, validate_grid
 
 
 class SourceContextTests(unittest.TestCase):
@@ -50,6 +50,16 @@ class SourceContextTests(unittest.TestCase):
             out=Path(tmp)/'new'
             with self.assertRaises(ValueError):
                 prepare(Path(tmp)/'missing', evidence, out)
+            self.assertFalse(out.exists())
+
+    def test_changed_source_fingerprint_rejected_without_creating_output(self):
+        evidence = Path(__file__).resolve().parents[2]/'public/bodyexposure/dataset-inspection/fetal-parcels/manifest.json'
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)/'source'; source.mkdir()
+            (source/FILES['t2'][0]).write_bytes(b'changed source')
+            out=Path(tmp)/'new'
+            with self.assertRaisesRegex(ValueError, 'fingerprint'):
+                prepare(source, evidence, out)
             self.assertFalse(out.exists())
 
 
