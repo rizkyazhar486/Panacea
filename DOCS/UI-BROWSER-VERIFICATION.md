@@ -34,6 +34,14 @@ script with the same session snippet; see `qa/lab-result-review-clinician-e2e.mj
 - **Not caused by those changes, found while measuring:** Data Lab's *Blood Panel Forecaster* opens with example values
   (90, 92, 95) and already prints a five-year projection. That is an invented starting state of the same kind the
   empty-field ratchet removes elsewhere; it is not counted by the ratchet because it is not `Number(x) || 0`.
+- Sports Lab (`/#/latihan?t=sportlab`, main `4242cabd`): overflow 0 px, no page errors. "Add player" opens 12 empty fields (42 px
+  high); saving blank shows 11 per-field `role=alert` messages (first: "Name: required"); age 9 shows "Age: 10–60"; pass accuracy 101
+  shows "0–100"; a valid entry is saved and listed.
+- **Not reachable, so not measurable:** `src/pages/MacroLab.tsx` (the economics lab: policy simulator, trade analysis) has no route.
+  `/macro-lab` redirects to the nutrition Macros tab, the build has no `MacroLab-*.js` chunk, and the file is listed in
+  `scripts/uji/permukaan-tak-terjangkau.mts`. Input fixes made there (#2322, #2421) are tested at source level only.
+- **Not measured:** the training-target field (#2452) needs stored workouts, and workout storage is scoped to the signed-in account,
+  so a plain `localStorage` seed is not enough; it needs a scoped fixture.
 
 Limits: inputs are 42 px high (below a 44 px touch target); this is a technical measurement, not an accessibility or
 clinical review.

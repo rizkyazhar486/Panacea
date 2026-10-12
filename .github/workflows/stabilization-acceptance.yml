@@ -232,6 +232,21 @@ jobs:
           path: artifacts/nutrition-inputs
           if-no-files-found: ignore
 
+      - name: Upload price client input guards (390x844)
+        timeout-minutes: 5
+        env:
+          UPLOAD_PRICE_QA_ORIGIN: http://127.0.0.1:4173
+          UPLOAD_PRICE_QA_OUTPUT: artifacts/upload-price-inputs
+        run: node scripts/qa/upload-price-input-smoke.mjs
+
+      - name: Upload price input guard evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-price-client-input-guard
+          path: artifacts/upload-price-inputs
+          if-no-files-found: ignore
+
       # Alpha B7: the clinician lab-result review queue against the REAL server (fresh data file, so the doctor-verification
       # fixture starts clean) and Chromium 390x844. Fails by name: SERVER_TIDAK_SIAP, VITE_TIDAK_SIAP or E2E_GAGAL.
       - name: Install server dependencies for the lab review E2E
