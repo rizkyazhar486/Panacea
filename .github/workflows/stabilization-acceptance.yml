@@ -202,6 +202,21 @@ jobs:
           path: artifacts/autophagy-inputs
           if-no-files-found: ignore
 
+      - name: Clinical validation claim-count input guard (synthetic client fixture, 390x844)
+        timeout-minutes: 5
+        env:
+          CLAIM_COUNT_QA_ORIGIN: http://127.0.0.1:4173
+          CLAIM_COUNT_QA_OUTPUT: artifacts/claim-count-inputs
+        run: node scripts/qa/claim-count-input-smoke.mjs
+
+      - name: Upload claim-count client input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claim-count-client-input-guard
+          path: artifacts/claim-count-inputs
+          if-no-files-found: ignore
+
       - name: C2 nutrition missing-input recovery (390x844)
         timeout-minutes: 5
         env:

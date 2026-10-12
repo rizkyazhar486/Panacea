@@ -1,0 +1,217 @@
+{
+  "schema": "panacea-fetal-mri-blender-trial/v1",
+  "purpose": "source_dataset_trial",
+  "clinical_validation": "pending",
+  "anatomical_identity": "unresolved",
+  "source_blend_sha256": "f3baa221c9fa8c528f730a67c0993886f86fb215644b95c29a0b2e1f9da2e0da",
+  "source_geometry_unchanged": true,
+  "source_inputs_unchanged": true,
+  "source_surfaces": {
+    "1": {
+      "world_geometry_sha256": "c9c31e0f355e7bda3e05b1e718dce94550fe99510faa01ba31341df449f05f88",
+      "vertices": 7017,
+      "polygons": 14050
+    },
+    "2": {
+      "world_geometry_sha256": "5a2b9639f101e65db892ed6ffbc5e822db9193968e36318f5237fc7e80ae6af4",
+      "vertices": 8628,
+      "polygons": 17264
+    },
+    "3": {
+      "world_geometry_sha256": "b44f96af9e510985d722dc37c93c8d63daabab4185db4f1088334323703895ee",
+      "vertices": 9069,
+      "polygons": 18150
+    },
+    "4": {
+      "world_geometry_sha256": "c7cfe1f02a15610709e88eeda056f6ba1882708964e4395d34b6db378ecdfbf2",
+      "vertices": 5648,
+      "polygons": 11316
+    },
+    "5": {
+      "world_geometry_sha256": "e8b2d3ef4b6ed9eb90d67057f733710341f0437c56eee9bf666faa200d54311d",
+      "vertices": 5336,
+      "polygons": 10684
+    },
+    "6": {
+      "world_geometry_sha256": "98513280db33302d9ba207e2cfcf20f8010057e3ca7023145a05466e0598d730",
+      "vertices": 3865,
+      "polygons": 7730
+    },
+    "7": {
+      "world_geometry_sha256": "08bd85e36b8663134918e5a272f209906d6a73f078527f2da6fde0fb57c792ea",
+      "vertices": 14749,
+      "polygons": 29534
+    },
+    "8": {
+      "world_geometry_sha256": "cd7a96c9048e2f6ec4c31f910530ecd50c1436befe58f2b4fca4c53fb7956514",
+      "vertices": 1972,
+      "polygons": 3940
+    },
+    "9": {
+      "world_geometry_sha256": "f88b822625d50b64c7fc66a3e53896612b3bd142fba9644c937080c5a8be8fac",
+      "vertices": 1306,
+      "polygons": 2608
+    }
+  },
+  "source_polygons": 115276,
+  "selected_source_label": 1,
+  "source_voxel_ijk": [
+    97,
+    138,
+    185
+  ],
+  "source_point_blender_m": [
+    0.018779421225190163,
+    -0.0009218156919814646,
+    0.02509729564189911
+  ],
+  "planes": [
+    {
+      "name": "MRI_SOURCE.REGION_01.PLANE_I",
+      "axis": 0,
+      "index": 97,
+      "pixel_grid": {
+        "column_axis": 1,
+        "row_axis": 2,
+        "row_direction": -1
+      },
+      "image_sha256": "148da883002244962cf586fe55af081a50bc63959a63748ea05f93e7a9c766db",
+      "world_quad_corners_m": [
+        [
+          0.01879517175257206,
+          0.03715119510889053,
+          -0.00956142321228981
+        ],
+        [
+          0.01868792064487934,
+          -0.03259759023785591,
+          -0.009958632290363312
+        ],
+        [
+          0.01876741275191307,
+          -0.03296929597854614,
+          0.055290259420871735
+        ],
+        [
+          0.01887466572225094,
+          0.0367794893682003,
+          0.055687468498945236
+        ]
+      ]
+    },
+    {
+      "name": "MRI_SOURCE.REGION_01.PLANE_J",
+      "axis": 1,
+      "index": 138,
+      "pixel_grid": {
+        "column_axis": 0,
+        "row_axis": 2,
+        "row_direction": -1
+      },
+      "image_sha256": "48217ec1fe6f7bdd56941a866068993bcdbd990192a664d6b8903612732df666",
+      "world_quad_corners_m": [
+        [
+          0.0378618948161602,
+          -0.0007524205138906837,
+          -0.009800578467547894
+        ],
+        [
+          -0.03938795626163483,
+          -0.0006341734551824629,
+          -0.009705792181193829
+        ],
+        [
+          -0.03930846229195595,
+          -0.0010058785555884242,
+          0.05554310232400894
+        ],
+        [
+          0.03794138878583908,
+          -0.001124125556088984,
+          0.05544831603765488
+        ]
+      ]
+    },
+    {
+      "name": "MRI_SOURCE.REGION_01.PLANE_K",
+      "axis": 2,
+      "index": 185,
+      "pixel_grid": {
+        "column_axis": 0,
+        "row_axis": 1,
+        "row_direction": -1
+      },
+      "image_sha256": "3fe4040753f0b632bf5b2a773fb7f3706fd6b3b03c68005c35cb311272eafa0d",
+      "world_quad_corners_m": [
+        [
+          0.037962622940540314,
+          0.036923252046108246,
+          0.025289518758654594
+        ],
+        [
+          -0.039287228137254715,
+          0.037041496485471725,
+          0.02538430504500866
+        ],
+        [
+          -0.039394479244947433,
+          -0.03270728886127472,
+          0.024987095966935158
+        ],
+        [
+          0.037855371832847595,
+          -0.0328255370259285,
+          0.024892309680581093
+        ]
+      ]
+    }
+  ],
+  "scene_sha256": "d7d4d64a9b869f854a2229c1eaa8122e2d766e188416ed806269ac4ac4358b0f",
+  "actual_capture": {
+    "profile": "preview",
+    "device_backend": "METAL",
+    "cycles_device": "GPU",
+    "devices": [
+      {
+        "name": "Apple M4 (GPU - 10 cores)",
+        "type": "METAL"
+      }
+    ],
+    "sample_ceiling": 32,
+    "adaptive_threshold": 0.1,
+    "sampling_time_limit_seconds": 0,
+    "resolution": [
+      960,
+      540
+    ],
+    "color_depth": "16",
+    "elapsed_seconds": 12.305949499830604,
+    "process_memory": {
+      "peak_rss_bytes": 1046462464,
+      "scope": "process_lifetime_high_water_rss",
+      "gpu_memory_bytes": null
+    },
+    "blender_version": "5.2.2 LTS"
+  },
+  "capture_png_sha256": "b4a650291f40c33601305f0429e87fac5ea17ca645a4134fa87d3fab648a753c",
+  "actual_png_ihdr": {
+    "width": 960,
+    "height": 540,
+    "bit_depth": 16,
+    "color_type": 2
+  },
+  "scope": "Offline native-grid MRI comparison, not patient-specific anatomy or clinical acceptance. Other GPU backends and larger profiles were not rendered for this scene.",
+  "negative_trials": {
+    "existing_scene_output": {
+      "exit_code": 1,
+      "preserved_output_scene_sha256": "d7d4d64a9b869f854a2229c1eaa8122e2d766e188416ed806269ac4ac4358b0f"
+    },
+    "unavailable_cuda_backend": {
+      "exit_code": 1,
+      "output_directory_created": false,
+      "cpu_substitution": false
+    }
+  },
+  "portable_registration_tests": 5,
+  "shared_artifact_ownership_tests": 9
+}

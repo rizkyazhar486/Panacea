@@ -187,6 +187,9 @@ import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
+import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
+import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS } from './store.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -636,7 +639,8 @@ app.get('/api/facility-prices', (req, res) => {
   const facilityId = String(req.query.facilityId || '')
   if (!facilityId) return res.status(400).json({ error: 'missing_facilityId' })
   const diagnosisCode = req.query.diagnosisCode ? String(req.query.diagnosisCode) : undefined
-  res.json({ prices: listFacilityPrices(facilityId, diagnosisCode) })
+  // Papan harga ini publik: nama kontributor tampil, surelnya tidak (klien hanya memakai submittedByName).
+  res.json({ prices: listFacilityPrices(facilityId, diagnosisCode).map(({ submittedByEmail: _surel, ...umum }) => umum) })
 })
 app.post('/api/facility-prices', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -645,12 +649,13 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
   if (b.confidence !== 'estimated' && b.confidence !== 'verified') {
     return res.status(400).json({ error: 'invalid_confidence' })
   }
+  for (const harga of [b.low, b.high]) if (harga !== undefined && harga !== null && (typeof harga !== 'number' || !Number.isFinite(harga) || harga < 0)) return res.status(400).json({ error: 'invalid_price' })
   const p = {
     id: uid(),
-    facilityId: String(b.facilityId),
-    diagnosisCode: b.diagnosisCode ? String(b.diagnosisCode) : undefined,
-    diagnosisTitle: b.diagnosisTitle ? String(b.diagnosisTitle) : undefined,
-    currency: String(b.currency || 'IDR'),
+    facilityId: String(b.facilityId).slice(0, 120),
+    diagnosisCode: b.diagnosisCode ? String(b.diagnosisCode).slice(0, 40) : undefined,
+    diagnosisTitle: b.diagnosisTitle ? String(b.diagnosisTitle).slice(0, 200) : undefined,
+    currency: String(b.currency || 'IDR').slice(0, 8),
     low: typeof b.low === 'number' ? b.low : undefined,
     high: typeof b.high === 'number' ? b.high : undefined,
     confidence: b.confidence,
@@ -660,10 +665,14 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
     at: new Date().toISOString(),
   }
   addFacilityPrice(p)
-  res.json({ price: p })
+  const { submittedByEmail: _surel, ...umum } = p
+  res.json({ price: umum })
 })
 
-app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
+app.get('/api/posts', (req, res) => {
+  const pemirsa = currentUser(req)?.email
+  res.json({ posts: listPosts().map((p) => postUntukPemirsa(p, pemirsa, config.jwtSecret)) })
+})
 app.post('/api/posts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Post>
@@ -673,9 +682,9 @@ app.post('/api/posts', requireAuth, (req, res) => {
     authorName: u.name,
     role: u.role,
     kind: b.kind === 'video' ? 'video' : 'image',
-    activity: String(b.activity || 'Aktivitas'),
-    caption: String(b.caption || ''),
-    mediaColor: String(b.mediaColor || '#00BF63'),
+    activity: String(b.activity || 'Aktivitas').slice(0, MAKS_AKTIVITAS_POS),
+    caption: String(b.caption || '').slice(0, MAKS_CAPTION_POS),
+    mediaColor: /^#[0-9a-fA-F]{3,8}$/.test(String(b.mediaColor ?? '')) ? String(b.mediaColor) : '#00BF63',
     durationSec: b.kind === 'video' ? 15 : undefined,
     likes: 0,
     at: new Date().toISOString(),
@@ -686,7 +695,7 @@ app.post('/api/posts', requireAuth, (req, res) => {
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, currentUser(req)?.email, config.jwtSecret) })
 })
 // Delete a post (owner-only).
 app.delete('/api/posts/:id', requireAuth, (req, res) => {
@@ -700,7 +709,7 @@ app.patch('/api/posts/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const p = updatePost(req.params.id, u.email, req.body as Partial<Post>)
   if (!p) return res.status(403).json({ error: 'forbidden' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 // Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.
 app.post('/api/posts/:id/react', requireAuth, (req, res) => {
@@ -709,7 +718,7 @@ app.post('/api/posts/:id/react', requireAuth, (req, res) => {
   if (!emoji) return res.status(400).json({ error: 'missing_emoji' })
   const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 
 // --- Club Hub meets (real, user-created — join counts are actual RSVPs) ---
@@ -1850,8 +1859,8 @@ app.get('/api/push/status', requireAuth, (req, res) => {
 })
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const sub = (req.body as { subscription?: unknown }).subscription
-  if (!sub || typeof sub !== 'object') return res.status(400).json({ error: 'bad_subscription' })
+  let sub: LanggananPush
+  try { sub = validasiLanggananPush((req.body as { subscription?: unknown }).subscription) } catch (e) { return res.status(400).json({ error: 'bad_subscription', detail: (e as Error).message }) }
   addPushSub(u.id, sub)
   res.json({ ok: true })
 })
@@ -2185,6 +2194,7 @@ app.post('/api/feedback', requireAuth, (req, res) => {
   const { kind, text } = req.body as { kind?: Feedback['kind']; text?: string }
   const trimmed = (text ?? '').trim()
   if (trimmed.length < 5) return res.status(400).json({ error: 'text_too_short' })
+  if (trimmed.length > 5000) return res.status(400).json({ error: 'text_too_long' })
   const validKinds: Feedback['kind'][] = ['Suggestion', 'Problem/Bug', 'Question', 'Compliment', 'Feature Request']
   const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Suggestion'
   const entry: Feedback = { id: uid(), userId: u.id, userEmail: u.email, userName: u.name, kind: safeKind, text: trimmed, at: new Date().toISOString(), read: false }
