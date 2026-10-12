@@ -9,6 +9,11 @@ import { KATALOG } from './healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
 import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
+import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
+
+// Batas kewajaran masukan teks pos (bukan aturan klinis): cukup longgar untuk teks nyata, cukup ketat agar satu akun tak menggembungkan berkas data.
+export const MAKS_CAPTION_POS = 5000
+export const MAKS_AKTIVITAS_POS = 100
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
@@ -744,8 +749,8 @@ export function deletePost(id: string, email: string): boolean {
 export function updatePost(id: string, email: string, patch: Partial<Post>): Post | undefined {
   const p = db.posts?.find((x) => x.id === id)
   if (!p || p.authorEmail !== email) return undefined
-  if (typeof patch.caption === 'string') p.caption = patch.caption
-  if (typeof patch.activity === 'string') p.activity = patch.activity
+  if (typeof patch.caption === 'string') p.caption = patch.caption.slice(0, MAKS_CAPTION_POS)
+  if (typeof patch.activity === 'string') p.activity = patch.activity.slice(0, MAKS_AKTIVITAS_POS)
   const flags = patch as Record<string, unknown>
   const target = p as unknown as Record<string, unknown>
   for (const k of ['exclusive', 'locked', 'archived', 'pinned', 'hideLikes', 'commentsOff', 'reuseOff']) {
@@ -1325,11 +1330,9 @@ export function listDoctors(): DoctorRow[] {
 }
 
 // Web Push subscriptions per user (dedup by endpoint).
-export function addPushSub(userId: string, sub: any) {
+export function addPushSub(userId: string, sub: LanggananPush) {
   if (!db.pushSubs) db.pushSubs = {}
-  const list = db.pushSubs[userId] ?? []
-  if (!list.some((s) => s.endpoint === sub.endpoint)) list.push(sub)
-  db.pushSubs[userId] = list
+  db.pushSubs[userId] = tambahkanLangganan(db.pushSubs[userId] ?? [], sub)
   save()
 }
 export function listPushSubs(userId: string): any[] {

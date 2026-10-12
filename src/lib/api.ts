@@ -13,7 +13,8 @@ export interface FacilityPriceSubmission {
   high?: number
   confidence: 'estimated' | 'verified'
   source?: string
-  submittedByEmail: string
+  /** Tidak lagi dikirim server: papan harga publik hanya menampilkan nama kontributor. */
+  submittedByEmail?: string
   submittedByName: string
   at: string
 }
