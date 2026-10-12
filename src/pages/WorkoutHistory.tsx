@@ -18,6 +18,7 @@ import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { GrafikOlahraga } from '../components/GrafikOlahraga'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parseTargetValue } from '../domains/training-goals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // History Latihan — sesi nyata beserta deret detak jantung per menit.
@@ -80,6 +81,8 @@ export function WorkoutHistory() {
   useEffect(() => {
     try { localStorage.setItem('pmd-target-latihan', JSON.stringify(target)) } catch { /* kuota */ }
   }, [target])
+  const [nilaiTeks, setNilaiTeks] = useState(() => String(target.nilai))
+  const alvoValido = useMemo(() => parseTargetValue(nilaiTeks), [nilaiTeks])
   const kemajuan = useMemo(() => kemajuanTarget(workouts, target), [workouts, target])
 
   if (!workouts.length) {
@@ -178,10 +181,17 @@ export function WorkoutHistory() {
             <option value="bulan" className="bg-slate-900">Per month</option>
             <option value="tahun" className="bg-slate-900">Per year</option>
           </select>
-          <input type="number" min={1} value={target.nilai}
-            onChange={(e) => setTarget({ ...target, nilai: Math.max(0, Number(e.target.value) || 0) })}
+          <input type="number" min={1} value={nilaiTeks} aria-label="Target value"
+            onChange={(e) => {
+              setNilaiTeks(e.target.value)
+              const v = parseTargetValue(e.target.value)
+              if (v.ok) setTarget({ ...target, nilai: v.value })
+            }}
             className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
         </div>
+        {!alvoValido.ok && (
+          <p role="alert" className="mt-1 text-[11px] text-amber-700">{alvoValido.problem}. Showing your last saved target: {target.nilai}.</p>
+        )}
         <div className="mt-3 flex items-baseline justify-between">
           <span className="text-2xl font-black text-ink">
             {kemajuan.tercapai} <span className="text-sm font-bold text-neutral-500">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
