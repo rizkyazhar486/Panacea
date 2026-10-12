@@ -322,3 +322,5 @@ await import("./labReferralHttpRbac.uji.js")
 await import("./labShareHttpRbac.uji.js")
 // Real HTTP daily check-in (care plan / report) ownership, integrity, replacement and revocation.
 await import("./careHttpRbac.uji.js")
+// Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
+await import("./secondOpinionHttpRbac.uji.js")
