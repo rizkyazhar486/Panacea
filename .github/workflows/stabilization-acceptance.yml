@@ -247,6 +247,80 @@ jobs:
           path: artifacts/upload-price-inputs
           if-no-files-found: ignore
 
+      - name: Body Toolkit account-isolated storage (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          BODY_TOOLKIT_QA_ORIGIN: http://127.0.0.1:4173
+          BODY_TOOLKIT_QA_OUTPUT: artifacts/body-toolkit-storage
+        run: node scripts/qa/body-toolkit-storage-smoke.mjs
+
+      - name: Upload Body Toolkit isolation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: body-toolkit-storage-isolation
+          path: artifacts/body-toolkit-storage
+          if-no-files-found: ignore
+
+      - name: Genome campaign missing-count and precision guards (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          GENOME_CAMPAIGN_QA_ORIGIN: http://127.0.0.1:4173
+          GENOME_CAMPAIGN_QA_OUTPUT: artifacts/genome-campaign-inputs
+        run: node scripts/qa/genome-campaign-input-smoke.mjs
+
+      - name: Upload Genome campaign input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genome-campaign-input-guard
+          path: artifacts/genome-campaign-inputs
+          if-no-files-found: ignore
+
+      - name: Carbon Diet missing-input and account isolation (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          CARBON_DIET_QA_ORIGIN: http://127.0.0.1:4173
+          CARBON_DIET_QA_OUTPUT: artifacts/carbon-diet-inputs
+        run: node scripts/qa/carbon-diet-input-smoke.mjs
+
+      - name: Upload Carbon Diet input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-diet-input-isolation
+          path: artifacts/carbon-diet-inputs
+          if-no-files-found: ignore
+
+      - name: Numeric display animation (actual component, missing/zero/reduced motion)
+        timeout-minutes: 5
+        env:
+          ANIMATION_QA_OUTPUT: artifacts/animated-number
+        run: node scripts/qa/animated-number-smoke.mjs
+
+      - name: Upload numeric display animation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: animated-number-boundaries
+          path: artifacts/animated-number
+          if-no-files-found: ignore
+
+      - name: BMI calculation availability (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          BMI_QA_ORIGIN: http://127.0.0.1:4173
+          BMI_QA_OUTPUT: artifacts/bmi-availability
+        run: node scripts/qa/bmi-availability-smoke.mjs
+
+      - name: Upload BMI availability evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmi-calculation-availability
+          path: artifacts/bmi-availability
+          if-no-files-found: ignore
+
       # Alpha B7: the clinician lab-result review queue against the REAL server (fresh data file, so the doctor-verification
       # fixture starts clean) and Chromium 390x844. Fails by name: SERVER_TIDAK_SIAP, VITE_TIDAK_SIAP or E2E_GAGAL.
       - name: Install server dependencies for the lab review E2E
