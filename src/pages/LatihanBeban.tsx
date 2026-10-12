@@ -7,6 +7,7 @@ import {
   type SesiAngkat, type SetAngkat,
 } from '../lib/angkatBeban'
 import { parseStrengthDraft, type StrengthSetDraft } from '../domains/personal-health/engine/strengthDraft'
+import { usePersonalHealthCacheScope } from '../domains/personal-health/ui/usePersonalHealthCacheScope'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -31,6 +32,12 @@ function hariIni(): string {
 const KOSONG: StrengthSetDraft[] = [{ ulangan: '', kg: '' }, { ulangan: '', kg: '' }, { ulangan: '', kg: '' }]
 
 export function LatihanBeban() {
+  const { scope, identity, allowed } = usePersonalHealthCacheScope()
+  if (!allowed) return <p role="alert" className="p-4 text-sm">Session changed. Reopen this page after signing in.</p>
+  return <LatihanBebanIsi key={identity} ephemeral={scope.kind === 'anonymous'} />
+}
+
+function LatihanBebanIsi({ ephemeral }: { ephemeral: boolean }) {
   const [semua, setSemua] = useState<SesiAngkat[]>(ambilSesi)
   const [gerakan, setGerakan] = useState('')
   const [tanggal, setTanggal] = useState(hariIni)
@@ -52,7 +59,12 @@ export function LatihanBeban() {
     const alasan = alasanSesiDitolak(sesi, Date.now())
     setGalat(alasan)
     if (alasan) return
-    setSemua(simpanSesi(sesi))
+    const tersimpan = ephemeral ? [sesi, ...semua].slice(0, 500) : simpanSesi(sesi)
+    if (!tersimpan.some((row) => row.id === sesi.id)) {
+      setGalat('Could not save. Check your session and available storage')
+      return
+    }
+    setSemua(tersimpan)
     setGerakan('')
     setSet(KOSONG)
   }
@@ -179,7 +191,11 @@ export function LatihanBeban() {
                     {s.tanggal} · {s.set.map((x) => `${x.ulangan}×${x.kg}`).join(', ')} · {volumeSesi(s).toLocaleString('id-ID')} kg
                   </span>
                 </span>
-                <button onClick={() => setSemua(hapusSesi(s.id))}
+                <button onClick={() => {
+                  const berikut = ephemeral ? semua.filter((row) => row.id !== s.id) : hapusSesi(s.id)
+                  if (berikut.some((row) => row.id === s.id)) setGalat('Could not delete. Check your session and available storage')
+                  setSemua(berikut)
+                }}
                   className="flex h-9 shrink-0 items-center px-2 text-[11px] font-bold text-rose-500">Hapus</button>
               </div>
             ))}
