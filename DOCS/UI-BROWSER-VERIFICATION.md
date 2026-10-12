@@ -40,8 +40,13 @@ script with the same session snippet; see `qa/lab-result-review-clinician-e2e.mj
 - **Not reachable, so not measurable:** `src/pages/MacroLab.tsx` (the economics lab: policy simulator, trade analysis) has no route.
   `/macro-lab` redirects to the nutrition Macros tab, the build has no `MacroLab-*.js` chunk, and the file is listed in
   `scripts/uji/permukaan-tak-terjangkau.mts`. Input fixes made there (#2322, #2421) are tested at source level only.
-- **Not measured:** the training-target field (#2452) needs stored workouts, and workout storage is scoped to the signed-in account,
-  so a plain `localStorage` seed is not enough; it needs a scoped fixture.
+- Training target (#2452), `/#/latihan?t=pelatih` and `/#/latihan?t=analisis`, main `40c04273`: overflow 0 px, no page errors, input
+  42 px high. With three stored runs the card shows "5 / 20 km | 25%". Clearing the field, entering 0, -3 or 100001 shows
+  "Enter a target of at least 1" / "Target must be 1–100000" plus "Showing your last saved target: 20" and the progress stays
+  5 / 20 km (a blank field no longer reads as "on track"); entering 30 gives "5 / 30 km | 17%" and stores `{"nilai":30}`.
+  Fixture: the synthetic session needs a `patientId`, otherwise personal-health storage is refused and the screen shows
+  "0 sessions". Seed `pmd_workouts_v1:scope_v1:<encodeURIComponent(JSON.stringify([accountId, patientId]))>` with
+  `{version:1, ownerAccountId, subjectId, items:[{id, nama, mulai, selesai, durasi, jarakKm, hr:[{t,bpm}…], pemulihan:[]}]}`.
 
 Limits: inputs are 42 px high (below a 44 px touch target); this is a technical measurement, not an accessibility or
 clinical review.
