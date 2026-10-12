@@ -262,6 +262,21 @@ jobs:
           path: artifacts/body-toolkit-storage
           if-no-files-found: ignore
 
+      - name: Genome campaign missing-count and precision guards (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          GENOME_CAMPAIGN_QA_ORIGIN: http://127.0.0.1:4173
+          GENOME_CAMPAIGN_QA_OUTPUT: artifacts/genome-campaign-inputs
+        run: node scripts/qa/genome-campaign-input-smoke.mjs
+
+      - name: Upload Genome campaign input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genome-campaign-input-guard
+          path: artifacts/genome-campaign-inputs
+          if-no-files-found: ignore
+
       - name: Carbon Diet missing-input and account isolation (synthetic client, 390x844)
         timeout-minutes: 5
         env:
