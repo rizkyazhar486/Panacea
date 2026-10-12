@@ -186,7 +186,7 @@ import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
-import { validasiPengingatBaru, validasiTambalPengingat } from './pengingatObat.js'
+import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
