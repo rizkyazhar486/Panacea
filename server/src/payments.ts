@@ -61,6 +61,8 @@ function channels(method: string): string[] {
  * server-owned.
  */
 export function normalizeTopUpPnc(value: unknown, tokenToIdr: number): number | undefined {
+  if (typeof value !== 'number' && typeof value !== 'string') return undefined
+  if (typeof value === 'string' && value.trim() === '') return undefined
   const numeric = Number(value)
   if (!Number.isFinite(numeric) || numeric < 1) return undefined
   const pnc = Math.floor(numeric)
