@@ -72,13 +72,17 @@ try {
   const withPlan = await save(alice.token, { ...edited.body.record, plan: [{ id: 'p1', text: 'Synthetic patient-entered plan item' }] })
   assert.equal(withPlan.status, 200); assert.equal(withPlan.body.record.plan.length, 1, 'KNOWN LIMIT A4/A6: a patient can store a plan item on her own unsigned record')
   assert.equal(withPlan.body.record.signedAt, undefined, 'it is never signed, so it is not an active signed plan')
-  // A6 says an unsigned signing attempt is rejected AND logged. Today it is silently stripped and only a generic save is logged.
-  const audit = (await call('GET', '/api/audit', owner.token)).body
-  const actions = new Set((audit.entries ?? audit.audit ?? audit).map((a: any) => a.action))
-  assert.ok(actions.has('emr.save') && actions.has('emr.signed_version_archived'))
-  assert.ok(![...actions].some(a => /sign.*(reject|denied|refus)|reject.*sign/i.test(String(a))), 'KNOWN LIMIT A6: a refused signing attempt has no audit entry of its own')
+  // A6 says an unsigned signing attempt is rejected AND logged. The server strips the claim (checked above) and now records the refusal on its own
+  // audit action. It is still saved with 200 and stripped, not answered with an error: that part of A6 stays a KNOWN LIMIT.
+  const auditEntries = ((await call('GET', '/api/audit', owner.token)).body as any)
+  const entries = (auditEntries.entries ?? auditEntries.audit ?? auditEntries) as any[]
+  const refused = entries.filter(a => a.action === 'emr.signature_refused')
+  assert.equal(refused.length, 1, 'exactly one refusal: the forged patient save. The clinician save, the identical carry-over and the plain patient edits are not refusals')
+  assert.equal(refused[0].userId, alice.user.id); assert.equal(refused[0].target, patientId)
+  assert.ok(entries.some(a => a.action === 'emr.save') && entries.some(a => a.action === 'emr.signed_version_archived'))
+  assert.equal(byPatient.status, 200, 'KNOWN LIMIT A6: the refused attempt is stripped and the save returns 200, not an error')
 
-  console.log('clinicalSigningIntegrity: no client-asserted review claim persists; only a verified clinician produces signed state; AI labels survive signing; patient edits drop signatures; KNOWN LIMITS A4/A6 recorded; passed')
+  console.log('clinicalSigningIntegrity: no client-asserted review claim persists; only a verified clinician produces signed state; AI labels survive signing; patient edits drop signatures; refused signing attempts are audited; KNOWN LIMITS A4 (patient writes labelled, not rejected) and A6 (stripped with 200, not an error) recorded; passed')
 } finally {
   await running.stop()
 }

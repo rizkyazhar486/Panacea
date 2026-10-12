@@ -5,3 +5,8 @@ export { parsePredictiveField, PREDICTIVE_FIELDS } from './engine/predictiveInpu
 export type { FieldResult as PredictiveFieldResult, PredictiveField } from './engine/predictiveInputs.ts'
 export { coffeeFluidMl, fastingElectrolytes, FASTING_HYDRATION_REVIEW, COFFEE_CUPS_MAX, FASTING_HOURS_MAX } from './engine/fastingHydration.ts'
 export type { NutritionEstimate } from './engine/fastingHydration.ts'
+
+export { readToolkitStorage, writeToolkitStorage, toolkitStorageKey } from './adapters/toolkitStorage.ts'
+export { SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, sanitizeMinutes } from './engine/toolkitData.ts'
+export type { SymptomLog } from './engine/toolkitData.ts'
+export { parseServingField, sanitizeServings, estimateRecordedFood, MAX_SERVINGS_PER_WEEK } from './engine/dietServings.ts'

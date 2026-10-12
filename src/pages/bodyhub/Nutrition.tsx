@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { AnimatedNumber } from '../../components/AnimatedNumber'
 import { Fold } from '../../shared/ui/Fold'
 import { openFoldsAround } from '../../shared/ui/openFolds'
 import { kunciHari, hariIni } from '../../lib/tanggal'
@@ -739,17 +740,11 @@ function Stepper({ label, value, min, max, step = 1, unit, onChange }: { label?:
   )
 }
 
-function ANum({ v, d = 0 }: { v: number; d?: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    const el = ref.current; if (!el) return
-    let cur = Number(el.textContent) || 0
-    if (Math.abs(cur - v) < 0.01) return
-    const s = cur; const t0 = performance.now(); let raf = 0
-    const tick = (now: number) => { const p = Math.min(1, (now - t0) / 500); cur = s + (v - s) * (1 - (1 - p) ** 3); el.textContent = cur.toFixed(d); if (p < 1) raf = requestAnimationFrame(tick) }
-    raf = requestAnimationFrame(tick); return () => cancelAnimationFrame(raf)
-  }, [v, d])
-  return <span ref={ref}>{v.toFixed(d)}</span>
+function ANum(props: { v: number; d?: number }) {
+  const { account, activePatient } = useStore()
+  // A different account or selected patient must never animate through the old subject's value.
+  const identity = JSON.stringify([account?.id, account?.email, account?.patientId, activePatient.id])
+  return <AnimatedNumber key={identity} {...props} />
 }
 
 function Pillar({ label, v, hl }: { label: string; v: number; hl?: boolean }) {

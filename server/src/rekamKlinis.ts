@@ -121,6 +121,27 @@ function terapkanAsalIsian(lama: any | undefined, r: any, penulis: Penulis, kini
   r.asalIsian = keluar
 }
 
+/**
+ * Alpha A6: percobaan non-klinisi untuk mengklaim tanda tangan atau verifikasi pemeriksaan baru.
+ * Server membuang klaim itu secara diam-diam (terapkanSimpanRekam); fungsi ini hanya membedakan
+ * "klaim baru" dari "membawa kembali cap yang sudah ada tanpa perubahan" supaya penolakan tercatat di audit
+ * tanpa menandai setiap simpanan pasien biasa. Murni: tidak mengubah apa pun.
+ */
+export function tandaTanganDitolak(lama: any | undefined, baru: any, penulis: Penulis): boolean {
+  if (penulis.klinisi) return false
+  const klaimCap = Boolean(baru?.signedAt || baru?.signedBy || baru?.signedById)
+  const capLamaSama = Boolean(
+    lama?.signedAt && sama(baru?.signedAt, lama.signedAt) && sama(baru?.signedBy, lama.signedBy) && sama(baru?.signedById, lama.signedById)
+  )
+  const fisikBaru = baru?.physicalExam
+  const fisikLama = lama?.physicalExam
+  const klaimFisik = fisikBaru?.doctorVerified === true
+  const fisikLamaSama = Boolean(
+    fisikLama?.doctorVerified && sama(fisikBaru?.verifiedBy, fisikLama.verifiedBy) && sama(fisikBaru?.verifiedById, fisikLama.verifiedById)
+  )
+  return (klaimCap && !capLamaSama) || (klaimFisik && !fisikLamaSama)
+}
+
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
   // Status tinjauan klinis milik server, bukan klien: belum ada peninjau terdaftar, jadi klaim "sudah ditinjau" tidak pernah disimpan.
