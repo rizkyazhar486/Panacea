@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useStore, TOKEN_TO_IDR } from '../lib/store'
+import { parseWithdrawAmount } from '../domains/wallet/index.ts'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
@@ -48,7 +49,7 @@ const PLANS: {
 export function Billing() {
   const { state, subscribe, withdrawTokens } = useStore()
   const { wallet, subscription } = state
-  const [withdraw, setWithdraw] = useState(10)
+  const [withdraw, setWithdraw] = useState('')
   const [bank, setBank] = useState('BCA')
   const [msg, setMsg] = useState('')
   const [buyPlan, setBuyPlan] = useState<SubscriptionPlan | null>(null)
@@ -90,7 +91,7 @@ export function Billing() {
               <div className="flex flex-wrap items-end gap-3">
                 <div className="w-32">
                   <Field label="Amount (PNC)">
-                    <input className={inputClass} type="number" min={1} value={withdraw} onChange={(e) => setWithdraw(Number(e.target.value))} />
+                    <input className={inputClass} type="number" min={1} step={1} value={withdraw} onChange={(e) => setWithdraw(e.target.value)} />
                   </Field>
                 </div>
                 <div className="w-32">
@@ -103,8 +104,13 @@ export function Billing() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const r = withdrawTokens(Number(withdraw) || 0, bank)
-                    setMsg(r.ok ? `Withdrawal of Rp${((withdraw || 0) * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
+                    const parsed = parseWithdrawAmount(withdraw)
+                    if (!parsed.ok) {
+                      setMsg(parsed.reason)
+                      return
+                    }
+                    const r = withdrawTokens(parsed.amount, bank)
+                    setMsg(r.ok ? `Withdrawal of Rp${(parsed.amount * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
                     setTimeout(() => setMsg(''), 2800)
                   }}
                 >

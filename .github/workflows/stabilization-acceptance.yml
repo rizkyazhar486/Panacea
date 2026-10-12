@@ -292,6 +292,21 @@ jobs:
           path: artifacts/carbon-diet-inputs
           if-no-files-found: ignore
 
+      - name: Demo wallet withdrawal (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WALLET_QA_ORIGIN: http://127.0.0.1:4173
+          WALLET_QA_OUTPUT: artifacts/wallet-withdraw
+        run: node scripts/qa/wallet-withdraw-smoke.mjs
+
+      - name: Upload demo wallet withdrawal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallet-withdraw-validation
+          path: artifacts/wallet-withdraw
+          if-no-files-found: ignore
+
       - name: Numeric display animation (actual component, missing/zero/reduced motion)
         timeout-minutes: 5
         env:
