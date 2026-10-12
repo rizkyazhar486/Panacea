@@ -106,6 +106,7 @@ import {
   addApplication,
   listApplications,
   setApplicationStatus,
+  getApplication,
   setApplicationVerdict,
   isEarlyAdopter,
   earlyAdopterInfo,
@@ -616,7 +617,12 @@ app.post('/api/applications/decide', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   const { id, grant } = req.body as { id?: string; grant?: boolean }
-  const a = setApplicationStatus(String(id || ''), grant ? 'granted' : 'rejected')
+  // Satu keputusan per permohonan: UI hanya memutuskan baris `pending`. Tanpa penjaga ini, `rejected` setelah `granted`
+  // meninggalkan akun tetap terverifikasi (strStatus) padahal permohonannya tercatat ditolak. Pencabutan lewat /api/doctors/:id/verify.
+  const sebelum = getApplication(String(id || ''))
+  if (!sebelum) return res.status(404).json({ error: 'not_found' })
+  if (sebelum.status !== 'pending') return res.status(409).json({ error: 'already_decided' })
+  const a = setApplicationStatus(sebelum.id, grant ? 'granted' : 'rejected')
   if (!a) return res.status(404).json({ error: 'not_found' })
   notify(a.userId, grant
     ? { title: 'Access approved ✅', body: `Your ${a.role} registration was approved. Full access is now active.`, url: './#/' }
@@ -2072,7 +2078,12 @@ app.post('/api/connect/verifikasi', requireAuth, (req, res) => {
 
 app.post('/api/connect/radius', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  res.json({ radiusKm: setelRadius(u.email, Number((req.body ?? {}).km)) })
+  // Number(undefined|'abc') = NaN lolos Math.min/max sebagai NaN dan mematikan saringan radius (jarak > NaN selalu salah);
+  // Number(null) = 0 diam-diam menjadi 1 km. Hanya angka atau teks angka yang terhingga yang diterima.
+  const mentah = (req.body ?? {}).km
+  const km = typeof mentah === 'number' ? mentah : typeof mentah === 'string' && mentah.trim() !== '' ? Number(mentah) : NaN
+  if (!Number.isFinite(km)) return res.status(400).json({ error: 'km_tidak_sah' })
+  res.json({ radiusKm: setelRadius(u.email, km) })
 })
 
 // Deck: kartu calon kenalan yang sudah lolos verifikasi, blokir, kredit,
