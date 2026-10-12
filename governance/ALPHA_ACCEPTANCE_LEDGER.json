@@ -30,9 +30,9 @@
    "acceptance": "Satu pasien uji memiliki satu identitas; encounter, anamnesis, dan hasil merujuk ID yang sama (diuji lewat API, bukan UI saja)",
    "status": "VERIFIED",
    "evidence": [
-       "server/uji/patientIdentityContinuity.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2440, merge 1d193a9b; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with random session secret and synthetic identities. One test account maps to one clinical id (self-u-<userId>); creating the patient twice updates in place and leaves exactly one patient record; the signed record, encounter close and successor record, lab result and referral all carry that same patientId, and the signed record keeps the authenticated doctor as signer and as author of each anamnesis answer even when the client forges the signer.",
-       "The same run shows the daily check-in (anamnesis) plan and the patient's answer stored against the same account id, and /api/keadaan-longitudinal keyed by that id joining the clinical records, encounters and care plans with reports for the same patient. A second account sees none of it and cannot write, file, answer or link into another identity (403/404/400/409 as applicable); a record cannot be filed under a different patientId; a patient session can create only its own primary record. A practice patient joins exactly one account through a one-time clinician-issued code: patients cannot issue codes, spent codes and already-linked patients cannot be reused or shared, and access ends when the link is removed.",
-       "Seven route-guard mutants (record patient mismatch, patient writes any id, patient issues link codes, link ownership, spent-code reuse, second-account link, check-in ownership) each fail by name; an eighth (removing the self-id candidate check) is not caught on purpose because the next line independently blocks the same case. Server typecheck, build and full npm run uji passed. Test-only change; no runtime code was modified. This is not human clinical approval."
+    "server/uji/patientIdentityContinuity.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2440, merge 1d193a9b; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with random session secret and synthetic identities. One test account maps to one clinical id (self-u-<userId>); creating the patient twice updates in place and leaves exactly one patient record; the signed record, encounter close and successor record, lab result and referral all carry that same patientId, and the signed record keeps the authenticated doctor as signer and as author of each anamnesis answer even when the client forges the signer.",
+    "The same run shows the daily check-in (anamnesis) plan and the patient's answer stored against the same account id, and /api/keadaan-longitudinal keyed by that id joining the clinical records, encounters and care plans with reports for the same patient. A second account sees none of it and cannot write, file, answer or link into another identity (403/404/400/409 as applicable); a record cannot be filed under a different patientId; a patient session can create only its own primary record. A practice patient joins exactly one account through a one-time clinician-issued code: patients cannot issue codes, spent codes and already-linked patients cannot be reused or shared, and access ends when the link is removed.",
+    "Seven route-guard mutants (record patient mismatch, patient writes any id, patient issues link codes, link ownership, spent-code reuse, second-account link, check-in ownership) each fail by name; an eighth (removing the self-id candidate check) is not caught on purpose because the next line independently blocks the same case. Server typecheck, build and full npm run uji passed. Test-only change; no runtime code was modified. This is not human clinical approval."
    ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
    "note": "VERIFIED only for technical identity continuity in file-mode application over HTTP. The clinical id (self-u-<userId>) and the care/longitudinal subject (the bare account id) are two deterministic forms of one identity, not one literal string. Lab results and referrals carry the same patientId but are served by their own RBAC routes, not inside /api/keadaan-longitudinal. Not covered: Mongo mode, legacy email-derived alias ids and email change, share expiry, and any UI. Doctor verification is a test fixture, not proof of qualification; clinically_reviewed stays false."
@@ -58,7 +58,7 @@
    "acceptance": "Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa",
    "status": "REPORTED",
    "evidence": [
-       "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval."
+    "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval."
    ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
    "note": "REPORTED, not VERIFIED, because two parts of the acceptance are not met as written. (1) Versioning applies only to SIGNED records: an unsigned draft is edited in place and nothing is archived, so 'a change creates a new version, not an overwrite' is not true for drafts. (2) Provenance for non-clinician or AI-declared answers (asal 'AI') has a source and time but no author id (no olehId), so 'author' is present only for clinician-authored answers; a patient edit is labelled and archives the signed version it replaced, but the patient's identity is recorded on the archive (diarsipkanOleh), not on the answer. Decision for the ledger owner: either accept these as the intended model and promote, or change the runtime (version drafts; record the author id for patient/AI answers) and re-test. Not covered: Mongo mode, UI, AI-draft generation paths."
@@ -250,12 +250,13 @@
    "pillar": "Clinical Calculators",
    "criterion": "Ratchet \"kolom kosong → 0\" mencapai nol",
    "acceptance": "governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0",
-   "status": "NOT_STARTED",
+   "status": "REPORTED",
    "evidence": [
-    "Baseline 147 → 80 (28 berkas) di main 4b2009a1f"
+    "Baseline 147 → 80 (28 berkas) di main 4b2009a1f",
+    "Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766)."
    ],
    "owner": "Sonnet",
-   "note": "Sisa 80 belum diklasifikasikan klinis vs non-klinis."
+   "note": "Kemajuan engineering parsial; total pada main terakhir 19. Perubahan nutrisi dalam revisi ini menurunkan baseline aktual menjadi 17 (14 berkas), belum nol. Kriteria tetap belum VERIFIED; pemindaian lengkap dan aturan deteksi tetap utuh."
   },
   {
    "id": "C3",
@@ -304,7 +305,7 @@
    "status": "PENDING_CLINICAL_REVIEW",
    "evidence": [],
    "owner": "Klinisi (belum ditunjuk)",
-   "note": "Gerbang terpisah; tidak menghentikan pekerjaan teknis."
+   "note": "Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false."
   },
   {
    "id": "C7",

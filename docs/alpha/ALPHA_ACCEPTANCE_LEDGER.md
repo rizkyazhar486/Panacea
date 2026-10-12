@@ -25,9 +25,9 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | Status | Jumlah |
 |---|---|
 | VERIFIED | 29 |
-| REPORTED | 4 |
+| REPORTED | 5 |
 | NOT_CHECKED | 8 |
-| NOT_STARTED | 1 |
+| NOT_STARTED | 0 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
@@ -63,11 +63,11 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
 | C1 | Validasi masukan pada kalkulator yang dimigrasi | Kolom kosong = "belum diisi" (bukan 0); di luar rentang ditolak dengan alasan; tes positif, negatif, dan batas; mutasi terbunuh | VERIFIED | Sonnet | PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314 dan 7 mesin sebelumnya di src/domains/clinical-calculators/engine; scripts/uji/*.mts per mesin; Rentang adalah batas kewajaran, bukan ambang klinis. |
-| C2 | Ratchet "kolom kosong → 0" mencapai nol | governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0 | NOT_STARTED | Sonnet | Baseline 147 → 80 (28 berkas) di main 4b2009a1f; Sisa 80 belum diklasifikasikan klinis vs non-klinis. |
+| C2 | Ratchet "kolom kosong → 0" mencapai nol | governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0 | REPORTED | Sonnet | Baseline 147 → 80 (28 berkas) di main 4b2009a1f; Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766).; Kemajuan engineering parsial; total pada main terakhir 19. Perubahan nutrisi dalam revisi ini menurunkan baseline aktual menjadi 17 (14 berkas), belum nol. Kriteria tetap belum VERIFIED; pemindaian lengkap dan aturan deteksi tetap utuh. |
 | C3 | Penandaan batas klaim pada kalkulator klinis | Setiap permukaan kalkulator terdaftar dan menampilkan batas klaim (bukan keputusan klinis tervalidasi) | VERIFIED | Sonnet | scripts/uji/clinical-claim-maturity.mts (bagian npm run uji, check CI `validate`) |
 | C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | VERIFIED | Sonnet | governance/CALCULATOR_REVIEW_REGISTRY.json: 43 mesin kalkulator, semuanya PENDING_CLINICAL_REVIEW dengan clinically_reviewed=false; 4 modul pembantu dikecualikan eksplisit dengan alasan.; src/domains/clinical-calculators/engine/reviewRegistry.ts + scripts/uji/calculator-review-registry.mts (bagian npm run uji, dijalankan di CI): menolak mesin tanpa entri, entri yatim/ganda, dan status ditinjau tanpa peninjau, tanggal ISO, atau bukti.; Sabotase: berkas engine baru tanpa entri → uji gagal dengan nama ("zzSabotage: engine-without-review-entry"); dihapus kembali → lulus.; VERIFIED hanya untuk kriteria penandaan yang dapat diperiksa mesin. Ini label status, BUKAN tinjauan klinis: tidak ada peninjau yang ditunjuk dan semua mesin tetap clinically_reviewed=false (C6 tetap PENDING_CLINICAL_REVIEW). |
 | C5 | Regression suite kalkulator berjalan di CI | Tes kalkulator termasuk dalam check wajib `validate` dan merah bila gagal | VERIFIED | Sonnet | npm run uji (681/681 pada 4b2009a1f); check wajib `validate` |
-| C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang terpisah; tidak menghentikan pekerjaan teknis. |
+| C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |
 
 ## Body Exposure Alpha (7 / 10)
