@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type SetStateAction } from 'react'
+import { useStore } from '../lib/store'
+import { readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage, SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, sanitizeMinutes } from '../domains/personal-health'
+import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope'
 import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
@@ -16,13 +19,23 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 type Tab = 'skincare' | 'symptom-map' | 'neat'
 
-const SKINCARE_STEPS = ['Cleanser', 'Vitamin C serum', 'Retinol/Retinoid', 'Moisturizer', 'Sunscreen (SPF)', 'Niacinamide', 'Eye cream', 'Exfoliant (AHA/BHA)']
+type ToolkitScope = Extract<PersonalHealthStorageScope, { kind: 'account' }> | null
+function useToolkitData<T>(key: string, scope: ToolkitScope, sanitize: (value: unknown) => T) {
+  const [value, setValue] = useState<T>(() => readToolkitStorage(key, scope, sanitize))
+  const [storageProblem, setStorageProblem] = useState<string | null>(null)
+  const update = (action: SetStateAction<T>) => {
+    // Persist outside React updater callbacks: StrictMode may invoke them twice.
+    const next = sanitize(typeof action === 'function' ? (action as (previous: T) => T)(value) : action)
+    if (scope && !writeToolkitStorage(key, scope, next)) { setStorageProblem('Unable to save. Check your session and browser storage, then retry.'); return }
+    setStorageProblem(null)
+    setValue(next)
+  }
+  return [value, update, storageProblem] as const
+}
+
 const SKINCARE_KEY = 'pmd_skincare_routine_v1'
-function SkincareBuilder() {
-  const [routine, setRoutine] = useState<{ morning: string[]; night: string[] }>(() => {
-    try { return JSON.parse(localStorage.getItem(SKINCARE_KEY) || '') } catch { return { morning: [], night: [] } }
-  })
-  useEffect(() => { try { localStorage.setItem(SKINCARE_KEY, JSON.stringify(routine)) } catch { /* ignore */ } }, [routine])
+function SkincareBuilder({ scope }: { scope: ToolkitScope }) {
+  const [routine, setRoutine, storageProblem] = useToolkitData(SKINCARE_KEY, scope, sanitizeRoutine)
 
   const toggle = (period: 'morning' | 'night', step: string) => {
     setRoutine((r) => ({ ...r, [period]: r[period].includes(step) ? r[period].filter((s) => s !== step) : [...r[period], step] }))
@@ -61,6 +74,7 @@ function SkincareBuilder() {
 
   return (
     <Card className="!p-5 space-y-4">
+      {storageProblem && <p role="alert">{storageProblem}</p>}
       <p className="text-[13px] text-neutral-500">Tap to add a step, then reorder with the arrows — order matters (thinnest-to-thickest texture, actives before moisturizer, sunscreen last in the morning).</p>
       <Period period="morning" label="☀️ Morning" />
       <Period period="night" label="🌙 Night" />
@@ -68,15 +82,12 @@ function SkincareBuilder() {
   )
 }
 
-const BODY_REGIONS = ['Head/Neck', 'Chest', 'Abdomen', 'Left Arm', 'Right Arm', 'Lower Back', 'Left Leg', 'Right Leg']
 const SYMPTOM_KEY = 'pmd_symptom_map_v1'
-interface SymptomLog { t: number; region: string; severity: number; note: string }
-function SymptomBodyMap() {
-  const [logs, setLogs] = useState<SymptomLog[]>(() => { try { return JSON.parse(localStorage.getItem(SYMPTOM_KEY) || '[]') } catch { return [] } })
+function SymptomBodyMap({ scope }: { scope: ToolkitScope }) {
+  const [logs, setLogs, storageProblem] = useToolkitData(SYMPTOM_KEY, scope, sanitizeSymptoms)
   const [region, setRegion] = useState(BODY_REGIONS[0])
   const [severity, setSeverity] = useState(3)
   const [note, setNote] = useState('')
-  useEffect(() => { try { localStorage.setItem(SYMPTOM_KEY, JSON.stringify(logs)) } catch { /* ignore */ } }, [logs])
 
   const save = () => { setLogs((l) => [{ t: Date.now(), region, severity, note: note.trim() }, ...l].slice(0, 30)); setNote('') }
   const byRegion = useMemo(() => {
@@ -87,6 +98,7 @@ function SymptomBodyMap() {
 
   return (
     <Card className="!p-5">
+      {storageProblem && <p role="alert">{storageProblem}</p>}
       <p className="text-[13px] text-neutral-500">Log where you're feeling pain/fatigue/discomfort — patterns across regions and time are useful to bring to a clinician.</p>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {BODY_REGIONS.map((r) => (
@@ -115,10 +127,9 @@ function SymptomBodyMap() {
 }
 
 const NEAT_KEY = 'pmd_neat_tracker_v1'
-function NeatTracker() {
+function NeatTracker({ scope }: { scope: ToolkitScope }) {
   const today = hariIni()
-  const [minutes, setMinutes] = useState<Record<string, number>>(() => { try { return JSON.parse(localStorage.getItem(NEAT_KEY) || '{}') } catch { return {} } })
-  useEffect(() => { try { localStorage.setItem(NEAT_KEY, JSON.stringify(minutes)) } catch { /* ignore */ } }, [minutes])
+  const [minutes, setMinutes, storageProblem] = useToolkitData(NEAT_KEY, scope, sanitizeMinutes)
   const [logProblem, setLogProblem] = useState<string | null>(null)
   const todayMin = minutes[today] || 0
   const weekTotal = useMemo(() => {
@@ -128,9 +139,10 @@ function NeatTracker() {
   }, [minutes])
   return (
     <Card className="!p-5">
+      {storageProblem && <p role="alert">{storageProblem}</p>}
       <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">NEAT (Non-Exercise Activity Thermogenesis) — berjalan, berdiri, bergerak-gerak kecil, pekerjaan rumah — sering membakar lebih banyak kalori sehari daripada satu sesi latihan, dan jumlah jam berdiri/berjalan berkaitan dengan kesehatan metabolik yang lebih baik, terlepas dari olahraga terjadwal.</Prosa>
       <Field label="Standing/walking minutes today">
-        <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => { const v = parseDailyLog(e.target.value, MINUTES_PER_DAY_MAX, 'Minutes'); if (v.ok) { setMinutes((m) => ({ ...m, [today]: v.value })); setLogProblem(null) } else setLogProblem(v.problem) }} placeholder="0" />
+        <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={minutes[today] ?? ''} onChange={(e) => { const v = parseDailyLog(e.target.value, MINUTES_PER_DAY_MAX, 'Minutes'); if (v.ok) { setMinutes((m) => ({ ...m, [today]: v.value })); setLogProblem(null) } else setLogProblem(v.problem) }} placeholder="0" />
         {logProblem && <p role="alert" className="mt-1 text-[12px] text-red-600">{logProblem}. Showing your last saved value: {todayMin} min.</p>}
       </Field>
       <div className="mt-3 grid grid-cols-2 gap-3 text-center">
@@ -149,6 +161,20 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 export function BodyToolkit() {
+  const { account } = useStore()
+  const [, refresh] = useState(0)
+  useEffect(() => {
+    const changed = () => refresh(v => v + 1)
+    window.addEventListener('storage', changed)
+    window.addEventListener('focus', changed)
+    // A mounted remembered identity must also stop displaying data after expiry.
+    const timer = window.setInterval(changed, 1000)
+    return () => { window.removeEventListener('storage', changed); window.removeEventListener('focus', changed); window.clearInterval(timer) }
+  }, [])
+  const remembered = readPersonalHealthStorageScope()
+  const scope = remembered.kind === 'account' && matchesPersonalHealthAccount(remembered, account) ? remembered : null
+  const blocked = remembered.kind === 'invalid' || (account !== null && !scope) || (account === null && remembered.kind === 'account')
+  const identityKey = scope?.token || 'anonymous'
   const [tab, setTab] = useState<Tab>('skincare')
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -162,9 +188,12 @@ export function BodyToolkit() {
         </div>
       </Card>
 
-      {tab === 'skincare' && <SkincareBuilder />}
-      {tab === 'symptom-map' && <SymptomBodyMap />}
-      {tab === 'neat' && <NeatTracker />}
+      {blocked ? <Card><p role="alert">Session changed. Reopen this page after signing in.</p></Card> : <div key={identityKey}>
+        {!scope && <p className="mb-3 text-xs text-neutral-500">Sign in to save your logs. Guest changes remain only on this page.</p>}
+        {tab === 'skincare' && <SkincareBuilder scope={scope} />}
+        {tab === 'symptom-map' && <SymptomBodyMap scope={scope} />}
+        {tab === 'neat' && <NeatTracker scope={scope} />}
+      </div>}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Self-tracking tools — not a dermatology consultation or a clinical symptom assessment. Persistent
