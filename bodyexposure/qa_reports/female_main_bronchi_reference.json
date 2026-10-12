@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+  "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+  "source_url": "https://3d.nih.gov/entries/3DPX-020976",
+  "license": "CC BY 4.0",
+  "input_artifacts": [
+    {
+      "path": "/Users/rizkyazhar/Downloads/29135-outputs/3d-vh-f-main-bronchus.glb",
+      "bytes": 2858776,
+      "sha256": "c58e5b8fb61d982eb72f7385b6ce858e07e05766b0101ff0e15c7bc469cf60ff"
+    },
+    {
+      "path": "/Users/rizkyazhar/.codex/worktrees/female-respiratory-source/bodyexposure/pipeline/build_female_main_bronchi.py",
+      "bytes": 4861,
+      "sha256": "3cbfa262a22016a7f6eab9c965593125d7797330a54986ca71937323beb479f2"
+    },
+    {
+      "path": "/Users/rizkyazhar/.codex/worktrees/female-respiratory-source/bodyexposure/pipeline/female_main_bronchi_source.py",
+      "bytes": 829,
+      "sha256": "d890e1064cd524accbadc8d2a933794b6b7bb57f2fd7feb9b9f56b989fc6f54a"
+    }
+  ],
+  "inputs_unchanged": true,
+  "clinical_validation": "pending",
+  "structures": [
+    {
+      "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.L",
+      "canonical_name": "Cartilage of left main bronchus",
+      "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+      "panacea_system": "respiratory",
+      "panacea_laterality": "left",
+      "panacea_laterality_source": "source_mesh_name",
+      "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+      "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+      "panacea_license": "CC BY 4.0",
+      "panacea_source_raw_name": "VH_F_cartilage_of_main_bronchus_L",
+      "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+      "panacea_accuracy_status": "model_segmented",
+      "panacea_review_status": "review_required",
+      "panacea_version": "body_v001",
+      "biological_sex_applicability": "female",
+      "panacea_clinically_reviewed": false,
+      "panacea_educational_only": true,
+      "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+      "bbox_min_m": [
+        -0.002182638505473733,
+        0.07580356299877167,
+        0.49073827266693115
+      ],
+      "bbox_max_m": [
+        0.045744914561510086,
+        0.10265914350748062,
+        0.5354741811752319
+      ],
+      "mesh": {
+        "verts": 30270,
+        "tris": 15142,
+        "boundary_edges": 30272,
+        "nonmanifold_edges": 0
+      }
+    },
+    {
+      "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.R",
+      "canonical_name": "Cartilage of right main bronchus",
+      "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+      "panacea_system": "respiratory",
+      "panacea_laterality": "right",
+      "panacea_laterality_source": "source_mesh_name",
+      "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+      "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+      "panacea_license": "CC BY 4.0",
+      "panacea_source_raw_name": "VH_F_cartilage_of_main_bronchus_R",
+      "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+      "panacea_accuracy_status": "model_segmented",
+      "panacea_review_status": "review_required",
+      "panacea_version": "body_v001",
+      "biological_sex_applicability": "female",
+      "panacea_clinically_reviewed": false,
+      "panacea_educational_only": true,
+      "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+      "bbox_min_m": [
+        -0.044529709964990616,
+        0.07393630594015121,
+        0.4810422360897064
+      ],
+      "bbox_max_m": [
+        -0.01115112192928791,
+        0.10199782997369766,
+        0.5319393277168274
+      ],
+      "mesh": {
+        "verts": 35707,
+        "tris": 17854,
+        "boundary_edges": 35708,
+        "nonmanifold_edges": 0
+      }
+    },
+    {
+      "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.L",
+      "canonical_name": "Left main bronchus",
+      "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+      "panacea_system": "respiratory",
+      "panacea_laterality": "left",
+      "panacea_laterality_source": "source_mesh_name",
+      "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+      "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+      "panacea_license": "CC BY 4.0",
+      "panacea_source_raw_name": "VH_F_left_main_bronchus",
+      "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+      "panacea_accuracy_status": "model_segmented",
+      "panacea_review_status": "review_required",
+      "panacea_version": "body_v001",
+      "biological_sex_applicability": "female",
+      "panacea_clinically_reviewed": false,
+      "panacea_educational_only": true,
+      "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+      "bbox_min_m": [
+        -0.0068596284836530685,
+        0.07333506643772125,
+        0.4909159243106842
+      ],
+      "bbox_max_m": [
+        0.046276114881038666,
+        0.10442360490560532,
+        0.535576581954956
+      ],
+      "mesh": {
+        "verts": 273,
+        "tris": 495,
+        "boundary_edges": 53,
+        "nonmanifold_edges": 0
+      }
+    },
+    {
+      "panacea_structure_id": "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.R",
+      "canonical_name": "Right main bronchus",
+      "panacea_body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+      "panacea_system": "respiratory",
+      "panacea_laterality": "right",
+      "panacea_laterality_source": "source_mesh_name",
+      "panacea_source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976",
+      "panacea_source_url": "https://3d.nih.gov/entries/3DPX-020976",
+      "panacea_license": "CC BY 4.0",
+      "panacea_source_raw_name": "VH_F_right_main_bronchus",
+      "panacea_method": "existing HRA source mesh; no segmentation or registration added",
+      "panacea_accuracy_status": "model_segmented",
+      "panacea_review_status": "review_required",
+      "panacea_version": "body_v001",
+      "biological_sex_applicability": "female",
+      "panacea_clinically_reviewed": false,
+      "panacea_educational_only": true,
+      "panacea_known_limitations": "Standalone four-component reference in the source frame; not registered to the canonical whole-body female.",
+      "bbox_min_m": [
+        -0.0465373657643795,
+        0.07388007640838623,
+        0.48094412684440613
+      ],
+      "bbox_max_m": [
+        -0.010999024845659733,
+        0.10177753865718842,
+        0.5332576036453247
+      ],
+      "mesh": {
+        "verts": 210,
+        "tris": 374,
+        "boundary_edges": 48,
+        "nonmanifold_edges": 0
+      }
+    }
+  ],
+  "coordinate_frame": "Source glTF Y-up metres converted by the Blender importer; no further geometry or placement transform.",
+  "registration_to_whole_body": null,
+  "output_artifacts": [
+    {
+      "path": "/private/tmp/panacea-female-main-bronchi-source-v005/female_main_bronchi.glb",
+      "bytes": 2601396,
+      "sha256": "cda6122f87e000fb700f880fd215e8b7392946c02a6e195827ed6bfc02d91b32"
+    },
+    {
+      "path": "/private/tmp/panacea-female-main-bronchi-source-v005/female_main_bronchi.blend",
+      "bytes": 1412494,
+      "sha256": "a849e5a64a4239a0202b6b8e61a6f01142049b3c2464092e55fa8cbf5252a11e"
+    }
+  ],
+  "packed_artifact": {
+    "path": "/private/tmp/panacea-female-main-bronchi-source-v005/female_main_bronchi.meshopt.glb",
+    "bytes": 1217600,
+    "sha256": "e2227d6c90d892137990f0751448da5ed7f8f3c9060f6f950a92e1fec9ac70b9"
+  },
+  "published_files": [
+    "adult_female_main_bronchi_reference.respiratory.LOD2.glb",
+    "adult_female_main_bronchi_reference.respiratory.LOD3.glb"
+  ],
+  "packing": "gltfpack 1.3.0 -c -kn -km -ke -noq; no requested simplification or position quantization",
+  "runtime_variant": {
+    "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+    "structures": 4,
+    "stature_m": null,
+    "label": "Main bronchi reference (HRA)",
+    "status": "source_backed_partial",
+    "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976, CC BY 4.0",
+    "coverage": "Four main-bronchus/cartilage components in their source coordinates; a separate reference, unregistered to the whole-body model.",
+    "individual": "Visible Human female source; standalone HRA organ reference"
+  },
+  "source_surface_hashes": {
+    "method": "SHA-256 of sorted indexed world-space triangles, 1e-6 metre rounding, cyclic vertex rotations preserve winding",
+    "by_structure": {
+      "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.R": "200903af414d98ba2e55688a89e7bc7deaa171bdf3da8bd4eb89b0b715e78720",
+      "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.R": "047551eef8f6859e65201b3f19d4dd476b88d482cdcdf81fc131a4ab991a972c",
+      "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS.L": "1f0e85cd8709db0f851b849956a99a10c9c89cad9795365f3431085a38ad7825",
+      "REFERENCE.VH_FEMALE.RESPIRATORY.MAIN_BRONCHUS_CARTILAGE.L": "2d0798661185e11f4170d9abdf4273b8e7dccc32bb101d27ac548eb6f573250f"
+    }
+  }
+}

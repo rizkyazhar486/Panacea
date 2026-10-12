@@ -186,6 +186,7 @@ import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
+import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -717,6 +718,11 @@ app.post('/api/meets', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Meet>
   if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  // Match the Club Hub form's whole-rupiah limit. Free means an explicit 0;
+  // absent, coercible or negative input must never silently publish a free meet.
+  if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
+    return res.status(400).json({ error: 'invalid_fee' })
+  }
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -728,7 +734,7 @@ app.post('/api/meets', requireAuth, (req, res) => {
     time: String(b.time).slice(0, 5),
     durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
-    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
     lat: Number(b.lat) || 0,
     lng: Number(b.lng) || 0,
@@ -935,7 +941,7 @@ app.get('/api/clinical/links', requireAuth, (req, res) => {
 })
 app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const pid = String(req.params.patientId), t = getTautan()[pid]
+  const pid = String(req.params.patientId), semuaTautan = getTautan(), t = Object.prototype.hasOwnProperty.call(semuaTautan, pid) ? semuaTautan[pid] : undefined
   if (!t) return res.status(404).json({ error: 'not-linked' })
   if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
   hapusTautan(pid)
@@ -1008,6 +1014,8 @@ app.get('/api/settings', requireAuth, (req, res) => {
 app.put('/api/settings', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
+  // Sebaran (...rest) mengubah larik menjadi {0:..,1:..}; tanpa pemeriksaan ini muatan non-objek diterima dan disimpan sebagai kunci sampah.
+  if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) return res.status(400).json({ error: 'invalid settings payload' })
   // Defensive: never persist the Anthropic API key server-side.
   const { apiKey: _drop, ...rest } = prefs as Record<string, unknown>
   // Entitlements and alert-cooldown stamps live in this same blob, so an
@@ -1893,14 +1901,15 @@ app.get('/api/reminders', requireAuth, (req, res) => {
 })
 app.post('/api/reminders', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const { medName, dose, timeOfDay, nextFireAt } = req.body as { medName?: string; dose?: string; timeOfDay?: string; nextFireAt?: string }
-  if (!medName?.trim() || !timeOfDay || !nextFireAt) return res.status(400).json({ error: 'missing_fields' })
-  const rem = addReminder(u.id, { medName: medName.trim(), dose: (dose ?? '').trim(), timeOfDay, nextFireAt, active: true })
+  let baru: ReturnType<typeof validasiPengingatBaru>
+  try { baru = validasiPengingatBaru(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
+  const rem = addReminder(u.id, { ...baru, active: true })
   res.json({ reminder: rem })
 })
 app.patch('/api/reminders/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const patch = req.body as Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>
+  let patch: ReturnType<typeof validasiTambalPengingat>
+  try { patch = validasiTambalPengingat(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
   const rem = updateReminder(u.id, req.params.id, patch)
   if (!rem) return res.status(404).json({ error: 'not_found' })
   res.json({ reminder: rem })

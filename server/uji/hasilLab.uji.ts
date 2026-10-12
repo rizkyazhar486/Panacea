@@ -318,3 +318,9 @@ console.log('hasilLab.uji: ok')
 
 // Real HTTP lab/referral role and patient-ownership boundaries.
 await import("./labReferralHttpRbac.uji.js")
+// Real HTTP lab-log and clinician lab-share role, ownership and revocation boundaries.
+await import("./labShareHttpRbac.uji.js")
+// Real HTTP daily check-in (care plan / report) ownership, integrity, replacement and revocation.
+await import("./careHttpRbac.uji.js")
+// Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
+await import("./secondOpinionHttpRbac.uji.js")

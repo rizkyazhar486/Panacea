@@ -4,11 +4,19 @@ dist-ssr
 *.local
 .DS_Store
 .env
+.env*
 .env.*
+.env.local
 !.env.example
 npm-debug.log*
 yarn-error.log*
 .vite
+
+# Generated frontend revision metadata and local Vercel build/environment state.
+/public/build-info.json
+/public/build-info.json.tmp
+# Vercel CLI checks these literal entries before adding them to this file.
+.vercel
 
 # backend
 server/data.json

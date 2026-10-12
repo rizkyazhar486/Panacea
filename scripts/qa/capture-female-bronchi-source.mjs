@@ -1,0 +1,12 @@
+import {readFile,writeFile} from 'node:fs/promises';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {surfaceHash} from '../../qa/reference-surface-hash.mjs';
+const [source,target]=process.argv.slice(2);
+if(!source||!target)throw new Error('Usage: node capture-female-bronchi-source.mjs SOURCE.glb EVIDENCE.json');
+const report=JSON.parse(await readFile(target,'utf8'));
+const b=await readFile(source);
+assert.equal(createHash('sha256').update(b).digest('hex'),report.input_artifacts[0].sha256);
+const g=await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');g.scene.updateMatrixWorld(true);
+const hashes={};g.scene.traverse(o=>{if(o.isMesh){const row=report.structures.find(r=>r.panacea_source_raw_name===o.name);assert.ok(row);hashes[row.panacea_structure_id]=surfaceHash(o)}});
+assert.equal(Object.keys(hashes).length,4);report.source_surface_hashes={method:'SHA-256 of sorted indexed world-space triangles, 1e-6 metre rounding, cyclic vertex rotations preserve winding',by_structure:hashes};
+await writeFile(target,JSON.stringify(report,null,2)+'\n');console.log('Pinned all four original source surfaces');

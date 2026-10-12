@@ -28,10 +28,14 @@
    "pillar": "Panacea One OS",
    "criterion": "Satu identitas pasien dan satu state longitudinal",
    "acceptance": "Satu pasien uji memiliki satu identitas; encounter, anamnesis, dan hasil merujuk ID yang sama (diuji lewat API, bukan UI saja)",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/patientIdentityContinuity.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2440, merge 1d193a9b; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with random session secret and synthetic identities. One test account maps to one clinical id (self-u-<userId>); creating the patient twice updates in place and leaves exactly one patient record; the signed record, encounter close and successor record, lab result and referral all carry that same patientId, and the signed record keeps the authenticated doctor as signer and as author of each anamnesis answer even when the client forges the signer.",
+    "The same run shows the daily check-in (anamnesis) plan and the patient's answer stored against the same account id, and /api/keadaan-longitudinal keyed by that id joining the clinical records, encounters and care plans with reports for the same patient. A second account sees none of it and cannot write, file, answer or link into another identity (403/404/400/409 as applicable); a record cannot be filed under a different patientId; a patient session can create only its own primary record. A practice patient joins exactly one account through a one-time clinician-issued code: patients cannot issue codes, spent codes and already-linked patients cannot be reused or shared, and access ends when the link is removed.",
+    "Seven route-guard mutants (record patient mismatch, patient writes any id, patient issues link codes, link ownership, spent-code reuse, second-account link, check-in ownership) each fail by name; an eighth (removing the self-id candidate check) is not caught on purpose because the next line independently blocks the same case. Server typecheck, build and full npm run uji passed. Test-only change; no runtime code was modified. This is not human clinical approval."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED only for technical identity continuity in file-mode application over HTTP. The clinical id (self-u-<userId>) and the care/longitudinal subject (the bare account id) are two deterministic forms of one identity, not one literal string. Lab results and referrals carry the same patientId but are served by their own RBAC routes, not inside /api/keadaan-longitudinal. Not covered: Mongo mode, legacy email-derived alias ids and email change, share expiry, and any UI. Doctor verification is a test fixture, not proof of qualification; clinically_reviewed stays false."
   },
   {
    "id": "A2",
@@ -52,10 +56,12 @@
    "pillar": "Panacea One OS",
    "criterion": "Anamnesis tercatat dengan provenance",
    "acceptance": "Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "REPORTED, not VERIFIED, because two parts of the acceptance are not met as written. (1) Versioning applies only to SIGNED records: an unsigned draft is edited in place and nothing is archived, so 'a change creates a new version, not an overwrite' is not true for drafts. (2) Provenance for non-clinician or AI-declared answers (asal 'AI') has a source and time but no author id (no olehId), so 'author' is present only for clinician-authored answers; a patient edit is labelled and archives the signed version it replaced, but the patient's identity is recorded on the archive (diarsipkanOleh), not on the answer. Decision for the ledger owner: either accept these as the intended model and promote, or change the runtime (version drafts; record the author id for patient/AI answers) and re-test. Not covered: Mongo mode, UI, AI-draft generation paths."
   },
   {
    "id": "A4",
@@ -192,13 +198,13 @@
    "pillar": "Lab & Referral Closure",
    "criterion": "UI tinjauan klinisi atas hasil",
    "acceptance": "Klinisi dapat meninjau hasil dan mengubah state lewat API; UI memakai kontrak backend",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "src/pages/LabResultReview.tsx (/doctor-review/lab-results, #2351): antrean hasil lab untuk dokter/owner di atas kontrak backend #2346 (api.labResultsList/labResultAdvance); model murni src/domains/lab-results/model/labResultQueue.ts dengan scripts/uji/lab-result-queue.mts (positif, negatif berpasangan, batas, tanpa efek samping).",
-    "qa/lab-result-review-clinician-e2e.mjs: server NYATA + Chromium 390x844. Dokter belum terverifikasi ditolak server (>=400) dan tidak boleh memverifikasi dirinya sendiri (403); pemilik memverifikasi lewat /api/doctors/:id/verify (200); klinisi lalu memajukan satu hasil received→pending_review→reviewed→communicated→closed lewat UI. Dijalankan lokal pada server baru: \"OK status closed steps 4\"."
+    "qa/lab-result-review-clinician-e2e.mjs dijalankan sebagai gerbang CI wajib (#2432, merge a88cf6e0d672590fcf1a28da5500ac7a1155bf3f; scripts/qa/lab-result-review-e2e-gate.mjs di Stabilization Acceptance; scripts/uji/lab-review-e2e-gerbang.mts menjaga langkahnya): server NYATA + Chromium 390x844. Dokter belum terverifikasi ditolak server (>=400) dan tidak boleh memverifikasi dirinya sendiri (403); pemilik memverifikasi lewat /api/doctors/:id/verify (200); klinisi memajukan satu hasil received→pending_review→reviewed→communicated→closed lewat UI. Bukti log CI: run 38166657927, job 114550504193."
    ],
    "owner": "Sonnet (setelah kontrak tersedia)",
-   "note": "Belum VERIFIED: E2E dijalankan lokal (bukan gerbang CI), dan verifikasi STR dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi nyata. Aturan alur lab belum ditinjau klinis; server tetap otoritas atas siapa yang boleh menandai reviewed."
+   "note": "VERIFIED hanya untuk perilaku teknis alur UI→API (gerbang CI). Verifikasi STR dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi nyata; aturan alur lab belum ditinjau klinis; server tetap otoritas atas siapa yang boleh menandai reviewed."
   },
   {
    "id": "B8",
@@ -244,12 +250,14 @@
    "pillar": "Clinical Calculators",
    "criterion": "Ratchet \"kolom kosong → 0\" mencapai nol",
    "acceptance": "governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0",
-   "status": "NOT_STARTED",
+   "status": "REPORTED",
    "evidence": [
-    "Baseline 147 → 80 (28 berkas) di main 4b2009a1f"
+    "Baseline 147 → 80 (28 berkas) di main 4b2009a1f",
+    "Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766).",
+    "Main 92707f132561a9d2529f691b12af10e5b80897d4: actual remaining count 17 after #2439; head 796f3c04 passed nine exact-head checks including nutrition recovery (run 38218032932)."
    ],
    "owner": "Sonnet",
-   "note": "Sisa 80 belum diklasifikasikan klinis vs non-klinis."
+   "note": "Kemajuan engineering parsial; total main terakhir 17. Penjaga input jumlah klaim dalam revisi ini menurunkan baseline aktual menjadi 16 (13 berkas), belum nol. Kriteria tetap belum VERIFIED; pemindaian lengkap dan aturan deteksi tetap utuh."
   },
   {
    "id": "C3",
@@ -298,7 +306,7 @@
    "status": "PENDING_CLINICAL_REVIEW",
    "evidence": [],
    "owner": "Klinisi (belum ditunjuk)",
-   "note": "Gerbang terpisah; tidak menghentikan pekerjaan teknis."
+   "note": "Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false."
   },
   {
    "id": "C7",
@@ -387,14 +395,16 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "WALK/RUN: kontinuitas loop",
    "acceptance": "Jahitan loop rotasi ≤ batas teknis terdokumen; kecepatan batas dilaporkan",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "bodyexposure/qa_reports/gait_loop_continuity.json (seam 0,0°)",
     "bodyexposure/qa_reports/gait_visual_browser.json",
-    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gait-seam-reproduce.mjs): animasi WALK dan RUN pada GLB publik adult_male.rig_rom.glb didekode (three + meshopt); sudut jahitan kunci pertama vs terakhir = 0,0000° pada semua 14 kanal rotasi, selisih posisi 0 m. Kontrol negatif: membandingkan kunci pertama dengan kunci ke-2 menghasilkan nilai taknol"
+    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gait-seam-reproduce.mjs): animasi WALK dan RUN pada GLB publik adult_male.rig_rom.glb didekode (three + meshopt); sudut jahitan kunci pertama vs terakhir = 0,0000° pada semua 14 kanal rotasi, selisih posisi 0 m. Kontrol negatif: membandingkan kunci pertama dengan kunci ke-2 menghasilkan nilai taknol",
+    "scripts/uji/body-gait-loop-reproduction.mts + src/domains/body-exposure/engine/gaitLoopSmoothness.ts (gerbang CI, reproduksi independen dari GLB publik via three+meshopt, tanpa Blender/numpy): salto kecepatan sudut pada emenda = |omega_akhir - omega_awal| dihitung ulang untuk WALK dan RUN pada adult_male dan vhf_denver_ct_adult_female dan dicocokkan dengan laporan Local dalam 0,1 deg/s (male RUN 250,7 deg/s di SHIN.R, WALK 132,1 di SHIN.L; female RUN 250,8, WALK 132,0), termasuk jumlah tulang beranimasi, tulang terburuk, dan median; batas teknis terdokumen (check_gait_loop.py) = salto di emenda tiap tulang <= maksimum salto antar-interval di dalam klip yang sama, diuji sebagai gerbang (daftar tulang di atas batas = kosong). Unit: kecepatan konstan, salto 20 deg/s eksak, q dan -q setara, emenda dengan tanda terbalik = 0, masukan tak sah melempar galat. Sabotase: 7 mutan (interval salah di awal/akhir, tanpa jalur terpendek, emenda tanpa abs, interior memakai min, omega tanpa dt, cek waktu monoton dihapus) masing-masing gagal dengan nama.",
+    "Bukti run di main: Stabilization Acceptance run 38202867415 (merge 53b0b5bc1583c9837dcd15c2fb61a8c7383dda99, #2458), job full-acceptance 114659869644, langkah 'Frontend tests' sukses dengan '712/712 berkas uji lulus' (jumlah yang sama dengan lokal setelah gerbang body-gait-loop-reproduction ditambahkan; nama berkas tidak dicetak per baris, jadi ini bukti jumlah, bukan baris log per tes). Run tidak dibatalkan oleh merge lain."
    ],
    "owner": "Local",
-   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label \"Recorded motion\" (pemeriksaan fungsional, bukan kualitas gait). Jahitan nol sebagian hasil konstruksi (selisih akhir-awal disebar linear: 4,58° WALK, 12,39° RUN per DELTA.md), jadi bukan bukti kehalusan gerak; lompatan kecepatan sudut (RUN maks 250,7 °/dtk) belum direproduksi dan ambang 'batas teknis terdokumen' belum ditemukan. Tetap REPORTED."
+   "note": "Alat sendiri menyatakan analisis kaki WALK/RUN eksperimental. Skrip QA di atas juga memutar klip Walk dan memeriksa kanvas berubah serta label \"Recorded motion\" (pemeriksaan fungsional, bukan kualitas gait). Jahitan nol sebagian hasil konstruksi (selisih akhir-awal disebar linear: 4,58° WALK, 12,39° RUN per DELTA.md), jadi bukan bukti kehalusan gerak; lompatan kecepatan sudut (RUN maks 250,7 °/dtk) belum direproduksi dan ambang 'batas teknis terdokumen' belum ditemukan. Tetap REPORTED. PEMBARUAN: lompatan kecepatan sudut kini direproduksi independen (male dan female) dan batas teknis 'salto emenda <= maksimum interior per tulang' diuji sebagai gerbang CI; dua kekurangan lama di catatan ini terjawab. Yang TETAP berlaku: emenda posisi 0 sebagian hasil konstruksi (selisih disebar linear), batas itu adalah pembanding internal klip - bukan bukti kualitas gait - dan analisis kaki WALK/RUN eksperimental. Gerbang kini punya run sukses di main (lihat bukti). PROMOSI KE VERIFIED hanya untuk kriteria sebagaimana tertulis (jahitan rotasi <= batas teknis terdokumen; kecepatan batas dilaporkan dan direproduksi independen untuk male dan female). Batas yang tetap berlaku: emenda posisi 0 sebagian hasil konstruksi; batas teknis adalah pembanding internal klip (bukan ambang tervalidasi pihak luar dan bukan bukti kualitas gait); analisis kaki WALK/RUN tetap eksperimental dan dinilai terpisah di D7."
   },
   {
    "id": "D7",
@@ -421,10 +431,11 @@
    "evidence": [
     "bodyexposure/PROVENANCE.md",
     "scripts/uji/body-asset-provenance.mts",
-    "Audit independen parsial (Sonnet Cloud, scripts/qa/glb-provenance-audit.mjs, main 1ee18b373): 17.676 struktur bernama di 380 GLB publik (tanpa rig) semuanya membawa panacea_source, panacea_license, dan panacea_accuracy_status — 0 tanpa metadata. Lisensi: CC BY-SA 4.0 (11.625), CC BY 4.0 (2.537), ICRP 156/145 'redistribusi dibebaskan pemilik proyek 2026-10-03' (2.772), Denver CC BY 4.0 (736). Akurasi: source_backed 17.344, model_segmented 224, source_backed_corrected 93, review_required 12, approximate 3. Kontrol negatif: GLB dengan satu panacea_license dihapus gagal dengan nama berkas dan struktur"
+    "Audit independen parsial (Sonnet Cloud, scripts/qa/glb-provenance-audit.mjs, main 1ee18b373): 17.676 struktur bernama di 380 GLB publik (tanpa rig) semuanya membawa panacea_source, panacea_license, dan panacea_accuracy_status — 0 tanpa metadata. Lisensi: CC BY-SA 4.0 (11.625), CC BY 4.0 (2.537), ICRP 156/145 'redistribusi dibebaskan pemilik proyek 2026-10-03' (2.772), Denver CC BY 4.0 (736). Akurasi: source_backed 17.344, model_segmented 224, source_backed_corrected 93, review_required 12, approximate 3. Kontrol negatif: GLB dengan satu panacea_license dihapus gagal dengan nama berkas dan struktur",
+    "scripts/uji/body-attribution-coverage.mts + src/domains/body-exposure/engine/attributionCoverage.ts (gerbang CI): membaca chunk JSON dari 506 GLB publik (14 lisensi distinct, 463 sumber distinct) dan mensyaratkan tiap lisensi/sumber DIKENALI dan DINAMAI di public/bodyexposure/provenance.html; lisensi/sumber tak dikenal = lacuna (fail-closed); CanonicalBody menautkan ke halaman itu. Sabotase: halaman kehilangan ICRP 145 / Allen, tabel melupakan Andreassen, toleransi 'desconhecida', cek halaman dimatikan - masing-masing gagal dengan nama lacuna. Dua mutan setara (Allen sudah tercakup kunci HuBMAP; String(undefined)) tidak membedakan perilaku."
    ],
    "owner": "Local",
-   "note": " Terverifikasi hanya kelengkapan metadata di data. Belum diperiksa: halaman atribusi resmi di aplikasi, dan keabsahan lisensi itu sendiri; lisensi ICRP bersandar pada pernyataan pemilik proyek, bukan teks lisensi yang diverifikasi independen. Tetap REPORTED."
+   "note": " Terverifikasi hanya kelengkapan metadata di data. Belum diperiksa: halaman atribusi resmi di aplikasi, dan keabsahan lisensi itu sendiri; lisensi ICRP bersandar pada pernyataan pemilik proyek, bukan teks lisensi yang diverifikasi independen. Tetap REPORTED. Kelengkapan atribusi data↔halaman kini dijaga gerbang CI, tetapi itu bukan bukti keabsahan lisensi: pernyataan ICRP bersandar pada pernyataan pemilik proyek, dan alias 'Human Reference Atlas' diperlakukan sama dengan 'HuBMAP' (HRA adalah atlas HuBMAP; halaman menamainya HuBMAP). Tetap REPORTED."
   },
   {
    "id": "D9",

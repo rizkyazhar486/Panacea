@@ -8,7 +8,8 @@ export const UNSUPPORTED_CLAIM_MAX = 100
 
 export type UnsupportedClaimResult = { ok: true; value: number } | { ok: false; problem: string }
 
-export function parseUnsupportedClaimCount(text: string): UnsupportedClaimResult {
+export function parseUnsupportedClaimCount(text: unknown): UnsupportedClaimResult {
+  if (typeof text !== 'string') return { ok: false, problem: 'Unsupported claims must be a whole number.' }
   const t = text.trim()
   if (t === '') return { ok: false, problem: 'Enter the number of unsupported claims (0 if none).' }
   if (!/^\d+$/.test(t)) return { ok: false, problem: 'Unsupported claims must be a whole number.' }

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { parseUnsupportedClaimCount as p, UNSUPPORTED_CLAIM_MAX } from '../../src/domains/clinical-review/index.ts'
 
 // Positif: nol eksplisit dan bilangan bulat diterima persis.
@@ -15,4 +16,16 @@ const bukanBulat = { ok: false, problem: 'Unsupported claims must be a whole num
 for (const v of ['abc', '-1', '2.5', '1e2', 'Infinity', 'NaN', '0x10', '1,5']) assert.deepEqual(p(v), bukanBulat, v)
 // Determinisme.
 assert.deepEqual(p('7'), p('7'))
-console.log('klaim-tak-didukung-entry: OK')
+
+// Runtime callers must fail closed, not throw or coerce a non-text value.
+for (const bad of [null, undefined, 0, true, {}, []]) assert.equal(p(bad as unknown as string).ok, false)
+
+const component = readFileSync(new URL('../../src/components/clinical/StudiValidasiKlinis.tsx', import.meta.url), 'utf8')
+const guard = component.indexOf('if (!klaim.ok)')
+assert.ok(guard > component.indexOf('parseUnsupportedClaimCount(f.klaim)'))
+assert.ok(guard < component.indexOf('api.submitValidationAssessment'))
+assert.match(component, /klaimTakDidukung: klaim.value/)
+assert.doesNotMatch(component, /Number\(f.klaim\)\s*\|\|\s*0/)
+const workflow = readFileSync(new URL('../../.github/workflows/stabilization-acceptance.yml', import.meta.url), 'utf8')
+assert.match(workflow, /run: node scripts\/qa\/claim-count-input-smoke\.mjs/)
+console.log('klaim-tak-didukung-entry: OK; missing/runtime-invalid denied before submission')

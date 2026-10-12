@@ -4,6 +4,8 @@ import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconFood } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parseNumberField } from '../domains/clinical-calculators'
+import { coffeeFluidMl, fastingElectrolytes } from '../domains/personal-health'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Nutrition Longevity Toolkit — six small real nutrition habit-trackers in
@@ -120,20 +122,29 @@ function PlantDiversity() {
 }
 
 function CoffeeHydration() {
-  const [cups, setCups] = useState(2)
+  const [cups, setCups] = useState('')
   // Angka "tambah air 1,5x volume kopi" dihapus: tidak ada terbitan yang
   // mendukungnya. Killer, Blannin & Jeukendrup (2014), PLoS ONE 9(1):e84154 —
   // pada peminum kopi biasa, 4 cangkir/hari TIDAK menyebabkan kekurangan
   // cairan; kopi ikut dihitung sebagai asupan cairan.
-  const ml = cups * 150
+  const est = coffeeFluidMl(parseNumberField(cups))
   return (
     <Card className="!p-5">
       <Field label="Cups of coffee today">
-        <input className={inputClass} type="number" min={0} max={15} value={cups} onChange={(e) => setCups(Number(e.target.value) || 0)} />
+        <input className={inputClass} type="number" min={0} max={15} value={cups} onChange={(e) => setCups(e.target.value)} placeholder="e.g. 2" />
       </Field>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">{ml} mL</div>
-        <div className="text-[11px] text-neutral-500">counts toward fluid intake, not against it</div>
+        {est.ok ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{est.value.ml} mL</div>
+            <div className="text-[11px] text-neutral-500">counts toward fluid intake, not against it</div>
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-black text-neutral-500">No estimate yet</div>
+            <div role="alert" className="text-[11px] text-neutral-500">{cups.trim() === '' ? 'Enter the number of cups to see the estimate.' : est.problem}</div>
+          </>
+        )}
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
         For regular coffee drinkers, up to 4 cups a day does not dehydrate the body — coffee counts toward
@@ -144,21 +155,26 @@ function CoffeeHydration() {
 }
 
 function ElectrolyteCalc() {
-  const [hours, setHours] = useState(16)
-  const sodium = Math.min(3000, Math.round(hours * 60))
-  const potassium = Math.min(2500, Math.round(hours * 45))
-  const magnesium = Math.min(350, Math.round(hours * 8))
+  const [hours, setHours] = useState('')
+  const est = fastingElectrolytes(parseNumberField(hours))
   return (
     <Card className="!p-5">
       <Field label="How many hours have you been fasting">
-        <input className={inputClass} type="number" min={0} max={72} value={hours} onChange={(e) => setHours(Number(e.target.value) || 0)} />
+        <input className={inputClass} type="number" min={0} max={72} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. 16" />
       </Field>
-      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{sodium}mg</div><div className="text-[10px] text-neutral-500">Sodium</div></div>
-        <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{potassium}mg</div><div className="text-[10px] text-neutral-500">Potassium</div></div>
-        <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{magnesium}mg</div><div className="text-[10px] text-neutral-500">Magnesium</div></div>
-      </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Rough daily targets for longer fasts (above about 16 hours), when electrolyte loss without food intake can cause headache/weakness. Not medical advice — if you have kidney, heart, or blood pressure conditions, check with a healthcare provider before fasting or supplementing electrolytes.</Prosa>
+      {est.ok ? (
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{est.value.sodiumMg}mg</div><div className="text-[10px] text-neutral-500">Sodium</div></div>
+          <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{est.value.potassiumMg}mg</div><div className="text-[10px] text-neutral-500">Potassium</div></div>
+          <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{est.value.magnesiumMg}mg</div><div className="text-[10px] text-neutral-500">Magnesium</div></div>
+        </div>
+      ) : (
+        <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+          <div className="text-lg font-black text-neutral-500">No estimate yet</div>
+          <div role="alert" className="text-[11px] text-neutral-500">{hours.trim() === '' ? 'Enter your fasting hours to see rough targets.' : est.problem}</div>
+        </div>
+      )}
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Illustrative values from the existing formula, not intake targets or supplement doses. The coefficients and input range have not been clinically reviewed. These numbers do not establish your electrolyte losses or requirements. Ask a qualified clinician before fasting or supplementing, especially with kidney, heart, or blood pressure conditions.</Prosa>
     </Card>
   )
 }

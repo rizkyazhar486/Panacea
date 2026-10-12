@@ -17,6 +17,7 @@ import {
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parseTargetValue } from '../domains/training-goals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Analisis Pro — satu halaman berisi padanan fitur analisis berbayar Strava,
@@ -85,6 +86,8 @@ export function AnalisisPro() {
   const laju = useMemo(() => lajuBeban(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const pr = useMemo(() => usahaTerbaik(workouts), [workouts])
   const log = useMemo(() => logLatihan(workouts, konteks, satuanLog), [workouts, konteks, satuanLog])
+  const [nilaiTeks, setNilaiTeks] = useState(() => String(target.nilai))
+  const alvoValido = useMemo(() => parseTargetValue(nilaiTeks), [nilaiTeks])
   const kemajuan = useMemo(() => kemajuanTarget(workouts, target), [workouts, target])
   const ambang = useMemo(() => perkiraanPaceAmbang(workouts), [workouts])
   const zp = useMemo(() => (ambang ? zonaPace(workouts, ambang) : []), [workouts, ambang])
@@ -212,10 +215,17 @@ export function AnalisisPro() {
             opsi={[['jarak', 'Distance'], ['waktu', 'Time'], ['sesi', 'Session count']]} />
           <Pilih value={target.periode} onChange={(v) => setTarget({ ...target, periode: v as PeriodeTarget })}
             opsi={[['pekan', 'Per week'], ['bulan', 'Per month'], ['tahun', 'Per year']]} />
-          <input type="number" min={1} value={target.nilai}
-            onChange={(e) => setTarget({ ...target, nilai: Math.max(0, Number(e.target.value) || 0) })}
+          <input type="number" min={1} value={nilaiTeks} aria-label="Target value"
+            onChange={(e) => {
+              setNilaiTeks(e.target.value)
+              const v = parseTargetValue(e.target.value)
+              if (v.ok) setTarget({ ...target, nilai: v.value })
+            }}
             className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
         </div>
+        {!alvoValido.ok && (
+          <p role="alert" className="mt-1 text-[11px] text-amber-700">{alvoValido.problem}. Showing your last saved target: {target.nilai}.</p>
+        )}
         <div className="mt-3 flex items-baseline justify-between">
           <span className="text-2xl font-black text-ink">
             {kemajuan.tercapai} <span className="text-sm font-bold text-neutral-500">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
