@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
+import { parseDailyLog, MINUTES_PER_DAY_MAX } from '../domains/training-goals'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,6 +119,7 @@ function NeatTracker() {
   const today = hariIni()
   const [minutes, setMinutes] = useState<Record<string, number>>(() => { try { return JSON.parse(localStorage.getItem(NEAT_KEY) || '{}') } catch { return {} } })
   useEffect(() => { try { localStorage.setItem(NEAT_KEY, JSON.stringify(minutes)) } catch { /* ignore */ } }, [minutes])
+  const [logProblem, setLogProblem] = useState<string | null>(null)
   const todayMin = minutes[today] || 0
   const weekTotal = useMemo(() => {
     let s = 0
@@ -128,7 +130,8 @@ function NeatTracker() {
     <Card className="!p-5">
       <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">NEAT (Non-Exercise Activity Thermogenesis) — berjalan, berdiri, bergerak-gerak kecil, pekerjaan rumah — sering membakar lebih banyak kalori sehari daripada satu sesi latihan, dan jumlah jam berdiri/berjalan berkaitan dengan kesehatan metabolik yang lebih baik, terlepas dari olahraga terjadwal.</Prosa>
       <Field label="Standing/walking minutes today">
-        <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => setMinutes((m) => ({ ...m, [today]: Number(e.target.value) || 0 }))} placeholder="0" />
+        <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => { const v = parseDailyLog(e.target.value, MINUTES_PER_DAY_MAX, 'Minutes'); if (v.ok) { setMinutes((m) => ({ ...m, [today]: v.value })); setLogProblem(null) } else setLogProblem(v.problem) }} placeholder="0" />
+        {logProblem && <p role="alert" className="mt-1 text-[12px] text-red-600">{logProblem}. Showing your last saved value: {todayMin} min.</p>}
       </Field>
       <div className="mt-3 grid grid-cols-2 gap-3 text-center">
         <div className="rounded-xl bg-brand/10 p-3"><div className="text-xl font-black text-brand-dark">{Math.round(todayMin / 60 * 10) / 10}h</div><div className="text-[11px] text-neutral-500">Today</div></div>

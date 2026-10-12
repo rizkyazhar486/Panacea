@@ -167,7 +167,7 @@ import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
 import { repoHasilLab, repoRujukan } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
-import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
+import { terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { readBuildCommit } from './shared/buildInfo.js'
@@ -876,8 +876,13 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const actor = (req as express.Request & { user: User }).user
   // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
-  const hasil = terapkanSimpanRekam(getRecord(patientId, record.id), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  const penulis = { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }
+  const rekamLama = getRecord(patientId, record.id)
+  const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
+  const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
+  // A6: klaim tanda tangan dari non-klinisi dibuang oleh server dan dicatat sendiri, bukan hanya sebagai simpanan biasa.
+  if (tandaTanganDitolakAktor) addAudit(actor, 'emr.signature_refused', patientId)
   if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
