@@ -68,3 +68,6 @@ await import('./encounterHttpRestart.uji.js')
 await import('./patientIdentityContinuity.uji.js')
 // Alpha A3: per-answer anamnesis provenance and immutable signed versions.
 await import('./anamnesisProvenanceVersioning.uji.js')
+
+// Alpha A8: one scripted journey from identity to follow-up with real persistence across a process restart.
+await import('./careJourneyRestart.uji.js')
