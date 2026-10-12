@@ -187,6 +187,7 @@ import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
+import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -663,7 +664,10 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
   res.json({ price: p })
 })
 
-app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
+app.get('/api/posts', (req, res) => {
+  const pemirsa = currentUser(req)?.email
+  res.json({ posts: listPosts().map((p) => postUntukPemirsa(p, pemirsa, config.jwtSecret)) })
+})
 app.post('/api/posts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Post>
@@ -686,7 +690,7 @@ app.post('/api/posts', requireAuth, (req, res) => {
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, currentUser(req)?.email, config.jwtSecret) })
 })
 // Delete a post (owner-only).
 app.delete('/api/posts/:id', requireAuth, (req, res) => {
@@ -700,7 +704,7 @@ app.patch('/api/posts/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const p = updatePost(req.params.id, u.email, req.body as Partial<Post>)
   if (!p) return res.status(403).json({ error: 'forbidden' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 // Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.
 app.post('/api/posts/:id/react', requireAuth, (req, res) => {
@@ -709,7 +713,7 @@ app.post('/api/posts/:id/react', requireAuth, (req, res) => {
   if (!emoji) return res.status(400).json({ error: 'missing_emoji' })
   const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 
 // --- Club Hub meets (real, user-created — join counts are actual RSVPs) ---
