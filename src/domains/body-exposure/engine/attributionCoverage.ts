@@ -8,7 +8,7 @@ export interface ChaveAtribuicao { chave: string; aliases: readonly string[] }
 export const LICENCAS_CONHECIDAS: readonly ChaveAtribuicao[] = [
   { chave: 'CC BY-SA 4.0', aliases: ['CC BY-SA 4.0'] },
   { chave: 'CC BY 4.0', aliases: ['CC BY 4.0'] },
-  { chave: 'CC0 1.0', aliases: ['CC0 1.0'] },
+  { chave: 'CC0 1.0', aliases: ['CC0 1.0', 'CC0-1.0'] },
   { chave: 'ICRP Publication 156', aliases: ['ICRP Publication 156'] },
   { chave: 'ICRP Publication 145', aliases: ['ICRP Publication 145'] },
 ]

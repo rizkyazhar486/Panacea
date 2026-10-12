@@ -10,6 +10,15 @@ assert.deepEqual(lacunasDeAtribuicao(['CC0 1.0; combined atlas layer CC BY-SA 4.
   [{ tipo: 'licenca', valor: 'CC0 1.0', motivo: 'ausente-na-pagina' }])
 // Pareado: só a página muda → deixa de ser lacuna
 assert.deepEqual(lacunasDeAtribuicao(['CC0 1.0'], [], 'CC0 1.0'), [])
+// The existing fetal inspection package uses the hyphenated SPDX spelling.
+const fetal = JSON.parse(readFileSync(new URL('../../public/bodyexposure/dataset-inspection/fetal-parcels/manifest.json', import.meta.url), 'utf8'))
+assert.equal(fetal.license, 'CC0-1.0')
+assert.deepEqual(lacunasDeAtribuicao([fetal.license], [], 'CC0 1.0'), [])
+assert.deepEqual(lacunasDeAtribuicao(['CC0 1.0'], [], 'CC0-1.0'), [])
+assert.deepEqual(lacunasDeAtribuicao([fetal.license], [], 'Z-Anatomy CC BY-SA 4.0'),
+  [{ tipo: 'licenca', valor: 'CC0 1.0', motivo: 'ausente-na-pagina' }])
+assert.deepEqual(lacunasDeAtribuicao(['CC0-2.0'], [], pagina),
+  [{ tipo: 'licenca', valor: 'CC0-2.0', motivo: 'desconhecida' }])
 // Fail-closed: licença/fonte desconhecida nunca passa
 assert.deepEqual(lacunasDeAtribuicao(['MIT'], [], pagina), [{ tipo: 'licenca', valor: 'MIT', motivo: 'desconhecida' }])
 assert.deepEqual(lacunasDeAtribuicao([], ['Some New Atlas'], pagina), [{ tipo: 'fonte', valor: 'Some New Atlas', motivo: 'desconhecida' }])
