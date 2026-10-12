@@ -2,13 +2,14 @@
 // tanpa menunggu jam berjalan. Teks notifikasi tidak memuat PHI: tidak ada
 // nama dokter, diagnosis, maupun isi pertanyaan — layar kunci bisa dilihat orang lain.
 
+import { waktuLokalPengguna } from './shared/userLocalTime.js'
+
 export const JENDELA_SUSUL_MENIT = 6 * 60
 
 export type AlasanCek = 'off' | 'no-target' | 'no-plan' | 'done-today' | 'not-time' | 'already-today' | 'send'
 
 export function putusanPengingatCek(prefs: Record<string, unknown>, nowMs: number, punyaRencanaAktif: boolean, tanggalSudahLapor: string[]): { alasan: AlasanCek; tanggalLokal: string } {
-  const off = Number(prefs.tzOffsetMin)
-  const lokal = new Date(nowMs + (Number.isFinite(off) ? off : 0) * 60_000)
+  const lokal = waktuLokalPengguna(prefs, nowMs)
   const tanggalLokal = lokal.toISOString().slice(0, 10)
   const hasil = (alasan: AlasanCek) => ({ alasan, tanggalLokal })
   if (prefs.notifCekHarian !== true) return hasil('off')
