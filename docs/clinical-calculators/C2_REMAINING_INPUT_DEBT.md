@@ -1,0 +1,20 @@
+# C2 remaining coercion classification
+
+Source snapshot: canonical `0315d8590a1df787f389f9fb43144e7cf465dc30`, 12 patterns in 9 files, 836 TSX files scanned by the unchanged ratchet. This is a classification, not a passing C2 result. C2 still requires the actual baseline to reach zero with meaningful regression evidence.
+
+| File / count | Value and origin | Classification and remaining action |
+| --- | --- | --- |
+| `src/components/UbinPenutupImpl.tsx` / 1 | Jet-lag hour difference from a bounded select (`-12…12`, explicit default Same = 0) and untrusted saved strings | Legitimate selectable zero; corrupt/blank/nonfinite saved text must not become a valid same-zone result. Validate the allowed selection and preserve uncertainty. |
+| `src/components/UbinTambahan.tsx` / 1 | Workout duration in weekly logged-minute aggregation | Missing evidence is not zero duration. Audit the upstream workout normalizer as well as the tile; preserve real zero and identify excluded/unknown records. |
+| `src/components/UbinTambahan.tsx` / 1 | Food kcal in logged-today aggregation | Missing or malformed imported kcal is not zero intake. Finite nonnegative recorded values may be summed, with missing-data coverage distinguished. |
+| `src/components/UbinTambahan.tsx` / 1 | Optional workout kcal in logged-today aggregation | Missing expenditure is unknown, not zero burned. Preserve explicit zero and avoid presenting incomplete expenditure as complete. |
+| `src/pages/Billing.tsx` / 1 | Withdrawal amount at submit | Financial validation, not clinical arithmetic. Reject blank, fractional, nonfinite and unsafe amounts before submit; preserve the existing server/store refusal boundary. Overlapping candidates #2478/#2470/#2408 must be reconciled by Cloud. |
+| `src/pages/bodyhub/Nutrition.tsx` / 1 | DOM text used as an animation start value | Presentation interpolation, not an observed nutritional measurement. Use a finite numeric animation state and deny nonfinite target values; retain real zero and the animation feature. Do not relabel coercion to satisfy the regex. |
+| `src/pages/CarbonDiet.tsx` / 1 | Food-category serving input | Unknown blank and rejected input were saved as zero. #2411 completion keeps unknown absent, explicit zero/decimal quantities valid, rejects nonfinite/negative/out-of-cap values, labels partial recorded-food estimates and suppresses invalid outputs. Pending canonical integration. |
+| `src/pages/dashboard/Dashboard.tsx` / 1 | Derived BMI passed to gauge | A BMI that cannot be computed must stay unavailable, not 0 kg/m². Inspect the existing #2459 candidate and current engine before modifying. |
+| `src/pages/GenomeLab.tsx` / 1 (shared handler for 5 fields) | Designed/assembled/viable/off-target-tested/off-target-growth counts | Scientific evidence counts: unknown is distinct from measured zero. Reject fractions, unsafe integers and nonfinite values; preserve explicit zero and count relationships before deriving campaign rates. |
+| `src/pages/HealthPerformanceLeague.tsx` / 1 | Workout duration projected into ranking evidence | Missing duration is not measured zero. The adapter and shared workout normalizer must preserve evidence maturity and prevent invented ranking evidence. |
+| `src/pages/LatihanBeban.tsx` / 1 | Strength-set repetitions | Unknown reps must not become zero or an accepted recorded set. Require finite nonnegative integer counts where valid; preserve explicit zero according to the existing session rules. |
+| `src/pages/LatihanBeban.tsx` / 1 | Strength-set weight, kg | Missing load is distinct from an explicitly entered bodyweight/0 kg set. Preserve valid decimal loads, reject negatives/nonfinite values and do not derive volume from incomplete sets. |
+
+Candidate #2411 lowers the unchanged scan from 12 to 11 by correcting the input behavior. Other entries remain unfinished; classification does not remove them or promote Alpha. Existing numeric limits, source coefficients and qualified clinical review are separate requirements. C6 remains pending human review.

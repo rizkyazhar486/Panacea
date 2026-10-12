@@ -3,6 +3,9 @@ import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { parseServingField, sanitizeServings, estimateRecordedFood, readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage } from '../domains/personal-health'
+import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope'
+import { useStore } from '../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Carbon-Footprint Diet Calculator — estimates the greenhouse-gas footprint of
@@ -34,8 +37,9 @@ const FOODS: FoodItem[] = [
 
 type Servings = Record<string, number>
 const KEY = 'pmd_carbon_diet_v1'
-function load(): Servings {
-  try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
+type DietScope = Extract<PersonalHealthStorageScope, { kind: 'account' }> | null
+function load(scope: DietScope): Servings {
+  return readToolkitStorage(KEY, scope, value => sanitizeServings(value, FOODS.map(f => f.key)))
 }
 
 // Reference points (kg CO2e/year, food only) from the same Our World in Data
@@ -49,13 +53,27 @@ const REFERENCE = [
   { label: 'Vegan diet', kgYear: 700 },
 ]
 
-export function CarbonDiet() {
-  const [servings, setServings] = useState<Servings>(load)
+function CarbonDietForm({ scope }: { scope: DietScope }) {
+  const [servings, setServings] = useState<Servings>(() => load(scope))
+  const [storageProblem, setStorageProblem] = useState<string | null>(null)
+  // Teks mentah per kolom: nilai tak sah ditandai, tidak diam-diam menjadi 0 atau ikut dihitung.
+  const [raw, setRaw] = useState<Record<string, string>>(() => Object.fromEntries(Object.entries(load(scope)).map(([k, v]) => [k, String(v)])))
+  const [invalid, setInvalid] = useState<Record<string, string>>({})
+
+  function onServing(key: string, text: string) {
+    setRaw((r) => ({ ...r, [key]: text }))
+    const p = parseServingField(text)
+    setInvalid((m) => { const { [key]: _drop, ...rest } = m; return p.ok || p.reason === 'required' ? rest : { ...rest, [key]: p.reason === 'negative' ? 'Cannot be negative' : p.reason === 'too_many' ? 'Max 100 servings/week' : 'Enter a number' } })
+    // A blank or rejected field has no recorded quantity; do not persist a fabricated zero.
+    setServings((s) => { const { [key]: _drop, ...rest } = s; return p.ok ? { ...rest, [key]: p.value } : rest })
+  }
 
   useEffect(() => {
-    const t = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(servings)) } catch { /* ignore */ } }, 400)
+    const t = setTimeout(() => {
+      if (scope) setStorageProblem(writeToolkitStorage(KEY, scope, servings) ? null : 'Unable to save. Check your session and browser storage, then retry.')
+    }, 400)
     return () => clearTimeout(t)
-  }, [servings])
+  }, [servings, scope?.token])
 
   const rows = FOODS.map((f) => {
     const perWeek = servings[f.key] ?? 0
@@ -63,8 +81,10 @@ export function CarbonDiet() {
     const co2eWeek = kgFoodPerWeek * f.kgCo2ePerKg
     return { ...f, perWeek, co2eWeek }
   })
-  const totalWeek = rows.reduce((s, r) => s + r.co2eWeek, 0)
-  const totalYear = totalWeek * 52
+  const estimate = estimateRecordedFood(servings, FOODS)
+  const totalWeek = estimate.totalWeek
+  const totalYear = totalWeek === null ? null : totalWeek * 52
+  const validEstimate = Object.keys(invalid).length === 0 && totalWeek !== null && totalYear !== null
   const maxRow = Math.max(1, ...rows.map((r) => r.co2eWeek))
 
   return (
@@ -81,6 +101,8 @@ export function CarbonDiet() {
       </Card>
 
       <Card className="!p-5">
+        {storageProblem && <p role="alert">{storageProblem}</p>}
+        {!scope && <p className="mb-3 text-xs text-neutral-500">Sign in to save your food entries. Guest changes remain only on this page.</p>}
         <div className="grid gap-3 sm:grid-cols-2">
           {FOODS.map((f) => (
             <Field key={f.key} label={`${f.icon} ${f.label} (servings/week)`}>
@@ -88,27 +110,33 @@ export function CarbonDiet() {
                 className={inputClass}
                 type="number"
                 min={0}
-                inputMode="numeric"
-                value={servings[f.key] ?? ''}
-                onChange={(e) => setServings((s) => ({ ...s, [f.key]: Number(e.target.value) || 0 }))}
-                placeholder="0"
+                max={100}
+                step="any"
+                inputMode="decimal"
+                value={raw[f.key] ?? ''}
+                onChange={(e) => onServing(f.key, e.target.value)}
+                aria-invalid={invalid[f.key] ? true : undefined}
+                placeholder="Not entered"
               />
+              {invalid[f.key] && <span role="alert" className="mt-1 block text-[11px] font-semibold text-red-600">{invalid[f.key]} — correct this field to see the estimate</span>}
             </Field>
           ))}
         </div>
       </Card>
 
-      {totalWeek > 0 && (
+      {!validEstimate && <Card><p>No estimate yet</p><p className="mt-1 text-xs text-neutral-500">Enter a quantity, including 0 if you do not eat that food. Correct invalid entries before calculating.</p></Card>}
+      {validEstimate && totalWeek !== null && totalYear !== null && (
         <>
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your estimated footprint</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{estimate.missing > 0 ? 'Partial recorded-food estimate' : 'Your estimated footprint'}</div>
+            <p className="mt-1 text-xs text-neutral-500">{estimate.recorded}/{FOODS.length} categories recorded. {estimate.missing > 0 ? 'Unentered foods are unknown; this is not your complete diet footprint.' : 'Zero quantities were explicitly entered where applicable.'}</p>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-black text-brand-dark">{totalYear.toFixed(0)}</span>
               <span className="text-sm font-semibold text-neutral-500">kg CO₂e / year (food only)</span>
             </div>
             <div className="mt-0.5 text-[12px] text-neutral-500">≈ {totalWeek.toFixed(1)} kg CO₂e this week</div>
 
-            <div className="mt-4 space-y-1.5">
+            {estimate.missing === 0 && <div className="mt-4 space-y-1.5">
               {REFERENCE.map((r) => {
                 const pct = Math.min(100, (totalYear / r.kgYear) * 100)
                 const isClosest = Math.abs(totalYear - r.kgYear) === Math.min(...REFERENCE.map((x) => Math.abs(totalYear - x.kgYear)))
@@ -122,7 +150,7 @@ export function CarbonDiet() {
                   </div>
                 )
               })}
-            </div>
+            </div>}
           </Card>
 
           <Card className="!p-5">
@@ -149,6 +177,24 @@ export function CarbonDiet() {
       </div>
     </div>
   )
+}
+
+export function CarbonDiet() {
+  const { account } = useStore()
+  const [, refresh] = useState(0)
+  useEffect(() => {
+    const changed = () => refresh(v => v + 1)
+    window.addEventListener('storage', changed)
+    window.addEventListener('focus', changed)
+    const timer = window.setInterval(changed, 1000)
+    return () => { window.removeEventListener('storage', changed); window.removeEventListener('focus', changed); window.clearInterval(timer) }
+  }, [])
+  const remembered = readPersonalHealthStorageScope()
+  const scope = remembered.kind === 'account' && matchesPersonalHealthAccount(remembered, account) ? remembered : null
+  if (remembered.kind === 'invalid' || (account !== null && !scope) || (account === null && remembered.kind === 'account')) {
+    return <Card><p role="alert">Session changed. Reopen this page after signing in.</p></Card>
+  }
+  return <CarbonDietForm key={scope?.token || 'anonymous'} scope={scope} />
 }
 
 export default CarbonDiet
