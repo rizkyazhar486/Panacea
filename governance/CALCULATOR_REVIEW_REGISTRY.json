@@ -137,6 +137,14 @@
       "evidence": null
     },
     {
+      "id": "framinghamInputs",
+      "review_status": "PENDING_CLINICAL_REVIEW",
+      "clinically_reviewed": false,
+      "reviewer": null,
+      "reviewed_at": null,
+      "evidence": null
+    },
+    {
       "id": "glasgowBlatchford",
       "review_status": "PENDING_CLINICAL_REVIEW",
       "clinically_reviewed": false,
