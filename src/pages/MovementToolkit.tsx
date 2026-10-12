@@ -4,6 +4,7 @@ import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
+import { parseDailyLog, REPS_PER_DAY_MAX } from '../domains/training-goals'
 import { zone2HeartRate, validateGripKg, parseNumberField } from '../domains/clinical-calculators'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
@@ -115,6 +116,7 @@ const SQUAT_KEY = 'pmd_squat_challenge_v1'
 function SquatChallenge() {
   const [days, setDays] = useState<Record<string, number>>(() => { try { return JSON.parse(localStorage.getItem(SQUAT_KEY) || '{}') } catch { return {} } })
   useEffect(() => { try { localStorage.setItem(SQUAT_KEY, JSON.stringify(days)) } catch { /* ignore */ } }, [days])
+  const [logProblem, setLogProblem] = useState<string | null>(null)
   const today = hariIni()
   const total = Object.values(days).reduce((a, b) => a + b, 0)
   const streak = useMemo(() => {
@@ -132,7 +134,8 @@ function SquatChallenge() {
       <p className="text-[13px] text-neutral-500">30-day squat challenge — log today's reps.</p>
       <div className="mt-3 flex items-end gap-2">
         <Field label="Reps done today">
-          <input className={inputClass} type="number" min={0} max={500} value={days[today] || ''} onChange={(e) => setDays((d) => ({ ...d, [today]: Number(e.target.value) || 0 }))} placeholder="0" />
+          <input className={inputClass} type="number" min={0} max={500} value={days[today] || ''} onChange={(e) => { const v = parseDailyLog(e.target.value, REPS_PER_DAY_MAX, 'Reps'); if (v.ok) { setDays((d) => ({ ...d, [today]: v.value })); setLogProblem(null) } else setLogProblem(v.problem) }} placeholder="0" />
+          {logProblem && <p role="alert" className="mt-1 text-[12px] text-red-600">{logProblem}. Showing your last saved value: {days[today] || 0} reps.</p>}
         </Field>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3 text-center">
