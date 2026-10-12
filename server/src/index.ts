@@ -186,6 +186,7 @@ import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
 import { mountVisitRoutes } from './visits.js'
+import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -1013,6 +1014,8 @@ app.get('/api/settings', requireAuth, (req, res) => {
 app.put('/api/settings', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
+  // Sebaran (...rest) mengubah larik menjadi {0:..,1:..}; tanpa pemeriksaan ini muatan non-objek diterima dan disimpan sebagai kunci sampah.
+  if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) return res.status(400).json({ error: 'invalid settings payload' })
   // Defensive: never persist the Anthropic API key server-side.
   const { apiKey: _drop, ...rest } = prefs as Record<string, unknown>
   // Entitlements and alert-cooldown stamps live in this same blob, so an
@@ -1898,14 +1901,15 @@ app.get('/api/reminders', requireAuth, (req, res) => {
 })
 app.post('/api/reminders', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const { medName, dose, timeOfDay, nextFireAt } = req.body as { medName?: string; dose?: string; timeOfDay?: string; nextFireAt?: string }
-  if (!medName?.trim() || !timeOfDay || !nextFireAt) return res.status(400).json({ error: 'missing_fields' })
-  const rem = addReminder(u.id, { medName: medName.trim(), dose: (dose ?? '').trim(), timeOfDay, nextFireAt, active: true })
+  let baru: ReturnType<typeof validasiPengingatBaru>
+  try { baru = validasiPengingatBaru(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
+  const rem = addReminder(u.id, { ...baru, active: true })
   res.json({ reminder: rem })
 })
 app.patch('/api/reminders/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const patch = req.body as Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>
+  let patch: ReturnType<typeof validasiTambalPengingat>
+  try { patch = validasiTambalPengingat(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
   const rem = updateReminder(u.id, req.params.id, patch)
   if (!rem) return res.status(404).json({ error: 'not_found' })
   res.json({ reminder: rem })
