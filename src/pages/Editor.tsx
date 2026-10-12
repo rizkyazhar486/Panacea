@@ -4,6 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconBook, IconUpload, IconScissors, IconCheck, IconSparkle } from '../components/icons'
 import { verifyMaterial } from '../lib/ai'
+import { validateMaterialPrice } from '../domains/marketplace'
 import type { Material, MaterialCategory, ExamTrack } from '../lib/types'
 
 // English display labels for the stored (Indonesian) category/exam enum values.
@@ -19,6 +20,7 @@ export function Editor() {
   const [price, setPrice] = useState(6)
   const [body, setBody] = useState('')
   const [status, setStatus] = useState('')
+  const [priceProblem, setPriceProblem] = useState('')
   const taRef = useRef<HTMLTextAreaElement>(null)
 
   function cutSelection() {
@@ -31,6 +33,12 @@ export function Editor() {
 
   async function submit() {
     if (!title.trim() || !body.trim()) return
+    const priceCheck = validateMaterialPrice(price)
+    if (!priceCheck.ok) {
+      setPriceProblem(priceCheck.problem)
+      return
+    }
+    setPriceProblem('')
     const m: Material = {
       id: uid(),
       title: title.trim(),
@@ -42,7 +50,7 @@ export function Editor() {
       authorName: account?.name ?? 'Author',
       fileType: 'Word',
       fileName: title.trim().toLowerCase().replace(/\s+/g, '-').slice(0, 30) + '.docx',
-      priceTokens: Number(price) || 0,
+      priceTokens: priceCheck.priceTokens,
       status: 'pending-ai',
       createdAt: new Date().toISOString(),
       downloads: 0,
@@ -101,7 +109,8 @@ export function Editor() {
         />
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div className="w-32">
-            <Field label="Price (PNC)"><input className={inputClass} type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} /></Field>
+            <Field label="Price (PNC)"><input className={inputClass} type="number" min={0} value={Number.isNaN(price) ? '' : price} onChange={(e) => setPrice(e.target.value === '' ? NaN : Number(e.target.value))} /></Field>
+            {priceProblem && <p role="alert" className="mt-1 text-xs font-semibold text-red-600">{priceProblem}</p>}
           </div>
           <Button onClick={submit} disabled={!title.trim() || !body.trim()}><IconUpload size={16} /> Upload to Verifier</Button>
           {status && <Badge tone="brand"><IconSparkle size={12} /> {status}</Badge>}

@@ -254,10 +254,11 @@
    "evidence": [
     "Baseline 147 → 80 (28 berkas) di main 4b2009a1f",
     "Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766).",
-    "Main 92707f132561a9d2529f691b12af10e5b80897d4: actual remaining count 17 after #2439; head 796f3c04 passed nine exact-head checks including nutrition recovery (run 38218032932)."
+    "Main 92707f132561a9d2529f691b12af10e5b80897d4: actual remaining count 17 after #2439; head 796f3c04 passed nine exact-head checks including nutrition recovery (run 38218032932).",
+    "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767)."
    ],
    "owner": "Sonnet",
-   "note": "Kemajuan engineering parsial; total main terakhir 17. Penjaga input jumlah klaim dalam revisi ini menurunkan baseline aktual menjadi 16 (13 berkas), belum nol. Kriteria tetap belum VERIFIED; pemindaian lengkap dan aturan deteksi tetap utuh."
+   "note": "Kemajuan engineering parsial; total main terakhir 16. Penjaga harga Editor/Marketplace dalam revisi ini menurunkan baseline aktual menjadi 14 (11 berkas), belum nol. Kriteria tetap belum VERIFIED; pemindaian lengkap dan aturan deteksi tetap utuh."
   },
   {
    "id": "C3",
