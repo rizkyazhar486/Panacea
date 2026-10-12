@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage, parseJetLagHours, sanitizeJetLagPlan } from '../domains/personal-health'
+import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope'
 import { useStore } from '../lib/store'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { hariIni as tanggalHariIni } from '../lib/ukurBerkala'
@@ -379,31 +381,26 @@ export function UbinRangkaian() {
 // memberi resep tanpa mengetahui apa pun tentang pemakainya.
 const KUNCI_JETLAG = 'pmd_jetlag_v1'
 
-export function UbinJetLag() {
-  const [selisih, setSelisih] = useState('0')
-  const [tanggal, setTanggal] = useState('')
-
-  useEffect(() => {
-    try {
-      const d = JSON.parse(localStorage.getItem(KUNCI_JETLAG) || 'null')
-      if (d && typeof d.selisih === 'string') { setSelisih(d.selisih); setTanggal(d.tanggal ?? '') }
-    } catch { /* abaikan */ }
-  }, [])
-
+type JetLagScope = Extract<PersonalHealthStorageScope, { kind: 'account' }> | null
+function JetLagCard({ scope }: { scope: JetLagScope }) {
+  const [plan, setPlan] = useState(() => readToolkitStorage(KUNCI_JETLAG, scope, sanitizeJetLagPlan))
+  const [problem, setProblem] = useState<string | null>(null)
+  const selisih = plan.selisih, tanggal = plan.tanggal
   const simpan = (s: string, t: string) => {
-    setSelisih(s); setTanggal(t)
-    try { localStorage.setItem(KUNCI_JETLAG, JSON.stringify({ selisih: s, tanggal: t })) } catch { /* kuota */ }
+    const next = sanitizeJetLagPlan({ selisih: s, tanggal: t })
+    if (scope && !writeToolkitStorage(KUNCI_JETLAG, scope, next)) { setProblem('Unable to save. Check your session and browser storage, then retry.'); return }
+    setProblem(null); setPlan(next)
   }
-
-  const jam = Number(selisih) || 0
+  const jam = parseJetLagHours(selisih)
   const hariLagi = tanggal ? Math.ceil((Date.parse(`${tanggal}T00:00:00`) - Date.now()) / HARI) : null
-  const perluHari = Math.abs(jam)
-  const keTimur = jam > 0
+  const perluHari = jam === null ? null : Math.abs(jam)
+  const keTimur = jam !== null && jam > 0
 
   return (
     <section>
       <Kepala judul="Jet lag" ke="/harian" />
       <div className="kaca rounded-3xl p-3">
+        {problem && <p role="alert">{problem}</p>}
         <div className="flex gap-1.5">
           <select
             value={selisih}
@@ -411,6 +408,7 @@ export function UbinJetLag() {
             aria-label="Destination hour difference"
             className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
           >
+            <option value="">Choose hour difference</option>
             {Array.from({ length: 25 }, (_, i) => i - 12).map((n) => (
               <option key={n} value={String(n)}>{n === 0 ? 'Same' : n > 0 ? `+${n} h (east)` : `${n} h (west)`}</option>
             ))}
@@ -424,13 +422,13 @@ export function UbinJetLag() {
           />
         </div>
 
-        {jam === 0 ? (
+        {jam === null || jam === 0 ? (
           <p className="t-kecil mt-2 text-neutral-500">Enter the hour difference at your destination and your departure date.</p>
         ) : (
           <>
             <div className="mt-2 flex items-baseline gap-1.5">
               <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{perluHari}</span>
-              <span className="t-mikro font-bold text-neutral-400">days to adjust</span>
+              <span className="t-mikro font-bold text-neutral-400">illustrative model days</span>
               {hariLagi != null && (
                 <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
                   {hariLagi > 0 ? `departing in ${hariLagi} d` : 'already departed'}
@@ -439,8 +437,8 @@ export function UbinJetLag() {
             </div>
             <p className="t-kecil mt-1.5 leading-snug text-neutral-600 dark:text-neutral-300">
               {keTimur
-                ? `Heading east: bring your bedtime forward ${perluHari > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the morning once you arrive.`
-                : `Heading west: push your bedtime later ${perluHari > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the afternoon once you arrive.`}
+                ? `Heading east: bring your bedtime forward ${(perluHari ?? 0) > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the morning once you arrive.`
+                : `Heading west: push your bedtime later ${(perluHari ?? 0) > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the afternoon once you arrive.`}
             </p>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
               The body clock shifts roughly an hour a day, so a large difference genuinely cannot be closed at once. There is no melatonin advice here — that is a medicine, and how to use it is your doctor's call.
@@ -450,4 +448,22 @@ export function UbinJetLag() {
       </div>
     </section>
   )
+}
+
+
+export function UbinJetLag() {
+  const { account } = useStore()
+  const [, refresh] = useState(0)
+  useEffect(() => {
+    const changed = () => refresh(v => v + 1)
+    window.addEventListener('storage', changed); window.addEventListener('focus', changed)
+    const timer = window.setInterval(changed, 1000)
+    return () => { window.removeEventListener('storage', changed); window.removeEventListener('focus', changed); window.clearInterval(timer) }
+  }, [])
+  const remembered = readPersonalHealthStorageScope()
+  const scope = remembered.kind === 'account' && matchesPersonalHealthAccount(remembered, account) ? remembered : null
+  if (remembered.kind === 'invalid' || (account !== null && !scope) || (account === null && remembered.kind === 'account')) {
+    return <section><Kepala judul="Jet lag" /><p role="alert">Session changed. Reopen this page after signing in.</p></section>
+  }
+  return <JetLagCard key={scope?.token || 'anonymous'} scope={scope} />
 }
