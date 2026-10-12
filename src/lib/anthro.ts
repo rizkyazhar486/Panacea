@@ -6,11 +6,14 @@ export interface AnthroResult {
   bmi: number
   kesan: string
   tone: 'low' | 'normal' | 'high' | 'critical'
+  /** false = berat/tinggi hilang atau tak sah: `bmi` (0) BUKAN pengukuran dan tidak boleh ditampilkan sebagai angka. */
+  valid: boolean
 }
 
 export function computeBmi(weightKg: number, heightCm: number): AnthroResult {
   const h = heightCm / 100
-  const bmi = h > 0 ? weightKg / (h * h) : 0
+  const valid = Number.isFinite(weightKg) && weightKg > 0 && Number.isFinite(h) && h > 0
+  const bmi = valid ? weightKg / (h * h) : 0
   let kesan = 'Cannot be calculated'
   let tone: AnthroResult['tone'] = 'normal'
   if (bmi > 0) {
@@ -32,7 +35,7 @@ export function computeBmi(weightKg: number, heightCm: number): AnthroResult {
       tone = 'critical'
     }
   }
-  return { bmi: Math.round(bmi * 10) / 10, kesan, tone }
+  return { bmi: Math.round(bmi * 10) / 10, kesan, tone, valid }
 }
 
 export function ageFromDob(dob: string): number {

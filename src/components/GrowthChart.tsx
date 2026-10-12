@@ -179,7 +179,7 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
 }
 
 function AdultBmiChart({ patient }: { patient: Patient }) {
-  const { bmi, kesan, tone } = computeBmi(patient.weightKg, patient.heightCm)
+  const { bmi, kesan, tone, valid } = computeBmi(patient.weightKg, patient.heightCm)
   const bands = [
     { from: 12, to: 18.5, label: 'Underweight', color: '#fbbf24' },
     { from: 18.5, to: 23, label: 'Normal', color: '#00BF63' },
@@ -197,7 +197,7 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
         <div>
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Adult BMI</div>
           <div className="text-3xl font-extrabold">
-            {bmi} <span className="text-base font-medium text-neutral-500">kg/m²</span>
+            {valid ? bmi : '—'} {valid && <span className="text-base font-medium text-neutral-500">kg/m²</span>}
           </div>
         </div>
         <Badge tone={tone}>{kesan}</Badge>
@@ -208,10 +208,12 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
             <div key={b.label} style={{ width: `${((b.to - b.from) / (max - min)) * 100}%`, background: b.color }} className="h-full" />
           ))}
         </div>
-        <div className="absolute top-0 h-8" style={{ left: `calc(${pct(bmi)}% - 1px)` }}>
-          <div className="h-8 w-0.5 bg-ink" />
-          <div className="absolute -top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-1 text-[10px] font-bold">▲</div>
-        </div>
+        {valid && (
+          <div className="absolute top-0 h-8" style={{ left: `calc(${pct(bmi)}% - 1px)` }}>
+            <div className="h-8 w-0.5 bg-ink" />
+            <div className="absolute -top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-1 text-[10px] font-bold">▲</div>
+          </div>
+        )}
       </div>
       <div className="mt-1 flex justify-between text-[10px] text-neutral-500">
         <span>18.5</span>

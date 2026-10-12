@@ -158,8 +158,9 @@ function Spark({ values, color }: { values: number[]; color: string }) {
    BMI VISUAL GAUGE
    ═══════════════════════════════════════════ */
 
-function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: string }) {
-  const pct = Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
+function BmiGauge({ bmi, kesan, tone }: { bmi: number | null; kesan: string; tone: string }) {
+  // bmi null = berat/tinggi tak ada: tanpa penanda di skala dan tanpa angka 0 yang tampak sebagai pengukuran.
+  const pct = bmi === null ? 0 : Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
   const color = tone === 'high' || tone === 'critical' ? '#FF3131' : tone === 'low' ? '#f59e0b' : '#00BF63'
 
   return (
@@ -169,16 +170,18 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
         <div className="absolute inset-y-0 left-[30%] w-[20%] bg-green-100/60" />
         <div className="absolute inset-y-0 left-[50%] w-[20%] bg-amber-100/60" />
         <div className="absolute inset-y-0 left-[70%] w-[30%] bg-red-100/60" />
-        <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out" style={{ left: `calc(${pct}% - 6px)` }}>
-          <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
-        </div>
+        {bmi !== null && (
+          <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out" style={{ left: `calc(${pct}% - 6px)` }}>
+            <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
+          </div>
+        )}
       </div>
       <div className="flex justify-between text-[10px] font-semibold text-neutral-300">
         <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
       </div>
       <div className="text-center">
-        <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
-        <span className="ml-1 text-xs text-neutral-500">kg/m²</span>
+        <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi ?? '—'}</span>
+        {bmi !== null && <span className="ml-1 text-xs text-neutral-500">kg/m²</span>}
       </div>
       <div className="text-center">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -717,7 +720,7 @@ export function Dashboard() {
           </div>
           <div className="flex items-center">
             <div className="w-full">
-              <BmiGauge bmi={Number(anthro.bmi) || 0} kesan={String(anthro.kesan || '')} tone={String(anthro.tone || 'normal')} />
+              <BmiGauge bmi={anthro.valid ? anthro.bmi : null} kesan={String(anthro.kesan || '')} tone={String(anthro.tone || 'normal')} />
             </div>
           </div>
         </div>
