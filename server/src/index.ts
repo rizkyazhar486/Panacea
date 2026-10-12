@@ -155,7 +155,7 @@ import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
 import { submitEmr } from './satusehat.js'
-import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
+import { createPayment, confirmPayment, paymentWebhook, orderStatus, normalizeTopUpPnc } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
@@ -512,7 +512,7 @@ app.get('/api/wallet', requireAuth, (req, res) => {
 app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as { amountPnc?: number; bank?: string; accountNumber?: string; accountHolder?: string }
-  const amount = Math.floor(Number(b.amountPnc) || 0)
+  const amount = normalizeTopUpPnc(b.amountPnc, config.tokenToIdr) ?? 0
   const bank = String(b.bank || '').trim()
   const accountNumber = String(b.accountNumber || '').replace(/\s/g, '')
   const accountHolder = String(b.accountHolder || '').trim()
@@ -560,7 +560,7 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
 // User submits a request after transferring; the owner approves to credit PNC.
 app.post('/api/wallet/topup-request', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const amount = Math.floor(Number((req.body as { amountPnc?: number }).amountPnc) || 0)
+  const amount = normalizeTopUpPnc((req.body as { amountPnc?: number }).amountPnc, config.tokenToIdr) ?? 0
   if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
   const row = addManualTopup({ userId: u.id, email: u.email, name: u.name, amountPnc: amount, amountIdr: amount * config.tokenToIdr })
   addAudit(u, 'wallet.topup_request', `${amount} PNC (Rp${row.amountIdr.toLocaleString('id-ID')})`)
