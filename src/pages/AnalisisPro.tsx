@@ -6,7 +6,7 @@ import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, Responsive
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
 import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
-import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
+import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtWorkoutDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
 import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
@@ -257,7 +257,7 @@ export function AnalisisPro() {
                   <div className="truncate text-[13px] font-bold text-ink">{w.nama}</div>
                   <div className="text-[10px] text-slate-500">
                     {new Date(w.mulai).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                    {' · '}{fmtDurasi(w.durasi)}{w.jarakKm ? ` · ${w.jarakKm} km` : ''}
+                    {' · '}{fmtWorkoutDurasi(w)}{w.jarakKm ? ` · ${w.jarakKm} km` : ''}
                     {!u.dariDeret && ' · from the average'}
                   </div>
                 </div>

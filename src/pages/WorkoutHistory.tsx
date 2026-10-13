@@ -8,7 +8,7 @@ import { ShareCardButton } from '../components/ShareCardButton'
 import { IconRun, IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import {
-  zoneBreakdown, hrMaksimum, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts, parseHrNotifications,
+  zoneBreakdown, hrMaksimum, summarise, fmtDurasi, fmtWorkoutDurasi, fmtPace, NOTIF_INFO, parseWorkouts, parseHrNotifications,
   type ImportedWorkout,
 } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
@@ -345,7 +345,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
             </span>
           </div>
           <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
-            <span>{fmtDurasi(w.durasi)}</span>
+            <span>{fmtWorkoutDurasi(w)}</span>
             {w.jarakKm != null && <span>{w.jarakKm} km</span>}
             {w.paceSec != null && <span>{fmtPace(w.paceSec)}/km</span>}
             {w.avgHr != null && <span>♥ {w.avgHr} rata-rata</span>}
