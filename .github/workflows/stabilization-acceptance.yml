@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Training duration provenance (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          TRAINING_DURATION_QA_ORIGIN: http://127.0.0.1:4173
+          TRAINING_DURATION_QA_OUTPUT: artifacts/training-duration
+        run: node scripts/qa/training-duration-smoke.mjs
+
+      - name: Upload training duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-duration
+          path: artifacts/training-duration
+          if-no-files-found: ignore
+
       - name: Workout duration summary missingness (synthetic client, 390x844)
         timeout-minutes: 5
         env:

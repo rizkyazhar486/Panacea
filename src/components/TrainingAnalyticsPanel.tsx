@@ -76,8 +76,9 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
 
         <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
           <div className="rounded-xl bg-white/80 p-2.5 dark:bg-white/5">
-            <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Time</div>
-            <div className="mt-1 text-sm font-black tabular-nums text-ink dark:text-white">{minggu.menit} min</div>
+            <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Logged time</div>
+            <div className="mt-1 text-sm font-black tabular-nums text-ink dark:text-white">{minggu.sesiDurasi > 0 && Number.isFinite(minggu.menit) ? `${minggu.menit} min` : '—'}</div>
+            {minggu.sesiDurasi < minggu.sesi && <div className="mt-1 text-[9px] text-neutral-500">{minggu.sesi - minggu.sesiDurasi} sessions missing duration{minggu.sesiDurasi > 0 ? ' · partial total' : ''}</div>}
           </div>
           <div className="rounded-xl bg-white/80 p-2.5 dark:bg-white/5">
             <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Distance</div>
