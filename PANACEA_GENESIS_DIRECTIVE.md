@@ -45,6 +45,18 @@ Research priority = (Expected information gain × potential patient relevance ×
 
 Define each term and its uncertainty if used; do not fabricate precision or declare scientific success based on the heuristic.
 
+## 4. Every generation of medical device — historical, current and future
+
+**Universal temporal device compatibility is a standing operating-system design objective.** Panacea must be able to *translate the clinically useful evidence obtainable from* legacy/analog, contemporary digital, and emerging/future medical devices without treating “can be represented” as “can be directly connected.”
+
+- **Historical:** paper ECGs, film radiographs, paper laboratory reports, manually read sphygmomanometers/thermometers, retired instruments, legacy device exports, floppy/serial files or earlier institutional archives. Digitization requires source-document provenance, capture-date precision, transcription/extraction uncertainty, device/method context when known, and clinician verification for any clinical use. Unknown manufacturer, original timestamp or calibration must remain unknown; scanned measurements are not fresh telemetry.
+- **Current:** modern FHIR/HL7, DICOM, IEEE 11073, IHE device feeds, BLE, USB, TCP, certified export, approved vendor SDKs and wearable APIs. Actual integration requires authorized source-specific adapters, quality control, correct encounter binding and proof of real device support.
+- **Future:** novel biosensors, implantable diagnostics, biomedical interfaces, and research devices. Extend via versioned schemas and a new conformance manifest; do not invent proprietary protocols or claim current clinical validation.
+
+Treat *measurement event time*, *archival import time*, *clinical acceptance time* and *algorithm reinterpretation time* as distinct; preserve immutable originals and corrections. Keep original clinical context and historical reference ranges/method-dependent comparability visible to clinicians. A present-day threshold does not automatically apply to a historical measurement.
+
+The [Universal Device Translation OS](DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md) defines the timeline, metadata and lifecycle gates. No past/current/future source creates synthetic patient truth.
+
 ## 4. A synchronized healthcare operating system
 
 Genome-to-organ-to-whole-body reasoning is useful only if grounded in time, device/source identity, units, context, uncertainty and appropriate patient consent. Devices, clinicians, laboratory systems, imaging, longitudinal physiology and AI must synchronize through **one governed event/identity substrate**, with bounded domain engines and separate factual/derived/simulated lanes.
