@@ -1,4 +1,5 @@
 import type { ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 import { buildWorkoutDna, type WorkoutDnaSignature } from './workoutDNA'
 
 export interface HumanReplayEpoch {
@@ -43,10 +44,11 @@ function monthLabel(key: string) {
 }
 
 function weightedAverage(values: Array<{ value?: number; weight: number }>) {
-  const valid = values.filter((item): item is { value: number; weight: number } => typeof item.value === 'number' && Number.isFinite(item.value) && item.weight > 0)
+  const valid = values.filter((item): item is { value: number; weight: number } => typeof item.value === 'number' && Number.isFinite(item.value) && Number.isFinite(item.weight) && item.weight > 0)
   const denominator = valid.reduce((sum, item) => sum + item.weight, 0)
-  if (!denominator) return undefined
-  return valid.reduce((sum, item) => sum + item.value * item.weight, 0) / denominator
+  if (!Number.isFinite(denominator) || denominator <= 0) return undefined
+  const numerator = valid.reduce((sum, item) => sum + item.value * item.weight, 0)
+  return Number.isFinite(numerator) ? numerator / denominator : undefined
 }
 
 function dominant(values: string[]) {
@@ -73,7 +75,7 @@ export function buildHumanReplay(workouts: ImportedWorkout[], hrMax: number): Hu
     const activeMinutes = group.reduce((sum, workout) => sum + workout.durasi / 60, 0)
     const distanceKm = group.reduce((sum, workout) => sum + (workout.jarakKm ?? 0), 0)
     const kcal = group.reduce((sum, workout) => sum + (workout.kcal ?? 0), 0)
-    const avgHr = weightedAverage(group.map((workout) => ({ value: workout.avgHr, weight: Math.max(1, workout.durasi) })))
+    const avgHr = weightedAverage(group.map((workout) => ({ value: workout.avgHr, weight: workoutDurationSeconds(workout) ?? 0 })))
     const maxHrValues = group.map((workout) => workout.maxHr).filter((value): value is number => typeof value === 'number')
     const representativeDna = dna.slice().sort((a, b) => b.durationMin - a.durationMin)[0]
 

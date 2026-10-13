@@ -24,3 +24,8 @@ A synthetic workout marked `durationSource: unknown` previously counted as 30 ob
 Regression: `scripts/uji/training-duration-provenance.mts` covers unknown-only/mixed/explicit-zero/nonfinite and1,000 positive duration equations. Existing `training-analytics.mts` passes unchanged. Browser fixture `scripts/qa/training-duration-smoke.mjs` checks actual390x844 UI with synthetic scoped storage, mandatory in Stabilization Acceptance. This verifies software behavior, not device accuracy or clinical review.
 
 Browser evidence is a bundled actual-component fixture, not Home-route integration: the legacy panel is not currently mounted by active Home. Its source repair and component behavior are verified separately; wiring the legacy analytics into an appropriate active surface remains explicit unfinished work.
+
+
+## Human Replay weighted heart rate
+
+The replay previously used `Math.max(1, raw duration)`, admitting explicitly unknown intervals and inventing a positive time weight for zero-length observations. The aggregate now weights only finite, positive source-aware duration and makes nonfinite weighted accumulators unavailable. Explicit source zero remains a valid zero interval but contributes no positive elapsed-time weight. `scripts/uji/replay-duration-weights.mts` reproduces150vs100, checks unknown/zero/overflow, and preserves1,000 equal-weight equations. This is weighted-arithmetic validation, not device or clinical accuracy. Replay numeric minute totals and other observational fields remain separate missingness debt.
