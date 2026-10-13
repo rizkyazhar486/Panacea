@@ -7,20 +7,28 @@ const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-p
 export function FetalMriContext({ dataset, selected }: { dataset: FetalParcelDataset; selected: number }) {
   const [context, setContext] = useState<Context | null>(null)
   const [error, setError] = useState('')
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     const abort = new AbortController()
+    setContext(null)
+    setError('')
     fetch(`${BASE}manifest.json`, { signal: abort.signal }).then(response => {
       if (!response.ok) throw new Error('MRI context could not be loaded')
       return response.json()
-    }).then(value => parseFetalMriContext(value, dataset)).then(setContext)
+    }).then(value => parseFetalMriContext(value, dataset)).then(value => {
+      if (!abort.signal.aborted) setContext(value)
+    })
       .catch(reason => { if (!abort.signal.aborted) setError(String(reason.message ?? reason)) })
     return () => abort.abort()
-  }, [dataset])
+  }, [dataset, attempt])
   const region = context?.regions.find(r => r.source_label === selected)
   return <details className="fpi-mri">
     <summary>MRI source context · region {selected}</summary>
     <Prosa>Native source-grid planes at a voxel inside the selected label. Colours match the 3D numeric regions. Images use an 8-bit display window; anatomical interpretation and clinical review remain pending.</Prosa>
-    {error && <p role="alert">{error}</p>}
+    {error && <>
+      <p role="alert">{error}</p>
+      <button type="button" className="rounded-lg border border-brand px-3 py-2 text-sm font-semibold" onClick={() => setAttempt(value => value + 1)}>Retry MRI context</button>
+    </>}
     {!context && !error && <p role="status">Loading MRI context…</p>}
     {region && <>
       <div className="fpi-mri-images">{region.images.map(image => <figure key={image.axis}>
