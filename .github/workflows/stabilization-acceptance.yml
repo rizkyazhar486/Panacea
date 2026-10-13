@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Workout duration summary missingness (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WORKOUT_SUMMARY_QA_ORIGIN: http://127.0.0.1:4173
+          WORKOUT_SUMMARY_QA_OUTPUT: artifacts/workout-duration-summary
+        run: node scripts/qa/workout-duration-summary-smoke.mjs
+
+      - name: Upload workout duration summary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workout-duration-summary
+          path: artifacts/workout-duration-summary
+          if-no-files-found: ignore
+
       - name: Workout detail duration labels (synthetic client, 390x844)
         timeout-minutes: 5
         env:
