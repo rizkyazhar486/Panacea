@@ -1,5 +1,6 @@
 import { kunciTanggal } from './ramalan'
 import type { ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 
 export interface TrainingWeekSummary {
   sesi: number
@@ -149,13 +150,14 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     let sesiRecovery = 0
 
     for (const { w } of rows) {
-      const d = angkaPositif(w.durasi)
+      const knownDuration = workoutDurationSeconds(w)
+      const d = knownDuration ?? 0
       const j = angkaPositif(w.jarakKm)
       const k = angkaNonNegatif(w.kcal)
       detik += d
       km += j
       kcal += k
-      if (d > 0) sesiDurasi += 1
+      if (knownDuration !== null) sesiDurasi += 1
       if (j > 0) sesiJarak += 1
       if (d > 0 && j > 0) {
         detikJarak += d
@@ -190,7 +192,8 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     const dasar = ringkas(rows)
     let srpe = 0
     for (const { w } of rows) {
-      const d = angkaPositif(w.durasi)
+      const knownDuration = workoutDurationSeconds(w)
+      const d = knownDuration ?? 0
       const rpe = rpeValid(w.rpe)
       if (d > 0 && rpe !== null) srpe += (d / 60) * rpe
     }
