@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Workout DNA duration provenance and poster (synthetic component, 390x844)
+        timeout-minutes: 5
+        env:
+          DNA_DURATION_QA_ORIGIN: http://127.0.0.1:4173
+          DNA_DURATION_QA_OUTPUT: artifacts/dna-duration
+        run: node scripts/qa/workout-dna-duration-smoke.mjs
+
+      - name: Upload Workout DNA duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dna-duration
+          path: artifacts/dna-duration
+          if-no-files-found: ignore
+
       - name: Training duration provenance (synthetic client, 390x844)
         timeout-minutes: 5
         env:

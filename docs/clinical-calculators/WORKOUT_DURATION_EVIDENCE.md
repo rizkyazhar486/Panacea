@@ -29,3 +29,10 @@ Browser evidence is a bundled actual-component fixture, not Home-route integrati
 ## Human Replay weighted heart rate
 
 The replay previously used `Math.max(1, raw duration)`, admitting explicitly unknown intervals and inventing a positive time weight for zero-length observations. The aggregate now weights only finite, positive source-aware duration and makes nonfinite weighted accumulators unavailable. Explicit source zero remains a valid zero interval but contributes no positive elapsed-time weight. `scripts/uji/replay-duration-weights.mts` reproduces150vs100, checks unknown/zero/overflow, and preserves1,000 equal-weight equations. This is weighted-arithmetic validation, not device or clinical accuracy. Replay numeric minute totals and other observational fields remain separate missingness debt.
+
+
+## Workout DNA observed duration and distance
+
+Reproduced unknown duration1800 being presented as endurance33 with measured-derived provenance and30min labels. Generator now uses source-aware duration, retains nullable `knownDurationMin` beside numeric compatibility `durationMin`, and marks missing endurance/volume evidence unavailable. Explicit sourcezero stays0min and measured-derived. Volume uses available time or finite nonnegative recorded distance; invalid distance is excluded from facts/signature. Known normalization constants90/120minutes and15km are unchanged, not clinically validated fitness thresholds. UI and local poster share the same duration label helper. Other signal fields and archetype scientific maturity remain separate limitations.
+
+`dna-duration-provenance.mts` checks unknown/zero/nonfinite and1,000 known values. Actual component390x844 and actual canvas poster download are exercised by mandatory `workout-dna-duration-smoke.mjs`: unknown duration unavailable, no invented30min, sourcezero0min, no errors/overflow. Fixture does not certify active route integration or clinical accuracy. Initial smoke failed only due CSS uppercase label and case-sensitive matcher; normalized case matching retains all semantic requirements.
