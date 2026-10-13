@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Workout duration provenance and consumer guards (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WORKOUT_DURATION_QA_ORIGIN: http://127.0.0.1:4173
+          WORKOUT_DURATION_QA_OUTPUT: artifacts/workout-duration
+        run: node scripts/qa/workout-duration-smoke.mjs
+
+      - name: Upload workout duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workout-duration-boundaries
+          path: artifacts/workout-duration
+          if-no-files-found: ignore
+
       - name: Logged calories distinguish missing from zero (synthetic client, 390x844)
         timeout-minutes: 5
         env:
