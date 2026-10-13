@@ -190,6 +190,16 @@ function historicalTranslation(
   if (!['human-attested', 'machine-unverified', 'direct-file-export'].includes(String(a.extraction))) {
     errors.push('extraction provenance is unsupported')
   }
+  if (recordedWhen && isValidIsoTimestamp(a.importedAt)) {
+    const importedMillis = Date.parse(a.importedAt)
+    if (recordedWhen.precision === 'instant' && Date.parse(recordedWhen.value) > importedMillis) {
+      errors.push('historical capture instant cannot be later than archival import time')
+    }
+    if (recordedWhen.precision === 'date'
+      && Date.parse(recordedWhen.value + 'T00:00:00.000Z') > importedMillis) {
+      errors.push('historical capture date cannot be later than archival import date')
+    }
+  }
   if (errors.length || !recordedWhen || !doc) return rejected(errors)
 
   // Historical imports are *references*, never reconstructed live sensor data,
@@ -246,11 +256,12 @@ export function translateMedicalDeviceForOs(
   }
 
   const isEmerging = input.generation === 'emerging'
+  const isHistorical = input.generation === 'historical'
   const explanation: DeviceOsExplanation = {
     sourceId: e.id.trim(),
     subjectId: e.subjectId,
     generation: input.generation,
-    truthLane: isEmerging ? 'research-only' : 'device-reported',
+    truthLane: isEmerging ? 'research-only' : isHistorical ? 'archival-reference' : 'device-reported',
     eventType: e.kind,
     sourceRecordedWhen: { precision: 'instant', value: e.provenance.capturedAt },
     ingestedAt: e.provenance.receivedAt,
@@ -258,14 +269,16 @@ export function translateMedicalDeviceForOs(
     summary: deviceExplanation(e.kind),
     limits: isEmerging
       ? 'Research-only device metadata. No vendor interoperability or clinical validation is implied.'
-      : 'Envelope validity is not device authenticity, interoperability certification, calibrated measurement or clinical interpretation.',
-    nextAction: isEmerging ? 'research-review' : 'clinician-review',
+      : isHistorical
+        ? 'Retrospective digital data is not live telemetry. Original method, capture precision, calibration and clinical comparability require verification.'
+        : 'Envelope validity is not device authenticity, interoperability certification, calibrated measurement or clinical interpretation.',
+    nextAction: isEmerging ? 'research-review' : isHistorical ? 'verify-original-and-clinician-review' : 'clinician-review',
     clinicalPublicationEligible: false,
     autonomousDeviceControlEnabled: false,
   }
   return {
     accepted: true,
-    disposition: isEmerging ? 'research-only' : 'technical-event',
+    disposition: isEmerging ? 'research-only' : isHistorical ? 'archival-reference' : 'technical-event',
     errors: [],
     explanation,
   }
