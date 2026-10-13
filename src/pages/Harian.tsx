@@ -5,7 +5,7 @@ import { PanaceaOsFocusRail } from '../components/PanaceaOsFocusRail'
 import { useStore } from '../lib/store'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
-import { fmtDurasi, fmtPace } from '../lib/workoutImport'
+import { fmtDurasi, fmtWorkoutDurasi, fmtPace } from '../lib/workoutImport'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ export function Harian() {
               <div key={s.id} className="flex items-baseline justify-between gap-2 rounded-xl bg-black/[0.03] px-2.5 py-2 dark:bg-white/5">
                 <span className="min-w-0 truncate text-[12px] font-bold text-ink dark:text-white">{s.nama}</span>
                 <span className="shrink-0 text-[11px] tabular-nums text-neutral-500">
-                  {s.jarakKm ? `${s.jarakKm.toFixed(1)} km · ` : ''}{fmtDurasi(s.durasi)}
+                  {s.jarakKm ? `${s.jarakKm.toFixed(1)} km · ` : ''}{fmtWorkoutDurasi(s)}
                   {s.jarakKm && s.durasi ? ` · ${fmtPace(Math.round(s.durasi / s.jarakKm))}/km` : ''}
                   {s.avgHr ? ` · ${Math.round(s.avgHr)} bpm` : ''}
                 </span>

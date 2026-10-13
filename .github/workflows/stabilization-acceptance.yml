@@ -339,6 +339,21 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Workout detail duration labels (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WORKOUT_LABEL_QA_ORIGIN: http://127.0.0.1:4173
+          WORKOUT_LABEL_QA_OUTPUT: artifacts/workout-duration-labels
+        run: node scripts/qa/workout-duration-labels-smoke.mjs
+
+      - name: Upload workout detail duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workout-duration-labels
+          path: artifacts/workout-duration-labels
+          if-no-files-found: ignore
+
       - name: Workout duration provenance and consumer guards (synthetic client, 390x844)
         timeout-minutes: 5
         env:

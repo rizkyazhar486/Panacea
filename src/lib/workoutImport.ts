@@ -1,3 +1,5 @@
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Latihan dan peringatan detak jantung dari ekspor Health Auto Export.
 //
@@ -509,6 +511,11 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
       : undefined,
     pctMudah: berzonaDetik > 0 ? Math.round((mudahDetik / berzonaDetik) * 100) : undefined,
   }
+}
+
+export function fmtWorkoutDurasi(workout: unknown): string {
+  const seconds = workoutDurationSeconds(workout)
+  return seconds === null ? '—' : fmtDurasi(seconds)
 }
 
 export function fmtDurasi(sec: number): string {
