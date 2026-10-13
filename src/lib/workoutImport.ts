@@ -449,6 +449,10 @@ export const NOTIF_INFO: Record<HrNotification['jenis'], { arti: string; kapanPe
 export interface WeeklySummary {
   sesi: number
   totalMenit: number
+  knownDurationMinutes?: number | null
+  durationKnownCount?: number
+  durationMissingCount?: number
+  durationOverflow?: boolean
   totalKm: number
   totalKcal: number
   rerataPaceSec?: number
@@ -463,6 +467,8 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
 
   let totalDetik = 0
+  let durationKnownCount = 0
+  let durationMissingCount = 0
   let totalKm = 0
   let totalKcal = 0
   let durasiBerjarak = 0
@@ -472,7 +478,10 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
   const hrMaxAman = Number.isFinite(hrMax) && hrMax > 0 ? hrMax : 0
 
   for (const w of workouts) {
-    const durasi = nonNegatif(w?.durasi)
+    const knownDuration = workoutDurationSeconds(w)
+    const durasi = knownDuration ?? 0
+    if (knownDuration === null) durationMissingCount++
+    else durationKnownCount++
     const jarak = positif(w?.jarakKm)
     const kcal = nonNegatif(w?.kcal)
 
@@ -501,12 +510,17 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     }
   }
 
+  const durationOverflow = !Number.isFinite(totalDetik)
   return {
     sesi: workouts.length,
-    totalMenit: Math.round(totalDetik / 60),
+    totalMenit: durationOverflow ? 0 : Math.round(totalDetik / 60),
+    knownDurationMinutes: durationKnownCount > 0 && !durationOverflow ? Math.round(totalDetik / 60) : null,
+    durationKnownCount,
+    durationMissingCount,
+    durationOverflow,
     totalKm: +totalKm.toFixed(2),
     totalKcal: Math.round(totalKcal),
-    rerataPaceSec: jarakBerpace > 0 && durasiBerjarak > 0
+    rerataPaceSec: Number.isFinite(durasiBerjarak) && Number.isFinite(jarakBerpace) && jarakBerpace > 0 && durasiBerjarak > 0
       ? Math.round(durasiBerjarak / jarakBerpace)
       : undefined,
     pctMudah: berzonaDetik > 0 ? Math.round((mudahDetik / berzonaDetik) * 100) : undefined,

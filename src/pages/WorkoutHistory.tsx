@@ -235,10 +235,12 @@ export function WorkoutHistory() {
         <SectionTitle icon={<IconTimer />} title="Summary" />
         <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
           <Stat label="Sessions" value={String(ringkas.sesi)} />
-          <Stat label="Total time" value={fmtDurasi(ringkas.totalMenit * 60)} />
+          <Stat label="Logged time" value={ringkas.knownDurationMinutes == null ? '—' : fmtDurasi(ringkas.knownDurationMinutes * 60)} />
           <Stat label="Total distance" value={`${ringkas.totalKm} km`} />
           <Stat label="Total calories" value={`${ringkas.totalKcal}`} />
         </div>
+        {(ringkas.durationMissingCount ?? 0) > 0 && <p className="mt-2 text-xs text-neutral-500">{ringkas.knownDurationMinutes != null ? 'Partial logged time. ' : ''}{ringkas.durationMissingCount} session(s) without known duration.</p>}
+        {ringkas.durationOverflow && <p className="mt-2 text-xs text-neutral-500">Duration total unavailable.</p>}
 
         {ringkas.pctMudah != null && (
           <div className="mt-4">
