@@ -65,9 +65,12 @@ export function FetalParcelInspector() {
     const regionBounds = new Map<number, THREE.Box3>()
     const plane = new THREE.Plane()
     const render = () => { if (!disposed) renderer.render(scene, camera) }
+    let framedSide: 'anterior' | 'left' | 'superior' = 'anterior'
+    let framedLabel: number | undefined
     const fit = (side: 'anterior' | 'left' | 'superior' = 'anterior', focusLabel?: number) => {
       const frame = focusLabel === undefined ? bounds : regionBounds.get(focusLabel)
       if (!frame || frame.isEmpty()) return
+      framedSide = side; framedLabel = focusLabel
       const center = frame.getCenter(new THREE.Vector3()), size = frame.getSize(new THREE.Vector3())
       const radius = size.length() / 2
       const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.min(camera.aspect, 1) * 1.15
@@ -81,7 +84,7 @@ export function FetalParcelInspector() {
       const { width, height } = host.getBoundingClientRect()
       if (width <= 0 || height <= 0) return
       camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false)
-      fit()
+      fit(framedSide, framedLabel)
     }
     const observer = new ResizeObserver(resize); observer.observe(host)
     controls.addEventListener('change', render)
