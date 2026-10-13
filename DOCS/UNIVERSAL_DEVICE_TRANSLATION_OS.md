@@ -1,13 +1,28 @@
-# Panacea Universal Medical Device Translation & Synchronized Healthcare OS
+# Panacea Universal Medical Device Translation & Synchronized Healthcare OS — Past, Present and Future
 ## Architecture, data engineering and future-device conformance contract — 2026-10-13
 
 **Status: future-extensible architecture, with a small non-patient-facing event explanation projection in `src/lib/medicalDeviceOsTranslation.ts`. This document does not certify vendor support, device connectivity, medical diagnoses, real-time control, patient integration, clinical efficacy or regulatory clearance.**
 
 Related authorities: `PANACEA_GENESIS_DIRECTIVE.md`, `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md`, and `PANACEA_CONSTITUTION.md`.
 
+## 0. Mandatory temporal scope: ALL generations of medical devices
+
+The owner's explicit scope is **past, present, and future medical devices**, including their data and documentation. Support is bounded by accessible, authorized evidence — not retroactive universal connectivity.
+
+| Device generation | Example evidence | Translation route | Truth & time boundary |
+| --- | --- | --- | --- |
+| **Past / legacy analog** | Paper ECG, handwritten/manual BP or temperature logs, film X-ray, charted ventilator printout | Scanned source image or clinician-attested transcription; typed human review before use | Historical observation/document, NOT automatically a directly measured live device event |
+| **Past / legacy digital** | Serial/RS-232 monitor, proprietary historic file, early DICOM, HL7 v2 archive, offline removable media | Authorized file/serial parser or approved export and data migration | Preserve original device/method/version, archived clinical context, dates, conversion uncertainty |
+| **Present digital** | ICU monitor, imaging, laboratory, remote vital sensors, clinical wearable | Existing Visit OS scalar path, non-scalar envelope, DICOM/HL7/FHIR and approved adapters | Live or imported signal with device identity, timestamps, quality and consent |
+| **Future/emerging** | New optical/implantable/synthetic-biology diagnostics and new sensor modalities | Versioned capability handshake, documented plugin/adapter + independent conformance | Research/sandbox by default until individual device and intended use are validated |
+
+**Historical evidence must never be quietly upgraded** into current telemetry, clinician-accepted measurement or a signed finding. If an original has only a year or a date, preserve that limited time precision. If calibration, units, provenance, subject identity or original document cannot be validated, quarantine or present it explicitly as unverified historical reference. Do not silently recompute old reference ranges against current methods. Preserve corrections with lineage and never invent missing signal samples from a scan.
+
+Historical backfill and future research data use different trust gates from present-day live telemetry. All three still contribute, where authorized and correctly understood, to **one longitudinal clinical narrative** rather than three incompatible patient charts.
+
 ## 1. Universal does not mean auto-connect
 
-Panacea must be **prepared to onboard future devices with compatible, authorized data interfaces**, from wearables to ventilators, ECG, ICU monitors, laboratory equipment, imaging systems, implants, neuromodulation research hardware and future biomedical sensors.
+Panacea must be **prepared to represent historical device evidence, onboard current compatible and authorized medical devices, and adapt to future device data contracts**, from analog ECG and archival imaging to wearables, ventilators, ICU monitors, implants, laboratory equipment, neuromodulation research hardware and novel biomedical sensors.
 
 **Device discoverability, protocol support, payload translation, verified integration and clinical approval are different gates.** Unknown proprietary protocols cannot be decoded by wishful AI generation. A future device may require a licensed SDK, manufacturer agreement, approval, different jurisdiction adapter or separate regulated software.
 
@@ -16,12 +31,12 @@ No arbitrary model may write a device driver, infer a proprietary protocol from 
 ## 2. Convergent architecture — one clinical reality
 
 ```
-DEVICE / LAB / IMAGING / WEARABLE / RESEARCH HARDWARE
-  -> transport or standard-specific authorized SOURCE ADAPTER
+LEGACY ARCHIVE / ANALOG TRANSCRIPTION / CURRENT DEVICE / LAB / IMAGING / FUTURE RESEARCH SENSOR
+  -> authorized historical digitization / protocol- and standard-specific SOURCE ADAPTER
   -> capability handshake (profile/model/firmware/protocol/supported data, read-only)
   -> authentication + purpose-bound consent + owner/subject/encounter binding
-  -> raw ingress quarantine (untrusted until accepted)
-  -> integrity/QC: schema, replay/idempotency, time, clock drift, units, semantics, signal quality
+  -> raw ingress quarantine (untrusted until accepted; keep historical raw scans/files)
+  -> integrity/QC: schema, replay/idempotency, historical date precision vs transport clock, units, semantics, quality
   -> transport-normalized scalar / non-scalar canonical DEVICE EVENT
   -> typed data routing:
        - Visit OS scalar adapter (clinically measured as verified)
@@ -75,7 +90,7 @@ A universal metadata contract **must not become one universal numeric container*
 
 Every accepted, authorized event may produce an **OS explanation projection**, not a new fact:
 
-- **What was observed:** exact device-reported modality, event type/time, signal/report pointer, units if known, quality and provenance.
+- **What was observed:** source-reported modality and event/source date (precision explicit for archives), event type/time, signal/report pointer, units if known, quality and provenance. When a legacy source was transcribed, say “historical record states”, not “device streamed”.
 - **What it means technically:** constrained explanation of the source's declared semantics; avoid extrapolating to patient diagnosis.
 - **What remains unknown:** calibration limits, sample quality, reference context, device support maturity, missing follow-up/clinician review.
 - **Next responsible action:** view source, verify patient/encounter, clinician review, or research-only exploration, never automatic treatment.
@@ -88,8 +103,8 @@ The minimal pure prototype `medicalDeviceOsTranslation.ts` validates existing no
 
 ## 6. Synchronization semantics
 
-- One global patient reference and correct encounter association, plus per-device and per-protocol source identifiers.
-- Prefer append-only, time-stamped events and deterministic read models with explicit source-vs-server time.
+- One global patient reference and correct encounter association when resolvable, plus per-device, archive/document and per-protocol source identifiers; unresolved historical subject identity blocks clinical association.
+- Prefer append-only, time-stamped events and deterministic read models with explicit event time (including date precision), archival import time, clinical review time, source-vs-server clock and analysis/reinterpretation version.
 - Maintain separate states for real-time observability, signed clinical truth, derived models and counterfactual research.
 - Use an explicit watermark or equivalent per-source policy for late data; surface gaps rather than interpolating undisclosed values.
 - Version every analyzer, correction and explanation. Corrections supersede with provenance; do not erase signed clinical records or reinterpret the past without lineage.
@@ -116,7 +131,7 @@ Research-only device integrations are visibly separate from licensed clinical wo
 
 **First** finish the clinical workflow proof and higher-priority safety/security/data/CI/release blockers.
 
-**Smallest present slice:** read-only event-to-explanation projection from the existing envelope, fail closed on invalid data/scope, and tests. No second patient database, no vendor connector, no UI expansion, no device actuation.
+**Smallest present slice:** a pure, read-only translation-and-explanation projection for existing non-scalar device events **and separately typed historical archive references**; fail closed on missing scope, wrong patient, unsafe time/identity or incomplete provenance. No second patient database, no vendor connector, no OCR inference, no UI expansion, no device actuation.
 
 **Subsequent independent PRs (only after proof):** source conformance manifest -> real adapter for one device model -> trusted server-side subject/consent binding -> event-synchronized provenance ledger -> clinician reviewed publication -> explanatory Cognitive Translation projection in existing Clinical/Body surfaces -> measured end-to-end clinical value.
 
@@ -130,4 +145,4 @@ Research-only device integrations are visibly separate from licensed clinical wo
 - FDA, *Design Considerations and Pre-market Submission Recommendations for Interoperable Medical Devices* (2017): https://www.fda.gov/regulatory-information/search-fda-guidance-documents/design-considerations-and-pre-market-submission-recommendations-interoperable-medical-devices
 - FDA, *Cybersecurity in Medical Devices: Quality Management System Considerations and Content of Premarket Submissions* (2026): https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cybersecurity-medical-devices-quality-management-system-considerations-and-content-premarket
 
-**Definition of success:** A previously unseen **compatible and authorized** medical device can be onboarded through a versioned, tested adapter; its observations are correctly associated with one patient, synchronized across care settings, explained transparently without invention, reviewed by qualified humans and reproducible from provenance. This is a future acceptance target, **not an implemented feature claim**.
+**Definition of success:** Authorized **historical artifacts, current device observations and emerging compatible sensors** can be appropriately represented by versioned, tested translators/adapters, correctly associated with one patient only when verified, chronologically synchronized without fabricated timestamps, and explained transparently with source, uncertainty and qualified review. Emerging hardware requires a new validated adapter; retrospective records remain visibly retrospective. This is an evolving acceptance target, **not a claim of universal support or a clinically deployed integration**.
