@@ -124,6 +124,39 @@ test('invalid historic date, checksum, extra measured values and unknown extract
   }
 })
 
+test('historical digital device event remains retrospective rather than live measured state', () => {
+  const result = translateMedicalDeviceForOs({
+    mode: 'device-event', generation: 'historical', event: {
+      ...event,
+      provenance: {
+        ...event.provenance,
+        capturedAt: '2001-02-14T08:00:00.000Z',
+        receivedAt: '2026-10-13T08:00:02.000Z',
+      },
+    },
+  }, scope)
+  assert.equal(result.accepted, true)
+  assert.equal(result.disposition, 'archival-reference')
+  assert.equal(result.explanation?.truthLane, 'archival-reference')
+  assert.equal(result.explanation?.nextAction, 'verify-original-and-clinician-review')
+  assert.equal(result.explanation?.clinicalPublicationEligible, false)
+})
+
+test('retrospective archive cannot be captured after its import date', () => {
+  for (const recordedWhen of [
+    { precision: 'date', value: '2027-01-01' },
+    { precision: 'instant', value: '2027-01-01T01:00:00.000Z' },
+  ]) {
+    const result = translateMedicalDeviceForOs({
+      mode: 'historical-archive', generation: 'historical',
+      artifact: { ...archive, recordedWhen },
+    }, scope)
+    assert.equal(result.accepted, false)
+    assert.equal(result.explanation, null)
+    assert.ok(result.errors.some((error) => error.includes('later than archival import')))
+  }
+})
+
 test('emerging device events are research-only and never deemed clinically publishable', () => {
   const result = translateMedicalDeviceForOs({
     mode: 'device-event', generation: 'emerging', event,
