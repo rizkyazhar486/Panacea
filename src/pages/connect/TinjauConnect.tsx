@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Button, inputClass } from '../components/ui'
-import { KolomAngka } from '../components/KolomAngka'
-import { IconShield } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import { useStore } from '../lib/store'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Button, inputClass } from '../../components/ui'
+import { KolomAngka } from '../../components/KolomAngka'
+import { IconShield } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import { useStore } from '../../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tinjauan pemilik — verifikasi akun dan putusan atas laporan.

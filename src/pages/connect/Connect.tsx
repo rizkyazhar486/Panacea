@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
-import { IconUsers, IconShield } from '../components/icons'
-import { useStore } from '../lib/store'
+import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../../components/ui'
+import { IconUsers, IconShield } from '../../components/icons'
+import { useStore } from '../../lib/store'
 import {
   ACTIVITY_OPTIONS, ACTIVITY_LABEL, LOOKING_FOR_LABEL, CHILDREN_LABEL, MATCH_LABEL,
   SAFETY_RULES, buildDeck, compatibility,
   type MatchProfile, type Preferences, type Sex,
-} from '../lib/matching'
+} from '../../lib/matching'
 
 // Connect — Bumble-style: women hold the initiative, men set preferences.
 // Swipe left rejects, swipe right accepts.

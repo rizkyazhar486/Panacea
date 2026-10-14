@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle, Button } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { Card, SectionTitle, Button } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Deck Connect — kartu calon kenalan.

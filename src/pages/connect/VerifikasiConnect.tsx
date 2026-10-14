@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
-import { KolomAngka } from '../components/KolomAngka'
-import { IconShield } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Button, Field, inputClass } from '../../components/ui'
+import { KolomAngka } from '../../components/KolomAngka'
+import { IconShield } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Verifikasi akun Connect.
