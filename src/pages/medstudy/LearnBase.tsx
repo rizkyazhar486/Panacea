@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconChartUp } from '../components/icons'
-import { TOPICS, TIER_LABEL, type Topic, type Tier } from '../lib/learn'
-import { Ringkas, Poin } from '../components/Ringkas'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconChartUp } from '../../components/icons'
+import { TOPICS, TIER_LABEL, type Topic, type Tier } from '../../lib/learn'
+import { Ringkas, Poin } from '../../components/Ringkas'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const PILLARS = [
   { id: 'money', emoji: '💰', title: 'Money', line: 'Income, ownership, resilience and enough.', to: '/keuangan', tone: 'bg-lime-100 text-lime-900 dark:bg-lime-400/15 dark:text-lime-100' },

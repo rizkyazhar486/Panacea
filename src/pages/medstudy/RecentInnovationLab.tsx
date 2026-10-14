@@ -1,4 +1,4 @@
-import { PanaceaFrontierSeven } from '../components/PanaceaFrontierSeven'
+import { PanaceaFrontierSeven } from '../../components/PanaceaFrontierSeven'
 import { RecentInnovationLab as RecentInnovationLabBase } from './RecentInnovationLabBase'
 
 export function RecentInnovationLab() {

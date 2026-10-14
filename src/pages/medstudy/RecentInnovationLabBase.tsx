@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
+import { Card, SectionTitle } from '../../components/ui'
 import {
   RECENT_HEALTH_INNOVATIONS,
   innovationReadinessPercent,
   type InnovationDomain,
   type InnovationStatus,
-} from '../lib/recentHealthInnovations'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/recentHealthInnovations'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const DOMAIN_LABELS: Record<InnovationDomain, string> = {
   'personal-experiments': 'Personal experiments',

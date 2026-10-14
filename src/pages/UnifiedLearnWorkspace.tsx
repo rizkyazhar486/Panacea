@@ -6,7 +6,7 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
-const RecentInnovationLab = lazy(() => import('./RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
+const RecentInnovationLab = lazy(() => import('./medstudy/RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
 const AtomicSystemsLab = lazy(() => import('./bodyhub/AtomicSystemsLab').then((m) => ({ default: m.AtomicSystemsLab })))
 const Radiology = lazy(() => import('./Radiology').then((m) => ({ default: m.Radiology })))
 const Electrophysiology = lazy(() => import('./Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
