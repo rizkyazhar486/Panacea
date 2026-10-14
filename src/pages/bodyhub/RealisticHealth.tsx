@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconHeart } from '../components/icons'
-import { useVitals } from '../lib/useVitals'
-import { vitalsAge } from '../lib/healthVitals'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconHeart } from '../../components/icons'
+import { useVitals } from '../../lib/useVitals'
+import { vitalsAge } from '../../lib/healthVitals'
 import {
   DOMAIN_LABEL, pickDoses, triageBadReading,
   type Domain, type Slot,
-} from '../lib/minimumDose'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/minimumDose'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // "Sehat Tapi Sibuk" — built as a deliberate answer to the complaint that

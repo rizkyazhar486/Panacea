@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/ui/Prosa'
-import { parseFetalMriContext, type FetalMriContext as Context, type FetalParcelDataset } from '../domains/body-exposure'
+import { Prosa } from '../../components/ui/Prosa'
+import { parseFetalMriContext, type FetalMriContext as Context, type FetalParcelDataset } from '../../domains/body-exposure'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-parcels/mri/`
 

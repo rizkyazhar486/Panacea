@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconStethoscope } from '../components/icons'
-import { CfpbComplaintRoutingLab } from '../components/finance/CfpbComplaintRoutingLab'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { getDemoTersimpan } from '../lib/profile'
-import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../domains/data-lab'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconStethoscope } from '../../components/icons'
+import { CfpbComplaintRoutingLab } from '../../components/finance/CfpbComplaintRoutingLab'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { getDemoTersimpan } from '../../lib/profile'
+import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../../domains/data-lab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data Lab Advanced — local data-processing tools and transparent research workspaces in one

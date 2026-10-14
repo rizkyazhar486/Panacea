@@ -5,12 +5,12 @@ import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
 const BodyExplorer = lazy(() => import('./bodyhub/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
-const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
+const FrontierHealthOS = lazy(() => import('./medstudy/FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
 const RecentInnovationLab = lazy(() => import('./medstudy/RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
 const AtomicSystemsLab = lazy(() => import('./bodyhub/AtomicSystemsLab').then((m) => ({ default: m.AtomicSystemsLab })))
 const Radiology = lazy(() => import('./Radiology').then((m) => ({ default: m.Radiology })))
 const Electrophysiology = lazy(() => import('./Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
-const GenomeLab = lazy(() => import('./GenomeLab').then((m) => ({ default: m.GenomeLab })))
+const GenomeLab = lazy(() => import('./medstudy/GenomeLab').then((m) => ({ default: m.GenomeLab })))
 const KnowledgeBridge = lazy(() => import('./KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
 const OsceUkmppd = lazy(() => import('./OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))

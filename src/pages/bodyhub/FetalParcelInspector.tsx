@@ -4,10 +4,10 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { penjagaMuatan } from '../lib/gltfSesudahLepas'
-import { Prosa } from '../components/ui/Prosa'
+import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
+import { Prosa } from '../../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
-import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../domains/body-exposure'
+import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure'
 import './fetalParcelInspector.css'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-parcels/`

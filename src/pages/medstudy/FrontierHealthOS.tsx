@@ -1,9 +1,9 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { DiscoveryWorkbench } from '../components/frontier/DiscoveryWorkbench'
-import { PanaceaCausalTimeMachine } from '../components/frontier/PanaceaCausalTimeMachine'
-import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
-import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
-import { PanaceaRealityEngine } from '../components/frontier/PanaceaRealityEngine'
+import { DiscoveryWorkbench } from '../../components/frontier/DiscoveryWorkbench'
+import { PanaceaCausalTimeMachine } from '../../components/frontier/PanaceaCausalTimeMachine'
+import { PanaceaFrontierSeven } from '../../components/frontier/PanaceaFrontierSeven'
+import { PanaceaHopeStack } from '../../components/frontier/PanaceaHopeStack'
+import { PanaceaRealityEngine } from '../../components/frontier/PanaceaRealityEngine'
 const AGILongevitySystemsLab = lazy(() => import('./bodyhub/AGILongevitySystemsLab'))
 import {
   FRONTIER_CATEGORIES,
@@ -12,8 +12,8 @@ import {
   readinessPercent,
   type FrontierCategory,
   type FrontierFeature,
-} from '../lib/frontierHealthOS'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/frontierHealthOS'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const STATUS_LABEL: Record<FrontierFeature['status'], string> = {
   'integration-ready': 'Integration ready',

@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, ReferenceLine } from 'recharts'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
-import { getDemoTersimpan } from '../lib/profile'
-import { parseNumberField, validateFraminghamInput } from '../domains/clinical-calculators'
-import type { FraminghamField } from '../domains/clinical-calculators'
-import { framinghamCVD, cvdBand } from '../lib/riskModels'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { getDemoTersimpan } from '../../lib/profile'
+import { parseNumberField, validateFraminghamInput } from '../../domains/clinical-calculators'
+import type { FraminghamField } from '../../domains/clinical-calculators'
+import { framinghamCVD, cvdBand } from '../../lib/riskModels'
+import { CopyNote } from '../../components/CopyNote'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Simulator Bagaimana-Jika — the honest, transparent foundation of a "digital

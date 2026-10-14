@@ -1,27 +1,27 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { Prosa } from '../components/Prosa'
-import { IconActivity } from '../components/icons'
-import { CentralDogmaEvolutionSimulator } from '../components/CentralDogmaEvolutionSimulator'
+import { Card, SectionTitle } from '../../components/ui'
+import { Prosa } from '../../components/Prosa'
+import { IconActivity } from '../../components/icons'
+import { CentralDogmaEvolutionSimulator } from '../../components/CentralDogmaEvolutionSimulator'
 import {
   TETAPAN, TELOMERASE, GARPU_PER_ORIGIN,
   mulaiReplikasi, langkahReplikasi, lamaFaseSDetik, anggaranGalat,
   mulaiTelomer, langkahPembelahan, sisaPembelahan, batasHayflick,
   type JenisSel, type KeadaanReplikasi,
-} from '../lib/replikasiDna'
-import { bersihkanUrutan, komplemenBalik, persenGC, terjemahkan } from '../lib/genomics'
-import { rancangPanduan } from '../lib/crispr'
+} from '../../lib/replikasiDna'
+import { bersihkanUrutan, komplemenBalik, persenGC, terjemahkan } from '../../lib/genomics'
+import { rancangPanduan } from '../../lib/crispr'
 import {
   PHAGE_RESEARCH_BOUNDARY,
   analyzePhageCampaign,
   parsePhageCount,
   simulateVirtualPhage,
-} from '../lib/biology/phageResearchSandbox'
+} from '../../lib/biology/phageResearchSandbox'
 import {
   hill, konsentrasiUntukEfek, bebanSetimbang, bebanAnalitik,
   SENYAWA_GERO, cakupanKuantitatif, type SenyawaGero,
-} from '../lib/farmakodinamik'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/farmakodinamik'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Halaman ini menjelaskan MEKANISME, bukan keadaan seseorang. Tidak ada satu
 // pun simulasi di sini adalah pengukuran pasien atau ramalan umur. Hitungan

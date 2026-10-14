@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconStethoscope } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconStethoscope } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Local SNP Longevity Profiler — parses a raw consumer-genotyping export

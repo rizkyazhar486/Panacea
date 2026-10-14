@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconActivity } from '../components/icons'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconActivity } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Vocal Biomarker Analyzer — records a sustained vowel sound and computes

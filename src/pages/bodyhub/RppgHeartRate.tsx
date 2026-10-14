@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconActivity } from '../components/icons'
-import { savePhonePulse } from '../lib/phoneHealthScan'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconActivity } from '../../components/icons'
+import { savePhonePulse } from '../../lib/phoneHealthScan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // rPPG (remote photoplethysmography) heart rate — a real, well-published
