@@ -68,6 +68,9 @@ assert.ok(diagnosisEvent?.tags?.includes('field-review:primary-diagnosis:clinici
 assert.ok(planEvent?.tags?.includes('field-origin:verified-plan:clinician-entered'))
 assert.ok(planEvent?.tags?.includes('field-review:verified-plan:clinician-verified'))
 
+const userOrigin = emrRecordToLongitudinalEvents({ ...signed, asalIsian: { 'anamnesis.keluhanUtama': { asal: 'Pengguna', olehId: 'account-patient-1' } } }, 'account-patient-1', consent, '2026-09-25T04:06:00.000Z').events.find(e => e.metric === 'emr.signed-note')
+assert.ok(userOrigin?.tags?.includes('field-origin:chief-complaint:non-clinician-or-ai'), 'a clinician signature must not relabel user-entered wording as clinician-authored')
+
 let state = createLongitudinalPatientState('account-patient-1', '2026-09-25T04:06:00.000Z')
 for (const event of events) state = ingestLongitudinalEvent(state, event).state
 assert.equal(state.revision, 3)

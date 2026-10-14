@@ -694,7 +694,7 @@ function tanpaDeklarasi(a: EMRRecord['asalIsian'], kunci: string) {
   return sisa
 }
 
-function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' } }) {
+function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' | 'Pengguna' } }) {
   const l = labelAsalIsian(asal)
   return <span className={`ml-1.5 text-[10px] font-semibold ${asal?.asal === 'Dokter' ? 'text-brand-dark' : asal ? 'text-amber-700' : 'text-neutral-400'}`} data-asal-isian={asal?.asal ?? 'unknown'}>{l}</span>
 }
@@ -708,7 +708,7 @@ function ExamField({
 }: {
   label: string
   /** undefined = kolom kosong (tanpa lencana); null = terisi tanpa cap asal. */
-  asal?: { asal: 'AI' | 'Dokter' } | null
+  asal?: { asal: 'AI' | 'Dokter' | 'Pengguna' } | null
   value: string
   onChange: (v: string) => void
   rows: number
