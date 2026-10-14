@@ -11,7 +11,7 @@ import { isDeepStrictEqual } from 'node:util'
 // 2. Identitas penanda tangan & waktunya dicap SERVER (nama & id pengguna yang
 //    login, jam server), bukan nama yang dikirim klien.
 // 3. Rekam yang sudah ditandatangani tidak pernah hilang: setiap simpanan yang
-//    mengubahnya mengarsipkan versi bertanda tangan itu ke riwayat (append-only).
+//    mengubahnya mengarsipkan versi sebelumnya ke riwayat (append-only), termasuk draf.
 export interface Penulis { id: string; nama: string; klinisi: boolean }
 
 // Full-object writes may echo an existing examination, but cannot change its
@@ -110,7 +110,7 @@ function terapkanAsalPerButir(lama: any | undefined, r: any, penulis: Penulis, k
 }
 
 // Asal per KOLOM isian (anamnesis & pemeriksaan fisik). Kolom yang berubah dicap
-// dari penulis terautentikasi: non-klinisi -> 'AI' (intake AI / isian pasien);
+// dari penulis terautentikasi: non-klinisi -> 'Pengguna'; AI hanya bila dideklarasikan sebagai AI;
 // klinisi -> 'Dokter' + olehId, kecuali klien menyatakan 'AI' (mis. Chatbot di sesi
 // dokter) — menurunkan asal tidak pernah eskalasi. Kolom tak berubah mempertahankan
 // capnya; cap dari klien selain deklarasi 'AI' diabaikan.
@@ -124,13 +124,13 @@ const kosong = (v: unknown) => v === undefined || v === null || v === '' || (typ
 function terapkanAsalIsian(lama: any | undefined, r: any, penulis: Penulis, kini: Date) {
   const asalLama = (lama?.asalIsian ?? {}) as Record<string, any>
   const deklarasi = (r?.asalIsian ?? {}) as Record<string, any>
-  const keluar: Record<string, { asal: 'AI' | 'Dokter'; olehId?: string; pada: string }> = {}
+  const keluar: Record<string, { asal: 'AI' | 'Dokter' | 'Pengguna'; olehId?: string; pada: string }> = {}
   for (const k of KOLOM_ASAL) {
     const baru = ambil(r, k)
     if (kosong(baru)) continue
     if (lama && sama(ambil(lama, k), baru)) { if (asalLama[k]) keluar[k] = asalLama[k]; continue }
-    const asal = !penulis.klinisi || deklarasi[k]?.asal === 'AI' ? 'AI' : 'Dokter'
-    keluar[k] = asal === 'Dokter' ? { asal, olehId: penulis.id, pada: kini.toISOString() } : { asal, pada: kini.toISOString() }
+    const asal = deklarasi[k]?.asal === 'AI' ? 'AI' : penulis.klinisi ? 'Dokter' : 'Pengguna'
+    keluar[k] = { asal, olehId: penulis.id, pada: kini.toISOString() }
   }
   r.asalIsian = keluar
 }
@@ -231,8 +231,8 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
   }
   terapkanAsalPerButir(lama, r, penulis, kini)
   terapkanAsalIsian(lama, r, penulis, kini)
-  const berubah = lama && !sama(lama, r)
-  return { rekam: r, ...(lama?.signedAt && berubah ? { arsip: { ...lama, diarsipkanPada: kini.toISOString(), diarsipkanOleh: penulis.id } } : {}) }
+  const berubah = lama && !isDeepStrictEqual(lama, r)
+  return { rekam: r, ...(lama && berubah ? { arsip: { ...lama, diarsipkanPada: kini.toISOString(), diarsipkanOleh: penulis.id } } : {}) }
 }
 
 // Kunjungan (encounter). Satu pasien memiliki SATU draf aktif dan daftar

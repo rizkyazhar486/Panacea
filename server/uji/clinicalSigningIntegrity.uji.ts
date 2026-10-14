@@ -46,7 +46,7 @@ try {
   assert.equal(p.signedAt, undefined); assert.equal(p.signedById, undefined); assert.equal(p.signedBy, undefined)
   assert.equal(p.physicalExam.doctorVerified, false); assert.equal(p.physicalExam.verifiedBy, undefined); assert.equal(p.physicalExam.verifiedById, undefined)
   assert.equal(p.primaryDiagnosis.source, 'AI', 'a patient cannot label a diagnosis as clinician-authored')
-  for (const key of ['anamnesis.keluhanUtama']) assert.equal(p.asalIsian[key].asal, 'AI', `${key} from a non-clinician is labelled as not clinician-authored`)
+  for (const key of ['anamnesis.keluhanUtama']) assert.equal(p.asalIsian[key].asal, 'Pengguna', `${key} from a non-clinician is labelled as not clinician-authored`)
 
   // 3. Only a verified clinician signs: the signer is the authenticated identity, the exam verification is theirs, the time is the server's.
   const d = byDoctor.body.record
@@ -56,7 +56,7 @@ try {
   // 4. A clinician who signs content still labelled AI keeps that label per answer: signing does not relabel AI text as clinician-authored.
   const aiText = await save(doctor.token, { ...d, anamnesis: { keluhanUtama: 'Synthetic AI-generated text' }, asalIsian: { 'anamnesis.keluhanUtama': { asal: 'AI' } }, signedAt: 'sign-intent' })
   assert.equal(aiText.body.record.signedById, doctor.user.id)
-  assert.equal(aiText.body.record.asalIsian['anamnesis.keluhanUtama'].asal, 'AI'); assert.equal(aiText.body.record.asalIsian['anamnesis.keluhanUtama'].olehId, undefined)
+  assert.equal(aiText.body.record.asalIsian['anamnesis.keluhanUtama'].asal, 'AI'); assert.equal(aiText.body.record.asalIsian['anamnesis.keluhanUtama'].olehId, doctor.user.id)
 
   // 5. Editing a signed record as a patient removes the signature and exam verification (the signed version is archived).
   const edited = await save(alice.token, { ...aiText.body.record, anamnesis: { keluhanUtama: 'Synthetic patient history rewrite' } })

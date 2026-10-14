@@ -893,7 +893,7 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   saveRecord(patientId, hasil.rekam, hasil.arsip)
   // A6: klaim tanda tangan dari non-klinisi dibuang oleh server dan dicatat sendiri, bukan hanya sebagai simpanan biasa.
   if (tandaTanganDitolakAktor) addAudit(actor, 'emr.signature_refused', patientId)
-  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
+  if (hasil.arsip) addAudit(actor, hasil.arsip.signedAt ? 'emr.signed_version_archived' : 'emr.draft_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
