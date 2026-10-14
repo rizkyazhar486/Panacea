@@ -39,6 +39,14 @@ try {
   const created = await plan(doctorA.token, { diagnosisRefs: [diagnosis], questions })
   assert.equal(created.status, 200)
   const planId: string = created.body.id
+  assert.equal((await call('GET', '/api/keadaan-longitudinal')).status, 401)
+  const aliceState = (await call('GET', '/api/keadaan-longitudinal', alice.token)).body
+  assert.equal(aliceState.subjectId, alice.user.id)
+  assert.equal(aliceState.care.plans[0].plan.id, planId, 'populated own longitudinal state contains the care plan')
+  const bobState = (await call('GET', `/api/keadaan-longitudinal?subjectId=${alice.user.id}&email=${alice.user.email}`, bob.token)).body
+  assert.equal(bobState.subjectId, bob.user.id, 'client query cannot select another longitudinal subject')
+  assert.deepEqual(bobState.care.plans, [], 'foreign populated care plans are not projected into another patient state')
+
   assert.equal(created.body.subjectId, alice.user.id, 'plan subject is the account id from the server, not the client')
   const activeAfter = async () => (await call('GET', '/api/care/plans', alice.token)).body.plans
   const snapshot = await activeAfter()
