@@ -239,7 +239,7 @@ export function EMR() {
   }
 
   function sign() {
-    if (!draft || historicalReadOnly) return
+    if (!draft || historicalReadOnly || !canEditExam) return
     const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
@@ -625,7 +625,7 @@ export function EMR() {
               By signing, the doctor attests review of this record; human review alone does not establish clinical validation of Panacea's underlying capability.
             </p>
           </div>
-          <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
+          <Button onClick={sign} disabled={!canEditExam || (Boolean(draft.signedBy) && !dirty)}>
             <IconCheck size={16} />
             {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>

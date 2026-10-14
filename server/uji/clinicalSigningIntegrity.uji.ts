@@ -32,7 +32,9 @@ try {
 
   // 1. A client-asserted review claim never persists, whoever sends it (patient or verified clinician, draft or signed).
   assert.equal((await save(alice.token, record({ ...forged }))).status, 403, 'patient examination creation rejected')
-  const byPatient = await save(alice.token, record({ ...forged, physicalExam: {} }))
+  const refusedSignature = await save(alice.token, record({ ...forged, physicalExam: {} }))
+  assert.equal(refusedSignature.status, 403, 'unsigned patient signing attempt must be rejected, not silently saved')
+  const byPatient = await save(alice.token, record({ clinically_reviewed: true, physicalExam: {}, primaryDiagnosis: forged.primaryDiagnosis }))
   assert.equal(byPatient.status, 200)
   assert.notEqual(byPatient.body.record.clinically_reviewed, true, 'a patient cannot persist a clinical-review claim')
   const byDoctor = await save(doctor.token, { ...byPatient.body.record, clinically_reviewed: true, signedAt: 'sign-intent', signedById: 'forged-id', signedBy: 'Forged Doctor', physicalExam: { general: 'Synthetic exam text', doctorVerified: true } })
@@ -50,6 +52,9 @@ try {
 
   // 3. Only a verified clinician signs: the signer is the authenticated identity, the exam verification is theirs, the time is the server's.
   const d = byDoctor.body.record
+  assert.equal((await save(owner.token, { ...d, signedAt: 'owner-sign-intent' })).status, 403, 'administrative ownership cannot approve a clinical signature')
+  assert.equal((await call('POST', '/api/clinical/encounter/close', owner.token, { patientId })).status, 403, 'administrative ownership cannot close a clinical encounter')
+  assert.deepEqual((await call('GET', `/api/clinical/records/${patientId}`, doctor.token)).body.records, stored, 'owner refusal leaves the signed clinician record unchanged')
   assert.equal(d.signedById, doctor.user.id); assert.notEqual(d.signedBy, 'Forged Doctor'); assert.ok(Number.isFinite(Date.parse(d.signedAt)))
   assert.equal(d.physicalExam.doctorVerified, true); assert.equal(d.physicalExam.verifiedById, doctor.user.id)
 
@@ -71,17 +76,16 @@ try {
   const withPlan = await save(alice.token, { ...edited.body.record, plan: [{ id: 'p1', text: 'Synthetic patient-entered plan item' }] })
   assert.equal(withPlan.status, 200); assert.equal(withPlan.body.record.plan.length, 1, 'KNOWN LIMIT A6: a patient can store a plan item on her own unsigned record')
   assert.equal(withPlan.body.record.signedAt, undefined, 'it is never signed, so it is not an active signed plan')
-  // A6 says an unsigned signing attempt is rejected AND logged. The server strips the claim (checked above) and now records the refusal on its own
-  // audit action. It is still saved with 200 and stripped, not answered with an error: that part of A6 stays a KNOWN LIMIT.
+  // A6 EMR signature attempts are rejected and audited; this does not close the separate daily-plan activation/linkage requirement.
   const auditEntries = ((await call('GET', '/api/audit', owner.token)).body as any)
   const entries = (auditEntries.entries ?? auditEntries.audit ?? auditEntries) as any[]
   const refused = entries.filter(a => a.action === 'emr.signature_refused')
-  assert.equal(refused.length, 1, 'exactly one refusal: the forged patient save. The clinician save, the identical carry-over and the plain patient edits are not refusals')
-  assert.equal(refused[0].userId, alice.user.id); assert.equal(refused[0].target, patientId)
+  assert.equal(refused.length, 2, 'only the patient and administrative-owner sign attempts are refusals; unchanged carry-over and ordinary edits are not')
+  assert.deepEqual(refused.map(a => a.userId).sort(), [alice.user.id, owner.user.id].sort()); assert.ok(refused.every(a => a.target === patientId))
   assert.ok(entries.some(a => a.action === 'emr.save') && entries.some(a => a.action === 'emr.signed_version_archived'))
-  assert.equal(byPatient.status, 200, 'KNOWN LIMIT A6: the refused attempt is stripped and the save returns 200, not an error')
+  assert.equal(refusedSignature.status, 403, 'refused signing returns an error and does not save')
 
-  console.log('clinicalSigningIntegrity: no client-asserted review claim persists; only a verified clinician produces signed state; AI labels survive signing; patient edits drop signatures; refused signing attempts are audited; A4 examination writes rejected; KNOWN LIMIT A6 (stripped with 200, not an error) recorded; passed')
+  console.log('clinicalSigningIntegrity: no client-asserted review claim persists; only a verified clinician produces signed state; AI labels survive signing; patient edits drop signatures; refused signing attempts are audited; A4 examination writes rejected; A6 EMR signing attempts rejected and audited; daily-plan activation remains separate; passed')
 } finally {
   await running.stop()
 }

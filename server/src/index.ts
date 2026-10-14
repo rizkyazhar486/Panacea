@@ -882,17 +882,19 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const actor = (req as express.Request & { user: User }).user
   // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
-  const penulis = { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }
+  const penulis = { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }
   const rekamLama = getRecord(patientId, record.id)
   if (actor.role !== 'dokter' && !pemeriksaanTetapSama(rekamLama?.physicalExam, record.physicalExam)) {
     addAudit(actor, 'emr.examination_write_refused', patientId)
     return res.status(403).json({ error: 'clinician_required_for_examination' })
   }
   const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
+  if (tandaTanganDitolakAktor) {
+    addAudit(actor, 'emr.signature_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_signature' })
+  }
   const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
-  // A6: klaim tanda tangan dari non-klinisi dibuang oleh server dan dicatat sendiri, bukan hanya sebagai simpanan biasa.
-  if (tandaTanganDitolakAktor) addAudit(actor, 'emr.signature_refused', patientId)
   if (hasil.arsip) addAudit(actor, hasil.arsip.signedAt ? 'emr.signed_version_archived' : 'emr.draft_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
@@ -913,7 +915,7 @@ app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
   const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
-  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }, new Date(), `emr-${randomUUID()}`)
   if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
   closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
   addAudit(actor, 'emr.encounter_closed', patientId)
