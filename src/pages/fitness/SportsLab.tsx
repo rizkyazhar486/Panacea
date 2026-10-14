@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
-import { IconActivity } from '../components/icons'
+import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
 import {
   SPORT_LABEL, SPORT_METRICS, valuePlayer, findSimilar, analyseTeam,
   type Player, type Sport,
-} from '../lib/sportsAnalytics'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { validatePlayerEntry } from '../domains/sports-roster'
+} from '../../lib/sportsAnalytics'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { validatePlayerEntry } from '../../domains/sports-roster'
 
 // Sports Lab — roster entry, multi-agent valuation, and similarity search.
 //

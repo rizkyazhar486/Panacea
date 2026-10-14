@@ -8,12 +8,12 @@ import { IconDownload, IconCheck } from './icons'
 // instantly with zero network the next time, even in airplane mode.
 const OFFLINE_PAGES: { label: string; imp: () => Promise<unknown> }[] = [
   { label: 'Athlete', imp: () => import('../pages/Athlete') },
-  { label: 'Performance Lab', imp: () => import('../pages/PerformanceLab') },
+  { label: 'Performance Lab', imp: () => import('../pages/fitness/PerformanceLab') },
   { label: 'AI Program', imp: () => import('../pages/fitness/TrainingPlan') },
   { label: 'Body Composition', imp: () => import('../pages/BodyComposition') },
   { label: 'Initial Assessment', imp: () => import('../pages/InitialAssessment') },
-  { label: 'Science & KPIs', imp: () => import('../pages/SportsScience') },
-  { label: 'Fitness Test', imp: () => import('../pages/FitnessTest') },
+  { label: 'Science & KPIs', imp: () => import('../pages/fitness/SportsScience') },
+  { label: 'Fitness Test', imp: () => import('../pages/fitness/FitnessTest') },
   { label: 'Logs & Stats', imp: () => import('../pages/Logs') },
 ]
 const KEY = 'pmd_offline_ready_v1'

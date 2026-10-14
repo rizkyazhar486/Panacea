@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
-import { IconRun } from '../components/icons'
-import { EQUIPMENT, GROUP_LABEL, equipmentByGroup, type Group } from '../lib/gymEquipment'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge, inputClass } from '../../components/ui'
+import { IconRun } from '../../components/icons'
+import { EQUIPMENT, GROUP_LABEL, equipmentByGroup, type Group } from '../../lib/gymEquipment'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Equipment education. The comparison against calisthenics is stated in both
 // directions for every item — where the machine genuinely wins, where the

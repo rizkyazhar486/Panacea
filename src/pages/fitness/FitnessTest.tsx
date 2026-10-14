@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
-import { IconActivity, IconFlame, IconRun } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import { readAsDataUrl, compressImage } from '../lib/upload'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { IconActivity, IconFlame, IconRun } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import { readAsDataUrl, compressImage } from '../../lib/upload'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ── Physical readiness / SIPSS scoring ─────────────────────────────────────
 // Approximate max-score targets (≈ "Excellent") for the Indonesian

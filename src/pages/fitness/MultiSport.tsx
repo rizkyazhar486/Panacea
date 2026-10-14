@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
-import { IconRun, IconActivity, IconHeart, IconTimer, IconChartUp } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge, Field, inputClass } from '../../components/ui'
+import { IconRun, IconActivity, IconHeart, IconTimer, IconChartUp } from '../../components/icons'
 import {
   SPORTS, POWER_ZONES, SWIM_ZONES, SPEED_WORK, BIKE_FIT, CYCLING_COUNTER, CROSS_RULES,
   ftpFrom20Min, powerRange, wattPerKg, wkgBand, criticalSwimSpeed, weeklyMultiSport,
   type Sport, type Goal,
-} from '../lib/multiSport'
-import { parsePace, fmtPace, trainingPaces, RUN_ZONES } from '../lib/baseTraining'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/multiSport'
+import { parsePace, fmtPace, trainingPaces, RUN_ZONES } from '../../lib/baseTraining'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lari, Sepeda, Renang — zona intensitas per cabang, kerja kecepatan, dan

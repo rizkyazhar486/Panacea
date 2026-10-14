@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconRun } from '../components/icons'
-import { BAGIAN, FISIOLOGI, LABEL_BUKTI, RUJUKAN_LARI } from '../lib/teknikLari'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconRun } from '../../components/icons'
+import { BAGIAN, FISIOLOGI, LABEL_BUKTI, RUJUKAN_LARI } from '../../lib/teknikLari'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Teknik Lari.

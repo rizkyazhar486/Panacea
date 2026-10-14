@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { kunciHari, hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconRun } from '../components/icons'
-import { getDemoTersimpan } from '../lib/profile'
-import { parseDailyLog, REPS_PER_DAY_MAX } from '../domains/training-goals'
-import { zone2HeartRate, validateGripKg, parseNumberField } from '../domains/clinical-calculators'
-import { ScoreTrend } from '../components/ScoreTrend'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { kunciHari, hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconRun } from '../../components/icons'
+import { getDemoTersimpan } from '../../lib/profile'
+import { parseDailyLog, REPS_PER_DAY_MAX } from '../../domains/training-goals'
+import { zone2HeartRate, validateGripKg, parseNumberField } from '../../domains/clinical-calculators'
+import { ScoreTrend } from '../../components/ScoreTrend'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement Longevity Toolkit — five small real tools bundled into one page:

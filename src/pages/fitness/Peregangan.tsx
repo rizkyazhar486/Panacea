@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconLeaf } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconLeaf } from '../../components/icons'
 import {
   GERAKAN, PROTOKOL, SALAH_KAPRAH, RUJUKAN_PEREGANGAN,
   type Kapan,
-} from '../lib/peregangan'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/peregangan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Peregangan & Postur.

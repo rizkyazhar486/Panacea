@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconRun } from '../components/icons'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconRun } from '../../components/icons'
 import {
   ambilSesi, simpanSesi, alasanSesiDitolak, hapusSesi, volumeSesi, rekorPerGerakan, volumeMingguan, epley,
   BATAS_ULANGAN, BATAS_KG,
   type SesiAngkat, type SetAngkat,
-} from '../lib/angkatBeban'
-import { parseStrengthDraft, type StrengthSetDraft } from '../domains/personal-health/engine/strengthDraft'
-import { usePersonalHealthCacheScope } from '../domains/personal-health/ui/usePersonalHealthCacheScope'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/angkatBeban'
+import { parseStrengthDraft, type StrengthSetDraft } from '../../domains/personal-health/engine/strengthDraft'
+import { usePersonalHealthCacheScope } from '../../domains/personal-health/ui/usePersonalHealthCacheScope'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Latihan beban.

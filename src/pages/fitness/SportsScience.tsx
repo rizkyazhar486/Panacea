@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconActivity, IconRun, IconHeart, IconChartUp } from '../components/icons'
-import { useStore } from '../lib/store'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconActivity, IconRun, IconHeart, IconChartUp } from '../../components/icons'
+import { useStore } from '../../lib/store'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ── Key Performance Indicators per cabang, dari sains olahraga nyata ──────────
 // Tiap KPI menjelaskan: apa yang diukur, alat/indikator (jam/device/tes), dan

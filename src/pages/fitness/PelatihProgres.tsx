@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { IconChartUp } from '../components/icons'
-import { GrafikProgres, GLIF, panahDelta } from '../components/GrafikProgres'
-import { Accordion } from '../components/Accordion'
-import { getWorkouts } from '../lib/workoutStore'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconChartUp } from '../../components/icons'
+import { GrafikProgres, GLIF, panahDelta } from '../../components/GrafikProgres'
+import { Accordion } from '../../components/Accordion'
+import { getWorkouts } from '../../lib/workoutStore'
 import {
   UKURAN, bandingkan, ringkas, kunciPekan, BATAS_PROGRES,
   type PekanProgres,
-} from '../lib/progresPekanan'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/progresPekanan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Pelacak progres pekanan.
 //

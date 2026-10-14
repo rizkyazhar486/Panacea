@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { getDemo } from '../lib/profile'
-import { useVitalField } from '../lib/useVitals'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { getDemo } from '../../lib/profile'
+import { useVitalField } from '../../lib/useVitals'
 import {
   SASARAN, FASE_REKOMP, PEKAN, PENGUKURAN, giziFase, type FaseRekomp,
-} from '../lib/rekomposisi'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/rekomposisi'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Program rekomposisi — kalistenik dan dumbel.
