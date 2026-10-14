@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { MenuPeran } from '../MenuPeran'
 import { PencarianGlobal } from '../PencarianGlobal'
 import { useGestur } from '../../lib/useGestur'
@@ -515,9 +515,12 @@ export function Shell({ children }: { children: ReactNode }) {
     )
   }
 
+  // An anonymous /logout deep link should return home. Otherwise signing in on
+  // that URL would immediately land the user on the sign-out confirmation.
+  if (!account && loc.pathname === '/logout') return <Navigate to="/" replace />
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
-  const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
+  const judul = loc.pathname === '/logout' ? 'Sign out' : judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
   const ruteAktif = [...nav, ...KATALOG].find((n) => navMatches(n, loc.pathname))
   const superPageAktif = activeSuperPageForLocation(loc.pathname, loc.search, ruteAktif?.group ?? '')
   const homeAktif = loc.pathname === '/' && superPageAktif === null
