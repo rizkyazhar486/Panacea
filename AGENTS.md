@@ -1,5 +1,9 @@
 # Panacea Multi-Agent Operating Policy
 
+## Frontier biomedical discovery directive — mandatory (owner, 2026-10-13)
+
+Every current and future agent must read and apply [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md) for long-horizon strategy, scientific research, physiology modeling, vision restoration, neurotechnology, regenerative medicine, AI discovery, and broad autonomous continuation. PanaceaMed's ambition is **verified clinical outcome delivery today plus original, independently validated biomedical science tomorrow**. Its scientific discovery mission is an evidence-gated parallel lane, **not** permission to destabilize the clinical wedge, perform unapproved experiments, claim treatment efficacy, or multiply shallow features. Follow its falsifiable-hypothesis, permissioned-data, reproducibility, external-validation, partnership and translational stage gates. Preserve all Constitution and exact-head CI/review requirements.
+
 ## Evidence-first worthiness review
 
 The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
@@ -69,7 +73,7 @@ The depth heuristic is architectural, not clinical:
 
 The existing Canonical Patient State remains authoritative for measured/recorded patient truth. Simulated, inferred and model-derived physiological states remain separate truth classes and must not silently overwrite the clinical record. The Universal Human Gold Standard remains whole-body and uniform.
 
-For product prioritization, every agent must also follow [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Panaceamed's primary product center is personalized longitudinal longevity, wellness and healthy aging: one canonical health state combining blood/laboratory trends, personal baselines, biological-age trajectory, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition, environment and real-world wellness exposures such as sauna/bath-house check-ins. Stabilization, security, privacy and clinical-safety blockers still outrank feature expansion.
+For the longevity/consumer-health domain, agents must also follow [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md): one canonical health state integrating verified blood/laboratory trends, personal baselines, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition and environment. This remains a domain directive, not a mandate to prioritize consumer-feature breadth over the active clinical wedge or the separate, evidence-gated frontier biomedical research mission. Stabilization, security, privacy and clinical-safety blockers outrank both.
 
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
 
