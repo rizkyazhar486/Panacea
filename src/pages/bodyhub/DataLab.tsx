@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconChartUp, IconActivity } from '../components/icons'
-import { FraudThresholdLab } from '../components/finance/FraudThresholdLab'
-import { analyzeCsv, type AnalysisResult, type ColumnStats } from '../lib/dataAnalyzer'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconChartUp, IconActivity } from '../../components/icons'
+import { FraudThresholdLab } from '../../components/finance/FraudThresholdLab'
+import { analyzeCsv, type AnalysisResult, type ColumnStats } from '../../lib/dataAnalyzer'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Data Lab keeps the existing health-device CSV workflow and adds a separate,
 // explicitly non-clinical finance analytics mode. Files remain browser-local.

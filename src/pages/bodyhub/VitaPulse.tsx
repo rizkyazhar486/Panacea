@@ -1,8 +1,8 @@
-import { Fold } from '../shared/ui/Fold'
-import { useStore } from '../lib/store'
-import { PusatKesehatanRealtime } from './social/Feed'
-import { VideoGallery } from '../components/VideoGallery'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Fold } from '../../shared/ui/Fold'
+import { useStore } from '../../lib/store'
+import { PusatKesehatanRealtime } from '../social/Feed'
+import { VideoGallery } from '../../components/VideoGallery'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // VitaPulse — pusat pemantauan kesehatan realtime: kalkulator (BMI, kalori,
 // cairan, tensi, VO2Max/Cooper), monitor vital, tidur, pengingat obat, berita,

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState, type SetStateAction } from 'react'
-import { useStore } from '../lib/store'
-import { readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage, SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, sanitizeMinutes } from '../domains/personal-health'
-import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope'
-import { Prosa } from '../components/Prosa'
-import { kunciHari, hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
-import { parseDailyLog, MINUTES_PER_DAY_MAX } from '../domains/training-goals'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { useStore } from '../../lib/store'
+import { readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage, SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, sanitizeMinutes } from '../../domains/personal-health'
+import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../../shared/kernel/personalHealthStorageScope'
+import { Prosa } from '../../components/Prosa'
+import { kunciHari, hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { parseDailyLog, MINUTES_PER_DAY_MAX } from '../../domains/training-goals'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body & Skin Toolkit — three small real tools in one page: a drag-order

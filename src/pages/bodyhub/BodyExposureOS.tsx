@@ -1,13 +1,13 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { BodySystemId } from '../lib/bodySystemSourceWave'
+import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './bodyhub/UnifiedHumanSimulationProjector'
-import { BodyExposurePatientOverlay } from '../components/BodyExposurePatientOverlay'
-import { SinyalPribadiDiTubuh } from '../components/SinyalPribadiDiTubuh'
+import { BodyExposurePatientOverlay } from '../../components/BodyExposurePatientOverlay'
+import { SinyalPribadiDiTubuh } from '../../components/SinyalPribadiDiTubuh'
 import { BodyExplorer } from './BodyExplorer'
-import { hitungScrollAgarTerlihat } from '../lib/railViewport'
+import { hitungScrollAgarTerlihat } from '../../lib/railViewport'
 import './bodyExposureOS.css'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { Fold } from '../shared/ui/Fold'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { Fold } from '../../shared/ui/Fold'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../components/PanelKoplingMultiSkala'))

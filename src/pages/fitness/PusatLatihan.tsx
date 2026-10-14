@@ -44,7 +44,7 @@ const SportsScience = lazy(() => import('./SportsScience').then((m) => ({ defaul
 const SportsLab = lazy(() => import('./SportsLab').then((m) => ({ default: m.SportsLab })))
 const GymEquipment = lazy(() => import('./GymEquipment').then((m) => ({ default: m.GymEquipment })))
 const MovementToolkit = lazy(() => import('./MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
-const ShapeForming = lazy(() => import('../ShapeForming').then((m) => ({ default: m.ShapeForming })))
+const ShapeForming = lazy(() => import('../bodyhub/ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m.Rekomposisi })))
 
 const TABS: TabDef[] = [

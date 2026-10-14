@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
-import { Card, SectionTitle, Button, Badge } from '../components/ui'
-import { IconSparkle, IconUpload, IconActivity, IconLeaf, IconHeart } from '../components/icons'
-import { compressImage, readAsDataUrl } from '../lib/upload'
-import { api } from '../lib/api'
-import { saveBodyCharacter } from '../lib/bodyCharacter'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Button, Badge } from '../../components/ui'
+import { IconSparkle, IconUpload, IconActivity, IconLeaf, IconHeart } from '../../components/icons'
+import { compressImage, readAsDataUrl } from '../../lib/upload'
+import { api } from '../../lib/api'
+import { saveBodyCharacter } from '../../lib/bodyCharacter'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Level-based workout plans (Beginner → Pro) for shaping the body.
 type Level = 'beginner' | 'intermediate' | 'advanced' | 'pro'

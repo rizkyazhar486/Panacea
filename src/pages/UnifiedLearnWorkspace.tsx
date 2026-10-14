@@ -4,7 +4,7 @@ import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
-const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const BodyExplorer = lazy(() => import('./bodyhub/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
 const RecentInnovationLab = lazy(() => import('./medstudy/RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
 const AtomicSystemsLab = lazy(() => import('./bodyhub/AtomicSystemsLab').then((m) => ({ default: m.AtomicSystemsLab })))

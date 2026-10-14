@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, Badge } from '../components/ui'
-import { Prosa } from '../components/Prosa'
-import { getWorkouts } from '../lib/workoutStore'
-import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
+import { Card, Badge } from '../../components/ui'
+import { Prosa } from '../../components/Prosa'
+import { getWorkouts } from '../../lib/workoutStore'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import {
   RANK_TIERS,
   calculateSeasonalRank,
@@ -10,9 +10,9 @@ import {
   type RankedHealthEvidence,
   type RankedMode,
   type RankedWorkoutEvidence,
-} from '../lib/seasonalHealthSportRank'
-import { Fold } from '../shared/ui/Fold'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/seasonalHealthSportRank'
+import { Fold } from '../../shared/ui/Fold'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const HEALTH_PROFILE_KEY = 'pmd_health_profile'
 
