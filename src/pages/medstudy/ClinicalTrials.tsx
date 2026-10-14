@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
-import { IconSearch, IconStethoscope } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { IconSearch, IconStethoscope } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Trials Finder — connects people to REAL registered studies from

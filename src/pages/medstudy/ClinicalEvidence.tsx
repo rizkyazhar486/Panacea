@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
-import { IconSearch, IconShield, IconChartUp, IconStethoscope } from '../components/icons'
-import { useStore } from '../lib/store'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { IconSearch, IconShield, IconChartUp, IconStethoscope } from '../../components/icons'
+import { useStore } from '../../lib/store'
 import {
   GagalUrai,
   askClinicalEvidence, verificationLinks, evidenceAvailable,
@@ -10,8 +10,8 @@ import {
   EVIDENCE_PRICE_PNC, EVIDENCE_FREE_ALLOWANCE, type EvidenceGate,
   fetchRelatedArticles, type PubmedArticle,
   AUDIENS, type Audiens,
-} from '../lib/evidence'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/evidence'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Evidence — ask a clinical question, get a structured, graded,

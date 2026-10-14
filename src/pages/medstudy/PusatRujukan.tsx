@@ -29,8 +29,8 @@ const NeonatalResuscitationGuide = lazy(() => import('../NeonatalResuscitationGu
 const EmpiricTherapyReference = lazy(() => import('../EmpiricTherapyReference').then((m) => ({ default: m.EmpiricTherapyReference })))
 const DrugInfo = lazy(() => import('../DrugInfo').then((m) => ({ default: m.DrugInfo })))
 const LabDecoder = lazy(() => import('../LabDecoder').then((m) => ({ default: m.LabDecoder })))
-const ClinicalEvidence = lazy(() => import('../ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
-const ClinicalTrials = lazy(() => import('../ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
+const ClinicalEvidence = lazy(() => import('./ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
+const ClinicalTrials = lazy(() => import('./ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 const PatientEducation = lazy(() => import('../PatientEducation').then((m) => ({ default: m.PatientEducation })))
 const EdukasiAwam = lazy(() => import('./EdukasiAwam').then((m) => ({ default: m.EdukasiAwam })))
 
