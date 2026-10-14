@@ -3,8 +3,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 
 // Gerbang ledger penerimaan Alpha (governance/ALPHA_ACCEPTANCE_LEDGER.json = sumber kebenaran; docs/alpha/*.md dihasilkan darinya).
 // Aturan: hanya VERIFIED yang berkredit dan wajib berbukti; status harus dari kosakata; id unik; kriteria tidak boleh berkurang dari
-// baseline (43) supaya persentase tidak naik karena penyebut diperkecil; dokumen Markdown harus sinkron dengan JSON.
-const BASELINE_TOTAL = 43
+// baseline (45) setelah penambahan F1/F2 supaya persentase tidak naik karena penyebut diperkecil; dokumen Markdown harus sinkron dengan JSON.
+const BASELINE_TOTAL = 45
 const JSON_PATH = new URL('../../governance/ALPHA_ACCEPTANCE_LEDGER.json', import.meta.url)
 const MD_PATH = new URL('../../docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md', import.meta.url)
 
