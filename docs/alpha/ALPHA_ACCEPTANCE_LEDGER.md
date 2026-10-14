@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 28 / 43 = 65.1%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 29 / 43 = 67.4%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -24,14 +24,14 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 
 | Status | Jumlah |
 |---|---|
-| VERIFIED | 28 |
+| VERIFIED | 29 |
 | REPORTED | 6 |
-| NOT_CHECKED | 8 |
+| NOT_CHECKED | 7 |
 | NOT_STARTED | 0 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
-## Panacea One OS (2 / 8)
+## Panacea One OS (3 / 8)
 
 | ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
 |---|---|---|---|---|---|
@@ -42,7 +42,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | A5 | Dokumentasi berbantuan AI berstatus draf | Keluaran AI tersimpan sebagai draf, tidak pernah sebagai catatan bertanda tangan, sampai klinisi teridentifikasi menyetujui | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
 | A6 | Persetujuan dan tanda tangan klinisi | Rencana klinis menjadi aktif hanya setelah tanda tangan klinisi; percobaan tanpa tanda tangan ditolak dan tercatat | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
 | A7 | Tindak lanjut terjadwal | Tindak lanjut dapat dibuat dari rencana bertanda tangan dan muncul pada daftar kerja pemilik yang benar | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
-| A8 | Satu perjalanan E2E lulus | Satu skenario terskrip dari identitas hingga tindak lanjut lulus di CI dengan persistensi nyata (bukan mock UI) | NOT_CHECKED | Sol (backend) / Sonnet (UI setelah kontrak) | Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit. |
+| A8 | Satu perjalanan E2E lulus | Satu skenario terskrip dari identitas hingga tindak lanjut lulus di CI dengan persistensi nyata (bukan mock UI) | VERIFIED | Sol (backend) / Sonnet (UI setelah kontrak) | server/uji/careJourneyRestart.uji.ts runs the actual application over HTTP with synthetic identities and real file persistence: authenticated clinician signs and closes an encounter; lab and referral lifecycles reach closure; patient follow-up answers persist across a killed/restarted server process; identity, signed snapshots, provenance, idempotency, cross-patient isolation and consent revocation are asserted.; Reproduced on canonical a70fb28786ab6263398a43f09581a60c31ddefd4 with: cd server && node --import tsx uji/careJourneyRestart.uji.ts (passed, 2026-10-14). Mandatory npm run uji imports this scenario through rekamEncounter.uji.ts. Exact-source CI run 38459565347, server-acceptance job 115511605728 SUCCESS, explicitly logs careJourneyRestart passed at 2026-10-13T20:05:32.9250820Z. https://github.com/rizkyazhar486/Panacea/actions/runs/38459565347; Engineering E2E evidence only: isolated real file persistence, not MongoDB or production delivery. Synthetic doctor verification is a test fixture, not clinical approval. This does not certify A3-A7 or imply a signed-plan-to-follow-up causal link. |
 
 ## Lab & Referral Closure (9 / 9)
 

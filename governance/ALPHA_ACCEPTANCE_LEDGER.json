@@ -108,10 +108,13 @@
    "pillar": "Panacea One OS",
    "criterion": "Satu perjalanan E2E lulus",
    "acceptance": "Satu skenario terskrip dari identitas hingga tindak lanjut lulus di CI dengan persistensi nyata (bukan mock UI)",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/careJourneyRestart.uji.ts runs the actual application over HTTP with synthetic identities and real file persistence: authenticated clinician signs and closes an encounter; lab and referral lifecycles reach closure; patient follow-up answers persist across a killed/restarted server process; identity, signed snapshots, provenance, idempotency, cross-patient isolation and consent revocation are asserted.",
+    "Reproduced on canonical a70fb28786ab6263398a43f09581a60c31ddefd4 with: cd server && node --import tsx uji/careJourneyRestart.uji.ts (passed, 2026-10-14). Mandatory npm run uji imports this scenario through rekamEncounter.uji.ts. Exact-source CI run 38459565347, server-acceptance job 115511605728 SUCCESS, explicitly logs careJourneyRestart passed at 2026-10-13T20:05:32.9250820Z. https://github.com/rizkyazhar486/Panacea/actions/runs/38459565347"
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "Engineering E2E evidence only: isolated real file persistence, not MongoDB or production delivery. Synthetic doctor verification is a test fixture, not clinical approval. This does not certify A3-A7 or imply a signed-plan-to-follow-up causal link."
   },
   {
    "id": "B1",
