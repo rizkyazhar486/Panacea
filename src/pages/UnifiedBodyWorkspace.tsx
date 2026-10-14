@@ -18,7 +18,7 @@ const PusatTubuh = lazy(() => import('./PusatTubuh').then((m) => ({ default: m.P
 const PusatGizi = lazy(() => import('./PusatGizi').then((m) => ({ default: m.PusatGizi })))
 const HealthProfile = lazy(() => import('./HealthProfile').then((m) => ({ default: m.HealthProfile })))
 const VitaPulse = lazy(() => import('./VitaPulse').then((m) => ({ default: m.VitaPulse })))
-const Longevity = lazy(() => import('./Longevity').then((m) => ({ default: m.Longevity })))
+const Longevity = lazy(() => import('./bodyhub/Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./DataLab').then((m) => ({ default: m.DataLab })))
 
 type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'

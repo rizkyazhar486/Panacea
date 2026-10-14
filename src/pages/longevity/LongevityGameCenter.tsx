@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { simpanKanvas, pesanSimpan } from '../lib/unduh'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { simpanKanvas, pesanSimpan } from '../../lib/unduh'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Longevity Game Center — the "fun, shareable, viral-loop" cluster: a 5x5

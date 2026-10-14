@@ -26,7 +26,7 @@ const Nutrition = lazy(() => import('../Nutrition').then((m) => ({ default: m.Nu
 const MacroLabGizi = lazy(() => import('../MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
 const NutritionChecklist = lazy(() => import('../NutritionChecklist').then((m) => ({ default: m.NutritionChecklist })))
 const NutritionToolkit = lazy(() => import('../NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
-const DietarySupplements = lazy(() => import('../DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
+const DietarySupplements = lazy(() => import('../longevity/DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
 const HydrationCalculator = lazy(() => import('../HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
 const CaffeineCalculator = lazy(() => import('../CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const AlcoholCalculator = lazy(() => import('../AlcoholCalculator').then((m) => ({ default: m.AlcoholCalculator })))
