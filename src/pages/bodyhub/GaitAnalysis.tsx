@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconRun, IconActivity, IconHeart } from '../components/icons'
-import { useVitals } from '../lib/useVitals'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconRun, IconActivity, IconHeart } from '../../components/icons'
+import { useVitals } from '../../lib/useVitals'
 import {
   buildGaitSections, highlights, coverage, fmtPaceSec, paceFromSpeed, DISCLAIMER,
   type Band, type Reading,
-} from '../lib/gaitAnalysis'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/gaitAnalysis'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement Analysis — kualitas berjalan, bentuk lari, pemulihan, dan paparan.

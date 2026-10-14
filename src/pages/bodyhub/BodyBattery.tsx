@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { Card, SectionTitle } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconActivity, IconMoon, IconHeart } from '../components/icons'
-import { api, backendEnabled, type HrSample, type SleepNight } from '../lib/api'
-import { getDemo, getDemoTersimpan } from '../lib/profile'
-import { hrMaxPerkiraan } from '../lib/workoutImport'
-import { hitungBodyBattery, hitungStres, saranBaterai, JEDA_MAKS_MS } from '../lib/bodyBattery'
+import { Card, SectionTitle } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconActivity, IconMoon, IconHeart } from '../../components/icons'
+import { api, backendEnabled, type HrSample, type SleepNight } from '../../lib/api'
+import { getDemo, getDemoTersimpan } from '../../lib/profile'
+import { hrMaxPerkiraan } from '../../lib/workoutImport'
+import { hitungBodyBattery, hitungStres, saranBaterai, JEDA_MAKS_MS } from '../../lib/bodyBattery'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Battery — cadangan energi 0–100 dan stres sepanjang hari.

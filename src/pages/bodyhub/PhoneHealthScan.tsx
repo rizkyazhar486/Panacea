@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Prosa } from '../components/Prosa'
-import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
-import { getPhoneHealthScanSnapshot, phoneReadingAge, type PhoneHealthScanSnapshot } from '../lib/phoneHealthScan'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { getVitals, vitalsAge, type Vitals } from '../../lib/healthVitals'
+import { getPhoneHealthScanSnapshot, phoneReadingAge, type PhoneHealthScanSnapshot } from '../../lib/phoneHealthScan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 type PhotoSlot = 'front' | 'profile'
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconTimer } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconTimer } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Posture & Desk-Break Reminder — a simple interval timer that nudges you to

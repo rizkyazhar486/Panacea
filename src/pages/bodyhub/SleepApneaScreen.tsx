@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
-import { IconMoon } from '../components/icons'
-import { getDemoTersimpan } from '../lib/profile'
-import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
-import { parseNumberField, stopBang } from '../domains/clinical-calculators'
-import type { StopBangBand } from '../domains/clinical-calculators'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge, Field, inputClass } from '../../components/ui'
+import { IconMoon } from '../../components/icons'
+import { getDemoTersimpan } from '../../lib/profile'
+import { BatasKlaimSkorTerbit } from '../../components/BatasKlaimSkorTerbit'
+import { parseNumberField, stopBang } from '../../domains/clinical-calculators'
+import type { StopBangBand } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STOP-BANG — published obstructive sleep apnea (OSA) risk screening tool

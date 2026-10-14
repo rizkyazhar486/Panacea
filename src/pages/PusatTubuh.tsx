@@ -23,24 +23,24 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 //   Klinis   — SpO₂, EKG, jet lag, kehamilan, kursi roda
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BodyBattery = lazy(() => import('./BodyBattery').then((m) => ({ default: m.BodyBattery })))
-const HeartRateLog = lazy(() => import('./HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
-const SleepPattern = lazy(() => import('./SleepPattern').then((m) => ({ default: m.SleepPattern })))
-const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
-const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
+const BodyBattery = lazy(() => import('./bodyhub/BodyBattery').then((m) => ({ default: m.BodyBattery })))
+const HeartRateLog = lazy(() => import('./fitness/HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
+const SleepPattern = lazy(() => import('./fitness/SleepPattern').then((m) => ({ default: m.SleepPattern })))
+const GaitAnalysis = lazy(() => import('./bodyhub/GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
+const ClinicalTrackers = lazy(() => import('./clinical/ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 // Pemulihan dan tidur yang dulu tersebar sebagai rute sendiri-sendiri. Halaman
 // ini sudah memiliki tab Tidur sejak awal, jadi di sinilah tempatnya — bukan di
 // hub baru. Isinya tidak ditulis ulang; komponennya dipasang apa adanya.
-const SleepDebt = lazy(() => import('./SleepDebt').then((m) => ({ default: m.SleepDebt })))
-const SleepApneaScreen = lazy(() => import('./SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
-const SleepToolkit = lazy(() => import('./SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
-const Chronotype = lazy(() => import('./Chronotype').then((m) => ({ default: m.Chronotype })))
-const Recovery = lazy(() => import('./Recovery').then((m) => ({ default: m.Recovery })))
-const Breathwork = lazy(() => import('./Breathwork').then((m) => ({ default: m.Breathwork })))
-const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
-const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
+const SleepDebt = lazy(() => import('./bodyhub/SleepDebt').then((m) => ({ default: m.SleepDebt })))
+const SleepApneaScreen = lazy(() => import('./bodyhub/SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
+const SleepToolkit = lazy(() => import('./bodyhub/SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
+const Chronotype = lazy(() => import('./bodyhub/Chronotype').then((m) => ({ default: m.Chronotype })))
+const Recovery = lazy(() => import('./bodyhub/Recovery').then((m) => ({ default: m.Recovery })))
+const Breathwork = lazy(() => import('./bodyhub/Breathwork').then((m) => ({ default: m.Breathwork })))
+const ThermalTherapy = lazy(() => import('./bodyhub/ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
+const PostureBreaks = lazy(() => import('./bodyhub/PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
 const FastingTimer = lazy(() => import('./wellness/FastingTimer').then((m) => ({ default: m.FastingTimer })))
-const PhoneHealthScan = lazy(() => import('./PhoneHealthScan').then((m) => ({ default: m.PhoneHealthScan })))
+const PhoneHealthScan = lazy(() => import('./bodyhub/PhoneHealthScan').then((m) => ({ default: m.PhoneHealthScan })))
 
 const TABS: TabDef[] = [
   { id: 'phone', label: 'Phone scan', emoji: '📱', komponen: PhoneHealthScan,

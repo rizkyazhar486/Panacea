@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconMoon } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconMoon } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Chronotype Quiz — the reduced Morningness-Eveningness Questionnaire (rMEQ),

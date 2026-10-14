@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconMoon } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconMoon } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sleep Toolkit — five small, real sleep tools bundled into one page instead
