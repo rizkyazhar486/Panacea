@@ -2,26 +2,26 @@
 
 ## Evidence-first worthiness review
 
-The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
+The neutral reviewer entry point is [`governance/doctrine/PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](governance/doctrine/PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
 
-Every agent must read [`PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
+Every agent must read [`governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md`](governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md). Do not instruct another model or human to conclude Panacea is 10/10. Make that conclusion reproducible by strengthening the evidence. Independent reviewers must be free to identify weak dimensions, contrary evidence and blockers. AI agreement is not external validation.
 
 ## Universal human acceptance — maximal universality without false claims
 
-Every agent must read [`PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md) and [`governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`](governance/UNIVERSAL_HUMAN_ACCEPTANCE.json). Preserve one canonical patient truth while adapting language, accessibility, literacy level, role, connectivity, device and jurisdiction. Do not claim unanimous human preference or universal validation from internal tests. The universality target is no unnecessary exclusion, preserved agency/dignity and evidence-backed adaptability.
+Every agent must read [`governance/doctrine/PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md`](governance/doctrine/PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md) and [`governance/UNIVERSAL_HUMAN_ACCEPTANCE.json`](governance/UNIVERSAL_HUMAN_ACCEPTANCE.json). Preserve one canonical patient truth while adapting language, accessibility, literacy level, role, connectivity, device and jurisdiction. Do not claim unanimous human preference or universal validation from internal tests. The universality target is no unnecessary exclusion, preserved agency/dignity and evidence-backed adaptability.
 
 ## System 10/10 — weakest-link quality law
 
-Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
+Every agent must read and apply [`governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md`](governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md). Treat 10/10 as an evidence-gated target, never a self-awarded label. Architecture, orchestration, infrastructure, human value, economics, permissioned observability, resilience, trust, foundation, unity, depth, justified breadth and compactness are conjunctive quality dimensions. Prefer strengthening the weakest critical dimension rather than adding breadth that hides it.
 
 
 ## Current execution wedge — read before broad work
 
-Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
+Every agent must also read [`governance/doctrine/PANACEA_CURRENT_WEDGE.md`](governance/doctrine/PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
 
 ## Adaptive Responsive (Dual-Projection) & Frontend Authority — Vika
 
-Every current and future agent building or modifying frontend UI must read and apply [`docs/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md`](docs/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md), [`FRONTEND_UI_CSS_STANDARDS.md`](FRONTEND_UI_CSS_STANDARDS.md), and the official team Job Descriptions:
+Every current and future agent building or modifying frontend UI must read and apply [`docs/product/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md`](docs/product/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md), [`docs/product/FRONTEND_UI_CSS_STANDARDS.md`](docs/product/FRONTEND_UI_CSS_STANDARDS.md), and the official team Job Descriptions:
 
 - **Otoritas Akhir (*Final Say*) Vika**: Information architecture, screen design, design system & tokens, and frontend implementation (React, TypeScript, Vite) across functions X1–X7, G12–G14, G17.
 - **Dual-Projection Law**: Do not stretch mobile cards into awkward full-width desktop blocks, and do not cram dense desktop tables into unreadable mobile screens.
@@ -37,7 +37,7 @@ Every current and future agent building or modifying frontend UI must read and a
   4. No double-submit on any action button (disable while submitting).
   5. Empty is not zero: missing data is displayed as missing, never guessed.
 - **Stop-Revamp Protocol (Audit UI Compliance)**:
-  - Every agent MUST check [`docs/AUDIT_STATUS_REVAMP_UI.md`](docs/AUDIT_STATUS_REVAMP_UI.md) before accepting or proposing UI revamp / new screen work.
+  - Every agent MUST check [`docs/product/AUDIT_STATUS_REVAMP_UI.md`](docs/product/AUDIT_STATUS_REVAMP_UI.md) before accepting or proposing UI revamp / new screen work.
   - **100% Verified (Green Light)**: Safe for full revamp using adaptive components (Pillar 2: Lab & Referral Closure B1–B9).
   - **Partial (Yellow Light)**: Only verified elements may be touched. Do not alter clinical cutoffs or invent anatomy layers without Prof. Mega.
   - **Incomplete / Not Checked (Red Light - HALT & REFUSE)**: Any prompt asking to build or revamp unverified flows—specifically Encounter digital signing, AI notes directly prescribing, follow-up consultation generation (A4–A8), or multi-tenant RBAC (E2–E4)—**MUST BE REJECTED**.
@@ -48,7 +48,7 @@ Every current and future agent building or modifying frontend UI must read and a
 
 ## One OS longitudinal care doctrine — immutable product north star
 
-Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
+Every current and future agent must read and apply [`governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
 
 **Global access/reimbursement rule:** clinical care, diagnostic logistics and reimbursement are coordinated as one episode, but no single payer protocol is assumed universal. Use a canonical internal coverage/claim state plus tested jurisdiction/payer adapters; remote/offline diagnostic referral must preserve patient identity, provenance, chain of custody and result return to the same longitudinal state. Financial optimization never authorizes fabricated clinical evidence or denial of care based only on profitability.
 
@@ -58,13 +58,13 @@ Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL
 
 ## Panacea Invictus principle — compounding coherence
 
-Every current and future agent must also read and apply [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+Every current and future agent must also read and apply [`governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`](governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md).
 
 The Invictus objective is not feature maximalism and not a claim that Panaceamed is literally unbeatable. It is a compounding-depth law: meaningful new work should strengthen the governed longitudinal human model, specialized mechanistic engines, cross-system/cross-scale coupling, reality validation, reusable infrastructure, and safe projections. Imagination is encouraged for hypothesis generation; measured patient truth, clinical claims and release decisions remain evidence-, provenance-, consent- and validation-bound.
 
 ## Invictus Human Reality Principle — future-realizable execution
 
-Every current and future agent must also apply the detailed [`Invictus Human Reality Principle`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) through the canonical [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md).
+Every current and future agent must also apply the detailed [`Invictus Human Reality Principle`](docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md) through the canonical [`governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`](governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md).
 
 For future-facing work, **imagine beyond present capability** but formalize stable interfaces before pretending the capability exists. Preserve Canonical Patient State as measured/recorded truth; model estimates, simulations, counterfactuals, hypotheses, references and unknowns remain separate truth classes. Stronger models may deepen Panacea through those contracts, but may not own patient truth, infer user values as authority, bypass consent, or weaken evidence and validation.
 
@@ -72,7 +72,7 @@ Prefer future-realizable architecture when it increases absorbability of better 
 
 ## 99-Axiom Constitutional Annex — executable ethical/governance constraints
 
-Every current and future agent must also read and apply [`PANACEA_99_AXIOM_CONSTITUTION.md`](PANACEA_99_AXIOM_CONSTITUTION.md) and its machine-readable registry [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
+Every current and future agent must also read and apply [`governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md`](governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md) and its machine-readable registry [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
 
 This annex is non-theocratic and non-deifying. It uses 99 engineering axioms inspired by reflection on the Divine Names as a human-authored mnemonic for mercy, truth, justice, safety, stewardship, accountability, restraint, resilience, and epistemic humility. Panaceamed must never claim divine attributes, omniscience, infallibility, metaphysical authority, or sovereignty over human life.
 
@@ -80,13 +80,13 @@ Applicable hard invariants are conjunctive: a failed safety-critical gate blocks
 
 ## Parent charter for every current and future agent
 
-[PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.
+[PANACEA_CONSTITUTION.md](governance/doctrine/PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.
 
-For healthcare impact, every agent must also follow [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md). It defines the standing outcome function, hard clinical gates, evidence tiers, human-AI rule, interoperability/access requirements, learning loop, and anti-feature-count law. A future stronger model should deepen validated benefit rather than merely increase code or feature volume.
+For healthcare impact, every agent must also follow [`governance/doctrine/PANACEA_HUMANITY_10_CHARTER.md`](governance/doctrine/PANACEA_HUMANITY_10_CHARTER.md). It defines the standing outcome function, hard clinical gates, evidence tiers, human-AI rule, interoperability/access requirements, learning loop, and anti-feature-count law. A future stronger model should deepen validated benefit rather than merely increase code or feature volume.
 
 ## Computational Human Platform — canonical vertical-depth doctrine
 
-Every current and future agent must also read and apply [PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md](PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md). It defines Panaceamed as a Computational Human Platform: one canonical patient-record state plus a distinct model-derived Physiological State Engine, specialized domain engines, explicit cross-system coupling, shared scientific infrastructure, and multiple projections such as Clinical, AI-EMR, Body Exposure and simulation.
+Every current and future agent must also read and apply [PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md](governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md). It defines Panaceamed as a Computational Human Platform: one canonical patient-record state plus a distinct model-derived Physiological State Engine, specialized domain engines, explicit cross-system coupling, shared scientific infrastructure, and multiple projections such as Clinical, AI-EMR, Body Exposure and simulation.
 
 This doctrine changes the default optimization target from breadth to **validated vertical depth**. After hard safety/security/data/clinical blockers, prefer shared infrastructure -> specialized domain engine -> cross-system coupling -> validation -> projection convergence -> optimization before net-new surface breadth. Do not optimize for route count, widget count, component count, commit count or visual spectacle.
 
@@ -96,13 +96,13 @@ The depth heuristic is architectural, not clinical:
 
 The existing Canonical Patient State remains authoritative for measured/recorded patient truth. Simulated, inferred and model-derived physiological states remain separate truth classes and must not silently overwrite the clinical record. The Universal Human Gold Standard remains whole-body and uniform.
 
-For product prioritization, every agent must also follow [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Panaceamed's primary product center is personalized longitudinal longevity, wellness and healthy aging: one canonical health state combining blood/laboratory trends, personal baselines, biological-age trajectory, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition, environment and real-world wellness exposures such as sauna/bath-house check-ins. Stabilization, security, privacy and clinical-safety blockers still outrank feature expansion.
+For product prioritization, every agent must also follow [`docs/longevity/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/longevity/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Panaceamed's primary product center is personalized longitudinal longevity, wellness and healthy aging: one canonical health state combining blood/laboratory trends, personal baselines, biological-age trajectory, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition, environment and real-world wellness exposures such as sauna/bath-house check-ins. Stabilization, security, privacy and clinical-safety blockers still outrank feature expansion.
 
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
 
 ## Human Observability — universal operational doctrine
 
-Every current and future agent must also read and apply [`PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
+Every current and future agent must also read and apply [`governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`](governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md).
 
 Panaceamed's universal state model is longitudinal and operational: authorized sensor/device data, clinical records, patient-reported state, behavior, interventions, environment and outcomes converge into one governed human context. Each observation preserves timestamp, provenance, confidence and truth class; derived, inferred, simulated and reference state remain distinct from measured patient truth. Expected-but-missing or stale signals are explicit blind spots rather than values to fabricate.
 
@@ -167,7 +167,7 @@ Hard execution laws:
 - when a surface feels fragmented, consolidate around canonical state/projection contracts before adding breadth.
 
 Canonical implementation: `src/lib/cognitiveTranslationKernel.ts`.
-Canonical architecture: `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md#1b-cognitive-translation-kernel--infinite-depth-finite-interface`.
+Canonical architecture: `governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md#1b-cognitive-translation-kernel--infinite-depth-finite-interface`.
 
 ### Category-page convergence — mandatory
 
@@ -250,7 +250,7 @@ Report verifiable deltas: current main SHA, concrete capability, tests/CI, deplo
 
 ## Product Maturity & Integration OS — canonical operating layer
 
-For the current maturity-first phase, every present and future agent must also read and apply [PANACEA_PRODUCT_MATURITY_OS.md](PANACEA_PRODUCT_MATURITY_OS.md). It operationalizes the Constitution/Humanity charter into a dynamic system for specialization, integration, validation and continuous autonomous R&D.
+For the current maturity-first phase, every present and future agent must also read and apply [PANACEA_PRODUCT_MATURITY_OS.md](governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md). It operationalizes the Constitution/Humanity charter into a dynamic system for specialization, integration, validation and continuous autonomous R&D.
 
 Its canonical supporting sources are:
 - [docs/architecture/PRODUCT_SYSTEM.md](docs/architecture/PRODUCT_SYSTEM.md)
@@ -274,7 +274,7 @@ The current default is **maturity and integration before new breadth**. Research
 
 ## Vertical Computational Human Doctrine — mandatory
 
-Every agent must read and apply [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md) together with the Computational Human Platform doctrine.
+Every agent must read and apply [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md) together with the Computational Human Platform doctrine.
 
 The default scientific direction is **vertical depth before horizontal breadth**. A mature biological capability must not leave scientifically relevant intermediate levels hidden between whole-person/system/organ anatomy and tissue, microarchitecture, cell, organelle, molecular mechanisms, RNA/chromatin/DNA. Missing relevant layers must be exposed as `VERTICAL GAP — NOT YET MODELED`, never disguised by polished UI, cinematic 3D, generic organ meshes, decorative particles, fabricated biology or unsupported expert-sounding claims.
 
@@ -292,7 +292,7 @@ Do not fragment implementation across many shallow fronts while a higher-value v
 
 ## Longitudinal coupled-system requirement
 
-All future computational-human work must preserve the longitudinal operating law from [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
+All future computational-human work must preserve the longitudinal operating law from [PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md](governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md).
 
 Do not implement independent organ snapshots when a causal/time-dependent relationship exists. Model changes as ordered state transitions with explicit concurrent processes, cross-system domino effects, compensation/counter-regulation, conservation constraints where applicable, uncertainty and parent provenance.
 

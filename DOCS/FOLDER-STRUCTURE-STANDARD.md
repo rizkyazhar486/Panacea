@@ -78,3 +78,125 @@ Pengecualian yang sah (gak perlu dipecah):
 tidak ada file di atas ambang). Root `src/pages/` masih dalam migrasi
 bertahap — jangan nambah file baru langsung ke root, taruh di domain yang
 sesuai atau buat domain baru kalau belum ada yang cocok.
+
+## Status migrasi `src/components/`
+
+Root `src/components/` sudah dipecah ke subfolder domain (2026-10-14). Semua
+file lama ditinggal sebagai stub re-export satu baris di path lama
+(`export * from './<domain>/File'`) biar importer lama gak perlu diubah —
+**jangan hapus stub ini** sampai semua importer lama dimigrasi dan dicek
+(lihat §3 di atas). Subfolder domain yang ada sekarang: `bodyhub/`,
+`clinical/`, `dashboard/`, `digital-twin/`, `finance/`, `fitness/`,
+`foryou/`, `frontier/`, `growth/`, `ibadah/`, `landing/`, `layout/`,
+`medstudy/`, `notifications/`, `share/`, `tiles/`, `ui/`. File baru **wajib**
+masuk subfolder yang sesuai domainnya — kalau gak ada yang cocok, bikin
+subfolder baru dengan nama domain (bukan nama generik), jangan taruh flat
+di root.
+
+## Standar `docs/` (dan `DOCS/` — folder yang sama, lihat catatan di bawah)
+
+Root `docs/` sudah dipecah per domain (2026-10-14), **tanpa** stub re-export
+— dokumen `.md` gak dipanggil lewat import, jadi link yang lama cuma
+dibetulin langsung di pemanggil yang kepake (`CLAUDE.md`, `AGENTS.md`).
+Referensi lama di dokumen lain (`DOCS/*`, `governance/*.json`, dll) yang
+belum sempat diupdate bisa 404 — itu utang kecil, bukan alasan nulis dobel.
+
+**Peta domain `docs/` — taruh dokumen baru di sini, jangan bikin folder baru
+kalau salah satu ini cocok:**
+
+| Folder | Isinya |
+|---|---|
+| `docs/body-exposure/` | Anatomi, atlas 3D, digital twin tubuh, organ/eye/ECMO pipeline |
+| `docs/clinical-research/` | Evidence pipeline (genomik, varian, sequencing), gate akademik, engine fisiologi/oksigen |
+| `docs/sport/` | Performance, tactical/sport OS, workout/strength, rescue/expedition |
+| `docs/environment/` | Sensor lingkungan, geospasial, wearable, satellite mesh |
+| `docs/product/` | IA, design system, UI/UX, feature factory, audit revamp |
+| `docs/longevity/` | Longevity, personal digital human, diet/carbon input |
+| `docs/care-governance/` | Continuous care OS, replay/ledger governance longitudinal |
+| `docs/engineering/` | Setup, release gate, API eksternal, infra persistence |
+| `docs/handoffs/` | Handoff antar-agent, status stabilisasi, continuation notes |
+| `docs/mental-health/` | Mental health clinical research & safety orchestrator |
+| `docs/clinical-calculators/` | Kalkulator skor klinis (sudah ada sebelumnya) |
+| `docs/architecture/`, `docs/adr/` | Keputusan arsitektur (sudah ada sebelumnya) |
+
+Root repo tetap cuma nyimpen meta/entry file yang emang harus di root biar
+ke-auto-load tooling: `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `README.md`.
+Semua dokumen baca lainnya (termasuk panduan setup, standar CSS/UI) masuk
+`docs/<domain>/`, bukan root.
+
+## Status migrasi `scripts/` (2026-10-14)
+
+Root `scripts/` dipecah: `scripts/medstudy/` (audit kurikulum/catatan klinis,
+SKDI, OSCE), `scripts/atlas/` (tooling GLB/atlas 3D), `scripts/bangun/`
+(build & release tracking), `scripts/qa/validate-*.mjs` (gate validasi
+`npm run build`, digabung ke folder `qa/` yang udah ada). `package.json`,
+`render.yaml`, dan `.github/workflows/` sudah diupdate ke path baru.
+
+**Gotcha path relatif via `import.meta.url`/`fileURLToPath`**: script yang
+nulis/baca file lain pakai `new URL('../x', import.meta.url)` — ini
+kedalamannya ikut berubah kalau script dipindah satu level folder, SAMA
+kayak import TypeScript biasa. Udah ketemu beberapa kali kejadian nyata:
+`write-frontend-build-info.mjs` sempat nulis `scripts/public/build-info.json`
+(harusnya `public/build-info.json`) gara-gara path `'../'`-nya gak
+disesuaikan pas dipindah ke `scripts/bangun/`. **Selalu grep
+`import.meta.url\|__dirname\|fileURLToPath` di script yang mau dipindah**,
+bukan cuma `import ... from './...'` — dua-duanya sama-sama berbasis lokasi
+file, bukan cwd. (Pengecualian: string yang dieksekusi lewat
+`execFileSync('npx', ['tsx', '-e', ...])` — itu jalan di cwd proses
+pemanggil, bukan lokasi file, jadi aman gak perlu disesuaikan.)
+
+`qa/` di root sendiri masih 24 file flat — di bawah ambang ~25 folder
+homogen (lihat §"Dua kelas folder beda ambang"), jadi belum wajib dipecah.
+Kalau nambah lagi dan lewat 25, kelompokkan per topik (body/anatomy vs
+clinical-workflow vs misc).
+
+## Status migrasi `server/src/` (area Insan — backend/auth/payments/clinical)
+
+Root `server/src/` masih 37 file flat (mulai 62). Empat batch 2026-10-14:
+1. `visits.ts`, `visitRealtimePolicy.ts`, `realtime.ts`,
+   `realtimeRoomRegistry.ts` → `server/src/modules/visits/` (sesuai urutan
+   yang udah ditulis di `CLAUDE.md` §2.4 poin 3).
+2. `rxnorm.ts`, `rxclass.ts`, `atcDdd.ts`, `drugInfo.ts`,
+   `productAtcCrosswalk.ts`, `mygene.ts`, `icd11.ts`, `openfda.ts`,
+   `pubmed.ts`, `trials.ts` → `server/src/domains/medical-reference/`
+   (wrapper API terminologi/obat eksternal, kopling rendah).
+3. `anatomyImages.ts`, `anatomyOntology.ts`, `hraReference.ts`,
+   `bodyBiomedicalCoverage.ts`, `genomicsCompute.ts` →
+   `server/src/domains/anatomy/`.
+4. `healthAlerts.ts`, `healthMetrics.ts`, `healthWebhook.ts`,
+   `aturanNotif.ts`, `pengingatCek.ts`, `push.ts` →
+   `server/src/domains/push/` (gabung ke folder yang udah ada,
+   `pushSubscription.ts`).
+
+**Ini bukan folder rame-rame** —
+tanya Insan dulu sebelum mindahin batch berikutnya, per aturan "Peran
+manusia" di `CLAUDE.md`. Pola layer `http/service/domain/repo` penuh (lihat
+`modules/labResults/`) itu target ideal CLAUDE.md §2.2, tapi gak wajib
+dipaksa sekaligus pas sekadar mindahin file — pindah dulu flat ke
+`modules/<domain>/`, layering nyusul kalau emang disentuh logic-nya.
+
+Checklist tambahan khusus server (di atas checklist umum §"Checklist PR"):
+- [ ] `npm run typecheck` (bukan cuma `tsc -b` frontend) hijau di `server/`.
+- [ ] Cek importer bukan cuma `src/` tapi juga `uji/` (test pakai path
+      `../src/...` relatif dari folder test, bukan dari `src/`).
+- [ ] Import yang nyeberang keluar folder baru (`../auth.js`, `../store.js`,
+      dst) ikut nambah satu `../` — pola sama kayak bug yang kejadian di
+      migrasi `src/components/` dan `scripts/` (lihat gotcha di atas).
+- [ ] Grep importer pakai DUA pola ekstensi sekaligus: `src/` impor pakai
+      `.js` (NodeNext ESM), tapi `uji/*.uji.ts` impor file yang sama pakai
+      `.ts` (dijalankan lewat `tsx`, bukan dikompilasi). Grep yang cuma
+      nyari `.js'` bakal ngelewatin importer test — kejadian nyata pas
+      migrasi `rxnorm`/`openfda`/`icd11` dkk, 3 file test ketinggalan dan
+      baru ketauan pas jalanin test manual, bukan dari `tsc`.
+
+Gak ada yang cocok? Tanya pemilik area dulu (lihat `CLAUDE.md` §"Peran
+manusia") sebelum bikin domain baru — jangan taruh flat di root `docs/` dan
+jangan bikin folder generik (`misc/`, `other/`, `general/`).
+
+**Gotcha macOS/case-insensitive filesystem**: `DOCS/` dan `docs/` itu folder
+**yang sama** di disk (case-insensitive), walau ditulis beda kapital di
+dokumen ini dan di `CLAUDE.md`. Jangan pernah bikin folder/file baru di root
+yang namanya cuma beda kapital dari folder lain (`ui.tsx` vs folder `ui/`
+pernah nyebabin bug resolusi path pas migrasi `src/components/` — file dan
+folder sama-sama "resolve" ke path yang sama, jadi relative import jadi
+kosong/salah). Cek `ls` dulu sebelum pilih nama folder baru.

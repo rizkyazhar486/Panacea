@@ -3,7 +3,7 @@ import { Prosa } from '../../components/Prosa'
 import { simpanTeks } from '../../lib/unduh'
 import { createPortal } from 'react-dom'
 
-const MeetMap = lazy(() => import('../components/MeetMap'))
+const MeetMap = lazy(() => import('../../components/MeetMap'))
 import { Card, SectionTitle, inputClass } from '../../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../../components/icons'
 import { api, type BackendMeet, type BackendClub } from '../../lib/api'
@@ -281,7 +281,7 @@ export function ClubHub() {
                         id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
                         count: m.participants.length, cap: m.cap,
                       }))}
-                      onSelect={(id) => { const m = meets.find((x) => x.id === id); if (m) setDetail(m) }}
+                      onSelect={(id: string) => { const m = meets.find((x) => x.id === id); if (m) setDetail(m) }}
                     />
                   </Suspense>
                 ) : (

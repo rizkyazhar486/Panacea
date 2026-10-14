@@ -3,19 +3,31 @@
    the first viewport denser, calmer and genuinely fluid from narrow phones to
    wide desktop. */
 
-.panacea-liquid-home {
+main.pmd-page-stage,
+main.pmd-page-stage[data-spatial],
+main.pmd-page-stage[data-spatial='false'],
+main.mx-auto,
+.page-enter,
+html.pmd-reference-ui-v47 .panacea-liquid-home,
+.panacea-liquid-home,
+.panacea-human-home {
   box-sizing: border-box;
-  width: min(100%, 1180px) !important;
+  width: 100% !important;
   max-width: 100% !important;
   min-width: 0;
   overflow-x: clip;
-  padding-inline: clamp(10px, 2.8vw, 24px);
+}
+
+main.pmd-page-stage,
+.panacea-liquid-home {
+  padding-inline: clamp(12px, 1.6vw, 32px) !important;
 }
 
 .panacea-liquid-home > *,
 .panacea-human-home,
 .panacea-human-home > * {
   min-width: 0;
+  width: 100%;
 }
 
 .panacea-human-home {
@@ -319,6 +331,16 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .pmd-superpage-grid > div:last-child {
+    grid-column: 1 / -1;
+  }
+  .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+    border-color: rgba(0, 191, 99, 0.25) !important;
+    background: linear-gradient(90deg, rgba(0, 191, 99, 0.05), transparent 70%), rgba(255, 255, 255, 0.02) !important;
+  }
 }
 
 .pmd-superpage-grid > div {
@@ -643,6 +665,55 @@ html:not(.dark) .panacea-instrument-mini:hover,
 html:not(.dark) .panacea-instrument-checkin:hover {
   border-color: rgba(0, 191, 99, 0.35);
   background: #f0fdf4;
+}
+
+html:not(.dark) .pmd-superpage-launcher {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-heading > strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-tile {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+html:not(.dark) .pmd-superpage-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 6px 16px rgba(0, 191, 99, 0.08) !important;
+}
+
+html:not(.dark) .pmd-liquid-metal-icon {
+  background: rgba(0, 191, 99, 0.08);
+  color: #00BF63;
+}
+
+html:not(.dark) .pmd-superpage-copy strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-copy small {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-arrow {
+  color: #94a3b8;
+}
+
+html:not(.dark) .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+  border-color: rgba(0, 191, 99, 0.3) !important;
+  background: linear-gradient(90deg, rgba(0, 191, 99, 0.08), #ffffff 70%) !important;
 }
 
 /* Lantai ukuran teks Home di ponsel: 11px. Terukur di 390x844 sebelum perubahan ini: 155 teks berukuran 8-9,5px dan 219 dari

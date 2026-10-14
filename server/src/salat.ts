@@ -1,6 +1,6 @@
 import { getSettings, saveSettings } from './store.js'
-import { notify } from './push.js'
-import { deliverThenCommitAlertState } from './healthAlerts.js'
+import { notify } from './domains/push/push.js'
+import { deliverThenCommitAlertState } from './domains/push/healthAlerts.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pengingat SEBELUM waktu salat, dikirim server.

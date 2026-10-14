@@ -7,7 +7,7 @@ import { WidgetBeranda } from '../../components/WidgetBeranda'
 
 // Real map (Leaflet + OpenStreetMap, free) — lazy so the heavy lib loads only
 // when the GPS tracker is opened.
-const RouteMap = lazy(() => import('../components/RouteMap'))
+const RouteMap = lazy(() => import('../../components/RouteMap'))
 import { useStore, uid } from '../../lib/store'
 import { Card, Field, inputClass } from '../../components/ui'
 import {
@@ -524,7 +524,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             points={pts}
             planned={plan}
             height={240}
-            onMapClick={mode === 'planning' ? (p) => setPlan((pl) => [...pl, p]) : undefined}
+            onMapClick={mode === 'planning' ? (p: { lat: number; lng: number }) => setPlan((pl) => [...pl, { lat: p.lat, lng: p.lng }]) : undefined}
           />
         </Suspense>
 

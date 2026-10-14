@@ -108,7 +108,7 @@ npm run lint:arsitektur   # dependency-cruiser boundary check
 ```
 
 See [`docs/RUN.md`](../docs/RUN.md) (workspace root) for the combined
-Panacea + PanaceaMed-v2 run guide, and [`PANDUAN-SETUP.md`](PANDUAN-SETUP.md)
+Panacea + PanaceaMed-v2 run guide, and [`docs/engineering/PANDUAN-SETUP.md`](docs/engineering/PANDUAN-SETUP.md)
 for first-time environment setup details.
 
 ## Brand
