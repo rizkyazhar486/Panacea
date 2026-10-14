@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useStore } from '../lib/store'
-import { DOCTOR_REVIEW_CHECKLIST, doctorReviewIsComplete } from '../domains/clinical-review'
-import { Prosa } from '../components/Prosa'
+import { useStore } from '../../lib/store'
+import { DOCTOR_REVIEW_CHECKLIST, doctorReviewIsComplete } from '../../domains/clinical-review'
+import { Prosa } from '../../components/Prosa'
 
 export function DoctorReviewChecklist() {
   const { account } = useStore()

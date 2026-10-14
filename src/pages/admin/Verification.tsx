@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useStore } from '../lib/store'
-import { Card, SectionTitle, Badge, Button } from '../components/ui'
-import { IconShield, IconSparkle, IconCheck } from '../components/icons'
-import { verifyMaterial } from '../lib/ai'
-import { api, backendEnabled } from '../lib/api'
-import type { Material } from '../lib/types'
+import { useStore } from '../../lib/store'
+import { Card, SectionTitle, Badge, Button } from '../../components/ui'
+import { IconShield, IconSparkle, IconCheck } from '../../components/icons'
+import { verifyMaterial } from '../../lib/ai'
+import { api, backendEnabled } from '../../lib/api'
+import type { Material } from '../../lib/types'
 
 const statusLabel: Record<Material['status'], { label: string; tone: 'high' | 'normal' | 'brand' | 'critical' }> = {
   'pending-ai': { label: 'Awaiting Claude AI', tone: 'high' },

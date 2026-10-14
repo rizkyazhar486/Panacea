@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconStethoscope } from '../components/icons'
-import { api, type BackendSecondOpinion } from '../lib/api'
-import { useStore } from '../lib/store'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconStethoscope } from '../../components/icons'
+import { api, type BackendSecondOpinion } from '../../lib/api'
+import { useStore } from '../../lib/store'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Second Opinion — human-in-the-loop, same pattern as AI-EMR: a patient
