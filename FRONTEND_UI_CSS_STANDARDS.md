@@ -12,6 +12,7 @@ Panaceamed adalah platform komputasi kesehatan presisi, rekam medis longitudinal
 - **Tenang, Elegan, dan Dapat Dipercaya (*Calm & Authoritative*)**: Bukan situs game, bukan demo fiksi ilmiah, dan bukan showcase AI yang hiperaktif.
 - **Kejelasan Hirarki (*Clarity Over Decoration*)**: Informasi klinis dan tindakan pengguna harus dapat dipahami dalam waktu < 2 detik tanpa kebingungan visual.
 - **Aksessibilitas Tanpa Kompromi (*WCAG AAA Standard*)**: Rasio kontras tinggi, keterbacaan teks, dan state kendali yang jelas di setiap kondisi cahaya (Light & Dark Mode).
+- **Adaptive Responsive (Dual-Projection)**: Wajib mematuhi [ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md](docs/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md). Komponen bertransformasi secara proporsional antara Mobile (<1024px: stacked cards, infinite scroll, bottom sheet, touch FAB) dan Desktop (≥1024px: tabular tables, explicit pagination, centered modal, sidebar navigation). Dilarang meregangkan kartu mobile menjadi baris raksasa di desktop atau menjejalkan tabel desktop ke ponsel. Gunakan selalu modul `src/shared/adaptive/`.
 
 ---
 

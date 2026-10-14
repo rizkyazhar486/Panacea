@@ -4,7 +4,8 @@ import { PencarianGlobal } from '../PencarianGlobal'
 import { useGestur } from '../../lib/useGestur'
 import { pasangKilau } from '../../lib/kilau'
 import { buatAlurKembali } from '../../lib/alurHalaman'
-import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { LogoMark } from '../Logo'
 import { FabNavigasi } from '../FabNavigasi'
 import { kirimRingkasan } from '../../lib/ringkasan'
@@ -299,7 +300,9 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [spacesOpen, setSpacesOpen] = useState(false)
   const [userMenuBuka, setUserMenuBuka] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
+  const userBtnRef = useRef<HTMLButtonElement>(null)
+  const userMenuPanelRef = useRef<HTMLDivElement>(null)
+  const [userMenuPos, setUserMenuPos] = useState({ top: 64, right: 16 })
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -414,15 +417,46 @@ export function Shell({ children }: { children: ReactNode }) {
     trackVisit(loc.pathname)
   }, [loc.pathname])
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setUserMenuBuka(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+  const placeUserMenu = useCallback(() => {
+    const rect = userBtnRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const viewport = window.innerWidth
+    const width = Math.min(290, viewport - 16)
+    const wantedRight = viewport - rect.right
+    const right = Math.min(Math.max(12, wantedRight), Math.max(12, viewport - width - 12))
+    setUserMenuPos({ top: Math.round(rect.bottom + 8), right: Math.round(right) })
   }, [])
+
+  useLayoutEffect(() => {
+    if (!userMenuBuka) return
+    placeUserMenu()
+    window.addEventListener('resize', placeUserMenu)
+    window.addEventListener('scroll', placeUserMenu, true)
+    return () => {
+      window.removeEventListener('resize', placeUserMenu)
+      window.removeEventListener('scroll', placeUserMenu, true)
+    }
+  }, [userMenuBuka, placeUserMenu])
+
+  useEffect(() => {
+    if (!userMenuBuka) return
+    function onPointer(e: PointerEvent) {
+      const target = e.target as Node
+      if (userMenuPanelRef.current?.contains(target) || userBtnRef.current?.contains(target)) return
+      setUserMenuBuka(false)
+    }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setUserMenuBuka(false) }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [userMenuBuka])
+
+  useEffect(() => {
+    if (keadaanBilah === 'hidden') setUserMenuBuka(false)
+  }, [keadaanBilah])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -637,7 +671,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </svg>
           </button>
 
-          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
+          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:overflow-visible sm:gap-3">
             {/* Pesan, dukungan, dan tema pindah ke laci menu -- lihat catatan
                 di atas soal delapan sasaran ketuk dalam satu bilah. Yang
                 tersisa di sini hanya yang benar-benar dipakai setiap hari. */}
@@ -649,6 +683,15 @@ export function Shell({ children }: { children: ReactNode }) {
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+            </button>
+            <button
+              type="button"
+              onClick={doLogout}
+              className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 sm:grid"
+              title="Keluar dari akun (Log out)"
+              aria-label="Log out"
+            >
+              <IconLogout size={18} />
             </button>
             {/* Peran: lambang orang, bukan kotak pilihan. Saldo PNC: pindah ke
                 beranda. Keduanya dulu berdiri di sini dan bersama-sama memakan
@@ -691,8 +734,9 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
 
             {/* Menu Akun Pengguna & Logout */}
-            <div className="relative shrink-0" ref={userMenuRef}>
+            <div className="relative shrink-0">
               <button
+                ref={userBtnRef}
                 type="button"
                 onClick={() => setUserMenuBuka((prev) => !prev)}
                 className={`group flex items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
@@ -741,10 +785,13 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
 
-              {userMenuBuka && (
+              {typeof document !== 'undefined' && userMenuBuka && createPortal(
                 <div
-                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
-                  style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
+                  ref={userMenuPanelRef}
+                  role="menu"
+                  aria-label="Menu Akun Pengguna"
+                  style={{ top: `${userMenuPos.top}px`, right: `${userMenuPos.right}px` }}
+                  className="fixed z-[100] w-72 origin-top-right overflow-hidden rounded-3xl border border-black/10 bg-white p-2 shadow-2xl dark:border-white/15 dark:bg-neutral-900 menu-turun"
                 >
                   {/* Profil Header */}
                   <div className="flex items-center gap-3 border-b border-black/5 p-3 dark:border-white/10">
@@ -758,8 +805,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-neutral-900" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-extrabold text-ink">{account.name}</div>
-                      <div className="truncate text-[11px] text-neutral-500">{account.email}</div>
+                      <div className="truncate text-sm font-extrabold text-ink dark:text-white">{account.name}</div>
+                      <div className="truncate text-[11px] text-neutral-500 dark:text-neutral-400">{account.email}</div>
                       <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                         {roleLabel[account.role] ?? account.role}
@@ -858,7 +905,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       <span className="text-[10px] font-semibold text-rose-500/80">Keluar ↵</span>
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           </div>

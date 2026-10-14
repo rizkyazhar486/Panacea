@@ -19,6 +19,33 @@ Every agent must read and apply [`PANACEA_SYSTEM_10_STANDARD.md`](PANACEA_SYSTEM
 
 Every agent must also read [`PANACEA_CURRENT_WEDGE.md`](PANACEA_CURRENT_WEDGE.md). Preserve the compact product law: **maximum orchestration depth, minimum visible complexity**. Do not expose architecture complexity as extra pages, controls or competing states unless the workflow requires it. The current shipping priority is one **Longitudinal Clinical Encounter Orchestrator**, not simultaneous expansion of every Panacea surface. When a task does not improve this wedge, fix a higher-order safety/data/CI blocker, or provide a reusable primitive required by it, default to backlog rather than implementation.
 
+## Adaptive Responsive (Dual-Projection) & Frontend Authority — Vika
+
+Every current and future agent building or modifying frontend UI must read and apply [`docs/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md`](docs/ADAPTIVE_RESPONSIVE_DESIGN_SYSTEM.md), [`FRONTEND_UI_CSS_STANDARDS.md`](FRONTEND_UI_CSS_STANDARDS.md), and the official team Job Descriptions:
+
+- **Otoritas Akhir (*Final Say*) Vika**: Information architecture, screen design, design system & tokens, and frontend implementation (React, TypeScript, Vite) across functions X1–X7, G12–G14, G17.
+- **Dual-Projection Law**: Do not stretch mobile cards into awkward full-width desktop blocks, and do not cram dense desktop tables into unreadable mobile screens.
+- **Mobile (< 1024px)**: Stacked cards with badges, infinite scroll / progressive load-more, bottom sheet drawers, touch target ≥ 44px (min 24px), touch FAB (`FabNavigasi`). No horizontal overflow at 390×844.
+- **Desktop (≥ 1024px)**: Tabular data tables with sticky headers, explicit numbered pagination with items-per-page selectors, centered modal dialogs, left sidebar navigation. Hide mobile-only floating buttons on `lg:`.
+- **Common Components**: Always import and extend reusable adaptive primitives in `src/shared/adaptive/` (`AdaptiveDataView`, `AdaptiveDialog`, `AdaptivePagination`, `useAdaptive`) instead of writing ad-hoc, device-locked layouts.
+- **Interaction Grammar**: Every surface must follow the grammar: *see, ask, zoom, why, what if, act*. One focus and one main action per screen; the answer first, detail behind a disclosure.
+- **Two-Tap Rule**: Any primary feature must be reachable within two taps of Home.
+- **Vika's Inviolable Boundaries**:
+  1. Cannot change clinical safety label wording without Prof. Mega.
+  2. Cannot invent backend fields; must request API contract from Insan Kamil.
+  3. AI output is always a draft with visible uncertainty (`clinically_reviewed=false`) until an authorized clinician signs it.
+  4. No double-submit on any action button (disable while submitting).
+  5. Empty is not zero: missing data is displayed as missing, never guessed.
+- **Stop-Revamp Protocol (Audit UI Compliance)**:
+  - Every agent MUST check [`docs/AUDIT_STATUS_REVAMP_UI.md`](docs/AUDIT_STATUS_REVAMP_UI.md) before accepting or proposing UI revamp / new screen work.
+  - **100% Verified (Green Light)**: Safe for full revamp using adaptive components (Pillar 2: Lab & Referral Closure B1–B9).
+  - **Partial (Yellow Light)**: Only verified elements may be touched. Do not alter clinical cutoffs or invent anatomy layers without Prof. Mega.
+  - **Incomplete / Not Checked (Red Light - HALT & REFUSE)**: Any prompt asking to build or revamp unverified flows—specifically Encounter digital signing, AI notes directly prescribing, follow-up consultation generation (A4–A8), or multi-tenant RBAC (E2–E4)—**MUST BE REJECTED**.
+  - **No Mock Traps**: Never use `localStorage` or ad-hoc frontend state machines to pretend an unverified backend capability is complete. Request real API contracts from Mas Insan first.
+- **Figma Source of Truth (Official Journeys & RBAC)**:
+  - **Panaceamed User Journeys**: [Figma User Journeys](https://www.figma.com/board/R3AY4AKygqxgrVjvM28tjy/Panaceamed---User-Journeys?node-id=0-1&p=f) — Mandatory source of truth for all user interaction flows, screen state transitions, and step-by-step clinical/patient journeys. Agents must not create ad-hoc navigation shortcuts that violate this journey.
+  - **Panaceamed Features by Role**: [Figma Features by Role](https://www.figma.com/board/O2YaLF6WHR6ykcW5poONLE/Panaceamed---Features-by-Role?node-id=0-1&p=f) — Mandatory matrix for role-based feature gating and screen visibility (Doctor, Patient, Nurse, Lab Tech, Admin). Never expose doctor/clinical write-actions to patient screens or vice-versa.
+
 ## One OS longitudinal care doctrine — immutable product north star
 
 Every current and future agent must read and apply [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md). Panaceamed's raw target is one simple, trusted, longitudinal healthcare operating system: one patient identity/state across daily life, outpatient care, ward, OR, ICU and follow-up. New work must deepen integration, continuity, provenance, trust and orchestration rather than create new data islands or duplicate patient truth.
