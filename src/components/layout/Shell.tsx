@@ -406,6 +406,8 @@ export function Shell({ children }: { children: ReactNode }) {
   // The top command bar may hide while reading. Assistive Touch stays mounted
   // independently so global actions never disappear with the chrome.
   const keadaanBilah = useCommandBar(bilahAtas)
+  // Never hide the primary navigation while an account or spaces menu is open.
+  const keadaanBilahTerlihat = spacesOpen || userMenuBuka ? 'shown' : keadaanBilah
 
   // Route changes close compact command dropdown, user menu, and record local use.
   useEffect(() => {
@@ -423,6 +425,18 @@ export function Shell({ children }: { children: ReactNode }) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (!spacesOpen && !userMenuBuka) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSpacesOpen(false)
+        setUserMenuBuka(false)
+      }
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [spacesOpen, userMenuBuka])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -549,7 +563,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="panacea-command-bar-reveal-zone" aria-hidden />
         <header
           ref={pasangBilah}
-          data-panacea-command-bar={keadaanBilah}
+          data-panacea-command-bar={keadaanBilahTerlihat}
           className="kaca panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
         >
           <div className="flex min-w-0 items-center gap-2">
@@ -557,7 +571,9 @@ export function Shell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setSpacesOpen((value) => !value)}
               className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
-              aria-label="Open Panacea spaces"
+              aria-label="Open Panacea pages and workspaces"
+              title="Pages and workspaces"
+              aria-controls="panacea-spaces-menu"
               aria-expanded={spacesOpen}
               aria-haspopup="true"
             >
@@ -588,7 +604,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           {spacesOpen && (
-            <div className="pmd-command-spaces" aria-label="Panacea spaces">
+            <div id="panacea-spaces-menu" className="pmd-command-spaces" aria-label="Panacea pages and workspaces">
               <Link
                 to="/"
                 className="pmd-command-space-link"
@@ -614,15 +630,15 @@ export function Shell({ children }: { children: ReactNode }) {
                 )
               })}
               <div className="my-1 h-px bg-black/5 dark:bg-white/10" aria-hidden />
-              <NavLink to="/settings" className="pmd-command-space-link">
+              <NavLink to="/settings" onClick={() => setSpacesOpen(false)} className="pmd-command-space-link">
                 <span>Settings</span><IconSettings size={15} />
               </NavLink>
               <button type="button" onClick={() => { setSpacesOpen(false); setBantuanBuka(true) }} className="pmd-command-space-link w-full text-left">
                 <span>Support</span><IconPhone size={15} />
               </button>
-              <button type="button" onClick={doLogout} className="pmd-command-space-link w-full text-left">
+              <NavLink to="/logout" onClick={() => setSpacesOpen(false)} className="pmd-command-space-link">
                 <span>Log out</span><IconLogout size={15} />
-              </button>
+              </NavLink>
             </div>
           )}
           {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
@@ -690,8 +706,12 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             )}
 
-            {/* Menu Akun Pengguna & Logout */}
-            <div className="relative shrink-0" ref={userMenuRef}>
+          </div>
+          {/* The account dropdown must be OUTSIDE the overflow-x-auto controls rail.
+              Otherwise the rail clips its Profile, Settings and Logout actions
+              on narrow screens even when the dropdown has a high z-index. */}
+          {/* Menu Akun Pengguna & Logout */}
+          <div className="relative shrink-0" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setUserMenuBuka((prev) => !prev)}
@@ -700,9 +720,11 @@ export function Shell({ children }: { children: ReactNode }) {
                     ? 'border-brand ring-2 ring-brand/30 dark:border-brand/70'
                     : 'border-black/10 hover:border-black/20 dark:border-white/15 dark:hover:border-white/30'
                 }`}
-                aria-label="Menu akun dan keluar"
-                title="Akun & Pengaturan (Klik untuk menu)"
+                aria-label="Open account menu, profile, settings, and log out"
+                title="Account, Settings & Log out"
+                aria-controls="panacea-account-menu"
                 aria-expanded={userMenuBuka}
+                aria-haspopup="true"
               >
                 {/* Avatar dengan titik indikator aktif */}
                 <div className="relative">
@@ -743,7 +765,9 @@ export function Shell({ children }: { children: ReactNode }) {
 
               {userMenuBuka && (
                 <div
-                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
+                  id="panacea-account-menu"
+                  aria-label="Account navigation"
+                  className="absolute right-0 top-full z-50 mt-2 w-[min(18rem,calc(100vw-1rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
                   style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
                 >
                   {/* Profil Header */}
@@ -787,7 +811,8 @@ export function Shell({ children }: { children: ReactNode }) {
                     </NavLink>
                   </div>
 
-                  {/* Switch Role / Ganti Peran */}
+                  {/* Switching role is an owner-only action; do not offer inert controls to other accounts. */}
+                  {account.isOwner && (
                   <div className="border-t border-black/5 px-2 py-2 dark:border-white/10">
                     <div className="mb-1.5 flex items-center justify-between px-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                       <span>Ganti Peran Aktif</span>
@@ -823,6 +848,8 @@ export function Shell({ children }: { children: ReactNode }) {
                     </div>
                   </div>
 
+                  )}
+
                   {/* Pasang Aplikasi (PWA) */}
                   <div className="border-t border-black/5 p-1.5 dark:border-white/10">
                     <button
@@ -843,24 +870,20 @@ export function Shell({ children }: { children: ReactNode }) {
 
                   {/* Tombol Logout */}
                   <div className="border-t border-black/5 p-1.5 dark:border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserMenuBuka(false)
-                        doLogout()
-                      }}
-                      className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
+                    <NavLink
+                      to="/logout"
+                      onClick={() => setUserMenuBuka(false)}
+                      className="flex min-h-11 w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
                     >
                       <div className="flex items-center gap-2">
                         <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
                         <span>Keluar dari Akun (Log Out)</span>
                       </div>
-                      <span className="text-[10px] font-semibold text-rose-500/80">Keluar ↵</span>
-                    </button>
+                      <span className="text-[10px] font-semibold text-rose-500/80">Open ↗</span>
+                    </NavLink>
                   </div>
                 </div>
               )}
-            </div>
           </div>
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
