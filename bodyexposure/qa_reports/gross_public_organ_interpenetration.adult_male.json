@@ -1,0 +1,205 @@
+{
+  "grossChecks": [
+    {
+      "check": "laterality_suffix_matches_side",
+      "ok": true,
+      "detail": {
+        "paired": 3403,
+        "documented_exceptions": [
+          "ADULT.MALE.NERVOUS.VAGUS_NERVE_X.R"
+        ],
+        "unexplained": []
+      }
+    },
+    {
+      "check": "liver_on_right",
+      "ok": true,
+      "detail": -0.024653543283650006
+    },
+    {
+      "check": "spleen_on_left",
+      "ok": true,
+      "detail": 0.08676727666513749
+    },
+    {
+      "check": "heart_left_of_midline",
+      "ok": true,
+      "detail": 0.04643005774657924
+    },
+    {
+      "check": "stomach_on_left",
+      "ok": true,
+      "detail": 0.04516139000698802
+    },
+    {
+      "check": "vertical_organ_order",
+      "ok": true,
+      "detail": {
+        "brain": 1.640024914942692,
+        "heart": 1.2768194266621815,
+        "liver": 1.1901498861847002,
+        "kidney": 1.1021660300208298,
+        "bladder": 0.8534247541615148
+      }
+    },
+    {
+      "check": "feet_on_ground",
+      "ok": true,
+      "detail": -0.0003799160680000302
+    },
+    {
+      "check": "heart_within_ribcage_height",
+      "ok": true,
+      "detail": {
+        "heart_z": 1.2768194266621815,
+        "ribs_z": [
+          1.0564959406768,
+          1.4464893022043999
+        ]
+      }
+    },
+    {
+      "check": "brain_within_cranium_bounds",
+      "ok": true,
+      "detail": {
+        "brain": "ADULT.MALE.NERVOUS.WHITE_MATTER_OF_TELENCEPHALON",
+        "cranium_parts": 7,
+        "tolerance_m": 0.002
+      }
+    }
+  ],
+  "structureCount": 3877,
+  "schema": 1,
+  "sourceLevel": "public LOD3 reference anatomy",
+  "sources": [
+    {
+      "path": "public/bodyexposure/adult_male.cardiovascular.LOD3.glb",
+      "sha256": "82b1510de61bb7937f5b0a591b35a11950488215a7e764264bff1dc7c90f2389"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.digestive.LOD3.glb",
+      "sha256": "334da842372fdd0b94889eaf78e97d8d18787b2ae2cb058748a0651fb7d9f518"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.endocrine.LOD3.glb",
+      "sha256": "b7bc2bc613cd3aa94e41eec2f91426cd92acf2dc3f49a1c0b5d3adf1e5587efd"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.fascia.LOD3.glb",
+      "sha256": "d009a87faf283cd735a05ada466eb9e9e25521e1cbff7b504f74a1444c60303e"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.joint.LOD3.glb",
+      "sha256": "9ba6197bada293d5bdd67dd4e00e1dcea4b68e67a3b31a383914cb8610d96fe3"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.lymphatic.LOD3.glb",
+      "sha256": "9ea3c81e6205428037985f1280bb45bf64616ea325c08ff13867cf85584d09c1"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.muscular.LOD3.glb",
+      "sha256": "b197e099b7e21d1725c22670f9a7b298412bbbbd8349afc64735b24367a09593"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.nervous.LOD3.glb",
+      "sha256": "0e3f80f5f0f5d11bd14f33d36a78f3ecf91edd3b2fb26e3a7d82f2778e20efa0"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.reproductive.LOD3.glb",
+      "sha256": "d90da3c39eab9978f9a7bd6241af3f2c3cbff4d2ec7f4a07c133930661907656"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.respiratory.LOD3.glb",
+      "sha256": "488a59e9911784d34bd69b1d116ebc188352c8c81b3dd2e52773486553745f8e"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.sensory.LOD3.glb",
+      "sha256": "2bb5cc56ef87579e7ecebe91e9f223fad213210aadf47d6379880b77dc414ec3"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.skeletal.LOD3.glb",
+      "sha256": "60b1bb294d38caa519f065d0e7586a911744e600343542da0d641322447c0a6d"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.surface.LOD3.glb",
+      "sha256": "e5a08e3195a4953b65e49bfaed8b9e3bd57ff69840a3da7a2605c08fad1e8d0b"
+    },
+    {
+      "path": "public/bodyexposure/adult_male.urinary.LOD3.glb",
+      "sha256": "0462d6a873500a45ad3c25f2aae2e319027b80af2cd26694fad6f37f89e88397"
+    }
+  ],
+  "method": "3-ray majority parity; source vertices sampled at max(1,floor(N/300)) stride; 1e-5m step",
+  "threshold": 0.05,
+  "thresholdSource": "bodyexposure/pipeline/qa_gross_anatomy.py existing technical screen",
+  "checks": [
+    {
+      "a": "ADULT.MALE.DIGESTIVE.LIVER",
+      "b": "ADULT.MALE.CARDIOVASCULAR.LEFT_VENTRICLE",
+      "inside": 4,
+      "sampled": 292,
+      "fraction": 0.014,
+      "stride": 1,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.DIGESTIVE.LIVER",
+      "b": "ADULT.MALE.DIGESTIVE.STOMACH",
+      "inside": 7,
+      "sampled": 292,
+      "fraction": 0.024,
+      "stride": 1,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.CARDIOVASCULAR.LEFT_VENTRICLE",
+      "b": "ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG",
+      "inside": 0,
+      "sampled": 313,
+      "fraction": 0.0,
+      "stride": 2,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.CARDIOVASCULAR.LEFT_VENTRICLE",
+      "b": "ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG",
+      "inside": 0,
+      "sampled": 313,
+      "fraction": 0.0,
+      "stride": 2,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.URINARY.KIDNEY.L",
+      "b": "ADULT.MALE.LYMPHATIC.SPLEEN",
+      "inside": 1,
+      "sampled": 64,
+      "fraction": 0.016,
+      "stride": 1,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.DIGESTIVE.LIVER",
+      "b": "ADULT.MALE.URINARY.KIDNEY.R",
+      "inside": 0,
+      "sampled": 292,
+      "fraction": 0.0,
+      "stride": 1,
+      "ok": true
+    },
+    {
+      "a": "ADULT.MALE.URINARY.URINARY_BLADDER",
+      "b": "ADULT.MALE.DIGESTIVE.RECTUM",
+      "inside": 0,
+      "sampled": 62,
+      "fraction": 0.0,
+      "stride": 1,
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "limits": [
+    "LOD3 exported surface and split vertices differ from original Blender source mesh",
+    "Sampled vertex fraction is directional, not overlap volume or clinical validation"
+  ]
+}
