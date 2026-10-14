@@ -7,7 +7,7 @@
 // berkas GLB kecil per organ — geometri manusia sungguhan, bukan model
 // buatan AI, sehingga tampilan dekat organ bisa dipercaya untuk belajar.
 //
-// Jalankan:  node scripts/atlasOrgan.mjs <folder-human-atlas>
+// Jalankan:  node scripts/atlas/atlasOrgan.mjs <folder-human-atlas>
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
@@ -133,7 +133,7 @@ console.table(ringkas)
 // Berkas TS ditulis dari data, bukan diketik ulang: nama bagian dan titik
 // pusatnya berasal langsung dari geometri yang baru saja ditulis, sehingga
 // penanda tidak akan pernah bergeser dari mesh-nya.
-const isi = `// DIBANGKITKAN oleh scripts/atlasOrgan.mjs — jangan disunting tangan.
+const isi = `// DIBANGKITKAN oleh scripts/atlas/atlasOrgan.mjs — jangan disunting tangan.
 //
 // Geometri organ diambil dari BodyParts3D 4.0 (Database Center for Life
 // Science, CC BY 4.0) lewat kemasan ashemag/human-atlas. Berbeda dengan model

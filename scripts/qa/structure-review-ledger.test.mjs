@@ -67,9 +67,9 @@ test('mesin_tinjauan_memakai_metode_yang_benar_pada_tubuh_denver_ct', () => {
 })
 
 test('halaman_dokter_terpasang_dan_tidak_menyetujui_sendiri', async () => {
-  const page = await readFile(new URL('../../src/pages/DoctorBodyReview.tsx', import.meta.url), 'utf8')
+  const page = await readFile(new URL('../../src/pages/bodyhub/DoctorBodyReview.tsx', import.meta.url), 'utf8')
   const main = await readFile(new URL('../../src/main.tsx', import.meta.url), 'utf8')
-  const checklist = await readFile(new URL('../../src/pages/DoctorReviewChecklist.tsx', import.meta.url), 'utf8')
+  const checklist = await readFile(new URL('../../src/pages/clinical/DoctorReviewChecklist.tsx', import.meta.url), 'utf8')
   assert.match(main, /path="\/doctor-review\/body"/); assert.match(main, /DoctorBodyReview/)
   assert.match(checklist, /to="\/doctor-review\/body"/)
   assert.match(page, /account\?\.role === 'dokter' \|\| Boolean\(account\?\.isOwner\)/)

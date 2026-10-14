@@ -12,7 +12,7 @@ atau massanya tidak cocok dengan hitungan RDKit dari SMILES-nya. Jadi SMILES
 yang salah ketik — satu ikatan keliru, satu cincin kurang — menghentikan
 pembangunan, bukan diam-diam menjadi molekul palsu di layar aplikasi kedokteran.
 
-Jalankan:  python3 scripts/molekul.py
+Jalankan:  python3 scripts/atlas/molekul.py
 """
 
 import json
@@ -130,7 +130,7 @@ if gagal:
 
 with open(GEN_TS, "w") as f:
     f.write(
-        "// DIBANGKITKAN oleh scripts/molekul.py — jangan disunting tangan.\n"
+        "// DIBANGKITKAN oleh scripts/atlas/molekul.py — jangan disunting tangan.\n"
         "//\n"
         "// Konformer 3D dihitung RDKit (ETKDG + MMFF94) dari SMILES yang tercatat di\n"
         "// skrip itu, dan tiap molekul hanya ditulis setelah rumus serta massa\n"

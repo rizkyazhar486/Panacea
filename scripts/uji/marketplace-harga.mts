@@ -14,7 +14,7 @@ assert.deepEqual(validateMaterialPrice(2.5), bad)
 // Determinisme.
 assert.deepEqual(validateMaterialPrice(7), validateMaterialPrice(7))
 // Regresi halaman: harga tidak lagi dipaksa 0 lewat `|| 0`.
-const hal = readFileSync(new URL('../../src/pages/Marketplace.tsx', import.meta.url), 'utf8')
+const hal = readFileSync(new URL('../../src/pages/finance/Marketplace.tsx', import.meta.url), 'utf8')
 assert.ok(!/priceTokens: Number\(f\.price\) \|\| 0/.test(hal))
 assert.ok(hal.includes('validateMaterialPrice(f.price)'))
 // Regresi Editor: harga kosong (NaN) ditolak, bukan jadi listing gratis.

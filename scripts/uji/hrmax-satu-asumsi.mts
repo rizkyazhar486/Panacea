@@ -56,9 +56,9 @@ assert.deepEqual(pelanggar, [],
 
 // ── 3. Pemanggil yang sudah dimigrasikan memakai jalur bersumber ──────────
 const dimigrasikan = [
-  'components/WidgetBeranda.tsx', 'components/PapanWidget.tsx', 'components/UbinRingHarian.tsx',
-  'components/UbinLangsung.tsx', 'components/UbinLanjutan.tsx', 'components/digital-twin/Workout4DLab.tsx',
-  'pages/BodyBattery.tsx', 'pages/AnalisisPro.tsx', 'pages/fitness/HeartRateLog.tsx', 'pages/PapanAtlet.tsx',
+  'components/dashboard/WidgetBeranda.tsx', 'components/dashboard/PapanWidget.tsx', 'components/tiles/UbinRingHarian.tsx',
+  'components/tiles/UbinLangsung.tsx', 'components/tiles/UbinLanjutan.tsx', 'components/digital-twin/Workout4DLab.tsx',
+  'pages/bodyhub/BodyBattery.tsx', 'pages/AnalisisPro.tsx', 'pages/fitness/HeartRateLog.tsx', 'pages/PapanAtlet.tsx',
 ]
 for (const rel of dimigrasikan) {
   const isi = readFileSync(join('src', rel), 'utf8')

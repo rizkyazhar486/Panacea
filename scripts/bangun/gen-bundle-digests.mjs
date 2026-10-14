@@ -45,12 +45,12 @@ export async function hitungSidikJari() {
 function render(daftar) {
   const baris = daftar.map((d) =>
     `  { file: '${d.file}', bytes: ${d.bytes}, sha256: '${d.sha256}', nodes: ${d.nodes} },`).join('\n')
-  return `// DIHASILKAN OLEH scripts/gen-bundle-digests.mjs — jangan disunting tangan.
+  return `// DIHASILKAN OLEH scripts/bangun/gen-bundle-digests.mjs — jangan disunting tangan.
 //
 // Sidik jari bundel geometri yang benar-benar dikirim. Dipakai supaya klaim
 // provenans bisa diperiksa terhadap bit, bukan hanya terhadap niat.
 //
-// Perbarui dengan: node scripts/gen-bundle-digests.mjs --write
+// Perbarui dengan: node scripts/bangun/gen-bundle-digests.mjs --write
 
 export interface SidikJariBundel {
   file: string

@@ -29,7 +29,7 @@
 // menggantikannya — dan penggantian teks massal sebaiknya dibatasi pada frasa
 // berspasi, bukan kata tunggal.
 //
-// Pakai:  node scripts/periksaTeks.mjs [--semua]
+// Pakai:  node scripts/medstudy/periksaTeks.mjs [--semua]
 // Keluar dengan kode 1 bila ada temuan, supaya bisa dipasang di CI.
 // ─────────────────────────────────────────────────────────────────────────────
 

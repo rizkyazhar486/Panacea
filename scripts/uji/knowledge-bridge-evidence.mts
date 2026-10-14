@@ -61,7 +61,7 @@ assert.equal(removeBridgeEvidence('paper-30').some((item) => item.key === 'paper
 assert.deepEqual(clearBridgeEvidence(), [])
 assert.deepEqual(loadBridgeEvidence(), [])
 
-const workbench = await readFile(new URL('../../src/components/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
+const workbench = await readFile(new URL('../../src/components/medstudy/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
 assert.match(workbench, /Open the original source before treating a claim as verified\./)
 assert.match(workbench, /item\.source/)
 assert.match(workbench, /item\.year/)

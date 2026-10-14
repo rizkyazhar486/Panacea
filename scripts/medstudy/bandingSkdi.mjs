@@ -28,7 +28,7 @@
 // satu sisi termuat sebagai potongan baris di sisi lain — itu tanda
 // penggabungan baris, bukan penyakit yang hilang. Sisanya yang dilaporkan.
 //
-// Dijalankan: node scripts/bandingSkdi.mjs
+// Dijalankan: node scripts/medstudy/bandingSkdi.mjs
 import { readFileSync } from 'node:fs'
 
 const induk = readFileSync('docs/rujukan/skdi2012-induk.tsv', 'utf8')

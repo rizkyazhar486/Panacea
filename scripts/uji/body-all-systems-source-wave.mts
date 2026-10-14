@@ -89,7 +89,7 @@ const trustedLoader = readFileSync(new URL('../../src/lib/anatomy/pemuatAtlas.ts
 assert.match(trustedLoader, /MeshoptDecoder/)
 assert.match(trustedLoader, /GLTFLoader/)
 
-const bodyExposureOS = readFileSync(new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url), 'utf8')
+const bodyExposureOS = readFileSync(new URL('../../src/pages/bodyhub/BodyExposureOS.tsx', import.meta.url), 'utf8')
 const projector = readFileSync(new URL('../../src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', import.meta.url), 'utf8')
 assert.match(bodyExposureOS, /UnifiedHumanSimulationProjector/)
 assert.match(bodyExposureOS, /Explore 11 systems/)

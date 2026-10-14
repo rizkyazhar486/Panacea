@@ -16,7 +16,7 @@
 // ketemu. Perbaikan yang mematikan pemicu palsu dengan cara mematikan seluruh
 // tabelnya akan lulus separuh pemeriksaan; karena itu keduanya diperiksa.
 //
-// Dijalankan: node scripts/sinonimAman.mjs
+// Dijalankan: node scripts/medstudy/sinonimAman.mjs
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
 

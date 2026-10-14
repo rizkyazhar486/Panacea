@@ -5,7 +5,7 @@
 // sudah ada — yang pernah terjadi di sini dan melahirkan satu catatan kembar
 // sepanjang delapan ribu huruf.
 //
-// Dijalankan: node scripts/medanKurang.mjs [kata kunci]
+// Dijalankan: node scripts/medstudy/medanKurang.mjs [kata kunci]
 import { readFileSync } from 'node:fs'
 
 const FIELD = ['definisi', 'etiologi', 'patofisiologi', 'anamnesis', 'pemeriksaanFisik', 'penunjang', 'diagnosisBanding', 'tatalaksana']

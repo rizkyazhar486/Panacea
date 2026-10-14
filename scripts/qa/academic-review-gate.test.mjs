@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { validateAcademicReview } from '../validate-academic-review.mjs'
+import { validateAcademicReview } from './validate-academic-review.mjs'
 
 const domains = [
   { id: 'medical-education', risk: 'medium' },
