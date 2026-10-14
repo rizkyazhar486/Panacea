@@ -42,7 +42,7 @@ assert.equal(top.length, 2)
   assert.equal(tl[0].butir.length, 2)
   assert.ok(tl[0].butir.every((b) => b.asal === 'from your lab report'), 'asal data hilang dari timeline')
   assert.equal(timelineHarian(s, 1).length, 1, 'batas jumlah hari timeline diabaikan')
-  assert.match(readFileSync('src/components/ApaYangBerubah.tsx', 'utf8'), /timelineHarian\(state, 30, labels\)/, 'timeline tidak lagi dibaca dari status kanonik')
+  assert.match(readFileSync('src/components/growth/ApaYangBerubah.tsx', 'utf8'), /timelineHarian\(state, 30, labels\)/, 'timeline tidak lagi dibaca dari status kanonik')
 }
 
 const ui = readFileSync('src/lib/longitudinalSnapshot.ts', 'utf8')
@@ -70,7 +70,7 @@ assert.match(readFileSync('src/pages/PusatTubuh.tsx', 'utf8'), /<ApaYangBerubah 
   assert.deepEqual(labLogToBodyExposureSignals({}, { nowISO: '2026-09-25' }), [])
   assert.deepEqual(labLogToBodyExposureSignals({ gdp: [{ id: 'g', tanggal: '2026-09-20', nilai: 100 }] }, { max: 0 }), [])
   assert.deepEqual(labLogToBodyExposureSignals({ gdp: [{ id: 'g', tanggal: '2026-09-20', nilai: 100 }] }, { nowISO: 'bukan' }), [])
-  const overlay = readFileSync('src/components/BodyExposurePatientOverlay.tsx', 'utf8')
+  const overlay = readFileSync('src/components/digital-twin/BodyExposurePatientOverlay.tsx', 'utf8')
   assert.match(overlay, /labLogToBodyExposureSignals\(/, 'overlay Body Exposure tidak memproyeksikan lab tersinkron')
   assert.match(overlay, /data-pmd-lab-overlay-signal/, 'sinyal lab overlay tanpa penanda mesin')
   assert.match(overlay, /not atlas anatomy|do not morph atlas/, 'lab overlay harus menolak klaim anatomi atlas')

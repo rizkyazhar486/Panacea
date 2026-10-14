@@ -69,7 +69,7 @@ assert.equal(jumlahHariIni('2026-09-20'), 0, 'a day with nothing recorded report
 }
 
 // ── 7. Widget benar-benar memakainya, bukan hanya mengimpornya ──────────
-const ubin = readFileSync(new URL('../../src/components/UbinSalat.tsx', import.meta.url), 'utf8')
+const ubin = readFileSync(new URL('../../src/components/ibadah/UbinSalat.tsx', import.meta.url), 'utf8')
 assert.match(ubin, /HoldToConfirm/, 'UbinSalat no longer renders the hold-to-confirm control')
 assert.match(ubin, /catatSelesai\(/, 'UbinSalat no longer records a completed prayer')
 assert.match(ubin, /sudahDicatat\(/, 'UbinSalat no longer checks whether a prayer was already marked')
@@ -94,7 +94,7 @@ assert.match(blokKonfirmasi, /HoldToConfirm/, 'sudahLewat() is computed but neve
 assert.match(blokKonfirmasi, /terlewat\.salat/, 'the confirm control no longer targets the prayer sudahLewat() found')
 
 // ── 8. Kontrolnya sendiri menahan, bukan sekadar tombol ──────────────────
-const htc = readFileSync(new URL('../../src/components/HoldToConfirm.tsx', import.meta.url), 'utf8')
+const htc = readFileSync(new URL('../../src/components/ui/HoldToConfirm.tsx', import.meta.url), 'utf8')
 assert.match(htc, /onPointerDown/, 'the control no longer tracks a held pointer')
 assert.match(htc, /onPointerUp/, 'releasing early no longer cancels the hold')
 assert.match(htc, /holdMs/, 'the deliberate hold duration disappeared')

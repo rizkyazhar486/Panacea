@@ -9,7 +9,7 @@ import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { idPasienDiri } from '../src/aksesKlinis.js'
+import { idPasienDiri } from '../src/domains/clinical-records/aksesKlinis.js'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const FOREIGN = 'p-clinic-001'

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { hitungSidikJari } from '../gen-bundle-digests.mjs'
+import { hitungSidikJari } from '../bangun/gen-bundle-digests.mjs'
 import { SIDIK_JARI_BUNDEL } from '../../src/lib/anatomy/bundleDigests.gen.ts'
 import { COMPLETE_WHOLE_BODY_ATLAS } from '../../src/lib/anatomy/completeAtlas.ts'
 
@@ -22,7 +22,7 @@ assert.ok(sekarang.length >= 7, `Hanya ${sekarang.length} bundel ditemukan; dire
 for (const b of sekarang) {
   const rekam = tercatat.get(b.file)
   assert.ok(rekam,
-    `Bundel ${b.file} dikirim tanpa sidik jari tercatat. Jalankan: node scripts/gen-bundle-digests.mjs --write`)
+    `Bundel ${b.file} dikirim tanpa sidik jari tercatat. Jalankan: node scripts/bangun/gen-bundle-digests.mjs --write`)
   assert.equal(b.sha256, rekam.sha256,
     `Isi ${b.file} berubah tetapi sidik jarinya tidak diperbarui.\n`
     + `  tercatat: ${rekam.sha256}\n  sekarang: ${b.sha256}\n`

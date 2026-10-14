@@ -5,7 +5,7 @@ import {
   daftarEncounter,
   simpanEncounter,
   type SimpananEncounter,
-} from '../src/rekamEncounter.js'
+} from '../src/domains/clinical-records/rekamEncounter.js'
 
 const lama = {
   id: 'enc-1',

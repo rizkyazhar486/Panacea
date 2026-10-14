@@ -1,7 +1,7 @@
 import {
   fetchHraReferenceOrgans,
   HRA_REFERENCE_ORGANS_URL,
-} from '../src/hraReference.ts'
+} from '../src/domains/anatomy/hraReference.ts'
 
 let lulus = 0
 let gagal = 0

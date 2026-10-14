@@ -59,7 +59,7 @@ test('the real Assistive Touch contract rejects a missing accessible name', asyn
     'scripts/uji/assistive-touch-component-contract.mts',
     'scripts/uji/check.mjs',
     'src/components/layout/FabNavigasi.tsx',
-    'src/components/PemilihAksiFab.tsx',
+    'src/components/dashboard/PemilihAksiFab.tsx',
   ]
   for (const path of files) {
     await mkdir(dirname(join(root, path)), { recursive: true })

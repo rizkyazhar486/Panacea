@@ -1,4 +1,4 @@
-import { lookupDrugLabel } from '../src/drugInfo.ts'
+import { lookupDrugLabel } from '../src/domains/medical-reference/drugInfo.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

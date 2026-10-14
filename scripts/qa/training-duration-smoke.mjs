@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { readFile } from 'node:fs/promises'
 import { build } from 'esbuild'
-await build({ stdin: { contents: `import React from 'react';import {createRoot} from 'react-dom/client';import {TrainingAnalyticsPanel} from './src/components/TrainingAnalyticsPanel.tsx';createRoot(document.getElementById('root')).render(<TrainingAnalyticsPanel untukKemarin={false} versi={0}/>);`, resolveDir: process.cwd(), sourcefile:'training-duration-fixture.tsx', loader:'tsx' }, bundle:true,format:'esm',jsx:'automatic',outfile:'dist/training-duration-fixture.js' })
+await build({ stdin: { contents: `import React from 'react';import {createRoot} from 'react-dom/client';import {TrainingAnalyticsPanel} from './src/components/fitness/TrainingAnalyticsPanel.tsx';createRoot(document.getElementById('root')).render(<TrainingAnalyticsPanel untukKemarin={false} versi={0}/>);`, resolveDir: process.cwd(), sourcefile:'training-duration-fixture.tsx', loader:'tsx' }, bundle:true,format:'esm',jsx:'automatic',outfile:'dist/training-duration-fixture.js' })
 const index=await readFile('dist/index.html','utf8')
 const styles=[...index.matchAll(/<link[^>]*rel="stylesheet"[^>]*>/g)].map(x=>x[0]).join('')
 await writeFile('dist/training-duration-fixture.html',`<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">${styles}</head><body><div id="root"></div><script type="module" src="/training-duration-fixture.js"></script></body></html>`)

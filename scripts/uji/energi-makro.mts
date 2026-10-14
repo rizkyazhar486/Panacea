@@ -62,7 +62,7 @@ assert.ok(puncakMenit([{ indeks: 0, hari: 'Monday', menit: 5, judul: 'x', latiha
   'a single short session would be drawn as a full-height bar')
 
 // ── 4. Warna tidak boleh menjadi satu-satunya pembawa arti ───────────────
-const komponen = readFileSync(new URL('../../src/components/GrafikEnergiPekan.tsx', import.meta.url), 'utf8')
+const komponen = readFileSync(new URL('../../src/components/growth/GrafikEnergiPekan.tsx', import.meta.url), 'utf8')
 assert.ok(/\{s\.label\}/.test(komponen), 'the legend no longer prints each macro by name')
 assert.ok(/\{s\.gram\.toLocaleString\(\)\} g/.test(komponen), 'the legend no longer prints grams')
 assert.ok(/aria-label=/.test(komponen), 'the charts are unreadable to assistive tech')

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const page = readFileSync('src/pages/ForYouHub.tsx', 'utf8')
+const page = readFileSync('src/pages/social/ForYouHub.tsx', 'utf8')
 // The Life destination rail (Social/Community/Clubs/Faith/Finance/Markets)
 // used to live inline in ForYouHub.tsx. 824a119 "refactor(for-you): remove
 // duplicate life destination rail" intentionally deleted it because
@@ -10,7 +10,7 @@ const page = readFileSync('src/pages/ForYouHub.tsx', 'utf8')
 // Direct one-tap reachability now lives in that child component, so the
 // contract checks the combined rendered surface rather than only the hub
 // shell.
-const socialPulse = readFileSync('src/components/ForYouSocialPulse.tsx', 'utf8')
+const socialPulse = readFileSync('src/components/foryou/ForYouSocialPulse.tsx', 'utf8')
 const combined = `${page}\n${socialPulse}`
 
 // For You is a personal command surface, not a gallery of equal-weight

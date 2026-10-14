@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const renderer = readFileSync(new URL('../../src/components/VolumeDicom3D.tsx', import.meta.url), 'utf8')
+const renderer = readFileSync(new URL('../../src/components/digital-twin/VolumeDicom3D.tsx', import.meta.url), 'utf8')
 const panel = readFileSync(new URL('../../src/pages/bodyhub/VolumeDicomBagian.tsx', import.meta.url), 'utf8')
 
 // The crop must happen inside the ray-caster, not by shrinking a CSS box or

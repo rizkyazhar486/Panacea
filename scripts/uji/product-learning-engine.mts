@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { normalizeProductEventInput, summarizeProductEvents, type ProductEvent } from '../../server/src/productLearning.ts'
+import { normalizeProductEventInput, summarizeProductEvents, type ProductEvent } from '../../server/src/domains/product/productLearning.ts'
 
 const normalized = normalizeProductEventInput({
   name: 'feature_open', surface: 'home', target: 'body-3d',

@@ -68,7 +68,7 @@ A novel technology may be urgent to investigate while still being unfit to adopt
 
 Critical replacement remains blocked until the Future Resilience OS gates are met: benchmark, shadow mode, rollback, canonical-contract compatibility, portability, security and clinical-safety thresholds.
 
-See \`DOCS/FUTURE-RESILIENCE-OS.md\` and \`src/lib/futureResilienceOS.ts\`.
+See \`DOCS/sport/FUTURE-RESILIENCE-OS.md\` and \`src/lib/futureResilienceOS.ts\`.
 
 ## Next action
 

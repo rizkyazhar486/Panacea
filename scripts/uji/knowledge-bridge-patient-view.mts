@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const workbench = readFileSync('src/components/KnowledgeBridgeWorkbench.tsx', 'utf8')
+const workbench = readFileSync('src/components/medstudy/KnowledgeBridgeWorkbench.tsx', 'utf8')
 const map = readFileSync('src/lib/knowledgeBridgeMap.ts', 'utf8')
 
 // Patient-view capability must reuse the same curated facts rather than inventing
