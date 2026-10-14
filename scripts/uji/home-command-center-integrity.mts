@@ -5,7 +5,7 @@ import { emptyHomeDailyState, homeDailyStateSignature, parseHomeDailyState } fro
 const home = readFileSync('src/pages/dashboard/Beranda.tsx', 'utf8')
 const routedHome = readFileSync('src/pages/dashboard/Home.tsx', 'utf8')
 const activeHome = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
-const activeHomeHero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
+const activeHomeHero = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
 const activeHomeIntent = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const routes = readFileSync('src/main.tsx', 'utf8')
 const deferred = readFileSync('src/components/dashboard/DeferredHomeSections.tsx', 'utf8')

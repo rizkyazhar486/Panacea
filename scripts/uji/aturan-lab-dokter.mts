@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { susunRencana } from '../../server/src/carePlan.ts'
+import { susunRencana } from '../../server/src/domains/clinical-records/carePlan.ts'
 import { validateContinuousCarePlan } from '../../src/lib/continuousCareOperatingSystem.ts'
 import { statusPasienUntukDokter } from '../../src/lib/statusPasienDokter.ts'
 import { evaluasiAturanLab } from '../../src/lib/aturanLabDokter.ts'

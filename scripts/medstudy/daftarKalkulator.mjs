@@ -20,7 +20,7 @@ const isi = readFileSync(SUMBER, 'utf8')
 const judul = [...isi.matchAll(/<SectionTitle[\s\S]{0,400}?title="([^"]+)"/g)].map((m) => m[1])
 const unik = [...new Set(judul)].filter((j) => j && !/Kalkulator Klinis$/.test(j))
 
-const berkas = `// DIBUAT OTOMATIS oleh scripts/daftarKalkulator.mjs — jangan disunting tangan.
+const berkas = `// DIBUAT OTOMATIS oleh scripts/medstudy/daftarKalkulator.mjs — jangan disunting tangan.
 //
 // Judul tiap kalkulator di dalam halaman Kalkulator Klinis. Diperlukan karena
 // kalkulator-kalkulator itu bagian di dalam satu halaman, bukan rute
@@ -31,7 +31,7 @@ export const KALKULATOR_KLINIS: string[] = ${JSON.stringify(unik, null, 2)}
 if (process.argv.includes('--periksa')) {
   const lama = (() => { try { return readFileSync(TUJUAN, 'utf8') } catch { return '' } })()
   if (lama.trim() !== berkas.trim()) {
-    console.error(`Daftar kalkulator tidak cocok lagi dengan ${SUMBER}. Jalankan: node scripts/daftarKalkulator.mjs`)
+    console.error(`Daftar kalkulator tidak cocok lagi dengan ${SUMBER}. Jalankan: node scripts/medstudy/daftarKalkulator.mjs`)
     process.exit(1)
   }
   console.log(`${unik.length} kalkulator, daftar masih cocok.`)

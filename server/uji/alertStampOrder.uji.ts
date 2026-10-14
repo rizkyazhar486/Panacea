@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs'
 const TARGETS: Array<[file: string, keys: string[]]> = [
   ['src/domains/push/healthAlerts.ts', ['hrZoneLastAlertAt', 'sleepLastFiredOn', 'latihanLastFiredOn']],
   ['src/index.ts', ['cekHarianLastFiredOn']],
-  ['src/salat.ts', ['salatLastFired']],
+  ['src/domains/lifestyle/salat.ts', ['salatLastFired']],
 ]
 
 export function stampWrites(source: string, key: string) {

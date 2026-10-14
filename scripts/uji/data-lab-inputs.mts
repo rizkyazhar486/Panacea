@@ -62,8 +62,8 @@ assert.deepEqual(sp({ nama: ' ', doseMg: 'x' }), { ok: false, masalah: { nama: '
 assert.equal(sp({ nama: 'a'.repeat(41) }).ok, false); assert.equal(sp({ nama: 'a'.repeat(40) }).ok, true)
 
 // Regresi halaman: tanpa `|| 0` dan tanpa salinan rumus PhenoAge inline; memakai mesin kanonik lewat domain.
-const halaman = readFileSync(new URL('../../src/pages/DataLabAdvanced.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/bodyhub/DataLabAdvanced.tsx', import.meta.url), 'utf8')
 assert.doesNotMatch(halaman, /Number\([^)]*\) *\|\| *[01]/, 'bentuk lama Number(x) || 0/1 kembali di DataLabAdvanced')
 assert.doesNotMatch(halaman, /19\.907|0\.0336|0\.00188/, 'salinan koefisien PhenoAge inline kembali; pakai lib/longevity lewat domains/data-lab')
-assert.match(halaman, /from '\.\.\/domains\/data-lab'/); assert.match(halaman, /hitungPhenoAgeDariTeks\(t\)/)
+assert.match(halaman, /from '\.\.\/\.\.\/domains\/data-lab'/); assert.match(halaman, /hitungPhenoAgeDariTeks\(t\)/)
 console.log('data-lab-inputs: ok')

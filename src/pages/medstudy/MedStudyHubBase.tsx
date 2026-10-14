@@ -7,7 +7,7 @@ import { MedicalEvidenceExplorer } from '../../components/MedicalEvidenceExplore
 import { StudyStartPanel, type StudyStartSection } from '../../components/medstudy/StudyStartPanel'
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../../lib/examBank'
-import '../styles/panacea2026.css'
+import '../../styles/panacea2026.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 type Section = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
@@ -28,14 +28,14 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
 
-const SkdiSkillsSection = lazy(() => import('./medstudy/SkdiSkillsSection'))
-const SkdiTherapySection = lazy(() => import('./medstudy/SkdiTherapySection'))
-const SkdiDiseaseDirectorySection = lazy(() => import('./medstudy/SkdiDiseaseDirectorySection'))
-const OsceCaseBankSection = lazy(() => import('./medstudy/OsceCaseBankSection'))
-const StationSimulatorSection = lazy(() => import('./medstudy/StationSimulatorSection'))
-const ClinicalSkillsSection = lazy(() => import('./medstudy/ClinicalSkillsSection'))
-const MnemonikSection = lazy(() => import('./medstudy/MnemonikSection'))
-const UsmleSection = lazy(() => import('./medstudy/UsmleSection'))
+const SkdiSkillsSection = lazy(() => import('./SkdiSkillsSection'))
+const SkdiTherapySection = lazy(() => import('./SkdiTherapySection'))
+const SkdiDiseaseDirectorySection = lazy(() => import('./SkdiDiseaseDirectorySection'))
+const OsceCaseBankSection = lazy(() => import('./OsceCaseBankSection'))
+const StationSimulatorSection = lazy(() => import('./StationSimulatorSection'))
+const ClinicalSkillsSection = lazy(() => import('./ClinicalSkillsSection'))
+const MnemonikSection = lazy(() => import('./MnemonikSection'))
+const UsmleSection = lazy(() => import('./UsmleSection'))
 
 const SCORE_KEY = 'pmd_medstudy_scores'
 interface Scores { [track: string]: { correct: number; total: number } }

@@ -19,7 +19,7 @@
 // jendela 60 huruf sesudahnya. Jendela dipakai, bukan seluruh kalimat, sebab
 // dosis obat lain di ujung kalimat bukan dosis obat ini.
 //
-// Dijalankan: node scripts/dosisPerObat.mjs [jumlah]
+// Dijalankan: node scripts/medstudy/dosisPerObat.mjs [jumlah]
 import { readFileSync } from 'node:fs'
 
 const terapi = readFileSync('src/lib/skdiTherapyReference.ts', 'utf8')

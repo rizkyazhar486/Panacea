@@ -27,7 +27,7 @@ risks:
       - scripts/qa/mongo-save-drain.test.mjs
       - server/uji/mongoRestart.uji.ts
       - .github/workflows/mongo-persistence.yml
-      - docs/MONGO_PERSISTENCE_ACCEPTANCE.md
+      - DOCS/engineering/MONGO_PERSISTENCE_ACCEPTANCE.md
 
   - risk_id: risk.production_release_exact_revision
     category: validation_integrity
@@ -52,7 +52,7 @@ risks:
       - scripts/qa/vercel-release-workflow.test.mjs
       - .github/workflows/vercel-prebuilt-production.yml
       - .github/workflows/dependency-audit.yml
-      - docs/VERCEL_RELEASE_GATES.md
+      - DOCS/engineering/VERCEL_RELEASE_GATES.md
 
   - risk_id: risk.referral_linked_result_integrity
     category: patient_data_integrity
@@ -120,7 +120,7 @@ risks:
       real mounted browser regressions passed; final exact-head CI and canonical
       verification remain required. This does not certify unchanged HealthProfile
       load/save, global profiles, broader tenancy or clinical/vendor accuracy.
-    evidence: [src/domains/personal-health/adapters/operation.ts, src/domains/personal-health/adapters/fileImport.ts, src/pages/HealthProfile.tsx, scripts/qa/health-file-session.test.mjs, scripts/qa/longitudinal-health-import-smoke.mjs]
+    evidence: [src/domains/personal-health/adapters/operation.ts, src/domains/personal-health/adapters/fileImport.ts, src/pages/bodyhub/HealthProfile.tsx, scripts/qa/health-file-session.test.mjs, scripts/qa/longitudinal-health-import-smoke.mjs]
 
   - risk_id: risk.personal_workout_history_ownership
     category: patient_data_integrity
@@ -136,7 +136,7 @@ risks:
       fixtures now use the same owned schema; final exact-head CI and canonical
       verification remain pending. Manual HealthProfile imports, global profiles and
       broader tenancy remain independently unresolved.
-    evidence: [src/lib/workoutStore.ts, src/pages/WorkoutHistory.tsx, src/domains/personal-health/adapters/operation.ts, scripts/qa/workout-store-owner.test.mjs, scripts/qa/share-card-owner-fixture.test.mjs]
+    evidence: [src/lib/workoutStore.ts, src/pages/fitness/WorkoutHistory.tsx, src/domains/personal-health/adapters/operation.ts, scripts/qa/workout-store-owner.test.mjs, scripts/qa/share-card-owner-fixture.test.mjs]
 
   - risk_id: risk.api_session_continuity
     category: privacy
@@ -240,14 +240,14 @@ risks:
       Converge on canonical patient state and explicit write authority.
       2026-09-29: GET /api/keadaan-longitudinal returns one shared revision for lab, care, self-scoped EMR,
       health-profile device vitals, and validated selfVitals/vo2max synced through PUT /api/health-series/*
-      (server/src/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
+      (server/src/domains/clinical-records/catatanKesehatanDiri.ts). AppState writes now upload; a one-shot migration pushes older
       browser-only rows. Remaining fragmentation risk is outside this lab→trajectory lane (other modules
       that still model the person independently).
       2026-10-11: actual synthetic HTTP clinician signing/closing and file-mode process restart
       reproduce encounter provenance and unsigned successor (A2 candidate only). Persistent clinical.hasilLab
       remains outside /api/keadaan-longitudinal; lab-result intake checks patientId syntax without existing
       patient/encounter linkage. Shared-ID API evidence alone does not close unified aggregate readiness.
-    evidence: [server/src/keadaanLongitudinal.ts, server/src/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
+    evidence: [server/src/domains/clinical-records/keadaanLongitudinal.ts, server/src/domains/clinical-records/catatanKesehatanDiri.ts, server/uji/catatanKesehatanDiri.uji.ts, src/lib/useLongitudinalState.ts, src/lib/store.tsx]
 
   - risk_id: risk.feature_sprawl
     category: product_architecture
@@ -315,8 +315,8 @@ risks:
       Remaining work is still platform-wide for generated clinical artifacts and any new healthcare surface
       before this risk can be marked fully mitigated.
     evidence:
-      - PANACEA_CONSTITUTION.md
-      - PANACEA_HUMANITY_10_CHARTER.md
+      - governance/doctrine/PANACEA_CONSTITUTION.md
+      - governance/doctrine/PANACEA_HUMANITY_10_CHARTER.md
       - src/lib/clinicalClaimMaturity.ts
       - src/pages/EMR.tsx
       - src/pages/Chatbot.tsx
@@ -329,7 +329,7 @@ risks:
     state: mitigated_in_part
     description: Future models may restart from incomplete context and duplicate or contradict prior architecture.
     mitigation: Root agent contract plus human-readable architecture plus machine-readable registries and autonomous R&D loop.
-    evidence: [PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
+    evidence: [governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
 
   - risk_id: risk.single_document_store
     category: data_integrity
@@ -400,12 +400,12 @@ risks:
       unverified doctors, and the clinical write routes accepted any patientId. Production (Render, mongo) was
       exposed for as long as these routes existed; no access log review has been done yet.
     mitigation: >-
-      server/src/aksesKlinis.ts: verified clinicians / owner keep practice-wide access; everyone else reads and
+      server/src/domains/clinical-records/aksesKlinis.ts: verified clinicians / owner keep practice-wide access; everyone else reads and
       writes only the self-record linked to their own account (id match AND reverse lookup to the same user, so an
       id-prefix collision fails closed). Enforced on GET /api/clinical and all five clinical write routes.
       Follow-up for the owner: review the audit log ('clinical.read') for reads by non-clinician accounts to decide
       whether a data-exposure notification is required.
-    evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
+    evidence: [server/src/domains/clinical-records/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
 
   - risk_id: risk.stale_emr_signature_reuse
     category: clinical_safety
@@ -416,13 +416,13 @@ risks:
       of an already-signed EMR while preserving old signedBy/signedById/signedAt fields, making new content appear
       to retain an earlier clinician signature.
     mitigation: >-
-      server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
+      server/src/domains/clinical-records/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
       unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
       Any patient clinical edit beyond patient-authored consent removes the signature; clinician content edits carrying
       the old signedAt also become unsigned until an explicit re-sign intent is sent and server-stamped. Changes to
       physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
       Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
-    evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
+    evidence: [server/src/domains/clinical-records/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
 
   - risk_id: risk.speculative_truth_leakage
     category: scientific_integrity
@@ -440,8 +440,8 @@ risks:
       can be marked fully mitigated.
     evidence:
       - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
-      - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
-      - PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md
+      - governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
+      - governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md
       - src/lib/panaceaLongitudinalState.ts
       - src/lib/visitOperatingSystem.ts
       - scripts/uji/speculative-truth-clinical-boundary.mts
@@ -464,8 +464,8 @@ risks:
       rollback/version history; and never let a model vendor own irreplaceable patient truth.
     evidence:
       - docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md
-      - PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
-      - PANACEA_PRODUCT_MATURITY_OS.md
+      - governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md
+      - governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md
       - src/lib/physiology/runtime.ts
       - scripts/uji/physiological-runtime.mts
 
@@ -628,15 +628,15 @@ risks:
       not close other global personal-health caches or establish server RBAC.
     evidence:
       - src/domains/personal-health/adapters/toolkitStorage.ts
-      - src/pages/BodyToolkit.tsx
-      - src/pages/CarbonDiet.tsx
+      - src/pages/bodyhub/BodyToolkit.tsx
+      - src/pages/bodyhub/CarbonDiet.tsx
       - scripts/uji/body-toolkit-storage.mts
       - scripts/qa/body-toolkit-storage-smoke.mjs
       - scripts/qa/carbon-diet-input-smoke.mjs
-      - docs/BODY_TOOLKIT_STORAGE.md
-      - docs/CARBON_DIET_INPUTS.md
+      - DOCS/body-exposure/BODY_TOOLKIT_STORAGE.md
+      - DOCS/longevity/CARBON_DIET_INPUTS.md
       - src/lib/angkatBeban.ts
       - src/domains/personal-health/ui/usePersonalHealthCacheScope.ts
       - scripts/uji/strength-cache-scope.mts
       - scripts/qa/strength-cache-smoke.mjs
-      - docs/STRENGTH_LOG_STORAGE.md
+      - DOCS/sport/STRENGTH_LOG_STORAGE.md

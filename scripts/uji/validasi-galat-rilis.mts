@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { tambahCatatan, susunLaporan, sidik, gerbangRilisKlinis, JENIS_GALAT, type Catatan, type IsiCatatan, type Penilai, type Protokol, type Penilaian } from '../../src/lib/validasiKlinis.ts'
-import { JENIS_GALAT as GALAT_SERVER, susunPenilaian } from '../../server/src/validasiLedger.ts'
+import { JENIS_GALAT as GALAT_SERVER, susunPenilaian } from '../../server/src/domains/clinical-records/validasiLedger.ts'
 
 assert.deepEqual([...GALAT_SERVER], [...JENIS_GALAT], 'daftar kelas galat server dan klien berbeda')
 
