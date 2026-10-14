@@ -9,6 +9,10 @@ Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang me
 
 > Catatan migrasi: CLAUDE.md versi lama (1000+ baris, ledger arahan pemilik) dipindahkan utuh ke [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md). Isinya tetap berlaku sebagai arahan produk/domain, **kecuali** aturan shipping "direct-to-main" yang kini digantikan oleh §5–§6 di bawah.
 
+## Genesis device OS — past, present, future
+
+Directive pemilik wajib: [`PANACEA_GENESIS_DIRECTIVE.md`](PANACEA_GENESIS_DIRECTIVE.md) dan [`DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md`](DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md). Bangun kemampuan translasi **perangkat medis lampau (arsip analog/digital), masa kini dan masa depan** memakai satu identity/state longitudinal, metadata perangkat, time precision, provenance, consent, unit/signal QC, dan clinical review. Jangan samakan dokumen historis dengan sinyal device live, atau catalog-only dengan konektivitas vendor. Semua interpretasi AI adalah projection/draft bukan pengukuran baru; tidak ada device actuation otomatis. Implementasi bertahap di `DOCS/MEDICAL-DEVICE-FABRIC.md`; current clinical wedge, keamanan dan exact-head CI tetap prioritas.
+
 ---
 
 ## 1. Gambaran proyek
@@ -283,6 +287,7 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 | Klaim ilmiah/klinis, R&D, novelty | `PANACEA_CONSTITUTION.md`, `DOCS/ACADEMIC-ACCURACY-GATE.md` |
 | Model manusia, fisiologi, simulasi, coupling | `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/PHYSIOLOGICAL-RUNTIME.md` |
 | Data pasien, wearable, device, EMR | `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
+| Historical/current/future device translation & Genesis research | `PANACEA_GENESIS_DIRECTIVE.md`, `DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md` |
 | Body Exposure / 3D / atlas | `DOCS/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `PANACEA_OWNER_DIRECTIVES.md` |
 | Visit OS / realtime / WebRTC | bagian "Visit OS" di `PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
 | Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |

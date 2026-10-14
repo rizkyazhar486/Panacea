@@ -1,5 +1,9 @@
 # Panacea Multi-Agent Operating Policy
 
+## Genesis universal device intelligence — mandatory owner directive (2026-10-13)
+
+All agents building current or future Panacea devices, clinical-data exchange, Body Exposure, longitudinal physiology, research or cognitive explanations must read and apply [`PANACEA_GENESIS_DIRECTIVE.md`](PANACEA_GENESIS_DIRECTIVE.md) and [`DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md`](DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md). The scope includes **past (analog/digitized and legacy digital), current, and future** medical devices. Reuse the existing [Medical Device Fabric](DOCS/MEDICAL-DEVICE-FABRIC.md), catalog, Visit OS, non-scalar envelope, FHIR, DICOM, canonical longitudinal state and Cognitive Translation Kernel. Every device requires a lawful source, verified identity/consent and testable conformance; a historical artifact remains a provenance-linked reference rather than invented live telemetry. Exploratory AI may generate explanations and research hypotheses, **never missing measurement values, autonomous diagnoses, signed clinical evidence or device actuation**. Clinical safety, present shipping wedge, exact-head CI, and qualified human review remain binding.
+
 ## Evidence-first worthiness review
 
 The neutral reviewer entry point is [`PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.
