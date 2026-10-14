@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { repairWorkoutLogStorage, type WorkoutLogRepairResult } from '../lib/workoutLogGuard'
+import { repairWorkoutLogStorage, type WorkoutLogRepairResult } from '../../lib/workoutLogGuard'
 import { Workout } from './Workout'
 
 function repairLocalWorkoutLog(): WorkoutLogRepairResult {

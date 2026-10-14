@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../components/icons'
-import { getDemo, setDemo, hasHealth, pushBiometrics } from '../lib/profile'
-import { PrefillBadge } from '../components/HealthSnapshot'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../../components/icons'
+import { getDemo, setDemo, hasHealth, pushBiometrics } from '../../lib/profile'
+import { PrefillBadge } from '../../components/HealthSnapshot'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Training Planner — rule-based sports-science generator (runs offline).

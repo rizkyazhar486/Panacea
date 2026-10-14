@@ -9,7 +9,7 @@ import { IconDownload, IconCheck } from './icons'
 const OFFLINE_PAGES: { label: string; imp: () => Promise<unknown> }[] = [
   { label: 'Athlete', imp: () => import('../pages/Athlete') },
   { label: 'Performance Lab', imp: () => import('../pages/PerformanceLab') },
-  { label: 'AI Program', imp: () => import('../pages/TrainingPlan') },
+  { label: 'AI Program', imp: () => import('../pages/fitness/TrainingPlan') },
   { label: 'Body Composition', imp: () => import('../pages/BodyComposition') },
   { label: 'Initial Assessment', imp: () => import('../pages/InitialAssessment') },
   { label: 'Science & KPIs', imp: () => import('../pages/SportsScience') },

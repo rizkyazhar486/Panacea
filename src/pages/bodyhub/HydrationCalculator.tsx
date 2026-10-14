@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconActivity } from '../components/icons'
-import { getHealthCache, hasHealth } from '../lib/profile'
-import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../domains/clinical-calculators'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconActivity } from '../../components/icons'
+import { getHealthCache, hasHealth } from '../../lib/profile'
+import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Daily Hydration Calculator — pure arithmetic, no external API. Baseline is
