@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { terapkanSimpanRekam } from '../src/rekamKlinis.js'
+import { terapkanSimpanRekam } from '../src/domains/clinical-records/rekamKlinis.js'
 const kini = new Date('2026-09-26T10:00:00Z')
 const pasien = { id: 'u1', nama: 'Budi', klinisi: false }, dokter = { id: 'd1', nama: 'Dr. Asli', klinisi: true }
 const dasar = { id: 'r1', patientId: 'self-budi', physicalExam: { doctorVerified: false }, plan: [] }

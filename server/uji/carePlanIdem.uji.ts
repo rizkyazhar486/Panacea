@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { susunRencana, susunLaporan } from '../src/carePlan.js'
+import { susunRencana, susunLaporan } from '../src/domains/clinical-records/carePlan.js'
 const kini = new Date('2026-09-25T08:00:00Z')
 const r = susunRencana({ diagnosisRefs: [{ code: 'I10', display: 'Hypertension' }], questions: [{ id: 'a', prompt: 'Dizzy?', kind: 'boolean' }] }, 'p@x', 'd@x', kini)
 const l = susunLaporan(r, { scheduledFor: '2026-09-25', answers: [], clientId: 'cabcdef1234', authoredAt: '2026-09-24T20:00:00Z' }, kini)

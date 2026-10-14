@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
-import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './galatKlien.js'
+import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './domains/observability/observabilitas.js'
+import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './domains/observability/galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
 import { fileURLToPath as keJalurBerkas } from 'node:url'
@@ -142,8 +142,8 @@ import {
   modeIrisan,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { putusanPengingat } from './jadwal.js'
+import { emailOtpStart, emailOtpVerify, emailOtpLive } from './domains/identity/otp.js'
+import { putusanPengingat } from './domains/lifestyle/jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup, anatomyStructureLookup } from './domains/anatomy/anatomyOntology.js'
 import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup, exerciseImageLookup } from './domains/anatomy/anatomyImages.js'
@@ -152,33 +152,33 @@ import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './domains/
 import { terjemahkan, BAHASA, REGISTER, type Register } from './translate.js'
 import { panggilModel } from './ai.js'
 import { lookupDrugLabel } from './domains/medical-reference/drugInfo.js'
-import { sendEmail } from './email.js'
+import { sendEmail } from './domains/identity/email.js'
 import { sendPush, notify, keadaanPush } from './domains/push/push.js'
-import { submitEmr } from './satusehat.js'
-import { createPayment, confirmPayment, paymentWebhook, orderStatus, normalizeTopUpPnc } from './payments.js'
+import { submitEmr } from './domains/clinical-records/satusehat.js'
+import { createPayment, confirmPayment, paymentWebhook, orderStatus, normalizeTopUpPnc } from './domains/payments/payments.js'
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './domains/push/healthMetrics.js'
-import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
-import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
-import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './catatanKesehatanDiri.js'
-import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
-import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
+import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './domains/clinical-records/labLog.js'
+import { susunKeadaanLongitudinal } from './domains/clinical-records/keadaanLongitudinal.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './domains/clinical-records/catatanKesehatanDiri.js'
+import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './domains/clinical-records/labFhir.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir } from './domains/clinical-records/carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
 import { repoHasilLab, repoRujukan } from './store.js'
-import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
-import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './rekamKlinis.js'
-import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
+import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
+import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './domains/clinical-records/validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './domains/push/healthWebhook.js'
 import { readBuildCommit } from './shared/buildInfo.js'
 import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './domains/push/healthAlerts.js'
-import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
-import { checkPrayerReminder } from './salat.js'
-import { lingkunganKota, cariPangan } from './lingkungan.js'
+import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './domains/lifestyle/sports.js'
+import { checkPrayerReminder } from './domains/lifestyle/salat.js'
+import { lingkunganKota, cariPangan } from './domains/lifestyle/lingkungan.js'
 import { jalankanAturanNotif, detakMesinAturan } from './domains/push/aturanNotif.js'
 import { searchPubmed } from './domains/medical-reference/pubmed.js'
-import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
+import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './domains/payments/markets.js'
 import { searchTrials } from './domains/medical-reference/trials.js'
 import { lookupDrug } from './domains/medical-reference/openfda.js'
 import { lookupGene } from './domains/medical-reference/mygene.js'
@@ -860,7 +860,7 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
-// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
+// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat domains/clinical-records/aksesKlinis.ts).
 const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId, (pid) => tertautKe(u, pid, getTautan()))
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -1115,7 +1115,7 @@ app.put('/api/health-series/diary', requireAuth, (req, res) => {
 
 // Riwayat lab pribadi. Kepemilikan dari sesi terautentikasi saja (tanpa id di
 // jalur), validasi di server, dan tulisan lama ditolak (409) agar penghapusan
-// di perangkat lain tidak dihidupkan kembali. Lihat server/src/labLog.ts.
+// di perangkat lain tidak dihidupkan kembali. Lihat server/src/domains/clinical-records/labLog.ts.
 app.get('/api/lab-log', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json(getLabLog(u.email) ?? { log: {}, diperbaruiPada: null })
@@ -1166,7 +1166,7 @@ app.put('/api/lab-log', requireAuth, (req, res) => {
   }
 })
 
-// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/labFhir.ts).
+// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/domains/clinical-records/labFhir.ts).
 app.get('/api/lab-log/fhir', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json(logKeBundelFhir(getLabLog(u.email)?.log ?? {}, `Patient/${u.id}`, new Date().toISOString()))
