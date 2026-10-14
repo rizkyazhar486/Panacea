@@ -1,4 +1,4 @@
-import { StoryReflectionStudio } from '../components/StoryReflectionStudio'
+import { StoryReflectionStudio } from '../../components/StoryReflectionStudio'
 import { LifeStory as LifeStoryBase } from './LifeStoryBase'
 
 export function LifeStory() {

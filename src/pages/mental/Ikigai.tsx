@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { simpanTeks } from '../lib/unduh'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Button, Field } from '../components/ui'
-import { IconSparkle, IconHeart } from '../components/icons'
+import { simpanTeks } from '../../lib/unduh'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Button, Field } from '../../components/ui'
+import { IconSparkle, IconHeart } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ikigai & Legacy Letter — a structured "sense of purpose" exercise. Purpose in

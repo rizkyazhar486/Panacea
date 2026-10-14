@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconSparkle } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const STORAGE_KEY = 'panacea:mental-safety-plan:v1'
 

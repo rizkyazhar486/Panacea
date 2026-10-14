@@ -1,4 +1,4 @@
-import { ResilienceActionLab } from '../components/ResilienceActionLab'
+import { ResilienceActionLab } from '../../components/ResilienceActionLab'
 import { ResilienceStories as ResilienceStoriesBase } from './ResilienceStoriesBase'
 
 export function ResilienceStories() {

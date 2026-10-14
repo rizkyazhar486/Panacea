@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useStore } from '../lib/store'
-import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconBook, IconPlus, IconDownload } from '../components/icons'
+import { useStore } from '../../lib/store'
+import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
+import { IconBook, IconPlus, IconDownload } from '../../components/icons'
 import {
   LIFE_DOMAINS,
   DOMAIN_LABEL,
@@ -13,9 +13,9 @@ import {
   domainCounts,
   type StoryItem,
   type LifeChapter,
-} from '../lib/lifeStory'
-import { ageFromDob } from '../lib/anthro'
-import type { LifeDomain, LifeEvent, Quest } from '../lib/types'
+} from '../../lib/lifeStory'
+import { ageFromDob } from '../../lib/anthro'
+import type { LifeDomain, LifeEvent, Quest } from '../../lib/types'
 
 // Life Story: health reframed as one thread in a whole life. The user is
 // the protagonist, not a patient — no vitals, no labs, no diagnoses here.

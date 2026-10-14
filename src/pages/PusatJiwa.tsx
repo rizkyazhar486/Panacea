@@ -18,15 +18,15 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 // darurat. Setelah itu baru screening, toolkit harian, arah hidup dan cerita.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MentalSafetyPlan = lazy(() => import('./MentalSafetyPlan').then((m) => ({ default: m.MentalSafetyPlan })))
-const MentalHealthScreen = lazy(() => import('./MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
-const SubstanceUseScreen = lazy(() => import('./SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
-const MindToolkit = lazy(() => import('./MindToolkit').then((m) => ({ default: m.MindToolkit })))
-const GratitudeJournal = lazy(() => import('./GratitudeJournal').then((m) => ({ default: m.GratitudeJournal })))
-const Ikigai = lazy(() => import('./Ikigai').then((m) => ({ default: m.Ikigai })))
-const LifeCompass = lazy(() => import('./LifeCompass').then((m) => ({ default: m.LifeCompass })))
-const ResilienceStories = lazy(() => import('./ResilienceStories').then((m) => ({ default: m.ResilienceStories })))
-const LifeStory = lazy(() => import('./LifeStory').then((m) => ({ default: m.LifeStory })))
+const MentalSafetyPlan = lazy(() => import('./mental/MentalSafetyPlan').then((m) => ({ default: m.MentalSafetyPlan })))
+const MentalHealthScreen = lazy(() => import('./mental/MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
+const SubstanceUseScreen = lazy(() => import('./mental/SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
+const MindToolkit = lazy(() => import('./mental/MindToolkit').then((m) => ({ default: m.MindToolkit })))
+const GratitudeJournal = lazy(() => import('./mental/GratitudeJournal').then((m) => ({ default: m.GratitudeJournal })))
+const Ikigai = lazy(() => import('./mental/Ikigai').then((m) => ({ default: m.Ikigai })))
+const LifeCompass = lazy(() => import('./mental/LifeCompass').then((m) => ({ default: m.LifeCompass })))
+const ResilienceStories = lazy(() => import('./mental/ResilienceStories').then((m) => ({ default: m.ResilienceStories })))
+const LifeStory = lazy(() => import('./mental/LifeStory').then((m) => ({ default: m.LifeStory })))
 
 const TABS: TabDef[] = [
   { id: 'aman', label: 'Safety plan', emoji: '🛟', komponen: MentalSafetyPlan,

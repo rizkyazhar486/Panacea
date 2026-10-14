@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconHeart, IconPhone } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconHeart, IconPhone } from '../../components/icons'
 import {
   simpan, bacaRiwayat, perubahan, riwayatAlat, pita, MAKSIMAL,
   type Alat, type Catatan,
-} from '../lib/mentalTrend'
-import { deriveMentalHealthSafetyDisposition } from '../lib/mentalHealthSafety'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/mentalTrend'
+import { deriveMentalHealthSafetyDisposition } from '../../lib/mentalHealthSafety'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mental Health Screening — PHQ-9 (depression, Kroenke, Spitzer & Williams,

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, inputClass, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Resilience Stories — a curated collection of well-documented people across
@@ -12,9 +12,9 @@ import { IconSparkle } from '../components/icons'
 // Pure static content, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { KISAH as STORIES, type Story } from '../lib/kisahKetahanan'
-import { FightHero } from '../components/FightHero'
-import { ResilienceQuoteCard } from '../components/ResilienceQuoteCard'
+import { KISAH as STORIES, type Story } from '../../lib/kisahKetahanan'
+import { FightHero } from '../../components/FightHero'
+import { ResilienceQuoteCard } from '../../components/ResilienceQuoteCard'
 
 const CATEGORIES = ['All', ...Array.from(new Set(STORIES.map((s) => s.category)))]
 

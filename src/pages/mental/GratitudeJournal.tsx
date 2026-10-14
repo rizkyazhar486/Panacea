@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { kunciHari, hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { kunciHari, hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, inputClass, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Gratitude Journal — "Three Good Things" (Seligman et al., 2005, Am Psychol

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
-import { IconSparkle } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, inputClass, Badge } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Life Compass — a vision/mission/purpose planner. Combines two validated

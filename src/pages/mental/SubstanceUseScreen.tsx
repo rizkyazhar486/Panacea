@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { packYearScreen, parseNumberField } from '../domains/clinical-calculators'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge, Field, inputClass } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { packYearScreen, parseNumberField } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alcohol & Tobacco Use Screening — two short, validated clinical instruments:
