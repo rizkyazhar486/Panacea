@@ -1353,16 +1353,16 @@ app.post('/api/health-webhook/:token', (req, res) => {
     res.status(404).json({ error: 'unknown_token' })
     return
   }
-  // Names only (never values) — safe to log for diagnosing "0 imported" reports,
-  // since a wrong Date Range in Health Auto Export can send metric groups with
-  // no samples, which looks identical to a naming-mismatch bug from the outside.
+  // Operational logs contain counts only: client-controlled health labels can
+  // contain private text or newlines. Preserve naming evidence in the
+  // authenticated, account-scoped delivery diagnostics below.
   const rawMetrics = (req.body as { data?: { metrics?: { name?: string; data?: unknown[] }[] } })?.data?.metrics
   const metricNames = Array.isArray(rawMetrics) ? rawMetrics.map((m) => `${m?.name ?? '?'}(${m?.data?.length ?? 0})`) : []
   const mapped = parseHealthWebhookPayload(req.body)
   const workoutCount = Array.isArray((req.body as { data?: { workouts?: unknown[] } })?.data?.workouts)
     ? (req.body as { data: { workouts: unknown[] } }).data.workouts.length
     : 0
-  console.log(`[health-webhook] ${penandaLog(config.jwtSecret, email)}: groups=${metricNames.join(', ') || 'none'} workouts=${workoutCount} matched=${Object.keys(mapped).join(',') || 'none'}`)
+  console.log(`[health-webhook] ${penandaLog(config.jwtSecret, email)}: groups=${Array.isArray(rawMetrics) ? rawMetrics.length : 0} workouts=${workoutCount} matched=${Object.keys(mapped).length}`)
 
   try {
     // Series FIRST, and unconditionally. Health Auto Export sends one Data Type
