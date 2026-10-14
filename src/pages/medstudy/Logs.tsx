@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { kunciHari } from '../lib/tanggal'
-import { useStore } from '../lib/store'
-import { Card } from '../components/ui'
-import { HealthSnapshot } from '../components/HealthSnapshot'
+import { kunciHari } from '../../lib/tanggal'
+import { useStore } from '../../lib/store'
+import { Card } from '../../components/ui'
+import { HealthSnapshot } from '../../components/HealthSnapshot'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 
 const PROGRAM_OPTIONS = ['—', 'SIPSS / Civil Service Exam', 'HYROX', 'Marathon (42K)', 'Half Marathon (21K)', 'Shape: Beginner', 'Shape: Intermediate', 'Shape: Advanced', 'Shape: Pro', 'Custom']

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { ScoreTrend } from '../components/ScoreTrend'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { ScoreTrend } from '../../components/ScoreTrend'
+import { CopyNote } from '../../components/CopyNote'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pain / Symptom Diary — log a 0-10 severity rating with location/notes and

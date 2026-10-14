@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Vaccine / Immunization Schedule Tracker — log your last dose of each common

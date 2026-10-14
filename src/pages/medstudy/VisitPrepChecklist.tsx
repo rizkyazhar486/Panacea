@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass } from '../components/ui'
-import { IconStethoscope } from '../components/icons'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
+import { IconStethoscope } from '../../components/icons'
+import { CopyNote } from '../../components/CopyNote'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Doctor-Visit Prep Checklist — turns a short description of why you're going

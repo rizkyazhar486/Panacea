@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
-import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconChartUp } from '../components/icons'
-import { parseWhoVisit } from '../domains/clinical-calculators'
+import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconChartUp } from '../../components/icons'
+import { parseWhoVisit } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child Growth Tracker — longitudinal weight-for-age & height-for-age

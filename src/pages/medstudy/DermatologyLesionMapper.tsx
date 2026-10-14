@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { MorfologiLesi } from '../components/MorfologiLesi'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { MorfologiLesi } from '../../components/MorfologiLesi'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { CopyNote } from '../../components/CopyNote'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dermatology Status & Lesion Predilection Mapper — a structured teaching

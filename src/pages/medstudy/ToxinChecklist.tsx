@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconLeaf } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconLeaf } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Environment & Toxin Checklist — a consolidated set of daily-life exposure
