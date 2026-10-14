@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util'
 // Integritas rekam AI-EMR di server.
 //
 // Sebelumnya server menyimpan rekam apa adanya dari klien: tanda tangan hanyalah
@@ -12,6 +13,19 @@
 // 3. Rekam yang sudah ditandatangani tidak pernah hilang: setiap simpanan yang
 //    mengubahnya mengarsipkan versi bertanda tangan itu ke riwayat (append-only).
 export interface Penulis { id: string; nama: string; klinisi: boolean }
+
+// Full-object writes may echo an existing examination, but cannot change its
+// content or verification metadata from a non-clinician session. Key order is
+// irrelevant; null/absent examinations both mean no examination.
+export function pemeriksaanTetapSama(lama: unknown, baru: unknown): boolean {
+  const kosong = (value: unknown) => {
+    if (value == null) return {}
+    if (typeof value !== 'object' || Array.isArray(value)) return value
+    return Object.fromEntries(Object.entries(value).filter(([key, v]) => v !== '' && v != null && !(key === 'doctorVerified' && v === false)))
+  }
+  return isDeepStrictEqual(kosong(lama), kosong(baru))
+}
+
 
 const sama = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
@@ -44,7 +58,7 @@ function tanpaCapVerifikasiFisik(value: any) {
 }
 
 function isiFisikTetapSama(lama: any, baru: any) {
-  return sama(tanpaCapVerifikasiFisik(lama), tanpaCapVerifikasiFisik(baru))
+  return isDeepStrictEqual(tanpaCapVerifikasiFisik(lama), tanpaCapVerifikasiFisik(baru))
 }
 
 function tanpaCapKlinis(value: any) {
