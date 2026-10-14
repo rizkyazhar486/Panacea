@@ -128,6 +128,8 @@ export interface EMRRecord {
   updatedAt: string
   anamnesis: Anamnesis
   physicalExam: PhysicalExam
+  /** AI proposals and patient-reported context; never observed examination findings. */
+  aiExamDraft?: { vitalsNote: string; perSystem: string }
   problems: ProblemEntry[]
   // Diagnosis utama (ICD-10) — picked by the doctor or accepted from AI.
   primaryDiagnosis?: { code: string; title: string; chapter?: string; source?: 'AI' | 'Dokter' }

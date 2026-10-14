@@ -168,7 +168,7 @@ import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
 import { repoHasilLab, repoRujukan } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
-import { terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './rekamKlinis.js'
+import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { readBuildCommit } from './shared/buildInfo.js'
@@ -884,6 +884,10 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
   const penulis = { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }
   const rekamLama = getRecord(patientId, record.id)
+  if (actor.role !== 'dokter' && !pemeriksaanTetapSama(rekamLama?.physicalExam, record.physicalExam)) {
+    addAudit(actor, 'emr.examination_write_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_examination' })
+  }
   const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
   const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
