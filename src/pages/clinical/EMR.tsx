@@ -643,7 +643,7 @@ export function EMR() {
             Signature pending — not yet confirmed by the server, so it does not count as signed.
           </p>
         ))}
-        <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
+        <KunjunganEmr record={draft} dirty={dirty} klinisi={canEditExam} />
         {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
     </div>
