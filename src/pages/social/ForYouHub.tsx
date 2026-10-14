@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
-import { ForYouOmniFeed } from '../components/ForYouOmniFeed'
-import { useStore } from '../lib/store'
+import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
+import { ForYouOmniFeed } from '../../components/ForYouOmniFeed'
+import { useStore } from '../../lib/store'
 import {
   IconBook,
   IconChat,
@@ -11,7 +11,7 @@ import {
   IconSettings,
   IconUser,
   IconUsers,
-} from '../components/icons'
+} from '../../components/icons'
 
 type Destination = {
   label: string

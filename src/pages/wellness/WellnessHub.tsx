@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconSparkle } from '../components/icons'
-import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { ambilTersembunyi, saring, langgananFitur } from '../../lib/fiturTersembunyi'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wellness Hub — one flagship surface for the longevity / mental-health /

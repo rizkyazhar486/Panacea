@@ -1,4 +1,4 @@
-import { UnifiedBodyWorkspace } from './UnifiedBodyWorkspace'
+import { UnifiedBodyWorkspace } from '../UnifiedBodyWorkspace'
 
 // Search-catalog compatibility for PencarianGlobal. FitnessHub is now a unified
 // workspace, but global search still consumes the historical GROUPS contract.

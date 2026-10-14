@@ -26,7 +26,7 @@ const Markets = lazy(() => import('./Markets').then((m) => ({ default: m.Markets
 const SportsScores = lazy(() => import('./SportsScores').then((m) => ({ default: m.SportsScores })))
 const ReligionWorkspace = lazy(() => import('./ReligionWorkspace').then((m) => ({ default: m.ReligionWorkspace })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
-const ForYouHub = lazy(() => import('./ForYouHub').then((m) => ({ default: m.ForYouHub })))
+const ForYouHub = lazy(() => import('./social/ForYouHub').then((m) => ({ default: m.ForYouHub })))
 
 type LegacyViewKey = 'social' | 'community' | 'clubs' | 'finance' | 'markets' | 'scores' | 'religion' | 'learn'
 type HomeView = 'home' | 'for-you' | LegacyViewKey
