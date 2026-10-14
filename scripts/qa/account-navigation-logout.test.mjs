@@ -19,6 +19,7 @@ test('sign-out is a real route and requires user confirmation', () => {
   parse('Logout.tsx', logout)
   assert.match(app, /<Route path="\/logout" element=\{<Logout \/>\}/)
   assert.match(shell, /to="\/logout"/)
+  assert.match(shell, /if \(!account && loc.pathname === '\/logout'\) return <Navigate to="\/" replace \/>/)
   assert.match(logout, /onClick=\{confirmLogout\}/)
   assert.match(logout, /logout\(\)/)
   assert.match(logout, /navigate\('\/', \{ replace: true \}\)/)
