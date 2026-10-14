@@ -7,6 +7,58 @@
   will-change: transform;
 }
 
+/* Legacy desktop glass styling clips the entire header; mobile already
+   overrides it. Menus need visible overflow at every viewport width. */
+header.kaca.panacea-command-bar {
+  overflow: visible;
+}
+
+header.kaca.panacea-command-bar > .pmd-command-spaces {
+  position: absolute;
+  z-index: 50;
+}
+
+/* Both disclosures must scroll within short/mobile viewports, never clip
+   their last action below the screen or inside the horizontal toolbar. */
+.panacea-account-panel {
+  width: min(18rem, calc(100vw - 2rem));
+}
+
+.panacea-account-panel,
+.pmd-command-spaces {
+  max-height: calc(100dvh - var(--tinggi-bilah-atas, 80px) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.panacea-account-panel a,
+.panacea-account-panel button {
+  min-height: 44px;
+}
+
+.panacea-account-panel :focus-visible,
+.pmd-command-spaces :focus-visible {
+  outline: 2px solid var(--color-brand, #00bf63);
+  outline-offset: -2px;
+}
+
+.panacea-skip-link {
+  position: fixed;
+  /* Global reduced-motion styles reset transforms on links. Positioning keeps
+     this helper offscreen until focused without covering navigation. */
+  top: -100px;
+  left: 8px;
+  z-index: 100;
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: #fff;
+  color: #111;
+}
+
+.panacea-skip-link:focus {
+  top: 8px;
+}
+
 .panacea-command-bar[data-panacea-command-bar='hidden'] {
   transform: translateY(-100%);
   opacity: 0;
