@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { hariIni } from '../lib/tanggal'
-import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
-import { IconToken } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { hariIni } from '../../lib/tanggal'
+import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../../components/ui'
+import { IconToken } from '../../components/icons'
 import {
   CATEGORY_LABEL, summarise, emergencyMonths, emergencyVerdict, planDebt, assessRisk,
   project, formatIdr, RISK_LEVEL_LABEL,
   type Category, type Tx, type Debt, type RiskAnswers,
-} from '../lib/finance'
+} from '../../lib/finance'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Money Hub — recording, cash flow, emergency fund, debt order, risk profile.

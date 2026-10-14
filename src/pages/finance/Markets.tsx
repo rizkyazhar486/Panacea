@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
-import { IconToken } from '../components/icons'
-import { api, backendEnabled, type MarketQuote, type MarketInstrument, type LiveNewsItem, type SymbolHit } from '../lib/api'
+import { Card, SectionTitle, Badge, inputClass } from '../../components/ui'
+import { IconToken } from '../../components/icons'
+import { api, backendEnabled, type MarketQuote, type MarketInstrument, type LiveNewsItem, type SymbolHit } from '../../lib/api'
 
 // Live market data: prices, charts, business news.
 //

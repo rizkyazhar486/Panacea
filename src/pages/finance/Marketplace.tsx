@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
-import { useStore, uid } from '../lib/store'
-import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } from '../components/icons'
-import { verifyMaterial } from '../lib/ai'
-import { ButtonGroup } from '../components/Carousel'
-import { downloadWatermarkedPdf } from '../lib/pdf'
-import { validateMaterialPrice } from '../domains/marketplace'
-import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
+import { useStore, uid } from '../../lib/store'
+import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
+import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } from '../../components/icons'
+import { verifyMaterial } from '../../lib/ai'
+import { ButtonGroup } from '../../components/Carousel'
+import { downloadWatermarkedPdf } from '../../lib/pdf'
+import { validateMaterialPrice } from '../../domains/marketplace'
+import type { Material, MaterialCategory, ExamTrack, FileType } from '../../lib/types'
 
 const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
 const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'Artikel']

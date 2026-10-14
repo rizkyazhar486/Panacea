@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { Card, SectionTitle, Badge, Button } from '../components/ui'
-import { IconWallet, IconStethoscope, IconHeart } from '../components/icons'
-import { MANUAL_BANK } from '../lib/payment'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Badge, Button } from '../../components/ui'
+import { IconWallet, IconStethoscope, IconHeart } from '../../components/icons'
+import { MANUAL_BANK } from '../../lib/payment'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // In-app pricing page (mirrors the public landing page's "Layanan & Harga"
 // section, but for already-logged-in users browsing under Layanan). Each
