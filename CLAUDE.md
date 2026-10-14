@@ -288,6 +288,7 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 | Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |
 | UI/UX & navigasi | `DOCS/RUTHLESS-SIMPLICITY.md`, `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md` |
 | Keputusan arsitektur | `DOCS/adr/` (mulai `0001-domain-first-clean-architecture.md`) |
+| Nambah file ke `src/pages`/`components`/`lib`/domain folder | `DOCS/FOLDER-STRUCTURE-STANDARD.md` (batas 15 file per folder flat, kapan & cara pecah ke subfolder) |
 
 Prinsip **Invictus Human Reality Principle** (arsitektur masa depan yang dapat direalisasikan): `docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`, kanonik lewat `PANACEA_INVICTUS_PRINCIPLE.md`.
 
