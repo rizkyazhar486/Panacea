@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimSkorTerbit } from '../components/BatasKlaimSkorTerbit'
-import { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, parseNumberField } from '../domains/clinical-calculators'
-import type { ResusScenario } from '../domains/clinical-calculators'
+import { Prosa } from '../../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
+import { IconActivity } from '../../../components/icons'
+import { CopyNote } from '../../../components/CopyNote'
+import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, parseNumberField } from '../../../domains/clinical-calculators'
+import type { ResusScenario } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fluid & Electrolyte Calculators — maintenance (Holliday-Segar), fluid

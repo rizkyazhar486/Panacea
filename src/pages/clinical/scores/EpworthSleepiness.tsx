@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconMoon } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../../components/Prosa'
+import { Card, SectionTitle, Badge } from '../../../components/ui'
+import { IconMoon } from '../../../components/icons'
+import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Epworth Sleepiness Scale (ESS) — Johns, M.W. (1991), Sleep, 14(6):540-545.
