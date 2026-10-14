@@ -56,12 +56,14 @@
    "pillar": "Panacea One OS",
    "criterion": "Anamnesis tercatat dengan provenance",
    "acceptance": "Jawaban anamnesis tersimpan bersama penulis, waktu, dan sumber; perubahan membuat versi baru, bukan menimpa",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
-    "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval."
+    "server/uji/anamnesisProvenanceVersioning.uji.ts, imported by rekamEncounter.uji.ts in the mandatory server npm run uji (#2444, merge 073e4c33; exact-head CI including Stabilization Acceptance and Validate changes passed before merge): actual application over HTTP in isolated file mode with synthetic identities. Each filled anamnesis answer stores source, author and a server-stamped time (client-claimed author/time ignored); editing one answer re-stamps only that answer; a signed record is never overwritten: a change archives the signed version (original wording, signer, per-answer provenance, who replaced it and when), strips the signature from the live record, and earlier archived versions stay unmodified. Eight source mutants fail by name. Test-only; not clinical approval.",
+    "PR #2526 exact3d2f6b93e8768ad0db3bfde0ac19f1547ee168bd passed all11 applicable checks. Mandatory real HTTP anamnesisProvenanceVersioning now asserts each new/changed nonempty answer has authenticated writer, source and server time; untouched provenance remains unchanged. Draft edits, signing and signed edits each append exact previous server-held snapshots; identical retries do not create versions. Draft/signed history is immutable through API, scoped to the patient and unchanged across a killed/restarted server.",
+    "Current-main combined encounter and AI-draft approval suites passed before expected-head integration. Canonical merge29d77bc915d0dc04a458974c895320c96a452d85 has independently reproduced tree a95518a97b96fdf4b20f61b8a42d7074d53caf83. User-entered Pengguna origin is distinguished from explicit AI origin in UI/longitudinal projection; authenticated writer identity is not a fabricated model identity. https://github.com/rizkyazhar486/Panacea/pull/2526"
    ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "REPORTED, not VERIFIED, because two parts of the acceptance are not met as written. (1) Versioning applies only to SIGNED records: an unsigned draft is edited in place and nothing is archived, so 'a change creates a new version, not an overwrite' is not true for drafts. (2) Provenance for non-clinician or AI-declared answers (asal 'AI') has a source and time but no author id (no olehId), so 'author' is present only for clinician-authored answers; a patient edit is labelled and archives the signed version it replaced, but the patient's identity is recorded on the archive (diarsipkanOleh), not on the answer. Decision for the ledger owner: either accept these as the intended model and promote, or change the runtime (version drafts; record the author id for patient/AI answers) and re-test. Not covered: Mongo mode, UI, AI-draft generation paths."
+   "note": "Prospective author/source/time and draft-version gaps are repaired. Legacy unattributed values remain unattributed; historical writers are not invented. Synthetic engineering fixtures are not medical validation."
   },
   {
    "id": "A4",
@@ -517,10 +519,14 @@
    "pillar": "Platform Reliability",
    "criterion": "Audit trail perubahan klinis",
    "acceptance": "Setiap perubahan klinis tercatat dengan pelaku dan waktu",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "Mandatory auditTrailHttp.uji.ts covers actual clinical/link/lab/referral changes with authenticated actor and server time, ignored forged identity/time, owner-only access, persistence and a route audit guard. Existing patient-scoped lab/share/review/plan audit paths remain. The guard additionally covers lab-log, clinician lab-share, care and second-opinion mutations.",
+    "careWriteAuditHttp.uji.ts reproduces and repairs the missing accepted lab-log and daily-care-report audit events. Actual HTTP checks successful writes, forged actor/time, rejected stale and foreign writes, idempotent retries and process-restart persistence. Full backend suite/typecheck passed; PR #2528 exact6f92f9747e8a5f78c62f1ab111a7deca5893f793 passed all10 applicable gates.",
+    "Reran real HTTP audit and care-isolation suites with refreshed current main before expected-head integration. Canonical mergecc449017261711d3a937c8df7ab4cd0e5a252bd3 has independently reproduced merge tree0a4468e7b79b730c3379b7bb3a805a52c3805a97. https://github.com/rizkyazhar486/Panacea/pull/2528"
+   ],
    "owner": "Sol",
-   "note": ""
+   "note": "Verified criterion is successful clinical-change actor/time recording. Existing audit storage is a bounded plain array, not a tamper-evident chain or content diff; rejected attempts may lack entries. Retention/privacy and production journey are separate criteria; no stronger integrity or clinical-approval claim."
   },
   {
    "id": "E4",
