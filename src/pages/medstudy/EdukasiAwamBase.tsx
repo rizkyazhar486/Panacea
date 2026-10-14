@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { IconBook } from '../components/icons'
-import { KELUHAN_AWAM, BUKAN, type Keluhan } from '../lib/edukasiAwam'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconBook } from '../../components/icons'
+import { KELUHAN_AWAM, BUKAN, type Keluhan } from '../../lib/edukasiAwam'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Halaman edukasi untuk orang awam.

@@ -32,7 +32,7 @@ const LabDecoder = lazy(() => import('../LabDecoder').then((m) => ({ default: m.
 const ClinicalEvidence = lazy(() => import('../ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const ClinicalTrials = lazy(() => import('../ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 const PatientEducation = lazy(() => import('../PatientEducation').then((m) => ({ default: m.PatientEducation })))
-const EdukasiAwam = lazy(() => import('../EdukasiAwam').then((m) => ({ default: m.EdukasiAwam })))
+const EdukasiAwam = lazy(() => import('./EdukasiAwam').then((m) => ({ default: m.EdukasiAwam })))
 
 // Darurat lebih dulu, lalu yang dipakai saat memutuskan, lalu yang dibaca
 // dengan waktu luang.

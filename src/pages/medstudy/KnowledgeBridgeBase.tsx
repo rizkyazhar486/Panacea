@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
-import { MedicalEvidenceExplorer } from '../components/MedicalEvidenceExplorer'
+import { MedicalEvidenceExplorer } from '../../components/MedicalEvidenceExplorer'
 import {
   DEFAULT_TEACH_BACK,
   KNOWLEDGE_BRIDGE_MODULES,
   KNOWLEDGE_BRIDGE_TRUTH_RULES,
   compareRisks,
   type BridgeModuleKey,
-} from '../lib/knowledgeBridge'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/knowledgeBridge'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 function pct(value: number) {
   return `${(value * 100).toFixed(value * 100 < 10 ? 1 : 0)}%`

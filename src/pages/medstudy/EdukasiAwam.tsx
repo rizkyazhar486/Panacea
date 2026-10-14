@@ -1,4 +1,4 @@
-import { HealthLiteracyCoach } from '../components/HealthLiteracyCoach'
+import { HealthLiteracyCoach } from '../../components/HealthLiteracyCoach'
 import { EdukasiAwam as EdukasiAwamBase } from './EdukasiAwamBase'
 
 export function EdukasiAwam() {
