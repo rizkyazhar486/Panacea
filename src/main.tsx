@@ -47,6 +47,7 @@ const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default:
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
 const Orders = lazy(() => import('./pages/Orders').then((m) => ({ default: m.Orders })))
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
+const Logout = lazy(() => import('./pages/Logout').then((m) => ({ default: m.Logout })))
 
 // Lazy-load role-specific / heavier secondary pages so the initial bundle stays
 // small; they're fetched on demand when first navigated to.
@@ -211,6 +212,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/verification" element={<Verification />} />
               <Route path="/billing" element={<Billing />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/logout" element={<Logout />} />
               <Route path="/architecture" element={<Architecture />} />
               <Route path="/owner" element={<Owner />} />
               <Route path="/clinical" element={<Dashboard />} />
