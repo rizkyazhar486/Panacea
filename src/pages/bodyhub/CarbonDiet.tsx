@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass } from '../components/ui'
-import { IconLeaf } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { parseServingField, sanitizeServings, estimateRecordedFood, readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage } from '../domains/personal-health'
-import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope'
-import { useStore } from '../lib/store'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
+import { IconLeaf } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { parseServingField, sanitizeServings, estimateRecordedFood, readPersonalHealthStorageScope, readToolkitStorage, writeToolkitStorage } from '../../domains/personal-health'
+import { matchesPersonalHealthAccount, type PersonalHealthStorageScope } from '../../shared/kernel/personalHealthStorageScope'
+import { useStore } from '../../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Carbon-Footprint Diet Calculator — estimates the greenhouse-gas footprint of

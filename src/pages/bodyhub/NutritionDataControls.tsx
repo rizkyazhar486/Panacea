@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
-import { useStore } from '../lib/store'
+import { useStore } from '../../lib/store'
 import {
   MAX_NUTRITION_IMPORT_BYTES,
   MAX_NUTRITION_IMPORT_ENTRIES,
@@ -8,8 +8,8 @@ import {
   parseNutritionJournalJson,
   sanitizeNutritionJournal,
   serializeNutritionJournal,
-} from '../lib/nutritionJournal'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/nutritionJournal'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 interface StatusMessage {
   kind: 'idle' | 'success' | 'error'

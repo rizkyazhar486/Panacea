@@ -23,7 +23,7 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const OrganizerLatihan = lazy(() => import('./OrganizerLatihan').then((m) => ({ default: m.OrganizerLatihan })))
 const PelatihProgres = lazy(() => import('./PelatihProgres').then((m) => ({ default: m.PelatihProgres })))
-const PelatihAsupan = lazy(() => import('../PelatihAsupan').then((m) => ({ default: m.PelatihAsupan })))
+const PelatihAsupan = lazy(() => import('./PelatihAsupan').then((m) => ({ default: m.PelatihAsupan })))
 const GpsTracker = lazy(() => import('../../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('../AthleteScience').then((m) => ({ default: m.AthleteScience })))
 const AnalisisPro = lazy(() => import('../AnalisisPro').then((m) => ({ default: m.AnalisisPro })))

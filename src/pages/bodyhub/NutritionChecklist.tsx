@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 interface CheckItem {
   id: string

@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { getDemoTersimpan } from '../lib/profile'
-import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
-import { susunPekan, type HariRencana } from '../lib/organizerLatihan'
-import { BatangEnergi, BatangMenitPekan } from '../components/GrafikEnergiPekan'
-import type { BebanHari } from '../lib/energiMakro'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { getDemoTersimpan } from '../../lib/profile'
+import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, type TujuanGizi, type TingkatAktivitas } from '../../lib/tdee'
+import { susunPekan, type HariRencana } from '../../lib/organizerLatihan'
+import { BatangEnergi, BatangMenitPekan } from '../../components/GrafikEnergiPekan'
+import type { BebanHari } from '../../lib/energiMakro'
 import {
   MASUKAN, PERAN, BATAS_PELATIH, periksaKesiapan, sulihanTerpakai,
   type Masukan, type PeranPelatih, type Terisi,
-} from '../lib/asupanPelatih'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/asupanPelatih'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // Empat peran, satu aturan: kumpulkan masukannya SEBELUM membuat rencana.
 //

@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle, Field } from '../components/ui'
-import { KolomAngka } from '../components/KolomAngka'
-import { IconLeaf } from '../components/icons'
-import { useVitalField } from '../lib/useVitals'
-import { KolomVitalTerikat } from '../components/KolomVital'
-import { getDemo, getDemoTersimpan } from '../lib/profile'
-import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field } from '../../components/ui'
+import { KolomAngka } from '../../components/KolomAngka'
+import { IconLeaf } from '../../components/icons'
+import { useVitalField } from '../../lib/useVitals'
+import { KolomVitalTerikat } from '../../components/KolomVital'
+import { getDemo, getDemoTersimpan } from '../../lib/profile'
+import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGizi, type TingkatAktivitas } from '../../lib/tdee'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Macro Lab — target makronutrien dan komposisi makan.
