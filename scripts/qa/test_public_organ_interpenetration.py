@@ -18,6 +18,15 @@ class Parity(unittest.TestCase):
     def test_sample_stride_is_existing_method(self):
         result=audit.inside_fraction([[0,0,0]]*901,V,T)
         self.assertEqual(result,{'inside':301,'sampled':301,'fraction':1.,'stride':3})
+    def test_existing_five_percent_threshold_accepts_boundary_rejects_above(self):
+        expected=[['liver','heart'],['liver','stomach'],['heart','lungLeft'],['heart','lungRight'],['kidneyLeft','spleen'],['liver','kidneyRight'],['bladder','rectum']]
+        for count,ok in [(5,True),(6,False)]:
+            organs={k:{'name':k,'vertices':V,'triangles':T} for k in ['liver','heart','stomach','lungLeft','lungRight','kidneyLeft','kidneyRight','spleen','bladder','rectum']}
+            organs['liver']={'name':'liver','vertices':[[0,0,0]]*count+[[2,2,2]]*(100-count),'triangles':[[0,1,2]]}
+            result=audit.audit({'schema':1,'coordinateFrame':'Blender Z-up metres','pairs':expected,
+                                'organs':organs,'summaries':gross_fixture(),'sourceLevel':'synthetic test','sources':[]})
+            self.assertEqual(result['checks'][0]['ok'],ok)
+            self.assertEqual(result['checks'][0]['fraction'],count/100)
     def test_empty_contract_fails_closed(self):
         with self.assertRaises(ValueError):audit.audit({})
 
