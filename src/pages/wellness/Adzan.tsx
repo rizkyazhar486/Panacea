@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Kiblat } from '../components/Kiblat'
-import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
-import { Ringkas, Poin } from '../components/Ringkas'
-import { IconShield } from '../components/icons'
-import { useJam } from '../lib/useJam'
+import { Prosa } from '../../components/Prosa'
+import { Kiblat } from '../../components/Kiblat'
+import { Card, SectionTitle, Button, Field, inputClass } from '../../components/ui'
+import { Ringkas, Poin } from '../../components/Ringkas'
+import { IconShield } from '../../components/icons'
+import { useJam } from '../../lib/useJam'
 import {
   SALAT, METODE, PENYEDIA_WAKTU, jadwalHariIni, berikutnya, bunyikanNada,
   saatnyaMengingatkan, menitSekarang, fmtMenit, muatSetelan, simpanSetelan,
   type JadwalHari, type SetelanAdzan, type Salat,
-} from '../lib/adzan'
+} from '../../lib/adzan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pengingat waktu salat.

@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { PemutarBaca } from '../components/PemutarBaca'
-import { Card, SectionTitle, Button } from '../components/ui'
-import { Ringkas, Poin } from '../components/Ringkas'
-import { IconShield } from '../components/icons'
+import { Prosa } from '../../components/Prosa'
+import { PemutarBaca } from '../../components/PemutarBaca'
+import { Card, SectionTitle, Button } from '../../components/ui'
+import { Ringkas, Poin } from '../../components/Ringkas'
+import { IconShield } from '../../components/icons'
 import {
   daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN, QARI,
   daftarTafsir, type TafsirTersedia,
   TOTAL_SURAH, TOTAL_AYAT_HAFS, bacaAlkitab, bacaTanakh, PENGANTAR, SUMBER,
   bacaTradisi,
   type Surah, type Bacaan, type HasilBaca, type Pengantar,
-} from '../lib/kitab'
-import { usePemutarAyat, TombolPutar } from '../components/PemutarAyat'
-import { Field, inputClass } from '../components/ui'
+} from '../../lib/kitab'
+import { usePemutarAyat, TombolPutar } from '../../components/PemutarAyat'
+import { Field, inputClass } from '../../components/ui'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Scripture — pembaca kitab suci.

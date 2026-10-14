@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle, Button } from '../components/ui'
-import { Ringkas, Poin } from '../components/Ringkas'
-import { IconShield } from '../components/icons'
+import { Card, SectionTitle, Button } from '../../components/ui'
+import { Ringkas, Poin } from '../../components/Ringkas'
+import { IconShield } from '../../components/icons'
 import {
   KITAB, daftarBagian, bacaBagian, PENYEDIA_HADIS, PERINGATAN_DERAJAT, CATATAN_SAHIH,
   type Kitab, type HalamanHadis,
-} from '../lib/hadis'
+} from '../../lib/hadis'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pembaca hadis.

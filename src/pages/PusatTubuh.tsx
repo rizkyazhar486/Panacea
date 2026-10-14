@@ -39,7 +39,7 @@ const Recovery = lazy(() => import('./Recovery').then((m) => ({ default: m.Recov
 const Breathwork = lazy(() => import('./Breathwork').then((m) => ({ default: m.Breathwork })))
 const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
 const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
-const FastingTimer = lazy(() => import('./FastingTimer').then((m) => ({ default: m.FastingTimer })))
+const FastingTimer = lazy(() => import('./wellness/FastingTimer').then((m) => ({ default: m.FastingTimer })))
 const PhoneHealthScan = lazy(() => import('./PhoneHealthScan').then((m) => ({ default: m.PhoneHealthScan })))
 
 const TABS: TabDef[] = [

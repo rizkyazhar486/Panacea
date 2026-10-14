@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconTimer, IconActivity } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconTimer, IconActivity } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fasting & Autophagy Timer — maps to several longevity-list features (autophagy
