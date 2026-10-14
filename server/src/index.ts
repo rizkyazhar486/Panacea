@@ -1156,7 +1156,10 @@ app.put('/api/lab-log', requireAuth, (req, res) => {
     const kini = new Date()
     const baru = { log: validasiLogLab(body?.log, kini), diperbaruiPada: validasiCapWaktu(body?.diperbaruiPada, kini) }
     const { diterima, hasil } = terimaTulisan(getLabLog(u.email), baru)
-    if (diterima) putLabLog(u.email, hasil)
+    if (diterima) {
+      putLabLog(u.email, hasil)
+      addAudit(u, 'lab.log.updated', u.id)
+    }
     res.status(diterima ? 200 : 409).json(hasil)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
@@ -1323,6 +1326,7 @@ app.post('/api/care/reports', requireAuth, (req, res) => {
     const sama = laporan.clientId ? listCareReports(u.email, p.rencana.id).find((l) => l.clientId === laporan.clientId) : undefined
     if (sama) { res.json(sama); return }
     addCareReport(u.email, laporan)
+    addAudit(u, 'care.report.created', p.rencana.id)
     res.json(laporan)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
