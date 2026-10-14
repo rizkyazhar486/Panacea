@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { useStore } from '../lib/store'
-import { validateAbInput, validateSampleSizeInput, validateSeoNumbers, validateCustomerEntry } from '../domains/owner-analytics'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { useStore } from '../../lib/store'
+import { validateAbInput, validateSampleSizeInput, validateSeoNumbers, validateCustomerEntry } from '../../domains/owner-analytics'
 import {
   auditSeo, analyseAb, requiredSampleSize, segment, analyseSentiment,
   SEGMENT_LABEL, SEO_STATUS_LABEL, SENTIMENT_LABEL,
   type Customer,
-} from '../lib/ownerAnalytics'
+} from '../../lib/ownerAnalytics'
 
 // Owner tools: SEO audit, A/B testing, RFM segmentation, sentiment triage.
 // Owner-only — these expose aggregate business data.

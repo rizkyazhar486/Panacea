@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { useStore } from '../lib/store'
-import { Card, SectionTitle } from '../components/ui'
-import { IconStethoscope, IconPhone, IconSparkle, IconCheck } from '../components/icons'
+import { useStore } from '../../lib/store'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconStethoscope, IconPhone, IconSparkle, IconCheck } from '../../components/icons'
 
 export function Admin() {
   const { state } = useStore()

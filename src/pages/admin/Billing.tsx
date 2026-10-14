@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
-import { useStore, TOKEN_TO_IDR } from '../lib/store'
-import { parseWithdrawAmount } from '../domains/wallet/index.ts'
-import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import { MANUAL_BANK } from '../lib/payment'
-import { Portal } from '../components/Portal'
-import type { SubscriptionPlan, TxType } from '../lib/types'
+import { useStore, TOKEN_TO_IDR } from '../../lib/store'
+import { parseWithdrawAmount } from '../../domains/wallet/index.ts'
+import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
+import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import { MANUAL_BANK } from '../../lib/payment'
+import { Portal } from '../../components/Portal'
+import type { SubscriptionPlan, TxType } from '../../lib/types'
 
 const txMeta: Record<TxType, { label: string; tone: 'brand' | 'critical' | 'neutral' | 'high' }> = {
   deposit: { label: 'Deposit', tone: 'brand' },
