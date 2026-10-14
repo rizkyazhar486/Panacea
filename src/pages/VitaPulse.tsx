@@ -1,6 +1,6 @@
 import { Fold } from '../shared/ui/Fold'
 import { useStore } from '../lib/store'
-import { PusatKesehatanRealtime } from './Feed'
+import { PusatKesehatanRealtime } from './social/Feed'
 import { VideoGallery } from '../components/VideoGallery'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 

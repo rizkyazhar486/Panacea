@@ -1,15 +1,15 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { simpanTeks } from '../lib/unduh'
+import { Prosa } from '../../components/Prosa'
+import { simpanTeks } from '../../lib/unduh'
 import { createPortal } from 'react-dom'
 
 const MeetMap = lazy(() => import('../components/MeetMap'))
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
-import { api, type BackendMeet, type BackendClub } from '../lib/api'
-import { useStore } from '../lib/store'
-import { geocode } from '../lib/geocode'
-import { parseMeetFee } from '../domains/club'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconUsers, IconActivity, IconMapPin } from '../../components/icons'
+import { api, type BackendMeet, type BackendClub } from '../../lib/api'
+import { useStore } from '../../lib/store'
+import { geocode } from '../../lib/geocode'
+import { parseMeetFee } from '../../domains/club'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Club Hub — community sports & health clubs and scheduled meets, both fully

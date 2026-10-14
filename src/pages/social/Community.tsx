@@ -1,6 +1,6 @@
-import { useStore } from '../lib/store'
+import { useStore } from '../../lib/store'
 import { KomunitasSehat } from './Feed'
-import { GpsCompetition } from '../components/GpsCompetition'
+import { GpsCompetition } from '../../components/GpsCompetition'
 
 // Community — social part of the app: Health Buddy, mood & support,
 // group challenges, sports community, Circle of Care, gratitude wall.

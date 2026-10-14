@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../lib/store'
-import { PostCard } from './Feed'
+import { PostCard } from './social/Feed'
 import { backendEnabled } from '../lib/api'
 import { IconSearch, IconUsers } from '../components/icons'
 

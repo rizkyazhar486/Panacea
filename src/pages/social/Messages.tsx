@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useStore } from '../lib/store'
+import { useStore } from '../../lib/store'
 import { useSearchParams } from 'react-router-dom'
-import { ConsultChat } from '../components/ConsultChat'
-import { backendEnabled } from '../lib/api'
-import { IconSend, IconX } from '../components/icons'
+import { ConsultChat } from '../../components/ConsultChat'
+import { backendEnabled } from '../../lib/api'
+import { IconSend, IconX } from '../../components/icons'
 
 const THREADS_KEY = 'panacea_dm_threads_v1'
 

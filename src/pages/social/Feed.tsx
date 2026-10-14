@@ -1,32 +1,32 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
-import { Fold } from '../shared/ui/Fold'
-import { Prosa } from '../components/Prosa'
-import { kunciHari, hariIni } from '../lib/tanggal'
-import { KolomVitalTerikat } from '../components/KolomVital'
-import { WidgetBeranda } from '../components/WidgetBeranda'
+import { Fold } from '../../shared/ui/Fold'
+import { Prosa } from '../../components/Prosa'
+import { kunciHari, hariIni } from '../../lib/tanggal'
+import { KolomVitalTerikat } from '../../components/KolomVital'
+import { WidgetBeranda } from '../../components/WidgetBeranda'
 
 // Real map (Leaflet + OpenStreetMap, free) — lazy so the heavy lib loads only
 // when the GPS tracker is opened.
 const RouteMap = lazy(() => import('../components/RouteMap'))
-import { useStore, uid } from '../lib/store'
-import { Card, Field, inputClass } from '../components/ui'
+import { useStore, uid } from '../../lib/store'
+import { Card, Field, inputClass } from '../../components/ui'
 import {
   IconHome, IconUsers, IconSearch, IconUser, IconPlus, IconRun, IconDrop, IconFlame, IconLeaf,
   IconArticle, IconComment, IconMoon, IconVideo, IconHeart, IconRepost, IconBookmark, IconLock,
   IconShare2, IconSend, IconX, IconMapPin, IconNavigation, IconTimer, IconGauge, IconActivity, IconDownload,
-} from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import { HealthQuiz } from '../components/HealthQuiz'
-import { ExamQuiz } from '../components/ExamQuiz'
-import { uploadOrLocal } from '../lib/upload'
-import { ActivityShareCard } from '../components/ActivityShareCard'
-import { WeatherWidget } from '../components/WeatherWidget'
-import { getDemo } from '../lib/profile'
-import { Portal } from '../components/Portal'
-import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
-import { useVitals, useVitalField } from '../lib/useVitals'
-import { useLiveHeartRate } from '../lib/useLiveHeartRate'
-import { vitalsAge } from '../lib/healthVitals'
+} from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import { HealthQuiz } from '../../components/HealthQuiz'
+import { ExamQuiz } from '../../components/ExamQuiz'
+import { uploadOrLocal } from '../../lib/upload'
+import { ActivityShareCard } from '../../components/ActivityShareCard'
+import { WeatherWidget } from '../../components/WeatherWidget'
+import { getDemo } from '../../lib/profile'
+import { Portal } from '../../components/Portal'
+import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../../lib/types'
+import { useVitals, useVitalField } from '../../lib/useVitals'
+import { useLiveHeartRate } from '../../lib/useLiveHeartRate'
+import { vitalsAge } from '../../lib/healthVitals'
 
 /* ═══════════════════════════════════════════════════════
    GPS SPORTS MODES

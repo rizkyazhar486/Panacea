@@ -18,9 +18,9 @@ import '../styles/home-human-interface.css'
 import '../styles/home-liquid-control-layer.css'
 import '../styles/home-compact-responsive.css'
 
-const Feed = lazy(() => import('./Feed'))
-const Community = lazy(() => import('./Community').then((m) => ({ default: m.Community })))
-const ClubHub = lazy(() => import('./ClubHub').then((m) => ({ default: m.ClubHub })))
+const Feed = lazy(() => import('./social/Feed'))
+const Community = lazy(() => import('./social/Community').then((m) => ({ default: m.Community })))
+const ClubHub = lazy(() => import('./social/ClubHub').then((m) => ({ default: m.ClubHub })))
 const MoneyHub = lazy(() => import('./MoneyHub').then((m) => ({ default: m.MoneyHub })))
 const Markets = lazy(() => import('./Markets').then((m) => ({ default: m.Markets })))
 const SportsScores = lazy(() => import('./SportsScores').then((m) => ({ default: m.SportsScores })))
