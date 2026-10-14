@@ -1,4 +1,4 @@
-import { pathologyImageLookup, searchAnatomyImages, xrayImageLookup } from '../src/anatomyImages.ts'
+import { pathologyImageLookup, searchAnatomyImages, xrayImageLookup } from '../src/domains/anatomy/anatomyImages.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

@@ -4,9 +4,9 @@ import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
-const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const BodyExplorer = lazy(() => import('./bodyhub/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
-const RecentInnovationLab = lazy(() => import('./RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
+const RecentInnovationLab = lazy(() => import('./medstudy/RecentInnovationLab').then((m) => ({ default: m.RecentInnovationLab })))
 const AtomicSystemsLab = lazy(() => import('./bodyhub/AtomicSystemsLab').then((m) => ({ default: m.AtomicSystemsLab })))
 const Radiology = lazy(() => import('./Radiology').then((m) => ({ default: m.Radiology })))
 const Electrophysiology = lazy(() => import('./Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
@@ -14,7 +14,7 @@ const GenomeLab = lazy(() => import('./GenomeLab').then((m) => ({ default: m.Gen
 const KnowledgeBridge = lazy(() => import('./KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
 const OsceUkmppd = lazy(() => import('./OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))
-const ClinicalEvidence = lazy(() => import('./ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
+const ClinicalEvidence = lazy(() => import('./medstudy/ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const DrugInfo = lazy(() => import('./DrugInfo').then((m) => ({ default: m.DrugInfo })))
 const ClinicalCalculators = lazy(() => import('./ClinicalCalculators').then((m) => ({ default: m.ClinicalCalculators })))
 

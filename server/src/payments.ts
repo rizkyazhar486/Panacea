@@ -5,7 +5,7 @@ import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
 import { currentUser } from './auth.js'
 import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type Order, type User } from './store.js'
-import { notify } from './push.js'
+import { notify } from './domains/push/push.js'
 import { sendReceipt } from './email.js'
 
 // Fixed-price purposes (IDR) — paid directly, not priced per-PNC.

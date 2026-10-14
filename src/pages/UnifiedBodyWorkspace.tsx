@@ -8,18 +8,18 @@ import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 
-const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
-const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
-const BodyToolkit = lazy(() => import('./BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
-const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
-const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
-const HealthPerformanceLeague = lazy(() => import('./HealthPerformanceLeague').then((m) => ({ default: m.HealthPerformanceLeague })))
+const BodyComposition = lazy(() => import('./bodyhub/BodyComposition').then((m) => ({ default: m.BodyComposition })))
+const BodyExposureOS = lazy(() => import('./bodyhub/BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
+const BodyToolkit = lazy(() => import('./bodyhub/BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
+const ShapeForming = lazy(() => import('./bodyhub/ShapeForming').then((m) => ({ default: m.ShapeForming })))
+const PusatLatihan = lazy(() => import('./fitness/PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
+const HealthPerformanceLeague = lazy(() => import('./bodyhub/HealthPerformanceLeague').then((m) => ({ default: m.HealthPerformanceLeague })))
 const PusatTubuh = lazy(() => import('./PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
-const PusatGizi = lazy(() => import('./PusatGizi').then((m) => ({ default: m.PusatGizi })))
-const HealthProfile = lazy(() => import('./HealthProfile').then((m) => ({ default: m.HealthProfile })))
-const VitaPulse = lazy(() => import('./VitaPulse').then((m) => ({ default: m.VitaPulse })))
-const Longevity = lazy(() => import('./Longevity').then((m) => ({ default: m.Longevity })))
-const DataLab = lazy(() => import('./DataLab').then((m) => ({ default: m.DataLab })))
+const PusatGizi = lazy(() => import('./bodyhub/PusatGizi').then((m) => ({ default: m.PusatGizi })))
+const HealthProfile = lazy(() => import('./bodyhub/HealthProfile').then((m) => ({ default: m.HealthProfile })))
+const VitaPulse = lazy(() => import('./bodyhub/VitaPulse').then((m) => ({ default: m.VitaPulse })))
+const Longevity = lazy(() => import('./bodyhub/Longevity').then((m) => ({ default: m.Longevity })))
+const DataLab = lazy(() => import('./bodyhub/DataLab').then((m) => ({ default: m.DataLab })))
 
 type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }

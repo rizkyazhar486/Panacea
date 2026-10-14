@@ -6,7 +6,7 @@
 // hanya bila pemilik atau isi salah satu jalur berubah.
 import { createHash } from 'node:crypto'
 import type { LogLab } from './labLog.js'
-import { KATALOG } from './healthMetrics.js'
+import { KATALOG } from './domains/push/healthMetrics.js'
 import { bacaSelfVitalsLog, bacaVo2maxLog, bacaDiarySleep, bacaDiaryFoods, bacaDiaryWellness, bacaDiaryDihapus, bacaDiaryTraining, bacaDiaryGps } from './catatanKesehatanDiri.js'
 
 const KUNCI_METRIK = new Set<string>([...KATALOG.map((d) => d.kunci), 'sleepH'])

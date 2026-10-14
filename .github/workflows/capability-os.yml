@@ -5,7 +5,7 @@ on:
     paths:
       - 'config/capability-os*.json'
       - 'scripts/lib/capability-os.mjs'
-      - 'scripts/validate-capability-os.mjs'
+      - 'scripts/qa/validate-capability-os.mjs'
       - 'scripts/qa/capability-os-*.test.mjs'
       - '.claude/skills/panacea-capability-router/**'
       - '.claude/skills/panacea-orchestrator/**'
