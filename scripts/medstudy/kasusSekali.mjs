@@ -13,7 +13,7 @@
 // sebagian besarnya sudah selesai — kekeliruan yang sudah berkali-kali terjadi
 // pada skrip-skrip di sini, dan yang paling mahal akibatnya.
 //
-// Dijalankan: node scripts/kasusSekali.mjs [jumlah]
+// Dijalankan: node scripts/medstudy/kasusSekali.mjs [jumlah]
 
 import { FIELD, ALIAS_GANDA, petaNorm, terisi, bukanKasus, norm, kunciCatatan, semuaKasus } from '../lib/catatanRekap.mjs'
 

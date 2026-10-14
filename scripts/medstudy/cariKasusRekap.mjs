@@ -11,12 +11,12 @@
 // dewasa' ke 'Anisometropia pada DEWASA'. Yang dikerjakannya hanya menampilkan
 // calon, supaya tiap barisnya dipilih dengan mata sebelum ditulis ke tabel.
 //
-// Dijalankan: node scripts/cariKasusRekap.mjs <kata> [kata lain...]
+// Dijalankan: node scripts/medstudy/cariKasusRekap.mjs <kata> [kata lain...]
 import { execFileSync } from 'node:child_process'
 
 const kata = process.argv.slice(2).map((k) => k.toLowerCase())
 if (!kata.length) {
-  console.error('pakai: node scripts/cariKasusRekap.mjs <kata> [kata lain...]')
+  console.error('pakai: node scripts/medstudy/cariKasusRekap.mjs <kata> [kata lain...]')
   process.exit(1)
 }
 

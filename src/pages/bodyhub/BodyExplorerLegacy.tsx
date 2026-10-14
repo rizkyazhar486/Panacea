@@ -15,31 +15,31 @@ import { Link } from 'react-router-dom'
 
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
-const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
-const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
-const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
-const OrganDossier = lazy(() => import('./bodyhub/OrganDossier'))
-const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
+const PhysiologySection = lazy(() => import('./PhysiologySection'))
+const DrugSection = lazy(() => import('./DrugSection'))
+const DiseaseSection = lazy(() => import('./DiseaseSection'))
+const OrganDossier = lazy(() => import('./OrganDossier'))
+const SimulatorSection = lazy(() => import('./SimulatorSection'))
 // Ruang kardiovaskular: figur pembuluh tersendiri dengan aliran dan lesi, jadi
 // dimuat hanya ketika tabnya dibuka — GLB-nya 3,6 MB.
-const CardioLab = lazy(() => import('./bodyhub/CardioLab'))
+const CardioLab = lazy(() => import('./CardioLab'))
 // Ruang spesialisasi: dua belas modul anatomi bernama, dimuat per modul.
-const SpecialtyLab = lazy(() => import('./bodyhub/SpecialtyLab'))
+const SpecialtyLab = lazy(() => import('./SpecialtyLab'))
 // Ruang molekul: geometri 3D obat, dibangkitkan RDKit dan diperiksa rumusnya.
-const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
+const MolecularLab = lazy(() => import('./MolecularLab'))
 // Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
-const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
+const GenomicsLab = lazy(() => import('./GenomicsLab'))
 // Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
-const CellLab = lazy(() => import('./bodyhub/CellLab'))
+const CellLab = lazy(() => import('./CellLab'))
 // Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
-const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
+const StructureFinder = lazy(() => import('./StructureFinder'))
 // Dua ruang ini sudah rampung tetapi tidak pernah dipasang ke tab mana pun,
 // sehingga tidak ada satu pun cara membukanya dari dalam aplikasi.
-const WholeBodyPrecisionLab = lazy(() => import('./bodyhub/WholeBodyPrecisionLab'))
-const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
+const WholeBodyPrecisionLab = lazy(() => import('./WholeBodyPrecisionLab'))
+const BiomedicalEngineLab = lazy(() => import('./BiomedicalEngineLab'))
 // Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
-const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
-const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
+const SurgicalLab = lazy(() => import('./SurgicalLab'))
+const WorkoutSimSection = lazy(() => import('./WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data

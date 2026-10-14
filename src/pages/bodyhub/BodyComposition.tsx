@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Fold } from '../../../shared/ui/Fold'
-import { Prosa } from '../../../components/Prosa'
-import { KolomAngka } from '../../../components/KolomAngka'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../../components/ui'
-import { useVitals } from '../../../lib/useVitals'
-import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../../components/icons'
-import { getHealthCache, pushBiometrics, mergeHealthCache } from '../../../lib/profile'
-import { mergeVitals } from '../../../lib/healthVitals'
-import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
+import { Fold } from '../../shared/ui/Fold'
+import { Prosa } from '../../components/Prosa'
+import { KolomAngka } from '../../components/KolomAngka'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { useVitals } from '../../lib/useVitals'
+import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../components/icons'
+import { getHealthCache, pushBiometrics, mergeHealthCache } from '../../lib/profile'
+import { mergeVitals } from '../../lib/healthVitals'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Komposisi Tubuh — InBody-style visual page. Nilai yang diketahui perangkat

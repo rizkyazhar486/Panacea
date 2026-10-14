@@ -123,7 +123,7 @@ const baris = semua.map((s) => {
   }
 }).sort((a, b) => a.b.localeCompare(b.b) || a.n.localeCompare(b.n))
 
-const isi = `// DIBANGKITKAN oleh scripts/indeksTubuh.mjs — jangan disunting tangan.
+const isi = `// DIBANGKITKAN oleh scripts/atlas/indeksTubuh.mjs — jangan disunting tangan.
 //
 // Setiap struktur bernama yang BENAR-BENAR ADA di /public/anatomy/*.glb
 // (Z-Anatomy, CC BY-SA 4.0 — lihat public/anatomy/CREDITS.txt). Tidak ada nama

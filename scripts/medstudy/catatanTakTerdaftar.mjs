@@ -18,7 +18,7 @@
 // atau seluruh kata bermakna termuat — sebab pencocokan longgar pernah
 // menautkan dua penyakit yang tidak berhubungan di skrip lain.
 //
-// Dijalankan: node scripts/catatanTakTerdaftar.mjs
+// Dijalankan: node scripts/medstudy/catatanTakTerdaftar.mjs
 import { readFileSync } from 'node:fs'
 
 const FIELD = ['definisi', 'etiologi', 'patofisiologi', 'anamnesis', 'pemeriksaanFisik', 'penunjang', 'diagnosisBanding', 'tatalaksana']

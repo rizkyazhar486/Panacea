@@ -2,7 +2,7 @@
   {
     "type": "dependency",
     "from": "src/components/digital-twin/DigitalTwinEngine.tsx",
-    "to": "src/pages/BodyExplorerLegacy.tsx",
+    "to": "src/pages/bodyhub/BodyExplorerLegacy.tsx",
     "unresolvedTo": "../../pages/BodyExplorerLegacy",
     "dependencyTypes": [
       "local",
@@ -29,7 +29,7 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
     "to": "src/pages/Athlete.tsx",
     "unresolvedTo": "../pages/Athlete",
     "dependencyTypes": [
@@ -43,8 +43,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/BodyComposition.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/bodyhub/BodyComposition.tsx",
     "unresolvedTo": "../pages/BodyComposition",
     "dependencyTypes": [
       "local",
@@ -57,8 +57,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/FitnessTest.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/fitness/FitnessTest.tsx",
     "unresolvedTo": "../pages/FitnessTest",
     "dependencyTypes": [
       "local",
@@ -71,7 +71,7 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
     "to": "src/pages/InitialAssessment.tsx",
     "unresolvedTo": "../pages/InitialAssessment",
     "dependencyTypes": [
@@ -85,8 +85,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/Logs.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/medstudy/Logs.tsx",
     "unresolvedTo": "../pages/Logs",
     "dependencyTypes": [
       "local",
@@ -99,8 +99,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/PerformanceLab.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/fitness/PerformanceLab.tsx",
     "unresolvedTo": "../pages/PerformanceLab",
     "dependencyTypes": [
       "local",
@@ -113,8 +113,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/SportsScience.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/fitness/SportsScience.tsx",
     "unresolvedTo": "../pages/SportsScience",
     "dependencyTypes": [
       "local",
@@ -127,8 +127,8 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/OfflineReady.tsx",
-    "to": "src/pages/TrainingPlan.tsx",
+    "from": "src/components/ui/OfflineReady.tsx",
+    "to": "src/pages/fitness/TrainingPlan.tsx",
     "unresolvedTo": "../pages/TrainingPlan",
     "dependencyTypes": [
       "local",
@@ -142,7 +142,7 @@
   {
     "type": "dependency",
     "from": "src/components/layout/PencarianGlobal.tsx",
-    "to": "src/pages/ClinicalHub.tsx",
+    "to": "src/pages/clinical/ClinicalHub.tsx",
     "unresolvedTo": "../../pages/ClinicalHub",
     "dependencyTypes": [
       "local",
@@ -156,7 +156,7 @@
   {
     "type": "dependency",
     "from": "src/components/layout/PencarianGlobal.tsx",
-    "to": "src/pages/FitnessHub.tsx",
+    "to": "src/pages/fitness/FitnessHub.tsx",
     "unresolvedTo": "../../pages/FitnessHub",
     "dependencyTypes": [
       "local",
@@ -170,7 +170,7 @@
   {
     "type": "dependency",
     "from": "src/components/layout/PencarianGlobal.tsx",
-    "to": "src/pages/WellnessHub.tsx",
+    "to": "src/pages/wellness/WellnessHub.tsx",
     "unresolvedTo": "../../pages/WellnessHub",
     "dependencyTypes": [
       "local",
@@ -183,7 +183,7 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/PersonalBodyUnifiedSurface.tsx",
+    "from": "src/components/digital-twin/PersonalBodyUnifiedSurface.tsx",
     "to": "src/pages/bodyhub/PersonalAvatarCameraCapture.tsx",
     "unresolvedTo": "../pages/bodyhub/PersonalAvatarCameraCapture",
     "dependencyTypes": [
@@ -197,7 +197,7 @@
   },
   {
     "type": "dependency",
-    "from": "src/components/PersonalBodyUnifiedSurface.tsx",
+    "from": "src/components/digital-twin/PersonalBodyUnifiedSurface.tsx",
     "to": "src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx",
     "unresolvedTo": "../pages/bodyhub/UnifiedHumanSimulationProjector",
     "dependencyTypes": [

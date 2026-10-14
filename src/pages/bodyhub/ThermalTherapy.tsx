@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation } from 'react-router-dom'
 import { hariLalu, hariIni } from '../../lib/tanggal'
-import '../styles/thermal-recovery.css'
+import '../../styles/thermal-recovery.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 type ThermalMode = 'spa' | 'sauna' | 'steam' | 'jacuzzi' | 'hot' | 'cold' | 'onsen'
