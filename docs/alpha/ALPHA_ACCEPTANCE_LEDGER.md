@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 32 / 43 = 74.4%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 32 / 45 = 71.1%** (baseline main `4b2009a1f`, 2026-10-10).
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
@@ -19,6 +19,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 - Clinical Calculators: fungsi, validasi, regression, penandaan status review
 - Body Exposure Alpha: anatomi seluruh tubuh bertahap, interaksi 3D, layer dasar, navigasi, WALK/RUN teruji; modul belum tervalidasi berlabel
 - Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment
+- User Journey & Product Experience: perjalanan pengguna lintas peran dari masuk hingga menuntaskan tugas dan keluar, ditambah optimasi aksesibilitas, responsivitas, performa, serta konsistensi visual aplikasi
 
 ## Ringkasan status
 
@@ -27,7 +28,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | VERIFIED | 32 |
 | REPORTED | 5 |
 | NOT_CHECKED | 5 |
-| NOT_STARTED | 0 |
+| NOT_STARTED | 2 |
 | BLOCKED | 0 |
 | PENDING_CLINICAL_REVIEW | 1 |
 
@@ -98,4 +99,11 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | E7 | Deployment staging terverifikasi | SHA yang berjalan di staging/produksi sama dengan SHA main dan smoke perjalanan kritis lulus | NOT_CHECKED | Sol | Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen |
 | E8 | Security Baseline hijau pada main | Security Baseline Enforcement hijau pada main | VERIFIED | Sol (CI) | Workflow security-baseline-enforcement.yml hijau pada main 4b2009a1f |
 | E9 | Audit dependensi menolak laporan rusak | Gerbang audit dependensi gagal pada laporan malformed | VERIFIED | Sol | scripts/qa/dependency-audit-gate.mjs + scripts/qa/dependency-audit-gate.test.mjs (main d1f5244cc+): node --test 33/33 lulus; dipanggil dari .github/workflows/dependency-audit.yml untuk workspace web dan server.; Uji CLI independen (Sonnet Cloud): JSON terpotong, {"error":...}, dan berkas kosong semuanya exit 2; laporan bersih berpasangan exit 0.; Sabotase: gerbang dengan cek `audit.error` dimatikan gagal pada tes 'kunci_error_pada_laporan_yang_tampak_lengkap_tetap_gagal_tertutup'; dengan cek bentuk-objek dimatikan gagal pada 'input_audit_rusak_gagal_tertutup_bukan_lolos'.; Batas: yang diverifikasi adalah penolakan bentuk laporan (rusak, kosong, berisi galat), bukan kebenaran data advisory npm. Gerbang belum dijalankan terhadap npm audit nyata di sesi ini (jaringan). |
+
+## User Journey & Product Experience (0 / 2)
+
+| ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |
+|---|---|---|---|---|---|
+| F1 | Task 44 — Full User Journey Acceptance | Inventarisasi rute dan peran dari kontrak backend dan matriks fitur yang berlaku; uji browser E2E pada aplikasi dan API nyata memakai identitas sintetis untuk perjalanan kritis pasien, dokter, perawat, laboratorium, dan admin sesuai kapabilitas yang benar-benar tersedia, dari onboarding atau login melalui navigasi, tindakan utama, penyelesaian, kembali, dan logout. Bukti CI mencakup RBAC positif dan negatif, navigasi tidak buntu, state loading atau error, serta viewport 390x844 dan 1440x900. Keterbatasan integrasi maupun peran yang belum tersedia tidak dianggap lulus. | NOT_STARTED | Vika (journey dan UI) / Insan (kontrak) / Sol dan Sonnet (uji E2E) | Kriteria baru ke-44 disetujui oleh pemilik 2026-10-14. A8 adalah E2E backend, bukan bukti browser user journey produk; jangan menghitung A8/B7 sebagai verifikasi otomatis task ini. |
+| F2 | Task 45 — UI/UX Optimization & Polishing Acceptance | Audit dan perbaiki halaman aktif yang masuk cakupan perjalanan kritis serta navigasi global dengan desain adaptif yang konsisten: tipografi, token warna PanaceaMed, hirarki visual, fokus dan keyboard, label semantik, kontras WCAG 2.2 AA, target sentuh sekurangnya 44px sesuai standar repo, responsivitas 390x844 dan desktop tanpa overflow, state kosong atau loading atau error, pembatalan atau pemulihan, dan reduced motion. Lampirkan inventaris halaman, hasil audit aksesibilitas otomatis ditambah pemeriksaan manual terarah, regresi screenshot lintas viewport dan tema, serta pengukuran performa yang metodologinya tercatat. Temuan kritis harus dituntaskan atau tetap berstatus belum VERIFIED; hindari klaim validasi pengguna yang tidak diuji. | NOT_STARTED | Vika (design authority) / Sonnet (frontend) / Sol (gate dan performance) | Kriteria baru ke-45 disetujui oleh pemilik 2026-10-14. C7, D10, dan E5 membuktikan responsivitas terbatas; tidak mencakup audit atau polishing menyeluruh. Jangan mengklaim sudah teruji secara eksternal. |
 
