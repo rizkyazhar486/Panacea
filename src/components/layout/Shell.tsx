@@ -300,6 +300,9 @@ export function Shell({ children }: { children: ReactNode }) {
   const [spacesOpen, setSpacesOpen] = useState(false)
   const [userMenuBuka, setUserMenuBuka] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const userMenuButtonRef = useRef<HTMLButtonElement>(null)
+  const spacesRef = useRef<HTMLDivElement>(null)
+  const spacesButtonRef = useRef<HTMLButtonElement>(null)
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -356,7 +359,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const { tarikan, geser, menggeser } = useGestur({
     onKembali: kembali, onLanjut: lanjut, onSegarkan: segarkan,
-    mati: cariBuka || spacesOpen,
+    mati: cariBuka || spacesOpen || userMenuBuka,
   })
 
   // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
@@ -405,24 +408,43 @@ export function Shell({ children }: { children: ReactNode }) {
 
   // The top command bar may hide while reading. Assistive Touch stays mounted
   // independently so global actions never disappear with the chrome.
-  const keadaanBilah = useCommandBar(bilahAtas)
+  const keadaanBilahOtomatis = useCommandBar(bilahAtas)
+  const keadaanBilah = spacesOpen || userMenuBuka ? 'shown' : keadaanBilahOtomatis
 
   // Route changes close compact command dropdown, user menu, and record local use.
   useEffect(() => {
     setSpacesOpen(false)
     setUserMenuBuka(false)
     trackVisit(loc.pathname)
-  }, [loc.pathname])
+  }, [loc.pathname, loc.search, loc.hash])
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function handleClickOutside(e: PointerEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuBuka(false)
       }
+      if (!spacesRef.current?.contains(e.target as Node) && !spacesButtonRef.current?.contains(e.target as Node)) {
+        setSpacesOpen(false)
+      }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handleClickOutside)
+    return () => document.removeEventListener('pointerdown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (!userMenuBuka && !spacesOpen) return
+    const panel = userMenuBuka ? userMenuRef.current?.querySelector('#panacea-account-panel') : spacesRef.current
+    panel?.querySelector<HTMLElement>('a, button')?.focus()
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      setUserMenuBuka(false)
+      setSpacesOpen(false)
+      ;(userMenuBuka ? userMenuButtonRef : spacesButtonRef).current?.focus()
+    }
+    document.addEventListener('keydown', onEscape)
+    return () => document.removeEventListener('keydown', onEscape)
+  }, [userMenuBuka, spacesOpen])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -448,7 +470,13 @@ export function Shell({ children }: { children: ReactNode }) {
   // Harus berada SEBELUM return awal di bawah: hook yang dipanggil setelah
   // return kondisional membuat React crash ("rendered more hooks") saat rute
   // berpindah antara /design-demo atau Login dan halaman biasa.
-  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
+  const doLogout = () => {
+    setUserMenuBuka(false)
+    setSpacesOpen(false)
+    if (backendEnabled) api.logout().catch(() => {})
+    logout()
+    navigate('/', { replace: true })
+  }
   useEffect(() => {
     const onLogout = () => doLogout()
     window.addEventListener('panacea:logout', onLogout)
@@ -531,6 +559,11 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="pmd-spectral-shell relative flex min-h-screen">
+      <a href="#panacea-main" className="panacea-skip-link" onClick={(event) => {
+        // HashRouter owns the URL hash; focus content without changing the route.
+        event.preventDefault()
+        document.getElementById('panacea-main')?.focus()
+      }}>Skip to content</a>
       {onHome && <DailyQuoteBanner />}
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
@@ -554,12 +587,14 @@ export function Shell({ children }: { children: ReactNode }) {
         >
           <div className="flex min-w-0 items-center gap-2">
             <button
+              ref={spacesButtonRef}
               type="button"
-              onClick={() => setSpacesOpen((value) => !value)}
+              onClick={() => { setUserMenuBuka(false); setSpacesOpen((value) => !value) }}
               className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
               aria-label="Open Panacea spaces"
               aria-expanded={spacesOpen}
               aria-haspopup="true"
+              aria-controls="panacea-spaces-panel"
             >
               <LogoMark size={27} />
             </button>
@@ -588,7 +623,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           {spacesOpen && (
-            <div className="pmd-command-spaces" aria-label="Panacea spaces">
+            <div ref={spacesRef} id="panacea-spaces-panel" className="pmd-command-spaces" role="navigation" aria-label="Panacea spaces" onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node) && event.relatedTarget !== spacesButtonRef.current) setSpacesOpen(false)
+            }}>
               <Link
                 to="/"
                 className="pmd-command-space-link"
@@ -690,19 +727,27 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             )}
 
+          </div>
+
             {/* Menu Akun Pengguna & Logout */}
-            <div className="relative shrink-0" ref={userMenuRef}>
+            {/* Keep the disclosure outside the scrolling toolbar: overflow-x
+                also clips vertical overflow, including the logout control. */}
+            <div className="relative shrink-0" ref={userMenuRef} onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) setUserMenuBuka(false)
+            }}>
               <button
+                ref={userMenuButtonRef}
                 type="button"
-                onClick={() => setUserMenuBuka((prev) => !prev)}
-                className={`group flex items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
+                onClick={() => { setSpacesOpen(false); setUserMenuBuka((prev) => !prev) }}
+                className={`group flex min-h-11 items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
                   userMenuBuka
                     ? 'border-brand ring-2 ring-brand/30 dark:border-brand/70'
                     : 'border-black/10 hover:border-black/20 dark:border-white/15 dark:hover:border-white/30'
                 }`}
-                aria-label="Menu akun dan keluar"
-                title="Akun & Pengaturan (Klik untuk menu)"
+                aria-label="Account and log out"
+                title="Account and log out"
                 aria-expanded={userMenuBuka}
+                aria-controls="panacea-account-panel"
               >
                 {/* Avatar dengan titik indikator aktif */}
                 <div className="relative">
@@ -717,7 +762,8 @@ export function Shell({ children }: { children: ReactNode }) {
 
                 <div className="flex flex-col items-start text-left leading-none">
                   <span className="max-w-[84px] truncate font-bold text-neutral-800 dark:text-neutral-100 sm:max-w-[110px]">
-                    {account.name.split(' ')[0]}
+                    <span className="sm:hidden">Account</span>
+                    <span className="hidden sm:inline">{account.name.split(' ')[0]}</span>
                   </span>
                   <span className="hidden text-[9px] font-semibold capitalize text-neutral-400 dark:text-neutral-500 sm:inline">
                     {roleLabel[account.role] ? roleLabel[account.role].split(' ')[0] : account.role}
@@ -743,7 +789,10 @@ export function Shell({ children }: { children: ReactNode }) {
 
               {userMenuBuka && (
                 <div
-                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
+                  id="panacea-account-panel"
+                  role="region"
+                  aria-label="Account"
+                  className="panacea-account-panel absolute right-0 top-full z-50 mt-2 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
                   style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
                 >
                   {/* Profil Header */}
@@ -775,7 +824,7 @@ export function Shell({ children }: { children: ReactNode }) {
                       className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
                     >
                       <IconUser size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span>Profil &amp; Rekam Medis</span>
+                      <span>Profile &amp; Medical Records</span>
                     </NavLink>
                     <NavLink
                       to="/settings"
@@ -783,22 +832,40 @@ export function Shell({ children }: { children: ReactNode }) {
                       className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
                     >
                       <IconSettings size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span>Pengaturan Akun</span>
+                      <span>Account Settings</span>
                     </NavLink>
+                  </div>
+
+                  {/* Tombol Logout */}
+                  <div className="border-t border-black/5 p-1.5 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuBuka(false)
+                        doLogout()
+                      }}
+                      className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
+                    >
+                      <div className="flex items-center gap-2">
+                        <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
+                        <span>Log out</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-rose-500/80" aria-hidden>↗</span>
+                    </button>
                   </div>
 
                   {/* Switch Role / Ganti Peran */}
                   <div className="border-t border-black/5 px-2 py-2 dark:border-white/10">
                     <div className="mb-1.5 flex items-center justify-between px-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                      <span>Ganti Peran Aktif</span>
-                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-semibold text-neutral-500 dark:bg-neutral-800">Cepat</span>
+                      <span>Switch Active Role</span>
+                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-semibold text-neutral-500 dark:bg-neutral-800">Quick</span>
                     </div>
                     <div className="grid grid-cols-2 gap-1">
                       {([
-                        { r: 'pasien', label: 'Pasien', icon: '🩺' },
-                        { r: 'dokter', label: 'Dokter', icon: '👨‍⚕️' },
-                        { r: 'verifikator', label: 'Verifikator', icon: '🔍' },
-                        { r: 'kontributor', label: 'Kontributor', icon: '✍️' },
+                        { r: 'pasien', label: 'Patient', icon: '🩺' },
+                        { r: 'dokter', label: 'Doctor', icon: '👨‍⚕️' },
+                        { r: 'verifikator', label: 'Verifier', icon: '🔍' },
+                        { r: 'kontributor', label: 'Contributor', icon: '✍️' },
                       ] as const).map(({ r, label, icon }) => {
                         const isCur = account.role === r
                         return (
@@ -835,33 +902,16 @@ export function Shell({ children }: { children: ReactNode }) {
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm">📲</span>
-                        <span>Pasang Aplikasi (Install App)</span>
+                        <span>Install App</span>
                       </div>
                       <span className="text-[10px] font-semibold text-neutral-400">PWA</span>
                     </button>
                   </div>
 
-                  {/* Tombol Logout */}
-                  <div className="border-t border-black/5 p-1.5 dark:border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserMenuBuka(false)
-                        doLogout()
-                      }}
-                      className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
-                    >
-                      <div className="flex items-center gap-2">
-                        <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
-                        <span>Keluar dari Akun (Log Out)</span>
-                      </div>
-                      <span className="text-[10px] font-semibold text-rose-500/80">Keluar ↵</span>
-                    </button>
-                  </div>
+
                 </div>
               )}
             </div>
-          </div>
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
 
@@ -896,6 +946,8 @@ export function Shell({ children }: { children: ReactNode }) {
             menggeser, gerakannya tertinggal di belakang jari dan justru terasa
             berat. */}
         <main
+          id="panacea-main"
+          tabIndex={-1}
           data-spatial={spatialSurface ? 'true' : 'false'}
           /* pb-16, bukan pb-28. Ruang 112 px di bawah dulu disediakan untuk
              bilah navigasi selebar layar; bilah itu sudah diganti tombol

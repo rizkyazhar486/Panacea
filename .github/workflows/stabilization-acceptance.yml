@@ -172,6 +172,12 @@ jobs:
           NAVIGATION_QA_OUTPUT: artifacts/uiux-mobile-390x844
         run: node scripts/qa/navigation-back-smoke.mjs
 
+      - name: Account logout and keyboard navigation (mobile, landscape, desktop)
+        timeout-minutes: 5
+        env:
+          NAVIGATION_QA_ORIGIN: http://127.0.0.1:4173
+        run: node scripts/qa/navigation-account-smoke.mjs
+
       - name: C2 Framingham missing-input recovery (390x844)
         timeout-minutes: 5
         env:
