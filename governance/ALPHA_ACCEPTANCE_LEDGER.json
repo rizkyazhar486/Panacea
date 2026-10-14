@@ -68,20 +68,26 @@
    "pillar": "Panacea One OS",
    "criterion": "Pemeriksaan dikendalikan klinisi",
    "acceptance": "Entri pemeriksaan hanya dapat dibuat/diubah oleh peran klinisi terotorisasi; peran lain ditolak (tes negatif)",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/examinationWriteHttp.uji.ts, mandatory through rekamEncounter.uji.ts: real HTTP positive verified-clinician examination writes and negative patient creation/change/deletion/metadata forgery, administrative-owner and anonymous attempts, and revoked-clinician sessions. Denied writes preserve exact stored records. Unchanged examination echoes permit patient anamnesis edits, including reordered keys. AI examination proposals remain separately persisted and labelled unexamined; nonclinical examination controls are read-only.",
+    "PR #2523 exact head64c28b9761164db05279e40601c576a6f3b9b8e5 passed all10 applicable checks; named examinationWriteHttp success independently read in server job115638357170. Refreshed main and reran the regression against the combined merge candidate before expected-head integration. Canonical merge d6dc45222d0dbdba8f7d3914fc8b5de80417e048 has the independently reproduced merge tree beb980fec9452e332c52ac3781209289170c9049. https://github.com/rizkyazhar486/Panacea/pull/2523"
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "Engineering authorization evidence using synthetic fixtures only. Administrative ownership is not examination authority; fixture professional verification is not human clinical approval."
   },
   {
    "id": "A5",
    "pillar": "Panacea One OS",
    "criterion": "Dokumentasi berbantuan AI berstatus draf",
    "acceptance": "Keluaran AI tersimpan sebagai draf, tidak pernah sebagai catatan bertanda tangan, sampai klinisi teridentifikasi menyetujui",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/aiDraftApprovalHttp.uji.ts, mandatory through rekamKlinis.uji.ts: actual HTTP application with a deterministic AI-labelled content fixture and real file persistence. Patient and verified-clinician draft saves remain unsigned across process restart; unsigned encounter closure and forged patient approval cannot create signed state. Only explicit sign intent from the authenticated verified clinician produces a server-timed signature, and AI origin stays AI.",
+    "PR #2524 exact head692f7efc07003bc6376df9c5abd331d3aa47e29d passed all10 applicable checks; named aiDraftApprovalHttp success independently read in server job115639187305. Reran the suite with current main and the integrated A4 examination boundary before expected-head merge. Canonical merge7127b799d62e31ec7df42f97cae5a1dab3a10f51 has independently reproduced merge tree b0e472761195caf3be645791e24afd1fe09ecc1f. https://github.com/rizkyazhar486/Panacea/pull/2524"
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "Tests cover the documentation persistence/signature boundary, not AI-provider correctness or clinical validation. Synthetic clinician signature does not set clinically_reviewed=true. A6 active-plan/signature acceptance remains separate and open."
   },
   {
    "id": "A6",
@@ -108,10 +114,13 @@
    "pillar": "Panacea One OS",
    "criterion": "Satu perjalanan E2E lulus",
    "acceptance": "Satu skenario terskrip dari identitas hingga tindak lanjut lulus di CI dengan persistensi nyata (bukan mock UI)",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/careJourneyRestart.uji.ts runs the actual application over HTTP with synthetic identities and real file persistence: authenticated clinician signs and closes an encounter; lab and referral lifecycles reach closure; patient follow-up answers persist across a killed/restarted server process; identity, signed snapshots, provenance, idempotency, cross-patient isolation and consent revocation are asserted.",
+    "Reproduced on canonical a70fb28786ab6263398a43f09581a60c31ddefd4 with: cd server && node --import tsx uji/careJourneyRestart.uji.ts (passed, 2026-10-14). Mandatory npm run uji imports this scenario through rekamEncounter.uji.ts. Exact-source CI run 38459565347, server-acceptance job 115511605728 SUCCESS, explicitly logs careJourneyRestart passed at 2026-10-13T20:05:32.9250820Z. https://github.com/rizkyazhar486/Panacea/actions/runs/38459565347"
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "Engineering E2E evidence only: isolated real file persistence, not MongoDB or production delivery. Synthetic doctor verification is a test fixture, not clinical approval. This does not certify A3-A7 or imply a signed-plan-to-follow-up causal link."
   },
   {
    "id": "B1",
@@ -488,7 +497,7 @@
    "pillar": "Platform Reliability",
    "criterion": "Otorisasi (RBAC) untuk data klinis",
    "acceptance": "Peran yang salah ditolak pada setiap rute data klinis",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "server/uji/rbacKlinis.uji.ts (terdaftar di server `npm run uji`): menjalankan server nyata (berkas data sementara, port bebas, login dev) dan memanggil 15 rute /api/clinical* sebagai anonim, pasien, dan dokter tanpa STR terverifikasi: anonim 401 di semua; pasien dan dokter tanpa STR ditolak sesuai matriks (403/404 sebelum efek; rute 200 hanya memuat data sendiri, diperiksa tidak bocor); id pasien asing 403 vs id sendiri 200 (berpasangan).",
     "Kelengkapan: pemindai rute di index.ts gagal bila ada rute /api/clinical* yang tidak ada di matriks.",
@@ -496,10 +505,12 @@
     "server/uji/rbacKlinis.uji.ts: fase HTTP tambahan setelah matriks 15 rute memverifikasi dokter melalui endpoint owner yang sah, membuat pasien praktik p1 dengan rekam privat nyata, menolak pembacaan/daftar kedua pasien tanpa tautan, menguji dua identitas self-u-<userId> dengan baca/tulis sendiri 200 dan akses silang 403, lalu membuktikan kode tautan dokter hanya memberi akses ke akun penebus; akun lain tetap 403 tanpa tautan.",
     "Sabotase tambahan: penjaga kepemilikan sementara mengizinkan pasien asing yang benar-benar tersimpan. Matriks id asing yang belum ada tetap lulus, tetapi fase baru gagal tepat pada unlinked patient cannot read existing private p1. Penjaga runtime dipulihkan sebelum uji bersih targeted/full server, typecheck, build, dan typecheck ketat fixture lulus.",
     "server/uji/labReferralHttpRbac.uji.ts, imported by mandatory hasilLab.uji.ts: nine actual HTTP lab/referral routes have an exact route-coverage matrix. Anonymous requests are 401; patients and effective unverified doctors read only their genuinely populated self-u subjects, cannot intake/advance or read staff metrics; unrelated existing IDs are concealed with 404 and filtered lists. Configured owner verifies a synthetic doctor via the real API; doctor transitions have authenticated actor/time provenance, while owner intake/scheduling cannot grant clinical review/completion. Every denial compares exact clinician-visible collections before/after.",
-    "Real patient-ownership admission mutation fails the named populated-subject list exclusion assertion. Runtime source restored before clean targeted/full-server suites, typecheck/build and strict fixture typecheck. Development/file-mode synthetic fixtures only; lifecycle reviewed is not human clinical validation."
+    "Real patient-ownership admission mutation fails the named populated-subject list exclusion assertion. Runtime source restored before clean targeted/full-server suites, typecheck/build and strict fixture typecheck. Development/file-mode synthetic fixtures only; lifecycle reviewed is not human clinical validation.",
+    "Existing mandatory server/uji/labShareHttpRbac.uji.ts covers all12 registered lab-log/lab-share routes: anonymous401, populated own-only patient data, verified named-doctor role, unrelated doctor, review/write bounds and immediate revocation. careHttpRbac.uji.ts covers every /api/care route, patient-only report ownership, server-derived subjects, replacement and revocation. shareExpiryHttp.uji.ts controls persisted grant expiry across a process restart and checks all dependent clinician/care/longitudinal read routes; secondOpinionHttpRbac.uji.ts checks private patient views and verified-clinician completion. These named scenarios passed exact-source server CI job115638357170, and were reproduced locally on integrated main7127b799.",
+    "The supplementary careHttpRbac regression checks anonymous longitudinal reads, a populated own care-plan projection, and a second patient forging subjectId/email query parameters: the response remains keyed to the authenticated second patient with no foreign care plans. Removing the clinician lab-share role guard temporarily causes the existing mandatory suite to fail by name: patient GET /api/clinician/lab-shares (200 vs403). Original runtime bytes restored before clean labShareHttpRbac, careHttpRbac and shareExpiryHttp passes."
    ],
    "owner": "Sol",
-   "note": "Belum VERIFIED: actual clinical and lab/referral HTTP boundaries now have populated-subject positive/negative evidence. Remaining broader HTTP role/consent coverage includes /api/lab-log, /api/clinician/lab-shares/* and /api/care/*. Synthetic account verification and lifecycle transitions are not medical review or production patient-care acceptance."
+   "note": "The previously recorded missing lab/care HTTP evidence is reconciled with existing mandatory suites; original clinical and lab/referral route matrices remain intact. Development/file-mode synthetic fixtures, not medical review, multitenant certification or live production acceptance. Exact-head candidate checks remain required before integration."
   },
   {
    "id": "E3",

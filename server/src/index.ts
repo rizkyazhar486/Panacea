@@ -168,7 +168,7 @@ import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
 import { repoHasilLab, repoRujukan } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
-import { terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
+import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './domains/clinical-records/validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './domains/push/healthWebhook.js'
 import { readBuildCommit } from './shared/buildInfo.js'
@@ -884,12 +884,16 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
   const penulis = { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }
   const rekamLama = getRecord(patientId, record.id)
+  if (actor.role !== 'dokter' && !pemeriksaanTetapSama(rekamLama?.physicalExam, record.physicalExam)) {
+    addAudit(actor, 'emr.examination_write_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_examination' })
+  }
   const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
   const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
   // A6: klaim tanda tangan dari non-klinisi dibuang oleh server dan dicatat sendiri, bukan hanya sebagai simpanan biasa.
   if (tandaTanganDitolakAktor) addAudit(actor, 'emr.signature_refused', patientId)
-  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
+  if (hasil.arsip) addAudit(actor, hasil.arsip.signedAt ? 'emr.signed_version_archived' : 'emr.draft_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
@@ -1152,7 +1156,10 @@ app.put('/api/lab-log', requireAuth, (req, res) => {
     const kini = new Date()
     const baru = { log: validasiLogLab(body?.log, kini), diperbaruiPada: validasiCapWaktu(body?.diperbaruiPada, kini) }
     const { diterima, hasil } = terimaTulisan(getLabLog(u.email), baru)
-    if (diterima) putLabLog(u.email, hasil)
+    if (diterima) {
+      putLabLog(u.email, hasil)
+      addAudit(u, 'lab.log.updated', u.id)
+    }
     res.status(diterima ? 200 : 409).json(hasil)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
@@ -1319,6 +1326,7 @@ app.post('/api/care/reports', requireAuth, (req, res) => {
     const sama = laporan.clientId ? listCareReports(u.email, p.rencana.id).find((l) => l.clientId === laporan.clientId) : undefined
     if (sama) { res.json(sama); return }
     addCareReport(u.email, laporan)
+    addAudit(u, 'care.report.created', p.rencana.id)
     res.json(laporan)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })

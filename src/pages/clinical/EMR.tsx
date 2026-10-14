@@ -165,6 +165,7 @@ export function EMR() {
   const { state, activePatient, saveRecord } = store
   const acc = state.account
   const strBlocked = acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner
+  const canEditExam = acc?.role === 'dokter' && acc.strStatus === 'verified' && !acc.isOwner
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
   const [dirty, setDirty] = useState(false)
@@ -225,6 +226,7 @@ export function EMR() {
     patch((r) => ({ ...r, anamnesis: { ...r.anamnesis, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `anamnesis.${key}`), updatedAt: new Date().toISOString() }))
   }
   function setExam(key: keyof PhysicalExam, value: string | boolean) {
+    if (!canEditExam) return
     patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, [key]: value }, asalIsian: tanpaDeklarasi(r.asalIsian, `physicalExam.${key}`), updatedAt: new Date().toISOString() }))
   }
 
@@ -370,6 +372,7 @@ export function EMR() {
               <input
                 type="checkbox"
                 checked={draft.physicalExam.doctorVerified}
+                disabled={!canEditExam}
                 onChange={(e) => setExam('doctorVerified', e.target.checked)}
                 className="h-4 w-4 accent-[#00BF63]"
               />
@@ -399,7 +402,16 @@ export function EMR() {
           </div>
         </details>
 
-        <div className="grid gap-4">
+        {draft.aiExamDraft && (
+          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm">
+            <p className="font-semibold">AI proposals — not examined or clinician-reviewed</p>
+            <p className="mt-2 whitespace-pre-wrap">{draft.aiExamDraft.vitalsNote}</p>
+            <p className="mt-2 whitespace-pre-wrap">{draft.aiExamDraft.perSystem}</p>
+          </div>
+        )}
+
+        {!canEditExam && <p className="mb-3 text-sm text-neutral-500">Only a verified clinician can edit examination findings.</p>}
+        <fieldset disabled={!canEditExam} className="grid gap-4">
           <ExamField
             label="General Condition & Level of Consciousness"
             asal={draft.physicalExam.general?.trim() ? draft.asalIsian?.['physicalExam.general'] ?? null : undefined}
@@ -426,7 +438,7 @@ export function EMR() {
             findings={systemFindings}
             onChange={(statusSistem) => patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, statusSistem }, asalIsian: tanpaDeklarasi(r.asalIsian, 'physicalExam.statusSistem'), updatedAt: new Date().toISOString() }))}
           />
-        </div>
+        </fieldset>
       </Card>
 
       {/* Penunjang & Suportif */}
@@ -682,7 +694,7 @@ function tanpaDeklarasi(a: EMRRecord['asalIsian'], kunci: string) {
   return sisa
 }
 
-function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' } }) {
+function LencanaAsal({ asal }: { asal?: { asal: 'AI' | 'Dokter' | 'Pengguna' } }) {
   const l = labelAsalIsian(asal)
   return <span className={`ml-1.5 text-[10px] font-semibold ${asal?.asal === 'Dokter' ? 'text-brand-dark' : asal ? 'text-amber-700' : 'text-neutral-400'}`} data-asal-isian={asal?.asal ?? 'unknown'}>{l}</span>
 }
@@ -696,7 +708,7 @@ function ExamField({
 }: {
   label: string
   /** undefined = kolom kosong (tanpa lencana); null = terisi tanpa cap asal. */
-  asal?: { asal: 'AI' | 'Dokter' } | null
+  asal?: { asal: 'AI' | 'Dokter' | 'Pengguna' } | null
   value: string
   onChange: (v: string) => void
   rows: number

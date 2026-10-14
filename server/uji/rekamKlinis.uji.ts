@@ -60,3 +60,6 @@ assert.deepEqual([resign.physicalExam.verifiedBy, resign.physicalExam.verifiedBy
 // Simpan identik tidak mengarsipkan.
 assert.equal(terapkanSimpanRekam(tt, tt, dokter, kini).arsip, undefined)
 console.log('rekamKlinis: tanda tangan tidak dapat dipalsukan, dicap server, versi bertanda tangan diarsipkan')
+
+// A5: real HTTP persisted AI draft and explicit clinician approval boundary.
+await import('./aiDraftApprovalHttp.uji.js')
