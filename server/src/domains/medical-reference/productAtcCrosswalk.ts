@@ -1,5 +1,5 @@
 import { verifiedAtcProductCrosswalk, unmappedAtcProductCrosswalk, type AtcProductCrosswalk } from './atcDdd.js'
-import type { ProductRegistryRecord } from '../../productRegistry.js'
+import type { ProductRegistryRecord } from '../product/productRegistry.js'
 
 export interface ProductAtcEvidence {
   productSource: string

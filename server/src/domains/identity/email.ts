@@ -1,4 +1,4 @@
-import { config } from './config.js'
+import { config } from '../../config.js'
 
 // Transactional email via Resend (https://resend.com) — fetch-based, no extra
 // dependency. No-ops unless RESEND_API_KEY is set, so the app runs without it.

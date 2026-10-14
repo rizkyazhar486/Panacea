@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
 import { upsertUser, getUser, getUserByEmail, getSettings, type Role, type User } from './store.js'
-import { sendWelcome } from './email.js'
-import { effectiveRoleForRequest, roleForLogin } from './accessControl.js'
+import { sendWelcome } from './domains/identity/email.js'
+import { effectiveRoleForRequest, roleForLogin } from './domains/identity/accessControl.js'
 
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'

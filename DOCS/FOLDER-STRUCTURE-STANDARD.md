@@ -152,7 +152,8 @@ clinical-workflow vs misc).
 
 ## Status migrasi `server/src/` (area Insan — backend/auth/payments/clinical)
 
-Root `server/src/` masih 37 file flat (mulai 62). Empat batch 2026-10-14:
+Root `server/src/` turun ke 11 file flat (mulai 62, di bawah ambang 15 —
+lihat §"Kenapa berhenti" di bawah). Sepuluh batch 2026-10-14:
 1. `visits.ts`, `visitRealtimePolicy.ts`, `realtime.ts`,
    `realtimeRoomRegistry.ts` → `server/src/modules/visits/` (sesuai urutan
    yang udah ditulis di `CLAUDE.md` §2.4 poin 3).
@@ -167,6 +168,47 @@ Root `server/src/` masih 37 file flat (mulai 62). Empat batch 2026-10-14:
    `aturanNotif.ts`, `pengingatCek.ts`, `push.ts` →
    `server/src/domains/push/` (gabung ke folder yang udah ada,
    `pushSubscription.ts`).
+5. `aksesKlinis.ts`, `carePlan.ts`, `catatanKesehatanDiri.ts`,
+   `rekamEncounter.ts`, `rekamKlinis.ts`, `labFhir.ts`, `labLog.ts`,
+   `satusehat.ts`, `validasiLedger.ts`, `keadaanLongitudinal.ts` →
+   `server/src/domains/clinical-records/` (EMR/FHIR inti — dipisah dari
+   `domains/clinical/` yang isinya cuma demo RAG, beda konsen).
+6. `observabilitas.ts`, `galatKlien.ts` → `domains/observability/`.
+7. `accessControl.ts`, `otp.ts`, `email.ts`, `telepon.ts` →
+   `domains/identity/` (`auth.ts` sendiri sengaja TETAP di root — kopling
+   terlalu tinggi buat batch ini, lihat §"Kenapa berhenti" di bawah).
+8. `payments.ts`, `markets.ts`, `midtrans-client.d.ts` →
+   `domains/payments/` (`.d.ts` ambient module ikut pindah aman karena
+   `tsconfig.json` `include: ["src"]` rekursif, bukan path eksplisit).
+9. `productLearning.ts`, `productRegistry.ts` → `domains/product/`
+   (`productLearning.ts` ternyata orphan — nol importer di seluruh repo,
+   dibiarin gitu aja, bukan wewenang saya hapus).
+10. `jadwal.ts`, `kota.ts`, `lingkungan.ts`, `salat.ts`, `sports.ts` →
+    `domains/lifestyle/`.
+
+### Kenapa berhenti di 11 file flat
+
+Sisa `ai.ts`, `aiRequestPolicy.ts`, `auth.ts`, `config.ts`, `connect.ts`,
+`index.ts`, `iris.ts`, `irisanPenyimpanan.ts`, `simpanAman.ts`, `store.ts`,
+`translate.ts` — ini **sudah di bawah ambang 15**, jadi secara standar gak
+wajib dipecah lagi. `auth.ts`/`config.ts`/`store.ts`/`index.ts` itu inti
+bootstrap yang diimpor hampir semua modul lain (puluhan importer) — pindahin
+itu beda kelas resiko dari batch-batch di atas, bukan sekadar "satu domain
+kopling rendah". Kalau mau lanjut, pecah dulu yang jelas kopling rendah
+(`ai.ts`+`aiRequestPolicy.ts` → `domains/ai/`, `iris.ts`+
+`irisanPenyimpanan.ts`+`simpanAman.ts` → `domains/storage/`), baru
+`auth`/`config`/`store`/`connect`/`index` dipertimbangkan terpisah dengan
+Insan langsung (bukan lewat agent), karena blast radius-nya beda level.
+
+Batch 5 pakai script generik
+`node server-move.mjs <dest-dir-under-src> <Name1> <Name2> ...` (bisa dibuat
+ulang kapan aja — lihat logika di bawah) yang otomatis: (a) `git mv` file,
+(b) grep+rewrite semua referensi ke file itu di seluruh `src/` + `uji/`
+dengan path relatif yang dihitung ulang dari lokasi tiap pemanggil, (c) pass
+kedua yang ngecek import KELUAR dari file yang baru dipindah (`./store.js`
+dkk) dan ikut nambahin `../` yang perlu. Tetap wajib dicek manual: baris
+komentar yang nyebut path file (gak ikut ke-rewrite, itu teks biasa) dan
+`npm run typecheck` + jalanin test satu-satu buat verifikasi akhir.
 
 **Ini bukan folder rame-rame** —
 tanya Insan dulu sebelum mindahin batch berikutnya, per aturan "Peran

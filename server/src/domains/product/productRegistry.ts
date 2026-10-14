@@ -1,5 +1,5 @@
-import { lookupDrugLabel, type DrugLabelInfo } from './domains/medical-reference/drugInfo.js'
-import { findRelatedDrugs, normalizeDrugName, type RelatedDrug } from './domains/medical-reference/rxnorm.js'
+import { lookupDrugLabel, type DrugLabelInfo } from '../medical-reference/drugInfo.js'
+import { findRelatedDrugs, normalizeDrugName, type RelatedDrug } from '../medical-reference/rxnorm.js'
 
 /**
  * Product-registry federation boundary for Body Exposure.

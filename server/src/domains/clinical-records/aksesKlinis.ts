@@ -10,7 +10,7 @@
 //   tidak membuat identitas pasien baru. Id berbasis surel lama tetap diterima
 //   hanya sebagai alias kompatibilitas dan selalu harus resolve balik ke userId
 //   yang sama (tabrakan gagal tertutup).
-import type { Clinical } from './store.js'
+import type { Clinical } from '../../store.js'
 
 export interface PenggunaAkses { id: string; email: string; role: string }
 

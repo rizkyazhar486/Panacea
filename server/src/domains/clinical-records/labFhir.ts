@@ -13,7 +13,7 @@
 // belum dicabut, dan perannya dokter terverifikasi. Setiap baca dicatat.
 
 import { randomBytes, createHash } from 'node:crypto'
-import { VERIFIED_METRIC_TERMS, LOINC_SYSTEM, UCUM_SYSTEM, OBS_CATEGORY_SYSTEM } from './mcp/verifiedTerminologyRegistry.js'
+import { VERIFIED_METRIC_TERMS, LOINC_SYSTEM, UCUM_SYSTEM, OBS_CATEGORY_SYSTEM } from '../../mcp/verifiedTerminologyRegistry.js'
 import type { LogLab } from './labLog.js'
 
 export const SISTEM_ASAL = 'https://panaceamed.id/fhir/CodeSystem/data-origin'

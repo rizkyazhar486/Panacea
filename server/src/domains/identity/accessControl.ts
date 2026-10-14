@@ -1,4 +1,4 @@
-import type { Role, User } from './store.js'
+import type { Role, User } from '../../store.js'
 
 export type AccessSettings = { strStatus?: unknown } | undefined
 

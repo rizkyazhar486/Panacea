@@ -1,6 +1,6 @@
 import { getSettings, saveSettings, getHealthProfile, getRingkasan } from '../../store.js'
 import { notify } from './push.js'
-import { lingkunganKota } from '../../lingkungan.js'
+import { lingkunganKota } from '../lifestyle/lingkungan.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mesin aturan notifikasi.

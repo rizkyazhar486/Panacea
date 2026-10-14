@@ -15,7 +15,7 @@ export interface ButirLabServer { id: string; tanggal: string; nilai: number; ru
 export type LogLab = Record<string, ButirLabServer[]>
 export interface LogLabTersimpan { log: LogLab; diperbaruiPada: string }
 
-import { isRealCalendarDate } from './shared/calendarDate.js'
+import { isRealCalendarDate } from '../../shared/calendarDate.js'
 
 export const MAKS_JENIS = 80
 export const MAKS_BUTIR_PER_JENIS = 100

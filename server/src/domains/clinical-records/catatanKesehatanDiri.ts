@@ -4,7 +4,7 @@
 // Validasi di batas kepercayaan: klien tidak dipercaya. Baris tidak lengkap
 // atau angka non-positif ditolak, bukan diisi nol.
 import type { CatatanSelfVitalServer, CatatanVo2Server } from './keadaanLongitudinal.js'
-import { isRealCalendarDate } from './shared/calendarDate.js'
+import { isRealCalendarDate } from '../../shared/calendarDate.js'
 
 export const MAKS_SELF_VITAL = 50
 export const MAKS_VO2 = 50

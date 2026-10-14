@@ -2,8 +2,8 @@
 // Nomor telepon di Connect hanya untuk deteksi akun ganda; OTP login hanya lewat email.
 import { randomInt } from 'node:crypto'
 import type { Request, Response } from 'express'
-import { upsertUser, getUserByEmail, type Role } from './store.js'
-import { setSession } from './auth.js'
+import { upsertUser, getUserByEmail, type Role } from '../../store.js'
+import { setSession } from '../../auth.js'
 import { sendWelcome, sendOtpCode } from './email.js'
 import { roleForLogin } from './accessControl.js'
 
