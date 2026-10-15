@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { SectionTitle } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { useJam } from '../lib/useJam'
-import { getWorkouts } from '../lib/workoutStore'
-import { getDemo, getDemoTersimpan } from '../lib/profile'
-import { getVitals } from '../lib/healthVitals'
-import { hrMaxPerkiraan } from '../lib/workoutImport'
-import { kebugaranKesegaran } from '../lib/analisisPro'
-import { ringkasBeban, statusLatihan } from '../lib/trainingPhysiology'
+import { SectionTitle } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { useJam } from '../../lib/useJam'
+import { getWorkouts } from '../../lib/workoutStore'
+import { getDemo, getDemoTersimpan } from '../../lib/profile'
+import { getVitals } from '../../lib/healthVitals'
+import { hrMaxPerkiraan } from '../../lib/workoutImport'
+import { kebugaranKesegaran } from '../../lib/analisisPro'
+import { ringkasBeban, statusLatihan } from '../../lib/trainingPhysiology'
 import {
   siapkan, bebanHarian, rentangBeban, fokusBeban, kapanBerlatih,
   bebanPekanan, upayaLawanPemulihan, dampakBeban, pemulihanHarian,
   kebugaranKardio, pemulihanDenyut, adaptasi, rekorPribadi, rekapBulanan, petakTahun,
-} from '../lib/athlytic'
-import { deretMetrik } from '../lib/riwayatVitals'
-import { nilaiKebugaran, vo2DariDenyut } from '../lib/bugarIlmiah'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/athlytic'
+import { deretMetrik } from '../../lib/riwayatVitals'
+import { nilaiKebugaran, vo2DariDenyut } from '../../lib/bugarIlmiah'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan atlet — beranda angka, bukan beranda kalimat.

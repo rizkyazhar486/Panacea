@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, inputClass } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { ALAT_DI_HALAMAN, tautanAlat, samakan } from '../lib/katalogKalkulator'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { ALAT_DI_HALAMAN, tautanAlat, samakan } from '../../lib/katalogKalkulator'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Calculator Hub — searchable index of every clinical calculator and score in

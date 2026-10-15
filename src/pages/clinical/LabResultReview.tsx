@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { useStore } from '../lib/store'
-import { api, backendEnabled, GalatApi } from '../lib/api'
-import { COMMUNICATION_CHANNELS, MAX_NOTE, buildAdvance, buildQueue, formatValue, parseLabResults, type LabResultRecord, type QueueRow } from '../domains/lab-results'
+import { useStore } from '../../lib/store'
+import { api, backendEnabled, GalatApi } from '../../lib/api'
+import { COMMUNICATION_CHANNELS, MAX_NOTE, buildAdvance, buildQueue, formatValue, parseLabResults, type LabResultRecord, type QueueRow } from '../../domains/lab-results'
 
 const STATUS_LABEL: Record<string, string> = { received: 'Received', pending_review: 'Awaiting review', reviewed: 'Reviewed', communicated: 'Communicated', closed: 'Closed' }
 const ACTION_LABEL: Record<string, string> = { pending_review: 'Mark awaiting review', reviewed: 'Mark reviewed', communicated: 'Record communication', closed: 'Close result' }

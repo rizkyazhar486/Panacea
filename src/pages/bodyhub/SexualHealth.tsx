@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { kunciHari } from '../lib/tanggal'
-import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
-import { IconHeart, IconUsers, IconHospital, IconShield } from '../components/icons'
-import { HOSPITALS, fetchNearbyFacilities, type NearbyFacility } from '../lib/hospitals'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { kunciHari } from '../../lib/tanggal'
+import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../../components/ui'
+import { IconHeart, IconUsers, IconHospital, IconShield } from '../../components/icons'
+import { HOSPITALS, fetchNearbyFacilities, type NearbyFacility } from '../../lib/hospitals'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 type Coords = { lat: number; lng: number }
 
