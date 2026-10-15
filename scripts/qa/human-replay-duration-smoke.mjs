@@ -36,7 +36,21 @@ try {
     await page.getByRole('note').filter({hasText:'Duration unavailable in one or more sessions.'}).waitFor()
     const poster=async expected=>{
       await page.evaluate(()=>{window.__replayPosterText=[]})
-      const downloaded=page.waitForEvent('download');await page.getByRole('button',{name:'Share this chapter',exact:true}).click();const file=await downloaded
+      let file
+      try {
+        ;[file]=await Promise.all([
+          page.waitForEvent('download'),
+          page.getByRole('button',{name:'Share this chapter',exact:true}).click(),
+        ])
+      } catch (error) {
+        const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
+          posterText:await page.evaluate(()=>window.__replayPosterText),
+          bodyText:await page.locator('body').innerText()}
+        await writeFile(`${out}/poster-failure-${viewport.width}.json`,JSON.stringify(diagnostic,null,2))
+        await page.screenshot({path:`${out}/poster-failure-${viewport.width}.png`,fullPage:true}).catch(screenshotError=>{diagnostic.screenshotError=String(screenshotError)})
+        console.error(JSON.stringify(diagnostic))
+        throw error
+      }
       await file.saveAs(`${out}/poster-${expected}-${viewport.width}.png`)
       const texts=await page.evaluate(()=>window.__replayPosterText)
       assert.ok(texts.includes(expected));assert.ok(texts.includes('ACTIVE MINUTES'))
