@@ -1,5 +1,18 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
+## /init — Owner's AI-only Alpha execution mandate (2026-10-16)
+
+**Zero human-assigned tasks within Alpha engineering (45 criteria).** Codex/Claude Cloud and Terminal own all code, E2E, source/citation verification, computational clinical review (especially C6), legal/licensing research (especially D8), privacy, compliance mapping, documentation and automated engineering review. Human reviewer, doctor and lawyer work must **not** be inserted into the engineering backlog, counted as remaining engineering tasks, or used to pause independent work.
+
+**AI handles the full feasible legal workstream:** read and verify primary licenses and permissions, identify ownership and restrictions, generate attribution and compliance artifacts, maintain evidence/risk registers, and provide legally conservative alternatives. Missing enforceable permission means restrict the relevant release or replace the asset with a legitimately cleared source; it **does not** authorize agents to invent rights, consent, certifications, signatures, regulator decisions or clinical approval. Continue other tasks autonomously.
+
+**Two independent completion axes:** `ENGINEERING_READY` means implementation plus reproducible automated technical evidence; `VERIFIED` means the actual canonical ledger acceptance is satisfied. Current C6 formal acceptance mentions clinician signature: complete AI-only technical validation now, while preserving `clinically_reviewed=false` and an honest distinct external clinical-release restriction unless a traceable owner-approved acceptance amendment changes its scope. No fake formal ledger promotion. Actual patient care and high-risk clinical publication keep their clinician-controlled safety rules.
+
+**Review/merge:** use independent AI engineering reviewer(s) and exact-head mandatory CI. Do not create optional human-review tasks; do not bypass genuine branch protection or claim merge/deployment while a mandatory external permission/review remains unsatisfied. Place any unavoidable real-world external approval **outside engineering**, at the final release gate. Never block work on unrelated tasks for that approval.
+
+This section and the matching directive in `AGENTS.md` govern execution priority, without weakening §8 safety/privacy/provenance protections.
+
+
 Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. **North star produk yang tidak berubah:** [`governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) — satu patient identity/state longitudinal yang sederhana, terpadu, provenance-aware dan dipercaya lintas daily life, poli, ward, OR, ICU, serta follow-up. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
 
 1. Instruksi eksplisit terbaru dari pemilik repo.
