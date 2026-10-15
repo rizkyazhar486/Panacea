@@ -365,13 +365,14 @@
    "pillar": "Body Exposure Alpha",
    "criterion": "Anatomi seluruh tubuh dewasa laki-laki lulus gerbang kasar",
    "acceptance": "gross_adult_male lulus",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "bodyexposure/qa_reports/gross_adult_male.json",
-    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gross-reproduce.py, dari GLB publik LOD3 tanpa Blender): 3877 struktur, 3403 berpasangan (sama dengan laporan Local); hati x=-0,012, limpa +0,085, lambung +0,038; kaki y=-0,0004 m. Lateralitas: 6 pelanggaran pada metrik bbox-center, 5 di antaranya ≤2,1 mm dari garis tengah (artefak metrik kasar) dan 1 (VAGUS_NERVE_X.R, +20 mm) setara satu pengecualian terdokumen Local"
+    "Reproduksi independen parsial (Sonnet Cloud, scripts/qa/glb-gross-reproduce.py, dari GLB publik LOD3 tanpa Blender): 3877 struktur, 3403 berpasangan (sama dengan laporan Local); hati x=-0,012, limpa +0,085, lambung +0,038; kaki y=-0,0004 m. Lateralitas: 6 pelanggaran pada metrik bbox-center, 5 di antaranya ≤2,1 mm dari garis tengah (artefak metrik kasar) dan 1 (VAGUS_NERVE_X.R, +20 mm) setara satu pengecualian terdokumen Local",
+    "PR #2535: scripts/qa/public-organ-geometry.mjs + public-organ-interpenetration.py reproduce all nine original gross relations and seven directional interpenetration screens from unchanged public adult_male LOD3. Committed bodyexposure/qa_reports/gross_public_organ_interpenetration.adult_male.json SHA256-pins 14 files; 3,877 structures/3,403 paired; all checks pass at original technical tolerances. Six Node tests and nine native Blender tests pass; inverted-ray-parity mutation fails three tests. Exact native public report replay matches all source/result fields. Review-found 15/298 rounding boundary now rejects using the raw 0.05 ratio before display rounding; all public pairs still pass."
    ],
    "owner": "Local",
-   "note": "Direproduksi sebagian saja (lateralitas, sisi organ, kaki). Interpenetrasi, rongga iga, dan kranium belum direproduksi, jadi tetap REPORTED."
+   "note": "Engineering verification of gross_adult_male only. Original Blender report and public-GLB reproduction pass. Existing documented right-vagus laterality ambiguity remains visible. Quantized LOD3 split vertices change numerical centroids/fractions versus original Blender source; directional sampled vertex fractions are not overlap volume or clinical validation. No source geometry, threshold, medical review status or patient-specific claim changed."
   },
   {
    "id": "D4",
