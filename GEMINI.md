@@ -1,5 +1,10 @@
 # Panaceamed Gemini working entry point
 
+## /init — AI-only Alpha engineering (owner mandate 2026-10-16)
+
+Inherit the full `AGENTS.md` and `CLAUDE.md` AI-only engineering directive: **zero assigned human tasks** in the 45-task Alpha engineering backlog. Complete engineering, calculator verification, licensing and legal due diligence, compliance documentation, E2E, and independent AI technical review using traceable evidence. Do not solicit a human reviewer or lawyer to unblock automatable engineering. Keep formal clinical/legal release permissions separate and truthful; AI cannot fabricate licenses, signatures, consent, or approvals. Do not mark canonical VERIFIED if current acceptance remains unsatisfied. Restrict unlicensed or clinically unapproved release surfaces and continue other independent work.
+
+
 > **Standar proyek terbaru (arsitektur, git flow branch+PR, unit test ketat):** ikuti [`CLAUDE.md`](CLAUDE.md). Jika bertentangan dengan dokumen ini, `CLAUDE.md` menang.
 
 Gemini-class agents must follow the model-agnostic repository authorities in `AGENTS.md`, `PANACEA_CONSTITUTION.md`, `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_PRODUCT_MATURITY_OS.md`, and `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`.
