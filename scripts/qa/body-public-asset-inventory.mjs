@@ -46,6 +46,10 @@ export function glbJson(bytes, name) {
 }
 
 export function inventory(root) {
+  // lstat the selected root itself: readdirSync would otherwise follow a symlink.
+  const rootStat = lstatSync(root)
+  if (rootStat.isSymbolicLink()) throw new Error(`${root}: symlink not permitted in published inventory`)
+  if (!rootStat.isDirectory()) throw new Error(`${root}: published inventory root must be a directory`)
   const entries = []
   function walk(dir) {
     for (const name of readdirSync(dir).sort()) {
@@ -82,6 +86,10 @@ export function compareInventory(expected, actual) {
   const prior = new Map(expected.entries.map((entry) => [entry.path, entry]))
   const current = new Map(actual.entries.map((entry) => [entry.path, entry]))
   const findings = []
+  // A clean replay requires identical report contracts, not just identical asset rows.
+  for (const field of ['schema', 'scope', 'permissionDisclaimer']) {
+    if (expected[field] !== actual[field]) findings.push(`changed-report-header:${field}`)
+  }
   for (const [name, entry] of prior) {
     if (!current.has(name)) findings.push(`missing-file:${name}`)
     else if (JSON.stringify(entry) !== JSON.stringify(current.get(name))) findings.push(`changed-resource:${name}`)
