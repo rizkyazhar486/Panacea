@@ -7,7 +7,7 @@
 // satu bisa disorot sendiri, dengan GARIS TENGAH tiap pembuluh supaya darah
 // bisa dianimasikan mengalir sepanjangnya, bukan sekadar berkelip.
 //
-// Jalankan:  node scripts/atlasCardio.mjs <folder-human-atlas>
+// Jalankan:  node scripts/atlas/atlasCardio.mjs <folder-human-atlas>
 
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { bacaAtlas, ambilBagian, garisTengah, pusat, tulisGlb, HAK_CIPTA } from './atlasGlb.mjs'
@@ -143,7 +143,7 @@ const daftar = terpilih.map(({ p, kind, wilayah, warna }, i) => ({
 }))
 
 writeFileSync(new URL('../../src/lib/cardioAtlas.gen.ts', import.meta.url).pathname,
-`// DIBANGKITKAN oleh scripts/atlasCardio.mjs — jangan disunting tangan.
+`// DIBANGKITKAN oleh scripts/atlas/atlasCardio.mjs — jangan disunting tangan.
 //
 // ${daftar.length} pembuluh dan struktur jantung bernama, dipotong dari
 // BodyParts3D 4.0 (Database Center for Life Science, CC BY 4.0). Nama di sini

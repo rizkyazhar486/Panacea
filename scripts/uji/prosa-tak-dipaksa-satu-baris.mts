@@ -18,7 +18,7 @@ import { readFileSync } from 'node:fs'
 // baris, bukan pada satu.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const css = readFileSync(new URL('../../public/panacea-visual-first-v43.css', import.meta.url), 'utf8')
+const css = readFileSync(new URL('../../public/ui-iterations/panacea-visual-first-v43.css', import.meta.url), 'utf8')
 // Komentar dibuang: pemeriksaan di bawah membaca SELEKTOR, dan prosa yang
 // menjelaskan sebuah larangan pernah tertangkap sebagai pelanggarannya.
 const cssKode = css.replace(/\/\*[\s\S]*?\*\//g, '')

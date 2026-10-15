@@ -9,7 +9,7 @@ assert.equal(layarBerubah(a, { x: { x: 11, y: 20, depan: true } }), true, 'geser
 assert.equal(layarBerubah(a, { x: { x: 10, y: 20, depan: false } }), true, 'perubahan boolean memicu render')
 assert.equal(layarBerubah(a, { ...a, z: { x: 1, y: 1, depan: true } }), true, 'titik baru memicu render')
 assert.equal(layarBerubah({ p: { x: 1, y: 1, v: 0.2 } }, { p: { x: 1, y: 1, v: 0.9 } }), true, 'nilai aktivasi berubah memicu render')
-for (const f of ['src/components/OrganModel3D.tsx', 'src/components/Pathway3D.tsx']) {
+for (const f of ['src/components/digital-twin/OrganModel3D.tsx', 'src/components/digital-twin/Pathway3D.tsx']) {
   const s = readFileSync(f, 'utf8')
   assert.match(s, /if \(layarBerubah\(layarTerakhir, next\)\)/, `${f}: setLayar harus dijaga`)
   assert.doesNotMatch(s, /^\s*setLayar\(next\)\s*$/m, `${f}: setLayar tanpa penjaga di loop frame`)

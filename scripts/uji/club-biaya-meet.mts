@@ -21,7 +21,7 @@ assert.equal('feeRp' in (parseMeetFee('') as object), false)
 assert.deepEqual(parseMeetFee('45000'), parseMeetFee('45000'))
 // Regresi: dulu kosong/negatif → 0 (meet gratis tak disengaja) lewat `Number(x) || 0`.
 assert.equal(Number('') || 0, 0)
-const halaman = readFileSync(new URL('../../src/pages/ClubHub.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/social/ClubHub.tsx', import.meta.url), 'utf8')
 assert.match(halaman, /parseMeetFee\(feeText\)/)
 assert.match(halaman, /if \(!fee\.ok\) \{ setError\(fee\.message\); return \}/)
 assert.doesNotMatch(halaman, /setFeeRp\(Number\(e\.target\.value\) \|\| 0\)/)

@@ -7,7 +7,7 @@
 // seluruh 2.234 mesh, yang akan membuat berkasnya puluhan megabita dan tidak
 // ada satu pun struktur yang bisa dibedakan.
 //
-// Jalankan:  node scripts/atlasSystem.mjs <folder-human-atlas>
+// Jalankan:  node scripts/atlas/atlasSystem.mjs <folder-human-atlas>
 
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -476,7 +476,7 @@ for (const [id, m] of Object.entries(MODUL_GLB)) {
 }
 
 writeFileSync(new URL('../../src/lib/systemAtlas.gen.ts', import.meta.url).pathname,
-`// DIBANGKITKAN oleh scripts/atlasSystem.mjs — jangan disunting tangan.
+`// DIBANGKITKAN oleh scripts/atlas/atlasSystem.mjs — jangan disunting tangan.
 //
 // Struktur bernama untuk tiap modul spesialisasi, dipotong dari BodyParts3D 4.0
 // (Database Center for Life Science, CC BY 4.0). Nama di sini SAMA PERSIS

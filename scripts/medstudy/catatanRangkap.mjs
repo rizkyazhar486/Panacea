@@ -26,7 +26,7 @@
 // di tempat lain. Sengaja TIDAK memakai pencocokan longgar: yang dicari adalah
 // nama yang benar-benar sama, bukan yang mirip.
 //
-// Dijalankan: node scripts/catatanRangkap.mjs
+// Dijalankan: node scripts/medstudy/catatanRangkap.mjs
 import { readFileSync } from 'node:fs'
 
 const BERKAS = ['src/lib/osceStationNotes.ts', 'src/lib/skdiDiseaseNotes.ts']

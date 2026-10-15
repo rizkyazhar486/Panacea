@@ -17,7 +17,7 @@
 // konseling, dan fisioterapi. Itu disaring lewat daftar kata di bawah supaya
 // daftar kerjanya berisi pekerjaan yang benar-benar ada.
 //
-// Dijalankan: node scripts/dosisKurang.mjs [jumlah]
+// Dijalankan: node scripts/medstudy/dosisKurang.mjs [jumlah]
 import { readFileSync } from 'node:fs'
 
 const teks = readFileSync('src/lib/skdiTherapyReference.ts', 'utf8')

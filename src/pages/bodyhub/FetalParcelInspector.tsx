@@ -8,7 +8,7 @@ import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { Prosa } from '../../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
 import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure'
-import './fetalParcelInspector.css'
+import '../fetalParcelInspector.css'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-parcels/`
 type Section = 'off' | 'sagittal' | 'coronal' | 'axial'

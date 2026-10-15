@@ -7,7 +7,7 @@
 // hanya karena huruf awalnya lebih belakang. Urutan pengerjaan adalah keputusan
 // yang paling menentukan hasil di sini, dan keputusan itu pantas dihitung.
 //
-// Dijalankan: node scripts/prioritasCatatan.mjs [jumlah]
+// Dijalankan: node scripts/medstudy/prioritasCatatan.mjs [jumlah]
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 

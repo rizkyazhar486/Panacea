@@ -44,7 +44,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "panacea.evidence.registered-study",
-    "module": "server/src/trials.ts",
+    "module": "server/src/domains/medical-reference/trials.ts",
     "notes": "Existing production adapter normalizes NCT ID, title, recruitment status, condition, phase and location."
   },
   "trust": {

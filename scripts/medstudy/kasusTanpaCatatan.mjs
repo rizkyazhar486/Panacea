@@ -12,7 +12,7 @@
 // Skrip ini memakai penyeragaman ejaan dan tabel padanan yang SAMA dengan
 // kasusSekali.mjs, supaya kedua angkanya dapat dibandingkan.
 //
-// Dijalankan: node scripts/kasusTanpaCatatan.mjs [jumlah]
+// Dijalankan: node scripts/medstudy/kasusTanpaCatatan.mjs [jumlah]
 
 import { kunciCatatan, bukanKasus, semuaKasus } from '../lib/catatanRekap.mjs'
 

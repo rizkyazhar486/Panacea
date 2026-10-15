@@ -2,15 +2,15 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const os = readFileSync(resolve('src/pages/BodyExposureOS.tsx'), 'utf8')
+const os = readFileSync(resolve('src/pages/bodyhub/BodyExposureOS.tsx'), 'utf8')
 const projector = readFileSync(resolve('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx'), 'utf8')
 const explorerPage = readFileSync(resolve('src/pages/bodyhub/BodyExplorer.tsx'), 'utf8')
 const routes = readFileSync(resolve('src/main.tsx'), 'utf8')
 const body3d = readFileSync(resolve('src/components/bodyhub/BodyAllSystems3D.tsx'), 'utf8')
-const visualFirstRuntime = readFileSync(resolve('public/panacea-visual-first-v43.js'), 'utf8')
-const visualFirstStyles = readFileSync(resolve('public/panacea-visual-first-v43.css'), 'utf8')
-const liquidRuntime = readFileSync(resolve('public/panacea-liquid-actions-v45.js'), 'utf8')
-const grading = readFileSync(resolve('public/panacea-control-grading-v46.css'), 'utf8')
+const visualFirstRuntime = readFileSync(resolve('public/ui-iterations/panacea-visual-first-v43.js'), 'utf8')
+const visualFirstStyles = readFileSync(resolve('public/ui-iterations/panacea-visual-first-v43.css'), 'utf8')
+const liquidRuntime = readFileSync(resolve('public/ui-iterations/panacea-liquid-actions-v45.js'), 'utf8')
+const grading = readFileSync(resolve('public/ui-iterations/panacea-control-grading-v46.css'), 'utf8')
 
 assert.match(os, /data-pmd-body-exposure="true"/, 'Body Exposure must declare an explicit product boundary')
 assert.match(os, /data-pmd-unclamped="true"/, 'Body Exposure must opt out of generic copy mutation/clamping')

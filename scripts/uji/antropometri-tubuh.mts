@@ -180,7 +180,7 @@ for (const kasus of KASUS) {
   }
 
   const sumberPerender = readFileSync(
-    new URL('../../src/components/PersonalBodyAvatar3D.tsx', import.meta.url),
+    new URL('../../src/components/digital-twin/PersonalBodyAvatar3D.tsx', import.meta.url),
     'utf8',
   )
   for (const nama of DIPAKAI_PERENDER) {
