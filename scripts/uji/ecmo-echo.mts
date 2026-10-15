@@ -21,9 +21,9 @@ assert.equal(bangunEcho(S({ ...N, hr: 0 })), null, 'keadaan tidak sah → tanpa 
 // Regresi crash browser: stempel rAF sebelum waktu mulai memberi indeks negatif → panel ECMO hilang.
 for (const t of [-5, 0, 3, 999, 1e7]) { const k = indeksBingkai(1000 + t, 1000, 0.005, 160); assert.ok(Number.isInteger(k) && k >= 0 && k < 160, `indeks bingkai di luar 0..n-1 pada t=${t}: ${k}`) }
 assert.equal(indeksBingkai(NaN, 0, 0.005, 160), 0); assert.equal(indeksBingkai(10, 0, 0.005, 0), 0)
-assert.match(readFileSync('src/components/PanelEcmo.tsx', 'utf8'), /indeksBingkai\(/, 'animasi echo harus memakai indeksBingkai')
+assert.match(readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8'), /indeksBingkai\(/, 'animasi echo harus memakai indeksBingkai')
 // UI: dinyatakan skematis; kecepatan puncak tidak ditampilkan (bentuk profil belum tervalidasi).
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.match(ui, /data-ecmo-echo/); assert.match(ui, /not an ultrasound image/i)
 assert.doesNotMatch(ui, /kecepatanPuncak/, 'kecepatan puncak tidak boleh ditampilkan sebelum inersia dimodelkan')
 console.log('ecmo-echo: lulus')

@@ -4,11 +4,11 @@ import { focusBodyClinicalProjection } from '../../src/lib/bodyClinicalSystemCon
 import type { BodyClinicalBridgeProjection } from '../../src/lib/bodyClinicalBridge.ts'
 
 const overlay = readFileSync(
-  new URL('../../src/components/BodyExposurePatientOverlay.tsx', import.meta.url),
+  new URL('../../src/components/digital-twin/BodyExposurePatientOverlay.tsx', import.meta.url),
   'utf8',
 )
 const body = readFileSync(
-  new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url),
+  new URL('../../src/pages/bodyhub/BodyExposureOS.tsx', import.meta.url),
   'utf8',
 )
 

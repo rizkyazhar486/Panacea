@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const halaman = await readFile(new URL('../../src/pages/GenomeLab.tsx', import.meta.url), 'utf8')
+const halaman = await readFile(new URL('../../src/pages/medstudy/GenomeLab.tsx', import.meta.url), 'utf8')
 const mesin = await readFile(new URL('../../src/lib/replikasiDna.ts', import.meta.url), 'utf8')
 
 // Halaman ini menyentuh penuaan, sel punca, dan penyuntingan genom sekaligus.

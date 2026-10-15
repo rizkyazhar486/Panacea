@@ -87,7 +87,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
       }
       try {
         const [f, w, c] = await Promise.all([
-          import('../../pages/FitnessHub'), import('../../pages/WellnessHub'), import('../../pages/ClinicalHub'),
+          import('../../pages/fitness/FitnessHub'), import('../../pages/wellness/WellnessHub'), import('../../pages/clinical/ClinicalHub'),
         ])
         const tambah = (grup: string, arr: { to: string; name: string; kw?: string }[]) => {
           for (const t of arr) {

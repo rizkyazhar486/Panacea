@@ -7,7 +7,7 @@ const di = dirname(fileURLToPath(import.meta.url))
 const akar = join(di, '..', '..')
 
 const shell = readFileSync(join(akar, 'src/components/layout/Shell.tsx'), 'utf8')
-const home = readFileSync(join(akar, 'src/components/HomeCommandDeck.tsx'), 'utf8')
+const home = readFileSync(join(akar, 'src/components/dashboard/HomeCommandDeck.tsx'), 'utf8')
 const dataNav = readFileSync(join(akar, 'src/data/navPengaturan.ts'), 'utf8')
 
 assert.doesNotMatch(

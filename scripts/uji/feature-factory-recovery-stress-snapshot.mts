@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const readiness = readFileSync('src/pages/Readiness.tsx', 'utf8')
+const readiness = readFileSync('src/pages/bodyhub/Readiness.tsx', 'utf8')
 
 // The existing /readiness surface is the Recovery/Stress snapshot. Keep the
 // snapshot tied to explicit recorded observations instead of adding a second

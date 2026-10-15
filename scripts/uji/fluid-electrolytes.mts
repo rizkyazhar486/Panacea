@@ -68,7 +68,7 @@ assert.equal(correctedSodium(FLUID_RANGES.sodium.max + 0.1, 100).ok, false); ass
 assert.deepEqual(maintenanceFluid(33), maintenanceFluid(33))
 
 // Halaman: teks mentah + mesin, tanpa `|| 0`, setiap sub-kalkulator menampilkan alasan.
-const page = readFileSync(new URL('../../src/pages/FluidCalculators.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/clinical/scores/FluidCalculators.tsx', import.meta.url), 'utf8')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 for (const f of ['maintenanceFluid(', 'resuscitation(', 'correctedSodium(', 'naCorrectionRate(', 'potassiumDeficit(']) assert.ok(page.includes(f), `halaman tidak memakai ${f}`)
 assert.equal((page.match(/<Penolakan r=\{/g) ?? []).length, 5, 'tiap sub-kalkulator harus menampilkan alasan penolakan')

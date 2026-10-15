@@ -5,10 +5,10 @@ import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
-import { KATALOG } from './healthMetrics.js'
+import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
 import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
-import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
+import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
 import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
 
 // Batas kewajaran masukan teks pos (bukan aturan klinis): cukup longgar untuk teks nyata, cukup ketat agar satu akun tak menggembungkan berkas data.
@@ -98,9 +98,9 @@ export interface Clinical {
   /** Kunjungan tertutup per pasien (append-only). */
   encounters?: Record<string, any[]>
   /** Tautan pasien praktik -> akun pasien (disetujui pasien lewat kode). */
-  tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
+  tautan?: Record<string, import('./domains/clinical-records/aksesKlinis.js').TautanPasien>
   /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
-  kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
+  kodeTaut?: import('./domains/clinical-records/aksesKlinis.js').KodeTaut[]
   /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
   hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
   rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
@@ -139,7 +139,7 @@ interface DB {
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
   /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
-  validasiLedger?: import('./validasiLedger.js').CatatanLedger[]
+  validasiLedger?: import('./domains/clinical-records/validasiLedger.js').CatatanLedger[]
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
@@ -885,12 +885,12 @@ export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any
   c.records[patientId] = rekamBaru
   save()
 }
-export function simpanKodeTaut(k: import('./aksesKlinis.js').KodeTaut) {
+export function simpanKodeTaut(k: import('./domains/clinical-records/aksesKlinis.js').KodeTaut) {
   const c = ensureClinical(); (c.kodeTaut ??= []).push(k); save()
 }
 export function getKodeTaut() { return ensureClinical().kodeTaut ?? [] }
 export function getTautan() { return ensureClinical().tautan ?? {} }
-export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHash: string) {
+export function simpanTautan(t: import('./domains/clinical-records/aksesKlinis.js').TautanPasien, kodeHash: string) {
   const c = ensureClinical()
   ;(c.tautan ??= {})[t.patientId] = t
   const k = (c.kodeTaut ?? []).find((x) => x.hash === kodeHash); if (k) { k.dipakaiPada = t.ditautkanPada; k.dipakaiOleh = t.userId }
@@ -1052,7 +1052,7 @@ export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (d
 export function listCarePlans() { return db.carePlans ?? [] }
 export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
 /** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
-export function tambahLedgerValidasi(c: import('./validasiLedger.js').CatatanLedger) {
+export function tambahLedgerValidasi(c: import('./domains/clinical-records/validasiLedger.js').CatatanLedger) {
   const l = (db.validasiLedger ??= [])
   if (c.urutan !== l.length || (l.length && c.sidikSebelum !== l[l.length - 1].sidik)) throw new Error('ledger append out of order')
   l.push(c); save()
