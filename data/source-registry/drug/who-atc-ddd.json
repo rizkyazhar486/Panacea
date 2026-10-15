@@ -43,7 +43,7 @@
   "adapter": {
     "status": "PROTOTYPE",
     "normalizedTarget": "AtcDddEntry",
-    "module": "server/src/atcDdd.ts",
+    "module": "server/src/domains/medical-reference/atcDdd.ts",
     "notes": "The current module defines the normalized entry shape, 2026 provenance constant, ATC-code plausibility validation, query normalization and fail-closed product crosswalk construction. No external ATC/DDD dataset adapter is active yet; free-text drug names must never be converted to ATC codes heuristically."
   }
 }

@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "OntologyTerm",
-    "module": "server/src/anatomyOntology.ts",
+    "module": "server/src/domains/anatomy/anatomyOntology.ts",
     "notes": "Implemented server adapter normalizes Conditions results to `ontology: nlm-conditions`, `identifierSystem: NLM_CONDITIONS_KEY`, and HPO results to `ontology: hp`, `identifierSystem: HP`; it bounds queries, validates HP CURIEs, preserves source URLs, and merges these results with OLS4 without converting NLM keys into DOID identifiers."
   },
   "trust": {

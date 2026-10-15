@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 // Ledger arahan pemilik dipindah dari CLAUDE.md ke PANACEA_OWNER_DIRECTIVES.md (CLAUDE.md v2, #2094).
-const claude = readFileSync('PANACEA_OWNER_DIRECTIVES.md', 'utf8')
+const claude = readFileSync('governance/doctrine/PANACEA_OWNER_DIRECTIVES.md', 'utf8')
 
 assert.match(
   claude,

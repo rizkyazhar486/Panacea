@@ -7,7 +7,7 @@ import { VideoGallery } from '../../components/VideoGallery'
 import { FightHero } from '../../components/FightHero'
 import { AchievementToasts } from '../../components/AchievementToasts'
 import { evaluateWorkoutAchievements, newlyUnlocked, unlockedCount, type Achievement } from '../../lib/achievements'
-import '../styles/metal.css'
+import '../../styles/metal.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'

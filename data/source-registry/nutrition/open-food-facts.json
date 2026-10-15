@@ -42,7 +42,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "Pangan",
-    "module": "server/src/lingkungan.ts",
+    "module": "server/src/domains/lifestyle/lingkungan.ts",
     "notes": "The backend adapter uses a custom User-Agent, caches results for 24 hours, selects a bounded field set, normalizes finite non-negative nutrient values per 100 g, drops products without a usable energy value, and returns an empty result on upstream failure rather than fabricated nutrition data. API rate limits and upstream availability remain operational dependencies."
   }
 }

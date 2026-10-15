@@ -43,7 +43,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "Lingkungan",
-    "module": "server/src/lingkungan.ts",
+    "module": "server/src/domains/lifestyle/lingkungan.ts",
     "notes": "The current backend adapter requests city-centre environmental context, caches successful results for one hour and fails closed when no useful upstream values are returned. A future commercial deployment must configure a contractually compatible endpoint rather than silently continuing to use the free non-commercial service tier."
   }
 }

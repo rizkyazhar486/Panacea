@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaHealthObservation",
-    "module": "server/src/healthWebhook.ts",
+    "module": "server/src/domains/push/healthWebhook.ts",
     "notes": "The active parser normalizes supported metrics, unit variants, phone-local calendar dates, heart-rate series and sleep sessions. It keeps malformed or unsupported values from being silently invented. Live webhook endpoints must remain authenticated/rate-limited at the server boundary and raw health payloads must not be exposed through browser logs, URLs or public storage."
   },
   "trust": {

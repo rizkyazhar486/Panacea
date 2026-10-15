@@ -251,7 +251,7 @@ function Susun({
   )
 }
 
-function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import('../lib/perubahan').Tinjauan) => void }) {
+function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import('../../lib/perubahan').Tinjauan) => void }) {
   const [hari, setHari] = useState<number | undefined>(undefined)
   const [arah, setArah] = useState<'maju' | 'diam' | 'mundur'>('diam')
   const [halangan, setHalangan] = useState('')

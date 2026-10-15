@@ -4,7 +4,7 @@ import { PanaceaCausalTimeMachine } from '../../components/frontier/PanaceaCausa
 import { PanaceaFrontierSeven } from '../../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../../components/frontier/PanaceaHopeStack'
 import { PanaceaRealityEngine } from '../../components/frontier/PanaceaRealityEngine'
-const AGILongevitySystemsLab = lazy(() => import('./bodyhub/AGILongevitySystemsLab'))
+const AGILongevitySystemsLab = lazy(() => import('../bodyhub/AGILongevitySystemsLab'))
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
