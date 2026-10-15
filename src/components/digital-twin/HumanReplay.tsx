@@ -4,8 +4,13 @@ import { IconActivity, IconHeart, IconRun, IconShield, IconSparkle, IconTimer } 
 import type { ImportedWorkout } from '../../lib/workoutImport'
 import { buildHumanReplay, compareReplayEpochs, type HumanReplayEpoch } from '../../lib/humanReplay'
 
-function formatNumber(value: number, digits = 0) {
+function formatNumber(value: number | null, digits = 0) {
+  if (value === null) return 'Unknown'
   return value.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })
+}
+
+function formatMinutes(value: number | null) {
+  return value === null ? 'Unknown' : formatNumber(Math.round(value))
 }
 
 async function replayPoster(epoch: HumanReplayEpoch, totalEpochs: number): Promise<Blob | null> {
@@ -53,7 +58,7 @@ async function replayPoster(epoch: HumanReplayEpoch, totalEpochs: number): Promi
 
   const facts = [
     [`${epoch.sessions}`, 'sessions'],
-    [`${Math.round(epoch.activeMinutes)}`, 'active minutes'],
+    [formatMinutes(epoch.activeMinutes), 'active minutes'],
     [`${formatNumber(epoch.distanceKm, 1)}`, 'km recorded'],
     [epoch.avgHr != null ? `${Math.round(epoch.avgHr)}` : '—', 'mean workout HR'],
   ]
@@ -171,6 +176,7 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_22%,rgba(0,191,99,.12),transparent_34%),radial-gradient(circle_at_85%_76%,rgba(240,214,138,.07),transparent_28%)]" />
           <div className="relative h-[500px]">
             <Body3D
+              stageClassName="relative h-full w-full overflow-hidden"
               layers={new Set(['surface', 'skeletal', 'muscular', 'cardiovascular', 'visceral'])}
               highlighted={[]}
               focusKeywords={null}
@@ -195,7 +201,7 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
               [epoch.sessions, 'sessions'],
-              [Math.round(epoch.activeMinutes), 'active min'],
+              [formatMinutes(epoch.activeMinutes), 'active min'],
               [formatNumber(epoch.distanceKm, 1), 'km'],
               [epoch.measuredHrSessions, 'HR sessions'],
             ].map(([value, label]) => (
@@ -206,10 +212,12 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
             ))}
           </div>
 
+          {epoch.activeMinutes === null && <p role="note" className="mt-2 text-xs text-white/60">Duration unavailable in one or more sessions.</p>}
+
           <div className="mt-4 rounded-2xl border border-emerald-300/12 bg-emerald-300/[.045] p-4">
             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-emerald-200"><IconRun size={13} /> Movement chapter</div>
             <div className="mt-2 text-base font-black">{epoch.dominantArchetype ?? 'Recorded activity chapter'}</div>
-            <div className="mt-2 text-[10px] leading-relaxed text-white/38">Cumulative: {epoch.cumulativeSessions} sessions · {Math.round(epoch.cumulativeMinutes)} active minutes · {formatNumber(epoch.cumulativeDistanceKm, 1)} km recorded.</div>
+            <div className="mt-2 text-[10px] leading-relaxed text-white/38">Cumulative: {epoch.cumulativeSessions} sessions · {formatMinutes(epoch.cumulativeMinutes)} active minutes · {formatNumber(epoch.cumulativeDistanceKm, 1)} km recorded.</div>
           </div>
 
           {previous && (
@@ -218,7 +226,7 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {deltas.map((item) => (
                   <div key={item.label} className="rounded-xl bg-black/15 p-2.5 text-center">
-                    <div className={`text-sm font-black ${item.delta > 0 ? 'text-emerald-300' : item.delta < 0 ? 'text-amber-200' : 'text-white/55'}`}>{item.delta > 0 ? '+' : ''}{item.delta}{item.unit ? ` ${item.unit}` : ''}</div>
+                    <div className={`text-sm font-black ${item.delta !== null && item.delta > 0 ? 'text-emerald-300' : item.delta !== null && item.delta < 0 ? 'text-amber-200' : 'text-white/55'}`}>{item.delta === null ? 'Unknown' : `${item.delta > 0 ? '+' : ''}${item.delta}${item.unit ? ` ${item.unit}` : ''}`}</div>
                     <div className="mt-1 text-[8px] uppercase tracking-wide text-white/28">{item.label}</div>
                   </div>
                 ))}
