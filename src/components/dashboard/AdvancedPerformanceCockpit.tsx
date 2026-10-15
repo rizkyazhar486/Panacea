@@ -3,6 +3,7 @@ import { getVitals } from '../../lib/healthVitals'
 import { getWorkouts } from '../../lib/workoutStore'
 import type { ImportedWorkout } from '../../lib/workoutImport'
 import { useStore } from '../../lib/store'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 
 type Mode = 'home' | 'athlete'
 type Sport = 'Run' | 'Strength' | 'Cycle' | 'Walk/Hike' | 'Other'
@@ -71,12 +72,13 @@ function collectSessions(workouts: ImportedWorkout[], gps: Array<{ id: string; a
   const all: Session[] = []
 
   for (const w of workouts) {
-    if (!w.mulai || !Number.isFinite(w.durasi) || w.durasi <= 0) continue
-    const minutes = w.durasi / 60
+    const seconds = workoutDurationSeconds(w)
+    if (!w.mulai || seconds === null || seconds <= 0) continue
+    const minutes = seconds / 60
     const distanceKm = typeof w.jarakKm === 'number' && w.jarakKm > 0 ? w.jarakKm : undefined
     const paceSec = typeof w.paceSec === 'number' && w.paceSec > 0
       ? w.paceSec
-      : distanceKm ? w.durasi / distanceKm : undefined
+      : distanceKm ? seconds / distanceKm : undefined
     all.push({
       id: `import-${w.id}`,
       at: w.mulai,
