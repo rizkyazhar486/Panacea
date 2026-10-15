@@ -1,5 +1,6 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
+import { isSignedCarePlan } from './domains/clinical-records/carePlan.js'
 import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
@@ -1050,6 +1051,7 @@ type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
 export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listCarePlans() { return db.carePlans ?? [] }
+export function listSignedCarePlans() { return listCarePlans().filter(p => isSignedCarePlan(p?.rencana)) }
 export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
 /** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
 export function tambahLedgerValidasi(c: import('./domains/clinical-records/validasiLedger.js').CatatanLedger) {

@@ -10,7 +10,7 @@
 //   aturan yang terpicu dengan mengirim ringkasan palsu.
 // Server tidak menambah aturan klinis, ambang, atau red flag apa pun.
 
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { uuidStabil } from './labFhir.js'
 
 export type JenisPertanyaan = 'boolean' | 'number' | 'text' | 'choice'
@@ -27,6 +27,7 @@ export interface AturanLaporanPasien {
 export interface RencanaPerawatan {
   id: string; version: string; subjectId: string; clinicianId: string; questionnaireId: string
   diagnosisRefs: { system: 'icd-10' | 'snomed-ct' | 'local'; code: string; display: string; verificationStatus: 'confirmed' | 'provisional' | 'differential' }[]
+  signature?: { actorId: string; at: string; contentHash: string }
   activeFrom: string; activeUntil?: string
   schedule: { cadence: 'daily'; graceMinutes: number }
   questions: PertanyaanRencana[]
@@ -147,6 +148,23 @@ export function susunRencana(masukan: unknown, subjectId: string, clinicianId: s
     schedule: { cadence: 'daily', graceMinutes: 720 },
     questions, patientReportedReviewRules, measurementReviewRules, monitoredMetrics: [...new Set(measurementReviewRules.map((r) => r.metric))],
   }
+}
+
+// The authenticated clinician explicitly approves the exact stored plan content.
+// This records session-bound approval; it is not a certificate or clinical validation.
+function planHash(plan: RencanaPerawatan): string {
+  const { signature: _signature, ...content } = plan
+  return createHash('sha256').update(JSON.stringify(content)).digest('hex')
+}
+export function signCarePlan(plan: RencanaPerawatan, actorId: string, at: Date): RencanaPerawatan {
+  if (!actorId || actorId !== plan.clinicianId || !Number.isFinite(at.getTime())) throw new Error('invalid care plan signer')
+  return { ...plan, signature: { actorId, at: at.toISOString(), contentHash: planHash(plan) } }
+}
+export function isSignedCarePlan(plan: RencanaPerawatan): boolean {
+  const signature = plan?.signature
+  return !!signature && typeof signature.actorId === 'string' && signature.actorId === plan.clinicianId
+    && typeof signature.at === 'string' && Number.isFinite(Date.parse(signature.at))
+    && signature.contentHash === planHash(plan)
 }
 
 /** Jawaban mentah pasien harus cocok dengan pertanyaan rencana. */
