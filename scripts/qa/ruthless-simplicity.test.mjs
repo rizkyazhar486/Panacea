@@ -21,7 +21,7 @@ test('v50 removes ambient gradients, glow and blur from the shared shell', async
 })
 
 test('simplicity contract preserves safety and progressive disclosure', async () => {
-  const doc = await source('docs/product/RUTHLESS-SIMPLICITY.md')
+  const doc = await source('DOCS/product/RUTHLESS-SIMPLICITY.md')
   for (const phrase of [
     'One viewport, one focal purpose',
     'Two-step access',

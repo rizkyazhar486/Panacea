@@ -15,7 +15,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea calls Open Food Facts through server/src/lingkungan.ts and normalizes only selected product identity and per-100g nutrient fields. React components must not call the upstream API directly. The adapter intentionally does not invent serving-size conversions because package serving definitions are heterogeneous and user-entered data quality varies."
+    "notes": "Panacea calls Open Food Facts through server/src/domains/lifestyle/lingkungan.ts and normalizes only selected product identity and per-100g nutrient fields. React components must not call the upstream API directly. The adapter intentionally does not invent serving-size conversions because package serving definitions are heterogeneous and user-entered data quality varies."
   },
   "license": {
     "status": "VERIFIED",

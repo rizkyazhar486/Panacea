@@ -54,7 +54,7 @@ assert.deepEqual(blank, { ok: false, problems: { age: 'age is required', totChol
 assert.deepEqual(validateFraminghamInput(ok), validateFraminghamInput(ok))
 
 // Regresi halaman: tanpa `|| 0`, tanpa getDemo(), tanpa nilai awal karangan 200/50/140; hasil digerbang oleh masukan sah.
-const kode = readFileSync(new URL('../../src/pages/HealthSimulator.tsx', import.meta.url), 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')
+const kode = readFileSync(new URL('../../src/pages/bodyhub/HealthSimulator.tsx', import.meta.url), 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')
 assert.ok(!/\|\|\s*0\b/.test(kode.replace(/\|\|\s*0\.\d/g, '')) , 'kolom kosong kembali terbaca 0')
 assert.ok(!/\bgetDemo\s*\(/.test(kode), 'getDemo() kembali')
 assert.ok(!/totChol: 200|hdl: 50|sbp: 140|age: demo\.age \|\| 45/.test(kode), 'nilai awal karangan kembali')

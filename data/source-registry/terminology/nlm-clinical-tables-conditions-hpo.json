@@ -11,7 +11,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea uses the NLM Clinical Tables `conditions` and `hpo` v3 endpoints only through `server/src/anatomyOntology.ts` as bounded semantic grounding sources alongside EMBL-EBI OLS4. The conditions table returns an NLM-internal `key_id`, not a Disease Ontology CURIE; the HPO table returns `HP:...` identifiers. These identifier systems must remain distinct in normalized records and UI provenance."
+    "notes": "Panacea uses the NLM Clinical Tables `conditions` and `hpo` v3 endpoints only through `server/src/domains/anatomy/anatomyOntology.ts` as bounded semantic grounding sources alongside EMBL-EBI OLS4. The conditions table returns an NLM-internal `key_id`, not a Disease Ontology CURIE; the HPO table returns `HP:...` identifiers. These identifier systems must remain distinct in normalized records and UI provenance."
   },
   "license": {
     "status": "CHECK_REQUIRED",

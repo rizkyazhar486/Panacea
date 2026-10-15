@@ -34,7 +34,7 @@ assert.equal(sebagian.weightKg, undefined, 'a weight that was never stored must 
 toko.clear()
 
 // ── 3. Ubin itu harus memakai bacaan tersimpan, bukan getDemo() ────────────
-const ubin = readFileSync(new URL('../../src/components/UbinTdee.tsx', import.meta.url), 'utf8')
+const ubin = readFileSync(new URL('../../src/components/tiles/UbinTdee.tsx', import.meta.url), 'utf8')
 assert.ok(/getDemoTersimpan/.test(ubin), 'UbinTdee does not read the stored profile')
 // Komentar boleh menyebut getDemo() -- justru harus, karena di situlah
 // alasannya dicatat. Yang diperiksa adalah KODE.
@@ -55,7 +55,7 @@ assert.ok(/Weight, height, age and sex are needed/.test(ubin),
 // Halaman itu punya kolom yang terlihat dan bisa disunting, jadi nilai awal
 // masuk akal. Yang tidak masuk akal adalah membiarkannya terbaca seperti
 // angka yang tersimpan.
-const makro = readFileSync(new URL('../../src/pages/MacroLabGizi.tsx', import.meta.url), 'utf8')
+const makro = readFileSync(new URL('../../src/pages/bodyhub/MacroLabGizi.tsx', import.meta.url), 'utf8')
 assert.ok(/Not yours yet:/.test(makro), 'Macro Lab no longer marks its substituted values')
 assert.ok(/bawaan\.length > 0 &&/.test(makro), 'the notice is not conditional on there being substitutions')
 assert.ok(!/from your own body mass/.test(makro),

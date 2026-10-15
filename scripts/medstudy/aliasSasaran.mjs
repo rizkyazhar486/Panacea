@@ -11,7 +11,7 @@
 // dan LENGKAP tetapi TIDAK TERJANGKAU. Tabel padanan justru menambah satu cara
 // baru untuk mengalaminya, jadi ia perlu penjaganya sendiri.
 //
-// Dijalankan: node scripts/aliasSasaran.mjs
+// Dijalankan: node scripts/medstudy/aliasSasaran.mjs
 import { readFileSync } from 'node:fs'
 
 const alias = readFileSync('src/lib/osceStationNoteAliases.ts', 'utf8')

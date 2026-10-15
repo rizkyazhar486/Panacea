@@ -5,7 +5,7 @@
 // Skrip juga membuat pembaruan berikutnya — periode ujian baru — menjadi satu
 // perintah, bukan satu pekerjaan penyuntingan.
 //
-// Dijalankan: node scripts/impor-osce-ukmppd.mjs <berkas.xlsx>
+// Dijalankan: node scripts/medstudy/impor-osce-ukmppd.mjs <berkas.xlsx>
 // Keluarannya src/lib/osceUkmppdRiwayat.ts
 //
 // APA YANG TIDAK DIBERSIHKAN. Nama kasus dibiarkan APA ADANYA, termasuk yang
@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 
 const berkas = process.argv[2]
-if (!berkas) { console.error('pakai: node scripts/impor-osce-ukmppd.mjs <berkas.xlsx>'); process.exit(1) }
+if (!berkas) { console.error('pakai: node scripts/medstudy/impor-osce-ukmppd.mjs <berkas.xlsx>'); process.exit(1) }
 
 // Pembacaan xlsx diserahkan ke Python+openpyxl: menulis pembaca xlsx sendiri
 // berarti menulis pembaca ZIP dan XML, dan kekeliruan di sana muncul sebagai
@@ -74,7 +74,7 @@ const periodeUnik = [...new Set(bersih.map((b) => b.periode))]
 // dan hasilnya string TypeScript yang sah karena keduanya sepakat pada bentuk
 // kutip ganda.
 const esc = (s) => JSON.stringify(s.replace(/\s+/g, ' ').trim())
-const isi = `// BERKAS INI DIHASILKAN OLEH scripts/impor-osce-ukmppd.mjs — JANGAN DISUNTING TANGAN.
+const isi = `// BERKAS INI DIHASILKAN OLEH scripts/medstudy/impor-osce-ukmppd.mjs — JANGAN DISUNTING TANGAN.
 //
 // Rekap stasiun OSCE UKMPPD ${periodeUnik.length} periode, ${sistemUnik.length} sistem, ${bersih.length} stasiun.
 //

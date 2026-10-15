@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-// Ledger arahan pemilik dipindah dari CLAUDE.md ke PANACEA_OWNER_DIRECTIVES.md (CLAUDE.md v2, #2094).
+// Ledger arahan pemilik dipindah dari CLAUDE.md ke governance/doctrine/PANACEA_OWNER_DIRECTIVES.md (CLAUDE.md v2, #2094).
 const claude = readFileSync('governance/doctrine/PANACEA_OWNER_DIRECTIVES.md', 'utf8')
 
 assert.match(
   claude,
   /## Visit OS secure realtime handoff — updated 2026-09-20/,
-  'PANACEA_OWNER_DIRECTIVES.md must carry the current secure Visit realtime handoff',
+  'governance/doctrine/PANACEA_OWNER_DIRECTIVES.md must carry the current secure Visit realtime handoff',
 )
 
 assert.doesNotMatch(
   claude,
   /backend has no canonical server-side visit\/encounter membership registry/i,
-  'PANACEA_OWNER_DIRECTIVES.md must not retain the resolved Visit membership blocker',
+  'governance/doctrine/PANACEA_OWNER_DIRECTIVES.md must not retain the resolved Visit membership blocker',
 )
 
 for (const required of [
@@ -26,7 +26,7 @@ for (const required of [
 ]) {
   assert.ok(
     claude.includes(required),
-    `PANACEA_OWNER_DIRECTIVES.md secure Visit handoff missing current boundary: ${required}`,
+    `governance/doctrine/PANACEA_OWNER_DIRECTIVES.md secure Visit handoff missing current boundary: ${required}`,
   )
 }
 

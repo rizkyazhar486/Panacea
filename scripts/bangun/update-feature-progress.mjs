@@ -6,7 +6,7 @@ const status = process.argv[3]
 const allowed = new Set(['candidate', 'in_progress', 'done', 'blocked', 'skipped'])
 
 if (!id || !status || !allowed.has(status)) {
-  console.error('Usage: node scripts/update-feature-progress.mjs <candidate-id> <candidate|in_progress|done|blocked|skipped> [--commit=SHA] [--paths=a,b] [--note=text]')
+  console.error('Usage: node scripts/bangun/update-feature-progress.mjs <candidate-id> <candidate|in_progress|done|blocked|skipped> [--commit=SHA] [--paths=a,b] [--note=text]')
   process.exit(2)
 }
 

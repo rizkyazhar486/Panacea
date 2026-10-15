@@ -16,7 +16,7 @@
     "runtime": false,
     "buildTime": false,
     "networkRequired": false,
-    "notes": "Panacea currently keeps only an ATC/DDD source boundary and validation helpers in server/src/atcDdd.ts. It does not scrape the public searchable index, download the registered bulk catalogue, or redistribute WHO ATC/DDD data at runtime. Future ingestion must be explicitly licensed and version-pinned before enabling runtime or build-time use."
+    "notes": "Panacea currently keeps only an ATC/DDD source boundary and validation helpers in server/src/domains/medical-reference/atcDdd.ts. It does not scrape the public searchable index, download the registered bulk catalogue, or redistribute WHO ATC/DDD data at runtime. Future ingestion must be explicitly licensed and version-pinned before enabling runtime or build-time use."
   },
   "license": {
     "status": "VERIFIED",

@@ -24,7 +24,7 @@ assert.equal(parseWhoVisit('60.01', '9.6', '75.7').ok, false); assert.equal(pars
 assert.equal(parseWhoVisit('12', '9.6', '75.7').ok, validateWhoGrowthInputs(12, 9.6, 75.7).ok)
 assert.deepEqual(parseWhoVisit('12', '9.6', '75.7'), parseWhoVisit('12', '9.6', '75.7'))
 
-const page = readFileSync(new URL('../../src/pages/ChildGrowthTracker.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/medstudy/ChildGrowthTracker.tsx', import.meta.url), 'utf8')
 assert.ok(/parseWhoVisit\(ageText, weightText, heightText\)/.test(page), 'halaman tidak memakai parseWhoVisit')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 assert.ok(/if \(!parsed\.ok\) \{ setVisitError\(parsed\.reason\); return \}/.test(page), 'kunjungan tidak ditolak saat tidak sah')

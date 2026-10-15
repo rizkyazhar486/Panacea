@@ -70,6 +70,6 @@ assert.ok(validasiHierarki({ ...protein, anak: [{ ...sel, anak: [] }] }).some((g
 assert.ok(validasiHierarki({ ...protein, geometri: { ...protein.geometri, sha256: 'x' } as never }).some((g) => /sha256/.test(g)))
 assert.equal(estimasiMemori({ jumlahProtein: 1, rerataPanjang: 76, atomBeratPerResidu: 602 / 76, resolusi: 'all-atom' }).entitas, 602)
 console.log(`molekul-ubiquitin: 1UBI (sha ok), urutan = SEQRES = P62988, ${b.jumlahUkuran} ukuran tulang punggung 0 pencilan (rmsZ ${b.rmsZ.toFixed(2)}), 70/70 L & cermin terdeteksi, ${cl.length} kontak ringan dilaporkan, SASA ${tot.toFixed(0)} Å², SE(3) terpulihkan`)
-const panel = readFileSync('src/components/PanelUbiquitin.tsx', 'utf8')
+const panel = readFileSync('src/components/digital-twin/PanelUbiquitin.tsx', 'utf8')
 assert.match(panel, /reference structure, not patient-specific/, 'panel protein tanpa label rujukan')
-assert.match(readFileSync('src/pages/BodyExposureOS.tsx', 'utf8'), /<PanelUbiquitin \/>/)
+assert.match(readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8'), /<PanelUbiquitin \/>/)
