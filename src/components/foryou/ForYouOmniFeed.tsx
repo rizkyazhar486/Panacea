@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import type { SocialPost } from '../../lib/types'
 import { getWorkouts } from '../../lib/workoutStore'
+import { rankedWorkoutsFromStored } from '../../domains/personal-health'
 import { calculateSeasonalRank, type RankedHealthEvidence } from '../../lib/seasonalHealthSportRank'
 import { ForYouDailyStack } from '../ForYouDailyStack'
 import { ForYouNetworkHub } from '../ForYouNetworkHub'
@@ -81,17 +82,7 @@ function useSeasonRank() {
 
   return useMemo(() => calculateSeasonalRank({
     health: readHealth(),
-    workouts: getWorkouts().map((workout) => ({
-      id: workout.id,
-      startedAt: workout.mulai,
-      durationMinutes: Math.max(0, workout.durasi / 60),
-      activeKcal: workout.kcal,
-      paceSecondsPerKm: workout.paceSec,
-      speedKmh: workout.kecepatanKmh,
-      avgHr: workout.avgHr,
-      maxHr: workout.maxHr,
-      rpe: workout.rpe,
-    })),
+    workouts: rankedWorkoutsFromStored(getWorkouts()),
   }, 'health', new Date()), [revision])
 }
 
