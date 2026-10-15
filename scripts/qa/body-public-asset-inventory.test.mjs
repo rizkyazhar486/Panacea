@@ -92,7 +92,8 @@ test('restrictive or negated familiar licence substrings are never recognized as
 })
 test('PNG cannot follow a manifest symlink before walker reaches the manifest', () => fixture((dir) => {
   writeFileSync(path.join(dir, 'a.png'), 'synthetic fixture')
-  writeFileSync(path.join(dir, 'z-source.json'), '{"source":"External atlas","license":"CC0-1.0"}')
+  // Invalid target makes an accidental pre-check read observably fail with SyntaxError.
+  writeFileSync(path.join(dir, 'z-source.json'), '{')
   symlinkSync(path.join(dir, 'z-source.json'), path.join(dir, 'manifest.json'))
   assert.throws(() => inventory(dir), /manifest.json: symlink not permitted/)
 }))
