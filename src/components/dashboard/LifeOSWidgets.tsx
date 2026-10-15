@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getVitals, vitalsAge } from '../../lib/healthVitals'
 import { getWorkouts } from '../../lib/workoutStore'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import { IconBook, IconHeart, IconPlan, IconRun, IconWallet } from '../icons'
 
 type FinanceTx = {
@@ -93,6 +94,7 @@ export function LifeOSWidgets() {
   const workouts = useMemo(() => getWorkouts(), [version])
   const finance = useMemo(() => readFinance(), [version])
   const latestWorkout = workouts[0]
+  const latestDurationSeconds = workoutDurationSeconds(latestWorkout)
   const monthKey = now.toISOString().slice(0, 7)
   const monthFinance = finance.filter((tx) => tx.date?.startsWith(monthKey))
   const income = monthFinance.reduce((sum, tx) => sum + (tx.kind === 'income' && Number.isFinite(tx.amount) ? Number(tx.amount) : 0), 0)
@@ -153,7 +155,7 @@ export function LifeOSWidgets() {
           <span className="text-[8px] font-black uppercase tracking-[.18em] text-cyan-100/45">Movement</span>
         </div>
         <div className="mt-4 text-2xl font-black tracking-tight">{latestWorkout ? (latestWorkout.nama || 'Workout') : 'Move today'}</div>
-        <div className="mt-1 text-[10px] font-bold text-white/45">{latestWorkout ? `${Math.round(latestWorkout.durasi / 60)} min${latestWorkout.jarakKm ? ` · ${latestWorkout.jarakKm.toFixed(1)} km` : ''}` : 'Run · strength · mobility · recovery'}</div>
+        <div className="mt-1 text-[10px] font-bold text-white/45">{latestWorkout ? `${latestDurationSeconds === null ? '—' : `${Math.round(latestDurationSeconds / 60)} min`}${latestWorkout.jarakKm ? ` · ${latestWorkout.jarakKm.toFixed(1)} km` : ''}` : 'Run · strength · mobility · recovery'}</div>
         <div className="mt-4 flex items-center justify-between text-[10px] font-black text-cyan-200"><span>{workouts.length ? `${workouts.length} sessions saved` : 'Start a session'}</span><span>→</span></div>
       </Link>
 
