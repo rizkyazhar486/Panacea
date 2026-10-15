@@ -40,3 +40,8 @@ Focused duration/field/overflow and existing HR-weight regressions pass. Final b
 Active overlap: #2545 consolidates #2540–#2544 rewards/training/dashboard duration work and does not modify Human Replay. #2529, #2533 and #2546 are independent pending owner review; workflow insertion conflicts must retain all acceptance steps. Merge only through PR, with current-main/head inspection, all mandatory exact-head CI, required review and expected-head protection. No production shipment is claimed.
 
 The final visual inspection found Body3D's default68vh/negative-margin stage extending beyond the enclosing500px viewport and covering metric cards. HumanReplay now supplies the existing full-size stageClassName prop. A browser bounding-box assertion rejects intersecting canvas/metric rectangles, covering mobile stacking and desktop side-by-side layout. Renderer logic and geometry are unchanged.
+
+
+## Current-main reconciliation
+
+Main129f5ddb integrated #2545 during this candidate's publication. The replay implementation/harness has no file overlap with its consumer changes; only the execution checkpoint conflicted. Both valid intents are preserved by a forward merge. Earlier945-QA/737-frontend/browser results describe source57454378 on base0f9e6a21. The synchronized candidate must repeat build/full frontend/browser and all exact-head CI; old-head green is not current-head proof. No criterion is promoted.
