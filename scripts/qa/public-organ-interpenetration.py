@@ -99,10 +99,10 @@ def audit(data):
     for a,b in expected:
         A,B = data['organs'][a],data['organs'][b]
         detail = inside_fraction(A['vertices'],B['vertices'],B['triangles'])
-        checks.append({'a':A['name'],'b':B['name'],**detail,'ok':detail['fraction']<=.05})
+        checks.append({'a':A['name'],'b':B['name'],**detail,'ok':detail['inside']/detail['sampled']<=.05})
     gross=gross_checks(data['summaries'])
     return {'grossChecks':gross,'structureCount':len(data['summaries']),'schema':1,'sourceLevel':data['sourceLevel'],'sources':data['sources'],
-            'method':'3-ray majority parity; source vertices sampled at max(1,floor(N/300)) stride; 1e-5m step',
+            'method':'3-ray majority parity; source vertices sampled at max(1,floor(N/300)) stride; 1e-5m step; raw fraction threshold before display rounding',
             'threshold':.05,'thresholdSource':'bodyexposure/pipeline/qa_gross_anatomy.py existing technical screen',
             'checks':checks,'ok':all(c['ok'] for c in checks+gross),
             'limits':['LOD3 exported surface and split vertices differ from original Blender source mesh',

@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { Group, Mesh, BufferGeometry, Float32BufferAttribute } from 'three'
 import { extractGeometry, collect } from './public-organ-geometry.mjs'
+import { assertReplayMatches } from './public-organ-replay.mjs'
 
 const triangle = () => new BufferGeometry().setAttribute('position',new Float32BufferAttribute([0,0,0, 1,0,0, 0,1,0],3))
 test('indexed and unindexed source triangles preserve transforms and Z-up conversion',()=>{
@@ -27,6 +28,17 @@ test('empty, invalid indices, incomplete triangles and nonfinite vertices reject
 })
 test('missing source collection rejects rather than producing empty success',async()=>{
   await assert.rejects(collect('public/bodyexposure/nonexistent-body'),/No source/)
+})
+
+test('replay comparison rejects changed counts, fractions, gross results and unsuccessful reports',()=>{
+  const report={ok:true,checks:[{inside:1,fraction:.01}],grossChecks:[{ok:true,detail:1}]}
+  assertReplayMatches(report,structuredClone(report))
+  for(const mutate of [r=>r.checks[0].inside++,r=>r.checks[0].fraction=.02,
+    r=>r.grossChecks[0].detail=2,r=>r.ok=false]) {
+    const replay=structuredClone(report);mutate(replay)
+    assert.throws(()=>assertReplayMatches(report,replay))
+  }
+  assert.throws(()=>assertReplayMatches({ok:false},{ok:false}))
 })
 
 test('committed report matches exact decoded public source collection',async()=>{

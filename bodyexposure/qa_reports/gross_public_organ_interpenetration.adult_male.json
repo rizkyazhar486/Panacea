@@ -129,7 +129,7 @@
       "sha256": "0462d6a873500a45ad3c25f2aae2e319027b80af2cd26694fad6f37f89e88397"
     }
   ],
-  "method": "3-ray majority parity; source vertices sampled at max(1,floor(N/300)) stride; 1e-5m step",
+  "method": "3-ray majority parity; source vertices sampled at max(1,floor(N/300)) stride; 1e-5m step; raw fraction threshold before display rounding",
   "threshold": 0.05,
   "thresholdSource": "bodyexposure/pipeline/qa_gross_anatomy.py existing technical screen",
   "checks": [

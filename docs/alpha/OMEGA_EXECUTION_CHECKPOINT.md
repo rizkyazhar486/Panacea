@@ -4,11 +4,11 @@ Source: governance/ALPHA_ACCEPTANCE_LEDGER.json in this candidate. Main last obs
 
 ## Active evidence / integration unit
 
-D3 PR2535 reproduces all nine gross adult-male checks and seven organ-pair parity screens from source-pinned public geometry. Source report, positive/negative/boundary tests and native Blender reproduction pass. Prior headab3c8d2e passed all applicable CI including full Stabilization and render proof. Candidate was synchronized onto main12515dbd; current-head CI and configured CodeRabbit review are running, not inferred from old green checks.
+D3 PR2535 reproduces all nine gross adult-male checks and seven organ-pair parity screens from source-pinned public geometry. Source report, positive/negative/boundary tests and native Blender reproduction pass. Prior headab3c8d2e passed all applicable CI including full Stabilization and render proof. Candidate was synchronized onto main12515dbd; configured CodeRabbit review on e497def2 found a rounded-threshold boundary and requested exact report replay. Both are addressed with regression coverage; latest-head CI must pass before integration.
 
-C2 PR2540 fixes the For You/League unknown-duration mismatch; dashboard-label work is isolated on fix/c2-dashboard-duration-label. Neither alone promotes C2. E4 logging repair PR2538 is integrated; broader E4 acceptance remains unverified. A6 PR2529 stays separate. C6 requires qualified human signatures.
+C2 PR2540 fixes the For You/League unknown-duration mismatch; dashboard-label PR2541 and sRPE-load PR2542 are isolated; their evidence is synthetic local component/browser testing. Neither alone promotes C2. E4 logging repair PR2538 is integrated; broader E4 acceptance remains unverified. A6 PR2529 stays separate. C6 requires qualified human signatures.
 
-Production independently observed frontend a70fb287 with dirty=false, not the observed main12515dbd. Public attribution page passes390x844/1440x900/keyboard with synthetic-free read-only browsing. Official ICRP145/156 pages and localREADMEs consulted do not establish a redistribution grant; owner statement remains distinct. No SHIPPED/current-main or clinical approval claim.
+Production release38681031229 passed; independently fetched public build-info now matches main12515dbd, tree8203c311, dirty=false. Public smoke has no overflow/errors at390x844/1440x900; authenticated clinical journey remains unavailable without an authorized session. Public attribution page passes390x844/1440x900/keyboard with synthetic-free read-only browsing. Official ICRP145/156 pages and localREADMEs consulted do not establish a redistribution grant; owner statement remains distinct. Deployment identity is proved; full E7 shipment/clinical acceptance remains unproved.
 
 ## Execution ledger
 
