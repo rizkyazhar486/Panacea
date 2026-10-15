@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 const Kitab = lazy(() => import('./wellness/Kitab').then((m) => ({ default: m.Kitab })))
 const Hadis = lazy(() => import('./wellness/Hadis').then((m) => ({ default: m.Hadis })))
 const Adzan = lazy(() => import('./wellness/Adzan').then((m) => ({ default: m.Adzan })))
-const KisahNabi = lazy(() => import('./KisahNabi').then((m) => ({ default: m.KisahNabi })))
+const KisahNabi = lazy(() => import('./wellness/KisahNabi').then((m) => ({ default: m.KisahNabi })))
 
 type FaithView = 'scripture' | 'hadith' | 'prayer' | 'stories'
 type View = { key: FaithView; label: string; short: string; component: ComponentType; description: string }
