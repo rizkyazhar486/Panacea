@@ -3,8 +3,10 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import ts from 'typescript'
-import { rankedWorkoutsFromStored } from '../../src/domains/personal-health/adapters/rankedWorkoutEvidence.ts'
-import { calculateSeasonalRank } from '../../src/lib/seasonalHealthSportRank.ts'
+import { loadTypeScriptSubject } from './load-typescript-subject.mjs'
+const { rankedWorkoutsFromStored } = await loadTypeScriptSubject('src/domains/personal-health/adapters/rankedWorkoutEvidence.ts')
+const { calculateSeasonalRank } = await loadTypeScriptSubject('src/lib/seasonalHealthSportRank.ts')
+const { workoutDurationSeconds } = await loadTypeScriptSubject('src/shared/kernel/workoutDurationEvidence.ts')
 
 // Actual hook body; storage and React scheduling are the mocked boundaries.
 function feedRank(workouts) {
@@ -15,7 +17,7 @@ function feedRank(workouts) {
     {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText
   class FixedDate extends Date { constructor(...args){super(...(args.length?args:['2026-10-15T12:00:00Z']))} }
   const context={useState:()=>[0,()=>{}],useEffect:()=>{},useMemo:fn=>fn(),
-    rankedWorkoutsFromStored,getWorkouts:()=>workouts,readHealth:()=>undefined,calculateSeasonalRank,Date:FixedDate}
+    workoutDurationSeconds,rankedWorkoutsFromStored,getWorkouts:()=>workouts,readHealth:()=>undefined,calculateSeasonalRank,Date:FixedDate}
   vm.runInNewContext(js,context)
   return context.result
 }
@@ -47,5 +49,16 @@ test('valid timestamps and legacy positive duration retain ranking eligibility',
 })
 test('mixed For You evidence matches the same known-only inputs in League',()=>{
   const known=workout(),unknown=workout({id:'unknown',durationSource:'unknown'})
-  assert.deepEqual(feedRank([known,unknown]),feedRank([known]))
+  const mixed=feedRank([known,unknown]),onlyKnown=feedRank([known])
+  const {unavailableDurationWorkouts:mixedMissing,...mixedRank}=mixed
+  const {unavailableDurationWorkouts:knownMissing,...knownRank}=onlyKnown
+  assert.deepEqual(mixedRank,knownRank)
+  assert.equal(mixedMissing,1)
+  assert.equal(knownMissing,0)
+})
+
+test('rank exposes unavailable duration without labelling recorded zero unavailable',()=>{
+  assert.equal(feedRank([workout({durationSource:'unknown'})]).unavailableDurationWorkouts,1)
+  assert.equal(feedRank([workout({durasi:0})]).unavailableDurationWorkouts,0)
+  assert.equal(feedRank([workout({durationSource:'timestamps',selesai:'2026-10-15T08:01:00Z'})]).unavailableDurationWorkouts,1)
 })

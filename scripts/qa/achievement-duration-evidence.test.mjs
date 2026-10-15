@@ -3,7 +3,8 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import ts from 'typescript'
-import { workoutDurationSeconds } from '../../src/shared/kernel/workoutDurationEvidence.ts'
+import { loadTypeScriptSubject } from './load-typescript-subject.mjs'
+const { workoutDurationSeconds } = await loadTypeScriptSubject('src/shared/kernel/workoutDurationEvidence.ts')
 
 function achievements(workouts) {
   const source=fs.readFileSync('src/components/dashboard/ActivityAchievementWidget.tsx','utf8')

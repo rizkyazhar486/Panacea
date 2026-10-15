@@ -4,6 +4,7 @@ import { useStore } from '../../lib/store'
 import type { SocialPost } from '../../lib/types'
 import { getWorkouts } from '../../lib/workoutStore'
 import { rankedWorkoutsFromStored } from '../../domains/personal-health'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import { calculateSeasonalRank, type RankedHealthEvidence } from '../../lib/seasonalHealthSportRank'
 import { ForYouDailyStack } from '../ForYouDailyStack'
 import { ForYouNetworkHub } from '../ForYouNetworkHub'
@@ -80,10 +81,13 @@ function useSeasonRank() {
     }
   }, [])
 
-  return useMemo(() => calculateSeasonalRank({
-    health: readHealth(),
-    workouts: rankedWorkoutsFromStored(getWorkouts()),
-  }, 'health', new Date()), [revision])
+  return useMemo(() => {
+    const stored = getWorkouts()
+    return {
+      ...calculateSeasonalRank({ health: readHealth(), workouts: rankedWorkoutsFromStored(stored) }, 'health', new Date()),
+      unavailableDurationWorkouts: stored.filter(workout => workoutDurationSeconds(workout) === null).length,
+    }
+  }, [revision])
 }
 
 function matchesMode(post: SocialPost, mode: FeedMode, me?: string, follows: readonly string[] = []) {
@@ -191,6 +195,9 @@ function RankCard() {
         <div className="mt-2 text-[10px] font-bold text-white/35">
           {result.nextTier ? `★ ${result.starsToNext.toFixed(2)} to ${result.nextTier.label}` : 'Season cap reached'} · each verified effort is one match
         </div>
+        {result.unavailableDurationWorkouts > 0 && <p role="note" className="mt-2 text-[11px] leading-relaxed text-white/60">
+          Duration unavailable for {result.unavailableDurationWorkouts} stored workout{result.unavailableDurationWorkouts === 1 ? '' : 's'}; excluded from rank.
+        </p>}
       </Link>
     </section>
   )

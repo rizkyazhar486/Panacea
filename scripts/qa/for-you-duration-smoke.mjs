@@ -14,6 +14,7 @@ const temp=await fs.mkdtemp(path.join(os.tmpdir(),'panacea-for-you-rank-'))
 const out=process.env.OUT || path.join(temp,'evidence');await fs.mkdir(out,{recursive:true})
 const entry=`import React,{useState,useMemo,useEffect} from 'react';
 import {createRoot} from 'react-dom/client';import {BrowserRouter,Link} from 'react-router-dom';
+import {workoutDurationSeconds} from '${path.resolve('src/shared/kernel/workoutDurationEvidence.ts')}';
 import {calculateSeasonalRank} from '${path.resolve('src/lib/seasonalHealthSportRank.ts')}';
 import {rankedWorkoutsFromStored} from '${path.resolve('src/domains/personal-health/index.ts')}';
 let workouts=[];const getWorkouts=()=>workouts;const recordAffectEvent=()=>{};
@@ -45,21 +46,28 @@ try{
   await page.getByText('Ranked Season',{exact:true}).waitFor()
   const stars=()=>page.locator('a').getByText(/^★ \d+\.\d+$/).textContent()
   const fixture={id:'synthetic',mulai:new Date().toISOString(),durasi:1800,durationSource:'source_field',kcal:280}
-  const set=async items=>{await page.evaluate(items=>window.setWorkouts(items),items);await page.waitForTimeout(100)}
+  const set=async items=>{await page.evaluate(items=>window.setWorkouts(items),items);await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[])}
+  const omissions=page.getByRole('note')
   assert.equal((await stars()).trim(),'★ 0.00')
   await set([fixture]);const known=(await stars()).trim();assert.notEqual(known,'★ 0.00')
+  assert.equal(await omissions.count(),0)
   for(const extra of [{durationSource:'unknown'},{durasi:0},{durationSource:'timestamps',selesai:fixture.mulai}]){
    await set([{...fixture,...extra}]);assert.equal((await stars()).trim(),'★ 0.00')
+   if(extra.durasi===0)assert.equal(await omissions.count(),0)
+   else assert.match(await omissions.innerText(),/Duration unavailable for 1 stored workout; excluded from rank/)
+   if(extra.durationSource==='unknown')await page.screenshot({path:path.join(out,`rank-unknown-${width}.png`),fullPage:true})
   }
   await set([fixture,{...fixture,id:'unknown',durationSource:'unknown'}]);assert.equal((await stars()).trim(),known)
+  assert.match(await omissions.innerText(),/1 stored workout/)
   await page.evaluate(()=>localStorage.setItem('pmd_health_profile','{invalid'))
   await set([]);assert.equal((await stars()).trim(),'★ 0.00')
+  assert.equal(await omissions.count(),0)
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)
   await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.tagName),'A')
   assert.equal(await page.locator('a').getAttribute('href'),'/fitness-hub?view=ranked')
   assert.deepEqual(errors,[])
   await page.screenshot({path:path.join(out,`rank-${width}.png`),fullPage:true})
-  results.push({width,height,knownStars:known,emptyUnknownZeroInconsistent:0,mixedMatchesKnown:true,overflow:false,keyboardLink:true,errors})
+  results.push({width,height,knownStars:known,emptyUnknownZeroInconsistent:0,unavailableDurationDisclosed:true,recordedZeroNotLabelledUnavailable:true,mixedMatchesKnown:true,overflow:false,keyboardLink:true,errors})
   await context.close()
  }
  await fs.writeFile(path.join(out,'report.json'),JSON.stringify({scope:'actual extracted RankCard/hooks, synthetic storage only; not full app route or device proof',viewports:results},null,2))
