@@ -45,3 +45,6 @@ The final visual inspection found Body3D's default68vh/negative-margin stage ext
 ## Current-main reconciliation
 
 Main129f5ddb integrated #2545 during this candidate's publication. The replay implementation/harness has no file overlap with its consumer changes; only the execution checkpoint conflicted. Both valid intents are preserved by a forward merge. Earlier945-QA/737-frontend/browser results describe source57454378 on base0f9e6a21. The synchronized candidate must repeat build/full frontend/browser and all exact-head CI; old-head green is not current-head proof. No criterion is promoted.
+
+
+Synchronized-source verification completed on `f590af015caa7c62d2a2f767c953a1361eebf3b9`:972 Node QA tests, TypeScript/Vite,737/737 frontend files, architecture/ratchet and the complete actual-component/poster browser fixture pass at390×844 and1440×900. Geometry/reference components remain real; font-service CSS fallback is still explicitly isolated. The checkpoint-only follow-up records these results; exact-head CI must repeat the required gates before integration.
