@@ -640,3 +640,27 @@ risks:
       - scripts/uji/strength-cache-scope.mts
       - scripts/qa/strength-cache-smoke.mjs
       - DOCS/sport/STRENGTH_LOG_STORAGE.md
+
+  - risk_id: risk.health_webhook_operational_log_privacy
+    category: privacy_security
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      Health webhook logs associated an opaque account marker with client-controlled
+      metric names and matched health categories. Unknown names could contain private
+      text or newlines. This was reproduced through the actual application and file
+      store using synthetic inputs; production logs were not inspected.
+    mitigation: >-
+      Operational webhook telemetry retains only numeric group, workout and match
+      counts plus the existing opaque correlation marker. Raw exporter naming evidence
+      remains in authenticated account-scoped delivery diagnostics. The mandatory HTTP
+      privacy regression covers real imports, process-restart persistence, account
+      isolation, invalid-token rejection without changes and absence of labels, values,
+      tokens or injected lines in logs. This does not certify all PHI logging, time-based
+      retention, deletion compliance, clinical approval or Alpha E4 completion. Exact-head
+      CI, canonical integration and deployed-source proof must be recorded separately.
+    evidence:
+      - server/src/index.ts
+      - server/src/domains/observability/logIdentity.ts
+      - server/uji/logPrivacyHttp.uji.ts
+      - docs/alpha/OMEGA_EXECUTION_CHECKPOINT.md
