@@ -21,7 +21,7 @@ try {
     await context.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:'/* system-font fallback for isolated QA */'}))
     page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')consoleErrors.push({text:m.text(),location:m.location()})})
     page.on('response',r=>{if(r.status()>=400)failedResponses.push({url:r.url(),status:r.status()})})
-    await page.addInitScript(()=>{window.__replayPosterText=[];const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
+    await page.addInitScript(()=>{window.__replayPosterText=[];window.__replayExportTelemetry={toBlobStarted:false,toBlobFinished:false,blobBytes:null,downloadClicked:false};const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};const encode=HTMLCanvasElement.prototype.toBlob;HTMLCanvasElement.prototype.toBlob=function(callback,...args){if(this.width===1080&&this.height===1350){window.__replayExportTelemetry.toBlobStarted=true;const started=performance.now();return encode.call(this,(blob)=>{window.__replayExportTelemetry.toBlobFinished=true;window.__replayExportTelemetry.blobBytes=blob?.size??null;window.__replayExportTelemetry.toBlobElapsedMs=Math.round(performance.now()-started);callback(blob)},...args)}return encode.call(this,callback,...args)};const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(...args){if(this.download==='panacea-human-replay.png')window.__replayExportTelemetry.downloadClicked=true;return click.apply(this,args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
     await page.goto(`${origin}/replay-duration-fixture.html`,{waitUntil:'domcontentloaded',timeout:120000})
     await page.waitForLoadState('networkidle',{timeout:120000})
     const active=page.getByText('active min',{exact:true}).locator('..')
@@ -39,18 +39,21 @@ try {
       let file
       try {
         ;[file]=await Promise.all([
-          page.waitForEvent('download'),
+          page.waitForEvent('download', { timeout: 75000 }),
           page.getByRole('button',{name:'Share this chapter',exact:true}).click(),
         ])
       } catch (error) {
         const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
           posterText:await page.evaluate(()=>window.__replayPosterText),
+          exportTelemetry:await page.evaluate(()=>window.__replayExportTelemetry),
+          shareStatus:await page.locator('section').first().getByText(/Human Replay (?:export unavailable|poster exported|shared)/).allTextContents(),
           bodyText:await page.locator('body').innerText()}
         await writeFile(`${out}/poster-failure-${viewport.width}.json`,JSON.stringify(diagnostic,null,2))
         await page.screenshot({path:`${out}/poster-failure-${viewport.width}.png`,fullPage:true}).catch(screenshotError=>{diagnostic.screenshotError=String(screenshotError)})
         console.error(JSON.stringify(diagnostic))
         throw error
       }
+      assert.ok((await page.evaluate(()=>window.__replayExportTelemetry)).blobBytes>0,'actual poster PNG Blob must contain bytes');
       await file.saveAs(`${out}/poster-${expected}-${viewport.width}.png`)
       const texts=await page.evaluate(()=>window.__replayPosterText)
       assert.ok(texts.includes(expected));assert.ok(texts.includes('ACTIVE MINUTES'))
