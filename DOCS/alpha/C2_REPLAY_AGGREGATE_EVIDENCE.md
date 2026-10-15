@@ -48,3 +48,11 @@ Main129f5ddb integrated #2545 during this candidate's publication. The replay im
 
 
 Synchronized-source verification completed on `f590af015caa7c62d2a2f767c953a1361eebf3b9`:972 Node QA tests, TypeScript/Vite,737/737 frontend files, architecture/ratchet and the complete actual-component/poster browser fixture pass at390×844 and1440×900. Geometry/reference components remain real; font-service CSS fallback is still explicitly isolated. The checkpoint-only follow-up records these results; exact-head CI must repeat the required gates before integration.
+
+## Replay CI diagnostic and repair — 2026-10-15
+
+Diagnostic head2714c87149d1d62b574d9375f8a224d9c003897c failed full Stabilization38739436612. Artifact `replay-duration/poster-failure-390.json` proves all expected poster text (including two Unknown values) was drawn, with no page/console/HTTP errors, but the PNG export had not reached its completion status within30s. This narrows the stall to canvas export before download; it does not prove a clinical or data failure.
+
+The repair requests a CPU-backed2D context for the immediately-read-back poster and keeps layer/highlight props stable across chapter/status updates to avoid redundant scene effects. The harness waits for the same anatomy-loading boundary as the dedicated Body3D gate and rejects failed layers. Download timeout and all poster/Unknown/zero checks remain unchanged; failure diagnostics retain page errors, poster text and screenshot. Local bundled Chromium headless passes both390×844/1440×900 with the complete actual component/engine/PNG fixture; screenshots were inspected. Prior readiness-only and original runs reproduced screenshot/layout timeouts, so readiness alone was insufficient locally. These results support the repair but require fresh CI; no merged, VERIFIED or production claim follows.
+
+The next independent4D gap is reproduced with a synthetic missing-duration/no-HR workout: current workout4d emits60 seconds labelled measured and65bpm labelled derived despite absent HR summary. No4D implementation has started. Preserve unknown patient values and separate educational animation inputs when that unit begins.

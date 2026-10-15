@@ -28,6 +28,11 @@ try {
     const select=async name=>{await page.getByRole('button',{name:`${name} history`,exact:true}).click()}
     const distance=page.getByText('km',{exact:true}).locator('..')
     await active.waitFor()
+    // Network idle does not mean asynchronous anatomy parsing/material setup has finished.
+    // Use the same visible readiness boundary as the dedicated Body3D acceptance fixture.
+    await page.getByText('Loading anatomy…',{exact:true}).waitFor({state:'hidden',timeout:120000})
+    await page.getByText('Adding anatomy layer…',{exact:true}).waitFor({state:'hidden',timeout:120000})
+    assert.equal(await page.getByText(/Couldn.t load:/i).count(),0,'all requested anatomy layers must load')
     const canvasBox=await page.locator('section canvas').first().boundingBox(), metricBox=await active.boundingBox()
     const overlapWidth=Math.min(canvasBox.x+canvasBox.width,metricBox.x+metricBox.width)-Math.max(canvasBox.x,metricBox.x)
     const overlapHeight=Math.min(canvasBox.y+canvasBox.height,metricBox.y+metricBox.height)-Math.max(canvasBox.y,metricBox.y)

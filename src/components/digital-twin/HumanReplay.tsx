@@ -4,6 +4,10 @@ import { IconActivity, IconHeart, IconRun, IconShield, IconSparkle, IconTimer } 
 import type { ImportedWorkout } from '../../lib/workoutImport'
 import { buildHumanReplay, compareReplayEpochs, type HumanReplayEpoch } from '../../lib/humanReplay'
 
+// Stable scene inputs avoid reapplying anatomy layers and highlighting on chapter/status updates.
+const REPLAY_LAYERS = new Set(['surface', 'skeletal', 'muscular', 'cardiovascular', 'visceral'] as const)
+const REPLAY_HIGHLIGHTS: string[] = []
+
 function formatNumber(value: number | null, digits = 0) {
   if (value === null) return 'Unknown'
   return value.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })
@@ -17,7 +21,9 @@ async function replayPoster(epoch: HumanReplayEpoch, totalEpochs: number): Promi
   const canvas = document.createElement('canvas')
   canvas.width = 1080
   canvas.height = 1350
-  const ctx = canvas.getContext('2d')
+  // This offscreen canvas is read back immediately for PNG export. Keep its
+  // backing store on CPU so readback does not queue behind the live WebGL scene.
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
   if (!ctx) return null
 
   const bg = ctx.createLinearGradient(0, 0, 1080, 1350)
@@ -177,8 +183,8 @@ export function HumanReplay({ workouts, hrMax }: { workouts: ImportedWorkout[]; 
           <div className="relative h-[500px]">
             <Body3D
               stageClassName="relative h-full w-full overflow-hidden"
-              layers={new Set(['surface', 'skeletal', 'muscular', 'cardiovascular', 'visceral'])}
-              highlighted={[]}
+              layers={REPLAY_LAYERS}
+              highlighted={REPLAY_HIGHLIGHTS}
               focusKeywords={null}
               renderMode="anatomy"
               ctWindow={CT_WINDOWS[0]}
