@@ -98,6 +98,6 @@ Both findings were repaired: licence recognition now requires the complete
 supported string, with conditional/negated/noncommercial strings explicitly
 reported as unrecognized; the PNG handler checks manifest file type before
 reading. Paired adversarial licence cases and an image-sorts-before-manifest
-symlink negative control reproduce these findings. All eleven focused tests
+symlink negative control reproduce these findings. All twelve focused tests
 pass after repair. This AI engineering review establishes neither rightsholder
 permission nor legal/clinical approval.

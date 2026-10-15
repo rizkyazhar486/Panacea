@@ -96,3 +96,9 @@ test('PNG cannot follow a manifest symlink before walker reaches the manifest', 
   symlinkSync(path.join(dir, 'z-source.json'), path.join(dir, 'manifest.json'))
   assert.throws(() => inventory(dir), /manifest.json: symlink not permitted/)
 }))
+
+test('PNG rejects a manifest directory instead of treating it as a metadata file', () => fixture((dir) => {
+  writeFileSync(path.join(dir, 'a.png'), 'synthetic fixture')
+  mkdirSync(path.join(dir, 'manifest.json'))
+  assert.throws(() => inventory(dir), /manifest must be a regular file/)
+}))
