@@ -59,7 +59,7 @@ try {
       assert.ok(texts.includes(expected));assert.ok(texts.includes('ACTIVE MINUTES'))
       if(expected==='Unknown'){assert.ok(!texts.includes('30'),'unknown provenance must not become30 minutes in a share image');assert.ok(texts.filter(t=>t==='Unknown').length>=2,'missing distance also stays unknown in the poster')}
     }
-    await poster('Unknown');await page.screenshot({path:`${out}/unknown-${viewport.width}.png`,fullPage:true})
+    await poster('Unknown');await page.screenshot({path:`${out}/unknown-${viewport.width}.png`,fullPage:true,animations:'disabled',timeout:90000})
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
     await select('Zero');assert.match(await active.innerText(),/^0\s/);assert.match(await distance.innerText(),/^0[.,]0\s/);await poster('0')
     await select('Invalid');assert.match(await active.innerText(),/Unknown/)
@@ -70,7 +70,7 @@ try {
     await page.getByText(/Cumulative: 1 sessions · 30 active minutes/).waitFor();assert.match(await active.innerText(),/^30\s/)
     await page.keyboard.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1)
-    await page.screenshot({path:`${out}/mixed-${viewport.width}.png`,fullPage:true})
+    await page.screenshot({path:`${out}/mixed-${viewport.width}.png`,fullPage:true,animations:'disabled',timeout:90000})
     await select('Empty');await page.getByRole('slider',{name:'Human Replay month'}).waitFor({state:'hidden'})
     if(errors.length||consoleErrors.length||failedResponses.length) {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))
