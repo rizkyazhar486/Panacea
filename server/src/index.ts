@@ -1297,6 +1297,7 @@ app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
     void notify(pasien.id, { title: 'Your doctor set up a daily check-in', body: 'Open Your Body to answer today\'s questions.', url: '/tubuh' }).catch((e) => console.warn('[care-plan] notify failed', (e as Error).message))
     res.json(rencana)
   } catch (e) {
+    addAudit(u, 'care.plan.rejected', pasien.id)
     res.status(400).json({ error: (e as Error).message })
   }
 })
