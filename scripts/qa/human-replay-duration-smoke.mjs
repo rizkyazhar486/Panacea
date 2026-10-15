@@ -40,7 +40,7 @@ try {
       try {
         ;[file]=await Promise.all([
           page.waitForEvent('download', { timeout: 75000 }),
-          page.getByRole('button',{name:'Share this chapter',exact:true}).click(),
+          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 90000, noWaitAfter: true }),
         ])
       } catch (error) {
         const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
