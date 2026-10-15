@@ -49,6 +49,18 @@ test('replay detects deletion, addition, modified content and modified attributi
   writeFileSync(path.join(dir, 'b.txt'), 'unexpected')
   assert.deepEqual(compareInventory(expected, inventory(dir)), ['missing-file:a.json', 'unrecorded-file:b.txt'])
 }))
+test('replay rejects changed schema, inventory scope and clearance disclaimer even with identical resources', () => fixture((dir) => {
+  writeFileSync(path.join(dir, 'a.json'), '{"source":"Atlas","license":"CC0-1.0"}')
+  const expected = inventory(dir), same = inventory(dir)
+  assert.deepEqual(compareInventory(expected, same), [])
+  for (const field of ['schema', 'scope', 'permissionDisclaimer']) {
+    const changed = { ...same, [field]: field === 'schema' ? 2 : 'tampered release claim' }
+    assert.deepEqual(compareInventory(expected, changed), [`changed-report-header:${field}`])
+    const removed = { ...same }
+    delete removed[field]
+    assert.deepEqual(compareInventory(expected, removed), [`changed-report-header:${field}`])
+  }
+}))
 test('reads a valid GLB JSON chunk and rejects overrun/wrong chunk boundaries', () => {
   const json = Buffer.from('{"nodes":[]}')
   const bytes = Buffer.alloc(20 + json.length)
@@ -71,6 +83,14 @@ test('rejects symlinks instead of following unpublished external data', () => fi
   assert.throws(() => inventory(dir), /symlink not permitted/)
 }))
 
+test('rejects a symlink selected as the root and a regular file root', () => fixture((dir) => {
+  const actual = path.join(dir, 'actual'), linked = path.join(dir, 'linked')
+  mkdirSync(actual)
+  writeFileSync(path.join(actual, 'resource.txt'), 'fixture')
+  symlinkSync(actual, linked, 'dir')
+  assert.throws(() => inventory(linked), /symlink not permitted/)
+  assert.throws(() => inventory(path.join(actual, 'resource.txt')), /root must be a directory/)
+}))
 test('committed complete published-resource snapshot replays without omissions or drift', () => {
   const root = new URL('../../public/bodyexposure/', import.meta.url)
   const report = new URL('../../bodyexposure/qa_reports/public_resource_inventory.json', import.meta.url)
