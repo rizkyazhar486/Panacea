@@ -290,8 +290,8 @@ export function Settings() {
         </button>
         <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 ${S ? 'p-4' : 'p-3'}`}>
           <span className="min-w-0">
-            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Local Data</span>
-            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Delete data stored on this device</span>
+            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Saved App State</span>
+            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Other local caches and server-held records are not erased</span>
           </span>
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
