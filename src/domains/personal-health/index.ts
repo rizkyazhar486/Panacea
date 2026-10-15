@@ -11,3 +11,5 @@ export { SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, saniti
 export type { SymptomLog } from './engine/toolkitData.ts'
 export { parseServingField, sanitizeServings, estimateRecordedFood, MAX_SERVINGS_PER_WEEK } from './engine/dietServings.ts'
 export { parseJetLagHours, validDepartureDate, sanitizeJetLagPlan } from './engine/jetLagInputs.ts'
+
+export { rankedWorkoutsFromStored } from './adapters/rankedWorkoutEvidence.ts'

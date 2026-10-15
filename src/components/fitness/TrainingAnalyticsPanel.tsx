@@ -56,7 +56,7 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
     { label: 'Duration', n: total28.sesiDurasi },
     { label: 'Distance', n: total28.sesiJarak },
     { label: 'HR series', n: total28.sesiHr },
-    { label: 'RPE', n: total28.sesiRpe },
+    { label: 'RPE', n: total28.sesiRpeTercatat },
     { label: 'Recovery HR', n: total28.sesiRecovery },
   ]
 
