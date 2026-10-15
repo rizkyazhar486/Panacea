@@ -5,6 +5,11 @@ import { readFileSync, writeFileSync } from 'node:fs'
 // Aturan: hanya VERIFIED yang berkredit dan wajib berbukti; status harus dari kosakata; id unik; kriteria tidak boleh berkurang dari
 // baseline (45) setelah penambahan F1/F2 supaya persentase tidak naik karena penyebut diperkecil; dokumen Markdown harus sinkron dengan JSON.
 const BASELINE_TOTAL = 45
+// F1/F2 are owner-approved extension IDs. A replacement criterion must not masquerade as the 45-item scope.
+const REQUIRED_EXTENSIONS = new Map([
+  ['F1', 'Task 44 — Full User Journey Acceptance'],
+  ['F2', 'Task 45 — UI/UX Optimization & Polishing Acceptance'],
+])
 const JSON_PATH = new URL('../../governance/ALPHA_ACCEPTANCE_LEDGER.json', import.meta.url)
 const MD_PATH = new URL('../../docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md', import.meta.url)
 
@@ -22,6 +27,11 @@ export function auditLedger(l: Ledger): { masalah: string[]; terverifikasi: numb
     if (!c.acceptance || c.acceptance.trim() === '') masalah.push(`kriteria tanpa syarat penerimaan: ${c.id}`)
   }
   if (l.criteria.length < BASELINE_TOTAL) masalah.push(`kriteria berkurang di bawah baseline ${BASELINE_TOTAL}: ${l.criteria.length}`)
+  for (const [id, title] of REQUIRED_EXTENSIONS) {
+    const extension = l.criteria.find((c) => c.id === id)
+    if (!extension) masalah.push(`ekstensi wajib hilang: ${id}`)
+    else if (extension.criterion !== title) masalah.push(`identitas ekstensi berubah: ${id}`)
+  }
   const terverifikasi = l.criteria.filter((c) => c.status === 'VERIFIED').length
   const total = l.criteria.length
   return { masalah, terverifikasi, total, persen: total === 0 ? 0 : Math.round((1000 * terverifikasi) / total) / 10 }
@@ -69,6 +79,11 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
   assert.ok(auditLedger(x).masalah.some((m) => m.startsWith('id ganda')), 'id ganda lolos')
   x = salin(); x.criteria.pop()
   assert.ok(auditLedger(x).masalah.some((m) => m.startsWith('kriteria berkurang')), 'penghapusan kriteria (penyebut diperkecil) lolos')
+  // Negatif: replacing the new 44/45 criteria with arbitrary IDs/titles cannot preserve false denominator credit.
+  x = salin(); x.criteria.find((c) => c.id === 'F1')!.id = 'Z44'
+  assert.ok(auditLedger(x).masalah.includes('ekstensi wajib hilang: F1'), 'F1 diganti identitas tanpa diketahui')
+  x = salin(); x.criteria.find((c) => c.id === 'F2')!.criterion = 'Unrelated task'
+  assert.ok(auditLedger(x).masalah.includes('identitas ekstensi berubah: F2'), 'F2 diganti judul tanpa diketahui')
   x = salin(); x.criteria[0].acceptance = ''
   assert.ok(auditLedger(x).masalah.some((m) => m.startsWith('kriteria tanpa syarat penerimaan')), 'kriteria tanpa syarat lolos')
   x = salin(); x.criteria.find((c) => c.status === 'REPORTED')!.status = 'VERIFIED'
