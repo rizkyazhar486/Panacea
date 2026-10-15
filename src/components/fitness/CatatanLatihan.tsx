@@ -4,6 +4,7 @@ import { kunciTanggal } from '../../lib/ramalan'
 import { getWorkouts } from '../../lib/workoutStore'
 import { catatLatihanTangan, sesiTangan } from '../../lib/latihanManual'
 import { TrainingAnalyticsPanel } from '../TrainingAnalyticsPanel'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan latihan dengan tangan — bentuknya sengaja SAMA dengan catatan harian.
@@ -62,7 +63,7 @@ export function CatatanLatihan() {
     const sesiBerdurasiPerTanggal = new Map<string, number>()
     for (const x of w) {
       const kunci = kunciTanggal(new Date(x.mulai))
-      const aman = Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0
+      const aman = workoutDurationSeconds(x) ?? 0
       detikPerTanggal.set(kunci, (detikPerTanggal.get(kunci) ?? 0) + aman)
 
       if (aman > 0) {
@@ -89,8 +90,9 @@ export function CatatanLatihan() {
     const terbaruRpe = terbaru && typeof terbaru.rpe === 'number' && Number.isFinite(terbaru.rpe) && terbaru.rpe >= 1 && terbaru.rpe <= 10
       ? terbaru.rpe
       : null
-    const terbaruSrpe = terbaru && terbaruRpe !== null && Number.isFinite(terbaru.durasi) && terbaru.durasi > 0
-      ? Math.round((terbaru.durasi / 60) * terbaruRpe)
+    const terbaruDetik = workoutDurationSeconds(terbaru)
+    const terbaruSrpe = terbaruDetik !== null && terbaruDetik > 0 && terbaruRpe !== null
+      ? Math.round((terbaruDetik / 60) * terbaruRpe)
       : null
 
     const recoveryValid = terbaru?.pemulihan
