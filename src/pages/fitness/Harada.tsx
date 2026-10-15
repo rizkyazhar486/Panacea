@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { simpanTeks } from '../lib/unduh'
-import { Card, SectionTitle, Button, inputClass } from '../components/ui'
-import { IconSparkle, IconChartUp } from '../components/icons'
-import { hariIni } from '../lib/tanggal'
+import { Prosa } from '../../components/Prosa'
+import { simpanTeks } from '../../lib/unduh'
+import { Card, SectionTitle, Button, inputClass } from '../../components/ui'
+import { IconSparkle, IconChartUp } from '../../components/icons'
+import { hariIni } from '../../lib/tanggal'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Metode Harada — kisi 9×9 (Mandal-Art).

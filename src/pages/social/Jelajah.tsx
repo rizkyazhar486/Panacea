@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconUsers } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconUsers } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Jelajah — tempat mendaratnya hasil pencarian orang dan tagar.
