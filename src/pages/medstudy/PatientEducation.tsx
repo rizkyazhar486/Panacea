@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useStore, uid } from '../lib/store'
-import { Card, SectionTitle, Button, Badge } from '../components/ui'
-import { IconBook, IconSparkle, IconCheck, IconScissors } from '../components/icons'
-import { generateEducation } from '../lib/ai'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { useStore, uid } from '../../lib/store'
+import { Card, SectionTitle, Button, Badge } from '../../components/ui'
+import { IconBook, IconSparkle, IconCheck, IconScissors } from '../../components/icons'
+import { generateEducation } from '../../lib/ai'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 export function PatientEducation() {
   const { state, account, activePatient, saveEducation, sendEmail } = useStore()

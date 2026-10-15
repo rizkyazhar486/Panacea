@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
-import { IconPill, IconShield } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { api, backendEnabled } from '../lib/api'
-import { ATC, cariObat, jumlahObat, jumlahEml, jumlahDenganDosisSkdi, dosisSkdi, type Obat } from '../lib/obatKatalog'
-import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
-import { semuaButir, periksa, dariNama, type Butir } from '../lib/interaksi'
+import { Card, SectionTitle, inputClass, Button, Badge } from '../../components/ui'
+import { IconPill, IconShield } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { api, backendEnabled } from '../../lib/api'
+import { ATC, cariObat, jumlahObat, jumlahEml, jumlahDenganDosisSkdi, dosisSkdi, type Obat } from '../../lib/obatKatalog'
+import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../../lib/herbal'
+import { semuaButir, periksa, dariNama, type Butir } from '../../lib/interaksi'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Drug Info — dua sumber, dan tiap kalimat di layar mengaku datang dari yang mana.
