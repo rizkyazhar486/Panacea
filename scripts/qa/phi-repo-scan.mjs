@@ -11,6 +11,9 @@ import { dirname, join } from 'node:path'
 const AKAR = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const SKIP_EXT = /\.(png|jpe?g|gif|webp|avif|svg|ico|glb|gltf|bin|woff2?|ttf|otf|pdf|mp[34]|wav|zip|gz|wasm|map|lock|nii|dcm|npy|blend|py)$/i
 const SKIP_PREFIX = ['public/', 'node_modules/', 'bodyexposure/']
+// Berkas yang SENGAJA memuat nilai terlarang: fixture tes pemindai ini, dan daftar-izin itu sendiri (jika ikut dipindai ia mencocokkan dirinya
+// sendiri sehingga entri usang tak pernah terdeteksi). Daftar dikunci oleh tes (harus persis ini).
+export const BERKAS_FIXTURE = ['scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json']
 // Domain yang pasti sintetis/placeholder (RFC 2606 dan konvensi uji repo). Bukan izin untuk menaruh alamat nyata di domain ini.
 const DOMAIN_SINTETIS = /^(example\.(com|org|net|test|invalid)|.*\.(test|invalid|example|localhost)|localhost|x\.(id|com|co|test)|a\.b|b\.id|email\.com|domain\.com|test\.com)$/i
 
@@ -33,7 +36,7 @@ export function pindaiTeks(teks) {
 }
 
 export function daftarBerkas() {
-  return execFileSync('git', ['ls-files', '-z'], { cwd: AKAR, maxBuffer: 1 << 28 }).toString().split('\0').filter((f) => f && !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)))
+  return execFileSync('git', ['ls-files', '-z'], { cwd: AKAR, maxBuffer: 1 << 28 }).toString().split('\0').filter((f) => f && !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)) && !BERKAS_FIXTURE.includes(f))
 }
 
 export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(join(AKAR, f), 'utf8')) {

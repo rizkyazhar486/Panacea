@@ -1,7 +1,7 @@
 // E4: pemindai PHI repo. Positif/negatif/batas pada pola, logika daftar-izin, dan pemindaian repo nyata terhadap daftar izin.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin } from './phi-repo-scan.mjs'
+import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas } from './phi-repo-scan.mjs'
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
 
@@ -77,4 +77,10 @@ test('berkas_sintetis_dengan_phi_disuntikkan_terdeteksi_oleh_pindaiRepo', () => 
   const t = pindaiRepo(['f.txt'], () => 'pasien 3171011505900001 telp 081377745521 mail ani@rsharapan.id')
   assert.deepEqual(t.map((x) => x.jenis).sort(), ['email', 'nik', 'ponsel'])
   assert.equal(bandingkan(t, muatDaftarIzin()).takTerdaftar.length, 3, 'tidak ada di daftar izin ⇒ gagal')
+})
+test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
+  assert.deepEqual(BERKAS_FIXTURE, ['scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json'], 'daftar pengecualian tidak boleh melebar diam-diam')
+  for (const f of BERKAS_FIXTURE) assert.ok(!daftarBerkas().includes(f), `${f} dikecualikan`)
+  assert.ok(daftarBerkas().includes('scripts/qa/phi-repo-scan.mjs'), 'pemindai sendiri tetap dipindai')
+  assert.ok(daftarBerkas().includes('server/src/config.ts'), 'kode produk tetap dipindai')
 })
