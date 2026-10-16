@@ -130,7 +130,7 @@ function PostCard({ post }: { post: SocialPost }) {
             {post.activity || post.postType || 'Post'}{post.location ? ` · ${post.location}` : ''}
           </div>
         </div>
-        <Link to="/feed" className="shrink-0 text-[10px] font-black text-white/28 hover:text-white">•••</Link>
+        <Link to="/feed" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-[10px] font-black text-white/28 hover:text-white">•••</Link>
       </div>
 
       {(post.articleTitle || post.caption) && (

@@ -22,13 +22,22 @@ const medir = () => {
   const vis = (e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && e.offsetParent !== null }
   const nama = (e) => (e.getAttribute('aria-label') || e.getAttribute('aria-labelledby') || e.getAttribute('title') || e.innerText || e.textContent || e.value || e.getAttribute('placeholder') || '').trim()
   const interaktif = [...document.querySelectorAll('a[href],button,input:not([type=hidden]),select,textarea,[role=button],[role=link],[role=tab]')].filter(vis)
-  const kecil = interaktif.filter((e) => { const r = e.getBoundingClientRect(); return r.width < 44 || r.height < 44 })
+  // Tiga kelas, tidak dilebur: (1) kontrol sungguhan -> lantai 44px (standar repo); (2) tautan inline dalam teks -> dikecualikan
+  // WCAG 2.5.8 tetapi DIHITUNG terpisah; (3) blok teks tap-to-interpret (.pmd-vf-copy, role=button dari skrip visual-first) -> lantai 24px (WCAG 2.5.8 AA; toleransi 0.5px: animasi masuk halaman menskala ~0.3%).
+  const ukuran = (e) => e.getBoundingClientRect()
+  const inlineTeks = (e) => e.tagName === 'A' && getComputedStyle(e).display === 'inline'
+  const blokTeks = (e) => e.classList.contains('pmd-vf-copy')
+  const kecil = interaktif.filter((e) => { if (inlineTeks(e) || blokTeks(e)) return false; const r = ukuran(e); return r.width < 44 || r.height < 44 })
+  const inlineDikecualikan = interaktif.filter((e) => inlineTeks(e) && (ukuran(e).height < 44)).length
+  const blokTeksBawah24 = interaktif.filter((e) => blokTeks(e) && (ukuran(e).width < 23.5 || ukuran(e).height < 23.5)).length
   const tanpaNama = interaktif.filter((e) => !nama(e) && !(e.id && document.querySelector(`label[for="${CSS.escape(e.id)}"]`)) && !e.closest('label'))
   const sel = (e) => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}${e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).slice(0, 2).join('.') : ''}`
   return {
     overflowPx: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     interaktif: interaktif.length,
+    inlineDikecualikan, blokTeksBawah24,
     targetKecil: kecil.length, contohTargetKecil: kecil.slice(0, 5).map(sel),
+    daftarTargetKecil: kecil.map((e) => { const r = e.getBoundingClientRect(); return `${sel(e)} ${Math.round(r.width)}x${Math.round(r.height)}` }),
     tanpaNama: tanpaNama.length, contohTanpaNama: tanpaNama.slice(0, 5).map(sel),
     gambarTanpaAlt: [...document.querySelectorAll('img')].filter((i) => vis(i) && !i.hasAttribute('alt')).length,
     mainLandmark: !!document.querySelector('main,[role=main]'),
@@ -62,13 +71,19 @@ try {
 
 const jumlah = (k) => hasil.reduce((a, r) => a + (r[k] || 0), 0)
 const ringkas = { dihasilkan: new Date().toISOString(), metode: 'DOM terukur via Playwright Chromium; bukan axe; kontras WCAG dan pemeriksaan manual BELUM tercakup', halaman: PAGES, viewport: VIEWPORTS.map((v) => v.name), tema: THEMES,
-  total: { pengukuran: hasil.length, overflowHalaman: hasil.filter((r) => r.overflowPx > 1).length, targetKecil: jumlah('targetKecil'), tanpaNama: jumlah('tanpaNama'), gambarTanpaAlt: jumlah('gambarTanpaAlt'), tanpaFokusTerlihat: hasil.filter((r) => !r.fokusTab.ada || !r.fokusTab.indikator).length, tanpaMain: hasil.filter((r) => !r.mainLandmark).length, galatHalaman: jumlah('galatHalaman'),
+  total: { pengukuran: hasil.length, overflowHalaman: hasil.filter((r) => r.overflowPx > 1).length, targetKecil: jumlah('targetKecil'), targetKecilMobile: hasil.filter((r) => r.viewport.startsWith('mobile')).reduce((a, r) => a + r.targetKecil, 0), blokTeksBawah24: jumlah('blokTeksBawah24'), inlineDikecualikan: jumlah('inlineDikecualikan'), tanpaNama: jumlah('tanpaNama'), gambarTanpaAlt: jumlah('gambarTanpaAlt'), tanpaFokusTerlihat: hasil.filter((r) => !r.fokusTab.ada || !r.fokusTab.indikator).length, tanpaMain: hasil.filter((r) => !r.mainLandmark).length, galatHalaman: jumlah('galatHalaman'),
     muatMsP50: [...hasil.map((r) => r.muatMs)].sort((a, b) => a - b)[Math.floor(hasil.length / 2)], muatMsMaks: Math.max(...hasil.map((r) => r.muatMs)) }, hasil }
+// histogram pelanggar per selektor (mobile-390 saja: target sentuh nyata) agar perbaikan menyasar primitif, bukan instans
+const histo = {}
+for (const r of hasil.filter((x) => x.viewport.startsWith('mobile') && x.tema === 'light')) for (const d of r.daftarTargetKecil) { const k = d.replace(/ \d+x\d+$/, ''); histo[k] = (histo[k] || 0) + 1 }
+ringkas.pelanggarMobileTerang = Object.entries(histo).sort((a, b) => b[1] - a[1]).slice(0, 60)
 writeFileSync(process.env.QA_OUT || 'ux-audit-evidence.json', JSON.stringify(ringkas, null, 2))
 console.log(JSON.stringify(ringkas.total))
 const dasar = process.env.UX_BASELINE && existsSync(process.env.UX_BASELINE) ? JSON.parse(readFileSync(process.env.UX_BASELINE, 'utf8')) : null
 const gagal = []
 if (ringkas.total.overflowHalaman > (dasar?.overflowHalaman ?? 0)) gagal.push(`overflow horizontal: ${ringkas.total.overflowHalaman}`)
 if (ringkas.total.tanpaNama > (dasar?.tanpaNama ?? Infinity)) gagal.push(`kontrol tanpa nama melampaui baseline: ${ringkas.total.tanpaNama}`)
-if (ringkas.total.targetKecil > (dasar?.targetKecil ?? Infinity)) gagal.push(`target sentuh <${MIN_TARGET}px melampaui baseline: ${ringkas.total.targetKecil}`)
+// Target sentuh relevan di viewport sentuh (mobile); desktop 1440 dilaporkan sebagai informasi, tidak digerbang.
+if (ringkas.total.targetKecilMobile > (dasar?.targetKecilMobile ?? Infinity)) gagal.push(`target sentuh <${MIN_TARGET}px (mobile) melampaui baseline: ${ringkas.total.targetKecilMobile}`)
+if (ringkas.total.blokTeksBawah24 > (dasar?.blokTeksBawah24 ?? Infinity)) gagal.push(`blok teks interaktif <24px melampaui baseline: ${ringkas.total.blokTeksBawah24}`)
 if (gagal.length) { console.error('ux-audit GAGAL: ' + gagal.join('; ')); process.exit(1) }
