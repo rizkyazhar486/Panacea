@@ -25,6 +25,7 @@ import { saranBerikutnya } from '../../lib/pelatih'
 import { hrMaxPerkiraan } from '../../lib/workoutImport'
 import { getDemo, getDemoTersimpan } from '../../lib/profile'
 import { UbinSalat } from '../UbinSalat'
+import { ringkasLatihan, menitTujuhHari } from '../../domains/personal-health/engine/weeklyTraining'
 
 const HARI = 864e5
 
@@ -81,36 +82,20 @@ function Cincin({ rasio, isi }: { rasio: number; isi: string }) {
  * menjadi selisih yang tampak berlipat. Hari kosong tetap digambar sebagai
  * garis tipis — hari tanpa latihan adalah keterangan, bukan ketiadaan data.
  */
-function Batang({ deret, nada = 'bg-brand' }: { deret: number[]; nada?: string }) {
-  const maks = Math.max(...deret, 1)
+function Batang({ deret, nada = 'bg-brand' }: { deret: (number | null)[]; nada?: string }) {
+  const maks = Math.max(...deret.map((v) => v ?? 0), 1)
   return (
     <span className="flex h-7 items-end gap-[3px]" aria-hidden>
       {deret.map((v, i) => (
         <span
           key={i}
-          className={`flex-1 rounded-sm ${v > 0 ? nada : 'bg-neutral-300 dark:bg-white/15'}`}
-          style={{ height: v > 0 ? `${Math.max(12, (v / maks) * 100)}%` : '3px' }}
+          data-durasi-tidak-diketahui={v === null ? '' : undefined}
+          className={`flex-1 rounded-sm ${v === null ? 'border-t-2 border-dashed border-neutral-400' : v > 0 ? nada : 'bg-neutral-300 dark:bg-white/15'}`}
+          style={{ height: v !== null && v > 0 ? `${Math.max(12, (v / maks) * 100)}%` : '3px' }}
         />
       ))}
     </span>
   )
-}
-
-/** Menit latihan per hari untuk tujuh hari terakhir, hari ini paling kanan. */
-function menitTujuhHari(): number[] {
-  const per = new Map<string, number>()
-  for (const w of getWorkouts()) {
-    const d = new Date(Date.parse(w.mulai))
-    if (Number.isNaN(d.getTime())) continue
-    const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
-    per.set(k, (per.get(k) ?? 0) + Math.round((w.durasi ?? 0) / 60))
-  }
-  const out: number[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(Date.now() - i * HARI)
-    out.push(per.get(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`) ?? 0)
-  }
-  return out
 }
 
 // ── Langkah ────────────────────────────────────────────────────────────────
@@ -137,19 +122,17 @@ export function UbinLangkah() {
 export function UbinLatihan() {
   const sesi = getWorkouts().filter((w) => Date.now() - Date.parse(w.mulai) < 7 * HARI)
   if (!sesi.length) return null
-  const km = sesi.reduce((a, w) => a + (w.jarakKm ?? 0), 0)
-  const menit = Math.round(sesi.reduce((a, w) => a + (w.durasi ?? 0), 0) / 60)
-  const detikPerKm = km > 0 ? (menit * 60) / km : 0
-  const pace = detikPerKm > 0 ? `${Math.floor(detikPerKm / 60)}:${String(Math.round(detikPerKm % 60)).padStart(2, '0')}` : null
+  const { km, menit, detikPerKm } = ringkasLatihan(sesi)
+  const pace = detikPerKm !== null ? `${Math.floor(detikPerKm / 60)}:${String(Math.round(detikPerKm % 60)).padStart(2, '0')}` : null
   return (
     <Bingkai ke="/riwayat-latihan" judul="Training, 7 days">
-      <Angka nilai={String(sesi.length)} satuan={`sessions · ${menit} min`} />
+      <Angka nilai={String(sesi.length)} satuan={menit === null ? 'sessions' : `sessions · ${menit} min`} />
       {/* Keterangan jarak dan pace DIGANTI GRAFIK, bukan ditambah di bawahnya.
           Dua baris kalimat di dalam ubin sekecil ini membuat ubinnya terbaca
           sebagai paragraf; sebaran latihan sepekan justru tidak terbaca sama
           sekali dari angka totalnya. Jarak dan pace tetap ada, satu ketukan
           jauhnya, di halaman yang memang untuk itu. */}
-      <Batang deret={menitTujuhHari()} />
+      <Batang deret={menitTujuhHari(getWorkouts())} />
       {km > 0 && <span className="t-mikro truncate text-neutral-400">{km.toFixed(1)} km{pace ? ` · ${pace}/km` : ''}</span>}
     </Bingkai>
   )
