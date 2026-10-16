@@ -293,8 +293,11 @@ try {
         await page.goBack({ waitUntil: 'domcontentloaded' }); await page.waitForTimeout(1500)
         assert.ok(/#\/?$/.test(page.url()), `Kembali tidak pulang ke Home: ${page.url()}`)
         await page.goto(APP + '#/clinical-hub', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        // Navigasi hash SPA tidak memuat ulang: tombol 'Notifications' sudah terlihat sebelum router memproses hashchange, sehingga
+        // pengecekan seketika berbalapan dengan render (bisaKembali = pathname !== '/'). Tunggu dengan batas; tetap gagal bila tak pernah muncul.
         const kembali = page.getByRole('button', { name: /back|kembali/i }).first()
-        assert.ok(await kembali.isVisible().catch(() => false), 'tidak ada kontrol Kembali yang terlihat di halaman dalam')
+        const terlihat = await kembali.waitFor({ state: 'visible', timeout: 15000 }).then(() => true, () => false)
+        assert.ok(terlihat, 'tidak ada kontrol Kembali yang terlihat di halaman dalam (15 dtk)')
       })
       // (d) pemulihan: API kembali normal → muat ulang → halaman berfungsi (kontrol berpasangan dengan (b): hanya API yang berubah)
       await step(vp.name, J, 'pemulihan: setelah API normal, muat ulang menampilkan halaman tanpa galat', async () => {
