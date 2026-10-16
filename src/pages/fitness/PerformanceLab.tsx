@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { criticalPower2Point } from './criticalPower'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../../components/icons'
 import { useStore } from '../../lib/store'
 import { getDemo } from '../../lib/profile'
@@ -128,7 +129,7 @@ function ThresholdTab() {
         <MetricCard id="cp" name="Critical Power (2-point)" emoji="🔋" unit="W"
           inputs={[{ key: 'p1', label: 'Test 1 Power', unit: 'W', default: 320 }, { key: 't1', label: 'Test 1 Time', unit: 'sec', default: 180 },
             { key: 'p2', label: 'Test 2 Power', unit: 'W', default: 250 }, { key: 't2', label: 'Test 2 Time', unit: 'sec', default: 720 }]}
-          compute={(v) => { const cp = (v.p1 * v.t1 - v.p2 * v.t2) / (v.t1 - v.t2); return Number.isFinite(cp) ? cp : 0 }}
+          compute={(v) => criticalPower2Point(v.p1, v.t1, v.p2, v.t2)}
           note="Monod-Scherrer 2-point model: CP = (P1×t1 − P2×t2)/(t1−t2). W' (anaerobic capacity) = (P1−CP)×t1."
         />
         <VtLtCard />
