@@ -2,15 +2,17 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 38 / 45 = 84.4%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 38 / 44 = 86.4%** (baseline main `4b2009a1f`, 2026-10-10).
+
+Penyebut aktif 44 = 45 kriteria tercatat − 1 ditunda ke fase Clinical Validation (lihat bagian di bawah). Kriteria yang ditunda tidak VERIFIED, tidak berkredit, dan tidak divalidasi secara klinis.
 
 Disetujui: Product Owner (arahan eksekusi 2026-10-10). Baseline awal oleh Sonnet Cloud dari bukti yang ada; menunggu konfirmasi Sol atas penyebut. Kriteria dapat DITAMBAH oleh pemilik; tidak boleh dikurangi tanpa persetujuan pemilik.
 
 ## Kebijakan penghitungan
 
-Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase.
+Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase. Satu-satunya pengecualian penyebut yang disetujui pemilik (2026-10-17): kriteria berstatus DEFERRED_TO_CLINICAL_VALIDATION (tinjauan klinis formal di luar lingkup Alpha) tetap tercatat dengan syarat aslinya, bernilai 0, tidak pernah VERIFIED dan tidak divalidasi secara klinis, serta keluar dari penyebut AKTIF hanya bila membawa catatan penundaan lengkap (pemutus, tanggal, rujukan, fase tujuan, syarat asli). Validasi klinis tetap wajib sebelum fungsi apa pun dipakai untuk keputusan klinis nyata.
 
-Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% sebelum seluruh gerbang wajib lulus, termasuk tinjauan klinis yang terpisah.
+Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% sebelum seluruh gerbang aktif lulus. Tinjauan klinis formal di luar lingkup Alpha (keputusan pemilik); selesainya Alpha rekayasa BUKAN validasi klinis, dan validasi klinis tetap wajib sebelum fungsi apa pun dipakai untuk keputusan klinis nyata.
 
 ## Lingkup Alpha (disetujui)
 
@@ -30,7 +32,14 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | NOT_CHECKED | 2 |
 | NOT_STARTED | 0 |
 | BLOCKED | 0 |
-| PENDING_CLINICAL_REVIEW | 1 |
+| PENDING_CLINICAL_REVIEW | 0 |
+| DEFERRED_TO_CLINICAL_VALIDATION | 1 |
+
+## Ditunda ke Clinical Validation (tidak dihitung, tidak VERIFIED)
+
+| ID | Kriteria | Diputuskan oleh | Tanggal | Rujukan | Fase tujuan | Syarat asli (dipertahankan) |
+|---|---|---|---|---|---|---|
+| C6 | Rentang masukan ditinjau klinisi | Product Owner (instruksi UNIVERSAL CLINICAL REVIEW DEFERRAL) | 2026-10-17 | docs/alpha/CLINICAL_REVIEW_DEFERRAL.md | Clinical Validation (fase setelah Alpha; wajib sebelum penggunaan untuk keputusan klinis nyata) | Peninjau berwenang menandatangani rentang tiap kalkulator (status sebelumnya: PENDING_CLINICAL_REVIEW; pemilik sebelumnya: Klinisi (belum ditunjuk)) |
 
 ## Panacea One OS (8 / 8)
 
@@ -68,7 +77,7 @@ Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% seb
 | C3 | Penandaan batas klaim pada kalkulator klinis | Setiap permukaan kalkulator terdaftar dan menampilkan batas klaim (bukan keputusan klinis tervalidasi) | VERIFIED | Sonnet | scripts/uji/clinical-claim-maturity.mts (bagian npm run uji, check CI `validate`) |
 | C4 | Status review klinis eksplisit per fungsi | Fungsi yang memerlukan review ditandai PENDING_CLINICAL_REVIEW dan clinically_reviewed=false dapat diperiksa mesin | VERIFIED | Sonnet | governance/CALCULATOR_REVIEW_REGISTRY.json: 43 mesin kalkulator, semuanya PENDING_CLINICAL_REVIEW dengan clinically_reviewed=false; 4 modul pembantu dikecualikan eksplisit dengan alasan.; src/domains/clinical-calculators/engine/reviewRegistry.ts + scripts/uji/calculator-review-registry.mts (bagian npm run uji, dijalankan di CI): menolak mesin tanpa entri, entri yatim/ganda, dan status ditinjau tanpa peninjau, tanggal ISO, atau bukti.; Sabotase: berkas engine baru tanpa entri → uji gagal dengan nama ("zzSabotage: engine-without-review-entry"); dihapus kembali → lulus.; VERIFIED hanya untuk kriteria penandaan yang dapat diperiksa mesin. Ini label status, BUKAN tinjauan klinis: tidak ada peninjau yang ditunjuk dan semua mesin tetap clinically_reviewed=false (C6 tetap PENDING_CLINICAL_REVIEW). |
 | C5 | Regression suite kalkulator berjalan di CI | Tes kalkulator termasuk dalam check wajib `validate` dan merah bila gagal | VERIFIED | Sonnet | npm run uji (681/681 pada 4b2009a1f); check wajib `validate` |
-| C6 | Rentang masukan ditinjau klinisi | Peninjau berwenang menandatangani rentang tiap kalkulator | PENDING_CLINICAL_REVIEW | Klinisi (belum ditunjuk) | Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false. |
+| C6 | Rentang masukan ditinjau klinisi | Alpha (rekayasa): rentang masukan, ketelitian numerik, regresi dan perilaku fail-closed tiap kalkulator terbukti oleh referensi independen, matriks masukan bermusuhan dan mutasi; persetujuan klinis formal TIDAK diperlukan di Alpha dan ditunda ke fase Clinical Validation. | DEFERRED_TO_CLINICAL_VALIDATION | Klinisi (belum ditunjuk) — fase Clinical Validation | docs/clinical-calculators/ENGINEERING_REVIEW_DOSSIER.md; scripts/uji/calculator-independent-reference.mts; scripts/uji/calculator-independent-reference-2.mts; scripts/uji/calculator-independent-reference-3.mts; scripts/uji/calculator-independent-reference-4.mts; scripts/uji/calculator-independent-reference-5.mts; scripts/uji/calculator-independent-reference-6.mts; scripts/uji/calculator-independent-reference-7.mts; scripts/uji/calculator-independent-reference-8.mts; scripts/uji/calculator-independent-reference-9.mts; scripts/uji/calculator-independent-reference-10.mts; scripts/uji/support/calculatorHarness.mts; DITUNDA ke fase Clinical Validation atas keputusan pemilik 2026-10-17 (docs/alpha/CLINICAL_REVIEW_DEFERRAL.md). BUKAN VERIFIED dan BUKAN tervalidasi secara klinis; clinically_reviewed=false tetap; semua bukti rekayasa, uji keselamatan, validasi masukan, uji kebenaran numerik dan perilaku fail-closed dipertahankan dan tidak dinonaktifkan; fungsi pendukung keputusan yang belum tervalidasi tetap dibatasi untuk pengujian non-klinis. Riwayat sebelum penundaan: Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false. |
 | C7 | Halaman kalkulator diverifikasi di 390×844 | Per halaman: tanpa scroll horizontal, alasan penolakan tampil, hasil tidak tampil bila tak sahih | VERIFIED | Sonnet | Angka terukur di badan PR #2297 #2298 #2302 #2305 #2306 #2307 #2308 #2313 #2314; Hanya halaman yang saya ubah. |
 
 ## Body Exposure Alpha (8 / 10)

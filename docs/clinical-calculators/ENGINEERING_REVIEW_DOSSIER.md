@@ -14,6 +14,8 @@ added by engineering tests.
 
 Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8), `scripts/uji/calculator-independent-reference-9.mts` (tranche 9), `scripts/uji/calculator-independent-reference-10.mts` (tranche 10); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
+> **Status update, 2026-10-17 (owner decision):** formal clinical review is out of scope for Alpha and moved to the Clinical Validation phase (`docs/alpha/CLINICAL_REVIEW_DEFERRAL.md`). Everything below is preserved as written: it remains engineering evidence, not clinical approval, and the reviewer-only items stay open for that phase.
+
 ## What "engineering-ready" means here
 
 For each calculator below, the suite proves, deterministically and with a fixed seed:
