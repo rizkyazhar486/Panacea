@@ -1,3 +1,4 @@
+import { gpsWeek } from './gpsWeekly'
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -150,20 +151,13 @@ function GpsWidget() {
   const activities = state.gpsActivities ?? []
 
   const summary = useMemo(() => {
-    const now = Date.now()
-    const weekStart = now - 7 * 24 * 60 * 60 * 1000
-    const weekly = activities.filter((activity) => {
-      const at = new Date(activity.at).getTime()
-      return Number.isFinite(at) && at >= weekStart && at <= now
-    })
-    const distanceKm = weekly.reduce((sum, activity) => sum + (Number.isFinite(activity.distKm) ? activity.distKm : 0), 0)
-    const movingSec = weekly.reduce((sum, activity) => sum + (Number.isFinite(activity.durSec) ? activity.durSec : 0), 0)
+    const week = gpsWeek(activities, Date.now())
     const latest = [...activities].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())[0]
-    return { distanceKm, movingSec, count: weekly.length, latest }
+    return { distanceKm: week.distanceKm, movingSec: week.movingSec, count: week.count, latest }
   }, [activities])
 
-  const hours = Math.floor(summary.movingSec / 3600)
-  const minutes = Math.round((summary.movingSec % 3600) / 60)
+  const hours = summary.movingSec === null ? 0 : Math.floor(summary.movingSec / 3600)
+  const minutes = summary.movingSec === null ? 0 : Math.round((summary.movingSec % 3600) / 60)
 
   return (
     <Link to="/latihan?t=gps" className="pmd-social-live-widget group" aria-label="Open GPS activity tracker">
@@ -172,12 +166,12 @@ function GpsWidget() {
         <span className="text-[9px] font-black uppercase tracking-[.13em] text-white/28">7 days</span>
       </div>
       <div className="mt-5 flex items-end gap-2">
-        <strong className="text-4xl font-black tracking-[-.07em] tabular-nums text-white">{summary.distanceKm.toFixed(1)}</strong>
+        <strong className="text-4xl font-black tracking-[-.07em] tabular-nums text-white">{summary.distanceKm === null ? '—' : summary.distanceKm.toFixed(1)}</strong>
         <span className="pb-1 text-[10px] font-black uppercase tracking-[.12em] text-white/32">km</span>
       </div>
       <div className="mt-3 flex items-center gap-4 text-[10px] font-bold text-white/36">
         <span>{summary.count} sessions</span>
-        <span>{hours ? `${hours}h ` : ''}{minutes}m moving</span>
+        <span>{summary.movingSec === null ? '— moving' : `${hours ? `${hours}h ` : ''}${minutes}m moving`}</span>
         {summary.latest && <span className="truncate">{summary.latest.emoji} {summary.latest.sport}</span>}
       </div>
       <span className="pmd-social-widget-open">Track route ↗</span>
