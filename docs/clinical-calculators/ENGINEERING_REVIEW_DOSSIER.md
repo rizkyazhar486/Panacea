@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–4)
+# Clinical calculators — automated engineering-review dossier (tranches 1–5)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -111,7 +111,17 @@ unreachable, since the bolus is at most 20 mL/kg while the 48 h requirement is a
 | Fluid balance (`fluidBalance`) | total in − total out over seven components, each 0–20,000 mL | none (arithmetic) | **A blank component is read as 0 mL by design**, so an unmeasured urine output counts as zero output and the balance looks more positive. Whether blank should instead block the result is a clinical-design decision (and relates to C2). |
 | Paediatric DKA worksheet (`pediatricDka`) | Bolus 10 mL/kg (20 with shock); deficit = % × kg × 1000; maintenance = Holliday-Segar × 2 (48 h); rate = (deficit + maintenance − bolus) / 48; insulin = U/kg/h × kg; potassium bands at 3.5 and 5.5 mEq/L | none recorded | The fluid protocol, the potassium-band advice text and the insulin range (0.01–0.1 U/kg/h) are protocol content with no citation; the engine itself calls the tool educational and not a validated protocol. Each part is computed only from its own valid inputs. |
 
+## Tranche 5 — hydration target, sleep debt and pack-year screening (suite: `scripts/uji/calculator-independent-reference-5.mts`)
+
+Method as above: independently written oracles, seeded sampling (2 × 400 + 800 cases), every switch combination, exact boundaries, hostile-input matrices, range tables re-asserted as literals, and source mutants on every constant, boundary and branch of the three engines (each fails by name; four first-run survivors were closed by hard-coding the range literals and adding a coercing-date case; one, `&& cigsPerDay > 0` in `packYearScreen`, is equivalent because 0 cigarettes can never reach 20 pack-years). Result: **no discrepancy**; no engine defect found.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Daily fluid target (`hydrationTarget`) | 33 mL/kg + (minutes/60) × {400, 600, 800} + hot climate 500 + pregnancy 300 + breastfeeding 700; glasses = round(total/250) | none (population averages) | The per-kg figure, exercise rates and add-ons are unsourced population averages; pregnancy and breastfeeding stack (the page does not treat them as exclusive); organ-limited fluid restriction is a clinician matter. |
+| 14-night sleep debt (`sleepDebt`, `sanitizeNights`) | Σ(need − slept) over the first 14 nights; ≤ 2 h well-rested, ≤ 8 h mild, else significant | none | The 2 h and 8 h cut-offs are unsourced. Oversleeping yields negative debt (formula does not clamp at 0). **No recorded nights reads as "no debt", not "unknown".** `sanitizeNights` checks only the date shape, so `2026-02-31` is accepted. |
+| Pack-years and lung-screening eligibility (`packYearScreen`) | (cigarettes/day ÷ 20) × years; USPSTF 2021: age 50–80, ≥ 20 pack-years, quit ≤ 15 years, 0 cigarettes never eligible | USPSTF 2021 (as recorded in the engine) | Fractional ages: 49.5 and 80.5 are ineligible (inclusive integer cut-offs). Whether `quitYearsAgo = 0` (still smoking) should be entered explicitly is a UX decision already made in the engine. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `fluidElectrolytes`, `hydrationTarget`, `autophagyTiming`, `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
-`maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `packYearScreen`, `sleepDebt`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`graceScore` (points table too large to transcribe without the primary source), `fluidElectrolytes`, `autophagyTiming`, `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
+`maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
