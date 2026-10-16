@@ -47,6 +47,8 @@ if (import.meta.url === new URL(`file://${process.argv[1]}`).href) {
   const ringkas = { dihasilkan: new Date().toISOString(), kolom: KOLOM, baris: BARIS, pengukuran: Object.keys(grid).length, grid }
   if (process.env.QA_OUT) writeFileSync(process.env.QA_OUT, JSON.stringify(ringkas, null, 1))
   console.log(JSON.stringify({ pengukuran: ringkas.pengukuran }))
+  // Mode ukur: cetak grid ke log supaya baseline dapat diambil dari log job CI (artefak tidak dapat diunduh dari sandbox agen).
+  if (process.env.SHOT_REPORT_ONLY) console.log('SHOT_GRID_BEGIN\n' + JSON.stringify(grid) + '\nSHOT_GRID_END')
   const baseline = process.env.SHOT_BASELINE && existsSync(process.env.SHOT_BASELINE) ? JSON.parse(readFileSync(process.env.SHOT_BASELINE, 'utf8')) : null
   if (!process.env.SHOT_REPORT_ONLY && (baseline || process.env.CI)) { // SHOT_REPORT_ONLY=1: hanya ukur (dipakai sekali untuk memperoleh baseline dari lingkungan CI sendiri)
     const gagal = bandingkanSemua(grid, baseline)
