@@ -26,7 +26,7 @@
 
   /* Remap the product accent without changing semantic warning/error colors. */
   --color-brand: var(--pmd-ref-green);
-  --color-brand-dark: #169c49;
+  --color-brand-dark: #0b7a4b; /* >=4.5:1 sobre branco/tint claro; #169c49 dava 3.3:1 (kontras-wcag) */
 
   /* v44/v45 liquid tokens: cyan/violet -> restrained green/neutral material. */
   --pmd-liquid-line-hot: rgba(37, 209, 98, .34);

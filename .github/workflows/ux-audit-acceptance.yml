@@ -1,0 +1,93 @@
+name: UX Audit Acceptance (F2)
+# Bukti CI untuk Alpha F2 / Task 45: audit UI/UX terukur (overflow, kontrol tanpa nama, target sentuh) dengan baseline ratchet.
+# Ratchet: target sentuh mobile = 0, tanpa nama = 0, overflow = 0. F2 belum VERIFIED (kontras, screenshot, manual belum tercakup).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'governance/THEME_PARITY_BASELINE.json'
+      - 'governance/KONTRAS_BASELINE.json'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
+      - 'governance/UX_AUDIT_BASELINE.json'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/index.ts'
+      - '.github/workflows/ux-audit-acceptance.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'governance/THEME_PARITY_BASELINE.json'
+      - 'governance/KONTRAS_BASELINE.json'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
+      - 'governance/UX_AUDIT_BASELINE.json'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/index.ts'
+      - '.github/workflows/ux-audit-acceptance.yml'
+permissions:
+  contents: read
+jobs:
+  ux-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: server
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Measured UX audit vs ratchet baseline
+        env:
+          QA_OUT: ${{ runner.temp }}/ux-audit-evidence.json
+        run: |
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5190 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/f1-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/f1-server.log" 2>&1) &
+          api=$!
+          VITE_API_URL=http://127.0.0.1:18790 npx vite --host 127.0.0.1 --port 5190 --strictPort > "$RUNNER_TEMP/f1-vite.log" 2>&1 &
+          web=$!
+          trap 'kill "$api" "$web" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
+            sleep 1
+          done
+          rc=0
+          UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
+          SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ux-audit-evidence
+          path: |
+            ${{ runner.temp }}/ux-audit-evidence.json
+            ${{ runner.temp }}/kontras-evidence.json
+            ${{ runner.temp }}/theme-parity-evidence.json
+            ${{ runner.temp }}/theme-shots

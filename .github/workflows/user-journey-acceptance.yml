@@ -1,0 +1,73 @@
+name: User Journey Acceptance (F1)
+# Bukti CI untuk Alpha F1 / Task 44: perjalanan pengguna di peramban terhadap aplikasi + server NYATA
+# dengan identitas sintetis, pada 390x844 dan 1440x900. Satu langkah gagal = job merah (tanpa pelonggaran).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/qa/user-journey-e2e.mjs'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/landing/Login.tsx'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/domains/identity/**'
+      - 'src/pages/admin/Owner.tsx'
+      - 'server/src/index.ts'
+      - '.github/workflows/user-journey-acceptance.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/qa/user-journey-e2e.mjs'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/landing/Login.tsx'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/domains/identity/**'
+      - 'src/pages/admin/Owner.tsx'
+      - 'server/src/index.ts'
+      - '.github/workflows/user-journey-acceptance.yml'
+permissions:
+  contents: read
+jobs:
+  user-journeys:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: server
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Real API + real app journeys
+        env:
+          QA_OUT: ${{ runner.temp }}/user-journey-evidence.json
+        run: |
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5190 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/f1-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/f1-server.log" 2>&1) &
+          api=$!
+          VITE_API_URL=http://127.0.0.1:18790 npx vite --host 127.0.0.1 --port 5190 --strictPort > "$RUNNER_TEMP/f1-vite.log" 2>&1 &
+          web=$!
+          trap 'kill "$api" "$web" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
+            sleep 1
+          done
+          QA_URL=http://localhost:5190/ node scripts/qa/user-journey-e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: user-journey-evidence
+          path: ${{ runner.temp }}/user-journey-evidence.json
