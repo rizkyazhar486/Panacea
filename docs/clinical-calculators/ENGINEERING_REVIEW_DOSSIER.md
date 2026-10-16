@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–6)
+# Clinical calculators — automated engineering-review dossier (tranches 1–7)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -134,7 +134,19 @@ Method as above (400 seeded cases per formula, worked cases, breakpoints at 10/2
 | Potassium deficit (`potassiumDeficit`) | (4.0 − K) × kg × 0.3 to 0.6, never negative | none | The 0.3–0.6 factors and the 4.0 target are unsourced; serum K poorly predicts total deficit. |
 | Glycogen-depletion timing (`autophagyTiming`) | remaining = max(0, 14 − (1 − fat%/100) × 2 − hours since meal); started when ≤ 0 | none (illustrative heuristic) | The whole heuristic is unsourced and is not a measurement of autophagy; it must stay labelled illustrative. |
 
+## Tranche 7 — Maddrey, Siriraj, Fletcher and Denver age (suite: `scripts/uji/calculator-independent-reference-7.mts`)
+
+References use integer arithmetic (tenths/hundredths) so exact boundaries do not depend on float rounding; exhaustive boundary grids (793 exact-DF-32 combinations; every Siriraj feature combination × 361 half-step diastolic pressures; 2.2 M Fletcher grid points in a one-off probe), seeded sampling, hostile matrices, range tables re-asserted as literals, and ~40 source mutants (each fails by name; one, the `typeof` guard in Siriraj's `oneOf`, is equivalent because `includes` is strict).
+
+**One engine defect found and fixed (`maddreyScore`).** A discriminant function of exactly 32 was reported "not severe" whenever float arithmetic landed just below it: PT 15.5 s vs control 10 s with bilirubin 6.7 mg/dL gives 4.6 × 5.5 + 6.7 = 32 but computes as 31.999999999999996. 129 of the 793 exact-boundary combinations with a positive PT difference were misclassified, understating severity at the published threshold (DF ≥ 32). The fix rounds DF to 1e-6 before comparing; the displayed `df` is unchanged. The regression test fails on the unfixed engine.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Maddrey discriminant function (`maddreyScore`) | DF = 4.6 × (patient PT − control PT) + total bilirubin; severe when DF ≥ 32 | Maddrey 1978 | A patient PT shorter than control is accepted (negative difference), as before; range limits are input-sanity bounds. Corticosteroid decisions stay with the clinician. |
+| Siriraj stroke score (`sirirajStrokeScore`) | 2.5 × consciousness + 2 × vomiting + 2 × headache + 0.1 × diastolic − 3 × atheroma − 12; > +1 haemorrhagic, < −1 ischaemic, else indeterminate | Poungvarin et al., BMJ 1991 | Not a substitute for imaging (labelled so). Exactly ±1 is indeterminate (rule is strict). |
+| Fletcher index (`fletcherIndex`) | Mean of 500/1000/2000 Hz (basic) or + 3000 Hz (complete); cut-offs < 26 / 41 / 56 / 71 / 91 dB | AAO-HNS-style bands as recorded | The mean is classified unrounded (25.67 dB is "Normal"); some references round to whole dB first. In basic mode the 3000 Hz field is ignored. |
+| Denver II age check (`validateDenverAge`) | 0–72 months | none | Only the age range is validated here; the milestone list is not part of this engine. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
-`maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
