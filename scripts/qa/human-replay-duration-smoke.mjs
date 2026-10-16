@@ -21,7 +21,7 @@ try {
     await context.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:'/* system-font fallback for isolated QA */'}))
     page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')consoleErrors.push({text:m.text(),location:m.location()})})
     page.on('response',r=>{if(r.status()>=400)failedResponses.push({url:r.url(),status:r.status()})})
-    await page.addInitScript(()=>{window.__replayPosterText=[];const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
+    await page.addInitScript(()=>{window.__replayPosterText=[];window.__replayExportTelemetry={toBlobStarted:false,toBlobFinished:false,blobBytes:null,downloadClicked:false};const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};const encode=HTMLCanvasElement.prototype.toBlob;HTMLCanvasElement.prototype.toBlob=function(callback,...args){if(this.width===1080&&this.height===1350){window.__replayExportTelemetry.toBlobStarted=true;const started=performance.now();return encode.call(this,(blob)=>{window.__replayExportTelemetry.toBlobFinished=true;window.__replayExportTelemetry.blobBytes=blob?.size??null;window.__replayExportTelemetry.toBlobElapsedMs=Math.round(performance.now()-started);callback(blob)},...args)}return encode.call(this,callback,...args)};const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(...args){if(this.download==='panacea-human-replay.png')window.__replayExportTelemetry.downloadClicked=true;return click.apply(this,args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
     await page.goto(`${origin}/replay-duration-fixture.html`,{waitUntil:'domcontentloaded',timeout:120000})
     await page.waitForLoadState('networkidle',{timeout:120000})
     const active=page.getByText('active min',{exact:true}).locator('..')
@@ -44,24 +44,27 @@ try {
       let file
       try {
         ;[file]=await Promise.all([
-          page.waitForEvent('download'),
-          page.getByRole('button',{name:'Share this chapter',exact:true}).click(),
+          page.waitForEvent('download', { timeout: 75000 }),
+          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 90000, noWaitAfter: true }),
         ])
       } catch (error) {
         const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
           posterText:await page.evaluate(()=>window.__replayPosterText),
+          exportTelemetry:await page.evaluate(()=>window.__replayExportTelemetry),
+          shareStatus:await page.locator('section').first().getByText(/Human Replay (?:export unavailable|poster exported|shared)/).allTextContents(),
           bodyText:await page.locator('body').innerText()}
         await writeFile(`${out}/poster-failure-${viewport.width}.json`,JSON.stringify(diagnostic,null,2))
         await page.screenshot({path:`${out}/poster-failure-${viewport.width}.png`,fullPage:true}).catch(screenshotError=>{diagnostic.screenshotError=String(screenshotError)})
         console.error(JSON.stringify(diagnostic))
         throw error
       }
+      assert.ok((await page.evaluate(()=>window.__replayExportTelemetry)).blobBytes>0,'actual poster PNG Blob must contain bytes');
       await file.saveAs(`${out}/poster-${expected}-${viewport.width}.png`)
       const texts=await page.evaluate(()=>window.__replayPosterText)
       assert.ok(texts.includes(expected));assert.ok(texts.includes('ACTIVE MINUTES'))
       if(expected==='Unknown'){assert.ok(!texts.includes('30'),'unknown provenance must not become30 minutes in a share image');assert.ok(texts.filter(t=>t==='Unknown').length>=2,'missing distance also stays unknown in the poster')}
     }
-    await poster('Unknown');await page.screenshot({path:`${out}/unknown-${viewport.width}.png`,fullPage:true})
+    await poster('Unknown');await page.screenshot({path:`${out}/unknown-${viewport.width}.png`,fullPage:true,animations:'disabled',timeout:90000})
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
     await select('Zero');assert.match(await active.innerText(),/^0\s/);assert.match(await distance.innerText(),/^0[.,]0\s/);await poster('0')
     await select('Invalid');assert.match(await active.innerText(),/Unknown/)
@@ -72,7 +75,7 @@ try {
     await page.getByText(/Cumulative: 1 sessions · 30 active minutes/).waitFor();assert.match(await active.innerText(),/^30\s/)
     await page.keyboard.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1)
-    await page.screenshot({path:`${out}/mixed-${viewport.width}.png`,fullPage:true})
+    await page.screenshot({path:`${out}/mixed-${viewport.width}.png`,fullPage:true,animations:'disabled',timeout:90000})
     await select('Empty');await page.getByRole('slider',{name:'Human Replay month'}).waitFor({state:'hidden'})
     if(errors.length||consoleErrors.length||failedResponses.length) {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))
