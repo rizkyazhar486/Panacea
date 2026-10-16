@@ -97,20 +97,27 @@
    "pillar": "Panacea One OS",
    "criterion": "Persetujuan dan tanda tangan klinisi",
    "acceptance": "Rencana klinis menjadi aktif hanya setelah tanda tangan klinisi; percobaan tanpa tanda tangan ditolak dan tercatat",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (diimpor oleh rekamEncounter.uji.ts, gerbang wajib server-validate): server NYATA lewat HTTP + persistensi berkas. Rencana hanya aktif setelah tanda tangan klinisi terautentikasi yang mengikat isi (sha256); niat tanpa tanda tangan ditolak, rencana tetap tidak aktif (GET /api/care/plans kosong) dan penolakan tercatat di audit (care.plan.signature_refused dengan userId penolak; care.plan.signed hanya oleh dokter); rencana lama tanpa tanda tangan tidak aktif sampai ditinjau dan ditandatangani ulang dengan isi persis sama; subjek tidak cocok ditolak 404 tanpa mutasi.",
+    "qa/clinical/care-plan-approval.mjs (gerbang CI wajib di Stabilization Acceptance): komponen nyata + API HTTP nyata, Chromium 390x844 dan 1440x900. Niat tanpa tanda tangan disuntik ke request nyata dan ditolak dengan alert terlihat, rencana tidak aktif; tanda tangan lewat keyboard mengaktifkan; muat ulang tetap bertanda tangan; rencana lama diaktifkan ulang; state loading, galat dan Retry; tanpa overflow; tombol >=44px.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk perilaku teknis penegakan tanda tangan (server + komponen) dengan identitas sintetis. Verifikasi dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi/STR nyata. E2E browser memakai fixture komponen, bukan pemasangan rute produksi, dan tidak menyatakan perjalanan lengkap F1. Isi klinis rencana belum ditinjau klinisi."
   },
   {
    "id": "A7",
    "pillar": "Panacea One OS",
    "criterion": "Tindak lanjut terjadwal",
    "acceptance": "Tindak lanjut dapat dibuat dari rencana bertanda tangan dan muncul pada daftar kerja pemilik yang benar",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (gerbang wajib server-validate, HTTP nyata + berkas): dari rencana BERTANDA TANGAN, rencana terjadwal (cadence daily, activeFrom valid) muncul di daftar kerja pasien pemiliknya (/api/care/plans) dan TIDAK di pasien lain (kosong); tindak lanjut (POST /api/care/reports dengan planId) dibuat dengan subjectId dari sesi, bukan dari klien; klinisi bernama yang diberi izin melihat rencana dan laporan itu di /api/clinician/lab-shares/:id/care; hasil bertahan setelah server dimatikan dan dihidupkan ulang; pasien lain mendapat 404 pada laporan itu; pencabutan izin mengosongkan daftar.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk pembuatan tindak lanjut dari rencana bertanda tangan dan kemunculannya di daftar kerja pemilik yang benar (pasien pemilik dan klinisi berizin) pada identitas sintetis. Pengiriman pengingat (notifikasi) tidak dinilai di sini. Tidak menyatakan kebenaran klinis jadwal atau pertanyaan rencana; belum ada E2E browser untuk daftar kerja klinisi."
   },
   {
    "id": "A8",
