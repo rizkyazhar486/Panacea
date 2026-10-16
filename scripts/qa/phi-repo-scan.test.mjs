@@ -83,4 +83,5 @@ test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
   for (const f of BERKAS_FIXTURE) assert.ok(!daftarBerkas().includes(f), `${f} dikecualikan`)
   assert.ok(daftarBerkas().includes('scripts/qa/phi-repo-scan.mjs'), 'pemindai sendiri tetap dipindai')
   assert.ok(daftarBerkas().includes('server/src/config.ts'), 'kode produk tetap dipindai')
+  assert.ok(daftarBerkas().some((f) => /^scripts\/qa\/.+\.test\.mjs$/.test(f) && !BERKAS_FIXTURE.includes(f)), 'berkas uji lain tetap dipindai (pengecualian path persis, bukan awalan)')
 })
