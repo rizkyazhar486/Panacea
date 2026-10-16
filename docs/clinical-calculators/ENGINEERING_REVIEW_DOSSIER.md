@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranche 1)
+# Clinical calculators — automated engineering-review dossier (tranches 1–2)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `d88867af`. Suite: `scripts/uji/calculator-independent-reference.mts` (runs inside `npm run uji`).
+Baseline: `origin/main` at `4305008e`. Suites (both run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1) and `scripts/uji/calculator-independent-reference-2.mts` (tranche 2); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -60,9 +60,23 @@ npm ci
 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/calculator-independent-reference.mts
 ```
 
+## Tranche 2 — table-based scoring systems (suite: `scripts/uji/calculator-independent-reference-2.mts`)
+
+The five engines below were compared with references **transcribed separately as range tables** (not copies of the engine functions), over **every** integer value
+(or tenth, for creatinine, bilirubin, temperature, haemoglobin and BUN) across each parameter's accepted range, plus 400–800 seeded random cases, total/class/band
+logic, monotonicity, range boundaries and hostile inputs. 111 source mutants (each threshold, constant, clamp, flag weight and band cut-off) fail by name with no survivor.
+Result: **no discrepancy** between the engines and the published tables as transcribed; no engine defect was found in this tranche.
+
+| Calculator (engine) | Published form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Child-Pugh (`childPugh`) | Bilirubin < 2 / 2–3 / > 3; albumin > 3.5 / 2.8–3.5 / < 2.8; INR < 1.7 / 1.7–2.3 / > 2.3; ascites and encephalopathy 1–3; classes A 5–6, B 7–9, C 10–15 | Pugh et al. 1973 | The survival percentages shown per class carry no citation in the engine. Ascites and encephalopathy are user-chosen levels, not derived. |
+| MELD-Na (`meldNa`) | MELD = 3.78 ln(bili) + 11.2 ln(INR) + 9.57 ln(Cr) + 6.43 with lower floors of 1.0, Cr capped at 4.0 and pinned at 4.0 on dialysis; MELD-Na only if MELD > 11 using Na bounded to 125–137; result bounded to 6–40 | Kamath 2001; Kim 2008; OPTN/UNOS 2016 policy | Whether intermediate rounding per OPTN policy is required is not established here (the engine returns unrounded values). OPTN has since adopted a newer allocation model (MELD 3.0, 2023); whether this calculator should present the 2016 model as current is a reviewer decision, not verified in this session. Priority bands and the 3-month mortality figures carry no citation. |
+| NEWS2, SpO₂ scale 1 (`news2`) | RR, SpO₂, air/oxygen, SBP, pulse, consciousness, temperature tables; ≥ 7 high, ≥ 5 or any single 3 medium, ≥ 1 low-medium | Royal College of Physicians 2017 | SpO₂ scale 2 (hypercapnic respiratory failure) is **not implemented** (the engine says so): a patient who should be scored on scale 2 gets a wrong SpO₂ contribution. Consciousness is a yes/no (any non-alert state scores 3). The escalation text is an institutional protocol choice. |
+| SOFA (`sofaScore`) | Respiratory (PaO₂/FiO₂ with support), platelets, bilirubin, creatinine, GCS tables; cardiovascular level chosen by the user | Vincent et al. 1996 | **The mortality bands (< 10 %, ~10–20 %, ~20–40 %, ~50–60 %, > 80 %) have no citation and do not match the SOFA mortality tables I recall; I could not verify either here, so this is flagged, not asserted.** The renal subscore uses creatinine only (no urine-output criteria). The published table's "> 12.0" and "> 5.0" leave exactly 12.0 / 5.0 undefined; the engine scores them as the higher band. |
+| Glasgow-Blatchford (`glasgowBlatchford`) | Urea 6.5/8/10/25 mmol/L (× 2.8 = BUN 18.2/22.4/28/70 mg/dL); haemoglobin by sex; SBP; pulse, melaena, syncope, hepatic disease, cardiac failure | Blatchford et al., Lancet 2000;356:1318 | "Very low" is a score of exactly 0 and "low-moderate" is ≤ 5; guideline thresholds for outpatient management differ (0 versus ≤ 1) and were not verified here. Pulse ≥ 100 and the other flags are user-ticked. |
+
 ## Next tranche (not yet covered)
 
-`meldNa`, `childPugh`, `sofaScore`, `news2`, `glasgowBlatchford`, `graceScore`, `charlson`, `centor`, `paradise`, `findrisc`, `stopBang`,
-`widmarkBac`, `naegele`, `midParentalHeight`, `waistToHeight`, `lightsCriteria`, `pediatricDka`, `bloodGas`, `fluidElectrolytes`,
-`electrolyteCorrection`, `ivDrip`, `pedsDose`, and the input-contract engines. Several already have reference-style tests under `scripts/uji/`
-(`child-pugh`, `meld-na`, `sofa-score`, `egfr-ckd-epi-2021`); they are not yet re-derived independently here.
+`graceScore`, `charlson`, `centor`, `paradise`, `findrisc`, `stopBang`, `widmarkBac`, `naegele`, `midParentalHeight`, `waistToHeight`,
+`lightsCriteria`, `pediatricDka`, `bloodGas`, `fluidElectrolytes`, `electrolyteCorrection`, `ivDrip`, `pedsDose`, and the input-contract engines. `child-pugh`, `meld-na`,
+`sofa-score` and `egfr-ckd-epi-2021` already have point-wise tests under `scripts/uji/`; the first three are now also re-derived independently here.
