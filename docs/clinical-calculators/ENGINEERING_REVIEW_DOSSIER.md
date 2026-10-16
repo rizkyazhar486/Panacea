@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–2)
+# Clinical calculators — automated engineering-review dossier (tranches 1–3)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `4305008e`. Suites (both run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1) and `scripts/uji/calculator-independent-reference-2.mts` (tranche 2); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `5322f7e5`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2) and `scripts/uji/calculator-independent-reference-3.mts` (tranche 3); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -75,8 +75,27 @@ Result: **no discrepancy** between the engines and the published tables as trans
 | SOFA (`sofaScore`) | Respiratory (PaO₂/FiO₂ with support), platelets, bilirubin, creatinine, GCS tables; cardiovascular level chosen by the user | Vincent et al. 1996 | **The mortality bands (< 10 %, ~10–20 %, ~20–40 %, ~50–60 %, > 80 %) have no citation and do not match the SOFA mortality tables I recall; I could not verify either here, so this is flagged, not asserted.** The renal subscore uses creatinine only (no urine-output criteria). The published table's "> 12.0" and "> 5.0" leave exactly 12.0 / 5.0 undefined; the engine scores them as the higher band. |
 | Glasgow-Blatchford (`glasgowBlatchford`) | Urea 6.5/8/10/25 mmol/L (× 2.8 = BUN 18.2/22.4/28/70 mg/dL); haemoglobin by sex; SBP; pulse, melaena, syncope, hepatic disease, cardiac failure | Blatchford et al., Lancet 2000;356:1318 | "Very low" is a score of exactly 0 and "low-moderate" is ≤ 5; guideline thresholds for outpatient management differ (0 versus ≤ 1) and were not verified here. Pulse ≥ 100 and the other flags are user-ticked. |
 
+## Tranche 3 — dating, dosing arithmetic and screening (suite: `scripts/uji/calculator-independent-reference-3.mts`)
+
+Ten engines compared with independently written references (Naegele uses its own civil-calendar day arithmetic, not `Date`), 400–800 seeded cases each, exact-boundary
+cases, range corners and hostile inputs. 70 source mutants (every constant, threshold, comparison and branch) fail by name, no survivor. Result: **no discrepancy**.
+One suspicion was checked and **ruled out**: Light's "pleural LDH > ⅔ of the upper limit" has no floating-point error at the exact boundary for any integer limit from 3 to 2000
+(brute force), so no change was made.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Naegele (`naegele`) | EDD = LMP + 280 + (cycle − 28) days; gestational age = days since LMP − (cycle − 28), hidden when negative or beyond 45w0d; due date is exactly 40w0d for any cycle length; all in UTC calendar days | none recorded | Whether and how ultrasound dating should supersede the LMP estimate is a clinical decision (the engine only says confirmation is advised). The 45-week display limit is a presentation choice. |
+| Widmark BAC (`widmarkBac`) | BAC‰ = grams / (r × kg) − 0.15 × hours, r = 0.68 (M) / 0.55 (F), ethanol density 0.789 g/mL, UK unit 8 g, US standard drink 14 g, floored at 0 | none recorded | The constants are population averages and absorption is ignored; whether an "estimated BAC" should be shown at all, and with what wording, is a reviewer/legal decision. A drink count that is absent is read as 0 drinks (documented behaviour); `NaN`, negative or non-numeric counts are refused. |
+| Mid-parental height (`midParentalHeight`) | (father + mother ± 13) / 2, range ± 8.5 cm | none recorded | Citation and the meaning of the ± 8.5 cm range to be supplied. |
+| Waist-to-height (`waistToHeight`) | ratio < 0.5 / < 0.6 / ≥ 0.6 | none recorded | Citation for the cut-offs to be supplied; age and ethnicity applicability not established. |
+| IV drip rate (`ivDrip`) | mL/h = V / h; drops/min = V × factor / (h × 60); factors 15, 20, 60 | none (arithmetic) | The engine states the set's drop factor must be confirmed by the clinician. |
+| Katz sodium correction (`correctedSodiumKatz`) | + 1.6 mEq/L per 100 mg/dL glucose above 100 (never negative) | Katz 1973 | Other correction factors exist in the literature; which one to present is a clinical choice. |
+| Potassium assessment (`potassiumAssessment`) | deficit range (4.0 − K) × 200 to × 400 mEq below 4.0; severity bands at 2.5 / 3.0 / 3.5 and 5.5 / 6.0 / 6.5 | rule of thumb attributed in the engine header; bands unsourced | Both the deficit rule and the severity bands need a source and sign-off. |
+| Light's criteria (`lightsCriteria`) | exudate if protein ratio > 0.5, LDH ratio > 0.6, or pleural LDH > ⅔ of the serum upper limit | Light et al. 1972 | The input ranges and the inclusion of the third criterion's reference range per laboratory are the reviewer's. |
+| STOP-Bang (`stopBang`) | eight items, 1 point each; BMI > 35, age > 50, neck > 40 cm, male; 0–2 low, 3–4 intermediate, 5–8 high | Chung et al. 2008 | A single neck cut-off is used for both sexes (variants exist; not verified here). Intermediate-risk refinements are not modelled. |
+| Centor/McIsaac (`centorMcIsaac`) | four criteria + age (< 15: +1; 15–44: 0; ≥ 45: −1); five risk labels | Centor 1981; McIsaac 1998 | The "< 15" rule also gives +1 to ages 0–2; as I recall the published adjustment targets children from 3 years (not verified here). The percentage ranges in the labels carry no citation. |
+
 ## Next tranche (not yet covered)
 
-`graceScore`, `charlson`, `centor`, `paradise`, `findrisc`, `stopBang`, `widmarkBac`, `naegele`, `midParentalHeight`, `waistToHeight`,
-`lightsCriteria`, `pediatricDka`, `bloodGas`, `fluidElectrolytes`, `electrolyteCorrection`, `ivDrip`, `pedsDose`, and the input-contract engines. `child-pugh`, `meld-na`,
-`sofa-score` and `egfr-ckd-epi-2021` already have point-wise tests under `scripts/uji/`; the first three are now also re-derived independently here.
+`graceScore`, `charlson`, `findrisc`, `paradise`, `bloodGas`, `fluidElectrolytes`, `fluidBalance`, `pediatricDka`, `pedsDose` (arithmetic; its overflow fix is a separate PR), `hydrationTarget`,
+`autophagyTiming`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only; `child-pugh`, `meld-na`, `sofa-score` are re-derived independently in tranche 2.
