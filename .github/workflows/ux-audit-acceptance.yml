@@ -1,12 +1,17 @@
 name: UX Audit Acceptance (F2)
 # Bukti CI untuk Alpha F2 / Task 45: audit UI/UX terukur (overflow, kontrol tanpa nama, target sentuh) dengan baseline ratchet.
-# Ratchet: target sentuh mobile = 0, tanpa nama = 0, overflow = 0. F2 belum VERIFIED (kontras, screenshot, manual belum tercakup).
+# Ratchet: target sentuh mobile = 0, tanpa nama = 0, overflow = 0, axe serius/kritis = 0. F2 belum VERIFIED (screenshot, keyboard manual, performa belum tercakup).
 on:
   push:
     branches: [main]
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'scripts/qa/axe-audit.mjs'
+      - 'scripts/qa/axe-ratchet.mjs'
+      - 'governance/AXE_BASELINE.json'
+      - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
@@ -26,6 +31,11 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'scripts/qa/axe-audit.mjs'
+      - 'scripts/qa/axe-ratchet.mjs'
+      - 'governance/AXE_BASELINE.json'
+      - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
@@ -57,7 +67,7 @@ jobs:
         working-directory: server
       - name: Install browser
         run: |
-          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npm install --no-save --no-package-lock --ignore-scripts @playwright/test@1.55.0 axe-core@4.10.2
           npx playwright install --with-deps chromium
       - name: Measured UX audit vs ratchet baseline
         env:
@@ -76,6 +86,8 @@ jobs:
           rc=0
           UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
+          SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/axe-evidence.json" AXE_BASELINE=governance/AXE_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/axe-audit.mjs || rc=1
           exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
@@ -84,3 +96,6 @@ jobs:
           path: |
             ${{ runner.temp }}/ux-audit-evidence.json
             ${{ runner.temp }}/kontras-evidence.json
+            ${{ runner.temp }}/theme-parity-evidence.json
+            ${{ runner.temp }}/axe-evidence.json
+            ${{ runner.temp }}/theme-shots

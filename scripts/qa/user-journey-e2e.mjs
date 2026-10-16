@@ -29,6 +29,12 @@ const call = async (m, p, token, body) => {
 const devLogin = async (email, role) => (await call('POST', '/api/auth/dev-login', null, { email, role, name: email })).json
 const results = []
 const temuan = []
+// Pembatas laju global produk = 300 permintaan/menit (server/src/index.ts). Batas itu TIDAK dilonggarkan untuk uji; journey yang padat memicunya,
+// sehingga journey berikutnya menunggu jendela satu menit lewat (terbukti: GET /api/doctors -> 429 tanpa jeda).
+// Hanya permintaan KE server API. Pola glob '**/api/**' juga mencegat modul dev di direktori /api/ (mis. src/.../api/...), sehingga chunk halaman
+// dijawab JSON 500 dan Suspense macet 'Loading page' — artefak uji, terbukti lewat jejak diagnostik, bukan cacat produk.
+const apiUrl = (u) => u.origin === new URL(API).origin && u.pathname.startsWith('/api/')
+const tungguJendelaLaju = () => new Promise((r) => setTimeout(r, 61000))
 const record = (viewport, journey, step, ok, detail) => results.push({ viewport, journey, step, ok, ...(detail ? { detail } : {}) })
 
 // Setiap tabrakan asersi dicatat lalu dilempar ulang: satu langkah gagal = skrip gagal (tidak ada pelonggaran).
@@ -49,6 +55,32 @@ try {
   const seed = await call('POST', '/api/lab-results', owner.token, { patientId: 'p-f1-lain', item: { name: 'Hemoglobin', value: 13.1, unit: 'g/dL', collectedAt: '2026-10-09' }, source: 'lab-intake' })
   assert.equal(seed.status, 201, 'seed hasil lab sintetis')
   const labId = seed.json.id
+
+  // ===== Sekali jalan (API saja, tanpa viewport): RBAC peran lain, eskalasi peran, pencabutan token =====
+  {
+    const J = 'api-rbac'; const VP = 'api'
+    await step(VP, J, 'logout mencabut bearer token di server; sesi lain akun yang sama tetap sah (#2558)', async () => {
+      const tokA = (await devLogin('dokter-f1@example.com', 'dokter')).token
+      await new Promise((r) => setTimeout(r, 1100)) // jti acak membedakan token; jeda menghindari kolisi iat
+      const tokB = (await devLogin('dokter-f1@example.com', 'dokter')).token
+      assert.equal((await call('GET', '/api/auth/me', tokA)).status, 200, 'kontrol positif: token sah sebelum logout')
+      await call('POST', '/api/auth/logout', tokA)
+      assert.equal((await call('GET', '/api/auth/me', tokA)).status, 401, 'token yang di-logout harus ditolak')
+      assert.equal((await call('GET', '/api/auth/me', tokB)).status, 200, 'sesi lain akun yang sama tidak boleh ikut dicabut')
+    })
+    await step(VP, J, 'RBAC tiga-arah: verifikator belum diverifikasi ditolak, setelah diverifikasi pemilik diterima, pasien tetap ditolak', async () => {
+      const email = 'verifikator-api@example.com'; const body = { email: 'tidak-ada@example.com', body: 'uji' }
+      const baru = await devLogin(email, 'verifikator'); assert.equal(baru.user.role, 'verifikator', 'peran swa-layanan tercatat')
+      const sebelum = await call('POST', '/api/notify/user', baru.token, body); assert.equal(sebelum.status, 403, `belum diverifikasi harus 403, dapat ${sebelum.status}`)
+      assert.equal((await call('POST', `/api/doctors/${baru.user.id}/verify`, owner.token, { status: 'verified' })).status, 200)
+      const sesudah = await call('POST', '/api/notify/user', baru.token, body); assert.equal(sesudah.status, 200, `setelah verifikasi harus 200, dapat ${sesudah.status}`)
+      const pasien = await call('POST', '/api/notify/user', pasienApi.token, body); assert.equal(pasien.status, 403, `pasien harus 403, dapat ${pasien.status}`)
+    })
+    await step(VP, J, 'eskalasi peran ditolak: login mandiri sebagai admin/perawat tidak memberi peran itu', async () => {
+      for (const r of ['admin', 'perawat']) { const x = await devLogin(`eskalasi-${r}-${VP}@example.com`, r); assert.equal(x.user.role, 'pasien', `peran ${r} tidak boleh didapat lewat login mandiri, dapat ${x.user.role}`) }
+      const x = await devLogin(`eskalasi-owner-${VP}@example.com`, 'owner'); assert.notEqual(x.user.role, 'owner', 'bukan pemilik terdaftar tidak boleh menjadi owner')
+    })
+  }
 
   for (const vp of VIEWPORTS) {
     const newPage = async () => {
@@ -162,13 +194,44 @@ try {
         await page.reload({ waitUntil: 'domcontentloaded' })
         await page.waitForTimeout(3000)
       })
-      await step(vp.name, J, 'TEMUAN (dicatat, bukan lulus): logout belum mencabut bearer token di server', async () => {
-        const tok = (await devLogin('dokter-f1@example.com', 'dokter')).token
-        await call('POST', '/api/auth/logout', tok)
-        const sesudah = await call('GET', '/api/auth/me', tok)
-        temuan.push({ id: 'logout-tidak-mencabut-token', diamati: `GET /api/auth/me setelah POST /api/auth/logout → ${sesudah.status}`, harapan: '401 (token dicabut)', dampak: 'token yang bocor tetap berlaku sampai kedaluwarsa 7 hari (JWT stateless)', status: sesudah.status === 401 ? 'teratasi' : 'terbuka' })
-        return { statusSetelahLogout: sesudah.status }
+      await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
+      await ctx.close()
+    }
+
+    // ===== Perjalanan 4: pemilik/admin — verifikasi dokter lewat UI nyata, RBAC peran lain, eskalasi peran ditolak =====
+    {
+      await tungguJendelaLaju()
+      const { ctx, page, errors } = await newPage(); const J = 'pemilik'
+      const email = `dokter-ui-${vp.name}@example.com`
+      const calon = await devLogin(email, 'dokter')
+      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [
+        JSON.stringify({ loginAt: Date.now(), account: { email: OWNER, name: 'Pemilik F1', role: 'owner', isOwner: true, isSubscriber: false, loggedAt: new Date().toISOString() } }),
+        owner.token, SESSION_KEY, TOKEN_KEY])
+      await step(vp.name, J, 'kontrol negatif: dokter belum diverifikasi ditolak rute klinisi', async () => {
+        const r = await call('GET', '/api/clinician/lab-shares', calon.token); assert.equal(r.status, 403, `status ${r.status}`)
       })
+      await step(vp.name, J, 'pemilik membuka panel verifikasi STR dan melihat calon dokter', async () => {
+        await page.goto(APP + '#/owner', { waitUntil: 'domcontentloaded', timeout: 120000 })
+        await page.getByText('Doctor STR Verification').first().waitFor({ timeout: 60000 })
+        await page.getByText(email).first().waitFor({ timeout: 30000 })
+      })
+      await step(vp.name, J, 'pemilik menekan Verify di UI → API mencatat verified → dokter kini boleh rute klinisi', async () => {
+        const baris = page.locator('div.border-amber-200', { hasText: email }).first()
+        await baris.getByRole('button', { name: /Verify/ }).click()
+        await page.getByText(email).first().waitFor({ timeout: 30000 })
+        let status = ''; let http = 0
+        for (let i = 0; i < 20 && status !== 'verified'; i++) {
+          const r = await call('GET', '/api/doctors', owner.token); http = r.status
+          status = (r.json?.doctors ?? r.json ?? []).find?.((d) => d.email === email)?.strStatus ?? ''
+          if (status !== 'verified') await new Promise((r) => setTimeout(r, 500))
+        }
+        assert.equal(status, 'verified', `UI harus benar-benar memanggil API verifikasi (GET /api/doctors terakhir HTTP ${http})`)
+        if (vp === VIEWPORTS[0]) { // satu kali: batas laju /api/auth (30/15 mnt) tidak dilonggarkan untuk uji
+          const aktif = await devLogin(email, 'dokter')
+          assert.equal((await call('GET', '/api/clinician/lab-shares', aktif.token)).status, 200, 'setelah verifikasi dokter efektif sebagai klinisi')
+        }
+      })
+      await step(vp.name, J, 'tanpa overflow horizontal di panel pemilik', async () => { const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px`); return { overflowPx: o } })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
@@ -176,7 +239,7 @@ try {
     // ===== Perjalanan 3: API tak tersedia — state galat tidak crash =====
     {
       const { ctx, page, errors } = await newPage(); const J = 'api-tak-tersedia'
-      await page.route('**/api/**', (r) => r.abort('connectionrefused'))
+      await page.route(apiUrl, (r) => r.abort('connectionrefused'))
       await step(vp.name, J, 'landing tetap tampil saat semua panggilan API gagal', async () => {
         await page.goto(APP + '#/', { waitUntil: 'domcontentloaded', timeout: 120000 })
         await masuk(page).waitFor({ timeout: 60000 })
@@ -184,11 +247,86 @@ try {
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
+
+    // ===== Perjalanan 5: loading lambat, galat server (5xx), pemulihan, dan navigasi tidak buntu — sesi pasien nyata =====
+    {
+      const { ctx, page, errors } = await newPage(); const J = 'ketahanan'
+      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [
+        JSON.stringify({ loginAt: Date.now(), account: { email: 'pasien-f1@example.com', name: 'Pasien F1', role: 'pasien', isOwner: false, isSubscriber: false, loggedAt: new Date().toISOString() } }),
+        pasienApi.token, SESSION_KEY, TOKEN_KEY])
+      const RUTE = ['#/harian', '#/health-data', '#/clinical-hub']
+      const jejak = [] // diagnostik kegagalan: permintaan gagal dan respons >=400 di luar /api (mis. chunk yang tak termuat)
+      const menggantung = new Set() // permintaan non-API yang belum selesai: bukti bila chunk halaman macet
+      page.on('request', (r) => { if (!apiUrl(new URL(r.url()))) menggantung.add(r.url()) })
+      page.on('requestfinished', (r) => menggantung.delete(r.url()))
+      page.on('requestfailed', (r) => { menggantung.delete(r.url()); jejak.push(`GAGAL ${r.url().slice(-70)} ${r.failure()?.errorText ?? ''}`) })
+      page.on('response', (r) => { if (r.status() >= 400 && !r.url().includes('/api/')) jejak.push(`HTTP ${r.status()} ${r.url().slice(-70)}`) })
+      const teksBadan = (pg) => pg.evaluate(() => document.body.innerText)
+      const bocor = (t) => ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read'].filter((x) => t.includes(x))
+      const cangkang = async (pg) => { await pg.getByRole('button', { name: 'Notifications' }).first().waitFor({ timeout: 60000 }) }
+      // (0) kontrol positif + pemanasan: tanpa gangguan apa pun, tiap rute harus terisi. Dev server mengompilasi chunk saat pertama diminta; tanpa
+      // langkah ini kompilasi dingin bisa disangka kegagalan aplikasi saat API digagalkan. Gagal di sini = masalah dasar, bukan ketahanan.
+      await step(vp.name, J, 'kontrol positif tanpa gangguan: tiap rute terisi (pemanasan, batas 120 dtk)', async () => {
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+          await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 120000 }).catch(() => {})
+          const t = await teksBadan(page)
+          assert.ok(t.trim().length > 200, `${rute} tidak terisi dalam 120 dtk TANPA gangguan (${t.trim().length} karakter; menggantung=${JSON.stringify([...menggantung].slice(-5).map((u) => u.slice(-80)))})`)
+        }
+      })
+      // (a) loading lambat: semua panggilan API tertunda 1,5 dtk; cangkang harus tetap tampil, tanpa overflow, tanpa teks bocor
+      await step(vp.name, J, 'API lambat (1,5 dtk): cangkang dan halaman tetap tampil tanpa overflow atau teks bocor', async () => {
+        await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, 1500)); await r.continue().catch(() => {}) }) // navigasi bisa menutup rute lebih dulu: abaikan, bukan crash
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 })
+          await cangkang(page)
+          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat loading`)
+          const b = bocor(await teksBadan(page)); assert.deepEqual(b, [], `${rute} teks bocor saat loading: ${b}`)
+        }
+        await page.unroute(apiUrl)
+      })
+      // (b) galat server: semua panggilan API 500; kontrol positif = tanpa galat sama sekali sudah dicek di perjalanan lain
+      await step(vp.name, J, 'API 500: halaman tidak crash, tidak kosong, tanpa teks bocor, tanpa overflow', async () => {
+        await page.route(apiUrl, (r) => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'boom' }) }))
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 })
+          await cangkang(page)
+          // halaman rute dimuat malas (lazy): tunggu sampai terisi, tetapi gagal bila tak pernah terisi dalam 60 dtk (kompilasi chunk dev server bisa >20 dtk) (bukan sekadar belum dimuat)
+          await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 60000 }).catch(() => {})
+          const t = await teksBadan(page)
+          assert.ok(t.trim().length > 200, `${rute} tetap nyaris kosong 60 dtk setelah cangkang saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))}; jejak=${JSON.stringify(jejak.slice(-4))}; menggantung=${JSON.stringify([...menggantung].slice(-5).map((u) => u.slice(-80)))})`)
+          const b = bocor(t); assert.deepEqual(b, [], `${rute} teks bocor saat API 500: ${b}`)
+          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat API 500`)
+        }
+      })
+      // (c) navigasi tidak buntu dari keadaan galat: tombol Kembali riwayat dan logo/Home membawa pulang
+      await step(vp.name, J, 'tidak buntu saat galat: riwayat Kembali dan tautan Home berfungsi', async () => {
+        await page.goto(APP + '#/', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.goto(APP + '#/health-data', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.goBack({ waitUntil: 'domcontentloaded' }); await page.waitForTimeout(1500)
+        assert.ok(/#\/?$/.test(page.url()), `Kembali tidak pulang ke Home: ${page.url()}`)
+        await page.goto(APP + '#/clinical-hub', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        // Navigasi hash SPA tidak memuat ulang: tombol 'Notifications' sudah terlihat sebelum router memproses hashchange, sehingga
+        // pengecekan seketika berbalapan dengan render (bisaKembali = pathname !== '/'). Tunggu dengan batas; tetap gagal bila tak pernah muncul.
+        const kembali = page.getByRole('button', { name: /back|kembali/i }).first()
+        const terlihat = await kembali.waitFor({ state: 'visible', timeout: 15000 }).then(() => true, () => false)
+        assert.ok(terlihat, 'tidak ada kontrol Kembali yang terlihat di halaman dalam (15 dtk)')
+      })
+      // (d) pemulihan: API kembali normal → muat ulang → halaman berfungsi (kontrol berpasangan dengan (b): hanya API yang berubah)
+      await step(vp.name, J, 'pemulihan: setelah API normal, muat ulang menampilkan halaman tanpa galat', async () => {
+        await page.unroute(apiUrl)
+        await page.goto(APP + '#/health-data', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 60000 }).catch(() => {})
+        const t = await teksBadan(page); assert.ok(t.trim().length > 200, `pemulihan: halaman tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [])
+      })
+      await step(vp.name, J, 'tanpa galat halaman tak tertangani selama semua keadaan', async () => { assert.deepEqual(errors, []) })
+      await ctx.close()
+    }
   }
 } catch (e) { failed = e } finally {
   await browser.close()
   const ringkas = { dihasilkan: new Date().toISOString(), api: API, app: APP, lulus: results.filter((r) => r.ok).length, gagal: results.filter((r) => !r.ok).length,
-    temuan, tidakTercakup: ['perawat', 'laboratorium', 'admin'].map((p) => ({ peran: p, alasan: 'tidak ada perjalanan antarmuka mandiri yang dapat diuji; tidak dihitung lulus' })), hasil: results }
+    temuan, tidakTercakup: [{ peran: 'perawat', alasan: 'peran tidak ada di backend (Role = pasien|dokter|kontributor|verifikator|admin|owner); login mandiri sebagai perawat jatuh ke pasien; tidak dihitung lulus' }, { peran: 'laboratorium', alasan: 'peran tidak ada di backend; hasil lab masuk lewat jalur lab-intake/klinisi; tidak dihitung lulus' }, { peran: 'admin', alasan: 'peran ada tetapi tidak dapat diperoleh lewat login mandiri dan tidak ada UI admin terpisah dari pemilik; hanya RBAC API verifikator/pasien yang diuji' }, { peran: 'kontributor', alasan: 'peran ada; belum ada perjalanan UI diuji' }], hasil: results }
   writeFileSync(process.env.QA_OUT || 'user-journey-evidence.json', JSON.stringify(ringkas, null, 2))
   console.log(`user-journey-e2e: ${ringkas.lulus} lulus, ${ringkas.gagal} gagal`)
   if (failed) { console.error(failed.message); process.exit(1) }

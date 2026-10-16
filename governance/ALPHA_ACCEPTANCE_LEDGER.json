@@ -97,20 +97,27 @@
    "pillar": "Panacea One OS",
    "criterion": "Persetujuan dan tanda tangan klinisi",
    "acceptance": "Rencana klinis menjadi aktif hanya setelah tanda tangan klinisi; percobaan tanpa tanda tangan ditolak dan tercatat",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (diimpor oleh rekamEncounter.uji.ts, gerbang wajib server-validate): server NYATA lewat HTTP + persistensi berkas. Rencana hanya aktif setelah tanda tangan klinisi terautentikasi yang mengikat isi (sha256); niat tanpa tanda tangan ditolak, rencana tetap tidak aktif (GET /api/care/plans kosong) dan penolakan tercatat di audit (care.plan.signature_refused dengan userId penolak; care.plan.signed hanya oleh dokter); rencana lama tanpa tanda tangan tidak aktif sampai ditinjau dan ditandatangani ulang dengan isi persis sama; subjek tidak cocok ditolak 404 tanpa mutasi.",
+    "qa/clinical/care-plan-approval.mjs (gerbang CI wajib di Stabilization Acceptance): komponen nyata + API HTTP nyata, Chromium 390x844 dan 1440x900. Niat tanpa tanda tangan disuntik ke request nyata dan ditolak dengan alert terlihat, rencana tidak aktif; tanda tangan lewat keyboard mengaktifkan; muat ulang tetap bertanda tangan; rencana lama diaktifkan ulang; state loading, galat dan Retry; tanpa overflow; tombol >=44px.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk perilaku teknis penegakan tanda tangan (server + komponen) dengan identitas sintetis. Verifikasi dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi/STR nyata. E2E browser memakai fixture komponen, bukan pemasangan rute produksi, dan tidak menyatakan perjalanan lengkap F1. Isi klinis rencana belum ditinjau klinisi."
   },
   {
    "id": "A7",
    "pillar": "Panacea One OS",
    "criterion": "Tindak lanjut terjadwal",
    "acceptance": "Tindak lanjut dapat dibuat dari rencana bertanda tangan dan muncul pada daftar kerja pemilik yang benar",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (gerbang wajib server-validate, HTTP nyata + berkas): dari rencana BERTANDA TANGAN, rencana terjadwal (cadence daily, activeFrom valid) muncul di daftar kerja pasien pemiliknya (/api/care/plans) dan TIDAK di pasien lain (kosong); tindak lanjut (POST /api/care/reports dengan planId) dibuat dengan subjectId dari sesi, bukan dari klien; klinisi bernama yang diberi izin melihat rencana dan laporan itu di /api/clinician/lab-shares/:id/care; hasil bertahan setelah server dimatikan dan dihidupkan ulang; pasien lain mendapat 404 pada laporan itu; pencabutan izin mengosongkan daftar.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk pembuatan tindak lanjut dari rencana bertanda tangan dan kemunculannya di daftar kerja pemilik yang benar (pasien pemilik dan klinisi berizin) pada identitas sintetis. Pengiriman pengingat (notifikasi) tidak dinilai di sini. Tidak menyatakan kebenaran klinis jadwal atau pertanyaan rencana; belum ada E2E browser untuk daftar kerja klinisi."
   },
   {
    "id": "A8",
@@ -607,20 +614,26 @@
    "pillar": "User Journey & Product Experience",
    "criterion": "Task 44 — Full User Journey Acceptance",
    "acceptance": "Inventarisasi rute dan peran dari kontrak backend dan matriks fitur yang berlaku; uji browser E2E pada aplikasi dan API nyata memakai identitas sintetis untuk perjalanan kritis pasien, dokter, perawat, laboratorium, dan admin sesuai kapabilitas yang benar-benar tersedia, dari onboarding atau login melalui navigasi, tindakan utama, penyelesaian, kembali, dan logout. Bukti CI mencakup RBAC positif dan negatif, navigasi tidak buntu, state loading atau error, serta viewport 390x844 dan 1440x900. Keterbatasan integrasi maupun peran yang belum tersedia tidak dianggap lulus.",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "scripts/qa/user-journey-e2e.mjs + .github/workflows/user-journey-acceptance.yml (CI check `user-journeys`): browser E2E pada aplikasi dan API nyata dengan identitas sintetis di 390x844 dan 1440x900 — journey api-rbac (revokasi logout, RBAC verifikator 3 arah, negatif eskalasi peran), pasien, dokter, pemilik (verifikasi dokter lewat UI), api-tak-tersedia, ketahanan (API lambat, API 500, tidak buntu, pemulihan). Dua run lokal berturut-turut 61 lulus 0 gagal; sabotase navigasi-buntu dan teks bocor gagal dengan nama langkah. Merge #2572, #2576."
+   ],
    "owner": "Vika (journey dan UI) / Insan (kontrak) / Sol dan Sonnet (uji E2E)",
-   "note": "Kriteria baru ke-44 disetujui oleh pemilik 2026-10-14. A8 adalah E2E backend, bukan bukti browser user journey produk; jangan menghitung A8/B7 sebagai verifikasi otomatis task ini."
+   "note": "REPORTED, bukan VERIFIED. Syarat yang TIDAK terpenuhi: perjalanan perawat dan laboratorium (peran tidak ada di backend: Role = pasien|dokter|kontributor|verifikator|admin|owner) serta kontributor (tanpa kapabilitas backend) tidak dapat diuji dan tidak dihitung lulus; hanya 3 halaman diuji pada keadaan galat/lambat; login Google/OAuth nyata tidak diuji; A8/B7 tidak dihitung. Tanpa klaim validasi pengguna."
   },
   {
    "id": "F2",
    "pillar": "User Journey & Product Experience",
    "criterion": "Task 45 — UI/UX Optimization & Polishing Acceptance",
    "acceptance": "Audit dan perbaiki halaman aktif yang masuk cakupan perjalanan kritis serta navigasi global dengan desain adaptif yang konsisten: tipografi, token warna PanaceaMed, hirarki visual, fokus dan keyboard, label semantik, kontras WCAG 2.2 AA, target sentuh sekurangnya 44px sesuai standar repo, responsivitas 390x844 dan desktop tanpa overflow, state kosong atau loading atau error, pembatalan atau pemulihan, dan reduced motion. Lampirkan inventaris halaman, hasil audit aksesibilitas otomatis ditambah pemeriksaan manual terarah, regresi screenshot lintas viewport dan tema, serta pengukuran performa yang metodologinya tercatat. Temuan kritis harus dituntaskan atau tetap berstatus belum VERIFIED; hindari klaim validasi pengguna yang tidak diuji.",
-   "status": "NOT_STARTED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "scripts/qa/ux-audit.mjs + governance/UX_AUDIT_BASELINE.json (CI `ux-audit`, fail-closed tanpa baseline): overflow halaman 0, kontrol tanpa nama 0, target sentuh <44px mobile 0 (src/styles/touch-targets.css, #2568), animasi berjalan di bawah reduced-motion 0 (#2574); blok teks <24px 0 (panel Body Exposure 78px di 1440 diperbaiki dengan container query; ratchet 8 -> 0).",
+    "scripts/qa/kontras-wcag.mjs + governance/KONTRAS_BASELINE.json (#2570): kontras diukur dan tidak boleh naik dari baseline.",
+    "scripts/qa/theme-parity.mjs + governance/THEME_PARITY_BASELINE.json (#2573): paritas terang/gelap lintas halaman (teks sama 0 beda, tanpa layar kosong/overflow)."
+   ],
    "owner": "Vika (design authority) / Sonnet (frontend) / Sol (gate dan performance)",
-   "note": "Kriteria baru ke-45 disetujui oleh pemilik 2026-10-14. C7, D10, dan E5 membuktikan responsivitas terbatas; tidak mencakup audit atau polishing menyeluruh. Jangan mengklaim sudah teruji secara eksternal."
+   "note": "REPORTED, bukan VERIFIED. Temuan kritis BELUM tuntas: ±83–100 kegagalan kontras WCAG AA masih ada (baseline 100 dengan alasan tercatat — hijau merek #00BF63 pada latar terang 2,4:1, avatar gelap 1,8:1, label abu kecil); audit axe penuh, pemeriksaan keyboard/fokus manual, regresi screenshot lintas viewport, dan pengukuran performa bermetodologi BELUM ada. Tanpa klaim validasi pengguna."
   }
  ]
 }

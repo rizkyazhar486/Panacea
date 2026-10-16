@@ -28,7 +28,7 @@ try {
   assert.equal((await call('PUT', '/api/lab-log', patient.token, { log: {}, diperbaruiPada: '2000-01-01T00:00:00.000Z' })).status, 409)
   assert.equal((await entries()).filter(e => e.action === 'lab.log.updated').length, 1, 'rejected stale write is not recorded as an update')
   const share = (await call('POST', '/api/lab-log/shares', patient.token, { dokterEmail: doctor.user.email, hari: 7 })).body
-  const plan = await call('POST', `/api/clinician/lab-shares/${share.id}/care-plan`, doctor.token, { diagnosisRefs: [{ system: 'local', code: 'SYN', display: 'Synthetic fixture', verificationStatus: 'provisional' }], questions: [{ id: 'q', kind: 'boolean', prompt: 'Synthetic?' }] })
+  const plan = await call('POST', `/api/clinician/lab-shares/${share.id}/care-plan`, doctor.token, { signIntent: true, diagnosisRefs: [{ system: 'local', code: 'SYN', display: 'Synthetic fixture', verificationStatus: 'provisional' }], questions: [{ id: 'q', kind: 'boolean', prompt: 'Synthetic?' }] })
   assert.equal(plan.status, 200)
   const report = { planId: plan.body.id, scheduledFor: stamp.slice(0, 10), clientId: 'audit-report', answers: [{ questionId: 'q', value: true }], ...forged }
   assert.equal((await call('POST', '/api/care/reports', bob.token, report)).status, 404)

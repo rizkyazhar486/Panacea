@@ -77,3 +77,5 @@ await import('./clinicalSigningIntegrity.uji.js')
 await import('./tandaTanganDitolak.uji.js')
 
 await import('./examinationWriteHttp.uji.js')
+
+await import('./clinical/carePlanApproval.uji.js')

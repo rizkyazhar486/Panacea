@@ -40,6 +40,9 @@ const medir = () => {
     daftarTargetKecil: kecil.map((e) => { const r = e.getBoundingClientRect(); return `${sel(e)} ${Math.round(r.width)}x${Math.round(r.height)}` }),
     tanpaNama: tanpaNama.length, contohTanpaNama: tanpaNama.slice(0, 5).map(sel),
     gambarTanpaAlt: [...document.querySelectorAll('img')].filter((i) => vis(i) && !i.hasAttribute('alt')).length,
+    // reduced-motion: konteks audit memakai reducedMotion:'reduce'; animasi CSS yang tetap berjalan terus-menerus (iterasi tak hingga) atau
+    // masih >2 dtk sisa waktunya adalah pelanggaran preferensi. Transisi singkat yang kebetulan berjalan saat cuplik tidak dihitung.
+    animasiBerjalanReduced: document.getAnimations().filter((a) => { if (a.playState !== 'running') return false; const t = a.effect?.getComputedTiming?.(); return t && (t.iterations === Infinity || (t.endTime - (a.currentTime ?? 0)) > 2000) }).length,
     mainLandmark: !!document.querySelector('main,[role=main]'),
     h1: document.querySelectorAll('h1').length,
   }
@@ -71,7 +74,7 @@ try {
 
 const jumlah = (k) => hasil.reduce((a, r) => a + (r[k] || 0), 0)
 const ringkas = { dihasilkan: new Date().toISOString(), metode: 'DOM terukur via Playwright Chromium; bukan axe; kontras WCAG dan pemeriksaan manual BELUM tercakup', halaman: PAGES, viewport: VIEWPORTS.map((v) => v.name), tema: THEMES,
-  total: { pengukuran: hasil.length, overflowHalaman: hasil.filter((r) => r.overflowPx > 1).length, targetKecil: jumlah('targetKecil'), targetKecilMobile: hasil.filter((r) => r.viewport.startsWith('mobile')).reduce((a, r) => a + r.targetKecil, 0), blokTeksBawah24: jumlah('blokTeksBawah24'), inlineDikecualikan: jumlah('inlineDikecualikan'), tanpaNama: jumlah('tanpaNama'), gambarTanpaAlt: jumlah('gambarTanpaAlt'), tanpaFokusTerlihat: hasil.filter((r) => !r.fokusTab.ada || !r.fokusTab.indikator).length, tanpaMain: hasil.filter((r) => !r.mainLandmark).length, galatHalaman: jumlah('galatHalaman'),
+  total: { pengukuran: hasil.length, overflowHalaman: hasil.filter((r) => r.overflowPx > 1).length, targetKecil: jumlah('targetKecil'), targetKecilMobile: hasil.filter((r) => r.viewport.startsWith('mobile')).reduce((a, r) => a + r.targetKecil, 0), blokTeksBawah24: jumlah('blokTeksBawah24'), inlineDikecualikan: jumlah('inlineDikecualikan'), tanpaNama: jumlah('tanpaNama'), gambarTanpaAlt: jumlah('gambarTanpaAlt'), tanpaFokusTerlihat: hasil.filter((r) => !r.fokusTab.ada || !r.fokusTab.indikator).length, tanpaMain: hasil.filter((r) => !r.mainLandmark).length, animasiBerjalanReduced: jumlah('animasiBerjalanReduced'), galatHalaman: jumlah('galatHalaman'),
     muatMsP50: [...hasil.map((r) => r.muatMs)].sort((a, b) => a - b)[Math.floor(hasil.length / 2)], muatMsMaks: Math.max(...hasil.map((r) => r.muatMs)) }, hasil }
 // histogram pelanggar per selektor (mobile-390 saja: target sentuh nyata) agar perbaikan menyasar primitif, bukan instans
 const histo = {}
@@ -87,5 +90,6 @@ if (ringkas.total.overflowHalaman > (dasar?.overflowHalaman ?? 0)) gagal.push(`o
 if (ringkas.total.tanpaNama > (dasar?.tanpaNama ?? Infinity)) gagal.push(`kontrol tanpa nama melampaui baseline: ${ringkas.total.tanpaNama}`)
 // Target sentuh relevan di viewport sentuh (mobile); desktop 1440 dilaporkan sebagai informasi, tidak digerbang.
 if (ringkas.total.targetKecilMobile > (dasar?.targetKecilMobile ?? Infinity)) gagal.push(`target sentuh <${MIN_TARGET}px (mobile) melampaui baseline: ${ringkas.total.targetKecilMobile}`)
+if (ringkas.total.animasiBerjalanReduced > (dasar?.animasiBerjalanReduced ?? Infinity)) gagal.push(`animasi tetap berjalan saat prefers-reduced-motion: ${ringkas.total.animasiBerjalanReduced}`)
 if (ringkas.total.blokTeksBawah24 > (dasar?.blokTeksBawah24 ?? Infinity)) gagal.push(`blok teks interaktif <24px melampaui baseline: ${ringkas.total.blokTeksBawah24}`)
 if (gagal.length) { console.error('ux-audit GAGAL: ' + gagal.join('; ')); process.exit(1) }
