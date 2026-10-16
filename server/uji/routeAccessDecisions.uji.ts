@@ -158,6 +158,7 @@ const SESSION: readonly string[] = [
 
 const CLINICIAN: readonly string[] = [
   'GET /api/clinical/patient/:patientId/link-status',
+  'GET /api/clinician/follow-ups',
   'GET /api/clinician/lab-shares',
   'GET /api/clinician/lab-shares/:id/care',
   'GET /api/clinician/lab-shares/:id/care/fhir',
@@ -165,6 +166,7 @@ const CLINICIAN: readonly string[] = [
   'GET /api/validation/:id/cases',
   'GET /api/validation/:id/disagreements',
   'GET /api/validation/studies',
+  'POST /api/clinician/care-plans/:planId/follow-ups',
   'POST /api/clinician/lab-shares/:id/care-plan',
   'POST /api/clinician/lab-shares/:id/review',
   'POST /api/satusehat/encounter',
