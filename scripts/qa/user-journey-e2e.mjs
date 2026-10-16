@@ -29,6 +29,12 @@ const call = async (m, p, token, body) => {
 const devLogin = async (email, role) => (await call('POST', '/api/auth/dev-login', null, { email, role, name: email })).json
 const results = []
 const temuan = []
+// Pembatas laju global produk = 300 permintaan/menit (server/src/index.ts). Batas itu TIDAK dilonggarkan untuk uji; journey yang padat memicunya,
+// sehingga journey berikutnya menunggu jendela satu menit lewat (terbukti: GET /api/doctors -> 429 tanpa jeda).
+// Hanya permintaan KE server API. Pola glob '**/api/**' juga mencegat modul dev di direktori /api/ (mis. src/.../api/...), sehingga chunk halaman
+// dijawab JSON 500 dan Suspense macet 'Loading page' — artefak uji, terbukti lewat jejak diagnostik, bukan cacat produk.
+const apiUrl = (u) => u.origin === new URL(API).origin && u.pathname.startsWith('/api/')
+const tungguJendelaLaju = () => new Promise((r) => setTimeout(r, 61000))
 const record = (viewport, journey, step, ok, detail) => results.push({ viewport, journey, step, ok, ...(detail ? { detail } : {}) })
 
 // Setiap tabrakan asersi dicatat lalu dilempar ulang: satu langkah gagal = skrip gagal (tidak ada pelonggaran).
@@ -194,6 +200,7 @@ try {
 
     // ===== Perjalanan 4: pemilik/admin — verifikasi dokter lewat UI nyata, RBAC peran lain, eskalasi peran ditolak =====
     {
+      await tungguJendelaLaju()
       const { ctx, page, errors } = await newPage(); const J = 'pemilik'
       const email = `dokter-ui-${vp.name}@example.com`
       const calon = await devLogin(email, 'dokter')
@@ -212,13 +219,13 @@ try {
         const baris = page.locator('div.border-amber-200', { hasText: email }).first()
         await baris.getByRole('button', { name: /Verify/ }).click()
         await page.getByText(email).first().waitFor({ timeout: 30000 })
-        let status = ''
+        let status = ''; let http = 0
         for (let i = 0; i < 20 && status !== 'verified'; i++) {
-          const r = await call('GET', '/api/doctors', owner.token)
+          const r = await call('GET', '/api/doctors', owner.token); http = r.status
           status = (r.json?.doctors ?? r.json ?? []).find?.((d) => d.email === email)?.strStatus ?? ''
           if (status !== 'verified') await new Promise((r) => setTimeout(r, 500))
         }
-        assert.equal(status, 'verified', 'UI harus benar-benar memanggil API verifikasi')
+        assert.equal(status, 'verified', `UI harus benar-benar memanggil API verifikasi (GET /api/doctors terakhir HTTP ${http})`)
         if (vp === VIEWPORTS[0]) { // satu kali: batas laju /api/auth (30/15 mnt) tidak dilonggarkan untuk uji
           const aktif = await devLogin(email, 'dokter')
           assert.equal((await call('GET', '/api/clinician/lab-shares', aktif.token)).status, 200, 'setelah verifikasi dokter efektif sebagai klinisi')
@@ -232,12 +239,71 @@ try {
     // ===== Perjalanan 3: API tak tersedia — state galat tidak crash =====
     {
       const { ctx, page, errors } = await newPage(); const J = 'api-tak-tersedia'
-      await page.route('**/api/**', (r) => r.abort('connectionrefused'))
+      await page.route(apiUrl, (r) => r.abort('connectionrefused'))
       await step(vp.name, J, 'landing tetap tampil saat semua panggilan API gagal', async () => {
         await page.goto(APP + '#/', { waitUntil: 'domcontentloaded', timeout: 120000 })
         await masuk(page).waitFor({ timeout: 60000 })
       })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
+      await ctx.close()
+    }
+
+    // ===== Perjalanan 5: loading lambat, galat server (5xx), pemulihan, dan navigasi tidak buntu — sesi pasien nyata =====
+    {
+      const { ctx, page, errors } = await newPage(); const J = 'ketahanan'
+      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [
+        JSON.stringify({ loginAt: Date.now(), account: { email: 'pasien-f1@example.com', name: 'Pasien F1', role: 'pasien', isOwner: false, isSubscriber: false, loggedAt: new Date().toISOString() } }),
+        pasienApi.token, SESSION_KEY, TOKEN_KEY])
+      const RUTE = ['#/harian', '#/health-data', '#/clinical-hub']
+      const jejak = [] // diagnostik kegagalan: permintaan gagal dan respons >=400 di luar /api (mis. chunk yang tak termuat)
+      page.on('requestfailed', (r) => jejak.push(`GAGAL ${r.url().slice(-70)} ${r.failure()?.errorText ?? ''}`))
+      page.on('response', (r) => { if (r.status() >= 400 && !r.url().includes('/api/')) jejak.push(`HTTP ${r.status()} ${r.url().slice(-70)}`) })
+      const teksBadan = (pg) => pg.evaluate(() => document.body.innerText)
+      const bocor = (t) => ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read'].filter((x) => t.includes(x))
+      const cangkang = async (pg) => { await pg.getByRole('button', { name: 'Notifications' }).first().waitFor({ timeout: 60000 }) }
+      // (a) loading lambat: semua panggilan API tertunda 1,5 dtk; cangkang harus tetap tampil, tanpa overflow, tanpa teks bocor
+      await step(vp.name, J, 'API lambat (1,5 dtk): cangkang dan halaman tetap tampil tanpa overflow atau teks bocor', async () => {
+        await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, 1500)); await r.continue().catch(() => {}) }) // navigasi bisa menutup rute lebih dulu: abaikan, bukan crash
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 })
+          await cangkang(page)
+          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat loading`)
+          const b = bocor(await teksBadan(page)); assert.deepEqual(b, [], `${rute} teks bocor saat loading: ${b}`)
+        }
+        await page.unroute(apiUrl)
+      })
+      // (b) galat server: semua panggilan API 500; kontrol positif = tanpa galat sama sekali sudah dicek di perjalanan lain
+      await step(vp.name, J, 'API 500: halaman tidak crash, tidak kosong, tanpa teks bocor, tanpa overflow', async () => {
+        await page.route(apiUrl, (r) => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'boom' }) }))
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 })
+          await cangkang(page)
+          // halaman rute dimuat malas (lazy): tunggu sampai terisi, tetapi gagal bila tak pernah terisi dalam 60 dtk (kompilasi chunk dev server bisa >20 dtk) (bukan sekadar belum dimuat)
+          await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 60000 }).catch(() => {})
+          const t = await teksBadan(page)
+          assert.ok(t.trim().length > 200, `${rute} tetap nyaris kosong 60 dtk setelah cangkang saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))}; jejak=${JSON.stringify(jejak.slice(-4))})`)
+          const b = bocor(t); assert.deepEqual(b, [], `${rute} teks bocor saat API 500: ${b}`)
+          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat API 500`)
+        }
+      })
+      // (c) navigasi tidak buntu dari keadaan galat: tombol Kembali riwayat dan logo/Home membawa pulang
+      await step(vp.name, J, 'tidak buntu saat galat: riwayat Kembali dan tautan Home berfungsi', async () => {
+        await page.goto(APP + '#/', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.goto(APP + '#/health-data', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.goBack({ waitUntil: 'domcontentloaded' }); await page.waitForTimeout(1500)
+        assert.ok(/#\/?$/.test(page.url()), `Kembali tidak pulang ke Home: ${page.url()}`)
+        await page.goto(APP + '#/clinical-hub', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        const kembali = page.getByRole('button', { name: /back|kembali/i }).first()
+        assert.ok(await kembali.isVisible().catch(() => false), 'tidak ada kontrol Kembali yang terlihat di halaman dalam')
+      })
+      // (d) pemulihan: API kembali normal → muat ulang → halaman berfungsi (kontrol berpasangan dengan (b): hanya API yang berubah)
+      await step(vp.name, J, 'pemulihan: setelah API normal, muat ulang menampilkan halaman tanpa galat', async () => {
+        await page.unroute(apiUrl)
+        await page.goto(APP + '#/health-data', { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+        await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 60000 }).catch(() => {})
+        const t = await teksBadan(page); assert.ok(t.trim().length > 200, `pemulihan: halaman tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [])
+      })
+      await step(vp.name, J, 'tanpa galat halaman tak tertangani selama semua keadaan', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
   }
