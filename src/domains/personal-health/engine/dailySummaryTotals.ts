@@ -22,14 +22,30 @@ function completeTotal(values: readonly unknown[]): number | undefined {
   return s.missing === 0 && s.total !== null ? s.total : undefined
 }
 
-export function dailyIntakeTotals(foods: unknown, day: string): { kkal?: number; proteinG?: number } {
+export function dailyIntakeTotals(foods: unknown, day: string): { kkal?: number; proteinG?: number; carbsG?: number; fatG?: number } {
   const list = Array.isArray(foods) ? foods : []
   const kkal = completeTotal(valuesOn(list, day, 'date', 'kcal'))
   const protein = completeTotal(valuesOn(list, day, 'date', 'protein'))
+  const carbs = completeTotal(valuesOn(list, day, 'date', 'carbs'))
+  const fat = completeTotal(valuesOn(list, day, 'date', 'fat'))
   return {
     ...(kkal !== undefined ? { kkal: Math.round(kkal) } : {}),
     ...(protein !== undefined ? { proteinG: Math.round(protein) } : {}),
+    ...(carbs !== undefined ? { carbsG: Math.round(carbs) } : {}),
+    ...(fat !== undefined ? { fatG: Math.round(fat) } : {}),
   }
+}
+
+/** Total kalori per tanggal untuk hari yang SEMUA catatannya bernilai sah; hari dengan nilai hilang tidak masuk (tidak dihitung sebagai total yang lebih kecil). */
+export function completeKcalByDay(foods: unknown): Map<string, number> {
+  const tanggal = new Set<string>()
+  for (const e of Array.isArray(foods) ? foods : []) if (isRecord(e) && typeof own(e, 'date') === 'string' && own(e, 'date') !== '') tanggal.add(own(e, 'date') as string)
+  const hasil = new Map<string, number>()
+  for (const day of tanggal) {
+    const total = completeTotal(valuesOn(Array.isArray(foods) ? foods : [], day, 'date', 'kcal'))
+    if (total !== undefined) hasil.set(day, total)
+  }
+  return hasil
 }
 
 /** Menit sesi fokus pada `hari`; tidak dikirim bila ada sesi yang menitnya hilang atau totalnya bukan positif. */
