@@ -56,7 +56,7 @@ if (import.meta.url === new URL(`file://${process.argv[1]}`).href) {
   const seriusKritis = Object.entries(aturan).filter(([, a]) => DAMPAK_GERBANG.has(a.dampak))
   console.log(JSON.stringify({ pengukuran: hasil.length, aturanTotal: Object.keys(aturan).length, aturanSeriusKritis: seriusKritis.map(([id, a]) => `${id}:${a.dampak}:${a.node}`), totalNodeSeriusKritis: seriusKritis.reduce((s, [, a]) => s + a.node, 0), incompleteTotal: ringkas.incompleteTotal }))
   if (baseline || process.env.CI) {
-    const gagal = bandingkan(Object.fromEntries(Object.entries(aturan).map(([k, a]) => [k, { dampak: a.dampak, node: a.node }])), baseline)
+    const gagal = bandingkan(Object.fromEntries(Object.entries(aturan).map(([k, a]) => [k, { dampak: a.dampak, node: a.node }])), baseline, ringkas.incompleteTotal)
     if (gagal.length) { console.error('axe-audit GAGAL:\n - ' + gagal.join('\n - ')); process.exitCode = 1 }
   }
 }
