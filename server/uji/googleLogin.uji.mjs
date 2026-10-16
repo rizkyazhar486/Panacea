@@ -43,6 +43,11 @@ for (const fixture of cases) {
     roleForLogin() { return 'pasien' },
     upsertUser(email) { effects.push(['write', email]); return { id: 'u', email, role: 'pasien' } },
     async sendWelcome(email) { effects.push(['welcome', email]) },
+    // impor auth.ts yang dilepas harus tetap disediakan: jti sesi dan daftar cabut token (tidak dipakai jalur login).
+    randomUUID: () => 'test-jti',
+    createHash: () => { throw new Error('tidak boleh dipakai oleh login') },
+    cabutToken() { effects.push(['revoke']) },
+    tokenDicabut() { return false },
     jwt: { sign() { effects.push(['sign']); return 'session-token' } },
   })
   runInContext(source, context)

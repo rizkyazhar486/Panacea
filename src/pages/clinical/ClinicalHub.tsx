@@ -189,7 +189,7 @@ export function ClinicalHub() {
           <div className="border-t border-white/10 pt-4">
             <div className="flex items-center justify-between gap-3">
               <strong className="text-sm">Calculator</strong>
-              <Link to="/clinical-calculators" className="text-[10px] font-black text-white/45 hover:text-white">All calculators →</Link>
+              <Link to="/clinical-calculators" className="inline-flex min-h-[44px] items-center text-[10px] font-black text-white/45 hover:text-white">All calculators →</Link>
             </div>
 
             <div className="mt-4 flex gap-5" role="tablist" aria-label="Quick calculator">
@@ -244,7 +244,7 @@ export function ClinicalHub() {
           <div className="border-t border-white/10 pt-4">
             <div className="flex items-center justify-between gap-3">
               <strong className="text-sm">Lab range</strong>
-              <Link to="/data-lab" className="text-[10px] font-black text-white/45 hover:text-white">Data lab →</Link>
+              <Link to="/data-lab" className="inline-flex min-h-[44px] items-center text-[10px] font-black text-white/45 hover:text-white">Data lab →</Link>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-3">

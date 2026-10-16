@@ -4,16 +4,9 @@ import { IconActivity, IconFlame, IconRun } from '../../components/icons'
 import { api, backendEnabled } from '../../lib/api'
 import { readAsDataUrl, compressImage } from '../../lib/upload'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { parseButir, ringkasTes, type Butir, type Reps, type Sex } from './fitnessTestScoring'
 
-// ── Physical readiness / SIPSS scoring ─────────────────────────────────────
-// Approximate max-score targets (≈ "Excellent") for the Indonesian
-// TNI-Polri physical test. Reps within 1 minute unless noted.
-type Sex = 'L' | 'P'
-const TARGET: Record<Sex, { pushup: number; situp: number; pullup: number; cooper: number }> = {
-  L: { pushup: 43, situp: 41, pullup: 18, cooper: 2800 }, // pull-up reps, cooper metres / 12 min
-  P: { pushup: 30, situp: 30, pullup: 90, cooper: 2300 }, // women: "pull-up" = chinning hang (seconds)
-}
-const score = (v: number, target: number) => Math.max(0, Math.min(100, Math.round((v / target) * 100)))
+// ── Physical readiness / SIPSS scoring: lihat ./fitnessTestScoring (butir yang belum diisi bukan nol repetisi). ──
 
 interface FormResult { formScore: number; summary: string; goodPoints: string[]; corrections: string[]; injuryRisk: string }
 
@@ -35,17 +28,16 @@ const PROGRAMS = [
 
 export function FitnessTest() {
   const [sex, setSex] = useState<Sex>('L')
-  const [reps, setReps] = useState({ pushup: 0, situp: 0, pullup: 0, cooper: 0 })
-  const t = TARGET[sex]
+  const [reps, setReps] = useState<Reps>({})
   const items = [
     { k: 'pushup' as const, label: 'Push-up (1 min)', unit: 'x' },
     { k: 'situp' as const, label: 'Sit-up (1 min)', unit: 'x' },
     { k: 'pullup' as const, label: sex === 'L' ? 'Pull-up' : 'Chinning (sec)', unit: sex === 'L' ? 'x' : 's' },
     { k: 'cooper' as const, label: '12-min Run (Cooper)', unit: 'm' },
   ]
-  const scores = items.map((it) => ({ ...it, nilai: score(reps[it.k], t[it.k]) }))
-  const total = Math.round(scores.reduce((s, x) => s + x.nilai, 0) / scores.length)
-  const lulus = total >= 60 && scores.every((s) => s.nilai >= 41)
+  const ringkas = ringkasTes(reps, sex)
+  const scores = items.map((it) => ({ ...it, nilai: ringkas.skor.find((x) => x.k === it.k)?.nilai ?? null }))
+  const { total, lulus } = ringkas
 
   // ── AI form analysis ──
   const [exercise, setExercise] = useState(EXERCISES[0])
@@ -101,7 +93,7 @@ export function FitnessTest() {
         <div className="grid grid-cols-2 gap-3">
           {items.map((it) => (
             <Field key={it.k} label={`${it.label} (${it.unit})`}>
-              <input type="number" value={reps[it.k] || ''} onChange={(e) => setReps({ ...reps, [it.k]: +e.target.value || 0 })} className={inputClass} />
+              <input type="number" min={0} value={reps[it.k] ?? ''} onChange={(e) => setReps({ ...reps, [it.k]: parseButir(e.target.value, it.k as Butir) })} className={inputClass} />
             </Field>
           ))}
         </div>
@@ -110,21 +102,23 @@ export function FitnessTest() {
             <div key={s.k} className="flex items-center gap-2 text-xs">
               <span className="w-36 shrink-0 text-neutral-500">{s.label}</span>
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-100">
-                <div className="h-full rounded-full" style={{ width: `${s.nilai}%`, background: s.nilai >= 60 ? '#00BF63' : '#f59e0b' }} />
+                <div className="h-full rounded-full" style={{ width: `${s.nilai ?? 0}%`, background: (s.nilai ?? 0) >= 60 ? '#00BF63' : '#f59e0b' }} />
               </div>
-              <span className="w-8 text-right font-bold text-ink">{s.nilai}</span>
+              <span className="w-8 text-right font-bold text-ink">{s.nilai ?? '—'}</span>
             </div>
           ))}
         </div>
         {/* Latarnya dulu heks sebaris, satu nilai untuk dua tema, sehingga
             keterangan abu di atasnya terbaca 2,15:1 di mode gelap. Gaya
             sebaris tidak bisa dijangkau tema; dipindahkan ke kelas. */}
-        <div className={`panel-hasil ${lulus ? 'panel-hasil--lulus' : 'panel-hasil--kurang'} mt-4 flex items-center justify-between rounded-xl p-3`}>
+        <div className={`panel-hasil ${lulus === null ? '' : lulus ? 'panel-hasil--lulus' : 'panel-hasil--kurang'} mt-4 flex items-center justify-between rounded-xl p-3`} data-total-ready={total === null ? 'false' : 'true'}>
           <div>
             <div className="text-[11px] text-neutral-500">Total Score</div>
-            <div className="angka-hasil text-2xl font-black">{total}<span className="text-sm">/100</span></div>
+            <div className="angka-hasil text-2xl font-black">{total === null ? '—' : total}{total !== null && <span className="text-sm">/100</span>}</div>
           </div>
-          <Badge tone={lulus ? 'normal' : 'high'}>{lulus ? '✓ Meets Requirements' : 'Needs Improvement'}</Badge>
+          {lulus === null
+            ? <span className="text-[11px] text-neutral-500" role="status">Enter all four results to see your total</span>
+            : <Badge tone={lulus ? 'normal' : 'high'}>{lulus ? '✓ Meets Requirements' : 'Needs Improvement'}</Badge>}
         </div>
         <p className="mt-2 text-[10px] text-neutral-500">Equivalency estimate; official thresholds & tables may vary by agency/age. The 12-minute run can be measured automatically via GPS Tracker.</p>
       </Card>

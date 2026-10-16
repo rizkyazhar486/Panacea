@@ -292,7 +292,7 @@ function FlowRail({ nodes }: { nodes: FlowNode[] }) {
 function NumberField({ label, value, onChange, unit, min = 0, max = 1000, step = 1 }: { label: string; value: number; onChange: (n: number) => void; unit: string; min?: number; max?: number; step?: number }) {
   return (
     <label className="rounded-2xl border border-neutral-200 bg-white/70 p-3 dark:border-white/10 dark:bg-white/[.035]">
-      <span className="block text-[8px] font-black uppercase tracking-[.12em] text-neutral-400">{label}</span>
+      <span className="block text-[8px] font-black uppercase tracking-[.12em] text-neutral-600 dark:text-neutral-400">{label}</span>
       <div className="mt-1 flex items-center gap-2">
         <input type="number" value={value} min={min} max={max} step={step} onChange={(e) => onChange(Number(e.target.value))} className="min-w-0 flex-1 bg-transparent text-lg font-black tabular-nums text-neutral-950 outline-none dark:text-white" />
         <span className="text-[9px] font-bold text-neutral-400">{unit}</span>

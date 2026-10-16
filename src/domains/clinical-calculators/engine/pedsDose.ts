@@ -22,5 +22,8 @@ export function pedsDose(weightKg: number, doseMgPerKgPerDay: number, frequencyP
   if (!isFiniteNumber(concentrationMgPerMl) || concentrationMgPerMl <= 0) return { ok: false, reason: 'Concentration must be a number above 0 mg/mL' }
   const totalDailyMg = weightKg * doseMgPerKgPerDay
   const perDoseMg = totalDailyMg / frequencyPerDay
-  return { ok: true, data: { totalDailyMg, perDoseMg, perDoseMl: perDoseMg / concentrationMgPerMl } }
+  const perDoseMl = perDoseMg / concentrationMgPerMl
+  // Masukan yang hanya "hingga dan > 0" dapat meluap (dosis 1e308, konsentrasi 1e-320): hasil yang tidak hingga bukan hasil. Tidak ada dosis maksimum di sini (milik formularium).
+  if (![totalDailyMg, perDoseMg, perDoseMl].every(Number.isFinite)) return { ok: false, reason: 'Result is not a finite number — check the dose and concentration' }
+  return { ok: true, data: { totalDailyMg, perDoseMg, perDoseMl } }
 }

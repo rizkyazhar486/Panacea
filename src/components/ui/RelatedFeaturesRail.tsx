@@ -53,7 +53,7 @@ export function RelatedFeaturesRail() {
           <h2 className="mt-1 text-xl font-black tracking-[-.025em] text-ink dark:text-white">Keep exploring</h2>
           <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Useful tools related to the page you are using now.</p>
         </div>
-        <Link to="/semua-fitur" className="shrink-0 rounded-full border border-black/[.06] bg-white/70 px-3 py-2 text-[10px] font-black text-brand-dark shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[.05] dark:text-emerald-300">
+        <Link to="/semua-fitur" className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-black/[.06] bg-white/70 px-3 py-2 text-[10px] font-black text-brand-dark shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[.05] dark:text-emerald-300">
           All features →
         </Link>
       </div>

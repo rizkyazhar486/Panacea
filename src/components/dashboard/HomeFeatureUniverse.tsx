@@ -147,7 +147,7 @@ export function HomeFeatureUniverse() {
             <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">Your whole Panacea, from Home</h2>
             <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">Every catalog feature has a compact Home widget. Pin up to 12 without turning the dashboard into a wall of cards.</p>
           </div>
-          <Link to="/semua-fitur" className="shrink-0 rounded-full bg-neutral-950 px-3 py-2 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950">Browse all</Link>
+          <Link to="/semua-fitur" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-neutral-950 px-3 py-2 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950">Browse all</Link>
         </div>
 
         {pinned.length > 0 && (

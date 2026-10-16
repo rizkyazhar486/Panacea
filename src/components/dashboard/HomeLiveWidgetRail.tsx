@@ -92,7 +92,7 @@ export function HomeLiveWidgetRail() {
             Swipe your health signals
           </h3>
         </div>
-        <Link to="/health-data" className="shrink-0 text-[10px] font-black text-[#00BF63]">Data ↗</Link>
+        <Link to="/health-data" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-[10px] font-black text-[#00BF63]">Data ↗</Link>
       </div>
 
       <div className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-1 pb-2" aria-label="Scrollable live health widgets">

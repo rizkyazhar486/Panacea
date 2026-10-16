@@ -4,6 +4,7 @@ import { useStore } from '../../lib/store'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { getVitals } from '../../lib/healthVitals'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
+import { completeKcalByDay, dailyIntakeTotals } from '../../domains/personal-health/engine/dailySummaryTotals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dua widget lebar yang menggambarkan hari: tidur dan asupan.
@@ -123,26 +124,18 @@ export function UbinTidurLebar() {
 export function UbinGiziLebar() {
   const { state } = useStore()
 
+  // Nilai yang hilang bukan nol: total hari ini hanya ada bila SEMUA catatannya bernilai sah (lihat dailySummaryTotals).
   const { kkal, karbo, protein, lemak, biasa, adaHariIni } = useMemo(() => {
     const hariIni = kunciHari(Date.now())
-    let kkal = 0, karbo = 0, protein = 0, lemak = 0
-    const perHari = new Map<string, number>()
-    for (const f of state.foods ?? []) {
-      if (!f?.date) continue
-      perHari.set(f.date, (perHari.get(f.date) ?? 0) + (f.kcal ?? 0))
-      if (f.date === hariIni) {
-        kkal += f.kcal ?? 0
-        karbo += f.carbs ?? 0
-        protein += f.protein ?? 0
-        lemak += f.fat ?? 0
-      }
-    }
+    const total = dailyIntakeTotals(state.foods, hariIni)
+    const perHari = completeKcalByDay(state.foods)
     const tujuh: number[] = []
     for (let i = 1; i <= 7; i++) {
       const v = perHari.get(kunciHari(Date.now() - i * HARI))
       if (v && v > 0) tujuh.push(v)
     }
-    return { kkal, karbo, protein, lemak, biasa: median(tujuh), adaHariIni: perHari.has(hariIni) }
+    const adaHariIni = (Array.isArray(state.foods) ? state.foods : []).some((f) => f?.date === hariIni)
+    return { kkal: total.kkal, karbo: total.carbsG, protein: total.proteinG, lemak: total.fatG, biasa: median(tujuh), adaHariIni }
   }, [state.foods])
 
   if (!(state.foods ?? []).length) return null
@@ -152,8 +145,9 @@ export function UbinGiziLebar() {
   // (faktor Atwater). Dipakai untuk PERBANDINGAN antar-makro, bukan untuk
   // mengoreksi kalori yang tercatat — keduanya bisa berbeda karena serat dan
   // alkohol, dan menimpa angka yang tercatat berarti menyembunyikan selisih.
-  const eK = karbo * 4, eP = protein * 4, eL = lemak * 9
-  const eTotal = eK + eP + eL
+  const makroLengkap = karbo !== undefined && protein !== undefined && lemak !== undefined
+  const eK = (karbo ?? 0) * 4, eP = (protein ?? 0) * 4, eL = (lemak ?? 0) * 9
+  const eTotal = makroLengkap ? eK + eP + eL : 0
 
   return (
     <section>
@@ -167,9 +161,10 @@ export function UbinGiziLebar() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
-            {adaHariIni ? Math.round(kkal).toLocaleString('en-GB') : '—'}
+            {adaHariIni && kkal !== undefined ? Math.round(kkal).toLocaleString('en-GB') : '—'}
           </span>
           <span className="t-mikro font-bold text-neutral-400">kkal</span>
+          {adaHariIni && kkal === undefined && <span className="t-mikro font-bold text-amber-600" data-intake-incomplete="true">some entries have no calories</span>}
           {biasa > 0 && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
               usually {Math.round(biasa).toLocaleString('en-GB')}
@@ -182,7 +177,7 @@ export function UbinGiziLebar() {
             memaksa mata memeriksa keduanya untuk satu pertanyaan. Sasarannya
             tetap sama: pita 1,2-2,0 g/kg dengan garis 1,6 g/kg — bentuk
             buktinya memang rentang, bukan satu angka. */}
-        {berat > 0 && protein > 0 && (
+        {berat > 0 && protein !== undefined && protein > 0 && (
           <div className="mt-2">
             <div className="flex items-baseline justify-between gap-2">
               <span className="t-mikro text-neutral-500">Protein <b className="text-ink dark:text-white">{Math.round(protein)} g</b></span>
@@ -211,9 +206,9 @@ export function UbinGiziLebar() {
             </span>
             <div className="mt-1.5 flex items-baseline justify-between gap-2">
               {[
-                { l: 'Carbs', g: karbo, n: 'bg-amber-400' },
-                { l: 'Protein', g: protein, n: 'bg-brand' },
-                { l: 'Fat', g: lemak, n: 'bg-rose-400' },
+                { l: 'Carbs', g: karbo ?? 0, n: 'bg-amber-400' },
+                { l: 'Protein', g: protein ?? 0, n: 'bg-brand' },
+                { l: 'Fat', g: lemak ?? 0, n: 'bg-rose-400' },
               ].map((x) => (
                 <span key={x.l} className="flex min-w-0 items-center gap-1.5">
                   <span className={`h-2 w-2 shrink-0 rounded-full ${x.n}`} />
@@ -224,7 +219,7 @@ export function UbinGiziLebar() {
             </div>
           </>
         ) : (
-          <p className="t-kecil mt-2 text-neutral-500">Nothing logged today.</p>
+          <p className="t-kecil mt-2 text-neutral-500" data-intake-incomplete={adaHariIni ? 'true' : undefined}>{adaHariIni ? 'Some entries today are missing nutrients, so no macro split is shown.' : 'Nothing logged today.'}</p>
         )}
       </div>
     </section>

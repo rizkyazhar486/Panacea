@@ -141,7 +141,7 @@ import {
   modePenyimpanan,
   modeIrisan,
 } from './store.js'
-import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
+import { googleLogin, devLogin, currentUser, clearSession, revokeSessionToken, requireAuth } from './auth.js'
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './domains/identity/otp.js'
 import { putusanPengingat } from './domains/lifestyle/jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
@@ -499,7 +499,8 @@ app.get('/api/auth/me', (req, res) => {
   if (!u) return res.status(401).json({ error: 'unauthorized' })
   res.json({ user: u })
 })
-app.post('/api/auth/logout', (_req, res) => {
+app.post('/api/auth/logout', (req, res) => {
+  revokeSessionToken(req)
   clearSession(res)
   res.json({ ok: true })
 })

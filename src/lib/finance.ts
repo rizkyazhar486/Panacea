@@ -107,6 +107,26 @@ export function summarise(txs: Tx[]): CashflowSummary {
   }
 }
 
+// ── Masukan teks uang/persen: kosong BUKAN nol ─────────────────────────────────
+
+/** Jumlah rupiah dari teks (hanya digit dihitung). Kosong, tanpa digit, atau tidak aman → `null` ("belum diisi"); "0" yang diketik tetap 0. */
+export function parseMoney(text: unknown): number | null {
+  if (typeof text !== 'string') return null
+  const digits = text.replace(/[^\d]/g, '')
+  if (digits === '') return null
+  const v = Number(digits)
+  return Number.isSafeInteger(v) ? v : null
+}
+
+export const RATE_PCT_MAX = 1000
+
+/** Bunga per tahun (%) dari teks, koma desimal diterima. Kosong, bukan angka, negatif, atau di atas batas kewajaran → `null`; "0" yang diketik tetap 0. */
+export function parseRatePct(text: unknown): number | null {
+  if (typeof text !== 'string' || text.trim() === '') return null
+  const v = Number(text.trim().replace(',', '.'))
+  return Number.isFinite(v) && v >= 0 && v <= RATE_PCT_MAX ? v : null
+}
+
 // ── Emergency fund ───────────────────────────────────────────────────────────
 
 /**

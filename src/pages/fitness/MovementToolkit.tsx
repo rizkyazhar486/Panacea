@@ -45,7 +45,11 @@ const BALANCE_KEY = 'pmd_balance_test_v1'
 function BalanceTest() {
   const [seconds, setSeconds] = useState(0)
   const [running, setRunning] = useState(false)
-  const [best, setBest] = useState(() => Number(localStorage.getItem(BALANCE_KEY) || 0))
+  // Rekor yang belum pernah tercatat adalah "tidak diketahui" (null), bukan 0 detik: 0 detik akan tampil di samping ambang klinis.
+  const [best, setBest] = useState<number | null>(() => {
+    const v = Number(localStorage.getItem(BALANCE_KEY))
+    return Number.isFinite(v) && v > 0 ? v : null
+  })
   useEffect(() => {
     if (!running) return
     const t = setInterval(() => setSeconds((s) => s + 1), 1000)
@@ -53,7 +57,7 @@ function BalanceTest() {
   }, [running])
   const stop = () => {
     setRunning(false)
-    if (seconds > best) { setBest(seconds); try { localStorage.setItem(BALANCE_KEY, String(seconds)) } catch { /* ignore */ } }
+    if (seconds > 0 && (best === null || seconds > best)) { setBest(seconds); try { localStorage.setItem(BALANCE_KEY, String(seconds)) } catch { /* ignore */ } }
   }
   return (
     <Card className="!p-6 text-center">
@@ -63,7 +67,7 @@ function BalanceTest() {
         <button onClick={() => (running ? stop() : setRunning(true))} className={`flex-1 rounded-xl py-2.5 text-sm font-bold ${running ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300' : 'bg-brand text-white'}`}>{running ? 'Stop' : 'Start'}</button>
         <button onClick={() => { setSeconds(0); setRunning(false) }} className="rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-bold text-neutral-500 dark:bg-white/10">Reset</button>
       </div>
-      <p className="mt-3 text-[12px] text-neutral-500">Best: {best}s · under ~10s at midlife is worth mentioning to a clinician</p>
+      <p className="mt-3 text-[12px] text-neutral-500">Best: {best === null ? '—' : `${best}s`} · under ~10s at midlife is worth mentioning to a clinician</p>
     </Card>
   )
 }

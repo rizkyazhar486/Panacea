@@ -528,6 +528,7 @@ export function Chatbot() {
             <button
               onClick={send}
               disabled={busy || !input.trim()}
+              aria-label="Send message"
               className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white transition hover:brightness-110 disabled:opacity-30 disabled:hover:brightness-100"
             >
               <IconSend size={16} />

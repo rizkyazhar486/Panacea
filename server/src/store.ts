@@ -140,6 +140,8 @@ interface DB {
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
   /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
   validasiLedger?: import('./domains/clinical-records/validasiLedger.js').CatatanLedger[]
+  /** Token sesi yang dicabut saat logout: sha256(token) -> ISO kedaluwarsa token (dipangkas setelah lewat). */
+  tokenDicabut?: Record<string, string>
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
@@ -372,6 +374,15 @@ function save() {
   simpanTertunda = true
   queueMicrotask(flushSimpan)
 }
+/** Cabut token sesi (logout). Hanya hash yang disimpan; entri dipangkas setelah token kedaluwarsa dengan sendirinya. */
+export function cabutToken(hash: string, kedaluwarsaIso: string, sekarang: Date) {
+  const d = (db.tokenDicabut ??= {})
+  for (const [h, exp] of Object.entries(d)) if (Date.parse(exp) <= sekarang.getTime()) delete d[h]
+  d[hash] = kedaluwarsaIso
+  save()
+}
+export function tokenDicabut(hash: string): boolean { return !!db.tokenDicabut?.[hash] }
+
 /** Tulis sekarang bila ada perubahan tertunda (dipakai saat shutdown dan oleh uji). */
 export function flushSimpan() {
   if (!simpanTertunda) return

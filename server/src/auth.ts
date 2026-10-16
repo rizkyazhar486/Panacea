@@ -1,9 +1,10 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { IncomingMessage } from 'node:http'
 import jwt from 'jsonwebtoken'
+import { createHash, randomUUID } from 'node:crypto'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
-import { upsertUser, getUser, getUserByEmail, getSettings, type Role, type User } from './store.js'
+import { cabutToken, tokenDicabut, upsertUser, getUser, getUserByEmail, getSettings, type Role, type User } from './store.js'
 import { sendWelcome } from './domains/identity/email.js'
 import { effectiveRoleForRequest, roleForLogin } from './domains/identity/accessControl.js'
 
@@ -17,7 +18,7 @@ const SESSION_COOKIE_ATTRIBUTES = {
 } as const
 
 function issueToken(userId: string): string {
-  return jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d' })
+  return jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d', jwtid: randomUUID() }) // jti: tiap sesi unik, agar dapat dicabut satu per satu
 }
 
 export function setSession(res: Response, userId: string): string {
@@ -33,8 +34,23 @@ export function clearSession(res: Response) {
   res.clearCookie(COOKIE, SESSION_COOKIE_ATTRIBUTES)
 }
 
+const hashToken = (t: string) => createHash('sha256').update(t).digest('hex')
+
+/** Logout sungguhan: token (bearer atau cookie) dicabut di server, bukan hanya cookie dihapus di klien. */
+export function revokeSessionToken(req: Request, sekarang = new Date()): boolean {
+  const auth = req.headers.authorization
+  const token = (auth?.startsWith('Bearer ') ? auth.slice(7) : undefined) || req.cookies?.[COOKIE]
+  if (!token) return false
+  try {
+    const { exp } = jwt.verify(token, config.jwtSecret) as { exp: number }
+    cabutToken(hashToken(token), new Date(exp * 1000).toISOString(), sekarang)
+    return true
+  } catch { return false } // token tidak sah/kedaluwarsa: tidak ada yang perlu dicabut
+}
+
 function userFromToken(token: string | undefined): User | undefined {
   if (!token) return undefined
+  if (tokenDicabut(hashToken(token))) return undefined
   try {
     const { uid } = jwt.verify(token, config.jwtSecret) as { uid: string }
     return getUser(uid)

@@ -5,7 +5,7 @@ import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../../comp
 import { IconToken } from '../../components/icons'
 import {
   CATEGORY_LABEL, summarise, emergencyMonths, emergencyVerdict, planDebt, assessRisk,
-  project, formatIdr, RISK_LEVEL_LABEL,
+  project, formatIdr, RISK_LEVEL_LABEL, parseMoney, parseRatePct, RATE_PCT_MAX,
   type Category, type Tx, type Debt, type RiskAnswers,
 } from '../../lib/finance'
 
@@ -283,9 +283,11 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
 function EmergencyTab({ summary }: { summary: ReturnType<typeof summarise> }) {
   const [savings, setSavings] = useState('')
   const [essentials, setEssentials] = useState(() => String(Math.round(summary.buckets.needs) || ''))
-  const s = Number(savings.replace(/[^\d]/g, '')) || 0
-  const e = Number(essentials.replace(/[^\d]/g, '')) || 0
-  const months = emergencyMonths(s, e)
+  // Kosong adalah "belum diisi"; 0 yang diketik pada tabungan adalah nol sungguhan ("belum ada penyangga").
+  const s = parseMoney(savings)
+  const e = parseMoney(essentials)
+  const siap = s !== null && e !== null && e > 0
+  const months = siap ? emergencyMonths(s, e) : 0
   const v = emergencyVerdict(months)
 
   return (
@@ -307,7 +309,7 @@ function EmergencyTab({ summary }: { summary: ReturnType<typeof summarise> }) {
           has to be paid — not what you usually spend.
         </p>
 
-        {s > 0 && e > 0 && (
+        {siap && (
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-bold text-neutral-500">Lasts roughly</span>
@@ -331,15 +333,23 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
   const [strategy, setStrategy] = useState<'avalanche' | 'snowball'>('avalanche')
   const plan = useMemo(() => planDebt(debts, strategy), [debts, strategy])
 
+  const [problem, setProblem] = useState('')
+
   function add() {
-    const b = Number(balance.replace(/[^\d]/g, ''))
-    const r = Number(rate.replace(',', '.'))
-    if (!name.trim() || !Number.isFinite(b) || b <= 0) return
+    // Bunga dan cicilan minimum yang kosong bukan 0: rencana pelunasan bergantung pada keduanya, jadi keduanya wajib diisi (0 yang diketik sah).
+    const b = parseMoney(balance)
+    const r = parseRatePct(rate)
+    const mp = parseMoney(minPay)
+    if (!name.trim()) { setProblem('Enter a name for the debt.'); return }
+    if (b === null || b <= 0) { setProblem('Enter the balance (above 0).'); return }
+    if (r === null) { setProblem(`Enter the yearly interest rate (0–${RATE_PCT_MAX}%; type 0 if there is none).`); return }
+    if (mp === null) { setProblem('Enter the minimum payment (type 0 if there is none).'); return }
+    setProblem('')
     setDebts((d) => [...d, {
       id: Math.random().toString(36).slice(2),
       name: name.trim(), balance: b,
-      annualRatePct: Number.isFinite(r) ? r : 0,
-      minPayment: Number(minPay.replace(/[^\d]/g, '')) || 0,
+      annualRatePct: r,
+      minPayment: mp,
     }])
     setName(''); setBalance(''); setRate(''); setMinPay('')
   }
@@ -356,6 +366,7 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
           </div>
           <Field label="Minimum payment (Rp)"><input className={inputClass} inputMode="numeric" placeholder="500000" value={minPay} onChange={(e) => setMinPay(e.target.value)} /></Field>
         </div>
+        {problem && <p className="mt-2 text-[12px] font-semibold text-rose-600" role="alert">{problem}</p>}
         <Button className="mt-3 w-full" onClick={add}>Add debt</Button>
       </Card>
 
@@ -408,9 +419,9 @@ function RiskTab() {
   })
   const r = useMemo(() => assessRisk(a), [a])
   const [monthly, setMonthly] = useState('1000000')
-  const m = Number(monthly.replace(/[^\d]/g, '')) || 0
-  const low = useMemo(() => project(m, a.horizonYears, 4), [m, a.horizonYears])
-  const high = useMemo(() => project(m, a.horizonYears, 9), [m, a.horizonYears])
+  const m = parseMoney(monthly)
+  const low = useMemo(() => (m ? project(m, a.horizonYears, 4) : []), [m, a.horizonYears])
+  const high = useMemo(() => (m ? project(m, a.horizonYears, 9) : []), [m, a.horizonYears])
 
   const set = (p: Partial<RiskAnswers>) => setA({ ...a, ...p })
 
@@ -504,7 +515,7 @@ function RiskTab() {
             <input className={inputClass} inputMode="numeric" value={monthly} onChange={(e) => setMonthly(e.target.value)} />
           </Field>
         </div>
-        {m > 0 && (
+        {m !== null && m > 0 && (
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
             <div className="text-[12px] font-bold text-neutral-500">After {a.horizonYears} years, likely somewhere between</div>
             <div className="mt-1 text-[15px] font-black text-ink dark:text-ink">
