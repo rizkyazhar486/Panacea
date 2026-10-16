@@ -1,4 +1,4 @@
 {
-  "gagal": 100,
-  "_catatan": "Ratchet kontras WCAG 2.x AA (scripts/qa/kontras-wcag.mjs). Dua lingkungan mengukur sedikit beda untuk kode yang sama: lokal 83, CI (Chromium 140, font runner) 91 pada head 66f60d3f7. Batas 100 = pengukuran CI + selisih lingkungan, BUKAN klaim 100 teks boleh gagal. Sebelum perbaikan token lokal 97 (setara ~105 di CI) sehingga regresi token tetap tertangkap. Temuan TERBUKA, bukan lulus: teks hijau merek #00BF63 di latar terang (2.4:1), avatar akun dark, label 8-11px abu. 1286-1347 elemen berlatar gradien/gambar TIDAK diukur dan 30 elemen berlatar tak terselesaikan dilaporkan terpisah. Angka hanya boleh turun; turunkan ke nilai CI terukur saat ada margin."
+  "gagal": 62,
+  "_catatan": "Ratchet kontras WCAG 2.x AA (scripts/qa/kontras-wcag.mjs). Diukur CI (Chromium 140, runner) pada head e47c9c30a: 57 teks gagal; lokal 55 (selisih +2; sebelumnya +8 pada kode lama). Batas 62 = pengukuran CI 57 + margin 5 untuk variasi lingkungan, BUKAN klaim 62 teks boleh gagal; turunkan lagi saat perbaikan berikutnya mendarat. Temuan TERBUKA, bukan lulus: teks hijau merek #00BF63 di latar terang (2.4:1), label 8-11px abu/cyan, h2/summary kecil. 1349 elemen berlatar gradien/gambar TIDAK diukur dan 30 elemen berlatar tak terselesaikan dilaporkan terpisah. Angka hanya boleh turun."
 }

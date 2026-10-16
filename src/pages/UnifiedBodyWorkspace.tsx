@@ -135,14 +135,14 @@ export function UnifiedBodyWorkspace() {
               Body Exposure identity owned by BodyExposureOS. */}
           <h1 className="sr-only">Your Body · {active.label}</h1>
 
+          {/* Wadah scroll memegang tablist DAN pemilih "More features": pemilih bukan tab, jadi tidak boleh menjadi anak
+              role="tablist" (ARIA: tablist hanya memiliki tab; axe aria-required-children). */}
           <div
             ref={workspaceRailRef}
             className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`}
-            role="tablist"
-            aria-label="Your Body workspace"
-            data-one-shape="aria"
             data-body-workspace-rail="v1"
           >
+            <div role="tablist" aria-label="Your Body workspace" data-one-shape="aria" className="flex shrink-0 gap-1.5">
             <OneShape />
             {primaryViews.map((view) => {
               const selected = activeKey === view.key
@@ -167,6 +167,7 @@ export function UnifiedBodyWorkspace() {
                 </button>
               )
             })}
+            </div>
             <label className="shrink-0">
               <span className="sr-only">More features</span>
               <select

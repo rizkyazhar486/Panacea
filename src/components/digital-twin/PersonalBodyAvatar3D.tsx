@@ -450,7 +450,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
 
   return (
     <section className="dark overflow-hidden rounded-[26px] border border-white/10 bg-[#071018] text-white shadow-2xl">
-      <div ref={mountRef} className={compact ? "h-[300px] w-full sm:h-[340px]" : "h-[360px] w-full sm:h-[430px]"} aria-label="Personalized 3D body character" />
+      <div ref={mountRef} className={compact ? "h-[300px] w-full sm:h-[340px]" : "h-[360px] w-full sm:h-[430px]"} role="img" aria-label="Personalized 3D body character" />
       <div className="border-t border-white/10 p-3">
         <div className="flex flex-wrap gap-2 text-[10px] font-bold text-white/75">
           <span className="rounded-full bg-white/10 px-2 py-1">{Math.round(input.heightCm)} cm</span>
