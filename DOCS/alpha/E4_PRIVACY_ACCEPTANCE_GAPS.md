@@ -41,3 +41,7 @@ Screenshots were visually inspected. These checks do not certify legal complianc
 The theme screenshot review also reproduced a dark-dialog heading contrast of1.109:1 caused by the global `.dark .bg-white .text-ink` override. The candidate avoids that conflicting utility pairing locally and requires an actual-browser heading contrast of at least4.5:1; it does not claim a complete application-wide WCAG audit.
 
 Final browser evidence records minimum heading contrast17.93:1 light and13.20:1 dark (sRGB relative luminance, alpha composition bounded against black/white underlying surfaces). The unchanged4.5:1 threshold passes. Final screenshots confirm the dialog opens at its heading with readable dark text hierarchy.
+
+## 2026-10-16 independent review correction
+
+Review reproduced an unsupported rights-request channel: `ContactService.send()` appends transient component messages and generates a random ticket number, with no API, persistence or operator transmission. The shared disclosure therefore states that in-app Support does not submit or retain data-rights requests and does not confirm receipt or completion. It asks users to verify an operator channel independently; no contact or successful request delivery is invented. Public-route and modal browser assertions require this limitation. A direct import of the shared disclosure failed the new limitation assertion before repair and passed after. The broader Support ticket simulation remains a separate risk; this scoped disclosure repair does not make it an operational service.

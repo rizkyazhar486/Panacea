@@ -2,7 +2,7 @@
 export const PRIVACY_DISCLOSURE = {
   reviewedAt: '2026-10-15',
   draftReview: 'AI content remains a draft until an authorized clinician explicitly approves it.',
-  requests: 'Use Support to request access, correction, withdrawal of consent or server-data deletion.',
+  requests: 'In-app Support does not submit or retain data-rights requests. For access, correction, consent withdrawal or server-data deletion, contact your service operator through an independently verified channel. This app does not confirm receipt or completion.',
   localReset: 'Settings → Reset Saved App State resets the app state saved on this device; it does not erase other local caches or server-held records.',
   sharing: 'Revoking a lab-sharing permission ends access through that permission. Revocation does not itself erase stored records.',
   retention: 'Deployment-specific retention periods and the server-deletion process must be confirmed with the service operator; this page does not specify an approved retention schedule.',
