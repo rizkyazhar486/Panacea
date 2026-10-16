@@ -1,6 +1,7 @@
 {
-  "_catatan": "Baseline RATCHET untuk scripts/qa/ux-audit.mjs (F2). overflowHalaman dan tanpaNama dikunci EKSAK (deterministik). targetKecil = kontrol interaktif <44px pada 9 halaman x 2 viewport x 2 tema: temuan TERBUKA (standar repo 44px), bukan lulus. Angka ini bervariasi antar-run pada kode sama (teramati 1138-1162; konten dinamis), maka langit-langit 1200 dengan margin ~3%; turunkan seiring perbaikan. Kontras WCAG dan pemeriksaan manual belum tercakup.",
   "overflowHalaman": 0,
   "tanpaNama": 0,
-  "targetKecil": 1200
+  "targetKecilMobile": 0,
+  "blokTeksBawah24": 8,
+  "_catatan": "Ratchet F2. targetKecilMobile=0: kontrol sungguhan di viewport sentuh 390x844 wajib >=44px (aturan tunggal src/styles/touch-targets.css + 3 tautan flex-item). blokTeksBawah24=8: 4 blok teks x 2 tema di desktop #/fitness-hub terjepit ke kolom ~22px lebar (panel Body Exposure kolom kanan 78px pada 1440px) = cacat tata letak NYATA yang terbuka, bukan batas yang disetujui; angka hanya boleh turun. Desktop 1440 tidak digerbang untuk target sentuh (mouse), tetap dilaporkan. Tautan inline dalam teks dikecualikan (WCAG 2.5.8) dan dilaporkan terpisah."
 }

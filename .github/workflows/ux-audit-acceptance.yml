@@ -1,6 +1,6 @@
 name: UX Audit Acceptance (F2)
 # Bukti CI untuk Alpha F2 / Task 45: audit UI/UX terukur (overflow, kontrol tanpa nama, target sentuh) dengan baseline ratchet.
-# Hanya mencegah regresi; temuan terbuka (target <44px) tetap tercatat dan F2 belum VERIFIED.
+# Ratchet: target sentuh mobile = 0, tanpa nama = 0, overflow = 0. F2 belum VERIFIED (kontras, screenshot, manual belum tercakup).
 on:
   push:
     branches: [main]
@@ -10,6 +10,9 @@ on:
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
       - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
       - 'governance/UX_AUDIT_BASELINE.json'
       - 'src/lib/api.ts'
       - 'src/lib/store.tsx'
@@ -24,6 +27,9 @@ on:
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
       - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
       - 'governance/UX_AUDIT_BASELINE.json'
       - 'src/lib/api.ts'
       - 'src/lib/store.tsx'
