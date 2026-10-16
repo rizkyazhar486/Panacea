@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–7)
+# Clinical calculators — automated engineering-review dossier (tranches 1–8)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -147,6 +147,17 @@ References use integer arithmetic (tenths/hundredths) so exact boundaries do not
 | Fletcher index (`fletcherIndex`) | Mean of 500/1000/2000 Hz (basic) or + 3000 Hz (complete); cut-offs < 26 / 41 / 56 / 71 / 91 dB | AAO-HNS-style bands as recorded | The mean is classified unrounded (25.67 dB is "Normal"); some references round to whole dB first. In basic mode the 3000 Hz field is ignored. |
 | Denver II age check (`validateDenverAge`) | 0–72 months | none | Only the age range is validated here; the milestone list is not part of this engine. |
 
+## Tranche 8 — caffeine at bedtime and blood-donation pre-screening (suite: `scripts/uji/calculator-independent-reference-8.mts`)
+
+Integer-arithmetic references for the caffeine bands (minutes × 10 against half-life × 10 tenths) and for the 12-week interval (checked to the millisecond), seeded sampling, hostile matrices, tables re-asserted as literals, and ~50 source mutants (each fails by name; three first-run survivors were closed by tests for a donation dated exactly "now", for a passed 12-week mark at 10:00 never reporting −0 days, and for the hour regex).
+
+**One engine defect found and fixed (`caffeineBand`).** At exactly two or three half-lives to bedtime the remaining fraction is 25 % or 12.5 % by definition, but `0.5^(h / half-life)` can land just above (e.g. 25.000000000000007 or 12.500000000000004) and was classified into the next-worse band: 1,224 of 6,318 exact-boundary cases (e.g. half-life 1.6 h, 3.2 h to bed). The fix rounds the percentage to 1e-9 before comparing; reported values are unchanged. The regression test fails on the unfixed engine.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Caffeine at bedtime (`caffeineAtBedtime`, `caffeineBand`) | remaining = dose × 0.5^(hours / half-life); bands > 25 % high, > 12.5 % near, else low; 3 half-lives to ~12.5 %; drink table 95/63/47/28/80/34 mg | none beyond the table | The drink contents, the 25 % / 12.5 % bands and the 1.5–9.5 h half-life range are unsourced; **consumed time equal to bedtime reads as 0 h (full dose), not 24 h**; `hoursTo12pct` is 12.5 %, not 12 %; blank servings or custom mg read as 0 mg by documented design ("did not drink"); this is not a safe-intake limit. |
+| Blood-donation pre-screening (`bloodDonationScreen`) | age 17–65, weight ≥ 50 kg, 12 weeks since last donation, four deferral flags; last-donation date validated (calendar-real, not in the future) | generic national/WHO/PMI criteria as recorded | The age/weight limits and the 12-week interval vary by service and sex; this is not on-site screening (haemoglobin and interview remain with the blood bank). A donation dated today is accepted and not eligible. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `riskScreens`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
