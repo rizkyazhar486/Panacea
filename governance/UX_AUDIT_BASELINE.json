@@ -2,7 +2,7 @@
   "overflowHalaman": 0,
   "tanpaNama": 0,
   "targetKecilMobile": 0,
-  "blokTeksBawah24": 8,
-  "_catatan": "Ratchet F2. targetKecilMobile=0: kontrol sungguhan di viewport sentuh 390x844 wajib >=44px (aturan tunggal src/styles/touch-targets.css + 3 tautan flex-item). blokTeksBawah24=8: 4 blok teks x 2 tema di desktop #/fitness-hub terjepit ke kolom ~22px lebar (panel Body Exposure kolom kanan 78px pada 1440px) = cacat tata letak NYATA yang terbuka, bukan batas yang disetujui; angka hanya boleh turun. Desktop 1440 tidak digerbang untuk target sentuh (mouse), tetap dilaporkan. Tautan inline dalam teks dikecualikan (WCAG 2.5.8) dan dilaporkan terpisah.",
+  "blokTeksBawah24": 0,
+  "_catatan": "Ratchet F2. targetKecilMobile=0: kontrol sungguhan di viewport sentuh 390x844 wajib >=44px (aturan tunggal src/styles/touch-targets.css + 3 tautan flex-item). blokTeksBawah24=0: panel Body Exposure kolom kanan tidak lagi terjepit (78px pada 1440px di #/fitness-hub) karena grid dua kolom kini mengikuti lebar KOTAKNYA (container query), bukan lebar layar; angka hanya boleh naik jika ada cacat baru, dan gerbang gagal bila itu terjadi. Desktop 1440 tidak digerbang untuk target sentuh (mouse), tetap dilaporkan. Tautan inline dalam teks dikecualikan (WCAG 2.5.8) dan dilaporkan terpisah.",
   "animasiBerjalanReduced": 0
 }
