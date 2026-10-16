@@ -1,0 +1,6 @@
+{
+  "_catatan": "Baseline RATCHET untuk scripts/qa/ux-audit.mjs (F2). overflowHalaman dan tanpaNama dikunci EKSAK (deterministik). targetKecil = kontrol interaktif <44px pada 9 halaman x 2 viewport x 2 tema: temuan TERBUKA (standar repo 44px), bukan lulus. Angka ini bervariasi antar-run pada kode sama (teramati 1138-1162; konten dinamis), maka langit-langit 1200 dengan margin ~3%; turunkan seiring perbaikan. Kontras WCAG dan pemeriksaan manual belum tercakup.",
+  "overflowHalaman": 0,
+  "tanpaNama": 0,
+  "targetKecil": 1200
+}
