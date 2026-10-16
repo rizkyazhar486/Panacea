@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–5)
+# Clinical calculators — automated engineering-review dossier (tranches 1–6)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -121,7 +121,20 @@ Method as above: independently written oracles, seeded sampling (2 × 400 + 800 
 | 14-night sleep debt (`sleepDebt`, `sanitizeNights`) | Σ(need − slept) over the first 14 nights; ≤ 2 h well-rested, ≤ 8 h mild, else significant | none | The 2 h and 8 h cut-offs are unsourced. Oversleeping yields negative debt (formula does not clamp at 0). **No recorded nights reads as "no debt", not "unknown".** `sanitizeNights` checks only the date shape, so `2026-02-31` is accepted. |
 | Pack-years and lung-screening eligibility (`packYearScreen`) | (cigarettes/day ÷ 20) × years; USPSTF 2021: age 50–80, ≥ 20 pack-years, quit ≤ 15 years, 0 cigarettes never eligible | USPSTF 2021 (as recorded in the engine) | Fractional ages: 49.5 and 80.5 are ineligible (inclusive integer cut-offs). Whether `quitYearsAgo = 0` (still smoking) should be entered explicitly is a UX decision already made in the engine. |
 
+## Tranche 6 — fluids & electrolytes and the glycogen-timing heuristic (suite: `scripts/uji/calculator-independent-reference-6.mts`)
+
+Method as above (400 seeded cases per formula, worked cases, breakpoints at 10/20 kg, exact boundaries, hostile matrices, range tables re-asserted as literals, source mutants on every constant, branch and range). Every mutant fails by name; one, `w <= 10` → `w < 10` in the sodium maintenance formula, is equivalent because the piecewise formula is continuous at 10 kg. Result: **no discrepancy** between the engines and the independently written references; no engine change.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Maintenance fluid (`maintenanceFluid`) | Holliday-Segar 100/50/20 mL/kg/day; Na 3/2/1 and K 2/1/0.5 mEq/kg by weight band | Holliday-Segar (as recorded) | The electrolyte per-kg tiers are unsourced in the engine. |
+| Resuscitation (`resuscitation`) | Adult sepsis 30 mL/kg, paediatric shock 20 mL/kg, burns 4 × kg × %TBSA with half in the first 8 h; TBSA is ignored outside burns | none beyond the formula names | Fixed volumes are population defaults, not prescriptions; Parkland vs other burn formulas; adult-sepsis 30 mL/kg guidance changes over time. |
+| Corrected sodium (`correctedSodium`) | Na + 1.6 × (glucose − 100)/100 (Katz) | Katz (as recorded) | The 1.6 factor vs 2.4 (Hillier) is a choice; low glucose lowers the corrected value (no clamp). |
+| Sodium correction rate (`naCorrectionRate`) | TBW = kg × 0.6 (M) / 0.5 (F); ΔNa/L = (140 − Na)/(TBW + 1); litres for +10 mEq/L | simplified Adrogué-Madias | **Behaviour findings, unchanged:** current Na = 140 reports "0 litres"; Na > 140 reports a negative litre figure (the formula assumes a 140 infusate, which the page text contradicts for 0.9 % NaCl = 154). Only M/F are accepted. The 10 mEq/L figure is a goal, not a safe-rate limit. |
+| Potassium deficit (`potassiumDeficit`) | (4.0 − K) × kg × 0.3 to 0.6, never negative | none | The 0.3–0.6 factors and the 4.0 target are unsourced; serum K poorly predicts total deficit. |
+| Glycogen-depletion timing (`autophagyTiming`) | remaining = max(0, 14 − (1 − fat%/100) × 2 − hours since meal); started when ≤ 0 | none (illustrative heuristic) | The whole heuristic is unsourced and is not a measurement of autophagy; it must stay labelled illustrative. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `fluidElectrolytes`, `autophagyTiming`, `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
+`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
 `maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
