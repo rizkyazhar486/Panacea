@@ -98,7 +98,11 @@ function MemoryMatch() {
 function ReactionTime() {
   const [state, setState] = useState<'idle' | 'waiting' | 'go' | 'result' | 'early'>('idle')
   const [ms, setMs] = useState(0)
-  const [best, setBest] = useState(() => Number(localStorage.getItem('pmd_reaction_best_v1') || 0))
+  // Rekor yang belum tercatat adalah "tidak diketahui" (null), bukan 0 ms: 0 ms akan terbaca sebagai waktu reaksi terbaik yang mustahil.
+  const [best, setBest] = useState<number | null>(() => {
+    const v = Number(localStorage.getItem('pmd_reaction_best_v1'))
+    return Number.isFinite(v) && v > 0 ? v : null
+  })
   const startTs = useRef(0)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -113,7 +117,7 @@ function ReactionTime() {
     if (state === 'go') {
       const t = Date.now() - startTs.current
       setMs(t)
-      if (best === 0 || t < best) { setBest(t); try { localStorage.setItem('pmd_reaction_best_v1', String(t)) } catch { /* ignore */ } }
+      if (best === null || t < best) { setBest(t); try { localStorage.setItem('pmd_reaction_best_v1', String(t)) } catch { /* ignore */ } }
       setState('result')
     }
   }
@@ -124,7 +128,7 @@ function ReactionTime() {
   return (
     <Card className="!p-5 text-center">
       <button onClick={onClick} className={`flex h-56 w-full items-center justify-center rounded-2xl text-lg font-black text-ink transition ${bg}`}>{label}</button>
-      <p className="mt-3 text-[12px] text-neutral-500">Best: {best > 0 ? `${best}ms` : '—'}</p>
+      <p className="mt-3 text-[12px] text-neutral-500">Best: {best === null ? '—' : `${best}ms`}</p>
     </Card>
   )
 }
