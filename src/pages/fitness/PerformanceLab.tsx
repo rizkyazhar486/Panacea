@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
 import { criticalPower2Point } from './criticalPower'
+import { computeMetric, metricValue, parseMetricInput } from './metricInputs'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../../components/icons'
 import { useStore } from '../../lib/store'
 import { getDemo } from '../../lib/profile'
@@ -44,8 +45,9 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
 }) {
   const defaults = Object.fromEntries(inputs.map((i) => [i.key, i.default ?? 0]))
   const [vals, set] = useMetricState(id, defaults)
-  const result = compute(vals)
-  const interp = interpret ? interpret(result, vals) : null
+  const lengkap = inputs.every((i) => metricValue(vals[i.key]))
+  const result = computeMetric(inputs.map((i) => i.key), vals, compute)
+  const interp = interpret && lengkap ? interpret(result, vals) : null
   const display = typeof result === 'number' ? (Number.isFinite(result) ? result.toFixed(result % 1 === 0 ? 0 : 1) : '—') : result
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
@@ -56,8 +58,8 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
       <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {inputs.map((inp) => (
           <Field key={inp.key} label={inp.label + (inp.unit ? ` (${inp.unit})` : '')}>
-            <input className={inputClass} type="number" step="any" value={vals[inp.key] || ''} placeholder="0"
-              onChange={(e) => set(inp.key, +e.target.value)} />
+            <input className={inputClass} type="number" step="any" value={metricValue(vals[inp.key]) ? vals[inp.key] : ''} placeholder="0"
+              onChange={(e) => set(inp.key, parseMetricInput(e.target.value))} />
           </Field>
         ))}
       </div>
