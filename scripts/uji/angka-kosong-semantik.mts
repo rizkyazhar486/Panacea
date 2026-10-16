@@ -123,9 +123,7 @@ export const DAFTAR_IZIN: readonly { berkas: string; potongan: string; alasan: s
  * UTANG yang tercatat dan hanya boleh TURUN (bukan izin): temuan nyata yang belum dibenahi. Kunci: berkas -> jumlah temuan.
  * Menambah angka atau berkas baru gagal; setelah dibenahi, turunkan angkanya (dan hapus entrinya di nol).
  */
-export const UTANG: Readonly<Record<string, { jumlah: number; catatan: string }>> = {
-  'src/pages/finance/MoneyHub.tsx': { jumlah: 4, catatan: 'Simulator keuangan: tabungan/kebutuhan/cicilan minimum/setoran bulanan kosong dibaca 0 (mis. dana darurat "No buffer yet" untuk kolom kosong). Bukan data klinis; dibenahi di PR lanjutan.' },
-}
+export const UTANG: Readonly<Record<string, { jumlah: number; catatan: string }>> = {}
 
 function berkasSumber(akar: string): string[] {
   const hasil: string[] = []
