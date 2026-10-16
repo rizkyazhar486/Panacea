@@ -69,6 +69,9 @@ jobs:
           exit $code
       - name: Deployed SHA vs main (E7)
         if: always()
+        # Pada PR hanya melapor: produksi wajar tertinggal dari main (deploy frontend dibatch), dan itu bukan kesalahan PR ini.
+        # Pada dispatch dan jadwal, hasil tertinggal/menyimpang/tidak-diketahui menggagalkan langkah ini.
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         # Bukti E7: frontend (build.json) dan backend (/api/health) dibandingkan dengan main memakai kriteria deploy-equivalence.mjs.
         run: |
           git fetch --no-tags origin main
