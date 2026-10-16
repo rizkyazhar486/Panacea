@@ -66,3 +66,7 @@ Production release 38681031229 passed and independent public build-info matched 
 2. After integration, close PR #2540–#2544 as superseded, preserving every valid change; verify main and update the execution checkpoint. C2 stays REPORTED until its complete semantic acceptance is justified.
 3. Release the intended main through the existing gate-protected production workflow; match public build-info and actual smoke. An authorized test session is still needed for the authenticated critical clinical journey.
 4. Preserve active A6/A7/backend ownership. D7 needs defensible RUN/female contact evidence and justified technical criteria; D8 needs redistribution terms; C6 needs qualified signatures. Do not replace these gaps with synthetic approval.
+
+## A6/A7 current-main forward synchronization candidate
+
+PR #2529 carries signed EMR and daily-care plan activation restrictions, real HTTP authorization/restart/legacy/consent evidence, and dependent signed-follow-up worklist tests. This checkpoint preserves the integrated C2 duration-provenance evidence from current main and the candidate A6/A7 evidence from `docs/alpha/A6_EMR_SIGNATURE_REFUSAL_EVIDENCE.md`. Only the shared checkpoint overlapped with newer main; no clinical or other source files overlapped. Neither A6 nor A7 is promoted to VERIFIED by branch synchronization. Re-run current-head full Stabilization Acceptance, Validate changes, security/render gates and independent review, then integrate serially using expected-head protection. No live or clinical approval is claimed.

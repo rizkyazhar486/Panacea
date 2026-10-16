@@ -71,6 +71,7 @@ import {
   addLabReview,
   listLabReviews,
   listCarePlans,
+  listSignedCarePlans,
   addCarePlan,
   bacaLedgerValidasi,
   tambahLedgerValidasi,
@@ -162,7 +163,7 @@ import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './domains/clini
 import { susunKeadaanLongitudinal } from './domains/clinical-records/keadaanLongitudinal.js'
 import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './domains/clinical-records/catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './domains/clinical-records/labFhir.js'
-import { susunRencana, susunLaporan, laporanKeBundelFhir } from './domains/clinical-records/carePlan.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSignedCarePlan } from './domains/clinical-records/carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
@@ -883,17 +884,19 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const actor = (req as express.Request & { user: User }).user
   // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
-  const penulis = { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }
+  const penulis = { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }
   const rekamLama = getRecord(patientId, record.id)
   if (actor.role !== 'dokter' && !pemeriksaanTetapSama(rekamLama?.physicalExam, record.physicalExam)) {
     addAudit(actor, 'emr.examination_write_refused', patientId)
     return res.status(403).json({ error: 'clinician_required_for_examination' })
   }
   const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
+  if (tandaTanganDitolakAktor) {
+    addAudit(actor, 'emr.signature_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_signature' })
+  }
   const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
-  // A6: klaim tanda tangan dari non-klinisi dibuang oleh server dan dicatat sendiri, bukan hanya sebagai simpanan biasa.
-  if (tandaTanganDitolakAktor) addAudit(actor, 'emr.signature_refused', patientId)
   if (hasil.arsip) addAudit(actor, hasil.arsip.signedAt ? 'emr.signed_version_archived' : 'emr.draft_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
@@ -914,7 +917,7 @@ app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
   const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
-  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }, new Date(), `emr-${randomUUID()}`)
   if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
   closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
   addAudit(actor, 'emr.encounter_closed', patientId)
@@ -1127,7 +1130,7 @@ app.get('/api/keadaan-longitudinal', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
   const tersimpan = getLabLog(u.email)
-  const plans = listCarePlans()
+  const plans = listSignedCarePlans()
     .filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
     .map((p) => ({ plan: p.rencana, reports: listCareReports(u.email, p.rencana.id).slice(-7) }))
   const reviews = listLabReviews(u.email)
@@ -1269,19 +1272,33 @@ app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
 // sebagai jawaban MENTAH; prioritas dihitung ulang oleh kernel di sisi dokter.
 app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  if (u.role !== 'dokter') { res.status(403); addAudit(u, 'care.plan.signature_refused', String(req.params.id)); res.json({ error: 'verified clinician role required' }); return }
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
   const pasien = getUserByEmail(izin.pasienEmail)
   if (!pasien) { res.status(404).json({ error: 'patient not found' }); return }
   try {
-    const rencana = susunRencana(req.body, pasien.id, u.id, kini)
+    const body = req.body as { signIntent?: unknown; existingPlanId?: unknown }
+    const prior = body?.existingPlanId === undefined ? undefined : listCarePlans().find(p =>
+      p.rencana.id === body.existingPlanId && p.izinId === izin.id && p.dokterEmail === u.email && !p.dicabut)
+    if (body?.existingPlanId !== undefined && (!prior || prior.rencana.clinicianId !== u.id || prior.rencana.subjectId !== pasien.id)) {
+      addAudit(u, 'care.plan.signature_refused', pasien.id)
+      res.status(404).json({ error: 'no owned care plan awaiting signature' }); return
+    }
+    const draft = prior?.rencana ?? susunRencana(req.body, pasien.id, u.id, kini)
+    if (body?.signIntent !== true) {
+      addAudit(u, 'care.plan.signature_refused', pasien.id)
+      res.status(409).json({ error: 'explicit clinician signature required' }); return
+    }
+    const rencana = signCarePlan(draft, u.id, kini)
     addCarePlan({ izinId: izin.id, pasienEmail: izin.pasienEmail, dokterEmail: u.email, dibuat: kini.toISOString(), rencana })
+    addAudit(u, 'care.plan.signed', rencana.id)
     addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'rencana-harian', izinId: izin.id })
     void notify(pasien.id, { title: 'Your doctor set up a daily check-in', body: 'Open Your Body to answer today\'s questions.', url: '/tubuh' }).catch((e) => console.warn('[care-plan] notify failed', (e as Error).message))
     res.json(rencana)
   } catch (e) {
+    addAudit(u, 'care.plan.rejected', pasien.id)
     res.status(400).json({ error: (e as Error).message })
   }
 })
@@ -1292,7 +1309,7 @@ app.get('/api/clinician/lab-shares/:id/care/fhir', requireAuth, (req, res) => {
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
-  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
   if (!p) { res.status(404).json({ error: 'no daily plan' }); return }
   addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
   const pasienRef = `Patient/${getUserByEmail(izin.pasienEmail)?.id ?? 'unknown'}`
@@ -1305,22 +1322,23 @@ app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
-  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
   if (p) addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
-  res.json({ plan: p?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
+  const unsigned = listCarePlans().find(x => x.izinId === izin.id && x.dokterEmail === u.email && !x.dicabut && !isSignedCarePlan(x.rencana))
+  res.json({ plan: p?.rencana ?? null, unsignedPlan: unsigned?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
 })
 // Pasien: rencana aktif dari dokter yang IZINNYA MASIH BERLAKU; dicabut = berhenti.
 app.get('/api/care/plans', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
-  const aktif = listCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+  const aktif = listSignedCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
   res.json({ plans: aktif.map((p) => ({ plan: p.rencana, dokterEmail: p.dokterEmail, reports: listCareReports(u.email, p.rencana.id).slice(-7) })) })
 })
 app.post('/api/care/reports', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
   const b = req.body as { planId?: unknown }
-  const p = listCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
   if (!p || !izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini)) { res.status(404).json({ error: 'no active daily check-in' }); return }
   try {
     const laporan = susunLaporan(p.rencana, req.body, kini)
@@ -2451,7 +2469,7 @@ setInterval(() => {
       const prefs = getSettings(u.id)
       if (prefs.notifCekHarian === true) {
         const kini = new Date()
-        const aktif = listCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
+        const aktif = listSignedCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
         const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
         const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
         if (p.alasan === 'send') {
