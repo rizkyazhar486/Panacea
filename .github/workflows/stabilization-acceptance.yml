@@ -503,6 +503,20 @@ jobs:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
         run: node scripts/qa/lab-result-review-e2e-gate.mjs
 
+      - name: Privacy disclosure matches implemented controls (public route, mobile/desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node qa/clinical/privacy-disclosure.mjs
+
+      - name: Upload privacy disclosure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: privacy-disclosure
+          path: artifacts/privacy-disclosure
+          if-no-files-found: ignore
+
       - name: A6 clinician care-plan approval (real HTTP, mobile and desktop)
         timeout-minutes: 6
         env:

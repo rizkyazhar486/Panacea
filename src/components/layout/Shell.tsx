@@ -535,6 +535,16 @@ export function Shell({ children }: { children: ReactNode }) {
     )
   }
 
+  // A person must be able to read privacy/control details before sign-in or consent.
+  if (!account && loc.pathname === '/legal') return (
+    <div className={`min-h-screen ${theme === 'dark' ? 'dark bg-[#070b10] text-white' : 'bg-neutral-50 text-neutral-900'}`}>
+      <header className="mx-auto max-w-3xl px-4 py-3">
+        <Link to="/" className="inline-flex min-h-11 items-center font-bold underline">Back to Panaceamed</Link>
+      </header>
+      <main className="mx-auto max-w-3xl px-4 pb-8">{children}</main>
+    </div>
+  )
+
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
