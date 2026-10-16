@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–9)
+# Clinical calculators — automated engineering-review dossier (tranches 1–10)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8), `scripts/uji/calculator-independent-reference-9.mts` (tranche 9); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8), `scripts/uji/calculator-independent-reference-9.mts` (tranche 9), `scripts/uji/calculator-independent-reference-10.mts` (tranche 10); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -173,6 +173,24 @@ References: FIB-4 against the formula and band table (400 seeded cases plus exac
 | Growth inputs (`validateWhoGrowthInputs`, `validateNeonateInputs`, `validateCdcInputs`, `parseWhoVisit`) | age/weight/length ranges for WHO 0–60 months, neonate 0–30 days, CDC 2–20 years | as recorded | Weight/height ranges are input-sanity bounds. `parseWhoVisit` uses `Number()`, so a typed `0x10` reads as 16 (not typeable in a number input). Reference tables and z-scores are not in this engine. |
 | Framingham what-if inputs (`validateFraminghamInput`) | age 30–74, total cholesterol 100–500, HDL 10–150, SBP 70–300; NaN = "required" | D'Agostino 2008 derivation range | The 30–74 age range follows the derivation population; the ranges for cholesterol/HDL/SBP are input-sanity bounds. |
 
+## Tranche 10 — Katz sodium, potassium assessment, McDonald rule, zone-2 heart rate, grip validation, parseNumberField (suite: `scripts/uji/calculator-independent-reference-10.mts`)
+
+Independent references (zone-2 rounding against integer arithmetic in tenths of a year, 901 ages; potassium severity over every 0.1 mEq/L from 1.0 to 10.0 plus exact boundaries), hostile matrices, range tables re-asserted as literals, 33 source mutants each failing by name. Result: **no engine discrepancy and no engine change.**
+
+**Two cross-engine inconsistencies recorded for the reviewer (characterized in the test, deliberately not changed):**
+
+1. *Corrected sodium exists twice.* `correctedSodiumKatz` (`electrolyteCorrection`) clamps the glucose term at 0 (glucose < 100 mg/dL gives no correction; Na range 80–200), while `fluidElectrolytes.correctedSodium` applies it unclamped (Na 140, glucose 20 → 138.72; Na range 90–200).
+2. *Potassium deficit exists twice.* `potassiumAssessment` reports a fixed 200–400 mEq per 1 mEq/L below 4.0 (K 3.0 → 200–400 mEq), while `fluidElectrolytes.potassiumDeficit` is weight-based 0.3–0.6 mEq/kg per mEq/L (K 3.0, 70 kg → 21–42 mEq). They differ by an order of magnitude; which is intended is a clinical decision.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Katz corrected sodium (`correctedSodiumKatz`) | Na + 1.6 × max(0, (glucose − 100)/100) | Katz 1973 | The two cross-engine differences above; 1.6 vs 2.4 factor. |
+| Potassium assessment (`potassiumAssessment`) | severity < 2.5 or > 6.5 severe, < 3.0 or > 6.0 moderate, < 3.5 or > 5.5 mild; deficit 200–400 mEq per mEq/L below 4.0 | Sterns rule of thumb as recorded | Band cut-offs and the deficit rule are unsourced here; the second deficit estimate above. |
+| McDonald rule (`mcdonaldGestationalAge`) | fundal height (cm) ≈ weeks, 20–36 cm only | page text | Single-fetus, normal-growth assumption; no estimate outside 20–36 cm. |
+| Zone-2 heart rate (`zone2HeartRate`) | Tanaka HRmax = 208 − 0.7 × age; zone 60–70 % rounded | Tanaka 2001; ACSM | 60–70 % as zone 2 is a training convention, not a physiological measurement. |
+| Grip strength gate (`validateGripKg`) | 1–100 kg, must be typed | none | Range is input sanity only. |
+| `parseNumberField` | blank/whitespace/non-string → NaN; otherwise `Number()` | — | `Number()` accepts hex text (`0x10` = 16), infinities pass to the range gate. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`graceScore` (points table too large to transcribe without the primary source), and `reviewRegistry` (a registry, not a formula). `egfr-ckd-epi-2021` has a point-wise test only.
