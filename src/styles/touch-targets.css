@@ -1,21 +1,21 @@
 /* Lantai target sentuh 44x44 (standar repo; WCAG 2.5.5 AAA, di atas 2.5.8 AA = 24px).
    Satu aturan untuk kontrol native ketimbang menambal ratusan instans: puluhan berkas CSS lama menetapkan
-   min-height 40/42px dengan !important, jadi spesifisitas dinaikkan (html:root body) agar menang tanpa menyentuhnya.
+   min-height 40/42px dengan, jadi spesifisitas dinaikkan (html:root body) agar menang tanpa menyentuhnya.
    Hanya konteks sentuh/layar sempit; mouse di desktop tidak diubah. Tidak menyentuh tautan inline dalam teks
    (dikecualikan WCAG 2.5.8), checkbox/radio/range (ukuran visual dipertahankan; area klik lewat label), maupun kontrol 3D/canvas. */
 @media (pointer: coarse), (max-width: 820px) {
   html:root body :is(button, select, summary, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"])):not([data-touch-compact]) {
-    min-height: 44px !important;
-    min-width: 44px !important;
+    min-height: 44px;
+    min-width: 44px;
   }
   /* kolom isian tetap selebar kontainernya; min-width 44 hanya lantai */
   html:root body :is(input, select, textarea):not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]) {
-    min-height: 44px !important;
+    min-height: 44px;
   }
   /* tautan berbentuk blok/flex (kartu, item menu, chip); tautan inline dalam kalimat sengaja tidak disentuh */
   html:root body a[href]:is(.flex, .inline-flex, .grid, .inline-grid, .block, .inline-block, .panacea-instrument-status, .t-kecil) {
-    min-height: 44px !important;
-    min-width: 44px !important;
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
