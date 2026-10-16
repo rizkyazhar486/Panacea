@@ -79,6 +79,8 @@ for (const r of hasil.filter((x) => x.viewport.startsWith('mobile') && x.tema ==
 ringkas.pelanggarMobileTerang = Object.entries(histo).sort((a, b) => b[1] - a[1]).slice(0, 60)
 writeFileSync(process.env.QA_OUT || 'ux-audit-evidence.json', JSON.stringify(ringkas, null, 2))
 console.log(JSON.stringify(ringkas.total))
+// fail-closed: di CI baseline wajib ada; tanpa itu gerbang diam-diam menjadi Infinity (cacat yang pernah lolos: workflow tak mengirim UX_BASELINE).
+if (process.env.CI && !(process.env.UX_BASELINE && existsSync(process.env.UX_BASELINE))) { console.error('UX_BASELINE tidak diset/ada di CI: gerbang tidak boleh berjalan tanpa baseline'); process.exit(1) }
 const dasar = process.env.UX_BASELINE && existsSync(process.env.UX_BASELINE) ? JSON.parse(readFileSync(process.env.UX_BASELINE, 'utf8')) : null
 const gagal = []
 if (ringkas.total.overflowHalaman > (dasar?.overflowHalaman ?? 0)) gagal.push(`overflow horizontal: ${ringkas.total.overflowHalaman}`)

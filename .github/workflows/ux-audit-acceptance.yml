@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
@@ -23,6 +25,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
@@ -69,9 +73,14 @@ jobs:
             if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
             sleep 1
           done
-          QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs
+          rc=0
+          UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
+          exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ux-audit-evidence
-          path: ${{ runner.temp }}/ux-audit-evidence.json
+          path: |
+            ${{ runner.temp }}/ux-audit-evidence.json
+            ${{ runner.temp }}/kontras-evidence.json
