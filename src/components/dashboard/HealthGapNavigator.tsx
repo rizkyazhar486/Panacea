@@ -1,3 +1,4 @@
+import { FRICTION_KEYS, parseFriction, type FrictionKey } from './frictionInputs'
 import { useMemo, useState } from 'react'
 import { Card, inputClass } from '../ui'
 import {
@@ -41,19 +42,17 @@ function pct(value: number) {
 
 export function HealthGapNavigator() {
   const [signals, setSignals] = useState<GapSignal[]>(() => DEFAULT_GAP_SIGNALS.map((item) => ({ ...item })))
-  const [frictionInput, setFrictionInput] = useState<CareFrictionInput>(DEFAULT_FRICTION)
+  const [frictionText, setFrictionText] = useState<Record<FrictionKey, string>>(() => Object.fromEntries(FRICTION_KEYS.map((k) => [k, String(DEFAULT_FRICTION[k])])) as Record<FrictionKey, string>)
 
   const report = useMemo(() => buildGapReport(signals), [signals])
-  const friction = useMemo(() => careFriction(frictionInput), [frictionInput])
+  const frictionInput = useMemo(() => parseFriction(frictionText, DEFAULT_FRICTION.digitalBarrier), [frictionText])
+  const friction = useMemo(() => (frictionInput ? careFriction(frictionInput) : null), [frictionInput])
 
   const updateSignal = (id: string, status: GapStatus) => {
     setSignals((current) => current.map((item) => item.id === id ? { ...item, status } : item))
   }
 
-  const updateNumber = (key: keyof CareFrictionInput, raw: string) => {
-    const value = Number(raw)
-    setFrictionInput((current) => ({ ...current, [key]: Number.isFinite(value) ? value : 0 }))
-  }
+  const updateNumber = (key: FrictionKey, raw: string) => setFrictionText((current) => ({ ...current, [key]: raw }))
 
   const copyQuestionBudget = async () => {
     const text = report.topQuestions
@@ -149,42 +148,42 @@ export function HealthGapNavigator() {
                 <div className="text-[11px] text-neutral-500">Implementation burden, not medical risk</div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-black text-ink dark:text-white">{friction.score}</div>
-                <div className="text-[10px] font-bold uppercase text-neutral-500">{friction.level}</div>
+                <div className="text-2xl font-black text-ink dark:text-white">{friction ? friction.score : '—'}</div>
+                <div className="text-[10px] font-bold uppercase text-neutral-500">{friction ? friction.level : 'enter all fields'}</div>
               </div>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Wait (hours)
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionInput.waitingHours} onChange={(e) => updateNumber('waitingHours', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionText.waitingHours} onChange={(e) => updateNumber('waitingHours', e.target.value)} />
               </label>
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Travel (min)
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionInput.travelMinutes} onChange={(e) => updateNumber('travelMinutes', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionText.travelMinutes} onChange={(e) => updateNumber('travelMinutes', e.target.value)} />
               </label>
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Out-of-pocket
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionInput.outOfPocketCost} onChange={(e) => updateNumber('outOfPocketCost', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionText.outOfPocketCost} onChange={(e) => updateNumber('outOfPocketCost', e.target.value)} />
               </label>
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Monthly budget
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="1" value={frictionInput.monthlyDisposableBudget} onChange={(e) => updateNumber('monthlyDisposableBudget', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="1" value={frictionText.monthlyDisposableBudget} onChange={(e) => updateNumber('monthlyDisposableBudget', e.target.value)} />
               </label>
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Care steps
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="1" value={frictionInput.numberOfSteps} onChange={(e) => updateNumber('numberOfSteps', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="1" value={frictionText.numberOfSteps} onChange={(e) => updateNumber('numberOfSteps', e.target.value)} />
               </label>
               <label className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 Missed work (h)
-                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionInput.missedWorkHours} onChange={(e) => updateNumber('missedWorkHours', e.target.value)} />
+                <input className={`${inputClass} mt-1 !py-2`} type="number" min="0" value={frictionText.missedWorkHours} onChange={(e) => updateNumber('missedWorkHours', e.target.value)} />
               </label>
             </div>
 
             <div className="mt-3 grid grid-cols-3 gap-1.5 text-center text-[10px] text-neutral-500">
-              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">wait {pct(friction.components.waiting)}</div>
-              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">travel {pct(friction.components.travel)}</div>
-              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">cost {pct(friction.components.cost)}</div>
+              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">wait {friction ? pct(friction.components.waiting) : '—'}</div>
+              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">travel {friction ? pct(friction.components.travel) : '—'}</div>
+              <div className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">cost {friction ? pct(friction.components.cost) : '—'}</div>
             </div>
           </div>
 
