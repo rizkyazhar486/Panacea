@@ -6,8 +6,8 @@ export const ringkasPelanggaran = (violations) => Object.fromEntries(violations.
 
 /** Bandingkan pengukuran dengan baseline. Mengembalikan daftar pelanggaran gerbang (kosong = lulus).
  *  Fail-closed: tanpa baseline yang valid, gerbang tidak dapat dinilai dan dianggap gagal. */
-export const bandingkan = (aturan, baseline) => {
-  if (!baseline || typeof baseline.aturan !== 'object' || baseline.aturan === null || !Number.isFinite(baseline.totalNodeSeriusKritis)) {
+export const bandingkan = (aturan, baseline, incompleteTotal) => {
+  if (!baseline || typeof baseline.aturan !== 'object' || baseline.aturan === null || !Number.isFinite(baseline.totalNodeSeriusKritis) || !Number.isFinite(baseline.incompleteTotal)) {
     return ['AXE_BASELINE tidak ada atau tidak valid: gerbang tidak dapat dinilai (fail-closed)']
   }
   const gagal = []
@@ -19,5 +19,8 @@ export const bandingkan = (aturan, baseline) => {
     else if (a.node > baseline.aturan[id]) gagal.push(`${id} (${a.dampak}) naik: ${a.node} > baseline ${baseline.aturan[id]}`)
   }
   if (total > baseline.totalNodeSeriusKritis) gagal.push(`total node serius+kritis ${total} > baseline ${baseline.totalNodeSeriusKritis}`)
+  // 'incomplete' = axe tidak dapat memutuskan dan meminta tinjauan manual: tidak boleh bertambah diam-diam.
+  if (!Number.isFinite(incompleteTotal)) gagal.push('incompleteTotal tidak terukur')
+  else if (incompleteTotal > baseline.incompleteTotal) gagal.push(`incomplete naik: ${incompleteTotal} > baseline ${baseline.incompleteTotal}`)
   return gagal
 }

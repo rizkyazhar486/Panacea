@@ -14,7 +14,7 @@ export function HomeVisualLanding() {
         <h1>Health, made visible.</h1>
       </div>
 
-      <div className="panacea-intent-hero__actions" aria-label="Primary health actions">
+      <div className="panacea-intent-hero__actions" role="group" aria-label="Primary health actions">
         {heroActions.map(({ to, label, icon: Icon }) => (
           <Link key={label} to={to} className="panacea-intent-action" aria-label={label}>
             <span className="panacea-intent-action__icon" aria-hidden="true"><Icon size={20} /></span>
