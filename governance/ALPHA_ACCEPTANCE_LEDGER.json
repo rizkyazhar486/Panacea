@@ -269,15 +269,16 @@
    "pillar": "Clinical Calculators",
    "criterion": "Ratchet \"kolom kosong → 0\" mencapai nol",
    "acceptance": "governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "Baseline 147 → 80 (28 berkas) di main 4b2009a1f",
     "Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766).",
     "Main 92707f132561a9d2529f691b12af10e5b80897d4: actual remaining count 17 after #2439; head 796f3c04 passed nine exact-head checks including nutrition recovery (run 38218032932).",
-    "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767)."
+    "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767).",
+    "Pemindai asli pada main (scripts/uji/angka-kosong-ratchet.mts, dijalankan di `npm run uji`): 0 kejadian di 0 berkas dari 1017 TSX; governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0, berkas = {}. Sabotase: berkas TSX berisi `Number(v) || 0` gagal dengan 'halaman baru membaca kolom kosong sebagai 0 ... src/__sab/Sab.tsx: 1 kejadian, tidak ada di baseline'. CI exact-SHA main 394d5437c: Stabilization Acceptance run 38939685715 SUCCESS, job full-acceptance 117103883902, langkah 'Frontend tests' SUCCESS. scripts/qa/empty-field-zero-ratchet.test.mjs: 9 uji lulus."
    ],
    "owner": "Sonnet",
-   "note": "Pemindai asli pada kandidat provenance durasi mencapai 0 kejadian di 0 berkas (837 TSX), tanpa mengubah detector. Import, penyimpanan, ringkasan pekan dan liga membedakan durasi diketahui/turunan/tidak diketahui serta mempertahankan nol eksplisit. C2 tetap REPORTED: consumer kompatibilitas numerik lain (summary/detail, analisis harian, replay, chart, training load dan dashboard) masih perlu diklasifikasi/migrasi; nol regex bukan bukti cakupan semantik lengkap. Status, kriteria dan persetujuan klinis tidak dipromosikan."
+   "note": "VERIFIED menurut syarat tertulis kriteria (baseline total = 0, dijaga gerbang CI). BATAS: ini ukuran regex (`(Number|parseFloat|parseInt)(...) || 0`), bukan bukti bahwa SEMUA consumer numerik sudah membedakan kosong dari nol; migrasi semantik consumer lain (summary/detail, analisis harian, replay, chart, training load, dashboard) berlanjut lewat PR C2 terpisah dan tidak diklaim selesai di sini. Tidak ada klaim validasi klinis."
   },
   {
    "id": "C3",
@@ -453,10 +454,11 @@
     "bodyexposure/PROVENANCE.md",
     "scripts/uji/body-asset-provenance.mts",
     "Audit independen parsial (Sonnet Cloud, scripts/qa/glb-provenance-audit.mjs, main 1ee18b373): 17.676 struktur bernama di 380 GLB publik (tanpa rig) semuanya membawa panacea_source, panacea_license, dan panacea_accuracy_status — 0 tanpa metadata. Lisensi: CC BY-SA 4.0 (11.625), CC BY 4.0 (2.537), ICRP 156/145 'redistribusi dibebaskan pemilik proyek 2026-10-03' (2.772), Denver CC BY 4.0 (736). Akurasi: source_backed 17.344, model_segmented 224, source_backed_corrected 93, review_required 12, approximate 3. Kontrol negatif: GLB dengan satu panacea_license dihapus gagal dengan nama berkas dan struktur",
-    "scripts/uji/body-attribution-coverage.mts + src/domains/body-exposure/engine/attributionCoverage.ts (gerbang CI): membaca chunk JSON dari 506 GLB publik (14 lisensi distinct, 463 sumber distinct) dan mensyaratkan tiap lisensi/sumber DIKENALI dan DINAMAI di public/bodyexposure/provenance.html; lisensi/sumber tak dikenal = lacuna (fail-closed); CanonicalBody menautkan ke halaman itu. Sabotase: halaman kehilangan ICRP 145 / Allen, tabel melupakan Andreassen, toleransi 'desconhecida', cek halaman dimatikan - masing-masing gagal dengan nama lacuna. Dua mutan setara (Allen sudah tercakup kunci HuBMAP; String(undefined)) tidak membedakan perilaku."
+    "scripts/uji/body-attribution-coverage.mts + src/domains/body-exposure/engine/attributionCoverage.ts (gerbang CI): membaca chunk JSON dari 506 GLB publik (14 lisensi distinct, 463 sumber distinct) dan mensyaratkan tiap lisensi/sumber DIKENALI dan DINAMAI di public/bodyexposure/provenance.html; lisensi/sumber tak dikenal = lacuna (fail-closed); CanonicalBody menautkan ke halaman itu. Sabotase: halaman kehilangan ICRP 145 / Allen, tabel melupakan Andreassen, toleransi 'desconhecida', cek halaman dimatikan - masing-masing gagal dengan nama lacuna. Dua mutan setara (Allen sudah tercakup kunci HuBMAP; String(undefined)) tidak membedakan perilaku.",
+    "Inventaris seluruh aset biner di public/ (scripts/qa/public-asset-inventory.mjs + scripts/uji/public-asset-provenance.mts + governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json): 640 aset; 556 punya jejak (520 berkas kredit direktori >= 40 byte, 36 hak cipta tertanam, 2 per-node); 82 TANPA jejak. Gerbang ratchet: aset baru tanpa jejak gagal, entri basi harus dibuang; 3 sabotase pada repo nyata gagal dengan pesan bernama; kredit kosong tidak dihitung. Rincian dan keputusan yang dibutuhkan: docs/alpha/D8_PUBLIC_ASSET_PROVENANCE_GAPS.md."
    ],
    "owner": "Local",
-   "note": " Terverifikasi hanya kelengkapan metadata di data. Belum diperiksa: halaman atribusi resmi di aplikasi, dan keabsahan lisensi itu sendiri; lisensi ICRP bersandar pada pernyataan pemilik proyek, bukan teks lisensi yang diverifikasi independen. Tetap REPORTED. Kelengkapan atribusi data↔halaman kini dijaga gerbang CI, tetapi itu bukan bukti keabsahan lisensi: pernyataan ICRP bersandar pada pernyataan pemilik proyek, dan alias 'Human Reference Atlas' diperlakukan sama dengan 'HuBMAP' (HRA adalah atlas HuBMAP; halaman menamainya HuBMAP). Tetap REPORTED."
+   "note": "Tetap REPORTED. Cakupan sebelumnya hanya GLB di public/bodyexposure; inventaris seluruh public/ menemukan 82 aset tanpa jejak provenance (45 WebP organ, 28 aset dataset-inspection/fetal-parcels, 5 SVG, 3 MP4, 1 logo). Hanya pemilik yang dapat menyatakan asal-usul dan lisensinya; tidak diisi dengan tebakan. Gerbang mengukur ADA-nya jejak, bukan keabsahan lisensi; lisensi ICRP bersandar pada pernyataan pemilik proyek."
   },
   {
    "id": "D9",
