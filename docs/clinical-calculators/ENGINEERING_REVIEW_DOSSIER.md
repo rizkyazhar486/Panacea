@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–8)
+# Clinical calculators — automated engineering-review dossier (tranches 1–9)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8), `scripts/uji/calculator-independent-reference-9.mts` (tranche 9); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -158,6 +158,21 @@ Integer-arithmetic references for the caffeine bands (minutes × 10 against half
 | Caffeine at bedtime (`caffeineAtBedtime`, `caffeineBand`) | remaining = dose × 0.5^(hours / half-life); bands > 25 % high, > 12.5 % near, else low; 3 half-lives to ~12.5 %; drink table 95/63/47/28/80/34 mg | none beyond the table | The drink contents, the 25 % / 12.5 % bands and the 1.5–9.5 h half-life range are unsourced; **consumed time equal to bedtime reads as 0 h (full dose), not 24 h**; `hoursTo12pct` is 12.5 %, not 12 %; blank servings or custom mg read as 0 mg by documented design ("did not drink"); this is not a safe-intake limit. |
 | Blood-donation pre-screening (`bloodDonationScreen`) | age 17–65, weight ≥ 50 kg, 12 weeks since last donation, four deferral flags; last-donation date validated (calendar-real, not in the future) | generic national/WHO/PMI criteria as recorded | The age/weight limits and the 12-week interval vary by service and sex; this is not on-site screening (haemoglobin and interview remain with the blood bank). A donation dated today is accepted and not eligible. |
 
+## Tranche 9 — FIB-4, OST, risk-screen gates and the newborn/growth/Framingham input validators (suite: `scripts/uji/calculator-independent-reference-9.mts`)
+
+References: FIB-4 against the formula and band table (400 seeded cases plus exact band boundaries); OST against an integer reference (tenths of kg, 20,000 cases; a 391,503-point one-off probe found 0 mismatches); every validator under hostile-input matrices with range tables re-asserted as literals; 50 source mutants, each fails by name. Result: **no discrepancy and no engine change.**
+
+**Not verified here:** the Framingham General CVD model itself. `cvdRisk` delegates to `framinghamCVD` in `lib/riskModels` (D'Agostino 2008 coefficients); this tranche tests only its input gates, the HDL < total-cholesterol rule, band wiring and monotone sanity (age, risk factors, HDL). Re-deriving the coefficients needs the primary source, as for `graceScore`.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| FIB-4 (`fib4`, `fib4Band`) | age × AST / (platelets × √ALT), rounded to 2 dp; < 1.3 (age ≥ 65: < 2.0) low, ≤ 2.67 indeterminate, else high | Sterling 2006; age-adjusted cut-off as recorded | **The value is rounded to 2 dp before banding**, so an unrounded 1.2997 is shown as 1.30 and banded "Indeterminate" (the band follows the displayed value). The 65-year cut-over and the 2.0 cut-off are as recorded; the algorithm is not for general-population screening. |
+| OST (`ostIndex`, `ostBand`) | trunc(0.2 × (kg − age)); > −1 lower, −1…−4 moderate, < −4 higher | Koh 2001 | A small negative difference truncates to −0 (equal to 0; prints "0"). Applicability by sex and ethnicity is a clinical matter. |
+| Framingham CVD gates (`cvdRisk`) | age 18–120 gate, sex M/F, three yes/no flags, HDL < total cholesterol | D'Agostino 2008 | **Model coefficients not re-derived** (see above); the page's 30–74 validation population remains a page note while `cvdRisk` accepts 18–120. |
+| Newborn inputs (`validateBallardInputs`) | birth weight 200–8000 g; Apgar 1 and 5 min whole numbers 0–10 (0 is legitimate) | scale definition | The Ballard→gestational-age table and Lubchenco percentiles are not in this engine. |
+| Growth inputs (`validateWhoGrowthInputs`, `validateNeonateInputs`, `validateCdcInputs`, `parseWhoVisit`) | age/weight/length ranges for WHO 0–60 months, neonate 0–30 days, CDC 2–20 years | as recorded | Weight/height ranges are input-sanity bounds. `parseWhoVisit` uses `Number()`, so a typed `0x10` reads as 16 (not typeable in a number input). Reference tables and z-scores are not in this engine. |
+| Framingham what-if inputs (`validateFraminghamInput`) | age 30–74, total cholesterol 100–500, HDL 10–150, SBP 70–300; NaN = "required" | D'Agostino 2008 derivation range | The 30–74 age range follows the derivation population; the ranges for cholesterol/HDL/SBP are input-sanity bounds. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `framinghamInputs`, `growthInputs`, `ballardInputs`, `riskScreens`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`graceScore` (points table too large to transcribe without the primary source), and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
