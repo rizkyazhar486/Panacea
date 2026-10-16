@@ -13,6 +13,8 @@ on:
       - 'scripts/qa/keyboard-analisis.mjs'
       - 'governance/KEYBOARD_BASELINE.json'
       - 'scripts/qa/axe-ratchet.mjs'
+      - 'scripts/qa/screenshot-grid.mjs'
+      - 'scripts/qa/screenshot-regresi.mjs'
       - 'governance/AXE_BASELINE.json'
       - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
@@ -40,6 +42,8 @@ on:
       - 'scripts/qa/keyboard-analisis.mjs'
       - 'governance/KEYBOARD_BASELINE.json'
       - 'scripts/qa/axe-ratchet.mjs'
+      - 'scripts/qa/screenshot-grid.mjs'
+      - 'scripts/qa/screenshot-regresi.mjs'
       - 'governance/AXE_BASELINE.json'
       - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
@@ -95,6 +99,7 @@ jobs:
           SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/axe-evidence.json" AXE_BASELINE=governance/AXE_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/axe-audit.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/keyboard-evidence.json" KEYBOARD_BASELINE=governance/KEYBOARD_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/keyboard-audit.mjs || rc=1
+          SHOT_REPORT_ONLY=1 QA_OUT="$RUNNER_TEMP/screenshot-grid-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/screenshot-regresi.mjs || rc=1
           exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
@@ -106,4 +111,5 @@ jobs:
             ${{ runner.temp }}/theme-parity-evidence.json
             ${{ runner.temp }}/axe-evidence.json
             ${{ runner.temp }}/keyboard-evidence.json
+            ${{ runner.temp }}/screenshot-grid-evidence.json
             ${{ runner.temp }}/theme-shots
