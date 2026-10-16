@@ -7,6 +7,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
@@ -26,6 +28,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'governance/THEME_PARITY_BASELINE.json'
       - 'governance/KONTRAS_BASELINE.json'
       - 'src/main.tsx'
       - 'src/components/layout/**'
@@ -76,6 +80,7 @@ jobs:
           rc=0
           UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
+          SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
           exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
@@ -84,3 +89,5 @@ jobs:
           path: |
             ${{ runner.temp }}/ux-audit-evidence.json
             ${{ runner.temp }}/kontras-evidence.json
+            ${{ runner.temp }}/theme-parity-evidence.json
+            ${{ runner.temp }}/theme-shots
