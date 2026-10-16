@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
-import { IconActivity, IconHeart, IconCheck } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { IconActivity, IconHeart, IconCheck } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Initial Assessment — required before starting a demanding program: movement

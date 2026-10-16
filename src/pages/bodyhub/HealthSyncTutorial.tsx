@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle, Badge, Button } from '../components/ui'
+import { Card, SectionTitle, Badge, Button } from '../../components/ui'
 import {
   IconHeart, IconActivity, IconDownload, IconKey, IconShield, IconCheck,
   IconTimer, IconGauge, IconChevronRight,
-} from '../components/icons'
-import { api, backendEnabled, type SyncFinding } from '../lib/api'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../components/icons'
+import { api, backendEnabled, type SyncFinding } from '../../lib/api'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public-facing, step-by-step guide for connecting Apple Watch / Apple Health

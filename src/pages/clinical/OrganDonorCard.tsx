@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconHeart } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconHeart } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Organ Donor Pledge Card — an informational primer on organ/tissue donation

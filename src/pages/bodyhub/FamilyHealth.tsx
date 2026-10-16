@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
-import { IconHeart, IconShield, IconActivity } from '../components/icons'
-import { uid } from '../lib/store'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
+import { IconHeart, IconShield, IconActivity } from '../../components/icons'
+import { uid } from '../../lib/store'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Family Health History ("Legacy Tree") — record relatives and their major

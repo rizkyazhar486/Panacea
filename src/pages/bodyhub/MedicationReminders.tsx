@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
-import { IconPill, IconBell } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
-import type { MedReminder } from '../lib/types'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../components/ui'
+import { IconPill, IconBell } from '../../components/icons'
+import { api, backendEnabled } from '../../lib/api'
+import type { MedReminder } from '../../lib/types'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Medication Reminders — daily push notifications at a chosen time, backed by
