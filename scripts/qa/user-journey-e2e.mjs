@@ -256,11 +256,24 @@ try {
         pasienApi.token, SESSION_KEY, TOKEN_KEY])
       const RUTE = ['#/harian', '#/health-data', '#/clinical-hub']
       const jejak = [] // diagnostik kegagalan: permintaan gagal dan respons >=400 di luar /api (mis. chunk yang tak termuat)
-      page.on('requestfailed', (r) => jejak.push(`GAGAL ${r.url().slice(-70)} ${r.failure()?.errorText ?? ''}`))
+      const menggantung = new Set() // permintaan non-API yang belum selesai: bukti bila chunk halaman macet
+      page.on('request', (r) => { if (!apiUrl(new URL(r.url()))) menggantung.add(r.url()) })
+      page.on('requestfinished', (r) => menggantung.delete(r.url()))
+      page.on('requestfailed', (r) => { menggantung.delete(r.url()); jejak.push(`GAGAL ${r.url().slice(-70)} ${r.failure()?.errorText ?? ''}`) })
       page.on('response', (r) => { if (r.status() >= 400 && !r.url().includes('/api/')) jejak.push(`HTTP ${r.status()} ${r.url().slice(-70)}`) })
       const teksBadan = (pg) => pg.evaluate(() => document.body.innerText)
       const bocor = (t) => ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read'].filter((x) => t.includes(x))
       const cangkang = async (pg) => { await pg.getByRole('button', { name: 'Notifications' }).first().waitFor({ timeout: 60000 }) }
+      // (0) kontrol positif + pemanasan: tanpa gangguan apa pun, tiap rute harus terisi. Dev server mengompilasi chunk saat pertama diminta; tanpa
+      // langkah ini kompilasi dingin bisa disangka kegagalan aplikasi saat API digagalkan. Gagal di sini = masalah dasar, bukan ketahanan.
+      await step(vp.name, J, 'kontrol positif tanpa gangguan: tiap rute terisi (pemanasan, batas 120 dtk)', async () => {
+        for (const rute of RUTE) {
+          await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+          await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 120000 }).catch(() => {})
+          const t = await teksBadan(page)
+          assert.ok(t.trim().length > 200, `${rute} tidak terisi dalam 120 dtk TANPA gangguan (${t.trim().length} karakter; menggantung=${JSON.stringify([...menggantung].slice(-5).map((u) => u.slice(-80)))})`)
+        }
+      })
       // (a) loading lambat: semua panggilan API tertunda 1,5 dtk; cangkang harus tetap tampil, tanpa overflow, tanpa teks bocor
       await step(vp.name, J, 'API lambat (1,5 dtk): cangkang dan halaman tetap tampil tanpa overflow atau teks bocor', async () => {
         await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, 1500)); await r.continue().catch(() => {}) }) // navigasi bisa menutup rute lebih dulu: abaikan, bukan crash
@@ -281,7 +294,7 @@ try {
           // halaman rute dimuat malas (lazy): tunggu sampai terisi, tetapi gagal bila tak pernah terisi dalam 60 dtk (kompilasi chunk dev server bisa >20 dtk) (bukan sekadar belum dimuat)
           await page.waitForFunction(() => document.body.innerText.trim().length > 200, null, { timeout: 60000 }).catch(() => {})
           const t = await teksBadan(page)
-          assert.ok(t.trim().length > 200, `${rute} tetap nyaris kosong 60 dtk setelah cangkang saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))}; jejak=${JSON.stringify(jejak.slice(-4))})`)
+          assert.ok(t.trim().length > 200, `${rute} tetap nyaris kosong 60 dtk setelah cangkang saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))}; jejak=${JSON.stringify(jejak.slice(-4))}; menggantung=${JSON.stringify([...menggantung].slice(-5).map((u) => u.slice(-80)))})`)
           const b = bocor(t); assert.deepEqual(b, [], `${rute} teks bocor saat API 500: ${b}`)
           const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat API 500`)
         }
