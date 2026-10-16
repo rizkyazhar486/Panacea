@@ -254,3 +254,36 @@ export function laporanKeBundelFhir(rencana: RencanaPerawatan, laporan: LaporanH
     ],
   }
 }
+
+// ── Tindak lanjut terjadwal (Alpha A7) ─────────────────────────────────────────
+// Dibuat HANYA dari rencana yang sudah bertanda tangan klinisi; pemilik = klinisi penanda tangan.
+// Server tidak menentukan kapan tindak lanjut klinis diperlukan: tanggal dan alasan ditulis klinisi.
+export const MAKS_TINDAK_LANJUT_PER_RENCANA = 50
+export const MAKS_HARI_KE_DEPAN_TINDAK_LANJUT = 365
+export interface TindakLanjut {
+  id: string; planId: string; subjectId: string; ownerClinicianId: string
+  dueDate: string; reason: string; status: 'scheduled'; createdAt: string; clientId?: string
+}
+const TGL = /^\d{4}-\d{2}-\d{2}$/
+const ID_KLIEN = /^[A-Za-z0-9_-]{8,80}$/
+function hariUtc(d: Date): number { return Math.floor(d.getTime() / 86_400_000) }
+
+export function susunTindakLanjut(rencana: RencanaPerawatan, masukan: unknown, id: string, kini: Date): TindakLanjut {
+  if (!isSignedCarePlan(rencana)) throw new Error('follow-up requires a clinician-signed care plan')
+  if (!Number.isFinite(kini.getTime())) throw new Error('invalid clock')
+  const m = (masukan && typeof masukan === 'object' ? masukan : {}) as Record<string, unknown>
+  const dueDate = typeof m.dueDate === 'string' ? m.dueDate : ''
+  const tanggal = TGL.test(dueDate) ? new Date(`${dueDate}T00:00:00Z`) : null
+  if (!tanggal || !Number.isFinite(tanggal.getTime()) || tanggal.toISOString().slice(0, 10) !== dueDate) throw new Error('dueDate must be a real YYYY-MM-DD date')
+  const selisih = hariUtc(tanggal) - hariUtc(kini)
+  if (selisih < 0) throw new Error('dueDate cannot be in the past')
+  if (selisih > MAKS_HARI_KE_DEPAN_TINDAK_LANJUT) throw new Error(`dueDate is more than ${MAKS_HARI_KE_DEPAN_TINDAK_LANJUT} days ahead`)
+  const reason = typeof m.reason === 'string' ? m.reason.trim() : ''
+  if (reason.length < 3 || reason.length > 300) throw new Error('reason must be 3-300 characters')
+  let clientId: string | undefined
+  if (m.clientId !== undefined) {
+    if (typeof m.clientId !== 'string' || !ID_KLIEN.test(m.clientId)) throw new Error('invalid client id')
+    clientId = m.clientId
+  }
+  return { id, planId: rencana.id, subjectId: rencana.subjectId, ownerClinicianId: rencana.clinicianId, dueDate, reason, status: 'scheduled', createdAt: kini.toISOString(), ...(clientId ? { clientId } : {}) }
+}

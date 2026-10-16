@@ -73,6 +73,7 @@ import {
   listCarePlans,
   listSignedCarePlans,
   addCarePlan,
+  addCareFollowUp,
   bacaLedgerValidasi,
   tambahLedgerValidasi,
   addCareReport,
@@ -163,7 +164,7 @@ import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './domains/clini
 import { susunKeadaanLongitudinal } from './domains/clinical-records/keadaanLongitudinal.js'
 import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './domains/clinical-records/catatanKesehatanDiri.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './domains/clinical-records/labFhir.js'
-import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSignedCarePlan } from './domains/clinical-records/carePlan.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSignedCarePlan, susunTindakLanjut, MAKS_TINDAK_LANJUT_PER_RENCANA } from './domains/clinical-records/carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
@@ -1326,6 +1327,37 @@ app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
   if (p) addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
   const unsigned = listCarePlans().find(x => x.izinId === izin.id && x.dokterEmail === u.email && !x.dicabut && !isSignedCarePlan(x.rencana))
   res.json({ plan: p?.rencana ?? null, unsignedPlan: unsigned?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
+})
+// A7 — tindak lanjut dari rencana BERTANDA TANGAN. Pemilik = klinisi penanda tangan; rencana tak bertanda tangan,
+// klinisi lain, atau izin pasien yang sudah berakhir/dicabut ditolak dan tercatat.
+app.post('/api/clinician/care-plans/:planId/follow-ups', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const planId = String(req.params.planId)
+  const entri = listCarePlans().find(p => p.rencana?.id === planId && !p.dicabut && p.dokterEmail === u.email && p.rencana.clinicianId === u.id)
+  if (!entri || !izinBerlaku(listLabShares().find(i => i.id === entri.izinId), u.email, kini)) { addAudit(u, 'care.followup.refused', planId); res.status(404).json({ error: 'no owned active care plan' }); return }
+  try {
+    const f = susunTindakLanjut(entri.rencana, req.body, randomUUID(), kini)
+    const hasil = addCareFollowUp(planId, f, MAKS_TINDAK_LANJUT_PER_RENCANA)
+    if (!hasil) { res.status(404).json({ error: 'no owned active care plan' }); return }
+    if (hasil.baru) addAudit(u, 'care.followup.created', hasil.f.id)
+    res.json(hasil.f)
+  } catch (e) {
+    addAudit(u, 'care.followup.refused', planId)
+    res.status(/signed/.test((e as Error).message) ? 409 : 400).json({ error: (e as Error).message })
+  }
+})
+// Daftar kerja klinisi: hanya tindak lanjut milik sendiri, dari rencana aktif yang izin pasiennya masih berlaku.
+app.get('/api/clinician/follow-ups', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const items = listCarePlans()
+    .filter(p => p.dokterEmail === u.email && !p.dicabut && p.rencana?.clinicianId === u.id && isSignedCarePlan(p.rencana) && izinBerlaku(listLabShares().find(i => i.id === p.izinId), u.email, kini))
+    .flatMap(p => (p.tindakLanjut ?? []).filter(f => f.ownerClinicianId === u.id))
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.createdAt.localeCompare(b.createdAt))
+  res.json({ followUps: items })
 })
 // Pasien: rencana aktif dari dokter yang IZINNYA MASIH BERLAKU; dicabut = berhenti.
 app.get('/api/care/plans', requireAuth, (req, res) => {

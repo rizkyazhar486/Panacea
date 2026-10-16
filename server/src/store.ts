@@ -143,7 +143,8 @@ interface DB {
   validasiLedger?: import('./domains/clinical-records/validasiLedger.js').CatatanLedger[]
   /** Token sesi yang dicabut saat logout: sha256(token) -> ISO kedaluwarsa token (dipangkas setelah lewat). */
   tokenDicabut?: Record<string, string>
-  carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
+  /** tindakLanjut tersimpan DI DALAM dokumen rencana: ikut bertahan di penyimpanan berkas maupun Mongo tanpa koleksi baru. */
+  carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any; tindakLanjut?: import('./domains/clinical-records/carePlan.js').TindakLanjut[] }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
   labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter' | 'rencana-harian'; izinId: string }[]
@@ -1074,6 +1075,17 @@ export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
   // Satu rencana aktif per pasien–dokter: rencana baru menggantikan yang lama.
   for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat
   ;(db.carePlans ??= []).push(p); save()
+}
+/** Menambah tindak lanjut ke rencana aktif; clientId yang sama mengembalikan yang lama (idempoten). */
+export function addCareFollowUp(rencanaId: string, f: import('./domains/clinical-records/carePlan.js').TindakLanjut, maks: number): { f: import('./domains/clinical-records/carePlan.js').TindakLanjut; baru: boolean } | null {
+  const p = (db.carePlans ?? []).find(x => x.rencana?.id === rencanaId && !x.dicabut)
+  if (!p) return null
+  const daftar = (p.tindakLanjut ??= [])
+  const sama = f.clientId ? daftar.find(x => x.clientId === f.clientId) : undefined
+  if (sama) return { f: sama, baru: false }
+  if (daftar.length >= maks) throw new Error('follow-up limit reached for this care plan')
+  daftar.push(f); save()
+  return { f, baru: true }
 }
 export function addCareReport(pasienEmail: string, laporan: any) { const l = (db.careReports ??= []); l.push({ pasienEmail, laporan }); if (l.length > 50000) arsipkan('careReports', l.splice(0, l.length - 50000)); save() }
 export function listCareReports(pasienEmail: string, planId: string) { return (db.careReports ?? []).filter((r) => r.pasienEmail === pasienEmail && r.laporan.planId === planId).map((r) => r.laporan).slice(-60) }

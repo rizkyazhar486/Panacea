@@ -131,3 +131,4 @@ await import('./inputBoundsHttp.uji.js')
 // Connect privacy over real HTTP: consent first, no sensitive field in any user-facing response, server-side deck filters, radius validated, withdrawal erases.
 await import('./connectHttp.uji.js')
 await import('./logoutRevokeHttp.uji.js')
+await import('./tindakLanjutHttp.uji.js')
