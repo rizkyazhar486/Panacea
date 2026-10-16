@@ -13,10 +13,14 @@ const REQUIRED_EXTENSIONS = new Map([
 const JSON_PATH = new URL('../../governance/ALPHA_ACCEPTANCE_LEDGER.json', import.meta.url)
 const MD_PATH = new URL('../../docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md', import.meta.url)
 
-type Kriteria = { id: string; pillar: string; criterion: string; acceptance: string; status: string; evidence: string[]; owner: string; note: string }
-type Ledger = { version: number; approvedBy: string; scope: string[]; weightPolicy: string; baseline: { mainSha: string; date: string; note: string }; statuses: string[]; criteria: Kriteria[] }
+type Penundaan = { decision: string; phase: string; previousStatus: string; stillRequired: string }
+type Kriteria = { id: string; pillar: string; criterion: string; acceptance: string; status: string; evidence: string[]; owner: string; note: string; deferral?: Penundaan }
+type KebijakanPenundaan = { decision: string; decidedBy: string; allowedIds: string[]; targetPhase: string; requiredBeforeClinicalUse: boolean; preserved: string }
+type Ledger = { version: number; approvedBy: string; scope: string[]; weightPolicy: string; baseline: { mainSha: string; date: string; note: string }; statuses: string[]; criteria: Kriteria[]; deferralPolicy?: KebijakanPenundaan }
 
-export function auditLedger(l: Ledger): { masalah: string[]; terverifikasi: number; total: number; persen: number } {
+export const STATUS_DITUNDA = 'DEFERRED_TO_CLINICAL_VALIDATION'
+
+export function auditLedger(l: Ledger): { masalah: string[]; terverifikasi: number; total: number; aktif: number; ditunda: number; persen: number } {
   const masalah: string[] = []
   const ids = new Set<string>()
   for (const c of l.criteria) {
@@ -25,6 +29,18 @@ export function auditLedger(l: Ledger): { masalah: string[]; terverifikasi: numb
     if (!l.statuses.includes(c.status)) masalah.push(`status tidak dikenal pada ${c.id}: ${c.status}`)
     if (c.status === 'VERIFIED' && (!Array.isArray(c.evidence) || c.evidence.length === 0 || c.evidence.some((e) => typeof e !== 'string' || e.trim() === ''))) masalah.push(`VERIFIED tanpa bukti: ${c.id}`)
     if (!c.acceptance || c.acceptance.trim() === '') masalah.push(`kriteria tanpa syarat penerimaan: ${c.id}`)
+    // Penundaan hanya sah bila: status ditunda, id diizinkan kebijakan pemilik, dan alasan/fase/syarat-tersisa tercatat. Penunda tidak pernah VERIFIED.
+    if (c.status === STATUS_DITUNDA) {
+      const k = l.deferralPolicy
+      if (!k || !Array.isArray(k.allowedIds) || !k.allowedIds.includes(c.id)) masalah.push(`penundaan tanpa izin kebijakan pemilik: ${c.id}`)
+      const d = c.deferral
+      if (!d || [d.decision, d.phase, d.previousStatus, d.stillRequired].some((v) => typeof v !== 'string' || v.trim() === '')) masalah.push(`penundaan tanpa catatan lengkap: ${c.id}`)
+    } else if (c.deferral) masalah.push(`catatan penundaan pada kriteria yang tidak ditunda: ${c.id}`)
+  }
+  if (l.deferralPolicy) {
+    const k = l.deferralPolicy
+    if (k.requiredBeforeClinicalUse !== true) masalah.push('kebijakan penundaan wajib mempertahankan validasi klinis sebelum penggunaan klinis nyata')
+    for (const id of k.allowedIds) if (!l.criteria.some((c) => c.id === id)) masalah.push(`kebijakan penundaan menyebut id yang tidak ada: ${id}`)
   }
   if (l.criteria.length < BASELINE_TOTAL) masalah.push(`kriteria berkurang di bawah baseline ${BASELINE_TOTAL}: ${l.criteria.length}`)
   for (const [id, title] of REQUIRED_EXTENSIONS) {
@@ -34,7 +50,10 @@ export function auditLedger(l: Ledger): { masalah: string[]; terverifikasi: numb
   }
   const terverifikasi = l.criteria.filter((c) => c.status === 'VERIFIED').length
   const total = l.criteria.length
-  return { masalah, terverifikasi, total, persen: total === 0 ? 0 : Math.round((1000 * terverifikasi) / total) / 10 }
+  // Penyebut Alpha aktif mengecualikan kriteria yang SAH ditunda; kriteria tetap tercatat dan `total` tetap menjaga baseline 45.
+  const ditunda = l.criteria.filter((c) => c.status === STATUS_DITUNDA && l.deferralPolicy?.allowedIds.includes(c.id)).length
+  const aktif = total - ditunda
+  return { masalah, terverifikasi, total, aktif, ditunda, persen: aktif === 0 ? 0 : Math.round((1000 * terverifikasi) / aktif) / 10 }
 }
 
 export function renderLedger(l: Ledger): string {
@@ -44,10 +63,15 @@ export function renderLedger(l: Ledger): string {
   const out: string[] = []
   out.push('# Alpha acceptance ledger', '')
   out.push('> Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).', '')
-  out.push(`**Alpha completion: ${a.terverifikasi} / ${a.total} = ${a.persen}%** (baseline main \`${l.baseline.mainSha.slice(0, 9)}\`, ${l.baseline.date}).`, '')
+  out.push(`**Alpha engineering completion: ${a.terverifikasi} / ${a.aktif} = ${a.persen}%** (baseline main \`${l.baseline.mainSha.slice(0, 9)}\`, ${l.baseline.date}).`, '')
+  if (a.ditunda > 0 && l.deferralPolicy) {
+    const ids = l.criteria.filter((c) => c.status === STATUS_DITUNDA).map((c) => c.id).join(', ')
+    out.push(`Ditunda ke fase ${l.deferralPolicy.targetPhase}: ${a.ditunda} (${ids}); total kriteria tercatat ${a.total}. Kriteria ditunda **tidak** berstatus VERIFIED dan **bukan** tervalidasi klinis. ${l.deferralPolicy.decision} (${l.deferralPolicy.decidedBy}).`, '')
+  }
   out.push(`Disetujui: ${l.approvedBy}. ${l.baseline.note}`, '')
   out.push('## Kebijakan penghitungan', '', l.weightPolicy, '')
-  out.push('Persentase tidak mengalahkan gerbang yang gagal: Alpha tidak dinyatakan 100% sebelum seluruh gerbang wajib lulus, termasuk tinjauan klinis yang terpisah.', '')
+  out.push('Persentase tidak mengalahkan gerbang yang gagal: Alpha engineering tidak dinyatakan 100% sebelum seluruh gerbang wajib aktif lulus. Alpha engineering 100% BUKAN validasi klinis: validasi dan persetujuan klinis tetap wajib pada fase Clinical Validation sebelum fungsi pendukung keputusan klinis dipakai untuk keputusan klinis nyata.', '')
+  if (l.deferralPolicy) out.push(`Pelestarian: ${l.deferralPolicy.preserved}`, '')
   out.push('## Lingkup Alpha (disetujui)', '', ...l.scope.map((s) => `- ${s}`), '')
   out.push('## Ringkasan status', '', '| Status | Jumlah |', '|---|---|', ...l.statuses.map((s) => `| ${s} | ${hitung(s)} |`), '')
   for (const p of pillars) {
@@ -93,6 +117,36 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
   assert.deepEqual(auditLedger(x).masalah, [], 'penambahan kriteria dianggap pelanggaran')
   // Persentase mengikuti hitungan: REPORTED/NOT_CHECKED tidak berkredit.
   assert.equal(a.terverifikasi, l.criteria.filter((c) => c.status === 'VERIFIED').length)
-  assert.equal(a.persen, Math.round((1000 * a.terverifikasi) / a.total) / 10)
-  console.log(`alpha-ledger: ${a.terverifikasi}/${a.total} = ${a.persen}% (kredit hanya VERIFIED berbukti); sabotase gagal dengan nama`)
+  // Penyebut kini AKTIF (total dikurangi yang sah ditunda, arahan pemilik 2026-10-16); asersi persen lama terhadap total diganti dan diuji di blok penundaan.
+
+  // --- penundaan ke Clinical Validation (keputusan pemilik 2026-10-16) ---
+  assert.equal(a.ditunda, l.criteria.filter((c) => c.status === STATUS_DITUNDA).length, 'ditunda sah = ditunda tercatat')
+  assert.equal(a.aktif, a.total - a.ditunda, 'penyebut aktif = total - ditunda')
+  assert.equal(a.persen, a.aktif === 0 ? 0 : Math.round((1000 * a.terverifikasi) / a.aktif) / 10, 'persen memakai penyebut aktif')
+  assert.ok(l.criteria.filter((c) => c.status === STATUS_DITUNDA).every((c) => c.status !== 'VERIFIED'), 'penunda tidak pernah VERIFIED')
+  assert.equal(l.criteria.find((c) => c.id === 'C6')!.status, STATUS_DITUNDA, 'C6 ditunda sesuai arahan pemilik')
+  // negatif: hanya id yang diizinkan kebijakan yang boleh ditunda (mencegah menyembunyikan kriteria sulit dari penyebut)
+  x = salin(); x.criteria.find((c) => c.id === 'D7')!.status = STATUS_DITUNDA; x.criteria.find((c) => c.id === 'D7')!.deferral = x.criteria.find((c) => c.id === 'C6')!.deferral
+  assert.ok(auditLedger(x).masalah.includes('penundaan tanpa izin kebijakan pemilik: D7'), 'menunda kriteria lain lolos')
+  assert.equal(auditLedger(x).ditunda, 1, 'kriteria tak sah ditunda tidak dikeluarkan dari penyebut')
+  // negatif: tanpa kebijakan, tanpa catatan, catatan basi
+  x = salin(); delete x.deferralPolicy
+  assert.ok(auditLedger(x).masalah.includes('penundaan tanpa izin kebijakan pemilik: C6'), 'penundaan tanpa kebijakan lolos')
+  assert.equal(auditLedger(x).aktif, auditLedger(x).total, 'tanpa kebijakan penyebut tidak mengecil')
+  x = salin(); delete x.criteria.find((c) => c.id === 'C6')!.deferral
+  assert.ok(auditLedger(x).masalah.includes('penundaan tanpa catatan lengkap: C6'), 'penundaan tanpa catatan lolos')
+  x = salin(); x.criteria.find((c) => c.id === 'C6')!.deferral!.stillRequired = ' '
+  assert.ok(auditLedger(x).masalah.includes('penundaan tanpa catatan lengkap: C6'), 'syarat tersisa kosong lolos')
+  x = salin(); x.criteria.find((c) => c.id === 'D7')!.deferral = x.criteria.find((c) => c.id === 'C6')!.deferral
+  assert.ok(auditLedger(x).masalah.includes('catatan penundaan pada kriteria yang tidak ditunda: D7'), 'catatan penundaan basi lolos')
+  x = salin(); x.deferralPolicy!.requiredBeforeClinicalUse = false
+  assert.ok(auditLedger(x).masalah.some((m) => m.startsWith('kebijakan penundaan wajib mempertahankan validasi klinis')), 'kebijakan yang menghapus validasi klinis lolos')
+  x = salin(); x.deferralPolicy!.allowedIds.push('ZZ')
+  assert.ok(auditLedger(x).masalah.includes('kebijakan penundaan menyebut id yang tidak ada: ZZ'), 'id kebijakan fiktif lolos')
+  // negatif: menunda tidak mengurangi jumlah kriteria (baseline tetap dijaga), dan promosi ditunda -> VERIFIED tanpa bukti ditolak
+  x = salin(); x.criteria.find((c) => c.id === 'C6')!.status = 'VERIFIED'
+  assert.ok(auditLedger(x).masalah.includes('VERIFIED tanpa bukti: C6'), 'ditunda dipromosikan ke VERIFIED tanpa bukti lolos')
+  assert.ok(auditLedger(x).masalah.includes('catatan penundaan pada kriteria yang tidak ditunda: C6'), 'catatan penundaan tertinggal setelah promosi lolos')
+  assert.equal(a.total, l.criteria.length); assert.ok(a.total >= BASELINE_TOTAL, 'total kriteria tetap >= baseline meski ada yang ditunda')
+  console.log(`alpha-ledger: ${a.terverifikasi}/${a.aktif} = ${a.persen}% (aktif; ${a.ditunda} ditunda ke Clinical Validation, total ${a.total}; kredit hanya VERIFIED berbukti); sabotase gagal dengan nama`)
 }

@@ -9,7 +9,7 @@
   "Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment",
   "User Journey & Product Experience: perjalanan pengguna lintas peran dari masuk hingga menuntaskan tugas dan keluar, ditambah optimasi aksesibilitas, responsivitas, performa, serta konsistensi visual aplikasi"
  ],
- "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase.",
+ "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. DEFERRED_TO_CLINICAL_VALIDATION (keputusan pemilik 2026-10-16, lihat deferralPolicy) bernilai 0, TIDAK pernah berlabel VERIFIED atau tervalidasi klinis, tetap tercatat di ledger dan tidak masuk penyebut Alpha aktif; hanya id yang tercantum di deferralPolicy.allowedIds yang boleh ditunda. Kriteria tidak boleh dihapus untuk menaikkan persentase.",
  "baseline": {
   "mainSha": "4b2009a1fd66a70522dc2bfe78ded03ca5c2a295",
   "date": "2026-10-10",
@@ -21,7 +21,8 @@
   "NOT_CHECKED",
   "NOT_STARTED",
   "BLOCKED",
-  "PENDING_CLINICAL_REVIEW"
+  "PENDING_CLINICAL_REVIEW",
+  "DEFERRED_TO_CLINICAL_VALIDATION"
  ],
  "criteria": [
   {
@@ -324,10 +325,16 @@
    "pillar": "Clinical Calculators",
    "criterion": "Rentang masukan ditinjau klinisi",
    "acceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator",
-   "status": "PENDING_CLINICAL_REVIEW",
+   "status": "DEFERRED_TO_CLINICAL_VALIDATION",
    "evidence": [],
-   "owner": "Klinisi (belum ditunjuk)",
-   "note": "Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false."
+   "owner": "Klinisi (belum ditunjuk) — fase Clinical Validation",
+   "note": "DITUNDA, bukan VERIFIED dan bukan tervalidasi klinis. Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false. Status sebelumnya PENDING_CLINICAL_REVIEW dipertahankan di deferral.previousStatus; temuan historis tidak dihapus.",
+   "deferral": {
+    "decision": "Keputusan pemilik 2026-10-16: review klinis formal di luar lingkup Alpha.",
+    "phase": "Clinical Validation",
+    "previousStatus": "PENDING_CLINICAL_REVIEW",
+    "stillRequired": "Tanda tangan peninjau berwenang atas rentang tiap kalkulator wajib sebelum kalkulator dipakai untuk keputusan klinis nyata."
+   }
   },
   {
    "id": "C7",
@@ -638,5 +645,15 @@
    "owner": "Vika (design authority) / Sonnet (frontend) / Sol (gate dan performance)",
    "note": "REPORTED, bukan VERIFIED. Temuan kritis BELUM tuntas: 57 teks gagal kontras WCAG AA masih ada (baseline 62, CI 57; hijau merek #00BF63 di latar terang 2,4:1, label 8-11px abu/cyan, h2/summary kecil) dan 1349 elemen berlatar gradien/gambar tidak dapat diukur. Sudah ada: axe otomatis 0 serius/kritis, blok teks <24px 0, target sentuh mobile 0, reduced-motion 0, theme-parity 0 beda. Belum ada: pemeriksaan keyboard/fokus manual terarah, regresi screenshot lintas viewport dengan baseline gambar, 8 hasil axe 'incomplete' belum ditinjau, dan pengukuran performa bermetodologi (waktu muat hanya dicatat, belum digerbang). Tanpa klaim validasi pengguna."
   }
- ]
+ ],
+ "deferralPolicy": {
+  "decision": "Review klinis formal berada di luar lingkup Alpha dan dipindahkan ke fase Clinical Validation berikutnya.",
+  "decidedBy": "Product Owner (arahan eksplisit 2026-10-16)",
+  "allowedIds": [
+   "C6"
+  ],
+  "targetPhase": "Clinical Validation",
+  "requiredBeforeClinicalUse": true,
+  "preserved": "Seluruh bukti engineering, tes referensi, tes keselamatan, validasi masukan, perilaku fail-closed, dan temuan review klinis historis tetap ada. Fungsi pendukung keputusan klinis yang belum divalidasi tetap dibatasi pada pengujian non-klinis (clinically_reviewed=false di governance/CALCULATOR_REVIEW_REGISTRY.json) sampai validasi dan persetujuan yang disyaratkan selesai."
+ }
 }
