@@ -1,4 +1,4 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–3)
+# Clinical calculators — automated engineering-review dossier (tranches 1–4)
 
 Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
@@ -12,7 +12,7 @@ added by engineering tests.
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `5322f7e5`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2) and `scripts/uji/calculator-independent-reference-3.mts` (tranche 3); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
 
 ## What "engineering-ready" means here
 
@@ -95,7 +95,23 @@ One suspicion was checked and **ruled out**: Light's "pleural LDH > ⅔ of the u
 | STOP-Bang (`stopBang`) | eight items, 1 point each; BMI > 35, age > 50, neck > 40 cm, male; 0–2 low, 3–4 intermediate, 5–8 high | Chung et al. 2008 | A single neck cut-off is used for both sexes (variants exist; not verified here). Intermediate-risk refinements are not modelled. |
 | Centor/McIsaac (`centorMcIsaac`) | four criteria + age (< 15: +1; 15–44: 0; ≥ 45: −1); five risk labels | Centor 1981; McIsaac 1998 | The "< 15" rule also gives +1 to ages 0–2; as I recall the published adjustment targets children from 3 years (not verified here). The percentage ranges in the labels carry no citation. |
 
+## Tranche 4 — comorbidity, criteria, screening, acid-base, fluids and paediatric DKA (suite: `scripts/uji/calculator-independent-reference-4.mts`)
+
+Six engines compared with independently written references: all 2,000 Paradise combinations, every Charlson condition alone and every exclusive pair, FINDRISC at every point boundary, 1,200 seeded blood-gas
+cases, fluid-balance sums, and 800 seeded paediatric-DKA cases, plus exact boundaries and hostile inputs. About 95 source mutants fail by name; four survivors were analysed and are equivalent
+(two Charlson tone cut-offs that no integer score can hit exactly; a FINDRISC sex branch that only differs for values rejected earlier; a `Math.max(0, …)` in the DKA net volume that the allowed ranges make
+unreachable, since the bolus is at most 20 mL/kg while the 48 h requirement is at least about 68 mL/kg). Result: **no discrepancy**.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Charlson index (`charlsonIndex`) | 19 weighted conditions (1/2/3/6), exclusive pairs (plain vs organ-damage diabetes, mild vs severe liver disease, non-metastatic vs metastatic tumour), age points 50–59: 1, 60–69: 2, 70–79: 3, ≥ 80: 4, 10-year survival 0.983^exp(0.9 × score) | Charlson et al. 1987 | The age points come from a later publication than the one cited in the engine (as I recall; not verified here). The survival formula is population-level and its tone cut-offs (90 % / 50 %) are unsourced. |
+| Paradise criteria (`paradiseCriteria`) | ≥ 7 episodes in 1 year, or ≥ 5 a year for 2 years, or ≥ 3 a year for 3 years, with every episode documented | Paradise et al. 1984 | The engine takes a single yes/no for "every episode documented"; as I recall, the published criteria also specify clinical features of each episode, which are not checked here. It states whether criteria are met, not a surgical indication. |
+| FINDRISC (`findrisc`) | Age, BMI, waist (by sex), activity, vegetables/fruit, antihypertensive use, high glucose history, family history; total 0–26; risk bands < 7 / 7–11 / 12–14 / 15–20 / > 20 | Lindström & Tuomilehto 2003 | Non-integer ages are accepted, so 54.5 years falls in the 55–64 band (the published table uses whole years). |
+| Blood-gas interpretation (`interpretAbg`) | pH 7.35–7.45, PaCO₂ 35–45, HCO₃ 22–26; Winter's expected PaCO₂ = 1.5 × HCO₃ + 8 ± 2; anion gap = Na − (Cl + HCO₃) with +2.5 per g/dL albumin below 4; delta ratio = (gap − 12) / (24 − HCO₃) | none recorded | The anion-gap upper limit (> 12) and the delta-ratio bands vary between teaching sources; the engine treats 0.4–2 as "pure high-gap", while many sources separate 0.4–0.8 and 0.8–2. Compensation is assessed only for metabolic acidosis. The engine states it does not check pH/PaCO₂/HCO₃ consistency. |
+| Fluid balance (`fluidBalance`) | total in − total out over seven components, each 0–20,000 mL | none (arithmetic) | **A blank component is read as 0 mL by design**, so an unmeasured urine output counts as zero output and the balance looks more positive. Whether blank should instead block the result is a clinical-design decision (and relates to C2). |
+| Paediatric DKA worksheet (`pediatricDka`) | Bolus 10 mL/kg (20 with shock); deficit = % × kg × 1000; maintenance = Holliday-Segar × 2 (48 h); rate = (deficit + maintenance − bolus) / 48; insulin = U/kg/h × kg; potassium bands at 3.5 and 5.5 mEq/L | none recorded | The fluid protocol, the potassium-band advice text and the insulin range (0.01–0.1 U/kg/h) are protocol content with no citation; the engine itself calls the tool educational and not a validated protocol. Each part is computed only from its own valid inputs. |
+
 ## Next tranche (not yet covered)
 
-`graceScore`, `charlson`, `findrisc`, `paradise`, `bloodGas`, `fluidElectrolytes`, `fluidBalance`, `pediatricDka`, `pedsDose` (arithmetic; its overflow fix is a separate PR), `hydrationTarget`,
-`autophagyTiming`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only; `child-pugh`, `meld-na`, `sofa-score` are re-derived independently in tranche 2.
+`graceScore` (points table too large to transcribe without the primary source), `fluidElectrolytes`, `hydrationTarget`, `autophagyTiming`, `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
+`maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `packYearScreen`, `sleepDebt`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
