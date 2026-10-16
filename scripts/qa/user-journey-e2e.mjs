@@ -50,6 +50,32 @@ try {
   assert.equal(seed.status, 201, 'seed hasil lab sintetis')
   const labId = seed.json.id
 
+  // ===== Sekali jalan (API saja, tanpa viewport): RBAC peran lain, eskalasi peran, pencabutan token =====
+  {
+    const J = 'api-rbac'; const VP = 'api'
+    await step(VP, J, 'logout mencabut bearer token di server; sesi lain akun yang sama tetap sah (#2558)', async () => {
+      const tokA = (await devLogin('dokter-f1@example.com', 'dokter')).token
+      await new Promise((r) => setTimeout(r, 1100)) // jti acak membedakan token; jeda menghindari kolisi iat
+      const tokB = (await devLogin('dokter-f1@example.com', 'dokter')).token
+      assert.equal((await call('GET', '/api/auth/me', tokA)).status, 200, 'kontrol positif: token sah sebelum logout')
+      await call('POST', '/api/auth/logout', tokA)
+      assert.equal((await call('GET', '/api/auth/me', tokA)).status, 401, 'token yang di-logout harus ditolak')
+      assert.equal((await call('GET', '/api/auth/me', tokB)).status, 200, 'sesi lain akun yang sama tidak boleh ikut dicabut')
+    })
+    await step(VP, J, 'RBAC tiga-arah: verifikator belum diverifikasi ditolak, setelah diverifikasi pemilik diterima, pasien tetap ditolak', async () => {
+      const email = 'verifikator-api@example.com'; const body = { email: 'tidak-ada@example.com', body: 'uji' }
+      const baru = await devLogin(email, 'verifikator'); assert.equal(baru.user.role, 'verifikator', 'peran swa-layanan tercatat')
+      const sebelum = await call('POST', '/api/notify/user', baru.token, body); assert.equal(sebelum.status, 403, `belum diverifikasi harus 403, dapat ${sebelum.status}`)
+      assert.equal((await call('POST', `/api/doctors/${baru.user.id}/verify`, owner.token, { status: 'verified' })).status, 200)
+      const sesudah = await call('POST', '/api/notify/user', baru.token, body); assert.equal(sesudah.status, 200, `setelah verifikasi harus 200, dapat ${sesudah.status}`)
+      const pasien = await call('POST', '/api/notify/user', pasienApi.token, body); assert.equal(pasien.status, 403, `pasien harus 403, dapat ${pasien.status}`)
+    })
+    await step(VP, J, 'eskalasi peran ditolak: login mandiri sebagai admin/perawat tidak memberi peran itu', async () => {
+      for (const r of ['admin', 'perawat']) { const x = await devLogin(`eskalasi-${r}-${VP}@example.com`, r); assert.equal(x.user.role, 'pasien', `peran ${r} tidak boleh didapat lewat login mandiri, dapat ${x.user.role}`) }
+      const x = await devLogin(`eskalasi-owner-${VP}@example.com`, 'owner'); assert.notEqual(x.user.role, 'owner', 'bukan pemilik terdaftar tidak boleh menjadi owner')
+    })
+  }
+
   for (const vp of VIEWPORTS) {
     const newPage = async () => {
       const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } })
@@ -162,13 +188,43 @@ try {
         await page.reload({ waitUntil: 'domcontentloaded' })
         await page.waitForTimeout(3000)
       })
-      await step(vp.name, J, 'TEMUAN (dicatat, bukan lulus): logout belum mencabut bearer token di server', async () => {
-        const tok = (await devLogin('dokter-f1@example.com', 'dokter')).token
-        await call('POST', '/api/auth/logout', tok)
-        const sesudah = await call('GET', '/api/auth/me', tok)
-        temuan.push({ id: 'logout-tidak-mencabut-token', diamati: `GET /api/auth/me setelah POST /api/auth/logout → ${sesudah.status}`, harapan: '401 (token dicabut)', dampak: 'token yang bocor tetap berlaku sampai kedaluwarsa 7 hari (JWT stateless)', status: sesudah.status === 401 ? 'teratasi' : 'terbuka' })
-        return { statusSetelahLogout: sesudah.status }
+      await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
+      await ctx.close()
+    }
+
+    // ===== Perjalanan 4: pemilik/admin — verifikasi dokter lewat UI nyata, RBAC peran lain, eskalasi peran ditolak =====
+    {
+      const { ctx, page, errors } = await newPage(); const J = 'pemilik'
+      const email = `dokter-ui-${vp.name}@example.com`
+      const calon = await devLogin(email, 'dokter')
+      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [
+        JSON.stringify({ loginAt: Date.now(), account: { email: OWNER, name: 'Pemilik F1', role: 'owner', isOwner: true, isSubscriber: false, loggedAt: new Date().toISOString() } }),
+        owner.token, SESSION_KEY, TOKEN_KEY])
+      await step(vp.name, J, 'kontrol negatif: dokter belum diverifikasi ditolak rute klinisi', async () => {
+        const r = await call('GET', '/api/clinician/lab-shares', calon.token); assert.equal(r.status, 403, `status ${r.status}`)
       })
+      await step(vp.name, J, 'pemilik membuka panel verifikasi STR dan melihat calon dokter', async () => {
+        await page.goto(APP + '#/owner', { waitUntil: 'domcontentloaded', timeout: 120000 })
+        await page.getByText('Doctor STR Verification').first().waitFor({ timeout: 60000 })
+        await page.getByText(email).first().waitFor({ timeout: 30000 })
+      })
+      await step(vp.name, J, 'pemilik menekan Verify di UI → API mencatat verified → dokter kini boleh rute klinisi', async () => {
+        const baris = page.locator('div.border-amber-200', { hasText: email }).first()
+        await baris.getByRole('button', { name: /Verify/ }).click()
+        await page.getByText(email).first().waitFor({ timeout: 30000 })
+        let status = ''
+        for (let i = 0; i < 20 && status !== 'verified'; i++) {
+          const r = await call('GET', '/api/doctors', owner.token)
+          status = (r.json?.doctors ?? r.json ?? []).find?.((d) => d.email === email)?.strStatus ?? ''
+          if (status !== 'verified') await new Promise((r) => setTimeout(r, 500))
+        }
+        assert.equal(status, 'verified', 'UI harus benar-benar memanggil API verifikasi')
+        if (vp === VIEWPORTS[0]) { // satu kali: batas laju /api/auth (30/15 mnt) tidak dilonggarkan untuk uji
+          const aktif = await devLogin(email, 'dokter')
+          assert.equal((await call('GET', '/api/clinician/lab-shares', aktif.token)).status, 200, 'setelah verifikasi dokter efektif sebagai klinisi')
+        }
+      })
+      await step(vp.name, J, 'tanpa overflow horizontal di panel pemilik', async () => { const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px`); return { overflowPx: o } })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
@@ -188,7 +244,7 @@ try {
 } catch (e) { failed = e } finally {
   await browser.close()
   const ringkas = { dihasilkan: new Date().toISOString(), api: API, app: APP, lulus: results.filter((r) => r.ok).length, gagal: results.filter((r) => !r.ok).length,
-    temuan, tidakTercakup: ['perawat', 'laboratorium', 'admin'].map((p) => ({ peran: p, alasan: 'tidak ada perjalanan antarmuka mandiri yang dapat diuji; tidak dihitung lulus' })), hasil: results }
+    temuan, tidakTercakup: [{ peran: 'perawat', alasan: 'peran tidak ada di backend (Role = pasien|dokter|kontributor|verifikator|admin|owner); login mandiri sebagai perawat jatuh ke pasien; tidak dihitung lulus' }, { peran: 'laboratorium', alasan: 'peran tidak ada di backend; hasil lab masuk lewat jalur lab-intake/klinisi; tidak dihitung lulus' }, { peran: 'admin', alasan: 'peran ada tetapi tidak dapat diperoleh lewat login mandiri dan tidak ada UI admin terpisah dari pemilik; hanya RBAC API verifikator/pasien yang diuji' }, { peran: 'kontributor', alasan: 'peran ada; belum ada perjalanan UI diuji' }], hasil: results }
   writeFileSync(process.env.QA_OUT || 'user-journey-evidence.json', JSON.stringify(ringkas, null, 2))
   console.log(`user-journey-e2e: ${ringkas.lulus} lulus, ${ringkas.gagal} gagal`)
   if (failed) { console.error(failed.message); process.exit(1) }
