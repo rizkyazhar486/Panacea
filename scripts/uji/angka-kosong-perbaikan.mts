@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { dailyIntakeTotals, focusMinutesOn } from '../../src/domains/personal-health/engine/dailySummaryTotals.ts'
 import { DETECTED_LIMITS, PORTION_GRAMS, parseDetectedFoods, parsePortionGrams, scaledPer100 } from '../../src/domains/personal-health/engine/foodEntryInputs.ts'
 import { BATAS, BUTIR, parseButir, ringkasTes, skorButir } from '../../src/pages/fitness/fitnessTestScoring.ts'
+import { RATE_PCT_MAX, parseMoney, parseRatePct } from '../../src/lib/finance.ts'
 
 const DAY = '2026-10-16'
 
@@ -59,6 +60,12 @@ for (const b of BUTIR) {
   for (const bad of ['', ' ', 'abc', '-1', 'Infinity', 'NaN', null, undefined, 5, {}]) assert.equal(parseButir(bad, b), undefined, `${JSON.stringify(bad) ?? String(bad)} is not entered (${b})`)
 }
 
+// ── 4. Keuangan: uang/bunga kosong bukan nol ────────────────────────────────────────────────────
+assert.equal(parseMoney('0'), 0, 'a typed 0 is a real zero'); assert.equal(parseMoney('10.000.000'), 10000000, 'separators are ignored'); assert.equal(parseMoney('Rp 500000'), 500000); assert.equal(parseMoney('007'), 7)
+for (const bad of ['', '   ', 'abc', 'Rp', '-', null, undefined, 5, {}, [], '9'.repeat(30)]) assert.equal(parseMoney(bad), null, `${JSON.stringify(bad) ?? String(bad)} is "not entered", never 0`)
+assert.equal(parseRatePct('0'), 0, 'a typed 0 % is a real 0 %'); assert.equal(parseRatePct('24'), 24); assert.equal(parseRatePct('1,5'), 1.5, 'decimal comma accepted'); assert.equal(parseRatePct(String(RATE_PCT_MAX)), RATE_PCT_MAX)
+for (const bad of ['', '  ', 'abc', '-1', String(RATE_PCT_MAX + 1), 'Infinity', 'NaN', '1e999', null, undefined, 24, {}]) assert.equal(parseRatePct(bad), null, `rate ${JSON.stringify(bad) ?? String(bad)} is "not entered"`)
+
 // ── Regresi sumber: perbaikan tidak boleh kembali ───────────────────────────────────────────────
 const src = (p: string) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const ringkasan = src('src/lib/ringkasan.ts'); assert.ok(!/Number\(f\.kcal\) \|\| 0|Number\(f\.protein\) \|\| 0|Number\(s\.menit\) \|\| 0/.test(ringkasan), 'ringkasan no longer sums missing values as 0'); assert.ok(ringkasan.includes('dailyIntakeTotals(st.foods, hariIni)') && ringkasan.includes('focusMinutesOn(sesi, hariIni)'))
@@ -67,4 +74,5 @@ const nutrisi = src('src/pages/bodyhub/Nutrition.tsx'); assert.ok(!/\+i\.(grams|
 const tes = src('src/pages/fitness/FitnessTest.tsx'); assert.ok(!/\+e\.target\.value \|\| 0/.test(tes) && !/useState\(\{ pushup: 0/.test(tes), 'reps no longer start at or coerce to 0'); assert.ok(tes.includes('ringkasTes(reps, sex)') && tes.includes('parseButir('))
 const gerak = src('src/pages/fitness/MovementToolkit.tsx'); assert.ok(!/Number\(localStorage\.getItem\(BALANCE_KEY\) \|\| 0\)/.test(gerak) && gerak.includes("best === null ? '—'"), 'an unrecorded balance best is not shown as 0 s')
 const pikir = src('src/pages/mental/MindToolkit.tsx'); assert.ok(!/pmd_reaction_best_v1'\) \|\| 0/.test(pikir) && pikir.includes("best === null ? '—'"), 'an unrecorded reaction best is not 0 ms')
+const uang = src('src/pages/finance/MoneyHub.tsx'); assert.ok(!/replace\(\/\[\^\\d\]\/g, ''\)\) \|\| 0/.test(uang), 'MoneyHub no longer reads blank money fields as 0'); assert.ok(uang.includes('parseRatePct(rate)') && uang.includes('parseMoney(minPay)') && /if \(r === null\)/.test(uang) && /if \(mp === null\)/.test(uang), 'a debt cannot be added with a blank rate or minimum payment'); assert.ok(!/Number\.isFinite\(r\) \? r : 0/.test(uang), 'a blank interest rate is not silently 0 %')
 console.log('angka-kosong-perbaikan: missing values are withheld, skipped or shown as unavailable, never counted as 0; explicit zeros stay zero; passed')

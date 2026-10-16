@@ -24,7 +24,7 @@ template text and regex literals but still reads code inside `${}`. It understan
 to be read, and gates at **zero** except:
 
 - **`DAFTAR_IZIN`** — six reasoned sentinels or counters (last-sent timestamp, sit start time, share counter ×2, optional timezone regex groups, scripture metadata count). Each entry must still match, or the test fails.
-- **`UTANG`** — recorded debt that may only fall: `MoneyHub.tsx` ×4.
+- **`UTANG`** — recorded debt that may only fall. It is now empty.
 
 The original detector was not touched; this scanner only adds coverage.
 
@@ -45,16 +45,15 @@ The original detector was not touched; this scanner only adds coverage.
 | `src/components/dashboard/PanaceaGrowthWidgets.tsx` share counter | True counter (0 shares is a real 0) | Allowed |
 | `src/domains/clinical-operations/model/poliPatientFlow.ts` | Optional regex groups used only for a range check; the time comes from `Date.parse` of a zone-required timestamp | Allowed |
 | `src/lib/hadis.ts` | Scripture metadata count with a `list.length` fallback; not a user measurement | Allowed |
-| `src/pages/finance/MoneyHub.tsx` ×4 | Defect (non-clinical): blank savings/essentials/minimum payment/monthly amount read as 0, e.g. blank emergency-fund fields yield the verdict "No buffer yet — priority number one" | **Open — recorded as `UTANG`**; follow-up PR |
+| `src/pages/finance/MoneyHub.tsx` ×4 | Debt form: a blank interest rate became **0 % a year** and a blank minimum payment became 0, silently reshaping the payoff plan (defect, non-clinical). Emergency-fund and risk tabs already hid their results unless both values were above 0, so a blank gave no false verdict, but an entered 0 savings gave no verdict either (a real zero was indistinguishable from blank). An earlier version of this note wrongly said blanks produced "No buffer yet". | **Fixed**: `parseMoney` / `parseRatePct`; the debt form refuses a blank rate or minimum payment (a typed 0 is accepted); an entered 0 in savings now shows "No buffer yet" |
 
 ## Still open (not claimed fixed)
 
-1. `MoneyHub.tsx` ×4 above.
-2. **Macronutrients in `FoodEntry`**: `carbs`, `protein` and `fat` are required numbers, so a product lacking one of them is still stored as 0 (`UbinPangan` keeps `?? 0` for these, with a comment). Representing "unknown" needs a type change and migration.
-3. **Measurement sums written with `??`**, not flagged by the gate: 433 `?? 0` and 53 `|| 0` in code, of which 65 sit in `reduce`/`+=` and 79 touch measurement-named fields (`kcal`, `protein`, `durasi`, `jarakKm`, `menit`, `maxHr`, `avgHr`). Many are legitimate Map counters (`(m.get(k) ?? 0) + 1`); the measurement sums (for example `UbinTidurGizi`, `UbinGrafik`, `KartuKlinisTubuh`, `ActivityAchievementWidget`, `UbinLangsung`, `analisisLari`) need per-site classification, using `loggedSubtotal` as the established primitive.
-4. **43 NaN/non-finite ternaries to 0** (`Number.isFinite(x) ? x : 0`), not yet classified.
-5. Replay, dashboard performance deck, training-session cockpit and `analisisPro` are covered by other in-flight work (#2548–#2551) and were deliberately not touched here.
-6. Persisted historical data written by older versions cannot be re-labelled: values stored as 0 before these fixes are indistinguishable from real zeros.
+1. **Macronutrients in `FoodEntry`**: `carbs`, `protein` and `fat` are required numbers, so a product lacking one of them is still stored as 0 (`UbinPangan` keeps `?? 0` for these, with a comment). Representing "unknown" needs a type change and migration.
+2. **Measurement sums written with `??`**, not flagged by the gate: 433 `?? 0` and 53 `|| 0` in code, of which 65 sit in `reduce`/`+=` and 79 touch measurement-named fields (`kcal`, `protein`, `durasi`, `jarakKm`, `menit`, `maxHr`, `avgHr`). Many are legitimate Map counters (`(m.get(k) ?? 0) + 1`); the measurement sums (for example `UbinTidurGizi`, `UbinGrafik`, `KartuKlinisTubuh`, `ActivityAchievementWidget`, `UbinLangsung`, `analisisLari`) need per-site classification, using `loggedSubtotal` as the established primitive.
+3. **43 NaN/non-finite ternaries to 0** (`Number.isFinite(x) ? x : 0`), not yet classified.
+4. Replay, dashboard performance deck, training-session cockpit and `analisisPro` are covered by other in-flight work (#2548–#2551) and were deliberately not touched here.
+5. Persisted historical data written by older versions cannot be re-labelled: values stored as 0 before these fixes are indistinguishable from real zeros.
 
 `docs/clinical-calculators/C2_REMAINING_INPUT_DEBT.md` is an older snapshot (12 patterns at `0315d859`) and is superseded by this record for the items above.
 
