@@ -5,12 +5,15 @@ import type { Actor } from '../domain/lifecycle.js'
 import { TENANT_PRAKTIK } from '../service/labResultsService.js'
 
 export interface PenggunaHasil { id: string; role: string }
-export interface DepAktor { isOwner: (u: PenggunaHasil) => boolean; idPasienDiri: (userId: string) => string; pasienTertaut: (userId: string) => string[] }
+export interface DepAktor { isOwner: (u: PenggunaHasil) => boolean; idPasienDiri: (userId: string) => string; pasienTertaut: (userId: string) => string[]; pasienDitugaskan: (userId: string) => string[] }
 
 export function aktorDariPengguna(u: PenggunaHasil, d: DepAktor): Actor | null {
   const dasar = { actorId: u.id, tenantId: TENANT_PRAKTIK }
   if (u.role === 'dokter') return { ...dasar, role: 'clinician', authorizedClinician: true }
   if (u.role === 'admin' || d.isOwner(u)) return { ...dasar, role: 'admin' }
+  // Perawat dan lab: peran efektif hanya muncul setelah verifikasi (effectiveRoleForRequest); akses hanya ke pasien yang ditugaskan.
+  if (u.role === 'perawat') return { ...dasar, role: 'nurse', assignedPatientIds: d.pasienDitugaskan(u.id) }
+  if (u.role === 'lab') return { ...dasar, role: 'lab-staff', assignedPatientIds: d.pasienDitugaskan(u.id) }
   if (u.role === 'pasien') return { ...dasar, role: 'patient', patientIds: [d.idPasienDiri(u.id), ...d.pasienTertaut(u.id)] }
   return null
 }

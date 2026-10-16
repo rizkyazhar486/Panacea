@@ -79,9 +79,14 @@ export function validasiButir(x: unknown, sekarang: Date): ButirHasil | undefine
   return { name, ...(value !== undefined ? { value } : { valueText }), ...(unit ? { unit } : {}), ...(referenceRange ? { referenceRange } : {}), collectedAt }
 }
 
+/** Perawat dan staf lab dibatasi pada pasien yang ditugaskan (hak akses minimum); klinisi dan admin tetap seluas tenant seperti sebelumnya. */
+const staf = (a: Actor): boolean => a.role === 'nurse' || a.role === 'lab-staff'
+const ditugaskan = (a: Actor, patientId: string): boolean => (a.assignedPatientIds ?? []).includes(patientId)
+
 const bolehBaca = (a: Actor, rec: { tenantId: string; patientId: string }): boolean => {
   if (a.tenantId !== rec.tenantId) return false
   if (a.role === 'patient') return (a.patientIds ?? []).includes(rec.patientId)
+  if (staf(a)) return ditugaskan(a, rec.patientId)
   return STAFF_READ.includes(a.role)
 }
 
@@ -101,6 +106,7 @@ export function terimaHasil(k: Konteks, a: Actor, masukan: { patientId?: unknown
   const item = validasiButir(masukan.item, now)
   const source = masukan.source === 'lab-intake' || masukan.source === 'manual-entry' ? masukan.source : undefined
   if (!patientId || !item || !source || idDicadangkan(patientId)) return gagal('invalid-input')
+  if (staf(a) && !ditugaskan(a, patientId)) return gagal('forbidden') // staf hanya memasukkan hasil untuk pasien yang ditugaskan
   const rec: HasilLabRekam = {
     id: k.newId('lab'), tenantId: a.tenantId, patientId, status: resultLifecycle.initial, item,
     provenance: { source, recordedBy: a.actorId, recordedAt: now.toISOString() }, trail: [],
@@ -164,6 +170,7 @@ export function metrikPenutupan(k: Konteks, a: Actor, opsi: { dueHours?: number 
   if (opsi.dueHours !== undefined && !(Number.isFinite(opsi.dueHours) && opsi.dueHours > 0)) return gagal('invalid-input', 'dueHours')
   for (const r of k.hasil.all()) {
     if (r.tenantId !== a.tenantId) continue
+    if (staf(a) && !ditugaskan(a, r.patientId)) continue // metrik staf hanya atas pasien yang ditugaskan
     const v = verifyTrail(resultLifecycle, r.id, r.trail)
     if (!v.ok || v.status !== r.status) { corrupt++; continue }
     total++; byStatus[r.status]++

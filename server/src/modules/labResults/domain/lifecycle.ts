@@ -15,6 +15,8 @@ export interface Actor {
   authorizedClinician?: boolean
   /** Hanya untuk peran pasien: identitas pasien yang boleh diwakili akun ini. */
   patientIds?: readonly string[]
+  /** Hanya untuk perawat dan staf lab: pasien yang ditugaskan kepadanya (F1/R3). Tanpa entri = tidak ada akses (deny-by-default). */
+  assignedPatientIds?: readonly string[]
 }
 
 export interface Lifecycle<S extends string> {

@@ -20,7 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
 const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
-export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'perawat' | 'lab' | 'admin' | 'owner'
 
 export interface User {
   id: string
@@ -105,6 +105,8 @@ export interface Clinical {
   /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
   hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
   rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
+  /** Penugasan perawat/staf lab -> pasien (F1/R3); kunci "staf|pasien". */
+  penugasanStaf?: Record<string, import('./modules/labResults/domain/penugasanStaf.js').PenugasanStaf>
 }
 
 export interface VisitMembership {
@@ -924,6 +926,13 @@ export function repoRujukan() {
     all: () => Object.values(ensureClinical().rujukanKlinis ?? {}),
   }
 }
+export function repoPenugasanStaf() {
+  return {
+    all: () => ensureClinical().penugasanStaf ?? {},
+    put: (kunci: string, p: import('./modules/labResults/domain/penugasanStaf.js').PenugasanStaf) => { (ensureClinical().penugasanStaf ??= {})[kunci] = p; save() },
+    hapus: (kunci: string) => { const c = ensureClinical(); if (!c.penugasanStaf || !Object.prototype.hasOwnProperty.call(c.penugasanStaf, kunci)) return false; delete c.penugasanStaf[kunci]; save(); return true },
+  }
+}
 export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
 export function getRecordHistory(patientId: string, recordId?: string): any[] {
   return daftarRiwayatEncounter(ensureClinical(), patientId, recordId)
@@ -1326,7 +1335,7 @@ export interface DoctorRow {
 }
 // STR / practice-certificate holders awaiting verification: doctors plus the
 // licence-gated content roles (contributor & verifier).
-const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
+const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator', 'perawat', 'lab']
 export function listDoctors(): DoctorRow[] {
   const s = db.settings || {}
   return db.users

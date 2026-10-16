@@ -167,7 +167,9 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSigned
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
-import { repoHasilLab, repoRujukan } from './store.js'
+import { repoHasilLab, repoRujukan, repoPenugasanStaf, getUser } from './store.js'
+import { pasienDitugaskan } from './modules/labResults/domain/penugasanStaf.js'
+import { pasangRutePenugasanStaf } from './modules/labResults/http/penugasanRoutes.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
 import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './domains/clinical-records/validasiLedger.js'
@@ -936,7 +938,18 @@ pasangRuteHasilLab(app, {
   isOwner: (u) => isOwner(u as User),
   idPasienDiri,
   pasienTertaut: (userId) => Object.values(getTautan()).filter((t) => t.userId === userId).map((t) => t.patientId),
+  pasienDitugaskan: (userId) => pasienDitugaskan(repoPenugasanStaf().all(), userId),
   konteks: () => ({ hasil: repoHasilLab(), rujukan: repoRujukan(), now: () => new Date(), newId: (p) => `${p}-${randomUUID()}` }),
+  audit: (u, aksi, target) => addAudit(u as User, aksi, target),
+})
+
+// Penugasan perawat/staf lab ke pasien (F1/R3): staf hanya dapat melayani pasien yang ditugaskan klinisi terverifikasi atau owner.
+pasangRutePenugasanStaf(app, {
+  requireAuth,
+  isOwner: (u) => isOwner(u as User),
+  cariStaf: (id) => { const x = getUser(id); return x ? { role: x.role, verified: getSettings(x.id).strStatus === 'verified' } : undefined },
+  repo: repoPenugasanStaf(),
+  now: () => new Date(),
   audit: (u, aksi, target) => addAudit(u as User, aksi, target),
 })
 

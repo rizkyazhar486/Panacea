@@ -2,7 +2,7 @@ import type { Role, User } from '../../store.js'
 
 export type AccessSettings = { strStatus?: unknown } | undefined
 
-const SELF_SERVICE_ROLES = new Set<Role>(['pasien', 'dokter', 'kontributor', 'verifikator'])
+const SELF_SERVICE_ROLES = new Set<Role>(['pasien', 'dokter', 'kontributor', 'verifikator', 'perawat', 'lab'])
 
 export function selfServiceRole(requested: unknown): Role {
   return typeof requested === 'string' && SELF_SERVICE_ROLES.has(requested as Role)
@@ -33,10 +33,12 @@ export function effectiveRoleForRequest(
   allowOnboardingRole = false,
 ): Role {
   if (isConfiguredOwner(user, ownerEmail)) return 'owner'
-  if (allowOnboardingRole && ['dokter', 'kontributor', 'verifikator'].includes(user.role)) return user.role
+  if (allowOnboardingRole && ['dokter', 'kontributor', 'verifikator', 'perawat', 'lab'].includes(user.role)) return user.role
   if (user.role === 'owner' || user.role === 'admin') return 'pasien'
   if (user.role === 'dokter' && settings?.strStatus !== 'verified') return 'pasien'
   if (user.role === 'verifikator' && settings?.strStatus !== 'verified') return 'pasien'
+  // Perawat dan lab: tanpa verifikasi profesional diperlakukan sebagai pasien (tidak ada jalur self-assign ke akses staf).
+  if ((user.role === 'perawat' || user.role === 'lab') && settings?.strStatus !== 'verified') return 'pasien'
   return user.role
 }
 

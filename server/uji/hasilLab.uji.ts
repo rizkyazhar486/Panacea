@@ -14,7 +14,8 @@ function ctx() { return { hasil: mem<HasilLabRekam>(), rujukan: mem<RujukanRekam
 const T0 = s.TENANT_PRAKTIK
 const dok: Actor = { actorId: 'd1', role: 'clinician', tenantId: T0, authorizedClinician: true }
 const dokTanpaOtorisasi: Actor = { ...dok, actorId: 'd2', authorizedClinician: false }
-const perawat: Actor = { actorId: 'n1', role: 'nurse', tenantId: T0 }
+// Perawat kini dibatasi pada pasien yang ditugaskan (F1/R3); fixture lama hanya menyentuh p-A dan p-B, jadi ditugaskan ke keduanya. Kasus tak-ditugaskan: staffAksesLab.uji.ts.
+const perawat: Actor = { actorId: 'n1', role: 'nurse', tenantId: T0, assignedPatientIds: ['p-A', 'p-B'] }
 const admin: Actor = { actorId: 'a1', role: 'admin', tenantId: T0 }
 const sistem: Actor = { actorId: 'sys', role: 'system', tenantId: T0 }
 const pasienA: Actor = { actorId: 'uA', role: 'patient', tenantId: T0, patientIds: ['p-A'] }
