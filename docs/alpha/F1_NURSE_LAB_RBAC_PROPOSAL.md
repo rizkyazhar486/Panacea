@@ -1,6 +1,7 @@
 # F1 — Peran perawat dan laboratorium: temuan dan usulan RBAC (menunggu keputusan pemilik)
 
-**Status: USULAN. Tidak ada peran baru yang ditambahkan oleh dokumen ini; F1 tetap REPORTED.**
+**Status (diperbarui): backend R2–R6 DIIMPLEMENTASI dengan usulan bawaan sebagai keputusan agen atas arahan pemilik "semua di tangan AI"; UI dan perjalanan E2E belum ada, F1 tetap REPORTED.**
+Yang dikerjakan: peran `perawat` dan `lab` (dapat didaftarkan sendiri, diperlakukan sebagai pasien sampai owner memverifikasi lewat alur STR yang sama dengan dokter, R2); akses hasil lab hanya untuk pasien yang ditugaskan dokter terverifikasi atau owner, dapat dicabut (R3); kapabilitas sesuai matriks domain (R4, R5); penugasan, pencabutan dan penolakan masuk audit (R6). Uji: `server/uji/penugasanStaf.uji.ts`, `server/uji/staffAksesLab.uji.ts`. Pemilik tetap dapat mengubah keputusan R1–R6 di bawah; bagian 1–2 di bawah adalah kondisi SEBELUM perubahan ini.
 Kriteria F1 meminta perjalanan perawat dan laboratorium "sesuai kapabilitas yang benar-benar tersedia" dan menyatakan peran yang belum tersedia **tidak dianggap lulus**. Dokumen ini menjelaskan kenapa peran itu belum tersedia, apa yang sudah ada di model domain, dan keputusan privasi yang harus dibuat sebelum peran apa pun dibuka.
 
 ## 1. Fakta dari kode (diperiksa pada main)
