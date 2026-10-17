@@ -96,7 +96,7 @@ assert.equal(parseNumberField('Infinity'), Infinity, 'infinities pass through (t
     assert.equal(graceScore({ ...base, killip }).score, expectedBase + points, `GRACE published Killip ${killip + 1} points`)
   }
   assert.equal(graceScore({ age: 65, hr: 100, sbp: 100, creat: 1, killip: 1, arrest: false, stDev: true, markers: true }).score,
-    58 + 15 + 43 + 7 + 20 + 28 + 14, 'GRACE AHA/ACC worked nomogram case, independently summed')
+    58 + 15 + 43 + 7 + 20 + 28 + 14, 'GRACE synthetic multi-factor case summed from published table (not from inconsistent printed prose)')
 }
 
 // ── 6. GRACE: flag klinis harus boolean yang eksplisit. Masukan kotor tidak boleh diam-diam menjadi 0 poin. ──
