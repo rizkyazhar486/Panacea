@@ -37,6 +37,10 @@ assert.equal(resuscitation('adult-sepsis', 5000, NaN).ok, false)
 // ── Natrium terkoreksi (Katz) ─────────────────────────────────────────
 type Cna = Extract<ReturnType<typeof correctedSodium>, { ok: true }>
 close((correctedSodium(130, 400) as Cna).correctedNa, 130 + 1.6 * 3); close((correctedSodium(140, 100) as Cna).correctedNa, 140)
+close((correctedSodium(140, 20) as Cna).correctedNa, 140) // Katz below reference does not subtract Na
+close((correctedSodium(140, 99.9) as Cna).correctedNa, 140)
+close((correctedSodium(130, 100.1) as Cna).correctedNa, 130 + 1.6 * 0.001)
+
 assert.deepEqual(bad(correctedSodium(NaN, NaN)).missing, ['sodium', 'glucose']) // regresi: dulu "−1.6 mEq/L" dari kolom kosong
 assert.deepEqual(bad(correctedSodium(130, NaN)).missing, ['glucose'])
 assert.deepEqual(bad(correctedSodium(130, 1e9)).invalid, ['glucose must be 20–2000 mg/dL']); assert.deepEqual(bad(correctedSodium(30, 400)).invalid, ['sodium must be 90–200 mEq/L'])
