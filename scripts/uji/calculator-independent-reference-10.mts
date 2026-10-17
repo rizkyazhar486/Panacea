@@ -25,9 +25,16 @@ for (let n = 0; n < N; n++) {
 assert.equal((correctedSodiumKatz(130, 100) as any).data.correctedNa, 130, 'glucose 100: no change'); close((correctedSodiumKatz(130, 600) as any).data.correctedNa, 138, 'worked case: 130 + 1.6 × 5 = 138')
 assert.equal((correctedSodiumKatz(140, 20) as any).data.correctedNa, 140, 'glucose below 100 is clamped: no negative correction')
 {
-  // ACHADO untuk peninjau (tidak diubah): dua implementasi Na terkoreksi dalam aplikasi berbeda untuk glukosa < 100 mg/dL dan pada rentang Na.
-  const lain = correctedSodium(140, 20) as any; assert.ok(Math.abs(lain.correctedNa - 138.72) < 1e-9 && (correctedSodiumKatz(140, 20) as any).data.correctedNa === 140, 'REVIEWER ITEM: fluidElectrolytes.correctedSodium lowers Na for glucose < 100 (138.72); electrolyteCorrection.correctedSodiumKatz clamps (140)')
-  assert.equal(comp(correctedSodiumKatz(85, 100)), true, 'REVIEWER ITEM: Katz accepts Na 80–200'); assert.equal((correctedSodium(85, 100) as any).ok, false, '… while fluidElectrolytes accepts 90–200')
+  // Dua UI Katz sekarang memakai rumus yang sama pada rentang masukan bersama 90–200 mEq/L.
+  for (let i = 0; i < N; i++) {
+    const na = between(90, 200), glu = between(20, 2000)
+    const fluid = correctedSodium(na, glu) as any, direct = correctedSodiumKatz(na, glu) as any
+    assert.equal(fluid.ok, true); assert.equal(direct.ok, true)
+    close(fluid.correctedNa, direct.data.correctedNa, 'Katz cross-engine consistency')
+  }
+  close((correctedSodium(140, 20) as any).correctedNa, 140, 'glucose <100 must not lower corrected sodium')
+  assert.equal(comp(correctedSodiumKatz(85, 100)), true, 'the standalone severe-Na input sanity bound remains 80–200')
+  assert.equal((correctedSodium(85, 100) as any).ok, false, 'the fluid-calculator bound remains 90–200, a separately declared input scope')
   hostileMatrix('correctedSodiumKatz', { na: 130, g: 400 }, (i) => correctedSodiumKatz(i.na as never, i.g as never), comp, ['na', 'g'], { na: SODIUM_MEQ_L, g: GLUCOSE_MG_DL })
 }
 
