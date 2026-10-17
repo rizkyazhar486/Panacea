@@ -58,7 +58,7 @@ const GPS_SPORTS: GpsSportMode[] = [
    ═══════════════════════════════════════════════════════ */
 const COLORS = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#f59e0b', '#FF3131']
 const roleLabel: Record<Role, string> = {
-  pasien: 'Customer', dokter: 'Doctor', kontributor: 'Contributor', verifikator: 'Verifier', admin: 'Admin', owner: 'Owner',
+  pasien: 'Customer', dokter: 'Doctor', kontributor: 'Contributor', verifikator: 'Verifier', perawat: 'Nurse', lab: 'Lab staff', admin: 'Admin', owner: 'Owner',
 }
 type Tab = 'home' | 'friends' | 'search' | 'profile'
 
