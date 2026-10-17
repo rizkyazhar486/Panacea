@@ -37,3 +37,8 @@ Limits, not hidden: the authenticated Body Exposure page (`/body-exposure/canoni
 3. Owner decision: define "equal to main" for a batched-release system (HEAD vs the SHA of the latest deploy run vs last commit affecting each deployable).
 
 Not done and not claimed: staging (no staging environment is configured in this repository), authenticated journey smoke against production, production verification of the 3D canvas.
+
+## Addendum — the build-marker step in that release
+
+In release `38996081367` the `deploy` job's step **Verify deployed build marker equals the built commit** (added by #2610) also concluded `success`, next to the deploy and smoke steps: the deployed `build.json` commit equalled `github.sha`. This is the deployed artifact attesting its own commit, independent of the workflow's claim. It does not add staging, critical-journey smoke on that SHA, or the owner's definition of "equal to main"; E7 stays NOT_CHECKED. No ledger change.
+
