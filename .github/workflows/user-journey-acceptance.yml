@@ -7,6 +7,7 @@ on:
     paths:
       - 'scripts/qa/user-journey-e2e.mjs'
       - 'scripts/qa/user-journey-staff.mjs'
+      - 'scripts/qa/user-journey-resilience.mjs'
       - 'src/pages/LabResultReview.tsx'
       - 'src/components/clinical/**'
       - 'src/domains/lab-results/**'
@@ -26,6 +27,7 @@ on:
     paths:
       - 'scripts/qa/user-journey-e2e.mjs'
       - 'scripts/qa/user-journey-staff.mjs'
+      - 'scripts/qa/user-journey-resilience.mjs'
       - 'src/pages/LabResultReview.tsx'
       - 'src/components/clinical/**'
       - 'src/domains/lab-results/**'
@@ -85,6 +87,28 @@ jobs:
             sleep 1
           done
           QA_OUT="$RUNNER_TEMP/user-journey-staff-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-staff.mjs || rc=1
+          # Ketahanan (API lambat / 5xx / pemulihan) pada halaman kritis lain, per peran. Juga pada server SEGAR; lalu dua kontrol negatif yang HARUS gagal
+          # dengan nama langkah (QA_SABOTASE menyuntikkan teks bocor atau overflow ke setiap halaman): jika sabotase lolos, pendeteksi rusak dan job merah.
+          fresh_server() {
+            pkill -f "src/index.ts" || true
+            sleep 2
+            (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5190 \
+              PANACEA_DATA_FILE="$RUNNER_TEMP/f1-$1-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/f1-$1-server.log" 2>&1) &
+            for attempt in $(seq 1 60); do
+              if curl -fsS http://127.0.0.1:18790/api/health >/dev/null; then break; fi
+              sleep 1
+            done
+          }
+          fresh_server resilience
+          QA_OUT="$RUNNER_TEMP/user-journey-resilience-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs || rc=1
+          for mode in bocor overflow; do
+            fresh_server "negatif-$mode"
+            if QA_SABOTASE=$mode QA_OUT="$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs; then
+              echo "::error::Kontrol negatif '$mode' LOLOS: pendeteksi ketahanan tidak menangkap cacat yang disuntikkan"; rc=1
+            elif ! grep -q "\"ok\": false" "$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json"; then
+              echo "::error::Kontrol negatif '$mode' berhenti tanpa langkah gagal bernama (bukan gagal karena pendeteksi)"; rc=1
+            fi
+          done
           exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
@@ -93,3 +117,6 @@ jobs:
           path: |
             ${{ runner.temp }}/user-journey-evidence.json
             ${{ runner.temp }}/user-journey-staff-evidence.json
+            ${{ runner.temp }}/user-journey-resilience-evidence.json
+            ${{ runner.temp }}/user-journey-resilience-negatif-bocor.json
+            ${{ runner.temp }}/user-journey-resilience-negatif-overflow.json
