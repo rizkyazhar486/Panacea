@@ -15,5 +15,5 @@ test('P0: rejects missing or empty stable Home stylesheet', () => {
 })
 
 test('P0: reject missing stable Vite Home.css chunk', () => {
-  assert.match(verifyHomeOutput({ assets: [], hasStableCss: true, stableCssText: 'x'.repeat(2000) }).join(' '), /Home\\.css chunk missing/)
+  assert.match(verifyHomeOutput({ assets: [], hasStableCss: true, stableCssText: 'x'.repeat(2000) }).join(' '), /Home\.css chunk missing/)
 })
