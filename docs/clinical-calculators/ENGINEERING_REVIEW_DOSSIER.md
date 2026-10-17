@@ -1,6 +1,6 @@
 # Clinical calculators — automated engineering-review dossier (tranches 1–10)
 
-Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
+Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **DEFERRED_TO_CLINICAL_VALIDATION** for Alpha under the owner decision of 2026-10-17; calculator-registry entries separately remain `PENDING_CLINICAL_REVIEW` with `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
 AI-assisted review and the code is not clinical proof. No reviewer identity, date, signature or approval is recorded here, and none may be
 added by engineering tests.
@@ -196,3 +196,7 @@ Independent references (zone-2 rounding against integer arithmetic in tenths of 
 ## Next tranche (not yet covered)
 
 `graceScore` (points table too large to transcribe without the primary source), and `reviewRegistry` (a registry, not a formula). `egfr-ckd-epi-2021` has a point-wise test only.
+
+## Additional engineering correction — GRACE malformed flags (2026-10-17)
+
+The GRACE engine formerly evaluated `arrest`, `stDev`, and `markers` using `=== true` but did not validate their input types. A non-boolean value (including missing, `null`, `1`, or the string `"true"`) could silently contribute zero points and return an apparently valid score/risk band. The updated `graceScore` now refuses non-boolean flags with a named invalid field and withholds both score and band. Non-object envelopes are refused rather than throwing. A mandatory tranche-10 regression includes valid all-false/all-true cases, individual flag score deltas (39/28/14), hostile values on each flag, and malformed envelopes. This corrects **runtime input safety**, not the unverified provenance of the GRACE scoring table or clinical outcome calibration. Existing score thresholds and coefficients remain unchanged; no clinical approval or ledger promotion is claimed.
