@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
       - 'scripts/qa/kontras-ukur.fixture.mjs'
@@ -38,6 +40,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
       - 'scripts/qa/kontras-ukur.fixture.mjs'
@@ -120,3 +124,41 @@ jobs:
             ${{ runner.temp }}/keyboard-evidence.json
             ${{ runner.temp }}/screenshot-grid-evidence.json
             ${{ runner.temp }}/theme-shots
+  perf-audit:
+    # Audit performa terukur pada BUILD PRODUKSI (laporan, bukan gerbang): metodologi dan batas di scripts/qa/perf-audit.mjs. Job terpisah agar tidak memperlambat ux-audit.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: server
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Production build and measured performance audit
+        env:
+          QA_OUT: ${{ runner.temp }}/perf-evidence.json
+        run: |
+          VITE_API_URL=http://127.0.0.1:18790 npx vite build
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5191 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/perf-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/perf-server.log" 2>&1) &
+          api=$!
+          npx vite preview --host 127.0.0.1 --port 5191 --strictPort > "$RUNNER_TEMP/perf-preview.log" 2>&1 &
+          web=$!
+          trap 'kill "$api" "$web" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5191/ >/dev/null; then break; fi
+            sleep 1
+          done
+          QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-evidence
+          path: ${{ runner.temp }}/perf-evidence.json
