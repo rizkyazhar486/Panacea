@@ -24,6 +24,7 @@ type Kriteria = { id: string; pillar: string; criterion: string; acceptance: str
 type Ledger = { version: number; approvedBy: string; scope: string[]; weightPolicy: string; baseline: { mainSha: string; date: string; note: string }; statuses: string[]; criteria: Kriteria[] }
 
 const penundaanLengkap = (d: unknown): d is Penundaan => !!d && typeof d === 'object' && (['decidedBy', 'decidedOn', 'reference', 'targetPhase', 'originalAcceptance'] as const).every((k) => typeof (d as Record<string, unknown>)[k] === 'string' && ((d as Record<string, string>)[k]).trim() !== '')
+  && /^\d{4}-\d{2}-\d{2}$/.test((d as Penundaan).decidedOn)
 
 export function auditLedger(l: Ledger, authorized: ReadonlySet<string> = DEFERRAL_AUTHORIZED): { masalah: string[]; terverifikasi: number; total: number; aktif: number; ditunda: number; persen: number } {
   const masalah: string[] = []
@@ -74,7 +75,8 @@ export function renderLedger(l: Ledger): string {
   }
   for (const p of pillars) {
     const rows = l.criteria.filter((c) => c.pillar === p)
-    out.push(`## ${p} (${rows.filter((c) => c.status === 'VERIFIED').length} / ${rows.length})`, '', '| ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |', '|---|---|---|---|---|---|')
+    const ditundaPilar = rows.filter((c) => c.status === DEFERRED && DEFERRAL_AUTHORIZED.has(c.id) && penundaanLengkap(c.deferral)).length
+    out.push(`## ${p} (${rows.filter((c) => c.status === 'VERIFIED').length} / ${rows.length}${ditundaPilar > 0 ? `; ${ditundaPilar} ditunda ke Clinical Validation, tidak dihitung di penyebut aktif` : ''})`, '', '| ID | Kriteria | Syarat penerimaan | Status | Pemilik | Bukti / catatan |', '|---|---|---|---|---|---|')
     for (const c of rows) out.push(`| ${c.id} | ${c.criterion} | ${c.acceptance} | ${c.status} | ${c.owner || '-'} | ${[...c.evidence, c.note].filter(Boolean).join('; ') || '-'} |`)
     out.push('')
   }
@@ -128,6 +130,7 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
     x = cobaTunda(target, { [k]: '  ' }); assert.ok(auditLedger(x, izin).masalah.includes(`penundaan tanpa catatan lengkap: ${target}`), `catatan penundaan dengan ${k} kosong lolos`); assert.equal(auditLedger(x, izin).aktif, a.aktif, `${k} kosong tidak mengecilkan penyebut`)
     x = cobaTunda(target, { [k]: 5 as unknown as string }); assert.ok(auditLedger(x, izin).masalah.includes(`penundaan tanpa catatan lengkap: ${target}`), `catatan penundaan dengan ${k} bukan teks lolos`)
   }
+  for (const buruk of ['x', '2026-1-1', '17/10/2026', '2026-10-17T00:00:00Z', '20261017']) { x = cobaTunda(target, { decidedOn: buruk }); assert.ok(auditLedger(x, izin).masalah.includes(`penundaan tanpa catatan lengkap: ${target}`), `decidedOn ${buruk} lolos`); assert.equal(auditLedger(x, izin).aktif, a.aktif) }
   x = cobaTunda(target, {}); const ok = auditLedger(x, izin)
   const tanpaIzin = auditLedger(x)
   assert.ok(tanpaIzin.masalah.includes(`penundaan tidak diotorisasi pemilik: ${target}`), 'menunda kriteria lain tanpa otorisasi pemilik lolos'); assert.equal(tanpaIzin.aktif, a.aktif, 'penundaan tidak diotorisasi tidak mengecilkan penyebut'); assert.equal(tanpaIzin.ditunda, a.ditunda)

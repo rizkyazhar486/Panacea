@@ -15,7 +15,7 @@ assert.ok(existsSync(new URL('../../docs/alpha/CLINICAL_REVIEW_DEFERRAL.md', imp
 
 // 2. Kebijakan dan catatan keputusan memuat invarian keselamatan (bukan pelonggaran).
 const policy = flat(read('governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md')), record = flat(read('docs/alpha/CLINICAL_REVIEW_DEFERRAL.md'))
-for (const phrase of ['clinically_reviewed=false', 'Never', 'DEFERRED_TO_CLINICAL_VALIDATION', 'not VERIFIED', 'fail-closed', 'authorisation']) assert.ok(policy.includes(phrase), `policy keeps: ${phrase}`)
+for (const phrase of ['clinically_reviewed=false', 'Never set C6 to `VERIFIED`', 'DEFERRED_TO_CLINICAL_VALIDATION', 'not VERIFIED', 'fail-closed', 'not authorisation for clinical use', 'Do not reintroduce C6 into the active denominator']) assert.ok(policy.includes(phrase), `policy keeps: ${phrase}`)
 for (const phrase of ['not VERIFIED', 'not clinically validated', 'clinically_reviewed', 'fail-closed', 'restricted to non-clinical testing', 'before deployment for real clinical decision-making']) assert.ok(record.includes(phrase), `decision record keeps: ${phrase}`)
 
 // 3. Ledger: C6 ditunda dengan catatan mesin, tidak VERIFIED, syarat asli dan dossier dipertahankan, 45 catatan tetap.
