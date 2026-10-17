@@ -85,3 +85,16 @@ test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
   assert.ok(daftarBerkas().includes('server/src/config.ts'), 'kode produk tetap dipindai')
   assert.ok(daftarBerkas().some((f) => /^scripts\/qa\/.+\.test\.mjs$/.test(f) && !BERKAS_FIXTURE.includes(f)), 'berkas uji lain tetap dipindai (pengecualian path persis, bukan awalan)')
 })
+
+test('fail_closed_saat_berkas_tidak_dapat_dibaca', () => {
+  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca rahasia\\.ts/)
+})
+
+test('fail_closed_saat_berkas_melebihi_batas_pemindaian', () => {
+  assert.throws(() => pindaiRepo(['besar.txt'], () => 'x'.repeat(2_000_001)), /tidak memeriksa berkas >2 MB: besar\\.txt/)
+  assert.deepEqual(pindaiRepo(['tepat.txt'], () => 'x'.repeat(2_000_000)), [])
+})
+
+test('fail_closed_saat_pembaca_mengembalikan_konten_non_teks', () => {
+  assert.throws(() => pindaiRepo(['kosong.txt'], () => undefined), /konten bukan teks: kosong\\.txt/)
+})
