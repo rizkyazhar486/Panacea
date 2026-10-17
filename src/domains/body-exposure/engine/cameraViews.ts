@@ -31,7 +31,8 @@ const norm = (v: Vec3): Vec3 => { const l = Math.hypot(...v); return [v[0] / l, 
  * Input tidak valid → null (fail closed).
  */
 export function viewPose(view: AnatomicalView, center: Vec3, size: Vec3, vfovDeg: number, aspect: number, margin = 1.15): CameraPose | null {
-  if (!DIRS[view] || !finite(center) || !finite(size) || size.some((s) => s < 0) || !(vfovDeg > 0 && vfovDeg < 180) || !(aspect > 0)) return null
+  if (!DIRS[view] || !finite(center) || !finite(size) || size.some((s) => s < 0) || !(vfovDeg > 0 && vfovDeg < 180)
+      || !Number.isFinite(aspect) || aspect <= 0 || !Number.isFinite(margin) || margin <= 0) return null
   const { dir, up } = DIRS[view]
   const d = norm(dir)
   const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
@@ -40,7 +41,9 @@ export function viewPose(view: AnatomicalView, center: Vec3, size: Vec3, vfovDeg
   const extent = (a: Vec3) => Math.abs(a[0]) * size[0] + Math.abs(a[1]) * size[1] + Math.abs(a[2]) * size[2]
   const vfov = (vfovDeg * Math.PI) / 180, hfov = 2 * Math.atan(Math.tan(vfov / 2) * aspect)
   const dist = Math.max(extent(screenUp) / 2 / Math.tan(vfov / 2), extent(right) / 2 / Math.tan(hfov / 2)) * margin + extent(d) / 2
-  return { position: [center[0] + d[0] * dist, center[1] + d[1] * dist, center[2] + d[2] * dist], target: [...center] as Vec3, up: [...up] as Vec3 }
+  const position: Vec3 = [center[0] + d[0] * dist, center[1] + d[1] * dist, center[2] + d[2] * dist]
+  if (!finite(position)) return null
+  return { position, target: [...center] as Vec3, up: [...up] as Vec3 }
 }
 
 /** Kurva halus (smootherstep): mulai & berhenti tanpa lompatan kecepatan. */
