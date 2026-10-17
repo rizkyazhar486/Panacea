@@ -42,7 +42,7 @@ export function StaffIntakeForm({ onSaved }: { onSaved: () => void }) {
       <h2 className="text-sm font-black">Record a result</h2>
       {patients === null && !loadError && <p role="status" className="text-xs text-white/60">Loading assigned patients…</p>}
       {loadError && <p role="alert" className="text-xs text-red-200">Could not load your assigned patients.</p>}
-      {patients !== null && patients.length === 0 && <p className="text-xs text-white/60">No patients are assigned to you yet. The owner must assign a patient to you before you can record results.</p>}
+      {patients !== null && patients.length === 0 && <p className="text-xs text-white/60">No patients are assigned to you yet. Ask the owner to assign one.</p>}
       {patients !== null && patients.length > 0 && (
         <div className="grid gap-2 sm:grid-cols-2">
           <label className="text-xs font-black text-white/60">Patient
