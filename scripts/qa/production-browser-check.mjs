@@ -3,6 +3,7 @@
 // Keluar 2 = kegagalan jaringan (tahap disebutkan, BUKAN status aplikasi); 1 = temuan yang menggagalkan; 0 = lulus.
 // Tidak mengklaim apa pun yang tidak diamati: SHA penyebaran frontend tidak tertanam di halaman, hanya dilaporkan bila server melaporkannya.
 import dns from 'node:dns/promises'
+import { assessPublicPage } from './production-browser-verdict.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
@@ -113,6 +114,7 @@ try {
     }
     v.body = b
     report.viewports.push(v)
+    for (const message of assessPublicPage({ status: v.status, title: v.title, bodyTextChars: v.bodyTextChars })) finding('fail', `${width}px: ${message}`)
     if (v.errors.length) finding('fail', `${width}px: galat halaman ${v.errors.length}`)
     if (v.overflowX) finding('fail', `${width}px: scroll horizontal (scrollWidth ${v.scrollWidth})`)
     if (!v.webgl2 && !v.webgl1) finding('warn', `${width}px: WebGL tidak tersedia di runner`)
