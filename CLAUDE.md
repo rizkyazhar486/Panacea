@@ -1,5 +1,13 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
+
+## Arahan pemilik 17 Oktober 2026 — sederhana, bukan berlembar-lembar
+
+**WAJIB untuk Claude Code dan semua agent:** terapkan [Ruthless Simplicity](DOCS/product/RUTHLESS-SIMPLICITY.md) di semua layar Panaceamed, F1 user journey, F2 UX dan laporan. Satu tujuan, satu aksi utama, satu kalimat penjelas singkat; detail tidak wajib dibaca dan dibuka bila diminta. Hindari teks berparagraf-paragraf dan tombol/nav duplikat. Sederhanakan tampilan tanpa menghapus fitur atau menyembunyikan risiko klinis, consent, provenance, aksesibilitas, atau perbedaan peran.
+
+**Laporan ke owner:** maksimal 4 baris singkat (~120 kata) secara default: hasil; PR/SHA; validasi exact-head yang benar-benar terjadi; blocker/langkah berikutnya. Bukti lengkap tetap ditautkan, tidak ditempel berulang. Tulis panjang hanya jika diminta atau diperlukan untuk keselamatan/audit. Tidak boleh mengklaim F1/F2, production atau review klinis VERIFIED tanpa bukti.
+
+
 > **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
 >
 > **Arahan pemilik 17 Oktober 2026 — batas fase Clinical Review Alpha:** Semua persetujuan/review klinis formal untuk validasi model/kalkulator (termasuk C6) **ditunda ke fase Clinical Validation**, bukan syarat penutupan *engineering Alpha*. Wajib baca [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). **Jangan** tandai C6 `VERIFIED`, mengarang reviewer/tanda tangan, mengubah `clinically_reviewed=false` menjadi true, melonggarkan uji/safety, atau melewati tanda tangan klinisi dalam alur pasien. Ledger kanonik sudah dimigrasikan: 45 catatan historis tetap tercatat, hanya C6 yang berstatus `DEFERRED_TO_CLINICAL_VALIDATION` (dengan catatan penundaan mesin-terbaca), dan kemajuan dilaporkan terhadap 44 kriteria aktif; angka resmi ada di `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md` (dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json`).
