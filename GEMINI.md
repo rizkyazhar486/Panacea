@@ -1,5 +1,7 @@
 # Panaceamed Gemini working entry point
 
+> **Owner directive 2026-10-17 (clinical review phase boundary, see `governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`):** C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision. Deferral is not validation or authorisation for clinical use; `clinically_reviewed` stays false until genuinely reviewed.
+
 > **Standar proyek terbaru (arsitektur, git flow branch+PR, unit test ketat):** ikuti [`CLAUDE.md`](CLAUDE.md). Jika bertentangan dengan dokumen ini, `CLAUDE.md` menang.
 
 Gemini-class agents must follow the model-agnostic repository authorities in `AGENTS.md`, `PANACEA_CONSTITUTION.md`, `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_PRODUCT_MATURITY_OS.md`, and `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`.

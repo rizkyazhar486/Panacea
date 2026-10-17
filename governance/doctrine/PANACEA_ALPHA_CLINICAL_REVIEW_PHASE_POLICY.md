@@ -1,5 +1,7 @@
 # Panacea — Alpha Clinical Review Phase Boundary (Owner Directive)
 
+> **Mandatory instruction for all agents:** C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.
+
 **Scope:** All Alpha criteria and agents working on clinical calculators, clinical AI, anatomy, physiology, clinical safety labels, and acceptance reporting.  
 **Owner decision:** 2026-10-17 — formal independent clinical review/sign-off is deferred from **Alpha engineering acceptance** to the subsequent **Clinical Validation** phase.  
 **Authority:** Specific owner scope decision; read together with `CLAUDE.md` §8 and `AGENTS.md`. This directive **does not override clinical safety, security, provenance, privacy, or patient-level authorisation**.
@@ -14,7 +16,7 @@
 ## 2. C6 treatment — defer, never whitewash
 
 - **C6** ("Rentang masukan ditinjau klinisi"; acceptance: authorised reviewer signs off calculator ranges) is an explicitly **deferred Clinical Validation criterion**, not an engineering failure and **not VERIFIED** in Alpha.
-- Target explicit ledger status: `DEFERRED_TO_CLINICAL_VALIDATION` (or an equivalent machine-defined deferral with the same semantics). **Never** set C6 to `VERIFIED`, set `clinically_reviewed=true`, fabricate a reviewer/signature/date, or delete its review dossier.
+- Ledger status: `DEFERRED_TO_CLINICAL_VALIDATION`, carried by C6 with a machine-readable `deferral` record (decider, date, reference, target phase, original acceptance). **Never** set C6 to `VERIFIED`, set `clinically_reviewed=true`, fabricate a reviewer/signature/date, or delete its review dossier.
 - Preserve the existing `C5` machine-verifiable review-label gate, and preserve all engineering/safety tests for calculators. C6's deferred review must retain its own named record/owner in the next phase.
 - **C6 must not block closing Alpha engineering** solely because a formal clinician reviewer has not signed. This instruction does not remove clinical oversight from real-patient care workflows.
 - Engineering discrepancies (e.g. inconsistent corrected-sodium or potassium-deficit implementations) remain documented and safety-gated; do not choose or modify clinical formulas without sufficient source justification and review appropriate to the change.
@@ -24,9 +26,9 @@
 Maintain **both** a historical record and an explicit active-scope report:
 
 - Historical inventory: **45 originally defined criteria**, including C6, retained for traceability.
-- Owner-authorised *target* active Alpha scope: **44 criteria** (45 less 1 formally deferred C6).
+- Active Alpha scope: **44 criteria** (45 less 1 formally deferred C6); the ledger tool derives it (`active_total = historical_total − deferred_total`).
 - Count `VERIFIED` only when each *active* criterion has passed its actual engineering acceptance criteria. `DEFERRED_TO_CLINICAL_VALIDATION` receives **zero VERIFIED credit** and is excluded only from the **active-scope denominator**; it remains visible as a deferred obligation.
-- Report separately: `verified_active / active_total`, `deferred_clinical`, and `historical_total`. If the ledger currently reports 38/45, continue describing that as the **current machine-ledger state** until the canonical data/schema, renderer, automated acceptance checks, and documentation are updated and validated. Do **not** silently claim 38/44 or 100% before that migration is actually integrated.
+- Report separately: `verified_active / active_total`, `deferred_clinical`, and `historical_total`. The canonical ledger (JSON, renderer, `scripts/uji/alpha-ledger.mts`, documentation) is migrated and validated: progress is reported against the active denominator, with the deferred criterion shown separately and never credited. Never claim more than the ledger computes.
 - The owner has authorised *rephasing* the formal review criterion, not editing test history, retroactive approvals, or removing other engineering acceptance requirements. Changes to the machine ledger must be explicit, reviewed, generated through its normal workflow, and exact-head CI-validated.
 
 ## 4. Safety boundaries that remain mandatory
@@ -44,8 +46,8 @@ This deferral **does not** waive:
 When working on Alpha:
 1. Finish independently actionable engineering tasks and acceptance evidence; do not stall unrelated work awaiting formal clinical sign-off.
 2. Keep formal clinical review packages ready for the later phase, with reviewers listed as **unassigned** unless genuinely designated.
-3. Keep C6 explicitly **deferred** until the scoped canonical ledger migration is validated; never force a status by editing generated Markdown.
+3. Keep C6 explicitly **deferred**; never force a status by editing generated Markdown (edit the JSON and regenerate). Do not reintroduce C6 into the active denominator, and do not defer any other criterion, without an explicit Product Owner decision.
 4. Continue E4, E7, D7, D8, F1, and F2 under their *unchanged* evidence/authorisation boundaries.
 5. Report the real status, remaining engineering blockers, deferred clinical obligations, and clinical-use limitations distinctly.
 
-**Source of truth for current numerical status:** `governance/ALPHA_ACCEPTANCE_LEDGER.json` and generated `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md`. This directive governs the planned phase boundary; it is **not evidence that the ledger migration or clinical validation has already happened**.
+**Source of truth for current numerical status:** `governance/ALPHA_ACCEPTANCE_LEDGER.json` and generated `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md`; the decision record is `docs/alpha/CLINICAL_REVIEW_DEFERRAL.md`. This directive is a scope boundary, **not** evidence of clinical validation and **not** authorisation for clinical use.

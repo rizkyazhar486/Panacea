@@ -2,6 +2,8 @@
 
 ## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
 
+> **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
+
 **Mandatory for all agents:** Read [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). Formal independent clinical validation/sign-off (including C6) belongs to the subsequent Clinical Validation phase and must not block **Alpha engineering completion** solely for lack of a clinical signature. Preserve C6 as an explicit deferred obligation, not `VERIFIED`, and preserve `clinically_reviewed=false` until genuinely authorised review. Patient-level clinician signing, clinical safety limits, numerical/reference tests, RBAC, provenance, privacy, release gates, and production clinical-use restrictions are **not** waived. The canonical 45-record ledger and its denominator must be migrated in a separate verified change before reporting the proposed 44-active-criteria scope as implemented.
 
 ## Evidence-first worthiness review

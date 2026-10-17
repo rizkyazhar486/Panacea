@@ -2,7 +2,7 @@
 
 > Dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json` (jangan edit tangan; jalankan `UPDATE_LEDGER=1 node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/alpha-ledger.mts`).
 
-**Alpha completion: 38 / 44 = 86.4%** (baseline main `4b2009a1f`, 2026-10-10).
+**Alpha completion: 38 / 44 = 86.4%; sisa aktif 6** (baseline main `4b2009a1f`, 2026-10-10).
 
 Penyebut aktif 44 = 45 kriteria tercatat − 1 ditunda ke fase Clinical Validation (lihat bagian di bawah). Kriteria yang ditunda tidak VERIFIED, tidak berkredit, dan tidak divalidasi secara klinis.
 
