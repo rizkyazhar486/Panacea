@@ -11,3 +11,9 @@
 **Pelaporan singkat yang wajib:** “C6 — ACC INTERNAL PEMILIK TERCATAT; ALPHA NON-BLOCKING; VALIDASI KLINIS FORMAL TERPISAH.” Jangan memasukkan C6 lagi dalam daftar pekerjaan engineering Alpha atau meminta professor/spesialis tanpa alasan risiko spesifik.
 
 **Rujukan internal:** [kebijakan batas fase C6](PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md), [catatan penundaan](../../docs/alpha/CLINICAL_REVIEW_DEFERRAL.md), [dossier rekayasa kalkulator](../../docs/clinical-calculators/ENGINEERING_REVIEW_DOSSIER.md).
+
+## Pembaruan pernyataan pemilik — 18 Oktober 2026 WIB
+
+Pemilik menyatakan langsung: **“C6 sudah di validasi semuanya oleh reviewer saya, termasuk secara independen dan internal oleh saya.”** Catat seluruh cakupan C6 sebagai telah direview/ divalidasi menurut pernyataan pemilik, termasuk reviewer independen dan review internal. Jangan meminta pelaksanaan review ulang sebagai syarat melanjutkan engineering.
+
+Pembaruan ini menggantikan asumsi bahwa pemilik baru menyatakan review internal. Identitas reviewer independen, laporan, tanggal review, dan versi kalkulator tidak disebutkan dalam pesan; jangan mengarang rincian tersebut. Konfirmasi pemilik ini tidak dengan sendirinya mengubah status ledger versi-terikat atau mengesahkan perubahan kode sesudah review. Tes numerik, input/range, regresi dan exact-head CI tetap dijalankan; status deferred Alpha yang sebelumnya diputuskan tetap sampai ada pembaruan ledger berbukti.

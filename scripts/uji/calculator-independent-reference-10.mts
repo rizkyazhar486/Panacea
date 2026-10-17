@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { close, hostileMatrix, mulberry32 } from './support/calculatorHarness.mts'
 import {
   GLUCOSE_MG_DL, GRIP_KG, MCDONALD_FUNDAL_CM, POTASSIUM_MEQ_L, SODIUM_MEQ_L, ZONE2_AGE_YEARS, correctedSodium, correctedSodiumKatz, mcdonaldGestationalAge,
-  parseNumberField, potassiumAssessment, potassiumDeficit, validateGripKg, zone2HeartRate,
+  graceScore, parseNumberField, potassiumAssessment, potassiumDeficit, validateGripKg, zone2HeartRate,
 } from '../../src/domains/clinical-calculators/index.ts'
 
 // Tabel ditulis ulang sebagai literal: mengubah tabel mesin tidak boleh ikut mengubah acuan.
@@ -80,4 +80,52 @@ for (const t of [null, undefined, 5, {}, [], true]) assert.ok(Number.isNaN(parse
 assert.equal(parseNumberField('0'), 0, 'a typed 0 is a real 0'); assert.equal(parseNumberField(' 12.5 '), 12.5); assert.equal(parseNumberField('-3'), -3); assert.equal(parseNumberField('1e2'), 100)
 for (const t of ['abc', '1,5', '1_000', '--1', '12abc']) assert.ok(Number.isNaN(parseNumberField(t)), `"${t}" is NaN`)
 assert.equal(parseNumberField('Infinity'), Infinity, 'infinities pass through (the range gate rejects them)'); assert.equal(parseNumberField('0x10'), 16, 'REVIEWER ITEM: Number() accepts hex text')
+// GRACE classic 2003 nomogram, independently re-transcribed from AHA/ACC 2014 figure
+// (professional.heart.org 2014 AHA NSTE-ACS guideline, Grace Risk Model Nomogram).
+// Values are literal from the published table, not imported engine constants.
+{
+  const ageTable: [number, number][] = [[18, 0], [29, 0], [30, 8], [39, 8], [40, 25], [49, 25], [50, 41], [59, 41], [60, 58], [69, 58], [70, 75], [79, 75], [80, 91], [89, 91], [90, 100]]
+  const hrTable: [number, number][] = [[20, 0], [49, 0], [50, 3], [69, 3], [70, 9], [89, 9], [90, 15], [109, 15], [110, 24], [149, 24], [150, 38], [199, 38], [200, 46]]
+  const sbpTable: [number, number][] = [[40, 58], [79, 58], [80, 53], [99, 53], [100, 43], [119, 43], [120, 34], [139, 34], [140, 24], [159, 24], [160, 10], [199, 10], [200, 0]]
+  const creatTable: [number, number][] = [[0.1, 1], [0.39, 1], [0.4, 4], [0.79, 4], [0.8, 7], [1.19, 7], [1.2, 10], [1.59, 10], [1.6, 13], [1.99, 13], [2, 21], [3.99, 21], [4, 28]]
+  const base = { age: 45, hr: 75, sbp: 150, creat: 1, killip: 0, arrest: false, stDev: false, markers: false }
+  const refs = { age: 25, hr: 9, sbp: 24, creat: 7 }
+  const expectedBase = Object.values(refs).reduce((a, b) => a + b, 0)
+  assert.equal(graceScore(base).score, expectedBase, 'GRACE AHA/ACC reference base case')
+  for (const [key, table] of [['age', ageTable], ['hr', hrTable], ['sbp', sbpTable], ['creat', creatTable]] as const) {
+    for (const [value, pts] of table) {
+      const result = graceScore({ ...base, [key]: value })
+      assert.deepEqual(result.invalid, [], `GRACE ${key}=${value} within plausibility bounds`)
+      assert.equal(result.score, expectedBase - refs[key] + pts, `GRACE published points: ${key}=${value}`)
+    }
+  }
+  for (const [killip, points] of [[0, 0], [1, 20], [2, 39], [3, 59]] as const) {
+    assert.equal(graceScore({ ...base, killip }).score, expectedBase + points, `GRACE published Killip ${killip + 1} points`)
+  }
+  assert.equal(graceScore({ age: 65, hr: 100, sbp: 100, creat: 1, killip: 1, arrest: false, stDev: true, markers: true }).score,
+    58 + 15 + 43 + 7 + 20 + 28 + 14, 'GRACE synthetic multi-factor case summed from published table (not from inconsistent printed prose)')
+}
+
+// ── 6. GRACE: flag klinis harus boolean yang eksplisit. Masukan kotor tidak boleh diam-diam menjadi 0 poin. ──
+{
+  const base = { age: 50, hr: 100, sbp: 120, creat: 1, killip: 0, arrest: false, stDev: false, markers: false }
+  const low = graceScore(base)
+  assert.deepEqual(low.invalid, [], 'GRACE valid flags accepted')
+  assert.equal(low.score, 97, 'GRACE independently summed baseline: 41+15+34+7=97')
+  for (const [key, points] of [['arrest', 39], ['stDev', 28], ['markers', 14]] as const) {
+    assert.equal(graceScore({ ...base, [key]: true }).score, 97 + points, `GRACE positive flag ${key} adds points`)
+    for (const malformed of [undefined, null, 0, 1, 'true', 'false', {}, []]) {
+      const r = graceScore({ ...base, [key]: malformed } as never)
+      assert.equal(r.score, null, `GRACE ${key}=${String(malformed)} cannot produce score`)
+      assert.equal(r.band, null, `GRACE ${key} malformed has no mortality band`)
+      assert.ok(r.invalid.includes(`${key} must be a boolean`), `GRACE explicit refusal: ${key}`)
+    }
+  }
+  assert.equal(graceScore({ ...base, arrest: true, stDev: true, markers: true }).score, 178, 'GRACE all flags: 97+39+28+14')
+  for (const malformed of [null, undefined, 42, 'invalid', []]) {
+    const r = graceScore(malformed as never)
+    assert.deepEqual(r, { missing: [], invalid: ['GRACE input must be an object'], score: null, band: null }, 'GRACE malformed envelope fails closed')
+  }
+}
+
 console.log('calculator-independent-reference-10: Katz sodium, potassium assessment, McDonald rule, zone-2 heart rate (integer-arithmetic rounding reference), grip validation and parseNumberField match independently written references; two cross-engine inconsistencies recorded for the reviewer')

@@ -49,12 +49,17 @@ for (let n = 0; n < N; n++) {
   hostileMatrix('resuscitation TBSA (burns)', { t: 20 }, (i) => resuscitation('burns', 70, i.t as never), (r) => (r as { ok: boolean }).ok, ['t'], { t: { min: 1, max: 100 } })
 }
 
-// ── 3. Na terkoreksi (Katz): Na + 1,6 × (glukosa − 100)/100 ──
+// ── 3. Katz hyperglycemia correction: no correction at/below 100 mg/dL; above reference +0.016 per mg/dL ──
 for (let n = 0; n < N; n++) {
   const na = between(90, 200), g = between(20, 2000), r = correctedSodium(na, g) as any
-  close(r.correctedNa, na + 1.6 * ((g - 100) / 100), 'corrected Na')
+  const reference = g <= 100 ? na : na + (g - 100) * 16 / 1000
+  close(r.correctedNa, reference, 'corrected Na')
 }
-assert.equal((correctedSodium(130, 100) as any).correctedNa, 130, 'glucose 100 changes nothing'); close((correctedSodium(130, 600) as any).correctedNa, 138, 'worked case: Na 130, glucose 600 → 138'); close((correctedSodium(140, 20) as any).correctedNa, 138.72, 'low glucose lowers the corrected value (no clamp)')
+assert.equal((correctedSodium(130, 100) as any).correctedNa, 130, 'glucose 100 changes nothing'); close((correctedSodium(130, 600) as any).correctedNa, 138, 'worked case: Na 130, glucose 600 → 138'); close((correctedSodium(140, 20) as any).correctedNa, 140, 'below-reference glucose adds no hyperglycemia correction')
+// Exact boundary pairs use a separately tabulated expected correction, including decimal glucose.
+for (const [g, delta] of [[20, 0], [99.9, 0], [100, 0], [100.1, 0.0016], [200, 1.6], [600, 8], [2000, 30.4]] as const) {
+  for (const na of [90, 130, 200]) close((correctedSodium(na, g) as any).correctedNa, na + delta, `Katz boundary Na=${na}, glucose=${g}`)
+}
 hostileMatrix('correctedSodium Na', { na: 130, g: 400 }, (i) => correctedSodium(i.na as never, i.g as never), (r) => (r as { ok: boolean }).ok, ['na', 'g'], { na: { min: 90, max: 200 }, g: { min: 20, max: 2000 } })
 
 // ── 4. Laju koreksi Na (Adrogue-Madias disederhanakan, infusat 140): TBW = kg × (0,6 L | 0,5 P); ΔNa/L = (140 − Na)/(TBW + 1) ──

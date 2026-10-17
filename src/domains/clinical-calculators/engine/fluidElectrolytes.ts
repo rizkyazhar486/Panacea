@@ -1,7 +1,8 @@
 /**
  * Kalkulator cairan & elektrolit: rumatan Holliday-Segar, resusitasi (sepsis dewasa 30 mL/kg, syok anak PALS 20 mL/kg,
  * Parkland 4 × kg × %TBSA), natrium terkoreksi Katz, perkiraan kenaikan Na per liter (Adrogue-Madias disederhanakan),
- * dan perkiraan defisit kalium. Rumus dan konstanta awal dipindahkan dari halaman; koreksi Katz kemudian diselaraskan dengan engine natrium lain agar\n * glukosa <100 mg/dL tidak menghasilkan pengurangan natrium artifisial. Yang baru: setiap masukan
+ * dan perkiraan defisit kalium. Rumus dan konstanta awal dipindahkan dari halaman; koreksi Katz kemudian diselaraskan dengan engine natrium lain agar
+ * glukosa <100 mg/dL tidak menghasilkan pengurangan natrium artifisial. Yang baru: setiap masukan
  * diperiksa rentangnya dan "belum diisi" dipisahkan dari "di luar rentang". Dulu berat 5000 kg, TBSA 900% atau glukosa
  * 1e9 lolos gerbang `> 0`, dan sub-kalkulator natrium/kalium menampilkan angka (mis. "Corrected sodium −1.6") dari kolom
  * kosong. Rentang adalah batas kewajaran masukan, BUKAN rekomendasi dosis. Alat edukasi; keputusan tetap pada klinisi.
