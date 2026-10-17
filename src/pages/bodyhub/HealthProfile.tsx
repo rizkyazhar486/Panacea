@@ -431,7 +431,7 @@ function InsightCard({ history }: { history: Snapshot[] }) {
               <span className="text-base leading-none">{ins.icon}</span>
               <div className="min-w-0">
                 <div className="text-sm font-bold">{ins.title}</div>
-                <p className="mt-0.5 text-[12px] leading-relaxed opacity-90">{ins.body}</p>
+                <p className="mt-0.5 text-[12px] leading-relaxed">{ins.body}</p>
               </div>
             </div>
           </div>
