@@ -55,3 +55,18 @@ test('deterministik', () => {
   const a = rata(80, 120, 77)
   assert.deepEqual(gridDari(a, 80, 120), gridDari(a, 80, 120))
 })
+
+import { readFileSync } from 'node:fs'
+test('baseline_repo_berbentuk_sah_dan_mencakup_semua_kombinasi', () => {
+  const b = JSON.parse(readFileSync(new URL('../../governance/SCREENSHOT_GRID_BASELINE.json', import.meta.url), 'utf8'))
+  assert.equal(b.kolom, KOLOM); assert.equal(b.baris, BARIS)
+  const kunci = Object.keys(b.grid)
+  assert.equal(kunci.length, 36, '9 halaman x 2 viewport x 2 tema')
+  for (const k of kunci) assert.deepEqual(bandingkanGrid(b.grid[k], b.grid[k]), [], `${k}: grid baseline harus sahih dan lulus terhadap dirinya sendiri`)
+  // negatif: satu kombinasi dihapus = gerbang menolak (fail-closed), bukan diam-diam menurunkan cakupan
+  const {[kunci[0]]: _, ...kurang} = b.grid
+  assert.match(bandingkanSemua(b.grid, { grid: kurang }).join(), /tidak ada di baseline/)
+  // negatif: layar kosong (putih) pada satu kombinasi gelap ditolak dengan nama kuncinya
+  const putih = { ...b.grid, [kunci.find((k) => k.includes('|dark|'))]: grid(255) }
+  assert.match(bandingkanSemua(putih, b).join(), /\|dark\|.*sel menyimpang/)
+})
