@@ -24,7 +24,7 @@
 .rel-widget-rumah .widget-instrument-label-v5,
 .rel-widget-rumah .widget-instrument-state-v5,
 .rel-widget-rumah .widget-instrument-count-v5 {
-  color: rgba(255,255,255,.34);
+  color: rgba(255,255,255,.62);
 }
 
 
@@ -68,7 +68,7 @@
 }
 
 .home-fun-mini__head span {
-  color: rgba(255,255,255,.36);
+  color: rgba(255,255,255,.62);
   font-size: 9px;
   font-weight: 700;
 }
@@ -82,6 +82,17 @@
   font-size: 10px;
   font-weight: 850;
   cursor: pointer;
+}
+
+/* Kartu mini-tool selalu gelap, tetapi remap tema terang menggelapkan `text-neutral-500` (judul Timer/Focus/Breath) menjadi rgb(97,97,97): 3,15:1 di
+   atas rgb(11,13,12). Spesifisitas (0,3,2) mengalahkan `:root:not(.dark) .text-neutral-500` (0,3,0). */
+html:not(.dark) .home-fun-mini__card h2.t-kecil {
+  color: rgba(255,255,255,.62);
+}
+
+/* Hijau merek #00bf63 di atas latar terang hanya 2,4:1 (AA 4,5:1); brand-dark #0b7a4b ~5,4:1. */
+html:not(.dark) .home-fun-mini__head button {
+  color: #0b7a4b;
 }
 
 .home-fun-mini__rail {

@@ -4,7 +4,7 @@
   padding: clamp(10px, 1.8vw, 14px);
   border: 1px solid rgba(255,255,255,.09);
   border-radius: clamp(22px, 3vw, 28px);
-  background: rgba(8,12,10,.48);
+  background: rgba(8,12,10,.68);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
@@ -24,7 +24,7 @@
   font-weight: 900;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.72);
+  color: rgba(255,255,255,.88);
 }
 
 .pmd-recovery-head details { position: relative; }
@@ -37,7 +37,7 @@
   cursor: pointer;
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 999px;
-  color: rgba(255,255,255,.55);
+  color: rgba(255,255,255,.85);
   font: 800 11px/1 var(--font-sans);
 }
 .pmd-recovery-head summary::-webkit-details-marker { display: none; }
