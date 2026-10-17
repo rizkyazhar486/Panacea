@@ -377,7 +377,7 @@ export function Chatbot() {
 
   return (
     <div className="flex h-[calc(100vh-140px)] min-h-[500px] flex-col">
-      <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] leading-snug text-amber-800">
+      <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] leading-snug text-amber-800 dark:border-amber-300/30 dark:bg-amber-300/10 dark:text-amber-100">
         <span className="mt-0.5 shrink-0">⚕️</span>
         <span><b>Important:</b> This AI is <b>educational &amp; supportive</b>, not a replacement for a doctor. In an emergency, use <b>Emergency SOS</b> immediately.</span>
       </div>
