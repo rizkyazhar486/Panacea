@@ -8,6 +8,7 @@ export function verifyHomeOutput({ assets, hasStableCss, stableCssText }) {
   const failures = []
   if (!hasStableCss || typeof stableCssText !== 'string' || stableCssText.length < 1000)
     failures.push('stable Home stylesheet missing or empty in dist')
+  if (!assets.includes('Home.css')) failures.push('stable /assets/Home.css chunk missing from Vite output')
   const hashedCss = assets.filter((name) => /^Home-[A-Za-z0-9_-]+\.css$/.test(name))
   if (hashedCss.length) failures.push('hashed Home CSS chunks remain: ' + hashedCss.join(', '))
   return failures
