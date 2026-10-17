@@ -80,39 +80,50 @@ try {
       const cangkang = (pg) => pg.getByRole(peran.shell.role, { name: peran.shell.name }).first().waitFor({ timeout: 90000 })
       const J = `ketahanan-${peran.J}`
       const buka = async (rute) => { await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page) }
-      const terisi = (min, ms) => page.waitForFunction((m) => document.body.innerText.trim().length > m, min, { timeout: ms }).catch(() => {})
+      // Halaman dinilai 'terisi' bila cukup teks ATAU, untuk halaman yang memang ringkas, penanda khasnya terlihat (bukan sekadar bukan-kosong).
+      const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i }
+      const sehat = (rute, t) => (PENANDA[rute] ? PENANDA[rute].test(t) : t.trim().length > peran.minChar)
+      const terisi = (rute, ms) => page.waitForFunction(([m, pen]) => { const t = document.body.innerText; return pen ? new RegExp(pen.source, pen.flags).test(t) : t.trim().length > m }, [peran.minChar, PENANDA[rute] ? { source: PENANDA[rute].source, flags: PENANDA[rute].flags } : null], { timeout: ms }).catch(() => {})
+      // Kumpulkan SEMUA halaman sebelum menegaskan: satu run memberi data kalibrasi lengkap (ukuran teks per halaman) dan satu pesan gagal merinci semuanya.
+      const periksa = async (nama, rutes, fn) => {
+        const gagal = [], ukur = {}
+        for (const rute of rutes) { try { ukur[rute] = await fn(rute) } catch (e) { gagal.push(`${rute}: ${String(e.message).split('\n')[0]}`) } }
+        assert.deepEqual(gagal, [], `${nama}: ${gagal.join(' | ')}`)
+        return ukur
+      }
 
-      await step(vp.name, J, 'kontrol positif tanpa gangguan: tiap halaman terisi (pemanasan)', async () => {
-        for (const rute of peran.rute) {
-          await buka(rute); await terisi(peran.minChar, 120000)
-          const t = await teks(page); assert.ok(t.trim().length > peran.minChar, `${rute} tidak terisi TANPA gangguan (${t.trim().length} karakter)`)
-        }
-      })
+      await step(vp.name, J, 'kontrol positif tanpa gangguan: tiap halaman terisi (pemanasan)', () => periksa('kontrol positif', peran.rute, async (rute) => {
+        await buka(rute); await terisi(rute, 120000)
+        const t = await teks(page); assert.ok(sehat(rute, t), `tidak terisi TANPA gangguan (${t.trim().length} karakter)`); return { chars: t.trim().length }
+      }))
       await step(vp.name, J, `API lambat (${SLOW_MS} ms): cangkang tetap tampil, tanpa overflow atau teks bocor`, async () => {
         await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, SLOW_MS)); await r.continue().catch(() => {}) })
-        for (const rute of peran.rute) {
-          await buka(rute)
-          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat lambat`)
-          const b = bocor(await teks(page)); assert.deepEqual(b, [], `${rute} teks bocor saat lambat: ${b}`)
-        }
-        await page.unroute(apiUrl)
+        try {
+          return await periksa('API lambat', peran.rute, async (rute) => {
+            await buka(rute)
+            const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px saat lambat`)
+            const b = bocor(await teks(page)); assert.deepEqual(b, [], `teks bocor saat lambat: ${b}`)
+          })
+        } finally { await page.unroute(apiUrl) }
       })
       await step(vp.name, J, 'API 500: halaman tidak crash, tidak kosong, tanpa teks bocor atau overflow', async () => {
         await page.route(apiUrl, (r) => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'boom' }) }))
-        for (const rute of peran.rute) {
-          await buka(rute); await terisi(peran.minChar, 60000)
+        return await periksa('API 500', peran.rute, async (rute) => {
+          await buka(rute); await terisi(rute, 60000)
           const t = await teks(page)
-          assert.ok(t.trim().length > peran.minChar, `${rute} nyaris kosong saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))})`)
-          const b = bocor(t); assert.deepEqual(b, [], `${rute} teks bocor saat API 500: ${b}`)
-          const o = await overflowX(page); assert.ok(o <= 1, `${rute} overflow ${o}px saat API 500`)
-        }
+          assert.ok(sehat(rute, t), `nyaris kosong saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))})`)
+          const b = bocor(t); assert.deepEqual(b, [], `teks bocor saat API 500: ${b}`)
+          const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px saat API 500`)
+          return { chars: t.trim().length }
+        })
       })
       await step(vp.name, J, 'pemulihan: setelah API normal, halaman terisi lagi tanpa teks bocor', async () => {
         await page.unroute(apiUrl)
-        for (const rute of peran.rute) {
-          await buka(rute); await terisi(peran.minChar, 60000)
-          const t = await teks(page); assert.ok(t.trim().length > peran.minChar, `pemulihan: ${rute} tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [], `${rute} teks bocor setelah pemulihan`)
-        }
+        return await periksa('pemulihan', peran.rute, async (rute) => {
+          await buka(rute); await terisi(rute, 60000)
+          const t = await teks(page); assert.ok(sehat(rute, t), `pemulihan: tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [], 'teks bocor setelah pemulihan')
+          return { chars: t.trim().length }
+        })
       })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani selama semua keadaan', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
