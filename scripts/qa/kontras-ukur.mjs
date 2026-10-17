@@ -42,7 +42,9 @@ export const ukur = () => {
     if (!ok) { out.tidakDapatDiukur++; continue }
     const op = parseFloat(s.opacity) // opasitas elemen sendiri saja (opasitas ancestor tidak dihitung: dicatat di metode)
     const fg = over({ ...fg0, a: fg0.a * op }, bg)
-    const px = parseFloat(s.fontSize); const tebal = parseInt(s.fontWeight, 10) >= 700
+    const px = parseFloat(s.fontSize)
+    if (!(px > 0)) continue // font-size 0: tidak dirender sebagai teks yang terbaca (mis. lencana titik yang menyimpan angka); bukan kegagalan kontras
+    const tebal = parseInt(s.fontWeight, 10) >= 700
     const besar = px >= 24 || (px >= 18.66 && tebal)
     const perlu = besar ? 3 : 4.5
     const k = rasio(fg, bg)
