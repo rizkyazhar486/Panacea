@@ -54,15 +54,37 @@ if (API) {
   } catch (e) { finding('warn', `health server tidak terbaca: ${e.message}`) }
 } else finding('info', 'SHA penyebaran frontend tidak tertanam di halaman dan PROD_API_URL tidak diberikan: SHA produksi TIDAK diverifikasi')
 
+// Only same-origin built assets (/assets/*.css, *.js) are blocking. External fonts are
+// handled separately; a third-party timeout must not be misdiagnosed as a missing Vite chunk.
+const isProductionAsset = (assetUrl) => {
+  try {
+    const u = new URL(assetUrl)
+    const b = new URL(BASE)
+    return (u.hostname === b.hostname || u.hostname === 'www.panaceamed.id') &&
+      u.pathname.startsWith('/assets/') && /\\.(?:css|js)$/.test(u.pathname)
+  } catch { return false }
+}
+
 // 5) Peramban
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox', '--enable-webgl', '--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
 try {
   for (const [width, height] of [[390, 844], [1440, 900]]) {
-    const v = { width, height, errors: [], failedRequests: [] }
+    const v = { width, height, errors: [], failedRequests: [], assetFailures: [] }
     const ctx = await browser.newContext({ viewport: { width, height } }); const page = await ctx.newPage()
     page.on('pageerror', (e) => v.errors.push(e.message.slice(0, 300)))
-    page.on('requestfailed', (r) => v.failedRequests.push(`${r.url().slice(0, 120)} ${r.failure()?.errorText}`))
+    page.on('requestfailed', (r) => {
+      v.failedRequests.push(`${r.url().slice(0, 120)} ${r.failure()?.errorText}`)
+      if (isProductionAsset(r.url())) v.assetFailures.push(`${r.url().slice(0, 150)}: ${r.failure()?.errorText || 'request failed'}`)
+    })
+    // The previous smoke missed missing CSS because React caught the rejection and rendered
+    // a visible error page with HTTP 200. Fail also when Vercel sends index.html for CSS.
+    page.on('response', (r) => {
+      if (!isProductionAsset(r.url())) return
+      const ct = (r.headers()['content-type'] || '').toLowerCase()
+      if (r.status() >= 400 || (new URL(r.url()).pathname.endsWith('.css') && !ct.includes('text/css')))
+        v.assetFailures.push(`${r.url().slice(0, 150)}: HTTP ${r.status()} content-type ${ct}`)
+    })
     const resp = await page.goto(BASE + '/', { waitUntil: 'load', timeout: 60000 }).catch((e) => { v.errors.push('goto: ' + e.message); return null })
     v.status = resp?.status() ?? null; v.finalUrl = page.url()
     await page.waitForTimeout(3000)
@@ -75,6 +97,7 @@ try {
         webgl2: !!c.getContext('webgl2'), webgl1: !!c.getContext('webgl'),
         textUnder105px: [...document.querySelectorAll('body *')].filter((e) => e.children.length === 0 && (e.textContent || '').trim() && parseFloat(getComputedStyle(e).fontSize) < 10.5).length,
         bodyTextChars: (document.body.innerText || '').length,
+        rootErrorText: Array.from(document.querySelectorAll('[role="alert"]')).map((e) => e.textContent || '').find((s) => /something went wrong/i.test(s)) || '',
       }
     }))
     await page.screenshot({ path: path.join(OUT, `home-${width}.png`), fullPage: true })
@@ -114,7 +137,7 @@ try {
     }
     v.body = b
     report.viewports.push(v)
-    for (const message of assessPublicPage({ status: v.status, title: v.title, bodyTextChars: v.bodyTextChars })) finding('fail', `${width}px: ${message}`)
+    for (const message of assessPublicPage({ status: v.status, title: v.title, bodyTextChars: v.bodyTextChars, rootErrorText: v.rootErrorText, assetFailures: v.assetFailures })) finding('fail', `${width}px: ${message}`)
     if (v.errors.length) finding('fail', `${width}px: galat halaman ${v.errors.length}`)
     if (v.overflowX) finding('fail', `${width}px: scroll horizontal (scrollWidth ${v.scrollWidth})`)
     if (!v.webgl2 && !v.webgl1) finding('warn', `${width}px: WebGL tidak tersedia di runner`)
