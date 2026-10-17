@@ -76,6 +76,19 @@ try {
       const sesudah = await call('POST', '/api/notify/user', baru.token, body); assert.equal(sesudah.status, 200, `setelah verifikasi harus 200, dapat ${sesudah.status}`)
       const pasien = await call('POST', '/api/notify/user', pasienApi.token, body); assert.equal(pasien.status, 403, `pasien harus 403, dapat ${pasien.status}`)
     })
+    await step(VP, J, 'kontributor: login nyata tidak memberi akses owner, staf, atau pengiriman notifikasi', async () => {
+      const x = await devLogin('kontributor-f1@example.com', 'kontributor')
+      assert.equal(x.user.role, 'kontributor', 'self-service contributor role is recognized')
+      assert.equal((await call('GET', '/api/auth/me', x.token)).status, 200, 'contributor has only an authenticated identity')
+      const denied = [
+        await call('GET', '/api/staff/assignments', x.token),
+        await call('POST', '/api/owner/staff-role', x.token, { userId: x.user.id, role: 'perawat' }),
+        await call('POST', '/api/notify/user', x.token, { email: 'absent@example.com', body: 'synthetic' }),
+      ]
+      assert.deepEqual(denied.map((r) => r.status), [403, 403, 403], 'contributor cannot gain staff/owner/verifier powers')
+      assert.equal((await call('POST', '/api/auth/logout', x.token)).status, 200, 'contributor can log out')
+      assert.equal((await call('GET', '/api/auth/me', x.token)).status, 401, 'contributor token revoked on logout')
+    })
     await step(VP, J, 'eskalasi peran ditolak: login mandiri sebagai admin/perawat tidak memberi peran itu', async () => {
       for (const r of ['admin', 'perawat']) { const x = await devLogin(`eskalasi-${r}-${VP}@example.com`, r); assert.equal(x.user.role, 'pasien', `peran ${r} tidak boleh didapat lewat login mandiri, dapat ${x.user.role}`) }
       const x = await devLogin(`eskalasi-owner-${VP}@example.com`, 'owner'); assert.notEqual(x.user.role, 'owner', 'bukan pemilik terdaftar tidak boleh menjadi owner')
