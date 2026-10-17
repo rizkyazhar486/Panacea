@@ -72,6 +72,10 @@ export function graceBand(score: number): GraceBand {
 const isEmpty = (v: unknown) => typeof v === 'number' && Number.isNaN(v)
 
 export function graceScore(input: GraceInput): GraceResult {
+  // Runtime boundary: callers may bypass TypeScript (JSON, imported state, malformed UI data).
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    return { missing: [], invalid: ['GRACE input must be an object'], score: null, band: null }
+  }
   const missing: string[] = []
   const invalid: string[] = []
   const ok: Partial<Record<Field, number>> = {}
@@ -84,6 +88,9 @@ export function graceScore(input: GraceInput): GraceResult {
   }
   const killipOk = Number.isInteger(input.killip) && input.killip >= 0 && input.killip <= 3
   if (!killipOk) invalid.push('Killip class must be 0–3')
+  for (const field of ['arrest', 'stDev', 'markers'] as const) {
+    if (typeof input[field] !== 'boolean') invalid.push(`${field} must be a boolean`)
+  }
   if (missing.length > 0 || invalid.length > 0) return { missing, invalid, score: null, band: null }
   const score =
     agePts(ok.age as number) + hrPts(ok.hr as number) + sbpPts(ok.sbp as number) + creatPts(ok.creat as number) + KILLIP_PTS[input.killip] +
