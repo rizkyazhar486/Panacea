@@ -69,6 +69,19 @@
           "value": "text/css; charset=utf-8"
         }
       ]
+    },
+    {
+      "source": "/assets/Home.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        },
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
     }
   ],
   "rewrites": [
