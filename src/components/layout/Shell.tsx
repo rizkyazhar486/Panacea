@@ -84,7 +84,7 @@ function navMatches(n: Nav, pathname: string): boolean {
   return pathname === n.to || pathname.startsWith(n.to + '/')
 }
 
-const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
+const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'perawat', 'lab', 'admin', 'owner']
 
 
 /**
@@ -103,6 +103,7 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 const nav: Nav[] = [
   // Beranda
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/doctor-review/lab-results', label: 'Lab desk', icon: IconShield, roles: ['perawat', 'lab'], group: 'Home' },
   { to: '/semua-fitur', label: 'All Features', icon: IconSearch, roles: ALL, group: 'Home' },
   { to: '/tutorial', label: 'How to Use', icon: IconBook, roles: ALL, group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
@@ -283,6 +284,8 @@ const roleLabel: Record<Role, string> = {
   dokter: 'Doctor',
   kontributor: 'Contributor',
   verifikator: 'Verifier',
+  perawat: 'Nurse',
+  lab: 'Lab staff',
   admin: 'Admin',
   owner: 'Owner',
 }
