@@ -70,5 +70,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/assets/Home-D8IB3ISB.css",
+      "destination": "/home-styles.css"
+    }
   ]
 }

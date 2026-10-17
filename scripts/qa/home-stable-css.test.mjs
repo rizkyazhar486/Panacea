@@ -33,3 +33,11 @@ test('P0: production cache header forces Home stylesheet revalidation', () => {
   assert.ok(entry)
   assert.ok(entry.headers.some((x) => x.key === 'Cache-Control' && /no-cache/.test(x.value)))
 })
+
+test('P0: known stale iPhone Home CSS URL resolves to stable CSS without a broad asset fallback', () => {
+  const json = JSON.parse(read('vercel.json'))
+  const incident = '/assets/Home-D8IB3ISB.css'
+  const route = (json.rewrites || []).find((x) => x.source === incident)
+  assert.deepEqual(route, { source: incident, destination: '/home-styles.css' })
+  assert.equal((json.rewrites || []).some((x) => x.source.startsWith('/assets/') && (x.source.includes('*') || x.source.includes('(.*)'))), false, 'do not turn unrelated missing JS/CSS into a false HTTP 200')
+})
