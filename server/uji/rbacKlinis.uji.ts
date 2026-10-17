@@ -166,3 +166,7 @@ await import('./reservedPatientIdsHttp.uji.js')
 
 // Alpha E2: one access decision for every registered route (table vs source vs a real server).
 await import('./routeAccessDecisions.uji.js')
+
+// Alpha F1: perawat/lab owner-granted roles scoped by explicit patient assignment (store, then real HTTP).
+await import('./staffStore.uji.js')
+await import('./staffRbacHttp.uji.js')
