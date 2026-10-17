@@ -73,6 +73,32 @@ for (const t of [null, undefined, 5, {}, [], true]) assert.ok(Number.isNaN(parse
 assert.equal(parseNumberField('0'), 0, 'a typed 0 is a real 0'); assert.equal(parseNumberField(' 12.5 '), 12.5); assert.equal(parseNumberField('-3'), -3); assert.equal(parseNumberField('1e2'), 100)
 for (const t of ['abc', '1,5', '1_000', '--1', '12abc']) assert.ok(Number.isNaN(parseNumberField(t)), `"${t}" is NaN`)
 assert.equal(parseNumberField('Infinity'), Infinity, 'infinities pass through (the range gate rejects them)'); assert.equal(parseNumberField('0x10'), 16, 'REVIEWER ITEM: Number() accepts hex text')
+// GRACE classic 2003 nomogram, independently re-transcribed from AHA/ACC 2014 figure
+// (professional.heart.org 2014 AHA NSTE-ACS guideline, Grace Risk Model Nomogram).
+// Values are literal from the published table, not imported engine constants.
+{
+  const ageTable: [number, number][] = [[18, 0], [29, 0], [30, 8], [39, 8], [40, 25], [49, 25], [50, 41], [59, 41], [60, 58], [69, 58], [70, 75], [79, 75], [80, 91], [89, 91], [90, 100]]
+  const hrTable: [number, number][] = [[20, 0], [49, 0], [50, 3], [69, 3], [70, 9], [89, 9], [90, 15], [109, 15], [110, 24], [149, 24], [150, 38], [199, 38], [200, 46]]
+  const sbpTable: [number, number][] = [[40, 58], [79, 58], [80, 53], [99, 53], [100, 43], [119, 43], [120, 34], [139, 34], [140, 24], [159, 24], [160, 10], [199, 10], [200, 0]]
+  const creatTable: [number, number][] = [[0.1, 1], [0.39, 1], [0.4, 4], [0.79, 4], [0.8, 7], [1.19, 7], [1.2, 10], [1.59, 10], [1.6, 13], [1.99, 13], [2, 21], [3.99, 21], [4, 28]]
+  const base = { age: 45, hr: 75, sbp: 150, creat: 1, killip: 0, arrest: false, stDev: false, markers: false }
+  const refs = { age: 25, hr: 9, sbp: 24, creat: 7 }
+  const expectedBase = Object.values(refs).reduce((a, b) => a + b, 0)
+  assert.equal(graceScore(base).score, expectedBase, 'GRACE AHA/ACC reference base case')
+  for (const [key, table] of [['age', ageTable], ['hr', hrTable], ['sbp', sbpTable], ['creat', creatTable]] as const) {
+    for (const [value, pts] of table) {
+      const result = graceScore({ ...base, [key]: value })
+      assert.deepEqual(result.invalid, [], `GRACE ${key}=${value} within plausibility bounds`)
+      assert.equal(result.score, expectedBase - refs[key] + pts, `GRACE published points: ${key}=${value}`)
+    }
+  }
+  for (const [killip, points] of [[0, 0], [1, 20], [2, 39], [3, 59]] as const) {
+    assert.equal(graceScore({ ...base, killip }).score, expectedBase + points, `GRACE published Killip ${killip + 1} points`)
+  }
+  assert.equal(graceScore({ age: 65, hr: 100, sbp: 100, creat: 1, killip: 1, arrest: false, stDev: true, markers: true }).score,
+    58 + 15 + 43 + 7 + 20 + 28 + 14, 'GRACE AHA/ACC worked nomogram case, independently summed')
+}
+
 // ── 6. GRACE: flag klinis harus boolean yang eksplisit. Masukan kotor tidak boleh diam-diam menjadi 0 poin. ──
 {
   const base = { age: 50, hr: 100, sbp: 120, creat: 1, killip: 0, arrest: false, stDev: false, markers: false }
