@@ -72,12 +72,12 @@ export function evaluateFootSlide(m: FootSlideMeasure | null | undefined, criter
   if (!nonNeg(phases) || phases === 0) return { status: 'unmeasurable', criteria, reason: 'no_stance' }
   if (!Number.isInteger(phases)) return { status: 'unmeasurable', criteria, reason: 'too_few_phases' }
   if (phases < criteria.minStancePhases) return { status: 'unmeasurable', criteria, reason: 'too_few_phases' }
-  // Independent replay uses >=3 frames per stance. A bare RMS without sampling support is not credible evidence.
-  // Do not let a two-frame or unsourced fixture self-award a passing slide result.
+  // Preserve the established error classification when slide values themselves are invalid.
+  if (!nonNeg(m?.slide_rms_mm) || !nonNeg(m?.slide_max_mm)) return { status: 'unmeasurable', criteria, reason: 'missing_values' }
+  // Only award an assessment when sample counts are sufficient; never invent a stance.
   if (!Number.isInteger(m?.stance_frames) || (m?.stance_frames ?? 0) < 3 * phases) {
     return { status: 'unmeasurable', criteria, reason: 'insufficient_frames' }
   }
-  if (!nonNeg(m?.slide_rms_mm) || !nonNeg(m?.slide_max_mm)) return { status: 'unmeasurable', criteria, reason: 'missing_values' }
   const failed: Array<'rms' | 'peak'> = []
   if (m.slide_rms_mm > criteria.maxRmsMm) failed.push('rms')
   if (m.slide_max_mm > criteria.maxPeakMm) failed.push('peak')
