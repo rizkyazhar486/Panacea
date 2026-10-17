@@ -1,5 +1,13 @@
 # Panacea Multi-Agent Operating Policy
 
+
+## Owner correction: concise UI, journeys and reports (2026-10-17)
+
+**Mandatory for all agents:** follow [Ruthless Simplicity](DOCS/product/RUTHLESS-SIMPLICITY.md) for F1 journeys, F2 UX, all patient/clinician screens and communication with the owner. Show one purpose, one main action, one short sentence; move optional detail behind progressive disclosure. No walls of text, duplicate navigation or button overload. Preserve all existing capabilities and visible safety/uncertainty/provenance requirements.
+
+**Owner update default:** up to 4 short lines (~120 words): result; PR/SHA; *actual* exact-head validation; remaining blocker/next action. Keep full evidence in linked artifacts; expand only on explicit request or when material safety/audit information requires it. Never misstate VERIFIED, merge, deployment or clinical review.
+
+
 ## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
 
 > **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
