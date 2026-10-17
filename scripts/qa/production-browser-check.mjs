@@ -3,7 +3,7 @@
 // Keluar 2 = kegagalan jaringan (tahap disebutkan, BUKAN status aplikasi); 1 = temuan yang menggagalkan; 0 = lulus.
 // Tidak mengklaim apa pun yang tidak diamati: SHA penyebaran frontend tidak tertanam di halaman, hanya dilaporkan bila server melaporkannya.
 import dns from 'node:dns/promises'
-import { assessPublicPage } from './production-browser-verdict.mjs'
+import { assessPublicPage, productionAssetFailure } from './production-browser-verdict.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
@@ -56,15 +56,6 @@ if (API) {
 
 // Only same-origin built assets (/assets/*.css, *.js) are blocking. External fonts are
 // handled separately; a third-party timeout must not be misdiagnosed as a missing Vite chunk.
-const isProductionAsset = (assetUrl) => {
-  try {
-    const u = new URL(assetUrl)
-    const b = new URL(BASE)
-    return (u.hostname === b.hostname || u.hostname === 'www.panaceamed.id') &&
-      u.pathname.startsWith('/assets/') && /\\.(?:css|js)$/.test(u.pathname)
-  } catch { return false }
-}
-
 // 5) Peramban
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox', '--enable-webgl', '--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
@@ -75,15 +66,14 @@ try {
     page.on('pageerror', (e) => v.errors.push(e.message.slice(0, 300)))
     page.on('requestfailed', (r) => {
       v.failedRequests.push(`${r.url().slice(0, 120)} ${r.failure()?.errorText}`)
-      if (isProductionAsset(r.url())) v.assetFailures.push(`${r.url().slice(0, 150)}: ${r.failure()?.errorText || 'request failed'}`)
+      const failure = productionAssetFailure({ url: r.url(), requestFailure: r.failure()?.errorText || 'request failed' }, BASE)
+      if (failure) v.assetFailures.push(failure)
     })
     // The previous smoke missed missing CSS because React caught the rejection and rendered
     // a visible error page with HTTP 200. Fail also when Vercel sends index.html for CSS.
     page.on('response', (r) => {
-      if (!isProductionAsset(r.url())) return
-      const ct = (r.headers()['content-type'] || '').toLowerCase()
-      if (r.status() >= 400 || (new URL(r.url()).pathname.endsWith('.css') && !ct.includes('text/css')))
-        v.assetFailures.push(`${r.url().slice(0, 150)}: HTTP ${r.status()} content-type ${ct}`)
+      const failure = productionAssetFailure({ url: r.url(), status: r.status(), contentType: r.headers()['content-type'] || '' }, BASE)
+      if (failure) v.assetFailures.push(failure)
     })
     const resp = await page.goto(BASE + '/', { waitUntil: 'load', timeout: 60000 }).catch((e) => { v.errors.push('goto: ' + e.message); return null })
     v.status = resp?.status() ?? null; v.finalUrl = page.url()

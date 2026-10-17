@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { assessPublicPage } from './production-browser-verdict.mjs'
+import { assessPublicPage, isProductionAsset, productionAssetFailure } from './production-browser-verdict.mjs'
 test('E7: public home HTTP 200 with visible text and title passes structural check', () => {
   assert.deepEqual(assessPublicPage({ status: 200, title: 'PanaceaMed', bodyTextChars: 42 }), [])
 })
@@ -25,4 +25,27 @@ test('P0: missing or wrong-MIME home CSS prevents green production smoke', () =>
 
 test('P0: a healthy home with no root error or broken assets still passes', () => {
   assert.deepEqual(assessPublicPage({ status: 200, title: 'Panacea', bodyTextChars: 400, rootErrorText: '', assetFailures: [] }), [])
+})
+
+test('P0: classifies hashed and stable required CSS/JS using actual URLs', () => {
+  const base = 'https://panaceamed.id'
+  for (const path of ['/assets/Home-D8IB3ISB.css', '/assets/index-X.js', '/home-styles.css', '/panacea-green-material-v48.css?v=20260916-1']) {
+    assert.equal(isProductionAsset('https://www.panaceamed.id' + path, base), true, path)
+    assert.equal(isProductionAsset('https://panaceamed.id' + path, base), true, path)
+  }
+  for (const url of ['https://fonts.googleapis.com/assets/font.css', 'https://evil.test/home-styles.css', 'https://www.panaceamed.id.evil.test/assets/x.css', 'https://panaceamed.id/other.css', 'https://panaceamed.id/assets/image.png', 'not a URL']) assert.equal(isProductionAsset(url, base), false, url)
+  assert.equal(isProductionAsset('http://localhost:4173/assets/home.css', 'http://localhost:4173'), true)
+  assert.equal(isProductionAsset('http://localhost:4174/assets/home.css', 'http://localhost:4173'), false)
+})
+test('P0: actual asset classifier drives failed-request, HTTP and CSS MIME failures', () => {
+  const base = 'https://www.panaceamed.id'
+  for (const path of ['/assets/Home-X.css', '/home-styles.css', '/panacea-green-material-v48.css']) {
+    const url = base + path
+    assert.equal(productionAssetFailure({ url, status: 200, contentType: 'text/css; charset=utf-8' }, base), null)
+    assert.match(productionAssetFailure({ url, requestFailure: 'net::ERR_FAILED' }, base), /ERR_FAILED/)
+    for (const status of [404, 500]) assert.match(productionAssetFailure({ url, status, contentType: 'text/css' }, base), /HTTP/)
+    assert.match(productionAssetFailure({ url, status: 200, contentType: 'text/html' }, base), /content-type text\/html/)
+  }
+  assert.match(productionAssetFailure({ url: base + '/assets/index-X.js', status: 404, contentType: 'text/html' }, base), /HTTP 404/)
+  assert.equal(productionAssetFailure({ url: 'https://fonts.googleapis.com/font.css', requestFailure: 'timeout' }, base), null)
 })
