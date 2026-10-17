@@ -77,3 +77,13 @@ assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 for (const f of ['maintenanceFluid(', 'resuscitation(', 'correctedSodium(', 'naCorrectionRate(', 'potassiumDeficit(']) assert.ok(page.includes(f), `halaman tidak memakai ${f}`)
 assert.equal((page.match(/<Penolakan r=\{/g) ?? []).length, 5, 'tiap sub-kalkulator harus menampilkan alasan penolakan')
 console.log('fluid-electrolytes: nilai tangan, batas Holliday-Segar, skenario berpasangan, kosong/di luar rentang gagal tertutup, tanpa angka dari kolom kosong')
+
+// Evaluate the actual exported note template: engine and copied explanation must agree around glucose 100.
+const noteTemplate = page.match(/<CopyNote text=\{`(Corrected Na = [^`]+)`\}/)?.[1]
+assert.ok(noteTemplate, 'corrected sodium export template must exist')
+const renderNote = new Function('measuredNa', 'glucose', 'correctedNa', 'return `' + noteTemplate + '`') as (na: number, glucose: number, corrected: number) => string
+for (const [glucose, expected] of [[20, 140], [100, 140], [200, 141.6]] as const) {
+  const result = correctedSodium(140, glucose) as Cna
+  close(result.correctedNa, expected)
+  assert.equal(renderNote(140, glucose, result.correctedNa), `Corrected Na = 140 + 1.6 x max(0, (${glucose}-100)/100) = ${expected.toFixed(1)} mEq/L [Katz formula]`, `exported Katz note at glucose ${glucose}`)
+}
