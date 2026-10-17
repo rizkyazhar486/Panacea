@@ -10,13 +10,14 @@
 //   PLAYWRIGHT_MODULE=<path>/playwright/index.js CHROME=<path chrome> QA_OUT=<json> QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
 import { writeFileSync } from 'node:fs'
 import { ANGGARAN, agregat, cumulativeLayoutShift, statusAnggaran, totalBlockingTime } from './perf-stats.mjs'
-import { enoughPerfEvidence, perfSampleProblem } from './perf-sample-coverage.mjs'
+import { enoughPerfEvidence, minimumPerfSamples, perfSampleProblem } from './perf-sample-coverage.mjs'
 
 const pw = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const chromium = pw.chromium ?? pw.default.chromium
 const API = process.env.QA_API || 'http://127.0.0.1:18790'
 const APP = process.env.QA_URL || 'http://localhost:5191/'
-const N = Number(process.env.QA_PERF_N || 5)
+const N = Number(process.env.QA_PERF_N ?? 5)
+const MINIMUM_SAMPLES = minimumPerfSamples(N)
 const SETTLE_MS = Number(process.env.QA_PERF_SETTLE_MS || 2500)
 const VIEWPORTS = [{ name: 'mobile-390x844', width: 390, height: 844, cpu: 4 }, { name: 'desktop-1440x900', width: 1440, height: 900, cpu: 1 }]
 const HALAMAN = [
@@ -70,7 +71,7 @@ try {
       } catch (e) { sampel.push({ galat: String(e.message).split('\n')[0] }) } finally { await ctx.close() }
     }
     const sah = sampel.filter((s) => perfSampleProblem(s) === null)
-    const required = Math.ceil(N / 2)
+    const required = MINIMUM_SAMPLES
     if (!enoughPerfEvidence(sampel, required)) gagalUkur++
     const metrik = ['ttfbMs', 'dclMs', 'loadMs', 'fcpMs', 'lcpMs', 'cls', 'tbtMs', 'requests', 'bytesTotal', 'bytesJs']
     const agg = Object.fromEntries(metrik.map((k) => [k, agregat(sah, k)]))

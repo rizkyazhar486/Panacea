@@ -14,3 +14,8 @@ export function enoughPerfEvidence(samples, required) {
   if (!Array.isArray(samples) || !Number.isInteger(required) || required < 1) return false
   return samples.filter(s => perfSampleProblem(s) === null).length >= required
 }
+
+export function minimumPerfSamples(planned) {
+  if (!Number.isSafeInteger(planned) || planned < 1) throw new Error('performance sample count must be a positive integer')
+  return Math.floor(planned / 2) + 1
+}
