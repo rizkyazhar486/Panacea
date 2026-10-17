@@ -1,5 +1,20 @@
 # Panaceamed Ruthless Simplicity
 
+
+## Owner directive (2026-10-17): simple, visual, concise
+
+Applies to Panaceamed UI, F1 user journeys, F2 UX, PR descriptions and owner-facing reports. When previous guidance encourages a text-heavy screen or report, **this directive wins**, without weakening clinical safety, privacy, RBAC, accessibility, provenance or testing.
+
+- **First viewport:** one obvious purpose, one primary action and at most one brief supporting sentence; show necessary clinical facts, never a wall of explanation.
+- **Copy budget:** one concise sentence per visible card/widget; short labels. Put explanations, methodology, formulas, evidence and optional tools behind **Details / Why / Evidence**. Routine tasks must not require reading long prose.
+- **Journey:** recognize → act → immediate feedback → next step. Minimize screens, re-entry, interruptions, choices and duplicated navigation. Preserve back, recovery and confirmation where safety demands them.
+- **Responsive:** validate patient and clinician journeys on mobile (390×844) and desktop, touch, keyboard, screen reader, light/dark, empty/loading/error states. Never obscure the action or create horizontal overflow.
+- **Critical exceptions:** clinical warnings, contraindications, emergencies, missing data, uncertainty, consent, units, provenance and required clinician review stay visible when necessary. Do not shorten safety information into ambiguity.
+- **Preserve capability:** simplify presentation and group controls; do not silently remove working features or change clinical behavior.
+- **PR acceptance:** include before/after screen captures, the shortest real patient/clinician task path, count of competing primary actions and persistent paragraphs, plus **exact-head F1/F2 checks**. If finding the action requires reading a paragraph wall, fix the design. Do not relax ratchets or call unverified tests VERIFIED.
+- **Owner updates (default):** maximum 4 concise lines, approximately 120 words total: (1) result; (2) changed UI/PR/SHA; (3) validated evidence; (4) outstanding blocker/next action. Link full logs, calculations and evidence; write longer only when requested or essential for safety and audit. Never conflate local checks with CI, production, clinical or user acceptance.
+
+
 Panacea may be technically deep, but the user should experience one obvious path at a time.
 
 ## Core equation
