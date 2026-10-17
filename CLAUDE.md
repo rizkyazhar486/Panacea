@@ -1,5 +1,8 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
+> **Owner direction — parallel F1 + F2 engineering (2026-10-17):** Claude Code may work on F1 Full User Journey Acceptance and F2 UI/UX Optimization concurrently, using separate branches/worktrees and PRs. Follow [`PANACEA_F1_F2_PARALLEL_CLAUDE_EXECUTION.md`](governance/doctrine/PANACEA_F1_F2_PARALLEL_CLAUDE_EXECUTION.md) for exact-head checks, overlap review, owner-controlled RBAC policy, F2 design/human QA, and evidence-gated acceptance. F1/F2 remain REPORTED until formally verified.
+
+
 > **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
 >
 > **Arahan pemilik 17 Oktober 2026 — batas fase Clinical Review Alpha:** Semua persetujuan/review klinis formal untuk validasi model/kalkulator (termasuk C6) **ditunda ke fase Clinical Validation**, bukan syarat penutupan *engineering Alpha*. Wajib baca [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). **Jangan** tandai C6 `VERIFIED`, mengarang reviewer/tanda tangan, mengubah `clinically_reviewed=false` menjadi true, melonggarkan uji/safety, atau melewati tanda tangan klinisi dalam alur pasien. Ledger kanonik sudah dimigrasikan: 45 catatan historis tetap tercatat, hanya C6 yang berstatus `DEFERRED_TO_CLINICAL_VALIDATION` (dengan catatan penundaan mesin-terbaca), dan kemajuan dilaporkan terhadap 44 kriteria aktif; angka resmi ada di `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md` (dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json`).

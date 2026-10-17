@@ -1,5 +1,10 @@
 # Panacea Multi-Agent Operating Policy
 
+## Owner-directed F1 + F2 parallel Claude Code execution (2026-10-17)
+
+**Mandatory:** [`PANACEA_F1_F2_PARALLEL_CLAUDE_EXECUTION.md`](governance/doctrine/PANACEA_F1_F2_PARALLEL_CLAUDE_EXECUTION.md). F1 Full User Journey and F2 UI/UX may run in parallel in separate Claude Code branches/worktrees and PRs. Enforce exact-head CI, branch/PR isolation, owner decisions for F1 RBAC, and human design/QA review for F2. Both remain REPORTED until evidence-backed acceptance; never weaken safety, privacy or accessibility gates.
+
+
 ## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
 
 > **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
