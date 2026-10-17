@@ -246,7 +246,7 @@ export default function UnifiedHumanSimulationProjector({
         return (
           <div className="grid gap-3 @[44rem]:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
             <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-              <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-200/70">Selected structure</div>
+              <div className="text-[9px] font-black uppercase tracking-[.14em] text-[#a5f3fc]">Selected structure</div>
               <div className="mt-1 text-base font-black text-white/90">{selectedStructureName ?? 'Tap a rendered structure'}</div>
               <p className="mt-1 text-[10px] leading-relaxed text-white/45">
                 Selection comes from the rendered source mesh, not inferred screen position. The exact structure can stay in context while the projection changes.
