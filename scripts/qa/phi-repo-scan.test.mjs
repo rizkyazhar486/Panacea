@@ -1,7 +1,7 @@
 // E4: pemindai PHI repo. Positif/negatif/batas pada pola, logika daftar-izin, dan pemindaian repo nyata terhadap daftar izin.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas } from './phi-repo-scan.mjs'
+import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER } from './phi-repo-scan.mjs'
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
 
@@ -84,4 +84,23 @@ test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
   assert.ok(daftarBerkas().includes('scripts/qa/phi-repo-scan.mjs'), 'pemindai sendiri tetap dipindai')
   assert.ok(daftarBerkas().includes('server/src/config.ts'), 'kode produk tetap dipindai')
   assert.ok(daftarBerkas().some((f) => /^scripts\/qa\/.+\.test\.mjs$/.test(f) && !BERKAS_FIXTURE.includes(f)), 'berkas uji lain tetap dipindai (pengecualian path persis, bukan awalan)')
+})
+
+test('E4: unreadable tracked file fails closed rather than being skipped', () => {
+  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca rahasia[.]ts/)
+})
+
+test('E4: non-text reader result cannot certify a clean repository', () => {
+  assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: kosong[.]ts/)
+})
+
+test('E4: real-world source larger than old 2M boundary is scanned fully', () => {
+  const contents = 'x'.repeat(2_000_001) + ' 3171011505900001'
+  const found = pindaiRepo(['besar.ts'], () => contents)
+  assert.deepEqual(found, [{ berkas: 'besar.ts', jenis: 'nik', nilai: '3171011505900001' }])
+})
+
+test('E4: pathological oversized content fails closed instead of silently passing', () => {
+  assert.equal(BATAS_PINDAI_KARAKTER, 16_000_000)
+  assert.throws(() => pindaiRepo(['terlalu-besar.ts'], () => 'x'.repeat(BATAS_PINDAI_KARAKTER + 1)), /tidak memeriksa berkas >16000000 karakter: terlalu-besar[.]ts/)
 })
