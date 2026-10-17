@@ -40,3 +40,14 @@ test('negative-control modes are validated and injected into every page', () => 
   assert.ok(script.includes('addInitScript({ content: SKRIP_SABOTASE[SABOTASE] })'), 'sabotage is injected into the browser context')
   assert.ok(script.includes('NaN [object Object]') && script.includes('width:4000px'), 'leak and overflow payloads')
 })
+
+test('contributor identity has explicit negative authorization coverage rather than being counted as a functioning staff journey', () => {
+  const main = readFileSync(new URL('./user-journey-e2e.mjs', import.meta.url), 'utf8')
+  for (const marker of [
+    "'kontributor-f1@example.com'", "'kontributor'",
+    "'/api/staff/assignments'", "'/api/owner/staff-role'",
+    "'/api/notify/user'", "'/api/auth/logout'",
+  ]) assert.ok(main.includes(marker), `F1 contributor negative boundary missing: ${marker}`)
+  assert.ok(main.includes('contributor cannot gain staff/owner/verifier powers'))
+  assert.ok(main.includes('contributor token revoked on logout'))
+})
