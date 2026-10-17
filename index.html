@@ -208,6 +208,15 @@
     </script>
     <!-- P0: Vite emits this event when a lazy page's hashed JS/CSS cannot load after deployment.
          Install before the entry module so a stale iOS tab can recover once without an infinite loop. -->
+    <!-- Stable Home styles: CSS survives hashed JS/CSS churn across deploys. -->
+    <script data-panacea-home-styles>
+      (() => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = '/home-styles.css'
+        document.head.appendChild(link)
+      })()
+    </script>
     <script data-panacea-preload-recovery>
       (() => {
         const KEY = 'pmd-vite-preload-retry-at'
