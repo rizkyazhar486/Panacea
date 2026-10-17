@@ -22,3 +22,9 @@ Independent cross-check for the frontend: the most recent run of that workflow w
 3. Owner decision: define "equal to main" for a batched-release system (HEAD vs the SHA of the latest deploy run vs last commit affecting each deployable).
 
 Not done and not claimed: staging (no staging environment is configured in this repository), independent post-deploy comparison, journey smoke for the deployed SHA.
+
+## Update, 2026-10-17 ~02:50 UTC — first production deploy with the build-marker check (read-only evidence)
+
+- Run `38996081367` (`workflow_dispatch`, head `80f9cef9`): `deploy` job steps **Deploy prebuilt artifact to production = success**, **Smoke-test deployed production artifact = success**, **Verify deployed build marker equals the built commit = success** (the step added by #2610: the deployed `build.json` commit equals `github.sha`).
+- Live read afterwards (`node scripts/qa/verify-deployed-sha.mjs <main>`): frontend `80f9cef9` (classified as an ancestor of main with no change on the deployed path), backend `f67c2bfa`. Main had advanced to `1f858fd3` by docs/governance-only commits.
+- What this establishes: for that deploy, the running frontend commit equals the commit CI built, verified by the deployed artifact itself rather than by the workflow's own claim. What it does **not** establish: staging (none exists in this repository), the critical-journey smoke against that SHA, the owner's definition of "equal to main" for a batched-release system. E7 therefore stays NOT_CHECKED in the ledger; promotion is the owner's decision and needs the remaining items above.
