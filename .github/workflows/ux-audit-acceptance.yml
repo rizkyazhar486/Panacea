@@ -7,6 +7,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/kontras-ukur.mjs'
+      - 'scripts/qa/kontras-ukur.fixture.mjs'
       - 'scripts/qa/theme-parity.mjs'
       - 'scripts/qa/axe-audit.mjs'
       - 'scripts/qa/keyboard-audit.mjs'
@@ -37,6 +39,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/kontras-ukur.mjs'
+      - 'scripts/qa/kontras-ukur.fixture.mjs'
       - 'scripts/qa/theme-parity.mjs'
       - 'scripts/qa/axe-audit.mjs'
       - 'scripts/qa/keyboard-audit.mjs'
@@ -97,6 +101,7 @@ jobs:
           done
           rc=0
           UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
+          node scripts/qa/kontras-ukur.fixture.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
           SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/axe-evidence.json" AXE_BASELINE=governance/AXE_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/axe-audit.mjs || rc=1
