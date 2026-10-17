@@ -2,7 +2,10 @@
 // Murni dan deterministik (membaca berkas, tanpa jaringan). Tiap aset diklasifikasikan:
 //   per-node            GLB: setiap node membawa panacea_license DAN panacea_source
 //   hak-cipta-tertanam  GLB: asset.copyright tidak kosong dan memuat lisensi yang dikenali
-//   berkas-kredit       ada CREDITS*/PROVENANCE*/LICENSE*/NOTICE* (>= UKURAN_MIN_KREDIT byte) di direktori yang sama
+//   berkas-kredit       ada CREDITS*/PROVENANCE*/LICENSE*/NOTICE* (>= UKURAN_MIN_KREDIT byte) di direktori yang sama, ATAU
+//                       berkas kredit di direktori induk (bukan akar public/) yang MENYEBUT nama berkas aset itu, ATAU
+//                       ASSET_SOURCES* (di direktori yang sama/induk) yang menyebut nama berkas aset itu. ASSET_SOURCES hanya menutup aset yang disebut namanya:
+//                       aset lain di direktori yang sama tetap tercatat sebagai celah (tidak ada tebakan "semua di sini sama asalnya").
 //   tanpa-jejak         tidak ada satu pun di atas -> TIDAK dianggap tercakup (fail-closed)
 // BATAS: mengukur ADA-nya jejak, bukan KEABSAHAN lisensi; berkas kredit direktori tidak membuktikan tiap aset di dalamnya.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -12,6 +15,11 @@ export const EKSTENSI_ASET = new Set(['glb', 'gltf', 'png', 'jpg', 'jpeg', 'webp
 /** Berkas kredit kosong/terlalu pendek tidak menjadi bukti: batas bawah ukuran (byte). */
 export const UKURAN_MIN_KREDIT = 40
 export const POLA_KREDIT = /^(credits?|provenance|licen[cs]es?|notice)(\.|$)/i
+/** Daftar sumber per-aset: menutup HANYA aset yang disebut namanya. */
+export const POLA_SUMBER_ASET = /^asset[-_]sources?(\.|$)/i
+const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+/** Nama berkas disebut utuh (bukan potongan nama lain): batas = awal/akhir teks atau karakter di luar [A-Za-z0-9_.-]. */
+export const menyebutBerkas = (teks, nama) => new RegExp(`(^|[^A-Za-z0-9_.-])${escapeRe(nama)}($|[^A-Za-z0-9_.-])`).test(teks)
 const LISENSI_DIKENAL = /(CC\s*BY(?:-SA)?\s*\d(?:\.\d)?|CC0|public\s+domain|MIT\b|Apache[- ]2|ODbL|BSD)/i
 
 /** Baca metadata dari buffer GLB. Mengembalikan null bila bukan GLB valid (tanpa melempar). */
@@ -51,7 +59,12 @@ function* telusuri(dir) {
 export function inventaris(akar) {
   const publik = join(akar, 'public')
   const semua = [...telusuri(publik)]
-  const kreditPerDir = new Set(semua.filter((p) => POLA_KREDIT.test(p.split(sep).pop()) && statSync(p).size >= UKURAN_MIN_KREDIT).map((p) => dirname(p)))
+  const sah = (p) => statSync(p).size >= UKURAN_MIN_KREDIT
+  const kreditPerDir = new Set(semua.filter((p) => POLA_KREDIT.test(p.split(sep).pop()) && sah(p)).map((p) => dirname(p)))
+  // Berkas yang boleh menutup aset lewat penyebutan nama: kredit (induk) dan ASSET_SOURCES (direktori yang sama atau induk). Akar public/ tidak pernah menutup turunannya.
+  const penyebut = semua.filter((p) => dirname(p) !== publik && sah(p) && (POLA_KREDIT.test(p.split(sep).pop()) || POLA_SUMBER_ASET.test(p.split(sep).pop())))
+    .map((p) => ({ dir: dirname(p), teks: readFileSync(p, 'utf8') }))
+  const disebutLeluhur = (p) => penyebut.some((k) => (dirname(p) === k.dir || dirname(p).startsWith(k.dir + sep)) && menyebutBerkas(k.teks, p.split(sep).pop()))
   const hasil = []
   for (const p of semua) {
     const rel = relative(akar, p).split(sep).join('/')
@@ -59,7 +72,7 @@ export function inventaris(akar) {
     const ekstensi = rel.split('.').pop().toLowerCase()
     if (!EKSTENSI_ASET.has(ekstensi)) continue
     const meta = ekstensi === 'glb' ? bacaMetaGlb(readFileSync(p)) : null
-    hasil.push({ jalur: rel, ekstensi, kelas: klasifikasiAset({ ekstensi, meta, adaBerkasKredit: kreditPerDir.has(dirname(p)) }), ukuran: statSync(p).size })
+    hasil.push({ jalur: rel, ekstensi, kelas: klasifikasiAset({ ekstensi, meta, adaBerkasKredit: kreditPerDir.has(dirname(p)) || disebutLeluhur(p) }), ukuran: statSync(p).size })
   }
   return hasil.sort((a, b) => a.jalur.localeCompare(b.jalur))
 }

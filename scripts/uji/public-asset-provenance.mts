@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { bacaMetaGlb, klasifikasiAset, inventaris, ringkasKelas, UKURAN_MIN_KREDIT } from '../qa/public-asset-inventory.mjs'
+import { bacaMetaGlb, klasifikasiAset, inventaris, ringkasKelas, menyebutBerkas, UKURAN_MIN_KREDIT } from '../qa/public-asset-inventory.mjs'
 
 // ── Fixture GLB minimal: header + chunk JSON (tanpa chunk biner).
 const glb = (json: unknown): Buffer => {
@@ -65,6 +65,51 @@ try {
   tulis('public/e/NOTICE.md', 'Aset berasal dari X, lisensi CC0 1.0, tanpa perubahan.')
   assert.equal(inventaris(akar).find((x: { jalur: string }) => x.jalur === 'public/e/baru.mp4')?.kelas, 'berkas-kredit')
 } finally { rmSync(akar, { recursive: true, force: true }) }
+
+// ── Penyebutan nama berkas: kredit INDUK dan ASSET_SOURCES hanya menutup aset yang disebut namanya.
+{
+  assert.equal(menyebutBerkas('berkas: organ.webp dan lain', 'organ.webp'), true)
+  assert.equal(menyebutBerkas('<organ>/organ.webp', 'organ.webp'), true, 'dipisah garis miring')
+  assert.equal(menyebutBerkas('hanya myorgan.webp', 'organ.webp'), false, 'potongan akhir nama lain bukan penyebutan')
+  assert.equal(menyebutBerkas('organ.webp.bak', 'organ.webp'), false, 'potongan awal nama lain bukan penyebutan')
+  assert.equal(menyebutBerkas('', 'organ.webp'), false)
+  assert.equal(menyebutBerkas('organ.webp', 'organ.webp'), true, 'seluruh teks')
+  const a2 = mkdtempSync(join(tmpdir(), 'pub-asset2-'))
+  try {
+    const t = (rel: string, isi: Buffer | string) => { const p = join(a2, rel); mkdirSync(join(p, '..'), { recursive: true }); writeFileSync(p, isi) }
+    const kelasDari = () => Object.fromEntries(inventaris(a2).map((x: { jalur: string; kelas: string }) => [x.jalur, x.kelas]))
+    const panjang = 'Sumber: repositori X dicatat dari riwayat git; lisensi belum diverifikasi. Berkas: '
+    // kredit INDUK yang menyebut nama berkas menutup turunan; yang tidak disebut tetap celah
+    t('public/o/CREDITS.txt', panjang + '<x>/organ.webp dan <x>/location.webp')
+    t('public/o/jantung/organ.webp', 'x'); t('public/o/jantung/location.webp', 'x'); t('public/o/jantung/thumb.webp', 'x')
+    // kredit di AKAR public/ tidak pernah menutup turunan, sekalipun menyebut namanya
+    t('public/CREDITS.txt', panjang + 'akar.png')
+    t('public/z/akar.png', 'x')
+    // kredit induk tapi terlalu pendek
+    t('public/p/CREDITS.txt', 'pendek organ.webp')
+    t('public/p/sub/organ.webp', 'x')
+    // ASSET_SOURCES: hanya yang disebut; tetangga di direktori yang sama tetap celah
+    t('public/m/ASSET_SOURCES.md', panjang + 'a.mp4 dan b.mp4 saja')
+    t('public/m/a.mp4', 'x'); t('public/m/b.mp4', 'x'); t('public/m/c.mp4', 'x')
+    // ASSET_SOURCES terlalu pendek tidak menutup apa pun
+    t('public/q/ASSET_SOURCES.md', 'a.mp4'); t('public/q/a.mp4', 'x')
+    // potongan nama tidak menutup: kredit menyebut organ.webp, aset bernama myorgan.webp
+    t('public/o/jantung/myorgan.webp', 'x')
+    const k = kelasDari()
+    assert.equal(k['public/o/jantung/organ.webp'], 'berkas-kredit'); assert.equal(k['public/o/jantung/location.webp'], 'berkas-kredit')
+    assert.equal(k['public/o/jantung/thumb.webp'], 'tanpa-jejak', 'tidak disebut = tetap celah')
+    assert.equal(k['public/o/jantung/myorgan.webp'], 'tanpa-jejak', 'potongan nama bukan penyebutan')
+    assert.equal(k['public/z/akar.png'], 'tanpa-jejak', 'kredit akar public/ tidak menutup turunan')
+    assert.equal(k['public/p/sub/organ.webp'], 'tanpa-jejak', 'kredit induk di bawah ukuran minimum tidak berlaku')
+    assert.equal(k['public/m/a.mp4'], 'berkas-kredit'); assert.equal(k['public/m/b.mp4'], 'berkas-kredit')
+    assert.equal(k['public/m/c.mp4'], 'tanpa-jejak', 'ASSET_SOURCES tidak menutup aset tetangga yang tidak disebut')
+    assert.equal(k['public/q/a.mp4'], 'tanpa-jejak', 'ASSET_SOURCES terlalu pendek tidak berlaku')
+    // berpasangan: menyebut thumb.webp mengubah hanya kelas thumb.webp
+    t('public/o/CREDITS.txt', panjang + '<x>/organ.webp dan <x>/location.webp dan <x>/thumb.webp')
+    assert.equal(kelasDari()['public/o/jantung/thumb.webp'], 'berkas-kredit')
+    assert.deepEqual(inventaris(a2), inventaris(a2), 'determinisme')
+  } finally { rmSync(a2, { recursive: true, force: true }) }
+}
 
 // ── Ratchet pada repo nyata: aset tanpa jejak tidak boleh bertambah; entri basi harus dibuang.
 const akarRepo = new URL('../../', import.meta.url).pathname

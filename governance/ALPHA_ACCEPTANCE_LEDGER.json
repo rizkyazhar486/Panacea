@@ -9,7 +9,7 @@
   "Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment",
   "User Journey & Product Experience: perjalanan pengguna lintas peran dari masuk hingga menuntaskan tugas dan keluar, ditambah optimasi aksesibilitas, responsivitas, performa, serta konsistensi visual aplikasi"
  ],
- "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase.",
+ "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase. Satu-satunya pengecualian penyebut yang disetujui pemilik (2026-10-17): kriteria berstatus DEFERRED_TO_CLINICAL_VALIDATION (tinjauan klinis formal di luar lingkup Alpha) tetap tercatat dengan syarat aslinya, bernilai 0, tidak pernah VERIFIED dan tidak divalidasi secara klinis, serta keluar dari penyebut AKTIF hanya bila membawa catatan penundaan lengkap (pemutus, tanggal, rujukan, fase tujuan, syarat asli). Validasi klinis tetap wajib sebelum fungsi apa pun dipakai untuk keputusan klinis nyata.",
  "baseline": {
   "mainSha": "4b2009a1fd66a70522dc2bfe78ded03ca5c2a295",
   "date": "2026-10-10",
@@ -21,7 +21,8 @@
   "NOT_CHECKED",
   "NOT_STARTED",
   "BLOCKED",
-  "PENDING_CLINICAL_REVIEW"
+  "PENDING_CLINICAL_REVIEW",
+  "DEFERRED_TO_CLINICAL_VALIDATION"
  ],
  "criteria": [
   {
@@ -323,11 +324,31 @@
    "id": "C6",
    "pillar": "Clinical Calculators",
    "criterion": "Rentang masukan ditinjau klinisi",
-   "acceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator",
-   "status": "PENDING_CLINICAL_REVIEW",
-   "evidence": [],
-   "owner": "Klinisi (belum ditunjuk)",
-   "note": "Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false."
+   "acceptance": "Alpha (rekayasa): rentang masukan, ketelitian numerik, regresi dan perilaku fail-closed tiap kalkulator terbukti oleh referensi independen, matriks masukan bermusuhan dan mutasi; persetujuan klinis formal TIDAK diperlukan di Alpha dan ditunda ke fase Clinical Validation.",
+   "status": "DEFERRED_TO_CLINICAL_VALIDATION",
+   "evidence": [
+    "docs/clinical-calculators/ENGINEERING_REVIEW_DOSSIER.md",
+    "scripts/uji/calculator-independent-reference.mts",
+    "scripts/uji/calculator-independent-reference-2.mts",
+    "scripts/uji/calculator-independent-reference-3.mts",
+    "scripts/uji/calculator-independent-reference-4.mts",
+    "scripts/uji/calculator-independent-reference-5.mts",
+    "scripts/uji/calculator-independent-reference-6.mts",
+    "scripts/uji/calculator-independent-reference-7.mts",
+    "scripts/uji/calculator-independent-reference-8.mts",
+    "scripts/uji/calculator-independent-reference-9.mts",
+    "scripts/uji/calculator-independent-reference-10.mts",
+    "scripts/uji/support/calculatorHarness.mts"
+   ],
+   "owner": "Klinisi (belum ditunjuk) — fase Clinical Validation",
+   "note": "DITUNDA ke fase Clinical Validation atas keputusan pemilik 2026-10-17 (docs/alpha/CLINICAL_REVIEW_DEFERRAL.md). BUKAN VERIFIED dan BUKAN tervalidasi secara klinis; clinically_reviewed=false tetap; semua bukti rekayasa, uji keselamatan, validasi masukan, uji kebenaran numerik dan perilaku fail-closed dipertahankan dan tidak dinonaktifkan; fungsi pendukung keputusan yang belum tervalidasi tetap dibatasi untuk pengujian non-klinis. Riwayat sebelum penundaan: Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false.",
+   "deferral": {
+    "decidedBy": "Product Owner (instruksi UNIVERSAL CLINICAL REVIEW DEFERRAL)",
+    "decidedOn": "2026-10-17",
+    "reference": "docs/alpha/CLINICAL_REVIEW_DEFERRAL.md",
+    "targetPhase": "Clinical Validation (fase setelah Alpha; wajib sebelum penggunaan untuk keputusan klinis nyata)",
+    "originalAcceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator (status sebelumnya: PENDING_CLINICAL_REVIEW; pemilik sebelumnya: Klinisi (belum ditunjuk))"
+   }
   },
   {
    "id": "C7",

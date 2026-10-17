@@ -20,7 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
 const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
-export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'perawat' | 'lab' | 'admin' | 'owner'
 
 export interface User {
   id: string
@@ -105,6 +105,8 @@ export interface Clinical {
   /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
   hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
   rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
+  /** Penugasan staf (perawat/lab) per pasien: patientId -> id akun staf. Tanpa penugasan, staf tidak melihat data pasien mana pun. */
+  penugasanStaf?: Record<string, string[]>
 }
 
 export interface VisitMembership {
@@ -909,6 +911,33 @@ export function simpanTautan(t: import('./domains/clinical-records/aksesKlinis.j
   save()
 }
 export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+
+// --- Staf perawat/lab (F1): peran hanya diberikan pemilik; akses data hanya lewat penugasan eksplisit per pasien ---
+export const STAFF_ROLES: readonly Role[] = ['perawat', 'lab']
+export function pasienDitugaskan(userId: string): string[] {
+  const p = ensureClinical().penugasanStaf ?? {}
+  return Object.keys(p).filter((pid) => p[pid]?.includes(userId)).sort()
+}
+export function daftarStaf(): User[] { return db.users.filter((x) => STAFF_ROLES.includes(x.role)) }
+export function tugaskanStaf(patientId: string, userId: string): boolean {
+  if (patientId in Object.prototype) return false // id warisan objek (__proto__, constructor, ...) bukan id pasien
+  const c = ensureClinical(); const list = ((c.penugasanStaf ??= {})[patientId] ??= [])
+  if (list.includes(userId)) return false
+  list.push(userId); save(); return true
+}
+export function cabutStaf(patientId: string, userId: string): boolean {
+  const c = ensureClinical(); const list = c.penugasanStaf?.[patientId]; if (!list || !list.includes(userId)) return false
+  const sisa = list.filter((x) => x !== userId); if (sisa.length) c.penugasanStaf![patientId] = sisa; else delete c.penugasanStaf![patientId]
+  save(); return true
+}
+/** Ubah peran staf. Hanya pasien <-> perawat/lab; peran profesional, admin dan owner tidak disentuh. Mencabut peran juga mencabut semua penugasan. */
+export function setStaffRole(userId: string, role: 'perawat' | 'lab' | 'pasien'): { ok: true; user: User } | { ok: false; reason: 'not-found' | 'not-eligible' } {
+  const u = db.users.find((x) => x.id === userId); if (!u) return { ok: false, reason: 'not-found' }
+  if (u.role !== 'pasien' && !STAFF_ROLES.includes(u.role)) return { ok: false, reason: 'not-eligible' }
+  u.role = role
+  if (role === 'pasien') { const c = ensureClinical(); for (const pid of Object.keys(c.penugasanStaf ?? {})) cabutStaf(pid, userId) }
+  save(); return { ok: true, user: u }
+}
 /** Port penyimpanan modul labResults: tulis lewat save() sehingga ikut berkas/Mongo yang sama. */
 export function repoHasilLab() {
   return {
