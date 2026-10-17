@@ -41,7 +41,15 @@ export function daftarBerkas() {
 
 export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(join(AKAR, f), 'utf8')) {
   const hasil = []
-  for (const f of berkas) { let t; try { t = baca(f) } catch { continue } if (t.length > 2_000_000) continue; for (const x of pindaiTeks(t)) hasil.push({ berkas: f, ...x }) }
+  for (const f of berkas) {
+    let t
+    try { t = baca(f) } catch (error) {
+      throw new Error(`PHI scan gagal membaca ${f}; hasil tidak boleh dinyatakan bersih`, { cause: error })
+    }
+    if (typeof t !== 'string') throw new TypeError(`PHI scan menerima konten bukan teks: ${f}`)
+    if (t.length > 2_000_000) throw new Error(`PHI scan tidak memeriksa berkas >2 MB: ${f}`)
+    for (const x of pindaiTeks(t)) hasil.push({ berkas: f, ...x })
+  }
   return hasil
 }
 
