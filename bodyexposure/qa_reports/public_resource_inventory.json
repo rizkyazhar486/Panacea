@@ -7953,8 +7953,8 @@
     },
     {
       "path": "provenance.html",
-      "bytes": 69953,
-      "sha256": "ac5820c6f2bac6e059e74d83c5ade5a3d2f2b69642f1c61ba916a0b04ba4c67c",
+      "bytes": 70083,
+      "sha256": "f0c9248a6f6280a19abf8e2594eb50fb02779623907e9a73afb0fefb124e2bf6",
       "evidencePath": "provenance.html",
       "sources": [],
       "licenses": [],
@@ -7977,6 +7977,19 @@
         "CC BY 3.0"
       ],
       "findings": [],
+      "permissionStatus": "not-independently-cleared"
+    },
+    {
+      "path": "software-notices.html",
+      "bytes": 6716,
+      "sha256": "646429137b5a1218019aeafb5982747d571c972835596dfe9c4bdf17d52ef86d",
+      "evidencePath": "software-notices.html",
+      "sources": [],
+      "licenses": [],
+      "findings": [
+        "license-claim-missing",
+        "source-claim-missing"
+      ],
       "permissionStatus": "not-independently-cleared"
     },
     {
