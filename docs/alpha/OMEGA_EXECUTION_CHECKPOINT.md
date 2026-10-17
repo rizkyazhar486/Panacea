@@ -1,3 +1,23 @@
+# Current seven-criterion checkpoint — 18 October 2026 WIB
+
+Source of truth: main `7834e2a4299e1379a21a75c4e513f4f7f2cd4240`, `governance/ALPHA_ACCEPTANCE_LEDGER.json`. Active progress **38/44 VERIFIED (86.36%)**, six active criteria remain; C6 stays separately deferred under the existing owner phase decision. Formula: `progress = 100 × VERIFIED_active / active_total`. All older counts and proposed steps below are historical. This checkpoint grants no new verification.
+
+| Criterion | Action/evidence in this session | Concrete remaining gate |
+| --- | --- | --- |
+| D7 | Current-main stance metric suite passed; invalid/insufficient stance samples remain unmeasurable. | RUN and female contact evidence remain insufficient; justify technical thresholds and reproduce rig measurements. Never change sampling/thresholds to manufacture a pass. |
+| D8 | Current-main public-credit test passed, including accessible markup, source links, licensing boundaries and negative controls. Existing credits page is integrated. | Creator/source evidence for logo-mark.png and tutorial-video.mp4; exact dataset licence and ICRP redistribution permission evidence. Metadata presence is not permission. |
+| E4 | PHI pattern scan: 26 allowlisted matches, 0 unlisted, 0 stale, 0 without reason. General audit archiving and I/O preservation already integrated; draft corrected to describe that behavior. | Approved retention/consent values, implementation of approved lifecycle and evidence for infrastructure logs. No destructive retention defaults are invented. |
+| E7 | Scheduled release 39067558848 and production browser run 39068852157 succeeded; frontend exact main, backend unchanged-path ancestor 3c7ac454. | Authenticated critical production journeys and staging/equality scope remain unproved; Body Exposure canvas absent without session at both viewports. |
+| F1 | Updated existing PR #2656 to dc402169, preserving contributor denial controls and latest production-preview harness. Seven local harness checks passed; fresh journey run 39074120166 started. | Exact-head CI and review; real OAuth and unresolved scope acceptance remain separate. |
+| F2 | Updated existing PR #2657 to 1d7062a8: strict majority floor(N/2)+1, invalid sample plans rejected, 1085 QA tests passed; ceil(N/2) mutant rejected. | Fresh Validate/Stabilization/UX checks and review; mobile TBT budget findings and directed manual QA remain open. |
+| C6 | Updated existing PR #2658 to e2882de: repaired stale independent sodium oracle, boundary/cross-engine regression, and owner confirmation of completed independent/internal review. Build 1081 QA, offline 768/768, architecture checks passed; removing clamp fails. | Fresh exact-head CI and engineering integration; exact approved-review metadata is not invented. Owner confirmation does not require a repeat review. |
+
+No main merge was performed by this checkpoint. Integrate one PR at a time only after latest-main ancestry, review and exact-head gates; if main moves, synchronize remaining candidates and refresh affected CI. No old green or skipped bot review substitutes for those gates.
+
+---
+
+## Historical checkpoint (15 October 2026; superseded counts and next steps)
+
 # Omega completion execution checkpoint — 2026-10-15
 
 Source: governance/ALPHA_ACCEPTANCE_LEDGER.json on integrated main `0f9e6a2137b08376aada4a583e0dbddacddc7ddd`: **35/43 VERIFIED (81.40%), remaining 8**. D3 is integrated. This C2 duration-provenance candidate does not promote another criterion or change any of the 43 acceptance definitions.

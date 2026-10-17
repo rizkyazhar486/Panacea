@@ -42,3 +42,14 @@ Not done and not claimed: staging (no staging environment is configured in this 
 
 In release `38996081367` the `deploy` job's step **Verify deployed build marker equals the built commit** (added by #2610) also concluded `success`, next to the deploy and smoke steps: the deployed `build.json` commit equalled `github.sha`. This is the deployed artifact attesting its own commit, independent of the workflow's claim. It does not add staging, critical-journey smoke on that SHA, or the owner's definition of "equal to main"; E7 stays NOT_CHECKED. No ledger change.
 
+
+## Observation — 18 October 2026 WIB, current-main release
+
+Scheduled release [39067558848](https://github.com/rizkyazhar486/Panacea/actions/runs/39067558848) completed successfully at main `7834e2a4299e1379a21a75c4e513f4f7f2cd4240`. Subsequent [Production browser check 39068852157](https://github.com/rizkyazhar486/Panacea/actions/runs/39068852157), job `117502070517`, also completed successfully. Its actual job log records:
+
+| Target | Observed commit | Comparator |
+| --- | --- | --- |
+| Frontend | `7834e2a4299e1379a21a75c4e513f4f7f2cd4240` | SAMA: exact main |
+| Backend | `3c7ac45421d6d17e1e92454c467715426e2d2243` | SETARA: ancestor, no changes on deployed backend paths |
+
+The log still warns that the backend does not report literal main HEAD. At both 390px and 1440px, authenticated Body Exposure canvas was absent because no production session was supplied. No anatomical/slicing/label production acceptance or authenticated critical-journey smoke follows from the green job. This observation updates evidence only; E7 remains REPORTED in the canonical ledger. The older NOT_CHECKED wording above is historical, superseded by the canonical ledger.
