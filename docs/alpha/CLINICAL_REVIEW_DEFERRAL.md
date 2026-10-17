@@ -4,6 +4,9 @@
 
 ## What changed
 
+**Owner ACC update (2026-10-17):** The owner personally states that he has reviewed and approved the basic C6 formulas and related basic anatomy/physiology material. Record this as an **owner-attested internal clinical review decision**, not as an independently verified clinician credential, an external validation, or a signature bound to a particular source revision. No professor/specialist sign-off may be inserted as an arbitrary Alpha engineering blocker. Follow [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](../../governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). The canonical C6 ledger remains deferred rather than falsely marked VERIFIED.
+
+
 | Item | Before | After |
 | --- | --- | --- |
 | C6 status | `PENDING_CLINICAL_REVIEW` | `DEFERRED_TO_CLINICAL_VALIDATION` (with a complete `deferral` record: who decided, when, reference, target phase, original acceptance) |
