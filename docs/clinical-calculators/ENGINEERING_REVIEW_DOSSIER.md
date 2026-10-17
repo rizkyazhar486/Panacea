@@ -1,6 +1,6 @@
 # Clinical calculators — automated engineering-review dossier (tranches 1–10)
 
-Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
+Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **DEFERRED_TO_CLINICAL_VALIDATION** for Alpha under the owner decision of 2026-10-17; calculator-registry entries separately remain `PENDING_CLINICAL_REVIEW` with `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
 AI-assisted review and the code is not clinical proof. No reviewer identity, date, signature or approval is recorded here, and none may be
 added by engineering tests.
@@ -195,4 +195,14 @@ Independent references (zone-2 rounding against integer arithmetic in tenths of 
 
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), and `reviewRegistry` (a registry, not a formula). `egfr-ckd-epi-2021` has a point-wise test only.
+`reviewRegistry` (a registry, not a formula). The GRACE point table is now tested against the published AHA/ACC reproduction of the classic Granger nomogram; clinical prognosis calibration remains out of scope. `egfr-ckd-epi-2021` has a point-wise test only.
+
+## Additional engineering correction — GRACE malformed flags (2026-10-17)
+
+The GRACE engine formerly evaluated `arrest`, `stDev`, and `markers` using `=== true` but did not validate their input types. A non-boolean value (including missing, `null`, `1`, or the string `"true"`) could silently contribute zero points and return an apparently valid score/risk band. The updated `graceScore` now refuses non-boolean flags with a named invalid field and withholds both score and band. Non-object envelopes are refused rather than throwing. A mandatory tranche-10 regression includes valid all-false/all-true cases, individual flag score deltas (39/28/14), hostile values on each flag, and malformed envelopes. This corrects **runtime input safety**, not the unverified provenance of the GRACE scoring table or clinical outcome calibration. Existing score thresholds and coefficients remain unchanged; no clinical approval or ledger promotion is claimed.
+
+## GRACE 2003 classic point-table reproduction (engineering tranche 10 extension)
+
+The mandatory `scripts/uji/calculator-independent-reference-10.mts` now includes an independently transcribed literal grid of classic GRACE points for **age, pulse, systolic pressure, serum creatinine, Killip I–IV, arrest, ST deviation and cardiac markers**. For every table boundary (inclusive starts and adjacent ends), the engine's complete score must match the sum of the printed points; it also checks a multi-factor synthetic example. This closes the *absence of any independent point-table test* previously recorded, but it does not validate the prognostic probabilities, newer GRACE 2.0, the user-provided categorization, or clinical suitability.
+
+Published reference: **2014 AHA/ACC Guideline for the Management of Patients With Non–ST-Elevation Acute Coronary Syndromes**, “GRACE Risk Model Nomogram” (reprinted/modified with permission from Granger et al. 2003), https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2014/2014_AHA_ACC_Guideline_for_the_Management_of_Patients_With_NonSTElevation_Acute_Coronary_Syndromes.pdf ; original report Granger CB et al., *Arch Intern Med*. 2003;163:2345–2353. doi:10.1001/archinte.163.19.2345. The published worked-example prose contains a systolic-pressure/point discrepancy relative to its own printed point table; the regression uses the explicit point table, not that prose. This is automated software checking, **not** authorisation for patient decisions.
