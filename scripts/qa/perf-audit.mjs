@@ -10,6 +10,7 @@
 //   PLAYWRIGHT_MODULE=<path>/playwright/index.js CHROME=<path chrome> QA_OUT=<json> QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
 import { writeFileSync } from 'node:fs'
 import { ANGGARAN, agregat, cumulativeLayoutShift, statusAnggaran, totalBlockingTime } from './perf-stats.mjs'
+import { enoughPerfEvidence, perfSampleProblem } from './perf-sample-coverage.mjs'
 
 const pw = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const chromium = pw.chromium ?? pw.default.chromium
@@ -50,7 +51,8 @@ try {
         if (h.masuk) await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [sesi, login.token, SESSION_KEY, TOKEN_KEY])
         const page = await ctx.newPage()
         if (vp.cpu > 1) { const cdp = await ctx.newCDPSession(page); await cdp.send('Emulation.setCPUThrottlingRate', { rate: vp.cpu }) }
-        await page.goto(APP + h.rute, { waitUntil: 'load', timeout: 120000 })
+        const response = await page.goto(APP + h.rute, { waitUntil: 'load', timeout: 120000 })
+        if (!response || response.status() !== 200) throw new Error(`public app navigation HTTP ${response?.status() ?? 'no response'}`)
         await page.waitForTimeout(SETTLE_MS)
         const m = await page.evaluate(() => {
           const nav = performance.getEntriesByType('navigation')[0]
@@ -67,11 +69,12 @@ try {
         })
       } catch (e) { sampel.push({ galat: String(e.message).split('\n')[0] }) } finally { await ctx.close() }
     }
-    const sah = sampel.filter((s) => !s.galat)
-    if (sah.length === 0) gagalUkur++
+    const sah = sampel.filter((s) => perfSampleProblem(s) === null)
+    const required = Math.ceil(N / 2)
+    if (!enoughPerfEvidence(sampel, required)) gagalUkur++
     const metrik = ['ttfbMs', 'dclMs', 'loadMs', 'fcpMs', 'lcpMs', 'cls', 'tbtMs', 'requests', 'bytesTotal', 'bytesJs']
     const agg = Object.fromEntries(metrik.map((k) => [k, agregat(sah, k)]))
-    hasil.push({ viewport: vp.name, cpuThrottle: vp.cpu, halaman: h.nama, rute: h.rute, sampelSah: sah.length, sampelGalat: sampel.length - sah.length, galat: sampel.filter((s) => s.galat).map((s) => s.galat).slice(0, 2), agg,
+    hasil.push({ viewport: vp.name, cpuThrottle: vp.cpu, halaman: h.nama, rute: h.rute, sampelSah: sah.length, sampelGalat: sampel.length - sah.length, galat: sampel.map(perfSampleProblem).filter(Boolean).slice(0, 2), minimumSampelSah: required, agg,
       anggaran: { lcpMs: statusAnggaran('lcpMs', agg.lcpMs.median), cls: statusAnggaran('cls', agg.cls.median), tbtMs: statusAnggaran('tbtMs', agg.tbtMs.median) } })
   }
 } finally { await browser.close() }
@@ -82,5 +85,5 @@ const ringkas = { dihasilkan: new Date().toISOString(), app: APP, sampelPerHalam
 for (const r of hasil) for (const s of Object.values(r.anggaran)) { if (s === 'lulus') ringkas.ringkasanAnggaran.lulus++; else if (s === 'melebihi') ringkas.ringkasanAnggaran.melebihi++; else ringkas.ringkasanAnggaran.takTerukur++ }
 writeFileSync(process.env.QA_OUT || 'perf-evidence.json', JSON.stringify(ringkas, null, 2))
 for (const r of hasil) console.log(`${r.viewport} ${r.halaman.padEnd(15)} n=${r.sampelSah} lcp=${r.agg.lcpMs.median?.toFixed(0) ?? '-'}ms cls=${r.agg.cls.median?.toFixed(3) ?? '-'} tbt=${r.agg.tbtMs.median?.toFixed(0) ?? '-'}ms js=${r.agg.bytesJs.median ?? '-'}B req=${r.agg.requests.median ?? '-'} [${r.anggaran.lcpMs}/${r.anggaran.cls}/${r.anggaran.tbtMs}]`)
-console.log(`perf-audit: ${hasil.length} pengukuran; anggaran lulus ${ringkas.ringkasanAnggaran.lulus}, melebihi ${ringkas.ringkasanAnggaran.melebihi}, tak terukur ${ringkas.ringkasanAnggaran.takTerukur}; halaman tak terukur sama sekali: ${gagalUkur}`)
-if (gagalUkur > 0) { console.error(`perf-audit: ${gagalUkur} halaman tidak dapat diukur (semua sampel galat)`); process.exit(1) }
+console.log(`perf-audit: ${hasil.length} pengukuran; anggaran lulus ${ringkas.ringkasanAnggaran.lulus}, melebihi ${ringkas.ringkasanAnggaran.melebihi}, tak terukur ${ringkas.ringkasanAnggaran.takTerukur}; halaman dengan sampel metrik lengkap kurang dari mayoritas: ${gagalUkur}`)
+if (gagalUkur > 0) { console.error(`perf-audit: ${gagalUkur} halaman tidak cukup sampel metrik lengkap`); process.exit(1) }
