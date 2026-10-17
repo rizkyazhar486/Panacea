@@ -2311,6 +2311,13 @@ app.post('/api/owner/staff-assignments', requireAuth, (req, res) => {
   res.json({ ok: true, changed })
 })
 
+// Staf melihat pasien yang ditugaskan kepadanya sendiri (untuk memilih pasien pada formulir intake). Hanya perawat/lab; tidak membuka data pasien.
+app.get('/api/staff/assignments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!STAFF_ROLES.includes(u.role)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ patientIds: pasienDitugaskan(u.id) })
+})
+
 // --- SATUSEHAT: submit an EMR as a FHIR R4 Bundle (dokter/owner) ---
 app.post('/api/satusehat/encounter', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user

@@ -233,6 +233,15 @@ export const api = {
   labResultsList: (patientId?: string) => req<unknown>(`/api/lab-results${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`),
   labResultAdvance: (id: string, body: { to: string; expectedStatus: string; communication?: { channel: string; note: string } }) =>
     req<unknown>(`/api/lab-results/${encodeURIComponent(id)}/advance`, { method: 'POST', body: JSON.stringify(body) }),
+  // Meja hasil lab perawat/staf lab (F1): akses hanya ke pasien yang ditugaskan owner; server menegakkan.
+  labResultCreate: (body: { patientId: string; item: { name: string; value: number; unit?: string; collectedAt: string }; source: 'lab-intake' | 'manual-entry' }) =>
+    req<unknown>('/api/lab-results', { method: 'POST', body: JSON.stringify(body) }),
+  staffMine: () => req<{ patientIds: string[] }>('/api/staff/assignments').then((r) => r.patientIds),
+  ownerStaff: () => req<{ staff: { id: string; name: string; email: string; role: Role; patientIds: string[] }[] }>('/api/owner/staff').then((r) => r.staff),
+  ownerStaffRole: (userId: string, role: 'perawat' | 'lab' | 'pasien') =>
+    req<unknown>('/api/owner/staff-role', { method: 'POST', body: JSON.stringify({ userId, role }) }),
+  ownerStaffAssign: (userId: string, patientId: string, revoke = false) =>
+    req<{ ok: boolean; changed: boolean }>('/api/owner/staff-assignments', { method: 'POST', body: JSON.stringify({ userId, patientId, ...(revoke ? { revoke: true } : {}) }) }),
   health: () => req<Health>('/api/health'),
   promo: () => req<{ limit: number; used: number; slotsLeft: number; discountPct: number; eligible: boolean }>('/api/promo'),
   me: () => req<{ user: BackendUser }>('/api/auth/me').then((r) => toAccount(r.user)),

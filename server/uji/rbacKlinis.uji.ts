@@ -170,3 +170,4 @@ await import('./routeAccessDecisions.uji.js')
 // Alpha F1: perawat/lab owner-granted roles scoped by explicit patient assignment (store, then real HTTP).
 await import('./staffStore.uji.js')
 await import('./staffRbacHttp.uji.js')
+await import('./staffAssignmentsSelfHttp.uji.js')

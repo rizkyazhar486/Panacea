@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/user-journey-e2e.mjs'
+      - 'scripts/qa/user-journey-staff.mjs'
+      - 'src/pages/LabResultReview.tsx'
+      - 'src/components/clinical/**'
+      - 'src/domains/lab-results/**'
       - 'src/main.tsx'
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
@@ -21,6 +25,10 @@ on:
     branches: [main]
     paths:
       - 'scripts/qa/user-journey-e2e.mjs'
+      - 'scripts/qa/user-journey-staff.mjs'
+      - 'src/pages/LabResultReview.tsx'
+      - 'src/components/clinical/**'
+      - 'src/domains/lab-results/**'
       - 'src/main.tsx'
       - 'src/components/layout/**'
       - 'src/components/dashboard/OnboardingTour.tsx'
@@ -65,9 +73,23 @@ jobs:
             if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
             sleep 1
           done
-          QA_URL=http://localhost:5190/ node scripts/qa/user-journey-e2e.mjs
+          rc=0
+          QA_URL=http://localhost:5190/ node scripts/qa/user-journey-e2e.mjs || rc=1
+          # Peran staf berjalan pada server SEGAR: pembatas /api/auth (30 per 15 menit) tidak dilonggarkan dan sudah hampir habis oleh skrip di atas.
+          pkill -f "src/index.ts" || true
+          sleep 2
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5190 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/f1-staff-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/f1-staff-server.log" 2>&1) &
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null; then break; fi
+            sleep 1
+          done
+          QA_OUT="$RUNNER_TEMP/user-journey-staff-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-staff.mjs || rc=1
+          exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: user-journey-evidence
-          path: ${{ runner.temp }}/user-journey-evidence.json
+          path: |
+            ${{ runner.temp }}/user-journey-evidence.json
+            ${{ runner.temp }}/user-journey-staff-evidence.json

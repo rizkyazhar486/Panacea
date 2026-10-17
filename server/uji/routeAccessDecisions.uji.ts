@@ -101,6 +101,7 @@ const SESSION: readonly string[] = [
   'GET /api/second-opinion',
   'GET /api/settings',
   'GET /api/sports/favorites',
+  'GET /api/staff/assignments',
   'GET /api/trials',
   'GET /api/users/search',
   'GET /api/wallet',
