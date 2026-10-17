@@ -1,6 +1,6 @@
 // Catatan audit/klinis yang tergeser batas ukuran harus diarsipkan, bukan dihapus.
 import assert from 'node:assert/strict'
-import { mkdtempSync, readFileSync, existsSync } from 'node:fs'
+import { mkdtempSync, readFileSync, existsSync, writeFileSync, renameSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 const dir = mkdtempSync(join(tmpdir(), 'arsip-'))
@@ -28,3 +28,22 @@ const generalRows = readFileSync(generalArchive, 'utf8').trim().split('\n').map(
 assert.deepEqual(generalRows.map((entry) => entry.c.action), ['action-0', 'action-1', 'action-2'], 'three oldest entries archived exactly once in order')
 assert.ok(generalRows.every((entry) => entry.c.userId === syntheticUser.id && entry.diarsipkan), 'archive keeps actor and archive timestamp')
 console.log('arsipKlinis: lab + general audits preserve evicted entries without changing the hot set')
+
+// Failure injection: put a regular file where the archive directory should be.
+// The append must fail, but action-3 and newer entries must remain in the hot log.
+const archiveDir = join(dir, 'arsip'), backupDir = join(dir, 'arsip-backup')
+renameSync(archiveDir, backupDir)
+writeFileSync(archiveDir, 'archive path intentionally blocked by fixture')
+addAudit(syntheticUser as never, 'action-5003', 'synthetic-target')
+assert.equal(getAudit(5005).length, 5001, 'failed archive preserves the 5001st audit entry')
+assert.equal(getAudit(5005).at(-1)?.action, 'action-3', 'the oldest resident audit survives a write failure')
+assert.equal(readFileSync(join(backupDir, 'audit.jsonl'), 'utf8').trim().split(String.fromCharCode(10)).length, 3, 'archive remains unmodified on write failure')
+// Recovery: restore the directory and cross the threshold again. Both
+// postponed evictions must be archived exactly once.
+unlinkSync(archiveDir)
+renameSync(backupDir, archiveDir)
+addAudit(syntheticUser as never, 'action-5004', 'synthetic-target')
+assert.equal(getAudit(5005).length, 5000, 'successful retry returns to bounded hot log')
+const afterRecovery = readFileSync(generalArchive, 'utf8').trim().split(String.fromCharCode(10)).map((line) => JSON.parse(line).c.action)
+assert.deepEqual([...afterRecovery].sort(), ['action-0', 'action-1', 'action-2', 'action-3', 'action-4'], 'all overflow events survive exactly once after recovery')
+console.log('arsipKlinis: general-audit file archive failure does not discard history, recovery catches up')
