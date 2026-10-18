@@ -18,7 +18,12 @@ const KASUS = [
 ]
 // `ukur` memotong teks ke 30 karakter; id lebih panjang tidak akan pernah cocok dan membuat kasus 'lulus' vacuous.
 for (const k of KASUS) if (k.id.length > 30) throw new Error(`id fixture > 30 karakter: ${k.id}`)
-const html = `<!doctype html><meta charset="utf-8"><body style="margin:0;background:rgb(2,4,7)">${KASUS.map((k, i) => `<div style="background:${k.bg};padding:8px"><span id="k${i}" style="color:${k.fg};font:${k.fs ? k.fs + '/1.4 sans-serif;display:inline-block;width:12px;height:12px;overflow:hidden' : '16px/1.4 sans-serif'}">${k.id}</span></div>`).join('')}${[0, 280].map((offset, i) => `<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:${offset}px;top:0;width:180px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;color:black;font:16px sans-serif">${i ? 'shape-uncovered-gagal' : 'shape-covered-lulus'}</a></div>`).join('')}</body>`
+const extra = [
+  '<div data-one-shape="aria" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><div style="position:relative;z-index:1"><span aria-selected="true" style="display:inline-block;margin:8px;color:black;font:16px sans-serif">shape-aria-nested-lulus</span></div></div>',
+  '<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;background:rgb(67,69,72);color:black;font:16px sans-serif">shape-overlay-gagal</a></div>',
+  '<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;background:linear-gradient(to right,transparent,transparent);color:black;font:16px sans-serif">shape-gradient-unmeasured</a></div>',
+].join('')
+const html = `<!doctype html><meta charset="utf-8"><body style="margin:0;background:rgb(2,4,7)">${KASUS.map((k, i) => `<div style="background:${k.bg};padding:8px"><span id="k${i}" style="color:${k.fg};font:${k.fs ? k.fs + '/1.4 sans-serif;display:inline-block;width:12px;height:12px;overflow:hidden' : '16px/1.4 sans-serif'}">${k.id}</span></div>`).join('')}${[0, 280].map((offset, i) => `<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:${offset}px;top:0;width:180px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;color:black;font:16px sans-serif">${i ? 'shape-uncovered-gagal' : 'shape-covered-lulus'}</a></div>`).join('')}${extra}</body>`
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox'] })
 let hasil
 try {
@@ -34,13 +39,14 @@ for (const k of KASUS) {
   if (gagal !== k.gagal) masalah.push(`${k.id}: ${k.gagal ? 'seharusnya GAGAL tetapi lulus' : 'seharusnya LULUS tetapi gagal'}`)
 }
 // Sibling backing must be measured only when it genuinely covers the text.
-for (const [id, expectedFail] of [['shape-covered-lulus', false], ['shape-uncovered-gagal', true]]) {
+for (const [id, expectedFail] of [['shape-covered-lulus', false], ['shape-uncovered-gagal', true], ['shape-aria-nested-lulus', false], ['shape-overlay-gagal', true]]) {
   const failed = hasil.gagal.some(x => x.teks === id)
   if (failed !== expectedFail) masalah.push(`${id}: ${expectedFail ? 'must fail without coverage' : 'must pass with measured white coverage'}`)
 }
 // latar yang tak terselesaikan tidak boleh diam-diam menjadi lulus: tidak ada kasus fixture yang boleh jatuh ke penghitung terpisah
-if ((hasil.latarTakTerselesaikan || 0) !== 0 || hasil.tidakDapatDiukur !== 0) masalah.push(`kasus fixture jatuh ke penghitung tak-terukur (latarTakTerselesaikan=${hasil.latarTakTerselesaikan || 0}, tidakDapatDiukur=${hasil.tidakDapatDiukur})`)
-const diharap = KASUS.filter((k) => !k.takTerukur).length + 2
+if ((hasil.latarTakTerselesaikan || 0) !== 0 || hasil.tidakDapatDiukur !== 1) masalah.push(`fixture must classify only the deliberate gradient as unmeasurable (latarTakTerselesaikan=${hasil.latarTakTerselesaikan || 0}, tidakDapatDiukur=${hasil.tidakDapatDiukur})`)
+if (hasil.gagal.some(x => x.teks === 'shape-gradient-unmeasured')) masalah.push('unknown gradient must not be labeled a measured contrast failure')
+const diharap = KASUS.filter((k) => !k.takTerukur).length + 4
 if (hasil.teksDiukur !== diharap) masalah.push(`teksDiukur ${hasil.teksDiukur} != ${diharap}`)
 if (masalah.length) { console.error('kontras-ukur.fixture GAGAL:\n - ' + masalah.join('\n - ')); process.exit(1) }
 console.log(`kontras-ukur.fixture: ${KASUS.length} kasus (lulus dan gagal berpasangan, batas 4.54/4.48, ruang warna oklch/color/hex/rgb) sesuai harapan`)
