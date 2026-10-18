@@ -24,14 +24,14 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Isinya tidak ditulis ulang; komponennya dipasang apa adanya dan tetap lazy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FirstAidGuide = lazy(() => import('../FirstAidGuide').then((m) => ({ default: m.FirstAidGuide })))
-const NeonatalResuscitationGuide = lazy(() => import('../NeonatalResuscitationGuide').then((m) => ({ default: m.NeonatalResuscitationGuide })))
-const EmpiricTherapyReference = lazy(() => import('../EmpiricTherapyReference').then((m) => ({ default: m.EmpiricTherapyReference })))
-const DrugInfo = lazy(() => import('../DrugInfo').then((m) => ({ default: m.DrugInfo })))
-const LabDecoder = lazy(() => import('../LabDecoder').then((m) => ({ default: m.LabDecoder })))
+const FirstAidGuide = lazy(() => import('./FirstAidGuide').then((m) => ({ default: m.FirstAidGuide })))
+const NeonatalResuscitationGuide = lazy(() => import('./NeonatalResuscitationGuide').then((m) => ({ default: m.NeonatalResuscitationGuide })))
+const EmpiricTherapyReference = lazy(() => import('./EmpiricTherapyReference').then((m) => ({ default: m.EmpiricTherapyReference })))
+const DrugInfo = lazy(() => import('./DrugInfo').then((m) => ({ default: m.DrugInfo })))
+const LabDecoder = lazy(() => import('./LabDecoder').then((m) => ({ default: m.LabDecoder })))
 const ClinicalEvidence = lazy(() => import('./ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const ClinicalTrials = lazy(() => import('./ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
-const PatientEducation = lazy(() => import('../PatientEducation').then((m) => ({ default: m.PatientEducation })))
+const PatientEducation = lazy(() => import('./PatientEducation').then((m) => ({ default: m.PatientEducation })))
 const EdukasiAwam = lazy(() => import('./EdukasiAwam').then((m) => ({ default: m.EdukasiAwam })))
 
 // Darurat lebih dulu, lalu yang dipakai saat memutuskan, lalu yang dibaca

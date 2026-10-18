@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { INDIKATOR, RENCANA, type Indikator } from '../lib/indikator'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { Prosa } from '../components/Prosa'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { INDIKATOR, RENCANA, type Indikator } from '../../lib/indikator'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aturan main — halaman yang menjelaskan angka-angka aplikasi ini.

@@ -26,7 +26,7 @@ const PelatihProgres = lazy(() => import('./PelatihProgres').then((m) => ({ defa
 const PelatihAsupan = lazy(() => import('./PelatihAsupan').then((m) => ({ default: m.PelatihAsupan })))
 const GpsTracker = lazy(() => import('../../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('../AthleteScience').then((m) => ({ default: m.AthleteScience })))
-const AnalisisPro = lazy(() => import('../AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
+const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('../TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('../EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 const Workout = lazy(() => import('./WorkoutSafe').then((m) => ({ default: m.WorkoutSafe })))

@@ -1,23 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { useJam } from '../lib/useJam'
+import { useJam } from '../../lib/useJam'
 import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { Card, SectionTitle } from '../components/ui'
-import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
-import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
-import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtWorkoutDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
-import { api, backendEnabled } from '../lib/api'
-import { getDemo, getDemoTersimpan } from '../lib/profile'
-import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
-import { useVitals } from '../lib/useVitals'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconChartUp, IconRun, IconTimer, IconActivity } from '../../components/icons'
+import { getWorkouts, mergeWorkouts } from '../../lib/workoutStore'
+import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtWorkoutDurasi, fmtPace, type ImportedWorkout } from '../../lib/workoutImport'
+import { api, backendEnabled } from '../../lib/api'
+import { getDemo, getDemoTersimpan } from '../../lib/profile'
+import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../../lib/analisisLari'
+import { useVitals } from '../../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
   kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
-} from '../lib/analisisPro'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { parseTargetValue } from '../domains/training-goals'
+} from '../../lib/analisisPro'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { parseTargetValue } from '../../domains/training-goals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Analisis Pro — satu halaman berisi padanan fitur analisis berbayar Strava,
