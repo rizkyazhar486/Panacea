@@ -333,13 +333,9 @@ main.pmd-page-stage,
   min-width: 0;
 }
 
-@media (min-width: 768px) {
-  .pmd-superpage-grid > div:last-child {
-    grid-column: 1 / -1;
-  }
-  .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
-    border-color: rgba(0, 191, 99, 0.25) !important;
-    background: linear-gradient(90deg, rgba(0, 191, 99, 0.05), transparent 70%), rgba(255, 255, 255, 0.02) !important;
+@media (min-width: 1024px) {
+  .pmd-superpage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
