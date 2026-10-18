@@ -557,9 +557,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // #9: multi-user social feed — pull posts from the server on login and poll so
   // posts/likes from other users appear near-realtime. Local-only (offline) posts
   // are preserved via mergePosts. No-op when no backend is configured.
+  // Every pull calls setState on the whole AppState, which this provider hands
+  // to every useStore() consumer app-wide — so this timer keeps re-rendering the
+  // entire app every 15s even on a backgrounded tab. Paused while hidden and
+  // resumed immediately on return, matching the existing visibilitychange
+  // convention already used elsewhere in the app (see useJam.ts, SmartNotificationOrchestrator.tsx).
   useEffect(() => {
     if (!backendEnabled || !state.account?.email) return
     let alive = true
+    let timer: ReturnType<typeof setInterval> | undefined
     const pull = () =>
       api
         .posts()
@@ -569,11 +575,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setState((st) => ({ ...st, posts: mergePosts(mapped, st.posts) }))
         })
         .catch(() => {})
+    const start = () => {
+      if (timer !== undefined) return
+      timer = setInterval(pull, 15_000)
+    }
+    const stop = () => {
+      if (timer === undefined) return
+      clearInterval(timer)
+      timer = undefined
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        pull()
+        start()
+      } else {
+        stop()
+      }
+    }
     pull()
-    const t = setInterval(pull, 15_000)
+    if (document.visibilityState === 'visible') start()
+    document.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
-      clearInterval(t)
+      stop()
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [state.account?.email])
 
