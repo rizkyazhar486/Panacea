@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
-import { IconGauge } from '../components/icons'
-import { getDemoTersimpan } from '../lib/profile'
-import { waistToHeight, WAIST_CM, WHTR_HEIGHT_CM, parseNumberField } from '../domains/clinical-calculators'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { IconGauge } from '../../components/icons'
+import { getDemoTersimpan } from '../../lib/profile'
+import { waistToHeight, WAIST_CM, WHTR_HEIGHT_CM, parseNumberField } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Self-Assessment Toolkit — four small real self-assessment tools in one

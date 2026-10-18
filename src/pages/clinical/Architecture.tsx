@@ -1,8 +1,8 @@
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { Prosa } from '../components/Prosa'
-import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../components/icons'
-import { WEIGHTS, S_THRESHOLD } from '../lib/cdss'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { Prosa } from '../../components/Prosa'
+import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../../components/icons'
+import { WEIGHTS, S_THRESHOLD } from '../../lib/cdss'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 const MODULES = [
   ['EHR & Data Ingest', 'HL7/FHIR connectors — medication list, labs, allergies, vitals. Input normalization.'],

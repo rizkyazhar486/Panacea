@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
+import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
-import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
-import { Ringkas, Poin } from '../components/Ringkas'
-import { IconChartUp } from '../components/icons'
-import { KolomAngka } from '../components/KolomAngka'
+import { Card, SectionTitle, Button, Field, inputClass } from '../../components/ui'
+import { Ringkas, Poin } from '../../components/Ringkas'
+import { IconChartUp } from '../../components/icons'
+import { KolomAngka } from '../../components/KolomAngka'
 import {
   muat, simpan, ringkas, pekanBerjalan, tinjauanJatuhTempo, WILAYAH,
   type Keadaan, type Komitmen, type Wilayah,
-} from '../lib/perubahan'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/perubahan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Change — halaman yang mengubah membaca menjadi berbuat.
@@ -251,7 +251,7 @@ function Susun({
   )
 }
 
-function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import('../lib/perubahan').Tinjauan) => void }) {
+function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import('../../lib/perubahan').Tinjauan) => void }) {
   const [hari, setHari] = useState<number | undefined>(undefined)
   const [arah, setArah] = useState<'maju' | 'diam' | 'mundur'>('diam')
   const [halangan, setHalangan] = useState('')

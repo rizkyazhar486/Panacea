@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { api, type TranslateLanguage, type TranslateResult } from '../lib/api'
+import { Card, SectionTitle } from '../../components/ui'
+import { api, type TranslateLanguage, type TranslateResult } from '../../lib/api'
 
 // Penerjemah kedokteran. Lihat server/src/translate.ts untuk perisai
 // deterministik yang melindungi dosis, kode, dan nama obat — dan kenapa itu,

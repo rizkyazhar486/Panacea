@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Prosa } from '../components/Prosa'
-import { Card, SectionTitle } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { CopyNote } from '../components/CopyNote'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { CopyNote } from '../../components/CopyNote'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Psychiatric Status (Mental Status Exam) — a structured MSE documentation
