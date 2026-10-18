@@ -4,6 +4,10 @@ export const ESSENTIAL_METRICS = Object.freeze(['lcpMs', 'cls', 'tbtMs'])
 export function perfSampleProblem(sample) {
   if (!sample || typeof sample !== 'object' || Array.isArray(sample)) return 'malformed sample'
   if (sample.galat) return String(sample.galat)
+  // A zero CLS/TBT value is only evidence when its observer registered successfully.
+  for (const type of ['layout-shift', 'longtask']) {
+    if (sample.observers?.[type] !== true) return `unmeasured ${type} observer`
+  }
   for (const name of ESSENTIAL_METRICS) {
     const x = sample[name]
     if (typeof x !== 'number' || !Number.isFinite(x) || x < 0) return `unmeasured ${name}`

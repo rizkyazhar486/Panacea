@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { perfSampleProblem, enoughPerfEvidence, minimumPerfSamples } from './perf-sample-coverage.mjs'
-const observed = { lcpMs: 1100, cls: 0, tbtMs: 0 }
+const observed = { lcpMs: 1100, cls: 0, tbtMs: 0, observers: { 'layout-shift': true, longtask: true } }
 test('F2 accepts observed zero layout shift and TBT (not missing values)', () => {
   assert.equal(perfSampleProblem(observed), null)
   assert.equal(enoughPerfEvidence([observed, observed, observed], 3), true)
@@ -29,4 +29,15 @@ test('F2 strict majority rejects half of even sample counts and invalid plans', 
     assert.equal(enoughPerfEvidence(majority, minimumPerfSamples(n)), true)
   }
   for (const invalid of [0, -1, 1.5, NaN, Infinity, '5', null, undefined]) assert.throws(() => minimumPerfSamples(invalid), /positive integer/)
+})
+
+test('F2 layout-shift/longtask observer support and registration are required for measured zero', () => {
+  for (const type of ['layout-shift', 'longtask']) {
+    for (const state of [false, undefined, null]) {
+      const sample = { ...observed, observers: { ...observed.observers, [type]: state } }
+      assert.match(perfSampleProblem(sample), new RegExp(type))
+    }
+  }
+  assert.match(perfSampleProblem({ ...observed, observers: null }), /observer/)
+  assert.equal(perfSampleProblem(observed), null, 'legitimate observer with no entries may report 0')
 })

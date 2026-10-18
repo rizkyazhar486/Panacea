@@ -33,8 +33,10 @@ if (!login?.token) { console.error('perf-audit: login dev gagal'); process.exit(
 const sesi = JSON.stringify({ loginAt: Date.now(), account: { email: 'perf@example.com', name: 'Perf Audit', role: 'pasien', isOwner: false, isSubscriber: false, loggedAt: new Date().toISOString() } })
 
 // Dipasang sebelum skrip halaman: mengumpulkan LCP, pergeseran tata letak, dan tugas panjang.
-const KOLEKTOR = `(() => { const p = window.__perf = { lcp: null, shifts: [], longTasks: [] };
-  const obs = (type, fn) => { try { new PerformanceObserver((l) => l.getEntries().forEach(fn)).observe({ type, buffered: true }) } catch {} }
+const KOLEKTOR = `(() => { const p = window.__perf = { lcp: null, shifts: [], longTasks: [], observers: {} };
+  const supported = typeof PerformanceObserver === 'function' && Array.isArray(PerformanceObserver.supportedEntryTypes) ? PerformanceObserver.supportedEntryTypes : [];
+  const obs = (type, fn) => { p.observers[type] = false; if (!supported.includes(type)) return;
+    try { const observer = new PerformanceObserver((l) => l.getEntries().forEach(fn)); observer.observe({ type, buffered: true }); p.observers[type] = true } catch {} }
   obs('largest-contentful-paint', (e) => { p.lcp = e.startTime })
   obs('layout-shift', (e) => { p.shifts.push({ value: e.value, hadRecentInput: e.hadRecentInput }) })
   obs('longtask', (e) => { p.longTasks.push({ startTime: e.startTime, duration: e.duration }) }) })()`
@@ -66,6 +68,7 @@ try {
         sampel.push({
           ttfbMs: m.nav?.ttfb ?? null, dclMs: m.nav?.dcl ?? null, loadMs: m.nav?.load ?? null, fcpMs: m.fcp, lcpMs: m.perf?.lcp ?? null,
           cls: cumulativeLayoutShift(m.perf?.shifts ?? null), tbtMs: m.fcp === null ? null : totalBlockingTime(m.perf?.longTasks ?? null, m.fcp),
+          observers: m.perf?.observers ?? null,
           requests: m.requests, bytesTotal: m.bytesTotal, bytesJs: m.bytesJs,
         })
       } catch (e) { sampel.push({ galat: String(e.message).split('\n')[0] }) } finally { await ctx.close() }
