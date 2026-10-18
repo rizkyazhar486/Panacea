@@ -14,7 +14,7 @@ test('offline preloading is owned by Settings page, not shared component layer',
   assert.match(page, /import\('\.\.\/clinical\/InitialAssessment'\)/, 'clinical assessment still downloaded')
 })
 
-test('offline preload must report real failures rather than claiming success after a failed import', () => {
+test('offline preload executes the supplied manifest and reports progress against its actual length', () => {
   const component = read('src/components/ui/OfflineReady.tsx')
   assert.match(component, /await pages\[i\]\.imp\(\)/, 'all manifest entries are executed')
   assert.match(component, /pages\.length/, 'progress denominator equals supplied manifest')
