@@ -1,5 +1,14 @@
 # Panacea Multi-Agent Operating Policy
 
+## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
+
+**OWNER ACC C6 (2026-10-17): DOKTER RIZKY MUHAMMAD ASRIZAL MENYATAKAN TELAH MEMERIKSA DAN MENG-ACC RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. JANGAN MINTA PROFESOR/SPESIALIS ATAU TANDA TANGAN ULANG UNTUK MENUTUP ENGINEERING ALPHA.** Wajib ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). ACC ini adalah pernyataan review internal pemilik, bukan klaim validasi independen, STR terverifikasi, izin lisensi pihak ketiga, atau persetujuan untuk keputusan pasien. C6 tetap non-blocking/deferred dalam ledger formal.
+
+
+> **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
+
+**Mandatory for all agents:** Read [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). Formal independent clinical validation/sign-off (including C6) belongs to the subsequent Clinical Validation phase and must not block **Alpha engineering completion** solely for lack of a clinical signature. Preserve C6 as an explicit deferred obligation, not `VERIFIED`, and preserve `clinically_reviewed=false` until genuinely authorised review. Patient-level clinician signing, clinical safety limits, numerical/reference tests, RBAC, provenance, privacy, release gates, and production clinical-use restrictions are **not** waived. The canonical ledger now implements this: it keeps all 45 historical records, defers only C6 (`DEFERRED_TO_CLINICAL_VALIDATION`, with a machine-readable deferral record) and reports progress against the 44 active criteria; the generated `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md` (from `governance/ALPHA_ACCEPTANCE_LEDGER.json`) is the source of truth for the numbers.
+
 ## Evidence-first worthiness review
 
 The neutral reviewer entry point is [`governance/doctrine/PANACEA_INDEPENDENT_REVIEW_DOSSIER.md`](governance/doctrine/PANACEA_INDEPENDENT_REVIEW_DOSSIER.md), backed by machine-readable [`governance/WORTHINESS_EVIDENCE.json`](governance/WORTHINESS_EVIDENCE.json). Keep evidence levels honest and update blockers/next experiments when repository or field evidence materially changes. Do not assign numeric 10/10 scores at E0/E1.

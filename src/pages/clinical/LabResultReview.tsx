@@ -3,7 +3,9 @@ import { Prosa } from '../../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { api, backendEnabled, GalatApi } from '../../lib/api'
-import { COMMUNICATION_CHANNELS, MAX_NOTE, buildAdvance, buildQueue, formatValue, parseLabResults, type LabResultRecord, type QueueRow } from '../../domains/lab-results'
+import { COMMUNICATION_CHANNELS, MAX_NOTE, bolehLangkah, buildAdvance, buildQueue, formatValue, parseLabResults, peranMeja, type LabResultRecord, type QueueRow } from '../../domains/lab-results'
+import { StaffIntakeForm } from '../../components/clinical/StaffIntakeForm'
+import { OwnerStaffPanel } from '../../components/clinical/OwnerStaffPanel'
 
 const STATUS_LABEL: Record<string, string> = { received: 'Received', pending_review: 'Awaiting review', reviewed: 'Reviewed', communicated: 'Communicated', closed: 'Closed' }
 const ACTION_LABEL: Record<string, string> = { pending_review: 'Mark awaiting review', reviewed: 'Mark reviewed', communicated: 'Record communication', closed: 'Close result' }
@@ -18,7 +20,9 @@ type Load = { state: 'loading' } | { state: 'error'; message: string } | { state
 
 export function LabResultReview() {
   const { account } = useStore()
-  const authorized = account?.role === 'dokter' || Boolean(account?.isOwner)
+  const peran = peranMeja(account?.role, Boolean(account?.isOwner))
+  const authorized = peran !== null
+  const staff = peran === 'perawat' || peran === 'lab'
   const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [busy, setBusy] = useState<string | null>(null)
   // Prevent repeat taps before React has rendered the busy state.
@@ -66,7 +70,7 @@ export function LabResultReview() {
     return (
       <section aria-label="Lab review access" className="mx-auto w-full max-w-3xl space-y-5 py-10 text-slate-900">
         <h1 className="text-3xl font-black tracking-[-.04em]">Lab result review</h1>
-        <p className="max-w-2xl text-sm leading-6 text-slate-600">This queue is reserved for clinicians.</p>
+        <p className="max-w-2xl text-sm leading-6 text-slate-600">This queue is reserved for clinicians and verified nursing and lab staff.</p>
         <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center border-b border-slate-500 text-sm font-black">Back to Clinical →</Link>
       </section>
     )
@@ -75,12 +79,14 @@ export function LabResultReview() {
   return (
     <section aria-label="Lab result review" className="dark mx-auto w-full max-w-4xl space-y-6 rounded-xl bg-slate-950 px-4 pb-24 pt-6 text-white sm:px-6">
       <header className="border-b border-white/10 pb-5">
-        <p className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-200/65">Doctor workspace · workflow only</p>
+        <p className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-200/65">{staff ? 'Staff workspace · assigned patients only' : 'Doctor workspace · workflow only'}</p>
         <h1 className="mt-2 text-3xl font-black tracking-[-.05em] sm:text-4xl">Lab result review</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">Review, communicate and close results; every step is audited.</p>
         <Prosa kelas="mt-1 max-w-2xl text-xs leading-5 text-white/45">It does not interpret values. Reference ranges are shown only as recorded, and the server decides who may review.</Prosa>
       </header>
 
+      {staff && backendEnabled && <StaffIntakeForm onSaved={() => void refresh()} />}
+      {account?.isOwner && backendEnabled && <OwnerStaffPanel />}
       {!backendEnabled && <p role="status" className="text-sm text-white/60">The server is not connected in this build, so there are no results to show.</p>}
       {backendEnabled && load.state === 'loading' && <p role="status" className="text-sm text-white/60">Loading results…</p>}
       {load.state === 'error' && (
@@ -104,7 +110,7 @@ export function LabResultReview() {
               {r.item.referenceRange ? ` · recorded range ${r.item.referenceRange}` : ' · no range recorded'}
               {r.ageHours === null ? '' : ` · ${Math.floor(r.ageHours)} h since recorded`}
             </p>
-            {r.nextStatus && (
+            {r.nextStatus && bolehLangkah(peran, r.nextStatus) && (
               <div className="mt-3 space-y-2">
                 {r.nextStatus === 'communicated' && (
                   <div className="grid gap-2 sm:grid-cols-[10rem_1fr]">
@@ -127,7 +133,7 @@ export function LabResultReview() {
           </li>
         ))}
       </ul>
-      <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/50 hover:text-white">Clinical →</Link>
+      {!staff && <Link to="/clinical-hub" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/50 hover:text-white">Clinical →</Link>}
     </section>
   )
 }

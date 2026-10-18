@@ -65,6 +65,7 @@ export interface MeasurementReviewRule {
 }
 
 export interface ContinuousCarePlan {
+  signature?: { actorId: string; at: string; contentHash: string }
   id: string
   version: string
   subjectId: string

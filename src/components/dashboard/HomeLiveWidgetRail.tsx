@@ -87,12 +87,12 @@ export function HomeLiveWidgetRail() {
       <BatasKlaimKesehatan permukaan="wellness.home-live-rail" />
       <div className="mb-2 flex items-center justify-between gap-3 px-0.5">
         <div>
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">33 live instruments</div>
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-brand-dark dark:text-[#00BF63]">33 live instruments</div>
           <h3 id="home-live-widget-rail-title" className="mt-0.5 text-[15px] font-black tracking-[-.02em] text-white">
             Swipe your health signals
           </h3>
         </div>
-        <Link to="/health-data" className="shrink-0 text-[10px] font-black text-[#00BF63]">Data ↗</Link>
+        <Link to="/health-data" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-[10px] font-black text-brand-dark dark:text-[#00BF63]">Data ↗</Link>
       </div>
 
       <div className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-1 pb-2" aria-label="Scrollable live health widgets">

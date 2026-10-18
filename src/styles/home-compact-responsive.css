@@ -187,7 +187,7 @@ main.pmd-page-stage,
 }
 
 .panacea-signal-ring-meta {
-  color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.6);
   font-size: 8.5px;
   font-weight: 750;
   white-space: nowrap;
@@ -634,7 +634,7 @@ html:not(.dark) .panacea-signal-ring-value {
 }
 
 html:not(.dark) .panacea-signal-ring-meta {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 html:not(.dark) .panacea-instrument-mini,

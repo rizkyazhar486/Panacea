@@ -46,7 +46,7 @@ try {
   assert.equal((await call('PUT', '/api/lab-log', alice.token, { log: { gdp }, diperbaruiPada: new Date().toISOString() })).status, 200)
   const share = (await call('POST', '/api/lab-log/shares', alice.token, { dokterEmail: doctor.user.email, hari: 7 })).body
   const plan = await call('POST', `/api/clinician/lab-shares/${share.id}/care-plan`, doctor.token, {
-    diagnosisRefs: [{ system: 'local', code: 'SYN-1', display: 'Synthetic fixture condition', verificationStatus: 'provisional' }],
+    signIntent: true, diagnosisRefs: [{ system: 'local', code: 'SYN-1', display: 'Synthetic fixture condition', verificationStatus: 'provisional' }],
     questions: [{ id: 'sym', kind: 'boolean', prompt: 'Synthetic symptom today?' }, { id: 'pain', kind: 'number', prompt: 'Synthetic pain score?' }],
   })
   assert.equal(plan.status, 200); assert.equal(plan.body.subjectId, alice.user.id)

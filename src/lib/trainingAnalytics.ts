@@ -12,6 +12,8 @@ export interface TrainingWeekSummary {
   sesiJarak: number
   sesiHr: number
   sesiRpe: number
+  /** Valid reported RPE, independent of positive-duration load eligibility. */
+  sesiRpeTercatat: number
   sesiRecovery: number
 }
 
@@ -49,6 +51,7 @@ export interface TrainingAnalytics {
     sesiJarak: number
     sesiHr: number
     sesiRpe: number
+    sesiRpeTercatat: number
     sesiRecovery: number
   }
   paceAktivitas: {
@@ -115,9 +118,9 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
   const anchor = new Date(anchorInput)
   if (Number.isNaN(anchor.getTime())) {
     return {
-      minggu: { sesi: 0, menit: 0, km: 0, kcal: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRecovery: 0 },
+      minggu: { sesi: 0, menit: 0, km: 0, kcal: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRpeTercatat: 0, sesiRecovery: 0 },
       blok28: [],
-      total28: { sesi: 0, menit: 0, km: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRecovery: 0 },
+      total28: { sesi: 0, menit: 0, km: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRpeTercatat: 0, sesiRecovery: 0 },
       paceAktivitas: null,
       hrrAktivitas: null,
     }
@@ -147,6 +150,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     let sesiJarak = 0
     let sesiHr = 0
     let sesiRpe = 0
+    let sesiRpeTercatat = 0
     let sesiRecovery = 0
 
     for (const { w } of rows) {
@@ -165,6 +169,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
       }
       if (adaHr(w)) sesiHr += 1
       if (rpeValid(w.rpe) !== null && d > 0) sesiRpe += 1
+      if (rpeValid(w.rpe) !== null) sesiRpeTercatat += 1
       if (adaRecovery(w)) sesiRecovery += 1
     }
 
@@ -178,6 +183,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
       sesiJarak,
       sesiHr,
       sesiRpe,
+      sesiRpeTercatat,
       sesiRecovery,
     }
   }
@@ -220,6 +226,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     sesiJarak: total28Base.sesiJarak,
     sesiHr: total28Base.sesiHr,
     sesiRpe: total28Base.sesiRpe,
+    sesiRpeTercatat: total28Base.sesiRpeTercatat,
     sesiRecovery: total28Base.sesiRecovery,
   }
 

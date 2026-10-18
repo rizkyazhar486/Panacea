@@ -41,7 +41,10 @@ jobs:
       - name: Frontend production build and TypeScript
         run: npm run build
 
+      # On pull requests `Validate changes` already runs the identical `npm run uji` on the same SHA,
+      # so repeating it here only lengthens the task. Pushes to main (no PR validate run) still execute it.
       - name: Frontend tests
+        if: github.event_name != 'pull_request'
         run: npm run uji
 
       - name: Install mobile browser smoke runner
@@ -499,6 +502,20 @@ jobs:
         env:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
         run: node scripts/qa/lab-result-review-e2e-gate.mjs
+
+      - name: A6 clinician care-plan approval (real HTTP, mobile and desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node --experimental-transform-types qa/clinical/care-plan-approval.mjs
+
+      - name: Upload care-plan approval evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: care-plan-approval
+          path: artifacts/care-plan-approval
+          if-no-files-found: ignore
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()

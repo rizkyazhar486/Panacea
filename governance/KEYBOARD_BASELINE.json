@@ -1,0 +1,7 @@
+{
+  "tanpaIndikator": 0,
+  "takTerlihat": 0,
+  "terjebak": 0,
+  "tanpaStopFokus": 0,
+  "_catatan": "Ratchet audit keyboard (scripts/qa/keyboard-audit.mjs): Tab x60 pada 9 halaman x 2 viewport (tema terang) di aplikasi + API nyata. Diukur lokal: 0 stop tanpa indikator fokus (setelah transisi), 0 stop tak terlihat, 0 jebakan keyboard, 0 halaman tanpa stop fokus. Pengukuran pertama sempat melaporkan 3 'tanpa indikator' pada input waktu/select di #/harian; itu artefak pengukuran (transisi CSS belum selesai), bukan cacat, sehingga skrip kini menunggu transisi dan mengukur ulang sebelum menghitung. BATAS: tidak mencakup Escape pada dialog, urutan fokus yang bermakna, atau pemulihan fokus setelah aksi; tidak menggantikan uji pembaca layar/pemeriksaan manual. Angka hanya boleh naik jika ada cacat baru, dan gerbang gagal bila itu terjadi."
+}

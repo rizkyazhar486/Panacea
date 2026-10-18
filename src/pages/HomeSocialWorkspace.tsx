@@ -12,11 +12,6 @@ import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
 import { ThinkingOrb } from '../components/ThinkingOrb'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { Fold } from '../shared/ui/Fold'
-import '../styles/home-liquid-reference.css'
-import '../styles/home-green-material-v48.css'
-import '../styles/home-human-interface.css'
-import '../styles/home-liquid-control-layer.css'
-import '../styles/home-compact-responsive.css'
 
 const Feed = lazy(() => import('./social/Feed'))
 const Community = lazy(() => import('./social/Community').then((m) => ({ default: m.Community })))
