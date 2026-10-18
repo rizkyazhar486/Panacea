@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Card, SectionTitle, Button } from '../ui'
 import { IconDownload, IconCheck } from '../icons'
 
-// Pure reusable UI: only page layer owns Vite lazy page imports.\nexport type OfflinePage = { label: string; imp: () => Promise<unknown> }\nconst KEY = 'pmd_offline_ready_v1'
+// Pure reusable UI: only page layer owns Vite lazy page imports.
+export type OfflinePage = { label: string; imp: () => Promise<unknown> }
+const KEY = 'pmd_offline_ready_v1'
 
 function fmtWhen(iso: string) {
   const d = new Date(iso)
