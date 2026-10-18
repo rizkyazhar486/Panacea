@@ -18,7 +18,7 @@ export function isProductionAsset(assetUrl, baseUrl) {
       (b.origin === 'https://panaceamed.id' && u.origin === 'https://www.panaceamed.id')
     if (!sameOrigin) return false
     return (u.pathname.startsWith('/assets/') && /\.(?:css|js)$/.test(u.pathname)) ||
-      u.pathname === '/home-styles.css' || u.pathname === '/panacea-green-material-v48.css'
+      u.pathname === '/home-styles.css' || u.pathname === '/panacea-green-material-v48.css' || u.pathname === '/ui-iterations/panacea-green-material-v48.css'
   } catch { return false }
 }
 
@@ -29,10 +29,4 @@ export function productionAssetFailure({ url, status, contentType = '', requestF
   if (status >= 400 || (new URL(url).pathname.endsWith('.css') && !ct.includes('text/css')))
     return url.slice(0, 150) + ': HTTP ' + status + ' content-type ' + ct
   return null
-}
-
-// E7: a later Body route may abort CSS imports after Home has rendered.
-// Freeze genuine Home failures; never blanket-ignore ERR_ABORTED or other asset errors.
-export function captureHomeAssetFailures(assetFailures) {
-  return [...assetFailures]
 }

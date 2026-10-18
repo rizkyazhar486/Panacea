@@ -3,7 +3,7 @@
 // Keluar 2 = kegagalan jaringan (tahap disebutkan, BUKAN status aplikasi); 1 = temuan yang menggagalkan; 0 = lulus.
 // Tidak mengklaim apa pun yang tidak diamati: SHA penyebaran frontend tidak tertanam di halaman, hanya dilaporkan bila server melaporkannya.
 import dns from 'node:dns/promises'
-import { assessPublicPage, productionAssetFailure, captureHomeAssetFailures } from './production-browser-verdict.mjs'
+import { assessPublicPage, productionAssetFailure } from './production-browser-verdict.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
@@ -91,9 +91,6 @@ try {
       }
     }))
     await page.screenshot({ path: path.join(OUT, `home-${width}.png`), fullPage: true })
-    // Home evidence ends here. Body navigation cancels pending Home requests as ERR_ABORTED.
-    // Do not charge those post-navigation cancellations to the already-observed public Home.
-    const homeAssetFailures = captureHomeAssetFailures(v.assetFailures)
 
     // Halaman Body Exposure kanonik. Tanpa sesi, aplikasi menampilkan landing/login (dicatat). Dengan BODY_SESSION=1 sesi KLIEN saja (peran pasien, tanpa token)
     // disuntik ke peramban ini (opsional; pada build dev lokal rute tetap menampilkan Home, jadi hasilnya TIDAK dijamin). Tidak melewati kontrol server apa pun.
@@ -130,7 +127,7 @@ try {
     }
     v.body = b
     report.viewports.push(v)
-    for (const message of assessPublicPage({ status: v.status, title: v.title, bodyTextChars: v.bodyTextChars, rootErrorText: v.rootErrorText, assetFailures: homeAssetFailures })) finding('fail', `${width}px: ${message}`)
+    for (const message of assessPublicPage({ status: v.status, title: v.title, bodyTextChars: v.bodyTextChars, rootErrorText: v.rootErrorText, assetFailures: v.assetFailures })) finding('fail', `${width}px: ${message}`)
     if (v.errors.length) finding('fail', `${width}px: galat halaman ${v.errors.length}`)
     if (v.overflowX) finding('fail', `${width}px: scroll horizontal (scrollWidth ${v.scrollWidth})`)
     if (!v.webgl2 && !v.webgl1) finding('warn', `${width}px: WebGL tidak tersedia di runner`)

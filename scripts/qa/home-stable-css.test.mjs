@@ -41,3 +41,15 @@ test('P0: known stale iPhone Home CSS URL resolves to stable CSS without a broad
   assert.deepEqual(route, { source: incident, destination: '/home-styles.css' })
   assert.equal((json.rewrites || []).some((x) => x.source.startsWith('/assets/') && (x.source.includes('*') || x.source.includes('(.*)'))), false, 'do not turn unrelated missing JS/CSS into a false HTTP 200')
 })
+
+test('P0 E7: Home v48 material URL resolves to an actually committed public stylesheet', () => {
+  const source = read('src/styles/home-green-material-v48.css')
+  const imported = source.match(/@import url\\('([^']+)'\\)/)?.[1]
+  assert.ok(imported, 'v48 stylesheet must have a declared source')
+  const importedPath = new URL(imported, 'https://www.panaceamed.id').pathname
+  assert.equal(importedPath, '/ui-iterations/panacea-green-material-v48.css', 'root v48 URL was a production 404')
+  const published = read('public' + importedPath)
+  assert.match(published, /--pmd48-green\\s*:/, 'do not replace missing source with empty CSS')
+  assert.ok(published.length > 1000, 'existing v48 source rules must be retained')
+  assert.ok(homeStyles().includes(imported), 'build must include the same real published source URL')
+})
