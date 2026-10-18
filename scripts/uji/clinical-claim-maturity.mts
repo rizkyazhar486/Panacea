@@ -120,7 +120,7 @@ const berkasPermukaan: Record<(typeof PERMUKAAN_KLAIM_KESEHATAN)[number], string
   'clinical.dermatology-mapper': '../../src/pages/medstudy/DermatologyLesionMapper.tsx',
   'care.second-opinion': '../../src/pages/clinical/SecondOpinion.tsx',
   'longevity.supplements': '../../src/pages/longevity/DietarySupplements.tsx',
-  'clinical.drug-info': '../../src/pages/DrugInfo.tsx',
+  'clinical.drug-info': '../../src/pages/medstudy/DrugInfo.tsx',
   'performance.fitness-test': '../../src/pages/fitness/FitnessTest.tsx',
   'longevity.shape-forming': '../../src/pages/bodyhub/ShapeForming.tsx',
   'clinical.empiric-therapy': '../../src/pages/EmpiricTherapyReference.tsx',
