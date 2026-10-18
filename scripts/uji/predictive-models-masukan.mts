@@ -33,6 +33,6 @@ const halaman = readFileSync('src/pages/bodyhub/PredictiveModelsToolkit.tsx', 'u
 assert.doesNotMatch(halaman, /(?:Number|parseFloat|parseInt)\([^()]*\)\s*\|\|\s*0/, 'kolom kosong tidak boleh dibaca 0')
 for (const f of Object.keys(PREDICTIVE_FIELDS)) assert.match(halaman, new RegExp(`useField\\('${f}'`), `${f} harus lewat validator`)
 assert.match(halaman, /No estimate yet/)
-assert.match(halaman, /from '\.\.\/domains\/personal-health'/, 'impor lewat index domain')
+assert.match(halaman, /from '\.\.\/\.\.\/domains\/personal-health'/, 'impor lewat index domain')
 
 console.log('predictive-models-masukan: OK')
