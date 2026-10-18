@@ -5,6 +5,7 @@ import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
+import { buildPersistedSnapshot } from './storePersistScope'
 import type {
   AppState,
   Patient,
@@ -477,20 +478,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
+  // Heavy media (uploaded photo/video data URLs) is stripped up front rather than
+  // only on quota-exceeded retry: it's server-backed when a backend is configured
+  // (re-pulled by the posts poll below) and was never safe to treat as the local
+  // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
   useEffect(() => {
-    const { account: _account, ...persist } = state
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
-    } catch {
-      // Storage quota exceeded (e.g. many uploaded photos) — drop heavy media
-      // from the persisted copy so the app keeps working.
+    const t = setTimeout(() => {
+      const { account: _account, ...rest } = state
+      const persist = buildPersistedSnapshot(rest)
       try {
-        const slim = { ...persist, posts: persist.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
       } catch {
-        /* give up persisting this update */
+        /* quota exceeded even without media — give up persisting this update */
       }
-    }
+    }, 400)
+    return () => clearTimeout(t)
   }, [state])
 
   // Auto-login DISABLED by request: the app always starts at the landing/login,
