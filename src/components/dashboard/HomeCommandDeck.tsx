@@ -82,44 +82,75 @@ export function HomeCommandDeck() {
   return (
     <section data-panacea-command-surface className="panacea-command-surface" aria-label="Panacea capabilities">
       <div className="panacea-command-topline">
-        <h2 className="panacea-command-title">Explore</h2>
-        <label className="panacea-command-search-wrap">
-          <span className="sr-only">Search Panacea capabilities</span>
-          <input
-            className="panacea-command-search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Panacea"
-            autoComplete="off"
-          />
-        </label>
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-[.18em] text-emerald-600 dark:text-[#00BF63]">
+            Universal Capability Index
+          </span>
+          <h2 className="panacea-command-title">Command Deck</h2>
+        </div>
+        <div className="panacea-command-search-wrap">
+          <label className="panacea-command-search-label">
+            <span className="sr-only">Search Panacea capabilities</span>
+            <span className="panacea-command-search-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <input
+              className="panacea-command-search"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search 187 capabilities, calculators, records..."
+              autoComplete="off"
+            />
+            {query ? (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="panacea-command-search-clear"
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            ) : (
+              <kbd className="panacea-command-search-kbd">⌘K</kbd>
+            )}
+          </label>
+        </div>
       </div>
       <BatasKlaimKesehatan permukaan="wellness.home-command" className="mt-2 text-[11px] leading-snug text-neutral-500" />
 
       {!showIndex && pintasan.length > 0 ? (
-        <nav className="panacea-command-recents" aria-label="Most used capabilities">
-          {pintasan.map((feature) => (
-            <Link
-              key={`recent-${feature.label}-${canonical(feature.to)}`}
-              to={canonical(feature.to)}
-              className="panacea-command-recent"
-            >
-              <span>{feature.label}</span>
-              <span aria-hidden>→</span>
-            </Link>
-          ))}
-        </nav>
+        <div className="panacea-command-recents-section">
+          <span className="panacea-command-recents-kicker">Pinned & Most Used</span>
+          <nav className="panacea-command-recents" aria-label="Most used capabilities">
+            {pintasan.map((feature) => (
+              <Link
+                key={`recent-${feature.label}-${canonical(feature.to)}`}
+                to={canonical(feature.to)}
+                className="panacea-command-recent"
+              >
+                <span>{feature.label}</span>
+                <span aria-hidden className="panacea-command-recent-arrow">→</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
       ) : null}
 
-      <button
-        type="button"
-        className="panacea-command-index-toggle"
-        aria-expanded={showIndex}
-        onClick={() => setExpanded((value) => !value)}
-      >
-        {showIndex ? 'Hide capabilities' : `All ${uniqueFeatures.length} capabilities`}
-      </button>
+      <div className="panacea-command-toggle-wrap">
+        <button
+          type="button"
+          className="panacea-command-index-toggle"
+          aria-expanded={showIndex}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <span>{showIndex ? 'Hide capabilities' : `All ${uniqueFeatures.length} capabilities`}</span>
+          <span aria-hidden className="panacea-command-toggle-arrow">{showIndex ? '↑' : '↓'}</span>
+        </button>
+      </div>
 
       {showIndex ? (
         <div className="panacea-bento" aria-label="Capability index" aria-live={searching ? 'polite' : 'off'}>

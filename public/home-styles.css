@@ -1783,4 +1783,268 @@ html.dark .panacea-live-signal-card:hover,
   background: #111814 !important;
 }
 
+/* ── Command Deck / Capability Directory ─────────────────────────────── */
+.panacea-command-surface {
+  padding: 6px 2px 20px;
+}
+
+.panacea-command-topline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .panacea-command-topline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.panacea-command-title {
+  margin: 2px 0 0;
+  font-size: clamp(20px, 2.5vw, 26px);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  color: #0f172a;
+}
+
+html.dark .panacea-command-title,
+.dark .panacea-command-title {
+  color: #ffffff;
+}
+
+.panacea-command-search-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+}
+
+.panacea-command-search-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.panacea-command-search-icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  color: #94a3b8;
+}
+
+html.dark .panacea-command-search-icon,
+.dark .panacea-command-search-icon {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.panacea-command-search {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 0 44px 0 38px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  transition: all 150ms ease !important;
+}
+
+html.dark .panacea-command-search,
+.dark .panacea-command-search {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.panacea-command-search:focus {
+  border-color: rgba(0, 191, 99, 0.45) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 191, 99, 0.12) !important;
+}
+
+html.dark .panacea-command-search:focus,
+.dark .panacea-command-search:focus {
+  border-color: rgba(0, 191, 99, 0.5) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(0, 191, 99, 0.18) !important;
+}
+
+.panacea-command-search-kbd {
+  position: absolute;
+  right: 12px;
+  display: none;
+  align-items: center;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #f1f5f9;
+  color: #64748b;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .panacea-command-search-kbd {
+    display: inline-flex;
+  }
+}
+
+html.dark .panacea-command-search-kbd,
+.dark .panacea-command-search-kbd {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.panacea-command-search-clear {
+  position: absolute;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+html.dark .panacea-command-search-clear,
+.dark .panacea-command-search-clear {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Most used chips */
+.panacea-command-recents-section {
+  margin-top: 18px;
+}
+
+.panacea-command-recents-kicker {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  padding-left: 1px;
+}
+
+html.dark .panacea-command-recents-kicker,
+.dark .panacea-command-recents-kicker {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.panacea-command-recents {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+  overflow-x: visible !important;
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.panacea-command-recent {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  min-height: 36px !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(0, 0, 0, 0.07) !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  transition: all 140ms ease !important;
+}
+
+html.dark .panacea-command-recent,
+.dark .panacea-command-recent {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: none !important;
+}
+
+.panacea-command-recent:hover,
+.panacea-command-recent:focus-visible {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: #f0fdf4 !important;
+  color: #00bf63 !important;
+  transform: translateY(-1px) !important;
+}
+
+html.dark .panacea-command-recent:hover,
+html.dark .panacea-command-recent:focus-visible,
+.dark .panacea-command-recent:hover,
+.dark .panacea-command-recent:focus-visible {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: rgba(0, 191, 99, 0.08) !important;
+  color: #00bf63 !important;
+}
+
+.panacea-command-recent-arrow {
+  color: #94a3b8;
+  font-size: 11px;
+  transition: transform 140ms ease;
+}
+
+.panacea-command-recent:hover .panacea-command-recent-arrow {
+  transform: translateX(2px);
+  color: #00bf63;
+}
+
+/* Toggle all capabilities */
+.panacea-command-toggle-wrap {
+  margin-top: 14px;
+}
+
+.panacea-command-index-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 7px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.07) !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  font-size: 11.5px !important;
+  font-weight: 750 !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+html.dark .panacea-command-index-toggle,
+.dark .panacea-command-index-toggle {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.panacea-command-index-toggle:hover,
+.panacea-command-index-toggle:focus-visible {
+  border-color: rgba(0, 191, 99, 0.3) !important;
+  background: rgba(0, 191, 99, 0.06) !important;
+  color: #00bf63 !important;
+}
+
+.panacea-command-toggle-arrow {
+  font-size: 10px;
+  color: inherit;
+}
+
+
 
