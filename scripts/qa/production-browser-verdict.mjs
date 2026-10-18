@@ -30,3 +30,9 @@ export function productionAssetFailure({ url, status, contentType = '', requestF
     return url.slice(0, 150) + ': HTTP ' + status + ' content-type ' + ct
   return null
 }
+
+// E7: a later Body route may abort CSS imports after Home has rendered.
+// Freeze genuine Home failures; never blanket-ignore ERR_ABORTED or other asset errors.
+export function captureHomeAssetFailures(assetFailures) {
+  return [...assetFailures]
+}
