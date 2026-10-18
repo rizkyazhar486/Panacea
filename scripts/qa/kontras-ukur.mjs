@@ -19,9 +19,15 @@ export const ukur = () => {
   // Credit its measured colour ONLY if the rendered shape fully covers this text.
   // Otherwise retain normal ancestor-based WCAG failure (fail closed).
   const oneShapeBackdrop = (el, textNode) => {
-    const active = el.closest('[data-one-shape-active="true"]')
-    const parent = active?.parentElement
-    if (!parent?.hasAttribute('data-one-shape')) return null
+    const active = el.closest('[data-one-shape-active="true"],[aria-selected="true"],[aria-current="page"]')
+    const parent = active?.closest('[data-one-shape]')
+    if (!parent) return null
+    // Match OneShape's own selection rule: explicit containers NEVER fall back to
+    // aria-current, e.g. the For You route points to Home without selecting its tab.
+    const selector = parent.dataset.oneShape === 'explicit'
+      ? '[data-one-shape-active="true"]'
+      : '[aria-selected="true"],[aria-current="page"],[data-one-shape-active="true"]'
+    if (parent.querySelector(selector) !== active) return null
     const shape = parent.querySelector(':scope > .pmd-one-shape')
     if (!shape) return null
     const st = getComputedStyle(shape)
@@ -34,11 +40,24 @@ export const ukur = () => {
     const b = shape.getBoundingClientRect()
     if (!(t.width > 0 && t.height > 0 && b.width > 0 && b.height > 0)) return null
     if (b.left > t.left + 1 || b.right < t.right - 1 || b.top > t.top + 1 || b.bottom < t.bottom - 1) return null
-    return colour
+    // Backgrounds painted by descendants and the active element appear ABOVE
+    // the shape; failing to composite them can falsely pass unreadable text.
+    const layers = []
+    let ruang = !!colour.ruang
+    for (let e = el; e && e !== parent; e = e.parentElement) {
+      const s = getComputedStyle(e)
+      if (s.backgroundImage !== 'none' || Number(s.opacity) < 0.999) return { warna: null, ok: false, ruang }
+      const c = parse(s.backgroundColor)
+      if (!c) return { warna: null, ok: false, ruang }
+      if (c.a > 0) { layers.push(c); ruang ||= !!c.ruang }
+    }
+    let warna = colour
+    for (const layer of layers.reverse()) warna = over(layer, warna)
+    return { warna, ok: true, ruang }
   }
   const latar = (el, textNode) => { // dari elemen ke atas sampai lapisan opak; gradien/gambar di antaranya => tak dapat diukur
-    const shapeColour = oneShapeBackdrop(el, textNode)
-    if (shapeColour) return { warna: shapeColour, ok: true, ruang: !!shapeColour.ruang }
+    const shapeBackdrop = oneShapeBackdrop(el, textNode)
+    if (shapeBackdrop) return shapeBackdrop
     const lapis = []; let ok = true; let dasar = null; let ruang = false
     for (let e = el; e; e = e.parentElement) {
       const s = getComputedStyle(e)
