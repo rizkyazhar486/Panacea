@@ -431,7 +431,7 @@ assert.match(
   'Duke criteria must render the published-score claim boundary',
 )
 assert.match(
-  readFileSync(new URL('../../src/pages/EmpiricTherapyReference.tsx', import.meta.url), 'utf8'),
+  readFileSync(new URL('../../src/pages/medstudy/EmpiricTherapyReference.tsx', import.meta.url), 'utf8'),
   /not a clinically validated Panacea prescribing decision/,
   'empiric therapy must state it is not a Panacea prescribing decision',
 )
