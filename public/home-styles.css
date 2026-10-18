@@ -1,0 +1,1742 @@
+/* Panacea Home stable stylesheet. Rebuilt from src/styles/home-*.css by scripts/bangun/home-stable-css.mjs.
+   Deliberately un-hashed: cached tabs must not fail Vite dynamic CSS preloads after deploy. */
+@import url('/panacea-green-material-v48.css?v=20260916-1');
+
+/* Source: src/styles/home-liquid-reference.css */
+.panacea-liquid-home {
+  --liquid-ink: #0f172a;
+  --liquid-muted: rgba(100, 116, 139, .78);
+  --liquid-line: rgba(0, 0, 0, .08);
+  --liquid-surface: rgba(255, 255, 255, .88);
+  --liquid-surface-strong: rgba(255, 255, 255, .98);
+  position: relative;
+  isolation: isolate;
+}
+
+.dark .panacea-liquid-home {
+  --liquid-ink: #f7fbff;
+  --liquid-muted: rgba(226, 238, 255, .58);
+  --liquid-line: rgba(255, 255, 255, .105);
+  --liquid-surface: rgba(9, 15, 28, .58);
+  --liquid-surface-strong: rgba(5, 10, 20, .82);
+}
+
+.panacea-liquid-home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(56rem 38rem at 8% -8%, rgba(44, 164, 255, .06), transparent 66%),
+    radial-gradient(46rem 32rem at 92% 8%, rgba(154, 90, 255, .05), transparent 66%),
+    radial-gradient(40rem 34rem at 54% 112%, rgba(38, 226, 178, .04), transparent 70%),
+    #f4f7f8;
+}
+
+.dark .panacea-liquid-home::before {
+  background:
+    radial-gradient(56rem 38rem at 8% -8%, rgba(44, 164, 255, .13), transparent 66%),
+    radial-gradient(46rem 32rem at 92% 8%, rgba(154, 90, 255, .13), transparent 66%),
+    radial-gradient(40rem 34rem at 54% 112%, rgba(38, 226, 178, .08), transparent 70%),
+    #02050b;
+}
+
+.panacea-liquid-home::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .22;
+  background-image:
+    radial-gradient(circle at 20% 35%, rgba(255,255,255,.34) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 76% 22%, rgba(125,211,252,.34) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 66% 72%, rgba(196,181,253,.26) 0 1px, transparent 1.4px);
+  background-size: 170px 170px, 230px 230px, 290px 290px;
+}
+
+.liquid-glass {
+  border: 1px solid var(--liquid-line);
+  background: var(--liquid-surface);
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  backdrop-filter: blur(24px) saturate(145%);
+}
+
+.dark .liquid-glass {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025) 42%, rgba(86,110,170,.035)),
+    var(--liquid-surface);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(255,255,255,.02),
+    0 24px 70px rgba(0,0,0,.26);
+}
+
+.liquid-glass-strong {
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.085), rgba(255,255,255,.025) 38%, rgba(80,120,210,.04)),
+    var(--liquid-surface-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 26px 90px rgba(0,0,0,.38);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  backdrop-filter: blur(30px) saturate(150%);
+}
+
+.liquid-spectral-edge {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-spectral-edge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(125,211,252,.38), rgba(255,255,255,.08) 30%, rgba(196,181,253,.32) 66%, rgba(110,231,183,.22));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: .66;
+}
+
+.liquid-lens {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.22);
+  background:
+    radial-gradient(circle at 35% 24%, rgba(255,255,255,.42), transparent 18%),
+    radial-gradient(circle at 65% 65%, rgba(90,110,255,.20), transparent 46%),
+    linear-gradient(145deg, rgba(94,234,212,.14), rgba(59,130,246,.12) 45%, rgba(217,70,239,.12));
+  box-shadow:
+    inset 0 0 22px rgba(255,255,255,.08),
+    0 10px 34px rgba(79,70,229,.18);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.liquid-lens::after {
+  content: '';
+  position: absolute;
+  width: 72%;
+  height: 30%;
+  top: 8%;
+  left: 14%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0));
+  transform: rotate(-8deg);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.liquid-action {
+  transform: translateZ(0);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.liquid-action:hover {
+  transform: translateY(-2px) scale(1.005);
+}
+
+.liquid-action:active {
+  transform: translateY(0) scale(.975);
+  transition-duration: 90ms;
+}
+
+.liquid-widget-rail {
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-inline: contain;
+}
+
+.liquid-widget-rail::-webkit-scrollbar { display: none; }
+.liquid-widget-rail > * { scroll-snap-align: start; }
+
+.liquid-mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 34px;
+}
+
+.liquid-mini-bars > span {
+  width: 5px;
+  min-height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: .62;
+  transform-origin: bottom;
+  animation: panacea-liquid-breathe 4.8s ease-in-out infinite;
+}
+
+.liquid-mini-bars > span:nth-child(2) { animation-delay: -.8s; }
+.liquid-mini-bars > span:nth-child(3) { animation-delay: -1.6s; }
+.liquid-mini-bars > span:nth-child(4) { animation-delay: -2.4s; }
+.liquid-mini-bars > span:nth-child(5) { animation-delay: -3.2s; }
+
+@keyframes panacea-liquid-breathe {
+  0%, 100% { transform: scaleY(.92); opacity: .52; }
+  50% { transform: scaleY(1.08); opacity: .82; }
+}
+
+.panacea-liquid-dock {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: min(calc(100vw - 22px), 520px);
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,.13);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    rgba(2, 7, 15, .76);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 18px 52px rgba(0,0,0,.45);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+}
+
+.panacea-liquid-dock .liquid-dock-item {
+  position: relative;
+  min-width: 0;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms cubic-bezier(.2,.8,.2,1);
+}
+
+.panacea-liquid-dock .liquid-dock-item:active { transform: scale(.94); }
+.panacea-liquid-dock .liquid-dock-item[data-active='true'] {
+  color: #07101d;
+  background: linear-gradient(135deg, rgba(226,248,255,.98), rgba(176,244,235,.94) 50%, rgba(215,199,255,.95));
+  box-shadow: 0 8px 26px rgba(94,234,212,.15), inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+@media (min-width: 900px) {
+  .panacea-liquid-dock {
+    bottom: 18px;
+    width: min(600px, calc(100vw - 40px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-action,
+  .panacea-liquid-dock .liquid-dock-item,
+  .liquid-mini-bars > span {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+
+/* Source: src/styles/home-human-interface.css */
+.panacea-human-home {
+  display: grid;
+  gap: clamp(40px, 6vw, 88px);
+}
+
+.panacea-instrument-strip,
+.panacea-command-surface {
+  color: rgba(255,255,255,.94);
+}
+
+.panacea-instrument-strip {
+  border-block: 1px solid rgba(255,255,255,.10);
+  padding-block: 18px;
+}
+
+.panacea-instrument-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: 2px;
+  margin-bottom: 10px;
+}
+
+.panacea-instrument-date {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.42);
+}
+
+.panacea-instrument-sync {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: rgba(255,255,255,.58);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.panacea-instrument-sync:hover,
+.panacea-instrument-sync:focus-visible {
+  color: rgba(255,255,255,.96);
+  transform: translateY(-1px);
+}
+
+.panacea-instrument-rail {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.55fr) repeat(3, minmax(150px, 1fr)) 56px;
+  align-items: stretch;
+}
+
+.panacea-instrument-cell {
+  position: relative;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 22px;
+  color: inherit;
+  text-decoration: none;
+  border-left: 1px solid rgba(255,255,255,.08);
+  scroll-snap-align: start;
+}
+
+.panacea-instrument-cell:first-child {
+  border-left: 0;
+  padding-left: 2px;
+}
+
+.panacea-instrument-cell::after {
+  content: '';
+  position: absolute;
+  inset: auto 22px 0 22px;
+  height: 1px;
+  background: rgba(255,255,255,.72);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms cubic-bezier(.22,1,.36,1);
+}
+
+.panacea-instrument-cell:hover::after,
+.panacea-instrument-cell:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.panacea-instrument-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.42);
+  white-space: nowrap;
+}
+
+.panacea-instrument-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 850;
+  letter-spacing: -.055em;
+  line-height: .92;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-instrument-primary .panacea-instrument-value {
+  font-size: clamp(58px, 7vw, 92px);
+}
+
+.panacea-instrument-unit {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.34);
+}
+
+.panacea-instrument-checkin {
+  align-self: stretch;
+  min-width: 56px;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.58);
+  text-decoration: none;
+  border-left: 1px solid rgba(255,255,255,.08);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.panacea-instrument-checkin:hover,
+.panacea-instrument-checkin:focus-visible {
+  color: rgba(255,255,255,.98);
+  transform: translateY(-1px);
+}
+
+.panacea-command-surface {
+  border-top: 1px solid rgba(255,255,255,.10);
+  padding-top: 22px;
+}
+
+.panacea-command-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.panacea-command-title {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 850;
+  letter-spacing: -.045em;
+}
+
+.panacea-command-search-wrap {
+  position: relative;
+  flex: 1 1 360px;
+  max-width: 520px;
+}
+
+.panacea-command-search {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255,255,255,.96);
+  padding: 0;
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panacea-command-search::placeholder {
+  color: rgba(255,255,255,.34);
+}
+
+.panacea-command-search:focus {
+  border-bottom-color: rgba(255,255,255,.72);
+}
+
+
+
+
+.panacea-command-index-toggle {
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.50);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.panacea-command-index-toggle:hover,
+.panacea-command-index-toggle:focus-visible {
+  color: rgba(255,255,255,.96);
+}
+
+.panacea-command-results {
+  margin-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+
+.panacea-command-result {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding-block: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  color: inherit;
+  text-decoration: none;
+}
+
+.panacea-command-result-main {
+  min-width: 0;
+}
+
+.panacea-command-result-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.panacea-command-result-meta {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,.34);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.panacea-command-result-arrow {
+  color: rgba(255,255,255,.34);
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.panacea-command-result:hover .panacea-command-result-arrow,
+.panacea-command-result:focus-visible .panacea-command-result-arrow {
+  transform: translateX(3px);
+  color: rgba(255,255,255,.92);
+}
+
+.panacea-assistive-orbit {
+  position: absolute;
+  width: 236px;
+  height: 236px;
+  pointer-events: none;
+}
+
+.panacea-assistive-orbit[data-side='left'] {
+  left: -10px;
+}
+
+.panacea-assistive-orbit[data-side='right'] {
+  right: -10px;
+}
+
+.panacea-assistive-orbit[data-vertical='up'] {
+  bottom: 0;
+}
+
+.panacea-assistive-orbit[data-vertical='down'] {
+  top: 0;
+}
+
+.panacea-assistive-action {
+  position: absolute;
+  width: 54px;
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(2,5,10,.74);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  color: rgba(255,255,255,.88);
+  pointer-events: auto;
+  transition: transform 170ms cubic-bezier(.22,1,.36,1), border-color 170ms ease, background-color 170ms ease;
+}
+
+.panacea-assistive-action:hover,
+.panacea-assistive-action:focus-visible {
+  transform: scale(1.06);
+  border-color: rgba(255,255,255,.34);
+  background: rgba(6,10,18,.92);
+}
+
+.panacea-assistive-action-label {
+  position: absolute;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 800;
+  color: rgba(255,255,255,.58);
+  transform: translateY(38px);
+  pointer-events: none;
+}
+
+.panacea-assistive-page-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.24);
+  pointer-events: auto;
+}
+
+.panacea-assistive-page-dot[aria-current='page'] {
+  background: rgba(255,255,255,.92);
+}
+
+@media (max-width: 760px) {
+  .panacea-human-home {
+    gap: 48px;
+  }
+
+  .panacea-instrument-strip {
+    margin-inline: -4px;
+  }
+
+  .panacea-instrument-rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .panacea-instrument-cell {
+    flex: 0 0 42vw;
+    min-width: 148px;
+  }
+
+  .panacea-instrument-primary {
+    flex-basis: 72vw;
+    min-width: 250px;
+  }
+
+  .panacea-instrument-checkin {
+    flex: 0 0 64px;
+    min-width: 64px;
+  }
+
+  .panacea-command-topline {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .panacea-command-search-wrap {
+    max-width: none;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-instrument-sync,
+  .panacea-instrument-cell::after,
+  .panacea-instrument-checkin,
+  .panacea-command-result-arrow,
+  .panacea-assistive-action {
+    transition: none !important;
+  }
+}
+
+/* ── Bento indeks kapabilitas ──────────────────────────────────────────────
+   Ubin dikelompokkan menurut `grup` milik katalog, dan LEBARNYA dibaca dari
+   jumlah isinya (lihat bentoSpan): kelompok dengan lima puluh kapabilitas
+   memang mengambil ruang lebih besar daripada yang bersembilan. Ukuran yang
+   dipilih menurut selera tidak memberi tahu apa pun; ukuran yang dihitung
+   memberi tahu di mana isi produk sebenarnya berada.
+
+   Tidak ada gradien dan tidak ada bayangan melayang di sini: bahasa rupa
+   permukaan ini sudah ditetapkan datar dan bergaris rambut, dan gerbang
+   home-anti-slop menjaganya tetap begitu. */
+.panacea-bento {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.panacea-bento-tile {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  background: rgba(255,255,255,.018);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.panacea-bento-tile[data-span='lead'],
+.panacea-bento-tile[data-open='true'] {
+  grid-column: 1 / -1;
+}
+
+.panacea-bento-tile:hover,
+.panacea-bento-tile:focus-within {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.04);
+}
+
+.panacea-bento-head {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.panacea-bento-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+/* Hitungan ditulis dengan angka tabular supaya deretan ubin tidak bergoyang
+   saat pencarian mengubah jumlahnya dari 9 menjadi 41. */
+.panacea-bento-count {
+  flex: 0 0 auto;
+  color: rgba(255,255,255,.40);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-bento-tile[data-open='true'] .panacea-bento-count {
+  color: rgba(255,255,255,.88);
+}
+
+.panacea-bento-items {
+  margin: 0;
+  padding: 0 16px 6px;
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* Isi kelompok yang panjang digulir di dalam ubinnya sendiri, bukan
+   memanjangkan halaman: 57 baris sekaligus mendorong segalanya keluar layar
+   dan membuat kelompok berikutnya mustahil dijangkau tanpa menggulir jauh. */
+.panacea-bento-items {
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 520px) {
+  .panacea-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-bento-tile {
+    transition: none;
+  }
+}
+
+/* Light mode adaptation: clean text and surfaces */
+html:not(.dark) .panacea-instrument-strip,
+html:not(.dark) .panacea-command-surface {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-command-surface {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+html:not(.dark) .panacea-command-search {
+  color: #0f172a;
+  border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+html:not(.dark) .panacea-command-search::placeholder {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-command-search:focus {
+  border-bottom-color: #00BF63;
+}
+
+html:not(.dark) .panacea-command-index-toggle {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-command-index-toggle:hover {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-command-results {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+html:not(.dark) .panacea-command-result {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+html:not(.dark) .panacea-command-result-meta {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-bento-tile {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+html:not(.dark) .panacea-bento-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  background: #f8fafc;
+}
+
+html:not(.dark) .panacea-bento-count {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-bento-tile[data-open='true'] .panacea-bento-count {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-bento-items {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+
+/* Source: src/styles/home-liquid-control-layer.css */
+/* Home control layer.
+   Liquid Glass belongs on navigation and contextual controls floating over
+   content. Health data, widgets, and capability content remain flat so the
+   material communicates hierarchy instead of becoming decoration. */
+
+.panacea-liquid-home .panacea-liquid-dock {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 999px !important;
+  background: rgba(17,21,19,.62) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.18),
+    0 12px 34px rgba(0,0,0,.30) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
+  backdrop-filter: blur(20px) saturate(135%) !important;
+  isolation: isolate;
+  contain: paint;
+}
+
+.panacea-liquid-home .panacea-liquid-dock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), transparent 42%),
+    radial-gradient(80% 120% at 50% 130%, rgba(37,209,98,.055), transparent 70%);
+}
+
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item {
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgba(255,255,255,.58) !important;
+  transition:
+    color 170ms ease,
+    background-color 170ms ease,
+    transform 150ms cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item svg {
+  transition: color 170ms ease, transform 170ms cubic-bezier(.2,.8,.2,1);
+}
+
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[data-active='true'],
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[aria-current='page'] {
+  color: rgba(255,255,255,.98) !important;
+  border-color: rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.085) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.10) !important;
+}
+
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[data-active='true'] svg,
+.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[aria-current='page'] svg {
+  color: #49df7f;
+  transform: translateY(-1px);
+}
+
+/* Contextual controls can use glass because real hero content moves beneath
+   them. This is deliberately not applied to metric cards or catalogue tiles. */
+html.dark .panacea-liquid-home .panacea-intent-action {
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(13,18,16,.50) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 8px 22px rgba(0,0,0,.18) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
+  backdrop-filter: blur(16px) saturate(130%) !important;
+}
+
+html.dark .panacea-liquid-home .panacea-intent-action:hover,
+html.dark .panacea-liquid-home .panacea-intent-action:focus-visible {
+  border-color: rgba(255,255,255,.24) !important;
+  background: rgba(255,255,255,.10) !important;
+}
+
+html:not(.dark) .panacea-liquid-home .panacea-intent-action {
+  border-color: rgba(0,0,0,.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.03) !important;
+}
+
+html:not(.dark) .panacea-liquid-home .panacea-intent-action:hover,
+html:not(.dark) .panacea-liquid-home .panacea-intent-action:focus-visible {
+  border-color: rgba(0,191,99,.35) !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 4px 14px rgba(0,191,99,.08) !important;
+}
+
+/* Personalized repetition gets a direct one-tap path without adding another
+   dashboard card. When the full index opens this rail disappears. */
+.panacea-command-recents {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin: 4px 0 2px;
+  padding: 2px 0 8px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.panacea-command-recents::-webkit-scrollbar { display: none; }
+
+.panacea-command-recent {
+  flex: 0 0 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: rgba(255,255,255,.76);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  transition: color 150ms ease, background-color 150ms ease, transform 120ms ease;
+}
+
+.panacea-command-recent:hover,
+.panacea-command-recent:focus-visible {
+  color: rgba(255,255,255,.98);
+  background: rgba(255,255,255,.055);
+}
+
+.panacea-command-recent:active {
+  transform: scale(.97);
+}
+
+/* Home owns one primary navigation surface. The global draggable navigation
+   remains available everywhere else, but showing both here would force the
+   user to choose between two systems for the same job. */
+body:has(.panacea-liquid-home) button[aria-label="Buka menu navigasi"],
+body:has(.panacea-liquid-home) button[aria-label="Tutup menu"],
+body:has(.panacea-liquid-home) [role="menu"][aria-label="Tindakan cepat"] {
+  display: none !important;
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .panacea-liquid-home .panacea-liquid-dock,
+  .panacea-liquid-home .panacea-intent-action {
+    background: rgba(20,24,22,.96) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panacea-liquid-home .panacea-liquid-dock,
+  .panacea-liquid-home .panacea-intent-action {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: rgba(20,24,22,.96) !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item:hover,
+  .panacea-liquid-home .panacea-intent-action:hover,
+  .panacea-command-recent:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item,
+  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item svg,
+  .panacea-liquid-home .panacea-intent-action,
+  .panacea-command-recent {
+    transition: none !important;
+  }
+}
+
+
+/* Source: src/styles/home-compact-responsive.css */
+/* Home compact responsive layer
+   Scoped to the current Home workspace. Keeps capability intact while making
+   the first viewport denser, calmer and genuinely fluid from narrow phones to
+   wide desktop. */
+
+main.pmd-page-stage,
+main.pmd-page-stage[data-spatial],
+main.pmd-page-stage[data-spatial='false'],
+main.mx-auto,
+.page-enter,
+html.pmd-reference-ui-v47 .panacea-liquid-home,
+.panacea-liquid-home,
+.panacea-human-home {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+main.pmd-page-stage,
+.panacea-liquid-home {
+  padding-inline: clamp(12px, 1.6vw, 32px) !important;
+}
+
+.panacea-liquid-home > *,
+.panacea-human-home,
+.panacea-human-home > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.panacea-human-home {
+  gap: clamp(22px, 3.8vw, 42px) !important;
+}
+
+/* ── Daily health instrument: one focal ring + compact secondary grid ─── */
+
+.panacea-instrument-strip {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: clamp(24px, 4vw, 32px);
+  padding: clamp(12px, 2.4vw, 18px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
+    rgba(8, 12, 10, .58);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 18px 48px rgba(0,0,0,.18);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.panacea-instrument-head {
+  margin-bottom: 12px !important;
+  padding-inline: 1px !important;
+}
+
+.panacea-instrument-date {
+  font-size: 9.5px !important;
+  letter-spacing: .13em !important;
+}
+
+.panacea-instrument-status {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.58);
+  transition: transform 150ms ease, color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.panacea-instrument-status[data-online='true'] {
+  color: #54df82;
+}
+
+.panacea-instrument-status:hover,
+.panacea-instrument-status:focus-visible {
+  color: rgba(255,255,255,.95);
+  border-color: rgba(255,255,255,.20);
+  background: rgba(255,255,255,.065);
+  transform: translateY(-1px);
+}
+
+.panacea-instrument-rail {
+  display: grid !important;
+  grid-template-columns: minmax(156px, .72fr) minmax(0, 1.6fr) !important;
+  align-items: stretch;
+  gap: clamp(10px, 1.8vw, 16px);
+  overflow: visible !important;
+}
+
+.panacea-signal-ring {
+  position: relative;
+  min-height: clamp(152px, 18vw, 188px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: clamp(22px, 3vw, 28px);
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255,255,255,.055), transparent 56%),
+    rgba(255,255,255,.018);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 180ms cubic-bezier(.22,1,.36,1), border-color 180ms ease, background-color 180ms ease;
+}
+
+.panacea-signal-ring:hover,
+.panacea-signal-ring:focus-visible {
+  border-color: rgba(84,223,130,.26);
+  background-color: rgba(255,255,255,.028);
+  transform: translateY(-2px);
+}
+
+.panacea-signal-ring:active {
+  transform: scale(.985);
+}
+
+.panacea-signal-ring svg {
+  width: min(132px, 78%);
+  aspect-ratio: 1;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.panacea-signal-ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,.075);
+  stroke-width: 8;
+}
+
+.panacea-signal-segment {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  opacity: .22;
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.panacea-signal-segment[data-available='true'] {
+  opacity: .96;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.panacea-signal-segment[data-signal='steps'] { color: #55df82; stroke: currentColor; }
+.panacea-signal-segment[data-signal='sleep'] { color: #8aa7ff; stroke: currentColor; }
+.panacea-signal-segment[data-signal='heart'] { color: #ff7a8c; stroke: currentColor; }
+.panacea-signal-segment[data-signal='vo2'] { color: #62d4ef; stroke: currentColor; }
+
+.panacea-signal-ring-copy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 34px;
+  text-align: center;
+}
+
+.panacea-signal-ring-kicker {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,.40);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+}
+
+.panacea-signal-ring-value {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(25px, 4.8vw, 39px);
+  font-weight: 900;
+  letter-spacing: -.055em;
+  line-height: .96;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-signal-ring-meta {
+  color: rgba(255,255,255,.6);
+  font-size: 8.5px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.panacea-instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.panacea-instrument-mini,
+.panacea-instrument-checkin {
+  min-width: 0;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 18px;
+  background: rgba(255,255,255,.018);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 140ms ease;
+}
+
+.panacea-instrument-mini:hover,
+.panacea-instrument-mini:focus-visible,
+.panacea-instrument-checkin:hover,
+.panacea-instrument-checkin:focus-visible {
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.04);
+  transform: translateY(-1px);
+}
+
+.panacea-instrument-mini-main {
+  min-width: 0;
+}
+
+.panacea-instrument-mini-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: rgba(255,255,255,.40);
+  font-size: 8.5px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.panacea-instrument-mini-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  margin-top: 4px;
+  color: rgba(255,255,255,.94);
+  font-size: clamp(18px, 3vw, 27px);
+  font-weight: 900;
+  letter-spacing: -.045em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-instrument-mini-value > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panacea-instrument-unit {
+  font-size: 8.5px !important;
+  color: rgba(255,255,255,.33) !important;
+}
+
+.panacea-instrument-checkin {
+  justify-content: center;
+  color: rgba(255,255,255,.62);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.panacea-instrument-checkin span {
+  white-space: nowrap;
+}
+
+/* ── Super pages: one compact glass object, three high-utility entries ─── */
+
+.pmd-superpage-launcher {
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(10px, 2vw, 16px);
+  border: 1px solid rgba(255,255,255,.095);
+  border-radius: clamp(24px, 4vw, 32px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.042), rgba(255,255,255,.012)),
+    rgba(8,12,10,.54);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 18px 48px rgba(0,0,0,.17);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.pmd-superpage-launcher .pmd-section-heading {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 2px 3px 11px;
+}
+
+.pmd-superpage-launcher .pmd-section-kicker {
+  flex: 0 0 auto;
+  color: rgba(255,255,255,.35);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.pmd-superpage-launcher .pmd-section-heading > strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.92);
+  font-size: clamp(14px, 2vw, 18px);
+  font-weight: 900;
+  letter-spacing: -.025em;
+  white-space: nowrap;
+}
+
+.pmd-superpage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .pmd-superpage-grid > div:last-child {
+    grid-column: 1 / -1;
+  }
+  .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+    border-color: rgba(0, 191, 99, 0.25) !important;
+    background: linear-gradient(90deg, rgba(0, 191, 99, 0.05), transparent 70%), rgba(255, 255, 255, 0.02) !important;
+  }
+}
+
+.pmd-superpage-grid > div {
+  min-width: 0;
+}
+
+.pmd-superpage-tile {
+  min-height: 86px;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: none !important;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pmd-liquid-metal-icon {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 14px !important;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255,255,255,.16), transparent 34%),
+    rgba(255,255,255,.035) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09) !important;
+}
+
+.pmd-liquid-metal-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pmd-superpage-copy {
+  min-width: 0;
+}
+
+.pmd-superpage-copy strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.95);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -.025em;
+  white-space: nowrap;
+}
+
+.pmd-superpage-copy small {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.38);
+  font-size: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.pmd-superpage-arrow {
+  color: rgba(255,255,255,.32);
+  font-size: 13px;
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.pmd-superpage-tile:hover,
+.pmd-superpage-tile:focus-visible {
+  border-color: rgba(84,223,130,.22) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+
+.pmd-superpage-tile:hover .pmd-superpage-arrow,
+.pmd-superpage-tile:focus-visible .pmd-superpage-arrow {
+  color: rgba(255,255,255,.82);
+  transform: translate(2px, -2px);
+}
+
+/* Keep downstream Home content from making the whole page feel zoomed. */
+.panacea-human-home :where(img, video, canvas, svg) {
+  max-width: 100%;
+}
+
+.panacea-human-home :where(section, article, nav, div) {
+  min-width: 0;
+}
+
+/* ── Tablet / phone ───────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .panacea-liquid-home {
+    padding-inline: clamp(8px, 2.8vw, 14px);
+  }
+
+  .panacea-human-home {
+    gap: 22px !important;
+  }
+
+  .panacea-instrument-strip {
+    margin-inline: 0 !important;
+  }
+
+  .panacea-instrument-rail {
+    grid-template-columns: minmax(126px, .76fr) minmax(0, 1.34fr) !important;
+    gap: 8px;
+  }
+
+  .panacea-signal-ring {
+    min-height: 144px;
+  }
+
+  .panacea-signal-ring svg {
+    width: min(116px, 82%);
+  }
+
+  .panacea-signal-ring-copy {
+    padding: 28px;
+  }
+
+  .panacea-instrument-grid {
+    gap: 6px;
+  }
+
+  .panacea-instrument-mini,
+  .panacea-instrument-checkin {
+    min-height: 67px;
+    padding: 8px 9px;
+    border-radius: 16px;
+  }
+
+  .panacea-instrument-mini-label {
+    font-size: 7.5px;
+    letter-spacing: .06em;
+  }
+
+  .panacea-instrument-mini-label svg {
+    display: none;
+  }
+
+  .panacea-instrument-mini-value {
+    font-size: clamp(16px, 5vw, 23px);
+  }
+
+  .pmd-superpage-launcher {
+    padding: 9px;
+    border-radius: 24px;
+  }
+
+  .pmd-superpage-launcher .pmd-section-heading {
+    padding: 3px 4px 8px;
+  }
+
+  .pmd-superpage-launcher .pmd-section-heading > strong {
+    font-size: 14px;
+  }
+
+  .pmd-superpage-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .pmd-superpage-grid > div + div .pmd-superpage-tile {
+    border-top-color: rgba(255,255,255,.06) !important;
+  }
+
+  .pmd-superpage-tile {
+    min-height: 64px;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 9px;
+    padding: 9px 7px;
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+  }
+
+  .pmd-liquid-metal-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px;
+    border-radius: 13px !important;
+  }
+
+  .pmd-superpage-copy strong {
+    font-size: 13.5px;
+  }
+
+  .pmd-superpage-copy small {
+    font-size: 8.5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .panacea-instrument-rail {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .panacea-signal-ring {
+    min-height: 132px;
+  }
+
+  .panacea-instrument-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .pmd-superpage-launcher .pmd-section-heading {
+    display: block;
+  }
+
+  .pmd-superpage-launcher .pmd-section-heading > strong {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+/* Touch hardware: keep glass hierarchy but trim expensive blur work. */
+@media (hover: none) and (pointer: coarse) {
+  .panacea-instrument-strip,
+  .pmd-superpage-launcher {
+    -webkit-backdrop-filter: blur(10px) saturate(112%);
+    backdrop-filter: blur(10px) saturate(112%);
+  }
+
+  .panacea-signal-ring:hover,
+  .panacea-instrument-mini:hover,
+  .panacea-instrument-checkin:hover,
+  .pmd-superpage-tile:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panacea-instrument-strip,
+  .pmd-superpage-launcher {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(18,22,20,.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-instrument-status,
+  .panacea-signal-ring,
+  .panacea-signal-segment,
+  .panacea-instrument-mini,
+  .panacea-instrument-checkin,
+  .pmd-superpage-arrow {
+    transition: none !important;
+  }
+}
+
+/* Light mode adaptation: clean white surfaces and readable contrast */
+html:not(.dark) .panacea-instrument-strip {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .panacea-instrument-head .panacea-instrument-date {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-status {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html:not(.dark) .panacea-signal-ring {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+html:not(.dark) .panacea-signal-ring-track {
+  stroke: rgba(0, 0, 0, 0.07);
+}
+
+html:not(.dark) .panacea-signal-ring-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-signal-ring-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-signal-ring-meta {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-mini,
+html:not(.dark) .panacea-instrument-checkin {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini-label {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-mini-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-unit {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-instrument-checkin {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini:hover,
+html:not(.dark) .panacea-instrument-checkin:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  background: #f0fdf4;
+}
+
+html:not(.dark) .pmd-superpage-launcher {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-heading > strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-tile {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+html:not(.dark) .pmd-superpage-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 6px 16px rgba(0, 191, 99, 0.08) !important;
+}
+
+html:not(.dark) .pmd-liquid-metal-icon {
+  background: rgba(0, 191, 99, 0.08);
+  color: #00BF63;
+}
+
+html:not(.dark) .pmd-superpage-copy strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-copy small {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-arrow {
+  color: #94a3b8;
+}
+
+html:not(.dark) .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+  border-color: rgba(0, 191, 99, 0.3) !important;
+  background: linear-gradient(90deg, rgba(0, 191, 99, 0.08), #ffffff 70%) !important;
+}
+
+/* Lantai ukuran teks Home di ponsel: 11px. Terukur di 390x844 sebelum perubahan ini: 155 teks berukuran 8-9,5px dan 219 dari
+   280 teks terlihat di bawah 11px. Hanya ukuran huruf yang naik; tata letak, warna, dan bentuk tidak diubah. !important karena
+   beberapa kelas di atas memakai !important dan utilitas Tailwind berukuran arbitrer (text-[Npx]) harus kalah oleh lantai ini. */
+@media (max-width: 760px) {
+  .panacea-liquid-home .text-\[8px\],
+  .panacea-liquid-home .text-\[8\.5px\],
+  .panacea-liquid-home .text-\[9px\],
+  .panacea-liquid-home .text-\[9\.5px\],
+  .panacea-liquid-home .text-\[10px\],
+  .panacea-liquid-home .text-\[10\.5px\],
+  .panacea-liquid-home small.pmd-one-line,
+  .panacea-liquid-home .pmd-recovery-cue,
+  .panacea-liquid-home .pmd-section-kicker,
+  .panacea-liquid-home .panacea-instrument-date,
+  .panacea-liquid-home .panacea-instrument-unit,
+  .panacea-liquid-home .panacea-signal-ring-kicker,
+  .panacea-liquid-home .widget-instrument-kicker-v5,
+  .panacea-liquid-home .widget-instrument-count-v5,
+  .panacea-liquid-home .pmd-recovery-label,
+  .panacea-liquid-home .pmd-vf-copy:not(.t-kecil),
+  .panacea-liquid-home .panacea-instrument-checkin,
+  .panacea-liquid-home .home-fun-mini__head > div > span,
+  .panacea-liquid-home .home-fun-mini__head > button,
+  .panacea-liquid-home .panacea-instrument-mini-label,
+  .panacea-liquid-home .pmd-superpage-copy small {
+    font-size: 11px !important;
+  }
+  /* t-kecil juga fluid (clamp 11-14px di index.css); kurva yang sama menaikkan tombol yang ditekan di bawah 11px oleh aturan lain. */
+  .panacea-liquid-home .t-kecil {
+    font-size: clamp(11px, 9.35px + 0.517cqw, 14px) !important;
+  }
+  /* t-mikro bersifat fluid (clamp 10-12px di index.css): kurva yang sama dengan lantai 11px supaya nilai yang sudah lebih besar tidak pernah mengecil. */
+  .panacea-liquid-home .t-mikro {
+    font-size: clamp(11px, 8.9px + 0.345cqw, 12px) !important;
+  }
+  /* Pengecualian terukur: pada 11px "0/4 signals" menyentuh busur cincin; 10px masih muat di dalam cincin. */
+  .panacea-liquid-home .panacea-signal-ring-meta {
+    font-size: 10px !important;
+  }
+}
+
+/* Layar sangat sempit: sub-label satu baris di kartu "Seven categories" terpotong elipsis pada 11px di 360px, jadi diberi 10px
+   (tetap naik dari 8,5px). */
+@media (max-width: 380px) {
+  .panacea-liquid-home small.pmd-one-line {
+    font-size: 10px !important;
+  }
+}
+

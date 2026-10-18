@@ -76,7 +76,11 @@ assert.deepEqual(
   `lapisan berversi baru dilarang; ubah yang sudah ada atau token desain:\n  ${baru.join('\n  ')}`,
 )
 
-const css = berkas.filter((p) => p.endsWith('.css'))
+// Generated deployment copies are byte-for-byte guarded by their own parity
+// tests. Count only authored sources here so one declaration is not counted
+// twice merely because the build publishes it at a stable URL.
+const CSS_TURUNAN = new Set(['public/home-styles.css'])
+const css = berkas.filter((p) => p.endsWith('.css') && !CSS_TURUNAN.has(p))
 const BATAS_IMPORTANT = 2157
 
 const jumlah = css.reduce(
