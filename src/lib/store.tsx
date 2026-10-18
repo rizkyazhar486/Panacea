@@ -5,7 +5,7 @@ import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
-import { buildPersistedSnapshot } from './storePersistScope'
+import { buildPersistedSnapshot } from './state/storePersistScope'
 import type {
   AppState,
   Patient,
@@ -450,7 +450,7 @@ interface Store {
 
 const Ctx = createContext<Store | null>(null)
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+export function StoreProvider({ children, visibilityDocument }: { children: ReactNode; visibilityDocument?: Pick<Document, 'visibilityState' | 'addEventListener' | 'removeEventListener'> }) {
   const [state, setState] = useState<AppState>(load)
 
   useLayoutEffect(() => {
@@ -585,7 +585,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       timer = undefined
     }
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') {
+      if (visibilityDocument?.visibilityState === 'visible') {
         pull()
         start()
       } else {
@@ -593,14 +593,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     }
     pull()
-    if (document.visibilityState === 'visible') start()
-    document.addEventListener('visibilitychange', onVisibility)
+    if (!visibilityDocument || visibilityDocument.visibilityState === 'visible') start()
+    visibilityDocument?.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
       stop()
-      document.removeEventListener('visibilitychange', onVisibility)
+      visibilityDocument?.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [state.account?.email])
+  }, [state.account?.email, visibilityDocument])
 
   const store = useMemo<Store>(() => {
     const activePatient =
