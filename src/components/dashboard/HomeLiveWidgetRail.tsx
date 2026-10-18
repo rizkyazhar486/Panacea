@@ -103,7 +103,7 @@ export function HomeLiveWidgetRail() {
             <Link
               key={signal.key}
               to={signal.to}
-              className="group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-black/5 bg-white p-3 text-slate-900 shadow-sm transition active:scale-[.97] dark:border-[#00BF63]/35 dark:bg-black dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,.06)]"
+              className="panacea-live-signal-card group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] p-3 transition active:scale-[.97]"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="text-[9px] font-black uppercase tracking-[.13em] text-emerald-600 dark:text-[#00BF63]">{signal.label}</span>
