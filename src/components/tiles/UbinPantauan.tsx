@@ -44,9 +44,10 @@ export function UbinPantauan() {
         <BatasKlaimKesehatan permukaan="wellness.monitor-tile" />
         <button
           onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
-          className="t-kecil flex min-h-[64px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
+          className="group flex min-h-[50px] w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-2.5 text-xs font-semibold text-slate-500 transition-all hover:border-emerald-300 hover:bg-emerald-50/30 hover:text-emerald-700 active:scale-[0.99] dark:border-white/10 dark:bg-white/[0.02] dark:text-slate-400 dark:hover:border-emerald-500/30 dark:hover:text-emerald-400"
         >
-          Nothing yet. Search for a disease, drug, or score, then tap ★ to watch it here.
+          <span className="text-sm">🔍</span>
+          <span>Search disease, drug, or score, then tap ★ to pin here</span>
         </button>
       </section>
     )
