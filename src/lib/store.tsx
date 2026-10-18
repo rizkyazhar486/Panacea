@@ -5,6 +5,7 @@ import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
+import { buildPersistedSnapshot } from './storePersistScope'
 import type {
   AppState,
   Patient,
@@ -477,20 +478,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
+  // Heavy media (uploaded photo/video data URLs) is stripped up front rather than
+  // only on quota-exceeded retry: it's server-backed when a backend is configured
+  // (re-pulled by the posts poll below) and was never safe to treat as the local
+  // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
   useEffect(() => {
-    const { account: _account, ...persist } = state
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
-    } catch {
-      // Storage quota exceeded (e.g. many uploaded photos) — drop heavy media
-      // from the persisted copy so the app keeps working.
+    const t = setTimeout(() => {
+      const { account: _account, ...rest } = state
+      const persist = buildPersistedSnapshot(rest)
       try {
-        const slim = { ...persist, posts: persist.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
       } catch {
-        /* give up persisting this update */
+        /* quota exceeded even without media — give up persisting this update */
       }
-    }
+    }, 400)
+    return () => clearTimeout(t)
   }, [state])
 
   // Auto-login DISABLED by request: the app always starts at the landing/login,
@@ -555,9 +557,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // #9: multi-user social feed — pull posts from the server on login and poll so
   // posts/likes from other users appear near-realtime. Local-only (offline) posts
   // are preserved via mergePosts. No-op when no backend is configured.
+  // Every pull calls setState on the whole AppState, which this provider hands
+  // to every useStore() consumer app-wide — so this timer keeps re-rendering the
+  // entire app every 15s even on a backgrounded tab. Paused while hidden and
+  // resumed immediately on return, matching the existing visibilitychange
+  // convention already used elsewhere in the app (see useJam.ts, SmartNotificationOrchestrator.tsx).
   useEffect(() => {
     if (!backendEnabled || !state.account?.email) return
     let alive = true
+    let timer: ReturnType<typeof setInterval> | undefined
     const pull = () =>
       api
         .posts()
@@ -567,11 +575,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setState((st) => ({ ...st, posts: mergePosts(mapped, st.posts) }))
         })
         .catch(() => {})
+    const start = () => {
+      if (timer !== undefined) return
+      timer = setInterval(pull, 15_000)
+    }
+    const stop = () => {
+      if (timer === undefined) return
+      clearInterval(timer)
+      timer = undefined
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        pull()
+        start()
+      } else {
+        stop()
+      }
+    }
     pull()
-    const t = setInterval(pull, 15_000)
+    if (document.visibilityState === 'visible') start()
+    document.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
-      clearInterval(t)
+      stop()
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [state.account?.email])
 
