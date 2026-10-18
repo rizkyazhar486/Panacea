@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { NABI, NAMA_25, BATAS, type Nabi } from '../lib/kisahNabi'
-import { AyatTerambil } from '../components/AyatTerambil'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { NABI, NAMA_25, BATAS, type Nabi } from '../../lib/kisahNabi'
+import { AyatTerambil } from '../../components/AyatTerambil'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kisah para nabi.

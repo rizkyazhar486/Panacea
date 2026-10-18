@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
-import { IconActivity } from '../components/icons'
-import { useJam } from '../lib/useJam'
+import { Card, SectionTitle, Button, Field, inputClass } from '../../components/ui'
+import { IconActivity } from '../../components/icons'
+import { useJam } from '../../lib/useJam'
 import {
   bacaSelaman, simpanSelaman, hapusSelaman, lamaMenit, jedaPermukaan,
   waktuTerbang, ringkasSelam, peringatan, type Selaman,
-} from '../lib/menyelam'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+} from '../../lib/menyelam'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan menyelam.

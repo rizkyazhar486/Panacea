@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
-import { IconShield } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, inputClass, Badge } from '../../components/ui'
+import { IconShield } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // First Aid Quick Guide — plain-language emergency steps for bystanders, not

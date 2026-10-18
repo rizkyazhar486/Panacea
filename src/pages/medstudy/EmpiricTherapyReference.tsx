@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconPill } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Badge } from '../../components/ui'
+import { IconPill } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empiric Therapy Reference — a searchable, curated quick-reference of

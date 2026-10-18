@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Card, SectionTitle } from '../components/ui'
-import { IconChartUp } from '../components/icons'
-import { ambilRiwayat } from '../lib/riwayatVitals'
-import { getVitals } from '../lib/healthVitals'
-import { KartuKlinisTubuh } from '../components/KartuKlinisTubuh'
-import { KartuTidurPemulihan } from '../components/KartuTidurPemulihan'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconChartUp } from '../../components/icons'
+import { ambilRiwayat } from '../../lib/riwayatVitals'
+import { getVitals } from '../../lib/healthVitals'
+import { KartuKlinisTubuh } from '../../components/KartuKlinisTubuh'
+import { KartuTidurPemulihan } from '../../components/KartuTidurPemulihan'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ikhtisar — seluruh angka tubuh pada satu layar, dengan jangka yang dipilih.

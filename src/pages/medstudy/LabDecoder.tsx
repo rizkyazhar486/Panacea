@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconActivity, IconChartUp } from '../components/icons'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconActivity, IconChartUp } from '../../components/icons'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Result Decoder ("Jargon Buster" / "Blood Test Decoder") — paste common

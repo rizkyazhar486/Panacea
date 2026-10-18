@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle } from '../components/ui'
-import { IconChartUp } from '../components/icons'
-import { PanaceaOsFocusRail } from '../components/PanaceaOsFocusRail'
-import { useStore } from '../lib/store'
-import { ambilRiwayat } from '../lib/riwayatVitals'
-import { getWorkouts } from '../lib/workoutStore'
-import { fmtDurasi, fmtWorkoutDurasi, fmtPace } from '../lib/workoutImport'
-import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { Card, SectionTitle } from '../../components/ui'
+import { IconChartUp } from '../../components/icons'
+import { PanaceaOsFocusRail } from '../../components/PanaceaOsFocusRail'
+import { useStore } from '../../lib/store'
+import { ambilRiwayat } from '../../lib/riwayatVitals'
+import { getWorkouts } from '../../lib/workoutStore'
+import { fmtDurasi, fmtWorkoutDurasi, fmtPace } from '../../lib/workoutImport'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Harian — satu hari mana pun, ditelusuri maju-mundur.

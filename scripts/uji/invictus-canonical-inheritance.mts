@@ -15,7 +15,7 @@ function requireText(path: string, needles: readonly string[]) {
   }
 }
 
-const authority = 'PANACEA_INVICTUS_PRINCIPLE.md'
+const authority = 'governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md'
 
 for (const path of [
   'governance/doctrine/PANACEA_CONSTITUTION.md',
