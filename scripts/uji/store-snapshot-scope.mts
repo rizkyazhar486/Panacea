@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { createListenerSet } from '../../src/lib/storeSnapshotScope.ts'
+import { createListenerSet } from '../../src/lib/state/storeSnapshotScope.ts'
 
 // Positif: listener terdaftar dipanggil tiap notify().
 const set = createListenerSet()

@@ -5,8 +5,8 @@ import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
-import { buildPersistedSnapshot } from './storePersistScope'
-import { createListenerSet } from './storeSnapshotScope'
+import { buildPersistedSnapshot } from './state/storePersistScope'
+import { createListenerSet } from './state/storeSnapshotScope'
 import type {
   AppState,
   Patient,
@@ -475,7 +475,7 @@ export function useStoreSelector<T>(selector: (state: AppState) => T): T {
   return useSyncExternalStore(snap.subscribe, () => selector(snap.getSnapshot()))
 }
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+export function StoreProvider({ children, visibilityDocument }: { children: ReactNode; visibilityDocument?: Pick<Document, 'visibilityState' | 'addEventListener' | 'removeEventListener'> }) {
   const [state, setState] = useState<AppState>(load)
   const stateRef = useRef(state)
   const listenerSetRef = useRef(createListenerSet())
@@ -626,7 +626,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       timer = undefined
     }
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') {
+      if (visibilityDocument?.visibilityState === 'visible') {
         pull()
         start()
       } else {
@@ -634,14 +634,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     }
     pull()
-    if (document.visibilityState === 'visible') start()
-    document.addEventListener('visibilitychange', onVisibility)
+    if (!visibilityDocument || visibilityDocument.visibilityState === 'visible') start()
+    visibilityDocument?.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
       stop()
-      document.removeEventListener('visibilitychange', onVisibility)
+      visibilityDocument?.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [state.account?.email])
+  }, [state.account?.email, visibilityDocument])
 
   const store = useMemo<Store>(() => {
     const activePatient =

@@ -50,7 +50,7 @@ for (const jk of ['L', 'P'] as const) {
 // Sebuah penanda di tengah skala "−4 MET … age midpoint … +4 MET" MENYATAKAN
 // sebuah pembandingan. Menggambarnya dengan nilai null adalah berbohong lewat
 // tata letak, bukan lewat kalimat.
-const papan = readFileSync(new URL('../../src/pages/PapanAtlet.tsx', import.meta.url), 'utf8')
+const papan = readFileSync(new URL('../../src/pages/fitness/PapanAtlet.tsx', import.meta.url), 'utf8')
 assert.ok(/kardio\.bandingSeusia\s*&&\s*kardio\.selisihMet\s*!==\s*null/.test(papan),
   'the MET midpoint bar is not gated on an actual age comparison')
 assert.ok(/age and sex are not stored/.test(papan),

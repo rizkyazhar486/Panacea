@@ -2,20 +2,8 @@ import { useState } from 'react'
 import { Card, SectionTitle, Button } from '../ui'
 import { IconDownload, IconCheck } from '../icons'
 
-// One button, one progress bar, one clear list — no sync queues, no conflict
-// resolution, nothing to configure. Tapping "Siapkan" just pre-downloads the
-// JS for the fully local (localStorage-only) Kebugaran pages so they open
-// instantly with zero network the next time, even in airplane mode.
-const OFFLINE_PAGES: { label: string; imp: () => Promise<unknown> }[] = [
-  { label: 'Athlete', imp: () => import('../../pages/Athlete') },
-  { label: 'Performance Lab', imp: () => import('../../pages/fitness/PerformanceLab') },
-  { label: 'AI Program', imp: () => import('../../pages/fitness/TrainingPlan') },
-  { label: 'Body Composition', imp: () => import('../../pages/bodyhub/BodyComposition') },
-  { label: 'Initial Assessment', imp: () => import('../../pages/clinical/InitialAssessment') },
-  { label: 'Science & KPIs', imp: () => import('../../pages/fitness/SportsScience') },
-  { label: 'Fitness Test', imp: () => import('../../pages/fitness/FitnessTest') },
-  { label: 'Logs & Stats', imp: () => import('../../pages/medstudy/Logs') },
-]
+// Pure reusable UI: only page layer owns Vite lazy page imports.
+export type OfflinePage = { label: string; imp: () => Promise<unknown> }
 const KEY = 'pmd_offline_ready_v1'
 
 function fmtWhen(iso: string) {
@@ -23,15 +11,15 @@ function fmtWhen(iso: string) {
   return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
 
-export function OfflineReady() {
+export function OfflineReady({ pages }: { pages: readonly OfflinePage[] }) {
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(0)
   const [readyAt, setReadyAt] = useState<string | null>(() => { try { return localStorage.getItem(KEY) } catch { return null } })
 
   async function prepare() {
     setBusy(true); setDone(0)
-    for (let i = 0; i < OFFLINE_PAGES.length; i++) {
-      try { await OFFLINE_PAGES[i].imp() } catch { /* halaman ini dicoba lagi lain kali */ }
+    for (let i = 0; i < pages.length; i++) {
+      try { await pages[i].imp() } catch { /* halaman ini dicoba lagi lain kali */ }
       setDone(i + 1)
     }
     const now = new Date().toISOString()
@@ -47,9 +35,9 @@ export function OfflineReady() {
       {busy ? (
         <div className="mt-1">
           <div className="h-2.5 w-full overflow-hidden rounded-full bg-neutral-100">
-            <div className="h-full rounded-full bg-brand transition-all duration-300" style={{ width: `${(done / OFFLINE_PAGES.length) * 100}%` }} />
+            <div className="h-full rounded-full bg-brand transition-all duration-300" style={{ width: `${(done / pages.length) * 100}%` }} />
           </div>
-          <p className="mt-2 text-xs text-neutral-500">Preparing… {done}/{OFFLINE_PAGES.length}</p>
+          <p className="mt-2 text-xs text-neutral-500">Preparing… {done}/{pages.length}</p>
         </div>
       ) : (
         <>

@@ -24,7 +24,7 @@ assert.equal('data' in (waistToHeight(80, 0) as object), false)
 assert.equal(80 / (Number('') || 0), Infinity)
 assert.equal(waistToHeight(80, parseNumberField('')).ok, false)
 // Halaman memakai engine dan tidak lagi membaca kolom kosong sebagai 0.
-const halaman = readFileSync(new URL('../../src/pages/SelfAssessmentToolkit.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/mental/SelfAssessmentToolkit.tsx', import.meta.url), 'utf8')
 assert.match(halaman, /waistToHeight\(parseNumberField\(waist\), parseNumberField\(height\)\)/)
 assert.doesNotMatch(halaman, /Number\(e\.target\.value\) \|\| 0/)
 // Regresi: kolom dulu terisi 80 cm / 170 cm (getDemo) sehingga rasio 0.47 "tampil" untuk orang yang tidak ada.

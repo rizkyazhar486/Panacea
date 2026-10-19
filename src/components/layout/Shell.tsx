@@ -568,7 +568,6 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="pmd-spectral-shell relative flex min-h-screen w-full">
-      {onHome && <DailyQuoteBanner />}
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
         <LogoMark size={28} />
@@ -933,6 +932,8 @@ export function Shell({ children }: { children: ReactNode }) {
             </span>
           </div>
         )}
+
+        {onHome && <DailyQuoteBanner />}
 
         {/* Isi halaman mengikuti jari saat digeser, lalu memantul pulih. Kelas
             transisi hanya dipasang SETELAH jari diangkat — bila dipasang selagi
