@@ -101,14 +101,14 @@ export function FiveStageVisualAtlas({
       data-five-stage-visual-atlas="v1"
       data-active-atlas-stage={activeStageId}
       aria-label="5-stage multiscale visual physiology atlas"
-      className="border-t border-white/[.08] bg-[#03070c] p-3 sm:p-4"
+      className="dark border-t border-white/[.08] bg-[#03070c] p-3 sm:p-4"
     >
       <button
         type="button"
         aria-expanded={atlasExpanded}
         data-five-stage-atlas-drawer="v1"
         onClick={() => setAtlasExpanded((prev) => !prev)}
-        className="flex min-h-[44px] w-full cursor-pointer items-center justify-between gap-2 rounded-2xl border border-cyan-300/30 bg-[#07131e] px-3.5 py-2.5 text-sm font-black text-white"
+        className="dark flex min-h-[44px] w-full cursor-pointer items-center justify-between gap-2 rounded-2xl border border-cyan-300/30 bg-[#07131e] px-3.5 py-2.5 text-sm font-black text-white"
       >
         <span>5-Stage Atlas</span>
         <span className="font-mono text-sm font-bold text-cyan-200">
