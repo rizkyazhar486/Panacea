@@ -8,7 +8,9 @@ on:
       - 'scripts/qa/user-journey-e2e.mjs'
       - 'scripts/qa/user-journey-staff.mjs'
       - 'scripts/qa/user-journey-resilience.mjs'
-      - 'src/pages/LabResultReview.tsx'
+      - 'scripts/qa/f1-critical-action-contract.test.mjs'
+      - 'src/pages/clinical/LabResultReview.tsx'
+      - 'src/pages/bodyhub/Harian.tsx'
       - 'src/components/clinical/**'
       - 'src/domains/lab-results/**'
       - 'src/main.tsx'
@@ -28,7 +30,9 @@ on:
       - 'scripts/qa/user-journey-e2e.mjs'
       - 'scripts/qa/user-journey-staff.mjs'
       - 'scripts/qa/user-journey-resilience.mjs'
-      - 'src/pages/LabResultReview.tsx'
+      - 'scripts/qa/f1-critical-action-contract.test.mjs'
+      - 'src/pages/clinical/LabResultReview.tsx'
+      - 'src/pages/bodyhub/Harian.tsx'
       - 'src/components/clinical/**'
       - 'src/domains/lab-results/**'
       - 'src/main.tsx'
@@ -57,6 +61,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: server
+      - name: F1 critical action and workflow path contracts
+        run: node --test scripts/qa/f1-critical-action-contract.test.mjs scripts/qa/user-journey-resilience.test.mjs scripts/qa/user-journey-preview.test.mjs
       - name: Install browser
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
