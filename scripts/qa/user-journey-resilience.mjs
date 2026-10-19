@@ -83,7 +83,7 @@ try {
       // Halaman dinilai 'terisi' bila cukup teks ATAU, untuk halaman yang memang ringkas, penanda khasnya terlihat (bukan sekadar bukan-kosong).
       const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i, '#/settings': /Reset Local Data/ }
       const sehat = (rute, t) => (!PENANDA[rute] || PENANDA[rute].test(t)) && (rute === '#/chatbot' || t.trim().length > peran.minChar)
-      const terisi = (rute, ms) => page.waitForFunction(([m, pen]) => { const t = document.body.innerText; return (!pen || new RegExp(pen.source, pen.flags).test(t)) && (m <= 0 || t.trim().length > m) }, [peran.minChar, PENANDA[rute] ? { source: PENANDA[rute].source, flags: PENANDA[rute].flags } : null], { timeout: ms })
+      const terisi = (rute, ms) => page.waitForFunction(([m, pen]) => { const t = document.body.innerText; return (!pen || new RegExp(pen.source, pen.flags).test(t)) && (m <= 0 || t.trim().length > m) }, [rute === '#/chatbot' ? 0 : peran.minChar, PENANDA[rute] ? { source: PENANDA[rute].source, flags: PENANDA[rute].flags } : null], { timeout: ms })
       // Kumpulkan SEMUA halaman sebelum menegaskan: satu run memberi data kalibrasi lengkap (ukuran teks per halaman) dan satu pesan gagal merinci semuanya.
       const periksa = async (nama, rutes, fn) => {
         const gagal = [], ukur = {}
