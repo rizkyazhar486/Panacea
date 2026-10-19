@@ -1,7 +1,7 @@
 // E4: pemindai PHI repo. Positif/negatif/batas pada pola, logika daftar-izin, dan pemindaian repo nyata terhadap daftar izin.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER } from './phi-repo-scan.mjs'
+import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
 
@@ -66,8 +66,8 @@ test('entri_berpasangan_berkas_hanya_cocok_pada_berkas_itu', () => {
 })
 test('repo_nyata_tanpa_temuan_tak_terdaftar_dan_tanpa_entri_usang', () => {
   const r = bandingkan(pindaiRepo(), muatDaftarIzin())
-  assert.deepEqual(r.takTerdaftar, [], `PHI tak terdaftar: ${JSON.stringify(r.takTerdaftar.slice(0, 5))}`)
-  assert.deepEqual(r.usang, [], `entri usang: ${JSON.stringify(r.usang)}`)
+  assert.equal(r.takTerdaftar.length, 0, 'jumlah PHI tak terdaftar harus nol (jangan cetak nilainya ke CI)')
+  assert.equal(r.usang.length, 0, 'jumlah allowlist usang harus nol (jangan cetak nilainya ke CI)')
   assert.deepEqual(r.tanpaAlasan, [])
 })
 test('deterministik_dua_kali_jalan_identik', () => {
@@ -87,11 +87,11 @@ test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
 })
 
 test('E4: unreadable tracked file fails closed rather than being skipped', () => {
-  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca rahasia[.]ts/)
+  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca berkas ref=[0-9a-f]{16}/)
 })
 
 test('E4: non-text reader result cannot certify a clean repository', () => {
-  assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: kosong[.]ts/)
+  assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: ref=[0-9a-f]{16}/)
 })
 
 test('E4: real-world source larger than old 2M boundary is scanned fully', () => {
@@ -102,5 +102,32 @@ test('E4: real-world source larger than old 2M boundary is scanned fully', () =>
 
 test('E4: pathological oversized content fails closed instead of silently passing', () => {
   assert.equal(BATAS_PINDAI_KARAKTER, 16_000_000)
-  assert.throws(() => pindaiRepo(['terlalu-besar.ts'], () => 'x'.repeat(BATAS_PINDAI_KARAKTER + 1)), /tidak memeriksa berkas >16000000 karakter: terlalu-besar[.]ts/)
+  assert.throws(() => pindaiRepo(['terlalu-besar.ts'], () => 'x'.repeat(BATAS_PINDAI_KARAKTER + 1)), /tidak memeriksa berkas >16000000 karakter: ref=[0-9a-f]{16}/)
+})
+
+test('E4: scanner failures remain fail-closed without publishing matched PHI or filenames', () => {
+  const filename = 'patients/name-and-081377745521.ts'
+  const secret = 'budi.santoso@rsudharapan.go.id'
+  const nik = '3171011505900001'
+  const r = ringkasKegagalanTanpaPHI({
+    takTerdaftar: [{ jenis: 'email', nilai: secret, berkas: filename }, { jenis: 'nik', nilai: nik, berkas: filename }],
+    usang: [{ jenis: 'email', nilai: secret, berkas: filename }],
+    tanpaAlasan: [{ jenis: 'email', nilai: secret, berkas: filename }],
+  })
+  assert.equal(r.length, 4)
+  const log = r.join('\\n')
+  for (const sensitive of [secret, nik, filename, '081377745521']) {
+    assert.equal(log.includes(sensitive), false, 'PII must never be printed in CI errors')
+  }
+  assert.equal(r.filter(x => x.includes('nilai=[REDACTED]')).length, 4)
+  assert.ok(log.includes('ref=' + refBerkasAman(filename)))
+  assert.match(refBerkasAman(filename), /^[0-9a-f]{16}$/)
+  const untrusted = ringkasKegagalanTanpaPHI({ usang: [{ jenis: secret, nilai: nik }] })
+  assert.equal(untrusted[0].includes(secret), false, 'untrusted category must also be redacted')
+  assert.match(untrusted[0], /jenis=unknown/)
+  assert.throws(
+    () => pindaiRepo([filename], () => { throw new Error(secret) }),
+    e => e instanceof Error && !e.message.includes(secret) && !e.message.includes(filename) && /ref=[0-9a-f]{16}/.test(e.message),
+    'read exceptions must not echo secret causes or sensitive filenames',
+  )
 })
