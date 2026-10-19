@@ -8,7 +8,7 @@ import { createPresentationLighting, AnatomicalLightingControls, parseRespirator
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { searchStructures } from '../../domains/body-exposure'
 import { penjagaMuatan, type PenjagaMuatan } from '../../lib/gltfSesudahLepas'
-import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../../domains/body-exposure'
+import { parseMotionLibrary, movementAt, advanceClock, scrubToTime, crossfadeWeight, MOTION_SPEEDS, type MotionTimeline, type MotionClock, type MotionSpeed, QUALITY_PRESETS, frameStats, stepAuto, type AutoState, initialPreset, effectivePixelRatio, type QualityPreset, type QualityChoice, type FrameStats, ANATOMICAL_VIEWS, viewPose, stepTween, mergeRigMeshes, structureAtFace, reviewLabel, tissueShading, type ReviewLabel, type AnatomicalView, type CameraPose, type CameraTween } from '../../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BODY EXPOSURE — TUBUH KANONIK
@@ -462,6 +462,43 @@ export function CanonicalBody() {
         const missing = parsed.clips.filter((c) => !g.animations.some((a) => a.name === c.clip))
         if (missing.length) { drop(); setError(`Motion clip missing from the rig file: ${missing.map((c) => c.clip).join(', ')}`); setMotionOn(false); return }
         disposeMotion()
+        const rigMats = new Map<THREE.Material, THREE.Material>()
+        g.scene.traverse((o) => {
+          if (o instanceof THREE.Mesh && !Array.isArray(o.material)) {
+            const rawMat = o.material
+            const cached = rigMats.get(rawMat)
+            if (cached) {
+              o.material = cached
+              return
+            }
+            const s = tissueShading(o.material.name)
+            let nextMat: THREE.Material
+            if (rawMat instanceof THREE.MeshStandardMaterial) {
+              const phys = new THREE.MeshPhysicalMaterial({
+                name: rawMat.name,
+                color: rawMat.color.clone(),
+                transparent: rawMat.transparent,
+                opacity: rawMat.opacity,
+                alphaTest: rawMat.alphaTest,
+                side: rawMat.side,
+                depthWrite: rawMat.depthWrite,
+                metalness: s.metalness,
+                roughness: s.roughness,
+                clearcoat: s.clearcoat,
+                clearcoatRoughness: s.clearcoatRoughness,
+                sheen: s.sheen,
+                sheenRoughness: s.sheenRoughness,
+                sheenColor: rawMat.color.clone().lerp(new THREE.Color(1, 1, 1), 0.35),
+              })
+              phys.userData = { ...rawMat.userData, panaceaTissue: s.tissue }
+              nextMat = phys
+            } else {
+              nextMat = rawMat.clone()
+            }
+            rigMats.set(rawMat, nextMat)
+            o.material = nextMat
+          }
+        })
         s.motionRoot.add(g.scene)
         // satu draw call per (tulang × material), bukan per struktur: ±825 → ±100 (mesh asli disembunyikan)
         const merge = mergeRigMeshes(g.scene)
@@ -540,7 +577,30 @@ export function CanonicalBody() {
         scene.traverse((o) => {
           if (o.userData.panacea_structure_id) s.byId.set(o.userData.panacea_structure_id, o)
           if (o instanceof THREE.Mesh) {
-            o.material = (o.material as THREE.Material).clone()
+            const srcMat = o.material as THREE.Material
+            if (srcMat instanceof THREE.MeshStandardMaterial) {
+              const sh = tissueShading(srcMat.name || sys)
+              const phys = new THREE.MeshPhysicalMaterial({
+                name: srcMat.name,
+                color: srcMat.color.clone(),
+                transparent: srcMat.transparent,
+                opacity: srcMat.opacity,
+                alphaTest: srcMat.alphaTest,
+                side: srcMat.side,
+                depthWrite: srcMat.depthWrite,
+                metalness: sh.metalness,
+                roughness: sh.roughness,
+                clearcoat: sh.clearcoat,
+                clearcoatRoughness: sh.clearcoatRoughness,
+                sheen: sh.sheen,
+                sheenRoughness: sh.sheenRoughness,
+                sheenColor: srcMat.color.clone().lerp(new THREE.Color(1, 1, 1), 0.35),
+              })
+              phys.userData = { ...srcMat.userData, panaceaTissue: sh.tissue }
+              o.material = phys
+            } else {
+              o.material = srcMat.clone()
+            }
             o.userData.baseOpacity = sys === 'surface' ? 0.12 : 1
             const geo = o.geometry
             L.tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3
