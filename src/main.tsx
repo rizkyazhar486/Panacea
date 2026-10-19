@@ -193,7 +193,7 @@ captureFoldsPreference()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-    <StoreProvider>
+    <StoreProvider visibilityDocument={document}>
     <LongitudinalStateProvider>
       <AppStatus />
       <OfflineBanner />
