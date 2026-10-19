@@ -4,6 +4,7 @@
 // Batas jujur: ini pemindai pola, bukan bukti tiadanya PHI; nama orang, alamat, dan data klinis bebas-teks tidak terdeteksi.
 //   node scripts/qa/phi-repo-scan.mjs        (keluar 1 bila ada temuan tak terdaftar atau entri daftar-izin usang)
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -13,6 +14,12 @@ const SKIP_EXT = /\.(png|jpe?g|gif|webp|avif|svg|ico|glb|gltf|bin|woff2?|ttf|otf
 const SKIP_PREFIX = ['public/', 'node_modules/', 'bodyexposure/']
 // Upper bound measured in JS UTF-16 code units, not bytes. >2M-character source files are fully scanned.
 export const BATAS_PINDAI_KARAKTER = 16_000_000
+
+// CI is shared and retained. Never echo the matched identifier or a filename
+// (filenames can themselves contain PHI). This deterministic opaque reference
+// lets engineers locate the file locally without publishing its contents.
+export const refBerkasAman = (f) => createHash('sha256').update(String(f)).digest('hex').slice(0, 16)
+const jenisAman = (x) => ['email', 'nik', 'ponsel'].includes(x) ? x : 'unknown'
 // Berkas yang SENGAJA memuat nilai terlarang: fixture tes pemindai ini, dan daftar-izin itu sendiri (jika ikut dipindai ia mencocokkan dirinya
 // sendiri sehingga entri usang tak pernah terdeteksi). Daftar dikunci oleh tes (harus persis ini).
 export const BERKAS_FIXTURE = ['scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json']
@@ -48,10 +55,10 @@ export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(j
   for (const f of berkas) {
     let t
     try { t = baca(f) } catch (error) {
-      throw new Error(`PHI scan gagal membaca ${f}; hasil tidak boleh dinyatakan bersih`, { cause: error })
+      throw new Error(`PHI scan gagal membaca berkas ref=${refBerkasAman(f)}; hasil tidak boleh dinyatakan bersih`)
     }
-    if (typeof t !== 'string') throw new TypeError(`PHI scan menerima konten bukan teks: ${f}`)
-    if (t.length > BATAS_PINDAI_KARAKTER) throw new Error(`PHI scan tidak memeriksa berkas >${BATAS_PINDAI_KARAKTER} karakter: ${f}`)
+    if (typeof t !== 'string') throw new TypeError(`PHI scan menerima konten bukan teks: ref=${refBerkasAman(f)}`)
+    if (t.length > BATAS_PINDAI_KARAKTER) throw new Error(`PHI scan tidak memeriksa berkas >${BATAS_PINDAI_KARAKTER} karakter: ref=${refBerkasAman(f)}`)
     for (const x of pindaiTeks(t)) hasil.push({ berkas: f, ...x })
   }
   return hasil
@@ -73,13 +80,23 @@ export function muatDaftarIzin(path = join(AKAR, 'governance', 'PHI_SCAN_ALLOWLI
   return d.entri
 }
 
+// A failure should still be actionable (kind, count, stable file reference),
+// without turning a privacy check into a second PHI disclosure in CI logs.
+export function ringkasKegagalanTanpaPHI({ takTerdaftar = [], usang = [], tanpaAlasan = [] }) {
+  const baris = []
+  for (const x of takTerdaftar.slice(0, 20)) {
+    baris.push(`PHI tak terdaftar: jenis=${jenisAman(x.jenis)} nilai=[REDACTED] ref=${refBerkasAman(x.berkas)}`)
+  }
+  for (const x of usang) baris.push(`entri daftar-izin usang: jenis=${jenisAman(x.jenis)} nilai=[REDACTED]`)
+  for (const x of tanpaAlasan) baris.push(`entri tanpa alasan memadai: jenis=${jenisAman(x.jenis)} nilai=[REDACTED]`)
+  return baris
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const t = pindaiRepo(); const { takTerdaftar, usang, tanpaAlasan } = bandingkan(t, muatDaftarIzin())
   console.log(JSON.stringify({ temuan: t.length, takTerdaftar: takTerdaftar.length, usang: usang.length, tanpaAlasan: tanpaAlasan.length }))
   if (takTerdaftar.length || usang.length || tanpaAlasan.length) {
-    for (const x of takTerdaftar.slice(0, 20)) console.error(`PHI tak terdaftar: ${x.jenis} ${x.nilai} di ${x.berkas}`)
-    for (const x of usang) console.error(`entri daftar-izin usang: ${x.jenis} ${x.nilai}`)
-    for (const x of tanpaAlasan) console.error(`entri tanpa alasan memadai: ${x.jenis} ${x.nilai}`)
+    for (const line of ringkasKegagalanTanpaPHI({ takTerdaftar, usang, tanpaAlasan })) console.error(line)
     process.exit(1)
   }
 }
