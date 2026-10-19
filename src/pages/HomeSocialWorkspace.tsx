@@ -11,12 +11,7 @@ import { SuperPageLauncher } from '../components/SuperPageLauncher'
 import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
 import { ThinkingOrb } from '../components/ThinkingOrb'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
-import { Fold } from '../shared/ui/Fold'
-import '../styles/home-liquid-reference.css'
-import '../styles/home-green-material-v48.css'
-import '../styles/home-human-interface.css'
-import '../styles/home-liquid-control-layer.css'
-import '../styles/home-compact-responsive.css'
+import { Fold, FoldGroup } from '../shared/ui/Fold'
 
 const Feed = lazy(() => import('./social/Feed'))
 const Community = lazy(() => import('./social/Community').then((m) => ({ default: m.Community })))
@@ -61,55 +56,47 @@ export function HomeSocialWorkspace() {
   const LegacyActive = legacy?.component
 
   return (
-    <div className="panacea-liquid-home w-full max-w-none pb-32">
+    <div className="panacea-liquid-home mx-auto w-full max-w-7xl pb-32">
       <div className="lg:hidden">
         <PanaceaZoneNav />
       </div>
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
-          {/* Executive Bento Grid on Desktop (12 columns: 7 left, 5 right) */}
-          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-            {/* Left Column (7 cols): Longitudinal Vitals & Recovery Trends */}
-            <div className="flex flex-col gap-6 lg:col-span-7">
+          {/* Balanced 2-Column Bento Grid on Desktop */}
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
+            {/* Left Column (7 cols): Telemetry Brief */}
+            <div className="flex flex-col lg:col-span-7 h-full">
               <HomeHealthBrief />
-              <div className="rounded-[28px] border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0c1017]">
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Tren Pemulihan & Tidur (7 Hari)
-                  </span>
-                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-400">
-                    Live Telemetry
-                  </span>
-                </div>
-                <HomeRecoveryVisuals />
-              </div>
             </div>
 
-            {/* Right Column (5 cols): AI Copilot, Daily Tools */}
-            <div className="flex flex-col gap-6 lg:col-span-5">
+            {/* Right Column (5 cols): AI Copilot, Essential Tools & Recovery */}
+            <div className="flex flex-col gap-4 lg:col-span-5">
               <HomeVisualLanding />
               <HomeEssentialTools />
+              <HomeRecoveryVisuals />
             </div>
           </div>
 
-          {/* 7 Connected Categories (Full width) */}
+          {/* 7 Connected Categories */}
           <SuperPageLauncher />
 
-          {/* Secondary Ecosystem Modules in balanced 2-column grid on desktop */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Fold label="Widgets" subtitle="Ringkasan Alat & Ekosistem Terhubung">
-              <RelWidgetRumah />
-            </Fold>
-            <Fold label="Live" subtitle="Aliran Telemetri Langsung">
-              <HomeLiveWidgetRail />
-            </Fold>
-            <Fold label="Stories" subtitle="Edukasi & Wawasan Longevity">
-              <PanaceaImageSlider />
-            </Fold>
-            <Fold label="Deck" subtitle="Pusat Kendali Perintah">
-              <HomeCommandDeck />
-            </Fold>
-          </div>
+          {/* Secondary Ecosystem Modules: 1-Column Full-Width Stacked Folds (Zero-Void, Exclusive Accordion) */}
+          <FoldGroup name="home-secondary">
+            <div className="mt-6 flex flex-col gap-3.5 w-full">
+              <Fold label="Widgets" subtitle="Ringkasan Alat & Ekosistem Terhubung">
+                <RelWidgetRumah />
+              </Fold>
+              <Fold label="Live" subtitle="Aliran Telemetri Langsung">
+                <HomeLiveWidgetRail />
+              </Fold>
+              <Fold label="Stories" subtitle="Edukasi & Wawasan Longevity">
+                <PanaceaImageSlider />
+              </Fold>
+              <Fold label="Deck" subtitle="Pusat Kendali Perintah">
+                <HomeCommandDeck />
+              </Fold>
+            </div>
+          </FoldGroup>
         </div>
       ) : activeKey === 'for-you' ? (
         <Suspense fallback={<Loader />}><ForYouHub /></Suspense>

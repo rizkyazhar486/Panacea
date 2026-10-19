@@ -22,7 +22,7 @@ assert.equal('value' in parseTargetValue(''), false)
 assert.deepEqual(parseTargetValue('20'), parseTargetValue('20'), 'determinismo')
 
 // Regressão das duas páginas: nada de `|| 0`, alvo inválido avisa e não é gravado
-for (const f of ['fitness/WorkoutHistory', 'AnalisisPro']) {
+for (const f of ['fitness/WorkoutHistory', 'fitness/AnalisisPro']) {
   const src = readFileSync(new URL(`../../src/pages/${f}.tsx`, import.meta.url), 'utf8')
   assert.equal(/Number\(e\.target\.value\)\s*\|\|\s*0/.test(src), false, `${f}: campo vazio não pode virar alvo 0`)
   assert.ok(src.includes('parseTargetValue(e.target.value)'), `${f}: deve validar via domínio`)

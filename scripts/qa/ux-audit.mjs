@@ -32,7 +32,21 @@ const medir = () => {
   const blokTeksBawah24 = interaktif.filter((e) => blokTeks(e) && (ukuran(e).width < 23.5 || ukuran(e).height < 23.5)).length
   const tanpaNama = interaktif.filter((e) => !nama(e) && !(e.id && document.querySelector(`label[for="${CSS.escape(e.id)}"]`)) && !e.closest('label'))
   const sel = (e) => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}${e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).slice(0, 2).join('.') : ''}`
+  const reminder = document.querySelector('[data-daily-reminder]')
+  // Fixed overlays have no offsetParent; the general control probe above
+  // cannot establish their visibility.
+  const reminderVisible = Boolean(reminder && (() => {
+    const box = ukuran(reminder), style = getComputedStyle(reminder)
+    return box.width > 0 && box.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
+  })())
+  const reminderBox = reminderVisible ? ukuran(reminder) : null
+  const reminderHeadingOverlap = reminderBox ? [...document.querySelectorAll('main h1')].filter(vis).filter((heading) => {
+    const box = ukuran(heading)
+    return Math.min(box.right, reminderBox.right) > Math.max(box.left, reminderBox.left)
+      && Math.min(box.bottom, reminderBox.bottom) > Math.max(box.top, reminderBox.top)
+  }).length : 0
   return {
+    reminderVisible, reminderHeadingOverlap,
     overflowPx: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     interaktif: interaktif.length,
     inlineDikecualikan, blokTeksBawah24,
@@ -86,6 +100,7 @@ console.log(JSON.stringify(ringkas.total))
 if (process.env.CI && !(process.env.UX_BASELINE && existsSync(process.env.UX_BASELINE))) { console.error('UX_BASELINE tidak diset/ada di CI: gerbang tidak boleh berjalan tanpa baseline'); process.exit(1) }
 const dasar = process.env.UX_BASELINE && existsSync(process.env.UX_BASELINE) ? JSON.parse(readFileSync(process.env.UX_BASELINE, 'utf8')) : null
 const gagal = []
+if (jumlah('reminderHeadingOverlap') > 0) gagal.push(`daily quote overlaps the Home heading: ${jumlah('reminderHeadingOverlap')}`)
 if (ringkas.total.overflowHalaman > (dasar?.overflowHalaman ?? 0)) gagal.push(`overflow horizontal: ${ringkas.total.overflowHalaman}`)
 if (ringkas.total.tanpaNama > (dasar?.tanpaNama ?? Infinity)) gagal.push(`kontrol tanpa nama melampaui baseline: ${ringkas.total.tanpaNama}`)
 // Target sentuh relevan di viewport sentuh (mobile); desktop 1440 dilaporkan sebagai informasi, tidak digerbang.
