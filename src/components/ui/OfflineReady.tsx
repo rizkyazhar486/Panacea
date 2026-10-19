@@ -11,7 +11,7 @@ const OFFLINE_PAGES: { label: string; imp: () => Promise<unknown> }[] = [
   { label: 'Performance Lab', imp: () => import('../../pages/fitness/PerformanceLab') },
   { label: 'AI Program', imp: () => import('../../pages/fitness/TrainingPlan') },
   { label: 'Body Composition', imp: () => import('../../pages/bodyhub/BodyComposition') },
-  { label: 'Initial Assessment', imp: () => import('../../pages/InitialAssessment') },
+  { label: 'Initial Assessment', imp: () => import('../../pages/clinical/InitialAssessment') },
   { label: 'Science & KPIs', imp: () => import('../../pages/fitness/SportsScience') },
   { label: 'Fitness Test', imp: () => import('../../pages/fitness/FitnessTest') },
   { label: 'Logs & Stats', imp: () => import('../../pages/medstudy/Logs') },

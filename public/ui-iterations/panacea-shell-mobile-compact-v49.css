@@ -52,11 +52,11 @@
     button[aria-label^='Search'],
     button[aria-label^='Notifications']
   ) {
-    min-width: 40px !important;
-    width: 40px !important;
-    min-height: 40px !important;
-    height: 40px !important;
-    flex: 0 0 40px !important;
+    min-width: 44px !important;
+    width: 44px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    flex: 0 0 44px !important;
   }
 
   header.kaca.panacea-command-bar .pmd-notification-button {
@@ -113,11 +113,11 @@
     button[aria-label^='Search'],
     button[aria-label^='Notifications']
   ) {
-    min-width: 40px !important;
-    width: 40px !important;
-    min-height: 40px !important;
-    height: 40px !important;
-    flex-basis: 40px !important;
+    min-width: 44px !important;
+    width: 44px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    flex-basis: 44px !important;
   }
 }
 

@@ -1983,6 +1983,19 @@
       "permissionStatus": "not-independently-cleared"
     },
     {
+      "path": "dataset-inspection/fetal-parcels/PROVENANCE.md",
+      "bytes": 1123,
+      "sha256": "c83bb4da97c8c1c80e49b94b6ebf5250687af4cf0c6519c4c9d424860eddd38b",
+      "evidencePath": "dataset-inspection/fetal-parcels/PROVENANCE.md",
+      "sources": [],
+      "licenses": [],
+      "findings": [
+        "license-claim-missing",
+        "source-claim-missing"
+      ],
+      "permissionStatus": "not-independently-cleared"
+    },
+    {
       "path": "dataset-inspection/fetal-parcels/manifest.json",
       "bytes": 8883,
       "sha256": "8e78884be6eba7de5b9a5c8e52970dd1359065a155d26283ef1594f37cbac39d",
@@ -1994,6 +2007,19 @@
         "CC0-1.0"
       ],
       "findings": [],
+      "permissionStatus": "not-independently-cleared"
+    },
+    {
+      "path": "dataset-inspection/fetal-parcels/mri/PROVENANCE.md",
+      "bytes": 933,
+      "sha256": "1bd2d9a3ca02b07ca84295e019467278e4033dfaaa0787c861d8a157ef4a2c34",
+      "evidencePath": "dataset-inspection/fetal-parcels/mri/PROVENANCE.md",
+      "sources": [],
+      "licenses": [],
+      "findings": [
+        "license-claim-missing",
+        "source-claim-missing"
+      ],
       "permissionStatus": "not-independently-cleared"
     },
     {
@@ -7927,8 +7953,8 @@
     },
     {
       "path": "provenance.html",
-      "bytes": 70083,
-      "sha256": "f0c9248a6f6280a19abf8e2594eb50fb02779623907e9a73afb0fefb124e2bf6",
+      "bytes": 70180,
+      "sha256": "b126ff03818012b000fb76a0aedba0657ca712144b41a2b322f08ccaf7b9cb1b",
       "evidencePath": "provenance.html",
       "sources": [],
       "licenses": [],

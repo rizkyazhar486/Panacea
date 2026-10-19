@@ -103,6 +103,6 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string, op
   }
   try {
     await launch()
-    return { call, stop, restart, dataFile, logs: () => logs }
+    return { call, stop, restart, dataFile, logs: () => logs, get origin() { return base } }
   } catch (error) { await stop(); throw error }
 }

@@ -84,7 +84,7 @@ export function HomeHealthBrief() {
   return (
     <section
       data-panacea-instrument-strip
-      className="panacea-instrument-strip"
+      className="panacea-instrument-strip h-full flex flex-col justify-between"
       aria-label="Today health instruments"
     >
       <BatasKlaimKesehatan permukaan="wellness.home-brief" />
@@ -101,10 +101,10 @@ export function HomeHealthBrief() {
         </Link>
       </div>
 
-      <div className="panacea-instrument-rail">
+      <div className="panacea-instrument-rail flex-1">
         <Link
           to={primary.to}
-          className="panacea-signal-ring"
+          className="panacea-signal-ring h-full"
           aria-label={`${primary.label} ${primary.value}. ${availableCount} of ${instruments.length} health signals currently available.`}
         >
           <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -131,12 +131,12 @@ export function HomeHealthBrief() {
           </span>
         </Link>
 
-        <div className="panacea-instrument-grid">
+        <div className="panacea-instrument-grid h-full">
           {instruments.slice(1).map(({ key, label, value, unit, to, icon: Icon }) => (
             <Link
               key={key}
               to={to}
-              className="panacea-instrument-mini"
+              className="panacea-instrument-mini h-full"
               aria-label={`${label} ${value}${unit ? ` ${unit}` : ''}`}
             >
               <span className="panacea-instrument-mini-main">
@@ -149,7 +149,7 @@ export function HomeHealthBrief() {
             </Link>
           ))}
 
-          <Link to="/harian" className="panacea-instrument-checkin" aria-label="Log today">
+          <Link to="/harian" className="panacea-instrument-checkin h-full" aria-label="Log today">
             <IconPlus size={17} />
             <span>Log</span>
           </Link>

@@ -1,0 +1,164 @@
+name: UX Audit Acceptance (F2)
+# Bukti CI untuk Alpha F2 / Task 45: audit UI/UX terukur (overflow, kontrol tanpa nama, target sentuh) dengan baseline ratchet.
+# Ratchet: target sentuh mobile = 0, tanpa nama = 0, overflow = 0, axe serius/kritis = 0, keyboard (indikator fokus/jebakan) = 0. F2 belum VERIFIED (kontras, keyboard manual, performa belum tercakup); regresi screenshot (grid kasar) kini bergerbang terhadap baseline CI.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-stats.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/kontras-ukur.mjs'
+      - 'scripts/qa/kontras-ukur.fixture.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'scripts/qa/axe-audit.mjs'
+      - 'scripts/qa/keyboard-audit.mjs'
+      - 'scripts/qa/keyboard-analisis.mjs'
+      - 'governance/KEYBOARD_BASELINE.json'
+      - 'scripts/qa/axe-ratchet.mjs'
+      - 'scripts/qa/screenshot-grid.mjs'
+      - 'scripts/qa/screenshot-regresi.mjs'
+      - 'governance/SCREENSHOT_GRID_BASELINE.json'
+      - 'governance/AXE_BASELINE.json'
+      - 'governance/THEME_PARITY_BASELINE.json'
+      - 'governance/KONTRAS_BASELINE.json'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
+      - 'governance/UX_AUDIT_BASELINE.json'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/index.ts'
+      - '.github/workflows/ux-audit-acceptance.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/qa/ux-audit.mjs'
+      - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-stats.mjs'
+      - 'scripts/qa/kontras-wcag.mjs'
+      - 'scripts/qa/kontras-ukur.mjs'
+      - 'scripts/qa/kontras-ukur.fixture.mjs'
+      - 'scripts/qa/theme-parity.mjs'
+      - 'scripts/qa/axe-audit.mjs'
+      - 'scripts/qa/keyboard-audit.mjs'
+      - 'scripts/qa/keyboard-analisis.mjs'
+      - 'governance/KEYBOARD_BASELINE.json'
+      - 'scripts/qa/axe-ratchet.mjs'
+      - 'scripts/qa/screenshot-grid.mjs'
+      - 'scripts/qa/screenshot-regresi.mjs'
+      - 'governance/SCREENSHOT_GRID_BASELINE.json'
+      - 'governance/AXE_BASELINE.json'
+      - 'governance/THEME_PARITY_BASELINE.json'
+      - 'governance/KONTRAS_BASELINE.json'
+      - 'src/main.tsx'
+      - 'src/components/layout/**'
+      - 'src/components/dashboard/OnboardingTour.tsx'
+      - 'src/pages/**'
+      - 'src/styles/**'
+      - 'src/components/**'
+      - 'public/ui-iterations/**'
+      - 'governance/UX_AUDIT_BASELINE.json'
+      - 'src/lib/api.ts'
+      - 'src/lib/store.tsx'
+      - 'server/src/auth.ts'
+      - 'server/src/index.ts'
+      - '.github/workflows/ux-audit-acceptance.yml'
+permissions:
+  contents: read
+jobs:
+  ux-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: server
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts @playwright/test@1.55.0 axe-core@4.10.2
+          npx playwright install --with-deps chromium
+      - name: Measured UX audit vs ratchet baseline
+        env:
+          QA_OUT: ${{ runner.temp }}/ux-audit-evidence.json
+        run: |
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5190 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/f1-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/f1-server.log" 2>&1) &
+          api=$!
+          VITE_API_URL=http://127.0.0.1:18790 npx vite --host 127.0.0.1 --port 5190 --strictPort > "$RUNNER_TEMP/f1-vite.log" 2>&1 &
+          web=$!
+          trap 'kill "$api" "$web" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
+            sleep 1
+          done
+          rc=0
+          UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
+          node scripts/qa/kontras-ukur.fixture.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
+          SHOT_DIR="$RUNNER_TEMP/theme-shots" QA_OUT="$RUNNER_TEMP/theme-parity-evidence.json" PARITY_BASELINE=governance/THEME_PARITY_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/theme-parity.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/axe-evidence.json" AXE_BASELINE=governance/AXE_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/axe-audit.mjs || rc=1
+          QA_OUT="$RUNNER_TEMP/keyboard-evidence.json" KEYBOARD_BASELINE=governance/KEYBOARD_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/keyboard-audit.mjs || rc=1
+          SHOT_BASELINE=governance/SCREENSHOT_GRID_BASELINE.json QA_OUT="$RUNNER_TEMP/screenshot-grid-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/screenshot-regresi.mjs || rc=1
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ux-audit-evidence
+          path: |
+            ${{ runner.temp }}/ux-audit-evidence.json
+            ${{ runner.temp }}/kontras-evidence.json
+            ${{ runner.temp }}/theme-parity-evidence.json
+            ${{ runner.temp }}/axe-evidence.json
+            ${{ runner.temp }}/keyboard-evidence.json
+            ${{ runner.temp }}/screenshot-grid-evidence.json
+            ${{ runner.temp }}/theme-shots
+  perf-audit:
+    # Audit performa terukur pada BUILD PRODUKSI (laporan, bukan gerbang): metodologi dan batas di scripts/qa/perf-audit.mjs. Job terpisah agar tidak memperlambat ux-audit.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: server
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Production build and measured performance audit
+        env:
+          QA_OUT: ${{ runner.temp }}/perf-evidence.json
+        run: |
+          VITE_API_URL=http://127.0.0.1:18790 npx vite build
+          (cd server && OWNER_EMAIL=owner-f1@example.com ALLOW_DEV_LOGIN=true CORS_ORIGINS=http://localhost:5191 \
+            PANACEA_DATA_FILE="$RUNNER_TEMP/perf-data.json" PORT=18790 npx tsx src/index.ts > "$RUNNER_TEMP/perf-server.log" 2>&1) &
+          api=$!
+          npx vite preview --host 127.0.0.1 --port 5191 --strictPort > "$RUNNER_TEMP/perf-preview.log" 2>&1 &
+          web=$!
+          trap 'kill "$api" "$web" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5191/ >/dev/null; then break; fi
+            sleep 1
+          done
+          QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-evidence
+          path: ${{ runner.temp }}/perf-evidence.json

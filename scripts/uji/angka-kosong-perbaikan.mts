@@ -1,9 +1,10 @@
 // C2: perilaku "nilai hilang bukan nol" untuk ringkasan harian, catatan makan dan tes kebugaran.
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { dailyIntakeTotals, focusMinutesOn } from '../../src/domains/personal-health/engine/dailySummaryTotals.ts'
+import { completeKcalByDay, dailyIntakeTotals, focusMinutesOn } from '../../src/domains/personal-health/engine/dailySummaryTotals.ts'
 import { DETECTED_LIMITS, PORTION_GRAMS, parseDetectedFoods, parsePortionGrams, scaledPer100 } from '../../src/domains/personal-health/engine/foodEntryInputs.ts'
 import { BATAS, BUTIR, parseButir, ringkasTes, skorButir } from '../../src/pages/fitness/fitnessTestScoring.ts'
+import { RATE_PCT_MAX, parseMoney, parseRatePct } from '../../src/lib/finance.ts'
 
 const DAY = '2026-10-16'
 
@@ -24,6 +25,17 @@ assert.equal(focusMinutesOn([{ tanggal: DAY, menit: 25 }, { tanggal: DAY, menit:
 assert.equal(focusMinutesOn([{ tanggal: DAY, menit: 25 }, { tanggal: DAY }], DAY), undefined, 'a session without minutes withholds the total')
 assert.equal(focusMinutesOn([{ tanggal: DAY, menit: 0 }], DAY), undefined, 'a zero total is not reported as focus time')
 assert.equal(focusMinutesOn([{ tanggal: DAY, menit: -3 }], DAY), undefined); assert.equal(focusMinutesOn('x', DAY), undefined); assert.equal(focusMinutesOn([{ tanggal: '2026-10-15', menit: 40 }], DAY), undefined)
+
+// Karbohidrat dan lemak mengikuti aturan yang sama: total lengkap atau tidak ada.
+assert.deepEqual(dailyIntakeTotals([{ date: DAY, kcal: 300, protein: 20, carbs: 40, fat: 10 }, { date: DAY, kcal: 200, protein: 15, carbs: 25, fat: 5 }], DAY), { kkal: 500, proteinG: 35, carbsG: 65, fatG: 15 })
+assert.deepEqual(dailyIntakeTotals([{ date: DAY, kcal: 300, carbs: 40, fat: 10 }, { date: DAY, kcal: 200, carbs: 25 }], DAY), { kkal: 500, carbsG: 65 }, 'a missing fat value withholds only the fat total')
+assert.deepEqual(dailyIntakeTotals([{ date: DAY, kcal: 0, carbs: 0, fat: 0, protein: 0 }], DAY), { kkal: 0, proteinG: 0, carbsG: 0, fatG: 0 }, 'explicit zeros stay zeros')
+// Total kalori per hari (grafik tujuh hari dan median "biasanya"): hari dengan nilai hilang tidak masuk, bukan menjadi total yang lebih kecil.
+{
+  const m = completeKcalByDay([{ date: '2026-10-14', kcal: 400 }, { date: '2026-10-14', kcal: 600 }, { date: '2026-10-15', kcal: 500 }, { date: '2026-10-15' }, { date: '2026-10-16', kcal: 0 }, { date: '2026-10-13', kcal: Number.NaN }, { date: '', kcal: 5 }, { kcal: 9 }, null, 5, 'x'])
+  assert.deepEqual([...m.entries()], [['2026-10-14', 1000], ['2026-10-16', 0]], 'only fully valid days appear; an explicit zero day stays 0; an incomplete day is absent')
+  assert.deepEqual([...completeKcalByDay('x').entries()], []); assert.deepEqual([...completeKcalByDay(undefined).entries()], []); assert.deepEqual([...completeKcalByDay([Object.create({ date: DAY, kcal: 5 })]).entries()], [], 'inherited fields are not observations')
+}
 
 // ── 2. Catatan makan: porsi, nilai per 100 g, keluaran model foto ───────────────────────────────
 assert.equal(parsePortionGrams('100'), 100); assert.equal(parsePortionGrams('12,5'), 12.5, 'decimal comma accepted'); assert.equal(parsePortionGrams(String(PORTION_GRAMS.min)), PORTION_GRAMS.min); assert.equal(parsePortionGrams(String(PORTION_GRAMS.max)), PORTION_GRAMS.max)
@@ -59,6 +71,12 @@ for (const b of BUTIR) {
   for (const bad of ['', ' ', 'abc', '-1', 'Infinity', 'NaN', null, undefined, 5, {}]) assert.equal(parseButir(bad, b), undefined, `${JSON.stringify(bad) ?? String(bad)} is not entered (${b})`)
 }
 
+// ── 4. Keuangan: uang/bunga kosong bukan nol ────────────────────────────────────────────────────
+assert.equal(parseMoney('0'), 0, 'a typed 0 is a real zero'); assert.equal(parseMoney('10.000.000'), 10000000, 'separators are ignored'); assert.equal(parseMoney('Rp 500000'), 500000); assert.equal(parseMoney('007'), 7)
+for (const bad of ['', '   ', 'abc', 'Rp', '-', null, undefined, 5, {}, [], '9'.repeat(30)]) assert.equal(parseMoney(bad), null, `${JSON.stringify(bad) ?? String(bad)} is "not entered", never 0`)
+assert.equal(parseRatePct('0'), 0, 'a typed 0 % is a real 0 %'); assert.equal(parseRatePct('24'), 24); assert.equal(parseRatePct('1,5'), 1.5, 'decimal comma accepted'); assert.equal(parseRatePct(String(RATE_PCT_MAX)), RATE_PCT_MAX)
+for (const bad of ['', '  ', 'abc', '-1', String(RATE_PCT_MAX + 1), 'Infinity', 'NaN', '1e999', null, undefined, 24, {}]) assert.equal(parseRatePct(bad), null, `rate ${JSON.stringify(bad) ?? String(bad)} is "not entered"`)
+
 // ── Regresi sumber: perbaikan tidak boleh kembali ───────────────────────────────────────────────
 const src = (p: string) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const ringkasan = src('src/lib/ringkasan.ts'); assert.ok(!/Number\(f\.kcal\) \|\| 0|Number\(f\.protein\) \|\| 0|Number\(s\.menit\) \|\| 0/.test(ringkasan), 'ringkasan no longer sums missing values as 0'); assert.ok(ringkasan.includes('dailyIntakeTotals(st.foods, hariIni)') && ringkasan.includes('focusMinutesOn(sesi, hariIni)'))
@@ -67,4 +85,8 @@ const nutrisi = src('src/pages/bodyhub/Nutrition.tsx'); assert.ok(!/\+i\.(grams|
 const tes = src('src/pages/fitness/FitnessTest.tsx'); assert.ok(!/\+e\.target\.value \|\| 0/.test(tes) && !/useState\(\{ pushup: 0/.test(tes), 'reps no longer start at or coerce to 0'); assert.ok(tes.includes('ringkasTes(reps, sex)') && tes.includes('parseButir('))
 const gerak = src('src/pages/fitness/MovementToolkit.tsx'); assert.ok(!/Number\(localStorage\.getItem\(BALANCE_KEY\) \|\| 0\)/.test(gerak) && gerak.includes("best === null ? '—'"), 'an unrecorded balance best is not shown as 0 s')
 const pikir = src('src/pages/mental/MindToolkit.tsx'); assert.ok(!/pmd_reaction_best_v1'\) \|\| 0/.test(pikir) && pikir.includes("best === null ? '—'"), 'an unrecorded reaction best is not 0 ms')
+const uang = src('src/pages/finance/MoneyHub.tsx'); assert.ok(!/replace\(\/\[\^\\d\]\/g, ''\)\) \|\| 0/.test(uang), 'MoneyHub no longer reads blank money fields as 0'); assert.ok(uang.includes('parseRatePct(rate)') && uang.includes('parseMoney(minPay)') && /if \(r === null\)/.test(uang) && /if \(mp === null\)/.test(uang), 'a debt cannot be added with a blank rate or minimum payment'); assert.ok(!/Number\.isFinite\(r\) \? r : 0/.test(uang), 'a blank interest rate is not silently 0 %')
+const gizi = src('src/components/tiles/UbinTidurGizi.tsx'); assert.ok(!/\(f\.kcal \?\? 0\)|kkal \+= f\.kcal \?\? 0|karbo \+= f\.carbs \?\? 0|protein \+= f\.protein \?\? 0|lemak \+= f\.fat \?\? 0/.test(gizi), "today's intake no longer sums missing values as 0"); assert.ok(gizi.includes('dailyIntakeTotals(state.foods, hariIni)') && gizi.includes('completeKcalByDay(state.foods)') && gizi.includes('data-intake-incomplete') && gizi.includes('some entries have no calories'))
+const grafik = src('src/components/tiles/UbinGrafik.tsx'); assert.ok(!/\(f\.kcal \?\? 0\)/.test(grafik) && grafik.includes('completeKcalByDay(state.foods)'), 'the seven-day calorie chart does not draw an incomplete day as a smaller total')
+const kartu = src('src/components/clinical/KartuKlinisTubuh.tsx'); assert.ok(!/\(f\.kcal \?\? 0\)/.test(kartu) && !/toISOString\(\)\.slice\(0, 10\)/.test(kartu), 'the clinical card neither sums missing calories as 0 nor compares food dates with a UTC day'); assert.ok(kartu.includes('dailyIntakeTotals(state.foods, hariIni).kkal') && kartu.includes('localCalorieDay(Date.now())'))
 console.log('angka-kosong-perbaikan: missing values are withheld, skipped or shown as unavailable, never counted as 0; explicit zeros stay zero; passed')

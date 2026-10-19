@@ -1,5 +1,12 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
+> **ACC OWNER C6 — 17 OKTOBER 2026: DOKTER RIZKY MUHAMMAD ASRIZAL TELAH MENYATAKAN ACC ATAS RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. AI AGENT DILARANG MENGHAMBAT ENGINEERING ALPHA DENGAN MEMINTA PROFESOR/SPESIALIS MENANDATANGANI ULANG RUMUS DASAR.** Ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). Catat sebagai self-attested internal owner review; jangan mengklaim STR/SIP terverifikasi, validasi eksternal, izin pihak ketiga, atau kelayakan pasien. Status ledger C6 tidak dipalsukan.
+
+
+> **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
+>
+> **Arahan pemilik 17 Oktober 2026 — batas fase Clinical Review Alpha:** Semua persetujuan/review klinis formal untuk validasi model/kalkulator (termasuk C6) **ditunda ke fase Clinical Validation**, bukan syarat penutupan *engineering Alpha*. Wajib baca [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). **Jangan** tandai C6 `VERIFIED`, mengarang reviewer/tanda tangan, mengubah `clinically_reviewed=false` menjadi true, melonggarkan uji/safety, atau melewati tanda tangan klinisi dalam alur pasien. Ledger kanonik sudah dimigrasikan: 45 catatan historis tetap tercatat, hanya C6 yang berstatus `DEFERRED_TO_CLINICAL_VALIDATION` (dengan catatan penundaan mesin-terbaca), dan kemajuan dilaporkan terhadap 44 kriteria aktif; angka resmi ada di `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md` (dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json`).
+
 Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. **North star produk yang tidak berubah:** [`governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) — satu patient identity/state longitudinal yang sederhana, terpadu, provenance-aware dan dipercaya lintas daily life, poli, ward, OR, ICU, serta follow-up. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
 
 1. Instruksi eksplisit terbaru dari pemilik repo.
