@@ -16,7 +16,12 @@ export function HomeVisualLanding() {
 
       <div className="panacea-intent-hero__actions" role="group" aria-label="Primary health actions">
         {heroActions.map(({ to, label, icon: Icon }) => (
-          <Link key={label} to={to} className="panacea-intent-action" aria-label={label}>
+          <Link
+            key={label}
+            to={to}
+            className={`panacea-intent-action ${to === '/chatbot' ? 'panacea-intent-action--primary' : ''}`}
+            aria-label={label}
+          >
             <span className="panacea-intent-action__icon" aria-hidden="true"><Icon size={20} /></span>
             <span className="panacea-intent-action__label">{label}</span>
           </Link>

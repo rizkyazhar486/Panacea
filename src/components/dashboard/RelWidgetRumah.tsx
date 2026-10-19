@@ -68,7 +68,7 @@ export function RelWidgetRumah() {
   )
 
   return (
-    <section aria-label="Your widgets" className="rel-widget-rumah mt-6">
+    <section aria-label="Your widgets" className="rel-widget-rumah mx-auto w-full max-w-4xl mt-2">
       <Suspense fallback={<RangkaMuat />}>
         <LazyPapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
       </Suspense>
