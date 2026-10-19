@@ -2,6 +2,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
@@ -133,4 +136,42 @@ test('E4: scanner failures remain fail-closed without publishing matched PHI or 
     e => e instanceof Error && !e.message.includes(secret) && !e.message.includes(filename) && /ref=[0-9a-f]{16}/.test(e.message),
     'read exceptions must not echo secret causes or sensitive filenames',
   )
+})
+
+test('E4: allowlist read and parse failures do not echo sensitive JSON, exceptions, or filesystem path', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'panacea-phi-allowlist-'))
+  const file = join(directory, 'sensitive-identity@private.example.json')
+  const secret = 'patient.privacy@hospital.example'
+  try {
+    const missing = file + '-missing'
+    assert.throws(
+      () => muatDaftarIzin(missing),
+      (e) => e instanceof Error && /tidak dapat dibaca/.test(e.message) && !e.message.includes(missing),
+      'missing file must fail closed with no path leak',
+    )
+    writeFileSync(file, '{ "entri": [ " ' + secret + '" }')
+    assert.throws(
+      () => muatDaftarIzin(file),
+      (e) => e instanceof Error && /JSON tidak valid/.test(e.message) && !e.message.includes(secret) && !e.message.includes(file),
+      'malformed JSON must not emit parser snippets or paths',
+    )
+    writeFileSync(file, 'null')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'null root must fail closed')
+    writeFileSync(file, '{"entri":[null]}')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'null item must fail closed')
+    writeFileSync(file, '{"entri":[{"jenis":"email","nilai":123,"alasan":"long enough reason"}]}')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'malformed identifier must fail closed')
+  } finally { rmSync(directory, { recursive: true, force: true }) }
+})
+
+test('E4: valid empty or scoped allowlist remains accepted', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'panacea-phi-allowlist-'))
+  const file = join(directory, 'synthetic.json')
+  try {
+    writeFileSync(file, '{"entri":[]}')
+    assert.deepEqual(muatDaftarIzin(file), [])
+    const entry = { jenis: 'email', nilai: 'a@example.com', berkas: 'test.ts', alasan: 'synthetic fixture' }
+    writeFileSync(file, JSON.stringify({ entri: [entry] }))
+    assert.deepEqual(muatDaftarIzin(file), [entry])
+  } finally { rmSync(directory, { recursive: true, force: true }) }
 })
