@@ -1,6 +1,7 @@
 // E4: pemindai PHI repo. Positif/negatif/batas pada pola, logika daftar-izin, dan pemindaian repo nyata terhadap daftar izin.
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
@@ -68,10 +69,12 @@ test('repo_nyata_tanpa_temuan_tak_terdaftar_dan_tanpa_entri_usang', () => {
   const r = bandingkan(pindaiRepo(), muatDaftarIzin())
   assert.equal(r.takTerdaftar.length, 0, 'jumlah PHI tak terdaftar harus nol (jangan cetak nilainya ke CI)')
   assert.equal(r.usang.length, 0, 'jumlah allowlist usang harus nol (jangan cetak nilainya ke CI)')
-  assert.deepEqual(r.tanpaAlasan, [])
+  assert.equal(r.tanpaAlasan.length, 0, 'jumlah allowlist tanpa alasan harus nol (jangan cetak nilainya ke CI)')
 })
 test('deterministik_dua_kali_jalan_identik', () => {
-  assert.deepEqual(pindaiRepo(), pindaiRepo())
+  const first = pindaiRepo(), second = pindaiRepo()
+  assert.equal(first.length, second.length, 'same count without exposing matched values')
+  assert.equal(createHash('sha256').update(JSON.stringify(first)).digest('hex'), createHash('sha256').update(JSON.stringify(second)).digest('hex'), 'same findings, compare digests rather than printing identifiers')
 })
 test('berkas_sintetis_dengan_phi_disuntikkan_terdeteksi_oleh_pindaiRepo', () => {
   const t = pindaiRepo(['f.txt'], () => 'pasien 3171011505900001 telp 081377745521 mail ani@rsharapan.id')
