@@ -18,7 +18,7 @@ export function isProductionAsset(assetUrl, baseUrl) {
       (b.origin === 'https://panaceamed.id' && u.origin === 'https://www.panaceamed.id')
     if (!sameOrigin) return false
     return (u.pathname.startsWith('/assets/') && /\.(?:css|js)$/.test(u.pathname)) ||
-      u.pathname === '/home-styles.css' || u.pathname === '/panacea-green-material-v48.css'
+      u.pathname === '/home-styles.css' || u.pathname === '/panacea-green-material-v48.css' || u.pathname === '/ui-iterations/panacea-green-material-v48.css'
   } catch { return false }
 }
 
