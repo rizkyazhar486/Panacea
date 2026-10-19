@@ -7,6 +7,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-sample-coverage.mjs'
+      - 'scripts/qa/perf-sample-coverage.test.mjs'
       - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
@@ -41,6 +43,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-sample-coverage.mjs'
+      - 'scripts/qa/perf-sample-coverage.test.mjs'
       - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
