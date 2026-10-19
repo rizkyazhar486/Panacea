@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { parseWithdrawAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
-import { buildPersistedSnapshot } from './storePersistScope'
+import { buildPersistedSnapshot } from './state/storePersistScope'
+import { createListenerSet } from './state/storeSnapshotScope'
 import type {
   AppState,
   Patient,
@@ -450,8 +451,48 @@ interface Store {
 
 const Ctx = createContext<Store | null>(null)
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+// ── Selective subscription (opt-in, back-compat) ────────────────────────────
+// `useStore()` reads the whole `Store` via plain Context, so every consumer
+// re-renders on every `setState` anywhere in the app — by design, unchanged
+// for the ~90 existing call sites. Splitting that into one Context per domain
+// would mean migrating every one of those files in lockstep (forbidden by the
+// "strangler, not big-bang" migration rule in CLAUDE.md §2.4). Instead,
+// `useStoreSelector` lets a page opt in to re-rendering only when the slice it
+// actually reads changes, backed by React's built-in `useSyncExternalStore` —
+// no new dependency, no change required to any existing `useStore()` caller.
+// Note: the selector should return a referentially-stable value (a field, or a
+// `useCallback`-memoized derivation) — a selector that allocates a new
+// array/object every call defeats the point and re-renders on every update.
+interface StoreSnapshot {
+  getSnapshot: () => AppState
+  subscribe: (listener: () => void) => () => void
+}
+const SnapshotCtx = createContext<StoreSnapshot | null>(null)
+
+export function useStoreSelector<T>(selector: (state: AppState) => T): T {
+  const snap = useContext(SnapshotCtx)
+  if (!snap) throw new Error('useStoreSelector must be used within StoreProvider')
+  return useSyncExternalStore(snap.subscribe, () => selector(snap.getSnapshot()))
+}
+
+export function StoreProvider({ children, visibilityDocument }: { children: ReactNode; visibilityDocument?: Pick<Document, 'visibilityState' | 'addEventListener' | 'removeEventListener'> }) {
   const [state, setState] = useState<AppState>(load)
+  const stateRef = useRef(state)
+  const listenerSetRef = useRef(createListenerSet())
+  // Runs after every commit where `state` changed; mirrors it into the ref +
+  // wakes selector subscribers. A render-phase assignment would be simpler but
+  // isn't safe under concurrent rendering, so this stays in an effect.
+  useEffect(() => {
+    stateRef.current = state
+    listenerSetRef.current.notify()
+  }, [state])
+  const snapshot = useMemo<StoreSnapshot>(
+    () => ({
+      getSnapshot: () => stateRef.current,
+      subscribe: (listener) => listenerSetRef.current.subscribe(listener),
+    }),
+    [],
+  )
 
   useLayoutEffect(() => {
     bindPersonalHealthAccount(state.account)
@@ -585,7 +626,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       timer = undefined
     }
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') {
+      if (visibilityDocument?.visibilityState === 'visible') {
         pull()
         start()
       } else {
@@ -593,14 +634,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     }
     pull()
-    if (document.visibilityState === 'visible') start()
-    document.addEventListener('visibilitychange', onVisibility)
+    if (!visibilityDocument || visibilityDocument.visibilityState === 'visible') start()
+    visibilityDocument?.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
       stop()
-      document.removeEventListener('visibilitychange', onVisibility)
+      visibilityDocument?.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [state.account?.email])
+  }, [state.account?.email, visibilityDocument])
 
   const store = useMemo<Store>(() => {
     const activePatient =
@@ -1318,7 +1359,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state])
 
-  return <Ctx.Provider value={store}>{children}</Ctx.Provider>
+  return (
+    <SnapshotCtx.Provider value={snapshot}>
+      <Ctx.Provider value={store}>{children}</Ctx.Provider>
+    </SnapshotCtx.Provider>
+  )
 }
 
 export function useStore(): Store {

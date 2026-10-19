@@ -4,6 +4,8 @@
 
 **Status:** Canonical product-architecture doctrine beneath `PANACEA_CONSTITUTION.md` and `PANACEA_HUMANITY_10_CHARTER.md`, operationalized by `PANACEA_PRODUCT_MATURITY_OS.md`.
 
+**Inherited development principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) (repository path: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). This human-authored guidance does not override clinical safety, evidence, privacy, or approved governance boundaries.
+
 This document applies to every current and future model, agent, workflow and human contributor working on Panaceamed. It does not replace the Constitution, Humanity 10 Charter, clinical/safety gates, Universal Human Gold Standard, or validated existing architecture. It tells builders **what Panaceamed is becoming and how to deepen it**.
 
 ## 1. Product identity

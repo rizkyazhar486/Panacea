@@ -2,6 +2,8 @@
 
 **Status:** Canonical operational layer beneath `PANACEA_CONSTITUTION.md` and `PANACEA_HUMANITY_10_CHARTER.md`.
 
+**Inherited development principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) (repository path: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). This human-authored guidance does not override clinical safety, evidence, privacy, or approved governance boundaries.
+
 This document converts Panaceamed's maturity-first direction into a durable, model-agnostic operating system for future AI agents and human contributors.
 
 ## Authority
