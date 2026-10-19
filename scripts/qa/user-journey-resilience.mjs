@@ -81,7 +81,7 @@ try {
       const J = `ketahanan-${peran.J}`
       const buka = async (rute) => { await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page) }
       // Halaman dinilai 'terisi' bila cukup teks ATAU, untuk halaman yang memang ringkas, penanda khasnya terlihat (bukan sekadar bukan-kosong).
-      const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i }
+      const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i, '#/settings': /Reset Local Data/ }
       const sehat = (rute, t) => (PENANDA[rute] ? PENANDA[rute].test(t) : t.trim().length > peran.minChar)
       const terisi = (rute, ms) => page.waitForFunction(([m, pen]) => { const t = document.body.innerText; return pen ? new RegExp(pen.source, pen.flags).test(t) : t.trim().length > m }, [peran.minChar, PENANDA[rute] ? { source: PENANDA[rute].source, flags: PENANDA[rute].flags } : null], { timeout: ms })
       // Kumpulkan SEMUA halaman sebelum menegaskan: satu run memberi data kalibrasi lengkap (ukuran teks per halaman) dan satu pesan gagal merinci semuanya.
