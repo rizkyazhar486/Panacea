@@ -41,9 +41,11 @@ test('static notice HTML escapes embedded text and URL attributes', () => {
   assert.ok(page.includes('&lt;script&gt;&amp;&quot;&lt;/script&gt;'))
   assert.ok(page.includes('https://example.test/&quot; unsafe=&quot;1'))
 })
-test('provenance page links to the shipped notice page and notices link back', () => {
+test('provenance and global asset credits pages link to the shipped notice page and notices link back', () => {
   const provenance = readFileSync(new URL('../../public/bodyexposure/provenance.html', import.meta.url), 'utf8')
+  const assetCredits = readFileSync(new URL('../../public/asset-credits.html', import.meta.url), 'utf8')
   assert.match(provenance, /href="software-notices.html"/)
+  assert.match(assetCredits, /href="\.\/bodyexposure\/software-notices\.html"/)
   assert.match(renderNotices(records), /href="provenance.html"/)
 })
 
