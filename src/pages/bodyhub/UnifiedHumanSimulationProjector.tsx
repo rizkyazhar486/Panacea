@@ -383,7 +383,7 @@ export default function UnifiedHumanSimulationProjector({
       </div>
       )}
 
-      {!hideReferenceAtlasCanvas && (
+      {!compact && !hideReferenceAtlasCanvas && (
         <FiveStageVisualAtlas
           selectedSystemId={selectedSystemId}
           semanticScale={semanticZoom.scale}

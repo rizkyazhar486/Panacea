@@ -17,6 +17,7 @@ export interface FiveStageVisualAtlasProps {
   selectedSystemId: BodySystemId
   semanticScale: BodySemanticScale
   selectedStructureName?: string | null
+  defaultExpanded?: boolean
   onOpenScale?: (scale: BodySemanticScale) => void
   onSelectDomain?: (domain: AtlasSimulationDomainTarget) => void
   onSelectStructure?: (name: string) => void
@@ -26,10 +27,12 @@ export function FiveStageVisualAtlas({
   selectedSystemId,
   semanticScale,
   selectedStructureName = null,
+  defaultExpanded = false,
   onOpenScale,
   onSelectDomain,
   onSelectStructure,
 }: FiveStageVisualAtlasProps) {
+  const [atlasExpanded, setAtlasExpanded] = useState(defaultExpanded)
   const [scenario, setScenario] = useState<FiveStageSimulationInput>(() => ({
     ...FIVE_STAGE_DEFAULTS,
     depth01: depth01ForStageId(stageIdForSemanticScale(semanticScale)),
@@ -100,13 +103,19 @@ export function FiveStageVisualAtlas({
       aria-label="5-stage multiscale visual physiology atlas"
       className="border-t border-white/[.08] bg-[#03070c] p-3 sm:p-4"
     >
-      <details data-five-stage-atlas-drawer="v1" className="group">
-        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-300/[.06] px-3.5 py-2.5 text-sm font-black text-white">
-          <span>5-Stage Atlas</span>
-          <span className="font-mono text-sm font-bold text-cyan-200">
-            1.7m → 2nm
-          </span>
-        </summary>
+      <button
+        type="button"
+        aria-expanded={atlasExpanded}
+        data-five-stage-atlas-drawer="v1"
+        onClick={() => setAtlasExpanded((prev) => !prev)}
+        className="flex min-h-[44px] w-full cursor-pointer items-center justify-between gap-2 rounded-2xl border border-cyan-300/30 bg-[#07131e] px-3.5 py-2.5 text-sm font-black text-white"
+      >
+        <span>5-Stage Atlas</span>
+        <span className="font-mono text-sm font-bold text-cyan-200">
+          1.7m → 2nm
+        </span>
+      </button>
+      {atlasExpanded && (
         <div className="mt-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
@@ -498,7 +507,7 @@ export function FiveStageVisualAtlas({
         </div>
       </details>
         </div>
-      </details>
+      )}
     </section>
   )
 }
