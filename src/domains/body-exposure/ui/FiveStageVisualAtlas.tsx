@@ -100,24 +100,32 @@ export function FiveStageVisualAtlas({
       aria-label="5-stage multiscale visual physiology atlas"
       className="border-t border-white/[.08] bg-[#03070c] p-3 sm:p-4"
     >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <div className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-200/75">
-            5-Stage Next-Gen Visual Atlas · Textbook &amp; Journal Coupled
+      <details data-five-stage-atlas-drawer="v1" className="group">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-300/[.06] px-3.5 py-2.5 text-sm font-black text-white">
+          <span>5-Stage Atlas</span>
+          <span className="font-mono text-sm font-bold text-cyan-200">
+            1.7m → 2nm
+          </span>
+        </summary>
+        <div className="mt-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-200/75">
+                5-Stage Next-Gen Visual Atlas · Textbook &amp; Journal Coupled
+              </div>
+              <h4 className="mt-0.5 truncate text-sm font-black tracking-[-.02em] text-white sm:text-base">
+                Whole Body → Organ Conduit → Tissue Microvessel → Cell → Molecular Gene
+              </h4>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5 text-[10px] font-bold">
+              <span className="rounded-full border border-cyan-300/25 bg-cyan-300/[.08] px-2.5 py-1 text-cyan-100">
+                Scale: {evaluation.ok ? evaluation.scroll.characteristicLengthLabel : '1.70 m'}
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/[.04] px-2.5 py-1 text-white/75">
+                LOD: {evaluation.ok ? `${evaluation.scroll.effectiveRelativeZoom.toFixed(1)}×` : '1.0×'}
+              </span>
+            </div>
           </div>
-          <h4 className="mt-0.5 truncate text-sm font-black tracking-[-.02em] text-white sm:text-base">
-            Whole Body → Organ Conduit → Tissue Microvessel → Cell → Molecular Gene
-          </h4>
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-1.5 text-[10px] font-bold">
-          <span className="rounded-full border border-cyan-300/25 bg-cyan-300/[.08] px-2.5 py-1 text-cyan-100">
-            Scale: {evaluation.ok ? evaluation.scroll.characteristicLengthLabel : '1.70 m'}
-          </span>
-          <span className="rounded-full border border-white/10 bg-white/[.04] px-2.5 py-1 text-white/75">
-            LOD: {evaluation.ok ? `${evaluation.scroll.effectiveRelativeZoom.toFixed(1)}×` : '1.0×'}
-          </span>
-        </div>
-      </div>
 
       {/* 5-Stage Interactive Continuum Rail */}
       <div
@@ -487,6 +495,8 @@ export function FiveStageVisualAtlas({
               </div>
             ))}
           </div>
+        </div>
+      </details>
         </div>
       </details>
     </section>
