@@ -16,7 +16,11 @@ test('journey covers four roles and the critical pages beyond the three in user-
 test('each page is checked for slow API, API 500 and recovery, with paired positive control and unhandled-error check', () => {
   for (const s of ['kontrol positif tanpa gangguan', 'API lambat', 'API 500', 'pemulihan', 'tanpa galat halaman tak tertangani']) assert.ok(script.includes(s), `missing step: ${s}`)
   assert.ok(/status: 500/.test(script) && /r\.fulfill/.test(script), 'API 500 is injected for real')
+  assert.ok(/waitForFunction\([\s\S]*?\{ timeout: ms \}\)(?!\.catch)/.test(script), 'page readiness timeout/error must propagate instead of being swallowed')
   assert.ok(/overflowX\(page\)/.test(script) && /bocor\(/.test(script), 'overflow and leaked-text detectors are used')
+  assert.ok(script.includes("'#/settings': /Reset Local Data/"), 'Settings must load its own content, not merely shared navigation')
+  assert.ok(script.includes("rute === '#/chatbot' ? 0 : peran.minChar"), 'only the compact Chatbot route may skip the text-length minimum')
+  assert.ok(script.includes('m <= 0 || t.trim().length > m'), 'route-specific readiness cannot bypass the minimum content threshold')
   for (const w of ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read']) assert.ok(script.includes(`'${w}'`), `leak marker ${w}`)
 })
 
