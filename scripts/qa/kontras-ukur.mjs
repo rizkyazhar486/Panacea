@@ -15,7 +15,49 @@ export const ukur = () => {
   const over = (f, b) => ({ r: f.r * f.a + b.r * (1 - f.a), g: f.g * f.a + b.g * (1 - f.a), b: f.b * f.a + b.b * (1 - f.a), a: 1 })
   const lum = (c) => { const t = [c.r, c.g, c.b].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }); return 0.2126 * t[0] + 0.7152 * t[1] + 0.0722 * t[2] }
   const rasio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05) }
-  const latar = (el) => { // dari elemen ke atas sampai lapisan opak; gradien/gambar di antaranya => tak dapat diukur
+  // OneShape is an actual opaque sibling backdrop, not an ancestor background.
+  // Credit its measured colour ONLY if the rendered shape fully covers this text.
+  // Otherwise retain normal ancestor-based WCAG failure (fail closed).
+  const oneShapeBackdrop = (el, textNode) => {
+    const active = el.closest('[data-one-shape-active="true"],[aria-selected="true"],[aria-current="page"]')
+    const parent = active?.closest('[data-one-shape]')
+    if (!parent) return null
+    // Match OneShape's own selection rule: explicit containers NEVER fall back to
+    // aria-current, e.g. the For You route points to Home without selecting its tab.
+    const selector = parent.dataset.oneShape === 'explicit'
+      ? '[data-one-shape-active="true"]'
+      : '[aria-selected="true"],[aria-current="page"],[data-one-shape-active="true"]'
+    if (parent.querySelector(selector) !== active) return null
+    const shape = parent.querySelector(':scope > .pmd-one-shape')
+    if (!shape) return null
+    const st = getComputedStyle(shape)
+    if (st.visibility === 'hidden' || st.display === 'none' || st.backgroundImage !== 'none' || Number(st.opacity) < 0.999) return null
+    const colour = parse(st.backgroundColor)
+    if (!colour || colour.a < 0.999) return null
+    const range = document.createRange()
+    range.selectNodeContents(textNode)
+    const t = range.getBoundingClientRect()
+    const b = shape.getBoundingClientRect()
+    if (!(t.width > 0 && t.height > 0 && b.width > 0 && b.height > 0)) return null
+    if (b.left > t.left + 1 || b.right < t.right - 1 || b.top > t.top + 1 || b.bottom < t.bottom - 1) return null
+    // Backgrounds painted by descendants and the active element appear ABOVE
+    // the shape; failing to composite them can falsely pass unreadable text.
+    const layers = []
+    let ruang = !!colour.ruang
+    for (let e = el; e && e !== parent; e = e.parentElement) {
+      const s = getComputedStyle(e)
+      if (s.backgroundImage !== 'none' || Number(s.opacity) < 0.999) return { warna: null, ok: false, ruang }
+      const c = parse(s.backgroundColor)
+      if (!c) return { warna: null, ok: false, ruang }
+      if (c.a > 0) { layers.push(c); ruang ||= !!c.ruang }
+    }
+    let warna = colour
+    for (const layer of layers.reverse()) warna = over(layer, warna)
+    return { warna, ok: true, ruang }
+  }
+  const latar = (el, textNode) => { // dari elemen ke atas sampai lapisan opak; gradien/gambar di antaranya => tak dapat diukur
+    const shapeBackdrop = oneShapeBackdrop(el, textNode)
+    if (shapeBackdrop) return shapeBackdrop
     const lapis = []; let ok = true; let dasar = null; let ruang = false
     for (let e = el; e; e = e.parentElement) {
       const s = getComputedStyle(e)
@@ -38,7 +80,7 @@ export const ukur = () => {
     if (s.clip !== 'auto' && s.clip !== '' || (s.position === 'absolute' && r.width <= 1 && r.height <= 1) || el.closest('.sr-only')) continue // teks khusus pembaca layar (sr-only)
     if (el.disabled || el.closest('[disabled]')) continue // WCAG 1.4.3 mengecualikan komponen nonaktif
     const fg0 = parse(s.color); if (!fg0) continue
-    const { warna: bg, ok, ruang: bgRuang } = latar(el)
+    const { warna: bg, ok, ruang: bgRuang } = latar(el, n)
     if (!ok) { out.tidakDapatDiukur++; continue }
     const op = parseFloat(s.opacity) // opasitas elemen sendiri saja (opasitas ancestor tidak dihitung: dicatat di metode)
     const fg = over({ ...fg0, a: fg0.a * op }, bg)

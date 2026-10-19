@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { buildPersistedSnapshot, stripHeavyPostMedia } from '../../src/lib/storePersistScope.ts'
+import { buildPersistedSnapshot, stripHeavyPostMedia } from '../../src/lib/state/storePersistScope.ts'
 import type { SocialPost } from '../../src/lib/types.ts'
 
 const base: Partial<SocialPost> = {
