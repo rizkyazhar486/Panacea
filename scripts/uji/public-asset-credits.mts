@@ -6,7 +6,7 @@ const body = readFileSync('public/bodyexposure/provenance.html', 'utf8')
 function inspect(p: string) {
   const required = [
     '<html lang="en">', '<main>', '<h1>Asset sources and licensing</h1>',
-    'bodyexposure/provenance.html', 'organs/CREDITS.txt',
+    'bodyexposure/provenance.html', 'bodyexposure/software-notices.html', 'organs/CREDITS.txt',
     'media/ASSET_SOURCES.md', 'images/ASSET_SOURCES.md',
     'logo-mark.png', 'tutorial-video.mp4',
     'https://www.icrp.org/page.asp?id=5',
@@ -19,12 +19,13 @@ function inspect(p: string) {
 assert.deepEqual(inspect(page), [], 'The public credit page must attribute sources and disclose unverified rights')
 for (const path of [
   'public/bodyexposure/provenance.html',
+  'public/bodyexposure/software-notices.html',
   'public/organs/CREDITS.txt',
   'public/media/ASSET_SOURCES.md',
   'public/images/ASSET_SOURCES.md',
 ]) assert.ok(existsSync(path), `The credited file must actually exist: ${path}`)
 assert.ok(body.includes('href="../asset-credits.html"'), 'Body Exposure must link the global credits')
-for (const removed of ['logo-mark.png', 'https://www.icrp.org/page.asp?id=5', 'not a blanket licence']) {
+for (const removed of ['logo-mark.png', 'bodyexposure/software-notices.html', 'https://www.icrp.org/page.asp?id=5', 'not a blanket licence']) {
   assert.ok(inspect(page.replace(removed, '')).includes(removed), `Negative control detects omitted ${removed}`)
 }
 console.log('D8 public asset credits: source links, accessible markup, legal boundaries and negative controls pass')

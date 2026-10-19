@@ -188,7 +188,7 @@ function Electrolytes() {
               <div className="text-2xl font-black text-brand-dark">{correctedNa.toFixed(1)} mEq/L</div>
             </div>
           ) : <p className="mt-3 text-[12.5px] text-neutral-600 dark:text-neutral-300">Enter measured sodium and glucose.</p>}
-          {adaNaTerkoreksi && <div className="mt-3"><CopyNote text={`Corrected Na = ${measuredNa} + 1.6 x ((${glucose}-100)/100) = ${correctedNa.toFixed(1)} mEq/L [Katz formula]`} /></div>}
+          {adaNaTerkoreksi && <div className="mt-3"><CopyNote text={`Corrected Na = ${measuredNa} + 1.6 x max(0, (${glucose}-100)/100) = ${correctedNa.toFixed(1)} mEq/L [Katz formula]`} /></div>}
         </div>
       )}
 

@@ -8,6 +8,8 @@
 //     (sol) tiap bingkai sebagai definisi kontak yang tidak bergantung pada pilihan landmark.
 // Hasil adalah batas atas selip (penanda kaku ikut berguling bersama kaki), bukan selip sebenarnya.
 import fs from 'node:fs'
+import { createHash } from 'node:crypto'
+import { fitFootContact } from './foot-contact-math.mjs'
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import { GLTFLoader } from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from '../../node_modules/three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -16,6 +18,8 @@ const args = process.argv.slice(2)
 const file = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--thresh-mm' && args[i - 1] !== '--out')
 const ti = args.indexOf('--thresh-mm')
 const CONTACT_M = (ti >= 0 ? Number(args[ti + 1]) : 15) / 1000
+if (!file) throw new Error('a source GLB is required')
+if (!Number.isFinite(CONTACT_M) || CONTACT_M <= 0) throw new Error('contact threshold must be finite and positive')
 const oi = args.indexOf('--out')
 const OUT = oi >= 0 ? args[oi + 1] : null
 const FPS = 24
@@ -23,8 +27,14 @@ const MIN_FRAMES = 3
 const buf = fs.readFileSync(file)
 const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder)
 const gltf = await new Promise((res, rej) => loader.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), '', res, rej))
+const requiredClips = ['WALK', 'RUN']
+for (const name of requiredClips) {
+  const found = gltf.animations.filter((clip) => clip.name === name)
+  if (found.length !== 1 || !Number.isFinite(found[0].duration) || found[0].duration <= 0) throw new Error(`exactly one finite positive ${name} animation is required`)
+}
 const root = gltf.scene
 const pelvis = root.getObjectByName('PELVIS')
+if (!pelvis) throw new Error('node PELVIS is required')
 const feet = { L: root.getObjectByName('FOOTL'), R: root.getObjectByName('FOOTR') }
 for (const [k, o] of Object.entries(feet)) if (!o) throw new Error(`node FOOT${k} tidak ada`)
 
@@ -34,6 +44,9 @@ const v = new THREE.Vector3()
 
 // Sumbu: +Y atas, +Z anterior (dibuktikan oleh jari kaki di +Z pada pose awal: bbox kaki z -0.092..0.137 dengan jari di +).
 root.updateMatrixWorld(true)
+root.traverse((node) => {
+  if (!node.matrixWorld.elements.every(Number.isFinite) || !(node.matrixWorld.determinant() > 0)) throw new Error(`invalid or reflected world transform: ${node.name}`)
+})
 const marker = {}
 // Penanda ekstrem (simpul paling posterior/anterior) bisa berada jauh di atas telapak (mis. ligamen/jaringan setinggi pergelangan), jadi tidak mewakili
 // titik yang menapak. Penanda PLANTAR = simpul TERENDAH di dalam seperempat posterior (tumit) atau anterior (jari) panjang kaki pada pose awal.
@@ -41,7 +54,9 @@ const PLANTAR_FRACTION = 0.25
 for (const side of ['L', 'R']) {
   const all = []
   for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); all.push({ mesh, i, y: v.y, z: v.z }) }
+  if (!all.length || all.some((p) => !Number.isFinite(p.y) || !Number.isFinite(p.z))) throw new Error(`missing or invalid foot geometry: ${side}`)
   const zmin = Math.min(...all.map((p) => p.z)), zmax = Math.max(...all.map((p) => p.z)), len = zmax - zmin
+  if (!(len > 0) || !Number.isFinite(len)) throw new Error(`invalid foot length: ${side}`)
   const pick = (cands, better) => cands.reduce((a, b) => (better(b, a) ? b : a))
   const heel = pick(all, (b, a) => b.z < a.z), toe = pick(all, (b, a) => b.z > a.z)
   const heelPlantar = pick(all.filter((p) => p.z <= zmin + PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))
@@ -57,8 +72,10 @@ function sample(clip) {
   for (let f = 0; f < n; f++) {
     mixer.setTime(f / FPS); root.updateMatrixWorld(true)
     const p = new THREE.Vector3().setFromMatrixPosition(pelvis.matrixWorld)
+    if (![p.x, p.y, p.z].every(Number.isFinite)) throw new Error('invalid animated pelvis transform')
     const row = { pelvisZ: p.z }
     for (const side of ['L', 'R']) {
+      for (const mesh of footMeshes(feet[side])) if (!mesh.matrixWorld.elements.every(Number.isFinite) || !(mesh.matrixWorld.determinant() > 0)) throw new Error(`invalid animated foot transform: ${side}`)
       let lowest = Infinity, lowestZ = 0
       for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); if (v.y < lowest) { lowest = v.y; lowestZ = v.z } }
       const mk = {}
@@ -86,19 +103,9 @@ function phases(heights, closed) {
   return out.filter(([a, b]) => b - a + 1 >= MIN_FRAMES)
 }
 
-function fit(groups) {
-  if (!groups.length) return { stance_phases: 0 }
-  // x_g(t) = c_g − v·t, v bersama untuk semua fase: v = −Σcov(t,x)/Σvar(t)
-  let num = 0, den = 0
-  for (const g of groups) { const tm = g.t.reduce((a, b) => a + b, 0) / g.t.length, xm = g.x.reduce((a, b) => a + b, 0) / g.x.length; g.t.forEach((t, i) => { num += (t - tm) * (g.x[i] - xm); den += (t - tm) ** 2 }) }
-  const vel = -num / den
-  const res = []
-  for (const g of groups) { const tm = g.t.reduce((a, b) => a + b, 0) / g.t.length, xm = g.x.reduce((a, b) => a + b, 0) / g.x.length; g.t.forEach((t, i) => res.push(g.x[i] - (xm - vel * (t - tm)))) }
-  const rms = Math.sqrt(res.reduce((a, b) => a + b * b, 0) / res.length)
-  return { stance_phases: groups.length, stance_frames: groups.reduce((a, g) => a + g.t.length, 0), common_forward_speed_m_s: +Math.abs(vel).toFixed(3), slide_rms_mm: +(rms * 1000).toFixed(1), slide_max_mm: +(Math.max(...res.map(Math.abs)) * 1000).toFixed(1) }
-}
 
-const report = { method: 'single clip-wide floor; heel/toe = extreme vertices at rest pose; heelPlantar/toePlantar = lowest vertex within the posterior/anterior quarter of the foot at rest; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)', contact_threshold_mm: CONTACT_M * 1000, clips: {} }
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
+const report = { schema: 'panacea-foot-contact/v2', source_sha256: sha256(buf), reproducer_sha256: sha256(fs.readFileSync(new URL(import.meta.url))), math_sha256: sha256(fs.readFileSync(new URL('./foot-contact-math.mjs', import.meta.url))), coordinate_contract: { gltf_length_unit: 'metre', up: '+Y', anterior: '+Z', reference: 'pelvis-relative', fps: FPS, minimum_stance_frames: MIN_FRAMES, plantar_fraction: PLANTAR_FRACTION, limitation: 'Rigid markers and a fitted common forward speed give an engineering residual, not independently measured ground slip or clinical validation.' }, method: 'single clip-wide floor; heel/toe = extreme vertices at rest pose; heelPlantar/toePlantar = lowest vertex within the posterior/anterior quarter of the foot at rest; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)', contact_threshold_mm: CONTACT_M * 1000, clips: {} }
 for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name === 'RUN')) {
   let rows = sample(clip)
   // loop tertutup bila seluruh nilai kaki relatif panggul di bingkai terakhir sama dengan bingkai pertama (< 0,5 mm)
@@ -115,9 +122,9 @@ for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name ===
       const ph = phases(h, closed)
       per[side] = ph.map(([a, b]) => (b >= N ? `${a}-${N - 1}+0-${b - N}` : `${a}-${b}`))
       // Posisi AP: penanda tumit/jari = simpul kaku; sol = z simpul TERENDAH tiap bingkai (titik kontak, ikut berguling tanpa bias penanda kaku).
-      for (const [a, b] of ph) { const t = [], x = []; for (let f = a; f <= b; f++) { const r = rows[f % N]; t.push(f / FPS); x.push((kind === 'sole' ? r[side].lowestZ : r[side][kind].z) - r.pelvisZ) } groups.push({ t, x }) }
+      for (const [a, b] of ph) { const t = [], x = []; for (let f = a; f <= b; f++) { const r = rows[f % N]; t.push(f / FPS); x.push((kind === 'sole' ? r[side].lowestZ : r[side][kind].z) - r.pelvisZ) } groups.push({ side, t, x }) }
     }
-    out[kind] = { ...fit(groups), phases_by_side: per }
+    out[kind] = { ...fitFootContact(groups), phases_by_side: per, samples: groups }
   }
   report.clips[clip.name] = out
 }

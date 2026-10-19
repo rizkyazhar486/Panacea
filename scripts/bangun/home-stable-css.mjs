@@ -15,7 +15,7 @@ const SOURCES = [
 
 export function homeStyles(read = (name) => readFileSync(join(ROOT, 'src/styles', name), 'utf8')) {
   const importSource = read('home-green-material-v48.css')
-  const material = "@import url('/panacea-green-material-v48.css?v=20260916-1');"
+  const material = "@import url('/ui-iterations/panacea-green-material-v48.css?v=20260916-1');"
   if (!importSource.includes(material)) throw new Error('Home green material import changed: review stable asset ordering')
   return `/* Panacea Home stable stylesheet. Rebuilt from src/styles/home-*.css by scripts/bangun/home-stable-css.mjs.
    Deliberately un-hashed: cached tabs must not fail Vite dynamic CSS preloads after deploy. */

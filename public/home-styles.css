@@ -1,6 +1,6 @@
 /* Panacea Home stable stylesheet. Rebuilt from src/styles/home-*.css by scripts/bangun/home-stable-css.mjs.
    Deliberately un-hashed: cached tabs must not fail Vite dynamic CSS preloads after deploy. */
-@import url('/panacea-green-material-v48.css?v=20260916-1');
+@import url('/ui-iterations/panacea-green-material-v48.css?v=20260916-1');
 
 /* Source: src/styles/home-liquid-reference.css */
 .panacea-liquid-home {
