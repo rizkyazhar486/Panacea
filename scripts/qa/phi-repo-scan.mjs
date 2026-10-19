@@ -5,7 +5,7 @@
 //   node scripts/qa/phi-repo-scan.mjs        (keluar 1 bila ada temuan tak terdaftar atau entri daftar-izin usang)
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -74,9 +74,21 @@ export function bandingkan(temuan, daftarIzin) {
 }
 
 export function muatDaftarIzin(path = join(AKAR, 'governance', 'PHI_SCAN_ALLOWLIST.json')) {
-  if (!existsSync(path)) throw new Error(`daftar izin tidak ada: ${path}`)
-  const d = JSON.parse(readFileSync(path, 'utf8'))
-  if (!Array.isArray(d.entri)) throw new Error('daftar izin tidak valid: entri harus larik')
+  // JSON.parse/read errors can embed patient identifiers or private paths.
+  // Replace all parser/file-system diagnostics with static fail-closed errors.
+  let d
+  try {
+    d = JSON.parse(readFileSync(path, 'utf8'))
+  } catch {
+    throw new Error('daftar izin tidak dapat dibaca atau JSON tidak valid; pemindaian dibatalkan')
+  }
+  if (!d || typeof d !== 'object' || !Array.isArray(d.entri) ||
+    d.entri.some((e) => !e || typeof e !== 'object' ||
+      !['nik', 'ponsel', 'email'].includes(e.jenis) ||
+      typeof e.nilai !== 'string' || typeof e.alasan !== 'string' ||
+      (e.berkas !== undefined && typeof e.berkas !== 'string'))) {
+    throw new Error('daftar izin memiliki struktur tidak valid; pemindaian dibatalkan')
+  }
   return d.entri
 }
 
