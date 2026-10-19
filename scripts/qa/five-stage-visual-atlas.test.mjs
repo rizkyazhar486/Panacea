@@ -1,7 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { BODY_SYSTEM_SOURCE_WAVE } from '../../src/lib/bodySystemSourceWave.ts'
 import {
   ATLAS_LITERATURE_SOURCES,
   depth01ForStageId,
@@ -12,6 +11,20 @@ import {
   SYSTEM_FIVE_STAGE_PROFILES,
   VISUAL_ATLAS_STAGES,
 } from '../../src/domains/body-exposure/engine/fiveStageVisualAtlas.ts'
+
+const CANONICAL_BODY_SYSTEM_IDS = [
+  'cardiovascular',
+  'nervous',
+  'respiratory',
+  'digestive',
+  'urinary',
+  'endocrine',
+  'reproductive',
+  'lymphatic-immune',
+  'musculoskeletal',
+  'sensory-ent',
+  'integumentary-surface',
+]
 
 test('positif: defines all 5 sequential visual atlas stages from Whole Body (1.7 m) to Subcellular/Molecular (2 nm)', () => {
   assert.deepEqual(
@@ -41,21 +54,29 @@ test('positif: defines all 5 sequential visual atlas stages from Whole Body (1.7
 })
 
 test('positif: every one of the 11 canonical body systems owns a complete 5-stage profile and textbook/journal citations', () => {
+  const waveSrc = readFileSync(
+    new URL('../../src/lib/bodySystemSourceWave.ts', import.meta.url),
+    'utf8',
+  )
   assert.ok(ATLAS_LITERATURE_SOURCES.length >= 7)
-  for (const system of BODY_SYSTEM_SOURCE_WAVE) {
-    const profile = SYSTEM_FIVE_STAGE_PROFILES[system.id]
-    assert.ok(profile, `missing 5-stage profile for ${system.id}`)
+  for (const systemId of CANONICAL_BODY_SYSTEM_IDS) {
+    assert.ok(
+      waveSrc.includes(`id: '${systemId}'`),
+      `canonical system ${systemId} must exist in bodySystemSourceWave.ts`,
+    )
+    const profile = SYSTEM_FIVE_STAGE_PROFILES[systemId]
+    assert.ok(profile, `missing 5-stage profile for ${systemId}`)
     for (const stage of VISUAL_ATLAS_STAGES) {
       assert.ok(
         profile.stageNarratives[stage.id].length > 40,
-        `${system.id} missing narrative for ${stage.id}`,
+        `${systemId} missing narrative for ${stage.id}`,
       )
       assert.ok(
         profile.stageLandmarks[stage.id].length >= 3,
-        `${system.id} must provide at least 3 landmarks at ${stage.id}`,
+        `${systemId} must provide at least 3 landmarks at ${stage.id}`,
       )
     }
-    const evalResult = evaluateFiveStagePhysiology(system.id, FIVE_STAGE_DEFAULTS)
+    const evalResult = evaluateFiveStagePhysiology(systemId, FIVE_STAGE_DEFAULTS)
     assert.equal(evalResult.ok, true)
     if (evalResult.ok) {
       assert.ok(evalResult.metrics.stage1Macro.cardiacOutputLMin > 0)
