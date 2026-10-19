@@ -4,13 +4,14 @@
 import assert from 'node:assert/strict'
 import { close, hostileMatrix, mulberry32 } from './support/calculatorHarness.mts'
 import {
-  GLUCOSE_MG_DL, GRIP_KG, MCDONALD_FUNDAL_CM, POTASSIUM_MEQ_L, SODIUM_MEQ_L, ZONE2_AGE_YEARS, correctedSodium, correctedSodiumKatz, mcdonaldGestationalAge,
+  GLUCOSE_MG_DL, GLUCOSE_MG_DL_PER_MMOL_L, GRIP_KG, MCDONALD_FUNDAL_CM, POTASSIUM_MEQ_L, SODIUM_MEQ_L, ZONE2_AGE_YEARS, correctedSodium, correctedSodiumKatz, glucoseMmolLToMgDl, mcdonaldGestationalAge,
   graceScore, parseNumberField, potassiumAssessment, potassiumDeficit, validateGripKg, zone2HeartRate,
 } from '../../src/domains/clinical-calculators/index.ts'
 
 // Tabel ditulis ulang sebagai literal: mengubah tabel mesin tidak boleh ikut mengubah acuan.
 assert.deepEqual({ na: { ...SODIUM_MEQ_L }, glu: { ...GLUCOSE_MG_DL }, k: { ...POTASSIUM_MEQ_L }, mc: { ...MCDONALD_FUNDAL_CM }, age: { ...ZONE2_AGE_YEARS }, grip: { ...GRIP_KG } },
   { na: { min: 80, max: 200 }, glu: { min: 20, max: 2000 }, k: { min: 1, max: 10 }, mc: { min: 20, max: 36 }, age: { min: 10, max: 100 }, grip: { min: 1, max: 100 } }, 'range tables')
+assert.equal(GLUCOSE_MG_DL_PER_MMOL_L, 18.0182, 'glucose molar conversion factor 18.0182 mg/dL per mmol/L')
 
 const rand = mulberry32(20261024)
 const between = (min: number, max: number) => min + (max - min) * rand()
@@ -21,6 +22,15 @@ const comp = (r: unknown) => (r as { ok: boolean }).ok
 for (let n = 0; n < N; n++) {
   const na = between(80, 200), g = between(20, 2000), r = correctedSodiumKatz(na, g) as any
   close(r.data.correctedNa, na + 1.6 * Math.max(0, (g - 100) / 100), 'Katz corrected Na')
+}
+for (let n = 0; n < N; n++) {
+  const na = between(90, 200), mmol = between(20 / 18.0182, 2000 / 18.0182)
+  const g = glucoseMmolLToMgDl(mmol)
+  close(g, mmol * 18.0182, 'glucose mmol/L → mg/dL conversion')
+  const katz = correctedSodiumKatz(na, g) as any, fluid = correctedSodium(na, g) as any
+  assert.equal(katz.ok, true); assert.equal(fluid.ok, true)
+  close(katz.data.correctedNa, na + 1.6 * Math.max(0, (mmol * 18.0182 - 100) / 100), 'Katz from mmol/L')
+  close(fluid.correctedNa, katz.data.correctedNa, 'cross-engine from mmol/L')
 }
 assert.equal((correctedSodiumKatz(130, 100) as any).data.correctedNa, 130, 'glucose 100: no change'); close((correctedSodiumKatz(130, 600) as any).data.correctedNa, 138, 'worked case: 130 + 1.6 × 5 = 138')
 assert.equal((correctedSodiumKatz(140, 20) as any).data.correctedNa, 140, 'glucose below 100 is clamped: no negative correction')
@@ -128,4 +138,4 @@ assert.equal(parseNumberField('Infinity'), Infinity, 'infinities pass through (t
   }
 }
 
-console.log('calculator-independent-reference-10: Katz sodium, potassium assessment, McDonald rule, zone-2 heart rate (integer-arithmetic rounding reference), grip validation and parseNumberField match independently written references; two cross-engine inconsistencies recorded for the reviewer')
+console.log('calculator-independent-reference-10: Katz sodium (including mmol/L × 18.0182 conversion and cross-engine parity), potassium assessment, McDonald rule, zone-2 heart rate (integer-arithmetic rounding reference), grip validation and parseNumberField match independently written references; one potassium-deficit scope distinction recorded for the reviewer')

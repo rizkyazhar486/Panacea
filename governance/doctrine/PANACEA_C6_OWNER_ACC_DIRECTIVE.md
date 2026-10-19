@@ -17,3 +17,9 @@
 Pemilik menyatakan langsung: **“C6 sudah di validasi semuanya oleh reviewer saya, termasuk secara independen dan internal oleh saya.”** Catat seluruh cakupan C6 sebagai telah direview/ divalidasi menurut pernyataan pemilik, termasuk reviewer independen dan review internal. Jangan meminta pelaksanaan review ulang sebagai syarat melanjutkan engineering.
 
 Pembaruan ini menggantikan asumsi bahwa pemilik baru menyatakan review internal. Identitas reviewer independen, laporan, tanggal review, dan versi kalkulator tidak disebutkan dalam pesan; jangan mengarang rincian tersebut. Konfirmasi pemilik ini tidak dengan sendirinya mengubah status ledger versi-terikat atau mengesahkan perubahan kode sesudah review. Tes numerik, input/range, regresi dan exact-head CI tetap dijalankan; status deferred Alpha yang sebelumnya diputuskan tetap sampai ada pembaruan ledger berbukti.
+
+## Pemisahan tiga dimensi status C6 — 19 Oktober 2026 WIB
+
+1. **`C6_ENGINEERING_STATUS = VERIFIED`**: Seluruh kalkulator klinis C6 (termasuk penyatuan rumus Katz `Na + 1.6 × max(0, (Glukosa − 100) / 100)`, konversi `mmol/L × 18.0182`, penyelarasan penjelasan UI di `FluidCalculators.tsx` dan `ClinicalCalculators.tsx`, serta 10 paket referensi independen `calculator-independent-reference*.mts`) lulus uji numerik, batas rentang, matriks masukan bermusuhan, dan regresi.
+2. **`CLINICAL_REVIEW_STATUS = OWNER_ATTESTED_INTERNAL_AND_INDEPENDENT_REVIEW_RECORDED`**: Attestasi pemilik atas review internal dan independen tercatat di dokumen ini; atribut `clinically_reviewed` per-fungsi di kode tetap `false` sampai nama/identitas peninjau eksternal, tanggal, dan ikatan versi tercatat secara eksplisit.
+3. **`ALPHA_SCOPE_STATUS = DEFERRED`**: Status di `governance/ALPHA_ACCEPTANCE_LEDGER.json` tetap `DEFERRED_TO_CLINICAL_VALIDATION` sesuai keputusan pemilik 2026-10-17.
