@@ -87,6 +87,7 @@ try {
       await page.getByPlaceholder('nama@email.com').waitFor({ timeout: 30000 })
     }
     const logout = async (page) => {
+      await page.evaluate(() => window.scrollTo(0, 0))
       const direct = page.getByRole('button', { name: 'Log out', exact: true })
       if (await direct.first().isVisible().catch(() => false)) { await direct.first().click(); return }
       await page.getByRole('button', { name: 'Menu akun dan keluar' }).click()
@@ -97,7 +98,11 @@ try {
 
     // ===== Perjalanan 4b: pemilik memberi peran/penugasan lewat UI → perawat → staf lab (hak akses minimum, kapabilitas per peran) =====
     {
-      const sesi = async (ctx, akun, token) => ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') },
+      const sesi = async (ctx, akun, token) => ctx.addInitScript(([s, t, k1, k2]) => {
+        if (sessionStorage.getItem('__f1_staff_init')) return
+        sessionStorage.setItem('__f1_staff_init', '1')
+        localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1')
+      },
         [JSON.stringify({ loginAt: Date.now(), account: { isOwner: false, isSubscriber: false, ...akun, loggedAt: new Date().toISOString() } }), token, SESSION_KEY, TOKEN_KEY])
       const desk = async (page) => { await page.goto(APP + '#/', { waitUntil: 'domcontentloaded', timeout: 120000 }); await page.getByRole('heading', { name: 'Lab result review' }).waitFor({ timeout: 90000 }) }
 
@@ -146,7 +151,8 @@ try {
         ['laboratorium', { email: 'lab-f1@example.com', name: 'Lab F1', role: 'lab' }, labAktif, 'lab'],
       ]) {
         const { ctx, page, errors } = await newPage()
-        await sesi(ctx, akun, aktif.token)
+        const sesiStaf = vp === VIEWPORTS[0] ? aktif : await devLogin(akun.email, peranUi)
+        await sesi(ctx, akun, sesiStaf.token)
         const nmTugas = `Glukosa-${J}-${vp.name}`; const nmLain = `Rahasia-${J}-${vp.name}`; const nmIntake = `Intake-${J}-${vp.name}`
         const hTugas = await hasilBaru(P_TUGAS, nmTugas); const hLain = await hasilBaru(P_LAIN, nmLain)
         await step(vp.name, J, 'login staf → langsung ke meja hasil lab (bukan beranda sosial)', async () => {
@@ -155,8 +161,8 @@ try {
         await step(vp.name, J, 'hanya pasien yang ditugaskan terlihat; pasien lain tidak (hak akses minimum)', async () => {
           await page.getByText(nmTugas).first().waitFor({ timeout: 60000 })
           assert.equal(await page.getByText(nmLain).count(), 0, 'hasil pasien yang tidak ditugaskan tidak boleh tampil')
-          assert.equal((await call('GET', `/api/lab-results/${hLain.id}`, aktif.token)).status, 404, 'API menyembunyikan hasil pasien lain')
-          assert.equal((await call('GET', `/api/lab-results/${hTugas.id}`, aktif.token)).status, 200, 'kontrol positif: hasil pasien yang ditugaskan terbaca')
+          assert.equal((await call('GET', `/api/lab-results/${hLain.id}`, sesiStaf.token)).status, 404, 'API menyembunyikan hasil pasien lain')
+          assert.equal((await call('GET', `/api/lab-results/${hTugas.id}`, sesiStaf.token)).status, 200, 'kontrol positif: hasil pasien yang ditugaskan terbaca')
         })
         await step(vp.name, J, 'aksi sesuai kapabilitas peran: ada "Mark awaiting review"; tidak ada "Mark reviewed"', async () => {
           await page.getByRole('button', { name: 'Mark awaiting review' }).first().waitFor({ timeout: 30000 })
@@ -169,16 +175,16 @@ try {
           // Pada status menunggu tinjauan langkah berikutnya adalah 'reviewed': hanya dokter yang boleh; staf tidak boleh diberi tombolnya.
           await page.waitForTimeout(2000) // lewati cooldown 1,5 dtk setelah sukses (tombol sementara berlabel 'Wait before next step…')
           assert.equal(await baris.getByRole('button', { name: 'Mark reviewed' }).count(), 0, 'staf tidak boleh melihat tombol Mark reviewed')
-          assert.equal((await call('GET', `/api/lab-results/${hTugas.id}`, aktif.token)).json?.status, 'pending_review')
+          assert.equal((await call('GET', `/api/lab-results/${hTugas.id}`, sesiStaf.token)).json?.status, 'pending_review')
         })
         // Penolakan peran hanya bermakna bila langkahnya sah menurut siklus hidup (pada status lain server menjawab 409 lebih dulu).
         await step(vp.name, J, 'server menolak tinjauan oleh staf (403) padahal langkahnya sah; hanya dokter yang meninjau', async () => {
-          assert.equal((await call('POST', `/api/lab-results/${hTugas.id}/advance`, aktif.token, { to: 'reviewed' })).status, 403, 'staf tidak boleh meninjau')
+          assert.equal((await call('POST', `/api/lab-results/${hTugas.id}/advance`, sesiStaf.token, { to: 'reviewed' })).status, 403, 'staf tidak boleh meninjau')
           assert.equal((await call('POST', `/api/lab-results/${hTugas.id}/advance`, dokterAktif.token, { to: 'reviewed' })).status, 200, 'kontrol positif: dokter terverifikasi boleh meninjau')
         })
         await step(vp.name, J, peranUi === 'lab' ? 'lab tidak boleh menyampaikan hasil (403)' : 'perawat boleh menyampaikan hasil dengan bukti (200)', async () => {
           const komunikasi = { to: 'communicated', communication: { channel: 'phone', note: 'Hasil disampaikan via telepon' } }
-          const r = await call('POST', `/api/lab-results/${hTugas.id}/advance`, aktif.token, komunikasi)
+          const r = await call('POST', `/api/lab-results/${hTugas.id}/advance`, sesiStaf.token, komunikasi)
           assert.equal(r.status, peranUi === 'lab' ? 403 : 200, `status ${r.status}`)
         })
         await step(vp.name, J, 'intake lewat formulir: tervalidasi (negatif) lalu tersimpan (positif)', async () => {
@@ -193,11 +199,18 @@ try {
           await page.getByText(nmIntake).first().waitFor({ timeout: 30000 })
         })
         await step(vp.name, J, 'tanpa overflow horizontal di meja staf', async () => { const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px`); return { overflowPx: o } })
-        // Logout mencabut bearer token di server (#2558); dilakukan di viewport terakhir saja agar token yang sama dapat dipakai ulang dan batas /api/auth tidak dilonggarkan.
-        if (vp === VIEWPORTS[VIEWPORTS.length - 1]) await step(vp.name, J, 'logout staf mengembalikan ke landing dan mencabut token', async () => {
+        await step(vp.name, J, 'staff browser back returns to the lab desk', async () => {
+          await page.goto(APP + '#/settings', { waitUntil: 'domcontentloaded', timeout: 120000 })
+          await page.waitForFunction(() => location.hash.startsWith('#/settings'), null, { timeout: 30000 })
+          await page.goBack({ waitUntil: 'domcontentloaded' })
+          await page.waitForFunction(() => location.hash.startsWith('#/doctor-review/lab-results'), null, { timeout: 30000 })
+          await page.getByRole('heading', { name: 'Lab result review' }).waitFor({ timeout: 30000 })
+          assert.ok(page.url().includes('#/doctor-review/lab-results'), 'staff browser back returns to the lab desk')
+        })
+        await step(vp.name, J, 'logout staf mengembalikan ke landing dan mencabut token', async () => {
           await logout(page); await masuk(page).waitFor({ timeout: 60000 })
           // Diperiksa lewat rute di luar pembatas /api/auth (batas itu tidak dilonggarkan dan sudah hampir habis oleh perjalanan lain).
-          assert.equal((await call('GET', '/api/staff/assignments', aktif.token)).status, 401, 'token staf dicabut di server')
+          assert.equal((await call('GET', '/api/staff/assignments', sesiStaf.token)).status, 401, 'token staf dicabut di server')
         })
         await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
         await ctx.close()

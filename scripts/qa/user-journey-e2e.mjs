@@ -61,12 +61,11 @@ try {
     const J = 'api-rbac'; const VP = 'api'
     await step(VP, J, 'logout mencabut bearer token di server; sesi lain akun yang sama tetap sah (#2558)', async () => {
       const tokA = (await devLogin('dokter-f1@example.com', 'dokter')).token
-      await new Promise((r) => setTimeout(r, 1100)) // jti acak membedakan token; jeda menghindari kolisi iat
-      const tokB = (await devLogin('dokter-f1@example.com', 'dokter')).token
+      const tokB = dokterAktif.token
       assert.equal((await call('GET', '/api/auth/me', tokA)).status, 200, 'kontrol positif: token sah sebelum logout')
       await call('POST', '/api/auth/logout', tokA)
       assert.equal((await call('GET', '/api/auth/me', tokA)).status, 401, 'token yang di-logout harus ditolak')
-      assert.equal((await call('GET', '/api/auth/me', tokB)).status, 200, 'sesi lain akun yang sama tidak boleh ikut dicabut')
+      assert.equal((await call('GET', '/api/clinician/lab-shares', tokB)).status, 200, 'sesi lain akun yang sama tidak boleh ikut dicabut')
     })
     await step(VP, J, 'RBAC tiga-arah: verifikator belum diverifikasi ditolak, setelah diverifikasi pemilik diterima, pasien tetap ditolak', async () => {
       const email = 'verifikator-api@example.com'; const body = { email: 'tidak-ada@example.com', body: 'uji' }
@@ -108,6 +107,7 @@ try {
       await page.getByPlaceholder('nama@email.com').waitFor({ timeout: 30000 })
     }
     const logout = async (page) => {
+      await page.evaluate(() => window.scrollTo(0, 0))
       const direct = page.getByRole('button', { name: 'Log out', exact: true })
       if (await direct.first().isVisible().catch(() => false)) { await direct.first().click(); return }
       await page.getByRole('button', { name: 'Menu akun dan keluar' }).click()
@@ -116,7 +116,7 @@ try {
     const masuk = (page) => page.getByRole('button', { name: /^Masuk( \/ Daftar Gratis)?$/ }).first()
     const overflowX = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
 
-    // ===== Perjalanan 1: pasien — login nyata → dashboard → navigasi → back/refresh/deep link → logout =====
+    // ===== Perjalanan 1: pasien — login nyata → dashboard → navigasi → back/refresh/deep link → tindakan catatan harian → logout =====
     {
       const { ctx, page, errors } = await newPage(); const J = 'pasien'
       await step(vp.name, J, 'persetujuan wajib: tombol masuk nonaktif tanpa centang (negatif)', async () => {
@@ -159,6 +159,18 @@ try {
         await page.getByRole('button', { name: 'Notifications' }).waitFor({ timeout: 60000 })
         assert.ok(page.url().includes('#/harian'), 'deep link tetap')
       })
+      await step(vp.name, J, 'patient daily note persists after refresh', async () => {
+        const catatan = `F1 daily note ${vp.name}`
+        const kolom = page.getByLabel('Notes')
+        await kolom.waitFor({ timeout: 30000 })
+        await kolom.fill(catatan)
+        await kolom.blur()
+        await page.waitForFunction((n) => (localStorage.getItem('panaceamed.state.v3') || '').includes(n), catatan, { timeout: 10000 })
+        await page.reload({ waitUntil: 'domcontentloaded' })
+        await page.getByRole('button', { name: 'Notifications' }).waitFor({ timeout: 60000 })
+        await page.getByLabel('Notes').waitFor({ timeout: 30000 })
+        assert.equal(await page.getByLabel('Notes').inputValue(), catatan, 'patient daily note persists after refresh')
+      })
       await step(vp.name, J, 'RBAC negatif: pasien ditolak API klinisi (server)', async () => {
         const r = await call('POST', '/api/doctors/x/verify', pasienApi.token, { status: 'verified' }); assert.ok([401, 403].includes(r.status), `status ${r.status}`)
         // Pasangan positif/negatif: pemilik MELIHAT hasil lab pasien lain; pasien biasa TIDAK.
@@ -182,44 +194,80 @@ try {
       await ctx.close()
     }
 
-    // ===== Perjalanan 2: dokter terverifikasi — sesi nyata → area klinis → RBAC → sesi kedaluwarsa =====
+    // ===== Perjalanan 2: dokter terverifikasi — sesi nyata → area klinis → tinjauan lab UI → kembali → logout → sesi kedaluwarsa =====
     {
       const { ctx, page, errors } = await newPage(); const J = 'dokter'
-      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t) }, [
+      const dokterVp = vp === VIEWPORTS[0] ? dokter : dokterAktif
+      const nmLabDokter = `Troponin-dokter-${vp.name}`
+      const seedDokter = await call('POST', '/api/lab-results', owner.token, { patientId: `p-f1-dokter-${vp.name}`, item: { name: nmLabDokter, value: 0.02, unit: 'ng/mL', collectedAt: '2026-10-09' }, source: 'lab-intake' })
+      assert.equal(seedDokter.status, 201, 'seed hasil lab untuk tinjauan dokter')
+      assert.equal((await call('POST', `/api/lab-results/${seedDokter.json.id}/advance`, owner.token, { to: 'pending_review' })).status, 200, 'hasil lab siap ditinjau dokter')
+      await ctx.addInitScript(([s, t, k1, k2]) => {
+        if (sessionStorage.getItem('__f1_dokter_init')) return
+        sessionStorage.setItem('__f1_dokter_init', '1')
+        localStorage.setItem(k1, s); localStorage.setItem(k2, t)
+        localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1')
+      }, [
         JSON.stringify({ loginAt: Date.now(), account: { email: 'dokter-f1@example.com', name: 'Dokter F1', role: 'dokter', isOwner: false, isSubscriber: false, loggedAt: new Date().toISOString() } }),
-        dokterAktif.token, SESSION_KEY, TOKEN_KEY])
+        dokterVp.token, SESSION_KEY, TOKEN_KEY])
       await step(vp.name, J, 'sesi dokter → shell dimuat', async () => {
         await page.goto(APP + '#/clinical-hub', { waitUntil: 'domcontentloaded', timeout: 120000 })
         await page.getByRole('button', { name: 'Notifications' }).waitFor({ timeout: 60000 })
       })
       await step(vp.name, J, 'RBAC positif: dokter terverifikasi boleh memanggil rute klinisi', async () => {
-        const r = await call('GET', '/api/clinician/lab-shares', dokterAktif.token); assert.equal(r.status, 200, `status ${r.status}`)
+        const r = await call('GET', '/api/clinician/lab-shares', dokterVp.token); assert.equal(r.status, 200, `status ${r.status}`)
       })
       await step(vp.name, J, 'RBAC negatif: dokter tidak boleh memverifikasi dirinya sendiri', async () => {
-        const r = await call('POST', `/api/doctors/${dokter.user.id}/verify`, dokterAktif.token, { status: 'verified' }); assert.equal(r.status, 403)
+        const r = await call('POST', `/api/doctors/${dokter.user.id}/verify`, dokterVp.token, { status: 'verified' }); assert.equal(r.status, 403)
+      })
+      await step(vp.name, J, 'clinician reviews a real lab result through the UI and returns to clinical hub', async () => {
+        await page.goto(APP + '#/doctor-review/lab-results', { waitUntil: 'domcontentloaded', timeout: 120000 })
+        await page.getByRole('heading', { name: 'Lab result review' }).waitFor({ timeout: 60000 })
+        const baris = page.locator('li', { hasText: nmLabDokter }).first()
+        await baris.waitFor({ timeout: 30000 })
+        await baris.getByRole('button', { name: 'Mark reviewed' }).click()
+        await baris.getByText('Reviewed', { exact: true }).waitFor({ timeout: 30000 })
+        assert.equal((await call('GET', `/api/lab-results/${seedDokter.json.id}`, dokterVp.token)).json?.status, 'reviewed', 'clinician reviews a real lab result through the UI')
+        await page.goBack({ waitUntil: 'domcontentloaded' })
+        await page.waitForFunction(() => location.hash.startsWith('#/clinical-hub'), null, { timeout: 30000 })
       })
       await step(vp.name, J, 'tidak ada overflow horizontal di area klinis', async () => { const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px`); return { overflowPx: o } })
       await step(vp.name, J, 'sesi tidak sah: token rusak ditolak API (401) dan UI tidak crash', async () => {
-        const rusak = dokterAktif.token.slice(0, -4) + 'xxxx'
-        assert.equal((await call('GET', '/api/auth/me', rusak)).status, 401, 'token dengan tanda tangan rusak harus ditolak')
-        assert.equal((await call('GET', '/api/auth/me', dokterAktif.token)).status, 200, 'kontrol positif: token asli diterima')
+        const rusak = dokterVp.token.slice(0, -4) + 'xxxx'
+        assert.equal((await call('GET', '/api/clinician/lab-shares', rusak)).status, 401, 'token dengan tanda tangan rusak harus ditolak')
+        assert.equal((await call('GET', '/api/clinician/lab-shares', dokterVp.token)).status, 200, 'kontrol positif: token asli diterima')
         await page.evaluate(([k, t]) => localStorage.setItem(k, t), [TOKEN_KEY, rusak])
         await page.reload({ waitUntil: 'domcontentloaded' })
-        await page.waitForTimeout(3000)
+        await page.waitForTimeout(1500)
+        await page.evaluate(([k, t]) => localStorage.setItem(k, t), [TOKEN_KEY, dokterVp.token])
+        await page.reload({ waitUntil: 'domcontentloaded' })
+        await page.getByRole('button', { name: 'Notifications' }).waitFor({ timeout: 60000 })
+      })
+      await step(vp.name, J, 'doctor logout returns to landing and revokes bearer token', async () => {
+        await logout(page)
+        await masuk(page).waitFor({ timeout: 60000 })
+        assert.equal(await page.evaluate((k) => localStorage.getItem(k), SESSION_KEY), null, 'sesi lokal dokter dibersihkan')
+        assert.equal((await call('GET', '/api/clinician/lab-shares', dokterVp.token)).status, 401, 'doctor logout revokes bearer token')
       })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
 
-    // ===== Perjalanan 4: pemilik/admin — verifikasi dokter lewat UI nyata, RBAC peran lain, eskalasi peran ditolak =====
+    // ===== Perjalanan 4: pemilik/admin — verifikasi dokter lewat UI nyata, RBAC peran lain, eskalasi peran ditolak, logout =====
     {
       await tungguJendelaLaju()
       const { ctx, page, errors } = await newPage(); const J = 'pemilik'
       const email = `dokter-ui-${vp.name}@example.com`
       const calon = await devLogin(email, 'dokter')
-      await ctx.addInitScript(([s, t, k1, k2]) => { localStorage.setItem(k1, s); localStorage.setItem(k2, t); localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1') }, [
+      const ownerVp = await devLogin(OWNER, 'owner')
+      await ctx.addInitScript(([s, t, k1, k2]) => {
+        if (sessionStorage.getItem('__f1_owner_init')) return
+        sessionStorage.setItem('__f1_owner_init', '1')
+        localStorage.setItem(k1, s); localStorage.setItem(k2, t)
+        localStorage.setItem('panacea_onboarded_v1', '1'); localStorage.setItem('panacea_assessment_prompt_v1', '1')
+      }, [
         JSON.stringify({ loginAt: Date.now(), account: { email: OWNER, name: 'Pemilik F1', role: 'owner', isOwner: true, isSubscriber: false, loggedAt: new Date().toISOString() } }),
-        owner.token, SESSION_KEY, TOKEN_KEY])
+        ownerVp.token, SESSION_KEY, TOKEN_KEY])
       await step(vp.name, J, 'kontrol negatif: dokter belum diverifikasi ditolak rute klinisi', async () => {
         const r = await call('GET', '/api/clinician/lab-shares', calon.token); assert.equal(r.status, 403, `status ${r.status}`)
       })
@@ -239,12 +287,16 @@ try {
           if (status !== 'verified') await new Promise((r) => setTimeout(r, 500))
         }
         assert.equal(status, 'verified', `UI harus benar-benar memanggil API verifikasi (GET /api/doctors terakhir HTTP ${http})`)
-        if (vp === VIEWPORTS[0]) { // satu kali: batas laju /api/auth (30/15 mnt) tidak dilonggarkan untuk uji
-          const aktif = await devLogin(email, 'dokter')
-          assert.equal((await call('GET', '/api/clinician/lab-shares', aktif.token)).status, 200, 'setelah verifikasi dokter efektif sebagai klinisi')
-        }
+        assert.equal((await call('GET', '/api/clinician/lab-shares', calon.token)).status, 200, 'setelah verifikasi dokter efektif sebagai klinisi')
       })
       await step(vp.name, J, 'tanpa overflow horizontal di panel pemilik', async () => { const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px`); return { overflowPx: o } })
+      await step(vp.name, J, 'owner logout returns to landing and revokes bearer token', async () => {
+        await logout(page)
+        await masuk(page).waitFor({ timeout: 60000 })
+        assert.equal(await page.evaluate((k) => localStorage.getItem(k), SESSION_KEY), null, 'sesi lokal pemilik dibersihkan')
+        assert.equal((await call('GET', '/api/doctors', ownerVp.token)).status, 401, 'owner logout revokes bearer token')
+        assert.equal((await call('GET', '/api/doctors', owner.token)).status, 200, 'sesi pemilik lain tetap sah')
+      })
       await step(vp.name, J, 'tanpa galat halaman tak tertangani', async () => { assert.deepEqual(errors, []) })
       await ctx.close()
     }
