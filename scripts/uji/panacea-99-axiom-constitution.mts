@@ -74,7 +74,7 @@ assert.match(annex, /hard PASS without evidence/)
 
 for (const path of ['AGENTS.md', 'governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md']) {
   const content = read(path)
-  assert.ok(content.includes('PANACEA_99_AXIOM_CONSTITUTION.md'), `${path} must inherit the 99-Axiom annex`)
+  assert.ok(content.includes('governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md'), `${path} must inherit the 99-Axiom annex`)
   assert.ok(content.includes('governance/panacea-99-axioms.json'), `${path} must point to the machine-readable registry`)
 }
 

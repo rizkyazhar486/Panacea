@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getWorkouts } from '../../lib/workoutStore'
-import { useStore } from '../../lib/store'
+import { useStoreSelector } from '../../lib/store'
 import { ambilRiwayat } from '../../lib/riwayatVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -41,8 +41,13 @@ function rangkaianHari(tanggal: Set<string>): number {
   return n
 }
 
-export function UbinMotivasi() {
-  const { state } = useStore()
+// Dibungkus memo() + dibaca lewat useStoreSelector (bukan useStore()) sebagai
+// contoh konkret: tile ini cuma butuh sleepLogs/wellness, jadi sekarang cuma
+// re-render saat DUA field itu berubah — bukan tiap perubahan AppState di mana
+// pun (posts, vitals, wallet, dll) seperti useStore() biasa.
+function UbinMotivasiInner() {
+  const sleepLogs = useStoreSelector((s) => s.sleepLogs)
+  const wellness = useStoreSelector((s) => s.wellness)
 
   const { rangkaian, pekanIni, pekanLalu, hariAktifPekan } = useMemo(() => {
     const kunci = (t: number) => {
@@ -51,8 +56,8 @@ export function UbinMotivasi() {
     }
     const jejak = new Set<string>()
     for (const w of getWorkouts()) jejak.add(kunci(Date.parse(w.mulai)))
-    for (const s of state.sleepLogs ?? []) if (s?.date) jejak.add(kunci(Date.parse(s.date)))
-    for (const t of Object.keys(state.wellness ?? {})) jejak.add(kunci(Date.parse(t)))
+    for (const s of sleepLogs ?? []) if (s?.date) jejak.add(kunci(Date.parse(s.date)))
+    for (const t of Object.keys(wellness ?? {})) jejak.add(kunci(Date.parse(t)))
     for (const h of ambilRiwayat()) if (h?.tanggal) jejak.add(kunci(Date.parse(h.tanggal)))
 
     let pekanIni = 0
@@ -68,7 +73,7 @@ export function UbinMotivasi() {
       if (jejak.has(kunci(Date.now() - i * HARI))) hariAktifPekan += 1
     }
     return { rangkaian: rangkaianHari(jejak), pekanIni, pekanLalu, hariAktifPekan }
-  }, [state.sleepLogs, state.wellness])
+  }, [sleepLogs, wellness])
 
   const kutipan = KUTIPAN[Math.floor(Date.now() / HARI) % KUTIPAN.length]
   const ada = rangkaian > 0 || pekanIni > 0
@@ -144,4 +149,5 @@ export function UbinMotivasi() {
   )
 }
 
+export const UbinMotivasi = memo(UbinMotivasiInner)
 export default UbinMotivasi

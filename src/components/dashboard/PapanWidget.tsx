@@ -129,10 +129,15 @@ function UbinKosong({ ke, judul }: { ke: string; judul: string; garis?: string }
   return (
     <Link
       to={ke}
-      className="flex min-h-[64px] flex-col justify-center gap-0.5 rounded-3xl border border-dashed border-neutral-300 p-3 transition active:scale-[0.98] dark:border-white/20"
+      className="group flex min-h-[56px] items-center justify-between rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-3.5 py-2 transition-all hover:border-emerald-300 hover:bg-emerald-50/40 active:scale-[0.99] dark:border-white/10 dark:bg-white/[0.02] dark:hover:border-emerald-500/30"
     >
-      <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">{judul}</span>
-      <span className="t-kecil text-neutral-400">Nothing yet — log one →</span>
+      <div className="flex flex-col min-w-0">
+        <span className="t-mikro font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">{judul}</span>
+        <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">No logs yet</span>
+      </div>
+      <span className="flex items-center gap-1 rounded-xl border border-black/5 bg-white px-2.5 py-1 text-[11px] font-bold text-emerald-600 shadow-2xs transition-colors group-hover:border-emerald-600 group-hover:bg-emerald-600 group-hover:text-white dark:border-white/10 dark:bg-white/10 dark:text-emerald-400">
+        + Log
+      </span>
     </Link>
   )
 }
@@ -702,7 +707,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         lebih masuk akal dibaca. */}
     {pratinjau.some((p) => !bergrafik.includes(p.id)) && (
       <section>
-        <div className="grid grid-cols-2 gap-fluid">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {pratinjau.filter((p) => !bergrafik.includes(p.id)).map((p) => <UbinAngka key={p.id} p={p} />)}
         </div>
       </section>
