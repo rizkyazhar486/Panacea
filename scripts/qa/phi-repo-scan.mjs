@@ -11,6 +11,8 @@ import { dirname, join } from 'node:path'
 const AKAR = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const SKIP_EXT = /\.(png|jpe?g|gif|webp|avif|svg|ico|glb|gltf|bin|woff2?|ttf|otf|pdf|mp[34]|wav|zip|gz|wasm|map|lock|nii|dcm|npy|blend|py)$/i
 const SKIP_PREFIX = ['public/', 'node_modules/', 'bodyexposure/']
+// Upper bound measured in JS UTF-16 code units, not bytes. >2M-character source files are fully scanned.
+export const BATAS_PINDAI_KARAKTER = 16_000_000
 // Berkas yang SENGAJA memuat nilai terlarang: fixture tes pemindai ini, dan daftar-izin itu sendiri (jika ikut dipindai ia mencocokkan dirinya
 // sendiri sehingga entri usang tak pernah terdeteksi). Daftar dikunci oleh tes (harus persis ini).
 export const BERKAS_FIXTURE = ['scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json']
@@ -41,7 +43,17 @@ export function daftarBerkas() {
 
 export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(join(AKAR, f), 'utf8')) {
   const hasil = []
-  for (const f of berkas) { let t; try { t = baca(f) } catch { continue } if (t.length > 2_000_000) continue; for (const x of pindaiTeks(t)) hasil.push({ berkas: f, ...x }) }
+  // All in-scope source files must be examined; never silently skip a failed read.
+  // Keep a bounded fail-closed ceiling for pathological generated files.
+  for (const f of berkas) {
+    let t
+    try { t = baca(f) } catch (error) {
+      throw new Error(`PHI scan gagal membaca ${f}; hasil tidak boleh dinyatakan bersih`, { cause: error })
+    }
+    if (typeof t !== 'string') throw new TypeError(`PHI scan menerima konten bukan teks: ${f}`)
+    if (t.length > BATAS_PINDAI_KARAKTER) throw new Error(`PHI scan tidak memeriksa berkas >${BATAS_PINDAI_KARAKTER} karakter: ${f}`)
+    for (const x of pindaiTeks(t)) hasil.push({ berkas: f, ...x })
+  }
   return hasil
 }
 
