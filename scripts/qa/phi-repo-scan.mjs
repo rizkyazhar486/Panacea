@@ -44,8 +44,19 @@ export function pindaiTeks(teks) {
   return temuan
 }
 
-export function daftarBerkas() {
-  return execFileSync('git', ['ls-files', '-z'], { cwd: AKAR, maxBuffer: 1 << 28 }).toString().split('\0').filter((f) => f && !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)) && !BERKAS_FIXTURE.includes(f))
+export function daftarBerkas(jalankanGit = execFileSync) {
+  // Child-process exceptions may contain tracked filenames or sensitive output.
+  // Keep the scan fail-closed without exposing untrusted subprocess diagnostics.
+  let keluaran
+  try {
+    keluaran = jalankanGit('git', ['ls-files', '-z'], { cwd: AKAR, maxBuffer: 1 << 28 })
+  } catch {
+    throw new Error('PHI scan gagal mendapatkan daftar berkas terlacak; pemindaian dibatalkan')
+  }
+  if (!Buffer.isBuffer(keluaran) && typeof keluaran !== 'string') {
+    throw new TypeError('PHI scan menerima daftar berkas bukan teks; pemindaian dibatalkan')
+  }
+  return keluaran.toString().split('\0').filter((f) => f && !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)) && !BERKAS_FIXTURE.includes(f))
 }
 
 export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(join(AKAR, f), 'utf8')) {
