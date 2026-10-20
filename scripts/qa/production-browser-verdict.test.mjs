@@ -42,10 +42,25 @@ test('P0: actual asset classifier drives failed-request, HTTP and CSS MIME failu
   for (const path of ['/assets/Home-X.css', '/home-styles.css', '/panacea-green-material-v48.css', '/ui-iterations/panacea-green-material-v48.css']) {
     const url = base + path
     assert.equal(productionAssetFailure({ url, status: 200, contentType: 'text/css; charset=utf-8' }, base), null)
-    assert.match(productionAssetFailure({ url, requestFailure: 'net::ERR_FAILED' }, base), /ERR_FAILED/)
+    assert.match(productionAssetFailure({ url, requestFailure: 'net::ERR_FAILED' }, base), /request failed/)
     for (const status of [404, 500]) assert.match(productionAssetFailure({ url, status, contentType: 'text/css' }, base), /HTTP/)
     assert.match(productionAssetFailure({ url, status: 200, contentType: 'text/html' }, base), /content-type text\/html/)
   }
   assert.match(productionAssetFailure({ url: base + '/assets/index-X.js', status: 404, contentType: 'text/html' }, base), /HTTP 404/)
   assert.equal(productionAssetFailure({ url: 'https://fonts.googleapis.com/font.css', requestFailure: 'timeout' }, base), null)
+})
+
+test('E7: asset diagnostics redact URL path, query, raw errors, and MIME metadata', () => {
+  const base = 'https://www.panaceamed.id'
+  const secret = 'PRIVATE_TOKEN_X'
+  const asset = base + '/assets/private-marker.css?token=' + secret
+  const requestFailure = productionAssetFailure({ url: asset, requestFailure: 'network ' + secret }, base)
+  const httpFailure = productionAssetFailure({ url: asset, status: 404, contentType: 'text/html; private=' + secret }, base)
+  assert.match(requestFailure, /required asset ref=[0-9a-f]{16}: request failed/)
+  assert.match(httpFailure, /required asset ref=[0-9a-f]{16}: HTTP 404 content-type text\\/html/)
+  assert.equal(requestFailure.includes('private-marker'), false)
+  assert.equal(httpFailure.includes('private-marker'), false)
+  for (const result of [requestFailure, httpFailure]) assert.equal(result.includes(secret), false)
+  assert.equal(productionAssetFailure({ url: base + '/assets/healthy.css?token=' + secret, status: 200, contentType: 'text/css' }, base), null)
+  assert.equal(productionAssetFailure({ url: 'https://fonts.googleapis.com/assets/remote.css', requestFailure: 'network ' + secret }, base), null)
 })
