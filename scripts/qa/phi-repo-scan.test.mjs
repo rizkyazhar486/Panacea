@@ -175,3 +175,43 @@ test('E4: valid empty or scoped allowlist remains accepted', () => {
     assert.deepEqual(muatDaftarIzin(file), [entry])
   } finally { rmSync(directory, { recursive: true, force: true }) }
 })
+
+test('E4: git listing errors never expose subprocess diagnostics', () => {
+  const secret = 'private.person@hospital.example'
+  const opaque = new Error('command failed: ' + secret)
+  opaque.stderr = Buffer.from('secret path: ' + secret)
+  opaque.stdout = Buffer.from('patient 3171011505900001')
+  assert.throws(() => daftarBerkas(() => { throw opaque }), (error) =>
+    error instanceof Error &&
+    /gagal mendapatkan daftar berkas terlacak/.test(error.message) &&
+    !error.message.includes(secret) &&
+    !error.message.includes('3171011505900001') &&
+    !('cause' in error),
+    'subprocess output and error causes must never enter shared CI logs',
+  )
+})
+
+test('E4: git listing rejects non-text output and does not silently mark a scan clean', () => {
+  assert.throws(() => daftarBerkas(() => undefined), /daftar berkas bukan teks/)
+  assert.throws(() => daftarBerkas(() => ({ toString: () => 'safe.ts' })), /daftar berkas bukan teks/)
+})
+
+test('E4: git listing keeps tracked scope and exact fixture exclusions after redaction', () => {
+  const payload = Buffer.from([
+    'server/src/config.ts', 'scripts/qa/additional.test.mjs',
+    'public/logo-mark.png', 'node_modules/private.ts',
+    'scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json',
+    'bodyexposure/secret.txt', 'src/main.tsx', '',
+  ].join('\\0'))
+  let invoked = 0
+  const names = daftarBerkas((binary, args, opts) => {
+    invoked++
+    assert.equal(binary, 'git')
+    assert.deepEqual(args, ['ls-files', '-z'])
+    assert.ok(opts.cwd)
+    return payload
+  })
+  assert.equal(invoked, 1)
+  assert.deepEqual(names, ['server/src/config.ts', 'scripts/qa/additional.test.mjs', 'src/main.tsx'])
+  assert.equal(pindaiRepo(names, (name) => name === 'src/main.tsx' ? 'contact 3171011505900001' : 'safe').length, 1, 'tracked code still scanned')
+})
