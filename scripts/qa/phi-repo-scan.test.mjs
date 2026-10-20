@@ -202,7 +202,7 @@ test('E4: git listing keeps tracked scope and exact fixture exclusions after red
     'public/logo-mark.png', 'node_modules/private.ts',
     'scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json',
     'bodyexposure/secret.txt', 'src/main.tsx', '',
-  ].join('\\0'))
+  ].join('\0'))
   let invoked = 0
   const names = daftarBerkas((binary, args, opts) => {
     invoked++
