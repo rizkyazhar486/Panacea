@@ -22,6 +22,12 @@ assert.ok(dns.report.findings.some((f: { severity: string }) => f.severity === '
 const http = run('http://127.0.0.1:1')  // porta tertutup: DNS (literal IP) lolos, TLS dilewati (http), koneksi ditolak
 assert.equal(http.code, 2)
 assert.equal(http.report.network.failed.stage, 'http', 'tahap harus berbeda dari kasus DNS (pasangan: hanya tahap yang berbeda)')
-assert.ok(http.report.network.dns?.length >= 1, 'DNS literal IP harus tercatat lolos sebelum kegagalan http')
-for (const r of [dns, http]) assert.ok(!r.report.findings.some((f: { msg: string }) => /lulus|pass|ok/i.test(f.msg)), 'laporan gagal tidak boleh memuat klaim lulus')
+assert.ok(http.report.network.dnsAddressCount >= 1, 'DNS literal IP harus tercatat lolos sebelum kegagalan http (jumlah, bukan alamat)')
+assert.equal(dns.report.findings[0].category, 'network_dns', 'kategori DNS tetap terlapor tanpa pesan error mentah')
+assert.equal(http.report.findings[0].category, 'network_http', 'kategori HTTP tetap terlapor tanpa pesan error mentah')
+for (const r of [dns, http]) {
+  assert.equal(Object.hasOwn(r.report.network, 'dns'), false, 'alamat DNS tidak boleh disimpan')
+  assert.equal(Object.hasOwn(r.report.network.failed, 'error'), false, 'pesan error mentah tidak boleh disimpan')
+  assert.ok(r.report.findings.every((f: { category: string; msg?: string }) => typeof f.category === 'string' && !Object.hasOwn(f, 'msg')), 'temuan tetap berjenis tanpa raw page/network text')
+}
 console.log('production-check-network-failure: DNS dan koneksi gagal = exit 2 dengan tahap yang benar, tanpa hasil peramban atau klaim lulus')
