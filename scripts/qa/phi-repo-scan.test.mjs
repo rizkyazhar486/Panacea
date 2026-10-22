@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, chmodSync } from 'node:fs'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -259,4 +259,21 @@ test('E4: git listing keeps tracked scope and exact fixture exclusions after red
   assert.equal(invoked, 1)
   assert.deepEqual(names, ['server/src/config.ts', 'scripts/qa/additional.test.mjs', 'src/main.tsx'])
   assert.equal(pindaiRepo(names, (name) => name === 'src/main.tsx' ? 'contact 3171011505900001' : 'safe').length, 1, 'tracked code still scanned')
+})
+
+
+test('E4: actual failing Git cannot forward sensitive stderr to CLI logs', () => {
+  const root = mkdtempSync(join(tmpdir(), 'phi-git-failure-'))
+  const marker = 'SYNTHETIC_PRIVATE_GIT_DIAGNOSTIC'
+  try {
+    const git = join(root, 'git')
+    writeFileSync(git, `#!/bin/sh\necho '${marker}' >&2\nexit 1\n`)
+    chmodSync(git, 0o755)
+    const result = spawnSync(process.execPath, [new URL('./phi-repo-scan.mjs', import.meta.url).pathname], {
+      encoding: 'utf8', env: { ...process.env, PATH: root + ':' + process.env.PATH },
+    })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /gagal mendapatkan daftar berkas terlacak/)
+    assert.equal((result.stdout + result.stderr).includes(marker), false, 'child stderr must be captured before sanitizing the exception')
+  } finally { rmSync(root, { recursive: true, force: true }) }
 })

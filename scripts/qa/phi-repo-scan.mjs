@@ -49,7 +49,7 @@ export function daftarBerkasTerlacak(jalankanGit = execFileSync) {
   // Keep the scan fail-closed without exposing untrusted subprocess diagnostics.
   let keluaran
   try {
-    keluaran = jalankanGit('git', ['ls-files', '-z'], { cwd: AKAR, maxBuffer: 1 << 28 })
+    keluaran = jalankanGit('git', ['ls-files', '-z'], { cwd: AKAR, stdio: 'pipe', maxBuffer: 1 << 28 })
   } catch {
     throw new Error('PHI scan gagal mendapatkan daftar berkas terlacak; pemindaian dibatalkan')
   }
