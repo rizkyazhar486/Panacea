@@ -65,13 +65,16 @@ export function daftarBerkas(jalankanGit = execFileSync) {
 }
 
 // File-content exclusions must not exempt PHI embedded in tracked path names.
-// Strip only a terminal file extension so NIK/phone regex boundaries still work.
+// Preserve the existing email/extension convention. Numeric identifiers need
+// dot boundaries independent of file type, including unknown/compound suffixes.
 // Do not log the filename or the detected identifier.
 export function pindaiNamaBerkas(berkas = daftarBerkasTerlacak()) {
   const hasil = []
   for (const f of berkas) {
     const candidate = f.replace(/\.(?:tsx?|jsx?|mjs|cjs|mts|cts|json|md|txt|html|css|svg|png|jpe?g|webp|avif|ico|glb|gltf|bin|pdf|mp[34]|wav|wasm|map|lock|nii|dcm|npy|blend|py)$/i, '')
-    for (const x of pindaiTeks(candidate)) hasil.push({ berkas: f, ...x })
+    const email = pindaiTeks(candidate).filter((x) => x.jenis === 'email')
+    const numeric = pindaiTeks(f.replace(/\./g, ' ')).filter((x) => x.jenis !== 'email')
+    for (const x of [...email, ...numeric]) hasil.push({ berkas: f, ...x })
   }
   return hasil
 }

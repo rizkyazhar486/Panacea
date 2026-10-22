@@ -2,10 +2,55 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
+import { pindaiTeks, bandingkan, pindaiRepo, pindaiNamaBerkas, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
+
+test('E4: filename identifiers are detected across arbitrary and compound extensions', () => {
+  for (const suffix of ['', '.ts', '.csv', '.zip', '.tar.gz', '.2026']) {
+    for (const [value, kind] of [['3171011505900001', 'nik'], ['081377745521', 'ponsel']]) {
+      const file = `public/patients/${value}${suffix}`
+      const findings = pindaiNamaBerkas([file])
+      assert.deepEqual(findings, [{ berkas: file, jenis: kind, nilai: value }], 'filename coverage must not depend on extension')
+      const diagnostics = ringkasKegagalanTanpaPHI(bandingkan(findings, [])).join('\n')
+      assert.equal(diagnostics.includes(value), false)
+      assert.equal(diagnostics.includes(file), false)
+    }
+  }
+})
+
+test('E4: filename scan preserves email detection and rejects invalid or synthetic identifiers', () => {
+  const file = 'public/patients/person@hospital.co.id.ts'
+  assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: 'person@hospital.co.id' }])
+  assert.deepEqual(pindaiNamaBerkas(['public/patients/person@example.com.ts', 'public/3171011513900001.csv', 'public/081111111111.csv']), [])
+  assert.deepEqual(pindaiNamaBerkas(['public/3171011505900001/archive.bin']), [{ berkas: 'public/3171011505900001/archive.bin', jenis: 'nik', nilai: '3171011505900001' }])
+})
+
+test('E4: real CLI rejects identifiers in excluded binary/CSV filenames with redacted logs', () => {
+  for (const [name, expected] of [['synthetic.csv', 0], ['3171011505900001.csv', 1], ['081377745521.tar.gz', 1]]) {
+    const root = mkdtempSync(join(tmpdir(), 'phi-cli-'))
+    try {
+      const qa = join(root, 'scripts', 'qa')
+      mkdirSync(qa, { recursive: true })
+      mkdirSync(join(root, 'governance'))
+      mkdirSync(join(root, 'public'))
+      const script = join(qa, 'phi-repo-scan.mjs')
+      writeFileSync(script, readFileSync(new URL('./phi-repo-scan.mjs', import.meta.url)))
+      writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
+      writeFileSync(join(root, 'public', name), 'no identifiers in file contents')
+      for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
+      const result = spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8' })
+      assert.equal(result.status, expected)
+      const summary = JSON.parse(result.stdout.trim())
+      assert.equal(summary.takTerdaftar, expected)
+      const logs = result.stdout + result.stderr
+      for (const secret of ['3171011505900001', '081377745521']) assert.equal(logs.includes(secret), false)
+      if (expected) assert.match(result.stderr, /nilai=\[REDACTED\] ref=[0-9a-f]{16}/)
+    } finally { rmSync(root, { recursive: true, force: true }) }
+  }
+})
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
 
