@@ -44,7 +44,7 @@ export function pindaiTeks(teks) {
   return temuan
 }
 
-export function daftarBerkas(jalankanGit = execFileSync) {
+export function daftarBerkasTerlacak(jalankanGit = execFileSync) {
   // Child-process exceptions may contain tracked filenames or sensitive output.
   // Keep the scan fail-closed without exposing untrusted subprocess diagnostics.
   let keluaran
@@ -56,7 +56,24 @@ export function daftarBerkas(jalankanGit = execFileSync) {
   if (!Buffer.isBuffer(keluaran) && typeof keluaran !== 'string') {
     throw new TypeError('PHI scan menerima daftar berkas bukan teks; pemindaian dibatalkan')
   }
-  return keluaran.toString().split('\0').filter((f) => f && !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)) && !BERKAS_FIXTURE.includes(f))
+  return keluaran.toString().split('\0').filter(Boolean)
+}
+
+export function daftarBerkas(jalankanGit = execFileSync) {
+  return daftarBerkasTerlacak(jalankanGit).filter((f) =>
+    !SKIP_EXT.test(f) && !SKIP_PREFIX.some((p) => f.startsWith(p)) && !BERKAS_FIXTURE.includes(f))
+}
+
+// File-content exclusions must not exempt PHI embedded in tracked path names.
+// Strip only a terminal file extension so NIK/phone regex boundaries still work.
+// Do not log the filename or the detected identifier.
+export function pindaiNamaBerkas(berkas = daftarBerkasTerlacak()) {
+  const hasil = []
+  for (const f of berkas) {
+    const candidate = f.replace(/\.(?:tsx?|jsx?|mjs|cjs|mts|cts|json|md|txt|html|css|svg|png|jpe?g|webp|avif|ico|glb|gltf|bin|pdf|mp[34]|wav|wasm|map|lock|nii|dcm|npy|blend|py)$/i, '')
+    for (const x of pindaiTeks(candidate)) hasil.push({ berkas: f, ...x })
+  }
+  return hasil
 }
 
 export function pindaiRepo(berkas = daftarBerkas(), baca = (f) => readFileSync(join(AKAR, f), 'utf8')) {
@@ -116,7 +133,7 @@ export function ringkasKegagalanTanpaPHI({ takTerdaftar = [], usang = [], tanpaA
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const t = pindaiRepo(); const { takTerdaftar, usang, tanpaAlasan } = bandingkan(t, muatDaftarIzin())
+  const t = [...pindaiNamaBerkas(), ...pindaiRepo()]; const { takTerdaftar, usang, tanpaAlasan } = bandingkan(t, muatDaftarIzin())
   console.log(JSON.stringify({ temuan: t.length, takTerdaftar: takTerdaftar.length, usang: usang.length, tanpaAlasan: tanpaAlasan.length }))
   if (takTerdaftar.length || usang.length || tanpaAlasan.length) {
     for (const line of ringkasKegagalanTanpaPHI({ takTerdaftar, usang, tanpaAlasan })) console.error(line)
