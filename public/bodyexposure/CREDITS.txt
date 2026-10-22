@@ -44,7 +44,9 @@ vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoske
 
 fetus.*      — SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
                (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas),
-               CC0 1.0 as recorded in the project manifest; upstream dataset licence unverified.
+               CC0 1.0; upstream dataset README and LICENSE verified 2026-10-23 at revision 74f11a186c709078d712bb2fd827bfa2b36e3407.
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE
                Uus A, Hall M, Grigorescu I, et al.
                Automated body organ segmentation, volumetry and population-averaged atlas for 3D motion-corrected
                T2-weighted fetal body MRI. Scientific Reports 14:6637 (2024), doi:10.1038/s41598-024-57087-x.
@@ -91,3 +93,4 @@ adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Mo
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.
                The database was created with funding from NSF EIA-0196217.
+

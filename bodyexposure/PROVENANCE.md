@@ -262,7 +262,7 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
 ## FETUS — source_backed_partial (v014): organ atlas, not an individual
 
 - **Source:** SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
-  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (historically recorded by the project; upstream dataset licence unverified in the current D8 evidence).
+  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (dataset README and LICENSE verified 2026-10-23 at revision `74f11a186c709078d712bb2fd827bfa2b36e3407`: [README](https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md), [LICENSE](https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE)). Licence verification does not establish anatomical accuracy or clinical validation.
   Uus A, Hall M, Grigorescu I, et al. *Scientific Reports* 14:6637 (2024), doi:10.1038/s41598-024-57087-x. Read on 2026-10-10.
 - **What it is:** a population-average atlas of **17 normal fetuses** (3T, T2-weighted, TE 180 ms), 0.75 mm isotropic, with 10 organ labels. The
   repository does not state a gestational age; the preprint (PMC10312818) states 25 to 28 weeks. It is not one fetus and not a reference fetus.
@@ -489,3 +489,4 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 - **Build (`pipeline/build_fetal_reference_tables.py`):** every value is parsed from the source files (SHA-256 recorded) with checks: 27 weekly rows per table, increasing percentiles, increasing medians by age, equal z spacing (SD) per week, 50th centile equal to z 0.
 - **Method in the engine (`engine/fetalBiometry.ts`):** WHO: linear interpolation between the published percentiles, bounds stated outside 2.5 to 97.5 (or 5 to 95 for EFW by sex). INTERGROWTH: linear interpolation of the z-score between the published z values, percentile = normal CDF of z; this reproduces the published 3rd/5th/10th/90th/95th/97th centiles within 0.35 percentile points at every week and measure (tested). Ages between weeks are interpolated linearly between neighbouring published weeks and flagged; ages outside 14+0 to 40+0 weeks and unsupported measures give an explicit "not available".
 - **Not included:** embryologic milestones (a different kind of reference), sex-specific INTERGROWTH, the Hadlock EFW formula, charts below 14 weeks. Output is a position against a reference only; interpretation needs a qualified clinician.
+
