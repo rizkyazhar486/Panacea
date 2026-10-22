@@ -28,6 +28,41 @@ test('E4: filename scan preserves email detection and rejects invalid or synthet
   assert.deepEqual(pindaiNamaBerkas(['public/3171011505900001/archive.bin']), [{ berkas: 'public/3171011505900001/archive.bin', jenis: 'nik', nilai: '3171011505900001' }])
 })
 
+test('E4: email domains that resemble file extensions remain detectable', () => {
+  for (const domain of ['hospital.md', 'hospital.py']) for (const prefix of ['public', 'public/contact@example.com']) {
+    const file = `${prefix}/person@${domain}`
+    assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: `person@${domain}` }])
+  }
+  for (const suffix of ['.ts', '.csv', '.zip', '.tar.gz']) {
+    assert.deepEqual(pindaiNamaBerkas([`public/person@example.com${suffix}`]), [], 'synthetic domain stays synthetic behind a file suffix')
+    const file = `public/person@hospital.md${suffix}`
+    assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: 'person@hospital.md' }])
+  }
+})
+
+test('E4: mandatory repository CI rejects filename PHI without invoking the CLI', () => {
+  for (const [name, expected] of [['synthetic.glb', 0], ['3171011505900001.glb', 1]]) {
+    const root = mkdtempSync(join(tmpdir(), 'phi-ci-'))
+    try {
+      mkdirSync(join(root, 'scripts', 'qa'), { recursive: true })
+      mkdirSync(join(root, 'governance'))
+      mkdirSync(join(root, 'public'))
+      for (const file of ['phi-repo-scan.mjs', 'phi-repo-scan.test.mjs']) {
+        writeFileSync(join(root, 'scripts', 'qa', file), readFileSync(new URL(file, import.meta.url)))
+      }
+      writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
+      writeFileSync(join(root, 'public', name), 'synthetic non-patient fixture')
+      for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
+      // This is an independent test runner, not a worker of the parent suite.
+      const env = { ...process.env }
+      delete env.NODE_TEST_CONTEXT
+      const result = spawnSync(process.execPath, ['--test', '--test-name-pattern=^repo_nyata_', 'scripts/qa/phi-repo-scan.test.mjs'], { cwd: root, encoding: 'utf8', env })
+      assert.equal(result.status, expected, 'the build-invoked real-repository gate must enforce filename coverage')
+      assert.equal((result.stdout + result.stderr).includes('3171011505900001'), false, 'the CI failure must not disclose the identifier')
+    } finally { rmSync(root, { recursive: true, force: true }) }
+  }
+})
+
 test('E4: real CLI rejects identifiers in excluded binary/CSV filenames with redacted logs', () => {
   for (const [name, expected] of [['synthetic.csv', 0], ['3171011505900001.csv', 1], ['081377745521.tar.gz', 1]]) {
     const root = mkdtempSync(join(tmpdir(), 'phi-cli-'))
@@ -114,7 +149,7 @@ test('entri_berpasangan_berkas_hanya_cocok_pada_berkas_itu', () => {
   assert.deepEqual(r.takTerdaftar.map((x) => x.berkas), ['b.ts'])
 })
 test('repo_nyata_tanpa_temuan_tak_terdaftar_dan_tanpa_entri_usang', () => {
-  const r = bandingkan(pindaiRepo(), muatDaftarIzin())
+  const r = bandingkan([...pindaiNamaBerkas(), ...pindaiRepo()], muatDaftarIzin())
   assert.equal(r.takTerdaftar.length, 0, 'jumlah PHI tak terdaftar harus nol (jangan cetak nilainya ke CI)')
   assert.equal(r.usang.length, 0, 'jumlah allowlist usang harus nol (jangan cetak nilainya ke CI)')
   assert.equal(r.tanpaAlasan.length, 0, 'jumlah allowlist tanpa alasan harus nol (jangan cetak nilainya ke CI)')

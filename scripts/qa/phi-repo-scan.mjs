@@ -71,8 +71,15 @@ export function daftarBerkas(jalankanGit = execFileSync) {
 export function pindaiNamaBerkas(berkas = daftarBerkasTerlacak()) {
   const hasil = []
   for (const f of berkas) {
-    const candidate = f.replace(/\.(?:tsx?|jsx?|mjs|cjs|mts|cts|json|md|txt|html|css|svg|png|jpe?g|webp|avif|ico|glb|gltf|bin|pdf|mp[34]|wav|wasm|map|lock|nii|dcm|npy|blend|py)$/i, '')
-    const email = pindaiTeks(candidate).filter((x) => x.jenis === 'email')
+    const email = f.split('/').flatMap((part, index, parts) => {
+      const candidate = index === parts.length - 1
+        ? part.replace(/\.(?:tar\.)?(?:tsx?|jsx?|mjs|cjs|mts|cts|json|md|txt|html|css|svg|png|jpe?g|webp|avif|ico|glb|gltf|bin|pdf|mp[34]|wav|wasm|map|lock|nii|dcm|npy|blend|py|csv|zip|gz)$/i, '')
+        : part
+      // .md/.py can be an email domain. Check each path component separately
+      // so a synthetic parent-directory email cannot suppress this fallback.
+      const emailCandidate = [...candidate.matchAll(RE_EMAIL)].length ? candidate : part
+      return pindaiTeks(emailCandidate).filter((x) => x.jenis === 'email')
+    })
     const numeric = pindaiTeks(f.replace(/\./g, ' ')).filter((x) => x.jenis !== 'email')
     for (const x of [...email, ...numeric]) hasil.push({ berkas: f, ...x })
   }
