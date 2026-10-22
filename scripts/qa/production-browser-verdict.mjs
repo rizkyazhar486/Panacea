@@ -30,9 +30,10 @@ export function productionAssetFailure({ url, status, contentType = '', requestF
   const pathname = new URL(url).pathname
   const ref = createHash('sha256').update(pathname).digest('hex').slice(0, 16)
   if (requestFailure) return `required asset ref=${ref}: request failed`
-  const ct = String(contentType).toLowerCase()
-  if (status >= 400 || (pathname.endsWith('.css') && !ct.includes('text/css'))) {
-    const safeType = ct.includes('text/css') ? 'text/css' : ct.includes('text/html') ? 'text/html' : 'other'
+  // Compare the MIME essence; a parameter mentioning text/css is not CSS.
+  const ct = String(contentType).split(';', 1)[0].trim().toLowerCase()
+  if (status >= 400 || (pathname.endsWith('.css') && ct !== 'text/css')) {
+    const safeType = ct === 'text/css' ? 'text/css' : ct === 'text/html' ? 'text/html' : 'other'
     const safeStatus = Number.isInteger(status) && status >= 100 && status <= 599 ? status : 'unknown'
     return `required asset ref=${ref}: HTTP ${safeStatus} content-type ${safeType}`
   }

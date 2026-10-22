@@ -1,6 +1,20 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { assessPublicPage, isProductionAsset, productionAssetFailure } from './production-browser-verdict.mjs'
+
+test('E7: CSS MIME requires an exact media type, never a substring or parameter match', () => {
+  const base = 'https://panaceamed.id'
+  const url = base + '/assets/Home.css?token=synthetic-secret'
+  for (const contentType of ['text/css', 'TEXT/CSS', ' text/css ; charset=utf-8']) {
+    assert.equal(productionAssetFailure({ url, status: 200, contentType }, base), null, contentType)
+  }
+  for (const contentType of ['', 'text/css-invalid', 'application/text/css', 'text/html; note=text/css', 'text/css, text/html']) {
+    const failure = productionAssetFailure({ url, status: 200, contentType }, base)
+    assert.match(failure ?? '', /required asset ref=[0-9a-f]{16}: HTTP 200 content-type (?:text\/html|other)$/, contentType)
+    assert.equal(failure.includes('synthetic-secret'), false)
+    assert.equal(assessPublicPage({ status: 200, title: 'Panacea', bodyTextChars: 42, assetFailures: [failure] }).length, 1)
+  }
+})
 test('E7: public home HTTP 200 with visible text and title passes structural check', () => {
   assert.deepEqual(assessPublicPage({ status: 200, title: 'PanaceaMed', bodyTextChars: 42 }), [])
 })
