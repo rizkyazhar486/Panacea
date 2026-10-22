@@ -23,7 +23,7 @@ jobs:
   # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
   # only repeated the same type gate on every PR.
   full-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - name: Checkout
