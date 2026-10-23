@@ -62,7 +62,24 @@ for (const side of ['L', 'R']) {
   const heelPlantar = pick(all.filter((p) => p.z <= zmin + PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))
   const toePlantar = pick(all.filter((p) => p.z >= zmax - PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
   marker[side] = { heel, toe, heelPlantar, toePlantar, footLength_m: len }
+  // T-D7-02: landmark ANATOMIS dari mesh tulang sumber (bukan simpul ekstrem kaki). Rig tidak punya sendi jari, jadi bola kaki (kepala
+  // metatarsal I) adalah pivot depan terjauh yang sah; ujung jari tidak dipakai. Nama simpul disanitasi three.js (titik dihapus).
+  const bone = (re) => { const m = []; feet[side].traverse((c) => { if (re.test(c.name)) footMeshes(c).forEach((x) => m.includes(x) || m.push(x)) }); return m }
+  const verts = (meshes) => { const p = []; for (const mesh of meshes) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); p.push({ mesh, i, y: v.y, z: v.z }) } return p }
+  const calc = verts(bone(new RegExp(`SKELETALCALCANEUS${side}$`)))
+  const mt1 = verts(bone(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`)))
+  // tumit = simpul terendah kalkaneus (tuberositas yang menapak), seri dipecah ke arah posterior
+  marker[side].heelCalcaneus = calc.length ? pick(calc, (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z)) : null
+  // bola = simpul terendah di seperempat anterior metatarsal I (kepala metatarsal), seri dipecah ke arah anterior
+  if (mt1.length) {
+    const z0 = Math.min(...mt1.map((p) => p.z)), z1 = Math.max(...mt1.map((p) => p.z))
+    if (!(z1 > z0)) throw new Error(`invalid first metatarsal length: ${side}`)
+    marker[side].ballMT1 = pick(mt1.filter((p) => p.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
+  } else marker[side].ballMT1 = null
 }
+// Ketersediaan landmark anatomis per sisi dicatat; landmark yang tidak ada di sumber TIDAK diganti tebakan.
+const ANATOMICAL = { heelCalcaneus: 'calcaneus (lowest vertex)', ballMT1: 'first metatarsal head (lowest vertex in anterior quarter)' }
+const landmarkAvailability = Object.fromEntries(Object.keys(ANATOMICAL).map((k) => [k, { L: !!marker.L[k], R: !!marker.R[k] }]))
 
 function sample(clip) {
   const mixer = new THREE.AnimationMixer(root)
@@ -79,7 +96,7 @@ function sample(clip) {
       let lowest = Infinity, lowestZ = 0
       for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); if (v.y < lowest) { lowest = v.y; lowestZ = v.z } }
       const mk = {}
-      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar']) { world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
+      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1']) { if (!marker[side][name]) continue; world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
       row[side] = { lowest, lowestZ, ...mk }
     }
     rows.push(row)
@@ -115,9 +132,10 @@ for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name ===
   const N = rows.length
   const floor = Math.min(...rows.flatMap((r) => ['L', 'R'].map((s) => r[s].lowest)))
   const out = { frames: N, foot_length_m: +marker.L.footLength_m.toFixed(3), loop_closed_duplicate_end_frame_dropped: closed, floor_m: +floor.toFixed(4) }
-  for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'sole']) {
+  for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1', 'sole']) {
     const groups = []; const per = {}
     for (const side of ['L', 'R']) {
+      if (kind !== 'sole' && !marker[side][kind]) { per[side] = null; continue }
       const h = rows.map((r) => (kind === 'sole' ? r[side].lowest : r[side][kind].y) - floor)
       const ph = phases(h, closed)
       per[side] = ph.map(([a, b]) => (b >= N ? `${a}-${N - 1}+0-${b - N}` : `${a}-${b}`))
@@ -125,6 +143,7 @@ for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name ===
       for (const [a, b] of ph) { const t = [], x = []; for (let f = a; f <= b; f++) { const r = rows[f % N]; t.push(f / FPS); x.push((kind === 'sole' ? r[side].lowestZ : r[side][kind].z) - r.pelvisZ) } groups.push({ side, t, x }) }
     }
     out[kind] = { ...fitFootContact(groups), phases_by_side: per, samples: groups }
+    if (kind in ANATOMICAL) out[kind].landmark = { definition: ANATOMICAL[kind], available_by_side: landmarkAvailability[kind] }
   }
   report.clips[clip.name] = out
 }
