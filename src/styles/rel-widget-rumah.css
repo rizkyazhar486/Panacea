@@ -24,7 +24,7 @@
 .rel-widget-rumah .widget-instrument-label-v5,
 .rel-widget-rumah .widget-instrument-state-v5,
 .rel-widget-rumah .widget-instrument-count-v5 {
-  color: rgba(255,255,255,.34);
+  color: rgba(255,255,255,.62);
 }
 
 
@@ -60,17 +60,25 @@
 
 .home-fun-mini__head h2 {
   margin: 0;
-  color: rgba(255,255,255,.82);
+  color: #1e293b;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
 
+.dark .home-fun-mini__head h2 {
+  color: rgba(255,255,255,.82);
+}
+
 .home-fun-mini__head span {
-  color: rgba(255,255,255,.36);
+  color: #64748b;
   font-size: 9px;
   font-weight: 700;
+}
+
+.dark .home-fun-mini__head span {
+  color: rgba(255,255,255,.62);
 }
 
 .home-fun-mini__head button {
@@ -78,10 +86,18 @@
   flex: 0 0 auto;
   border: 0;
   background-color: transparent;
-  color: #00bf63;
+  color: #0b7a4b;
   font-size: 10px;
   font-weight: 850;
   cursor: pointer;
+}
+
+.dark .home-fun-mini__head button {
+  color: #00bf63;
+}
+
+html:not(.dark) .home-fun-mini__card h2.t-kecil {
+  color: #475569;
 }
 
 .home-fun-mini__rail {
@@ -112,11 +128,19 @@
 .home-fun-mini__card {
   min-height: 184px;
   padding: 14px;
-  border: 1px solid rgba(255,255,255,.10);
+  border: 1px solid rgba(0,0,0,.08);
   border-radius: 28px;
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.dark .home-fun-mini__card {
+  border: 1px solid rgba(255,255,255,.10);
   background-color: #0b0d0c;
   color: white;
-  overflow: hidden;
+  box-shadow: none;
 }
 
 .home-fun-mini__card > section {
@@ -124,9 +148,14 @@
 }
 
 .home-fun-mini__card .kaca {
+  background-color: #f8fafc;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: none;
+}
+
+.dark .home-fun-mini__card .kaca {
   background-color: rgba(255,255,255,.035);
   border-color: rgba(255,255,255,.09);
-  box-shadow: none;
 }
 
 .home-fun-mini__add {
@@ -136,12 +165,18 @@
   justify-items: start;
   gap: 5px;
   padding: 20px;
-  border: 1px dashed rgba(255,255,255,.18);
+  border: 1px dashed rgba(0,0,0,.15);
   border-radius: 28px;
   background-color: transparent;
-  color: white;
+  color: #0f172a;
   text-align: left;
   cursor: pointer;
+}
+
+.dark .home-fun-mini__add {
+  border: 1px solid rgba(255,255,255,.18);
+  border-style: dashed;
+  color: white;
 }
 
 .home-fun-mini__add strong {
@@ -150,16 +185,29 @@
 }
 
 .home-fun-mini__add span {
-  color: rgba(255,255,255,.42);
+  color: #64748b;
   font-size: 10px;
   font-weight: 700;
 }
 
+.dark .home-fun-mini__add span {
+  color: rgba(255,255,255,.42);
+}
+
 @media (min-width: 760px) {
+  .home-fun-mini__rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
   .home-fun-mini__card,
   .home-fun-mini__add {
-    flex-basis: 354px;
-    min-width: 354px;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
   }
 }
 

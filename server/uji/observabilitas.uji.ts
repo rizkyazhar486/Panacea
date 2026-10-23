@@ -1,7 +1,7 @@
 // Observabilitas HTTP: ID korelasi, tanpa bocor token/query/badan, ringkasan status & latensi.
 import assert from 'node:assert/strict'
 import express from 'express'
-import { middlewareObservabilitas, ringkasanObservabilitas, aturUlangObservabilitas, jalurAman } from '../src/observabilitas.js'
+import { middlewareObservabilitas, ringkasanObservabilitas, aturUlangObservabilitas, jalurAman } from '../src/domains/observability/observabilitas.js'
 
 aturUlangObservabilitas()
 const log: string[] = []

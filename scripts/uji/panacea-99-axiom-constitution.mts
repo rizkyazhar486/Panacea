@@ -6,7 +6,7 @@ const root = process.cwd()
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8')
 
 const registryPath = 'governance/panacea-99-axioms.json'
-const annexPath = 'PANACEA_99_AXIOM_CONSTITUTION.md'
+const annexPath = 'governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md'
 const registry = JSON.parse(read(registryPath)) as {
   schemaVersion: number
   enforcementPolicy: {
@@ -72,9 +72,9 @@ assert.match(annex, /intelligence != authority/)
 assert.match(annex, /Runtime constitutional policy kernel/)
 assert.match(annex, /hard PASS without evidence/)
 
-for (const path of ['AGENTS.md', 'PANACEA_INVICTUS_PRINCIPLE.md']) {
+for (const path of ['AGENTS.md', 'governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md']) {
   const content = read(path)
-  assert.ok(content.includes('PANACEA_99_AXIOM_CONSTITUTION.md'), `${path} must inherit the 99-Axiom annex`)
+  assert.ok(content.includes('governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md'), `${path} must inherit the 99-Axiom annex`)
   assert.ok(content.includes('governance/panacea-99-axioms.json'), `${path} must point to the machine-readable registry`)
 }
 

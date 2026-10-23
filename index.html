@@ -7,43 +7,43 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#010306" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f8fc" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="/home-performance-v12.css?v=20260908-1" />
-    <link rel="stylesheet" href="/shell-theme-v18.css?v=20260908-2" />
-    <link rel="stylesheet" href="/shell-performance-v20.css?v=20260908-1" />
-    <link rel="stylesheet" href="/nav-ux-v21.css?v=20260915-1" />
-    <link rel="stylesheet" href="/welcome-revitalization-v28.css?v=20260908-1" />
+    <link rel="stylesheet" href="/ui-iterations/home-performance-v12.css?v=20260908-1" />
+    <link rel="stylesheet" href="/ui-iterations/shell-theme-v18.css?v=20260908-2" />
+    <link rel="stylesheet" href="/ui-iterations/shell-performance-v20.css?v=20260908-1" />
+    <link rel="stylesheet" href="/ui-iterations/nav-ux-v21.css?v=20260915-1" />
+    <link rel="stylesheet" href="/ui-iterations/welcome-revitalization-v28.css?v=20260908-1" />
     <!-- Load the HIG foundation LAST so its system-level interaction/material
          rules consistently win over legacy page-specific CSS. -->
-    <link rel="stylesheet" href="/panacea-hig-v41.css?v=20260915-1" />
-    <link rel="stylesheet" href="/panacea-visual-first-v43.css?v=20260916-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-hig-v41.css?v=20260915-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-visual-first-v43.css?v=20260916-1" />
     <!-- v44 is the final presentation layer: floating Liquid Glass controls,
          wide spatial rhythm, continuous canvas, and compact widget rails. -->
-    <link rel="stylesheet" href="/panacea-liquid-infinite-v44.css?v=20260916-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-liquid-infinite-v44.css?v=20260916-1" />
     <!-- v45 makes every functional action behave like one liquid control:
          compress on touch, morph/expand, preserve the original feature logic. -->
-    <link rel="stylesheet" href="/panacea-liquid-actions-v45.css?v=20260916-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-liquid-actions-v45.css?v=20260916-1" />
     <!-- v46 translates the supplied button studies into production material:
          #25D162 active green, #2B2B2B/#1D1D1D graphite, white specular glass. -->
-    <link rel="stylesheet" href="/panacea-control-grading-v46.css?v=20260919-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-control-grading-v46.css?v=20260919-1" />
     <!-- v47 translates the supplied dashboard/premium-app/spatial-web recordings:
          dominant visual hierarchy, poster objects, adaptive ambient stage. -->
-    <link rel="stylesheet" href="/panacea-reference-ui-v47.css?v=20260916-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-reference-ui-v47.css?v=20260916-1" />
     <!-- v48 synthesizes the 10 supplied visual references into coherent feature
          identities and makes the sidebar + multifunction assistive context-aware. -->
-    <link rel="stylesheet" href="/panacea-feature-spectrum-v48.css?v=20260916-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-feature-spectrum-v48.css?v=20260916-1" />
     <!-- v49 is the final mobile shell repair: toolbar-height cap, compact
          icon geometry, and unclipped notification counts. -->
-    <link rel="stylesheet" href="/panacea-shell-mobile-compact-v49.css?v=20260918-1" />
+    <link rel="stylesheet" href="/ui-iterations/panacea-shell-mobile-compact-v49.css?v=20260918-1" />
     <!-- v50 is the governing visual layer: ruthless simplicity. It preserves
          capability while removing decorative gradients/glow/blur and reducing
          simultaneous visual hierarchy across the shared shell. -->
-    <link rel="stylesheet" href="/panacea-ruthless-simple-v50.css?v=20260919-2" />
-    <script defer src="/welcome-runtime-v28.js?v=20260908-1"></script>
-    <script defer src="/panacea-visual-first-v43.js?v=20260917-1"></script>
-    <script defer src="/panacea-liquid-infinite-v44.js?v=20260916-1"></script>
-    <script defer src="/panacea-liquid-actions-v45.js?v=20260916-1"></script>
-    <script defer src="/panacea-reference-ui-v47.js?v=20260916-1"></script>
-    <script defer src="/panacea-feature-spectrum-v48.js?v=20260916-1"></script>
+    <link rel="stylesheet" href="/ui-iterations/panacea-ruthless-simple-v50.css?v=20260919-2" />
+    <script defer src="/ui-iterations/welcome-runtime-v28.js?v=20260908-1"></script>
+    <script defer src="/ui-iterations/panacea-visual-first-v43.js?v=20260917-1"></script>
+    <script defer src="/ui-iterations/panacea-liquid-infinite-v44.js?v=20260916-1"></script>
+    <script defer src="/ui-iterations/panacea-liquid-actions-v45.js?v=20260916-1"></script>
+    <script defer src="/ui-iterations/panacea-reference-ui-v47.js?v=20260916-1"></script>
+    <script defer src="/ui-iterations/panacea-feature-spectrum-v48.js?v=20260916-1"></script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -204,6 +204,40 @@
           if (!splash) return
           splash.innerHTML = '<div style="max-width:330px;padding:24px;text-align:center;font-family:system-ui;color:white"><img src="./logo-mark.png" alt="" width="64" height="64" style="border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)"/><div style="margin-top:16px;font-size:20px;font-weight:800">Panacea gagal memulai</div><div style="margin-top:7px;font-size:13px;line-height:1.5;opacity:.86">Tidak ada reload otomatis. Coba muat ulang satu kali.</div><button type="button" onclick="location.reload()" style="margin-top:16px;border:0;border-radius:14px;padding:12px 18px;font:700 14px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button></div>'
         }, 12000)
+      })()
+    </script>
+    <!-- P0: Vite emits this event when a lazy page's hashed JS/CSS cannot load after deployment.
+         Install before the entry module so a stale iOS tab can recover once without an infinite loop. -->
+    <script data-panacea-preload-recovery>
+      (() => {
+        const KEY = 'pmd-vite-preload-retry-at'
+        const COOLDOWN_MS = 5 * 60 * 1000
+        window.addEventListener('vite:preloadError', (event) => {
+          if (!navigator.onLine) return
+          const now = Date.now()
+          try {
+            const previous = Number(sessionStorage.getItem(KEY) || '0')
+            if (Number.isFinite(previous) && previous > 0 && now - previous < COOLDOWN_MS) return
+            // If storage is unavailable, do not reload: repeated reloads would trap users.
+            sessionStorage.setItem(KEY, String(now))
+            const fresh = new URL(window.location.href)
+            fresh.searchParams.set('_pmd_asset_refresh', String(now))
+            // Vite checks defaultPrevented before throwing the preload rejection.
+            event.preventDefault()
+            window.location.replace(fresh.href)
+          } catch {
+            // Keep the original ErrorBoundary visible rather than looping.
+          }
+        })
+      })()
+    </script>
+    <!-- Stable Home styles: CSS survives hashed JS/CSS churn across deploys. -->
+    <script data-panacea-home-styles>
+      (() => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = '/home-styles.css'
+        document.head.appendChild(link)
       })()
     </script>
     <script type="module" src="/src/main.tsx"></script>

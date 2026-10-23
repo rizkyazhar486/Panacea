@@ -14,7 +14,8 @@ function ctx() { return { hasil: mem<HasilLabRekam>(), rujukan: mem<RujukanRekam
 const T0 = s.TENANT_PRAKTIK
 const dok: Actor = { actorId: 'd1', role: 'clinician', tenantId: T0, authorizedClinician: true }
 const dokTanpaOtorisasi: Actor = { ...dok, actorId: 'd2', authorizedClinician: false }
-const perawat: Actor = { actorId: 'n1', role: 'nurse', tenantId: T0 }
+// Perawat/lab hanya bekerja untuk pasien yang ditugaskan (F1); fixture ini ditugaskan ke kedua pasien uji.
+const perawat: Actor = { actorId: 'n1', role: 'nurse', tenantId: T0, patientIds: ['p-A', 'p-B'] }
 const admin: Actor = { actorId: 'a1', role: 'admin', tenantId: T0 }
 const sistem: Actor = { actorId: 'sys', role: 'system', tenantId: T0 }
 const pasienA: Actor = { actorId: 'uA', role: 'patient', tenantId: T0, patientIds: ['p-A'] }
@@ -314,6 +315,29 @@ assert.equal(lanjut.trail.length, 1)
   const jalan = () => { const k = ctx(); n = 0; t = Date.parse('2026-10-10T08:00:00Z'); const id = ok(s.terimaHasil(k, perawat, { patientId: 'p-A', item: butir, source: 'manual-entry' })).id; waktu(1000); ok(s.majukanHasil(k, perawat, id, { to: 'pending_review' })); return k.hasil.get(id)!.trail[0]!.hash }
   assert.equal(jalan(), jalan())
 }
+// ── F1: perawat dan staf lab dibatasi per pasien yang ditugaskan (hak akses minimum, deny-by-default) ──
+{
+  const k = ctx()
+  const perawatA: Actor = { actorId: 'n2', role: 'nurse', tenantId: T0, patientIds: ['p-A'] }
+  const labB: Actor = { actorId: 'l1', role: 'lab-staff', tenantId: T0, patientIds: ['p-B'] }
+  const tanpa: Actor = { actorId: 'n3', role: 'nurse', tenantId: T0 }
+  const tanpaLab: Actor = { actorId: 'l2', role: 'lab-staff', tenantId: T0, patientIds: [] }
+  const hA = ok(s.terimaHasil(k, dok, { patientId: 'p-A', item: butir, source: 'manual-entry' })), hB = ok(s.terimaHasil(k, dok, { patientId: 'p-B', item: butir, source: 'manual-entry' }))
+  const ids = (a: Actor) => s.daftarHasil(k, a).map((r) => r.id).sort()
+  assert.deepEqual(ids(perawatA), [hA.id], 'a nurse assigned to p-A lists only p-A'); assert.deepEqual(ids(labB), [hB.id], 'lab staff assigned to p-B lists only p-B')
+  assert.deepEqual(ids(tanpa), [], 'a nurse without assignment lists nothing'); assert.deepEqual(ids(tanpaLab), [], 'lab staff with an empty assignment lists nothing')
+  assert.deepEqual(ids(dok), [hA.id, hB.id].sort(), 'the clinician view is unchanged'); assert.deepEqual(ids(admin), [hA.id, hB.id].sort(), 'the admin view is unchanged')
+  tolak(s.bacaHasil(k, perawatA, hB.id), 'not-found'); tolak(s.bacaHasil(k, tanpa, hA.id), 'not-found'); tolak(s.bacaHasil(k, labB, hA.id), 'not-found'); ok(s.bacaHasil(k, perawatA, hA.id)); ok(s.bacaHasil(k, labB, hB.id))
+  tolak(s.terimaHasil(k, perawatA, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, tanpa, { patientId: 'p-A', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, labB, { patientId: 'p-A', item: butir, source: 'lab-intake' }), 'forbidden')
+  assert.equal(ok(s.terimaHasil(k, perawatA, { patientId: 'p-A', item: butir, source: 'manual-entry' })).patientId, 'p-A'); assert.equal(ok(s.terimaHasil(k, labB, { patientId: 'p-B', item: butir, source: 'lab-intake' })).patientId, 'p-B')
+  tolak(s.majukanHasil(k, perawatA, hB.id, { to: 'pending_review' }), 'not-found'); waktu(1000); assert.equal(ok(s.majukanHasil(k, perawatA, hA.id, { to: 'pending_review' })).status, 'pending_review')
+  tolak(s.metrikPenutupan(k, perawatA), 'forbidden'); tolak(s.metrikPenutupan(k, labB), 'forbidden'); tolak(s.metrikPenutupan(k, tanpa), 'forbidden'); ok(s.metrikPenutupan(k, dok)); ok(s.metrikPenutupan(k, admin))
+  // Rujukan: staf hanya membaca rujukan pasien yang ditugaskan; membuat rujukan tetap hanya klinisi.
+  const r = ok(s.buatRujukan(k, dok, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' })); ok(s.buatRujukan(k, dok, { patientId: 'p-B', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }))
+  assert.deepEqual(s.daftarRujukan(k, perawatA).map((x) => x.id), [r.id], 'a nurse lists only the assigned patient\'s referrals'); assert.deepEqual(s.daftarRujukan(k, tanpa), [], 'an unassigned nurse lists no referrals'); tolak(s.bacaRujukan(k, tanpa, r.id), 'not-found'); ok(s.bacaRujukan(k, perawatA, r.id))
+  tolak(s.buatRujukan(k, perawatA, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }), 'forbidden')
+}
+
 console.log('hasilLab.uji: ok')
 
 // Real HTTP lab/referral role and patient-ownership boundaries.

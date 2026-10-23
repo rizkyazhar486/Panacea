@@ -49,7 +49,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "panacea.evidence.citation",
-    "module": "server/src/pubmed.ts",
+    "module": "server/src/domains/medical-reference/pubmed.ts",
     "notes": "Existing production adapter performs PubMed esearch then esummary and returns normalized citation metadata."
   },
   "trust": {

@@ -78,7 +78,7 @@ for (const bad of [undefined, null, 5, {}] as unknown[]) {
 assert.deepEqual(validateAbInput(ab), validateAbInput({ ...ab }))
 
 // ── Regressão da página: sem `|| 0`, sem números de exemplo, usa o domínio
-const pagina = readFileSync(new URL('../../src/pages/OwnerAnalytics.tsx', import.meta.url), 'utf8')
+const pagina = readFileSync(new URL('../../src/pages/admin/OwnerAnalytics.tsx', import.meta.url), 'utf8')
 assert.equal(/\|\|\s*0\b/.test(pagina), false, 'a página não pode voltar a ler campo vazio como 0')
 assert.equal(/useState\('(4000|200|232|5|1)'\)/.test(pagina), false, 'A/B não pode abrir com números de exemplo')
 assert.equal(/wordCount:\s*450/.test(pagina), false, 'SEO não pode abrir com auditoria inventada')

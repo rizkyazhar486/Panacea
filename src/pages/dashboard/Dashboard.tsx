@@ -511,9 +511,13 @@ export function Dashboard() {
         <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
-        <a href="#manual-icu-flowsheet" className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85">
+        <button
+          type="button"
+          onClick={() => document.getElementById('manual-icu-flowsheet')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85"
+        >
           ICU Flowsheet
-        </a>
+        </button>
         <Link
           to="/clinical-hub"
           title="Open visual clinical workspace"

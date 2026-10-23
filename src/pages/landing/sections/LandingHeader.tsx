@@ -8,6 +8,10 @@ interface LandingHeaderProps {
   onMasuk: () => void
 }
 
+export function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
+
 export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderProps) {
   return (
     <>
@@ -37,18 +41,18 @@ export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderPr
           <Wordmark size={32} />
         </div>
         <nav className="hidden items-center gap-6 text-sm font-semibold text-neutral-600 dark:text-neutral-300 lg:flex">
-          <a href="#features" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+          <button type="button" onClick={() => scrollToSection('features')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
             Kapabilitas Platform
-          </a>
-          <a href="#roles" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+          </button>
+          <button type="button" onClick={() => scrollToSection('roles')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
             Profil Pengguna
-          </a>
-          <a href="#pricing" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+          </button>
+          <button type="button" onClick={() => scrollToSection('pricing')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
             Tarif &amp; Layanan
-          </a>
-          <a href="#science" className="transition hover:text-brand-dark dark:hover:text-emerald-400">
+          </button>
+          <button type="button" onClick={() => scrollToSection('science')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
             Eksplorasi Sains
-          </a>
+          </button>
         </nav>
         <div className="flex shrink-0 items-center gap-2">
           <button
