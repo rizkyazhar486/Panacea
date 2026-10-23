@@ -606,7 +606,7 @@
       ],
       "status": "FAIL",
       "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Legacy D7 note: RUN and female not measurable."
+      "statusNote": "Diagnosed 2026-10-24 (bodyexposure/qa_reports/gait_measurability.json, test scripts/uji/body-gait-measurability.mts): only male WALK is measurable. Male RUN heel landmark never comes within the 15 mm window (min 32.3/34.8 mm L/R); female WALK heel min 35.5/22.8 mm and the female source has no separate first metatarsal. This is a property of the retargeted source motion/geometry, not of the metric; making RUN/female measurable needs contact-corrected retargeting (R-D7-CONTACT), which changes motion data and is not done silently."
     },
     {
       "id": "ENG-D7-03",
