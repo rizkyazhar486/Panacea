@@ -778,7 +778,7 @@
       "dependsOn": [],
       "status": "NOT_RUN",
       "statusSha": null,
-      "statusNote": "Evidence so far, status stays NOT_RUN. logPrivacyHttp passed in server-validate job 120538961247 (run 39989986652, success) at dae2f180 (tree identical to main 2cc6b05f). Covered: (1) static guard over all of server/src: no console statement may receive request data (0 of 69 calls); (2) dynamic journey over clinical patient/record, lab-results, lab-log and shares, health webhook/profile, settings, second-opinion, feedback and auth; (3) seven malformed or oversize payloads (truncated JSON, trailing garbage, unquoted keys, single quotes, plain text, 13 MB over the 12 MB limit) are refused 400/413 and leave no content in the log. Sabotage that fails by name: console.log(req.body) on reminders/applications/clinical routes, req.query in a template, multi-line req.headers, console.error(err) and JSON.stringify(err) on the parse-error branch, a refused payload answered 200. Honest negatives: logging only err.message, or the too-large error, leaks no payload content on this Node version, so those variants pass correctly. NOT met: the criterion says every route group in the RBAC matrix; the dynamic journey does not yet hit all 15 clinical routes of rbacKlinis or the referral, care, reminder, application, genomics and health-series groups. Known limits: the guard is syntactic (data copied into another variable first is not seen); the 500 path passes err.message and stack to alertOwner and no test makes a route throw with payload data; process.stderr.write in src/mcp/stdio.ts is outside the guard."
+      "statusNote": "Evidence so far, status stays NOT_RUN. logPrivacyHttp passed in server-validate job 120538961247 (run 39989986652, success) at dae2f180 (tree identical to main 2cc6b05f). Covered: (1) static guard over all of server/src: no console statement may receive request data (0 of 69 calls); (2) dynamic journey over clinical patient/record, lab-results, lab-log and shares, health webhook/profile, settings, second-opinion, feedback and auth; (3) seven malformed or oversize payloads (truncated JSON, trailing garbage, unquoted keys, single quotes, plain text, 13 MB over the 12 MB limit) are refused 400/413 and leave no content in the log. Sabotage that fails by name: console.log(req.body) on reminders/applications/clinical routes, req.query in a template, multi-line req.headers, console.error(err) and JSON.stringify(err) on the parse-error branch, a refused payload answered 200. Honest negatives: logging only err.message, or the too-large error, leaks no payload content on this Node version, so those variants pass correctly. NOT met: the criterion says every route group in the RBAC matrix; the dynamic journey does not yet hit all 15 clinical routes of rbacKlinis or the referral, care, reminder, application, genomics and health-series groups. Known limits: the guard is syntactic (data copied into another variable first is not seen); the 500 path passes err.message and stack to alertOwner and no test makes a route throw with payload data; process.stderr.write in src/mcp/stdio.ts is outside the guard. Console inventory (main e5d3c9f1): 69 console statements; 24 in src/index.ts, of which the personal-data routes are PUT /api/settings, POST /api/lab-log/shares, POST /api/clinician/lab-shares/:id/review and /care-plan, and POST /api/health-webhook/:token. The first four of those and the webhook are exercised by the dynamic journey; /care-plan logs only a push-notification failure message. The external lookup routes (PubMed, trials, openFDA, RxNorm, MyGene, markets) log only e.message of upstream errors, and their helpers throw static codes such as mygene_search_503 or market source 503, never the search term. The remaining 45 are in sports.ts (24, upstream), store.ts (10, operational), push.ts, ai.ts and similar. This argues that the log channel is small and covered, but the criterion text asks for every route group in the RBAC matrix, which the dynamic journey does not yet show, so the status is not changed."
     },
     {
       "id": "ENG-E4-03",
@@ -942,15 +942,19 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/calculator-independent-reference.mts",
-            "governance/CALCULATOR_REVIEW_REGISTRY.json"
+            "governance/CALCULATOR_REVIEW_REGISTRY.json",
+            "scripts/uji/calculator-reference-coverage.mts",
+            "scripts/qa/calculator-mutation-sweep.mts",
+            "docs/governance/CALCULATOR_MUTATION_SWEEP.md"
           ]
         }
       ],
       "negativeControl": "Off-by-one coefficient mutation fails its reference comparison.",
       "evidence": "Coverage table engine -> reference test at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "1f2771b1f95bd79b05baa09699e314fd8791802d",
+      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation."
     },
     {
       "id": "ENG-C6-02",
@@ -976,7 +980,8 @@
       "evidence": "Matrix output at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Not started as a matrix. The C6-01 mutation sweep (docs/governance/CALCULATOR_MUTATION_SWEEP.md) found 94 surviving input-range limit mutants in 27 engines, e.g. meanArterialPressure SYSTOLIC_MMHG max 300 -> 301 is accepted by every reference suite, so the exact accepted limit is not pinned. A matrix needs a per-engine adapter because the call signatures differ; the range tables are already exported constants (e.g. SYSTOLIC_MMHG, DIASTOLIC_MMHG) and engines share inRange() from engine/inputs.ts."
     },
     {
       "id": "ENG-C6-03",
