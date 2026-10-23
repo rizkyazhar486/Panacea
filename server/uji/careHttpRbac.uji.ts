@@ -36,21 +36,29 @@ try {
   const plan = (token: string, body: unknown, id = share.id) => call('POST', `/api/clinician/lab-shares/${id}/care-plan`, token, body)
 
   // 2. Plan bounds: bad plans are rejected and leave the active plan untouched.
-  const created = await plan(doctorA.token, { diagnosisRefs: [diagnosis], questions })
+  const created = await plan(doctorA.token, { signIntent: true, diagnosisRefs: [diagnosis], questions })
   assert.equal(created.status, 200)
   const planId: string = created.body.id
+  assert.equal((await call('GET', '/api/keadaan-longitudinal')).status, 401)
+  const aliceState = (await call('GET', '/api/keadaan-longitudinal', alice.token)).body
+  assert.equal(aliceState.subjectId, alice.user.id)
+  assert.equal(aliceState.care.plans[0].plan.id, planId, 'populated own longitudinal state contains the care plan')
+  const bobState = (await call('GET', `/api/keadaan-longitudinal?subjectId=${alice.user.id}&email=${alice.user.email}`, bob.token)).body
+  assert.equal(bobState.subjectId, bob.user.id, 'client query cannot select another longitudinal subject')
+  assert.deepEqual(bobState.care.plans, [], 'foreign populated care plans are not projected into another patient state')
+
   assert.equal(created.body.subjectId, alice.user.id, 'plan subject is the account id from the server, not the client')
   const activeAfter = async () => (await call('GET', '/api/care/plans', alice.token)).body.plans
   const snapshot = await activeAfter()
   assert.equal(snapshot.length, 1)
   for (const [label, body] of [
-    ['no diagnosis', { diagnosisRefs: [], questions }],
-    ['six diagnoses', { diagnosisRefs: Array(6).fill(diagnosis), questions }],
-    ['no questions', { diagnosisRefs: [diagnosis], questions: [] }],
-    ['twenty-one questions', { diagnosisRefs: [diagnosis], questions: Array.from({ length: 21 }, (_, i) => ({ id: `q${i}`, kind: 'boolean', prompt: 'x' })) }],
-    ['duplicate question id', { diagnosisRefs: [diagnosis], questions: [questions[0], questions[0]] }],
-    ['unknown question kind', { diagnosisRefs: [diagnosis], questions: [{ id: 'x', kind: 'file', prompt: 'x' }] }],
-    ['choice without choices', { diagnosisRefs: [diagnosis], questions: [{ id: 'x', kind: 'choice', prompt: 'x' }] }],
+    ['no diagnosis', { signIntent: true, diagnosisRefs: [], questions }],
+    ['six diagnoses', { signIntent: true, diagnosisRefs: Array(6).fill(diagnosis), questions }],
+    ['no questions', { signIntent: true, diagnosisRefs: [diagnosis], questions: [] }],
+    ['twenty-one questions', { signIntent: true, diagnosisRefs: [diagnosis], questions: Array.from({ length: 21 }, (_, i) => ({ id: `q${i}`, kind: 'boolean', prompt: 'x' })) }],
+    ['duplicate question id', { signIntent: true, diagnosisRefs: [diagnosis], questions: [questions[0], questions[0]] }],
+    ['unknown question kind', { signIntent: true, diagnosisRefs: [diagnosis], questions: [{ id: 'x', kind: 'file', prompt: 'x' }] }],
+    ['choice without choices', { signIntent: true, diagnosisRefs: [diagnosis], questions: [{ id: 'x', kind: 'choice', prompt: 'x' }] }],
   ] as const) {
     assert.equal((await plan(doctorA.token, body)).status, 400, label)
     assert.deepEqual(await activeAfter(), snapshot, `${label}: rejected plan leaves the active plan unchanged`)
@@ -121,7 +129,7 @@ try {
   assert.equal((await call('GET', `/api/clinician/lab-shares/${share.id}/care`, bob.token)).status, 403)
 
   // 9. A new plan from the same doctor replaces the old one: the old plan stops accepting answers and its reports do not carry over.
-  const replacement = await plan(doctorA.token, { diagnosisRefs: [diagnosis], questions: [questions[0]] })
+  const replacement = await plan(doctorA.token, { signIntent: true, diagnosisRefs: [diagnosis], questions: [questions[0]] })
   assert.equal(replacement.status, 200); assert.notEqual(replacement.body.id, planId)
   const active = (await call('GET', '/api/care/plans', alice.token)).body.plans
   assert.deepEqual(active.map((p: any) => p.plan.id), [replacement.body.id]); assert.deepEqual(active[0].reports, [])
@@ -134,7 +142,7 @@ try {
   assert.equal((await call('GET', `/api/clinician/lab-shares/${share.id}/care`, doctorA.token)).status, 404)
   const reshare = (await call('POST', '/api/lab-log/shares', alice.token, { dokterEmail: doctorA.user.email, hari: 7 })).body
   assert.deepEqual((await call('GET', '/api/care/plans', alice.token)).body.plans, [], 're-sharing needs a new plan: the old one is not resurrected')
-  assert.equal((await plan(doctorA.token, { diagnosisRefs: [diagnosis], questions: [questions[0]] }, reshare.id)).status, 200)
+  assert.equal((await plan(doctorA.token, { signIntent: true, diagnosisRefs: [diagnosis], questions: [questions[0]] }, reshare.id)).status, 200)
   assert.equal((await call('GET', '/api/care/plans', alice.token)).body.plans.length, 1)
 
   console.log('careHttpRbac: two real /api/care routes plus plan creation bounds, patient-only answers with server-derived subject, validation and idempotency, offline-time clamp, replacement and revocation; passed')

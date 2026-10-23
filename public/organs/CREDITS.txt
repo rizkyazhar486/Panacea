@@ -15,6 +15,9 @@ Files
   <organ>/location.webp        where it sits in the body
   <organ>/microscopic.webp     tissue appearance
   <organ>/compare.webp         size comparison
+  <organ>/thumb.webp           180x180 thumbnail. Added in the same import commit (42a3ed3ad) as the files
+                               above; the upstream repository was not re-inspected when this line was
+                               written, so its derivation from organ.webp is recorded, not verified.
 
 Organs: brain, eyeball, heart, intestine, kidneys, liver, lungs,
         pancreas, skin

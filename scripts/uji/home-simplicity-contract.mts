@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 
-const landing = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
-const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
+const landing = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
+const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 
 // Simplicity is information compression, not feature deletion. The hero owns

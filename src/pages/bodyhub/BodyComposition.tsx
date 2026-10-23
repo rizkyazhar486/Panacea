@@ -8,6 +8,10 @@ import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../components
 import { getHealthCache, pushBiometrics, mergeHealthCache } from '../../lib/profile'
 import { mergeVitals } from '../../lib/healthVitals'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import {
+  DEF, PERLU_UBIN, bacaTersimpan, biometrikUntukDibagikan, kurangKomposisi, serialisasi, terapkan, yangKurang,
+  type Body, type KeadaanMasukan, type KunciBody,
+} from './bodyCompositionInputs'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Komposisi Tubuh — InBody-style visual page. Nilai yang diketahui perangkat
@@ -17,37 +21,19 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Persists locally so it works offline.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface Body {
-  w: number; h: number; age: number; g: 'M' | 'F'
-  waist: number; hip: number; neck: number
-  smm: number; bfm: number // optional direct from InBody (0 = estimate)
-  rhr: number; hrv: number; sleepH: number; remH: number; deepH: number
-  stress: number; anxiety: number; mood: number // 0-10 self report
-  mets: number; caffeineCutoff: string; noiseDb: number
-  vo2: number
-  bmd: number // bone mineral density T-score (from DEXA scan, if available)
-}
-const DEF: Body = {
-  w: 70, h: 170, age: 30, g: 'M', waist: 85, hip: 98, neck: 38,
-  smm: 0, bfm: 0, rhr: 65, hrv: 0, sleepH: 7, remH: 1.5, deepH: 1.2,
-  stress: 4, anxiety: 3, mood: 7, mets: 6, caffeineCutoff: '14:00', noiseDb: 45, vo2: 0,
-  bmd: 0,
-}
 const KEY = 'pm_bodycomp_v1'
-const load = (): Body => {
-  let d = DEF
-  try { d = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { /* ignore */ }
-  // Seed demographics from the shared profile if the user hasn't set them here yet.
+// Keadaan awal: isian tersimpan, lalu (hanya bila belum pernah tersimpan) profil bersama. Kolom yang tidak
+// diisi siapa pun tetap kosong; angka bawaan hanya menjaga rumus terdefinisi.
+const load = (): KeadaanMasukan => {
+  let mentah: unknown = null
+  try { mentah = JSON.parse(localStorage.getItem(KEY) || 'null') } catch { /* ignore */ }
+  let keadaan = bacaTersimpan(mentah)
+  if (localStorage.getItem(KEY)) return keadaan
   try {
     const p = JSON.parse(localStorage.getItem('pmd_profile') || '{}')
-    if (!localStorage.getItem(KEY)) {
-      if (p.age) d.age = p.age
-      if (p.sex) d.g = p.sex
-      if (p.weightKg) d.w = p.weightKg
-      if (p.heightCm) d.h = p.heightCm
-    }
+    keadaan = terapkan(keadaan, { age: p.age, g: p.sex, w: p.weightKg, h: p.heightCm })
   } catch { /* ignore */ }
-  return d
+  return keadaan
 }
 
 // US Navy body-fat % (needs waist/neck/hip in cm, height in cm).
@@ -119,20 +105,22 @@ function BodyTypeGrid({ bmi, pbf, g }: { bmi: number; pbf: number; g: 'M' | 'F' 
 
 // Pull whatever the Health Profile has synced from Apple Health / WHOOP / etc.
 // and map it onto this page's fields, so the two don't silently disagree.
-function syncFromHealthProfile(cur: Body): { next: Body; changed: string[] } {
+function syncFromHealthProfile(cur: KeadaanMasukan): { next: KeadaanMasukan; changed: string[] } {
   const hc = getHealthCache() as Record<string, unknown>
   const num = (k: string) => (typeof hc[k] === 'number' && (hc[k] as number) > 0 ? (hc[k] as number) : undefined)
-  const patch: Partial<Body> = {}
+  const patch: Partial<Record<KunciBody, number>> = {}
   const changed: string[] = []
   const wKg = num('weightKg'); if (wKg) { patch.w = wKg; changed.push('Weight') }
   const bf = num('bodyFatPct')
-  if (bf) { patch.bfm = +(((wKg ?? cur.w) * bf) / 100).toFixed(1); changed.push('Body Fat') }
+  // Massa lemak dari persen lemak perangkat butuh berat yang nyata; tanpa berat, persen itu tidak dihitung.
+  const beratNyata = wKg ?? (cur.diisi.has('w') ? cur.b.w : undefined)
+  if (bf && beratNyata) { patch.bfm = +((beratNyata * bf) / 100).toFixed(1); changed.push('Body Fat') }
   const smm = num('muscleMassKg'); if (smm) { patch.smm = smm; changed.push('Muscle Mass') }
   const vo2 = num('vo2max'); if (vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
   const rhr = num('restingHr'); if (rhr) { patch.rhr = rhr; changed.push('Resting HR') }
   const hrv = num('hrvMs'); if (hrv) { patch.hrv = hrv; changed.push('HRV') }
   const sleepH = num('sleepH'); if (sleepH) { patch.sleepH = sleepH; changed.push('Sleep') }
-  return { next: { ...cur, ...patch }, changed }
+  return { next: terapkan(cur, patch), changed }
 }
 
 export function BodyComposition() {
@@ -140,22 +128,27 @@ export function BodyComposition() {
   // below never has a chance to commit stale default values over real synced
   // ones — that race is exactly what caused this page to silently disagree
   // with Apple Health/WHOOP data in the first place.
-  const [b, setB] = useState<Body>(() => {
+  const [masukan, setMasukan] = useState<KeadaanMasukan>(() => {
     const initial = load()
     if (localStorage.getItem(KEY) == null) return syncFromHealthProfile(initial).next
     return initial
   })
+  const { b, diisi } = masukan
   const [syncNote, setSyncNote] = useState('')
   const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const vital = useVitals()
-  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(b)) } catch { /* ignore */ } }, [b])
+  // Hanya isian nyata yang disimpan; sebelum ada satu pun isian, tidak ada yang ditulis (halaman lain membaca kunci ini).
+  useEffect(() => {
+    try { if (diisi.size > 0 || localStorage.getItem(KEY) != null) localStorage.setItem(KEY, JSON.stringify(serialisasi(masukan))) } catch { /* ignore */ }
+  }, [masukan])
   // Keep the shared Health Profile cache in sync with manual edits made here too,
   // so calculators elsewhere in the app don't drift from what's shown on this page.
-  useEffect(() => { pushBiometrics({ vo2max: b.vo2, restingHr: b.rhr, hrvMs: b.hrv, sleepH: b.sleepH, weightKg: b.w }) }, [b.vo2, b.rhr, b.hrv, b.sleepH, b.w])
-  const u = (p: Partial<Body>) => setB((x) => ({ ...x, ...p }))
+  // Hanya yang benar-benar diisi yang dibagikan: angka bawaan tidak boleh sampai ke profil bersama.
+  useEffect(() => { pushBiometrics(biometrikUntukDibagikan(masukan)) }, [masukan])
+  const u = (p: Partial<Record<KunciBody, unknown>>) => setMasukan((x) => terapkan(x, p))
 
   function syncNow(silent = false) {
-    setB((cur) => {
+    setMasukan((cur) => {
       const { next, changed } = syncFromHealthProfile(cur)
       if (!silent) setSyncNote(changed.length ? `Synced from Health Profile: ${changed.join(', ')}.` : 'No new device data found in Health Profile.')
       return changed.length ? next : cur
@@ -172,6 +165,9 @@ export function BodyComposition() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Hasil hanya tampil bila semua masukannya nyata; selebihnya ditulis apa yang masih kurang, bukan angka dari bawaan.
+  const kurangSkor = kurangKomposisi(masukan)
+  const kurangUbin = (id: string, tambahan: string[] = []) => [...new Set([...yangKurang(diisi, PERLU_UBIN[id] ?? []), ...tambahan])]
   const d = useMemo(() => {
     const bmi = b.w / Math.pow(b.h / 100, 2)
     const pbf = b.bfm > 0 ? (b.bfm / b.w) * 100 : navyBf(b)
@@ -212,7 +208,7 @@ export function BodyComposition() {
   }
   const num = (label: string, key: keyof Body, step = 1) => {
     const kv = KE_VITAL[key]
-    const nilai = b[key] as number
+    const nilai = diisi.has(key) ? (b[key] as number) : undefined
     const perangkat = kv ? vital[kv] : undefined
     const dariPerangkat = typeof nilai === 'number' && typeof perangkat === 'number'
       && Math.abs(nilai - perangkat) < 0.05
@@ -234,8 +230,8 @@ export function BodyComposition() {
         <div className="flex items-center gap-1"
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }}>
           <KolomAngka
-            nilai={b[key] as number | undefined}
-            onNilai={(n) => u({ [key]: n } as Partial<Body>)}
+            nilai={nilai}
+            onNilai={(n) => u({ [key]: n })}
             step={step}
             ariaLabel={label} />
           {perluSimpan && baruDisimpan !== String(key) && (
@@ -255,11 +251,24 @@ export function BodyComposition() {
       <div className="grid grid-cols-2 gap-3">
         <Card className="!p-4 liquid-glass">
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
-          <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
-          <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
+          {kurangSkor.length === 0 ? (
+            <>
+              <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
+              <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
+            </>
+          ) : (
+            <>
+              <div className="text-4xl font-extrabold text-neutral-400" aria-label="No score yet">—</div>
+              <p className="mt-1 text-[11px] leading-snug text-neutral-500" role="status">Enter your {kurangSkor.join(', ')} to see your score.</p>
+            </>
+          )}
           <BatasKlaimKesehatan permukaan="longevity.body-composition" />
         </Card>
-        <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
+        <Card className="!p-4 liquid-glass">
+          {kurangSkor.length === 0
+            ? <BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} />
+            : <div><div className="text-xs font-bold text-neutral-500">Body Type</div><div className="text-2xl font-extrabold text-neutral-400">—</div><p className="mt-1 text-[11px] leading-snug text-neutral-500">Appears once the score has what it needs.</p></div>}
+        </Card>
       </div>
 
       <Fold label="Measurements">
@@ -277,7 +286,8 @@ export function BodyComposition() {
           {num('Height (cm)', 'h')}
           {num('Age', 'age')}
           <Field label="Sex">
-            <select className={inputClass} value={b.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
+            <select className={inputClass} value={diisi.has('g') ? b.g : ''} onChange={(e) => u({ g: e.target.value })}>
+              <option value="" disabled>Select</option>
               <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
@@ -299,7 +309,8 @@ export function BodyComposition() {
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
-        <div className="mt-3 space-y-2.5">
+        {kurangSkor.length > 0 && <p className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] text-neutral-500" role="status">Enter your {kurangSkor.join(', ')} to see this analysis.</p>}
+        {kurangSkor.length === 0 && <div className="mt-3 space-y-2.5">
           <RangeBar label="Body Weight" value={b.w} unit="kg" lo={18.5 * Math.pow(b.h / 100, 2)} hi={24.9 * Math.pow(b.h / 100, 2)} max={35 * Math.pow(b.h / 100, 2)} />
           <RangeBar label="Skeletal Muscle Mass" value={d.smm} unit="kg" lo={b.w * 0.37} hi={b.w * 0.5} max={b.w * 0.6} />
           <RangeBar label="Body Fat Mass" value={d.fatMass} unit="kg" lo={b.w * (b.g === 'M' ? 0.08 : 0.15)} hi={b.w * (b.g === 'M' ? 0.2 : 0.28)} max={b.w * 0.45} danger />
@@ -308,9 +319,11 @@ export function BodyComposition() {
           <RangeBar label="Waist-Hip Ratio" value={d.whr} unit="" lo={0.7} hi={b.g === 'M' ? 0.9 : 0.85} max={1.2} danger />
           <RangeBar label="Visceral Fat Level" value={d.visceral} unit="Lv" lo={1} hi={9} max={20} danger />
           <RangeBar label="Lean Body Mass" value={d.lean} unit="kg" lo={b.w * 0.7} hi={b.w * 0.92} max={b.w} />
-        </div>
+        </div>}
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-500">
-          <b className="text-ink">BMR: {d.basal} kcal</b> (Mifflin-St Jeor) — baseline requirement before activity.
+          {yangKurang(diisi, ['w', 'h', 'age', 'g']).length === 0
+            ? <b className="text-ink">BMR: {d.basal} kcal</b>
+            : <b className="text-ink">BMR: — (enter {yangKurang(diisi, ['w', 'h', 'age', 'g']).join(', ')})</b>} (Mifflin-St Jeor) — baseline requirement before activity.
           Body fat is calculated using the US Navy method from body circumference measurements when InBody data is not provided.
         </div>
       </Card>
@@ -359,22 +372,26 @@ export function BodyComposition() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {[
-            { t: 'Training Readiness', v: `${d.readiness}`, u: '/100', tone: d.readiness >= 70 ? 'text-brand-dark' : d.readiness >= 45 ? 'text-amber-600' : 'text-rose-500', note: d.readiness >= 70 ? 'Ready for a hard session' : d.readiness >= 45 ? 'Light-moderate session' : 'Prioritize recovery' },
-            { t: 'Body Battery', v: `${d.battery}`, u: '/100', tone: d.battery >= 60 ? 'text-brand-dark' : 'text-amber-600', note: 'Sleep + HRV − stress' },
-            { t: 'Cardio Fitness', v: b.vo2.toFixed(0), u: 'VO₂max', tone: 'text-brand-dark', note: d.vo2Tier },
-            { t: 'Resting HR', v: `${b.rhr}`, u: 'bpm', tone: b.rhr <= 60 ? 'text-brand-dark' : b.rhr <= 72 ? 'text-amber-600' : 'text-rose-500', note: b.rhr <= 60 ? 'Healthy' : 'Can be lowered with Zone 2' },
-            { t: 'Restorative Sleep', v: d.restorative.toFixed(0), u: '%', tone: d.restorative >= 35 ? 'text-brand-dark' : 'text-amber-600', note: 'REM + Deep out of total' },
-            { t: 'Pace of Aging', v: d.aging.toFixed(2), u: '×', tone: d.aging <= 1 ? 'text-brand-dark' : 'text-amber-600', note: d.aging <= 1 ? 'Aging more slowly 🎉' : 'Improve sleep & VO₂max' },
-            { t: 'Estimated Life Expectancy', v: `${d.lifeExp}`, u: 'yrs', tone: 'text-ink', note: 'Heuristic — check Longevity Illustrator for actuarial figures' },
-            { t: 'Physical Effort', v: b.mets.toFixed(1), u: 'METs', tone: b.mets >= 6 ? 'text-brand-dark' : 'text-amber-600', note: '≥6 METs = vigorous' },
-            { t: 'Noise Environment', v: `${b.noiseDb}`, u: 'dB', tone: b.noiseDb <= 55 ? 'text-brand-dark' : 'text-rose-500', note: b.noiseDb <= 55 ? 'Safe' : '>55 dB chronic = stress/CVD risk' },
-          ].map((x) => (
-            <div key={x.t} className="liquid-glass rounded-xl p-3">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{x.t}</div>
-              <div className={'text-xl font-extrabold ' + x.tone}>{x.v}<span className="text-[10px] font-medium text-neutral-500"> {x.u}</span></div>
-              <div className="text-[10px] text-neutral-500">{x.note}</div>
-            </div>
-          ))}
+            { id: 'readiness', t: 'Training Readiness', v: `${d.readiness}`, u: '/100', tone: d.readiness >= 70 ? 'text-brand-dark' : d.readiness >= 45 ? 'text-amber-600' : 'text-rose-500', note: d.readiness >= 70 ? 'Ready for a hard session' : d.readiness >= 45 ? 'Light-moderate session' : 'Prioritize recovery' },
+            { id: 'battery', t: 'Body Battery', v: `${d.battery}`, u: '/100', tone: d.battery >= 60 ? 'text-brand-dark' : 'text-amber-600', note: 'Sleep + HRV − stress' },
+            { id: 'cardio', t: 'Cardio Fitness', v: b.vo2.toFixed(0), u: 'VO₂max', tone: 'text-brand-dark', note: d.vo2Tier },
+            { id: 'restingHr', t: 'Resting HR', v: `${b.rhr}`, u: 'bpm', tone: b.rhr <= 60 ? 'text-brand-dark' : b.rhr <= 72 ? 'text-amber-600' : 'text-rose-500', note: b.rhr <= 60 ? 'Healthy' : 'Can be lowered with Zone 2' },
+            { id: 'restorative', t: 'Restorative Sleep', v: d.restorative.toFixed(0), u: '%', tone: d.restorative >= 35 ? 'text-brand-dark' : 'text-amber-600', note: 'REM + Deep out of total' },
+            { id: 'aging', t: 'Pace of Aging', v: d.aging.toFixed(2), u: '×', tone: d.aging <= 1 ? 'text-brand-dark' : 'text-amber-600', note: d.aging <= 1 ? 'Aging more slowly 🎉' : 'Improve sleep & VO₂max' },
+            { id: 'lifeExpectancy', t: 'Estimated Life Expectancy', v: `${d.lifeExp}`, u: 'yrs', tone: 'text-ink', note: 'Heuristic — check Longevity Illustrator for actuarial figures' },
+            { id: 'effort', t: 'Physical Effort', v: b.mets.toFixed(1), u: 'METs', tone: b.mets >= 6 ? 'text-brand-dark' : 'text-amber-600', note: '≥6 METs = vigorous' },
+            { id: 'noise', t: 'Noise Environment', v: `${b.noiseDb}`, u: 'dB', tone: b.noiseDb <= 55 ? 'text-brand-dark' : 'text-rose-500', note: b.noiseDb <= 55 ? 'Safe' : '>55 dB chronic = stress/CVD risk' },
+          ].map((x) => {
+            // Ubin tanpa semua masukannya nyata tidak menampilkan angka dari bawaan.
+            const kurang = kurangUbin(x.id, x.id === 'lifeExpectancy' ? kurangSkor : [])
+            return (
+              <div key={x.t} className="liquid-glass rounded-xl p-3" data-marker={x.id} data-needs-input={kurang.length > 0 ? 'true' : undefined}>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{x.t}</div>
+                <div className={'text-xl font-extrabold ' + (kurang.length ? 'text-neutral-400' : x.tone)}>{kurang.length ? '—' : x.v}{!kurang.length && <span className="text-[10px] font-medium text-neutral-500"> {x.u}</span>}</div>
+                <div className="text-[10px] text-neutral-500">{kurang.length ? `Enter ${kurang.join(', ')}` : x.note}</div>
+              </div>
+            )
+          })}
         </div>
 
         {/* Caffeine + sleep hygiene */}
@@ -385,18 +402,32 @@ export function BodyComposition() {
         </div>
 
         {/* Mental quick screen */}
-        <div className={'mt-3 rounded-xl p-3 ' + ((b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3) ? 'bg-rose-50 border border-rose-200' : 'bg-brand-50')}>
-          <div className="text-xs font-bold">🧠 Mental Health</div>
-          <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
-            {b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3
-              ? 'High anxiety/stress score or low mood over the past few days. Try a 10-minute meditation and talk to the AI counselor — if it continues, consult a professional.'
-              : 'Mental condition looks good. Keep up meditation, regular sleep & a gratitude journal.'}
-          </p>
-          <div className="mt-2 flex gap-2">
-            <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-ink active:scale-95">💬 AI Consultation</a>
-            <a href="#/recovery" className="rounded-full bg-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-600 active:scale-95">🧘 Meditation & Recovery</a>
+        {(() => {
+          const kurang = kurangUbin('mental')
+          if (kurang.length > 0) {
+            return (
+              <div className="mt-3 rounded-xl bg-neutral-50 p-3" data-needs-input="true">
+                <div className="text-xs font-bold">🧠 Mental Health</div>
+                <p className="mt-1 text-[11px] leading-relaxed text-neutral-600" role="status">Enter your {kurang.join(', ')} to see this quick screen. Nothing is assumed for you.</p>
+              </div>
+            )
+          }
+          return null
+        })()}
+        {kurangUbin('mental').length === 0 && (
+          <div className={'mt-3 rounded-xl p-3 ' + ((b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3) ? 'bg-rose-50 border border-rose-200' : 'bg-brand-50')}>
+            <div className="text-xs font-bold">🧠 Mental Health</div>
+            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
+              {b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3
+                ? 'High anxiety/stress score or low mood over the past few days. Try a 10-minute meditation and talk to the AI counselor — if it continues, consult a professional.'
+                : 'Mental condition looks good. Keep up meditation, regular sleep & a gratitude journal.'}
+            </p>
+            <div className="mt-2 flex gap-2">
+              <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-ink active:scale-95">💬 AI Consultation</a>
+              <a href="#/recovery" className="rounded-full bg-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-600 active:scale-95">🧘 Meditation & Recovery</a>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
       </Fold>
 

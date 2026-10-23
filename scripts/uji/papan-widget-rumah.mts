@@ -23,9 +23,9 @@ import { readFileSync } from 'node:fs'
 //      penyusutan itu memindahkan pembaca ke widget lain di tengah geseran.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const tumpukan = readFileSync(new URL('../../src/components/Tumpukan.tsx', import.meta.url), 'utf8')
+const tumpukan = readFileSync(new URL('../../src/components/ui/Tumpukan.tsx', import.meta.url), 'utf8')
 const home = readFileSync(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
-const rel = readFileSync(new URL('../../src/components/RelWidgetRumah.tsx', import.meta.url), 'utf8')
+const rel = readFileSync(new URL('../../src/components/dashboard/RelWidgetRumah.tsx', import.meta.url), 'utf8')
 
 assert.ok(/import \{ RelWidgetRumah \} from '\.\.\/components\/RelWidgetRumah'/.test(home),
   'Home no longer imports the widget rail')

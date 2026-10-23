@@ -16,8 +16,8 @@
       "evidence_level": "E0",
       "score": null,
       "evidence": [
-        "PANACEA_CURRENT_WEDGE.md",
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
+        "governance/doctrine/PANACEA_CURRENT_WEDGE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
       ],
       "blocker": "Needs a curated external problem-evidence packet and direct workflow observations.",
       "next_experiment": "Document baseline workflow pain from outpatient/primary-care settings, including rural referral and data-return failures."
@@ -53,7 +53,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
         "src/domains/clinical-operations/model/oneOsCareProof.ts",
         "scripts/qa/one-os-care-proof.test.mjs"
       ],
@@ -66,9 +66,9 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md",
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
-        "PANACEA_SYSTEM_10_STANDARD.md"
+        "governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md"
       ],
       "blocker": "Needs architecture review against deployed runtime behavior and duplicate-state inventory.",
       "next_experiment": "Independent architecture review plus runtime trace of one patient across relevant surfaces."
@@ -79,7 +79,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
         "src/lib/panaceaLongitudinalState.ts",
         "src/lib/longitudinalSnapshot.ts"
       ],
@@ -92,7 +92,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
         "src/domains/clinical-operations/model/careAccessOrchestrator.ts",
         "src/domains/clinical-operations/model/clinicalEpisodeResilience.ts",
         "src/lib/secureCareOutbox.ts",
@@ -109,8 +109,8 @@
       "evidence_level": "E0",
       "score": null,
       "evidence": [
-        "PANACEA_SYSTEM_10_STANDARD.md",
-        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
+        "governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md",
+        "governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
       ],
       "blocker": "No buyer-specific willingness-to-pay, implementation cost or measured ROI evidence.",
       "next_experiment": "Run buyer discovery and workflow-cost baseline for clinician, clinic/Puskesmas, hospital and payer segments."
@@ -121,8 +121,8 @@
       "evidence_level": "E0",
       "score": null,
       "evidence": [
-        "PANACEA_CURRENT_WEDGE.md",
-        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
+        "governance/doctrine/PANACEA_CURRENT_WEDGE.md",
+        "governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md"
       ],
       "blocker": "Needs formal benchmark against realistic tool combinations, not feature comparison.",
       "next_experiment": "Benchmark end-to-end episode coordination against existing EMR + wearable + AI + referral + payer workflow."
@@ -133,7 +133,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_CURRENT_WEDGE.md",
+        "governance/doctrine/PANACEA_CURRENT_WEDGE.md",
         "src/domains/clinical-operations/ui/PoliPatientFlowBoard.tsx",
         "scripts/qa/compact-product-law.test.mjs"
       ],
@@ -146,8 +146,8 @@
       "evidence_level": "E0",
       "score": null,
       "evidence": [
-        "PANACEA_INVICTUS_PRINCIPLE.md",
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
+        "governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md"
       ],
       "blocker": "Compounding moat is architectural thesis until deployment learning and integration depth are demonstrated.",
       "next_experiment": "Track integration depth, switching cost, reusable primitives and deployment-specific learning across pilots."
@@ -158,7 +158,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+        "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
         "src/domains/clinical-operations/model/careAccessOrchestrator.ts"
       ],
       "blocker": "No multi-jurisdiction payer/terminology/conformance deployments yet.",
@@ -170,7 +170,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md",
+        "governance/doctrine/PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md",
         "governance/UNIVERSAL_HUMAN_ACCEPTANCE.json"
       ],
       "blocker": "Universal design doctrine and matrix exist, but representative subgroup validation is not yet complete.",
@@ -182,7 +182,7 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md",
+        "governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md",
         "src/lib/biology/verticalBiologyGraph.ts",
         "src/lib/biology/verticalDepthEvidence.ts",
         "src/lib/biology/cardiovascularVerticalLineage.ts",
@@ -201,8 +201,8 @@
       "evidence_level": "E1",
       "score": null,
       "evidence": [
-        "PANACEA_WORTHINESS_EVIDENCE_STANDARD.md",
-        "PANACEA_SYSTEM_10_STANDARD.md",
+        "governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md",
+        "governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md",
         "governance/WORTHINESS_EVIDENCE.json"
       ],
       "blocker": "Most dimensions remain E0/E1; E2-E4 evidence is still sparse.",

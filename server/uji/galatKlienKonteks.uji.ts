@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { aturUlangGalatKlien, catatGalatKlien, daftarGalatKlien, ringkasanGalatKlien, type GalatKlien } from '../src/galatKlien.js'
+import { aturUlangGalatKlien, catatGalatKlien, daftarGalatKlien, ringkasanGalatKlien, type GalatKlien } from '../src/domains/observability/galatKlien.js'
 
 aturUlangGalatKlien()
 

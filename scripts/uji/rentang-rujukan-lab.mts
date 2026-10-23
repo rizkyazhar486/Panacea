@@ -23,8 +23,8 @@ const riwayat = (akhir: { rujukanBawah?: number; rujukanAtas?: number }) => [
 assert.equal(analisisTrenLab(riwayat({}), gdp)!.diLuarRentangPopulasi, true)
 assert.equal(analisisTrenLab(riwayat({ rujukanBawah: 74, rujukanAtas: 106 }), gdp)!.diLuarRentangPopulasi, false, 'rentang dari lembar lab diabaikan oleh mesin tren')
 
-const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+const ui = readFileSync('src/components/tiles/UbinLab.tsx', 'utf8')
 assert.match(ui, /aria-label="Reference range low \(from your report\)"/, 'isian rentang dari lembar lab hilang')
 assert.match(ui, /from your report/, 'tampilan tidak membedakan rentang dari lab vs rentang umum')
-assert.match(readFileSync('server/src/labFhir.ts', 'utf8'), /As printed on the laboratory report \(patient-transcribed\)/, 'referenceRange FHIR tanpa keterangan asal')
+assert.match(readFileSync('server/src/domains/clinical-records/labFhir.ts', 'utf8'), /As printed on the laboratory report \(patient-transcribed\)/, 'referenceRange FHIR tanpa keterangan asal')
 console.log('rentang-rujukan-lab: rentang dari lembar lab divalidasi, dipakai mesin tren dan FHIR, rentang umum hanya cadangan')

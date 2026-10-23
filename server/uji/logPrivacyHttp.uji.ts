@@ -47,8 +47,36 @@ try {
   const share = (await call('POST', '/api/lab-log/shares', alice.token, { dokterEmail: 'logprivacy-doctor@localhost.test', hari: 7 })).body
   await call('POST', `/api/clinician/lab-shares/${share.id}/review`, doctor.token, { tes: 'gdp', catatan: 'review-note-marker-xyz' })
   const token = (await call('GET', '/api/health-profile/webhook-token', alice.token)).body.token
-  await call('POST', `/api/health-webhook/${token}`, undefined, { data: { metrics: [{ name: 'weight_body_mass', units: 'kg', data: [{ qty: 71.234, date: '2026-10-11 08:00:00 +0000' }] }] } })
-  await call('POST', '/api/health-webhook/not-a-real-token', undefined, { data: {} })
+  const privateLabel = 'synthetic-private-health-label\nsynthetic-forged-log-line'
+  const delivered = await call('POST', `/api/health-webhook/${token}`, undefined, { data: { metrics: [
+    { name: 'weight_body_mass', units: 'kg', data: [{ qty: 71.234, date: '2026-10-11 08:00:00 +0000' }] },
+    { name: privateLabel, data: [{ qty: 53117, date: '2026-10-11 08:00:00 +0000' }] },
+  ] } })
+  assert.equal(delivered.status, 200, 'valid delivery must remain accepted')
+  assert.equal(delivered.body.imported, 1, 'unknown labels must not become clinical measurements')
+  assert.equal(delivered.body.profile.weightKg, 71.23, 'normal measurement normalization must be preserved')
+  const profile = await call('GET', '/api/health-profile', alice.token)
+  const diagnosis = await call('GET', '/api/health-sync/diagnosis', alice.token)
+  assert.equal(profile.status, 200)
+  assert.equal(profile.body.profile.weightKg, 71.23, 'imported measurement must persist')
+  assert.equal(diagnosis.status, 200)
+  assert.deepEqual(diagnosis.body.recent[0].metricGroups, [
+    { name: 'weight_body_mass', samples: 1 }, { name: privateLabel, samples: 1 },
+  ], 'raw exporter naming evidence belongs in account-scoped diagnostics')
+  assert.deepEqual(diagnosis.body.recent[0].matched, ['weightKg'])
+  const otherDiagnosis = await call('GET', '/api/health-sync/diagnosis', owner.token)
+  assert.equal(otherDiagnosis.status, 200)
+  assert.deepEqual(otherDiagnosis.body.recent, [], 'another account must not see delivery diagnostics')
+  const rejected = await call('POST', '/api/health-webhook/not-a-real-token', undefined, { data: { metrics: [
+    { name: 'weight_body_mass', units: 'kg', data: [{ qty: 99, date: '2026-10-12 08:00:00 +0000' }] },
+  ] } })
+  assert.equal(rejected.status, 404)
+  assert.equal(rejected.body.error, 'unknown_token')
+  assert.deepEqual((await call('GET', '/api/health-profile', alice.token)).body, profile.body, 'invalid token must not change the profile')
+  assert.deepEqual((await call('GET', '/api/health-sync/diagnosis', alice.token)).body.recent, diagnosis.body.recent, 'invalid token must not record a delivery')
+  await running.restart()
+  assert.deepEqual((await call('GET', '/api/health-profile', alice.token)).body, profile.body, 'measurement must survive process restart')
+  assert.deepEqual((await call('GET', '/api/health-sync/diagnosis', alice.token)).body.recent, diagnosis.body.recent, 'private diagnostics must survive process restart')
   await call('PUT', '/api/settings', alice.token, { settings: { strStatus: 'forged' } })
   await call('POST', '/api/second-opinion', alice.token, { symptoms: 'symptom-marker-xyz', history: 'history-marker-xyz' })
   await call('POST', '/api/feedback', alice.token, { kind: 'Question', text: 'feedback-marker-xyz text' })
@@ -59,10 +87,11 @@ try {
   for (const secret of [
     'logprivacy-alice@localhost.test', 'logprivacy-doctor@localhost.test', ownerEmail, '@localhost.test',
     'Alice Marker', 'Dr Marker', 'Owner Marker', 'MRN-MARKER', 'penicillin-marker', 'complaint-marker', 'exam-marker', 'labvalue-marker', '987.65',
-    'review-note-marker', '71.234', 'symptom-marker', 'history-marker', 'feedback-marker', 'forged',
+    'review-note-marker', '71.234', '71.23', '53117', 'symptom-marker', 'history-marker', 'feedback-marker', 'forged',
+    privateLabel, 'synthetic-private-health-label', 'synthetic-forged-log-line', 'weight_body_mass', 'weightKg', token,
   ]) assert.ok(!written.includes(secret), `the server log must not contain "${secret}"`)
-  // The diagnostics people rely on are still there, with an opaque marker instead of the address.
-  assert.match(written, /\[health-webhook\] u:[0-9a-f]{10}: groups=weight_body_mass\(1\)/, 'the webhook line keeps its diagnostics under an opaque marker')
+  // Operational telemetry retains counts and correlation, without health categories.
+  assert.match(written, /\[health-webhook\] u:[0-9a-f]{10}: groups=2 workouts=0 matched=1(?:\r?\n|$)/, 'the webhook line keeps counts under an opaque marker')
   assert.match(written, /\[settings\] u:[0-9a-f]{10} attempted to write server-owned keys: strStatus/, 'the settings warning keeps its diagnostics under an opaque marker')
   const markers = new Set([...written.matchAll(/\bu:[0-9a-f]{10}\b/g)].map(m => m[0]))
   assert.equal(markers.size, 1, 'one account is one stable marker across lines (so a support engineer can correlate them)')

@@ -53,7 +53,7 @@ for (const item of BRIDGE_TOPICS) {
   assert.ok(hits.some((hit) => hit.topic.id === item.id), `expected "${item.title}" to find itself`)
 }
 
-const source = await readFile(new URL('../../src/components/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
+const source = await readFile(new URL('../../src/components/medstudy/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
 assert.match(source, /searchBridgeTopics/)
 assert.match(source, /aria-label="Related curated topics"/)
 assert.match(source, /Did you mean/)

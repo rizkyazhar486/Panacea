@@ -55,15 +55,16 @@ try {
   assert.deepEqual(p2['anamnesis.keluhanUtama'], p1['anamnesis.keluhanUtama'], 'unchanged answer keeps its provenance')
   assert.notEqual(p2['anamnesis.rps'].pada, p1['anamnesis.rps'].pada, 'changed answer is re-stamped')
   assert.ok(p2['anamnesis.rps'].pada > p1['anamnesis.rps'].pada)
-  assert.deepEqual(await history(), [], 'an unsigned draft is edited in place: nothing is archived yet')
+  assert.equal((await history()).length, 1, 'editing an unsigned draft archives its previous version')
+  assert.deepEqual((await history())[0].anamnesis, first.body.record.anamnesis)
 
   // 3. Signing is server-stamped; saving identical content afterwards creates no version.
   const signed = await save(doctor.token, { ...second.body.record, signedAt: 'sign-intent', signedById: 'client-forged', signedBy: 'Client forged' })
   assert.equal(signed.body.record.signedById, doctor.user.id); assert.ok(isoNow(signed.body.record.signedAt))
   const v1 = signed.body.record
-  assert.deepEqual(await history(), [])
+  assert.equal((await history()).length, 2, 'signing archives the preceding unsigned version')
   assert.equal((await save(doctor.token, v1)).status, 200)
-  assert.deepEqual(await history(), [], 're-saving identical signed content creates no version')
+  assert.equal((await history()).length, 2, 're-saving identical signed content creates no version')
 
   // 4. Changing a signed record never overwrites it: the signed version is archived, retrievable, and the live record loses the signature.
   await pause()
@@ -73,21 +74,22 @@ try {
   assert.equal(edited.body.record.anamnesis.keluhanUtama, 'Synthetic complaint C')
   assert.notEqual(edited.body.record.asalIsian['anamnesis.keluhanUtama'].pada, v1.asalIsian['anamnesis.keluhanUtama'].pada)
   const h1 = await history()
-  assert.equal(h1.length, 1, 'one archived version')
-  assert.equal(h1[0].anamnesis.keluhanUtama, 'Synthetic complaint A', 'the archived version keeps the original wording')
-  assert.equal(h1[0].signedById, doctor.user.id); assert.equal(h1[0].signedAt, v1.signedAt)
-  assert.equal(h1[0].diarsipkanOleh, doctor.user.id, 'who replaced it is recorded'); assert.ok(isoNow(h1[0].diarsipkanPada))
-  assert.deepEqual(h1[0].asalIsian, v1.asalIsian, 'archived version keeps its own per-answer provenance')
+  assert.equal(h1.length, 3, 'draft edit, signature and signed edit each preserve a version')
+  const signedArchive = h1[2]
+  assert.equal(signedArchive.anamnesis.keluhanUtama, 'Synthetic complaint A', 'the archived version keeps the original wording')
+  assert.equal(signedArchive.signedById, doctor.user.id); assert.equal(signedArchive.signedAt, v1.signedAt)
+  assert.equal(signedArchive.diarsipkanOleh, doctor.user.id, 'who replaced it is recorded'); assert.ok(isoNow(signedArchive.diarsipkanPada))
+  assert.deepEqual(signedArchive.asalIsian, v1.asalIsian, 'archived version keeps its own per-answer provenance')
 
   // 5. Re-sign and change again: history grows by one, earlier versions are untouched, order is chronological.
   const resigned = await save(doctor.token, { ...edited.body.record, signedAt: 'sign-intent' })
   await pause()
   await save(doctor.token, { ...resigned.body.record, anamnesis: { ...resigned.body.record.anamnesis, rps: 'Synthetic history D' } })
   const h2 = await history()
-  assert.equal(h2.length, 2)
-  assert.deepEqual(h2[0], h1[0], 'earlier archived versions are never modified')
-  assert.equal(h2[1].anamnesis.keluhanUtama, 'Synthetic complaint C'); assert.ok(h2[1].diarsipkanPada >= h2[0].diarsipkanPada)
-  assert.equal((await call('GET', `/api/clinical/record-history/${patientId}`, doctor.token)).body.history.length, 2, 'history is readable without a recordId filter too')
+  assert.equal(h2.length, 5)
+  assert.deepEqual(h2.slice(0, 3), h1, 'earlier archived versions are never modified')
+  assert.equal(h2[4].anamnesis.keluhanUtama, 'Synthetic complaint C'); assert.ok(h2[4].diarsipkanPada >= h2[3].diarsipkanPada)
+  assert.equal((await call('GET', `/api/clinical/record-history/${patientId}`, doctor.token)).body.history.length, 5, 'history is readable without a recordId filter too')
   assert.deepEqual((await call('GET', `/api/clinical/record-history/${patientId}?recordId=other-record`, doctor.token)).body.history, [], 'filtered by record')
 
   // 6. A patient edit of a signed record is labelled as not clinician-authored, cannot carry a clinician signature or clinician provenance,
@@ -101,12 +103,16 @@ try {
   assert.equal(patientEdit.status, 200)
   const pr = patientEdit.body.record
   assert.equal(pr.signedAt, undefined); assert.equal(pr.signedById, undefined); assert.equal(pr.signedBy, undefined)
-  assert.equal(pr.asalIsian['anamnesis.keluhanUtama'].asal, 'AI', 'a patient cannot claim clinician provenance')
-  assert.equal(pr.asalIsian['anamnesis.keluhanUtama'].olehId, undefined, 'KNOWN LIMIT: non-clinician provenance carries a source and time but no author id')
+  assert.equal(pr.asalIsian['anamnesis.keluhanUtama'].asal, 'Pengguna', 'patient text is user-authored, not clinician or AI-authored')
+  assert.equal(pr.asalIsian['anamnesis.keluhanUtama'].olehId, alice.user.id, 'the authenticated patient author is retained')
   assert.ok(isoNow(pr.asalIsian['anamnesis.keluhanUtama'].pada))
   assert.equal((await history()).length, beforePatient + 1, 'the signed version replaced by the patient is archived')
   assert.equal((await history()).at(-1).diarsipkanOleh, alice.user.id, 'the archive records that the patient replaced it')
   assert.equal((await history()).at(-1).signedById, doctor.user.id, 'the archived version still shows its clinician signer')
+
+  const beforeRestart = await history()
+  await running.restart()
+  assert.deepEqual(await history(), beforeRestart, 'all draft and signed versions survive process restart unchanged')
 
   // 7. History is as private as the record, and a client cannot write it.
   assert.equal((await call('GET', `/api/clinical/record-history/${patientId}`, bob.token)).status, 403)
@@ -118,7 +124,7 @@ try {
   }
   assert.equal((await history()).length, beforePatient + 1, 'nothing rewrote the history')
 
-  console.log('anamnesisProvenanceVersioning: per-answer author/source/server time, untouched answers keep provenance, signed versions archived and immutable, patient edits labelled and archived; passed')
+  console.log('anamnesisProvenanceVersioning: per-answer author/source/server time, untouched answers keep provenance, draft and signed versions archived, immutable and restart-persistent, patient edits labelled and archived; passed')
 } finally {
   await running.stop()
 }

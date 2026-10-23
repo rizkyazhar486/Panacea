@@ -2,13 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getVitals, vitalsAge } from '../../lib/healthVitals'
 import { getWorkouts } from '../../lib/workoutStore'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
+import { monthTotals, type FinanceTx } from './lifeOsFinance'
 import { IconBook, IconHeart, IconPlan, IconRun, IconWallet } from '../icons'
-
-type FinanceTx = {
-  date?: string
-  kind?: 'income' | 'expense'
-  amount?: number
-}
 
 const FINANCE_KEY = 'pmd_finance_tx_v1'
 const FOCUS_KEY = 'pmd_focus_timer_v1'
@@ -93,11 +89,11 @@ export function LifeOSWidgets() {
   const workouts = useMemo(() => getWorkouts(), [version])
   const finance = useMemo(() => readFinance(), [version])
   const latestWorkout = workouts[0]
+  const latestDurationSeconds = workoutDurationSeconds(latestWorkout)
   const monthKey = now.toISOString().slice(0, 7)
-  const monthFinance = finance.filter((tx) => tx.date?.startsWith(monthKey))
-  const income = monthFinance.reduce((sum, tx) => sum + (tx.kind === 'income' && Number.isFinite(tx.amount) ? Number(tx.amount) : 0), 0)
-  const expense = monthFinance.reduce((sum, tx) => sum + (tx.kind === 'expense' && Number.isFinite(tx.amount) ? Number(tx.amount) : 0), 0)
-  const net = income - expense
+  const totals = monthTotals(finance, monthKey)
+  const monthCount = finance.filter((tx) => tx.date?.startsWith(monthKey)).length
+  const net = totals.net
   const healthAge = vitalsAge(vitals)
 
   const dateLabel = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
@@ -142,8 +138,8 @@ export function LifeOSWidgets() {
           <span className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[.07] text-emerald-200"><IconWallet size={20} /></span>
           <span className="text-[8px] font-black uppercase tracking-[.18em] text-emerald-100/45">Money</span>
         </div>
-        <div className={`mt-4 text-2xl font-black tracking-tight ${net < 0 ? 'text-rose-200' : 'text-white'}`}>{monthFinance.length ? formatIdrShort(net) : 'Start tracking'}</div>
-        <div className="mt-1 text-[10px] font-bold text-white/45">{monthFinance.length ? `Net this month · ${monthFinance.length} entries` : 'Cash flow · emergency fund · debt'}</div>
+        <div className={`mt-4 text-2xl font-black tracking-tight ${net !== null && net < 0 ? 'text-rose-200' : 'text-white'}`}>{monthCount ? (net === null ? '—' : formatIdrShort(net)) : 'Start tracking'}</div>
+        <div className="mt-1 text-[10px] font-bold text-white/45">{monthCount ? `Net this month · ${monthCount} entries${totals.skipped > 0 ? ` · ${totals.skipped} not counted (no valid amount)` : ''}` : 'Cash flow · emergency fund · debt'}</div>
         <div className="mt-4 text-[10px] font-black text-emerald-200">Open finance →</div>
       </Link>
 
@@ -153,7 +149,7 @@ export function LifeOSWidgets() {
           <span className="text-[8px] font-black uppercase tracking-[.18em] text-cyan-100/45">Movement</span>
         </div>
         <div className="mt-4 text-2xl font-black tracking-tight">{latestWorkout ? (latestWorkout.nama || 'Workout') : 'Move today'}</div>
-        <div className="mt-1 text-[10px] font-bold text-white/45">{latestWorkout ? `${Math.round(latestWorkout.durasi / 60)} min${latestWorkout.jarakKm ? ` · ${latestWorkout.jarakKm.toFixed(1)} km` : ''}` : 'Run · strength · mobility · recovery'}</div>
+        <div className="mt-1 text-[10px] font-bold text-white/45">{latestWorkout ? `${latestDurationSeconds === null ? '—' : `${Math.round(latestDurationSeconds / 60)} min`}${latestWorkout.jarakKm ? ` · ${latestWorkout.jarakKm.toFixed(1)} km` : ''}` : 'Run · strength · mobility · recovery'}</div>
         <div className="mt-4 flex items-center justify-between text-[10px] font-black text-cyan-200"><span>{workouts.length ? `${workouts.length} sessions saved` : 'Start a session'}</span><span>→</span></div>
       </Link>
 

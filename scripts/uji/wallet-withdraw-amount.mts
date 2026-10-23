@@ -31,7 +31,7 @@ for (let amount = 1; amount <= 1000; amount++) {
 // Regresi sumber: store memvalidasi lewat parser, UI tidak lagi memakai `|| 0`.
 const store = readFileSync('src/lib/store.tsx', 'utf8')
 assert.match(store, /parseWithdrawAmount\(amount\)/)
-const billing = readFileSync('src/pages/Billing.tsx', 'utf8')
+const billing = readFileSync('src/pages/admin/Billing.tsx', 'utf8')
 assert.doesNotMatch(billing, /withdrawTokens\(Number\(withdraw\) \|\| 0/)
 
 // Exercise the production action in both configured modes. A server-backed

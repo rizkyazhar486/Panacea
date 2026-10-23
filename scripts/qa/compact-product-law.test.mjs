@@ -6,8 +6,8 @@ const read = (path) => readFileSync(new URL('../../' + path, import.meta.url), '
 
 test('compact product law remains wired into wedge, doctrine and agent policy', () => {
   for (const path of [
-    'PANACEA_CURRENT_WEDGE.md',
-    'PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
+    'governance/doctrine/PANACEA_CURRENT_WEDGE.md',
+    'governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
     'AGENTS.md',
   ]) {
     const content = read(path)
@@ -16,8 +16,8 @@ test('compact product law remains wired into wedge, doctrine and agent policy', 
 })
 
 test('canonical compact expression remains stable', () => {
-  const wedge = read('PANACEA_CURRENT_WEDGE.md')
-  const doctrine = read('PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md')
+  const wedge = read('governance/doctrine/PANACEA_CURRENT_WEDGE.md')
+  const doctrine = read('governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md')
   for (const content of [wedge, doctrine]) {
     assert.match(content, /One patient\. One longitudinal state\. One trusted care flow\./)
   }

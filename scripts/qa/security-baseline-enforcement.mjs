@@ -48,10 +48,10 @@ for (const file of files) {
   })
 }
 
-const reviewedDebt = findings.filter((item) => item.file === 'src/pages/Feed.tsx' && item.rule === 'document.write')
-const unreviewed = findings.filter((item) => !(item.file === 'src/pages/Feed.tsx' && item.rule === 'document.write'))
+const reviewedDebt = findings.filter((item) => item.file === 'src/pages/social/Feed.tsx' && item.rule === 'document.write')
+const unreviewed = findings.filter((item) => !(item.file === 'src/pages/social/Feed.tsx' && item.rule === 'document.write'))
 
-const feed = await readFile(join(root, 'src/pages/Feed.tsx'), 'utf8')
+const feed = await readFile(join(root, 'src/pages/social/Feed.tsx'), 'utf8')
 const feedChecks = {
   escapeFunction: feed.includes("const esc = (s: string) => s.replace(/[<>&]/g"),
   escapedGeneratedDate: feed.includes("${esc(new Date().toLocaleString('en-US'))}"),
