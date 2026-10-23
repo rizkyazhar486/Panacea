@@ -5,9 +5,12 @@ supersedes any conflicting *process* text in `AGENTS.md`, `CLAUDE.md`, `GEMINI.m
 `governance/CONTINUATION_STATE.md`. Product doctrine (One OS, safety boundaries, English-first UI,
 evidence rules) is unchanged.
 
-**Operating model: AI does the work, humans hold a small set of gates.** AI agents write the code,
-tests, evidence and PRs. Humans make only the decisions that need authority AI does not have:
-rights, legal policy, clinical validation, infrastructure credentials, release sign-off.
+**Operating model: AI does all the work; humans are a final stage.** AI agents write the code,
+tests, evidence and PRs and carry them to merge. Decisions that need a qualified human (rights, legal
+policy, clinical validation, release sign-off) are deferred to a *final stage (H3)* that starts only
+when such a person actually exists after Alpha engineering. Nobody is asked for signatures, QA or
+attestations now. Deferral grants no approval: AI never marks a gate decided, and safety labels stay
+(`clinically_reviewed=false`, unattested assets flagged, non-clinical use).
 
 | Need | File |
 |---|---|
@@ -32,8 +35,8 @@ pick top READY task on TASK_BOARD (respect lane + WIP)
 → re-verify main → update criterion status + TASK_BOARD row
 ```
 
-A loop ends with **a merged/mergeable commit** or **one new external-gate request**. Never with a
-report alone.
+A loop ends with **a merged/mergeable commit** or **a gate recorded as deferred**. Never with a
+report alone, and never with a question to the owner.
 
 ## Seven hard rules
 
@@ -44,8 +47,8 @@ report alone.
 3. **No docs-only PRs** unless the doc is an acceptance artifact or removes a real risk.
 4. **Status words mean one thing** (see VERIFICATION_V2): `PASS` only with evidence at the exact SHA.
    Implemented ≠ tested ≠ merged ≠ deployed ≠ clinically validated.
-5. **Humans are asked once.** An external gate is written once in EXTERNAL_GATES with one precise
-   question; agents then move to the next independent task instead of re-reporting it.
+5. **Humans are a final stage.** A task that needs a human becomes a deferred gate in EXTERNAL_GATES
+   (future question + activation condition); agents move on and do not ask or re-report it.
 6. **Never fabricate** approvals, licences, clinical review, deployments or test results. Never lower
    a threshold or ratchet after seeing it fail without a versioned, owner-approved change.
 7. **Reports are short:** SHA, what changed, test/CI result, PR, the one decision needed. Max ~120

@@ -65,3 +65,7 @@ Engineering work never waits on an EXT gate unless it would *decide* that gate's
 | Clinician reads whole tenant | P1 | EXT-F1-A decision; tests pin current behaviour |
 | Calculators used clinically before review | P1 | ENG-C6-03 label gate; EXT-C6-A |
 | Release SHA ambiguity | P1 | ENG-E7-01/02 evidence; EXT-E7-A policy |
+
+
+## Update 2026-10-23: root cause of most red checks
+`ubuntu-latest` rolled to Ubuntu 26.04 (kernel >= 6.19). Playwright 1.55 aborts (`does not support chromium on ubuntu26.04-x64`) in user-journeys / proof-shard / full-acceptance, and the Mongo service container cannot start (SERVER-121912; Mongo 8.0.34 did not help). Fix: pin runners to `ubuntu-24.04` (PR #2691 pins all 27 workflows; `mongo-persistence` went green on it). Separate red: 4 high server advisories (Dependency Audit Gate) and the Home mobile screenshot grid (PR #2682).

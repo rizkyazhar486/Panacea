@@ -4,9 +4,9 @@ Single queue for all agents. One row = one small PR. Update the row in the same 
 work (status, PR, SHA). Do not create parallel task lists or checkpoint essays.
 
 **WIP:** integrator 1 · each lane ≤ 2 open PRs · no file overlap between open PRs.
-**Status:** READY · IN_PROGRESS · IN_REVIEW · DONE · BLOCKED_EXTERNAL (→ EXTERNAL_GATES id).
+**Status:** READY · IN_PROGRESS · IN_REVIEW · DONE · DEFERRED_FINAL_STAGE (→ EXTERNAL_GATES id; not asked now).
 
-Snapshot main `c57e22fc`, 2026-10-23.
+Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9baf`).
 
 ## Now (H0)
 
@@ -44,7 +44,7 @@ Snapshot main `c57e22fc`, 2026-10-23.
 | R-D7-RIG | Research (time box 1 session): can the source rig get heel/toe landmarks without re-rigging? Output: yes/no + method | ENG-D7-03 | claude | READY |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | READY |
 
-## Open PR triage (2026-10-23, main c57e22fc)
+## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
 Method: for each open PR, every file it changes was compared with main; no PR had all its changes already on main, so none is closed automatically. Counts: 14 close-recommended (stale), 38 owner-decide, 9 keep. **Owner decision 2026-10-23:** close the 14 (done, branches kept) and update the other 47 with main.
 
@@ -71,7 +71,7 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2463 | yes | 2026-10-12 | 371 | fix(data-lab): blood-panel forecaster starts blank, needs 3  | Owner decide: rebase or close (>150 behind) |
 | #2461 | yes | 2026-10-12 | 371 | fix(salat): missing lead minutes fall back to 5 instead of N | Owner decide: rebase or close (>150 behind) |
 | #2466 | yes | 2026-10-12 | 366 | fix(meets): reject out-of-range or non-numeric coordinates i | Owner decide: rebase or close (>150 behind) |
-| #2456 | no | 2026-10-12 | 346 | docs(alpha): promote E2 (RBAC for clinical data) to VERIFIED | Owner decide: rebase or close (>150 behind) |
+| #2456 | no | 2026-10-12 | 346 | docs(alpha): promote E2 (RBAC for clinical data) to VERIFIED | Closed superseded 2026-10-23: E2 VERIFIED on current main |
 | #2488 | yes | 2026-10-12 | 326 | fix(notifications): bound user tz offset so a huge value can | Owner decide: rebase or close (>150 behind) |
 | #2492 | no | 2026-10-12 | 324 | fix(body): preserve fetal view and region focus across viewp | Owner decide: rebase or close (>150 behind) |
 | #2491 | no | 2026-10-12 | 324 | fix(body): retry failed fetal MRI source context loads | Owner decide: rebase or close (>150 behind) |
@@ -114,5 +114,5 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 
 ## Waiting on humans
 
-See [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not re-raise these; they are reviewed when the
+Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
 owner answers.

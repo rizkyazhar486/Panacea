@@ -1,8 +1,10 @@
-# External Gates — decisions only humans can make
+# Final-Stage Human Gates — deferred, not requested now
 
-Machine-readable copy: `externalGates` in `governance/ACCEPTANCE_V2.json`. Each gate is asked
-**once**. Agents continue independent engineering work and do not re-report open gates.
-To close a gate: supply the artifact, then an agent sets `status: DECIDED` and `decisionRef` to it.
+> **Owner decision 2026-10-23:** qualified humans (specialists, counsel, employed operators) are not available as working dependencies, so every gate below is `DEFERRED_FINAL_STAGE` (H3). No one is asked to answer them now, and no engineering task waits for them. They are listed so nothing is hidden. The AI never marks one `DECIDED`; until a qualified human does, the capability ships with its limitation stated or does not ship as approved.
+
+Machine-readable copy: `externalGates` in `governance/ACCEPTANCE_V2.json`. Questions below are the
+*future* questions for H3. Agents continue independent engineering work and do not re-raise them.
+To close a gate later: a qualified human supplies the artifact, then an agent sets `status: DECIDED` and `decisionRef` to it.
 
 ## Product Owner
 
