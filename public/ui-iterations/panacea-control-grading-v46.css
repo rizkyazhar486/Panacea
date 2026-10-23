@@ -26,7 +26,7 @@
 
   /* Remap the product accent without changing semantic warning/error colors. */
   --color-brand: var(--pmd-ref-green);
-  --color-brand-dark: #169c49;
+  --color-brand-dark: #0b7a4b; /* >=4.5:1 sobre branco/tint claro; #169c49 dava 3.3:1 (kontras-wcag) */
 
   /* v44/v45 liquid tokens: cyan/violet -> restrained green/neutral material. */
   --pmd-liquid-line-hot: rgba(37, 209, 98, .34);
@@ -169,7 +169,9 @@ html.pmd-liquid-actions-v45 :where(
   input[type='button'],
   input[type='submit'],
   input[type='reset']
-) :where(span, small, strong, b, em, i, label, p) {
+) :where(span, small, strong, b, em, i, label, p):where(:not([style*='color'])) {
+  /* Elemen yang membawa warna inline sengaja memilih warnanya (mis. inisial avatar gelap di atas hijau merek,
+     kontras 8,7:1); meratakannya ke warna tombol menjatuhkannya ke 1,84:1. :where() menjaga spesifisitas tetap nol. */
   color: inherit !important;
 }
 

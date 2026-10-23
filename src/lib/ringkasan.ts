@@ -4,6 +4,7 @@ import { ambilLab } from './lab'
 import { ambilSuplemen, sudahDiminum, hariSejak } from './kebiasaanHarian'
 import { jumlahLewat, umurUkur } from './ukurBerkala'
 import { ambilSesi } from './angkatBeban'
+import { dailyIntakeTotals, focusMinutesOn } from '../domains/personal-health/engine/dailySummaryTotals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ringkasan harian yang dititipkan ke server — SESEDIKIT MUNGKIN.
@@ -78,16 +79,10 @@ export function susunRingkasan(): Ringkasan {
   // Gizi hari ini, dari simpanan aplikasi utama.
   try {
     const st = JSON.parse(localStorage.getItem('panaceamed.state.v3') || '{}')
-    let kkal = 0
-    let protein = 0
-    let ada = false
-    for (const f of st.foods ?? []) {
-      if (f?.date !== hariIni) continue
-      ada = true
-      kkal += Number(f.kcal) || 0
-      protein += Number(f.protein) || 0
-    }
-    if (ada) { r.kkal = Math.round(kkal); r.proteinG = Math.round(protein) }
+    // Hanya total yang lengkap yang dikirim: nilai hilang bukan nol (lihat dailySummaryTotals).
+    const gizi = dailyIntakeTotals(st.foods, hariIni)
+    if (gizi.kkal !== undefined) r.kkal = gizi.kkal
+    if (gizi.proteinG !== undefined) r.proteinG = gizi.proteinG
     const w = st.wellness?.[hariIni]
     r.catatanHariIni = Boolean(w)
     if (typeof w?.tenaga === 'number') r.tenaga = w.tenaga
@@ -143,9 +138,8 @@ export function susunRingkasan(): Ringkasan {
 
   try {
     const sesi = JSON.parse(localStorage.getItem('pmd_sesi_fokus_log_v1') || '[]') as { tanggal?: string; menit?: number }[]
-    let menit = 0
-    for (const s of sesi) if (s?.tanggal === hariIni) menit += Number(s.menit) || 0
-    if (menit > 0) r.fokusMenitHariIni = Math.round(menit)
+    const menit = focusMinutesOn(sesi, hariIni)
+    if (menit !== undefined) r.fokusMenitHariIni = menit
   } catch { /* abaikan */ }
 
   try {

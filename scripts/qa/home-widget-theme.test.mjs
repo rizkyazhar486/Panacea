@@ -127,7 +127,7 @@ test('Mobile loading cards stay explicit black-green instead of gray placeholder
 
 test('HIG v41 is loaded once after the remaining legacy shell layers', () => {
   const legacy = index.indexOf('/welcome-revitalization-v28.css')
-  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
+  const hig = index.indexOf('/ui-iterations/panacea-hig-v41.css?v=20260915-1')
   assert.ok(hig >= 0, 'HIG foundation must remain registered')
   assert.ok(hig > legacy, 'HIG foundation must load after the remaining legacy layers')
   assert.equal(index.split('/panacea-hig-v41.css').length - 1, 1, 'HIG foundation must not be loaded twice')

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { criticalPower2Point } from './criticalPower'
+import { computeMetric, metricValue, parseMetricInput } from './metricInputs'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../../components/icons'
 import { useStore } from '../../lib/store'
 import { getDemo } from '../../lib/profile'
@@ -43,8 +45,9 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
 }) {
   const defaults = Object.fromEntries(inputs.map((i) => [i.key, i.default ?? 0]))
   const [vals, set] = useMetricState(id, defaults)
-  const result = compute(vals)
-  const interp = interpret ? interpret(result, vals) : null
+  const lengkap = inputs.every((i) => metricValue(vals[i.key]))
+  const result = computeMetric(inputs.map((i) => i.key), vals, compute)
+  const interp = interpret && lengkap ? interpret(result, vals) : null
   const display = typeof result === 'number' ? (Number.isFinite(result) ? result.toFixed(result % 1 === 0 ? 0 : 1) : '—') : result
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
@@ -55,8 +58,8 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
       <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {inputs.map((inp) => (
           <Field key={inp.key} label={inp.label + (inp.unit ? ` (${inp.unit})` : '')}>
-            <input className={inputClass} type="number" step="any" value={vals[inp.key] || ''} placeholder="0"
-              onChange={(e) => set(inp.key, +e.target.value)} />
+            <input className={inputClass} type="number" step="any" value={metricValue(vals[inp.key]) ? vals[inp.key] : ''} placeholder="0"
+              onChange={(e) => set(inp.key, parseMetricInput(e.target.value))} />
           </Field>
         ))}
       </div>
@@ -128,7 +131,7 @@ function ThresholdTab() {
         <MetricCard id="cp" name="Critical Power (2-point)" emoji="🔋" unit="W"
           inputs={[{ key: 'p1', label: 'Test 1 Power', unit: 'W', default: 320 }, { key: 't1', label: 'Test 1 Time', unit: 'sec', default: 180 },
             { key: 'p2', label: 'Test 2 Power', unit: 'W', default: 250 }, { key: 't2', label: 'Test 2 Time', unit: 'sec', default: 720 }]}
-          compute={(v) => { const cp = (v.p1 * v.t1 - v.p2 * v.t2) / (v.t1 - v.t2); return Number.isFinite(cp) ? cp : 0 }}
+          compute={(v) => criticalPower2Point(v.p1, v.t1, v.p2, v.t2)}
           note="Monod-Scherrer 2-point model: CP = (P1×t1 − P2×t2)/(t1−t2). W' (anaerobic capacity) = (P1−CP)×t1."
         />
         <VtLtCard />

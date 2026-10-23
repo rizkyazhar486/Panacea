@@ -53,9 +53,9 @@
     "uji:lab-log": "export PANACEA_DATA_FILE=\"${TMPDIR:-/tmp}/panacea-uji-$$.json\"; tsx uji/labLog.uji.ts && tsx uji/keadaanLongitudinal.uji.ts && tsx uji/catatanKesehatanDiri.uji.ts && tsx uji/labFhir.uji.ts && tsx uji/carePlanFhir.uji.ts && tsx uji/carePlanIdem.uji.ts && tsx uji/pengingatCek.uji.ts && tsx uji/irisanPenyimpanan.uji.ts && tsx uji/simpanAman.uji.ts && tsx uji/arsipKlinis.uji.ts && tsx uji/aksesKlinis.uji.ts && tsx uji/idempotenKlinis.uji.ts && tsx uji/rekamKlinis.uji.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/express": "2.0.0",
-    "@modelcontextprotocol/node": "2.0.0",
-    "@modelcontextprotocol/server": "2.0.0",
+    "@modelcontextprotocol/express": "2.0.2",
+    "@modelcontextprotocol/node": "2.1.1",
+    "@modelcontextprotocol/server": "2.3.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

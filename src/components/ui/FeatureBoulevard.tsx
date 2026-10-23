@@ -157,7 +157,7 @@ export function FeatureBoulevard({ zone = 'all', title = 'Feature Boulevard' }: 
 
       <div className="relative flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-200/90 sm:text-[10px]">Feature boulevard · direct access</div>
+          <div className="text-[9px] font-black uppercase tracking-[.2em] text-[#a5f3fc] sm:text-[10px]">Feature boulevard · direct access</div>
           <h2 className="mt-1 text-lg font-black tracking-tight text-white sm:text-xl">{title}</h2>
           <p className="mt-1 max-w-3xl text-[10px] font-medium leading-relaxed text-white/58 sm:text-[11px]">
             Search or swipe through capabilities without adding another menu layer. Every tool stays in a predictable workspace.

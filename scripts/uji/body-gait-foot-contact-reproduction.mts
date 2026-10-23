@@ -2,8 +2,12 @@
 // skrip (deterministik), loop tertutup ditangani (fase melintasi jahitan terhitung SATU), dan vonis terhadap kriteria penelitian
 // eksplisit dicatat apa adanya (tidak ada ambang yang disetel agar lulus).
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
+import { createHash } from 'node:crypto'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+import { fitFootContact } from '../qa/foot-contact-math.mjs'
 import { evaluateFootSlide, RESEARCH_FOOT_SLIDE_CRITERIA as C } from '../../src/domains/body-exposure/engine/gaitFootMetrics.ts'
 
 const BODIES = ['adult_male', 'vhf_denver_ct_adult_female'] as const
@@ -11,6 +15,8 @@ const regen = (b: string) => JSON.parse(execFileSync(process.execPath, ['scripts
 const committed = (b: string) => JSON.parse(fs.readFileSync(`bodyexposure/qa_reports/gait_foot_contact_reproduction.${b}.json`, 'utf8'))
 
 for (const b of BODIES) {
+  assert.equal(committed(b).schema, 'panacea-foot-contact/v2')
+  assert.equal(committed(b).source_sha256, createHash('sha256').update(fs.readFileSync(`public/bodyexposure/${b}.rig_rom.glb`)).digest('hex'), 'source hash must identify the actual GLB')
   assert.deepEqual(regen(b), committed(b), `laporan ${b} tidak sama dengan hasil jalan ulang: jalankan skrip dengan --out`)
   assert.deepEqual(regen(b), regen(b), `jalan ulang ${b} tidak deterministik`)
 }
@@ -53,3 +59,44 @@ assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).sta
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata
 assert.ok(m.clips.WALK.sole.slide_rms_mm > 4 * m.clips.WALK.toe.slide_rms_mm, 'sol lebih besar dari jari (derau pergantian simpul), dicatat sebagai batasan metode')
 console.log('body-gait-foot-contact-reproduction: laporan = jalan ulang; loop tertutup dihitung benar; jari ekstrem WALK jantan melampaui maks 30 mm, penanda plantar jantan dalam kriteria (placeholder); RUN dan betina tidak terukur')
+
+// Salinan GLB rusak tidak boleh menghasilkan laporan seolah pengukuran lengkap berhasil.
+const scratch = fs.mkdtempSync(path.join(tmpdir(), 'panacea-foot-contact-'))
+try {
+  const original = fs.readFileSync('public/bodyexposure/adult_male.rig_rom.glb')
+  const jsonLength = original.readUInt32LE(12)
+  const rewrite = (mutate: (json: any) => void) => {
+    const json = JSON.parse(original.subarray(20, 20 + jsonLength).toString('utf8')); mutate(json)
+    const raw = Buffer.from(JSON.stringify(json)); const chunk = Buffer.alloc(Math.ceil(raw.length / 4) * 4, 32); raw.copy(chunk)
+    const tail = original.subarray(20 + jsonLength), header = Buffer.from(original.subarray(0, 20))
+    header.writeUInt32LE(20 + chunk.length + tail.length, 8); header.writeUInt32LE(chunk.length, 12)
+    const file = path.join(scratch, 'mutated.glb'); fs.writeFileSync(file, Buffer.concat([header, chunk, tail])); return file
+  }
+  for (const [name, mutate, expected] of [
+    ['missing RUN', (j: any) => { j.animations = j.animations.filter((a: any) => a.name !== 'RUN') }, /exactly one finite positive RUN/],
+    ['missing WALK', (j: any) => { j.animations = j.animations.filter((a: any) => a.name !== 'WALK') }, /exactly one finite positive WALK/],
+    ['duplicate RUN', (j: any) => { j.animations.push(j.animations.find((a: any) => a.name === 'RUN')) }, /exactly one finite positive RUN/],
+    ['duplicate WALK', (j: any) => { j.animations.push(j.animations.find((a: any) => a.name === 'WALK')) }, /exactly one finite positive WALK/],
+    ['missing foot', (j: any) => { j.nodes.find((n: any) => n.name === 'FOOT.L').name = 'NO_FOOT' }, /node FOOTL tidak ada/],
+    ['missing pelvis', (j: any) => { j.nodes.find((n: any) => n.name === 'PELVIS').name = 'NO_PELVIS' }, /node PELVIS is required/],
+    ['singular scale', (j: any) => { j.nodes.find((n: any) => n.name === 'FOOT.L').scale = [0, 0, 0] }, /invalid or reflected world transform/],
+    ['reflected scale', (j: any) => { j.nodes.find((n: any) => n.name === 'FOOT.L').scale = [-1, 1, 1] }, /invalid or reflected world transform/],
+  ] as const) {
+    const file = rewrite(mutate)
+    const result = spawnSync(process.execPath, ['scripts/qa/glb-foot-contact-reproduce.mjs', file], { encoding: 'utf8' })
+    assert.notEqual(result.status, 0, `${name} must fail closed`); assert.match(result.stderr, expected, `${name} must identify its cause`)
+    assert.equal(result.stdout, '', `${name} must not emit a success report`)
+  }
+  for (const value of ['NaN', 'Infinity', '0', '-1']) {
+    const result = spawnSync(process.execPath, ['scripts/qa/glb-foot-contact-reproduce.mjs', 'public/bodyexposure/adult_male.rig_rom.glb', '--thresh-mm', value], { encoding: 'utf8' })
+    assert.notEqual(result.status, 0); assert.match(result.stderr, /contact threshold must be finite and positive/)
+  }
+} finally { fs.rmSync(scratch, { recursive: true, force: true }) }
+
+// Penerima acceptance harus memakai angka mentah: 30,04 mm terlihat sebagai 30,0 tetapi tetap melampaui 30.
+const near = fitFootContact(Array.from({ length: 2 }, () => ({ t: [0, 1, 2], x: [0.01502, -0.03004, 0.01502] })))
+const roundingCriteria = { ...C, maxRmsMm: 100 }
+assert.equal(near.display?.slide_max_mm, 30)
+assert.deepEqual(evaluateFootSlide(near, roundingCriteria), { status: 'exceeds', criteria: roundingCriteria, failed: ['peak'] })
+
+console.log('D7 source identity, full replay, GLB mutations and raw acceptance regression: all passed')
