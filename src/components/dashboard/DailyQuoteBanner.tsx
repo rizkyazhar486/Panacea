@@ -68,7 +68,7 @@ export function DailyQuoteBanner() {
       className="relative mt-4 flex w-full justify-center px-3 sm:px-6"
     >
       <div
-        className="fly-in-drop pointer-events-auto relative w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
+        className="fly-in-drop pointer-events-auto relative min-h-[100px] w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
         style={{
           animation: 'fly-in-drop 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.1) both',
           background:
