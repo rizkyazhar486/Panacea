@@ -376,10 +376,13 @@
       "done": "user-journey-resilience covers 100% of pages listed in the F1 critical page inventory; each with a paired positive control.",
       "checks": [
         {
-          "cmd": "node --test scripts/qa/user-journey-resilience.test.mjs",
+          "cmd": "node --test scripts/qa/user-journey-resilience.test.mjs scripts/qa/f1-critical-pages.test.mjs",
           "files": [
             "scripts/qa/user-journey-resilience.mjs",
-            "scripts/qa/user-journey-resilience.test.mjs"
+            "scripts/qa/user-journey-resilience.test.mjs",
+            "governance/F1_CRITICAL_PAGES.json",
+            "scripts/qa/f1-critical-pages.mjs",
+            "scripts/qa/f1-critical-pages.test.mjs"
           ]
         }
       ],

@@ -222,6 +222,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/community" element={<Community />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/semua-fitur" element={<SemuaFitur />} />
+              <Route path="/all-features" element={<Navigate to="/semua-fitur" replace />} />
               <Route path="/ringkasan-karya" element={<RingkasanKarya />} />
               <Route path="/tutorial" element={<Tutorial />} />
               <Route path="/vitapulse" element={<VitaPulse />} />
