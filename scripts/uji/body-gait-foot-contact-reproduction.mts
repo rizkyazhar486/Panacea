@@ -10,6 +10,12 @@ import path from 'node:path'
 import { fitFootContact } from '../qa/foot-contact-math.mjs'
 import { evaluateFootSlide, RESEARCH_FOOT_SLIDE_CRITERIA as C } from '../../src/domains/body-exposure/engine/gaitFootMetrics.ts'
 
+// D7 (ENG-D7-01): data tidak terukur wajib berstatus 'unmeasurable' — memeriksa alasan saja tidak cukup, status 'within' dengan alasan tetap lolos.
+const unmeasurable = (result: any, reason: string, msg?: string) => {
+  assert.equal(result?.status, 'unmeasurable', `${msg ?? reason}: status harus unmeasurable, bukan ${result?.status}`)
+  assert.equal(result.reason, reason, msg)
+}
+
 const BODIES = ['adult_male', 'vhf_denver_ct_adult_female'] as const
 const regen = (b: string) => JSON.parse(execFileSync(process.execPath, ['scripts/qa/glb-foot-contact-reproduce.mjs', `public/bodyexposure/${b}.rig_rom.glb`], { encoding: 'utf8' }))
 const committed = (b: string) => JSON.parse(fs.readFileSync(`bodyexposure/qa_reports/gait_foot_contact_reproduction.${b}.json`, 'utf8'))
@@ -47,13 +53,13 @@ assert.ok(f.clips.WALK.sole.stance_phases >= 1, 'betina: titik terendah kaki tet
 // vonis terhadap kriteria penelitian (apa adanya)
 const v = (rep: any, clip: string, k: string) => evaluateFootSlide(rep.clips[clip][k], C)
 assert.deepEqual(v(m, 'WALK', 'toe'), { status: 'exceeds', criteria: C, failed: ['peak'] }, 'jari WALK jantan: RMS 12,6 <= 15 tetapi maks 32,2 > 30')
-assert.equal((v(m, 'WALK', 'heel') as any).reason, 'no_stance')
+unmeasurable(v(m, 'WALK', 'heel'), 'no_stance')
 assert.equal(v(m, 'WALK', 'heelPlantar').status, 'within', 'tumit plantar jantan: RMS 7,8 <= 15 dan maks 16,6 <= 30 (placeholder)')
 assert.equal(v(m, 'WALK', 'toePlantar').status, 'within')
-assert.equal((v(f, 'WALK', 'heelPlantar') as any).reason, 'no_stance')
-assert.equal((v(m, 'RUN', 'toe') as any).reason, 'no_stance')
-assert.equal((v(m, 'RUN', 'sole') as any).reason, 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
-assert.equal((v(f, 'WALK', 'toe') as any).reason, 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
+unmeasurable(v(f, 'WALK', 'heelPlantar'), 'no_stance')
+unmeasurable(v(m, 'RUN', 'toe'), 'no_stance')
+unmeasurable(v(m, 'RUN', 'sole'), 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
+unmeasurable(v(f, 'WALK', 'toe'), 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
 // pasangan: hanya satu angka yang berbeda dari kasus yang melampaui -> dalam kriteria
 assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).status, 'within')
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata
