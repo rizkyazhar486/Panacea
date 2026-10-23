@@ -907,19 +907,21 @@
       "done": "Workflow and env template committed; workflow fails closed with a named message when credentials are absent.",
       "checks": [
         {
-          "cmd": "ls .github/workflows",
+          "cmd": "node --test scripts/qa/staging-credentials.test.mjs",
           "files": [
-            ".github/workflows/vercel-prebuilt-production.yml",
-            "render.yaml"
+            ".github/workflows/staging-gate.yml",
+            "scripts/qa/staging-credentials.mjs",
+            "scripts/qa/staging-credentials.test.mjs",
+            "docs/governance/staging.env.example"
           ]
         }
       ],
       "negativeControl": "Running without secrets exits non-zero with 'staging credentials absent'.",
       "evidence": "Workflow file + failing-closed run.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Provisioning itself is EXT-E7-B."
+      "status": "PASS",
+      "statusSha": "da442f22d862d9dcc9c212e097b31ff07a59a8f1",
+      "statusNote": "PASS at da442f22d862d9dcc9c212e097b31ff07a59a8f1 (main after PR #2720). Staging gate run 39979087541 (workflow_dispatch on main, no staging variables or secrets set): job credentials 120501323312 failed with exit 1 and the named message 'staging credentials absent or invalid: STAGING_URL: absent; STAGING_API_URL: absent; STAGING_DEPLOY_TOKEN: absent'; job smoke was skipped (needs credentials). Env contract: docs/governance/staging.env.example. The 9 tests in scripts/qa/staging-credentials.test.mjs run inside npm run build (node --test scripts/qa/*.test.mjs, package.json) and the validate job 120494128516 on the PR head 67b73539 succeeded; the log excerpt retrievable here was truncated, so no individual test line is quoted. Six sabotages (CLI exit code, production-host check, https check, '|| true', missing needs, pull_request trigger) each failed by test name. CORRECTION: the previous check command 'ls .github/workflows' verified nothing; the check now runs the staging-credentials tests. Scope: staging is defined as code only. No staging environment exists (EXT-E7-B, infra owner); the smoke job has never run and is unproven; the three variable names are a proposed contract."
     },
     {
       "id": "ENG-C6-01",
