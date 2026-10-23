@@ -17,9 +17,9 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
 | T-H0-04 | Triage open PRs (61): none provably superseded by file content; recommendations in §Open PR triage | — | integrator | DONE | 14 stale closed. Of the rest: 25 updated with main directly; 16 had real conflicts → 13 resolved and pushed (#2461 #2463 #2466 #2488 #2499 #2501 #2503 #2504 #2508 #2509 #2546 #2548 #2640 incl. path fixes after main's folder moves), 3 closed as superseded by main (#2407 equivalent fix on main; #2520/#2521 clipping already fixed by Vika's portal 14577e7e); #2442/#2456 closed by others. All by Claude (merge, no force-push). |
 | T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | IN_REVIEW | #2697 |
-| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | any-ai | READY | — |
-| T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | READY (after 03) | — |
-| T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | READY (after 03) | — |
+| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | claude | IN_PROGRESS | slices 1-2/3 in #2718 (domain rules; HTTP append-only store, AI rejection, rate limit); next: page `#/review/<taskId>` |
+| T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
+| T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
 | T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | claude | IN_REVIEW | run 39883766083; recurred on a0f2f0cd run 39914203220; single attempt with a 22 min budget in this PR (a timeout+retry wrapper was tried and failed on the dpkg lock) |
 | T-H0-07 | Consolidate duplicate workflows (stabilization ×3, wake-server ×2) — proposal PR, no required check removed until replacement proven | — | integrator | READY | — |
 
@@ -29,13 +29,14 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 |---|---|---|---|---|
 | T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
 | T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
-| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | IN_REVIEW (PR pending): governance/F1_CRITICAL_PAGES.json now equals the journey coverage and every route must resolve to a real page; found and fixed dead `#/all-features` (404). ENG-F1-03 stays NOT_RUN until the browser run is recorded at an exact SHA |
+| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | DONE (#2711 merged): inventory equals journey coverage and every route resolves to a real page; dead `#/all-features` fixed. ENG-F1-03 stays NOT_RUN until the browser run is recorded at an exact SHA |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | IN_REVIEW (PR pending): Apache-2.0 and CC BY-SA 2.1 became required classes; per-class removal control on real data. Criterion stays NOT_RUN until ENG-D8-01 passes and the rendered page is captured at an exact SHA |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
+| T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (pedsDose gap closed in #2702; guard hardened to call-sites after independent review) | ENG-C6-01 | claude | IN_REVIEW | this PR |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
 
@@ -45,7 +46,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 |---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | READY | follows R-D7-RIG |
-| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output: engine already distinct; tests only checked `.reason`, so a `within` mislabel passed. Tests now assert `status`, zero-stance fixture added | ENG-D7-01 | claude | IN_REVIEW |
+| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
