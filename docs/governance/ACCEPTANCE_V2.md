@@ -9,12 +9,12 @@ Validator: `node scripts/qa/acceptance-v2.mjs` (also run inside `npm run uji` vi
 | Book | Contains | Who closes it | Counted in |
 |---|---|---|---|
 | **Engineering criteria** (`ENG-*`) | Gates `ENGINEERING`, `PRODUCT_QUALITY`, `PRODUCTION`, `CLINICAL_SAFETY_ENG` | AI lanes, by code + test + CI | Engineering denominator |
-| **External gates** (`EXT-*`) | Rights, legal policy, clinical validation, credentials, release sign-off, real-user acceptance | Named human role | Separate open/decided count |
+| **Final-stage human gates** (`EXT-*`) | Rights, legal policy, clinical validation, credentials, release sign-off, real-user acceptance | Named human role, activated at H3 | Separate deferred/decided count; not asked now |
 
-Report both numbers side by side, e.g. `Engineering PASS 12/32 · External gates open 9/14`.
+Report both numbers side by side, e.g. `Engineering PASS 12/32 · Human gates deferred 14/14`.
 Never merge them into one percentage.
 
-Baseline on main `256a22de`: **Engineering PASS 0/32** (FAIL 6, NOT_RUN 26) · **External open 14/14**.
+Baseline on main `256a22de`: **Engineering PASS 0/32** (FAIL 6, NOT_RUN 26) · **Human gates deferred to final stage 14/14**.
 Every criterion starts NOT_RUN or FAIL: nothing is carried over as PASS from the legacy ledger
 until its evidence is re-recorded at a v2 SHA.
 
@@ -29,7 +29,8 @@ until its evidence is re-recorded at a v2 SHA.
 - a criterion with no executable check, or an evidence file that does not exist
 - an engineering criterion owned by a human role, or whose `done` needs a signature/approval
 - `PASS`/`FAIL` without a 40-hex SHA; `NOT_APPLICABLE` without a reason
-- `BLOCKED_EXTERNAL` inside the engineering statuses
+- `BLOCKED_EXTERNAL` or `DEFERRED_FINAL_STAGE` inside the engineering statuses
+- a deferred gate without `activatesWhen`
 - any of the 45 legacy ids left unmapped (hard criteria cannot be dropped to raise the score)
 - an external gate owned by an AI lane, or marked `DECIDED` without a decision record
 - a missing negative control
