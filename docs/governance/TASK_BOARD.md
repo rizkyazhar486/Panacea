@@ -12,9 +12,12 @@ Snapshot main `256a22de`, 2026-10-23.
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-H0-01 | Pin Playwright browser jobs to Ubuntu 24.04 | ENG-CI-02 | integrator | IN_REVIEW | #2686 (other agent) |
-| T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | IN_REVIEW | #2687, head 7af12661 |
-| T-H0-03 | After 01+02 merge: record run IDs of every required workflow on new main SHA | ENG-CI-01 | integrator | READY (after 01, 02) | — |
+| T-H0-01 | Pin runners to Ubuntu 24.04 (all 27 workflows; `ubuntu-latest` became 26.04 and broke Playwright and Mongo) | ENG-CI-02 | integrator | DONE | #2691 (supersedes #2686), merged `c57e22fc` |
+| T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 merged; #2688 closed as duplicate |
+| T-H0-02b | Stabilize Home daily-quote layout so the mobile screenshot grid matches its baseline | ENG-F2-04 | claude | DONE | #2682, merged `7877a493` |
+| T-H0-03 | Record run IDs of every required workflow on the current main SHA (main `c57e22fc`: 23 checks, 0 failing after one infra rerun; `944a9baf`: 16 checks, 0 failing) | ENG-CI-01 | integrator | READY | — |
+| T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | IN_REVIEW | this PR |
+| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | any-ai | READY | — |
 | T-H0-04 | Triage 65 open PRs: close superseded, rebase live ones, list owners; target ≤ 15 | — | integrator | READY | — |
 | T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | READY (after 03) | — |
 | T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | READY (after 03) | — |
