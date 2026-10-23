@@ -27,8 +27,8 @@
       "negativeControl": "A deliberately failing required job on a throwaway branch must turn the check red.",
       "evidence": "Run IDs per required workflow for the exact main SHA, recorded in docs/governance/TASK_BOARD.md.",
       "dependsOn": ["ENG-CI-02", "ENG-SEC-01"],
-      "status": "FAIL", "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Stabilization, Body 3D, User Journey (F1), Dependency Audit and Production browser check failed on 256a22de."
+      "status": "PASS", "statusSha": "c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11",
+      "statusNote": "All 15 push workflows success on main c57e22fc: Dependency Audit 39883765825, Body 3D 39883765926, Mongo 39883766001, Security Enforcement 39883766013, Clinical Evidence 39883765813, Render backend CI 39883765834, Stabilization 39883766083 (attempt 2; attempt 1 timed out in apt install before tests, tracked T-FLAKY-PW-APT), plus 8 others. PR-only gates (validate, server-validate, user-journeys, ux-audit) green on #2695 whose tree bf048d73 is identical to c57e22fc."
     },
     {
       "id": "ENG-CI-02", "gate": "ENGINEERING", "horizon": "H0", "priority": "P0", "lane": "integrator",
@@ -40,8 +40,8 @@
       "negativeControl": "Same job on ubuntu-latest (26.04) fails at 'Playwright does not support chromium on ubuntu26.04-x64'.",
       "evidence": "Exact-head run of each browser workflow reaching its test step.",
       "dependsOn": [],
-      "status": "FAIL", "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Fix in flight: PR #2686."
+      "status": "PASS", "statusSha": "c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11",
+      "statusNote": "All 27 workflows pinned to ubuntu-24.04 (#2691). Browser jobs reach their test steps: Body 3D 39883765926 success; Stabilization full-acceptance 39883766083 success (attempt 2)."
     },
     {
       "id": "ENG-SEC-01", "gate": "ENGINEERING", "horizon": "H0", "priority": "P0", "lane": "any-ai",
@@ -53,8 +53,8 @@
       "negativeControl": "scripts/qa/dependency-audit-gate.test.mjs fixtures with unaccepted highs must fail.",
       "evidence": "Gate output for the exact SHA; Dependency Audit Gate run ID.",
       "dependsOn": [],
-      "status": "FAIL", "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "4 high in server (MCP SDK, follow-redirects). Fix: PR #2687, gate OK locally on 7af12661."
+      "status": "PASS", "statusSha": "c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11",
+      "statusNote": "Dependency Audit Gate run 39883765825 success on c57e22fc (web + server OK; #2687 via #2691)."
     },
     {
       "id": "ENG-REG-A", "gate": "ENGINEERING", "horizon": "H0", "priority": "P1", "lane": "codex",
