@@ -29,13 +29,14 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 |---|---|---|---|---|
 | T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
 | T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
-| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | IN_REVIEW (PR pending): governance/F1_CRITICAL_PAGES.json now equals the journey coverage and every route must resolve to a real page; found and fixed dead `#/all-features` (404). ENG-F1-03 stays NOT_RUN until the browser run is recorded at an exact SHA |
+| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | DONE (#2711 merged): inventory equals journey coverage and every route resolves to a real page; dead `#/all-features` fixed. ENG-F1-03 stays NOT_RUN until the browser run is recorded at an exact SHA |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | IN_REVIEW (PR pending): Apache-2.0 and CC BY-SA 2.1 became required classes; per-class removal control on real data. Criterion stays NOT_RUN until ENG-D8-01 passes and the rendered page is captured at an exact SHA |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
+| T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (pedsDose gap closed in #2702; guard hardened to call-sites after independent review) | ENG-C6-01 | claude | IN_REVIEW | this PR |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
 
