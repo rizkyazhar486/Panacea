@@ -167,7 +167,7 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSigned
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
-import { repoHasilLab, repoRujukan } from './store.js'
+import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
 import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './domains/clinical-records/validasiLedger.js'
@@ -936,6 +936,7 @@ pasangRuteHasilLab(app, {
   isOwner: (u) => isOwner(u as User),
   idPasienDiri,
   pasienTertaut: (userId) => Object.values(getTautan()).filter((t) => t.userId === userId).map((t) => t.patientId),
+  pasienDitugaskan,
   konteks: () => ({ hasil: repoHasilLab(), rujukan: repoRujukan(), now: () => new Date(), newId: (p) => `${p}-${randomUUID()}` }),
   audit: (u, aksi, target) => addAudit(u as User, aksi, target),
 })
@@ -2275,6 +2276,46 @@ app.post('/api/doctors/:id/verify', requireAuth, (req, res) => {
   saveSettings(id, { strStatus: status })
   addAudit(u, 'str.verify', id)
   res.json({ ok: true })
+})
+
+// --- Staf perawat/lab (F1): peran dan penugasan hanya oleh owner; tanpa jalur self-assign; semua perubahan diaudit ---
+const idStaf = (v: unknown) => (typeof v === 'string' && v.length > 0 && v.length <= 96 ? v : null)
+app.get('/api/owner/staff', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ staff: daftarStaf().map((x) => ({ id: x.id, name: x.name, email: x.email, role: x.role, patientIds: pasienDitugaskan(x.id) })) })
+})
+app.post('/api/owner/staff-role', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const b = (req.body ?? {}) as { userId?: unknown; role?: unknown }
+  const userId = idStaf(b.userId)
+  if (!userId || (b.role !== 'perawat' && b.role !== 'lab' && b.role !== 'pasien')) return res.status(400).json({ error: 'invalid-input' })
+  const target = getUser(userId)
+  if (target && isOwner(target)) return res.status(409).json({ error: 'not-eligible' })
+  const r = setStaffRole(userId, b.role)
+  if (!r.ok) { addAudit(u, `staff.role.rejected:${r.reason}`, userId); return res.status(r.reason === 'not-found' ? 404 : 409).json({ error: r.reason }) }
+  addAudit(u, `staff.role:${b.role}`, userId)
+  res.json({ ok: true, id: userId, role: b.role })
+})
+app.post('/api/owner/staff-assignments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const b = (req.body ?? {}) as { userId?: unknown; patientId?: unknown; revoke?: unknown }
+  const userId = idStaf(b.userId), patientId = idStaf(b.patientId)
+  if (!userId || !patientId || patientId in Object.prototype || (b.revoke !== undefined && typeof b.revoke !== 'boolean')) return res.status(400).json({ error: 'invalid-input' })
+  const target = getUser(userId)
+  if (!target || !STAFF_ROLES.includes(target.role)) return res.status(404).json({ error: 'not-found' })
+  const changed = b.revoke === true ? cabutStaf(patientId, userId) : tugaskanStaf(patientId, userId)
+  addAudit(u, b.revoke === true ? 'staff.unassign' : 'staff.assign', `${userId}:${patientId}`)
+  res.json({ ok: true, changed })
+})
+
+// Staf melihat pasien yang ditugaskan kepadanya sendiri (untuk memilih pasien pada formulir intake). Hanya perawat/lab; tidak membuka data pasien.
+app.get('/api/staff/assignments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!STAFF_ROLES.includes(u.role)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ patientIds: pasienDitugaskan(u.id) })
 })
 
 // --- SATUSEHAT: submit an EMR as a FHIR R4 Bundle (dokter/owner) ---

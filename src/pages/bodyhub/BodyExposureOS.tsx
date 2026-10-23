@@ -10,8 +10,8 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { Fold } from '../../shared/ui/Fold'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./UnifiedHumanSimulationProjector'))
-const PanelKoplingMultiSkala = lazy(() => import('../../components/PanelKoplingMultiSkala'))
-const PanelUbiquitin = lazy(() => import('../../components/PanelUbiquitin'))
+const PanelKoplingMultiSkala = lazy(() => import('../../components/digital-twin/PanelKoplingMultiSkala'))
+const PanelUbiquitin = lazy(() => import('../../components/digital-twin/PanelUbiquitin'))
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 

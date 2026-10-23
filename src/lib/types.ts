@@ -267,7 +267,7 @@ export interface ConsentStage {
 }
 
 // -------- Accounts & roles -------------------------------------------------
-export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'perawat' | 'lab' | 'admin' | 'owner'
 export interface Account {
   /** Stable server user id; used for identity-bound longitudinal records. */
   id?: string

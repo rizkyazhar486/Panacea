@@ -1,18 +1,19 @@
-# Clinical calculators — automated engineering-review dossier (tranches 1–5)
+# Clinical calculators — automated engineering-review dossier (tranches 1–10)
 
-Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
+Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **DEFERRED_TO_CLINICAL_VALIDATION** for Alpha under the owner decision of 2026-10-17; calculator-registry entries separately remain `PENDING_CLINICAL_REVIEW` with `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
-AI-assisted review and the code is not clinical proof. No reviewer identity, date, signature or approval is recorded here, and none may be
-added by engineering tests.
+AI-assisted review and the code is not clinical proof. Owner confirmation of completed independent and internal C6 review is recorded in `governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md` (18 October 2026 WIB). Reviewer details and source-version approval are not inferred from engineering tests.
 
 | Qualified review field | Current value |
 | --- | --- |
-| Reviewer name / professional identifier | Unassigned |
-| Review date | Not reviewed |
+| Reviewer name / professional identifier | Owner confirms independent reviewer and internal owner review; independent name/identifier not supplied |
+| Review date | Completion confirmed by owner on 18 October 2026 WIB; original review date not supplied |
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
-Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+Baseline: `origin/main` at `6a093511`. Suites (all run inside `npm run uji`): `scripts/uji/calculator-independent-reference.mts` (tranche 1), `scripts/uji/calculator-independent-reference-2.mts` (tranche 2), `scripts/uji/calculator-independent-reference-3.mts` (tranche 3) and `scripts/uji/calculator-independent-reference-4.mts` (tranche 4), `scripts/uji/calculator-independent-reference-5.mts` (tranche 5), `scripts/uji/calculator-independent-reference-6.mts` (tranche 6), `scripts/uji/calculator-independent-reference-7.mts` (tranche 7), `scripts/uji/calculator-independent-reference-8.mts` (tranche 8), `scripts/uji/calculator-independent-reference-9.mts` (tranche 9), `scripts/uji/calculator-independent-reference-10.mts` (tranche 10); shared helpers in `scripts/uji/support/calculatorHarness.mts`.
+
+> **Status update, 2026-10-17 (owner decision):** formal clinical review is out of scope for Alpha and moved to the Clinical Validation phase (`docs/alpha/CLINICAL_REVIEW_DEFERRAL.md`). Everything below is preserved as written: it remains engineering evidence, not clinical approval, and the reviewer-only items stay open for that phase.
 
 ## What "engineering-ready" means here
 
@@ -121,7 +122,95 @@ Method as above: independently written oracles, seeded sampling (2 × 400 + 800 
 | 14-night sleep debt (`sleepDebt`, `sanitizeNights`) | Σ(need − slept) over the first 14 nights; ≤ 2 h well-rested, ≤ 8 h mild, else significant | none | The 2 h and 8 h cut-offs are unsourced. Oversleeping yields negative debt (formula does not clamp at 0). **No recorded nights reads as "no debt", not "unknown".** `sanitizeNights` checks only the date shape, so `2026-02-31` is accepted. |
 | Pack-years and lung-screening eligibility (`packYearScreen`) | (cigarettes/day ÷ 20) × years; USPSTF 2021: age 50–80, ≥ 20 pack-years, quit ≤ 15 years, 0 cigarettes never eligible | USPSTF 2021 (as recorded in the engine) | Fractional ages: 49.5 and 80.5 are ineligible (inclusive integer cut-offs). Whether `quitYearsAgo = 0` (still smoking) should be entered explicitly is a UX decision already made in the engine. |
 
+## Tranche 6 — fluids & electrolytes and the glycogen-timing heuristic (suite: `scripts/uji/calculator-independent-reference-6.mts`)
+
+Method as above (400 seeded cases per formula, worked cases, breakpoints at 10/20 kg, exact boundaries, hostile matrices, range tables re-asserted as literals, source mutants on every constant, branch and range). Every mutant fails by name; one, `w <= 10` → `w < 10` in the sodium maintenance formula, is equivalent because the piecewise formula is continuous at 10 kg. Result: **no discrepancy** between the engines and the independently written references; no engine change.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Maintenance fluid (`maintenanceFluid`) | Holliday-Segar 100/50/20 mL/kg/day; Na 3/2/1 and K 2/1/0.5 mEq/kg by weight band | Holliday-Segar (as recorded) | The electrolyte per-kg tiers are unsourced in the engine. |
+| Resuscitation (`resuscitation`) | Adult sepsis 30 mL/kg, paediatric shock 20 mL/kg, burns 4 × kg × %TBSA with half in the first 8 h; TBSA is ignored outside burns | none beyond the formula names | Fixed volumes are population defaults, not prescriptions; Parkland vs other burn formulas; adult-sepsis 30 mL/kg guidance changes over time. |
+| Corrected sodium (`correctedSodium`) | Na + 1.6 × max(0, (glucose − 100)/100) (Katz hyperglycemia correction) | Katz (as recorded) | Below-reference glucose now adds zero in both engines; 1.6 vs 2.4 (Hillier) remains a separate model choice. |
+| Sodium correction rate (`naCorrectionRate`) | TBW = kg × 0.6 (M) / 0.5 (F); ΔNa/L = (140 − Na)/(TBW + 1); litres for +10 mEq/L | simplified Adrogué-Madias | **Behaviour findings, unchanged:** current Na = 140 reports "0 litres"; Na > 140 reports a negative litre figure (the formula assumes a 140 infusate, which the page text contradicts for 0.9 % NaCl = 154). Only M/F are accepted. The 10 mEq/L figure is a goal, not a safe-rate limit. |
+| Potassium deficit (`potassiumDeficit`) | (4.0 − K) × kg × 0.3 to 0.6, never negative | none | The 0.3–0.6 factors and the 4.0 target are unsourced; serum K poorly predicts total deficit. |
+| Glycogen-depletion timing (`autophagyTiming`) | remaining = max(0, 14 − (1 − fat%/100) × 2 − hours since meal); started when ≤ 0 | none (illustrative heuristic) | The whole heuristic is unsourced and is not a measurement of autophagy; it must stay labelled illustrative. |
+
+## Tranche 7 — Maddrey, Siriraj, Fletcher and Denver age (suite: `scripts/uji/calculator-independent-reference-7.mts`)
+
+References use integer arithmetic (tenths/hundredths) so exact boundaries do not depend on float rounding; exhaustive boundary grids (793 exact-DF-32 combinations; every Siriraj feature combination × 361 half-step diastolic pressures; 2.2 M Fletcher grid points in a one-off probe), seeded sampling, hostile matrices, range tables re-asserted as literals, and ~40 source mutants (each fails by name; one, the `typeof` guard in Siriraj's `oneOf`, is equivalent because `includes` is strict).
+
+**One engine defect found and fixed (`maddreyScore`).** A discriminant function of exactly 32 was reported "not severe" whenever float arithmetic landed just below it: PT 15.5 s vs control 10 s with bilirubin 6.7 mg/dL gives 4.6 × 5.5 + 6.7 = 32 but computes as 31.999999999999996. 129 of the 793 exact-boundary combinations with a positive PT difference were misclassified, understating severity at the published threshold (DF ≥ 32). The fix rounds DF to 1e-6 before comparing; the displayed `df` is unchanged. The regression test fails on the unfixed engine.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Maddrey discriminant function (`maddreyScore`) | DF = 4.6 × (patient PT − control PT) + total bilirubin; severe when DF ≥ 32 | Maddrey 1978 | A patient PT shorter than control is accepted (negative difference), as before; range limits are input-sanity bounds. Corticosteroid decisions stay with the clinician. |
+| Siriraj stroke score (`sirirajStrokeScore`) | 2.5 × consciousness + 2 × vomiting + 2 × headache + 0.1 × diastolic − 3 × atheroma − 12; > +1 haemorrhagic, < −1 ischaemic, else indeterminate | Poungvarin et al., BMJ 1991 | Not a substitute for imaging (labelled so). Exactly ±1 is indeterminate (rule is strict). |
+| Fletcher index (`fletcherIndex`) | Mean of 500/1000/2000 Hz (basic) or + 3000 Hz (complete); cut-offs < 26 / 41 / 56 / 71 / 91 dB | AAO-HNS-style bands as recorded | The mean is classified unrounded (25.67 dB is "Normal"); some references round to whole dB first. In basic mode the 3000 Hz field is ignored. |
+| Denver II age check (`validateDenverAge`) | 0–72 months | none | Only the age range is validated here; the milestone list is not part of this engine. |
+
+## Tranche 8 — caffeine at bedtime and blood-donation pre-screening (suite: `scripts/uji/calculator-independent-reference-8.mts`)
+
+Integer-arithmetic references for the caffeine bands (minutes × 10 against half-life × 10 tenths) and for the 12-week interval (checked to the millisecond), seeded sampling, hostile matrices, tables re-asserted as literals, and ~50 source mutants (each fails by name; three first-run survivors were closed by tests for a donation dated exactly "now", for a passed 12-week mark at 10:00 never reporting −0 days, and for the hour regex).
+
+**One engine defect found and fixed (`caffeineBand`).** At exactly two or three half-lives to bedtime the remaining fraction is 25 % or 12.5 % by definition, but `0.5^(h / half-life)` can land just above (e.g. 25.000000000000007 or 12.500000000000004) and was classified into the next-worse band: 1,224 of 6,318 exact-boundary cases (e.g. half-life 1.6 h, 3.2 h to bed). The fix rounds the percentage to 1e-9 before comparing; reported values are unchanged. The regression test fails on the unfixed engine.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Caffeine at bedtime (`caffeineAtBedtime`, `caffeineBand`) | remaining = dose × 0.5^(hours / half-life); bands > 25 % high, > 12.5 % near, else low; 3 half-lives to ~12.5 %; drink table 95/63/47/28/80/34 mg | none beyond the table | The drink contents, the 25 % / 12.5 % bands and the 1.5–9.5 h half-life range are unsourced; **consumed time equal to bedtime reads as 0 h (full dose), not 24 h**; `hoursTo12pct` is 12.5 %, not 12 %; blank servings or custom mg read as 0 mg by documented design ("did not drink"); this is not a safe-intake limit. |
+| Blood-donation pre-screening (`bloodDonationScreen`) | age 17–65, weight ≥ 50 kg, 12 weeks since last donation, four deferral flags; last-donation date validated (calendar-real, not in the future) | generic national/WHO/PMI criteria as recorded | The age/weight limits and the 12-week interval vary by service and sex; this is not on-site screening (haemoglobin and interview remain with the blood bank). A donation dated today is accepted and not eligible. |
+
+## Tranche 9 — FIB-4, OST, risk-screen gates and the newborn/growth/Framingham input validators (suite: `scripts/uji/calculator-independent-reference-9.mts`)
+
+References: FIB-4 against the formula and band table (400 seeded cases plus exact band boundaries); OST against an integer reference (tenths of kg, 20,000 cases; a 391,503-point one-off probe found 0 mismatches); every validator under hostile-input matrices with range tables re-asserted as literals; 50 source mutants, each fails by name. Result: **no discrepancy and no engine change.**
+
+**Not verified here:** the Framingham General CVD model itself. `cvdRisk` delegates to `framinghamCVD` in `lib/riskModels` (D'Agostino 2008 coefficients); this tranche tests only its input gates, the HDL < total-cholesterol rule, band wiring and monotone sanity (age, risk factors, HDL). Re-deriving the coefficients needs the primary source, as for `graceScore`.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| FIB-4 (`fib4`, `fib4Band`) | age × AST / (platelets × √ALT), rounded to 2 dp; < 1.3 (age ≥ 65: < 2.0) low, ≤ 2.67 indeterminate, else high | Sterling 2006; age-adjusted cut-off as recorded | **The value is rounded to 2 dp before banding**, so an unrounded 1.2997 is shown as 1.30 and banded "Indeterminate" (the band follows the displayed value). The 65-year cut-over and the 2.0 cut-off are as recorded; the algorithm is not for general-population screening. |
+| OST (`ostIndex`, `ostBand`) | trunc(0.2 × (kg − age)); > −1 lower, −1…−4 moderate, < −4 higher | Koh 2001 | A small negative difference truncates to −0 (equal to 0; prints "0"). Applicability by sex and ethnicity is a clinical matter. |
+| Framingham CVD gates (`cvdRisk`) | age 18–120 gate, sex M/F, three yes/no flags, HDL < total cholesterol | D'Agostino 2008 | **Model coefficients not re-derived** (see above); the page's 30–74 validation population remains a page note while `cvdRisk` accepts 18–120. |
+| Newborn inputs (`validateBallardInputs`) | birth weight 200–8000 g; Apgar 1 and 5 min whole numbers 0–10 (0 is legitimate) | scale definition | The Ballard→gestational-age table and Lubchenco percentiles are not in this engine. |
+| Growth inputs (`validateWhoGrowthInputs`, `validateNeonateInputs`, `validateCdcInputs`, `parseWhoVisit`) | age/weight/length ranges for WHO 0–60 months, neonate 0–30 days, CDC 2–20 years | as recorded | Weight/height ranges are input-sanity bounds. `parseWhoVisit` uses `Number()`, so a typed `0x10` reads as 16 (not typeable in a number input). Reference tables and z-scores are not in this engine. |
+| Framingham what-if inputs (`validateFraminghamInput`) | age 30–74, total cholesterol 100–500, HDL 10–150, SBP 70–300; NaN = "required" | D'Agostino 2008 derivation range | The 30–74 age range follows the derivation population; the ranges for cholesterol/HDL/SBP are input-sanity bounds. |
+
+## Tranche 10 — Katz sodium, potassium assessment, McDonald rule, zone-2 heart rate, grip validation, parseNumberField (suite: `scripts/uji/calculator-independent-reference-10.mts`)
+
+Independent references (zone-2 rounding against integer arithmetic in tenths of a year, 901 ages; potassium severity over every 0.1 mEq/L from 1.0 to 10.0 plus exact boundaries), hostile matrices, range tables re-asserted as literals, 33 source mutants each failing by name. Result: **no engine discrepancy and no engine change.**
+
+**Cross-engine status recorded for the reviewer:**
+
+1. *Corrected sodium alignment (resolved in #2658).* Both engines (`correctedSodiumKatz` in `electrolyteCorrection.ts` and `correctedSodium` in `fluidElectrolytes.ts`) and both clinical UI surfaces (`ClinicalCalculators.tsx` and `FluidCalculators.tsx`) now apply and display the identical clamped Katz contract `Corrected Na = Measured Na + 1.6 × max(0, (Glucose − 100) / 100)`, with `glucoseMmolLToMgDl` providing explicit `mmol/L × 18.0182` conversion (`GLUCOSE_MG_DL_PER_MMOL_L = 18.0182`) and failing closed on non-finite inputs. Tranche 6 independently checks a piecewise reference and tabulated boundary corrections; tranche 10 checks 400 seeded cross-engine cases in both `mg/dL` and converted `mmol/L` on the shared Na range 90–200. The standalone Na range 80–200 and fluid range 90–200 remain distinct input scopes. The previous unbounded subtraction at Na 140/glucose 20 (138.72) is historical, now expected 140.
+2. *Potassium deficit exists twice (documented scope distinction).* `potassiumAssessment` reports a fixed 200–400 mEq per 1 mEq/L below 4.0 (K 3.0 → 200–400 mEq), while `fluidElectrolytes.potassiumDeficit` is weight-based 0.3–0.6 mEq/kg per mEq/L (K 3.0, 70 kg → 21–42 mEq). They differ by an order of magnitude; which is intended for a given workflow is a clinical decision.
+
+| Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
+| --- | --- | --- | --- |
+| Katz corrected sodium (`correctedSodiumKatz`, `glucoseMmolLToMgDl`) | Na + 1.6 × max(0, (glucose − 100)/100); mmol/L × 18.0182 | Katz 1973 | Standalone 80–200 vs fluid 90–200 input scope; 1.6 vs 2.4 (Hillier) factor. |
+| Potassium assessment (`potassiumAssessment`) | severity < 2.5 or > 6.5 severe, < 3.0 or > 6.0 moderate, < 3.5 or > 5.5 mild; deficit 200–400 mEq per mEq/L below 4.0 | Sterns rule of thumb as recorded | Band cut-offs and the deficit rule are unsourced here; the second deficit estimate above. |
+| McDonald rule (`mcdonaldGestationalAge`) | fundal height (cm) ≈ weeks, 20–36 cm only | page text | Single-fetus, normal-growth assumption; no estimate outside 20–36 cm. |
+| Zone-2 heart rate (`zone2HeartRate`) | Tanaka HRmax = 208 − 0.7 × age; zone 60–70 % rounded | Tanaka 2001; ACSM | 60–70 % as zone 2 is a training convention, not a physiological measurement. |
+| Grip strength gate (`validateGripKg`) | 1–100 kg, must be typed | none | Range is input sanity only. |
+| `parseNumberField` | blank/whitespace/non-string → NaN; otherwise `Number()` | — | `Number()` accepts hex text (`0x10` = 16), infinities pass to the range gate. |
+
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), `fluidElectrolytes`, `autophagyTiming`, `framinghamInputs`, `growthInputs`, `ballardInputs`, `denverAge`, `fletcher`,
-`maddreyScore`, `sirirajStrokeScore`, `riskScreens`, `bloodDonationScreen`, `caffeineSleep`, and the input-contract engines. `egfr-ckd-epi-2021` has a point-wise test only.
+`reviewRegistry` (a registry, not a formula). The GRACE point table is now tested against the published AHA/ACC reproduction of the classic Granger nomogram; clinical prognosis calibration remains out of scope. `egfr-ckd-epi-2021` has a point-wise test only.
+
+## Additional engineering correction — GRACE malformed flags (2026-10-17)
+
+The GRACE engine formerly evaluated `arrest`, `stDev`, and `markers` using `=== true` but did not validate their input types. A non-boolean value (including missing, `null`, `1`, or the string `"true"`) could silently contribute zero points and return an apparently valid score/risk band. The updated `graceScore` now refuses non-boolean flags with a named invalid field and withholds both score and band. Non-object envelopes are refused rather than throwing. A mandatory tranche-10 regression includes valid all-false/all-true cases, individual flag score deltas (39/28/14), hostile values on each flag, and malformed envelopes. This corrects **runtime input safety**, not the unverified provenance of the GRACE scoring table or clinical outcome calibration. Existing score thresholds and coefficients remain unchanged; no clinical approval or ledger promotion is claimed.
+
+## GRACE 2003 classic point-table reproduction (engineering tranche 10 extension)
+
+The mandatory `scripts/uji/calculator-independent-reference-10.mts` now includes an independently transcribed literal grid of classic GRACE points for **age, pulse, systolic pressure, serum creatinine, Killip I–IV, arrest, ST deviation and cardiac markers**. For every table boundary (inclusive starts and adjacent ends), the engine's complete score must match the sum of the printed points; it also checks a multi-factor synthetic example. This closes the *absence of any independent point-table test* previously recorded, but it does not validate the prognostic probabilities, newer GRACE 2.0, the user-provided categorization, or clinical suitability.
+
+Published reference: **2014 AHA/ACC Guideline for the Management of Patients With Non–ST-Elevation Acute Coronary Syndromes**, “GRACE Risk Model Nomogram” (reprinted/modified with permission from Granger et al. 2003), https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2014/2014_AHA_ACC_Guideline_for_the_Management_of_Patients_With_NonSTElevation_Acute_Coronary_Syndromes.pdf ; original report Granger CB et al., *Arch Intern Med*. 2003;163:2345–2353. doi:10.1001/archinte.163.19.2345. The published worked-example prose contains a systolic-pressure/point discrepancy relative to its own printed point table; the regression uses the explicit point table, not that prose. This is automated software checking, **not** authorisation for patient decisions.
+
+## C6 sodium CI regression correction & Invictus engineering closure — 18–19 October 2026
+
+PR #2658 unified the fluid-engine and electrolyte-correction Katz formulas (`Na + 1.6 × max(0, (glucose − 100) / 100)`), aligned both UI formula explanations (`FluidCalculators.tsx` and `ClinicalCalculators.tsx`), added explicit `mmol/L → mg/dL` conversion (`glucoseMmolLToMgDl`, factor `18.0182`), and updated the independent tranche-6 and tranche-10 oracles with piecewise references and explicit glucose `20 / 99.9 / 100 / 100.1 / 200 / 600 / 2000` boundary values. No tolerance, input guard, potassium method, or clinical review status is relaxed.
+
+### Separated Status Dimensions (2026-10-19)
+- **`C6_ENGINEERING_STATUS`**: `VERIFIED` (all 10 independent reference tranches, `fluid-electrolytes.mts`, `electrolyte-correction.mts`, hostile-input matrices, mutation checks, TypeScript, architecture ratchet, and production build pass).
+- **`CLINICAL_REVIEW_STATUS`**: Owner-attested internal and independent clinical review recorded in `governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md`; per-calculator version-bound `clinically_reviewed` remains `false` where external reviewer identity, date, and version binding are not recorded in the code registry.
+- **`ALPHA_SCOPE_STATUS`**: `DEFERRED` (`DEFERRED_TO_CLINICAL_VALIDATION` in `governance/ALPHA_ACCEPTANCE_LEDGER.json`, non-blocking for Alpha engineering).

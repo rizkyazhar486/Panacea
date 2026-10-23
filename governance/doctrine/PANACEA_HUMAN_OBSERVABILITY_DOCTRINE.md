@@ -1,5 +1,7 @@
 # PANACEA HUMAN OBSERVABILITY DOCTRINE
 
+**Inherited development principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) (repository path: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). Human-authored development guidance; clinical safety, evidence, privacy, and approved governance remain binding.
+
 ## Universal, longitudinal, permissioned human-state intelligence
 
 **Status:** Mandatory cross-repository architecture doctrine beneath `PANACEA_CONSTITUTION.md` and `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`.

@@ -1,5 +1,6 @@
 {
   "aturan": {},
   "totalNodeSeriusKritis": 0,
-  "_catatan": "Ratchet axe-core (scripts/qa/axe-audit.mjs, tag wcag2a/2aa/21a/21aa/22aa; color-contrast dikecualikan karena diukur terpisah oleh kontras-wcag.mjs). Diukur lokal pada 9 halaman x 2 viewport x 2 tema: 0 pelanggar serius/kritis setelah dua perbaikan nyata (tablist hanya berisi tab; kanvas 3D role=img). Aturan serius/kritis baru yang muncul, atau kenaikan node di atas baseline, menggagalkan gerbang. BATAS: axe hanya menangkap sebagian masalah aksesibilitas; 8 hasil 'incomplete' (butuh tinjauan manual) dilaporkan, bukan dianggap lulus; tidak menggantikan uji pembaca layar/pemeriksaan manual."
+  "_catatan": "Ratchet axe-core (scripts/qa/axe-audit.mjs, tag wcag2a/2aa/21a/21aa/22aa; color-contrast dikecualikan karena diukur terpisah oleh kontras-wcag.mjs). Diukur lokal pada 9 halaman x 2 viewport x 2 tema: 0 pelanggar serius/kritis setelah dua perbaikan nyata (tablist hanya berisi tab; kanvas 3D role=img). Aturan serius/kritis baru yang muncul, atau kenaikan node di atas baseline, menggagalkan gerbang. BATAS: axe hanya menangkap sebagian masalah aksesibilitas; hasil 'incomplete' (butuh tinjauan manual) kini digerbang (baseline 0): 8 hitungan awal berasal dari 2 elemen unik (aria-label pada div tanpa role) yang diperbaiki dengan role=group; tidak menggantikan uji pembaca layar/pemeriksaan manual.",
+  "incompleteTotal": 0
 }
