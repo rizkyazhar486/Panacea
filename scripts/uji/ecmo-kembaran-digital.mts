@@ -98,7 +98,7 @@ assert.ok(jva[0] === 'Native LV output' && jva.some((t) => t.startsWith('Mixing 
 // Provenans: setiap model menunjuk bukti yang ada; UI tidak memuat sitasi sendiri.
 for (const id of Object.keys(MODEL)) if (MODEL[id].status !== 'verifikasi-sumber-tertunda' || MODEL[id].bukti.length) buktiUntuk(id)
 for (const b of Object.values(BUKTI)) assert.ok(b.pmid && b.doi, `bukti ${b.id} tanpa PMID/DOI`)
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.doesNotMatch(ui, /doi\.org\/10\.|PMID \d/, 'UI tidak boleh menulis sitasi langsung')
 assert.doesNotMatch(ui, /Math\.random/, 'tanpa angka acak di UI')
 assert.match(ui, /not yet simulated/i); assert.doesNotMatch(ui, /ELSO[- ](endorsed|certified)/i)

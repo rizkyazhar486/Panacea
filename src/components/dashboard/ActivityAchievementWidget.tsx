@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getWorkouts } from '../../lib/workoutStore'
 import type { ImportedWorkout } from '../../lib/workoutImport'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 
 interface Milestone {
   id: string
@@ -31,9 +32,9 @@ function longestStreak(workouts: ImportedWorkout[]) {
 
 function milestones(workouts: ImportedWorkout[]): Milestone[] {
   const totalKm = workouts.reduce((n, w) => n + (w.jarakKm ?? 0), 0)
-  const totalMin = workouts.reduce((n, w) => n + w.durasi / 60, 0)
+  const totalMin = workouts.reduce((n, w) => n + (workoutDurationSeconds(w) ?? 0) / 60, 0)
   const longestKm = workouts.reduce((n, w) => Math.max(n, w.jarakKm ?? 0), 0)
-  const longestMin = workouts.reduce((n, w) => Math.max(n, w.durasi / 60), 0)
+  const longestMin = workouts.reduce((n, w) => Math.max(n, (workoutDurationSeconds(w) ?? 0) / 60), 0)
   const days = distinctDays(workouts)
   const streak = longestStreak(workouts)
   return [

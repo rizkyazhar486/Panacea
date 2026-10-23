@@ -2,9 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const canonical = [
-  'PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md',
-  'PANACEA_PRODUCT_MATURITY_OS.md',
-  'PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md',
+  'governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md',
+  'governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md',
+  'governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md',
 ]
 
 for (const path of canonical) {
@@ -30,12 +30,12 @@ for (const path of canonical) {
   )
 }
 
-const maturity = readFileSync('PANACEA_PRODUCT_MATURITY_OS.md', 'utf8')
+const maturity = readFileSync('governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md', 'utf8')
 assert.match(maturity, /S_\{compound\}[\s\S]*?\\times[\s\S]*?D_\{personalization\}/)
 assert.match(maturity, /V\s*=\s*[\s\S]*?\\frac\{D\s*\\times\s*R/)
 assert.match(maturity, /Data\s*\\rightarrow\s*PatientState/)
 
-const platform = readFileSync('PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', 'utf8')
+const platform = readFileSync('governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', 'utf8')
 assert.match(platform, /\\boldsymbol\{\\theta\}/)
 assert.match(platform, /\\boldsymbol\{\\epsilon\}/)
 

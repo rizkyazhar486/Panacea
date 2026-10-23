@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { physiologySnapshot, type PhysiologyInputs } from '../../lib/microphysiology'
+import { SCALE_KEYS, scaleResult, type ScaleKey } from './physiologyScaleInputs'
 
 export type PhysiologyScale = 'tissue' | 'cell' | 'gene'
 
@@ -25,7 +25,7 @@ const SCALE_META: Record<PhysiologyScale, { label: string; scale: string; detail
   },
 }
 
-const DEFAULT_INPUTS: PhysiologyInputs = {
+const DEFAULT_INPUTS: Record<ScaleKey, number> = {
   hb: 15,
   saO2: 98,
   paO2: 95,
@@ -34,7 +34,6 @@ const DEFAULT_INPUTS: PhysiologyInputs = {
   cardiacOutput: 5,
   potassiumOutside: 4,
   potassiumInside: 140,
-  temperatureC: 37,
   bicarbonate: 24,
   paCO2: 40,
 }
@@ -210,6 +209,8 @@ function GeneVisual({ motion }: { motion: boolean }) {
   )
 }
 
+const fmt = (v: number | null, digits: number) => (v === null ? '—' : v.toFixed(digits))
+
 function NumberField({
   label,
   value,
@@ -218,9 +219,9 @@ function NumberField({
   step = 1,
 }: {
   label: string
-  value: number
+  value: string
   unit: string
-  onChange: (value: number) => void
+  onChange: (value: string) => void
   step?: number
 }) {
   return (
@@ -233,7 +234,7 @@ function NumberField({
           inputMode="decimal"
           step={step}
           value={value}
-          onChange={(event) => onChange(Number(event.target.value))}
+          onChange={(event) => onChange(event.target.value)}
           className="min-w-0 flex-1 bg-transparent text-sm font-black text-white outline-none"
         />
         <span className="text-[8px] font-bold text-white/30">{unit}</span>
@@ -244,13 +245,13 @@ function NumberField({
 
 export function PhysiologyScaleExplorer({ initialScale = 'tissue' }: Props) {
   const [scale, setScale] = useState<PhysiologyScale>(initialScale)
-  const [inputs, setInputs] = useState<PhysiologyInputs>(DEFAULT_INPUTS)
+  const [inputs, setInputs] = useState<Record<ScaleKey, string>>(() => Object.fromEntries(SCALE_KEYS.map((k) => [k, String(DEFAULT_INPUTS[k])])) as Record<ScaleKey, string>)
   const [motion, setMotion] = useState(() => typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  const result = useMemo(() => physiologySnapshot(inputs), [inputs])
+  const result = useMemo(() => scaleResult(inputs), [inputs])
   const meta = SCALE_META[scale]
 
-  function setInput<K extends keyof PhysiologyInputs>(key: K, value: number) {
-    setInputs((previous) => ({ ...previous, [key]: Number.isFinite(value) ? value : 0 }))
+  function setInput(key: ScaleKey, value: string) {
+    setInputs((previous) => ({ ...previous, [key]: value }))
   }
 
   return (
@@ -306,10 +307,10 @@ export function PhysiologyScaleExplorer({ initialScale = 'tissue' }: Props) {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-cyan-300/10 bg-cyan-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-cyan-200/55">CaO₂</div><div className="mt-1 text-lg font-black">{result.caO2.toFixed(1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
-            <div className="rounded-xl border border-cyan-300/10 bg-cyan-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-cyan-200/55">CvO₂</div><div className="mt-1 text-lg font-black">{result.cvO2.toFixed(1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
-            <div className="rounded-xl border border-emerald-300/10 bg-emerald-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-emerald-200/55">Fick VO₂</div><div className="mt-1 text-lg font-black">{result.vo2.toFixed(0)} <span className="text-[8px] text-white/35">mL/min</span></div></div>
-            <div className="rounded-xl border border-violet-300/10 bg-violet-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-violet-200/55">O₂ extraction</div><div className="mt-1 text-lg font-black">{result.extraction.toFixed(1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
+            <div className="rounded-xl border border-cyan-300/10 bg-cyan-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-cyan-200/55">CaO₂</div><div className="mt-1 text-lg font-black">{fmt(result.caO2, 1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
+            <div className="rounded-xl border border-cyan-300/10 bg-cyan-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-cyan-200/55">CvO₂</div><div className="mt-1 text-lg font-black">{fmt(result.cvO2, 1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
+            <div className="rounded-xl border border-emerald-300/10 bg-emerald-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-emerald-200/55">Fick VO₂</div><div className="mt-1 text-lg font-black">{fmt(result.vo2, 0)} <span className="text-[8px] text-white/35">mL/min</span></div></div>
+            <div className="rounded-xl border border-violet-300/10 bg-violet-300/[.035] p-3"><div className="text-[8px] font-black uppercase text-violet-200/55">O₂ extraction</div><div className="mt-1 text-lg font-black">{fmt(result.extraction, 1)} <span className="text-[8px] text-white/35">mL/dL</span></div></div>
           </div>
 
           <details className="rounded-2xl border border-white/8 bg-white/[.025] p-3" open={scale === 'cell'}>
@@ -318,7 +319,7 @@ export function PhysiologyScaleExplorer({ initialScale = 'tissue' }: Props) {
               <NumberField label="K⁺ outside" value={inputs.potassiumOutside} unit="mmol/L" step={0.1} onChange={(v) => setInput('potassiumOutside', v)} />
               <NumberField label="K⁺ inside" value={inputs.potassiumInside} unit="mmol/L" step={1} onChange={(v) => setInput('potassiumInside', v)} />
             </div>
-            <div className="mt-2 rounded-xl border border-violet-300/10 bg-violet-300/[.035] p-3 text-sm font-black">E<sub>K</sub> ≈ {result.kNernst.toFixed(1)} mV</div>
+            <div className="mt-2 rounded-xl border border-violet-300/10 bg-violet-300/[.035] p-3 text-sm font-black">E<sub>K</sub> ≈ {fmt(result.kNernst, 1)} mV</div>
           </details>
 
           <details className="rounded-2xl border border-white/8 bg-white/[.025] p-3">
@@ -327,7 +328,7 @@ export function PhysiologyScaleExplorer({ initialScale = 'tissue' }: Props) {
               <NumberField label="HCO₃⁻" value={inputs.bicarbonate} unit="mmol/L" step={0.1} onChange={(v) => setInput('bicarbonate', v)} />
               <NumberField label="PaCO₂" value={inputs.paCO2} unit="mmHg" step={0.1} onChange={(v) => setInput('paCO2', v)} />
             </div>
-            <div className="mt-2 rounded-xl border border-amber-300/10 bg-amber-300/[.035] p-3 text-sm font-black">pH ≈ {result.pH.toFixed(2)}</div>
+            <div className="mt-2 rounded-xl border border-amber-300/10 bg-amber-300/[.035] p-3 text-sm font-black">pH ≈ {fmt(result.pH, 2)}</div>
           </details>
 
           <div className="space-y-2 rounded-2xl border border-white/8 bg-black/20 p-3 text-[9px] leading-relaxed text-white/45">

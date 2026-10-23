@@ -9,7 +9,13 @@ import { inRange } from './inputs'
 // Batas kewarasan masukan (bukan ambang klinis): menolak kolom kosong (0), negatif, NaN, Infinity dan salah satuan.
 export const SODIUM_MEQ_L = { min: 80, max: 200 } as const
 export const GLUCOSE_MG_DL = { min: 20, max: 2000 } as const
+export const GLUCOSE_MG_DL_PER_MMOL_L = 18.0182
 export const POTASSIUM_MEQ_L = { min: 1, max: 10 } as const
+
+export function glucoseMmolLToMgDl(glucoseMmolL: number): number {
+  if (typeof glucoseMmolL !== 'number' || !Number.isFinite(glucoseMmolL)) return Number.NaN
+  return glucoseMmolL * GLUCOSE_MG_DL_PER_MMOL_L
+}
 
 export type SodiumCorrectionResult =
   | { ok: true; data: { correctedNa: number } }

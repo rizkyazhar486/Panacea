@@ -19,7 +19,7 @@ assert.ok(sudut.every((p) => dipertahankan(p, { aktif: true, kemiringanDerajat: 
 assert.ok(sudut.every((p) => dipertahankan(p, { ...BIDANG_AWAL, posisi: -JARAK_MAKS })), 'bidang mati tetap memotong')
 
 // Shader: sisi terbuang DILEWATI (continue), tidak mengakhiri sinar (break).
-const s = readFileSync('src/components/VolumeDicom3D.tsx', 'utf8')
+const s = readFileSync('src/components/digital-twin/VolumeDicom3D.tsx', 'utf8')
 assert.match(s, /return uBidangAktif == 1 && dot\(p, uBidangNormal\) > uBidangJarak;/)
 assert.equal((s.match(/if \(terpotongBidang\(p\)\) \{ p \+= langkahVec; continue; \}/g) ?? []).length, 3, 'tidak semua mode render melewati sisi terpotong')
 assert.doesNotMatch(s, /terpotongBidang\(p\)\) break/, 'sinar berhenti di sisi terpotong — bidang dari arah kamera menghapus seluruh volume')

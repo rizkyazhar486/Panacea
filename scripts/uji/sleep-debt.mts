@@ -65,9 +65,9 @@ assert.deepEqual(sanitizeNights(sah), { nights: sah, dropped: 0 })
 assert.equal(sanitizeNights([{ date: '2026-00-10', hours: 7 }]).nights.length, 0); assert.equal(sanitizeNights([{ date: '2026-10-32', hours: 7 }]).nights.length, 0); assert.equal(sanitizeNights([{ date: '2026-10-00', hours: 7 }]).nights.length, 0)
 
 // Halaman.
-const src = readFileSync('src/pages/SleepDebt.tsx', 'utf8')
+const src = readFileSync('src/pages/bodyhub/SleepDebt.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { parseNumberField, sanitizeNights, sleepDebt, validateHours, type Night } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { parseNumberField, sanitizeNights, sleepDebt, validateHours, type Night } from '../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/reduce\(\(s, n\) => s \+ \(need/.test(src) && !/debt <= 2|debt <= 8/.test(src), 'rumus/ambang tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok ? ('))
