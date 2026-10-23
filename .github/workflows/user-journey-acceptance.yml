@@ -27,27 +27,6 @@ on:
       - '.github/workflows/user-journey-acceptance.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'scripts/qa/user-journey-e2e.mjs'
-      - 'scripts/qa/user-journey-staff.mjs'
-      - 'scripts/qa/user-journey-resilience.mjs'
-      - 'scripts/qa/f1-critical-action-contract.test.mjs'
-      - 'scripts/qa/f1-negative-evidence*'
-      - 'src/pages/clinical/LabResultReview.tsx'
-      - 'src/pages/bodyhub/Harian.tsx'
-      - 'src/components/clinical/**'
-      - 'src/domains/lab-results/**'
-      - 'src/main.tsx'
-      - 'src/components/layout/**'
-      - 'src/components/dashboard/OnboardingTour.tsx'
-      - 'src/pages/landing/Login.tsx'
-      - 'src/lib/api.ts'
-      - 'src/lib/store.tsx'
-      - 'server/src/auth.ts'
-      - 'server/src/domains/identity/**'
-      - 'src/pages/admin/Owner.tsx'
-      - 'server/src/index.ts'
-      - '.github/workflows/user-journey-acceptance.yml'
 permissions:
   contents: read
 jobs:
