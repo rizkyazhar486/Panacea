@@ -1,9 +1,9 @@
-import { isValidIsoTimestamp } from '../shared/kernel/isoTimestamp.ts'
+import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
 import {
   validateMedicalDeviceEvent,
   type MedicalDeviceEventEnvelope,
   type MedicalDeviceEventKind,
-} from './medicalDeviceEventEnvelope.ts'
+} from '../../../lib/medicalDeviceEventEnvelope.ts'
 
 /**
  * Pure, read-only device-to-OS explanation prototype across historical, current

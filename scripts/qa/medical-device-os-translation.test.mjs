@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { translateMedicalDeviceForOs } from '../../src/lib/medicalDeviceOsTranslation.ts'
+import { translateMedicalDeviceForOs } from '../../src/domains/observability/adapters/medicalDeviceOsTranslation.ts'
 
 const scope = {
   subjectId: 'patient-01',

@@ -1,7 +1,7 @@
 # Panacea Universal Medical Device Translation & Synchronized Healthcare OS — Past, Present and Future
 ## Architecture, data engineering and future-device conformance contract — 2026-10-13
 
-**Status: future-extensible architecture, with a small non-patient-facing event explanation projection in `src/lib/medicalDeviceOsTranslation.ts`. This document does not certify vendor support, device connectivity, medical diagnoses, real-time control, patient integration, clinical efficacy or regulatory clearance.**
+**Status: future-extensible architecture, with a small non-patient-facing event explanation projection in `src/domains/observability/adapters/medicalDeviceOsTranslation.ts`. This document does not certify vendor support, device connectivity, medical diagnoses, real-time control, patient integration, clinical efficacy or regulatory clearance.**
 
 Related authorities: `PANACEA_GENESIS_DIRECTIVE.md`, `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md`, and `PANACEA_CONSTITUTION.md`.
 
