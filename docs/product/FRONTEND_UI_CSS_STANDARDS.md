@@ -164,6 +164,18 @@ Repositori ini memiliki lapisan CSS warisan (`panacea-control-grading-v46.css`, 
 
 ---
 
+## 5. Navigasi: Jangan Pakai `href="#id"` untuk Scroll-Anchor (HashRouter)
+
+App ini pakai `HashRouter` (`src/main.tsx`). Fragment `#...` di URL ditafsirkan react-router sebagai **route path**, bukan scroll-anchor native browser.
+
+- **Dilarang**: `<a href="#features">` untuk lompat ke section di halaman yang sama. React-router akan "menavigasi" ke route `features` yang gak terdaftar → jatuh ke catch-all `*` → render `NotFound` (404).
+- **Boleh**: `href="#/route"` (dengan garis miring) — itu link HashRouter yang sah ke route beneran.
+- **Cara benar buat scroll-anchor**: `<button type="button" onClick={() => document.getElementById('id')?.scrollIntoView({ behavior: 'smooth' })}>`. Contoh pola reuse: `scrollToSection` di `src/pages/landing/sections/LandingHeader.tsx`.
+- **Ditegakkan otomatis**: `scripts/qa/hashrouter-anchor-guard.test.mjs` (jalan via `node --test scripts/qa/*.test.mjs`, bagian dari `npm run build`) scan seluruh `src/**/*.tsx` dan gagal kalau nemu `href="#id"` non-route.
+- **Insiden**: landing nav (`#features`/`#roles`/`#pricing`/`#science`) + 2 lokasi lain 404 di production sebelum ketahuan — PR #2667.
+
+---
+
 ## Ringkasan Checklist Sebelum Mengajukan Perubahan Frontend:
 - [ ] Apakah kontras teks dan tombol terbaca jelas (>7:1) di Mode Terang dan Mode Gelap?
 - [ ] Apakah tombol di kanvas gelap kebal dari pemetaan `.dark .bg-white`?
@@ -172,3 +184,4 @@ Repositori ini memiliki lapisan CSS warisan (`panacea-control-grading-v46.css`, 
 - [ ] Apakah tidak ada animasi kapsul raksasa melayang yang menutupi layar saat klik?
 - [ ] Apakah form memiliki wadah scroll vertikal yang aman tanpa memotong bagian atas?
 - [ ] Apakah seluruh 7 suite pengujian (`scripts/uji/*`) dan `tsc --noEmit` lulus 100%?
+- [ ] Apakah tidak ada `href="#id"` baru (non-route) — pakai `onClick` + `scrollIntoView` buat scroll-anchor?

@@ -421,17 +421,17 @@ function simpanSekarang() {
 // MENGHAPUS data: yang tergeser dipindah ke sini, tidak dibuang.
 let mongoDb: any = null
 const ARSIP_DIR = process.env.PANACEA_ARCHIVE_DIR || join(dirname(DB_PATH), 'arsip')
-export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): void {
-  if (!catatan.length) return
+export function arsipkan(nama: 'audit' | 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): boolean {
+  if (!catatan.length) return true
   const baris = catatan.map((c) => ({ c, diarsipkan: new Date().toISOString() }))
   if (mongoDb) {
     mongoDb.collection(`arsip_${nama}`).insertMany(baris).catch((e: Error) => {
       catatGagal(e); console.error(`[store] archive ${nama} failed:`, e.message)
     })
-    return
+    return true // scheduled, NOT a durability acknowledgement: Mongo async write failures remain an E4 limitation
   }
-  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n') }
-  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message) }
+  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n'); return true }
+  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message); return false }
 }
 
 /** Serialize snapshots: an older slice deletion must never follow a newer save. */
@@ -998,7 +998,13 @@ export function addAudit(user: User, action: string, target?: string) {
   if (!(db as any).audit) (db as any).audit = []
   const audit: AuditEntry[] = (db as any).audit
   audit.unshift({ id: uid(), at: new Date().toISOString(), userId: user.id, userEmail: user.email, action, target })
-  if (audit.length > 5000) audit.length = 5000
+  // Retain the bounded hot set; archive overflow with the existing clinical-audit sink.
+  // Retention/deletion periods remain a separate owner-governed policy decision.
+  if (audit.length > 5000) {
+    const evicted = audit.slice(5000)
+    // File-mode append failure must not destroy the only copy of the audit history.
+    if (arsipkan('audit', evicted)) audit.splice(5000)
+  }
   save()
 }
 export function getAudit(limit = 200): AuditEntry[] {

@@ -7,6 +7,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-sample-coverage.mjs'
+      - 'scripts/qa/perf-sample-coverage.test.mjs'
       - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
@@ -19,6 +21,7 @@ on:
       - 'scripts/qa/axe-ratchet.mjs'
       - 'scripts/qa/screenshot-grid.mjs'
       - 'scripts/qa/screenshot-regresi.mjs'
+      - 'scripts/qa/daily-quote-layout.mjs'
       - 'governance/SCREENSHOT_GRID_BASELINE.json'
       - 'governance/AXE_BASELINE.json'
       - 'governance/THEME_PARITY_BASELINE.json'
@@ -41,6 +44,8 @@ on:
     paths:
       - 'scripts/qa/ux-audit.mjs'
       - 'scripts/qa/perf-audit.mjs'
+      - 'scripts/qa/perf-sample-coverage.mjs'
+      - 'scripts/qa/perf-sample-coverage.test.mjs'
       - 'scripts/qa/perf-stats.mjs'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
@@ -53,6 +58,7 @@ on:
       - 'scripts/qa/axe-ratchet.mjs'
       - 'scripts/qa/screenshot-grid.mjs'
       - 'scripts/qa/screenshot-regresi.mjs'
+      - 'scripts/qa/daily-quote-layout.mjs'
       - 'governance/SCREENSHOT_GRID_BASELINE.json'
       - 'governance/AXE_BASELINE.json'
       - 'governance/THEME_PARITY_BASELINE.json'
@@ -74,7 +80,7 @@ permissions:
   contents: read
 jobs:
   ux-audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -104,6 +110,7 @@ jobs:
             sleep 1
           done
           rc=0
+          QA_OUT="$RUNNER_TEMP/daily-quote-layout-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/daily-quote-layout.mjs || rc=1
           UX_BASELINE=governance/UX_AUDIT_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/ux-audit.mjs || rc=1
           node scripts/qa/kontras-ukur.fixture.mjs || rc=1
           QA_OUT="$RUNNER_TEMP/kontras-evidence.json" KONTRAS_BASELINE=governance/KONTRAS_BASELINE.json QA_URL=http://localhost:5190/ node scripts/qa/kontras-wcag.mjs || rc=1
@@ -123,10 +130,11 @@ jobs:
             ${{ runner.temp }}/axe-evidence.json
             ${{ runner.temp }}/keyboard-evidence.json
             ${{ runner.temp }}/screenshot-grid-evidence.json
+            ${{ runner.temp }}/daily-quote-layout-evidence.json
             ${{ runner.temp }}/theme-shots
   perf-audit:
     # Audit performa terukur pada BUILD PRODUKSI (laporan, bukan gerbang): metodologi dan batas di scripts/qa/perf-audit.mjs. Job terpisah agar tidak memperlambat ux-audit.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4

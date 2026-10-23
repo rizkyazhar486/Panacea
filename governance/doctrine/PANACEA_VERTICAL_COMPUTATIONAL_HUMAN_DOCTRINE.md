@@ -1,5 +1,7 @@
 # Panacea Vertical Computational Human Doctrine
 
+**Inherited development principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) (repository path: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). Human-authored development guidance; clinical safety, evidence, privacy, and approved governance remain binding.
+
 **Status:** canonical mandatory repository doctrine  
 **Owner direction:** 2026-09-27  
 **Applies to:** every present and future agent/model, all three superpages, biomedical domains, simulation engines, knowledge/data layers, and every 2D/3D/3DCG representation.

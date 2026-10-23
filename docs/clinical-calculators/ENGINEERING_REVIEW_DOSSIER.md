@@ -1,14 +1,13 @@
 # Clinical calculators — automated engineering-review dossier (tranches 1–10)
 
-Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **PENDING_CLINICAL_REVIEW**; every registry entry keeps `clinically_reviewed=false`.
+Status: **ENGINEERING EVIDENCE ONLY**. Criterion C6 stays **DEFERRED_TO_CLINICAL_VALIDATION** for Alpha under the owner decision of 2026-10-17; calculator-registry entries separately remain `PENDING_CLINICAL_REVIEW` with `clinically_reviewed=false`.
 This dossier records reproducible software behavior. It does not approve any calculator for patient-care use, and agreement between an
-AI-assisted review and the code is not clinical proof. No reviewer identity, date, signature or approval is recorded here, and none may be
-added by engineering tests.
+AI-assisted review and the code is not clinical proof. Owner confirmation of completed independent and internal C6 review is recorded in `governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md` (18 October 2026 WIB). Reviewer details and source-version approval are not inferred from engineering tests.
 
 | Qualified review field | Current value |
 | --- | --- |
-| Reviewer name / professional identifier | Unassigned |
-| Review date | Not reviewed |
+| Reviewer name / professional identifier | Owner confirms independent reviewer and internal owner review; independent name/identifier not supplied |
+| Review date | Completion confirmed by owner on 18 October 2026 WIB; original review date not supplied |
 | Approved source revision | None |
 | Signed range / interpretation approval | None |
 
@@ -131,7 +130,7 @@ Method as above (400 seeded cases per formula, worked cases, breakpoints at 10/2
 | --- | --- | --- | --- |
 | Maintenance fluid (`maintenanceFluid`) | Holliday-Segar 100/50/20 mL/kg/day; Na 3/2/1 and K 2/1/0.5 mEq/kg by weight band | Holliday-Segar (as recorded) | The electrolyte per-kg tiers are unsourced in the engine. |
 | Resuscitation (`resuscitation`) | Adult sepsis 30 mL/kg, paediatric shock 20 mL/kg, burns 4 × kg × %TBSA with half in the first 8 h; TBSA is ignored outside burns | none beyond the formula names | Fixed volumes are population defaults, not prescriptions; Parkland vs other burn formulas; adult-sepsis 30 mL/kg guidance changes over time. |
-| Corrected sodium (`correctedSodium`) | Na + 1.6 × (glucose − 100)/100 (Katz) | Katz (as recorded) | The 1.6 factor vs 2.4 (Hillier) is a choice; low glucose lowers the corrected value (no clamp). |
+| Corrected sodium (`correctedSodium`) | Na + 1.6 × max(0, (glucose − 100)/100) (Katz hyperglycemia correction) | Katz (as recorded) | Below-reference glucose now adds zero in both engines; 1.6 vs 2.4 (Hillier) remains a separate model choice. |
 | Sodium correction rate (`naCorrectionRate`) | TBW = kg × 0.6 (M) / 0.5 (F); ΔNa/L = (140 − Na)/(TBW + 1); litres for +10 mEq/L | simplified Adrogué-Madias | **Behaviour findings, unchanged:** current Na = 140 reports "0 litres"; Na > 140 reports a negative litre figure (the formula assumes a 140 infusate, which the page text contradicts for 0.9 % NaCl = 154). Only M/F are accepted. The 10 mEq/L figure is a goal, not a safe-rate limit. |
 | Potassium deficit (`potassiumDeficit`) | (4.0 − K) × kg × 0.3 to 0.6, never negative | none | The 0.3–0.6 factors and the 4.0 target are unsourced; serum K poorly predicts total deficit. |
 | Glycogen-depletion timing (`autophagyTiming`) | remaining = max(0, 14 − (1 − fat%/100) × 2 − hours since meal); started when ≤ 0 | none (illustrative heuristic) | The whole heuristic is unsourced and is not a measurement of autophagy; it must stay labelled illustrative. |
@@ -179,14 +178,14 @@ References: FIB-4 against the formula and band table (400 seeded cases plus exac
 
 Independent references (zone-2 rounding against integer arithmetic in tenths of a year, 901 ages; potassium severity over every 0.1 mEq/L from 1.0 to 10.0 plus exact boundaries), hostile matrices, range tables re-asserted as literals, 33 source mutants each failing by name. Result: **no engine discrepancy and no engine change.**
 
-**Two cross-engine inconsistencies recorded for the reviewer (characterized in the test, deliberately not changed):**
+**Cross-engine status recorded for the reviewer:**
 
-1. *Corrected sodium exists twice.* `correctedSodiumKatz` (`electrolyteCorrection`) clamps the glucose term at 0 (glucose < 100 mg/dL gives no correction; Na range 80–200), while `fluidElectrolytes.correctedSodium` applies it unclamped (Na 140, glucose 20 → 138.72; Na range 90–200).
-2. *Potassium deficit exists twice.* `potassiumAssessment` reports a fixed 200–400 mEq per 1 mEq/L below 4.0 (K 3.0 → 200–400 mEq), while `fluidElectrolytes.potassiumDeficit` is weight-based 0.3–0.6 mEq/kg per mEq/L (K 3.0, 70 kg → 21–42 mEq). They differ by an order of magnitude; which is intended is a clinical decision.
+1. *Corrected sodium alignment (resolved in #2658).* Both engines (`correctedSodiumKatz` in `electrolyteCorrection.ts` and `correctedSodium` in `fluidElectrolytes.ts`) and both clinical UI surfaces (`ClinicalCalculators.tsx` and `FluidCalculators.tsx`) now apply and display the identical clamped Katz contract `Corrected Na = Measured Na + 1.6 × max(0, (Glucose − 100) / 100)`, with `glucoseMmolLToMgDl` providing explicit `mmol/L × 18.0182` conversion (`GLUCOSE_MG_DL_PER_MMOL_L = 18.0182`) and failing closed on non-finite inputs. Tranche 6 independently checks a piecewise reference and tabulated boundary corrections; tranche 10 checks 400 seeded cross-engine cases in both `mg/dL` and converted `mmol/L` on the shared Na range 90–200. The standalone Na range 80–200 and fluid range 90–200 remain distinct input scopes. The previous unbounded subtraction at Na 140/glucose 20 (138.72) is historical, now expected 140.
+2. *Potassium deficit exists twice (documented scope distinction).* `potassiumAssessment` reports a fixed 200–400 mEq per 1 mEq/L below 4.0 (K 3.0 → 200–400 mEq), while `fluidElectrolytes.potassiumDeficit` is weight-based 0.3–0.6 mEq/kg per mEq/L (K 3.0, 70 kg → 21–42 mEq). They differ by an order of magnitude; which is intended for a given workflow is a clinical decision.
 
 | Calculator (engine) | Form checked | Citation recorded in the engine | Items only a qualified reviewer can settle |
 | --- | --- | --- | --- |
-| Katz corrected sodium (`correctedSodiumKatz`) | Na + 1.6 × max(0, (glucose − 100)/100) | Katz 1973 | The two cross-engine differences above; 1.6 vs 2.4 factor. |
+| Katz corrected sodium (`correctedSodiumKatz`, `glucoseMmolLToMgDl`) | Na + 1.6 × max(0, (glucose − 100)/100); mmol/L × 18.0182 | Katz 1973 | Standalone 80–200 vs fluid 90–200 input scope; 1.6 vs 2.4 (Hillier) factor. |
 | Potassium assessment (`potassiumAssessment`) | severity < 2.5 or > 6.5 severe, < 3.0 or > 6.0 moderate, < 3.5 or > 5.5 mild; deficit 200–400 mEq per mEq/L below 4.0 | Sterns rule of thumb as recorded | Band cut-offs and the deficit rule are unsourced here; the second deficit estimate above. |
 | McDonald rule (`mcdonaldGestationalAge`) | fundal height (cm) ≈ weeks, 20–36 cm only | page text | Single-fetus, normal-growth assumption; no estimate outside 20–36 cm. |
 | Zone-2 heart rate (`zone2HeartRate`) | Tanaka HRmax = 208 − 0.7 × age; zone 60–70 % rounded | Tanaka 2001; ACSM | 60–70 % as zone 2 is a training convention, not a physiological measurement. |
@@ -195,4 +194,23 @@ Independent references (zone-2 rounding against integer arithmetic in tenths of 
 
 ## Next tranche (not yet covered)
 
-`graceScore` (points table too large to transcribe without the primary source), and `reviewRegistry` (a registry, not a formula). `egfr-ckd-epi-2021` has a point-wise test only.
+`reviewRegistry` (a registry, not a formula). The GRACE point table is now tested against the published AHA/ACC reproduction of the classic Granger nomogram; clinical prognosis calibration remains out of scope. `egfr-ckd-epi-2021` has a point-wise test only.
+
+## Additional engineering correction — GRACE malformed flags (2026-10-17)
+
+The GRACE engine formerly evaluated `arrest`, `stDev`, and `markers` using `=== true` but did not validate their input types. A non-boolean value (including missing, `null`, `1`, or the string `"true"`) could silently contribute zero points and return an apparently valid score/risk band. The updated `graceScore` now refuses non-boolean flags with a named invalid field and withholds both score and band. Non-object envelopes are refused rather than throwing. A mandatory tranche-10 regression includes valid all-false/all-true cases, individual flag score deltas (39/28/14), hostile values on each flag, and malformed envelopes. This corrects **runtime input safety**, not the unverified provenance of the GRACE scoring table or clinical outcome calibration. Existing score thresholds and coefficients remain unchanged; no clinical approval or ledger promotion is claimed.
+
+## GRACE 2003 classic point-table reproduction (engineering tranche 10 extension)
+
+The mandatory `scripts/uji/calculator-independent-reference-10.mts` now includes an independently transcribed literal grid of classic GRACE points for **age, pulse, systolic pressure, serum creatinine, Killip I–IV, arrest, ST deviation and cardiac markers**. For every table boundary (inclusive starts and adjacent ends), the engine's complete score must match the sum of the printed points; it also checks a multi-factor synthetic example. This closes the *absence of any independent point-table test* previously recorded, but it does not validate the prognostic probabilities, newer GRACE 2.0, the user-provided categorization, or clinical suitability.
+
+Published reference: **2014 AHA/ACC Guideline for the Management of Patients With Non–ST-Elevation Acute Coronary Syndromes**, “GRACE Risk Model Nomogram” (reprinted/modified with permission from Granger et al. 2003), https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2014/2014_AHA_ACC_Guideline_for_the_Management_of_Patients_With_NonSTElevation_Acute_Coronary_Syndromes.pdf ; original report Granger CB et al., *Arch Intern Med*. 2003;163:2345–2353. doi:10.1001/archinte.163.19.2345. The published worked-example prose contains a systolic-pressure/point discrepancy relative to its own printed point table; the regression uses the explicit point table, not that prose. This is automated software checking, **not** authorisation for patient decisions.
+
+## C6 sodium CI regression correction & Invictus engineering closure — 18–19 October 2026
+
+PR #2658 unified the fluid-engine and electrolyte-correction Katz formulas (`Na + 1.6 × max(0, (glucose − 100) / 100)`), aligned both UI formula explanations (`FluidCalculators.tsx` and `ClinicalCalculators.tsx`), added explicit `mmol/L → mg/dL` conversion (`glucoseMmolLToMgDl`, factor `18.0182`), and updated the independent tranche-6 and tranche-10 oracles with piecewise references and explicit glucose `20 / 99.9 / 100 / 100.1 / 200 / 600 / 2000` boundary values. No tolerance, input guard, potassium method, or clinical review status is relaxed.
+
+### Separated Status Dimensions (2026-10-19)
+- **`C6_ENGINEERING_STATUS`**: `VERIFIED` (all 10 independent reference tranches, `fluid-electrolytes.mts`, `electrolyte-correction.mts`, hostile-input matrices, mutation checks, TypeScript, architecture ratchet, and production build pass).
+- **`CLINICAL_REVIEW_STATUS`**: Owner-attested internal and independent clinical review recorded in `governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md`; per-calculator version-bound `clinically_reviewed` remains `false` where external reviewer identity, date, and version binding are not recorded in the code registry.
+- **`ALPHA_SCOPE_STATUS`**: `DEFERRED` (`DEFERRED_TO_CLINICAL_VALIDATION` in `governance/ALPHA_ACCEPTANCE_LEDGER.json`, non-blocking for Alpha engineering).

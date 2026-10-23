@@ -58,7 +58,7 @@ assert.deepEqual(pelanggar, [],
 const dimigrasikan = [
   'components/dashboard/WidgetBeranda.tsx', 'components/dashboard/PapanWidget.tsx', 'components/tiles/UbinRingHarian.tsx',
   'components/tiles/UbinLangsung.tsx', 'components/tiles/UbinLanjutan.tsx', 'components/digital-twin/Workout4DLab.tsx',
-  'pages/bodyhub/BodyBattery.tsx', 'pages/AnalisisPro.tsx', 'pages/fitness/HeartRateLog.tsx', 'pages/PapanAtlet.tsx',
+  'pages/bodyhub/BodyBattery.tsx', 'pages/fitness/AnalisisPro.tsx', 'pages/fitness/HeartRateLog.tsx', 'pages/fitness/PapanAtlet.tsx',
 ]
 for (const rel of dimigrasikan) {
   const isi = readFileSync(join('src', rel), 'utf8')

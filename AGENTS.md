@@ -1,6 +1,14 @@
 # Panacea Multi-Agent Operating Policy
 
+> **Governance v2 (read first):** work selection, acceptance, verification, stabilization and roles are defined in
+> [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
+> Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
+
+
 ## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
+
+**OWNER ACC C6 (2026-10-17): DOKTER RIZKY MUHAMMAD ASRIZAL MENYATAKAN TELAH MEMERIKSA DAN MENG-ACC RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. JANGAN MINTA PROFESOR/SPESIALIS ATAU TANDA TANGAN ULANG UNTUK MENUTUP ENGINEERING ALPHA.** Wajib ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). ACC ini adalah pernyataan review internal pemilik, bukan klaim validasi independen, STR terverifikasi, izin lisensi pihak ketiga, atau persetujuan untuk keputusan pasien. C6 tetap non-blocking/deferred dalam ledger formal.
+
 
 > **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
 
