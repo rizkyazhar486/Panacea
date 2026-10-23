@@ -1,3 +1,4 @@
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import { useMemo, useState } from 'react'
 import { getWorkouts } from '../../lib/workoutStore'
 import type { ImportedWorkout } from '../../lib/workoutImport'
@@ -24,7 +25,9 @@ function workoutTerms(workout: ImportedWorkout) {
   return ['heart', 'lung', 'blood vasculature', 'skeletal muscle']
 }
 
-function durationLabel(seconds: number) {
+function durationLabel(workout: ImportedWorkout) {
+  const seconds = workoutDurationSeconds(workout)
+  if (seconds === null) return '—'
   const minutes = Math.max(0, Math.round(seconds / 60))
   if (minutes < 60) return `${minutes} min`
   const hours = Math.floor(minutes / 60)
@@ -66,7 +69,7 @@ export function WorkoutHraWorkbench() {
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         <div className="min-w-[120px] rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
           <div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">Duration</div>
-          <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{durationLabel(selected.durasi)}</div>
+          <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{durationLabel(selected)}</div>
         </div>
         {selected.jarakKm != null && <div className="min-w-[120px] rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]"><div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">Distance</div><div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{selected.jarakKm.toFixed(2)} km</div></div>}
         {selected.avgHr != null && <div className="min-w-[120px] rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]"><div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">Average HR</div><div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{selected.avgHr} bpm</div></div>}

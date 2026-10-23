@@ -5,7 +5,7 @@ import {
   newestSampleDate,
   parseHealthWebhookPayload,
   tanggalDiOffset,
-} from '../src/healthWebhook.js'
+} from '../src/domains/push/healthWebhook.js'
 
 assert.equal(tanggalDiOffset('2026-09-08 00:30:00 +0700'), '2026-09-08')
 assert.equal(tanggalDiOffset('2026-09-08T00:30:00.123+05:30'), '2026-09-08')

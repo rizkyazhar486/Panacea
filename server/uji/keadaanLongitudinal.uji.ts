@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { keadaanLongitudinalLab, pilihProfilPerangkat, susunKeadaanLongitudinal, turunkanSelfVital, turunkanVo2 } from '../src/keadaanLongitudinal.ts'
+import { keadaanLongitudinalLab, pilihProfilPerangkat, susunKeadaanLongitudinal, turunkanSelfVital, turunkanVo2 } from '../src/domains/clinical-records/keadaanLongitudinal.ts'
 
 const log = { gdp: [{ id: 'a', tanggal: '2026-09-20', nilai: 100 }] }
 const a = keadaanLongitudinalLab('user-1', log, '2026-09-29T00:00:00.000Z', '2026-09-28T00:00:00.000Z')

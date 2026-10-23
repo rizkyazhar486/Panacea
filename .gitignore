@@ -81,3 +81,5 @@ server/data/clinical-rag/*.partial
 .claude-flow/
 .swarm/
 ruvector.db
+agentdb.rvf
+agentdb.rvf.lock

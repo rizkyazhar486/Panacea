@@ -3,13 +3,13 @@ import {
   icd11Release,
   rincianIcd11,
   type IcdEntry,
-} from '../icd11.js'
+} from '../domains/medical-reference/icd11.js'
 import {
   ATC_DDD_SOURCE,
   ATC_DDD_VERSION,
   isPlausibleAtcCode,
-} from '../atcDdd.js'
-import { resolveRxNormConcept, type RxNormConcept } from '../rxnorm.js'
+} from '../domains/medical-reference/atcDdd.js'
+import { resolveRxNormConcept, type RxNormConcept } from '../domains/medical-reference/rxnorm.js'
 import {
   LOCAL_DERIVED_SYSTEM,
   LOINC_SYSTEM,

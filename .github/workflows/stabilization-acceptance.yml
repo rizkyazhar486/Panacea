@@ -23,7 +23,7 @@ jobs:
   # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
   # only repeated the same type gate on every PR.
   full-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - name: Checkout
@@ -41,7 +41,10 @@ jobs:
       - name: Frontend production build and TypeScript
         run: npm run build
 
+      # On pull requests `Validate changes` already runs the identical `npm run uji` on the same SHA,
+      # so repeating it here only lengthens the task. Pushes to main (no PR validate run) still execute it.
       - name: Frontend tests
+        if: github.event_name != 'pull_request'
         run: npm run uji
 
       - name: Install mobile browser smoke runner
@@ -339,6 +342,66 @@ jobs:
           path: artifacts/strength-drafts
           if-no-files-found: ignore
 
+      - name: Workout DNA duration provenance and poster (synthetic component, 390x844)
+        timeout-minutes: 5
+        env:
+          DNA_DURATION_QA_ORIGIN: http://127.0.0.1:4173
+          DNA_DURATION_QA_OUTPUT: artifacts/dna-duration
+        run: node scripts/qa/workout-dna-duration-smoke.mjs
+
+      - name: Upload Workout DNA duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dna-duration
+          path: artifacts/dna-duration
+          if-no-files-found: ignore
+
+      - name: Training duration provenance (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          TRAINING_DURATION_QA_ORIGIN: http://127.0.0.1:4173
+          TRAINING_DURATION_QA_OUTPUT: artifacts/training-duration
+        run: node scripts/qa/training-duration-smoke.mjs
+
+      - name: Upload training duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-duration
+          path: artifacts/training-duration
+          if-no-files-found: ignore
+
+      - name: Workout duration summary missingness (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WORKOUT_SUMMARY_QA_ORIGIN: http://127.0.0.1:4173
+          WORKOUT_SUMMARY_QA_OUTPUT: artifacts/workout-duration-summary
+        run: node scripts/qa/workout-duration-summary-smoke.mjs
+
+      - name: Upload workout duration summary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workout-duration-summary
+          path: artifacts/workout-duration-summary
+          if-no-files-found: ignore
+
+      - name: Workout detail duration labels (synthetic client, 390x844)
+        timeout-minutes: 5
+        env:
+          WORKOUT_LABEL_QA_ORIGIN: http://127.0.0.1:4173
+          WORKOUT_LABEL_QA_OUTPUT: artifacts/workout-duration-labels
+        run: node scripts/qa/workout-duration-labels-smoke.mjs
+
+      - name: Upload workout detail duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workout-duration-labels
+          path: artifacts/workout-duration-labels
+          if-no-files-found: ignore
+
       - name: Workout duration provenance and consumer guards (synthetic client, 390x844)
         timeout-minutes: 5
         env:
@@ -440,6 +503,20 @@ jobs:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
         run: node scripts/qa/lab-result-review-e2e-gate.mjs
 
+      - name: A6 clinician care-plan approval (real HTTP, mobile and desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node --experimental-transform-types qa/clinical/care-plan-approval.mjs
+
+      - name: Upload care-plan approval evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: care-plan-approval
+          path: artifacts/care-plan-approval
+          if-no-files-found: ignore
+
       - name: Upload Body Exposure mobile QA artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -482,7 +559,7 @@ jobs:
   # runner installs both lockfile graphs before executing the same server
   # typecheck/build/test suite. GitHub can run both acceptance jobs in parallel.
   server-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Checkout

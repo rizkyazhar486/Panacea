@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "IcdEntry",
-    "module": "server/src/icd11.ts",
+    "module": "server/src/domains/medical-reference/icd11.ts",
     "notes": "Implemented fallback: bounded/sanitized diagnosis term -> NLM Clinical Tables ICD-10-CM v3 -> defensive parsing of display rows -> IcdEntry with `sumber: icd10cm`. The same module owns WHO ICD-11 and NLM fallback routing so source identity remains explicit at the normalization boundary."
   }
 }

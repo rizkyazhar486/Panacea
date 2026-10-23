@@ -53,7 +53,7 @@ ujiVV('vv-sweep', ['o2', 'paco2'], (k) => ({ ...k, gas: { ...k.gas, sweep: 3 } }
 assert.deepEqual(petunjukVV(dv, jalankanVV(DASAR_VV)), [], 'VV tak berubah → tanpa petunjuk')
 
 // UI tidak punya tombol "jawaban".
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.doesNotMatch(ui, /correct answer|jawaban benar/i, 'skenario tidak boleh berupa kuis tombol-jawaban')
 assert.match(ui, /data-ecmo-skenario/, 'skenario harus terpasang di panel')
 assert.match(ui, /data-ecmo-skenario-vv/, 'skenario VV harus terpasang di panel')
