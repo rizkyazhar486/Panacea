@@ -14,7 +14,7 @@ import { readFile } from 'node:fs/promises'
 // galat apa pun untuk ditampilkan. Satu-satunya jalan keluar adalah menyebutkan
 // apa yang diketahui.
 
-const source = await readFile(new URL('../../src/components/KolomPelatih.tsx', import.meta.url), 'utf8')
+const source = await readFile(new URL('../../src/components/fitness/KolomPelatih.tsx', import.meta.url), 'utf8')
 
 // ── Pita itu harus ada, dan harus terpasang di kartu debrief ────────────────
 assert.match(source, /function KesegaranData\(/, 'Pita kesegaran data harus ada.')

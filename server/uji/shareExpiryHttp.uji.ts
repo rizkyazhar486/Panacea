@@ -22,7 +22,7 @@ try {
   const share = (await call('POST', '/api/lab-log/shares', alice.token, { dokterEmail: doctor.user.email, hari: 7 })).body
   const diagnosis = { system: 'local', code: 'SYN-1', display: 'Synthetic fixture condition', verificationStatus: 'provisional' }
   const questions = [{ id: 'sym', kind: 'boolean', prompt: 'Synthetic symptom today?' }]
-  const plan = (await call('POST', `/api/clinician/lab-shares/${share.id}/care-plan`, doctor.token, { diagnosisRefs: [diagnosis], questions })).body
+  const plan = (await call('POST', `/api/clinician/lab-shares/${share.id}/care-plan`, doctor.token, { signIntent: true, diagnosisRefs: [diagnosis], questions })).body
   const today = new Date().toISOString().slice(0, 10)
   const answer = (id: string, planId: string) => call('POST', '/api/care/reports', alice.token, { planId, scheduledFor: today, clientId: id, answers: [{ questionId: 'sym', value: true }] })
   assert.equal((await answer('expiry-report-1', plan.id)).status, 200)
@@ -31,7 +31,7 @@ try {
   // The doctor-side routes that depend on an active share, each with the status it must return.
   const doctorRoutes = (id: string): Array<[string, string, unknown]> => [
     ['GET', `/api/clinician/lab-shares/${id}/fhir`, undefined], ['GET', `/api/clinician/lab-shares/${id}/care`, undefined], ['GET', `/api/clinician/lab-shares/${id}/care/fhir`, undefined],
-    ['POST', `/api/clinician/lab-shares/${id}/review`, { tes: 'gdp' }], ['POST', `/api/clinician/lab-shares/${id}/care-plan`, { diagnosisRefs: [diagnosis], questions }],
+    ['POST', `/api/clinician/lab-shares/${id}/review`, { tes: 'gdp' }], ['POST', `/api/clinician/lab-shares/${id}/care-plan`, { signIntent: true, diagnosisRefs: [diagnosis], questions }],
   ]
 
   // 1. While active (7 days left) every dependent route works for the named doctor and the patient's follow-up is live.
@@ -71,7 +71,7 @@ try {
   assert.equal((await call('GET', `/api/clinician/lab-shares/${share.id}/fhir`, doctor.token)).status, 404, 'the old share stays expired')
   assert.deepEqual((await call('GET', '/api/care/plans', alice.token)).body.plans, [], 'the old plan is not resurrected by a new share')
   assert.equal((await answer('expiry-report-3', plan.id)).status, 404)
-  assert.equal((await call('POST', `/api/clinician/lab-shares/${renewed.id}/care-plan`, doctor.token, { diagnosisRefs: [diagnosis], questions })).status, 200)
+  assert.equal((await call('POST', `/api/clinician/lab-shares/${renewed.id}/care-plan`, doctor.token, { signIntent: true, diagnosisRefs: [diagnosis], questions })).status, 200)
   assert.equal((await call('GET', '/api/care/plans', alice.token)).body.plans.length, 1, 'a new plan on the new share is active')
 
   console.log('shareExpiryHttp: an expired share (end time moved into the past across a process restart) is refused on every dependent clinician, care and read-model route, patient data is untouched, and renewing is explicit without resurrecting the old plan; passed')

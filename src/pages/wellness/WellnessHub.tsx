@@ -1,0 +1,206 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Card, SectionTitle, inputClass } from '../../components/ui'
+import { IconSparkle } from '../../components/icons'
+import { ambilTersembunyi, saring, langgananFitur } from '../../lib/fiturTersembunyi'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wellness Hub — one flagship surface for the longevity / mental-health /
+// aesthetic / futuristic suite. Ties together the pioneering wellness features
+// (new and existing) so the "live longer, feel better, age well" journey is one
+// place, searchable by intent. Pure catalog, no external API.
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Feat { to: string; name: string; what: string; kw: string; tag: string }
+
+export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
+  {
+    title: 'Longevity & Anti-Aging',
+    emoji: '🧬',
+    feats: [
+      { to: '/health-simulator', name: 'What-If Health Simulator', what: "See how today's choices reshape your 10-year risk", kw: 'simulator digital twin future risk what-if prevent timeline', tag: 'New' },
+      { to: '/findrisc', name: 'Diabetes Risk (FINDRISC)', what: 'Your 10-year diabetes risk — and how to lower it', kw: 'diabetes findrisc prediabetes prevention metabolic glucose', tag: 'New' },
+      { to: '/biological-age', name: 'Biological Age', what: 'PhenoAge-style estimate from your logged labs — technical, not a true age', kw: 'phenoage biomarker aging longevity', tag: 'Antiaging' },
+      { to: '/longevity', name: 'Longevity Blueprint', what: 'Healthspan levers and risk drivers from logged inputs', kw: 'lifespan healthspan risk', tag: 'Longevity' },
+      { to: '/organ-vitality', name: 'Organ Vitality', what: 'System-by-system health snapshot', kw: 'organ heart liver kidney vitality', tag: 'Longevity' },
+      { to: '/supplements', name: 'Supplement Guide', what: 'Educational evidence grades for sports supplements', kw: 'supplement vitamin omega creatine stack', tag: 'Antiaging' },
+      { to: '/family-health', name: 'Family Health History', what: 'Early-screening flags from your family history', kw: 'family history genogram legacy tree hereditary risk', tag: 'Longevity' },
+      { to: '/gene-info', name: 'Gene Info', what: 'Look up what a gene does and why it matters', kw: 'gene genetics dna hereditary', tag: 'Longevity' },
+    ],
+  },
+  {
+    title: 'Mind & Mental Wellness',
+    emoji: '🧠',
+    feats: [
+      { to: '/connect', name: 'Connect — Cari Teman & Pasangan', what: 'Profiles, filters and matching based on a healthy lifestyle — not device pairing', kw: 'connect kenalan teman pasangan jodoh relasi relationship match kecocokan deck profil sosial dating', tag: 'Wellness' },
+      { to: '/breathwork', name: 'Breathwork Pacer', what: 'Animated paced breathing to calm you in minutes', kw: 'breathing box 478 coherence anxiety stress calm vagus', tag: 'New' },
+      { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
+      { to: '/mental-health-screen', name: 'Mental Health Check', what: 'PHQ-9 & GAD-7 self-screens — not a Panacea diagnosis', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
+      { to: '/substance-use-screen', name: 'Alcohol & Tobacco Screening', what: 'Published CAGE / pack-year screens — not a Panacea diagnosis', kw: 'audit fagerstrom alcohol tobacco smoking screen substance', tag: 'Mental' },
+      { to: '/ikigai', name: 'Ikigai & Purpose', what: 'Find your reason for being', kw: 'ikigai purpose meaning japanese', tag: 'Wellness' },
+      { to: '/harada', name: 'Harada 9×9 Goal Grid', what: 'One goal, eight pillars, 64 concrete actions', kw: 'harada mandal-art mandala 9x9 goal target sasaran tujuan rencana ohtani grid kisi', tag: 'Wellness' },
+      { to: '/life-compass', name: 'Life Compass', what: 'Plan your vision, mission, and next step', kw: 'vision mission purpose goals future anxiety worry planning', tag: 'New' },
+      { to: '/resilience-stories', name: 'Resilience Stories', what: 'Real people, real hardship, real comebacks', kw: 'motivation inspiration resilience hardship comeback stories', tag: 'New' },
+    ],
+  },
+  {
+    title: 'Sleep & Circadian',
+    emoji: '🌙',
+    feats: [
+      { to: '/sleep-debt', name: 'Sleep Debt', what: 'Track the rolling gap between sleep need and sleep got', kw: 'sleep debt insomnia tired rest hours', tag: 'New' },
+      { to: '/chronotype', name: 'Chronotype', what: 'Are you a morning lark or night owl?', kw: 'chronotype morning owl circadian rmeq', tag: 'Circadian' },
+      { to: '/epworth-sleepiness', name: 'Epworth Sleepiness', what: 'How sleepy are you during the day?', kw: 'epworth sleepiness daytime somnolence', tag: 'Sleep' },
+      { to: '/sleep-apnea-screen', name: 'Sleep Apnea (STOP-BANG)', what: 'Screen your risk of obstructive sleep apnea', kw: 'apnea snoring stopbang osa', tag: 'Sleep' },
+    ],
+  },
+  {
+    title: 'Metabolic & Body',
+    emoji: '⚡',
+    feats: [
+      { to: '/fasting', name: 'Metabolic Fasting', what: 'Time-restricted eating window & metabolic phases', kw: 'fasting intermittent eating window metabolic autophagy', tag: 'Metabolic' },
+      { to: '/thermal-therapy', name: 'Thermal Recovery', what: 'Spa · sauna · steam · jacuzzi · hot · cold · onsen', kw: 'spa sauna steam jacuzzi hot cold plunge heat ice onsen thermal recovery', tag: 'New' },
+      { to: '/macro-lab', name: 'Macro Lab', what: 'Macronutrient targets and meal composition', kw: 'macro protein karbohidrat lemak gizi makro kalori', tag: 'Wellness' },
+      { to: '/sehat-sibuk', name: 'Healthy But Busy', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
+      { to: '/carbon-diet', name: 'Carbon-Footprint Diet', what: 'Dietary choices weighed by carbon footprint', kw: 'carbon jejak karbon diet lingkungan iklim makanan', tag: 'Wellness' },
+      { to: '/nutrition', name: 'Nutrition & BMR', what: 'Calories, macros, and metabolic rate', kw: 'nutrition calorie macro bmr tdee diet', tag: 'Wellness' },
+      { to: '/hydration', name: 'Hydration', what: 'Your daily water target', kw: 'water hydration drink fluid', tag: 'Wellness' },
+      { to: '/alcohol', name: 'Alcohol Unit & BAC Estimator', what: 'Standard drinks and an educational BAC estimate', kw: 'alcohol drink bac widmark unit', tag: 'Wellness' },
+      { to: '/caffeine', name: 'Caffeine & Sleep', what: "See how today's caffeine lingers into tonight's sleep", kw: 'caffeine coffee sleep half-life', tag: 'Sleep' },
+      { to: '/air-quality', name: 'Air Quality & Lungs', what: 'Local air quality and what it means for your lungs', kw: 'air quality aqi pollution lungs pm2.5', tag: 'Wellness' },
+    ],
+  },
+  {
+    title: 'Aesthetic & Skin',
+    emoji: '✨',
+    feats: [
+      { to: '/aesthetic', name: 'Aesthetic Studio', what: 'Skin, face, and aesthetic guidance', kw: 'aesthetic skin face beauty antiaging glow', tag: 'Aesthetic' },
+      { to: '/sun-exposure', name: 'Sun & Vitamin D', what: 'Safe sun for vitamin D without skin damage', kw: 'sun uv vitamin d sunscreen skin', tag: 'Aesthetic' },
+    ],
+  },
+  {
+    title: 'Emergency Preparedness',
+    emoji: '🚑',
+    feats: [
+      { to: '/first-aid', name: 'First Aid Quick Guide', what: 'Plain-language steps for choking, CPR, bleeding & more', kw: 'first aid cpr choking bleeding burns seizure fainting stroke anaphylaxis emergency', tag: 'New' },
+      { to: '/vaccine-tracker', name: 'Vaccine / Immunization Tracker', what: 'Log your last dose, see when the next is due', kw: 'vaccine immunization booster flu tdap covid schedule', tag: 'New' },
+      { to: '/allergy-tracker', name: 'Allergy Tracker', what: 'Log food, drink, medication & contact (DKA) allergies', kw: 'allergy allergies food drink medication contact dermatitis kontak alergi dka anaphylaxis', tag: 'New' },
+      { to: '/blood-donation', name: 'Blood Donation Eligibility', what: 'A quick pre-screen and your next-eligible date', kw: 'blood donation donor eligibility hemoglobin', tag: 'New' },
+      { to: '/organ-donor', name: 'Organ Donor Pledge', what: 'Clarify your wishes, then talk to your family', kw: 'organ donor pledge donation transplant', tag: 'New' },
+    ],
+  },
+  {
+    title: 'Habits & Prep',
+    emoji: '🗓️',
+    feats: [
+      { to: '/visit-prep', name: 'Doctor-Visit Prep Checklist', what: "What to bring and what to ask, before you walk in", kw: 'doctor visit checklist prepare questions appointment', tag: 'New' },
+      { to: '/posture-breaks', name: 'Posture & Desk-Break Reminder', what: 'A gentle nudge to stand, stretch, or rest your eyes', kw: 'posture desk break timer eye strain 20-20-20 sedentary', tag: 'New' },
+      { to: '/pain-diary', name: 'Pain / Symptom Diary', what: 'Track severity over time — useful for you and your clinician', kw: 'pain symptom diary tracker severity trend', tag: 'New' },
+      { to: '/second-opinion', name: 'Second Opinion', what: 'AI drafts privately, a real doctor reviews and approves', kw: 'second opinion doctor review diagnosis ai emr', tag: 'New' },
+    ],
+  },
+  {
+    title: 'Longevity Toolkits',
+    emoji: '🧰',
+    feats: [
+      { to: '/sleep-toolkit', name: 'Sleep Toolkit', what: 'Cycle alarm, nap timer, consistency score, dream journal, soundscape generator & more', kw: 'sleep cycle alarm nap timer consistency dream journal bedtime toolkit binaural beats white noise pink noise soundscape', tag: 'New' },
+      { to: '/movement-toolkit', name: 'Movement Longevity Toolkit', what: 'Grip strength, balance test, Zone 2, micro-workouts & squat streak', kw: 'grip strength balance zone 2 cardio micro workout squat challenge toolkit', tag: 'New' },
+      { to: '/mind-toolkit', name: 'Cognitive Longevity Toolkit', what: 'Brain puzzle, memory game, reaction time, stress inventory & more', kw: 'brain puzzle memory game reaction time word stress digital detox meditation toolkit', tag: 'New' },
+      { to: '/nutrition-toolkit', name: 'Nutrition Longevity Toolkit', what: 'Mediterranean checklist, sugar streak, plant diversity & more', kw: 'mediterranean diet sugar streak antioxidant plant diversity coffee electrolyte toolkit', tag: 'New' },
+      { to: '/toxin-checklist', name: 'Environment & Toxin Checklist', what: 'Everyday exposure reduction — plastics, cleaning, EMF, air quality', kw: 'toxin environment plastic emf endocrine disruptor cleaning swap air purifier checklist', tag: 'New' },
+      { to: '/longevity-science', name: 'Longevity Science Explainers', what: 'Hallmarks of aging, NAD+, sirtuins, rapamycin & more, explained', kw: 'hallmarks aging nad sirtuins spermidine urolithin metformin rapamycin methylene blue science', tag: 'New' },
+      { to: '/self-assessment-toolkit', name: 'Self-Assessment Toolkit', what: 'Telomere quiz, inflammation score, waist-to-height & more', kw: 'telomere quiz inflammation score aging factor waist height ratio toolkit', tag: 'New' },
+      { to: '/body-toolkit', name: 'Body & Skin Toolkit', what: 'Skincare routine builder, symptom map, NEAT tracker', kw: 'skincare routine builder symptom body map neat non-exercise activity toolkit', tag: 'New' },
+      { to: '/longevity-game-center', name: 'Longevity Game Center', what: 'Habit bingo, a shareable report card, and a daily quote', kw: 'habit bingo report card shareable quote game viral', tag: 'New' },
+    ],
+  },
+  {
+    title: 'Computational Biomarkers (experimental)',
+    emoji: '🔬',
+    feats: [
+      { to: '/rppg-heart-rate', name: 'rPPG Heart Rate', what: 'Estimate your pulse from your webcam — no wearable needed', kw: 'rppg heart rate webcam camera photoplethysmography pulse experimental', tag: 'New' },
+      { to: '/vocal-biomarkers', name: 'Vocal Biomarker Analyzer', what: 'Pitch, jitter & shimmer from a 5-second voice sample', kw: 'voice vocal biomarker jitter shimmer pitch acoustic experimental', tag: 'New' },
+      { to: '/snp-profiler', name: 'Local SNP Longevity Profiler', what: 'Upload raw DNA data — parsed entirely in your browser, never uploaded', kw: 'dna snp gene genotype 23andme foxo3 apoe mthfr profiler local', tag: 'New' },
+      { to: '/predictive-models-toolkit', name: 'Predictive Models Toolkit', what: 'Autophagy timing, cortisol curve, glycemic load & more', kw: 'autophagy cortisol sauna nova glycemic load healthspan predictive model toolkit', tag: 'New' },
+      { to: '/data-lab-advanced', name: 'Data Lab Advanced', what: 'Blood trend forecaster, PhenoAge, encrypted vault & more', kw: 'blood panel forecaster phenoage glucose variability omega microbiome supplement vault local data', tag: 'New' },
+      { to: '/bio-simulators', name: 'Bio-Simulators', what: 'Illustrative mTOR/AMPK, circadian, and telomere visualizations', kw: 'mtor ampk circadian telomere attrition simulator illustrative', tag: 'New' },
+    ],
+  },
+]
+
+const TAG_STYLE: Record<string, string> = {
+  New: 'bg-brand text-white',
+  Antiaging: 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300',
+  Longevity: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
+  Mental: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
+  Wellness: 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300',
+  Circadian: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
+  Sleep: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
+  Metabolic: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+  Aesthetic: 'bg-pink-100 text-pink-700 dark:bg-pink-500/15 dark:text-pink-300',
+}
+
+export function WellnessHub() {
+  const [query, setQuery] = useState('')
+  // Fitur yang disembunyikan pengguna juga hilang dari hub, bukan hanya dari
+  // menu — kalau tidak, "disembunyikan" hanya berarti pindah tempat.
+  const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
+  useEffect(() => langgananFitur(setTersembunyi), [])
+  const q = query.trim().toLowerCase()
+
+  const filtered = useMemo(() => {
+    const dasar = GROUPS.map((g) => ({ ...g, feats: saring(g.feats, tersembunyi) })).filter((g) => g.feats.length > 0)
+    if (!q) return dasar
+    return dasar.map((g) => ({ ...g, feats: g.feats.filter((f) => (f.name + ' ' + f.what + ' ' + f.kw).toLowerCase().includes(q)) })).filter((g) => g.feats.length > 0)
+  }, [q, tersembunyi])
+
+  const total = GROUPS.reduce((s, g) => s + g.feats.length, 0)
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <Card className="!p-5">
+        <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Live longer, feel better, age well — your whole journey in one place" />
+        <BatasKlaimKesehatan permukaan="wellness.hub" />
+        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
+          Longevity, mental wellness, sleep, metabolism, and aesthetics — {total} tools, each grounded
+          in evidence and yours to build a daily practice around.
+        </p>
+        <input
+          className={`${inputClass} mt-3`}
+          placeholder="Search: stress, sleep, aging, skin, fasting…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </Card>
+
+      {filtered.length === 0 && (
+        <Card className="!p-5 text-center text-sm text-neutral-500">Nothing matches "{query}" — try "sleep", "stress", "aging", or "skin".</Card>
+      )}
+
+      {filtered.map((g) => (
+        <Card key={g.title} className="!p-5">
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.emoji} {g.title}</div>
+          <div className="mt-3 space-y-1.5">
+            {g.feats.map((f) => (
+              <a key={f.to} href={`#${f.to}`} className="group flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 transition hover:bg-brand/10 dark:bg-white/5">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-ink group-hover:text-brand-dark dark:text-white">{f.name}</span>
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TAG_STYLE[f.tag] ?? TAG_STYLE.Wellness}`}>{f.tag}</span>
+                  </div>
+                  <div className="text-[12px] leading-snug text-neutral-500">{f.what}</div>
+                </div>
+                <span className="mt-1 shrink-0 text-neutral-300 transition group-hover:text-brand-dark">→</span>
+              </a>
+            ))}
+          </div>
+        </Card>
+      ))}
+
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
+        Every tool cites its evidence on-page. Wellbeing support — not a replacement for medical care.
+      </div>
+    </div>
+  )
+}
+
+export default WellnessHub

@@ -58,7 +58,7 @@ assert.equal(kunciPekan('2026-09-17'), '2026-09-14', 'a Thursday must fall into 
 assert.equal(kunciPekan('2026-09-20'), '2026-09-14', 'a Sunday must fall into the SAME week, not the next one')
 
 // ── 6. Grafiknya: satu skala per ukuran, dan arah tidak pernah warna saja ──
-const grafik = readFileSync(new URL('../../src/components/GrafikProgres.tsx', import.meta.url), 'utf8')
+const grafik = readFileSync(new URL('../../src/components/growth/GrafikProgres.tsx', import.meta.url), 'utf8')
 assert.ok(/Math\.min\(\.\.\.nilai\)/.test(grafik) && /Math\.max\(\.\.\.nilai\)/.test(grafik),
   'the chart no longer scales each measure to its own range')
 // Setiap arah harus membawa panah DAN kata. Pasangan hijau/merah di mode
@@ -91,7 +91,7 @@ assert.ok(!/deret\.map[\s\S]{0,200}<text/.test(grafik), 'a value label was put o
 assert.ok(/Nothing recorded yet/.test(grafik), 'an empty measure no longer says it is empty')
 
 // ── 7. Halaman: tabel tersedia, dan sesi tidak diketik ulang ──────────────
-const halaman = readFileSync(new URL('../../src/pages/PelatihProgres.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/fitness/PelatihProgres.tsx', import.meta.url), 'utf8')
 assert.ok(/Show as table/.test(halaman), 'the table view is gone; colour and shape became the only encoding')
 assert.ok(/asal === 'diisi sendiri'/.test(halaman),
   'every measure became typeable, including the one the training log already holds')

@@ -46,6 +46,6 @@ assert.throws(() => jalankanKopling([takHingga], 1), /non-finite/)
 
 // 8. Batas kebenaran tampil di UI.
 assert.match(STATUS_KEBENARAN, /simulated/)
-assert.match(readFileSync('src/components/PanelKoplingMultiSkala.tsx', 'utf8'), /data-status-kebenaran>\{STATUS_KEBENARAN\}/, 'label simulasi tidak tampil')
-assert.match(readFileSync('src/pages/BodyExposureOS.tsx', 'utf8'), /<PanelKoplingMultiSkala \/>/)
+assert.match(readFileSync('src/components/digital-twin/PanelKoplingMultiSkala.tsx', 'utf8'), /data-status-kebenaran>\{STATUS_KEBENARAN\}/, 'label simulasi tidak tampil')
+assert.match(readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8'), /<PanelKoplingMultiSkala \/>/)
 console.log(`kernel-kopling-multiskala: kontrak gagal tertutup, multi-laju 601/121/61, dua arah Δθ=${beda.toFixed(3)}, provenance lintas skala, ketidakpastian dirambatkan`)

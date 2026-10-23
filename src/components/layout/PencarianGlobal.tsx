@@ -87,7 +87,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
       }
       try {
         const [f, w, c] = await Promise.all([
-          import('../../pages/FitnessHub'), import('../../pages/WellnessHub'), import('../../pages/ClinicalHub'),
+          import('../../pages/fitness/FitnessHub'), import('../../pages/wellness/WellnessHub'), import('../../pages/clinical/ClinicalHub'),
         ])
         const tambah = (grup: string, arr: { to: string; name: string; kw?: string }[]) => {
           for (const t of arr) {
@@ -212,114 +212,195 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/60 p-0 pt-0 sm:pt-16"
+      <div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/50 backdrop-blur-md p-3 pt-12 sm:pt-20"
         onClick={tutup} role="dialog" aria-modal="true" aria-label="Search">
-        <div className="max-h-full w-full max-w-lg overflow-hidden rounded-none bg-slate-900 sm:max-h-[70vh] sm:rounded-3xl"
+        <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-[#0c1017]/95"
           onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-            <span className="text-slate-400">🔍</span>
+          <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3.5 dark:border-white/10">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00BF63" strokeWidth="2.5" strokeLinecap="round" className="shrink-0">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="16.5" y1="16.5" x2="21" y2="21" />
+            </svg>
             <input
               ref={kotak}
-              className="min-w-0 flex-1 bg-transparent text-[15px] text-white outline-none placeholder:text-slate-500"
-              placeholder="Features, diseases, drugs, scores, people, #hashtags…"
+              className="min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+              placeholder="Cari fitur, penyakit, obat, skor klinis, #tagar…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={padaTombol}
               aria-label="Search features, diseases, drugs, people, or hashtags"
             />
-            <button onClick={tutup} aria-label="Close search"
-              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Close</button>
+            <div className="flex items-center gap-2">
+              <kbd className="hidden rounded-md border border-black/10 bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 sm:inline-block dark:border-white/10 dark:bg-white/10 dark:text-slate-400">Esc</kbd>
+              <button
+                type="button"
+                onClick={tutup}
+                aria-label="Close search"
+                className="grid h-7 w-7 place-items-center rounded-full text-sm font-bold text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
-          <div className="max-h-[calc(100vh-64px)] overflow-y-auto p-2 sm:max-h-[calc(70vh-64px)]">
+          <div className="max-h-[55vh] flex-1 overflow-y-auto p-3">
             {!q.trim() && (
-              <p className="px-3 py-6 text-center text-[12px] leading-relaxed text-slate-500">
-                Type anything: a feature name, disease, drug, calculator, OSCE station, person, or #hashtag.
-                {jumlahIndeks > 0 && <><br />{jumlahIndeks.toLocaleString('en-GB')} things indexed.</>}
-              </p>
+              <div className="py-2">
+                <div className="mb-2 px-1 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Kategori Populer
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: 'Klinis & Diagnosis', icon: '🩺', q: 'diagnosis' },
+                    { label: 'Katalog Obat', icon: '💊', q: 'obat' },
+                    { label: 'Anatomi 3D', icon: '🫀', q: 'anatomi' },
+                    { label: 'Kalkulator Medis', icon: '⚡', q: 'kalkulator' },
+                  ].map((chip) => (
+                    <button
+                      key={chip.q}
+                      type="button"
+                      onClick={() => setQ(chip.q)}
+                      className="flex items-center gap-1.5 rounded-xl border border-black/5 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 hover:bg-emerald-50/50 hover:text-emerald-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
+                    >
+                      <span>{chip.icon}</span>
+                      <span>{chip.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-4 border-t border-black/5 pt-3 dark:border-white/10">
+                  <div className="mb-2 px-1 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Akses Cepat Fitur Utama
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {[
+                      { to: '/chatbot', label: 'Ask Panacea AI Co-Physician', desc: 'AI Chatbot, Anamnesis & Konsultasi', icon: '💬' },
+                      { to: '/tubuh', label: 'Canonical Body Explorer', desc: 'Penjelajah Anatomi 3D & Organ Fisiologis', icon: '🫀' },
+                      { to: '/kalkulator', label: 'NEWS2 & Kalkulator Klinis', desc: 'Skor Triase & Stratifikasi Risiko Pasien', icon: '⚡' },
+                    ].map((item) => (
+                      <button
+                        key={item.to}
+                        type="button"
+                        onClick={() => pergi(item.to)}
+                        className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition hover:bg-slate-100/70 dark:hover:bg-white/5"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-base">{item.icon}</span>
+                          <div>
+                            <div className="text-[13px] font-bold text-slate-900 dark:text-white">{item.label}</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400">{item.desc}</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Buka →</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="mt-4 text-center text-[11px] leading-relaxed text-slate-400 dark:text-slate-500">
+                  Ketik nama fitur, penyakit, obat, stasiun OSCE, profil orang, atau #tagar.
+                  {jumlahIndeks > 0 && <span className="block mt-0.5">{jumlahIndeks.toLocaleString('id-ID')} indeks aktif terhubung.</span>}
+                </p>
+              </div>
             )}
 
             {q.trim() && semua.length === 0 && (
-              <p className="px-3 py-6 text-center text-[12px] text-slate-500">
-                Nothing matches "{q}".
+              <p className="px-3 py-8 text-center text-[13px] text-slate-500 dark:text-slate-400">
+                Tidak ada hasil yang cocok dengan "{q}".
               </p>
             )}
 
             {aksi.length > 0 && (
               <div className="mb-2">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-rose-400">Tindakan Perintah</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-rose-500 dark:text-rose-400">Tindakan Perintah</div>
                 {aksi.map((a) => (
                   <button
                     key={a.id}
                     onClick={a.eksekusi}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition ${
-                      semua[sorot]?.kunci === a.id ? 'bg-rose-500/25 ring-1 ring-rose-500/50' : 'hover:bg-white/5'
+                      semua[sorot]?.kunci === a.id
+                        ? 'bg-rose-50 ring-1 ring-rose-500/40 dark:bg-rose-500/25 dark:ring-rose-500/50'
+                        : 'hover:bg-slate-100/70 dark:hover:bg-white/5'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <span className="text-base">{a.ikon}</span>
                       <div>
-                        <div className="text-[13px] font-bold text-white">{a.label}</div>
-                        <div className="text-[11px] text-slate-400">{a.desc}</div>
+                        <div className="text-[13px] font-bold text-slate-900 dark:text-white">{a.label}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">{a.desc}</div>
                       </div>
                     </div>
-                    <span className="rounded bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300">Enter ↵</span>
+                    <span className="rounded bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-500/20 dark:text-rose-300">Enter ↵</span>
                   </button>
                 ))}
               </div>
             )}
 
             {fitur.length > 0 && (
-              <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Features</div>
-                {fitur.map((f, i) => (
-                  <button key={f.to} onClick={() => pergi(f.to)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
-                      semua[sorot]?.kunci === f.to ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-white">{f.label}</span>
-                    <span className="shrink-0 text-[10px] text-slate-500">{f.grup}</span>
+              <div className="mb-2">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-slate-500">Fitur & Alat</div>
+                {fitur.map((f) => (
+                  <button
+                    key={f.to}
+                    onClick={() => pergi(f.to)}
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition ${
+                      semua[sorot]?.kunci === f.to
+                        ? 'bg-emerald-50 ring-1 ring-emerald-500/30 text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-500/40'
+                        : 'hover:bg-slate-100/70 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-slate-900 dark:text-white">{f.label}</span>
+                    <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:bg-white/5 dark:text-slate-400">{f.grup}</span>
                   </button>
                 ))}
               </div>
             )}
 
             {orang.length > 0 && (
-              <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Orang</div>
+              <div className="mb-2">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-slate-500">Orang</div>
                 {orang.map((o) => (
-                  <button key={o.id} onClick={() => pergi(`/jelajah?orang=${encodeURIComponent(o.name)}`)}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left ${
-                      semua[sorot]?.kunci === 'u' + o.id ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
+                  <button
+                    key={o.id}
+                    onClick={() => pergi(`/jelajah?orang=${encodeURIComponent(o.name)}`)}
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left transition ${
+                      semua[sorot]?.kunci === 'u' + o.id
+                        ? 'bg-emerald-50 ring-1 ring-emerald-500/30 dark:bg-emerald-950/40 dark:ring-emerald-500/40'
+                        : 'hover:bg-slate-100/70 dark:hover:bg-white/5'
+                    }`}
+                  >
                     {o.picture
                       ? <img src={o.picture} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
-                      : <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-[11px] font-black text-white">
+                      : <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 text-[11px] font-black text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                           {o.name.slice(0, 1).toUpperCase()}
                         </span>}
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-white">{o.name}</span>
-                    <span className="shrink-0 text-[10px] text-slate-500">{o.role}</span>
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-slate-900 dark:text-white">{o.name}</span>
+                    <span className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">{o.role}</span>
                   </button>
                 ))}
               </div>
             )}
 
             {tagar.length > 0 && (
-              <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Hashtags</div>
+              <div className="mb-2">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-slate-500">Hashtags</div>
                 {tagar.map((h) => (
-                  <button key={h.tag} onClick={() => pergi(`/jelajah?tag=${h.tag}`)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
-                      semua[sorot]?.kunci === 't' + h.tag ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-white">#{h.tag}</span>
-                    <span className="shrink-0 text-[10px] text-slate-500">{h.jumlah} posts</span>
+                  <button
+                    key={h.tag}
+                    onClick={() => pergi(`/jelajah?tag=${h.tag}`)}
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition ${
+                      semua[sorot]?.kunci === 't' + h.tag
+                        ? 'bg-emerald-50 ring-1 ring-emerald-500/30 dark:bg-emerald-950/40 dark:ring-emerald-500/40'
+                        : 'hover:bg-slate-100/70 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-emerald-700 dark:text-emerald-400">#{h.tag}</span>
+                    <span className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">{h.jumlah} posts</span>
                   </button>
                 ))}
               </div>
             )}
 
-            {/* ISI APLIKASI — dikelompokkan menurut jenisnya, dan tiap hasil
-                membawa satu baris keterangannya sendiri. Tanpa keterangan itu
-                sepuluh nama penyakit yang mirip tidak dapat dibedakan sebelum
-                dibuka satu per satu. */}
             {isi.length > 0 && (() => {
               const perJenis = new Map<string, Hasil[]>()
               for (const h of isi) {
@@ -328,24 +409,40 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
                 else perJenis.set(h.jenis, [h])
               }
               return [...perJenis.entries()].map(([jenis, daftar]) => (
-                <div key={jenis} className="mb-1">
-                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">
+                <div key={jenis} className="mb-2">
+                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-slate-500">
                     {NAMA_JENIS[jenis as keyof typeof NAMA_JENIS]}
                   </div>
                   {daftar.map((h) => {
                     const kunci = `i${isi.indexOf(h)}-${h.ke}`
                     return (
-                      <button key={kunci} onClick={() => pergi(h.ke)}
-                        className={`flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-2 text-left ${
-                          semua[sorot]?.kunci === kunci ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
-                        <span className="w-full truncate text-[13px] font-bold text-white">{h.judul}</span>
-                        <span className="w-full truncate text-[11px] text-slate-400">{h.ringkas}</span>
+                      <button
+                        key={kunci}
+                        onClick={() => pergi(h.ke)}
+                        className={`flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-2 text-left transition ${
+                          semua[sorot]?.kunci === kunci
+                            ? 'bg-emerald-50 ring-1 ring-emerald-500/30 dark:bg-emerald-950/40 dark:ring-emerald-500/40'
+                            : 'hover:bg-slate-100/70 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <span className="w-full truncate text-[13px] font-bold text-slate-900 dark:text-white">{h.judul}</span>
+                        <span className="w-full truncate text-[11px] text-slate-500 dark:text-slate-400">{h.ringkas}</span>
                       </button>
                     )
                   })}
                 </div>
               ))
             })()}
+          </div>
+
+          {/* Footer Bar: Keyboard shortcuts & index count */}
+          <div className="hidden sm:flex items-center justify-between border-t border-black/5 bg-slate-50/80 px-4 py-2.5 text-[11px] font-semibold text-slate-400 dark:border-white/5 dark:bg-white/[0.02] dark:text-slate-500">
+            <div className="flex items-center gap-3">
+              <span><kbd className="rounded border border-black/10 bg-white px-1.5 py-0.5 text-[9px] shadow-2xs dark:border-white/10 dark:bg-white/10">↑</kbd> <kbd className="rounded border border-black/10 bg-white px-1.5 py-0.5 text-[9px] shadow-2xs dark:border-white/10 dark:bg-white/10">↓</kbd> Navigasi</span>
+              <span><kbd className="rounded border border-black/10 bg-white px-1.5 py-0.5 text-[9px] shadow-2xs dark:border-white/10 dark:bg-white/10">↵</kbd> Buka</span>
+              <span><kbd className="rounded border border-black/10 bg-white px-1.5 py-0.5 text-[9px] shadow-2xs dark:border-white/10 dark:bg-white/10">Esc</kbd> Tutup</span>
+            </div>
+            {jumlahIndeks > 0 && <span>{jumlahIndeks.toLocaleString('id-ID')} data</span>}
           </div>
         </div>
       </div>

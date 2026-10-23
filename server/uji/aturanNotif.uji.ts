@@ -1,6 +1,6 @@
 // Uji mesin aturan tanpa server: store dan push diganti dengan tiruan lewat
 // jalur impor yang sama, jadi yang diuji benar-benar berkas aturannya.
-import { ATURAN, PREF_KATEGORI } from '../src/aturanNotif.js'
+import { ATURAN, PREF_KATEGORI } from '../src/domains/push/aturanNotif.js'
 
 const hari = (n: number) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10)
 const riwayat = Array.from({ length: 20 }, (_, i) => ({

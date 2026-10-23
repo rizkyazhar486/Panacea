@@ -2,9 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const hub = readFileSync(new URL('../../src/pages/ForYouHub.tsx', import.meta.url), 'utf8')
-const feed = readFileSync(new URL('../../src/components/ForYouOmniFeed.tsx', import.meta.url), 'utf8')
-const network = readFileSync(new URL('../../src/components/ForYouNetworkHub.tsx', import.meta.url), 'utf8')
+const hub = readFileSync(new URL('../../src/pages/social/ForYouHub.tsx', import.meta.url), 'utf8')
+const feed = readFileSync(new URL('../../src/components/foryou/ForYouOmniFeed.tsx', import.meta.url), 'utf8')
+const network = readFileSync(new URL('../../src/components/foryou/ForYouNetworkHub.tsx', import.meta.url), 'utf8')
 
 test('For You mounts one unified superfeed instead of fragmented social/daily sections', () => {
   assert.match(hub, /<ForYouOmniFeed \/>/)

@@ -2,10 +2,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const body = readFileSync(new URL('../../src/pages/UnifiedBodyWorkspace.tsx', import.meta.url), 'utf8')
-const rail = readFileSync(new URL('../../src/components/SuperPageCapabilityRail.tsx', import.meta.url), 'utf8')
-const forYou = readFileSync(new URL('../../src/pages/ForYouHub.tsx', import.meta.url), 'utf8')
-const stack = readFileSync(new URL('../../src/components/ForYouDailyStack.tsx', import.meta.url), 'utf8')
-const depth = readFileSync(new URL('../../src/components/SurfaceDepthNavigator.tsx', import.meta.url), 'utf8')
+const rail = readFileSync(new URL('../../src/components/ui/SuperPageCapabilityRail.tsx', import.meta.url), 'utf8')
+const forYou = readFileSync(new URL('../../src/pages/social/ForYouHub.tsx', import.meta.url), 'utf8')
+const stack = readFileSync(new URL('../../src/components/foryou/ForYouDailyStack.tsx', import.meta.url), 'utf8')
+const depth = readFileSync(new URL('../../src/components/ui/SurfaceDepthNavigator.tsx', import.meta.url), 'utf8')
 
 assert.match(body, /SuperPageCapabilityRail/)
 assert.match(body, /domain="body"/)

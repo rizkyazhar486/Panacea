@@ -2,13 +2,13 @@
 // seberapa lengkap catatan itu.
 //
 // MENGAPA DIPISAH KE SINI. Logika ini semula disalin ke dua skrip. Keduanya
-// lalu menyimpang: kasusSekali.mjs menyeragamkan ejaan dan membuang baris yang
-// bukan kasus, kasusTanpaCatatan.mjs tidak — dan keduanya melaporkan angka
+// lalu menyimpang: medstudy/kasusSekali.mjs menyeragamkan ejaan dan membuang baris yang
+// bukan kasus, medstudy/kasusTanpaCatatan.mjs tidak — dan keduanya melaporkan angka
 // "belum ada catatannya" yang berbeda untuk data yang sama. Angka yang saling
 // bertentangan lebih buruk daripada tidak ada angka sama sekali, sebab
 // keduanya tetap dipercaya.
 //
-// Dipakai oleh scripts/kasusSekali.mjs dan scripts/kasusTanpaCatatan.mjs.
+// Dipakai oleh scripts/medstudy/kasusSekali.mjs dan scripts/medstudy/kasusTanpaCatatan.mjs.
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 

@@ -104,14 +104,14 @@ for (const rule of SMART_NOTIFICATION_RULES) {
   assert.doesNotMatch(text, /you have (?:a |an )?(?:disease|cancer|stroke|heart attack)|you are diagnosed|take \d+\s?mg|stop your medication/i, `${rule.id} must not make an autonomous diagnosis or dosing instruction`)
 }
 
-const orchestrator = readFileSync('src/components/SmartNotificationOrchestrator.tsx', 'utf8')
+const orchestrator = readFileSync('src/components/notifications/SmartNotificationOrchestrator.tsx', 'utf8')
 assert.match(orchestrator, /notificationEngineExtended/)
 assert.match(orchestrator, /evaluateNotificationRules/)
 assert.match(orchestrator, /document\.visibilityState === 'hidden'/)
 assert.match(orchestrator, /One interruption per evaluation/)
 assert.doesNotMatch(orchestrator, /Notification\.requestPermission/, 'ambient evaluator must never surprise the user with a permission prompt')
 
-const settings = readFileSync('src/components/SmartNotificationSettings.tsx', 'utf8')
+const settings = readFileSync('src/components/notifications/SmartNotificationSettings.tsx', 'utf8')
 assert.match(settings, /notificationEngineExtended/)
 assert.match(settings, /Smart combinations/)
 assert.match(settings, /Quiet hours/)

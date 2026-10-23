@@ -1,4 +1,4 @@
-import { fetchLeagueScoreboard, UNAVAILABLE } from '../src/sports'
+import { fetchLeagueScoreboard, UNAVAILABLE } from '../src/domains/lifestyle/sports'
 await import('./meetFeeHttp.uji.js')
 
 let lulus = 0

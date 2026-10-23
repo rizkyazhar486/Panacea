@@ -1,4 +1,4 @@
-import { lookupDrug } from '../src/openfda.ts'
+import { lookupDrug } from '../src/domains/medical-reference/openfda.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {
