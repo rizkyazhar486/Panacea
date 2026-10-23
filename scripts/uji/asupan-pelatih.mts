@@ -88,7 +88,7 @@ for (const pola of [/Mifflin-St Jeor/i, /does not screen/i, /not a treatment pla
 // ── 8. Halaman harus benar-benar memakai penjaganya ────────────────────────
 // Penjaga yang ada di pustaka tetapi tidak dipanggil di layar tidak menjaga
 // apa pun. Dan rencananya harus berdiri di belakang `kesiapan.siap`.
-const halaman = readFileSync(new URL('../../src/pages/PelatihAsupan.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/fitness/PelatihAsupan.tsx', import.meta.url), 'utf8')
 assert.ok(/periksaKesiapan\(/.test(halaman), 'the page never calls periksaKesiapan')
 // Bukan sekadar "kata kesiapan.siap muncul di suatu tempat": baris yang
 // benar-benar merender <Rencana /> harus berdiri di belakangnya. Penjaga di
@@ -98,7 +98,7 @@ assert.ok(barisRencana.length > 0, 'the page never renders a plan at all')
 for (const b of barisRencana) {
   assert.ok(/kesiapan\.siap\s*&&/.test(b), `a plan is rendered without the readiness guard: ${b.trim()}`)
 }
-const impor = halaman.match(/import\s*\{[^}]*\}\s*from\s*'\.\.\/lib\/profile'/)?.[0] ?? ''
+const impor = halaman.match(/import\s*\{[^}]*\}\s*from\s*'\.\.\/\.\.\/lib\/profile'/)?.[0] ?? ''
 assert.ok(/getDemoTersimpan/.test(impor) && !/\bgetDemo\b/.test(impor),
   'the page must prefill from getDemoTersimpan, never from getDemo() which injects 70/170/30')
 assert.ok(/BATAS_PELATIH/.test(halaman), 'the page does not render the boundary statements')

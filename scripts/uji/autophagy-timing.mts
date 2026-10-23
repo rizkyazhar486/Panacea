@@ -36,7 +36,7 @@ for (const k of ['bodyFatPct', 'hoursSinceMeal'] as const) {
   assert.equal(run({ [k]: min - 0.1 }).invalid.length, 1, `${k} min-`); assert.equal(run({ [k]: max + 0.1 }).invalid.length, 1, `${k} max+`)
 }
 
-const page = readFileSync(new URL('../../src/pages/PredictiveModelsToolkit.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/bodyhub/PredictiveModelsToolkit.tsx', import.meta.url), 'utf8')
 const blok = page.slice(page.indexOf('function AutophagyTiming'), page.indexOf('function CortisolAwakening'))
 assert.ok(/autophagyTiming\(\{/.test(blok) && /useField\('hoursSinceMeal'/.test(blok), 'halaman tidak memakai mesin domain')
 assert.ok(!/\)\s*\|\|\s*0/.test(blok), '`|| 0` kembali di AutophagyTiming')

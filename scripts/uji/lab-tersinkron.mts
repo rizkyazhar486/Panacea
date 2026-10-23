@@ -12,7 +12,7 @@ assert.equal(arahSinkron('2026-09-25T02:00:00Z', '2026-09-25T01:00:00Z', true), 
 assert.equal(arahSinkron('2026-09-25T01:00:00Z', '2026-09-25T02:00:00Z', true), 'tarik', 'salinan server yang lebih baru (mis. penghapusan di perangkat lain) ditimpa')
 assert.equal(arahSinkron('2026-09-25T01:00:00Z', '2026-09-25T01:00:00Z', true), 'diam')
 
-const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+const ui = readFileSync('src/components/tiles/UbinLab.tsx', 'utf8')
 assert.match(ui, /pasangSinkronLab\(\)/, 'kartu lab tidak lagi menyalakan sinkronisasi')
 assert.match(ui, /lokal: '· this device only'/, 'status "hanya di perangkat ini" hilang — tampilan bisa mengklaim tersimpan padahal tidak')
 const sync = readFileSync('src/lib/labSync.ts', 'utf8')

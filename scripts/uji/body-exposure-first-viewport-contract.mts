@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const workspace = readFileSync(new URL('../../src/pages/UnifiedBodyWorkspace.tsx', import.meta.url), 'utf8')
-const exposure = readFileSync(new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url), 'utf8')
+const exposure = readFileSync(new URL('../../src/pages/bodyhub/BodyExposureOS.tsx', import.meta.url), 'utf8')
 
 // Body Exposure owns its visible product identity. The parent Your Body workspace
 // must provide navigation/accessibility without spending phone-height on a

@@ -18,6 +18,6 @@ assert.ok(Math.abs(lvotBesar.vti - pulih.h.sv / (Math.PI * 1.2 ** 2)) < 1e-6, 'V
 for (const r of [lemah, pulih]) { assert.equal(st(r, 'tdsa'), 'tidak-disimulasikan', 'TDSa harus dinyatakan tidak disimulasikan'); assert.equal(r.dapatDinyatakanSiap, false) }
 // Ambang MAP adalah masukan pendidik dan benar-benar dipakai.
 assert.equal(st(ujiPenurunanAliranVA(denganEes(0.3), { ...OPSI_WEANING_VA, mapMin: 90 }), 'map'), 'tidak', 'ambang MAP pendidik harus dipakai')
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.match(ui, /data-ecmo-weaning-va/); assert.match(ui, /cannot declare readiness/i)
 console.log('ecmo-weaning-va: lulus')

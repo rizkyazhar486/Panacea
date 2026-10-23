@@ -17,32 +17,32 @@ import { join } from 'node:path'
 // Saat sebuah berkas dipensiunkan, hapus juga namanya dari DAFTAR_LAMA.
 
 const DAFTAR_LAMA = new Set([
-  'public/deep-human-lab-v2.css',
-  'public/deep-human-lab-v2.js',
-  'public/deep-human-lab-v3.css',
-  'public/deep-human-lab-v3.js',
-  'public/home-performance-v12.css',
-  'public/nav-ux-v21.css',
-  'public/panacea-control-grading-v46.css',
-  'public/panacea-feature-spectrum-v48.css',
-  'public/panacea-feature-spectrum-v48.js',
-  'public/panacea-green-material-v48.css',
-  'public/panacea-hig-v41.css',
-  'public/panacea-liquid-actions-v45.css',
-  'public/panacea-liquid-actions-v45.js',
-  'public/panacea-liquid-infinite-v44.css',
-  'public/panacea-liquid-infinite-v44.js',
-  'public/panacea-reference-ui-v47.css',
-  'public/panacea-reference-ui-v47.js',
-  'public/panacea-ruthless-simple-v50.css',
-  'public/panacea-shell-mobile-compact-v49.css',
-  'public/panacea-visual-first-v43.css',
-  'public/panacea-visual-first-v43.js',
-  'public/shell-mobile-compact-v49.css',
-  'public/shell-performance-v20.css',
-  'public/shell-theme-v18.css',
-  'public/welcome-revitalization-v28.css',
-  'public/welcome-runtime-v28.js',
+  'public/deep-human-lab/deep-human-lab-v2.css',
+  'public/deep-human-lab/deep-human-lab-v2.js',
+  'public/deep-human-lab/deep-human-lab-v3.css',
+  'public/deep-human-lab/deep-human-lab-v3.js',
+  'public/ui-iterations/home-performance-v12.css',
+  'public/ui-iterations/nav-ux-v21.css',
+  'public/ui-iterations/panacea-control-grading-v46.css',
+  'public/ui-iterations/panacea-feature-spectrum-v48.css',
+  'public/ui-iterations/panacea-feature-spectrum-v48.js',
+  'public/ui-iterations/panacea-green-material-v48.css',
+  'public/ui-iterations/panacea-hig-v41.css',
+  'public/ui-iterations/panacea-liquid-actions-v45.css',
+  'public/ui-iterations/panacea-liquid-actions-v45.js',
+  'public/ui-iterations/panacea-liquid-infinite-v44.css',
+  'public/ui-iterations/panacea-liquid-infinite-v44.js',
+  'public/ui-iterations/panacea-reference-ui-v47.css',
+  'public/ui-iterations/panacea-reference-ui-v47.js',
+  'public/ui-iterations/panacea-ruthless-simple-v50.css',
+  'public/ui-iterations/panacea-shell-mobile-compact-v49.css',
+  'public/ui-iterations/panacea-visual-first-v43.css',
+  'public/ui-iterations/panacea-visual-first-v43.js',
+  'public/ui-iterations/shell-mobile-compact-v49.css',
+  'public/ui-iterations/shell-performance-v20.css',
+  'public/ui-iterations/shell-theme-v18.css',
+  'public/ui-iterations/welcome-revitalization-v28.css',
+  'public/ui-iterations/welcome-runtime-v28.js',
   'src/styles/home-dark-comfort-v34.css',
   'src/styles/home-green-material-v48.css',
   'src/styles/home-health-instruments-v40.css',
@@ -76,7 +76,11 @@ assert.deepEqual(
   `lapisan berversi baru dilarang; ubah yang sudah ada atau token desain:\n  ${baru.join('\n  ')}`,
 )
 
-const css = berkas.filter((p) => p.endsWith('.css'))
+// Generated deployment copies are byte-for-byte guarded by their own parity
+// tests. Count only authored sources here so one declaration is not counted
+// twice merely because the build publishes it at a stable URL.
+const CSS_TURUNAN = new Set(['public/home-styles.css'])
+const css = berkas.filter((p) => p.endsWith('.css') && !CSS_TURUNAN.has(p))
 const BATAS_IMPORTANT = 2157
 
 const jumlah = css.reduce(
