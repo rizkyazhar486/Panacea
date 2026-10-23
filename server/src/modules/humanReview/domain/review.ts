@@ -114,7 +114,7 @@ export function labelFor(log: readonly HumanReviewEntry[], taskId: string, curre
 
 // Penanda agen AI yang terlihat di permintaan. Tidak bisa membuktikan bahwa pengirim manusia; hanya menolak semua yang MENYATAKAN atau
 // tampak sebagai agen (gagal tertutup). Review buatan AI yang lolos tetap bug menurut §3.5.
-const AI_USER_AGENT = /(?:claude|anthropic|openai|chatgpt|gpt-?\d|gptbot|codex|copilot|gemini|bard|langchain|autogpt|headless|python-requests|curl\/|wget|node-fetch|undici|axios)|\bllm\b|\bmcp\b|\bai[- ]?agent\b|bot\b|crawler|spider/i
+const AI_USER_AGENT = /(?:claude|anthropic|openai|chatgpt|gpt-?\d|gptbot|codex|copilot|gemini|bard|langchain|autogpt|headless|python-requests|curl\/|wget|node-fetch|undici|axios|deno|bun\/)|^node$|\bllm\b|\bmcp\b|\bai[- ]?agent\b|bot\b|crawler|spider/i
 export type RequestSignals = { userAgent?: string; agentHeader?: string; usedMcpToken?: boolean; userId?: string }
 export function classifyAuthor(s: RequestSignals): Author {
   if (s.usedMcpToken) return { kind: 'ai-service', marker: 'mcp-token' }

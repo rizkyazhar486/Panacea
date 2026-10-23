@@ -104,7 +104,7 @@ assert.deepEqual(classifyAuthor({ userAgent: BROWSER }), { kind: 'human' }, 'ide
 assert.deepEqual(classifyAuthor({ userAgent: BROWSER, usedMcpToken: true }), { kind: 'ai-service', marker: 'mcp-token' })
 assert.deepEqual(classifyAuthor({ userAgent: BROWSER, agentHeader: 'codex' }), { kind: 'ai-service', marker: 'agent-header' })
 assert.deepEqual(classifyAuthor({}), { kind: 'ai-service', marker: 'no-user-agent' })
-for (const ua of ['Claude-User/1.0', 'ClaudeBot', 'OpenAI ChatGPT-User', 'GPTBot/1.1', 'python-requests/2.32', 'curl/8.7.1', 'node-fetch/3', 'undici', 'HeadlessChrome/131', 'Mozilla/5.0 (compatible; Googlebot/2.1)'])
+for (const ua of ['Claude-User/1.0', 'ClaudeBot', 'OpenAI ChatGPT-User', 'GPTBot/1.1', 'python-requests/2.32', 'curl/8.7.1', 'node-fetch/3', 'undici', 'node', 'Deno/2.1', 'Bun/1.2', 'HeadlessChrome/131', 'Mozilla/5.0 (compatible; Googlebot/2.1)'])
   assert.equal(classifyAuthor({ userAgent: ua, userId: 'u1' }).kind, 'ai-service', `user-agent ${ua}`)
 // pasangan: peramban manusia dengan merek yang mengandung 'bot' di dalam kata tetap manusia
 assert.equal(classifyAuthor({ userAgent: 'Mozilla/5.0 (Linux; Android 13; CUBOT_X30) AppleWebKit/537.36 Chrome/131 Mobile Safari/537.36' }).kind, 'human')
