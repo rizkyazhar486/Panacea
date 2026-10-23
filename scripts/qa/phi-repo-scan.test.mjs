@@ -6,6 +6,7 @@ import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, chmodSync,
 import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { pindaiTeks, bandingkan, pindaiRepo, pindaiNamaBerkas, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
 
 test('E4: filename identifiers are detected across arbitrary and compound extensions', () => {
@@ -308,7 +309,7 @@ test('E4: actual failing Git cannot forward sensitive stderr to CLI logs', () =>
     const git = join(root, 'git')
     writeFileSync(git, `#!/bin/sh\necho '${marker}' >&2\nexit 1\n`)
     chmodSync(git, 0o755)
-    const result = spawnSync(process.execPath, [new URL('./phi-repo-scan.mjs', import.meta.url).pathname], {
+    const result = spawnSync(process.execPath, [fileURLToPath(new URL('./phi-repo-scan.mjs', import.meta.url))], {
       encoding: 'utf8', env: { ...process.env, PATH: root + ':' + process.env.PATH },
     })
     assert.equal(result.status, 1)
