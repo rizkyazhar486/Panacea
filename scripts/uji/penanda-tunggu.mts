@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs'
 // lalu berhenti mempercayai angka lain di layar yang sama.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const orb = readFileSync(new URL('../../src/components/ThinkingOrb.tsx', import.meta.url), 'utf8')
+const orb = readFileSync(new URL('../../src/components/ui/ThinkingOrb.tsx', import.meta.url), 'utf8')
 const orbCss = readFileSync(new URL('../../src/components/thinking-orb.css', import.meta.url), 'utf8')
 const rangka = readFileSync(new URL('../../src/components/layout/Rangka.tsx', import.meta.url), 'utf8')
 const main = readFileSync(new URL('../../src/main.tsx', import.meta.url), 'utf8')

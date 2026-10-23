@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { bolehAksesPasien, saringKlinis, idPasienDiri, idPasienDiriLegacy } from '../src/aksesKlinis.js'
+import { bolehAksesPasien, saringKlinis, idPasienDiri, idPasienDiriLegacy } from '../src/domains/clinical-records/aksesKlinis.js'
 
 const pasien = { id: 'u1', email: 'budi.santoso@example.com', role: 'pasien' }
 const lain = { id: 'u2', email: 'ani@example.com', role: 'pasien' }

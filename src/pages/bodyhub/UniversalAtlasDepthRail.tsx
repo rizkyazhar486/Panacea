@@ -80,7 +80,7 @@ export default function UniversalAtlasDepthRail({
                   />
                 ))}
               </span>
-              <span className="block text-[8px] font-black uppercase tracking-[.13em] opacity-45">
+              <span className={`block text-[8px] font-black uppercase tracking-[.13em] ${active ? 'opacity-95' : 'opacity-80'}`}>
                 {String(index + 1).padStart(2, '0')}
               </span>
               <span className="mt-0.5 block text-[10px] font-black">{depth.label}</span>

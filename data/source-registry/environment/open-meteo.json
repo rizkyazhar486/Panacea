@@ -16,7 +16,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea currently calls the public Open-Meteo air-quality and forecast endpoints through server/src/lingkungan.ts using a selected city centre rather than a user's precise home/GPS coordinates. React components must not call Open-Meteo directly. The public free endpoint is appropriate for non-commercial evaluation only; a commercial Panacea deployment must use an Open-Meteo commercial API plan/customer endpoint or another contractually compatible source before treating this integration as production-commercial-safe."
+    "notes": "Panacea currently calls the public Open-Meteo air-quality and forecast endpoints through server/src/domains/lifestyle/lingkungan.ts using a selected city centre rather than a user's precise home/GPS coordinates. React components must not call Open-Meteo directly. The public free endpoint is appropriate for non-commercial evaluation only; a commercial Panacea deployment must use an Open-Meteo commercial API plan/customer endpoint or another contractually compatible source before treating this integration as production-commercial-safe."
   },
   "license": {
     "status": "VERIFIED",
@@ -43,7 +43,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "Lingkungan",
-    "module": "server/src/lingkungan.ts",
+    "module": "server/src/domains/lifestyle/lingkungan.ts",
     "notes": "The current backend adapter requests city-centre environmental context, caches successful results for one hour and fails closed when no useful upstream values are returned. A future commercial deployment must configure a contractually compatible endpoint rather than silently continuing to use the free non-commercial service tier."
   }
 }

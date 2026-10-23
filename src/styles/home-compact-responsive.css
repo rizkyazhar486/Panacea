@@ -3,19 +3,31 @@
    the first viewport denser, calmer and genuinely fluid from narrow phones to
    wide desktop. */
 
-.panacea-liquid-home {
+main.pmd-page-stage,
+main.pmd-page-stage[data-spatial],
+main.pmd-page-stage[data-spatial='false'],
+main.mx-auto,
+.page-enter,
+html.pmd-reference-ui-v47 .panacea-liquid-home,
+.panacea-liquid-home,
+.panacea-human-home {
   box-sizing: border-box;
-  width: min(100%, 1180px) !important;
+  width: 100% !important;
   max-width: 100% !important;
   min-width: 0;
   overflow-x: clip;
-  padding-inline: clamp(10px, 2.8vw, 24px);
+}
+
+main.pmd-page-stage,
+.panacea-liquid-home {
+  padding-inline: clamp(12px, 1.6vw, 32px) !important;
 }
 
 .panacea-liquid-home > *,
 .panacea-human-home,
 .panacea-human-home > * {
   min-width: 0;
+  width: 100%;
 }
 
 .panacea-human-home {
@@ -175,7 +187,7 @@
 }
 
 .panacea-signal-ring-meta {
-  color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.6);
   font-size: 8.5px;
   font-weight: 750;
   white-space: nowrap;
@@ -319,6 +331,12 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .pmd-superpage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .pmd-superpage-grid > div {
@@ -612,7 +630,7 @@ html:not(.dark) .panacea-signal-ring-value {
 }
 
 html:not(.dark) .panacea-signal-ring-meta {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 html:not(.dark) .panacea-instrument-mini,
@@ -643,6 +661,55 @@ html:not(.dark) .panacea-instrument-mini:hover,
 html:not(.dark) .panacea-instrument-checkin:hover {
   border-color: rgba(0, 191, 99, 0.35);
   background: #f0fdf4;
+}
+
+html:not(.dark) .pmd-superpage-launcher {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-heading > strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-tile {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+html:not(.dark) .pmd-superpage-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 6px 16px rgba(0, 191, 99, 0.08) !important;
+}
+
+html:not(.dark) .pmd-liquid-metal-icon {
+  background: rgba(0, 191, 99, 0.08);
+  color: #00BF63;
+}
+
+html:not(.dark) .pmd-superpage-copy strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-copy small {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-arrow {
+  color: #94a3b8;
+}
+
+html:not(.dark) .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+  border-color: rgba(0, 191, 99, 0.3) !important;
+  background: linear-gradient(90deg, rgba(0, 191, 99, 0.08), #ffffff 70%) !important;
 }
 
 /* Lantai ukuran teks Home di ponsel: 11px. Terukur di 390x844 sebelum perubahan ini: 155 teks berukuran 8-9,5px dan 219 dari
@@ -693,3 +760,31 @@ html:not(.dark) .panacea-instrument-checkin:hover {
     font-size: 10px !important;
   }
 }
+
+/* ── Live Signal Rail Cards: Pure Theme Parity ────────────────────────── */
+.panacea-live-signal-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.panacea-live-signal-card:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.08);
+}
+
+html.dark .panacea-live-signal-card,
+.dark .panacea-live-signal-card {
+  border: 1px solid rgba(0, 191, 99, 0.28) !important;
+  background: #0d120f !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+html.dark .panacea-live-signal-card:hover,
+.dark .panacea-live-signal-card:hover {
+  border-color: rgba(0, 191, 99, 0.5) !important;
+  background: #111814 !important;
+}
+

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 
 const workbench = readFileSync('src/pages/bodyhub/VirtualEndoscopyWorkbench.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
-const exposure = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
+const exposure = readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8')
 
 for (const procedure of ['Colonoscopy', 'Upper GI endoscopy', 'Bronchoscopy']) {
   assert.match(workbench, new RegExp(procedure.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))

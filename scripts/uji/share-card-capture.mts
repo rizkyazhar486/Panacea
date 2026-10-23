@@ -16,7 +16,7 @@ import { readFile } from 'node:fs/promises'
 //      ada pesan, dan tidak ada jejak di console. Kegagalan yang tidak
 //      meninggalkan jejak tidak bisa dibedakan dari tombol mati.
 
-const source = await readFile(new URL('../../src/components/ShareCardButton.tsx', import.meta.url), 'utf8')
+const source = await readFile(new URL('../../src/components/share/ShareCardButton.tsx', import.meta.url), 'utf8')
 const pkg = JSON.parse(await readFile(new URL('../../package.json', import.meta.url), 'utf8')) as {
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>

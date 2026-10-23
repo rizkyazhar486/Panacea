@@ -20,7 +20,7 @@ import {
   type ScaleNode,
 } from '../../lib/digitalTwin'
 
-const LegacyBodyExplorer = lazy(() => import('../../pages/BodyExplorerLegacy').then((m) => ({ default: m.BodyExplorer })))
+const LegacyBodyExplorer = lazy(() => import('../../pages/bodyhub/BodyExplorerLegacy').then((m) => ({ default: m.BodyExplorer })))
 
 type MainTab = 'twin' | 'advanced'
 

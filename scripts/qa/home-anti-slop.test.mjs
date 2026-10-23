@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises'
 const source = async (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8')
 
 test('Home health surface is a data instrument instead of nested AI dashboard cards', async () => {
-  const health = await source('src/components/HomeHealthBrief.tsx')
+  const health = await source('src/components/dashboard/HomeHealthBrief.tsx')
 
   assert.doesNotMatch(health, /liquid-glass|liquid-spectral-edge/)
   assert.doesNotMatch(health, /Good morning|Good afternoon|Good evening/)
@@ -14,7 +14,7 @@ test('Home health surface is a data instrument instead of nested AI dashboard ca
 })
 
 test('Home capability surface is search-first and not a gradient card mosaic', async () => {
-  const deck = await source('src/components/HomeCommandDeck.tsx')
+  const deck = await source('src/components/dashboard/HomeCommandDeck.tsx')
 
   assert.doesNotMatch(deck, /live capabilities|Welcome,/)
   assert.doesNotMatch(deck, /featureSurface\(|bg-gradient-to-/)

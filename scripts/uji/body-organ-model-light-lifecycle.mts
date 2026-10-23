@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync(new URL('../../src/components/OrganModel3D.tsx', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../src/components/digital-twin/OrganModel3D.tsx', import.meta.url), 'utf8')
 
 // Jeda offscreen / tab tersembunyi / konteks hilang kini disediakan SATU loop bersama
 // (loopRenderTerjaga); gerbang ini mengunci bahwa penampil organ memakainya dan melepasnya.
