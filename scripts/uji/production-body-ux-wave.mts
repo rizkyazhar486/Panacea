@@ -12,7 +12,7 @@ const body = readFileSync('src/pages/UnifiedBodyWorkspace.tsx', 'utf8')
 const exposure = readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 const main = readFileSync('src/main.tsx', 'utf8')
-const drug = readFileSync('src/pages/DrugInfo.tsx', 'utf8')
+const drug = readFileSync('src/pages/medstudy/DrugInfo.tsx', 'utf8')
 const catalog = readFileSync('src/lib/obatKatalog.ts', 'utf8')
 
 assert.match(unified, /PersonalBodyAvatar3D/)

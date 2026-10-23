@@ -246,7 +246,7 @@ export default function UnifiedHumanSimulationProjector({
         return (
           <div className="grid gap-3 @[44rem]:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
             <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-              <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-200/70">Selected structure</div>
+              <div className="text-[9px] font-black uppercase tracking-[.14em] text-[#a5f3fc]">Selected structure</div>
               <div className="mt-1 text-base font-black text-white/90">{selectedStructureName ?? 'Tap a rendered structure'}</div>
               <p className="mt-1 text-[10px] leading-relaxed text-white/45">
                 Selection comes from the rendered source mesh, not inferred screen position. The exact structure can stay in context while the projection changes.
@@ -292,7 +292,7 @@ export default function UnifiedHumanSimulationProjector({
       <header className="border-b border-white/[.08] p-3 sm:p-4">
         <div className="flex flex-col gap-3 @[50rem]:flex-row @[50rem]:items-end @[50rem]:justify-between">
           <div className="min-w-0">
-            <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/70">Body Exposure · unified human simulation projector</div>
+            <div className="text-[9px] font-black uppercase tracking-[.22em] text-[#a5f3fc]">Body Exposure · unified human simulation projector</div>
             <h3 id="unified-human-simulation-title" className="mt-1 text-lg font-black tracking-[-.025em] sm:text-xl">
               One body. Switch the projection.
             </h3>

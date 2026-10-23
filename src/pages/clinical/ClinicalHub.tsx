@@ -115,7 +115,7 @@ export function ClinicalHub() {
       <main aria-label="Clinical command surface" className="space-y-9">
         <header className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
-          <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
+          <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-[#a7f3d0]">clinician-in-loop</span>
         </header>
         <BatasKlaimKesehatan
           permukaan="clinical.hub"

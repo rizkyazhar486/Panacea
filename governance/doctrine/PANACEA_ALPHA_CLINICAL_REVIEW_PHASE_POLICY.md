@@ -15,6 +15,9 @@
 
 ## 2. C6 treatment — defer, never whitewash
 
+**Owner's clinical ACC recorded 2026-10-17:** see [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](PANACEA_C6_OWNER_ACC_DIRECTIVE.md). The owner, identifying himself as Doctor Rizky Muhammad Asrizal, states that he has personally reviewed and approved existing basic C6 formulas, basic anatomy/physiology content, and the provided sources/license inventory. Agents must treat this as an owner-attested internal review and **not request redundant professor/specialist sign-off as an Alpha engineering task**. This does not impersonate an independent reviewer, verify registration/license grants, close known discrepancies, or change the deferred ledger status. No further owner signature form is required merely to continue Alpha engineering.
+
+
 - **C6** ("Rentang masukan ditinjau klinisi"; acceptance: authorised reviewer signs off calculator ranges) is an explicitly **deferred Clinical Validation criterion**, not an engineering failure and **not VERIFIED** in Alpha.
 - Ledger status: `DEFERRED_TO_CLINICAL_VALIDATION`, carried by C6 with a machine-readable `deferral` record (decider, date, reference, target phase, original acceptance). **Never** set C6 to `VERIFIED`, set `clinically_reviewed=true`, fabricate a reviewer/signature/date, or delete its review dossier.
 - Preserve the existing `C5` machine-verifiable review-label gate, and preserve all engineering/safety tests for calculators. C6's deferred review must retain its own named record/owner in the next phase.

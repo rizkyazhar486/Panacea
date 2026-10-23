@@ -200,7 +200,7 @@ export function UnifiedBodyWorkspace() {
                 'Use the six primary destinations for daily work.',
                 'Everything else stays preserved under More features.',
               ].map((langkah, i) => (
-                <li key={langkah} className="flex gap-2"><span className="font-black text-cyan-200/90">{i + 1}</span>{langkah}</li>
+                <li key={langkah} className="flex gap-2"><span className="font-black text-[#a5f3fc]">{i + 1}</span>{langkah}</li>
               ))}
             </ol>
             <div className="mt-2">

@@ -1133,7 +1133,7 @@ function NaCorrectionCalc() {
       ) : (
         <p role="status" className="mt-3 text-xs font-bold text-neutral-600">{sodium.reason}. No corrected sodium is shown until both values are valid.</p>
       )}
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × max(0, (Glucose − 100) / 100). Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</Prosa>
 
       <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Potassium</h4>
       <div className="mt-2">
