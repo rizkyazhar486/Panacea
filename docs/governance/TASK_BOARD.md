@@ -37,8 +37,8 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
 | T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
-| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (pedsDose gap closed in #2702; guard hardened to call-sites after independent review) | ENG-C6-01 | claude | IN_REVIEW | this PR |
-| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
+| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
+| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | READY: start from the 94 unpinned input-range limits in 27 engines found by the sweep; needs a per-engine adapter |
 
 ## Later (H2)
 
