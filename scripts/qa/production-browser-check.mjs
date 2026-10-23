@@ -4,6 +4,7 @@
 // Tidak mengklaim apa pun yang tidak diamati: SHA penyebaran frontend tidak tertanam di halaman, hanya dilaporkan bila server melaporkannya.
 import dns from 'node:dns/promises'
 import { assessPublicPage, productionAssetFailure } from './production-browser-verdict.mjs'
+import { sanitizeProductionReport } from './production-browser-report.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
@@ -16,8 +17,8 @@ fs.mkdirSync(OUT, { recursive: true })
 const url = new URL(BASE)
 const report = { checkedAt: new Date().toISOString(), base: BASE, network: {}, viewports: [], findings: [], server: null }
 const finding = (severity, msg) => report.findings.push({ severity, msg })
-const save = () => fs.writeFileSync(path.join(OUT, 'report.json'), JSON.stringify(report, null, 1) + '\n')
-const netFail = (stage, err) => { report.network.failed = { stage, error: String(err && err.message ? err.message : err), code: err && err.code }; finding('fail', `network ${stage}: ${report.network.failed.error}`); save(); console.error(JSON.stringify(report.network.failed)); process.exit(2) }
+const save = () => fs.writeFileSync(path.join(OUT, 'report.json'), JSON.stringify(sanitizeProductionReport(report), null, 1) + '\n')
+const netFail = (stage, err) => { report.network.failed = { stage, error: String(err && err.message ? err.message : err), code: err && err.code }; finding('fail', `network ${stage}: ${report.network.failed.error}`); save(); console.error(JSON.stringify(sanitizeProductionReport(report).network.failed)); process.exit(2) }
 
 // 1) DNS
 try { report.network.dns = await dns.lookup(url.hostname, { all: true }) } catch (e) { netFail('dns', e) }
@@ -136,5 +137,5 @@ try {
   }
 } finally { await browser.close() }
 save()
-console.log(JSON.stringify({ findings: report.findings, network: report.network, viewports: report.viewports.map((v) => ({ w: v.width, status: v.status, overflowX: v.overflowX, webgl2: v.webgl2, errors: v.errors.length, body: v.body && { canvas: v.body.canvasPresent, loaded: v.body.loaded, stats: v.body.stats, slicing: v.body.slicing, reviewLabel: v.body.reviewLabel } })) }, null, 1))
+console.log(JSON.stringify(sanitizeProductionReport(report), null, 1))
 process.exit(report.findings.some((f) => f.severity === 'fail') ? 1 : 0)
