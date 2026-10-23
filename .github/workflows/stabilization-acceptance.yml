@@ -90,17 +90,12 @@ jobs:
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
-          # The Azure Ubuntu mirror intermittently crawls (~50 KB/s) and the apt step then
-          # exceeds the step budget (main c57e22fc and a0f2f0cd). Bound each attempt and
-          # retry once; apt resumes partial downloads, so the second attempt is cheap.
-          for attempt in 1 2; do
-            if timeout 600 "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium; then
-              exit 0
-            fi
-            echo "playwright --with-deps attempt $attempt failed or timed out; retrying" >&2
-          done
-          echo "playwright --with-deps failed after 2 attempts" >&2
-          exit 1
+          # The Azure Ubuntu mirror intermittently crawls (~40 KB/s): this step needed about
+          # 10 minutes on a bad day and failed the old 8-minute budget twice on main
+          # (c57e22fc, a0f2f0cd). A single attempt gets a larger budget. Do NOT wrap this in
+          # `timeout` + retry: killing playwright leaves its apt-get child holding the dpkg
+          # lock, so the retry fails at once with "Could not get lock" (observed on #2704).
+          "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Start frontend preview
         run: |

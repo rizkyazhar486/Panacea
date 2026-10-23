@@ -9,17 +9,19 @@ const workflow = readFileSync(
 assert.match(
   workflow,
   /name: Install mobile browser smoke runner\n\s+timeout-minutes: 22\n/,
-  'stabilization browser provisioning must have its own hard runtime bound (22 min: two attempts of at most 10 min plus npm install; raised from 8 after the apt mirror timed out twice on main)',
+  'stabilization browser provisioning must have its own hard runtime bound (22 min; raised from 8 after the slow apt mirror needed ~10 min and timed out twice on main)',
 )
-assert.match(
+// Pelajaran #2704: membungkus langkah apt dengan `timeout` + retry membunuh playwright tetapi apt-get anaknya tetap memegang
+// kunci dpkg, sehingga percobaan kedua langsung gagal ("Could not get lock"). Satu percobaan dengan anggaran lebih besar.
+assert.doesNotMatch(
   workflow,
-  /for attempt in 1 2; do\n\s+if timeout 600 "\$PW_PREFIX\/node_modules\/\.bin\/playwright" install --with-deps chromium; then/,
-  'each apt/browser attempt must be capped at 10 minutes and retried exactly once, never unbounded',
+  /timeout \d+ "\$PW_PREFIX\/node_modules\/\.bin\/playwright" install/,
+  'do not kill the playwright/apt install with timeout: the orphaned apt-get keeps the dpkg lock and any retry fails at once',
 )
-assert.match(
-  workflow,
-  /playwright --with-deps failed after 2 attempts" >&2\n\s+exit 1/,
-  'a persistent provisioning failure must still fail the step after the bounded retries',
+assert.equal(
+  (workflow.match(/"\$PW_PREFIX\/node_modules\/\.bin\/playwright" install --with-deps chromium/g) ?? []).length,
+  1,
+  'exactly one apt/browser provisioning invocation inside the 22 minute step budget',
 )
 assert.match(
   workflow,
