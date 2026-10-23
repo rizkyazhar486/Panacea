@@ -13,6 +13,9 @@ export function Home() {
       return <Navigate to="/editor" replace />
     case 'verifikator':
       return <Navigate to="/verification" replace />
+    case 'perawat':
+    case 'lab':
+      return <Navigate to="/doctor-review/lab-results" replace />
     case 'admin':
       return <Navigate to="/admin" replace />
     default:

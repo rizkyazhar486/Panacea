@@ -51,8 +51,8 @@ assert.equal(run({ age: '', played: '' }).ok, false)
 assert.equal(run({ metrics: { goalsPer90: '-5', passAccuracy: '88' } }).ok, false)
 
 // Wiring halaman: memakai validator domain lewat index, tidak ada lagi `|| 0`, tombol tak menyimpan saat tak sah.
-const halaman = readFileSync(new URL('../../src/pages/SportsLab.tsx', import.meta.url), 'utf8')
-assert.match(halaman, /from '\.\.\/domains\/sports-roster'/, 'SportsLab harus memakai domain sports-roster lewat index')
+const halaman = readFileSync(new URL('../../src/pages/fitness/SportsLab.tsx', import.meta.url), 'utf8')
+assert.match(halaman, /from '\.\.\/\.\.\/domains\/sports-roster'/, 'SportsLab harus memakai domain sports-roster lewat index')
 assert.match(halaman, /validatePlayerEntry\(/)
 assert.doesNotMatch(halaman, /Number\((age|played|missed|minutes|metrics\[[^\]]*\] \?\? '')\) \|\| 0/, 'bentuk lama Number(x) || 0 kembali di form Add player')
 assert.match(halaman, /if \(!r\.ok\) \{ setProblems\(r\.problems\); return \}/, 'submit harus berhenti bila tidak sah')

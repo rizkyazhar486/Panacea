@@ -1,5 +1,6 @@
 import { kunciTanggal } from './ramalan'
 import type { ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 
 export interface TrainingWeekSummary {
   sesi: number
@@ -11,6 +12,8 @@ export interface TrainingWeekSummary {
   sesiJarak: number
   sesiHr: number
   sesiRpe: number
+  /** Valid reported RPE, independent of positive-duration load eligibility. */
+  sesiRpeTercatat: number
   sesiRecovery: number
 }
 
@@ -48,6 +51,7 @@ export interface TrainingAnalytics {
     sesiJarak: number
     sesiHr: number
     sesiRpe: number
+    sesiRpeTercatat: number
     sesiRecovery: number
   }
   paceAktivitas: {
@@ -114,9 +118,9 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
   const anchor = new Date(anchorInput)
   if (Number.isNaN(anchor.getTime())) {
     return {
-      minggu: { sesi: 0, menit: 0, km: 0, kcal: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRecovery: 0 },
+      minggu: { sesi: 0, menit: 0, km: 0, kcal: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRpeTercatat: 0, sesiRecovery: 0 },
       blok28: [],
-      total28: { sesi: 0, menit: 0, km: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRecovery: 0 },
+      total28: { sesi: 0, menit: 0, km: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRpeTercatat: 0, sesiRecovery: 0 },
       paceAktivitas: null,
       hrrAktivitas: null,
     }
@@ -146,16 +150,18 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     let sesiJarak = 0
     let sesiHr = 0
     let sesiRpe = 0
+    let sesiRpeTercatat = 0
     let sesiRecovery = 0
 
     for (const { w } of rows) {
-      const d = angkaPositif(w.durasi)
+      const knownDuration = workoutDurationSeconds(w)
+      const d = knownDuration ?? 0
       const j = angkaPositif(w.jarakKm)
       const k = angkaNonNegatif(w.kcal)
       detik += d
       km += j
       kcal += k
-      if (d > 0) sesiDurasi += 1
+      if (knownDuration !== null) sesiDurasi += 1
       if (j > 0) sesiJarak += 1
       if (d > 0 && j > 0) {
         detikJarak += d
@@ -163,6 +169,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
       }
       if (adaHr(w)) sesiHr += 1
       if (rpeValid(w.rpe) !== null && d > 0) sesiRpe += 1
+      if (rpeValid(w.rpe) !== null) sesiRpeTercatat += 1
       if (adaRecovery(w)) sesiRecovery += 1
     }
 
@@ -176,6 +183,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
       sesiJarak,
       sesiHr,
       sesiRpe,
+      sesiRpeTercatat,
       sesiRecovery,
     }
   }
@@ -190,7 +198,8 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     const dasar = ringkas(rows)
     let srpe = 0
     for (const { w } of rows) {
-      const d = angkaPositif(w.durasi)
+      const knownDuration = workoutDurationSeconds(w)
+      const d = knownDuration ?? 0
       const rpe = rpeValid(w.rpe)
       if (d > 0 && rpe !== null) srpe += (d / 60) * rpe
     }
@@ -217,6 +226,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     sesiJarak: total28Base.sesiJarak,
     sesiHr: total28Base.sesiHr,
     sesiRpe: total28Base.sesiRpe,
+    sesiRpeTercatat: total28Base.sesiRpeTercatat,
     sesiRecovery: total28Base.sesiRecovery,
   }
 

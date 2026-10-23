@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const unified = readFileSync('src/components/PersonalBodyUnifiedSurface.tsx', 'utf8')
-const avatar = readFileSync('src/components/PersonalBodyAvatar3D.tsx', 'utf8')
+const unified = readFileSync('src/components/digital-twin/PersonalBodyUnifiedSurface.tsx', 'utf8')
+const avatar = readFileSync('src/components/digital-twin/PersonalBodyAvatar3D.tsx', 'utf8')
 const share = readFileSync('src/lib/sharePersonalBody.ts', 'utf8')
 const profile = readFileSync('src/pages/dashboard/Profile.tsx', 'utf8')
 const clinical = readFileSync('src/pages/clinical/ClinicalHub.tsx', 'utf8')
 const tubuh = readFileSync('src/pages/PusatTubuh.tsx', 'utf8')
 const dashboard = readFileSync('src/pages/dashboard/Dashboard.tsx', 'utf8')
 const body = readFileSync('src/pages/UnifiedBodyWorkspace.tsx', 'utf8')
-const exposure = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
+const exposure = readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 const main = readFileSync('src/main.tsx', 'utf8')
-const drug = readFileSync('src/pages/DrugInfo.tsx', 'utf8')
+const drug = readFileSync('src/pages/medstudy/DrugInfo.tsx', 'utf8')
 const catalog = readFileSync('src/lib/obatKatalog.ts', 'utf8')
 
 assert.match(unified, /PersonalBodyAvatar3D/)

@@ -10,3 +10,6 @@ export { readToolkitStorage, writeToolkitStorage, toolkitStorageKey } from './ad
 export { SKINCARE_STEPS, BODY_REGIONS, sanitizeRoutine, sanitizeSymptoms, sanitizeMinutes } from './engine/toolkitData.ts'
 export type { SymptomLog } from './engine/toolkitData.ts'
 export { parseServingField, sanitizeServings, estimateRecordedFood, MAX_SERVINGS_PER_WEEK } from './engine/dietServings.ts'
+export { parseJetLagHours, validDepartureDate, sanitizeJetLagPlan } from './engine/jetLagInputs.ts'
+
+export { rankedWorkoutsFromStored } from './adapters/rankedWorkoutEvidence.ts'

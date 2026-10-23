@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs'
 const client = readFileSync('src/lib/hopeEvidence.ts', 'utf8')
 const panel = readFileSync('src/components/frontier/HopeEvidencePanel.tsx', 'utf8')
 const stack = readFileSync('src/components/frontier/PanaceaHopeStack.tsx', 'utf8')
-const pubmedAdapter = readFileSync('server/src/pubmed.ts', 'utf8')
-const trialAdapter = readFileSync('server/src/trials.ts', 'utf8')
+const pubmedAdapter = readFileSync('server/src/domains/medical-reference/pubmed.ts', 'utf8')
+const trialAdapter = readFileSync('server/src/domains/medical-reference/trials.ts', 'utf8')
 const pubmedRegistry = JSON.parse(readFileSync('data/source-registry/evidence/pubmed-ncbi-eutils.json', 'utf8')) as Record<string, unknown>
 const trialRegistry = JSON.parse(readFileSync('data/source-registry/evidence/clinicaltrials-gov-api-v2.json', 'utf8')) as Record<string, unknown>
 
@@ -41,8 +41,8 @@ const trialValidation = trialRegistry.validation as { clinicalDecisionUse?: unkn
 const pubmedRegistryAdapter = pubmedRegistry.adapter as { status?: unknown; module?: unknown }
 const trialRegistryAdapter = trialRegistry.adapter as { status?: unknown; module?: unknown }
 
-assert.equal(pubmedRegistryAdapter.module, 'server/src/pubmed.ts')
-assert.equal(trialRegistryAdapter.module, 'server/src/trials.ts')
+assert.equal(pubmedRegistryAdapter.module, 'server/src/domains/medical-reference/pubmed.ts')
+assert.equal(trialRegistryAdapter.module, 'server/src/domains/medical-reference/trials.ts')
 assert.equal(pubmedRegistryAdapter.status, 'ACTIVE')
 assert.equal(trialRegistryAdapter.status, 'ACTIVE')
 assert.equal(pubmedUsage.runtime, true)

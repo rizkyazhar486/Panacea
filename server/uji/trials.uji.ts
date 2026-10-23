@@ -1,4 +1,4 @@
-import { searchTrials } from '../src/trials.ts'
+import { searchTrials } from '../src/domains/medical-reference/trials.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

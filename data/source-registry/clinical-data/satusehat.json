@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaHealthResource",
-    "module": "server/src/satusehat.ts",
+    "module": "server/src/domains/clinical-records/satusehat.ts",
     "notes": "Current adapter centralizes OAuth token handling, server-side secret isolation, path validation, bounded network timeouts and deterministic FHIR Bundle construction. Production activation must remain fail-closed until SATUSEHAT credentials and required national identity mappings are configured and verified."
   },
   "trust": {

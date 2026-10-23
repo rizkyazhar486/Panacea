@@ -36,7 +36,7 @@ assert.equal(coffeeFluidMl(parseNumberField('')).ok, false)
 assert.deepEqual(fastingElectrolytes(16), fastingElectrolytes(16))
 
 // Regresi halaman: tanpa fallback `|| 0`, kolom mulai kosong, estimasi lewat engine.
-const halaman = readFileSync(new URL('../../src/pages/NutritionToolkit.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/bodyhub/NutritionToolkit.tsx', import.meta.url), 'utf8')
 assert.doesNotMatch(halaman, /Number\([^()]*\)\s*\|\|\s*0/, 'halaman tidak boleh membaca kolom kosong sebagai 0')
 assert.match(halaman, /useState\(''\)[\s\S]*coffeeFluidMl\(parseNumberField\(cups\)\)/)
 assert.match(halaman, /fastingElectrolytes\(parseNumberField\(hours\)\)/)

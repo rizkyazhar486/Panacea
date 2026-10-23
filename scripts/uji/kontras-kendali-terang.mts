@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs'
 // Memaksa satu sisi saja selalu dapat menghasilkan pasangan yang tak terbaca.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const css = readFileSync(new URL('../../public/panacea-control-grading-v46.css', import.meta.url), 'utf8')
+const css = readFileSync(new URL('../../public/ui-iterations/panacea-control-grading-v46.css', import.meta.url), 'utf8')
 
 /** Semua blok aturan: pemilih + isinya. */
 const blok = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]

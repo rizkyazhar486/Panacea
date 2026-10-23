@@ -5,7 +5,7 @@ import {
   daftarEncounter,
   simpanEncounter,
   type SimpananEncounter,
-} from '../src/rekamEncounter.js'
+} from '../src/domains/clinical-records/rekamEncounter.js'
 
 const lama = {
   id: 'enc-1',
@@ -75,3 +75,7 @@ await import('./careJourneyRestart.uji.js')
 // Alpha A4-A6 characterization and review-claim integrity: no client-asserted clinical review, signed state only from a verified clinician.
 await import('./clinicalSigningIntegrity.uji.js')
 await import('./tandaTanganDitolak.uji.js')
+
+await import('./examinationWriteHttp.uji.js')
+
+await import('./clinical/carePlanApproval.uji.js')

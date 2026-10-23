@@ -114,7 +114,7 @@ function volumePalsu(kolom: number, baris: number, kedalaman: number, opsi?: Par
 // Sebuah "volume renderer" yang hanya menggambar satu irisan akan lolos
 // setiap uji di atas. Yang diperiksa di sini adalah keberadaan langkah sinar
 // dan sampler3D di dalam sumbernya.
-const komponen = readFileSync(new URL('../../src/components/VolumeDicom3D.tsx', import.meta.url), 'utf8')
+const komponen = readFileSync(new URL('../../src/components/digital-twin/VolumeDicom3D.tsx', import.meta.url), 'utf8')
 assert.ok(/sampler3D/.test(komponen), 'the shader no longer uses a 3D sampler; it cannot be ray-casting a volume')
 assert.ok(/for \(int i = 0; i < \d+; i\+\+\)/.test(komponen), 'the ray-march loop is gone')
 assert.ok(/potongKotak/.test(komponen), 'the ray is no longer clipped to the volume box')

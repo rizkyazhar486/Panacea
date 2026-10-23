@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const os = readFileSync(resolve('src/pages/BodyExposureOS.tsx'), 'utf8')
+const os = readFileSync(resolve('src/pages/bodyhub/BodyExposureOS.tsx'), 'utf8')
 const projector = readFileSync(resolve('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx'), 'utf8')
 const deep = readFileSync(resolve('src/pages/bodyhub/BodySystemDeepDiveWorkspace.tsx'), 'utf8')
 const neuro = readFileSync(resolve('src/pages/bodyhub/NeurovascularPerfusionWorkbench.tsx'), 'utf8')
