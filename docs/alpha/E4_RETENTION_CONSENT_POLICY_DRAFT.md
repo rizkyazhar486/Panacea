@@ -39,7 +39,13 @@ Setiap baris menyebut opsi dan usulan bawaan yang **belum berlaku sampai disetuj
 | D7 | Inventaris tujuan pemrosesan dan dasar pemrosesan | daftar tujuan + consent terpisah per tujuan | consent terpisah, dapat ditarik, tanpa menahan layanan inti | daftar tujuan disetujui |
 | D8 | Cadangan | masa simpan, penghapusan ikut jadwal retensi | cadangan mengikuti D2/D3 | aturan disetujui |
 
-## 4. Pekerjaan teknis yang menyusul SETELAH keputusan (tidak dikerjakan di sini)
+## 4. Harness engineering dan pekerjaan produksi yang masih tertunda
+
+T-E4-02 / ENG-E4-03 menambahkan harness sintetis yang dijalankan oleh `cd server && npm run uji` (`uji/privacy/retentionHarness.uji.ts`). Kebijakan dibaca dari berkas, jam disuntik, hasil sweep ditulis atomik ke JSON sementara lalu dibaca ulang. Record pada atau melewati ambang tidak boleh terbaca; audit mempunyai ambang sendiri dan jejak penghapusan tidak menyalin payload. Kasus negatif memastikan kebijakan/jam/input invalid tidak menulis perubahan. Menonaktifkan penghapusan menggagalkan assertion `expired synthetic record still readable after sweep`.
+
+Angka 1000/3000 ms di `server/uji/fixtures/privacy/retention-policy.test.json` hanya nilai uji, bukan usulan masa simpan. `governance/RETENTION_POLICY.json` mempertahankan kedua periode produksi sebagai `null`; memakainya menghasilkan `retention-policy-unset`, tanpa default. Mengubah angka pada berkas kebijakan mengubah perilaku harness tanpa perubahan kode. Modul murni `server/src/modules/privacy/domain/retention.ts` belum disambungkan ke store, endpoint, arsip, backup, atau scheduler produksi. Harness bukan bukti penghapusan data nyata maupun kepatuhan hukum.
+
+EXT-E4-A tetap **DEFERRED_FINAL_STAGE**. Sesuai governance v2, engineering sintetis tidak menunggu keputusan manusia; penerapan kebijakan produksi tetap tertunda. Pekerjaan produksi yang belum ada:
 
 - Rute hapus akun dan ekspor data dengan uji positif dan negatif (identitas, otorisasi, tanpa efek samping pada penolakan, tidak menyentuh data pasien lain).
 - Pekerjaan retensi yang deterministik (jam disuntik) dengan uji batas tepat di ambang.

@@ -31,7 +31,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
 | T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | READY |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
-| T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
+| T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | IN_REVIEW | This PR (`test/privacy-retention-harness`), base 972b95431de28ba1b87572740ce275864df58eb7; persisted synthetic JSON, independent audit window, exact-boundary/no-write controls; removing deletion fails `expired synthetic record still readable after sweep`. Production periods null; EXT-E4-A deferred. Exact-head CI evidence in PR. |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |

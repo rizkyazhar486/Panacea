@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "recordRetentionMs": 1000,
+  "auditRetentionMs": 3000
+}
