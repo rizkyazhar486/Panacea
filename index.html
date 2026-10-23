@@ -206,6 +206,40 @@
         }, 12000)
       })()
     </script>
+    <!-- P0: Vite emits this event when a lazy page's hashed JS/CSS cannot load after deployment.
+         Install before the entry module so a stale iOS tab can recover once without an infinite loop. -->
+    <script data-panacea-preload-recovery>
+      (() => {
+        const KEY = 'pmd-vite-preload-retry-at'
+        const COOLDOWN_MS = 5 * 60 * 1000
+        window.addEventListener('vite:preloadError', (event) => {
+          if (!navigator.onLine) return
+          const now = Date.now()
+          try {
+            const previous = Number(sessionStorage.getItem(KEY) || '0')
+            if (Number.isFinite(previous) && previous > 0 && now - previous < COOLDOWN_MS) return
+            // If storage is unavailable, do not reload: repeated reloads would trap users.
+            sessionStorage.setItem(KEY, String(now))
+            const fresh = new URL(window.location.href)
+            fresh.searchParams.set('_pmd_asset_refresh', String(now))
+            // Vite checks defaultPrevented before throwing the preload rejection.
+            event.preventDefault()
+            window.location.replace(fresh.href)
+          } catch {
+            // Keep the original ErrorBoundary visible rather than looping.
+          }
+        })
+      })()
+    </script>
+    <!-- Stable Home styles: CSS survives hashed JS/CSS churn across deploys. -->
+    <script data-panacea-home-styles>
+      (() => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = '/home-styles.css'
+        document.head.appendChild(link)
+      })()
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -74,7 +74,7 @@ try {
   const share = await call('POST', '/api/lab-log/shares', alice.token, { dokterEmail: doctor.user.email, hari: 7 })
   assert.equal(share.status, 200)
   const plan = await call('POST', `/api/clinician/lab-shares/${share.body.id}/care-plan`, doctor.token, {
-    diagnosisRefs: [{ system: 'local', code: 'SYN-1', display: 'Synthetic fixture condition', verificationStatus: 'provisional' }],
+    signIntent: true, diagnosisRefs: [{ system: 'local', code: 'SYN-1', display: 'Synthetic fixture condition', verificationStatus: 'provisional' }],
     questions: [{ id: 'sym1', kind: 'boolean', prompt: 'Synthetic symptom present today?', required: true }],
   })
   assert.equal(plan.status, 200, JSON.stringify(plan.body))

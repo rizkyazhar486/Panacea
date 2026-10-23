@@ -3,6 +3,8 @@
 
 **Status:** Parent authority for Panacea research, development, discovery, innovation, invention, validation, deployment, publication, and post-deployment learning.
 
+**Inherited development principle:** [`PANACEA_INVICTUS_PRINCIPLE.md`](PANACEA_INVICTUS_PRINCIPLE.md) (repository path: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). This human-authored guidance does not override clinical safety, evidence, privacy, or approved governance boundaries.
+
 This document is intentionally model-agnostic. It applies to Claude Code, ChatGPT/Codex, Astra-class systems, future GPT/Claude/Gemini/open models, specialist scientific agents, autonomous workflows, human contributors, and technologies that do not yet exist.
 
 The repository owner's latest explicit instruction remains the highest product-development authority. Within that intent, this Constitution is the standing scientific/safety/governance baseline. Model-specific files such as `CLAUDE.md`, `AGENTS.md`, future `GPT.md`, `ASTRA.md`, workflow prompts, and agent handoffs must conform to it rather than silently weakening it.

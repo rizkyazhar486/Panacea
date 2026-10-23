@@ -84,7 +84,7 @@ function navMatches(n: Nav, pathname: string): boolean {
   return pathname === n.to || pathname.startsWith(n.to + '/')
 }
 
-const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
+const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'perawat', 'lab', 'admin', 'owner']
 
 
 /**
@@ -103,6 +103,7 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 const nav: Nav[] = [
   // Beranda
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/doctor-review/lab-results', label: 'Lab desk', icon: IconShield, roles: ['perawat', 'lab'], group: 'Home' },
   { to: '/semua-fitur', label: 'All Features', icon: IconSearch, roles: ALL, group: 'Home' },
   { to: '/tutorial', label: 'How to Use', icon: IconBook, roles: ALL, group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
@@ -283,6 +284,8 @@ const roleLabel: Record<Role, string> = {
   dokter: 'Doctor',
   kontributor: 'Contributor',
   verifikator: 'Verifier',
+  perawat: 'Nurse',
+  lab: 'Lab staff',
   admin: 'Admin',
   owner: 'Owner',
 }
@@ -565,7 +568,6 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="pmd-spectral-shell relative flex min-h-screen w-full">
-      {onHome && <DailyQuoteBanner />}
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
         <LogoMark size={28} />
@@ -683,15 +685,6 @@ export function Shell({ children }: { children: ReactNode }) {
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
-            </button>
-            <button
-              type="button"
-              onClick={doLogout}
-              className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 sm:grid"
-              title="Keluar dari akun (Log out)"
-              aria-label="Log out"
-            >
-              <IconLogout size={18} />
             </button>
             {/* Peran: lambang orang, bukan kotak pilihan. Saldo PNC: pindah ke
                 beranda. Keduanya dulu berdiri di sini dan bersama-sama memakan
@@ -897,6 +890,7 @@ export function Shell({ children }: { children: ReactNode }) {
                         doLogout()
                       }}
                       className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
+                      aria-label="Log out"
                     >
                       <div className="flex items-center gap-2">
                         <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
@@ -939,6 +933,8 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         )}
 
+        {onHome && <DailyQuoteBanner />}
+
         {/* Isi halaman mengikuti jari saat digeser, lalu memantul pulih. Kelas
             transisi hanya dipasang SETELAH jari diangkat — bila dipasang selagi
             menggeser, gerakannya tertinggal di belakang jari dan justru terasa
@@ -962,32 +958,7 @@ export function Shell({ children }: { children: ReactNode }) {
         >
           {onHome && account.role === 'owner' && <PeringatanPenyimpanan />}
           {onHome && <div className="lg:hidden"><InstallBanner /></div>}
-          {onHome && homeServices.length > 0 && (
-            <div className="mb-5 hidden lg:block">
-              <div className="mb-2 flex items-center justify-between px-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                  Your most-used services
-                </span>
-                <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
-                  Quick Access
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 lg:grid-cols-8">
-                {homeServices.map((n) => (
-                  <NavLink
-                    key={n.to}
-                    to={n.to}
-                    className="group flex flex-col items-center gap-2 rounded-2xl border border-black/5 bg-white p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:bg-brand-50/50 hover:shadow-md dark:border-white/10 dark:bg-neutral-900/80 dark:hover:border-brand/40 dark:hover:bg-neutral-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
-                  >
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-dark transition-colors group-hover:bg-brand-100 dark:bg-emerald-950/60 dark:text-emerald-400 dark:group-hover:bg-emerald-900/70">
-                      <n.icon size={20} />
-                    </span>
-                    <span className="line-clamp-2 text-[10.5px] font-medium leading-tight text-neutral-700 dark:text-neutral-200">{n.label}</span>
-                  </NavLink>
-                ))}
-              </div>
-            </div>
-          )}
+
           <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter w-full">
             {children}
           </div>

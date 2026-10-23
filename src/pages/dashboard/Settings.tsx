@@ -33,8 +33,19 @@ import {
 import { LANGS, getLang, setLang, t, type Lang } from '../../lib/i18n'
 import { enablePush, disablePush, pushStatus, resyncPush, type PushStatus } from '../../lib/push'
 import { InstallApp } from '../../components/InstallApp'
-import { OfflineReady } from '../../components/OfflineReady'
+import { OfflineReady, type OfflinePage } from '../../components/OfflineReady'
 import { api, backendEnabled } from '../../lib/api'
+
+const OFFLINE_PAGES: OfflinePage[] = [
+  { label: 'Athlete', imp: () => import('../Athlete') },
+  { label: 'Performance Lab', imp: () => import('../fitness/PerformanceLab') },
+  { label: 'AI Program', imp: () => import('../fitness/TrainingPlan') },
+  { label: 'Body Composition', imp: () => import('../bodyhub/BodyComposition') },
+  { label: 'Initial Assessment', imp: () => import('../clinical/InitialAssessment') },
+  { label: 'Science & KPIs', imp: () => import('../fitness/SportsScience') },
+  { label: 'Fitness Test', imp: () => import('../fitness/FitnessTest') },
+  { label: 'Logs & Stats', imp: () => import('../medstudy/Logs') },
+]
 
 export function Settings() {
   const store = useStore()
@@ -129,7 +140,7 @@ export function Settings() {
       <InstallApp />
 
       {/* ── Offline mode ───────────────────────────────────────── */}
-      <OfflineReady />
+      <OfflineReady pages={OFFLINE_PAGES} />
 
       {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>

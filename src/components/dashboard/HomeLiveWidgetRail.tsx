@@ -87,12 +87,12 @@ export function HomeLiveWidgetRail() {
       <BatasKlaimKesehatan permukaan="wellness.home-live-rail" />
       <div className="mb-2 flex items-center justify-between gap-3 px-0.5">
         <div>
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">33 live instruments</div>
-          <h3 id="home-live-widget-rail-title" className="mt-0.5 text-[15px] font-black tracking-[-.02em] text-white">
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-brand-dark dark:text-[#00BF63]">33 live instruments</div>
+          <h3 id="home-live-widget-rail-title" className="mt-0.5 text-[15px] font-black tracking-[-.02em] text-slate-900 dark:text-white">
             Swipe your health signals
           </h3>
         </div>
-        <Link to="/health-data" className="shrink-0 text-[10px] font-black text-[#00BF63]">Data ↗</Link>
+        <Link to="/health-data" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-[10px] font-black text-brand-dark dark:text-[#00BF63]">Data ↗</Link>
       </div>
 
       <div className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-1 pb-2" aria-label="Scrollable live health widgets">
@@ -103,26 +103,26 @@ export function HomeLiveWidgetRail() {
             <Link
               key={signal.key}
               to={signal.to}
-              className="dark group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#00BF63]/35 bg-black p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition active:scale-[.97]"
+              className="panacea-live-signal-card group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] p-3 transition active:scale-[.97]"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="text-[9px] font-black uppercase tracking-[.13em] text-[#00BF63]">{signal.label}</span>
-                <span className="text-[10px] font-black text-white/55" aria-label={history.delta ? `14-day change ${history.delta}` : 'Not enough history'}>
+                <span className="text-[9px] font-black uppercase tracking-[.13em] text-emerald-600 dark:text-[#00BF63]">{signal.label}</span>
+                <span className="text-[10px] font-black text-slate-400 dark:text-white/55" aria-label={history.delta ? `14-day change ${history.delta}` : 'Not enough history'}>
                   {history.delta || 'LIVE'}
                 </span>
               </div>
 
               <div className="mt-4 flex items-baseline gap-1">
-                <strong className="text-[27px] font-black leading-none tracking-[-.045em] tabular-nums">
+                <strong className="text-[27px] font-black leading-none tracking-[-.045em] tabular-nums text-slate-900 dark:text-white">
                   {format(value, signal.digits)}
                 </strong>
-                {value != null && <span className="max-w-[58px] truncate text-[8px] font-bold text-white/65">{signal.unit}</span>}
+                {value != null && <span className="max-w-[58px] truncate text-[8px] font-bold text-slate-500 dark:text-white/65">{signal.unit}</span>}
               </div>
 
               <div className="mt-3 h-[38px] w-full">
                 {history.polyline ? (
                   <svg viewBox="0 0 100 34" preserveAspectRatio="none" className="h-full w-full" role="img" aria-label={`${signal.label} recorded trend`}>
-                    <line x1="0" y1="30" x2="100" y2="30" stroke="rgba(255,255,255,.12)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                    <line x1="0" y1="30" x2="100" y2="30" stroke="currentColor" className="text-slate-200 dark:text-white/10" strokeWidth="1" vectorEffect="non-scaling-stroke" />
                     <polyline
                       points={history.polyline}
                       fill="none"
@@ -134,13 +134,13 @@ export function HomeLiveWidgetRail() {
                     />
                   </svg>
                 ) : (
-                  <div className="flex h-full items-center text-[9px] font-bold text-white/45">Trend after 2 records</div>
+                  <div className="flex h-full items-center text-[9px] font-bold text-slate-400 dark:text-white/45">Trend after 2 records</div>
                 )}
               </div>
 
-              <div className="absolute inset-x-3 bottom-2.5 flex items-center justify-between border-t border-white/10 pt-2 text-[8px] font-black uppercase tracking-[.1em] text-white/50">
+              <div className="absolute inset-x-3 bottom-2.5 flex items-center justify-between border-t border-black/5 pt-2 text-[8px] font-black uppercase tracking-[.1em] text-slate-400 dark:border-white/10 dark:text-white/50">
                 <span>Recorded</span>
-                <span className="text-[#00BF63] transition group-active:translate-x-0.5">Open →</span>
+                <span className="text-emerald-600 transition group-active:translate-x-0.5 dark:text-[#00BF63]">Open →</span>
               </div>
             </Link>
           )
