@@ -29,7 +29,7 @@ test('P0: a healthy home with no root error or broken assets still passes', () =
 
 test('P0: classifies hashed and stable required CSS/JS using actual URLs', () => {
   const base = 'https://panaceamed.id'
-  for (const path of ['/assets/Home-D8IB3ISB.css', '/assets/index-X.js', '/home-styles.css', '/panacea-green-material-v48.css?v=20260916-1']) {
+  for (const path of ['/assets/Home-D8IB3ISB.css', '/assets/index-X.js', '/home-styles.css', '/panacea-green-material-v48.css?v=20260916-1', '/ui-iterations/panacea-green-material-v48.css?v=20260916-1']) {
     assert.equal(isProductionAsset('https://www.panaceamed.id' + path, base), true, path)
     assert.equal(isProductionAsset('https://panaceamed.id' + path, base), true, path)
   }
@@ -39,7 +39,7 @@ test('P0: classifies hashed and stable required CSS/JS using actual URLs', () =>
 })
 test('P0: actual asset classifier drives failed-request, HTTP and CSS MIME failures', () => {
   const base = 'https://www.panaceamed.id'
-  for (const path of ['/assets/Home-X.css', '/home-styles.css', '/panacea-green-material-v48.css']) {
+  for (const path of ['/assets/Home-X.css', '/home-styles.css', '/panacea-green-material-v48.css', '/ui-iterations/panacea-green-material-v48.css']) {
     const url = base + path
     assert.equal(productionAssetFailure({ url, status: 200, contentType: 'text/css; charset=utf-8' }, base), null)
     assert.match(productionAssetFailure({ url, requestFailure: 'net::ERR_FAILED' }, base), /ERR_FAILED/)

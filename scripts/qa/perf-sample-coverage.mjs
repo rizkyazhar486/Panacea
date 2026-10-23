@@ -1,0 +1,25 @@
+// F2: Only observed, finite Web Vitals lab measurements are eligible for performance evidence.
+// A missing metric is not a score of 0 and cannot satisfy a performance gate.
+export const ESSENTIAL_METRICS = Object.freeze(['lcpMs', 'cls', 'tbtMs'])
+export function perfSampleProblem(sample) {
+  if (!sample || typeof sample !== 'object' || Array.isArray(sample)) return 'malformed sample'
+  if (sample.galat) return String(sample.galat)
+  // A zero CLS/TBT value is only evidence when its observer registered successfully.
+  for (const type of ['layout-shift', 'longtask']) {
+    if (sample.observers?.[type] !== true) return `unmeasured ${type} observer`
+  }
+  for (const name of ESSENTIAL_METRICS) {
+    const x = sample[name]
+    if (typeof x !== 'number' || !Number.isFinite(x) || x < 0) return `unmeasured ${name}`
+  }
+  return null
+}
+export function enoughPerfEvidence(samples, required) {
+  if (!Array.isArray(samples) || !Number.isInteger(required) || required < 1) return false
+  return samples.filter(s => perfSampleProblem(s) === null).length >= required
+}
+
+export function minimumPerfSamples(planned) {
+  if (!Number.isSafeInteger(planned) || planned < 1) throw new Error('performance sample count must be a positive integer')
+  return Math.floor(planned / 2) + 1
+}

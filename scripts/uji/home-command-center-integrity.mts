@@ -57,7 +57,7 @@ assert.match(mobileStability, /\.home-icon-button[\s\S]*width: 44px !important;[
 assert.match(routedHome, /return <HomeSocialWorkspace \/>/, 'The routed default Home must render HomeSocialWorkspace')
 assert.match(activeHome, /className="panacea-liquid-home/, 'The active routed Home root must remain panacea-liquid-home')
 assert.match(activeHome, /<HomeVisualLanding \/>/, 'The active routed Home must mount its primary action surface')
-assert.match(activeHomeHero, /className="panacea-intent-action"/, 'Active Home hero actions must use the guarded action class')
+assert.match(activeHomeHero, /className=\{`panacea-intent-action\s+\$\{/, 'Active Home hero actions must use the guarded action class')
 assert.match(activeHomeIntent, /\.panacea-intent-action\s*\{[\s\S]*?min-height:\s*50px;/, 'Active Home hero actions must keep a touch target above the 44px floor')
 assert.match(activeHomeIntent, /@media \(max-width: 680px\)[\s\S]*?\.panacea-intent-action\s*\{[\s\S]*?min-height:\s*48px;/, 'Active Home hero actions must remain at least 44px tall on phones')
 assert.match(activeHomeIntent, /\.panacea-intent-action:focus-visible\s*\{[\s\S]*?outline:\s*3px solid[\s\S]*?outline-offset:\s*2px;/, 'Active Home hero actions must retain a visible keyboard focus ring')

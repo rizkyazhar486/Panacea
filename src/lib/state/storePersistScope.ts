@@ -1,4 +1,4 @@
-import type { SocialPost } from './types'
+import type { SocialPost } from '../types'
 
 /**
  * Shape of `AppState` actually safe/worth writing to localStorage: no heavy
