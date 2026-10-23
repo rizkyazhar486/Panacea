@@ -3,6 +3,8 @@ import { getVitals } from '../../lib/healthVitals'
 import { getDemo } from '../../lib/profile'
 import { useStore } from '../../lib/store'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
+import { dailyIntakeTotals } from '../../domains/personal-health/engine/dailySummaryTotals'
+import { localCalorieDay } from '../../domains/personal-health/engine/loggedCalories'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Angka klinis komposisi tubuh dan energi.
@@ -61,10 +63,9 @@ export function KartuKlinisTubuh() {
   const usia = num(demo.age)
   const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
 
-  const hariIni = new Date().toISOString().slice(0, 10)
-  const kaloriMasuk = (state.foods ?? [])
-    .filter((f) => f.date === hariIni)
-    .reduce((a, f) => a + (f.kcal ?? 0), 0)
+  // Hari lokal (tanggal catatan makan adalah tanggal lokal, bukan UTC) dan total yang lengkap: nilai kalori yang hilang bukan nol.
+  const hariIni = localCalorieDay(Date.now()) ?? ''
+  const kaloriMasuk = dailyIntakeTotals(state.foods, hariIni).kkal ?? 0
 
   const baris = useMemo<Baris[]>(() => {
     const out: Baris[] = []

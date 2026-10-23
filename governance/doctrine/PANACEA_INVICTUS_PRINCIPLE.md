@@ -6,6 +6,8 @@ This is a canonical product-development principle for Panaceamed. It extends the
 
 ## 99-Axiom constitutional constraint layer
 
+Canonical inherited annex: `governance/doctrine/PANACEA_99_AXIOM_CONSTITUTION.md` (machine-readable source: `governance/panacea-99-axioms.json`).
+
 Invictus depth is subordinate to the executable [`PANACEA_99_AXIOM_CONSTITUTION.md`](PANACEA_99_AXIOM_CONSTITUTION.md) and [`governance/panacea-99-axioms.json`](governance/panacea-99-axioms.json).
 
 The annex is explicitly non-theocratic and non-deifying: it translates reflection on the Divine Names into human-authored engineering constraints without claiming that Panaceamed possesses divine attributes, omniscience, infallibility, metaphysical authority, or sovereignty over human life.

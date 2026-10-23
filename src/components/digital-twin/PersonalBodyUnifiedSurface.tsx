@@ -154,7 +154,7 @@ function PermukaanTubuh({
   return (
     <section
       data-personal-body-unified-surface="v1"
-      className="dark pmd-product-surface overflow-hidden rounded-[26px] border border-white/10 bg-[#050708] text-white"
+      className="@container dark pmd-product-surface overflow-hidden rounded-[26px] border border-white/10 bg-[#050708] text-white"
       aria-label="Unified personal body and anatomy surface"
     >
       <header className="grid gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
@@ -211,8 +211,10 @@ function PermukaanTubuh({
         </div>
       </header>
 
-      <div className={`grid min-w-0 gap-0 ${compact ? 'xl:grid-cols-[minmax(260px,.72fr)_minmax(0,1.28fr)]' : 'lg:grid-cols-[minmax(320px,.78fr)_minmax(0,1.22fr)]'}`}>
-        <div ref={avatarRef} className="min-w-0 border-b border-white/10 lg:border-b-0 lg:border-r">
+      {/* compact diletakkan di kolom sempit (mis. 340px di UnifiedBodyWorkspace): dua kolom dipilih dari LEBAR KOTAKNYA
+          (container query), bukan lebar layar — breakpoint viewport menyisakan ~78px untuk kolom kedua di 1440px. */}
+      <div className={`grid min-w-0 gap-0 ${compact ? '@[44rem]:grid-cols-[minmax(260px,.72fr)_minmax(0,1.28fr)]' : 'lg:grid-cols-[minmax(320px,.78fr)_minmax(0,1.22fr)]'}`}>
+        <div ref={avatarRef} className={`min-w-0 border-b border-white/10 ${compact ? '@[44rem]:border-b-0 @[44rem]:border-r' : 'lg:border-b-0 lg:border-r'}`}>
           <PersonalBodyAvatar3D compact={compact} />
         </div>
 

@@ -18,7 +18,7 @@ const hal = readFileSync(new URL('../../src/pages/finance/Marketplace.tsx', impo
 assert.ok(!/priceTokens: Number\(f\.price\) \|\| 0/.test(hal))
 assert.ok(hal.includes('validateMaterialPrice(f.price)'))
 // Regresi Editor: harga kosong (NaN) ditolak, bukan jadi listing gratis.
-const ed = readFileSync(new URL('../../src/pages/Editor.tsx', import.meta.url), 'utf8')
+const ed = readFileSync(new URL('../../src/pages/medstudy/Editor.tsx', import.meta.url), 'utf8')
 assert.ok(!/Number\(price\) \|\| 0/.test(ed))
 assert.ok(ed.includes('validateMaterialPrice(price)'))
 assert.ok(ed.includes("e.target.value === '' ? NaN"))
