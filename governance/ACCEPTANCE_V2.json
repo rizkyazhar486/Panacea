@@ -748,9 +748,9 @@
       "negativeControl": "Synthetic MRN fixture must be detected; its value must not appear in output.",
       "evidence": "Test output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "PR #2679 in flight (CI diagnostic redaction)."
+      "status": "PASS",
+      "statusSha": "8ed1065f4b5610ca03b08e2cd142dae985d7ac66",
+      "statusNote": "PASS at 8ed1065f4b5610ca03b08e2cd142dae985d7ac66 (PR #2721 head; git tree 875db2058956b90e28a9de9bee834f0bedf01a80 is identical to main 54a08819b87801966aa0dc5f0d64a34ad39067a8). phi-repo-scan.test.mjs (31 tests) runs inside npm run build (node --test scripts/qa/*.test.mjs, package.json); Validate changes run 39983697913, job validate 120517271080 succeeded. The retrievable log excerpt is truncated before that step, so no individual test line is quoted; the same 31 tests passed 31/31 locally on this tree. Covered by name: unreadable tracked file fails closed; non-text reader result cannot certify clean; source above the old 2M boundary scanned fully; content over BATAS_PINDAI_KARAKTER (16,000,000) fails closed; failures never publish matched PHI or filenames (value printed as [REDACTED], file shown only as a hash ref); allowlist read/parse errors and git stderr are not echoed; injected synthetic PHI is detected; real repo has no unlisted finding and no stale allowlist entry. Sabotage (each fails by test name, restored afterwards): printing the PHI value instead of [REDACTED] fails 1, 5 and 25; removing the size limit fails 24; swallowing read errors fails 21 and 25; disabling content detection fails 17, 19, 23 and 30. Previous note 'PR #2679 in flight' is obsolete: #2679 is merged. Scope: pattern scan (NIK, phone, email) over tracked text files and filenames; it does not prove absence of PHI in other forms, runtime logs (ENG-E4-02) or retention (ENG-E4-03), and is not a privacy certification."
     },
     {
       "id": "ENG-E4-02",
