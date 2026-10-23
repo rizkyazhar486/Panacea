@@ -27,7 +27,9 @@ function browserGateErrors(source, job) {
   const trigger = pullRequestTrigger(source)
   if (trigger === null) errors.push('pull_request trigger missing')
   else {
-    if (!/^    branches:\s*\[main\]\s*$/m.test(trigger)) errors.push('not targeting main')
+    const mainInline = /^    branches:\s*\[main\]\s*$/m.test(trigger)
+    const mainList = /^    branches:\s*$/m.test(trigger) && /^      - main\s*$/m.test(trigger)
+    if (!mainInline && !mainList) errors.push('not targeting main')
     if (/^    (?:paths|paths-ignore|types):/m.test(trigger)) errors.push('pull_request is filtered')
   }
   if (!new RegExp('^  ' + job + ':\\s*$', 'm').test(source)) errors.push(job + ' job missing')
