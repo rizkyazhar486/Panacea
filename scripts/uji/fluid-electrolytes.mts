@@ -37,6 +37,10 @@ assert.equal(resuscitation('adult-sepsis', 5000, NaN).ok, false)
 // ── Natrium terkoreksi (Katz) ─────────────────────────────────────────
 type Cna = Extract<ReturnType<typeof correctedSodium>, { ok: true }>
 close((correctedSodium(130, 400) as Cna).correctedNa, 130 + 1.6 * 3); close((correctedSodium(140, 100) as Cna).correctedNa, 140)
+close((correctedSodium(140, 20) as Cna).correctedNa, 140) // Katz below reference does not subtract Na
+close((correctedSodium(140, 99.9) as Cna).correctedNa, 140)
+close((correctedSodium(130, 100.1) as Cna).correctedNa, 130 + 1.6 * 0.001)
+
 assert.deepEqual(bad(correctedSodium(NaN, NaN)).missing, ['sodium', 'glucose']) // regresi: dulu "−1.6 mEq/L" dari kolom kosong
 assert.deepEqual(bad(correctedSodium(130, NaN)).missing, ['glucose'])
 assert.deepEqual(bad(correctedSodium(130, 1e9)).invalid, ['glucose must be 20–2000 mg/dL']); assert.deepEqual(bad(correctedSodium(30, 400)).invalid, ['sodium must be 90–200 mEq/L'])
@@ -68,8 +72,18 @@ assert.equal(correctedSodium(FLUID_RANGES.sodium.max + 0.1, 100).ok, false); ass
 assert.deepEqual(maintenanceFluid(33), maintenanceFluid(33))
 
 // Halaman: teks mentah + mesin, tanpa `|| 0`, setiap sub-kalkulator menampilkan alasan.
-const page = readFileSync(new URL('../../src/pages/FluidCalculators.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/clinical/scores/FluidCalculators.tsx', import.meta.url), 'utf8')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 for (const f of ['maintenanceFluid(', 'resuscitation(', 'correctedSodium(', 'naCorrectionRate(', 'potassiumDeficit(']) assert.ok(page.includes(f), `halaman tidak memakai ${f}`)
 assert.equal((page.match(/<Penolakan r=\{/g) ?? []).length, 5, 'tiap sub-kalkulator harus menampilkan alasan penolakan')
 console.log('fluid-electrolytes: nilai tangan, batas Holliday-Segar, skenario berpasangan, kosong/di luar rentang gagal tertutup, tanpa angka dari kolom kosong')
+
+// Evaluate the actual exported note template: engine and copied explanation must agree around glucose 100.
+const noteTemplate = page.match(/<CopyNote text=\{`(Corrected Na = [^`]+)`\}/)?.[1]
+assert.ok(noteTemplate, 'corrected sodium export template must exist')
+const renderNote = new Function('measuredNa', 'glucose', 'correctedNa', 'return `' + noteTemplate + '`') as (na: number, glucose: number, corrected: number) => string
+for (const [glucose, expected] of [[20, 140], [100, 140], [200, 141.6]] as const) {
+  const result = correctedSodium(140, glucose) as Cna
+  close(result.correctedNa, expected)
+  assert.equal(renderNote(140, glucose, result.correctedNa), `Corrected Na = 140 + 1.6 x max(0, (${glucose}-100)/100) = ${expected.toFixed(1)} mEq/L [Katz formula]`, `exported Katz note at glucose ${glucose}`)
+}

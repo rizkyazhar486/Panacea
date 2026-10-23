@@ -35,7 +35,7 @@ for (const topic of BRIDGE_TOPICS) {
   assert.equal(trace.boundary, 'not-evidence-verification-or-clinical-reasoning')
 }
 
-const ui = await readFile(new URL('../../src/components/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
+const ui = await readFile(new URL('../../src/components/medstudy/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
 assert.match(ui, /aria-label="Explanation depth"/)
 assert.match(ui, /Educational · not patient-specific/)
 assert.match(ui, /without hiding the reasoning path/)

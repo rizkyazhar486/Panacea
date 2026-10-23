@@ -1,6 +1,6 @@
 // Galat klien: disamarkan, didedup, dibatasi; endpoint pemilik saja yang melihat daftar.
 import assert from 'node:assert/strict'
-import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien, aturUlangGalatKlien } from '../src/galatKlien.js'
+import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien, aturUlangGalatKlien } from '../src/domains/observability/galatKlien.js'
 aturUlangGalatKlien()
 const g = bersihkanGalatKlien({ jenis: 'error', pesan: 'Cannot read x of budi@rs.id token eyJhbGciOiJIUzI1NiJ9abcdefghijklmnop pasien 1234567 https://x.id/a?b=1', berkas: 'https://app.id/assets/Body-abc.js?v=2', baris: 12, rute: '/emr/pasien/ABCDEFGHIJKLMNOPQRST?nik=3171', fitur: 'Genome', versi: '1.2.3<x>' })!
 for (const bocor of ['budi@rs.id', 'eyJhbGci', '1234567', 'https://', 'ABCDEFGHIJKLMNOPQRST', 'nik', '3171', '<x>']) assert.ok(!JSON.stringify(g).includes(bocor), `bocor: ${bocor}`)

@@ -10,7 +10,7 @@ assert.ok(periksaAturanLab({ ...sah, ambang: '12abc' }).ambang, 'ambang bukan an
 assert.ok(periksaAturanLab({ ...sah, hari: '0' }).hari, 'usia hasil 0 hari diterima')
 assert.ok(periksaAturanLab({ ...sah, hari: '1.5' }).hari, 'usia hasil pecahan diterima')
 assert.ok(periksaAturanLab({ ...sah, bukti: '  ' }).bukti, 'aturan tanpa rujukan bukti diterima')
-const cek = readFileSync('src/components/CekHarian.tsx', 'utf8')
+const cek = readFileSync('src/components/clinical/CekHarian.tsx', 'utf8')
 assert.match(cek, /if \(sedangKirim\.current\) return/, 'ketuk-ganda mengirim dua laporan cek harian')
 assert.match(cek, /finally \{ sedangKirim\.current = false; setMengirim\(false\) \}/, 'penjaga kirim tidak dilepas setelah gagal')
 const rencana = readFileSync('src/components/clinical/RencanaHarianDokter.tsx', 'utf8')

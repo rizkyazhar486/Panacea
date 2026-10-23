@@ -63,7 +63,7 @@ for (const kueri of ['femur', 'tibia', 'aorta', 'heart', 'lung']) {
 }
 
 // ── 5. Kotaknya harus menyalakan sistem hasilnya ──────────────────────────
-const komponen = readFileSync(new URL('../../src/components/CariStrukturCepat.tsx', import.meta.url), 'utf8')
+const komponen = readFileSync(new URL('../../src/components/clinical/CariStrukturCepat.tsx', import.meta.url), 'utf8')
 assert.ok(/if \(!lapisanAktif\.has\(s\.l\)\) onNyalakanLapisan\(s\.l\)/.test(komponen),
   'selecting a result no longer switches its system on — the search would succeed while the screen stays unchanged')
 assert.ok(/onSorot\(pasangan\(s\), namaTampil\(s\)\)/.test(komponen), 'the result no longer highlights both sides')

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { tutupKunjungan, terapkanSimpanRekam } from '../src/rekamKlinis.js'
+import { tutupKunjungan, terapkanSimpanRekam } from '../src/domains/clinical-records/rekamKlinis.js'
 const kini = new Date('2026-09-26T10:00:00Z')
 const dokter = { id: 'd1', nama: 'Dr. Asli', klinisi: true }, pasien = { id: 'u1', nama: 'Budi', klinisi: false }
 const draf = { id: 'r1', patientId: 'p1', physicalExam: { doctorVerified: true }, problems: [{ id: 'm1', title: 'Hypertension' }], plan: [{ id: 'x', text: 'Amlodipine', status: 'diverifikasi' }], primaryDiagnosis: { code: 'I10', title: 'HT', source: 'Dokter' } }

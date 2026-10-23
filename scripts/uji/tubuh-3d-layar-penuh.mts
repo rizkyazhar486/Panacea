@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 // ~2.900 px dan mendorong isi Your Body ke layar keempat (7.268 px total).
 // Sekarang ia menjadi satu kartu yang membuka layar penuh; di layar lebar tetap
 // di tempat. Satu halaman juga hanya boleh memuat satu salinannya.
-const s = readFileSync('src/components/PersonalBodyUnifiedSurface.tsx', 'utf8')
+const s = readFileSync('src/components/digital-twin/PersonalBodyUnifiedSurface.tsx', 'utf8')
 const w = readFileSync('src/pages/UnifiedBodyWorkspace.tsx', 'utf8')
 
 assert.match(s, /LEBAR_PERMUKAAN_DI_TEMPAT = '\(min-width: 1024px\)'/, 'ambang tampilan di tempat hilang')

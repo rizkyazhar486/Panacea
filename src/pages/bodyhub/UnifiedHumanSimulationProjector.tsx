@@ -244,9 +244,9 @@ export default function UnifiedHumanSimulationProjector({
       case 'anatomy':
       default:
         return (
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
+          <div className="grid gap-3 @[44rem]:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
             <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-              <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-200/70">Selected structure</div>
+              <div className="text-[9px] font-black uppercase tracking-[.14em] text-[#a5f3fc]">Selected structure</div>
               <div className="mt-1 text-base font-black text-white/90">{selectedStructureName ?? 'Tap a rendered structure'}</div>
               <p className="mt-1 text-[10px] leading-relaxed text-white/45">
                 Selection comes from the rendered source mesh, not inferred screen position. The exact structure can stay in context while the projection changes.
@@ -285,14 +285,14 @@ export default function UnifiedHumanSimulationProjector({
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
       data-selected-source-structure={selectedStructureName ?? undefined}
-      className="dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
+      className="@container dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
       aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >
       <header className="border-b border-white/[.08] p-3 sm:p-4">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+        <div className="flex flex-col gap-3 @[50rem]:flex-row @[50rem]:items-end @[50rem]:justify-between">
           <div className="min-w-0">
-            <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/70">Body Exposure · unified human simulation projector</div>
+            <div className="text-[9px] font-black uppercase tracking-[.22em] text-[#a5f3fc]">Body Exposure · unified human simulation projector</div>
             <h3 id="unified-human-simulation-title" className="mt-1 text-lg font-black tracking-[-.025em] sm:text-xl">
               One body. Switch the projection.
             </h3>
@@ -333,8 +333,8 @@ export default function UnifiedHumanSimulationProjector({
       )}
 
       {!hideReferenceAtlasCanvas && (
-      <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_250px]">
-        <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 xl:border-b-0 xl:border-r">
+      <div className="grid gap-0 @[50rem]:grid-cols-[minmax(0,1fr)_250px]">
+        <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 @[50rem]:border-b-0 @[50rem]:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
             <BodyAllSystems3D
               selectedSystemId={selectedSystemId}

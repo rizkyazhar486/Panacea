@@ -5,7 +5,7 @@ import {
   normalizeAtcQuery,
   verifiedAtcProductCrosswalk,
   unmappedAtcProductCrosswalk,
-} from '../src/atcDdd.js'
+} from '../src/domains/medical-reference/atcDdd.js'
 
 let pass = 0
 let fail = 0

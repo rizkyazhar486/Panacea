@@ -107,7 +107,7 @@ for (const peran of SEMUA_PERAN) {
 
 // Indeks Beranda harus benar-benar menarik dari KEDUA daftar. Tanpa ini,
 // gerbang di atas tetap lulus sementara layarnya kembali hanya membaca hub.
-const deck = readFileSync(new URL('../../src/components/HomeCommandDeck.tsx', import.meta.url), 'utf8')
+const deck = readFileSync(new URL('../../src/components/dashboard/HomeCommandDeck.tsx', import.meta.url), 'utf8')
 assert.ok(/gabungKatalog\(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN\)/.test(deck),
   "Home's index stopped merging the sidebar destinations; the 56 menu-only routes fall out of Home again")
 assert.ok(/saringPeran\(/.test(deck),
