@@ -1,0 +1,85 @@
+{
+  "_catatan": "Daftar izin pemindai PHI repo (scripts/qa/phi-repo-scan.mjs). Setiap entri = temuan yang DISENGAJA dengan alasan; entri yang tak lagi cocok gagal. Bukan penilaian bahwa alamat/nomor ini aman dibagikan: keputusan pemilik. Catatan untuk pemilik: repo ini memuat email pribadi pemilik sebagai default OWNER_EMAIL (server/src/config.ts), nomor WhatsApp pemilik, dan identitas rekening top-up manual di src/lib/payment.ts (rekening tidak dipindai karena polanya bukan PHI pasien).",
+  "entri": [
+    {
+      "jenis": "email",
+      "nilai": "rizkyazhar486@gmail.com",
+      "alasan": "email pemilik: default OWNER_EMAIL yang menentukan siapa owner (server/src/config.ts), konstanta klien, dan dokumen setup; keputusan pemilik, mengubahnya mengubah siapa yang menjadi owner"
+    },
+    {
+      "jenis": "email",
+      "nilai": "index.meds@gmail.com",
+      "alasan": "alamat umpan balik pemilik yang ditampilkan di Settings"
+    },
+    {
+      "jenis": "ponsel",
+      "nilai": "6282261143040",
+      "alasan": "nomor WhatsApp pemilik untuk konfirmasi top-up manual dan umpan balik; sengaja ditampilkan ke pengguna (src/lib/payment.ts, Settings.tsx)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "no-reply@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (EMAIL_FROM contoh di panduan)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "admin@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (subjek VAPID)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "community@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (host komunitas bawaan)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "owner@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (fallback penulis di panel pemilik)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "guest@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (fallback pembeli tamu)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "demo.user@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (akun demo)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "support@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (kontak publik di halaman tata kelola)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "partnership@panaceamed.id",
+      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (kontak publik di halaman tata kelola)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "onboarding@resend.dev",
+      "alasan": "alamat pengirim uji bawaan layanan Resend (bukan orang)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "panacea-conveyor@users.noreply.github.com",
+      "alasan": "alamat noreply GitHub untuk bot conveyor di dokumen rencana (bukan orang)"
+    },
+    {
+      "jenis": "email",
+      "nilai": "budi@rs.id",
+      "alasan": "masukan sintetis untuk tes redaksi galat klien (server/uji/galatKlien.uji.ts); tes memastikan alamat ini TIDAK bocor"
+    },
+    {
+      "jenis": "email",
+      "nilai": "user@gmail.com",
+      "alasan": "placeholder bawaan formulir login saat email kosong (Login.tsx), bukan akun nyata"
+    },
+    {
+      "jenis": "email",
+      "nilai": "user@fitlife.id",
+      "alasan": "placeholder bawaan fallback di Feed.tsx, bukan akun nyata"
+    }
+  ]
+}

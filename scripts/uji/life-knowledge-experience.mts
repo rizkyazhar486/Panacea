@@ -46,10 +46,10 @@ const wrappers = [
   ['src/pages/medstudy/MedStudyHub.tsx', /StudyCommandCenter/],
   ['src/pages/medstudy/MedStudyHub.tsx', /MedicalLibraryWorkbench/],
   ['src/pages/medstudy/MedStudyHub.tsx', /bagian.*evidence/],
-  ['src/pages/EdukasiAwam.tsx', /HealthLiteracyCoach/],
-  ['src/pages/LifeStory.tsx', /StoryReflectionStudio/],
-  ['src/pages/ResilienceStories.tsx', /ResilienceActionLab/],
-  ['src/pages/RecentInnovationLab.tsx', /PanaceaFrontierSeven/],
+  ['src/pages/medstudy/EdukasiAwam.tsx', /HealthLiteracyCoach/],
+  ['src/pages/mental/LifeStory.tsx', /StoryReflectionStudio/],
+  ['src/pages/mental/ResilienceStories.tsx', /ResilienceActionLab/],
+  ['src/pages/medstudy/RecentInnovationLab.tsx', /PanaceaFrontierSeven/],
 ] as const
 for (const [path, pattern] of wrappers) assert.match(readFileSync(path, 'utf8'), pattern, `${path} must integrate its functional workspace`)
 
@@ -58,7 +58,7 @@ assert.match(frontierSource, /does not claim that no comparable idea exists anyw
 assert.doesNotMatch(frontierSource, /guaranteed cure|will diagnose|will prescribe|autonomous diagnosis|autonomous prescribing/i)
 assert.match(frontierSource, /must not autonomously diagnose or prescribe/)
 
-const medicalLibrarySource = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
+const medicalLibrarySource = readFileSync('src/components/medstudy/MedicalLibraryWorkbench.tsx', 'utf8')
 assert.match(medicalLibrarySource, /Diagnosis/)
 assert.match(medicalLibrarySource, /Therapy/)
 assert.match(medicalLibrarySource, /Appraisal before conclusion/)

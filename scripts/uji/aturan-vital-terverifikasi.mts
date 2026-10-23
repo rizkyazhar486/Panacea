@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { susunRencana } from '../../server/src/carePlan.ts'
+import { susunRencana } from '../../server/src/domains/clinical-records/carePlan.ts'
 import { buildClinicianContinuousCareDigest, type ContinuousCarePlan } from '../../src/lib/continuousCareOperatingSystem.ts'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type LongitudinalEvent } from '../../src/lib/panaceaLongitudinalState.ts'
 const now='2026-09-26T07:30:00.000Z'

@@ -22,7 +22,7 @@ assert.equal(salatLeadMinutes(2.5), 3, 'pecahan dibulatkan agar judul notifikasi
 assert.equal(salatLeadMinutes(7), salatLeadMinutes(7))
 
 // Regresi: salat.ts memakai fungsi ini, bukan pola `Number(...) ?? 5` yang mati.
-const src = readFileSync('src/salat.ts', 'utf8')
+const src = readFileSync('src/domains/lifestyle/salat.ts', 'utf8')
 assert.match(src, /salatLeadMinutes\(prefs\.salatLeadMin\)/)
 assert.doesNotMatch(src, /Number\(prefs\.salatLeadMin\)\s*\?\?/)
 console.log('salatLead.uji ok')

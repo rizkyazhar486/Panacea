@@ -29,7 +29,7 @@ for (const dasar of [{ ...N, hr: 110, svr: 0.7 }, CS]) {
 { const h = VV({ volumeDarah: 4500 }, 4000), n = VV({}, 4000)
   assert.ok(h.qEcmo < n.qEcmo && h.sirkuit!.pDrainase < n.sirkuit!.pDrainase, 'hipovolemia → aliran VV turun, drainase lebih negatif') }
 // UI memakai nilai turunan, bukan penggeser CO/aliran bebas.
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.match(ui, /vvTurunan\(/); assert.doesNotMatch(ui, /label: 'Patient cardiac output'/, 'CO VV tidak boleh lagi penggeser bebas')
 assert.doesNotMatch(ui, /\{ k: 'qEcmo', label: 'Pump flow'/, 'aliran VV tidak boleh lagi penggeser bebas')
 console.log('ecmo-vv-kopling: lulus')

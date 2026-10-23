@@ -17,16 +17,16 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Isinya tidak ditulis ulang; komponennya dipasang apa adanya dan tetap lazy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const Logs = lazy(() => import('../Logs').then((m) => ({ default: m.Logs })))
-const PainDiary = lazy(() => import('../PainDiary').then((m) => ({ default: m.PainDiary })))
-const AllergyTracker = lazy(() => import('../AllergyTracker').then((m) => ({ default: m.AllergyTracker })))
-const VaccineTracker = lazy(() => import('../VaccineTracker').then((m) => ({ default: m.VaccineTracker })))
-const ChildGrowthTracker = lazy(() => import('../ChildGrowthTracker').then((m) => ({ default: m.ChildGrowthTracker })))
-const DermatologyLesionMapper = lazy(() => import('../DermatologyLesionMapper').then((m) => ({ default: m.DermatologyLesionMapper })))
-const BloodDonation = lazy(() => import('../BloodDonation').then((m) => ({ default: m.BloodDonation })))
-const ToxinChecklist = lazy(() => import('../ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
-const VisitPrepChecklist = lazy(() => import('../VisitPrepChecklist').then((m) => ({ default: m.VisitPrepChecklist })))
-const BiologicalAge = lazy(() => import('../BiologicalAge').then((m) => ({ default: m.BiologicalAge })))
+const Logs = lazy(() => import('./Logs').then((m) => ({ default: m.Logs })))
+const PainDiary = lazy(() => import('./PainDiary').then((m) => ({ default: m.PainDiary })))
+const AllergyTracker = lazy(() => import('./AllergyTracker').then((m) => ({ default: m.AllergyTracker })))
+const VaccineTracker = lazy(() => import('./VaccineTracker').then((m) => ({ default: m.VaccineTracker })))
+const ChildGrowthTracker = lazy(() => import('./ChildGrowthTracker').then((m) => ({ default: m.ChildGrowthTracker })))
+const DermatologyLesionMapper = lazy(() => import('./DermatologyLesionMapper').then((m) => ({ default: m.DermatologyLesionMapper })))
+const BloodDonation = lazy(() => import('../bodyhub/BloodDonation').then((m) => ({ default: m.BloodDonation })))
+const ToxinChecklist = lazy(() => import('./ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
+const VisitPrepChecklist = lazy(() => import('./VisitPrepChecklist').then((m) => ({ default: m.VisitPrepChecklist })))
+const BiologicalAge = lazy(() => import('../bodyhub/BiologicalAge').then((m) => ({ default: m.BiologicalAge })))
 
 // Urutannya dari yang paling sering dibuka ke yang paling jarang.
 const TABS: TabDef[] = [

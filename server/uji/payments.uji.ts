@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
-import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
+import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/domains/payments/payments'
 
 const ownOrder = { userId: 'user-a', status: 'pending' as const }
 const paidOrder = { userId: 'user-a', status: 'paid' as const }
@@ -14,6 +14,13 @@ assert.equal(visibleOrderStatus(undefined, 'user-a'), undefined)
 assert.equal(normalizeTopUpPnc(1, 1000), 1)
 assert.equal(normalizeTopUpPnc(12.9, 1000), 12)
 assert.equal(normalizeTopUpPnc('25', 1000), 25)
+for (const value of [true, false, [], [25], {}, null, undefined, '', ' ', '1e999']) {
+  assert.equal(normalizeTopUpPnc(value, 1000), undefined)
+}
+for (let amount = 1; amount <= 1000; amount++) {
+  assert.equal(normalizeTopUpPnc(String(amount), 1000), amount)
+  assert.equal(normalizeTopUpPnc(amount + 0.9, 1000), amount, 'existing floor compatibility remains')
+}
 assert.equal(normalizeTopUpPnc(0, 1000), undefined)
 assert.equal(normalizeTopUpPnc(-1, 1000), undefined)
 assert.equal(normalizeTopUpPnc(Number.POSITIVE_INFINITY, 1000), undefined)
@@ -155,3 +162,6 @@ assert.deepEqual(
 )
 
 console.log('Payment ownership, amount normalization, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
+
+// Clinical Calculators paywall over real HTTP (free first 50, 500 PNC once, no double charge).
+await import("./calculatorPaywallHttp.uji.js")

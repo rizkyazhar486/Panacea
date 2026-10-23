@@ -1,4 +1,18 @@
 {
+ "schema": "panacea-foot-contact/v2",
+ "source_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
+ "reproducer_sha256": "474590f3f203905a32a4592a4e487a1048c72a1248b61f7079fb2d087f1986ea",
+ "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
+ "coordinate_contract": {
+  "gltf_length_unit": "metre",
+  "up": "+Y",
+  "anterior": "+Z",
+  "reference": "pelvis-relative",
+  "fps": 24,
+  "minimum_stance_frames": 3,
+  "plantar_fraction": 0.25,
+  "limitation": "Rigid markers and a fitted common forward speed give an engineering residual, not independently measured ground slip or clinical validation."
+ },
  "method": "single clip-wide floor; heel/toe = extreme vertices at rest pose; heelPlantar/toePlantar = lowest vertex within the posterior/anterior quarter of the foot at rest; additional lowest-point (sole) contact definition whose AP position is the lowest vertex (contact point)",
  "contact_threshold_mm": 15,
  "clips": {
@@ -12,41 +26,65 @@
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "toe": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "heelPlantar": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "toePlantar": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "sole": {
     "stance_phases": 1,
     "stance_frames": 3,
-    "common_forward_speed_m_s": 2.57,
-    "slide_rms_mm": 7.5,
-    "slide_max_mm": 10.6,
+    "common_forward_speed_m_s": 2.5701082443391896,
+    "slide_rms_mm": 7.501116234490572,
+    "slide_max_mm": 10.60818031175357,
+    "display": {
+     "common_forward_speed_m_s": 2.57,
+     "slide_rms_mm": 7.5,
+     "slide_max_mm": 10.6
+    },
     "phases_by_side": {
      "L": [],
      "R": [
       "8-10"
      ]
-    }
+    },
+    "samples": [
+     {
+      "side": "R",
+      "t": [
+       0.3333333333333333,
+       0.375,
+       0.4166666666666667
+      ],
+      "x": [
+       0.042750566114930715,
+       -0.04842500693157189,
+       -0.1714251209133352
+      ]
+     }
+    ]
    }
   },
   "WALK": {
@@ -59,41 +97,73 @@
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "toe": {
     "stance_phases": 1,
     "stance_frames": 5,
-    "common_forward_speed_m_s": 1.254,
-    "slide_rms_mm": 14,
-    "slide_max_mm": 26,
+    "common_forward_speed_m_s": 1.254092945167465,
+    "slide_rms_mm": 13.962625364808149,
+    "slide_max_mm": 26.028380911846895,
+    "display": {
+     "common_forward_speed_m_s": 1.254,
+     "slide_rms_mm": 14,
+     "slide_max_mm": 26
+    },
     "phases_by_side": {
      "L": [],
      "R": [
       "18-22"
      ]
-    }
+    },
+    "samples": [
+     {
+      "side": "R",
+      "t": [
+       0.75,
+       0.7916666666666666,
+       0.8333333333333334,
+       0.875,
+       0.9166666666666666
+      ],
+      "x": [
+       -0.1419772270281243,
+       -0.1992268123196784,
+       -0.25717708626004354,
+       -0.2738596847532634,
+       -0.36593015438788695
+      ]
+     }
+    ]
    },
    "heelPlantar": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "toePlantar": {
     "stance_phases": 0,
     "phases_by_side": {
      "L": [],
      "R": []
-    }
+    },
+    "samples": []
    },
    "sole": {
     "stance_phases": 3,
     "stance_frames": 31,
-    "common_forward_speed_m_s": 0.866,
-    "slide_rms_mm": 41.8,
-    "slide_max_mm": 83.5,
+    "common_forward_speed_m_s": 0.8656577476435412,
+    "slide_rms_mm": 41.80082858187786,
+    "slide_max_mm": 83.51798379576356,
+    "display": {
+     "common_forward_speed_m_s": 0.866,
+     "slide_rms_mm": 41.8,
+     "slide_max_mm": 83.5
+    },
     "phases_by_side": {
      "L": [
       "23-25+0-10"
@@ -102,7 +172,92 @@
       "5-8",
       "10-22"
      ]
-    }
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25,
+       1.2916666666666667,
+       1.3333333333333333,
+       1.375,
+       1.4166666666666667,
+       1.4583333333333333,
+       1.5
+      ],
+      "x": [
+       0.13613345336727725,
+       0.08579034321400297,
+       0.03580607158442179,
+       -0.012465266086532027,
+       -0.056251415507739745,
+       -0.09982481366084342,
+       -0.14679045244586492,
+       -0.19800390246781155,
+       -0.25630115351268695,
+       -0.13355413938515265,
+       -0.18252975311961525,
+       -0.22739040603707764,
+       -0.2870732945228917,
+       -0.3190591182683122
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.20833333333333334,
+       0.25,
+       0.2916666666666667,
+       0.3333333333333333
+      ],
+      "x": [
+       0.23643040528858744,
+       0.2730151954918054,
+       0.2380939324843771,
+       0.19297839294936903
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.4166666666666667,
+       0.4583333333333333,
+       0.5,
+       0.5416666666666666,
+       0.5833333333333334,
+       0.625,
+       0.6666666666666666,
+       0.7083333333333334,
+       0.75,
+       0.7916666666666666,
+       0.8333333333333334,
+       0.875,
+       0.9166666666666666
+      ],
+      "x": [
+       0.07025641384830869,
+       0.15979379332809923,
+       0.10980891818647004,
+       0.061384261522027854,
+       0.014897001244887312,
+       -0.03687746481516233,
+       -0.08453113909953297,
+       -0.10899529371987401,
+       -0.1598925434872593,
+       -0.21818206764288428,
+       -0.2670622316381899,
+       -0.282541315811203,
+       -0.3707013129533307
+      ]
+     }
+    ]
    }
   }
  }

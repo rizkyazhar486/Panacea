@@ -47,7 +47,7 @@ assert.equal(titikDariHasil('kemarin', 50, h50.data), null)
 assert.equal(titikDariHasil('2025-01-01', 0, h50.data), null)
 
 // Terpasang di panel PhenoAge.
-const panel = readFileSync(new URL('../../src/components/LongevityPanel.tsx', import.meta.url), 'utf8')
+const panel = readFileSync(new URL('../../src/components/growth/LongevityPanel.tsx', import.meta.url), 'utf8')
 assert.match(panel, /<TrajektoriUsia titik=\{gabungSumber\(trajektori, titikDariRiwayatLab\(/, 'trajektori (manual + log lab) tidak lagi dirender di panel PhenoAge')
 assert.match(panel, /Save to trajectory/, 'tombol menyimpan titik trajektori hilang')
 assert.match(panel, /tetapkanLabPadaTanggal/, 'PhenoAge panel must write the synced lab log')

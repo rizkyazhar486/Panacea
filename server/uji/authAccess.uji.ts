@@ -6,7 +6,7 @@ import {
   isConfiguredOwner,
   roleForLogin,
   selfServiceRole,
-} from '../src/accessControl'
+} from '../src/domains/identity/accessControl'
 import type { User } from '../src/store'
 
 function user(role: User['role'], email = `${role}@example.test`): User {
@@ -47,7 +47,7 @@ assert.equal(effectiveRoleForRequest(user('pasien', ownerEmail), undefined, owne
 assert.equal(effectiveRoleForRequest(user('owner', ownerEmail), undefined, ownerEmail), 'owner')
 
 const authSource = readFileSync('src/auth.ts', 'utf8')
-const otpSource = readFileSync('src/otp.ts', 'utf8')
+const otpSource = readFileSync('src/domains/identity/otp.ts', 'utf8')
 assert.match(authSource, /payload\.email_verified !== true/)
 assert.match(authSource, /ALLOW_DEV_LOGIN === 'true'/)
 assert.match(authSource, /NODE_ENV !== 'production'/)
@@ -66,3 +66,6 @@ console.log('Authentication privilege, session-cookie, and OTP security boundari
 
 // Verify production middleware over actual HTTP, not only source assertions.
 await import('./authSessionHttp.uji.js')
+
+// Professional-role applications over real HTTP: owner-only decisions, a grant verifies, each application is decided once.
+await import('./applicationsHttp.uji.js')

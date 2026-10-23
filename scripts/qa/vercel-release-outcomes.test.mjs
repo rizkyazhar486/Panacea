@@ -38,9 +38,13 @@ const cases = [
   ['failed acceptance recheck', 'skipped', 'skipped', '', '', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'failure'],
   ['cancelled acceptance recheck', 'skipped', 'skipped', '', '', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'cancelled'],
   ['unproven acceptance with reported deploy success', 'success', 'success', url, 'false', 'BLOCKED_RELEASE_GATES', 'BLOCKED', 'failure'],
+  ['deployed build marker mismatch', 'success', 'success', url, 'false', 'FAILED_OR_UNVERIFIED', 'UNVERIFIED', 'success', 'failure'],
+  ['build marker not run', 'success', 'success', url, 'false', 'FAILED_OR_UNVERIFIED', 'UNVERIFIED', 'success', 'skipped'],
 ]
 
-for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus, recheck = 'success'] of cases) {
+for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus, recheck = 'success', markerOverride] of cases) {
+  // The marker step runs only after a successful smoke test; otherwise it is skipped.
+  const marker = markerOverride ?? (smoke === 'success' ? 'success' : 'skipped')
   test(`actual release scripts report ${label} without false shipment`, () => {
     const root = mkdtempSync(join(tmpdir(), 'panacea-release-outcomes-'))
     try {
@@ -48,7 +52,7 @@ for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus
       const summaryPath = join(root, 'summary.md')
       run(runBlock('Write machine-readable release evidence'), {
         DEPLOYMENT_SHA: sha, DEPLOYMENT_URL: deploymentUrl, DEPLOYMENT_DEFERRED: deferred,
-        DEPLOY_STEP_OUTCOME: deploy, SMOKE_STEP_OUTCOME: smoke,
+        DEPLOY_STEP_OUTCOME: deploy, SMOKE_STEP_OUTCOME: smoke, MARKER_STEP_OUTCOME: marker,
         RELEASE_RECHECK_OUTCOME: recheck,
         WORKFLOW_RUN_URL: 'https://github.com/example/repo/actions/runs/123', EVIDENCE_PATH: evidencePath,
       })
@@ -58,10 +62,11 @@ for (const [label, deploy, smoke, deploymentUrl, deferred, status, summaryStatus
       assert.equal(record.deployment_url, deploymentUrl || null)
       assert.equal(record.deploy_step, deploy)
       assert.equal(record.smoke_step, smoke)
+      assert.equal(record.build_marker_step, marker)
       assert.equal(record.release_recheck, recheck)
       const bindings = {
         'steps.deploy.outputs.deferred': deferred, 'steps.deploy.outcome': deploy,
-        'steps.smoke.outcome': smoke, 'steps.deploy.outputs.url': deploymentUrl,
+        'steps.smoke.outcome': smoke, 'steps.marker.outcome': marker, 'steps.deploy.outputs.url': deploymentUrl,
         'steps.release-recheck.outcome': recheck,
       }
       const script = runBlock('Deployment summary').replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, (_, key) => {
@@ -93,4 +98,9 @@ test('smoke outcome and retained evidence are wired into the actual deployment j
   assert.match(workflow, /SMOKE_STEP_OUTCOME: \$\{\{ steps\.smoke\.outcome \}\}/)
   assert.match(workflow, /name: Upload Vercel release evidence\n\s+if: always\(\)/)
   assert.match(workflow, /if-no-files-found: error/)
+})
+
+test('the build-marker step is wired into the actual deployment job and gates the verified status', () => {
+  assert.match(workflow, /name: Verify deployed build marker equals the built commit\n\s+id: marker\n\s+if: steps\.smoke\.outcome == 'success'/)
+  assert.match(workflow, /MARKER_STEP_OUTCOME: \$\{\{ steps\.marker\.outcome \}\}/)
 })

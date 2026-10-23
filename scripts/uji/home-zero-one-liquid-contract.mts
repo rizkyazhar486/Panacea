@@ -2,12 +2,12 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
-const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
-const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
+const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
+const hero = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/layout/Shell.tsx', 'utf8')
-const launcher = readFileSync('src/components/SuperPageLauncher.tsx', 'utf8')
+const launcher = readFileSync('src/components/ui/SuperPageLauncher.tsx', 'utf8')
 const convergence = readFileSync('src/styles/superpage-convergence.css', 'utf8')
 
 // Zero-step: Home itself shows health context. One-step: primary destinations

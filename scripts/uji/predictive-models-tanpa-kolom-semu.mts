@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 // getDemo(), padahal rumusnya (lean mass factor dari lemak tubuh, dikurangi
 // jam sejak makan terakhir) tidak memakai berat. Kolom yang tidak berpengaruh
 // membuat pembaca mengira hasil disesuaikan dengan tubuhnya.
-const src = readFileSync('src/pages/PredictiveModelsToolkit.tsx', 'utf8')
+const src = readFileSync('src/pages/bodyhub/PredictiveModelsToolkit.tsx', 'utf8')
 const kode = src.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')
 const mulai = kode.indexOf('function AutophagyTiming')
 const akhir = kode.indexOf('function CortisolAwakening')

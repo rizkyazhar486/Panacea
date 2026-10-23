@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { frontendBuildInfo, readFrontendGitState, writeFrontendBuildInfo } from '../write-frontend-build-info.mjs'
+import { frontendBuildInfo, readFrontendGitState, writeFrontendBuildInfo } from '../bangun/write-frontend-build-info.mjs'
 
 const state = { commitSha: 'a'.repeat(40), treeSha: 'b'.repeat(40), dirty: false }
 

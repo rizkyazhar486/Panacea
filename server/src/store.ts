@@ -1,20 +1,26 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
+import { isSignedCarePlan } from './domains/clinical-records/carePlan.js'
 import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
-import { KATALOG } from './healthMetrics.js'
+import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
 import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
-import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
+import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
+import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
+
+// Batas kewajaran masukan teks pos (bukan aturan klinis): cukup longgar untuk teks nyata, cukup ketat agar satu akun tak menggembungkan berkas data.
+export const MAKS_CAPTION_POS = 5000
+export const MAKS_AKTIVITAS_POS = 100
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
 const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
-export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'perawat' | 'lab' | 'admin' | 'owner'
 
 export interface User {
   id: string
@@ -93,12 +99,14 @@ export interface Clinical {
   /** Kunjungan tertutup per pasien (append-only). */
   encounters?: Record<string, any[]>
   /** Tautan pasien praktik -> akun pasien (disetujui pasien lewat kode). */
-  tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
+  tautan?: Record<string, import('./domains/clinical-records/aksesKlinis.js').TautanPasien>
   /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
-  kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
+  kodeTaut?: import('./domains/clinical-records/aksesKlinis.js').KodeTaut[]
   /** Hasil lab dan rujukan (modul labResults); bentuk dimiliki modul itu, jejak audit ada di dalam rekam. */
   hasilLab?: Record<string, import('./modules/labResults/service/labResultsService.js').HasilLabRekam>
   rujukanKlinis?: Record<string, import('./modules/labResults/service/labResultsService.js').RujukanRekam>
+  /** Penugasan staf (perawat/lab) per pasien: patientId -> id akun staf. Tanpa penugasan, staf tidak melihat data pasien mana pun. */
+  penugasanStaf?: Record<string, string[]>
 }
 
 export interface VisitMembership {
@@ -134,7 +142,9 @@ interface DB {
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
   /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
-  validasiLedger?: import('./validasiLedger.js').CatatanLedger[]
+  validasiLedger?: import('./domains/clinical-records/validasiLedger.js').CatatanLedger[]
+  /** Token sesi yang dicabut saat logout: sha256(token) -> ISO kedaluwarsa token (dipangkas setelah lewat). */
+  tokenDicabut?: Record<string, string>
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
@@ -367,6 +377,15 @@ function save() {
   simpanTertunda = true
   queueMicrotask(flushSimpan)
 }
+/** Cabut token sesi (logout). Hanya hash yang disimpan; entri dipangkas setelah token kedaluwarsa dengan sendirinya. */
+export function cabutToken(hash: string, kedaluwarsaIso: string, sekarang: Date) {
+  const d = (db.tokenDicabut ??= {})
+  for (const [h, exp] of Object.entries(d)) if (Date.parse(exp) <= sekarang.getTime()) delete d[h]
+  d[hash] = kedaluwarsaIso
+  save()
+}
+export function tokenDicabut(hash: string): boolean { return !!db.tokenDicabut?.[hash] }
+
 /** Tulis sekarang bila ada perubahan tertunda (dipakai saat shutdown dan oleh uji). */
 export function flushSimpan() {
   if (!simpanTertunda) return
@@ -402,17 +421,17 @@ function simpanSekarang() {
 // MENGHAPUS data: yang tergeser dipindah ke sini, tidak dibuang.
 let mongoDb: any = null
 const ARSIP_DIR = process.env.PANACEA_ARCHIVE_DIR || join(dirname(DB_PATH), 'arsip')
-export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): void {
-  if (!catatan.length) return
+export function arsipkan(nama: 'audit' | 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): boolean {
+  if (!catatan.length) return true
   const baris = catatan.map((c) => ({ c, diarsipkan: new Date().toISOString() }))
   if (mongoDb) {
     mongoDb.collection(`arsip_${nama}`).insertMany(baris).catch((e: Error) => {
       catatGagal(e); console.error(`[store] archive ${nama} failed:`, e.message)
     })
-    return
+    return true // scheduled, NOT a durability acknowledgement: Mongo async write failures remain an E4 limitation
   }
-  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n') }
-  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message) }
+  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n'); return true }
+  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message); return false }
 }
 
 /** Serialize snapshots: an older slice deletion must never follow a newer save. */
@@ -744,8 +763,8 @@ export function deletePost(id: string, email: string): boolean {
 export function updatePost(id: string, email: string, patch: Partial<Post>): Post | undefined {
   const p = db.posts?.find((x) => x.id === id)
   if (!p || p.authorEmail !== email) return undefined
-  if (typeof patch.caption === 'string') p.caption = patch.caption
-  if (typeof patch.activity === 'string') p.activity = patch.activity
+  if (typeof patch.caption === 'string') p.caption = patch.caption.slice(0, MAKS_CAPTION_POS)
+  if (typeof patch.activity === 'string') p.activity = patch.activity.slice(0, MAKS_AKTIVITAS_POS)
   const flags = patch as Record<string, unknown>
   const target = p as unknown as Record<string, unknown>
   for (const k of ['exclusive', 'locked', 'archived', 'pinned', 'hideLikes', 'commentsOff', 'reuseOff']) {
@@ -880,18 +899,45 @@ export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any
   c.records[patientId] = rekamBaru
   save()
 }
-export function simpanKodeTaut(k: import('./aksesKlinis.js').KodeTaut) {
+export function simpanKodeTaut(k: import('./domains/clinical-records/aksesKlinis.js').KodeTaut) {
   const c = ensureClinical(); (c.kodeTaut ??= []).push(k); save()
 }
 export function getKodeTaut() { return ensureClinical().kodeTaut ?? [] }
 export function getTautan() { return ensureClinical().tautan ?? {} }
-export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHash: string) {
+export function simpanTautan(t: import('./domains/clinical-records/aksesKlinis.js').TautanPasien, kodeHash: string) {
   const c = ensureClinical()
   ;(c.tautan ??= {})[t.patientId] = t
   const k = (c.kodeTaut ?? []).find((x) => x.hash === kodeHash); if (k) { k.dipakaiPada = t.ditautkanPada; k.dipakaiOleh = t.userId }
   save()
 }
 export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+
+// --- Staf perawat/lab (F1): peran hanya diberikan pemilik; akses data hanya lewat penugasan eksplisit per pasien ---
+export const STAFF_ROLES: readonly Role[] = ['perawat', 'lab']
+export function pasienDitugaskan(userId: string): string[] {
+  const p = ensureClinical().penugasanStaf ?? {}
+  return Object.keys(p).filter((pid) => p[pid]?.includes(userId)).sort()
+}
+export function daftarStaf(): User[] { return db.users.filter((x) => STAFF_ROLES.includes(x.role)) }
+export function tugaskanStaf(patientId: string, userId: string): boolean {
+  if (patientId in Object.prototype) return false // id warisan objek (__proto__, constructor, ...) bukan id pasien
+  const c = ensureClinical(); const list = ((c.penugasanStaf ??= {})[patientId] ??= [])
+  if (list.includes(userId)) return false
+  list.push(userId); save(); return true
+}
+export function cabutStaf(patientId: string, userId: string): boolean {
+  const c = ensureClinical(); const list = c.penugasanStaf?.[patientId]; if (!list || !list.includes(userId)) return false
+  const sisa = list.filter((x) => x !== userId); if (sisa.length) c.penugasanStaf![patientId] = sisa; else delete c.penugasanStaf![patientId]
+  save(); return true
+}
+/** Ubah peran staf. Hanya pasien <-> perawat/lab; peran profesional, admin dan owner tidak disentuh. Mencabut peran juga mencabut semua penugasan. */
+export function setStaffRole(userId: string, role: 'perawat' | 'lab' | 'pasien'): { ok: true; user: User } | { ok: false; reason: 'not-found' | 'not-eligible' } {
+  const u = db.users.find((x) => x.id === userId); if (!u) return { ok: false, reason: 'not-found' }
+  if (u.role !== 'pasien' && !STAFF_ROLES.includes(u.role)) return { ok: false, reason: 'not-eligible' }
+  u.role = role
+  if (role === 'pasien') { const c = ensureClinical(); for (const pid of Object.keys(c.penugasanStaf ?? {})) cabutStaf(pid, userId) }
+  save(); return { ok: true, user: u }
+}
 /** Port penyimpanan modul labResults: tulis lewat save() sehingga ikut berkas/Mongo yang sama. */
 export function repoHasilLab() {
   return {
@@ -952,7 +998,13 @@ export function addAudit(user: User, action: string, target?: string) {
   if (!(db as any).audit) (db as any).audit = []
   const audit: AuditEntry[] = (db as any).audit
   audit.unshift({ id: uid(), at: new Date().toISOString(), userId: user.id, userEmail: user.email, action, target })
-  if (audit.length > 5000) audit.length = 5000
+  // Retain the bounded hot set; archive overflow with the existing clinical-audit sink.
+  // Retention/deletion periods remain a separate owner-governed policy decision.
+  if (audit.length > 5000) {
+    const evicted = audit.slice(5000)
+    // File-mode append failure must not destroy the only copy of the audit history.
+    if (arsipkan('audit', evicted)) audit.splice(5000)
+  }
   save()
 }
 export function getAudit(limit = 200): AuditEntry[] {
@@ -1045,9 +1097,10 @@ type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
 export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listCarePlans() { return db.carePlans ?? [] }
+export function listSignedCarePlans() { return listCarePlans().filter(p => isSignedCarePlan(p?.rencana)) }
 export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
 /** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
-export function tambahLedgerValidasi(c: import('./validasiLedger.js').CatatanLedger) {
+export function tambahLedgerValidasi(c: import('./domains/clinical-records/validasiLedger.js').CatatanLedger) {
   const l = (db.validasiLedger ??= [])
   if (c.urutan !== l.length || (l.length && c.sidikSebelum !== l[l.length - 1].sidik)) throw new Error('ledger append out of order')
   l.push(c); save()
@@ -1325,11 +1378,9 @@ export function listDoctors(): DoctorRow[] {
 }
 
 // Web Push subscriptions per user (dedup by endpoint).
-export function addPushSub(userId: string, sub: any) {
+export function addPushSub(userId: string, sub: LanggananPush) {
   if (!db.pushSubs) db.pushSubs = {}
-  const list = db.pushSubs[userId] ?? []
-  if (!list.some((s) => s.endpoint === sub.endpoint)) list.push(sub)
-  db.pushSubs[userId] = list
+  db.pushSubs[userId] = tambahkanLangganan(db.pushSubs[userId] ?? [], sub)
   save()
 }
 export function listPushSubs(userId: string): any[] {

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { AnimatedNumber } from '../../components/AnimatedNumber'
 import { Fold } from '../../shared/ui/Fold'
 import { openFoldsAround } from '../../shared/ui/openFolds'
 import { kunciHari, hariIni } from '../../lib/tanggal'
@@ -15,6 +16,7 @@ import { JENIS_OLAHRAGA, type JenisOlahraga } from '../../lib/olahraga'
 import { getVitals } from '../../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../../lib/bugarIlmiah'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { parseDetectedFoods } from '../../domains/personal-health/engine/foodEntryInputs'
 import { proyeksikanNilaiNutrisiKeLabKanonic, gabungLabNutrisiDenganKanonic } from '../../lib/lab'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
@@ -739,17 +741,11 @@ function Stepper({ label, value, min, max, step = 1, unit, onChange }: { label?:
   )
 }
 
-function ANum({ v, d = 0 }: { v: number; d?: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    const el = ref.current; if (!el) return
-    let cur = Number(el.textContent) || 0
-    if (Math.abs(cur - v) < 0.01) return
-    const s = cur; const t0 = performance.now(); let raf = 0
-    const tick = (now: number) => { const p = Math.min(1, (now - t0) / 500); cur = s + (v - s) * (1 - (1 - p) ** 3); el.textContent = cur.toFixed(d); if (p < 1) raf = requestAnimationFrame(tick) }
-    raf = requestAnimationFrame(tick); return () => cancelAnimationFrame(raf)
-  }, [v, d])
-  return <span ref={ref}>{v.toFixed(d)}</span>
+function ANum(props: { v: number; d?: number }) {
+  const { account, activePatient } = useStore()
+  // A different account or selected patient must never animate through the old subject's value.
+  const identity = JSON.stringify([account?.id, account?.email, account?.patientId, activePatient.id])
+  return <AnimatedNumber key={identity} {...props} />
 }
 
 function Pillar({ label, v, hl }: { label: string; v: number; hl?: boolean }) {
@@ -858,10 +854,11 @@ function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }
       const prompt = 'Identify the food in this photo. Reply with ONLY a JSON array: [{"name":"...","grams":n,"kcal":n,"carbs":n,"protein":n,"fat":n}] with realistic portion estimates. No other text.'
       const out = (await api.aiVision(dataUrl, prompt)).text
       const jsonStr = out.slice(out.indexOf('['), out.lastIndexOf(']') + 1)
-      const items = JSON.parse(jsonStr) as DetectedFood[]
-      if (!Array.isArray(items) || items.length === 0) throw new Error('empty')
-      onDetect(items.map((i) => ({ name: String(i.name), grams: Math.round(+i.grams || 100), kcal: Math.round(+i.kcal || 0), carbs: Math.round(+i.carbs || 0), protein: Math.round(+i.protein || 0), fat: Math.round(+i.fat || 0) })))
-      setMsg(`✓ ${items.length} food item(s) detected & added to journal: ${items.map((i) => i.name).join(', ')}`)
+      // Keluaran model tidak tepercaya: butir tanpa porsi/kalori/gizi yang sah dilewati, bukan diisi 0 atau 100 g.
+      const { items, skipped } = parseDetectedFoods(JSON.parse(jsonStr))
+      if (items.length === 0) throw new Error('empty')
+      onDetect(items)
+      setMsg(`✓ ${items.length} food item(s) detected & added to journal: ${items.map((i) => i.name).join(', ')}${skipped > 0 ? ` · ${skipped} skipped (incomplete values)` : ''}`)
     } catch {
       setMsg('AI is not confident about this photo — try a clearer photo or enter manually.')
     } finally { setBusy(false) }

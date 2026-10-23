@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { susunRencana, susunLaporan, laporanKeBundelFhir } from '../src/carePlan.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir } from '../src/domains/clinical-records/carePlan.js'
 
 const kini = new Date('2026-09-25T08:00:00Z')
 const r = susunRencana({

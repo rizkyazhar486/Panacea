@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { cariPangan, lingkunganKota, resolveOpenMeteoAccess } from '../src/lingkungan'
+import { cariPangan, lingkunganKota, resolveOpenMeteoAccess } from '../src/domains/lifestyle/lingkungan'
 
 const TEST_ENV = { NODE_ENV: 'test' }
 

@@ -13,7 +13,7 @@ test('ruthless simplicity is the final global presentation layer', async () => {
 })
 
 test('v50 removes ambient gradients, glow and blur from the shared shell', async () => {
-  const css = await source('public/panacea-ruthless-simple-v50.css')
+  const css = await source('public/ui-iterations/panacea-ruthless-simple-v50.css')
   assert.match(css, /body[\s\S]*background-image:\s*none\s*!important/)
   assert.match(css, /header\.kaca[\s\S]*backdrop-filter:\s*none\s*!important/)
   assert.match(css, /box-shadow:\s*none\s*!important/)
@@ -21,7 +21,7 @@ test('v50 removes ambient gradients, glow and blur from the shared shell', async
 })
 
 test('simplicity contract preserves safety and progressive disclosure', async () => {
-  const doc = await source('DOCS/RUTHLESS-SIMPLICITY.md')
+  const doc = await source('DOCS/product/RUTHLESS-SIMPLICITY.md')
   for (const phrase of [
     'One viewport, one focal purpose',
     'Two-step access',
@@ -52,7 +52,7 @@ test('Body Exposure spatial mode removes the floating assistive control', async 
 
 test('mobile command bar stays below the PWA safe area', async () => {
   const html = await source('index.html')
-  const css = await source('public/panacea-shell-mobile-compact-v49.css')
+  const css = await source('public/ui-iterations/panacea-shell-mobile-compact-v49.css')
 
   assert.match(html, /viewport-fit=cover/, 'the app opts into edge-to-edge viewport rendering')
   assert.match(

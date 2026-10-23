@@ -11,8 +11,9 @@ import { api, backendEnabled, type SleepNight } from '../../lib/api'
 import {
   hitungSesi, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
   perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
-  UNAVAILABLE, type Sesi,
+  UNAVAILABLE,
 } from '../../lib/trainingPhysiology'
+import { sesiFisiologi } from './trainingPhysiologySessions'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -58,10 +59,7 @@ export function TrainingPhysiology() {
     }
   }, [workouts, demo, vitals])
 
-  const sesi = useMemo<Sesi[]>(() => workouts.map((w) => ({
-    id: w.id, nama: w.nama, mulai: w.mulai, durasiDetik: w.durasi,
-    jarakKm: w.jarakKm, avgHr: w.avgHr, maxHr: w.maxHr, hr: w.hr,
-  })), [workouts])
+  const { sesi, dikecualikan } = useMemo(() => sesiFisiologi(workouts), [workouts])
 
   const calc = useMemo(() => hitungSesi(sesi, ctx), [sesi, ctx])
   const beban = useMemo(() => ringkasBeban(calc), [calc])
@@ -145,7 +143,7 @@ export function TrainingPhysiology() {
       <SectionTitle
         icon={<IconActivity />}
         title="Training Physiology"
-        subtitle={`${calc.length} sessions · HRmax used ${ctx.hrMax} bpm · resting ${ctx.hrRest} bpm`}
+        subtitle={`${calc.length} sessions${dikecualikan > 0 ? ` (${dikecualikan} excluded: duration unknown)` : ''} · HRmax used ${ctx.hrMax} bpm · resting ${ctx.hrRest} bpm`}
       />
 
       {/* Kesiapan — satu-satunya yang menuntut keputusan hari ini */}

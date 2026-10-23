@@ -1,13 +1,25 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
-Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. **North star produk yang tidak berubah:** [`PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) — satu patient identity/state longitudinal yang sederhana, terpadu, provenance-aware dan dipercaya lintas daily life, poli, ward, OR, ICU, serta follow-up. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
+> **Governance v2 (read first):** work selection, acceptance, verification, stabilization and roles are defined in
+> [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
+> Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
+
+
+> **ACC OWNER C6 — 17 OKTOBER 2026: DOKTER RIZKY MUHAMMAD ASRIZAL TELAH MENYATAKAN ACC ATAS RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. AI AGENT DILARANG MENGHAMBAT ENGINEERING ALPHA DENGAN MEMINTA PROFESOR/SPESIALIS MENANDATANGANI ULANG RUMUS DASAR.** Ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). Catat sebagai self-attested internal owner review; jangan mengklaim STR/SIP terverifikasi, validasi eksternal, izin pihak ketiga, atau kelayakan pasien. Status ledger C6 tidak dipalsukan.
+
+
+> **C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision.**
+>
+> **Arahan pemilik 17 Oktober 2026 — batas fase Clinical Review Alpha:** Semua persetujuan/review klinis formal untuk validasi model/kalkulator (termasuk C6) **ditunda ke fase Clinical Validation**, bukan syarat penutupan *engineering Alpha*. Wajib baca [`PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`](governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md). **Jangan** tandai C6 `VERIFIED`, mengarang reviewer/tanda tangan, mengubah `clinically_reviewed=false` menjadi true, melonggarkan uji/safety, atau melewati tanda tangan klinisi dalam alur pasien. Ledger kanonik sudah dimigrasikan: 45 catatan historis tetap tercatat, hanya C6 yang berstatus `DEFERRED_TO_CLINICAL_VALIDATION` (dengan catatan penundaan mesin-terbaca), dan kemajuan dilaporkan terhadap 44 kriteria aktif; angka resmi ada di `docs/alpha/ALPHA_ACCEPTANCE_LEDGER.md` (dihasilkan dari `governance/ALPHA_ACCEPTANCE_LEDGER.json`).
+
+Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang mengembangkan Panacea. Baca seluruhnya sebelum mengubah kode. **North star produk yang tidak berubah:** [`governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`](governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md) — satu patient identity/state longitudinal yang sederhana, terpadu, provenance-aware dan dipercaya lintas daily life, poli, ward, OR, ICU, serta follow-up. Aturan di sini bersifat wajib; jika ada konflik, urutan otoritas:
 
 1. Instruksi eksplisit terbaru dari pemilik repo.
 2. Batas keselamatan/keamanan/privasi/provenance di §8 (tidak boleh dilemahkan).
 3. Dokumen ini → `AGENTS.md` → dokumen doktrin di §10.
 4. Rencana/rekomendasi agent lama.
 
-> Catatan migrasi: CLAUDE.md versi lama (1000+ baris, ledger arahan pemilik) dipindahkan utuh ke [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md). Isinya tetap berlaku sebagai arahan produk/domain, **kecuali** aturan shipping "direct-to-main" yang kini digantikan oleh §5–§6 di bawah.
+> Catatan migrasi: CLAUDE.md versi lama (1000+ baris, ledger arahan pemilik) dipindahkan utuh ke [`governance/doctrine/PANACEA_OWNER_DIRECTIVES.md`](governance/doctrine/PANACEA_OWNER_DIRECTIVES.md). Isinya tetap berlaku sebagai arahan produk/domain, **kecuali** aturan shipping "direct-to-main" yang kini digantikan oleh §5–§6 di bawah.
 
 ---
 
@@ -263,13 +275,18 @@ Laporan kemajuan konkret: SHA/nomor PR, kapabilitas yang berubah, hasil uji, sta
 
 ## 9. Produk: sederhana di luar, dalam terstruktur
 
-Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur penting ≤2 interaksi dari Home; visual/data dulu, interpretasi di balik disclosure; dekorasi harus bermakna. Detail: `DOCS/RUTHLESS-SIMPLICITY.md`.
+Satu fokus & satu aksi utama per viewport; ≤6 pilihan utama per surface; fitur penting ≤2 interaksi dari Home; visual/data dulu, interpretasi di balik disclosure; dekorasi harus bermakna. Detail: `DOCS/product/RUTHLESS-SIMPLICITY.md`.
 
 ---
 
 ## 10. Skill proyek & dokumen rujukan
 
-Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif), **`invictus`** (eksekusi compounding-depth berbasis `PANACEA_INVICTUS_PRINCIPLE.md`). Panggil manual dengan `/panacea-git-flow`, `/panacea-architecture`, `/panacea-testing`, atau `/invictus`. Teks pemilik **`@invictus`** adalah pemanggilan eksplisit yang ekuivalen dengan `/invictus` untuk scope tugas saat itu; tidak pernah menonaktifkan gate keselamatan, bukti, provenance, testing, review, atau Git flow.
+> Semua dokumen doktrin `PANACEA_*.md` ada di `governance/doctrine/` (dipindah
+> dari root repo, 2026-10-14, tanpa stub). Kalau nemu link/path lama ke
+> `PANACEA_XXX.md` di root yang 404, dokumennya ada di
+> `governance/doctrine/PANACEA_XXX.md` — cari di situ, jangan bikin ulang.
+
+Skill di `.claude/skills/` dimuat otomatis sesuai tugas (aturan tetap di dokumen ini; skill berisi prosedur): **`panacea-git-flow`** (branch/commit/PR), **`panacea-architecture`** (penempatan kode, layer, migrasi), **`panacea-testing`** (tes positif/negatif), **`invictus`** (eksekusi compounding-depth berbasis `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`). Panggil manual dengan `/panacea-git-flow`, `/panacea-architecture`, `/panacea-testing`, atau `/invictus`. Teks pemilik **`@invictus`** adalah pemanggilan eksplisit yang ekuivalen dengan `/invictus` untuk scope tugas saat itu; tidak pernah menonaktifkan gate keselamatan, bukti, provenance, testing, review, atau Git flow.
 
 Instruksi umum multi-agent (dimuat otomatis lewat import di bawah; bila bertentangan dengan dokumen ini, **dokumen ini menang**):
 
@@ -279,16 +296,17 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 
 | Bila tugasmu menyentuh… | Baca dulu |
 |---|---|
-| Apa pun yang luas / "lanjut" | `PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
-| Klaim ilmiah/klinis, R&D, novelty | `PANACEA_CONSTITUTION.md`, `DOCS/ACADEMIC-ACCURACY-GATE.md` |
-| Model manusia, fisiologi, simulasi, coupling | `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/PHYSIOLOGICAL-RUNTIME.md` |
-| Data pasien, wearable, device, EMR | `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/MEDICAL-DEVICE-FABRIC.md` |
-| Body Exposure / 3D / atlas | `DOCS/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `PANACEA_OWNER_DIRECTIVES.md` |
-| Visit OS / realtime / WebRTC | bagian "Visit OS" di `PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
-| Sport / rescue / environment | `DOCS/UNIVERSAL-SPORT-OS.md`, `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md` |
-| UI/UX & navigasi | `DOCS/RUTHLESS-SIMPLICITY.md`, `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md` |
+| Apa pun yang luas / "lanjut" | `governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
+| Klaim ilmiah/klinis, R&D, novelty | `governance/doctrine/PANACEA_CONSTITUTION.md`, `DOCS/clinical-research/ACADEMIC-ACCURACY-GATE.md` |
+| Model manusia, fisiologi, simulasi, coupling | `governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/clinical-research/PHYSIOLOGICAL-RUNTIME.md` |
+| Data pasien, wearable, device, EMR | `governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/clinical-research/MEDICAL-DEVICE-FABRIC.md` |
+| Body Exposure / 3D / atlas | `DOCS/body-exposure/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `governance/doctrine/PANACEA_OWNER_DIRECTIVES.md` |
+| Visit OS / realtime / WebRTC | bagian "Visit OS" di `governance/doctrine/PANACEA_OWNER_DIRECTIVES.md`, `server/src/visitRealtimePolicy.ts` |
+| Sport / rescue / environment | `DOCS/sport/UNIVERSAL-SPORT-OS.md`, `DOCS/sport/SPORT-ADVENTURE-RESCUE-OS.md`, `DOCS/environment/ENVIRONMENT-SOURCE-ADAPTER.md` |
+| UI/UX & navigasi | `DOCS/product/RUTHLESS-SIMPLICITY.md`, `DOCS/product/SUPERPAGE-SEMANTIC-DEPTH.md` |
 | Keputusan arsitektur | `DOCS/adr/` (mulai `0001-domain-first-clean-architecture.md`) |
+| Nambah file ke `src/pages`/`components`/`lib`/domain folder, **atau nambah dokumen `.md` baru ke `docs/`/`DOCS/`** | `DOCS/FOLDER-STRUCTURE-STANDARD.md` (batas 15 file per folder flat, peta domain `docs/`, kapan & cara pecah ke subfolder) |
 
-Prinsip **Invictus Human Reality Principle** (arsitektur masa depan yang dapat direalisasikan): `docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`, kanonik lewat `PANACEA_INVICTUS_PRINCIPLE.md`.
+Prinsip **Invictus Human Reality Principle** (arsitektur masa depan yang dapat direalisasikan): `docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md`, kanonik lewat `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`.
 
-Arahan pemilik lengkap (ledger historis): [`PANACEA_OWNER_DIRECTIVES.md`](PANACEA_OWNER_DIRECTIVES.md) — dibaca on-demand, tidak di-import agar konteks sesi tetap ramping. Doktrin tambahan: `PANACEA_INVICTUS_PRINCIPLE.md`, `PANACEA_HUMANITY_10_CHARTER.md`.
+Arahan pemilik lengkap (ledger historis): [`governance/doctrine/PANACEA_OWNER_DIRECTIVES.md`](governance/doctrine/PANACEA_OWNER_DIRECTIVES.md) — dibaca on-demand, tidak di-import agar konteks sesi tetap ramping. Doktrin tambahan: `governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md`, `governance/doctrine/PANACEA_HUMANITY_10_CHARTER.md`.
