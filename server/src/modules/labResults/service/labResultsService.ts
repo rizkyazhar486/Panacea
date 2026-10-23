@@ -81,9 +81,13 @@ export function validasiButir(x: unknown, sekarang: Date): ButirHasil | undefine
 
 const bolehBaca = (a: Actor, rec: { tenantId: string; patientId: string }): boolean => {
   if (a.tenantId !== rec.tenantId) return false
-  if (a.role === 'patient') return (a.patientIds ?? []).includes(rec.patientId)
+  if (a.role === 'patient' || a.role === 'nurse' || a.role === 'lab-staff') return (a.patientIds ?? []).includes(rec.patientId)
   return STAFF_READ.includes(a.role)
 }
+
+/** Staf perawat/lab menulis hanya untuk pasien yang ditugaskan; klinisi dan admin tidak dibatasi di sini. */
+const bolehTulisPasien = (a: Actor, patientId: string): boolean =>
+  (a.role !== 'nurse' && a.role !== 'lab-staff') || (a.patientIds ?? []).includes(patientId)
 
 // Aktor sistem (intake otomatis) tidak membaca data, tetapi boleh MENGAJUKAN transisi yang diizinkan
 // definisi siklus hidup (received -> pending_review); transisi lain ditolak dengan alasan eksplisit.
@@ -101,6 +105,7 @@ export function terimaHasil(k: Konteks, a: Actor, masukan: { patientId?: unknown
   const item = validasiButir(masukan.item, now)
   const source = masukan.source === 'lab-intake' || masukan.source === 'manual-entry' ? masukan.source : undefined
   if (!patientId || !item || !source || idDicadangkan(patientId)) return gagal('invalid-input')
+  if (!bolehTulisPasien(a, patientId)) return gagal('forbidden')
   const rec: HasilLabRekam = {
     id: k.newId('lab'), tenantId: a.tenantId, patientId, status: resultLifecycle.initial, item,
     provenance: { source, recordedBy: a.actorId, recordedAt: now.toISOString() }, trail: [],
@@ -157,7 +162,8 @@ export interface MetrikPenutupan {
 
 /** B9: metrik dihitung dari backend; hanya hasil yang jejaknya utuh yang dihitung, sisanya dilaporkan terpisah. */
 export function metrikPenutupan(k: Konteks, a: Actor, opsi: { dueHours?: number } = {}): Hasil<MetrikPenutupan & { corrupt: number }> {
-  if (!STAFF_READ.includes(a.role) || a.tenantId !== TENANT_PRAKTIK) return gagal('forbidden')
+  // Metrik menjumlahkan seluruh tenant: hanya klinisi dan admin; perawat/lab (dibatasi per pasien) tidak.
+  if (!(a.role === 'clinician' || a.role === 'admin') || a.tenantId !== TENANT_PRAKTIK) return gagal('forbidden')
   const byStatus = Object.fromEntries(RESULT_STATUSES.map((s) => [s, 0])) as Record<ResultStatus, number>
   const sekarang = k.now().getTime()
   let total = 0, corrupt = 0, oldest: number | null = null, overdue: number | null = opsi.dueHours === undefined ? null : 0

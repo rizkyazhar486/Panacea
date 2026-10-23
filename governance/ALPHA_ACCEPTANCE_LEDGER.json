@@ -6,9 +6,10 @@
   "Lab & Referral Closure: penerimaan, penyimpanan persisten, review klinisi, komunikasi, penutupan terverifikasi",
   "Clinical Calculators: fungsi, validasi, regression, penandaan status review",
   "Body Exposure Alpha: anatomi seluruh tubuh bertahap, interaksi 3D, layer dasar, navigasi, WALK/RUN teruji; modul belum tervalidasi berlabel",
-  "Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment"
+  "Platform Reliability: auth, authorization, audit trail, keamanan data, UI 390×844, CI/CD, verifikasi deployment",
+  "User Journey & Product Experience: perjalanan pengguna lintas peran dari masuk hingga menuntaskan tugas dan keluar, ditambah optimasi aksesibilitas, responsivitas, performa, serta konsistensi visual aplikasi"
  ],
- "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase.",
+ "weightPolicy": "Bobot sama (1 per kriteria). Hanya status VERIFIED yang diberi kredit. REPORTED, NOT_CHECKED, NOT_STARTED, BLOCKED, dan PENDING_CLINICAL_REVIEW bernilai 0 tetapi tetap masuk penyebut. Kriteria tidak boleh dihapus untuk menaikkan persentase. Satu-satunya pengecualian penyebut yang disetujui pemilik (2026-10-17): kriteria berstatus DEFERRED_TO_CLINICAL_VALIDATION (tinjauan klinis formal di luar lingkup Alpha) tetap tercatat dengan syarat aslinya, bernilai 0, tidak pernah VERIFIED dan tidak divalidasi secara klinis, serta keluar dari penyebut AKTIF hanya bila membawa catatan penundaan lengkap (pemutus, tanggal, rujukan, fase tujuan, syarat asli). Validasi klinis tetap wajib sebelum fungsi apa pun dipakai untuk keputusan klinis nyata.",
  "baseline": {
   "mainSha": "4b2009a1fd66a70522dc2bfe78ded03ca5c2a295",
   "date": "2026-10-10",
@@ -20,7 +21,8 @@
   "NOT_CHECKED",
   "NOT_STARTED",
   "BLOCKED",
-  "PENDING_CLINICAL_REVIEW"
+  "PENDING_CLINICAL_REVIEW",
+  "DEFERRED_TO_CLINICAL_VALIDATION"
  ],
  "criteria": [
   {
@@ -96,20 +98,27 @@
    "pillar": "Panacea One OS",
    "criterion": "Persetujuan dan tanda tangan klinisi",
    "acceptance": "Rencana klinis menjadi aktif hanya setelah tanda tangan klinisi; percobaan tanpa tanda tangan ditolak dan tercatat",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (diimpor oleh rekamEncounter.uji.ts, gerbang wajib server-validate): server NYATA lewat HTTP + persistensi berkas. Rencana hanya aktif setelah tanda tangan klinisi terautentikasi yang mengikat isi (sha256); niat tanpa tanda tangan ditolak, rencana tetap tidak aktif (GET /api/care/plans kosong) dan penolakan tercatat di audit (care.plan.signature_refused dengan userId penolak; care.plan.signed hanya oleh dokter); rencana lama tanpa tanda tangan tidak aktif sampai ditinjau dan ditandatangani ulang dengan isi persis sama; subjek tidak cocok ditolak 404 tanpa mutasi.",
+    "qa/clinical/care-plan-approval.mjs (gerbang CI wajib di Stabilization Acceptance): komponen nyata + API HTTP nyata, Chromium 390x844 dan 1440x900. Niat tanpa tanda tangan disuntik ke request nyata dan ditolak dengan alert terlihat, rencana tidak aktif; tanda tangan lewat keyboard mengaktifkan; muat ulang tetap bertanda tangan; rencana lama diaktifkan ulang; state loading, galat dan Retry; tanpa overflow; tombol >=44px.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk perilaku teknis penegakan tanda tangan (server + komponen) dengan identitas sintetis. Verifikasi dokter adalah fixture uji yang dipicu pemilik uji, bukan bukti kualifikasi/STR nyata. E2E browser memakai fixture komponen, bukan pemasangan rute produksi, dan tidak menyatakan perjalanan lengkap F1. Isi klinis rencana belum ditinjau klinisi."
   },
   {
    "id": "A7",
    "pillar": "Panacea One OS",
    "criterion": "Tindak lanjut terjadwal",
    "acceptance": "Tindak lanjut dapat dibuat dari rencana bertanda tangan dan muncul pada daftar kerja pemilik yang benar",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "VERIFIED",
+   "evidence": [
+    "server/uji/clinical/carePlanApproval.uji.ts (gerbang wajib server-validate, HTTP nyata + berkas): dari rencana BERTANDA TANGAN, rencana terjadwal (cadence daily, activeFrom valid) muncul di daftar kerja pasien pemiliknya (/api/care/plans) dan TIDAK di pasien lain (kosong); tindak lanjut (POST /api/care/reports dengan planId) dibuat dengan subjectId dari sesi, bukan dari klien; klinisi bernama yang diberi izin melihat rencana dan laporan itu di /api/clinician/lab-shares/:id/care; hasil bertahan setelah server dimatikan dan dihidupkan ulang; pasien lain mendapat 404 pada laporan itu; pencabutan izin mengosongkan daftar.",
+    "CI exact-source pada head PR #2529 414a1a999 (squash-merged sebagai 145835d36): run 38900045635 job server-validate 116969748578 SUCCESS (log 2026-10-16T12:25:32Z: carePlanApproval ... passed) dan run 38900045860 job full-acceptance 116969749671 SUCCESS dengan langkah 'A6 clinician care-plan approval (real HTTP, mobile and desktop)' SUCCESS."
+   ],
    "owner": "Sol (backend) / Sonnet (UI setelah kontrak)",
-   "note": "Ada bukti tingkat unit di server/uji (carePlanFhir, carePlanIdem, authAccess) tetapi bukan E2E; tanpa kredit."
+   "note": "VERIFIED hanya untuk pembuatan tindak lanjut dari rencana bertanda tangan dan kemunculannya di daftar kerja pemilik yang benar (pasien pemilik dan klinisi berizin) pada identitas sintetis. Pengiriman pengingat (notifikasi) tidak dinilai di sini. Tidak menyatakan kebenaran klinis jadwal atau pertanyaan rencana; belum ada E2E browser untuk daftar kerja klinisi."
   },
   {
    "id": "A8",
@@ -261,15 +270,16 @@
    "pillar": "Clinical Calculators",
    "criterion": "Ratchet \"kolom kosong → 0\" mencapai nol",
    "acceptance": "governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0",
-   "status": "REPORTED",
+   "status": "VERIFIED",
    "evidence": [
     "Baseline 147 → 80 (28 berkas) di main 4b2009a1f",
     "Main a866e78237e0309a8b8471de159ad03d9aa8f90b: actual scanner 836 TSX, 19 remaining patterns; #2454 head 5ee53f23 has 9 passing exact-head checks, mandatory 390x844 input recovery (run 38216080766).",
     "Main 92707f132561a9d2529f691b12af10e5b80897d4: actual remaining count 17 after #2439; head 796f3c04 passed nine exact-head checks including nutrition recovery (run 38218032932).",
-    "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767)."
+    "Main f08ae2a29ca65787d5ffdead141a6c004f024582: actual remaining count 16 after #2419; candidate b2a5a646 passed eight applicable exact-head checks including synthetic client request-guard (Stabilization 38220629767).",
+    "Pemindai asli pada main (scripts/uji/angka-kosong-ratchet.mts, dijalankan di `npm run uji`): 0 kejadian di 0 berkas dari 1017 TSX; governance/EMPTY_FIELD_ZERO_BASELINE.json total = 0, berkas = {}. Sabotase: berkas TSX berisi `Number(v) || 0` gagal dengan 'halaman baru membaca kolom kosong sebagai 0 ... src/__sab/Sab.tsx: 1 kejadian, tidak ada di baseline'. CI exact-SHA main 394d5437c: Stabilization Acceptance run 38939685715 SUCCESS, job full-acceptance 117103883902, langkah 'Frontend tests' SUCCESS. scripts/qa/empty-field-zero-ratchet.test.mjs: 9 uji lulus."
    ],
    "owner": "Sonnet",
-   "note": "Pemindai asli pada kandidat provenance durasi mencapai 0 kejadian di 0 berkas (837 TSX), tanpa mengubah detector. Import, penyimpanan, ringkasan pekan dan liga membedakan durasi diketahui/turunan/tidak diketahui serta mempertahankan nol eksplisit. C2 tetap REPORTED: consumer kompatibilitas numerik lain (summary/detail, analisis harian, replay, chart, training load dan dashboard) masih perlu diklasifikasi/migrasi; nol regex bukan bukti cakupan semantik lengkap. Status, kriteria dan persetujuan klinis tidak dipromosikan."
+   "note": "VERIFIED menurut syarat tertulis kriteria (baseline total = 0, dijaga gerbang CI). BATAS: ini ukuran regex (`(Number|parseFloat|parseInt)(...) || 0`), bukan bukti bahwa SEMUA consumer numerik sudah membedakan kosong dari nol; migrasi semantik consumer lain (summary/detail, analisis harian, replay, chart, training load, dashboard) berlanjut lewat PR C2 terpisah dan tidak diklaim selesai di sini. Tidak ada klaim validasi klinis."
   },
   {
    "id": "C3",
@@ -314,11 +324,31 @@
    "id": "C6",
    "pillar": "Clinical Calculators",
    "criterion": "Rentang masukan ditinjau klinisi",
-   "acceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator",
-   "status": "PENDING_CLINICAL_REVIEW",
-   "evidence": [],
-   "owner": "Klinisi (belum ditunjuk)",
-   "note": "Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false."
+   "acceptance": "Alpha (rekayasa): rentang masukan, ketelitian numerik, regresi dan perilaku fail-closed tiap kalkulator terbukti oleh referensi independen, matriks masukan bermusuhan dan mutasi; persetujuan klinis formal TIDAK diperlukan di Alpha dan ditunda ke fase Clinical Validation.",
+   "status": "DEFERRED_TO_CLINICAL_VALIDATION",
+   "evidence": [
+    "docs/clinical-calculators/ENGINEERING_REVIEW_DOSSIER.md",
+    "scripts/uji/calculator-independent-reference.mts",
+    "scripts/uji/calculator-independent-reference-2.mts",
+    "scripts/uji/calculator-independent-reference-3.mts",
+    "scripts/uji/calculator-independent-reference-4.mts",
+    "scripts/uji/calculator-independent-reference-5.mts",
+    "scripts/uji/calculator-independent-reference-6.mts",
+    "scripts/uji/calculator-independent-reference-7.mts",
+    "scripts/uji/calculator-independent-reference-8.mts",
+    "scripts/uji/calculator-independent-reference-9.mts",
+    "scripts/uji/calculator-independent-reference-10.mts",
+    "scripts/uji/support/calculatorHarness.mts"
+   ],
+   "owner": "Klinisi (belum ditunjuk) — fase Clinical Validation",
+   "note": "DITUNDA ke fase Clinical Validation atas keputusan pemilik 2026-10-17 (docs/alpha/CLINICAL_REVIEW_DEFERRAL.md). BUKAN VERIFIED dan BUKAN tervalidasi secara klinis; clinically_reviewed=false tetap; semua bukti rekayasa, uji keselamatan, validasi masukan, uji kebenaran numerik dan perilaku fail-closed dipertahankan dan tidak dinonaktifkan; fungsi pendukung keputusan yang belum tervalidasi tetap dibatasi untuk pengujian non-klinis. Riwayat sebelum penundaan: Gerbang manusia terpisah; paket engineering tersedia di docs/clinical-calculators/FRAMINGHAM_REVIEW_PACKAGE.md, AUTOPHAGY_REVIEW_PACKAGE.md dan FASTING_HYDRATION_REVIEW_PACKAGE.md. Nama/identitas peninjau, tanggal, versi yang disetujui dan tanda tangan tetap belum diisi; clinically_reviewed=false.",
+   "deferral": {
+    "decidedBy": "Product Owner (instruksi UNIVERSAL CLINICAL REVIEW DEFERRAL)",
+    "decidedOn": "2026-10-17",
+    "reference": "docs/alpha/CLINICAL_REVIEW_DEFERRAL.md",
+    "targetPhase": "Clinical Validation (fase setelah Alpha; wajib sebelum penggunaan untuk keputusan klinis nyata)",
+    "originalAcceptance": "Peninjau berwenang menandatangani rentang tiap kalkulator (status sebelumnya: PENDING_CLINICAL_REVIEW; pemilik sebelumnya: Klinisi (belum ditunjuk))"
+   }
   },
   {
    "id": "C7",
@@ -445,10 +475,12 @@
     "bodyexposure/PROVENANCE.md",
     "scripts/uji/body-asset-provenance.mts",
     "Audit independen parsial (Sonnet Cloud, scripts/qa/glb-provenance-audit.mjs, main 1ee18b373): 17.676 struktur bernama di 380 GLB publik (tanpa rig) semuanya membawa panacea_source, panacea_license, dan panacea_accuracy_status — 0 tanpa metadata. Lisensi: CC BY-SA 4.0 (11.625), CC BY 4.0 (2.537), ICRP 156/145 'redistribusi dibebaskan pemilik proyek 2026-10-03' (2.772), Denver CC BY 4.0 (736). Akurasi: source_backed 17.344, model_segmented 224, source_backed_corrected 93, review_required 12, approximate 3. Kontrol negatif: GLB dengan satu panacea_license dihapus gagal dengan nama berkas dan struktur",
-    "scripts/uji/body-attribution-coverage.mts + src/domains/body-exposure/engine/attributionCoverage.ts (gerbang CI): membaca chunk JSON dari 506 GLB publik (14 lisensi distinct, 463 sumber distinct) dan mensyaratkan tiap lisensi/sumber DIKENALI dan DINAMAI di public/bodyexposure/provenance.html; lisensi/sumber tak dikenal = lacuna (fail-closed); CanonicalBody menautkan ke halaman itu. Sabotase: halaman kehilangan ICRP 145 / Allen, tabel melupakan Andreassen, toleransi 'desconhecida', cek halaman dimatikan - masing-masing gagal dengan nama lacuna. Dua mutan setara (Allen sudah tercakup kunci HuBMAP; String(undefined)) tidak membedakan perilaku."
+    "scripts/uji/body-attribution-coverage.mts + src/domains/body-exposure/engine/attributionCoverage.ts (gerbang CI): membaca chunk JSON dari 506 GLB publik (14 lisensi distinct, 463 sumber distinct) dan mensyaratkan tiap lisensi/sumber DIKENALI dan DINAMAI di public/bodyexposure/provenance.html; lisensi/sumber tak dikenal = lacuna (fail-closed); CanonicalBody menautkan ke halaman itu. Sabotase: halaman kehilangan ICRP 145 / Allen, tabel melupakan Andreassen, toleransi 'desconhecida', cek halaman dimatikan - masing-masing gagal dengan nama lacuna. Dua mutan setara (Allen sudah tercakup kunci HuBMAP; String(undefined)) tidak membedakan perilaku.",
+    "Inventaris seluruh aset biner di public/ (scripts/qa/public-asset-inventory.mjs + scripts/uji/public-asset-provenance.mts + governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json): 640 aset; 556 punya jejak (520 berkas kredit direktori >= 40 byte, 36 hak cipta tertanam, 2 per-node); 82 TANPA jejak. Gerbang ratchet: aset baru tanpa jejak gagal, entri basi harus dibuang; 3 sabotase pada repo nyata gagal dengan pesan bernama; kredit kosong tidak dihitung. Rincian dan keputusan yang dibutuhkan: docs/alpha/D8_PUBLIC_ASSET_PROVENANCE_GAPS.md.",
+    "Celah provenance aset publik menyusut dari 82 menjadi 2 tanpa mengarang kepemilikan atau lisensi (#2617): inventaris seluruh public/ (640 aset); kredit induk dan ASSET_SOURCES hanya menutup aset yang disebut namanya; catatan jejak baru hanya dari manifest dan riwayat git; tersisa public/logo-mark.png dan public/media/tutorial-video.mp4 (butuh pernyataan pemilik). Gerbang scripts/uji/public-asset-provenance.mts + governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json (tanpaJejak=2, hanya boleh menyusut)."
    ],
    "owner": "Local",
-   "note": " Terverifikasi hanya kelengkapan metadata di data. Belum diperiksa: halaman atribusi resmi di aplikasi, dan keabsahan lisensi itu sendiri; lisensi ICRP bersandar pada pernyataan pemilik proyek, bukan teks lisensi yang diverifikasi independen. Tetap REPORTED. Kelengkapan atribusi data↔halaman kini dijaga gerbang CI, tetapi itu bukan bukti keabsahan lisensi: pernyataan ICRP bersandar pada pernyataan pemilik proyek, dan alias 'Human Reference Atlas' diperlakukan sama dengan 'HuBMAP' (HRA adalah atlas HuBMAP; halaman menamainya HuBMAP). Tetap REPORTED."
+   "note": "Tetap REPORTED. Pembaruan: dari 82 aset tanpa jejak kini 2 (public/logo-mark.png, public/media/tutorial-video.mp4) — hanya pemilik yang dapat menyatakan asal-usul dan lisensinya; tidak diisi dengan tebakan. Masih belum terpenuhi untuk VERIFIED: pernyataan pemilik untuk 2 aset itu, verifikasi lisensi tercatat terhadap sumber primer, dan halaman atribusi resmi yang menamai sumber. Gerbang mengukur ADA-nya jejak, bukan keabsahan lisensi; lisensi ICRP bersandar pada pernyataan pemilik proyek; CC0-1.0 atlas janin sebagaimana tercatat di manifest proyek, belum diverifikasi ulang terhadap repositori dataset. Riwayat catatan sebelumnya: Tetap REPORTED. Cakupan sebelumnya hanya GLB di public/bodyexposure; inventaris seluruh public/ menemukan 82 aset tanpa jejak provenance (45 WebP organ, 28 aset dataset-inspection/fetal-parcels, 5 SVG, 3 MP4, 1 logo). Hanya pemilik yang dapat menyatakan asal-usul dan lisensinya; tidak diisi dengan tebakan. Gerbang mengukur ADA-nya jejak, bukan keabsahan lisensi; lisensi ICRP bersandar pada pernyataan pemilik proyek."
   },
   {
    "id": "D9",
@@ -534,10 +566,14 @@
    "pillar": "Platform Reliability",
    "criterion": "Perlindungan data pasien",
    "acceptance": "Tidak ada PHI di log/repo; retensi dan consent sesuai kebijakan",
-   "status": "NOT_CHECKED",
-   "evidence": [],
+   "status": "REPORTED",
+   "evidence": [
+    "Tanpa PHI di log (sebagian): server/uji/logPrivacyHttp.uji.ts (gerbang server-validate) — perjalanan klinis yang diuji tidak menulis nama, email, MRN, teks atau nilai klinis ke log server; hanya jalur yang diuji.",
+    "Tanpa PHI di repo (sebagian): scripts/qa/phi-repo-scan.mjs + governance/PHI_SCAN_ALLOWLIST.json — pola yang dikenal; bukan jaminan bebas PHI.",
+    "Draf keputusan retensi, penghapusan, dan consent untuk persetujuan pemilik: docs/alpha/E4_RETENTION_CONSENT_POLICY_DRAFT.md (belum disetujui, belum berlaku, bukan nasihat hukum)."
+   ],
    "owner": "Sol",
-   "note": ""
+   "note": "REPORTED, bukan VERIFIED. Belum terpenuhi: kebijakan retensi/penghapusan/consent belum disetujui pemilik dan penasihat hukum (tidak ada otorisasi yang dikarang), sehingga 'sesuai kebijakan' belum dapat diuji; cakupan log hanya jalur yang diuji dan log infrastruktur pihak ketiga (Render/Vercel) di luar jangkauan; pemindaian repo mengenali pola yang dikenal saja."
   },
   {
    "id": "E5",
@@ -568,12 +604,15 @@
    "pillar": "Platform Reliability",
    "criterion": "Deployment staging terverifikasi",
    "acceptance": "SHA yang berjalan di staging/produksi sama dengan SHA main dan smoke perjalanan kritis lulus",
-   "status": "NOT_CHECKED",
+   "status": "REPORTED",
    "evidence": [
-    "Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen"
+    "Workflow Vercel Prebuilt Production hijau, tetapi belum diverifikasi independen (catatan awal)",
+    "Penanda build: scripts/vite/buildMarker.mjs menulis build.json (SHA 40-heksadesimal atau null, tidak pernah dikarang) pada tiap build (#2581); alat baca-saja scripts/qa/verify-deployed-sha.mjs membandingkan SHA frontend (build.json) dan backend (/api/health build.commit) dengan main, dengan klasifikasi setara/ancestor (#2609).",
+    "Rilis produksi memverifikasi dirinya: langkah 'Verify deployed build marker equals the built commit' (scripts/qa/verify-build-marker.mjs, #2610) membandingkan build.json artefak yang dideploy dengan github.sha; status DEPLOYED_SMOKE_VERIFIED mensyaratkannya; harness scripts/qa/vercel-release-outcomes.test.mjs (15 kasus) dan scripts/uji/verify-build-marker.mts (HTTP nyata lokal + mutan) menjaganya.",
+    "Bukti rilis nyata: run 38996081367 (workflow_dispatch, head 80f9cef9) — deploy, smoke, dan langkah penanda build semuanya success; pembacaan langsung sesudahnya frontend 80f9cef9 dan backend f67c2bfa (SETARA: leluhur main tanpa perubahan pada jalur yang dideploy). Rincian dan batas di docs/alpha/E7_DEPLOYMENT_EVIDENCE.md."
    ],
    "owner": "Sol",
-   "note": ""
+   "note": "REPORTED, bukan VERIFIED. Belum terpenuhi: (1) tidak ada lingkungan staging di repositori ini (tidak ada workflow/konfigurasi staging); (2) smoke perjalanan kritis terhadap SHA yang dideploy belum dijalankan dan dicatat; (3) definisi pemilik tentang 'sama dengan main' untuk sistem rilis berkelompok (HEAD vs SHA rilis terakhir vs commit terakhir per artefak) belum diputuskan; (4) verifikasi independen di luar CI sendiri baru berupa pembacaan baca-saja; rilis produksi berjalan terjadwal 6 jam atau dispatch, sehingga main hampir selalu lebih maju dari SHA yang berjalan. Konektor Vercel sesi ini tidak melihat proyek produksi sehingga rekaman Vercel tidak dapat dibaca. Tidak ada klaim deployment di luar yang tercatat di atas."
   },
   {
    "id": "E8",
@@ -600,6 +639,36 @@
    ],
    "owner": "Sol",
    "note": "Batas: yang diverifikasi adalah penolakan bentuk laporan (rusak, kosong, berisi galat), bukan kebenaran data advisory npm. Gerbang belum dijalankan terhadap npm audit nyata di sesi ini (jaringan)."
+  },
+  {
+   "id": "F1",
+   "pillar": "User Journey & Product Experience",
+   "criterion": "Task 44 — Full User Journey Acceptance",
+   "acceptance": "Inventarisasi rute dan peran dari kontrak backend dan matriks fitur yang berlaku; uji browser E2E pada aplikasi dan API nyata memakai identitas sintetis untuk perjalanan kritis pasien, dokter, perawat, laboratorium, dan admin sesuai kapabilitas yang benar-benar tersedia, dari onboarding atau login melalui navigasi, tindakan utama, penyelesaian, kembali, dan logout. Bukti CI mencakup RBAC positif dan negatif, navigasi tidak buntu, state loading atau error, serta viewport 390x844 dan 1440x900. Keterbatasan integrasi maupun peran yang belum tersedia tidak dianggap lulus.",
+   "status": "REPORTED",
+   "evidence": [
+    "scripts/qa/user-journey-e2e.mjs + .github/workflows/user-journey-acceptance.yml (CI check `user-journeys`): browser E2E pada aplikasi dan API nyata dengan identitas sintetis di 390x844 dan 1440x900 — journey api-rbac (revokasi logout, RBAC verifikator 3 arah, negatif eskalasi peran), pasien, dokter, pemilik (verifikasi dokter lewat UI), api-tak-tersedia, ketahanan (API lambat, API 500, tidak buntu, pemulihan). Dua run lokal berturut-turut 61 lulus 0 gagal; sabotase navigasi-buntu dan teks bocor gagal dengan nama langkah. Merge #2572, #2576.",
+    "Peran perawat dan laboratorium (backend #2614, UI + E2E #2616): hak akses minimum dan deny-by-default — peran tidak bisa dipilih sendiri (login meminta perawat/lab menjadi pasien), hanya owner memberi/mencabut peran dan penugasan per pasien, tanpa penugasan staf tidak melihat atau menulis apa pun, pencabutan berlaku seketika, semua perubahan diaudit. Bukti: server/uji/staffRbacHttp.uji.ts (HTTP nyata: anonim 401; pasien/dokter/calon staf 403 pada rute owner; deny tanpa efek samping; lintas pasien ditolak; pencabutan seketika; audit; 19 mutan gagal dengan nama), server/uji/staffStore.uji.ts, server/uji/staffAssignmentsSelfHttp.uji.ts, scripts/uji/lab-staff-capability.mts, tiga rute owner terdaftar di server/uji/routeAccessDecisions.uji.ts (174 rute), dan scripts/qa/user-journey-staff.mjs (browser nyata 390x844 dan 1440x900: owner memberi peran dan penugasan lewat UI; perawat dan lab hanya melihat pasien yang ditugaskan, aksi sesuai peran, intake, logout mencabut token; 51 lulus lokal, dijalankan pada server segar di user-journey-acceptance.yml).",
+    "Ketahanan lintas halaman dan peran (#2630): scripts/qa/user-journey-resilience.mjs — aplikasi + API nyata pada server segar, 390x844 dan 1440x900; per halaman kontrol positif, API lambat (1,5 dtk), API 500 dan pemulihan, tanpa teks bocor/overflow/galat tak tertangani; pasien (beranda, chatbot, pengaturan, profil, fitness hub, semua fitur), dokter terverifikasi (doctor review, tinjauan hasil lab), pemilik (panel owner), perawat (meja lab). CI user-journeys: 63 (e2e) + 51 (staf) + 40 (ketahanan) langkah lulus; dua kontrol negatif (QA_SABOTASE=bocor dan QA_SABOTASE=overflow) berjalan di CI dan masing-masing gagal pada langkah detektor di enam rute pasien mobile (beranda, chatbot, pengaturan, profil, fitness hub, semua fitur); runner berhenti pada kegagalan detektor pertama sehingga run negatif ini tidak membuktikan deteksi pada dokter, pemilik, perawat atau desktop; scripts/qa/user-journey-resilience.test.mjs (5 tes, 11 mutan) menjaga cakupan dan pemasangan alur kerja.",
+    "Penyelesaian tindakan nyata #2676, merged 2026-10-19 (2a73a4f2dadfe0afadba670a6fa77a5edf396584), tercakup main bfeeace7d84aee21ff967b66ed52290b69c51e6d: catatan harian pasien bertahan setelah reload dan persist debounced; dokter meninjau hasil lab melalui UI dengan status API reviewed lalu browser-back ke clinical hub; logout dokter/owner/perawat/lab mencabut bearer token pada kedua viewport. CI exact-head cf60dba5251756e6db891ad9280db0b1ee4dcc23: https://github.com/rizkyazhar486/Panacea/actions/runs/39194793622 (user-journeys SUCCESS), artefak user-journey-evidence = 72 utama + 57 staf + 40 ketahanan lulus, 0 gagal; dua kontrol negatif gagal terdeteksi. Bukti sesi sintetis, bukan OAuth produksi atau validasi pengguna. Status tetap REPORTED."
+   ],
+   "owner": "Vika (journey dan UI) / Insan (kontrak) / Sol dan Sonnet (uji E2E)",
+   "note": "REPORTED, bukan VERIFIED. Peran perawat dan laboratorium KINI tersedia dan teruji (#2614, #2616; lihat bukti) sehingga bagian itu tidak lagi menjadi pemblokir. Syarat yang TIDAK terpenuhi atau belum diputuskan pemilik: (1) peran kontributor tidak punya kapabilitas backend untuk diuji dan tidak dihitung lulus; (2) keadaan galat/lambat kini diuji pada 3 halaman asli + 10 halaman/peran tambahan (#2630) tetapi bukan setiap halaman produk; (3) login Google/OAuth nyata tidak diuji (journey memakai sesi sintetis); (4) A8/B7 tidak dihitung; (5) verifikasi identitas profesional perawat/lab adalah atestasi owner, bukan pemeriksaan izin; (6) klinisi masih membaca seluruh tenant (keputusan pemilik terpisah, docs/alpha/F1_NURSE_LAB_RBAC_PROPOSAL.md §2). Tanpa klaim validasi pengguna. Catatan sebelumnya yang dikoreksi: 'peran perawat dan laboratorium tidak ada di backend' tidak lagi benar sejak #2614."
+  },
+  {
+   "id": "F2",
+   "pillar": "User Journey & Product Experience",
+   "criterion": "Task 45 — UI/UX Optimization & Polishing Acceptance",
+   "acceptance": "Audit dan perbaiki halaman aktif yang masuk cakupan perjalanan kritis serta navigasi global dengan desain adaptif yang konsisten: tipografi, token warna PanaceaMed, hirarki visual, fokus dan keyboard, label semantik, kontras WCAG 2.2 AA, target sentuh sekurangnya 44px sesuai standar repo, responsivitas 390x844 dan desktop tanpa overflow, state kosong atau loading atau error, pembatalan atau pemulihan, dan reduced motion. Lampirkan inventaris halaman, hasil audit aksesibilitas otomatis ditambah pemeriksaan manual terarah, regresi screenshot lintas viewport dan tema, serta pengukuran performa yang metodologinya tercatat. Temuan kritis harus dituntaskan atau tetap berstatus belum VERIFIED; hindari klaim validasi pengguna yang tidak diuji.",
+   "status": "REPORTED",
+   "evidence": [
+    "scripts/qa/ux-audit.mjs + governance/UX_AUDIT_BASELINE.json (CI `ux-audit`, fail-closed tanpa baseline): overflow halaman 0, kontrol tanpa nama 0, target sentuh <44px mobile 0 (src/styles/touch-targets.css, #2568), animasi berjalan di bawah reduced-motion 0 (#2574); blok teks <24px 0 (panel Body Exposure 78px di 1440 diperbaiki dengan container query; ratchet 8 -> 0).",
+    "scripts/qa/kontras-wcag.mjs + governance/KONTRAS_BASELINE.json (#2570): kontras diukur dan tidak boleh naik dari baseline.",
+    "scripts/qa/theme-parity.mjs + governance/THEME_PARITY_BASELINE.json (#2573): paritas terang/gelap lintas halaman (teks sama 0 beda, tanpa layar kosong/overflow).",
+    "scripts/qa/axe-audit.mjs + scripts/qa/axe-ratchet.mjs + governance/AXE_BASELINE.json (#2593; CI `ux-audit`): axe-core 4.10.2 (WCAG 2.0/2.1/2.2 A+AA, color-contrast dikecualikan karena diukur terpisah) pada 9 halaman x 2 viewport x 2 tema. Menemukan dua cacat nyata (tablist berisi select; aria-label pada div generik) yang diperbaiki; hasil CI run 38923846391 job 117050244246: 36 pengukuran, 0 node serius/kritis, 8 hasil 'incomplete' (butuh tinjauan manual, tidak dianggap lulus). Logika pembanding diuji 9 kasus (positif, negatif, batas, fail-closed); dua mutasi menggagalkan uji bernama."
+   ],
+   "owner": "Vika (design authority) / Sonnet (frontend) / Sol (gate dan performance)",
+   "note": "REPORTED, bukan VERIFIED. Temuan kritis BELUM tuntas: 57 teks gagal kontras WCAG AA masih ada (baseline 62, CI 57; hijau merek #00BF63 di latar terang 2,4:1, label 8-11px abu/cyan, h2/summary kecil) dan 1349 elemen berlatar gradien/gambar tidak dapat diukur. Sudah ada: axe otomatis 0 serius/kritis, blok teks <24px 0, target sentuh mobile 0, reduced-motion 0, theme-parity 0 beda. Belum ada: pemeriksaan keyboard/fokus manual terarah, regresi screenshot lintas viewport dengan baseline gambar, 8 hasil axe 'incomplete' belum ditinjau, dan pengukuran performa bermetodologi (waktu muat hanya dicatat, belum digerbang). Tanpa klaim validasi pengguna."
   }
  ]
 }

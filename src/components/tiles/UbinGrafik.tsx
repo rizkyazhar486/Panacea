@@ -4,6 +4,7 @@ import { getWorkouts } from '../../lib/workoutStore'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { useStore } from '../../lib/store'
 import { ambilWidget } from '../../lib/homeWidgets'
+import { completeKcalByDay } from '../../domains/personal-health/engine/dailySummaryTotals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ubin berbentuk GRAFIK, bukan kalimat.
@@ -149,9 +150,8 @@ export function UbinGrafik() {
   }, [])
 
   const gizi = useMemo(() => {
-    const m = new Map<string, number>()
-    for (const f of state.foods ?? []) if (f?.date) m.set(f.date, (m.get(f.date) ?? 0) + (f.kcal ?? 0))
-    return tujuhHari(m)
+    // Hari yang ada catatan tanpa kalori sah tidak digambar sebagai total yang lebih kecil (lihat dailySummaryTotals).
+    return tujuhHari(completeKcalByDay(state.foods))
   }, [state.foods])
 
   // Denyut memakai 14 hari, bukan 7: ia bergerak pelan, dan tujuh titik terlalu

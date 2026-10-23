@@ -102,7 +102,13 @@ export function HumanAnatomyLayerNavigator() {
           <div className="mt-3 flex flex-wrap gap-1.5">
             {active.terms.map((term) => <span key={term} className="rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-[8px] font-bold text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">{term}</span>)}
           </div>
-          <a href="#body-physiology" className="mt-4 inline-flex rounded-full bg-neutral-950 px-3 py-2 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950">Bridge to physiology ↓</a>
+          <button
+            type="button"
+            onClick={() => document.getElementById('body-physiology')?.scrollIntoView({ behavior: 'smooth' })}
+            className="mt-4 inline-flex rounded-full bg-neutral-950 px-3 py-2 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950"
+          >
+            Bridge to physiology ↓
+          </button>
         </aside>
 
         <div className="min-w-0">
