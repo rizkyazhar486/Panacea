@@ -907,19 +907,21 @@
       "done": "Workflow and env template committed; workflow fails closed with a named message when credentials are absent.",
       "checks": [
         {
-          "cmd": "ls .github/workflows",
+          "cmd": "node --test scripts/qa/staging-credentials.test.mjs",
           "files": [
-            ".github/workflows/vercel-prebuilt-production.yml",
-            "render.yaml"
+            ".github/workflows/staging-gate.yml",
+            "docs/governance/staging.env.example",
+            "scripts/qa/staging-credentials.mjs",
+            "scripts/qa/staging-credentials.test.mjs"
           ]
         }
       ],
       "negativeControl": "Running without secrets exits non-zero with 'staging credentials absent'.",
       "evidence": "Workflow file + failing-closed run.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Provisioning itself is EXT-E7-B."
+      "status": "PASS",
+      "statusSha": "da442f22d862d9dcc9c212e097b31ff07a59a8f1",
+      "statusNote": "ENG-E7-04 engineering fail-closed gate only (NOT healthy staging or deployment): PR #2720 head 67b73539c16f984b3f524a055d114f88187b8dd2 merged to main da442f22d862d9dcc9c212e097b31ff07a59a8f1 (2026-10-23). Exact PR head Validate changes run 39977009557/job validate 120494128516 succeeded, including all 9 staging-credentials tests and the negative CLI fixture. Stabilization Acceptance 39977009386 (server-acceptance + full-acceptance) and Body 3D Render Acceptance 39977009401 also succeeded at PR head. At exact merged main da442f22, manually dispatched staging gate run 39979087541 proved fail-closed: credentials job 120501323312 failed exit 1 and explicitly identified STAGING_URL, STAGING_API_URL, STAGING_DEPLOY_TOKEN as absent; smoke job 120501666935 skipped. This failure was intentional and is evidence for this criterion, not a passed live staging smoke. EXT-E7-B remains unprovisioned/deferred; no credentials, staging deployment, runtime smoke, production acceptance, or patient-use verification claimed."
     },
     {
       "id": "ENG-C6-01",
