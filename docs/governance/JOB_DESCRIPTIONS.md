@@ -1,7 +1,8 @@
 # Job Descriptions — AI-first operating model
 
-Panaceamed is built **primarily by AI agents**. Humans are not in the delivery path for routine
-work; they hold the authority AI must not fake. This page extends the team function map
+Panaceamed is built **primarily by AI agents**. Humans are not in the delivery path. The authority
+AI must not fake is held by named roles in a *final stage (H3)* that begins only when such a person
+exists; until then those decisions are deferred, not asked. This page extends the team function map
 (Oct 10, 2026: P1–P6, X1–X7, B1–B8, C1–C6, O1–O3) by moving execution of X and B functions to AI
 lanes, while every decision right stays with the named human.
 
@@ -22,10 +23,10 @@ Rules for every AI lane:
   terms). AI may not grant rights, declare authorship, or approve a policy. Unresolved rights restrict
   the asset; they never become an invented grant.
 
-## Human roles (gate holders)
+## Human roles (final-stage gate holders — not engaged now)
 
-Ask each person only the questions in [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Expected time:
-minutes per gate, not ongoing work.
+These roles are activated at H3 and asked only the questions in [EXTERNAL_GATES.md](EXTERNAL_GATES.md).
+No one is asked to attest, sign or QA anything in the working phase.
 
 | Role (team map) | Decides | Gates | Does not need to |
 |---|---|---|---|

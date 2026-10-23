@@ -31,4 +31,9 @@ const fails = (d: unknown, pattern: RegExp, why: string, opts: Record<string, un
 { const d = clone(); d.externalGates[0].status = 'DECIDED'; fails(d, /DECIDED needs decisionRef/, 'decision without a record') }
 { const d = clone(); d.criteria[0].negativeControl = ''; fails(d, /missing negativeControl/, 'criterion without negative control') }
 
-console.log(`acceptance-v2: ${real.summary.engineeringTotal} engineering criteria runnable by AI, ${real.summary.externalOpen} human gates kept separate, 45/45 legacy mapped`)
+{ const d = clone(); d.externalGates[0].status = 'BLOCKED_EXTERNAL'; fails(d, /status BLOCKED_EXTERNAL not allowed/, 'old blocking status is no longer a working state') }
+{ const d = clone(); delete d.externalGates[1].activatesWhen; fails(d, /deferred gate needs activatesWhen/, 'deferred gate without activation condition') }
+{ const d = clone(); d.statuses.push('DEFERRED_FINAL_STAGE'); fails(d, /must not include DEFERRED_FINAL_STAGE/, 'deferred state inside engineering denominator') }
+assert.ok(doc.externalGates.every((g: { status: string }) => g.status === 'DEFERRED_FINAL_STAGE'), 'no human gate is requested now: all deferred to the final stage')
+
+console.log(`acceptance-v2: ${real.summary.engineeringTotal} engineering criteria runnable by AI, ${real.summary.externalDeferred} human gates deferred to the final stage and kept separate, 45/45 legacy mapped`)
