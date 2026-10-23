@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import assert from 'node:assert/strict'
 
-const page = await readFile('src/pages/HealthProfile.tsx', 'utf8')
+const page = await readFile('src/pages/bodyhub/HealthProfile.tsx', 'utf8')
 const surfaces = JSON.parse(await readFile('data/feature-factory/surfaces.json', 'utf8')) as {
   surfaces: Array<{ domainId: string; route: string; surface: string }>
 }

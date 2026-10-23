@@ -27,7 +27,7 @@ const tolak = async () => { throw new Error('no active daily check-in') }
 const idx = readFileSync('server/src/index.ts', 'utf8')
 const rute = idx.slice(idx.indexOf("app.post('/api/care/reports'"), idx.indexOf('\napp.', idx.indexOf("app.post('/api/care/reports'") + 5))
 assert.match(rute, /find\(\(l\) => l\.clientId === laporan\.clientId\)[\s\S]*if \(sama\) \{ res\.json\(sama\); return \}[\s\S]*addCareReport/, 'rute laporan tidak idempoten — antrean offline bisa menggandakan laporan')
-const ui = readFileSync('src/components/CekHarian.tsx', 'utf8')
+const ui = readFileSync('src/components/clinical/CekHarian.tsx', 'utf8')
 assert.match(ui, /addEventListener\('online'/, 'antrean tidak dikuras saat kembali online')
 assert.match(ui, /not yet sent to your doctor/, 'jawaban yang masih diantre ditampilkan seolah sudah terkirim')
 assert.match(ui, /sendOrQueueEncryptedCareReport/, 'production check-in tidak memakai secure encrypted outbox')

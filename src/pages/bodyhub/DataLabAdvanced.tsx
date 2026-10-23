@@ -1,0 +1,352 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
+import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
+import { IconStethoscope } from '../../components/icons'
+import { CfpbComplaintRoutingLab } from '../../components/finance/CfpbComplaintRoutingLab'
+import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { getDemoTersimpan } from '../../lib/profile'
+import { hitungPhenoAgeDariTeks, rasioOmega, periksaSuplemen, proyeksiTren, PHENOAGE_KOLOM, type KolomPhenoAge, type TeksPhenoAge, type TeksSuplemen } from '../../domains/data-lab'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Data Lab Advanced — local data-processing tools and transparent research workspaces in one
+// page: a blood-panel linear-regression trend forecaster, a glucose-
+// variability calculator (CGM-style), the published PhenoAge biological-age
+// formula, an omega-6:3 ratio calculator, a Shannon Diversity Index on your
+// tracked plants (reuses Nutrition Toolkit's weekly plant list), a
+// multi-supplement pharmacokinetic curve, and a client-side AES-GCM
+// encrypted journal vault. Pure client-side math + Web Crypto API, no
+// external API, no data ever leaves the browser.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type Tab = 'blood-trend' | 'glucose' | 'phenoage' | 'omega' | 'microbiome' | 'supplements' | 'vault' | 'cfpb'
+
+function BloodTrendForecaster() {
+  // Mulai kosong: contoh karangan (90, 92, 95) dulu langsung menampilkan proyeksi lima tahun seolah data pengguna.
+  const [values, setValues] = useState(['', '', '', '', ''])
+  const r = useMemo(() => proyeksiTren(values), [values])
+
+  return (
+    <Card className="!p-5">
+      <Prosa kelas="text-[13px] text-neutral-500">Enter a biomarker's values from the last few years (e.g. fasting glucose, mg/dL) — linear regression projects its trend five years ahead if nothing changes.</Prosa>
+      <div className="mt-3 grid grid-cols-5 gap-1.5">
+        {values.map((v, i) => (
+          <Field key={i} label={`Yr ${i + 1}`}>
+            <input className={inputClass} type="number" inputMode="decimal" value={v} onChange={(e) => setValues((vs) => vs.map((x, j) => (j === i ? e.target.value : x)))} />
+          </Field>
+        ))}
+      </div>
+      {!r.ok && (
+        <div role="alert" className="mt-3 rounded-xl bg-neutral-100 p-3">
+          <div className="text-[12px] font-bold text-neutral-600">No projection yet</div>
+          <p className="mt-1 text-[11px] text-neutral-500">{r.alasan}</p>
+        </div>
+      )}
+      {r.ok && (
+        <div className="mt-3 rounded-xl bg-brand/10 p-3">
+          <div className="text-[12px] font-bold text-neutral-500">Projected next 5 years after Yr {r.data.indeksTerakhir + 1}</div>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {r.data.proyeksi.map((p) => <Badge key={p.tahunKe} tone={r.data.kemiringanPerTahun > 0 ? 'low' : 'brand'}>Yr+{p.tahunKe}: {p.nilai ?? 'not meaningful'}</Badge>)}
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">Trend: {r.data.kemiringanPerTahun > 0 ? '+' : ''}{r.data.kemiringanPerTahun.toFixed(2)}/year from {r.data.n} values; scatter around the line ±{r.data.sisaSd.toFixed(1)} — a simple straight-line projection, not a physiological model; real biomarkers rarely move perfectly linearly.</p>
+          <BatasKlaimKesehatan permukaan="lab.blood-trend" />
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function GlucoseVariability() {
+  const [text, setText] = useState('')
+  const values = useMemo(() => text.split(/[,\s]+/).map(Number).filter((n) => !isNaN(n) && n > 0), [text])
+  const stats = useMemo(() => {
+    if (values.length < 3) return null
+    const mean = values.reduce((a, b) => a + b, 0) / values.length
+    const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length
+    const sd = Math.sqrt(variance)
+    const cv = (sd / mean) * 100
+    return { mean: Math.round(mean), sd: Math.round(sd * 10) / 10, cv: Math.round(cv * 10) / 10, n: values.length }
+  }, [values])
+  return (
+    <Card className="!p-5">
+      <p className="text-[13px] text-neutral-500">Paste a series of glucose readings (from a CGM export, comma or space separated, mg/dL) to calculate glucose variability.</p>
+      <textarea className={`${inputClass} mt-2 min-h-24`} placeholder="90, 105, 88, 140, 95, 102…" value={text} onChange={(e) => setText(e.target.value)} />
+      {stats && (
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-xl bg-brand/10 p-3"><div className="text-lg font-black text-brand-dark">{stats.mean}</div><div className="text-[10px] text-neutral-500">Mean (mg/dL)</div></div>
+          <div className="rounded-xl bg-brand/10 p-3"><div className="text-lg font-black text-brand-dark">{stats.sd}</div><div className="text-[10px] text-neutral-500">SD</div></div>
+          <div className="rounded-xl bg-brand/10 p-3">
+            <div className="text-lg font-black text-brand-dark">{stats.cv}%</div>
+            <div className="text-[10px] text-neutral-500">CV</div>
+            <Badge tone={stats.cv < 36 ? 'brand' : 'low'}>{stats.cv < 36 ? 'Typical' : 'High variability'}</Badge>
+          </div>
+        </div>
+      )}
+      <p className="mt-2 text-[11px] text-neutral-500">Coefficient of variation (CV) &lt;36% is the commonly-cited threshold for "stable" glucose in CGM research (Monnier et al.) — not a diagnostic cutoff.</p>
+    </Card>
+  )
+}
+
+function PhenoAgeCalc() {
+  const [t, setT] = useState<TeksPhenoAge>(() => {
+    const usia = getDemoTersimpan().age
+    return { usia: Number.isFinite(usia) ? String(usia) : '', albuminGL: '', kreatininUmolL: '', glukosaMmolL: '', crpMgL: '', limfositPersen: '', mcvFL: '', rdwPersen: '', alpUL: '', wbcRibu: '' }
+  })
+  const set = (k: KolomPhenoAge) => (e: React.ChangeEvent<HTMLInputElement>) => setT((s) => ({ ...s, [k]: e.target.value }))
+  // Satu jalur: validasi + mesin kanonik lib/longevity.phenoAge (koefisien terbitan Levine 2018, satuan dan rentang diperiksa).
+  const hasil = useMemo(() => hitungPhenoAgeDariTeks(t), [t])
+  const langkah: Partial<Record<KolomPhenoAge, string>> = { glukosaMmolL: '0.1', crpMgL: '0.1', rdwPersen: '0.1', wbcRibu: '0.1' }
+
+  return (
+    <Card className="!p-5">
+      <Prosa kelas="text-[13px] text-neutral-500">Rumus PhenoAge sebagaimana diterbitkan (Levine dkk. 2018) dari 9 penanda darah baku + umur kronologis. Isi nilai dari pemeriksaan terbaru; kolom kosong tidak dihitung sebagai nol.</Prosa>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        {PHENOAGE_KOLOM.map(({ key, label }) => (
+          <Field key={key} label={label}><input className={inputClass} type="number" inputMode="decimal" step={langkah[key] ?? '1'} value={t[key]} onChange={set(key)} /></Field>
+        ))}
+      </div>
+      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+        {hasil.ok ? (
+          <>
+            <div className="text-3xl font-black text-brand-dark">{hasil.data.phenoAge}</div>
+            <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {t.usia})</div>
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-black text-neutral-500">No result yet</div>
+            <div role="alert" className="mt-1 text-[11px] text-neutral-500">{hasil.alasan}</div>
+          </>
+        )}
+        <BatasKlaimKesehatan permukaan="lab.phenoage" />
+      </div>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Levine ME dkk., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Penerapan koefisien terbitannya sebaik yang kami mampu; bukan pengganti pemeriksaan laboratorium klinis tervalidasi, dan sebaiknya diperiksa silang dengan kalkulator PhenoAge lain.</Prosa>
+    </Card>
+  )
+}
+
+function OmegaRatio() {
+  const [o6, setO6] = useState('')
+  const [o3, setO3] = useState('')
+  const r = rasioOmega(o6, o3)
+  return (
+    <Card className="!p-5">
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Omega-6 intake (mg/day, est.)"><input className={inputClass} type="number" inputMode="decimal" value={o6} onChange={(e) => setO6(e.target.value)} /></Field>
+        <Field label="Omega-3 intake (mg/day, est.)"><input className={inputClass} type="number" inputMode="decimal" value={o3} onChange={(e) => setO3(e.target.value)} /></Field>
+      </div>
+      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+        {r.ok ? (
+          <>
+            <div className="text-2xl font-black text-brand-dark">{r.data.ratio.toFixed(1)} : 1</div>
+            <Badge tone={r.data.nada}>{r.data.pita}</Badge>
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-black text-neutral-500">No ratio yet</div>
+            <div role="alert" className="mt-1 text-[11px] text-neutral-500">{o6 === '' && o3 === '' ? 'Enter both intakes.' : r.alasan}</div>
+          </>
+        )}
+      </div>
+      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Western diets often sit at an omega-6:3 ratio of 15:1-20:1; traditional diets are estimated closer to 1:1-4:1. A lower ratio is thought to favor a less pro-inflammatory eicosanoid balance — this is an active area of research, not an agreed-upon clinical target.</Prosa>
+    </Card>
+  )
+}
+
+const PLANTS_KEY = 'pmd_plant_diversity_v1'
+function MicrobiomeDiversity() {
+  const [plants, setPlants] = useState<string[]>([])
+  useEffect(() => {
+    try { const s = JSON.parse(localStorage.getItem(PLANTS_KEY) || '{}'); setPlants(s.list || []) } catch { /* ignore */ }
+  }, [])
+  // Shannon Diversity Index treating each unique plant as equally weighted
+  // (we don't track quantity eaten) — H = -sum(p_i * ln(p_i)), p_i = 1/n each.
+  const shannon = useMemo(() => {
+    const n = plants.length
+    if (n === 0) return 0
+    const p = 1 / n
+    return -(n * (p * Math.log(p)))
+  }, [plants])
+  const maxShannon = plants.length > 0 ? Math.log(plants.length) : 0
+
+  return (
+    <Card className="!p-5">
+      <Prosa kelas="text-[13px] text-neutral-500">Diambil dari daftar Keragaman Tanaman Anda pada Nutrition Longevity Toolkit pekan ini, lalu dihitung Indeks Keragaman Shannon yang sesungguhnya (ukuran baku kemerataan/kekayaan dalam ekologi, di sini diterapkan pada pola makan Anda).</Prosa>
+      <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
+        <div className="text-2xl font-black text-brand-dark">{shannon.toFixed(2)}</div>
+        <div className="text-[11px] text-neutral-500">Shannon Index · {plants.length} unique plants logged this week</div>
+      </div>
+      {plants.length === 0 && <p className="mt-2 text-center text-[12px] text-neutral-500">Nothing logged yet — add plants in the Nutrition Longevity Toolkit's "Plant Diversity" tab first.</p>}
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Kekayaan yang lebih tinggi (makin banyak jenis tanaman berbeda) menaikkan indeksnya — ini ukuran pengganti yang dipakai sebagian peneliti mikrobiom untuk keragaman serat/polifenol, bukan pengukuran langsung mikrobiom usus Anda (yang memerlukan pengurutan dari tinja).</Prosa>
+    </Card>
+  )
+}
+
+interface Supp { name: string; doseMg: number; timeHour: number; halfLifeH: number; stimulant: boolean }
+function SupplementCombiner() {
+  const [supps, setSupps] = useState<Supp[]>([{ name: 'Caffeine', doseMg: 200, timeHour: 8, halfLifeH: 5, stimulant: true }])
+  const [name, setName] = useState('')
+  const [dose, setDose] = useState('')
+  const [time, setTime] = useState('')
+  const [halfLife, setHalfLife] = useState('')
+  const [masalah, setMasalah] = useState<Partial<Record<keyof TeksSuplemen, string>>>({})
+  const [stimulant, setStimulant] = useState(false)
+
+  const add = () => {
+    const r = periksaSuplemen({ nama: name, doseMg: dose, jam: time, paruhJam: halfLife })
+    if (!r.ok) { setMasalah(r.masalah); return }
+    setMasalah({})
+    setSupps((s) => [...s, { ...r.nilai, stimulant }])
+    setName(''); setDose(''); setTime(''); setHalfLife('')
+  }
+  const remove = (i: number) => setSupps((s) => s.filter((_, x) => x !== i))
+
+  const curve = useMemo(() => {
+    return Array.from({ length: 25 }, (_, h) => {
+      let total = 0
+      for (const s of supps) {
+        if (h < s.timeHour) continue
+        const elapsed = h - s.timeHour
+        total += s.doseMg * Math.pow(0.5, elapsed / s.halfLifeH)
+      }
+      return total
+    })
+  }, [supps])
+  const maxVal = Math.max(...curve, 1)
+  const stimulantHours = supps.filter((s) => s.stimulant).map((s) => s.timeHour)
+  const overlapWarning = stimulantHours.length >= 2 && Math.max(...stimulantHours) - Math.min(...stimulantHours) < 6
+
+  return (
+    <Card className="!p-5">
+      <p className="text-[13px] text-neutral-500">Model each supplement/medication's approximate blood-concentration curve over 24h using its dose and half-life.</p>
+      <div className="mt-3 grid grid-cols-4 gap-1.5">
+        <input className={inputClass} placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <input className={inputClass} type="number" placeholder="mg" inputMode="decimal" value={dose} onChange={(e) => setDose(e.target.value)} />
+        <input className={inputClass} type="number" placeholder="hr taken" inputMode="decimal" value={time} onChange={(e) => setTime(e.target.value)} />
+        <input className={inputClass} type="number" placeholder="half-life h" inputMode="decimal" value={halfLife} onChange={(e) => setHalfLife(e.target.value)} />
+      </div>
+      {Object.values(masalah).map((m) => <div key={m} role="alert" className="mt-1 text-[11px] font-bold text-red-600">{m}</div>)}
+      <label className="mt-1.5 flex items-center gap-2 text-[12px] text-neutral-500">
+        <input type="checkbox" checked={stimulant} onChange={(e) => setStimulant(e.target.checked)} className="h-4 w-4 accent-brand" /> This is a stimulant
+      </label>
+      <button onClick={add} className="mt-2 w-full rounded-xl bg-brand py-2 text-sm font-bold text-white">Add</button>
+
+      <svg viewBox="0 0 300 100" className="mt-4 w-full">
+        <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={curve.map((v, h) => `${h * 12},${100 - (v / maxVal) * 90}`).join(' ')} />
+      </svg>
+      <p className="text-center text-[11px] text-neutral-500">24-hour combined concentration curve (relative units)</p>
+
+      {overlapWarning && <div className="mt-2 rounded-xl bg-amber-50 p-3 text-[12px] text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">⚠️ Multiple stimulants taken within 6 hours of each other — overlapping peaks may compound effects.</div>}
+
+      <div className="mt-3 space-y-1.5">
+        {supps.map((s, i) => (
+          <div key={i} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
+            <span>{s.name} · {s.doseMg}mg @ hr{s.timeHour} · t½{s.halfLifeH}h {s.stimulant && '⚡'}</span>
+            <button onClick={() => remove(i)} className="text-red-500">✕</button>
+          </div>
+        ))}
+      </div>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">A simplified single-compartment exponential-decay model — real pharmacokinetics involve an absorption phase, metabolism (CYP450), and person-to-person variation not captured here. Not medical advice; check real interactions with a pharmacist.</Prosa>
+    </Card>
+  )
+}
+
+const VAULT_KEY = 'pmd_encrypted_vault_v1'
+async function deriveKey(passphrase: string, salt: BufferSource): Promise<CryptoKey> {
+  const enc = new TextEncoder()
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey'])
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt'])
+}
+function buf2b64(buf: ArrayBufferLike): string { return btoa(String.fromCharCode(...new Uint8Array(buf))) }
+function b642buf(b64: string): ArrayBuffer { return new Uint8Array([...atob(b64)].map((c) => c.charCodeAt(0))).buffer as ArrayBuffer }
+
+function EncryptedVault() {
+  const [passphrase, setPassphrase] = useState('')
+  const [text, setText] = useState('')
+  const [status, setStatus] = useState('')
+  const [decrypted, setDecrypted] = useState<string | null>(null)
+
+  const encrypt = async () => {
+    if (!passphrase || !text.trim()) { setStatus('Enter a passphrase and some text.'); return }
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+    const key = await deriveKey(passphrase, salt)
+    const enc = new TextEncoder()
+    const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(text))
+    const payload = { salt: buf2b64(salt.buffer), iv: buf2b64(iv.buffer), data: buf2b64(cipher) }
+    try { localStorage.setItem(VAULT_KEY, JSON.stringify(payload)) } catch { /* ignore */ }
+    setStatus('Encrypted and saved locally.')
+    setText(''); setDecrypted(null)
+  }
+
+  const decrypt = async () => {
+    setStatus(''); setDecrypted(null)
+    try {
+      const raw = localStorage.getItem(VAULT_KEY)
+      if (!raw) { setStatus('Nothing saved yet.'); return }
+      const payload = JSON.parse(raw)
+      const salt = b642buf(payload.salt), iv = b642buf(payload.iv), data = b642buf(payload.data)
+      const key = await deriveKey(passphrase, salt)
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data)
+      setDecrypted(new TextDecoder().decode(plain))
+    } catch {
+      setStatus('Wrong passphrase, or no valid entry saved.')
+    }
+  }
+
+  return (
+    <Card className="!p-5">
+      <p className="text-[13px] text-neutral-500">A real AES-256-GCM encrypted note, key-derived from your passphrase via PBKDF2 (Web Crypto API) — the plaintext is never stored, only the ciphertext. <b>There is no password recovery</b> — if you forget the passphrase, the entry is unrecoverable, by design.</p>
+      <Field label="Passphrase"><input className={`${inputClass} mt-1`} type="password" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} /></Field>
+      <Field label="Note to encrypt"><textarea className={`${inputClass} mt-1 min-h-20`} value={text} onChange={(e) => setText(e.target.value)} /></Field>
+      <div className="mt-2 flex gap-2">
+        <button onClick={encrypt} className="flex-1 rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Encrypt & save</button>
+        <button onClick={decrypt} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 dark:bg-white/10">Decrypt saved</button>
+      </div>
+      {status && <p className="mt-2 text-[12px] text-neutral-500">{status}</p>}
+      {decrypted !== null && <div className="mt-2 rounded-xl bg-brand/10 p-3 text-[13px] whitespace-pre-wrap">{decrypted}</div>}
+    </Card>
+  )
+}
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'blood-trend', label: 'Blood Panel Forecaster' },
+  { id: 'glucose', label: 'Glucose Variability' },
+  { id: 'phenoage', label: 'PhenoAge' },
+  { id: 'omega', label: 'Omega-6:3 Ratio' },
+  { id: 'microbiome', label: 'Microbiome Diversity' },
+  { id: 'supplements', label: 'Supplement Curves' },
+  { id: 'vault', label: 'Encrypted Vault' },
+  { id: 'cfpb', label: 'CFPB Complaints' },
+]
+
+export function DataLabAdvanced() {
+  const [tab, setTab] = useState<Tab>('blood-trend')
+  return (
+    <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <Card className="!p-5">
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Data Lab Advanced" subtitle="Local health tools and transparent research workspaces" />
+        <div className="mt-3 flex flex-wrap gap-2">
+          {TABS.map((t) => (
+            <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
+          ))}
+        </div>
+      </Card>
+
+      {tab === 'blood-trend' && <BloodTrendForecaster />}
+      {tab === 'glucose' && <GlucoseVariability />}
+      {tab === 'phenoage' && <PhenoAgeCalc />}
+      {tab === 'omega' && <OmegaRatio />}
+      {tab === 'microbiome' && <MicrobiomeDiversity />}
+      {tab === 'supplements' && <SupplementCombiner />}
+      {tab === 'vault' && <EncryptedVault />}
+      {tab === 'cfpb' && <CfpbComplaintRoutingLab />}
+
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
+        All computation happens locally in your browser — no imported file, blood value, complaint,
+        or note here is sent to a server. Educational and research tools, not diagnostic, legal,
+        lending, or regulatory decisions.
+      </div>
+    </div>
+  )
+}
+
+export default DataLabAdvanced

@@ -24,7 +24,7 @@ assert.deepEqual(validateGripKg(NaN), { ok: false, reason: 'grip strength is req
 assert.equal(validateGripKg('30' as unknown as number).ok, false)
 assert.deepEqual([ZONE2_AGE_YEARS.min, ZONE2_AGE_YEARS.max, GRIP_KG.min, GRIP_KG.max], [10, 100, 1, 100])
 
-const page = readFileSync(new URL('../../src/pages/MovementToolkit.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/fitness/MovementToolkit.tsx', import.meta.url), 'utf8')
 const kode = page.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')
 assert.ok(/zone2HeartRate\(parseNumberField\(ageText\)\)/.test(kode) && /validateGripKg\(parseNumberField\(kgText\)\)/.test(kode), 'halaman tidak memakai mesin domain')
 assert.ok(!/useState\(30\)/.test(kode) && !/getDemo\(\)/.test(kode) && !/\bgetDemo\s*\(/.test(kode), 'nilai awal 30 atau getDemo() kembali')

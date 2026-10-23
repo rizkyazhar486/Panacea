@@ -4,6 +4,7 @@ import { kunciTanggal } from '../../lib/ramalan'
 import { getWorkouts } from '../../lib/workoutStore'
 import { catatLatihanTangan, sesiTangan } from '../../lib/latihanManual'
 import { TrainingAnalyticsPanel } from '../TrainingAnalyticsPanel'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan latihan dengan tangan — bentuknya sengaja SAMA dengan catatan harian.
@@ -60,9 +61,14 @@ export function CatatanLatihan() {
     const srpePerTanggal = new Map<string, number>()
     const sesiDenganRpePerTanggal = new Map<string, number>()
     const sesiBerdurasiPerTanggal = new Map<string, number>()
+    const durasiDiketahuiPerTanggal = new Map<string, number>()
+    const tanpaDurasiPerTanggal = new Map<string, number>()
     for (const x of w) {
       const kunci = kunciTanggal(new Date(x.mulai))
-      const aman = Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0
+      const detik = workoutDurationSeconds(x)
+      const cakupan = detik === null ? tanpaDurasiPerTanggal : durasiDiketahuiPerTanggal
+      cakupan.set(kunci, (cakupan.get(kunci) ?? 0) + 1)
+      const aman = detik ?? 0
       detikPerTanggal.set(kunci, (detikPerTanggal.get(kunci) ?? 0) + aman)
 
       if (aman > 0) {
@@ -89,8 +95,9 @@ export function CatatanLatihan() {
     const terbaruRpe = terbaru && typeof terbaru.rpe === 'number' && Number.isFinite(terbaru.rpe) && terbaru.rpe >= 1 && terbaru.rpe <= 10
       ? terbaru.rpe
       : null
-    const terbaruSrpe = terbaru && terbaruRpe !== null && Number.isFinite(terbaru.durasi) && terbaru.durasi > 0
-      ? Math.round((terbaru.durasi / 60) * terbaruRpe)
+    const terbaruDetik = workoutDurationSeconds(terbaru)
+    const terbaruSrpe = terbaruDetik !== null && terbaruDetik > 0 && terbaruRpe !== null
+      ? Math.round((terbaruDetik / 60) * terbaruRpe)
       : null
 
     const recoveryValid = terbaru?.pemulihan
@@ -134,6 +141,7 @@ export function CatatanLatihan() {
       .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
       .slice(0, 5)
       .map((x) => {
+        const detik = workoutDurationSeconds(x)
         const paceDetik = typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0 ? Math.round(x.paceSec) : null
         const pace = paceDetik !== null
           ? `${Math.floor(paceDetik / 60)}:${String(paceDetik % 60).padStart(2, '0')}`
@@ -142,7 +150,7 @@ export function CatatanLatihan() {
           id: x.id,
           nama: typeof x.nama === 'string' && x.nama.trim() ? x.nama.trim() : 'Movement session',
           tanggal: new Date(x.mulai).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          menit: Number.isFinite(x.durasi) && x.durasi > 0 ? Math.round(x.durasi / 60) : null,
+          menit: detik === null ? null : Math.round(detik / 60),
           jarakKm: typeof x.jarakKm === 'number' && Number.isFinite(x.jarakKm) && x.jarakKm > 0 ? x.jarakKm : null,
           pace,
           speed: typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0 ? x.kecepatanKmh : null,
@@ -170,11 +178,12 @@ export function CatatanLatihan() {
           .filter((x) => namaAktivitas(x.nama).toLocaleLowerCase() === kunciAktivitas)
           .slice(0, 3)
           .map((x) => {
+            const detik = workoutDurationSeconds(x)
             const paceDetik = typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0 ? Math.round(x.paceSec) : null
             return {
               id: x.id,
               tanggal: new Date(x.mulai).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-              menit: Number.isFinite(x.durasi) && x.durasi > 0 ? Math.round(x.durasi / 60) : null,
+              menit: detik === null ? null : Math.round(detik / 60),
               jarakKm: typeof x.jarakKm === 'number' && Number.isFinite(x.jarakKm) && x.jarakKm > 0 ? x.jarakKm : null,
               pace: paceDetik !== null ? `${Math.floor(paceDetik / 60)}:${String(paceDetik % 60).padStart(2, '0')}` : null,
               speed: typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0 ? x.kecepatanKmh : null,
@@ -195,6 +204,8 @@ export function CatatanLatihan() {
         kunci,
         label: d.toLocaleDateString('en-US', { weekday: 'short' }),
         menit: Math.round((detikPerTanggal.get(kunci) ?? 0) / 60),
+        diketahui: durasiDiketahuiPerTanggal.get(kunci) ?? 0,
+        tanpaDurasi: tanpaDurasiPerTanggal.get(kunci) ?? 0,
       }
     })
     const maxMenit7 = Math.max(1, ...tren.map((x) => x.menit))
@@ -207,6 +218,8 @@ export function CatatanLatihan() {
       let srpeBlok = 0
       let sesiDenganRpe = 0
       let sesiBerdurasi = 0
+      let diketahui = 0
+      let tanpaDurasi = 0
       let awal = ''
       let akhir = ''
 
@@ -220,6 +233,8 @@ export function CatatanLatihan() {
         srpeBlok += srpePerTanggal.get(kunci) ?? 0
         sesiDenganRpe += sesiDenganRpePerTanggal.get(kunci) ?? 0
         sesiBerdurasi += sesiBerdurasiPerTanggal.get(kunci) ?? 0
+        diketahui += durasiDiketahuiPerTanggal.get(kunci) ?? 0
+        tanpaDurasi += tanpaDurasiPerTanggal.get(kunci) ?? 0
         if (offset === mulaiOffset) awal = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
         if (offset === akhirOffset) akhir = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       }
@@ -231,6 +246,8 @@ export function CatatanLatihan() {
         srpe: Math.round(srpeBlok),
         sesiDenganRpe,
         sesiBerdurasi,
+        diketahui,
+        tanpaDurasi,
       }
     })
     const maxMenit28 = Math.max(1, ...blok28.map((x) => x.menit))
@@ -240,8 +257,10 @@ export function CatatanLatihan() {
       total: w.length,
       tangan: w.filter((x) => sesiTangan(x.id)).length,
       hari: sesiTanggal.length,
-      menit: Math.round(detikTanggal / 60),
+      menit: (durasiDiketahuiPerTanggal.get(tanggal) ?? 0) === 0 && sesiTanggal.length > 0 ? null : Math.round(detikTanggal / 60),
+      tanpaDurasiHari: tanpaDurasiPerTanggal.get(tanggal) ?? 0,
       terbaru,
+      terbaruDetik,
       terbaruHr: hrSpark,
       hrMinSpark,
       hrMaxSpark,
@@ -266,7 +285,8 @@ export function CatatanLatihan() {
       blok28,
       maxMenit28,
       maxSrpe28,
-      menit28: blok28.reduce((total, x) => total + x.menit, 0),
+      menit28: blok28.every(x => x.diketahui === 0) && blok28.some(x => x.tanpaDurasi > 0) ? null : blok28.reduce((total, x) => total + x.menit, 0),
+      tanpaDurasi28: blok28.reduce((total, x) => total + x.tanpaDurasi, 0),
       hariAktif28: blok28.reduce((total, x) => total + x.hariAktif, 0),
       srpe28: blok28.reduce((total, x) => total + x.srpe, 0),
       sesiDenganRpe28: blok28.reduce((total, x) => total + x.sesiDenganRpe, 0),
@@ -315,14 +335,16 @@ export function CatatanLatihan() {
         </div>
         <div className="rounded-2xl bg-neutral-100/80 p-3 dark:bg-white/10">
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Logged time</div>
-          <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{ringkas.menit}<span className="ml-1 text-xs font-bold text-neutral-500">min</span></div>
+          <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{ringkas.menit ?? '—'}<span className="ml-1 text-xs font-bold text-neutral-500">min</span></div>
         </div>
       </div>
 
       <p className="t-kecil mt-2 leading-snug text-neutral-600 dark:text-neutral-300">
         {ringkas.hari === 0
           ? `No training logged ${untukKemarin ? 'yesterday' : 'today'} yet.`
-          : `${ringkas.hari} session${ringkas.hari === 1 ? '' : 's'} logged ${untukKemarin ? 'yesterday' : 'today'} across ${ringkas.menit} minute${ringkas.menit === 1 ? '' : 's'}.`}
+          : ringkas.menit === null
+            ? `${ringkas.hari} session${ringkas.hari === 1 ? '' : 's'} logged ${untukKemarin ? 'yesterday' : 'today'}; duration unavailable.`
+            : `${ringkas.hari} session${ringkas.hari === 1 ? '' : 's'} logged ${untukKemarin ? 'yesterday' : 'today'} across ${ringkas.menit} ${ringkas.tanpaDurasiHari > 0 ? 'known ' : ''}minute${ringkas.menit === 1 ? '' : 's'}.`}
       </p>
       {ringkas.total > 0 && (
         <p className="t-mikro mt-1 text-neutral-500 dark:text-neutral-400">
@@ -346,7 +368,7 @@ export function CatatanLatihan() {
             <div className="rounded-2xl bg-sky-50/70 p-3 dark:bg-sky-400/[0.05]">
               <div className="text-[10px] font-black uppercase tracking-wide text-sky-700 dark:text-sky-300">Recorded</div>
               <div className="mt-1 text-lg font-black tabular-nums text-ink dark:text-white">
-                {Number.isFinite(ringkas.terbaru.durasi) && ringkas.terbaru.durasi > 0 ? `${Math.round(ringkas.terbaru.durasi / 60)} min` : '—'}
+                {ringkas.terbaruDetik === null ? '—' : `${Math.round(ringkas.terbaruDetik / 60)} min`}
               </div>
               <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-[9px] font-semibold text-neutral-500">
                 {Number.isFinite(ringkas.terbaru.jarakKm) && (ringkas.terbaru.jarakKm ?? 0) > 0 && <span>{ringkas.terbaru.jarakKm?.toFixed(1)} km</span>}
@@ -586,7 +608,7 @@ export function CatatanLatihan() {
         </div>
         <div className="mt-3 grid grid-cols-7 gap-1.5">
           {ringkas.tren.map((d) => (
-            <div key={d.kunci} className="min-w-0 text-center" aria-label={`${d.kunci}: ${d.menit} training minutes`}>
+            <div key={d.kunci} className="min-w-0 text-center" aria-label={`${d.kunci}: ${d.tanpaDurasi > 0 && d.diketahui === 0 ? 'duration unavailable' : `${d.menit} training minutes`}`}>
               <div className="flex h-16 items-end overflow-hidden rounded-lg bg-neutral-100 dark:bg-white/5">
                 <div
                   className="w-full rounded-t-lg bg-brand/80"
@@ -594,7 +616,7 @@ export function CatatanLatihan() {
                 />
               </div>
               <div className="mt-1 truncate text-[9px] font-bold text-neutral-500">{d.label}</div>
-              <div className="text-[9px] font-black tabular-nums text-ink dark:text-white">{d.menit || '—'}</div>
+              <div className="text-[9px] font-black tabular-nums text-ink dark:text-white">{d.tanpaDurasi > 0 && d.diketahui === 0 ? '—' : d.diketahui > 0 ? d.menit : '—'}</div>
             </div>
           ))}
         </div>
@@ -610,7 +632,7 @@ export function CatatanLatihan() {
             <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Duration rhythm</div>
           </div>
           <div className="text-right">
-            <div className="text-lg font-black tabular-nums text-brand-dark">{ringkas.menit28}<span className="ml-1 text-xs text-neutral-500">min</span></div>
+            <div className="text-lg font-black tabular-nums text-brand-dark">{ringkas.menit28 ?? '—'}<span className="ml-1 text-xs text-neutral-500">min</span></div>
             <div className="t-mikro text-neutral-500">{ringkas.hariAktif28} active days</div>
           </div>
         </div>
@@ -619,7 +641,7 @@ export function CatatanLatihan() {
             <div key={blok.label}>
               <div className="mb-1 flex items-center justify-between gap-3 text-[10px]">
                 <span className="font-bold text-neutral-500">{blok.label}</span>
-                <span className="font-black tabular-nums text-ink dark:text-white">{blok.menit} min · {blok.hariAktif}/7 days</span>
+                <span className="font-black tabular-nums text-ink dark:text-white">{blok.tanpaDurasi > 0 && blok.diketahui === 0 ? '—' : blok.menit} min · {blok.hariAktif}/7 days{blok.tanpaDurasi > 0 ? ` · ${blok.tanpaDurasi} duration unavailable` : ''}</span>
               </div>
               <div className="h-2.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/5">
                 <div
@@ -633,6 +655,7 @@ export function CatatanLatihan() {
         <Prosa kelas="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
           Each row is one consecutive 7-day block, oldest to newest. Bar length compares recorded duration within this 28-day window; active days show frequency, not adherence quality.
         </Prosa>
+        {ringkas.tanpaDurasi28 > 0 && <p className="t-mikro mt-2 text-neutral-500">Duration unavailable for {ringkas.tanpaDurasi28} session{ringkas.tanpaDurasi28 === 1 ? '' : 's'}; time and load totals include known durations only.</p>}
       </div>
 
       {ringkas.sesiDenganRpe28 > 0 && (

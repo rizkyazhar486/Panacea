@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { bolehAksesPasien, idPasienDiri, idPasienDiriLegacy } from '../../server/src/aksesKlinis.ts'
+import { bolehAksesPasien, idPasienDiri, idPasienDiriLegacy } from '../../server/src/domains/clinical-records/aksesKlinis.ts'
 
 const u = { id: 'user-7f91', email: 'lama@example.com', role: 'pasien' }
 const stable = idPasienDiri(u.id)

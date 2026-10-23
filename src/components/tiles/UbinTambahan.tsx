@@ -1,0 +1,340 @@
+import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
+import { useStore } from '../../lib/store'
+import { deretMetrik, rentangPribadi } from '../../lib/riwayatVitals'
+import { getWorkouts } from '../../lib/workoutStore'
+import { localCalorieDay, loggedCaloriesToday } from '../../domains/personal-health/engine/loggedCalories'
+import { weeklyWorkoutDurations } from '../../domains/personal-health/engine/weeklyWorkoutDurations'
+import { riwayatMinum } from '../../lib/kebiasaanHarian'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Empat widget yang membaca RENTANG WAKTU LEBIH PANJANG daripada tujuh hari.
+//
+// MENGAPA PERLU. Seluruh grafik beranda sebelumnya berjendela tujuh hari, dan
+// tujuh hari adalah jendela yang tepat untuk menjawab "bagaimana pekan ini"
+// tetapi tidak dapat menjawab "apakah ini berubah". Nadi istirahat yang naik
+// tiga denyut selama sebulan tidak pernah terlihat pada grafik tujuh hari:
+// tiap pekan ia tampak datar.
+//
+// YANG TIDAK DILAKUKAN DI SINI. Tidak ada angka gabungan — tidak ada "skor
+// pemulihan", tidak ada "usia biologis", tidak ada persentase kesiapan. Tiap
+// ubin menampilkan satu besaran yang diukur, dibandingkan terhadap kebiasaan
+// ORANG ITU SENDIRI, dan menyebut jumlah titik yang menjadi dasarnya. Bila
+// titiknya kurang, ubinnya tidak digambar sama sekali.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Kepala({ judul, ke }: { judul: string; ke: string }) {
+  return (
+    <div className="mb-2 flex items-baseline justify-between gap-2">
+      <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link>
+    </div>
+  )
+}
+
+/** Grafik garis kecil dengan pita kebiasaan di belakangnya. */
+function Garis({ nilai, bawah, atas, warna }: { nilai: number[]; bawah?: number; atas?: number; warna: string }) {
+  const L = 100
+  const T = 34
+  const semua = [...nilai, ...(bawah != null ? [bawah] : []), ...(atas != null ? [atas] : [])]
+  const min = Math.min(...semua)
+  const maks = Math.max(...semua)
+  const bentang = maks - min || 1
+  const y = (v: number) => T - ((v - min) / bentang) * (T - 4) - 2
+  const x = (i: number) => (i / Math.max(1, nilai.length - 1)) * L
+  const jalur = nilai.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
+  return (
+    <svg viewBox={`0 0 ${L} ${T}`} preserveAspectRatio="none" className="mt-2 h-9 w-full" aria-hidden>
+      {bawah != null && atas != null && (
+        <rect x="0" y={y(atas)} width={L} height={Math.max(1, y(bawah) - y(atas))} className="fill-current text-neutral-300/40 dark:text-white/12" />
+      )}
+      <path d={jalur} fill="none" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" className={`stroke-current ${warna}`} />
+      <circle cx={x(nilai.length - 1)} cy={y(nilai[nilai.length - 1])} r="2.2" className={`fill-current ${warna}`} />
+    </svg>
+  )
+}
+
+// ── Nadi istirahat 30 hari, dengan pita kebiasaan Anda sendiri ─────────────
+//
+// Nilainya justru pada PITA-nya: 58 bpm tidak dapat disebut baik atau buruk
+// tanpa tahu siapa orangnya, tetapi 58 pada orang yang tiga bulan terakhir
+// berada di 46-52 adalah sesuatu yang berubah — dan perubahan itu fakta.
+export function UbinNadiPanjang() {
+  const { deret, rentang } = useMemo(() => ({
+    deret: deretMetrik('restingHr', 30),
+    rentang: rentangPribadi('restingHr'),
+  }), [])
+  if (deret.length < 7) return null
+  const nilai = deret.map((d) => d.nilai)
+  const kini = nilai[nilai.length - 1]
+  const luar = rentang && (kini < rentang.bawah || kini > rentang.atas)
+  return (
+    <section>
+      <Kepala judul="Resting heart rate, 30 days" ke="/tubuh" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(kini)}</span>
+          <span className="t-mikro font-bold text-neutral-400">bpm</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{deret.length} days logged</span>
+        </div>
+        <Garis nilai={nilai} bawah={rentang?.bawah} atas={rentang?.atas} warna={luar ? 'text-amber-500' : 'text-rose-500'} />
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          {rentang
+            ? `The grey band is your own usual range, ${Math.round(rentang.bawah)}–${Math.round(rentang.atas)} bpm. ${luar ? 'Today sits outside it — one day outside the band is not an illness; what matters is whether it stays there for several days.' : 'Today is still inside it.'}`
+            : 'Not enough readings yet to call anything usual for you; only the line is drawn so far.'}
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Tidur 14 malam ─────────────────────────────────────────────────────────
+export function UbinTidurDuaPekan() {
+  const { state } = useStore()
+  const malam = useMemo(() => {
+    const peta = new Map<string, number>()
+    for (const l of state.sleepLogs ?? []) {
+      if (typeof l?.hours === 'number' && l.hours > 0 && l.date) peta.set(l.date, l.hours)
+    }
+    const out: { tanggal: string; jam: number }[] = []
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 864e5)
+      const p = (x: number) => String(x).padStart(2, '0')
+      const t = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+      out.push({ tanggal: t, jam: peta.get(t) ?? 0 })
+    }
+    return out
+  }, [state.sleepLogs])
+
+  const tercatat = malam.filter((m) => m.jam > 0)
+  if (tercatat.length < 4) return null
+  const urut = [...tercatat].map((m) => m.jam).sort((a, b) => a - b)
+  const tengah = urut.length % 2 ? urut[(urut.length - 1) / 2] : (urut[urut.length / 2 - 1] + urut[urut.length / 2]) / 2
+  const maks = Math.max(...urut, 9)
+  const dibawah7 = tercatat.filter((m) => m.jam < 7).length
+
+  return (
+    <section>
+      <Kepala judul="Sleep, 14 nights" ke="/pola-tidur" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(Math.round(tengah * 10) / 10).toFixed(1)}</span>
+          <span className="t-mikro font-bold text-neutral-400">h — median</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{tercatat.length}/14 nights</span>
+        </div>
+        {/* Garis tujuh jam digambar sebagai acuan, bukan sebagai target yang
+            gagal dicapai: kebutuhan tidur berbeda antar-orang, dan tujuh jam
+            hanyalah batas bawah yang paling sering dipakai untuk orang dewasa. */}
+        <span className="relative mt-2 flex h-14 items-end gap-[3px]" aria-hidden>
+          <span className="absolute inset-x-0 border-t border-dashed border-neutral-400/60" style={{ bottom: `${(7 / maks) * 100}%` }} />
+          {malam.map((m, i) => (
+            <span
+              key={i}
+              className={`flex-1 rounded-sm ${m.jam === 0 ? 'bg-neutral-200 dark:bg-white/10' : m.jam >= 7 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+              style={{ height: m.jam > 0 ? `${(m.jam / maks) * 100}%` : '3px' }}
+            />
+          ))}
+        </span>
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          The dashed line at 7 h is the reference most often used for adults, not your personal target — sleep need
+          differs between people. {dibawah7} of {tercatat.length} nights fell below it. An empty bar means that night was not logged.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Menit latihan per pekan, delapan pekan ─────────────────────────────────
+//
+// Delapan pekan, bukan tujuh hari: yang ingin diketahui di sini bukan "pekan
+// ini bagaimana" melainkan "apakah ini bertahan". Garis 150 menit adalah
+// anjuran mingguan aktivitas sedang untuk orang dewasa (WHO) — disebut sebagai
+// anjuran, bukan sebagai nilai ujian.
+export function UbinMuatanPekan() {
+  const workouts = getWorkouts()
+  const pekan = useMemo(() => weeklyWorkoutDurations(workouts), [workouts])
+  if (!pekan.some(x => x.recorded + x.missing > 0)) return null
+  const maks = Math.max(...pekan.map(x => x.total ?? 0), 150)
+  const ini = pekan[pekan.length - 1]
+  const lalu = pekan[pekan.length - 2]
+  const missing = pekan.reduce((sum, x) => sum + x.missing, 0)
+
+  return (
+    <section>
+      <Kepala judul="Training minutes per week" ke="/latihan" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{ini.total === null ? '—' : Math.round(ini.total)}</span>
+          <span className="t-mikro font-bold text-neutral-400">minutes this week</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
+            {ini.total !== null && lalu.total !== null && lalu.total > 0 && ini.missing === 0 && lalu.missing === 0 ? `${ini.total >= lalu.total ? '+' : ''}${Math.round(ini.total - lalu.total)} logged vs last week` : '8 weeks'}
+          </span>
+        </div>
+        <span className="relative mt-2 flex h-14 items-end gap-[3px]" aria-hidden>
+          <span className="absolute inset-x-0 border-t border-dashed border-neutral-400/60" style={{ bottom: `${(150 / maks) * 100}%` }} />
+          {pekan.map((m, i) => (
+            <span
+              key={i}
+              className={`flex-1 rounded-sm ${i === pekan.length - 1 ? 'bg-brand' : 'bg-neutral-300 dark:bg-white/20'}`}
+              style={{ height: m.total === null ? 0 : m.total > 0 ? `${(m.total / maks) * 100}%` : '3px' }}
+            />
+          ))}
+        </span>
+        {ini.total === null && <p className="t-mikro mt-1 text-neutral-400">{ini.overflow ? 'Duration total unavailable.' : ini.missing ? 'Duration unavailable for this week.' : 'No sessions logged this week.'}</p>}
+        {missing > 0 && <p className="t-mikro mt-1 text-neutral-400">{ini.total !== null && ini.missing > 0 ? 'Partial logged subtotal. ' : ''}{missing} session(s) across these weeks have no known duration.</p>}
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          The dashed line at 150 minutes is the weekly moderate-activity recommendation for adults (WHO). Only sessions
+          logged in this app are counted, so walking you never recorded does not appear here.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Kalori tercatat masuk vs kalori latihan ────────────────────────────────
+//
+// UBIN INI PALING MUDAH DISALAHPAHAMI, dan karena itu keterangannya paling
+// panjang. Dua batang di sini BUKAN neraca energi: sisi masuk hanya sebesar
+// yang sempat dicatat, sisi keluar tidak memuat metabolisme basal yang justru
+// bagian terbesarnya, dan keduanya punya galat besar. Yang jujur dikatakan
+// ubin ini hanya satu hal: seberapa banyak yang sudah Anda catat hari ini.
+export function UbinKaloriBanding() {
+  const { state } = useStore()
+  const now = Date.now()
+  const day = localCalorieDay(now)
+  const workouts = getWorkouts()
+  const { food: masuk, training: latihan } = useMemo(
+    () => loggedCaloriesToday(state.foods ?? [], workouts, now), [state.foods, workouts, day],
+  )
+
+  if (masuk.recorded + masuk.missing + latihan.recorded + latihan.missing === 0) return null
+  const maks = Math.max(masuk.total ?? 0, latihan.total ?? 0, 1)
+
+  return (
+    <section>
+      <Kepala judul="Logged today" ke="/nutrisi" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex flex-col gap-2">
+          {[
+            { nama: 'Food logged', nilai: masuk, kelas: 'bg-brand' },
+            { nama: 'Training calories', nilai: latihan, kelas: 'bg-amber-500' },
+          ].map((b) => (
+            <div key={b.nama} data-logged-calories={b.nama}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="t-mikro font-bold text-neutral-500">{b.nama}</span>
+                <span className="t-kecil font-black tabular-nums text-ink dark:text-white">{b.nilai.total === null ? (b.nilai.overflow ? 'Total unavailable' : b.nilai.missing ? 'Calories unavailable' : 'Not logged') : `${Math.round(b.nilai.total)} kkal`}</span>
+              </div>
+              {b.nilai.total !== null && <span className="mt-1 block h-2 rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+                <span className={`block h-full rounded-full ${b.kelas}`} style={{ width: `${(b.nilai.total / maks) * 100}%` }} />
+              </span>}
+              {b.nilai.missing > 0 && <p className="t-mikro mt-1 text-neutral-400">{b.nilai.total !== null ? 'Partial logged subtotal. ' : ''}{b.nilai.missing} record(s) without usable calories.</p>}
+            </div>
+          ))}
+        </div>
+        <p className="t-mikro mt-2 leading-snug text-neutral-400">
+          This is NOT an energy balance. The food side is only as big as what you managed to log, the training side leaves
+          out basal metabolism — which is the largest part of daily energy use — and both carry wide error. All this can
+          tell you is how complete today's logging is.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Kepatuhan minum, 14 hari ───────────────────────────────────────────────
+//
+// Pertanyaan yang sesungguhnya pada obat rutin bukan "sudah minum hari ini?"
+// melainkan "seberapa sering saya benar-benar meminumnya" — dan itulah yang
+// paling menentukan hasilnya pada tekanan darah, gula, dan hampir semua obat
+// harian. Riwayatnya baru dimulai sejak fitur ini ada, dan ubin ini
+// mengatakannya alih-alih menampilkan hari-hari kosong seolah terlewat.
+export function UbinKepatuhan() {
+  const hari = useMemo(() => {
+    const peta = new Map(riwayatMinum().map((h) => [h.tanggal, h]))
+    const out: { tanggal: string; minum: number; total: number; ada: boolean }[] = []
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 864e5)
+      const p = (x: number) => String(x).padStart(2, '0')
+      const t = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+      const r = peta.get(t)
+      out.push({ tanggal: t, minum: r?.minum ?? 0, total: r?.total ?? 0, ada: Boolean(r) })
+    }
+    return out
+  }, [])
+
+  const tercatat = hari.filter((h) => h.ada && h.total > 0)
+  if (tercatat.length < 3) return null
+  const penuh = tercatat.filter((h) => h.minum >= h.total).length
+
+  return (
+    <section>
+      <Kepala judul="Adherence, 14 days" ke="/harian" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{penuh}</span>
+          <span className="t-mikro font-bold text-neutral-400">of {tercatat.length} days complete</span>
+        </div>
+        <span className="mt-2 grid grid-cols-7 gap-1" aria-hidden>
+          {hari.map((h) => (
+            <span
+              key={h.tanggal}
+              title={h.ada ? `${h.minum}/${h.total}` : 'not logged'}
+              className={`h-5 rounded ${
+                !h.ada || h.total === 0 ? 'bg-neutral-200 dark:bg-white/10'
+                  : h.minum >= h.total ? 'bg-emerald-500'
+                  : h.minum > 0 ? 'bg-amber-400'
+                  : 'bg-rose-400'
+              }`}
+            />
+          ))}
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Green means everything scheduled that day was marked as taken, amber some of it, red none, grey not logged at
+          all. This history only begins when the logging feature did — older days are not missing, they were never
+          stored.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Berat 90 hari ──────────────────────────────────────────────────────────
+//
+// Perubahan berat yang berarti berjalan dalam hitungan bulan, sedangkan
+// timbangan berubah satu-dua kilogram dalam sehari karena air dan isi usus.
+// Jendela sembilan puluh hari inilah yang memisahkan keduanya, dan angka yang
+// disebut adalah SELISIH per tiga puluh hari, bukan selisih hari ke hari.
+export function UbinBeratTren() {
+  const deret = useMemo(() => deretMetrik('weightKg', 90), [])
+  if (deret.length < 5) return null
+
+  const nilai = deret.map((d) => d.nilai)
+  const kini = nilai[nilai.length - 1]
+  const tAkhir = Date.parse(`${deret[deret.length - 1].tanggal}T00:00:00`)
+  const tAwal = Date.parse(`${deret[0].tanggal}T00:00:00`)
+  const rentangHari = Math.max(1, Math.round((tAkhir - tAwal) / 864e5))
+  const selisih = kini - nilai[0]
+  const perBulan = (selisih / rentangHari) * 30
+  const cepat = Math.abs(perBulan) >= kini * 0.05
+
+  return (
+    <section>
+      <Kepala judul="Weight, 90 days" ke="/tubuh" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(Math.round(kini * 10) / 10).toFixed(1)}</span>
+          <span className="t-mikro font-bold text-neutral-400">kg</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
+            {perBulan >= 0 ? '+' : ''}{(Math.round(perBulan * 10) / 10).toFixed(1)} kg / 30 days
+          </span>
+        </div>
+        <Garis nilai={nilai} warna={cepat ? 'text-amber-500' : 'text-brand'} />
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          Calculated from {deret.length} weigh-ins across {rentangHari} days. The scale moves a kilo or two within a single
+          day from water and gut contents, so what you read here is the three-month direction, not day-to-day change.
+          {cepat && ' An unintended change of more than 5% of body weight in a month is worth raising with a doctor.'}
+        </p>
+      </div>
+    </section>
+  )
+}

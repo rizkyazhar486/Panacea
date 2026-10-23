@@ -26,7 +26,7 @@ const PILIHAN_PENGUKURAN = [
 const LABEL_PRIORITAS = { routine: 'Routine', 'review-today': 'Review today', 'immediate-human-review': 'Review now' } as const
 
 export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?: LongitudinalPatientState }) {
-  const [data, setData] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] } | null>(null)
+  const [data, setData] = useState<{ plan: ContinuousCarePlan | null; unsignedPlan?: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] } | null>(null)
   const [dx, setDx] = useState({ code: '', display: '' })
   const [qs, setQs] = useState<Q[]>([{ id: 'q1', prompt: '', kind: 'boolean', required: true, tandai: false }])
   const [galat, setGalat] = useState<string | null>(null)
@@ -38,6 +38,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
   const aturanSah = galatAturan.every((g) => Object.keys(g).length === 0)
   const [menyimpan, setMenyimpan] = useState(false)
   const simpan = () => { if (!aturanSah || menyimpan) return; setMenyimpan(true); return api.createCarePlan(izinId, {
+    signIntent: true,
     diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
     questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
     patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
@@ -68,10 +69,28 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
       </div>
     )
   }
-  const plan = data.plan
+  const plan = data.plan ?? data.unsignedPlan
+  const unsigned = !data.plan && !!data.unsignedPlan
   return (
     <div className="mt-3 border-t border-white/10 pt-3" data-care-plan>
       <h3 className="text-[12px] font-black">Daily follow-up</h3>
+      {unsigned && <div role="status" className="mb-3 rounded-lg border border-amber-400/40 p-3 text-sm">
+        <p>This saved plan is inactive until you review and sign its exact content below.</p>
+        <details className="mt-2" open><summary>Review saved plan</summary>
+          <p>Starts {plan?.activeFrom}{plan?.activeUntil ? ` · ends ${plan.activeUntil}` : ''} · daily</p>
+          <ul>{plan?.diagnosisRefs.map((d, i) => <li key={i}>{d.display} · {d.code} · {d.verificationStatus}</li>)}</ul>
+          <ul>{plan?.questions.map(q => <li key={q.id}>{q.prompt} · {q.kind}{q.unit ? ` · ${q.unit}` : ''}{q.required ? ' · required' : ''}{q.choices ? ` · ${q.choices.join(', ')}` : ''}</li>)}</ul>
+          <ul>{plan?.patientReportedReviewRules.map(r => <li key={r.id}>{r.label}: {r.questionId} {r.operator} {String(r.value)} · {r.priority} · {r.rationale}</li>)}</ul>
+          <ul>{plan?.measurementReviewRules.map(r => <li key={r.id}>{r.label}: {r.metric} {r.operator} {r.threshold} {r.unit} · {r.priority} · {r.rationale} · {r.evidenceRef}</li>)}</ul>
+        </details>
+        <button type="button" className="mt-2 min-h-11 rounded-full border px-4 font-bold" disabled={menyimpan} onClick={() => {
+          if (!plan || menyimpan) return
+          setMenyimpan(true)
+          void api.createCarePlan(izinId, { signIntent: true, existingPlanId: plan.id })
+            .then(() => { setGalat(null); void muat() }).catch(e => setGalat((e as Error).message)).finally(() => setMenyimpan(false))
+        }}>{menyimpan ? 'Signing…' : 'Sign & activate saved plan'}</button>
+      </div>}
+      {plan?.signature && <p className="mb-2 text-sm">Signed by {plan.signature.actorId} · {plan.signature.at}</p>}
       {!plan ? (
         <div className="mt-1.5 grid gap-1.5">
           <input value={dx.display} onChange={(e) => setDx({ ...dx, display: e.target.value })} placeholder="Diagnosis being followed" aria-label="Diagnosis being followed"
@@ -122,7 +141,7 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
           </div>
           <div className="flex gap-1.5">
             {qs.length < 20 && <button type="button" className="min-h-9 rounded-full px-3 text-[11px] font-bold" onClick={() => setQs([...qs, { id: `q${qs.length + 1}`, prompt: '', kind: 'boolean', required: true, tandai: false }])}>+ Question</button>}
-            <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black disabled:opacity-50" disabled={!aturanSah || menyimpan} title={aturanSah ? undefined : 'Fix the highlighted lab rules first'} onClick={() => void simpan()}>{menyimpan ? 'Saving…' : 'Start daily check-in'}</button>
+            <button type="button" className="ml-auto min-h-11 rounded-full px-3 text-[11px] font-black disabled:opacity-50" disabled={!aturanSah || menyimpan} title={aturanSah ? undefined : 'Fix the highlighted lab rules first'} onClick={() => void simpan()}>{menyimpan ? 'Saving…' : 'Sign & start daily check-in'}</button>
           </div>
         </div>
       ) : (

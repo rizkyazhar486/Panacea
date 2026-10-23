@@ -6,8 +6,8 @@ const read = (path) => readFileSync(new URL('../../' + path, import.meta.url), '
 
 test('worthiness standard is wired into agent, system and maturity policy', () => {
   for (const path of [
-    'PANACEA_SYSTEM_10_STANDARD.md',
-    'PANACEA_PRODUCT_MATURITY_OS.md',
+    'governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md',
+    'governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md',
     'AGENTS.md',
   ]) {
     assert.match(read(path), /PANACEA_WORTHINESS_EVIDENCE_STANDARD\.md/)
@@ -15,7 +15,7 @@ test('worthiness standard is wired into agent, system and maturity policy', () =
 })
 
 test('worthiness review remains evidence-first and non-coercive', () => {
-  const standard = read('PANACEA_WORTHINESS_EVIDENCE_STANDARD.md')
+  const standard = read('governance/doctrine/PANACEA_WORTHINESS_EVIDENCE_STANDARD.md')
   assert.match(standard, /Conviction must be an output of evidence, not an input to evaluation/)
   assert.match(standard, /AI consensus is not external validation/)
   assert.match(standard, /Make Panacea demonstrably worth building/)

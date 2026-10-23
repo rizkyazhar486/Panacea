@@ -1,0 +1,25 @@
+name: Fetal MRI source registration
+on:
+  pull_request:
+    paths:
+      - 'bodyexposure/pipeline/*fetal_mri*'
+      - 'public/bodyexposure/dataset-inspection/fetal-parcels/mri/**'
+      - '.github/workflows/fetal-mri-scene.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'bodyexposure/pipeline/*fetal_mri*'
+      - 'public/bodyexposure/dataset-inspection/fetal-parcels/mri/**'
+      - '.github/workflows/fetal-mri-scene.yml'
+permissions:
+  contents: read
+jobs:
+  registration:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check native MRI pixel registration and source pins
+        run: python3 -m unittest discover -s bodyexposure/pipeline -p test_fetal_mri_scene_geometry.py -v

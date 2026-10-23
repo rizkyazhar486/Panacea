@@ -1,9 +1,12 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { parseWithdrawAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
+import { buildPersistedSnapshot } from './state/storePersistScope'
+import { createListenerSet } from './state/storeSnapshotScope'
 import type {
   AppState,
   Patient,
@@ -448,8 +451,48 @@ interface Store {
 
 const Ctx = createContext<Store | null>(null)
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+// ── Selective subscription (opt-in, back-compat) ────────────────────────────
+// `useStore()` reads the whole `Store` via plain Context, so every consumer
+// re-renders on every `setState` anywhere in the app — by design, unchanged
+// for the ~90 existing call sites. Splitting that into one Context per domain
+// would mean migrating every one of those files in lockstep (forbidden by the
+// "strangler, not big-bang" migration rule in CLAUDE.md §2.4). Instead,
+// `useStoreSelector` lets a page opt in to re-rendering only when the slice it
+// actually reads changes, backed by React's built-in `useSyncExternalStore` —
+// no new dependency, no change required to any existing `useStore()` caller.
+// Note: the selector should return a referentially-stable value (a field, or a
+// `useCallback`-memoized derivation) — a selector that allocates a new
+// array/object every call defeats the point and re-renders on every update.
+interface StoreSnapshot {
+  getSnapshot: () => AppState
+  subscribe: (listener: () => void) => () => void
+}
+const SnapshotCtx = createContext<StoreSnapshot | null>(null)
+
+export function useStoreSelector<T>(selector: (state: AppState) => T): T {
+  const snap = useContext(SnapshotCtx)
+  if (!snap) throw new Error('useStoreSelector must be used within StoreProvider')
+  return useSyncExternalStore(snap.subscribe, () => selector(snap.getSnapshot()))
+}
+
+export function StoreProvider({ children, visibilityDocument }: { children: ReactNode; visibilityDocument?: Pick<Document, 'visibilityState' | 'addEventListener' | 'removeEventListener'> }) {
   const [state, setState] = useState<AppState>(load)
+  const stateRef = useRef(state)
+  const listenerSetRef = useRef(createListenerSet())
+  // Runs after every commit where `state` changed; mirrors it into the ref +
+  // wakes selector subscribers. A render-phase assignment would be simpler but
+  // isn't safe under concurrent rendering, so this stays in an effect.
+  useEffect(() => {
+    stateRef.current = state
+    listenerSetRef.current.notify()
+  }, [state])
+  const snapshot = useMemo<StoreSnapshot>(
+    () => ({
+      getSnapshot: () => stateRef.current,
+      subscribe: (listener) => listenerSetRef.current.subscribe(listener),
+    }),
+    [],
+  )
 
   useLayoutEffect(() => {
     bindPersonalHealthAccount(state.account)
@@ -476,20 +519,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
+  // Heavy media (uploaded photo/video data URLs) is stripped up front rather than
+  // only on quota-exceeded retry: it's server-backed when a backend is configured
+  // (re-pulled by the posts poll below) and was never safe to treat as the local
+  // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
   useEffect(() => {
-    const { account: _account, ...persist } = state
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
-    } catch {
-      // Storage quota exceeded (e.g. many uploaded photos) — drop heavy media
-      // from the persisted copy so the app keeps working.
+    const t = setTimeout(() => {
+      const { account: _account, ...rest } = state
+      const persist = buildPersistedSnapshot(rest)
       try {
-        const slim = { ...persist, posts: persist.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
       } catch {
-        /* give up persisting this update */
+        /* quota exceeded even without media — give up persisting this update */
       }
-    }
+    }, 400)
+    return () => clearTimeout(t)
   }, [state])
 
   // Auto-login DISABLED by request: the app always starts at the landing/login,
@@ -554,9 +598,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // #9: multi-user social feed — pull posts from the server on login and poll so
   // posts/likes from other users appear near-realtime. Local-only (offline) posts
   // are preserved via mergePosts. No-op when no backend is configured.
+  // Every pull calls setState on the whole AppState, which this provider hands
+  // to every useStore() consumer app-wide — so this timer keeps re-rendering the
+  // entire app every 15s even on a backgrounded tab. Paused while hidden and
+  // resumed immediately on return, matching the existing visibilitychange
+  // convention already used elsewhere in the app (see useJam.ts, SmartNotificationOrchestrator.tsx).
   useEffect(() => {
     if (!backendEnabled || !state.account?.email) return
     let alive = true
+    let timer: ReturnType<typeof setInterval> | undefined
     const pull = () =>
       api
         .posts()
@@ -566,13 +616,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setState((st) => ({ ...st, posts: mergePosts(mapped, st.posts) }))
         })
         .catch(() => {})
+    const start = () => {
+      if (timer !== undefined) return
+      timer = setInterval(pull, 15_000)
+    }
+    const stop = () => {
+      if (timer === undefined) return
+      clearInterval(timer)
+      timer = undefined
+    }
+    const onVisibility = () => {
+      if (visibilityDocument?.visibilityState === 'visible') {
+        pull()
+        start()
+      } else {
+        stop()
+      }
+    }
     pull()
-    const t = setInterval(pull, 15_000)
+    if (!visibilityDocument || visibilityDocument.visibilityState === 'visible') start()
+    visibilityDocument?.addEventListener('visibilitychange', onVisibility)
     return () => {
       alive = false
-      clearInterval(t)
+      stop()
+      visibilityDocument?.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [state.account?.email])
+  }, [state.account?.email, visibilityDocument])
 
   const store = useMemo<Store>(() => {
     const activePatient =
@@ -1202,7 +1271,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       sendEmail: (e) => setState((st) => ({ ...st, emails: [e, ...st.emails] })),
       withdrawTokens: (amount, bank) => {
-        if (amount <= 0) return { ok: false, reason: 'Invalid amount.' }
+        if (backendEnabled) return { ok: false, reason: 'Use the server wallet to request a bank payout.' }
+        const parsed = parseWithdrawAmount(amount)
+        if (!parsed.ok) return { ok: false, reason: parsed.reason }
         if (state.wallet.balance < amount) return { ok: false, reason: 'Not enough balance.' }
         setState((st) => ({
           ...st,
@@ -1213,7 +1284,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'withdraw' as TxType,
                 amount: -amount,
-                note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('en-GB')})`,
+                note: `Demo debit: ${amount} PNC (${bank}); no bank payout requested`,
                 at: new Date().toISOString(),
               },
               ...st.wallet.transactions,
@@ -1288,7 +1359,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state])
 
-  return <Ctx.Provider value={store}>{children}</Ctx.Provider>
+  return (
+    <SnapshotCtx.Provider value={snapshot}>
+      <Ctx.Provider value={store}>{children}</Ctx.Provider>
+    </SnapshotCtx.Provider>
+  )
 }
 
 export function useStore(): Store {
