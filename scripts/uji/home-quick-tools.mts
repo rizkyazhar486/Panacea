@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const papan = readFileSync('src/components/PapanWidget.tsx', 'utf8')
+const papan = readFileSync('src/components/dashboard/PapanWidget.tsx', 'utf8')
 const css = readFileSync('src/styles/rel-widget-rumah.css', 'utf8')
 
 // Quick tools must reuse the real stateful mini-apps, not create decorative

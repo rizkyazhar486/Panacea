@@ -13,7 +13,7 @@ export function ClinicalPatientContext() {
       <section className="border-y border-white/10 py-4" aria-label="Clinical patient context">
         <div className="flex min-h-[52px] items-center justify-between gap-4">
           <span className="min-w-0 text-xs font-black leading-snug text-white/48">No patient record yet</span>
-          <Link to="/emr" className="shrink-0 text-[10px] font-black text-white/72 hover:text-white">Open AI-EMR →</Link>
+          <Link to="/emr" className="inline-flex min-h-[44px] shrink-0 items-center text-[10px] font-black text-white/72 hover:text-white">Open AI-EMR →</Link>
         </div>
       </section>
     )

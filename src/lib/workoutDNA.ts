@@ -1,4 +1,5 @@
 import { zoneBreakdown, type ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 
 export type WorkoutDnaAxisId = 'endurance' | 'intensity' | 'variability' | 'recovery' | 'volume' | 'data'
 
@@ -18,6 +19,7 @@ export interface WorkoutDnaSignature {
   archetype: string
   measuredFacts: string[]
   durationMin: number
+  knownDurationMin?: number | null
   distanceKm?: number
   avgHr?: number
   maxHr?: number
@@ -53,7 +55,10 @@ function archetype(axes: WorkoutDnaAxis[]) {
 }
 
 export function buildWorkoutDna(workout: ImportedWorkout, hrMax: number): WorkoutDnaSignature {
-  const durationMin = workout.durasi / 60
+  const duration = workoutDurationSeconds(workout)
+  const knownDurationMin = duration === null ? null : duration / 60
+  const durationMin = knownDurationMin ?? 0
+  const distanceKnown = typeof workout.jarakKm === 'number' && Number.isFinite(workout.jarakKm) && workout.jarakKm >= 0
   const hrValues = workout.hr.map((point) => point.bpm).filter((value) => value > 0)
   const zones = zoneBreakdown(workout.hr, hrMax)
   const easyPct = zones.filter((zone) => zone.zona <= 2).reduce((sum, zone) => sum + zone.pctWaktu, 0)
@@ -65,7 +70,7 @@ export function buildWorkoutDna(workout: ImportedWorkout, hrMax: number): Workou
   const cv = hrMean > 0 ? standardDeviation(hrValues) / hrMean : 0
   const variability = hrValues.length >= 4 ? clamp(cv * 650) : 0
   const endurance = clamp(durationMin / 90 * 100)
-  const distanceSignal = workout.jarakKm != null ? clamp(workout.jarakKm / 15 * 100) : 0
+  const distanceSignal = distanceKnown ? clamp(workout.jarakKm! / 15 * 100) : 0
   const timeSignal = clamp(durationMin / 120 * 100)
   const volume = Math.max(distanceSignal, timeSignal)
   const recovery = workout.hrr1 != null ? clamp(workout.hrr1 / 35 * 100) : 0
@@ -74,19 +79,19 @@ export function buildWorkoutDna(workout: ImportedWorkout, hrMax: number): Workou
   if (workout.hr.length) measuredFacts.push(`${workout.hr.length} HR samples`)
   if (workout.avgHr != null) measuredFacts.push(`${Math.round(workout.avgHr)} bpm average`)
   if (workout.maxHr != null) measuredFacts.push(`${Math.round(workout.maxHr)} bpm max`)
-  if (workout.jarakKm != null) measuredFacts.push(`${workout.jarakKm.toFixed(2)} km`)
+  if (distanceKnown) measuredFacts.push(`${workout.jarakKm!.toFixed(2)} km`)
   if (workout.hrr1 != null) measuredFacts.push(`${Math.round(workout.hrr1)} bpm HRR1`)
   if (workout.kadens != null) measuredFacts.push(`${Math.round(workout.kadens)} spm cadence`)
 
-  const possibleMeasured = [workout.hr.length > 0, workout.avgHr != null, workout.maxHr != null, workout.jarakKm != null, workout.hrr1 != null, workout.kadens != null]
+  const possibleMeasured = [workout.hr.length > 0, workout.avgHr != null, workout.maxHr != null, distanceKnown, workout.hrr1 != null, workout.kadens != null]
   const dataRichness = Math.round((possibleMeasured.filter(Boolean).length / possibleMeasured.length) * 100)
 
   const axes: WorkoutDnaAxis[] = [
-    { id: 'endurance', label: 'Endurance', value: Math.round(endurance), meaning: 'Session duration normalized for visual comparison, not a fitness rating.', provenance: 'measured-derived' },
+    { id: 'endurance', label: 'Endurance', value: Math.round(endurance), meaning: duration === null ? 'Recorded session duration is unavailable.' : 'Session duration normalized for visual comparison, not a fitness rating.', provenance: duration === null ? 'unavailable' : 'measured-derived' },
     { id: 'intensity', label: 'Intensity', value: Math.round(intensity), meaning: hrValues.length ? 'Derived from the measured heart-rate zone distribution.' : 'Derived from the recorded average HR because no continuous trace is available.', provenance: workout.avgHr || hrValues.length ? 'measured-derived' : 'unavailable' },
     { id: 'variability', label: 'Variability', value: Math.round(variability), meaning: 'Visual normalization of how much the measured heart-rate trace varied within the session.', provenance: hrValues.length >= 4 ? 'measured-derived' : 'unavailable' },
     { id: 'recovery', label: 'Recovery', value: Math.round(recovery), meaning: workout.hrr1 != null ? 'Normalized from the recorded first-minute heart-rate recovery.' : 'No first-minute recovery sample is available for this session.', provenance: workout.hrr1 != null ? 'measured-derived' : 'unavailable' },
-    { id: 'volume', label: 'Volume', value: Math.round(volume), meaning: 'Visual normalization from recorded time and distance; not a training recommendation.', provenance: 'measured-derived' },
+    { id: 'volume', label: 'Volume', value: Math.round(volume), meaning: 'Visual normalization from available recorded time or distance; not a training recommendation.', provenance: duration !== null || distanceKnown ? 'measured-derived' : 'unavailable' },
     { id: 'data', label: 'Data richness', value: dataRichness, meaning: 'How many workout signals are actually present, not how healthy the session was.', provenance: 'measured' },
   ]
 
@@ -98,7 +103,8 @@ export function buildWorkoutDna(workout: ImportedWorkout, hrMax: number): Workou
     archetype: archetype(axes),
     measuredFacts,
     durationMin,
-    distanceKm: workout.jarakKm,
+    knownDurationMin,
+    distanceKm: distanceKnown ? workout.jarakKm : undefined,
     avgHr: workout.avgHr,
     maxHr: workout.maxHr,
     hrr1: workout.hrr1,
@@ -130,4 +136,10 @@ export function buildWorkoutDnaLibrary(workouts: ImportedWorkout[], hrMax: numbe
   return [...workouts]
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     .map((workout) => buildWorkoutDna(workout, hrMax))
+}
+
+/** Compatibility durationMin does not establish an observed duration. */
+export function workoutDnaDurationLabel(signature: Pick<WorkoutDnaSignature, 'knownDurationMin'>): string {
+  const value = signature.knownDurationMin
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? `${Math.round(value)} min` : 'Duration unavailable'
 }

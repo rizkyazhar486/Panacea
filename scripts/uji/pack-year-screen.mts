@@ -40,7 +40,7 @@ for (const [k, lo, hi] of [['cigsPerDay', 0, 200], ['yearsSmoked', 0, 90], ['age
 }
 assert.equal(PACK_YEAR_RANGES.cigsPerDay.max, 200)
 
-const page = readFileSync(new URL('../../src/pages/SubstanceUseScreen.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/mental/SubstanceUseScreen.tsx', import.meta.url), 'utf8')
 assert.ok(/packYearScreen\(\{/.test(page) && /parseNumberField\(quitText\)/.test(page), 'halaman tidak memakai mesin domain')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 assert.ok(/hasil\.status === 'eligible'/.test(page) && /hasil\.invalid\.length > 0/.test(page), 'halaman tidak memakai status/penolakan mesin')

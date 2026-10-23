@@ -80,7 +80,7 @@ assert.equal(sesiLariAwal(-2), 0, 'tidak pernah negatif')
 
 // Halaman harus memakainya, bukan menuliskan 2 sendiri.
 {
-  const halamanOrg = readFileSync('src/pages/OrganizerLatihan.tsx', 'utf8')
+  const halamanOrg = readFileSync('src/pages/fitness/OrganizerLatihan.tsx', 'utf8')
   assert.match(halamanOrg, /sesiLari: sesiLariAwal\(tercatat\)/,
     'the page must seed the run count from the recorded cadence, not a hard-coded number')
   assert.doesNotMatch(halamanOrg, /sesiLari: 2\b/,
@@ -89,7 +89,7 @@ assert.equal(sesiLariAwal(-2), 0, 'tidak pernah negatif')
 
 // ── 5. Batas biomedis: tidak ada beban, tidak ada klaim klinis ──────────────
 // Halaman ini menjadwalkan latihan; ia tidak boleh berubah menjadi resep.
-const halaman = readFileSync('src/pages/OrganizerLatihan.tsx', 'utf8')
+const halaman = readFileSync('src/pages/fitness/OrganizerLatihan.tsx', 'utf8')
 const pustaka = readFileSync('src/lib/organizerLatihan.ts', 'utf8')
 assert.match(halaman, /not a trained model and not a\s*\n?\s*personalised prescription/,
   'the page must say plainly that it is rules, not a model and not a prescription')
@@ -103,7 +103,7 @@ for (const klaim of [/injury risk/i, /readiness score/i, /guaranteed/i, /diagnos
 // ── 6. Terpasang di suatu tempat yang bisa dibuka ──────────────────────────
 // Halaman yang tidak dirujuk siapa pun bernilai nol, betapapun benarnya.
 const pusat = readFileSync('src/pages/fitness/PusatLatihan.tsx', 'utf8')
-assert.match(pusat, /import\('\.\.\/OrganizerLatihan'\)/, 'the organizer is not loaded by the Training hub')
+assert.match(pusat, /import\('\.\/OrganizerLatihan'\)/, 'the organizer is not loaded by the Training hub')
 assert.match(pusat, /id: 'organizer'/, 'the organizer has no tab a user can select')
 
 console.log('Weekly organizer: push/pull/legs/abs scheduled around recorded runs, rules verified across every selectable combination, load and clinical boundaries held')

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import { StoreProvider, useStore } from '../../src/lib/store'
-import { HealthProfile } from '../../src/pages/HealthProfile'
+import { HealthProfile } from '../../src/pages/bodyhub/HealthProfile'
 function Fixture() {
   const store = useStore()
   const [show, setShow] = useState(true)
