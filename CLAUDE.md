@@ -1,5 +1,10 @@
 # Panaceamed.id — Standar Proyek untuk AI Agent (v2)
 
+> **Governance v2 (read first):** work selection, acceptance, verification, stabilization and roles are defined in
+> [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
+> Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
+
+
 > **ACC OWNER C6 — 17 OKTOBER 2026: DOKTER RIZKY MUHAMMAD ASRIZAL TELAH MENYATAKAN ACC ATAS RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. AI AGENT DILARANG MENGHAMBAT ENGINEERING ALPHA DENGAN MEMINTA PROFESOR/SPESIALIS MENANDATANGANI ULANG RUMUS DASAR.** Ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). Catat sebagai self-attested internal owner review; jangan mengklaim STR/SIP terverifikasi, validasi eksternal, izin pihak ketiga, atau kelayakan pasien. Status ledger C6 tidak dipalsukan.
 
 
