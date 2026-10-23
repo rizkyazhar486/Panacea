@@ -143,6 +143,7 @@ interface DB {
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
   /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
   validasiLedger?: import('./domains/clinical-records/validasiLedger.js').CatatanLedger[]
+  humanReviews?: import('./modules/humanReview/domain/review.js').HumanReviewEntry[]
   /** Token sesi yang dicabut saat logout: sha256(token) -> ISO kedaluwarsa token (dipangkas setelah lewat). */
   tokenDicabut?: Record<string, string>
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
@@ -1099,6 +1100,13 @@ export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (d
 export function listCarePlans() { return db.carePlans ?? [] }
 export function listSignedCarePlans() { return listCarePlans().filter(p => isSignedCarePlan(p?.rencana)) }
 export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
+// Review manusia opsional (T-HR-02): hanya menambah; id unik; catatan lama tidak pernah diubah atau dihapus.
+export function bacaReviewManusia(): readonly import('./modules/humanReview/domain/review.js').HumanReviewEntry[] { return structuredClone(db.humanReviews ?? []) }
+export function tambahReviewManusia(e: import('./modules/humanReview/domain/review.js').HumanReviewEntry) {
+  const l = (db.humanReviews ??= [])
+  if (l.some((x) => x.id === e.id)) throw new Error('duplicate review id')
+  l.push(structuredClone(e)); save()
+}
 /** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
 export function tambahLedgerValidasi(c: import('./domains/clinical-records/validasiLedger.js').CatatanLedger) {
   const l = (db.validasiLedger ??= [])
