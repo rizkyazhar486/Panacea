@@ -1,0 +1,61 @@
+name: Staging gate
+
+# ENG-E7-04: pra-produksi sebagai kode. Sebelum kredensial staging ada (EXT-E7-B), job `credentials` GAGAL TERTUTUP dengan pesan
+# bernama dan job `smoke` tidak berjalan. Hanya workflow_dispatch: kegagalan tertutup di sini disengaja dan tidak boleh
+# menjadi cek merah di setiap PR. Kontrak env: docs/governance/staging.env.example.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  credentials:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Staging credentials present (fail closed)
+        env:
+          STAGING_URL: ${{ vars.STAGING_URL }}
+          STAGING_API_URL: ${{ vars.STAGING_API_URL }}
+          STAGING_DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
+        run: node scripts/qa/staging-credentials.mjs
+
+  smoke:
+    needs: credentials
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright (no repo dependency change)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw"
+          npm init -y >/dev/null
+          npm install playwright@1.55.1 >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Staging browser check (same script as production, staging URL)
+        env:
+          PROD_URL: ${{ vars.STAGING_URL }}
+          PROD_API_URL: ${{ vars.STAGING_API_URL }}
+          EXPECT_SHA: ${{ github.sha }}
+          OUT: staging-check
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/pw/node_modules/playwright/index.mjs
+        run: node scripts/qa/production-browser-check.mjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-check
+          path: staging-check/
+          if-no-files-found: ignore
