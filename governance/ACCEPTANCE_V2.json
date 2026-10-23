@@ -417,9 +417,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Legacy F2 note records 57 measurable failures; 1349 gradient/image-backed elements unmeasured (tracked, not counted as pass)."
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: ux-audit job 120391192973 (run 39946759961) measured teksDiukur 3253, gagal 0, gagalRuangWarna 0, gagalMobileTerang 0 against KONTRAS_BASELINE 0/0 (#2706); kontras-ukur.fixture (9 paired cases incl. 2.4:1 green-on-white) ran in the same job. CAVEAT kept: 1499 gradient/image-backed elements are unmeasurable and 16 backgrounds unresolved; passing measured text is not a claim that every page meets AA."
     },
     {
       "id": "ENG-F2-02",
@@ -448,8 +448,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: axe-audit in ux-audit job 120391192973 (run 39946759961): 0 serious/critical nodes, incompleteTotal 0 (AXE_BASELINE incompleteTotal 0); axe-ratchet.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). axe covers only part of accessibility; manual assistive-tech QA is a deferred final-stage gate (EXT-F2-A)."
     },
     {
       "id": "ENG-F2-03",
@@ -477,8 +478,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: keyboard-audit in ux-audit job 120391192973 (run 39946759961): 18 measurements, 0 without focus indicator, 0 invisible, 0 trapped, 0 missing stop; keyboard-analisis.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Real screen-reader/keyboard judgment stays EXT-F2-A."
     },
     {
       "id": "ENG-F2-04",
@@ -506,8 +508,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: screenshot-regresi gate against SCREENSHOT_GRID_BASELINE in ux-audit job 120391192973 (run 39946759961) (36 measurements); screenshot-grid.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Coarse luminance grid, not pixel-perfect visual review."
     },
     {
       "id": "ENG-F2-05",
@@ -535,8 +538,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: perf-audit job 120391192556 (run 39946759961) success; perf-audit.test.mjs and perf-stats.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Budgets are those in the repo scripts, measured on a shared CI runner."
     },
     {
       "id": "ENG-D7-01",
@@ -666,7 +670,10 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/body-asset-provenance.mts",
-            "bodyexposure/PROVENANCE.md"
+            "bodyexposure/PROVENANCE.md",
+            "scripts/uji/body-attribution-coverage.mts",
+            "src/domains/body-exposure/engine/attributionCoverage.ts",
+            "public/bodyexposure/provenance.html"
           ]
         }
       ],
@@ -810,8 +817,9 @@
       "negativeControl": "Missing build.json yields unknown, not equal.",
       "evidence": "verify-deployed-sha output + run ID.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: verify-deployed-sha printed 'frontend: f6dd71855 SAMA — SHA terdeploy = SHA main' and 'backend: c57e22fc0 SETARA — leluhur main; tidak ada perubahan pada jalur yang dideploy'. Unknown/missing SHAs classify as unknown, never equal (deploy-equivalence.test.mjs and frontend-build-info.test.mjs run in the main build job 120391193192). Classification 'SETARA' for the backend is the engineering rule; what counts as an accepted release SHA is a deferred final-stage policy (EXT-E7-A)."
     },
     {
       "id": "ENG-E7-02",
@@ -841,9 +849,9 @@
         "ENG-CI-02",
         "ENG-E7-01"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Production browser check failed on 256a22de."
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: browser smoke against https://panaceamed.id at 390 and 1440 px, both HTTP 200, overflowX false, webgl2 true, 0 page errors, and it logged 'tested frontend=f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb backend=c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11' (testedShas, #2701). The EXPECT_SHA mismatch for the backend (c57e22fc vs f6dd7185) was reported as a warning, not hidden. CAVEAT: the Body Exposure canvas is behind a login, so production anatomy/slicing is NOT verified without an owner session (reported as info by the check)."
     },
     {
       "id": "ENG-E7-03",
