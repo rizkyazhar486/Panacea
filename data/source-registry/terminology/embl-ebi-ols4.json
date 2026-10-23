@@ -11,7 +11,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea queries the public OLS4 REST API through two bounded adapter paths: `src/lib/medicalSources.ts` for Medical Library ontology search (UBERON, CL, EFO) and `server/src/anatomyOntology.ts` for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
+    "notes": "Panacea queries the public OLS4 REST API through two bounded adapter paths: `src/lib/medicalSources.ts` for Medical Library ontology search (UBERON, CL, EFO) and `server/src/domains/anatomy/anatomyOntology.ts` for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
   },
   "license": {
     "status": "CHECK_REQUIRED",
@@ -39,7 +39,7 @@
     "status": "ACTIVE",
     "normalizedTarget": "OntologyResult | OntologyTerm",
     "module": "src/lib/medicalSources.ts",
-    "notes": "The registry validator requires one concrete module path here, so the Medical Library adapter is the canonical module pointer. OLS4 is also consumed through the bounded server adapter at `server/src/anatomyOntology.ts`, which normalizes DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
+    "notes": "The registry validator requires one concrete module path here, so the Medical Library adapter is the canonical module pointer. OLS4 is also consumed through the bounded server adapter at `server/src/domains/anatomy/anatomyOntology.ts`, which normalizes DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
   },
   "trust": {
     "authority": 5,

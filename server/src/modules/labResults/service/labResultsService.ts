@@ -6,6 +6,9 @@ import type { Actor, AuditEntry, TransitionRejection } from '../domain/lifecycle
 import { REFERRAL_STATUSES, RESULT_STATUSES, STAFF_READ_ROLES as STAFF_READ, referralLifecycle, resultLifecycle } from '../domain/definitions.js'
 import type { ReferralStatus, ResultStatus } from '../domain/definitions.js'
 
+// Nama yang diwarisi setiap objek (constructor, __proto__, ...) bukan id pasien yang sah.
+const idDicadangkan = (id: unknown): boolean => typeof id === 'string' && id in Object.prototype
+
 export const TENANT_PRAKTIK = 'praktik'
 export const CHANNEL_KOMUNIKASI = ['in-person', 'phone', 'portal-message', 'letter'] as const
 export type ChannelKomunikasi = (typeof CHANNEL_KOMUNIKASI)[number]
@@ -78,9 +81,13 @@ export function validasiButir(x: unknown, sekarang: Date): ButirHasil | undefine
 
 const bolehBaca = (a: Actor, rec: { tenantId: string; patientId: string }): boolean => {
   if (a.tenantId !== rec.tenantId) return false
-  if (a.role === 'patient') return (a.patientIds ?? []).includes(rec.patientId)
+  if (a.role === 'patient' || a.role === 'nurse' || a.role === 'lab-staff') return (a.patientIds ?? []).includes(rec.patientId)
   return STAFF_READ.includes(a.role)
 }
+
+/** Staf perawat/lab menulis hanya untuk pasien yang ditugaskan; klinisi dan admin tidak dibatasi di sini. */
+const bolehTulisPasien = (a: Actor, patientId: string): boolean =>
+  (a.role !== 'nurse' && a.role !== 'lab-staff') || (a.patientIds ?? []).includes(patientId)
 
 // Aktor sistem (intake otomatis) tidak membaca data, tetapi boleh MENGAJUKAN transisi yang diizinkan
 // definisi siklus hidup (received -> pending_review); transisi lain ditolak dengan alasan eksplisit.
@@ -97,7 +104,8 @@ export function terimaHasil(k: Konteks, a: Actor, masukan: { patientId?: unknown
   const patientId = str(masukan.patientId, MAKS_ID)
   const item = validasiButir(masukan.item, now)
   const source = masukan.source === 'lab-intake' || masukan.source === 'manual-entry' ? masukan.source : undefined
-  if (!patientId || !item || !source) return gagal('invalid-input')
+  if (!patientId || !item || !source || idDicadangkan(patientId)) return gagal('invalid-input')
+  if (!bolehTulisPasien(a, patientId)) return gagal('forbidden')
   const rec: HasilLabRekam = {
     id: k.newId('lab'), tenantId: a.tenantId, patientId, status: resultLifecycle.initial, item,
     provenance: { source, recordedBy: a.actorId, recordedAt: now.toISOString() }, trail: [],
@@ -154,7 +162,8 @@ export interface MetrikPenutupan {
 
 /** B9: metrik dihitung dari backend; hanya hasil yang jejaknya utuh yang dihitung, sisanya dilaporkan terpisah. */
 export function metrikPenutupan(k: Konteks, a: Actor, opsi: { dueHours?: number } = {}): Hasil<MetrikPenutupan & { corrupt: number }> {
-  if (!STAFF_READ.includes(a.role) || a.tenantId !== TENANT_PRAKTIK) return gagal('forbidden')
+  // Metrik menjumlahkan seluruh tenant: hanya klinisi dan admin; perawat/lab (dibatasi per pasien) tidak.
+  if (!(a.role === 'clinician' || a.role === 'admin') || a.tenantId !== TENANT_PRAKTIK) return gagal('forbidden')
   const byStatus = Object.fromEntries(RESULT_STATUSES.map((s) => [s, 0])) as Record<ResultStatus, number>
   const sekarang = k.now().getTime()
   let total = 0, corrupt = 0, oldest: number | null = null, overdue: number | null = opsi.dueHours === undefined ? null : 0
@@ -180,7 +189,7 @@ export function buatRujukan(k: Konteks, a: Actor, m: { patientId?: unknown; kind
   if (a.role !== 'clinician' || a.authorizedClinician !== true) return gagal('forbidden')
   const patientId = str(m.patientId, MAKS_ID), reason = str(m.reason, MAKS_CATATAN), toFacility = str(m.toFacility, MAKS_NAMA)
   const kind = JENIS_RUJUKAN.find((j) => j === m.kind)
-  if (!patientId || !reason || !toFacility || !kind) return gagal('invalid-input')
+  if (!patientId || !reason || !toFacility || !kind || idDicadangkan(patientId)) return gagal('invalid-input')
   const rec: RujukanRekam = { id: k.newId('ref'), tenantId: a.tenantId, patientId, status: referralLifecycle.initial, kind, reason, toFacility, trail: [] }
   k.rujukan.put(rec)
   return { ok: true, value: rec }

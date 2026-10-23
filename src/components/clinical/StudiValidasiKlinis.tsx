@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { gerbangRilisKlinis, JENIS_GALAT, susunLaporan, type JenisGalat, type KasusBeku, type KlaimKlinis, type LaporanValidasi, type Protokol } from '../../lib/validasiKlinis'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
+import { parseUnsupportedClaimCount } from '../../domains/clinical-review'
 
 // Studi validasi klinis — layar penilai (buta) dan laporan pemimpin studi.
 // Perangkat lunak tidak membuat penilaian apa pun; setiap angka laporan berasal
@@ -63,10 +64,10 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
 function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases: Kasus[] }; onSelesai: () => void }) {
   const kasus = studi.cases.find((c) => !c.sudahSaya)
   const mulai = useRef(Date.now())
-  const [f, setF] = useState({ galat: [] as JenisGalat[], benar: null as boolean | null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', coi: '', catatan: '' })
+  const [f, setF] = useState({ galat: [] as JenisGalat[], benar: null as boolean | null, bahaya: 'none', klaim: '', omisi: '', override: false, alasan: '', coi: '', catatan: '' })
   const [kirim, setKirim] = useState(false)
   const [pesan, setPesan] = useState<string | null>(null)
-  useEffect(() => { mulai.current = Date.now(); setF((x) => ({ ...x, galat: [], benar: null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', catatan: '' })) }, [kasus?.id])
+  useEffect(() => { mulai.current = Date.now(); setF((x) => ({ ...x, galat: [], benar: null, bahaya: 'none', klaim: '', omisi: '', override: false, alasan: '', catatan: '' })) }, [kasus?.id])
   if (!kasus) return (
     <div className="mt-2" data-validation-done>
       <p className="text-[12px] font-bold text-emerald-300">All cases in this study are assessed. Thank you.</p>
@@ -80,10 +81,12 @@ function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases
     if (f.benar === null) { setPesan('State whether the output is correct.'); return }
     if (f.benar === false && !f.galat.length) { setPesan('Classify the error.'); return }
     if (f.override && !f.alasan.trim()) { setPesan('An override needs a reason.'); return }
+    const klaim = parseUnsupportedClaimCount(f.klaim)
+    if (!klaim.ok) { setPesan(klaim.problem); return }
     setKirim(true)
     try {
       await api.submitValidationAssessment(studi.protokol.id, {
-        kasusId: kasus.id, benar: f.benar, galat: f.benar ? [] : f.galat, bahaya: f.bahaya, klaimTakDidukung: Number(f.klaim) || 0,
+        kasusId: kasus.id, benar: f.benar, galat: f.benar ? [] : f.galat, bahaya: f.bahaya, klaimTakDidukung: klaim.value,
         omisi: f.omisi.split('\n').map((x) => x.trim()).filter(Boolean), override: { dilakukan: f.override, alasan: f.alasan },
         waktuTinjauMs: Date.now() - mulai.current, konflikKepentingan: f.coi, catatan: f.catatan,
       })
@@ -125,7 +128,7 @@ function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases
           </select>
         </label>
         <label className="flex items-center justify-between gap-2">Unsupported claims in the reason
-          <input inputMode="numeric" value={f.klaim} onChange={(e) => setF({ ...f, klaim: e.target.value })} aria-label="Unsupported claims" className="w-14 rounded-md border border-white/15 bg-transparent px-1 py-1 text-white" />
+          <input inputMode="numeric" placeholder="0 if none" value={f.klaim} onChange={(e) => setF({ ...f, klaim: e.target.value })} aria-label="Unsupported claims" className="w-20 rounded-md border border-white/15 bg-transparent px-1 py-1 text-white" />
         </label>
         <textarea rows={2} value={f.omisi} onChange={(e) => setF({ ...f, omisi: e.target.value })} placeholder="Omissions — one per line (optional)" aria-label="Omissions" className="rounded-md border border-white/15 bg-transparent px-2 py-1 text-white" />
         <label className="flex items-center gap-2"><input type="checkbox" checked={f.override} onChange={(e) => setF({ ...f, override: e.target.checked })} /> I would override this output in practice</label>

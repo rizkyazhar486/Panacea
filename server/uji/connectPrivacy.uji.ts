@@ -121,3 +121,13 @@ assert.equal(setelRadius('radius@example.test', 9999), 500)
 assert.equal(setelRadius('radius@example.test', 42.4), 42)
 
 console.log('Connect consent, identity minimization, retention, public-redaction, blocking, and radius invariants verified.')
+
+// Real HTTP: the public feed carries no reactor emails (counts and "mine" preserved), redaction is output-only, owner-only edits whitelisted.
+await import('./postsPrivacyHttp.uji.js')
+
+// Real HTTP: push subscriptions validated and capped, post/feedback text bounded, public price board without contributor emails.
+await import('./inputBoundsHttp.uji.js')
+
+// Connect privacy over real HTTP: consent first, no sensitive field in any user-facing response, server-side deck filters, radius validated, withdrawal erases.
+await import('./connectHttp.uji.js')
+await import('./logoutRevokeHttp.uji.js')

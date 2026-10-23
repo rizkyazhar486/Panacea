@@ -5,3 +5,4 @@ export {
   type DoctorReviewChecklistItem,
   type DoctorReviewChecklistStatus,
 } from './model/doctorReviewChecklist'
+export { parseUnsupportedClaimCount, UNSUPPORTED_CLAIM_MAX, type UnsupportedClaimResult } from './engine/unsupportedClaimCount'

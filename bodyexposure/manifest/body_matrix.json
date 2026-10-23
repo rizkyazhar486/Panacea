@@ -73,6 +73,16 @@
      "label": "ICRP reference",
      "status": "source_backed",
      "source": "ICRP Publication 145 adult mesh-type reference computational phantom (CT-based, adjusted to ICRP Publication 89 reference values); redistribution cleared by project owner 2026-10-03"
+    },
+    {
+     "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+     "structures": 4,
+     "stature_m": null,
+     "label": "Main bronchi reference (HRA)",
+     "status": "source_backed_partial",
+     "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976, CC BY 4.0",
+     "coverage": "Four main-bronchus/cartilage components in their source coordinates; a separate reference, unregistered to the whole-body model.",
+     "individual": "Visible Human female source; standalone HRA organ reference"
     }
    ],
    "redistribution": null,

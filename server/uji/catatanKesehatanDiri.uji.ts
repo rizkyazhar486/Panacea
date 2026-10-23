@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { bacaSelfVitalsLog, bacaVo2maxLog, validasiSelfVitalsLog, validasiVo2maxLog } from '../src/catatanKesehatanDiri.ts'
+import { bacaSelfVitalsLog, bacaVo2maxLog, validasiSelfVitalsLog, validasiVo2maxLog } from '../src/domains/clinical-records/catatanKesehatanDiri.ts'
 
 const ok = validasiSelfVitalsLog([
   { id: 'a1', at: '2026-09-28T10:00:00.000Z', systolic: 120, diastolic: 80, heartRate: 72, spo2: 98, tempC: 36.8 },
@@ -20,7 +20,7 @@ assert.equal(vo2.length, 1, 'duplicate ids keep the first occurrence after sort 
 assert.deepEqual(bacaSelfVitalsLog({ selfVitalsLog: 'bad' }), [])
 assert.deepEqual(bacaVo2maxLog({ vo2maxEntries: [{ id: 'bad' }] }), [])
 
-const { validasiDiarySleep, validasiDiaryFoods, validasiDiaryWellness, validasiDiaryTraining, validasiDiaryGps, bacaDiarySleep } = await import('../src/catatanKesehatanDiri.ts')
+const { validasiDiarySleep, validasiDiaryFoods, validasiDiaryWellness, validasiDiaryTraining, validasiDiaryGps, bacaDiarySleep } = await import('../src/domains/clinical-records/catatanKesehatanDiri.ts')
 const tidur = validasiDiarySleep([
   { id: 's1', date: '2026-09-28', hours: 7.5, bedtimeConsistent: true },
   { id: 's1', date: '2026-09-27', hours: 6, bedtimeConsistent: false },
@@ -47,7 +47,7 @@ assert.equal(hari.length, 1)
 assert.equal(hari[0].waterMl, 1800)
 assert.deepEqual(bacaDiarySleep({ diarySleep: [{ id: 'bad' }] }), [])
 
-const { susunPatchDiary, MAKS_TIDUR } = await import('../src/catatanKesehatanDiri.ts')
+const { susunPatchDiary, MAKS_TIDUR } = await import('../src/domains/clinical-records/catatanKesehatanDiri.ts')
 const profil = {
   diarySleep: [{ id: 's1', date: '2026-09-28', hours: 7, bedtimeConsistent: true }],
   diaryFoods: [{ id: 'f1', date: '2026-09-28', name: 'rice', grams: 100, kcal: 130, protein: 3, carbs: 28, fat: 0 }],
@@ -92,7 +92,7 @@ assert.equal(batasTidur.some((r) => r.id === 'baru'), true)
 assert.equal(batasTidur.some((r) => r.id === 'p0'), false)
 assert.equal((susunPatchDiary({ diarySleep: penuh }, { sleepLogs: [] }).diarySleep as unknown[]).length, MAKS_TIDUR)
 
-const { buangKunciDiary, MAKS_NISAN } = await import('../src/catatanKesehatanDiri.ts')
+const { buangKunciDiary, MAKS_NISAN } = await import('../src/domains/clinical-records/catatanKesehatanDiri.ts')
 const diganti = susunPatchDiary(profil, {
   sleepLogs: [{ id: 's9', date: '2026-09-28', hours: 8, bedtimeConsistent: false }],
 })
@@ -290,3 +290,6 @@ assert.equal((tidurTetap.diaryWellness as { sleepHr?: number }[])[0].sleepHr, 7)
 assert.equal((susunPatchDiary({ diaryWellness: [{ date: '2026-09-28', sleepHr: 7 }] }, { wellness: [{ date: '2026-09-28', sleepHr: 0, waterMl: 0 }] }).diaryWellness as unknown[]).length, 0)
 
 console.log('catatanKesehatanDiri: self-vital and vo2max lists validate fail-closed')
+
+// Real HTTP: personal-data routes (settings with server-owned keys, health profile, series, reminders) authorization and integrity.
+await import('./personalDataHttpRbac.uji.js')

@@ -28,22 +28,44 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   push-policy:
     if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[deploy-vercel]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Batch this push for the next Vercel release
         run: |
           echo "## Vercel production release" >> "$GITHUB_STEP_SUMMARY"
-          echo "This main push was **batched**, not failed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Release status: **QUEUED — NOT DEPLOYED** for commit ${GITHUB_SHA}." >> "$GITHUB_STEP_SUMMARY"
+          echo "This main push was batched, not failed." >> "$GITHUB_STEP_SUMMARY"
           echo "The newest main will deploy on the next 6-hour release window." >> "$GITHUB_STEP_SUMMARY"
           echo "For an intentional immediate release, use workflow_dispatch or include \`[deploy-vercel]\` in the commit message." >> "$GITHUB_STEP_SUMMARY"
 
-  deploy:
+  release-gates:
     if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout release revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify exact revision acceptance
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_GATE_WAIT_SECONDS: 1200
+        run: node scripts/qa/vercel-release-gate.mjs
+
+  deploy:
+    needs: release-gates
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     concurrency:
       group: vercel-production
@@ -94,6 +116,12 @@ jobs:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: vercel build --prod --scope=panaceamed --token="$VERCEL_TOKEN"
 
+      - name: Recheck exact revision acceptance
+        id: release-recheck
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/qa/vercel-release-gate.mjs
+
       - name: Deploy prebuilt artifact to production
         id: deploy
         shell: bash
@@ -127,6 +155,7 @@ jobs:
           echo "Production deployment: $URL"
 
       - name: Smoke-test deployed production artifact
+        id: smoke
         if: steps.deploy.outputs.deferred != 'true' && steps.deploy.outputs.url != ''
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
@@ -134,18 +163,96 @@ jobs:
           curl --fail --silent --show-error --location --retry 4 --retry-delay 3 --max-time 30 "$DEPLOYMENT_URL" >/dev/null
           echo "Deployment responded successfully: $DEPLOYMENT_URL"
 
+      - name: Verify deployed build marker equals the built commit
+        id: marker
+        if: steps.smoke.outcome == 'success'
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: node scripts/qa/verify-build-marker.mjs "$DEPLOYMENT_URL" "$EXPECTED_SHA"
+
+      - name: Write machine-readable release evidence
+        if: always()
+        env:
+          RELEASE_RECHECK_OUTCOME: ${{ steps.release-recheck.outcome }}
+          DEPLOYMENT_SHA: ${{ github.sha }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+          DEPLOYMENT_DEFERRED: ${{ steps.deploy.outputs.deferred }}
+          DEPLOY_STEP_OUTCOME: ${{ steps.deploy.outcome }}
+          SMOKE_STEP_OUTCOME: ${{ steps.smoke.outcome }}
+          MARKER_STEP_OUTCOME: ${{ steps.marker.outcome }}
+          WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVIDENCE_PATH: ${{ runner.temp }}/vercel-release-evidence.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          recheck_passed = os.environ.get("RELEASE_RECHECK_OUTCOME") == "success"
+          deferred = os.environ.get("DEPLOYMENT_DEFERRED") == "true"
+          deployed = os.environ.get("DEPLOY_STEP_OUTCOME") == "success"
+          smoke_passed = os.environ.get("SMOKE_STEP_OUTCOME") == "success"
+          marker_passed = os.environ.get("MARKER_STEP_OUTCOME") == "success"
+          url = os.environ.get("DEPLOYMENT_URL", "")
+          if not recheck_passed:
+              status = "BLOCKED_RELEASE_GATES"
+          elif deferred:
+              status = "DEFERRED_QUOTA"
+          elif deployed and smoke_passed and marker_passed and url:
+              status = "DEPLOYED_SMOKE_VERIFIED"
+          else:
+              status = "FAILED_OR_UNVERIFIED"
+
+          record = {
+              "status": status,
+              "commit_sha": os.environ["DEPLOYMENT_SHA"],
+              "deployment_url": url or None,
+              "deploy_step": os.environ.get("DEPLOY_STEP_OUTCOME", ""),
+              "smoke_step": os.environ.get("SMOKE_STEP_OUTCOME", ""),
+              "build_marker_step": os.environ.get("MARKER_STEP_OUTCOME", ""),
+              "release_recheck": os.environ.get("RELEASE_RECHECK_OUTCOME", ""),
+              "workflow_run": os.environ["WORKFLOW_RUN_URL"],
+          }
+          Path(os.environ["EVIDENCE_PATH"]).write_text(
+              json.dumps(record, indent=2) + chr(10), encoding="utf-8"
+          )
+          print(json.dumps(record))
+          PY
+
+      - name: Upload Vercel release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-release-evidence
+          path: ${{ runner.temp }}/vercel-release-evidence.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Deployment summary
         if: always()
         run: |
           echo "## Vercel production" >> "$GITHUB_STEP_SUMMARY"
           echo "Commit built: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.deploy.outputs.deferred }}" = "true" ]; then
+          if [ "${{ steps.release-recheck.outcome }}" != "success" ]; then
+            echo "Status: **BLOCKED — exact-revision acceptance was not established**" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.deploy.outputs.deferred }}" = "true" ]; then
             echo "Status: **DEFERRED — Vercel free daily deployment quota reached**" >> "$GITHUB_STEP_SUMMARY"
             echo "Code/build status: **valid**" >> "$GITHUB_STEP_SUMMARY"
             echo "The next scheduled or manually dispatched run will retry the newest main." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.deploy.outcome }}" != "success" ]; then
+            echo "Status: **FAILED — deployment step did not succeed**" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.smoke.outcome }}" != "success" ]; then
+            echo "Status: **UNVERIFIED — production smoke test did not pass**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Deployment URL: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.marker.outcome }}" != "success" ]; then
+            echo "Status: **UNVERIFIED — deployed build marker does not match the built commit**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Deployment URL: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          elif [ -z "${{ steps.deploy.outputs.url }}" ]; then
+            echo "Status: **UNVERIFIED — no deployment URL**" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Status: **DEPLOYED**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Status: **DEPLOYED — deployment URL smoke-verified**" >> "$GITHUB_STEP_SUMMARY"
             echo "Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
-            echo "Alias: https://www.panaceamed.id" >> "$GITHUB_STEP_SUMMARY"
-            echo "Smoke test: passed" >> "$GITHUB_STEP_SUMMARY"
+            echo "Production alias (not independently verified): https://www.panaceamed.id" >> "$GITHUB_STEP_SUMMARY"
+            echo "Smoke test: passed on deployment URL" >> "$GITHUB_STEP_SUMMARY"
           fi

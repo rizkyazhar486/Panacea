@@ -1,13 +1,13 @@
 import { strict as assert } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { cleanBodyBiomedicalQuery, unmappedAnatomy } from '../src/bodyBiomedicalCoverage.js'
+import { cleanBodyBiomedicalQuery, unmappedAnatomy } from '../src/domains/anatomy/bodyBiomedicalCoverage.js'
 
 assert.equal(cleanBodyBiomedicalQuery('  Parkinson\n disease  '), 'Parkinson disease')
 assert.equal(cleanBodyBiomedicalQuery('<script>TB</script>'), 'script TB /script')
 assert.equal(cleanBodyBiomedicalQuery('x'.repeat(300)).length, 160)
 assert.deepEqual(unmappedAnatomy(), { status: 'unmapped', organKeys: [] })
 
-const source = readFileSync(new URL('../src/bodyBiomedicalCoverage.ts', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../src/domains/anatomy/bodyBiomedicalCoverage.ts', import.meta.url), 'utf8')
 
 // No giant bundled catalog and no broad all-source fan-out: each explicit kind
 // goes through the already-hardened canonical server adapter.

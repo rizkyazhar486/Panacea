@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "blender_version": "5.2.2 LTS",
+  "input_artifacts": [
+    {
+      "path": "/private/tmp/codex-fetal-outward-v016-final/PANACEA_BODY_FETUS_ATLAS.blend",
+      "bytes": 4008005,
+      "sha256": "b6acef63722629d4f0c75070c8d90e2f9ca6b4ab77d0815b252d57685ebf820f"
+    },
+    {
+      "path": "/private/tmp/panacea-render-source-frozen-20261011/render_cinematic.py",
+      "bytes": 14461,
+      "sha256": "273cb77a8a90ffaf7bdbbf81f13bb6214e3f197ae164e8296ed1b9bf39aa70fe"
+    },
+    {
+      "path": "/private/tmp/panacea-render-source-frozen-20261011/render_body_file.py",
+      "bytes": 2737,
+      "sha256": "b5e1604b309567de3e294280e976937c7033c5c3db6c5774a412aa915b1f3071"
+    }
+  ],
+  "inputs_unchanged": true,
+  "clinical_validation": "pending",
+  "profile": "cinematic",
+  "benchmark": "body-qa",
+  "device_backend": "METAL",
+  "devices": [
+    "Apple M4 (GPU - 10 cores)"
+  ],
+  "audit": {
+    "visible_meshes": 14,
+    "source_polygons": 170262,
+    "meshes_without_uv": 14,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 14
+    },
+    "suppressed_display_instances": []
+  },
+  "renders": [
+    {
+      "variant": "after",
+      "path": "body-qa_c0_cinematic_after.png",
+      "sha256": "589bccab391d0baff093bdfb8dad615d98b88bafa2e9dfd58cbfb0fa70e90b31",
+      "render_seconds": 1330.468,
+      "process_memory": {
+        "peak_rss_bytes": 3565207552,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        7680,
+        4320
+      ],
+      "sample_limit": 512,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key",
+          "energy_watts": 1.9587148427963257,
+          "diameter_metres": 0.06780515611171722,
+          "location_metres": [
+            -0.09388405829668045,
+            -0.13561031222343445,
+            0.1199629083275795
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill",
+          "energy_watts": 0.4896787106990814,
+          "diameter_metres": 0.09388405829668045,
+          "location_metres": [
+            0.11474718898534775,
+            -0.1043156236410141,
+            0.06780511885881424
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim",
+          "energy_watts": 1.3058099746704102,
+          "diameter_metres": 0.046942029148340225,
+          "location_metres": [
+            0.07302093505859375,
+            0.10431559383869171,
+            0.11474721878767014
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "after",
+      "path": "body-qa_c1_cinematic_after.png",
+      "sha256": "506a1bf17a8908888bb05f210f3ca0ea926104317f7741276d1d68649570ea0d",
+      "render_seconds": 1034.411,
+      "process_memory": {
+        "peak_rss_bytes": 4045897728,
+        "scope": "process_lifetime_high_water_rss",
+        "gpu_memory_bytes": null
+      },
+      "resolution": [
+        7680,
+        4320
+      ],
+      "sample_limit": 512,
+      "time_limit_seconds": 0.0,
+      "adaptive_sampling": true,
+      "denoising": true,
+      "lighting": "studio",
+      "exposure_ev": -1.5,
+      "lighting_state_restored": true,
+      "studio_lights": [
+        {
+          "name": "PAN.CINEMATIC.key.001",
+          "energy_watts": 1.9587148427963257,
+          "diameter_metres": 0.06780515611171722,
+          "location_metres": [
+            0.13561031222343445,
+            -0.09388405829668045,
+            0.11996296793222427
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.fill.001",
+          "energy_watts": 0.4896787106990814,
+          "diameter_metres": 0.09388405829668045,
+          "location_metres": [
+            0.1043156236410141,
+            0.11474718898534775,
+            0.06780515611171722
+          ]
+        },
+        {
+          "name": "PAN.CINEMATIC.rim.001",
+          "energy_watts": 1.3058099746704102,
+          "diameter_metres": 0.046942029148340225,
+          "location_metres": [
+            -0.1043156236410141,
+            0.07302093505859375,
+            0.11474718898534775
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation or browser FPS measurement performed.",
+    "RSS is the OS process-lifetime high-water mark, not GPU memory or per-frame allocation.",
+    "Sample limits are requested ceilings; adaptive sampling/time limits may stop earlier.",
+    "External linked libraries and unpacked textures are not inventoried by this report.",
+    "Quality comparison isolates sampling/denoising; lighting comparison holds those fixed.",
+    "Timings include scene synchronization and sequential cache effects."
+  ]
+}

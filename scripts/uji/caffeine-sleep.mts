@@ -44,7 +44,7 @@ for (const t of ['00:00', '23:59']) assert.equal(run({ bedtime: t }).invalid.len
 for (const t of ['24:00', '23:60', '7:00', '07:5']) assert.equal(run({ bedtime: t }).invalid.length, 1, t)
 assert.deepEqual([CAFFEINE_RANGES.servings.max, CAFFEINE_RANGES.customMg.max, CAFFEINE_RANGES.halfLifeH.min, CAFFEINE_RANGES.halfLifeH.max], [20, 2000, 1.5, 9.5])
 
-const page = readFileSync(new URL('../../src/pages/CaffeineCalculator.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/bodyhub/CaffeineCalculator.tsx', import.meta.url), 'utf8')
 assert.ok(/caffeineAtBedtime\(\{/.test(page) && /parseNumberField\(v\)/.test(page), 'halaman tidak memakai mesin domain')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 assert.ok(/hasil\.invalid\.length > 0/.test(page) && /hasil\.invalid\.length === 0 && totalDose > 0/.test(page), 'hasil tidak digerbang oleh validasi')

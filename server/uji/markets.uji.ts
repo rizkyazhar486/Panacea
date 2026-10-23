@@ -1,4 +1,4 @@
-import { fetchQuote, fetchQuotes, isValidSymbol, searchSymbols } from '../src/markets'
+import { fetchQuote, fetchQuotes, isValidSymbol, searchSymbols } from '../src/domains/payments/markets'
 
 let lulus = 0
 let gagal = 0

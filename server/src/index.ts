@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './observabilitas.js'
-import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './galatKlien.js'
+import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './domains/observability/observabilitas.js'
+import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './domains/observability/galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
 import { fileURLToPath as keJalurBerkas } from 'node:url'
@@ -71,6 +71,7 @@ import {
   addLabReview,
   listLabReviews,
   listCarePlans,
+  listSignedCarePlans,
   addCarePlan,
   bacaLedgerValidasi,
   tambahLedgerValidasi,
@@ -106,6 +107,7 @@ import {
   addApplication,
   listApplications,
   setApplicationStatus,
+  getApplication,
   setApplicationVerdict,
   isEarlyAdopter,
   earlyAdopterInfo,
@@ -140,52 +142,57 @@ import {
   modePenyimpanan,
   modeIrisan,
 } from './store.js'
-import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { putusanPengingat } from './jadwal.js'
+import { googleLogin, devLogin, currentUser, clearSession, revokeSessionToken, requireAuth } from './auth.js'
+import { emailOtpStart, emailOtpVerify, emailOtpLive } from './domains/identity/otp.js'
+import { putusanPengingat } from './domains/lifestyle/jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
-import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
-import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup, exerciseImageLookup } from './anatomyImages.js'
-import { cariDiagnosis, icd11Configured } from './icd11.js'
-import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './rxclass.js'
+import { anatomyOntologyLookup, anatomyStructureLookup } from './domains/anatomy/anatomyOntology.js'
+import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup, exerciseImageLookup } from './domains/anatomy/anatomyImages.js'
+import { cariDiagnosis, icd11Configured } from './domains/medical-reference/icd11.js'
+import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './domains/medical-reference/rxclass.js'
 import { terjemahkan, BAHASA, REGISTER, type Register } from './translate.js'
 import { panggilModel } from './ai.js'
-import { lookupDrugLabel } from './drugInfo.js'
-import { sendEmail } from './email.js'
-import { sendPush, notify, keadaanPush } from './push.js'
-import { submitEmr } from './satusehat.js'
-import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
+import { lookupDrugLabel } from './domains/medical-reference/drugInfo.js'
+import { sendEmail } from './domains/identity/email.js'
+import { sendPush, notify, keadaanPush } from './domains/push/push.js'
+import { submitEmr } from './domains/clinical-records/satusehat.js'
+import { createPayment, confirmPayment, paymentWebhook, orderStatus, normalizeTopUpPnc } from './domains/payments/payments.js'
 import { disburse, irisLive } from './iris.js'
-import { KATALOG, KATEGORI } from './healthMetrics.js'
-import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
-import { susunKeadaanLongitudinal } from './keadaanLongitudinal.js'
-import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './catatanKesehatanDiri.js'
-import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
-import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
-import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
+import { KATALOG, KATEGORI } from './domains/push/healthMetrics.js'
+import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './domains/clinical-records/labLog.js'
+import { susunKeadaanLongitudinal } from './domains/clinical-records/keadaanLongitudinal.js'
+import { validasiSelfVitalsLog, validasiVo2maxLog, susunPatchDiary, buangKunciDiary } from './domains/clinical-records/catatanKesehatanDiri.js'
+import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './domains/clinical-records/labFhir.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSignedCarePlan } from './domains/clinical-records/carePlan.js'
+import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
-import { repoHasilLab, repoRujukan } from './store.js'
-import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
-import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
-import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
-import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
+import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
+import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
+import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './domains/clinical-records/validasiLedger.js'
+import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './domains/push/healthWebhook.js'
 import { readBuildCommit } from './shared/buildInfo.js'
-import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
-import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
-import { checkPrayerReminder } from './salat.js'
-import { lingkunganKota, cariPangan } from './lingkungan.js'
-import { jalankanAturanNotif, detakMesinAturan } from './aturanNotif.js'
-import { searchPubmed } from './pubmed.js'
-import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
-import { searchTrials } from './trials.js'
-import { lookupDrug } from './openfda.js'
-import { lookupGene } from './mygene.js'
-import { findRelatedDrugs } from './rxnorm.js'
-import { attachRealtime } from './realtime.js'
+import { deliverThenCommitAlertState, checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './domains/push/healthAlerts.js'
+import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './domains/lifestyle/sports.js'
+import { checkPrayerReminder } from './domains/lifestyle/salat.js'
+import { lingkunganKota, cariPangan } from './domains/lifestyle/lingkungan.js'
+import { jalankanAturanNotif, detakMesinAturan } from './domains/push/aturanNotif.js'
+import { searchPubmed } from './domains/medical-reference/pubmed.js'
+import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './domains/payments/markets.js'
+import { searchTrials } from './domains/medical-reference/trials.js'
+import { lookupDrug } from './domains/medical-reference/openfda.js'
+import { lookupGene } from './domains/medical-reference/mygene.js'
+import { findRelatedDrugs } from './domains/medical-reference/rxnorm.js'
+import { attachRealtime } from './modules/visits/realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
 import { cronAuthorized } from './shared/secretCompare.js'
-import { mountVisitRoutes } from './visits.js'
+import { mountVisitRoutes } from './modules/visits/visits.js'
+import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
+import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
+import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS } from './store.js'
+import { penandaLog } from './domains/observability/logIdentity.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -493,7 +500,8 @@ app.get('/api/auth/me', (req, res) => {
   if (!u) return res.status(401).json({ error: 'unauthorized' })
   res.json({ user: u })
 })
-app.post('/api/auth/logout', (_req, res) => {
+app.post('/api/auth/logout', (req, res) => {
+  revokeSessionToken(req)
   clearSession(res)
   res.json({ ok: true })
 })
@@ -506,7 +514,7 @@ app.get('/api/wallet', requireAuth, (req, res) => {
 app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as { amountPnc?: number; bank?: string; accountNumber?: string; accountHolder?: string }
-  const amount = Math.floor(Number(b.amountPnc) || 0)
+  const amount = normalizeTopUpPnc(b.amountPnc, config.tokenToIdr) ?? 0
   const bank = String(b.bank || '').trim()
   const accountNumber = String(b.accountNumber || '').replace(/\s/g, '')
   const accountHolder = String(b.accountHolder || '').trim()
@@ -554,7 +562,7 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
 // User submits a request after transferring; the owner approves to credit PNC.
 app.post('/api/wallet/topup-request', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const amount = Math.floor(Number((req.body as { amountPnc?: number }).amountPnc) || 0)
+  const amount = normalizeTopUpPnc((req.body as { amountPnc?: number }).amountPnc, config.tokenToIdr) ?? 0
   if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
   const row = addManualTopup({ userId: u.id, email: u.email, name: u.name, amountPnc: amount, amountIdr: amount * config.tokenToIdr })
   addAudit(u, 'wallet.topup_request', `${amount} PNC (Rp${row.amountIdr.toLocaleString('id-ID')})`)
@@ -611,7 +619,12 @@ app.post('/api/applications/decide', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   const { id, grant } = req.body as { id?: string; grant?: boolean }
-  const a = setApplicationStatus(String(id || ''), grant ? 'granted' : 'rejected')
+  // Satu keputusan per permohonan: UI hanya memutuskan baris `pending`. Tanpa penjaga ini, `rejected` setelah `granted`
+  // meninggalkan akun tetap terverifikasi (strStatus) padahal permohonannya tercatat ditolak. Pencabutan lewat /api/doctors/:id/verify.
+  const sebelum = getApplication(String(id || ''))
+  if (!sebelum) return res.status(404).json({ error: 'not_found' })
+  if (sebelum.status !== 'pending') return res.status(409).json({ error: 'already_decided' })
+  const a = setApplicationStatus(sebelum.id, grant ? 'granted' : 'rejected')
   if (!a) return res.status(404).json({ error: 'not_found' })
   notify(a.userId, grant
     ? { title: 'Access approved ✅', body: `Your ${a.role} registration was approved. Full access is now active.`, url: './#/' }
@@ -635,7 +648,8 @@ app.get('/api/facility-prices', (req, res) => {
   const facilityId = String(req.query.facilityId || '')
   if (!facilityId) return res.status(400).json({ error: 'missing_facilityId' })
   const diagnosisCode = req.query.diagnosisCode ? String(req.query.diagnosisCode) : undefined
-  res.json({ prices: listFacilityPrices(facilityId, diagnosisCode) })
+  // Papan harga ini publik: nama kontributor tampil, surelnya tidak (klien hanya memakai submittedByName).
+  res.json({ prices: listFacilityPrices(facilityId, diagnosisCode).map(({ submittedByEmail: _surel, ...umum }) => umum) })
 })
 app.post('/api/facility-prices', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -644,12 +658,13 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
   if (b.confidence !== 'estimated' && b.confidence !== 'verified') {
     return res.status(400).json({ error: 'invalid_confidence' })
   }
+  for (const harga of [b.low, b.high]) if (harga !== undefined && harga !== null && (typeof harga !== 'number' || !Number.isFinite(harga) || harga < 0)) return res.status(400).json({ error: 'invalid_price' })
   const p = {
     id: uid(),
-    facilityId: String(b.facilityId),
-    diagnosisCode: b.diagnosisCode ? String(b.diagnosisCode) : undefined,
-    diagnosisTitle: b.diagnosisTitle ? String(b.diagnosisTitle) : undefined,
-    currency: String(b.currency || 'IDR'),
+    facilityId: String(b.facilityId).slice(0, 120),
+    diagnosisCode: b.diagnosisCode ? String(b.diagnosisCode).slice(0, 40) : undefined,
+    diagnosisTitle: b.diagnosisTitle ? String(b.diagnosisTitle).slice(0, 200) : undefined,
+    currency: String(b.currency || 'IDR').slice(0, 8),
     low: typeof b.low === 'number' ? b.low : undefined,
     high: typeof b.high === 'number' ? b.high : undefined,
     confidence: b.confidence,
@@ -659,10 +674,14 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
     at: new Date().toISOString(),
   }
   addFacilityPrice(p)
-  res.json({ price: p })
+  const { submittedByEmail: _surel, ...umum } = p
+  res.json({ price: umum })
 })
 
-app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
+app.get('/api/posts', (req, res) => {
+  const pemirsa = currentUser(req)?.email
+  res.json({ posts: listPosts().map((p) => postUntukPemirsa(p, pemirsa, config.jwtSecret)) })
+})
 app.post('/api/posts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Post>
@@ -672,9 +691,9 @@ app.post('/api/posts', requireAuth, (req, res) => {
     authorName: u.name,
     role: u.role,
     kind: b.kind === 'video' ? 'video' : 'image',
-    activity: String(b.activity || 'Aktivitas'),
-    caption: String(b.caption || ''),
-    mediaColor: String(b.mediaColor || '#00BF63'),
+    activity: String(b.activity || 'Aktivitas').slice(0, MAKS_AKTIVITAS_POS),
+    caption: String(b.caption || '').slice(0, MAKS_CAPTION_POS),
+    mediaColor: /^#[0-9a-fA-F]{3,8}$/.test(String(b.mediaColor ?? '')) ? String(b.mediaColor) : '#00BF63',
     durationSec: b.kind === 'video' ? 15 : undefined,
     likes: 0,
     at: new Date().toISOString(),
@@ -685,7 +704,7 @@ app.post('/api/posts', requireAuth, (req, res) => {
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, currentUser(req)?.email, config.jwtSecret) })
 })
 // Delete a post (owner-only).
 app.delete('/api/posts/:id', requireAuth, (req, res) => {
@@ -699,7 +718,7 @@ app.patch('/api/posts/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const p = updatePost(req.params.id, u.email, req.body as Partial<Post>)
   if (!p) return res.status(403).json({ error: 'forbidden' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 // Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.
 app.post('/api/posts/:id/react', requireAuth, (req, res) => {
@@ -708,7 +727,7 @@ app.post('/api/posts/:id/react', requireAuth, (req, res) => {
   if (!emoji) return res.status(400).json({ error: 'missing_emoji' })
   const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
-  res.json({ post: p })
+  res.json({ post: postUntukPemirsa(p, u.email, config.jwtSecret) })
 })
 
 // --- Club Hub meets (real, user-created — join counts are actual RSVPs) ---
@@ -717,6 +736,11 @@ app.post('/api/meets', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as Partial<Meet>
   if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  // Match the Club Hub form's whole-rupiah limit. Free means an explicit 0;
+  // absent, coercible or negative input must never silently publish a free meet.
+  if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
+    return res.status(400).json({ error: 'invalid_fee' })
+  }
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -728,7 +752,7 @@ app.post('/api/meets', requireAuth, (req, res) => {
     time: String(b.time).slice(0, 5),
     durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
-    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
     lat: Number(b.lat) || 0,
     lng: Number(b.lng) || 0,
@@ -838,7 +862,7 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
-// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
+// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat domains/clinical-records/aksesKlinis.ts).
 const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId, (pid) => tertautKe(u, pid, getTautan()))
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -860,9 +884,20 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const actor = (req as express.Request & { user: User }).user
   // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
   // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
-  const hasil = terapkanSimpanRekam(getRecord(patientId, record.id), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  const penulis = { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }
+  const rekamLama = getRecord(patientId, record.id)
+  if (actor.role !== 'dokter' && !pemeriksaanTetapSama(rekamLama?.physicalExam, record.physicalExam)) {
+    addAudit(actor, 'emr.examination_write_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_examination' })
+  }
+  const tandaTanganDitolakAktor = tandaTanganDitolak(rekamLama, record, penulis)
+  if (tandaTanganDitolakAktor) {
+    addAudit(actor, 'emr.signature_refused', patientId)
+    return res.status(403).json({ error: 'clinician_required_for_signature' })
+  }
+  const hasil = terapkanSimpanRekam(rekamLama, record, penulis, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
-  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
+  if (hasil.arsip) addAudit(actor, hasil.arsip.signedAt ? 'emr.signed_version_archived' : 'emr.draft_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
@@ -882,7 +917,7 @@ app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
   const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
-  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: actor.role === 'dokter' }, new Date(), `emr-${randomUUID()}`)
   if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
   closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
   addAudit(actor, 'emr.encounter_closed', patientId)
@@ -901,6 +936,7 @@ pasangRuteHasilLab(app, {
   isOwner: (u) => isOwner(u as User),
   idPasienDiri,
   pasienTertaut: (userId) => Object.values(getTautan()).filter((t) => t.userId === userId).map((t) => t.patientId),
+  pasienDitugaskan,
   konteks: () => ({ hasil: repoHasilLab(), rujukan: repoRujukan(), now: () => new Date(), newId: (p) => `${p}-${randomUUID()}` }),
   audit: (u, aksi, target) => addAudit(u as User, aksi, target),
 })
@@ -935,7 +971,7 @@ app.get('/api/clinical/links', requireAuth, (req, res) => {
 })
 app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const pid = String(req.params.patientId), t = getTautan()[pid]
+  const pid = String(req.params.patientId), semuaTautan = getTautan(), t = Object.prototype.hasOwnProperty.call(semuaTautan, pid) ? semuaTautan[pid] : undefined
   if (!t) return res.status(404).json({ error: 'not-linked' })
   if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
   hapusTautan(pid)
@@ -1008,6 +1044,8 @@ app.get('/api/settings', requireAuth, (req, res) => {
 app.put('/api/settings', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
+  // Sebaran (...rest) mengubah larik menjadi {0:..,1:..}; tanpa pemeriksaan ini muatan non-objek diterima dan disimpan sebagai kunci sampah.
+  if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) return res.status(400).json({ error: 'invalid settings payload' })
   // Defensive: never persist the Anthropic API key server-side.
   const { apiKey: _drop, ...rest } = prefs as Record<string, unknown>
   // Entitlements and alert-cooldown stamps live in this same blob, so an
@@ -1015,7 +1053,7 @@ app.put('/api/settings', requireAuth, (req, res) => {
   // status. Only the server may set those.
   const { safe, rejected } = stripServerOwnedSettings(rest)
   if (rejected.length) {
-    console.warn(`[settings] ${u.email} attempted to write server-owned keys: ${rejected.join(', ')}`)
+    console.warn(`[settings] ${penandaLog(config.jwtSecret, u.email)} attempted to write server-owned keys: ${rejected.join(', ')}`)
   }
   try {
     saveSettings(u.id, safe)
@@ -1082,7 +1120,7 @@ app.put('/api/health-series/diary', requireAuth, (req, res) => {
 
 // Riwayat lab pribadi. Kepemilikan dari sesi terautentikasi saja (tanpa id di
 // jalur), validasi di server, dan tulisan lama ditolak (409) agar penghapusan
-// di perangkat lain tidak dihidupkan kembali. Lihat server/src/labLog.ts.
+// di perangkat lain tidak dihidupkan kembali. Lihat server/src/domains/clinical-records/labLog.ts.
 app.get('/api/lab-log', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json(getLabLog(u.email) ?? { log: {}, diperbaruiPada: null })
@@ -1093,7 +1131,7 @@ app.get('/api/keadaan-longitudinal', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
   const tersimpan = getLabLog(u.email)
-  const plans = listCarePlans()
+  const plans = listSignedCarePlans()
     .filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
     .map((p) => ({ plan: p.rencana, reports: listCareReports(u.email, p.rencana.id).slice(-7) }))
   const reviews = listLabReviews(u.email)
@@ -1123,14 +1161,17 @@ app.put('/api/lab-log', requireAuth, (req, res) => {
     const kini = new Date()
     const baru = { log: validasiLogLab(body?.log, kini), diperbaruiPada: validasiCapWaktu(body?.diperbaruiPada, kini) }
     const { diterima, hasil } = terimaTulisan(getLabLog(u.email), baru)
-    if (diterima) putLabLog(u.email, hasil)
+    if (diterima) {
+      putLabLog(u.email, hasil)
+      addAudit(u, 'lab.log.updated', u.id)
+    }
     res.status(diterima ? 200 : 409).json(hasil)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
 })
 
-// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/labFhir.ts).
+// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/domains/clinical-records/labFhir.ts).
 app.get('/api/lab-log/fhir', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json(logKeBundelFhir(getLabLog(u.email)?.log ?? {}, `Patient/${u.id}`, new Date().toISOString()))
@@ -1232,19 +1273,33 @@ app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
 // sebagai jawaban MENTAH; prioritas dihitung ulang oleh kernel di sisi dokter.
 app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  if (u.role !== 'dokter') { res.status(403); addAudit(u, 'care.plan.signature_refused', String(req.params.id)); res.json({ error: 'verified clinician role required' }); return }
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
   const pasien = getUserByEmail(izin.pasienEmail)
   if (!pasien) { res.status(404).json({ error: 'patient not found' }); return }
   try {
-    const rencana = susunRencana(req.body, pasien.id, u.id, kini)
+    const body = req.body as { signIntent?: unknown; existingPlanId?: unknown }
+    const prior = body?.existingPlanId === undefined ? undefined : listCarePlans().find(p =>
+      p.rencana.id === body.existingPlanId && p.izinId === izin.id && p.dokterEmail === u.email && !p.dicabut)
+    if (body?.existingPlanId !== undefined && (!prior || prior.rencana.clinicianId !== u.id || prior.rencana.subjectId !== pasien.id)) {
+      addAudit(u, 'care.plan.signature_refused', pasien.id)
+      res.status(404).json({ error: 'no owned care plan awaiting signature' }); return
+    }
+    const draft = prior?.rencana ?? susunRencana(req.body, pasien.id, u.id, kini)
+    if (body?.signIntent !== true) {
+      addAudit(u, 'care.plan.signature_refused', pasien.id)
+      res.status(409).json({ error: 'explicit clinician signature required' }); return
+    }
+    const rencana = signCarePlan(draft, u.id, kini)
     addCarePlan({ izinId: izin.id, pasienEmail: izin.pasienEmail, dokterEmail: u.email, dibuat: kini.toISOString(), rencana })
+    addAudit(u, 'care.plan.signed', rencana.id)
     addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'rencana-harian', izinId: izin.id })
     void notify(pasien.id, { title: 'Your doctor set up a daily check-in', body: 'Open Your Body to answer today\'s questions.', url: '/tubuh' }).catch((e) => console.warn('[care-plan] notify failed', (e as Error).message))
     res.json(rencana)
   } catch (e) {
+    addAudit(u, 'care.plan.rejected', pasien.id)
     res.status(400).json({ error: (e as Error).message })
   }
 })
@@ -1255,7 +1310,7 @@ app.get('/api/clinician/lab-shares/:id/care/fhir', requireAuth, (req, res) => {
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
-  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
   if (!p) { res.status(404).json({ error: 'no daily plan' }); return }
   addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
   const pasienRef = `Patient/${getUserByEmail(izin.pasienEmail)?.id ?? 'unknown'}`
@@ -1268,28 +1323,30 @@ app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
   const kini = new Date()
   const izin = listLabShares().find((i) => i.id === String(req.params.id))
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
-  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
   if (p) addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
-  res.json({ plan: p?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
+  const unsigned = listCarePlans().find(x => x.izinId === izin.id && x.dokterEmail === u.email && !x.dicabut && !isSignedCarePlan(x.rencana))
+  res.json({ plan: p?.rencana ?? null, unsignedPlan: unsigned?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
 })
 // Pasien: rencana aktif dari dokter yang IZINNYA MASIH BERLAKU; dicabut = berhenti.
 app.get('/api/care/plans', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
-  const aktif = listCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+  const aktif = listSignedCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
   res.json({ plans: aktif.map((p) => ({ plan: p.rencana, dokterEmail: p.dokterEmail, reports: listCareReports(u.email, p.rencana.id).slice(-7) })) })
 })
 app.post('/api/care/reports', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const kini = new Date()
   const b = req.body as { planId?: unknown }
-  const p = listCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
+  const p = listSignedCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
   if (!p || !izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini)) { res.status(404).json({ error: 'no active daily check-in' }); return }
   try {
     const laporan = susunLaporan(p.rencana, req.body, kini)
     const sama = laporan.clientId ? listCareReports(u.email, p.rencana.id).find((l) => l.clientId === laporan.clientId) : undefined
     if (sama) { res.json(sama); return }
     addCareReport(u.email, laporan)
+    addAudit(u, 'care.report.created', p.rencana.id)
     res.json(laporan)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
@@ -1316,16 +1373,16 @@ app.post('/api/health-webhook/:token', (req, res) => {
     res.status(404).json({ error: 'unknown_token' })
     return
   }
-  // Names only (never values) — safe to log for diagnosing "0 imported" reports,
-  // since a wrong Date Range in Health Auto Export can send metric groups with
-  // no samples, which looks identical to a naming-mismatch bug from the outside.
+  // Operational logs contain counts only: client-controlled health labels can
+  // contain private text or newlines. Preserve naming evidence in the
+  // authenticated, account-scoped delivery diagnostics below.
   const rawMetrics = (req.body as { data?: { metrics?: { name?: string; data?: unknown[] }[] } })?.data?.metrics
   const metricNames = Array.isArray(rawMetrics) ? rawMetrics.map((m) => `${m?.name ?? '?'}(${m?.data?.length ?? 0})`) : []
   const mapped = parseHealthWebhookPayload(req.body)
   const workoutCount = Array.isArray((req.body as { data?: { workouts?: unknown[] } })?.data?.workouts)
     ? (req.body as { data: { workouts: unknown[] } }).data.workouts.length
     : 0
-  console.log(`[health-webhook] ${email}: groups=${metricNames.join(', ') || 'none'} workouts=${workoutCount} matched=${Object.keys(mapped).join(',') || 'none'}`)
+  console.log(`[health-webhook] ${penandaLog(config.jwtSecret, email)}: groups=${Array.isArray(rawMetrics) ? rawMetrics.length : 0} workouts=${workoutCount} matched=${Object.keys(mapped).length}`)
 
   try {
     // Series FIRST, and unconditionally. Health Auto Export sends one Data Type
@@ -1842,8 +1899,8 @@ app.get('/api/push/status', requireAuth, (req, res) => {
 })
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const sub = (req.body as { subscription?: unknown }).subscription
-  if (!sub || typeof sub !== 'object') return res.status(400).json({ error: 'bad_subscription' })
+  let sub: LanggananPush
+  try { sub = validasiLanggananPush((req.body as { subscription?: unknown }).subscription) } catch (e) { return res.status(400).json({ error: 'bad_subscription', detail: (e as Error).message }) }
   addPushSub(u.id, sub)
   res.json({ ok: true })
 })
@@ -1893,14 +1950,15 @@ app.get('/api/reminders', requireAuth, (req, res) => {
 })
 app.post('/api/reminders', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const { medName, dose, timeOfDay, nextFireAt } = req.body as { medName?: string; dose?: string; timeOfDay?: string; nextFireAt?: string }
-  if (!medName?.trim() || !timeOfDay || !nextFireAt) return res.status(400).json({ error: 'missing_fields' })
-  const rem = addReminder(u.id, { medName: medName.trim(), dose: (dose ?? '').trim(), timeOfDay, nextFireAt, active: true })
+  let baru: ReturnType<typeof validasiPengingatBaru>
+  try { baru = validasiPengingatBaru(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
+  const rem = addReminder(u.id, { ...baru, active: true })
   res.json({ reminder: rem })
 })
 app.patch('/api/reminders/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const patch = req.body as Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>
+  let patch: ReturnType<typeof validasiTambalPengingat>
+  try { patch = validasiTambalPengingat(req.body, new Date()) } catch (e) { return res.status(400).json({ error: (e as Error).message }) }
   const rem = updateReminder(u.id, req.params.id, patch)
   if (!rem) return res.status(404).json({ error: 'not_found' })
   res.json({ reminder: rem })
@@ -2048,7 +2106,12 @@ app.post('/api/connect/verifikasi', requireAuth, (req, res) => {
 
 app.post('/api/connect/radius', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  res.json({ radiusKm: setelRadius(u.email, Number((req.body ?? {}).km)) })
+  // Number(undefined|'abc') = NaN lolos Math.min/max sebagai NaN dan mematikan saringan radius (jarak > NaN selalu salah);
+  // Number(null) = 0 diam-diam menjadi 1 km. Hanya angka atau teks angka yang terhingga yang diterima.
+  const mentah = (req.body ?? {}).km
+  const km = typeof mentah === 'number' ? mentah : typeof mentah === 'string' && mentah.trim() !== '' ? Number(mentah) : NaN
+  if (!Number.isFinite(km)) return res.status(400).json({ error: 'km_tidak_sah' })
+  res.json({ radiusKm: setelRadius(u.email, km) })
 })
 
 // Deck: kartu calon kenalan yang sudah lolos verifikasi, blokir, kredit,
@@ -2176,6 +2239,7 @@ app.post('/api/feedback', requireAuth, (req, res) => {
   const { kind, text } = req.body as { kind?: Feedback['kind']; text?: string }
   const trimmed = (text ?? '').trim()
   if (trimmed.length < 5) return res.status(400).json({ error: 'text_too_short' })
+  if (trimmed.length > 5000) return res.status(400).json({ error: 'text_too_long' })
   const validKinds: Feedback['kind'][] = ['Suggestion', 'Problem/Bug', 'Question', 'Compliment', 'Feature Request']
   const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Suggestion'
   const entry: Feedback = { id: uid(), userId: u.id, userEmail: u.email, userName: u.name, kind: safeKind, text: trimmed, at: new Date().toISOString(), read: false }
@@ -2212,6 +2276,46 @@ app.post('/api/doctors/:id/verify', requireAuth, (req, res) => {
   saveSettings(id, { strStatus: status })
   addAudit(u, 'str.verify', id)
   res.json({ ok: true })
+})
+
+// --- Staf perawat/lab (F1): peran dan penugasan hanya oleh owner; tanpa jalur self-assign; semua perubahan diaudit ---
+const idStaf = (v: unknown) => (typeof v === 'string' && v.length > 0 && v.length <= 96 ? v : null)
+app.get('/api/owner/staff', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ staff: daftarStaf().map((x) => ({ id: x.id, name: x.name, email: x.email, role: x.role, patientIds: pasienDitugaskan(x.id) })) })
+})
+app.post('/api/owner/staff-role', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const b = (req.body ?? {}) as { userId?: unknown; role?: unknown }
+  const userId = idStaf(b.userId)
+  if (!userId || (b.role !== 'perawat' && b.role !== 'lab' && b.role !== 'pasien')) return res.status(400).json({ error: 'invalid-input' })
+  const target = getUser(userId)
+  if (target && isOwner(target)) return res.status(409).json({ error: 'not-eligible' })
+  const r = setStaffRole(userId, b.role)
+  if (!r.ok) { addAudit(u, `staff.role.rejected:${r.reason}`, userId); return res.status(r.reason === 'not-found' ? 404 : 409).json({ error: r.reason }) }
+  addAudit(u, `staff.role:${b.role}`, userId)
+  res.json({ ok: true, id: userId, role: b.role })
+})
+app.post('/api/owner/staff-assignments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const b = (req.body ?? {}) as { userId?: unknown; patientId?: unknown; revoke?: unknown }
+  const userId = idStaf(b.userId), patientId = idStaf(b.patientId)
+  if (!userId || !patientId || patientId in Object.prototype || (b.revoke !== undefined && typeof b.revoke !== 'boolean')) return res.status(400).json({ error: 'invalid-input' })
+  const target = getUser(userId)
+  if (!target || !STAFF_ROLES.includes(target.role)) return res.status(404).json({ error: 'not-found' })
+  const changed = b.revoke === true ? cabutStaf(patientId, userId) : tugaskanStaf(patientId, userId)
+  addAudit(u, b.revoke === true ? 'staff.unassign' : 'staff.assign', `${userId}:${patientId}`)
+  res.json({ ok: true, changed })
+})
+
+// Staf melihat pasien yang ditugaskan kepadanya sendiri (untuk memilih pasien pada formulir intake). Hanya perawat/lab; tidak membuka data pasien.
+app.get('/api/staff/assignments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!STAFF_ROLES.includes(u.role)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ patientIds: pasienDitugaskan(u.id) })
 })
 
 // --- SATUSEHAT: submit an EMR as a FHIR R4 Bundle (dokter/owner) ---
@@ -2358,7 +2462,7 @@ semaiStudiValidasi()
 setInterval(() => {
   for (const email of jatuhTempoHapus()) {
     hapusAkunConnect(email)
-    console.log('[connect] akun dihapus karena kredit di bawah ambang:', email)
+    console.log('[connect] akun dihapus karena kredit di bawah ambang:', penandaLog(config.jwtSecret, email))
   }
 }, 3600_000)
 
@@ -2406,7 +2510,7 @@ setInterval(() => {
       const prefs = getSettings(u.id)
       if (prefs.notifCekHarian === true) {
         const kini = new Date()
-        const aktif = listCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
+        const aktif = listSignedCarePlans().filter((x) => x.pasienEmail === u.email && !x.dicabut && izinBerlaku(listLabShares().find((i) => i.id === x.izinId), x.dokterEmail, kini))
         const sudah = aktif.flatMap((x) => listCareReports(u.email, x.rencana.id).map((l) => l.scheduledFor.slice(0, 10)))
         const p = putusanPengingatCek(prefs, kini.getTime(), aktif.length > 0, sudah)
         if (p.alasan === 'send') {

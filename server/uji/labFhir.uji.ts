@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { logKeBundelFhir, kodeUntuk, buatIzin, izinBerlaku, SISTEM_ASAL } from '../src/labFhir.js'
+import { logKeBundelFhir, kodeUntuk, buatIzin, izinBerlaku, SISTEM_ASAL } from '../src/domains/clinical-records/labFhir.js'
 
 const kini = new Date('2026-09-25T06:00:00Z')
 const b = logKeBundelFhir({
@@ -82,7 +82,7 @@ console.log('labFhir: LOINC hanya dari registry terverifikasi (hs-CRP tidak diko
 
 // Tinjauan klinisi
 {
-  const { buatTinjauan, MAKS_CATATAN } = await import('../src/labFhir.js')
+  const { buatTinjauan, MAKS_CATATAN } = await import('../src/domains/clinical-records/labFhir.js')
   const iz2 = buatIzin('a@x.test', 'dr@x.test', 30, kini)
   const t = buatTinjauan(iz2, { tes: 'gdp', catatan: ' Repeat fasting glucose; no action now. ', cekUlangSebelum: '2026-12-01' }, kini)
   assert.equal(t.dokterEmail, 'dr@x.test'); assert.equal(t.pasienEmail, 'a@x.test'); assert.equal(t.catatan, 'Repeat fasting glucose; no action now.')

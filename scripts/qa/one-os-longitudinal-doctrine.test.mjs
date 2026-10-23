@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 const read = (path) => readFileSync(new URL('../../' + path, import.meta.url), 'utf8')
 
 test('One OS doctrine is wired into the constitutional and agent authority chain', () => {
-  const constitution = read('PANACEA_CONSTITUTION.md')
+  const constitution = read('governance/doctrine/PANACEA_CONSTITUTION.md')
   const agents = read('AGENTS.md')
   const claude = read('CLAUDE.md')
   const gemini = read('GEMINI.md')
