@@ -7,7 +7,7 @@ on:
       - 'src/lib/longitudinalSnapshot.ts'
       - 'src/lib/store.tsx'
       - 'src/main.tsx'
-      - 'src/pages/HealthProfile.tsx'
+      - 'src/pages/bodyhub/HealthProfile.tsx'
       - 'src/domains/personal-health/**'
       - 'scripts/qa/longitudinal-*'
       - 'scripts/uji/longitudinal-snapshot.mts'
@@ -19,7 +19,7 @@ on:
       - 'src/lib/longitudinalSnapshot.ts'
       - 'src/lib/store.tsx'
       - 'src/main.tsx'
-      - 'src/pages/HealthProfile.tsx'
+      - 'src/pages/bodyhub/HealthProfile.tsx'
       - 'src/domains/personal-health/**'
       - 'scripts/qa/longitudinal-*'
       - 'scripts/uji/longitudinal-snapshot.mts'
@@ -28,7 +28,7 @@ permissions:
   contents: read
 jobs:
   shared-snapshot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4

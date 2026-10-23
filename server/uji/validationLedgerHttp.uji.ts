@@ -3,7 +3,7 @@
 // Synthetic reviewers; the seeded frozen study is the repository's own. Not clinical validation of anything.
 import assert from 'node:assert/strict'
 import { startIsolatedServer } from './support/isolatedServer.ts'
-import { AWAL_RANTAI, sidik } from '../src/validasiLedger.ts'
+import { AWAL_RANTAI, sidik } from '../src/domains/clinical-records/validasiLedger.ts'
 
 const ownerEmail = 'validation-owner@localhost.test'
 const running = await startIsolatedServer('validation-ledger', ownerEmail)

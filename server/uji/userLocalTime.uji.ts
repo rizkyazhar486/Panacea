@@ -27,7 +27,7 @@ assert.equal(tzOffsetMenit({}), 0, 'setelan tanpa offset')
 assert.equal(waktuLokalPengguna({ tzOffsetMin: 420 }, NOW).getTime(), waktuLokalPengguna({ tzOffsetMin: 420 }, NOW).getTime())
 
 // Regresi struktural: pemeriksa pengingat memakai helper bersama, bukan `Number(prefs.tzOffsetMin)` mentah
-for (const f of ['src/aturanNotif.ts', 'src/healthAlerts.ts', 'src/pengingatCek.ts']) {
+for (const f of ['src/domains/push/aturanNotif.ts', 'src/domains/push/healthAlerts.ts', 'src/domains/push/pengingatCek.ts']) {
   assert.doesNotMatch(readFileSync(f, 'utf8'), /Number\(prefs\.tzOffsetMin\)/, `${f} must use shared userLocalTime`)
 }
 console.log('userLocalTime ok')

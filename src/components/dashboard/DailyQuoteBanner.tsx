@@ -60,17 +60,15 @@ export function DailyQuoteBanner() {
   if (!visible) return null
 
   return (
-    // Dipasang DI BAWAH bilah atas, bukan di atasnya: menutupi seluruh baris
-    // navigasi dengan pengingat harian membuat menu, pencarian, profil dan
-    // keluar tidak terlihat sekaligus tidak bisa ditekan sampai spanduknya
-    // ditutup. Tingginya dibaca dari bilah yang sebenarnya, bukan ditebak.
+    // Remain in Home's content flow so the quote cannot cover the heading or
+    // primary actions on either viewport. Dismissal and the reading timer keep
+    // their existing once-per-day behavior.
     <div
       data-daily-reminder="v1"
-      className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4"
-      style={{ top: 'calc(var(--tinggi-bilah-atas, 0px) + 12px)' }}
+      className="relative mt-4 flex w-full justify-center px-3 sm:px-6"
     >
       <div
-        className="fly-in-drop pointer-events-auto relative w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
+        className="fly-in-drop pointer-events-auto relative min-h-[100px] w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
         style={{
           animation: 'fly-in-drop 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.1) both',
           background:
@@ -100,12 +98,12 @@ export function DailyQuoteBanner() {
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="absolute right-2.5 top-2.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-black/60 text-white/90 backdrop-blur-sm transition hover:bg-black/80 hover:text-white"
+          className="absolute right-2 top-2 z-10 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/60 text-white/90 backdrop-blur-sm transition hover:bg-black/80 hover:text-white"
         >
           <IconX size={13} />
         </button>
 
-        <div className="relative flex gap-2.5 p-3 pr-9">
+        <div className="relative flex min-h-[60px] gap-2.5 p-3 pr-16">
           <span
             aria-hidden
             className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 bg-black/50"

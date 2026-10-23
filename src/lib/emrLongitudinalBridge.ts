@@ -24,9 +24,9 @@ export interface EmrLongitudinalProjection {
 const validIso = (value?: string) => Boolean(value && Number.isFinite(Date.parse(value)))
 const text = (value?: string) => String(value ?? '').trim()
 
-function stampedFieldOrigin(meta?: { asal: 'AI' | 'Dokter'; olehId?: string }): 'clinician-entered' | 'non-clinician-or-ai' | 'unknown' {
+function stampedFieldOrigin(meta?: { asal: 'AI' | 'Dokter' | 'Pengguna'; olehId?: string }): 'clinician-entered' | 'non-clinician-or-ai' | 'unknown' {
   if (meta?.asal === 'Dokter' && text(meta.olehId)) return 'clinician-entered'
-  if (meta?.asal === 'AI') return 'non-clinician-or-ai'
+  if (meta?.asal === 'AI' || meta?.asal === 'Pengguna') return 'non-clinician-or-ai'
   return 'unknown'
 }
 

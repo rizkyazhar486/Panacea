@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import test from 'node:test'
 
 const cwd = process.cwd()
-const validator = join(cwd, 'scripts', 'validate-source-registry.mjs')
+const validator = join(cwd, 'scripts', 'qa', 'validate-source-registry.mjs')
 const schemaSource = join(cwd, 'data', 'source-registry', 'source.schema.json')
 const schema = await readFile(schemaSource, 'utf8')
 
@@ -153,7 +153,7 @@ test('accepts ACTIVE adapter whose repository-relative module is a real file', a
   const result = await runFixture([
     {
       filename: 'active-existing-module.json',
-      entry: activeEntry('scripts/validate-source-registry.mjs'),
+      entry: activeEntry('scripts/qa/validate-source-registry.mjs'),
     },
   ])
   assert.equal(result.status, 0, result.stderr)
@@ -164,7 +164,7 @@ test('rejects ACTIVE adapter without source identity provenance', async () => {
     {
       filename: 'active-without-source-identity.json',
       entry: {
-        ...activeEntry('scripts/validate-source-registry.mjs'),
+        ...activeEntry('scripts/qa/validate-source-registry.mjs'),
         provenance: { ...baseEntry.provenance, sourceIdentityRequired: false },
       },
     },

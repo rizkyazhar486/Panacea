@@ -48,6 +48,14 @@ export async function verifyPoliPatientTemporalScope(page, url) {
   await row('QA Own wearable').getByRole('button', { name: 'QA Own wearable', exact: true }).click()
   await center.getByText('QA Own wearable', { exact: true }).waitFor()
   assert.match(await heartRate(), /173/)
+  // Store persistence is debounced: validate the selected patient's durable state
+  // before reloading, or a fast CI runner races localStorage and tests the prior patient.
+  // This is a stronger persistence assertion, not a delay or a waived privacy check.
+  await page.waitForFunction(() => {
+    try {
+      return JSON.parse(localStorage.getItem('panaceamed.state.v3') || '{}').activePatientId === 'qa-self'
+    } catch { return false }
+  }, null, { timeout: 15_000 })
   // A prior account's cache and unbound legacy imports cannot become this patient's truth.
   for (const ownership of [{ subjectId: 'qa-self', ownerAccountId: 'other-doctor' }, {}]) {
     await page.evaluate(ownership => {
