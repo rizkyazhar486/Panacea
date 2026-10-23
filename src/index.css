@@ -3008,3 +3008,43 @@ html:not(.dark) body button[data-cta="primary"] {
 
 
 
+
+
+/* ── Lantai keterbacaan teks putih berkepekatan rendah (F2, WCAG 1.4.3) ──────────
+   `text-white/30`, `/35`, `/45` dst. dipakai ratusan kali untuk label 8-11px pada panel yang latarnya selalu gelap (rgb ~8,11,14).
+   Putih 30-45% di atas latar itu hanya 2,6-4,4:1, di bawah AA 4,5:1; audit kontras (scripts/qa/kontras-wcag.mjs, kelas gagalRuangWarna)
+   mengukur ratusan teks seperti itu. Lantai 60% memberi ~7:1 pada latar gelap tersebut. Aturan ini tak berlapis, jadi mengalahkan
+   utilitas Tailwind yang berlapis tanpa !important. Varian (hover:, group-hover:) bernama kelas lain dan tidak terpengaruh. */
+.text-white\/20,
+.text-white\/21,
+.text-white\/22,
+.text-white\/23,
+.text-white\/24,
+.text-white\/25,
+.text-white\/26,
+.text-white\/27,
+.text-white\/28,
+.text-white\/29,
+.text-white\/30,
+.text-white\/31,
+.text-white\/32,
+.text-white\/33,
+.text-white\/34,
+.text-white\/35,
+.text-white\/36,
+.text-white\/37,
+.text-white\/38,
+.text-white\/39,
+.text-white\/40,
+.text-white\/41,
+.text-white\/42,
+.text-white\/43,
+.text-white\/44,
+.text-white\/45,
+.text-white\/46,
+.text-white\/47,
+.text-white\/48,
+.text-white\/49,
+.text-white\/50 {
+  color: rgb(255 255 255 / 0.6);
+}

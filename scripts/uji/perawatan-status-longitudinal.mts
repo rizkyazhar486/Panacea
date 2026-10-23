@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { careToLongitudinalEvents } from '../../src/lib/careLongitudinalBridge.ts'
-import { susunRencana, susunLaporan } from '../../server/src/carePlan.ts'
+import { susunRencana, susunLaporan } from '../../server/src/domains/clinical-records/carePlan.ts'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, canEnterAiContext } from '../../src/lib/panaceaLongitudinalState.ts'
 import { timelineHarian } from '../../src/lib/perubahanLongitudinal.ts'
 

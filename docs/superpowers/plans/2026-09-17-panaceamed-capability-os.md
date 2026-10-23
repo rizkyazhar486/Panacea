@@ -30,7 +30,7 @@
 - `config/capability-os.json` — canonical logical capability catalog and routing metadata.
 - `config/capability-os.scenarios.json` — deterministic pressure scenarios covering routing and fallback cases.
 - `scripts/lib/capability-os.mjs` — dependency-free loader, structural/semantic validator, and pure route-selection helper used only by tooling/tests.
-- `scripts/validate-capability-os.mjs` — CLI validator for CI and maintainers.
+- `scripts/qa/validate-capability-os.mjs` — CLI validator for CI and maintainers.
 - `scripts/qa/capability-os-validator.test.mjs` — schema/semantic failure-mode tests.
 - `scripts/qa/capability-os-routing.test.mjs` — deterministic pressure-scenario tests.
 - `.claude/skills/panacea-capability-router/SKILL.md` — judgment workflow for selecting skills/plugins/providers.
@@ -47,7 +47,7 @@
 - Create: `config/capability-os.json`
 - Create: `scripts/lib/capability-os.mjs`
 - Create: `scripts/qa/capability-os-validator.test.mjs`
-- Create: `scripts/validate-capability-os.mjs`
+- Create: `scripts/qa/validate-capability-os.mjs`
 
 **Interfaces:**
 - Produces `loadCapabilityOs({ manifestPath?, schemaPath? }) -> Promise<{ manifest, schema }>`.
@@ -152,7 +152,7 @@ if (entry.sideEffects === 'read-only' && entry.writeAuthority !== 'none') {
 }
 ```
 
-Create `scripts/validate-capability-os.mjs`:
+Create `scripts/qa/validate-capability-os.mjs`:
 
 ```js
 import process from 'node:process'
@@ -202,7 +202,7 @@ Run:
 
 ```bash
 node --test scripts/qa/capability-os-validator.test.mjs
-node scripts/validate-capability-os.mjs
+node scripts/qa/validate-capability-os.mjs
 ```
 
 Expected: PASS; CLI reports the capability count.
@@ -210,7 +210,7 @@ Expected: PASS; CLI reports the capability count.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add config/capability-os.schema.json config/capability-os.json scripts/lib/capability-os.mjs scripts/qa/capability-os-validator.test.mjs scripts/validate-capability-os.mjs
+git add config/capability-os.schema.json config/capability-os.json scripts/lib/capability-os.mjs scripts/qa/capability-os-validator.test.mjs scripts/qa/validate-capability-os.mjs
 git commit -m "feat(capability-os): add manifest contract and validator"
 ```
 
@@ -462,7 +462,7 @@ Run:
 
 ```bash
 node --test scripts/qa/capability-os-skill-contract.test.mjs
-node scripts/validate-capability-os.mjs
+node scripts/qa/validate-capability-os.mjs
 ```
 
 Expected: PASS.
@@ -493,7 +493,7 @@ git commit -m "feat(skills): add Panaceamed capability router"
 Add:
 
 ```json
-"validate:capability-os": "node scripts/validate-capability-os.mjs",
+"validate:capability-os": "node scripts/qa/validate-capability-os.mjs",
 "test:capability-os": "node --test scripts/qa/capability-os-validator.test.mjs scripts/qa/capability-os-routing.test.mjs scripts/qa/capability-os-skill-contract.test.mjs"
 ```
 
@@ -501,10 +501,10 @@ Update `build` so the beginning becomes:
 
 ```text
 node scripts/gen-note-index.mjs --check &&
-node scripts/validate-source-registry.mjs &&
-node scripts/validate-feature-factory.mjs &&
-node scripts/validate-academic-review.mjs &&
-node scripts/validate-capability-os.mjs &&
+node scripts/qa/validate-source-registry.mjs &&
+node scripts/qa/validate-feature-factory.mjs &&
+node scripts/qa/validate-academic-review.mjs &&
+node scripts/qa/validate-capability-os.mjs &&
 node --test ... scripts/qa/capability-os-validator.test.mjs scripts/qa/capability-os-routing.test.mjs scripts/qa/capability-os-skill-contract.test.mjs &&
 ...
 ```
@@ -523,7 +523,7 @@ on:
     paths:
       - 'config/capability-os*.json'
       - 'scripts/lib/capability-os.mjs'
-      - 'scripts/validate-capability-os.mjs'
+      - 'scripts/qa/validate-capability-os.mjs'
       - 'scripts/qa/capability-os-*.test.mjs'
       - '.claude/skills/panacea-capability-router/**'
       - '.claude/skills/panacea-orchestrator/**'
@@ -590,7 +590,7 @@ git commit -m "ci(capability-os): gate routing contract"
 
 ## Final Verification Checklist
 
-- [ ] `node scripts/validate-capability-os.mjs` exits 0.
+- [ ] `node scripts/qa/validate-capability-os.mjs` exits 0.
 - [ ] `npm run test:capability-os` exits 0 with validator, routing and skill-contract tests passing.
 - [ ] Manifest contains no credential or connection-state fields.
 - [ ] All capability IDs are unique.

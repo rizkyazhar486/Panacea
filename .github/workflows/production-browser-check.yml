@@ -9,8 +9,12 @@ on:
         description: 'Production base URL'
         required: false
         default: 'https://panaceamed.id'
+  schedule:
+    - cron: '41 */6 * * *'
   pull_request:
     paths:
+      - 'scripts/qa/verify-deployed-sha.mjs'
+      - 'scripts/qa/deploy-equivalence.mjs'
       - 'scripts/qa/production-browser-check.mjs'
       - '.github/workflows/production-browser-check.yml'
 
@@ -23,7 +27,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +66,19 @@ jobs:
             node -e "const r=require('./production-check/report.json');console.log(JSON.stringify({network:r.network,server:r.server,findings:r.findings,viewports:r.viewports.map(v=>({w:v.width,status:v.status,overflowX:v.overflowX,webgl2:v.webgl2,errors:v.errors.length,body:v.body&&{canvas:v.body.canvasPresent,finalUrl:v.body.finalUrl}}))},null,1))" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
+          exit $code
+      - name: Deployed SHA vs main (E7)
+        if: always()
+        # Pada PR hanya melapor: produksi wajar tertinggal dari main (deploy frontend dibatch), dan itu bukan kesalahan PR ini.
+        # Pada dispatch dan jadwal, hasil tertinggal/menyimpang/tidak-diketahui menggagalkan langkah ini.
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        # Bukti E7: frontend (build.json) dan backend (/api/health) dibandingkan dengan main memakai kriteria deploy-equivalence.mjs.
+        run: |
+          git fetch --no-tags origin main
+          set +e
+          node scripts/qa/verify-deployed-sha.mjs "$(git rev-parse origin/main)" | tee deployed-sha.txt
+          code=${PIPESTATUS[0]}
+          { echo '```'; cat deployed-sha.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $code
       - name: Upload evidence
         if: always()

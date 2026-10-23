@@ -45,7 +45,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "AnatomyImage",
-    "module": "server/src/anatomyImages.ts",
+    "module": "server/src/domains/anatomy/anatomyImages.ts",
     "notes": "Backend adapter bounds and sanitizes search terms, restricts file namespace and accepted image MIME types, accepts media only from upload.wikimedia.org, requires per-file license metadata, preserves or reconstructs a canonical Commons source page, and uses a descriptive User-Agent plus request timeout."
   }
 }

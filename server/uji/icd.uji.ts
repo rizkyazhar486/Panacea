@@ -3,7 +3,7 @@ const whoClientSecretAsli = process.env.WHO_ICD_CLIENT_SECRET
 process.env.WHO_ICD_CLIENT_ID = ''
 process.env.WHO_ICD_CLIENT_SECRET = ''
 
-const { cariDiagnosis, icd11Configured, icd11Release, normalisasiIcdEntityId } = await import('../src/icd11.ts')
+const { cariDiagnosis, icd11Configured, icd11Release, normalisasiIcdEntityId } = await import('../src/domains/medical-reference/icd11.ts')
 
 if (whoClientIdAsli === undefined) delete process.env.WHO_ICD_CLIENT_ID
 else process.env.WHO_ICD_CLIENT_ID = whoClientIdAsli

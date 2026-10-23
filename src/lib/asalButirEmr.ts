@@ -15,7 +15,7 @@ export function labelAsalRencana(b: Pick<PlanItem, 'source' | 'status' | 'verifi
 }
 
 /** Label asal satu kolom isian; tanpa cap (data lama) = asal tak tercatat, tidak diklaim dokter. */
-export function labelAsalIsian(a?: { asal: 'AI' | 'Dokter' }): string {
+export function labelAsalIsian(a?: { asal: 'AI' | 'Dokter' | 'Pengguna' }): string {
   if (!a) return 'origin not recorded'
-  return a.asal === 'Dokter' ? 'doctor-written' : 'AI draft / patient-entered'
+  return a.asal === 'Dokter' ? 'doctor-written' : a.asal === 'Pengguna' ? 'user-entered · not clinician-verified' : 'AI draft / patient-entered'
 }

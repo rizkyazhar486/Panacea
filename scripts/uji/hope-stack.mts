@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs'
 const data = readFileSync('src/lib/hopeStack.ts', 'utf8')
 const ui = readFileSync('src/components/frontier/PanaceaHopeStack.tsx', 'utf8')
 const workbench = readFileSync('src/components/frontier/HopeWorkbench.tsx', 'utf8')
-const frontier = readFileSync('src/pages/FrontierHealthOS.tsx', 'utf8')
+const frontier = readFileSync('src/pages/medstudy/FrontierHealthOS.tsx', 'utf8')
 const mind = readFileSync('src/pages/PusatJiwa.tsx', 'utf8')
-const safety = readFileSync('src/pages/MentalSafetyPlan.tsx', 'utf8')
+const safety = readFileSync('src/pages/mental/MentalSafetyPlan.tsx', 'utf8')
 
 const domains = [
   'mental-health',

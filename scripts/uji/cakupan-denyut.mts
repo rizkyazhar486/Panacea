@@ -73,7 +73,7 @@ assert.equal(kalimatCakupan({ denganHr: 3, tanpaHr: 0 }), null,
 }
 
 // ── 7. Ubin Zona 2 harus benar-benar memakainya ──────────────────────────
-const ubin = readFileSync(new URL('../../src/components/UbinLanjutan.tsx', import.meta.url), 'utf8')
+const ubin = readFileSync(new URL('../../src/components/tiles/UbinLanjutan.tsx', import.meta.url), 'utf8')
 const blok = ubin.slice(ubin.indexOf('export function UbinZona2'))
   .slice(0, ubin.slice(ubin.indexOf('export function UbinZona2')).indexOf('\nexport function '))
 assert.ok(/cakupanDenyutPekan\(/.test(blok),

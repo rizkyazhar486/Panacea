@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import {
   authorizeVisitRealtimeJoin,
   validateVisitRealtimeSignalEnvelope,
-} from '../src/visitRealtimePolicy.js'
+} from '../src/modules/visits/visitRealtimePolicy.js'
 
 const membership = {
   visitId: 'visit-1',

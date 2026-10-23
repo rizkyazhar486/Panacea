@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { buildEmrBundle } from '../satusehat.js'
+import { buildEmrBundle } from '../domains/clinical-records/satusehat.js'
 import {
   LOCAL_DERIVED_SYSTEM,
   LOINC_SYSTEM,

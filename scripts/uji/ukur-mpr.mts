@@ -30,5 +30,5 @@ assert.equal(skalaIrisanTunggal({ jarakPiksel: [0.7, 0.7] }).sah, true)
 const ui = readFileSync('src/pages/bodyhub/Radiology.tsx', 'utf8')
 assert.match(ui, /skala=\{volume \? skalaBidang\(volume, 'cross-row'\)/, 'bidang silang tidak memakai skala bidangnya sendiri')
 // Tampilan ukur kini di penampil MPR bersama (dipakai /radiology dan Imaging).
-assert.match(readFileSync('src/components/PlaneViewerMpr.tsx', 'utf8'), /hasilUkur\.ok \? `\$\{hasilUkur\.mm\.toFixed\(1\)\} mm/)
+assert.match(readFileSync('src/components/digital-twin/PlaneViewerMpr.tsx', 'utf8'), /hasilUkur\.ok \? `\$\{hasilUkur\.mm\.toFixed\(1\)\} mm/)
 console.log('ukur-mpr: aksial 5.0 mm, silang 10.0 mm (jarak irisan), tanpa Pixel Spacing → tidak ada angka mm')

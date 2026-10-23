@@ -1,3 +1,5 @@
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Latihan dan peringatan detak jantung dari ekspor Health Auto Export.
 //
@@ -47,6 +49,8 @@ export interface ImportedWorkout {
   selesai: string
   /** Detik. */
   durasi: number
+  /** Client-source provenance; unknown keeps numeric compatibility without claiming a recorded zero. */
+  durationSource?: 'source_field' | 'timestamps' | 'unknown'
   jarakKm?: number
   kcal?: number
   avgHr?: number
@@ -160,9 +164,13 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
 
     const durasiTerekam = qty(w?.duration)
     const durasiTurunan = akhirValid ? (t1 - t0) / 1000 : 0
-    const durasi = durasiTerekam != null && durasiTerekam > 0
-      ? durasiTerekam
-      : durasiTurunan > 0 ? durasiTurunan : 0
+    // Date TimeClip is a technical representability boundary, not a clinical limit.
+    // Reject a source duration whose projected end cannot be serialized; a real
+    // valid end may still supply timestamp-derived duration.
+    const sumberValid = durasiTerekam != null && durasiTerekam >= 0
+      && Number.isFinite(new Date(t0 + durasiTerekam * 1000).getTime())
+    const durasi = sumberValid ? durasiTerekam : durasiTurunan
+    const durationSource = sumberValid ? 'source_field' : akhirValid ? 'timestamps' : 'unknown'
 
     const jarakMentah = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
     const jarakKm = jarakMentah != null && jarakMentah > 0 ? jarakMentah : undefined
@@ -208,6 +216,7 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
       mulai: new Date(t0).toISOString(),
       selesai: akhirValid ? new Date(t1).toISOString() : new Date(t0 + durasi * 1000).toISOString(),
       durasi: Math.round(durasi),
+      durationSource,
       jarakKm: jarakKm != null ? +jarakKm.toFixed(2) : undefined,
       kcal: toKcal(w?.activeEnergyBurned) ?? toKcal(w?.totalEnergy),
       avgHr: avgHrMentah != null && avgHrMentah > 0 ? Math.round(avgHrMentah) : undefined,
@@ -440,6 +449,10 @@ export const NOTIF_INFO: Record<HrNotification['jenis'], { arti: string; kapanPe
 export interface WeeklySummary {
   sesi: number
   totalMenit: number
+  knownDurationMinutes?: number | null
+  durationKnownCount?: number
+  durationMissingCount?: number
+  durationOverflow?: boolean
   totalKm: number
   totalKcal: number
   rerataPaceSec?: number
@@ -454,6 +467,8 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
 
   let totalDetik = 0
+  let durationKnownCount = 0
+  let durationMissingCount = 0
   let totalKm = 0
   let totalKcal = 0
   let durasiBerjarak = 0
@@ -463,7 +478,10 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
   const hrMaxAman = Number.isFinite(hrMax) && hrMax > 0 ? hrMax : 0
 
   for (const w of workouts) {
-    const durasi = nonNegatif(w?.durasi)
+    const knownDuration = workoutDurationSeconds(w)
+    const durasi = knownDuration ?? 0
+    if (knownDuration === null) durationMissingCount++
+    else durationKnownCount++
     const jarak = positif(w?.jarakKm)
     const kcal = nonNegatif(w?.kcal)
 
@@ -492,16 +510,26 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     }
   }
 
+  const durationOverflow = !Number.isFinite(totalDetik)
   return {
     sesi: workouts.length,
-    totalMenit: Math.round(totalDetik / 60),
+    totalMenit: durationOverflow ? 0 : Math.round(totalDetik / 60),
+    knownDurationMinutes: durationKnownCount > 0 && !durationOverflow ? Math.round(totalDetik / 60) : null,
+    durationKnownCount,
+    durationMissingCount,
+    durationOverflow,
     totalKm: +totalKm.toFixed(2),
     totalKcal: Math.round(totalKcal),
-    rerataPaceSec: jarakBerpace > 0 && durasiBerjarak > 0
+    rerataPaceSec: Number.isFinite(durasiBerjarak) && Number.isFinite(jarakBerpace) && jarakBerpace > 0 && durasiBerjarak > 0
       ? Math.round(durasiBerjarak / jarakBerpace)
       : undefined,
     pctMudah: berzonaDetik > 0 ? Math.round((mudahDetik / berzonaDetik) * 100) : undefined,
   }
+}
+
+export function fmtWorkoutDurasi(workout: unknown): string {
+  const seconds = workoutDurationSeconds(workout)
+  return seconds === null ? '—' : fmtDurasi(seconds)
 }
 
 export function fmtDurasi(sec: number): string {

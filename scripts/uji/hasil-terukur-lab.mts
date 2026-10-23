@@ -37,7 +37,7 @@ assert.equal(hitungHasilTerukur({ hba1c: [{ id: 'y', tanggal: '2026-09-20', nila
 assert.equal(JENDELA_TINJAUAN_HARI, 14)
 {
   const { readFileSync } = await import('node:fs')
-  const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+  const ui = readFileSync('src/components/tiles/UbinLab.tsx', 'utf8')
   assert.match(ui, /hitungHasilTerukur\(ambilLab\(\), tinjauan,/, 'kartu Lab tidak lagi menampilkan lingkaran tindak lanjut dari data nyata')
   assert.match(ui, /penyebut > 0/, 'lingkaran tampil walau penyebut nol — akan menampilkan 0 of 0')
 }
