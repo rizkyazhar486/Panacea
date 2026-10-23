@@ -56,6 +56,10 @@ const runSuite = (file: string): Promise<{ code: number | null; stderr: string }
 
 const suites = readdirSync(UJI_DIR).filter((f) => /^calculator-independent-reference.*\.mts$/.test(f))
 const suiteCode = new Map(suites.map((f) => [f, executableCode(readFileSync(new URL(f, UJI_DIR), 'utf8'))]))
+// A suite that exercises every engine without calling its functions (it pins exported range tables by importing the package index)
+// declares `sweep:all-engines` in its first 25 lines; it then counts for every engine. Without this the sweep would only run suites
+// that call an engine and would miss mutants such a suite really kills.
+const allEngineSuites = suites.filter((f) => /sweep:all-engines/.test(readFileSync(new URL(f, UJI_DIR), 'utf8').split('\n').slice(0, 25).join('\n')))
 
 interface Report { engine: string; suites: string[]; mutants: number; killed: number; crashed: number; survived: number; survivors: Array<{ line: number; from: string; to: string; context: string }> }
 const reports: Report[] = []
@@ -70,7 +74,7 @@ try {
     const source = readFileSync(path, 'utf8')
     originals.set(path, source)
     const names = exportedCalculators(source)
-    const relevant = suites.filter((f) => names.some((n) => invokes(suiteCode.get(f)!, n)))
+    const relevant = suites.filter((f) => allEngineSuites.includes(f) || names.some((n) => invokes(suiteCode.get(f)!, n)))
     const report: Report = { engine: id, suites: relevant, mutants: 0, killed: 0, crashed: 0, survived: 0, survivors: [] }
     if (relevant.length === 0) { reports.push(report); continue }
     const baseline = await Promise.all(relevant.map(runSuite))
