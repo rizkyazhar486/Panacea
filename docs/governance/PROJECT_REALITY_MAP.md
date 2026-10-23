@@ -31,6 +31,8 @@ One longitudinal human/health OS: AI-EMR, Clinical, Your Body, Body Exposure (3D
 | Clinical calculators (47 engines) | **Engineering-tested, `clinically_reviewed=false`** | C6 deferral |
 
 ## 4. Observed state of main (this pass)
+**Root cause of most red checks: `ubuntu-latest` rolled to Ubuntu 26.04 (kernel >= 6.19).** Playwright 1.55 aborts (`does not support chromium on ubuntu26.04-x64`) in user-journeys/proof-shard/full-acceptance, and the Mongo service container cannot start (SERVER-121912). Mongo 8.0.34 did not help (#2690 closed). Fix: pin `ubuntu-24.04` (#2691); `mongo-persistence` turned green on that PR.
+
 Main `256a22de9` push-triggered runs: **Stabilization Acceptance, Body 3D Render Acceptance, Dependency Audit Gate, User Journey Acceptance (F1) = failure**.
 - Dependency Audit Gate: root-caused. 4 new **high** advisories in server prod deps (`@modelcontextprotocol/server`, `follow-redirects`). Fix: PR #2688.
 - User Journey Acceptance: failed at step "Install browser" (infrastructure, not an assertion). Not yet re-run; treat as flaky-infra until a re-run proves otherwise.
@@ -38,7 +40,7 @@ Main `256a22de9` push-triggered runs: **Stabilization Acceptance, Body 3D Render
 - Scheduled `Production browser check` and `Vercel Prebuilt Production` failed on schedule events; they monitor production and are not merge gates.
 
 ## 5. Root causes of the loss of trust (evidence-based)
-1. **One denominator mixed engineering with human decisions.** Legal, clinical and ownership questions sat inside the same 44 criteria, so AI work could not close them however many credits were spent.
+1. **One denominator mixed engineering with human decisions.** Legal, clinical and ownership questions sat inside the same 44 criteria, so AI work could not close them however many credits were spent. Human specialists are not available now; v2 defers them to a final stage.
 2. **Criteria without a single runnable definition.** e.g. F2 "no critical finding", D7 "within documented limit", E7 "SHA equals main" (undefined for a scheduled release).
 3. **Concurrency design wastes CI.** Stabilization Acceptance uses `cancel-in-progress: true` on main, so a newer commit cancels an older SHA's run; cancelled is neither pass nor fail (decision pending: task #12).
 4. **Overlapping agent work.** 30 open PRs, several for the same lane; stale heads.

@@ -13,6 +13,8 @@ The v1 ledger (`governance/ALPHA_ACCEPTANCE_LEDGER.json`: 45 criteria, 38 VERIFI
 | C6 | DEFERRED | ENG-C6-1 | EXT-C6-1 | engineering reference tests ≠ clinical validation; deferral preserved |
 | other 38 | VERIFIED | not re-listed | — | remain valid as of their evidence; their test suites keep running in CI |
 
-Anti-gaming checks: (a) `scripts/qa/acceptance-v2.test.mjs` fails if any of the seven legacy ids loses its mapping; (b) external gates are always printed beside the engineering count; (c) moving a hard item out of the engineering list requires adding it as an external gate with a specific question.
+Anti-gaming checks: (a) `scripts/qa/acceptance-v2.test.mjs` fails if any of the seven legacy ids loses its mapping; (b) deferred gates stay listed beside the engineering count; (c) moving a hard item out of the engineering list requires adding it as a deferred gate with its future question and an `activatesWhen` condition.
+
+Honest consequence: deferral changes the workflow, not the facts. v1 statuses stay REPORTED/DEFERRED; nothing here claims they were verified.
 
 Phase F (after owner approval): switch active workflows to the tiers in [STABILIZATION_V2.md](STABILIZATION_V2.md) one at a time; no required check is turned off before its replacement has passed.

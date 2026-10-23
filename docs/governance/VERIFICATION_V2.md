@@ -6,7 +6,7 @@
 | `PASS` | command + negative control passed on exact SHA, evidence stored | CI/AI after run |
 | `FAIL` | ran and failed; failing step recorded | CI/AI |
 | `NOT_RUN` | no run on current evidence SHA | default |
-| `BLOCKED_EXTERNAL` (gate) | human decision requested, specific question sent | AI sets after sending request |
+| `DEFERRED_FINAL_STAGE` (gate) | needs a qualified human; not requested now | default |
 | `DECIDED` (gate) | signed decision record attached | **human only** |
 `VERIFIED` is not used in v2. Legal/clinical/production claims use gates, never criteria.
 
@@ -33,4 +33,4 @@ On every PR touching a criterion's evidence paths; full re-run on each release S
 Reviewer ≠ author agent (the Codex lane reviews Claude Code PRs and vice versa; a human reviewer satisfies this too). The reviewer checks head SHA, changed-file overlap, exact-head checks, and that no test was weakened. AI review is not external validation.
 
 ## Production linkage
-Release acceptance records: deployed artifact SHA (`build.json` / `/api/health build.commit`) classified by `scripts/qa/deploy-equivalence.mjs` (equal / ancestor / diverged), deployment id, smoke result, previous deployment id for rollback. What counts as "accepted SHA" is EXT-E7-1; until decided, reports state the facts and never say "equal to main" as a pass.
+Release acceptance records: deployed artifact SHA (`build.json` / `/api/health build.commit`) classified by `scripts/qa/deploy-equivalence.mjs` (equal / ancestor / diverged), deployment id, smoke result, previous deployment id for rollback. Until a final-stage release policy exists, the engineering rule is: a deployment is current only if the comparator says `equal` for the release SHA; `ancestor` is reported as behind, never as a pass.
