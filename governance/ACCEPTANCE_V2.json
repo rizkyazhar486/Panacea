@@ -972,7 +972,8 @@
         {
           "cmd": "npm run uji",
           "files": [
-            "scripts/uji/calculator-review-registry.mts"
+            "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-adversarial-matrix.mts"
           ]
         }
       ],
@@ -981,7 +982,7 @@
       "dependsOn": [],
       "status": "NOT_RUN",
       "statusSha": null,
-      "statusNote": "Partly done, status stays NOT_RUN. Done: suites 12 to 14 (scripts/uji/calculator-independent-reference-12/13/14.mts) pin every input-range limit (66 exported range tables as literals; a new or stale table fails the suite), the cut-offs that change a label or score (GRACE 108/140, NEWS2 bands, MAP 60/100, MELD-Na meld > 11, MELD floor and clamp, Killip 3) and two guards. Measured with the mutation sweep (docs/governance/CALCULATOR_MUTATION_SWEEP.md): input-range survivors 94 -> 0; total survivors 128 -> 24 of 1054 (killed 909 -> 1028); each pin was sabotaged on the real engines and failed by test name. NOT done, which is why this is not PASS: the criterion asks for a matrix that asserts a NAMED rejection reason for each adversarial class (blank, NaN, Infinity, negative, out-of-range, unit mismatch) on EACH engine. Many engines reject these and suites 1 to 12 exercise hostile inputs for several, but there is no generic matrix over all 47; it needs a per-engine adapter because call signatures differ. Finding: sleepDebt accepts calendar-impossible dates (2026-02-30, 2026-04-31); documented, not pinned as correct. Pins freeze the values the engines declare today; they are not clinical validation."
+      "statusNote": "Status stays NOT_RUN until CI on the PR head is recorded. Built: scripts/uji/calculator-adversarial-matrix.mts, run by npm run uji, attacks all 47 registry engines (57 adapters because call signatures and exported calculators differ) with blank (NaN, undefined, ''), Infinity, -Infinity, negative, one step below/above the declared range, unit text ('70 mg/dL') and numeric text ('70') on every numeric input, plus categorical and yes/no probes; 2026 runs. It requires a named rejection reason, no finite number in a rejected result (declared partials only), distinct reasons per field, and boundary-accept pairs (exact min and max and real booleans are accepted). Fail-open paths it found and that were fixed: non-boolean yes/no input read as 'no' or by truthiness in stopBang, news2, sofaScore, meldNa and hydrationTarget; sleepDebt returned ok:true with a critical verdict for a night with blank hours. Negative controls on the real engines: MAP range check removed, isFiniteNumber coercing text, stopBang and sleepDebt guards reverted: each reported by name. Details and limits: docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md. NOT shown: clinical correctness of any accepted value; clinically_reviewed stays false; sleepDebt calendar-impossible dates are still accepted."
     },
     {
       "id": "ENG-C6-03",
