@@ -22,15 +22,15 @@ rejected.writeUInt32LE(rejected.length,8)
 rejected.writeUInt32LE(paddedLength,12)
 rejected.writeUInt32LE(0x4e4f534a,16)
 encoded.copy(rejected,20); tail.copy(rejected,20+paddedLength)
-const component = await readFile(new URL('../src/pages/FetalParcelInspector.tsx', import.meta.url), 'utf8')
+const component = await readFile(new URL('../src/pages/bodyhub/FetalParcelInspector.tsx', import.meta.url), 'utf8')
 const bundle = await build({
   stdin: { contents: `import React from 'react'; import {createRoot} from 'react-dom/client'; import {MemoryRouter} from 'react-router-dom';
-    import {FetalParcelInspector} from './src/pages/FetalParcelInspector';
+    import {FetalParcelInspector} from './src/pages/bodyhub/FetalParcelInspector';
     createRoot(document.getElementById('root')).render(<MemoryRouter><FetalParcelInspector/></MemoryRouter>);`, resolveDir: root, loader: 'tsx' },
   bundle: true, write: false, format: 'esm', jsx: 'automatic', outfile: 'app.js',
   define: { 'import.meta.env.BASE_URL': '"/"', 'process.env.NODE_ENV': '"production"' },
   plugins: [{ name: 'test-camera', setup(builder) {
-    builder.onLoad({ filter: /FetalParcelInspector\.tsx$/ }, () => ({ loader: 'tsx', resolveDir: `${root}src/pages`,
+    builder.onLoad({ filter: /FetalParcelInspector\.tsx$/ }, () => ({ loader: 'tsx', resolveDir: `${root}src/pages/bodyhub`,
       contents: component.replace('const controls = new OrbitControls(camera, renderer.domElement)',
         'const controls = new OrbitControls(camera, renderer.domElement); window.__qaCamera = camera; window.__qaControls = controls').replace('const scene = new THREE.Scene()', 'const scene = new THREE.Scene(); window.__qaScene = scene') }))
     builder.onLoad({ filter: /\.css$/ }, () => ({ loader: 'empty', contents: '' }))
