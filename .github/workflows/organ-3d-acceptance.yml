@@ -26,7 +26,7 @@ jobs:
   # kelenjar 44, ventilasi 33, bergerak 32, bilah-atas 2, share-card 2. The required check name `render-proof` is kept by the aggregator below.
   proof-shard:
     name: proof-shard (${{ matrix.nama }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
       fail-fast: true
@@ -216,7 +216,7 @@ jobs:
   render-proof:
     needs: proof-shard
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Require every Body3D proof shard to have passed
