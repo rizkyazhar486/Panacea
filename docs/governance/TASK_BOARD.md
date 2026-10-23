@@ -35,7 +35,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | READY |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | IN_REVIEW (PR pending): Apache-2.0 and CC BY-SA 2.1 became required classes; per-class removal control on real data. Criterion stays NOT_RUN until ENG-D8-01 passes and the rendered page is captured at an exact SHA |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (pedsDose gap closed in #2702; guard hardened to call-sites after independent review) | ENG-C6-01 | claude | IN_REVIEW | this PR |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
 
