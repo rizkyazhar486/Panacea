@@ -44,7 +44,7 @@ assert.equal(rusak.jumlah, 0, 'rentang terbalik/di luar jendela tetap digambar')
 assert.equal(lapisanKeUniform([...ct, ...ct].map((l) => ({ ...l, aktif: true })), jendela).jumlah, MAKS_LAPISAN)
 
 // 4. Shader & UI.
-const komp = readFileSync('src/components/VolumeDicom3D.tsx', 'utf8')
+const komp = readFileSync('src/components/digital-twin/VolumeDicom3D.tsx', 'utf8')
 assert.match(komp, /if \(uMode == 4\)/, 'mode lapisan tidak ada di shader')
 assert.match(komp, /akum\.rgb \+= \(1\.0 - akum\.a\) \* a \* uLapisanWarna\[k\]/, 'lapisan tidak dikomposit depan-ke-belakang')
 assert.match(komp, /gradien\(p, uLangkah \* uHalus\)/, 'penghalusan tidak memengaruhi bayangan')

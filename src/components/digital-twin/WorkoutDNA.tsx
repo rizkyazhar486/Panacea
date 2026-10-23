@@ -3,6 +3,7 @@ import { IconActivity, IconHeart, IconShield, IconSparkle } from '../icons'
 import type { ImportedWorkout } from '../../lib/workoutImport'
 import {
   buildWorkoutDnaLibrary,
+  workoutDnaDurationLabel,
   findClosestWorkoutDna,
   type WorkoutDnaSignature,
 } from '../../lib/workoutDNA'
@@ -55,7 +56,7 @@ async function dnaPoster(signature: WorkoutDnaSignature): Promise<Blob | null> {
   ctx.fillText(title, 86, 310)
   ctx.fillStyle = 'rgba(255,255,255,.48)'
   ctx.font = '700 23px Montserrat, system-ui, sans-serif'
-  ctx.fillText(`${formatDate(signature.startedAt)} · ${Math.round(signature.durationMin)} min${signature.distanceKm != null ? ` · ${signature.distanceKm.toFixed(2)} km` : ''}`, 86, 355)
+  ctx.fillText(`${formatDate(signature.startedAt)} · ${workoutDnaDurationLabel(signature)}${signature.distanceKm != null ? ` · ${signature.distanceKm.toFixed(2)} km` : ''}`, 86, 355)
 
   ctx.fillStyle = '#63f5a6'
   ctx.font = '900 30px Montserrat, system-ui, sans-serif'
@@ -155,7 +156,7 @@ export function WorkoutDNA({ workouts, hrMax }: { workouts: ImportedWorkout[]; h
             {library.map((item) => (
               <button key={item.workoutId} onClick={() => { setSelectedId(item.workoutId); setShareStatus('') }} className={`w-full rounded-2xl border p-3 text-left ${item.workoutId === selected.workoutId ? 'border-emerald-300/20 bg-emerald-300/[.07]' : 'border-white/8 bg-white/[.025]'}`}>
                 <div className="text-xs font-black text-white/82">{item.name}</div>
-                <div className="mt-1 text-[9px] text-white/30">{formatDate(item.startedAt)} · {Math.round(item.durationMin)} min{item.distanceKm != null ? ` · ${item.distanceKm.toFixed(1)} km` : ''}</div>
+                <div className="mt-1 text-[9px] text-white/30">{formatDate(item.startedAt)} · {workoutDnaDurationLabel(item)}{item.distanceKm != null ? ` · ${item.distanceKm.toFixed(1)} km` : ''}</div>
                 <div className="mt-2 text-[9px] font-bold text-[#f0d68a]/70">{item.archetype}</div>
               </button>
             ))}
@@ -191,7 +192,7 @@ export function WorkoutDNA({ workouts, hrMax }: { workouts: ImportedWorkout[]; h
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <article className="rounded-2xl border border-cyan-300/12 bg-cyan-300/[.045] p-4">
               <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-cyan-200"><IconHeart size={13} /> Recorded facts</div>
-              <div className="mt-3 flex flex-wrap gap-1.5">{selected.measuredFacts.length ? selected.measuredFacts.map((item) => <span key={item} className="rounded-full border border-cyan-200/10 px-2.5 py-1 text-[9px] text-white/46">{item}</span>) : <span className="text-[10px] text-white/35">Only basic workout timing is available.</span>}</div>
+              <div className="mt-3 flex flex-wrap gap-1.5">{selected.measuredFacts.length ? selected.measuredFacts.map((item) => <span key={item} className="rounded-full border border-cyan-200/10 px-2.5 py-1 text-[9px] text-white/46">{item}</span>) : <span className="text-[10px] text-white/35">{selected.knownDurationMin == null ? 'Session duration and physiological measurements are unavailable.' : 'Only basic workout timing is available.'}</span>}</div>
               {(selected.zoneEasyPct != null || selected.zoneHardPct != null) && <div className="mt-3 text-[10px] leading-relaxed text-white/38">Measured HR trace: {selected.zoneEasyPct ?? 0}% in zones 1–2 · {selected.zoneHardPct ?? 0}% in zones 4–5.</div>}
             </article>
 

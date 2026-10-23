@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs'
 import { statusPasienUntukDokter, logDariBundel } from '../../src/lib/statusPasienDokter.ts'
 import { timelineHarian } from '../../src/lib/perubahanLongitudinal.ts'
 import { canEnterClinicalRecord } from '../../src/lib/panaceaLongitudinalState.ts'
-import { logKeBundelFhir } from '../../server/src/labFhir.ts'
-import { susunRencana, susunLaporan } from '../../server/src/carePlan.ts'
+import { logKeBundelFhir } from '../../server/src/domains/clinical-records/labFhir.ts'
+import { susunRencana, susunLaporan } from '../../server/src/domains/clinical-records/carePlan.ts'
 
 // Dokter melihat status kanonik YANG SAMA dengan pasien, disusun dari sumber
 // server lewat jembatan yang sama — bukan model pasien kedua di server.

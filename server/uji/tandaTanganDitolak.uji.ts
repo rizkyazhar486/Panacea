@@ -1,7 +1,7 @@
 // Alpha A6: percobaan non-klinisi menandatangani harus dikenali (untuk audit), tanpa menandai simpanan biasa.
 // Fungsi murni; fixture sintetis. Ini bukan tinjauan klinis.
 import assert from 'node:assert/strict'
-import { tandaTanganDitolak, terapkanSimpanRekam } from '../src/rekamKlinis.ts'
+import { tandaTanganDitolak, terapkanSimpanRekam } from '../src/domains/clinical-records/rekamKlinis.ts'
 
 const pasien = { id: 'u-pasien', nama: 'Synthetic Patient', klinisi: false }
 const dokter = { id: 'u-dokter', nama: 'Synthetic Doctor', klinisi: true }

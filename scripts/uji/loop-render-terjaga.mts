@@ -48,7 +48,7 @@ guarded.hentikan()
 assert.equal(reentrant.antre.size, 0, 'no orphan frame remains after stopping a reentrant loop')
 const PENGGUNA = [
   ...['Arteri3D', 'KelenjarSaluran3D', 'LesiNeuro3D', 'WilayahAbdomen3D', 'Kerangka3D', 'VentilasiBronkus3D', 'AlphaGenomeAtlas'].map((n) => `src/pages/bodyhub/${n}.tsx`),
-  ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D', 'VolumeDicom3D'].map((n) => `src/components/${n}.tsx`),
+  ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D', 'VolumeDicom3D'].map((n) => `src/components/digital-twin/${n}.tsx`),
   ...['MicroPathologyComparator', 'BodyParts3DDeepAtlas', 'RealisticAnatomyAtlas', 'HighDefinitionCellAtlas', 'HraClinicalAtlas', 'CinematicCellGenomeExplorer', 'MicroPhysiologyExplorer', 'TissuePreview'].map((n) => `src/components/digital-twin/${n}.tsx`),
   'src/pages/discovery/SynapseMicro3DLab.tsx',
 ]

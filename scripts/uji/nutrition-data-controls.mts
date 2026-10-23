@@ -59,7 +59,7 @@ assert.throws(
   /larger than the 1 MB import limit/,
 )
 
-const controlsSource = readFileSync(new URL('../../src/pages/NutritionDataControls.tsx', import.meta.url), 'utf8')
+const controlsSource = readFileSync(new URL('../../src/pages/bodyhub/NutritionDataControls.tsx', import.meta.url), 'utf8')
 assert.match(controlsSource, /No file is uploaded to Panacea/)
 assert.match(controlsSource, /file\.size > MAX_NUTRITION_IMPORT_BYTES/)
 assert.match(controlsSource, /existingIds\.has\(entry\.id\)/)

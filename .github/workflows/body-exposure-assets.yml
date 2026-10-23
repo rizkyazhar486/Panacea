@@ -6,7 +6,7 @@ on:
       - 'public/bodyexposure/**'
       - 'bodyexposure/pipeline/check_web_budget.py'
       - 'bodyexposure/pipeline/test_web_budget.py'
-      - 'src/pages/CanonicalBody.tsx'
+      - 'src/pages/bodyhub/CanonicalBody.tsx'
       - '.github/workflows/body-exposure-assets.yml'
   push:
     branches: [main]
@@ -14,7 +14,7 @@ on:
       - 'public/bodyexposure/**'
       - 'bodyexposure/pipeline/check_web_budget.py'
       - 'bodyexposure/pipeline/test_web_budget.py'
-      - 'src/pages/CanonicalBody.tsx'
+      - 'src/pages/bodyhub/CanonicalBody.tsx'
       - '.github/workflows/body-exposure-assets.yml'
 
 permissions:
@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   asset-budget:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

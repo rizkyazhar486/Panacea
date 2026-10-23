@@ -136,8 +136,8 @@ try {
   const mutating = (chunk: string, prefix: RegExp) => new RegExp(`^\\s*app\\.(?:post|put|patch|delete)\\('(${prefix.source}[^']*)'`).exec(chunk)?.[1]
   const unaudited: string[] = []
   for (const chunk of chunks('src/index.ts')) {
-    const route = mutating(chunk, /\/api\/clinical\//)
-    if (route && !/addAudit\(/.test(chunk)) unaudited.push(route)
+    const route = mutating(chunk, /\/api\/(?:clinical\/|lab-log|clinician\/lab-shares|care\/|second-opinion)/)
+    if (route && !/add(?:Lab)?Audit\(/.test(chunk)) unaudited.push(route)
   }
   for (const chunk of chunks('src/modules/labResults/http/routes.ts')) {
     const route = mutating(chunk, /\/api\/(?:lab-results|referrals)/)
@@ -148,3 +148,5 @@ try {
 } finally {
   await running.stop()
 }
+
+await import('./careWriteAuditHttp.uji.js')

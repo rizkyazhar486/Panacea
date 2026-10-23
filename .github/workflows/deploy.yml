@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,7 +39,7 @@ jobs:
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           # Optional — for video call (#10) to work on mobile data, set these
-          # repo variables to your TURN server (see PANDUAN-SETUP.md Bagian Video).
+          # repo variables to your TURN server (see docs/engineering/PANDUAN-SETUP.md Bagian Video).
           VITE_TURN_URL: ${{ vars.VITE_TURN_URL }}
           VITE_TURN_USER: ${{ vars.VITE_TURN_USER }}
           VITE_TURN_CRED: ${{ vars.VITE_TURN_CRED }}
@@ -54,7 +54,7 @@ jobs:
   deploy:
     if: ${{ vars.ENABLE_GITHUB_PAGES == 'true' }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

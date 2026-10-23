@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from '../src/pengingatCek.js'
+import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from '../src/domains/push/pengingatCek.js'
 import { stripServerOwnedSettings } from '../src/store.js'
 
 // Jakarta (+420): 19:00 lokal = 12:00Z.

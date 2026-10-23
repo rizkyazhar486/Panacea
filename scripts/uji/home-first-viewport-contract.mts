@@ -2,12 +2,12 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 
-const landing = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
-const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
+const landing = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
+const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
-const healthBrief = readFileSync('src/components/HomeHealthBrief.tsx', 'utf8')
-const essentialTools = readFileSync('src/components/HomeEssentialTools.tsx', 'utf8')
-const liveRail = readFileSync('src/components/HomeLiveWidgetRail.tsx', 'utf8')
+const healthBrief = readFileSync('src/components/dashboard/HomeHealthBrief.tsx', 'utf8')
+const essentialTools = readFileSync('src/components/dashboard/HomeEssentialTools.tsx', 'utf8')
+const liveRail = readFileSync('src/components/dashboard/HomeLiveWidgetRail.tsx', 'utf8')
 
 // Simplicity is not feature deletion. Home stays an entry surface; the hero is
 // allowed only contextual actions so category pages do not compete with it.

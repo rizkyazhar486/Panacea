@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { MedicalLibraryWorkbench } from '../../components/MedicalLibraryWorkbench'
 import { StudyCommandCenter } from '../../components/StudyCommandCenter'
-import { MedStudyHub as MedStudyHubBase } from '../MedStudyHubBase'
+import { MedStudyHub as MedStudyHubBase } from './MedStudyHubBase'
 import { Fold } from '../../shared/ui/Fold'
 
 export function MedStudyHub() {
