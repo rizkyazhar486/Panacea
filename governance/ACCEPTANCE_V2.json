@@ -1,0 +1,1157 @@
+{
+  "schemaVersion": 2,
+  "version": "2.0.0",
+  "status": "PROPOSED_UNTIL_OWNER_MERGE",
+  "createdAt": "2026-10-23",
+  "baselineMainSha": "256a22de9687605b14297bb25b48319f257ccab7",
+  "doc": "docs/governance/ACCEPTANCE_V2.md",
+  "legacyLedger": "governance/ALPHA_ACCEPTANCE_LEDGER.json",
+  "statuses": [
+    "PASS",
+    "FAIL",
+    "NOT_RUN",
+    "NOT_APPLICABLE"
+  ],
+  "externalStatuses": [
+    "DEFERRED_FINAL_STAGE",
+    "DECIDED"
+  ],
+  "gates": {
+    "ENGINEERING": "Deterministic code/test/CI evidence. AI-actionable end to end.",
+    "PRODUCT_QUALITY": "Measured accessibility, responsiveness, performance, real-browser journeys. AI-actionable.",
+    "PRODUCTION": "Artifact SHA, deployment, smoke and rollback evidence that AI can produce with existing access.",
+    "CLINICAL_SAFETY_ENG": "Engineering safety of clinical functions. Never equals clinical validation."
+  },
+  "lanes": [
+    "integrator",
+    "claude",
+    "codex",
+    "any-ai"
+  ],
+  "humanRoles": [
+    "product-owner",
+    "clinical-reviewer",
+    "legal-counsel",
+    "infra-owner",
+    "manual-qa"
+  ],
+  "criteria": [
+    {
+      "id": "ENG-CI-01",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P0",
+      "lane": "integrator",
+      "legacy": [
+        "E6"
+      ],
+      "capability": "Every required workflow on main is green at the exact main head.",
+      "risk": "A red main hides regressions and makes every PR's CI evidence meaningless.",
+      "done": "Latest run of each required workflow on the current main SHA has conclusion success.",
+      "checks": [
+        {
+          "cmd": "gh run list --branch main --limit 40 --json name,conclusion,headSha",
+          "files": [
+            ".github/workflows/validate-pr.yml",
+            ".github/workflows/stabilization-acceptance.yml"
+          ]
+        }
+      ],
+      "negativeControl": "A deliberately failing required job on a throwaway branch must turn the check red.",
+      "evidence": "Run IDs per required workflow for the exact main SHA, recorded in docs/governance/TASK_BOARD.md.",
+      "dependsOn": [
+        "ENG-CI-02",
+        "ENG-SEC-01"
+      ],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "Stabilization, Body 3D, User Journey (F1), Dependency Audit and Production browser check failed on 256a22de."
+    },
+    {
+      "id": "ENG-CI-02",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P0",
+      "lane": "integrator",
+      "legacy": [
+        "E6"
+      ],
+      "capability": "Browser jobs run on a runner image the pinned Playwright supports.",
+      "risk": "ubuntu-latest moved to 26.04; Playwright 1.55 cannot install Chromium there, so every browser gate fails before testing.",
+      "done": "Every workflow job that installs Playwright pins a supported runs-on image; browser jobs reach their test steps.",
+      "checks": [
+        {
+          "cmd": "grep -n 'runs-on' .github/workflows/stabilization-acceptance.yml .github/workflows/organ-3d-acceptance.yml .github/workflows/user-journey-acceptance.yml",
+          "files": [
+            ".github/workflows/user-journey-acceptance.yml"
+          ]
+        }
+      ],
+      "negativeControl": "Same job on ubuntu-latest (26.04) fails at 'Playwright does not support chromium on ubuntu26.04-x64'.",
+      "evidence": "Exact-head run of each browser workflow reaching its test step.",
+      "dependsOn": [],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "Fix in flight: PR #2686."
+    },
+    {
+      "id": "ENG-SEC-01",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P0",
+      "lane": "any-ai",
+      "legacy": [
+        "E9"
+      ],
+      "capability": "No unaccepted high/critical advisory in web or server production dependencies.",
+      "risk": "Known-exploitable dependencies in a health-data backend.",
+      "done": "dependency-audit-gate.mjs exits 0 for both workspaces with the policy file unchanged or with dated, risk-registered acceptances.",
+      "checks": [
+        {
+          "cmd": "cd server && npm audit --omit=dev --json > /tmp/a.json; node ../scripts/qa/dependency-audit-gate.mjs --workspace server --file /tmp/a.json --policy ../governance/dependency-audit-policy.json",
+          "files": [
+            "scripts/qa/dependency-audit-gate.mjs",
+            "scripts/qa/dependency-audit-gate.test.mjs",
+            "governance/dependency-audit-policy.json"
+          ]
+        }
+      ],
+      "negativeControl": "scripts/qa/dependency-audit-gate.test.mjs fixtures with unaccepted highs must fail.",
+      "evidence": "Gate output for the exact SHA; Dependency Audit Gate run ID.",
+      "dependsOn": [],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "4 high in server (MCP SDK, follow-redirects). Fix: PR #2687, gate OK locally on 7af12661."
+    },
+    {
+      "id": "ENG-REG-A",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8"
+      ],
+      "capability": "One OS longitudinal flow regression pack stays green (identity, encounter, anamnesis, exam, AI draft, signature, follow-up, E2E).",
+      "risk": "Silent regression of previously verified clinical flow.",
+      "done": "Server suite and encounter HTTP restart suite pass at the exact SHA.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "server/uji/encounterHttpRestart.uji.ts",
+            "server/uji/rekamEncounter.uji.ts"
+          ]
+        }
+      ],
+      "negativeControl": "Removing encounter close persistence fails the post-restart assertion (recorded in legacy A2 evidence).",
+      "evidence": "Validate changes / server-validate run ID at exact SHA.",
+      "dependsOn": [
+        "ENG-CI-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-REG-B",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9"
+      ],
+      "capability": "Lab and referral closure regression pack stays green (persistence, state machine, audit, RBAC, UI, communication, metrics).",
+      "risk": "Lost or mis-closed lab results.",
+      "done": "Lab/referral HTTP and RBAC suites pass at the exact SHA.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "server/uji/hasilLab.uji.ts",
+            "server/uji/labReferralClosureHttp.uji.ts",
+            "server/uji/labReferralHttpRbac.uji.ts"
+          ]
+        }
+      ],
+      "negativeControl": "Admitting every same-tenant patient in service ownership code fails the populated-subject exclusion assertion.",
+      "evidence": "server-validate run ID at exact SHA.",
+      "dependsOn": [
+        "ENG-CI-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-REG-C",
+      "gate": "CLINICAL_SAFETY_ENG",
+      "horizon": "H0",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C7"
+      ],
+      "capability": "Calculator input validation, empty-not-zero ratchet, claim limits, review-status labels and regression suite stay green.",
+      "risk": "A calculator silently returns a number for invalid input.",
+      "done": "npm run uji passes, including calculator-review-registry and independent-reference suites.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/calculator-review-registry.mts",
+            "governance/EMPTY_FIELD_ZERO_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "Empty-field-zero ratchet fails if any calculator maps blank input to 0.",
+      "evidence": "Validate changes run ID at exact SHA.",
+      "dependsOn": [
+        "ENG-CI-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-REG-D",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D9",
+        "D10"
+      ],
+      "capability": "Body Exposure viewer, GLB loading, gross gates, layers, loop continuity, unvalidated labels and 390x844 layout stay green.",
+      "risk": "3D viewer regressions on the most visible surface.",
+      "done": "Body 3D Render Acceptance and body uji suites pass at the exact SHA.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/body-gait-loop-reproduction.mts",
+            "scripts/uji/body-asset-provenance.mts",
+            ".github/workflows/organ-3d-acceptance.yml"
+          ]
+        }
+      ],
+      "negativeControl": "Body asset provenance test fails for a GLB node without panacea_source.",
+      "evidence": "Body 3D Render Acceptance run ID at exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-REG-E",
+      "gate": "ENGINEERING",
+      "horizon": "H0",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "E1",
+        "E2",
+        "E3",
+        "E5",
+        "E8"
+      ],
+      "capability": "Auth, clinical RBAC, audit trail, responsive home and security baseline stay green.",
+      "risk": "Cross-patient read or unaudited clinical change.",
+      "done": "RBAC and audit HTTP suites pass; Security Baseline Enforcement green at exact SHA.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "server/uji/rbacKlinis.uji.ts",
+            "server/uji/personalDataHttpRbac.uji.ts",
+            ".github/workflows/security-baseline-enforcement.yml"
+          ]
+        }
+      ],
+      "negativeControl": "Populated-patient RBAC fixture fails when a foreign account is admitted.",
+      "evidence": "server-validate + Security Baseline Enforcement run IDs at exact SHA.",
+      "dependsOn": [
+        "ENG-CI-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-F1-01",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "claude",
+      "legacy": [
+        "F1"
+      ],
+      "capability": "Synthetic-identity browser journeys for patient, doctor, nurse, lab, owner and admin on the real app and API at 390x844 and 1440x900.",
+      "risk": "Dead-end navigation or broken primary task for a supported role.",
+      "done": "user-journeys check green with every supported role journey, logout and two failing negative controls named by step.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/user-journey-e2e.mjs",
+          "files": [
+            "scripts/qa/user-journey-e2e.mjs",
+            "scripts/qa/user-journey-staff.mjs",
+            ".github/workflows/user-journey-acceptance.yml"
+          ]
+        }
+      ],
+      "negativeControl": "Navigation dead-end and leaked-text sabotage controls must fail at their named step.",
+      "evidence": "User Journey Acceptance (F1) run ID at exact SHA with per-role results.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass."
+    },
+    {
+      "id": "ENG-F1-02",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "F1"
+      ],
+      "capability": "HTTP RBAC matrix: positive and negative per role, tenant isolation, revocation, role escalation denial.",
+      "risk": "Privilege escalation or cross-tenant read.",
+      "done": "Staff, care and lab-share HTTP RBAC suites pass at exact SHA.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "server/uji/staffRbacHttp.uji.ts",
+            "server/uji/careHttpRbac.uji.ts",
+            "server/uji/labShareHttpRbac.uji.ts"
+          ]
+        }
+      ],
+      "negativeControl": "Granting nurse a doctor-only write must fail the matrix.",
+      "evidence": "server-validate run ID at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "Clinician tenant-wide read is current behaviour; changing it waits on EXT-F1-A. Tests must pin current behaviour, not decide policy."
+    },
+    {
+      "id": "ENG-F1-03",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "F1"
+      ],
+      "capability": "Slow-API, API-500 and recovery states on every page in the critical-journey page list.",
+      "risk": "Blank or stuck screens on backend failure.",
+      "done": "user-journey-resilience covers 100% of pages listed in the F1 critical page inventory; each with a paired positive control.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/user-journey-resilience.test.mjs",
+          "files": [
+            "scripts/qa/user-journey-resilience.mjs",
+            "scripts/qa/user-journey-resilience.test.mjs"
+          ]
+        }
+      ],
+      "negativeControl": "Removing the error boundary from one listed page fails its resilience check.",
+      "evidence": "Coverage list (page -> result) for exact SHA.",
+      "dependsOn": [
+        "ENG-F1-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-F2-01",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "claude",
+      "legacy": [
+        "F2"
+      ],
+      "capability": "WCAG 2.2 AA text contrast on critical-journey pages, brand #00BF63 preserved via accessible foreground variants.",
+      "risk": "Unreadable clinical text.",
+      "done": "kontras-wcag measurable failures = 0 on the critical page list in light and dark; KONTRAS_BASELINE ratchet at 0.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/kontras-wcag.mjs",
+          "files": [
+            "scripts/qa/kontras-wcag.mjs",
+            "governance/KONTRAS_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "kontras-ukur fixture with 2.4:1 green-on-white must fail.",
+      "evidence": "Contrast report JSON for exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "Legacy F2 note records 57 measurable failures; 1349 gradient/image-backed elements unmeasured (tracked, not counted as pass)."
+    },
+    {
+      "id": "ENG-F2-02",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "claude",
+      "legacy": [
+        "F2"
+      ],
+      "capability": "axe: zero serious/critical; every 'incomplete' result triaged with a reason in the repo.",
+      "risk": "Automated a11y blind spots stay invisible.",
+      "done": "axe-ratchet green and governance/AXE_BASELINE.json lists each incomplete with disposition.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/axe-ratchet.test.mjs",
+          "files": [
+            "scripts/qa/axe-audit.mjs",
+            "scripts/qa/axe-ratchet.mjs",
+            "governance/AXE_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "Unlabelled button fixture must add a serious violation.",
+      "evidence": "axe report for exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-F2-03",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "F2"
+      ],
+      "capability": "Keyboard: tab order reaches every primary action, visible focus, no traps.",
+      "risk": "Keyboard users blocked.",
+      "done": "keyboard-audit zero traps/unreachable primary actions vs KEYBOARD_BASELINE.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/keyboard-analisis.test.mjs",
+          "files": [
+            "scripts/qa/keyboard-audit.mjs",
+            "governance/KEYBOARD_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "tabindex=-1 on a primary action must be reported unreachable.",
+      "evidence": "Keyboard audit JSON for exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-F2-04",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "F2"
+      ],
+      "capability": "Screenshot regression baselines per page x viewport x theme.",
+      "risk": "Unreviewed visual regressions.",
+      "done": "screenshot-grid compares against committed baseline with a fixed tolerance; diff above tolerance fails.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/screenshot-grid.test.mjs",
+          "files": [
+            "scripts/qa/screenshot-grid.mjs",
+            "governance/SCREENSHOT_GRID_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "1px layout shift above tolerance fixture must fail.",
+      "evidence": "Grid diff report for exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-F2-05",
+      "gate": "PRODUCT_QUALITY",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "F2"
+      ],
+      "capability": "Performance budget gated with recorded methodology (device profile, runs, statistic).",
+      "risk": "Slow mobile load unnoticed.",
+      "done": "perf-audit gates LCP/TBT per page against a committed budget using median of N runs.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/perf-audit.test.mjs scripts/qa/perf-stats.test.mjs",
+          "files": [
+            "scripts/qa/perf-audit.mjs",
+            "scripts/qa/perf-stats.mjs"
+          ]
+        }
+      ],
+      "negativeControl": "Budget fixture exceeded by one sample-median must fail.",
+      "evidence": "Perf report with methodology header for exact SHA.",
+      "dependsOn": [
+        "ENG-CI-02"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-D7-01",
+      "gate": "ENGINEERING",
+      "horizon": "H2",
+      "priority": "P3",
+      "lane": "claude",
+      "legacy": [
+        "D7"
+      ],
+      "capability": "Foot-contact metrics reproduced from raw GLB with PASS / FAIL / UNMEASURABLE kept distinct.",
+      "risk": "Unmeasurable treated as pass.",
+      "done": "body-gait-foot-metrics returns UNMEASURABLE (not PASS) when stance phases are absent; reproducible JSON written.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/body-gait-foot-metrics.mts",
+            "scripts/uji/body-gait-foot-contact-reproduction.mts"
+          ]
+        }
+      ],
+      "negativeControl": "Zero-stance fixture must yield UNMEASURABLE.",
+      "evidence": "bodyexposure/qa_reports/gait_foot_slide.json regenerated at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-D7-02",
+      "gate": "ENGINEERING",
+      "horizon": "H2",
+      "priority": "P3",
+      "lane": "claude",
+      "legacy": [
+        "D7"
+      ],
+      "capability": "WALK and RUN for male and female rigs all measurable (>= 2 stance phases per foot).",
+      "risk": "Claiming gait quality on unmeasured animations.",
+      "done": "All four fixtures measurable; slide metrics reported against the documented engineering threshold.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/body-gait-foot-metrics.mts"
+          ]
+        }
+      ],
+      "negativeControl": "Rig without heel/toe landmark yields UNMEASURABLE.",
+      "evidence": "Per-fixture metrics JSON at exact SHA.",
+      "dependsOn": [
+        "ENG-D7-01",
+        "ENG-D7-03"
+      ],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "Legacy D7 note: RUN and female not measurable."
+    },
+    {
+      "id": "ENG-D7-03",
+      "gate": "ENGINEERING",
+      "horizon": "H2",
+      "priority": "P3",
+      "lane": "claude",
+      "legacy": [
+        "D7"
+      ],
+      "capability": "Rig carries heel and toe landmarks so contact is not inferred from a rolling rigid marker.",
+      "risk": "Metrics are an upper bound only.",
+      "done": "Exported rig has named heel/toe bones or empties; metrics script consumes them.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/compare-blender-gait-contact.test.mjs",
+          "files": [
+            "scripts/qa/compare-blender-gait-contact.mjs"
+          ]
+        }
+      ],
+      "negativeControl": "Missing landmark name fails the loader.",
+      "evidence": "GLB node listing + metrics run at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "Research task first (TASK_BOARD R-D7-RIG): unknown whether source rig can be extended without re-rigging."
+    },
+    {
+      "id": "ENG-D8-01",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "D8"
+      ],
+      "capability": "Every public binary asset has a provenance record or is listed as an open external gate; nothing untracked.",
+      "risk": "Shipping assets with unknown rights.",
+      "done": "public-asset-inventory finds 0 untracked assets outside the EXT-D8-A/B list; the gate fails closed on a new untracked file.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/public-asset-inventory.mjs",
+          "files": [
+            "scripts/qa/public-asset-inventory.mjs",
+            "governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json"
+          ]
+        }
+      ],
+      "negativeControl": "Adding an untracked PNG under public/ fails the gate.",
+      "evidence": "Inventory JSON for exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-D8-02",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "D8"
+      ],
+      "capability": "A visible in-app attribution page names every source, licence and required credit line.",
+      "risk": "CC BY / CC BY-SA attribution obligations unmet.",
+      "done": "Attribution page renders every licence class present in GLB metadata; test fails if a class is missing.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/body-asset-provenance.mts",
+            "bodyexposure/PROVENANCE.md"
+          ]
+        }
+      ],
+      "negativeControl": "Removing one licence class from the page fails the test.",
+      "evidence": "Rendered page screenshot + test output at exact SHA.",
+      "dependsOn": [
+        "ENG-D8-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-D8-03",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "claude",
+      "legacy": [
+        "D8"
+      ],
+      "capability": "Each licence class is checked against an accessible primary source and the check is recorded (URL, date, hash).",
+      "risk": "Licence recorded from memory or a manifest only.",
+      "done": "Record per licence class with primary URL and retrieval date; ICRP basis marked as owner statement, not verified licence.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/glb-provenance-audit.mjs",
+          "files": [
+            "scripts/qa/glb-provenance-audit.mjs"
+          ]
+        }
+      ],
+      "negativeControl": "Licence class without a primary-source record fails the audit.",
+      "evidence": "Licence check table committed with retrieval dates.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "PR #2685 is in flight for fetal atlas CC0 verification."
+    },
+    {
+      "id": "ENG-E4-01",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "E4"
+      ],
+      "capability": "PHI repo scan covers every tracked text file, fails closed on unreadable or oversized files, and never prints findings into CI logs.",
+      "risk": "PHI committed or leaked via CI output.",
+      "done": "phi-repo-scan tests pass including unreadable/large-file and redacted-output cases.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/phi-repo-scan.test.mjs",
+          "files": [
+            "scripts/qa/phi-repo-scan.mjs",
+            "scripts/qa/phi-repo-scan.test.mjs",
+            "governance/PHI_SCAN_ALLOWLIST.json"
+          ]
+        }
+      ],
+      "negativeControl": "Synthetic MRN fixture must be detected; its value must not appear in output.",
+      "evidence": "Test output at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "PR #2679 in flight (CI diagnostic redaction)."
+    },
+    {
+      "id": "ENG-E4-02",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "E4"
+      ],
+      "capability": "Server logs carry no names, emails, MRNs, clinical text or values across all tested HTTP journeys.",
+      "risk": "PHI in application logs.",
+      "done": "logPrivacyHttp suite passes and covers every route group in the RBAC matrix.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "server/uji/logPrivacyHttp.uji.ts"
+          ]
+        }
+      ],
+      "negativeControl": "Adding console.log(req.body) to a clinical route fails the suite.",
+      "evidence": "server-validate run ID at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-E4-03",
+      "gate": "ENGINEERING",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "codex",
+      "legacy": [
+        "E4"
+      ],
+      "capability": "Deletion and retention harness parameterised by a policy file, so approved values plug in without code change.",
+      "risk": "Policy cannot be enforced once approved.",
+      "done": "Harness deletes/expires synthetic records per a test policy and proves audit retention; production policy values stay unset until EXT-E4-A.",
+      "checks": [
+        {
+          "cmd": "cd server && npm run uji",
+          "files": [
+            "docs/alpha/E4_RETENTION_CONSENT_POLICY_DRAFT.md"
+          ]
+        }
+      ],
+      "negativeControl": "Expired synthetic record still readable after a sweep fails the harness.",
+      "evidence": "Harness test output at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-E7-01",
+      "gate": "PRODUCTION",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "E7"
+      ],
+      "capability": "Deployed frontend (build.json) and backend (/api/health build.commit) SHAs read and classified equal / ancestor / unknown vs main.",
+      "risk": "Claiming a release that is not running.",
+      "done": "verify-deployed-sha run recorded with both SHAs and classification; unknown is never reported as equal.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/verify-deployed-sha.mjs",
+          "files": [
+            "scripts/qa/verify-deployed-sha.mjs",
+            "scripts/vite/buildMarker.mjs"
+          ]
+        }
+      ],
+      "negativeControl": "Missing build.json yields unknown, not equal.",
+      "evidence": "verify-deployed-sha output + run ID.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-E7-02",
+      "gate": "PRODUCTION",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "E7"
+      ],
+      "capability": "Critical-journey browser smoke against the deployed artifact, recorded with the artifact SHA.",
+      "risk": "Deploy that boots but cannot complete a journey.",
+      "done": "production-browser-check passes at both viewports and logs the frontend and backend SHA it tested.",
+      "checks": [
+        {
+          "cmd": "node scripts/qa/production-browser-check.mjs",
+          "files": [
+            "scripts/qa/production-browser-check.mjs",
+            "scripts/qa/production-browser-verdict.test.mjs",
+            ".github/workflows/production-browser-check.yml"
+          ]
+        }
+      ],
+      "negativeControl": "production-browser-verdict fixture with absent canvas must fail.",
+      "evidence": "Production browser check run ID.",
+      "dependsOn": [
+        "ENG-CI-02",
+        "ENG-E7-01"
+      ],
+      "status": "FAIL",
+      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
+      "statusNote": "Production browser check failed on 256a22de."
+    },
+    {
+      "id": "ENG-E7-03",
+      "gate": "PRODUCTION",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "codex",
+      "legacy": [
+        "E7"
+      ],
+      "capability": "Scripted rollback to a previous artifact with a dry-run that proves the command resolves the target SHA.",
+      "risk": "No tested way back from a bad release.",
+      "done": "Rollback script + dry-run test committed; real rollback stays an infra-owner action.",
+      "checks": [
+        {
+          "cmd": "node --test scripts/qa/production-browser-verdict.test.mjs",
+          "files": [
+            ".github/workflows/vercel-prebuilt-production.yml"
+          ]
+        }
+      ],
+      "negativeControl": "Dry-run with a SHA not on main must refuse.",
+      "evidence": "Dry-run output at exact SHA.",
+      "dependsOn": [
+        "ENG-E7-01"
+      ],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "Rollback script does not exist yet; check entry points at the release workflow it will extend."
+    },
+    {
+      "id": "ENG-E7-04",
+      "gate": "PRODUCTION",
+      "horizon": "H1",
+      "priority": "P2",
+      "lane": "codex",
+      "legacy": [
+        "E7"
+      ],
+      "capability": "Staging environment defined as code (workflow + env contract) so it can be provisioned once credentials exist.",
+      "risk": "No pre-production gate.",
+      "done": "Workflow and env template committed; workflow fails closed with a named message when credentials are absent.",
+      "checks": [
+        {
+          "cmd": "ls .github/workflows",
+          "files": [
+            ".github/workflows/vercel-prebuilt-production.yml",
+            "render.yaml"
+          ]
+        }
+      ],
+      "negativeControl": "Running without secrets exits non-zero with 'staging credentials absent'.",
+      "evidence": "Workflow file + failing-closed run.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null,
+      "statusNote": "Provisioning itself is EXT-E7-B."
+    },
+    {
+      "id": "ENG-C6-01",
+      "gate": "CLINICAL_SAFETY_ENG",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "C6"
+      ],
+      "capability": "Every calculator engine matches an independent reference implementation on a shared input set.",
+      "risk": "Formula transcription error.",
+      "done": "calculator-independent-reference suites pass for all 47 registry engines (coverage asserted, not assumed).",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/calculator-independent-reference.mts",
+            "governance/CALCULATOR_REVIEW_REGISTRY.json"
+          ]
+        }
+      ],
+      "negativeControl": "Off-by-one coefficient mutation fails its reference comparison.",
+      "evidence": "Coverage table engine -> reference test at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-C6-02",
+      "gate": "CLINICAL_SAFETY_ENG",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "C6"
+      ],
+      "capability": "Adversarial input matrix (blank, NaN, Infinity, negative, out-of-range, unit mismatch) fails closed for every engine.",
+      "risk": "Garbage in, plausible number out.",
+      "done": "Matrix test asserts a named rejection reason for each adversarial class on each engine.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/calculator-review-registry.mts"
+          ]
+        }
+      ],
+      "negativeControl": "Engine returning a number for NaN fails the matrix.",
+      "evidence": "Matrix output at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    },
+    {
+      "id": "ENG-C6-03",
+      "gate": "CLINICAL_SAFETY_ENG",
+      "horizon": "H1",
+      "priority": "P1",
+      "lane": "codex",
+      "legacy": [
+        "C6"
+      ],
+      "capability": "Every engine result shows formula, units, source and 'not clinically reviewed' while clinically_reviewed=false.",
+      "risk": "Unreviewed output read as validated.",
+      "done": "Registry test fails if any engine lacks source/DOI or renders without the not-reviewed label.",
+      "checks": [
+        {
+          "cmd": "npm run uji",
+          "files": [
+            "scripts/uji/calculator-review-registry.mts",
+            "governance/CALCULATOR_REVIEW_REGISTRY.json"
+          ]
+        }
+      ],
+      "negativeControl": "Engine with clinically_reviewed=true but no reviewer record fails.",
+      "evidence": "Registry test output at exact SHA.",
+      "dependsOn": [],
+      "status": "NOT_RUN",
+      "statusSha": null
+    }
+  ],
+  "externalGates": [
+    {
+      "id": "EXT-F1-A",
+      "legacy": [
+        "F1"
+      ],
+      "owner": "product-owner",
+      "question": "Should clinicians read all patients in their tenant, or only patients assigned to them? Who may grant exceptions?",
+      "impact": "RBAC scope in production. Current code = tenant-wide read.",
+      "artifact": "Decision record: deny-by-default yes/no, role scope, exception rule, effective date.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-F1-B",
+      "legacy": [
+        "F1"
+      ],
+      "owner": "infra-owner",
+      "question": "Provide a test Google OAuth client (or approve a production-credential test window) for a real login journey.",
+      "impact": "Real provider login stays untested; journeys use synthetic sessions.",
+      "artifact": "OAuth test client credentials in CI secrets, or written refusal.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-F1-C",
+      "legacy": [
+        "F1"
+      ],
+      "owner": "product-owner",
+      "question": "Run or delegate a real-user acceptance session per role.",
+      "impact": "No claim of user validation.",
+      "artifact": "Dated session notes per role with findings.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-F2-A",
+      "legacy": [
+        "F2"
+      ],
+      "owner": "manual-qa",
+      "question": "Manual keyboard, screen-reader and cross-device pass over the critical page list.",
+      "impact": "Automated a11y cannot prove usability.",
+      "artifact": "Filled docs/alpha manual QA checklist with tester name and date.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-D7-A",
+      "legacy": [
+        "D7"
+      ],
+      "owner": "clinical-reviewer",
+      "question": "What foot-slide threshold is scientifically defensible for a teaching animation? (Current values are placeholders.)",
+      "impact": "Engineering threshold cannot be called realistic.",
+      "artifact": "Cited threshold with reviewer name.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-D8-A",
+      "legacy": [
+        "D8"
+      ],
+      "owner": "product-owner",
+      "question": "Who made public/logo-mark.png and on what rights basis is it used?",
+      "impact": "Asset stays listed as rights-unknown.",
+      "artifact": "Signed authorship/rights statement.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-D8-B",
+      "legacy": [
+        "D8"
+      ],
+      "owner": "product-owner",
+      "question": "Source, author and media rights (music, voice, footage) of public/media/tutorial-video.mp4?",
+      "impact": "Asset stays listed as rights-unknown.",
+      "artifact": "Source + licence/permission evidence.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-D8-C",
+      "legacy": [
+        "D8"
+      ],
+      "owner": "legal-counsel",
+      "question": "Is the owner's statement that ICRP 145/156 phantoms may be redistributed sufficient, or is written ICRP permission needed?",
+      "impact": "2,772 structures rest on an owner statement.",
+      "artifact": "Counsel note or ICRP permission.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-E4-A",
+      "legacy": [
+        "E4"
+      ],
+      "owner": "legal-counsel",
+      "question": "Approve retention periods, deletion rights, consent text, backup/log retention and legal basis (UU PDP).",
+      "impact": "'Compliant with policy' cannot be tested until a policy exists.",
+      "artifact": "Dated, versioned policy with counsel sign-off.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-E4-B",
+      "legacy": [
+        "E4"
+      ],
+      "owner": "infra-owner",
+      "question": "Grant read access to Render and Vercel log settings so third-party log retention and PHI exposure can be checked.",
+      "impact": "Infra logs are outside tested scope.",
+      "artifact": "Read-only access or exported log-settings evidence.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-E7-A",
+      "legacy": [
+        "E7"
+      ],
+      "owner": "product-owner",
+      "question": "Which SHA counts as 'released' (latest main, last release tag, per-artifact last change), and who may release and roll back?",
+      "impact": "'Running SHA equals main' has no agreed meaning.",
+      "artifact": "Release policy document.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-E7-B",
+      "legacy": [
+        "E7"
+      ],
+      "owner": "infra-owner",
+      "question": "Provision staging (Vercel preview project + Render service) and add its secrets to CI.",
+      "impact": "No staging gate exists.",
+      "artifact": "Staging URLs + CI secrets present.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-E7-C",
+      "legacy": [
+        "E7"
+      ],
+      "owner": "product-owner",
+      "question": "Sign off each production release (go / no-go with reason).",
+      "impact": "Release has no accountable approver.",
+      "artifact": "Release record per version.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    },
+    {
+      "id": "EXT-C6-A",
+      "legacy": [
+        "C6"
+      ],
+      "owner": "clinical-reviewer",
+      "question": "Appoint a qualified reviewer and review each calculator engine per version (formula, parameters, population, limits, interpretation).",
+      "impact": "All 47 engines stay clinically_reviewed=false and restricted to non-clinical use.",
+      "artifact": "Signed per-engine review record tied to engine ID + commit SHA.",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage (H3): after Alpha engineering is complete AND a qualified human holds this role. Not requested now."
+    }
+  ],
+  "operatingModel": "AI-first: AI does all engineering, testing, review, merge-prep and evidence. Human gates are a FINAL stage (H3), activated only when a qualified human exists after Alpha engineering; nothing in the working loop waits for or asks a human. Deferral never grants approval: AI never marks a gate DECIDED, and product safety labels stay (clinically_reviewed=false, unattested assets flagged, non-clinical use only)."
+}
