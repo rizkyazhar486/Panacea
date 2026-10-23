@@ -2,7 +2,7 @@ import { chk } from './check.mjs'
 import { readFile } from 'node:fs/promises'
 
 const source = await readFile(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
-const picker = await readFile(new URL('../../src/components/PemilihAksiFab.tsx', import.meta.url), 'utf8')
+const picker = await readFile(new URL('../../src/components/dashboard/PemilihAksiFab.tsx', import.meta.url), 'utf8')
 
 
 

@@ -4,7 +4,8 @@ import { PencarianGlobal } from '../PencarianGlobal'
 import { useGestur } from '../../lib/useGestur'
 import { pasangKilau } from '../../lib/kilau'
 import { buatAlurKembali } from '../../lib/alurHalaman'
-import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { LogoMark } from '../Logo'
 import { FabNavigasi } from '../FabNavigasi'
 import { kirimRingkasan } from '../../lib/ringkasan'
@@ -83,7 +84,7 @@ function navMatches(n: Nav, pathname: string): boolean {
   return pathname === n.to || pathname.startsWith(n.to + '/')
 }
 
-const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
+const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'perawat', 'lab', 'admin', 'owner']
 
 
 /**
@@ -102,6 +103,7 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 const nav: Nav[] = [
   // Beranda
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/doctor-review/lab-results', label: 'Lab desk', icon: IconShield, roles: ['perawat', 'lab'], group: 'Home' },
   { to: '/semua-fitur', label: 'All Features', icon: IconSearch, roles: ALL, group: 'Home' },
   { to: '/tutorial', label: 'How to Use', icon: IconBook, roles: ALL, group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
@@ -282,6 +284,8 @@ const roleLabel: Record<Role, string> = {
   dokter: 'Doctor',
   kontributor: 'Contributor',
   verifikator: 'Verifier',
+  perawat: 'Nurse',
+  lab: 'Lab staff',
   admin: 'Admin',
   owner: 'Owner',
 }
@@ -299,7 +303,9 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [spacesOpen, setSpacesOpen] = useState(false)
   const [userMenuBuka, setUserMenuBuka] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
+  const userBtnRef = useRef<HTMLButtonElement>(null)
+  const userMenuPanelRef = useRef<HTMLDivElement>(null)
+  const [userMenuPos, setUserMenuPos] = useState({ top: 64, right: 16 })
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -414,15 +420,46 @@ export function Shell({ children }: { children: ReactNode }) {
     trackVisit(loc.pathname)
   }, [loc.pathname])
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setUserMenuBuka(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+  const placeUserMenu = useCallback(() => {
+    const rect = userBtnRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const viewport = window.innerWidth
+    const width = Math.min(290, viewport - 16)
+    const wantedRight = viewport - rect.right
+    const right = Math.min(Math.max(12, wantedRight), Math.max(12, viewport - width - 12))
+    setUserMenuPos({ top: Math.round(rect.bottom + 8), right: Math.round(right) })
   }, [])
+
+  useLayoutEffect(() => {
+    if (!userMenuBuka) return
+    placeUserMenu()
+    window.addEventListener('resize', placeUserMenu)
+    window.addEventListener('scroll', placeUserMenu, true)
+    return () => {
+      window.removeEventListener('resize', placeUserMenu)
+      window.removeEventListener('scroll', placeUserMenu, true)
+    }
+  }, [userMenuBuka, placeUserMenu])
+
+  useEffect(() => {
+    if (!userMenuBuka) return
+    function onPointer(e: PointerEvent) {
+      const target = e.target as Node
+      if (userMenuPanelRef.current?.contains(target) || userBtnRef.current?.contains(target)) return
+      setUserMenuBuka(false)
+    }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setUserMenuBuka(false) }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [userMenuBuka])
+
+  useEffect(() => {
+    if (keadaanBilah === 'hidden') setUserMenuBuka(false)
+  }, [keadaanBilah])
 
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
 
@@ -530,8 +567,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const spatialSurface = loc.pathname.startsWith('/body-explorer') || bodyExposureView
 
   return (
-    <div className="pmd-spectral-shell relative flex min-h-screen">
-      {onHome && <DailyQuoteBanner />}
+    <div className="pmd-spectral-shell relative flex min-h-screen w-full">
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
         <LogoMark size={28} />
@@ -540,7 +576,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col w-full">
         {/* Pita tangkap: selalu ada di tepi atas, tidak pernah ikut menyingkir.
             Inilah yang memanggil bilah kembali — mengandalkan hover pada
             bilahnya sendiri mustahil, karena bilah yang tersembunyi sudah tidak
@@ -637,7 +673,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </svg>
           </button>
 
-          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
+          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:overflow-visible sm:gap-3">
             {/* Pesan, dukungan, dan tema pindah ke laci menu -- lihat catatan
                 di atas soal delapan sasaran ketuk dalam satu bilah. Yang
                 tersisa di sini hanya yang benar-benar dipakai setiap hari. */}
@@ -691,8 +727,9 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
 
             {/* Menu Akun Pengguna & Logout */}
-            <div className="relative shrink-0" ref={userMenuRef}>
+            <div className="relative shrink-0">
               <button
+                ref={userBtnRef}
                 type="button"
                 onClick={() => setUserMenuBuka((prev) => !prev)}
                 className={`group flex items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
@@ -741,10 +778,13 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
 
-              {userMenuBuka && (
+              {typeof document !== 'undefined' && userMenuBuka && createPortal(
                 <div
-                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-3xl border border-black/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-neutral-900/95"
-                  style={{ animation: 'masuk-dari-bawah 0.15s ease-out' }}
+                  ref={userMenuPanelRef}
+                  role="menu"
+                  aria-label="Menu Akun Pengguna"
+                  style={{ top: `${userMenuPos.top}px`, right: `${userMenuPos.right}px` }}
+                  className="fixed z-[100] w-72 origin-top-right overflow-hidden rounded-3xl border border-black/10 bg-white p-2 shadow-2xl dark:border-white/15 dark:bg-neutral-900 menu-turun"
                 >
                   {/* Profil Header */}
                   <div className="flex items-center gap-3 border-b border-black/5 p-3 dark:border-white/10">
@@ -758,8 +798,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-neutral-900" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-extrabold text-ink">{account.name}</div>
-                      <div className="truncate text-[11px] text-neutral-500">{account.email}</div>
+                      <div className="truncate text-sm font-extrabold text-ink dark:text-white">{account.name}</div>
+                      <div className="truncate text-[11px] text-neutral-500 dark:text-neutral-400">{account.email}</div>
                       <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                         {roleLabel[account.role] ?? account.role}
@@ -850,6 +890,7 @@ export function Shell({ children }: { children: ReactNode }) {
                         doLogout()
                       }}
                       className="flex w-full items-center justify-between rounded-2xl border border-rose-200/70 bg-rose-50/80 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/60"
+                      aria-label="Log out"
                     >
                       <div className="flex items-center gap-2">
                         <IconLogout size={16} className="text-rose-600 dark:text-rose-400" />
@@ -858,7 +899,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       <span className="text-[10px] font-semibold text-rose-500/80">Keluar ↵</span>
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           </div>
@@ -891,6 +933,8 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         )}
 
+        {onHome && <DailyQuoteBanner />}
+
         {/* Isi halaman mengikuti jari saat digeser, lalu memantul pulih. Kelas
             transisi hanya dipasang SETELAH jari diangkat — bila dipasang selagi
             menggeser, gerakannya tertinggal di belakang jari dan justru terasa
@@ -908,34 +952,14 @@ export function Shell({ children }: { children: ReactNode }) {
              sudut kanan bawah, dan di sana ia menempati 12-68 px dari dasar
              layar. Dengan 64 px, empat piksel terakhir isi halaman berada
              tepat di bawahnya. */
-          className={`pmd-page-stage pmd-scroll-orchestrator mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 sm:px-6 lg:pb-6 ${
+          className={`pmd-page-stage pmd-scroll-orchestrator w-full max-w-none flex-1 px-3 py-6 pb-20 sm:px-6 lg:px-8 xl:px-10 lg:pb-6 ${
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >
           {onHome && account.role === 'owner' && <PeringatanPenyimpanan />}
           {onHome && <div className="lg:hidden"><InstallBanner /></div>}
-          {onHome && homeServices.length > 0 && (
-            <div className="mb-5 hidden lg:block">
-              <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-500">
-                Your most-used services
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-                {homeServices.map((n) => (
-                  <NavLink
-                    key={n.to}
-                    to={n.to}
-                    className="flex flex-col items-center gap-1.5 rounded-2xl border border-black/5 bg-white p-2.5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:bg-brand-50 hover:shadow-[0_8px_20px_rgba(0,191,99,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
-                  >
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-dark">
-                      <n.icon size={20} />
-                    </span>
-                    <span className="line-clamp-2 text-[10px] font-semibold leading-tight text-neutral-600">{n.label}</span>
-                  </NavLink>
-                ))}
-              </div>
-            </div>
-          )}
-          <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter">
+
+          <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter w-full">
             {children}
           </div>
         </main>
@@ -951,25 +975,29 @@ export function Shell({ children }: { children: ReactNode }) {
 
           Tujuh tujuan yang sama tetap ada, kini di dalam menu yang muncul saat
           tombolnya diketuk; tidak ada satu pun yang dihapus. */}
+      {/* Navigasi mobile: satu tombol melayang Assistive Touch hanya untuk mobile (< 1024px).
+          Di desktop (>= 1024px), navigasi menggunakan Header dan sidebar sesuai standar Dual-Projection. */}
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
-        <FabNavigasi
-          tersembunyi={keadaanBilah === 'hidden'}
-          onKembali={kembali}
-          tujuan={[
-            { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
-            { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
-            { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
-            { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
-            { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
-            { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
-            { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
-          ]}
-          onCari={() => setCariBuka(true)}
-          onTambah={() => {
-            navigate('/feed')
-            setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
-          }}
-        />
+        <div className="lg:hidden">
+          <FabNavigasi
+            tersembunyi={keadaanBilah === 'hidden'}
+            onKembali={kembali}
+            tujuan={[
+              { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
+              { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
+              { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
+              { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
+              { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
+              { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
+              { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
+            ]}
+            onCari={() => setCariBuka(true)}
+            onTambah={() => {
+              navigate('/feed')
+              setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
+            }}
+          />
+        </div>
       )}
 
       {onHome && ['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}

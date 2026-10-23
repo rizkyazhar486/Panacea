@@ -1,4 +1,4 @@
-import { lingkunganKota } from '../src/lingkungan.ts'
+import { lingkunganKota } from '../src/domains/lifestyle/lingkungan.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

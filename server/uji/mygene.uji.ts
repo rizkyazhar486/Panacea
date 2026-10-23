@@ -1,4 +1,4 @@
-import { lookupGene } from '../src/mygene.ts'
+import { lookupGene } from '../src/domains/medical-reference/mygene.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

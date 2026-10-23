@@ -9,6 +9,7 @@
 // Semua mengembalikan null bila bahannya kurang. Tidak ada nilai bawaan.
 
 import type { ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 
 const HARI = 864e5
 
@@ -111,7 +112,8 @@ export function hanyutanDenyut(sesi: ImportedWorkout[], minMenit = 45): Hanyutan
 // ── 3. Volume mingguan ─────────────────────────────────────────────────────
 
 export interface Volume {
-  minggu: { mulai: string; km: number; menit: number }[]
+  /** `menit` null bila ada sesi minggu itu yang durasinya tidak diketahui; minggu tanpa sesi tetap 0. */
+  minggu: { mulai: string; km: number; menit: number | null }[]
   rataKm: number
   /** Kemiringan regresi kuadrat terkecil, km per minggu. */
   trenKmPerMinggu: number
@@ -121,7 +123,7 @@ export function volumeMingguan(sesi: ImportedWorkout[], jumlahMinggu = 8, sekara
   if (!sesi.length) return null
   // Minggu dihitung mundur dari hari ini, bukan dari kalender Senin-Minggu:
   // yang ditanya adalah "tujuh hari terakhir", dan bukan "sejak Senin".
-  const minggu: { mulai: string; km: number; menit: number }[] = []
+  const minggu: { mulai: string; km: number; menit: number | null }[] = []
   for (let i = jumlahMinggu - 1; i >= 0; i--) {
     const akhir = sekarang - i * 7 * HARI
     const awal = akhir - 7 * HARI
@@ -129,10 +131,13 @@ export function volumeMingguan(sesi: ImportedWorkout[], jumlahMinggu = 8, sekara
       const t = Date.parse(w.mulai)
       return t >= awal && t < akhir
     })
+    // km: hanya jarak yang tercatat; sesi tanpa jarak (mis. angkat beban) memang tidak menambah km.
+    // menit: durasi yang asal-usulnya tidak diketahui bukan 0 menit, jadi minggunya tidak diketahui.
+    const detik = dalam.map(workoutDurationSeconds)
     minggu.push({
       mulai: new Date(awal).toISOString().slice(0, 10),
       km: dalam.reduce((a, w) => a + (w.jarakKm ?? 0), 0),
-      menit: Math.round(dalam.reduce((a, w) => a + (w.durasi ?? 0), 0) / 60),
+      menit: detik.some((d) => d === null) ? null : Math.round(detik.reduce<number>((a, d) => a + (d ?? 0), 0) / 60),
     })
   }
   const kmArr = minggu.map((m) => m.km)

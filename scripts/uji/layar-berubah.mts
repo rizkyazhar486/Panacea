@@ -16,7 +16,7 @@ for (const invalid of [NaN, Infinity, -Infinity]) {
   assert.equal(layarBerubah(bad, { x: { ...bad.x } }), false, 'identical invalid frames must not create a render loop')
 }
 assert.equal(layarBerubah({ p: { x: Infinity } }, { p: { x: -Infinity } }), true)
-for (const f of ['src/components/OrganModel3D.tsx', 'src/components/Pathway3D.tsx']) {
+for (const f of ['src/components/digital-twin/OrganModel3D.tsx', 'src/components/digital-twin/Pathway3D.tsx']) {
   const s = readFileSync(f, 'utf8')
   assert.match(s, /if \(layarBerubah\(layarTerakhir, next\)\)/, `${f}: setLayar harus dijaga`)
   assert.doesNotMatch(s, /^\s*setLayar\(next\)\s*$/m, `${f}: setLayar tanpa penjaga di loop frame`)

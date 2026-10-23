@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict'
+import { summarise, type ImportedWorkout } from '../../src/lib/workoutImport.ts'
+const row = { id: 'synthetic', nama: 'Run', mulai: '2026-10-13T00:00:00Z', selesai: '2026-10-13T00:30:00Z', durasi: 1800, jarakKm: 3, hr: [], pemulihan: [] } satisfies ImportedWorkout
+assert.equal(summarise([{ ...row, durationSource: 'unknown' }], 180).rerataPaceSec, undefined, 'unknown duration must not become a pace denominator')
+const missing = summarise([{ ...row, durationSource: 'unknown' }], 180)
+assert.equal(missing.knownDurationMinutes, null)
+assert.equal(missing.durationMissingCount, 1)
+assert.equal(missing.durationKnownCount, 0)
+const zero = summarise([{ ...row, durasi: 0, durationSource: 'source_field' }], 180)
+assert.equal(zero.knownDurationMinutes, 0)
+assert.equal(zero.durationKnownCount, 1)
+const partial = summarise([row, { ...row, durationSource: 'unknown' }], 180)
+assert.equal(partial.knownDurationMinutes, 30)
+assert.equal(partial.durationMissingCount, 1)
+assert.equal(partial.rerataPaceSec, 600)
+assert.equal(summarise([], 180).knownDurationMinutes, null)
+assert.equal(summarise([{ ...row, durasi: NaN }], 180).knownDurationMinutes, null)
+const overflow = summarise([{ ...row, durasi: Number.MAX_VALUE }, { ...row, durasi: Number.MAX_VALUE }], 180)
+assert.equal(overflow.knownDurationMinutes, null)
+assert.equal(overflow.durationOverflow, true)
+assert.equal(overflow.rerataPaceSec, undefined)
+for (let minutes = 1; minutes <= 1000; minutes++) assert.equal(summarise([{ ...row, durasi: minutes * 60, durationSource: 'source_field' }], 180).knownDurationMinutes, minutes)
+console.log('workout summary: known zero, missing/partial counts, no unknown pace and overflow PASS')

@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync(new URL('../../src/pages/MentalHealthScreen.tsx', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../src/pages/mental/MentalHealthScreen.tsx', import.meta.url), 'utf8')
 
 test('PHQ-9 item 9 is wired to the fail-closed mental-health safety disposition', () => {
   assert.match(source, /deriveMentalHealthSafetyDisposition/)

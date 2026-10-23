@@ -22,9 +22,21 @@ assert.doesNotMatch(
 
 assert.match(
   workflow,
-  /render-proof:[\s\S]*?timeout-minutes: 60/,
-  'the Body3D job must retain enough bounded headroom for setup plus the serial proof stage',
+  /proof-shard:[\s\S]*?timeout-minutes: 60/,
+  'every Body3D proof shard must retain enough bounded headroom for setup plus its serial proof stage',
 )
+// The required status check keeps its original name through an aggregator that passes only when EVERY shard passed.
+assert.match(
+  workflow,
+  /\n  render-proof:\n    needs: proof-shard\n    if: always\(\)\n/,
+  'the required `render-proof` check must be an always-run aggregator that needs the proof shards',
+)
+assert.match(
+  workflow,
+  /HASIL_SHARD: \$\{\{ needs\.proof-shard\.result \}\}[\s\S]*?if \[ "\$\{HASIL_SHARD\}" != 'success' \]; then[\s\S]*?exit 1/,
+  'the aggregator must fail unless the whole shard matrix succeeded (failed, cancelled or skipped shards fail it)',
+)
+assert.match(workflow, /fail-fast: true/, 'a failed shard must stop the sibling shards instead of queueing known-bad work')
 assert.match(
   workflow,
   /name: Install browser smoke runner\n\s+timeout-minutes: 15/,
@@ -109,14 +121,13 @@ const ordered = [
 ]
 const loopMatch = workflow.match(/for gerbang in ([\s\S]*?); do/)
 assert.ok(loopMatch, 'Body3D smoke loop declaration must exist')
-const loopDeclaration = loopMatch[1]
+assert.equal(loopMatch[1], '$GERBANG_SHARD', 'each shard must iterate only the gates assigned to it by the matrix')
+assert.match(workflow, /GERBANG_SHARD: \$\{\{ matrix\.gerbang \}\}/, 'the shard gate list must come from the matrix')
 
-let previous = -1
-for (const gate of ordered) {
-  const index = loopDeclaration.indexOf(gate)
-  assert.ok(index > previous, `Body3D smoke gate missing or reordered unexpectedly: ${gate}`)
-  previous = index
-}
+// Coverage: the shards together must contain every one of the 13 gates EXACTLY once (none dropped, none duplicated).
+const assigned = [...workflow.matchAll(/^\s+gerbang: (qa:[^\n]+)$/gm)].flatMap((m) => m[1].trim().split(/\s+/))
+assert.deepEqual([...assigned].sort(), [...ordered].sort(), 'the proof shards must cover all 13 gates exactly once')
+assert.equal(new Set(assigned).size, assigned.length, 'no gate may run in two shards')
 
 assert.match(
   workflow,
@@ -125,5 +136,5 @@ assert.match(
 )
 
 console.log(
-  'Body3D CI: serial proofs are individually bounded with a 240s organ exception, fail fast, and retain stage/job/process-group hard stops',
+  'Body3D CI: 13 proofs are sharded (each exactly once), individually bounded with a 240s organ exception, fail fast, aggregated by the required render-proof check, and retain stage/job/process-group hard stops',
 )

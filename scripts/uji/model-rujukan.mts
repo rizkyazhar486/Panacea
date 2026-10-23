@@ -51,6 +51,6 @@ assert.match(layar, /Organ close-up/)
 assert.match(layar, /Whole body/, 'the organ view can return to the same body')
 assert.match(layar, /modelDekat \?/, 'the organ mesh replaces the body only after an organ with a reference cut is chosen')
 assert.match(layar, /barisAsal\(modelDekat\)/, 'the first screen keeps provenance to one line')
-assert.match(readFileSync(new URL('../../src/components/OrganModel3D.tsx', import.meta.url), 'utf8'), /computeVertexNormals/, 'close-up shading follows the mesh instead of flat facets')
+assert.match(readFileSync(new URL('../../src/components/digital-twin/OrganModel3D.tsx', import.meta.url), 'utf8'), /computeVertexNormals/, 'close-up shading follows the mesh instead of flat facets')
 
 console.log('model-rujukan: heart, lungs and liver use shipped atlas cuts; AI meshes do not')

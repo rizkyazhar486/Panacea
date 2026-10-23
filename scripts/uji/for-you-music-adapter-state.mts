@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const stack = readFileSync(new URL('../../src/components/ForYouDailyStack.tsx', import.meta.url), 'utf8')
+const stack = readFileSync(new URL('../../src/components/foryou/ForYouDailyStack.tsx', import.meta.url), 'utf8')
 const catalog = readFileSync(new URL('../../src/lib/forYouWidgetCatalog.ts', import.meta.url), 'utf8')
 
 // The music widget has no route (no real player to open), so before this fix
