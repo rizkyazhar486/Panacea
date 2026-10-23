@@ -1,5 +1,5 @@
 // F1 / Task 44 — ketahanan (API lambat, galat server 5xx, pemulihan, tanpa teks bocor/overflow/crash) pada halaman perjalanan kritis LAIN selain
-// 3 halaman di user-journey-e2e.mjs, untuk peran pasien, dokter terverifikasi, pemilik dan perawat, di PERAMBAN terhadap aplikasi + API NYATA.
+// 3 halaman di user-journey-e2e.mjs, untuk peran pasien, dokter terverifikasi, pemilik, perawat dan lab, di PERAMBAN terhadap aplikasi + API NYATA.
 // Dipisahkan karena pembatas /api/auth (30 per 15 menit; TIDAK dilonggarkan) sudah hampir habis oleh skrip lain; skrip ini berjalan pada server SEGAR.
 // Identitas sintetis; verifikasi dokter dan peran/penugasan perawat adalah fixture alur kerja, bukan persetujuan klinis.
 //
@@ -52,6 +52,9 @@ try {
   assert.equal((await call('POST', '/api/owner/staff-role', owner.token, { userId: perawat.user.id, role: 'perawat' })).status, 200, 'pemilik memberi peran perawat')
   const P = 'p-res-tugas'
   assert.equal((await call('POST', '/api/owner/staff-assignments', owner.token, { userId: perawat.user.id, patientId: P })).status, 200, 'pemilik menugaskan perawat')
+  const lab = await devLogin('lab-res@example.com', 'lab'); assert.equal(lab.user.role, 'pasien', 'lab mendaftar sendiri = pasien')
+  assert.equal((await call('POST', '/api/owner/staff-role', owner.token, { userId: lab.user.id, role: 'lab' })).status, 200, 'pemilik memberi peran lab')
+  assert.equal((await call('POST', '/api/owner/staff-assignments', owner.token, { userId: lab.user.id, patientId: P })).status, 200, 'pemilik menugaskan lab')
   const hasil = await call('POST', '/api/lab-results', owner.token, { patientId: P, item: { name: 'Glukosa-ketahanan', value: 5.5, unit: 'mmol/L', collectedAt: '2026-10-09' }, source: 'lab-intake' })
   assert.equal(hasil.status, 201, 'hasil lab sintetis untuk meja perawat')
 
@@ -64,6 +67,8 @@ try {
     { J: 'pemilik', akun: { email: OWNER, name: 'Pemilik Res', role: 'owner', isOwner: true }, token: owner.token, shell: { role: 'button', name: 'Notifications' },
       rute: ['#/owner'], minChar: 120 },
     { J: 'perawat', akun: { email: 'perawat-res@example.com', name: 'Perawat Res', role: 'perawat' }, token: perawat.token, shell: { role: 'heading', name: 'Lab result review' },
+      rute: ['#/'], minChar: 80 },
+    { J: 'lab', akun: { email: 'lab-res@example.com', name: 'Lab Res', role: 'lab' }, token: lab.token, shell: { role: 'heading', name: 'Lab result review' },
       rute: ['#/'], minChar: 80 },
   ]
 
