@@ -110,6 +110,21 @@ try {
   await call('PUT', '/api/settings', alice.token, { settings: { strStatus: 'forged' } })
   await call('POST', '/api/second-opinion', alice.token, { symptoms: 'symptom-marker-xyz', history: 'history-marker-xyz' })
   await call('POST', '/api/feedback', alice.token, { kind: 'Question', text: 'feedback-marker-xyz text' })
+  // Rejected payloads never reach a handler, but Node's JSON.parse error text quotes part of the input. Each must be refused with a
+  // client error (the body limit is 12 MB, so the oversize case is 13 MB) and leave no trace of its content in the log (the parse and too-large errors are answered 400/413 without logging).
+  const malformed: Array<[path: string, body: string, status: number, contentType?: string]> = [
+    ['/api/clinical/patient', '{"patient":{"name":"malformed-name-marker","mrn":"malformed-mrn-marker"', 400],
+    ['/api/clinical/patient', '{"patient":{"name":"malformed-trailing-marker"}} garbage', 400],
+    ['/api/second-opinion', '{symptoms: "malformed-unquoted-marker"}', 400],
+    ['/api/feedback', "{'text':'malformed-singlequote-marker'}", 400],
+    ['/api/lab-results', '{"item":{"name":"malformed-lab-marker","valueText":"malformed-value-marker"', 400],
+    ['/api/second-opinion', 'malformed-not-json-marker', 400],
+    ['/api/clinical/record', `{"record":{"anamnesis":{"keluhanUtama":"malformed-oversize-marker${'x'.repeat(13_000_000)}"}}}`, 413],
+  ]
+  for (const [path, body, status, contentType] of malformed) {
+    const refused = await fetch(`${running.origin}${path}`, { method: 'POST', headers: { 'content-type': contentType ?? 'application/json', authorization: `Bearer ${alice.token}` }, body, signal: AbortSignal.timeout(10000) })
+    assert.equal(refused.status, status, `a malformed payload to ${path} must be refused with ${status}`)
+  }
   await new Promise(resolve => setTimeout(resolve, 1500))
 
   const written = logs()
@@ -119,6 +134,8 @@ try {
     'Alice Marker', 'Dr Marker', 'Owner Marker', 'MRN-MARKER', 'penicillin-marker', 'complaint-marker', 'exam-marker', 'labvalue-marker', '987.65',
     'review-note-marker', '71.234', '71.23', '53117', 'symptom-marker', 'history-marker', 'feedback-marker', 'forged',
     privateLabel, 'synthetic-private-health-label', 'synthetic-forged-log-line', 'weight_body_mass', 'weightKg', token,
+    'malformed-name-marker', 'malformed-mrn-marker', 'malformed-trailing-marker', 'malformed-unquoted-marker', 'malformed-singlequote-marker',
+    'malformed-lab-marker', 'malformed-value-marker', 'malformed-not-json-marker', 'malformed-oversize-marker',
   ]) assert.ok(!written.includes(secret), `the server log must not contain "${secret}"`)
   // Operational telemetry retains counts and correlation, without health categories.
   assert.match(written, /\[health-webhook\] u:[0-9a-f]{10}: groups=2 workouts=0 matched=1(?:\r?\n|$)/, 'the webhook line keeps counts under an opaque marker')
