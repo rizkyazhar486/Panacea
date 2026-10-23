@@ -34,6 +34,12 @@ jobs:
         run: npm run build
       - name: Deterministic offline tests
         run: npm run uji
+      # ENG-D7-03 (landmark rig + kontrol landmark hilang/bergeser) dan ENG-D8-03 (catatan sumber primer per kelas lisensi):
+      # sebelumnya hanya dijalankan lokal, sehingga tidak ada run CI yang bisa dikutip sebagai bukti.
+      - name: Body Exposure rig landmarks and licence primary sources (ENG-D7-03, ENG-D8-03)
+        run: |
+          node --test scripts/qa/compare-blender-gait-contact.test.mjs scripts/qa/glb-add-foot-landmarks.test.mjs scripts/qa/licence-primary-sources.test.mjs
+          node scripts/qa/glb-provenance-audit.mjs
 
   server-validate:
     runs-on: ubuntu-24.04

@@ -1,10 +1,11 @@
 // Audit independen D8: tiap struktur bernama di setiap GLB publik membawa sumber, lisensi, dan status akurasi
-// (extras glTF). Mengelompokkan lisensi dan melaporkan struktur tanpa metadata. Bukan gerbang CI.
+// (extras glTF), dan tiap kelas lisensinya punya catatan sumber primer (governance/LICENCE_PRIMARY_SOURCES.json).
 // Pakai: node scripts/qa/glb-provenance-audit.mjs [dir]
 import fs from 'node:fs'
 import path from 'node:path'
 import { GLTFLoader } from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from '../../node_modules/three/examples/jsm/libs/meshopt_decoder.module.js'
+import { checkLicenceRecords } from './licence-primary-sources.mjs'
 const dir = process.argv[2] || 'public/bodyexposure'
 const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder)
 const WAJIB = ['panacea_source', 'panacea_license', 'panacea_accuracy_status']
@@ -26,3 +27,7 @@ for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.glb') && !x.inclu
 const top = (m) => Object.fromEntries([...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8))
 console.log(JSON.stringify({ files, struktur, tanpaMetadata: missing.length, lisensi: top(lisensi), akurasi: top(akurasi), sumber: top(sumber) }, null, 1))
 if (missing.length) { console.log(missing.slice(0, 15).join('\n')); process.exit(1) }
+// ENG-D8-03: setiap kelas lisensi yang dipakai harus punya catatan sumber primer; ICRP dicatat sebagai pernyataan pemilik.
+const { used, problems } = checkLicenceRecords([...lisensi.keys()], JSON.parse(fs.readFileSync('governance/LICENCE_PRIMARY_SOURCES.json', 'utf8')))
+if (problems.length) { console.log(problems.join('\n')); process.exit(1) }
+console.log(`licence classes with primary-source records: ${used.join(', ')}`)

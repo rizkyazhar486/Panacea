@@ -21,8 +21,10 @@ from mathutils import Matrix, Quaternion, Vector
 ROOT = Path(__file__).resolve().parents[2]
 NAMES = ('adult_male', 'vhf_denver_ct_adult_female')
 SOURCE_SHA256 = {
-    'adult_male': '0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b',
-    'vhf_denver_ct_adult_female': '73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525',
+    # 2026-10-23 (ENG-D7-03): sumber berubah hanya dengan node landmark FOOT_LANDMARK_* yang ditambahkan; ditinjau lewat
+    # bodyexposure/qa_reports/rig_landmark_nodes.json (strip node -> JSON kanonik + BIN identik dengan versi 0d4a9564/73b112ed).
+    'adult_male': '03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177',
+    'vhf_denver_ct_adult_female': '2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec',
 }
 FPS = 24
 CONTACT_M = 0.015

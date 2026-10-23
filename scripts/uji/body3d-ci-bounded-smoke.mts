@@ -22,7 +22,7 @@ assert.doesNotMatch(
 
 assert.match(
   workflow,
-  /proof-shard:[\s\S]*?timeout-minutes: 60/,
+  /proof-shard:[\s\S]*?timeout-minutes: 70/,
   'every Body3D proof shard must retain enough bounded headroom for setup plus its serial proof stage',
 )
 // The required status check keeps its original name through an aggregator that passes only when EVERY shard passed.
@@ -39,8 +39,19 @@ assert.match(
 assert.match(workflow, /fail-fast: true/, 'a failed shard must stop the sibling shards instead of queueing known-bad work')
 assert.match(
   workflow,
-  /name: Install browser smoke runner\n\s+timeout-minutes: 15/,
-  'browser provisioning must not consume the whole job indefinitely',
+  /name: Install browser smoke runner\n\s+timeout-minutes: 22\n/,
+  'browser provisioning needs a bounded 22 minute budget: main run 39954196713 exhausted 15 minutes during installation',
+)
+// Jangan ulangi apt setelah membunuh induknya: proses anak dapat tetap memegang kunci dpkg (#2704).
+assert.equal(
+  (workflow.match(/"\$PW_PREFIX\/node_modules\/\.bin\/playwright" install --with-deps chromium/g) ?? []).length,
+  1,
+  'browser provisioning must invoke apt/Playwright exactly once',
+)
+assert.doesNotMatch(
+  workflow,
+  /timeout[^\n]*"\$PW_PREFIX\/node_modules\/\.bin\/playwright" install/,
+  'do not wrap apt/Playwright in a child timeout that can orphan the dpkg lock',
 )
 assert.match(
   workflow,
@@ -100,7 +111,7 @@ assert.ok(
   'the stage hard stop must not pre-empt any individually bounded serial gate',
 )
 assert.ok(
-  60 * 60 > (41 * 60) + (15 * 60),
+  70 * 60 > (41 * 60) + (22 * 60) + (3 * 60),
   'the job hard stop must leave bounded headroom for browser provisioning plus the proof stage',
 )
 

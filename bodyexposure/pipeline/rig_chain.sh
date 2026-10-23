@@ -20,4 +20,6 @@ RAW=$(mktemp -d)
 run $R/PANACEA_RIG_ADULT_MALE_GAIT.blend -P $P/export_rig_glb.py -- --out $RAW/adult_male.rig_rom.glb --timeline $QA/rig_rom_animation.json --gait $QA/rig_gait.json --timeline-out public/bodyexposure/adult_male.rig_motion.json
 # -af 0: jangan resample animasi (default 30 Hz menggeser kunci 24 fps); -ar 16: rotasi 16 bit (sambungan loop < 0,1°)
 npx -y gltfpack -i $RAW/adult_male.rig_rom.glb -o public/bodyexposure/adult_male.rig_rom.glb -c -kn -km -ke -af 0 -ar 16 >/dev/null
+# ENG-D7-03: node landmark kaki bernama (tumit = kalkaneus, bola = kepala MT1) sebagai anak FOOT.L/R; hanya JSON yang berubah
+node scripts/qa/glb-add-foot-landmarks.mjs public/bodyexposure/adult_male.rig_rom.glb
 echo "CHAIN done"

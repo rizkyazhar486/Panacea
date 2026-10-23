@@ -1,6 +1,8 @@
-# Calculator mutation sweep (ENG-C6-01 evidence)
+# Calculator mutation sweep (ENG-C6-01 and ENG-C6-02 evidence)
 
-**What this is.** For every numeric literal in each of the 47 registry engines under `src/domains/clinical-calculators/engine/`, the sweep replaces the literal with `value + 1` (an off-by-one coefficient) and runs the independent-reference suites that invoke that engine (`scripts/uji/calculator-independent-reference*.mts`). A mutant is **killed** only when a suite fails with an `AssertionError`. A failure of any other kind (syntax error, thrown `TypeError`, timeout) is counted as **crashed** and is *not* credited as detection. A **survivor** is a literal the reference suites cannot see.
+**What this is.** For every numeric literal in each of the 47 registry engines under `src/domains/clinical-calculators/engine/`, the sweep replaces the literal with `value + 1` (an off-by-one coefficient) and runs the independent-reference suites that exercise that engine (`scripts/uji/calculator-independent-reference*.mts`). A mutant is **killed** only when a suite fails with an `AssertionError`. A failure of any other kind (syntax error, thrown `TypeError`, timeout) is counted as **crashed** and is *not* credited as detection. A **survivor** is a literal the reference suites cannot see.
+
+A suite counts for an engine when it calls one of that engine's exported functions, or when it declares `sweep:all-engines` in its first 25 lines (suite 13, which pins every exported range table by importing the package index).
 
 **Reproduce** (from the repository root, after `npm ci`):
 
@@ -10,89 +12,106 @@ OUT=sweep.json node --experimental-transform-types --import=./scripts/uji/typesc
 
 `ENGINES=a,b` limits the engines. The tool restores every engine file on exit; a clean `git status` afterwards is the check. It is deliberately **not** part of `npm run build` or CI (about ten minutes).
 
-## Result on main `e5d3c9f1` (git tree `94f692bf2d67ce20abb730042f0552fffd2993d2`)
+## Two runs on the same 1054 mutants
 
-| Engines | Mutants | Killed (assertion) | Crashed | Survived |
-|---|---|---|---|---|
-| 47 | 1054 | 909 (86%) | 17 | 128 (12%) |
-
-Every one of the 47 engines is invoked by at least one reference suite (CI line `calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites`, validate job 120549725081).
-
-### What the 128 survivors are
-
-| Kind | Survivors | Engines | Meaning |
+| Run | Killed (assertion) | Crashed | Survived |
 |---|---|---|---|
-| Input-range limit (`min: 40, max: 300`) | 94 | 27 | The references do not pin the exact accepted limit. This is the out-of-range class of **ENG-C6-02**. |
-| Type-level literal (`type CpLevel = 1 \| 2 \| 3`) | 11 | 3 | Erased at compile time: equivalent mutants, harmless. |
-| Display rounding (`toFixed(2)`) | 3 | 1 | Output formatting only. |
-| Other (interpretation cut-offs, clamps, guards) | 20 | 14 | Includes real boundary gaps listed below; a few are equivalent (`+ 0`, `?? 0`). Read one by one. |
+| 1. before suites 12 to 14 (main `e5d3c9f1`, tree `94f692bf…`) | 909 (86%) | 17 | 128 (12%) |
+| 2. after suites 12 to 14 | 1028 (98%) | 2 | 24 (2%) |
 
-### Boundary gaps worth fixing first (survivors that change a clinical label or score)
+| Kind of survivor | Run 1 | Run 2 |
+|---|---|---|
+| Input-range limit (`min: 40, max: 300`) | 94 | 0 |
+| Type-level literal (`type CpLevel = 1 \| 2 \| 3`), erased at compile time | 11 | 11 |
+| Display rounding (`toFixed(2)`) | 3 | 3 |
+| Other (cut-offs, clamps, guards) | 20 | 10 |
 
-- `graceScore`: risk-band cut-offs `score <= 108` and `score <= 140` are not pinned (a score of 109 could be labelled Low risk and no suite fails).
-- `meldNa`: the score is clamped with `Math.min(Math.max(raw, 6), 40)`; the 6 and 40 are not pinned.
-- `news2`: the `total >= 1` Low-medium risk band edge is not pinned.
-- `meanArterialPressure`: the interpretation cut-offs `map < 60` and `map <= 100` are not pinned.
-- `pediatricDka`: the `Math.max(0, ...)` floor on net fluid after bolus is not pinned.
-- `meldNa`: the sodium correction is applied only when `meld > 11`; the 11 is a formula condition, not a coefficient, and it is not pinned.
-- `graceScore`: the upper bound `killip <= 3` of input validation is not pinned.
-- `sleepDebt`: the date pattern `(0[1-9]|1[0-2])` for months is not pinned; mutating the `1` of `1[0-2]` survives, so months 10 to 12 are not exercised by any reference case.
-- `charlson`: the tone threshold `survival10y >= 50` (display tone, not the score) is not pinned.
+What closed them:
+
+- **Suite 12** pins the cut-offs that change a label or a score: GRACE risk bands (every integer 0 to 400; 108 and 140), the Killip upper bound and the "exactly one blank field" guard; NEWS2 bands for every total 0 to 20 with and without a single red parameter; MAP interpretation cut-offs 60 and 100 and its input ranges; MELD-Na against a separately written reference (the `meld > 11` condition on both sides, the floor value 6.43 and the 40 clamp).
+- **Suite 13** pins all 66 exported input-range tables as literals. A new table without a pin, or a stale pin, fails the suite.
+- **Suite 14** pins the `cvdRisk` blank-field guard (four fields) and the `sleepDebt` date pattern (months 01 to 12, days 01 to 31, shapes).
+
+Each was sabotaged on the real engines before being trusted (GRACE 108→109, Killip 3→4, blank-field guard, NEWS2 `>= 1`→`>= 2`, MAP 60→61, MELD `> 11`→`> 12`, MELD floor 6→7, `SYSTOLIC max 300`→301, a new unpinned range table, `sleepDebt` month and day patterns); each failed by test name.
+
+## What is left after run 2 (24 survivors)
+
+Type-level literals (11) and display rounding (3, `lightsCriteria`) are not behaviour. The 10 others:
+
+| Survivor | Disposition |
+|---|---|
+| `bloodDonationScreen` L71 (`0`→`1`) | Equivalent: `+ 0` changes nothing. |
+| `caffeineSleep` L84 (`0`→`1`) | Edge: the `totalDoseMg > 0` guard only matters for a total dose between 0 and 1 mg; not pinned. |
+| `charlson` L58 (`50`→`51`) | Unreachable: survival is a function of an integer total (4 -> 53.4%, 5 -> 21.4%), so no value falls in 50 to 51. |
+| `fluidElectrolytes` L61 (`1`→`2`) | Equivalent: the non-burn placeholder `1` only feeds a range check and any in-range value gives the same result. |
+| `hydrationTarget` L46 (`0`→`1`) | Edge: the `r.ml > 0` row filter would only differ for a row with 0 < ml <= 1; not pinned. |
+| `meldNa` L63 (`40`→`41`) | Equivalent: at MELD 40 the sodium term `(1.32 - 0.033 x 40)` is exactly zero, so the final clamp can differ only by floating-point noise (about 1e-15). |
+| `packYearScreen` L47 (`0`→`1`) | Equivalent: 0 cigarettes per day gives 0 pack-years, already below the minimum, so `cigsPerDay > 0` is redundant. |
+| `pediatricDka` L77 (`0`→`1`) | Likely unreachable: the bolus (10 or 20 mL/kg) cannot exceed deficit plus 48 h maintenance for a valid weight; not proven for every input. |
+| `riskScreens` L53 (`0`→`1`) | Equivalent: with the guard loosened, `framinghamCVD` returns null for a missing age anyway (defence in depth); checked directly. |
+| `widmarkBac` L43 (`0`→`1`) | Edge: the `?? 0` default for a drink label absent from `counts` is not pinned. |
+
+Of the 10: six are equivalent or unreachable (`bloodDonationScreen`, `charlson`, `fluidElectrolytes`, `meldNa`, `packYearScreen`, `riskScreens`); three are small edge guards that remain unpinned (`caffeineSleep`, `hydrationTarget`, `widmarkBac`); `pediatricDka` is likely unreachable but not proven.
+
+## Finding (not fixed, not pinned as correct)
+
+`sleepDebt`'s date pattern checks month 01 to 12 and day 01 to 31 independently, so **calendar-impossible dates are accepted**: `2026-02-30`, `2026-02-31` and `2026-04-31` all pass `sanitizeNights`. The tests pin only the unambiguous cases. Rejecting impossible dates is a behaviour change and belongs in its own change.
 
 ## What this does and does not show
 
-- **Shows:** the arithmetic coefficients of the formulas are guarded: the survivors were read one by one and none is a multiplicative or additive coefficient (for example MELD-Na `1.32`, `0.033` and `137` were all killed). One formula *condition* survives (`meldNa` `meld > 11`, listed above), so formula structure is not fully pinned.
-- **Does not show:** that the references pin validation limits, interpretation cut-offs or clamps (the survivors above), or that any engine is clinically correct. `clinically_reviewed` stays `false` for every engine and nothing here is a clinical validation.
-- **Limits of the method:** one mutation per literal (`+1`), no mutation of operators or control flow; a survivor may be an equivalent mutant; the 17 crashed mutants fail a suite but not with an assertion, so they are reported, not credited.
+- **Shows:** the arithmetic coefficients of the formulas are guarded (MELD-Na `1.32`, `0.033` and `137` were killed in run 1 already), and now also the cut-offs, clamps and input-range limits. No survivor of run 2 is a formula coefficient.
+- **Does not show:** that any limit or cut-off is clinically right. The pins freeze the values the engines declare today; `clinically_reviewed` stays `false` for every engine and nothing here is a clinical validation. The range tables are repo-defined sanity bounds, not clinical thresholds (the engine comments say so).
+- **Does not cover:** the per-engine adversarial matrix of ENG-C6-02 (blank, NaN, Infinity, negative, unit mismatch, each with a *named* rejection reason). Many engines reject those, and suites 1 to 12 exercise hostile inputs for several, but there is no generic matrix asserting it for all 47.
+- **Limits of the method:** one mutation per literal (`+1`), no mutation of operators or control flow; a survivor may be an equivalent mutant; crashed mutants fail a suite but not with an assertion, so they are reported, not credited.
 
-## Per-engine results
+## Per-engine results (run 2; the column "Run 1" is survivors before suites 12 to 14)
 
-| Engine | Suites | Mutants | Killed | Crashed | Survived |
+| Engine | Mutants | Run 1 survived | Killed | Crashed | Survived |
 |---|---|---|---|---|---|
-| aaGradient | 1 | 16 | 6 | 3 | 7 |
-| autophagyTiming | 1 | 12 | 12 | 0 | 0 |
-| bloodDonationScreen | 1 | 19 | 18 | 0 | 1 |
-| bloodGas | 1 | 33 | 27 | 0 | 6 |
-| caffeineSleep | 1 | 38 | 36 | 1 | 1 |
-| centor | 1 | 11 | 10 | 1 | 0 |
-| charlson | 1 | 36 | 35 | 0 | 1 |
-| childPugh | 1 | 30 | 24 | 0 | 6 |
-| cockcroftGault | 1 | 25 | 21 | 0 | 4 |
-| correctedCalcium | 1 | 12 | 10 | 0 | 2 |
-| denverAge | 1 | 2 | 2 | 0 | 0 |
-| electrolyteCorrection | 2 | 22 | 22 | 0 | 0 |
-| fena | 1 | 13 | 8 | 0 | 5 |
-| findrisc | 1 | 48 | 42 | 0 | 6 |
-| fletcher | 1 | 9 | 9 | 0 | 0 |
-| fluidBalance | 1 | 2 | 2 | 0 | 0 |
-| fluidElectrolytes | 2 | 54 | 53 | 0 | 1 |
-| framinghamInputs | 1 | 9 | 8 | 1 | 0 |
-| glasgowBlatchford | 1 | 46 | 43 | 0 | 3 |
-| graceScore | 1 | 78 | 70 | 0 | 8 |
-| hollidaySegar | 1 | 12 | 10 | 0 | 2 |
-| hydrationTarget | 1 | 19 | 18 | 0 | 1 |
-| idealBodyWeight | 1 | 14 | 12 | 1 | 1 |
-| ivDrip | 1 | 8 | 6 | 0 | 2 |
-| ldlFriedewald | 1 | 17 | 12 | 0 | 5 |
-| lightsCriteria | 1 | 18 | 5 | 3 | 10 |
-| maddreyScore | 1 | 10 | 10 | 0 | 0 |
-| mcdonaldRule | 1 | 2 | 2 | 0 | 0 |
-| meanArterialPressure | 1 | 8 | 2 | 0 | 6 |
-| meldNa | 1 | 34 | 27 | 0 | 7 |
-| midParentalHeight | 1 | 7 | 6 | 0 | 1 |
-| naegele | 1 | 21 | 20 | 0 | 1 |
-| news2 | 1 | 66 | 59 | 0 | 7 |
-| packYearScreen | 1 | 16 | 15 | 0 | 1 |
-| paradise | 1 | 8 | 8 | 0 | 0 |
-| parkland | 1 | 9 | 6 | 2 | 1 |
-| pediatricDka | 1 | 26 | 21 | 1 | 4 |
-| pedsDose | 1 | 6 | 6 | 0 | 0 |
-| qtc | 1 | 20 | 17 | 0 | 3 |
-| riskScreens | 1 | 30 | 29 | 0 | 1 |
-| serumOsmolality | 1 | 22 | 12 | 4 | 6 |
-| sirirajStrokeScore | 1 | 19 | 19 | 0 | 0 |
-| sleepDebt | 1 | 25 | 24 | 0 | 1 |
-| sofaScore | 1 | 67 | 58 | 0 | 9 |
-| stopBang | 1 | 21 | 18 | 0 | 3 |
-| waistToHeight | 1 | 6 | 4 | 0 | 2 |
-| widmarkBac | 1 | 28 | 25 | 0 | 3 |
+| aaGradient | 16 | 7 | 16 | 0 | 0 |
+| autophagyTiming | 12 | 0 | 12 | 0 | 0 |
+| bloodDonationScreen | 19 | 1 | 18 | 0 | 1 |
+| bloodGas | 33 | 6 | 33 | 0 | 0 |
+| caffeineSleep | 38 | 1 | 36 | 1 | 1 |
+| centor | 11 | 0 | 11 | 0 | 0 |
+| charlson | 36 | 1 | 35 | 0 | 1 |
+| childPugh | 30 | 6 | 27 | 0 | 3 |
+| cockcroftGault | 25 | 4 | 25 | 0 | 0 |
+| correctedCalcium | 12 | 2 | 12 | 0 | 0 |
+| denverAge | 2 | 0 | 2 | 0 | 0 |
+| electrolyteCorrection | 22 | 0 | 22 | 0 | 0 |
+| fena | 13 | 5 | 13 | 0 | 0 |
+| findrisc | 48 | 6 | 45 | 0 | 3 |
+| fletcher | 9 | 0 | 9 | 0 | 0 |
+| fluidBalance | 2 | 0 | 2 | 0 | 0 |
+| fluidElectrolytes | 54 | 1 | 53 | 0 | 1 |
+| framinghamInputs | 9 | 0 | 8 | 1 | 0 |
+| glasgowBlatchford | 46 | 3 | 46 | 0 | 0 |
+| graceScore | 78 | 8 | 78 | 0 | 0 |
+| hollidaySegar | 12 | 2 | 12 | 0 | 0 |
+| hydrationTarget | 19 | 1 | 18 | 0 | 1 |
+| idealBodyWeight | 14 | 1 | 14 | 0 | 0 |
+| ivDrip | 8 | 2 | 8 | 0 | 0 |
+| ldlFriedewald | 17 | 5 | 17 | 0 | 0 |
+| lightsCriteria | 18 | 10 | 15 | 0 | 3 |
+| maddreyScore | 10 | 0 | 10 | 0 | 0 |
+| mcdonaldRule | 2 | 0 | 2 | 0 | 0 |
+| meanArterialPressure | 8 | 6 | 8 | 0 | 0 |
+| meldNa | 34 | 7 | 33 | 0 | 1 |
+| midParentalHeight | 7 | 1 | 7 | 0 | 0 |
+| naegele | 21 | 1 | 21 | 0 | 0 |
+| news2 | 66 | 7 | 66 | 0 | 0 |
+| packYearScreen | 16 | 1 | 15 | 0 | 1 |
+| paradise | 8 | 0 | 8 | 0 | 0 |
+| parkland | 9 | 1 | 9 | 0 | 0 |
+| pediatricDka | 26 | 4 | 25 | 0 | 1 |
+| pedsDose | 6 | 0 | 6 | 0 | 0 |
+| qtc | 20 | 3 | 20 | 0 | 0 |
+| riskScreens | 30 | 1 | 29 | 0 | 1 |
+| serumOsmolality | 22 | 6 | 22 | 0 | 0 |
+| sirirajStrokeScore | 19 | 0 | 19 | 0 | 0 |
+| sleepDebt | 25 | 1 | 25 | 0 | 0 |
+| sofaScore | 67 | 9 | 62 | 0 | 5 |
+| stopBang | 21 | 3 | 21 | 0 | 0 |
+| waistToHeight | 6 | 2 | 6 | 0 | 0 |
+| widmarkBac | 28 | 3 | 27 | 0 | 1 |
