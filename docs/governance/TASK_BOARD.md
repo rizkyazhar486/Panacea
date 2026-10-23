@@ -20,23 +20,23 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | any-ai | READY | — |
 | T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | READY (after 03) | — |
 | T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | READY (after 03) | — |
-| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | integrator | READY | run 39883766083 |
+| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | claude | IN_REVIEW | run 39883766083; recurred on a0f2f0cd run 39914203220; single attempt with a 22 min budget in this PR (a timeout+retry wrapper was tried and failed on the dpkg lock) |
 | T-H0-07 | Consolidate duplicate workflows (stabilization ×3, wake-server ×2) — proposal PR, no required check removed until replacement proven | — | integrator | READY | — |
 
 ## Next (H1) — start when H0 exit is met, or earlier if it does not touch red paths
 
 | ID | Task | Criterion | Lane | Status |
 |---|---|---|---|---|
-| T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | READY |
-| T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | READY |
+| T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
+| T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
 | T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | READY |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
-| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | IN_REVIEW | this PR |
+| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | READY |
-| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (found pedsDose uncovered; reference suite 11 added) | ENG-C6-01 | claude | IN_REVIEW | this PR |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | IN_REVIEW (PR pending): Apache-2.0 and CC BY-SA 2.1 became required classes; per-class removal control on real data. Criterion stays NOT_RUN until ENG-D8-01 passes and the rendered page is captured at an exact SHA |
+| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test (pedsDose gap closed in #2702; guard hardened to call-sites after independent review) | ENG-C6-01 | claude | IN_REVIEW | this PR |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
 
 ## Later (H2)

@@ -48,7 +48,7 @@ jobs:
         run: npm run uji
 
       - name: Install mobile browser smoke runner
-        timeout-minutes: 8
+        timeout-minutes: 22
         run: |
           set -euo pipefail
           PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
@@ -90,6 +90,11 @@ jobs:
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
+          # The Azure Ubuntu mirror intermittently crawls (~40 KB/s): this step needed about
+          # 10 minutes on a bad day and failed the old 8-minute budget twice on main
+          # (c57e22fc, a0f2f0cd). A single attempt gets a larger budget. Do NOT wrap this in
+          # `timeout` + retry: killing playwright leaves its apt-get child holding the dpkg
+          # lock, so the retry fails at once with "Could not get lock" (observed on #2704).
           "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Start frontend preview
