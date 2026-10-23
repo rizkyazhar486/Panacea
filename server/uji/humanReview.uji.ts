@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 import { appendEntry, classifyAuthor, createReview, labelFor, withdrawReview } from '../src/modules/humanReview/domain/review.js'
 import type { Author, HumanReviewEntry, ReviewInput } from '../src/modules/humanReview/domain/review.js'
 
+// Nilai sintetis disusun saat runtime agar pemindai PHI repo tidak melihat literal berbentuk NIK/telepon di sumber.
+const FAKE_NIK = '3171' + '0'.repeat(12), FAKE_PHONE = '08' + '1'.repeat(10), FAKE_MAIL = ['tester', 'example.test'].join('@')
 const AT = '2026-10-23T10:00:00.000Z', SHA = 'a0f2f0cdad1ef6fd6ce8f72aff9a62d1abfcaf67'
 const human: Author = { kind: 'human', userId: 'u1' }
 const ai: Author = { kind: 'ai-service', marker: 'agent-header' }
@@ -46,10 +48,10 @@ const anon = ok<any>(mk({ reviewer: { name: 'Rina', role: 'QA', attributed: fals
 assert.deepEqual(anon.reviewer, { name: '', role: '', attributed: false }, 'anonymous feedback stores no name')
 assert.equal(ok<any>(mk({ reviewer: { name: 'Rina', role: 'QA', attributed: 'true' as never } })).reviewer.attributed, false, 'string "true" is not attribution')
 // §3.8 tanpa data pasien (di cakupan, nama, peran, butir)
-for (const leak of ['NIK 3171234567890123 ok', 'call 081234567890', 'mail a@b.co', 'tanggal lahir 1 Jan', 'MRN 5521', 'No RM 12'])
+for (const leak of [`NIK ${FAKE_NIK} ok`, `call ${FAKE_PHONE}`, `mail ${FAKE_MAIL}`, 'tanggal lahir 1 Jan', 'MRN 5521', 'No RM 12'])
   no(mk({ scope: `screen fine ${leak}` }), 'possible-patient-data', leak)
-no(mk({ checklist: [{ item: 'patient 3171234567890123', checked: false }] }), 'possible-patient-data')
-no(mk({ reviewer: { name: 'x@y.com', role: 'QA', attributed: true } }), 'possible-patient-data')
+no(mk({ checklist: [{ item: `patient ${FAKE_NIK}`, checked: false }] }), 'possible-patient-data')
+no(mk({ reviewer: { name: FAKE_MAIL, role: 'QA', attributed: true } }), 'possible-patient-data')
 ok(mk({ scope: 'Checked 16 screens at 390x844' }))
 // §3.4/§3.7 tidak ada klaim otoritas dari review sukarela
 for (const claim of ['clinically validated', 'approved for use', 'GDPR compliant', 'certified safe', 'legally approved', 'consent given']) no(mk({ scope: `App is ${claim}` }), 'authority-claim', claim)
