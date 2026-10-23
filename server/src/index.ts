@@ -74,6 +74,8 @@ import {
   listSignedCarePlans,
   addCarePlan,
   bacaLedgerValidasi,
+  bacaReviewManusia,
+  tambahReviewManusia,
   tambahLedgerValidasi,
   addCareReport,
   listCareReports,
@@ -167,6 +169,7 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSigned
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
+import { pasangRuteReviewManusia } from './modules/humanReview/http/routes.js'
 import { parseMeetCoordinates } from './modules/meets/domain/coordinates.js'
 import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
@@ -931,6 +934,17 @@ app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
   if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
   addAudit(u, 'emr.encounters.read', String(req.params.patientId))
   res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Review manusia opsional (T-HR-02, HUMAN_VERIFICATION_OPTIONAL §5): identitas opsional, append-only, AI ditolak.
+pasangRuteReviewManusia(app, {
+  currentUserId: (req) => currentUser(req)?.id,
+  baca: bacaReviewManusia,
+  tambah: tambahReviewManusia,
+  now: () => new Date(),
+  newId: () => `hr-${randomUUID()}`,
+  mcpToken: process.env.PANACEA_MCP_HTTP_BEARER_TOKEN?.trim() || undefined,
+  writeLimiter: rateLimit({ windowMs: 15 * 60_000, max: 20, standardHeaders: true, legacyHeaders: false, message: { error: 'rate_limited' } }),
 })
 
 // Hasil lab + rujukan: siklus hidup teraudit, backend sumber kebenaran (lihat modules/labResults).

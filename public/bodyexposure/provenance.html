@@ -40,14 +40,16 @@ pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Referen
                Computational Phantoms (2024), ICRP. Newborn, 1, 5, 10 and 15 years,
                male and female; CT-based reference phantoms. Dosimetry-only layers
                removed; laterality corrected where the source label contradicted the
-               geometry (15-year female ovaries). Redistribution in Panacea cleared
-               by the project owner (2026-10-03).
+               geometry (15-year female ovaries). Internal owner approval recorded 2026-10-03;
+               rightsholder permission for derivatives and redistribution remains unverified.
+               Official reuse policy: https://www.icrp.org/page.asp?id=5
 
 icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
                Computational Phantoms (2020), ICRP. Reference adult male (176 cm)
                and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
-               reference values. Dosimetry-only layers removed. Redistribution in
-               Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).
+               reference values. Dosimetry-only layers removed. Internal owner approval recorded 2026-10-03;
+               rightsholder permission for derivatives and redistribution remains unverified.
+               Official reuse policy: https://www.icrp.org/page.asp?id=5
 
 vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoskeletal geometry
                (pelvis to feet), University of Denver Center for Orthopaedic Biomechanics,
@@ -65,7 +67,11 @@ vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoske
                One individual (donor 59 y, 157 cm, 88 kg), not an atlas. Not clinically reviewed.
 
 fetus.*      — SVRTK fetal MRI atlas repository, King&#x27;s College London, Centre for the Developing Brain
-               (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), CC0 1.0. Uus A, Hall M, Grigorescu I, et al.
+               (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas),
+               CC0 1.0; upstream dataset README and LICENSE verified 2026-10-23 at revision 74f11a186c709078d712bb2fd827bfa2b36e3407.
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE
+               Uus A, Hall M, Grigorescu I, et al.
                Automated body organ segmentation, volumetry and population-averaged atlas for 3D motion-corrected
                T2-weighted fetal body MRI. Scientific Reports 14:6637 (2024), doi:10.1038/s41598-024-57087-x.
                Population average of 17 normal fetuses (25 to 28 weeks per the preprint), organs only, not an individual.
@@ -388,7 +394,7 @@ no anatomist review required for this step; the result is unreviewed, <code>clin
 <h2>FETUS — source_backed_partial (v014): organ atlas, not an individual</h2>
 <ul>
 <li><strong>Source:</strong> SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
-  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence <strong>CC0 1.0 Universal</strong> (stated in the repository's README and LICENSE; the article is CC BY 4.0).
+  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence <strong>CC0 1.0 Universal</strong> (dataset README and LICENSE verified 2026-10-23 at revision <code>74f11a186c709078d712bb2fd827bfa2b36e3407</code>: <a href="https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md">README</a>, <a href="https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE">LICENSE</a>). Licence verification does not establish anatomical accuracy or clinical validation.
   Uus A, Hall M, Grigorescu I, et al. <em>Scientific Reports</em> 14:6637 (2024), doi:10.1038/s41598-024-57087-x. Read on 2026-10-10.</li>
 <li><strong>What it is:</strong> a population-average atlas of <strong>17 normal fetuses</strong> (3T, T2-weighted, TE 180 ms), 0.75 mm isotropic, with 10 organ labels. The
   repository does not state a gestational age; the preprint (PMC10312818) states 25 to 28 weeks. It is not one fetus and not a reference fetus.</li>
@@ -403,7 +409,7 @@ no anatomist review required for this step; the result is unreviewed, <code>clin
   below kidneys, both lungs paired): <code>qa_reports/gross_fetus_atlas.json</code>. Meshes are marching-cubes surfaces with volume-preserving smoothing, so the 0.75 mm voxel steps remain visible.</li>
 <li><code>clinically_reviewed</code> is false. A fetal body with skeleton and skin still needs a source (the ICRP pregnant-female phantoms are in public consultation).</li>
 </ul>
-<h2>Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)</h2>
+<h2>Paediatric bodies — source_backed (published; rightsholder redistribution permission unverified)</h2>
 <ul>
 <li><strong>Source:</strong> ICRP Publication 156, <em>Paediatric Mesh-type Reference Computational Phantoms</em>
   (2024), polygon-mesh OBJ files from <code>P156 Electronic files.zip</code>
@@ -412,8 +418,9 @@ no anatomist review required for this step; the result is unreviewed, <code>clin
   adjusted to the ICRP Publication 89 reference values. They are <strong>not</strong> scaled adults.</li>
 <li><strong>Retrieval:</strong> HTTP range requests on the 11.8 GB archive fetched only the README and the
   ten OBJ/MTL pairs.</li>
-<li><strong>Licence:</strong> neither the ICRP page nor the README states redistribution terms. The project
-  owner cleared redistribution in Panacea on 2026-10-03. The web derivatives are published in
+<li><strong>Licence:</strong> internal owner approval was recorded on 2026-10-03; it does not establish a grant from ICRP.
+  Rightsholder permission for derivatives and redistribution remains unverified.
+  Official reuse policy: https://www.icrp.org/page.asp?id=5. The web derivatives are published in
   <code>public/bodyexposure/pediatric_*</code>; the master body <code>.blend</code> files stay local (size).</li>
 <li><strong>Laterality correction:</strong> the 15-year female phantom labels its ovaries with swapped
   sides; the builder corrects this from geometry and records it on the objects.</li>
@@ -529,8 +536,9 @@ stays an open gap.</p>
 <p>Source: ICRP Publication 145, <em>Adult Mesh-type Reference Computational Phantoms</em> (2020), electronic files
 <code>MRCP_AM</code> and <code>MRCP_AF</code>, polygon-mesh version (https://www.icrp.org/docs/P145%20Electronic%20files.zip). Built with the
 same pipeline as the paediatric bodies (<code>pipeline/build_icrp156_bodies.py -- --only AM,AF</code>). The coordinate convention
-matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Redistribution falls under the
-owner's 2026-10-03 clearance of ICRP-derived meshes.</p>
+matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Internal owner approval was recorded on 2026-10-03;
+rightsholder permission for derivatives and redistribution remains unverified.
+Official reuse policy: https://www.icrp.org/page.asp?id=5.</p>
 <p>These are <strong>separate, internally consistent bodies</strong>, published as an "ICRP reference" variant of the adult male and
 adult female entries. They are not grafted onto the Z-Anatomy male or the HuBMAP female. Mixing two individuals'
 anatomy in one body would itself be invented anatomy. The ICRP female supplies everything the HuBMAP female lacks:
@@ -673,3 +681,4 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 <li><strong>Not included:</strong> embryologic milestones (a different kind of reference), sex-specific INTERGROWTH, the Hadlock EFW formula, charts below 14 weeks. Output is a position against a reference only; interpretation needs a qualified clinician.</li>
 </ul>
 </main></body></html>
+
