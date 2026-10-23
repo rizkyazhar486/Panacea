@@ -48,7 +48,7 @@ jobs:
         run: npm run uji
 
       - name: Install mobile browser smoke runner
-        timeout-minutes: 8
+        timeout-minutes: 22
         run: |
           set -euo pipefail
           PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
@@ -90,7 +90,17 @@ jobs:
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
-          "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
+          # The Azure Ubuntu mirror intermittently crawls (~50 KB/s) and the apt step then
+          # exceeds the step budget (main c57e22fc and a0f2f0cd). Bound each attempt and
+          # retry once; apt resumes partial downloads, so the second attempt is cheap.
+          for attempt in 1 2; do
+            if timeout 600 "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium; then
+              exit 0
+            fi
+            echo "playwright --with-deps attempt $attempt failed or timed out; retrying" >&2
+          done
+          echo "playwright --with-deps failed after 2 attempts" >&2
+          exit 1
 
       - name: Start frontend preview
         run: |
