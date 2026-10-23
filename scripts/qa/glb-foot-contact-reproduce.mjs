@@ -76,9 +76,21 @@ for (const side of ['L', 'R']) {
     if (!(z1 > z0)) throw new Error(`invalid first metatarsal length: ${side}`)
     marker[side].ballMT1 = pick(mt1.filter((p) => p.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
   } else marker[side].ballMT1 = null
+  // ENG-D7-03: rig yang diekspor membawa node landmark bernama (scripts/qa/glb-add-foot-landmarks.mjs). Metrik MEMAKAI node itu; simpul mesh
+  // hanya kontrol silang: selisih > 1 µm berarti node usang atau salah taruh, dan reproduksi berhenti.
+  for (const [kind, key] of [['heelCalcaneus', 'HEEL'], ['ballMT1', 'BALL']]) {
+    const node = root.getObjectByName(`FOOT_LANDMARK_${key}_${side}`)
+    const mk = marker[side][kind]
+    if (!node && !mk) continue
+    if (!node) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} missing while its source bone exists`)
+    if (!mk) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} has no source bone`)
+    const pn = new THREE.Vector3().setFromMatrixPosition(node.matrixWorld), pm = world(mk.mesh, mk.i, new THREE.Vector3())
+    if (pn.distanceTo(pm) > 1e-6) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} is ${(pn.distanceTo(pm) * 1000).toFixed(3)} mm from its source vertex`)
+    marker[side][kind] = { node }
+  }
 }
 // Ketersediaan landmark anatomis per sisi dicatat; landmark yang tidak ada di sumber TIDAK diganti tebakan.
-const ANATOMICAL = { heelCalcaneus: 'calcaneus (lowest vertex)', ballMT1: 'first metatarsal head (lowest vertex in anterior quarter)' }
+const ANATOMICAL = { heelCalcaneus: 'rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex', ballMT1: 'rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)' }
 const landmarkAvailability = Object.fromEntries(Object.keys(ANATOMICAL).map((k) => [k, { L: !!marker.L[k], R: !!marker.R[k] }]))
 
 function sample(clip) {
@@ -96,7 +108,11 @@ function sample(clip) {
       let lowest = Infinity, lowestZ = 0
       for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); if (v.y < lowest) { lowest = v.y; lowestZ = v.z } }
       const mk = {}
-      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1']) { if (!marker[side][name]) continue; world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
+      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1']) {
+        const m = marker[side][name]; if (!m) continue
+        if (m.node) v.setFromMatrixPosition(m.node.matrixWorld); else world(m.mesh, m.i, v)
+        mk[name] = { y: v.y, z: v.z }
+      }
       row[side] = { lowest, lowestZ, ...mk }
     }
     rows.push(row)
