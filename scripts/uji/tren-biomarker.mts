@@ -35,6 +35,11 @@ for (const buruk of ['abc', '0', '-5', 'NaN', 'Infinity', '1e999']) {
 }
 assert.equal(proyeksiTren(['90', '91', '95', '97', '']).ok, true, 'pasangan: hanya sel buruk yang menolak')
 assert.equal(proyeksiTren(undefined as unknown as string[]).ok, false); assert.equal(proyeksiTren([null, 3, {}] as unknown as string[]).ok, false)
+// Negative control: before this fix, a non-string Yr 4 was silently skipped and returned a projection.
+for (const malformed of [null, undefined, 3, {}, true]) {
+  assert.match(gagal(proyeksiTren(['90', '92', '95', malformed] as unknown as string[])), /^Yr 4: enter a number above 0/, String(malformed))
+}
+assert.equal(proyeksiTren(['90', '92', '95', '']).ok, true, 'a genuinely blank cell is still optional')
 
 // Proyeksi ≤ 0 → null ("not meaningful"), bukan angka negatif.
 const turun = ok(proyeksiTren(['30', '20', '10', '', '']))

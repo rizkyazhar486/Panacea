@@ -19,7 +19,10 @@ export function proyeksiTren(teks: readonly string[], horizon = 5): HasilTren {
   const xs: number[] = []
   const ys: number[] = []
   for (let i = 0; i < teks.length; i++) {
-    const t = typeof teks[i] === 'string' ? teks[i].trim() : ''
+    // Runtime callers may pass malformed imported data despite the string[] type.
+    // A non-string populated cell is invalid, never an implicit blank year.
+    if (typeof teks[i] !== 'string') return { ok: false, alasan: `Yr ${i + 1}: enter a number above 0 and up to ${TREN_MAKS_NILAI}.` }
+    const t = teks[i].trim()
     if (t === '') continue
     const v = Number(t)
     if (!Number.isFinite(v) || v <= 0 || v > TREN_MAKS_NILAI) return { ok: false, alasan: `Yr ${i + 1}: enter a number above 0 and up to ${TREN_MAKS_NILAI}.` }
