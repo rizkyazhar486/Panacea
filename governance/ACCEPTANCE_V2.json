@@ -569,8 +569,9 @@
       "negativeControl": "Zero-stance fixture must yield UNMEASURABLE.",
       "evidence": "bodyexposure/qa_reports/gait_foot_slide.json regenerated at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "96cbeacec78305a3d0512ce7a1ba88d8d62e0172",
+      "statusNote": "PASS at 96cbeacec78305a3d0512ce7a1ba88d8d62e0172 (PR #2711 head; git tree 9601f6d623e658ff04f147ea933506dc494ca4b9 is identical to main 42c64db7a52d95c2b069a6f20c6af6e80508396f). Validate job 120428954204 (run 39957938726, success) ran npm run uji: body-gait-foot-metrics.mts and body-gait-foot-contact-reproduction.mts both printed their ok line. body-gait-foot-metrics asserts stance_phases 0 and null input -> unmeasurable/no_stance, never within/exceeds; the contact reproduction asserts the written report equals a re-run. Sabotage: dropping the zero-stance guard fails the test (expected 'no_stance', got 'too_few_phases'). Scope: ENG-D7-01 only (verdict separation). Four fixtures are not all measurable (see ENG-D7-02 FAIL); thresholds are engineering placeholders, not clinically validated."
     },
     {
       "id": "ENG-D7-02",
