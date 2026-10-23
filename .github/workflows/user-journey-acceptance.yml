@@ -9,6 +9,7 @@ on:
       - 'scripts/qa/user-journey-staff.mjs'
       - 'scripts/qa/user-journey-resilience.mjs'
       - 'scripts/qa/f1-critical-action-contract.test.mjs'
+      - 'scripts/qa/f1-negative-evidence*'
       - 'src/pages/clinical/LabResultReview.tsx'
       - 'src/pages/bodyhub/Harian.tsx'
       - 'src/components/clinical/**'
@@ -31,6 +32,7 @@ on:
       - 'scripts/qa/user-journey-staff.mjs'
       - 'scripts/qa/user-journey-resilience.mjs'
       - 'scripts/qa/f1-critical-action-contract.test.mjs'
+      - 'scripts/qa/f1-negative-evidence*'
       - 'src/pages/clinical/LabResultReview.tsx'
       - 'src/pages/bodyhub/Harian.tsx'
       - 'src/components/clinical/**'
@@ -50,7 +52,7 @@ permissions:
   contents: read
 jobs:
   user-journeys:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -62,7 +64,7 @@ jobs:
       - run: npm ci
         working-directory: server
       - name: F1 critical action and workflow path contracts
-        run: node --test scripts/qa/f1-critical-action-contract.test.mjs scripts/qa/user-journey-resilience.test.mjs scripts/qa/user-journey-preview.test.mjs
+        run: node --test scripts/qa/f1-critical-action-contract.test.mjs scripts/qa/user-journey-resilience.test.mjs scripts/qa/user-journey-preview.test.mjs scripts/qa/f1-negative-evidence.test.mjs
       - name: Install browser
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
@@ -113,8 +115,8 @@ jobs:
             fresh_server "negatif-$mode"
             if QA_SABOTASE=$mode QA_OUT="$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs; then
               echo "::error::Kontrol negatif '$mode' LOLOS: pendeteksi ketahanan tidak menangkap cacat yang disuntikkan"; rc=1
-            elif ! grep -q "\"ok\": false" "$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json"; then
-              echo "::error::Kontrol negatif '$mode' berhenti tanpa langkah gagal bernama (bukan gagal karena pendeteksi)"; rc=1
+            elif ! node scripts/qa/f1-negative-evidence.mjs "$mode" "$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json"; then
+              echo "::error::Kontrol negatif '$mode' berhenti tanpa langkah gagal bernama dari pendeteksi yang tepat di semua rute"; rc=1
             fi
           done
           exit $rc

@@ -6,8 +6,8 @@ import test from 'node:test'
 const script = readFileSync(new URL('./user-journey-resilience.mjs', import.meta.url), 'utf8')
 const workflow = readFileSync(new URL('../../.github/workflows/user-journey-acceptance.yml', import.meta.url), 'utf8')
 
-test('journey covers four roles and the critical pages beyond the three in user-journey-e2e', () => {
-  for (const j of ["J: 'pasien'", "J: 'dokter'", "J: 'pemilik'", "J: 'perawat'"]) assert.ok(script.includes(j), `missing role ${j}`)
+test('journey covers five roles and the critical pages beyond the three in user-journey-e2e', () => {
+  for (const j of ["J: 'pasien'", "J: 'dokter'", "J: 'pemilik'", "J: 'perawat'", "J: 'lab'"]) assert.ok(script.includes(j), `missing role ${j}`)
   for (const r of ["'#/chatbot'", "'#/settings'", "'#/profile'", "'#/fitness-hub'", "'#/all-features'", "'#/doctor-review/lab-results'", "'#/owner'"]) assert.ok(script.includes(r), `missing page ${r}`)
   const base = readFileSync(new URL('./user-journey-e2e.mjs', import.meta.url), 'utf8')
   for (const r of ["'#/harian'", "'#/health-data'", "'#/clinical-hub'"]) assert.ok(base.includes(r), `the original journey still covers ${r}`)
@@ -16,13 +16,20 @@ test('journey covers four roles and the critical pages beyond the three in user-
 test('each page is checked for slow API, API 500 and recovery, with paired positive control and unhandled-error check', () => {
   for (const s of ['kontrol positif tanpa gangguan', 'API lambat', 'API 500', 'pemulihan', 'tanpa galat halaman tak tertangani']) assert.ok(script.includes(s), `missing step: ${s}`)
   assert.ok(/status: 500/.test(script) && /r\.fulfill/.test(script), 'API 500 is injected for real')
+  assert.ok(/waitForFunction\([\s\S]*?\{ timeout: ms \}\)(?!\.catch)/.test(script), 'page readiness timeout/error must propagate instead of being swallowed')
   assert.ok(/overflowX\(page\)/.test(script) && /bocor\(/.test(script), 'overflow and leaked-text detectors are used')
+  assert.ok(script.includes("'#/settings': /Reset Local Data/"), 'Settings must load its own content, not merely shared navigation')
+  assert.ok(script.includes("rute === '#/chatbot' ? 0 : peran.minChar"), 'only the compact Chatbot route may skip the text-length minimum')
+  assert.ok(script.includes('m <= 0 || t.trim().length > m'), 'route-specific readiness cannot bypass the minimum content threshold')
   for (const w of ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read']) assert.ok(script.includes(`'${w}'`), `leak marker ${w}`)
 })
 
-test('nurse and fixture roles use the official owner-granted path and the journey runs on a fresh server', () => {
+test('nurse and lab fixture roles use the official owner-granted path and the journey runs on a fresh server', () => {
   assert.ok(script.includes("'/api/owner/staff-role'") && script.includes("'/api/owner/staff-assignments'"))
   assert.ok(script.includes("perawat.user.role, 'pasien'"), 'self-registered nurse is a patient first')
+  assert.ok(script.includes("lab.user.role, 'pasien'"), 'self-registered lab is a patient first')
+  assert.match(script, /staff-role'[\s\S]*?userId: lab\.user\.id, role: 'lab'/, 'lab role is owner-granted')
+  assert.match(script, /staff-assignments'[\s\S]*?userId: lab\.user\.id, patientId: P/, 'lab receives an explicit patient assignment')
 })
 
 test('workflow runs the journey on a fresh server and keeps two negative controls that must fail by named step', () => {
