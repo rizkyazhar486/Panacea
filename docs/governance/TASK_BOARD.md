@@ -30,10 +30,10 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
 | T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
 | T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | DONE (#2711 merged): inventory equals journey coverage and every route resolves to a real page; dead `#/all-features` fixed. ENG-F1-03 stays NOT_RUN until the browser run is recorded at an exact SHA |
-| T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
+| T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | DONE (#2679 merged); ENG-E4-01 PASS recorded at 8ed1065f (31/31 tests in build, four sabotages fail by name) |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
-| T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
+| T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | claude | DONE (#2720): fail-closed run 39979087541 recorded; smoke job unproven until EXT-E7-B provisions staging |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
 | T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
@@ -46,7 +46,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 |---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | READY | follows R-D7-RIG |
-| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified |
+| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
