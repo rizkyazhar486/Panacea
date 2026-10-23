@@ -18,6 +18,10 @@ for (const invalid of [NaN, Infinity, -Infinity]) {
 }
 assert.equal(layarBerubah({ p: { x: Infinity } }, { p: { x: -Infinity } }), true)
 assert.equal(layarBerubah({ p: { x: NaN } }, { p: { x: NaN } }), false)
+assert.equal(layarBerubah(a, { x: { x: 10, depan: true } }), true, 'removed nested field must refresh label')
+assert.equal(layarBerubah({ x: { x: 10, depan: true } }, a), true, 'added nested field must refresh label')
+assert.equal(layarBerubah(a, { x: { x: 10, z: 20, depan: true } }), true, 'renamed nested field must refresh label')
+assert.equal(layarBerubah(a, { x: { ...a.x } }), false, 'same nested shape must remain stable')
 for (const f of ['src/components/digital-twin/OrganModel3D.tsx', 'src/components/digital-twin/Pathway3D.tsx']) {
   const s = readFileSync(f, 'utf8')
   assert.match(s, /if \(layarBerubah\(layarTerakhir, next\)\)/, `${f}: setLayar harus dijaga`)
