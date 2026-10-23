@@ -48,7 +48,7 @@ export const config = {
   // ICD-11 WHO. Gratis, tapi lewat OAuth2 client credentials yang perlu
   // didaftarkan sekali di https://icd.who.int/icdapi. Kalau kosong, pencarian
   // diagnosis jatuh ke ICD-10-CM (NLM, tanpa kunci) dan layarnya berkata
-  // demikian — lihat server/src/icd11.ts.
+  // demikian — lihat server/src/domains/medical-reference/icd11.ts.
   whoIcd: {
     clientId: process.env.WHO_ICD_CLIENT_ID || '',
     clientSecret: process.env.WHO_ICD_CLIENT_SECRET || '',

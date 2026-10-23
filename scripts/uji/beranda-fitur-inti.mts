@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 // WAJIB ada di home". Berkas ini menahan keempatnya di baris aksi beranda,
 // dan memastikan setiap tujuannya benar-benar rute yang terdaftar, supaya
 // tombolnya tidak pernah menjadi jalan buntu.
-const src = readFileSync(new URL('../../src/components/HomeEssentialTools.tsx', import.meta.url), 'utf8')
+const src = readFileSync(new URL('../../src/components/dashboard/HomeEssentialTools.tsx', import.meta.url), 'utf8')
 const ruang = readFileSync(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
 const dok = readFileSync(new URL('../../src/lib/superPages.ts', import.meta.url), 'utf8')
 assert.match(ruang, /<HomeEssentialTools \/>/, 'baris alat harian tidak lagi dipasang di beranda')

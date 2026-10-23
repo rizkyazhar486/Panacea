@@ -1,5 +1,5 @@
-import { joinProductToVerifiedAtc } from '../src/productAtcCrosswalk.ts'
-import type { ProductRegistryRecord } from '../src/productRegistry.ts'
+import { joinProductToVerifiedAtc } from '../src/domains/medical-reference/productAtcCrosswalk.ts'
+import type { ProductRegistryRecord } from '../src/domains/product/productRegistry.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

@@ -17,7 +17,7 @@ function includesAll(path: string, needles: string[]) {
 
 const specPath = 'docs/superpowers/specs/2026-09-28-invictus-human-reality-principle-design.md'
 
-includesAll('PANACEA_INVICTUS_PRINCIPLE.md', [
+includesAll('governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md', [
   'Invictus Human Reality Principle',
   specPath,
   'future-realizable',
@@ -26,7 +26,7 @@ includesAll('PANACEA_INVICTUS_PRINCIPLE.md', [
   'human agency',
 ])
 
-includesAll('PANACEA_CONSTITUTION.md', [
+includesAll('governance/doctrine/PANACEA_CONSTITUTION.md', [
   'Invictus Human Reality Principle',
   specPath,
   'future-realizable',
@@ -34,7 +34,7 @@ includesAll('PANACEA_CONSTITUTION.md', [
   'human agency',
 ])
 
-includesAll('PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', [
+includesAll('governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', [
   'Human Reality Model',
   'Reality Lattice',
   'future-capability absorbability',
@@ -42,20 +42,20 @@ includesAll('PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', [
   'Physiological State Engine',
 ])
 
-includesAll('PANACEA_PRODUCT_MATURITY_OS.md', [
+includesAll('governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md', [
   'IMAGINE FUTURE-REALIZABLE CAPABILITY',
   'FORMALIZE STABLE INTERFACE',
   'DEEPEST JUSTIFIED PRESENT SLICE',
   'VALIDATE / FALSIFY AGAINST REALITY',
 ])
 
-includesAll('PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md', [
+includesAll('governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md', [
   'meaningful horizontal expansion',
   'adaptive explanatory scale',
   'VERTICAL GAP — NOT YET MODELED',
 ])
 
-includesAll('PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md', [
+includesAll('governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md', [
   'knowledge boundary',
   'KNOWN_WITH_UNCERTAINTY',
   'KNOWABLE_BUT_UNMEASURED',

@@ -33,7 +33,7 @@ permissions:
 jobs:
   push-policy:
     if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[deploy-vercel]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Batch this push for the next Vercel release
         run: |
@@ -45,7 +45,7 @@ jobs:
 
   release-gates:
     if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - name: Checkout release revision
@@ -65,7 +65,7 @@ jobs:
   deploy:
     needs: release-gates
     if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     concurrency:
       group: vercel-production
@@ -163,6 +163,14 @@ jobs:
           curl --fail --silent --show-error --location --retry 4 --retry-delay 3 --max-time 30 "$DEPLOYMENT_URL" >/dev/null
           echo "Deployment responded successfully: $DEPLOYMENT_URL"
 
+      - name: Verify deployed build marker equals the built commit
+        id: marker
+        if: steps.smoke.outcome == 'success'
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: node scripts/qa/verify-build-marker.mjs "$DEPLOYMENT_URL" "$EXPECTED_SHA"
+
       - name: Write machine-readable release evidence
         if: always()
         env:
@@ -172,6 +180,7 @@ jobs:
           DEPLOYMENT_DEFERRED: ${{ steps.deploy.outputs.deferred }}
           DEPLOY_STEP_OUTCOME: ${{ steps.deploy.outcome }}
           SMOKE_STEP_OUTCOME: ${{ steps.smoke.outcome }}
+          MARKER_STEP_OUTCOME: ${{ steps.marker.outcome }}
           WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EVIDENCE_PATH: ${{ runner.temp }}/vercel-release-evidence.json
         run: |
@@ -184,12 +193,13 @@ jobs:
           deferred = os.environ.get("DEPLOYMENT_DEFERRED") == "true"
           deployed = os.environ.get("DEPLOY_STEP_OUTCOME") == "success"
           smoke_passed = os.environ.get("SMOKE_STEP_OUTCOME") == "success"
+          marker_passed = os.environ.get("MARKER_STEP_OUTCOME") == "success"
           url = os.environ.get("DEPLOYMENT_URL", "")
           if not recheck_passed:
               status = "BLOCKED_RELEASE_GATES"
           elif deferred:
               status = "DEFERRED_QUOTA"
-          elif deployed and smoke_passed and url:
+          elif deployed and smoke_passed and marker_passed and url:
               status = "DEPLOYED_SMOKE_VERIFIED"
           else:
               status = "FAILED_OR_UNVERIFIED"
@@ -200,6 +210,7 @@ jobs:
               "deployment_url": url or None,
               "deploy_step": os.environ.get("DEPLOY_STEP_OUTCOME", ""),
               "smoke_step": os.environ.get("SMOKE_STEP_OUTCOME", ""),
+              "build_marker_step": os.environ.get("MARKER_STEP_OUTCOME", ""),
               "release_recheck": os.environ.get("RELEASE_RECHECK_OUTCOME", ""),
               "workflow_run": os.environ["WORKFLOW_RUN_URL"],
           }
@@ -233,6 +244,9 @@ jobs:
             echo "Status: **FAILED — deployment step did not succeed**" >> "$GITHUB_STEP_SUMMARY"
           elif [ "${{ steps.smoke.outcome }}" != "success" ]; then
             echo "Status: **UNVERIFIED — production smoke test did not pass**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Deployment URL: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.marker.outcome }}" != "success" ]; then
+            echo "Status: **UNVERIFIED — deployed build marker does not match the built commit**" >> "$GITHUB_STEP_SUMMARY"
             echo "Deployment URL: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
           elif [ -z "${{ steps.deploy.outputs.url }}" ]; then
             echo "Status: **UNVERIFIED — no deployment URL**" >> "$GITHUB_STEP_SUMMARY"

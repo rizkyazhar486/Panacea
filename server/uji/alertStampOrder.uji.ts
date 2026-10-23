@@ -7,9 +7,9 @@ import { readFileSync } from 'node:fs'
 // struktural: ia mencegah pola lama kembali di salah satu pemeriksa.
 
 const TARGETS: Array<[file: string, keys: string[]]> = [
-  ['src/healthAlerts.ts', ['hrZoneLastAlertAt', 'sleepLastFiredOn', 'latihanLastFiredOn']],
+  ['src/domains/push/healthAlerts.ts', ['hrZoneLastAlertAt', 'sleepLastFiredOn', 'latihanLastFiredOn']],
   ['src/index.ts', ['cekHarianLastFiredOn']],
-  ['src/salat.ts', ['salatLastFired']],
+  ['src/domains/lifestyle/salat.ts', ['salatLastFired']],
 ]
 
 export function stampWrites(source: string, key: string) {

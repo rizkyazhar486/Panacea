@@ -4,13 +4,13 @@ import { readFileSync } from 'node:fs'
 
 const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8')
 
-const tumpukan = read('src/components/Tumpukan.tsx')
-const semangat = read('src/components/UbinSemangat.tsx')
+const tumpukan = read('src/components/ui/Tumpukan.tsx')
+const semangat = read('src/components/tiles/UbinSemangat.tsx')
 const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
 const mobileStability = read('src/styles/home-mobile-stability.css')
-const higFoundation = read('public/panacea-hig-v41.css')
+const higFoundation = read('public/ui-iterations/panacea-hig-v41.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -71,7 +71,7 @@ test('Cache maintenance key tracks the newest linked presentation layer', () => 
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
-  assert.match(semangat, /import '\.\.\/styles\/home-dark-comfort-v34\.css'/)
+  assert.match(semangat, /import '\.\.\/\.\.\/styles\/home-dark-comfort-v34\.css'/)
   assert.match(comfortGuard, /--pmd-calm-surface:rgba\(9,14,22,\.82\)/)
   assert.match(comfortGuard, /--pmd-calm-border:rgba\(255,255,255,\.085\)/)
   assert.match(comfortGuard, /\.panacea-home \.kaca\{/)
@@ -127,7 +127,7 @@ test('Mobile loading cards stay explicit black-green instead of gray placeholder
 
 test('HIG v41 is loaded once after the remaining legacy shell layers', () => {
   const legacy = index.indexOf('/welcome-revitalization-v28.css')
-  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
+  const hig = index.indexOf('/ui-iterations/panacea-hig-v41.css?v=20260915-1')
   assert.ok(hig >= 0, 'HIG foundation must remain registered')
   assert.ok(hig > legacy, 'HIG foundation must load after the remaining legacy layers')
   assert.equal(index.split('/panacea-hig-v41.css').length - 1, 1, 'HIG foundation must not be loaded twice')

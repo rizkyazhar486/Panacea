@@ -21,7 +21,7 @@ const k = { x: 32, y: 32, z: 24 }, p = kursorKeKotak(k, v.volume)
 const [ix, iy, iz] = [Math.floor((p[0] + 0.5) * v.volume.kolom), Math.floor((p[1] + 0.5) * v.volume.baris), Math.floor((p[2] + 0.5) * v.volume.kedalaman)]
 assert.equal(v.volume.irisan[iz].nilai[iy * v.volume.kolom + ix], 900, 'penanda 3D tidak berada di voksel tulang yang dipilih di MPR')
 
-const shader = readFileSync('src/components/VolumeDicom3D.tsx', 'utf8')
+const shader = readFileSync('src/components/digital-twin/VolumeDicom3D.tsx', 'utf8')
 assert.match(shader, /if \(uPenandaAktif == 1\) \{[\s\S]{0,260}color = vec4\(0\.25, 0\.9, 1\.0, 1\.0\); return; \}/, 'penanda kursor tidak digambar di 3D')
 assert.match(shader, /\(m\.uniforms\.uPenanda\.value as THREE\.Vector3\)\.set\(penanda\[0\], penanda\[1\], penanda\[2\]\)\n  \}, \[/, 'penanda 3D tidak diperbarui saat kursor MPR berpindah')
 const ui = readFileSync('src/pages/bodyhub/VolumeDicomBagian.tsx', 'utf8')

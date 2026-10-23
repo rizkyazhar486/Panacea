@@ -2,9 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const training = readFileSync(new URL('../../src/pages/fitness/PusatLatihan.tsx', import.meta.url), 'utf8')
-const bento = readFileSync(new URL('../../src/components/TrainingLabBento.tsx', import.meta.url), 'utf8')
+const bento = readFileSync(new URL('../../src/components/fitness/TrainingLabBento.tsx', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../../src/styles/training-lab-bento.css', import.meta.url), 'utf8')
-const tabs = readFileSync(new URL('../../src/components/HalamanTab.tsx', import.meta.url), 'utf8')
+const tabs = readFileSync(new URL('../../src/components/ui/HalamanTab.tsx', import.meta.url), 'utf8')
 
 assert.match(training, /<TrainingLabBento snapshot=\{bento\} \/>/)
 assert.match(training, /<details className="training-depth-disclosure">/)

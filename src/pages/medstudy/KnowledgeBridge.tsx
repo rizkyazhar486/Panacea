@@ -1,5 +1,5 @@
 import { KnowledgeBridgeWorkbench } from '../../components/KnowledgeBridgeWorkbench'
-import { KnowledgeBridge as KnowledgeBridgeBase } from '../KnowledgeBridgeBase'
+import { KnowledgeBridge as KnowledgeBridgeBase } from './KnowledgeBridgeBase'
 
 export function KnowledgeBridge() {
   return (
