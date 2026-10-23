@@ -262,7 +262,7 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
 ## FETUS — source_backed_partial (v014): organ atlas, not an individual
 
 - **Source:** SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
-  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (stated in the repository's README and LICENSE; the article is CC BY 4.0).
+  (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), licence **CC0 1.0 Universal** (dataset README and LICENSE verified 2026-10-23 at revision `74f11a186c709078d712bb2fd827bfa2b36e3407`: [README](https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md), [LICENSE](https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE)). Licence verification does not establish anatomical accuracy or clinical validation.
   Uus A, Hall M, Grigorescu I, et al. *Scientific Reports* 14:6637 (2024), doi:10.1038/s41598-024-57087-x. Read on 2026-10-10.
 - **What it is:** a population-average atlas of **17 normal fetuses** (3T, T2-weighted, TE 180 ms), 0.75 mm isotropic, with 10 organ labels. The
   repository does not state a gestational age; the preprint (PMC10312818) states 25 to 28 weeks. It is not one fetus and not a reference fetus.
@@ -277,7 +277,7 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   below kidneys, both lungs paired): `qa_reports/gross_fetus_atlas.json`. Meshes are marching-cubes surfaces with volume-preserving smoothing, so the 0.75 mm voxel steps remain visible.
 - `clinically_reviewed` is false. A fetal body with skeleton and skin still needs a source (the ICRP pregnant-female phantoms are in public consultation).
 
-## Paediatric bodies — source_backed (published; redistribution cleared by owner 2026-10-03)
+## Paediatric bodies — source_backed (published; rightsholder redistribution permission unverified)
 
 - **Source:** ICRP Publication 156, *Paediatric Mesh-type Reference Computational Phantoms*
   (2024), polygon-mesh OBJ files from `P156 Electronic files.zip`
@@ -286,8 +286,9 @@ no anatomist review required for this step; the result is unreviewed, `clinicall
   adjusted to the ICRP Publication 89 reference values. They are **not** scaled adults.
 - **Retrieval:** HTTP range requests on the 11.8 GB archive fetched only the README and the
   ten OBJ/MTL pairs.
-- **Licence:** neither the ICRP page nor the README states redistribution terms. The project
-  owner cleared redistribution in Panacea on 2026-10-03. The web derivatives are published in
+- **Licence:** internal owner approval was recorded on 2026-10-03; it does not establish a grant from ICRP.
+  Rightsholder permission for derivatives and redistribution remains unverified.
+  Official reuse policy: https://www.icrp.org/page.asp?id=5. The web derivatives are published in
   `public/bodyexposure/pediatric_*`; the master body `.blend` files stay local (size).
 - **Laterality correction:** the 15-year female phantom labels its ovaries with swapped
   sides; the builder corrects this from geometry and records it on the objects.
@@ -362,8 +363,9 @@ stays an open gap.
 Source: ICRP Publication 145, *Adult Mesh-type Reference Computational Phantoms* (2020), electronic files
 `MRCP_AM` and `MRCP_AF`, polygon-mesh version (https://www.icrp.org/docs/P145%20Electronic%20files.zip). Built with the
 same pipeline as the paediatric bodies (`pipeline/build_icrp156_bodies.py -- --only AM,AF`). The coordinate convention
-matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Redistribution falls under the
-owner's 2026-10-03 clearance of ICRP-derived meshes.
+matches the paediatric phantoms: cm with +Z superior, sternum at −Y and liver at −X. Internal owner approval was recorded on 2026-10-03;
+rightsholder permission for derivatives and redistribution remains unverified.
+Official reuse policy: https://www.icrp.org/page.asp?id=5.
 
 These are **separate, internally consistent bodies**, published as an "ICRP reference" variant of the adult male and
 adult female entries. They are not grafted onto the Z-Anatomy male or the HuBMAP female. Mixing two individuals'
@@ -487,3 +489,4 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 - **Build (`pipeline/build_fetal_reference_tables.py`):** every value is parsed from the source files (SHA-256 recorded) with checks: 27 weekly rows per table, increasing percentiles, increasing medians by age, equal z spacing (SD) per week, 50th centile equal to z 0.
 - **Method in the engine (`engine/fetalBiometry.ts`):** WHO: linear interpolation between the published percentiles, bounds stated outside 2.5 to 97.5 (or 5 to 95 for EFW by sex). INTERGROWTH: linear interpolation of the z-score between the published z values, percentile = normal CDF of z; this reproduces the published 3rd/5th/10th/90th/95th/97th centiles within 0.35 percentile points at every week and measure (tested). Ages between weeks are interpolated linearly between neighbouring published weeks and flagged; ages outside 14+0 to 40+0 weeks and unsupported measures give an explicit "not available".
 - **Not included:** embryologic milestones (a different kind of reference), sex-specific INTERGROWTH, the Hadlock EFW formula, charts below 14 weeks. Output is a position against a reference only; interpretation needs a qualified clinician.
+
