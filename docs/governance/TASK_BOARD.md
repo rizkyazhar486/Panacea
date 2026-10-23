@@ -32,7 +32,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | READY |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
-| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | IN_REVIEW | this PR |
+| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
 | T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | READY |

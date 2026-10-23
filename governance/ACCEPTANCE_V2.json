@@ -814,8 +814,9 @@
       "negativeControl": "Missing build.json yields unknown, not equal.",
       "evidence": "verify-deployed-sha output + run ID.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: verify-deployed-sha printed 'frontend: f6dd71855 SAMA — SHA terdeploy = SHA main' and 'backend: c57e22fc0 SETARA — leluhur main; tidak ada perubahan pada jalur yang dideploy'. Unknown/missing SHAs classify as unknown, never equal (deploy-equivalence.test.mjs and frontend-build-info.test.mjs run in the main build job 120391193192). Classification 'SETARA' for the backend is the engineering rule; what counts as an accepted release SHA is a deferred final-stage policy (EXT-E7-A)."
     },
     {
       "id": "ENG-E7-02",
@@ -845,9 +846,9 @@
         "ENG-CI-02",
         "ENG-E7-01"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Production browser check failed on 256a22de."
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: browser smoke against https://panaceamed.id at 390 and 1440 px, both HTTP 200, overflowX false, webgl2 true, 0 page errors, and it logged 'tested frontend=f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb backend=c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11' (testedShas, #2701). The EXPECT_SHA mismatch for the backend (c57e22fc vs f6dd7185) was reported as a warning, not hidden. CAVEAT: the Body Exposure canvas is behind a login, so production anatomy/slicing is NOT verified without an owner session (reported as info by the check)."
     },
     {
       "id": "ENG-E7-03",
