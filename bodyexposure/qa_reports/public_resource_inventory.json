@@ -1117,8 +1117,8 @@
     },
     {
       "path": "adult_male.rig_rom.glb",
-      "bytes": 1383288,
-      "sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
+      "bytes": 1385024,
+      "sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
       "evidencePath": "adult_male.rig_rom.glb",
       "sources": [
         "Z-Anatomy (derived from BodyParts3D, DBCLS) via Panaceamed public/anatomy/skeletal.glb",
@@ -10743,8 +10743,8 @@
     },
     {
       "path": "vhf_denver_ct_adult_female.rig_rom.glb",
-      "bytes": 212488,
-      "sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
+      "bytes": 213228,
+      "sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
       "evidencePath": "vhf_denver_ct_adult_female.rig_rom.glb",
       "sources": [
         "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; file VHF_Left_Bone_Calcaneous_smooth.stl",

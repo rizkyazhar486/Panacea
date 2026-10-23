@@ -34,19 +34,22 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | claude | DONE (#2720): fail-closed run 39979087541 recorded; smoke job unproven until EXT-E7-B provisions staging |
-| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
+| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | DONE | #2685 merged 31bd8bfd |
+| T-D8-04 | Primary-source record per licence class (URL, retrieval time, SHA-256 of bytes read); ICRP as owner statement (EXT-D8-C); audit fails on a class without a record | ENG-D8-03 | claude | IN_REVIEW | governance/LICENCE_PRIMARY_SOURCES.json, 7 classes |
 | T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
-| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | READY: start from the 94 unpinned input-range limits in 27 engines found by the sweep; needs a per-engine adapter |
+| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | IN_REVIEW (PR pending): range limits (94 -> 0 survivors) and label/score cut-offs pinned by suites 12 to 14; the per-class named-rejection matrix over all 47 engines is NOT done and needs a per-engine adapter |
 
 ## Later (H2)
 
 | ID | Task | Criterion | Lane | Status |
 |---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
-| T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | READY | follows R-D7-RIG |
+| T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence + root cause in gait_measurability.json (this PR). ENG-D7-02 stays FAIL: only male WALK measurable |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
+| T-D7-03 | Named heel/ball landmark empties in the exported rig (FOOT_LANDMARK_HEEL/BALL_<side>, from calcaneus and 1st metatarsal head); metrics consume them | ENG-D7-03 | claude | DONE | #2723 merged 654347b8; Blender reproduction re-run: only source hashes changed |
+| R-D7-CONTACT | Research: contact-corrected retarget of CMU RUN (and female lower-limb) so both feet plant within the 15 mm window, without inventing motion; compare against the uncorrected clip and label truth class honestly | ENG-D7-02 | claude | READY | root cause: male RUN heel min 32 mm, female heel min 23-55 mm above floor |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
