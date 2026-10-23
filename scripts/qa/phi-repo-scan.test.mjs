@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, chmodSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, chmodSync, symlinkSync } from 'node:fs'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -63,7 +63,7 @@ test('E4: mandatory repository CI rejects filename PHI without invoking the CLI'
   }
 })
 
-test('E4: real CLI rejects identifiers in excluded binary/CSV filenames with redacted logs', () => {
+test('E4: real CLI and symlink entrypoints reject filename identifiers with redacted logs', () => {
   for (const [name, expected] of [['synthetic.csv', 0], ['3171011505900001.csv', 1], ['081377745521.tar.gz', 1]]) {
     const root = mkdtempSync(join(tmpdir(), 'phi-cli-'))
     try {
@@ -73,16 +73,20 @@ test('E4: real CLI rejects identifiers in excluded binary/CSV filenames with red
       mkdirSync(join(root, 'public'))
       const script = join(qa, 'phi-repo-scan.mjs')
       writeFileSync(script, readFileSync(new URL('./phi-repo-scan.mjs', import.meta.url)))
+      const linkedScript = join(qa, 'scan-entry.mjs')
+      symlinkSync('phi-repo-scan.mjs', linkedScript)
       writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
       writeFileSync(join(root, 'public', name), 'no identifiers in file contents')
       for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
-      const result = spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8' })
-      assert.equal(result.status, expected)
-      const summary = JSON.parse(result.stdout.trim())
-      assert.equal(summary.takTerdaftar, expected)
-      const logs = result.stdout + result.stderr
-      for (const secret of ['3171011505900001', '081377745521']) assert.equal(logs.includes(secret), false)
-      if (expected) assert.match(result.stderr, /nilai=\[REDACTED\] ref=[0-9a-f]{16}/)
+      for (const entrypoint of [script, linkedScript]) {
+        const result = spawnSync(process.execPath, [entrypoint], { cwd: root, encoding: 'utf8' })
+        assert.equal(result.status, expected)
+        const summary = JSON.parse(result.stdout.trim())
+        assert.equal(summary.takTerdaftar, expected)
+        const logs = result.stdout + result.stderr
+        for (const secret of ['3171011505900001', '081377745521']) assert.equal(logs.includes(secret), false)
+        if (expected) assert.match(result.stderr, /nilai=\[REDACTED\] ref=[0-9a-f]{16}/)
+      }
     } finally { rmSync(root, { recursive: true, force: true }) }
   }
 })

@@ -5,7 +5,7 @@
 //   node scripts/qa/phi-repo-scan.mjs        (keluar 1 bila ada temuan tak terdaftar atau entri daftar-izin usang)
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -142,7 +142,9 @@ export function ringkasKegagalanTanpaPHI({ takTerdaftar = [], usang = [], tanpaA
   return baris
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+// Node resolves the module's symlinks (including macOS /var -> /private/var).
+// Resolve argv too: a linked CLI must execute the same fail-closed scan.
+if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {
   const t = [...pindaiNamaBerkas(), ...pindaiRepo()]; const { takTerdaftar, usang, tanpaAlasan } = bandingkan(t, muatDaftarIzin())
   console.log(JSON.stringify({ temuan: t.length, takTerdaftar: takTerdaftar.length, usang: usang.length, tanpaAlasan: tanpaAlasan.length }))
   if (takTerdaftar.length || usang.length || tanpaAlasan.length) {
