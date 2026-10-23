@@ -11,7 +11,8 @@ const { alasanSesiDitolak, simpanSesi, ambilSesi, setSah, volumeSesi } = await i
 
 const SEKARANG = Date.parse('2026-10-10T12:00:00Z')
 const ok = { id: 'a', tanggal: '2026-10-10', gerakan: 'Squat', set: [{ ulangan: 5, kg: 100 }] }
-const reset = () => simpan.clear()
+const KEY = 'pmd_beban_v1:scope_v1:' + encodeURIComponent(JSON.stringify(['strength-owner', 'self-strength-owner']))
+const reset = () => { simpan.clear(); simpan.set('panaceamed.session.v1', JSON.stringify({account:{id:'strength-owner',patientId:'self-strength-owner'},loginAt:Date.now()})) }
 
 // positif
 assert.equal(alasanSesiDitolak(ok, SEKARANG), null, 'menerima_sesi_sah')
@@ -49,16 +50,16 @@ assert.match(tolak({ set: [{ ulangan: 5, kg: 100 }, { ulangan: 5, kg: NaN }] })!
 reset()
 simpanSesi(ok, SEKARANG)
 assert.equal(ambilSesi().length, 1)
-const sebelum = simpan.get('pmd_beban_v1')
+const sebelum = simpan.get(KEY)
 const hasil = simpanSesi({ ...ok, id: 'b', tanggal: '2027-01-01' }, SEKARANG)
 assert.equal(hasil.length, 1, 'sesi_tak_sah_tidak_ditambahkan')
-assert.equal(simpan.get('pmd_beban_v1'), sebelum, 'penyimpanan_tak_berubah')
+assert.equal(simpan.get(KEY), sebelum, 'penyimpanan_tak_berubah')
 // pasangan: sesi yang hanya berbeda pada tanggal (sah) diterima
 assert.equal(simpanSesi({ ...ok, id: 'c', tanggal: '2026-10-09' }, SEKARANG).length, 2)
 
 // regresi: data tersimpan rusak dibuang dan tidak meracuni volume
 reset()
-simpan.set('pmd_beban_v1', JSON.stringify([
+simpan.set(KEY, JSON.stringify([
   { id: 'x', tanggal: '2026-10-01', gerakan: 'Bench', set: [{ ulangan: 5, kg: 60 }, { ulangan: -3, kg: 60 }, { ulangan: 5, kg: null }, { ulangan: 'a', kg: 5 }] },
   { id: 'y', tanggal: '2026-10-02', gerakan: 'Deadlift', set: [{ ulangan: 0, kg: 0 }] },
 ]))

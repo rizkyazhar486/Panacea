@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useStore } from '../../lib/store'
 import { HealthSnapshot } from '../../components/HealthSnapshot'
-import { PostCard } from '../Feed'
+import { PostCard } from '../social/Feed'
 import { compressImage, readAsDataUrl } from '../../lib/upload'
 import { IconX, IconLogout } from '../../components/icons'
 import { api, backendEnabled } from '../../lib/api'

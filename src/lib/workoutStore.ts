@@ -11,6 +11,7 @@
 import { broadcastHealthUpdate } from './profile'
 import { readPersonalHealthStorageScope } from '../domains/personal-health/index.ts'
 import { allowsPersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence.ts'
 import type { ImportedWorkout, HrNotification, HrPoint } from './workoutImport'
 
 const KEY_W = 'pmd_workouts_v1'
@@ -161,6 +162,9 @@ function normalisasiWorkout(w: unknown): ImportedWorkout | null {
     // dari field durasi sendiri; kita tidak mengarang durasi dari timestamp.
     selesai,
     durasi: durasi !== undefined && durasi >= 0 ? durasi : 0,
+    // Check original timestamps before invalid end times are neutralized.
+    durationSource: workoutDurationSeconds(x) === null ? 'unknown'
+      : x.durationSource === 'source_field' || x.durationSource === 'timestamps' ? x.durationSource : undefined,
     hr,
     pemulihan,
   }

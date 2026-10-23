@@ -1,85 +1,117 @@
-# Panaceamed.id — Longevity Medical-AI Co-Physician
+# Panaceamed.id — Computational Human Platform
 
-A web app that demonstrates the Panacea concept: **AI performs the anamnesis and
-recommends supporting examinations through a chatbot**, the results flow into an
-integrated **AI-EMR**, and the **physical examination and final plan are filled
-in and verified by the examining (human) doctor**. The patient identity is kept
-**continuously integrated** across every module — always carrying vital signs and
-supporting results as support for *longevity*. Built for continuous monitoring of
-patients with chronic disease, the elderly, and the immunocompromised.
+One longitudinal patient state — daily life, outpatient care, ward, OR, ICU,
+follow-up — projected into AI-EMR, Clinical, Body Exposure, sport/performance
+and longevity surfaces. AI drafts (anamnesis, assessment, education); a
+licensed clinician reviews and signs. See [`CLAUDE.md`](CLAUDE.md) for the
+full working contract and [`AGENTS.md`](AGENTS.md) for governing doctrine.
 
-> ⚕️ The AI **supports, and never replaces**, a licensed clinician. All doses must
-> be verified against a current formulary before use.
-
-![Brand](public/logo.svg)
-
-## Modules
-
-| Module | What it does |
-| --- | --- |
-| **Dashboard** | Continuous patient identity — vital-sign trends, anthropometry, **growth & BMI charts** (pediatric WHO/CDC curves for BB/U·TB/U·IMT/U and an adult BMI band chart), supporting results (Lab/EKG/Radiology), and a Longevity Score. |
-| **AI Chatbot** | Anamnesis Co-Physician. Interviews the patient with SOCRATES-based, open-ended questions and recommends supporting examinations. One click drafts a structured AI-EMR. |
-| **AI-EMR** | SOAP record. AI drafts the anamnesis (S) and assessment (A) with a *"Dipikirkan …"* comparative narrative; the **doctor fills & verifies the physical exam (O)** and signs. Includes an AI **patient-education** sheet (brief + deep) so patients understand their disease and how to stay healthy. |
-| **Planning** | AI recommends management (Suportif · Definitif · Edukasi · Follow-up · Monitoring); the **doctor verifies, rejects, or adds** items. High-alert drugs return ranges + references only. |
-| **Marketplace** | Buy & sell **medical notes / materials / journals** (USMLE, UKMPPD) and **AI-EMR templates** with **PanaceaToken (PNC)**. Upload as **Word / PDF / PowerPoint**. Every upload is gated by **Claude AI verification → specialist verifier**. |
-| **Materi Saya** | Contributor dashboard — uploaded materials, verification pipeline (Upload → AI Screening → Specialist Verification → Published), downloads, and **royalty earnings**. |
-| **Verifikasi** | Two-layer gatekeeping: Panacea AI Verification Layer (accuracy/safety) then a **Spesialis/Subspesialis verifier**. Contributors must be verified before their materials are listed. "Act as" switcher to demo each role. |
-| **Billing & Token** | Runnable token wallet — deposit (simulated gateway), purchase, **author royalty payout**, and **subscriptions** (Individu / Rumah Sakit) that unlock full AI-EMR + automatic patient education. |
-| **Arsitektur CDSS** | Reference for the hybrid lateral+vertical CDSS: 12 microservices, data flow, the ensemble formula, the safety-filter pseudocode, roadmap, evaluation metrics & regulatory checklist. |
-| **Settings** | Anthropic API key, model selection, examining-doctor identity. |
-
-## Clinical engines
-
-- **LMS z-scores (Cole's method)** power the pediatric growth charts — exact z-score &
-  percentile with WHO/CDC classification (stunted/wasted/overweight), fitted from the
-  tabulated P3/P50/P97 reference points. Adults get a WHO Asia-Pacific BMI band chart.
-- **CDSS hybrid safety engine** (`src/lib/cdss.ts`) scores every plan item as
-  `CombinedScore = α·V + β·L + γ·S` and **blocks** any item with safety `S < 0.8`
-  (allergy/high-alert/contraindication), requiring a **logged clinician override
-  justification** (doctor-in-the-loop). Visualized on the Planning page.
-- **Comprehensive EMR framework** — the AI drafts records per a Patient-Based Medicine
-  spec (SOCRATES algorithmic expansion, conditional pediatric/obstetric history,
-  **probability-ranked differentials**, "Dipikirkan …" reasoning, prognosis, and
-  evidence-graded Vancouver citations).
-- **Modern visual layer** — an anatomical **body map** summarizes physical-exam findings
-  per system; patient education renders as a brief, high-impact **presentation deck**.
-
-## Business model
-
-Panaceamed.id is both an **AI-EMR system** and a **tokenized marketplace** for medical
-knowledge. Buyers deposit PanaceaToken to purchase notes/materials; authors earn
-royalties (platform takes a fee). Contributors are verified by specialist/subspecialist
-verifiers, and Panacea AI validates every uploaded item using configurable LLM engines and clinical safety rules — including AI-EMR templates.
-Hospitals and individuals subscribe so their **patients receive concise-yet-deep
-education** about their disease and how to maintain their health.
-
-## The Co-Physician brain
-
-The chatbot and AI-EMR are orchestrated by the **Panacea Co-Physician Engine**
-system prompt (`src/lib/systemPrompt.ts`) — bilingual (ID/EN), tight-by-default,
-with a dual safety guardrail separating **Education/Simulation** from **Clinical**
-reasoning, and Vancouver citations for key claims.
-
-- **AI Live** — add an API key (Anthropic-compatible) in *Settings* to call the Claude API
-  directly from the browser.
-- **Mode Demo** — without a key, the app runs a scripted simulation so every
-  screen and flow can be explored offline.
+> ⚕️ AI supports, never replaces, a licensed clinician. Diagnosis, dosing and
+> final plans require clinician verification.
 
 ## Tech stack
 
-Vite · React · TypeScript · Tailwind CSS v4. State is persisted in `localStorage`
-(seeded with three example patients).
+| | |
+| --- | --- |
+| Frontend | React + TypeScript + Vite (`src/`), Tailwind CSS v4 |
+| Backend | Node + TypeScript, `tsx` runtime (`server/`) |
+| Deploy | Vercel (frontend), Render (`render.yaml`, backend) |
+| CI | GitHub Actions (`.github/workflows/`) |
+
+## Architecture
+
+Dependency direction is one-way, inward:
+
+```
+pages/  →  components/ / domains/*/ui  →  lib/ (pure logic)  →  data/ (constants, corpora)
+                                              ↓
+                                        lib/api.ts (the only HTTP boundary)
+                                              ↓
+                              server/src (routes → service → store)
+```
+
+- **`lib/`** — domain logic and use-cases. Pure and deterministic: no React,
+  no DOM, no direct `fetch`, no hidden `Date.now()`/`Math.random()`. This is
+  what makes it testable offline.
+- **`components/`** — presentation only. No formulas, clinical rules or
+  parsing; calls into `lib/` and renders the result.
+- **`pages/`** — composition (routing, lazy-loading, assembling components).
+  No domain logic.
+- **`domains/`** — newer bounded-context folders (`physiology`,
+  `body-exposure`, `clinical-operations`, `lab-results`, `marketplace`, …),
+  each holding its own model/engine/data/adapters/ui. This is the target
+  shape for the whole codebase; migration is incremental (see below).
+- **Server** — `routes` (input validation + auth) → `service` (business
+  rules) → `store`/adapter (DB, FHIR, external APIs). Handlers hold no
+  business logic; services know nothing about HTTP.
+
+### Current state vs. target
+
+The codebase is mid-migration from a flat structure to the domain-first
+layout described in [`CLAUDE.md` §2](CLAUDE.md#2-arsitektur--clean-architecture):
+
+- `src/pages/landing/` is the reference implementation — composed of
+  `sections/`, `components/`, isolated data/SVG/CSS files. New domain work
+  should follow this pattern.
+- `src/pages/` root still holds ~250 files: real pages plus transitional
+  one-line re-export stubs (kept so existing imports and tests don't break).
+  Newer page groups already live under subfolders (`clinical/`, `emr/`,
+  `dashboard/`, `bodyhub/`, `fitness/`, `discovery/`, `medstudy/`).
+  Ungrouped pages are being sorted into domain folders incrementally — see
+  `scripts/arch/ratchet.mjs` and `lint:arsitektur` for the enforced boundary.
+- `src/lib/` is still largely flat (~500 files, some subfolders). Rule: no
+  new files land in the flat `lib/` root — new logic goes into
+  `src/domains/<domain>/` instead.
+- `src/domains/` already holds newer bounded contexts: `physiology`,
+  `body-exposure`, `clinical-operations`, `clinical-review`,
+  `clinical-calculators`, `lab-results`, `personal-health`, `affect`,
+  `training-goals`, `sports-roster`, `club`, `data-lab`, `macro-policy`,
+  `marketplace`, `owner-analytics`, `observability`, `wallet`.
+- Dependency boundaries are enforced by `dependency-cruiser`
+  (`.dependency-cruiser.cjs`, violations ratcheted down via
+  `.dependency-cruiser-known-violations.json`), not just convention.
 
 ## Run locally
 
+### Frontend only (demo mode, no backend)
+
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # type-check + production build
-npm run preview  # serve the production build
+npm run dev       # http://localhost:5173
 ```
+
+Without `VITE_API_URL` set, the app runs on seeded `localStorage` demo data —
+every screen and flow is explorable offline.
+
+### Frontend + backend
+
+```bash
+# 1) backend
+cd server
+npm install
+npm run dev        # http://localhost:8787 (tsx watch)
+
+# 2) frontend, in a separate terminal
+cp .env.example .env.local   # sets VITE_API_URL=http://localhost:8787
+npm install
+npm run dev         # http://localhost:5173
+```
+
+### Build & validate
+
+```bash
+npm run build       # dozens of gates (registry/feature/academic/capability
+                     # validators + unit tests) + tsc -b + vite build — slow
+npm run uji          # frontend deterministic test suite
+cd server && npm run typecheck && npm run uji   # backend typecheck + tests
+npm run lint:arsitektur   # dependency-cruiser boundary check
+```
+
+See [`docs/RUN.md`](../docs/RUN.md) (workspace root) for the combined
+Panacea + PanaceaMed-v2 run guide, and [`docs/engineering/PANDUAN-SETUP.md`](docs/engineering/PANDUAN-SETUP.md)
+for first-time environment setup details.
 
 ## Brand
 
-Logo: red cross + green `tP` letterform. Palette `#00BF63` · `#FF3131` · `#000000`
-· `#FFFFFF`. Typeface: **Montserrat**.
+Logo: red cross + green `tP` letterform. Palette `#00BF63` · `#FF3131` ·
+`#000000` · `#FFFFFF`. Typeface: **Montserrat**.

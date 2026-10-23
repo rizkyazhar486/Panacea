@@ -128,6 +128,8 @@ export interface EMRRecord {
   updatedAt: string
   anamnesis: Anamnesis
   physicalExam: PhysicalExam
+  /** AI proposals and patient-reported context; never observed examination findings. */
+  aiExamDraft?: { vitalsNote: string; perSystem: string }
   problems: ProblemEntry[]
   // Diagnosis utama (ICD-10) — picked by the doctor or accepted from AI.
   primaryDiagnosis?: { code: string; title: string; chapter?: string; source?: 'AI' | 'Dokter' }
@@ -144,7 +146,7 @@ export interface EMRRecord {
   signedById?: string
   signedAt?: string
   /** Asal per kolom isian ('anamnesis.rps', 'physicalExam.perSystem', …) — dicap server; klien hanya boleh menyatakan 'AI'. */
-  asalIsian?: Record<string, { asal: 'AI' | 'Dokter'; olehId?: string; pada?: string }>
+  asalIsian?: Record<string, { asal: 'AI' | 'Dokter' | 'Pengguna'; olehId?: string; pada?: string }>
   /** Kunjungan tertutup sebelumnya (dicap server saat kunjungan ditutup). */
   previousEncounterId?: string
   // The downstream half of the care journey — everything the clinical plan
@@ -265,7 +267,7 @@ export interface ConsentStage {
 }
 
 // -------- Accounts & roles -------------------------------------------------
-export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'perawat' | 'lab' | 'admin' | 'owner'
 export interface Account {
   /** Stable server user id; used for identity-bound longitudinal records. */
   id?: string

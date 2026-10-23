@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { terapkanSimpanRekam } from '../src/rekamKlinis.js'
+import { terapkanSimpanRekam } from '../src/domains/clinical-records/rekamKlinis.js'
 const kini = new Date('2026-09-26T10:00:00Z')
 const pasien = { id: 'u1', nama: 'Budi', klinisi: false }, dokter = { id: 'd1', nama: 'Dr. Asli', klinisi: true }
 const dasar = { id: 'r1', patientId: 'self-budi', physicalExam: { doctorVerified: false }, plan: [] }
@@ -60,3 +60,6 @@ assert.deepEqual([resign.physicalExam.verifiedBy, resign.physicalExam.verifiedBy
 // Simpan identik tidak mengarsipkan.
 assert.equal(terapkanSimpanRekam(tt, tt, dokter, kini).arsip, undefined)
 console.log('rekamKlinis: tanda tangan tidak dapat dipalsukan, dicap server, versi bertanda tangan diarsipkan')
+
+// A5: real HTTP persisted AI draft and explicit clinician approval boundary.
+await import('./aiDraftApprovalHttp.uji.js')

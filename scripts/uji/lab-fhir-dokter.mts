@@ -37,7 +37,7 @@ assert.match(ui, /a monitoring signal, not an interpretation/, 'batas "sinyal pe
   assert.match(r, /\n  if \(!izinBerlaku\(izin, u\.email, kini\)\) \{ res\.status\(404\)/, 'tinjauan tanpa izin pasien yang berlaku')
   assert.match(r, /aksi: 'ditinjau-dokter'/, 'tinjauan tidak dicatat di audit pasien')
   assert.doesNotMatch(r, /putLabLog|validasiLogLab/, 'tinjauan dokter menulis ke angka lab pasien')
-  assert.match(readFileSync('src/components/UbinLab.tsx', 'utf8'), /— clinician note/, 'catatan dokter tidak diberi label penulisnya di sisi pasien')
+  assert.match(readFileSync('src/components/tiles/UbinLab.tsx', 'utf8'), /— clinician note/, 'catatan dokter tidak diberi label penulisnya di sisi pasien')
 }
 
 // Notifikasi: dokter saat dibagikan, pasien saat ditinjau — tanpa nama/nilai
@@ -59,7 +59,7 @@ assert.match(ui, /resourceType === 'Observation'/, 'tampilan dokter mengolah Pro
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))
 assert.doesNotThrow(() => buildBodyClinicalFindings(null))
-for (const f of ['src/components/clinical/ClinicalPatientContext.tsx', 'src/components/BodyExposurePatientOverlay.tsx']) {
+for (const f of ['src/components/clinical/ClinicalPatientContext.tsx', 'src/components/digital-twin/BodyExposurePatientOverlay.tsx']) {
   assert.match(readFileSync(f, 'utf8'), /record\.physicalExam\?\.perSystem/, `${f}: physicalExam tanpa pengaman lagi`)
 }
 console.log('lab-fhir-dokter: rute terautentikasi, dokter terverifikasi + izin + audit-sebelum-data, asal disalin-pasien terlihat, Clinical tidak roboh tanpa pemeriksaan')

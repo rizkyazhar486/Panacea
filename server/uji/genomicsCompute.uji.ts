@@ -17,7 +17,7 @@ process.env.JWT_SECRET = 'synthetic-genomics-boundary-test-secret'
 process.env.GENOMICS_WORKER_URL = 'https://synthetic-worker.example.test'
 const { config } = await import('../src/config.js')
 const { upsertUser } = await import('../src/store.js')
-const { attachGenomicsComputeRoutes } = await import('../src/genomicsCompute.js')
+const { attachGenomicsComputeRoutes } = await import('../src/domains/anatomy/genomicsCompute.js')
 const owner = upsertUser('genomics-owner@example.test', 'Synthetic Owner', 'pasien')
 const other = upsertUser('genomics-other@example.test', 'Synthetic Other', 'pasien')
 const token = (id: string) => jwt.sign({ uid: id }, config.jwtSecret, { expiresIn: '5m' })

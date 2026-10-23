@@ -43,5 +43,7 @@ export function maddreyScore(input: MaddreyInput): MaddreyResult {
   if (missing.length > 0 || invalid.length > 0) return { missing, invalid, df: null, ptDiff: null, severe: null }
   const ptDiff = (ok.patientPt as number) - (ok.controlPt as number)
   const df = DF_COEFFICIENT * ptDiff + (ok.bilirubin as number)
-  return { missing, invalid, df, ptDiff, severe: df >= SEVERE_DF_THRESHOLD }
+  // DF = 32 tepat (mis. PT 15,5 vs kontrol 10 dan bilirubin 6,7) dihitung float sebagai 31,999999999999996 dan dulu dilaporkan
+  // "tidak berat". Pembulatan ke 1e-6 hanya menyerap galat float; masukan klinis tidak sehalus itu.
+  return { missing, invalid, df, ptDiff, severe: Math.round(df * 1e6) / 1e6 >= SEVERE_DF_THRESHOLD }
 }

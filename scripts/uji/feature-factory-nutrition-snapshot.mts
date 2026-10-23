@@ -52,7 +52,7 @@ assert.equal(
   'Missing dates must never be fabricated as zero-valued observations.',
 )
 
-const page = readFileSync(new URL('../../src/pages/NutritionDataControls.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/bodyhub/NutritionDataControls.tsx', import.meta.url), 'utf8')
 assert.match(page, /Recorded-only snapshot \+ timeline/)
 assert.match(page, /No valid nutrition journal records yet\. This panel stays empty instead of generating a sample day\./)
 assert.match(page, /Recorded kcal/)

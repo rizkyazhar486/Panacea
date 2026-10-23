@@ -1,5 +1,6 @@
 import type { ImportedWorkout } from './workoutImport'
 import { kunciHari } from './tanggal'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Angka olahraga SEHARI-HARI: langkah, jarak, pace, denyut, zona, kadens.
@@ -50,7 +51,7 @@ function rerata(pasangan: [number, number][]): number | null {
     atas += nilai * bobot
     bawah += bobot
   }
-  return bawah > 0 ? atas / bawah : null
+  return Number.isFinite(atas) && Number.isFinite(bawah) && bawah > 0 ? atas / bawah : null
 }
 
 function jumlah(nilai: (number | undefined)[]): number | null {
@@ -97,8 +98,8 @@ export function deretHarian(
       // Pace dibobot JARAK, bukan durasi: lari 1 km cepat dan 10 km lambat
       // dalam satu hari tidak boleh dirata-ratakan seolah setara.
       paceSec: rerata(s.map((w) => [w.paceSec ?? NaN, w.jarakKm ?? 0] as [number, number])),
-      avgHr: rerata(s.map((w) => [w.avgHr ?? NaN, w.durasi ?? 0] as [number, number])),
-      kadens: rerata(s.map((w) => [w.kadens ?? NaN, w.durasi ?? 0] as [number, number])),
+      avgHr: rerata(s.map((w) => [w.avgHr ?? NaN, workoutDurationSeconds(w) ?? NaN] as [number, number])),
+      kadens: rerata(s.map((w) => [w.kadens ?? NaN, workoutDurationSeconds(w) ?? NaN] as [number, number])),
     })
   }
   return out
@@ -154,7 +155,7 @@ export function deretPekanan(
       km: jumlah(s.map((w) => w.jarakKm)),
       langkah: jumlah(s.map((w) => w.langkah)),
       paceSec: rerata(s.map((w) => [w.paceSec ?? NaN, w.jarakKm ?? 0] as [number, number])),
-      avgHr: rerata(s.map((w) => [w.avgHr ?? NaN, w.durasi ?? 0] as [number, number])),
+      avgHr: rerata(s.map((w) => [w.avgHr ?? NaN, workoutDurationSeconds(w) ?? NaN] as [number, number])),
     })
   }
   return out

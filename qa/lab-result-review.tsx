@@ -2,7 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter } from 'react-router-dom'
 import { StoreProvider } from '../src/lib/store'
-import { LabResultReview } from '../src/pages/LabResultReview'
+import { LabResultReview } from '../src/pages/clinical/LabResultReview'
 import '../src/index.css'
 
 // Halaman uji: sesi dan token dibaca dari localStorage (diisi oleh qa/lab-result-review-check.mjs terhadap server nyata)

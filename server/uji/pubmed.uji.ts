@@ -1,4 +1,4 @@
-import { searchPubmed } from '../src/pubmed.ts'
+import { searchPubmed } from '../src/domains/medical-reference/pubmed.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {
