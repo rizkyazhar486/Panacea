@@ -34,7 +34,8 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | claude | DONE (#2720): fail-closed run 39979087541 recorded; smoke job unproven until EXT-E7-B provisions staging |
-| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
+| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | DONE | #2685 merged 31bd8bfd |
+| T-D8-04 | Primary-source record per licence class (URL, retrieval time, SHA-256 of bytes read); ICRP as owner statement (EXT-D8-C); audit fails on a class without a record | ENG-D8-03 | claude | IN_REVIEW | governance/LICENCE_PRIMARY_SOURCES.json, 7 classes |
 | T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 stays NOT_RUN: needs the rendered attribution page captured at an exact SHA |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
