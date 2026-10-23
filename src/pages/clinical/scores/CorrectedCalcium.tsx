@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { correctedCalcium, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Corrected Calcium — Payne, R.B., et al. (1973), BMJ, 4(5893):643-646.
@@ -16,14 +17,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // Corrected Ca (mg/dL) = Measured total Ca (mg/dL) + 0.8 x (4.0 - albumin g/dL)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function band(ca: number): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (ca < 7.0) return { label: 'Severe hypocalcemia', tone: 'critical' }
-  if (ca < 8.5) return { label: 'Hypocalcemia', tone: 'low' }
-  if (ca <= 10.5) return { label: 'Normal', tone: 'brand' }
-  if (ca <= 12) return { label: 'Hypercalcemia', tone: 'low' }
-  return { label: 'Severe hypercalcemia', tone: 'critical' }
-}
-
 export function CorrectedCalcium() {
   // Kedua angka ini hasil laboratorium. Tidak ada nilai awal yang bisa
   // dibela untuk keduanya: halaman ini dahulu terbuka pada kalsium 8,0 dan
@@ -31,18 +24,17 @@ export function CorrectedCalcium() {
   // kalimat siap salin, untuk pasien yang tidak ada. Dan mengosongkan satu
   // kolom membuat nilainya 0, yang dijawab band() dengan "Severe
   // hypocalcemia": kolom kosong ditampilkan sebagai keadaan gawat.
-  const [totalCa, setTotalCa] = useState(0)
-  const [albumin, setAlbumin] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [totalText, setTotalCa] = useState('')
+  const [albuminText, setAlbumin] = useState('')
 
-  const lengkap = totalCa > 0 && albumin > 0
-  const corrected = lengkap ? totalCa + 0.8 * (4.0 - albumin) : null
-  const totalBand = lengkap ? band(totalCa) : null
-  const correctedBand = corrected !== null ? band(corrected) : null
-  const changesCategory = totalBand !== null && correctedBand !== null && totalBand.label !== correctedBand.label
-
-  const belum: string[] = []
-  if (!(totalCa > 0)) belum.push('measured total calcium')
-  if (!(albumin > 0)) belum.push('serum albumin')
+  const totalCa = parseNumberField(totalText)
+  const albumin = parseNumberField(albuminText)
+  const hasil = correctedCalcium({ totalCa, albumin })
+  const { corrected, totalBand, correctedBand } = hasil
+  const lengkap = corrected !== null
+  const changesCategory = hasil.changesCategory === true
+  const belum = hasil.missing
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -52,12 +44,15 @@ export function CorrectedCalcium() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Sekitar separuh kalsium serum terikat protein (terutama albumin) — albumin yang rendah membuat kalsium total terbaca rendah palsu meskipun bagian yang aktif secara fisiologis (terionisasi) sebenarnya normal. Jebakan yang sangat lazim di sisi tempat tidur pada pasien rawat inap, kurang gizi, atau sirosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Measured total calcium (mg/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={totalCa || ''} onChange={(e) => setTotalCa(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={totalText} onChange={(e) => setTotalCa(e.target.value)} />
           </Field>
           <Field label="Serum albumin (g/dL)">
-            <input className={inputClass} type="number" step="0.1" min={0} value={albumin || ''} onChange={(e) => setAlbumin(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" min={0} value={albuminText} onChange={(e) => setAlbumin(e.target.value)} />
           </Field>
         </div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       <Card className="!p-5">
@@ -87,7 +82,7 @@ export function CorrectedCalcium() {
             </p>
             <CopyNote text={`Corrected Ca ${corrected.toFixed(1)} mg/dL (measured ${totalCa.toFixed(1)}, albumin ${albumin} g/dL) — ${correctedBand.label.toLowerCase()} [Payne 1973]`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             Nothing is calculated yet. Still needed: {belum.join(' and ')}.
             {' '}Both are laboratory results and neither has a default — an empty field is not a value of zero,

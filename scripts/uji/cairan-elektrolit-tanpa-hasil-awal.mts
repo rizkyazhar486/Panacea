@@ -1,6 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { fena as fenaMotor, ldlFriedewald, resuscitation, maintenanceFluid, correctedSodium, naCorrectionRate, potassiumDeficit } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIGA TERAKHIR DARI PENYISIRAN, DAN YANG SATU MENGELUARKAN VOLUME.
@@ -27,8 +28,10 @@ const fenaKode = kodeDari(fena)
 for (const b of ['useState(20)', 'useState(2.0)', 'useState(140)', 'useState(60)']) {
   assert.ok(!fenaKode.includes(b), `a laboratory default is back in FeNa: ${b}`)
 }
-assert.ok(/const result = lengkap \? interpret\(fena\) : null/.test(fenaKode),
+assert.ok(/const result = hasil\.band/.test(fenaKode) && /hitungFena\(\{/.test(fenaKode), 'the FeNa page no longer takes its band from the engine')
+assert.equal(fenaMotor({ urineNa: NaN, plasmaCr: NaN, plasmaNa: NaN, urineCr: NaN }).band, null,
   'FeNa still names a differential diagnosis without a paired urine and plasma sample')
+assert.equal(fenaMotor({ urineNa: 20, plasmaCr: 2, plasmaNa: 140, urineCr: NaN }).fena, null, 'a FeNa was produced without all four values')
 // "Sedang memakai diuretik" adalah jawaban, bukan pengukuran.
 assert.ok(/const \[onDiuretics, setOnDiuretics\] = useState\(false\)/.test(fenaKode),
   'the diuretic question was made unanswered; unticked means no, and it changes how the result is read')
@@ -37,7 +40,10 @@ const hitungFena = (una: number, pcr: number, pna: number, ucr: number) => (una 
 assert.ok(Math.abs(hitungFena(20, 2.0, 140, 60) - 0.476) < 0.001,
   'the old defaults no longer give 0.48%; re-read this gate')
 assert.ok(hitungFena(20, 2.0, 140, 60) < 1, 'the old defaults no longer fall in the prerenal band; re-read this gate')
-assert.ok(/\(urineNa \* plasmaCr\) \/ denom \* 100/.test(fenaKode), 'the page no longer applies the FeNa formula')
+const fenaMotorSrc = readFileSync(new URL('../../src/domains/clinical-calculators/engine/fena.ts', import.meta.url), 'utf8')
+assert.ok(/\(ok\.urineNa as number\) \* \(ok\.plasmaCr as number\)/.test(fenaMotorSrc) && /\* 100/.test(fenaMotorSrc), 'the engine no longer applies the FeNa formula')
+const fm = fenaMotor({ urineNa: 20, plasmaCr: 2, plasmaNa: 140, urineCr: 60 })
+assert.ok(fm.fena !== null && Math.abs(fm.fena - hitungFena(20, 2.0, 140, 60)) < 1e-9, 'engine FeNa differs from the independent rewrite')
 
 // ── LDL (Friedewald 1972) ──────────────────────────────────────────────────
 const ldl = baca('LdlCalculator.tsx')
@@ -45,10 +51,19 @@ const ldlKode = kodeDari(ldl)
 for (const b of ['useState(200)', 'useState(50)', 'useState(150)']) {
   assert.ok(!ldlKode.includes(b), `a lipid default is back in the LDL calculator: ${b}`)
 }
-assert.ok(/const band = lengkap \? ldlBand\(ldl\) : null/.test(ldlKode), 'LDL still bands a value computed from nothing')
-assert.ok(/totalChol - hdl - tg \/ 5/.test(ldlKode), 'the page no longer applies Friedewald')
+const ldlMotor = readFileSync(new URL('../../src/domains/clinical-calculators/engine/ldlFriedewald.ts', import.meta.url), 'utf8')
+const ldlMotorKode = kodeDari(ldlMotor)
+assert.ok(/ldlFriedewald\(/.test(ldlKode) && /const band = hasil\.band/.test(ldlKode), 'the LDL page no longer takes its band from the engine')
+// Perilaku: pita hanya untuk masukan lengkap dan sah — nilai kosong tidak pernah punya pita.
+assert.equal(ldlFriedewald({ totalChol: NaN, hdl: NaN, tg: NaN }).band, null, 'LDL still bands a value computed from nothing')
+assert.equal(ldlFriedewald({ totalChol: 200, hdl: 50, tg: NaN }).ldl, null, 'LDL was produced without triglycerides')
+assert.ok(/totalChol - hdl - tg \/ 5/.test(ldlMotorKode), 'the engine no longer applies Friedewald')
+const f = ldlFriedewald({ totalChol: 200, hdl: 50, tg: 150 })
+assert.ok(f.ldl === 120 && f.nonHdl === 150, 'engine Friedewald differs from the independent rewrite (200-50-150/5 = 120)')
 // Peringatan TG >= 400 harus bertahan: ia benar dan penting.
-assert.ok(/tg >= 400/.test(ldlKode), 'the Friedewald validity limit at TG >= 400 was dropped')
+assert.ok(/FRIEDEWALD_TG_LIMIT = 400/.test(ldlMotorKode) && /tg >= FRIEDEWALD_TG_LIMIT/.test(ldlMotorKode), 'the Friedewald validity limit at TG >= 400 was dropped')
+assert.equal(ldlFriedewald({ totalChol: 300, hdl: 40, tg: 400 }).ldl, null, 'LDL was calculated at TG >= 400')
+assert.equal(ldlFriedewald({ totalChol: 300, hdl: 40, tg: 399 }).ldl !== null, true, 'LDL was withheld below TG 400')
 
 // ── FluidCalculators ───────────────────────────────────────────────────────
 const cairan = baca('FluidCalculators.tsx')
@@ -72,6 +87,16 @@ assert.ok(/useState<'adult-sepsis' \| 'peds-shock' \| 'burns'>\('adult-sepsis'\)
 // Parkland ditulis ulang: 4 mL x kg x %TBSA.
 const parkland = (kg: number, tbsa: number) => 4 * kg * tbsa
 assert.equal(parkland(70, 20), 5600, 'the old defaults no longer give 5600 mL; re-read this gate')
-assert.ok(/4 \* weightKg \* tbsaPct/.test(cairanKode), 'the page no longer applies the Parkland formula')
+// Rumus kini berada di mesin domain; gerbang memeriksa kode mesin DAN perilakunya.
+const motor = readFileSync(new URL('../../src/domains/clinical-calculators/engine/fluidElectrolytes.ts', import.meta.url), 'utf8')
+assert.ok(/4 \* w \* v\.ok\.tbsaPct/.test(motor), 'the engine no longer applies the Parkland formula')
+assert.ok(/resuscitation\(/.test(cairanKode), 'the page no longer uses the domain engine')
+const r = resuscitation('burns', 70, 20)
+assert.ok(r.ok && r.ml === 5600, 'engine Parkland differs from the independent rewrite')
+assert.equal(resuscitation('burns', NaN, NaN).ok, false, 'a burns volume was produced from empty fields')
+assert.equal(maintenanceFluid(NaN).ok, false, 'a maintenance rate was produced from an empty weight')
+assert.equal(correctedSodium(NaN, NaN).ok, false, 'a corrected sodium was produced from empty fields')
+assert.equal(naCorrectionRate(NaN, NaN, 'M').ok, false, 'a sodium correction rate was produced from empty fields')
+assert.equal(potassiumDeficit(NaN, NaN).ok, false, 'a potassium deficit was produced from empty fields')
 
 console.log('cairan-elektrolit-tanpa-hasil-awal: ok')

@@ -15,9 +15,9 @@ OUT = argv[argv.index("--out") + 1] if "--out" in argv else os.path.join(os.path
 
 KEYS = ["panacea_structure_id", "canonical_name", "panacea_body_id", "panacea_system", "panacea_kind", "panacea_laterality",
         "panacea_laterality_source", "panacea_position_side", "panacea_region", "panacea_source", "panacea_license",
-        "panacea_source_raw_name", "panacea_accuracy_status", "panacea_review_status", "panacea_reference", "panacea_method",
+        "panacea_source_raw_name", "panacea_source_labels", "panacea_source_file", "panacea_accuracy_status", "panacea_review_status", "panacea_reference", "panacea_method",
         "panacea_known_limitations", "panacea_qa_note", "panacea_version", "biological_sex_applicability",
-        "panacea_kind", "panacea_ta2_id", "panacea_latin_name", "panacea_name_fr", "panacea_ta2_match", "panacea_source_group"]
+        "panacea_kind", "panacea_ta2_id", "panacea_latin_name", "panacea_name_fr", "panacea_ta2_match", "panacea_source_group", "panacea_individual", "panacea_clinically_reviewed"]
 
 
 def mesh_stats(o):
@@ -58,7 +58,7 @@ def run(out=OUT):
     for o in bpy.data.objects:
         if o.type != 'MESH' or "panacea_structure_id" not in o:
             continue
-        e = {k: o[k] for k in KEYS if k in o}
+        e = {k: (list(o[k]) if k == "panacea_source_labels" else o[k]) for k in KEYS if k in o}
         for k in o.keys():
             if k.startswith("qa_"):
                 e[k] = o[k]

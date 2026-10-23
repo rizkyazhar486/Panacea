@@ -11,7 +11,10 @@
 // hanya terlihat kalau benar-benar dilihat.
 import { chromium } from '@playwright/test'
 
-const url = process.env.BILAH_QA_URL || 'http://127.0.0.1:4173/#/latihan?t=pelatih'
+// Spanduk harian kini hanya dipasang di Beranda, jadi tumpang-tindihnya diuji
+// di sana; hierarki judul (langkah 4) tetap diuji di halaman Latihan.
+const url = process.env.BILAH_QA_URL || 'http://127.0.0.1:4173/#/'
+const urlLatihan = process.env.BILAH_QA_URL_LATIHAN || 'http://127.0.0.1:4173/#/latihan?t=pelatih'
 
 const browser = await chromium.launch({ headless: true })
 const context = await browser.newContext({
@@ -50,8 +53,21 @@ try {
   //    Dikenali lewat penanda stabil, bukan teks labelnya: label "Today's
   //    reminder" dihapus demi keringkasan dan gerbang ini ikut buta karenanya.
   const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('[data-daily-reminder]')]
-    .some((d) => getComputedStyle(d).position === 'fixed' && (d.textContent || '').trim().length > 0))
+    .some((d) => d.getBoundingClientRect().height > 0 && (d.textContent || '').trim().length > 0))
   if (!adaSpanduk) throw new Error('spanduk harian tidak tampil, jadi tumpang-tindihnya tidak teruji sama sekali')
+
+  const quoteLayout = await page.evaluate(() => {
+    const banner = document.querySelector('[data-daily-reminder]').getBoundingClientRect()
+    const close = document.querySelector('[data-daily-reminder] button[aria-label="Dismiss"]').getBoundingClientRect()
+    const overlapsHeading = [...document.querySelectorAll('main h1')].some((node) => {
+      const heading = node.getBoundingClientRect()
+      return Math.min(banner.right, heading.right) > Math.max(banner.left, heading.left)
+        && Math.min(banner.bottom, heading.bottom) > Math.max(banner.top, heading.top)
+    })
+    return { overlapsHeading, dismissTarget: close.width >= 44 && close.height >= 44 }
+  })
+  if (quoteLayout.overlapsHeading) throw new Error('daily quote covers the Home heading')
+  if (!quoteLayout.dismissTarget) throw new Error('daily quote dismiss target is smaller than 44px')
 
   // 2. Tidak boleh ada apa pun yang MENUTUPI bilah atas.
   //
@@ -106,6 +122,8 @@ try {
   // 4. Konteks lokasi harus terbaca utuh pada 390px. Category page tetap
   // hadir sebagai level pertama; ponsel boleh memakai short label yang sama
   // maknanya, tanpa membuat taxonomy baru atau membuang level konteks.
+  await page.goto(urlLatihan, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('header.kaca h1[data-navigation-hierarchy="v1"]', { state: 'visible' })
   const hierarki = page.locator('header.kaca h1[data-navigation-hierarchy="v1"]').first()
   await hierarki.waitFor({ state: 'visible' })
   const infoHierarki = await hierarki.evaluate((node) => ({

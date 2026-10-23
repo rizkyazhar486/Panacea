@@ -23,10 +23,10 @@ const expected = [
 
 test('universal human acceptance standard is wired into core authority', () => {
   for (const path of [
-    'PANACEA_SYSTEM_10_STANDARD.md',
-    'PANACEA_PRODUCT_MATURITY_OS.md',
-    'PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
-    'PANACEA_INDEPENDENT_REVIEW_DOSSIER.md',
+    'governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md',
+    'governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md',
+    'governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
+    'governance/doctrine/PANACEA_INDEPENDENT_REVIEW_DOSSIER.md',
     'AGENTS.md',
   ]) {
     assert.match(read(path), /PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD\.md/)
@@ -46,7 +46,7 @@ test('unmeasured universality dimensions cannot self-award 10/10', () => {
 })
 
 test('standard rejects rigid one-size-fits-all universality and preserves compactness', () => {
-  const standard = read('PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md')
+  const standard = read('governance/doctrine/PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD.md')
   assert.match(standard, /Universal does not mean identical/)
   assert.match(standard, /Maximum orchestration depth, minimum visible complexity/)
   assert.match(standard, /Any human\. Any care setting\. One trusted longitudinal care flow/)

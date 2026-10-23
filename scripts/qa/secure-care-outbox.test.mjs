@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { sendOrQueueEncryptedCareReport } from '../../src/lib/secureCareOutbox.ts'
 
 const secure = readFileSync(new URL('../../src/lib/secureCareOutbox.ts', import.meta.url), 'utf8')
-const ui = readFileSync(new URL('../../src/components/CekHarian.tsx', import.meta.url), 'utf8')
+const ui = readFileSync(new URL('../../src/components/clinical/CekHarian.tsx', import.meta.url), 'utf8')
 
 test('offline clinical answers use authenticated encryption and a non-extractable key', () => {
   assert.match(secure, /AES-GCM/)

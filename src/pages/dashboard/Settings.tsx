@@ -16,6 +16,7 @@ import {
   IconUser,
   IconCheck,
   IconChevronRight,
+  IconLogout,
 } from '../../components/icons'
 import {
   getThemePref,
@@ -32,13 +33,29 @@ import {
 import { LANGS, getLang, setLang, t, type Lang } from '../../lib/i18n'
 import { enablePush, disablePush, pushStatus, resyncPush, type PushStatus } from '../../lib/push'
 import { InstallApp } from '../../components/InstallApp'
-import { OfflineReady } from '../../components/OfflineReady'
+import { OfflineReady, type OfflinePage } from '../../components/OfflineReady'
 import { api, backendEnabled } from '../../lib/api'
+
+const OFFLINE_PAGES: OfflinePage[] = [
+  { label: 'Athlete', imp: () => import('../Athlete') },
+  { label: 'Performance Lab', imp: () => import('../fitness/PerformanceLab') },
+  { label: 'AI Program', imp: () => import('../fitness/TrainingPlan') },
+  { label: 'Body Composition', imp: () => import('../bodyhub/BodyComposition') },
+  { label: 'Initial Assessment', imp: () => import('../clinical/InitialAssessment') },
+  { label: 'Science & KPIs', imp: () => import('../fitness/SportsScience') },
+  { label: 'Fitness Test', imp: () => import('../fitness/FitnessTest') },
+  { label: 'Logs & Stats', imp: () => import('../medstudy/Logs') },
+]
 
 export function Settings() {
   const store = useStore()
   const { state, updateSettings, resetDemo } = store
   const nav = useNavigate()
+
+  const handleLogout = () => {
+    if (backendEnabled) api.logout().catch(() => {})
+    store.logout()
+  }
 
   const [themePref, setThemePrefState] = useState<ThemePref>(getThemePref)
   const [lang, setLangState] = useState<Lang>(getLang)
@@ -123,7 +140,7 @@ export function Settings() {
       <InstallApp />
 
       {/* ── Offline mode ───────────────────────────────────────── */}
-      <OfflineReady />
+      <OfflineReady pages={OFFLINE_PAGES} />
 
       {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>
@@ -289,6 +306,28 @@ export function Settings() {
           </span>
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
+      </Card>
+
+      {/* Sesi Akun & Logout */}
+      <Card>
+        <SectionTitle
+          icon={<IconLogout size={S ? 22 : 18} />}
+          title="Sesi Akun & Keluar"
+          subtitle="Keluar dari sesi akun aktif pada perangkat ini"
+        />
+        <p className={`text-neutral-500 ${S ? 'text-sm' : 'text-xs'}`}>
+          Setelah keluar, data rekam medis Anda tetap tersimpan dengan aman di server dan Anda dapat masuk kembali kapan saja.
+        </p>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/60 font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 ${
+            S ? 'py-4 text-base' : 'py-3 text-sm'
+          }`}
+        >
+          <IconLogout size={18} />
+          <span>Keluar dari Akun (Log Out)</span>
+        </button>
       </Card>
 
       {/* App info */}

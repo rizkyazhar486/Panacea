@@ -1,0 +1,365 @@
+{
+ "frames": 793,
+ "fps": 24,
+ "timeline": [
+  {
+   "movement": "shoulder flexion",
+   "frames": [
+    1,
+    37,
+    73
+   ],
+   "target_deg": 120,
+   "note": "120 of AAOS 180: glenohumeral share by the 2:1 scapulohumeral rhythm (Inman et al. 1944); no scapulothoracic joint yet"
+  },
+  {
+   "movement": "shoulder abduction",
+   "frames": [
+    73,
+    109,
+    145
+   ],
+   "target_deg": 90,
+   "note": "90 of AAOS 180: no scapulothoracic joint yet"
+  },
+  {
+   "movement": "elbow flexion",
+   "frames": [
+    145,
+    181,
+    217
+   ],
+   "target_deg": 150,
+   "note": "AAOS 150"
+  },
+  {
+   "movement": "forearm pronation",
+   "frames": [
+    217,
+    253,
+    289
+   ],
+   "target_deg": 120,
+   "note": "120 of 160 (AAOS 80+80 from supinated rest): beyond ~120 the lunate meets the ulnar head because the TFCC disc is not modelled and the distal axis point is approximate"
+  },
+  {
+   "movement": "wrist flexion",
+   "frames": [
+    289,
+    325,
+    361
+   ],
+   "target_deg": 80,
+   "note": "AAOS 80"
+  },
+  {
+   "movement": "wrist extension",
+   "frames": [
+    361,
+    397,
+    433
+   ],
+   "target_deg": 70,
+   "note": "AAOS 70"
+  },
+  {
+   "movement": "hip flexion (knee flexed)",
+   "frames": [
+    433,
+    469,
+    505
+   ],
+   "target_deg": 120,
+   "note": "AAOS hip 120, knee flexed"
+  },
+  {
+   "movement": "hip abduction",
+   "frames": [
+    505,
+    541,
+    577
+   ],
+   "target_deg": 45,
+   "note": "AAOS 45"
+  },
+  {
+   "movement": "knee flexion",
+   "frames": [
+    577,
+    613,
+    649
+   ],
+   "target_deg": 135,
+   "note": "AAOS 135"
+  },
+  {
+   "movement": "ankle plantarflexion",
+   "frames": [
+    649,
+    685,
+    721
+   ],
+   "target_deg": 50,
+   "note": "AAOS 50"
+  },
+  {
+   "movement": "ankle dorsiflexion",
+   "frames": [
+    721,
+    757,
+    793
+   ],
+   "target_deg": 20,
+   "note": "AAOS 20"
+  }
+ ],
+ "rest_joint_deg": {
+  "knee": 2.9,
+  "elbow": 11.0
+ },
+ "max_joint_excursion_deg": {
+  "knee": 129.6,
+  "elbow": 149.9,
+  "hip": 120.0,
+  "shoulder": 120.0
+ },
+ "angle_within_limits": true,
+ "bone_contact_overlap": [
+  {
+   "pair": [
+    "FEMUR.L",
+    "TIBIA.L"
+   ],
+   "max_penetration_mm": 1.31,
+   "at_frame": 625,
+   "movement": "knee flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "ULNA.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "RADIUS.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "FEMUR.L",
+    "HIP_BONE.L"
+   ],
+   "max_penetration_mm": 0.19,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "SCAPULA.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.L",
+    "CLAVICLE.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.L",
+    "ULNA.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "TIBIA.L",
+    "TALUS.L"
+   ],
+   "max_penetration_mm": 0.8,
+   "at_frame": 685,
+   "movement": "ankle plantarflexion"
+  },
+  {
+   "pair": [
+    "FIBULA.L",
+    "TALUS.L"
+   ],
+   "max_penetration_mm": 0.61,
+   "at_frame": 757,
+   "movement": "ankle dorsiflexion"
+  },
+  {
+   "pair": [
+    "RADIUS.L",
+    "LUNATE_BONE.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.L",
+    "SCAPHOID_BONE.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "ULNA.L",
+    "LUNATE_BONE.L"
+   ],
+   "max_penetration_mm": 1.31,
+   "at_frame": 253,
+   "movement": "forearm pronation"
+  },
+  {
+   "pair": [
+    "ULNA.L",
+    "TRIQUETRUM_BONE.L"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "FEMUR.R",
+    "TIBIA.R"
+   ],
+   "max_penetration_mm": 1.07,
+   "at_frame": 481,
+   "movement": "hip flexion (knee flexed)"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "ULNA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "RADIUS.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "FEMUR.R",
+    "HIP_BONE.R"
+   ],
+   "max_penetration_mm": 0.71,
+   "at_frame": 469,
+   "movement": "hip flexion (knee flexed)"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "SCAPULA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "HUMERUS.R",
+    "CLAVICLE.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.R",
+    "ULNA.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "TIBIA.R",
+    "TALUS.R"
+   ],
+   "max_penetration_mm": 0.8,
+   "at_frame": 685,
+   "movement": "ankle plantarflexion"
+  },
+  {
+   "pair": [
+    "FIBULA.R",
+    "TALUS.R"
+   ],
+   "max_penetration_mm": 0.61,
+   "at_frame": 757,
+   "movement": "ankle dorsiflexion"
+  },
+  {
+   "pair": [
+    "RADIUS.R",
+    "LUNATE_BONE.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "RADIUS.R",
+    "SCAPHOID_BONE.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  },
+  {
+   "pair": [
+    "ULNA.R",
+    "LUNATE_BONE.R"
+   ],
+   "max_penetration_mm": 1.31,
+   "at_frame": 253,
+   "movement": "forearm pronation"
+  },
+  {
+   "pair": [
+    "ULNA.R",
+    "TRIQUETRUM_BONE.R"
+   ],
+   "max_penetration_mm": 0.0,
+   "at_frame": 1,
+   "movement": "shoulder flexion"
+  }
+ ],
+ "no_new_bone_penetration": true,
+ "ok": true
+}

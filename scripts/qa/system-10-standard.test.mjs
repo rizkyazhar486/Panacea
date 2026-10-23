@@ -6,9 +6,9 @@ const read = (path) => readFileSync(new URL('../../' + path, import.meta.url), '
 
 test('system 10 standard is wired into core product authority documents', () => {
   for (const path of [
-    'PANACEA_HUMANITY_10_CHARTER.md',
-    'PANACEA_PRODUCT_MATURITY_OS.md',
-    'PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
+    'governance/doctrine/PANACEA_HUMANITY_10_CHARTER.md',
+    'governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md',
+    'governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md',
     'AGENTS.md',
   ]) {
     assert.match(read(path), /PANACEA_SYSTEM_10_STANDARD\.md/)
@@ -16,7 +16,7 @@ test('system 10 standard is wired into core product authority documents', () => 
 })
 
 test('system 10 standard uses a weakest-link law and preserves permissioned observability', () => {
-  const standard = read('PANACEA_SYSTEM_10_STANDARD.md')
+  const standard = read('governance/doctrine/PANACEA_SYSTEM_10_STANDARD.md')
   assert.match(standard, /S_system = min\(A, O, I, H, E, P, R, T, F, U, D, B, C, Q\)/)
   assert.match(standard, /permissioned Human Observability/)
   assert.match(standard, /PANACEA_UNIVERSAL_HUMAN_ACCEPTANCE_STANDARD\.md/)

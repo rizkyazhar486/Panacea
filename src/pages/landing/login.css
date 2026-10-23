@@ -1,0 +1,198 @@
+/* ── Login screen role switcher, submit button & theme harmony ────────── */
+
+.login-page-root {
+  background-color: #ffffff;
+  color: #0c1410;
+}
+.dark .login-page-root {
+  background-color: #060a08 !important;
+  color: #eef2ef !important;
+}
+
+.login-form-panel {
+  background-color: #ffffff;
+  color: #0c1410;
+}
+.dark .login-form-panel {
+  background-color: #060a08 !important;
+  color: #eef2ef !important;
+}
+
+/* ── Primary Role Switcher (Pasien vs Medis) ─────────────────────────── */
+.login-role-switch {
+  display: flex;
+  padding: 4px;
+  border-radius: 16px;
+  background-color: #f1f5f3 !important;
+  border: 1px solid rgba(13, 39, 26, 0.08) !important;
+}
+.dark .login-role-switch {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.login-role-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.login-role-tab:not([data-active="true"]) {
+  background: transparent !important;
+  color: #64748b !important;
+}
+.dark .login-role-tab:not([data-active="true"]) {
+  background: transparent !important;
+  color: #94a3b8 !important;
+}
+.login-role-tab:not([data-active="true"]):hover {
+  color: #0f172a !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+.dark .login-role-tab:not([data-active="true"]):hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+.login-role-tab[data-active="true"] {
+  background: #00bf63 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.35) !important;
+}
+.dark .login-role-tab[data-active="true"] {
+  background: #00bf63 !important;
+  color: #041a0d !important;
+  font-weight: 800;
+  box-shadow: 0 4px 18px rgba(0, 191, 99, 0.45) !important;
+}
+
+/* ── Sub-role pills (Dokter, Kontributor, Verifikator, etc.) ───────────── */
+button.login-subrole-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+button.login-subrole-btn:not([data-selected="true"]) {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+}
+button.login-subrole-btn:not([data-selected="true"]):hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+.dark button.login-subrole-btn:not([data-selected="true"]) {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.dark button.login-subrole-btn:not([data-selected="true"]):hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+button.login-subrole-btn[data-selected="true"] {
+  background: #00bf63 !important;
+  color: #ffffff !important;
+  border: 1px solid #00bf63 !important;
+  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.4) !important;
+  font-weight: 800 !important;
+}
+.dark button.login-subrole-btn[data-selected="true"] {
+  background: #00bf63 !important;
+  color: #041a0d !important;
+  border: 1px solid #00bf63 !important;
+  box-shadow: 0 4px 16px rgba(0, 191, 99, 0.5) !important;
+  font-weight: 800 !important;
+}
+
+/* ── Google Button ────────────────────────────────────────────────────── */
+button.login-google-btn {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid #e2e8f0 !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+button.login-google-btn:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.dark button.login-google-btn {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #f1f5f3 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+.dark button.login-google-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ── Primary Submit Button ────────────────────────────────────────────── */
+button.login-submit-btn {
+  min-height: 46px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+button.login-submit-btn:not(:disabled) {
+  background: linear-gradient(180deg, #00bf63 0%, #0b7a4b 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 191, 99, 0.45) !important;
+  cursor: pointer;
+}
+button.login-submit-btn:not(:disabled):hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px -4px rgba(0, 191, 99, 0.55) !important;
+}
+button.login-submit-btn:not(:disabled):active {
+  transform: scale(0.985);
+}
+.dark button.login-submit-btn:not(:disabled) {
+  background: linear-gradient(180deg, #00bf63 0%, #08633c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 8px 26px -4px rgba(0, 191, 99, 0.5) !important;
+}
+
+/* Disabled state — WCAG compliant contrast, soft background, clear text */
+button.login-submit-btn:disabled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+.dark button.login-submit-btn:disabled {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}

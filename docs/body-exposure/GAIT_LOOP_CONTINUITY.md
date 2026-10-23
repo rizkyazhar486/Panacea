@@ -1,0 +1,40 @@
+# WALK / RUN loop continuity and clip transitions (adult male rig)
+
+Measured 2026-10-10 on the published `adult_male.rig_rom.glb` from PR #2300 (fixed loop timing), decoded with
+`gltfpack -noq -af 0` (without `-af 0` gltfpack resamples to 30 Hz and the numbers change).
+Reproduce: `python3 bodyexposure/pipeline/check_gait_loop.py <decoded.glb>` (needs numpy); browser part: `qa/gait-visual-check.mjs`.
+Reports: `bodyexposure/qa_reports/gait_loop_continuity.json`, `gait_visual_browser.json`.
+
+## What was checked and the result
+
+| Check | WALK (27 keys, 1.083 s) | RUN (19 keys, 0.75 s) |
+|---|---|---|
+| Max seam angle, first vs last key, 10 animated bones | 0.0° | 0.0° |
+| Pelvis/root drift | 0.0 m | 0.0 m |
+| Angular-velocity jump at the seam, worst bone | 132 deg/s (SHIN.L) | 251 deg/s (SHIN.R) |
+| Same jump relative to the largest interior frame-to-frame change of that bone | ≤ 0.48 | ≤ 0.83 |
+| Bones whose seam jump exceeds their own interior maximum | none | none |
+| Root velocity jump (vertical bounce) | 0.12 m/s | 0.33 m/s |
+
+Reading: endpoints match exactly, and the velocity step at the wrap is no larger than the variation between ordinary
+neighbouring keys. Endpoint match alone would not have shown that, so both are reported. At 24 fps the finite differences
+are coarse; this is not a proof of C1 continuity.
+
+## Defect found: clip switches are hard cuts
+
+The viewer used `stopAllAction()` then `play()`, so a switch jumped to the new clip's first pose. Largest single-bone pose jump
+between first keys: ROM↔WALK 69°, ROM↔RUN 117°, WALK↔RUN 102°.
+Fix in this PR: the last pose of the old clip is captured and blended into the new clip over 0.3 s (smootherstep,
+`crossfadeWeight`, unit-tested). Browser check: the first frame after a switch is 85–89 % of the hard-cut pixel difference
+(the screenshot itself takes a sizeable part of the 0.3 s, so this shows a blend in progress, not exact continuity).
+
+## Not verified
+
+- **Foot sliding, WALK (measured, upper bound):** `check_foot_slide.py` tracks a rigid toe marker on the foot mesh of the rig in Blender. Over 3 stance phases (29 frames) the toe stays within 11 mm RMS and 30 mm at most of a straight line at one common forward speed of 1.34 m/s, which is a plausible walking speed. This is an upper bound, not the true slide: the rig has no toe or heel bone, so the rigid toe marker also rolls with the foot. The heel marker has only one 4-frame stance phase and its fit (0.49 m/s) is not reliable. Report: `qa_reports/gait_foot_slide.json`.
+- **Independent reproduction and correction (2026-10-11):** `scripts/qa/glb-foot-contact-reproduce.mjs` recomputes this from the public GLB without Blender (reports under `bodyexposure/qa_reports/gait_foot_contact_reproduction.*.json`, checked by `scripts/uji/body-gait-foot-contact-reproduction.mts`). Two method corrections: the clip is a closed loop, so a stance phase across the seam counts once and the duplicate end frame is dropped (male WALK toe is 2 phases / 28 frames, 12.6 mm RMS, 32.2 mm max, not 3 / 29); and one clip-wide floor is used, under which the heel marker never touches the ground in WALK or RUN, so the 24.5 mm heel figure above is not a valid contact measurement. A third correction (2026-10-11, plantar landmarks): the earlier extreme-vertex markers sit at ankle height, not on the sole. Using the lowest vertex in the posterior/anterior quarter of the foot at rest, male WALK heel and toe each give 2 stance phases with at most 16.6 mm slide (RMS 7.8/8.7 mm), heel-off before toe-off; the female rig (CT bones without sole tissue) shows no plantar-landmark contact, and RUN is not measurable (right foot 3 frames below 15 mm, left foot 2). The pelvis/root has only a vertical bob and no forward drift. Blender was not available for this change, so no rig or mesh was altered. Thresholds stay explicit research placeholders, not clinically validated.
+- **Foot sliding, RUN: NOT VERIFIED.** Only one 3-frame heel stance phase and none at the toe were detected, too few to fit a speed.
+- Animation in a physical sense (ground reaction, centre of mass) is not modelled. The motion is CMU motion capture of one other
+  person, retargeted and range-limited; it is not patient biomechanics.
+- The viewer applies no root speed to the in-place clips, so on screen the feet do move relative to the ground; the figures above say how well a root speed could remove that.
+- Real-GPU frame rate: the 48–60 fps figures come from software rendering in headless Chrome.
+- `clinically_reviewed` is false; nothing here is clinical validation.

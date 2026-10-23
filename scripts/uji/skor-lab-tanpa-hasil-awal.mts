@@ -1,6 +1,7 @@
 import { bacaSumber } from '../lib/sumberAsli.mjs'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { findrisc as findriscMotor } from '../../src/domains/clinical-calculators/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NOL YANG PALING BERBAHAYA ADALAH NOL YANG BERARTI "PULANGKAN SAJA".
@@ -51,8 +52,14 @@ const finKode = kodeDari(fin)
 assert.ok(!/useState\(demo\.age \|\| 45\)/.test(finKode) && !/: 24\n/.test(finKode),
   'the age 45 / BMI 24 defaults are back in FINDRISC')
 assert.ok(!/useState\(90\)/.test(finKode), 'the waist 90 cm default is back')
-assert.ok(/const result = lengkap \? band\(score\) : null/.test(finKode),
-  'FINDRISC still prints a ten-year diabetes percentage without the measurements')
+assert.ok(/const \[waistText, setWaist\] = useState\(''\)/.test(finKode), 'the waist field has a starting value again')
+// Mesin domain: tanpa ukuran, tidak ada skor/persentase (dulu halaman mencetak risiko 10 tahun).
+const finDasar = { age: NaN, bmi: NaN, waist: NaN, sex: 'M', active: true, veg: true, bpMed: false, highGlucose: false, family: 0 } as const
+const finKosong = findriscMotor(finDasar)
+assert.equal(finKosong.score, null, 'FINDRISC still prints a ten-year diabetes percentage without the measurements')
+assert.equal(finKosong.band, null)
+assert.deepEqual(finKosong.missing, ['age', 'BMI', 'waist circumference'])
+assert.ok(/hitungFindrisc\(\{/.test(finKode) && /const result = hasil\.band/.test(finKode), 'the page does not use the domain engine')
 assert.ok(/getDemoTersimpan/.test(finKode) && !/\bgetDemo\s*\(/.test(finKode), 'FINDRISC still reads getDemo()')
 // Pertanyaan gaya hidup TETAP terjawab -- itu jawaban bernilai nol poin.
 for (const tetap of ['active, setActive] = useState(true)', 'veg, setVeg] = useState(true)']) {
@@ -64,9 +71,11 @@ const sb = baca('SleepApneaScreen.tsx')
 const sbKode = kodeDari(sb)
 assert.ok(!/useState\(demo\.sex === 'M'\)/.test(sbKode),
   'sex again defaults to male, handing every user a BANG point they did not answer for')
-assert.ok(/const male = sex === 'M'/.test(sbKode), 'the sex answer is no longer explicit')
-assert.ok(/const band = lengkap \? bandFor\(total\) : null/.test(sbKode),
-  'STOP-BANG still bands a total that includes an unanswered sex point')
+// Skor kini dihitung mesin stopBang (scripts/uji/stop-bang.mts membuktikan sex '' → missing, tanpa skor); halaman hanya
+// boleh meneruskan jawaban jenis kelamin apa adanya dan menampilkan pita hanya bila mesin memberinya.
+assert.ok(/bmi: parseNumberField\(bmiText\).*sex,/s.test(sbKode), 'the sex answer is no longer passed explicitly to the engine')
+assert.ok(/const band = hasil\.band !== null \? BANDS\[hasil\.band\] : null/.test(sbKode),
+  'STOP-BANG shows a band the engine did not give (e.g. with an unanswered sex point)')
 assert.ok(/<option value="">Not answered<\/option>/.test(sb), 'there is no way to leave sex unanswered')
 assert.ok(/useState<Record<string, boolean>>\(\{\}\)/.test(sbKode),
   'the four STOP questions were dragged into being required; unticked means no, worth zero')

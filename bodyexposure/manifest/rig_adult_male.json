@@ -18,19 +18,29 @@
    0.4555
   ],
   "ELBOW.L": [
-   0.2164,
-   0.04,
-   1.1113
+   0.2182,
+   0.0281,
+   1.1033
   ],
   "ANKLE.L": [
-   0.0772,
-   0.0434,
-   0.0793
+   0.074,
+   0.0407,
+   0.0679
   ],
   "WRIST.L": [
-   0.2646,
-   -0.014,
-   0.856
+   0.2638,
+   -0.02,
+   0.852
+  ],
+  "RADIAL_HEAD.L": [
+   0.2381,
+   0.029,
+   1.0879
+  ],
+  "ULNAR_HEAD.L": [
+   0.2462,
+   -0.0134,
+   0.8624
   ],
   "HAND_END.L": [
    0.2713,
@@ -63,19 +73,29 @@
    0.4556
   ],
   "ELBOW.R": [
-   -0.2163,
-   0.04,
-   1.1113
+   -0.2181,
+   0.0281,
+   1.1033
   ],
   "ANKLE.R": [
-   -0.0772,
-   0.0434,
-   0.0793
+   -0.074,
+   0.0407,
+   0.0679
   ],
   "WRIST.R": [
-   -0.2646,
-   -0.014,
-   0.856
+   -0.2638,
+   -0.02,
+   0.852
+  ],
+  "RADIAL_HEAD.R": [
+   -0.2381,
+   0.029,
+   1.0879
+  ],
+  "ULNAR_HEAD.R": [
+   -0.2462,
+   -0.0134,
+   0.8624
   ],
   "HAND_END.R": [
    -0.2713,
@@ -242,14 +262,38 @@
   },
   "ELBOW.L": {
    "method": "midpoint of humeral epicondyles",
-   "mirror_snap_mm": 0.05
+   "mirror_snap_mm": 0.05,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 14.4,
+   "max_penetration_mm": [
+    9.07,
+    0.23
+   ]
   },
   "ANKLE.L": {
    "method": "midpoint of medial and lateral malleoli",
-   "mirror_snap_mm": 0.05
+   "mirror_snap_mm": 0.05,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 12.2,
+   "max_penetration_mm": [
+    4.23,
+    0.78
+   ]
   },
   "WRIST.L": {
-   "method": "midpoint of radial and ulnar styloid tips (most distal vertices)"
+   "method": "midpoint of radial and ulnar styloid tips (most distal vertices)",
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 7.2,
+   "max_penetration_mm": [
+    4.84,
+    0.0
+   ]
+  },
+  "RADIAL_HEAD.L": {
+   "method": "centroid of the proximal 12 mm of the radius (radial head)"
+  },
+  "ULNAR_HEAD.L": {
+   "method": "centroid of the distal 15 mm of the ulna (ulnar head)"
   },
   "HAND_END.L": {
    "method": "distal end of third metacarpal"
@@ -278,14 +322,38 @@
   },
   "ELBOW.R": {
    "method": "midpoint of humeral epicondyles",
-   "mirror_snap_mm": 0.0
+   "mirror_snap_mm": 0.0,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 14.4,
+   "max_penetration_mm": [
+    9.07,
+    0.24
+   ]
   },
   "ANKLE.R": {
    "method": "midpoint of medial and lateral malleoli",
-   "mirror_snap_mm": 0.0
+   "mirror_snap_mm": 0.0,
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 12.2,
+   "max_penetration_mm": [
+    4.23,
+    0.78
+   ]
   },
   "WRIST.R": {
-   "method": "midpoint of radial and ulnar styloid tips (most distal vertices)"
+   "method": "midpoint of radial and ulnar styloid tips (most distal vertices)",
+   "refined": "surface-congruence hinge fit",
+   "shift_mm": 7.2,
+   "max_penetration_mm": [
+    4.84,
+    0.0
+   ]
+  },
+  "RADIAL_HEAD.R": {
+   "method": "centroid of the proximal 12 mm of the radius (radial head)"
+  },
+  "ULNAR_HEAD.R": {
+   "method": "centroid of the distal 15 mm of the ulna (ulnar head)"
   },
   "HAND_END.R": {
    "method": "distal end of third metacarpal"
@@ -402,19 +470,21 @@
   "SPINE.C2": 34.9,
   "HEAD": 153.0,
   "CLAVICLE.L": 167.9,
-  "UPPER_ARM.L": 276.0,
-  "FOREARM.L": 265.4,
-  "HAND.L": 90.1,
+  "UPPER_ARM.L": 283.9,
+  "FOREARM.L": 259.9,
+  "FOREARM_ROT.L": 229.6,
+  "HAND.L": 85.0,
   "CLAVICLE.R": 167.9,
-  "UPPER_ARM.R": 276.0,
-  "FOREARM.R": 265.5,
-  "HAND.R": 90.1,
+  "UPPER_ARM.R": 283.9,
+  "FOREARM.R": 259.9,
+  "FOREARM_ROT.R": 229.6,
+  "HAND.R": 85.0,
   "THIGH.L": 405.9,
-  "SHIN.L": 376.4,
-  "FOOT.L": 142.0,
+  "SHIN.L": 387.7,
+  "FOOT.L": 135.7,
   "THIGH.R": 405.9,
-  "SHIN.R": 376.4,
-  "FOOT.R": 142.0
+  "SHIN.R": 387.7,
+  "FOOT.R": 135.7
  },
  "rom_limits_deg_local": {
   "THIGH.L": {
@@ -434,8 +504,8 @@
   },
   "SHIN.L": {
    "X": [
-    -135,
-    0
+    0,
+    135
    ],
    "Y": [
     0,
@@ -445,12 +515,12 @@
     0,
     0
    ],
-   "positive_X": "extension"
+   "positive_X": "flexion"
   },
   "FOOT.L": {
    "X": [
-    -50,
-    20
+    -20,
+    50
    ],
    "Y": [
     0,
@@ -460,7 +530,7 @@
     0,
     0
    ],
-   "positive_X": "extension"
+   "positive_X": "flexion"
   },
   "UPPER_ARM.L": {
    "X": [
@@ -479,8 +549,23 @@
   },
   "FOREARM.L": {
    "X": [
+    -150,
+    0
+   ],
+   "Y": [
     0,
-    150
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "extension"
+  },
+  "FOREARM_ROT.L": {
+   "X": [
+    0,
+    0
    ],
    "Y": [
     0,
@@ -573,6 +658,21 @@
     150
    ],
    "Y": [
+    0,
+    0
+   ],
+   "Z": [
+    0,
+    0
+   ],
+   "positive_X": "flexion"
+  },
+  "FOREARM_ROT.R": {
+   "X": [
+    0,
+    0
+   ],
+   "Y": [
     -160,
     0
    ],
@@ -584,33 +684,118 @@
   },
   "HAND.R": {
    "X": [
-    -70,
-    80
+    -80,
+    70
    ],
    "Y": [
     0,
     0
    ],
    "Z": [
-    -20,
-    30
+    -30,
+    20
    ],
-   "positive_X": "flexion"
+   "positive_X": "extension"
   }
  },
  "rom_source": "AAOS normal values (Greene & Heckman 1994)",
+ "flexion_axis": "knee, elbow, ankle and wrist flexion about the epicondylar / malleolar / styloid line (ISB); others perpendicular to the bone, anterior roll",
+ "flexion_axis_change_deg": {
+  "SHIN.L": 3.7,
+  "FOREARM.L": 8.2,
+  "FOOT.L": 43.3,
+  "HAND.L": 7.2,
+  "SHIN.R": 3.7,
+  "FOREARM.R": 8.2,
+  "FOOT.R": 43.2,
+  "HAND.R": 7.2
+ },
+ "flexion_axes": {
+  "KNEE.L": [
+   0.9937,
+   -0.06549,
+   0.09097
+  ],
+  "ELBOW.L": [
+   0.9917,
+   0.11938,
+   0.04778
+  ],
+  "ANKLE.L": [
+   0.93305,
+   0.18557,
+   -0.3082
+  ],
+  "WRIST.L": [
+   -0.99018,
+   0.13868,
+   -0.01743
+  ],
+  "KNEE.R": [
+   -0.99369,
+   -0.06552,
+   0.091
+  ],
+  "ELBOW.R": [
+   -0.99169,
+   0.11955,
+   0.04752
+  ],
+  "ANKLE.R": [
+   -0.93312,
+   0.18543,
+   -0.30805
+  ],
+  "WRIST.R": [
+   0.99018,
+   0.13868,
+   -0.01743
+  ]
+ },
+ "hinge_refinement": {
+  "ELBOW.L": {
+   "shift_mm": 14.4,
+   "max_penetration_mm_isb": 9.07,
+   "max_penetration_mm_refined": 0.23
+  },
+  "ANKLE.L": {
+   "shift_mm": 12.2,
+   "max_penetration_mm_isb": 4.23,
+   "max_penetration_mm_refined": 0.78
+  },
+  "WRIST.L": {
+   "shift_mm": 7.2,
+   "max_penetration_mm_isb": 4.84,
+   "max_penetration_mm_refined": 0.0
+  },
+  "ELBOW.R": {
+   "shift_mm": 14.4,
+   "max_penetration_mm_isb": 9.07,
+   "max_penetration_mm_refined": 0.24
+  },
+  "ANKLE.R": {
+   "shift_mm": 12.2,
+   "max_penetration_mm_isb": 4.23,
+   "max_penetration_mm_refined": 0.78
+  },
+  "WRIST.R": {
+   "shift_mm": 7.2,
+   "max_penetration_mm_isb": 4.84,
+   "max_penetration_mm_refined": 0.0
+  }
+ },
  "binding": {
   "PELVIS": 31,
   "CLAVICLE.L": 12,
   "CLAVICLE.R": 12,
-  "FOREARM.L": 12,
-  "FOREARM.R": 12,
-  "SHIN.L": 27,
-  "SHIN.R": 27,
+  "FOREARM.L": 7,
+  "FOREARM.R": 7,
+  "SHIN.L": 28,
+  "SHIN.R": 28,
   "SPINE.T9": 11,
   "SPINE.T4": 18,
-  "FOOT.L": 71,
-  "FOOT.R": 71,
+  "FOOT.L": 70,
+  "FOOT.R": 70,
   "UPPER_ARM.L": 8,
   "UPPER_ARM.R": 8,
   "THIGH.L": 10,
@@ -618,6 +803,8 @@
   "HAND.L": 69,
   "HAND.R": 69,
   "HEAD": 48,
+  "FOREARM_ROT.L": 5,
+  "FOREARM_ROT.R": 5,
   "SPINE.T6": 11,
   "SPINE.C6": 6,
   "SPINE.T11": 7,
@@ -643,8 +830,9 @@
  "qa": {
   "left_right_length_difference_mm": {
    "CLAVICLE": 0.0,
-   "UPPER_ARM": 0.01,
-   "FOREARM": 0.01,
+   "UPPER_ARM": 0.02,
+   "FOREARM": 0.02,
+   "FOREARM_ROT": 0.0,
    "HAND": 0.0,
    "THIGH": 0.0,
    "SHIN": 0.0,
@@ -668,12 +856,12 @@
     "TIBIA": 23.0
    },
    "ANKLE.L": {
-    "TIBIA": 6.8,
-    "TALUS": 4.3
+    "TIBIA": 18.3,
+    "TALUS": 6.5
    },
    "ANKLE.R": {
-    "TIBIA": 6.8,
-    "TALUS": 4.3
+    "TIBIA": 18.3,
+    "TALUS": 6.5
    },
    "SHOULDER.L": {
     "HUMERUS": 18.5,
@@ -684,18 +872,18 @@
     "SCAPULA": 26.7
    },
    "ELBOW.L": {
-    "HUMERUS": 0.6,
-    "ULNA": 2.7
+    "HUMERUS": 1.8,
+    "ULNA": 11.4
    },
    "ELBOW.R": {
-    "HUMERUS": 0.6,
-    "ULNA": 2.7
+    "HUMERUS": 1.8,
+    "ULNA": 11.4
    },
    "WRIST.L": {
-    "RADIUS": 5.0
+    "RADIUS": 11.8
    },
    "WRIST.R": {
-    "RADIUS": 5.0
+    "RADIUS": 11.8
    }
   },
   "bound_meshes": 645,
@@ -703,11 +891,11 @@
   "for_review": [
    [
     "ADULT.MALE.JOINT.ANTERIOR_LIGAMENT_OF_FIBULAR_HEAD.L",
-    "SHIN.L via nearest segment (37 mm)"
+    "SHIN.L via nearest segment (38 mm)"
    ],
    [
     "ADULT.MALE.JOINT.ANTERIOR_LIGAMENT_OF_FIBULAR_HEAD.R",
-    "SHIN.R via nearest segment (37 mm)"
+    "SHIN.R via nearest segment (38 mm)"
    ],
    [
     "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_DISTAL_INTERPHALANGEAL_JOINTS.L",
@@ -755,7 +943,7 @@
    ],
    [
     "ADULT.MALE.JOINT.INFRAPATELLAR_FAT_PAD.L",
-    "SHIN.L via nearest segment (22 mm)"
+    "SHIN.L via nearest segment (21 mm)"
    ],
    [
     "ADULT.MALE.JOINT.INFRAPATELLAR_FAT_PAD.R",
@@ -763,11 +951,11 @@
    ],
    [
     "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.L",
-    "FOOT.L via nearest segment (22 mm)"
+    "FOOT.L via nearest segment (21 mm)"
    ],
    [
     "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.R",
-    "FOOT.R via nearest segment (22 mm)"
+    "FOOT.R via nearest segment (21 mm)"
    ],
    [
     "ADULT.MALE.JOINT.MEDIAN_CRICOTHYROID_LIGAMENT",
@@ -775,11 +963,11 @@
    ],
    [
     "ADULT.MALE.JOINT.OBLIQUE_CORD.L",
-    "FOREARM.L via nearest segment (4 mm)"
+    "FOREARM.L via nearest segment (8 mm)"
    ],
    [
     "ADULT.MALE.JOINT.OBLIQUE_CORD.R",
-    "FOREARM.R via nearest segment (4 mm)"
+    "FOREARM.R via nearest segment (8 mm)"
    ],
    [
     "ADULT.MALE.JOINT.POPLITEOFIBULAR_LIGAMENT.L",
@@ -791,19 +979,19 @@
    ],
    [
     "ADULT.MALE.JOINT.POSTERIOR_LIGAMENT_OF_FIBULAR_HEAD.L",
-    "SHIN.L via nearest segment (33 mm)"
+    "SHIN.L via nearest segment (34 mm)"
    ],
    [
     "ADULT.MALE.JOINT.POSTERIOR_LIGAMENT_OF_FIBULAR_HEAD.R",
-    "SHIN.R via nearest segment (33 mm)"
+    "SHIN.R via nearest segment (34 mm)"
    ],
    [
     "ADULT.MALE.JOINT.POSTERIOR_TIBIOTALAR_LIGAMENT.L",
-    "FOOT.L via nearest segment (24 mm)"
+    "SHIN.L via nearest segment (20 mm)"
    ],
    [
     "ADULT.MALE.JOINT.POSTERIOR_TIBIOTALAR_LIGAMENT.R",
-    "FOOT.R via nearest segment (24 mm)"
+    "SHIN.R via nearest segment (20 mm)"
    ],
    [
     "ADULT.MALE.JOINT.QUADRANGULAR_MEMBRANE.L",
@@ -815,11 +1003,11 @@
    ],
    [
     "ADULT.MALE.JOINT.QUADRATE_LIGAMENT.L",
-    "FOREARM.L via nearest segment (6 mm)"
+    "FOREARM_ROT.L via nearest segment (11 mm)"
    ],
    [
     "ADULT.MALE.JOINT.QUADRATE_LIGAMENT.R",
-    "FOREARM.R via nearest segment (6 mm)"
+    "FOREARM_ROT.R via nearest segment (11 mm)"
    ],
    [
     "ADULT.MALE.JOINT.SUPERIOR_PUBIC_LIGAMENT",
@@ -827,11 +1015,11 @@
    ],
    [
     "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.L",
-    "FOOT.L via nearest segment (25 mm)"
+    "FOOT.L via nearest segment (20 mm)"
    ],
    [
     "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.R",
-    "FOOT.R via nearest segment (25 mm)"
+    "FOOT.R via nearest segment (20 mm)"
    ]
   ],
   "multi_segment_rigid_approximation": [

@@ -19,7 +19,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 // `!important` membuatnya tidak dapat dilawan dari sisi komponen.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const css = readFileSync(new URL('../../public/panacea-ruthless-simple-v50.css', import.meta.url), 'utf8')
+const css = readFileSync(new URL('../../public/ui-iterations/panacea-ruthless-simple-v50.css', import.meta.url), 'utf8')
 
 /** Aturan yang menyasar dialog sekaligus memaksa latar belakang. */
 const blokDialog = [...css.matchAll(/([^{}]*\[role='dialog'\][^{}]*)\{([^}]*)\}/g)]

@@ -8,16 +8,16 @@
   "FOOT.R": 30,
   "HAND.R": 60
  },
- "left_knee_rest_deg": 2.8,
- "left_knee_after_170_request_deg": 132.8,
+ "left_knee_rest_deg": 2.9,
+ "left_knee_after_170_request_deg": 132.5,
  "rom_clamped": true,
  "right_knee_anterior_y_m": -0.4,
  "meshes_far_from_bone": [],
  "wrist_flexion_moves_hand_anterior": true,
  "forearm_pronation_limit_moves_anterior_point_medially": true,
  "hand_X_limits": [
-  -70,
-  80
+  -80,
+  70
  ],
  "forearm_Y_limits": [
   -160,

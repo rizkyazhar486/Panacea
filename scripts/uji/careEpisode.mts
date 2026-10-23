@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 // Regression coverage for the Care Episode Graph (src/lib/careEpisode.ts).
 // Written after three real bugs (stale itemized costs surviving a candidate
 // switch, a manual total silently discarded on itemizing, and a dangling
@@ -23,7 +24,7 @@ import {
 } from '../../src/lib/careEpisode.ts'
 import type { CareEpisode, EMRRecord } from '../../src/lib/types.ts'
 
-const chk = (n: string, c: boolean, x = '') => console.log(c ? 'PASS' : 'FAIL', n, x)
+
 
 // --- stage cascade: recovery + follow-up run in parallel, outcome waits on both ---
 {

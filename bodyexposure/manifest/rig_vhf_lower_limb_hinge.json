@@ -1,0 +1,43 @@
+{
+ "method": "Penyempurnaan pusat engsel siku, pergelangan kaki & pergelangan tangan berbasis kesesuaian permukaan tulang (geometri sumber).",
+ "hinges": {
+  "ANKLE.L": {
+   "isb_centre_m": [
+    0.0347,
+    0.0109,
+    0.1405
+   ],
+   "refined_centre_m": [
+    0.035,
+    0.0074,
+    0.1348
+   ],
+   "shift_mm": 6.7,
+   "max_penetration_mm_isb": 2.19,
+   "max_penetration_mm_refined": 0.25,
+   "range_deg": [
+    -61.86,
+    8.14
+   ]
+  },
+  "ANKLE.R": {
+   "isb_centre_m": [
+    -0.0531,
+    0.0253,
+    0.1328
+   ],
+   "refined_centre_m": [
+    -0.0551,
+    0.0229,
+    0.1299
+   ],
+   "shift_mm": 4.2,
+   "max_penetration_mm_isb": 2.25,
+   "max_penetration_mm_refined": 0.0,
+   "range_deg": [
+    -61.25,
+    8.75
+   ]
+  }
+ }
+}

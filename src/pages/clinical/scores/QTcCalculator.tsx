@@ -6,6 +6,7 @@ import { getDemoTersimpan } from '../../../lib/profile'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { qtc, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // QTc Calculator — corrected QT interval, essential for drug safety (many
@@ -19,40 +20,28 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // RR interval (seconds) = 60 / heart rate (bpm). Pure arithmetic, no API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function band(qtcMs: number, sex: 'M' | 'F'): { label: string; tone: 'brand' | 'low' | 'critical' } {
-  if (qtcMs >= 500) return { label: 'High risk — markedly prolonged', tone: 'critical' }
-  const prolongedCutoff = sex === 'M' ? 450 : 470
-  const borderlineCutoff = sex === 'M' ? 430 : 450
-  if (qtcMs >= prolongedCutoff) return { label: 'Prolonged', tone: 'critical' }
-  if (qtcMs >= borderlineCutoff) return { label: 'Borderline', tone: 'low' }
-  return { label: 'Normal', tone: 'brand' }
-}
-
 export function QTcCalculator() {
   // QT 400 ms pada nadi 60 bukan nilai netral: ia menghasilkan QTc tepat
   // 400 ms, yang dijawab "Normal". Halaman ini dahulu terbuka dengan kabar
   // baik itu -- lengkap dengan kalimat siap salin dan satu titik tren yang
   // tersimpan -- untuk EKG yang belum pernah diukur siapa pun. Keduanya
   // bacaan dari rekaman; tidak ada nilai bawaan yang bisa dibela.
-  const [qtMs, setQtMs] = useState(0)
-  const [hr, setHr] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [qtText, setQtMs] = useState('')
+  const [hrText, setHr] = useState('')
   const [sex, setSex] = useState<'M' | 'F'>(() => (getDemoTersimpan().sex === 'F' ? 'F' : 'M'))
 
-  const belum: string[] = []
-  if (!(qtMs > 0)) belum.push('QT interval')
-  if (!(hr > 0)) belum.push('heart rate')
-  const lengkap = belum.length === 0
-
-  const rrSec = lengkap ? 60 / hr : 0
-  const qtSec = qtMs / 1000
-
-  const bazett = lengkap ? qtSec / Math.sqrt(rrSec) * 1000 : 0
-  const fridericia = lengkap ? qtSec / Math.cbrt(rrSec) * 1000 : 0
-  const framingham = lengkap ? (qtSec + 0.154 * (1 - rrSec)) * 1000 : 0
-  const hodges = lengkap ? qtMs + 1.75 * (hr - 60) : 0
-
+  const qtMs = parseNumberField(qtText)
+  const hr = parseNumberField(hrText)
+  const hasil = qtc({ qtMs, hr, sex })
+  const belum = hasil.missing
+  const lengkap = hasil.bazett !== null
+  const bazett = hasil.bazett ?? 0
+  const fridericia = hasil.fridericia ?? 0
+  const framingham = hasil.framingham ?? 0
+  const hodges = hasil.hodges ?? 0
   const primary = bazett // Bazett is the most widely used in routine practice
-  const primaryBand = lengkap ? band(primary, sex) : null
+  const primaryBand = hasil.band
 
   const rows = [
     { name: 'Bazett', value: bazett, note: 'Most widely used; overcorrects at high heart rates' },
@@ -69,10 +58,10 @@ export function QTcCalculator() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Many drugs (antipsychotics, some antibiotics/antiemetics, methadone, class Ia/III antiarrhythmics) prolong the QT interval and raise the risk of Torsades de Pointes. Enter the measured QT interval and heart rate from an ECG.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="QT interval (ms)">
-            <input className={inputClass} type="number" min={200} max={700} value={qtMs || ''} onChange={(e) => setQtMs(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={200} max={700} value={qtText} onChange={(e) => setQtMs(e.target.value)} />
           </Field>
           <Field label="Heart rate (bpm)">
-            <input className={inputClass} type="number" min={30} max={200} value={hr || ''} onChange={(e) => setHr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={30} max={200} value={hrText} onChange={(e) => setHr(e.target.value)} />
           </Field>
           <Field label="Sex">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
@@ -81,6 +70,9 @@ export function QTcCalculator() {
             </select>
           </Field>
         </div>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       <Card className="!p-5">
@@ -98,7 +90,7 @@ export function QTcCalculator() {
             </p>
             <CopyNote text={`QTc ${primary.toFixed(0)} ms by Bazett (QT ${qtMs} ms @ HR ${hr}, ${sex === 'M' ? 'male' : 'female'}) — ${primaryBand.label.toLowerCase()}; Fridericia ${fridericia.toFixed(0)}, Framingham ${framingham.toFixed(0)}, Hodges ${hodges.toFixed(0)} ms`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             No QTc yet. Still needed: {belum.join(' and ')}.
             {' '}Both are read off a recording. A QT of 400 ms at 60 bpm is not a neutral placeholder — it corrects to

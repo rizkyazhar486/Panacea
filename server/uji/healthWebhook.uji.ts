@@ -5,7 +5,7 @@ import {
   newestSampleDate,
   parseHealthWebhookPayload,
   tanggalDiOffset,
-} from '../src/healthWebhook.js'
+} from '../src/domains/push/healthWebhook.js'
 
 assert.equal(tanggalDiOffset('2026-09-08 00:30:00 +0700'), '2026-09-08')
 assert.equal(tanggalDiOffset('2026-09-08T00:30:00.123+05:30'), '2026-09-08')
@@ -146,3 +146,6 @@ assert.deepEqual(sleepSessions[0], {
 })
 
 console.log('Health webhook parsing, unit, timezone, HR-series, and sleep-session invariants verified.')
+
+// Real HTTP: only server-issued tokens are accepted by the unauthenticated webhook (no inherited property names), rotation and secrecy.
+await import('./healthWebhookTokenHttp.uji.js')

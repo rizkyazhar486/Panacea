@@ -20,9 +20,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  render-proof:
-    runs-on: ubuntu-latest
+  # Wall-clock: the 13 serial WebGL gates took ~595s on one runner (+ ~190s of build/browser setup = ~13 min). They are independent smokes,
+  # so they are sharded across runners; each shard keeps the identical steps, per-gate bounds and fail-fast loop. Shards were balanced from
+  # measured per-gate durations (s): limfe 82, arteri 76, hepatobiliary 68, kerangka 62, kendali 51, organ 49, wilayah 47, lesi 47,
+  # kelenjar 44, ventilasi 33, bergerak 32, bilah-atas 2, share-card 2. The required check name `render-proof` is kept by the aggregator below.
+  proof-shard:
+    name: proof-shard (${{ matrix.nama }})
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - nama: limfe-arteri
+            gerbang: qa:arteri-3d qa:limfe-3d
+          - nama: ventilasi-hepatobilier-kerangka
+            gerbang: qa:ventilasi-3d qa:hepatobiliary-3d qa:kerangka-3d
+          - nama: organ-wilayah-lesi
+            gerbang: qa:organ-3d qa:wilayah-3d qa:lesi-3d qa:bilah-atas qa:share-card
+          - nama: kelenjar-bergerak-kendali
+            gerbang: qa:kelenjar-3d qa:bergerak qa:kendali
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -130,12 +147,12 @@ jobs:
       # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
       # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
-        # 13 serial gates are individually bounded below (240s for organ,
-        # 180s for each of the other 12). The stage hard stop must be large
-        # enough to let those fail-closed per-gate verdicts run instead of
-        # pre-empting a healthy queue: 240 + 12*180 = 2400s = 40m.
+        # The 13 gates are sharded; within a shard they stay serial and individually bounded (240s for organ,
+        # 180s for each of the others). The stage hard stop is kept at the original worst case for ALL 13 gates so a
+        # shard can never be pre-empted before its own per-gate verdicts run: 240 + 12*180 = 2400s = 40m.
         timeout-minutes: 41
         env:
+          GERBANG_SHARD: ${{ matrix.gerbang }}
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
@@ -147,13 +164,12 @@ jobs:
           KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
           KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
-          BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+          BILAH_QA_URL: http://127.0.0.1:4173/#/
+          BILAH_QA_URL_LATIHAN: http://127.0.0.1:4173/#/latihan?t=pelatih
           SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
         run: |
           set -e
-          for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
-                         qa:limfe-3d qa:hepatobiliary-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
-                         qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
+          for gerbang in $GERBANG_SHARD; do
             echo "::group::$gerbang"
             mulai=$SECONDS
             batas=180
@@ -192,4 +208,23 @@ jobs:
             kill -TERM -- "-$preview_pid" 2>/dev/null || kill -TERM "$preview_pid" 2>/dev/null || true
             sleep 1
             kill -KILL -- "-$preview_pid" 2>/dev/null || true
+          fi
+
+  # Required status check `render-proof` (branch protection and scripts/qa/vercel-release-gate.mjs look it up by this exact job name).
+  # It passes only when EVERY shard passed; a failed, cancelled or skipped shard fails it. No gate may be dropped from the shard list:
+  # scripts/uji/body3d-ci-bounded-smoke.mts asserts that the shards together cover all 13 gates exactly once.
+  render-proof:
+    needs: proof-shard
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every Body3D proof shard to have passed
+        env:
+          HASIL_SHARD: ${{ needs.proof-shard.result }}
+        run: |
+          echo "proof-shard result: ${HASIL_SHARD}"
+          if [ "${HASIL_SHARD}" != 'success' ]; then
+            echo "::error::Body3D proof shards did not all pass (${HASIL_SHARD})"
+            exit 1
           fi

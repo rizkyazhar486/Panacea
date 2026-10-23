@@ -31,38 +31,29 @@ import { join } from 'node:path'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DIKETAHUI: ReadonlyArray<readonly [string, number]> = [
-  ['src/components/KartuKlinisTubuh.tsx', 1],
-  ['src/components/PapanWidget.tsx', 1],
-  ['src/components/UbinLangsung.tsx', 1],
-  ['src/components/UbinLanjutan.tsx', 1],
-  ['src/components/UbinRingHarian.tsx', 1],
-  ['src/components/WidgetBeranda.tsx', 1],
+  ['src/components/clinical/KartuKlinisTubuh.tsx', 1],
+  ['src/components/dashboard/PapanWidget.tsx', 1],
+  ['src/components/tiles/UbinLangsung.tsx', 1],
+  ['src/components/tiles/UbinLanjutan.tsx', 1],
+  ['src/components/tiles/UbinRingHarian.tsx', 1],
+  ['src/components/dashboard/WidgetBeranda.tsx', 1],
   ['src/components/digital-twin/Workout4DLab.tsx', 1],
   ['src/lib/autoIsiFilter.ts', 1],
   ['src/lib/nilaiAwal.ts', 1],
   ['src/lib/profile.ts', 2],
-  ['src/pages/clinical/scores/AaGradient.tsx', 1],
-  ['src/pages/AlcoholCalculator.tsx', 2],
-  ['src/pages/AnalisisPro.tsx', 1],
-  ['src/pages/bodyhub/BloodDonation.tsx', 2],
-  ['src/pages/BodyBattery.tsx', 1],
-  ['src/pages/clinical/scores/CharlsonIndex.tsx', 1],
+  ['src/pages/fitness/AnalisisPro.tsx', 1],
+  ['src/pages/bodyhub/BodyBattery.tsx', 1],
   ['src/pages/fitness/EnduranceTools.tsx', 3],
-  ['src/pages/Feed.tsx', 2],
-  ['src/pages/HealthSimulator.tsx', 1],
+  ['src/pages/social/Feed.tsx', 2],
   ['src/pages/fitness/HeartRateLog.tsx', 1],
-  ['src/pages/MacroLabGizi.tsx', 1],
-  ['src/pages/MovementToolkit.tsx', 1],
+  ['src/pages/bodyhub/MacroLabGizi.tsx', 1],
   ['src/pages/bodyhub/Nutrition.tsx', 1],
-  ['src/pages/PapanAtlet.tsx', 1],
-  ['src/pages/PerformanceLab.tsx', 2],
-  ['src/pages/PredictiveModelsToolkit.tsx', 1],
-  ['src/pages/Rekomposisi.tsx', 1],
-  ['src/pages/clinical/scores/RiskCalculators.tsx', 1],
-  ['src/pages/SelfAssessmentToolkit.tsx', 1],
+  ['src/pages/fitness/PapanAtlet.tsx', 1],
+  ['src/pages/fitness/PerformanceLab.tsx', 2],
+  ['src/pages/fitness/Rekomposisi.tsx', 1],
   ['src/pages/fitness/TrainingPhysiology.tsx', 1],
-  ['src/pages/TrainingPlan.tsx', 3],
-  ['src/pages/WorkoutHistory.tsx', 1],
+  ['src/pages/fitness/TrainingPlan.tsx', 3],
+  ['src/pages/fitness/WorkoutHistory.tsx', 1],
 ]
 
 function hitungDi(berkas: string): number {
@@ -118,7 +109,7 @@ assert.deepEqual(lapuk, [],
 // ── Empat yang sudah diperbaiki tidak boleh kembali ────────────────────────
 // Masing-masing punya gerbangnya sendiri. Di sini hanya dijaga bahwa keempat
 // berkas itu TIDAK muncul lagi sebagai pemanggil getDemo() untuk penyajian.
-for (const berkas of ['src/components/UbinTdee.tsx', 'src/pages/PelatihAsupan.tsx']) {
+for (const berkas of ['src/components/tiles/UbinTdee.tsx', 'src/pages/fitness/PelatihAsupan.tsx']) {
   assert.equal(sekarang.get(berkas), undefined,
     `${berkas} calls getDemo() again; it was changed to getDemoTersimpan() precisely because its guard could not fire otherwise`)
 }

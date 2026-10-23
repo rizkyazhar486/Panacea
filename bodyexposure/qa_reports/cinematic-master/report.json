@@ -1,0 +1,53 @@
+{
+  "source_blend": "/Users/rizkyazhar/Documents/Panaceamed.id/bodyexposure/PANACEA_HUMAN_MASTER_v011.blend",
+  "blender_version": "5.2.2 LTS",
+  "profile": "preview",
+  "benchmark": "layered",
+  "device_backend": "CPU",
+  "devices": [],
+  "hdri": null,
+  "audit": {
+    "visible_meshes": 3003,
+    "source_polygons": 9284861,
+    "meshes_without_uv": 1137,
+    "meshes_without_material": 0,
+    "review_status_counts": {
+      "review_required": 3003
+    }
+  },
+  "renders": [
+    {
+      "variant": "before",
+      "path": "layered_preview_before.png",
+      "sha256": "aaa3554b3fe80d7142807b43ef8bd628f0c4c9c81c420f44670e05ed33090c79",
+      "render_seconds": 16.358,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": false,
+      "denoising": false
+    },
+    {
+      "variant": "after",
+      "path": "layered_preview_after.png",
+      "sha256": "ce60a0b6d3bdc31028bdc8b949af4765b7af9892ff1e0135265fb93209a4e374",
+      "render_seconds": 25.668,
+      "resolution": [
+        480,
+        270
+      ],
+      "sample_limit": 8,
+      "time_limit_seconds": 30.0,
+      "adaptive_sampling": true,
+      "denoising": true
+    }
+  ],
+  "limitations": [
+    "UV absence is informational for procedural materials.",
+    "No anatomical validation, deformation, browser FPS or memory measurement performed.",
+    "Before/after isolates adaptive sampling and denoising at identical sample limits."
+  ]
+}

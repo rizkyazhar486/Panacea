@@ -2,14 +2,14 @@ import assert from 'node:assert/strict'
 import {
   moveRealtimeRoomMember,
   removeRealtimeRoomMember,
-} from '../src/realtimeRoomRegistry.js'
+} from '../src/modules/visits/realtimeRoomRegistry.js'
 import {
   authorizeVisitRealtimeJoin,
   createVisitRealtimeReplayGuard,
   isReservedVisitRealtimeRoom,
   refreshVisitRealtimeAuthorization,
   validateVisitRealtimeSignalEnvelope,
-} from '../src/visitRealtimePolicy.js'
+} from '../src/modules/visits/visitRealtimePolicy.js'
 
 const membership = {
   visitId: 'visit-secure',

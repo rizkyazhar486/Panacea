@@ -1,0 +1,111 @@
+{
+ "method": "TotalSegmentator total task on the Visible Human Female CT (1.5 mm), vs Denver manual segmentation (same subject)",
+ "bones": {
+  "femur_left": {
+   "ct_volume_cm3": 503.2,
+   "mask_components": 1,
+   "largest_component_fraction": 1.0,
+   "common_transform": {
+    "median_mm": 1.23,
+    "p95_mm": 3.02,
+    "max_mm": 8.8
+   },
+   "own_fit": {
+    "median_mm": 1.23,
+    "p95_mm": 3.02,
+    "max_mm": 8.8
+   }
+  },
+  "femur_right": {
+   "ct_volume_cm3": 518.3,
+   "mask_components": 1,
+   "largest_component_fraction": 1.0,
+   "common_transform": {
+    "median_mm": 2.14,
+    "p95_mm": 5.34,
+    "max_mm": 7.8
+   },
+   "own_fit": {
+    "median_mm": 1.61,
+    "p95_mm": 3.72,
+    "max_mm": 6.7
+   }
+  },
+  "hip_left": {
+   "ct_volume_cm3": 379.8,
+   "mask_components": 2,
+   "largest_component_fraction": 0.9997,
+   "common_transform": {
+    "median_mm": 1.65,
+    "p95_mm": 3.79,
+    "max_mm": 8.0
+   },
+   "own_fit": {
+    "median_mm": 0.65,
+    "p95_mm": 1.42,
+    "max_mm": 8.7
+   }
+  },
+  "hip_right": {
+   "ct_volume_cm3": 378.0,
+   "mask_components": 2,
+   "largest_component_fraction": 1.0,
+   "common_transform": {
+    "median_mm": 1.48,
+    "p95_mm": 4.12,
+    "max_mm": 7.6
+   },
+   "own_fit": {
+    "median_mm": 0.63,
+    "p95_mm": 1.83,
+    "max_mm": 6.3
+   }
+  },
+  "sacrum": {
+   "ct_volume_cm3": 169.7,
+   "mask_components": 36,
+   "largest_component_fraction": 0.9984,
+   "common_transform": {
+    "median_mm": 2.85,
+    "p95_mm": 11.04,
+    "max_mm": 35.9
+   },
+   "own_fit": {
+    "median_mm": 2.04,
+    "p95_mm": 10.3,
+    "max_mm": 26.9
+   }
+  }
+ },
+ "transform_ct_to_denver": {
+  "R": [
+   [
+    0.998587,
+    0.047702,
+    -0.02344
+   ],
+   [
+    -0.048054,
+    0.998737,
+    -0.0147
+   ],
+   [
+    0.022709,
+    0.015806,
+    0.999617
+   ]
+  ],
+  "t_mm": [
+   807.045,
+   680.775,
+   9.495
+  ]
+ },
+ "common_transform_fitted_on": "femur_left",
+ "residual_rotation_deg": 3.17,
+ "residual_translation_mm": [
+  807.0,
+  680.8,
+  9.5
+ ]
+}

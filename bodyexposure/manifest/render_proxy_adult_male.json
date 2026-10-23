@@ -1,0 +1,80 @@
+{
+ "body": "HUMAN.ADULT.MALE",
+ "budget_tris": 2000000,
+ "floor_tris": 60,
+ "source_tris": 11541912,
+ "proxy_tris": 2022441,
+ "structures": 3877,
+ "uv_mapped_structures": 3877,
+ "materials_upgraded": 42,
+ "reverted_after_bbox_escape": [
+  [
+   "ADULT.MALE.CARDIOVASCULAR.CAVERNOUS_SINUS.L",
+   "unsplit mesh"
+  ],
+  [
+   "ADULT.MALE.CARDIOVASCULAR.CAVERNOUS_SINUS.R",
+   "unsplit mesh"
+  ],
+  [
+   "ADULT.MALE.NERVOUS.LATERAL_FASCICULUS_PROPRIUS",
+   "ratio x4"
+  ]
+ ],
+ "error_mm": {
+  "median_of_means": 0.055,
+  "p95_of_max": 1.046,
+  "worst": [
+   [
+    "ADULT.MALE.MUSCULAR.EXTERNAL_ABDOMINAL_OBLIQUE_MUSCLE_ORIGIN_4.L",
+    0.44,
+    116.35
+   ],
+   [
+    "ADULT.MALE.MUSCULAR.EXTERNAL_ABDOMINAL_OBLIQUE_MUSCLE_ORIGIN_4.R",
+    0.44,
+    116.08
+   ],
+   [
+    "ADULT.MALE.NERVOUS.TECTOSPINAL_TRACT",
+    1.02,
+    36.58
+   ],
+   [
+    "ADULT.MALE.NERVOUS.SYMPATHETIC_NERVES.L",
+    2.81,
+    22.45
+   ],
+   [
+    "ADULT.MALE.FASCIA.MEDIAL_INTERMUSCULAR_SEPTUM_OF_ARM.R",
+    0.1,
+    18.43
+   ],
+   [
+    "ADULT.MALE.FASCIA.MEDIAL_INTERMUSCULAR_SEPTUM_OF_ARM.L",
+    0.1,
+    18.43
+   ],
+   [
+    "ADULT.MALE.JOINT.TRANSVERSE_LIGAMENT_OF_KNEE.R",
+    0.17,
+    16.63
+   ],
+   [
+    "ADULT.MALE.JOINT.TRANSVERSE_LIGAMENT_OF_KNEE.L",
+    0.18,
+    16.63
+   ],
+   [
+    "ADULT.MALE.NERVOUS.MEDIAL_VESTIBULOSPINAL_TRACT",
+    0.23,
+    15.48
+   ],
+   [
+    "ADULT.MALE.NERVOUS.NUCLEUS_PROPRIUS",
+    0.23,
+    15.07
+   ]
+  ]
+ }
+}

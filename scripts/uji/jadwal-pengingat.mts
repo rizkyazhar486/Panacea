@@ -4,7 +4,7 @@
 // server yang mati lima hari mengirim lima pemberitahuan dalam lima menit saat
 // hidup kembali — dan yang diberitahukan adalah dosis yang sudah lewat
 // berhari-hari, yang bisa membuat orang minum obat dua kali.
-import { putusanPengingat, TOLERANSI_TELAT_MS } from '../../server/src/jadwal.js'
+import { putusanPengingat, TOLERANSI_TELAT_MS } from '../../server/src/domains/lifestyle/jadwal.js'
 
 let lulus = 0, gagal = 0
 function cek(nama: string, benar: boolean, ket = '') {

@@ -1,11 +1,19 @@
 .panacea-liquid-home {
+  --liquid-ink: #0f172a;
+  --liquid-muted: rgba(100, 116, 139, .78);
+  --liquid-line: rgba(0, 0, 0, .08);
+  --liquid-surface: rgba(255, 255, 255, .88);
+  --liquid-surface-strong: rgba(255, 255, 255, .98);
+  position: relative;
+  isolation: isolate;
+}
+
+.dark .panacea-liquid-home {
   --liquid-ink: #f7fbff;
   --liquid-muted: rgba(226, 238, 255, .58);
   --liquid-line: rgba(255, 255, 255, .105);
   --liquid-surface: rgba(9, 15, 28, .58);
   --liquid-surface-strong: rgba(5, 10, 20, .82);
-  position: relative;
-  isolation: isolate;
 }
 
 .panacea-liquid-home::before {
@@ -14,6 +22,14 @@
   inset: 0;
   z-index: -3;
   pointer-events: none;
+  background:
+    radial-gradient(56rem 38rem at 8% -8%, rgba(44, 164, 255, .06), transparent 66%),
+    radial-gradient(46rem 32rem at 92% 8%, rgba(154, 90, 255, .05), transparent 66%),
+    radial-gradient(40rem 34rem at 54% 112%, rgba(38, 226, 178, .04), transparent 70%),
+    #f4f7f8;
+}
+
+.dark .panacea-liquid-home::before {
   background:
     radial-gradient(56rem 38rem at 8% -8%, rgba(44, 164, 255, .13), transparent 66%),
     radial-gradient(46rem 32rem at 92% 8%, rgba(154, 90, 255, .13), transparent 66%),
@@ -37,6 +53,13 @@
 
 .liquid-glass {
   border: 1px solid var(--liquid-line);
+  background: var(--liquid-surface);
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  backdrop-filter: blur(24px) saturate(145%);
+}
+
+.dark .liquid-glass {
   background:
     linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025) 42%, rgba(86,110,170,.035)),
     var(--liquid-surface);
@@ -44,8 +67,6 @@
     inset 0 1px 0 rgba(255,255,255,.11),
     inset 0 -1px 0 rgba(255,255,255,.02),
     0 24px 70px rgba(0,0,0,.26);
-  -webkit-backdrop-filter: blur(24px) saturate(145%);
-  backdrop-filter: blur(24px) saturate(145%);
 }
 
 .liquid-glass-strong {

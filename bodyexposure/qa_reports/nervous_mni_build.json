@@ -1,0 +1,3919 @@
+{
+ "summary": {
+  "body": "ATLAS.NERVOUS.MNI152",
+  "structures": 556,
+  "extent_m": 1.8208,
+  "file": "PANACEA_BODY_ATLAS_NERVOUS_MNI152.blend",
+  "tris_total": 4724478,
+  "atlas_meshes_total": 587,
+  "excluded": {
+   "mni_aseg": 30,
+   "envelope": 1
+  },
+  "missing_files": [],
+  "laterality_near_midline": [
+   {
+    "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VAGUS_NERVE_X_RIGHT.R",
+    "x_m": 0.0195,
+    "alignment": "registered-affine"
+   }
+  ],
+  "open_boundary": 68,
+  "nonmanifold": 67
+ },
+ "structures": [
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.BED_NUCLEUS_OF_THE_STRIA_TERMINALIS.L",
+   "atlas_id": "bed-nucleus-stria-terminalis-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.BED_NUCLEUS_OF_THE_STRIA_TERMINALIS.R",
+   "atlas_id": "bed-nucleus-stria-terminalis-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.NUCLEUS_BASALIS_OF_MEYNERT.L",
+   "atlas_id": "nucleus-basalis-meynert-l",
+   "tris": 1292,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.NUCLEUS_BASALIS_OF_MEYNERT.R",
+   "atlas_id": "nucleus-basalis-meynert-r",
+   "tris": 1624,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.AMYGDALA.L",
+   "atlas_id": "amygdala-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.AMYGDALA.R",
+   "atlas_id": "amygdala-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.BASAL_FOREBRAIN_CHOLINERGIC_NUCLEI.L",
+   "atlas_id": "basal-forebrain-cholinergic-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.BASAL_FOREBRAIN_CHOLINERGIC_NUCLEI.R",
+   "atlas_id": "basal-forebrain-cholinergic-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.DENTATE_GYRUS.L",
+   "atlas_id": "dentate-gyrus-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.DENTATE_GYRUS.R",
+   "atlas_id": "dentate-gyrus-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.FORNIX",
+   "atlas_id": "fornix",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.HIPPOCAMPUS_CA1.L",
+   "atlas_id": "hippocampus-ca1-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.HIPPOCAMPUS_CA1.R",
+   "atlas_id": "hippocampus-ca1-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.HIPPOCAMPUS_CA2_CA3.L",
+   "atlas_id": "hippocampus-ca23-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.HIPPOCAMPUS_CA2_CA3.R",
+   "atlas_id": "hippocampus-ca23-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRESUBICULUM.L",
+   "atlas_id": "presubiculum-l",
+   "tris": 1999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRESUBICULUM.R",
+   "atlas_id": "presubiculum-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SEPTAL_NUCLEI",
+   "atlas_id": "septal-area",
+   "tris": 548,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBICULUM.L",
+   "atlas_id": "subiculum-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBICULUM.R",
+   "atlas_id": "subiculum-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.UNCUS.L",
+   "atlas_id": "uncus-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.UNCUS.R",
+   "atlas_id": "uncus-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDAL_MIDDLE_FRONTAL_GYRUS.L",
+   "atlas_id": "dkt-caudal-middle-frontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDAL_MIDDLE_FRONTAL_GYRUS.R",
+   "atlas_id": "dkt-caudal-middle-frontal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_OPERCULARIS.L",
+   "atlas_id": "dkt-pars-opercularis-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_OPERCULARIS.R",
+   "atlas_id": "dkt-pars-opercularis-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_ORBITALIS.L",
+   "atlas_id": "dkt-pars-orbitalis-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_ORBITALIS.R",
+   "atlas_id": "dkt-pars-orbitalis-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_TRIANGULARIS.L",
+   "atlas_id": "dkt-pars-triangularis-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_FRONTAL_GYRUS_PARS_TRIANGULARIS.R",
+   "atlas_id": "dkt-pars-triangularis-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_ORBITOFRONTAL_CORTEX.L",
+   "atlas_id": "dkt-lateral-orbitofrontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_ORBITOFRONTAL_CORTEX.R",
+   "atlas_id": "dkt-lateral-orbitofrontal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_ORBITOFRONTAL_CORTEX.L",
+   "atlas_id": "dkt-medial-orbitofrontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_ORBITOFRONTAL_CORTEX.R",
+   "atlas_id": "dkt-medial-orbitofrontal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARACENTRAL_LOBULE.L",
+   "atlas_id": "dkt-paracentral-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARACENTRAL_LOBULE.R",
+   "atlas_id": "dkt-paracentral-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRECENTRAL_GYRUS.L",
+   "atlas_id": "dkt-precentral-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRECENTRAL_GYRUS.R",
+   "atlas_id": "dkt-precentral-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ROSTRAL_MIDDLE_FRONTAL_GYRUS.L",
+   "atlas_id": "dkt-rostral-middle-frontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ROSTRAL_MIDDLE_FRONTAL_GYRUS.R",
+   "atlas_id": "dkt-rostral-middle-frontal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_FRONTAL_GYRUS.L",
+   "atlas_id": "dkt-superior-frontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_FRONTAL_GYRUS.R",
+   "atlas_id": "dkt-superior-frontal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INSULAR_CORTEX.L",
+   "atlas_id": "dkt-insula-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INSULAR_CORTEX.R",
+   "atlas_id": "dkt-insula-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDAL_ANTERIOR_CINGULATE_CORTEX.L",
+   "atlas_id": "dkt-caudal-anterior-cingulate-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDAL_ANTERIOR_CINGULATE_CORTEX.R",
+   "atlas_id": "dkt-caudal-anterior-cingulate-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ENTORHINAL_CORTEX.L",
+   "atlas_id": "dkt-entorhinal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ENTORHINAL_CORTEX.R",
+   "atlas_id": "dkt-entorhinal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ISTHMUS_OF_THE_CINGULATE_GYRUS.L",
+   "atlas_id": "dkt-isthmus-cingulate-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ISTHMUS_OF_THE_CINGULATE_GYRUS.R",
+   "atlas_id": "dkt-isthmus-cingulate-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAHIPPOCAMPAL_GYRUS.L",
+   "atlas_id": "dkt-parahippocampal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAHIPPOCAMPAL_GYRUS.R",
+   "atlas_id": "dkt-parahippocampal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTERIOR_CINGULATE_CORTEX.L",
+   "atlas_id": "dkt-posterior-cingulate-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTERIOR_CINGULATE_CORTEX.R",
+   "atlas_id": "dkt-posterior-cingulate-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ROSTRAL_ANTERIOR_CINGULATE_CORTEX.L",
+   "atlas_id": "dkt-rostral-anterior-cingulate-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ROSTRAL_ANTERIOR_CINGULATE_CORTEX.R",
+   "atlas_id": "dkt-rostral-anterior-cingulate-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CUNEUS.L",
+   "atlas_id": "dkt-cuneus-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CUNEUS.R",
+   "atlas_id": "dkt-cuneus-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_OCCIPITAL_CORTEX.L",
+   "atlas_id": "dkt-lateral-occipital-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_OCCIPITAL_CORTEX.R",
+   "atlas_id": "dkt-lateral-occipital-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LINGUAL_GYRUS.L",
+   "atlas_id": "dkt-lingual-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LINGUAL_GYRUS.R",
+   "atlas_id": "dkt-lingual-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PERICALCARINE_CORTEX.L",
+   "atlas_id": "dkt-pericalcarine-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PERICALCARINE_CORTEX.R",
+   "atlas_id": "dkt-pericalcarine-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_PARIETAL_LOBULE_ANGULAR_GYRUS.L",
+   "atlas_id": "dkt-inferior-parietal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_PARIETAL_LOBULE_ANGULAR_GYRUS.R",
+   "atlas_id": "dkt-inferior-parietal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTCENTRAL_GYRUS.L",
+   "atlas_id": "dkt-postcentral-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTCENTRAL_GYRUS.R",
+   "atlas_id": "dkt-postcentral-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRECUNEUS.L",
+   "atlas_id": "dkt-precuneus-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PRECUNEUS.R",
+   "atlas_id": "dkt-precuneus-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_PARIETAL_LOBULE.L",
+   "atlas_id": "dkt-superior-parietal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_PARIETAL_LOBULE.R",
+   "atlas_id": "dkt-superior-parietal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRAMARGINAL_GYRUS.L",
+   "atlas_id": "dkt-supramarginal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRAMARGINAL_GYRUS.R",
+   "atlas_id": "dkt-supramarginal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.FUSIFORM_GYRUS.L",
+   "atlas_id": "dkt-fusiform-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.FUSIFORM_GYRUS.R",
+   "atlas_id": "dkt-fusiform-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_TEMPORAL_GYRUS.L",
+   "atlas_id": "dkt-inferior-temporal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_TEMPORAL_GYRUS.R",
+   "atlas_id": "dkt-inferior-temporal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MIDDLE_TEMPORAL_GYRUS.L",
+   "atlas_id": "dkt-middle-temporal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MIDDLE_TEMPORAL_GYRUS.R",
+   "atlas_id": "dkt-middle-temporal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_TEMPORAL_GYRUS.L",
+   "atlas_id": "dkt-superior-temporal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_TEMPORAL_GYRUS.R",
+   "atlas_id": "dkt-superior-temporal-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.TRANSVERSE_TEMPORAL_GYRUS_HESCHL.L",
+   "atlas_id": "dkt-transverse-temporal-l",
+   "tris": 16852,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.TRANSVERSE_TEMPORAL_GYRUS_HESCHL.R",
+   "atlas_id": "dkt-transverse-temporal-r",
+   "tris": 13352,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ANTERIOR_COMMISSURE",
+   "atlas_id": "anterior-commissure",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INTERNAL_CAPSULE.L",
+   "atlas_id": "internal-capsule-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INTERNAL_CAPSULE.R",
+   "atlas_id": "internal-capsule-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDATE_NUCLEUS.L",
+   "atlas_id": "caudate-nucleus-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDATE_NUCLEUS.R",
+   "atlas_id": "caudate-nucleus-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CLAUSTRUM.L",
+   "atlas_id": "claustrum-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CLAUSTRUM.R",
+   "atlas_id": "claustrum-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.GLOBUS_PALLIDUS_EXTERNAL_SEGMENT.L",
+   "atlas_id": "globus-pallidus-externus-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.GLOBUS_PALLIDUS_EXTERNAL_SEGMENT.R",
+   "atlas_id": "globus-pallidus-externus-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.GLOBUS_PALLIDUS_INTERNAL_SEGMENT.L",
+   "atlas_id": "globus-pallidus-internus-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.GLOBUS_PALLIDUS_INTERNAL_SEGMENT.R",
+   "atlas_id": "globus-pallidus-internus-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.NUCLEUS_ACCUMBENS.L",
+   "atlas_id": "nucleus-accumbens-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.NUCLEUS_ACCUMBENS.R",
+   "atlas_id": "nucleus-accumbens-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PUTAMEN.L",
+   "atlas_id": "putamen-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PUTAMEN.R",
+   "atlas_id": "putamen-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBTHALAMIC_NUCLEUS.L",
+   "atlas_id": "subthalamic-nucleus-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBTHALAMIC_NUCLEUS.R",
+   "atlas_id": "subthalamic-nucleus-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_GENICULATE_NUCLEUS.L",
+   "atlas_id": "lateral-geniculate-nucleus-l",
+   "tris": 1780,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_GENICULATE_NUCLEUS.R",
+   "atlas_id": "lateral-geniculate-nucleus-r",
+   "tris": 1580,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_HABENULA.L",
+   "atlas_id": "habenula-l",
+   "tris": 248,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_HABENULA.R",
+   "atlas_id": "habenula-r",
+   "tris": 312,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_GENICULATE_NUCLEUS.L",
+   "atlas_id": "medial-geniculate-nucleus-l",
+   "tris": 620,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_GENICULATE_NUCLEUS.R",
+   "atlas_id": "medial-geniculate-nucleus-r",
+   "tris": 928,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PINEAL_GLAND",
+   "atlas_id": "pineal-gland",
+   "tris": 580,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.THALAMUS.L",
+   "atlas_id": "thalamus-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.THALAMUS.R",
+   "atlas_id": "thalamus-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ANTERIOR_HYPOTHALAMIC_AREA.L",
+   "atlas_id": "hypothalamus-anterior-area-l",
+   "tris": 580,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ANTERIOR_HYPOTHALAMIC_AREA.R",
+   "atlas_id": "hypothalamus-anterior-area-r",
+   "tris": 744,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ARCUATE_NUCLEUS.L",
+   "atlas_id": "hypothalamus-arcuate-l",
+   "tris": 660,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ARCUATE_NUCLEUS.R",
+   "atlas_id": "hypothalamus-arcuate-r",
+   "tris": 652,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.DORSOMEDIAL_NUCLEUS.L",
+   "atlas_id": "hypothalamus-dorsomedial-l",
+   "tris": 292,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.DORSOMEDIAL_NUCLEUS.R",
+   "atlas_id": "hypothalamus-dorsomedial-r",
+   "tris": 280,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_HYPOTHALAMIC_AREA.L",
+   "atlas_id": "hypothalamus-lateral-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_HYPOTHALAMIC_AREA.R",
+   "atlas_id": "hypothalamus-lateral-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MAMMILLARY_BODY.L",
+   "atlas_id": "mammillary-body-l",
+   "tris": 1316,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MAMMILLARY_BODY.R",
+   "atlas_id": "mammillary-body-r",
+   "tris": 1236,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MAMMILLOTHALAMIC_TRACT.L",
+   "atlas_id": "mammillothalamic-tract-l",
+   "tris": 1072,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MAMMILLOTHALAMIC_TRACT.R",
+   "atlas_id": "mammillothalamic-tract-r",
+   "tris": 1312,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PREOPTIC_NUCLEUS.L",
+   "atlas_id": "hypothalamus-medial-preoptic-l",
+   "tris": 104,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PREOPTIC_NUCLEUS.R",
+   "atlas_id": "hypothalamus-medial-preoptic-r",
+   "tris": 88,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAVENTRICULAR_NUCLEUS.L",
+   "atlas_id": "hypothalamus-paraventricular-l",
+   "tris": 804,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAVENTRICULAR_NUCLEUS.R",
+   "atlas_id": "hypothalamus-paraventricular-r",
+   "tris": 796,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PITUITARY_GLAND",
+   "atlas_id": "pituitary-gland",
+   "tris": 1164,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTERIOR_HYPOTHALAMIC_NUCLEUS.L",
+   "atlas_id": "hypothalamus-posterior-l",
+   "tris": 544,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTERIOR_HYPOTHALAMIC_NUCLEUS.R",
+   "atlas_id": "hypothalamus-posterior-r",
+   "tris": 540,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRACHIASMATIC_NUCLEUS.L",
+   "atlas_id": "hypothalamus-suprachiasmatic-l",
+   "tris": 84,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRACHIASMATIC_NUCLEUS.R",
+   "atlas_id": "hypothalamus-suprachiasmatic-r",
+   "tris": 68,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRAOPTIC_NUCLEUS.L",
+   "atlas_id": "hypothalamus-supraoptic-l",
+   "tris": 276,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPRAOPTIC_NUCLEUS.R",
+   "atlas_id": "hypothalamus-supraoptic-r",
+   "tris": 272,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.TUBEROMAMMILLARY_NUCLEUS.L",
+   "atlas_id": "hypothalamus-tuberomammillary-l",
+   "tris": 592,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.TUBEROMAMMILLARY_NUCLEUS.R",
+   "atlas_id": "hypothalamus-tuberomammillary-r",
+   "tris": 532,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTROMEDIAL_NUCLEUS.L",
+   "atlas_id": "hypothalamus-ventromedial-l",
+   "tris": 728,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTROMEDIAL_NUCLEUS.R",
+   "atlas_id": "hypothalamus-ventromedial-r",
+   "tris": 704,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ZONA_INCERTA.L",
+   "atlas_id": "zona-incerta-l",
+   "tris": 1896,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ZONA_INCERTA.R",
+   "atlas_id": "zona-incerta-r",
+   "tris": 1586,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_POSTERIOR_VENTRAL_POSTERIOR_GROUP.L",
+   "atlas_id": "thalamus-lateral-posterior-ventral-posterior-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_POSTERIOR_VENTRAL_POSTERIOR_GROUP.R",
+   "atlas_id": "thalamus-lateral-posterior-ventral-posterior-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PULVINAR_CENTROLATERAL_GROUP.L",
+   "atlas_id": "thalamus-pulvinar-medial-centrolateral-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PULVINAR_CENTROLATERAL_GROUP.R",
+   "atlas_id": "thalamus-pulvinar-medial-centrolateral-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIODORSAL_NUCLEUS.L",
+   "atlas_id": "thalamus-mediodorsal-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIODORSAL_NUCLEUS.R",
+   "atlas_id": "thalamus-mediodorsal-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PULVINAR.L",
+   "atlas_id": "thalamus-pulvinar-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PULVINAR.R",
+   "atlas_id": "thalamus-pulvinar-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_ANTERIOR_NUCLEUS.L",
+   "atlas_id": "thalamus-ventral-anterior-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_ANTERIOR_NUCLEUS.R",
+   "atlas_id": "thalamus-ventral-anterior-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_POSTERIOR_VENTROLATERAL_GROUP_VPL_VPM.L",
+   "atlas_id": "thalamus-ventral-posterior-ventrolateral-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_POSTERIOR_VENTROLATERAL_GROUP_VPL_VPM.R",
+   "atlas_id": "thalamus-ventral-posterior-ventrolateral-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTROLATERAL_NUCLEUS.L",
+   "atlas_id": "thalamus-ventrolateral-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTROLATERAL_NUCLEUS.R",
+   "atlas_id": "thalamus-ventrolateral-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.COCHLEAR_NUCLEI_LEFT.L",
+   "atlas_id": "cochlear-nuclei-l",
+   "tris": 192,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.COCHLEAR_NUCLEI_RIGHT.R",
+   "atlas_id": "cochlear-nuclei-r",
+   "tris": 192,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_OLIVE_LEFT.L",
+   "atlas_id": "inferior-olivary-nucleus-l",
+   "tris": 960,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_OLIVE_RIGHT.R",
+   "atlas_id": "inferior-olivary-nucleus-r",
+   "tris": 960,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PYRAMID_OF_THE_MEDULLA_LEFT.L",
+   "atlas_id": "pyramid-l",
+   "tris": 960,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PYRAMID_OF_THE_MEDULLA_RIGHT.R",
+   "atlas_id": "pyramid-r",
+   "tris": 960,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SPINAL_ACCESSORY_NUCLEUS_LEFT.L",
+   "atlas_id": "accessory-nucleus-l",
+   "tris": 1792,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SPINAL_ACCESSORY_NUCLEUS_RIGHT.R",
+   "atlas_id": "accessory-nucleus-r",
+   "tris": 1792,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_MEDULLARY_RETICULAR_FORMATION_L_LOCATION_MARKER.L",
+   "atlas_id": "reticular-formation-medullary-superior-anchor-l",
+   "tris": 804,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_MEDULLARY_RETICULAR_FORMATION_R_LOCATION_MARKER.R",
+   "atlas_id": "reticular-formation-medullary-superior-anchor-r",
+   "tris": 804,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CAUDAL_ROSTRAL_LINEAR_RAPHE_NUCLEUS_COMPLEX_LOCATION_MARKER",
+   "atlas_id": "raphe-linear-caudal-rostral-anchor",
+   "tris": 1412,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_CEREBRI_BASE_OF_PEDUNCLE_LEFT.L",
+   "atlas_id": "cerebral-peduncle-crus-l",
+   "tris": 2999,
+   "boundary_edges": 6,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_CEREBRI_BASE_OF_PEDUNCLE_RIGHT.R",
+   "atlas_id": "cerebral-peduncle-crus-r",
+   "tris": 2999,
+   "boundary_edges": 6,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CUNEIFORM_NUCLEUS_L_LOCATION_MARKER.L",
+   "atlas_id": "nucleus-cuneiform-anchor-l",
+   "tris": 760,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CUNEIFORM_NUCLEUS_R_LOCATION_MARKER.R",
+   "atlas_id": "nucleus-cuneiform-anchor-r",
+   "tris": 760,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.DORSAL_RAPHE_NUCLEUS",
+   "atlas_id": "raphe-dorsal",
+   "tris": 940,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_COLLICULUS.L",
+   "atlas_id": "inferior-colliculus-l",
+   "tris": 1420,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_COLLICULUS.R",
+   "atlas_id": "inferior-colliculus-r",
+   "tris": 1356,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MESENCEPHALIC_RETICULAR_FORMATION_L_LOCATION_MARKER.L",
+   "atlas_id": "reticular-formation-mesencephalic-anchor-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MESENCEPHALIC_RETICULAR_FORMATION_L_AAN_ATLAS.L",
+   "atlas_id": "reticular-formation-mesencephalic-aan-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MESENCEPHALIC_RETICULAR_FORMATION_R_LOCATION_MARKER.R",
+   "atlas_id": "reticular-formation-mesencephalic-anchor-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MESENCEPHALIC_RETICULAR_FORMATION_R_AAN_ATLAS.R",
+   "atlas_id": "reticular-formation-mesencephalic-aan-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MICROCELLULAR_TEGMENTAL_AND_PARABIGEMINAL_NUCLEI_L_LOCATION_MARKER.L",
+   "atlas_id": "nucleus-microcellular-tegmental-parabigeminal-anchor-l",
+   "tris": 496,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MICROCELLULAR_TEGMENTAL_AND_PARABIGEMINAL_NUCLEI_R_LOCATION_MARKER.R",
+   "atlas_id": "nucleus-microcellular-tegmental-parabigeminal-anchor-r",
+   "tris": 496,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.OCULOMOTOR_NUCLEUS_LEFT.L",
+   "atlas_id": "oculomotor-nucleus-l",
+   "tris": 1536,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.OCULOMOTOR_NUCLEUS_RIGHT.R",
+   "atlas_id": "oculomotor-nucleus-r",
+   "tris": 1536,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PERIAQUEDUCTAL_GREY.L",
+   "atlas_id": "periaqueductal-grey-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PERIAQUEDUCTAL_GREY.R",
+   "atlas_id": "periaqueductal-grey-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.POSTERIOR_COMMISSURE",
+   "atlas_id": "posterior-commissure",
+   "tris": 176,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.RED_NUCLEUS.L",
+   "atlas_id": "red-nucleus-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.RED_NUCLEUS.R",
+   "atlas_id": "red-nucleus-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA.L",
+   "atlas_id": "substantia-nigra-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA.R",
+   "atlas_id": "substantia-nigra-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA_PARS_COMPACTA.L",
+   "atlas_id": "substantia-nigra-pars-compacta-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA_PARS_COMPACTA.R",
+   "atlas_id": "substantia-nigra-pars-compacta-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA_PARS_RETICULATA.L",
+   "atlas_id": "substantia-nigra-pars-reticulata-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBSTANTIA_NIGRA_PARS_RETICULATA.R",
+   "atlas_id": "substantia-nigra-pars-reticulata-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_COLLICULUS.L",
+   "atlas_id": "superior-colliculus-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_COLLICULUS.R",
+   "atlas_id": "superior-colliculus-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_TEGMENTAL_AREA.L",
+   "atlas_id": "ventral-tegmental-area-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VENTRAL_TEGMENTAL_AREA.R",
+   "atlas_id": "ventral-tegmental-area-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ABDUCENS_NUCLEUS_LEFT.L",
+   "atlas_id": "abducens-nucleus-l",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ABDUCENS_NUCLEUS_RIGHT.R",
+   "atlas_id": "abducens-nucleus-r",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.FACIAL_MOTOR_NUCLEUS_LEFT.L",
+   "atlas_id": "facial-motor-nucleus-l",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.FACIAL_MOTOR_NUCLEUS_RIGHT.R",
+   "atlas_id": "facial-motor-nucleus-r",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_PARABRACHIAL_NUCLEUS_L_LOCATION_MARKER.L",
+   "atlas_id": "nucleus-parabrachial-lateral-anchor-l",
+   "tris": 808,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERAL_PARABRACHIAL_NUCLEUS_R_LOCATION_MARKER.R",
+   "atlas_id": "nucleus-parabrachial-lateral-anchor-r",
+   "tris": 808,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERODORSAL_TEGMENTAL_NUCLEUS_L_AAN_ATLAS.L",
+   "atlas_id": "nucleus-laterodorsal-tegmental-aan-l",
+   "tris": 464,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LATERODORSAL_TEGMENTAL_NUCLEUS_R_AAN_ATLAS.R",
+   "atlas_id": "nucleus-laterodorsal-tegmental-aan-r",
+   "tris": 464,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOCUS_COERULEUS.L",
+   "atlas_id": "locus-coeruleus-meta-l",
+   "tris": 968,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOCUS_COERULEUS.R",
+   "atlas_id": "locus-coeruleus-meta-r",
+   "tris": 832,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PARABRACHIAL_NUCLEUS_L_LOCATION_MARKER.L",
+   "atlas_id": "nucleus-parabrachial-medial-anchor-l",
+   "tris": 744,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAL_PARABRACHIAL_NUCLEUS_R_LOCATION_MARKER.R",
+   "atlas_id": "nucleus-parabrachial-medial-anchor-r",
+   "tris": 740,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MEDIAN_RAPHE_NUCLEUS",
+   "atlas_id": "raphe-median",
+   "tris": 508,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ORAL_PONTINE_RETICULAR_NUCLEUS_L_AAN_ATLAS.L",
+   "atlas_id": "reticular-formation-pontine-aan-l",
+   "tris": 1780,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.ORAL_PONTINE_RETICULAR_NUCLEUS_R_AAN_ATLAS.R",
+   "atlas_id": "reticular-formation-pontine-aan-r",
+   "tris": 1780,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARABRACHIAL_COMPLEX_L_AAN_ATLAS.L",
+   "atlas_id": "nucleus-parabrachial-lateral-aan-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARABRACHIAL_COMPLEX_R_AAN_ATLAS.R",
+   "atlas_id": "nucleus-parabrachial-lateral-aan-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAMEDIAN_RAPHE_NUCLEUS_L_LOCATION_MARKER.L",
+   "atlas_id": "raphe-paramedian-anchor-l",
+   "tris": 696,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PARAMEDIAN_RAPHE_NUCLEUS_R_LOCATION_MARKER.R",
+   "atlas_id": "raphe-paramedian-anchor-r",
+   "tris": 696,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PEDUNCULOPONTINE_NUCLEUS.L",
+   "atlas_id": "pedunculopontine-nucleus-l",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.PEDUNCULOPONTINE_NUCLEUS.R",
+   "atlas_id": "pedunculopontine-nucleus-r",
+   "tris": 2000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBCOERULEUS_NUCLEUS_L_LOCATION_MARKER.L",
+   "atlas_id": "nucleus-subcoeruleus-anchor-l",
+   "tris": 520,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUBCOERULEUS_NUCLEUS_R_LOCATION_MARKER.R",
+   "atlas_id": "nucleus-subcoeruleus-anchor-r",
+   "tris": 520,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_OLIVARY_COMPLEX_L_LOCATION_MARKER.L",
+   "atlas_id": "superior-olivary-complex-anchor-l",
+   "tris": 372,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_OLIVARY_COMPLEX_R_LOCATION_MARKER.R",
+   "atlas_id": "superior-olivary-complex-anchor-r",
+   "tris": 372,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_SALIVATORY_NUCLEUS_LEFT.L",
+   "atlas_id": "superior-salivatory-nucleus-l",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_SALIVATORY_NUCLEUS_RIGHT.R",
+   "atlas_id": "superior-salivatory-nucleus-r",
+   "tris": 768,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VESTIBULAR_NUCLEI_LEFT.L",
+   "atlas_id": "vestibular-nuclei-l",
+   "tris": 1568,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VESTIBULAR_NUCLEI_RIGHT.R",
+   "atlas_id": "vestibular-nuclei-r",
+   "tris": 1568,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_I.L",
+   "atlas_id": "cerebellar-lobule-crus-i-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_I.R",
+   "atlas_id": "cerebellar-lobule-crus-i-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_II.L",
+   "atlas_id": "cerebellar-lobule-crus-ii-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CRUS_II.R",
+   "atlas_id": "cerebellar-lobule-crus-ii-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_IX.L",
+   "atlas_id": "cerebellar-lobule-ix-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_IX.R",
+   "atlas_id": "cerebellar-lobule-ix-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_V.L",
+   "atlas_id": "cerebellar-lobule-v-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_V.R",
+   "atlas_id": "cerebellar-lobule-v-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VI.L",
+   "atlas_id": "cerebellar-lobule-vi-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VI.R",
+   "atlas_id": "cerebellar-lobule-vi-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIIA.L",
+   "atlas_id": "cerebellar-lobule-viiia-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIIA.R",
+   "atlas_id": "cerebellar-lobule-viiia-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIIB.L",
+   "atlas_id": "cerebellar-lobule-viiib-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIIB.R",
+   "atlas_id": "cerebellar-lobule-viiib-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIB.L",
+   "atlas_id": "cerebellar-lobule-viib-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_VIIB.R",
+   "atlas_id": "cerebellar-lobule-viib-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_X_FLOCCULONODULAR.L",
+   "atlas_id": "cerebellar-lobule-x-fs-l",
+   "tris": 6680,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULE_X_FLOCCULONODULAR.R",
+   "atlas_id": "cerebellar-lobule-x-fs-r",
+   "tris": 6480,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULES_I_IV.L",
+   "atlas_id": "cerebellar-lobule-i-iv-fs-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.LOBULES_I_IV.R",
+   "atlas_id": "cerebellar-lobule-i-iv-fs-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_CEREBELLAR_PEDUNCLE.L",
+   "atlas_id": "inferior-cerebellar-peduncle-l",
+   "tris": 19999,
+   "boundary_edges": 39,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.INFERIOR_CEREBELLAR_PEDUNCLE.R",
+   "atlas_id": "inferior-cerebellar-peduncle-r",
+   "tris": 19999,
+   "boundary_edges": 35,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.MIDDLE_CEREBELLAR_PEDUNCLE",
+   "atlas_id": "middle-cerebellar-peduncle",
+   "tris": 19986,
+   "boundary_edges": 20,
+   "nonmanifold_edges": 35
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.SUPERIOR_CEREBELLAR_PEDUNCLE",
+   "atlas_id": "superior-cerebellar-peduncle",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VERMIS_IX",
+   "atlas_id": "cerebellar-vermis-ix-fs",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VERMIS_VI",
+   "atlas_id": "cerebellar-vermis-vi-fs",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VERMIS_VII_CRUS_I_CRUS_II_AND_VIIB",
+   "atlas_id": "cerebellar-vermis-vii-fs",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VERMIS_VIII_VIIIA_AND_VIIIB",
+   "atlas_id": "cerebellar-vermis-viii-fs",
+   "tris": 3999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.VERMIS_X_FLOCCULONODULAR",
+   "atlas_id": "cerebellar-vermis-x-fs",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FACIAL_NERVE_CN_VII_CISTERNAL.L",
+   "atlas_id": "cn-07-facial-l",
+   "tris": 2892,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FACIAL_NERVE_CN_VII_CISTERNAL.R",
+   "atlas_id": "cn-07-facial-r",
+   "tris": 2624,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_CN_III_CISTERNAL.L",
+   "atlas_id": "cn-03-oculomotor-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_CN_III_CISTERNAL.R",
+   "atlas_id": "cn-03-oculomotor-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_ORBITAL_BRANCHES.L",
+   "atlas_id": "oculomotor-nerve-orbital-l",
+   "tris": 2464,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_ORBITAL_BRANCHES.R",
+   "atlas_id": "oculomotor-nerve-orbital-r",
+   "tris": 2418,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPHTHALMIC_NERVE_V1_AND_BRANCHES.L",
+   "atlas_id": "ophthalmic-nerve-l",
+   "tris": 5812,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPHTHALMIC_NERVE_V1_AND_BRANCHES.R",
+   "atlas_id": "ophthalmic-nerve-r",
+   "tris": 5778,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_NERVE_TRACT_CN_II.L",
+   "atlas_id": "cn-02-optic-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_NERVE_TRACT_CN_II.R",
+   "atlas_id": "cn-02-optic-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TRIGEMINAL_NERVE_CN_V_CISTERNAL.L",
+   "atlas_id": "cn-05-trigeminal-l",
+   "tris": 4000,
+   "boundary_edges": 16,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TRIGEMINAL_NERVE_CN_V_CISTERNAL.R",
+   "atlas_id": "cn-05-trigeminal-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TROCHLEAR_NERVE.L",
+   "atlas_id": "trochlear-nerve-l",
+   "tris": 2720,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TROCHLEAR_NERVE.R",
+   "atlas_id": "trochlear-nerve-r",
+   "tris": 2758,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VESTIBULOCOCHLEAR_NERVE_CN_VIII_CISTERNAL.L",
+   "atlas_id": "cn-08-vestibulocochlear-l",
+   "tris": 3999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VESTIBULOCOCHLEAR_NERVE_CN_VIII_CISTERNAL.R",
+   "atlas_id": "cn-08-vestibulocochlear-r",
+   "tris": 3998,
+   "boundary_edges": 4,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OLFACTORY_NERVE_I_LEFT.L",
+   "atlas_id": "cn-01-olfactory-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OLFACTORY_NERVE_I_RIGHT.R",
+   "atlas_id": "cn-01-olfactory-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_III_LEFT.L",
+   "atlas_id": "cn-03-oculomotor-course-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OCULOMOTOR_NERVE_III_RIGHT.R",
+   "atlas_id": "cn-03-oculomotor-course-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TROCHLEAR_NERVE_IV_LEFT.L",
+   "atlas_id": "cn-04-trochlear-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TROCHLEAR_NERVE_IV_RIGHT.R",
+   "atlas_id": "cn-04-trochlear-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.GLOSSOPHARYNGEAL_NERVE_IX_LEFT.L",
+   "atlas_id": "cn-09-glossopharyngeal-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.GLOSSOPHARYNGEAL_NERVE_IX_RIGHT.R",
+   "atlas_id": "cn-09-glossopharyngeal-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MANDIBULAR_NERVE_V3_AND_BRANCHES_LEFT.L",
+   "atlas_id": "mandibular-nerve-l",
+   "tris": 7984,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 23
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MANDIBULAR_NERVE_V3_AND_BRANCHES_RIGHT.R",
+   "atlas_id": "mandibular-nerve-r",
+   "tris": 7984,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 23
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MAXILLARY_NERVE_V2_LEFT.L",
+   "atlas_id": "maxillary-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MAXILLARY_NERVE_V2_RIGHT.R",
+   "atlas_id": "maxillary-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TRIGEMINAL_NERVE_V_LEFT.L",
+   "atlas_id": "cn-05-trigeminal-course-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TRIGEMINAL_NERVE_V_RIGHT.R",
+   "atlas_id": "cn-05-trigeminal-course-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ABDUCENS_NERVE_VI_LEFT.L",
+   "atlas_id": "cn-06-abducens-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ABDUCENS_NERVE_VI_RIGHT.R",
+   "atlas_id": "cn-06-abducens-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.CHORDA_TYMPANI_LEFT.L",
+   "atlas_id": "cn-07-chorda-tympani-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.CHORDA_TYMPANI_RIGHT.R",
+   "atlas_id": "cn-07-chorda-tympani-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FACIAL_NERVE_VII_LEFT.L",
+   "atlas_id": "cn-07-facial-course-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FACIAL_NERVE_VII_RIGHT.R",
+   "atlas_id": "cn-07-facial-course-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VESTIBULOCOCHLEAR_NERVE_VIII_LEFT.L",
+   "atlas_id": "cn-08-vestibulocochlear-course-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VESTIBULOCOCHLEAR_NERVE_VIII_RIGHT.R",
+   "atlas_id": "cn-08-vestibulocochlear-course-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VAGUS_NERVE_X_LEFT.L",
+   "atlas_id": "cn-10-vagus-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.VAGUS_NERVE_X_RIGHT.R",
+   "atlas_id": "cn-10-vagus-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ACCESSORY_NERVE_XI_LEFT.L",
+   "atlas_id": "cn-11-accessory-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ACCESSORY_NERVE_XI_RIGHT.R",
+   "atlas_id": "cn-11-accessory-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.HYPOGLOSSAL_NERVE_XII_LEFT.L",
+   "atlas_id": "cn-12-hypoglossal-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.HYPOGLOSSAL_NERVE_XII_RIGHT.R",
+   "atlas_id": "cn-12-hypoglossal-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_CHIASM",
+   "atlas_id": "optic-chiasm",
+   "tris": 1788,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_NERVE.L",
+   "atlas_id": "optic-nerve-l",
+   "tris": 4236,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_NERVE.R",
+   "atlas_id": "optic-nerve-r",
+   "tris": 4236,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_TRACT.L",
+   "atlas_id": "optic-tract-l",
+   "tris": 2336,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OPTIC_TRACT.R",
+   "atlas_id": "optic-tract-r",
+   "tris": 2332,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.ANTERIOR_HORN_OF_THE_SPINAL_CORD_Z_ANATOMY",
+   "atlas_id": "spinal-grey-anterior-horn",
+   "tris": 7999,
+   "boundary_edges": 83,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.POSTERIOR_HORN_OF_THE_SPINAL_CORD_Z_ANATOMY",
+   "atlas_id": "spinal-grey-posterior-horn",
+   "tris": 8000,
+   "boundary_edges": 80,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.ANTERIOR_VENTRAL_ROOTS_LEFT.L",
+   "atlas_id": "spinal-roots-anterior-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.ANTERIOR_VENTRAL_ROOTS_RIGHT.R",
+   "atlas_id": "spinal-roots-anterior-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.CAUDA_EQUINA",
+   "atlas_id": "cauda-equina",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 240
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_ANTERIOR_VENTRAL_ROOTS_LEFT.L",
+   "atlas_id": "roots-lumbosacral-anterior-l",
+   "tris": 1592,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_ANTERIOR_VENTRAL_ROOTS_RIGHT.R",
+   "atlas_id": "roots-lumbosacral-anterior-r",
+   "tris": 1592,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_DORSAL_ROOT_GANGLIA_LEFT.L",
+   "atlas_id": "ganglia-lumbosacral-l",
+   "tris": 160,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_DORSAL_ROOT_GANGLIA_RIGHT.R",
+   "atlas_id": "ganglia-lumbosacral-r",
+   "tris": 160,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_POSTERIOR_DORSAL_ROOTS_LEFT.L",
+   "atlas_id": "roots-lumbosacral-posterior-l",
+   "tris": 1592,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBOSACRAL_POSTERIOR_DORSAL_ROOTS_RIGHT.R",
+   "atlas_id": "roots-lumbosacral-posterior-r",
+   "tris": 1592,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.POSTERIOR_DORSAL_ROOTS_LEFT.L",
+   "atlas_id": "spinal-roots-posterior-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.POSTERIOR_DORSAL_ROOTS_RIGHT.R",
+   "atlas_id": "spinal-roots-posterior-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.CERVICAL_CORD_C1_C8",
+   "atlas_id": "spinal-segment-cervical-vert",
+   "tris": 3568,
+   "boundary_edges": 104,
+   "nonmanifold_edges": 22
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.FILUM_TERMINALE",
+   "atlas_id": "filum-terminale-vert",
+   "tris": 1769,
+   "boundary_edges": 89,
+   "nonmanifold_edges": 10
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.LUMBAR_CORD_L1_L5",
+   "atlas_id": "spinal-segment-lumbar-vert",
+   "tris": 3338,
+   "boundary_edges": 23,
+   "nonmanifold_edges": 19
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.SACRAL_AND_COCCYGEAL_CORD_S1_S5_CO",
+   "atlas_id": "spinal-segment-sacral-vert",
+   "tris": 1812,
+   "boundary_edges": 13,
+   "nonmanifold_edges": 9
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.THORACIC_CORD_T1_T12",
+   "atlas_id": "spinal-segment-thoracic-vert",
+   "tris": 6000,
+   "boundary_edges": 15,
+   "nonmanifold_edges": 37
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.SPINAL.WHITE_MATTER_OF_THE_SPINAL_CORD_Z_ANATOMY",
+   "atlas_id": "spinal-white-columns",
+   "tris": 8000,
+   "boundary_edges": 180,
+   "nonmanifold_edges": 74
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.COMMON_PERONEAL_FIBULAR_NERVE_LEFT.L",
+   "atlas_id": "common-peroneal-nerve-l",
+   "tris": 5404,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.COMMON_PERONEAL_FIBULAR_NERVE_RIGHT.R",
+   "atlas_id": "common-peroneal-nerve-r",
+   "tris": 5404,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DEEP_PERONEAL_FIBULAR_NERVE_LEFT.L",
+   "atlas_id": "deep-peroneal-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DEEP_PERONEAL_FIBULAR_NERVE_RIGHT.R",
+   "atlas_id": "deep-peroneal-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DORSAL_CUTANEOUS_NERVES_OF_THE_FOOT_LEFT.L",
+   "atlas_id": "dorsal-cutaneous-nerves-foot-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DORSAL_CUTANEOUS_NERVES_OF_THE_FOOT_RIGHT.R",
+   "atlas_id": "dorsal-cutaneous-nerves-foot-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FEMORAL_NERVE_LEFT.L",
+   "atlas_id": "femoral-nerve-l",
+   "tris": 10836,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.FEMORAL_NERVE_RIGHT.R",
+   "atlas_id": "femoral-nerve-r",
+   "tris": 10836,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.GENITOFEMORAL_NERVE_LEFT.L",
+   "atlas_id": "genitofemoral-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.GENITOFEMORAL_NERVE_RIGHT.R",
+   "atlas_id": "genitofemoral-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ILIOHYPOGASTRIC_NERVE_LEFT.L",
+   "atlas_id": "iliohypogastric-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ILIOHYPOGASTRIC_NERVE_RIGHT.R",
+   "atlas_id": "iliohypogastric-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ILIOINGUINAL_NERVE_LEFT.L",
+   "atlas_id": "ilioinguinal-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ILIOINGUINAL_NERVE_RIGHT.R",
+   "atlas_id": "ilioinguinal-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LATERAL_FEMORAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "lateral-femoral-cutaneous-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LATERAL_FEMORAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "lateral-femoral-cutaneous-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LUMBOSACRAL_PLEXUS_PROXIMAL_BRANCHES_LEFT.L",
+   "atlas_id": "lumbosacral-plexus-l",
+   "tris": 15985,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 34
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LUMBOSACRAL_PLEXUS_PROXIMAL_BRANCHES_RIGHT.R",
+   "atlas_id": "lumbosacral-plexus-r",
+   "tris": 15985,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 34
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LUMBOSACRAL_TRUNK_LEFT.L",
+   "atlas_id": "lumbosacral-trunk-l",
+   "tris": 1920,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LUMBOSACRAL_TRUNK_RIGHT.R",
+   "atlas_id": "lumbosacral-trunk-r",
+   "tris": 1920,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OBTURATOR_NERVE_LEFT.L",
+   "atlas_id": "obturator-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.OBTURATOR_NERVE_RIGHT.R",
+   "atlas_id": "obturator-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.POSTERIOR_FEMORAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "posterior-femoral-cutaneous-nerve-l",
+   "tris": 6996,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.POSTERIOR_FEMORAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "posterior-femoral-cutaneous-nerve-r",
+   "tris": 6996,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SAPHENOUS_NERVE_LEFT.L",
+   "atlas_id": "saphenous-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SAPHENOUS_NERVE_RIGHT.R",
+   "atlas_id": "saphenous-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SCIATIC_NERVE_LEFT.L",
+   "atlas_id": "sciatic-nerve-l",
+   "tris": 13140,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SCIATIC_NERVE_RIGHT.R",
+   "atlas_id": "sciatic-nerve-r",
+   "tris": 13140,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERFICIAL_PERONEAL_FIBULAR_NERVE_LEFT.L",
+   "atlas_id": "superficial-peroneal-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERFICIAL_PERONEAL_FIBULAR_NERVE_RIGHT.R",
+   "atlas_id": "superficial-peroneal-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERIOR_GLUTEAL_NERVE_LEFT.L",
+   "atlas_id": "superior-gluteal-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERIOR_GLUTEAL_NERVE_RIGHT.R",
+   "atlas_id": "superior-gluteal-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SURAL_NERVE_LEFT.L",
+   "atlas_id": "sural-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SURAL_NERVE_RIGHT.R",
+   "atlas_id": "sural-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TIBIAL_NERVE_LEFT.L",
+   "atlas_id": "tibial-nerve-l",
+   "tris": 6940,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.TIBIAL_NERVE_RIGHT.R",
+   "atlas_id": "tibial-nerve-r",
+   "tris": 6940,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.PHRENIC_NERVE_LEFT.L",
+   "atlas_id": "phrenic-nerve-l",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.PHRENIC_NERVE_RIGHT.R",
+   "atlas_id": "phrenic-nerve-r",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.INTERCOSTAL_NERVES_LEFT.L",
+   "atlas_id": "intercostal-nerves-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.INTERCOSTAL_NERVES_RIGHT.R",
+   "atlas_id": "intercostal-nerves-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.AXILLARY_NERVE_LEFT.L",
+   "atlas_id": "axillary-nerve-l",
+   "tris": 3100,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.AXILLARY_NERVE_RIGHT.R",
+   "atlas_id": "axillary-nerve-r",
+   "tris": 3100,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.BRACHIAL_PLEXUS_LEFT.L",
+   "atlas_id": "brachial-plexus-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.BRACHIAL_PLEXUS_RIGHT.R",
+   "atlas_id": "brachial-plexus-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DORSAL_SCAPULAR_NERVE_LEFT.L",
+   "atlas_id": "dorsal-scapular-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.DORSAL_SCAPULAR_NERVE_RIGHT.R",
+   "atlas_id": "dorsal-scapular-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LATERAL_ANTEBRACHIAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "lateral-antebrachial-cutaneous-nerve-l",
+   "tris": 4636,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LATERAL_ANTEBRACHIAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "lateral-antebrachial-cutaneous-nerve-r",
+   "tris": 4636,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LONG_THORACIC_NERVE_LEFT.L",
+   "atlas_id": "long-thoracic-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.LONG_THORACIC_NERVE_RIGHT.R",
+   "atlas_id": "long-thoracic-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_AND_LATERAL_PECTORAL_NERVES_LEFT.L",
+   "atlas_id": "pectoral-nerves-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_AND_LATERAL_PECTORAL_NERVES_RIGHT.R",
+   "atlas_id": "pectoral-nerves-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_ANTEBRACHIAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "medial-antebrachial-cutaneous-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_ANTEBRACHIAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "medial-antebrachial-cutaneous-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_BRACHIAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "medial-brachial-cutaneous-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAL_BRACHIAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "medial-brachial-cutaneous-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAN_NERVE_LEFT.L",
+   "atlas_id": "median-nerve-l",
+   "tris": 13852,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MEDIAN_NERVE_RIGHT.R",
+   "atlas_id": "median-nerve-r",
+   "tris": 13852,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MUSCULOCUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "musculocutaneous-nerve-l",
+   "tris": 3868,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.MUSCULOCUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "musculocutaneous-nerve-r",
+   "tris": 3868,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.POSTERIOR_ANTEBRACHIAL_CUTANEOUS_NERVE_LEFT.L",
+   "atlas_id": "posterior-antebrachial-cutaneous-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.POSTERIOR_ANTEBRACHIAL_CUTANEOUS_NERVE_RIGHT.R",
+   "atlas_id": "posterior-antebrachial-cutaneous-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.RADIAL_NERVE_LEFT.L",
+   "atlas_id": "radial-nerve-l",
+   "tris": 6172,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.RADIAL_NERVE_RIGHT.R",
+   "atlas_id": "radial-nerve-r",
+   "tris": 6172,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERFICIAL_BRANCH_OF_THE_RADIAL_NERVE_LEFT.L",
+   "atlas_id": "superficial-radial-nerve-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPERFICIAL_BRANCH_OF_THE_RADIAL_NERVE_RIGHT.R",
+   "atlas_id": "superficial-radial-nerve-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPRASCAPULAR_NERVE_LEFT.L",
+   "atlas_id": "suprascapular-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SUPRASCAPULAR_NERVE_RIGHT.R",
+   "atlas_id": "suprascapular-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.THORACODORSAL_NERVE_LEFT.L",
+   "atlas_id": "thoracodorsal-nerve-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.THORACODORSAL_NERVE_RIGHT.R",
+   "atlas_id": "thoracodorsal-nerve-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ULNAR_NERVE_LEFT.L",
+   "atlas_id": "ulnar-nerve-l",
+   "tris": 8476,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.ULNAR_NERVE_RIGHT.R",
+   "atlas_id": "ulnar-nerve-r",
+   "tris": 8476,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.CILIARY_GANGLION.L",
+   "atlas_id": "ciliary-ganglion-l",
+   "tris": 180,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.CILIARY_GANGLION.R",
+   "atlas_id": "ciliary-ganglion-r",
+   "tris": 246,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SYMPATHETIC_TRUNK_AND_GANGLIA_LEFT.L",
+   "atlas_id": "sympathetic-trunk-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.PERIPHERAL.SYMPATHETIC_TRUNK_AND_GANGLIA_RIGHT.R",
+   "atlas_id": "sympathetic-trunk-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CHOROID_PLEXUS_LEFT.L",
+   "atlas_id": "choroid-plexus-l",
+   "tris": 2647,
+   "boundary_edges": 3,
+   "nonmanifold_edges": 5
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.NERVOUS.CHOROID_PLEXUS_RIGHT.R",
+   "atlas_id": "choroid-plexus-r",
+   "tris": 2647,
+   "boundary_edges": 3,
+   "nonmanifold_edges": 5
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.FASCIA.CRANIAL_DURA_MATER",
+   "atlas_id": "dura-mater-cranial",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.FASCIA.TENTORIUM_CEREBELLI",
+   "atlas_id": "tentorium-cerebelli",
+   "tris": 21924,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.FASCIA.FALX_CEREBRI",
+   "atlas_id": "falx-cerebri",
+   "tris": 7983,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 315
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.FASCIA.SPINAL_DURA_MATER",
+   "atlas_id": "spinal-dura",
+   "tris": 8000,
+   "boundary_edges": 785,
+   "nonmanifold_edges": 3
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_CEREBRAL_ARTERY.L",
+   "atlas_id": "artery-aca-l",
+   "tris": 400,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_CEREBRAL_ARTERY.R",
+   "atlas_id": "artery-aca-r",
+   "tris": 400,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_CHOROIDAL_ARTERY.L",
+   "atlas_id": "artery-anterior-choroidal-l",
+   "tris": 418,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_CHOROIDAL_ARTERY.R",
+   "atlas_id": "artery-anterior-choroidal-r",
+   "tris": 418,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_CAROTID_ARTERY.L",
+   "atlas_id": "artery-internal-carotid-l",
+   "tris": 5552,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_CAROTID_ARTERY.R",
+   "atlas_id": "artery-internal-carotid-r",
+   "tris": 7894,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.MIDDLE_CEREBRAL_ARTERY.L",
+   "atlas_id": "artery-mca-l",
+   "tris": 7478,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.MIDDLE_CEREBRAL_ARTERY.R",
+   "atlas_id": "artery-mca-r",
+   "tris": 7478,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.OPHTHALMIC_ARTERY.L",
+   "atlas_id": "artery-ophthalmic-l",
+   "tris": 2410,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.OPHTHALMIC_ARTERY.R",
+   "atlas_id": "artery-ophthalmic-r",
+   "tris": 2410,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_COMMUNICATING_ARTERY",
+   "atlas_id": "artery-acom",
+   "tris": 80,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_COMMUNICATING_ARTERY.L",
+   "atlas_id": "artery-pcom-l",
+   "tris": 204,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_COMMUNICATING_ARTERY.R",
+   "atlas_id": "artery-pcom-r",
+   "tris": 204,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.CEREBRAL_ARTERIES_MRA_ATLAS_ISO_SURFACE",
+   "atlas_id": "arteries-mra-atlas",
+   "tris": 59999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.LENTICULOSTRIATE_ARTERIES.L",
+   "atlas_id": "arteries-lenticulostriate-l",
+   "tris": 1542,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.LENTICULOSTRIATE_ARTERIES.R",
+   "atlas_id": "arteries-lenticulostriate-r",
+   "tris": 1542,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.THALAMOPERFORATING_AND_THALAMOGENICULATE_ARTERIES.L",
+   "atlas_id": "arteries-thalamoperforating-l",
+   "tris": 1484,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.THALAMOPERFORATING_AND_THALAMOGENICULATE_ARTERIES.R",
+   "atlas_id": "arteries-thalamoperforating-r",
+   "tris": 1484,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.ANTERIOR_INFERIOR_CEREBELLAR_ARTERY",
+   "atlas_id": "artery-aica",
+   "tris": 1532,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.BASILAR_ARTERY",
+   "atlas_id": "artery-basilar",
+   "tris": 262,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_CEREBRAL_ARTERY.L",
+   "atlas_id": "artery-pca-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_CEREBRAL_ARTERY.R",
+   "atlas_id": "artery-pca-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_CHOROIDAL_ARTERIES.L",
+   "atlas_id": "artery-posterior-choroidal-l",
+   "tris": 880,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_CHOROIDAL_ARTERIES.R",
+   "atlas_id": "artery-posterior-choroidal-r",
+   "tris": 880,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_INFERIOR_CEREBELLAR_ARTERY.L",
+   "atlas_id": "artery-pica-l",
+   "tris": 3998,
+   "boundary_edges": 4,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.POSTERIOR_INFERIOR_CEREBELLAR_ARTERY.R",
+   "atlas_id": "artery-pica-r",
+   "tris": 3998,
+   "boundary_edges": 4,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SUPERIOR_CEREBELLAR_ARTERY.L",
+   "atlas_id": "artery-sca-l",
+   "tris": 406,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SUPERIOR_CEREBELLAR_ARTERY.R",
+   "atlas_id": "artery-sca-r",
+   "tris": 406,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.VERTEBRAL_ARTERY.L",
+   "atlas_id": "artery-vertebral-l",
+   "tris": 800,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.VERTEBRAL_ARTERY.R",
+   "atlas_id": "artery-vertebral-r",
+   "tris": 800,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ACA_TERRITORY.L",
+   "atlas_id": "territory-aca-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ACA_TERRITORY.R",
+   "atlas_id": "territory-aca-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ANTERIOR_CHOROIDAL_THALAMOPERFORATING_TERRITORY.L",
+   "atlas_id": "territory-anterior-choroidal-thalamoperforating-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ANTERIOR_CHOROIDAL_THALAMOPERFORATING_TERRITORY.R",
+   "atlas_id": "territory-anterior-choroidal-thalamoperforating-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.BASILAR_PONTINE_TERRITORY.L",
+   "atlas_id": "territory-basilar-l",
+   "tris": 16000,
+   "boundary_edges": 16,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.BASILAR_PONTINE_TERRITORY.R",
+   "atlas_id": "territory-basilar-r",
+   "tris": 16000,
+   "boundary_edges": 16,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.INFERIOR_CEREBELLAR_PICA_AICA_TERRITORY.L",
+   "atlas_id": "territory-inferior-cerebellar-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.INFERIOR_CEREBELLAR_PICA_AICA_TERRITORY.R",
+   "atlas_id": "territory-inferior-cerebellar-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.LATERAL_LENTICULOSTRIATE_TERRITORY.L",
+   "atlas_id": "territory-lateral-lenticulostriate-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.LATERAL_LENTICULOSTRIATE_TERRITORY.R",
+   "atlas_id": "territory-lateral-lenticulostriate-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_FRONTAL.L",
+   "atlas_id": "territory-mca-frontal-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_FRONTAL.R",
+   "atlas_id": "territory-mca-frontal-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_INSULAR.L",
+   "atlas_id": "territory-mca-insular-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_INSULAR.R",
+   "atlas_id": "territory-mca-insular-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_OCCIPITAL.L",
+   "atlas_id": "territory-mca-occipital-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_OCCIPITAL.R",
+   "atlas_id": "territory-mca-occipital-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_PARIETAL.L",
+   "atlas_id": "territory-mca-parietal-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_PARIETAL.R",
+   "atlas_id": "territory-mca-parietal-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_TEMPORAL.L",
+   "atlas_id": "territory-mca-temporal-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_TERRITORY_TEMPORAL.R",
+   "atlas_id": "territory-mca-temporal-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MEDIAL_LENTICULOSTRIATE_TERRITORY.L",
+   "atlas_id": "territory-medial-lenticulostriate-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MEDIAL_LENTICULOSTRIATE_TERRITORY.R",
+   "atlas_id": "territory-medial-lenticulostriate-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_TERRITORY_OCCIPITAL.L",
+   "atlas_id": "territory-pca-occipital-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_TERRITORY_OCCIPITAL.R",
+   "atlas_id": "territory-pca-occipital-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_TERRITORY_TEMPORAL.L",
+   "atlas_id": "territory-pca-temporal-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_TERRITORY_TEMPORAL.R",
+   "atlas_id": "territory-pca-temporal-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.POSTERIOR_CHOROIDAL_THALAMOPERFORATING_TERRITORY.L",
+   "atlas_id": "territory-posterior-choroidal-thalamoperforating-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.POSTERIOR_CHOROIDAL_THALAMOPERFORATING_TERRITORY.R",
+   "atlas_id": "territory-posterior-choroidal-thalamoperforating-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.SUPERIOR_CEREBELLAR_ARTERY_TERRITORY.L",
+   "atlas_id": "territory-superior-cerebellar-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.SUPERIOR_CEREBELLAR_ARTERY_TERRITORY.R",
+   "atlas_id": "territory-superior-cerebellar-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ACA_MAJOR_TERRITORY.L",
+   "atlas_id": "territory-aca-major-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.ACA_MAJOR_TERRITORY.R",
+   "atlas_id": "territory-aca-major-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_MAJOR_TERRITORY.L",
+   "atlas_id": "territory-mca-major-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.MCA_MAJOR_TERRITORY.R",
+   "atlas_id": "territory-mca-major-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_MAJOR_TERRITORY.L",
+   "atlas_id": "territory-pca-major-l",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.PCA_MAJOR_TERRITORY.R",
+   "atlas_id": "territory-pca-major-r",
+   "tris": 16000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.VERTEBROBASILAR_MAJOR_TERRITORY.L",
+   "atlas_id": "territory-vertebrobasilar-major-l",
+   "tris": 16000,
+   "boundary_edges": 8,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TERRITORIES.VERTEBROBASILAR_MAJOR_TERRITORY.R",
+   "atlas_id": "territory-vertebrobasilar-major-r",
+   "tris": 15999,
+   "boundary_edges": 9,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.BASAL_VEIN_OF_ROSENTHAL.L",
+   "atlas_id": "vein-basal-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.BASAL_VEIN_OF_ROSENTHAL.R",
+   "atlas_id": "vein-basal-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.GREAT_CEREBRAL_VEIN_OF_GALEN",
+   "atlas_id": "vein-great-cerebral",
+   "tris": 4000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_CEREBRAL_VEIN.L",
+   "atlas_id": "vein-internal-cerebral-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_CEREBRAL_VEIN.R",
+   "atlas_id": "vein-internal-cerebral-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.CAVERNOUS_SINUS_LEFT.L",
+   "atlas_id": "sinus-cavernous-l",
+   "tris": 5227,
+   "boundary_edges": 77,
+   "nonmanifold_edges": 1325
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.CAVERNOUS_SINUS_RIGHT.R",
+   "atlas_id": "sinus-cavernous-r",
+   "tris": 5184,
+   "boundary_edges": 87,
+   "nonmanifold_edges": 1319
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INFERIOR_PETROSAL_SINUS_LEFT.L",
+   "atlas_id": "sinus-inferior-petrosal-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INFERIOR_PETROSAL_SINUS_RIGHT.R",
+   "atlas_id": "sinus-inferior-petrosal-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INFERIOR_SAGITTAL_SINUS",
+   "atlas_id": "sinus-inferior-sagittal",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERCAVERNOUS_SINUSES",
+   "atlas_id": "sinus-intercavernous",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.OCCIPITAL_SINUS",
+   "atlas_id": "sinus-occipital",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SIGMOID_SINUS_LEFT.L",
+   "atlas_id": "sinus-sigmoid-l",
+   "tris": 2332,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SIGMOID_SINUS_RIGHT.R",
+   "atlas_id": "sinus-sigmoid-r",
+   "tris": 2332,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.STRAIGHT_SINUS",
+   "atlas_id": "sinus-straight",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.STRAIGHT_SINUS_VENAT_ATLAS",
+   "atlas_id": "sinus-straight-venat",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SUPERIOR_PETROSAL_SINUS_LEFT.L",
+   "atlas_id": "sinus-superior-petrosal-l",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SUPERIOR_PETROSAL_SINUS_RIGHT.R",
+   "atlas_id": "sinus-superior-petrosal-r",
+   "tris": 3000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.SUPERIOR_SAGITTAL_SINUS",
+   "atlas_id": "sinus-superior-sagittal",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.TRANSVERSE_SINUS_LEFT.L",
+   "atlas_id": "sinus-transverse-l",
+   "tris": 5404,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.TRANSVERSE_SINUS_RIGHT.R",
+   "atlas_id": "sinus-transverse-r",
+   "tris": 5404,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_JUGULAR_VEIN_LEFT.L",
+   "atlas_id": "vein-internal-jugular-l",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.INTERNAL_JUGULAR_VEIN_RIGHT.R",
+   "atlas_id": "vein-internal-jugular-r",
+   "tris": 8000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.CARDIOVASCULAR.CEREBRAL_VEINS_AND_SINUSES_VENAT_ATLAS_ISO_SURFACE",
+   "atlas_id": "veins-venat-atlas",
+   "tris": 60000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ARCUATE_FASCICULUS.L",
+   "atlas_id": "tract-arcuate-fasciculus-l",
+   "tris": 19994,
+   "boundary_edges": 8,
+   "nonmanifold_edges": 12
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ARCUATE_FASCICULUS.R",
+   "atlas_id": "tract-arcuate-fasciculus-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 11
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FRONTAL_ASLANT_TRACT.L",
+   "atlas_id": "tract-frontal-aslant-l",
+   "tris": 19998,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 8
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FRONTAL_ASLANT_TRACT.R",
+   "atlas_id": "tract-frontal-aslant-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.INFERIOR_FRONTO_OCCIPITAL_FASCICULUS.L",
+   "atlas_id": "tract-inferior-fronto-occipital-fasciculus-l",
+   "tris": 19985,
+   "boundary_edges": 24,
+   "nonmanifold_edges": 38
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.INFERIOR_FRONTO_OCCIPITAL_FASCICULUS.R",
+   "atlas_id": "tract-inferior-fronto-occipital-fasciculus-r",
+   "tris": 19983,
+   "boundary_edges": 22,
+   "nonmanifold_edges": 35
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.INFERIOR_LONGITUDINAL_FASCICULUS.L",
+   "atlas_id": "tract-inferior-longitudinal-fasciculus-l",
+   "tris": 19986,
+   "boundary_edges": 18,
+   "nonmanifold_edges": 31
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.INFERIOR_LONGITUDINAL_FASCICULUS.R",
+   "atlas_id": "tract-inferior-longitudinal-fasciculus-r",
+   "tris": 19986,
+   "boundary_edges": 18,
+   "nonmanifold_edges": 30
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.MIDDLE_LONGITUDINAL_FASCICULUS.L",
+   "atlas_id": "tract-middle-longitudinal-fasciculus-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.MIDDLE_LONGITUDINAL_FASCICULUS.R",
+   "atlas_id": "tract-middle-longitudinal-fasciculus-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_I.L",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-i-l",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_I.R",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-i-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_II.L",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-ii-l",
+   "tris": 19989,
+   "boundary_edges": 19,
+   "nonmanifold_edges": 26
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_II.R",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-ii-r",
+   "tris": 19987,
+   "boundary_edges": 22,
+   "nonmanifold_edges": 21
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_III.L",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-iii-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_LONGITUDINAL_FASCICULUS_III.R",
+   "atlas_id": "tract-superior-longitudinal-fasciculus-iii-r",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.UNCINATE_FASCICULUS.L",
+   "atlas_id": "tract-uncinate-fasciculus-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.UNCINATE_FASCICULUS.R",
+   "atlas_id": "tract-uncinate-fasciculus-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.DENTATORUBROTHALAMIC_TRACT.L",
+   "atlas_id": "tract-dentatorubrothalamic-l",
+   "tris": 19994,
+   "boundary_edges": 7,
+   "nonmanifold_edges": 17
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.DENTATORUBROTHALAMIC_TRACT.R",
+   "atlas_id": "tract-dentatorubrothalamic-r",
+   "tris": 19995,
+   "boundary_edges": 10,
+   "nonmanifold_edges": 13
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ANTERIOR_COMMISSURE_HCP",
+   "atlas_id": "tract-anterior-commissure",
+   "tris": 19963,
+   "boundary_edges": 61,
+   "nonmanifold_edges": 67
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORPUS_CALLOSUM_FIBRES_HCP",
+   "atlas_id": "tract-corpus-callosum",
+   "tris": 19667,
+   "boundary_edges": 492,
+   "nonmanifold_edges": 603
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CINGULUM_FRONTO_PARIETAL.L",
+   "atlas_id": "tract-cingulum-frontoparietal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CINGULUM_FRONTO_PARIETAL.R",
+   "atlas_id": "tract-cingulum-frontoparietal-r",
+   "tris": 19995,
+   "boundary_edges": 8,
+   "nonmanifold_edges": 8
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CINGULUM_PARAHIPPOCAMPAL.L",
+   "atlas_id": "tract-cingulum-parahippocampal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CINGULUM_PARAHIPPOCAMPAL.R",
+   "atlas_id": "tract-cingulum-parahippocampal-r",
+   "tris": 18748,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FORNIX_HCP.L",
+   "atlas_id": "tract-fornix-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FORNIX_HCP.R",
+   "atlas_id": "tract-fornix-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.STRIA_TERMINALIS_LEFT.L",
+   "atlas_id": "stria-terminalis-l",
+   "tris": 746,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.STRIA_TERMINALIS_RIGHT.R",
+   "atlas_id": "stria-terminalis-r",
+   "tris": 746,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ACOUSTIC_RADIATION.L",
+   "atlas_id": "tract-acoustic-radiation-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ACOUSTIC_RADIATION.R",
+   "atlas_id": "tract-acoustic-radiation-r",
+   "tris": 17040,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ANTERIOR_THALAMIC_RADIATION.L",
+   "atlas_id": "tract-thalamic-radiation-anterior-l",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.ANTERIOR_THALAMIC_RADIATION.R",
+   "atlas_id": "tract-thalamic-radiation-anterior-r",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOBULBAR_TRACT.L",
+   "atlas_id": "tract-corticobulbar-l",
+   "tris": 19999,
+   "boundary_edges": 28,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOBULBAR_TRACT.R",
+   "atlas_id": "tract-corticobulbar-r",
+   "tris": 19999,
+   "boundary_edges": 39,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICORETICULAR_TRACT.L",
+   "atlas_id": "tract-corticoreticular-l",
+   "tris": 19998,
+   "boundary_edges": 3,
+   "nonmanifold_edges": 8
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICORETICULAR_TRACT.R",
+   "atlas_id": "tract-corticoreticular-r",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 15
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSPINAL_TRACT.L",
+   "atlas_id": "tract-corticospinal-l",
+   "tris": 19998,
+   "boundary_edges": 23,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSPINAL_TRACT.R",
+   "atlas_id": "tract-corticospinal-r",
+   "tris": 19998,
+   "boundary_edges": 38,
+   "nonmanifold_edges": 3
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_ANTERIOR.L",
+   "atlas_id": "tract-corticostriatal-anterior-l",
+   "tris": 19995,
+   "boundary_edges": 8,
+   "nonmanifold_edges": 10
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_ANTERIOR.R",
+   "atlas_id": "tract-corticostriatal-anterior-r",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 3
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_POSTERIOR.L",
+   "atlas_id": "tract-corticostriatal-posterior-l",
+   "tris": 13340,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_POSTERIOR.R",
+   "atlas_id": "tract-corticostriatal-posterior-r",
+   "tris": 11846,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_SUPERIOR.L",
+   "atlas_id": "tract-corticostriatal-superior-l",
+   "tris": 19997,
+   "boundary_edges": 4,
+   "nonmanifold_edges": 8
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.CORTICOSTRIATAL_TRACT_SUPERIOR.R",
+   "atlas_id": "tract-corticostriatal-superior-r",
+   "tris": 19986,
+   "boundary_edges": 23,
+   "nonmanifold_edges": 30
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FRONTOPONTINE_TRACT.L",
+   "atlas_id": "tract-corticopontine-frontal-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.FRONTOPONTINE_TRACT.R",
+   "atlas_id": "tract-corticopontine-frontal-r",
+   "tris": 19988,
+   "boundary_edges": 18,
+   "nonmanifold_edges": 19
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.MEDIAL_LEMNISCUS.L",
+   "atlas_id": "tract-medial-lemniscus-l",
+   "tris": 20000,
+   "boundary_edges": 46,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.MEDIAL_LEMNISCUS.R",
+   "atlas_id": "tract-medial-lemniscus-r",
+   "tris": 19999,
+   "boundary_edges": 49,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.OCCIPITOPONTINE_TRACT.L",
+   "atlas_id": "tract-corticopontine-occipital-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 2
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.OCCIPITOPONTINE_TRACT.R",
+   "atlas_id": "tract-corticopontine-occipital-r",
+   "tris": 19999,
+   "boundary_edges": 2,
+   "nonmanifold_edges": 1
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.OPTIC_RADIATION.L",
+   "atlas_id": "tract-optic-radiation-l",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.OPTIC_RADIATION.R",
+   "atlas_id": "tract-optic-radiation-r",
+   "tris": 20000,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.PARIETOPONTINE_TRACT.L",
+   "atlas_id": "tract-corticopontine-parietal-l",
+   "tris": 19990,
+   "boundary_edges": 25,
+   "nonmanifold_edges": 22
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.PARIETOPONTINE_TRACT.R",
+   "atlas_id": "tract-corticopontine-parietal-r",
+   "tris": 19992,
+   "boundary_edges": 27,
+   "nonmanifold_edges": 25
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.POSTERIOR_THALAMIC_RADIATION.L",
+   "atlas_id": "tract-thalamic-radiation-posterior-l",
+   "tris": 6478,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.POSTERIOR_THALAMIC_RADIATION.R",
+   "atlas_id": "tract-thalamic-radiation-posterior-r",
+   "tris": 8986,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.RETICULOSPINAL_TRACT.L",
+   "atlas_id": "tract-reticulospinal-l",
+   "tris": 12906,
+   "boundary_edges": 76,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.RETICULOSPINAL_TRACT.R",
+   "atlas_id": "tract-reticulospinal-r",
+   "tris": 8272,
+   "boundary_edges": 52,
+   "nonmanifold_edges": 0
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_THALAMIC_RADIATION.L",
+   "atlas_id": "tract-thalamic-radiation-superior-l",
+   "tris": 19982,
+   "boundary_edges": 29,
+   "nonmanifold_edges": 29
+  },
+  {
+   "id": "ATLAS.NERVOUS.MNI152.TRACTS.SUPERIOR_THALAMIC_RADIATION.R",
+   "atlas_id": "tract-thalamic-radiation-superior-r",
+   "tris": 19985,
+   "boundary_edges": 23,
+   "nonmanifold_edges": 32
+  }
+ ],
+ "atlas_manifest_generated": "2026-09-20T10:21:07+00:00"
+}

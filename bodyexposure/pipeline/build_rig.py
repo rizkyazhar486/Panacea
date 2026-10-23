@@ -85,6 +85,7 @@ def extreme(name, axis, mode):
 
 
 jc, meta = {}, {}
+AXIS = {}  # sumbu fleksi anatomis ISB: medial → lateral (garis epikondilus / maleolus)
 for s in SIDES:
     jc[f"HIP.{s}"], meta[f"HIP.{s}"] = head_centre("FEMUR", "Head of femur", s)
     jc[f"SHOULDER.{s}"], meta[f"SHOULDER.{s}"] = head_centre("HUMERUS", "Head of humerus", s)
@@ -92,10 +93,20 @@ for s in SIDES:
                                   ("ELBOW", "HUMERUS", "Medial epicondyle of humerus", "Lateral epicondyle of humerus", "midpoint of humeral epicondyles")]:
         (pa, da), (pb, db) = landmark(a, P + bone, s), landmark(b, P + bone, s)
         jc[f"{key}.{s}"] = (pa + pb) / 2; meta[f"{key}.{s}"] = {"method": defn, "mirror_snap_mm": round(max(da, db) * 1000, 2)}
+        AXIS[f"{key}.{s}"] = (pb - pa) / np.linalg.norm(pb - pa)
     (pm, dm), (pl, dl) = landmark("Medial malleolus", P + "TIBIA", s), landmark("Lateral malleolus", P + "FIBULA", s)
     jc[f"ANKLE.{s}"] = (pm + pl) / 2; meta[f"ANKLE.{s}"] = {"method": "midpoint of medial and lateral malleoli", "mirror_snap_mm": round(max(dm, dl) * 1000, 2)}
+    AXIS[f"ANKLE.{s}"] = (pl - pm) / np.linalg.norm(pl - pm)
     rs, us = extreme(f"{P}RADIUS.{s}", 2, "min"), extreme(f"{P}ULNA.{s}", 2, "min")
     jc[f"WRIST.{s}"] = (rs + us) / 2; meta[f"WRIST.{s}"] = {"method": "midpoint of radial and ulnar styloid tips (most distal vertices)"}
+    AXIS[f"WRIST.{s}"] = (us - rs) / np.linalg.norm(us - rs)  # fleksi pergelangan ≈ garis stiloid radius–ulna
+    # sumbu pronasi–supinasi: pusat kaput radius (proksimal) → pusat kaput ulna (distal); radius berputar mengelilingi
+    # ulna, ulna tetap pada sendi humeroulnar. Lengan tergantung (posisi anatomis): proksimal = z maksimum.
+    Vr, Vu = verts(f"{P}RADIUS.{s}"), verts(f"{P}ULNA.{s}")
+    jc[f"RADIAL_HEAD.{s}"] = Vr[Vr[:, 2] > Vr[:, 2].max() - 0.012].mean(0)
+    jc[f"ULNAR_HEAD.{s}"] = Vu[Vu[:, 2] < Vu[:, 2].min() + 0.015].mean(0)
+    meta[f"RADIAL_HEAD.{s}"] = {"method": "centroid of the proximal 12 mm of the radius (radial head)"}
+    meta[f"ULNAR_HEAD.{s}"] = {"method": "centroid of the distal 15 mm of the ulna (ulnar head)"}
     jc[f"HAND_END.{s}"] = extreme(f"{P}THIRD_METACARPAL_BONE.{s}", 2, "min"); meta[f"HAND_END.{s}"] = {"method": "distal end of third metacarpal"}
     jc[f"TOE_END.{s}"] = extreme(f"{P}SECOND_METATARSAL_BONE.{s}", 1, "min"); meta[f"TOE_END.{s}"] = {"method": "distal (anterior) end of second metatarsal"}
     jc[f"STERNOCLAVICULAR.{s}"] = centroid(f"{J}ARTICULAR_DISC_OF_STERNOCLAVICULAR_JOINT.{s}"); meta[f"STERNOCLAVICULAR.{s}"] = {"method": "centroid of sternoclavicular articular disc"}
@@ -109,6 +120,16 @@ skull = [n for n in ob.keys() if re.match(P + r"(FRONTAL_BONE|PARIETAL_BONE\.[LR
 top = max((extreme(n, 2, "max") for n in skull), key=lambda v: v[2])
 jc["VERTEX"] = np.array([0.0, top[1], top[2]]); meta["VERTEX"] = {"method": "highest point of the calvaria, midsagittal"}
 jc["PELVIS_CENTRE"] = (jc["HIP.L"] + jc["HIP.R"]) / 2; meta["PELVIS_CENTRE"] = {"method": "midpoint of hip joint centres"}
+# opsional: pusat engsel siku/pergelangan kaki/pergelangan tangan yang disempurnakan (fit_hinge_centres.py; geser ⟂ sumbu, ±12 mm per arah)
+HINGE_NOTE = None
+if "--hinges" in argv:
+    ref = json.load(open(argv[argv.index("--hinges") + 1]))["hinges"]
+    for k, r in ref.items():
+        jc[k] = np.array(r["refined_centre_m"])
+        meta[k] = dict(meta[k], refined="surface-congruence hinge fit", shift_mm=r["shift_mm"],
+                       max_penetration_mm=[r["max_penetration_mm_isb"], r["max_penetration_mm_refined"]])
+    HINGE_NOTE = {k: {"shift_mm": r["shift_mm"], "max_penetration_mm_isb": r["max_penetration_mm_isb"],
+                      "max_penetration_mm_refined": r["max_penetration_mm_refined"]} for k, r in ref.items()}
 
 # ── armature ──────────────────────────────────────────────────────────────────
 arm_d = bpy.data.armatures.new("RIG.ADULT_MALE"); arm = bpy.data.objects.new("RIG.ADULT_MALE", arm_d)
@@ -138,10 +159,21 @@ for s in SIDES:
     bone(f"CLAVICLE.{s}", jc[f"STERNOCLAVICULAR.{s}"], jc[f"SHOULDER.{s}"], VERT_OF["T1"])
     bone(f"UPPER_ARM.{s}", jc[f"SHOULDER.{s}"], jc[f"ELBOW.{s}"], f"CLAVICLE.{s}", connect=True)
     bone(f"FOREARM.{s}", jc[f"ELBOW.{s}"], jc[f"WRIST.{s}"], f"UPPER_ARM.{s}", connect=True)
-    bone(f"HAND.{s}", jc[f"WRIST.{s}"], jc[f"HAND_END.{s}"], f"FOREARM.{s}", connect=True)
+    bone(f"FOREARM_ROT.{s}", jc[f"RADIAL_HEAD.{s}"], jc[f"ULNAR_HEAD.{s}"], f"FOREARM.{s}")  # radius + tangan berputar di sini
+    bone(f"HAND.{s}", jc[f"WRIST.{s}"], jc[f"HAND_END.{s}"], f"FOREARM_ROT.{s}")
     bone(f"THIGH.{s}", jc[f"HIP.{s}"], jc[f"KNEE.{s}"], "PELVIS")
     bone(f"SHIN.{s}", jc[f"KNEE.{s}"], jc[f"ANKLE.{s}"], f"THIGH.{s}", connect=True)
     bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"TOE_END.{s}"], f"SHIN.{s}", connect=True)
+# sumbu fleksi lutut, siku, pergelangan kaki = garis epikondilus / maleolus (ISB, Wu dkk. 2002/2005), bukan sekadar
+# tegak lurus tulang ke anterior: X lokal tulang distal diarahkan ke sumbu itu (diproyeksikan ⟂ tulang).
+AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE", "HAND": "WRIST"}
+axis_dev = {}
+for s in SIDES:
+    for bn, key in AXIS_BONE.items():
+        b = eb[f"{bn}.{s}"]; y = (b.tail - b.head).normalized()
+        x = Vector(AXIS[f"{key}.{s}"].tolist()); x = (x - y * x.dot(y)).normalized()
+        old_x = b.x_axis.copy(); b.align_roll(x.cross(y))
+        dev = math.degrees(old_x.angle(b.x_axis)); axis_dev[f"{bn}.{s}"] = round(min(dev, 180 - dev), 1)  # sudut antar garis (arah sumbu bisa terbalik)
 bpy.ops.object.mode_set(mode='OBJECT')
 
 # ── ikatan kaku: tiap mesh rangka/sendi → satu tulang rig ────────────────────
@@ -156,7 +188,8 @@ RULES = [
     (r"\.(TIBIA|FIBULA)\.|KNEE|MENISC|CRUCIATE|TIBIAL_COLLATERAL|FIBULAR_COLLATERAL|PATELLAR_LIGAMENT|TIBIOFIBULAR|INTEROSSEOUS_MEMBRANE_OF_LEG|POPLITEAL", "SHIN"),
     (r"TALUS|CALCANEUS|NAVICULAR|CUBOID|CUNEIFORM|METATARS|OF_FOOT|TOE|SESAMOID_BONES_OF_FOOT|PLANTAR|TALO|CALCANEO|DELTOID_LIGAMENT|ANKLE|TARS", "FOOT"),
     (r"\.HUMERUS\.|GLENOHUMERAL|CORACOHUMERAL|GLENOID_LABRUM", "UPPER_ARM"),
-    (r"\.(RADIUS|ULNA)\.|ELBOW|ANNULAR_LIGAMENT|RADIO_ULNAR|INTEROSSEOUS_MEMBRANE_OF_FOREARM|ULNAR_COLLATERAL_LIGAMENT\.|RADIAL_COLLATERAL_LIGAMENT\.", "FOREARM"),
+    (r"\.RADIUS\.|RADIO_ULNAR|DISTAL_RADIO", "FOREARM_ROT"),  # radius & sendi radioulnar distal ikut berputar (pronasi)
+    (r"\.ULNA\.|ELBOW|ANNULAR_LIGAMENT|INTEROSSEOUS_MEMBRANE_OF_FOREARM|ULNAR_COLLATERAL_LIGAMENT\.|RADIAL_COLLATERAL_LIGAMENT\.", "FOREARM"),
     (r"SCAPHOID|LUNATE|TRIQUETR|PISIFORM|TRAPEZI|CAPITATE|HAMATE|METACARP|OF_HAND|CARP|WRIST|RADIOCARPAL|FINGER|THUMB|SESAMOID_BONES_OF_HAND|PALMAR|PISOHAMATE", "HAND"),
     (r"\.(CLAVICLE|SCAPULA)\.|STERNOCLAVICULAR|ACROMIOCLAVICULAR|CORACOCLAVICULAR|CORACOACROMIAL|TRANSVERSE_SCAPULAR|COSTOCLAVICULAR|CONOID|TRAPEZOID_LIGAMENT", "CLAVICLE"),
 ]
@@ -217,7 +250,8 @@ ROM = {  # tulang: {gerak: derajat}
     "UPPER_ARM": {"flexion": 180, "extension": 60, "abduction": 180, "adduction": 0, "internal_rotation": 70, "external_rotation": 90},
     # rotasi lengan bawah = pronasi/supinasi. AAOS: 80/80 dari posisi netral (ibu jari ke atas); posisi istirahat
     # anatomis = supinasi penuh, jadi dari istirahat: pronasi 0→160, supinasi 0 (diverifikasi: radius distal lateral dari ulna)
-    "FOREARM": {"flexion": 150, "extension": 0, "internal_rotation": 160, "external_rotation": 0},
+    "FOREARM": {"flexion": 150, "extension": 0},
+    "FOREARM_ROT": {"internal_rotation": 160, "external_rotation": 0},  # pronasi 0→160 dari istirahat (supinasi penuh)
     "HAND": {"flexion": 80, "extension": 70, "abduction": 20, "adduction": 30},  # abduksi = deviasi radial, aduksi = deviasi ulnar
 }
 
@@ -264,7 +298,7 @@ for s in SIDES:
 
 # ── QA rig ────────────────────────────────────────────────────────────────────
 def length(n): return arm_d.bones[n].length
-sym = {b: round(abs(length(f"{b}.L") - length(f"{b}.R")) * 1000, 2) for b in ("CLAVICLE", "UPPER_ARM", "FOREARM", "HAND", "THIGH", "SHIN", "FOOT")}
+sym = {b: round(abs(length(f"{b}.L") - length(f"{b}.R")) * 1000, 2) for b in ("CLAVICLE", "UPPER_ARM", "FOREARM", "FOREARM_ROT", "HAND", "THIGH", "SHIN", "FOOT")}
 seglen = {b.name: round(b.length * 1000, 1) for b in arm_d.bones}
 prox = {}
 for key, pair in {"HIP": ("FEMUR", "HIP_BONE"), "KNEE": ("FEMUR", "TIBIA"), "ANKLE": ("TIBIA", "TALUS"),
@@ -289,7 +323,11 @@ bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(OUT))
 json.dump({"body": "HUMAN.ADULT.MALE", "frame": "+Z superior, +X subject left, -Y anterior, metres",
            "joint_centres_m": {k: [round(float(x), 4) for x in v] for k, v in jc.items()}, "joint_centre_methods": meta,
            "segments_mm": seglen, "rom_limits_deg_local": limits_report,
-           "rom_source": "AAOS normal values (Greene & Heckman 1994)", "binding": {k: len(v) for k, v in binding.items()}, "qa": qa},
+           "rom_source": "AAOS normal values (Greene & Heckman 1994)",
+           "flexion_axis": "knee, elbow, ankle and wrist flexion about the epicondylar / malleolar / styloid line (ISB); others perpendicular to the bone, anterior roll",
+           "flexion_axis_change_deg": axis_dev,
+           "flexion_axes": {k: [round(float(x), 5) for x in v] for k, v in AXIS.items()},
+           "hinge_refinement": HINGE_NOTE, "binding": {k: len(v) for k, v in binding.items()}, "qa": qa},
           open(REPORT, "w"), indent=1)
 print("RIG", len(arm_d.bones), "bones;", qa["bound_meshes"], "/", qa["meshes_considered"], "meshes bound;", len(review), "for review")
 print("SYM", sym); print("PROX", prox)

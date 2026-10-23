@@ -5,7 +5,7 @@ import {
   daftarEncounter,
   simpanEncounter,
   type SimpananEncounter,
-} from '../src/rekamEncounter.js'
+} from '../src/domains/clinical-records/rekamEncounter.js'
 
 const lama = {
   id: 'enc-1',
@@ -61,3 +61,21 @@ assert.match(indexSource, /getRecordHistory\(patientId, recordId\)/, 'history be
 assert.match(indexSource, /record_patient_mismatch/, 'server belum menolak record yang mengaku milik pasien lain')
 
 console.log('rekamEncounter: multi-encounter per pasien, migrasi legacy, exact-id update, latest pointer, scoped archive')
+
+// Actual HTTP creation, authorization and file persistence across process restart.
+await import('./encounterHttpRestart.uji.js')
+// Alpha A1: one account id <-> one clinical id across record, encounter, lab, referral, care and the longitudinal read model.
+await import('./patientIdentityContinuity.uji.js')
+// Alpha A3: per-answer anamnesis provenance and immutable signed versions.
+await import('./anamnesisProvenanceVersioning.uji.js')
+
+// Alpha A8: one scripted journey from identity to follow-up with real persistence across a process restart.
+await import('./careJourneyRestart.uji.js')
+
+// Alpha A4-A6 characterization and review-claim integrity: no client-asserted clinical review, signed state only from a verified clinician.
+await import('./clinicalSigningIntegrity.uji.js')
+await import('./tandaTanganDitolak.uji.js')
+
+await import('./examinationWriteHttp.uji.js')
+
+await import('./clinical/carePlanApproval.uji.js')

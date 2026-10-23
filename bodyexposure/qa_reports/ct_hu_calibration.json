@@ -1,0 +1,92 @@
+{
+ "dicom_tags": {
+  "Modality": "OT",
+  "RescaleSlope": "1",
+  "RescaleIntercept": "0",
+  "RescaleType": "US",
+  "BitsStored": "16",
+  "PixelRepresentation": "0",
+  "SpacingBetweenSlices": "1"
+ },
+ "air": [
+  {
+   "slice": 700,
+   "pixels": 108832,
+   "stored_median": 24.0,
+   "hu_median_if_offset_1024": -1000.0
+  },
+  {
+   "slice": 1000,
+   "pixels": 44621,
+   "stored_median": 27.0,
+   "hu_median_if_offset_1024": -997.0
+  },
+  {
+   "slice": 1300,
+   "pixels": 65257,
+   "stored_median": 26.0,
+   "hu_median_if_offset_1024": -998.0
+  },
+  {
+   "slice": 1450,
+   "pixels": 95995,
+   "stored_median": 27.0,
+   "hu_median_if_offset_1024": -997.0
+  }
+ ],
+ "organs": {
+  "liver": {
+   "mean_hu": 35.6,
+   "p5": -3.0,
+   "p95": 83.0,
+   "literature": "about +50 to +70 healthy; lower with fat"
+  },
+  "aorta": {
+   "mean_hu": 43.1,
+   "p5": -15.0,
+   "p95": 113.0,
+   "literature": "blood about +40"
+  },
+  "autochthon_left": {
+   "mean_hu": 9.9,
+   "p5": -67.0,
+   "p95": 60.0,
+   "literature": "muscle about +45 to +60; lower post-mortem or fatty"
+  },
+  "vertebrae_L3": {
+   "mean_hu": 295.3,
+   "p5": 58.0,
+   "p95": 851.0,
+   "literature": "bone mix 150-400"
+  }
+ },
+ "soft_tissue_histogram_peaks_hu": [
+  [
+   -110,
+   1746349
+  ],
+  [
+   -120,
+   1632257
+  ],
+  [
+   -100,
+   1422320
+  ],
+  [
+   30,
+   1387478
+  ],
+  [
+   40,
+   1347101
+  ],
+  [
+   20,
+   1270635
+  ]
+ ],
+ "fat_peak_hu_bin": -110,
+ "soft_peak_hu_bin": 30,
+ "fat_to_soft_separation_hu": 140
+}

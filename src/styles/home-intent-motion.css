@@ -1,34 +1,63 @@
-/* Compact action surface: one line of intent + two real actions. */
+/* Compact action surface: executive card in Bento Grid */
 .panacea-intent-hero {
   position: relative;
-  min-height: 116px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(250px, 360px);
-  align-items: center;
-  gap: clamp(16px, 3vw, 32px);
-  padding: clamp(14px, 2.4vw, 22px) clamp(2px, 1vw, 10px);
+  border-radius: 24px;
+  padding: 22px 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #0f172a;
   overflow: hidden;
-  border-block: 1px solid rgba(255,255,255,.08);
-  background: transparent;
+}
+
+.dark .panacea-intent-hero {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #0c1017;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   color: #fff;
 }
 
 .panacea-intent-hero__copy h1 {
   margin: 0;
   max-width: 620px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: clamp(22px, 3.2vw, 34px);
-  line-height: 1;
-  letter-spacing: -.045em;
-  font-weight: 720;
+  font-size: clamp(20px, 2.2vw, 26px);
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dark .panacea-intent-hero__copy h1 {
+  color: #ffffff;
 }
 
 .panacea-intent-hero__actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
+  gap: 10px;
+  width: 100%;
+}
+
+.panacea-intent-action--primary {
+  background: linear-gradient(135deg, #00bf63, #009e52) !important;
+  color: #ffffff !important;
+  border-color: rgba(0, 191, 99, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 191, 99, 0.25) !important;
+  font-weight: 700 !important;
+}
+
+.panacea-intent-action--primary:hover {
+  background: linear-gradient(135deg, #05d670, #00b05b) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 191, 99, 0.35) !important;
+}
+
+.panacea-intent-action--primary .panacea-intent-action__icon {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
 }
 
 .panacea-intent-action {
@@ -118,4 +147,36 @@
   justify-content: center;
   gap: 4px;
   text-align: center;
+}
+
+/* Light mode adaptation: clean white action buttons and crisp contrast */
+html:not(.dark) .panacea-intent-hero {
+  border-block-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-intent-hero__copy h1 {
+  color: #0f172a !important;
+}
+
+html.dark .panacea-intent-hero__copy h1 {
+  color: #ffffff !important;
+}
+
+html:not(.dark) .panacea-intent-action {
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+html:not(.dark) .panacea-intent-action__icon {
+  background: rgba(0, 0, 0, 0.04);
+  color: #00BF63;
+}
+
+html:not(.dark) .panacea-intent-action:hover,
+html:not(.dark) .panacea-intent-action:focus-visible {
+  border-color: rgba(0, 191, 99, 0.4);
+  background: #f0fdf4;
 }

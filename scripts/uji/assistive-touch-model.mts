@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 const {
   DEFAULT_ASSISTIVE_PREFERENCES,
   normalizeAssistivePreferences,
@@ -7,7 +8,7 @@ const {
 } = await import('../../src/lib/interaction/assistive.ts')
 
 const { KATALOG_AKSI } = await import('../../src/lib/aksiFab.ts')
-const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
 
 const fallback = normalizeAssistivePreferences(null)
 chk('null preference falls back to defaults', fallback.size === DEFAULT_ASSISTIVE_PREFERENCES.size && fallback.gestures.singleTap === 'menu')

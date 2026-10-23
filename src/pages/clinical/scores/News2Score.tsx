@@ -6,6 +6,7 @@ import { ScoreTrend } from '../../../components/ScoreTrend'
 import { getHealthCache, hasHealth } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { news2, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS2 (National Early Warning Score 2) — Royal College of Physicians (2017).
@@ -15,49 +16,6 @@ import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
 // exists for patients with hypercapnic respiratory failure on a lower target
 // range, not implemented here.
 // ─────────────────────────────────────────────────────────────────────────────
-
-function rrPts(v: number): number {
-  if (v <= 8) return 3
-  if (v <= 11) return 1
-  if (v <= 20) return 0
-  if (v <= 24) return 2
-  return 3
-}
-function spo2Pts(v: number): number {
-  if (v <= 91) return 3
-  if (v <= 93) return 2
-  if (v <= 95) return 1
-  return 0
-}
-function sbpPts(v: number): number {
-  if (v <= 90) return 3
-  if (v <= 100) return 2
-  if (v <= 110) return 1
-  if (v <= 219) return 0
-  return 3
-}
-function hrPts(v: number): number {
-  if (v <= 40) return 3
-  if (v <= 50) return 1
-  if (v <= 90) return 0
-  if (v <= 110) return 1
-  if (v <= 130) return 2
-  return 3
-}
-function tempPts(v: number): number {
-  if (v <= 35.0) return 3
-  if (v <= 36.0) return 1
-  if (v <= 38.0) return 0
-  if (v <= 39.0) return 1
-  return 2
-}
-
-function band(total: number, anyThree: boolean): { label: string; tone: 'brand' | 'low' | 'critical'; action: string } {
-  if (total >= 7) return { label: 'High risk', tone: 'critical', action: 'Urgent/emergency clinical review — continuous monitoring, consider critical care referral.' }
-  if (total >= 5 || anyThree) return { label: 'Medium risk', tone: 'low', action: 'Urgent review by a clinician skilled in acute illness, increased monitoring frequency.' }
-  if (total >= 1) return { label: 'Low-medium risk', tone: 'brand', action: 'Ward nurse review, consider increasing monitoring frequency.' }
-  return { label: 'Low risk', tone: 'brand', action: 'Routine monitoring per ward protocol.' }
-}
 
 export function News2Score() {
   // NEWS2 adalah pemicu eskalasi di samping tempat tidur. Sebelum ini halaman
@@ -69,46 +27,30 @@ export function News2Score() {
   //
   // Nadi masih boleh terisi dari cache kesehatan, karena itu memang bacaan
   // yang benar-benar ada; hanya nilai bawaan 75-nya yang dihapus.
-  const [rr, setRr] = useState(0)
-  const [spo2, setSpo2] = useState(0)
+  // Teks mentah: kolom kosong = NaN ("belum diisi"), bukan 0.
+  const [rrText, setRr] = useState('')
+  const [spo2Text, setSpo2] = useState('')
   const [onOxygen, setOnOxygen] = useState(false)
-  const [sbp, setSbp] = useState(0)
-  const [hr, setHr] = useState(() => {
+  const [sbpText, setSbp] = useState('')
+  const [hrText, setHr] = useState(() => {
     const v = getHealthCache().restingHr
-    return typeof v === 'number' && v > 0 ? v : 0
+    return typeof v === 'number' && v > 0 ? String(v) : ''
   })
   const hrFromDevice = hasHealth('restingHr')
   const [alert, setAlert] = useState(true)
-  const [temp, setTemp] = useState(0)
+  const [tempText, setTemp] = useState('')
 
-  const belum: string[] = []
-  if (!(rr > 0)) belum.push('respiration rate')
-  if (!(spo2 > 0)) belum.push('SpO₂')
-  if (!(sbp > 0)) belum.push('systolic BP')
-  if (!(hr > 0)) belum.push('pulse')
-  if (!(temp > 0)) belum.push('temperature')
-  const lengkap = belum.length === 0
-
-  const rrScore = rrPts(rr)
-  const spo2Score = spo2Pts(spo2)
-  const oxygenScore = onOxygen ? 2 : 0
-  const sbpScore = sbpPts(sbp)
-  const hrScore = hrPts(hr)
-  const consciousnessScore = alert ? 0 : 3
-  const tempScore = tempPts(temp)
-
-  const rows = [
-    { name: 'Respiration rate', pts: rrScore },
-    { name: 'SpO₂', pts: spo2Score },
-    { name: 'Air or oxygen', pts: oxygenScore },
-    { name: 'Systolic BP', pts: sbpScore },
-    { name: 'Pulse', pts: hrScore },
-    { name: 'Consciousness (AVPU)', pts: consciousnessScore },
-    { name: 'Temperature', pts: tempScore },
-  ]
-  const total = rows.reduce((s, r) => s + r.pts, 0)
-  const anyThree = rows.some((r) => r.pts === 3)
-  const result = lengkap ? band(total, anyThree) : null
+  const rr = parseNumberField(rrText)
+  const spo2 = parseNumberField(spo2Text)
+  const sbp = parseNumberField(sbpText)
+  const hr = parseNumberField(hrText)
+  const temp = parseNumberField(tempText)
+  const hasil = news2({ rr, spo2, sbp, hr, temp, onOxygen, alert })
+  const belum = hasil.missing
+  const lengkap = hasil.total !== null
+  const rows = hasil.rows
+  const total = hasil.total ?? 0
+  const result = hasil.band
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -118,19 +60,19 @@ export function News2Score() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Combines 7 routine vital signs into a single escalation trigger. Widely used across UK and international hospital wards to standardize the response to acute deterioration.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Respiration rate (/min)">
-            <input className={inputClass} type="number" min={0} value={rr || ''} onChange={(e) => setRr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={rrText} onChange={(e) => setRr(e.target.value)} />
           </Field>
           <Field label="SpO₂ (%)">
-            <input className={inputClass} type="number" min={0} max={100} value={spo2 || ''} onChange={(e) => setSpo2(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} max={100} value={spo2Text} onChange={(e) => setSpo2(e.target.value)} />
           </Field>
           <Field label="Systolic BP (mmHg)">
-            <input className={inputClass} type="number" min={0} value={sbp || ''} onChange={(e) => setSbp(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={sbpText} onChange={(e) => setSbp(e.target.value)} />
           </Field>
           <Field label={hrFromDevice ? 'Pulse (bpm) — prefilled from Health Profile' : 'Pulse (bpm)'}>
-            <input className={inputClass} type="number" min={0} value={hr || ''} onChange={(e) => setHr(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={0} value={hrText} onChange={(e) => setHr(e.target.value)} />
           </Field>
           <Field label="Temperature (°C)">
-            <input className={inputClass} type="number" step="0.1" value={temp || ''} onChange={(e) => setTemp(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" step="0.1" value={tempText} onChange={(e) => setTemp(e.target.value)} />
           </Field>
         </div>
         {hrFromDevice && (
@@ -144,6 +86,9 @@ export function News2Score() {
           <input type="checkbox" checked={alert} onChange={(e) => setAlert(e.target.checked)} className="h-4 w-4 rounded" />
           Alert (uncheck if confused, responds only to voice/pain, or unresponsive — AVPU)
         </label>
+        {hasil.invalid.length > 0 && (
+          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-red-600">{hasil.invalid.join('; ')}.</p>
+        )}
       </Card>
 
       {lengkap && (
@@ -171,7 +116,7 @@ export function News2Score() {
             <p className="mt-2 text-[12px] text-neutral-500">{result.action}</p>
             <CopyNote text={`NEWS2 ${total} (RR ${rr}, SpO2 ${spo2}%${onOxygen ? ' on supplemental O2' : ' on air'}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'AVPU<A'}, T ${temp.toFixed(1)}°C) — ${result.label.toLowerCase()}: ${result.action} [RCP 2017]`} />
           </>
-        ) : (
+        ) : hasil.invalid.length > 0 ? null : (
           <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             No score yet. Still needed: {belum.join(', ')}.
             {' '}NEWS2 is an escalation trigger, so an unmeasured observation is left blank rather than assumed normal —

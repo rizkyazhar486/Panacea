@@ -1,6 +1,7 @@
+import { chk } from './check.mjs'
 const { classifyReleasedGesture, dominantDirection } = await import('../../src/lib/interaction/gesture.ts')
 
-const chk = (name: string, condition: boolean, detail = '') => console.log(condition ? 'PASS' : 'FAIL', name, detail)
+
 
 chk('small movement is a tap', classifyReleasedGesture({ dx: 3, dy: 2, elapsedMs: 120, dragged: false, longPressed: false, cancelled: false }) === 'tap')
 chk('right swipe is classified', classifyReleasedGesture({ dx: 44, dy: 8, elapsedMs: 220, dragged: false, longPressed: false, cancelled: false }) === 'swipe-right')

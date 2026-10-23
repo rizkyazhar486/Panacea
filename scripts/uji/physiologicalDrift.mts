@@ -1,3 +1,4 @@
+import { chk } from './check.mjs'
 // Physiological Drift Detection is deliberately real statistics (z-score
 // against the patient's own history), not an invented health score — these
 // tests exist to keep it that way: honest about insufficient data, honest
@@ -5,7 +6,7 @@
 import { detectDrift } from '../../src/lib/physiologicalDrift.ts'
 import type { VitalSign } from '../../src/lib/types.ts'
 
-const chk = (n: string, c: boolean, x = '') => console.log(c ? 'PASS' : 'FAIL', n, x)
+
 
 function v(overrides: Partial<VitalSign>): VitalSign {
   return {

@@ -26,6 +26,8 @@ export const GROUPS = [
       { to: '/chatbot', name: 'Ask Health', kw: 'health question ai clinical assistant' },
       { to: '/emr', name: 'AI-EMR', kw: 'medical record longitudinal care documentation' },
       { to: '/doctor-review', name: 'Doctor Review Checklist', kw: 'doctor human review checklist clinical notes provenance safety' },
+      { to: '/doctor-review/lab-results', name: 'Lab Result Review', kw: 'lab result review queue clinician communicate close backend audit' },
+      { to: '/doctor-review/body', name: 'Body Structure Review', kw: 'doctor review checklist anatomy body structure clinical review ledger body exposure' },
       { to: '/clinical-calculators', name: 'Calculators & Lab', kw: 'calculator laboratory clinical score' },
       { to: '/learn', name: 'Learn & Look Up', kw: 'learn lookup study reference' },
     ],
@@ -113,7 +115,7 @@ export function ClinicalHub() {
       <main aria-label="Clinical command surface" className="space-y-9">
         <header className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
-          <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
+          <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-[#a7f3d0]">clinician-in-loop</span>
         </header>
         <BatasKlaimKesehatan
           permukaan="clinical.hub"
@@ -162,6 +164,24 @@ export function ClinicalHub() {
               <span aria-hidden>→</span>
             </Link>
           )}
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review/lab-results"
+              className="flex min-h-[48px] items-center justify-between border-b border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Lab Result Review</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
+          {(account?.role === 'dokter' || account?.isOwner) && (
+            <Link
+              to="/doctor-review/body"
+              className="flex min-h-[48px] items-center justify-between border-b border-white/10 text-xs font-black text-emerald-200/80 transition hover:text-emerald-100"
+            >
+              <span>Body Structure Review</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
 
         <Fold label="Calculators">
@@ -169,7 +189,7 @@ export function ClinicalHub() {
           <div className="border-t border-white/10 pt-4">
             <div className="flex items-center justify-between gap-3">
               <strong className="text-sm">Calculator</strong>
-              <Link to="/clinical-calculators" className="text-[10px] font-black text-white/45 hover:text-white">All calculators →</Link>
+              <Link to="/clinical-calculators" className="inline-flex min-h-[44px] items-center text-[10px] font-black text-white/45 hover:text-white">All calculators →</Link>
             </div>
 
             <div className="mt-4 flex gap-5" role="tablist" aria-label="Quick calculator">
@@ -224,7 +244,7 @@ export function ClinicalHub() {
           <div className="border-t border-white/10 pt-4">
             <div className="flex items-center justify-between gap-3">
               <strong className="text-sm">Lab range</strong>
-              <Link to="/data-lab" className="text-[10px] font-black text-white/45 hover:text-white">Data lab →</Link>
+              <Link to="/data-lab" className="inline-flex min-h-[44px] items-center text-[10px] font-black text-white/45 hover:text-white">Data lab →</Link>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-3">

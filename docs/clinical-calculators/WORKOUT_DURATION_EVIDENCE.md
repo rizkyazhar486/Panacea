@@ -1,0 +1,38 @@
+# Workout duration source boundary
+
+Workout import and persistence now distinguish `source_field`, `timestamps`, and `unknown` duration provenance. These describe client input, not device accuracy or clinical validation. Explicit source zero is retained; valid ordered start/end timestamps may derive zero or positive duration. Missing/invalid duration without usable timestamps remains unknown. Unrepresentable projected timestamps are rejected using JavaScript Date's technical boundary, not an invented clinical threshold.
+
+The existing numeric `durasi` field and nearest-second import precision remain compatible with older consumers. The new `workoutDurationSeconds` accessor returns null for unknown duration, inconsistent timestamp-derived metadata, and ambiguous unmarked legacy zero. Positive legacy durations remain usable; owned cache reads do not rewrite raw bytes. Round-trip persistence retains unknown provenance and existing account/self-subject isolation.
+
+The home weekly summary now displays unknown duration as unavailable rather than zero, preserves recorded zero, labels partial totals, leaves gaps for unavailable weeks, and compares only complete known logged subtotals. The existing eight rolling seven-day bins and WHO reference line remain unchanged. The league excludes records without known positive duration and names calories as recorded instead of claiming external verification; ranking formulas and weights remain unchanged.
+
+Regression evidence includes actual old-parser loss of explicit zero and projected-date RangeError, source/store round trips, wrong-type/nonfinite inputs, TimeClip/overflow boundaries, 1,001 weekly pairs, exact bin boundaries, and the actual built 390×844 home/league browser. The old built weekly UI shows an unknown current week as zero; the browser fixture requires unavailable instead. Browser evidence is synthetic and does not certify physiology or clinical safety.
+
+The lexical blank-to-zero ratchet can now reach zero without changing its detector. C2 remains REPORTED while remaining duration consumers are classified and migrated: workout summaries/detail formatters, daily analysis, replay, charts, training load and dashboard adapters may still use numeric compatibility duration. Do not confuse a zero regex count with complete semantic coverage. No acceptance status or clinical approval is promoted by this change.
+
+Detail duration labels in Training History, professional analysis, daily session rows and the HRA workout context now use the whole-workout provenance accessor. Unknown or ambiguous legacy duration displays a dash; explicit source zero retains the existing known-zero format. Generic numeric formatting remains unchanged for measured zone durations and other numeric quantities. Existing summary calculations and their missingness debt remain separate. Unit pairs cover zero/unknown, source/timestamp consistency and existing nearest-minute precision; the built browser fixture checks unknown versus recorded zero in real Training History rows.
+
+The shared workout summary now counts known and missing duration independently, exposes a nullable known-duration subtotal and detects sum overflow. Unknown duration is excluded from aggregate pace; existing equations for usable duration/distance are preserved. Training History calls the subtotal Logged time, displays unavailable as a dash and labels partial logged time. Numeric compatibility fields remain available for older callers. Calories, distance, replay and other unconverted summary consumers remain separate semantic debt; no blanket completion or clinical approval is claimed.
+
+Daily and weekly duration-weighted heart-rate and cadence averages now exclude unknown duration weights and reject nonfinite accumulator results. The weighted-mean equation and valid-known data remain unchanged. Regression reproduces the old daily average150 from a known100BPM session plus unknown-duration200BPM session; corrected output100 uses the only usable time weight. Missing-only and real-zero intervals produce unavailable weighted averages. Minute totals and remaining downstream adapters still require separate migration.
+
+
+## Training Analytics duration provenance
+
+A synthetic workout marked `durationSource: unknown` previously counted as 30 observed minutes, one duration-bearing session, pace600sec/km and RPE150 despite having no trustworthy duration. `buildTrainingAnalytics` now uses the canonical duration accessor for minute sub-totals, paired pace and session-RPE weighting. Explicit source zero counts as recorded coverage but contributes no positive time weight. The panel labels Logged time, renders unknown-only totals unavailable and labels mixed observed totals partial. Numeric compatibility totals remain zero internally when no duration is known; display uses coverage rather than treating that compatibility value as an observation. Distance/calorie and independent measured pace-series semantics remain separate work.
+
+Regression: `scripts/uji/training-duration-provenance.mts` covers unknown-only/mixed/explicit-zero/nonfinite and1,000 positive duration equations. Existing `training-analytics.mts` passes unchanged. Browser fixture `scripts/qa/training-duration-smoke.mjs` checks actual390x844 UI with synthetic scoped storage, mandatory in Stabilization Acceptance. This verifies software behavior, not device accuracy or clinical review.
+
+Browser evidence is a bundled actual-component fixture, not Home-route integration: the legacy panel is not currently mounted by active Home. Its source repair and component behavior are verified separately; wiring the legacy analytics into an appropriate active surface remains explicit unfinished work.
+
+
+## Human Replay weighted heart rate
+
+The replay previously used `Math.max(1, raw duration)`, admitting explicitly unknown intervals and inventing a positive time weight for zero-length observations. The aggregate now weights only finite, positive source-aware duration and makes nonfinite weighted accumulators unavailable. Explicit source zero remains a valid zero interval but contributes no positive elapsed-time weight. `scripts/uji/replay-duration-weights.mts` reproduces150vs100, checks unknown/zero/overflow, and preserves1,000 equal-weight equations. This is weighted-arithmetic validation, not device or clinical accuracy. Replay numeric minute totals and other observational fields remain separate missingness debt.
+
+
+## Workout DNA observed duration and distance
+
+Reproduced unknown duration1800 being presented as endurance33 with measured-derived provenance and30min labels. Generator now uses source-aware duration, retains nullable `knownDurationMin` beside numeric compatibility `durationMin`, and marks missing endurance/volume evidence unavailable. Explicit sourcezero stays0min and measured-derived. Volume uses available time or finite nonnegative recorded distance; invalid distance is excluded from facts/signature. Known normalization constants90/120minutes and15km are unchanged, not clinically validated fitness thresholds. UI and local poster share the same duration label helper. Other signal fields and archetype scientific maturity remain separate limitations.
+
+`dna-duration-provenance.mts` checks unknown/zero/nonfinite and1,000 known values. Actual component390x844 and actual canvas poster download are exercised by mandatory `workout-dna-duration-smoke.mjs`: unknown duration unavailable, no invented30min, sourcezero0min, no errors/overflow. Fixture does not certify active route integration or clinical accuracy. Initial smoke failed only due CSS uppercase label and case-sensitive matcher; normalized case matching retains all semantic requirements.

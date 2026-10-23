@@ -3,19 +3,31 @@
    the first viewport denser, calmer and genuinely fluid from narrow phones to
    wide desktop. */
 
-.panacea-liquid-home {
+main.pmd-page-stage,
+main.pmd-page-stage[data-spatial],
+main.pmd-page-stage[data-spatial='false'],
+main.mx-auto,
+.page-enter,
+html.pmd-reference-ui-v47 .panacea-liquid-home,
+.panacea-liquid-home,
+.panacea-human-home {
   box-sizing: border-box;
-  width: min(100%, 1180px) !important;
+  width: 100% !important;
   max-width: 100% !important;
   min-width: 0;
   overflow-x: clip;
-  padding-inline: clamp(10px, 2.8vw, 24px);
+}
+
+main.pmd-page-stage,
+.panacea-liquid-home {
+  padding-inline: clamp(12px, 1.6vw, 32px) !important;
 }
 
 .panacea-liquid-home > *,
 .panacea-human-home,
 .panacea-human-home > * {
   min-width: 0;
+  width: 100%;
 }
 
 .panacea-human-home {
@@ -26,9 +38,9 @@
 
 .panacea-instrument-strip {
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.10) !important;
+  border: 1px solid rgba(255,255,255,.10);
   border-radius: clamp(24px, 4vw, 32px);
-  padding: clamp(12px, 2.4vw, 18px) !important;
+  padding: clamp(12px, 2.4vw, 18px);
   background:
     linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
     rgba(8, 12, 10, .58);
@@ -175,7 +187,7 @@
 }
 
 .panacea-signal-ring-meta {
-  color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.6);
   font-size: 8.5px;
   font-weight: 750;
   white-space: nowrap;
@@ -319,6 +331,12 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .pmd-superpage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .pmd-superpage-grid > div {
@@ -575,3 +593,198 @@
     transition: none !important;
   }
 }
+
+/* Light mode adaptation: clean white surfaces and readable contrast */
+html:not(.dark) .panacea-instrument-strip {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .panacea-instrument-head .panacea-instrument-date {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-status {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html:not(.dark) .panacea-signal-ring {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+html:not(.dark) .panacea-signal-ring-track {
+  stroke: rgba(0, 0, 0, 0.07);
+}
+
+html:not(.dark) .panacea-signal-ring-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-signal-ring-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-signal-ring-meta {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-mini,
+html:not(.dark) .panacea-instrument-checkin {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini-label {
+  color: #64748b;
+}
+
+html:not(.dark) .panacea-instrument-mini-value {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-unit {
+  color: #94a3b8;
+}
+
+html:not(.dark) .panacea-instrument-checkin {
+  color: #0f172a;
+}
+
+html:not(.dark) .panacea-instrument-mini:hover,
+html:not(.dark) .panacea-instrument-checkin:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  background: #f0fdf4;
+}
+
+html:not(.dark) .pmd-superpage-launcher {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-kicker {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-launcher .pmd-section-heading > strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-tile {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+html:not(.dark) .pmd-superpage-tile:hover {
+  border-color: rgba(0, 191, 99, 0.35) !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 6px 16px rgba(0, 191, 99, 0.08) !important;
+}
+
+html:not(.dark) .pmd-liquid-metal-icon {
+  background: rgba(0, 191, 99, 0.08);
+  color: #00BF63;
+}
+
+html:not(.dark) .pmd-superpage-copy strong {
+  color: #0f172a;
+}
+
+html:not(.dark) .pmd-superpage-copy small {
+  color: #64748b;
+}
+
+html:not(.dark) .pmd-superpage-arrow {
+  color: #94a3b8;
+}
+
+html:not(.dark) .pmd-superpage-grid > div:last-child .pmd-superpage-tile {
+  border-color: rgba(0, 191, 99, 0.3) !important;
+  background: linear-gradient(90deg, rgba(0, 191, 99, 0.08), #ffffff 70%) !important;
+}
+
+/* Lantai ukuran teks Home di ponsel: 11px. Terukur di 390x844 sebelum perubahan ini: 155 teks berukuran 8-9,5px dan 219 dari
+   280 teks terlihat di bawah 11px. Hanya ukuran huruf yang naik; tata letak, warna, dan bentuk tidak diubah. !important karena
+   beberapa kelas di atas memakai !important dan utilitas Tailwind berukuran arbitrer (text-[Npx]) harus kalah oleh lantai ini. */
+@media (max-width: 760px) {
+  .panacea-liquid-home .text-\[8px\],
+  .panacea-liquid-home .text-\[8\.5px\],
+  .panacea-liquid-home .text-\[9px\],
+  .panacea-liquid-home .text-\[9\.5px\],
+  .panacea-liquid-home .text-\[10px\],
+  .panacea-liquid-home .text-\[10\.5px\],
+  .panacea-liquid-home small.pmd-one-line,
+  .panacea-liquid-home .pmd-recovery-cue,
+  .panacea-liquid-home .pmd-section-kicker,
+  .panacea-liquid-home .panacea-instrument-date,
+  .panacea-liquid-home .panacea-instrument-unit,
+  .panacea-liquid-home .panacea-signal-ring-kicker,
+  .panacea-liquid-home .widget-instrument-kicker-v5,
+  .panacea-liquid-home .widget-instrument-count-v5,
+  .panacea-liquid-home .pmd-recovery-label,
+  .panacea-liquid-home .pmd-vf-copy:not(.t-kecil),
+  .panacea-liquid-home .panacea-instrument-checkin,
+  .panacea-liquid-home .home-fun-mini__head > div > span,
+  .panacea-liquid-home .home-fun-mini__head > button,
+  .panacea-liquid-home .panacea-instrument-mini-label,
+  .panacea-liquid-home .pmd-superpage-copy small {
+    font-size: 11px !important;
+  }
+  /* t-kecil juga fluid (clamp 11-14px di index.css); kurva yang sama menaikkan tombol yang ditekan di bawah 11px oleh aturan lain. */
+  .panacea-liquid-home .t-kecil {
+    font-size: clamp(11px, 9.35px + 0.517cqw, 14px) !important;
+  }
+  /* t-mikro bersifat fluid (clamp 10-12px di index.css): kurva yang sama dengan lantai 11px supaya nilai yang sudah lebih besar tidak pernah mengecil. */
+  .panacea-liquid-home .t-mikro {
+    font-size: clamp(11px, 8.9px + 0.345cqw, 12px) !important;
+  }
+  /* Pengecualian terukur: pada 11px "0/4 signals" menyentuh busur cincin; 10px masih muat di dalam cincin. */
+  .panacea-liquid-home .panacea-signal-ring-meta {
+    font-size: 10px !important;
+  }
+}
+
+/* Layar sangat sempit: sub-label satu baris di kartu "Seven categories" terpotong elipsis pada 11px di 360px, jadi diberi 10px
+   (tetap naik dari 8,5px). */
+@media (max-width: 380px) {
+  .panacea-liquid-home small.pmd-one-line {
+    font-size: 10px !important;
+  }
+}
+
+/* ── Live Signal Rail Cards: Pure Theme Parity ────────────────────────── */
+.panacea-live-signal-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.panacea-live-signal-card:hover {
+  border-color: rgba(0, 191, 99, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.08);
+}
+
+html.dark .panacea-live-signal-card,
+.dark .panacea-live-signal-card {
+  border: 1px solid rgba(0, 191, 99, 0.28) !important;
+  background: #0d120f !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+html.dark .panacea-live-signal-card:hover,
+.dark .panacea-live-signal-card:hover {
+  border-color: rgba(0, 191, 99, 0.5) !important;
+  background: #111814 !important;
+}
+
