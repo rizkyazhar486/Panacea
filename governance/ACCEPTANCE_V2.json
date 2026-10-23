@@ -156,8 +156,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success) ran the full server npm run uji; encounterHttpRestart, patientIdentityContinuity, careJourneyRestart, clinicalSigningIntegrity and carePlanApproval each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-B",
@@ -194,8 +195,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success): labReferralHttpRbac, labShareHttpRbac and labReferralClosureHttp each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-C",
@@ -228,8 +230,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job validate 120440844359 (success) ran npm run uji: calculator-independent-reference-10 and -11, calculator-reference-coverage (47/47 engines invoked by 11 suites) and angka-kosong-perbaikan/-ratchet all ran and passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-D",
@@ -265,8 +268,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Body 3D Render Acceptance run 39961643195 (success: render-proof 120445913333 plus four proof-shards) and the body uji suites in validate job 120440844359 (body-asset-provenance and body-attribution-coverage 506 GLB) passed. Production canvas stays login-gated; anatomy is not clinically validated. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-E",
@@ -299,8 +303,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). server-validate job 120440844663 (success): auditTrailHttp, careWriteAuditHttp, rbacKlinis, staffRbacHttp, personalDataHttpRbac and applicationsHttp printed passed; Security Baseline Enforcement run 39961643227 (job enforce 120440844633) success. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-F1-01",
@@ -569,8 +574,9 @@
       "negativeControl": "Zero-stance fixture must yield UNMEASURABLE.",
       "evidence": "bodyexposure/qa_reports/gait_foot_slide.json regenerated at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "96cbeacec78305a3d0512ce7a1ba88d8d62e0172",
+      "statusNote": "PASS at 96cbeacec78305a3d0512ce7a1ba88d8d62e0172 (PR #2711 head; git tree 9601f6d623e658ff04f147ea933506dc494ca4b9 is identical to main 42c64db7a52d95c2b069a6f20c6af6e80508396f). Validate job 120428954204 (run 39957938726, success) ran npm run uji: body-gait-foot-metrics.mts and body-gait-foot-contact-reproduction.mts both printed their ok line. body-gait-foot-metrics asserts stance_phases 0 and null input -> unmeasurable/no_stance, never within/exceeds; the contact reproduction asserts the written report equals a re-run. Sabotage: dropping the zero-stance guard fails the test (expected 'no_stance', got 'too_few_phases'). Scope: ENG-D7-01 only (verdict separation). Four fixtures are not all measurable (see ENG-D7-02 FAIL); thresholds are engineering placeholders, not clinically validated."
     },
     {
       "id": "ENG-D7-02",
