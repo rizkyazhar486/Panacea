@@ -673,7 +673,10 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/body-asset-provenance.mts",
-            "bodyexposure/PROVENANCE.md"
+            "bodyexposure/PROVENANCE.md",
+            "scripts/uji/body-attribution-coverage.mts",
+            "src/domains/body-exposure/engine/attributionCoverage.ts",
+            "public/bodyexposure/provenance.html"
           ]
         }
       ],
