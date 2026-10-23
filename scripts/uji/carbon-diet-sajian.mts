@@ -29,7 +29,7 @@ for (const bad of [null, undefined, 5, 'x', [1, 2]]) assert.deepEqual(sanitizeSe
 assert.deepEqual(sanitizeServings({ beef: 2 }, keys), sanitizeServings({ beef: 2 }, keys))
 
 // Regresi halaman: tidak lagi memaksa nilai tak sah menjadi angka lewat `|| 0`
-const halaman = readFileSync('src/pages/CarbonDiet.tsx', 'utf8')
+const halaman = readFileSync('src/pages/bodyhub/CarbonDiet.tsx', 'utf8')
 assert.ok(!/Number\([^()]*\)\s*\|\|\s*0/.test(halaman), 'CarbonDiet masih memakai Number(...) || 0')
 assert.ok(halaman.includes('parseServingField') && halaman.includes('sanitizeServings'))
 console.log('carbon-diet-sajian: ok')

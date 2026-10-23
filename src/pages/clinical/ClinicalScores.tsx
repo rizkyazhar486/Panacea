@@ -104,13 +104,13 @@ export const SKOR: Skor[] = [
   { key: 'braden', nama: 'Braden Scale', untuk: 'Pressure ulcer risk', kategori: 'Perawatan & Risiko', ruteLama: '/braden-scale',
     Komponen: L(() => import('../BradenScale'), 'BradenScale') },
   { key: 'epworth', nama: 'Epworth Sleepiness', untuk: 'Daytime sleepiness severity', kategori: 'Perawatan & Risiko', ruteLama: '/epworth-sleepiness',
-    Komponen: L(() => import('../EpworthSleepiness'), 'EpworthSleepiness') },
+    Komponen: L(() => import('./scores/EpworthSleepiness'), 'EpworthSleepiness') },
   { key: 'findrisc', nama: 'FINDRISC', untuk: 'Ten-year risk of type 2 diabetes', kategori: 'Perawatan & Risiko', ruteLama: '/findrisc',
     Komponen: L(() => import('../Findrisc'), 'Findrisc') },
 
   // Kalkulator yang bentuknya sama tapi sempat tertinggal di rutenya sendiri.
   { key: 'fluid', nama: 'Fluid Calculators', untuk: 'Maintenance fluids, deficit and replacement', kategori: 'Cairan & Anak', ruteLama: '/fluid-calculators',
-    Komponen: L(() => import('../FluidCalculators'), 'FluidCalculators') },
+    Komponen: L(() => import('./scores/FluidCalculators'), 'FluidCalculators') },
   { key: 'dka-anak', nama: 'Paediatric DKA', untuk: 'Fluid and insulin in paediatric diabetic ketoacidosis', kategori: 'Cairan & Anak', ruteLama: '/pediatric-dka-calculator',
     Komponen: L(() => import('../PediatricDkaCalculator'), 'PediatricDkaCalculator') },
   { key: 'ldl', nama: 'LDL Calculator', untuk: 'Calculated LDL cholesterol — and when the calculation fails', kategori: 'Kardiovaskular', ruteLama: '/ldl-calculator',

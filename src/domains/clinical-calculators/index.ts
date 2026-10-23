@@ -10,7 +10,7 @@ export type { IvDripResult, DropFactor } from './engine/ivDrip'
 export { fluidBalance, FLUID_COMPONENT_ML } from './engine/fluidBalance'
 export type { FluidBalanceInput, FluidBalanceResult } from './engine/fluidBalance'
 export {
-  correctedSodiumKatz, potassiumAssessment, SODIUM_MEQ_L, GLUCOSE_MG_DL, POTASSIUM_MEQ_L,
+  correctedSodiumKatz, glucoseMmolLToMgDl, potassiumAssessment, SODIUM_MEQ_L, GLUCOSE_MG_DL, GLUCOSE_MG_DL_PER_MMOL_L, POTASSIUM_MEQ_L,
 } from './engine/electrolyteCorrection'
 export type { SodiumCorrectionResult, PotassiumResult, PotassiumTone } from './engine/electrolyteCorrection'
 export { interpretAbg, ABG_RANGES } from './engine/bloodGas'

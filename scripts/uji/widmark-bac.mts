@@ -63,9 +63,9 @@ assert.deepEqual(run({ weightKg: 0, hours: 99 }), GW)
 assert.deepEqual(run({ hours: 99, counts: { [BEER]: -1 } }), GH)
 
 // Halaman.
-const src = readFileSync('src/pages/AlcoholCalculator.tsx', 'utf8')
+const src = readFileSync('src/pages/bodyhub/AlcoholCalculator.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { DRINKS, parseNumberField, widmarkBac } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { DRINKS, parseNumberField, widmarkBac } from '../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/Math\.max\(0|const r =|const beta|ETHANOL_DENSITY|gramsOf\(|\/ 8\b|\/ 14\b/.test(src), 'rumus/konstanta tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok && ('))

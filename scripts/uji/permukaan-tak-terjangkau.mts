@@ -71,6 +71,9 @@ const takTerjangkau = komponen.filter((p) => !dirujuk(p)).map((p) => p.replace(`
  * Ini CATATAN, bukan restu. Setiap barisnya adalah pekerjaan yang sudah selesai
  * dan tidak dilihat siapa pun.
  */
+// Re-export wrappers introduced by #2530 now name four former orphan files.
+// This scanner measures textual references, not actual mounted UI; removing
+// them from this debt list does not claim user reachability or activation.
 const DIKETAHUI: readonly string[] = [
   // Ditambahkan 2026-09-16, dengan alasannya, bukan sekadar didiamkan:
   //
@@ -80,8 +83,6 @@ const DIKETAHUI: readonly string[] = [
   // menampilkan vitals yang sama dua kali di satu layar. Ia disimpan, tidak
   // dihapus, karena HomeOverviewMosaic dan HomeHealthInstruments hanya hidup
   // lewat berkas ini.
-  'components/HomeNowWidget.tsx',
-  'components/KartuPratinjau.tsx',
   // PremiumMotionRuntime hanya menyuapi --panacea-pointer-x/y untuk
   // src/styles/panacea-pointer-light.css, yang sendirinya hanya terjangkau
   // lewat src/styles/premium-motion-entry.css — dan berkas itu tidak diimpor
@@ -92,8 +93,6 @@ const DIKETAHUI: readonly string[] = [
   // seluruh aplikasi, sementara index.html sudah memuat lapisan v43–v48 yang
   // menguasai permukaan yang sama. Keputusan itu milik pemilik lapisan v48,
   // dan dicatat di sini alih-alih dinyalakan diam-diam di tengah PR lain.
-  'components/PremiumMotionRuntime.tsx',
-  'components/RelatedFeaturesRail.tsx',
   'components/dashboard/ActivityAchievementWidget.tsx',
   'components/dashboard/LibraryDiscoveryWidget.tsx',
   'components/dashboard/LifeOSWidgets.tsx',

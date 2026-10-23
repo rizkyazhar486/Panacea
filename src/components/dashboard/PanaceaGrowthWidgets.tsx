@@ -358,7 +358,7 @@ export function PanaceaGrowthRail() {
           <div className="text-[9px] font-black uppercase tracking-[.15em] text-emerald-700 dark:text-emerald-300">Panacea now</div>
           <h2 className="mt-0.5 text-[15px] font-black tracking-tight text-neutral-950 dark:text-white">Useful today. Shareable tomorrow.</h2>
         </div>
-        <Link to="/atur-fitur" className="shrink-0 text-[10px] font-black text-neutral-600 dark:text-neutral-300">More widgets ›</Link>
+        <Link to="/atur-fitur" className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-[10px] font-black text-neutral-600 dark:text-neutral-300">More widgets ›</Link>
       </div>
       <div className="no-scrollbar -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2">
         <div className="w-[286px] shrink-0 snap-start"><UbinDailyMission compact /></div>

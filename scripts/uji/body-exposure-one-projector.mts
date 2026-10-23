@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const os = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
+const os = readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 const atlas = readFileSync('src/components/bodyhub/BodyAllSystems3D.tsx', 'utf8')
 const physiology = readFileSync('src/pages/bodyhub/AtlasPhysiologyBridgePanel.tsx', 'utf8')

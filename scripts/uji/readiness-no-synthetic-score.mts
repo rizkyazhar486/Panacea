@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const source = readFileSync('src/pages/Readiness.tsx', 'utf8')
+const source = readFileSync('src/pages/bodyhub/Readiness.tsx', 'utf8')
 
 assert.doesNotMatch(source, /function recoveryScore\s*\(/)
 assert.doesNotMatch(source, /function strainTarget\s*\(/)

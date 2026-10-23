@@ -1,7 +1,7 @@
 // Kontrak server ↔ kernel: rantai yang disusun server harus lolos pemeriksaan
 // kernel peramban (sidik identik), dan penilaian server diterima kernel.
 import assert from 'node:assert/strict'
-import { sambung, susunPenilaian, susunAdjudikasi, susunUsabilitas, sidik as sidikServer, kanonik as kanonikServer } from '../../server/src/validasiLedger.ts'
+import { sambung, susunPenilaian, susunAdjudikasi, susunUsabilitas, sidik as sidikServer, kanonik as kanonikServer } from '../../server/src/domains/clinical-records/validasiLedger.ts'
 import { periksaRantai, susunLaporan, sidik as sidikKlien, kanonik as kanonikKlien, type Catatan } from '../../src/lib/validasiKlinis.ts'
 
 const contoh = { b: [1, { z: null, a: 'x' }], a: true, c: undefined, 'ü': 2.5 }

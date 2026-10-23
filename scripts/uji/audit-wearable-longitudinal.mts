@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { KATALOG } from '../../server/src/healthMetrics.ts'
+import { KATALOG } from '../../server/src/domains/push/healthMetrics.ts'
 import {
   auditCakupanWearableLongitudinal,
   deviceSnapshotToBodyExposureSignals,
@@ -38,7 +38,7 @@ assert.deepEqual(deviceSnapshotToBodyExposureSignals({}), [])
 assert.deepEqual(deviceSnapshotToBodyExposureSignals({ restingHr: -1, hrvMs: NaN }), [])
 assert.deepEqual(deviceSnapshotToBodyExposureSignals({ restingHr: 56 }, { max: 0 }), [])
 
-const overlay = readFileSync('src/components/BodyExposurePatientOverlay.tsx', 'utf8')
+const overlay = readFileSync('src/components/digital-twin/BodyExposurePatientOverlay.tsx', 'utf8')
 assert.match(overlay, /deviceSnapshotToBodyExposureSignals\(/)
 assert.match(overlay, /data-pmd-device-overlay-signal/)
 

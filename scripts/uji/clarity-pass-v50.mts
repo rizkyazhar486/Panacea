@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const tabs = readFileSync(new URL('../../src/components/HalamanTab.tsx', import.meta.url), 'utf8')
+const tabs = readFileSync(new URL('../../src/components/ui/HalamanTab.tsx', import.meta.url), 'utf8')
 const ui = readFileSync(new URL('../../src/components/ui/ui.tsx', import.meta.url), 'utf8')
-const rail = readFileSync(new URL('../../src/components/SuperPageCapabilityRail.tsx', import.meta.url), 'utf8')
+const rail = readFileSync(new URL('../../src/components/ui/SuperPageCapabilityRail.tsx', import.meta.url), 'utf8')
 const body = readFileSync(new URL('../../src/pages/UnifiedBodyWorkspace.tsx', import.meta.url), 'utf8')
-const exposure = readFileSync(new URL('../../src/pages/BodyExposureOS.tsx', import.meta.url), 'utf8')
+const exposure = readFileSync(new URL('../../src/pages/bodyhub/BodyExposureOS.tsx', import.meta.url), 'utf8')
 
 assert.match(tabs, /PRIMARY_TAB_LIMIT = 7/)
 assert.match(tabs, /More \$\{moreTabs\.length\}/)

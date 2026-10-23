@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
-import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
+import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/domains/payments/payments'
 
 const ownOrder = { userId: 'user-a', status: 'pending' as const }
 const paidOrder = { userId: 'user-a', status: 'paid' as const }
