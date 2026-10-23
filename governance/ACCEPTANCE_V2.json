@@ -156,8 +156,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success) ran the full server npm run uji; encounterHttpRestart, patientIdentityContinuity, careJourneyRestart, clinicalSigningIntegrity and carePlanApproval each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-B",
@@ -194,8 +195,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success): labReferralHttpRbac, labShareHttpRbac and labReferralClosureHttp each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-C",
@@ -228,8 +230,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job validate 120440844359 (success) ran npm run uji: calculator-independent-reference-10 and -11, calculator-reference-coverage (47/47 engines invoked by 11 suites) and angka-kosong-perbaikan/-ratchet all ran and passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-D",
@@ -265,8 +268,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Body 3D Render Acceptance run 39961643195 (success: render-proof 120445913333 plus four proof-shards) and the body uji suites in validate job 120440844359 (body-asset-provenance and body-attribution-coverage 506 GLB) passed. Production canvas stays login-gated; anatomy is not clinically validated. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-E",
@@ -299,8 +303,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). server-validate job 120440844663 (success): auditTrailHttp, careWriteAuditHttp, rbacKlinis, staffRbacHttp, personalDataHttpRbac and applicationsHttp printed passed; Security Baseline Enforcement run 39961643227 (job enforce 120440844633) success. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-F1-01",
@@ -644,8 +649,9 @@
       "done": "public-asset-inventory finds 0 untracked assets outside the EXT-D8-A/B list; the gate fails closed on a new untracked file.",
       "checks": [
         {
-          "cmd": "node scripts/qa/public-asset-inventory.mjs",
+          "cmd": "npm run uji",
           "files": [
+            "scripts/uji/public-asset-provenance.mts",
             "scripts/qa/public-asset-inventory.mjs",
             "governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json"
           ]
@@ -654,8 +660,9 @@
       "negativeControl": "Adding an untracked PNG under public/ fails the gate.",
       "evidence": "Inventory JSON for exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "2dd319189b1149f0fd4b6a6d920451d617ff2e1a",
+      "statusNote": "PASS at 2dd319189b1149f0fd4b6a6d920451d617ff2e1a (PR #2717 head; git tree bc42413d357c682bd21ad5fe5d88394961279427 is identical to main c89d55fe6d78c5e44ffa1206b07526a82a5c181b). Validate changes run 39965989203, job validate 120455871022 (success) ran npm run uji: public-asset-provenance printed '640 aset publik; berkas-kredit 600, hak-cipta-tertanam 36, per-node 2, tanpa-jejak 2 (baseline 2); passed'. The 2 untracked assets are exactly public/logo-mark.png (EXT-D8-A) and public/media/tutorial-video.mp4 (EXT-D8-B); governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json may only shrink. Sabotage: adding public/zz-sabotage-d8.png fails the gate naming that file (exit 1). CORRECTION: the previous check command 'node scripts/qa/public-asset-inventory.mjs' is a library with no CLI entry (exits 0 silently, verifies nothing); the check now points at the real gate scripts/uji/public-asset-provenance.mts. Scope: presence of a provenance trail only, not licence validity or the rights of the two open assets."
     },
     {
       "id": "ENG-D8-02",
