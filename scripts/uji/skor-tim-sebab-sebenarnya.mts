@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs'
 // Sumbernya tidak menjawab, dan diamnya dibaca sebagai jawaban "kosong".
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ubin = readFileSync(new URL('../../src/components/UbinSkor.tsx', import.meta.url), 'utf8')
+const ubin = readFileSync(new URL('../../src/components/tiles/UbinSkor.tsx', import.meta.url), 'utf8')
 
 // ── 1. Muatan galat dari sumber dihitung sebagai KEGAGALAN, bukan kekosongan ─
 assert.match(ubin, /if \(r\.error\) \{[\s\S]{0,200}gagal\.add\(liga\)/,

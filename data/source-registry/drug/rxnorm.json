@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaMedicationConcept",
-    "module": "server/src/rxnorm.ts",
+    "module": "server/src/domains/medical-reference/rxnorm.ts",
     "notes": "Canonical production adapter sanitizes/bounds medication text, resolves exact names to numeric RXCUI for SCD/SBD related concepts, and separately supports approximateTerm->numeric RXCUI->RxNorm Name canonical normalization. It rejects malformed upstream identifiers, applies timeouts and does not perform drug-drug interaction checking or prescribing recommendations. Higher-level drugInfo orchestration reuses this normalization path rather than issuing duplicate RxNav requests."
   },
   "trust": {

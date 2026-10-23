@@ -1,4 +1,4 @@
-import { cariZatAktif, daftarSemuaZatAktif, profilFarmakologi } from '../src/rxclass'
+import { cariZatAktif, daftarSemuaZatAktif, profilFarmakologi } from '../src/domains/medical-reference/rxclass'
 
 let lulus = 0
 let gagal = 0

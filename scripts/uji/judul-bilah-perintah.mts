@@ -102,8 +102,8 @@ const cocok = (n: { to: string; end?: boolean }, pathname: string) =>
 // memotong judulnya di 78px, jadi keduanya harus dijaga bersama.
 {
   for (const berkas of [
-    'public/panacea-shell-mobile-compact-v49.css',
-    'public/shell-mobile-compact-v49.css',
+    'public/ui-iterations/panacea-shell-mobile-compact-v49.css',
+    'public/ui-iterations/shell-mobile-compact-v49.css',
   ]) {
     const css = readFileSync(new URL(`../../${berkas}`, import.meta.url), 'utf8')
     const blokJudul = [...css.matchAll(/command-bar h1 \{([^}]*)\}/g)].map((m) => m[1])

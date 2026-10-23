@@ -15,45 +15,45 @@ function requireText(path: string, needles: readonly string[]) {
   }
 }
 
-const authority = 'PANACEA_INVICTUS_PRINCIPLE.md'
+const authority = 'governance/doctrine/PANACEA_INVICTUS_PRINCIPLE.md'
 
 for (const path of [
-  'PANACEA_CONSTITUTION.md',
-  'PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md',
-  'PANACEA_PRODUCT_MATURITY_OS.md',
-  'PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md',
-  'PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md',
+  'governance/doctrine/PANACEA_CONSTITUTION.md',
+  'governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md',
+  'governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md',
+  'governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md',
+  'governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md',
   'AGENTS.md',
   'CLAUDE.md',
 ]) {
   requireText(path, [authority])
 }
 
-requireText('PANACEA_CONSTITUTION.md', [
+requireText('governance/doctrine/PANACEA_CONSTITUTION.md', [
   'future-realizable',
   'patient truth',
   'human agency',
 ])
 
-requireText('PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', [
+requireText('governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md', [
   'future-capability absorbability',
   'Canonical Patient State',
   'Physiological State Engine',
 ])
 
-requireText('PANACEA_PRODUCT_MATURITY_OS.md', [
+requireText('governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md', [
   'IMAGINE FUTURE-REALIZABLE CAPABILITY',
   'FORMALIZE STABLE INTERFACE',
   'DEEPEST JUSTIFIED PRESENT SLICE',
   'VALIDATE / FALSIFY AGAINST REALITY',
 ])
 
-requireText('PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md', [
+requireText('governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md', [
   'meaningful horizontal expansion',
   'VERTICAL GAP — NOT YET MODELED',
 ])
 
-requireText('PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md', [
+requireText('governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md', [
   'knowledge boundary',
   'KNOWN_WITH_UNCERTAINTY',
   'KNOWABLE_BUT_UNMEASURED',

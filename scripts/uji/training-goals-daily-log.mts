@@ -22,7 +22,7 @@ assert.equal('value' in parseDailyLog('abc', 500, 'Reps'), false)
 assert.deepEqual(parseDailyLog('7', 500, 'Reps'), parseDailyLog('7', 500, 'Reps'), 'determinismo')
 
 // Regressão das páginas: sem `|| 0` no campo, entrada inválida avisa e não grava
-for (const f of ['BodyToolkit', 'MovementToolkit']) {
+for (const f of ['bodyhub/BodyToolkit', 'fitness/MovementToolkit']) {
   const src = readFileSync(new URL(`../../src/pages/${f}.tsx`, import.meta.url), 'utf8')
   assert.equal(/Number\(e\.target\.value\)\s*\|\|\s*0/.test(src), false, `${f}: texto inválido não pode virar 0`)
   assert.ok(src.includes('parseDailyLog(e.target.value'), `${f}: deve validar via domínio`)

@@ -1,4 +1,4 @@
-import { findRelatedDrugs, normalizeDrugName } from '../src/rxnorm.ts'
+import { findRelatedDrugs, normalizeDrugName } from '../src/domains/medical-reference/rxnorm.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

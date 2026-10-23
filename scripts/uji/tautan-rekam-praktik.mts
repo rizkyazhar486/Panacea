@@ -14,7 +14,7 @@ assert.match(idx, /res\.json\(statusTautanPasien\(String\(req\.params\.patientId
 assert.match(baca('server/package.json'), /"uji": [^\n]*uji\/tautanPasien\.uji\.ts/, 'uji kernel tautan tidak dijalankan')
 assert.match(baca('src/pages/PusatTubuh.tsx'), /<TebusKodeTaut \/>/, 'pasien tidak punya tempat menebus kode')
 assert.match(baca('src/pages/clinical/EMR.tsx'), /<TerbitkanKodeTaut patientId=\{activePatient\.id\} \/>/, 'dokter tidak punya tempat menerbitkan kode')
-const taut = baca('src/components/TautanRekamPraktik.tsx')
+const taut = baca('src/components/clinical/TautanRekamPraktik.tsx')
 assert.match(taut, /api\.linkStatus\(patientId\)/, 'dokter tidak melihat status tautan pasien praktiknya')
 assert.match(taut, /status\?\.linked[\s\S]{0,300}onClick=\{cabut\}/, 'dokter tidak punya tombol cabut tautan saat sudah tertaut')
 assert.match(taut, /api\.unlink\(patientId\)/, 'tombol cabut sisi dokter tidak memanggil unlink')

@@ -60,7 +60,7 @@ const scientificBoundary = traced.find((item) => item.id === 'scientific-boundar
 assert.equal(scientificBoundary?.status, 'pass')
 assert.match(scientificBoundary?.detail ?? '', /does not calculate[\s\S]*readiness[\s\S]*provider-derived metrics/i)
 
-const readiness = readFileSync('src/pages/Readiness.tsx', 'utf8')
+const readiness = readFileSync('src/pages/bodyhub/Readiness.tsx', 'utf8')
 assert.match(readiness, /buildRecoveryRecordedChecklist/)
 assert.match(readiness, /Recorded-data safety check/)
 assert.match(readiness, /not clinical clearance/i)

@@ -64,8 +64,12 @@ assert.equal((page.match(/<Body3D\b/g) ?? []).length, 1, 'Body Explorer renders 
 // Home: ringkasan harian, alat esensial dan tujuh kategori tetap terlihat (kontrak hierarki Home);
 // bagian sekunder dilipat satu kata.
 const home = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
-for (const w of ['Recovery', 'Widgets', 'Live', 'Stories', 'Deck']) assert.match(home, new RegExp(`<Fold label="${w}">`), `Home folds ${w}`)
+for (const w of ['Widgets', 'Live', 'Stories', 'Deck']) assert.match(home, new RegExp(`<Fold label="${w}"(?: subtitle="[^"]+")?>`), `Home folds ${w}`)
 assert.doesNotMatch(home, /<Fold label="[A-Za-z]+"><(HomeHealthBrief|HomeVisualLanding|HomeEssentialTools|SuperPageLauncher) \/>/, 'the first-viewport hierarchy (status, actions, tools, categories) is never folded')
+// Recovery moved into the visible bento in PR #2530; it remains mounted and
+// must not become hidden behind a collapsed Fold.
+assert.match(home, /<HomeRecoveryVisuals \/>/)
+assert.doesNotMatch(home, /<Fold[^>]*>\s*<HomeRecoveryVisuals/)
 // Clinical: Ask, aksi utama, proyeksi tubuh dan rujukan tetap terlihat; bagian sekunder dilipat satu kata.
 const clinical = readFileSync('src/pages/clinical/ClinicalHub.tsx', 'utf8')
 for (const w of ['Calculators', 'Research', 'Patient', 'Depth', 'Guide', 'Capabilities']) assert.match(clinical, new RegExp(`<Fold label="${w}">`), `Clinical folds ${w}`)
@@ -75,7 +79,7 @@ const learn = readFileSync('src/pages/medstudy/MedStudyHub.tsx', 'utf8')
 assert.match(learn, /<Fold label="Topics" defaultOpen=\{params\.has\('bagian'\)\}>/, 'Learn opens Topics itself when an evidence query sets `bagian`')
 assert.match(learn, /<Fold label="Planner">/, 'Learn folds the study planner')
 assert.match(learn, /<MedicalLibraryWorkbench onRun=\{runEvidenceQuery\} \/>/, 'the library search stays the visible main surface')
-const bench = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
+const bench = readFileSync('src/components/medstudy/MedicalLibraryWorkbench.tsx', 'utf8')
 for (const w of ['Guide', 'Appraisal']) assert.match(bench, new RegExp(`<Fold label="${w}">`), `the library workbench folds ${w}`)
 assert.doesNotMatch(bench, /<Fold label="[A-Za-z]+">\s*<div className="mt-3 rounded-\[22px\] bg-neutral-950/, 'the generated query and its search/save actions are never folded')
 // Health > Body: satu hero (skor + tipe tubuh) lalu empat lipatan satu kata; formulir pengukuran dilipat.
@@ -103,13 +107,13 @@ for (const w of ['Longevity', 'Log', 'Calculators', 'Sources']) assert.match(giz
 assert.ok(gizi.indexOf('<PanelAngka angka={angkaHariIni} />') < gizi.indexOf('<Fold label="Longevity">'), "today's numbers come before every fold")
 assert.match(gizi, /openFoldsAround\(el\)/, 'anchor jumps (lompat) open the fold that holds their target')
 // Health > Data: kartu sumber data tetap terlihat; impor, sinkronisasi, metrik dan wawasan dilipat; Simpan tetap melekat.
-const data = readFileSync('src/pages/HealthProfile.tsx', 'utf8')
+const data = readFileSync('src/pages/bodyhub/HealthProfile.tsx', 'utf8')
 for (const w of ['Import', 'Sync', 'Metrics', 'Insights']) assert.match(data, new RegExp(`<Fold label="${w}">`), `Health Data folds ${w}`)
 assert.ok(data.indexOf('title="My Health Data"') < data.indexOf('<Fold label="Import">'), 'the source card comes before every fold')
 assert.ok(data.indexOf('<div className="sticky bottom-4 z-10">') > data.indexOf('<Fold label="Insights">'), 'the Save bar stays outside the folds (always reachable)')
 assert.doesNotMatch(data, /<Fold label="[A-Za-z]+">\s*<div className="sticky bottom-4/, 'the Save bar is never folded')
 // League: peringkat + indeks kemenangan adalah hero; lima bagian lain dilipat satu kata.
-const liga = readFileSync('src/pages/HealthPerformanceLeague.tsx', 'utf8')
+const liga = readFileSync('src/pages/bodyhub/HealthPerformanceLeague.tsx', 'utf8')
 for (const w of ['Components', 'Matches', 'Ladder', 'Promotion', 'Scoring', 'Seasons']) assert.match(liga, new RegExp(`<Fold label="${w}"`), `League folds ${w}`)
 assert.ok(liga.indexOf('Current rank') < liga.indexOf('<Fold label="Components"'), 'the rank hero comes before every fold')
 assert.ok(liga.indexOf('AI victory index') < liga.indexOf('<Fold label="Matches">'), 'the victory index stays outside the folds')
@@ -118,14 +122,14 @@ const umur = readFileSync('src/pages/bodyhub/Longevity.tsx', 'utf8')
 for (const w of ['Evidence', 'Pillars', 'Projection', 'Labs', 'Testing', 'Sources']) assert.match(umur, new RegExp(`<Fold label="${w}">`), `Longevity folds ${w}`)
 assert.ok(umur.indexOf('Biological Age (est.)') < umur.indexOf('<Fold label="Evidence">'), 'the score hero comes before every fold')
 // VitaPulse: ringkasan waktu-nyata adalah hero; tujuh bagian lain dan video dilipat satu kata.
-const vita = readFileSync('src/pages/VitaPulse.tsx', 'utf8')
-const pusat = readFileSync('src/pages/Feed.tsx', 'utf8')
+const vita = readFileSync('src/pages/bodyhub/VitaPulse.tsx', 'utf8')
+const pusat = readFileSync('src/pages/social/Feed.tsx', 'utf8')
 assert.match(vita, /<Fold label="Video"/, 'VitaPulse folds Video')
 for (const w of ['Assistant', 'Vitals', 'Sleep', 'Fitness', 'News', 'Learn', 'Goals']) assert.match(pusat, new RegExp(`<Fold label="${w}">`), `VitaPulse folds ${w}`)
 assert.ok(pusat.indexOf('Real-Time Summary') < pusat.indexOf('<Fold label="Assistant">'), 'the summary hero comes before every fold')
 assert.ok(pusat.slice(pusat.indexOf('Real-Time Summary'), pusat.indexOf('<Fold label="Assistant">')).includes('</Card>'), 'the folds are siblings of the summary hero, never nested inside its card')
 // Body Exposure: proyektor tunggal tetap di atas; panel multiskala + ubiquitin (proyeksi molekul kedua) dilipat satu kata.
-const eksposur = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
+const eksposur = readFileSync('src/pages/bodyhub/BodyExposureOS.tsx', 'utf8')
 const lipatMulti = eksposur.indexOf('<Fold label="Multiscale"')
 assert.ok(lipatMulti >= 0, 'Body Exposure folds Multiscale')
 assert.ok(lipatMulti > eksposur.indexOf('<UnifiedHumanSimulationProjector'), 'the single projector comes before the Multiscale fold')

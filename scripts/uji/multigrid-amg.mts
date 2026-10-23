@@ -48,5 +48,5 @@ assert.ok(eps.every((v) => Number.isFinite(v) && v >= 0) && rerata(eps) > 0, 're
 assert.throws(() => ambilKorektor('tissue'), /no trained residual corrector/, 'mode hibrida berjalan tanpa korektor terlatih')
 assert.throws(() => daftarkanKorektor({ id: 'x', versi: '1', artefak: { sha256: 'bukan-hash', dataLatih: 'x', metrikValidasi: { l2: 0.1 } }, koreksi: (u) => u }), /sha256/)
 assert.throws(() => daftarkanKorektor({ id: 'x', versi: '1', artefak: { sha256: 'a'.repeat(64), dataLatih: '', metrikValidasi: { l2: 0.1 } }, koreksi: (u) => u }), /training data/)
-assert.match(readFileSync('src/components/PanelKoplingMultiSkala.tsx', 'utf8'), /modulJaringanMultigrid\(p\)/)
+assert.match(readFileSync('src/components/digital-twin/PanelKoplingMultiSkala.tsx', 'utf8'), /modulJaringanMultigrid\(p\)/)
 console.log(`multigrid-amg: orde dua (rasio 4.0), siklus bebas grid ${siklus.join('/')}, AMG ${amg.siklus} siklus ${amg.ukuranLevel.join('→')}, kemurnian agregat ${(murni / A.n).toFixed(2)}, korektor gagal tertutup`)

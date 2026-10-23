@@ -8,16 +8,16 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('../', import.meta.url))
 const asset = 'bodyexposure/adult_female_main_bronchi_reference.respiratory.LOD3.glb'
 const bytes = await readFile(new URL(`../public/${asset}`, import.meta.url))
-const component = await readFile(new URL('../src/components/OrganModel3D.tsx', import.meta.url), 'utf8')
+const component = await readFile(new URL('../src/components/digital-twin/OrganModel3D.tsx', import.meta.url), 'utf8')
 const bundle = await build({
   stdin: { contents: `import React from 'react'; import {createRoot} from 'react-dom/client';
-    import {OrganModel3D} from './src/components/OrganModel3D';
+    import {OrganModel3D} from './src/components/digital-twin/OrganModel3D';
     const organ = {id:'female-bronchi-reference',focusKey:null,label:'Female main bronchi reference',scientificName:'Main bronchi',accent:'#00BF63',illustrated:false,hotspots:[],sumber:'hubmap',berkas:${JSON.stringify(asset)}};
     createRoot(document.getElementById('root')).render(<OrganModel3D organ={organ}/>);`, resolveDir: root, loader: 'tsx' },
   bundle: true, write: false, format: 'esm', jsx: 'automatic',
   define: { 'import.meta.env.BASE_URL': '"/"', 'process.env.NODE_ENV': '"production"' },
   plugins: [{ name: 'test-camera', setup(builder) {
-    builder.onLoad({ filter: /OrganModel3D\.tsx$/ }, () => ({ loader: 'tsx', resolveDir: `${root}src/components`,
+    builder.onLoad({ filter: /OrganModel3D\.tsx$/ }, () => ({ loader: 'tsx', resolveDir: `${root}src/components/digital-twin`,
       contents: component.replace('const controls = new OrbitControls(camera, renderer.domElement)',
         'const controls = new OrbitControls(camera, renderer.domElement); window.__qaCamera = camera; window.__qaControls = controls; window.__qaRenderer = renderer') }))
   } }],

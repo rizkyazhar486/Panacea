@@ -59,19 +59,25 @@ export interface FootSlideMeasure {
 export type FootSlideVerdict =
   | { status: 'within'; criteria: FootSlideCriteria }
   | { status: 'exceeds'; criteria: FootSlideCriteria; failed: Array<'rms' | 'peak'> }
-  | { status: 'unmeasurable'; criteria: FootSlideCriteria; reason: 'invalid_criteria' | 'no_stance' | 'too_few_phases' | 'missing_values' }
+  | { status: 'unmeasurable'; criteria: FootSlideCriteria; reason: 'invalid_criteria' | 'no_stance' | 'too_few_phases' | 'insufficient_frames' | 'missing_values' }
 
 const nonNeg = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0
 
 /** Menilai satu ukuran selip. Statistik tipis atau data hilang = "unmeasurable", tidak pernah lulus/gagal tebakan. */
 export function evaluateFootSlide(m: FootSlideMeasure | null | undefined, criteria: FootSlideCriteria): FootSlideVerdict {
-  if (!nonNeg(criteria?.maxRmsMm) || !nonNeg(criteria.maxPeakMm) || !nonNeg(criteria.minStancePhases) || !criteria.provenance) {
+  if (!nonNeg(criteria?.maxRmsMm) || !nonNeg(criteria.maxPeakMm) || !Number.isInteger(criteria.minStancePhases) || criteria.minStancePhases < 1 || typeof criteria.provenance !== 'string' || !criteria.provenance.trim()) {
     return { status: 'unmeasurable', criteria, reason: 'invalid_criteria' }
   }
   const phases = m?.stance_phases
   if (!nonNeg(phases) || phases === 0) return { status: 'unmeasurable', criteria, reason: 'no_stance' }
+  if (!Number.isInteger(phases)) return { status: 'unmeasurable', criteria, reason: 'too_few_phases' }
   if (phases < criteria.minStancePhases) return { status: 'unmeasurable', criteria, reason: 'too_few_phases' }
+  // Preserve the established error classification when slide values themselves are invalid.
   if (!nonNeg(m?.slide_rms_mm) || !nonNeg(m?.slide_max_mm)) return { status: 'unmeasurable', criteria, reason: 'missing_values' }
+  // Only award an assessment when sample counts are sufficient; never invent a stance.
+  if (!Number.isInteger(m?.stance_frames) || (m?.stance_frames ?? 0) < 3 * phases) {
+    return { status: 'unmeasurable', criteria, reason: 'insufficient_frames' }
+  }
   const failed: Array<'rms' | 'peak'> = []
   if (m.slide_rms_mm > criteria.maxRmsMm) failed.push('rms')
   if (m.slide_max_mm > criteria.maxPeakMm) failed.push('peak')

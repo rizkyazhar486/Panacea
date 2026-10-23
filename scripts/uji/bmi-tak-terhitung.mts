@@ -36,7 +36,7 @@ const dash = readFileSync(new URL('../../src/pages/dashboard/Dashboard.tsx', imp
 assert.ok(dash.includes('anthro.valid ? anthro.bmi : null'), 'dashboard_memakai_valid')
 assert.ok(!/Number\(anthro\.bmi\)\s*\|\|\s*0/.test(dash), 'dashboard_tanpa_fallback_nol')
 assert.ok(dash.includes("bmi ?? '—'"), 'dashboard_menampilkan_strip')
-const gc = readFileSync(new URL('../../src/components/GrowthChart.tsx', import.meta.url), 'utf8')
+const gc = readFileSync(new URL('../../src/components/growth/GrowthChart.tsx', import.meta.url), 'utf8')
 assert.ok(gc.includes("valid ? bmi : '—'"), 'growthchart_dewasa_strip')
 
 console.log('bmi-tak-terhitung: ok')

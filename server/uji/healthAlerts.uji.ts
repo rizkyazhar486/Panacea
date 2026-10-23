@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { deliverThenCommitAlertState } from '../src/healthAlerts.js'
+import { deliverThenCommitAlertState } from '../src/domains/push/healthAlerts.js'
 
 {
   const events: string[] = []

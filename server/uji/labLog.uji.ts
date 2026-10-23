@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { validasiLogLab, validasiCapWaktu, terimaTulisan, MAKS_BUTIR_PER_JENIS } from '../src/labLog.js'
+import { validasiLogLab, validasiCapWaktu, terimaTulisan, MAKS_BUTIR_PER_JENIS } from '../src/domains/clinical-records/labLog.js'
 
 const kini = new Date('2026-09-25T06:00:00Z')
 const ok = { gdp: [{ id: 'gdp-1', tanggal: '2026-09-20', nilai: 92 }, { id: 'gdp-0', tanggal: '2026-01-02', nilai: 88 }] }
