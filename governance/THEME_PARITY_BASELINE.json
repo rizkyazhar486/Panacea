@@ -1,0 +1,8 @@
+{
+  "teksBeda": 0,
+  "bergeser": 15,
+  "tanpaPasangan": 0,
+  "overflow": 0,
+  "layarKosong": 0,
+  "_catatan": "Ratchet paritas tema (scripts/qa/theme-parity.mjs): tema terang/gelap harus memberi isi teks identik, pasangan kontrol lengkap, tanpa overflow di kedua tema, layar tidak kosong, dan kotak kontrol interaktif bergeser <= 4px. BUKAN regresi piksel (piksel berbeda antar mesin render); tangkapan layar diunggah sebagai artefak untuk tinjauan manusia. bergeser=15 adalah batas sadar, bukan klaim 15 pergeseran dapat diterima: run kontrol lokal berurutan memberi 0, 0, 0, 2 (dan 10 pada toleransi 2px sebelum penantian stabil) akibat jitter konten async di #/health-data; sabotase tema-gelap-ubah-tata-letak memberi 633. Turunkan ke nilai CI terukur bila ada margin."
+}

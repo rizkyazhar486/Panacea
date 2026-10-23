@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { susunRencana, susunLaporan } from '../../server/src/carePlan.ts'
+import { susunRencana, susunLaporan } from '../../server/src/domains/clinical-records/carePlan.ts'
 import { validateContinuousCarePlan, submitDailyAnamnesis, buildDailyInterview } from '../../src/lib/continuousCareOperatingSystem.ts'
 
 // Kontrak server ↔ kernel: rencana/laporan yang disusun server HARUS diterima
@@ -62,7 +62,7 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   assert.match(potong("app.post('/api/care/reports'"), /izinBerlaku\(/, 'laporan diterima setelah izin dicabut')
   const dokterUi = readFileSync('src/components/clinical/RencanaHarianDokter.tsx', 'utf8')
   assert.match(dokterUi, /submitDailyAnamnesis\(plan, r\)/, 'prioritas laporan dipercaya dari pasien, bukan dihitung ulang kernel')
-  assert.match(readFileSync('src/components/CekHarian.tsx', 'utf8'), /Not an emergency service/, 'cek harian kehilangan batas "bukan layanan darurat"')
+  assert.match(readFileSync('src/components/clinical/CekHarian.tsx', 'utf8'), /Not an emergency service/, 'cek harian kehilangan batas "bukan layanan darurat"')
   // Kegagalan muat() awal TIDAK BOLEH `if (!data) return null` menelan pesan
   // galat: dokter harus melihat error + jalan retry, bukan bagian kosong selamanya.
   const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))

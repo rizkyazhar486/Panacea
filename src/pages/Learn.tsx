@@ -7,7 +7,7 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 const LifeLibraryWorkbench = lazy(() => import('../components/LifeLibraryWorkbench').then((m) => ({ default: m.LifeLibraryWorkbench })))
 const HealthGapNavigator = lazy(() => import('../components/HealthGapNavigator').then((m) => ({ default: m.HealthGapNavigator })))
 const Medical3DFrontierLab = lazy(() => import('../components/Medical3DFrontierLab').then((m) => ({ default: m.Medical3DFrontierLab })))
-const LearnBase = lazy(() => import('./LearnBase').then((m) => ({ default: m.Learn })))
+const LearnBase = lazy(() => import('./medstudy/LearnBase').then((m) => ({ default: m.Learn })))
 const SettingsWorkspace = lazy(() => import('./SettingsWorkspace').then((m) => ({ default: m.SettingsWorkspace })))
 
 type LearnExtension = 'none' | 'library' | 'life' | 'gap' | 'frontier3d' | 'tutorial'

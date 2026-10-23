@@ -9,7 +9,7 @@ import { labLogToLongitudinalEvents, labLogToBodyExposureSignals } from '../../s
 // production imports or weakening calendar-date validation.
 import '../uji/typescript-resolver.mjs'
 
-const { validasiLogLab } = await import('../../server/src/labLog.ts')
+const { validasiLogLab } = await import('../../server/src/domains/clinical-records/labLog.ts')
 
 const invalidDates = ['2026-02-29', '2026-02-30', '2026-04-31', '1900-02-29', '2026-00-10', '2026-13-01', '2026-01-00', '2026-1-01', 'not-a-date']
 const validDates = ['2000-02-29', '2024-02-29', '2026-02-28', '2026-04-30']

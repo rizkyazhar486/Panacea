@@ -25,7 +25,7 @@
   font-weight:850;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(255,255,255,.34)
+  color:rgba(255,255,255,.62)
 }
 .widget-instrument-title-row-v5{display:flex;align-items:baseline;gap:10px;min-width:0}
 .widget-instrument-title-v5{
@@ -44,7 +44,7 @@
   flex:0 0 auto;
   font-size:9px;
   font-weight:750;
-  color:rgba(255,255,255,.28)
+  color:rgba(255,255,255,.62)
 }
 .widget-instrument-tools-v5{display:flex;align-items:center;gap:12px;flex:0 0 auto}
 .widget-instrument-count-v5{
@@ -159,7 +159,7 @@
   text-align:right;
   font-size:9px;
   font-weight:750;
-  color:rgba(255,255,255,.30)
+  color:rgba(255,255,255,.62)
 }
 .widget-instrument-dots-v5{display:flex;flex:1;align-items:center;justify-content:center;gap:2px;min-width:0}
 .widget-instrument-dot-v5{

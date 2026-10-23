@@ -23,7 +23,12 @@ export const CAFFEINE_RANGES = {
 } as const
 
 export type CaffeineBand = 'high' | 'near' | 'low'
-export const caffeineBand = (pct: number): CaffeineBand => (pct > 25 ? 'high' : pct > 12.5 ? 'near' : 'low')
+// 0,5^(jam/waktu paruh) di tepat 2 atau 3 waktu paruh bisa berujung 25,000000000000007 atau 12,500000000000004 dan jatuh ke pita yang salah
+// (dulu 1.224 dari 6.318 kasus batas-tepat). Pembulatan ke 1e-9 persen hanya menyerap galat float.
+export const caffeineBand = (pct: number): CaffeineBand => {
+  const p = Math.round(pct * 1e9) / 1e9
+  return p > 25 ? 'high' : p > 12.5 ? 'near' : 'low'
+}
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/
 const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3))

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 const prosa = readFileSync(new URL('../../src/components/ui/Prosa.tsx', import.meta.url), 'utf8')
 const bell = readFileSync(new URL('../../src/components/dashboard/NotificationBell.tsx', import.meta.url), 'utf8')
 const training = readFileSync(new URL('../../src/pages/fitness/PusatLatihan.tsx', import.meta.url), 'utf8')
-const shellCss = readFileSync(new URL('../../public/shell-mobile-compact-v49.css', import.meta.url), 'utf8')
+const shellCss = readFileSync(new URL('../../public/ui-iterations/shell-mobile-compact-v49.css', import.meta.url), 'utf8')
 const index = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
 
 assert.match(prosa, /baris = 1/)

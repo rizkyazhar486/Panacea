@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { build } from 'esbuild'
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '@playwright/test')
-const component = process.env.ANIMATION_QA_COMPONENT || resolve('src/components/AnimatedNumber.tsx')
+const component = process.env.ANIMATION_QA_COMPONENT || resolve('src/components/ui/AnimatedNumber.tsx')
 const bundle = await build({ stdin: { resolveDir: process.cwd(), loader: 'jsx', contents: `
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'

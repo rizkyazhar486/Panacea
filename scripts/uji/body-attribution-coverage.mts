@@ -55,6 +55,6 @@ const lacunas = lacunasDeAtribuicao([...licencas], [...fontes], paginaOficial)
 assert.deepEqual(lacunas, [], `lacunas de atribuição: ${JSON.stringify(lacunas)}`)
 
 // A página do app aponta para a página oficial
-const canonico = readFileSync(new URL('../../src/pages/CanonicalBody.tsx', import.meta.url), 'utf8')
+const canonico = readFileSync(new URL('../../src/pages/bodyhub/CanonicalBody.tsx', import.meta.url), 'utf8')
 assert.ok(canonico.includes('provenance.html') && canonico.includes('Sources and provenance'), 'CanonicalBody deve ligar a página de proveniência')
 console.log(`body-attribution-coverage: ok (${glb} GLB, ${licencas.size} licenças, ${fontes.size} fontes)`)

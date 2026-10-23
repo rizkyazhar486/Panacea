@@ -1,5 +1,6 @@
 import { Wordmark } from '../../../components/Logo'
 import { Prosa } from '../../../components/Prosa'
+import { scrollToSection } from './LandingHeader'
 
 export function LandingFooter() {
   return (
@@ -20,10 +21,10 @@ export function LandingFooter() {
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Platform &amp; Solusi</h4>
             <ul className="mt-3 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
-              <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI Intake (SOCRATES)</a></li>
-              <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI Longevity Calculator</a></li>
-              <li><a href="#features" className="hover:text-brand-dark dark:hover:text-emerald-400">AI-EMR for Clinicians</a></li>
-              <li><a href="#pricing" className="hover:text-brand-dark dark:hover:text-emerald-400">34 Skoring Medis Standar</a></li>
+              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI Intake (SOCRATES)</button></li>
+              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI Longevity Calculator</button></li>
+              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI-EMR for Clinicians</button></li>
+              <li><button type="button" onClick={() => scrollToSection('pricing')} className="hover:text-brand-dark dark:hover:text-emerald-400">34 Skoring Medis Standar</button></li>
             </ul>
           </div>
 

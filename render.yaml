@@ -9,7 +9,7 @@ services:
     runtime: node
     plan: free
     rootDir: server
-    buildCommand: npm install && node ../scripts/fetch-opus55-clinical-dataset.mjs --optional
+    buildCommand: npm install && node ../scripts/medstudy/fetch-opus55-clinical-dataset.mjs --optional
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true

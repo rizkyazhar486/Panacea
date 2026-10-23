@@ -1,4 +1,4 @@
-import { cleanProductQuery, resolveProductRegistry } from '../src/productRegistry.ts'
+import { cleanProductQuery, resolveProductRegistry } from '../src/domains/product/productRegistry.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {

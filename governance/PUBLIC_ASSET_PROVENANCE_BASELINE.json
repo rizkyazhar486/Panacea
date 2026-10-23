@@ -1,0 +1,8 @@
+{
+ "_catatan": "Ratchet D8 (scripts/uji/public-asset-provenance.mts): aset biner di public/ TANPA jejak provenance apa pun (bukan metadata per-node, bukan hak cipta tertanam, bukan berkas CREDITS/PROVENANCE/LICENSE/NOTICE di direktorinya, bukan kredit induk yang menyebut nama berkasnya, bukan ASSET_SOURCES yang menyebut nama berkasnya). Daftar ini hanya boleh MENYUSUT: aset baru tanpa jejak menggagalkan gerbang, dan entri yang sudah tercakup/terhapus harus dibuang dari sini. Mengisi daftar ini butuh pernyataan asal-usul dan lisensi dari pemilik aset; tidak boleh diisi dengan tebakan. Gerbang mengukur ADA-nya jejak, bukan keabsahan lisensi.",
+ "jumlahTotalAset": 640,
+ "tanpaJejak": [
+  "public/logo-mark.png",
+  "public/media/tutorial-video.mp4"
+ ]
+}

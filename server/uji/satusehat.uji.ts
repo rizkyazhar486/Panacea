@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { buildEmrBundle, getAccessToken, postResource, submitEmr } from '../src/satusehat'
+import { buildEmrBundle, getAccessToken, postResource, submitEmr } from '../src/domains/clinical-records/satusehat'
 
 function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {

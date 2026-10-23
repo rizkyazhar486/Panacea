@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaDrugLabelReference",
-    "module": "server/src/openfda.ts",
+    "module": "server/src/domains/medical-reference/openfda.ts",
     "notes": "Canonical production adapter performs bounded brand-name lookup with generic-name fallback, uses upstream timeouts, returns selected structured-product-label fields including mechanism_of_action when present, and preserves set_id/record identity plus a key-free source URL when available. Higher-level drugInfo orchestration reuses this adapter rather than issuing duplicate openFDA requests."
   },
   "trust": {

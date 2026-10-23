@@ -127,6 +127,6 @@ console.log('impor-lembar-lab: nama ID/EN, koma desimal, rentang dua sisi saja, 
   assert.match(ui, /PERINTAH_BACA_LEMBAR_LAB/, 'photo path must use the lab-specific vision prompt')
   assert.match(ui, /Draft from photo|technical draft/, 'photo OCR must not claim clinical validation')
   assert.match(ui, /Nothing is saved until you tick/, 'photo OCR must still require per-value confirm')
-  assert.match(readFileSync('src/components/UbinLab.tsx', 'utf8'), /<ImporLembarLab \/>/)
+  assert.match(readFileSync('src/components/tiles/UbinLab.tsx', 'utf8'), /<ImporLembarLab \/>/)
   assert.match(readFileSync('src/lib/imporLab.ts', 'utf8'), /export const PERINTAH_BACA_LEMBAR_LAB/, 'lab vision prompt must stay next to the deterministic parser')
 }

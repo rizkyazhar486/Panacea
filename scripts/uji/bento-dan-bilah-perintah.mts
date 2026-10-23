@@ -25,7 +25,7 @@ import {
 //    pengguna papan ketik ke kendali yang tidak terlihat.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const deck = readFileSync(new URL('../../src/components/HomeCommandDeck.tsx', import.meta.url), 'utf8')
+const deck = readFileSync(new URL('../../src/components/dashboard/HomeCommandDeck.tsx', import.meta.url), 'utf8')
 const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../../src/styles/command-bar.css', import.meta.url), 'utf8')
 
