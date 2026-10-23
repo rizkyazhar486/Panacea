@@ -768,7 +768,8 @@
         {
           "cmd": "cd server && npm run uji",
           "files": [
-            "server/uji/logPrivacyHttp.uji.ts"
+            "server/uji/logPrivacyHttp.uji.ts",
+            "server/uji/support/consoleRequestGuard.ts"
           ]
         }
       ],
@@ -776,7 +777,8 @@
       "evidence": "server-validate run ID at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Static guard added: no console statement in server/src may receive request data (body, query, params, headers, cookies, url); covers every route group structurally. Dynamic journey still covers only the groups it exercises (clinical, lab, lab-log/shares, health webhook/profile, settings, second-opinion, feedback, auth). Not yet PASS: needs a server-validate run at an exact SHA after this lands."
     },
     {
       "id": "ENG-E4-03",

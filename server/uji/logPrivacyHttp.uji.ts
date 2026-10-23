@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { consoleCallsWithRequestData } from './support/consoleRequestGuard.ts'
 import { serverRoot, startIsolatedServer } from './support/isolatedServer.ts'
 
 // 1. Static guard: no console statement in the server source may interpolate an email address. New code that logs one fails here.
@@ -24,6 +25,35 @@ for (const file of sources(join(serverRoot, 'src'))) {
   })
 }
 assert.deepEqual(offenders, [], `a log statement interpolates an email address: ${offenders.join(', ')}`)
+
+// 1b. Static guard over EVERY route group: no console statement may receive request data (body, query, params, headers, cookies, url).
+// The scanner is proven on synthetic source first (positive, negative, paired and boundary cases), then run over server/src.
+const flagged = (src: string) => consoleCallsWithRequestData(src).findings.length
+for (const leak of [
+  'console.log(req.body)', "console.error('failed', req.query)", 'console.warn(request.params.id)', 'console.info(req.headers.authorization)',
+  'console.log(`saved ${req.body.name}`)', 'console.log(\n  "multi-line",\n  req.body,\n)', 'console.debug(fn(a(b)), req.cookies)', 'console.log(req)',
+  'console.log(req?.body)', 'console.log(req.originalUrl)', 'console.log(request, 1)',
+]) assert.equal(flagged(leak), 1, `request data in a console call must be flagged: ${leak}`)
+for (const fine of [
+  "console.log('req.body is never logged')", 'console.log(`req.body is ${count} bytes`)', 'console.log(penandaLog(userId))', 'console.log(req.method, req.path)',
+  'const b = req.body; handle(b)', 'res.json(req.body)', 'console.log(requested)', 'console.log(reqCount)', "console.warn('[x]', e?.message)",
+]) assert.equal(flagged(fine), 0, `must not be flagged: ${fine}`)
+// Paired: the same statement is flagged only because of the request argument.
+assert.equal(flagged('console.log(note)'), 0)
+assert.equal(flagged('console.log(note, req.body)'), 1)
+assert.equal(flagged('console.log(1)\nconsole.log(req.body)').valueOf(), 1, 'only the offending statement counts')
+assert.deepEqual(consoleCallsWithRequestData('a\nb\nconsole.log(req.body)').findings, [{ line: 3, call: 'console.log(' }], 'the finding names the line')
+assert.equal(consoleCallsWithRequestData('console.log(req.body').findings[0]?.call, 'unbalanced console call', 'an unbalanced call fails closed instead of being skipped')
+assert.deepEqual(consoleCallsWithRequestData(''), { scanned: 0, findings: [] })
+const requestLeaks: string[] = []
+let consoleCalls = 0
+for (const file of sources(join(serverRoot, 'src'))) {
+  const { scanned, findings } = consoleCallsWithRequestData(readFileSync(file, 'utf8'))
+  consoleCalls += scanned
+  for (const f of findings) requestLeaks.push(`${file.slice(serverRoot.length)}:${f.line}`)
+}
+assert.ok(consoleCalls > 30, `the scanner must see the real console statements (saw ${consoleCalls}), otherwise an empty result proves nothing`)
+assert.deepEqual(requestLeaks, [], `a console statement receives request data: ${requestLeaks.join(', ')}`)
 
 // 2. Dynamic: run a clinical journey and read everything the server wrote.
 const ownerEmail = 'logprivacy-owner@localhost.test'
