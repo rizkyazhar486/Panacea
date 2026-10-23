@@ -42,7 +42,7 @@ assert.deepEqual(turun.proyeksi.map((p) => p.nilai), [null, null, null, null, nu
 assert.equal(ok(proyeksiTren(['40', '30', '20'])).proyeksi[0].nilai, 10)
 
 // Regresi halaman: tanpa contoh karangan, tanpa regresi inline, memakai mesin domain.
-const halaman = readFileSync(new URL('../../src/pages/DataLabAdvanced.tsx', import.meta.url), 'utf8')
+const halaman = readFileSync(new URL('../../src/pages/bodyhub/DataLabAdvanced.tsx', import.meta.url), 'utf8')
 assert.doesNotMatch(halaman, /'90', '92', '95'/); assert.doesNotMatch(halaman, /function linreg/)
 assert.match(halaman, /proyeksiTren\(values\)/); assert.match(halaman, /No projection yet/)
 console.log('tren-biomarker: ok')
