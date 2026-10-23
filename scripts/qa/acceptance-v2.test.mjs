@@ -78,3 +78,21 @@ test('jalur_server_diselesaikan_relatif_ke_server', () => {
 test('deterministik_dua_kali_sama', () => {
   assert.deepEqual(validasi(baca(), ada), validasi(baca(), ada))
 })
+
+test('semua_gerbang_manusia_ditunda_ke_tahap_akhir_dan_tidak_diminta_sekarang', () => {
+  const d = baca()
+  for (const g of d.externalGates) {
+    assert.equal(g.status, 'DEFERRED_FINAL_STAGE', g.id)
+    assert.match(g.activatesWhen, /Final stage/, g.id)
+  }
+})
+
+test('menolak_status_gerbang_lama_open', () => {
+  const d = salin(); d.externalGates[0].status = 'OPEN'
+  assert.match(validasi(d, adaSemua).join('\n'), /EXT-D8-1: status OPEN tidak diizinkan/)
+})
+
+test('menolak_gerbang_tanpa_syarat_aktivasi', () => {
+  const d = salin(); d.externalGates[2].activatesWhen = ''
+  assert.match(validasi(d, adaSemua).join('\n'), /EXT-E4-1: field activatesWhen kosong/)
+})

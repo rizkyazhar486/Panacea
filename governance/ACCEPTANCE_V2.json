@@ -2,16 +2,16 @@
   "version": 2,
   "status": "DRAFT_PROPOSAL_AWAITING_OWNER_APPROVAL",
   "createdFromMainSha": "256a22de9687605b14297bb25b48319f257ccab7",
-  "denominatorPolicy": "v2 starts with a NEW baseline: engineering criteria are counted separately from external gates. A criterion is PASS only with all evidence for the exact SHA; otherwise FAIL or NOT_RUN. No v2 criterion is VERIFIED. External gates are reported beside the engineering count and never removed to raise a percentage. The legacy ledger stays read-only history.",
+  "operatingModel": "AI-first: AI does all engineering, testing, review and evidence. Human decisions are a FINAL stage, not a working dependency. Deferred gates never become PASS or VERIFIED by AI; they keep their safety labels until a qualified human acts.",
+  "denominatorPolicy": "v2 starts with a NEW baseline: engineering criteria are counted separately from external gates. A criterion is PASS only with all evidence for the exact SHA; otherwise FAIL or NOT_RUN. No v2 criterion is VERIFIED. Deferred final-stage gates are reported beside the engineering count and never removed to raise a percentage. The legacy ledger stays read-only history.",
   "statuses": {
     "engineering": [
       "PASS",
       "FAIL",
       "NOT_RUN"
     ],
-    "externalGate": [
-      "OPEN",
-      "BLOCKED_EXTERNAL",
+    "finalStageGate": [
+      "DEFERRED_FINAL_STAGE",
       "DECIDED"
     ]
   },
@@ -540,7 +540,8 @@
       "question": "Is public/logo-mark.png original work you may use? Provide an author statement and the basis of rights.",
       "whyAiCannot": "AI must not self-attest ownership",
       "interimBehaviour": "Keep asset; D8 stays BLOCKED_EXTERNAL",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -550,7 +551,8 @@
       "question": "Source, author and rights of public/media/tutorial-video.mp4 including music, voice and footage.",
       "whyAiCannot": "AI must not self-attest rights",
       "interimBehaviour": "Keep asset; D8 stays BLOCKED_EXTERNAL",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -560,7 +562,8 @@
       "question": "Approve retention periods, deletion rights, consent and legal basis (docs/alpha/E4_RETENTION_CONSENT_POLICY_DRAFT.md).",
       "whyAiCannot": "'Compliant with policy' is untestable without an approved policy",
       "interimBehaviour": "Engineering safeguards proceed; policy tests added after approval",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -570,7 +573,8 @@
       "question": "Provide Render/Vercel/Mongo log visibility or accept them as out of scope.",
       "whyAiCannot": "Third-party logs are unreadable from the repo",
       "interimBehaviour": "Documented as a blind spot",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -580,7 +584,8 @@
       "question": "Define 'accepted release SHA' (HEAD vs last release vs per-artifact), whether staging is required, and grant infra access.",
       "whyAiCannot": "Equivalence rule is policy",
       "interimBehaviour": "Comparator reports facts; no VERIFIED claim",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -590,7 +595,8 @@
       "question": "Choose clinician access model A-D (docs/alpha/F1_CLINICIAN_ACCESS_AUDIT.md), contributor role scope, owner/admin treatment and OAuth scope.",
       "whyAiCannot": "AI must not silently open or restrict access",
       "interimBehaviour": "Current behaviour pinned by test",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -600,17 +606,19 @@
       "question": "Provide a real Google OAuth test account, or accept synthetic sessions only.",
       "whyAiCannot": "Real provider flow is untestable in CI",
       "interimBehaviour": "Gap stays listed",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
       "id": "EXT-F2-1",
       "legacy": "F2",
-      "decisionOwner": "Manual QA assignee",
-      "question": "Run docs/alpha/F2_MANUAL_QA_CHECKLIST.md and record results.",
-      "whyAiCannot": "Human judgment",
-      "interimBehaviour": "Result cells stay blank until done",
-      "status": "OPEN",
+      "decisionOwner": "Manual QA (final stage)",
+      "question": "Run docs/alpha/F2_MANUAL_QA_CHECKLIST.md with real assistive tech and devices.",
+      "whyAiCannot": "Automated axe/keyboard/screenshot checks cover what a machine can; assistive-tech judgment needs a person",
+      "interimBehaviour": "Automated F2 criteria keep running; manual cells stay blank",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -620,7 +628,8 @@
       "question": "Justify or replace placeholder slip thresholds; judge rig fidelity before any 'realistic' claim.",
       "whyAiCannot": "Thresholds are placeholders, not literature",
       "interimBehaviour": "Claims limited to 'measured against a placeholder'",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -630,7 +639,8 @@
       "question": "Review each calculator engine, sign per formula, record version and findings.",
       "whyAiCannot": "Clinical validation is not an engineering result",
       "interimBehaviour": "clinically_reviewed=false and the deferral stay",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     },
     {
@@ -640,7 +650,8 @@
       "question": "Confirm production credentials/ownership and who may publish or roll back.",
       "whyAiCannot": "AI cannot hold production authority",
       "interimBehaviour": "Release gate records SHA only",
-      "status": "OPEN",
+      "status": "DEFERRED_FINAL_STAGE",
+      "activatesWhen": "Final stage: after Alpha engineering is complete AND a qualified human holds the relevant role (specialist, counsel, employed operator). Not requested now.",
       "blocksEngineeringWork": false
     }
   ]

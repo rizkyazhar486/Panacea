@@ -4,9 +4,9 @@
 // status yang tidak boleh; TIDAK menjalankan perintahnya dan TIDAK membuktikan kriteria lulus.
 export const LEGACY_WAJIB = ['D7', 'D8', 'E4', 'E7', 'F1', 'F2', 'C6']
 const FIELD_KRITERIA = ['id', 'legacy', 'capability', 'risk', 'definitionOfDone', 'command', 'negativeControl', 'evidence', 'owner', 'priority', 'horizon', 'allowedStatus', 'status', 'revalidation']
-const FIELD_GATE = ['id', 'legacy', 'decisionOwner', 'question', 'whyAiCannot', 'interimBehaviour', 'status']
+const FIELD_GATE = ['id', 'legacy', 'decisionOwner', 'question', 'whyAiCannot', 'interimBehaviour', 'status', 'activatesWhen']
 const STATUS_ENG = ['PASS', 'FAIL', 'NOT_RUN']
-const STATUS_GATE = ['OPEN', 'BLOCKED_EXTERNAL', 'DECIDED']
+const STATUS_GATE = ['DEFERRED_FINAL_STAGE', 'DECIDED']
 
 /** Token jalur skrip di dalam string perintah; `uji/...` relatif ke server/ bila perintah memakai `cd server`. */
 export function jalurDariPerintah(cmd) {

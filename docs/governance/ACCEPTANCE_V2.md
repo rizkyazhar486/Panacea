@@ -4,7 +4,7 @@
 
 ## Rules
 
-- Denominator: **22 engineering criteria**, counted separately from **11 external gates** ([EXTERNAL_GATES.md](EXTERNAL_GATES.md)). Both numbers are always reported together; neither is removed to raise a percentage.
+- Denominator: **22 engineering criteria**, counted separately from **11 deferred final-stage human gates** ([EXTERNAL_GATES.md](EXTERNAL_GATES.md)). Deferred gates are not requested now and not scored; they are listed so nothing is hidden, never removed to raise a percentage.
 - Allowed statuses: `PASS`, `FAIL`, `NOT_RUN`. **No v2 criterion is `VERIFIED`** — legal, clinical and production claims are not engineering results.
 - `PASS` requires the command and the negative control to pass on the **exact SHA**, with evidence recorded per [VERIFICATION_V2.md](VERIFICATION_V2.md). Otherwise `FAIL` or `NOT_RUN`.
 - A criterion exists only if it has an executable command and a negative control. Work without a test yet (e.g. staging environment) is a roadmap task, not a criterion.
