@@ -1,0 +1,647 @@
+{
+  "version": 2,
+  "status": "DRAFT_PROPOSAL_AWAITING_OWNER_APPROVAL",
+  "createdFromMainSha": "256a22de9687605b14297bb25b48319f257ccab7",
+  "denominatorPolicy": "v2 starts with a NEW baseline: engineering criteria are counted separately from external gates. A criterion is PASS only with all evidence for the exact SHA; otherwise FAIL or NOT_RUN. No v2 criterion is VERIFIED. External gates are reported beside the engineering count and never removed to raise a percentage. The legacy ledger stays read-only history.",
+  "statuses": {
+    "engineering": [
+      "PASS",
+      "FAIL",
+      "NOT_RUN"
+    ],
+    "externalGate": [
+      "OPEN",
+      "BLOCKED_EXTERNAL",
+      "DECIDED"
+    ]
+  },
+  "engineeringCriteria": [
+    {
+      "id": "ENG-D8-1",
+      "legacy": "D8",
+      "capability": "Asset inventory covers every binary under public/",
+      "risk": "licence/provenance gap hidden",
+      "definitionOfDone": "Inventory classifies every binary asset; no-trace count equals baseline; a new asset without trace fails",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/public-asset-inventory.mjs",
+      "negativeControl": "node --test scripts/qa/body-public-asset-inventory.test.mjs (asset without trace -> named failure)",
+      "evidence": [
+        "governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json",
+        "scripts/qa/public-asset-inventory.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-D8-2",
+      "legacy": "D8",
+      "capability": "GLB per-node source/licence/accuracy metadata",
+      "risk": "unlabelled anatomy asset shipped",
+      "definitionOfDone": "0 named structures without panacea_source/license/accuracy_status in public GLB",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/glb-provenance-audit.mjs",
+      "negativeControl": "node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/body-asset-provenance.mts",
+      "evidence": [
+        "scripts/qa/glb-provenance-audit.mjs",
+        "bodyexposure/PROVENANCE.md"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-D8-3",
+      "legacy": "D8",
+      "capability": "Unprovenanced assets are listed for owner attestation, never deleted or self-attested",
+      "risk": "fabricated ownership",
+      "definitionOfDone": "Attestation request facts (hash, size) equal the on-disk assets",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --test scripts/qa/d8-attestation-facts.test.mjs",
+      "negativeControl": "same test: changed hash -> fails by name",
+      "evidence": [
+        "docs/alpha/D8_OWNER_ATTESTATION_REQUESTS.md"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F1-1",
+      "legacy": "F1",
+      "capability": "Role/tenant authorization over real HTTP (staff, patient, lab, share)",
+      "risk": "privilege escalation",
+      "definitionOfDone": "Positive and negative RBAC fixtures pass incl. escalation and logout revocation",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/staffRbacHttp.uji.ts",
+      "negativeControl": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/logoutRevokeHttp.uji.ts (revoked token -> 401)",
+      "evidence": [
+        "server/uji/staffRbacHttp.uji.ts",
+        "server/uji/logoutRevokeHttp.uji.ts"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F1-2",
+      "legacy": "F1",
+      "capability": "Synthetic-identity browser journeys at 390x844 and 1440x900",
+      "risk": "dead-end navigation",
+      "definitionOfDone": "Patient/doctor/owner/staff journeys pass; no dead end; error and slow-API states recover",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/user-journey-e2e.mjs",
+      "negativeControl": "scripts/qa/f1-negative-evidence.mjs (dead-end / leaked text fail by step name)",
+      "evidence": [
+        "scripts/qa/user-journey-e2e.mjs",
+        ".github/workflows/user-journey-acceptance.yml"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F1-3",
+      "legacy": "F1",
+      "capability": "Clinician tenant-read behaviour is characterised, not silently changed",
+      "risk": "silent access change",
+      "definitionOfDone": "Current behaviour pinned by test; any change must update the test in the same PR",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/clinicianTenantReadHttp.uji.ts",
+      "negativeControl": "non-clinician and cross-tenant cases in the same file",
+      "evidence": [
+        "server/uji/clinicianTenantReadHttp.uji.ts"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-E4-1",
+      "legacy": "E4",
+      "capability": "Repo PHI pattern scan",
+      "risk": "PHI committed",
+      "definitionOfDone": "No PHI-pattern hits outside the allowlist",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/phi-repo-scan.mjs",
+      "negativeControl": "node --test scripts/qa/phi-repo-scan.test.mjs",
+      "evidence": [
+        "scripts/qa/phi-repo-scan.mjs",
+        "governance/PHI_SCAN_ALLOWLIST.json"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-E4-2",
+      "legacy": "E4",
+      "capability": "Server log redaction on tested clinical paths",
+      "risk": "PHI in logs",
+      "definitionOfDone": "Tested journeys write no name/email/MRN/text/value to logs",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/logPrivacyHttp.uji.ts",
+      "negativeControl": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/postsPrivacyHttp.uji.ts",
+      "evidence": [
+        "server/uji/logPrivacyHttp.uji.ts"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-E4-3",
+      "legacy": "E4",
+      "capability": "Personal-data endpoints deny cross-user access",
+      "risk": "PHI cross-read",
+      "definitionOfDone": "Other-user and anonymous requests refused with no side effect",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "cd server && PANACEA_DATA_FILE=$(mktemp -u).json npx tsx uji/personalDataHttpRbac.uji.ts",
+      "negativeControl": "negative cases in the same file",
+      "evidence": [
+        "server/uji/personalDataHttpRbac.uji.ts"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-1",
+      "legacy": "F2",
+      "capability": "WCAG contrast does not regress and is measured honestly",
+      "risk": "inaccessible UI",
+      "definitionOfDone": "Failures <= baseline; measurer fixture proves detection",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/kontras-wcag.mjs",
+      "negativeControl": "node scripts/qa/kontras-ukur.fixture.mjs",
+      "evidence": [
+        "governance/KONTRAS_BASELINE.json",
+        "scripts/qa/kontras-ukur.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-2",
+      "legacy": "F2",
+      "capability": "axe serious/critical = 0 and incomplete does not grow",
+      "risk": "inaccessible UI",
+      "definitionOfDone": "axe ratchet green",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/axe-ratchet.mjs",
+      "negativeControl": "node --test scripts/qa/axe-ratchet.test.mjs",
+      "evidence": [
+        "governance/AXE_BASELINE.json"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-3",
+      "legacy": "F2",
+      "capability": "Keyboard order and visible focus",
+      "risk": "keyboard users blocked",
+      "definitionOfDone": "keyboard audit within baseline",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/keyboard-audit.mjs",
+      "negativeControl": "node --test scripts/qa/keyboard-analisis.test.mjs",
+      "evidence": [
+        "governance/KEYBOARD_BASELINE.json"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-4",
+      "legacy": "F2",
+      "capability": "Screenshot grid parity across viewport and theme",
+      "risk": "visual regression",
+      "definitionOfDone": "grid keys equal baseline",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/screenshot-grid.mjs",
+      "negativeControl": "node --test scripts/qa/screenshot-grid.test.mjs",
+      "evidence": [
+        "governance/SCREENSHOT_GRID_BASELINE.json"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-5",
+      "legacy": "F2",
+      "capability": "UX structural audit: overflow, unnamed controls, 44px targets, reduced motion",
+      "risk": "broken mobile layout",
+      "definitionOfDone": "ux-audit equals baseline of 0 defects",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/ux-audit.mjs",
+      "negativeControl": "fail-closed without baseline",
+      "evidence": [
+        "governance/UX_AUDIT_BASELINE.json"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-F2-6",
+      "legacy": "F2",
+      "capability": "Bundle size budget",
+      "risk": "slow load",
+      "definitionOfDone": "bundle within limits (measured +3%)",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node scripts/qa/bundle-budget.mjs",
+      "negativeControl": "exceeding a limit fails by chunk name",
+      "evidence": [
+        "governance/BUNDLE_BUDGET_BASELINE.json"
+      ],
+      "owner": "AI",
+      "priority": "P2",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-D7-1",
+      "legacy": "D7",
+      "capability": "Gait foot-slide assessed against an explicit criterion; UNMEASURABLE distinct from PASS/FAIL",
+      "risk": "false measured claim",
+      "definitionOfDone": "Metrics engine pass/fail/unmeasurable cases exact",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/body-gait-foot-metrics.mts",
+      "negativeControl": "same: too few stance phases -> UNMEASURABLE, not PASS",
+      "evidence": [
+        "src/domains/body-exposure/engine/gaitFootMetrics.ts"
+      ],
+      "owner": "AI",
+      "priority": "P3",
+      "horizon": "H2",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-D7-2",
+      "legacy": "D7",
+      "capability": "Contact phases reproduced from raw GLB (WALK/RUN, both sexes)",
+      "risk": "invented contact data",
+      "definitionOfDone": "Reproduction output equals the recorded JSON",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/body-gait-foot-contact-reproduction.mts",
+      "negativeControl": "node --test scripts/qa/compare-blender-gait-contact.test.mjs",
+      "evidence": [
+        "bodyexposure/qa_reports/gait_foot_slide.json"
+      ],
+      "owner": "AI",
+      "priority": "P3",
+      "horizon": "H2",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-D7-3",
+      "legacy": "D7",
+      "capability": "Rig coordinate decode is exact",
+      "risk": "wrong landmark space",
+      "definitionOfDone": "Decode round trip equal",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --test scripts/qa/gait-coordinate-decode.test.mjs",
+      "negativeControl": "corrupted input rejected",
+      "evidence": [
+        "scripts/qa/decode-rig-for-blender.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P3",
+      "horizon": "H2",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-E7-1",
+      "legacy": "E7",
+      "capability": "Deployed-SHA comparator classifies equal/ancestor/diverged",
+      "risk": "stale deploy mistaken as current",
+      "definitionOfDone": "Comparator unit cases exact",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --test scripts/qa/deploy-equivalence.test.mjs",
+      "negativeControl": "diverged SHA -> not equal",
+      "evidence": [
+        "scripts/qa/deploy-equivalence.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-E7-2",
+      "legacy": "E7",
+      "capability": "Build marker equals built commit; null never fabricated",
+      "risk": "false release provenance",
+      "definitionOfDone": "build.json holds a 40-hex SHA or null",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --test scripts/qa/frontend-build-info.test.mjs",
+      "negativeControl": "malformed SHA -> null",
+      "evidence": [
+        "scripts/vite/buildMarker.mjs",
+        "scripts/qa/verify-build-marker.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-C6-1",
+      "legacy": "C6",
+      "capability": "Independent-reference numerical checks for calculators",
+      "risk": "wrong numeric output",
+      "definitionOfDone": "Reference values equal calculator output within stated tolerance",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/calculator-independent-reference.mts",
+      "negativeControl": "hostile-input matrix in scripts/uji/calculator-independent-reference-2.mts .. -10.mts",
+      "evidence": [
+        "docs/clinical-calculators/ENGINEERING_REVIEW_DOSSIER.md",
+        "scripts/uji/support/calculatorHarness.mts"
+      ],
+      "owner": "AI",
+      "priority": "P1",
+      "horizon": "H2",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    },
+    {
+      "id": "ENG-G-1",
+      "legacy": "governance",
+      "capability": "This criteria file is well-formed and every engineering criterion is executable",
+      "risk": "paper governance",
+      "definitionOfDone": "Validator green",
+      "preconditions": "npm ci (root); server tests: cd server && npm ci",
+      "command": "node --test scripts/qa/acceptance-v2.test.mjs",
+      "negativeControl": "sabotaged copies fail by name (same test)",
+      "evidence": [
+        "governance/ACCEPTANCE_V2.json",
+        "scripts/qa/acceptance-v2.test.mjs"
+      ],
+      "owner": "AI",
+      "priority": "P0",
+      "horizon": "H0",
+      "allowedStatus": [
+        "PASS",
+        "FAIL",
+        "NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "revalidation": "every PR touching evidence paths; full re-run on the release SHA"
+    }
+  ],
+  "externalGates": [
+    {
+      "id": "EXT-D8-1",
+      "legacy": "D8",
+      "decisionOwner": "Product Owner",
+      "question": "Is public/logo-mark.png original work you may use? Provide an author statement and the basis of rights.",
+      "whyAiCannot": "AI must not self-attest ownership",
+      "interimBehaviour": "Keep asset; D8 stays BLOCKED_EXTERNAL",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-D8-2",
+      "legacy": "D8",
+      "decisionOwner": "Product Owner (+ legal if third-party)",
+      "question": "Source, author and rights of public/media/tutorial-video.mp4 including music, voice and footage.",
+      "whyAiCannot": "AI must not self-attest rights",
+      "interimBehaviour": "Keep asset; D8 stays BLOCKED_EXTERNAL",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-E4-1",
+      "legacy": "E4",
+      "decisionOwner": "Product Owner + legal/privacy counsel",
+      "question": "Approve retention periods, deletion rights, consent and legal basis (docs/alpha/E4_RETENTION_CONSENT_POLICY_DRAFT.md).",
+      "whyAiCannot": "'Compliant with policy' is untestable without an approved policy",
+      "interimBehaviour": "Engineering safeguards proceed; policy tests added after approval",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-E4-2",
+      "legacy": "E4",
+      "decisionOwner": "Product Owner",
+      "question": "Provide Render/Vercel/Mongo log visibility or accept them as out of scope.",
+      "whyAiCannot": "Third-party logs are unreadable from the repo",
+      "interimBehaviour": "Documented as a blind spot",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-E7-1",
+      "legacy": "E7",
+      "decisionOwner": "Product Owner",
+      "question": "Define 'accepted release SHA' (HEAD vs last release vs per-artifact), whether staging is required, and grant infra access.",
+      "whyAiCannot": "Equivalence rule is policy",
+      "interimBehaviour": "Comparator reports facts; no VERIFIED claim",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-F1-1",
+      "legacy": "F1",
+      "decisionOwner": "Product Owner (+ security reviewer)",
+      "question": "Choose clinician access model A-D (docs/alpha/F1_CLINICIAN_ACCESS_AUDIT.md), contributor role scope, owner/admin treatment and OAuth scope.",
+      "whyAiCannot": "AI must not silently open or restrict access",
+      "interimBehaviour": "Current behaviour pinned by test",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-F1-2",
+      "legacy": "F1",
+      "decisionOwner": "Product Owner",
+      "question": "Provide a real Google OAuth test account, or accept synthetic sessions only.",
+      "whyAiCannot": "Real provider flow is untestable in CI",
+      "interimBehaviour": "Gap stays listed",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-F2-1",
+      "legacy": "F2",
+      "decisionOwner": "Manual QA assignee",
+      "question": "Run docs/alpha/F2_MANUAL_QA_CHECKLIST.md and record results.",
+      "whyAiCannot": "Human judgment",
+      "interimBehaviour": "Result cells stay blank until done",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-D7-1",
+      "legacy": "D7",
+      "decisionOwner": "Biomechanics expert",
+      "question": "Justify or replace placeholder slip thresholds; judge rig fidelity before any 'realistic' claim.",
+      "whyAiCannot": "Thresholds are placeholders, not literature",
+      "interimBehaviour": "Claims limited to 'measured against a placeholder'",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-C6-1",
+      "legacy": "C6",
+      "decisionOwner": "Named specialist physicians",
+      "question": "Review each calculator engine, sign per formula, record version and findings.",
+      "whyAiCannot": "Clinical validation is not an engineering result",
+      "interimBehaviour": "clinically_reviewed=false and the deferral stay",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    },
+    {
+      "id": "EXT-PROD-1",
+      "legacy": "all",
+      "decisionOwner": "Product Owner",
+      "question": "Confirm production credentials/ownership and who may publish or roll back.",
+      "whyAiCannot": "AI cannot hold production authority",
+      "interimBehaviour": "Release gate records SHA only",
+      "status": "OPEN",
+      "blocksEngineeringWork": false
+    }
+  ]
+}
