@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { correctedSodiumKatz, potassiumAssessment } from '../../src/domains/clinical-calculators/index.ts'
+import {
+  GLUCOSE_MG_DL_PER_MMOL_L,
+  correctedSodiumKatz,
+  glucoseMmolLToMgDl,
+  potassiumAssessment,
+} from '../../src/domains/clinical-calculators/index.ts'
 
 // ── Natrium (Katz): nilai tangan ──
 const na = (n: number, g: number) => correctedSodiumKatz(n, g)
@@ -8,6 +13,23 @@ assert.deepEqual(na(130, 400), { ok: true, data: { correctedNa: 130 + 1.6 * 3 } 
 assert.deepEqual(na(130, 100), { ok: true, data: { correctedNa: 130 } })            // tepat di 100: tanpa koreksi
 assert.deepEqual(na(130, 50), { ok: true, data: { correctedNa: 130 } })             // di bawah 100: tidak dikoreksi turun
 assert.deepEqual(na(120, 600), { ok: true, data: { correctedNa: 120 + 1.6 * 5 } })
+
+// Konversi satuan glukosa mmol/L → mg/dL (× 18.0182)
+assert.equal(GLUCOSE_MG_DL_PER_MMOL_L, 18.0182)
+assert.ok(Math.abs(glucoseMmolLToMgDl(5.55) - 5.55 * 18.0182) < 1e-12)
+assert.deepEqual(na(135, glucoseMmolLToMgDl(3.0)), { ok: true, data: { correctedNa: 135 } }) // < 100 mg/dL: tanpa koreksi negatif
+assert.deepEqual(na(135, glucoseMmolLToMgDl(100 / 18.0182)), { ok: true, data: { correctedNa: 135 } })
+const rMmolMild = na(130, glucoseMmolLToMgDl(200 / 18.0182))
+assert.ok(rMmolMild.ok && Math.abs(rMmolMild.data.correctedNa - 131.6) < 1e-12)
+const rMmolSevere = na(130, glucoseMmolLToMgDl(600 / 18.0182))
+assert.ok(rMmolSevere.ok && Math.abs(rMmolSevere.data.correctedNa - 138.0) < 1e-12)
+for (const badMmol of [NaN, Infinity, -Infinity, undefined, null, '5.5'] as unknown as number[]) {
+  assert.ok(Number.isNaN(glucoseMmolLToMgDl(badMmol)))
+  assert.equal(na(135, glucoseMmolLToMgDl(badMmol)).ok, false)
+}
+for (const outMmol of [0, -5, 1.0, 120]) {
+  assert.equal(na(135, glucoseMmolLToMgDl(outMmol)).ok, false)
+}
 // Pasangan: hanya glukosa berbeda (100 vs 200) → koreksi baru muncul di atas 100. Toleransi 1e-9 karena selisih float.
 const g100 = na(130, 100), g200 = na(130, 200)
 assert.ok(g100.ok && g200.ok && Math.abs(g200.data.correctedNa - g100.data.correctedNa - 1.6) < 1e-9)
@@ -19,8 +41,8 @@ for (let n = 80; n <= 200; n += 7) for (let g = 20; g <= 2000; g += 37) {
 // Batas dan penolakan.
 for (const [n, g] of [[80, 20], [200, 2000]] as const) assert.equal(na(n, g).ok, true, `${n},${g}`)
 const GN = { ok: false, reason: 'Sodium must be 80–200 mEq/L' }, GG = { ok: false, reason: 'Glucose must be 20–2000 mg/dL' }
-for (const n of [79.99, 0, -130, 200.01, NaN, Infinity, +'']) assert.deepEqual(na(n, 400), GN, `Na ${n}`)
-for (const g of [19.99, 0, -400, 2000.01, NaN, Infinity, +'']) assert.deepEqual(na(130, g), GG, `glukosa ${g}`)
+for (const n of [79.99, 0, -130, 200.01, NaN, Infinity, -Infinity, +'']) assert.deepEqual(na(n, 400), GN, `Na ${n}`)
+for (const g of [19.99, 0, -400, 2000.01, NaN, Infinity, -Infinity, +'']) assert.deepEqual(na(130, g), GG, `glukosa ${g}`)
 for (const salah of [undefined, null, '130', {}] as unknown as number[]) { assert.equal(na(salah, 400).ok, false); assert.equal(na(130, salah).ok, false) }
 assert.equal('data' in (na(0, 400) as object), false)
 
@@ -54,7 +76,7 @@ assert.equal('data' in (kp(0) as object), false)
 // Jebakan nyata: kolom kosong dibaca 0 dan halaman lama menampilkan defisit 800–1600 mEq dengan lencana "Severe".
 assert.equal((4.0 - +'') * 200, 800)
 
-// Halaman memakai fungsi kanonik, tanpa menghitung ulang.
+// Halaman memakai fungsi kanonik, tanpa menghitung ulang, dan menampilkan penjelasan rumus Katz yang di-clamp.
 const halaman = readFileSync('src/pages/clinical/ClinicalCalculators.tsx', 'utf8')
 assert.match(halaman, /correctedSodiumKatz\(measuredNa, glucose\)/)
 assert.match(halaman, /potassiumAssessment\(measuredK\)/)
@@ -62,6 +84,7 @@ assert.match(halaman, /sodium\.ok \?/)
 assert.match(halaman, /potassium\.ok \?/)
 assert.match(halaman, /\{sodium\.reason\}/)
 assert.match(halaman, /\{potassium\.reason\}/)
+assert.match(halaman, /Corrected Na = Measured Na \+ 1\.6 × max\(0, \(Glucose − 100\) \/ 100\)\./)
 assert.doesNotMatch(halaman, /1\.6 \* Math\.max/, 'koreksi Katz tidak boleh disalin ke halaman')
 assert.doesNotMatch(halaman, /Severe — monitor ECG closely/, 'ambang keparahan kalium hanya boleh ada di engine')
-console.log('electrolyte-correction: golden values, behaviour-preserving regression grid, every K threshold at the boundary, fail-closed ranges')
+console.log('electrolyte-correction: golden values, mmol/L unit conversion, behaviour-preserving regression grid, every K threshold at the boundary, fail-closed ranges')

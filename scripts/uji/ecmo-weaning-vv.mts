@@ -21,6 +21,6 @@ assert.equal(nilaiWeaningVV({ ...pulihNormo, fdo2: 0.21, sweep: 0.5 }, 7.495, 7.
 // Sumber dan batasnya tertulis; UI menyebut ambang pH sebagai pilihan pendidik.
 const src = readFileSync('src/lib/ecmo/weaningVV.ts', 'utf8')
 assert.match(src, /Tabel 7/); assert.match(src, /TIDAK menetapkan angka pH/)
-const ui = readFileSync('src/components/PanelEcmo.tsx', 'utf8')
+const ui = readFileSync('src/components/digital-twin/PanelEcmo.tsx', 'utf8')
 assert.match(ui, /data-ecmo-weaning/); assert.match(ui, /educator-set/i); assert.match(ui, /not a decannulation decision/i)
 console.log('ecmo-weaning-vv: lulus')

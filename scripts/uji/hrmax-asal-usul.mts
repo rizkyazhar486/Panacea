@@ -49,7 +49,7 @@ for (const buruk of [0, -5, Number.NaN, undefined]) {
 }
 
 // ── 4. Layar harus MENGATAKAN ketiganya, dengan kata berbeda ───────────────
-const halaman = readFileSync('src/pages/WorkoutHistory.tsx', 'utf8')
+const halaman = readFileSync('src/pages/fitness/WorkoutHistory.tsx', 'utf8')
 assert.match(halaman, /hrMaksimum\(/, 'the page must take HRmax with its provenance')
 assert.doesNotMatch(halaman, /hrMaxFromAge\(demo\.age \|\| 30/,
   'the silent age-30 fallback must not come back on this page')

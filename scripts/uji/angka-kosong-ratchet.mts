@@ -25,27 +25,31 @@ assert.equal(hitung('const n = Number(x) ?? 0'), 0, '?? bukan || ')
 assert.equal(hitung('const n = Number(x) || 1'), 0, 'bukan fallback 0')
 assert.equal(hitung('const n = Number.isFinite(x) || 0'), 0, 'Number.isFinite bukan konversi')
 
-function pindai(akar: string): Record<string, number> {
+function pindai(akar: string): { berkas: Record<string, number>; tsxDipindai: number } {
   const hasil: Record<string, number> = {}
+  let tsxDipindai = 0
   const jalan = (dir: string) => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const p = join(dir, e.name)
       if (e.isDirectory()) jalan(p)
       else if (e.name.endsWith('.tsx')) {
+        tsxDipindai++
         const n = hitung(readFileSync(p, 'utf8'))
         if (n > 0) hasil[p.replaceAll('\\', '/')] = n
       }
     }
   }
   jalan(akar)
-  return hasil
+  return { berkas: hasil, tsxDipindai }
 }
 
 const BASELINE = 'governance/EMPTY_FIELD_ZERO_BASELINE.json'
-const aktual = pindai('src')
+const pemindaian = pindai('src')
+const aktual = pemindaian.berkas
 const total = Object.values(aktual).reduce((s, n) => s + n, 0)
-// Pemindaian yang rusak (salah folder, pola salah) tidak boleh lolos sebagai "nol pelanggaran".
-assert.ok(Object.keys(aktual).length >= 5 && total >= 20, `pemindaian hanya menemukan ${total} kejadian di ${Object.keys(aktual).length} berkas — pemindaian rusak`)
+// Nol pelanggaran adalah target yang sah. Buktikan pemindaian membaca TSX nyata,
+// bukan mewajibkan pelanggaran tetap ada; kontrol POLA di atas tetap menguji deteksinya.
+assert.ok(pemindaian.tsxDipindai > 0, 'pemindaian tidak membaca berkas TSX apa pun — pemindaian rusak')
 
 if (process.env.UPDATE_BASELINE === '1') {
   const urut = Object.fromEntries(Object.entries(aktual).sort(([a], [b]) => a.localeCompare(b)))
@@ -78,4 +82,4 @@ assert.deepEqual(baru, [], `halaman baru membaca kolom kosong sebagai 0 — paka
 assert.deepEqual(naik, [], `jumlah "|| 0" pada kolom naik — jangan menambah; pakai parseNumberField:\n  ${naik.join('\n  ')}`)
 assert.deepEqual(turun, [], `halaman diperbaiki, turunkan baseline (UPDATE_BASELINE=1 npm run uji) agar kemajuan terkunci:\n  ${turun.join('\n  ')}`)
 
-console.log(`angka-kosong-ratchet: ${total} kejadian di ${Object.keys(aktual).length} berkas, tidak naik dari baseline`)
+console.log(`angka-kosong-ratchet: ${total} kejadian di ${Object.keys(aktual).length} berkas, tidak naik dari baseline (${pemindaian.tsxDipindai} TSX dipindai)`)

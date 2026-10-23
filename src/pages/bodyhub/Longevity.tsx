@@ -10,6 +10,7 @@ import { ShareStatCard } from '../../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../../components/PanelKebugaranIlmiah'
 import { bahanOtomatis } from '../../lib/bugarOtomatis'
 import { Fold } from '../../shared/ui/Fold'
+import { DEF, bacaIsi, hitungSkor, pillarsOf, tandai, type Isi, type LongevityData } from './longevityScoring'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -26,102 +27,40 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Composition, Athlete). Manual, offline, device-agnostic — a complement to any watch.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface LongevityData {
-  age: number; g: 'M' | 'F'
-  vo2: number; grip: number; chair30: number; balance: number
-  whr: number; rhr: number; sleepH: number
-  smoke: 'never' | 'former' | 'current'; alcohol: 0 | 1 | 2 // none/moderate/heavy
-  protein: boolean; social: boolean; purpose: boolean
-  hba1c: number; ldl: number; crp: number; sbp: number
-  tests: Record<string, string> // test id -> last done ISO date
-}
-const DEF: LongevityData = {
-  age: 30, g: 'M', vo2: 0, grip: 0, chair30: 0, balance: 0,
-  whr: 0, rhr: 0, sleepH: 7, smoke: 'never', alcohol: 0,
-  protein: false, social: false, purpose: false,
-  hba1c: 0, ldl: 0, crp: 0, sbp: 0, tests: {},
-}
 const KEY = 'pmd_longevity_v1'
 
-function load(): LongevityData {
-  let d: LongevityData = { ...DEF }
-  try { d = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { /* ignore */ }
-  // Prefill once from sibling pages if empty — the "aggregator" behavior.
+interface KeadaanLongevity { d: LongevityData; isi: Isi }
+
+function load(): KeadaanLongevity {
+  let mentah: unknown = null
+  try { mentah = JSON.parse(localStorage.getItem(KEY) || 'null') } catch { /* ignore */ }
+  let isi = bacaIsi(mentah)
+  const d: LongevityData = { ...DEF }
+  if (mentah && typeof mentah === 'object' && !Array.isArray(mentah)) {
+    const { isi: _penanda, ...sisa } = mentah as Record<string, unknown>
+    Object.assign(d, sisa)
+  }
+  // Prefill once from sibling pages if empty — the "aggregator" behavior. Usia, jenis kelamin dan tidur
+  // ditandai diisi hanya bila sumbernya memang punya nilainya.
   try {
     const bc = JSON.parse(localStorage.getItem('pm_bodycomp_v1') || '{}')
     if (!d.vo2 && bc.vo2) d.vo2 = bc.vo2
     if (!d.rhr && bc.rhr) d.rhr = bc.rhr
     if (!d.whr && bc.waist && bc.hip) d.whr = +(bc.waist / bc.hip).toFixed(2)
-    if (d.age === DEF.age && bc.age) d.age = bc.age
-    if (bc.g) d.g = bc.g
-    if (!d.sleepH && bc.sleepH) d.sleepH = bc.sleepH
+    if (!isi.age && bc.age > 0) { d.age = bc.age; isi = tandai(isi, { age: bc.age }) }
+    if (!isi.g && (bc.g === 'M' || bc.g === 'F')) { d.g = bc.g; isi = tandai(isi, { g: bc.g }) }
+    if (!isi.sleepH && bc.sleepH > 0) { d.sleepH = bc.sleepH; isi = tandai(isi, { sleepH: bc.sleepH }) }
   } catch { /* ignore */ }
   // Then from the central Health Profile (manual/wearable) — highest priority source.
   try {
     const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
     if (!d.vo2 && hp.vo2max) d.vo2 = hp.vo2max
     if (!d.rhr && hp.restingHr) d.rhr = hp.restingHr
-    if (!d.sleepH && hp.sleepH) d.sleepH = hp.sleepH
-    if (d.age === DEF.age && hp.age) d.age = hp.age
-    if (hp.sex) d.g = hp.sex
+    if (!isi.sleepH && hp.sleepH > 0) { d.sleepH = hp.sleepH; isi = tandai(isi, { sleepH: hp.sleepH }) }
+    if (!isi.age && hp.age > 0) { d.age = hp.age; isi = tandai(isi, { age: hp.age }) }
+    if (hp.sex === 'M' || hp.sex === 'F') { d.g = hp.sex; isi = tandai(isi, { g: hp.sex }) }
   } catch { /* ignore */ }
-  return d
-}
-
-// ── Pillar scoring (0-100 each). Age-adjusted where the evidence says so. ────
-interface Pillar {
-  id: string; emoji: string; name: string; why: string
-  value: number; unit: string; score: number
-  target: string; weight: number
-}
-function pillarsOf(d: LongevityData): Pillar[] {
-  const M = d.g === 'M'
-  // VO2max: strongest single predictor (Mandsager 2018). Age-adjusted "good".
-  const vo2Good = (M ? 46 : 40) - Math.max(0, d.age - 25) * 0.35
-  const vo2Score = d.vo2 > 0 ? Math.min(100, (d.vo2 / vo2Good) * 75) : 0
-  // Grip: PURE study. Norm ≈ 46kg M / 29kg F young adult.
-  const gripNorm = (M ? 46 : 29) - Math.max(0, d.age - 30) * 0.25
-  const gripScore = d.grip > 0 ? Math.min(100, (d.grip / gripNorm) * 80) : 0
-  // Chair stand 30s (Rikli & Jones): ~25 young, decreasing.
-  const chairNorm = 25 - Math.max(0, d.age - 25) * 0.22
-  const chairScore = d.chair30 > 0 ? Math.min(100, (d.chair30 / chairNorm) * 80) : 0
-  // One-leg balance: 30s+ full marks; <10s red flag (BMJ 2022 flamingo study).
-  const balScore = d.balance > 0 ? Math.min(100, (d.balance / 30) * 100) : 0
-  // WHR: cardiometabolic shape.
-  const whrScore = d.whr > 0 ? Math.max(0, Math.min(100, 100 - Math.max(0, d.whr - (M ? 0.85 : 0.75)) * 400)) : 0
-  // RHR: 50-60 optimal.
-  const rhrScore = d.rhr > 0 ? Math.max(0, Math.min(100, 100 - Math.max(0, d.rhr - 58) * 3.2 - Math.max(0, 42 - d.rhr) * 3)) : 0
-  // Sleep: 7-8.5h sweet spot.
-  const sleepScore = d.sleepH > 0 ? Math.max(0, 100 - Math.abs(d.sleepH - 7.75) * 28) : 0
-  // Lifestyle bundle.
-  let life = 40
-  if (d.smoke === 'never') life += 30; else if (d.smoke === 'former') life += 15
-  if (d.alcohol === 0) life += 10; else if (d.alcohol === 2) life -= 20
-  if (d.protein) life += 7
-  if (d.social) life += 7
-  if (d.purpose) life += 6
-  const lifeScore = Math.max(0, Math.min(100, life))
-  return [
-    { id: 'vo2', emoji: '🫀', name: 'VO₂max', why: '#1 mortality predictor — elite vs low ≈ 5x risk difference', value: d.vo2, unit: 'ml/kg/min', score: vo2Score, target: `≥${vo2Good.toFixed(0)} for your age`, weight: 0.22 },
-    { id: 'grip', emoji: '✊', name: 'Grip Strength', why: 'Every −5kg ≈ +16% mortality risk (PURE)', value: d.grip, unit: 'kg', score: gripScore, target: `≥${gripNorm.toFixed(0)} kg`, weight: 0.13 },
-    { id: 'chair', emoji: '🦵', name: 'Leg Strength (Chair Stand 30s)', why: 'Predictor of mobility & independence in old age', value: d.chair30, unit: 'x', score: chairScore, target: `≥${chairNorm.toFixed(0)}x`, weight: 0.13 },
-    { id: 'bal', emoji: '🦩', name: 'One-Leg Balance', why: '<10s at age 50+ ≈ 2x 7-yr mortality risk (BMJ)', value: d.balance, unit: 'sec', score: balScore, target: '≥30 sec', weight: 0.1 },
-    { id: 'whr', emoji: '📏', name: 'Waist-Hip Ratio', why: 'Visceral fat > BMI for cardiometabolic risk', value: d.whr, unit: '', score: whrScore, target: M ? '≤0.90' : '≤0.85', weight: 0.1 },
-    { id: 'rhr', emoji: '❤️', name: 'Resting HR', why: 'Heart efficiency; lowers with Zone 2 training', value: d.rhr, unit: 'bpm', score: rhrScore, target: '50-60 bpm', weight: 0.1 },
-    { id: 'sleep', emoji: '😴', name: 'Sleep', why: 'Foundation of cellular & hormonal repair', value: d.sleepH, unit: 'hrs', score: sleepScore, target: '7-8.5 hrs', weight: 0.11 },
-    { id: 'life', emoji: '🌱', name: 'Lifestyle & Social', why: 'Smoking, alcohol, protein, social connection, sense of purpose', value: lifeScore, unit: '/100', score: lifeScore, target: 'smoke-free + socially active', weight: 0.11 },
-  ]
-}
-
-function bioAge(d: LongevityData, score: number): number {
-  // Heuristic: composite score 75 ≈ chronological. Each ±10 pts ≈ ∓2.5 yrs.
-  let b = d.age - (score - 72) * 0.25
-  // Lab sharpening (optional): each marker off-target adds years.
-  if (d.hba1c > 0) b += Math.max(0, d.hba1c - 5.4) * 3
-  if (d.ldl > 0) b += Math.max(0, d.ldl - 115) * 0.03
-  if (d.crp > 0) b += Math.max(0, d.crp - 1) * 1.2
-  if (d.sbp > 0) b += Math.max(0, d.sbp - 118) * 0.1
-  return Math.max(15, Math.round(b * 10) / 10)
+  return { d, isi }
 }
 
 // Decade projection: decline per decade untrained vs trained.
@@ -150,14 +89,18 @@ const PROTOCOL = [
 // imports, plus Body Composition measurements) OVER the saved local values, so
 // the Longevity Score is always computed from current data, not a stale copy
 // from the first visit. Returns which fields changed for the sync note.
-function syncFromDevices(cur: LongevityData): { next: LongevityData; changed: string[] } {
+function syncFromDevices(keadaan: KeadaanLongevity, overrideZeroSleep = false): { next: KeadaanLongevity; changed: string[] } {
+  const cur = keadaan.d
+  // The shared cache accepts positive biometrics only. Its previous positive
+  // sleep value must not silently replace a zero explicitly entered here.
+  const retainZeroSleep = !overrideZeroSleep && keadaan.isi.sleepH && cur.sleepH === 0
   const patch: Partial<LongevityData> = {}
   const changed: string[] = []
   try {
     const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
     if (hp.vo2max > 0 && hp.vo2max !== cur.vo2) { patch.vo2 = hp.vo2max; changed.push('VO₂max') }
     if (hp.restingHr > 0 && hp.restingHr !== cur.rhr) { patch.rhr = hp.restingHr; changed.push('Resting HR') }
-    if (hp.sleepH > 0 && hp.sleepH !== cur.sleepH) { patch.sleepH = hp.sleepH; changed.push('Sleep') }
+    if (!retainZeroSleep && hp.sleepH > 0 && hp.sleepH !== cur.sleepH) { patch.sleepH = hp.sleepH; changed.push('Sleep') }
     if (hp.age > 0 && hp.age !== cur.age) { patch.age = hp.age; changed.push('Age') }
     if ((hp.sex === 'M' || hp.sex === 'F') && hp.sex !== cur.g) { patch.g = hp.sex; changed.push('Sex') }
   } catch { /* ignore */ }
@@ -179,30 +122,32 @@ function syncFromDevices(cur: LongevityData): { next: LongevityData; changed: st
   }
   pakai(v.vo2max, patch.vo2 ?? cur.vo2, 'vo2', 'VO₂max')
   pakai(v.restingHr, patch.rhr ?? cur.rhr, 'rhr', 'Resting heart rate')
-  pakai(v.sleepH, patch.sleepH ?? cur.sleepH, 'sleepH', 'Sleep')
+  if (!retainZeroSleep) pakai(v.sleepH, patch.sleepH ?? cur.sleepH, 'sleepH', 'Sleep')
   pakai(v.systolic, cur.sbp, 'sbp', 'Systolic pressure')
   pakai(v.waistHipRatio, patch.whr ?? cur.whr, 'whr', 'Waist-to-hip ratio')
-  return { next: { ...cur, ...patch }, changed }
+  return { next: { d: { ...cur, ...patch }, isi: tandai(keadaan.isi, patch) }, changed }
 }
 
 export function Longevity() {
   // Sync device data in the initializer (before first render) so the
   // push-back effect below can never overwrite fresher cache values with a
   // stale localStorage copy — same race fixed on the Body Composition page.
-  const [d, setD] = useState<LongevityData>(() => syncFromDevices(load()).next)
+  const [st, setSt] = useState<KeadaanLongevity>(() => syncFromDevices(load()).next)
+  const { d, isi } = st
   // Diambil dari data tersimpan, bukan diisi ulang dengan tangan.
   const otomatis = useMemo(() => bahanOtomatis(), [])
   const vitals = useVitals()
   const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const [syncNote, setSyncNote] = useState('')
-  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
+  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify({ ...d, isi })) } catch { /* ignore */ } }, [st])
   // Sync edited biometrics back to the central Health Profile so the whole app agrees.
-  useEffect(() => { pushBiometrics({ vo2max: d.vo2, restingHr: d.rhr, sleepH: d.sleepH }) }, [d.vo2, d.rhr, d.sleepH])
-  const u = (p: Partial<LongevityData>) => setD((x) => ({ ...x, ...p }))
+  // Tidur bawaan (7 jam) bukan data pengguna: hanya yang diisi yang dibagikan ke profil bersama.
+  useEffect(() => { pushBiometrics({ vo2max: d.vo2, restingHr: d.rhr, sleepH: isi.sleepH ? d.sleepH : undefined }) }, [d.vo2, d.rhr, d.sleepH, isi.sleepH])
+  const u = (p: Partial<LongevityData>) => setSt((x) => ({ d: { ...x.d, ...p }, isi: tandai(x.isi, p) }))
 
   function syncNow(silent = false) {
-    setD((cur) => {
-      const { next, changed } = syncFromDevices(cur)
+    setSt((cur) => {
+      const { next, changed } = syncFromDevices(cur, !silent)
       if (!silent) setSyncNote(changed.length ? `Updated from your devices: ${changed.join(', ')}.` : 'Already up to date with your device data.')
       return changed.length ? next : cur
     })
@@ -217,17 +162,13 @@ export function Longevity() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const pillars = useMemo(() => pillarsOf(d), [d])
-  const filled = pillars.filter((p) => p.score > 0)
-  const score = filled.length >= 4
-    ? Math.round(filled.reduce((s, p) => s + p.score * p.weight, 0) / filled.reduce((s, p) => s + p.weight, 0))
-    : null
-  const bAge = score != null ? bioAge(d, score) : null
+  const pillars = useMemo(() => pillarsOf(d, isi), [d, isi])
+  const { score, bAge, kurang: kurangDasar } = useMemo(() => hitungSkor(d, isi), [d, isi])
   const delta = bAge != null ? bAge - d.age : null
 
-  const vo2Proj60 = d.vo2 > 0 ? project(d.vo2, d.age, 60, 0.10, 0.05) : null
-  const vo2Proj80 = d.vo2 > 0 ? project(d.vo2, d.age, 80, 0.10, 0.05) : null
-  const gripProj80 = d.grip > 0 ? project(d.grip, Math.max(d.age, 30), 80, 0.15, 0.07) : null
+  const vo2Proj60 = isi.age && d.vo2 > 0 ? project(d.vo2, d.age, 60, 0.10, 0.05) : null
+  const vo2Proj80 = isi.age && d.vo2 > 0 ? project(d.vo2, d.age, 80, 0.10, 0.05) : null
+  const gripProj80 = isi.age && d.grip > 0 ? project(d.grip, Math.max(d.age, 30), 80, 0.15, 0.07) : null
 
   const scoreColor = score == null ? '#a3a3a3' : score >= 75 ? '#00BF63' : score >= 55 ? '#f59e0b' : '#ef4444'
 
@@ -239,7 +180,7 @@ export function Longevity() {
   }
   const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => {
     const kv = KE_VITAL[key]
-    const nilai = d[key] as number
+    const nilai = (key === 'sleepH' && !isi.sleepH ? undefined : d[key]) as number | undefined
     const perangkat = kv ? vitals[kv] : undefined
     const dariPerangkat = typeof nilai === 'number' && typeof perangkat === 'number'
       && Math.abs(nilai - perangkat) < 0.05
@@ -256,7 +197,7 @@ export function Longevity() {
         <div className="flex items-center gap-1"
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }}>
           <KolomAngka step={step} placeholder={ph} ariaLabel={label}
-            nilai={d[key] as number | undefined}
+            nilai={nilai}
             onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Save ${label}`}
@@ -316,15 +257,16 @@ export function Longevity() {
                 {delta <= 0 ? `${Math.abs(delta).toFixed(1)} yrs younger 🎉` : `${delta.toFixed(1)} yrs older`}
               </Badge>
             )}
-            <div className="mt-1 text-[10px] text-neutral-500">vs chronological age {d.age}</div>
+            <div className="mt-1 text-[10px] text-neutral-500">vs chronological age {isi.age ? d.age : '—'}</div>
           </div>
         </div>
         <BatasKlaimKesehatan permukaan="longevity.score" />
-        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-500">Fill in at least 4 pillars below to activate your score & biological age.</p>}
+        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-500" role="status">Fill in at least 4 pillars below{kurangDasar.length ? ` and enter your ${kurangDasar.join(' and ')}` : ''} to activate your score & biological age.</p>}
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <Field label="Age"><input className={inputClass} type="number" value={d.age} onChange={(e) => u({ age: +e.target.value })} /></Field>
+          <Field label="Age"><KolomAngka ariaLabel="Age" nilai={isi.age ? d.age : undefined} onNilai={(n) => u({ age: n as number })} /></Field>
           <Field label="Sex">
-            <select className={inputClass} value={d.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
+            <select className={inputClass} value={isi.g ? d.g : ''} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
+              <option value="" disabled>Select</option>
               <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
@@ -349,12 +291,12 @@ export function Longevity() {
         />
         <div className="mt-3">
           <PanelKebugaranIlmiah
-            usia={d.age}
+            usia={isi.age && isi.g ? d.age : 0}
             jk={d.g === 'M' ? 'L' : 'P'}
             vo2={d.vo2 || otomatis.vo2}
             denyutIstirahat={d.rhr || otomatis.denyutIstirahat}
             denyutMaksTerukur={otomatis.denyutMaksTerukur}
-            genggamKg={d.grip || undefined}
+            genggamKg={isi.g ? d.grip || undefined : undefined}
             langkahHarian={otomatis.langkahHarian}
             menitZona={otomatis.menitZona}
           />
@@ -379,12 +321,14 @@ export function Longevity() {
           {num('Resting HR (bpm)', 'rhr')}
           {num('Average sleep (hrs)', 'sleepH', 0.1)}
           <Field label="Smoking">
-            <select className={inputClass} value={d.smoke} onChange={(e) => u({ smoke: e.target.value as LongevityData['smoke'] })}>
+            <select className={inputClass} value={isi.smoke ? d.smoke : ''} onChange={(e) => u({ smoke: e.target.value as LongevityData['smoke'] })}>
+              <option value="" disabled>Select</option>
               <option value="never">Never</option><option value="former">Quit</option><option value="current">Still smoking</option>
             </select>
           </Field>
           <Field label="Alcohol">
-            <select className={inputClass} value={d.alcohol} onChange={(e) => u({ alcohol: +e.target.value as LongevityData['alcohol'] })}>
+            <select className={inputClass} value={isi.alcohol ? d.alcohol : ''} onChange={(e) => u({ alcohol: +e.target.value as LongevityData['alcohol'] })}>
+              <option value="" disabled>Select</option>
               <option value={0}>None</option><option value={1}>Occasional</option><option value={2}>Frequent</option>
             </select>
           </Field>

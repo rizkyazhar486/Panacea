@@ -63,13 +63,18 @@ assert.deepEqual(run({ weightKg: 0, hours: 99 }), GW)
 assert.deepEqual(run({ hours: 99, counts: { [BEER]: -1 } }), GH)
 
 // Halaman.
-const src = readFileSync('src/pages/AlcoholCalculator.tsx', 'utf8')
+const src = readFileSync('src/pages/bodyhub/AlcoholCalculator.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { DRINKS, parseNumberField, widmarkBac } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { DRINKS, parseNumberField, widmarkBac } from '../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/Math\.max\(0|const r =|const beta|ETHANOL_DENSITY|gramsOf\(|\/ 8\b|\/ 14\b/.test(src), 'rumus/konstanta tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok && ('))
 assert.ok(lines.some((l) => l.includes('{res.reason}')))
 assert.ok(lines.includes('{res.ok && res.data.totalGrams > 0 && ('))
+
+// Regresi: profil bawaan (pria 70 kg) tidak boleh disulihkan; hanya profil tersimpan, dan jenis kelamin kosong ditolak mesin.
+assert.ok(!/\bgetDemo\(\)/.test(src) && src.includes('getDemoTersimpan()'), 'halaman tidak boleh memakai getDemo()')
+assert.ok(!/\|\|\s*(70|'M')/.test(src), 'tanpa bawaan 70 kg / pria')
+assert.deepEqual(run({ sex: '' as 'M' }), { ok: false, reason: 'Sex must be M or F' })
 
 console.log('widmark-bac: hand values, sex/weight pairs, floor at zero, fail-closed weight/hours/counts, negative counts no longer lower BAC')

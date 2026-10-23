@@ -56,14 +56,14 @@
 }
 
 .pmd-section-kicker {
-  color: rgba(100,116,139,.9);
+  color: #64748b;
   font-size: 9px;
   font-weight: 900;
   letter-spacing: .16em;
   text-transform: uppercase;
 }
 
-.dark .pmd-section-kicker { color: rgba(207,250,254,.4); }
+.dark .pmd-section-kicker { color: rgba(207,250,254,.7); }
 
 .pmd-one-line {
   display: block;
@@ -227,11 +227,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: rgba(100,116,139,.82);
+  color: #64748b;
   font-size: 10px;
   font-weight: 900;
 }
-.dark .pmd-slider-footer { color: rgba(226,232,240,.4); }
+.dark .pmd-slider-footer { color: rgba(226,232,240,.7); }
 /* Titik tetap 7px secara visual, tetapi area tekannya 26px (WCAG 2.2 target size >= 24px): titik digambar oleh ::before,
    tombolnya sendiri transparan. Diukur di 390x844: sebelumnya lebar tombol 7px (aktif 20px). */
 .pmd-slider-dots { display: flex; gap: 0; }

@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs'
 import { deriveAffectDecision, summarizeAffectEvents } from '../../src/domains/affect/engine/affectEngine.ts'
 
 const engineSource = readFileSync(new URL('../../src/domains/affect/engine/affectEngine.ts', import.meta.url), 'utf8')
-const affectSurface = readFileSync(new URL('../../src/components/ForYouAffectArc.tsx', import.meta.url), 'utf8')
-const feedSource = readFileSync(new URL('../../src/components/ForYouOmniFeed.tsx', import.meta.url), 'utf8')
+const affectSurface = readFileSync(new URL('../../src/components/foryou/ForYouAffectArc.tsx', import.meta.url), 'utf8')
+const feedSource = readFileSync(new URL('../../src/components/foryou/ForYouOmniFeed.tsx', import.meta.url), 'utf8')
 
 test('positive surprise can create a bounded peak without claiming hormone measurement', () => {
   const result = deriveAffectDecision({

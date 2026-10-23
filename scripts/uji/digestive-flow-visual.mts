@@ -21,7 +21,7 @@ assert.equal(advanceDigestiveFlowTime(-2, -1, true), 0)
 assert.equal(digestiveFlowVisualState(Number.NaN, 'upper').progress, 0)
 assert.equal(digestiveFlowVisualState(-10, 'colon').progress, 0)
 
-const componentSource = readFileSync(new URL('../../src/components/DigestiveFlow3D.tsx', import.meta.url), 'utf8')
+const componentSource = readFileSync(new URL('../../src/components/digital-twin/DigestiveFlow3D.tsx', import.meta.url), 'utf8')
 assert.match(componentSource, /Pause flow cue/)
 assert.match(componentSource, /Resume flow cue/)
 assert.match(componentSource, /Reset cue/)

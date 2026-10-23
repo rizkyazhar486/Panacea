@@ -6,6 +6,6 @@ export type TokenAmountCheck = { ok: true; amount: number } | { ok: false; reaso
 export function checkTokenAmount(amount: unknown): TokenAmountCheck {
   if (typeof amount !== 'number' || !Number.isFinite(amount)) return { ok: false, reason: 'Invalid amount.' }
   if (amount <= 0) return { ok: false, reason: 'Invalid amount.' }
-  if (!Number.isInteger(amount)) return { ok: false, reason: 'Amount must be a whole number of PNC.' }
+  if (!Number.isSafeInteger(amount)) return { ok: false, reason: 'Amount must be a whole number of PNC.' }
   return { ok: true, amount }
 }

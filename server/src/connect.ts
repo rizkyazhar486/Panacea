@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { Role } from './store.js'
-import { kotaDariTeks, jarakKm } from './kota.js'
-import { normalizePhone } from './telepon.js'
+import { kotaDariTeks, jarakKm } from './domains/lifestyle/kota.js'
+import { normalizePhone } from './domains/identity/telepon.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Connect — verifikasi, kredit kepercayaan, pelaporan dan pemblokiran.

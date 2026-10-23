@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "ProfilFarmakologi",
-    "module": "server/src/rxclass.ts",
+    "module": "server/src/domains/medical-reference/rxclass.ts",
     "notes": "Active server adapter bounds drug queries and class outputs, preserves `relaSource`, captures MEDRT/ATC `relaSourceVersion` metadata with a bounded timeout and runtime cache, rejects malformed class identities and RXCUIs, tolerates partial relation-source/version failure without fabricating missing classes or versions, normalizes RxNorm IN/PIN ingredients, and keeps the full ingredient list behind a 12-hour runtime cache. Regression coverage verifies version preservation and explicitly verifies that DailyMed is not assigned a fake version endpoint."
   },
   "trust": {

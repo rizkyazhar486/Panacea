@@ -53,8 +53,21 @@ try {
   //    Dikenali lewat penanda stabil, bukan teks labelnya: label "Today's
   //    reminder" dihapus demi keringkasan dan gerbang ini ikut buta karenanya.
   const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('[data-daily-reminder]')]
-    .some((d) => getComputedStyle(d).position === 'fixed' && (d.textContent || '').trim().length > 0))
+    .some((d) => d.getBoundingClientRect().height > 0 && (d.textContent || '').trim().length > 0))
   if (!adaSpanduk) throw new Error('spanduk harian tidak tampil, jadi tumpang-tindihnya tidak teruji sama sekali')
+
+  const quoteLayout = await page.evaluate(() => {
+    const banner = document.querySelector('[data-daily-reminder]').getBoundingClientRect()
+    const close = document.querySelector('[data-daily-reminder] button[aria-label="Dismiss"]').getBoundingClientRect()
+    const overlapsHeading = [...document.querySelectorAll('main h1')].some((node) => {
+      const heading = node.getBoundingClientRect()
+      return Math.min(banner.right, heading.right) > Math.max(banner.left, heading.left)
+        && Math.min(banner.bottom, heading.bottom) > Math.max(banner.top, heading.top)
+    })
+    return { overlapsHeading, dismissTarget: close.width >= 44 && close.height >= 44 }
+  })
+  if (quoteLayout.overlapsHeading) throw new Error('daily quote covers the Home heading')
+  if (!quoteLayout.dismissTarget) throw new Error('daily quote dismiss target is smaller than 44px')
 
   // 2. Tidak boleh ada apa pun yang MENUTUPI bilah atas.
   //

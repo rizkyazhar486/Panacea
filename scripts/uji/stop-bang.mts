@@ -40,7 +40,7 @@ for (const k of ['bmi', 'age', 'neckCm'] as const) {
   assert.equal(run({ [k]: min - 1 }).invalid.length, 1, `${k} min-1`); assert.equal(run({ [k]: max + 1 }).invalid.length, 1, `${k} max+1`)
 }
 
-const page = readFileSync(new URL('../../src/pages/SleepApneaScreen.tsx', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../src/pages/bodyhub/SleepApneaScreen.tsx', import.meta.url), 'utf8')
 assert.ok(/stopBang\(\{/.test(page) && /parseNumberField\(neckText\)/.test(page), 'halaman tidak memakai mesin domain')
 assert.ok(!/\)\s*\|\|\s*0/.test(page), '`|| 0` kembali')
 assert.ok(/hasil\.band/.test(page) && /hasil\.invalid\.length > 0/.test(page), 'halaman tidak memakai band/penolakan mesin')

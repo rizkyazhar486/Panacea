@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { bolehAksesPasien, hashKode, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe, type KodeTaut, type TautanPasien } from '../src/aksesKlinis.js'
+import { bolehAksesPasien, hashKode, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe, type KodeTaut, type TautanPasien } from '../src/domains/clinical-records/aksesKlinis.js'
 const kini = new Date('2026-09-26T10:00:00Z')
 const dokter = { id: 'd1', klinisi: true }, pasien = { id: 'u1', email: 'siti@x.id', role: 'pasien' }, lain = { id: 'u2', email: 'lain@x.id', role: 'pasien' }
 const acakTetap = () => Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])

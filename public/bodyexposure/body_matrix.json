@@ -91,6 +91,16 @@
      "stature_m": null,
      "coverage": "skeleton with forearm and hand bones (hand as one mesh; right forearm bones incomplete); muscles, cartilage and ligaments pelvis to feet",
      "individual": "One individual from source data (Visible Human Female donor, 59 y, 157 cm, 88 kg), not an atlas or a reference adult female. Pelvis-to-feet bones, cartilage, knee ligaments and muscles are manual segmentations (Univ. of Denver); skull, spine, ribs, sternum, clavicles, scapulae and humeri are machine-segmented from the CT (TotalSegmentator); radius, ulna and the hand bones are threshold-segmented from the native-resolution CT (algorithmic, no reference measurement). Not clinically reviewed."
+    },
+    {
+     "body_id": "HUMAN.ADULT.FEMALE.MAIN_BRONCHI_REFERENCE",
+     "structures": 4,
+     "stature_m": null,
+     "label": "Main bronchi reference (HRA)",
+     "status": "source_backed_partial",
+     "source": "Human Reference Atlas, main bronchus female v1.0, Visible Human female (NLM); NIH 3D 3DPX-020976, CC BY 4.0",
+     "coverage": "Four main-bronchus/cartilage components in their source coordinates; a separate reference, unregistered to the whole-body model.",
+     "individual": "Visible Human female source; standalone HRA organ reference"
     }
    ]
   },
@@ -311,6 +321,7 @@
   "adult_female.skeletal",
   "adult_female.surface",
   "adult_female.urinary",
+  "adult_female_main_bronchi_reference.respiratory",
   "adult_male.cardiovascular",
   "adult_male.digestive",
   "adult_male.endocrine",
@@ -514,7 +525,8 @@
   "fetus": "LOD3",
   "atlas_nervous_mni152": "LOD4",
   "tsd_s0196_older_adult_female": "LOD4",
-  "tsd_s0327_older_adult_male": "LOD4"
+  "tsd_s0327_older_adult_male": "LOD4",
+  "adult_female_main_bronchi_reference": "LOD3"
  },
  "motion": {
   "adult_male": {

@@ -27,7 +27,7 @@ for (const [teks, tgl] of [['', hari], ['abc', hari], ['5 mg/dL', hari], ['0', h
 }
 // UI: galat tampil sebagai alert, simpan butuh tekan kedua untuk nilai mencurigakan.
 {
-  const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+  const ui = readFileSync('src/components/tiles/UbinLab.tsx', 'utf8')
   assert.match(ui, /periksaMasukanLab\(/, 'UI tidak lagi memakai pemeriksa masukan')
   assert.match(ui, /role="alert"/, 'penolakan tidak lagi ditampilkan kepada pengguna')
   assert.match(ui, /konfirmasi !== kunci/, 'nilai bersatuan mencurigakan disimpan tanpa konfirmasi')
@@ -35,7 +35,7 @@ for (const [teks, tgl] of [['', hari], ['abc', hari], ['5 mg/dL', hari], ['0', h
 }
 // Hasil salah harus bisa dihapus dari UI (hapusLab dulu tidak dipakai di mana pun).
 {
-  const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+  const ui = readFileSync('src/components/tiles/UbinLab.tsx', 'utf8')
   assert.match(ui, /hapusLab\(j\.id, b\.id\)/, 'riwayat lab tidak bisa dikoreksi dari UI')
   assert.match(ui, /window\.confirm\(/, 'penghapusan tanpa konfirmasi')
 }
@@ -46,6 +46,6 @@ for (const [teks, tgl] of [['', hari], ['abc', hari], ['5 mg/dL', hari], ['0', h
   for (const id of PENANDA_PHENOAGE.filter((x) => x !== 'crp' && x !== 'rdw')) lab[id].push({ id: id + '2', tanggal: '2026-06-01', nilai: 1 })
   assert.deepEqual(penandaKurangTerbaru(lab), { tanggal: '2026-06-01', kurang: ['crp', 'rdw'] })
   assert.equal(penandaKurangTerbaru({}), null)
-  assert.match(readFileSync('src/components/LongevityPanel.tsx', 'utf8'), /data-phenoage-missing/, 'panel longevity tidak lagi menyebut penanda yang kurang')
+  assert.match(readFileSync('src/components/growth/LongevityPanel.tsx', 'utf8'), /data-phenoage-missing/, 'panel longevity tidak lagi menyebut penanda yang kurang')
 }
 console.log('masukan-lab-terjaga: nilai tak sah ditolak dengan alasan, tanggal masa depan ditolak, salah satuan butuh konfirmasi, hasil dapat dihapus, penanda PhenoAge yang kurang disebutkan')

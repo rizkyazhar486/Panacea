@@ -13,7 +13,9 @@ table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}th,t
 .note{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;color:var(--mut)}
 </style></head><body><main>
 <p><a href="../#/body-exposure/canonical">&larr; Back to Body Exposure</a></p>
+<p><a href="../asset-credits.html">Other PanaceaMed assets: public credits and licensing</a></p>
 <h1>Body Exposure: sources and provenance</h1>
+<p><a href="software-notices.html">Renderer and anatomy-tooling software notices</a> (separate from anatomical asset rights).</p>
 <div class="note"><strong>Educational models.</strong> Nothing here is patient-specific anatomy or a clinical tool, and no structure has been clinically reviewed
 (<code>clinically_reviewed</code> is false everywhere). Bodies built from one donor are labelled as that individual, not as an atlas.
 Structures marked <em>model segmented</em> were produced by a machine segmentation model and have no measured accuracy unless stated.</div>
@@ -98,6 +100,12 @@ opencell_index.json — OpenCell (Chan Zuckerberg Biohub; &quot;OpenCell on AWS&
                (share-alike: this file is distributed under the same licence). Cho NH, Cheveralls KC, Brunner AD, et al. Science 375:eabi6983
                (2022). Localisation of 1,310 endogenously tagged proteins and their abundance in cultured HEK293T cells; measured in a cell
                line, not in the tissue or body shown. Not clinically reviewed.
+
+fetal_reference_tables.json — fetal biometry reference tables. (1) WHO Fetal Growth Charts: Kiserud T, Piaggio G, Carroli G, et al. PLOS Medicine
+               14(1):e1002220 (2017), doi:10.1371/journal.pmed.1002220, Creative Commons Attribution License; Tables 6-9, 11, 14, 15.
+               (2) INTERGROWTH-21st fetal growth standards: Papageorghiou AT, Ohuma EO, Altman DG, et al. Lancet 384(9946):869-879 (2014),
+               doi:10.1016/S0140-6736(14)61490-2; values transcribed from the public University of Oxford table PDFs (reuse terms are not
+               stated there; the tables carry &quot;(c) University of Oxford&quot;). Reference positions only, not a diagnosis. Not clinically reviewed.
 
 adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Motion Capture
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
@@ -656,5 +664,12 @@ ICRP or other phantom variant that separates the bones. Read the DIR-Lab terms b
 <li><strong>Why a model and not a dataset:</strong> no cardiac cine dataset with a verified licence is used (ACDC states no licence; see DATASET_AUDIT.md). The engine takes its parameters explicitly so a measured dataset can replace the defaults later without changing the viewer.</li>
 <li><strong>Not modelled:</strong> valve motion, blood flow, wall thickening, torsion, arrhythmia, the individual's real volumes. Truth class: simulated (illustrative).</li>
 <li><code>clinically_reviewed</code> remains false.</li>
+</ul>
+<h2>Fetal growth references (fetal_reference_tables.json): published tables, not a model</h2>
+<ul>
+<li><strong>Sources (read 2026-10-11):</strong> WHO Fetal Growth Charts (Kiserud et al., PLOS Medicine 2017, CC BY; Tables 6 BPD outer-inner, 7 HC, 8 AC, 9 FL, 11 EFW, 14 EFW female, 15 EFW male; 14 to 40 weeks; 1,387 low-risk singleton pregnancies, 10 countries; quantile regression, percentiles 2.5 to 97.5, EFW with Hadlock's third formula) and the INTERGROWTH-21st fetal growth standards (Papageorghiou et al., Lancet 2014; Oxford PDFs for HC, BPD, AC, FL: centiles 3 to 97 and values at z = -3 to +3; 14 to 40 weeks; eight urban areas in Brazil, China, India, Italy, Kenya, Oman, the UK and the USA). The table PDFs print the citation as "Villar et al"; the volume and pages are those of Papageorghiou et al. (checked on PubMed/DOI). Terms of reuse for the INTERGROWTH tables are not stated on the download page; the tables carry "(c) University of Oxford" and are attributed. INTERGROWTH-21st has no EFW in these tables, and the viewer says so.</li>
+<li><strong>Build (<code>pipeline/build_fetal_reference_tables.py</code>):</strong> every value is parsed from the source files (SHA-256 recorded) with checks: 27 weekly rows per table, increasing percentiles, increasing medians by age, equal z spacing (SD) per week, 50th centile equal to z 0.</li>
+<li><strong>Method in the engine (<code>engine/fetalBiometry.ts</code>):</strong> WHO: linear interpolation between the published percentiles, bounds stated outside 2.5 to 97.5 (or 5 to 95 for EFW by sex). INTERGROWTH: linear interpolation of the z-score between the published z values, percentile = normal CDF of z; this reproduces the published 3rd/5th/10th/90th/95th/97th centiles within 0.35 percentile points at every week and measure (tested). Ages between weeks are interpolated linearly between neighbouring published weeks and flagged; ages outside 14+0 to 40+0 weeks and unsupported measures give an explicit "not available".</li>
+<li><strong>Not included:</strong> embryologic milestones (a different kind of reference), sex-specific INTERGROWTH, the Hadlock EFW formula, charts below 14 weeks. Output is a position against a reference only; interpretation needs a qualified clinician.</li>
 </ul>
 </main></body></html>

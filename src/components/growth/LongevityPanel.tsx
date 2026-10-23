@@ -1,0 +1,469 @@
+import { useEffect, useMemo, useState } from 'react'
+import { KolomAngka } from '../KolomAngka'
+import { Card, SectionTitle, Field, Badge } from '../ui'
+import { IconActivity, IconChartUp } from '../icons'
+import {
+  konversi, phenoAge, egfrCkdEpi2021, fib4, hrMaksTanaka, vo2maxUth,
+  sindromMetabolikIdf, type Hasil, type HasilAngka,
+} from '../../lib/longevity'
+import { bangunBundel, ringkasBundel, keJson } from '../../lib/fhir'
+import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, titikDariRiwayatLab, gabungSumber, penandaKurangTerbaru, type TitikUsiaBiologis } from '../../lib/bioAgeTrajectory'
+import { JENIS_LAB, ambilLab, tetapkanLabPadaTanggal, nilaiLabPadaTanggal } from '../../lib/lab'
+import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel ini berdiri terpisah dari model poin di halaman yang sama, dan
+// perbedaannya disengaja: di sini setiap koefisien berasal dari makalah yang
+// bisa dibuka, sedangkan model poin itu pilihan penulis. Keduanya ditampilkan
+// berdampingan supaya penggunanya melihat mana yang mana — bukan untuk
+// menyembunyikan yang lemah di balik yang kuat.
+//
+// Masukan diminta dalam satuan yang tertulis di lembar laboratorium Indonesia
+// (mg/dL, g/dL), lalu diubah di sini. Meminta pengguna mengonversi sendiri
+// adalah cara tercepat mendapat PhenoAge yang meleset dua puluh tahun.
+//
+// Blood values write into the account-synced lab log (pmd_lab_v1 /api/lab-log),
+// not a parallel browser-only sheet. Diastolic BP is not a lab analyte and stays
+// in a tiny local extras key.
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Lab {
+  albuminGdL: number; kreatininMgdL: number; glukosaPuasaMgdL: number
+  crpMgL: number; limfositPersen: number; mcv: number; rdw: number
+  alp: number; wbc: number
+  ast: number; alt: number; trombosit: number
+  trigliserida: number; hdl: number; diastolik: number
+}
+const KOSONG: Lab = {
+  albuminGdL: 0, kreatininMgdL: 0, glukosaPuasaMgdL: 0, crpMgL: 0, limfositPersen: 0,
+  mcv: 0, rdw: 0, alp: 0, wbc: 0, ast: 0, alt: 0, trombosit: 0,
+  trigliserida: 0, hdl: 0, diastolik: 0,
+}
+
+/** Panel field → synced lab jenis id (PhenoAge nine + FIB-4 / lipids helpers). */
+const LAB_JENIS: Partial<Record<keyof Lab, string>> = {
+  albuminGdL: 'albumin',
+  kreatininMgdL: 'kreatinin',
+  glukosaPuasaMgdL: 'gdp',
+  crpMgL: 'crp',
+  limfositPersen: 'limfosit',
+  mcv: 'mcv',
+  rdw: 'rdw',
+  alp: 'alp',
+  wbc: 'wbc',
+  ast: 'sgot',
+  alt: 'sgpt',
+  trombosit: 'trombosit',
+  trigliserida: 'tg',
+  hdl: 'hdl',
+}
+
+const LEGACY_PANEL = 'pmd_labs_v1'
+const LEGACY_MIGRATED = 'pmd_labs_v1_to_lab_log'
+const EKSTRA = 'pmd_longevity_panel_extras_v1'
+
+function hariIni(): string {
+  const d = new Date(); const p = (x: number) => String(x).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+function bacaEkstra(): Pick<Lab, 'diastolik'> {
+  try {
+    const x = JSON.parse(localStorage.getItem(EKSTRA) || '{}') as { diastolik?: number }
+    return { diastolik: typeof x.diastolik === 'number' && x.diastolik > 0 ? x.diastolik : 0 }
+  } catch { return { diastolik: 0 } }
+}
+
+function tulisEkstra(diastolik: number) {
+  try { localStorage.setItem(EKSTRA, JSON.stringify({ diastolik: diastolik > 0 ? diastolik : 0 })) } catch { /* ignore */ }
+}
+
+/** One-shot: copy legacy panel sheet into the synced lab log, then retire it. */
+function migrasiPanelLama(tanggal: string) {
+  try {
+    if (localStorage.getItem(LEGACY_MIGRATED)) return
+    const lama = JSON.parse(localStorage.getItem(LEGACY_PANEL) || '{}') as Partial<Lab>
+    if (!lama || typeof lama !== 'object') {
+      localStorage.setItem(LEGACY_MIGRATED, '1')
+      return
+    }
+    for (const [field, jenis] of Object.entries(LAB_JENIS) as [keyof Lab, string][]) {
+      const v = lama[field]
+      if (typeof v === 'number' && v > 0) tetapkanLabPadaTanggal(jenis, tanggal, v)
+    }
+    if (typeof lama.diastolik === 'number' && lama.diastolik > 0) tulisEkstra(lama.diastolik)
+    localStorage.setItem(LEGACY_MIGRATED, '1')
+    localStorage.removeItem(LEGACY_PANEL)
+  } catch { /* ignore */ }
+}
+
+function labDariLog(tanggal: string): Lab {
+  const n = (jenis: string) => nilaiLabPadaTanggal(jenis, tanggal) ?? 0
+  const ekstra = bacaEkstra()
+  return {
+    albuminGdL: n('albumin'),
+    kreatininMgdL: n('kreatinin'),
+    glukosaPuasaMgdL: n('gdp'),
+    crpMgL: n('crp'),
+    limfositPersen: n('limfosit'),
+    mcv: n('mcv'),
+    rdw: n('rdw'),
+    alp: n('alp'),
+    wbc: n('wbc'),
+    ast: n('sgot'),
+    alt: n('sgpt'),
+    trombosit: n('trombosit'),
+    trigliserida: n('tg'),
+    hdl: n('hdl'),
+    diastolik: ekstra.diastolik,
+  }
+}
+
+export interface LongevityPanelProps {
+  age: number
+  sex: 'M' | 'F'
+  restingHr: number
+  waistCm: number
+  systolic: number
+}
+
+// Nilai penanda ditampilkan setelah dikonversi, sehingga glukosa 112 mg/dL
+// menjadi 6.215937219034088 mmol/L kalau dicetak apa adanya — angka sepanjang
+// itu membaca seperti kesalahan, bukan seperti hasil laboratorium.
+const rapi = (x: number) => Number(x.toFixed(2)).toString()
+
+function Baris({ nama, hasil }: { nama: string; hasil: Hasil<HasilAngka> | null }) {
+  if (!hasil) return null
+  return (
+    <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="text-sm font-bold text-ink dark:text-ink">{nama}</div>
+        {hasil.ok
+          ? <div className="shrink-0 text-lg font-black text-brand-dark">{hasil.data.nilai}<span className="ml-1 text-[10px] font-bold text-neutral-500">{hasil.data.satuan}</span></div>
+          : <div className="shrink-0 text-[11px] font-semibold text-neutral-400">—</div>}
+      </div>
+      <ul className="mt-1 space-y-0.5">
+        {(hasil.ok ? hasil.data.catatan : [hasil.alasan]).map((c) => (
+          <li key={c} className="text-[11px] leading-snug text-neutral-500 dark:text-neutral-500">{c}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const ARAH_TEKS = {
+  membaik: 'Gap narrowing',
+  memburuk: 'Gap widening',
+  datar: 'Steady (<1 y change)',
+  'belum-cukup-data': 'Save a second blood draw to see a trajectory',
+} as const
+
+// Trajektori: AgeGap per tanggal pengambilan darah, dan ΔAgeGap antara dua
+// titik terakhir. Satu baris ringkas; titik-titiknya di balik ℹ️.
+function TrajektoriUsia({ titik }: { titik: TitikUsiaBiologis[] }) {
+  const t = hitungTrajektori(titik)
+  if (!t.titik.length) return null
+  const gaps = t.titik.map((x) => x.ageGap)
+  const min = Math.min(0, ...gaps), maks = Math.max(0, ...gaps), r = maks - min || 1
+  const y = (v: number) => 30 - ((v - min) / r) * 26
+  return (
+    <details className="mt-3 border-t border-neutral-100 pt-3 dark:border-white/10" data-bioage-trajectory={t.arah}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px]">
+        <span className="font-black text-ink dark:text-white">{ARAH_TEKS[t.arah]}</span>
+        {t.deltaAgeGap !== null && (
+          <span className="tabular-nums text-neutral-500">ΔAgeGap {t.deltaAgeGap > 0 ? '+' : t.deltaAgeGap < 0 ? '−' : ''}{Math.abs(t.deltaAgeGap)} y</span>
+        )}
+        <span className="ml-auto text-neutral-400" aria-hidden>ℹ️</span>
+      </summary>
+      {t.titik.length > 1 && (
+        <svg viewBox="0 0 100 32" preserveAspectRatio="none" className="mt-2 h-10 w-full" role="img" aria-label={`AgeGap across ${t.titik.length} blood draws`}>
+          <line x1="0" x2="100" y1={y(0)} y2={y(0)} stroke="currentColor" strokeWidth="0.6" strokeDasharray="3 3" className="text-neutral-400" />
+          <polyline fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" className="text-brand"
+            points={gaps.map((g, i) => `${(i / (gaps.length - 1)) * 100},${y(g).toFixed(2)}`).join(' ')} />
+        </svg>
+      )}
+      <ul className="mt-1.5 space-y-0.5 text-[10px] tabular-nums text-neutral-500">
+        {t.titik.map((x) => <li key={x.tanggal}>{x.tanggal} · PhenoAge {x.phenoAge} at age {x.usia} · AgeGap {x.ageGap > 0 ? '+' : ''}{x.ageGap}</li>)}
+      </ul>
+      <p className="mt-1 text-[10px] leading-snug text-neutral-500">
+        AgeGap = PhenoAge − age; ageing alone does not move it. Under 1 year may be lab noise.
+      </p>
+    </details>
+  )
+}
+
+export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: LongevityPanelProps) {
+  const [trajektori, setTrajektori] = useState<TitikUsiaBiologis[]>(ambilTrajektori)
+  const [tanggalDarah, setTanggalDarah] = useState(hariIni)
+  const [lab, setLab] = useState<Lab>(() => {
+    const t = hariIni()
+    migrasiPanelLama(t)
+    return { ...KOSONG, ...labDariLog(t) }
+  })
+  const [versiLab, setVersiLab] = useState(0)
+
+  useEffect(() => {
+    setLab({ ...KOSONG, ...labDariLog(tanggalDarah) })
+  }, [tanggalDarah, versiLab])
+
+  useEffect(() => {
+    const refresh = () => setVersiLab((n) => n + 1)
+    window.addEventListener('panacea:lab', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('panacea:lab', refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [])
+
+  const u = (p: Partial<Lab>) => {
+    setLab((x) => {
+      const next = { ...x, ...p }
+      for (const [field, nilai] of Object.entries(p) as [keyof Lab, number][]) {
+        if (field === 'diastolik') {
+          tulisEkstra(nilai)
+          continue
+        }
+        const jenis = LAB_JENIS[field]
+        if (jenis && typeof nilai === 'number' && nilai > 0) tetapkanLabPadaTanggal(jenis, tanggalDarah, nilai)
+      }
+      return next
+    })
+  }
+  const perempuan = sex === 'F'
+
+  const pheno = useMemo(() => {
+    // Angka nol berarti "belum diisi", bukan hasil laboratorium bernilai nol —
+    // menghitung PhenoAge dari kolom kosong akan menghasilkan angka yang
+    // terlihat sungguhan.
+    const wajib = [lab.albuminGdL, lab.kreatininMgdL, lab.glukosaPuasaMgdL, lab.crpMgL,
+      lab.limfositPersen, lab.mcv, lab.rdw, lab.alp, lab.wbc]
+    if (age <= 0 || wajib.some((x) => !(x > 0))) return null
+    return phenoAge({
+      usia: age,
+      albuminGL: konversi.albuminGdLKeGL(lab.albuminGdL),
+      kreatininUmolL: konversi.kreatininMgdLKeUmolL(lab.kreatininMgdL),
+      glukosaMmolL: konversi.glukosaMgdLKeMmolL(lab.glukosaPuasaMgdL),
+      crpMgdL: konversi.crpMgLKeMgdL(lab.crpMgL),
+      limfositPersen: lab.limfositPersen, mcvFL: lab.mcv, rdwPersen: lab.rdw,
+      alpUL: lab.alp, wbcRibu: lab.wbc,
+    })
+  }, [lab, age])
+
+  const egfr = age > 0 && lab.kreatininMgdL > 0 ? egfrCkdEpi2021(lab.kreatininMgdL, age, perempuan) : null
+  const fib = age > 0 && lab.ast > 0 && lab.alt > 0 && lab.trombosit > 0
+    ? fib4(age, lab.ast, lab.alt, lab.trombosit) : null
+  const hrMaks = age > 0 ? hrMaksTanaka(age) : null
+  const vo2 = age > 0 && restingHr > 0 ? vo2maxUth(restingHr, age) : null
+  const metab = waistCm > 0 && lab.trigliserida > 0 && lab.hdl > 0 && systolic > 0 && lab.glukosaPuasaMgdL > 0
+    ? sindromMetabolikIdf({
+      lingkarPinggangCm: waistCm, perempuan, trigliseridaMgdL: lab.trigliserida,
+      hdlMgdL: lab.hdl, sistolik: systolic, diastolik: lab.diastolik || 80,
+      glukosaPuasaMgdL: lab.glukosaPuasaMgdL,
+    })
+    : null
+
+  // Ekspor FHIR. Data yang tidak bisa dibawa keluar hanya berguna selama
+  // pengguna memakai aplikasi ini; klinik yang menerimanya membutuhkan bentuk
+  // yang bisa dibaca mesin lain, bukan tangkapan layar.
+  const bundel = useMemo(() => {
+    let bio: Record<string, number> = {}
+    try { bio = JSON.parse(localStorage.getItem('pmd_bioage_v1') || '{}') } catch { /* abaikan */ }
+    const bersih = (x: unknown) => (typeof x === 'number' && x > 0 ? x : undefined)
+    return bangunBundel({
+      nilai: {
+        weightKg: bersih(bio.weightKg), heightCm: bersih(bio.heightCm),
+        systolic: bersih(systolic), diastolic: bersih(lab.diastolik),
+        heartRate: bersih(restingHr), waistCm: bersih(waistCm), hba1c: bersih(bio.hba1c),
+        albuminGdL: bersih(lab.albuminGdL), kreatininMgdL: bersih(lab.kreatininMgdL),
+        glukosaPuasaMgdL: bersih(lab.glukosaPuasaMgdL), crpMgL: bersih(lab.crpMgL),
+        limfositPersen: bersih(lab.limfositPersen), mcv: bersih(lab.mcv), rdw: bersih(lab.rdw),
+        alp: bersih(lab.alp), wbc: bersih(lab.wbc), ast: bersih(lab.ast), alt: bersih(lab.alt),
+        trombosit: bersih(lab.trombosit), trigliserida: bersih(lab.trigliserida), hdl: bersih(lab.hdl),
+        phenoAge: pheno?.ok ? pheno.data.phenoAge : undefined,
+        egfr: egfr?.ok ? egfr.data.nilai : undefined,
+        fib4: fib?.ok ? fib.data.nilai : undefined,
+        vo2max: vo2?.ok ? vo2.data.nilai : undefined,
+      },
+      pasien: { kelamin: sex },
+    })
+  }, [lab, systolic, restingHr, waistCm, sex, pheno, egfr, fib, vo2])
+  const ringkas = ringkasBundel(bundel)
+
+  function unduh() {
+    const blob = new Blob([keJson(bundel)], { type: 'application/fhir+json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `panaceamed-fhir-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const kolom = (label: string, k: keyof Lab, step = 1) => (
+    <Field label={label} key={k}>
+      <KolomAngka nilai={lab[k] || undefined} onNilai={(n) => u({ [k]: n } as Partial<Lab>)} step={step} ariaLabel={label} />
+    </Field>
+  )
+
+  return (
+    <>
+      <Card className="!p-5">
+        <SectionTitle
+          icon={<IconActivity size={20} />}
+          title="Blood panel"
+          subtitle="Enter values exactly as your lab report prints them — conversion happens here"
+        />
+        <BatasKlaimKesehatan permukaan="lab.phenoage" />
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {kolom('Albumin (g/dL)', 'albuminGdL', 0.1)}
+          {kolom('Creatinine (mg/dL)', 'kreatininMgdL', 0.01)}
+          {kolom('Fasting glucose (mg/dL)', 'glukosaPuasaMgdL')}
+          {kolom('CRP (mg/L)', 'crpMgL', 0.1)}
+          {kolom('Lymphocytes (%)', 'limfositPersen', 0.1)}
+          {kolom('MCV (fL)', 'mcv', 0.1)}
+          {kolom('RDW (%)', 'rdw', 0.1)}
+          {kolom('Alk. phosphatase (U/L)', 'alp')}
+          {kolom('White cells (×10³/µL)', 'wbc', 0.1)}
+          {kolom('AST (U/L)', 'ast')}
+          {kolom('ALT (U/L)', 'alt')}
+          {kolom('Platelets (×10⁹/L)', 'trombosit')}
+          {kolom('Triglycerides (mg/dL)', 'trigliserida')}
+          {kolom('HDL (mg/dL)', 'hdl')}
+          {kolom('Diastolic BP', 'diastolik')}
+        </div>
+        <p className="mt-3 text-[11px] leading-snug text-neutral-500">
+          Values save into your account lab log (same source as Your Numbers) for this blood-draw date — blank fields stay missing, never zero. Diastolic BP stays on this device only.
+        </p>
+      </Card>
+
+      <Card className="!p-5">
+        <SectionTitle
+          icon={<IconChartUp size={20} />}
+          title="Published equations"
+          subtitle="Every coefficient below comes from a citable paper, unlike the points model above"
+        />
+
+        {pheno && (
+          <div className="mt-3 rounded-2xl border border-neutral-100 p-4 dark:border-white/10">
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">PhenoAge — Levine 2018</div>
+            {pheno.ok ? (
+              <>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <div className="text-4xl font-black" style={{ color: pheno.data.percepatan <= 0 ? '#00BF63' : '#ef4444' }}>{pheno.data.phenoAge}</div>
+                  <Badge tone={pheno.data.percepatan <= 0 ? 'brand' : 'critical'}>
+                    {pheno.data.percepatan <= 0
+                      ? `${Math.abs(pheno.data.percepatan)} years below chronological`
+                      : `${pheno.data.percepatan} years above chronological`}
+                  </Badge>
+                </div>
+                <p className="mt-2 text-[11px] leading-snug text-neutral-500">
+                  This is a mortality-risk age, not a tissue age: it means your 10-year mortality risk
+                  ({pheno.data.mortalitas10Tahun}% by the published model) resembles that of an average
+                  person aged {pheno.data.phenoAge}. It is not a diagnosis and not a prediction about you.
+                </p>
+                <div className="mt-3 space-y-1">
+                  {pheno.data.kontribusi.slice(0, 5).map((k) => (
+                    <div key={k.penanda} className="flex items-center justify-between gap-3 text-[11px]">
+                      <span className="truncate font-semibold text-ink dark:text-ink">{k.penanda}</span>
+                      <span className="shrink-0 tabular-nums text-neutral-500">{rapi(k.nilai)} {k.satuan} · {k.sumbangan >= 0 ? '+' : '−'}{Math.abs(k.sumbangan).toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[10px] text-neutral-500">Top five contributors to the model's linear term — the same PhenoAge can come from very different causes.</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <input type="date" value={tanggalDarah} onChange={(e) => setTanggalDarah(e.target.value)} aria-label="Blood draw date"
+                    className="min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-[11px] dark:border-white/12" />
+                  <button type="button"
+                    onClick={() => { const t = titikDariHasil(tanggalDarah, age, pheno.data); if (t) setTrajektori(simpanTitik(t)) }}
+                    className="shrink-0 rounded-xl bg-brand px-3 py-2 text-[11px] font-black text-white">
+                    Save to trajectory
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="mt-1 text-[11px] leading-snug text-amber-700 dark:text-amber-300">{pheno.alasan}</p>
+            )}
+            {/* Titik dari log lab (sembilan penanda pada tanggal ambil darah yang
+                sama) digabung dengan titik yang disimpan manual. */}
+            <TrajektoriUsia titik={gabungSumber(trajektori, titikDariRiwayatLab(ambilLab(), age, hariIni()))} />
+            {(() => {
+              const k = penandaKurangTerbaru(ambilLab())
+              if (!k || !k.kurang.length) return null
+              const nama = k.kurang.map((id) => JENIS_LAB.find((j) => j.id === id)?.nama ?? id).join(', ')
+              return (
+                <p className="mt-1 text-[11px] leading-snug text-neutral-500" data-phenoage-missing>
+                  Your latest blood draw ({k.tanggal}) is missing {nama}; PhenoAge from your lab log needs all nine from the same draw.
+                </p>
+              )
+            })()}
+          </div>
+        )}
+
+        <div className="mt-3 space-y-2">
+          <Baris nama="eGFR (CKD-EPI 2021)" hasil={egfr} />
+          <Baris nama="FIB-4 liver fibrosis index" hasil={fib} />
+          <Baris nama="Maximum heart rate (Tanaka)" hasil={hrMaks} />
+          <Baris nama="Estimated VO₂max (Uth)" hasil={vo2} />
+        </div>
+
+        {metab && metab.ok && (
+          <div className="mt-2 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+            <div className="flex items-baseline justify-between gap-3">
+              <div className="text-sm font-bold text-ink dark:text-ink">Metabolic syndrome (IDF 2006)</div>
+              <Badge tone={metab.data.memenuhi ? 'critical' : 'brand'}>{metab.data.memenuhi ? 'Criteria met' : 'Not met'}</Badge>
+            </div>
+            <p className="mt-1 text-[11px] leading-snug text-neutral-500">
+              {metab.data.obesitasSentral
+                ? 'Central obesity present — IDF requires it, plus two of the four below.'
+                : 'Central obesity absent, so IDF criteria cannot be met regardless of the others.'}
+              {' '}Waist thresholds used are the South/South-East Asian ones ({perempuan ? '80' : '90'} cm), not the European ones.
+            </p>
+            <div className="mt-2 space-y-0.5">
+              {metab.data.kriteriaTerpenuhi.map((c) => <div key={c} className="text-[11px] font-semibold text-amber-700 dark:text-amber-300">● {c}</div>)}
+              {metab.data.kriteriaTidak.map((c) => <div key={c} className="text-[11px] text-neutral-400">○ {c}</div>)}
+            </div>
+          </div>
+        )}
+
+        {!pheno && !egfr && !fib && !metab && (
+          <p className="mt-3 rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] leading-snug text-neutral-500 dark:bg-white/5">
+            Fill in the blood panel above to see these. Each equation appears only once it has every value it needs — a partial panel gives a wrong answer, not a rough one.
+          </p>
+        )}
+
+        {ringkas.observasi > 0 && (
+          <div className="mt-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-ink dark:text-ink">Export as FHIR</div>
+                <div className="text-[11px] leading-snug text-neutral-500">
+                  {ringkas.observasi} observations — {ringkas.berkode} LOINC-coded, {ringkas.lokal} locally
+                  coded because they are derived scores, not laboratory results.
+                </div>
+              </div>
+              <button
+                onClick={unduh}
+                className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95"
+              >
+                Download
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-neutral-500">
+              A FHIR R4 collection Bundle any clinic system or SMART on FHIR app can read. Derived scores
+              never claim a LOINC code — a wrong code files a number under the wrong row with no warning.
+            </p>
+          </div>
+        )}
+
+        <p className="mt-3 rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] leading-snug text-neutral-500 dark:bg-white/5">
+          Not included here: DNA-methylation clocks (Horvath, GrimAge, DunedinPACE), which need methylation data,
+          and Klemera-Doubal, which needs a reference population. No number in this app measures "reversing aging",
+          because none exists.
+        </p>
+      </Card>
+    </>
+  )
+}
+
+export default LongevityPanel

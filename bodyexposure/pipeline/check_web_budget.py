@@ -77,7 +77,7 @@ def main():
     args = parser.parse_args()
     if args.budget <= 0:
         parser.error("budget must be positive")
-    source = Path("src/pages/CanonicalBody.tsx").read_text()
+    source = Path("src/pages/bodyhub/CanonicalBody.tsx").read_text()
     match = re.search(r"DEFAULT_ON = new Set\(\[(.*?)\]\)", source)
     if not match:
         parser.error("viewer default systems could not be read")

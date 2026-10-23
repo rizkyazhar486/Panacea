@@ -57,9 +57,9 @@ assert.equal('data' in run({ weightKg: 0 }), false)
 assert.deepEqual(run({ weightKg: 0, exerciseMin: -1 }), GW) // urutan terdokumentasi
 
 // Halaman.
-const src = readFileSync('src/pages/HydrationCalculator.tsx', 'utf8')
+const src = readFileSync('src/pages/bodyhub/HydrationCalculator.tsx', 'utf8')
 const lines = src.split('\n').map((l) => l.trim())
-assert.ok(lines.includes("import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../domains/clinical-calculators'"))
+assert.ok(lines.includes("import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../../domains/clinical-calculators'"))
 assert.ok(!/\|\|\s*0\)/.test(src), 'tidak boleh ada || 0')
 assert.ok(!/\*\s*33\b|INTENSITY_ML_PER_HOUR|const baseMl|const totalMl/.test(src), 'rumus/konstanta tidak boleh disalin ke halaman')
 assert.ok(lines.includes('{!res.ok ? ('))

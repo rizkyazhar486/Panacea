@@ -32,7 +32,9 @@ assert.equal(checkTokenAmount(0.99).ok, false)
 // determinisme
 assert.deepEqual(checkTokenAmount(7), checkTokenAmount(7))
 
-// wiring: store memakai validator untuk tarik dana dan belanja PNC (regresi saldo NaN)
+// Wiring: spendPnc memakai checkTokenAmount; withdrawal telah dijaga parseWithdrawAmount dari main
 const store = readFileSync('src/lib/store.tsx', 'utf8')
-assert.equal((store.match(/checkTokenAmount\(amount\)/g) ?? []).length, 2)
+assert.equal((store.match(/checkTokenAmount\(amount\)/g) ?? []).length, 1)
+assert.match(store, /const parsed = parseWithdrawAmount\(amount\)/)
+tolak(Number.MAX_SAFE_INTEGER + 1, /whole number/)
 console.log('wallet-jumlah-token: OK')
