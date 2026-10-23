@@ -16,14 +16,16 @@ pediatric_*  — derived from ICRP Publication 156, Paediatric Mesh-type Referen
                Computational Phantoms (2024), ICRP. Newborn, 1, 5, 10 and 15 years,
                male and female; CT-based reference phantoms. Dosimetry-only layers
                removed; laterality corrected where the source label contradicted the
-               geometry (15-year female ovaries). Redistribution in Panacea cleared
-               by the project owner (2026-10-03).
+               geometry (15-year female ovaries). Internal owner approval recorded 2026-10-03;
+               rightsholder permission for derivatives and redistribution remains unverified.
+               Official reuse policy: https://www.icrp.org/page.asp?id=5
 
 icrp_adult_* — derived from ICRP Publication 145, Adult Mesh-type Reference
                Computational Phantoms (2020), ICRP. Reference adult male (176 cm)
                and female (163 cm); CT-based phantoms adjusted to ICRP Publication 89
-               reference values. Dosimetry-only layers removed. Redistribution in
-               Panacea cleared by the project owner (2026-10-03, ICRP-derived meshes).
+               reference values. Dosimetry-only layers removed. Internal owner approval recorded 2026-10-03;
+               rightsholder permission for derivatives and redistribution remains unverified.
+               Official reuse policy: https://www.icrp.org/page.asp?id=5
 
 vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoskeletal geometry
                (pelvis to feet), University of Denver Center for Orthopaedic Biomechanics,
@@ -41,7 +43,11 @@ vhf_denver_ct_adult_female.* — Visible Human Female lower-extremity musculoske
                One individual (donor 59 y, 157 cm, 88 kg), not an atlas. Not clinically reviewed.
 
 fetus.*      — SVRTK fetal MRI atlas repository, King's College London, Centre for the Developing Brain
-               (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas), CC0 1.0. Uus A, Hall M, Grigorescu I, et al.
+               (https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas),
+               CC0 1.0; upstream dataset README and LICENSE verified 2026-10-23 at revision 74f11a186c709078d712bb2fd827bfa2b36e3407.
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/README.md
+               https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas/src/74f11a186c709078d712bb2fd827bfa2b36e3407/LICENSE
+               Uus A, Hall M, Grigorescu I, et al.
                Automated body organ segmentation, volumetry and population-averaged atlas for 3D motion-corrected
                T2-weighted fetal body MRI. Scientific Reports 14:6637 (2024), doi:10.1038/s41598-024-57087-x.
                Population average of 17 normal fetuses (25 to 28 weeks per the preprint), organs only, not an individual.
@@ -87,3 +93,4 @@ adult_male.rig_rom.glb (Walk, Run clips) — motion from the CMU Graphics Lab Mo
                Database (subjects 07 and 09), retargeted and clamped to AAOS limits.
                The data used in this project was obtained from mocap.cs.cmu.edu.
                The database was created with funding from NSF EIA-0196217.
+

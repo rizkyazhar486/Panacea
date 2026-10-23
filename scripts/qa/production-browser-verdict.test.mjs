@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { assessPublicPage, isProductionAsset, productionAssetFailure } from './production-browser-verdict.mjs'
+import { assessPublicPage, isProductionAsset, productionAssetFailure, testedShas } from './production-browser-verdict.mjs'
 test('E7: public home HTTP 200 with visible text and title passes structural check', () => {
   assert.deepEqual(assessPublicPage({ status: 200, title: 'PanaceaMed', bodyTextChars: 42 }), [])
 })
@@ -48,4 +48,37 @@ test('P0: actual asset classifier drives failed-request, HTTP and CSS MIME failu
   }
   assert.match(productionAssetFailure({ url: base + '/assets/index-X.js', status: 404, contentType: 'text/html' }, base), /HTTP 404/)
   assert.equal(productionAssetFailure({ url: 'https://fonts.googleapis.com/font.css', requestFailure: 'timeout' }, base), null)
+})
+
+const A = 'a'.repeat(40)
+const B = 'b'.repeat(40)
+test('ENG-E7-02: logs frontend and backend SHA when both are observed', () => {
+  const r = testedShas({ frontendBuild: { commit: A }, health: { build: { commit: B } } })
+  assert.equal(r.frontend, A); assert.equal(r.backend, B); assert.deepEqual(r.notes, [])
+})
+test('ENG-E7-02: missing build.json or health is unknown (null), never equal or invented', () => {
+  const r = testedShas({ frontendBuild: null, health: null, expectSha: A })
+  assert.equal(r.frontend, null); assert.equal(r.backend, null)
+  assert.equal(r.frontendMatchesExpected, null); assert.equal(r.backendMatchesExpected, null)
+  assert.match(r.notes.join(' '), /frontend TIDAK diketahui/); assert.match(r.notes.join(' '), /backend TIDAK diketahui/)
+})
+test('ENG-E7-02: malformed SHAs (short, uppercase, non-string, "unknown") are rejected as unknown', () => {
+  for (const bad of ['abc123', 'A'.repeat(40), 'g'.repeat(40), 123, null, undefined, 'unknown', A + '0']) {
+    const r = testedShas({ frontendBuild: { commit: bad }, health: { build: { commit: bad } } })
+    assert.equal(r.frontend, null, String(bad)); assert.equal(r.backend, null, String(bad))
+  }
+})
+test('ENG-E7-02: SHA different from EXPECT_SHA is flagged; equal is confirmed; paired controls differ only in the SHA', () => {
+  const same = testedShas({ frontendBuild: { commit: A }, health: { build: { commit: A } }, expectSha: A })
+  assert.equal(same.frontendMatchesExpected, true); assert.equal(same.backendMatchesExpected, true); assert.deepEqual(same.notes, [])
+  const diff = testedShas({ frontendBuild: { commit: A }, health: { build: { commit: B } }, expectSha: A })
+  assert.equal(diff.frontendMatchesExpected, true); assert.equal(diff.backendMatchesExpected, false)
+  assert.match(diff.notes.join(' '), /backend bbbbbbbbb berbeda/)
+})
+test('ENG-E7-02: invalid EXPECT_SHA is ignored with a note, not treated as a match', () => {
+  const r = testedShas({ frontendBuild: { commit: A }, health: { build: { commit: A } }, expectSha: 'main' })
+  assert.equal(r.frontendMatchesExpected, null); assert.match(r.notes.join(' '), /EXPECT_SHA bukan 40-heksadesimal/)
+})
+test('ENG-E7-02: no arguments does not throw and reports both unknown', () => {
+  const r = testedShas(); assert.equal(r.frontend, null); assert.equal(r.backend, null)
 })

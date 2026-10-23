@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
- "source_sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
- "reproducer_sha256": "474590f3f203905a32a4592a4e487a1048c72a1248b61f7079fb2d087f1986ea",
+ "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+ "reproducer_sha256": "5f812e0a2c70c5e4c11b8ce9ac7917667a9c6fd141f7cc446d560fd9b9cd8342",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
@@ -52,6 +52,36 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 1,
@@ -337,6 +367,152 @@
       ]
      }
     ]
+   },
+   "heelCalcaneus": {
+    "stance_phases": 2,
+    "stance_frames": 13,
+    "common_forward_speed_m_s": 1.2432985541038521,
+    "slide_rms_mm": 7.763768346652511,
+    "slide_max_mm": 16.643477629441612,
+    "display": {
+     "common_forward_speed_m_s": 1.243,
+     "slide_rms_mm": 7.8,
+     "slide_max_mm": 16.6
+    },
+    "phases_by_side": {
+     "L": [
+      "22-25+0-4"
+     ],
+     "R": [
+      "7-10"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9166666666666666,
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25
+      ],
+      "x": [
+       0.16777762920522019,
+       0.1050009675689949,
+       0.05062209314181694,
+       -0.0031139735680957258,
+       -0.05454289783168437,
+       -0.10040074071897999,
+       -0.1459585095925092,
+       -0.19546587838002882,
+       -0.24963375898606646
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.2916666666666667,
+       0.3333333333333333,
+       0.375,
+       0.4166666666666667
+      ],
+      "x": [
+       0.233217439644782,
+       0.17786332216735334,
+       0.11614386003380144,
+       0.04994202426740241
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 2,
+    "stance_frames": 17,
+    "common_forward_speed_m_s": 1.2596362187600345,
+    "slide_rms_mm": 6.860171595591834,
+    "slide_max_mm": 16.05205665400611,
+    "display": {
+     "common_forward_speed_m_s": 1.26,
+     "slide_rms_mm": 6.9,
+     "slide_max_mm": 16.1
+    },
+    "phases_by_side": {
+     "L": [
+      "22-25+0-6"
+     ],
+     "R": [
+      "9-14"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9166666666666666,
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25,
+       1.2916666666666667,
+       1.3333333333333333
+      ],
+      "x": [
+       0.3125280818970411,
+       0.24980792883221972,
+       0.19541139821487724,
+       0.1416703684270267,
+       0.09022918802863829,
+       0.044403064937286324,
+       -0.0012328096633568257,
+       -0.05075316755969633,
+       -0.10489545054551441,
+       -0.16565170549596162,
+       -0.22342134523728943
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.375,
+       0.4166666666666667,
+       0.4583333333333333,
+       0.5,
+       0.5416666666666666,
+       0.5833333333333334
+      ],
+      "x": [
+       0.26099250244790756,
+       0.1946648334124746,
+       0.1344714787078471,
+       0.08109536579159296,
+       0.02970020473149636,
+       -0.018554347052931557
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 2,

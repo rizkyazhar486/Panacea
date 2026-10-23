@@ -156,8 +156,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success) ran the full server npm run uji; encounterHttpRestart, patientIdentityContinuity, careJourneyRestart, clinicalSigningIntegrity and carePlanApproval each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-B",
@@ -194,8 +195,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job server-validate 120440844663 (success): labReferralHttpRbac, labShareHttpRbac and labReferralClosureHttp each printed passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-C",
@@ -228,8 +230,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Validate changes run 39961643155, job validate 120440844359 (success) ran npm run uji: calculator-independent-reference-10 and -11, calculator-reference-coverage (47/47 engines invoked by 11 suites) and angka-kosong-perbaikan/-ratchet all ran and passed. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-D",
@@ -265,8 +268,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). Body 3D Render Acceptance run 39961643195 (success: render-proof 120445913333 plus four proof-shards) and the body uji suites in validate job 120440844359 (body-asset-provenance and body-attribution-coverage 506 GLB) passed. Production canvas stays login-gated; anatomy is not clinically validated. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-REG-E",
@@ -299,8 +303,9 @@
       "dependsOn": [
         "ENG-CI-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "09003a678afaf5b917221535679d022886a48aa8",
+      "statusNote": "PASS at 09003a678afaf5b917221535679d022886a48aa8 (PR #2715 head; git tree 0698da1084e9dad979d1d04afbb293a5366a8aaf is identical to main 2c4a347268dca51ab719083b5e29ba0423d8f0f1). server-validate job 120440844663 (success): auditTrailHttp, careWriteAuditHttp, rbacKlinis, staffRbacHttp, personalDataHttpRbac and applicationsHttp printed passed; Security Baseline Enforcement run 39961643227 (job enforce 120440844633) success. Negative control for this criterion is cited from the in-suite paired assertions and legacy evidence; it was NOT re-executed when recording this status. Regression pack only: not a clinical or production validation."
     },
     {
       "id": "ENG-F1-01",
@@ -376,10 +381,13 @@
       "done": "user-journey-resilience covers 100% of pages listed in the F1 critical page inventory; each with a paired positive control.",
       "checks": [
         {
-          "cmd": "node --test scripts/qa/user-journey-resilience.test.mjs",
+          "cmd": "node --test scripts/qa/user-journey-resilience.test.mjs scripts/qa/f1-critical-pages.test.mjs",
           "files": [
             "scripts/qa/user-journey-resilience.mjs",
-            "scripts/qa/user-journey-resilience.test.mjs"
+            "scripts/qa/user-journey-resilience.test.mjs",
+            "governance/F1_CRITICAL_PAGES.json",
+            "scripts/qa/f1-critical-pages.mjs",
+            "scripts/qa/f1-critical-pages.test.mjs"
           ]
         }
       ],
@@ -417,9 +425,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Legacy F2 note records 57 measurable failures; 1349 gradient/image-backed elements unmeasured (tracked, not counted as pass)."
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: ux-audit job 120391192973 (run 39946759961) measured teksDiukur 3253, gagal 0, gagalRuangWarna 0, gagalMobileTerang 0 against KONTRAS_BASELINE 0/0 (#2706); kontras-ukur.fixture (9 paired cases incl. 2.4:1 green-on-white) ran in the same job. CAVEAT kept: 1499 gradient/image-backed elements are unmeasurable and 16 backgrounds unresolved; passing measured text is not a claim that every page meets AA."
     },
     {
       "id": "ENG-F2-02",
@@ -448,8 +456,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: axe-audit in ux-audit job 120391192973 (run 39946759961): 0 serious/critical nodes, incompleteTotal 0 (AXE_BASELINE incompleteTotal 0); axe-ratchet.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). axe covers only part of accessibility; manual assistive-tech QA is a deferred final-stage gate (EXT-F2-A)."
     },
     {
       "id": "ENG-F2-03",
@@ -477,8 +486,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: keyboard-audit in ux-audit job 120391192973 (run 39946759961): 18 measurements, 0 without focus indicator, 0 invisible, 0 trapped, 0 missing stop; keyboard-analisis.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Real screen-reader/keyboard judgment stays EXT-F2-A."
     },
     {
       "id": "ENG-F2-04",
@@ -506,8 +516,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: screenshot-regresi gate against SCREENSHOT_GRID_BASELINE in ux-audit job 120391192973 (run 39946759961) (36 measurements); screenshot-grid.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Coarse luminance grid, not pixel-perfect visual review."
     },
     {
       "id": "ENG-F2-05",
@@ -535,8 +546,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: perf-audit job 120391192556 (run 39946759961) success; perf-audit.test.mjs and perf-stats.test.mjs ran in build job 120391193192 (run 39946759973, runs every scripts/qa/*.test.mjs). Budgets are those in the repo scripts, measured on a shared CI runner."
     },
     {
       "id": "ENG-D7-01",
@@ -562,8 +574,9 @@
       "negativeControl": "Zero-stance fixture must yield UNMEASURABLE.",
       "evidence": "bodyexposure/qa_reports/gait_foot_slide.json regenerated at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "96cbeacec78305a3d0512ce7a1ba88d8d62e0172",
+      "statusNote": "PASS at 96cbeacec78305a3d0512ce7a1ba88d8d62e0172 (PR #2711 head; git tree 9601f6d623e658ff04f147ea933506dc494ca4b9 is identical to main 42c64db7a52d95c2b069a6f20c6af6e80508396f). Validate job 120428954204 (run 39957938726, success) ran npm run uji: body-gait-foot-metrics.mts and body-gait-foot-contact-reproduction.mts both printed their ok line. body-gait-foot-metrics asserts stance_phases 0 and null input -> unmeasurable/no_stance, never within/exceeds; the contact reproduction asserts the written report equals a re-run. Sabotage: dropping the zero-stance guard fails the test (expected 'no_stance', got 'too_few_phases'). Scope: ENG-D7-01 only (verdict separation). Four fixtures are not all measurable (see ENG-D7-02 FAIL); thresholds are engineering placeholders, not clinically validated."
     },
     {
       "id": "ENG-D7-02",
@@ -636,8 +649,9 @@
       "done": "public-asset-inventory finds 0 untracked assets outside the EXT-D8-A/B list; the gate fails closed on a new untracked file.",
       "checks": [
         {
-          "cmd": "node scripts/qa/public-asset-inventory.mjs",
+          "cmd": "npm run uji",
           "files": [
+            "scripts/uji/public-asset-provenance.mts",
             "scripts/qa/public-asset-inventory.mjs",
             "governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json"
           ]
@@ -646,8 +660,9 @@
       "negativeControl": "Adding an untracked PNG under public/ fails the gate.",
       "evidence": "Inventory JSON for exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "2dd319189b1149f0fd4b6a6d920451d617ff2e1a",
+      "statusNote": "PASS at 2dd319189b1149f0fd4b6a6d920451d617ff2e1a (PR #2717 head; git tree bc42413d357c682bd21ad5fe5d88394961279427 is identical to main c89d55fe6d78c5e44ffa1206b07526a82a5c181b). Validate changes run 39965989203, job validate 120455871022 (success) ran npm run uji: public-asset-provenance printed '640 aset publik; berkas-kredit 600, hak-cipta-tertanam 36, per-node 2, tanpa-jejak 2 (baseline 2); passed'. The 2 untracked assets are exactly public/logo-mark.png (EXT-D8-A) and public/media/tutorial-video.mp4 (EXT-D8-B); governance/PUBLIC_ASSET_PROVENANCE_BASELINE.json may only shrink. Sabotage: adding public/zz-sabotage-d8.png fails the gate naming that file (exit 1). CORRECTION: the previous check command 'node scripts/qa/public-asset-inventory.mjs' is a library with no CLI entry (exits 0 silently, verifies nothing); the check now points at the real gate scripts/uji/public-asset-provenance.mts. Scope: presence of a provenance trail only, not licence validity or the rights of the two open assets."
     },
     {
       "id": "ENG-D8-02",
@@ -666,7 +681,10 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/body-asset-provenance.mts",
-            "bodyexposure/PROVENANCE.md"
+            "bodyexposure/PROVENANCE.md",
+            "scripts/uji/body-attribution-coverage.mts",
+            "src/domains/body-exposure/engine/attributionCoverage.ts",
+            "public/bodyexposure/provenance.html"
           ]
         }
       ],
@@ -730,9 +748,9 @@
       "negativeControl": "Synthetic MRN fixture must be detected; its value must not appear in output.",
       "evidence": "Test output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "PR #2679 in flight (CI diagnostic redaction)."
+      "status": "PASS",
+      "statusSha": "8ed1065f4b5610ca03b08e2cd142dae985d7ac66",
+      "statusNote": "PASS at 8ed1065f4b5610ca03b08e2cd142dae985d7ac66 (PR #2721 head; git tree 875db2058956b90e28a9de9bee834f0bedf01a80 is identical to main 54a08819b87801966aa0dc5f0d64a34ad39067a8). phi-repo-scan.test.mjs (31 tests) runs inside npm run build (node --test scripts/qa/*.test.mjs, package.json); Validate changes run 39983697913, job validate 120517271080 succeeded. The retrievable log excerpt is truncated before that step, so no individual test line is quoted; the same 31 tests passed 31/31 locally on this tree. Covered by name: unreadable tracked file fails closed; non-text reader result cannot certify clean; source above the old 2M boundary scanned fully; content over BATAS_PINDAI_KARAKTER (16,000,000) fails closed; failures never publish matched PHI or filenames (value printed as [REDACTED], file shown only as a hash ref); allowlist read/parse errors and git stderr are not echoed; injected synthetic PHI is detected; real repo has no unlisted finding and no stale allowlist entry. Sabotage (each fails by test name, restored afterwards): printing the PHI value instead of [REDACTED] fails 1, 5 and 25; removing the size limit fails 24; swallowing read errors fails 21 and 25; disabling content detection fails 17, 19, 23 and 30. Previous note 'PR #2679 in flight' is obsolete: #2679 is merged. Scope: pattern scan (NIK, phone, email) over tracked text files and filenames; it does not prove absence of PHI in other forms, runtime logs (ENG-E4-02) or retention (ENG-E4-03), and is not a privacy certification."
     },
     {
       "id": "ENG-E4-02",
@@ -750,7 +768,8 @@
         {
           "cmd": "cd server && npm run uji",
           "files": [
-            "server/uji/logPrivacyHttp.uji.ts"
+            "server/uji/logPrivacyHttp.uji.ts",
+            "server/uji/support/consoleRequestGuard.ts"
           ]
         }
       ],
@@ -758,7 +777,8 @@
       "evidence": "server-validate run ID at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Evidence so far, status stays NOT_RUN. logPrivacyHttp passed in server-validate job 120538961247 (run 39989986652, success) at dae2f180 (tree identical to main 2cc6b05f). Covered: (1) static guard over all of server/src: no console statement may receive request data (0 of 69 calls); (2) dynamic journey over clinical patient/record, lab-results, lab-log and shares, health webhook/profile, settings, second-opinion, feedback and auth; (3) seven malformed or oversize payloads (truncated JSON, trailing garbage, unquoted keys, single quotes, plain text, 13 MB over the 12 MB limit) are refused 400/413 and leave no content in the log. Sabotage that fails by name: console.log(req.body) on reminders/applications/clinical routes, req.query in a template, multi-line req.headers, console.error(err) and JSON.stringify(err) on the parse-error branch, a refused payload answered 200. Honest negatives: logging only err.message, or the too-large error, leaks no payload content on this Node version, so those variants pass correctly. NOT met: the criterion says every route group in the RBAC matrix; the dynamic journey does not yet hit all 15 clinical routes of rbacKlinis or the referral, care, reminder, application, genomics and health-series groups. Known limits: the guard is syntactic (data copied into another variable first is not seen); the 500 path passes err.message and stack to alertOwner and no test makes a route throw with payload data; process.stderr.write in src/mcp/stdio.ts is outside the guard. Console inventory (main e5d3c9f1): 69 console statements; 24 in src/index.ts, of which the personal-data routes are PUT /api/settings, POST /api/lab-log/shares, POST /api/clinician/lab-shares/:id/review and /care-plan, and POST /api/health-webhook/:token. The first four of those and the webhook are exercised by the dynamic journey; /care-plan logs only a push-notification failure message. The external lookup routes (PubMed, trials, openFDA, RxNorm, MyGene, markets) log only e.message of upstream errors, and their helpers throw static codes such as mygene_search_503 or market source 503, never the search term. The remaining 45 are in sports.ts (24, upstream), store.ts (10, operational), push.ts, ai.ts and similar. This argues that the log channel is small and covered, but the criterion text asks for every route group in the RBAC matrix, which the dynamic journey does not yet show, so the status is not changed."
     },
     {
       "id": "ENG-E4-03",
@@ -810,8 +830,9 @@
       "negativeControl": "Missing build.json yields unknown, not equal.",
       "evidence": "verify-deployed-sha output + run ID.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: verify-deployed-sha printed 'frontend: f6dd71855 SAMA — SHA terdeploy = SHA main' and 'backend: c57e22fc0 SETARA — leluhur main; tidak ada perubahan pada jalur yang dideploy'. Unknown/missing SHAs classify as unknown, never equal (deploy-equivalence.test.mjs and frontend-build-info.test.mjs run in the main build job 120391193192). Classification 'SETARA' for the backend is the engineering rule; what counts as an accepted release SHA is a deferred final-stage policy (EXT-E7-A)."
     },
     {
       "id": "ENG-E7-02",
@@ -841,9 +862,9 @@
         "ENG-CI-02",
         "ENG-E7-01"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Production browser check failed on 256a22de."
+      "status": "PASS",
+      "statusSha": "f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb",
+      "statusNote": "PASS on main f6dd7185: scheduled Production browser check run 39950731324, job 120404250140, on main f6dd7185: browser smoke against https://panaceamed.id at 390 and 1440 px, both HTTP 200, overflowX false, webgl2 true, 0 page errors, and it logged 'tested frontend=f6dd71855b0555be10ba8d74f7aa05aa0d1fbbdb backend=c57e22fc0ee4a1d0c37a605fc2578d2f9b8aef11' (testedShas, #2701). The EXPECT_SHA mismatch for the backend (c57e22fc vs f6dd7185) was reported as a warning, not hidden. CAVEAT: the Body Exposure canvas is behind a login, so production anatomy/slicing is NOT verified without an owner session (reported as info by the check)."
     },
     {
       "id": "ENG-E7-03",
@@ -888,19 +909,21 @@
       "done": "Workflow and env template committed; workflow fails closed with a named message when credentials are absent.",
       "checks": [
         {
-          "cmd": "ls .github/workflows",
+          "cmd": "node --test scripts/qa/staging-credentials.test.mjs",
           "files": [
-            ".github/workflows/vercel-prebuilt-production.yml",
-            "render.yaml"
+            ".github/workflows/staging-gate.yml",
+            "scripts/qa/staging-credentials.mjs",
+            "scripts/qa/staging-credentials.test.mjs",
+            "docs/governance/staging.env.example"
           ]
         }
       ],
       "negativeControl": "Running without secrets exits non-zero with 'staging credentials absent'.",
       "evidence": "Workflow file + failing-closed run.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Provisioning itself is EXT-E7-B."
+      "status": "PASS",
+      "statusSha": "da442f22d862d9dcc9c212e097b31ff07a59a8f1",
+      "statusNote": "PASS at da442f22d862d9dcc9c212e097b31ff07a59a8f1 (main after PR #2720). Staging gate run 39979087541 (workflow_dispatch on main, no staging variables or secrets set): job credentials 120501323312 failed with exit 1 and the named message 'staging credentials absent or invalid: STAGING_URL: absent; STAGING_API_URL: absent; STAGING_DEPLOY_TOKEN: absent'; job smoke was skipped (needs credentials). Env contract: docs/governance/staging.env.example. The 9 tests in scripts/qa/staging-credentials.test.mjs run inside npm run build (node --test scripts/qa/*.test.mjs, package.json) and the validate job 120494128516 on the PR head 67b73539 succeeded; the log excerpt retrievable here was truncated, so no individual test line is quoted. Six sabotages (CLI exit code, production-host check, https check, '|| true', missing needs, pull_request trigger) each failed by test name. CORRECTION: the previous check command 'ls .github/workflows' verified nothing; the check now runs the staging-credentials tests. Scope: staging is defined as code only. No staging environment exists (EXT-E7-B, infra owner); the smoke job has never run and is unproven; the three variable names are a proposed contract."
     },
     {
       "id": "ENG-C6-01",
@@ -919,15 +942,19 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/calculator-independent-reference.mts",
-            "governance/CALCULATOR_REVIEW_REGISTRY.json"
+            "governance/CALCULATOR_REVIEW_REGISTRY.json",
+            "scripts/uji/calculator-reference-coverage.mts",
+            "scripts/qa/calculator-mutation-sweep.mts",
+            "docs/governance/CALCULATOR_MUTATION_SWEEP.md"
           ]
         }
       ],
       "negativeControl": "Off-by-one coefficient mutation fails its reference comparison.",
       "evidence": "Coverage table engine -> reference test at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "1f2771b1f95bd79b05baa09699e314fd8791802d",
+      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation."
     },
     {
       "id": "ENG-C6-02",
@@ -953,7 +980,8 @@
       "evidence": "Matrix output at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Not started as a matrix. The C6-01 mutation sweep (docs/governance/CALCULATOR_MUTATION_SWEEP.md) found 94 surviving input-range limit mutants in 27 engines, e.g. meanArterialPressure SYSTOLIC_MMHG max 300 -> 301 is accepted by every reference suite, so the exact accepted limit is not pinned. A matrix needs a per-engine adapter because the call signatures differ; the range tables are already exported constants (e.g. SYSTOLIC_MMHG, DIASTOLIC_MMHG) and engines share inRange() from engine/inputs.ts."
     },
     {
       "id": "ENG-C6-03",
