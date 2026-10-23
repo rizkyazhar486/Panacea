@@ -38,7 +38,7 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "IcdEntry",
-    "module": "server/src/icd11.ts",
+    "module": "server/src/domains/medical-reference/icd11.ts",
     "notes": "Implemented flow: backend OAuth2 client-credentials -> WHO ICD API v2 -> pinned 2026-01 MMS search/entity response -> IcdEntry with source marker `icd11`, code/title and WHO URI when available. If WHO credentials are absent, or WHO search fails to return usable results, the same module can fall back to the separately registered NLM ICD-10-CM source; fallback results always carry `sumber: icd10cm` and must never be presented as ICD-11. WHO FHIR support remains outside this adapter's primary production path."
   },
   "trust": {

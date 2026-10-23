@@ -313,10 +313,11 @@ export function Chatbot() {
           riwayatSosialEkonomi: d.riwayatSosialEkonomi,
         },
         physicalExam: existing?.physicalExam ?? {
-          general: '',
+          general: '', vitalsNote: '', perSystem: '', doctorVerified: false,
+        },
+        aiExamDraft: {
           vitalsNote: autoObjective(messages, ctxOf(store).latestVitals),
           perSystem: d.suggestedExams.map((exam) => `• [AI SUGGESTION — NOT EXAMINED] ${exam.replace(/^AI SUGGESTION\s*[—:-]?\s*NOT EXAMINED\s*[—:-]?\s*/i, '')}`).join('\n'),
-          doctorVerified: false,
         },
         // Every AI-written field stays provenance-tagged as AI until a clinician
         // edits/verifies it; missing history is explicit rather than silently blank.
@@ -326,10 +327,6 @@ export function Chatbot() {
             'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang',
             'riwayatNutrisi', 'riwayatImunisasi', 'riwayatSosialEkonomi',
           ].map((k) => [`anamnesis.${k}`, { asal: 'AI' as const }])),
-          ...(existing?.physicalExam ? {} : {
-            'physicalExam.vitalsNote': { asal: 'AI' as const },
-            'physicalExam.perSystem': { asal: 'AI' as const },
-          }),
         },
         anthropometry: d.anthropometry,
         labEkgInterpretation: d.labEkgInterpretation,
@@ -531,6 +528,7 @@ export function Chatbot() {
             <button
               onClick={send}
               disabled={busy || !input.trim()}
+              aria-label="Send message"
               className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white transition hover:brightness-110 disabled:opacity-30 disabled:hover:brightness-100"
             >
               <IconSend size={16} />

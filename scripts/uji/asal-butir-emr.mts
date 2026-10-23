@@ -19,3 +19,5 @@ assert.match(emr, /<LencanaAsal asal=\{draft\.asalIsian\?\.\[`anamnesis\.\$\{f\.
 assert.match(readFileSync('src/pages/clinical/Chatbot.tsx', 'utf8'), /asalIsian: \{ \.\.\.\(existing\?\.asalIsian \?\? \{\}\)/, 'Chatbot tidak menyatakan kolom yang ditulisnya sebagai AI')
 assert.match(readFileSync('server/package.json', 'utf8'), /"uji": [^\n]*uji\/asalIsianKlinis\.uji\.ts/)
 console.log('asal-butir-emr: asal per butir tampil, fail closed untuk data lama dan verifikasi tanpa cap server')
+
+assert.equal(labelAsalIsian({ asal: 'Pengguna' }), 'user-entered · not clinician-verified')

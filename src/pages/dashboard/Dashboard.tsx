@@ -158,27 +158,30 @@ function Spark({ values, color }: { values: number[]; color: string }) {
    BMI VISUAL GAUGE
    ═══════════════════════════════════════════ */
 
-function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: string }) {
-  const pct = Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
+function BmiGauge({ bmi, kesan, tone }: { bmi: number | null; kesan: string; tone: string }) {
+  // bmi null = berat/tinggi tak ada: tanpa penanda di skala dan tanpa angka 0 yang tampak sebagai pengukuran.
+  const pct = bmi === null ? 0 : Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
   const color = tone === 'high' || tone === 'critical' ? '#FF3131' : tone === 'low' ? '#f59e0b' : '#00BF63'
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-3" role="img" aria-label={bmi === null ? 'BMI calculation unavailable' : `BMI ${bmi} kg/m²`}>
       <div className="relative h-3 w-full overflow-hidden rounded-full bg-neutral-100">
         <div className="absolute inset-y-0 left-0 w-[30%] bg-blue-100/60" />
         <div className="absolute inset-y-0 left-[30%] w-[20%] bg-green-100/60" />
         <div className="absolute inset-y-0 left-[50%] w-[20%] bg-amber-100/60" />
         <div className="absolute inset-y-0 left-[70%] w-[30%] bg-red-100/60" />
-        <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out" style={{ left: `calc(${pct}% - 6px)` }}>
-          <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
-        </div>
+        {bmi !== null && (
+          <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out" style={{ left: `calc(${pct}% - 6px)` }}>
+            <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
+          </div>
+        )}
       </div>
       <div className="flex justify-between text-[10px] font-semibold text-neutral-300">
         <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
       </div>
       <div className="text-center">
-        <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
-        <span className="ml-1 text-xs text-neutral-500">kg/m²</span>
+        <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi ?? '—'}</span>
+        {bmi !== null && <span className="ml-1 text-xs text-neutral-500">kg/m²</span>}
       </div>
       <div className="text-center">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -467,7 +470,7 @@ export function Dashboard() {
   const supportive: SupportiveResult[] = (state.supportive[p.id] ?? []) as any
   const latest = vitals[vitals.length - 1]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anthro: any = computeBmi(p.weightKg, p.heightCm)
+  const anthro = computeBmi(p.weightKg, p.heightCm)
   const [showAdd, setShowAdd] = useState(false)
   const [showAddPatient, setShowAddPatient] = useState(false)
 
@@ -508,9 +511,13 @@ export function Dashboard() {
         <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
-        <a href="#manual-icu-flowsheet" className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85">
+        <button
+          type="button"
+          onClick={() => document.getElementById('manual-icu-flowsheet')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85"
+        >
           ICU Flowsheet
-        </a>
+        </button>
         <Link
           to="/clinical-hub"
           title="Open visual clinical workspace"
@@ -711,13 +718,13 @@ export function Dashboard() {
             <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
               <p className="text-[11px] leading-relaxed text-neutral-500">
                 <IconSparkle size={11} className="mr-1 inline text-[#00BF63]" />
-                Full WHO/CDC Z-scores (weight-for-age, height-for-age, weight-for-height) are computed by AI during workup in AI-EMR.
+                Pediatric growth assessment needs age, sex and appropriate reference curves, with interpretation reviewed by a clinician.
               </p>
             </div>
           </div>
           <div className="flex items-center">
             <div className="w-full">
-              <BmiGauge bmi={Number(anthro.bmi) || 0} kesan={String(anthro.kesan || '')} tone={String(anthro.tone || 'normal')} />
+              <BmiGauge bmi={anthro.valid ? anthro.bmi : null} kesan={String(anthro.kesan || '')} tone={String(anthro.tone || 'normal')} />
             </div>
           </div>
         </div>

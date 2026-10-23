@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict'
 import { spawn, type ChildProcess } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -25,7 +25,7 @@ function freePort(): Promise<number> {
   })
 }
 
-export async function startIsolatedServer(prefix: string, ownerEmail: string) {
+export async function startIsolatedServer(prefix: string, ownerEmail: string, options: { captureLogs?: boolean } = {}) {
   const directory = mkdtempSync(join(tmpdir(), `panacea-${prefix}-`))
   const secret = randomBytes(32).toString('hex')
   const dataFile = join(directory, 'data.json')
@@ -33,12 +33,13 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   let base = ''
   let failed = false
   let exited: Promise<void>
+  let logs = ''   // stdout+stderr semua proses (hanya bila captureLogs), untuk uji kebocoran data ke log
 
   const launch = async () => {
     const port = await freePort()
     failed = false
     child = spawn(process.execPath, ['--import', 'tsx', 'src/index.ts'], {
-      cwd: serverRoot, stdio: 'ignore', env: {
+      cwd: serverRoot, stdio: options.captureLogs ? ['ignore', 'pipe', 'pipe'] : 'ignore', env: {
         ...process.env, NODE_ENV: 'development', PORT: String(port), JWT_SECRET: secret,
         ALLOW_DEV_LOGIN: 'true', OWNER_EMAIL: ownerEmail, COOKIE_SECURE: 'false',
         PANACEA_DATA_FILE: dataFile, PANACEA_ARCHIVE_DIR: join(directory, 'archive'), MONGODB_URI: '',
@@ -49,6 +50,7 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
       },
     })
     const current = child
+    if (options.captureLogs) for (const stream of [current.stdout, current.stderr]) stream?.on('data', (chunk: Buffer) => { logs += chunk.toString('utf8') })
     exited = new Promise<void>(resolve => {
       current.once('exit', () => resolve())
       current.once('error', () => { failed = true; resolve() })
@@ -82,7 +84,16 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   const stop = async () => {
     try { await terminate() } finally { rmSync(directory, { recursive: true, force: true }) }
   }
-  const restart = async () => { await terminate(); await launch() }
+  // mutate: mengubah isi berkas data selagi proses berhenti (mis. memundurkan tanggal berakhir), agar waktu dapat diatur tanpa jam palsu.
+  const restart = async (mutate?: (data: any) => void) => {
+    await terminate()
+    if (mutate) {
+      const data = JSON.parse(readFileSync(dataFile, 'utf8'))
+      mutate(data)
+      writeFileSync(dataFile, JSON.stringify(data))
+    }
+    await launch()
+  }
   const call = async (method: string, path: string, token?: string, body?: unknown): Promise<CallResult> => {
     const response = await fetch(base + path, {
       method, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
@@ -92,6 +103,6 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string) {
   }
   try {
     await launch()
-    return { call, stop, restart, dataFile }
+    return { call, stop, restart, dataFile, logs: () => logs, get origin() { return base } }
   } catch (error) { await stop(); throw error }
 }

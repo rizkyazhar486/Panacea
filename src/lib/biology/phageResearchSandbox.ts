@@ -53,9 +53,19 @@ function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
 }
 
+/** Unknown counts stay unknown; only exactly representable whole observations are accepted. */
+export function parsePhageCount(value: unknown): number | null {
+  if (typeof value === 'string') {
+    const text = value.trim()
+    if (!/^\+?\d+$/.test(text)) return null
+    value = Number(text)
+  }
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null
+}
+
 function nonNegativeInteger(name: string, value: number) {
-  if (!Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
-    throw new RangeError(`${name} must be a non-negative integer`)
+  if (!Number.isFinite(value) || value < 0 || !Number.isSafeInteger(value)) {
+    throw new RangeError(`${name} must be a non-negative safe integer`)
   }
   return value
 }

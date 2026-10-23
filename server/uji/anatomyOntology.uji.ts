@@ -1,4 +1,4 @@
-import { anatomyOntologyLookup, anatomyStructureLookup } from '../src/anatomyOntology'
+import { anatomyOntologyLookup, anatomyStructureLookup } from '../src/domains/anatomy/anatomyOntology'
 
 let lulus = 0
 let gagal = 0

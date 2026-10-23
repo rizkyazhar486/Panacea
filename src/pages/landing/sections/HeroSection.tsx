@@ -1,6 +1,7 @@
 import { Reveal } from '../../../components/Reveal'
 import { InteractiveAura } from '../../../components/InteractiveAura'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
+import { scrollToSection } from './LandingHeader'
 import {
   IconShield,
   IconCheck,
@@ -81,12 +82,13 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
                   </span>
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 </button>
-                <a
-                  href="#roles"
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('roles')}
                   className="flex items-center rounded-full border border-black/10 bg-white/70 px-6 py-3 font-bold text-neutral-700 shadow-sm backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-neutral-800/70 dark:text-neutral-200"
                 >
                   Solusi Dokter &amp; Faskes
-                </a>
+                </button>
               </div>
             </Reveal>
 

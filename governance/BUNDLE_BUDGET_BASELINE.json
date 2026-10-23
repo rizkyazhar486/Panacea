@@ -1,0 +1,12 @@
+{
+ "_catatan": "Anggaran muatan awal F2 (scripts/qa/bundle-budget.mjs). Mengukur apa yang dirujuk dist/index.html: stylesheet pemblokir render, JS (modul + defer + modulepreload), gzip level 9. Metodologi: parse tag, baca berkas dari dist/, berkas yang dirujuk tapi hilang = galat, stylesheet lintas-origin dihitung sebagai pemblokir tetapi tidak diukur. Bukan waktu muat: audit UX memakai server dev Vite (muatMsMaks ~30-40 detik, kompilasi dingin) dan runner berderau, jadi detik tidak digerbang. Diukur lokal pada main ad48a2b25 (vite build): cssBlokirBerkas 15, cssBlokirGzip 111813, cssBlokirEksternal 2 (Google Fonts), jsBerkas 8, jsGzip 248975, jsBlokirBerkas 0, totalGzip 360788. Batas byte = terukur + 3%; hitungan berkas = terukur (jsBerkas +2 karena pemisahan chunk Vite dapat menambah modulepreload). Ini BATAS, bukan klaim 15 stylesheet render-blocking itu baik: temuan terbuka (788 KB CSS mentah dari ui-iterations/ dimuat sebelum render). Angka hanya boleh turun; ganti dengan pengukuran CI + 3% bila CI berbeda.",
+ "batas": {
+  "cssBlokirBerkas": 15,
+  "cssBlokirGzip": 115200,
+  "cssBlokirEksternal": 2,
+  "jsBerkas": 10,
+  "jsGzip": 256500,
+  "jsBlokirBerkas": 0,
+  "totalGzip": 371700
+ }
+}
