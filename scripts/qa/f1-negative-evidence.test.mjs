@@ -88,5 +88,6 @@ test('CI executes the evidence verifier and watches its implementation and tests
   assert.match(workflow, /elif ! node scripts\/qa\/f1-negative-evidence\.mjs "\$mode"/)
   assert.doesNotMatch(workflow, /elif ! grep/)
   assert.match(workflow, /node --test .*scripts\/qa\/f1-negative-evidence\.test\.mjs/)
-  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 2)
+  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 1, 'push trigger must watch evidence verifier/test changes')
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/, 'unfiltered main PR trigger must always run negative-evidence tests')
 })
