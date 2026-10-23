@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
  "source_sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
- "reproducer_sha256": "474590f3f203905a32a4592a4e487a1048c72a1248b61f7079fb2d087f1986ea",
+ "reproducer_sha256": "eafbd99d5d7384b1666cf77cf8e655483a0ec813c4c0dbf0bb026415dd73c470",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
@@ -52,6 +52,36 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "calcaneus (lowest vertex)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 1,
@@ -337,6 +367,152 @@
       ]
      }
     ]
+   },
+   "heelCalcaneus": {
+    "stance_phases": 2,
+    "stance_frames": 13,
+    "common_forward_speed_m_s": 1.2432985391254965,
+    "slide_rms_mm": 7.763764946696831,
+    "slide_max_mm": 16.643469604190706,
+    "display": {
+     "common_forward_speed_m_s": 1.243,
+     "slide_rms_mm": 7.8,
+     "slide_max_mm": 16.6
+    },
+    "phases_by_side": {
+     "L": [
+      "22-25+0-4"
+     ],
+     "R": [
+      "7-10"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9166666666666666,
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25
+      ],
+      "x": [
+       0.16777766650342726,
+       0.10500100496899066,
+       0.05062213063171364,
+       -0.003113936025159438,
+       -0.0545428602187069,
+       -0.10040070316078632,
+       -0.14595847193976827,
+       -0.19546584088331007,
+       -0.24963372168845507
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.2916666666666667,
+       0.3333333333333333,
+       0.375,
+       0.4166666666666667
+      ],
+      "x": [
+       0.23321739503363367,
+       0.1778632916858776,
+       0.1161438374375044,
+       0.049942003652959574
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "calcaneus (lowest vertex)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 2,
+    "stance_frames": 17,
+    "common_forward_speed_m_s": 1.2596362283084115,
+    "slide_rms_mm": 6.8601711990212015,
+    "slide_max_mm": 16.05205354692252,
+    "display": {
+     "common_forward_speed_m_s": 1.26,
+     "slide_rms_mm": 6.9,
+     "slide_max_mm": 16.1
+    },
+    "phases_by_side": {
+     "L": [
+      "22-25+0-6"
+     ],
+     "R": [
+      "9-14"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9166666666666666,
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25,
+       1.2916666666666667,
+       1.3333333333333333
+      ],
+      "x": [
+       0.3125280896707465,
+       0.24980793632333914,
+       0.1954114058050646,
+       0.14167037602607388,
+       0.09022919566049492,
+       0.044403071720210976,
+       -0.0012328031026949508,
+       -0.05075316174561495,
+       -0.10489544518318994,
+       -0.1656517019811709,
+       -0.22342134485428636
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.375,
+       0.4166666666666667,
+       0.4583333333333333,
+       0.5,
+       0.5416666666666666,
+       0.5833333333333334
+      ],
+      "x": [
+       0.2609925198722162,
+       0.19466485210900755,
+       0.13447149783009385,
+       0.08109538555276993,
+       0.029700225528480537,
+       -0.01855432563356318
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 2,
