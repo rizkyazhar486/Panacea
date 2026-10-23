@@ -8,7 +8,7 @@
 | `FAIL` | At least one check failed on this exact commit | `statusSha` + the first failing line |
 | `NOT_RUN` | No evidence for the current SHA | — |
 | `NOT_APPLICABLE` | Capability does not exist in the product yet (e.g. contributor backend role) | reason in `statusNote`; never counted as pass |
-| `BLOCKED_EXTERNAL` | External gates only: waiting on a named human decision | one precise question |
+| `DEFERRED_FINAL_STAGE` | External gates only: needs a qualified human; not requested now | activation condition in the JSON |
 | `DECIDED` | External gates only | link to the actual signed/dated record |
 
 These are different states and are never reported as each other:

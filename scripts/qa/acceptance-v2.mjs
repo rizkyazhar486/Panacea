@@ -26,7 +26,7 @@ export function validate(doc, { root = AKAR, legacyIds = null, fileExists = (p) 
   const criteria = Array.isArray(doc.criteria) ? doc.criteria : []
   const external = Array.isArray(doc.externalGates) ? doc.externalGates : []
   if (!criteria.length) err('criteria is empty')
-  for (const s of ['BLOCKED_EXTERNAL']) if (statuses.has(s)) err(`engineering statuses must not include ${s}; human gates live in externalGates`)
+  for (const s of ['BLOCKED_EXTERNAL', 'DEFERRED_FINAL_STAGE']) if (statuses.has(s)) err(`engineering statuses must not include ${s}; human gates live in externalGates`)
 
   const ids = new Set()
   for (const c of criteria) {
@@ -64,6 +64,7 @@ export function validate(doc, { root = AKAR, legacyIds = null, fileExists = (p) 
     if (!humanRoles.has(g.owner)) err(`${tag}: owner must be a human role`)
     for (const k of ['question', 'impact', 'artifact']) if (!g?.[k]) err(`${tag}: missing ${k}`)
     if (!extStatuses.has(g.status)) err(`${tag}: status ${g.status} not allowed`)
+    if (g.status !== 'DECIDED' && !g.activatesWhen) err(`${tag}: deferred gate needs activatesWhen (the condition that activates the human stage)`)
     if (g.status === 'DECIDED' && !g.decisionRef) err(`${tag}: DECIDED needs decisionRef to a real record`)
   }
 
@@ -77,7 +78,7 @@ export function validate(doc, { root = AKAR, legacyIds = null, fileExists = (p) 
   const summary = {
     engineeringTotal: criteria.length - count('NOT_APPLICABLE'),
     pass: count('PASS'), fail: count('FAIL'), notRun: count('NOT_RUN'), notApplicable: count('NOT_APPLICABLE'),
-    externalOpen: external.filter((g) => g.status === 'BLOCKED_EXTERNAL').length,
+    externalDeferred: external.filter((g) => g.status === 'DEFERRED_FINAL_STAGE').length,
     externalDecided: external.filter((g) => g.status === 'DECIDED').length,
   }
   return { errors, summary }
@@ -88,6 +89,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const legacy = JSON.parse(readFileSync(join(AKAR, 'governance/ALPHA_ACCEPTANCE_LEDGER.json'), 'utf8')).criteria.map((c) => c.id)
   const { errors, summary } = validate(doc, { legacyIds: legacy })
   for (const e of errors) console.error(`acceptance-v2 FAIL ${e}`)
-  if (summary) console.log(`acceptance-v2 engineering PASS ${summary.pass}/${summary.engineeringTotal} (FAIL ${summary.fail}, NOT_RUN ${summary.notRun}) | external gates open ${summary.externalOpen}, decided ${summary.externalDecided}`)
+  if (summary) console.log(`acceptance-v2 engineering PASS ${summary.pass}/${summary.engineeringTotal} (FAIL ${summary.fail}, NOT_RUN ${summary.notRun}) | human gates deferred to final stage ${summary.externalDeferred}, decided ${summary.externalDecided}`)
   process.exit(errors.length ? 1 : 0)
 }

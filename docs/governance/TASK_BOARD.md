@@ -4,7 +4,7 @@ Single queue for all agents. One row = one small PR. Update the row in the same 
 work (status, PR, SHA). Do not create parallel task lists or checkpoint essays.
 
 **WIP:** integrator 1 · each lane ≤ 2 open PRs · no file overlap between open PRs.
-**Status:** READY · IN_PROGRESS · IN_REVIEW · DONE · BLOCKED_EXTERNAL (→ EXTERNAL_GATES id).
+**Status:** READY · IN_PROGRESS · IN_REVIEW · DONE · DEFERRED_FINAL_STAGE (→ EXTERNAL_GATES id; not asked now).
 
 Snapshot main `256a22de`, 2026-10-23.
 
@@ -45,5 +45,5 @@ Snapshot main `256a22de`, 2026-10-23.
 
 ## Waiting on humans
 
-See [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not re-raise these; they are reviewed when the
+Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
 owner answers.
