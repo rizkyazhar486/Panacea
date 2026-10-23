@@ -1,0 +1,19 @@
+{
+  "schema": "panacea-critical-pages/v1",
+  "purpose": "Single source for the 'critical page list' referenced by ENG-F1-03 (resilience), ENG-F2-01 (contrast) and EXT-F2-A (manual pass). Every page must be covered by a slow-API, API-500 and recovery journey with a paired positive control; scripts/qa/user-journey-resilience.test.mjs asserts this list equals the routes the journeys actually test.",
+  "derivedFrom": "Routes exercised by the F1 resilience journeys on main 2026-10-23 (no page added or removed). Extending the product's critical list is a product decision; add the page here and to a journey in the same PR.",
+  "pages": [
+    { "route": "#/", "roles": ["pasien", "perawat", "lab"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/chatbot", "roles": ["pasien"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/settings", "roles": ["pasien"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/profile", "roles": ["pasien"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/fitness-hub", "roles": ["pasien"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/all-features", "roles": ["pasien"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/doctor-review", "roles": ["dokter"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/doctor-review/lab-results", "roles": ["dokter"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/owner", "roles": ["pemilik"], "journey": "user-journey-resilience.mjs" },
+    { "route": "#/harian", "roles": ["pasien"], "journey": "user-journey-e2e.mjs" },
+    { "route": "#/health-data", "roles": ["pasien"], "journey": "user-journey-e2e.mjs" },
+    { "route": "#/clinical-hub", "roles": ["pasien"], "journey": "user-journey-e2e.mjs" }
+  ]
+}

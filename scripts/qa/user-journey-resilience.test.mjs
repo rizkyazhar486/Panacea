@@ -58,3 +58,35 @@ test('contributor identity has explicit negative authorization coverage rather t
   assert.ok(main.includes('contributor cannot gain staff/owner/verifier powers'))
   assert.ok(main.includes('contributor token revoked on logout'))
 })
+
+// ENG-F1-03: daftar halaman kritis (governance/CRITICAL_PAGES.json) == rute yang BENAR-BENAR diuji ketahanannya, per peran, dua arah.
+// Rute dibaca dari kode perjalanan (bukan dari daftar tulisan tangan kedua), jadi menghapus satu rute dari skrip langsung gagal di sini.
+export function testedResilienceRoutes(resilience, e2e) {
+  const pairs = []
+  for (const m of resilience.matchAll(/J: '([a-z]+)'[\s\S]*?rute: \[([^\]]*)\]/g)) {
+    for (const r of m[2].matchAll(/'(#\/[^']*)'/g)) pairs.push(`${r[1]}|${m[1]}|user-journey-resilience.mjs`)
+  }
+  // Perjalanan 5 e2e (ketahanan) memakai sesi pasien dan satu daftar RUTE
+  const blok = e2e.match(/Perjalanan 5:[\s\S]*?const RUTE = \[([^\]]*)\]/)
+  if (blok) for (const r of blok[1].matchAll(/'(#\/[^']*)'/g)) pairs.push(`${r[1]}|pasien|user-journey-e2e.mjs`)
+  return pairs.sort()
+}
+const inventoryPairs = (inv) => inv.pages.flatMap((p) => p.roles.map((role) => `${p.route}|${role}|${p.journey}`)).sort()
+
+test('critical page inventory equals the routes the resilience journeys actually test (ENG-F1-03)', () => {
+  const inv = JSON.parse(readFileSync(new URL('../../governance/CRITICAL_PAGES.json', import.meta.url), 'utf8'))
+  const e2e = readFileSync(new URL('./user-journey-e2e.mjs', import.meta.url), 'utf8')
+  assert.equal(inv.schema, 'panacea-critical-pages/v1')
+  const routes = inv.pages.map((p) => p.route)
+  assert.equal(new Set(routes).size, routes.length, 'each critical page is listed once')
+  const tested = testedResilienceRoutes(script, e2e)
+  assert.ok(tested.length >= inv.pages.length, 'route extraction found the journeys')
+  assert.deepEqual(tested, inventoryPairs(inv), 'inventory and tested routes must match exactly (page, role, journey)')
+  // e2e journey 5 must keep its own paired positive control, slow API, API 500 and recovery for its pages
+  for (const s of ['kontrol positif tanpa gangguan', 'API lambat', '5xx', 'pemulihan']) assert.ok(e2e.includes(s), `e2e resilience step missing: ${s}`)
+  // negative controls: dropping a route from either journey, or a page from the inventory, must fail
+  const dropped = script.replace("'#/fitness-hub', ", '')
+  assert.notDeepEqual(testedResilienceRoutes(dropped, e2e), inventoryPairs(inv), 'removing #/fitness-hub from the journey must be detected')
+  assert.notDeepEqual(testedResilienceRoutes(script, e2e.replace("'#/health-data', '#/clinical-hub']", "'#/health-data']")), inventoryPairs(inv), 'removing #/clinical-hub from e2e must be detected')
+  assert.notDeepEqual(tested, inventoryPairs({ pages: inv.pages.slice(1) }), 'a page missing from the inventory must be detected')
+})
