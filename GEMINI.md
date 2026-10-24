@@ -11,6 +11,8 @@
 
 Gemini-class agents must follow the model-agnostic repository authorities in `AGENTS.md`, `PANACEA_CONSTITUTION.md`, `PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `PANACEA_HUMANITY_10_CHARTER.md`, `PANACEA_PRODUCT_MATURITY_OS.md`, and `PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`.
 
+All research, discovery, mechanistic modeling and long-range architecture must also follow [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md): verified clinical workflows fund a separate, permissioned, reproducible, externally validated frontier biomedical research lane. Never imply preclinical/clinical efficacy, regulatory authorization or partner access without evidence.
+
 For broad continuation, treat Panaceamed as a **Computational Human Platform**: preserve one canonical measured/recorded patient state, keep model-derived physiological state separate, deepen specialized domain engines, make cross-system coupling explicit, validate before stronger claims, and project shared state into Clinical, AI-EMR, Body Exposure and simulation. Prefer validated vertical depth over adding disconnected routes/widgets.
 
 # Gemini entry point

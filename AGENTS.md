@@ -5,6 +5,10 @@
 > Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
 
 
+## Frontier biomedical discovery directive — mandatory (owner, 2026-10-13)
+
+Every current and future agent must read and apply [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md) for long-horizon strategy, scientific research, physiology modeling, vision restoration, neurotechnology, regenerative medicine, AI discovery, and broad autonomous continuation. PanaceaMed's ambition is **verified clinical outcome delivery today plus original, independently validated biomedical science tomorrow**. Its scientific discovery mission is an evidence-gated parallel lane, **not** permission to destabilize the clinical wedge, perform unapproved experiments, claim treatment efficacy, or multiply shallow features. Follow its falsifiable-hypothesis, permissioned-data, reproducibility, external-validation, partnership and translational stage gates. Preserve all Constitution and exact-head CI/review requirements.
+
 ## Owner-directed Alpha clinical-review phase boundary (2026-10-17)
 
 **OWNER ACC C6 (2026-10-17): DOKTER RIZKY MUHAMMAD ASRIZAL MENYATAKAN TELAH MEMERIKSA DAN MENG-ACC RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. JANGAN MINTA PROFESOR/SPESIALIS ATAU TANDA TANGAN ULANG UNTUK MENUTUP ENGINEERING ALPHA.** Wajib ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). ACC ini adalah pernyataan review internal pemilik, bukan klaim validasi independen, STR terverifikasi, izin lisensi pihak ketiga, atau persetujuan untuk keputusan pasien. C6 tetap non-blocking/deferred dalam ledger formal.

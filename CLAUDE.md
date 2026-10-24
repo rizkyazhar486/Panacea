@@ -21,6 +21,11 @@ Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang me
 
 > Catatan migrasi: CLAUDE.md versi lama (1000+ baris, ledger arahan pemilik) dipindahkan utuh ke [`governance/doctrine/PANACEA_OWNER_DIRECTIVES.md`](governance/doctrine/PANACEA_OWNER_DIRECTIVES.md). Isinya tetap berlaku sebagai arahan produk/domain, **kecuali** aturan shipping "direct-to-main" yang kini digantikan oleh §5–§6 di bawah.
 
+
+## Frontier biomedical discovery — arahan pemilik 2026-10-13
+
+Semua agent wajib mengikuti [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md). Arah jangka panjang PanaceaMed adalah **verified healthcare outcome delivery + reproducible biomedical discovery**: riset fisiologi yang bisa difalsifikasi, data yang sah/berizin, metrik yang dipraspesifikasi, replikasi eksternal, lalu kolaborasi translasi bila lolos gate. **Bukan** klaim telah menemukan terapi, izin riset manusia, atau alasan mengabaikan current clinical wedge, keamanan, clinical review dan CI exact-head. Riset awal hanya satu slice terukur; hindari feature sprawl.
+
 ---
 
 ## 1. Gambaran proyek
@@ -298,6 +303,7 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 |---|---|
 | Apa pun yang luas / "lanjut" | `governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
 | Klaim ilmiah/klinis, R&D, novelty | `governance/doctrine/PANACEA_CONSTITUTION.md`, `DOCS/clinical-research/ACADEMIC-ACCURACY-GATE.md` |
+| Frontier biomedical research, neurotechnology, translational strategy | `PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`, `PANACEA_CONSTITUTION.md` |
 | Model manusia, fisiologi, simulasi, coupling | `governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/clinical-research/PHYSIOLOGICAL-RUNTIME.md` |
 | Data pasien, wearable, device, EMR | `governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/clinical-research/MEDICAL-DEVICE-FABRIC.md` |
 | Body Exposure / 3D / atlas | `DOCS/body-exposure/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `governance/doctrine/PANACEA_OWNER_DIRECTIVES.md` |
