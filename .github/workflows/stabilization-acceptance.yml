@@ -366,6 +366,20 @@ jobs:
           path: artifacts/dna-duration
           if-no-files-found: ignore
 
+      - name: Human Replay duration provenance and poster (synthetic component, mobile/desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node scripts/qa/human-replay-duration-smoke.mjs
+
+      - name: Upload Human Replay duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: replay-duration
+          path: artifacts/replay-duration
+          if-no-files-found: ignore
+
       - name: Training duration provenance (synthetic client, 390x844)
         timeout-minutes: 5
         env:
