@@ -59,10 +59,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Winter formula without a citation; the stepwise interpretation itself is unattributed."
+        "kind": "published",
+        "citation": "Albert, Dell & Winters, Ann Intern Med 1967;66:312-22",
+        "anchor": "Albert, Dell & Winters, Ann Intern Med 1967;66:312-22",
+        "basis": "Identifies only the Winter expected-PaCO2 step (1.5 x HCO3 + 8); PubMed has no abstract, so the constant is not checked against the text. The rest of the stepwise interpretation (pH status, primary disorder, albumin-corrected anion gap, delta ratio) remains unattributed.",
+        "doi": "10.7326/0003-4819-66-2-312",
+        "pmid": "6016545",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6016545",
+          "doi": "10.7326/0003-4819-66-2-312",
+          "retrievedOn": "2026-10-24",
+          "title": "Quantitative displacement of acid-base equilibrium in metabolic acidosis.",
+          "firstAuthor": "Albert",
+          "journal": "Ann Intern Med",
+          "year": 1967,
+          "pages": "312-22"
+        }
       }
     },
     {
@@ -222,10 +235,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "arithmetic",
         "citation": null,
         "anchor": null,
-        "basis": "Age-range validation only; the milestone list is not part of this engine and no source is claimed."
+        "basis": "Declared arithmetic: the engine only validates the 0-72 month age range written on the page; the Denver II milestone list is not part of this engine and no source is claimed for it."
       }
     },
     {
@@ -440,10 +453,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Holliday-Segar 4-2-1 rule without a citation."
+        "kind": "published",
+        "citation": "Holliday & Segar, Pediatrics 1957;19:823-32",
+        "anchor": "Holliday & Segar, Pediatrics 1957;19:823-32",
+        "basis": "The 4-2-1 method is named after this paper (PubMed record has no abstract); the 100/50/20 mL/kg constants have not been checked against the full text.",
+        "doi": null,
+        "pmid": "13431307",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "13431307",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "The maintenance need for water in parenteral fluid therapy.",
+          "firstAuthor": "Holliday",
+          "journal": "Pediatrics",
+          "year": 1957,
+          "pages": "823-32"
+        }
       }
     },
     {
