@@ -1005,6 +1005,7 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-source-label.mts",
             "governance/CALCULATOR_REVIEW_REGISTRY.json"
           ]
         }
@@ -1013,7 +1014,8 @@
       "evidence": "Registry test output at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Status stays NOT_RUN: only the machine-checkable half is built. Built: every one of the 47 engines has a source record in governance/CALCULATOR_REVIEW_REGISTRY.json (24 published with a citation bound to the engine header by an anchor, 9 named-method, 6 unattributed, 4 arithmetic, 4 repo-heuristic) and scripts/uji/calculator-source-label.mts, run by npm run uji, fails by name when an engine has no record, a citation is not in the engine header, an unsourced engine carries a citation, a page that renders an engine lacks the claim-boundary label, or a page hands an engine surface reviewer evidence. Negative controls on real files: label removed from the FeNa page, FeNa header year changed, a registry source removed, clinicianReviewed:true added to a page; each reported by name and reverted. NOT done: 19 of 47 engines have no citable source (a verified reference is needed, not an invented one); no DOI or PMID is recorded for any engine (citations are as written in the headers, not looked up); the source is not shown on the pages and formula and units display is not machine-checked. Details: docs/governance/CALCULATOR_SOURCE_LABEL.md."
     }
   ],
   "externalGates": [
