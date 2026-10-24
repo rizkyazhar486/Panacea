@@ -72,3 +72,19 @@ test('model_terbit_valid_lisensi_cc_by_3_dan_dua_kali_jalan_sama', async () => {
   assert.ok(r.model.phases[0].scale.every((x) => Math.abs(x - 1) < 1e-9), 'phase 0 is the reference')
   assert.deepEqual(sampleRespiration(r.model, 0.37), sampleRespiration(r.model, 0.37))
 })
+
+test('cycleAt rejects overflow rather than returning a NaN animation phase', () => {
+  for (const time of [Number.MAX_VALUE, -Number.MAX_VALUE]) {
+    assert.throws(() => cycleAt(time, 0.001), RangeError)
+    assert.throws(() => cycleAt(time, Number.MIN_VALUE), RangeError)
+  }
+})
+
+test('cycleAt preserves normal playback and finite boundary phases', () => {
+  for (const period of [2, 4, 10]) for (const time of [-10, -1, 0, 0.125, 2, 4, 60, 3600]) {
+    assert.equal(cycleAt(time, period), (((time / period) % 1) + 1) % 1)
+  }
+  assert.equal(cycleAt(Number.MAX_VALUE, Number.MAX_VALUE), 0)
+  assert.equal(cycleAt(Number.MIN_VALUE, Number.MIN_VALUE), 0)
+  assert.equal(cycleAt(0, Number.MIN_VALUE), 0)
+})
