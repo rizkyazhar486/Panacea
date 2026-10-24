@@ -336,7 +336,7 @@
       ],
       "status": "NOT_RUN",
       "statusSha": null,
-      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass."
+      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass. Run 39979532110 (push, 74eba9d8) green: patient 24/24, doctor 16/16, nurse 22/22, lab 22/22, owner 12+12, logout, two named negative controls fail. Stays NOT_RUN pending owner decision: admin has no UI journey of its own (owner UI + API RBAC only)."
     },
     {
       "id": "ENG-F1-02",
@@ -397,7 +397,8 @@
         "ENG-F1-01"
       ],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Run 39979532110 (push, 74eba9d8) covers all 9 inventory pages for 5 roles at 390x844 and 1440x900, 50/50 with positive control; sabotage controls bocor/overflow fail at named steps. Stays NOT_RUN: the named negative control (remove the error boundary from one listed page) does not exist yet."
     },
     {
       "id": "ENG-F2-01",
@@ -606,7 +607,7 @@
       ],
       "status": "FAIL",
       "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Legacy D7 note: RUN and female not measurable."
+      "statusNote": "Diagnosed 2026-10-24 (bodyexposure/qa_reports/gait_measurability.json, test scripts/uji/body-gait-measurability.mts): only male WALK is measurable. Male RUN heel landmark never comes within the 15 mm window (min 32.3/34.8 mm L/R); female WALK heel min 35.5/22.8 mm and the female source has no separate first metatarsal. This is a property of the retargeted source motion/geometry, not of the metric; making RUN/female measurable needs contact-corrected retargeting (R-D7-CONTACT), which changes motion data and is not done silently."
     },
     {
       "id": "ENG-D7-03",
@@ -631,9 +632,9 @@
       "negativeControl": "Missing landmark name fails the loader.",
       "evidence": "GLB node listing + metrics run at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Research task first (TASK_BOARD R-D7-RIG): unknown whether source rig can be extended without re-rigging."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638) on #2734 head 768a7858, tree identical to merge commit b7410bef: step \"Body Exposure rig landmarks and licence primary sources\" success — compare-blender-gait-contact + glb-add-foot-landmarks tests pass. Rig GLBs carry FOOT_LANDMARK_HEEL/BALL_<side> nodes (bodyexposure/qa_reports/rig_landmark_nodes.json, #2723); gait metrics consume them. Negative control: renamed FOOT_LANDMARK_BALL_R and a 1 mm moved heel node both fail the loader."
     },
     {
       "id": "ENG-D8-01",
@@ -693,8 +694,9 @@
       "dependsOn": [
         "ENG-D8-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: `npm run uji` success incl. body-attribution-coverage ok (506 GLB, 14 licence classes, 463 sources) with per-class removal control on the real page (#2709). Rendered page: bodyexposure/qa_reports/evidence/provenance-page-58d17d8a-{390x844,1440x900}.png (headless Chrome, CDP device emulation); public/bodyexposure/provenance.html is byte-identical at 58d17d8a and b7410bef. Header wrap at 390px later fixed in #2732."
     },
     {
       "id": "ENG-D8-03",
@@ -719,9 +721,9 @@
       "negativeControl": "Licence class without a primary-source record fails the audit.",
       "evidence": "Licence check table committed with retrieval dates.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "PR #2685 is in flight for fetal atlas CC0 verification."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: glb-provenance-audit exit 0 and licence-primary-sources tests pass; all 7 licence classes have a primary-source record in governance/LICENCE_PRIMARY_SOURCES.json (retrieved 2026-10-23T20:19:47Z, URL + SHA-256). Negative control: a class without a record fails. ICRP 145/156 are owner statements (EXT-D8-C), not verified licences. Wired into CI by #2734."
     },
     {
       "id": "ENG-E4-01",
@@ -954,7 +956,7 @@
       "dependsOn": [],
       "status": "PASS",
       "statusSha": "1f2771b1f95bd79b05baa09699e314fd8791802d",
-      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation."
+      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation. Update after suites 12 to 14: the cut-off and range-limit gaps listed above were pinned (see ENG-C6-02); a second sweep gives 1028 killed, 2 crashed, 24 survived of 1054, with no range-limit survivor left. The statusSha above still points at the earlier evidence."
     },
     {
       "id": "ENG-C6-02",
@@ -972,16 +974,17 @@
         {
           "cmd": "npm run uji",
           "files": [
-            "scripts/uji/calculator-review-registry.mts"
+            "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-adversarial-matrix.mts"
           ]
         }
       ],
       "negativeControl": "Engine returning a number for NaN fails the matrix.",
       "evidence": "Matrix output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Not started as a matrix. The C6-01 mutation sweep (docs/governance/CALCULATOR_MUTATION_SWEEP.md) found 94 surviving input-range limit mutants in 27 engines, e.g. meanArterialPressure SYSTOLIC_MMHG max 300 -> 301 is accepted by every reference suite, so the exact accepted limit is not pinned. A matrix needs a per-engine adapter because the call signatures differ; the range tables are already exported constants (e.g. SYSTOLIC_MMHG, DIASTOLIC_MMHG) and engines share inRange() from engine/inputs.ts."
+      "status": "PASS",
+      "statusSha": "8a5c1f07a01c872671e224982b77523e9e1780cb",
+      "statusNote": "PASS at 8a5c1f07a01c872671e224982b77523e9e1780cb (PR #2733 head; git tree 25019f1c94110ca47ccdb6df7505e32cdc4c47d4 is identical to main b073f39ff89aec1371931322a3df11ada0092df8, the squash merge). Validate changes run 40049447757: job validate 120738588989 (success) ran npm run uji and printed '778/778 berkas uji lulus'; server-validate job 120738588882 and full-acceptance job 120738589458 also success. The matrix's own output line is NOT quotable from that log (the log is truncated before the build and uji per-file lines); the count is the evidence that the suite ran: the same tree gave 778/778 locally with scripts/uji/calculator-adversarial-matrix.mts, (the count without that file was not measured, so this shows the run size, not the file by itself). What the suite does: scripts/uji/calculator-adversarial-matrix.mts attacks all 47 registry engines (57 adapters because call signatures and exported calculators differ) with 2026 runs: NaN, undefined, '', Infinity, -Infinity, negative, one step below/above the declared range, unit text ('70 mg/dL') and numeric text ('70') on every numeric input, plus categorical and yes/no probes. It requires a named rejection reason, no finite number in a rejected result (declared partials only), distinct reasons per field, boundary-accept pairs (exact min and max and real booleans are accepted) and a registry-coverage assertion (an engine without an adapter fails). Fail-open paths it found and that were fixed in the same PR: non-boolean yes/no input read as 'no' or by truthiness in stopBang, news2, sofaScore, meldNa and hydrationTarget; sleepDebt returned ok:true with a critical verdict for a night with blank hours. Negative controls on the real engines, each reported by name and reverted: MAP systolic range check removed; isFiniteNumber coercing numeric text (numeric-text accepted across engines); stopBang boolean guard reverted; sleepDebt night guard reverted; built-in self-tests classify an object-for-NaN engine, an empty reason, a thrown error and a number-carrying rejection. NOT shown: the matrix attacks the fields listed per adapter, so a new input field not added to an adapter is not attacked (a new engine without an adapter does fail); it proves bad input is refused with a reason, not that any accepted value, range or cut-off is clinically right; clinically_reviewed stays false for every engine; sleepDebt calendar-impossible dates (2026-02-30) are still accepted. Details: docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md."
     },
     {
       "id": "ENG-C6-03",
