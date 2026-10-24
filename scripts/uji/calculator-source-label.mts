@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import {
   checkSourceRecords, engineHeader, SOURCE_KINDS, type SourceRecord,
 } from '../../src/domains/clinical-calculators/engine/sourceRecord.ts'
+import { describeSource } from '../../src/domains/clinical-calculators/engine/sourceLine.ts'
 import { reviewedCount, type ReviewRegistry } from '../../src/domains/clinical-calculators/engine/reviewRegistry.ts'
 import { clinicalClaimDisclosure, clinicalClaimLabel, klaimPermukaanKesehatan } from '../../src/lib/clinicalClaimMaturity.ts'
 
@@ -112,6 +113,35 @@ for (const e of reg.entries) {
   for (const p of unlabeled(pages, text)) unlabeledByEngine.push(`${e.id}: ${p.split('/src/')[1]}`)
 }
 assert.deepEqual(unlabeledByEngine, [], 'every page that renders an engine result shows the claim boundary')
+
+// sumber terlihat: setiap halaman yang menampilkan sebuah mesin juga memuat <SumberKalkulator ids={[...]}> berisi id mesin itu
+const SRC_TAG = /<SumberKalkulator\b[^>]*\bids=\{\[([^\]]*)\]\}/g
+export const sourceIdsOn = (src: string) => new Set([...src.matchAll(SRC_TAG)].flatMap((m) => [...m[1]!.matchAll(/'(\w+)'/g)].map((x) => x[1]!)))
+export const sourceMissing = (engineId: string, pages: string[], files: ReadonlyMap<string, string>) => pages.filter((p) => !sourceIdsOn(files.get(p) ?? '').has(engineId))
+const sourceMissingByEngine: string[] = []
+for (const e of reg.entries) for (const p of sourceMissing(e.id, pagesUsing(exportsOf(e.id), text), text)) sourceMissingByEngine.push(`${e.id}: ${p.split('/src/')[1]}`)
+assert.deepEqual(sourceMissingByEngine, [], 'every page that renders an engine result lists that engine in its source disclosure')
+{
+  const pg = "import { SumberKalkulator } from '../components/ui/SumberKalkulator'\nexport const A = () => <SumberKalkulator ids={['fena', 'qtc']} />"
+  assert.deepEqual([...sourceIdsOn(pg)], ['fena', 'qtc'])
+  const fake = new Map([['/x/A.tsx', pg], ['/x/B.tsx', "export const B = () => <SumberKalkulator ids={['qtc']} />"], ['/x/C.tsx', 'export const C = () => null'], ['/x/D.tsx', "export const D = () => <SumberKalkulator ids={['fena']} className=\"x\" />"]])
+  assert.deepEqual(sourceMissing('fena', ['/x/A.tsx', '/x/B.tsx', '/x/C.tsx', '/x/D.tsx'], fake), ['/x/B.tsx', '/x/C.tsx'], 'a page that lists other engines, or none, is named')
+  assert.deepEqual(sourceMissing('qtc', ['/x/A.tsx', '/x/B.tsx'], fake), [], 'listing the engine is enough')
+}
+
+// teks sumber: kutipan tampil apa adanya, tautan hanya dari identifier yang tersimpan dan sah, sumber tak bernama tidak diberi kutipan
+{
+  const pub = describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'Contoh 1999', basis: 'b', pmid: '12345', doi: '10.1000/abc' })
+  assert.deepEqual(pub, { id: 'x', kind: 'published', label: 'Published source', text: 'Contoh 1999', pubmedUrl: 'https://pubmed.ncbi.nlm.nih.gov/12345/', doiUrl: 'https://doi.org/10.1000/abc' })
+  assert.equal(describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'a', basis: 'b' }).pubmedUrl, null, 'tanpa PMID tersimpan tidak ada tautan')
+  assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: 'PMC1', doi: 'doi:1' }).pubmedUrl, null, 'PMID tak sah tidak jadi tautan')
+  assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: '1', doi: 'javascript:alert(1)' }).doiUrl, null, 'DOI tak sah tidak jadi tautan')
+  const un = describeSource('x', { kind: 'unattributed', citation: null, anchor: null, basis: 'Standard equation; no publication named.', pmid: '999' })
+  assert.deepEqual([un.label, un.text, un.pubmedUrl], ['No source recorded', 'Standard equation; no publication named.', null], 'sumber tak bernama tidak membawa tautan walau ada PMID nyasar')
+  assert.equal(describeSource('x', undefined).kind, 'unknown')
+  assert.equal(describeSource('x', { kind: 'verified' as never, citation: 'C', anchor: 'a', basis: 'b' }).kind, 'unknown', 'kind tak dikenal gagal tertutup')
+  assert.equal(describeSource('x', null).text, 'No source record was found for this calculator.')
+}
 
 // negatif berpasangan: halaman tanpa label, halaman tanpa impor mesin
 {

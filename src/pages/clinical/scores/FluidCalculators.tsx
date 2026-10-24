@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { maintenanceFluid, resuscitation, correctedSodium, naCorrectionRate, potassiumDeficit, parseNumberField } from '../../../domains/clinical-calculators'
 import type { ResusScenario } from '../../../domains/clinical-calculators'
 
@@ -252,6 +253,7 @@ export function FluidCalculators() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Fluid & Electrolyte Calculators" subtitle="Maintenance, resuscitation & electrolyte correction in one place" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['fluidElectrolytes']} />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>

@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { correctedCalcium, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@ export function CorrectedCalcium() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Corrected Calcium" subtitle="Published Payne corrected calcium (1973) — not a clinically validated Panacea decision" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['correctedCalcium']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Sekitar separuh kalsium serum terikat protein (terutama albumin) — albumin yang rendah membuat kalsium total terbaca rendah palsu meskipun bagian yang aktif secara fisiologis (terionisasi) sebenarnya normal. Jebakan yang sangat lazim di sisi tempat tidur pada pasien rawat inap, kurang gizi, atau sirosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Measured total calcium (mg/dL)">

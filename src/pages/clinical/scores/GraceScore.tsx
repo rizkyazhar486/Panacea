@@ -5,6 +5,7 @@ import { IconHeart } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { graceScore, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ export function GraceScore() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="GRACE Score" subtitle="ACS in-hospital mortality (Granger et al. 2003)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['graceScore']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mencakup seluruh rentang sindrom koroner akut (STEMI, NSTEMI, angina tidak stabil) dan lebih dianjurkan dalam panduan ESC untuk menentukan waktu strategi invasif — melengkapi skor TIMI yang khusus untuk UA/NSTEMI.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
