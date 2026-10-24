@@ -161,5 +161,54 @@ for (const surface of surfaces) {
   report.push(metrics)
 }
 
+// The spaces menu hangs from the header. A stylesheet that forced it back into flow once squeezed it to ~176px, collapsed the page title
+// to 0px and let the page text show through it, so it is measured on the real page rather than assumed.
+{
+  pageErrors.length = 0
+  await page.goto(`${origin}/#/`, { waitUntil: 'domcontentloaded', timeout: 45_000 })
+  await page.waitForSelector('header[data-panacea-command-bar]', { state: 'visible' })
+  await page.getByRole('button', { name: 'Open Panacea spaces' }).click()
+  const panel = page.locator('.pmd-command-spaces')
+  await panel.waitFor({ state: 'visible' })
+  const menu = await page.evaluate(() => {
+    const header = document.querySelector('header[data-panacea-command-bar]')
+    const panelNode = document.querySelector('.pmd-command-spaces')
+    const title = header.querySelector('h1')
+    const hr = header.getBoundingClientRect()
+    const pr = panelNode.getBoundingClientRect()
+    const style = getComputedStyle(panelNode)
+    const alpha = (css) => { const m = /rgba?\(([^)]+)\)/.exec(css); if (!m) return 0; const p = m[1].split(',').map((x) => Number.parseFloat(x)); return p.length > 3 ? p[3] : 1 }
+    // Items below the fold are reachable only if the panel scrolls: bring each into view inside the panel before the hit test.
+    const links = [...panelNode.querySelectorAll('a, button')].map((node) => {
+      node.scrollIntoView({ block: 'nearest' })
+      const r = node.getBoundingClientRect()
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+      return { label: node.textContent?.trim().slice(0, 24), top: r.top, bottom: r.bottom, covered: !(hit && panelNode.contains(hit)) }
+    })
+    return {
+      position: style.position,
+      headerBottom: hr.bottom,
+      panel: { left: pr.left, right: pr.right, top: pr.top, bottom: pr.bottom, width: pr.width },
+      viewportHeight: window.innerHeight,
+      titleWidth: title.getBoundingClientRect().width,
+      backgroundAlpha: alpha(style.backgroundColor),
+      backdropFilter: style.backdropFilter,
+      links,
+    }
+  })
+  await page.screenshot({ path: `${outDir}/spaces-menu.png`, fullPage: false })
+  if (menu.position !== 'absolute') throw new Error(`spaces menu: position is ${menu.position}, it must hang from the header out of flow`)
+  if (menu.panel.top < menu.headerBottom - 1) throw new Error(`spaces menu: opens over the header (top ${menu.panel.top} < header bottom ${menu.headerBottom})`)
+  if (menu.panel.left < -1 || menu.panel.right > viewportWidth + 1) throw new Error(`spaces menu escapes the viewport: ${JSON.stringify(menu.panel)}`)
+  if (menu.panel.width < Math.min(300, viewportWidth - 24)) throw new Error(`spaces menu squeezed to ${menu.panel.width}px`)
+  if (menu.panel.bottom > menu.viewportHeight + 1) throw new Error(`spaces menu runs off the screen: bottom ${menu.panel.bottom} > viewport ${menu.viewportHeight}`)
+  if (menu.titleWidth < 20) throw new Error(`spaces menu: page title collapsed to ${menu.titleWidth}px`)
+  if (menu.backgroundAlpha < 0.99) throw new Error(`spaces menu: background is ${menu.backgroundAlpha} opaque, page text shows through it`)
+  const covered = menu.links.filter((l) => l.covered)
+  if (menu.links.length < 8 || covered.length) throw new Error(`spaces menu: ${menu.links.length} items, covered or unreachable: ${JSON.stringify(covered)}`)
+  if (pageErrors.length) throw new Error(`spaces menu: page errors: ${pageErrors.join(' | ')}`)
+  report.push({ id: 'spaces-menu', ...menu, links: menu.links.length })
+}
+
 console.log(JSON.stringify({ ok: true, surfaces: report }, null, 2))
 await browser.close()

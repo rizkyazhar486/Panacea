@@ -334,9 +334,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass."
+      "status": "PASS",
+      "statusSha": "81999e3a7b28ace6625634b8edc7b4cfe4aa0a34",
+      "statusNote": "User Journey Acceptance push run 40057229053 (job user-journeys 120762770434) at 81999e3a (main): user-journey-e2e 72/0 (patient 24/24, doctor 16/16, owner 12/12, API RBAC 4/4, API-unavailable 4/4; logout asserted for patient, doctor, owner and API RBAC), user-journey-staff 57/0 (nurse 22/22, lab 22/22, owner-staff 12/12), at 390x844 and 1440x900; negative controls bocor and overflow fail at a named step and f1-negative-evidence.mjs verifies both. Admin: covered by the owner UI journey plus API RBAC, by owner decision D-F1-ADMIN (2026-10-24, in chat). Contributor stays NOT_APPLICABLE (no backend capability), never counted as pass."
     },
     {
       "id": "ENG-F1-02",
@@ -363,9 +363,9 @@
       "negativeControl": "Granting nurse a doctor-only write must fail the matrix.",
       "evidence": "server-validate run ID at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Clinician tenant-wide read is current behaviour; changing it waits on EXT-F1-A. Tests must pin current behaviour, not decide policy."
+      "status": "PASS",
+      "statusSha": "7e19ddcabb8dff56cbc2ff43982c3fc29bcd6f41",
+      "statusNote": "PASS at 7e19ddcabb8dff56cbc2ff43982c3fc29bcd6f41 (PR #2741 head; git tree 1f64c97faa56d1ab6f98af582ab7551a790df87d is identical to main d6073ce86795ea3563674a9304beb235b3dc3d71). Validate changes run 40053578343, job server-validate 120751432318 (success) ran cd server && npm run uji and printed the three suite lines: 'staffRbacHttp: perawat/lab roles are owner-granted only, patient-scoped by explicit assignment, refuse everything unassigned, revoke instantly and are audited', 'careHttpRbac: ... patient-only answers with server-derived subject, validation and idempotency, offline-time clamp, replacement and revocation; passed', 'labShareHttpRbac: twelve real lab-log / lab-share routes, anonymous 401, own-only patient data, named-verified-doctor-only clinician access, audit, review bounds and immediate revocation; passed'. Negative controls on the real server code, each reverted: (1) mapping the nurse role to a clinician actor in modules/labResults/http/aktor.ts fails staffRbacHttp with 'nurse without assignment lists nothing'; (2) granting nurse the doctor-only 'reviewed' step (roles.reviewed and needsAuthorizedClinician in modules/labResults/domain/definitions.ts) fails staffRbacHttp with 'a nurse cannot review (clinician-only step)' (200 !== 403). The suites pin current behaviour, including clinician tenant-wide read; changing it waits on EXT-F1-A. NOT shown: the server has a single practice tenant constant, so isolation tested is per patient (explicit assignment, own-only data), not between tenants; the suites cover the staff, care and lab-share route groups, not every route group in the RBAC matrix (see ENG-E4-02 for the remaining groups); no human review of the policy itself."
     },
     {
       "id": "ENG-F1-03",
@@ -396,8 +396,9 @@
       "dependsOn": [
         "ENG-F1-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "81999e3a7b28ace6625634b8edc7b4cfe4aa0a34",
+      "statusNote": "PASS at 81999e3a7b28ace6625634b8edc7b4cfe4aa0a34 (main, the squash merge of #2742). User Journey Acceptance (F1) run 40057229053 (event push, branch main) job user-journeys 120762770434 success. Quoted from that job log: 'user-journey-resilience: 50 lulus, 0 gagal' (slow API, API 5xx and recovery steps over the inventory pages for the supported roles at 390x844 and 1440x900, positive control); 'user-journey-resilience: 20 lulus, 0 gagal' for the render-crash step (every listed page is made to crash at render; the shell must stay alive, the error must stay in the route boundary, the page must recover). Negative controls, each failing by named step and then checked by f1-negative-evidence: bocor 'API lambat: #/: teks bocor saat lambat: [object Object],NaN | #/chatbot ... | #/all-features ...' then 'F1 negative control bocor: detector evidence verified'; overflow 'overflow 3610px saat lambat' on the same six routes then 'F1 negative control overflow: detector evidence verified'; and the one this criterion was missing, the build without the route error boundary (VITE_QA_NO_ROUTE_BOUNDARY=1): 'crash render: #/: cangkang hilang setelah crash render (layar galat akar tampil) | #/chatbot ... | #/all-features ...' then 'F1 negative control crash: detector evidence verified'. The inventory equals the covered routes: scripts/qa/f1-critical-pages.test.mjs (inside npm run build) requires governance/F1_CRITICAL_PAGES.json to equal the per-role routes of user-journey-resilience.mjs in both directions and every route to resolve to a real page; the workflow step 'F1 critical action and workflow path contracts' also succeeded. The files that define this check (user-journey-resilience.mjs and its test, f1-critical-pages.mjs and its test, f1-negative-evidence.mjs and its test, F1_CRITICAL_PAGES.json, the workflow, RouteErrorBoundary.tsx) are byte-identical between 81999e3a and main 32a1761c; src changed in that range only under src/domains/clinical-calculators/engine. NOT shown: only the tail of the job log was read, so the negative-crash failure lines I quote name the six patient routes and I did not see the failure lines for the doctor, owner, nurse and lab routes; the positive step passes all roles. Only the synthetic-identity real-app journeys are covered, not production. The galat-render sabotage in open PR #2739 is not part of this evidence."
     },
     {
       "id": "ENG-F2-01",
@@ -606,7 +607,7 @@
       ],
       "status": "FAIL",
       "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Legacy D7 note: RUN and female not measurable."
+      "statusNote": "Diagnosed 2026-10-24 (bodyexposure/qa_reports/gait_measurability.json, test scripts/uji/body-gait-measurability.mts): only male WALK is measurable. Male RUN heel landmark never comes within the 15 mm window (min 32.3/34.8 mm L/R); female WALK heel min 35.5/22.8 mm and the female source has no separate first metatarsal. This is a property of the retargeted source motion/geometry, not of the metric; making RUN/female measurable needs contact-corrected retargeting (R-D7-CONTACT), which changes motion data and is not done silently."
     },
     {
       "id": "ENG-D7-03",
@@ -631,9 +632,9 @@
       "negativeControl": "Missing landmark name fails the loader.",
       "evidence": "GLB node listing + metrics run at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Research task first (TASK_BOARD R-D7-RIG): unknown whether source rig can be extended without re-rigging."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638) on #2734 head 768a7858, tree identical to merge commit b7410bef: step \"Body Exposure rig landmarks and licence primary sources\" success — compare-blender-gait-contact + glb-add-foot-landmarks tests pass. Rig GLBs carry FOOT_LANDMARK_HEEL/BALL_<side> nodes (bodyexposure/qa_reports/rig_landmark_nodes.json, #2723); gait metrics consume them. Negative control: renamed FOOT_LANDMARK_BALL_R and a 1 mm moved heel node both fail the loader."
     },
     {
       "id": "ENG-D8-01",
@@ -693,8 +694,9 @@
       "dependsOn": [
         "ENG-D8-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: `npm run uji` success incl. body-attribution-coverage ok (506 GLB, 14 licence classes, 463 sources) with per-class removal control on the real page (#2709). Rendered page: bodyexposure/qa_reports/evidence/provenance-page-58d17d8a-{390x844,1440x900}.png (headless Chrome, CDP device emulation); public/bodyexposure/provenance.html is byte-identical at 58d17d8a and b7410bef. Header wrap at 390px later fixed in #2732."
     },
     {
       "id": "ENG-D8-03",
@@ -719,9 +721,9 @@
       "negativeControl": "Licence class without a primary-source record fails the audit.",
       "evidence": "Licence check table committed with retrieval dates.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "PR #2685 is in flight for fetal atlas CC0 verification."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: glb-provenance-audit exit 0 and licence-primary-sources tests pass; all 7 licence classes have a primary-source record in governance/LICENCE_PRIMARY_SOURCES.json (retrieved 2026-10-23T20:19:47Z, URL + SHA-256). Negative control: a class without a record fails. ICRP 145/156 are owner statements (EXT-D8-C), not verified licences. Wired into CI by #2734."
     },
     {
       "id": "ENG-E4-01",
@@ -776,9 +778,9 @@
       "negativeControl": "Adding console.log(req.body) to a clinical route fails the suite.",
       "evidence": "server-validate run ID at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Evidence so far, status stays NOT_RUN. logPrivacyHttp passed in server-validate job 120538961247 (run 39989986652, success) at dae2f180 (tree identical to main 2cc6b05f). Covered: (1) static guard over all of server/src: no console statement may receive request data (0 of 69 calls); (2) dynamic journey over clinical patient/record, lab-results, lab-log and shares, health webhook/profile, settings, second-opinion, feedback and auth; (3) seven malformed or oversize payloads (truncated JSON, trailing garbage, unquoted keys, single quotes, plain text, 13 MB over the 12 MB limit) are refused 400/413 and leave no content in the log. Sabotage that fails by name: console.log(req.body) on reminders/applications/clinical routes, req.query in a template, multi-line req.headers, console.error(err) and JSON.stringify(err) on the parse-error branch, a refused payload answered 200. Honest negatives: logging only err.message, or the too-large error, leaks no payload content on this Node version, so those variants pass correctly. NOT met: the criterion says every route group in the RBAC matrix; the dynamic journey does not yet hit all 15 clinical routes of rbacKlinis or the referral, care, reminder, application, genomics and health-series groups. Known limits: the guard is syntactic (data copied into another variable first is not seen); the 500 path passes err.message and stack to alertOwner and no test makes a route throw with payload data; process.stderr.write in src/mcp/stdio.ts is outside the guard. Console inventory (main e5d3c9f1): 69 console statements; 24 in src/index.ts, of which the personal-data routes are PUT /api/settings, POST /api/lab-log/shares, POST /api/clinician/lab-shares/:id/review and /care-plan, and POST /api/health-webhook/:token. The first four of those and the webhook are exercised by the dynamic journey; /care-plan logs only a push-notification failure message. The external lookup routes (PubMed, trials, openFDA, RxNorm, MyGene, markets) log only e.message of upstream errors, and their helpers throw static codes such as mygene_search_503 or market source 503, never the search term. The remaining 45 are in sports.ts (24, upstream), store.ts (10, operational), push.ts, ai.ts and similar. This argues that the log channel is small and covered, but the criterion text asks for every route group in the RBAC matrix, which the dynamic journey does not yet show, so the status is not changed."
+      "status": "PASS",
+      "statusSha": "bc0b8b840d64bd00a4033ec1a89301f5944e1989",
+      "statusNote": "PASS at bc0b8b840d64bd00a4033ec1a89301f5944e1989 (PR #2748 head; git tree c61bf0753c3502d540b717cc40bb10958a35c25e is identical to main bf21998f3f4120ea1119b388e1264e28ca4c67a5, the squash merge). Validate changes run 40072207084: job server-validate 120807890665 (success) ran cd server && npm run uji, which includes server/uji/logPrivacyHttp.uji.ts; job validate 120807890907 (success); Stabilization full-acceptance run 40072207140 job 120807948797 and server-acceptance job 120807948927 also success. The suite's own output lines (including the statistics line) are NOT quotable from the truncated job log; the evidence is that the step sits inside a job that succeeded, plus the local run before merge (74 routes, 124 markers) and the four sabotages named below. What it does: server/uji/logPrivacyHttp.uji.ts section 2c drives EVERY route of the RBAC-matrix groups with distinctive markers in the path, the query and the body, as the owning role: the 15 clinical routes of rbacKlinis, referrals, care, reminders, applications, genomics, health-series, lab-results, lab-log, clinician lab-shares, keadaan-longitudinal, health-alerts, health-profile, health-sync, health-webhook, settings, second-opinion, owner staff and audit, doctors (74 routes, 124 markers, statuses 200:42, 201:1, 400:5, 403:3, 404:21, 409:2). The route list is read from server/src and must equal the driven list in both directions, so a new route in these groups fails until it gets an entry. No route may answer 5xx with marker data, and none of the markers may appear in the server log. Sabotage on the real routes, each failed by name and reverted: a copied request body logged in PATCH reminders and in POST /api/owner/staff-role, and a copied query logged in GET /api/lab-results (none of these is visible to the syntactic static guard, the dynamic markers catch them); a handler that throws with the path id (DELETE reminders answered 500); a new route in the reminders and in the settings group; one driven entry removed. Earlier evidence still stands: the static guard over all of server/src (no console statement may receive request data), the seven malformed or oversize payloads, the gzip probes. NOT shown: statuses are mostly 200 and 404, so many routes are exercised on their not-found or validation path, not with a full valid payload; a handler that logs data it derived (not a copy of the request) from a stored record is covered only where the journey stored such data; the 500 path (alertOwner with err.message and stack) is checked only by the no-5xx assertion, not by making a route throw with payload data in production; process.stderr.write in src/mcp/stdio.ts is outside the guard; the criterion's 'RBAC matrix' is read as the union of the route groups exercised by the seven *Rbac* suites, plus applications and genomics which the earlier note listed."
     },
     {
       "id": "ENG-E4-03",
@@ -803,8 +805,9 @@
       "negativeControl": "Expired synthetic record still readable after a sweep fails the harness.",
       "evidence": "Harness test output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "b7329cb47ede927614b1367dece8082ab1178384",
+      "statusNote": "PASS at b7329cb47ede927614b1367dece8082ab1178384 (PR #2749 head; git tree 6860fc6d456075cf5088afd935e6ca7b5a18856f is identical to main 8e9e26e754e7e0b6e1ff76563a048f7808049d71, the squash merge). Validate changes run 40073381361: job server-validate 120811445004 (success) ran cd server && npm run uji, which includes server/uji/retention.uji.ts (wired before the proxyAddr step); job validate 120811445155 success; Stabilization full-acceptance run 40073381358 job 120811445148 and server-acceptance job 120811444941 also success. The suite's own output line ('retention.uji: ok') is NOT quotable from the truncated job log; the evidence is that the step sits inside a job that succeeded, plus the local run before merge and five sabotages that each failed it (>= at the boundary, audit entry not written, deletion not executed, NaN date accepted, and the negative control). What it does: server/src/modules/retention/domain/retentionPolicy.ts validates a policy file fail-closed (unknown field, bad version/status, non-integer/zero/negative/NaN/Infinity/text/over-maximum days, bad collection name, unset-with-values, approved without approver/date/decision reference), plans and applies a sweep with an injected clock and store: records strictly older than the rule are deleted, exactly at the threshold are kept, records with unprovable age are never deleted, collections without a rule are untouched, a null rule deletes nothing, the audit entry is written before each deletion and is never pruned when audit maxAgeDays is null. Negative control: an expired record still readable after a sweep is judged a failure. Production policy governance/RETENTION_POLICY.json is status unset with no numbers: no legal or clinical retention value is invented and EXT-E4-A stays open. NOT shown: the harness is not wired to server/src/store.ts or scheduled, so it does not yet enforce retention on real data; the memory store in the test is synthetic; the draft decisions D1-D8 are unapproved."
     },
     {
       "id": "ENG-E7-01",
@@ -880,8 +883,10 @@
       "done": "Rollback script + dry-run test committed; real rollback stays an infra-owner action.",
       "checks": [
         {
-          "cmd": "node --test scripts/qa/production-browser-verdict.test.mjs",
+          "cmd": "node --test scripts/qa/rollback-plan.test.mjs",
           "files": [
+            "scripts/qa/rollback-plan.mjs",
+            "scripts/qa/rollback-plan.test.mjs",
             ".github/workflows/vercel-prebuilt-production.yml"
           ]
         }
@@ -891,9 +896,9 @@
       "dependsOn": [
         "ENG-E7-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Rollback script does not exist yet; check entry points at the release workflow it will extend."
+      "status": "PASS",
+      "statusSha": "641c1eafa7eb656c8d1038fe571655f7e94a125d",
+      "statusNote": "PASS at 641c1eafa7eb656c8d1038fe571655f7e94a125d (PR #2746 head; git tree 764f5ec75322d19c2d4a78f7e4a4676805c5215a is identical to main 1ba97370edac198af599ea588b614ab6177aea4a, the squash merge). Validate changes run 40070423289: job validate 120802469332 (success) ran npm run build, whose test step is node --test scripts/qa/*.test.mjs and therefore includes scripts/qa/rollback-plan.test.mjs (14 tests), then npm run uji ('780/780 berkas uji lulus'); job server-validate 120802469526 and full-acceptance run 40070423296 job 120802469447 also success. The node --test output lines of rollback-plan.test.mjs are NOT quotable from that log (it is truncated before the build step); the evidence is that the build step sits inside a job that succeeded, plus the local run before merge: 14/14. What it does: scripts/qa/rollback-plan.mjs is a dry-run only (it starts only git, no execute mode, asserted by a test). It resolves a 40-hex target SHA that is an ancestor of main to the deployment URL in smoke-verified release evidence and prints 'vercel rollback <url> --scope=panaceamed' marked NOT EXECUTED; it refuses by name for a malformed SHA, a SHA not on main or unknown to git (negative control: a verified-evidence commit on a side branch is refused, tested end to end on a temporary git repository), no evidence, unverified evidence, ambiguous or invalid deployment URL. Real-repo dry-runs before merge: main~1 without evidence -> no-release-evidence; an unmerged branch SHA -> target-not-on-main; 'abc' -> invalid-target-sha. Sabotage on the real script, each reported by test name and reverted: on-main check removed (3 tests fail), any evidence status accepted (2), URL validation removed (1), ambiguity relaxed (1), exec path added (1). NOT shown: no real evidence artifact was used (artifacts could not be downloaded in this environment), so the success path is proven on fixtures and a temporary git repository, not a real deployment; it does not prove the old deployment still serves or is compatible with the current backend; evidence artifacts are kept 30 days, so older targets are refused; the rollback itself stays an infra-owner action. Details: docs/governance/ROLLBACK.md."
     },
     {
       "id": "ENG-E7-04",
@@ -954,7 +959,7 @@
       "dependsOn": [],
       "status": "PASS",
       "statusSha": "1f2771b1f95bd79b05baa09699e314fd8791802d",
-      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation."
+      "statusNote": "PASS at 1f2771b1f95bd79b05baa09699e314fd8791802d (PR #2726 head; git tree 94f692bf2d67ce20abb730042f0552fffd2993d2 is identical to main e5d3c9f108e0bfe7cbc54d021e865f0ca594e78d). Validate changes run 39993137997, job validate 120549725081 (success) ran npm run uji: all 11 calculator-independent-reference suites printed their ok line and 'calculator-reference-coverage: 47/47 engines invoked by 11 independent reference suites; comment/import/string/identifier-only mentions rejected'. Negative control at scale: scripts/qa/calculator-mutation-sweep.mts mutated every numeric literal (value+1) of all 47 engines (1054 mutants) on that tree: 909 killed by an AssertionError, 17 crashed (not credited), 128 survived. Survivors were read one by one: none is a multiplicative or additive formula coefficient (e.g. MELD-Na 1.32, 0.033, 137 killed). Results and the per-engine table: docs/governance/CALCULATOR_MUTATION_SWEEP.md. NOT shown: the references do not pin 94 input-range limits (27 engines, ENG-C6-02 scope), nor interpretation cut-offs, clamps and one formula condition (meldNa meld > 11, graceScore 108/140, meldNa 6/40, news2 total >= 1, MAP 60/100, pediatricDka floor, sleepDebt month pattern). Mutation is one +1 change per literal; operators and control flow are not mutated; a survivor can be an equivalent mutant. clinically_reviewed stays false for every engine; this is not clinical validation. Update after suites 12 to 14: the cut-off and range-limit gaps listed above were pinned (see ENG-C6-02); a second sweep gives 1028 killed, 2 crashed, 24 survived of 1054, with no range-limit survivor left. The statusSha above still points at the earlier evidence."
     },
     {
       "id": "ENG-C6-02",
@@ -972,16 +977,17 @@
         {
           "cmd": "npm run uji",
           "files": [
-            "scripts/uji/calculator-review-registry.mts"
+            "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-adversarial-matrix.mts"
           ]
         }
       ],
       "negativeControl": "Engine returning a number for NaN fails the matrix.",
       "evidence": "Matrix output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Not started as a matrix. The C6-01 mutation sweep (docs/governance/CALCULATOR_MUTATION_SWEEP.md) found 94 surviving input-range limit mutants in 27 engines, e.g. meanArterialPressure SYSTOLIC_MMHG max 300 -> 301 is accepted by every reference suite, so the exact accepted limit is not pinned. A matrix needs a per-engine adapter because the call signatures differ; the range tables are already exported constants (e.g. SYSTOLIC_MMHG, DIASTOLIC_MMHG) and engines share inRange() from engine/inputs.ts."
+      "status": "PASS",
+      "statusSha": "8a5c1f07a01c872671e224982b77523e9e1780cb",
+      "statusNote": "PASS at 8a5c1f07a01c872671e224982b77523e9e1780cb (PR #2733 head; git tree 25019f1c94110ca47ccdb6df7505e32cdc4c47d4 is identical to main b073f39ff89aec1371931322a3df11ada0092df8, the squash merge). Validate changes run 40049447757: job validate 120738588989 (success) ran npm run uji and printed '778/778 berkas uji lulus'; server-validate job 120738588882 and full-acceptance job 120738589458 also success. The matrix's own output line is NOT quotable from that log (the log is truncated before the build and uji per-file lines); the count is the evidence that the suite ran: the same tree gave 778/778 locally with scripts/uji/calculator-adversarial-matrix.mts, (the count without that file was not measured, so this shows the run size, not the file by itself). What the suite does: scripts/uji/calculator-adversarial-matrix.mts attacks all 47 registry engines (57 adapters because call signatures and exported calculators differ) with 2026 runs: NaN, undefined, '', Infinity, -Infinity, negative, one step below/above the declared range, unit text ('70 mg/dL') and numeric text ('70') on every numeric input, plus categorical and yes/no probes. It requires a named rejection reason, no finite number in a rejected result (declared partials only), distinct reasons per field, boundary-accept pairs (exact min and max and real booleans are accepted) and a registry-coverage assertion (an engine without an adapter fails). Fail-open paths it found and that were fixed in the same PR: non-boolean yes/no input read as 'no' or by truthiness in stopBang, news2, sofaScore, meldNa and hydrationTarget; sleepDebt returned ok:true with a critical verdict for a night with blank hours. Negative controls on the real engines, each reported by name and reverted: MAP systolic range check removed; isFiniteNumber coercing numeric text (numeric-text accepted across engines); stopBang boolean guard reverted; sleepDebt night guard reverted; built-in self-tests classify an object-for-NaN engine, an empty reason, a thrown error and a number-carrying rejection. NOT shown: the matrix attacks the fields listed per adapter, so a new input field not added to an adapter is not attacked (a new engine without an adapter does fail); it proves bad input is refused with a reason, not that any accepted value, range or cut-off is clinically right; clinically_reviewed stays false for every engine; sleepDebt calendar-impossible dates (2026-02-30) are still accepted. Details: docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md."
     },
     {
       "id": "ENG-C6-03",
@@ -1000,6 +1006,7 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-source-label.mts",
             "governance/CALCULATOR_REVIEW_REGISTRY.json"
           ]
         }
@@ -1008,7 +1015,8 @@
       "evidence": "Registry test output at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Status stays NOT_RUN: only the machine-checkable half is built. Built: every one of the 47 engines has a source record in governance/CALCULATOR_REVIEW_REGISTRY.json (24 published with a citation bound to the engine header by an anchor, 9 named-method, 6 unattributed, 4 arithmetic, 4 repo-heuristic) and scripts/uji/calculator-source-label.mts, run by npm run uji, fails by name when an engine has no record, a citation is not in the engine header, an unsourced engine carries a citation, a page that renders an engine lacks the claim-boundary label, or a page hands an engine surface reviewer evidence. Negative controls on real files: label removed from the FeNa page, FeNa header year changed, a registry source removed, clinicianReviewed:true added to a page; each reported by name and reverted. NOT done: 19 of 47 engines have no citable source (a verified reference is needed, not an invented one); PMID is recorded for 10 of the 24 published engines (PubMed lookup on 2026-10-24, returned metadata kept in a lookup block that the suite ties to the record and to the header citation; the suite cannot re-check PubMed offline) and DOI for 9 of those, none for the other 14 published engines; the source is not shown on the pages and formula and units display is not machine-checked. Details: docs/governance/CALCULATOR_SOURCE_LABEL.md."
     }
   ],
   "externalGates": [
