@@ -46,6 +46,11 @@ const turun = ok(proyeksiTren(['30', '20', '10', '', '']))
 assert.deepEqual(turun.proyeksi.map((p) => p.nilai), [null, null, null, null, null])
 assert.equal(ok(proyeksiTren(['40', '30', '20'])).proyeksi[0].nilai, 10)
 
+// Regresi skala kecil: formatter lama Math.round(0.04 * 10)/10 menjadi 0 walau input dan proyeksi > 0.
+const kecil = ok(proyeksiTren(['0.01', '0.02', '0.03']))
+assert.deepEqual(kecil.proyeksi.slice(0, 3).map(p => p.nilai), [0.04, 0.05, 0.06])
+assert.ok(kecil.proyeksi.every(p => p.nilai !== 0 && p.nilai !== null), 'positive subunit forecasts must retain positive precision')
+
 // Regresi halaman: tanpa contoh karangan, tanpa regresi inline, memakai mesin domain.
 const halaman = readFileSync(new URL('../../src/pages/bodyhub/DataLabAdvanced.tsx', import.meta.url), 'utf8')
 assert.doesNotMatch(halaman, /'90', '92', '95'/); assert.doesNotMatch(halaman, /function linreg/)

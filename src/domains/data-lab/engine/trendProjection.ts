@@ -10,7 +10,9 @@ export type HasilTren =
   | { ok: true; data: { n: number; kemiringanPerTahun: number; sisaSd: number; indeksTerakhir: number; proyeksi: TitikProyeksi[] } }
   | { ok: false; alasan: string }
 
-const bulat1 = (x: number) => Math.round(x * 10) / 10
+// Keep legacy one-decimal display for values >= 1, but preserve subunit biomarkers (e.g. 0.04).
+// Rounding a positive projection to 0 would misrepresent the input measurement scale.
+const bulat1 = (x: number) => x < 1 ? Number(x.toPrecision(3)) : Math.round(x * 10) / 10
 
 /** `teks[i]` = nilai tahun ke-(i+1). Proyeksi dihitung DARI tahun terakhir yang diisi, bukan dari ujung formulir. */
 export function proyeksiTren(teks: readonly string[], horizon = 5): HasilTren {
