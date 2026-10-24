@@ -3,6 +3,9 @@
 import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { request as httpRequest } from 'node:http'
+import { gzipSync } from 'node:zlib'
+import { consoleCallsWithRequestData } from './support/consoleRequestGuard.ts'
 import { serverRoot, startIsolatedServer } from './support/isolatedServer.ts'
 
 // 1. Static guard: no console statement in the server source may interpolate an email address. New code that logs one fails here.
@@ -24,6 +27,35 @@ for (const file of sources(join(serverRoot, 'src'))) {
   })
 }
 assert.deepEqual(offenders, [], `a log statement interpolates an email address: ${offenders.join(', ')}`)
+
+// 1b. Static guard over EVERY route group: no console statement may receive request data (body, query, params, headers, cookies, url).
+// The scanner is proven on synthetic source first (positive, negative, paired and boundary cases), then run over server/src.
+const flagged = (src: string) => consoleCallsWithRequestData(src).findings.length
+for (const leak of [
+  'console.log(req.body)', "console.error('failed', req.query)", 'console.warn(request.params.id)', 'console.info(req.headers.authorization)',
+  'console.log(`saved ${req.body.name}`)', 'console.log(\n  "multi-line",\n  req.body,\n)', 'console.debug(fn(a(b)), req.cookies)', 'console.log(req)',
+  'console.log(req?.body)', 'console.log(req.originalUrl)', 'console.log(request, 1)',
+]) assert.equal(flagged(leak), 1, `request data in a console call must be flagged: ${leak}`)
+for (const fine of [
+  "console.log('req.body is never logged')", 'console.log(`req.body is ${count} bytes`)', 'console.log(penandaLog(userId))', 'console.log(req.method, req.path)',
+  'const b = req.body; handle(b)', 'res.json(req.body)', 'console.log(requested)', 'console.log(reqCount)', "console.warn('[x]', e?.message)",
+]) assert.equal(flagged(fine), 0, `must not be flagged: ${fine}`)
+// Paired: the same statement is flagged only because of the request argument.
+assert.equal(flagged('console.log(note)'), 0)
+assert.equal(flagged('console.log(note, req.body)'), 1)
+assert.equal(flagged('console.log(1)\nconsole.log(req.body)').valueOf(), 1, 'only the offending statement counts')
+assert.deepEqual(consoleCallsWithRequestData('a\nb\nconsole.log(req.body)').findings, [{ line: 3, call: 'console.log(' }], 'the finding names the line')
+assert.equal(consoleCallsWithRequestData('console.log(req.body').findings[0]?.call, 'unbalanced console call', 'an unbalanced call fails closed instead of being skipped')
+assert.deepEqual(consoleCallsWithRequestData(''), { scanned: 0, findings: [] })
+const requestLeaks: string[] = []
+let consoleCalls = 0
+for (const file of sources(join(serverRoot, 'src'))) {
+  const { scanned, findings } = consoleCallsWithRequestData(readFileSync(file, 'utf8'))
+  consoleCalls += scanned
+  for (const f of findings) requestLeaks.push(`${file.slice(serverRoot.length)}:${f.line}`)
+}
+assert.ok(consoleCalls > 30, `the scanner must see the real console statements (saw ${consoleCalls}), otherwise an empty result proves nothing`)
+assert.deepEqual(requestLeaks, [], `a console statement receives request data: ${requestLeaks.join(', ')}`)
 
 // 2. Dynamic: run a clinical journey and read everything the server wrote.
 const ownerEmail = 'logprivacy-owner@localhost.test'
@@ -80,6 +112,62 @@ try {
   await call('PUT', '/api/settings', alice.token, { settings: { strStatus: 'forged' } })
   await call('POST', '/api/second-opinion', alice.token, { symptoms: 'symptom-marker-xyz', history: 'history-marker-xyz' })
   await call('POST', '/api/feedback', alice.token, { kind: 'Question', text: 'feedback-marker-xyz text' })
+  // Rejected payloads never reach a handler, but Node's JSON.parse error text quotes part of the input. Each must be refused with a
+  // client error (the body limit is 12 MB, so the oversize case is 13 MB) and leave no trace of its content in the log (the parse and too-large errors are answered 400/413 without logging).
+  const malformed: Array<[path: string, body: string, status: number, contentType?: string]> = [
+    ['/api/clinical/patient', '{"patient":{"name":"malformed-name-marker","mrn":"malformed-mrn-marker"', 400],
+    ['/api/clinical/patient', '{"patient":{"name":"malformed-trailing-marker"}} garbage', 400],
+    ['/api/second-opinion', '{symptoms: "malformed-unquoted-marker"}', 400],
+    ['/api/feedback', "{'text':'malformed-singlequote-marker'}", 400],
+    ['/api/lab-results', '{"item":{"name":"malformed-lab-marker","valueText":"malformed-value-marker"', 400],
+    ['/api/second-opinion', 'malformed-not-json-marker', 400],
+    ['/api/clinical/record', `{"record":{"anamnesis":{"keluhanUtama":"malformed-oversize-marker${'x'.repeat(13_000_000)}"}}}`, 413],
+  ]
+  for (const [path, body, status, contentType] of malformed) {
+    const refused = await fetch(`${running.origin}${path}`, { method: 'POST', headers: { 'content-type': contentType ?? 'application/json', authorization: `Bearer ${alice.token}` }, body, signal: AbortSignal.timeout(10000) })
+    assert.equal(refused.status, status, `a malformed payload to ${path} must be refused with ${status}`)
+  }
+
+  // GHSA-27r3-jxmh-p828: frame gzip valid diikuti sampah tidak boleh keluar sebagai exception proses.
+  // Rujukan patch primer: https://github.com/expressjs/body-parser/commit/f7075eae3a84c3473ab4bf0a777da28db208e916
+  const compressed = gzipSync(JSON.stringify({ email: ['logprivacy-alice', 'localhost.test'].join('@'), role: 'pasien', name: 'Alice Marker Patient' }))
+  const sendGzip = (body: Buffer): Promise<{ status: number; body: { user?: { id?: string }; error?: string } }> => new Promise((resolve, reject) => {
+    const req = httpRequest(new URL('/api/auth/dev-login', running.origin), {
+      method: 'POST', agent: false,
+      headers: { 'content-type': 'application/json', 'content-encoding': 'gzip', 'content-length': body.length, 'user-agent': 'Mozilla/5.0 PanaceaSyntheticTest' },
+    }, response => {
+      const chunks: Buffer[] = []
+      response.on('data', (chunk: Buffer) => chunks.push(chunk))
+      response.on('error', reject)
+      response.on('end', () => {
+        try { resolve({ status: response.statusCode ?? 0, body: JSON.parse(Buffer.concat(chunks).toString('utf8')) }) }
+        catch (error) { reject(error) }
+      })
+    })
+    req.on('error', reject)
+    req.setTimeout(5000, () => req.destroy(new Error('synthetic compressed request timeout')))
+    req.end(body)
+  })
+  const incidentsBefore = (logs().match(/\[incident\]/g) ?? []).length
+  assert.equal(incidentsBefore, 0, 'compression probe must start without incidents so alert throttling cannot hide a parser error')
+  const validCompressed = await sendGzip(compressed)
+  assert.equal(validCompressed.status, 200, 'valid compressed JSON remains accepted')
+  assert.equal(validCompressed.body.user?.id, alice.user.id, 'valid compressed login retains the same synthetic identity')
+  const usersBefore = (JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length
+  const corrupted = Buffer.from(compressed)
+  corrupted[0] ^= 0xff
+  const invalidCompressed = await sendGzip(corrupted)
+  assert.equal(invalidCompressed.status, 400, 'invalid gzip is refused before the handler')
+  assert.equal(invalidCompressed.body.error, 'bad_request')
+  assert.equal((JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length, usersBefore, 'invalid compressed JSON cannot create an account')
+  const trailingCompressed = await sendGzip(Buffer.concat([compressed, Buffer.from([0]), Buffer.alloc(100 * 1024, 0x58)]))
+  assert.equal(trailingCompressed.status, 200, 'completed gzip frame preserves valid JSON semantics despite trailing bytes')
+  assert.equal(trailingCompressed.body.user?.id, alice.user.id)
+  await new Promise(resolve => setTimeout(resolve, 250))
+  assert.equal((logs().match(/\[incident\]/g) ?? []).length, incidentsBefore, 'compressed trailing bytes must not raise an uncaught incident')
+  assert.equal((await call('GET', '/api/health')).status, 200, 'server remains responsive after compressed trailing bytes')
+  assert.deepEqual((await call('GET', '/api/health-profile', alice.token)).body, profile.body, 'compressed parser probes do not change health data')
+  console.log('bodyParserCompression: valid gzip accepted, invalid gzip refused without mutation, trailing bytes produce no uncaught incident, server responsive; passed')
   await new Promise(resolve => setTimeout(resolve, 1500))
 
   const written = logs()
@@ -89,6 +177,8 @@ try {
     'Alice Marker', 'Dr Marker', 'Owner Marker', 'MRN-MARKER', 'penicillin-marker', 'complaint-marker', 'exam-marker', 'labvalue-marker', '987.65',
     'review-note-marker', '71.234', '71.23', '53117', 'symptom-marker', 'history-marker', 'feedback-marker', 'forged',
     privateLabel, 'synthetic-private-health-label', 'synthetic-forged-log-line', 'weight_body_mass', 'weightKg', token,
+    'malformed-name-marker', 'malformed-mrn-marker', 'malformed-trailing-marker', 'malformed-unquoted-marker', 'malformed-singlequote-marker',
+    'malformed-lab-marker', 'malformed-value-marker', 'malformed-not-json-marker', 'malformed-oversize-marker',
   ]) assert.ok(!written.includes(secret), `the server log must not contain "${secret}"`)
   // Operational telemetry retains counts and correlation, without health categories.
   assert.match(written, /\[health-webhook\] u:[0-9a-f]{10}: groups=2 workouts=0 matched=1(?:\r?\n|$)/, 'the webhook line keeps counts under an opaque marker')
