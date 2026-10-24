@@ -21,7 +21,11 @@ const headers = Object.fromEntries(reg.entries.map((e) => [e.id, engineHeader(re
   assert.deepEqual(r.errors, [], 'every registry engine declares an honest source record')
   assert.equal(Object.values(r.counts).reduce((a, b) => a + b, 0), reg.entries.length)
   assert.ok(r.counts.published > 0, 'published sources are recorded for the engines whose header cites one')
-  console.log(`calculator-source-label: sources ${JSON.stringify(r.counts)}`)
+  const withPmid = reg.entries.filter((e) => e.source?.pmid)
+  assert.equal(withPmid.length, 10, 'PMID dicatat hanya untuk sepuluh engine yang sudah dicari dan dicocokkan di PubMed')
+  assert.ok(reg.entries.every((e) => !e.source?.pmid || e.source.kind === 'published'), 'identifier hanya pada sumber terbit')
+  assert.ok(withPmid.every((e) => e.source!.lookup?.retrievedOn === '2026-10-24'))
+  console.log(`calculator-source-label: sources ${JSON.stringify(r.counts)}, pmid ${withPmid.length}`)
 }
 
 const pubRec: SourceRecord = { kind: 'published', citation: 'Contoh et al. 1999', anchor: 'Contoh et al. 1999', basis: 'b' }
@@ -31,7 +35,7 @@ const errs = (s: SourceRecord | undefined, headers = H) => checkSourceRecords([{
 // positif
 assert.deepEqual(errs(pubRec), [])
 for (const k of ['named-method', 'unattributed', 'arithmetic', 'repo-heuristic'] as const) assert.deepEqual(errs(none(k)), [], k)
-assert.deepEqual(errs({ ...pubRec, doi: '10.1000/xyz123', pmid: '12345' }), [])
+// (identifier tanpa lookup kini ditolak; bentuk sahnya diuji di blok 'identifier ⇒ metadata' di bawah)
 // negatif berpasangan: tiap aturan menolak sendiri
 assert.deepEqual(errs(undefined), ['a: source-missing'])
 assert.deepEqual(errs({ ...pubRec, kind: 'verified' as never }), ['a: unknown-source-kind'])
@@ -44,9 +48,29 @@ assert.deepEqual(errs({ ...none('unattributed'), citation: 'Karangan et al. 2020
 assert.deepEqual(errs({ ...none('arithmetic'), anchor: 'Contoh' }), ['a: unsourced-must-not-carry-citation'])
 assert.deepEqual(errs({ ...none('named-method'), doi: '10.1000/x1' }), ['a: identifier-without-citation'])
 assert.deepEqual(errs({ ...none('named-method'), pmid: '1' }), ['a: identifier-without-citation'])
-assert.deepEqual(errs({ ...pubRec, doi: 'doi:10.1/x' }), ['a: doi-invalid'])
-assert.deepEqual(errs({ ...pubRec, pmid: 'PMC1' }), ['a: pmid-invalid'])
+assert.deepEqual(errs({ ...pubRec, doi: 'doi:10.1/x' }), ['a: doi-invalid', 'a: identifier-without-lookup'])
+assert.deepEqual(errs({ ...pubRec, pmid: 'PMC1' }), ['a: pmid-invalid', 'a: identifier-without-lookup'])
 assert.deepEqual(errs({ ...pubRec, doi: '' }), ['a: doi-invalid'])
+// identifier ⇒ metadata hasil pencarian yang cocok dengan kutipan; tiap aturan menolak sendiri
+const lk = { source: 'PubMed' as const, pmid: '12345' as string | null, doi: '10.1000/xyz123' as string | null, retrievedOn: '2026-10-24', title: 'Judul contoh', firstAuthor: 'Contoh', journal: 'J Contoh', year: 1999, pages: '1-9' }
+const withId = (over: Partial<typeof lk> | null, ids: Partial<SourceRecord> = { pmid: '12345', doi: '10.1000/xyz123' }): SourceRecord =>
+  ({ ...pubRec, ...ids, lookup: over === null ? undefined : { ...lk, ...over } })
+assert.deepEqual(errs(withId({})), [])
+assert.deepEqual(errs(withId({ doi: null }, { pmid: '12345', doi: null })), [], 'PMID tanpa DOI sah (mis. artikel lama tanpa DOI)')
+assert.deepEqual(errs(withId({ pmid: '99999' })), ['a: lookup-pmid-mismatch'], 'PMID ditukar di satu sisi')
+assert.deepEqual(errs(withId({ doi: '10.1000/lain' })), ['a: lookup-doi-mismatch'])
+assert.deepEqual(errs(withId({ doi: null })), ['a: lookup-doi-mismatch'], 'DOI dibuang dari lookup tetapi ada di sumber')
+assert.deepEqual(errs(withId(null)), ['a: identifier-without-lookup'])
+assert.deepEqual(errs(withId(null, { doi: '10.1000/xyz123' })), ['a: identifier-without-lookup'])
+assert.deepEqual(errs(withId({ source: 'Google' as never })), ['a: lookup-source-invalid'])
+assert.deepEqual(errs(withId({ retrievedOn: '24-10-2026' })), ['a: lookup-date-invalid'])
+assert.deepEqual(errs(withId({ title: ' ' })), ['a: lookup-title-missing'])
+assert.deepEqual(errs(withId({ journal: '' })), ['a: lookup-journal-missing'])
+assert.deepEqual(errs(withId({ pages: '' })), ['a: lookup-pages-missing'])
+assert.deepEqual(errs(withId({ firstAuthor: 'Lain' })), ['a: lookup-author-not-in-citation'], 'PMID milik artikel lain ditolak')
+assert.deepEqual(errs(withId({ year: 2001 })), ['a: lookup-year-not-in-citation'])
+assert.deepEqual(errs(withId({ year: 1999.5 })), ['a: lookup-year-not-in-citation'])
+assert.deepEqual(errs(pubRec), [], 'tanpa identifier, lookup tidak diwajibkan')
 assert.equal(SOURCE_KINDS.length, 5)
 assert.equal(engineHeader('/** kepala */\nconst x = 1 /* bukan kepala */'), ' kepala ')
 assert.equal(engineHeader('const x = 1'), '')
