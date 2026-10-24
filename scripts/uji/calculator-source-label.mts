@@ -24,15 +24,13 @@ const headers = Object.fromEntries(reg.entries.map((e) => [e.id, engineHeader(re
   assert.ok(r.counts.published > 0, 'published sources are recorded for the engines whose header cites one')
   const withPmid = reg.entries.filter((e) => e.source?.pmid)
   // 10 (#2752) + 7 (batch 1 C6-03: childPugh, framinghamInputs, graceScore, maddreyScore, paradise, serumOsmolality, sofaScore)
-  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc) + 2 (batch 4a: hollidaySegar, bloodGas)
-  assert.equal(withPmid.length, 25, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
+  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc) + 2 (batch 4a: hollidaySegar, bloodGas) + 2 (batch 4b: parkland, fletcher)
+  assert.equal(withPmid.length, 27, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
   assert.ok(reg.entries.every((e) => !e.source?.pmid || e.source.kind === 'published'), 'identifier hanya pada sumber terbit')
   assert.ok(withPmid.every((e) => e.source!.lookup?.retrievedOn === '2026-10-24'))
   // Ratchet ENG-C6-03: daftar engine yang BELUM patuh hanya boleh menyusut. Kosong = kriteria dapat dicatat PASS.
-  assert.deepEqual(incompleteSources(reg.entries), [
-    'aaGradient', 'bloodDonationScreen', 'fletcher', 'fluidElectrolytes', 'idealBodyWeight',
-    'mcdonaldRule', 'midParentalHeight', 'naegele', 'parkland', 'pediatricDka', 'waistToHeight', 'widmarkBac',
-  ], 'engine belum patuh berubah: perbarui daftar ini HANYA dengan menghapus id yang kini bersumber atau dinyatakan heuristik')
+  // Batch 4b: daftar kosong — setiap engine bersumber terverifikasi atau dinyatakan heuristik.
+  assert.deepEqual(incompleteSources(reg.entries), [], 'engine belum patuh muncul lagi: ratchet ENG-C6-03 hanya boleh tetap kosong')
   console.log(`calculator-source-label: sources ${JSON.stringify(r.counts)}, pmid ${withPmid.length}`)
 }
 
