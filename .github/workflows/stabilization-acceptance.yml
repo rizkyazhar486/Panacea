@@ -125,6 +125,10 @@ jobs:
       - name: OpenCell failed-source recovery
         run: node scripts/qa/opencell-load-recovery-smoke.mjs
 
+      - name: Fetal GLB rejection and resize regression (negative asset control)
+        timeout-minutes: 5
+        run: node qa/fetal-rejected-geometry.mjs
+
       - name: Body Exposure rendered WebGL visual artifact
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer?folds=open
