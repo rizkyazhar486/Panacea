@@ -314,10 +314,18 @@ export function CanonicalBody() {
 
     // identifikasi struktur dengan ketukan (bukan seretan)
     const ray = new THREE.Raycaster(), ptr = new THREE.Vector2()
-    let down: [number, number] | null = null
-    const onDown = (e: PointerEvent) => { down = [e.clientX, e.clientY] }
+    let down: { x: number; y: number; pointerId: number } | null = null
+    const onDown = (e: PointerEvent) => {
+      down = e.isPrimary && e.button === 0
+        ? { x: e.clientX, y: e.clientY, pointerId: e.pointerId }
+        : null
+    }
+    const onCancel = () => { down = null }
     const onUp = (e: PointerEvent) => {
-      if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return
+      const tap = down
+      down = null
+      if (!tap || !e.isPrimary || e.button !== 0 || e.pointerId !== tap.pointerId
+        || Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 6) return
       const r = renderer.domElement.getBoundingClientRect()
       ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
       ray.setFromCamera(ptr, camera)
@@ -339,6 +347,7 @@ export function CanonicalBody() {
     }
     renderer.domElement.addEventListener('pointerdown', onDown)
     renderer.domElement.addEventListener('pointerup', onUp)
+    renderer.domElement.addEventListener('pointercancel', onCancel)
     renderer.domElement.addEventListener('dblclick', onDbl)
     return () => {
       penjaga.lepas()
@@ -349,6 +358,7 @@ export function CanonicalBody() {
       renderer.setAnimationLoop(null)
       renderer.domElement.removeEventListener('pointerdown', onDown)
       renderer.domElement.removeEventListener('pointerup', onUp)
+      renderer.domElement.removeEventListener('pointercancel', onCancel)
       renderer.domElement.removeEventListener('dblclick', onDbl)
       for (const g of [root, motionRoot]) g.traverse((o) => {
         if (o instanceof THREE.Mesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()) }
