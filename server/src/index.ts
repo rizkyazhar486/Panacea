@@ -170,6 +170,7 @@ import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/penging
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
 import { pasangRuteReviewManusia } from './modules/humanReview/http/routes.js'
+import { parseMeetCoordinates } from './modules/meets/domain/coordinates.js'
 import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
 import { bolehAksesPasien, idPasienDiri, klinisiAtauPemilik, saringKlinis, statusTautanPasien, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './domains/clinical-records/aksesKlinis.js'
 import { pemeriksaanTetapSama, terapkanSimpanRekam, tandaTanganDitolak, tutupKunjungan } from './domains/clinical-records/rekamKlinis.js'
@@ -744,6 +745,8 @@ app.post('/api/meets', requireAuth, (req, res) => {
   if (typeof b.feeRp !== 'number' || !Number.isSafeInteger(b.feeRp) || b.feeRp < 0 || b.feeRp > 10_000_000) {
     return res.status(400).json({ error: 'invalid_fee' })
   }
+  const coords = parseMeetCoordinates(b.lat, b.lng)
+  if (!coords.ok) return res.status(400).json({ error: coords.error })
   const m: Meet = {
     id: uid(),
     title: String(b.title).slice(0, 120),
@@ -757,8 +760,8 @@ app.post('/api/meets', requireAuth, (req, res) => {
     cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
     feeRp: b.feeRp,
     notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
-    lat: Number(b.lat) || 0,
-    lng: Number(b.lng) || 0,
+    lat: coords.lat,
+    lng: coords.lng,
     emoji: String(b.emoji || '🏃').slice(0, 4),
     hostEmail: u.email,
     hostName: u.name,
