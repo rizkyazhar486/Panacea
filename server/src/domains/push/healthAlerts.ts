@@ -17,6 +17,7 @@
 
 import { getSettings, saveSettings, getSleepSessions } from '../../store.js'
 import { notify } from './push.js'
+import { tzOffsetMenit, waktuLokalPengguna } from '../../shared/userLocalTime.js'
 
 export interface ZoneDef {
   zone: 1 | 2 | 3 | 4 | 5
@@ -181,8 +182,7 @@ export function suggestedBedtime(email: string): string | null {
 function localMinutesNow(prefs: Record<string, any>): number {
   // Offset in minutes EAST of UTC (Jakarta = +420). Stored by the client, since
   // the server has no idea where the user is.
-  const off = Number(prefs.tzOffsetMin)
-  const offset = Number.isFinite(off) ? off : 0
+  const offset = tzOffsetMenit(prefs)
   const utcMin = new Date().getUTCHours() * 60 + new Date().getUTCMinutes()
   return ((utcMin + offset) % 1440 + 1440) % 1440
 }
@@ -218,7 +218,7 @@ export async function checkBedtimeReminder(userId: string, email: string): Promi
   if (diff > 2) return { sent: false, reason: 'not-time' }
 
   // One per calendar day, keyed on the user's own local date.
-  const localDate = new Date(Date.now() + (Number(prefs.tzOffsetMin) || 0) * 60_000).toISOString().slice(0, 10)
+  const localDate = waktuLokalPengguna(prefs, Date.now()).toISOString().slice(0, 10)
   if (prefs.sleepLastFiredOn === localDate) return { sent: false, reason: 'already-today' }
 
   const jam = `${String(Math.floor(target / 60)).padStart(2, '0')}.${String(target % 60).padStart(2, '0')}`
@@ -263,7 +263,7 @@ export async function checkWorkoutReminder(userId: string): Promise<LatihanCheck
 
   // Hari yang dipilih, 0 = Minggu. Kosong berarti setiap hari.
   const hariDipilih: number[] = Array.isArray(prefs.latihanHari) ? prefs.latihanHari.filter((h: unknown) => typeof h === 'number') : []
-  const lokal = new Date(Date.now() + (Number(prefs.tzOffsetMin) || 0) * 60_000)
+  const lokal = waktuLokalPengguna(prefs, Date.now())
   if (hariDipilih.length && !hariDipilih.includes(lokal.getUTCDay())) return { sent: false, reason: 'not-today' }
 
   const now = localMinutesNow(prefs)
