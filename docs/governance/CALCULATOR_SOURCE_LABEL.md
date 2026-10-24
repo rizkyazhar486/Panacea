@@ -1,6 +1,6 @@
 # Calculator source record and not-reviewed label (ENG-C6-03, partial)
 
-`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN**: only the machine-checkable half is built.
+`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN**: every source record is now complete (verified publication or declared heuristic), but displayed formulas and units are not machine-checked and PASS needs exact-SHA CI evidence.
 
 ## What is checked
 
@@ -15,11 +15,11 @@
 
 | kind | engines | meaning |
 |---|---|---|
-| published | 24 | the engine header cites author and year (often journal and pages) |
-| named-method | 9 | the header names a method (Holliday-Segar, Parkland, Naegele, ...) with no citation |
-| unattributed | 6 | the header names no source |
-| arithmetic | 4 | arithmetic on user-entered values, no clinical claim |
-| repo-heuristic | 4 | repo-defined model (hydration, sleep debt, caffeine, glycogen timing), not published |
+| published | 29 | the engine header cites author and year; 28 carry a PubMed lookup (PMID), NEWS2 an `unindexed` RCP report record |
+| named-method | 0 | (was 9) |
+| unattributed | 0 | (was 6) |
+| arithmetic | 5 | arithmetic on user-entered values, no clinical claim |
+| repo-heuristic | 13 | repo-defined model or classic rule whose original source was not found or not verified (declared, never guessed) |
 
 31 distinct pages render the 47 engines; none lacks the label.
 
@@ -33,7 +33,7 @@
 
 ## Why ENG-C6-03 is not PASS
 
-- **19 of 47 engines have no citable source** (named-method, unattributed, arithmetic, repo-heuristic). The criterion asks for a source for every engine; that needs a verified reference found for each, not an invented one.
-- **PMID is recorded for 10 of the 24 published engines** (cockcroftGault, correctedCalcium, fena, findrisc, glasgowBlatchford, ldlFriedewald, lightsCriteria, sirirajStrokeScore, stopBang, charlson), each looked up on 2026-10-24 against PubMed by journal, year, volume, first page and first author, then checked against the returned title, authors, journal, year and pages. DOI is recorded for nine of them (ldlFriedewald has none in PubMed). A `lookup` block keeps what PubMed returned; the suite requires it whenever an identifier is present, requires its PMID/DOI to equal the record's (so swapping one side fails by name), and requires its first author and year to appear in the citation the engine header carries. The suite uses no network, so it cannot re-check the lookup: the match to PubMed is a recorded manual check, not a continuous one. The other 14 published engines have no PMID because their citations lack a journal or page (for example 'Maddrey et al. 1978') or name a guideline rather than an article, and were not guessed.
-- **The source is not shown to users.** The registry holds it; the pages show the label but not the source line, and this suite does not check that pages show formula and units.
-- The label is shown while `clinically_reviewed` is false for every engine. Nothing here is a clinical review.
+- **Source completeness is done.** `incompleteSources()` returns [] and the suite fails by name if any engine falls back (negative control: `naegele` set to `named-method` -> `actual: [ 'naegele' ]`). Batch 4b (2026-10-24): parkland -> Baxter & Shires 1968 (PMID 4973463); fletcher -> Fletcher 1950 (PMID 14818775, three-frequency index only); waistToHeight -> Ashwell & Gibson 2016 (PMID 26975935, 0.5/0.6 bands checked in PMC4800150 Methods; adopted from Codex draft #2760); the other nine engines declared `repo-heuristic` with the reason in `basis`. PubMed records for Parkland and Fletcher have no abstract, so their constants are not checked against the full text and `basis` says so.
+- The suite uses no network, so PubMed matches are a recorded manual check (`lookup` block), not a continuous one.
+- Sources are shown on every consuming page (`<SumberKalkulator>`, checked by the suite), but **displayed formulas and units are not mechanically checked**; the criterion's capability mentions them.
+- All 47 engines remain `clinically_reviewed=false`. Nothing here is a clinical review.

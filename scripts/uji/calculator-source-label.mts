@@ -24,8 +24,8 @@ const headers = Object.fromEntries(reg.entries.map((e) => [e.id, engineHeader(re
   assert.ok(r.counts.published > 0, 'published sources are recorded for the engines whose header cites one')
   const withPmid = reg.entries.filter((e) => e.source?.pmid)
   // 10 (#2752) + 7 (batch 1 C6-03: childPugh, framinghamInputs, graceScore, maddreyScore, paradise, serumOsmolality, sofaScore)
-  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc) + 2 (batch 4a: hollidaySegar, bloodGas) + 2 (batch 4b: parkland, fletcher)
-  assert.equal(withPmid.length, 27, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
+  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc) + 2 (batch 4a: hollidaySegar, bloodGas) + 3 (batch 4b: parkland, fletcher, waistToHeight dari #2760)
+  assert.equal(withPmid.length, 28, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
   assert.ok(reg.entries.every((e) => !e.source?.pmid || e.source.kind === 'published'), 'identifier hanya pada sumber terbit')
   assert.ok(withPmid.every((e) => e.source!.lookup?.retrievedOn === '2026-10-24'))
   // Ratchet ENG-C6-03: daftar engine yang BELUM patuh hanya boleh menyusut. Kosong = kriteria dapat dicatat PASS.
