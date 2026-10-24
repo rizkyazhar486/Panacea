@@ -22,6 +22,13 @@ const SLOW_MS = Number(process.env.QA_SLOW_MS || 1500)
 // (Membuktikan pendeteksi teks bocor dan overflow benar-benar bekerja tanpa membangun ulang aplikasi.)
 const SABOTASE = process.env.QA_SABOTASE || ''
 assert.ok(['', 'bocor', 'overflow'].includes(SABOTASE), `QA_SABOTASE tidak dikenal: ${SABOTASE}`)
+// QA_CRASH=1 (butuh build VITE_QA_HOOKS=1): tiap halaman dibuat crash saat render lewat kait QA (sessionStorage); cangkang HARUS tetap
+// hidup, galat tertahan di batas rute, dan halaman pulih setelah kait dilepas. Kontrol negatif: build yang sama dengan
+// VITE_QA_NO_ROUTE_BOUNDARY=1 HARUS gagal di langkah ini untuk setiap rute (lihat f1-negative-evidence.mjs mode 'crash').
+const CRASH = process.env.QA_CRASH === '1'
+const QA_CRASH_KEY = 'panacea:qa-crash-route'
+const LANGKAH_CRASH = 'crash render satu halaman: cangkang tetap hidup, galat tertahan di halaman itu, halaman pulih setelahnya'
+assert.ok(!(CRASH && SABOTASE), 'QA_CRASH dan QA_SABOTASE tidak boleh digabung: satu kontrol per run')
 const SKRIP_SABOTASE = { bocor: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.textContent = 'Saldo: NaN [object Object]'; document.body.appendChild(d) })",
   overflow: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.style.cssText = 'width:4000px;height:1px'; document.body.appendChild(d) })" }
 
@@ -101,6 +108,30 @@ try {
         await buka(rute); await terisi(rute, 120000)
         const t = await teks(page); assert.ok(sehat(rute, t), `tidak terisi TANPA gangguan (${t.trim().length} karakter)`); return { chars: t.trim().length }
       }))
+      if (CRASH) {
+        await step(vp.name, J, LANGKAH_CRASH, () => periksa('crash render', peran.rute, async (rute) => {
+          // Mulai tiap rute dari aplikasi segar (galat akar dari rute sebelumnya tidak boleh terbawa) dan selalu lepas kait di akhir.
+          await page.evaluate((k) => sessionStorage.removeItem(k), QA_CRASH_KEY)
+          try {
+            // Sasaran crash = rute AKTIF setelah redirect selesai (mis. #/all-features -> /semua-fitur), bukan teks rute di daftar.
+            await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+            await page.evaluate((k) => sessionStorage.setItem(k, location.hash.slice(1).split('?')[0] || '/'), QA_CRASH_KEY)
+            await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 })
+            // Tunggu salah satu hasil: fallback batas rute atau layar galat akar (tanpa menunggu 90 dtk penuh bila cangkang hilang).
+            await page.waitForFunction(() => !!document.querySelector('[data-route-error]') || /Something went wrong/.test(document.body.innerText), null, { timeout: 60000 })
+            const akar = await page.evaluate(() => /Something went wrong/.test(document.body.innerText))
+            assert.ok(!akar, 'cangkang hilang setelah crash render (layar galat akar tampil)')
+            // Penanda cangkang yang sama untuk semua peran: penanda khusus staf ('Lab result review') adalah isi halaman, ikut hilang saat crash.
+            await page.getByRole('button', { name: 'Notifications' }).first().waitFor({ timeout: 15000 })
+            const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px pada fallback crash`)
+          } finally { await page.evaluate((k) => sessionStorage.removeItem(k), QA_CRASH_KEY).catch(() => {}) }
+          await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page); await terisi(rute, 60000)
+          const t = await teks(page); assert.ok(sehat(rute, t), `tidak pulih setelah crash (${t.trim().length} karakter)`)
+          return { fallback: true, chars: t.trim().length }
+        }))
+        await ctx.close()
+        continue
+      }
       await step(vp.name, J, `API lambat (${SLOW_MS} ms): cangkang tetap tampil, tanpa overflow atau teks bocor`, async () => {
         await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, SLOW_MS)); await r.continue().catch(() => {}) })
         try {

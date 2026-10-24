@@ -46,6 +46,8 @@ export function sleepDebt(need: number, nights: readonly Night[]): SleepDebtResu
   const checked = validateNeed(need)
   if (!checked.ok) return checked
   const last = nights.slice(0, MAX_NIGHTS)
+  // Pemanggil seharusnya sudah lewat sanitizeNights; tetap gagal-tertutup bila malam tak sah sampai di sini (NaN akan menjadi "debt: NaN" ok).
+  if (last.some((n) => !validateHours(n?.hours).ok)) return { ok: false, reason: `Each night must be ${SLEEP_RANGES.hours.min}–${SLEEP_RANGES.hours.max} hours` }
   const debt = last.reduce((s, n) => s + (need - n.hours), 0)
   const avg = last.length ? last.reduce((s, n) => s + n.hours, 0) / last.length : 0
   const tone: SleepDebtTone = debt <= DEBT_GOOD_MAX_H ? 'brand' : debt <= DEBT_MILD_MAX_H ? 'low' : 'critical'
