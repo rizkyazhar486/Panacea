@@ -89,6 +89,7 @@ export function sofaScore(input: SofaInput): SofaResult {
   }
   const cvOk = Number.isInteger(input.cv) && input.cv >= 0 && input.cv <= 4
   if (!cvOk) invalid.push('Cardiovascular level must be 0–4')
+  if (typeof input.supported !== 'boolean') invalid.push('respiratory support must be yes or no')
   const supported = input.supported === true
   const points = {
     resp: ok.pf !== undefined ? respPts(ok.pf, supported) : null,

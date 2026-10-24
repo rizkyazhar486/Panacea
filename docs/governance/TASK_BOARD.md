@@ -15,34 +15,45 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
-| T-H0-04 | Triage open PRs (61): none provably superseded by file content; recommendations in §Open PR triage | — | integrator | IN_PROGRESS | Owner decision 2026-10-23: 14 stale closed; 38 + 9 being updated with main (merge, no force-push) |
-| T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | READY (after 03) | — |
-| T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | READY (after 03) | — |
-| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | integrator | READY | run 39883766083 |
+| T-H0-04 | Triage open PRs (61): none provably superseded by file content; recommendations in §Open PR triage | — | integrator | DONE | 14 stale closed. Of the rest: 25 updated with main directly; 16 had real conflicts → 13 resolved and pushed (#2461 #2463 #2466 #2488 #2499 #2501 #2503 #2504 #2508 #2509 #2546 #2548 #2640 incl. path fixes after main's folder moves), 3 closed as superseded by main (#2407 equivalent fix on main; #2520/#2521 clipping already fixed by Vika's portal 14577e7e); #2442/#2456 closed by others. All by Claude (merge, no force-push). |
+| T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | IN_REVIEW | #2697 |
+| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | claude | IN_PROGRESS | slices 1-2/3 in #2718 (domain rules; HTTP append-only store, AI rejection, rate limit); next: page `#/review/<taskId>` |
+| T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
+| T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
+| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | claude | IN_REVIEW | run 39883766083; recurred on a0f2f0cd run 39914203220; single attempt with a 22 min budget in this PR (a timeout+retry wrapper was tried and failed on the dpkg lock) |
 | T-H0-07 | Consolidate duplicate workflows (stabilization ×3, wake-server ×2) — proposal PR, no required check removed until replacement proven | — | integrator | READY | — |
 
 ## Next (H1) — start when H0 exit is met, or earlier if it does not touch red paths
 
 | ID | Task | Criterion | Lane | Status |
 |---|---|---|---|---|
-| T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | READY |
-| T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | READY |
-| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | READY |
-| T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | IN_REVIEW |
+| T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
+| T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
+| T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | DONE (#2711 merged): inventory equals journey coverage and every route resolves to a real page; dead `#/all-features` fixed. run 39979532110 at 74eba9d8 covers 9/9 pages; ENG-F1-03 stays NOT_RUN: named error-boundary negative control missing (T-F1-04) |
+| T-F1-04 | Resilience negative control: remove the error boundary from one listed page; its resilience check must fail at a named step | ENG-F1-03 | claude | IN_REVIEW: slice 1 #2740 merged fb62d0ee (RouteErrorBoundary + QA-build-only crash hook); slice 2 (this PR) adds the `QA_CRASH=1` render-crash step and the no-boundary negative run (`f1-negative-evidence.mjs crash`) to user-journey-acceptance. ENG-F1-03 PASS needs that workflow green at an exact SHA |
+| D-F1-ADMIN | Owner decision: does admin count as covered by owner UI + API RBAC, or needs its own UI journey? (run 39979532110 otherwise green) | ENG-F1-01 | owner | BLOCKED (decision) |
+| T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | DONE (#2679 merged); ENG-E4-01 PASS recorded at 8ed1065f (31/31 tests in build, four sabotages fail by name) |
 | T-E4-02 | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | codex | READY |
-| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | codex | READY |
-| T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | codex | READY |
-| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | IN_REVIEW |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | READY |
-| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | codex | READY |
-| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | codex | READY |
+| T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
+| T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | claude | DONE (#2720): fail-closed run 39979087541 recorded; smoke job unproven until EXT-E7-B provisions staging |
+| T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | DONE | #2685 merged 31bd8bfd |
+| T-D8-04 | Primary-source record per licence class (URL, retrieval time, SHA-256 of bytes read); ICRP as owner statement (EXT-D8-C); audit fails on a class without a record | ENG-D8-03 | claude | DONE (#2730 merged eef1ceb7); ENG-D8-03 PASS at b7410bef | governance/LICENCE_PRIMARY_SOURCES.json, 7 classes |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 PASS at b7410bef: page screenshots in bodyexposure/qa_reports/evidence/; header wrap at 390px fixed in #2732 |
+| T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
+| T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
+| T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | DONE (#2733); ENG-C6-02 PASS at 8a5c1f07 (tree identical to main b073f39f), 47 engines, 2026 adversarial runs, six fail-open paths found and fixed; see docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md |
 
 ## Later (H2)
 
 | ID | Task | Criterion | Lane | Status |
 |---|---|---|---|---|
-| R-D7-RIG | Research (time box 1 session): can the source rig get heel/toe landmarks without re-rigging? Output: yes/no + method | ENG-D7-03 | claude | READY |
-| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | READY |
+| R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
+| T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence + root cause in gait_measurability.json (this PR). ENG-D7-02 stays FAIL: only male WALK measurable |
+| T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
+| T-D7-03 | Named heel/ball landmark empties in the exported rig (FOOT_LANDMARK_HEEL/BALL_<side>, from calcaneus and 1st metatarsal head); metrics consume them | ENG-D7-03 | claude | DONE | #2723 merged 654347b8; Blender reproduction re-run: only source hashes changed; ENG-D7-03 PASS at b7410bef (6/6 tests incl. missing/moved landmark controls) |
+| R-D7-CONTACT | Research: contact-corrected retarget of CMU RUN (and female lower-limb) so both feet plant within the 15 mm window, without inventing motion; compare against the uncorrected clip and label truth class honestly | ENG-D7-02 | claude | DONE (this PR): `scripts/qa/gait-contact-probe.mjs` → `bodyexposure/qa_reports/gait_contact_probe.json`. Clips do not float (sole reaches the floor). (1) Female WALK: the heel rig node is mis-derived at rest pose — the calcaneus vertex that actually lands reaches 0.3/0.4 mm (1–2 stance phases) while the node stays ≥ 35.5/22.8 mm → fixable without touching motion (T-D7-04). (2) RUN, both bodies: no calcaneus vertex ever enters the window (male 32.3/34.8, female 16.9/20.2 mm); male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint → heel stance on RUN cannot be made measurable without inventing contact (D-D7-RUN). Control: male nodes equal the closest-vertex definition on every clip/side. |
+| T-D7-04 | Female rig heel node from the calcaneus vertex nearest the floor in WALK stance (pose-independent), forefoot node from the combined metatarsal+phalanx mesh labelled as such (not MT1); regenerate measurability | ENG-D7-02 | claude | READY |
+| D-D7-RUN | Decision: RUN clips land on the forefoot/toes with no heel strike. Assess RUN on the forefoot landmark only (heel recorded as not-applicable with this evidence), or re-rig with an MTP toe joint first? Not decided by AI; criterion text unchanged until decided | ENG-D7-02 | owner | BLOCKED (decision) |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
