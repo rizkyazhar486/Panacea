@@ -8,6 +8,16 @@ Panacea already has a Visit Operating System for live scalar measurements, a FHI
 
 The fabric treats each physical device as a source of measured artifacts with explicit device identity, patient/encounter association, timestamps, units, signal quality, provenance and review state. Vendor-specific complexity remains inside adapters; the rest of Panacea consumes one normalized contract.
 
+## Temporal device coverage — past, present and future
+
+The device fabric must cover evidence generated across **historical, present-day and emerging** device generations. A *past device* may yield only a paper trace, scanned report, early-format disk export, serial capture or retrospectively digitized value; **a representation of a historical artifact is not a functioning adapter or live measured signal**. Older technology can require document-based import and identified human verification rather than electronic protocol connectivity.
+
+Preserve source identity when known, original capture-date precision, archival import time, transcription method/uncertainty, calibration/reference method, original units, legacy mapping versions and source document. Historical date-only or uncertain clocks must never be silently fabricated into a precise timestamp; do not auto-adjust historical methods to modern clinical thresholds. Unknown identity, units or data provenance -> unverified archive/reference-only or quarantine, not a normalized clinical observation.
+
+Current devices use existing adapter and standards pathways. Future research devices require a documented new adapter and conformance workflow; never declare universal vendor compatibility or auto-generate proprietary device protocols. All supported sources can ultimately contribute to the same **one longitudinal state** only after authorized identity/consent, clinical review and other applicable gates.
+
+The binding future-extensible translation and synchronization framework is [`DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md`](../DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md).
+
 ## Industry coverage target
 
 The canonical catalog is `src/lib/medicalDeviceIntegrationCatalog.ts`. It covers the major digital device families encountered across acute care, ambulatory care, imaging, laboratories, procedure rooms and home monitoring:
