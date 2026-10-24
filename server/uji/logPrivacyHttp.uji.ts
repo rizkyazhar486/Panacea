@@ -3,6 +3,8 @@
 import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { request as httpRequest } from 'node:http'
+import { gzipSync } from 'node:zlib'
 import { consoleCallsWithRequestData } from './support/consoleRequestGuard.ts'
 import { serverRoot, startIsolatedServer } from './support/isolatedServer.ts'
 
@@ -125,6 +127,47 @@ try {
     const refused = await fetch(`${running.origin}${path}`, { method: 'POST', headers: { 'content-type': contentType ?? 'application/json', authorization: `Bearer ${alice.token}` }, body, signal: AbortSignal.timeout(10000) })
     assert.equal(refused.status, status, `a malformed payload to ${path} must be refused with ${status}`)
   }
+
+  // GHSA-27r3-jxmh-p828: frame gzip valid diikuti sampah tidak boleh keluar sebagai exception proses.
+  // Rujukan patch primer: https://github.com/expressjs/body-parser/commit/f7075eae3a84c3473ab4bf0a777da28db208e916
+  const compressed = gzipSync(JSON.stringify({ email: ['logprivacy-alice', 'localhost.test'].join('@'), role: 'pasien', name: 'Alice Marker Patient' }))
+  const sendGzip = (body: Buffer): Promise<{ status: number; body: { user?: { id?: string }; error?: string } }> => new Promise((resolve, reject) => {
+    const req = httpRequest(new URL('/api/auth/dev-login', running.origin), {
+      method: 'POST', agent: false,
+      headers: { 'content-type': 'application/json', 'content-encoding': 'gzip', 'content-length': body.length, 'user-agent': 'Mozilla/5.0 PanaceaSyntheticTest' },
+    }, response => {
+      const chunks: Buffer[] = []
+      response.on('data', (chunk: Buffer) => chunks.push(chunk))
+      response.on('error', reject)
+      response.on('end', () => {
+        try { resolve({ status: response.statusCode ?? 0, body: JSON.parse(Buffer.concat(chunks).toString('utf8')) }) }
+        catch (error) { reject(error) }
+      })
+    })
+    req.on('error', reject)
+    req.setTimeout(5000, () => req.destroy(new Error('synthetic compressed request timeout')))
+    req.end(body)
+  })
+  const incidentsBefore = (logs().match(/\[incident\]/g) ?? []).length
+  assert.equal(incidentsBefore, 0, 'compression probe must start without incidents so alert throttling cannot hide a parser error')
+  const validCompressed = await sendGzip(compressed)
+  assert.equal(validCompressed.status, 200, 'valid compressed JSON remains accepted')
+  assert.equal(validCompressed.body.user?.id, alice.user.id, 'valid compressed login retains the same synthetic identity')
+  const usersBefore = (JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length
+  const corrupted = Buffer.from(compressed)
+  corrupted[0] ^= 0xff
+  const invalidCompressed = await sendGzip(corrupted)
+  assert.equal(invalidCompressed.status, 400, 'invalid gzip is refused before the handler')
+  assert.equal(invalidCompressed.body.error, 'bad_request')
+  assert.equal((JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length, usersBefore, 'invalid compressed JSON cannot create an account')
+  const trailingCompressed = await sendGzip(Buffer.concat([compressed, Buffer.from([0]), Buffer.alloc(100 * 1024, 0x58)]))
+  assert.equal(trailingCompressed.status, 200, 'completed gzip frame preserves valid JSON semantics despite trailing bytes')
+  assert.equal(trailingCompressed.body.user?.id, alice.user.id)
+  await new Promise(resolve => setTimeout(resolve, 250))
+  assert.equal((logs().match(/\[incident\]/g) ?? []).length, incidentsBefore, 'compressed trailing bytes must not raise an uncaught incident')
+  assert.equal((await call('GET', '/api/health')).status, 200, 'server remains responsive after compressed trailing bytes')
+  assert.deepEqual((await call('GET', '/api/health-profile', alice.token)).body, profile.body, 'compressed parser probes do not change health data')
+  console.log('bodyParserCompression: valid gzip accepted, invalid gzip refused without mutation, trailing bytes produce no uncaught incident, server responsive; passed')
   await new Promise(resolve => setTimeout(resolve, 1500))
 
   const written = logs()
