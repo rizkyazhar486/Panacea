@@ -8,7 +8,7 @@ export interface ChaveAtribuicao { chave: string; aliases: readonly string[] }
 export const LICENCAS_CONHECIDAS: readonly ChaveAtribuicao[] = [
   { chave: 'CC BY-SA 4.0', aliases: ['CC BY-SA 4.0'] },
   { chave: 'CC BY 4.0', aliases: ['CC BY 4.0'] },
-  { chave: 'CC0 1.0', aliases: ['CC0 1.0'] },
+  { chave: 'CC0 1.0', aliases: ['CC0 1.0', 'CC0-1.0'] },
   // Estas duas aparecem nos GLB junto a outra classe na mesma string ("CC BY-SA 2.1 JP (OBJ header); CC BY 4.0",
   // "Apache-2.0; combined atlas layer CC BY-SA 4.0"); sem entrada própria a página poderia omiti-las sem que nada falhasse.
   { chave: 'CC BY-SA 2.1', aliases: ['CC BY-SA 2.1'] },
