@@ -363,9 +363,9 @@
       "negativeControl": "Granting nurse a doctor-only write must fail the matrix.",
       "evidence": "server-validate run ID at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Clinician tenant-wide read is current behaviour; changing it waits on EXT-F1-A. Tests must pin current behaviour, not decide policy."
+      "status": "PASS",
+      "statusSha": "7e19ddcabb8dff56cbc2ff43982c3fc29bcd6f41",
+      "statusNote": "PASS at 7e19ddcabb8dff56cbc2ff43982c3fc29bcd6f41 (PR #2741 head; git tree 1f64c97faa56d1ab6f98af582ab7551a790df87d is identical to main d6073ce86795ea3563674a9304beb235b3dc3d71). Validate changes run 40053578343, job server-validate 120751432318 (success) ran cd server && npm run uji and printed the three suite lines: 'staffRbacHttp: perawat/lab roles are owner-granted only, patient-scoped by explicit assignment, refuse everything unassigned, revoke instantly and are audited', 'careHttpRbac: ... patient-only answers with server-derived subject, validation and idempotency, offline-time clamp, replacement and revocation; passed', 'labShareHttpRbac: twelve real lab-log / lab-share routes, anonymous 401, own-only patient data, named-verified-doctor-only clinician access, audit, review bounds and immediate revocation; passed'. Negative controls on the real server code, each reverted: (1) mapping the nurse role to a clinician actor in modules/labResults/http/aktor.ts fails staffRbacHttp with 'nurse without assignment lists nothing'; (2) granting nurse the doctor-only 'reviewed' step (roles.reviewed and needsAuthorizedClinician in modules/labResults/domain/definitions.ts) fails staffRbacHttp with 'a nurse cannot review (clinician-only step)' (200 !== 403). The suites pin current behaviour, including clinician tenant-wide read; changing it waits on EXT-F1-A. NOT shown: the server has a single practice tenant constant, so isolation tested is per patient (explicit assignment, own-only data), not between tenants; the suites cover the staff, care and lab-share route groups, not every route group in the RBAC matrix (see ENG-E4-02 for the remaining groups); no human review of the policy itself."
     },
     {
       "id": "ENG-F1-03",
@@ -1003,6 +1003,7 @@
           "cmd": "npm run uji",
           "files": [
             "scripts/uji/calculator-review-registry.mts",
+            "scripts/uji/calculator-source-label.mts",
             "governance/CALCULATOR_REVIEW_REGISTRY.json"
           ]
         }
@@ -1011,7 +1012,8 @@
       "evidence": "Registry test output at exact SHA.",
       "dependsOn": [],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Status stays NOT_RUN: only the machine-checkable half is built. Built: every one of the 47 engines has a source record in governance/CALCULATOR_REVIEW_REGISTRY.json (24 published with a citation bound to the engine header by an anchor, 9 named-method, 6 unattributed, 4 arithmetic, 4 repo-heuristic) and scripts/uji/calculator-source-label.mts, run by npm run uji, fails by name when an engine has no record, a citation is not in the engine header, an unsourced engine carries a citation, a page that renders an engine lacks the claim-boundary label, or a page hands an engine surface reviewer evidence. Negative controls on real files: label removed from the FeNa page, FeNa header year changed, a registry source removed, clinicianReviewed:true added to a page; each reported by name and reverted. NOT done: 19 of 47 engines have no citable source (a verified reference is needed, not an invented one); no DOI or PMID is recorded for any engine (citations are as written in the headers, not looked up); the source is not shown on the pages and formula and units display is not machine-checked. Details: docs/governance/CALCULATOR_SOURCE_LABEL.md."
     }
   ],
   "externalGates": [
