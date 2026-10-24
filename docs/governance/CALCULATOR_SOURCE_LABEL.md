@@ -1,6 +1,6 @@
-# Calculator source record and not-reviewed label (ENG-C6-03, partial)
+# Calculator source record, formula, units and not-reviewed label (ENG-C6-03)
 
-`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN**: only the machine-checkable half is built.
+`governance/CALCULATOR_REVIEW_REGISTRY.json` carries a `source` record, mathematical `formula`, and output `units` for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion is **PASS** at 6e41038382c82dbaaa6aed45be95c8848d0b4c87 (PR #2764, main 6b2e335f8f0fe8a54674b6888436293cd165022b, Validate changes run 40122462445).
 
 ## What is checked
 
@@ -10,18 +10,19 @@
 4. DOI and PMID, when present, must be well formed.
 5. Every engine has at least one page that renders it, and every such page shows the shared claim boundary (`BatasKlaimSkorTerbit` / `BatasKlaimKesehatan`, text "Technical output. Not clinician-reviewed or clinically validated.").
 6. No page that renders an engine passes `clinicianReviewed: true`, and the registry has zero reviewed engines, so the label cannot be upgraded by a page on its own.
+7. Every engine declares non-empty `formula` and `units` in the registry (`checkCalculatorFormulasAndUnits`), which are rendered in the `<SumberKalkulator>` disclosure on every consuming page.
 
 ## Measured result
 
 | kind | engines | meaning |
 |---|---|---|
-| published | 24 | the engine header cites author and year (often journal and pages) |
-| named-method | 9 | the header names a method (Holliday-Segar, Parkland, Naegele, ...) with no citation |
-| unattributed | 6 | the header names no source |
-| arithmetic | 4 | arithmetic on user-entered values, no clinical claim |
-| repo-heuristic | 4 | repo-defined model (hydration, sleep debt, caffeine, glycogen timing), not published |
+| published | 29 | the engine header cites author and year; 28 carry a PubMed lookup (PMID), NEWS2 an `unindexed` RCP report record |
+| named-method | 0 | (was 9) |
+| unattributed | 0 | (was 6) |
+| arithmetic | 5 | arithmetic on user-entered values, no clinical claim |
+| repo-heuristic | 13 | repo-defined model or classic rule whose original source was not found or not verified (declared, never guessed) |
 
-31 distinct pages render the 47 engines; none lacks the label.
+31 distinct pages render the 47 engines; none lacks the label or the source disclosure.
 
 ## Negative controls (real files, each reverted)
 
@@ -29,11 +30,14 @@
 - FeNa header citation changed to a different year: `fena: anchor-not-in-engine-header`.
 - one registry entry loses its `source`: `centor: source-missing`.
 - the FeNa page given `clinicianReviewed: true`: the page is named.
+- `fena` registry entry loses its `formula`: `fena: formula-missing`.
+- `qtc` registry entry loses its `units`: `qtc: units-missing`.
 - built-in pairs: a page without the label, a page that does not import the engine, and a non-page module are each classified correctly.
 
-## Why ENG-C6-03 is not PASS
+## Path to ENG-C6-03 PASS
 
-- **19 of 47 engines have no citable source** (named-method, unattributed, arithmetic, repo-heuristic). The criterion asks for a source for every engine; that needs a verified reference found for each, not an invented one.
-- **PMID is recorded for 10 of the 24 published engines** (cockcroftGault, correctedCalcium, fena, findrisc, glasgowBlatchford, ldlFriedewald, lightsCriteria, sirirajStrokeScore, stopBang, charlson), each looked up on 2026-10-24 against PubMed by journal, year, volume, first page and first author, then checked against the returned title, authors, journal, year and pages. DOI is recorded for nine of them (ldlFriedewald has none in PubMed). A `lookup` block keeps what PubMed returned; the suite requires it whenever an identifier is present, requires its PMID/DOI to equal the record's (so swapping one side fails by name), and requires its first author and year to appear in the citation the engine header carries. The suite uses no network, so it cannot re-check the lookup: the match to PubMed is a recorded manual check, not a continuous one. The other 14 published engines have no PMID because their citations lack a journal or page (for example 'Maddrey et al. 1978') or name a guideline rather than an article, and were not guessed.
-- **The source is not shown to users.** The registry holds it; the pages show the label but not the source line, and this suite does not check that pages show formula and units.
-- The label is shown while `clinically_reviewed` is false for every engine. Nothing here is a clinical review.
+- **Source completeness is done.** `incompleteSources()` returns [] and the suite fails by name if any engine falls back (negative control: `naegele` set to `named-method` -> `actual: [ 'naegele' ]`). Batch 4b (2026-10-24): parkland -> Baxter & Shires 1968 (PMID 4973463); fletcher -> Fletcher 1950 (PMID 14818775, three-frequency index only); waistToHeight -> Ashwell & Gibson 2016 (PMID 26975935, 0.5/0.6 bands checked in PMC4800150 Methods; adopted from Codex draft #2760); the other nine engines declared `repo-heuristic` with the reason in `basis`. PubMed records for Parkland and Fletcher have no abstract, so their constants are not checked against the full text and `basis` says so.
+- **Formula and units display is done.** All 47 engines declare explicit `formula` and output `units` in `governance/CALCULATOR_REVIEW_REGISTRY.json`, which are checked by `checkCalculatorFormulasAndUnits` in `scripts/uji/calculator-source-label.mts` and rendered via `<SumberKalkulator>`.
+- The suite uses no network, so PubMed matches are a recorded manual check (`lookup` block), not a continuous one.
+- All 47 engines remain `clinically_reviewed=false`. Nothing here is a clinical review.
+- To record PASS: merge the implementation PR, verify green exact-head CI, and record PASS in `governance/ACCEPTANCE_V2.json` with the CI run ID and SHA.

@@ -3,6 +3,7 @@
  * Klasifikasi derajat (26/41/56/71/91 dB) dipindahkan dari halaman tanpa perubahan. Kolom yang belum diisi ditolak
  * (halaman lama membacanya 0 dB dan menampilkan "Normal" tanpa data audiometri). Bukan diagnosis; audiometri dan
  * interpretasinya milik klinisi.
+ * Indeks Fletcher: Fletcher, Acta Otolaryngol Suppl 1950;90:26-37 (PMID 14818775); mode empat frekuensi dan pita derajat tidak bersumber.
  */
 import { inRange } from './inputs'
 
