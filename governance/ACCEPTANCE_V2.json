@@ -805,8 +805,9 @@
       "negativeControl": "Expired synthetic record still readable after a sweep fails the harness.",
       "evidence": "Harness test output at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "b7329cb47ede927614b1367dece8082ab1178384",
+      "statusNote": "PASS at b7329cb47ede927614b1367dece8082ab1178384 (PR #2749 head; git tree 6860fc6d456075cf5088afd935e6ca7b5a18856f is identical to main 8e9e26e754e7e0b6e1ff76563a048f7808049d71, the squash merge). Validate changes run 40073381361: job server-validate 120811445004 (success) ran cd server && npm run uji, which includes server/uji/retention.uji.ts (wired before the proxyAddr step); job validate 120811445155 success; Stabilization full-acceptance run 40073381358 job 120811445148 and server-acceptance job 120811444941 also success. The suite's own output line ('retention.uji: ok') is NOT quotable from the truncated job log; the evidence is that the step sits inside a job that succeeded, plus the local run before merge and five sabotages that each failed it (>= at the boundary, audit entry not written, deletion not executed, NaN date accepted, and the negative control). What it does: server/src/modules/retention/domain/retentionPolicy.ts validates a policy file fail-closed (unknown field, bad version/status, non-integer/zero/negative/NaN/Infinity/text/over-maximum days, bad collection name, unset-with-values, approved without approver/date/decision reference), plans and applies a sweep with an injected clock and store: records strictly older than the rule are deleted, exactly at the threshold are kept, records with unprovable age are never deleted, collections without a rule are untouched, a null rule deletes nothing, the audit entry is written before each deletion and is never pruned when audit maxAgeDays is null. Negative control: an expired record still readable after a sweep is judged a failure. Production policy governance/RETENTION_POLICY.json is status unset with no numbers: no legal or clinical retention value is invented and EXT-E4-A stays open. NOT shown: the harness is not wired to server/src/store.ts or scheduled, so it does not yet enforce retention on real data; the memory store in the test is synthetic; the draft decisions D1-D8 are unapproved."
     },
     {
       "id": "ENG-E7-01",
