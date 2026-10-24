@@ -44,6 +44,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | DONE (#2733); ENG-C6-02 PASS at 8a5c1f07 (tree identical to main b073f39f), 47 engines, 2026 adversarial runs, six fail-open paths found and fixed; see docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md |
 | T-C6-03 | Source record and not-reviewed label per engine | ENG-C6-03 | claude | IN_REVIEW (PR pending), criterion stays NOT_RUN: all 47 engines carry a source record (24 published, 23 with no citable source) bound to the engine header, and every page that renders an engine shows the not-reviewed label (31 pages, sabotaged); no DOI/PMID recorded, source not yet shown on pages. See docs/governance/CALCULATOR_SOURCE_LABEL.md |
+| T-E4-02 | logPrivacyHttp covers every route group of the RBAC matrix | ENG-E4-02 | claude | IN_REVIEW (PR pending), criterion stays NOT_RUN until CI is recorded: section 2c drives 74 routes with 124 markers, equals the registered routes in both directions, 4 sabotages (2 invisible to the static guard) fail by name. See ENG-E4-02 note |
 
 ## Later (H2)
 
