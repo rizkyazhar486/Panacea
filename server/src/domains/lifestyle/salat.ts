@@ -1,6 +1,7 @@
 import { getSettings, saveSettings } from '../../store.js'
 import { notify } from '../push/push.js'
 import { deliverThenCommitAlertState } from '../push/healthAlerts.js'
+import { salatLeadMinutes } from '../../modules/prayer/domain/leadMinutes.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pengingat SEBELUM waktu salat, dikirim server.
@@ -82,7 +83,7 @@ export async function checkPrayerReminder(userId: string): Promise<SalatCheck> {
   const kota = String(prefs.salatKota || 'Jakarta')
   const negara = String(prefs.salatNegara || 'Indonesia')
   const metode = Number(prefs.salatMetode) || 20
-  const lead = Math.min(60, Math.max(0, Number(prefs.salatLeadMin) ?? 5))
+  const lead = salatLeadMinutes(prefs.salatLeadMin)
 
   const offset = Number(prefs.tzOffsetMin) || 0
   const lokal = new Date(Date.now() + offset * 60_000)
