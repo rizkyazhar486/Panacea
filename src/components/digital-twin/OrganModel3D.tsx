@@ -257,6 +257,8 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
     const onCameraCommand = (e: Event) => {
       const custom = e as CustomEvent<{ action?: string }>
       const action = custom.detail?.action
+      if (!action || !['zoomIn', 'zoomOut', 'reset', 'front', 'back'].includes(action)) return
+      controls.autoRotate = false
       if (action === 'zoomIn') {
         controls.dollyIn(1.2)
         controls.update()
