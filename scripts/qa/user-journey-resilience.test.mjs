@@ -38,7 +38,8 @@ test('workflow runs the journey on a fresh server and keeps two negative control
   assert.ok(/for mode in bocor overflow/.test(workflow), 'both sabotage modes')
   assert.ok(/QA_SABOTASE=\$mode/.test(workflow) && /LOLOS/.test(workflow), 'a sabotage run that passes fails the job')
   assert.ok(workflow.includes('berhenti tanpa langkah gagal bernama'), 'a sabotage run must stop at a named failing step')
-  assert.equal((workflow.match(/user-journey-resilience\.mjs'/g) ?? []).length, 2, 'the script is in both path filters (push and pull_request)')
+  assert.equal((workflow.match(/user-journey-resilience\.mjs'/g) ?? []).length, 1, 'push paths retain resilience coverage')
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/, 'all PRs must execute resilience')
   assert.ok(workflow.includes('user-journey-resilience-negatif-bocor.json') && workflow.includes('user-journey-resilience-evidence.json'), 'evidence is uploaded')
 })
 

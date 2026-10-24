@@ -88,7 +88,8 @@ test('CI executes the evidence verifier and watches its implementation and tests
   assert.match(workflow, /elif ! node scripts\/qa\/f1-negative-evidence\.mjs "\$mode"/)
   assert.doesNotMatch(workflow, /elif ! grep/)
   assert.match(workflow, /node --test .*scripts\/qa\/f1-negative-evidence\.test\.mjs/)
-  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 2)
+  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 1)
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/)
 })
 
 // Mode 'crash' (ENG-F1-03): build tanpa batas rute harus gagal di langkah crash dengan diagnosis "cangkang hilang" per rute.
