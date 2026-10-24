@@ -134,8 +134,19 @@
         "citation": "Pugh et al. 1973",
         "anchor": "Pugh et al. 1973",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1002/bjs.1800600817",
+        "pmid": "4541913",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4541913",
+          "doi": "10.1002/bjs.1800600817",
+          "retrievedOn": "2026-10-24",
+          "title": "Transection of the oesophagus for bleeding oesophageal varices.",
+          "firstAuthor": "Pugh",
+          "journal": "Br J Surg",
+          "year": 1973,
+          "pages": "646-9"
+        }
       }
     },
     {
@@ -330,8 +341,19 @@
         "citation": "D'Agostino 2008 (Framingham General CVD)",
         "anchor": "D'Agostino 2008",
         "basis": "Input validation for the Framingham model; header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1161/CIRCULATIONAHA.107.699579",
+        "pmid": "18212285",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18212285",
+          "doi": "10.1161/CIRCULATIONAHA.107.699579",
+          "retrievedOn": "2026-10-24",
+          "title": "General cardiovascular risk profile for use in primary care: the Framingham Heart Study.",
+          "firstAuthor": "D'Agostino",
+          "journal": "Circulation",
+          "year": 2008,
+          "pages": "743-53"
+        }
       }
     },
     {
@@ -373,8 +395,19 @@
         "citation": "Granger et al. 2003 (GRACE in-hospital mortality)",
         "anchor": "Granger et al. 2003",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1001/archinte.163.19.2345",
+        "pmid": "14581255",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "14581255",
+          "doi": "10.1001/archinte.163.19.2345",
+          "retrievedOn": "2026-10-24",
+          "title": "Predictors of hospital mortality in the global registry of acute coronary events.",
+          "firstAuthor": "Granger",
+          "journal": "Arch Intern Med",
+          "year": 2003,
+          "pages": "2345-53"
+        }
       }
     },
     {
@@ -500,7 +533,18 @@
         "anchor": "Maddrey et al. 1978",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
+        "pmid": "352788",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "352788",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Corticosteroid therapy of alcoholic hepatitis.",
+          "firstAuthor": "Maddrey",
+          "journal": "Gastroenterology",
+          "year": 1978,
+          "pages": "193-9"
+        }
       }
     },
     {
@@ -619,8 +663,19 @@
         "citation": "Paradise et al., 1984",
         "anchor": "Paradise et al., 1984",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1056/NEJM198403153101102",
+        "pmid": "6700642",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6700642",
+          "doi": "10.1056/NEJM198403153101102",
+          "retrievedOn": "2026-10-24",
+          "title": "Efficacy of tonsillectomy for recurrent throat infection in severely affected children. Results of parallel randomized and nonrandomized clinical trials.",
+          "firstAuthor": "Paradise",
+          "journal": "N Engl J Med",
+          "year": 1984,
+          "pages": "674-83"
+        }
       }
     },
     {
@@ -710,7 +765,18 @@
         "anchor": "Dorwart & Chalmers 1975",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
+        "pmid": "1112025",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1112025",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Comparison of methods for calculating serum osmolality form chemical concentrations, and the prognostic value of such calculations.",
+          "firstAuthor": "Dorwart",
+          "journal": "Clin Chem",
+          "year": 1975,
+          "pages": "190-4"
+        }
       }
     },
     {
@@ -766,8 +832,19 @@
         "citation": "Vincent et al. 1996 (SOFA)",
         "anchor": "Vincent et al. 1996",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1007/BF01709751",
+        "pmid": "8844239",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "8844239",
+          "doi": "10.1007/BF01709751",
+          "retrievedOn": "2026-10-24",
+          "title": "The SOFA (Sepsis-related Organ Failure Assessment) score to describe organ dysfunction/failure. On behalf of the Working Group on Sepsis-Related Problems of the European Society of Intensive Care Medicine.",
+          "firstAuthor": "Vincent",
+          "journal": "Intensive Care Med",
+          "year": 1996,
+          "pages": "707-10"
+        }
       }
     },
     {
