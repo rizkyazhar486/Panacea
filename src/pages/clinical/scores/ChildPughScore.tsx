@@ -4,6 +4,7 @@ import { IconActivity } from '../../../components/icons'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { childPugh, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,6 +48,7 @@ export function ChildPughScore() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Child-Pugh Score" subtitle="Cirrhosis severity & surgical risk (Pugh et al. 1973)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['childPugh']} />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Five criteria, 1-3 points each (5-15 total). Used alongside MELD-Na for prognosis, and
           specifically for surgical risk stratification and drug-dosing decisions in cirrhosis.

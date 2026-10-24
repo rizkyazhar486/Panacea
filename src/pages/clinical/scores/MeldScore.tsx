@@ -4,6 +4,7 @@ import { IconActivity } from '../../../components/icons'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { meldNa as hitungMeld, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ export function MeldScore() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="MELD-Na Score" subtitle="End-stage liver disease severity — transplant allocation priority" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['meldNa']} />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Model for End-Stage Liver Disease, sodium-adjusted (current UNOS/OPTN organ allocation
           formula). Higher scores mean higher short-term mortality and higher transplant priority.
