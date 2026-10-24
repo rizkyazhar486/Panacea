@@ -1,0 +1,72 @@
+{
+ "schema": "panacea-rig-landmark-nodes/v1",
+ "criterion": "ENG-D7-03",
+ "tool": "scripts/qa/glb-add-foot-landmarks.mjs",
+ "statement": "Landmark empties were appended as children of FOOT.L/R. Stripping them must give the pre-landmark JSON (canonical JSON.stringify) and BIN chunk exactly; mesh, skin and animation data are unchanged.",
+ "assets": {
+  "adult_male": {
+   "before_sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
+   "before_json_canonical_sha256": "d17cb3234ed52ee40e06e382b77ecf2f9a3b1ee3f3695a3d1dfaa6b1b100144f",
+   "bin_sha256": "d57e2d9a31c6927b47a68f95696a4b57ce03fc094abfdcfc0857aa04666163e8",
+   "after_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+   "landmarks": {
+    "HEEL_L": {
+     "translation": [
+      0.0238228,
+      -0.0058447,
+      0.0577655
+     ],
+     "source": "SKELETAL.CALCANEUS.L (lowest vertex)"
+    },
+    "BALL_L": {
+     "translation": [
+      -0.0161362,
+      0.1269749,
+      0.0158267
+     ],
+     "source": "SKELETAL.FIRST_METATARSAL_BONE.L (lowest vertex in anterior quarter)"
+    },
+    "HEEL_R": {
+     "translation": [
+      0.0238129,
+      -0.0058444,
+      -0.0577696
+     ],
+     "source": "SKELETAL.CALCANEUS.R (lowest vertex)"
+    },
+    "BALL_R": {
+     "translation": [
+      -0.0161378,
+      0.1269748,
+      -0.015823
+     ],
+     "source": "SKELETAL.FIRST_METATARSAL_BONE.R (lowest vertex in anterior quarter)"
+    }
+   }
+  },
+  "vhf_denver_ct_adult_female": {
+   "before_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
+   "before_json_canonical_sha256": "445b02d5dfe1524d7dda0bb6923b3c20351b22ad7eaef4e8e486fd304ae8011e",
+   "bin_sha256": "d89b6b88b6dd68de4d80976942d83fb5e165b6b377a1e6a9865385adaba578bf",
+   "after_sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+   "landmarks": {
+    "HEEL_L": {
+     "translation": [
+      0.0165778,
+      0.035367,
+      0.0195416
+     ],
+     "source": "SKELETAL.CALCANEUS.L (lowest vertex)"
+    },
+    "HEEL_R": {
+     "translation": [
+      0.0174812,
+      0.0317236,
+      -0.0309754
+     ],
+     "source": "SKELETAL.CALCANEUS.R (lowest vertex)"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,62 @@
+name: Optional human review
+description: Voluntary review of a Panaceamed task. Never required; does not grant licence, consent or clinical validation.
+title: "[review] <task id>"
+labels: ["human-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This review is **voluntary**. Skipping it never blocks engineering. Terms: docs/governance/HUMAN_VERIFICATION_OPTIONAL.md.
+        Do not include patient data.
+  - type: input
+    id: task
+    attributes:
+      label: Task id
+      description: For example ENG-F2-01 or a PR number.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit SHA reviewed
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: What exactly did you review (scope)?
+      description: A review only covers what you write here.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist (tick only what you actually checked; nothing is pre-ticked)
+      options:
+        - label: The behaviour matches the task description
+        - label: It reads clearly on a phone (about 390 px wide)
+        - label: Keyboard / screen-reader use worked for what I tried
+        - label: I found no wrong, misleading or unsafe text
+        - label: Nothing looked like patient data being exposed
+  - type: dropdown
+    id: decision
+    attributes:
+      label: Decision
+      options:
+        - Approve
+        - Request changes
+        - Defer
+        - Not applicable
+    validations:
+      required: true
+  - type: input
+    id: reviewer
+    attributes:
+      label: Your name and role (leave empty to submit as anonymous feedback)
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I understand this review is voluntary, limited to the scope above, and is not a licence, consent, legal approval or clinical validation.
+          required: true
