@@ -13,6 +13,10 @@ export interface ReviewEntry {
   reviewer: string | null
   reviewed_at: string | null
   evidence: string | null
+  /** Rumus atau persamaan yang dijalankan mesin (ENG-C6-03). */
+  formula?: string
+  /** Satuan keluaran mesin (ENG-C6-03). */
+  units?: string
   /** Dasar sumber mesin (ENG-C6-03); diperiksa terpisah oleh checkSourceRecords. */
   source?: SourceRecord
 }
