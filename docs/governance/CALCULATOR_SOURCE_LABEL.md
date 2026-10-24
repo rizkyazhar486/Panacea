@@ -1,6 +1,6 @@
 # Calculator source record, formula, units and not-reviewed label (ENG-C6-03)
 
-`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record, mathematical `formula`, and output `units` for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN** until this PR is integrated and an exact-SHA CI evidence run is recorded.
+`governance/CALCULATOR_REVIEW_REGISTRY.json` carries a `source` record, mathematical `formula`, and output `units` for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion is **PASS** at 6e41038382c82dbaaa6aed45be95c8848d0b4c87 (PR #2764, main 6b2e335f8f0fe8a54674b6888436293cd165022b, Validate changes run 40122462445).
 
 ## What is checked
 
