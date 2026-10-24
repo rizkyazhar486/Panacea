@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getVitals, type Vitals } from '../../lib/healthVitals'
 import { getWorkouts } from '../../lib/workoutStore'
 import type { ImportedWorkout } from '../../lib/workoutImport'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { useStore } from '../../lib/store'
 
@@ -67,21 +68,24 @@ function paceLabel(sec: number) {
 }
 
 function weeklyVolume(workouts: ImportedWorkout[]) {
-  const out: { key: string; label: string; minutes: number }[] = []
+  const out: { key: string; label: string; minutes: number; known: number; missing: number }[] = []
   const now = new Date()
   for (let offset = 6; offset >= 0; offset--) {
     const d = new Date(now)
     d.setHours(0, 0, 0, 0)
     d.setDate(d.getDate() - offset)
-    out.push({ key: dayKey(d), label: d.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2), minutes: 0 })
+    out.push({ key: dayKey(d), label: d.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2), minutes: 0, known: 0, missing: 0 })
   }
   const byKey = new Map(out.map((d) => [d.key, d]))
   for (const w of workouts) {
     const d = new Date(w.mulai)
     const slot = byKey.get(dayKey(d))
-    if (slot && Number.isFinite(w.durasi) && w.durasi > 0) slot.minutes += w.durasi / 60
+    if (!slot) continue
+    const seconds = workoutDurationSeconds(w)
+    if (seconds === null) slot.missing++
+    else { slot.minutes += seconds / 60; slot.known++ }
   }
-  return out.map((d) => ({ ...d, minutes: Math.round(d.minutes) }))
+  return out.map((d) => ({ ...d, minutes: d.missing > 0 && d.known === 0 ? null : Math.round(d.minutes) }))
 }
 
 function zoneDistribution(workouts: ImportedWorkout[], hrMax: number) {
@@ -118,27 +122,32 @@ function sessionMix(workouts: ImportedWorkout[]) {
 }
 
 function activityCalendar(workouts: ImportedWorkout[], gps: { at: string; durSec: number }[]) {
-  const out: { key: string; label: string; minutes: number }[] = []
+  const out: { key: string; label: string; minutes: number; known: number; missing: number }[] = []
   const now = new Date()
   for (let offset = 27; offset >= 0; offset--) {
     const d = new Date(now)
     d.setHours(0, 0, 0, 0)
     d.setDate(d.getDate() - offset)
-    out.push({ key: dayKey(d), label: d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }), minutes: 0 })
+    out.push({ key: dayKey(d), label: d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }), minutes: 0, known: 0, missing: 0 })
   }
   const byKey = new Map(out.map((d) => [d.key, d]))
   if (workouts.length) {
     for (const w of workouts) {
       const slot = byKey.get(dayKey(new Date(w.mulai)))
-      if (slot && w.durasi > 0) slot.minutes += w.durasi / 60
+      if (!slot) continue
+      const seconds = workoutDurationSeconds(w)
+      if (seconds === null) slot.missing++
+      else { slot.minutes += seconds / 60; slot.known++ }
     }
   } else {
     for (const g of gps) {
       const slot = byKey.get(dayKey(new Date(g.at)))
-      if (slot && g.durSec > 0) slot.minutes += g.durSec / 60
+      if (!slot) continue
+      if (!Number.isFinite(g.durSec) || g.durSec < 0) slot.missing++
+      else { slot.minutes += g.durSec / 60; slot.known++ }
     }
   }
-  return out.map((d) => ({ ...d, minutes: Math.round(d.minutes) }))
+  return out.map((d) => ({ ...d, minutes: d.missing > 0 && d.known === 0 ? null : Math.round(d.minutes) }))
 }
 
 function paceHrScatter(workouts: ImportedWorkout[], gps: { at: string; avgHr?: number; avgSpeedKmh: number; sport: string }[]): ScatterPoint[] {
@@ -279,19 +288,22 @@ function SleepBars({ rows }: { rows: { label: string; value: number }[] }) {
   )
 }
 
-function ActivityHeatmap({ rows }: { rows: { key: string; label: string; minutes: number }[] }) {
-  const max = Math.max(...rows.map((r) => r.minutes), 1)
-  const total = rows.reduce((a, b) => a + b.minutes, 0)
-  const activeDays = rows.filter((r) => r.minutes > 0).length
+function ActivityHeatmap({ rows }: { rows: { key: string; label: string; minutes: number | null; known: number; missing: number }[] }) {
+  const max = Math.max(...rows.map((r) => r.minutes ?? 0), 1)
+  const missing = rows.reduce((a, b) => a + b.missing, 0)
+  const known = rows.reduce((a, b) => a + b.known, 0)
+  const total = missing > 0 && known === 0 ? '—' : rows.reduce((a, b) => a + (b.minutes ?? 0), 0)
+  const activeDays = rows.filter((r) => (r.minutes ?? 0) > 0).length
   return (
     <>
       <div className="mt-4 grid grid-cols-7 gap-1.5" role="img" aria-label="Twenty-eight day activity heatmap">
         {rows.map((r) => {
-          const level = r.minutes <= 0 ? 0 : clamp(r.minutes / max, .18, 1)
-          return <div key={r.key} title={`${r.label}: ${r.minutes} min`} className="aspect-square rounded-[7px] border border-black/[.04] dark:border-white/[.05]" style={{ background: level ? `rgba(109,93,252,${0.18 + level * 0.76})` : 'rgba(148,163,184,.10)' }} />
+          const level = (r.minutes ?? 0) <= 0 ? 0 : clamp((r.minutes ?? 0) / max, .18, 1)
+          return <div key={r.key} title={`${r.label}: ${r.minutes ?? '—'} ${r.missing ? 'known minutes; duration unavailable for ' + r.missing + ' session(s)' : 'min'}`} className="aspect-square rounded-[7px] border border-black/[.04] dark:border-white/[.05]" style={{ background: level ? `rgba(109,93,252,${0.18 + level * 0.76})` : 'rgba(148,163,184,.10)' }} />
         })}
       </div>
-      <div className="mt-3 flex items-center justify-between text-[9px] font-bold text-neutral-400"><span>{activeDays} active days</span><span>{total} min / 28d</span><span>more →</span></div>
+      {missing > 0 && <p className="mt-2 text-[11px] text-neutral-500 dark:text-neutral-400">Duration unavailable for {missing} session(s); excluded from minutes and active-day counts.</p>}
+      <div className="mt-3 flex items-center justify-between text-[9px] font-bold text-neutral-400"><span>{activeDays} active days</span><span>{total} {missing ? 'known min' : 'min'} / 28d</span><span>more →</span></div>
     </>
   )
 }
@@ -345,8 +357,10 @@ export function PerformanceVisualizationDeck({ mode = 'home' }: { mode?: Mode })
     return { vitals, workouts, athlete, maxHr, weekly, zones, mix, hrv, rhr, activity28, scatter, recovery }
   }, [tick, state.gpsActivities])
 
-  const weeklyMax = Math.max(...data.weekly.map((d) => d.minutes), 1)
-  const weeklyTotal = data.weekly.reduce((a, b) => a + b.minutes, 0)
+  const weeklyMax = Math.max(...data.weekly.map((d) => d.minutes ?? 0), 1)
+  const weeklyMissing = data.weekly.reduce((a, b) => a + b.missing, 0)
+  const weeklyKnown = data.weekly.reduce((a, b) => a + b.known, 0)
+  const weeklyTotal = weeklyMissing > 0 && weeklyKnown === 0 ? '—' : data.weekly.reduce((a, b) => a + (b.minutes ?? 0), 0)
   const zoneTotal = data.zones.reduce((a, b) => a + b, 0)
   const zonePct = zoneTotal ? data.zones.map((z) => Math.round((z / zoneTotal) * 100)) : []
   const biomarker = data.hrv.length >= 2 ? { label: 'HRV', unit: 'ms', rows: data.hrv } : { label: 'Resting HR', unit: 'bpm', rows: data.rhr }
@@ -381,7 +395,7 @@ export function PerformanceVisualizationDeck({ mode = 'home' }: { mode?: Mode })
     return deretMetrik('vo2max', 90).slice(-12).map((x) => ({ label: shortDate(x.tanggal), value: x.nilai }))
   }, [state.vo2maxLog, tick])
 
-  const advancedAvailable = data.activity28.some((d) => d.minutes > 0) || sleepRows.length >= 2 || vo2Rows.length >= 2 || data.scatter.length >= 2 || !!data.recovery
+  const advancedAvailable = data.activity28.some((d) => d.known > 0 || d.missing > 0) || sleepRows.length >= 2 || vo2Rows.length >= 2 || data.scatter.length >= 2 || !!data.recovery
   const sleepAvg = sleepRows.length ? sleepRows.reduce((a, b) => a + b.value, 0) / sleepRows.length : 0
   const vo2Values = vo2Rows.map((x) => x.value)
   const vo2Delta = vo2Values.length >= 2 ? vo2Values[vo2Values.length - 1] - vo2Values[0] : 0
@@ -402,16 +416,17 @@ export function PerformanceVisualizationDeck({ mode = 'home' }: { mode?: Mode })
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500 dark:text-neutral-400">7-day volume</div>
-              <div className="mt-1 text-[26px] font-black tracking-tight text-neutral-950 dark:text-white">{weeklyTotal}<span className="ml-1 text-[11px] font-bold text-neutral-400">min</span></div>
+              <div className="mt-1 text-[26px] font-black tracking-tight text-neutral-950 dark:text-white">{weeklyTotal}<span className="ml-1 text-[11px] font-bold text-neutral-400">{weeklyMissing ? 'known min' : 'min'}</span></div>
             </div>
             <span className="rounded-full bg-cyan-500/10 px-2 py-1 text-[9px] font-black text-cyan-700 dark:text-cyan-200">REAL SESSIONS</span>
           </div>
+          {weeklyMissing > 0 && <p className="mt-2 text-[11px] text-neutral-500 dark:text-neutral-400">Duration unavailable for {weeklyMissing} session(s); excluded from minutes.</p>}
           <div className="mt-4 flex h-[118px] items-end gap-2" role="img" aria-label="Workout minutes for each of the last seven days">
             {data.weekly.map((d) => {
-              const h = d.minutes > 0 ? Math.max(10, (d.minutes / weeklyMax) * 88) : 4
+              const h = (d.minutes ?? 0) > 0 ? Math.max(10, ((d.minutes ?? 0) / weeklyMax) * 88) : 4
               return (
-                <div key={d.key} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
-                  <div className="text-[8px] font-black tabular-nums text-neutral-400">{d.minutes || ''}</div>
+                <div key={d.key} title={`${d.label}: ${d.minutes ?? '—'} min${d.missing ? '; duration unavailable for ' + d.missing + ' session(s)' : ''}`} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
+                  <div className="text-[8px] font-black tabular-nums text-neutral-400">{d.minutes === null ? '—' : d.known > 0 ? d.minutes : ''}</div>
                   <div className="w-full rounded-t-[10px] bg-gradient-to-t from-cyan-500 via-blue-500 to-violet-500 shadow-[0_0_18px_rgba(82,92,255,.18)]" style={{ height: `${h}px`, opacity: d.minutes ? 1 : .18 }} />
                   <div className="text-[9px] font-black text-neutral-400">{d.label}</div>
                 </div>
@@ -509,7 +524,7 @@ export function PerformanceVisualizationDeck({ mode = 'home' }: { mode?: Mode })
           </div>
 
           <div className={mode === 'home' ? 'no-scrollbar -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2' : 'grid gap-3 sm:grid-cols-2'}>
-            {data.activity28.some((d) => d.minutes > 0) && (
+            {data.activity28.some((d) => d.known > 0 || d.missing > 0) && (
               <CardShell className={mode === 'home' ? 'w-[310px] shrink-0 snap-start' : ''}>
                 <div className="flex items-start justify-between gap-3">
                   <div><div className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500 dark:text-neutral-400">Consistency</div><div className="mt-1 text-[12px] font-bold text-neutral-800 dark:text-neutral-100">28-day activity heatmap</div></div>
