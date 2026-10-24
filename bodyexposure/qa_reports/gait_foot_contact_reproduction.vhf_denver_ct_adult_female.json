@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
- "source_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
- "reproducer_sha256": "474590f3f203905a32a4592a4e487a1048c72a1248b61f7079fb2d087f1986ea",
+ "source_sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+ "reproducer_sha256": "5f812e0a2c70c5e4c11b8ce9ac7917667a9c6fd141f7cc446d560fd9b9cd8342",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
@@ -52,6 +52,36 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": null,
+     "R": null
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": false,
+      "R": false
+     }
+    }
    },
    "sole": {
     "stance_phases": 1,
@@ -152,6 +182,36 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": null,
+     "R": null
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "available_by_side": {
+      "L": false,
+      "R": false
+     }
+    }
    },
    "sole": {
     "stance_phases": 3,

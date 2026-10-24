@@ -19,6 +19,7 @@ Rules for every AI lane:
 - Claim a TASK_BOARD row before starting; release it if blocked.
 - Check open PRs for file overlap before editing; never edit a file another open PR edits.
 - Author and reviewer are different lanes.
+- **Only Claude may take over another AI agent's code** (owner rule, 2026-10-23): resolving conflicts on, pushing to, closing or superseding a branch/PR authored by a different agent. Codex, Gemini, Astra and Argon work only on their own branches; if another agent's PR needs changes, they leave a review comment or a TASK_BOARD row for Claude.
 - AI may do legal and licence **research** (find primary licence text, draft questions, compare
   terms). AI may not grant rights, declare authorship, or approve a policy. Unresolved rights restrict
   the asset; they never become an invented grant.

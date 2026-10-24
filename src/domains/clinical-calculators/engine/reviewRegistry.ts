@@ -2,6 +2,8 @@
 // Murni: tanpa I/O. Fail closed — status "ditinjau" hanya sah bila identitas
 // peninjau, tanggal ISO, dan bukti tercatat; tidak ada peninjau karangan.
 
+import type { SourceRecord } from './sourceRecord'
+
 export type ReviewStatus = 'PENDING_CLINICAL_REVIEW' | 'CLINICALLY_REVIEWED'
 
 export interface ReviewEntry {
@@ -11,6 +13,8 @@ export interface ReviewEntry {
   reviewer: string | null
   reviewed_at: string | null
   evidence: string | null
+  /** Dasar sumber mesin (ENG-C6-03); diperiksa terpisah oleh checkSourceRecords. */
+  source?: SourceRecord
 }
 
 export interface ReviewRegistry {
