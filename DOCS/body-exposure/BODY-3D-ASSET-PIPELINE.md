@@ -3,6 +3,8 @@
 Status: active architecture target  
 Owner intent: simple at whole-body scale; progressively more detailed and complex only when the user zooms, selects, peels, isolates or enters a deeper biological scale.
 
+> **Rendering upgrade handoff for Claude/Argon:** See [`WebGPU / Temporal Upscaling / Neural Rendering Implementation Guide`](../../docs/body-exposure/WEBGPU_NEURAL_RENDERING_IMPLEMENTATION.md) for the phased WebGPU + TAAU implementation, compatibility fallbacks, testing, and the explicit restriction against calling browser reconstruction 'NVIDIA DLSS 5'. Follow it after existing stabilization and medical/provenance gates; no change here implies rendering is already implemented.
+
 ## 1. Non-negotiable architecture
 
 Panacea must not try to "draw anatomy with Three.js primitives" when source-backed geometry exists or is required.

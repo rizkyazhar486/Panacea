@@ -119,6 +119,25 @@ export function incompleteSources(entries: ReadonlyArray<{ id: string; source?: 
   }).map((e) => e.id).sort()
 }
 
+/**
+ * Validasi rumus dan satuan (ENG-C6-03): setiap mesin kalkulator wajib mendeklarasikan rumus (formula)
+ * dan satuan keluaran (units) yang tidak kosong. Mengembalikan daftar pesan galat per id yang melanggar.
+ */
+export function checkCalculatorFormulasAndUnits(
+  entries: ReadonlyArray<{ id: string; formula?: string | null; units?: string | null }>,
+): string[] {
+  const errors: string[] = []
+  for (const { id, formula, units } of entries) {
+    if (!formula || typeof formula !== 'string' || formula.trim().length === 0) {
+      errors.push(`${id}: formula-missing`)
+    }
+    if (!units || typeof units !== 'string' || units.trim().length === 0) {
+      errors.push(`${id}: units-missing`)
+    }
+  }
+  return errors
+}
+
 /** Komentar blok pertama berkas (kepala dokumentasi mesin); string kosong bila tidak ada. */
 export function engineHeader(source: string): string {
   const m = /^\s*\/\*\*?([\s\S]*?)\*\//.exec(source)

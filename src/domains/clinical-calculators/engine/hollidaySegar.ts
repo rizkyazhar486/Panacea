@@ -1,6 +1,7 @@
 /**
  * Holliday-Segar maintenance fluid (4-2-1): 100 mL/kg untuk 10 kg pertama, +50 mL/kg untuk 10 kg kedua,
  * +20 mL/kg untuk setiap kg di atas 20. Tampilan pendukung keputusan, bukan order.
+ * Sumber bernama: Holliday & Segar, Pediatrics 1957;19:823-32 (PMID 13431307); konstanta belum dicocokkan dengan teks lengkap.
  */
 import { inRange } from './inputs'
 

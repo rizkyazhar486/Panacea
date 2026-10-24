@@ -90,8 +90,11 @@ export const ukur = () => {
     const besar = px >= 24 || (px >= 18.66 && tebal)
     const perlu = besar ? 3 : 4.5
     const k = rasio(fg, bg)
-    // teks ~identik dengan latar yang terbaca = hampir pasti lapisan latar di luar rantai ancestor (pseudo-elemen, saudara absolut): TIDAK dinilai lulus, dihitung terpisah.
-    if (k < 1.5) { out.latarTakTerselesaikan = (out.latarTakTerselesaikan || 0) + 1; continue }
+    // Opaque solid backgrounds provide known contrast; do not hide white-on-white
+    // failures in the unresolved-sibling category.
+    const ownBg = parse(s.backgroundColor)
+    const ownOpaque = !!ownBg && ownBg.a >= 0.999 && s.backgroundImage === 'none' && s.backgroundClip !== 'text' && s.mixBlendMode === 'normal'
+    if (k < 1.5 && !ownOpaque) { out.latarTakTerselesaikan = (out.latarTakTerselesaikan || 0) + 1; continue }
     out.teksDiukur++
     if (k < perlu) out.gagal.push({ ruang: !!(fg0.ruang || bgRuang), sel: `${el.tagName.toLowerCase()}${typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : ''}`, teks: n.nodeValue.trim().slice(0, 30), rasio: Math.round(k * 100) / 100, perlu, px, fg: `rgb(${Math.round(fg.r)},${Math.round(fg.g)},${Math.round(fg.b)})`, bg: `rgb(${Math.round(bg.r)},${Math.round(bg.g)},${Math.round(bg.b)})` })
   }

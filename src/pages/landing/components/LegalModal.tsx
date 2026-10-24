@@ -1,38 +1,60 @@
+import { useEffect, useRef } from 'react'
+import { PRIVACY_DISCLOSURE } from '../../../domains/privacy'
+import { Link } from 'react-router-dom'
 export function LegalModal({ onClose }: { onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    const dialog = dialogRef.current
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const previousOverflow = document.body.style.overflow
+    dialog?.showModal()
+    dialog?.querySelector('h3')?.focus()
+    if (dialog) dialog.scrollTop = 0
+    document.body.style.overflow = 'hidden'
+    return () => {
+      if (dialog?.open) dialog.close()
+      document.body.style.overflow = previousOverflow
+      if (previousFocus?.isConnected) previousFocus.focus()
+    }
+  }, [])
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-      onClick={onClose}
+    <dialog ref={dialogRef} aria-labelledby="privacy-summary-title"
+      onCancel={e => { e.preventDefault(); onClose() }}
+      onKeyDown={e => {
+        if (e.key !== 'Tab') return
+        const controls = e.currentTarget.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+        const first = controls[0], last = controls[controls.length - 1]
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === e.currentTarget.querySelector('h3'))) {
+          e.preventDefault(); last?.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first?.focus()
+        }
+      }}
+      onClick={e => {
+        const box = e.currentTarget.getBoundingClientRect()
+        if (e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom) onClose()
+      }}
+      style={{ width: 'calc(100% - 2rem)' }}
+      className="m-auto max-h-[85vh] max-w-lg overflow-y-auto rounded-3xl border border-neutral-200 bg-neutral-50 p-6 text-neutral-900 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-xs dark:border-neutral-800 dark:bg-neutral-900 dark:text-white"
     >
-      <div
-        className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
-        onClick={e => e.stopPropagation()}
-      >
-        <h3 className="text-lg font-bold text-ink dark:text-white">
-          Persetujuan Klinis, Privasi &amp; Ketentuan Layanan
+        <h3 id="privacy-summary-title" tabIndex={-1} className="text-lg font-bold text-neutral-900 dark:text-white">
+          Clinical Consent, Privacy &amp; Terms
         </h3>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          <p>
-            <b>Informed Consent.</b> Interaksi dengan asisten AI bersifat edukatif dan suportif untuk membantu analisis kesehatan, bukan diagnosis medis akhir. Diagnosis resmi dan keputusan terapi tetap memerlukan verifikasi langsung oleh dokter berizin.
-          </p>
-          <p>
-            <b>Privasi (UU Perlindungan Data Pribadi No. 27/2022).</b> Data kesehatan Anda adalah data pribadi spesifik yang disimpan terenkripsi dengan audit log akses yang ketat. Anda memiliki hak penuh untuk mengakses, memperbarui, atau menghapus riwayat data Anda kapan saja.
-          </p>
-          <p>
-            <b>Ketentuan Profesi.</b> Modul AI-EMR khusus diperuntukkan bagi klinisi terdaftar dengan STR/SIP aktif. Layanan kefarmasian tunduk pada regulasi BPOM dan pengawasan apoteker berlisensi. Dalam situasi darurat medis, gunakan fitur Darurat SOS atau segera hubungi IGD rumah sakit terdekat.
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            Ketentuan lengkap dapat diakses kembali melalui menu "Privasi &amp; Legalitas" setelah Anda masuk.
-          </p>
+          <p><b>Clinical authority.</b> {PRIVACY_DISCLOSURE.draftReview} {PRIVACY_DISCLOSURE.clinicalAuthority}</p>
+          <p><b>Data requests.</b> {PRIVACY_DISCLOSURE.requests} {PRIVACY_DISCLOSURE.localReset}</p>
+          <p><b>Sharing.</b> {PRIVACY_DISCLOSURE.sharing}</p>
+          <p><b>Deployment.</b> {PRIVACY_DISCLOSURE.deployment}</p>
+          <p><b>Retention.</b> {PRIVACY_DISCLOSURE.retention}</p>
+          <Link to="/legal" onClick={onClose} className="inline-flex min-h-11 items-center underline">Read full policy and control details</Link>
         </div>
         <button
           onClick={onClose}
           type="button"
           className="mt-5 w-full rounded-full bg-brand hover:opacity-95 py-3 text-sm font-bold text-white shadow-md min-h-[44px]"
         >
-          Saya Mengerti &amp; Setuju
+          Close policy summary
         </button>
-      </div>
-    </div>
+    </dialog>
   )
 }

@@ -26,6 +26,10 @@ Dokumen ini adalah **kontrak kerja singkat** untuk setiap model/agent AI yang me
 
 Semua agent wajib mengikuti [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md). Arah jangka panjang PanaceaMed adalah **verified healthcare outcome delivery + reproducible biomedical discovery**: riset fisiologi yang bisa difalsifikasi, data yang sah/berizin, metrik yang dipraspesifikasi, replikasi eksternal, lalu kolaborasi translasi bila lolos gate. **Bukan** klaim telah menemukan terapi, izin riset manusia, atau alasan mengabaikan current clinical wedge, keamanan, clinical review dan CI exact-head. Riset awal hanya satu slice terukur; hindari feature sprawl.
 
+## Genesis device OS — past, present, future
+
+Directive pemilik wajib: [`PANACEA_GENESIS_DIRECTIVE.md`](PANACEA_GENESIS_DIRECTIVE.md) dan [`DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md`](DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md). Bangun kemampuan translasi **perangkat medis lampau (arsip analog/digital), masa kini dan masa depan** memakai satu identity/state longitudinal, metadata perangkat, time precision, provenance, consent, unit/signal QC, dan clinical review. Jangan samakan dokumen historis dengan sinyal device live, atau catalog-only dengan konektivitas vendor. Semua interpretasi AI adalah projection/draft bukan pengukuran baru; tidak ada device actuation otomatis. Implementasi bertahap di `DOCS/MEDICAL-DEVICE-FABRIC.md`; current clinical wedge, keamanan dan exact-head CI tetap prioritas.
+
 ---
 
 ## 1. Gambaran proyek
@@ -304,6 +308,7 @@ Dokumen lain **tidak** dimuat otomatis — baca sendiri sesuai tugas:
 | Apa pun yang luas / "lanjut" | `governance/doctrine/PANACEA_PRODUCT_MATURITY_OS.md`, `automation/AUTONOMOUS_RND_LOOP.md`, `governance/` |
 | Klaim ilmiah/klinis, R&D, novelty | `governance/doctrine/PANACEA_CONSTITUTION.md`, `DOCS/clinical-research/ACADEMIC-ACCURACY-GATE.md` |
 | Frontier biomedical research, neurotechnology, translational strategy | `PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`, `PANACEA_CONSTITUTION.md` |
+| Historical/current/future device translation & Genesis research | `PANACEA_GENESIS_DIRECTIVE.md`, `DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md` |
 | Model manusia, fisiologi, simulasi, coupling | `governance/doctrine/PANACEA_COMPUTATIONAL_HUMAN_PLATFORM.md`, `governance/doctrine/PANACEA_VERTICAL_COMPUTATIONAL_HUMAN_DOCTRINE.md`, `DOCS/clinical-research/PHYSIOLOGICAL-RUNTIME.md` |
 | Data pasien, wearable, device, EMR | `governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md`, `governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md`, `DOCS/clinical-research/MEDICAL-DEVICE-FABRIC.md` |
 | Body Exposure / 3D / atlas | `DOCS/body-exposure/BODY-3D-ASSET-PIPELINE.md`, bagian "Body Exposure" di `governance/doctrine/PANACEA_OWNER_DIRECTIVES.md` |

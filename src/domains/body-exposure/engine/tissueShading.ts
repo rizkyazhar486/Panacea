@@ -38,8 +38,8 @@ export interface TissueShading {
 // Urutan penting: pola lebih spesifik lebih dulu (mis. "tendon" sebelum otot,
 // "pulmonary artery" adalah pembuluh, "white matter" adalah otak).
 const RULES: readonly (readonly [TissueClass, RegExp])[] = [
-  ['tendon', /\b(tendon|ligament|aponeuros|fascia|suture)/i],
-  ['cartilage', /\b(cartilage|meniscus|disc)/i],
+  ['tendon', /\b(tendon|ligament|aponeuros|fascia|suture|jointcapsule|capsule)/i],
+  ['cartilage', /\b(cartilage|fibrocartilage|meniscus|disc)/i],
   ['bone', /\b(bone|vertebra|skull|teeth|tooth)/i],
   ['vessel', /\b(arter|vein|vessel|aorta|capillar)/i],
   ['nerve', /\b(nerve|plexus|ganglion)/i],
@@ -78,7 +78,7 @@ const PARAMS: Record<TissueClass, Params> = {
 
 export function classifyTissue(materialName: unknown): TissueClass {
   if (typeof materialName !== 'string') return 'unknown'
-  const name = materialName.replace(/^Flat_/, '').trim()
+  const name = materialName.replace(/^(Flat|PAN)_/i, '').trim()
   if (!name) return 'unknown'
   for (const [tissue, pattern] of RULES) if (pattern.test(name)) return tissue
   return 'unknown'

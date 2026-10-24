@@ -30,23 +30,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ops/wake-server.sh
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Sentuh /api/health
         env:
           SERVER_URL: ${{ vars.SERVER_URL }}
           SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
-        run: |
-          alamat="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
-          if [ -z "$alamat" ]; then
-            echo "Tidak ada VITE_API_URL maupun SERVER_URL di repositori ini; berhenti tanpa menjadi gagal."
-            exit 0
-          fi
-          echo "Menyentuh: ${alamat%/}/api/health"
-          kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${alamat%/}/api/health" || echo 000)
-          echo "HTTP $kode"
-          head -c 400 /tmp/jawab.json || true
-          echo
-          if [ "$kode" != "200" ]; then
-            echo "::warning::Server belum menjawab 200 (kode $kode). Jalur utama/cadangan akan mencoba lagi."
-          fi
+        run: bash scripts/ops/wake-server.sh once

@@ -8,11 +8,13 @@ const cases: [string, string][] = [
   ['Flat_Bone-3', 'bone'], ['Flat_Cartilage', 'cartilage'], ['Flat_Pulmonary artery', 'vessel'], ['Flat_Vein', 'vessel'],
   ['Flat_Nerve', 'nerve'], ['Flat_White matter', 'brain'], ['Flat_Frontal lobe', 'brain'], ['Flat_LCR', 'fluid'],
   ['Flat_Mucosa', 'mucosa'], ['Flat_Intestine', 'mucosa'], ['Flat_Lymph-1', 'gland'], ['Flat_Skin-7', 'skin'], ['Flat_Organ-6', 'viscera'],
+  ['PAN_Bone', 'bone'], ['PAN_Cartilage', 'cartilage'], ['PAN_Fibrocartilage', 'cartilage'],
+  ['PAN_JointCapsule', 'tendon'], ['PAN_Ligament', 'tendon'], ['Articular capsule', 'tendon'],
 ]
 for (const [name, tissue] of cases) assert.equal(classifyTissue(name), tissue, `${name} must classify as ${tissue}`)
 
 // Negatif: fail closed, tanpa tebakan.
-for (const bad of [undefined, null, 42, '', '   ', 'Flat_', 'Text', 'Flat_Zzz']) {
+for (const bad of [undefined, null, 42, '', '   ', 'Flat_', 'PAN_', 'Text', 'Flat_Zzz', 'PAN_Zzz']) {
   assert.equal(classifyTissue(bad), 'unknown', `unclassifiable material ${String(bad)} must be unknown`)
 }
 const unk = tissueShading('Flat_Zzz')

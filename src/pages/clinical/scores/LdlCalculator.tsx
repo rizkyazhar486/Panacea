@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconHeart } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { ldlFriedewald, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -42,6 +43,7 @@ export function LdlCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="LDL Cholesterol (Friedewald)" subtitle="Calculated LDL + non-HDL cholesterol (Friedewald et al. 1972)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['ldlFriedewald']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Most laboratories report LDL calculated with this formula, not measured directly: LDL = Total − HDL − Triglycerides/5. The TG/5 term estimates VLDL and no longer holds at high triglycerides.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="Total cholesterol (mg/dL)">

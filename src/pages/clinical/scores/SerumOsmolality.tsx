@@ -3,6 +3,7 @@ import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { IconActivity } from '../../../components/icons'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { parseNumberField, serumOsmolality } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -34,6 +35,7 @@ export function SerumOsmolality() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Serum Osmolality & Osmolal Gap" subtitle="Calculated osmolality + its gap against the measured value (toxic-alcohol screening)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['serumOsmolality']} />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Calculated osmolality = 2×Na + glucose/18 + BUN/2.8 (+ ethanol/3.7 if measured).
           Comparing this with the lab-measured osmolality gives the osmolal gap — a gap {'>'}10 mOsm/kg
