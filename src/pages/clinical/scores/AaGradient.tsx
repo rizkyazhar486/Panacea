@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { aaGradient, parseNumberField } from '../../../domains/clinical-calculators'
@@ -33,6 +34,7 @@ export function AaGradient() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="A-a Oxygen Gradient" subtitle="Published alveolar gas equation — decision-support arithmetic, not a clinically validated Panacea decision" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['aaGradient']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A normal gradient with hypoxemia points toward hypoventilation or low inspired oxygen (the lungs themselves may be fine); a widened gradient points toward a lung problem — V/Q mismatch, shunt, or diffusion limitation. Requires an arterial blood gas.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="FiO₂ (%)">

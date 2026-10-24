@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { pediatricDka, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -68,6 +69,7 @@ export function PediatricDkaCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Pediatric DKA Fluid & Insulin Calculator" subtitle="Educational pediatric DKA fluid/insulin worksheet — not a clinically validated Panacea protocol" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['pediatricDka']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mimics the standard bedside pediatric DKA fluid worksheet: bolus (if shock) → 48-hour deficit + maintenance fluid → hourly rate → potassium bracket → insulin infusion rate. A calculation aid only — always confirm against your institution's protocol.</Prosa>
 
         <div className="mt-4 grid grid-cols-2 gap-3">

@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { glasgowBlatchford, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,6 +49,7 @@ export function GlasgowBlatchfordScore() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Glasgow-Blatchford Score" subtitle="Pre-endoscopy upper GI bleed risk (Blatchford et al. 2000)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['glasgowBlatchford']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Calculated before endoscopy, from clinical and laboratory data alone. A score of 0 marks patients low-risk enough that some guidelines support outpatient management without admission or urgent endoscopy.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="BUN (mg/dL)">
