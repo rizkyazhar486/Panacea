@@ -1,6 +1,6 @@
 # PanaceaMed AI-First Super Intelligence Development Guidance
 
-> **Owner direction — 2026-10-23.** PanaceaMed is developed and operated through AI-first orchestration. This guidance is model-agnostic and applies to Argon, DeepSeek, Astra, Claude Code, and successor agents. Read the existing root `AGENTS.md`, repository policies, and this document before making changes. This proposal does not silently overwrite existing governance or authorize unsafe clinical operation.
+> **Owner direction — 2026-10-23.** PanaceaMed is developed and operated through AI-first orchestration. This guidance is model-agnostic and applies to Argon, DeepSeek, Astra, Claude Code, and successor agents. Read the current `docs/governance/AGENT_ENTRYPOINT.md`, root `AGENTS.md`, task board, acceptance V2 and current repository policies before using this complementary doctrine. Latest explicit owner instruction and hard safety rules outrank this document. This proposal does not silently overwrite existing governance or authorize unsafe clinical operation.
 
 ## 1. Operating doctrine
 
@@ -35,7 +35,7 @@ Every task, including future work, must define:
 4. **Evidence:** exact commit, test logs, artifacts, and applicable source/provenance records.
 5. **Risk:** security, privacy, clinical, legal, accessibility, and rollback impact.
 6. **Dependencies:** machine-solvable blockers versus specific external authorization.
-7. **Exit:** VERIFIED_ENGINEERING, BLOCKED_EXTERNAL, FAILED, or NOT_RUN with explanation. Do not conflate engineering pass with clinical/production approval.
+7. **Exit:** `PASS`, `FAIL`, or `NOT_RUN` under the canonical `governance/ACCEPTANCE_V2.json` engineering criteria, with SHA, CI run/job IDs and supporting evidence. Distinct deferred external gates remain `DEFERRED_FINAL_STAGE` under `docs/governance/EXTERNAL_GATES.md`; do not conflate engineering PASS with clinical/production approval.
 
 A task must be small enough to reach a concrete change or precise external blocker in one work cycle. Prefer vertical slices over broad percentage-based tasks.
 
@@ -87,3 +87,13 @@ Each agent must leave a short machine-readable or Markdown handoff containing:
 - one next executable step.
 
 **Definition of success:** meaningful, tested code integrated into `main` with truthful evidence, minimal token/CI waste, and no unnecessary human checklist dependency. This document guides AI execution; it does not supersede binding legal, security, clinical, or repository protection rules.
+
+## 9. Canonical execution pointers (keep this doctrine secondary)
+
+- [Agent entrypoint](../../docs/governance/AGENT_ENTRYPOINT.md): precedence, one-task workflow, same-head tests and handoff.
+- [Task Board](../../docs/governance/TASK_BOARD.md): ownership and non-overlap; agents do not take over each other's branch except per the owner-designated Claude integration lane.
+- [Capability router](../../docs/governance/SUPER_INTELLIGENCE_CAPABILITIES.md): seven capabilities, tiers and task classes.
+- [Acceptance V2](../ACCEPTANCE_V2.json): formal PASS/FAIL/NOT_RUN engineering evidence and deferred external gates.
+- [Optional human verification](../../docs/governance/HUMAN_VERIFICATION_OPTIONAL.md): voluntary in-product feedback; restricted actions require actual authority.
+
+The entrypoint's seven hard rules remain binding. A newer repo rule or a specific owner decision supersedes older implementation examples in this document.

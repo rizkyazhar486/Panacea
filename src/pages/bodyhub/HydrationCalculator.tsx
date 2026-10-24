@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { IconActivity } from '../../components/icons'
 import { getHealthCache, hasHealth } from '../../lib/profile'
 import { hydrationTarget, parseNumberField, type HydrationIntensity } from '../../domains/clinical-calculators'
@@ -58,6 +59,7 @@ export function HydrationCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Daily Hydration Calculator" subtitle="Population-average fluid target from weight, activity & climate — not a prescription" />
         <BatasKlaimKesehatan permukaan="wellness.hydration" />
+        <SumberKalkulator ids={['hydrationTarget']} />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This is a population-average estimate, not a personal prescription. Thirst and pale-yellow urine
           are the best everyday guides for most healthy people. If you have a kidney, heart, or liver

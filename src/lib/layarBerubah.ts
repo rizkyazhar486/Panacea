@@ -9,10 +9,17 @@ export function layarBerubah(lama: TitikLayar | null, baru: TitikLayar, tolPx = 
   if (kl.length !== kb.length) return true
   for (const k of kb) {
     const a = lama[k], b = baru[k]
-    if (!a) return true
+    // Detect removed or renamed projected-label fields as well as added ones.
+    if (!a || Object.keys(a).length !== Object.keys(b).length) return true
     for (const f of Object.keys(b)) {
+      if (!Object.prototype.hasOwnProperty.call(a, f)) return true
       const x = a[f], y = b[f]
-      if (typeof y === 'number' && typeof x === 'number') { if (Math.abs(x - y) > tolPx) return true }
+      if (typeof y === 'number' && typeof x === 'number') {
+        // Koordinat tidak-finit: NaN tidak pulih lewat selisih numerik biasa.
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+          if (!Object.is(x, y)) return true
+        } else if (Math.abs(x - y) > tolPx) return true
+      }
       else if (x !== y) return true
     }
   }

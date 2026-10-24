@@ -9,6 +9,19 @@ assert.equal(layarBerubah(a, { x: { x: 11, y: 20, depan: true } }), true, 'geser
 assert.equal(layarBerubah(a, { x: { x: 10, y: 20, depan: false } }), true, 'perubahan boolean memicu render')
 assert.equal(layarBerubah(a, { ...a, z: { x: 1, y: 1, depan: true } }), true, 'titik baru memicu render')
 assert.equal(layarBerubah({ p: { x: 1, y: 1, v: 0.2 } }, { p: { x: 1, y: 1, v: 0.9 } }), true, 'nilai aktivasi berubah memicu render')
+// Regression PR #2501: invalid -> valid values must recover and refresh labels.
+for (const invalid of [NaN, Infinity, -Infinity]) {
+  const bad = { x: { x: invalid, y: 20, depan: true } }
+  assert.equal(layarBerubah(bad, a), true, 'coordinate recovery must update the label')
+  assert.equal(layarBerubah(a, bad), true, 'a newly invalid coordinate is a state change')
+  assert.equal(layarBerubah(bad, { x: { ...bad.x } }), false, 'identical invalid frames must not create a render loop')
+}
+assert.equal(layarBerubah({ p: { x: Infinity } }, { p: { x: -Infinity } }), true)
+assert.equal(layarBerubah({ p: { x: NaN } }, { p: { x: NaN } }), false)
+assert.equal(layarBerubah(a, { x: { x: 10, depan: true } }), true, 'removed nested field must refresh label')
+assert.equal(layarBerubah({ x: { x: 10, depan: true } }, a), true, 'added nested field must refresh label')
+assert.equal(layarBerubah(a, { x: { x: 10, z: 20, depan: true } }), true, 'renamed nested field must refresh label')
+assert.equal(layarBerubah(a, { x: { ...a.x } }), false, 'same nested shape must remain stable')
 for (const f of ['src/components/digital-twin/OrganModel3D.tsx', 'src/components/digital-twin/Pathway3D.tsx']) {
   const s = readFileSync(f, 'utf8')
   assert.match(s, /if \(layarBerubah\(layarTerakhir, next\)\)/, `${f}: setLayar harus dijaga`)

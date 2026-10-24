@@ -1,7 +1,96 @@
 // E4: pemindai PHI repo. Positif/negatif/batas pada pola, logika daftar-izin, dan pemindaian repo nyata terhadap daftar izin.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { pindaiTeks, bandingkan, pindaiRepo, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER } from './phi-repo-scan.mjs'
+import { createHash } from 'node:crypto'
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, chmodSync, symlinkSync } from 'node:fs'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { pindaiTeks, bandingkan, pindaiRepo, pindaiNamaBerkas, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
+
+test('E4: filename identifiers are detected across arbitrary and compound extensions', () => {
+  for (const suffix of ['', '.ts', '.csv', '.zip', '.tar.gz', '.2026']) {
+    for (const [value, kind] of [['3171011505900001', 'nik'], ['081377745521', 'ponsel']]) {
+      const file = `public/patients/${value}${suffix}`
+      const findings = pindaiNamaBerkas([file])
+      assert.deepEqual(findings, [{ berkas: file, jenis: kind, nilai: value }], 'filename coverage must not depend on extension')
+      const diagnostics = ringkasKegagalanTanpaPHI(bandingkan(findings, [])).join('\n')
+      assert.equal(diagnostics.includes(value), false)
+      assert.equal(diagnostics.includes(file), false)
+    }
+  }
+})
+
+test('E4: filename scan preserves email detection and rejects invalid or synthetic identifiers', () => {
+  const file = 'public/patients/person@hospital.co.id.ts'
+  assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: 'person@hospital.co.id' }])
+  assert.deepEqual(pindaiNamaBerkas(['public/patients/person@example.com.ts', 'public/3171011513900001.csv', 'public/081111111111.csv']), [])
+  assert.deepEqual(pindaiNamaBerkas(['public/3171011505900001/archive.bin']), [{ berkas: 'public/3171011505900001/archive.bin', jenis: 'nik', nilai: '3171011505900001' }])
+})
+
+test('E4: email domains that resemble file extensions remain detectable', () => {
+  for (const domain of ['hospital.md', 'hospital.py']) for (const prefix of ['public', 'public/contact@example.com']) {
+    const file = `${prefix}/person@${domain}`
+    assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: `person@${domain}` }])
+  }
+  for (const suffix of ['.ts', '.csv', '.zip', '.tar.gz']) {
+    assert.deepEqual(pindaiNamaBerkas([`public/person@example.com${suffix}`]), [], 'synthetic domain stays synthetic behind a file suffix')
+    const file = `public/person@hospital.md${suffix}`
+    assert.deepEqual(pindaiNamaBerkas([file]), [{ berkas: file, jenis: 'email', nilai: 'person@hospital.md' }])
+  }
+})
+
+test('E4: mandatory repository CI rejects filename PHI without invoking the CLI', () => {
+  for (const [name, expected] of [['synthetic.glb', 0], ['3171011505900001.glb', 1]]) {
+    const root = mkdtempSync(join(tmpdir(), 'phi-ci-'))
+    try {
+      mkdirSync(join(root, 'scripts', 'qa'), { recursive: true })
+      mkdirSync(join(root, 'governance'))
+      mkdirSync(join(root, 'public'))
+      for (const file of ['phi-repo-scan.mjs', 'phi-repo-scan.test.mjs']) {
+        writeFileSync(join(root, 'scripts', 'qa', file), readFileSync(new URL(file, import.meta.url)))
+      }
+      writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
+      writeFileSync(join(root, 'public', name), 'synthetic non-patient fixture')
+      for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
+      // This is an independent test runner, not a worker of the parent suite.
+      const env = { ...process.env }
+      delete env.NODE_TEST_CONTEXT
+      const result = spawnSync(process.execPath, ['--test', '--test-name-pattern=^repo_nyata_', 'scripts/qa/phi-repo-scan.test.mjs'], { cwd: root, encoding: 'utf8', env })
+      assert.equal(result.status, expected, 'the build-invoked real-repository gate must enforce filename coverage')
+      assert.equal((result.stdout + result.stderr).includes('3171011505900001'), false, 'the CI failure must not disclose the identifier')
+    } finally { rmSync(root, { recursive: true, force: true }) }
+  }
+})
+
+test('E4: real CLI and symlink entrypoints reject filename identifiers with redacted logs', () => {
+  for (const [name, expected] of [['synthetic.csv', 0], ['3171011505900001.csv', 1], ['081377745521.tar.gz', 1]]) {
+    const root = mkdtempSync(join(tmpdir(), 'phi-cli-'))
+    try {
+      const qa = join(root, 'scripts', 'qa')
+      mkdirSync(qa, { recursive: true })
+      mkdirSync(join(root, 'governance'))
+      mkdirSync(join(root, 'public'))
+      const script = join(qa, 'phi-repo-scan.mjs')
+      writeFileSync(script, readFileSync(new URL('./phi-repo-scan.mjs', import.meta.url)))
+      const linkedScript = join(qa, 'scan-entry.mjs')
+      symlinkSync('phi-repo-scan.mjs', linkedScript)
+      writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
+      writeFileSync(join(root, 'public', name), 'no identifiers in file contents')
+      for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
+      for (const entrypoint of [script, linkedScript]) {
+        const result = spawnSync(process.execPath, [entrypoint], { cwd: root, encoding: 'utf8' })
+        assert.equal(result.status, expected)
+        const summary = JSON.parse(result.stdout.trim())
+        assert.equal(summary.takTerdaftar, expected)
+        const logs = result.stdout + result.stderr
+        for (const secret of ['3171011505900001', '081377745521']) assert.equal(logs.includes(secret), false)
+        if (expected) assert.match(result.stderr, /nilai=\[REDACTED\] ref=[0-9a-f]{16}/)
+      }
+    } finally { rmSync(root, { recursive: true, force: true }) }
+  }
+})
 
 const jenis = (t) => pindaiTeks(t).map((x) => `${x.jenis}:${x.nilai}`)
 
@@ -65,13 +154,15 @@ test('entri_berpasangan_berkas_hanya_cocok_pada_berkas_itu', () => {
   assert.deepEqual(r.takTerdaftar.map((x) => x.berkas), ['b.ts'])
 })
 test('repo_nyata_tanpa_temuan_tak_terdaftar_dan_tanpa_entri_usang', () => {
-  const r = bandingkan(pindaiRepo(), muatDaftarIzin())
-  assert.deepEqual(r.takTerdaftar, [], `PHI tak terdaftar: ${JSON.stringify(r.takTerdaftar.slice(0, 5))}`)
-  assert.deepEqual(r.usang, [], `entri usang: ${JSON.stringify(r.usang)}`)
-  assert.deepEqual(r.tanpaAlasan, [])
+  const r = bandingkan([...pindaiNamaBerkas(), ...pindaiRepo()], muatDaftarIzin())
+  assert.equal(r.takTerdaftar.length, 0, 'jumlah PHI tak terdaftar harus nol (jangan cetak nilainya ke CI)')
+  assert.equal(r.usang.length, 0, 'jumlah allowlist usang harus nol (jangan cetak nilainya ke CI)')
+  assert.equal(r.tanpaAlasan.length, 0, 'jumlah allowlist tanpa alasan harus nol (jangan cetak nilainya ke CI)')
 })
 test('deterministik_dua_kali_jalan_identik', () => {
-  assert.deepEqual(pindaiRepo(), pindaiRepo())
+  const first = pindaiRepo(), second = pindaiRepo()
+  assert.equal(first.length, second.length, 'same count without exposing matched values')
+  assert.equal(createHash('sha256').update(JSON.stringify(first)).digest('hex'), createHash('sha256').update(JSON.stringify(second)).digest('hex'), 'same findings, compare digests rather than printing identifiers')
 })
 test('berkas_sintetis_dengan_phi_disuntikkan_terdeteksi_oleh_pindaiRepo', () => {
   const t = pindaiRepo(['f.txt'], () => 'pasien 3171011505900001 telp 081377745521 mail ani@rsharapan.id')
@@ -87,11 +178,11 @@ test('pengecualian_fixture_terkunci_dan_berkas_lain_tetap_dipindai', () => {
 })
 
 test('E4: unreadable tracked file fails closed rather than being skipped', () => {
-  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca rahasia[.]ts/)
+  assert.throws(() => pindaiRepo(['rahasia.ts'], () => { throw new Error('EACCES') }), /PHI scan gagal membaca berkas ref=[0-9a-f]{16}/)
 })
 
 test('E4: non-text reader result cannot certify a clean repository', () => {
-  assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: kosong[.]ts/)
+  assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: ref=[0-9a-f]{16}/)
 })
 
 test('E4: real-world source larger than old 2M boundary is scanned fully', () => {
@@ -102,5 +193,127 @@ test('E4: real-world source larger than old 2M boundary is scanned fully', () =>
 
 test('E4: pathological oversized content fails closed instead of silently passing', () => {
   assert.equal(BATAS_PINDAI_KARAKTER, 16_000_000)
-  assert.throws(() => pindaiRepo(['terlalu-besar.ts'], () => 'x'.repeat(BATAS_PINDAI_KARAKTER + 1)), /tidak memeriksa berkas >16000000 karakter: terlalu-besar[.]ts/)
+  assert.throws(() => pindaiRepo(['terlalu-besar.ts'], () => 'x'.repeat(BATAS_PINDAI_KARAKTER + 1)), /tidak memeriksa berkas >16000000 karakter: ref=[0-9a-f]{16}/)
+})
+
+test('E4: scanner failures remain fail-closed without publishing matched PHI or filenames', () => {
+  const filename = 'patients/name-and-081377745521.ts'
+  const secret = 'budi.santoso@rsudharapan.go.id'
+  const nik = '3171011505900001'
+  const r = ringkasKegagalanTanpaPHI({
+    takTerdaftar: [{ jenis: 'email', nilai: secret, berkas: filename }, { jenis: 'nik', nilai: nik, berkas: filename }],
+    usang: [{ jenis: 'email', nilai: secret, berkas: filename }],
+    tanpaAlasan: [{ jenis: 'email', nilai: secret, berkas: filename }],
+  })
+  assert.equal(r.length, 4)
+  const log = r.join('\\n')
+  for (const sensitive of [secret, nik, filename, '081377745521']) {
+    assert.equal(log.includes(sensitive), false, 'PII must never be printed in CI errors')
+  }
+  assert.equal(r.filter(x => x.includes('nilai=[REDACTED]')).length, 4)
+  assert.ok(log.includes('ref=' + refBerkasAman(filename)))
+  assert.match(refBerkasAman(filename), /^[0-9a-f]{16}$/)
+  const untrusted = ringkasKegagalanTanpaPHI({ usang: [{ jenis: secret, nilai: nik }] })
+  assert.equal(untrusted[0].includes(secret), false, 'untrusted category must also be redacted')
+  assert.match(untrusted[0], /jenis=unknown/)
+  assert.throws(
+    () => pindaiRepo([filename], () => { throw new Error(secret) }),
+    e => e instanceof Error && !e.message.includes(secret) && !e.message.includes(filename) && /ref=[0-9a-f]{16}/.test(e.message),
+    'read exceptions must not echo secret causes or sensitive filenames',
+  )
+})
+
+test('E4: allowlist read and parse failures do not echo sensitive JSON, exceptions, or filesystem path', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'panacea-phi-allowlist-'))
+  const file = join(directory, 'sensitive-identity@private.example.json')
+  const secret = 'patient.privacy@hospital.example'
+  try {
+    const missing = file + '-missing'
+    assert.throws(
+      () => muatDaftarIzin(missing),
+      (e) => e instanceof Error && /tidak dapat dibaca/.test(e.message) && !e.message.includes(missing),
+      'missing file must fail closed with no path leak',
+    )
+    writeFileSync(file, '{ "entri": [ " ' + secret + '" }')
+    assert.throws(
+      () => muatDaftarIzin(file),
+      (e) => e instanceof Error && /JSON tidak valid/.test(e.message) && !e.message.includes(secret) && !e.message.includes(file),
+      'malformed JSON must not emit parser snippets or paths',
+    )
+    writeFileSync(file, 'null')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'null root must fail closed')
+    writeFileSync(file, '{"entri":[null]}')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'null item must fail closed')
+    writeFileSync(file, '{"entri":[{"jenis":"email","nilai":123,"alasan":"long enough reason"}]}')
+    assert.throws(() => muatDaftarIzin(file), /struktur tidak valid/, 'malformed identifier must fail closed')
+  } finally { rmSync(directory, { recursive: true, force: true }) }
+})
+
+test('E4: valid empty or scoped allowlist remains accepted', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'panacea-phi-allowlist-'))
+  const file = join(directory, 'synthetic.json')
+  try {
+    writeFileSync(file, '{"entri":[]}')
+    assert.deepEqual(muatDaftarIzin(file), [])
+    const entry = { jenis: 'email', nilai: 'a@example.com', berkas: 'test.ts', alasan: 'synthetic fixture' }
+    writeFileSync(file, JSON.stringify({ entri: [entry] }))
+    assert.deepEqual(muatDaftarIzin(file), [entry])
+  } finally { rmSync(directory, { recursive: true, force: true }) }
+})
+
+test('E4: git listing errors never expose subprocess diagnostics', () => {
+  const secret = 'private.person@hospital.example'
+  const opaque = new Error('command failed: ' + secret)
+  opaque.stderr = Buffer.from('secret path: ' + secret)
+  opaque.stdout = Buffer.from('patient 3171011505900001')
+  assert.throws(() => daftarBerkas(() => { throw opaque }), (error) =>
+    error instanceof Error &&
+    /gagal mendapatkan daftar berkas terlacak/.test(error.message) &&
+    !error.message.includes(secret) &&
+    !error.message.includes('3171011505900001') &&
+    !('cause' in error),
+    'subprocess output and error causes must never enter shared CI logs',
+  )
+})
+
+test('E4: git listing rejects non-text output and does not silently mark a scan clean', () => {
+  assert.throws(() => daftarBerkas(() => undefined), /daftar berkas bukan teks/)
+  assert.throws(() => daftarBerkas(() => ({ toString: () => 'safe.ts' })), /daftar berkas bukan teks/)
+})
+
+test('E4: git listing keeps tracked scope and exact fixture exclusions after redaction', () => {
+  const payload = Buffer.from([
+    'server/src/config.ts', 'scripts/qa/additional.test.mjs',
+    'public/logo-mark.png', 'node_modules/private.ts',
+    'scripts/qa/phi-repo-scan.test.mjs', 'governance/PHI_SCAN_ALLOWLIST.json',
+    'bodyexposure/secret.txt', 'src/main.tsx', '',
+  ].join('\0'))
+  let invoked = 0
+  const names = daftarBerkas((binary, args, opts) => {
+    invoked++
+    assert.equal(binary, 'git')
+    assert.deepEqual(args, ['ls-files', '-z'])
+    assert.ok(opts.cwd)
+    return payload
+  })
+  assert.equal(invoked, 1)
+  assert.deepEqual(names, ['server/src/config.ts', 'scripts/qa/additional.test.mjs', 'src/main.tsx'])
+  assert.equal(pindaiRepo(names, (name) => name === 'src/main.tsx' ? 'contact 3171011505900001' : 'safe').length, 1, 'tracked code still scanned')
+})
+
+
+test('E4: actual failing Git cannot forward sensitive stderr to CLI logs', () => {
+  const root = mkdtempSync(join(tmpdir(), 'phi-git-failure-'))
+  const marker = 'SYNTHETIC_PRIVATE_GIT_DIAGNOSTIC'
+  try {
+    const git = join(root, 'git')
+    writeFileSync(git, `#!/bin/sh\necho '${marker}' >&2\nexit 1\n`)
+    chmodSync(git, 0o755)
+    const result = spawnSync(process.execPath, [fileURLToPath(new URL('./phi-repo-scan.mjs', import.meta.url))], {
+      encoding: 'utf8', env: { ...process.env, PATH: root + ':' + process.env.PATH },
+    })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /gagal mendapatkan daftar berkas terlacak/)
+    assert.equal((result.stdout + result.stderr).includes(marker), false, 'child stderr must be captured before sanitizing the exception')
+  } finally { rmSync(root, { recursive: true, force: true }) }
 })

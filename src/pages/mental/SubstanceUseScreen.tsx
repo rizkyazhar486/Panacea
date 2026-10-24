@@ -3,6 +3,7 @@ import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../../components/ui'
 import { IconShield } from '../../components/icons'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { packYearScreen, parseNumberField } from '../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,6 +47,7 @@ export function SubstanceUseScreen() {
           Two short published primary-care screens. Answer honestly — these tools exist to catch risk early, not to judge.
         </p>
         <BatasKlaimKesehatan permukaan="screening.substance" />
+        <SumberKalkulator ids={['packYearScreen']} />
       </Card>
 
       <Card className="!p-5">
