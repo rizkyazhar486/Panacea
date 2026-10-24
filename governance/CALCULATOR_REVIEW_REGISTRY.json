@@ -90,9 +90,20 @@
         "kind": "published",
         "citation": "Centor 1981; McIsaac 1998 (score and age modification)",
         "anchor": "Centor 1981; modifikasi McIsaac 1998",
-        "basis": "Header cites authors and years only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "basis": "Primary identifier is Centor 1981. McIsaac 1998 (age modification) is PubMed 9475915 (CMAJ 1998, 'A clinical score to reduce unnecessary antibiotic use in patients with sore throat'); one identifier per record, so it is noted here.",
+        "doi": "10.1177/0272989X8100100304",
+        "pmid": "6763125",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6763125",
+          "doi": "10.1177/0272989X8100100304",
+          "retrievedOn": "2026-10-24",
+          "title": "The diagnosis of strep throat in adults in the emergency room.",
+          "firstAuthor": "Centor",
+          "journal": "Med Decis Making",
+          "year": 1981,
+          "pages": "239-46"
+        }
       }
     },
     {
@@ -134,8 +145,19 @@
         "citation": "Pugh et al. 1973",
         "anchor": "Pugh et al. 1973",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1002/bjs.1800600817",
+        "pmid": "4541913",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4541913",
+          "doi": "10.1002/bjs.1800600817",
+          "retrievedOn": "2026-10-24",
+          "title": "Transection of the oesophagus for bleeding oesophageal varices.",
+          "firstAuthor": "Pugh",
+          "journal": "Br J Surg",
+          "year": 1973,
+          "pages": "646-9"
+        }
       }
     },
     {
@@ -217,9 +239,20 @@
         "kind": "published",
         "citation": "Katz 1973 (sodium correction); Sterns rule of thumb (potassium deficit)",
         "anchor": "Katz 1973",
-        "basis": "Header cites Katz 1973; the Sterns rule has no year or journal in the repo. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "basis": "Identifier is Katz 1973 (sodium correction). The Sterns potassium-deficit rule of thumb named in the header has no specific citation and is not identified.",
+        "doi": "10.1056/NEJM197310182891607",
+        "pmid": "4763428",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4763428",
+          "doi": "10.1056/NEJM197310182891607",
+          "retrievedOn": "2026-10-24",
+          "title": "Hyperglycemia-induced hyponatremia--calculation of expected serum sodium depression.",
+          "firstAuthor": "Katz",
+          "journal": "N Engl J Med",
+          "year": 1973,
+          "pages": "843-4"
+        }
       }
     },
     {
@@ -330,8 +363,19 @@
         "citation": "D'Agostino 2008 (Framingham General CVD)",
         "anchor": "D'Agostino 2008",
         "basis": "Input validation for the Framingham model; header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1161/CIRCULATIONAHA.107.699579",
+        "pmid": "18212285",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18212285",
+          "doi": "10.1161/CIRCULATIONAHA.107.699579",
+          "retrievedOn": "2026-10-24",
+          "title": "General cardiovascular risk profile for use in primary care: the Framingham Heart Study.",
+          "firstAuthor": "D'Agostino",
+          "journal": "Circulation",
+          "year": 2008,
+          "pages": "743-53"
+        }
       }
     },
     {
@@ -373,8 +417,19 @@
         "citation": "Granger et al. 2003 (GRACE in-hospital mortality)",
         "anchor": "Granger et al. 2003",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1001/archinte.163.19.2345",
+        "pmid": "14581255",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "14581255",
+          "doi": "10.1001/archinte.163.19.2345",
+          "retrievedOn": "2026-10-24",
+          "title": "Predictors of hospital mortality in the global registry of acute coronary events.",
+          "firstAuthor": "Granger",
+          "journal": "Arch Intern Med",
+          "year": 2003,
+          "pages": "2345-53"
+        }
       }
     },
     {
@@ -500,7 +555,18 @@
         "anchor": "Maddrey et al. 1978",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
+        "pmid": "352788",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "352788",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Corticosteroid therapy of alcoholic hepatitis.",
+          "firstAuthor": "Maddrey",
+          "journal": "Gastroenterology",
+          "year": 1978,
+          "pages": "193-9"
+        }
       }
     },
     {
@@ -542,9 +608,20 @@
         "kind": "published",
         "citation": "Kamath 2001; Kim 2008; OPTN/UNOS policy 2016",
         "anchor": "Kamath 2001; Kim 2008; kebijakan OPTN/UNOS 2016",
-        "basis": "Header cites authors, years and policy only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "basis": "Primary identifier is Kamath 2001 (MELD). Kim 2008 (MELD-Na) is PubMed 18768945 (N Engl J Med 2008, 'Hyponatremia and mortality among patients on the liver-transplant waiting list'). The OPTN/UNOS 2016 policy is a policy document, not a PubMed record.",
+        "doi": "10.1053/jhep.2001.22172",
+        "pmid": "11172350",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "11172350",
+          "doi": "10.1053/jhep.2001.22172",
+          "retrievedOn": "2026-10-24",
+          "title": "A model to predict survival in patients with end-stage liver disease.",
+          "firstAuthor": "Kamath",
+          "journal": "Hepatology",
+          "year": 2001,
+          "pages": "464-70"
+        }
       }
     },
     {
@@ -619,8 +696,19 @@
         "citation": "Paradise et al., 1984",
         "anchor": "Paradise et al., 1984",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1056/NEJM198403153101102",
+        "pmid": "6700642",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6700642",
+          "doi": "10.1056/NEJM198403153101102",
+          "retrievedOn": "2026-10-24",
+          "title": "Efficacy of tonsillectomy for recurrent throat infection in severely affected children. Results of parallel randomized and nonrandomized clinical trials.",
+          "firstAuthor": "Paradise",
+          "journal": "N Engl J Med",
+          "year": 1984,
+          "pages": "674-83"
+        }
       }
     },
     {
@@ -692,9 +780,20 @@
         "kind": "published",
         "citation": "D'Agostino, Circulation 2008; Sterling 2006 (FIB-4); Koh 2001 (OST)",
         "anchor": "D'Agostino, Circulation 2008",
-        "basis": "Header cites three screens by author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "basis": "Primary identifier is D'Agostino 2008. Sterling 2006 (FIB-4) is PubMed 16729309 (Hepatology 2006) and Koh 2001 (OST) is PubMed 11580084 (Osteoporos Int 2001); one identifier per record, so they are noted here.",
+        "doi": "10.1161/CIRCULATIONAHA.107.699579",
+        "pmid": "18212285",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18212285",
+          "doi": "10.1161/CIRCULATIONAHA.107.699579",
+          "retrievedOn": "2026-10-24",
+          "title": "General cardiovascular risk profile for use in primary care: the Framingham Heart Study.",
+          "firstAuthor": "D'Agostino",
+          "journal": "Circulation",
+          "year": 2008,
+          "pages": "743-53"
+        }
       }
     },
     {
@@ -710,7 +809,18 @@
         "anchor": "Dorwart & Chalmers 1975",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
+        "pmid": "1112025",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1112025",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Comparison of methods for calculating serum osmolality form chemical concentrations, and the prognostic value of such calculations.",
+          "firstAuthor": "Dorwart",
+          "journal": "Clin Chem",
+          "year": 1975,
+          "pages": "190-4"
+        }
       }
     },
     {
@@ -766,8 +876,19 @@
         "citation": "Vincent et al. 1996 (SOFA)",
         "anchor": "Vincent et al. 1996",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1007/BF01709751",
+        "pmid": "8844239",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "8844239",
+          "doi": "10.1007/BF01709751",
+          "retrievedOn": "2026-10-24",
+          "title": "The SOFA (Sepsis-related Organ Failure Assessment) score to describe organ dysfunction/failure. On behalf of the Working Group on Sepsis-Related Problems of the European Society of Intensive Care Medicine.",
+          "firstAuthor": "Vincent",
+          "journal": "Intensive Care Med",
+          "year": 1996,
+          "pages": "707-10"
+        }
       }
     },
     {
