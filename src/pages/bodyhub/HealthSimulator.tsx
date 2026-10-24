@@ -9,6 +9,7 @@ import type { FraminghamField } from '../../domains/clinical-calculators'
 import { framinghamCVD, cvdBand } from '../../lib/riskModels'
 import { CopyNote } from '../../components/CopyNote'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Simulator Bagaimana-Jika — the honest, transparent foundation of a "digital
@@ -121,6 +122,7 @@ export function HealthSimulator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="What-If Health Simulator" subtitle="Published Framingham 10-year CVD risk under toggled choices — not a clinically validated Panacea decision" />
         <BatasKlaimKesehatan permukaan="longevity.health-simulator" />
+        <SumberKalkulator ids={['framinghamInputs']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enter your current numbers, then toggle published-model levers and watch estimated 10-year cardiovascular risk move. Every number comes from Framingham (D'Agostino 2008) — a technical estimate to discuss with a clinician, not a personal prognosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {num('Age (years, 30–74)', 'age')}

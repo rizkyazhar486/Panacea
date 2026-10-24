@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { CHARLSON_CONDITIONS, charlsonIndex, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ export function CharlsonIndex() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Charlson Comorbidity Index" subtitle="Comorbidity burden & estimated 10-year survival (Charlson et al. 1987)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['charlson']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Indeks komorbiditas yang paling luas dipakai — 19 penyakit berbobot ditambah penyesuaian umur. Bila bentuk ringan dan berat dari penyakit yang sama sama-sama dicentang, hanya bentuk beratnya yang dihitung (sesuai indeks aslinya).</Prosa>
         <div className="mt-3 max-w-[200px]">
           <Field label="Age (years)">

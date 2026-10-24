@@ -170,6 +170,82 @@ try {
   console.log('bodyParserCompression: valid gzip accepted, invalid gzip refused without mutation, trailing bytes produce no uncaught incident, server responsive; passed')
   await new Promise(resolve => setTimeout(resolve, 1500))
 
+  // 2c. Every route group of the RBAC matrix (ENG-E4-02). The 15 clinical routes of rbacKlinis plus the referral, care, reminder,
+  // application, genomics and health-series groups are each driven with a distinctive marker in the path, the query and the body, as the
+  // role that owns them. The route list is read from the source and must equal the driven list in both directions, so a new route in
+  // these groups forces an entry here. Statuses are not the point (many are 4xx for synthetic ids); what must hold is that no route
+  // answers 5xx (the path that alerts the owner with the error text) and that none of the markers reaches the log.
+  type Who = 'alice' | 'doctor' | 'owner'
+  const groupRoutes = new Set<string>()
+  for (const file of sources(join(serverRoot, 'src'))) {
+    for (const m of readFileSync(file, 'utf8').matchAll(/app\.(get|post|put|patch|delete)\('(\/api\/(?:clinical|referrals|care|reminders|applications|genomics|health-series|lab-results|lab-log|clinician|keadaan-longitudinal|health-alerts|health-profile|health-sync|health-webhook|settings|second-opinion|owner\/staff[a-z-]*|audit|doctors)(?:\/[^']*)?)'/g)) groupRoutes.add(`${m[1]!.toUpperCase()} ${m[2]}`)
+  }
+  assert.ok(groupRoutes.size >= 70, `the route scanner must see the real route groups (saw ${groupRoutes.size})`)
+  const mk = (tag: string) => `rg-${tag}-marker`
+  const text = (tag: string) => ({ text: mk(tag) })
+  const driven: Array<[who: Who, route: string, body?: (tag: string) => unknown]> = [
+    ['doctor', 'GET /api/clinical'], ['doctor', 'POST /api/clinical/record', (t) => ({ patientId: mk(t), record: { id: mk(`${t}id`), patientId: mk(t), anamnesis: { keluhanUtama: mk(`${t}b`) } } })],
+    ['doctor', 'POST /api/clinical/encounter/close', (t) => ({ patientId: mk(t), note: mk(`${t}n`) })], ['doctor', 'GET /api/clinical/encounters/:patientId'],
+    ['doctor', 'POST /api/clinical/patient/:patientId/link-code'], ['doctor', 'GET /api/clinical/patient/:patientId/link-status'],
+    ['alice', 'POST /api/clinical/link', (t) => ({ code: mk(t) })], ['alice', 'GET /api/clinical/links'], ['alice', 'DELETE /api/clinical/link/:patientId'],
+    ['doctor', 'GET /api/clinical/records/:patientId'], ['doctor', 'GET /api/clinical/record-history/:patientId'],
+    ['doctor', 'POST /api/clinical/education', (t) => ({ patientId: mk(t), sheet: { title: mk(`${t}s`) } })], ['doctor', 'POST /api/clinical/vital', (t) => ({ patientId: mk(t), vital: { note: mk(`${t}v`) } })],
+    ['doctor', 'POST /api/clinical/supportive', (t) => ({ patientId: mk(t), result: { note: mk(`${t}r`) } })], ['doctor', 'POST /api/clinical/patient', (t) => ({ patient: { id: mk(t), name: mk(`${t}p`), mrn: mk(`${t}m`) } })],
+    ['doctor', 'POST /api/referrals', (t) => ({ patientId: patientId, kind: 'lab', reason: mk(t), toFacility: mk(`${t}f`) })], ['doctor', 'GET /api/referrals'], ['doctor', 'GET /api/referrals/:id'],
+    ['doctor', 'POST /api/referrals/:id/advance', (t) => ({ to: 'accepted', returnNote: mk(t), closeReason: mk(`${t}c`) })],
+    ['alice', 'GET /api/care/plans'], ['alice', 'POST /api/care/reports', (t) => ({ planId: mk(t), answers: [{ question: 'q', answer: mk(`${t}a`) }], note: mk(`${t}n`) })],
+    ['alice', 'GET /api/reminders'], ['alice', 'POST /api/reminders', (t) => ({ medName: mk(t), dose: mk(`${t}d`), timeOfDay: '08:00' })], ['alice', 'PATCH /api/reminders/:id', (t) => ({ medName: mk(t), dose: mk(`${t}d`) })],
+    ['alice', 'DELETE /api/reminders/:id'],
+    ['owner', 'GET /api/applications'], ['alice', 'POST /api/applications', (t) => ({ role: 'dokter', name: mk(t), str: mk(`${t}s`), institution: mk(`${t}i`) })],
+    ['owner', 'POST /api/applications/decide', (t) => ({ id: mk(t), decision: 'approve', note: mk(`${t}n`) })],
+    ['alice', 'GET /api/genomics/compute/capabilities'], ['alice', 'POST /api/genomics/compute/jobs', (t) => ({ kind: 'ont-basecalling', sample: mk(t), input: mk(`${t}i`) })],
+    ['alice', 'GET /api/genomics/compute/jobs/:jobHandle'], ['alice', 'POST /api/genomics/compute/jobs/:jobHandle/cancel', (t) => text(t)],
+    ['alice', 'GET /api/health-series/heart-rate'], ['alice', 'GET /api/health-series/sleep'],
+    ['alice', 'PUT /api/health-series/diary', (t) => ({ foods: [{ id: mk(t), name: mk(`${t}f`), at: '2026-01-01T08:00:00.000Z' }], wellness: [{ id: mk(`${t}w`), note: mk(`${t}n`) }] })],
+    ['alice', 'PUT /api/health-series/self-vitals', (t) => ({ selfVitalsLog: [{ id: mk(t), at: '2026-01-01T08:00:00.000Z', systolic: 111, diastolic: 71, heartRate: 61, spo2: 98, tempC: 36.6 }] })],
+    ['alice', 'PUT /api/health-series/vo2max', (t) => ({ vo2maxLog: [{ id: mk(t), at: '2026-01-01T08:00:00.000Z', value: 47.5, method: mk(`${t}m`) }] })],
+    ['alice', 'DELETE /api/health-series'],
+    ['alice', 'GET /api/lab-results'], ['alice', 'GET /api/lab-results/:id'], ['alice', 'GET /api/lab-results/metrics'],
+    ['alice', 'POST /api/lab-results', (t) => ({ patientId: mk(t), item: { name: mk(`${t}n`), valueText: mk(`${t}v`), collectedAt: '2026-01-01' }, source: 'lab-intake' })],
+    ['alice', 'POST /api/lab-results/:id/advance', (t) => ({ to: 'pending_review', communication: mk(t) })],
+    ['alice', 'GET /api/lab-log'], ['alice', 'GET /api/lab-log/fhir'], ['alice', 'GET /api/lab-log/shares'],
+    ['alice', 'POST /api/lab-log/shares', (t) => ({ dokterEmail: `${mk(t)}@localhost.test`, hari: 7 })], ['alice', 'DELETE /api/lab-log/shares/:id'],
+    ['alice', 'PUT /api/lab-log', (t) => ({ log: { gdp: [{ id: mk(t), tanggal: '2026-01-03', nilai: 111.11 }] }, diperbaruiPada: '2000-01-01T00:00:00.000Z' })],
+    ['doctor', 'GET /api/clinician/lab-shares'], ['doctor', 'GET /api/clinician/lab-shares/:id/care'], ['doctor', 'GET /api/clinician/lab-shares/:id/care/fhir'], ['doctor', 'GET /api/clinician/lab-shares/:id/fhir'],
+    ['doctor', 'POST /api/clinician/lab-shares/:id/care-plan', (t) => ({ plan: { goal: mk(t), steps: [mk(`${t}s`)] } })], ['doctor', 'POST /api/clinician/lab-shares/:id/review', (t) => ({ tes: 'gdp', catatan: mk(t) })],
+    ['alice', 'GET /api/keadaan-longitudinal'], ['alice', 'GET /api/health-alerts/context'], ['alice', 'GET /api/health-profile'], ['alice', 'PUT /api/health-profile', (t) => ({ profile: { weightKg: 70, note: mk(t), name: mk(`${t}n`) } })],
+    ['alice', 'GET /api/health-profile/webhook-token'], ['alice', 'POST /api/health-profile/webhook-token/rotate'], ['alice', 'GET /api/health-sync/diagnosis'],
+    ['alice', 'POST /api/health-webhook/:token', (t) => ({ data: { metrics: [{ name: mk(t), units: 'kg', data: [{ qty: 61.5, date: '2026-10-11 08:00:00 +0000' }] }] } })],
+    ['alice', 'GET /api/settings'], ['alice', 'PUT /api/settings', (t) => ({ settings: { note: mk(t) } })],
+    ['alice', 'GET /api/second-opinion'], ['alice', 'POST /api/second-opinion', (t) => ({ symptoms: mk(t), history: mk(`${t}h`) })], ['doctor', 'POST /api/second-opinion/:id/complete', (t) => ({ answer: mk(t) })],
+    ['owner', 'GET /api/owner/staff'], ['owner', 'POST /api/owner/staff-assignments', (t) => ({ userId: mk(t), patientId: mk(`${t}p`) })], ['owner', 'POST /api/owner/staff-role', (t) => ({ userId: mk(t), role: 'perawat' })],
+    ['owner', 'GET /api/audit'], ['alice', 'GET /api/doctors'], ['owner', 'POST /api/doctors/:id/verify', (t) => ({ status: 'verified', note: mk(t) })],
+  ]
+  const drivenRoutes = driven.map(([, route]) => route)
+  assert.equal(new Set(drivenRoutes).size, drivenRoutes.length, 'each route group member is driven once')
+  assert.deepEqual([...groupRoutes].sort(), [...drivenRoutes].sort(), 'the driven routes equal the routes registered in the RBAC-matrix groups, in both directions')
+  const routeMarkers: string[] = []
+  const tokens: Record<Who, string> = { alice: alice.token, doctor: doctor.token, owner: owner.token }
+  const answered: string[] = []
+  for (const [i, [who, route, body]] of driven.entries()) {
+    const [method, pattern] = route.split(' ') as [string, string]
+    const tag = `g${i}`
+    const concrete = pattern.replace(/:([A-Za-z]+)/g, (_m, name: string) => mk(`${tag}${name}`))
+    for (const [, name] of pattern.matchAll(/:([A-Za-z]+)/g)) routeMarkers.push(mk(`${tag}${name}`))
+    const query = method === 'GET' || method === 'DELETE' ? `?rgq=${mk(`${tag}q`)}` : ''
+    if (query) routeMarkers.push(mk(`${tag}q`))
+    const payload = body?.(tag)
+    if (payload !== undefined) for (const m of JSON.stringify(payload).matchAll(/rg-[a-z0-9]+-marker/g)) routeMarkers.push(m[0])
+    const r = await call(method, `${concrete}${query}`, tokens[who], payload)
+    answered.push(`${route} -> ${r.status}`)
+    assert.ok(r.status < 500, `${route} must not answer 5xx with marker data (got ${r.status})`)
+  }
+  assert.ok(routeMarkers.length > 40, 'the markers were really sent')
+  const byStatus: Record<string, number> = {}
+  for (const line of answered) { const code = line.slice(-3); byStatus[code] = (byStatus[code] ?? 0) + 1 }
+  console.log(`logPrivacyHttp routes: ${driven.length} routes of the RBAC-matrix groups driven with ${routeMarkers.length} markers, statuses ${JSON.stringify(byStatus)}`)
+  await new Promise((resolve) => setTimeout(resolve, 500))
+
   const written = logs()
   assert.ok(written.length > 0, 'the server wrote its startup and request lines, so the capture is real')
   for (const secret of [
@@ -179,6 +255,7 @@ try {
     privateLabel, 'synthetic-private-health-label', 'synthetic-forged-log-line', 'weight_body_mass', 'weightKg', token,
     'malformed-name-marker', 'malformed-mrn-marker', 'malformed-trailing-marker', 'malformed-unquoted-marker', 'malformed-singlequote-marker',
     'malformed-lab-marker', 'malformed-value-marker', 'malformed-not-json-marker', 'malformed-oversize-marker',
+    ...routeMarkers,
   ]) assert.ok(!written.includes(secret), `the server log must not contain "${secret}"`)
   // Operational telemetry retains counts and correlation, without health categories.
   assert.match(written, /\[health-webhook\] u:[0-9a-f]{10}: groups=2 workouts=0 matched=1(?:\r?\n|$)/, 'the webhook line keeps counts under an opaque marker')
