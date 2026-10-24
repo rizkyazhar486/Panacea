@@ -82,5 +82,7 @@ export function sampleRespiration(model: RespiratoryModel, cycle01: number): Res
 /** Ciclus [0,1) dari waktu pemutaran (s). dt dan periode disuntikkan; periode harus positif. */
 export function cycleAt(timeS: number, periodS: number = DEFAULT_BREATH_PERIOD_S): number {
   if (!isNum(timeS) || !isNum(periodS) || periodS <= 0) throw new RangeError('time must be finite and period positive')
-  return (((timeS / periodS) % 1) + 1) % 1
+  const cycles = timeS / periodS
+  if (!isNum(cycles)) throw new RangeError('cycle count must be finite')
+  return ((cycles % 1) + 1) % 1
 }

@@ -6,6 +6,7 @@
     "growthInputs",
     "inputs",
     "movementInputs",
+    "sourceLine",
     "sourceRecord"
   ],
   "entries": [
@@ -17,11 +18,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Standard alveolar gas equation; the engine header names no publication, so no source is claimed."
-      }
+        "basis": "Declared repo heuristic: standard alveolar gas equation and the age/4 + 4 room-air threshold moved from the page; classic rule, original source not verified."
+      },
+      "formula": "PAO2 - PaO2, where PAO2 = (FiO2 * (Patm - 47)) - (PaCO2 / 0.8)",
+      "units": "mmHg"
     },
     {
       "id": "autophagyTiming",
@@ -35,7 +38,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Illustrative population-average heuristic stated as such in the engine header; not a published model and not a measurement of autophagy."
-      }
+      },
+      "formula": "14 - (1 - fastingLevel) * 4 - (intensity - 1) * 2 - (mealCarbs - 1) * 2",
+      "units": "hours"
     },
     {
       "id": "bloodDonationScreen",
@@ -45,11 +50,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Generic national blood-service/WHO/PMI criteria per the engine header; no specific document is cited, so none is claimed."
-      }
+        "basis": "Declared repo heuristic: generic blood-service eligibility thresholds (age, weight, 12-week interval) moved from the page; no specific WHO/PMI document is cited or verified."
+      },
+      "formula": "Age 17-65, weight >= 50 kg, last donation >= 12 weeks, deferral screening",
+      "units": "eligibility criteria"
     },
     {
       "id": "bloodGas",
@@ -59,11 +66,26 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Winter formula without a citation; the stepwise interpretation itself is unattributed."
-      }
+        "kind": "published",
+        "citation": "Albert, Dell & Winters, Ann Intern Med 1967;66:312-22",
+        "anchor": "Albert, Dell & Winters, Ann Intern Med 1967;66:312-22",
+        "basis": "Identifies only the Winter expected-PaCO2 step (1.5 x HCO3 + 8); PubMed has no abstract, so the constant is not checked against the text. The rest of the stepwise interpretation (pH status, primary disorder, albumin-corrected anion gap, delta ratio) remains unattributed.",
+        "doi": "10.7326/0003-4819-66-2-312",
+        "pmid": "6016545",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6016545",
+          "doi": "10.7326/0003-4819-66-2-312",
+          "retrievedOn": "2026-10-24",
+          "title": "Quantitative displacement of acid-base equilibrium in metabolic acidosis.",
+          "firstAuthor": "Albert",
+          "journal": "Ann Intern Med",
+          "year": 1967,
+          "pages": "312-22"
+        }
+      },
+      "formula": "pH/PaCO2/HCO3 classification; Winter expected PaCO2 = 1.5 * HCO3 + 8 (+/- 2); Anion Gap = Na - (Cl + HCO3)",
+      "units": "mmHg, mEq/L"
     },
     {
       "id": "caffeineSleep",
@@ -77,7 +99,9 @@
         "citation": null,
         "anchor": null,
         "basis": "First-order elimination model with repo-defined drink contents and bands; not a published model."
-      }
+      },
+      "formula": "Remaining = Dose * 0.5^(hours / halfLife)",
+      "units": "mg"
     },
     {
       "id": "centor",
@@ -90,10 +114,23 @@
         "kind": "published",
         "citation": "Centor 1981; McIsaac 1998 (score and age modification)",
         "anchor": "Centor 1981; modifikasi McIsaac 1998",
-        "basis": "Header cites authors and years only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Primary identifier is Centor 1981. McIsaac 1998 (age modification) is PubMed 9475915 (CMAJ 1998, 'A clinical score to reduce unnecessary antibiotic use in patients with sore throat'); one identifier per record, so it is noted here.",
+        "doi": "10.1177/0272989X8100100304",
+        "pmid": "6763125",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6763125",
+          "doi": "10.1177/0272989X8100100304",
+          "retrievedOn": "2026-10-24",
+          "title": "The diagnosis of strep throat in adults in the emergency room.",
+          "firstAuthor": "Centor",
+          "journal": "Med Decis Making",
+          "year": 1981,
+          "pages": "239-46"
+        }
+      },
+      "formula": "Tonsillar exudate (+1) + Tender anterior cervical adenopathy (+1) + Fever (+1) + Absence of cough (+1) + Age adjustment (+1, 0, or -1)",
+      "units": "points (0-5)"
     },
     {
       "id": "charlson",
@@ -120,7 +157,9 @@
           "year": 1987,
           "pages": "373-83"
         }
-      }
+      },
+      "formula": "Sum of 19 comorbidity condition weights (1-6) + age points (1 pt per decade >= 50)",
+      "units": "points"
     },
     {
       "id": "childPugh",
@@ -134,9 +173,22 @@
         "citation": "Pugh et al. 1973",
         "anchor": "Pugh et al. 1973",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "doi": "10.1002/bjs.1800600817",
+        "pmid": "4541913",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4541913",
+          "doi": "10.1002/bjs.1800600817",
+          "retrievedOn": "2026-10-24",
+          "title": "Transection of the oesophagus for bleeding oesophageal varices.",
+          "firstAuthor": "Pugh",
+          "journal": "Br J Surg",
+          "year": 1973,
+          "pages": "646-9"
+        }
+      },
+      "formula": "Bilirubin (1-3) + Albumin (1-3) + INR (1-3) + Ascites (1-3) + Encephalopathy (1-3)",
+      "units": "points (5-15; Class A: 5-6, B: 7-9, C: 10-15)"
     },
     {
       "id": "cockcroftGault",
@@ -163,7 +215,9 @@
           "year": 1976,
           "pages": "31-41"
         }
-      }
+      },
+      "formula": "[(140 - age) * weight (kg) / (72 * SCr (mg/dL))] * (0.85 if female)",
+      "units": "mL/min"
     },
     {
       "id": "correctedCalcium",
@@ -190,7 +244,9 @@
           "year": 1973,
           "pages": "643-6"
         }
-      }
+      },
+      "formula": "Serum Calcium + 0.8 * (4.0 - Serum Albumin (g/dL))",
+      "units": "mg/dL"
     },
     {
       "id": "denverAge",
@@ -200,11 +256,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "arithmetic",
         "citation": null,
         "anchor": null,
-        "basis": "Age-range validation only; the milestone list is not part of this engine and no source is claimed."
-      }
+        "basis": "Declared arithmetic: the engine only validates the 0-72 month age range written on the page; the Denver II milestone list is not part of this engine and no source is claimed for it."
+      },
+      "formula": "Validation of chronological age within 0 to 72 months for Denver II developmental milestones",
+      "units": "months"
     },
     {
       "id": "electrolyteCorrection",
@@ -217,10 +275,23 @@
         "kind": "published",
         "citation": "Katz 1973 (sodium correction); Sterns rule of thumb (potassium deficit)",
         "anchor": "Katz 1973",
-        "basis": "Header cites Katz 1973; the Sterns rule has no year or journal in the repo. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Identifier is Katz 1973 (sodium correction). The Sterns potassium-deficit rule of thumb named in the header has no specific citation and is not identified.",
+        "doi": "10.1056/NEJM197310182891607",
+        "pmid": "4763428",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4763428",
+          "doi": "10.1056/NEJM197310182891607",
+          "retrievedOn": "2026-10-24",
+          "title": "Hyperglycemia-induced hyponatremia--calculation of expected serum sodium depression.",
+          "firstAuthor": "Katz",
+          "journal": "N Engl J Med",
+          "year": 1973,
+          "pages": "843-4"
+        }
+      },
+      "formula": "Corrected Na = Measured Na + 0.016 * (Glucose - 100); Potassium deficit rule: 200-400 mEq per 1 mEq/L below 4.0",
+      "units": "mEq/L"
     },
     {
       "id": "fena",
@@ -247,7 +318,9 @@
           "year": 1976,
           "pages": "579-81"
         }
-      }
+      },
+      "formula": "(Urinary Na * Serum Cr) / (Serum Na * Urinary Cr) * 100",
+      "units": "%"
     },
     {
       "id": "findrisc",
@@ -274,7 +347,9 @@
           "year": 2003,
           "pages": "725-31"
         }
-      }
+      },
+      "formula": "Sum of scores: Age (0-4) + BMI (0-3) + Waist (0-4) + Physical activity (0-2) + Diet (0-1) + BP meds (0-2) + High glucose history (0-5) + Family history (0-5)",
+      "units": "points (0-26)"
     },
     {
       "id": "fletcher",
@@ -284,11 +359,26 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Fletcher index and AAO-HNS for the four-frequency mode without a citation."
-      }
+        "kind": "published",
+        "citation": "Fletcher, Acta Otolaryngol Suppl 1950;90:26-37",
+        "anchor": "Fletcher, Acta Otolaryngol Suppl 1950;90:26-37",
+        "basis": "Identifies only the Fletcher index (average of the 500/1000/2000 Hz thresholds); PubMed has no abstract, so it is not checked against the text. The four-frequency AAO-HNS mode and the 26/41/56/71/91 dB grade bands remain unattributed.",
+        "doi": "10.3109/00016485009127735",
+        "pmid": "14818775",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "14818775",
+          "doi": "10.3109/00016485009127735",
+          "retrievedOn": "2026-10-24",
+          "title": "A method of calculating hearing loss for speech from an audiogram.",
+          "firstAuthor": "Fletcher",
+          "journal": "Acta Otolaryngol Suppl",
+          "year": 1950,
+          "pages": "26-37"
+        }
+      },
+      "formula": "Basic: (500 Hz + 1000 Hz + 2000 Hz) / 3; Complete (AAO-HNS): (500 Hz + 1000 Hz + 2000 Hz + 3000 Hz) / 4",
+      "units": "dB HL"
     },
     {
       "id": "fluidBalance",
@@ -302,7 +392,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Intake minus output arithmetic on user-entered values; no clinical claim is made."
-      }
+      },
+      "formula": "Total fluid intake - Total fluid output",
+      "units": "mL"
     },
     {
       "id": "fluidElectrolytes",
@@ -312,11 +404,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names Holliday-Segar, PALS, Parkland, Katz and Adrogue-Madias without citations."
-      }
+        "basis": "Declared repo heuristic: a composite worksheet (Holliday-Segar, 30 mL/kg sepsis bolus, PALS 20 mL/kg, Parkland, Katz, simplified Adrogue-Madias, potassium deficit) with constants moved from the page; classic rules, original sources not verified for this composite."
+      },
+      "formula": "Maintenance (4-2-1 rule): 100 mL/kg (first 10 kg) + 50 mL/kg (next 10 kg) + 20 mL/kg (>20 kg); Resuscitation scenarios (sepsis 30 mL/kg, PALS 20 mL/kg, Parkland 4 mL * kg * %TBSA)",
+      "units": "mL/24h, mL/h"
     },
     {
       "id": "framinghamInputs",
@@ -330,9 +424,22 @@
         "citation": "D'Agostino 2008 (Framingham General CVD)",
         "anchor": "D'Agostino 2008",
         "basis": "Input validation for the Framingham model; header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "doi": "10.1161/CIRCULATIONAHA.107.699579",
+        "pmid": "18212285",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18212285",
+          "doi": "10.1161/CIRCULATIONAHA.107.699579",
+          "retrievedOn": "2026-10-24",
+          "title": "General cardiovascular risk profile for use in primary care: the Framingham Heart Study.",
+          "firstAuthor": "D'Agostino",
+          "journal": "Circulation",
+          "year": 2008,
+          "pages": "743-53"
+        }
+      },
+      "formula": "Sanity and range validation of age, total cholesterol, HDL, SBP, smoking, and diabetes inputs for Framingham CVD risk",
+      "units": "validated clinical inputs"
     },
     {
       "id": "glasgowBlatchford",
@@ -359,7 +466,9 @@
           "year": 2000,
           "pages": "1318-21"
         }
-      }
+      },
+      "formula": "BUN points (0-6) + Hb points (0-6) + SBP points (0-3) + Pulse >= 100 (1) + Melena (1) + Syncope (2) + Hepatic disease (2) + Heart failure (2)",
+      "units": "points (0-23)"
     },
     {
       "id": "graceScore",
@@ -373,9 +482,22 @@
         "citation": "Granger et al. 2003 (GRACE in-hospital mortality)",
         "anchor": "Granger et al. 2003",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "doi": "10.1001/archinte.163.19.2345",
+        "pmid": "14581255",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "14581255",
+          "doi": "10.1001/archinte.163.19.2345",
+          "retrievedOn": "2026-10-24",
+          "title": "Predictors of hospital mortality in the global registry of acute coronary events.",
+          "firstAuthor": "Granger",
+          "journal": "Arch Intern Med",
+          "year": 2003,
+          "pages": "2345-53"
+        }
+      },
+      "formula": "Sum of points for Age, Heart Rate, SBP, Initial Creatinine, Killip Class (I-IV), Cardiac Arrest at admission, ST segment deviation, Elevated cardiac enzymes",
+      "units": "points"
     },
     {
       "id": "hollidaySegar",
@@ -385,11 +507,26 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Holliday-Segar 4-2-1 rule without a citation."
-      }
+        "kind": "published",
+        "citation": "Holliday & Segar, Pediatrics 1957;19:823-32",
+        "anchor": "Holliday & Segar, Pediatrics 1957;19:823-32",
+        "basis": "The 4-2-1 method is named after this paper (PubMed record has no abstract); the 100/50/20 mL/kg constants have not been checked against the full text.",
+        "doi": null,
+        "pmid": "13431307",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "13431307",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "The maintenance need for water in parenteral fluid therapy.",
+          "firstAuthor": "Holliday",
+          "journal": "Pediatrics",
+          "year": 1957,
+          "pages": "823-32"
+        }
+      },
+      "formula": "Daily: 100 mL/kg (1-10 kg) + 50 mL/kg (11-20 kg) + 20 mL/kg (>20 kg); Hourly: 4 mL/kg/h + 2 mL/kg/h + 1 mL/kg/h",
+      "units": "mL/24h, mL/h"
     },
     {
       "id": "hydrationTarget",
@@ -403,7 +540,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Population-average constants (33 mL/kg and add-ons) defined in the repo; not a published recommendation."
-      }
+      },
+      "formula": "Baseline: 33 mL/kg + Exercise (400-800 mL/h) + Hot climate (+500 mL) + Pregnancy (+300 mL) + Breastfeeding (+700 mL)",
+      "units": "mL/day"
     },
     {
       "id": "idealBodyWeight",
@@ -413,11 +552,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the Broca and Lorentz formulas without a citation."
-      }
+        "basis": "Declared repo heuristic: classic Broca and Lorentz rules and the 30/35/40 kcal/kg activity factors moved from the page; original sources (19th/early 20th century, not indexed in PubMed) not verified."
+      },
+      "formula": "Broca: Height - 100 (- 10% for M, - 15% for F); Lorentz: (Height - 100) - (Height - 150) / (4 for M, 2.5 for F); Calories = IBW * Activity factor",
+      "units": "kg, kcal/day"
     },
     {
       "id": "ivDrip",
@@ -431,7 +572,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Drip-rate arithmetic on user-entered volume, time and drop factor; no clinical claim is made."
-      }
+      },
+      "formula": "Flow rate = Volume (mL) / Duration (hours); Drop rate = (Volume * Drop Factor) / (Duration * 60)",
+      "units": "mL/h, drops/min"
     },
     {
       "id": "ldlFriedewald",
@@ -458,7 +601,9 @@
           "year": 1972,
           "pages": "499-502"
         }
-      }
+      },
+      "formula": "LDL-C = Total Cholesterol - HDL-C - (Triglycerides / 5) (for TG < 400 mg/dL); Non-HDL = Total Cholesterol - HDL-C",
+      "units": "mg/dL"
     },
     {
       "id": "lightsCriteria",
@@ -485,7 +630,9 @@
           "year": 1972,
           "pages": "507-13"
         }
-      }
+      },
+      "formula": "Pleural/Serum Protein > 0.5 OR Pleural/Serum LDH > 0.6 OR Pleural LDH > 2/3 upper limit of normal serum LDH",
+      "units": "criteria met (exudate vs transudate)"
     },
     {
       "id": "maddreyScore",
@@ -500,8 +647,21 @@
         "anchor": "Maddrey et al. 1978",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
-      }
+        "pmid": "352788",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "352788",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Corticosteroid therapy of alcoholic hepatitis.",
+          "firstAuthor": "Maddrey",
+          "journal": "Gastroenterology",
+          "year": 1978,
+          "pages": "193-9"
+        }
+      },
+      "formula": "4.6 * (Patient PT - Control PT) + Total Bilirubin (mg/dL)",
+      "units": "discriminant factor (DF)"
     },
     {
       "id": "mcdonaldRule",
@@ -511,11 +671,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the McDonald rule without a citation."
-      }
+        "basis": "Declared repo heuristic: classic McDonald rule (fundal height in cm approximates gestational weeks, 20-36 weeks); original source not found in PubMed and not verified."
+      },
+      "formula": "Gestational age (weeks) ~ Symphysis-fundal height (cm) (valid 20-36 weeks)",
+      "units": "weeks"
     },
     {
       "id": "meanArterialPressure",
@@ -529,7 +691,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Standard MAP arithmetic; the label thresholds are repo-defined and no source is claimed."
-      }
+      },
+      "formula": "(Systolic BP + 2 * Diastolic BP) / 3",
+      "units": "mmHg"
     },
     {
       "id": "meldNa",
@@ -542,10 +706,23 @@
         "kind": "published",
         "citation": "Kamath 2001; Kim 2008; OPTN/UNOS policy 2016",
         "anchor": "Kamath 2001; Kim 2008; kebijakan OPTN/UNOS 2016",
-        "basis": "Header cites authors, years and policy only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Primary identifier is Kamath 2001 (MELD). Kim 2008 (MELD-Na) is PubMed 18768945 (N Engl J Med 2008, 'Hyponatremia and mortality among patients on the liver-transplant waiting list'). The OPTN/UNOS 2016 policy is a policy document, not a PubMed record.",
+        "doi": "10.1053/jhep.2001.22172",
+        "pmid": "11172350",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "11172350",
+          "doi": "10.1053/jhep.2001.22172",
+          "retrievedOn": "2026-10-24",
+          "title": "A model to predict survival in patients with end-stage liver disease.",
+          "firstAuthor": "Kamath",
+          "journal": "Hepatology",
+          "year": 2001,
+          "pages": "464-70"
+        }
+      },
+      "formula": "MELD = 3.78 * ln(Bilirubin) + 11.2 * ln(INR) + 9.57 * ln(Creatinine) + 6.43; MELD-Na = MELD + 1.32 * (137 - Na) - [0.033 * MELD * (137 - Na)]",
+      "units": "score (6-40)"
     },
     {
       "id": "midParentalHeight",
@@ -555,11 +732,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header states the formula and a ±8.5 cm range without naming a source."
-      }
+        "basis": "Declared repo heuristic: parental average +/- 13 cm with a +/-8.5 cm range moved from the page; not attributed to Tanner 1970 because the accessible text confirms the parental average only, not the offset or range."
+      },
+      "formula": "Boy: (Father + Mother + 13) / 2; Girl: (Father + Mother - 13) / 2; range +/- 8.5 cm",
+      "units": "cm"
     },
     {
       "id": "naegele",
@@ -569,11 +748,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names Naegele's rule without a citation."
-      }
+        "basis": "Declared repo heuristic: classic Naegele rule (LMP + 280 days with cycle-length correction); original 19th-century source not indexed in PubMed and not verified."
+      },
+      "formula": "Estimated Due Date (EDD) = LMP + 280 days + (Cycle length - 28 days)",
+      "units": "calendar date / gestational age (days/weeks)"
     },
     {
       "id": "news2",
@@ -586,10 +767,17 @@
         "kind": "published",
         "citation": "Royal College of Physicians 2017 (NEWS2)",
         "anchor": "Royal College of Physicians 2017",
-        "basis": "Header cites the issuing body and year only. DOI/PMID not verified in this repository.",
+        "basis": "Royal College of Physicians report 'National Early Warning Score (NEWS) 2' (London: RCP, 2017); a report, not a PubMed record.",
         "doi": null,
-        "pmid": null
-      }
+        "pmid": null,
+        "unindexed": {
+          "reason": "Royal College of Physicians report (London: RCP, 2017), not indexed in PubMed; the RCP page dated 19 December 2017 links the full report.",
+          "url": "https://www.rcp.ac.uk/improving-care/resources/national-early-warning-score-news-2/",
+          "checkedOn": "2026-10-24"
+        }
+      },
+      "formula": "Sum of 7 physiological parameter scores (Respiration rate, SpO2 scale 1/2, Supplemental O2, Systolic BP, Pulse, Consciousness/CVPU, Temperature)",
+      "units": "points (0-20)"
     },
     {
       "id": "packYearScreen",
@@ -600,12 +788,25 @@
       "evidence": null,
       "source": {
         "kind": "published",
-        "citation": "USPSTF 2021 lung cancer screening recommendation",
+        "citation": "US Preventive Services Task Force (USPSTF) 2021, Screening for Lung Cancer: Recommendation Statement, JAMA 325:962-970",
         "anchor": "USPSTF 2021",
-        "basis": "Header cites the body and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Header cites USPSTF 2021; identifier is the recommendation statement as indexed in PubMed (collective author).",
+        "doi": "10.1001/jama.2021.1117",
+        "pmid": "33687470",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "33687470",
+          "doi": "10.1001/jama.2021.1117",
+          "retrievedOn": "2026-10-24",
+          "title": "Screening for Lung Cancer: US Preventive Services Task Force Recommendation Statement.",
+          "firstAuthor": "US Preventive Services Task Force",
+          "journal": "JAMA",
+          "year": 2021,
+          "pages": "962-970"
+        }
+      },
+      "formula": "Pack-years = (Cigarettes per day / 20) * Years smoked; USPSTF 2021 criteria: age 50-80, >= 20 pack-years, quit <= 15 years",
+      "units": "pack-years"
     },
     {
       "id": "paradise",
@@ -619,9 +820,22 @@
         "citation": "Paradise et al., 1984",
         "anchor": "Paradise et al., 1984",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "doi": "10.1056/NEJM198403153101102",
+        "pmid": "6700642",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "6700642",
+          "doi": "10.1056/NEJM198403153101102",
+          "retrievedOn": "2026-10-24",
+          "title": "Efficacy of tonsillectomy for recurrent throat infection in severely affected children. Results of parallel randomized and nonrandomized clinical trials.",
+          "firstAuthor": "Paradise",
+          "journal": "N Engl J Med",
+          "year": 1984,
+          "pages": "674-83"
+        }
+      },
+      "formula": "Sore throat episodes: >= 7 in past year, OR >= 5/year for 2 years, OR >= 3/year for 3 years, each with clinical features documented",
+      "units": "criteria met (tonsillectomy indication)"
     },
     {
       "id": "parkland",
@@ -631,11 +845,26 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Parkland (Baxter) formula without a citation."
-      }
+        "kind": "published",
+        "citation": "Baxter & Shires, Ann N Y Acad Sci 1968;150:874-94",
+        "anchor": "Baxter & Shires, Ann N Y Acad Sci 1968;150:874-94",
+        "basis": "The Parkland (Baxter) formula is named after this paper (PubMed record has no abstract); the 4 mL x kg x %TBSA constant and the 8 h / 16 h split have not been checked against the full text.",
+        "doi": "10.1111/j.1749-6632.1968.tb14738.x",
+        "pmid": "4973463",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4973463",
+          "doi": "10.1111/j.1749-6632.1968.tb14738.x",
+          "retrievedOn": "2026-10-24",
+          "title": "Physiological response to crystalloid resuscitation of severe burns.",
+          "firstAuthor": "Baxter",
+          "journal": "Ann N Y Acad Sci",
+          "year": 1968,
+          "pages": "874-94"
+        }
+      },
+      "formula": "24-hour total volume = 4 mL * Weight (kg) * %TBSA; 50% administered in first 8 hours, remaining 50% over next 16 hours",
+      "units": "mL/24h (first 8h mL, next 16h mL)"
     },
     {
       "id": "pediatricDka",
@@ -645,11 +874,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names no source for the fluid, potassium and insulin worksheet constants."
-      }
+        "basis": "Declared repo heuristic: fluid, potassium (3.5 / 5.5 mEq/L) and insulin worksheet constants moved from the page; not a validated protocol and no source is verified."
+      },
+      "formula": "Initial bolus (10-20 mL/kg) -> Deficit (% dehydration * weight * 10) + Holliday-Segar 48h maintenance -> mL/h; Insulin infusion: 0.05-0.1 U/kg/h",
+      "units": "mL/h, U/h"
     },
     {
       "id": "pedsDose",
@@ -663,7 +894,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Weight-based dose arithmetic on user-entered values; it holds no dose, maximum or indication, by design."
-      }
+      },
+      "formula": "Daily dose = Weight (kg) * Dose (mg/kg/day); Single dose = Daily dose / Frequency; Syrup volume = Single dose (mg) / Concentration (mg/mL)",
+      "units": "mg/day, mg/dose, mL/dose"
     },
     {
       "id": "qtc",
@@ -676,10 +909,23 @@
         "kind": "published",
         "citation": "Bazett 1920; Fridericia 1920; Sagie 1992 (Framingham); Hodges 1983",
         "anchor": "Bazett (1920)",
-        "basis": "Header names four formulas with years and no journals. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Identifier is Sagie 1992 (Framingham formula), the only one of the four formulas found in PubMed; Bazett 1920, Fridericia 1920 and Hodges 1983 returned no PubMed record on 2026-10-24 and are not identified.",
+        "doi": "10.1016/0002-9149(92)90562-d",
+        "pmid": "1519533",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1519533",
+          "doi": "10.1016/0002-9149(92)90562-d",
+          "retrievedOn": "2026-10-24",
+          "title": "An improved method for adjusting the QT interval for heart rate (the Framingham Heart Study).",
+          "firstAuthor": "Sagie",
+          "journal": "Am J Cardiol",
+          "year": 1992,
+          "pages": "797-801"
+        }
+      },
+      "formula": "Bazett: QT / sqrt(RR); Fridericia: QT / cbrt(RR); Framingham: QT + 0.154 * (1 - RR); Hodges: QT + 1.75 * (HR - 60)",
+      "units": "ms"
     },
     {
       "id": "riskScreens",
@@ -692,10 +938,23 @@
         "kind": "published",
         "citation": "D'Agostino, Circulation 2008; Sterling 2006 (FIB-4); Koh 2001 (OST)",
         "anchor": "D'Agostino, Circulation 2008",
-        "basis": "Header cites three screens by author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "basis": "Primary identifier is D'Agostino 2008. Sterling 2006 (FIB-4) is PubMed 16729309 (Hepatology 2006) and Koh 2001 (OST) is PubMed 11580084 (Osteoporos Int 2001); one identifier per record, so they are noted here.",
+        "doi": "10.1161/CIRCULATIONAHA.107.699579",
+        "pmid": "18212285",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18212285",
+          "doi": "10.1161/CIRCULATIONAHA.107.699579",
+          "retrievedOn": "2026-10-24",
+          "title": "General cardiovascular risk profile for use in primary care: the Framingham Heart Study.",
+          "firstAuthor": "D'Agostino",
+          "journal": "Circulation",
+          "year": 2008,
+          "pages": "743-53"
+        }
+      },
+      "formula": "Framingham CVD 10-year risk (Cox model); FIB-4 = (Age * AST) / (Platelets * sqrt(ALT)); Osteoporosis Self-Assessment Tool (OST) = (Weight kg - Age) * 0.2",
+      "units": "% risk, FIB-4 index, OST score"
     },
     {
       "id": "serumOsmolality",
@@ -710,8 +969,21 @@
         "anchor": "Dorwart & Chalmers 1975",
         "basis": "Header cites authors and year only. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
-      }
+        "pmid": "1112025",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1112025",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Comparison of methods for calculating serum osmolality form chemical concentrations, and the prognostic value of such calculations.",
+          "firstAuthor": "Dorwart",
+          "journal": "Clin Chem",
+          "year": 1975,
+          "pages": "190-4"
+        }
+      },
+      "formula": "Calculated Osmolality = 2 * Na + (Glucose / 18) + (BUN / 2.8) [+ (Ethanol / 3.7)]; Osmolal Gap = Measured Osmolality - Calculated Osmolality",
+      "units": "mOsm/kg"
     },
     {
       "id": "sirirajStrokeScore",
@@ -738,7 +1010,9 @@
           "year": 1991,
           "pages": "1565-7"
         }
-      }
+      },
+      "formula": "(2.5 * Consciousness [0-2]) + (2 * Vomiting [0/1]) + (2 * Headache [0/1]) + (0.1 * Diastolic BP) - (3 * Atheroma markers [0/1]) - 12",
+      "units": "score (<-1 infarction, >+1 hemorrhage)"
     },
     {
       "id": "sleepDebt",
@@ -752,7 +1026,9 @@
         "citation": null,
         "anchor": null,
         "basis": "Repo-defined sleep-debt sum and bands; not a published model."
-      }
+      },
+      "formula": "Cumulative sleep debt = Sum of max(0, sleepNeed - actualSleep) over up to 14 nights; Average debt = Total debt / nights",
+      "units": "hours"
     },
     {
       "id": "sofaScore",
@@ -766,9 +1042,22 @@
         "citation": "Vincent et al. 1996 (SOFA)",
         "anchor": "Vincent et al. 1996",
         "basis": "Header cites author and year only. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
-      }
+        "doi": "10.1007/BF01709751",
+        "pmid": "8844239",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "8844239",
+          "doi": "10.1007/BF01709751",
+          "retrievedOn": "2026-10-24",
+          "title": "The SOFA (Sepsis-related Organ Failure Assessment) score to describe organ dysfunction/failure. On behalf of the Working Group on Sepsis-Related Problems of the European Society of Intensive Care Medicine.",
+          "firstAuthor": "Vincent",
+          "journal": "Intensive Care Med",
+          "year": 1996,
+          "pages": "707-10"
+        }
+      },
+      "formula": "Sum of 6 organ system scores (0-4 each): Respiration (PaO2/FiO2), Coagulation (Platelets), Liver (Bilirubin), Cardiovascular (MAP/vasopressors), CNS (GCS), Renal (Creatinine/urine)",
+      "units": "points (0-24)"
     },
     {
       "id": "stopBang",
@@ -795,7 +1084,9 @@
           "year": 2008,
           "pages": "812-21"
         }
-      }
+      },
+      "formula": "Sum of 8 yes/no items: Snoring, Tired, Observed apnea, high Blood Pressure, BMI > 35, Age > 50, Neck circumference > 40 cm, Male Gender",
+      "units": "points (0-8)"
     },
     {
       "id": "waistToHeight",
@@ -805,11 +1096,26 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header says the bands were moved unchanged from a page and names no source."
-      }
+        "kind": "published",
+        "citation": "Ashwell M, Gibson S. 2016. Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference. BMJ Open. 6(3):e010159.",
+        "anchor": "Ashwell M, Gibson S. 2016. BMJ Open. 6(3):e010159.",
+        "basis": "PubMed PMID 26975935 and PMC4800150 full text checked on 2026-10-24. Methods uses WHtR <0.5, >=0.5 and <0.6, and >=0.6 in UK adults (n=1453), matching the engine boundaries. App labels remain educational; input sanity ranges are repo-defined, and this is not an individualized risk probability or clinical validation.",
+        "doi": "10.1136/bmjopen-2015-010159",
+        "pmid": "26975935",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "26975935",
+          "doi": "10.1136/bmjopen-2015-010159",
+          "retrievedOn": "2026-10-24",
+          "title": "Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference.",
+          "firstAuthor": "Ashwell",
+          "journal": "BMJ open",
+          "year": 2016,
+          "pages": "e010159"
+        }
+      },
+      "formula": "Waist circumference / Height (in matching units); risk bands: < 0.5 (no increased risk), 0.5 to < 0.6 (increased risk), >= 0.6 (very high risk)",
+      "units": "ratio"
     },
     {
       "id": "widmarkBac",
@@ -819,11 +1125,13 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the Widmark formula without a citation; r and beta constants are uncited."
-      }
+        "basis": "Declared repo heuristic: classic Widmark formula with r = 0.68/0.55 and beta = 0.15 per mille/h moved from the page; original source not found in PubMed and the constants are not verified."
+      },
+      "formula": "BAC (permille) = [A (grams) / (r * Weight kg)] - (beta * time hours); r = 0.68 (M) / 0.55 (F), beta = 0.15 permille/h",
+      "units": "permille (g/L)"
     }
   ]
 }

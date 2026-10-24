@@ -4,6 +4,7 @@ import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySy
 import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
 import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
+import { FiveStageVisualAtlas } from '../../domains/body-exposure/ui/FiveStageVisualAtlas'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
@@ -200,6 +201,8 @@ export default function UnifiedHumanSimulationProjector({
   }
 
   function openScale(scale: BodySemanticScale) {
+    const stop = getBodySemanticZoomStop(scale)
+    setSemanticZoom({ scale, relativeZoom: stop.minRelativeZoom })
     if (scale === 'tissue' || scale === 'cell' || scale === 'organelle') selectDomain('cell')
     else if (scale === 'molecule' || scale === 'genome') selectDomain('genome')
     else selectDomain('anatomy')
@@ -378,6 +381,17 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </aside>
       </div>
+      )}
+
+      {!compact && !hideReferenceAtlasCanvas && (
+        <FiveStageVisualAtlas
+          selectedSystemId={selectedSystemId}
+          semanticScale={semanticZoom.scale}
+          selectedStructureName={selectedStructureName}
+          onOpenScale={openScale}
+          onSelectDomain={(nextDomain) => selectDomain(nextDomain)}
+          onSelectStructure={setSelectedStructureName}
+        />
       )}
 
       {!hideReferenceAtlasCanvas && microscopic && (

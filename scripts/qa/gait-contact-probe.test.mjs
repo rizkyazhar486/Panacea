@@ -21,11 +21,12 @@ test('control: male landmarks equal the closest-vertex definition, so the method
   }
 })
 
-test('finding 1: female heel landmark is mis-derived (contact calcaneus vertex reaches the floor, the rig node does not)', () => {
+test('finding 1: female heel landmark matches the closest-vertex definition and reaches the floor (T-D7-04)', () => {
   for (const s of ['L', 'R']) {
     const c = B.vhf_denver_ct_adult_female.clips.WALK.sides[s].groups.calcaneus
     assert.ok(c.closest_vertex.min_height_mm < 15 && c.closest_vertex.stance_phases >= 1, `closest vertex reaches the window (${s})`)
-    assert.ok(c.current_landmark.min_height_mm >= 15 && c.current_landmark.stance_phases === 0, `rig node never does (${s})`)
+    assert.ok(c.current_landmark.min_height_mm < 15 && c.current_landmark.stance_phases >= 1, `rig node reaches the window (${s})`)
+    assert.equal(c.closest_vertex.min_height_mm, c.current_landmark.min_height_mm, `${s} calcaneus`)
   }
 })
 

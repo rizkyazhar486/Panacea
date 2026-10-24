@@ -22,6 +22,8 @@ const extra = [
   '<div data-one-shape="aria" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><div style="position:relative;z-index:1"><span aria-selected="true" style="display:inline-block;margin:8px;color:black;font:16px sans-serif">shape-aria-nested-lulus</span></div></div>',
   '<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;background:rgb(67,69,72);color:black;font:16px sans-serif">shape-overlay-gagal</a></div>',
   '<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:0;top:0;width:260px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;background:linear-gradient(to right,transparent,transparent);color:black;font:16px sans-serif">shape-gradient-unmeasured</a></div>',
+  '<span style="display:inline-block;background:#fff;color:#fff;font:16px sans-serif">opaque-white-white-fail</span>',
+  '<span style="display:inline-block;background:#fff;color:#000;font:16px sans-serif">opaque-black-white-pass</span>',
 ].join('')
 const html = `<!doctype html><meta charset="utf-8"><body style="margin:0;background:rgb(2,4,7)">${KASUS.map((k, i) => `<div style="background:${k.bg};padding:8px"><span id="k${i}" style="color:${k.fg};font:${k.fs ? k.fs + '/1.4 sans-serif;display:inline-block;width:12px;height:12px;overflow:hidden' : '16px/1.4 sans-serif'}">${k.id}</span></div>`).join('')}${[0, 280].map((offset, i) => `<div data-one-shape="explicit" style="position:relative;width:420px;height:48px;background:rgb(67,69,72)"><span class="pmd-one-shape" style="position:absolute;left:${offset}px;top:0;width:180px;height:46px;background:white;opacity:1"></span><a data-one-shape-active="true" style="position:relative;z-index:1;display:inline-block;margin:8px;color:black;font:16px sans-serif">${i ? 'shape-uncovered-gagal' : 'shape-covered-lulus'}</a></div>`).join('')}${extra}</body>`
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox'] })
@@ -43,10 +45,14 @@ for (const [id, expectedFail] of [['shape-covered-lulus', false], ['shape-uncove
   const failed = hasil.gagal.some(x => x.teks === id)
   if (failed !== expectedFail) masalah.push(`${id}: ${expectedFail ? 'must fail without coverage' : 'must pass with measured white coverage'}`)
 }
+for (const [id, expectedFail] of [['opaque-white-white-fail', true], ['opaque-black-white-pass', false]]) {
+  const failed = hasil.gagal.some(x => x.teks === id)
+  if (failed !== expectedFail) masalah.push(`${id}: own opaque background must be measured as ${expectedFail ? 'AA failure' : 'AA pass'}`)
+}
 // latar yang tak terselesaikan tidak boleh diam-diam menjadi lulus: tidak ada kasus fixture yang boleh jatuh ke penghitung terpisah
 if ((hasil.latarTakTerselesaikan || 0) !== 0 || hasil.tidakDapatDiukur !== 1) masalah.push(`fixture must classify only the deliberate gradient as unmeasurable (latarTakTerselesaikan=${hasil.latarTakTerselesaikan || 0}, tidakDapatDiukur=${hasil.tidakDapatDiukur})`)
 if (hasil.gagal.some(x => x.teks === 'shape-gradient-unmeasured')) masalah.push('unknown gradient must not be labeled a measured contrast failure')
-const diharap = KASUS.filter((k) => !k.takTerukur).length + 4
+const diharap = KASUS.filter((k) => !k.takTerukur).length + 6
 if (hasil.teksDiukur !== diharap) masalah.push(`teksDiukur ${hasil.teksDiukur} != ${diharap}`)
 if (masalah.length) { console.error('kontras-ukur.fixture GAGAL:\n - ' + masalah.join('\n - ')); process.exit(1) }
 console.log(`kontras-ukur.fixture: ${KASUS.length} kasus (lulus dan gagal berpasangan, batas 4.54/4.48, ruang warna oklch/color/hex/rgb) sesuai harapan`)

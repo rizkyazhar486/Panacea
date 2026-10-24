@@ -3,6 +3,7 @@
  * terkoreksi albumin → delta ratio. Logika dan teks keluaran dipindahkan dari halaman tanpa perubahan; yang baru hanya
  * penolakan masukan di luar rentang (kolom kosong dibaca 0 dan sebelumnya menghasilkan "Acidemia"/gap palsu).
  * Alat bantu interpretasi, bukan diagnosis; tidak memeriksa konsistensi pH–PaCO2–HCO3 (itu fitur klinis terpisah).
+ * Rumus Winter: Albert, Dell & Winters, Ann Intern Med 1967;66:312-22 (PMID 6016545); urutan langkah lainnya tidak bersumber.
  */
 import { inRange } from './inputs'
 

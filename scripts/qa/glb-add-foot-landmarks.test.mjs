@@ -11,7 +11,7 @@ import { splitGlb, joinGlb, withLandmarks, computeLandmarks, LANDMARK_PREFIX } f
 const h = (b) => createHash('sha256').update(b).digest('hex')
 const rec = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/rig_landmark_nodes.json', 'utf8'))
 const file = (g) => `public/bodyexposure/${g}.rig_rom.glb`
-const EXPECTED = { adult_male: ['BALL_L', 'BALL_R', 'HEEL_L', 'HEEL_R'], vhf_denver_ct_adult_female: ['HEEL_L', 'HEEL_R'] }
+const EXPECTED = { adult_male: ['BALL_L', 'BALL_R', 'HEEL_L', 'HEEL_R'], vhf_denver_ct_adult_female: ['BALL_L', 'BALL_R', 'HEEL_L', 'HEEL_R'] }
 
 test('public rigs carry exactly the named landmark empties, parented to FOOT.L/R', () => {
   for (const [g, keys] of Object.entries(EXPECTED)) {
@@ -26,8 +26,13 @@ test('public rigs carry exactly the named landmark empties, parented to FOOT.L/R
       assert.match(n.extras.note, /no toe joint/)
     }
   }
-  // betina: tidak ada metatarsal I terpisah di sumber -> bola TIDAK ditebak
-  assert.ok(!splitGlb(fs.readFileSync(file('vhf_denver_ct_adult_female'))).json.nodes.some((n) => n.name?.startsWith(`${LANDMARK_PREFIX}BALL`)))
+  // betina: metatarsal I tidak dipisah di sumber -> bola diturunkan dari kombinasi metatarsal+falang dan dilabeli jelas (T-D7-04)
+  const fNodes = splitGlb(fs.readFileSync(file('vhf_denver_ct_adult_female'))).json.nodes
+  for (const s of ['L', 'R']) {
+    const ball = fNodes.find((n) => n.name === `${LANDMARK_PREFIX}BALL_${s}`)
+    assert.ok(ball, `female BALL_${s} node must exist`)
+    assert.match(ball.extras.derived_from, /METATARSALS_AND_PHALANGES_COMBINED.*forefoot \(combined\), not MT1/)
+  }
 })
 
 test('the only change to each rig is the landmark nodes: stripping them restores the reviewed JSON and identical BIN', () => {

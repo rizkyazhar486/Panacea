@@ -26,6 +26,26 @@ f.setHidden(true); assert.equal(f.antre.size, 0, 'tab tersembunyi: berhenti'); f
 loop.kontekHilang(); assert.equal(f.antre.size, 0, 'konteks WebGL hilang: berhenti'); f.setTerlihat(true); assert.equal(f.antre.size, 0, 'tidak dilanjutkan setelah konteks hilang')
 const g = palsu(); const l2 = mulaiLoopTerjaga({} as Element, () => {}, g.dep); l2.hentikan(); l2.hentikan()
 assert.equal(g.antre.size, 0, 'dibuang: tanpa frame menggantung'); assert.deepEqual(g.lepas(), [1, 1], 'listener dilepas tepat sekali')
+for (const change of ['dispose', 'context', 'hidden', 'offscreen'] as const) {
+  const h = palsu()
+  let active!: ReturnType<typeof mulaiLoopTerjaga>
+  active = mulaiLoopTerjaga({} as Element, () => {
+    if (change === 'dispose') active.hentikan()
+    else if (change === 'context') active.kontekHilang()
+    else if (change === 'hidden') h.setHidden(true)
+    else h.setTerlihat(false)
+  }, h.dep)
+  h.setTerlihat(true); h.tik()
+  assert.equal(h.antre.size, 0, `${change} during a frame must not enqueue another frame`)
+  assert.equal(active.berjalan(), false)
+  active.hentikan()
+}
+const reentrant = palsu()
+const guarded = mulaiLoopTerjaga({} as Element, () => reentrant.setTerlihat(true), reentrant.dep)
+reentrant.setTerlihat(true); reentrant.tik()
+assert.equal(reentrant.antre.size, 1, 'visibility notification during a frame must not double the queue')
+guarded.hentikan()
+assert.equal(reentrant.antre.size, 0, 'no orphan frame remains after stopping a reentrant loop')
 const PENGGUNA = [
   ...['Arteri3D', 'KelenjarSaluran3D', 'LesiNeuro3D', 'WilayahAbdomen3D', 'Kerangka3D', 'VentilasiBronkus3D', 'AlphaGenomeAtlas'].map((n) => `src/pages/bodyhub/${n}.tsx`),
   ...['Molecule3D', 'Medical3DFrontierLab', 'OrganModel3D', 'Pathway3D', 'PersonalBodyAvatar3D', 'VolumeDicom3D'].map((n) => `src/components/digital-twin/${n}.tsx`),

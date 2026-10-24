@@ -1,33 +1,33 @@
+import { PRIVACY_DISCLOSURE } from '../../domains/privacy'
 import { Card, SectionTitle } from '../../components/ui'
 import { IconShield, IconLock, IconCheck } from '../../components/icons'
 
-// Public legal & compliance content — Privacy Policy, Terms, Informed Consent,
-// and the data-residency / security statement (UU PDP 27/2022, Permenkes 24/2022).
+// Describe implemented controls without asserting unverified deployment or legal approval.
 export function Legal() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div data-pmd-unclamped="true" className="mx-auto max-w-3xl space-y-6">
       <Card>
-        <SectionTitle icon={<IconShield size={20} />} title="Privacy & Data Protection Policy" subtitle="In accordance with Law No. 27 of 2022 on Personal Data Protection (UU PDP)" />
+        <SectionTitle icon={<IconShield size={20} />} title="Privacy & Data Protection Policy" subtitle="Current data controls and their scope" />
         <div className="space-y-3 text-sm leading-relaxed text-neutral-600">
-          <p>Panaceamed.id respects your privacy. Health data is classified as <b>specific personal data</b> and receives enhanced protection.</p>
+          <p>This page describes data handling controls and their current limits. Health information requires careful access and sharing decisions.</p>
           <ul className="ml-4 list-disc space-y-1.5">
             <li><b>Data collected:</b> identity, demographic data, health history, vital signs, diagnostic results, and usage activity.</li>
-            <li><b>Purpose:</b> to provide AI-EMR services, education, consultations, and healthspan monitoring — always verified by licensed clinicians.</li>
-            <li><b>Your rights:</b> to access, correct, withdraw consent, and <b>delete</b> your data at any time (Settings → Privacy & Data).</li>
-            <li><b>Not shared</b> with third parties without consent, except as required by law.</li>
-            <li>The <b>Data Protection Officer (DPO)</b> can be reached through the Support channel.</li>
+            <li><b>Purpose:</b> AI-assisted documentation, education and health monitoring. {PRIVACY_DISCLOSURE.draftReview}</li>
+            <li><b>Data requests:</b> {PRIVACY_DISCLOSURE.requests} {PRIVACY_DISCLOSURE.localReset}</li>
+            <li><b>Sharing controls:</b> {PRIVACY_DISCLOSURE.sharing}</li>
+            <li><b>Retention:</b> {PRIVACY_DISCLOSURE.retention}</li>
           </ul>
         </div>
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconLock size={20} />} title="Data Security & Sovereignty" subtitle="Minister of Health Regulation No. 24/2022 on Electronic Medical Records" />
+        <SectionTitle icon={<IconLock size={20} />} title="Deployment Security" subtitle="Hosting and encryption require deployment evidence" />
         <div className="space-y-3 text-sm leading-relaxed text-neutral-600">
           <div className="flex items-start gap-2 rounded-xl bg-brand-50 p-3 text-brand-dark">
             <IconLock size={16} className="mt-0.5 shrink-0" />
-            <span><b>Stored in Indonesia & encrypted.</b> Electronic medical records are stored encrypted (in-transit &amp; at-rest) on infrastructure located in Indonesia, with role-based access controls and an <b>audit log</b> for every access.</span>
+            <span><b>Deployment settings.</b> {PRIVACY_DISCLOSURE.deployment}</span>
           </div>
-          <p>This system is designed for <b>interoperability with SATUSEHAT</b> (the Ministry of Health's national health data platform).</p>
+          <p>{PRIVACY_DISCLOSURE.integration}</p>
         </div>
       </Card>
 
@@ -35,8 +35,8 @@ export function Legal() {
         <SectionTitle icon={<IconCheck size={20} />} title="Terms & Conditions of Service" />
         <ol className="ml-4 list-decimal space-y-1.5 text-sm leading-relaxed text-neutral-600">
           <li>Panaceamed.id is a clinical support tool. <b>AI assists, but does not replace, licensed clinicians.</b> Final medical decisions rest with the physician.</li>
-          <li>The AI-EMR feature is only available to certified healthcare professionals holding a <b>verified STR/SIP license</b>.</li>
-          <li>Pharmacy &amp; prescription services are subject to the oversight of licensed pharmacists and BPOM regulations.</li>
+          <li>{PRIVACY_DISCLOSURE.clinicalAuthority}</li>
+          <li>Medication information does not authorize prescribing or dispensing. Treatment decisions remain with authorized healthcare professionals.</li>
           <li>Users are responsible for the accuracy of the data they enter.</li>
           <li>Misuse, including giving medical advice without authority, is prohibited.</li>
         </ol>
@@ -56,7 +56,7 @@ export function Legal() {
       </Card>
 
       <p className="px-1 text-center text-xs text-neutral-500">
-        This document is informational and will be refined together with healthcare legal counsel. Last updated: {new Date().toLocaleDateString('en-US')}.
+        These control descriptions are informational, not a certification of legal compliance. Deployment and retention details require operator confirmation. Last updated: {PRIVACY_DISCLOSURE.reviewedAt}.
       </p>
     </div>
   )

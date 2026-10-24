@@ -168,7 +168,7 @@
    }
   },
   "vhf_denver_ct_adult_female": {
-   "sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+   "sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
    "clips": {
     "RUN": {
      "frames": 18,
@@ -188,7 +188,7 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 55.3,
+          "min_height_mm": 17.5,
           "frames_within_window": 0,
           "stance_phases": 0
          }
@@ -200,7 +200,10 @@
           "stance_phases": 1
          },
          "current_landmark": {
-          "available": false
+          "node": "FOOT_LANDMARK_BALL_L",
+          "min_height_mm": 15.2,
+          "frames_within_window": 0,
+          "stance_phases": 0
          }
         }
        }
@@ -220,7 +223,7 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 39.8,
+          "min_height_mm": 23.6,
           "frames_within_window": 0,
           "stance_phases": 0
          }
@@ -232,7 +235,10 @@
           "stance_phases": 1
          },
          "current_landmark": {
-          "available": false
+          "node": "FOOT_LANDMARK_BALL_R",
+          "min_height_mm": 0.7,
+          "frames_within_window": 3,
+          "stance_phases": 1
          }
         }
        }
@@ -258,9 +264,9 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 35.5,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 0.3,
+          "frames_within_window": 10,
+          "stance_phases": 1
          }
         },
         "forefoot": {
@@ -270,7 +276,10 @@
           "stance_phases": 1
          },
          "current_landmark": {
-          "available": false
+          "node": "FOOT_LANDMARK_BALL_L",
+          "min_height_mm": 0.2,
+          "frames_within_window": 5,
+          "stance_phases": 1
          }
         }
        }
@@ -291,9 +300,9 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 22.8,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 0.4,
+          "frames_within_window": 8,
+          "stance_phases": 2
          }
         },
         "forefoot": {
@@ -303,7 +312,10 @@
           "stance_phases": 1
          },
          "current_landmark": {
-          "available": false
+          "node": "FOOT_LANDMARK_BALL_R",
+          "min_height_mm": 0,
+          "frames_within_window": 13,
+          "stance_phases": 1
          }
         }
        }
