@@ -19,7 +19,8 @@ test('both staff viewports complete browser back and logout', () => {
   assert.doesNotMatch(staff, /if \(vp === VIEWPORTS\[VIEWPORTS\.length - 1\]\) await step\(vp\.name, J, 'logout staf/)
 })
 
-test('F1 workflow watches the actual clinician lab-review page on push and pull requests', () => {
-  assert.equal((workflow.match(/src\/pages\/clinical\/LabResultReview\.tsx/g) ?? []).length, 2)
+test('F1 push lab coverage and unfiltered main PR', () => {
+  assert.equal((workflow.match(/src\/pages\/clinical\/LabResultReview\.tsx/g) ?? []).length, 1)
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/)
   assert.doesNotMatch(workflow, /src\/pages\/LabResultReview\.tsx/)
 })
