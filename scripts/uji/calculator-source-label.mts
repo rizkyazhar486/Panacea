@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import {
-  checkSourceRecords, engineHeader, SOURCE_KINDS, type SourceRecord,
+  checkSourceRecords, engineHeader, incompleteSources, SOURCE_KINDS, type SourceRecord,
 } from '../../src/domains/clinical-calculators/engine/sourceRecord.ts'
 import { describeSource } from '../../src/domains/clinical-calculators/engine/sourceLine.ts'
 import { reviewedCount, type ReviewRegistry } from '../../src/domains/clinical-calculators/engine/reviewRegistry.ts'
@@ -24,10 +24,15 @@ const headers = Object.fromEntries(reg.entries.map((e) => [e.id, engineHeader(re
   assert.ok(r.counts.published > 0, 'published sources are recorded for the engines whose header cites one')
   const withPmid = reg.entries.filter((e) => e.source?.pmid)
   // 10 (#2752) + 7 (batch 1 C6-03: childPugh, framinghamInputs, graceScore, maddreyScore, paradise, serumOsmolality, sofaScore)
-  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis)
-  assert.equal(withPmid.length, 21, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
+  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc)
+  assert.equal(withPmid.length, 23, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
   assert.ok(reg.entries.every((e) => !e.source?.pmid || e.source.kind === 'published'), 'identifier hanya pada sumber terbit')
   assert.ok(withPmid.every((e) => e.source!.lookup?.retrievedOn === '2026-10-24'))
+  // Ratchet ENG-C6-03: daftar engine yang BELUM patuh hanya boleh menyusut. Kosong = kriteria dapat dicatat PASS.
+  assert.deepEqual(incompleteSources(reg.entries), [
+    'aaGradient', 'bloodDonationScreen', 'bloodGas', 'denverAge', 'fletcher', 'fluidElectrolytes', 'hollidaySegar', 'idealBodyWeight',
+    'mcdonaldRule', 'midParentalHeight', 'naegele', 'parkland', 'pediatricDka', 'waistToHeight', 'widmarkBac',
+  ], 'engine belum patuh berubah: perbarui daftar ini HANYA dengan menghapus id yang kini bersumber atau dinyatakan heuristik')
   console.log(`calculator-source-label: sources ${JSON.stringify(r.counts)}, pmid ${withPmid.length}`)
 }
 
@@ -74,6 +79,25 @@ assert.deepEqual(errs(withId({ firstAuthor: 'Lain' })), ['a: lookup-author-not-i
 assert.deepEqual(errs(withId({ year: 2001 })), ['a: lookup-year-not-in-citation'])
 assert.deepEqual(errs(withId({ year: 1999.5 })), ['a: lookup-year-not-in-citation'])
 assert.deepEqual(errs(pubRec), [], 'tanpa identifier, lookup tidak diwajibkan')
+
+// terbitan tak terindeks (unindexed): hanya pada published tanpa PMID, dengan alasan, tanggal periksa, URL https atau null
+const un = { reason: 'Laporan lembaga, tidak di PubMed', url: 'https://contoh.org/laporan', checkedOn: '2026-10-24' }
+assert.deepEqual(errs({ ...pubRec, unindexed: un }), [])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, url: null } }), [])
+assert.deepEqual(errs({ ...none('named-method'), unindexed: un }), ['a: unindexed-on-unsourced'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, reason: ' ' } }), ['a: unindexed-reason-missing'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, url: 'http://contoh.org' } }), ['a: unindexed-url-invalid'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, checkedOn: 'kemarin' } }), ['a: unindexed-date-invalid'])
+assert.ok(errs({ ...pubRec, pmid: '1', lookup: { source: 'PubMed', pmid: '1', doi: null, retrievedOn: '2026-10-24', title: 't', firstAuthor: 'Contoh', journal: 'j', year: 1999, pages: '1' }, unindexed: un }).includes('a: unindexed-with-pmid'))
+
+// kelengkapan (aturan owner 2026-10-24): published ber-PMID / unindexed, atau arithmetic / repo-heuristic yang dinyatakan
+const one = (s: SourceRecord) => incompleteSources([{ id: 'a', source: s }])
+assert.deepEqual(one({ ...pubRec, unindexed: un }), [])
+assert.deepEqual(one(pubRec), ['a'], 'published tanpa PMID dan tanpa unindexed belum patuh')
+assert.deepEqual(one(none('arithmetic')), [])
+assert.deepEqual(one(none('repo-heuristic')), [])
+assert.deepEqual(one(none('named-method')), ['a'])
+assert.deepEqual(one(none('unattributed')), ['a'])
 assert.equal(SOURCE_KINDS.length, 5)
 assert.equal(engineHeader('/** kepala */\nconst x = 1 /* bukan kepala */'), ' kepala ')
 assert.equal(engineHeader('const x = 1'), '')
