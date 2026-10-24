@@ -6,6 +6,7 @@ import { Card, SectionTitle, inputClass, Badge } from '../../components/ui'
 import { IconMoon } from '../../components/icons'
 import { CopyNote } from '../../components/CopyNote'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { getHealthCache, hasHealth } from '../../lib/profile'
 import { parseNumberField, sanitizeNights, sleepDebt, validateHours, type Night } from '../../domains/clinical-calculators'
 
@@ -61,6 +62,7 @@ export function SleepDebt() {
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Sleep Debt Calculator" subtitle="Selisih berjalan antara tidur yang Anda butuhkan dan yang benar-benar Anda dapatkan" />
         <BatasKlaimKesehatan permukaan="wellness.sleep-debt" />
+        <SumberKalkulator ids={['sleepDebt']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Catat tidur tiap malam. Utang menumpuk ketika Anda tidur kurang dari kebutuhan — dan tidak seperti uang, ia tidak dapat "dilunasi" penuh dengan sekali tidur panjang, sehingga trennya lebih penting daripada malam mana pun. Orang dewasa umumnya membutuhkan ≥7 jam (AASM). This rolling sum is a self-tracking aid, not a sleep diagnosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <label className="text-[12px] font-semibold text-neutral-500">

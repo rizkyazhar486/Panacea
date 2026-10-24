@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../../../component
 import { IconActivity } from '../../../components/icons'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { fena as hitungFena, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,6 +48,7 @@ export function FenaCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Fractional Excretion of Sodium (FeNa)" subtitle="Prerenal azotemia vs. acute tubular necrosis (Espinel, 1976)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['fena']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Pada cedera ginjal akut, FeNa yang rendah menunjukkan ginjal masih menahan natrium sebagaimana mestinya (sebab prarenal, mis. hipovolemia); FeNa yang tinggi menunjukkan kerusakan tubulus intrinsik. Memerlukan sampel urin dan plasma yang diambil bersamaan.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Urine sodium (mEq/L)">

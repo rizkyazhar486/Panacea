@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../../components/ui'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { IconDrop } from '../../components/icons'
 import { getDemoTersimpan } from '../../lib/profile'
 import { DRINKS, parseNumberField, widmarkBac } from '../../domains/clinical-calculators'
@@ -36,6 +37,7 @@ export function AlcoholCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconDrop size={20} />} title="Alcohol Unit & BAC Estimator" subtitle="Standard drinks and an educational Widmark BAC estimate — not a breathalyzer" />
         <BatasKlaimKesehatan permukaan="wellness.alcohol-bac" />
+        <SumberKalkulator ids={['widmarkBac']} />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This uses the classic Widmark formula, the standard teaching model in forensic toxicology — but
           it is an <b>estimate from population averages</b>, not a breathalyzer reading. Food intake,
